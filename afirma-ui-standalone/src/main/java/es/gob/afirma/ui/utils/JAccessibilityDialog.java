@@ -62,31 +62,33 @@ public abstract class JAccessibilityDialog extends JDialog {
 		super(frame);
 		// Icono de @firma
         setIconImage(this.loadIcon("afirma_ico.png").getImage());
-		resizingAdaptor = new ResizingAdaptor(null,this,null,null,null,null,null,null);
-		this.addComponentListener(resizingAdaptor);
+		this.resizingAdaptor = new ResizingAdaptor(null,this,null,null,null,null,null,null);
+		this.addComponentListener(this.resizingAdaptor);
 		this.addComponentListener(new ComponentAdapter() {
 			/**
 			 * Evento que se lanza cuando se redimensiona el componente.
 			 */
-		    public void componentResized(ComponentEvent e)
+		    @Override
+			public void componentResized(ComponentEvent e)
 		    {
-		    	resized(e);
+		    	resized();
 		    }
 		    /**
 			 * Evento que se lanza cuando se mueve el componente.
 			 */
-		    public void componentMoved(ComponentEvent e)
+		    @Override
+			public void componentMoved(ComponentEvent e)
 		    {
-		    	resized(e);
+		    	resized();
 		    }
 		});
 
 	}
 	
 	/**
-	 * Relacion mínima que se aplica para la redimension de los componentes.
-	 * Cuanto menor es este número menor es la redimension aplicada.
-	 * @return int Relacion mínima
+	 * Relacion minima que se aplica para la redimension de los componentes.
+	 * Cuanto menor es este numero menor es la redimension aplicada.
+	 * @return int Relacion minima
 	 */
 	public abstract int getMinimumRelation();
 
@@ -94,7 +96,7 @@ public abstract class JAccessibilityDialog extends JDialog {
 	 * Evento de redimensionado. Comprueba el tamaÃ±o de la ventana para habilitar o deshabilitar el boton
 	 *  de Maximizar ventana. Tambien almacena el tamano y posicion de la ventana para su restauracion.
 	 */
-	private void resized(ComponentEvent e) {
+	void resized() {
 
 		//Se obtienen las dimensiones totales disponibles para mostrar una ventana
 		Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();

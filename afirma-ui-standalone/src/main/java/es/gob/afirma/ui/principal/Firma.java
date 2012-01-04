@@ -171,7 +171,7 @@ final class Firma extends JPanel {
                 keyStoreManager = AOKeyStoreManagerFactory.getAOKeyStoreManager(store, lib, kssc.toString(), pssCallback, this);
             }
             catch (final InvalidKeyException e) {
-                // Control de la excepcion generada al introducir mal la contrasena para el almacén
+                // Control de la excepcion generada al introducir mal la contrasena para el almacen
                 CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
                                                true,
                                                Messages.getString("Firma.msg.error.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$

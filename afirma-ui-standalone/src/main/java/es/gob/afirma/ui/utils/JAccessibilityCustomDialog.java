@@ -67,14 +67,16 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 			/**
 			 * Evento que se lanza cuando el componente se redimensiona.
 			 */
-		    public void componentResized(ComponentEvent e)
+		    @Override
+			public void componentResized(ComponentEvent e)
 		    {
 		    	resized(e);
 		    }
 		    /**
 			 * Evento que se lanza cuando el componente se mueve.
 			 */
-		    public void componentMoved(ComponentEvent e)
+		    @Override
+			public void componentMoved(ComponentEvent e)
 		    {
 		    	resized(e);
 		    }
@@ -94,14 +96,16 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 			/**
 			 * Evento que se lanza cuando el componente se redimensiona.
 			 */
-		    public void componentResized(ComponentEvent e)
+		    @Override
+			public void componentResized(ComponentEvent e)
 		    {
 		    	resized(e);
 		    }
 		    /**
 			 * Evento que se lanza cuando el componente se mueve.
 			 */
-		    public void componentMoved(ComponentEvent e)
+		    @Override
+			public void componentMoved(ComponentEvent e)
 		    {
 		    	resized(e);
 		    }
@@ -121,14 +125,16 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 			/**
 			 * Evento que se lanza cuando el componente se redimensiona.
 			 */
-		    public void componentResized(ComponentEvent e)
+		    @Override
+			public void componentResized(ComponentEvent e)
 		    {
 		    	resized(e);
 		    }
 		    /**
 			 * Evento que se lanza cuando el componente se mueve.
 			 */
-		    public void componentMoved(ComponentEvent e)
+		    @Override
+			public void componentMoved(ComponentEvent e)
 		    {
 		    	resized(e);
 		    }
@@ -139,8 +145,8 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 	
 	/**
 	 * Relacion minima que se aplica para la redimension de los componentes.
-	 * Cuanto menor es este número menor es la redimension aplicada.
-	 * @return int Relacion mínima
+	 * Cuanto menor es este numero menor es la redimension aplicada.
+	 * @return int Relacion minima
 	 */
 	public abstract int getMinimumRelation();
 
@@ -149,8 +155,8 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 	 * Evento de redimensionado. Comprueba el tamanio de la ventana para habilitar o deshabilitar el boton
 	 *  de Maximizar ventana. Tambien almacena el tamano y posicion de la ventana para su restauracion.
 	 */
-	private void resized(ComponentEvent e) {
-		//Variable que controlará sin las dimensiones van a exceder el límite
+	void resized(ComponentEvent e) {
+		//Variable que controlará sin las dimensiones van a exceder el limite
 		boolean limitControl = false;
 		
 		//Se obtienen las dimensiones de maximizado
@@ -162,7 +168,7 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 	    	CustomDialog customDialog = (CustomDialog) e.getSource();
 	    	Rectangle rect = customDialog.getBounds();
 	    	
-	    	//Se comprueba que no sobrepasen el límite
+	    	//Se comprueba que no sobrepasen el limite
 	    	if (rect.width > maxWidth) {
 	    		rect.width = maxWidth;
 	    		limitControl = true;
@@ -171,7 +177,7 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 	    		rect.height = maxHeight;
 	    		limitControl = true;
 	    	}
-	    	//Si sobrepasaban el limite, se hace un resize a las dimensiones límite indicadas
+	    	//Si sobrepasaban el limite, se hace un resize a las dimensiones limite indicadas
 	    	if (limitControl) {
 	    		//this.setBounds(rect.x, rect.y, rect.width, rect.height);
 	    		this.setSize(rect.width, rect.height);
@@ -301,7 +307,7 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 	 * @return boolean
 	 */
 	public boolean isBigSizeDefault() {
-		return bigSizeDefault;
+		return this.bigSizeDefault;
 	}
 
 	/**

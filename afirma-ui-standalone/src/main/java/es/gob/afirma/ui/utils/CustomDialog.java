@@ -34,6 +34,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JWindow;
 import javax.swing.KeyStroke;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.text.AttributeSet;
@@ -77,7 +79,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	/**
 	 * Campo de texto o campo de contrasena
 	 */
-	private JComponent component = null;
+	JComponent component = null;
 	
 	
 	/**
@@ -98,17 +100,17 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	/**
 	 * Boton de Cancel.
 	 */
-	private static JButton cancelButton = null;
+	static JButton cancelButton = null;
 	
 	/**
 	 * Boton de restaurar.
 	 */
-	private JButton restoreButton = null;
+	JButton restoreButton = null;
 	
 	/**
 	 * Boton de maximizar.
 	 */
-	private JButton maximizeButton = null;
+	JButton maximizeButton = null;
 
 	/**
 	 * Respuesta al mensaje
@@ -118,7 +120,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	/**
 	 * Texto para el boton 
 	 */
-	private static String cancellText = Messages.getString("PrincipalGUI.cancelar");
+	private static String cancellText = Messages.getString("PrincipalGUI.cancelar"); //$NON-NLS-1$
 
 	
 	/**
@@ -176,7 +178,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	 * Posici&oacute;n X inicial de la ventana dependiendo de la resoluci&oacute;n de pantalla.
 	 * @return int Posici&oacute;n X
 	 */
-    private int getInitialX(int width) {
+    private static int getInitialX(int width) {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); 
 		return ((screenSize.width/2) - (width / 2)) ;
 	}
@@ -186,7 +188,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	 * resoluci&oacute;n de pantalla.
 	 * @return int Posici&oacute;n Y
 	 */
-	private int getInitialY(int height) {
+	private static int getInitialY(int height) {
         Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
         return ((screenSize.height/2) - (height / 2)) ;
 	}
@@ -204,7 +206,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		int maxWidth = Constants.CUSTOMDIALOG_MAX_WIDTH;
 		int maxHeight = Constants.CUSTOMDIALOG_MAX_HEIGHT;
 		
-		//Se establece el tamano mínimo
+		//Se establece el tamano minimo
 		setMinimumSize(new Dimension(Constants.CUSTOMDIALOG_INITIAL_WIDTH, Constants.CUSTOMDIALOG_INITIAL_HEIGHT));
 		//Se establece el tamano máximo
 		setMaximumSize(new Dimension(maxWidth,maxHeight));
@@ -215,7 +217,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
     		//Se maximiza
     		this.setBounds(0,0, maxWidth, maxHeight);
     	} else {
-    		//Se establece el tamano mínimo en base a las opciones activas
+    		//Se establece el tamano minimo en base a las opciones activas
     		if (GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
     			setMinimumSize(new Dimension(Constants.CUSTOMDIALOG_FONT_INITIAL_WIDTH, Constants.CUSTOMDIALOG_FONT_INITIAL_HEIGHT));
     		}	
@@ -246,7 +248,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
        GridBagConstraints  consIconPanel = new GridBagConstraints();
        consIconPanel.fill = GridBagConstraints.BOTH;
        
-       iconPanel.add(iconLabel, consIconPanel);
+       iconPanel.add(this.iconLabel, consIconPanel);
 
        c.insets = new Insets(0,0,0,10);  //right padding
        c.gridx = 1;
@@ -257,15 +259,15 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         if (isInputDialog) {
         	//Se crea una etiqueta sencilla
         	this.infoLabel = new InfoLabel(message);
-        	this.infoLabel.setHorizontalAlignment(JLabel.LEFT); //Se alinea a la izqda
-        	this.infoLabel.setVerticalAlignment(JLabel.TOP); //Se alinea arriba el texto
+        	this.infoLabel.setHorizontalAlignment(SwingConstants.LEFT); //Se alinea a la izqda
+        	this.infoLabel.setVerticalAlignment(SwingConstants.TOP); //Se alinea arriba el texto
         } else {
         	//Se crea una etiqueta focusable
 			this.infoLabel = new InfoLabel(message, false);
-			this.infoLabel.setHorizontalAlignment(JLabel.CENTER); //Se centra el texto
+			this.infoLabel.setHorizontalAlignment(SwingConstants.CENTER); //Se centra el texto
 			//Foco a la etiqueta
 			this.infoLabel.addAncestorListener(new RequestFocusListener());
-			this.infoLabel.setVerticalAlignment(JLabel.TOP); //Se alinea arriba el texto
+			this.infoLabel.setVerticalAlignment(SwingConstants.TOP); //Se alinea arriba el texto
         }
         
         //this.infoLabel.setOpaque(true);
@@ -329,18 +331,18 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	 * @param typeMessage tipo de alerta.
 	 */
 	private void setIconLabel(int typeMessage) {
-		//Según el tipo de mensaje se selecciona el icono
+		//Segun el tipo de mensaje se selecciona el icono
   		Icon icon = null;
   		//Se comprueba el tipo de mensaje para poner o no, un icono
   		if (typeMessage != JOptionPane.PLAIN_MESSAGE) {
 	  		if (typeMessage == JOptionPane.ERROR_MESSAGE) {
-	  			icon = UIManager.getIcon("OptionPane.errorIcon");
+	  			icon = UIManager.getIcon("OptionPane.errorIcon"); //$NON-NLS-1$
 	  		} else if (typeMessage == JOptionPane.WARNING_MESSAGE) {
-	  			icon = UIManager.getIcon("OptionPane.warningIcon");
+	  			icon = UIManager.getIcon("OptionPane.warningIcon"); //$NON-NLS-1$
 	  		} else if (typeMessage == JOptionPane.QUESTION_MESSAGE) {
-	  			icon = UIManager.getIcon("OptionPane.questionIcon");
+	  			icon = UIManager.getIcon("OptionPane.questionIcon"); //$NON-NLS-1$
 	  		} else {
-				icon = UIManager.getIcon("OptionPane.informationIcon");
+				icon = UIManager.getIcon("OptionPane.informationIcon"); //$NON-NLS-1$
 	  		}
 	  		this.iconLabel.setIcon(icon);
 	  		this.iconLabel.setOriginalIcon(icon);
@@ -376,7 +378,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		ImageIcon imageIconRestore= new ImageIcon(CustomDialog.class.getResource("/resources/images/restore.png"));
 		this.restoreButton = new JButton(imageIconRestore);
 		this.restoreButton.setMnemonic(KeyEvent.VK_R );
-		this.restoreButton.setToolTipText(Messages.getString("Wizard.restaurar.description"));
+		this.restoreButton.setToolTipText(Messages.getString("Wizard.restaurar.description")); //$NON-NLS-1$
 		this.restoreButton.getAccessibleContext().setAccessibleName(this.restoreButton.getToolTipText());
 		
 		this.restoreButton.addFocusListener(new FocusListener() {
@@ -386,14 +388,14 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 			 */
 			@Override
 			public void focusLost(FocusEvent e) {
-				Utils.showToolTip(false, tip, restoreButton, tipText);
+				Utils.showToolTip(false, tip, CustomDialog.this.restoreButton, tipText);
 			}
 			/**
 			 * Evento que se produce cuando el componente tiene el foco.
 			 */
 			@Override
 			public void focusGained(FocusEvent e) {
-				Utils.showToolTip(true, tip, restoreButton, tipText);
+				Utils.showToolTip(true, tip, CustomDialog.this.restoreButton, tipText);
 			}
 		});
 		Dimension dimension = new Dimension(20,20);
@@ -427,7 +429,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		ImageIcon imageIconMaximize= new ImageIcon(CustomDialog.class.getResource("/resources/images/maximize.png"));
 		this.maximizeButton = new JButton(imageIconMaximize);
 		this.maximizeButton.setMnemonic(KeyEvent.VK_M );
-		this.maximizeButton.setToolTipText(Messages.getString("Wizard.maximizar.description"));
+		this.maximizeButton.setToolTipText(Messages.getString("Wizard.maximizar.description")); //$NON-NLS-1$
 		this.maximizeButton.getAccessibleContext().setAccessibleName(this.maximizeButton.getToolTipText());
 
 		//this.maximizeButton.setBorder(null); //Eliminar Borde, ayuda a centrar el iconod el boton
@@ -447,14 +449,14 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 			 */
 			@Override
 			public void focusLost(FocusEvent e) {
-				Utils.showToolTip(false, tip, maximizeButton, tipText);
+				Utils.showToolTip(false, tip, CustomDialog.this.maximizeButton, tipText);
 			}
 			/**
 			 * Evento que se produce cuando el componente tiene el foco.
 			 */
 			@Override
 			public void focusGained(FocusEvent e) {
-				Utils.showToolTip(true, tip, maximizeButton, tipText);
+				Utils.showToolTip(true, tip, CustomDialog.this.maximizeButton, tipText);
 			}
 		});
 		
@@ -517,7 +519,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		
 		//OK button
 		JPanel okPanel = new JPanel();
-		this.okButton = getButton(Messages.getString("PrincipalGUI.aceptar"), KeyEvent.VK_A);
+		this.okButton = getButton(Messages.getString("PrincipalGUI.aceptar"), KeyEvent.VK_A); //$NON-NLS-1$
 		
 		okPanel.add(this.okButton);
 		this.buttonsPanel.add(okPanel, consButtons);
@@ -540,7 +542,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		//Instancia de CustomDialog
 		CustomDialog customDialog = CustomDialog.getInstanceCustomDialog(componentParent, modal, message, title, typeMessage, false);
 	
-		customDialog.infoLabel.setHorizontalAlignment(JLabel.CENTER); //Se centra el texto
+		customDialog.infoLabel.setHorizontalAlignment(SwingConstants.CENTER); //Se centra el texto
 		//customDialog.component.setVisible(false); //Se oculta el campo de texto
 		customDialog.setVisible(true);
 	}
@@ -568,21 +570,21 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 
 		//Se comprueba el tipo de diálogo
 		if (typeOption == JOptionPane.YES_NO_OPTION) {
-			//Boton Sí
+			//Boton Si
 			customDialog.okButton.setText(Messages.getString("CustomDialog.confirmDialog.yes"));
 			customDialog.okButton.setMnemonic(KeyEvent.VK_S);
 			//Boton no
-			customDialog.noButton = customDialog.getButton(Messages.getString("CustomDialog.confirmDialog.no"), KeyEvent.VK_N);
+			customDialog.noButton = customDialog.getButton(Messages.getString("CustomDialog.confirmDialog.no"), KeyEvent.VK_N); //$NON-NLS-1$
 			JPanel noPanel = new JPanel();
 			noPanel.add(customDialog.noButton);
 			customDialog.buttonsPanel.add(noPanel, cons);
 			customDialog.noButton.addActionListener(customDialog);
 		} else if (typeOption == JOptionPane.YES_NO_CANCEL_OPTION) {
-			//Boton Sí
-			customDialog.okButton.setText(Messages.getString("CustomDialog.confirmDialog.yes"));
+			//Boton Si
+			customDialog.okButton.setText(Messages.getString("CustomDialog.confirmDialog.yes")); //$NON-NLS-1$
 			customDialog.okButton.setMnemonic(KeyEvent.VK_S);
 			//Boton No
-			customDialog.noButton = customDialog.getButton(Messages.getString("CustomDialog.confirmDialog.no"), KeyEvent.VK_N);
+			customDialog.noButton = customDialog.getButton(Messages.getString("CustomDialog.confirmDialog.no"), KeyEvent.VK_N); //$NON-NLS-1$
 			JPanel noPanel = new JPanel();
 			noPanel.add(customDialog.noButton);
 			customDialog.buttonsPanel.add(noPanel, cons);
@@ -604,7 +606,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 			cancelButton.addActionListener(customDialog);
 		}
 		
-		customDialog.infoLabel.setHorizontalAlignment(JLabel.CENTER); //Se centra el texto
+		customDialog.infoLabel.setHorizontalAlignment(SwingConstants.CENTER); //Se centra el texto
 				
 		customDialog.setVisible(true);
 		return customDialog.getAnswer();
@@ -666,7 +668,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		customDialog.buttonsPanel.add(cancelPanel, cons);
 		cancelButton.addActionListener(customDialog);
         
-		customDialog.infoLabel.setHorizontalAlignment(JLabel.LEFT); //Se centra el texto
+		customDialog.infoLabel.setHorizontalAlignment(SwingConstants.LEFT); //Se centra el texto
 		customDialog.component.setVisible(true); //Se hace visible el campo de texto
 		
 		cancelButton.addActionListener(customDialog);
@@ -744,7 +746,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		customDialog.buttonsPanel.add(cancelPanel, cons);
 		cancelButton.addActionListener(customDialog);
         
-		customDialog.infoLabel.setHorizontalAlignment(JLabel.LEFT); //Se centra el texto
+		customDialog.infoLabel.setHorizontalAlignment(SwingConstants.LEFT); //Se centra el texto
 		customDialog.component.setVisible(true); //Se hace visible el campo de texto
 		
 		cancelButton.addActionListener(customDialog);
@@ -767,7 +769,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	 * @param message mensaje a mostrar
 	 * @param mnemonic atajo
 	 * @param list lista de elementos
-	 * @param nameListElements nombre genérico para los elementos de la lista
+	 * @param nameListElements nombre generico para los elementos de la lista
 	 * @param title titulo del dialogo
 	 * @param typeMessage  tipo de mensaje
 	 * @return nombre del perfil
@@ -776,7 +778,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 
 		CustomDialog customDialog = CustomDialog.getInstanceCustomDialog(componentParent, modal, message, title, typeMessage, true);
 		customDialog.setBigSizeDefault(true); //Se indica que este tipo de diálogo requiere un tamano grande por defecto
-		//Se establece un tamano mínimo por defecto
+		//Se establece un tamano minimo por defecto
 		customDialog.setMinimumSize(new Dimension(Constants.CUSTOMDIALOG_FONT_INITIAL_WIDTH, Constants.CUSTOMDIALOG_FONT_INITIAL_HEIGHT));
 		
 		//Nombre accesible para el cuadro de texto
@@ -796,8 +798,8 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         c.insets = new Insets(0,10,5,10);  //right padding
 
         //Se crea un panel de scrolls
-        JScrollPane scrPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-		JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        JScrollPane scrPane = new JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+		ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		scrPane.setFocusable(true);
 		
 		//Panel para insertar las etiquetas
@@ -810,19 +812,19 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		
 		//Se crean etiquetas con cada elemento que contiene la lista
 		//y se anaden al scroll
-        if ((list!= null) && (list.size()>0)) {
+        if (list.size()>0) {
         	int index = 1;
         	 for (final String str : list) {
         		 //Etiqueta con un espacio en blanco al principio.
-        		 InfoLabel infoLabel = new InfoLabel("&nbsp;"+str, true);
+        		 InfoLabel infoLabel = new InfoLabel("&nbsp;" + str, true);
         		 infoLabel.setFocusable(false);
         		 panel.add(infoLabel);
-        		 fullList+=index+": "+str+", ";
+        		 fullList+=index + ": " + str + ", ";
         		 index++;
              }
         }
        //Se le da un nombre accesible al elemento para que lo lea el lector de pantallas
-        scrPane.getAccessibleContext().setAccessibleName(nameListElements+": "+fullList);
+        scrPane.getAccessibleContext().setAccessibleName(nameListElements + ": " + fullList);
         //Se crea el nombre accesible para el cuadro de texto
         fullAccesibleName += fullList; 
 		
@@ -938,8 +940,8 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		
 		//Check de mostrar contrasena o no
 		JPanel panelCheckShowPass = new JPanel(new GridLayout(1, 1));
-		final JCheckBox showPassCheckBox= new JCheckBox(Messages.getString("CustomDialog.showInputPasswordDialog.showPassCheckBox.text"));
-		showPassCheckBox.setToolTipText(Messages.getString("CustomDialog.showInputPasswordDialog.showPassCheckBox.tooltip"));
+		final JCheckBox showPassCheckBox= new JCheckBox(Messages.getString("CustomDialog.showInputPasswordDialog.showPassCheckBox.text")); //$NON-NLS-1$
+		showPassCheckBox.setToolTipText(Messages.getString("CustomDialog.showInputPasswordDialog.showPassCheckBox.tooltip")); //$NON-NLS-1$
 		showPassCheckBox.getAccessibleContext().setAccessibleDescription(showPassCheckBox.getToolTipText());
 		//se asigna un mnemonico que debe ser diferente al del campo de contrasena
 		if (mnemonic != KeyEvent.VK_T) {
@@ -994,7 +996,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		customDialog.buttonsPanel.add(cancelPanel, cons);
 		cancelButton.addActionListener(customDialog);
 
-		customDialog.infoLabel.setHorizontalAlignment(JLabel.LEFT); //Se centra el texto
+		customDialog.infoLabel.setHorizontalAlignment(SwingConstants.LEFT); //Se centra el texto
 		customDialog.component.setVisible(true); //Se hace visible el campo de texto
 		
 		cancelButton.addActionListener(customDialog);
@@ -1005,12 +1007,12 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		if (customDialog.getAnswer()== JOptionPane.YES_OPTION) {
 			return ((JPasswordField)customDialog.component).getPassword();
 		}
-		throw new AOCancelledOperationException("La insercion de contrasena ha sido cancelada por el usuario");
+		throw new AOCancelledOperationException("La insercion de contrasena ha sido cancelada por el usuario"); //$NON-NLS-1$
 
 	}
 
 	/**
-	 * Método que crea un boton.
+	 * Metodo que crea un boton.
 	 * Si el boton corresponde al de cancelar, se le asigna la tecla esc.
 	 * @param text texto del boton
 	 * @param mnemonic atajo
@@ -1055,13 +1057,13 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	 * @return the answer
 	 */
 	private final int getAnswer() {
-		return answer;
+		return this.answer;
 	}
 	
 	/**
 	 * Cambia el tama&ntilde;o de la ventana al tama&ntilde;o m&aacute;ximo de pantalla menos el tama&ntilde;o de la barra de tareas de windows
 	 */
-	private void maximizarActionPerformed(){
+	void maximizarActionPerformed(){
 		setActualPositionX(this.getX());
 		setActualPositionY(this.getY());
 		setActualWidth(this.getWidth());
@@ -1082,7 +1084,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	/**
 	 * Restaura el tama&ntilde;o de la ventana a la posicion anterior al maximizado
 	 */
-	private void restaurarActionPerformed(){
+	void restaurarActionPerformed(){
 		//Dimensiones de restaurado
 		int minWidth = Constants.CUSTOMDIALOG_INITIAL_WIDTH;
 		int minHeight = Constants.CUSTOMDIALOG_INITIAL_HEIGHT;
@@ -1091,7 +1093,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 			minWidth = Constants.CUSTOMDIALOG_FONT_INITIAL_WIDTH;
 			minHeight = Constants.CUSTOMDIALOG_FONT_INITIAL_HEIGHT;
 		}
-		//Se establece el tamano mínimo
+		//Se establece el tamano minimo
 		setMinimumSize(new Dimension(minWidth, minHeight));
 		
 		//Se situa el diálogo
@@ -1107,7 +1109,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	}
 
 	/**
-	 * Método que devuelve una instancia de CustomDialog.
+	 * Metodo que devuelve una instancia de CustomDialog.
 	 * @param componentParent Componente padre
 	 * @param modal modal
 	 * @param message mensaje
@@ -1135,12 +1137,12 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		
-		if (e.getSource().equals(okButton)) {
-			answer = JOptionPane.YES_OPTION;
-		} else if (e.getSource().equals(noButton)) {
-			answer = JOptionPane.NO_OPTION;
+		if (e.getSource().equals(this.okButton)) {
+			this.answer = JOptionPane.YES_OPTION;
+		} else if (e.getSource().equals(this.noButton)) {
+			this.answer = JOptionPane.NO_OPTION;
 		} else {
-			answer = JOptionPane.CANCEL_OPTION;
+			this.answer = JOptionPane.CANCEL_OPTION;
 		}
 		setVisible(false);
 	}

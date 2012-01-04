@@ -51,7 +51,7 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	private JDialog dialog;
 
 	/**
-	 * Relacion mínima.
+	 * Relacion minima.
 	 */
 	public int getMinimumRelation(){
 		return 9;
@@ -294,7 +294,7 @@ public class JAccessibilityFileChooser extends JFileChooser{
                 title);
 
        // this.dialog = new JDialog((Frame) this.getParent(), title, true);
-        //Se comprueba el tipo de componente padre, para asignar el correcto y que así se muestre el icono asociado.
+        //Se comprueba el tipo de componente padre, para asignar el correcto y que asi se muestre el icono asociado.
         if (parent instanceof JDialog) {
         	this.dialog = new JDialog((JDialog)parent, title, true);
         } else if (parent instanceof Frame){
@@ -508,14 +508,14 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	/**
 	 * Ajuste de fuentes.
 	 */
-	private void callResize(){
+	void callResize(){
 		this.resizingAdaptor.adjustWindowFonts();
 	}
 
 	/**
 	 * Se almacena la posicion actual.
 	 */
-	private void resized(){
+	void resized(){
 		if (!GeneralConfig.isMaximized()){
 	    	PrincipalGUI.fileActualPositionX = this.dialog.getX();
 	    	PrincipalGUI.fileActualPositionY = this.dialog.getY();

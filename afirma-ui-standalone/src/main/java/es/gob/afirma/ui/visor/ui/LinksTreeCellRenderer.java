@@ -20,7 +20,7 @@ final class LinksTreeCellRenderer extends DefaultTreeCellRenderer {
         super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, focus);
         if (value instanceof DefaultMutableTreeNode) {
             if (!(((DefaultMutableTreeNode) value).getUserObject() instanceof String)) {
-            	//Comprobacion de que el texto no sea nulo o vacío.
+            	//Comprobacion de que el texto no sea nulo o vacio.
             	String text = getText();
             	//Color de fondo cuando se ha seleccionado el elemento
             	Color selectionColor =getBackgroundSelectionColor();

@@ -188,7 +188,7 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
                 this.listaCertificadosRe.add(certDest);
                 anadir.setEnabled(false);
                 comboRepositorios.setEnabled(false);
-                this.etiquetaAnadir.setDisplayedMnemonic(0); // Se asigna un atajo vacío puesto que se ha deshabilitado el combo asociado
+                this.etiquetaAnadir.setDisplayedMnemonic(0); // Se asigna un atajo vacio puesto que se ha deshabilitado el combo asociado
                 this.etiquetaAnadir.getAccessibleContext().setAccessibleName(this.etiquetaAnadir.getText() + " "
                                                                              + Messages.getString("wizard.sobres.etiquetaAnadir")); //$NON-NLS-1$
                 this.etiquetaAnadir.setFocusable(true);

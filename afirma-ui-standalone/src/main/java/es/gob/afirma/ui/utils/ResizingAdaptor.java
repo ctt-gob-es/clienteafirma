@@ -254,7 +254,7 @@ public class ResizingAdaptor extends ComponentAdapter {
 				if(componentBorder instanceof TitledBorder){
 					//Se comprueba si el panel tiene un nombre asignado
 					String name = actualComponent.getName();
-					//Se hará el resize del título en el caso de que el componente no sea el panel de botones de accesibilidad de los alerts
+					//Se hará el resize del titulo en el caso de que el componente no sea el panel de botones de accesibilidad de los alerts
 					if ((name==null) || ((name!=null) && (!name.equalsIgnoreCase("AccessibilityButtonsPanel")))) {
 						TitledBorder b = (TitledBorder) componentBorder;
 						float resizeFactor = Math.round(relation / getResizingFactorFrame());

@@ -112,7 +112,7 @@ public class HelpUtils {
 
     /** Chequeo de la accesibilidad para la ventana de ayuda.
      * @param frame ventana de ayuda. */
-    private static void checkHelpAccessibility(final Window frame, final boolean activate) {
+    static void checkHelpAccessibility(final Window frame, final boolean activate) {
         JTabbedPane jtp = new JTabbedPane();
         if (frame != null) {
             Component component = null;
@@ -208,7 +208,7 @@ public class HelpUtils {
 
     /** Genera la ayuda
      * @return Ventana con el panel de ayuda */
-    private static HelpBroker getHelp() {
+    static HelpBroker getHelp() {
 
         if (helpBroker == null) {
             try {
@@ -537,13 +537,13 @@ public class HelpUtils {
 
     /** Establece el modo alto contraste para el editorPane que recibe como parámetro.
      * @param editorPane panel de edicion. */
-    private static void setHighContrastEditorPane(final JEditorPane editorPane, final boolean activate) {
+    static void setHighContrastEditorPane(final JEditorPane editorPane, final boolean activate) {
         if (editorPane != null) {
             if (editorPane.getDocument() instanceof HTMLDocument) {
                 final HTMLDocument h = (HTMLDocument) editorPane.getDocument();
                 // Se establece el color de la la letra a blanco
                 editorPane.setContentType("text/html"); //$NON-NLS-1$
-                String bodyRule = "";
+                final String bodyRule;
                 if (activate) {
                     bodyRule = "body { color: \"white\";}";
                     editorPane.setBackground(Color.BLACK);

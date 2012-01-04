@@ -52,7 +52,7 @@ public class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
 	private JDialog dialog;
 
 	/**
-	 * Relacion mínima.
+	 * Relacion minima.
 	 */
 	public int getMinimumRelation(){
 		return 9;
@@ -88,23 +88,23 @@ public class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
 	private void init(){
 		//Se comprueba si se esta en el modo Alto contraste
 		if (GeneralConfig.isHighContrast()){
-			setHighContrast((Container)this);
+			setHighContrast(this);
 		}
 		
 		//Asignacion de mnemonics
 		
 		//Etiqueta buscar en ...
-		setLabelMnemonics((Container)this, "FileChooser.lookInLabelText", KeyEvent.VK_U);
+		setLabelMnemonics(this, "FileChooser.lookInLabelText", KeyEvent.VK_U); //$NON-NLS-1$
 		
 		//Boton Cancelar
-		setButtonMnemonics((Container)this, "FileChooser.cancelButtonText", KeyEvent.VK_C);
+		setButtonMnemonics(this, "FileChooser.cancelButtonText", KeyEvent.VK_C); //$NON-NLS-1$
 		
 		//Boton Abrir
-		setButtonMnemonics((Container)this, "FileChooser.openButtonText", KeyEvent.VK_A);
+		setButtonMnemonics(this, "FileChooser.openButtonText", KeyEvent.VK_A); //$NON-NLS-1$
 		
 		//Toggle buttons
 		//TODO: Revisar puesto que los botones que se hacen accesibles estan predefinidos
-		setToggleButtonMnemonics((Container)this);
+		setToggleButtonMnemonics(this);
 	}
 
 	/**
@@ -119,7 +119,7 @@ public class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
                 title);
 
         //dialog = new JDialog((Frame) this.getParent(), title, true);
-        //Se comprueba el tipo de componente padre, para asignar el correcto y que así se muestre el icono asociado.
+        //Se comprueba el tipo de componente padre, para asignar el correcto y que asi se muestre el icono asociado.
         if (parent instanceof JDialog) {
         	this.dialog = new JDialog((JDialog)parent, title, true);
         } else if (parent instanceof Frame){
@@ -145,7 +145,7 @@ public class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
 		int maxWidth = (int)rect.getWidth();
 		int maxHeight = (int)rect.getHeight();
         
-        Container contentPane = dialog.getContentPane();
+        Container contentPane = this.dialog.getContentPane();
         
 //        if (!GeneralConfig.isAccessibility()){
 //        	contentPane.setLayout(new GridLayout());
@@ -154,7 +154,7 @@ public class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
         	removeWindowsToolBar();
         	contentPane.setLayout(new GridLayout());
         	
-        	dialog.addComponentListener(new ComponentListener() {
+        	this.dialog.addComponentListener(new ComponentListener() {
     			
     			@Override
     			public void componentShown(ComponentEvent e) {
@@ -182,26 +182,26 @@ public class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
     		});
         	// Dimensiones de la ventana
         	if (GeneralConfig.isMaximized()){
-        		dialog.setPreferredSize(new Dimension(maxWidth, maxHeight));
+        		this.dialog.setPreferredSize(new Dimension(maxWidth, maxHeight));
         	} else {
         		if (PrincipalGUI.fileActualPositionX != -1){
-    	    		dialog.setPreferredSize(new Dimension(PrincipalGUI.fileActualWidth, PrincipalGUI.fileActualHeight));
+    	    		this.dialog.setPreferredSize(new Dimension(PrincipalGUI.fileActualWidth, PrincipalGUI.fileActualHeight));
         		}
         	}
         	if (GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
-        		dialog.setMinimumSize(new Dimension(Constants.FILE_FONT_INITIAL_WIDTH, Constants.FILE_INITIAL_HEIGHT));
+        		this.dialog.setMinimumSize(new Dimension(Constants.FILE_FONT_INITIAL_WIDTH, Constants.FILE_INITIAL_HEIGHT));
         	} else {
-        		dialog.setMinimumSize(new Dimension(Constants.FILE_INITIAL_WIDTH, Constants.FILE_INITIAL_HEIGHT));
+        		this.dialog.setMinimumSize(new Dimension(Constants.FILE_INITIAL_WIDTH, Constants.FILE_INITIAL_HEIGHT));
         	}
             for (int i = 0; i<this.getComponentCount();i++){
             	if (this.getComponent(i).getClass().getName().equals("javax.swing.JToolBar")){
-            		jTool = (JToolBar)this.getComponent(i);
-            		for (int j = 0; j<jTool.getComponentCount();j++){
+            		this.jTool = (JToolBar)this.getComponent(i);
+            		for (int j = 0; j<this.jTool.getComponentCount();j++){
                 		// Al cambiar entre vista en lista y detalles se llama a adjustWindowFonts para que calcule el tamano del texto
-                		if (jTool.getComponent(j).getClass().getName().equals("javax.swing.JToggleButton")){
-                			final JToggleButton boton = ((JToggleButton)jTool.getComponent(j));
+                		if (this.jTool.getComponent(j).getClass().getName().equals("javax.swing.JToggleButton")){
+                			final JToggleButton boton = ((JToggleButton)this.jTool.getComponent(j));
                 			// Al cambiar entre vista en lista y detalles se llama a adjustWindowFonts para que calcule el tamano del texto
-                			((JToggleButton)(jTool.getComponent(j))).addMouseListener(new MouseListener() {
+                			((JToggleButton)(this.jTool.getComponent(j))).addMouseListener(new MouseListener() {
         						
         						@Override
         						public void mouseReleased(MouseEvent e) {
@@ -233,7 +233,7 @@ public class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
         							callResize();
         						}
         					});
-                			((JToggleButton)(jTool.getComponent(j))).addKeyListener(new KeyListener() {
+                			((JToggleButton)(this.jTool.getComponent(j))).addKeyListener(new KeyListener() {
         						
         						@Override
         						public void keyTyped(KeyEvent e) {
@@ -256,8 +256,8 @@ public class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
         					});
                 			
                 		}
-                		Utils.remarcar((JComponent)jTool.getComponent(j));
-                    	Utils.setFontBold((JComponent)jTool.getComponent(j));
+                		Utils.remarcar((JComponent)this.jTool.getComponent(j));
+                    	Utils.setFontBold((JComponent)this.jTool.getComponent(j));
                 	}
             	} else {
             		accessibility((JPanel)this.getComponent(i));
@@ -272,21 +272,21 @@ public class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
             boolean supportsWindowDecorations = UIManager
                     .getLookAndFeel().getSupportsWindowDecorations();
             if (supportsWindowDecorations) {
-                dialog.getRootPane().setWindowDecorationStyle(
+                this.dialog.getRootPane().setWindowDecorationStyle(
                         JRootPane.FILE_CHOOSER_DIALOG);
             }
         }
-        dialog.setResizable(true);
-        dialog.pack();
-        dialog.setLocationRelativeTo(parent);
+        this.dialog.setResizable(true);
+        this.dialog.pack();
+        this.dialog.setLocationRelativeTo(parent);
         
 //        if (GeneralConfig.isAccessibility()) {
-        	resizingAdaptor = new ResizingAdaptor(null,null,null,null,null,null,null,this);
-        	this.theDialog = dialog;
-     		dialog.addComponentListener(resizingAdaptor);
+        	this.resizingAdaptor = new ResizingAdaptor(null,null,null,null,null,null,null,this);
+        	this.theDialog = this.dialog;
+     		this.dialog.addComponentListener(this.resizingAdaptor);
 //        }
         
-        return dialog;
+        return this.dialog;
 	}
 	
 	/**
@@ -317,19 +317,21 @@ public class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
 	/**
 	 * Ajuste de fuentes.
 	 */
-	private final void callResize(){
+	@Override
+	final void callResize(){
 		this.resizingAdaptor.adjustWindowFonts();
 	}
 	
 	/**
 	 * Se almacena la posicion actual.
 	 */
-	private void resized(){
+	@Override
+	void resized(){
 		if (!GeneralConfig.isMaximized()){
-	    	PrincipalGUI.fileActualPositionX = dialog.getX();
-	    	PrincipalGUI.fileActualPositionY = dialog.getY();
-	    	PrincipalGUI.fileActualWidth = dialog.getWidth();
-	    	PrincipalGUI.fileActualHeight = dialog.getHeight();
+	    	PrincipalGUI.fileActualPositionX = this.dialog.getX();
+	    	PrincipalGUI.fileActualPositionY = this.dialog.getY();
+	    	PrincipalGUI.fileActualWidth = this.dialog.getWidth();
+	    	PrincipalGUI.fileActualHeight = this.dialog.getHeight();
     	}
 	}
 }

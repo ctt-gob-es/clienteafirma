@@ -497,7 +497,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 
             /** Evento que se lanza cuando la rama se expande. */
             @Override
-            public void treeExpanded(final TreeExpansionEvent event) {}
+            public void treeExpanded(final TreeExpansionEvent event) { /* se ignora */ }
         });
         this.arbolFirmas.setToolTipText(Messages.getString("Wizard.multifirma.simple.contrafirma.arbolFirmas.description")); // NOI18N
         this.arbolFirmas.getAccessibleContext().setAccessibleName(etiqueta.getText() + " " + this.arbolFirmas.getToolTipText() + "ALT + R.");
@@ -623,7 +623,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
                 try {
                     fileIn.close();
                 }
-                catch (final Exception e) {}
+                catch (final Exception e) { /* se ignora */ }
             }
         }
 

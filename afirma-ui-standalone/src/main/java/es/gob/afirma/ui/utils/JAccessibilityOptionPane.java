@@ -15,7 +15,7 @@ public class JAccessibilityOptionPane extends JOptionPane {
     /** Muestra un diálogo de confirmacion.
      * @param componentParent componente padre
      * @param message mensaje a mostrar
-     * @param title título del diálogo
+     * @param title titulo del diálogo
      * @param messageType tipo de mensaje */
     public static int showConfirmDialog(final Component componentParent, final String message, final String title, final int messageType) {
 
@@ -31,7 +31,7 @@ public class JAccessibilityOptionPane extends JOptionPane {
     /** Muestra un diálogo de inserccion.
      * @param componentParent componente padre
      * @param message mensaje a mostrar
-     * @param title título del diálogo
+     * @param title titulo del diálogo
      * @param messageType tipo de mensaje */
     public static String showInputDialog(final Component componentParent, final String message, final String title, final int messageType) {
 
@@ -47,7 +47,7 @@ public class JAccessibilityOptionPane extends JOptionPane {
     /** Muestra un diálogo con un mensaje.
      * @param componentParent componente padre
      * @param message mensaje a mostrar
-     * @param title título del diálogo
+     * @param title titulo del diálogo
      * @param messageType tipo de mensaje */
     public static void showMessageDialog(final Component componentParent, final String message, final String title, final int messageType) {
 

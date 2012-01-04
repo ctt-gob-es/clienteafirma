@@ -56,7 +56,7 @@ public class JDialogWizard extends JDialog implements ComponentListener {
         }
     }
 
-    /** Método que asigna el titulo.
+    /** Metodo que asigna el titulo.
      * @param titulo titulo de la ventana. */
     public void setTitulo(final String titulo) {
         setTitle(titulo);

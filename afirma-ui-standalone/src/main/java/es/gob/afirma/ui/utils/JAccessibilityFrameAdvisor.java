@@ -37,9 +37,9 @@ public abstract class JAccessibilityFrameAdvisor extends JFrame {
 	}
 	
 	/**
-	 * Relacion mínima que se aplica para la redimension de los componentes.
-	 * Cuanto menor es este número menor es la redimension aplicada.
-	 * @return int Relacion mínima
+	 * Relacion minima que se aplica para la redimension de los componentes.
+	 * Cuanto menor es este numero menor es la redimension aplicada.
+	 * @return int Relacion minima
 	 */
 	public abstract int getMinimumRelation();
 	

@@ -115,7 +115,7 @@ class PanelConfiguracion extends JAccessibilityDialogWizard {
         // Etiqueta con el texto "Respetar el formato..."
         final InfoLabel respectLabel = new InfoLabel(Messages.getString("Wizard.multifirma.ventana2.explicacion1"), false); //$NON-NLS-1$
 
-        // Panel para agregar la etiqueta y así desvincularla del check posterior.
+        // Panel para agregar la etiqueta y asi desvincularla del check posterior.
         final JPanel panel = new JPanel(new GridBagLayout());
         panel.add(respectLabel, c);
 

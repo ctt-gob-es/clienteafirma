@@ -198,7 +198,7 @@ final class PanelDestinatarios extends JAccessibilityDialogWizard {
 
         if (listaModel.isEmpty()) {
             eliminar.setEnabled(false);
-            eliminar.setMnemonic(0); // Se asigna un atajo vacío al boton ya que ha sido deshabilitado
+            eliminar.setMnemonic(0); // Se asigna un atajo vacio al boton ya que ha sido deshabilitado
         }
     }
 

@@ -104,7 +104,7 @@ public final class Utils {
 			}
 		} catch (IOException e) {
 			LOGGER.info(e.getMessage());
-			PrincipalGUI.setNuevoEstado(Messages.getString("Validacion.error.valide"));
+			PrincipalGUI.setNuevoEstado(Messages.getString("Validacion.error.valide")); //$NON-NLS-1$
 		}
 	}
 
@@ -707,11 +707,11 @@ public final class Utils {
             || store == AOKeyStore.APPLE) {
                 return new NullPasswordCallback();
         }
-        return new UIPasswordCallbackAccessibility(Messages.getString("CustomDialog.showInputDialog.certificate.pass"), (Component)parent, Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title")); //$NON-NLS-1$
+        return new UIPasswordCallbackAccessibility(Messages.getString("CustomDialog.showInputDialog.certificate.pass"), (Component)parent, Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title")); //$NON-NLS-1$ //$NON-NLS-3$
     }
     
     /**
-	 * Método que sumbraya el mnemonico correspondiente para texto HTML.
+	 * Metodo que sumbraya el mnemonico correspondiente para texto HTML.
 	 *
 	 * @param text	Texto en el que hay que subrayar el carácter.
 	 * @param key	Caracter a subrayar.
@@ -720,8 +720,8 @@ public final class Utils {
 	 */
 	public static String remarkMnemonic( String text, final int key) {
 		String newText = text;
-		int pos = text.indexOf(key); //Se obtiene el índice del caracter
-		if (pos == -1) {//Se busca en minúscula
+		int pos = text.indexOf(key); //Se obtiene el indice del caracter
+		if (pos == -1) {//Se busca en minuscula
 			char keyChar = (char) key;
 			pos = text.indexOf(String.valueOf(keyChar).toLowerCase());
 		}
@@ -737,7 +737,7 @@ public final class Utils {
      * @return filtro
      */
     public static final FileFilter getRepositoryFileFilter() {
-    	FileFilter fileFilter = new ExtFilter(new String[] {"p12", "pfx"}, Messages.getString("Repository.filefilter")); //$NON-NLS-1$ //$NON-NLS-2$
+    	FileFilter fileFilter = new ExtFilter(new String[] {"p12", "pfx"}, Messages.getString("Repository.filefilter")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     	return fileFilter;
     }
     
@@ -750,17 +750,18 @@ public final class Utils {
      */
     public static void showToolTip(boolean show, JWindow tip, JButton boton, JLabel tipText){    	
     	tipText.setText(boton.getToolTipText());
-    	tip.setBackground((Color)UIManager.get("ToolTip.background"));
-    	tipText.setBackground((Color)UIManager.get("ToolTip.background"));
+    	tip.setBackground((Color)UIManager.get("ToolTip.background")); //$NON-NLS-1$
+    	tipText.setBackground((Color)UIManager.get("ToolTip.background")); //$NON-NLS-1$
     	tipText.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.BLACK), BorderFactory.createEmptyBorder(0,3,0,3)));
-    	tipText.setFont((Font)UIManager.get("ToolTip.font"));
+    	tipText.setFont((Font)UIManager.get("ToolTip.font")); //$NON-NLS-1$
     	tipText.setOpaque(true);
     	tip.add(tipText);
     	Point p = new Point();
     	try{
     		p = boton.getLocationOnScreen();
-    	} catch(IllegalComponentStateException e){
-    		
+    	} 
+    	catch(IllegalComponentStateException e){
+    		// Se ignora
     	}
     	int factor = 0;
     	if (boton.getSize().getHeight()>34){

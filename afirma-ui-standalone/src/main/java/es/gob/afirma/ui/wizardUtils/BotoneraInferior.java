@@ -205,7 +205,7 @@ public class BotoneraInferior extends JPanel {
         // panelRestaurar.add(restaurar);
         // //add(panelRestaurar);
         //
-        // //Control de habilitado de los botones de maximizar y restaurar según la configuracion de
+        // //Control de habilitado de los botones de maximizar y restaurar segun la configuracion de
         // //accesibilidad
         // if (GeneralConfig.isMaximized()){
         // maximize.setEnabled(false);
@@ -356,7 +356,7 @@ public class BotoneraInferior extends JPanel {
         if (this.ventanas.get(indice) instanceof JAccessibilityDialogWizard) {
             // Se obtiene el diálogo
             final JAccessibilityDialogWizard wizard = (JAccessibilityDialogWizard) this.ventanas.get(indice);
-            // Se comprueba si estamos en la última ventana del wizard
+            // Se comprueba si estamos en la ultima ventana del wizard
             if (indice < this.ventanas.size() - 1) {
                 wizard.getRootPane().setDefaultButton(wizard.getBotonera().getSiguiente());
             }

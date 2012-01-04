@@ -153,7 +153,7 @@ class UserProfile extends JAccessibilityFrameAdvisor {
         }
     }
 
-    /** Método que genera el panel de botones.
+    /** Metodo que genera el panel de botones.
      * @return panel de botones. */
     private Component createButtonsPanel() {
         // Panel inferior
