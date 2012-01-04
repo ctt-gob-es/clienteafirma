@@ -38,7 +38,7 @@ final class CMSData {
      * @param content
      *        Datos que se desean envolver.
      * @return El envoltorio de tipo data. */
-    byte[] genData(final byte[] content) {
+    static byte[] genData(final byte[] content) {
         return new ContentInfo(PKCSObjectIdentifiers.data, new DEROctetString(content)).getDEREncoded();
     }
 

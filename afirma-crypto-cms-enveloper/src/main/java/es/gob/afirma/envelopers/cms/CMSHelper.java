@@ -44,44 +44,43 @@ final class CMSHelper {
             return false;
         }
 
-        final ValidateCMS validator = new ValidateCMS();
-        boolean valid = validator.isCMSData(data); // Comprobamos DATA
+        boolean valid = ValidateCMS.isCMSData(data); // Comprobamos DATA
         if (!valid)
          {
-            valid = validator.isCMSSignedData(data); // Comprobamos SIGNEDDATA
+            valid = ValidateCMS.isCMSSignedData(data); // Comprobamos SIGNEDDATA
         }
         if (!valid)
          {
-            valid = validator.isCMSDigestedData(data); // Comprobamos DIGESTDATA
+            valid = ValidateCMS.isCMSDigestedData(data); // Comprobamos DIGESTDATA
         }
         if (!valid)
          {
-            valid = validator.isCMSEncryptedData(data); // Comprobamos
+            valid = ValidateCMS.isCMSEncryptedData(data); // Comprobamos
         }
                                                                 // ENCRYPTEDDATA
         if (!valid)
          {
-            valid = validator.isCMSEnvelopedData(data); // Comprobamos
+            valid = ValidateCMS.isCMSEnvelopedData(data); // Comprobamos
         }
                                                                 // ENVELOPEDDATA
         if (!valid)
          {
-            valid = validator.isCMSSignedAndEnvelopedData(data); // Comprobamos
+            valid = ValidateCMS.isCMSSignedAndEnvelopedData(data); // Comprobamos
         }
                                                                          // SIGNEDANDENVELOPED
         if (!valid)
          {
-            valid = validator.isCMSAuthenticatedData(data); // Comprobamos
+            valid = ValidateCMS.isCMSAuthenticatedData(data); // Comprobamos
         }
                                                                     // AUTHENTICATED
         if (!valid)
          {
-            valid = validator.isCMSAuthenticatedEnvelopedData(data); // Comprobamos
+            valid = ValidateCMS.isCMSAuthenticatedEnvelopedData(data); // Comprobamos
         }
                                                                              // AUTHENTICATEDENVELOPEDDATA
         if (!valid)
          {
-            valid = validator.isCMSCompressedData(data); // Comprobamos
+            valid = ValidateCMS.isCMSCompressedData(data); // Comprobamos
                                                                      // COMPRESSEDDATA
         }
 
@@ -97,31 +96,31 @@ final class CMSHelper {
      *         contenido indicado. */
     static boolean isCMSValid(final byte[] data, final String type) {
         if (type.equals(AOCMSEnveloper.CMS_CONTENTTYPE_DATA)) {
-            return new ValidateCMS().isCMSData(data);
+			return ValidateCMS.isCMSData(data);
         }
         else if (type.equals(AOCMSEnveloper.CMS_CONTENTTYPE_SIGNEDDATA)) {
-            return new ValidateCMS().isCMSSignedData(data);
+			return ValidateCMS.isCMSSignedData(data);
         }
         else if (type.equals(AOCMSEnveloper.CMS_CONTENTTYPE_DIGESTEDDATA)) {
-            return new ValidateCMS().isCMSDigestedData(data);
+			return ValidateCMS.isCMSDigestedData(data);
         }
         else if (type.equals(AOCMSEnveloper.CMS_CONTENTTYPE_ENCRYPTEDDATA)) {
-            return new ValidateCMS().isCMSEncryptedData(data);
+			return ValidateCMS.isCMSEncryptedData(data);
         }
         else if (type.equals(AOCMSEnveloper.CMS_CONTENTTYPE_ENVELOPEDDATA)) {
-            return new ValidateCMS().isCMSEnvelopedData(data);
+			return ValidateCMS.isCMSEnvelopedData(data);
         }
         else if (type.equals(AOCMSEnveloper.CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA)) {
-            return new ValidateCMS().isCMSSignedAndEnvelopedData(data);
+			return ValidateCMS.isCMSSignedAndEnvelopedData(data);
         }
         else if (type.equals(AOCMSEnveloper.CMS_CONTENTTYPE_AUTHENTICATEDDATA)) {
-            return new ValidateCMS().isCMSAuthenticatedData(data);
+			return ValidateCMS.isCMSAuthenticatedData(data);
         }
         else if (type.equals(AOCMSEnveloper.CMS_CONTENTTYPE_AUTHENVELOPEDDATA)) {
-            return new ValidateCMS().isCMSAuthenticatedEnvelopedData(data);
+			return ValidateCMS.isCMSAuthenticatedEnvelopedData(data);
         }
         else if (type.equals(AOCMSEnveloper.CMS_CONTENTTYPE_COMPRESSEDDATA)) {
-            return new ValidateCMS().isCMSCompressedData(data);
+			return ValidateCMS.isCMSCompressedData(data);
         }
         Logger.getLogger("es.gob.afirma").warning("Tipo de contenido CMS no reconocido");  //$NON-NLS-1$//$NON-NLS-2$
         return false;

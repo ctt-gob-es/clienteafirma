@@ -55,6 +55,7 @@ final class ValidateCMS {
      *        Datos CMS.
      * @return si es de este tipo. */
     @SuppressWarnings("unused")
+	static
     boolean isCMSData(final byte[] data) {
         boolean isValid = true;
         try {
@@ -90,7 +91,7 @@ final class ValidateCMS {
      * @param data
      *        Datos CMS.
      * @return si es de este tipo. */
-    boolean isCMSSignedData(final byte[] data) {
+    static boolean isCMSSignedData(final byte[] data) {
         boolean isValid = true;
         try {
             final ASN1InputStream is = new ASN1InputStream(data);
@@ -128,7 +129,7 @@ final class ValidateCMS {
      *        SignerInfo para la verificaci&oacute;n del p&aacute;rametro
      *        adecuado.
      * @return si contiene el par&aacute;metro. */
-    private boolean verifySignerInfo(final SignerInfo si) {
+    private static boolean verifySignerInfo(final SignerInfo si) {
         boolean isSignerValid = true;
         final ASN1Set attrib = si.getAuthenticatedAttributes();
         final Enumeration<?> e = attrib.getObjects();
@@ -149,6 +150,7 @@ final class ValidateCMS {
      *        Datos CMS.
      * @return si es de este tipo. */
     @SuppressWarnings("unused")
+	static
     boolean isCMSDigestedData(final byte[] data) {
         boolean isValid = true;
         try {
@@ -185,7 +187,7 @@ final class ValidateCMS {
      * @param data
      *        Datos CMS.
      * @return si es de este tipo. */
-    boolean isCMSEncryptedData(final byte[] data) {
+    static boolean isCMSEncryptedData(final byte[] data) {
         boolean isValid = true;
         try {
             final ASN1InputStream is = new ASN1InputStream(data);
@@ -223,6 +225,7 @@ final class ValidateCMS {
      *        Datos CMS.
      * @return si es de este tipo. */
     @SuppressWarnings("unused")
+	static
     boolean isCMSEnvelopedData(final byte[] data) {
         boolean isValid = true;
         try {
@@ -259,7 +262,7 @@ final class ValidateCMS {
      * @param data
      *        Datos CMS.
      * @return si es de este tipo. */
-    boolean isCMSSignedAndEnvelopedData(final byte[] data) {
+    static boolean isCMSSignedAndEnvelopedData(final byte[] data) {
         boolean isValid = true;
         try {
             final ASN1InputStream is = new ASN1InputStream(data);
@@ -296,7 +299,7 @@ final class ValidateCMS {
      * @param data
      *        Datos CMS.
      * @return si es de este tipo. */
-    boolean isCMSAuthenticatedData(final byte[] data) {
+    static boolean isCMSAuthenticatedData(final byte[] data) {
         boolean isValid = true;
         // Leemos el fichero que contiene la firma.
         final ASN1InputStream is = new ASN1InputStream(data);
@@ -330,7 +333,7 @@ final class ValidateCMS {
      * @param data
      *        Datos CMS.
      * @return si es de este tipo. */
-    boolean isCMSAuthenticatedEnvelopedData(final byte[] data) {
+    static boolean isCMSAuthenticatedEnvelopedData(final byte[] data) {
         boolean isValid = true;
         // Leemos el fichero que contiene la firma.
         final ASN1InputStream is = new ASN1InputStream(data);
@@ -364,7 +367,7 @@ final class ValidateCMS {
      * @param data
      *        Datos CMS.
      * @return si es de este tipo. */
-    boolean isCMSCompressedData(final byte[] data) {
+    static boolean isCMSCompressedData(final byte[] data) {
         boolean isValid = true;
         // Leemos el fichero que contiene la firma.
         final ASN1InputStream is = new ASN1InputStream(data);

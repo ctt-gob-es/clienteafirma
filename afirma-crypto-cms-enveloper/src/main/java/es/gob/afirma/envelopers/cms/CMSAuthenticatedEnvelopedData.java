@@ -114,14 +114,17 @@ public final class CMSAuthenticatedEnvelopedData {
      * @throws AOException
      *         Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
      */
-    public byte[] genAuthenticatedEnvelopedData(final P7ContentSignerParameters parameters,
+    public static byte[] genAuthenticatedEnvelopedData(final P7ContentSignerParameters parameters,
                                                 final String autenticationAlgorithm,
                                                 final AOCipherConfig config,
                                                 final X509Certificate[] certDest,
                                                 final Oid dataType,
                                                 final boolean applySigningTime,
                                                 final Map<Oid, byte[]> atrib,
-                                                final Map<Oid, byte[]> uatrib) throws IOException, CertificateEncodingException, NoSuchAlgorithmException, AOException {
+                                                final Map<Oid, byte[]> uatrib) throws IOException, 
+                                                                                      CertificateEncodingException, 
+                                                                                      NoSuchAlgorithmException, 
+                                                                                      AOException {
         final SecretKey cipherKey = Utils.initEnvelopedData(config, certDest);
 
         // 1. ORIGINATORINFO
@@ -161,7 +164,7 @@ public final class CMSAuthenticatedEnvelopedData {
 
     }
 
-    private byte[] genPack(final byte[] parte1, final byte[] parte2) {
+    private static byte[] genPack(final byte[] parte1, final byte[] parte2) {
         final byte[] pack = new byte[parte1.length + parte2.length];
         System.arraycopy(parte1, 0, pack, 0, parte1.length);
         System.arraycopy(parte2, 0, pack, parte1.length, parte2.length);
@@ -178,7 +181,7 @@ public final class CMSAuthenticatedEnvelopedData {
      *        Lista de atributos firmados que se insertar&aacute;n dentro
      *        del archivo de firma.
      * @return Los atributos firmados de la firma. */
-    private ASN1Set generateSignedAtt(final Oid datatype, final boolean signingTime, final Map<Oid, byte[]> atrib) {
+    private static ASN1Set generateSignedAtt(final Oid datatype, final boolean signingTime, final Map<Oid, byte[]> atrib) {
 
         // // ATRIBUTOS
 
@@ -224,7 +227,7 @@ public final class CMSAuthenticatedEnvelopedData {
      * @return La nueva firma AuthenticatedEnvelopedData con los remitentes que
      *         ten&iacute;a (si los tuviera) con la cadena de certificados
      *         nueva. */
-    public byte[] addOriginatorInfo(final byte[] data, final X509Certificate[] signerCertificateChain) {
+    public static byte[] addOriginatorInfo(final byte[] data, final X509Certificate[] signerCertificateChain) {
 
         try {
             final ASN1InputStream is = new ASN1InputStream(data);

@@ -66,7 +66,12 @@ final class CMSEncryptedData {
      * @throws java.security.NoSuchAlgorithmException
      *         Si no se soporta alguno de los algoritmos de firma o huella
      *         digital */
-    byte[] genEncryptedData(final byte[] data, final String digAlg, final AOCipherConfig config, final Key cipherKey, final Oid dataType, final Map<Oid, byte[]> uatrib) throws NoSuchAlgorithmException {
+    static byte[] genEncryptedData(final byte[] data, 
+    		                       final String digAlg, 
+    		                       final AOCipherConfig config, 
+    		                       final Key cipherKey, 
+    		                       final Oid dataType, 
+    		                       final Map<Oid, byte[]> uatrib) throws NoSuchAlgorithmException {
 
         // Datos previos &uacute;tiles
         final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(digAlg);

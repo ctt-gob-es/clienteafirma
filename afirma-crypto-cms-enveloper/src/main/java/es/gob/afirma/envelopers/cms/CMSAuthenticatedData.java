@@ -229,7 +229,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
      * @return Los atributos firmados de la firma.
      * @throws java.security.NoSuchAlgorithmException
      *         Si no se encuentra un algoritmo v&aacute;lido. */
-    private ASN1Set generateSignedAtt(final X509Certificate cert,
+    private static ASN1Set generateSignedAtt(final X509Certificate cert,
                                       String digestAlgorithm,
                                       final byte[] datos,
                                       final Oid datatype,
@@ -297,7 +297,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
      * @return La nueva firma AuthenticatedData con los remitentes que
      *         ten&iacute;a (si los tuviera) con la cadena de certificados
      *         nueva. */
-    byte[] addOriginatorInfo(final InputStream data, final X509Certificate[] signerCertificateChain) {
+    static byte[] addOriginatorInfo(final InputStream data, final X509Certificate[] signerCertificateChain) {
         // boolean isValid = false;
         byte[] retorno = null;
 
@@ -351,7 +351,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
         return retorno;
     }
 
-    private AlgorithmIdentifier extractAOIfromAuth(final ASN1Sequence auth) {
+    private static AlgorithmIdentifier extractAOIfromAuth(final ASN1Sequence auth) {
 
         final Enumeration<?> e = auth.getObjects();
         // Elemento 0 : version

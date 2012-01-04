@@ -512,7 +512,7 @@ final class CoSignerEnveloped {
      *        Conjunto de atributos no firmados que se insertar&aacute;n
      *        dentro del archivo de firma.
      * @return Los atributos no firmados de la firma */
-    private ASN1Set generateUnsignerInfo(final Map<String, byte[]> uatrib) {
+    private static ASN1Set generateUnsignerInfo(final Map<String, byte[]> uatrib) {
 
         // // ATRIBUTOS
 

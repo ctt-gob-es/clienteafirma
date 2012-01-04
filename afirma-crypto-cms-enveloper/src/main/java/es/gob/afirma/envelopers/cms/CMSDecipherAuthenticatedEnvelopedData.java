@@ -53,7 +53,8 @@ public final class CMSDecipherAuthenticatedEnvelopedData {
      *         destinatarios del sobre.
      * @throws InvalidKeyException
      *         Cuando la clave almacenada en el sobre no es v&aacute;lida. */
-    public byte[] dechiperAuthenticatedEnvelopedData(final byte[] cmsData, final PrivateKeyEntry keyEntry) throws IOException,
+    public static byte[] dechiperAuthenticatedEnvelopedData(final byte[] cmsData, 
+    		                                                final PrivateKeyEntry keyEntry) throws IOException,
                                                                                               CertificateEncodingException,
                                                                                               AOException,
                                                                                               InvalidKeyException {

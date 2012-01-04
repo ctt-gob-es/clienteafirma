@@ -152,7 +152,7 @@ final class CMSDecipherAuthenticatedData {
      * @return Cifrador.
      * @throws java.security.NoSuchAlgorithmException
      * @throws javax.crypto.NoSuchPaddingException */
-    private Cipher createCipher(final String algName) throws NoSuchAlgorithmException, NoSuchPaddingException {
+    private static Cipher createCipher(final String algName) throws NoSuchAlgorithmException, NoSuchPaddingException {
         return Cipher.getInstance(algName);
     }
 }

@@ -219,8 +219,8 @@ public class AOCMSEnveloper implements AOEnveloper {
      * @param content
      *        Datos que se desean envolver.
      * @return Envoltorio Data. */
-    byte[] createCMSData(final byte[] content) {
-        return new CMSData().genData(content);
+    static byte[] createCMSData(final byte[] content) {
+		return CMSData.genData(content);
     }
 
     /** Crea un envoltorio CMS de tipo DigestedData.
@@ -233,15 +233,15 @@ public class AOCMSEnveloper implements AOEnveloper {
      *         Cuando el algoritmo de cifrado indicado no est&aacute;
      *         soportado. */
     byte[] createCMSDigestedData(final byte[] content) throws IOException, NoSuchAlgorithmException {
-        return new CMSDigestedData().genDigestedData(content, this.signatureAlgorithm, DATA_TYPE_OID);
+		return CMSDigestedData.genDigestedData(content, this.signatureAlgorithm, DATA_TYPE_OID);
     }
 
     /** Crea un envoltorio CMS de tipo CompressedData.
      * @param content
      *        Datos que se desean envolver.
      * @return Envoltorio Compressed Data. */
-    byte[] createCMSCompressedData(final byte[] content) {
-        return new CMSCompressedData().genCompressedData(content);
+    static byte[] createCMSCompressedData(final byte[] content) {
+		return CMSCompressedData.genCompressedData(content);
     }
 
     /** Crea un envoltorio CMS de tipo EncryptedData.
@@ -257,7 +257,7 @@ public class AOCMSEnveloper implements AOEnveloper {
      *         soportado.
      */
     byte[] createCMSEncryptedData(final byte[] content, final AOCipherConfig cipherConfig, final Key key) throws NoSuchAlgorithmException {
-        return new CMSEncryptedData().genEncryptedData(content, this.signatureAlgorithm, cipherConfig, key, DATA_TYPE_OID, this.uattrib);
+		return CMSEncryptedData.genEncryptedData(content, this.signatureAlgorithm, cipherConfig, key, DATA_TYPE_OID, this.uattrib);
     }
 
     /** Crea un envoltorio CMS de tipo EnvelopedData.
@@ -290,7 +290,7 @@ public class AOCMSEnveloper implements AOEnveloper {
 
         // Si se establecion un remitente
         if (ke != null) {
-            return new CMSEnvelopedData().genEnvelopedData(this.createContentSignerParementers(content, ke, this.signatureAlgorithm),
+            return new CMSEnvelopedData().genEnvelopedData(AOCMSEnveloper.createContentSignerParementers(content, ke, this.signatureAlgorithm),
                                                            cipherConfig,
                                                            recipientsCerts,
                                                            DATA_TYPE_OID,
@@ -327,7 +327,7 @@ public class AOCMSEnveloper implements AOEnveloper {
                                                   final X509Certificate[] recipientsCerts) throws CertificateEncodingException,
                                                                                           NoSuchAlgorithmException,
                                                                                           IOException, AOException {
-        return new CMSSignedAndEnvelopedData().genSignedAndEnvelopedData(this.createContentSignerParementers(content, ke, this.signatureAlgorithm),
+        return new CMSSignedAndEnvelopedData().genSignedAndEnvelopedData(AOCMSEnveloper.createContentSignerParementers(content, ke, this.signatureAlgorithm),
                                                                          cipherConfig,
                                                                          recipientsCerts,
                                                                          DATA_TYPE_OID,
@@ -359,7 +359,7 @@ public class AOCMSEnveloper implements AOEnveloper {
     byte[] createCMSAuthenticatedData(final byte[] content, final PrivateKeyEntry ke, final AOCipherConfig cipherConfig, final X509Certificate[] recipientsCerts) throws CertificateEncodingException,
                                                                                                                                          NoSuchAlgorithmException,
                                                                                                                                          IOException, AOException {
-        return new CMSAuthenticatedData().genAuthenticatedData(this.createContentSignerParementers(content, ke, this.signatureAlgorithm), // ContentSignerParameters
+        return new CMSAuthenticatedData().genAuthenticatedData(AOCMSEnveloper.createContentSignerParementers(content, ke, this.signatureAlgorithm), // ContentSignerParameters
                                                                null, // Algoritmo de autenticacion (usamos el por defecto)
                                                                cipherConfig, // Configuracion del cipher
                                                                recipientsCerts, // certificados destino
@@ -396,7 +396,7 @@ public class AOCMSEnveloper implements AOEnveloper {
                                                       final X509Certificate[] recipientsCerts) throws CertificateEncodingException,
                                                                                         NoSuchAlgorithmException,
                                                                                         IOException, AOException {
-        return new CMSAuthenticatedEnvelopedData().genAuthenticatedEnvelopedData(this.createContentSignerParementers(content, ke, this.signatureAlgorithm), // ContentSignerParameters
+		return CMSAuthenticatedEnvelopedData.genAuthenticatedEnvelopedData(AOCMSEnveloper.createContentSignerParementers(content, ke, this.signatureAlgorithm), // ContentSignerParameters
                                                                                  null, // Algoritmo de autenticacion (usamos el por
                                                                                        // defecto)
                                                                                  cipherConfig, // Configuracion del cipher
@@ -417,7 +417,7 @@ public class AOCMSEnveloper implements AOEnveloper {
      * @param digestAlgorithm
      *        Algoritmo de huella digital.
      * @return Bloque de datos con la informaci&oacute;n del remitente. */
-    private P7ContentSignerParameters createContentSignerParementers(final byte[] content, final PrivateKeyEntry ke, final String digestAlgorithm) {
+    private static P7ContentSignerParameters createContentSignerParementers(final byte[] content, final PrivateKeyEntry ke, final String digestAlgorithm) {
         return new P7ContentSignerParameters(content, digestAlgorithm, (X509Certificate[]) ke.getCertificateChain());
     }
 
@@ -431,16 +431,15 @@ public class AOCMSEnveloper implements AOEnveloper {
      *         Cuando se produce un error al agregar el nuevo remitente.
      * @throws AOInvalidFormatException
      *         Tipo de envoltorio no soportado. */
-    byte[] addOriginator(final byte[] envelop, final PrivateKeyEntry ke) throws AOException {
-        String contentInfo;
-        final ValidateCMS validator = new ValidateCMS();
-        if (validator.isCMSEnvelopedData(envelop)) {
+    static byte[] addOriginator(final byte[] envelop, final PrivateKeyEntry ke) throws AOException {
+        final String contentInfo;
+        if (ValidateCMS.isCMSEnvelopedData(envelop)) {
             contentInfo = CMS_CONTENTTYPE_ENVELOPEDDATA;
         }
-        else if (validator.isCMSSignedAndEnvelopedData(envelop)) {
+        else if (ValidateCMS.isCMSSignedAndEnvelopedData(envelop)) {
             contentInfo = CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA;
         }
-        else if (validator.isCMSAuthenticatedEnvelopedData(envelop)) {
+        else if (ValidateCMS.isCMSAuthenticatedEnvelopedData(envelop)) {
             contentInfo = CMS_CONTENTTYPE_AUTHENVELOPEDDATA;
         }
         else {
@@ -469,20 +468,18 @@ public class AOCMSEnveloper implements AOEnveloper {
      * @throws IllegalArgumentException
      *         Cuando se indica un contentInfo no compatible con
      *         m&uacute;tiples remitentes. */
-    private byte[] addOriginator(final byte[] envelop, final String contentInfo, final PrivateKeyEntry ke) throws AOException {
+    private static byte[] addOriginator(final byte[] envelop, final String contentInfo, final PrivateKeyEntry ke) throws AOException {
 
         byte[] newEnvelop;
 
         if (contentInfo.equals(CMS_CONTENTTYPE_ENVELOPEDDATA)) {
-            final CMSEnvelopedData enveloper = new CMSEnvelopedData();
-            newEnvelop = enveloper.addOriginatorInfo(envelop, (X509Certificate[]) ke.getCertificateChain());
+            newEnvelop = CMSEnvelopedData.addOriginatorInfo(envelop, (X509Certificate[]) ke.getCertificateChain());
         }
         else if (contentInfo.equals(CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA)) {
             newEnvelop = new AOCMSSigner().cosign(envelop, AOSignConstants.DEFAULT_SIGN_ALGO, ke, null);
         }
         else if (contentInfo.equals(CMS_CONTENTTYPE_AUTHENVELOPEDDATA)) {
-            final CMSAuthenticatedEnvelopedData enveloper = new CMSAuthenticatedEnvelopedData();
-            newEnvelop = enveloper.addOriginatorInfo(envelop, (X509Certificate[]) ke.getCertificateChain());
+            newEnvelop = CMSAuthenticatedEnvelopedData.addOriginatorInfo(envelop, (X509Certificate[]) ke.getCertificateChain());
 
         }
         else {
@@ -605,22 +602,22 @@ public class AOCMSEnveloper implements AOEnveloper {
             // datos = this.recoverCMSEncryptedData(cmsEnvelop, cipherKey);
         }
         else if (doi.equals(org.bouncycastle.asn1.cms.CMSObjectIdentifiers.compressedData)) {
-            datos = this.recoverCMSCompressedData(cmsEnvelop);
+            datos = AOCMSEnveloper.recoverCMSCompressedData(cmsEnvelop);
         }
         else if (doi.equals(org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.encryptedData)) {
-            datos = this.recoverCMSEncryptedData(cmsEnvelop, this.cipherKey);
+            datos = AOCMSEnveloper.recoverCMSEncryptedData(cmsEnvelop, this.cipherKey);
         }
         else if (doi.equals(org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.envelopedData)) {
-            datos = this.recoverCMSEnvelopedData(cmsEnvelop, this.configuredKe);
+            datos = AOCMSEnveloper.recoverCMSEnvelopedData(cmsEnvelop, this.configuredKe);
         }
         else if (doi.equals(org.bouncycastle.asn1.cms.CMSObjectIdentifiers.authEnvelopedData)) {
-            datos = this.recoverCMSAuthenticatedEnvelopedData(cmsEnvelop, this.configuredKe);
+            datos = AOCMSEnveloper.recoverCMSAuthenticatedEnvelopedData(cmsEnvelop, this.configuredKe);
         }
         else if (doi.equals(org.bouncycastle.asn1.cms.CMSObjectIdentifiers.authenticatedData)) {
-            datos = this.recoverCMSAuthenticatedData(cmsEnvelop, this.configuredKe);
+            datos = AOCMSEnveloper.recoverCMSAuthenticatedData(cmsEnvelop, this.configuredKe);
         }
         else if (doi.equals(org.bouncycastle.asn1.cms.CMSObjectIdentifiers.signedAndEnvelopedData)) {
-            datos = this.recoverCMSSignedEnvelopedData(cmsEnvelop, this.configuredKe);
+            datos = AOCMSEnveloper.recoverCMSSignedEnvelopedData(cmsEnvelop, this.configuredKe);
         }
         else {
             throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un tipo de objeto CMS soportado"); //$NON-NLS-1$
@@ -635,8 +632,8 @@ public class AOCMSEnveloper implements AOEnveloper {
      * @return Contenido del envoltorio.
      * @throws IOException
      *         Cuando ocurre un error al descomprimir los datos. */
-    byte[] recoverCMSCompressedData(final byte[] compressedData) throws IOException {
-        return new CMSCompressedData().getContentCompressedData(compressedData);
+    static byte[] recoverCMSCompressedData(final byte[] compressedData) throws IOException {
+		return CMSCompressedData.getContentCompressedData(compressedData);
     }
 
     /** Recupera el contenido de un envoltorio EncryptedData.
@@ -655,13 +652,14 @@ public class AOCMSEnveloper implements AOEnveloper {
      * @throws InvalidAlgorithmParameterException 
      * @throws NoSuchPaddingException 
      * @throws NoSuchAlgorithmException */
-    byte[] recoverCMSEncryptedData(final byte[] encryptedData, final String passkey) throws InvalidKeyException, 
-                                                                                            AOException, 
-                                                                                            NoSuchAlgorithmException, 
-                                                                                            NoSuchPaddingException, 
-                                                                                            InvalidAlgorithmParameterException, 
-                                                                                            IllegalBlockSizeException, 
-                                                                                            BadPaddingException {
+    static byte[] recoverCMSEncryptedData(final byte[] encryptedData, 
+    		                              final String passkey) throws InvalidKeyException, 
+                                                                       AOException, 
+                                                                       NoSuchAlgorithmException, 
+                                                                       NoSuchPaddingException, 
+                                                                       InvalidAlgorithmParameterException, 
+                                                                       IllegalBlockSizeException, 
+                                                                       BadPaddingException {
         return new CMSDecipherEncryptedData().dechiperEncryptedData(encryptedData, passkey);
     }
 
@@ -685,11 +683,12 @@ public class AOCMSEnveloper implements AOEnveloper {
      *         destinatarios del sobre.
      * @throws InvalidKeyException
      *         Cuando la clave almacenada en el sobre no es v&aacute;lida. */
-    byte[] recoverCMSEnvelopedData(final byte[] envelopedData, final PrivateKeyEntry ke) throws IOException,
-                                                                                        CertificateEncodingException,
-                                                                                        AOException,
-                                                                                        InvalidKeyException {
-        return new CMSDecipherEnvelopData().dechiperEnvelopData(envelopedData, ke);
+    static byte[] recoverCMSEnvelopedData(final byte[] envelopedData, 
+    		                              final PrivateKeyEntry ke) throws IOException,
+                                                                           CertificateEncodingException,
+                                                                           AOException,
+                                                                           InvalidKeyException {
+		return CMSDecipherEnvelopData.dechiperEnvelopData(envelopedData, ke);
     }
 
     /** Recupera el contenido de un envoltorio SignedEnvelopedData.
@@ -712,11 +711,12 @@ public class AOCMSEnveloper implements AOEnveloper {
      *         destinatarios del sobre.
      * @throws InvalidKeyException
      *         Cuando la clave almacenada en el sobre no es v&aacute;lida. */
-    byte[] recoverCMSSignedEnvelopedData(final byte[] signedEnvelopedData, final PrivateKeyEntry ke) throws IOException,
-                                                                                                    CertificateEncodingException,
-                                                                                                    AOException,
-                                                                                                    InvalidKeyException {
-        return new CMSDecipherSignedAndEnvelopedData().dechiperSignedAndEnvelopData(signedEnvelopedData, ke);
+    static byte[] recoverCMSSignedEnvelopedData(final byte[] signedEnvelopedData, 
+    		                                    final PrivateKeyEntry ke) throws IOException,
+                                                                                 CertificateEncodingException,
+                                                                                 AOException,
+                                                                                 InvalidKeyException {
+		return CMSDecipherSignedAndEnvelopedData.dechiperSignedAndEnvelopData(signedEnvelopedData, ke);
     }
 
     /** Comprueba la integridad de un envoltorio AuthenticatedData y, si es
@@ -739,10 +739,12 @@ public class AOCMSEnveloper implements AOEnveloper {
      *         Cuando la clave almacenada en el sobre no es v&aacute;lida. 
      * @throws NoSuchAlgorithmException
      */
-    byte[] recoverCMSAuthenticatedData(final byte[] authenticatedData, final PrivateKeyEntry ke) throws IOException,
-                                                                                                CertificateEncodingException,
-                                                                                                AOException,
-                                                                                                InvalidKeyException, NoSuchAlgorithmException {
+    static byte[] recoverCMSAuthenticatedData(final byte[] authenticatedData, 
+    		                                  final PrivateKeyEntry ke) throws IOException,
+                                                                               CertificateEncodingException,
+                                                                               AOException,
+                                                                               InvalidKeyException, 
+                                                                               NoSuchAlgorithmException {
         return new CMSDecipherAuthenticatedData().decipherAuthenticatedData(authenticatedData, ke);
     }
 
@@ -768,11 +770,12 @@ public class AOCMSEnveloper implements AOEnveloper {
      *         destinatarios del sobre.
      * @throws InvalidKeyException
      *         Cuando la clave almacenada en el sobre no es v&aacute;lida. */
-    byte[] recoverCMSAuthenticatedEnvelopedData(final byte[] authenticatedEnvelopedData, final PrivateKeyEntry ke) throws IOException,
-                                                                                                                  CertificateEncodingException,
-                                                                                                                  AOException,
-                                                                                                                  InvalidKeyException {
-        return new CMSDecipherAuthenticatedEnvelopedData().dechiperAuthenticatedEnvelopedData(authenticatedEnvelopedData, ke);
+    static byte[] recoverCMSAuthenticatedEnvelopedData(final byte[] authenticatedEnvelopedData, 
+    												   final PrivateKeyEntry ke) throws IOException,
+                                                                                        CertificateEncodingException,
+                                                                                        AOException,
+                                                                                        InvalidKeyException {
+		return CMSDecipherAuthenticatedEnvelopedData.dechiperAuthenticatedEnvelopedData(authenticatedEnvelopedData, ke);
     }
 
     /** M&eacute;todo que comprueba que unos datos se corresponden con una
@@ -791,7 +794,7 @@ public class AOCMSEnveloper implements AOEnveloper {
      * @param cmsData
      *        Datos que deseamos comprobar.
      * @return La validez del archivo cumpliendo la estructura. */
-    public boolean isCMSValid(final byte[] cmsData) {
+    public static boolean isCMSValid(final byte[] cmsData) {
         return CMSHelper.isCMSValid(cmsData);
     }
 
@@ -803,7 +806,7 @@ public class AOCMSEnveloper implements AOEnveloper {
      *        Tipo de contenido del envoltorio que queremos comprobar.
      * @return Indica los datos son una envoltura CMS con el tipo de contenido
      *         indicado. */
-    public boolean isCMSValid(final byte[] data, final String type) {
+    public static boolean isCMSValid(final byte[] data, final String type) {
         return CMSHelper.isCMSValid(data, type);
     }
 }

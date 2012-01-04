@@ -183,7 +183,7 @@ public final class CMSEnvelopedData {
      * @throws AOException
      *         Cuando ocurra un error al insertar el nuevo destinatario en el envoltorio. 
      */
-    public byte[] addOriginatorInfo(final byte[] data, final X509Certificate[] signerCertificateChain) throws AOException {
+    public static byte[] addOriginatorInfo(final byte[] data, final X509Certificate[] signerCertificateChain) throws AOException {
         byte[] retorno = null;
 
         try {

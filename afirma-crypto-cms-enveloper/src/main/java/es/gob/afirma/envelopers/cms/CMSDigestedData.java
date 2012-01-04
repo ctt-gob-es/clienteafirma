@@ -60,8 +60,9 @@ final class CMSDigestedData {
      * @throws java.io.IOException
      *         Si ocurre alg&uacute;n problema leyendo o escribiendo los
      *         datos */
-    byte[] genDigestedData(final byte[] content, final String digestAlgorithm, final Oid dataType) throws NoSuchAlgorithmException,
-                                                                                                         IOException {
+    static byte[] genDigestedData(final byte[] content, 
+    		                      final String digestAlgorithm, 
+    		                      final Oid dataType) throws NoSuchAlgorithmException, IOException {
 
         // Obtenemos el algoritmo para hacer el digest
         final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(

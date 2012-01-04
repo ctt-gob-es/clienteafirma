@@ -51,7 +51,7 @@ final class CMSCompressedData {
      * @param data
      *        Datos a comprimir
      * @return Tipo CompressedData. */
-    byte[] genCompressedData(final byte[] data) {
+    static byte[] genCompressedData(final byte[] data) {
 
         // Algoritmo de compresion
         final AlgorithmIdentifier comAlgId = new AlgorithmIdentifier(new DERObjectIdentifier(ZLIB));
@@ -74,7 +74,7 @@ final class CMSCompressedData {
      * @return El contenido del envoltorio.
      * @throws IOException
      *         Se produce cuando hay un error de lectura de datos. */
-    byte[] getContentCompressedData(final byte[] data) throws IOException {
+    static byte[] getContentCompressedData(final byte[] data) throws IOException {
         final ASN1Sequence contentEnvelopedData = Utils.fetchWrappedData(data);
         final CompressedData compressed = CompressedData.getInstance(contentEnvelopedData);
         final DEROctetString dos = (DEROctetString) compressed.getEncapContentInfo().getContent();
