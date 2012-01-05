@@ -26,6 +26,10 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
  * CADES. */
 public final class ObtainContentSignedData {
     
+    private ObtainContentSignedData() {
+        // No permitimos la instanciacion
+    }
+    
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** M&eacute;todo que obtiene el contenido firmado de un tipo Signed Data

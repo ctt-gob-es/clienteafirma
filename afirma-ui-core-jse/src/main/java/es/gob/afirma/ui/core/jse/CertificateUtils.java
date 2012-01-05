@@ -22,6 +22,10 @@ import es.gob.afirma.core.misc.Platform.OS;
  */
 final class CertificateUtils {
     
+    private CertificateUtils() {
+        // No permitimos la instanciacion
+    }
+    
     private static final String CERTIFICATE_DEFAULT_EXTENSION = ".cer"; //$NON-NLS-1$
 
 	/** Abre un certificado con la aplicaci&oacute;n por defecto del sistema. Si no
