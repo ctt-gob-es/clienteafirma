@@ -34,7 +34,6 @@ import java.util.logging.Logger;
 import javax.crypto.BadPaddingException;
 import javax.security.auth.callback.PasswordCallback;
 
-import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
@@ -506,7 +505,6 @@ public class AOKeyStoreManager {
      * @throws KeyStoreException Cuando ocurren errores en el tratamiento del almac&eacute;n de claves
      * @throws NoSuchAlgorithmException Cuando ocurren errores obteniendo la clave
      * @throws UnrecoverableEntryException Si la contrase&ntilde;a proporcionada no es v&aacute;lida para obtener la clave privada
-     * @throws UnrecoverableKeyException Si la contrase&ntilde;a proporcionada no es v&aacute;lida
      * @throws AOCancelledOperationException Cuando el usuario cancela el proceso antes de que finalice
      */
     public KeyStore.PrivateKeyEntry getKeyEntry(final String alias, 
