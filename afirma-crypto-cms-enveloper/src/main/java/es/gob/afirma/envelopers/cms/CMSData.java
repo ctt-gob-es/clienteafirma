@@ -33,6 +33,10 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
 
 final class CMSData {
+	
+	private CMSData() {
+		// No permitimos la instanciacion
+	}
 
     /** M&eacute;odo que genera una estructura CMS de tipo Data.
      * @param content

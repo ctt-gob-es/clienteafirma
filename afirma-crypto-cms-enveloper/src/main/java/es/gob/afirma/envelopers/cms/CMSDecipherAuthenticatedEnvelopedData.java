@@ -29,6 +29,10 @@ import es.gob.afirma.core.AOException;
  * AuthenticatedEnvelopedData. de CMS.
  * Se usa para ello una clave del usuario. */
 public final class CMSDecipherAuthenticatedEnvelopedData {
+	
+	private CMSDecipherAuthenticatedEnvelopedData() {
+		// No permitimos la instanciacion
+	}
 
     /** &Eacute;ste m&eacute;todo descifra el contenido de un CMS
      * AuthenticatedEnvelopedData.

@@ -43,6 +43,10 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
  * para crear un mensaje Compressed Data de BouncyCastle: <a
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
 final class CMSCompressedData {
+	
+	private CMSCompressedData() {
+		// No permitimos la instanciacion
+	}
 
     /** OID de ZLIB * */
     static final String ZLIB = "1.2.840.113549.1.9.16.3.8"; //$NON-NLS-1$

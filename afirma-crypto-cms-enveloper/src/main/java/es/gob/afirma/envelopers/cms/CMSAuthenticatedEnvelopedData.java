@@ -84,6 +84,10 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
 
 public final class CMSAuthenticatedEnvelopedData {
+	
+	private CMSAuthenticatedEnvelopedData() {
+		// No permitimos la instanciacion
+	}
 
     /** @param parameters
      *        Par&aacute;metros necesarios que contienen tanto la firma del

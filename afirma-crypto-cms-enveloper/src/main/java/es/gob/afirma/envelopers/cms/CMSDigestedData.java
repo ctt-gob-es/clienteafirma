@@ -46,6 +46,10 @@ import es.gob.afirma.signers.pkcs7.DigestedData;
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
 final class CMSDigestedData {
 
+	private CMSDigestedData() {
+		// No permitimos la instanciacion
+	}
+	
     /** Genera una estructura de tipo digestedData.
      * @param content
      *        Contenido original

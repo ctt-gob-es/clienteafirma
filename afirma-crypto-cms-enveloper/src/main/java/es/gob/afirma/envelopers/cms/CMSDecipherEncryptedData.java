@@ -81,7 +81,7 @@ final class CMSDecipherEncryptedData {
             final Enumeration<?> e2 = contentEncryptedData.getObjects();
             // version
             e2.nextElement();
-            // EncryptedContentInfo. donde está lo que necesitamos.
+            // EncryptedContentInfo. donde esta lo que necesitamos.
             eci = EncryptedContentInfo.getInstance(e2.nextElement());
 
             // Obtenemos el agoritmo de cifrado

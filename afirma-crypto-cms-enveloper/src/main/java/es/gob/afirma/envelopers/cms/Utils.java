@@ -401,7 +401,7 @@ final class Utils {
     /** M&eacute;todo cifra la clave usada para cifrar el archivo usando para
      * ello la clave p&uacute;blica del certificado del usuario.
      * @param pKey
-     *        Clave pública del certificado.
+     *        Clave publica del certificado.
      * @param cipherKey
      *        Clave de cifrado
      * @return La clave cifrada en "WRAP_MODE".

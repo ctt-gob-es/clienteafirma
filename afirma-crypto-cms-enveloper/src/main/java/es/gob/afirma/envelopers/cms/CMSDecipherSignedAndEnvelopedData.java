@@ -28,6 +28,10 @@ import es.gob.afirma.signers.pkcs7.SignedAndEnvelopedData;
 /** Clase que descifra el contenido de un fichero en formato
  * SignedAndEnvelopedData. de CMS. */
 public final class CMSDecipherSignedAndEnvelopedData {
+	
+	private CMSDecipherSignedAndEnvelopedData() {
+		// No permitimos la instanciacion
+	}
 
     /** &Eacute;ste m&eacute;todo descifra el contenido de un CMS
      * SignedAndEnvelopData.

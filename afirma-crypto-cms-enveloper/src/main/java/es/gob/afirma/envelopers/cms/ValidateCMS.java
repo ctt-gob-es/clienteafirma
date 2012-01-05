@@ -49,6 +49,10 @@ import es.gob.afirma.signers.pkcs7.SignedAndEnvelopedData;
  * <li>Authenticated and Enveloped Data</li>
  * </ul> */
 final class ValidateCMS {
+	
+	private ValidateCMS() {
+		// No permitimos la instanciacion
+	}
 
     /** M&eacute;todo que verifica que es una firma de tipo "data"
      * @param data

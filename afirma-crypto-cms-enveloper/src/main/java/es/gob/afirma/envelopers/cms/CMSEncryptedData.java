@@ -48,6 +48,10 @@ import es.gob.afirma.core.signers.AOSignConstants;
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
 
 final class CMSEncryptedData {
+	
+	private CMSEncryptedData() {
+		// No permitimos la instanciacion
+	}
 
     /** M&eacute;todo principal que genera la firma de tipo EncryptedData.
      * @param data
