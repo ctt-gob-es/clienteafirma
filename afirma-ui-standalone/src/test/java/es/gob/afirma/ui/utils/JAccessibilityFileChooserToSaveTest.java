@@ -31,7 +31,7 @@ public class JAccessibilityFileChooserToSaveTest {
 	
 
 	/*
-	 * Comprobacion de que el campo Mnemocic de las etiquetas y botones no esté duplicado. 
+	 * Comprobacion de que el campo Mnemocic de las etiquetas y botones no este duplicado. 
 	 */
 	@Test
 	public void testNotDuplicatedDisplayedMnemonic() {
@@ -45,7 +45,7 @@ public class JAccessibilityFileChooserToSaveTest {
 		//Conjunto de mnemonicos
 		Set <Integer> keyCodesSet = null;
 		
-		//Se llama al método que obtiene una lista de codigos de atajos asociados a los componentes del panel
+		//Se llama al metodo que obtiene una lista de codigos de atajos asociados a los componentes del panel
 		getKeyCodeList (fileChooser, keyCodes);
 
 		//Se crea un conjunto a partir de la lista para eliminar duplicados
@@ -55,7 +55,7 @@ public class JAccessibilityFileChooserToSaveTest {
 	}
 	
 	/**
-	 * Método que obtiene una lista de codigos de atajos a los componentes (Etiqueta, Boton) de un panel.
+	 * Metodo que obtiene una lista de codigos de atajos a los componentes (Etiqueta, Boton) de un panel.
 	 */
 	@Ignore
 	private void getKeyCodeList(Container panel, List <Integer> keyCodeList) {
@@ -92,7 +92,7 @@ public class JAccessibilityFileChooserToSaveTest {
 						keyCodeList.add(new Integer(keyCode));
 					}
 			} else if (component instanceof Container) {
-				//Si es un contenedor se vuelve a llamar recursivamente al método
+				//Si es un contenedor se vuelve a llamar recursivamente al metodo
 				getKeyCodeList((Container)component, keyCodeList);
 			}
 		} //for

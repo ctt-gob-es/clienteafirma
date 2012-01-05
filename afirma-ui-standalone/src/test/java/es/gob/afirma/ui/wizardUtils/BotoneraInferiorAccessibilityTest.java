@@ -31,14 +31,14 @@ public class BotoneraInferiorAccessibilityTest {
 
 
 	/**
-	 * Comprobacion de que el campo Mnemocic de los botones no esté duplicado. 
+	 * Comprobacion de que el campo Mnemocic de los botones no este duplicado. 
 	 */
 	@Test
 	public void testNotDuplicatedDisplayedMnemonic() {
 		logger.info("testNotDuplicatedDisplayedMnemonic");
 
 		//Instancia del panel que se va a analizar
-		//Lista de diálogos
+		//Lista de dialogos
 		List<JDialogWizard> dialogs = new ArrayList<JDialogWizard>();
 		dialogs.add(new JDialogWizard());
 		//Panel botonera inferior
@@ -49,7 +49,7 @@ public class BotoneraInferiorAccessibilityTest {
 		//Conjunto de mnemonicos
 		Set <Integer> keyCodesSet = null;
 		
-		//Se llama al método que obtiene una lista de codigos de atajos asociados a los componentes del panel
+		//Se llama al metodo que obtiene una lista de codigos de atajos asociados a los componentes del panel
 		getKeyCodeList (botoneraInferior, keyCodes);
 
 		//Se crea un conjunto a partir de la lista para eliminar duplicados
@@ -59,7 +59,7 @@ public class BotoneraInferiorAccessibilityTest {
 	}
 
 	/**
-	 * Método que obtiene una lista de codigos de atajos a los componentes botones de un panel.
+	 * Metodo que obtiene una lista de codigos de atajos a los componentes botones de un panel.
 	 */
 	@Ignore
 	private void getKeyCodeList(JPanel panel, List <Integer> keyCodeList) {
@@ -81,7 +81,7 @@ public class BotoneraInferiorAccessibilityTest {
 				}
 				
 			} else {
-				//Si es un panel se vuelve a llamar recursivamente al método
+				//Si es un panel se vuelve a llamar recursivamente al metodo
 				getKeyCodeList((JPanel)component, keyCodeList);
 			}
 		} //for

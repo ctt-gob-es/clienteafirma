@@ -37,7 +37,7 @@ public class DescifradoAccessibilityTest {
 	static Logger logger = Logger.getLogger(DescifradoAccessibilityTest.class.getName());
 	
 	/**
-	 * Comprobacion de que el campo labelFor de las etiquetas no esté duplicado. 
+	 * Comprobacion de que el campo labelFor de las etiquetas no este duplicado. 
 	 */
 	@Test
 	public void testNotDuplicatedLabelForProperty_SimpleMode() {
@@ -77,7 +77,7 @@ public class DescifradoAccessibilityTest {
 	}
 	
 	/**
-	 * Comprobacion de que el campo labelFor de las etiquetas no esté duplicado. 
+	 * Comprobacion de que el campo labelFor de las etiquetas no este duplicado. 
 	 */
 	@Test
 	public void testNotDuplicatedLabelForProperty_AdvancedMode() {
@@ -126,7 +126,7 @@ public class DescifradoAccessibilityTest {
 	}
 	
 	/**
-	 * Comprobacion de que el campo Mnemocic de las etiquetas y botones no esté duplicado. 
+	 * Comprobacion de que el campo Mnemocic de las etiquetas y botones no este duplicado. 
 	 */
 	@Test
 	public void testNotDuplicatedDisplayedMnemonic_AdvancedMode() {
@@ -149,7 +149,7 @@ public class DescifradoAccessibilityTest {
 		//Conjunto de mnemonicos
 		Set <Integer> keyCodesSet = null;
 		
-		//Se llama al método que obtiene una lista de codigos de atajos asociados a los componentes del panel
+		//Se llama al metodo que obtiene una lista de codigos de atajos asociados a los componentes del panel
 		getKeyCodeList (descifradoPanel, keyCodes);
 
 		//Se crea un conjunto a partir de la lista para eliminar duplicados
@@ -160,20 +160,20 @@ public class DescifradoAccessibilityTest {
 	
 	/**
 	 * Comprobacion de que el campo nombre accesible para botones, radiobuttons, combos y checks
-	 * no esté vacío. 
+	 * no este vacio. 
 	 */
 	@Test
 	public void testNotEmptyAccessibleName_SimpleMode() {
 		logger.info("testNotEmptyAccessibleName_SimpleMode");
 		//Instancia del panel que se va a analizar
 		Descifrado descifrado = new Descifrado();
-		//Se llama al método que comprueba que el nombre no sea vacío
+		//Se llama al metodo que comprueba que el nombre no sea vacio
 		assertTrue(checkAccessibleName(descifrado));
 	}
 	
 	/**
 	 * Comprobacion de que el campo nombre accesible para botones, radiobuttons, combos y checks
-	 * no esté vacío. 
+	 * no este vacio. 
 	 */
 	@Test
 	public void testNotEmptyAccessibleName_AdvancedMode() {
@@ -191,7 +191,7 @@ public class DescifradoAccessibilityTest {
 
 		//Instancia del panel que se va a analizar
 		Descifrado descifrado = new Descifrado();
-		//Se llama al método que comprueba que el nombre no sea vacío
+		//Se llama al metodo que comprueba que el nombre no sea vacio
 		assertTrue(checkAccessibleName(descifrado));
 	}
 	
@@ -200,7 +200,7 @@ public class DescifradoAccessibilityTest {
 	 * tienen un nombre accesible asignado.
 	 * @param panel panel
 	 * @return verdadero -> si los componentes tienen un nombre accesible asignado
-	 * 		   falso -> si algún componente no tiene un nombre accesible asignado
+	 * 		   falso -> si algun componente no tiene un nombre accesible asignado
 	 */
 	@Ignore
 	private boolean checkAccessibleName(JPanel panel) {
@@ -214,32 +214,32 @@ public class DescifradoAccessibilityTest {
 				if (component instanceof JButton) { //Se comprueba si es un boton
 					JButton button = (JButton) component;
 					if (button.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) {
-						return false; //Si no tiene asignado un nombre accesible se sale del método
+						return false; //Si no tiene asignado un nombre accesible se sale del metodo
 					}
 				} else if (component instanceof JCheckBox) { //Se comprueba si es un checkBox
 					JCheckBox checkBox = (JCheckBox) component;
 					if (checkBox.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) {
-						return false; //Si no tiene asignado un nombre accesible se sale del método
+						return false; //Si no tiene asignado un nombre accesible se sale del metodo
 					}
 				} else if (component instanceof JComboBox) { //Se comprueba si es un combo
 					JComboBox comboBox = (JComboBox) component;
 					if (comboBox.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) {
-						return false; //Si no tiene asignado un nombre accesible se sale del método
+						return false; //Si no tiene asignado un nombre accesible se sale del metodo
 					}
 				} else if (component instanceof JRadioButton) { //Se comprueba si es un radioButton
 					JRadioButton radioButton = (JRadioButton) component;
 					if (radioButton.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) {
-						return false; //Si no tiene asignado un nombre accesible se sale del método
+						return false; //Si no tiene asignado un nombre accesible se sale del metodo
 					}
 				} else if (component instanceof JTextField) { //Se comprueba si es un campo de texto
 					JTextField textField = (JTextField) component;
 					if (textField.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) {
-						return false; //Si no tiene asignado un nombre accesible se sale del método
+						return false; //Si no tiene asignado un nombre accesible se sale del metodo
 					}
 				}
 				
 			} else {
-				//Si es un panel se vuelve a llamar recursivamente al método
+				//Si es un panel se vuelve a llamar recursivamente al metodo
 				result = checkAccessibleName((JPanel)component);
 			}
 		} //for
@@ -247,7 +247,7 @@ public class DescifradoAccessibilityTest {
 	}
 
 	/**
-	 * Método que obtiene una lista de codigos de atajos a los componentes (Etiqueta, Boton) de un panel.
+	 * Metodo que obtiene una lista de codigos de atajos a los componentes (Etiqueta, Boton) de un panel.
 	 */
 	@Ignore
 	private void getKeyCodeList(JPanel panel, List <Integer> keyCodeList) {
@@ -278,14 +278,14 @@ public class DescifradoAccessibilityTest {
 				}
 				
 			} else {
-				//Si es un panel se vuelve a llamar recursivamente al método
+				//Si es un panel se vuelve a llamar recursivamente al metodo
 				getKeyCodeList((JPanel)component, keyCodeList);
 			}
 		} //for
 	}//getKeyCodeList
 	
 	/**
-	 * Método que obtiene la propiedad labelFor de las etiquetas de un panel.
+	 * Metodo que obtiene la propiedad labelFor de las etiquetas de un panel.
 	 */
 	@Ignore
 	private void getLabelForComponentList(JPanel panel, List <Component> componentList) {
@@ -308,7 +308,7 @@ public class DescifradoAccessibilityTest {
 				}
 				
 			} else {
-				//Si es un panel se vuelve a llamar recursivamente al método
+				//Si es un panel se vuelve a llamar recursivamente al metodo
 				getLabelForComponentList((JPanel) component, componentList);
 			}
 		} //for

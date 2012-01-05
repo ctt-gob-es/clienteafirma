@@ -35,7 +35,7 @@ public class PanelRemitentesAccessibilityTest {
 	static Logger logger = Logger.getLogger(PanelRemitentesAccessibilityTest.class.getName());
 	
 	/**
-	 * Comprobacion de que el campo labelFor de las etiquetas no esté duplicado. 
+	 * Comprobacion de que el campo labelFor de las etiquetas no este duplicado. 
 	 */
 	@Test
 	public void testNotDuplicatedLabelForProperty() {
@@ -64,7 +64,7 @@ public class PanelRemitentesAccessibilityTest {
 					Component componentRootPane = componentsRootPane[j];
 					//Si es un panel se trata
 					if (componentRootPane instanceof JPanel) {
-						//Se llama al método que obtiene una lista de componentes asociados a la propiedad labelFor del panel
+						//Se llama al metodo que obtiene una lista de componentes asociados a la propiedad labelFor del panel
 						getLabelForComponentList ((JPanel) componentRootPane, componentList);
 						
 					} else if (componentRootPane instanceof JLayeredPane) { //Si es un layeredPane se obtienen sus componentes
@@ -76,7 +76,7 @@ public class PanelRemitentesAccessibilityTest {
 							//Si es instancia de JPanel se trata
 							if (componentLayeredPane instanceof JPanel) {
 
-								//Se llama al método que obtiene una lista de componentes asociados a la propiedad labelFor del panel
+								//Se llama al metodo que obtiene una lista de componentes asociados a la propiedad labelFor del panel
 								getLabelForComponentList ((JPanel) componentLayeredPane, componentList);
 							}
 						}
@@ -92,7 +92,7 @@ public class PanelRemitentesAccessibilityTest {
 	}
 
 	/**
-	 * Comprobacion de que el campo Mnemocic de las etiquetas,botones y checkbox no estén duplicados. 
+	 * Comprobacion de que el campo Mnemocic de las etiquetas,botones y checkbox no esten duplicados. 
 	 */
 	@Test
 	public void testNotDuplicatedDisplayedMnemonic() {
@@ -122,7 +122,7 @@ public class PanelRemitentesAccessibilityTest {
 					Component componentRootPane = componentsRootPane[j];
 					//Si es un panel se trata
 					if (componentRootPane instanceof JPanel) {
-						//Se llama al método que obtiene una lista de codigos de atajos asociados a los componentes del panel
+						//Se llama al metodo que obtiene una lista de codigos de atajos asociados a los componentes del panel
 						getKeyCodeList ((JPanel) componentRootPane, keyCodes);
 						
 					} else if (componentRootPane instanceof JLayeredPane) { //Si es un layeredPane se obtienen sus componentes
@@ -133,7 +133,7 @@ public class PanelRemitentesAccessibilityTest {
 							Component componentLayeredPane = componentsLayeredPane[z];
 							//Si es instancia de JPanel se trata
 							if (componentLayeredPane instanceof JPanel) {
-								//Se llama al método que obtiene una lista de codigos de atajos asociados a los componentes del panel
+								//Se llama al metodo que obtiene una lista de codigos de atajos asociados a los componentes del panel
 								getKeyCodeList ((JPanel) componentLayeredPane, keyCodes);
 							}
 						}
@@ -150,7 +150,7 @@ public class PanelRemitentesAccessibilityTest {
 	
 	/**
 	 * Comprobacion de que el campo nombre accesible para botones, radiobuttons combos y checks
-	 * no esté vacío. 
+	 * no este vacio. 
 	 */
 	@Test
 	public void testNotEmptyAccessibleName() {
@@ -174,7 +174,7 @@ public class PanelRemitentesAccessibilityTest {
 					Component componentRootPane = componentsRootPane[j];
 					//Si es un panel se trata
 					if (componentRootPane instanceof JPanel) {
-						//Se llama al método que comprueba que el nombre no sea vacío
+						//Se llama al metodo que comprueba que el nombre no sea vacio
 						assertTrue(checkAccessibleName((JPanel) componentRootPane));
 						
 					} else if (componentRootPane instanceof JLayeredPane) { //Si es un layeredPane se obtienen sus componentes
@@ -185,7 +185,7 @@ public class PanelRemitentesAccessibilityTest {
 							Component componentLayeredPane = componentsLayeredPane[z];
 							//Si es instancia de JPanel se trata
 							if (componentLayeredPane instanceof JPanel) {
-								//Se llama al método que comprueba que el nombre no sea vacío
+								//Se llama al metodo que comprueba que el nombre no sea vacio
 								assertTrue(checkAccessibleName((JPanel) componentLayeredPane));
 							}
 						}
@@ -201,7 +201,7 @@ public class PanelRemitentesAccessibilityTest {
 	 * tienen un nombre accesible asignado.
 	 * @param panel panel
 	 * @return verdadero -> si los componentes tienen un nombre accesible asignado
-	 * 		   falso -> si algún componente no tiene un nombre accesible asignado
+	 * 		   falso -> si algun componente no tiene un nombre accesible asignado
 	 */
 	@Ignore
 	private boolean checkAccessibleName(JPanel panel) {
@@ -215,32 +215,32 @@ public class PanelRemitentesAccessibilityTest {
 				if (component instanceof JButton) { //Se comprueba si es un boton
 					JButton button = (JButton) component;
 					if (button.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) {
-						return false; //Si no tiene asignado un nombre accesible se sale del método
+						return false; //Si no tiene asignado un nombre accesible se sale del metodo
 					}
 				} else if (component instanceof JCheckBox) { //Se comprueba si es un checkBox
 					JCheckBox checkBox = (JCheckBox) component;
 					if (checkBox.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) {
-						return false; //Si no tiene asignado un nombre accesible se sale del método
+						return false; //Si no tiene asignado un nombre accesible se sale del metodo
 					}
 				} else if (component instanceof JComboBox) { //Se comprueba si es un combo
 					JComboBox comboBox = (JComboBox) component;
 					if (comboBox.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) {
-						return false; //Si no tiene asignado un nombre accesible se sale del método
+						return false; //Si no tiene asignado un nombre accesible se sale del metodo
 					}
 				} else if (component instanceof JRadioButton) { //Se comprueba si es un radioButton
 					JRadioButton radioButton = (JRadioButton) component;
 					if (radioButton.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) {
-						return false; //Si no tiene asignado un nombre accesible se sale del método
+						return false; //Si no tiene asignado un nombre accesible se sale del metodo
 					}
 				} else if (component instanceof JTextField) { //Se comprueba si es un campo de texto
 					JTextField textField = (JTextField) component;
 					if (textField.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) {
-						return false; //Si no tiene asignado un nombre accesible se sale del método
+						return false; //Si no tiene asignado un nombre accesible se sale del metodo
 					}
 				}
 				
 			} else {
-				//Si es un panel se vuelve a llamar recursivamente al método
+				//Si es un panel se vuelve a llamar recursivamente al metodo
 				result = checkAccessibleName((JPanel)component);
 			}
 		} //for
@@ -248,7 +248,7 @@ public class PanelRemitentesAccessibilityTest {
 	}
 
 	/**
-	 * Método que obtiene una lista de codigos de atajos a los componentes (Etiqueta, Boton, Checkbox, Radiobutton) de un panel.
+	 * Metodo que obtiene una lista de codigos de atajos a los componentes (Etiqueta, Boton, Checkbox, Radiobutton) de un panel.
 	 */
 	@Ignore
 	private void getKeyCodeList(JPanel panel, List <Integer> keyCodeList) {
@@ -295,14 +295,14 @@ public class PanelRemitentesAccessibilityTest {
 				}
 				
 			} else {
-				//Si es un panel se vuelve a llamar recursivamente al método
+				//Si es un panel se vuelve a llamar recursivamente al metodo
 				getKeyCodeList((JPanel) component, keyCodeList);
 			}
 		} //for
 	}//getKeyCodeList
 	
 	/**
-	 * Método que obtiene la propiedad labelFor de las etiquetas de un panel.
+	 * Metodo que obtiene la propiedad labelFor de las etiquetas de un panel.
 	 */
 	@Ignore
 	private void getLabelForComponentList(JPanel panel, List <Component> componentList) {
@@ -325,7 +325,7 @@ public class PanelRemitentesAccessibilityTest {
 				}
 				
 			} else {
-				//Si es un panel se vuelve a llamar recursivamente al método
+				//Si es un panel se vuelve a llamar recursivamente al metodo
 				getLabelForComponentList((JPanel) component, componentList);
 			}
 		} //for
