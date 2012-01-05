@@ -194,6 +194,25 @@ public final class AOKeyStoreManagerFactory {
             } 
             return ksm;
         }
+        
+        else if (store == AOKeyStore.DNIE) {
+        	try {
+                ksm.init(
+            		store, 
+            		null,
+            		(!(pssCallback instanceof NullPasswordCallback)) ? pssCallback : null, 
+            		null
+        		);
+            }
+            catch (final AOException e) {
+                throw new AOKeystoreAlternativeException(
+                     getAlternateKeyStoreType(store),
+                     "Error al inicializar el PKCS#11 del DNIe", //$NON-NLS-1$
+                     e
+                );
+            } 
+            return ksm;
+        }
 
         else if (store == AOKeyStore.MOZ_UNI) {
             final AOKeyStoreManager ksmUni;
