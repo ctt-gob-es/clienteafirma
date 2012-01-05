@@ -26,7 +26,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.security.KeyException;
 import java.security.KeyStore.PrivateKeyEntry;
-import java.security.UnrecoverableEntryException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -56,7 +55,6 @@ import es.gob.afirma.keystores.main.callbacks.NullPasswordCallback;
 import es.gob.afirma.keystores.main.common.AOKeyStore;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManagerFactory;
-import es.gob.afirma.keystores.main.common.AOKeystoreAlternativeException;
 import es.gob.afirma.keystores.main.common.KeyStoreConfiguration;
 import es.gob.afirma.keystores.main.filters.CertificateFilter;
 import es.gob.afirma.ui.listeners.ElementDescriptionFocusListener;
@@ -82,11 +80,15 @@ final class Firma extends JPanel {
     private static final long serialVersionUID = 1L;
 
     // Nombres de los diferentes formatos de firmado
-    private final List<String> formatosL = new ArrayList<String>(Arrays.asList("Firma est\u00E1ndar (XAdES Detached)",
-                                                                               // "XAdES Enveloping",
-                                                                               // "XAdES Enveloped",
-                                                                               "CAdES",
-    "PAdES"));
+    private final List<String> formatosL = new ArrayList<String>(
+       Arrays.asList(
+         "Firma est\u00E1ndar (XAdES Detached)",
+         // "XAdES Enveloping",
+         // "XAdES Enveloped",
+         "CAdES",
+         "PAdES"
+       )
+    );
 
     // Constantes de los diferentes formatos de firmado
     private final List<String> formatosV = new ArrayList<String>(Arrays.asList(AOSignConstants.SIGN_FORMAT_XADES_DETACHED,
@@ -122,9 +124,6 @@ final class Firma extends JPanel {
     void firmarActionPerformed(final JComboBox comboAlmacen, final JComboBox comboFormato, final JTextField campoFichero) {// GEN-FIRST:event_firmarActionPerformed
         // Obtenemos la constante del formato a utilizar
         final String formato = this.formatosV.get(comboFormato.getSelectedIndex());
-
-        // Keystore
-        AOKeyStoreManager keyStoreManager = null;
 
         // Obtenemos la ruta del fichero a firmar
         if (campoFichero.getText() == null || campoFichero.getText().equals("")) { //$NON-NLS-1$
@@ -176,6 +175,9 @@ final class Firma extends JPanel {
                         Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title") //$NON-NLS-1$ //$NON-NLS-2$
                     );
             }
+
+            // Keystore
+            final AOKeyStoreManager keyStoreManager;
 
             try {
                 keyStoreManager = AOKeyStoreManagerFactory.getAOKeyStoreManager(store, lib, kssc.toString(), pssCallback, this);
@@ -247,7 +249,7 @@ final class Firma extends JPanel {
             }
 
             // Firmamos los datos
-            AOSigner signer = null;
+            final AOSigner signer;
             try {
                 signer = AOSignerFactory.getSigner(formato);
             }
@@ -260,7 +262,7 @@ final class Firma extends JPanel {
                 return;
             }
 
-            URI uri = null;
+            final URI uri;
             try {
                 uri = AOUtil.createURI(campoFichero.getText());
             }
@@ -296,9 +298,6 @@ final class Firma extends JPanel {
                                                JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            catch (final AOException e) {
-                throw e;
-            }
             finally {
                 setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                 if (fileIn != null) {
@@ -329,7 +328,7 @@ final class Firma extends JPanel {
             prop.setProperty("mode", modoFirma); //$NON-NLS-1$
             prop.setProperty("uri", uri.toASCIIString()); //$NON-NLS-1$
 
-            byte[] signedData = null;
+            final byte[] signedData;
             try {
                 signedData = signer.sign(fileData, GeneralConfig.getSignAlgorithm(), privateKeyEntry, prop);
             }
