@@ -20,9 +20,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileInputStream;
-import java.security.InvalidKeyException;
-import java.security.KeyException;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableEntryException;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -138,17 +139,11 @@ final class Desensobrado extends JPanel {
                 logger.info("Operacion cancelada por el usuario"); //$NON-NLS-1$
                 return;
             }
-            catch (final KeyException e) {
+            catch (final UnrecoverableEntryException e) {
                 // Control de la excepcion generada al introducir mal la contrasena para el almacen
                 CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
                                                true,
                                                Messages.getString("Desensobrado.msg.error.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
-                return;
-            }
-            catch (final AOKeystoreAlternativeException e) {
-                CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
-                                               true,
-                                               Messages.getString("Desensobrado.msg.error.almacen.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
                 return;
             }
             catch (final AOException e) {
@@ -169,18 +164,17 @@ final class Desensobrado extends JPanel {
             // Identificamos el tipo de envoltorio y recuperamos los datos
             byte[] recoveredData = null;
             try {
-                final AOCMSEnveloper enveloper = new AOCMSEnveloper();
                 // EnvelopedData
-                if (enveloper.isCMSValid(envelopData, AOSignConstants.CMS_CONTENTTYPE_ENVELOPEDDATA)) {
-                    recoveredData = new CMSDecipherEnvelopData().dechiperEnvelopData(envelopData, privateKeyEntry);
+                if (AOCMSEnveloper.isCMSValid(envelopData, AOSignConstants.CMS_CONTENTTYPE_ENVELOPEDDATA)) {
+					recoveredData = CMSDecipherEnvelopData.dechiperEnvelopData(envelopData, privateKeyEntry);
                     // SignedAndEnvelopedData
                 }
-                else if (enveloper.isCMSValid(envelopData, AOSignConstants.CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA)) {
-                    recoveredData = new CMSDecipherSignedAndEnvelopedData().dechiperSignedAndEnvelopData(envelopData, privateKeyEntry);
+                else if (AOCMSEnveloper.isCMSValid(envelopData, AOSignConstants.CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA)) {
+					recoveredData = CMSDecipherSignedAndEnvelopedData.dechiperSignedAndEnvelopData(envelopData, privateKeyEntry);
                     // AuthenticatedAndEnvelopedData
                 }
-                else if (enveloper.isCMSValid(envelopData, AOSignConstants.CMS_CONTENTTYPE_AUTHENVELOPEDDATA)) {
-                    recoveredData = new CMSDecipherAuthenticatedEnvelopedData().dechiperAuthenticatedEnvelopedData(envelopData, privateKeyEntry);
+                else if (AOCMSEnveloper.isCMSValid(envelopData, AOSignConstants.CMS_CONTENTTYPE_AUTHENVELOPEDDATA)) {
+					recoveredData = CMSDecipherAuthenticatedEnvelopedData.dechiperAuthenticatedEnvelopedData(envelopData, privateKeyEntry);
                     // Envoltorio no reconocido
                 }
                 else {
@@ -224,9 +218,8 @@ final class Desensobrado extends JPanel {
     }
 
     private AOKeyStoreManager getKeyStoreManager(final KeyStoreConfiguration ksConfiguration) throws AOException,
-    InvalidKeyException,
-    AOKeystoreAlternativeException,
-    AOCancelledOperationException {
+    																							     AOKeystoreAlternativeException,
+    																							     AOCancelledOperationException {
         PasswordCallback pssCallback;
         final AOKeyStore store = ksConfiguration.getType();
         String lib = ksConfiguration.getLib();
@@ -267,17 +260,22 @@ final class Desensobrado extends JPanel {
         }
     }
 
-    private PrivateKeyEntry getPrivateKeyEntry(final AOKeyStoreManager keyStoreManager, final JComboBox comboAlmacen) throws AOException {
+    private PrivateKeyEntry getPrivateKeyEntry(final AOKeyStoreManager keyStoreManager, 
+    		                                   final JComboBox comboAlmacen) throws AOException, 
+    		                                                                        UnrecoverableEntryException,
+    		                                                                        KeyStoreException,
+    		                                                                        NoSuchAlgorithmException {
         // Seleccionamos un certificado
-        final String selectedcert =
-            Utils.showCertSelectionDialog(keyStoreManager.getAliases(),
-                                          keyStoreManager,
-                                          SwingUtilities.getRoot(this),
-                                          true,
-                                          true,
-                                          true,
-                                          new Vector<CertificateFilter>(0),
-                                          false);
+        final String selectedcert = Utils.showCertSelectionDialog(
+    		keyStoreManager.getAliases(),
+            keyStoreManager,
+            SwingUtilities.getRoot(this),
+            true,
+            true,
+            true,
+            new Vector<CertificateFilter>(0),
+            false
+        );
 
         // Comprobamos si se ha cancelado la seleccion
         if (selectedcert == null) {
@@ -285,24 +283,14 @@ final class Desensobrado extends JPanel {
         }
 
         // Recuperamos la clave del certificado
-        PrivateKeyEntry privateKeyEntry = null;
-        try {
-            privateKeyEntry =
-                keyStoreManager.getKeyEntry(selectedcert,
-                                            Utils.getCertificatePC(((KeyStoreConfiguration) comboAlmacen.getSelectedItem()).getType(),
-                                                                   SwingUtilities.getRoot(this)));
-        }
-        catch (final AOCancelledOperationException e) {
-            // Si se ha cancelado la operacion lo informamos en el nivel superior para que se trate.
-            // Este relanzamiento se realiza para evitar la siguiente captura generica de excepciones
-            // que las relanza en forma de AOException
-            throw e;
-        }
-        catch (final Exception e) {
-            logger.severe("No se ha podido obtener el certicado con el alias '" + selectedcert + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
-            throw new AOException(e.getMessage());
-        }
-        return privateKeyEntry;
+        return keyStoreManager.getKeyEntry(
+    		selectedcert,
+            Utils.getCertificatePC(
+        		((KeyStoreConfiguration) comboAlmacen.getSelectedItem()).getType(),
+        		SwingUtilities.getRoot(this)
+    		)
+        );
+
     }
 
     /** Inicializacion de los componentes */

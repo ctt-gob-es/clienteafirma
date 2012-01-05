@@ -22,7 +22,6 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.security.KeyException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -270,7 +269,7 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
 
     /** Carga un combo con los repositorios/almacenes disponibles
      * @param comboRepositorios Combo donde se deben cargar los repositorios */
-    private void cargarCombo(final JComboBox comboRepositorios) {
+    private static void cargarCombo(final JComboBox comboRepositorios) {
         comboRepositorios.setModel(new DefaultComboBoxModel(KeyStoreLoader.getKeyStoresToSign()));
     }
 
@@ -280,14 +279,13 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
      * @return Tipo de sobre */
     private String comprobarTipo(final byte[] data, final PrivateKeyEntry privateKey) {
         String tipo = null;
-        final AOCMSEnveloper enveloper = new AOCMSEnveloper();
-        if (enveloper.isCMSValid(data, AOSignConstants.CMS_CONTENTTYPE_ENVELOPEDDATA)) {
+        if (AOCMSEnveloper.isCMSValid(data, AOSignConstants.CMS_CONTENTTYPE_ENVELOPEDDATA)) {
             tipo = AOSignConstants.CMS_CONTENTTYPE_ENVELOPEDDATA;
         }
-        else if (enveloper.isCMSValid(data, AOSignConstants.CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA)) {
+        else if (AOCMSEnveloper.isCMSValid(data, AOSignConstants.CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA)) {
             tipo = AOSignConstants.CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA;
         }
-        else if (enveloper.isCMSValid(data, AOSignConstants.CMS_CONTENTTYPE_AUTHENVELOPEDDATA)) {
+        else if (AOCMSEnveloper.isCMSValid(data, AOSignConstants.CMS_CONTENTTYPE_AUTHENVELOPEDDATA)) {
             tipo = AOSignConstants.CMS_CONTENTTYPE_AUTHENVELOPEDDATA;
         }
         else {
@@ -312,9 +310,8 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
         final X509Certificate[] originatorCertChain = (X509Certificate[]) privateKey.getCertificateChain();
 
         if (contentType.equals(AOSignConstants.CMS_CONTENTTYPE_ENVELOPEDDATA)) {
-            final CMSEnvelopedData enveloper = new CMSEnvelopedData();
             try {
-                envelop = enveloper.addOriginatorInfo(data, originatorCertChain);
+                envelop = CMSEnvelopedData.addOriginatorInfo(data, originatorCertChain);
             }
             catch (final AOException e) {
                 logger.warning("Ocurrio al agregar el nuevo remitente al sobre electronico: " + e); //$NON-NLS-1$
@@ -336,8 +333,7 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
             }
         }
         else if (contentType.equals(AOSignConstants.CMS_CONTENTTYPE_AUTHENVELOPEDDATA)) {
-            final CMSAuthenticatedEnvelopedData enveloper = new CMSAuthenticatedEnvelopedData();
-            envelop = enveloper.addOriginatorInfo(data, originatorCertChain);
+            envelop = CMSAuthenticatedEnvelopedData.addOriginatorInfo(data, originatorCertChain);
         }
         else {
             CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.sobres.almacen.certificado.soportado"), //$NON-NLS-1$
@@ -517,7 +513,7 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
         // Boton Anadir
         final JButton anadir = new JButton();
         final JButton eliminar = new JButton();
-        anadir.setToolTipText(Messages.getString("Wizard.sobres.aniadir.originante.description"));
+        anadir.setToolTipText(Messages.getString("Wizard.sobres.aniadir.originante.description")); //$NON-NLS-1$
         anadir.setText(Messages.getString("wizard.aniadir")); //$NON-NLS-1$
         anadir.setAutoscrolls(true);
         anadir.setMnemonic(KeyEvent.VK_R); // Se asigna un atajo al boton
@@ -592,8 +588,8 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
         final JPanel panelEliminar = new JPanel(new GridLayout(1, 1));
         // Boton eliminar
         eliminar.setEnabled(false);
-        eliminar.setToolTipText(Messages.getString("Wizard.sobres.eliminar.remitente.description"));
-        eliminar.setText(Messages.getString("wizard.sobres.eliminar.remitente"));
+        eliminar.setToolTipText(Messages.getString("Wizard.sobres.eliminar.remitente.description")); //$NON-NLS-1$
+        eliminar.setText(Messages.getString("wizard.sobres.eliminar.remitente")); //$NON-NLS-1$
         eliminar.getAccessibleContext().setAccessibleName(eliminar.getText() + " " + eliminar.getToolTipText());
         eliminar.getAccessibleContext().setAccessibleDescription(eliminar.getToolTipText());
         eliminar.addActionListener(new ActionListener() {
