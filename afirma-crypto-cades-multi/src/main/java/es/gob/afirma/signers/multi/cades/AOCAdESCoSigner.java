@@ -51,7 +51,7 @@ public class AOCAdESCoSigner implements AOCoSigner {
 
             // Si la firma que nos introducen es SignedData
             //final boolean signedData = new ValidateCMS().isCMSSignedData(sign);
-            final boolean signedData = new CAdESValidator().isCAdESSignedData(sign);
+            final boolean signedData = CAdESValidator.isCAdESSignedData(sign);
             if (signedData) {
 
                 final String mode = extraParams.getProperty("mode", AOSignConstants.DEFAULT_SIGN_MODE); //$NON-NLS-1$
@@ -97,7 +97,7 @@ public class AOCAdESCoSigner implements AOCoSigner {
 
         // Si la firma que nos introducen es SignedData
         //final boolean signedData = new ValidateCMS().isCMSSignedData(sign);
-        final boolean signedData = new CAdESValidator().isCAdESSignedData(sign);
+        final boolean signedData = CAdESValidator.isCAdESSignedData(sign);
         if (signedData) {
             try {
                 return new CAdESCoSigner().coSigner(
