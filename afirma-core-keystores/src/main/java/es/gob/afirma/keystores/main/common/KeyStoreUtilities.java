@@ -49,14 +49,14 @@ public final class KeyStoreUtilities {
     }
     
     static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+    
+    private static final String OPENSC_USR_LIB_LINUX = "/usr/lib/opensc-pkcs11.so"; //$NON-NLS-1$
 
     /** Crea las l&iacute;neas de configuraci&oacute;n para el proveedor PKCS#11
      * de Sun.
-     * @param lib
-     *        Nombre (con o sin ruta) de la biblioteca PKCS#11
-     * @param name
-     *        Nombre que queremos tenga el proveedor. CUIDADO: SunPKCS11
-     *        a&ntilde;ade el prefijo <i>SunPKCS11-</i>.
+     * @param lib Nombre (con o sin ruta) de la biblioteca PKCS#11
+     * @param nameNombre que queremos tenga el proveedor. CUIDADO: SunPKCS11
+     *            a&ntilde;ade el prefijo <i>SunPKCS11-</i>.
      * @return Fichero con las propiedades de configuracion del proveedor
      *         PKCS#11 de Sun para acceder al KeyStore de un token gen&eacute;rico */
     static String createPKCS11ConfigFile(final String lib, String name, final Integer slot) {
@@ -577,8 +577,8 @@ public final class KeyStoreUtilities {
             if (new File("/Library/OpenSC/lib/libopensc-dnie.1.0.3.dylib").exists()) { //$NON-NLS-1$
                 return "/Library/OpenSC/lib/libopensc-dnie.1.0.3.dylib";  //$NON-NLS-1$
             }
-            if (new File("/usr/lib/opensc-pkcs11.so").exists()) { //$NON-NLS-1$
-                return "/usr/lib/opensc-pkcs11.so";  //$NON-NLS-1$
+            if (new File(OPENSC_USR_LIB_LINUX).exists()) { 
+                return OPENSC_USR_LIB_LINUX;  
             }
             throw new AOKeyStoreManagerException("No hay controlador PKCS#11 de DNIe instalado en este sistema Mac OS X"); //$NON-NLS-1$
         }
@@ -591,8 +591,8 @@ public final class KeyStoreUtilities {
         if (new File("/lib/libopensc-dnie.so").exists()) { //$NON-NLS-1$
             return "/lib/libopensc-dnie.so"; //$NON-NLS-1$
         }
-        if (new File("/usr/lib/opensc-pkcs11.so").exists()) { //$NON-NLS-1$
-            return "/usr/lib/opensc-pkcs11.so";  //$NON-NLS-1$
+        if (new File(OPENSC_USR_LIB_LINUX).exists()) { 
+            return OPENSC_USR_LIB_LINUX;  
         }
         if (new File("/lib/opensc-pkcs11.so").exists()) { //$NON-NLS-1$
             return "/lib/opensc-pkcs11.so";  //$NON-NLS-1$
