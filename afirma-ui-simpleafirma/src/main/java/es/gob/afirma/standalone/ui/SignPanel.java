@@ -142,6 +142,9 @@ public final class SignPanel extends JPanel {
         if (!file.exists()) {
             errorMessage = Messages.getString("SignPanel.3"); //$NON-NLS-1$
         }
+        else if (file.isDirectory()) {
+        	errorMessage = Messages.getString(Messages.getString("SignPanel.21")); //$NON-NLS-1$
+        }
         else if (!file.canRead()) {
             errorMessage = Messages.getString("SignPanel.7"); //$NON-NLS-1$
         }
@@ -155,6 +158,7 @@ public final class SignPanel extends JPanel {
                     Messages.getString("SignPanel.25"), //$NON-NLS-1$
                     JOptionPane.ERROR_MESSAGE
             );
+            this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));          
             return;
         }
 
@@ -785,19 +789,25 @@ public final class SignPanel extends JPanel {
                         "No se ha podido mostrar la barra de progreso indeterminado: " + e); //$NON-NLS-1$
             }
             
-            try { Thread.sleep(5000); } catch(Exception e) { /* Ignoramos los errores */ }
+            try { Thread.sleep(5000); } catch(final Exception e) { /* Ignoramos los errores */ }
 
             final byte[] signResult;
             try {
                 if (SignPanel.this.cosign) {
-                    signResult = SignPanel.this.signer.cosign(SignPanel.this.dataToSign, "SHA1withRSA", //$NON-NLS-1$
-                                              ksm.getKeyEntry(alias, KeyStoreUtilities.getPreferredPCB(ksm.getType(), SignPanel.this)),
-                                              p);
+                    signResult = SignPanel.this.signer.cosign(
+                		SignPanel.this.dataToSign, 
+                		"SHA1withRSA", //$NON-NLS-1$
+                        ksm.getKeyEntry(alias, KeyStoreUtilities.getCertificatePC(ksm.getType(), SignPanel.this)),
+                        p
+                    );
                 }
                 else {
-                    signResult = SignPanel.this.signer.sign(SignPanel.this.dataToSign, "SHA1withRSA", //$NON-NLS-1$
-                            ksm.getKeyEntry(alias, KeyStoreUtilities.getPreferredPCB(ksm.getType(), SignPanel.this)),
-                            p);
+                    signResult = SignPanel.this.signer.sign(
+                		SignPanel.this.dataToSign, 
+                		"SHA1withRSA", //$NON-NLS-1$
+                        ksm.getKeyEntry(alias, KeyStoreUtilities.getCertificatePC(ksm.getType(), SignPanel.this)),
+                        p
+                    );
                 }
             }
             catch (final Exception e) {

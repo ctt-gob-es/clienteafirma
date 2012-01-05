@@ -10,14 +10,18 @@
 
 package es.gob.afirma.util;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.NoSuchAlgorithmException;
 import java.security.Security;
 import java.security.cert.CertPath;
 import java.security.cert.CertPathValidator;
 import java.security.cert.CertPathValidatorException;
 import java.security.cert.CertStore;
+import java.security.cert.CertStoreException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateFactory;
@@ -154,20 +158,26 @@ public final class AOCertVerifier {
      * @param svr
      *        Servidor LDAP donde se encuentran los certificados
      * @param location
-     *        Ruta hacia los certificados dentro del servidor LDAP */
-    public void addRootCertificatesFromLdap(final String svr, final LdapName location) {
+     *        Ruta hacia los certificados dentro del servidor LDAP 
+     * @throws NoSuchAlgorithmException 
+     * @throws InvalidAlgorithmParameterException 
+     * @throws IOException 
+     * @throws CertStoreException */
+    public void addRootCertificatesFromLdap(final String svr, 
+    			                            final LdapName location) throws InvalidAlgorithmParameterException, 
+    																		NoSuchAlgorithmException, 
+    																		IOException, 
+    																		CertStoreException {
         if (svr == null || "".equals(svr) || location == null) { //$NON-NLS-1$
-            LOGGER.warning(
+            throw new IllegalArgumentException(
                "No se pueden anadir certificados desde un servidor o una localizacion nula o vacia" //$NON-NLS-1$
             );
-            return;
         }
         
         String server = svr;
 
         // Comprobamos que el nombre sea correcto
-        if (server.startsWith("ldap://")) //$NON-NLS-1$
-         {
+        if (server.startsWith("ldap://")) { //$NON-NLS-1$
             server = server.replace("ldap://", ""); //$NON-NLS-1$ //$NON-NLS-2$
         }
         int port = LDAP_DEFAULT_PORT;
@@ -187,7 +197,7 @@ public final class AOCertVerifier {
             }
             catch (final Exception e) {
                 Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
-                "El puerto proporcionado (" + tmpPort + ") no es un numero: " + e //$NON-NLS-1$ //$NON-NLS-2$
+                   "El puerto proporcionado (" + tmpPort + ") no es un numero, se usara el puerto por defecto (" + LDAP_DEFAULT_PORT + "): " + e //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 );
             }
             server = tmpRoot;
@@ -196,41 +206,16 @@ public final class AOCertVerifier {
             server = server.substring(0, server.indexOf('/')); 
         }
 
-        final CertStore cs;
-        try {
-            cs = CertStore.getInstance(
-        		"LDAP",  //$NON-NLS-1$
-        		new LDAPCertStoreParameters(server, port)
-    		);
-        }
-        catch (final Exception e) {
-        	e.printStackTrace();
-            LOGGER.warning(
-               "No se pudo anadir la configuracion del servidor LDAP, no se anadiran certificados: " + e //$NON-NLS-1$
-            );
-            return;
-        }
+        final CertStore cs = CertStore.getInstance(
+    		"LDAP",  //$NON-NLS-1$
+    		new LDAPCertStoreParameters(server, port)
+		);
 
         final X509CertSelector xcs = new X509CertSelector();
-        try {
-            xcs.setSubject(location.toString());
-        }
-        catch (final Exception e) {
-            LOGGER.warning(
-               "No se pudo anadir la configuracion de la localizacion LDAP, no se anadiran certificados: " + e //$NON-NLS-1$
-            );
-            return;
-        }
+        xcs.setSubject(location.toString());
 
-        try {
-            for (final Certificate f : cs.getCertificates(xcs)) {
-                this.tas.add(new TrustAnchor((X509Certificate) f, null));
-            }
-        }
-        catch (final Exception e) {
-            LOGGER.warning(
-               "No se pudieron anadir certificados desde el LDAP: " + e //$NON-NLS-1$
-            );
+        for (final Certificate f : cs.getCertificates(xcs)) {
+            this.tas.add(new TrustAnchor((X509Certificate) f, null));
         }
 
     }

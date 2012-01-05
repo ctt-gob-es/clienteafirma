@@ -25,6 +25,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.RandomAccessFile;
+import java.nio.channels.FileLock;
 import java.security.cert.X509Certificate;
 import java.util.Locale;
 import java.util.logging.Logger;
@@ -59,6 +61,8 @@ import es.gob.afirma.standalone.ui.UIUtils;
  * </ul>
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class SimpleAfirma extends JApplet implements PropertyChangeListener, ActionListener, KeyListener, WindowListener {
+	
+	private static final String APPLICATION_HOME = Platform.getUserHome() + File.separator + ".afirma" + File.separator + "firmafacil"; //$NON-NLS-1$ //$NON-NLS-2$
 
     /** Clave de la preferencia para el guardado del idioma por defecto. */
     public static final String PREFERENCES_LOCALE = "default.locale"; //$NON-NLS-1$
@@ -68,7 +72,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 
     private static final long serialVersionUID = 9146759318663175997L;
     
-    private static Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+    static Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** Preferencias generales establecidas para el aplicativo. */
     private Preferences preferences;
@@ -449,10 +453,10 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
     /** Muestra la ayuda de la aplicaci&oacute;n. */
     public static void showHelp() {
         if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-            final File helpFile = new File(Platform.getUserHome() + "\\.afirma\\firmafacil\\FirmaFacil.chm"); //$NON-NLS-1$
+            final File helpFile = new File(APPLICATION_HOME + "\\FirmaFacil.chm"); //$NON-NLS-1$
             try {
                 if (!helpFile.exists()) {
-                    final File helpDir = new File(Platform.getUserHome() + "\\.afirma\\firmafacil"); //$NON-NLS-1$
+                    final File helpDir = new File(APPLICATION_HOME);
                     if (!helpDir.exists()) {
                         helpDir.mkdirs();
                     }
@@ -548,8 +552,52 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
             }
         }
         else {
-            new SimpleAfirma().initialize(false);
+        	if (!isSimpleAfirmaAlreadyRunning()) {
+        		new SimpleAfirma().initialize(false);
+        	}
+        	else {
+        		JOptionPane.showMessageDialog(
+    				null, 
+    				Messages.getString("SimpleAfirma.3"), //$NON-NLS-1$
+    				Messages.getString("SimpleAfirma.48"), //$NON-NLS-1$
+    				JOptionPane.WARNING_MESSAGE
+				);
+        	}
         }
     }
+    
+    private static boolean isSimpleAfirmaAlreadyRunning() {
+    	final File appDir = new File(APPLICATION_HOME);
+        if (!appDir.exists()) {
+            appDir.mkdirs();
+        }
+        try {
+            final File file = new File(APPLICATION_HOME + File.separator + ".lock"); //$NON-NLS-1$
+            final RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw"); //$NON-NLS-1$
+            final FileLock fileLock = randomAccessFile.getChannel().tryLock();
+            if (fileLock != null) {
+                Runtime.getRuntime().addShutdownHook(new Thread() {
+                    @Override
+					public void run() {
+                        try {
+                            fileLock.release();
+                            randomAccessFile.close();
+                            file.delete();
+                        } 
+                        catch (final Exception e) {
+                            LOGGER.warning("No se ha podido eliminar el bloqueo de instancia"); //$NON-NLS-1$
+                        }
+                    }
+                });
+                return false;
+            }
+            return true;
+        } 
+        catch (Exception e) {
+        	LOGGER.warning("No se ha podido comprobar el bloqueo de instancia"); //$NON-NLS-1$
+            return false;
+        }
+    }
+
 
 }

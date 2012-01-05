@@ -73,11 +73,19 @@ final class EditorFocusManager extends KeyAdapter implements FocusListener, Hype
         this.linkUnfocusedStyle = sc.addStyle("linkUnfocused", sc.getStyle(StyleContext.DEFAULT_STYLE)); //$NON-NLS-1$
         StyleConstants.setUnderline(this.linkUnfocusedStyle, true);
         StyleConstants.setForeground(this.linkUnfocusedStyle, Color.BLUE);
-        StyleConstants.setBackground(this.linkUnfocusedStyle, UIManager.getColor("TREE.background")); //$NON-NLS-1$
-        
+        StyleConstants.setBackground(
+    		this.linkUnfocusedStyle, 
+    		(UIManager.getColor("TREE.background")!=null) ? UIManager.getColor("TREE.background") : Color.WHITE  //$NON-NLS-1$ //$NON-NLS-2$
+		);
         this.linkFocusedStyle = sc.addStyle("linkFocused", sc.getStyle(StyleContext.DEFAULT_STYLE)); //$NON-NLS-1$
-        StyleConstants.setBackground(this.linkFocusedStyle, UIManager.getColor("TREE.selectionBackground")); //$NON-NLS-1$
-        StyleConstants.setForeground(this.linkFocusedStyle, UIManager.getColor("TREE.selectionForeground")); //$NON-NLS-1$
+        StyleConstants.setBackground(
+    		this.linkFocusedStyle, 
+    		(UIManager.getColor("TREE.selectionBackground")!=null) ? UIManager.getColor("TREE.selectionBackground") : Color.BLUE //$NON-NLS-1$ //$NON-NLS-2$
+		);
+        StyleConstants.setForeground(
+    		this.linkFocusedStyle, 
+    		(UIManager.getColor("TREE.selectionForeground")!=null) ? UIManager.getColor("TREE.selectionForeground") : Color.WHITE //$NON-NLS-1$ //$NON-NLS-2$
+		);
         
         final AccessibleHypertext accessibleHypertext = (AccessibleHypertext) this.displayPane.getAccessibleContext().getAccessibleText();        
         this.hyperLinks = new Vector<AccessibleHyperlink>(accessibleHypertext.getLinkCount());

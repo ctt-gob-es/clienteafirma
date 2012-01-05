@@ -10,7 +10,7 @@
 
 package es.gob.afirma.standalone.crypto;
 
-import java.net.URL;
+import java.awt.Component;
 import java.security.cert.X509Certificate;
 import java.util.logging.Logger;
 
@@ -68,14 +68,21 @@ class DnieCertAnalyzer extends CertAnalyzer {
 	    catch(final Exception e) {
 	        Logger.getLogger("es.gob.afirma").warning("No se ha podido obtener el nombre del titular del DNIe: " + e); //$NON-NLS-1$ //$NON-NLS-2$
 	    }
-		return new CertificateInfo(cert, Messages.getString("DnieCertAnalyzer.2") + ((titular != null) ? (" " + Messages.getString("DnieCertAnalyzer.0") + " " + titular) : ""), getDNIeCertVerifier(), new ImageIcon(this.getClass().getResource("/resources/dnie_cert_ico.png")), Messages.getString("DnieCertAnalyzer.4")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
+		return new CertificateInfo(
+			cert, 
+			Messages.getString("DnieCertAnalyzer.2") + ((titular != null) ? (" " + Messages.getString("DnieCertAnalyzer.0") + " " + titular) : ""),  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+			getDNIeCertVerifier(this.c), 
+			new ImageIcon(this.getClass().getResource("/resources/dnie_cert_ico.png")),  //$NON-NLS-1$
+			Messages.getString("DnieCertAnalyzer.4") //$NON-NLS-1$
+		);
 	}
 
-	/**
-	 * Obtiene un validador de certificados DNIe v&iacute;a OCSP.
+	/** Obtiene un validador de certificados DNIe v&iacute;a OCSP.
+	 * @param c Se habilita este componente cuando termina la inicializaci&oacute;n de los
+	 *          par&aacute;metros PKIX OCSP desde LDAP
 	 * @return Validador de certificados de DNIe
 	 */
-	private static AOCertVerifier getDNIeCertVerifier() {
+	private static AOCertVerifier getDNIeCertVerifier(final Component c) {
 
 		// Instanciamos la clase verificadora
 		final AOCertVerifier v = new AOCertVerifier();
@@ -84,68 +91,21 @@ class DnieCertAnalyzer extends CertAnalyzer {
 		v.setCheckValidity(true);
 
 		// Anadimos los cerificados CA desde LDAP
-		try {
-			v.addRootCertificatesFromLdap(
-				"ldap.dnie.es",  //$NON-NLS-1$
-				new LdapName("CN=AC RAIZ DNIE,OU=DNIE,O=DIRECCION GENERAL DE LA POLICIA,C=ES") //$NON-NLS-1$
-			);
-		}
-		catch(final Exception e) {
-			Logger.getLogger("es.gob.afirma").warning("No se ha podido anadir el certificado CA raiz del DNIe: " + e); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		try {
-            v.addRootCertificatesFromLdap(
-                "ldap.dnie.es",  //$NON-NLS-1$
-                new LdapName("CN=AC DNIE 001,OU=DNIE,O=DIRECCION GENERAL DE LA POLICIA,C=ES") //$NON-NLS-1$
-            );
-        }
-        catch(final Exception e) {
-            Logger.getLogger("es.gob.afirma").warning("No se ha podido anadir el certificado CA 001 del DNIe: " + e); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-        try {
-            v.addRootCertificatesFromLdap(
-                "ldap.dnie.es",  //$NON-NLS-1$
-                new LdapName("CN=AC DNIE 002,OU=DNIE,O=DIRECCION GENERAL DE LA POLICIA,C=ES") //$NON-NLS-1$
-            );
-        }
-        catch(final Exception e) {
-            Logger.getLogger("es.gob.afirma").warning("No se ha podido anadir el certificado CA 002 del DNIe: " + e); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-        try {
-            v.addRootCertificatesFromLdap(
-                "ldap.dnie.es",  //$NON-NLS-1$
-                new LdapName("CN=AC DNIE 003,OU=DNIE,O=DIRECCION GENERAL DE LA POLICIA,C=ES") //$NON-NLS-1$
-            );
-        }
-        catch(final Exception e) {
-            Logger.getLogger("es.gob.afirma").warning("No se ha podido anadir el certificado CA 003 del DNIe: " + e); //$NON-NLS-1$ //$NON-NLS-2$
-        }
 
-		// Anadimos los certificados raiz de las VA desde LDAP
-		try {
-            v.addRootCertificatesFromLdap(
-                "ldap.dnie.es",  //$NON-NLS-1$
-                new LdapName("CN=AV DNIE FNMT,OU=FNMT, OU=DNIE,O=DIRECCION GENERAL DE LA POLICIA,C=ES") //$NON-NLS-1$
-            );
-        }
-        catch(final Exception e) {
-            Logger.getLogger("es.gob.afirma").warning("No se ha podido anadir el certificado VA FNMT raiz del DNIe: " + e); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-
-		// Habilitamos el OCSP (DNIe SHA-1)
-		try {
-			AOCertVerifier.enableOCSP(
-				new URL("http://ocsp.dnielectronico.es:80"),  //$NON-NLS-1$
-				null,
-				null,
-				null
-			);
-		}
-		catch(final Exception e) {
-			Logger.getLogger("es.gob.afirma").severe("No se ha podido habilitar la validacion OCSP, la validacion puede ser incompleta: " + e); //$NON-NLS-1$ //$NON-NLS-2$
-		}
+		new DniOcspLdapWorker(v, c).execute();
 
 		return v;
 	}
+	
+    /** Componente (bot&oacute;n, etc.) susceptible de iniciar una validaci&oacute;n o un ana&aacute;lisis
+     * de certificado. 
+     * Si se proporciona deshabilitado, esta clase lo habilita autom&aacute;ticamente cuando se termina
+     * de preparar el proceso en segundo plano.  
+     */
+    private final Component c;
+    
+    DnieCertAnalyzer(final Component comp) {
+    	this.c = comp;
+    }
 
 }

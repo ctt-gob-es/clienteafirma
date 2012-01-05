@@ -10,8 +10,8 @@
 
 package es.gob.afirma.standalone.crypto;
 
+import java.awt.Component;
 import java.security.cert.X509Certificate;
-import java.util.logging.Logger;
 
 /**
  * Analizador de certificados para visualizaci&oacute;n de detalles en pantalla.
@@ -19,29 +19,17 @@ import java.util.logging.Logger;
  */
 public abstract class CertAnalyzer {
 
-    private static final String[] analyzers = new String[] {
-            "es.gob.afirma.standalone.crypto.DnieCertAnalyzer",   //$NON-NLS-1$
-            "es.gob.afirma.standalone.crypto.GenericCertAnalyzer" //$NON-NLS-1$
-    };
-
     /** Recupera la informaci&oacute;n necesaria para la visualizaci&oacute;n y
      * el tratamiento del certificado.
      * @param cert Certificado.
+     * @param c Se habilitar&aacute; este componente cuando termina la inicializaci&oacute;n de los
+	 *          par&aacute;metros PKIX OCSP desde LDAP si el certificado es de DNIe
      * @return Informaci&oacute;n del certificado. */
-    public static CertificateInfo getCertInformation(final X509Certificate cert) {
-        for (final String analyzerClassName : analyzers) {
-            try {
-                final Class<?> analyzerClass = Class.forName(analyzerClassName);
-                final CertAnalyzer analyzer = CertAnalyzer.class.cast(analyzerClass.newInstance());
-                if (analyzer.isValidCert(cert)) {
-                    return analyzer.analyzeCert(cert);
-                }
-            }
-            catch (final Exception e) {
-                Logger.getLogger("es.gob.afirma").warning("No se pudo cargar un analizador de certificados: " + e); //$NON-NLS-1$ //$NON-NLS-2$
-            }
-        }
-        return null;
+    public static CertificateInfo getCertInformation(final X509Certificate cert, final Component c) {
+    	if (cert.getIssuerX500Principal().toString().contains("AC DNIE")) { //$NON-NLS-1$
+    		return new es.gob.afirma.standalone.crypto.DnieCertAnalyzer(c).analyzeCert(cert);
+    	}
+    	return new es.gob.afirma.standalone.crypto.GenericCertAnalyzer().analyzeCert(cert);
     }
 
     /** Indica si el analizador es capaz de identificar el tipo de certificado.

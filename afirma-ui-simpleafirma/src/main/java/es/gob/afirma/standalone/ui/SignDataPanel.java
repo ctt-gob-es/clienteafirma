@@ -56,6 +56,7 @@ import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.Messages;
+import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.crypto.CertAnalyzer;
 import es.gob.afirma.standalone.crypto.CertificateInfo;
 import es.gob.afirma.standalone.crypto.CompleteSignInfo;
@@ -72,7 +73,7 @@ final class SignDataPanel extends JPanel {
     private final JLabel filePathText = new JLabel();
     private final JLabel certIcon = new JLabel();
     private final JEditorPane certDescription = new JEditorPane();
-    private JButton validateCertButton = null;
+    private final JButton validateCertButton = new JButton();
 
     SignDataPanel(final File signFile, final byte[] sign, final JComponent fileTypeIcon, final X509Certificate cert) {
         SwingUtilities.invokeLater(new Runnable() {
@@ -180,7 +181,7 @@ final class SignDataPanel extends JPanel {
 
         // Panel con los datos del certificado
         if (cert != null) {
-            final CertificateInfo certInfo = CertAnalyzer.getCertInformation(cert);
+            final CertificateInfo certInfo = CertAnalyzer.getCertInformation(cert, this.validateCertButton);
 
             if (certInfo != null) {
 
@@ -209,7 +210,7 @@ final class SignDataPanel extends JPanel {
 	            this.certDescription.addHyperlinkListener(editorFocusManager);
 	            
 	            if (certInfo.getCertVerifier() != null) {
-	                this.validateCertButton = new JButton();
+	            	this.validateCertButton.setEnabled(false);
 	                this.validateCertButton.setPreferredSize(new Dimension(150, 24));
 	                this.validateCertButton.setText(Messages.getString("SignDataPanel.15")); //$NON-NLS-1$
 	                this.validateCertButton.setMnemonic('c');
@@ -223,10 +224,23 @@ final class SignDataPanel extends JPanel {
 						    SignDataPanel.this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 							try {
 								certInfo.getCertVerifier().checkCertificate(new X509Certificate[] { cert }, true);
-								JOptionPane.showMessageDialog(SignDataPanel.this, Messages.getString("SignDataPanel.19"), Messages.getString("SignDataPanel.20"), JOptionPane.INFORMATION_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+								JOptionPane.showMessageDialog(
+									SignDataPanel.this, 
+									Messages.getString("SignDataPanel.19"),  //$NON-NLS-1$
+									Messages.getString("SignDataPanel.20"),  //$NON-NLS-1$
+									JOptionPane.INFORMATION_MESSAGE
+								);
 							}
 							catch(final Exception e) {
-								e.printStackTrace();
+								JOptionPane.showMessageDialog(
+									SignDataPanel.this,
+									Messages.getString("SignDataPanel.11"), //$NON-NLS-1$
+									Messages.getString("SignDataPanel.32"), //$NON-NLS-1$
+									JOptionPane.ERROR_MESSAGE
+								);
+								if (SimpleAfirma.DEBUG) {
+									e.printStackTrace();
+								}
 							}
 							finally {
 							    SignDataPanel.this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
