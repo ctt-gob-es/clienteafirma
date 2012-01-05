@@ -512,8 +512,7 @@ public class AOKeyStoreManager {
     public KeyStore.PrivateKeyEntry getKeyEntry(final String alias, 
     		                                    final PasswordCallback pssCallback) throws KeyStoreException, 
     		                                                                               NoSuchAlgorithmException, 
-    		                                                                               UnrecoverableEntryException,
-    		                                                                               UnrecoverableKeyException {
+    		                                                                               UnrecoverableEntryException {
 
         if (this.ks == null) {
             throw new IllegalStateException("Se han pedido claves a un almacen no inicializado"); //$NON-NLS-1$
@@ -534,8 +533,12 @@ public class AOKeyStoreManager {
                     this.ks.getCertificate(alias)
                 };
             }
-
-            return new KeyStore.PrivateKeyEntry((PrivateKey) this.ks.getKey(alias, "dummy".toCharArray()), certChain); //$NON-NLS-1$
+            try {
+                return new KeyStore.PrivateKeyEntry((PrivateKey) this.ks.getKey(alias, "dummy".toCharArray()), certChain); //$NON-NLS-1$
+            }
+            catch(final UnrecoverableKeyException e) {
+                throw new UnrecoverableEntryException(e.toString());
+            }
         }
         return (KeyStore.PrivateKeyEntry) this.ks.getEntry(alias, new KeyStore.PasswordProtection((pssCallback != null) ? pssCallback.getPassword() : null));
     }
