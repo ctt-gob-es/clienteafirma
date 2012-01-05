@@ -235,7 +235,8 @@ public final class AOPDFSigner implements AOSigner {
 
         String signAlgorithm = algorithm;
 
-        if (!algorithm.equals(AOSignConstants.SIGN_ALGORITHM_MD5WITHRSA) && !algorithm.equals(AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA)
+        if (!algorithm.equals(AOSignConstants.SIGN_ALGORITHM_MD5WITHRSA) 
+        	&& !algorithm.equals(AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA)
             && !algorithm.equals(AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA)
             && !algorithm.equals(AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA)
             && !algorithm.equals(AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA)) {
@@ -523,130 +524,7 @@ public final class AOPDFSigner implements AOSigner {
         return sign(sign, algorithm, keyEntry, extraParams);
     }
 
-    /** A&ntilde;ade una firma PAdES a un documento PDF. El comportamiento es exactamente el mismo que una llamada al m&eacute;todo <code>sign(...)</code>
-     * puesto que las multifirmas en los ficheros PDF se limitan a firmas independientes "en serie", pero no implementando los mecanismos de
-     * cofirma o contrafirma de CAdES.
-     * <p>
-     *  Notas sobre documentos <i>certificados</i>:<br>
-     *  Si un PDF firmado se ha certificado (por ejemplo, a&ntilde;adiendo una firma electr&oacute;nica usando Adobe Reader), cualquier
-     *  modificaci&oacute;n posterior del fichero (como la adici&oacute;n de nuevas firmas con este m&eacute;todo) invalidar&aacute;
-     *  las firmas previamente existentes.<br>
-     *  Si se detecta un documento PDF certificado, se mostrar&aacute; un di&aacute;logo gr&aacute;fico advirtiendo al usuario de esta
-     *  situaci&oacute;n y pidiendo confirmaci&oacute;n para continuar.<br>Si desea evitar interacciones directas con los usuarios
-     *  consulte la documentaci&oacute;n de las opciones <code>allowSigningCertifiedPdfs</code> y <code>headLess</code>.<br>
-     * </p>
-     * <p>
-     *  Notas sobre documentos protegidos con contrase&ntilde;a:<br>
-     *  Si un PDF est&aacute; protegido con contrase&ntilde;a por estar cifrado, se mostrar&aacute; un di&aacute;logo gr&aacute;fico advirtiendo al usuario de esta
-     *  situaci&oacute;n y solicitando la contrase&ntilde;a de apertura del PDF.<br>Si desea evitar interacciones directas con los usuarios
-     *  consulte la documentaci&oacute;n de las opciones <code>ownerPassword</code> y <code>headLess</code>.
-     *  Adicionalmente, es posible, si el fichero de entrada estaba cifrado y protegido con contrase&ntilde;a, que la salida sea un documento PDF
-     *  igualmente cifrado y protegido con contrase&ntilde;a. Consulte la documentaci&oacute;n de la opci&oacute;n <code>avoidEncryptingSignedPdfs</code>
-     *  para m&aacute;s informaci&oacute;n.
-     * </p>
-     * En general, es recomendable prescindir de este m&eacute;todo y llamar directamente al m&eacute;todo <code>sign(...)</code>
-     * @param sign Documento PDF a firmar
-     * @param targetType Se ignora el valor de este par&aacute;metro
-     * @param targets Se ignora el valor de este par&aacute;metro
-     * @param algorithm Algoritmo a usar para la firma.
-     * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
-     * <ul>
-     *  <li><i>SHA1withRSA</i></li>
-     *  <li><i>MD5withRSA</i> (no recomendado por vulnerable)</li>
-     *  <li><i>MD2withRSA</i> (no recomendado por vulnerable)</li>
-     *  <li><i>SHA256withRSA</i></li>
-     *  <li><i>SHA384withRSA</i></li>
-     *  <li><i>SHA512withRSA</i></li>
-     * </ul>
-     * @param keyEntry Entrada que apunta a la clave privada a usar para firmar
-     * @param extraParams Par&aacute;metros adicionales para la firma.
-     * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>extraParams</code>:</p>
-     * <dl>
-     *  <dt><b><i>applySystemDate</i></b></dt>
-     *   <dd><code>true</code> si se desea usar la hora y fecha del sistema como hora y fecha de firma, <code>false</code> en caso contrario.
-     *  <dt><b><i>signReason</i></b></dt>
-     *   <dd>Raz&oacute;n por la que se realiza la firma (este dato se a&ntilde;ade al diccionario PDF, y no a la propia firma).</dd>
-     *  <dt><b><i>signField</i></b></dt>
-     *   <dd>
-     *    Nombre del campo en donde insertar la firma.
-     *    Si el documento PDF tiene ya un campo de firma precreado es posible utilizarlo para insertar la firma generada, referenci&aacute;ndolo 
-     *    por su nombre.<br>
-     *    Si se indica un nombre de campo de firma que no exista en el documento PDF proporcionado, se generar&aacute; una excepci&oacute;n.
-     *   </dd>
-     *  <dt><b><i>signatureProductionCity</i></b></dt>
-     *   <dd>Ciudad en la que se realiza la firma (este dato se a&ntilde;ade al diccionario PDF, y no a la propia firma).</dd>
-     *  <dt><b><i>signerContact</i></b></dt>
-     *   <dd>
-     *    Contacto del firmante, usualmente una direcci&oacute;n de coreo electr&oacute;nico 
-     *    (este dato se a&ntilde;ade al diccionario PDF, y no a la propia firma).
-     *   </dd>
-     *  <dt><b><i>signaturePage</i></b></dt>
-     *   <dd>
-     *    P&aacute;gina del documento PDF donde insertar la firma. Puede usarse la constante <code>LAST_PAGE</code>
-     *    para referirse a la &uacute;ltima p&aacute;gina del documento PDF si se desconoce el n&uacute;mero total de
-     *    p&aacute;ginas de este.
-     *   </dd>
-     *  <dt><b><i>policyIdentifier</i></b></dt>
-     *   <dd>
-     *    Identificadora de la pol&iacute;tica de firma. Debe ser un OID (o una URN de tipo OID) que identifique 
-     *    &uacute;nivocamente la pol&iacute;tica en formato ASN.1 procesable.
-     *   </dd>
-     *  <dt><b><i>policyIdentifierHash</i></b></dt>
-     *   <dd>
-     *    Huella digital del documento de pol&iacute;tica de firma (normalmente del mismo fichero en formato ASN.1 procesable).
-     *    Si no se indica una huella digital y el par&aacute;metro <code>policyIdentifier</code> no es una URL accesible 
-     *    universalmente se usar&aacute; <code>0</code>, mientras que si no se indica una huella digital pero el par&aacute;metro
-     *    <code>policyIdentifier</code> es una URL accesible universalmente, se descargara el fichero apuntado por la URL para calcular la huella
-     *    digital <i>al vuelo</i>.     
-     *   </dd>
-     *  <dt><b><i>policyIdentifierHashAlgorithm</i></b></dt>
-     *   <dd>
-     *    Algoritmo usado para el c&aacute;lculo de la huella digital indicada en el par&aacute;metro <code>policyIdentifierHash</code>.
-     *    Es obligario indicarlo cuando se proporciona una huella digital distinta de <code>0</code>.
-     *   </dd>
-     *  <dt><b><i>policyQualifier</i></b></dt>
-     *   <dd>
-     *    URL que apunta al documento descriptivo de la pol&iacute;tica de firma (normalmente un documento PDF con una descripci&oacute;n textual).
-     *   </dd>
-     *  <dt><b><i>ownerPassword</i></b></dt>
-     *   <dd>
-     *    Contrase&ntilde;a de apertura del PDF (contrase&ntilde;a del propietario) si este estaba cifrado.<br>
-     *    No se soporta la firma de documentos PDF cifrados con certificados o con algoritmo AES256.
-     *   </dd>
-     *  <dt><b><i>headLess</i></b></dt>
-     *   <dd>
-     *    Evita cualquier interacci&oacute;n con el usuario si se establece a <code>true</code>, si no se establece o se establece a <code>false</code>
-     *    act&uacute;a normalmente (puede mostrar di&aacute;logos, por ejemplo, para solicitar las contrase&ntilde;as de los PDF cifrados). &Uacute;til para
-     *    los procesos desatendidos y por lotes
-     *   </dd>
-     *  <dt><b><i>avoidEncryptingSignedPdfs</i></b></dt>
-     *   <dd>
-     *    Si se establece a <code>true</code> no cifra los PDF firmados aunque el original estuviese firmado, si no se establece o se establece a
-     *    <code>false</code> los PDF se cifran tras firmarse si el original lo estaba, usando la misma contrase&ntilde;a y opciones que este
-     *   </dd>
-     *  <dt><b><i>allowSigningCertifiedPdfs</i></b></dt>
-     *   <dd>
-     *    Si se establece a <code>true</code> permite la firma o cofirma de PDF certificados, si no se establece o se establece a <code>false</code> se
-     *    lanza una excepci&oacute;n en caso de intentar firmar o cofirmar un PDF certificado.<br>
-     *    <b>Solo tiene efecto cuando <code>headLess</code> est&aacute;
-     *    establecido a <code>true</code>, si <code>headLess</code> est&aacute; a <code>false</code> se ignora este par&aacute;metro.</b><br>
-     *    No se soporta el cifrado de documentos PDF con certificados o con algoritmo AES256.
-     *   </dd>
-     *  <dt><b><i>tsaURL</i></b></dt>
-     *   <dd>URL de la autoridad de sello de tiempo (si no se indica no se a&ntilde;ade sello de tiempo).</dd>
-     *  <dt><b><i>tsaPolicy</i></b></dt>
-     *   <dd>Pol&iacute;tica de sellado de tiempo (obligatoria si se indica <code>tsaURL</code>).</dd>
-     *  <dt><b><i>tsaHashAlgorithm</i></b></dt>
-     *   <dd>Algoritmo de huella digital a usar para el sello de tiempo (si no se establece se usa SHA-1).</dd>
-     *  <dt><b><i>tsaRequireCert</i></b></dt>
-     *   <dd><code>true</code> si se requiere el certificado de la TSA, false en caso contrario (si no se establece se asume <code>true</code>).</dd>
-     *  <dt><b><i>tsaUsr</i></b></dt>
-     *   <dd>Nombre de usuario de la TSA.</dd>
-     *  <dt><b><i>tsaPwd</i></b></dt>
-     *   <dd>Contrase&ntilde;a del usuario de la TSA. Se ignora si no de ha establecido adem&aacute;s <code>tsaUsr</code>.</dd>
-     * </dl>
-     * @return Documento PDF firmado en formato PAdES
-     * @throws AOException Cuando ocurre cualquier problema durante el proceso */
+    /** Operaci&oacute;n no soportada para firmas PAdES. */
     public byte[] countersign(final byte[] sign,
                               final String algorithm,
                               final CounterSignTarget targetType,
@@ -1092,14 +970,16 @@ public final class AOPDFSigner implements AOSigner {
         // **************** CALCULO DEL SIGNED DATA ***************************************
         // ********************************************************************************
 
+        // La norma PAdES establece que si el algoritmo de huella digital es SHA1 debe usarse SigningCertificateV2, y en cualquier
+        // otro caso SigningCertificateV2
 		byte[] pk = GenCAdESEPESSignedData.generateSignedData(
-                    new P7ContentSignerParameters(inPDF, algorithm, chain), 
-                    true, // omitContent
-                    new AdESPolicy(extraParams),
-                    true, // true -> isSigningCertificateV2, false -> isSigningCertificateV1
-                    ke,
-                    MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(algorithm)).digest(AOUtil.getDataFromInputStream(sap.getRangeStream())),
-                    true
+            new P7ContentSignerParameters(inPDF, algorithm, chain), 
+            true, // omitContent
+            new AdESPolicy(extraParams),
+            ("SHA1".equals(AOSignConstants.getDigestAlgorithmName(algorithm))) ? false : true, // true -> isSigningCertificateV2, false -> isSigningCertificateV1 //$NON-NLS-1$
+            ke,
+            MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(algorithm)).digest(AOUtil.getDataFromInputStream(sap.getRangeStream())),
+            true // Modo PAdES
         );
 
         //***************** SELLO DE TIEMPO ****************
