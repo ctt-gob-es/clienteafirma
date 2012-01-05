@@ -158,7 +158,7 @@ public final class AOCertVerifier {
     public void addRootCertificatesFromLdap(final String svr, final LdapName location) {
         if (svr == null || "".equals(svr) || location == null) { //$NON-NLS-1$
             LOGGER.warning(
-                           "No se pueden anadir certificados desde un servidor o una localizacion nula o vacia" //$NON-NLS-1$
+               "No se pueden anadir certificados desde un servidor o una localizacion nula o vacia" //$NON-NLS-1$
             );
             return;
         }
@@ -198,12 +198,15 @@ public final class AOCertVerifier {
 
         final CertStore cs;
         try {
-            cs = CertStore.getInstance("LDAP", //$NON-NLS-1$
-                                       new LDAPCertStoreParameters(server, port));
+            cs = CertStore.getInstance(
+        		"LDAP",  //$NON-NLS-1$
+        		new LDAPCertStoreParameters(server, port)
+    		);
         }
         catch (final Exception e) {
+        	e.printStackTrace();
             LOGGER.warning(
-                           "No se pudo anadir la configuracion del servidor LDAP, no se anadiran certificados: " + e //$NON-NLS-1$
+               "No se pudo anadir la configuracion del servidor LDAP, no se anadiran certificados: " + e //$NON-NLS-1$
             );
             return;
         }
@@ -214,7 +217,7 @@ public final class AOCertVerifier {
         }
         catch (final Exception e) {
             LOGGER.warning(
-                           "No se pudo anadir la configuracion de la localizacion LDAP, no se anadiran certificados: " + e //$NON-NLS-1$
+               "No se pudo anadir la configuracion de la localizacion LDAP, no se anadiran certificados: " + e //$NON-NLS-1$
             );
             return;
         }
@@ -226,7 +229,7 @@ public final class AOCertVerifier {
         }
         catch (final Exception e) {
             LOGGER.warning(
-                           "No se pudieron anadir certificados desde el LDAP: " + e //$NON-NLS-1$
+               "No se pudieron anadir certificados desde el LDAP: " + e //$NON-NLS-1$
             );
         }
 
