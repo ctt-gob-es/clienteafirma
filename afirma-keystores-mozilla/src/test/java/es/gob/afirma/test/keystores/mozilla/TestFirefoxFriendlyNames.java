@@ -11,7 +11,6 @@
 package es.gob.afirma.test.keystores.mozilla;
 
 import java.io.IOException;
-import java.security.InvalidKeyException;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
