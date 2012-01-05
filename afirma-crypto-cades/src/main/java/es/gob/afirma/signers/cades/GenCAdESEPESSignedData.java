@@ -52,6 +52,10 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
  * </pre>
  */
 public final class GenCAdESEPESSignedData {
+    
+    private GenCAdESEPESSignedData() {
+        // No permitimos la instanciacion
+    }
 
     /** Genera una firma digital usando una estructura PKCS#7
      * SignedData. Puede incluir el contenido del fichero codificado

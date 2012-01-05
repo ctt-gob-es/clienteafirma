@@ -38,6 +38,10 @@ public final class CAdESValidator {
     
     private static final Logger LOGGER = Logger.getLogger("es.gob.afima"); //$NON-NLS-1$
     
+    private CAdESValidator() {
+        // No permitimos la instanciacion
+    }
+    
     /** Verifica si los datos proporcionados se corresponden con una estructura de tipo <i>Data</i>.
      * @param data Datos PKCS#7/CMS/CAdES.
      * @return <code>true</code> si los datos proporcionados se corresponden con una estructura de tipo <i>Data</i>,
