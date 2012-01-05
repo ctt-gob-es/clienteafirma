@@ -54,14 +54,15 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                         0
                     };
 
-                    dataSigned =
-                            new CAdESCounterSigner().counterSigner(csp,
-                                                                   sign,
-                                                                   CounterSignTarget.TREE,
-                                                                   nodes,
-                                                                   keyEntry,
-                                                                   new AdESPolicy(extraParams),
-                                                                   signingCertificateV2);
+                    dataSigned = new CAdESCounterSigner().counterSigner(
+                    	   csp,
+	                       sign,
+	                       CounterSignTarget.TREE,
+	                       nodes,
+	                       keyEntry,
+	                       new AdESPolicy(extraParams),
+	                       signingCertificateV2
+                    );
                 }
                 // CASO DE FIRMA DE HOJAS
                 else if (targetType == CounterSignTarget.LEAFS) {
@@ -83,7 +84,7 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                     for (int i = 0; i < targets.length; i++) {
                         nodesID[i] = ((Integer) targets[i]).intValue();
                     }
-                    nodesID = new ReadNodesTree().simplyArray(nodesID);
+					nodesID = ReadNodesTree.simplyArray(nodesID);
                     dataSigned =
                             new CAdESCounterSigner().counterSigner(csp,
                                                                    sign,
@@ -159,15 +160,16 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                 for (int i = 0; i < targets.length; i++) {
                     nodesID[i] = ((Integer) targets[i]).intValue();
                 }
-                nodesID = new ReadNodesTree().simplyArray(nodesID);
-                dataSigned =
-                        new CAdESCounterSignerEnveloped().counterSigner(csp,
-                                                                        sign,
-                                                                        CounterSignTarget.NODES,
-                                                                        nodesID,
-                                                                        keyEntry,
-                                                                        new AdESPolicy(extraParams),
-                                                                        signingCertificateV2);
+				nodesID = ReadNodesTree.simplyArray(nodesID);
+                dataSigned = new CAdESCounterSignerEnveloped().counterSigner(
+            		csp,
+                    sign,
+                    CounterSignTarget.NODES,
+                    nodesID,
+                    keyEntry,
+                    new AdESPolicy(extraParams),
+                    signingCertificateV2
+                );
             }
             // CASO DE FIRMA DE NODOS DE UNO O VARIOS FIRMANTES
             else if (targetType == CounterSignTarget.SIGNERS) {
@@ -179,14 +181,15 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                     signers[i] = (String) targets[i];
                 }
                 final int[] nodes2 = new ReadNodesTree().readNodesFromSigners(signers, sign);
-                dataSigned =
-                        new CAdESCounterSignerEnveloped().counterSigner(csp,
-                                                                        sign,
-                                                                        CounterSignTarget.SIGNERS,
-                                                                        nodes2,
-                                                                        keyEntry,
-                                                                        new AdESPolicy(extraParams),
-                                                                        signingCertificateV2);
+                dataSigned = new CAdESCounterSignerEnveloped().counterSigner(
+            		csp,
+                    sign,
+                    CounterSignTarget.SIGNERS,
+                    nodes2,
+                    keyEntry,
+                    new AdESPolicy(extraParams),
+                    signingCertificateV2
+                );
 
             }
 
