@@ -21,6 +21,8 @@ import es.gob.afirma.core.misc.Platform.OS;
  * Funciones de utilidad del di&aacute;logo de selecci&oacute;n de certificados.
  */
 final class CertificateUtils {
+    
+    private static final String CERTIFICATE_DEFAULT_EXTENSION = ".cer"; //$NON-NLS-1$
 
 	/** Abre un certificado con la aplicaci&oacute;n por defecto del sistema. Si no
 	 * puede hacerlo, permite que el usuario lo almacene en la ruta que desee.
@@ -33,13 +35,13 @@ final class CertificateUtils {
 		try {
 			desktopClass = Class.forName("java.awt.Desktop"); //$NON-NLS-1$
 		} 
-		catch (ClassNotFoundException e) {
+		catch (final ClassNotFoundException e) {
 			desktopClass = null;
 		}
 		
 		if (desktopClass != null) {
 			try {
-				final File certFile = saveTemp(certificate.getEncoded(), ".cer"); //$NON-NLS-1$
+				final File certFile = saveTemp(certificate.getEncoded(), CERTIFICATE_DEFAULT_EXTENSION); 
 				final Method getDesktopMethod = desktopClass.getDeclaredMethod("getDesktop()", (Class[]) null); //$NON-NLS-1$
 				final Object desktopObject = getDesktopMethod.invoke(null, (Object[]) null);
 				final Method openMethod = desktopClass.getDeclaredMethod("open", File.class); //$NON-NLS-1$
@@ -54,7 +56,7 @@ final class CertificateUtils {
 		// En entornos Java 5 intentamos abrirlo manualmente en Windows
 		if (Platform.getOS() == OS.WINDOWS) {
 			try {
-				final File certFile = saveTemp(certificate.getEncoded(), ".cer"); //$NON-NLS-1$
+				final File certFile = saveTemp(certificate.getEncoded(), CERTIFICATE_DEFAULT_EXTENSION); 
 				new ProcessBuilder(
 						new String[] {
 								"cmd", "/C", "start", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -116,13 +118,13 @@ final class CertificateUtils {
 				if (f.isDirectory()) {
 					return true;
 				}
-				if (f.getName().toLowerCase().endsWith(".cer")) { //$NON-NLS-1$
+				if (f.getName().toLowerCase().endsWith(CERTIFICATE_DEFAULT_EXTENSION)) { 
 					return true;
 				}
 				return false;
 			}
 		});
-   		fc.setSelectedFile(new File(JSEUIMessages.getString("CertificateUtils.5") + ".cer"));  //$NON-NLS-1$//$NON-NLS-2$
+   		fc.setSelectedFile(new File(JSEUIMessages.getString("CertificateUtils.5") + CERTIFICATE_DEFAULT_EXTENSION));  //$NON-NLS-1$
 		
     	boolean selectedFile = false;
         File finalFile = null;
