@@ -41,7 +41,7 @@ public class CifradoAccessibilityTest {
 	 */
 	@Test
 	public void testNotDuplicatedLabelForProperty_SimpleMode() {
-		logger.info("testNotDuplicatedLabelForProperty_SimpleMode");
+		logger.info("testNotDuplicatedLabelForProperty_SimpleMode"); //$NON-NLS-1$
 
 		//Instancia del panel que se va a analizar
 		Cifrado cifradoPanel = new Cifrado();
@@ -204,12 +204,12 @@ public class CifradoAccessibilityTest {
 					}
 				} else if (component instanceof JRadioButton) { //Se comprueba si es un radioButton
 					JRadioButton radioButton = (JRadioButton) component;
-					if (radioButton.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) {
+					if (radioButton.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) { //$NON-NLS-1$
 						return false; //Si no tiene asignado un nombre accesible se sale del metodo
 					}
 				} else if (component instanceof JTextField) { //Se comprueba si es un campo de texto
 					JTextField textField = (JTextField) component;
-					if (textField.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) {
+					if (textField.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) { //$NON-NLS-1$
 						return false; //Si no tiene asignado un nombre accesible se sale del metodo
 					}
 				}

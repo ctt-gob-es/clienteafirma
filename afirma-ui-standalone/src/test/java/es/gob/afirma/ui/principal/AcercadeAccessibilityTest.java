@@ -38,7 +38,7 @@ public class AcercadeAccessibilityTest {
 	 */
 	@Test
 	public void testNotDuplicatedMnemonic() {
-		logger.info("testNotDuplicatedMnemonic");
+		logger.info("testNotDuplicatedMnemonic"); //$NON-NLS-1$
 
 		//Instancia del panel que se va a analizar
 		Acercade acercade = new Acercade();
@@ -95,7 +95,7 @@ public class AcercadeAccessibilityTest {
 	 */
 	@Test
 	public void testEditableTextPane() {
-		logger.info("testEditableTextPane");
+		logger.info("testEditableTextPane"); //$NON-NLS-1$
 
 		//Instancia del panel que se va a analizar
 		Acercade acercade = new Acercade();
@@ -142,7 +142,7 @@ public class AcercadeAccessibilityTest {
 	 */
 	@Test
 	public void testNotEmptyAccessibleName() {
-		logger.info("testNotEmptyAccessibleName");
+		logger.info("testNotEmptyAccessibleName"); //$NON-NLS-1$
 		//Instancia del panel que se va a analizar
 		Acercade acercade = new Acercade();
 		//Componentes del wizard
@@ -200,22 +200,22 @@ public class AcercadeAccessibilityTest {
 			if (!(component instanceof JPanel)) {
 				if (component instanceof JButton) { //Se comprueba si es un boton
 					JButton button = (JButton) component;
-					if (button.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) {
+					if (button.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) { //$NON-NLS-1$
 						return false; //Si no tiene asignado un nombre accesible se sale del metodo
 					}
 				} else if (component instanceof JCheckBox) { //Se comprueba si es un checkBox
 					JCheckBox checkBox = (JCheckBox) component;
-					if (checkBox.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) {
+					if (checkBox.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) { //$NON-NLS-1$
 						return false; //Si no tiene asignado un nombre accesible se sale del metodo
 					}
 				} else if (component instanceof JComboBox) { //Se comprueba si es un combo
 					JComboBox comboBox = (JComboBox) component;
-					if (comboBox.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) {
+					if (comboBox.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) { //$NON-NLS-1$
 						return false; //Si no tiene asignado un nombre accesible se sale del metodo
 					}
 				} else if (component instanceof JRadioButton) { //Se comprueba si es un radioButton
 					JRadioButton radioButton = (JRadioButton) component;
-					if (radioButton.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) {
+					if (radioButton.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) { //$NON-NLS-1$
 						return false; //Si no tiene asignado un nombre accesible se sale del metodo
 					}
 				}
