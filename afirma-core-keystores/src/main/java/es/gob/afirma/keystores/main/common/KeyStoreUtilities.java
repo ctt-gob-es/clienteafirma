@@ -244,7 +244,6 @@ public final class KeyStoreUtilities {
                         LOGGER.info(
                           "El certificado '" + al + "' no se mostrara por no soportar operaciones de clave privada" //$NON-NLS-1$ //$NON-NLS-2$
                         );
-                        continue;
                     }
                     catch (final Exception e) {
                         LOGGER.info(
