@@ -333,7 +333,7 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
         final JButton bClose = new JButton(Messages.getString("VisorPanel.1")); //$NON-NLS-1$
         bClose.setMnemonic(KeyEvent.VK_C);
         bClose.setToolTipText(Messages.getString("VisorPanel.2")); //$NON-NLS-1$
-        bClose.getAccessibleContext().setAccessibleName(Messages.getString("VisorPanel.1") + ". " +Messages.getString("VisorPanel.3"));  //$NON-NLS-1$
+        bClose.getAccessibleContext().setAccessibleName(Messages.getString("VisorPanel.1") + ". " +Messages.getString("VisorPanel.3"));  //$NON-NLS-1$ //$NON-NLS-3$
 
         Utils.remarcar(bClose);
         Utils.setContrastColor(bClose);
