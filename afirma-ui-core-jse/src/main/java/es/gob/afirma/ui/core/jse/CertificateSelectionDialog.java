@@ -26,8 +26,12 @@ final class CertificateSelectionDialog implements MouseListener {
 	 * @param el Listado de certificados.
 	 * @param parent Componente sobre el que se mostrar&aacute; el di&aacute;logo. */
 	CertificateSelectionDialog(final NameCertificateBean[] el, final Component parent) {
+	    
+	    if (el == null) {
+	        throw new IllegalArgumentException("El listado de certificados no puede ser nulo"); //$NON-NLS-1$
+	    }
 
-		this.csd = new CertificateSelectionPanel(el);
+		this.csd = new CertificateSelectionPanel(el.clone());
 		this.parent = parent;
 		this.optionPane = (el.length > 1) ?
 				new CertOptionPane(this.csd) : new JOptionPane();
