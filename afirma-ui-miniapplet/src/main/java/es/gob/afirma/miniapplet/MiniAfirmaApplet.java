@@ -40,6 +40,8 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
+	private static final String DEFAULT_CHARSET_NAME = "utf-8";  //$NON-NLS-1$
+	
 	private static final String APPLET_PARAM_USER_AGENT = "userAgent"; //$NON-NLS-1$
 
 	private static final String APPLET_PARAM_USER_KEYSTORE = "keystore"; //$NON-NLS-1$
@@ -424,7 +426,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			if (cleanCharset != null) {
 				return new String(Base64.decode(base64Data), cleanCharset);
 			}
-			return new String(Base64.decode(base64Data));
+			return new String(Base64.decode(base64Data), DEFAULT_CHARSET_NAME);
 		}
 		catch (final IOException e) {
 			setErrorMessage(e);
@@ -449,7 +451,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 				throw e;
 			}
 		}
-		return Base64.encodeBytes(plainText.getBytes());
+		return Base64.encodeBytes(plainText.getBytes(DEFAULT_CHARSET_NAME));
 	}
 
 	/**
