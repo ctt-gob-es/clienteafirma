@@ -125,8 +125,7 @@ public final class AOUtil {
      * @return Flujo de entrada hacia el contenido del fichero
      * @throws AOException
      *         Cuando ocurre cualquier problema obteniendo el flujo 
-     * @throws IOException 
-     * @throws MalformedURLException */
+     * @throws IOException */
     public static InputStream loadFile(final URI uri) throws AOException, IOException {
 
         if (uri == null) {

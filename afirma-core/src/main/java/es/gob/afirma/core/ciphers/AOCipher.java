@@ -67,9 +67,6 @@ public interface AOCipher {
      * @return Datos descifrados.
      * @throws AOException
      *         Cuando ocurre un error durante la operaci&oacute;n
-     * @throws InvalidKeyException
-     *         Cuando la clave introducida no se corresponda a la utilizada
-     *         para el cifrado de los datos.
      * @throws KeyException
      *         Cuando la clave de cifrado introducida no es compatible con
      *         este algoritmo. */

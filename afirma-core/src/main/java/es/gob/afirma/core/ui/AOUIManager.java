@@ -23,7 +23,7 @@ public interface AOUIManager {
      * @param c
      *        Componente padre (para la modalidad)
      * @return Contrase&ntilde;a introducida por el usuario
-     * @throws AOCancelledOperationException
+     * @throws es.gob.afirma.core.AOCancelledOperationException
      *         Cuando el usuario cancela el proceso de solicitud de
      *         contrase&ntilde;a */
     char[] getPassword(String text, Object c);
@@ -41,7 +41,7 @@ public interface AOUIManager {
      * @param c
      *        Componente padre (para la modalidad)
      * @return Array de caracteres del texto introducido como contrase&ntilde;a
-     * @throws AOCancelledOperationException
+     * @throws es.gob.afirma.core.AOCancelledOperationException
      *         Cuando el usuario cancela o cierra el di&aacute;logo */
     char[] getPassword(String text, final String charSet, final boolean beep, final Object c);
     

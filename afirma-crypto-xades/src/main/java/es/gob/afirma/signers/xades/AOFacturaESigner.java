@@ -58,7 +58,7 @@ public final class AOFacturaESigner implements AOSigner {
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
      * </ul>
      * @param keyEntry Entrada que apunta a la clave privada a usar para firmar.
-     * @param xParams Par&aacute;metros adicionales para la firma.
+     * @param extraParams Par&aacute;metros adicionales para la firma.
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
      * <dl>
      *  <dt><b><i>signerCertifiedRole</i></b></dt>
@@ -103,7 +103,7 @@ public final class AOFacturaESigner implements AOSigner {
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
      * </ul>
      * @param keyEntry Entrada que apunta a la clave privada a usar para firmar.
-     * @param xParams Par&aacute;metros adicionales para la firma.
+     * @param extraParams Par&aacute;metros adicionales para la firma.
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
      * <dl>
      *  <dt><b><i>signerCertifiedRole</i></b></dt>
@@ -157,7 +157,7 @@ public final class AOFacturaESigner implements AOSigner {
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
      * </ul>
      * @param keyEntry Entrada que apunta a la clave privada a usar para firmar.
-     * @param xParams Par&aacute;metros adicionales para la firma.
+     * @param extraParams Par&aacute;metros adicionales para la firma.
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
      * <dl>
      *  <dt><b><i>signerCertifiedRole</i></b></dt>

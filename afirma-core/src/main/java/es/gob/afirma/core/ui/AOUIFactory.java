@@ -89,7 +89,7 @@ public final class AOUIFactory {
      * @param c
      *        Componente padre (para la modalidad)
      * @return Contrase&ntilde;a introducida por el usuario
-     * @throws AOCancelledOperationException
+     * @throws es.gob.afirma.core.AOCancelledOperationException
      *         Cuando el usuario cancela el proceso de solicitud de
      *         contrase&ntilde;a */
     public static char[] getPassword(final String text, final Object c) {
@@ -112,7 +112,7 @@ public final class AOUIFactory {
      * @param c
      *        Componente padre (para la modalidad)
      * @return Contrase&ntilde;a introducida por el usuario
-     * @throws AOCancelledOperationException
+     * @throws es.gob.afirma.core.AOCancelledOperationException
      *         Cuando el usuario cancela el proceso de solicitud de
      *         contrase&ntilde;a */
     public static char[] getPassword(final String text, final String charset, final boolean beep, final Object c) {

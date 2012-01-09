@@ -57,7 +57,7 @@ final class GetFileNameContentAction implements PrivilegedExceptionAction<String
      * del mismo y su contenido.
      * @return Nombre del fichero, el car&aacute;cter "|" y el contenido del fichero (Texto o
      * BinarioB64 seg&uacute;n el indicador {@code asBase64}).
-     * @throws AOCancelledOperationException Cuando se cancela la operaci&oacute;n de selecci&oacute;n.
+     * @throws es.gob.afirma.core.AOCancelledOperationException Cuando se cancela la operaci&oacute;n de selecci&oacute;n.
      * @throws IOException Cuando se produce un error al leer el fichero.
      */
 	public String[] run() throws IOException {

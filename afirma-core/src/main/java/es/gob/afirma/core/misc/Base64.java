@@ -48,7 +48,7 @@ import java.util.logging.Logger;
  *  <li>v2.3.2 - Reduced memory footprint! Finally refined the "guessing" of how big the
  *   final encoded data will be so that the code doesn't have to create two output
  *   arrays: an oversized initial one and then a final, exact-sized one.</li>
- *  <li>v2.3.1 - Added {@link #encodeBytesToBytes(byte[], int, int, int)} and some
+ *  <li>v2.3.1 - Added <code>encodeBytesToBytes(byte[], int, int, int)</code> and some
  *   similar helper methods to be more efficient with memory by not returning a
  *   String but just a byte array.</li>
  *  <li>v2.3 - <strong>This is not a drop-in replacement!</strong> This is two years of comments

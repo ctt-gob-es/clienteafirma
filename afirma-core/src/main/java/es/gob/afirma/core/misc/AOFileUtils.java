@@ -26,7 +26,7 @@ public final class AOFileUtils {
      * @param zipFileData
      *        Los datos del zip.
      * @return Devuelve un fichero Zip.
-     * @throws ZipException
+     * @throws java.util.zip.ZipException
      *         Cuando los datos no eran realmente un Zip.
      * @throws IOException
      *         Cuando ocurre un error al leer los datos o crear el temporal

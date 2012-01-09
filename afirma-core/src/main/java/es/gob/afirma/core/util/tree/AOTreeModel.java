@@ -34,10 +34,8 @@ public final class AOTreeModel {
      * If this value is false, then any node which has no children is a leaf node, and any node may acquire children */
     private final boolean asksAllowsChildren;
 
-    /** Creates a tree in which any node can have children.
-     * @param root
-     *        a TreeNode object that is the root of the tree
-     * @see #AOTreeModel(AOTreeNode, boolean) */
+    /** Crea un &aacute;rbol en el que cualquier nodo puede tener hijos.
+     * @param root La ra&iacute;z del &aacute;rbol */
     public AOTreeModel(final AOTreeNode root) {
         this(root, false);
     }
@@ -67,8 +65,7 @@ public final class AOTreeModel {
     /** Tells how leaf nodes are determined.
      * @return true if only nodes which do not allow children are leaf nodes,
      *         false if nodes which have no children (even if allowed) are leaf
-     *         nodes
-     * @see #asksAllowsChildren */
+     *         nodes */
     public boolean asksAllowsChildren() {
         return this.asksAllowsChildren;
     }

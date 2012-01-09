@@ -459,8 +459,6 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	 * Si no cumple los requisitos m&iacute;nimos lanza una excepci&oacute;n con la
 	 * descripci&oacute;n del problema.
 	 * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
-	 * @throws InvalidExternalLibraryException Cuando se encuentra alguna incopatibilidad en el entorno de
-	 * ejecuci&oacute;n.
 	 * @deprecated Se externaliza las comprobaciones de entorno.
 	 */
 	@Deprecated

@@ -74,7 +74,7 @@ public interface AOSigner extends AOCoSigner, AOCounterSigner {
      * devuelve <code>null</code>.
      * @param signData Datos de firma o fichero firmado.
      * @return Datos originalmente firmados.
-     * @throws AOInvalidFormatException
+     * @throws es.gob.afirma.core.AOInvalidFormatException
      *         Si no se ha introducido un fichero de firma v&aacute;lido o no
      *         ha podido leerse la firma.
      * @throws AOException
@@ -90,7 +90,7 @@ public interface AOSigner extends AOCoSigner, AOCounterSigner {
      * @param signData
      *        Firma que se desea analizar.
      * @return Informaci&oacute;n sobre la firma electr&oacute;nica
-     * @throws AOInvalidFormatException
+     * @throws es.gob.afirma.core.AOInvalidFormatException
      *         Cuando la firma introducida no es un objeto de firma
      *         reconocido por este manejador.
      * @throws AOException

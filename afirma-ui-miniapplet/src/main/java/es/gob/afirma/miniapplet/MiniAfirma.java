@@ -153,7 +153,6 @@ interface MiniAfirma {
      * Por ejemplo: "pdf,xml,doc".
      * @param description Descripci&oacute;n del tipo de fichero que se desea cargar.
      * @return El contenido del fichero codificado en Base64.
-     * @throws IOException Cuando ocurre alg&uacute;n error en la lectura del fichero.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      * @deprecated
      */
@@ -169,7 +168,6 @@ interface MiniAfirma {
      * @param extensions Extensiones de b&uacute;squeda separadas por comas (',').
      * @param description Descripci&oacute;n del tipo de fichero que se desea cargar.
      * @return El nombre del fichero y su contenido en unicode.
-     * @throws IOException Cuando ocurre alg&uacute;n error en la lectura del fichero.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      * @deprecated Los ficheros deben cargarse en base64 (getFileNameContentBase64) y despu&eacute;s
 	 * convertirse a texto con la codificaci&oacute;n que se desee (getTextFromBase64).  */
@@ -186,7 +184,6 @@ interface MiniAfirma {
      * @param extensions Extensiones de b&uacute;squeda.
      * @param description Descripci&oacute;n del tipo de fichero que se desea cargar.
      * @return Array con los nombres del ficheros y sus contenidos en unicode.
-     * @throws IOException Cuando ocurre alg&uacute;n error en la lectura del fichero.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      * @deprecated Los ficheros deben cargarse en base64 (getMultiFileNameContentBase64) y
      * despu&eacute;s convertirse a texto con la codificaci&oacute;n que se desee (getTextFromBase64). */
@@ -228,7 +225,6 @@ interface MiniAfirma {
      * @param extensions Extensiones de b&uacute;squeda separadas por comas (',').
      * @param description Descripci&oacute;n del tipo de fichero que se desea cargar.
      * @return Nombre del fichero seleccionado.
-     * @throws IOException Cuando se produce un error al seleccionar el fichero.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      * @deprecated
      */

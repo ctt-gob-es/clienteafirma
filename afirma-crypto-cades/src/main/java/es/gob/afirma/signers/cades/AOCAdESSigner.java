@@ -487,8 +487,6 @@ public final class AOCAdESSigner implements AOSigner {
      * @throws AOInvalidFormatException
      *         Si no se ha introducido un fichero de firma v&aacute;lido o no
      *         ha podido leerse la firma.
-     * @throws AOException Si ocurre cualquier error durante la recuperaci&oacute;n de los
-     *         datos.
      * @throws IllegalArgumentException Si la firma introducida es nula. */
     public byte[] getData(final byte[] signData) throws AOInvalidFormatException {
         if (signData == null) {

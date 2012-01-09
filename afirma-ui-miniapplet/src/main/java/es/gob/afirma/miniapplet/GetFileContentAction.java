@@ -48,7 +48,7 @@ final class GetFileContentAction implements PrivilegedExceptionAction<byte[]>{
      * Muestra al usuario un di&aacute;logo modal para la selecci&oacute;n de un fichero y devuelve
      * su contenido.
      * @return El contenido del fichero.
-     * @throws AOCancelledOperationException Cuando se cancela la operacion de selecci&oacute;n.
+     * @throws es.gob.afirma.core.AOCancelledOperationException Cuando se cancela la operacion de selecci&oacute;n.
      * @throws IOException Cuando se produce un error al leer el fichero.
      */
 	public byte[] run() throws IOException {
