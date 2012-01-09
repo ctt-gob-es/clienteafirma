@@ -113,7 +113,7 @@ public final class MimeHelper {
     private static void loadOidMimetypeProperties() {
         oidMimetypeProp = new Properties();
 
-        final InputStream isProp = AOUtil.getCleanClassLoader().getResourceAsStream("resources/oids_mimetypes.properties"); //$NON-NLS-1$
+        final InputStream isProp = AOUtil.getCleanClassLoader().getResourceAsStream("resources/mimetypes_oids.properties"); //$NON-NLS-1$
         try {
             oidMimetypeProp.load(isProp);
         }
