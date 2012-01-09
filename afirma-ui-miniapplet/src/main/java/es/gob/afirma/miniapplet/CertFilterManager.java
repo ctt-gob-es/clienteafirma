@@ -25,6 +25,8 @@ import es.gob.afirma.miniapplet.keystores.filters.SignatureDNIeFilter;
  */
 final class CertFilterManager {
 
+	private static final String HEADLESS_PREFIX_KEY = "headless"; //$NON-NLS-1$
+	
 	private static final String FILTER_PREFIX_KEY = "filter"; //$NON-NLS-1$
 	private static final String FILTER_TYPE_DNIE = "dnie:"; //$NON-NLS-1$
 	private static final String FILTER_TYPE_SSL = "ssl:"; //$NON-NLS-1$
@@ -40,6 +42,9 @@ final class CertFilterManager {
 	 * establecen los criterios de filtrado.
 	 */
 	CertFilterManager(final Properties propertyFilters) {
+		
+		this.mandatoryCertificate = Boolean.parseBoolean(
+				propertyFilters.getProperty(HEADLESS_PREFIX_KEY));
 		
 		final String filterValue = propertyFilters.getProperty(FILTER_PREFIX_KEY);
 		if (filterValue == null) {
@@ -58,7 +63,6 @@ final class CertFilterManager {
 		}
 		
 		this.filters.add(filter);
-		this.mandatoryCertificate = true;
 	}
 	
 	/**
