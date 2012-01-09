@@ -41,7 +41,7 @@ final class SelectPrivateKeyAction implements PrivilegedExceptionAction<PrivateK
 	
 	private String library = null;
 	
-	   /** Crea la acci&oacute;n para la selecci&oacute;n de la clave privada de un certificado.
+	/** Crea la acci&oacute;n para la selecci&oacute;n de la clave privada de un certificado.
      * @param type Tipo de almac&eacute;n de certificados y claves privadas a usar.
      * @param lib Fichero asociado al almac&aacute;n (biblioteca din&aacute;mica en el caso de PKCS#11,
      *            fichero PFX en el caso de PKCS#12, archivo de llavero en el caso de llavero de 
