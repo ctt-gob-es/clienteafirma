@@ -53,7 +53,7 @@ final class ExtraParamsProcessor {
 		return params;
 	}
 	
-	private static final String EXPANDIBLE_POLICY_KEY = "ExpPolicy"; //$NON-NLS-1$
+	private static final String EXPANDIBLE_POLICY_KEY = "expPolicy"; //$NON-NLS-1$
 	
 	private static final String EXPANDIBLE_POLICY_VALUE_AGE = "FirmaAGE"; //$NON-NLS-1$
 	
@@ -66,7 +66,7 @@ final class ExtraParamsProcessor {
 	 * definidas en el Properties, prevalecer&aacute;n los valores expandidos.<br/>
 	 * Entre los par&aacute;metros clave se encuentran:
 	 * <ul>
-     *  <li><b>ExpPolicy</b>: Configuracion de la pol&iacute;tica de firma. Posibles valores:
+     *  <li><b>expPolicy</b>: Configuracion de la pol&iacute;tica de firma. Posibles valores:
      *   <ul><li><b>FirmaAGE</b>:
      *    Establece los diversions par&aacute;metros para la configuraci&oacute;n de la
      *    pol&iacute;tica de firma de la AGE.
