@@ -163,12 +163,10 @@ public final class KeyStoreUtilities {
         }
 
         String tmpCN;
-        String issuerTmpCN;
-
-        X509Certificate tmpCert;
         if (ksm != null && ksm.getKeyStores().size() > 0) {
 
-            KeyStore ks = null;
+        	KeyStore ks = null;
+        	X509Certificate tmpCert;
             for (final String al : aliassesByFriendlyName.keySet().toArray(new String[aliassesByFriendlyName.size()])) {
                 tmpCert = null;
 
@@ -267,15 +265,9 @@ public final class KeyStoreUtilities {
             }
             
             for (final String alias : aliassesByFriendlyName.keySet().toArray(new String[0])) {
-            	tmpCert = ksm.getCertificate(alias);
-            	tmpCN = AOUtil.getCN(tmpCert);
-            	issuerTmpCN = AOUtil.getCN(tmpCert.getIssuerX500Principal().getName());
-
-            	if (tmpCN != null && issuerTmpCN != null) {
-            		aliassesByFriendlyName.put(alias, tmpCN + " (" + issuerTmpCN + ", " + tmpCert.getSerialNumber() + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            	}
-
-            	else if (tmpCN != null /* && isValidString(tmpCN) */) {
+            	tmpCN = AOUtil.getCN(ksm.getCertificate(alias));
+            	
+            	if (tmpCN != null) {
             		aliassesByFriendlyName.put(alias, tmpCN);
             	}
             	else {
