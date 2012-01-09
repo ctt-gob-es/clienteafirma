@@ -27,7 +27,7 @@ final class LinksTreeCellRenderer extends DefaultTreeCellRenderer {
             	//Color de fondo cuando un elemento no esta seleccionado
             	Color nonSelectionColor =getBackgroundNonSelectionColor();
             	
-            	if (text!=null && !text.equalsIgnoreCase("")) {
+            	if (text!=null && !text.equalsIgnoreCase("")) { //$NON-NLS-1$
 	                if (focus) {
 	                	
 	                    //setText("<html><font color=\"white\"><u>" + text + "</u></font></html>"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -40,7 +40,7 @@ final class LinksTreeCellRenderer extends DefaultTreeCellRenderer {
 	                    //setText("<html><font color=\"blue\"><u>" + text + "</u></font></html>"); //$NON-NLS-1$ //$NON-NLS-2$
 	                	setText("<html><span style=\"text-decoration: underline; color:blue;\">" + text + 
 	                			"</span><span style=\"color:rgb("+nonSelectionColor.getRed()+","+nonSelectionColor.getGreen() +
-	                			","+nonSelectionColor.getBlue()+");\">" + " " + Messages.getString("Link.access") + "</span></html>"); //$NON-NLS-1$ //$NON-NLS-2$
+	                			","+nonSelectionColor.getBlue()+");\">" + " " + Messages.getString("Link.access") + "</span></html>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-4$
 	                }
 
             	}

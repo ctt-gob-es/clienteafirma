@@ -75,7 +75,7 @@ public class CipherConfig {
      * de no soportarse esta configuracion, se devolvera <code>null</code>.
      * @param algorithmConfig Configuraci&oacute;n de cifrado.
      * @return Proveedor que soporta la configuraci&oacute;n indicada. */
-    public AOCipher getCipher(final AOCipherConfig algorithmConfig) {
+    public static AOCipher getCipher(final AOCipherConfig algorithmConfig) {
         for (final CipherConfigures configure : configures) {
             if (configure.config.equals(algorithmConfig)) {
                 return configure.provider;

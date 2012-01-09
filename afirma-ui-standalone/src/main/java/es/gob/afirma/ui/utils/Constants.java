@@ -18,7 +18,7 @@ public class Constants {
 
 	/** Caracteres que pueden formar parte de una cadena de contrase&ntilde;a. */
     public static final String PASSWORD_VALID_CHARACTERS =
-    	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890.,-@";
+    	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890.,-@"; //$NON-NLS-1$
 	
     /**
      * Width inicial de los JAccessibilityFrame de la aplicacion.
@@ -208,16 +208,16 @@ public class Constants {
 	/**
 	 * C&oacute;digo HTML para el salto de l&iacute;nea
 	 */
-	public static final String HTML_SALTO_LINEA = "<br>";
+	public static final String HTML_SALTO_LINEA = "<br>"; //$NON-NLS-1$
 	
 	/**
 	 * C&oacute;digo HTML para el p&aacute:rrafo de texto
 	 */
-	public static final String HTML_PARRAFO = "<p>";
+	public static final String HTML_PARRAFO = "<p>"; //$NON-NLS-1$
 	
 	/**
 	 * C&oacute;digo HTML para el cierre de p&aacute:rrafo de texto
 	 */
-	public static final String HTML_PARRAFO_CIERRE = "</p>";
+	public static final String HTML_PARRAFO_CIERRE = "</p>"; //$NON-NLS-1$
 }
 

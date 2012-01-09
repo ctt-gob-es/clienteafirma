@@ -71,8 +71,8 @@ final class EditorFocusManager extends KeyAdapter implements FocusListener, Hype
         	StyleConstants.setBackground(this.linkFocusedStyle, Color.WHITE);
             StyleConstants.setForeground(this.linkFocusedStyle, Color.BLACK);
         } else {
-        	StyleConstants.setBackground(this.linkFocusedStyle, Color.BLUE); //$NON-NLS-1$
-            StyleConstants.setForeground(this.linkFocusedStyle, Color.WHITE); //$NON-NLS-1$
+        	StyleConstants.setBackground(this.linkFocusedStyle, Color.BLUE); 
+            StyleConstants.setForeground(this.linkFocusedStyle, Color.WHITE); 
         }
         
         final AccessibleHypertext accessibleHypertext = (AccessibleHypertext) this.displayPane.getAccessibleContext().getAccessibleText();        
@@ -192,7 +192,7 @@ final class EditorFocusManager extends KeyAdapter implements FocusListener, Hype
         }
     }
     
-    private int getBestFontSizeForJOptionPane(final int width, final int height, final String text, final String fontFamily, final int minSize) {
+    private static int getBestFontSizeForJOptionPane(final int width, final int height, final String text, final String fontFamily, final int minSize) {
         
         final String bodyRule = "body { font-family: " + fontFamily + "; font-size: %f%pt; }";  //$NON-NLS-1$//$NON-NLS-2$
         

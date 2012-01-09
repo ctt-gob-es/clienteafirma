@@ -4,7 +4,7 @@ import javax.swing.filechooser.FileFilter;
 
 import es.gob.afirma.core.signers.AOSignConstants;
 
-public class SignedFileManager {
+public final class SignedFileManager {
 
     /** Obtiene un filtro de fichero correspondiente para los ficheros mas comunes que contienen una firma.
      * @return filtro */

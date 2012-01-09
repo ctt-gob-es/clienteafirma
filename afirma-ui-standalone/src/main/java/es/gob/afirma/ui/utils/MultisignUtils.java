@@ -12,7 +12,6 @@ package es.gob.afirma.ui.utils;
 import java.awt.Component;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.security.KeyException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.Vector;
 import java.util.logging.Logger;

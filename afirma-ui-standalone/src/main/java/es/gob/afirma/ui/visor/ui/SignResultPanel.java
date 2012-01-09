@@ -84,10 +84,10 @@ final class SignResultPanel extends JPanel {
                 this.resultTextLabel.setText(Messages.getString("SignResultPanel.2")); //$NON-NLS-1$
                 if (GeneralConfig.isHighContrast() || Main.isOSHighContrast){
                 	this.descTextLabel.setText(Messages.getString("SignResultPanel.25")); //$NON-NLS-1$
-                	this.descTextLabel.getAccessibleContext().setAccessibleName(resultTextLabel.getText()+". "+Messages.getString("SignResultPanel.3_Lector_pantalla") +". "+ Messages.getString("SignResultPanel.enter_link"));
+                	this.descTextLabel.getAccessibleContext().setAccessibleName(this.resultTextLabel.getText()+". "+Messages.getString("SignResultPanel.3_Lector_pantalla") +". "+ Messages.getString("SignResultPanel.enter_link")); //$NON-NLS-2$ //$NON-NLS-4$
                 } else {
                 	this.descTextLabel.setText(Messages.getString("SignResultPanel.3")); //$NON-NLS-1$
-                	this.descTextLabel.getAccessibleContext().setAccessibleName(resultTextLabel.getText()+". "+Messages.getString("SignResultPanel.3_Lector_pantalla") +". "+ Messages.getString("SignResultPanel.enter_link"));
+                	this.descTextLabel.getAccessibleContext().setAccessibleName(this.resultTextLabel.getText()+". "+Messages.getString("SignResultPanel.3_Lector_pantalla") +". "+ Messages.getString("SignResultPanel.enter_link")); //$NON-NLS-2$ //$NON-NLS-4$
                 }
                 resultOperationIconTooltip = Messages.getString("SignResultPanel.4"); //$NON-NLS-1$
                 break;
@@ -95,10 +95,10 @@ final class SignResultPanel extends JPanel {
                 this.resultTextLabel.setText(Messages.getString("SignResultPanel.8")); //$NON-NLS-1$
                 if (GeneralConfig.isHighContrast() || Main.isOSHighContrast){
                 	this.descTextLabel.setText(Messages.getString("SignResultPanel.24")); //$NON-NLS-1$
-                	this.descTextLabel.getAccessibleContext().setAccessibleName(resultTextLabel.getText()+". "+Messages.getString("SignResultPanel.9_Lector_pantalla") +". "+ Messages.getString("SignResultPanel.enter_link"));
+                	this.descTextLabel.getAccessibleContext().setAccessibleName(this.resultTextLabel.getText()+". "+Messages.getString("SignResultPanel.9_Lector_pantalla") +". "+ Messages.getString("SignResultPanel.enter_link"));
                 } else {
                 	this.descTextLabel.setText(Messages.getString("SignResultPanel.9")); //$NON-NLS-1$
-                	this.descTextLabel.getAccessibleContext().setAccessibleName(resultTextLabel.getText()+". "+Messages.getString("SignResultPanel.9_Lector_pantalla") +". "+ Messages.getString("SignResultPanel.enter_link"));
+                	this.descTextLabel.getAccessibleContext().setAccessibleName(this.resultTextLabel.getText()+". "+Messages.getString("SignResultPanel.9_Lector_pantalla") +". "+ Messages.getString("SignResultPanel.enter_link"));
                 }
                 resultOperationIconTooltip = Messages.getString("SignResultPanel.10"); //$NON-NLS-1$
                 break;

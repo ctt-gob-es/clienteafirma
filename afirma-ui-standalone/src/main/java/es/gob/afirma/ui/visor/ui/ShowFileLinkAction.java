@@ -63,7 +63,7 @@ final class ShowFileLinkAction {
         }
     }
 
-    private String getCommonDataExtension(final byte[] dat) {
+    private static String getCommonDataExtension(final byte[] dat) {
         return new MimeHelper(dat).getExtension();
     }
 

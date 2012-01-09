@@ -162,7 +162,7 @@ final class SignDataPanel extends JPanel {
                         Desktop.getDesktop().open(signFile);
                     }
                     catch (final Exception e) {
-                    	CustomDialog.showMessageDialog(SignDataPanel.this, true, Messages.getString("SignDataPanel.7"), Messages.getString("SignDataPanel.8"), JOptionPane.ERROR_MESSAGE);
+                    	CustomDialog.showMessageDialog(SignDataPanel.this, true, Messages.getString("SignDataPanel.7"), Messages.getString("SignDataPanel.8"), JOptionPane.ERROR_MESSAGE);  //$NON-NLS-1$//$NON-NLS-2$
                     }
                 }
             });
@@ -229,7 +229,7 @@ final class SignDataPanel extends JPanel {
 						    SignDataPanel.this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 							try {
 								certInfo.getCertVerifier().checkCertificate(new X509Certificate[] { cert }, true);
-								CustomDialog.showMessageDialog(SignDataPanel.this, true, Messages.getString("SignDataPanel.19"), Messages.getString("SignDataPanel.20"), JOptionPane.INFORMATION_MESSAGE);
+								CustomDialog.showMessageDialog(SignDataPanel.this, true, Messages.getString("SignDataPanel.19"), Messages.getString("SignDataPanel.20"), JOptionPane.INFORMATION_MESSAGE);  //$NON-NLS-1$//$NON-NLS-2$
 							}
 							catch(final Exception e) {
 								e.printStackTrace();
@@ -329,7 +329,7 @@ final class SignDataPanel extends JPanel {
             Desktop.getDesktop().open(tmp);
         }
         catch(final Exception e) {
-        	CustomDialog.showMessageDialog(SignDataPanel.this, true, Messages.getString("SignDataPanel.23"), Messages.getString("SignDataPanel.8"), JOptionPane.ERROR_MESSAGE);
+        	CustomDialog.showMessageDialog(SignDataPanel.this, true, Messages.getString("SignDataPanel.23"), Messages.getString("SignDataPanel.8"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
 
@@ -338,7 +338,7 @@ final class SignDataPanel extends JPanel {
      * @param signData Firma.
      * @return Informaci&oacute;n de la firma.
      */
-    private CompleteSignInfo getSignInfo(final byte[] signData) throws IllegalArgumentException {
+    private static CompleteSignInfo getSignInfo(final byte[] signData) throws IllegalArgumentException {
         final CompleteSignInfo signInfo = new CompleteSignInfo();
         signInfo.setSignData(signData);
         final AOSigner signer = AOSignerFactory.getSigner(signData);

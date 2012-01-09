@@ -571,7 +571,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		//Se comprueba el tipo de dialogo
 		if (typeOption == JOptionPane.YES_NO_OPTION) {
 			//Boton Si
-			customDialog.okButton.setText(Messages.getString("CustomDialog.confirmDialog.yes"));
+			customDialog.okButton.setText(Messages.getString("CustomDialog.confirmDialog.yes")); //$NON-NLS-1$
 			customDialog.okButton.setMnemonic(KeyEvent.VK_S);
 			//Boton no
 			customDialog.noButton = customDialog.getButton(Messages.getString("CustomDialog.confirmDialog.no"), KeyEvent.VK_N); //$NON-NLS-1$

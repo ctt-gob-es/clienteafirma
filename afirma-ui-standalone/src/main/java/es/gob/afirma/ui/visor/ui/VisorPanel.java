@@ -415,7 +415,7 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
      * @return {@code true} si la firma es v&acute;lida, {@code false} en caso contrario.
      * @throws Exception Cuando los datos introducidos no se corresponden con una firma.
      */
-    private SignValidity validateSign(final byte[] sign) {
+    private static SignValidity validateSign(final byte[] sign) {
         if (DataAnalizerUtil.isPDF(sign)) {
             return new SignValidity(SIGN_DETAIL_TYPE.OK, null);
         }
