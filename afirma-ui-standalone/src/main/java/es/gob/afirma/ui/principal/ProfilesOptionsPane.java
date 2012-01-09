@@ -63,7 +63,7 @@ final class ProfilesOptionsPane {
         c.gridy = 0;
 
         // Perfil cargado
-        this.currentProfileTitleLabel = new JLabel("Perfil actual: " + ProfileManager.getProfileName(this.getCurrentProfileId()));
+        this.currentProfileTitleLabel = new JLabel("Perfil actual: " + ProfileManager.getProfileName(ProfilesOptionsPane.getCurrentProfileId()));
         this.currentProfileTitleLabel.setFocusable(true);
         Utils.remarcar(this.currentProfileTitleLabel);
         Utils.setContrastColor(this.currentProfileTitleLabel);
@@ -282,7 +282,7 @@ final class ProfilesOptionsPane {
         return config;
     }
 
-    private String getCurrentProfileId() {
+    private static String getCurrentProfileId() {
         return UserProfile.getCurrentProfileId();
     }
 
@@ -342,7 +342,7 @@ final class ProfilesOptionsPane {
     /** Guarda y/o modifica en el preferences la configuracion del usuario. */
     void saveAction() {
 
-        if (this.getCurrentProfileId() != null) {
+        if (ProfilesOptionsPane.getCurrentProfileId() != null) {
             final int confirm =
                 CustomDialog.showConfirmDialog(this.parent,
                                                true,
@@ -354,7 +354,7 @@ final class ProfilesOptionsPane {
 
             if (confirm == JOptionPane.YES_OPTION) {
                 try {
-                    ProfileManager.saveConfiguration(this.getCurrentProfileId(), this.getCurrentProfileName(), this.getCurrentConfig());
+                    ProfileManager.saveConfiguration(ProfilesOptionsPane.getCurrentProfileId(), this.getCurrentProfileName(), this.getCurrentConfig());
                     CustomDialog.showMessageDialog(this.parent, true, "Perfil modificado correctamente.", "Perfiles", JOptionPane.INFORMATION_MESSAGE);
                 }
                 catch (final IllegalArgumentException e) {

@@ -53,7 +53,7 @@ final class MultifirmaMasiva extends JPanel {
 
     /** Carga el combo almac&eacute;n con los almacenes y repositorios disponibles
      * @param comboAlmacen Combo con los almacenes y repositorios */
-    private void cargarComboAlmacen(final JComboBox comboAlmacen) {
+    private static void cargarComboAlmacen(final JComboBox comboAlmacen) {
         comboAlmacen.setModel(new DefaultComboBoxModel(KeyStoreLoader.getKeyStoresToSign()));
     }
 

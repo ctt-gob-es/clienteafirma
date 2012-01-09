@@ -101,7 +101,7 @@ class UserProfile extends JAccessibilityFrameAdvisor {
     /** Configuracion de accesibilidad por defecto de la pantalla.
      * Marcado de elementos con foco.
      * @param component */
-    private void config(final JComponent component) {
+    private static void config(final JComponent component) {
         if (component instanceof JLabel) {
             final JLabel label = (JLabel) component;
             label.addFocusListener(new FocusListener() {
@@ -217,7 +217,7 @@ class UserProfile extends JAccessibilityFrameAdvisor {
 
     /** Posicion X inicial de la ventana dependiendo de la resolucion de pantalla.
      * @return int Posicion X */
-    private int getInitialX() {
+    private static int getInitialX() {
         final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); // 329
         return (screenSize.width - 500) / 2;
     }
@@ -225,7 +225,7 @@ class UserProfile extends JAccessibilityFrameAdvisor {
     /** Posicion Y inicial de la ventana dependiendo del sistema operativo y de la
      * resolucion de pantalla.
      * @return int Posicion Y */
-    private int getInitialY() {
+    private static int getInitialY() {
         final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); // 329
         if (Platform.getOS().equals(Platform.OS.MACOSX)) {
             return (screenSize.height - 340) / 2;
@@ -248,7 +248,7 @@ class UserProfile extends JAccessibilityFrameAdvisor {
         }
 
         // Dimensiones de la ventana
-        setBounds(this.getInitialX(), this.getInitialY(), Constants.INIT_WINDOW_INITIAL_WIDTH, Constants.INIT_WINDOW_INITIAL_HEIGHT);
+        setBounds(UserProfile.getInitialX(), UserProfile.getInitialY(), Constants.INIT_WINDOW_INITIAL_WIDTH, Constants.INIT_WINDOW_INITIAL_HEIGHT);
 
         // Parametros ventana
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE); // NOI18N
@@ -279,7 +279,7 @@ class UserProfile extends JAccessibilityFrameAdvisor {
 
         // Cuerpo del mensaje
         final InfoLabel text =
-            new InfoLabel(Constants.HTML_PARRAFO   + Messages.getString("UserProfile.welcome") + Constants.HTML_PARRAFO_CIERRE + Constants.HTML_PARRAFO + Messages.getString("UserProfile.body1") + Constants.HTML_PARRAFO_CIERRE + Constants.HTML_PARRAFO + Messages.getString("UserProfile.body2") + Constants.HTML_PARRAFO_CIERRE + Constants.HTML_PARRAFO + Messages.getString("UserProfile.body3") + Constants.HTML_PARRAFO_CIERRE, false); //$NON-NLS-2$ //$NON-NLS-5$ //$NON-NLS-8$//$NON-NLS-11$
+            new InfoLabel(Constants.HTML_PARRAFO   + Messages.getString("UserProfile.welcome") + Constants.HTML_PARRAFO_CIERRE + Constants.HTML_PARRAFO + Messages.getString("UserProfile.body1") + Constants.HTML_PARRAFO_CIERRE + Constants.HTML_PARRAFO + Messages.getString("UserProfile.body2") + Constants.HTML_PARRAFO_CIERRE + Constants.HTML_PARRAFO + Messages.getString("UserProfile.body3") + Constants.HTML_PARRAFO_CIERRE, false);  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
         config(text);
 
         add(text, c);

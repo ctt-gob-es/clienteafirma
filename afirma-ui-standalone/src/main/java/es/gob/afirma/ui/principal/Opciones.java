@@ -71,16 +71,16 @@ class Opciones extends JAccessibilityDialog {
     private PrincipalGUI mainGui;
     
     /** Panel con la configuraci&oacute;n general del aplicativo. */
-    private MainOptionsPane mainOptions;
+    MainOptionsPane mainOptions;
     
     /** Panel con la configurac&oacute;n de las firmas PDF del aplicativo. */
-    private ContextOptionsPane contextOptions;
+    ContextOptionsPane contextOptions;
     
     /** Panel con la configurac&oacute;n de las firmas PDF del aplicativo. */
-    private AccessibilityOptionsPane accessibilityOptions;
+    AccessibilityOptionsPane accessibilityOptions;
     
     /** Panel con las opciones de gestion de perfiles de usuario. */
-    private ProfilesOptionsPane profilesOptions;
+    ProfilesOptionsPane profilesOptions;
     
     /** Indica si alguna accion del usuario necesita de un refresco de pantalla. */
     private static boolean update = false;
@@ -163,7 +163,7 @@ class Opciones extends JAccessibilityDialog {
 	 * Posici&oacute;n X inicial de la ventana dependiendo de la resoluci&oacute;n de pantalla.
 	 * @return int Posici&oacute;n X
 	 */
-    public int getInitialX() {
+    public static int getInitialX() {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); //329
 		return (screenSize.width - 426) / 2 ;
 	}
@@ -173,7 +173,7 @@ class Opciones extends JAccessibilityDialog {
 	 * resoluci&oacute;n de pantalla.
 	 * @return int Posici&oacute;n Y
 	 */
-	int getInitialY() {
+	static int getInitialY() {
         Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
         if (Platform.getOS().equals(Platform.OS.MACOSX)){
         	return (screenSize.height - 485) / 2;
@@ -246,14 +246,14 @@ class Opciones extends JAccessibilityDialog {
     		} else {
 	    		if (GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
 	    			if (Platform.getOS().equals(Platform.OS.LINUX)){
-	    				setBounds(this.getInitialX(), this.getInitialY(), Constants.OPTION_FONT_INITIAL_WIDTH_LINUX, Constants.OPTION_FONT_INITIAL_HEIGHT_LINUX);
+	    				setBounds(Opciones.getInitialX(), Opciones.getInitialY(), Constants.OPTION_FONT_INITIAL_WIDTH_LINUX, Constants.OPTION_FONT_INITIAL_HEIGHT_LINUX);
 	    				setMinimumSize(new Dimension(getSize().width, getSize().height));
 	    			} else {
-	    				setBounds(this.getInitialX(), this.getInitialY(), Constants.OPTION_FONT_INITIAL_WIDTH, Constants.OPTION_FONT_INITIAL_HEIGHT);
+	    				setBounds(Opciones.getInitialX(), Opciones.getInitialY(), Constants.OPTION_FONT_INITIAL_WIDTH, Constants.OPTION_FONT_INITIAL_HEIGHT);
 	    				setMinimumSize(new Dimension(getSize().width, getSize().height));
 	    			}
 	    		} else {
-	    			setBounds(this.getInitialX(), this.getInitialY(), Constants.OPTION_INITIAL_WIDTH, Constants.OPTION_INITIAL_HEIGHT);
+	    			setBounds(Opciones.getInitialX(), Opciones.getInitialY(), Constants.OPTION_INITIAL_WIDTH, Constants.OPTION_INITIAL_HEIGHT);
 	    			setMinimumSize(new Dimension(getSize().width, getSize().height));
 	    		}
     		}
@@ -362,7 +362,7 @@ class Opciones extends JAccessibilityDialog {
         	if (!this.accesibilidad){
         		this.accessibilityOptions.aplicar.addAncestorListener(new RequestFocusListener(false));
         	}
-        	HelpUtils.visualize("opciones.accesibilidad");
+        	HelpUtils.visualize("opciones.accesibilidad"); //$NON-NLS-1$
         	this.aplicar = false;
         	this.accesibilidad = false;
         }
@@ -496,7 +496,7 @@ class Opciones extends JAccessibilityDialog {
 		JPanel panelAceptar = new JPanel(new GridLayout(1, 1));
 		
 		// Boton aceptar
-        this.aceptar.setText(Messages.getString("PrincipalGUI.aceptar")); // NOI18N
+        this.aceptar.setText(Messages.getString("PrincipalGUI.aceptar")); // NOI18N //$NON-NLS-1$
         this.aceptar.setMnemonic(KeyEvent.VK_A); //Se asigna un atajo al boton aceptar
         this.getRootPane().setDefaultButton(this.aceptar); //Se asigna el boton por defecto para la ventana
         this.aceptar.addActionListener(new ActionListener() {
@@ -553,7 +553,7 @@ class Opciones extends JAccessibilityDialog {
         
 		JPanel panelAyuda = new JPanel();
         // Boton ayuda
-		JButton botonAyuda = HelpUtils.helpButton("opciones.configuracion");
+		JButton botonAyuda = HelpUtils.helpButton("opciones.configuracion"); //$NON-NLS-1$
 		botonAyuda.setName("helpButton");
 		
 		// Sustituimos el listener por defecto por otro que abrir la ventana de ayuda
@@ -620,7 +620,7 @@ class Opciones extends JAccessibilityDialog {
     	GeneralConfig.loadConfig(config);
     	
     	// Eliminamos los perfiles que el usuario haya borrado de la lista
-    	this.removeDeletedProfiles(remainderProfilesNames);
+    	Opciones.removeDeletedProfiles(remainderProfilesNames);
     	
     	// Si se ha cambiado la vista de simple a avanzada o viceversa reconstruimos la interfaz
     	if (needUpdateGUI && this.mainGui != null) {
@@ -690,14 +690,14 @@ class Opciones extends JAccessibilityDialog {
 		} else {
 			if (GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
     			if (Platform.getOS().equals(Platform.OS.LINUX)){
-    				setBounds(this.getInitialX(), this.getInitialY(), Constants.OPTION_FONT_INITIAL_WIDTH_LINUX, Constants.OPTION_FONT_INITIAL_HEIGHT_LINUX);
+    				setBounds(Opciones.getInitialX(), Opciones.getInitialY(), Constants.OPTION_FONT_INITIAL_WIDTH_LINUX, Constants.OPTION_FONT_INITIAL_HEIGHT_LINUX);
     				setMinimumSize(new Dimension(getSize().width, getSize().height));
     			} else {
-    				setBounds(this.getInitialX(), this.getInitialY(), Constants.OPTION_FONT_INITIAL_WIDTH, Constants.OPTION_FONT_INITIAL_HEIGHT);
+    				setBounds(Opciones.getInitialX(), Opciones.getInitialY(), Constants.OPTION_FONT_INITIAL_WIDTH, Constants.OPTION_FONT_INITIAL_HEIGHT);
     				setMinimumSize(new Dimension(getSize().width, getSize().height));
     			}
     		} else {
-    			setBounds(this.getInitialX(), this.getInitialY(), Constants.OPTION_INITIAL_WIDTH, Constants.OPTION_INITIAL_HEIGHT);
+    			setBounds(Opciones.getInitialX(), Opciones.getInitialY(), Constants.OPTION_INITIAL_WIDTH, Constants.OPTION_INITIAL_HEIGHT);
     			setMinimumSize(new Dimension(getSize().width, getSize().height));
     		}
 		}
@@ -720,17 +720,17 @@ class Opciones extends JAccessibilityDialog {
             
             switch (this.tabbedPane.getSelectedIndex()) {
             case ACCESIBILITY_OPTIONS_IDX:
-                HelpUtils.showHelp("opciones.accesibilidad");
+                HelpUtils.showHelp("opciones.accesibilidad"); //$NON-NLS-1$
                 break;
             case PDF_OPTIONS_IDX:
                 HelpUtils.showHelp("");
                 break;
             case PROFILE_OPTIONS_IDX:
-            	HelpUtils.showHelp("opciones.perfil");
+            	HelpUtils.showHelp("opciones.perfil"); //$NON-NLS-1$
             	break;
             case GENERAL_OPTIONS_IDX:
             default:
-                HelpUtils.showHelp("opciones.configuracion");
+                HelpUtils.showHelp("opciones.configuracion"); //$NON-NLS-1$
                 break;
             }
         }
@@ -741,7 +741,7 @@ class Opciones extends JAccessibilityDialog {
 	 * cuyo nombre no aparezca en este listado.
 	 * @param remainderProfiles Nombres de los listados que no deben borrarse.
 	 */
-	private void removeDeletedProfiles(String[] remainderProfiles) {
+	private static void removeDeletedProfiles(String[] remainderProfiles) {
 		
 		boolean remain;
 		for (String name : ProfileManager.getProfilesNames()) {

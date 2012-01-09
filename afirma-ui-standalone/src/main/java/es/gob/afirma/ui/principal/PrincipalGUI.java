@@ -164,16 +164,16 @@ public class PrincipalGUI extends JAccessibilityFrame {
     }
 
     /** Seleccion menu acerca de: Muestra la ventana con la informacion de aFirma */
-    void acercaActionPerformed() {
+    static void acercaActionPerformed() {
         Acercade.main();
     }
 
     /** Seleccion menu ayuda: Muestra la ventana con el panel de ayuda */
-    void ayudaHTMLActionPerformed() {
+    static void ayudaHTMLActionPerformed() {
         HelpUtils.visualize(true);
     }
 
-    /** Seleccion idiomas: Cambia el idioma de la aplicaci�n
+    /** Seleccion idiomas: Cambia el idioma de la aplicacion
      * @param locale Nuevo Locale */
     void cambiarIdioma(final Locale locale) {
         Locale.setDefault(locale);
@@ -249,7 +249,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
         final Icon baseIcon = this.loadIcon("boton_transparente.png"); //$NON-NLS-1$
 
         // Panel de firma
-        final ToggleImageButton buttonFirma = this.createToggleButton(Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma")); //$NON-NLS-1$
+        final ToggleImageButton buttonFirma = PrincipalGUI.createToggleButton(Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma")); //$NON-NLS-1$
         buttonFirma.setSelectedImage(this.loadImage("boton_fondo.png")); //$NON-NLS-1$
         buttonFirma.setToggledIcon(this.loadIcon("boton_firma_ico.png"), baseIcon); //$NON-NLS-1$
         buttonFirma.setSelectedToggledIcon(this.loadIcon("boton_firma_sel_ico.png"), baseIcon); //$NON-NLS-1$
@@ -264,7 +264,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
         this.htPanel.addTab(buttonFirma, panelFirma);
 
         // Panel de multifirma
-        final ToggleImageButton buttonMultifirma = this.createToggleButton(Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma")); //$NON-NLS-1$
+        final ToggleImageButton buttonMultifirma = PrincipalGUI.createToggleButton(Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma")); //$NON-NLS-1$
         buttonMultifirma.setSelectedImage(this.loadImage("boton_fondo.png")); //$NON-NLS-1$
         buttonMultifirma.setToggledIcon(this.loadIcon("boton_multifirma_ico.png"), baseIcon); //$NON-NLS-1$
         buttonMultifirma.setSelectedToggledIcon(this.loadIcon("boton_multifirma_sel_ico.png"), baseIcon); //$NON-NLS-1$
@@ -280,7 +280,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 
         // Panel de multifirma masiva
         final ToggleImageButton buttonMultifirmaMasiva =
-            this.createToggleButton(Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirmaMasiva")); //$NON-NLS-1$
+            PrincipalGUI.createToggleButton(Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirmaMasiva")); //$NON-NLS-1$
         buttonMultifirmaMasiva.setSelectedImage(this.loadImage("boton_fondo.png")); //$NON-NLS-1$
         buttonMultifirmaMasiva.setToggledIcon(this.loadIcon("boton_masiva_ico.png"), baseIcon); //$NON-NLS-1$
         buttonMultifirmaMasiva.setSelectedToggledIcon(this.loadIcon("boton_masiva_sel_ico.png"), baseIcon); //$NON-NLS-1$
@@ -304,7 +304,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
         this.htPanel.addTab(buttonMultifirmaMasiva, panelMultifirmaMasiva);
 
         // Panel de validacion y extraccion de documentos
-        final ToggleImageButton buttonValidacion = this.createToggleButton(Messages.getString("PrincipalGUI.TabConstraints.tabTitleValidacion")); //$NON-NLS-1$
+        final ToggleImageButton buttonValidacion = PrincipalGUI.createToggleButton(Messages.getString("PrincipalGUI.TabConstraints.tabTitleValidacion")); //$NON-NLS-1$
         buttonValidacion.setSelectedImage(this.loadImage("boton_fondo.png")); //$NON-NLS-1$
         buttonValidacion.setToggledIcon(this.loadIcon("boton_validacion_ico.png"), baseIcon); //$NON-NLS-1$
         buttonValidacion.setSelectedToggledIcon(this.loadIcon("boton_validacion_sel_ico.png"), baseIcon); //$NON-NLS-1$
@@ -319,7 +319,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
         this.htPanel.addTab(buttonValidacion, panelValidacion);
 
         // Panel de cifrado simetrico
-        final ToggleImageButton buttonCifrado = this.createToggleButton(Messages.getString("PrincipalGUI.TabConstraints.tabTitleCifrado")); //$NON-NLS-1$
+        final ToggleImageButton buttonCifrado = PrincipalGUI.createToggleButton(Messages.getString("PrincipalGUI.TabConstraints.tabTitleCifrado")); //$NON-NLS-1$
         buttonCifrado.setSelectedImage(this.loadImage("boton_fondo.png")); //$NON-NLS-1$
         buttonCifrado.setToggledIcon(this.loadIcon("boton_cifrado_ico.png"), baseIcon); //$NON-NLS-1$
         buttonCifrado.setSelectedToggledIcon(this.loadIcon("boton_cifrado_sel_ico.png"), baseIcon); //$NON-NLS-1$
@@ -334,7 +334,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
         this.htPanel.addTab(buttonCifrado, panelCifrado);
 
         // Panel de Descifrado
-        final ToggleImageButton buttonDescifrado = this.createToggleButton(Messages.getString("PrincipalGUI.TabConstraints.tabTitleDescifrado")); //$NON-NLS-1$
+        final ToggleImageButton buttonDescifrado = PrincipalGUI.createToggleButton(Messages.getString("PrincipalGUI.TabConstraints.tabTitleDescifrado")); //$NON-NLS-1$
         buttonDescifrado.setSelectedImage(this.loadImage("boton_fondo.png")); //$NON-NLS-1$
         buttonDescifrado.setToggledIcon(this.loadIcon("boton_descifrado_ico.png"), baseIcon); //$NON-NLS-1$
         buttonDescifrado.setSelectedToggledIcon(this.loadIcon("boton_descifrado_sel_ico.png"), baseIcon); //$NON-NLS-1$
@@ -349,7 +349,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
         this.htPanel.addTab(buttonDescifrado, panelDescifrado);
 
         // Panel de Ensobrado
-        final ToggleImageButton buttonEnsobrado = this.createToggleButton(Messages.getString("PrincipalGUI.TabConstraints.tabTitleEnsobrado")); //$NON-NLS-1$
+        final ToggleImageButton buttonEnsobrado = PrincipalGUI.createToggleButton(Messages.getString("PrincipalGUI.TabConstraints.tabTitleEnsobrado")); //$NON-NLS-1$
         buttonEnsobrado.setSelectedImage(this.loadImage("boton_fondo.png")); //$NON-NLS-1$
         buttonEnsobrado.setToggledIcon(this.loadIcon("boton_ensobrado_ico.png"), baseIcon); //$NON-NLS-1$
         buttonEnsobrado.setSelectedToggledIcon(this.loadIcon("boton_ensobrado_sel_ico.png"), baseIcon); //$NON-NLS-1$
@@ -369,7 +369,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
         this.htPanel.addTab(buttonEnsobrado, panelEnsobrado);
 
         // Panel de Desensobrado
-        final ToggleImageButton buttonDesensobrado = this.createToggleButton(Messages.getString("PrincipalGUI.TabConstraints.tabTitleDesensobrado")); //$NON-NLS-1$
+        final ToggleImageButton buttonDesensobrado = PrincipalGUI.createToggleButton(Messages.getString("PrincipalGUI.TabConstraints.tabTitleDesensobrado")); //$NON-NLS-1$
         buttonDesensobrado.setSelectedImage(this.loadImage("boton_fondo.png")); //$NON-NLS-1$
         buttonDesensobrado.setToggledIcon(this.loadIcon("boton_desensobrado_ico.png"), baseIcon); //$NON-NLS-1$
         buttonDesensobrado.setSelectedToggledIcon(this.loadIcon("boton_desensobrado_sel_ico.png"), baseIcon); //$NON-NLS-1$
@@ -410,7 +410,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
      * hacer clic sobre &eacute;l vuelve a su posici&oacute;n original.
      * @param text Texto del bot&oacute;n.
      * @return Bot&oacute;n creado. */
-    private ToggleImageButton createToggleButton(final String text) {
+    private static ToggleImageButton createToggleButton(final String text) {
 
         final ToggleImageButton tButton = new ToggleImageButton();
         tButton.setHorizontalAlignment(SwingConstants.LEFT);
@@ -745,7 +745,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
         return Toolkit.getDefaultToolkit().createImage(this.getClass().getResource(IMAGE_DIR_PATH + filename));
     }
 
-    /** Muestra la ventana de la aplicaci�n */
+    /** Muestra la ventana de la aplicacion */
     public void main() {
         EventQueue.invokeLater(new Runnable() {
             @Override
@@ -765,7 +765,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
     }
 
     /** Evento de redimensionado. Redimensiona el tamano de la barra de estado
-     * y de su contenido, tambien almacena los valores actuales de posicion y tama�o de
+     * y de su contenido, tambien almacena los valores actuales de posicion y tamaoo de
      * la ventana. */
     public void resized() {
         // Tamano de la ventana
@@ -782,8 +782,8 @@ public class PrincipalGUI extends JAccessibilityFrame {
         }
     }
 
-    /** Seleccion menu salir: Cierra la aplicaci�n */
-    void salirActionPerformed() {
+    /** Seleccion menu salir: Cierra la aplicacion */
+    static void salirActionPerformed() {
         System.exit(0);
     }
 

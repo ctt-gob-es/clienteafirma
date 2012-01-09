@@ -29,7 +29,7 @@ import es.gob.afirma.ui.wizardUtils.BotoneraSuperior;
 import es.gob.afirma.ui.wizardUtils.ImagenLateral;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
 
-/** Panel explicativo de finalizaci�n */
+/** Panel explicativo de finalizacion */
 final class PanelFinalizar extends JAccessibilityDialogWizard {
 
     private static final long serialVersionUID = 1L;

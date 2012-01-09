@@ -135,16 +135,16 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	 * @param mnemonic mnem&oacute;nico que se va a asignar al componente
 	 */
 	public void setButtonMnemonics( Container c, String key, int mnemonic ) {
-	    int len = c.getComponentCount(); //N�mero de componentes del contenedor
+	    int len = c.getComponentCount(); //Nomero de componentes del contenedor
 	    //Se recorren los elementos que forman el contenedor
 	    for (int i = 0; i < len; i++) {
 	      Component comp = c.getComponent(i); //Se obtiene un componente
-	      //Se comprueba si es de tipo bot�n
+	      //Se comprueba si es de tipo boton
 	      if (comp instanceof JButton) {
 		        JButton button = (JButton)comp;
 		        //Se comprueba si su texto es el indicado por la clave
 		        if (button.getText() ==  UIManager.get(key)) {
-		        	//Se le asigna el mnem�nico
+		        	//Se le asigna el mnemonico
 		        	button.setMnemonic(mnemonic);
 		        }
 		    } else if (comp instanceof Container) {
@@ -161,7 +161,7 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	 * @param mnemonic mnem&oacute;nico que se va a asignar al componente
 	 */
 	public void setLabelMnemonics( Container c, String key, int mnemonic ) {
-		 //N�mero de componentes del contenedor
+		 //Nomero de componentes del contenedor
 	    int len = c.getComponentCount();
 	    //Se recorren los elementos que forman el contenedor
 	    for (int i = 0; i < len; i++) {
@@ -171,7 +171,7 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	        JLabel label = (JLabel)comp;
 	        //Se comprueba si su texto es el indicado por la clave
 	        if (label.getText() ==  UIManager.get(key)) {
-	        	//Se le asigna el mnem�nico
+	        	//Se le asigna el mnemonico
 	        	label.setDisplayedMnemonic(mnemonic);
 		    }
 	      } else if (comp instanceof Container) {

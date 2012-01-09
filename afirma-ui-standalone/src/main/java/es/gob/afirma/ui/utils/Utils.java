@@ -102,15 +102,16 @@ public final class Utils {
 
 				rt.exec(new String[] { "sh", "-c", cmd.toString() });
 			}
-		} catch (IOException e) {
+		} 
+		catch (IOException e) {
 			LOGGER.info(e.getMessage());
 			PrincipalGUI.setNuevoEstado(Messages.getString("Validacion.error.valide")); //$NON-NLS-1$
 		}
 	}
 
 	/**
-     * Abre un fichero en la aplicaci\u00F3n predefinida por el sistema operativo actual.
-     * @param filepath Ruta completa al fichero.
+     * Abre un fichero en la aplicaci&oacute;n predefinida por el sistema operativo actual.
+     * @param file Fichero.
      */
     public static void openFile(File file){
         try {
@@ -122,7 +123,7 @@ public final class Utils {
 	
 	/**
 	 * M&eacute;todo que devuelve un mnem&oacute;nico v&aacute;lido para el lenguaje que recibe como par&aacute;metro.
-	 * @param listMnemonic lista de mnem&oacute;nicos que ya han sido utilizados para otros lenguajes.
+	 * @param mnemonicList lista de mnem&oacute;nicos que ya han sido utilizados para otros lenguajes.
 	 * @param actualLanguage lenguaje para el que se est&aacute; buscando un mnem&oacute;nico
 	 * @return mnem&oacute;nico seleccionado o 0 en el caso de que no se haya encontrado ninguno disponible
 	 */
@@ -602,7 +603,7 @@ public final class Utils {
         }
 
         // Ordenamos el array de alias justo antes de mostrarlo, ignorando entre
-        // mayusculas y min�sculas
+        // mayusculas y minosculas
         final String[] finalOrderedAliases = aliassesByFriendlyName.values().toArray(new String[0]);
         Arrays.sort(finalOrderedAliases, new Comparator<String>() {
             @Override

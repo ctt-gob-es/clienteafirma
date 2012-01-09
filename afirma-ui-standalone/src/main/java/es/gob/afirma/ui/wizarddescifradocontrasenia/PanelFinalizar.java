@@ -32,7 +32,7 @@ import es.gob.afirma.ui.wizardUtils.JDialogWizard;
 
 /**
  *
- * Panel explicativo de finalizaci�n
+ * Panel explicativo de finalizacion
  */
 public class PanelFinalizar extends JAccessibilityDialogWizard {
 	
@@ -72,7 +72,7 @@ public class PanelFinalizar extends JAccessibilityDialogWizard {
      */
     private void initComponents() {
     	// Titulo de la ventana
-    	setTitulo(Messages.getString("WizardDescifrado.titulo"));
+    	setTitulo(Messages.getString("WizardDescifrado.titulo")); //$NON-NLS-1$
     	
     	// Panel con la imagen lateral
         ImagenLateral panelIzdo = new ImagenLateral();
@@ -104,8 +104,8 @@ public class PanelFinalizar extends JAccessibilityDialogWizard {
 		c.anchor = GridBagConstraints.NORTHWEST;
 		
 		 // Etiqueta "felicidades" y "Ha finalizado con..."
-		String textLabel = Messages.getString("Wizard.sobres.final1") +
-				"<br>"+"<br>" + Messages.getString("Wizard.sobres.final.final2") ;
+		String textLabel = Messages.getString("Wizard.sobres.final1") + //$NON-NLS-1$
+				"<br>"+"<br>" + Messages.getString("Wizard.sobres.final.final2") ; //$NON-NLS-3$
 		
 		InfoLabel finalizeLabel = new InfoLabel(textLabel, false);
 		  //Foco al contenido
