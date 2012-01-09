@@ -59,11 +59,20 @@ public final class AOSignConstants {
     /** Identificador de la firma OOXML (<i>Office Open XML</i>). */
     public static final String SIGN_FORMAT_OOXML = "OOXML (Office Open XML)"; //$NON-NLS-1$
 
+    /** Identificador alternativo n&uacute;mero 1 para el formato OOXML. */
+    public static final String SIGN_FORMAT_OOXML_ALT1 = "OOXML"; //$NON-NLS-1$
+    
     /** Identificador de la firma ODF (<i>Open Document Format</i>). */
     public static final String SIGN_FORMAT_ODF = "ODF (Open Document Format)"; //$NON-NLS-1$
 
+    /** Identificador alternativo n&uacute;mero 1 para el formato ODF. */
+    public static final String SIGN_FORMAT_ODF_ALT1 = "ODF"; //$NON-NLS-1$
+    
     /** Identificador de la firma Adobe PDF. */
     public static final String SIGN_FORMAT_PDF = "Adobe PDF"; //$NON-NLS-1$
+    
+    /** Identificador de la firma PAdES. */
+    public static final String SIGN_FORMAT_PADES = "PAdES"; //$NON-NLS-1$
 
     /** Identificador de la firma SOAP. */
     public static final String SIGN_FORMAT_SOAP = "SOAP"; //$NON-NLS-1$
