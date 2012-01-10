@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
-import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
@@ -213,7 +212,7 @@ final class Firma extends JPanel {
                     true,
                     true,
                     true,
-                    new Vector<CertificateFilter>(0),
+                    new ArrayList<CertificateFilter>(0),
                     false
                 );
 

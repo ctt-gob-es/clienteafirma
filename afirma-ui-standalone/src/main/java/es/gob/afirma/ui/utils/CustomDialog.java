@@ -48,7 +48,7 @@ import es.gob.afirma.core.AOCancelledOperationException;
  * @author inteco
  *
  */
-public class CustomDialog extends JAccessibilityCustomDialog implements ActionListener {
+public final class CustomDialog extends JAccessibilityCustomDialog implements ActionListener {
 
 	/**
 	 * UID.
@@ -100,17 +100,17 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	/**
 	 * Boton de Cancel.
 	 */
-	static JButton cancelButton = null;
+	private static JButton cancelButton = null;
 	
 	/**
 	 * Boton de restaurar.
 	 */
-	JButton restoreButton = null;
+	private JButton restoreButton = null;
 	
 	/**
 	 * Boton de maximizar.
 	 */
-	JButton maximizeButton = null;
+	private JButton maximizeButton = null;
 
 	/**
 	 * Respuesta al mensaje
@@ -137,7 +137,6 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		super(componentParent, modal);
 		initComponents(message, title, typeMessage, isInputDialog);
 		setLocationRelativeTo(componentParent);
-		
 	}
 	
 	/**
@@ -641,7 +640,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         Utils.remarcar(customDialog.component);
         Utils.setContrastColor(customDialog.component);
         Utils.setFontBold(customDialog.component);
-        customDialog.component.getAccessibleContext().setAccessibleName(message.replaceAll(Constants.HTML_SALTO_LINEA, "") +".  ALT + " + String.valueOf((char) mnemonic) + ". ");
+        customDialog.component.getAccessibleContext().setAccessibleName(message.replaceAll(Constants.HTML_SALTO_LINEA, "") +".  ALT + " + mnemonic + ". ");
        //Se anade el campo de texto al panel de informacion general
         customDialog.mainPanel.add(customDialog.component, c);
         
@@ -719,7 +718,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         Utils.remarcar(customDialog.component);
         Utils.setContrastColor(customDialog.component);
         Utils.setFontBold(customDialog.component);
-        customDialog.component.getAccessibleContext().setAccessibleName(message.replaceAll(Constants.HTML_SALTO_LINEA, "") +".  ALT + " + String.valueOf((char) mnemonic) + ". ");
+        customDialog.component.getAccessibleContext().setAccessibleName(message.replaceAll(Constants.HTML_SALTO_LINEA, "") +".  ALT + " + mnemonic + ". ");
        //Se anade el campo de texto al panel de informacion general
         customDialog.mainPanel.add(customDialog.component, c);
         
@@ -849,7 +848,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
        //Se anade el campo de texto al panel de informacion general
         customDialog.mainPanel.add(customDialog.component, c);
         //Se le asigna el nombre accesible
-        customDialog.component.getAccessibleContext().setAccessibleName(fullAccesibleName.replaceAll(Constants.HTML_SALTO_LINEA, "") +" ALT + " + String.valueOf((char) mnemonic) + ". ");
+        customDialog.component.getAccessibleContext().setAccessibleName(fullAccesibleName.replaceAll(Constants.HTML_SALTO_LINEA, "") +" ALT + " + mnemonic + ". ");
         
         //Etiqueta principal
         //Se relaciona la etiqueta con el componente
@@ -921,7 +920,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         Utils.remarcar(customDialog.component);
         Utils.setContrastColor(customDialog.component);
         Utils.setFontBold(customDialog.component);
-        customDialog.component.getAccessibleContext().setAccessibleName(message.replaceAll(Constants.HTML_SALTO_LINEA, "") +"  ALT + " + String.valueOf((char) mnemonic) + ". ");
+        customDialog.component.getAccessibleContext().setAccessibleName(message.replaceAll(Constants.HTML_SALTO_LINEA, "") +"  ALT + " + mnemonic + ". ");
         //Se anade el campo de texto al panel de informacion general
         customDialog.mainPanel.add(customDialog.component, c);
 
@@ -1056,7 +1055,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	/**
 	 * @return the answer
 	 */
-	private final int getAnswer() {
+	private int getAnswer() {
 		return this.answer;
 	}
 	

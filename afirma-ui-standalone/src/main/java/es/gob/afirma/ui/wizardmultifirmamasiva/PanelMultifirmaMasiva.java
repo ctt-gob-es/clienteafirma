@@ -24,9 +24,9 @@ import java.io.File;
 import java.io.FileFilter;
 import java.security.KeyException;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
@@ -498,12 +498,11 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
                                               true,
                                               true,
                                               true,
-                                              new Vector<CertificateFilter>(0),
+                                              new ArrayList<CertificateFilter>(0),
                                               false);
 
             // Comprobamos si se ha cancelado la seleccion
-            if (selectedcert == null)
-            {
+            if (selectedcert == null) {
                 throw new AOCancelledOperationException("Operacion de firma cancelada por el usuario"); //$NON-NLS-1$
             }
 

@@ -24,7 +24,7 @@ import java.security.KeyStore.PrivateKeyEntry;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableEntryException;
-import java.util.Vector;
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
@@ -71,7 +71,7 @@ import es.gob.afirma.ui.utils.Utils;
 /** Clase que se encarga de desensobrar el contenido de un fichero. */
 final class Desensobrado extends JPanel {
 
-    static Logger logger = Logger.getLogger(Desensobrado.class.getName());
+    private static Logger LOGGER = Logger.getLogger(Desensobrado.class.getName());
 
     private static final long serialVersionUID = 1L;
 
@@ -122,7 +122,7 @@ final class Desensobrado extends JPanel {
                 envelopData = AOUtil.getDataFromInputStream(envelopFis);
             }
             catch (final Exception e) {
-                logger.severe("No se ha encontrado o no se ha podido leer el fichero: " + envelopPath); //$NON-NLS-1$
+                LOGGER.severe("No se ha encontrado o no se ha podido leer el fichero: " + envelopPath); //$NON-NLS-1$
                 CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
                                                true,
                                                Messages.getString("Desensobrado.msg.error.fichero2"), "Error", JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
@@ -136,7 +136,7 @@ final class Desensobrado extends JPanel {
                 privateKeyEntry = getPrivateKeyEntry(keyStoreManager, comboAlmacen);
             }
             catch (final AOCancelledOperationException e) {
-                logger.info("Operacion cancelada por el usuario"); //$NON-NLS-1$
+                LOGGER.info("Operacion cancelada por el usuario"); //$NON-NLS-1$
                 return;
             }
             catch (final UnrecoverableEntryException e) {
@@ -147,14 +147,14 @@ final class Desensobrado extends JPanel {
                 return;
             }
             catch (final AOException e) {
-                logger.severe("Error al abrir el almacen de claves del usuario: " + e); //$NON-NLS-1$
+                LOGGER.severe("Error al abrir el almacen de claves del usuario: " + e); //$NON-NLS-1$
                 CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
                                                true,
                                                Messages.getString("Desensobrado.msg.error.almacen"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
                 return;
             }
             catch (final Exception e) {
-                logger.severe("Error al recuperar el certificado del usuario: " + e); //$NON-NLS-1$
+                LOGGER.severe("Error al recuperar el certificado del usuario: " + e); //$NON-NLS-1$
                 CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
                                                true,
                                                Messages.getString("Desensobrado.msg.error.certificado"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
@@ -185,7 +185,7 @@ final class Desensobrado extends JPanel {
                 }
             }
             catch (final AOException e) {
-                logger.severe("Error al abrir el sobre digital: " + e); //$NON-NLS-1$
+                LOGGER.severe("Error al abrir el sobre digital: " + e); //$NON-NLS-1$
                 // El pop-up muestra el mensaje de la excepcion
                 CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
                                                true,
@@ -194,7 +194,7 @@ final class Desensobrado extends JPanel {
                 return;
             }
             catch (final Exception e) {
-                logger.severe("Error al abrir el sobre digital: " + e); //$NON-NLS-1$
+                LOGGER.severe("Error al abrir el sobre digital: " + e); //$NON-NLS-1$
                 // El pop-up muestra el mensaje de la excepcion
                 CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
                                                true,
@@ -218,8 +218,7 @@ final class Desensobrado extends JPanel {
     }
 
     private AOKeyStoreManager getKeyStoreManager(final KeyStoreConfiguration ksConfiguration) throws AOException,
-    																							     AOKeystoreAlternativeException,
-    																							     AOCancelledOperationException {
+    																							     AOKeystoreAlternativeException {
         PasswordCallback pssCallback;
         final AOKeyStore store = ksConfiguration.getType();
         String lib = ksConfiguration.getLib();
@@ -273,7 +272,7 @@ final class Desensobrado extends JPanel {
             true,
             true,
             true,
-            new Vector<CertificateFilter>(0),
+            new ArrayList<CertificateFilter>(0),
             false
         );
 
