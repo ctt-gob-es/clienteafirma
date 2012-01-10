@@ -25,6 +25,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileLock;
 import java.security.cert.X509Certificate;
@@ -461,11 +462,17 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
             final File helpFile = new File(APPLICATION_HOME + "\\FirmaFacil.chm"); //$NON-NLS-1$
             try {
                 if (!helpFile.exists()) {
+                	final byte[] helpDocument = AOUtil.getDataFromInputStream(
+                			ClassLoader.getSystemResourceAsStream("help/WinHelp/FirmaFacil.chm")); //$NON-NLS-1$
+                	if (helpDocument == null || helpDocument.length == 0) {
+                		throw new IOException("No se ha encontrado el fichero de ayuda de Windows"); //$NON-NLS-1$
+                	}
+                	
                     if (!helpFile.getParentFile().exists()) {
                     	helpFile.getParentFile().mkdirs();
                     }
                     final FileOutputStream fos = new FileOutputStream(helpFile);
-                    fos.write(AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream("WinHelp/FirmaFacil.chm"))); //$NON-NLS-1$
+                    fos.write(helpDocument);
                     try {
                         fos.flush();
                         fos.close();
