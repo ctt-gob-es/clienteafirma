@@ -1026,7 +1026,7 @@ public final class AOXMLDSigSigner implements AOSigner {
      *        Elemento que contiene el nodo ra&iacute;z del documento que se
      *        quiere comprobar
      * @return Valor booleano, siendo verdadero cuando la firma es detached */
-    private boolean isDetached(final Element element) {
+    private static boolean isDetached(final Element element) {
         if (element == null) {
             return false;
         }
@@ -1041,7 +1041,7 @@ public final class AOXMLDSigSigner implements AOSigner {
      *        Elemento que contiene el nodo ra&iacute;z del documento que se
      *        quiere comprobar
      * @return Valor booleano, siendo verdadero cuando la firma es enveloped */
-    private boolean isEnveloped(final Element element) {
+    private static boolean isEnveloped(final Element element) {
         final NodeList transformList = element.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Transform"); //$NON-NLS-1$
         for (int i = 0; i < transformList.getLength(); i++) {
             if (((Element) transformList.item(i)).getAttribute("Algorithm").equals(Transform.ENVELOPED)){ //$NON-NLS-1$
@@ -1056,7 +1056,7 @@ public final class AOXMLDSigSigner implements AOSigner {
      *        Elemento que contiene el nodo ra&iacute;z del documento que se
      *        quiere comprobar
      * @return Valor booleano, siendo verdadero cuando la firma es enveloping */
-    private boolean isEnveloping(final Element element) {
+    private static boolean isEnveloping(final Element element) {
         if (element == null) {
             return false;
         }
@@ -1088,7 +1088,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             rootSig = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign)).getDocumentElement();
 
             // si es detached
-            if (this.isDetached(rootSig)) {
+            if (AOXMLDSigSigner.isDetached(rootSig)) {
                 final Element firstChild = (Element) rootSig.getFirstChild();
                 // si el documento es un xml se extrae como tal
                 if (firstChild.getAttribute(MIMETYPE_STR).equals("text/xml")) { //$NON-NLS-1$ 
@@ -1108,7 +1108,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             }
 
             // si es enveloped
-            else if (this.isEnveloped(rootSig)) {
+            else if (AOXMLDSigSigner.isEnveloped(rootSig)) {
                 // obtiene las firmas y las elimina
                 final NodeList signatures = rootSig.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_STR); 
                 final int numSignatures = signatures.getLength();
@@ -1119,7 +1119,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             }
 
             // si es enveloping
-            else if (this.isEnveloping(rootSig)) {
+            else if (AOXMLDSigSigner.isEnveloping(rootSig)) {
                 // obtiene el nodo Object de la primera firma
                 final Element object = (Element) rootSig.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Object").item(0); //$NON-NLS-1$
                 // si el documento es un xml se extrae como tal
@@ -1915,7 +1915,7 @@ public final class AOXMLDSigSigner implements AOSigner {
      * @param docu Documento que estar&aacute; contenido en el nuevo documento
      * @return Documento con ra&iacute;z "AFIRMA"
      * @throws ParserConfigurationException */
-    private Document insertarNodoAfirma(final Document docu) throws ParserConfigurationException {
+    private static Document insertarNodoAfirma(final Document docu) throws ParserConfigurationException {
 
         // Nueva instancia de DocumentBuilderFactory que permita espacio de
         // nombres (necesario para XML)
