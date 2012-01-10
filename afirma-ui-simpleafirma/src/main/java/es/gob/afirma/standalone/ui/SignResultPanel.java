@@ -17,6 +17,7 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.KeyListener;
 import java.net.URI;
 import java.util.logging.Logger;
 
@@ -41,16 +42,16 @@ final class SignResultPanel extends JPanel {
     private final JEditorPane descTextLabel = new JEditorPane();
     private final JLabel resultTextLabel = new JLabel();
 
-    SignResultPanel(final SignValidity validity) {
+    SignResultPanel(final SignValidity validity, final KeyListener extKeyListener) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                createUI(validity);
+                createUI(validity, extKeyListener);
             }
         });
     }
 
-    void createUI(final SignValidity validity) {
+    void createUI(final SignValidity validity, final KeyListener extKeyListener) {
 
         // Para que se detecten apropiadamente los hipervinculos hay que establecer
         // el tipo de contenido antes que el contenido
@@ -161,6 +162,9 @@ final class SignResultPanel extends JPanel {
         this.descTextLabel.addFocusListener(editorFocusManager);
         this.descTextLabel.addHyperlinkListener(editorFocusManager);
         this.descTextLabel.addKeyListener(editorFocusManager);
+        if (extKeyListener != null) {
+        	this.descTextLabel.addKeyListener(extKeyListener);
+        }
         
         this.descTextLabel.setEditable(false);
         this.descTextLabel.setOpaque(false);

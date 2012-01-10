@@ -19,6 +19,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedOutputStream;
@@ -74,17 +75,17 @@ final class SignDataPanel extends JPanel {
     private final JLabel certIcon = new JLabel();
     private final JEditorPane certDescription = new JEditorPane();
     private JButton validateCertButton = null;
-
-    SignDataPanel(final File signFile, final byte[] sign, final JComponent fileTypeIcon, final X509Certificate cert) {
+    
+    SignDataPanel(final File signFile, final byte[] sign, final JComponent fileTypeIcon, final X509Certificate cert, final KeyListener extKeyListener) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                createUI(signFile, sign, fileTypeIcon, cert);
+                createUI(signFile, sign, fileTypeIcon, cert, extKeyListener);
             }
         });
     }
 
-    void createUI(final File signFile, final byte[] sign, final JComponent fileTypeIcon, final X509Certificate cert) {
+    void createUI(final File signFile, final byte[] sign, final JComponent fileTypeIcon, final X509Certificate cert, final KeyListener extKeyListener) {
 
         // Texto con la ruta del fichero
         final JTextField filePath = new JTextField();
@@ -135,7 +136,7 @@ final class SignDataPanel extends JPanel {
                 fileIcon = FILE_ICON_SIGN;
                 fileTooltip = Messages.getString("SignDataPanel.31"); //$NON-NLS-1$
             }
-            final JLabel iconLabel = new JLabel(new ImageIcon(SignDetailPanel.class.getResource(fileIcon)));
+            final JLabel iconLabel = new JLabel(new ImageIcon(SignDataPanel.class.getResource(fileIcon)));
             iconLabel.setToolTipText(fileTooltip);
             iconLabel.setFocusable(false);
             filePathPanel.add(iconLabel);
@@ -281,7 +282,7 @@ final class SignDataPanel extends JPanel {
         catch (final Exception e) {
             signInfo = null;
         }
-        final JScrollPane detailPanel = new JScrollPane(signInfo == null ? null : this.getSignDataTree(signInfo));
+        final JScrollPane detailPanel = new JScrollPane(signInfo == null ? null : this.getSignDataTree(signInfo, extKeyListener));
         // En Apple siempre hay barras, y es el SO el que las pinta o no si hacen o no falta
         if (Platform.OS.MACOSX.equals(Platform.getOS())) {
             detailPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -379,7 +380,7 @@ final class SignDataPanel extends JPanel {
         return signInfo;
     }
 
-    private JTree getSignDataTree(final CompleteSignInfo signInfo) {
+    private JTree getSignDataTree(final CompleteSignInfo signInfo, final KeyListener extKeyListener) {
         final DefaultMutableTreeNode root = new DefaultMutableTreeNode();
 
         // Formato de firma
@@ -433,6 +434,9 @@ final class SignDataPanel extends JPanel {
         tree.addFocusListener(treeFocusManager);
         tree.addMouseListener(treeFocusManager);
         tree.addKeyListener(treeFocusManager);
+        if (extKeyListener != null) {
+        	tree.addKeyListener(extKeyListener);
+        }
 
         for (int i = 0; i < tree.getRowCount(); i++) {
             tree.expandRow(i);

@@ -16,6 +16,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.logging.Logger;
@@ -40,7 +42,7 @@ import es.gob.afirma.standalone.VisorFirma;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
  * @author Carlos Gamuci
  */
-public final class VisorPanel extends JPanel {
+public final class VisorPanel extends JPanel implements KeyListener {
 
     /** Version ID */
     private static final long serialVersionUID = 8309157734617505338L;
@@ -104,8 +106,8 @@ public final class VisorPanel extends JPanel {
             }
         }
 
-        final JPanel resultPanel = new SignResultPanel(validity);
-        final JPanel dataPanel = new SignDataPanel(signFile, sign, null, null);
+        final JPanel resultPanel = new SignResultPanel(validity, this);
+        final JPanel dataPanel = new SignDataPanel(signFile, sign, null, null, this);
 
         final JPanel bottonPanel = new JPanel(true);
         bottonPanel.setLayout(new FlowLayout(FlowLayout.TRAILING));
@@ -114,6 +116,7 @@ public final class VisorPanel extends JPanel {
             final JButton openSign = new JButton(Messages.getString("VisorPanel.1")); //$NON-NLS-1$
             openSign.setMnemonic('V');
             bottonPanel.add(openSign);
+            openSign.addKeyListener(this);
             openSign.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
@@ -126,13 +129,13 @@ public final class VisorPanel extends JPanel {
         
         final JButton closeVisor = new JButton(Messages.getString("VisorPanel.0")); //$NON-NLS-1$
         closeVisor.setMnemonic('C');
+        closeVisor.addKeyListener(this);
         closeVisor.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 if (VisorPanel.this.visorFirma != null) {
                     VisorPanel.this.visorFirma.closeApplication(0);
                 }
-                
             }
         });
         bottonPanel.add(closeVisor);
@@ -180,5 +183,24 @@ public final class VisorPanel extends JPanel {
         }
         return new SignValidity(SIGN_DETAIL_TYPE.KO, null);
     }
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+		if (e.getKeyCode() == KeyEvent.VK_ESCAPE && VisorPanel.this.visorFirma != null) {
+			VisorPanel.this.visorFirma.closeApplication(0);
+		}
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void keyTyped(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

@@ -71,8 +71,11 @@ public final class DNIeWaitPanel extends JPanel {
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         try {
-            vectorDNIeHelpPicture.setDocument(dbf.newDocumentBuilder().parse(this.getClass().getResourceAsStream("/resources/lectordnie.svg") //$NON-NLS-1$
-                                                 ));
+        	vectorDNIeHelpPicture.setDocument(
+        			dbf.newDocumentBuilder().parse(
+        					this.getClass().getResourceAsStream("/resources/lectordnie.svg") //$NON-NLS-1$
+        			)
+        	);
         }
         catch (final Exception e) {
             Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
