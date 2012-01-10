@@ -98,11 +98,13 @@ import com.sun.org.apache.xml.internal.security.utils.Base64;
 import com.sun.org.apache.xml.internal.security.utils.Constants;
 import com.sun.org.apache.xpath.internal.XPathAPI;
 
+import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.spi.DigestInfo;
 import es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.spi.SignatureService;
 
 /** Abstract base class for an XML Signature Service implementation.
  * @author fcorneli */
+@SuppressWarnings("static-method")
 public abstract class AbstractXmlSignatureService implements SignatureService {
 
     private final List<SignatureFacet> signatureFacets;
@@ -122,7 +124,6 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
      * SHA-256, SHA-384, SHA-512, RIPEND160. The default algorithm is SHA-1.
      * Override this method to select another signature digest algorithm.
      * @return Signature digest algorithm */
-    @SuppressWarnings("static-method")
 	protected String getSignatureDigestAlgorithm() {
         return "SHA1"; //$NON-NLS-1$
     }
@@ -137,7 +138,6 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 
     /** Override this method to change the URI dereferener used by the signing
      * engine. */
-    @SuppressWarnings("static-method")
 	protected URIDereferencer getURIDereferencer() {
         return null;
     }
@@ -145,7 +145,6 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
     /** Gives back the human-readable description of what the citizen will be
      * signing. The default value is "XML Document". Override this method to
      * provide the citizen with another description. */
-    @SuppressWarnings("static-method")
 	protected String getSignatureDescription() {
         return "XML Document"; //$NON-NLS-1$
     }
@@ -195,7 +194,6 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
         return signedDocumentOutputStream.toByteArray();
     }
 
-    @SuppressWarnings("static-method")
 	protected String getCanonicalizationMethod() {
         return CanonicalizationMethod.EXCLUSIVE;
     }
@@ -368,19 +366,19 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
         if (null == digestAlgo) {
             throw new IllegalArgumentException("digest algo is null"); //$NON-NLS-1$
         }
-        if ("SHA-1".equals(digestAlgo) || "SHA1".equals(digestAlgo) || "SHA".equals(digestAlgo)) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        if ("SHA1".equals(AOSignConstants.getDigestAlgorithmName(digestAlgo))) { //$NON-NLS-1$ 
             return SignatureMethod.RSA_SHA1;
         }
-        if ("SHA-256".equals(digestAlgo) || "SHA256".equals(digestAlgo)) { //$NON-NLS-1$ //$NON-NLS-2$
+        if ("SHA-256".equals(AOSignConstants.getDigestAlgorithmName(digestAlgo))) { //$NON-NLS-1$ 
             return XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA256;
         }
-        if ("SHA-512".equals(digestAlgo) || "SHA512".equals(digestAlgo)) { //$NON-NLS-1$ //$NON-NLS-2$
+        if ("SHA-512".equals(AOSignConstants.getDigestAlgorithmName(digestAlgo))) { //$NON-NLS-1$ 
             return XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA512;
         }
-        if ("SHA-384".equals(digestAlgo) || "SHA384".equals(digestAlgo)) { //$NON-NLS-1$ //$NON-NLS-2$
+        if ("SHA-384".equals(AOSignConstants.getDigestAlgorithmName(digestAlgo))) { //$NON-NLS-1$ 
             return XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA384;
         }
-        if ("RIPEMD160".equals(digestAlgo) || "RIPEMD-160".equals(digestAlgo)) { //$NON-NLS-1$ //$NON-NLS-2$
+        if ("RIPEMD160".equals(AOSignConstants.getDigestAlgorithmName(digestAlgo))) { //$NON-NLS-1$ 
             return XMLSignature.ALGO_ID_SIGNATURE_RSA_RIPEMD160;
         }
         throw new IllegalArgumentException("unsupported sign algo: " + digestAlgo); //$NON-NLS-1$

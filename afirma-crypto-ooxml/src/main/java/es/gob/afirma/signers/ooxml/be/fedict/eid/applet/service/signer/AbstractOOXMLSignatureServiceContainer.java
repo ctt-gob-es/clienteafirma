@@ -56,6 +56,10 @@ import es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.signer.ooxml.OOX
 
 /** Contenedor para la implementaci&oacute;n abstracta del servicio de firma OOXML. */
 public final class AbstractOOXMLSignatureServiceContainer {
+	
+	private AbstractOOXMLSignatureServiceContainer() {
+		// No permitimos la instanciacion
+	}
 
     private static final class OOXMLSignatureService extends AbstractOOXMLSignatureService {
 
