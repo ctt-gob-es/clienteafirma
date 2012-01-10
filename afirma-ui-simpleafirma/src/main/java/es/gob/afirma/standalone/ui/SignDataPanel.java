@@ -73,7 +73,7 @@ final class SignDataPanel extends JPanel {
     private final JLabel filePathText = new JLabel();
     private final JLabel certIcon = new JLabel();
     private final JEditorPane certDescription = new JEditorPane();
-    private final JButton validateCertButton = new JButton();
+    private JButton validateCertButton = null;
 
     SignDataPanel(final File signFile, final byte[] sign, final JComponent fileTypeIcon, final X509Certificate cert) {
         SwingUtilities.invokeLater(new Runnable() {
@@ -210,6 +210,7 @@ final class SignDataPanel extends JPanel {
 	            this.certDescription.addHyperlinkListener(editorFocusManager);
 	            
 	            if (certInfo.getCertVerifier() != null) {
+	            	this.validateCertButton = new JButton();
 	            	this.validateCertButton.setEnabled(false);
 	                this.validateCertButton.setPreferredSize(new Dimension(150, 24));
 	                this.validateCertButton.setText(Messages.getString("SignDataPanel.15")); //$NON-NLS-1$
