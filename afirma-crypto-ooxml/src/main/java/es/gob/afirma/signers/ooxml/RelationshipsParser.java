@@ -57,7 +57,7 @@ final class RelationshipsParser {
      * @throws Exception
      *         Cuando la entrada no se corresponde con un objeto
      *         RelationShips v&aacute;lido. */
-    private RelationShip[] getRelationships(final InputStream xmlRelationships) throws AOException {
+    private static RelationShip[] getRelationships(final InputStream xmlRelationships) throws AOException {
 
         final Document doc;
         try {
@@ -79,7 +79,7 @@ final class RelationshipsParser {
         final NodeList relationsList = root.getChildNodes();
         final Vector<RelationShip> relationsVector = new Vector<RelationShip>();
         for (int i = 0; i < relationsList.getLength(); i++) {
-            relationsVector.add(this.getRelationship(relationsList.item(i)));
+            relationsVector.add(RelationshipsParser.getRelationship(relationsList.item(i)));
         }
 
         return relationsVector.toArray(new RelationShip[0]);
@@ -96,7 +96,7 @@ final class RelationshipsParser {
      * @return Objeto de relaci&oacute;n.
      * @throws AOException
      *         Cuando el nodo no encaja con el patr&oacute;n RelationShip. */
-    private RelationShip getRelationship(final Node node) throws AOException {
+    private static RelationShip getRelationship(final Node node) throws AOException {
 
         // Comprobamos que sea un nodo de relacion
         if (!node.getNodeName().equals("Relationship")) { //$NON-NLS-1$

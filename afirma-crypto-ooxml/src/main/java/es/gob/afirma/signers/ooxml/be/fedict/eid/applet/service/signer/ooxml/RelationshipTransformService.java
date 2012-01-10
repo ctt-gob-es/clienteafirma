@@ -218,7 +218,7 @@ public final class RelationshipTransformService extends TransformService {
         }
     }
 
-    private void sortRelationshipElements(final Element relationshipsElement) {
+    private static void sortRelationshipElements(final Element relationshipsElement) {
         final List<Element> relationshipElements = new LinkedList<Element>();
         final NodeList relationshipNodes = relationshipsElement.getElementsByTagName("*"); //$NON-NLS-1$
         final int nodeCount = relationshipNodes.getLength();
@@ -234,7 +234,7 @@ public final class RelationshipTransformService extends TransformService {
         }
     }
 
-    private String toString(final Node dom) throws TransformerException {
+    private static String toString(final Node dom) throws TransformerException {
         final Source source = new DOMSource(dom);
         final StringWriter stringWriter = new StringWriter();
         final Result result = new StreamResult(stringWriter);
@@ -248,7 +248,7 @@ public final class RelationshipTransformService extends TransformService {
         return stringWriter.getBuffer().toString();
     }
 
-    private OctetStreamData toOctetStreamData(final Node node) throws TransformerException {
+    private static OctetStreamData toOctetStreamData(final Node node) throws TransformerException {
         final Source source = new DOMSource(node);
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         final Result result = new StreamResult(outputStream);
@@ -259,7 +259,7 @@ public final class RelationshipTransformService extends TransformService {
         return new OctetStreamData(new ByteArrayInputStream(outputStream.toByteArray()));
     }
 
-    private Document loadDocument(final InputStream documentInputStream) throws ParserConfigurationException, SAXException, IOException {
+    private static Document loadDocument(final InputStream documentInputStream) throws ParserConfigurationException, SAXException, IOException {
         final InputSource inputSource = new InputSource(documentInputStream);
         final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         documentBuilderFactory.setNamespaceAware(true);

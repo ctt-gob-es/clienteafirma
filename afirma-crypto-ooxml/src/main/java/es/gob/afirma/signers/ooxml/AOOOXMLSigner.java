@@ -69,7 +69,7 @@ public final class AOOOXMLSigner implements AOSigner {
      * @param data Datos que deseamos analizar
      * @return {@code true} si el documento es un OOXML, {@code false} en caso
      *         contrario */
-    private boolean isOOXMLFile(final byte[] data) {
+    private static boolean isOOXMLFile(final byte[] data) {
 
         final ZipFile zipFile;
         try {
@@ -287,7 +287,7 @@ public final class AOOOXMLSigner implements AOSigner {
      * @param keyEntry Entrada que apunta a la clave privada del firmante
      * @return Documento OOXML firmado
      * @throws AOException Cuando ocurre alg&uacute;n error durante el proceso de firma */
-    private byte[] signOOXML(final byte[] ooxmlDocument,
+    private static byte[] signOOXML(final byte[] ooxmlDocument,
                              final int signNum,
                              final String algorithm,
                              final PrivateKeyEntry keyEntry) throws AOException {
@@ -303,7 +303,7 @@ public final class AOOOXMLSigner implements AOSigner {
         }
 
         try {
-            return new AbstractOOXMLSignatureServiceContainer().sign(
+			return AbstractOOXMLSignatureServiceContainer.sign(
                  new ByteArrayInputStream(ooxmlDocument),
                  Arrays.asList((X509Certificate[])keyEntry.getCertificateChain()),
                  AOSignConstants.getDigestAlgorithmName(algorithm),

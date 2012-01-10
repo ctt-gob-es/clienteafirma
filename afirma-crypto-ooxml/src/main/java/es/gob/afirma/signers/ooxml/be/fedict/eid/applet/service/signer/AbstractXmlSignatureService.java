@@ -122,7 +122,8 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
      * SHA-256, SHA-384, SHA-512, RIPEND160. The default algorithm is SHA-1.
      * Override this method to select another signature digest algorithm.
      * @return Signature digest algorithm */
-    protected String getSignatureDigestAlgorithm() {
+    @SuppressWarnings("static-method")
+	protected String getSignatureDigestAlgorithm() {
         return "SHA1"; //$NON-NLS-1$
     }
 
@@ -130,20 +131,22 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
      * ds:Signature should be the top-level element. Implementations can
      * override this method to provide a custom enveloping document.
      * @return */
-    private Document getEnvelopingDocument() {
+    private static Document getEnvelopingDocument() {
         return null;
     }
 
     /** Override this method to change the URI dereferener used by the signing
      * engine. */
-    protected URIDereferencer getURIDereferencer() {
+    @SuppressWarnings("static-method")
+	protected URIDereferencer getURIDereferencer() {
         return null;
     }
 
     /** Gives back the human-readable description of what the citizen will be
      * signing. The default value is "XML Document". Override this method to
      * provide the citizen with another description. */
-    protected String getSignatureDescription() {
+    @SuppressWarnings("static-method")
+	protected String getSignatureDescription() {
         return "XML Document"; //$NON-NLS-1$
     }
 
@@ -192,7 +195,8 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
         return signedDocumentOutputStream.toByteArray();
     }
 
-    protected String getCanonicalizationMethod() {
+    @SuppressWarnings("static-method")
+	protected String getCanonicalizationMethod() {
         return CanonicalizationMethod.EXCLUSIVE;
     }
 
@@ -329,7 +333,7 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 
     }
 
-    private void addDigestInfosAsReferences(final List<DigestInfo> digestInfos,
+    private static void addDigestInfosAsReferences(final List<DigestInfo> digestInfos,
                                             final XMLSignatureFactory signatureFactory,
                                             final List<Reference> references) throws NoSuchAlgorithmException,
                                                                              InvalidAlgorithmParameterException,
@@ -347,7 +351,7 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
         }
     }
 
-    private String getXmlDigestAlgo(final String digestAlgo) {
+    private static String getXmlDigestAlgo(final String digestAlgo) {
         if ("SHA1".equals(digestAlgo) || "SHA-1".equals(digestAlgo) || "SHA".equals(digestAlgo)) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             return DigestMethod.SHA1;
         }
@@ -360,7 +364,7 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
         throw new IllegalArgumentException("unsupported digest algo: " + digestAlgo); //$NON-NLS-1$
     }
 
-    private String getSignatureMethod(final String digestAlgo) {
+    private static String getSignatureMethod(final String digestAlgo) {
         if (null == digestAlgo) {
             throw new IllegalArgumentException("digest algo is null"); //$NON-NLS-1$
         }
@@ -382,18 +386,18 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
         throw new IllegalArgumentException("unsupported sign algo: " + digestAlgo); //$NON-NLS-1$
     }
 
-    private void writeDocument(final Document document, final OutputStream documentOutputStream) throws TransformerException,
+    private static void writeDocument(final Document document, final OutputStream documentOutputStream) throws TransformerException,
                                                                                                   IOException {
         writeDocumentNoClosing(document, documentOutputStream);
         documentOutputStream.close();
     }
 
-    private void writeDocumentNoClosing(final Document document, final OutputStream documentOutputStream) throws TransformerException {
+    private static void writeDocumentNoClosing(final Document document, final OutputStream documentOutputStream) throws TransformerException {
         // we need the XML processing initial line for OOXML
         writeDocumentNoClosing(document, documentOutputStream, false);
     }
 
-    protected void writeDocumentNoClosing(final Document document, final OutputStream documentOutputStream, final boolean omitXmlDeclaration) throws TransformerException {
+    protected static void writeDocumentNoClosing(final Document document, final OutputStream documentOutputStream, final boolean omitXmlDeclaration) throws TransformerException {
         final NoCloseOutputStream outputStream = new NoCloseOutputStream(documentOutputStream);
         final Result result = new StreamResult(outputStream);
         final Transformer xformer = TransformerFactory.newInstance().newTransformer();
@@ -404,13 +408,13 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
         xformer.transform(source, result);
     }
 
-    private Document loadDocument(final InputStream documentInputStream) throws ParserConfigurationException, SAXException, IOException {
+    private static Document loadDocument(final InputStream documentInputStream) throws ParserConfigurationException, SAXException, IOException {
         final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         documentBuilderFactory.setNamespaceAware(true);
         return documentBuilderFactory.newDocumentBuilder().parse(new InputSource(documentInputStream));
     }
 
-    protected Document loadDocumentNoClose(final InputStream documentInputStream) throws ParserConfigurationException, SAXException, IOException {
+    protected static Document loadDocumentNoClose(final InputStream documentInputStream) throws ParserConfigurationException, SAXException, IOException {
         final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         documentBuilderFactory.setNamespaceAware(true);
         final DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();

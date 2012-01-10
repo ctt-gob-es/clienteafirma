@@ -213,11 +213,11 @@ public abstract class AbstractOOXMLSignatureService extends AbstractXmlSignature
         return zipOutputStream;
     }
 
-    private void addOriginSigs(final ZipOutputStream zipOutputStream) throws IOException {
+    private static void addOriginSigs(final ZipOutputStream zipOutputStream) throws IOException {
         zipOutputStream.putNextEntry(new ZipEntry("_xmlsignatures/origin.sigs")); //$NON-NLS-1$
     }
 
-    private void addOriginSigsRels(final String signatureZipEntryName, final ZipOutputStream zipOutputStream) throws ParserConfigurationException,
+    private static void addOriginSigsRels(final String signatureZipEntryName, final ZipOutputStream zipOutputStream) throws ParserConfigurationException,
                                                                                                              IOException,
                                                                                                              TransformerException {
         final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();

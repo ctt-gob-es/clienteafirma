@@ -104,9 +104,8 @@ public final class AbstractOOXMLSignatureServiceContainer {
      * @throws ParserConfigurationException 
      * @throws IOException 
      * @throws InvalidAlgorithmParameterException 
-     * @throws NoSuchAlgorithmException 
-     * @throws Exception Cuando ocurre cualquier problema durante el proceso */
-    public byte[] sign(final InputStream ooxml,
+     * @throws NoSuchAlgorithmException */
+    public static byte[] sign(final InputStream ooxml,
                              final List<X509Certificate> certChain,
                              final String digestAlgorithm,
                              final PrivateKey pk,

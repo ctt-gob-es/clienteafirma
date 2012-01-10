@@ -162,7 +162,7 @@ final class OOXMLSignatureFacet implements SignatureFacet {
         return signatureFactory.newManifest(manifestReferences);
     }
 
-    private void addSignatureTime(final XMLSignatureFactory signatureFactory, final Document document, final String signatureId, final List<XMLStructure> objectContent) {
+    private static void addSignatureTime(final XMLSignatureFactory signatureFactory, final Document document, final String signatureId, final List<XMLStructure> objectContent) {
         /*
          * SignatureTime
          */
@@ -189,7 +189,7 @@ final class OOXMLSignatureFacet implements SignatureFacet {
         objectContent.add(signatureProperties);
     }
 
-    private void addSignatureInfo(final XMLSignatureFactory signatureFactory,
+    private static void addSignatureInfo(final XMLSignatureFactory signatureFactory,
                                   final Document document,
                                   final String signatureId,
                                   final List<Reference> references,
@@ -237,7 +237,7 @@ final class OOXMLSignatureFacet implements SignatureFacet {
         }
     }
 
-    private void addRelationshipsReference(final XMLSignatureFactory signatureFactory,
+    private static void addRelationshipsReference(final XMLSignatureFactory signatureFactory,
                                            final String zipEntryName,
                                            final Document relsDocument,
                                            final List<Reference> manifestReferences) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
@@ -302,7 +302,7 @@ final class OOXMLSignatureFacet implements SignatureFacet {
         }
     }
 
-    private List<String> getResourceNames(final InputStream ooxmldoc, final String contentType) throws IOException,
+    private static List<String> getResourceNames(final InputStream ooxmldoc, final String contentType) throws IOException,
                                                                                    ParserConfigurationException,
                                                                                    SAXException,
                                                                                    TransformerException {
@@ -351,7 +351,7 @@ final class OOXMLSignatureFacet implements SignatureFacet {
         return null;
     }
 
-    private Document loadDocumentNoClose(final InputStream documentInputStream) throws ParserConfigurationException, SAXException, IOException {
+    private static Document loadDocumentNoClose(final InputStream documentInputStream) throws ParserConfigurationException, SAXException, IOException {
         final NoCloseInputStream noCloseInputStream = new NoCloseInputStream(documentInputStream);
         final InputSource inputSource = new InputSource(noCloseInputStream);
         final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -360,7 +360,7 @@ final class OOXMLSignatureFacet implements SignatureFacet {
         return documentBuilder.parse(inputSource);
     }
 
-    private Document loadDocument(final InputStream documentInputStream) throws ParserConfigurationException, SAXException, IOException {
+    private static Document loadDocument(final InputStream documentInputStream) throws ParserConfigurationException, SAXException, IOException {
         final InputSource inputSource = new InputSource(documentInputStream);
         final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         documentBuilderFactory.setNamespaceAware(true);
