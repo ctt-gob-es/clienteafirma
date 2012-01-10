@@ -25,8 +25,6 @@ import java.io.IOException;
 import java.security.Key;
 import java.security.KeyException;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.spec.InvalidKeySpecException;
 import java.util.List;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -113,7 +111,7 @@ final class PanelClaveCifrado extends JAccessibilityDialogWizard {
     private Key cipherKey;
 
     /** Ruta donde se encuentra el archivo a cifrar */
-    private String rutaFichero = "";
+    private final String rutaFichero;
 
     /** Constructor.
      * @param algoritmo
@@ -289,9 +287,8 @@ final class PanelClaveCifrado extends JAccessibilityDialogWizard {
      * @throws FileNotFoundException Cuando no se encuentra o no puede leerse el fichero seleccionado.
      * @throws IOException Cuando ocurre un error durante la lectura de un fichero local.
      * @throws AOException Cuando ocurre un error al formar una ruta remota o al leer un fichero remoto. */
-    private byte[] getFileContent() throws FileNotFoundException, IOException, AOException, NullPointerException {
-        if (this.rutaFichero == null)
-        {
+    private byte[] getFileContent() throws IOException, AOException {
+        if (this.rutaFichero == null) {
             throw new IllegalArgumentException("No se ha indicado un fichero de entrada"); //$NON-NLS-1$
         }
         return AOUtil.getDataFromInputStream(AOUtil.loadFile(AOUtil.createURI(this.rutaFichero)));
