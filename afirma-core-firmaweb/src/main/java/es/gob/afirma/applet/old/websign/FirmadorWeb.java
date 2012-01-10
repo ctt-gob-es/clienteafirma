@@ -24,6 +24,12 @@ import java.security.NoSuchAlgorithmException;
 
 /** Clase para la realizaci&oacute;n de firmas de p&aacute;ginas Web XHTML. */
 public final class FirmadorWeb {
+	
+	private static final int BUFFER_SIZE = 1024;
+	
+	private FirmadorWeb() {
+		// No permitimos la instanciacion
+	}
 
     /** Firma de una p&aacute;gina Web XHTML. */
     public static class FirmaWeb {
@@ -73,7 +79,7 @@ public final class FirmadorWeb {
                     try {
                         // Volcamos el fichero en b64
                         int nBytes;
-                        final byte[] buffer = new byte[1024];
+                        final byte[] buffer = new byte[BUFFER_SIZE];
                         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
                         while ((nBytes = attachIS.read(buffer)) != -1) {
                             baos.write(buffer, 0, nBytes);

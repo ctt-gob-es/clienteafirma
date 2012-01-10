@@ -106,10 +106,10 @@ final class SimpleCondition extends AClause implements ConditionConstants {
         		if (rdns != null && (!rdns.isEmpty())) {
         			for (int j=0; j<rdns.size(); j++) {
         				if (rdns.get(j).toString().startsWith("serialnumber=") || rdns.get(j).toString().startsWith("SERIALNUMBER=")) { //$NON-NLS-1$ //$NON-NLS-2$
-        					o1 = asciiHexToString(rdns.get(j).toString().substring(13));
+        					o1 = asciiHexToString(rdns.get(j).toString().substring("serialnumber=".length())); //$NON-NLS-1$
         				}
         				else if (rdns.get(j).toString().startsWith("2.5.4.5=")) { //$NON-NLS-1$
-        				    o1 = asciiHexToString(rdns.get(j).toString().substring(8));
+        				    o1 = asciiHexToString(rdns.get(j).toString().substring("2.5.4.5=".length())); //$NON-NLS-1$
         				}
         			}
         			if (o1==null) {
