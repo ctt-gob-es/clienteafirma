@@ -456,9 +456,8 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
             final File helpFile = new File(APPLICATION_HOME + "\\FirmaFacil.chm"); //$NON-NLS-1$
             try {
                 if (!helpFile.exists()) {
-                    final File helpDir = new File(APPLICATION_HOME);
-                    if (!helpDir.exists()) {
-                        helpDir.mkdirs();
+                    if (!helpFile.getParentFile().exists()) {
+                    	helpFile.getParentFile().mkdirs();
                     }
                     final FileOutputStream fos = new FileOutputStream(helpFile);
                     fos.write(AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream("WinHelp/FirmaFacil.chm"))); //$NON-NLS-1$
