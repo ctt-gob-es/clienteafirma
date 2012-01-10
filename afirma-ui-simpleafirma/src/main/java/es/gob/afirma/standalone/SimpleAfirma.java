@@ -157,7 +157,9 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
         else {
             loadDefaultKeyStore();
         }
-        loadMainApp(true);
+        if (this.ksManager == null) {
+        	loadMainApp(true);
+        }
     }
 
     private void loadDefaultKeyStore() {
@@ -184,6 +186,9 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 
     @Override
     public void propertyChange(final PropertyChangeEvent evt) {
+    	if (this.ksManager != null) {
+    		return;
+    	}
         if (DNIeManager.BLOWN_DNI_INSERTED.equals(evt.getPropertyName())) {
             if (DEBUG)
              {
