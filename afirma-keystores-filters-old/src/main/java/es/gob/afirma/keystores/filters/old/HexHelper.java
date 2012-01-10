@@ -12,6 +12,7 @@ package es.gob.afirma.keystores.filters.old;
 
 
 final class HexHelper {
+	
     private static final HexHelper INSTANCE = new HexHelper();
 
     private static final char[] HEX_CHARS= new char[]{
@@ -27,12 +28,12 @@ final class HexHelper {
         return INSTANCE;
     }
 
-    public String toString(byte[] buff)
+    public static String toString(byte[] buff)
     {
         return toHex(buff);
     }
 
-    private String toHex(byte b)
+    private static String toHex(byte b)
     {
         int v= (b<0)?(128+(b&127)):b;
         int d0= v%16;
@@ -41,7 +42,7 @@ final class HexHelper {
         return new String(new char[]{HEX_CHARS[d1], HEX_CHARS[d0]});
     }
 
-    public String toHex(byte[] data)
+    public static String toHex(byte[] data)
     {
         final String hex;
         

@@ -139,7 +139,7 @@ final class SimpleCondition extends AClause implements ConditionConstants {
                 if (this.aux == null) {
                     this.aux = this.value;
                 }
-                o1 = HEX_HELPER.toString(MessageDigest.getInstance(this.hashAlg).digest(cert.getEncoded()));
+                o1 = HexHelper.toString(MessageDigest.getInstance(this.hashAlg).digest(cert.getEncoded()));
             }
             else {
                 throw new AOException("Campo desconocido:" + this.field); //$NON-NLS-1$
@@ -155,7 +155,7 @@ final class SimpleCondition extends AClause implements ConditionConstants {
         }
     } 			
 
-    private String asciiHexToString(final String ahex) {
+    private static String asciiHexToString(final String ahex) {
         
         if(!ahex.startsWith("#")) { //$NON-NLS-1$
             return ahex;
@@ -238,7 +238,7 @@ final class SimpleCondition extends AClause implements ConditionConstants {
         return outStr.toString();
     }
     
-    private String rewriteLdapName(String ln) {
+    private static String rewriteLdapName(final String ln) {
         try {
             final List<Rdn> rdns = new LdapName(ln).getRdns();
             final StringBuilder out = new StringBuilder();
