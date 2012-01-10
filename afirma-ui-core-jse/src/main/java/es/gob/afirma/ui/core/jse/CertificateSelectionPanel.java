@@ -66,7 +66,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 	/** Altura de un elemento de la lista de certificados. */
 	private static final int CERT_LIST_ELEMENT_HEIGHT = 86;
 	
-	private JList certList;
+	private JList<CertificateLine> certList;
 	
 	private String selectedValue = null;
 	
@@ -127,7 +127,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 			certLines.add(certLine);
 		}
 
-		this.certList = new JList();
+		this.certList = new JList<CertificateLine>();
 		this.certList.setCellRenderer(new CertListCellRendered());
 		this.certList.setListData(certLines);
 		this.certList.setVisibleRowCount(Math.max(Math.min(4, certLines.size()), 1));
@@ -308,17 +308,17 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 	/**
 	 * Renderer para mostrar la informaci&oacute;n de un certificado.
 	 */
-	private static final class CertListCellRendered implements ListCellRenderer {
+	private static final class CertListCellRendered implements ListCellRenderer<CertificateLine> {
 
 		CertListCellRendered() {
 			/* Limitamos la visibilidad del constructor */
 		}
 		
 		/** {@inheritDoc} */
-		public Component getListCellRendererComponent(JList list, Object value,
+		public Component getListCellRendererComponent(JList<? extends CertificateLine> list, CertificateLine value,
 				int index, boolean isSelected, boolean cellHasFocus) {
 
-			final CertificateLine line = (CertificateLine) value;
+			final CertificateLine line = value;
 			if (isSelected) {
 				line.setBackground(Color.decode("0xD9EAFF")); //$NON-NLS-1$
 				line.setBorder(BorderFactory.createCompoundBorder(
@@ -333,6 +333,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 			
 			return line;
 		}
+
 	}
 	
 	/** {@inheritDoc} */
@@ -352,13 +353,13 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		}
 		
 		/** {@inheritDoc} */
-		public void mouseClicked(MouseEvent me) {
+		public void mouseClicked(final MouseEvent me) {
 			if (me.getClickCount() == 1 &&
-					((CertificateLine)((JList) me.getSource()).getSelectedValue()).getCertificateLinkBounds().contains(me.getX(), me.getY() % CERT_LIST_ELEMENT_HEIGHT)) {
+					((CertificateLine)((JList<?>) me.getSource()).getSelectedValue()).getCertificateLinkBounds().contains(me.getX(), me.getY() % CERT_LIST_ELEMENT_HEIGHT)) {
 				try {
 					CertificateUtils.openCert(
 							CertificateSelectionPanel.this,
-							((CertificateLine)((JList) me.getSource()).getSelectedValue()).getCertificate());
+							((CertificateLine)((JList<?>) me.getSource()).getSelectedValue()).getCertificate());
 				} 
 				catch (final AOCancelledOperationException e) {
 					/* No hacemos nada */
@@ -367,15 +368,15 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		}
 		
 		/** {@inheritDoc} */
-		public void mouseMoved(MouseEvent me) {
-			if (((CertificateLine)((JList) me.getSource()).getSelectedValue()).getCertificateLinkBounds().contains(me.getX(), me.getY() % CERT_LIST_ELEMENT_HEIGHT)) {
+		public void mouseMoved(final MouseEvent me) {
+			if (((CertificateLine)((JList<?>) me.getSource()).getSelectedValue()).getCertificateLinkBounds().contains(me.getX(), me.getY() % CERT_LIST_ELEMENT_HEIGHT)) {
 				if (!this.entered) {
-					((JList) me.getSource()).setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+					((JList<?>) me.getSource()).setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 					this.entered = true;
 				}
 			} 
 			else if (this.entered) {
-				((JList) me.getSource()).setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+				((JList<?>) me.getSource()).setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 				this.entered = false;
 			}
 		}
