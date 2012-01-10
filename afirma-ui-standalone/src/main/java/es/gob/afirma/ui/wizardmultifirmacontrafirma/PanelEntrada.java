@@ -380,7 +380,7 @@ final class PanelEntrada extends JAccessibilityDialogWizard {
 	            }
 	        } catch (Exception e) {
 	            /* Si falla un signer continuamos con el resto */
-	            e.printStackTrace();
+	        	Logger.getLogger("es.gob.afirma").severe("Error en la obtencion del firmador: " + e); //$NON-NLS-1$ //$NON-NLS-2$
 	        }
 	    }
 	    return null;

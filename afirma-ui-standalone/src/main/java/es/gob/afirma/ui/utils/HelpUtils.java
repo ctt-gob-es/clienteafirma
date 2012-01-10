@@ -29,6 +29,7 @@ import java.awt.event.MouseListener;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.logging.Logger;
 
 import javax.help.DefaultHelpBroker;
 import javax.help.HelpBroker;
@@ -98,7 +99,7 @@ public class HelpUtils {
 
         }
         catch (final Exception ex) {
-            ex.printStackTrace();
+            Logger.getLogger("es.gob.afirma").severe("Error en el cambio de idioma: " + ex);  //$NON-NLS-1$//$NON-NLS-2$
         }
     }
 
@@ -232,7 +233,7 @@ public class HelpUtils {
 
             }
             catch (final Exception ex) {
-                ex.printStackTrace();
+                Logger.getLogger("es.gob.afirma").severe("Error en la carga de la ayuda: " + ex); //$NON-NLS-1$ //$NON-NLS-2$
             }
 
             visualize(false);

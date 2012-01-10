@@ -232,7 +232,7 @@ final class SignDataPanel extends JPanel {
 								CustomDialog.showMessageDialog(SignDataPanel.this, true, Messages.getString("SignDataPanel.19"), Messages.getString("SignDataPanel.20"), JOptionPane.INFORMATION_MESSAGE);  //$NON-NLS-1$//$NON-NLS-2$
 							}
 							catch(final Exception e) {
-								e.printStackTrace();
+								Logger.getLogger("es.gob.afirma").severe("Error en la validacion del certificado: " + e); //$NON-NLS-1$ //$NON-NLS-2$
 							}
 							finally {
 							    SignDataPanel.this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));

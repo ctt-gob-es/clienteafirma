@@ -29,6 +29,7 @@ import java.security.Security;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.logging.Logger;
 
 import javax.swing.ButtonGroup;
 import javax.swing.Icon;
@@ -547,7 +548,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
             languagesDirectory = new File(fileDirectory, "languages"); //$NON-NLS-1$
         }
         catch (final Exception ex) {
-            ex.printStackTrace();
+        	Logger.getLogger("es.gob.afirma").severe("Error en la obtencion del contenido del directorio de lenguajes: " + ex); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         // Inicialmente introducimos el espanol
@@ -660,14 +661,8 @@ public class PrincipalGUI extends JAccessibilityFrame {
             try {
                 Security.addProvider((Provider) Class.forName("sun.security.mscapi.SunMSCAPI").newInstance()); //$NON-NLS-1$
             }
-            catch (final InstantiationException e) {
-                e.printStackTrace();
-            }
-            catch (final IllegalAccessException e) {
-                e.printStackTrace();
-            }
-            catch (final ClassNotFoundException e) {
-                e.printStackTrace();
+            catch (final Exception e) {
+                Logger.getLogger("es.gob.afirma").warning("No se ha podido anadir el proveedor SunMSCAPI");  //$NON-NLS-1$//$NON-NLS-2$
             }
         }
     }
@@ -839,18 +834,10 @@ public class PrincipalGUI extends JAccessibilityFrame {
             }
 
         }
-        catch (final ClassNotFoundException e1) {
-            System.out.println(e1.getMessage());
+        catch (final Exception e) {
+        	Logger.getLogger("es.gob.afirma").severe("Error en el establecimiento del modo de alto contraste: " + e); //$NON-NLS-1$ //$NON-NLS-2$
         }
-        catch (final InstantiationException e1) {
-            System.out.println(e1.getMessage());
-        }
-        catch (final IllegalAccessException e1) {
-            System.out.println(e1.getMessage());
-        }
-        catch (final UnsupportedLookAndFeelException e1) {
-            System.out.println(e1.getMessage());
-        }
+        
         SwingUtilities.updateComponentTreeUI(this);
 
         this.validate();

@@ -112,7 +112,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
     }
 
     /** log. */
-    static Logger logger = Logger.getLogger(PanelMultifirma.class.getName());
+    private static Logger LOGGER = Logger.getLogger(PanelMultifirma.class.getName());
 
     /** UID. */
     private static final long serialVersionUID = 1L;
@@ -168,7 +168,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
             this.arbolFirmas.setSelectionRow(0);
         }
         catch (final Exception e) {
-            logger.severe("No se pudo cargar el arbol de firmas del fichero '" + this.rutaFichero + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+            LOGGER.severe("No se pudo cargar el arbol de firmas del fichero '" + this.rutaFichero + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
             CustomDialog.showMessageDialog(this,
                                            true,
                                            Messages.getString("Wizard.multifirma.simple.error.arbol"), //$NON-NLS-1$
@@ -188,7 +188,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
             }
         }
         catch (final Exception e) {
-            logger.warning("El arbol introducido contiene elementos no validos: " + e); //$NON-NLS-1$
+            LOGGER.warning("El arbol introducido contiene elementos no validos: " + e); //$NON-NLS-1$
             return false;
         }
 
@@ -304,13 +304,12 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
             }
         }
         catch (final AOException e) {
-            logger.warning(e.getMessage() + ": " + e);
+            LOGGER.warning(e.getMessage() + ": " + e);
             CustomDialog.showMessageDialog(this, true, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
             return null;
         }
         catch (final UnsupportedOperationException e) {
-            logger.warning("La firma seleccionada no soporta la operacion de contrafirma: " + e); //$NON-NLS-1$
+            LOGGER.warning("La firma seleccionada no soporta la operacion de contrafirma: " + e); //$NON-NLS-1$
             CustomDialog.showMessageDialog(this,
                                            true,
                                            Messages.getString("Wizard.multifirma.simple.error.firma.soporte"), //$NON-NLS-1$
@@ -318,7 +317,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
             return null;
         }
         catch (final Exception e) {
-            logger.warning("Error al contrafirmar el fichero de firma: " + e); //$NON-NLS-1$
+            LOGGER.warning("Error al contrafirmar el fichero de firma: " + e); //$NON-NLS-1$
             CustomDialog.showMessageDialog(this,
                                            true,
                                            Messages.getString("Wizard.multifirma.simple.error.contrafirmar"), //$NON-NLS-1$
@@ -470,7 +469,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
             leafIcon = new ImageIcon(getClass().getResource("/resources/images/firma_mini_ico.png")); //$NON-NLS-1$
         }
         catch (final Exception e) {
-            logger.warning("No se ha podido cargar la imagen para los nodos del arbol de firmantes: " + e);
+            LOGGER.warning("No se ha podido cargar la imagen para los nodos del arbol de firmantes: " + e);
         }
 
         c.fill = GridBagConstraints.BOTH;
@@ -580,11 +579,11 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
             }
         }
         catch (final AOCancelledOperationException e) {
-            logger.info("Operacion cancelada por el usuario: " + e); //$NON-NLS-1$
+            LOGGER.info("Operacion cancelada por el usuario: " + e); //$NON-NLS-1$
             return false;
         }
         catch (final Exception e) {
-            logger.severe(e.toString());
+            LOGGER.severe(e.toString());
             CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.simple.error"), //$NON-NLS-1$
                                            Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
             return false;

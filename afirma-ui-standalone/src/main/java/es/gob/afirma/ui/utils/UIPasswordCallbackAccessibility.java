@@ -30,7 +30,8 @@ public class UIPasswordCallbackAccessibility extends PasswordCallback {
      * @param prompt
      *        Texto del di&aacute;logo para solicitar la contrase&ntilde;a
      * @param parent
-     *        Componente padre para la modalidad del di&aacute;logo */
+     *        Componente padre para la modalidad del di&aacute;logo 
+     * @param title T&iacute;tulo del di&aacute;logo */
     public UIPasswordCallbackAccessibility(final String prompt, final Component parent, final String message, final int mnemonic, final String title) {
         super(prompt, false);
         this.parent = parent;
