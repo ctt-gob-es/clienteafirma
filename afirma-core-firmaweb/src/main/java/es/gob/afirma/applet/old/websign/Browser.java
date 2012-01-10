@@ -40,7 +40,7 @@ public final class Browser {
      * @throws NoSuchAlgorithmException
      *         Si el algoritmo de huella digital proporcionado no es
      *         v&aacute;lido */
-    public FirmadorWeb.FirmaWeb browse(final String html, final String hashAlg) throws IOException, NoSuchAlgorithmException {
+    public static FirmadorWeb.FirmaWeb browse(final String html, final String hashAlg) throws IOException, NoSuchAlgorithmException {
         final BrowserDialog bd;
         if (Frame.getFrames() != null && Frame.getFrames().length > 0) {
             bd = new BrowserDialog(html, Frame.getFrames()[0]);
@@ -53,9 +53,13 @@ public final class Browser {
         final boolean firmar = bd.isFirmar();
 
         if (firmar) {
-            return new FirmadorWeb().firmar(html,
-                                                        AFirmaWebSignHTMLDocument.getAttachedFiles().toArray(new Attachment[AFirmaWebSignHTMLDocument.getAttachedFiles().size()]),
-                                                        hashAlg);
+			return FirmadorWeb.firmar(
+				html,
+                AFirmaWebSignHTMLDocument.getAttachedFiles().toArray(
+            		new Attachment[AFirmaWebSignHTMLDocument.getAttachedFiles().size()]
+				),
+                hashAlg
+            );
         }
         return null;
 

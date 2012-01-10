@@ -42,7 +42,7 @@ public final class FirmadorWeb {
     }
 
     @SuppressWarnings("restriction")
-    FirmaWeb firmar(final String html, final Attachment[] attachments, final String hashAlgorithm) throws IOException, NoSuchAlgorithmException {
+	static FirmaWeb firmar(final String html, final Attachment[] attachments, final String hashAlgorithm) throws IOException, NoSuchAlgorithmException {
         final File tmpWebDataFile = File.createTempFile("afirma5_firmaweb", ".tmp"); //$NON-NLS-1$ //$NON-NLS-2$
         tmpWebDataFile.deleteOnExit();
 
@@ -111,7 +111,7 @@ public final class FirmadorWeb {
         return new FirmaWeb(tmpWebDataFile);
     }
 
-    private void tryClose(final OutputStream os) {
+    private static void tryClose(final OutputStream os) {
         try {
             if (os != null) {
                 os.close();
