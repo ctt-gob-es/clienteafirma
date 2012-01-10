@@ -260,17 +260,8 @@ final class MozillaKeyStoreUtilities {
             };
 
         for (final String path : paths) {
-            if (new File(path + "/libsoftokn3.dylib").exists() && new File(path + "/libnspr4.dylib").exists()) { //$NON-NLS-1$ //$NON-NLS-2$
-                try {
-                    System.load(path + "/libnspr4.dylib"); //$NON-NLS-1$
-                    nssLibDir = path;
-                }
-                catch (final Exception e) {
-                    nssLibDir = null;
-                    LOGGER.warning("Descartamos el NSS situado en '" + path //$NON-NLS-1$
-                                                              + "' porque no puede cargarse adecuadamente: " //$NON-NLS-1$
-                                                              + e);
-                }
+            if (new File(path + "/libsoftokn3.dylib").exists()) { //$NON-NLS-1$
+                nssLibDir = path;
             }
         }
 
@@ -298,8 +289,9 @@ final class MozillaKeyStoreUtilities {
             }
             catch (final Exception e) {
                 nssLibDir = null;
-                LOGGER
-                      .warning("Descartamos el NSS situado entre /lib y /usr/lib porque no puede cargarse adecuadamente: " + e); //$NON-NLS-1$
+                LOGGER.warning(
+            		"Descartamos el NSS situado entre /lib y /usr/lib porque no puede cargarse adecuadamente: " + e //$NON-NLS-1$
+        		);
             }
             if (nssLibDir != null) {
                 return nssLibDir;
@@ -328,9 +320,11 @@ final class MozillaKeyStoreUtilities {
                 }
                 catch (final Exception e) {
                     nssLibDir = null;
-                    LOGGER.warning("Descartamos el NSS situado en '" + path //$NON-NLS-1$
-                                                              + "' porque no puede cargarse adecuadamente: " //$NON-NLS-1$
-                                                              + e);
+                    LOGGER.warning(
+                		"Descartamos el NSS situado en '" + path //$NON-NLS-1$
+                            + "' porque no puede cargarse adecuadamente: " //$NON-NLS-1$
+                            + e
+                    );
                 }
                 if (nssLibDir != null) {
                     return nssLibDir;
@@ -369,7 +363,9 @@ final class MozillaKeyStoreUtilities {
             return getSystemNSSLibDirMacOSX();
         }
 
-        throw new FileNotFoundException("No se han encontrado bibliotecas NSS instaladas en su sistema operativo"); //$NON-NLS-1$
+        throw new FileNotFoundException(
+    		"No se han encontrado bibliotecas NSS instaladas en su sistema operativo" //$NON-NLS-1$
+		);
     }
 
     /** Busca la &uacute;ltima versi&oacute;n de firefox instalada en un sistema
@@ -421,9 +417,7 @@ final class MozillaKeyStoreUtilities {
             for (final AOSecMod.ModuleName module : AOSecMod.getModules(getMozillaUserProfileDirectory())) {
                 modsByDesc.put(module.getDescription(), module.getLib());
             }
-
-            return purgeStoresTable(modsByDesc); // Eliminamos las entradas que
-                                                 // usen la misma biblioteca
+            return purgeStoresTable(modsByDesc); // Eliminamos las entradas que usen la misma biblioteca
         }
         catch (final Exception t) {
             LOGGER.severe("No se han podido obtener los modulos externos de Mozilla, se devolvera una lista vacia o unicamente con el DNIe: " + t); //$NON-NLS-1$
