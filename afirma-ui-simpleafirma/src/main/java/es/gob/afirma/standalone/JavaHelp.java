@@ -19,6 +19,8 @@ import javax.help.HelpSet;
 import javax.help.WindowPresentation;
 import javax.swing.JFrame;
 
+import es.gob.afirma.core.misc.AOUtil;
+
 /**
  * Clase con utilidades relacionadas con la ayuda de la aplicacion
  */
@@ -32,10 +34,11 @@ final class JavaHelp {
 	static {
         try {
             // Cargamos el archivo de datos de la ayuda
-            final URL hsURL = HelpBroker.class.getResource("/help/JavaHelp/help_set-es_ES.hs"); //$NON-NLS-1$
+        	final ClassLoader classLoader = AOUtil.getCleanClassLoader();
+            final URL hsURL = classLoader.getResource("help/JavaHelp/help_set-es_ES.hs"); //$NON-NLS-1$
             
             // Creamos la ventana de ayuda
-            final HelpSet hset = new HelpSet(HelpBroker.class.getClassLoader(), hsURL);
+            final HelpSet hset = new HelpSet(classLoader, hsURL);
             helpBroker = hset.createHelpBroker();
             helpBroker.initPresentation();
             final WindowPresentation wp = ((DefaultHelpBroker)helpBroker).getWindowPresentation();
@@ -44,7 +47,7 @@ final class JavaHelp {
             // Introducimos el icono en la ventana
             helpwindow.setIconImage(
                     Toolkit.getDefaultToolkit().createImage(
-                            JavaHelp.class.getClassLoader().getResource("resources/afirma_ico.png") //$NON-NLS-1$
+                            classLoader.getResource("resources/afirma_ico.png") //$NON-NLS-1$
                     )
             ); 
         } 
