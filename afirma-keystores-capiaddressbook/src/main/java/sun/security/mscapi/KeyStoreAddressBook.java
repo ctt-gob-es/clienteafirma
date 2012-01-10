@@ -21,6 +21,7 @@ import java.util.logging.Logger;
 /** <code>sun.security.mscapi.KeyStore</code> modificada para acceder a los
  * almacenes de CAPI <i>ADDRESSBOOK</i> y <i>CA</i>.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
+@SuppressWarnings("restriction")
 public abstract class KeyStoreAddressBook extends KeyStoreSpi {
 
     /** KeyStore <i>CA</i> de CAPI. */
@@ -91,9 +92,10 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
     private final String storeName;
 
     private java.lang.reflect.Method loadKeysOrCertificateChains;
-    private final KeyStore.MY nativeWrapper;
 
-    KeyStoreAddressBook(final String storeName) {
+	private final KeyStore.MY nativeWrapper;
+
+	KeyStoreAddressBook(final String storeName) {
 
         this.nativeWrapper = new KeyStore.MY();
 
