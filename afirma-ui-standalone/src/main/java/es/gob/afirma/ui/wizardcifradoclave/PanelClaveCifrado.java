@@ -401,15 +401,17 @@ final class PanelClaveCifrado extends JAccessibilityDialogWizard {
                     Messages.getString("Cifrado.introducir.alias.titulo"),  //$NON-NLS-1$
                     JOptionPane.QUESTION_MESSAGE
             );
-            cksh.storeKey(alias + " (" + this.cipherConfig.getConfig().getAlgorithm().getName() + ")", this.cipherKey);
+            if (cksh != null) {
+            	cksh.storeKey(alias + " (" + this.cipherConfig.getConfig().getAlgorithm().getName() + ")", this.cipherKey);
+            }
+            else {
+            	CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.error.clavecifrar"), //$NON-NLS-1$
+                        Messages.getString("Cifrado.msg.error.titulo"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
+            }
         }
         catch (final AOCancelledOperationException e) {
             CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.error.cancelar"), //$NON-NLS-1$
                                            Messages.getString("Cifrado.msg.error.titulo"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$
-        }
-        catch (final AOException e) {
-            CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.error.clavecifrar"), //$NON-NLS-1$
-                                           Messages.getString("Cifrado.msg.error.titulo"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
         }
         catch (final Exception e) {
             CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.error.clavecifrar"), //$NON-NLS-1$
