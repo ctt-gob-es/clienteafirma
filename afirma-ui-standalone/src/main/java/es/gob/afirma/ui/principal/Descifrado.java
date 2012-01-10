@@ -79,7 +79,7 @@ final class Descifrado extends JPanel {
     /** Cambio de seleccion en el combo de los MECANISMOS
      * @param comboMecanismo Combo que contiene el listado de MECANISMOS de cifrado
      * @param comboAlgoritmo Combo que contiene el listado de algoritmos */
-    void comboMecanismoItemStateChanged(final JComboBox comboMecanismo, final JComboBox comboAlgoritmo) {
+    static void comboMecanismoItemStateChanged(final JComboBox comboMecanismo, final JComboBox comboAlgoritmo) {
         final String mecanismo = MECANISMOS.get(comboMecanismo.getSelectedIndex());
         if (mecanismo.equals("PASSWORD")) { //$NON-NLS-1$
             comboAlgoritmo.setModel(new DefaultComboBoxModel(ALGORITMO_LC.toArray()));

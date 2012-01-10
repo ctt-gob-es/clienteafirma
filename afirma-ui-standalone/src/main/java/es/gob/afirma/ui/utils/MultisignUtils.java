@@ -93,7 +93,7 @@ public class MultisignUtils {
      * @param kssc Configuraci&oacute;n del almac&eacute;n o repositorio de certificados
      * @param keyStoreManager Manager del almac&eacute;n o repositorio de certificados
      * @param padre Componente padre
-     * @return
+     * @return Entrada que apunta a la clave privada
      * @throws AOException se ha producido un error al intentar obtener la clave privada */
     public static PrivateKeyEntry getPrivateKeyEntry(final KeyStoreConfiguration kssc, final AOKeyStoreManager keyStoreManager, final Component padre) throws AOException {
         // Recuperamos la clave del certificado

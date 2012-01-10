@@ -381,14 +381,12 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 		    String intText = ".cosign";
 		    byte[] coSignedData = null;
 		    
-		    MultisignUtils msUtils = new MultisignUtils();
-		    
 		    PrivateKeyEntry keyEntry;
 
 		    // Recuperamos la clave del certificado
 		    try {
-		        AOKeyStoreManager keyStoreManager = msUtils.getAOKeyStoreManager(this.kssc,this);
-		        keyEntry = msUtils.getPrivateKeyEntry(this.kssc, keyStoreManager, this);
+		        AOKeyStoreManager keyStoreManager = MultisignUtils.getAOKeyStoreManager(this.kssc,this);
+		        keyEntry = MultisignUtils.getPrivateKeyEntry(this.kssc, keyStoreManager, this);
 		    } catch (AOException e) {
 		    	CustomDialog.showMessageDialog(this, true, Messages.getString("Desensobrado.msg.error.certificado"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
 		        return false;
@@ -437,11 +435,9 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 		            // Se ignora
 		        }
 		    }
-		    if (signIs != null) {
-		        try { signIs.close(); } catch (Exception e) {
-		            // Se ignora
-		        }
-		    }
+	        try { signIs.close(); } catch (Exception e) {
+	            // Se ignora
+	        }
 		}
 
 		return true;
@@ -456,7 +452,7 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 	 * @throws FileNotFoundException No se encuentra el fichero de datos.
 	 * @throws AOException Ocurrio un error durante el proceso de firma.
 	 */
-	private byte[] cosignOperation(AOSigner signer, byte[] data, byte[] sign, PrivateKeyEntry keyEntry, String filepath) throws FileNotFoundException, AOException {
+	private static byte[] cosignOperation(AOSigner signer, byte[] data, byte[] sign, PrivateKeyEntry keyEntry, String filepath) throws FileNotFoundException, AOException {
 		
 		Properties prop = GeneralConfig.getSignConfig();
 		prop.setProperty("uri", filepath);

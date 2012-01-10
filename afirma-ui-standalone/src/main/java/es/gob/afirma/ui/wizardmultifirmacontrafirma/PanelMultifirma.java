@@ -19,7 +19,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -155,7 +154,6 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
         this.signData = sign.clone();
 
         // Generamos el modelo del arbol a partir del fichero
-        final FileInputStream fis = null;
         javax.swing.tree.DefaultTreeModel modeloArbolSwing;
         try {
             final AOTreeModel modeloArbol = AOSignerFactory.getSigner(this.signData).getSignersStructure(this.signData, false);
@@ -546,13 +544,12 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
         try {
             final String intText = ".countersign";
             byte[] signedData = null;
-            final MultisignUtils msUtils = new MultisignUtils();
-            final AOKeyStoreManager keyStoreManager = msUtils.getAOKeyStoreManager(this.kssc, this);
+            final AOKeyStoreManager keyStoreManager = MultisignUtils.getAOKeyStoreManager(this.kssc, this);
 
             final byte[] signData1 = readFile(this.rutaFichero);
 
             // Recuperamos la clave del certificado
-            final PrivateKeyEntry keyEntry = msUtils.getPrivateKeyEntry(this.kssc, keyStoreManager, this);
+            final PrivateKeyEntry keyEntry = MultisignUtils.getPrivateKeyEntry(this.kssc, keyStoreManager, this);
             final AOSigner signer = AOSignerFactory.getSigner(signData1);
 
             if (signer == null) {

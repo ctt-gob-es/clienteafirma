@@ -73,7 +73,6 @@ public class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
 	
 	/**
 	 * Constructor.
-	 * @param file directorio.
 	 */
 	public JAccessibilityFileChooserToSave ()
 	 {

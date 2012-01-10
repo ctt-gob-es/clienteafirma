@@ -25,6 +25,8 @@ public final class AsistenteCofirma {
 	 */
     private KeyStoreConfiguration kssc;
 
+    /** Construye un nuevo asistente de cofirma.
+     * @param kss Configuraci&oacute;n del almac&eacute;n de claves */
     public AsistenteCofirma(KeyStoreConfiguration kss ) {
         this.kssc = kss;
         initComponents();

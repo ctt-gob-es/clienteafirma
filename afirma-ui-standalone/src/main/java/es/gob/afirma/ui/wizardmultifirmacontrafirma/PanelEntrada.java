@@ -292,11 +292,10 @@ final class PanelEntrada extends JAccessibilityDialogWizard {
 		
 		byte[] signedData = null;
 		try {
-			MultisignUtils msUtils = new MultisignUtils();
-			AOKeyStoreManager keyStoreManager = msUtils.getAOKeyStoreManager(this.kssc, this);
+			AOKeyStoreManager keyStoreManager = MultisignUtils.getAOKeyStoreManager(this.kssc, this);
 			
 			// Recuperamos la clave del certificado
-			PrivateKeyEntry keyEntry = msUtils.getPrivateKeyEntry(this.kssc, keyStoreManager, this);
+			PrivateKeyEntry keyEntry = MultisignUtils.getPrivateKeyEntry(this.kssc, keyStoreManager, this);
 			signedData = aoSigner.sign(
 					data,
 					GeneralConfig.getSignAlgorithm(),

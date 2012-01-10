@@ -21,7 +21,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
-import java.security.InvalidKeyException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -181,7 +180,7 @@ final class PanelDestinatarios extends JAccessibilityDialogWizard {
 
     /** Carga el combo con las diferentes opciones de destinatarios
      * @param comboDestinatarios Combo a cargar con las diferentes opciones de destinatarios */
-    private void cargarCombo(final JComboBox comboDestinatarios) {
+    private static void cargarCombo(final JComboBox comboDestinatarios) {
         comboDestinatarios.setModel(new DefaultComboBoxModel(KeyStoreLoader.getKeyStoresToWrap()));
     }
 

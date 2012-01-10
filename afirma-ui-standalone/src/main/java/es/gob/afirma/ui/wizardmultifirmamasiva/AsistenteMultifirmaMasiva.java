@@ -24,6 +24,10 @@ public final class AsistenteMultifirmaMasiva {
     /** Configuracion del KeyStore */
     private final KeyStoreConfiguration kssc;
 
+    /** Construye un nuevo asistente de multifirmas masivas.
+     * @param kssc Configuraci&oacute;n del almac&eacute;n de claves
+     * @param beep <code>true</code> habilita la reproducci&oacute;n de sonidos de advertencia,
+     *             <code>false</code> evita el uso de estos */
     public AsistenteMultifirmaMasiva(final KeyStoreConfiguration kssc, final boolean beep) {
         this.kssc = kssc;
         this.beep = beep;

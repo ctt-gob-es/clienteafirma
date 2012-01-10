@@ -53,7 +53,7 @@ public class BotoneraSuperior extends JPanel {
 	/**
 	 * Boton de maximizar.
 	 */
-	private JButton maximizeButton = null;
+	JButton maximizeButton = null;
 	
 	/**
 	 * Devuelve la lista de ventanas del wizard.

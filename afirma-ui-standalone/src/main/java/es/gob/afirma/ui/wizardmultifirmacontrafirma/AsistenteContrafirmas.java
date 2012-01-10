@@ -24,8 +24,10 @@ public class AsistenteContrafirmas {
 	/**
 	 * Configuracion del KeyStore
 	 */
-    private KeyStoreConfiguration kssc;
+    private final KeyStoreConfiguration kssc;
 
+    /** Construye un nuevo asistente de contrafirma.
+     * @param kss Configuraci&oacute;n del almac&eacute;n de claves */
     public AsistenteContrafirmas(KeyStoreConfiguration kss ) {
         this.kssc = kss;
         initComponents();
@@ -36,7 +38,7 @@ public class AsistenteContrafirmas {
 	 */
 	private void initComponents() {
 		// Generamos la lista para el control de la botonera
-    	List<JDialogWizard> ventanas = new ArrayList<JDialogWizard>();
+    	final List<JDialogWizard> ventanas = new ArrayList<JDialogWizard>();
     	
     	// Obtenemos todas las paginas
     	// Pagina 1: Panel presentacion

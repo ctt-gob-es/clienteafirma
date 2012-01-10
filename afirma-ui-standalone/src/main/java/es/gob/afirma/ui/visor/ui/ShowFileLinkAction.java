@@ -33,7 +33,7 @@ final class ShowFileLinkAction {
             return;
         }
 
-        final String ext = this.getCommonDataExtension(this.data);
+        final String ext = ShowFileLinkAction.getCommonDataExtension(this.data);
 
         // Si conocemos la extension, intentamos abrir el fichero. Si no, permitimos
         // guardarlo con la extension que se desee.

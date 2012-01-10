@@ -65,13 +65,13 @@ import es.gob.afirma.ui.utils.Utils;
  * ensobrado y desensobrado. */
 public class PrincipalGUI extends JAccessibilityFrame {
 
-    public static int aboutActualHeight = -1;
+    static int aboutActualHeight = -1;
 
-    public static int aboutActualPositionX = -1;
+    static int aboutActualPositionX = -1;
 
-    public static int aboutActualPositionY = -1;
+    static int aboutActualPositionY = -1;
 
-    public static int aboutActualWidth = -1;
+    static int aboutActualWidth = -1;
 
     public static JStatusBar bar = new JStatusBar();
 
@@ -93,13 +93,13 @@ public class PrincipalGUI extends JAccessibilityFrame {
 
     private static int linuxMargin = 35;
 
-    public static int optionActualHeight = -1;
+    static int optionActualHeight = -1;
 
-    public static int optionActualPositionX = -1;
+    static int optionActualPositionX = -1;
 
-    public static int optionActualPositionY = -1;
+    static int optionActualPositionY = -1;
 
-    public static int optionActualWidth = -1;
+    static int optionActualWidth = -1;
 
     private static final long serialVersionUID = 1L;
 
@@ -232,7 +232,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
             }
             else {
                 this.setExtendedState(0);
-                setBounds(this.getInitialX(), this.getInitialY(), Constants.WINDOW_INITIAL_WIDTH, Constants.WINDOW_INITIAL_HEIGHT);
+                setBounds(PrincipalGUI.getInitialX(), PrincipalGUI.getInitialY(), Constants.WINDOW_INITIAL_WIDTH, Constants.WINDOW_INITIAL_HEIGHT);
             }
         }
 
@@ -628,7 +628,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 
     /** Posicion X inicial de la ventana dependiendo de la resolucion de pantalla.
      * @return int Posicion X */
-    public int getInitialX() {
+    public static int getInitialX() {
         final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); // 329
         return (screenSize.width - 500) / 2;
     }
@@ -636,7 +636,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
     /** Posicion Y inicial de la ventana dependiendo del sistema operativo y de la
      * resolucion de pantalla.
      * @return int Posicion Y */
-    public int getInitialY() {
+    public static int getInitialY() {
         final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); // 329
         if (Platform.getOS().equals(Platform.OS.MACOSX)) {
             return (screenSize.height - 340) / 2;
@@ -678,7 +678,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
             Main.isOSHighContrast = true;
         }
         // Dimensiones de la ventana
-        setBounds(this.getInitialX(), this.getInitialY(), Constants.WINDOW_INITIAL_WIDTH, Constants.WINDOW_INITIAL_HEIGHT);
+        setBounds(PrincipalGUI.getInitialX(), PrincipalGUI.getInitialY(), Constants.WINDOW_INITIAL_WIDTH, Constants.WINDOW_INITIAL_HEIGHT);
         // Parametros ventana
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE); // NOI18N
         setTitle("Firma"); //$NON-NLS-1$

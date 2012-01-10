@@ -27,6 +27,9 @@ public final class AsistenteDescifradoContrasenia {
 
     private String rutaFichero;
 
+    /** Construye un nuevo asistente de cifrado por contrase&ntilde;a.
+     * @param algoritmo ALgoritmo de cifrado
+     * @param rutaFichero Fichero a cifrar */
     public AsistenteDescifradoContrasenia(String algoritmo, String rutaFichero) {
         this.algoritmo = algoritmo;
         this.rutaFichero  =rutaFichero;

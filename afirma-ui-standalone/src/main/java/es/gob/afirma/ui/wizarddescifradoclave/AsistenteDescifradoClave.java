@@ -21,6 +21,9 @@ public class AsistenteDescifradoClave {
 
     private final String rutaFichero;
 
+    /** Construye un nuevo asistente de descifrado por clave.
+     * @param algoritmo Algoritmo de cifrado
+     * @param rutaFichero Fichero a cifrar */
     public AsistenteDescifradoClave(final String algoritmo, final String rutaFichero) {
         this.algoritmo = algoritmo;
         this.rutaFichero = rutaFichero;

@@ -270,7 +270,7 @@ final class SignDataPanel extends JPanel {
         // Panel el detalle de la firma
         CompleteSignInfo signInfo;
         try {
-            signInfo = this.getSignInfo(sign);
+            signInfo = SignDataPanel.getSignInfo(sign);
         } catch (final Exception e) {
             signInfo = null;
         }
@@ -316,7 +316,8 @@ final class SignDataPanel extends JPanel {
         this.add(detailPanel, c);
     }
 
-    void openCertificate(final X509Certificate cert) {
+    @SuppressWarnings("static-method")
+	void openCertificate(final X509Certificate cert) {
         try {
             final File tmp = File.createTempFile("afirma", ".cer");  //$NON-NLS-1$//$NON-NLS-2$
             tmp.deleteOnExit();

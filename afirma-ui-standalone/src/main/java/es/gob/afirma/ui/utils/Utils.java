@@ -133,9 +133,9 @@ public final class Utils {
 			//Se lee el caracter correspondiente al indice i
 			char caracter = actualLanguage.charAt(i);
 			//Se comprueba si se ha utilizado
-			if (!mnemonicList.contains(caracter)) {
+			if (!mnemonicList.contains(Character.valueOf(caracter))) {
 				//se anade a la lista de caracteres utilizados
-				mnemonicList.add(caracter);
+				mnemonicList.add(Character.valueOf(caracter));
 				//Se devuelve
 				return caracter;
 			}

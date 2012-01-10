@@ -31,12 +31,10 @@ public class JAccessibilityFileChooserAccessibilityTest {
 	static Logger logger = Logger.getLogger(JAccessibilityFileChooserAccessibilityTest.class.getName());
 	
 
-	/*
-	 * Comprobacion de que el campo Mnemocic de las etiquetas y botones no este duplicado. 
-	 */
+	/** Comprobacion de que el campo Mnemocic de las etiquetas y botones no este duplicado. */
 	@Test
 	public void testNotDuplicatedDisplayedMnemonic() {
-		logger.info("testNotDuplicatedDisplayedMnemonic");
+		logger.info("testNotDuplicatedDisplayedMnemonic"); //$NON-NLS-1$
 
 		//Instancia del contenedor que se va a analizar
 		JAccessibilityFileChooser fileChooser= new JAccessibilityFileChooser(null);

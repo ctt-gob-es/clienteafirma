@@ -39,9 +39,10 @@ public class MultifirmaSimpleAccessibilityTest {
 	/**
 	 * Comprobacion de que el campo labelFor de las etiquetas no este duplicado. 
 	 */
+	@SuppressWarnings("static-method")
 	@Test
 	public void testNotDuplicatedLabelForProperty() {
-		logger.info("testNotDuplicatedLabelForProperty");
+		logger.info("testNotDuplicatedLabelForProperty"); //$NON-NLS-1$
 
 		//Instancia del panel que se va a analizar
 		MultifirmaSimple multifirmaPanel = new MultifirmaSimple();
@@ -77,7 +78,7 @@ public class MultifirmaSimpleAccessibilityTest {
 	 */
 	@Test
 	public void testNotDuplicatedDisplayedMnemonic_SimpleMode() {
-		logger.info("testNotDuplicatedDisplayedMnemonic_SimpleMode");
+		logger.info("testNotDuplicatedDisplayedMnemonic_SimpleMode"); //$NON-NLS-1$
 
 		//Instancia del panel que se va a analizar
 		MultifirmaSimple multifirmaPanel = new MultifirmaSimple();
@@ -102,7 +103,7 @@ public class MultifirmaSimpleAccessibilityTest {
 	 */
 	@Test
 	public void testNotDuplicatedDisplayedMnemonic_AdvancedMode() {
-		logger.info("testNotDuplicatedDisplayedMnemonic_AdvancedMode");
+		logger.info("testNotDuplicatedDisplayedMnemonic_AdvancedMode"); //$NON-NLS-1$
 
 		//Se obtiene la cofiguracion general
 		//Se anade el perfil por defecto
@@ -111,7 +112,7 @@ public class MultifirmaSimpleAccessibilityTest {
 		Properties config = GeneralConfig.getConfig();
 		
 		//Se cambia al modo avanzado
-		config.setProperty(MainOptionsPane.MAIN_ADVANCED_VIEW, "true");
+		config.setProperty(MainOptionsPane.MAIN_ADVANCED_VIEW, "true"); //$NON-NLS-1$
 
 		//Se asigna
 		GeneralConfig.loadConfig(config);
@@ -139,7 +140,7 @@ public class MultifirmaSimpleAccessibilityTest {
 	 */
 	@Test
 	public void testNotEmptyAccessibleName_SimpleMode() {
-		logger.info("testNotEmptyAccessibleName_SimpleMode()");
+		logger.info("testNotEmptyAccessibleName_SimpleMode()"); //$NON-NLS-1$
 		//Instancia del panel que se va a analizar
 		MultifirmaSimple multifirmaSimplePanel = new MultifirmaSimple();
 		//Se llama al metodo que comprueba que el nombre no sea vacio
@@ -152,7 +153,7 @@ public class MultifirmaSimpleAccessibilityTest {
 	 */
 	@Test
 	public void testNotEmptyAccessibleName_AdvancedMode() {
-		logger.info("testNotEmptyAccessibleName_AdvancedMode()");
+		logger.info("testNotEmptyAccessibleName_AdvancedMode()"); //$NON-NLS-1$
 		//Se obtiene la cofiguracion general
 		//Se anade el perfil por defecto
 		UserProfile.setCurrentProfileId(Constants.defaultUser);
@@ -160,7 +161,7 @@ public class MultifirmaSimpleAccessibilityTest {
 		Properties config = GeneralConfig.getConfig();
 		
 		//Se cambia al modo avanzado
-		config.setProperty(MainOptionsPane.MAIN_ADVANCED_VIEW, "true");
+		config.setProperty(MainOptionsPane.MAIN_ADVANCED_VIEW, "true"); //$NON-NLS-1$
 				
 		//Instancia del panel que se va a analizar
 		MultifirmaSimple multifirmaSimplePanel = new MultifirmaSimple();
@@ -186,27 +187,27 @@ public class MultifirmaSimpleAccessibilityTest {
 			if (!(component instanceof JPanel)) {
 				if (component instanceof JButton) { //Se comprueba si es un boton
 					JButton button = (JButton) component;
-					if (button.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) {
+					if (button.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) { //$NON-NLS-1$
 						return false; //Si no tiene asignado un nombre accesible se sale del metodo
 					}
 				} else if (component instanceof JCheckBox) { //Se comprueba si es un checkBox
 					JCheckBox checkBox = (JCheckBox) component;
-					if (checkBox.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) {
+					if (checkBox.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) { //$NON-NLS-1$
 						return false; //Si no tiene asignado un nombre accesible se sale del metodo
 					}
 				} else if (component instanceof JComboBox) { //Se comprueba si es un combo
 					JComboBox comboBox = (JComboBox) component;
-					if (comboBox.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) {
+					if (comboBox.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) { //$NON-NLS-1$
 						return false; //Si no tiene asignado un nombre accesible se sale del metodo
 					}
 				} else if (component instanceof JRadioButton) { //Se comprueba si es un radioButton
 					JRadioButton radioButton = (JRadioButton) component;
-					if (radioButton.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) {
+					if (radioButton.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) { //$NON-NLS-1$
 						return false; //Si no tiene asignado un nombre accesible se sale del metodo
 					}
 				} else if (component instanceof JTextField) { //Se comprueba si es un campo de texto
 					JTextField textField = (JTextField) component;
-					if (textField.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) {
+					if (textField.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) { //$NON-NLS-1$
 						return false; //Si no tiene asignado un nombre accesible se sale del metodo
 					}
 				}

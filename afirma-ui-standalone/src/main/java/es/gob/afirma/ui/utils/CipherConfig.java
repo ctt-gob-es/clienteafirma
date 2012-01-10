@@ -52,6 +52,8 @@ public class CipherConfig {
 
     private AOCipherConfig config;
 
+    /** Crea una nueva configuraci&oacute;n de cifrado.
+     * @param algoritmo Algoritmo de cifrado */
     public CipherConfig(final String algoritmo) {
         configurarCipher(algoritmo);
     }
@@ -67,6 +69,8 @@ public class CipherConfig {
         this.cipher = getCipher(this.config);
     }
 
+    /** Obtiene el cifrador.
+     * @return Cifrador correspondiente a esta configuraci&oacute;n */
     public AOCipher getCipher() {
         return this.cipher;
     }

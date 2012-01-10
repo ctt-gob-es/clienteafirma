@@ -30,14 +30,14 @@ public class ContextOptionsPaneAccessibilityTest {
 	/**
 	 * Log.
 	 */
-	static Logger logger = Logger.getLogger(ContextOptionsPaneAccessibilityTest.class.getName());
+	private static Logger LOGGER = Logger.getLogger(ContextOptionsPaneAccessibilityTest.class.getName());
 
 	/**
 	 * Comprobacion de que el campo labelFor de las etiquetas no este duplicado. 
 	 */
 	@Test
 	public void testNotDuplicatedLabelForProperty() {
-		logger.info("testNotDuplicatedLabelForProperty");
+		LOGGER.info("testNotDuplicatedLabelForProperty"); //$NON-NLS-1$
 
 		//Instancia de la clase que se va a analizar
 		ContextOptionsPane contextOptionsPane = new ContextOptionsPane();
@@ -50,7 +50,7 @@ public class ContextOptionsPaneAccessibilityTest {
 		JPanel mainPanel = contextOptionsPane.getConfigurationPanel();
 
 		//Se llama al metodo que obtiene una lista de componentes asociados a la propiedad labelFor del panel
-		getLabelForComponentList ((JPanel) mainPanel, componentList);
+		getLabelForComponentList (mainPanel, componentList);
 
 		//Se crea un conjunto a partir de la lista para eliminar duplicados
 		componentSet = new HashSet<Component>(componentList);
@@ -64,7 +64,7 @@ public class ContextOptionsPaneAccessibilityTest {
 	 */
 	@Test
 	public void testNotDuplicatedDisplayedMnemonic() {
-		logger.info("testNotDuplicatedDisplayedMnemonic");
+		LOGGER.info("testNotDuplicatedDisplayedMnemonic"); //$NON-NLS-1$
 
 		//Instancia de la clase que se va a analizar
 		ContextOptionsPane contextOptionsPane = new ContextOptionsPane();
@@ -91,7 +91,7 @@ public class ContextOptionsPaneAccessibilityTest {
 	 */
 	@Test
 	public void testNotEmptyAccessibleName() {
-		logger.info("testNotEmptyAccessibleName");
+		LOGGER.info("testNotEmptyAccessibleName"); //$NON-NLS-1$
 		//Instancia del panel que se va a analizar
 		ContextOptionsPane contextOptionsPane = new ContextOptionsPane();
 		//Se obtiene el panel principal
@@ -118,27 +118,27 @@ public class ContextOptionsPaneAccessibilityTest {
 			if (!(component instanceof JPanel)) {
 				if (component instanceof JButton) { //Se comprueba si es un boton
 					JButton button = (JButton) component;
-					if (button.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) {
+					if (button.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) { //$NON-NLS-1$
 						return false; //Si no tiene asignado un nombre accesible se sale del metodo
 					}
 				} else if (component instanceof JCheckBox) { //Se comprueba si es un checkBox
 					JCheckBox checkBox = (JCheckBox) component;
-					if (checkBox.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) {
+					if (checkBox.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) { //$NON-NLS-1$
 						return false; //Si no tiene asignado un nombre accesible se sale del metodo
 					}
 				} else if (component instanceof JComboBox) { //Se comprueba si es un combo
 					JComboBox comboBox = (JComboBox) component;
-					if (comboBox.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) {
+					if (comboBox.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) { //$NON-NLS-1$
 						return false; //Si no tiene asignado un nombre accesible se sale del metodo
 					}
 				} else if (component instanceof JRadioButton) { //Se comprueba si es un radioButton
 					JRadioButton radioButton = (JRadioButton) component;
-					if (radioButton.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) {
+					if (radioButton.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) { //$NON-NLS-1$
 						return false; //Si no tiene asignado un nombre accesible se sale del metodo
 					}
 				} else if (component instanceof JTextField) { //Se comprueba si es un campo de texto
 					JTextField textField = (JTextField) component;
-					if (textField.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) {
+					if (textField.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) { //$NON-NLS-1$
 						return false; //Si no tiene asignado un nombre accesible se sale del metodo
 					}
 				}

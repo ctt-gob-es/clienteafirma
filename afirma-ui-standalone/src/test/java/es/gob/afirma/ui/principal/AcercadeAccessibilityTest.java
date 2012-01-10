@@ -31,14 +31,14 @@ public class AcercadeAccessibilityTest {
 	/**
 	 * Log.
 	 */
-	static Logger logger = Logger.getLogger(AcercadeAccessibilityTest.class.getName());
+	private static Logger LOGGER = Logger.getLogger(AcercadeAccessibilityTest.class.getName());
 
 	/**
 	 * Comprobacion de que el campo Mnemocic de los botones no este duplicado. 
 	 */
 	@Test
 	public void testNotDuplicatedMnemonic() {
-		logger.info("testNotDuplicatedMnemonic"); //$NON-NLS-1$
+		LOGGER.info("testNotDuplicatedMnemonic"); //$NON-NLS-1$
 
 		//Instancia del panel que se va a analizar
 		Acercade acercade = new Acercade();
@@ -95,7 +95,7 @@ public class AcercadeAccessibilityTest {
 	 */
 	@Test
 	public void testEditableTextPane() {
-		logger.info("testEditableTextPane"); //$NON-NLS-1$
+		LOGGER.info("testEditableTextPane"); //$NON-NLS-1$
 
 		//Instancia del panel que se va a analizar
 		Acercade acercade = new Acercade();
@@ -142,7 +142,7 @@ public class AcercadeAccessibilityTest {
 	 */
 	@Test
 	public void testNotEmptyAccessibleName() {
-		logger.info("testNotEmptyAccessibleName"); //$NON-NLS-1$
+		LOGGER.info("testNotEmptyAccessibleName"); //$NON-NLS-1$
 		//Instancia del panel que se va a analizar
 		Acercade acercade = new Acercade();
 		//Componentes del wizard

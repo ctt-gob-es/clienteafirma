@@ -35,7 +35,7 @@ public class BotoneraInferiorAccessibilityTest {
 	 */
 	@Test
 	public void testNotDuplicatedDisplayedMnemonic() {
-		logger.info("testNotDuplicatedDisplayedMnemonic");
+		logger.info("testNotDuplicatedDisplayedMnemonic"); //$NON-NLS-1$
 
 		//Instancia del panel que se va a analizar
 		//Lista de dialogos

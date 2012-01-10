@@ -22,6 +22,8 @@ public class AsistenteRemitentes {
     /** Ruta del fichero a ensobrar */
     private final String rutaFichero;
 
+    /** Construye un nuevo asistente para el ensobrado digital de datos.
+     * @param rutafichero Fichero a ensobrar */
     public AsistenteRemitentes(final String rutafichero) {
         this.rutaFichero = rutafichero;
         initComponents();

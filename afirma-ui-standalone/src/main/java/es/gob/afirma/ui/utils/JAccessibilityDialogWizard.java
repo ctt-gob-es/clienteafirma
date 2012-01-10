@@ -250,18 +250,17 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 	
 	/**
 	 * Busca el JAccessibilityDialogWizard padre de un componente.
-	 * @param component El componente.
+	 * @param c El componente.
 	 * @return El JAccessibilityDialogWizard buscado.
 	 */
-	public static JAccessibilityDialogWizard getJAccessibilityDialogWizard(Component component)
-	{
+	public static JAccessibilityDialogWizard getJAccessibilityDialogWizard(final Component c)	{
 		JAccessibilityDialogWizard  resultingJAccessibilityDialogWizard = null;
-		while (component != null && resultingJAccessibilityDialogWizard == null)
-		{
+		Component component = c;
+		while (component != null && resultingJAccessibilityDialogWizard == null) {
 	        if (component instanceof JAccessibilityDialogWizard){
 	        	resultingJAccessibilityDialogWizard = (JAccessibilityDialogWizard)component;
 	        }
-	        else{
+	        else {
 	        	component = component.getParent();
 	        }
 		 }

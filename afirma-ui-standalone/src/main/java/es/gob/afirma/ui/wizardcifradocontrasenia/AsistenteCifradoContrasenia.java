@@ -21,10 +21,13 @@ public final class AsistenteCifradoContrasenia extends JDialog {
 
     private static final long serialVersionUID = 1L;
 
-    private String algoritmo = "";
+    private final String algoritmo;
 
-    private String rutaFichero = "";
+    private final String rutaFichero;
 
+    /** Construye un nuevo asistente de cifrado por contrase&ntilde;a.
+     * @param form ALgoritmo de cifrado
+     * @param ruta Fichero a cifrar */
     public AsistenteCifradoContrasenia(final String form, final String ruta) {
         this.algoritmo = form;
         this.rutaFichero = ruta;

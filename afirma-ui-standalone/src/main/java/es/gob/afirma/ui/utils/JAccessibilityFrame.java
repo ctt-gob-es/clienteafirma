@@ -46,18 +46,17 @@ public abstract class JAccessibilityFrame extends JFrame {
 	
 	/**
 	 * Busca el JAccessibilityFrame padre de un componente.
-	 * @param component El componente.
+	 * @param c El componente.
 	 * @return El JAccessibilityFrame buscado.
 	 */
-	public static JAccessibilityFrame getJAccessibilityFrame(Component component)
-	{
+	public static JAccessibilityFrame getJAccessibilityFrame(final Component c)	{
 		JAccessibilityFrame  resultingJAccessibilityFrame = null;
-		while (component != null && resultingJAccessibilityFrame == null)
-		{
+		Component component = c;
+		while (component != null && resultingJAccessibilityFrame == null) {
 	        if (component instanceof JAccessibilityFrame){
 	        	resultingJAccessibilityFrame = (JAccessibilityFrame)component;
 	        }
-	        else{
+	        else {
 	        	component = component.getParent();
 	        }
 		 }
