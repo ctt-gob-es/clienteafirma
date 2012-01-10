@@ -1,7 +1,5 @@
 <?xml version='1.0' encoding='ISO-8859-1'  ?>
-<!DOCTYPE index
-  PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp Index Version 1.0//EN"
-         "http://java.sun.com/products/javahelp/index_1_0.dtd">
+<!DOCTYPE index>
 <index version="1.0">
 	<indexitem text="SimpleAfirma" target="SimpleAfirma" />
 	<indexitem text="Pantalla de espera" target="PantallaEspera"/>
