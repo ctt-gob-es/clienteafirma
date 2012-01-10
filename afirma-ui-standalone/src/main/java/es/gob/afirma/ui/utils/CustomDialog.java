@@ -100,17 +100,17 @@ public final class CustomDialog extends JAccessibilityCustomDialog implements Ac
 	/**
 	 * Boton de Cancel.
 	 */
-	private static JButton cancelButton = null;
+	static JButton cancelButton = null;
 	
 	/**
 	 * Boton de restaurar.
 	 */
-	private JButton restoreButton = null;
+	JButton restoreButton = null;
 	
 	/**
 	 * Boton de maximizar.
 	 */
-	private JButton maximizeButton = null;
+	JButton maximizeButton = null;
 
 	/**
 	 * Respuesta al mensaje
