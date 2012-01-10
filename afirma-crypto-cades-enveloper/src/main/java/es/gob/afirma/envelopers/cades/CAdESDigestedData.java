@@ -60,7 +60,7 @@ final class CAdESDigestedData {
      * @throws java.io.IOException
      *         Si ocurre alg&uacute;n problema leyendo o escribiendo los
      *         datos */
-    byte[] genDigestedData(final P7ContentSignerParameters parameters, final String dataType) throws NoSuchAlgorithmException, IOException {
+    static byte[] genDigestedData(final P7ContentSignerParameters parameters, final String dataType) throws NoSuchAlgorithmException, IOException {
         if (parameters == null) {
             throw new IllegalArgumentException("Los parametros no pueden ser nulos"); //$NON-NLS-1$
         }

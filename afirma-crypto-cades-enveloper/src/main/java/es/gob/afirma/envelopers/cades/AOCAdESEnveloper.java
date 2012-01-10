@@ -140,11 +140,11 @@ public class AOCAdESEnveloper implements AOEnveloper {
 
             // Es Data.
             if (AOSignConstants.CMS_CONTENTTYPE_DATA.equals(type)) {
-                dataSigned = new CAdESData().genData(csp);
+				dataSigned = CAdESData.genData(csp);
             }
             // Es Digested Data.
             else if (AOSignConstants.CMS_CONTENTTYPE_DIGESTEDDATA.equals(type)) {
-                dataSigned = new CAdESDigestedData().genDigestedData(csp, dataType);
+				dataSigned = CAdESDigestedData.genDigestedData(csp, dataType);
             }
             // Es Enveloped Data. El null y el vacio se consideran Enveloped Data, el por defecto
             else if (AOSignConstants.CMS_CONTENTTYPE_ENVELOPEDDATA.equals(type)  || type == null || "".equals(type)) { //$NON-NLS-1$
@@ -222,7 +222,7 @@ public class AOCAdESEnveloper implements AOEnveloper {
         }
 
         try {
-            return new CADESEncryptedData().genEncryptedData(file, digestAlgorithm, config, key, (dataType != null) ? dataType : PKCSObjectIdentifiers.data.getId());
+			return CADESEncryptedData.genEncryptedData(file, digestAlgorithm, config, key, (dataType != null) ? dataType : PKCSObjectIdentifiers.data.getId());
         }
         catch (final Exception e) {
             throw new AOException("Error generando el enveloped de CADES", e); //$NON-NLS-1$

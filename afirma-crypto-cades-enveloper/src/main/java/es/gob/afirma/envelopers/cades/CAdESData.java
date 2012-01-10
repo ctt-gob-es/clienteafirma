@@ -43,8 +43,7 @@ final class CAdESData {
      *        Par&aacute;metros necesarios para obtener los datos de
      *        SignedData.
      * @return El contenido del fichero en formato Data. */
-    byte[] genData(final P7ContentSignerParameters parameters) {
-
+    static byte[] genData(final P7ContentSignerParameters parameters) {
         // construimos el Data y lo devolvemos
         return new ContentInfo(PKCSObjectIdentifiers.data, new DEROctetString(parameters.getContent())).getDEREncoded();
     }

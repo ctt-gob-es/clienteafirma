@@ -65,7 +65,7 @@ final class CADESEncryptedData {
      * @throws java.security.NoSuchAlgorithmException
      *         Si no se soporta alguno de los algoritmos de firma o huella
      *         digital */
-    byte[] genEncryptedData(final InputStream file, 
+    static byte[] genEncryptedData(final InputStream file, 
                             final String digAlg, 
                             final AOCipherConfig config, 
                             final String pass, 
