@@ -120,7 +120,7 @@ public final class Utils {
         }
     }
 
-    /** Dereferencia una joja de estilo en forma de Documento DOM.
+    /** Dereferencia una hoja de estilo en forma de Documento DOM.
      * @param id
      *        Identificador de la hoja de estilo
      * @param headLess
