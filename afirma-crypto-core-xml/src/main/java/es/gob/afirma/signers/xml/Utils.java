@@ -126,7 +126,7 @@ public final class Utils {
      * @param headLess
      *        <code>true</code> si <b>no</b> se desea que se pregunte al
      *        usuario para dereferenciar las hojas de estilo enlazadas con
-     *        rutas relativas
+     *        rutas locales
      * @return Documento DOM con la hoja de estilo
      * @throws CannotDereferenceException
      *         Si no se puede dereferenciar
@@ -167,38 +167,38 @@ public final class Utils {
             if (fileName.startsWith("#")) { //$NON-NLS-1$
                 throw new IsInnerlException(e); 
             }
-            else if (id.startsWith("file://")) { //$NON-NLS-1$
-                // Preguntamos al usuario para la dereferenciacion
-                if (AOUIFactory.showConfirmDialog(null, 
-                                                  XMLMessages.getString("Utils.5"), //$NON-NLS-1$
-                                                  XMLMessages.getString("Utils.6"), //$NON-NLS-1$
-                                                  AOUIFactory.OK_CANCEL_OPTION,
-                                                  AOUIFactory.INFORMATION_MESSAGE) == AOUIFactory.OK_OPTION) {
-                    
-                    final File xmlStyleFile = AOUIFactory.getLoadFile(
-                       XMLMessages.getString("Utils.7"), //$NON-NLS-1$
-                       fileName,
-                       XMLMessages.getString("Utils.8", fileName), //$NON-NLS-1$
-                       null
-                    );
-                    
-                    if (xmlStyleFile == null) {
-                        throw new CannotDereferenceException("No se ha podido dereferenciar la hoja de estilo", e); //$NON-NLS-1$
-                    }
-                    try {
-                        final InputStream is = new FileInputStream(xmlStyleFile);
-                        xml = AOUtil.getDataFromInputStream(is);
-                        try {
-                            is.close();
-                        }
-                        catch (final Exception ex) {
-                            // Ignoramos los errores en el cierre
-                        }
-                    }
-                    catch (final Exception ex) {
-                        throw new CannotDereferenceException("No se ha podido dereferenciar la hoja de estilo", ex); //$NON-NLS-1$
-                    }
-                }
+            else if (!headLess && id.startsWith("file://")) { //$NON-NLS-1$
+            	// Preguntamos al usuario para la dereferenciacion
+            	if (AOUIFactory.showConfirmDialog(null, 
+            			XMLMessages.getString("Utils.5"), //$NON-NLS-1$
+            			XMLMessages.getString("Utils.6"), //$NON-NLS-1$
+            			AOUIFactory.OK_CANCEL_OPTION,
+            			AOUIFactory.INFORMATION_MESSAGE) == AOUIFactory.OK_OPTION) {
+
+            		final File xmlStyleFile = AOUIFactory.getLoadFile(
+            				XMLMessages.getString("Utils.7"), //$NON-NLS-1$
+            				fileName,
+            				XMLMessages.getString("Utils.8", fileName), //$NON-NLS-1$
+            				null
+            		);
+
+            		if (xmlStyleFile == null) {
+            			throw new CannotDereferenceException("No se ha podido dereferenciar la hoja de estilo", e); //$NON-NLS-1$
+            		}
+            		try {
+            			final InputStream is = new FileInputStream(xmlStyleFile);
+            			xml = AOUtil.getDataFromInputStream(is);
+            			try {
+            				is.close();
+            			}
+            			catch (final Exception ex) {
+            				// Ignoramos los errores en el cierre
+            			}
+            		}
+            		catch (final Exception ex) {
+            			throw new CannotDereferenceException("No se ha podido dereferenciar la hoja de estilo", ex); //$NON-NLS-1$
+            		}
+            	}
             }
             else {
                 throw new CannotDereferenceException("No se ha podido dereferenciar la hoja de estilo: " + id, e); //$NON-NLS-1$
