@@ -63,7 +63,8 @@ public final class CAdESUtils {
      * @param digestAlgorithmName Nombre del algoritmo de huella digital a usar
      * @param datos Datos firmados
      * @param policy Pol&iacute;tica de firma
-     * @param signingCertificateV2
+     * @param signingCertificateV2 {@code true} para utilizar la versi&oacute;n 2 del campo
+     * signingCertificate, {@code false} para utilizar la versi&oacute;n 1.  
      * @param messageDigest Huella digital de los datos firmados
      * @param signDate Fecha de la firma (debe establecerse externamente para evitar desincronismos en la firma trif&aacute;sica)
      * @param padesMode <code>true</code> para generar una firma CAdES compatible PAdES, <code>false</code> para generar una firma CAdES normal
