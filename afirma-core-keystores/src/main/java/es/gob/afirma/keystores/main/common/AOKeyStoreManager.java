@@ -361,7 +361,7 @@ public class AOKeyStoreManager {
             // Si no se ha agregado el proveedor CAPI de Sun, lo anadimos
             // En java 6 viene instalado de serie, pero no pasa nada por
             // reinstalarlo
-            if (sunMSCAPIProvider == null) {
+            if (sunMSCAPIProvider == null && Security.getProvider("SunMSCAPI") == null) { //$NON-NLS-1$
                 try {
                     sunMSCAPIProvider = (Provider) AOUtil.classForName("sun.security.mscapi.SunMSCAPI").newInstance(); //$NON-NLS-1$
                     Security.insertProviderAt(sunMSCAPIProvider, 1);
@@ -505,7 +505,7 @@ public class AOKeyStoreManager {
      * @throws KeyStoreException Cuando ocurren errores en el tratamiento del almac&eacute;n de claves
      * @throws NoSuchAlgorithmException Cuando ocurren errores obteniendo la clave
      * @throws UnrecoverableEntryException Si la contrase&ntilde;a proporcionada no es v&aacute;lida para obtener la clave privada
-     * @throws AOCancelledOperationException Cuando el usuario cancela el proceso antes de que finalice
+     * @throws es.gob.afirma.core.AOCancelledOperationException Cuando el usuario cancela el proceso antes de que finalice
      */
     public KeyStore.PrivateKeyEntry getKeyEntry(final String alias, 
     		                                    final PasswordCallback pssCallback) throws KeyStoreException, 
