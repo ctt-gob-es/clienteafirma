@@ -2,17 +2,17 @@
 <html> <!-- Ejemplo básico de lanzador de la aplicación -->
 	<head>
 		<script type="text/javascript" src="http://www.java.com/js/deployJava.js"></script>
-		<script type="text/javascript" src="instalador.js"></script>
+		<script type="text/javascript" src="miniapplet.js"></script>
 		<script type="text/javascript" src="constantes.js"></script>
 		<script type="text/javascript">
 			function getSignersStructure() {
 				try {
-					var sign = clienteFirma.getFileContent("Seleccione una firma electr\u00F3nica", null, null);
+					var sign = getFileContent("Seleccione una firma electr\u00F3nica", null, null);
 					if (sign == null) {
 						return;
 					}
 				
-					document.getElementById("dataConsole").value = clienteFirma.getSignersStructure(sign);
+					document.getElementById("dataConsole").value = getSignersStructure(sign);
 					
 				} catch(e) {
 					document.getElementById("console").value = document.getElementById("console").value + "\n" + document.getElementById("dataConsole").value;
@@ -22,7 +22,7 @@
 	</head>
 	<body>
 		<script type="text/javascript">
-			cargarMiniApplet();
+			cargarMiniApplet(base);
 		</script>
 		<p>Cargamos el MiniApplet</p>
 		<input type="button" value="Funcion getSignersStructure" onclick="getSignersStructure();" /><br/>

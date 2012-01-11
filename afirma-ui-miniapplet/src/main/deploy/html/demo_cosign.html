@@ -2,26 +2,25 @@
 <html> <!-- Ejemplo básico de lanzador de la aplicación -->
 	<head>
 		<script type="text/javascript" src="http://www.java.com/js/deployJava.js"></script>
-		<script type="text/javascript" src="instalador.js"></script>
+		<script type="text/javascript" src="miniapplet.js"></script>
 		<script type="text/javascript" src="constantes.js"></script>
 		<script type="text/javascript">
 			function coSign() {
 				try {
 				
-					var sign = clienteFirma.getFileContent("Seleccione el fichero de firma", null, null);
+					var sign = getFileContent("Seleccione el fichero de firma", null, null);
 					if (sign == null) {
 						return;
 					}
 				
-					var signature = clienteFirma.coSign(
+					var signature = coSign(
 						sign,
-						clienteFirma.getFileContent("Seleccione si procede el fichero de datos original", null, null),
-						//document.getElementById("algorithm").value,
-						"MD5withRSA",
+						getFileContent("Seleccione si procede el fichero de datos original", null, null),
+						document.getElementById("algorithm").value,
 						document.getElementById("format").value,
 						document.getElementById("params").value);
 				
-					clienteFirma.saveDataToFile(
+					saveDataToFile(
 						signature,
 						"Guardar la cofirma generada",
 						null,
@@ -29,7 +28,7 @@
 						null);
 				
 				} catch(e) {
-					showLog(clienteFirma.getErrorMessage());
+					showLog(getErrorMessage());
 				}
 			}
 			
@@ -46,7 +45,7 @@
 	</head>
 	<body>
 		<script type="text/javascript">
-			cargarMiniApplet();
+			cargarMiniApplet(base);
 		</script>
 		<p>Cargamos el MiniApplet</p>
 		

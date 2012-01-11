@@ -2,7 +2,7 @@
 <html> <!-- Ejemplo básico de lanzador de la aplicación -->
 	<head>
 		<script type="text/javascript" src="http://www.java.com/js/deployJava.js"></script>
-		<script type="text/javascript" src="instalador.js"></script>
+		<script type="text/javascript" src="miniapplet.js"></script>
 		<script type="text/javascript" src="constantes.js"></script>
 		<script type="text/javascript">
 			function getFileNameContent(asBase64) {
@@ -11,12 +11,12 @@
 
 				try {
 				if (asBase64) {
-					result = clienteFirma.getFileNameContentBase64("Seleccione un fichero", null, null);
+					result = getFileNameContentBase64("Seleccione un fichero", null, null);
 				} else {
-					result = clienteFirma.getFileNameContentText("Seleccione un fichero", null, null);
+					result = getFileNameContentText("Seleccione un fichero", null, null);
 				}
 				} catch(e) {
-					document.getElementById("dataConsole").value = clienteFirma.getErrorMessage();
+					document.getElementById("dataConsole").value = getErrorMessage();
 					return;
 				}
 				
@@ -39,7 +39,7 @@
 	</head>
 	<body>
 		<script type="text/javascript">
-			cargarMiniApplet();
+			cargarMiniApplet(base);
 		</script>
 		<p>Cargamos el MiniApplet</p>
 		

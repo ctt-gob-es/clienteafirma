@@ -2,7 +2,7 @@
 <html> <!-- Ejemplo básico de lanzador de la aplicación -->
 	<head>
 		<script type="text/javascript" src="http://www.java.com/js/deployJava.js"></script>
-		<script type="text/javascript" src="instalador.js"></script>
+		<script type="text/javascript" src="miniapplet.js"></script>
 		<script type="text/javascript" src="constantes.js"></script>
 		<script type="text/javascript">
 			function saveDataToFile() {
@@ -10,22 +10,22 @@
 					
 					var data = document.getElementById("origin").value;
 				
-					clienteFirma.saveDataToFile(
-						clienteFirma.getBase64FromText(data),
+					saveDataToFile(
+						getBase64FromText(data),
 						document.getElementById("title").value,
 						document.getElementById("filename").value,
 						document.getElementById("exts").value,
 						document.getElementById("desc").value);
 						
 				} catch(e) {
-					document.getElementById("console").value = document.getElementById("console").value + "\n" + clienteFirma.getErrorMessage();
+					document.getElementById("console").value = document.getElementById("console").value + "\n" + getErrorMessage();
 				}
 			}
 		</script>
 	</head>
 	<body>
 		<script type="text/javascript">
-			cargarMiniApplet();
+			cargarMiniApplet(base);
 		</script>
 		<p>Cargamos el MiniApplet</p>
 		

@@ -2,24 +2,24 @@
 <html> <!-- Ejemplo básico de lanzador de la aplicación -->
 	<head>
 		<script type="text/javascript" src="http://www.java.com/js/deployJava.js"></script>
-		<script type="text/javascript" src="instalador.js"></script>
+		<script type="text/javascript" src="miniapplet.js"></script>
 		<script type="text/javascript" src="constantes.js"></script>
 		<script type="text/javascript">
 			function counterSign() {
 				try {
 				
-					var sign = clienteFirma.getFileContent("Seleccionar Firma", "pdf,sig,csig", "Firma electr\u00F3nica");
+					var sign = getFileContent("Seleccionar Firma", "pdf,sig,csig", "Firma electr\u00F3nica");
 					if (sign == null) {
 						return;
 					}
 				
-					var signature = clienteFirma.counterSign(
+					var signature = counterSign(
 						sign,
 						document.getElementById("algorithm").value,
 						document.getElementById("format").value,
 						document.getElementById("params").value);
 				
-					clienteFirma.saveDataToFile(
+					saveDataToFile(
 						signature,
 						"Guardar contrafirma",
 						"*.sig",
@@ -27,7 +27,7 @@
 						"Firma electr\u00F3nica");
 				
 				} catch(e) {
-					showLog(clienteFirma.getErrorMessage());
+					showLog(getErrorMessage());
 				}
 			}
 			
@@ -44,7 +44,7 @@
 	</head>
 	<body>
 		<script type="text/javascript">
-			cargarMiniApplet();
+			cargarMiniApplet(base);
 		</script>
 		<p>Cargamos el MiniApplet</p>
 		

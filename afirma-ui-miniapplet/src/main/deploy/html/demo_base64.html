@@ -2,31 +2,31 @@
 <html> <!-- Ejemplo básico de lanzador de la aplicación -->
 	<head>
 		<script type="text/javascript" src="http://www.java.com/js/deployJava.js"></script>
-		<script type="text/javascript" src="instalador.js"></script>
+		<script type="text/javascript" src="miniapplet.js"></script>
 		<script type="text/javascript" src="constantes.js"></script>
 		<script type="text/javascript">
 			function getTextFromBase64() {
 				try {
 					document.getElementById("result").value =
-						clienteFirma.getTextFromBase64(document.getElementById("origin").value, "utf-8");
+						getTextFromBase64(document.getElementById("origin").value, "utf-8");
 				} catch(e) {
-					document.getElementById("console").value = document.getElementById("console").value + "\n" + clienteFirma.getErrorMessage();
+					document.getElementById("console").value = document.getElementById("console").value + "\n" + getErrorMessage();
 				}
 			}
 
 			function getBase64FromText() {
 				try {
 					document.getElementById("result").value =
-						clienteFirma.getBase64FromText(document.getElementById("origin").value, "utf-8");
+						getBase64FromText(document.getElementById("origin").value, "utf-8");
 				} catch(e) {
-					document.getElementById("console").value = document.getElementById("console").value + "\n" + clienteFirma.getErrorMessage();
+					document.getElementById("console").value = document.getElementById("console").value + "\n" + getErrorMessage();
 				}
 			}
 		</script>
 	</head>
 	<body>
 		<script type="text/javascript">
-			cargarMiniApplet();
+			cargarMiniApplet(base);
 		</script>
 		<p>Cargamos el MiniApplet</p>
 		<table><tr>

@@ -2,23 +2,23 @@
 <html> <!-- Ejemplo básico de lanzador de la aplicación -->
 	<head>
 		<script type="text/javascript" src="http://www.java.com/js/deployJava.js"></script>
-		<script type="text/javascript" src="instalador.js"></script>
+		<script type="text/javascript" src="miniapplet.js"></script>
 		<script type="text/javascript" src="constantes.js"></script>
 		<script type="text/javascript">
 			function sign() {
 				try {
-					var data = clienteFirma.getFileContent("Seleccione el fichero que desee firmar", null, null);
+					var data = getFileContent("Seleccione el fichero que desee firmar", null, null);
 					if (data == null) {
 						return;
 					}
 				
-					var signature = clienteFirma.sign(
+					var signature = sign(
 						data,
 						document.getElementById("algorithm").value,
 						document.getElementById("format").value,
 						document.getElementById("params").value);
 				
-					clienteFirma.saveDataToFile(
+					saveDataToFile(
 						signature,
 						"Guardar firma electr\u00F3nica",
 						null,
@@ -26,7 +26,7 @@
 						null);
 						
 				} catch(e) {
-					showLog(clienteFirma.getErrorMessage());
+					showLog(getErrorMessage());
 				}
 			}
 			

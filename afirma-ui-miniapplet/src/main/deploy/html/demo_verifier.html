@@ -2,21 +2,21 @@
 <html> <!-- Ejemplo básico de lanzador de la aplicación -->
 	<head>
 		<script type="text/javascript" src="http://www.java.com/js/deployJava.js"></script>
-		<script type="text/javascript" src="instalador.js"></script>
+		<script type="text/javascript" src="miniapplet.js"></script>
 		<script type="text/javascript" src="constantes.js"></script>
 		<script type="text/javascript">
 			function verifyPlatform() {
 				try {
-					clienteFirma.verifyPlatform();
+					verifyPlatform();
 					showLog("Plataforma compatible");
 						
 				} catch(e) {
-					showLog("Imcompatibilidad con la plataforma:\n" + clienteFirma.getErrorMessage());
+					showLog("Imcompatibilidad con la plataforma:\n" + getErrorMessage());
 				}
 			}
 			
 			function getEcoJava() {
-				showLog("EcoJava: " + clienteFirma.getEcoJava());
+				showLog("EcoJava: " + getEcoJava());
 			}
 			
 			function showLog(newLog) {
@@ -26,7 +26,7 @@
 	</head>
 	<body>
 		<script type="text/javascript">
-			cargarMiniApplet();
+			cargarMiniApplet(base);
 		</script>
 		<p>Cargamos el MiniApplet</p>
 		
