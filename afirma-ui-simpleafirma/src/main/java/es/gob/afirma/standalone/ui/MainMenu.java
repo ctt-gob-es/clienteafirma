@@ -321,7 +321,8 @@ public final class MainMenu extends JMenuBar {
 
     void showAbout() {
         // EL texto del "Acerca de" no se externaliza
-        JOptionPane.showMessageDialog((this.parent == null) ? MainMenu.this : this.parent, "<html><p align=\"center\">\"Firma f\u00E1cil con @firma\" 1.0 Beta<br/>&copy; 2011 Gobierno de Espa&ntilde;a</p><br/><p>@firma es Software Libre bajo licencia GPLv2<br/> y puede distribuirse y modificarse libremente<br/>siguiendo los t&eacute;rminos de esta licencia.</html>", //$NON-NLS-1$
+        JOptionPane.showMessageDialog((this.parent == null) ? MainMenu.this : this.parent,
+        							  Messages.getString("MainMenu.14"), //$NON-NLS-1$,
                                       Messages.getString("MainMenu.15"), //$NON-NLS-1$
                                       JOptionPane.INFORMATION_MESSAGE);
     }
