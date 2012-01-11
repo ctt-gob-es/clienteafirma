@@ -491,54 +491,32 @@ final class MozillaKeyStoreUtilities {
      * @param nssDirectory
      *        Directorio en donde se encuentran las bibliotecas de NSS. */
     static void loadNSSDependencies(final String nssDirectory) {
-        // *********************************************************************
-        // *********************************************************************
+    	
+    	final String dependList[];
+    	
         // Compobamos antes el caso especifico de NSS partido entre /usr/lib y
         // /lib, que se da en Fedora
-        if (Platform.OS.LINUX.equals(Platform.getOS()) && new File("/usr/lib/libsoftokn3.so").exists() && new File(NSPR4_SO).exists()) { //$NON-NLS-1$ 
-            try {
-                System.load(NSPR4_SO); 
-                if (new File("/lib/libplds4.so").exists()) { //$NON-NLS-1$
-                    System.load("/lib/libplds4.so"); //$NON-NLS-1$
-                }
-                if (new File("/usr/lib/libplds4.so").exists()) { //$NON-NLS-1$
-                    System.load("/usr/lib/libplds4.so"); //$NON-NLS-1$
-                }
-                if (new File("/lib/libplc4.so").exists()) { //$NON-NLS-1$
-                    System.load("/lib/libplc4.so"); //$NON-NLS-1$
-                }
-                if (new File("/usr/lib/libplc4.so").exists()) { //$NON-NLS-1$
-                    System.load("/usr/lib/libplc4.so"); //$NON-NLS-1$
-                }
-                if (new File("/lib/libnssutil3.so").exists()) { //$NON-NLS-1$
-                    System.load("/lib/libnssutil3.so"); //$NON-NLS-1$
-                }
-                if (new File("/usr/lib/libnssutil3.so").exists()) { //$NON-NLS-1$
-                    System.load("/usr/lib/libnssutil3.so"); //$NON-NLS-1$
-                }
-                if (new File("/lib/libsqlite3.so").exists()) { //$NON-NLS-1$
-                    System.load("/lib/libsqlite3.so"); //$NON-NLS-1$
-                }
-                if (new File("/usr/lib/libsqlite3.so").exists()) { //$NON-NLS-1$
-                    System.load("/usr/lib/libsqlite3.so"); //$NON-NLS-1$
-                }
-                if (new File("/lib/libmozsqlite3.so").exists()) { //$NON-NLS-1$
-                    System.load("/lib/libmozsqlite3.so"); //$NON-NLS-1$
-                }
-                if (new File("/usr/lib/libmozsqlite3.so").exists()) { //$NON-NLS-1$
-                    System.load("/usr/lib/libmozsqlite3.so"); //$NON-NLS-1$
-                }
-            }
-            catch (final Exception e) {
-                LOGGER.warning("Error cargando NSS en una instalacion partida entre /lib y /usr/lib: " + e); //$NON-NLS-1$
-            }
-            return;
+        if (Platform.OS.LINUX.equals(Platform.getOS()) && new File("/usr/lib/libsoftokn3.so").exists() && new File(NSPR4_SO).exists()) { //$NON-NLS-1$
+        	dependList = new String[] {
+    			NSPR4_SO,
+    			"/lib/libplds4.so", //$NON-NLS-1$
+    			"/usr/lib/libplds4.so", //$NON-NLS-1$
+    			"/lib/libplc4.so", //$NON-NLS-1$
+    			"/usr/lib/libplc4.so", //$NON-NLS-1$
+    			"/lib/libnssutil3.so", //$NON-NLS-1$
+    			"/usr/lib/libnssutil3.so", //$NON-NLS-1$
+    			"/lib/libsqlite3.so", //$NON-NLS-1$
+    			"/usr/lib/libsqlite3.so", //$NON-NLS-1$
+    			"/lib/libmozsqlite3.so", //$NON-NLS-1$
+    			"/usr/lib/libmozsqlite3.so" //$NON-NLS-1$
+        	};
         }
-        // *********************************************************************
-        // *********************************************************************
-
-        final String path = nssDirectory + (nssDirectory.endsWith(File.separator) ? "" : File.separator); //$NON-NLS-1$
-        for (final String libPath : getSoftkn3Dependencies(path)) {
+        else {
+        	final String path = nssDirectory + (nssDirectory.endsWith(File.separator) ? "" : File.separator); //$NON-NLS-1$
+        	dependList = getSoftkn3Dependencies(path);
+        }
+        
+        for (final String libPath : dependList) {
             try {
                 if (new File(libPath).exists()) {
                     System.load(libPath);
