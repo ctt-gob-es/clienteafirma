@@ -1186,7 +1186,8 @@ public final class AOXAdESSigner implements AOSigner {
      * @param docu
      *        Documento que estar&aacute; contenido en el nuevo documento.
      * @return Documento con ra&iacute;z "AFIRMA".
-     * @throws ParserConfigurationException */
+     * @throws ParserConfigurationException Cuando se produce un error al analizar el XML.
+     */
     static Document insertarNodoAfirma(final Document docu) throws ParserConfigurationException {
 
         // Nueva instancia de DocumentBuilderFactory que permita espacio de
