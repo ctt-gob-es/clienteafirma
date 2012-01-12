@@ -89,7 +89,7 @@ final class ExtraParamsProcessor {
 				p.setProperty("policyIdentifier", //$NON-NLS-1$
 						"urn:oid:2.16.724.1.3.1.1.2.1.8");  //$NON-NLS-1$ 
 				p.setProperty("policyIdentifierHash", //$NON-NLS-1$
-						"tSbjbefbEoLcD06K/IR8FtuhhVE=");  //$NON-NLS-1$ 
+						"V8lVVNGDCPen6VELRD1Ja8HARFk=");  //$NON-NLS-1$ 
 				p.setProperty("policyIdentifierHashAlgorithm", //$NON-NLS-1$
 						"http://www.w3.org/2000/09/xmldsig#sha1"); //$NON-NLS-1$ 
 				p.setProperty("policyQualifier", //$NON-NLS-1$
