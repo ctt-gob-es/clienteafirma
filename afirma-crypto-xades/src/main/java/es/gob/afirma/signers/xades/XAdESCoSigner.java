@@ -51,6 +51,10 @@ import static es.gob.afirma.signers.xades.AOXAdESSigner.SIGNATURE_NODE_NAME;
 
 final class XAdESCoSigner {
 	
+	private XAdESCoSigner() {
+		// No permitimos la instanciacion
+	}
+	
     /** Cofirma datos en formato XAdES.
      * <p>
      *  Este m&eacute;todo firma todas las referencias a datos declaradas en la firma original,

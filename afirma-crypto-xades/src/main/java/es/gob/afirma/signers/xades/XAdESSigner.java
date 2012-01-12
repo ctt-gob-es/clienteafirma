@@ -76,6 +76,10 @@ import static es.gob.afirma.signers.xades.AOXAdESSigner.SIGNATURE_TAG;
 
 final class XAdESSigner {
 	
+	private XAdESSigner() {
+		// No permitimos la instanciacion
+	}
+	
     /** Firma datos en formato XAdES.
      * <p>
      * Este m&eacute;todo, al firmar un XML, firmas tambi&eacute;n sus hojas de estilo XSL asociadas, siguiendo el siguiente criterio:

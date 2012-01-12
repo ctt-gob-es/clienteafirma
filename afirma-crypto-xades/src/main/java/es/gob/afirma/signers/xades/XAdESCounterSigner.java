@@ -52,6 +52,10 @@ import static es.gob.afirma.signers.xades.AOXAdESSigner.DIGEST_METHOD;
 
 final class XAdESCounterSigner {
 	
+	private XAdESCounterSigner() {
+		// No permitimos la instanciacion
+	}
+	
 	private static final String CSURI = "http://uri.etsi.org/01903#CountersignedSignature"; //$NON-NLS-1$
 	
     /** Contrafirma firmas en formato XAdES.
