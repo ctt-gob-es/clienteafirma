@@ -44,7 +44,6 @@ public final class AOFacturaESigner implements AOSigner {
         EXTRA_PARAMS.setProperty("policyIdentifierHashAlgorithm", DigestMethod.SHA1);         //$NON-NLS-1$
         EXTRA_PARAMS.setProperty("policyDescription", "facturae31"); //$NON-NLS-1$ //$NON-NLS-2$
         EXTRA_PARAMS.setProperty("signerClaimedRole", "emisor"); //$NON-NLS-1$ //$NON-NLS-2$
-        EXTRA_PARAMS.setProperty("avoidTransformForEnvelopedCosign", "true"); //$NON-NLS-1$ //$NON-NLS-2$
     }
     
     /** Cofirma Facturas en formato XAdES Factura-E.
