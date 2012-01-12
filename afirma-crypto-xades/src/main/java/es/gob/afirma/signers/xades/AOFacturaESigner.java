@@ -26,7 +26,7 @@ public final class AOFacturaESigner implements AOSigner {
     
     private static final AOSigner XADES_SIGNER = new AOXAdESSigner();
 
-    private static final Set<String> ALLOWED_PARAMS = new HashSet<String>(7);
+    private static final Set<String> ALLOWED_PARAMS = new HashSet<String>(5);
     static {
         ALLOWED_PARAMS.add("signerCertifiedRole"); //$NON-NLS-1$
         ALLOWED_PARAMS.add("signatureProductionCity"); //$NON-NLS-1$
@@ -44,6 +44,7 @@ public final class AOFacturaESigner implements AOSigner {
         EXTRA_PARAMS.setProperty("policyIdentifierHashAlgorithm", DigestMethod.SHA1);         //$NON-NLS-1$
         EXTRA_PARAMS.setProperty("policyDescription", "facturae31"); //$NON-NLS-1$ //$NON-NLS-2$
         EXTRA_PARAMS.setProperty("signerClaimedRole", "emisor"); //$NON-NLS-1$ //$NON-NLS-2$
+        EXTRA_PARAMS.setProperty("avoidTransformForEnvelopedCosign", "true"); //$NON-NLS-1$ //$NON-NLS-2$
     }
     
     /** Cofirma Facturas en formato XAdES Factura-E.
