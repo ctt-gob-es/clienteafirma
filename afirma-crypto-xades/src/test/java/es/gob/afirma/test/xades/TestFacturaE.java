@@ -36,6 +36,7 @@ import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSimpleSignInfo;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
+import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
 import es.gob.afirma.signers.xml.Utils;
 
@@ -52,13 +53,7 @@ public final class TestFacturaE {
     
     static {
         final Properties p1 = new Properties();
-        p1.setProperty("format", AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED); //$NON-NLS-1$
-        p1.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
-        p1.setProperty("policyIdentifier", "http://www.facturae.es/politica_de_firma_formato_facturae/politica_de_firma_formato_facturae_v3_1.pdf"); //$NON-NLS-1$ //$NON-NLS-2$
-        p1.setProperty("policyIdentifierHash", "Ohixl6upD6av8N7pEvDABhEL6hM=");  //$NON-NLS-1$//$NON-NLS-2$
-        p1.setProperty("policyIdentifierHashAlgorithm", DigestMethod.SHA1);         //$NON-NLS-1$
-        p1.setProperty("policyDescription", "facturae31"); //$NON-NLS-1$ //$NON-NLS-2$
-        p1.setProperty("signerClaimedRole", "emisor"); //$NON-NLS-1$ //$NON-NLS-2$
+//        p1.setProperty("format", AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED); //$NON-NLS-1$
         
         XADES_MODES = new Properties[] {
                 p1
@@ -104,7 +99,7 @@ public final class TestFacturaE {
         pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
         cert = (X509Certificate) ks.getCertificate(CERT_ALIAS);
 
-        final AOSigner signer = new AOXAdESSigner();
+        final AOSigner signer = new AOFacturaESigner();
         
         String prueba;
         
@@ -112,11 +107,7 @@ public final class TestFacturaE {
             for (final String algo : ALGOS) {
                 for (final String filename : TEST_FILES_DATA) {
                     
-                    prueba = "Firma XAdES en modo '" +  //$NON-NLS-1$
-                    extraParams.getProperty("mode") +  //$NON-NLS-1$
-                    ", formato '" + //$NON-NLS-1$
-                    extraParams.getProperty("format") +  //$NON-NLS-1$
-                    "' con el algoritmo ': " + //$NON-NLS-1$
+                    prueba = "Factura electronica con el algoritmo ' " + //$NON-NLS-1$
                     algo +
                     "' y el fichero '" + //$NON-NLS-1$
                     filename + "'"; //$NON-NLS-1$
@@ -128,7 +119,7 @@ public final class TestFacturaE {
                     
                     final byte[] result = signer.sign(data, algo, pke, extraParams);
                         
-                    File f = File.createTempFile(algo + "-" + extraParams.getProperty("mode") + "-" + filename.replace(".xml", "") + "-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
+                    File f = File.createTempFile("Factura_firmada_" + filename.replace(".xml", "") + "-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
                     java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
                     fos.write(result);
                     try { fos.flush(); fos.close(); } catch (Exception e) { 
@@ -146,15 +137,6 @@ public final class TestFacturaE {
                     Assert.assertNotNull(prueba, result);
                     Assert.assertTrue(signer.isSign(result));
                     
-                    if ("implicit".equals(extraParams.getProperty("mode")) && (!filename.toLowerCase().endsWith(".xml")) && (!Arrays.equals(signer.getData(result), data))) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                        f = File.createTempFile(algo + "-" + extraParams.getProperty("mode") + "-" + filename.replace(".xml", "") + "-", "-" + filename); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
-                        fos = new java.io.FileOutputStream(f);
-                        fos.write(signer.getData(result));
-                        try { fos.flush(); fos.close(); } catch (Exception e) { /* Ignoramos los errores */ }
-                        System.out.println("Temporal de los datos extraidos para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
-                        Assert.fail("Los datos extraidos no coinciden con los originales: " + filename); //$NON-NLS-1$
-                    }
-                    
                     AOTreeModel tree = signer.getSignersStructure(result, false);
                     Assert.assertEquals("Datos", ((AOTreeNode) tree.getRoot()).getUserObject()); //$NON-NLS-1$
                     Assert.assertEquals("ANF Usuario Activo", ((AOTreeNode) tree.getRoot()).getChildAt(0).getUserObject()); //$NON-NLS-1$
@@ -165,7 +147,6 @@ public final class TestFacturaE {
                     
                     Assert.assertNotNull(simpleSignInfo.getSigningTime());
                     Assert.assertEquals(cert, simpleSignInfo.getCerts()[0]);    
-                                        
                 }
             }
         }
