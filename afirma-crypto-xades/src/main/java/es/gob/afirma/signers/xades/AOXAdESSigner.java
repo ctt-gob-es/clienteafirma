@@ -12,52 +12,31 @@ package es.gob.afirma.signers.xades;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStore.PrivateKeyEntry;
-import java.security.NoSuchAlgorithmException;
 import java.security.Security;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
-import java.util.UUID;
 import java.util.logging.Logger;
 
-import javax.xml.crypto.dsig.CanonicalizationMethod;
 import javax.xml.crypto.dsig.DigestMethod;
-import javax.xml.crypto.dsig.Reference;
 import javax.xml.crypto.dsig.Transform;
-import javax.xml.crypto.dsig.XMLSignatureFactory;
-import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
 import net.java.xades.security.xml.XAdES.SignaturePolicyIdentifier;
 import net.java.xades.security.xml.XAdES.SignaturePolicyIdentifierImpl;
 import net.java.xades.security.xml.XAdES.SignatureProductionPlace;
 import net.java.xades.security.xml.XAdES.SignatureProductionPlaceImpl;
-import net.java.xades.security.xml.XAdES.SignerRole;
-import net.java.xades.security.xml.XAdES.SignerRoleImpl;
-import net.java.xades.security.xml.XAdES.XAdES;
-import net.java.xades.security.xml.XAdES.XAdES_EPES;
 import net.java.xades.util.Base64;
 import net.java.xades.util.XMLUtils;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.DocumentType;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
-import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.CounterSignTarget;
@@ -290,11 +269,10 @@ public final class AOXAdESSigner implements AOSigner {
     /** URI que define una referencia de tipo OBJECT. */
     static final String OBJURI = "http://www.w3.org/2000/09/xmldsig#Object"; //$NON-NLS-1$
 
-    private static final String CSURI = "http://uri.etsi.org/01903#CountersignedSignature"; //$NON-NLS-1$
     static final String AFIRMA = "AFIRMA"; //$NON-NLS-1$
     static final String XML_SIGNATURE_PREFIX = "ds"; //$NON-NLS-1$
     static final String XADES_SIGNATURE_PREFIX = "xades"; //$NON-NLS-1$
-    private static final String SIGNATURE_NODE_NAME = XML_SIGNATURE_PREFIX + ":Signature"; //$NON-NLS-1$
+    static final String SIGNATURE_NODE_NAME = XML_SIGNATURE_PREFIX + ":Signature"; //$NON-NLS-1$
     static final String DETACHED_CONTENT_ELEMENT_NAME = "CONTENT"; //$NON-NLS-1$
     static final String DETACHED_STYLE_ELEMENT_NAME = "STYLE"; //$NON-NLS-1$
 
@@ -308,9 +286,6 @@ public final class AOXAdESSigner implements AOSigner {
     
     static final String MIMETYPE_STR = "MimeType"; //$NON-NLS-1$
     static final String ENCODING_STR = "Encoding"; //$NON-NLS-1$
-
-    private String algo;
-    private Document doc;
 
     static {
         if (Security.getProvider("XMLDSig") == null) { //$NON-NLS-1$
@@ -867,209 +842,7 @@ public final class AOXAdESSigner implements AOSigner {
                          final String algorithm, 
                          final PrivateKeyEntry keyEntry, 
                          final Properties xParams) throws AOException {
-
-        final String algoUri = XMLConstants.SIGN_ALGOS_URI.get(algorithm);
-        if (algoUri == null) {
-            throw new UnsupportedOperationException("Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'"); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-
-        final Properties extraParams = (xParams != null) ? xParams: new Properties();
-
-        final String digestMethodAlgorithm = extraParams.getProperty("referencesDigestMethod", DIGEST_METHOD); //$NON-NLS-1$
-        final String canonicalizationAlgorithm = extraParams.getProperty("canonicalizationAlgorithm", CanonicalizationMethod.INCLUSIVE); //$NON-NLS-1$
-        final String xadesNamespace = extraParams.getProperty("xadesNamespace", XADESNS); //$NON-NLS-1$
-
-        // nueva instancia de DocumentBuilderFactory que permita espacio de
-        // nombres (necesario para XML)
-        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-
-        // Propiedades del documento XML original
-        final Map<String, String> originalXMLProperties = new Hashtable<String, String>();
-
-        // carga el documento XML de firmas y su raiz
-        Document docSig;
-        Element rootSig;
-        try {
-            docSig = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
-            rootSig = docSig.getDocumentElement();
-
-            // Si el documento contiene una firma simple se inserta como raiz el
-            // nodo AFIRMA
-            if (rootSig.getNodeName().equals(SIGNATURE_NODE_NAME)) {
-                docSig = insertarNodoAfirma(docSig);
-                rootSig = docSig.getDocumentElement();
-            }
-        }
-        catch (final Exception e) {
-            throw new AOException("No se ha podido leer el documento XML de firmas", e); //$NON-NLS-1$
-        }
-
-        final List<Reference> referenceList = new ArrayList<Reference>();
-        final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
-        final DigestMethod digestMethod;
-        try {
-            digestMethod = fac.newDigestMethod(digestMethodAlgorithm, null);
-        }
-        catch (final Exception e) {
-            throw new AOException("No se ha podido obtener un generador de huellas digitales para el algoritmo '" + digestMethodAlgorithm + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-
-        // Localizamos la primera firma (primer nodo "Signature") en profundidad
-        // en el arbol de firma.
-        // Se considera que todos los objetos "Signature" del documento firman
-        // (referencian) los mismos
-        // objetos, por lo que podemos extraerlos de cualquiera de las firmas
-        // actuales.
-        // Buscamos dentro de ese Signature todas las referencias que apunten a
-        // datos para firmarlas
-        final List<String> referencesIds = new ArrayList<String>();
-        Node currentElement;
-        final NodeList nl = ((Element) docSig.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_TAG).item(0)).getElementsByTagNameNS(XMLConstants.DSIGNNS, "Reference"); //$NON-NLS-1$
-
-        // Se considera que la primera referencia de la firma son los datos que
-        // debemos firmar, ademas
-        // de varias referencias especiales
-        for (int i = 0; i < nl.getLength(); i++) {
-            currentElement = nl.item(i);
-
-            // Firmamos la primera referencia (que seran los datos firmados) y
-            // las hojas de estilo que
-            // tenga asignadas. Las hojas de estilo tendran un identificador que
-            // comience por STYLE_REFERENCE_PREFIX.
-            // TODO: Identificar las hojas de estilo de un modo generico.
-            final NamedNodeMap currentNodeAttributes = currentElement.getAttributes();
-            if (i == 0 || (currentNodeAttributes.getNamedItem("Id") != null && currentNodeAttributes.getNamedItem("Id")  //$NON-NLS-1$//$NON-NLS-2$
-                                                                                                    .getNodeValue()
-                                                                                                    .startsWith(STYLE_REFERENCE_PREFIX))) { 
-
-                // Buscamos las transformaciones declaradas en la Referencia,
-                // para anadirlas
-                // tambien en la nueva
-                final List<Transform> currentTransformList;
-                try {
-                    currentTransformList = Utils.getObjectReferenceTransforms(currentElement, XML_SIGNATURE_PREFIX);
-                }
-                catch (final NoSuchAlgorithmException e) {
-                    throw new AOException("Se ha declarado una transformacion personalizada de un tipo no soportado", e); //$NON-NLS-1$
-                }
-                catch (final InvalidAlgorithmParameterException e) {
-                    throw new AOException("Se han especificado parametros erroneos para una transformacion personalizada", e); //$NON-NLS-1$
-                }
-
-                // Creamos un identificador de referencia para el objeto a
-                // firmar y la almacenamos
-                // para mantener un listado con todas. En el caso de las hojas
-                // de estilo lo creamos con un
-                // identificador descriptivo
-                String referenceId = null;
-                if ((currentNodeAttributes.getNamedItem("Id") != null && currentNodeAttributes.getNamedItem("Id")  //$NON-NLS-1$//$NON-NLS-2$
-                                                                                              .getNodeValue()
-                                                                                              .startsWith(STYLE_REFERENCE_PREFIX))) { 
-                    referenceId = STYLE_REFERENCE_PREFIX + UUID.randomUUID().toString(); 
-                }
-                else {
-                    referenceId = "Reference-" + UUID.randomUUID().toString(); //$NON-NLS-1$
-                }
-                referencesIds.add(referenceId);
-
-                // Creamos la propia referencia con las transformaciones de la
-                // original
-                referenceList.add(fac.newReference(((Element) currentElement).getAttribute("URI"), digestMethod, currentTransformList, //$NON-NLS-1$
-                                                   null,
-                                                   referenceId));
-            }
-        }
-
-        final XAdES_EPES xades =
-                (XAdES_EPES) XAdES.newInstance(XAdES.EPES,
-                                               xadesNamespace,
-                                               XADES_SIGNATURE_PREFIX,
-                                               XML_SIGNATURE_PREFIX,
-                                               digestMethodAlgorithm,
-                                               rootSig);
-
-        // establece el certificado
-        final X509Certificate cert = (X509Certificate) keyEntry.getCertificate();
-        xades.setSigningCertificate(cert);
-
-        // SignaturePolicyIdentifier
-        final SignaturePolicyIdentifier spi =
-            getPolicy(extraParams.getProperty("policyIdentifier"), //$NON-NLS-1$
-                      extraParams.getProperty("policyIdentifierHash"), //$NON-NLS-1$
-                      extraParams.getProperty("policyIdentifierHashAlgorithm"), //$NON-NLS-1$
-                      extraParams.getProperty("policyDescription"), //$NON-NLS-1$
-                      extraParams.getProperty("policyQualifier")); //$NON-NLS-1$
-        if (spi != null) {
-            xades.setSignaturePolicyIdentifier(spi);
-        }
-
-        // SignatureProductionPlace
-        final SignatureProductionPlace spp =
-                getSignatureProductionPlace(extraParams.getProperty("signatureProductionCity"), //$NON-NLS-1$
-                                            extraParams.getProperty("signatureProductionProvince"), //$NON-NLS-1$
-                                            extraParams.getProperty("signatureProductionPostalCode"), //$NON-NLS-1$
-                                            extraParams.getProperty("signatureProductionCountry")); //$NON-NLS-1$
-        if (spp != null) {
-            xades.setSignatureProductionPlace(spp);
-        }
-
-        // SignerRole
-        SignerRole signerRole = null;
-        try {
-            final String claimedRole = extraParams.getProperty("signerClaimedRole"); //$NON-NLS-1$
-            final String certifiedRole = extraParams.getProperty("signerCertifiedRole"); //$NON-NLS-1$
-            signerRole = new SignerRoleImpl();
-            if (claimedRole != null) {
-                signerRole.addClaimedRole(claimedRole);
-            }
-            if (certifiedRole != null) {
-                signerRole.addCertifiedRole(certifiedRole);
-            }
-        }
-        catch (final Exception e) {
-            // Se ignoran los errores, son parametros opcionales
-        }
-
-        if (signerRole != null) {
-            xades.setSignerRole(signerRole);
-        }
-
-        // SigningTime
-        if (Boolean.parseBoolean(extraParams.getProperty("applySystemDate", Boolean.TRUE.toString()))) { //$NON-NLS-1$ 
-            xades.setSigningTime(new Date());
-        }
-
-        // crea la firma
-        final AOXMLAdvancedSignature xmlSignature;
-        try {
-            xmlSignature = AOXMLAdvancedSignature.newInstance(xades);
-        }
-        catch (final Exception e) {
-            throw new AOException("No se ha podido instanciar la firma Avanzada XML JXAdES", e); //$NON-NLS-1$
-        }
-
-        try {
-            xmlSignature.setDigestMethod(digestMethodAlgorithm);
-            xmlSignature.setCanonicalizationMethod(canonicalizationAlgorithm);
-        }
-        catch (final Exception e) {
-            LOGGER.severe("No se ha podido establecer el algoritmo de huella digital (" + algoUri //$NON-NLS-1$
-                                                     + "), es posible que el usado en la firma difiera del indicado: " //$NON-NLS-1$
-                                                     + e);
-        }
-
-        try {
-            xmlSignature.sign(Arrays.asList((X509Certificate[])keyEntry.getCertificateChain()), keyEntry.getPrivateKey(), algoUri, referenceList, "Signature-" + UUID.randomUUID().toString(), null/*TSA*/); //$NON-NLS-1$
-        }
-        catch (final NoSuchAlgorithmException e) {
-            throw new UnsupportedOperationException("No se soporta el algoritmo de firma '" + algorithm + "': " + e, e); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-        catch (final Exception e) {
-            throw new AOException("Error al generar la cofirma", e); //$NON-NLS-1$
-        }
-
-        return Utils.writeXML(rootSig, originalXMLProperties, null, null);
+    	return XAdESCoSigner.cosign(data, sign, algorithm, keyEntry, xParams);
     }
 
     /** Cofirma datos en formato XAdES.
@@ -1151,47 +924,7 @@ public final class AOXAdESSigner implements AOSigner {
                          final String algorithm, 
                          final PrivateKeyEntry keyEntry, 
                          final Properties extraParams) throws AOException {
-
-        // nueva instancia de DocumentBuilderFactory que permita espacio de
-        // nombres (necesario para XML)
-        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-
-        // carga la raiz del documento XML de firmas
-        // y crea un nuevo documento que contendra solo los datos sin firmar
-        final Element rootSig;
-        final Element rootData;
-        try {
-            rootSig = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign)).getDocumentElement();
-
-            final Document docData = dbf.newDocumentBuilder().newDocument();
-            rootData = (Element) docData.adoptNode(rootSig.cloneNode(true));
-
-            // Obtiene las firmas y las elimina. Para evitar eliminar firmas de
-            // las que cuelgan otras
-            // y despues intentar eliminar estas, las buscamos y eliminamos de
-            // una en una
-            NodeList signatures = rootData.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_TAG);
-            while (signatures.getLength() > 0) {
-                rootData.removeChild(signatures.item(0));
-                signatures = rootData.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_TAG);
-            }
-
-            docData.appendChild(rootData);
-        }
-        catch (final Exception ioex) {
-            throw new AOException("Error al leer el documento de firmas", ioex); //$NON-NLS-1$
-        }
-
-        // convierte el documento de firmas en un InputStream
-        final ByteArrayOutputStream baosSig = new ByteArrayOutputStream();
-        XMLUtils.writeXML(baosSig, rootSig, false);
-
-        // convierte el documento a firmar en un InputStream
-        final ByteArrayOutputStream baosData = new ByteArrayOutputStream();
-        XMLUtils.writeXML(baosData, rootData, false);
-
-        return cosign(baosData.toByteArray(), baosSig.toByteArray(), algorithm, keyEntry, extraParams);
+    	return XAdESCoSigner.cosign(sign, algorithm, keyEntry, extraParams);
     }
 
     /** Contrafirma firmas en formato XAdES.
@@ -1264,429 +997,7 @@ public final class AOXAdESSigner implements AOSigner {
                               final Object[] targets,
                               final PrivateKeyEntry keyEntry,
                               final Properties xParams) throws AOException {
-
-        final Properties extraParams = (xParams != null) ? xParams : new Properties();
-
-        String encoding = extraParams.getProperty("encoding"); //$NON-NLS-1$
-        if ("base64".equalsIgnoreCase(encoding)) { //$NON-NLS-1$
-            encoding = XMLConstants.BASE64_ENCODING;
-        }
-        
-        if (sign == null) {
-            throw new IllegalArgumentException("El objeto de firma no puede ser nulo"); //$NON-NLS-1$
-        }
-
-        final String algoUri = XMLConstants.SIGN_ALGOS_URI.get(algorithm);
-        if (algoUri == null) {
-            throw new UnsupportedOperationException("Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'"); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-
-        this.algo = algorithm;
-
-        // nueva instancia de DocumentBuilderFactory que permita espacio de
-        // nombres (necesario para XML)
-        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-
-        // flag que indica si el documento tiene una firma simple o esta
-        // cofirmado
-        // por defecto se considera que es un documento cofirmado
-        boolean esFirmaSimple = false;
-
-        // se carga el documento XML y su raiz
-        final Map<String, String> originalXMLProperties = new Hashtable<String, String>();
-        Element root;
-        try {
-            this.doc = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
-
-            if (encoding == null) {
-                encoding = this.doc.getXmlEncoding();
-            }
-
-            // Ademas del encoding, sacamos otros datos del doc XML original.
-            // Hacemos la comprobacion del base64 por si se establecido desde
-            // fuera
-            if (encoding != null && !XMLConstants.BASE64_ENCODING.equals(encoding)) {
-                originalXMLProperties.put(OutputKeys.ENCODING, encoding);
-            }
-            String tmpXmlProp = this.doc.getXmlVersion();
-            if (tmpXmlProp != null) {
-                originalXMLProperties.put(OutputKeys.VERSION, tmpXmlProp);
-            }
-            final DocumentType dt = this.doc.getDoctype();
-            if (dt != null) {
-                tmpXmlProp = dt.getSystemId();
-                if (tmpXmlProp != null) {
-                    originalXMLProperties.put(OutputKeys.DOCTYPE_SYSTEM, tmpXmlProp);
-                }
-            }
-
-            root = this.doc.getDocumentElement();
-
-            // si no es un documento cofirma se anade temporalmente el nodo raiz
-            // AFIRMA
-            // para que las operaciones de contrafirma funcionen correctamente
-            if (root.getNodeName().equals(SIGNATURE_NODE_NAME)) {
-                esFirmaSimple = true;
-                this.doc = insertarNodoAfirma(this.doc);
-                root = this.doc.getDocumentElement();
-            }
-        }
-        catch (final Exception e) {
-            throw new AOException("No se ha podido realizar la contrafirma", e); //$NON-NLS-1$
-        }
-
-        try {
-            if (targetType == CounterSignTarget.TREE) {
-                this.countersignTree(root, keyEntry, extraParams, algorithm);
-            }
-            else if (targetType == CounterSignTarget.LEAFS) {
-                this.countersignLeafs(root, keyEntry, extraParams, algorithm);
-            }
-            else if (targetType == CounterSignTarget.NODES) {
-                this.countersignNodes(root, targets, keyEntry, extraParams, algorithm);
-            }
-            else if (targetType == CounterSignTarget.SIGNERS) {
-                this.countersignSigners(root, targets, keyEntry, extraParams, algorithm);
-            }
-        }
-        catch (final Exception e) {
-            throw new AOException("Error al generar la contrafirma", e); //$NON-NLS-1$
-        }
-
-        // si el documento recibido no estaba cofirmado se elimina el nodo raiz
-        // temporal AFIRMA
-        // y se vuelve a dejar como raiz el nodo Signature original
-        if (esFirmaSimple) {
-            try {
-                final Document newdoc = dbf.newDocumentBuilder().newDocument();
-                newdoc.appendChild(newdoc.adoptNode(this.doc.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_TAG).item(0)));
-                this.doc = newdoc;
-            }
-            catch (final Exception e) {
-                LOGGER.info("No se ha eliminado el nodo padre '<AFIRMA>': " + e); //$NON-NLS-1$
-            }
-        }
-
-        return Utils.writeXML(this.doc.getDocumentElement(), originalXMLProperties, null, null);
-    }
-
-    /** Realiza la contrafirma de todos los nodos del arbol
-     * @param root
-     *        Elemento ra&iacute;z del documento xml que contiene las firmas
-     * @param algorithm
-     *        Algoritmo de firma XML
-     * @throws AOException
-     *         Cuando ocurre cualquier problema durante el proceso */
-    private void countersignTree(final Element root, final PrivateKeyEntry keyEntry, final Properties extraParams, final String algorithm) throws AOException {
-
-        // obtiene todas las firmas
-        final NodeList signatures = root.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_TAG);
-        final int numSignatures = signatures.getLength();
-
-        final Element[] nodes = new Element[numSignatures];
-        for (int i = 0; i < numSignatures; i++) {
-            nodes[i] = (Element) signatures.item(i);
-        }
-
-        // y crea sus contrafirmas
-        try {
-            for (int i = 0; i < numSignatures; i++) {
-                this.cs(nodes[i], keyEntry, extraParams, algorithm);
-            }
-        }
-        catch (final Exception e) {
-            throw new AOException("No se ha podido realizar la contrafirma del arbol", e); //$NON-NLS-1$
-        }
-    }
-
-    /** Realiza la contrafirma de todos los nodos hoja del arbol
-     * @param root
-     *        Elemento ra&iacute;z del documento xml que contiene las firmas
-     * @param algorithm
-     *        Algoritmo de firma XML
-     * @throws AOException
-     *         Cuando ocurre cualquier problema durante el proceso */
-    private void countersignLeafs(final Element root, final PrivateKeyEntry keyEntry, final Properties extraParams, final String algorithm) throws AOException {
-
-        // obtiene todas las firmas
-        final NodeList signatures = root.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_TAG);
-        int numSignatures = signatures.getLength();
-
-        // comprueba cuales son hojas
-        try {
-            for (int i = 0; i < numSignatures; i++) {
-                final Element signature = (Element) signatures.item(i);
-                final int children = signature.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_TAG).getLength();
-
-                // y crea sus contrafirmas
-                if (children == 0) {
-                    this.cs(signature, keyEntry, extraParams, algorithm);
-                    numSignatures++;
-                    i++;
-                }
-            }
-        }
-        catch (final Exception e) {
-            throw new AOException("No se ha podido realizar la contrafirma de hojas", e); //$NON-NLS-1$
-        }
-    }
-
-    /** Realiza la contrafirma de los nodos indicados en el par&aacute;metro
-     * targets
-     * @param root
-     *        Elemento raiz del documento xml que contiene las firmas
-     * @param tgts
-     *        Array con las posiciones de los nodos a contrafirmar
-     * @throws AOException
-     *         Cuando ocurre cualquier problema durante el proceso */
-    private void countersignNodes(final Element root,
-                                  Object[] tgts,
-                                  final PrivateKeyEntry keyEntry,
-                                  final Properties extraParams,
-                                  final String algorithm) throws AOException {
-
-        // descarta las posiciones que esten repetidas
-        final List<Integer> targetsList = new ArrayList<Integer>();
-        for (int i = 0; i < tgts.length; i++) {
-            if (!targetsList.contains(tgts[i])) {
-                targetsList.add((Integer) tgts[i]);
-            }
-        }
-        Object[] targets = targetsList.toArray();
-
-        // obtiene todas las firmas
-        final NodeList signatures = root.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_TAG);
-
-        // obtiene los nodos indicados en targets
-        final Element[] nodes = new Element[targets.length];
-        try {
-            for (int i = 0; i < targets.length; i++) {
-                nodes[i] = (Element) signatures.item(((Integer) targets[i]).intValue());
-                if (nodes[i] == null) {
-                    throw new AOException("Posicion de nodo no valida."); //$NON-NLS-1$
-                }
-            }
-        }
-        catch (final ClassCastException e) {
-            throw new AOException("Valor de nodo no valido", e); //$NON-NLS-1$
-        }
-
-        // y crea sus contrafirmas
-        try {
-            for (final Element node : nodes) {
-                this.cs(node, keyEntry, extraParams, algorithm);
-            }
-        }
-        catch (final Exception e) {
-            throw new AOException("No se ha podido realizar la contrafirma de nodos", e); //$NON-NLS-1$
-        }
-    }
-
-    /** Realiza la contrafirma de los firmantes indicados en el par&aacute;metro
-     * targets
-     * @param root
-     *        Elemento ra&iacute;z del documento xml que contiene las firmas
-     * @param targets
-     *        Array con el nombre de los firmantes de los nodos a
-     *        contrafirmar
-     * @throws AOException
-     *         Cuando ocurre cualquier problema durante el proceso */
-    private void countersignSigners(final Element root,
-                                    final Object[] targets,
-                                    final PrivateKeyEntry keyEntry,
-                                    final Properties extraParams,
-                                    final String algorithm) throws AOException {
-
-        // obtiene todas las firmas
-        final NodeList signatures = root.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_TAG);
-
-        final List<Object> signers = Arrays.asList(targets);
-        final List<Element> nodes = new ArrayList<Element>();
-
-        // obtiene los nodos de los firmantes indicados en targets
-        for (int i = 0; i < signatures.getLength(); i++) {
-            final Element node = (Element) signatures.item(i);
-            if (signers.contains(AOUtil.getCN(Utils.getCertificate(node.getElementsByTagNameNS(XMLConstants.DSIGNNS, "X509Certificate").item(0))))) { //$NON-NLS-1$
-                nodes.add(node);
-            }
-        }
-
-        // y crea sus contrafirmas
-        final Iterator<Element> i = nodes.iterator();
-        while (i.hasNext()) {
-            this.cs(i.next(), keyEntry, extraParams, algorithm);
-        }
-    }
-
-    /** Realiza la contrafirma de la firma pasada por par&aacute;metro
-     * @param signature
-     *        Elemento con el nodo de la firma a contrafirmar
-     * @param algorithm
-     *        Algoritmo de firma XML
-     * @throws AOException
-     *         Cuando ocurre cualquier problema durante el proceso */
-    private void cs(final Element signature, final PrivateKeyEntry keyEntry, final Properties xParams, final String algorithm) throws AOException {
-
-        final Properties extraParams = (xParams != null) ? xParams : new Properties();
-
-        final String digestMethodAlgorithm = extraParams.getProperty("referencesDigestMethod", DIGEST_METHOD); //$NON-NLS-1$
-        final String canonicalizationAlgorithm = extraParams.getProperty("canonicalizationAlgorithm", CanonicalizationMethod.INCLUSIVE); //$NON-NLS-1$
-        final String xadesNamespace = extraParams.getProperty("xadesNamespace", XADESNS); //$NON-NLS-1$
-
-        // crea un nodo CounterSignature
-        final Element counterSignature = this.doc.createElement(XADES_SIGNATURE_PREFIX + ":CounterSignature"); //$NON-NLS-1$
-
-        // recupera o crea un nodo UnsignedSignatureProperties
-        final NodeList usp = signature.getElementsByTagNameNS(xadesNamespace, "UnsignedSignatureProperties"); //$NON-NLS-1$
-        Element unsignedSignatureProperties;
-        if (usp.getLength() == 0) {
-            unsignedSignatureProperties = this.doc.createElement(XADES_SIGNATURE_PREFIX + ":UnsignedSignatureProperties"); //$NON-NLS-1$
-        }
-        else {
-            unsignedSignatureProperties = (Element) usp.item(0);
-        }
-
-        unsignedSignatureProperties.appendChild(counterSignature);
-
-        // recupera o crea un nodo UnsignedProperties
-        final NodeList up = signature.getElementsByTagNameNS(xadesNamespace, "UnsignedProperties"); //$NON-NLS-1$
-        final Element unsignedProperties;
-        if (up.getLength() == 0) {
-            unsignedProperties = this.doc.createElement(XADES_SIGNATURE_PREFIX + ":UnsignedProperties"); //$NON-NLS-1$
-        }
-        else {
-            unsignedProperties = (Element) up.item(0);
-        }
-
-        unsignedProperties.appendChild(unsignedSignatureProperties);
-
-        // inserta el nuevo nodo en QualifyingProperties
-        final Node qualifyingProperties = signature.getElementsByTagNameNS(xadesNamespace, "QualifyingProperties").item(0); //$NON-NLS-1$
-        qualifyingProperties.appendChild(unsignedProperties);
-
-        // obtiene el nodo SignatureValue
-        final Element signatureValue = (Element) signature.getElementsByTagNameNS(XMLConstants.DSIGNNS, "SignatureValue").item(0); //$NON-NLS-1$
-
-        // crea la referencia a la firma que se contrafirma
-        final List<Reference> referenceList = new ArrayList<Reference>();
-        final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
-        final DigestMethod digestMethod;
-        try {
-            digestMethod = fac.newDigestMethod(digestMethodAlgorithm, null);
-        }
-        catch (final Exception e) {
-            throw new AOException("No se ha podido obtener un generador de huellas digitales para el algoritmo '" + digestMethodAlgorithm + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-        final String referenceId = "Reference-" + UUID.randomUUID().toString(); //$NON-NLS-1$
-
-        try {
-            // Transformada para la canonicalizacion inclusiva con comentarios
-            final List<Transform> transformList = new ArrayList<Transform>();
-            transformList.add(fac.newTransform(canonicalizationAlgorithm, (TransformParameterSpec) null));
-
-            // Aunque el metodo utilizado para generar las contrafirmas hacen
-            // que no sea necesario
-            // indicar el tipo de la referencia, lo agregamos por si resultase
-            // de utilidad
-            referenceList.add(fac.newReference("#" + signatureValue.getAttribute("Id"), digestMethod, transformList, CSURI, referenceId)); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-        catch (final Exception e) {
-            throw new AOException("No se ha podido realizar la contrafirma", e); //$NON-NLS-1$
-        }
-
-        // nueva instancia XADES_EPES del nodo a contrafirmar
-        final XAdES_EPES xades =
-                (XAdES_EPES) XAdES.newInstance(XAdES.EPES,
-                                               xadesNamespace,
-                                               XADES_SIGNATURE_PREFIX,
-                                               XML_SIGNATURE_PREFIX,
-                                               digestMethodAlgorithm,
-                                               counterSignature);
-
-        // establece el certificado
-        final X509Certificate cert = (X509Certificate) keyEntry.getCertificate();
-        xades.setSigningCertificate(cert);
-
-        // SignaturePolicyIdentifier
-        final SignaturePolicyIdentifier spi =
-            getPolicy(extraParams.getProperty("policyIdentifier"), //$NON-NLS-1$
-                      extraParams.getProperty("policyIdentifierHash"), //$NON-NLS-1$
-                      extraParams.getProperty("policyIdentifierHashAlgorithm"), //$NON-NLS-1$
-                      extraParams.getProperty("policyDescription"), //$NON-NLS-1$
-                      extraParams.getProperty("policyQualifier")); //$NON-NLS-1$
-        if (spi != null) {
-            xades.setSignaturePolicyIdentifier(spi);
-        }
-
-        // SignatureProductionPlace
-        final SignatureProductionPlace spp =
-                getSignatureProductionPlace(extraParams.getProperty("signatureProductionCity"), //$NON-NLS-1$
-                                            extraParams.getProperty("signatureProductionProvince"), //$NON-NLS-1$
-                                            extraParams.getProperty("signatureProductionPostalCode"), //$NON-NLS-1$
-                                            extraParams.getProperty("signatureProductionCountry")); //$NON-NLS-1$
-        if (spp != null) {
-            xades.setSignatureProductionPlace(spp);
-        }
-
-        // SignerRole
-        SignerRole signerRole = null;
-        try {
-            final String claimedRole = extraParams.getProperty("signerClaimedRole"); //$NON-NLS-1$
-            final String certifiedRole = extraParams.getProperty("signerCertifiedRole"); //$NON-NLS-1$
-            signerRole = new SignerRoleImpl();
-            if (claimedRole != null) {
-                signerRole.addClaimedRole(claimedRole);
-            }
-            if (certifiedRole != null) {
-                signerRole.addCertifiedRole(certifiedRole);
-            }
-        }
-        catch (final Exception e) {
-            // Se ignoran los errores, los parametros son opcionales
-        }
-        if (signerRole != null) {
-            xades.setSignerRole(signerRole);
-        }
-
-        // SigningTime
-        if (Boolean.parseBoolean(extraParams.getProperty("applySystemDate", Boolean.TRUE.toString()))) { //$NON-NLS-1$ 
-            xades.setSigningTime(new Date());
-        }
-
-        // crea la firma
-        final AOXMLAdvancedSignature xmlSignature;
-        try {
-            xmlSignature = AOXMLAdvancedSignature.newInstance(xades);
-        }
-        catch (final Exception e) {
-            throw new AOException("No se ha podido instanciar la firma Avanzada XML JXAdES", e); //$NON-NLS-1$
-        }
-        try {
-            xmlSignature.setDigestMethod(digestMethodAlgorithm);
-            xmlSignature.setCanonicalizationMethod(canonicalizationAlgorithm);
-        }
-        catch (final Exception e) {
-            LOGGER.severe("No se ha podido establecer el algoritmo de huella digital (" + XMLConstants.SIGN_ALGOS_URI.get(this.algo) //$NON-NLS-1$
-                                                     + "), es posible que el usado en la firma difiera del indicado: " //$NON-NLS-1$
-                                                     + e);
-        }
-        
-        try {
-            xmlSignature.sign(
-              Arrays.asList((X509Certificate[])keyEntry.getCertificateChain()), 
-              keyEntry.getPrivateKey(), 
-              XMLConstants.SIGN_ALGOS_URI.get(algorithm), 
-              referenceList, "Signature-" + UUID.randomUUID().toString(), //$NON-NLS-1$
-              null /* TSA */
-            );
-        }
-        catch (final NoSuchAlgorithmException e) {
-            throw new UnsupportedOperationException("Los formatos de firma XML no soportan el algoritmo de firma '" + this.algo + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-        catch (final Exception e) {
-            throw new AOException("No se ha podido realizar la contrafirma", e); //$NON-NLS-1$
-        }
+    	return XAdESCounterSigner.countersign(sign, algorithm, targetType, targets, keyEntry, xParams);
     }
 
     /** {@inheritDoc} */
@@ -1871,7 +1182,7 @@ public final class AOXAdESSigner implements AOSigner {
      *        Documento que estar&aacute; contenido en el nuevo documento.
      * @return Documento con ra&iacute;z "AFIRMA".
      * @throws ParserConfigurationException */
-    private static Document insertarNodoAfirma(final Document docu) throws ParserConfigurationException {
+    static Document insertarNodoAfirma(final Document docu) throws ParserConfigurationException {
 
         // Nueva instancia de DocumentBuilderFactory que permita espacio de
         // nombres (necesario para XML)
