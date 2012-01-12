@@ -849,7 +849,7 @@ public final class SignPanel extends JPanel {
                     ".pdf"}; //$NON-NLS-1$
                 filterDescription = Messages.getString("SignPanel.72"); //$NON-NLS-1$
             }
-            else if (SignPanel.this.signer instanceof AOXAdESSigner) {
+            else if (SignPanel.this.signer instanceof AOXAdESSigner || SignPanel.this.signer instanceof AOFacturaESigner) {
                 newFileName = newFileName.replace(".", "_") + ".xsig"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 filterExtensions = new String[] {
                         ".xsig", ".xml"}; //$NON-NLS-1$ //$NON-NLS-2$
