@@ -1,10 +1,26 @@
 package es.gob.afirma.signers.xades;
 
+import static es.gob.afirma.signers.xades.AOXAdESSigner.AFIRMA;
+import static es.gob.afirma.signers.xades.AOXAdESSigner.DETACHED_CONTENT_ELEMENT_NAME;
+import static es.gob.afirma.signers.xades.AOXAdESSigner.DETACHED_STYLE_ELEMENT_NAME;
+import static es.gob.afirma.signers.xades.AOXAdESSigner.DIGEST_METHOD;
+import static es.gob.afirma.signers.xades.AOXAdESSigner.ENCODING_STR;
+import static es.gob.afirma.signers.xades.AOXAdESSigner.HTTPS_PROTOCOL_PREFIX;
+import static es.gob.afirma.signers.xades.AOXAdESSigner.HTTP_PROTOCOL_PREFIX;
+import static es.gob.afirma.signers.xades.AOXAdESSigner.LOGGER;
+import static es.gob.afirma.signers.xades.AOXAdESSigner.MIMETYPE_STR;
+import static es.gob.afirma.signers.xades.AOXAdESSigner.OBJURI;
+import static es.gob.afirma.signers.xades.AOXAdESSigner.SIGNATURE_TAG;
+import static es.gob.afirma.signers.xades.AOXAdESSigner.STYLE_REFERENCE_PREFIX;
+import static es.gob.afirma.signers.xades.AOXAdESSigner.XADESNS;
+import static es.gob.afirma.signers.xades.AOXAdESSigner.XADES_SIGNATURE_PREFIX;
+import static es.gob.afirma.signers.xades.AOXAdESSigner.XML_SIGNATURE_PREFIX;
+
 import java.io.ByteArrayInputStream;
 import java.net.URI;
+import java.security.KeyStore.PrivateKeyEntry;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,26 +69,10 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.xml.Utils;
-import es.gob.afirma.signers.xml.XMLConstants;
 import es.gob.afirma.signers.xml.Utils.CannotDereferenceException;
 import es.gob.afirma.signers.xml.Utils.IsInnerlException;
 import es.gob.afirma.signers.xml.Utils.ReferenceIsNotXMLException;
-
-import static es.gob.afirma.signers.xades.AOXAdESSigner.LOGGER;
-import static es.gob.afirma.signers.xades.AOXAdESSigner.DIGEST_METHOD;
-import static es.gob.afirma.signers.xades.AOXAdESSigner.XADESNS;
-import static es.gob.afirma.signers.xades.AOXAdESSigner.DETACHED_CONTENT_ELEMENT_NAME;
-import static es.gob.afirma.signers.xades.AOXAdESSigner.DETACHED_STYLE_ELEMENT_NAME;
-import static es.gob.afirma.signers.xades.AOXAdESSigner.HTTPS_PROTOCOL_PREFIX;
-import static es.gob.afirma.signers.xades.AOXAdESSigner.HTTP_PROTOCOL_PREFIX;
-import static es.gob.afirma.signers.xades.AOXAdESSigner.MIMETYPE_STR;
-import static es.gob.afirma.signers.xades.AOXAdESSigner.ENCODING_STR;
-import static es.gob.afirma.signers.xades.AOXAdESSigner.AFIRMA;
-import static es.gob.afirma.signers.xades.AOXAdESSigner.STYLE_REFERENCE_PREFIX;
-import static es.gob.afirma.signers.xades.AOXAdESSigner.XML_SIGNATURE_PREFIX;
-import static es.gob.afirma.signers.xades.AOXAdESSigner.OBJURI;
-import static es.gob.afirma.signers.xades.AOXAdESSigner.XADES_SIGNATURE_PREFIX;
-import static es.gob.afirma.signers.xades.AOXAdESSigner.SIGNATURE_TAG;
+import es.gob.afirma.signers.xml.XMLConstants;
 
 final class XAdESSigner {
 	
@@ -270,11 +270,6 @@ final class XAdESSigner {
      *    Indica si se debe introducir en la firma el atributo <i>signingTime</i> con la fecha actual
      *    del sistema. Por defecto, se encuentra a {@code true}. 
      *   </dd>
-     *  <dt><b><i>avoidTransformForEnvelopedCosign</i></b></dt>
-     *   <dd>
-     *    No a&ntilde;ade la transformaci&oaxute;n XPATH de utilidad usada para facilitar las posteriores cofirmas.
-     *    Por defecto, s&iacute; se a&ntilde;aden estas transformaciones
-     *   </dd>
      * </dl>
      * <p>
      *  Respecto al uso de los par&aacute;metros <code>xmlTransform</code>n<code>Type</code>, 
@@ -330,7 +325,6 @@ final class XAdESSigner {
         final boolean ignoreStyleSheets = Boolean.parseBoolean(extraParams.getProperty("ignoreStyleSheets", Boolean.TRUE.toString())); //$NON-NLS-1$ 
         final boolean avoidBase64Transforms = Boolean.parseBoolean(extraParams.getProperty("avoidBase64Transforms", Boolean.FALSE.toString())); //$NON-NLS-1$
         final boolean headLess = Boolean.parseBoolean(extraParams.getProperty("headLess", Boolean.TRUE.toString())); //$NON-NLS-1$
-        final boolean avoidTransformForEnvelopedCosign = Boolean.parseBoolean(extraParams.getProperty("avoidTransformForEnvelopedCosign", Boolean.FALSE.toString())); //$NON-NLS-1$
         final String precalculatedHashAlgorithm = extraParams.getProperty("precalculatedHashAlgorithm"); //$NON-NLS-1$
         String mimeType = extraParams.getProperty("mimeType"); //$NON-NLS-1$
         String encoding = extraParams.getProperty("encoding"); //$NON-NLS-1$
@@ -925,17 +919,15 @@ final class XAdESSigner {
 
                 // Transformacion XPATH para eliminar el resto de firmas del
                 // documento
-                if (!avoidTransformForEnvelopedCosign) {
-                	transformList.add(
-            			fac.newTransform(
-        					Transform.XPATH,
-        					new XPathFilterParameterSpec(
-    							"not(ancestor-or-self::" + XML_SIGNATURE_PREFIX + ":Signature)", //$NON-NLS-1$ //$NON-NLS-2$
-    							Collections.singletonMap(XML_SIGNATURE_PREFIX, XMLSignature.XMLNS)
-							)
-    					)
-        			);
-            	}
+                transformList.add(
+                		fac.newTransform(
+                				Transform.XPATH,
+                				new XPathFilterParameterSpec(
+                						"not(ancestor-or-self::" + XML_SIGNATURE_PREFIX + ":Signature)", //$NON-NLS-1$ //$NON-NLS-2$
+                						Collections.singletonMap(XML_SIGNATURE_PREFIX, XMLSignature.XMLNS)
+                				)
+                		)
+                );
 
                 // crea la referencia
                 referenceList.add(fac.newReference("", digestMethod, transformList, null, referenceId)); //$NON-NLS-1$
