@@ -921,7 +921,7 @@ final class XAdESSigner {
 
                 // Transformacion XPATH para eliminar el resto de firmas del
                 // documento
-                if (avoidTransformForEnvelopedCosign) {
+                if (!avoidTransformForEnvelopedCosign) {
                 	transformList.add(
             			fac.newTransform(
         					Transform.XPATH,
