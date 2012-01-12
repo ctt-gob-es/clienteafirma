@@ -24,7 +24,7 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.AOFileUtils;
-import es.gob.afirma.core.misc.OfficeXMLAnalizer;
+import es.gob.afirma.core.misc.OfficeAnalizer;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
@@ -293,7 +293,7 @@ public final class AOOOXMLSigner implements AOSigner {
                              final PrivateKeyEntry keyEntry) throws AOException {
 
         // Comprobamos si es un documento OOXML valido.
-        if (!OfficeXMLAnalizer.isOOXMLDocument(ooxmlDocument)) {
+        if (!OfficeAnalizer.isOOXMLDocument(ooxmlDocument)) {
             throw new AOFormatFileException("El fichero introducido no es un documento OOXML"); //$NON-NLS-1$
         }
 
