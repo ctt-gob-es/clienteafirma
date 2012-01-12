@@ -162,10 +162,9 @@ public final class MimeHelper {
                 this.mimeType = this.mimeInfo.getMimeType();
             }
 
-            // Cuando el MimeType sea el de un fichero ZIP, comprobamos si es en
-            // realidad alguno de los ficheros ofimaticos soportados (que son ZIP
-            // con una estructura concreta)
-            if (this.mimeType != null && this.mimeType.equals("application/zip")) { //$NON-NLS-1$
+            // Cuando el MimeType sea el de un fichero ZIP o el de Microsoft Word, comprobamos si es en
+            // realidad alguno de los ficheros ofimaticos soportados
+            if ("application/zip".equals(this.mimeType) || "application/msword".equals(this.mimeType)) { //$NON-NLS-1$ //$NON-NLS-2$
                 this.mimeType = OfficeAnalizer.getMimeType(this.data);
             }
             

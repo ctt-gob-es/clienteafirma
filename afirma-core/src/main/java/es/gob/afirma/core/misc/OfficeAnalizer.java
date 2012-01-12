@@ -27,7 +27,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-/** Clase para el an&aacute;lisis de ficheros OOXML. */
+/** Clase para el an&aacute;lisis de ficheros OOXML, ODF y Microsoft Office 97/2003. */
 public final class OfficeAnalizer {
     
     private OfficeAnalizer() {
@@ -106,14 +106,31 @@ public final class OfficeAnalizer {
      * proporcionado (ODF u OOXML). Si el fichero no se corresponde con ninguno
      * de ellos pero es un Zip se devolver&aacute; el MimeType del Zip
      * (application/zip) y si no es Zip se devolver&aacute; {@code null}.
-     * @param zipData
-     *        Fichero ODF u OOXML
+     * @param data Fichero ODF, OOXML o Microsoft Office 97/2003
      * @return MimeType. */
-    static String getMimeType(final byte[] zipData) {
+    static String getMimeType(final byte[] data) {
+    	
+    	final String testString = new String(data);
+    	
+    	if (testString.contains("Microsoft Excel")) { //$NON-NLS-1$
+    		return "application/vnd.ms-excel"; //$NON-NLS-1$
+    	}
+    	if (testString.contains("Microsoft Office Word")) { //$NON-NLS-1$
+    		return "application/msword"; //$NON-NLS-1$
+    	}
+    	if (testString.contains("Microsoft Office PowerPoint")) { //$NON-NLS-1$
+    		return "application/vnd.ms-powerpoint"; //$NON-NLS-1$
+    	}
+    	if (testString.contains("Microsoft Project")) { //$NON-NLS-1$
+    		return "application/vnd.ms-project"; //$NON-NLS-1$
+    	}
+    	if (testString.contains("Microsoft Visio")) { //$NON-NLS-1$
+    		return "application/vnd.visio"; //$NON-NLS-1$
+    	}
 
         final ZipFile zipFile;
         try {
-            zipFile = AOFileUtils.createTempZipFile(zipData);
+            zipFile = AOFileUtils.createTempZipFile(data);
         }
         catch (final ZipException e1) {
             LOGGER.warning("El fichero indicado no es un ZIP"); //$NON-NLS-1$
