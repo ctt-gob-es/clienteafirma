@@ -166,7 +166,7 @@ public final class MimeHelper {
             // realidad alguno de los ficheros ofimaticos soportados (que son ZIP
             // con una estructura concreta)
             if (this.mimeType != null && this.mimeType.equals("application/zip")) { //$NON-NLS-1$
-                this.mimeType = OfficeXMLAnalizer.getMimeType(this.data);
+                this.mimeType = MSOfficeAnalizer.getMimeType(this.data);
             }
             
             if (this.mimeType == null) {
@@ -202,7 +202,7 @@ public final class MimeHelper {
         // realidad alguno de los ficheros ofimaticos soportados (que son ZIP con una
         // estructura concreta)
         if (extension != null && extension.equals("zip")) { //$NON-NLS-1$
-            extension = OfficeXMLAnalizer.getExtension(this.data);
+            extension = MSOfficeAnalizer.getExtension(this.data);
         }
 
         return extension;

@@ -28,9 +28,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /** Clase para el an&aacute;lisis de ficheros OOXML. */
-public final class OfficeXMLAnalizer {
+public final class MSOfficeAnalizer {
     
-    private OfficeXMLAnalizer() {
+    private MSOfficeAnalizer() {
         // No permitimos la instanciacion
     }
 
