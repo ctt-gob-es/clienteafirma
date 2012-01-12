@@ -89,7 +89,7 @@ public final class OfficeXMLAnalizer {
 
         FILE_EXTENSIONS.put("application/vnd.openxmlformats-officedocument.wordprocessingml.document", "docx"); //$NON-NLS-1$ //$NON-NLS-2$
         FILE_EXTENSIONS.put("application/vnd.openxmlformats-officedocument.presentationml.presentation", "pptx"); //$NON-NLS-1$ //$NON-NLS-2$
-        FILE_EXTENSIONS.put("application/vnd.oasis.opendocument.spreadsheet", "xslx"); //$NON-NLS-1$ //$NON-NLS-2$
+        FILE_EXTENSIONS.put("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "xlsx"); //$NON-NLS-1$ //$NON-NLS-2$
 
         FILE_EXTENSIONS.put("application/vnd.oasis.opendocument.text", "odt"); //$NON-NLS-1$ //$NON-NLS-2$
         FILE_EXTENSIONS.put("application/vnd.oasis.opendocument.presentation", "odp"); //$NON-NLS-1$ //$NON-NLS-2$
