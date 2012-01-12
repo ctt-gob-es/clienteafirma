@@ -488,11 +488,6 @@ public final class AOXAdESSigner implements AOSigner {
      *    Indica si se debe introducir en la firma el atributo <i>signingTime</i> con la fecha actual
      *    del sistema. Por defecto, se encuentra a {@code true}. 
      *   </dd>
-     *  <dt><b><i>avoidTransformForEnvelopedCosign</i></b></dt>
-     *   <dd>
-     *    No a&ntilde;ade la transformaci&oaxute;n XPATH de utilidad usada para facilitar las posteriores cofirmas.
-     *    Por defecto, s&iacute; se a&ntilde;aden estas transformaciones
-     *   </dd>
      * </dl>
      * <p>
      *  Respecto al uso de los par&aacute;metros <code>xmlTransform</code>n<code>Type</code>, 
