@@ -48,9 +48,9 @@ import es.gob.afirma.signers.pkcs7.SigUtils;
  * La implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios
  * para crear un mensaje EncryptedData de BouncyCastle: <a
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
-final class CADESEncryptedData {
+final class CAdESEncryptedData {
 	
-	private CADESEncryptedData() {
+	private CAdESEncryptedData() {
 		// No permitimos la instanciacion
 	}
 

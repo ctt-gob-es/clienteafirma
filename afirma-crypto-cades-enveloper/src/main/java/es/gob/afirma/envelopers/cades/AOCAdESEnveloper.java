@@ -222,7 +222,7 @@ public class AOCAdESEnveloper implements AOEnveloper {
         }
 
         try {
-			return CADESEncryptedData.genEncryptedData(file, digestAlgorithm, config, key, (dataType != null) ? dataType : PKCSObjectIdentifiers.data.getId());
+			return CAdESEncryptedData.genEncryptedData(file, digestAlgorithm, config, key, (dataType != null) ? dataType : PKCSObjectIdentifiers.data.getId());
         }
         catch (final Exception e) {
             throw new AOException("Error generando el enveloped de CADES", e); //$NON-NLS-1$
