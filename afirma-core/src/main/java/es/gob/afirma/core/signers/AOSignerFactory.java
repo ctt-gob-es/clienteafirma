@@ -29,23 +29,31 @@ public final class AOSignerFactory {
     /** Listado de formatos de firma soportados y el manejador de firma asociado. */
     private static final Map<String, String> SIGNERS_CLASSES = new HashMap<String, String>(7);
     
+    private static final String SIGNER_CLASS_CADES = "es.gob.afirma.signers.cades.AOCAdESSigner"; //$NON-NLS-1$
+    private static final String SIGNER_CLASS_CMS = "es.gob.afirma.signers.cms.AOCMSSigner"; //$NON-NLS-1$
+    private static final String SIGNER_CLASS_XADES = "es.gob.afirma.signers.xades.AOXAdESSigner"; //$NON-NLS-1$
+    private static final String SIGNER_CLASS_XMLDSIG = "es.gob.afirma.signers.xmldsig.AOXMLDSigSigner"; //$NON-NLS-1$
+    private static final String SIGNER_CLASS_PADES = "es.gob.afirma.signers.pades.AOPDFSigner"; //$NON-NLS-1$
+    private static final String SIGNER_CLASS_ODF = "es.gob.afirma.signers.odf.AOODFSigner"; //$NON-NLS-1$
+    private static final String SIGNER_CLASS_OOXML = "es.gob.afirma.signers.ooxml.AOOOXMLSigner"; //$NON-NLS-1$
+    
     static {
-        SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_CADES,              "es.gob.afirma.signers.cades.AOCAdESSigner"); //$NON-NLS-1$
-        SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_CMS,                "es.gob.afirma.signers.cms.AOCMSSigner"); //$NON-NLS-1$
-        SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_XADES,     			"es.gob.afirma.signers.xades.AOXAdESSigner"); //$NON-NLS-1$
-        SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_XADES_DETACHED,     "es.gob.afirma.signers.xades.AOXAdESSigner"); //$NON-NLS-1$
-        SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED,    "es.gob.afirma.signers.xades.AOXAdESSigner"); //$NON-NLS-1$
-        SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING,   "es.gob.afirma.signers.xades.AOXAdESSigner"); //$NON-NLS-1$
-        SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_XMLDSIG,   			"es.gob.afirma.signers.xmldsig.AOXMLDSigSigner"); //$NON-NLS-1$
-        SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_XMLDSIG_DETACHED,   "es.gob.afirma.signers.xmldsig.AOXMLDSigSigner"); //$NON-NLS-1$
-        SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED,  "es.gob.afirma.signers.xmldsig.AOXMLDSigSigner"); //$NON-NLS-1$
-        SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPING, "es.gob.afirma.signers.xmldsig.AOXMLDSigSigner"); //$NON-NLS-1$
-        SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_PDF,                "es.gob.afirma.signers.pades.AOPDFSigner"); //$NON-NLS-1$
-        SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_PADES,                "es.gob.afirma.signers.pades.AOPDFSigner"); //$NON-NLS-1$
-        SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_ODF,                "es.gob.afirma.signers.odf.AOODFSigner"); //$NON-NLS-1$
-        SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_ODF_ALT1,           "es.gob.afirma.signers.odf.AOODFSigner"); //$NON-NLS-1$
-        SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_OOXML,              "es.gob.afirma.signers.ooxml.AOOOXMLSigner"); //$NON-NLS-1$
-        SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_OOXML_ALT1,              "es.gob.afirma.signers.ooxml.AOOOXMLSigner"); //$NON-NLS-1$
+        SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_CADES,              SIGNER_CLASS_CADES); 
+        SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_CMS,                SIGNER_CLASS_CMS); 
+        SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_XADES,     			SIGNER_CLASS_XADES); 
+        SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_XADES_DETACHED,     SIGNER_CLASS_XADES); 
+        SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED,    SIGNER_CLASS_XADES); 
+        SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING,   SIGNER_CLASS_XADES); 
+        SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_XMLDSIG,   			SIGNER_CLASS_XMLDSIG); 
+        SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_XMLDSIG_DETACHED,   SIGNER_CLASS_XMLDSIG); 
+        SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED,  SIGNER_CLASS_XMLDSIG); 
+        SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPING, SIGNER_CLASS_XMLDSIG); 
+        SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_PDF,                SIGNER_CLASS_PADES); 
+        SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_PADES,              SIGNER_CLASS_PADES); 
+        SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_ODF,                SIGNER_CLASS_ODF); 
+        SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_ODF_ALT1,           SIGNER_CLASS_ODF); 
+        SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_OOXML,              SIGNER_CLASS_OOXML); 
+        SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_OOXML_ALT1,         SIGNER_CLASS_OOXML); 
     }
     
     private AOSignerFactory() {
