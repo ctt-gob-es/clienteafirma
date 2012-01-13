@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -11,6 +11,7 @@
 package es.gob.afirma.core.misc;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.logging.Logger;
 
@@ -87,7 +88,7 @@ public final class Platform {
     }
 
     private static OS recoverOsName() {
-        
+
         final String osName = System.getProperty("os.name"); //$NON-NLS-1$
 
         if (osName.contains("indows")) { //$NON-NLS-1$
@@ -109,9 +110,9 @@ public final class Platform {
             LOGGER.warning("No se ha podido determinar el sistema operativo"); //$NON-NLS-1$
             return OS.OTHER;
         }
-        
+
     }
-    
+
     /** Recupera el navegador web actual.
      * @param userAgent <i>UserAgent</i> del navegador Web
      * @return Navegador web correspondiente al UserAgent indicado. */
@@ -221,11 +222,11 @@ public final class Platform {
      * @return Identificador de versi&oacute;n o {@code null} si no se pudo identificar */
     public static String getITextVersion() {
         try {
-            Class<?> documentClass = AOUtil.classForName("com.lowagie.text.Document"); //$NON-NLS-1$
-            Method getReleaseMethod = documentClass.getDeclaredMethod("getRelease"); //$NON-NLS-1$
+            final Class<?> documentClass = AOUtil.classForName("com.lowagie.text.Document"); //$NON-NLS-1$
+            final Method getReleaseMethod = documentClass.getDeclaredMethod("getRelease"); //$NON-NLS-1$
 
             return (String) getReleaseMethod.invoke(null);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             return null;
         }
     }
@@ -271,7 +272,7 @@ public final class Platform {
         if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
             String systemRoot = getSystemRoot();
             if (systemRoot == null) {
-                LOGGER .warning("No se ha podido determinar el directorio de Windows accediendo al registro, se usara 'C:\\WINDOWS\\'"); //$NON-NLS-1$ 
+                LOGGER .warning("No se ha podido determinar el directorio de Windows accediendo al registro, se usara 'C:\\WINDOWS\\'"); //$NON-NLS-1$
                 systemRoot = "c:\\windows\\"; //$NON-NLS-1$
             }
             if (!systemRoot.endsWith("\\")) { //$NON-NLS-1$
@@ -289,13 +290,10 @@ public final class Platform {
 
         try {
             final Class<?> bouncyCastleProviderClass = AOUtil.classForName("org.bouncycastle.jce.provider.BouncyCastleProvider"); //$NON-NLS-1$
-            final  Object bouncyCastleProviderObject = bouncyCastleProviderClass.newInstance();
-
-            final Class<?> providerClass = AOUtil.classForName("java.security.Provider"); //$NON-NLS-1$
-            final Method getVersionMethod = providerClass.getDeclaredMethod("getVersion"); //$NON-NLS-1$
-
-            return ((Double) getVersionMethod.invoke(bouncyCastleProviderObject)).toString();
-        } 
+            final Field info = bouncyCastleProviderClass.getDeclaredField("info"); //$NON-NLS-1$
+            info.setAccessible(true);
+            return info.get(new String()).toString().replace("BouncyCastle Security Provider v", ""); //$NON-NLS-1$ //$NON-NLS-2$
+        }
         catch (final Exception e) {
         	return null;
         }
@@ -310,7 +308,7 @@ public final class Platform {
         }
         return null;
     }
-    
+
     /** Obtiene el directorio global de extensiones de Java.
      * @return Directorio de extensiones Java del sistema o {@code null} si no se pudo identificar o no existe */
     public static String getSystemJavaExtDir() {
