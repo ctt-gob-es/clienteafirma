@@ -37,11 +37,11 @@ final class SignResultPanel extends JPanel {
     }
 
     void createUI(final SignValidity validity) {
-    	
+
         // Para que se detecten apropiadamente los hipervinculos hay que establecer
         // el tipo de contenido antes que el contenido
         this.descTextLabel.setContentType("text/html"); //$NON-NLS-1$
-        
+
         this.resultTextLabel.setFont(this.getFont().deriveFont(Font.PLAIN, 26));
         this.resultTextLabel.setLabelFor(this.descTextLabel);
 
@@ -49,7 +49,7 @@ final class SignResultPanel extends JPanel {
         Utils.remarcar(this.resultTextLabel);
         Utils.setContrastColor(this.resultTextLabel);
         Utils.setFontBold(this.resultTextLabel);
-        
+
         final JLabel resultOperationIcon = new JLabel();
         resultOperationIcon.setFocusable(false);
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -95,10 +95,10 @@ final class SignResultPanel extends JPanel {
                 this.resultTextLabel.setText(Messages.getString("SignResultPanel.8")); //$NON-NLS-1$
                 if (GeneralConfig.isHighContrast() || Main.isOSHighContrast){
                 	this.descTextLabel.setText(Messages.getString("SignResultPanel.24")); //$NON-NLS-1$
-                	this.descTextLabel.getAccessibleContext().setAccessibleName(this.resultTextLabel.getText()+". "+Messages.getString("SignResultPanel.9_Lector_pantalla") +". "+ Messages.getString("SignResultPanel.enter_link"));
+                	this.descTextLabel.getAccessibleContext().setAccessibleName(this.resultTextLabel.getText()+". "+Messages.getString("SignResultPanel.9_Lector_pantalla") +". "+ Messages.getString("SignResultPanel.enter_link"));  //$NON-NLS-2$//$NON-NLS-4$
                 } else {
                 	this.descTextLabel.setText(Messages.getString("SignResultPanel.9")); //$NON-NLS-1$
-                	this.descTextLabel.getAccessibleContext().setAccessibleName(this.resultTextLabel.getText()+". "+Messages.getString("SignResultPanel.9_Lector_pantalla") +". "+ Messages.getString("SignResultPanel.enter_link"));
+                	this.descTextLabel.getAccessibleContext().setAccessibleName(this.resultTextLabel.getText()+". "+Messages.getString("SignResultPanel.9_Lector_pantalla") +". "+ Messages.getString("SignResultPanel.enter_link"));  //$NON-NLS-2$//$NON-NLS-4$
                 }
                 resultOperationIconTooltip = Messages.getString("SignResultPanel.10"); //$NON-NLS-1$
                 break;
@@ -116,7 +116,7 @@ final class SignResultPanel extends JPanel {
                     default:
                         errorMessage = Messages.getString("SignResultPanel.6"); //$NON-NLS-1$
                     }
-                } 
+                }
                 else {
                     errorMessage = Messages.getString("SignResultPanel.6"); //$NON-NLS-1$
                 }
@@ -135,7 +135,7 @@ final class SignResultPanel extends JPanel {
                     default:
                         errorMessage = Messages.getString("SignResultPanel.12"); //$NON-NLS-1$
                     }
-                } 
+                }
                 else {
                     errorMessage = Messages.getString("SignResultPanel.12"); //$NON-NLS-1$
                 }
@@ -150,9 +150,9 @@ final class SignResultPanel extends JPanel {
         resultOperationIcon.setPreferredSize(new Dimension(120, 120));
         resultOperationIcon.setToolTipText(resultOperationIconTooltip);
 
-        
+
         this.setLayout(new GridBagLayout());
-        
+
         final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 0.0;
@@ -170,10 +170,10 @@ final class SignResultPanel extends JPanel {
         c.gridy = 1;
         c.insets = new Insets(0, 6, 5, 11);
         this.add(this.descTextLabel, c);
-        
-        final EditorFocusManager editorFocusManager = new EditorFocusManager (this.descTextLabel, new EditorFocusManagerAction() {  
+
+        final EditorFocusManager editorFocusManager = new EditorFocusManager (this.descTextLabel, new EditorFocusManagerAction() {
             @Override
-            public void openHyperLink(final HyperlinkEvent he, int linkIndex) {
+            public void openHyperLink(final HyperlinkEvent he, final int linkIndex) {
                 try {
                     if (he.getURL() != null) {
                         Desktop.getDesktop().browse(he.getURL().toURI());
@@ -192,19 +192,19 @@ final class SignResultPanel extends JPanel {
                 }
             }
         });
-        
+
         this.descTextLabel.setEditable(false);
-        this.descTextLabel.setOpaque(false);        
-        
+        this.descTextLabel.setOpaque(false);
+
         Utils.remarcar(this.descTextLabel);
         Utils.setContrastColor(this.descTextLabel);
         Utils.setFontBold(this.descTextLabel);
-        
+
         this.descTextLabel.addFocusListener(editorFocusManager);
         this.descTextLabel.addHyperlinkListener(editorFocusManager);
         this.descTextLabel.addKeyListener(editorFocusManager);
-        
-        
-        
+
+
+
     }
 }
