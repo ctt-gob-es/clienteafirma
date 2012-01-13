@@ -70,15 +70,8 @@ public final class TestOOXML {
         final Properties p1 = new Properties();
         p1.setProperty("format", AOSignConstants.SIGN_FORMAT_OOXML); //$NON-NLS-1$
         
-        final Properties p2 = new Properties();
-        p2.setProperty("format", AOSignConstants.SIGN_FORMAT_OOXML); //$NON-NLS-1$
-        p2.setProperty("policyIdentifier", "urn:oid:2.16.724.1.3.1.1.2.1.8"); //$NON-NLS-1$ //$NON-NLS-2$
-        p2.setProperty("policyIdentifierHash", "tSbjbefbEoLcD06K/IR8FtuhhVE="); //$NON-NLS-1$ //$NON-NLS-2$
-        p2.setProperty("policyIdentifierHashAlgorithm", "http://www.w3.org/2000/09/xmldsig#sha1"); //$NON-NLS-1$ //$NON-NLS-2$
-        //p2.setProperty("policyQualifier", "http://www.google.com"); //$NON-NLS-1$ //$NON-NLS-2$
-
         OOXML_MODES = new Properties[] {
-                p1, p2
+                p1
         };
     }
     
