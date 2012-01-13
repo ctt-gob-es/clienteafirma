@@ -472,7 +472,10 @@ public class DirectorySignatureHelper {
             final String mimeType = "hash/" + AOSignConstants.getDigestAlgorithmName(this.algorithm).toLowerCase(); //$NON-NLS-1$
             try {
                 signConfig.setProperty("mimeType", mimeType); //$NON-NLS-1$
-                signConfig.setProperty("oid", MimeHelper.transformMimeTypeToOid(mimeType)); //$NON-NLS-1$
+                final String dataOid = MimeHelper.transformMimeTypeToOid(mimeType);
+                if (dataOid != null) {
+                	signConfig.setProperty("oid", MimeHelper.transformMimeTypeToOid(mimeType)); //$NON-NLS-1$
+                }
             }
             catch (final Exception e) {
                 LOGGER.warning("Error al indicar el MIME-Type, se utilizara el por defecto y este aspecto no se indicara en el registro de firma masiva: " + e); //$NON-NLS-1$
@@ -594,7 +597,10 @@ public class DirectorySignatureHelper {
                 if (mimeType != null) {
                     try {
                         signConfig.setProperty("mimeType", mimeType); //$NON-NLS-1$
-                        signConfig.setProperty("oid", MimeHelper.transformMimeTypeToOid(mimeType)); //$NON-NLS-1$
+                        final String dataOid = MimeHelper.transformMimeTypeToOid(mimeType);
+                        if (dataOid != null) {
+                        	signConfig.setProperty("oid", MimeHelper.transformMimeTypeToOid(mimeType)); //$NON-NLS-1$
+                        }
                     }
                     catch (final Exception e) {
                         LOGGER.warning("No se ha podido detectar el MIME-Type, se utilizara el por defecto y este aspecto no se indicara en el registro de firma masiva: " + e); //$NON-NLS-1$
@@ -777,7 +783,10 @@ public class DirectorySignatureHelper {
             if (mimeType != null) {
                 try {
                     signConfig.setProperty("mimeType", mimeType); //$NON-NLS-1$
-                    signConfig.setProperty("oid", MimeHelper.transformMimeTypeToOid(mimeType)); //$NON-NLS-1$
+                    final String dataOid = MimeHelper.transformMimeTypeToOid(mimeType);
+                    if (dataOid != null) {
+                    	signConfig.setProperty("oid", MimeHelper.transformMimeTypeToOid(mimeType)); //$NON-NLS-1$
+                    }
                 }
                 catch (final Exception e) {
                     LOGGER.warning("No se ha podido detectar el MIME-Type, se utilizara el por defecto y este aspecto no se indicara en el registro de firma masiva: " + e); //$NON-NLS-1$

@@ -362,7 +362,10 @@ public final class MassiveSignatureHelper {
             if (mimeType != null) {
                 try {
                     config.setProperty("mimeType", mimeType); //$NON-NLS-1$
-                    config.setProperty("oid", MimeHelper.transformMimeTypeToOid(mimeType)); //$NON-NLS-1$
+                    final String dataOid = MimeHelper.transformMimeTypeToOid(mimeType);
+                    if (dataOid != null) {
+                    	config.setProperty("oid", MimeHelper.transformMimeTypeToOid(mimeType)); //$NON-NLS-1$
+                    }
                 }
                 catch (final Exception e) {
                     LOGGER
@@ -405,7 +408,10 @@ public final class MassiveSignatureHelper {
             final String mimeType = "hash/" + AOSignConstants.getDigestAlgorithmName(this.massiveConfiguration.getAlgorithm()).toLowerCase(); //$NON-NLS-1$
             try {
                 config.setProperty("mimeType", mimeType); //$NON-NLS-1$
-                config.setProperty("oid", MimeHelper.transformMimeTypeToOid(mimeType)); //$NON-NLS-1$
+                final String dataOid = MimeHelper.transformMimeTypeToOid(mimeType);
+                if (dataOid != null) {
+                	config.setProperty("oid", MimeHelper.transformMimeTypeToOid(mimeType)); //$NON-NLS-1$
+                }
             }
             catch (final Exception e) {
                 LOGGER
