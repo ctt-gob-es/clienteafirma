@@ -292,7 +292,7 @@ public final class Platform {
             final Class<?> bouncyCastleProviderClass = AOUtil.classForName("org.bouncycastle.jce.provider.BouncyCastleProvider"); //$NON-NLS-1$
             final Field info = bouncyCastleProviderClass.getDeclaredField("info"); //$NON-NLS-1$
             info.setAccessible(true);
-            return info.get(new String()).toString().replace("BouncyCastle Security Provider v", ""); //$NON-NLS-1$ //$NON-NLS-2$
+            return info.get("").toString().replace("BouncyCastle Security Provider v", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         }
         catch (final Exception e) {
         	return null;
