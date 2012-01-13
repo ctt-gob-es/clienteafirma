@@ -17,7 +17,7 @@ import es.gob.afirma.core.misc.Platform;
 final class VerifyPlatformAction implements PrivilegedExceptionAction<Void> {
 
 	private static final String BC_VERSION = "1.46";  //$NON-NLS-1$
-	
+
 	private final String userAgent;
 
 	/**
@@ -38,7 +38,7 @@ final class VerifyPlatformAction implements PrivilegedExceptionAction<Void> {
 	/**
 	 * Comprueba si est&aacute; disponible el proveedor de seguridad SunMSCAPI. En caso de no estarlo
 	 * lanza una excepci&oacute;n con la descripci&oacute;n del problema y c&oacute;mo podemos
-	 * solucionarlo. 
+	 * solucionarlo.
 	 * @throws InvalidExternalLibraryException Cuando no se detecte la biblioteca SunMSCAPI.
 	 */
 	private void verificaSunMSCAPINeeded() throws InvalidExternalLibraryException {
@@ -48,7 +48,7 @@ final class VerifyPlatformAction implements PrivilegedExceptionAction<Void> {
 			try {
 				AOUtil.classForName("sun.security.mscapi.SunMSCAPI"); //$NON-NLS-1$
 				return;
-			} 
+			}
 			catch(final Exception e) {
 				Logger.getLogger("es.gob.afirma").severe("Se requiere instalar SunMSCAPI en Windows 64"); //$NON-NLS-1$ //$NON-NLS-2$
 				final String sunmscapOri = MiniAppletMessages.getString("MSCapiJar.uri"); //$NON-NLS-1$
@@ -64,18 +64,19 @@ final class VerifyPlatformAction implements PrivilegedExceptionAction<Void> {
 		}
 	}
 
-	/** Indica si la versi&oacute;n de BouncyCastle es la adecuada para ejecutar el MiniApplet. 
+	/** Indica si la versi&oacute;n de BouncyCastle es la adecuada para ejecutar el MiniApplet.
 	 * @throws InvalidExternalLibraryException Si se encuentra una versi&oacute;n no compatible en en CLASSPATH de la aplicaci&oacute;n */
 	private static void verificaBCVersion() throws InvalidExternalLibraryException {
 
-		try {	
-			AOUtil.classForName("org.bouncycastle.jce.provider.BouncyCastleProvider"); //$NON-NLS-1$
-		} 
-		catch(final Exception e) {   
-			return;
-		}
-
 		final String bcVersion = Platform.getBouncyCastleVersion();
+
+		if (bcVersion == null) {
+			throw new InvalidExternalLibraryException(
+				"No se ha econtrado el proveedor BouncyCastleProvider", //$NON-NLS-1$
+				"VerifyPlatformAction.3", //$NON-NLS-1$
+				null
+			);
+		}
 
 		if (BC_VERSION.compareTo(bcVersion) > 0) {
 			String javaExtDir = Platform.getJavaExtDir();
@@ -86,9 +87,10 @@ final class VerifyPlatformAction implements PrivilegedExceptionAction<Void> {
 			}
 
 			throw new InvalidExternalLibraryException(
-					"Existe una biblioteca en el sistema, externa a la aplicacion, que puede causar un mal funcionamiento de la aplicacion", //$NON-NLS-1$
-					"VerifyPlatformAction.2", //$NON-NLS-1$
-					new String[] {bcVersion, BC_VERSION, javaExtDir});
+				"Existe una biblioteca en el sistema, externa a la aplicacion, que puede causar un mal funcionamiento de la aplicacion", //$NON-NLS-1$
+				"VerifyPlatformAction.2", //$NON-NLS-1$
+				new String[] {bcVersion, BC_VERSION, javaExtDir}
+			);
 		}
 	}
 }
