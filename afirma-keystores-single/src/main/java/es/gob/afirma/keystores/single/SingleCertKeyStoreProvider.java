@@ -18,7 +18,7 @@ import java.security.Provider;
 public final class SingleCertKeyStoreProvider extends Provider {
 
     private static final long serialVersionUID = 3525417804439532445L;
-    
+
     private static final double PROVIDER_VERSION = 0.1d;
 
     /** Construye un proveedor de seguridad para apertura de certificados en fichero.
@@ -27,6 +27,7 @@ public final class SingleCertKeyStoreProvider extends Provider {
     public SingleCertKeyStoreProvider() {
         super("PKCS7", PROVIDER_VERSION, "KeyStore for a PKCS7 or X.509 certificate"); //$NON-NLS-1$ //$NON-NLS-2$
         AccessController.doPrivileged(new java.security.PrivilegedAction<Object>() {
+        	/** {@inheritdoc} */
             public Object run() {
                 put("KeyStore.PKCS7", "es.gob.afirma.keystores.single.SingleCertKeyStore"); //$NON-NLS-1$ //$NON-NLS-2$
                 return null;
