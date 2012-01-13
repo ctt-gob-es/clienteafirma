@@ -49,6 +49,10 @@ import es.gob.afirma.signers.pkcs7.SigUtils;
  * para crear un mensaje EncryptedData de BouncyCastle: <a
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
 final class CADESEncryptedData {
+	
+	private CADESEncryptedData() {
+		// No permitimos la instanciacion
+	}
 
     /** M&eacute;todo principal que genera la firma de tipo EncryptedData.
      * @param file

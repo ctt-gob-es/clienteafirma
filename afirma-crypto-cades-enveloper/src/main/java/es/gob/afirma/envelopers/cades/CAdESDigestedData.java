@@ -46,6 +46,10 @@ import es.gob.afirma.signers.pkcs7.SigUtils;
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
 
 final class CAdESDigestedData {
+	
+	private CAdESDigestedData() {
+		// No permitimos la instanciacion
+	}
 
     /** M&eacute;todo que genera la firma de tipo digestedData.
      * @param parameters

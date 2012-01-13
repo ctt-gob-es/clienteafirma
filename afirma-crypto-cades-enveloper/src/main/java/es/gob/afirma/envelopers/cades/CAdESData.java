@@ -35,6 +35,10 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
 
 final class CAdESData {
+	
+	private CAdESData() {
+		// No permitimos la instanciacion
+	}
 
     /** M&eacute;odo que genera una firma digital usando el sitema conocido como
      * Data y que consiste en el contenido del fichero codificado como un
