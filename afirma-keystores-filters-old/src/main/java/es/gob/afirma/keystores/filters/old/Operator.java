@@ -18,7 +18,11 @@ interface Operator
 {
     Operator EQ = new Operator()
     {
-        public boolean eval(Object o1, Object o2)
+    	/** Evalua la operaci&oacute;n.
+    	 * @param o1 Primer operando
+    	 * @param o2 Segundo operando
+    	 * @return Resultado de la evaluaci&oacute;n */
+        public boolean eval(final Object o1, final Object o2)
         {
             return o1.equals(o2);
         }
@@ -26,7 +30,11 @@ interface Operator
 
     Operator MATCHES = new Operator()
     {
-        public boolean eval(Object str, Object pattern)
+    	/** Evalua la operaci&oacute;n.
+    	 * @param str Cadena
+    	 * @param pattern Patr&oacute;n
+    	 * @return Resultado de la evaluaci&oacute;n */
+        public boolean eval(final Object str, final Object pattern)
         {
             boolean matches;
             matches = Pattern.matches((String) pattern, (String) str);
@@ -36,7 +44,11 @@ interface Operator
 
     Operator NOT_MATCHES = new Operator()
     {
-        public boolean eval(Object str, Object pattern)
+    	/** Evalua la operaci&oacute;n.
+    	 * @param str Cadena
+    	 * @param pattern Patr&oacute;n
+    	 * @return Resultado de la evaluaci&oacute;n */
+        public boolean eval(final Object str, final Object pattern)
         {
             boolean matches;
             matches = Pattern.matches((String) pattern, (String) str);
@@ -44,5 +56,9 @@ interface Operator
         }
     };
 
+    /** Evalua la operaci&oacute;n.
+	 * @param o1 Primer operando
+	 * @param o2 Segundo operando
+	 * @return Resultado de la evaluaci&oacute;n */
     boolean eval(Object o1, Object o2);
 }
