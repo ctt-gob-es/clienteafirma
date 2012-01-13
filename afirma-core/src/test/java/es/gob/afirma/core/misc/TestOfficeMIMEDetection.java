@@ -13,49 +13,48 @@ public final class TestOfficeMIMEDetection {
 	@Test
 	public void testExcelDetection() throws Exception {
 		final byte[] file = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream("excel.xls")); //$NON-NLS-1$
-		final String mime = new MimeHelper(file).getMimeType(); 
+		final String mime = new MimeHelper(file).getMimeType();
 		Assert.assertEquals("El MIME-Type obtenido no es correcto para el fichero Excel: " + mime, "application/vnd.ms-excel", mime); //$NON-NLS-1$ //$NON-NLS-2$
 	}
-	
+
 	/** Prueba la detecci&oacute;n de documentos Word.
 	 * @throws Exception */
 	@SuppressWarnings("static-method")
 	@Test
 	public void testWordDetection() throws Exception {
 		final byte[] file = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream("word.doc")); //$NON-NLS-1$
-		final String mime = new MimeHelper(file).getMimeType(); 
-		Assert.assertEquals("El MIME-Type obtenido no es correcto para el fichero Excel: " + mime, "application/msword", mime); //$NON-NLS-1$ //$NON-NLS-2$
+		final String mime = new MimeHelper(file).getMimeType();
+		Assert.assertEquals("El MIME-Type obtenido no es correcto para el fichero Word: " + mime, "application/msword", mime); //$NON-NLS-1$ //$NON-NLS-2$
 	}
-	
+
 	/** Prueba la detecci&oacute;n de documentos PowerPoint.
 	 * @throws Exception */
 	@SuppressWarnings("static-method")
 	@Test
 	public void testPowerPointDetection() throws Exception {
 		final byte[] file = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream("powerpoint.ppt")); //$NON-NLS-1$
-		final String mime = new MimeHelper(file).getMimeType(); 
-		Assert.assertEquals("El MIME-Type obtenido no es correcto para el fichero Excel: " + mime, "application/vnd.ms-powerpoint", mime); //$NON-NLS-1$ //$NON-NLS-2$
+		final String mime = new MimeHelper(file).getMimeType();
+		Assert.assertEquals("El MIME-Type obtenido no es correcto para el fichero PowerPoint: " + mime, "application/vnd.ms-powerpoint", mime); //$NON-NLS-1$ //$NON-NLS-2$
 	}
-	
+
 	/** Prueba la detecci&oacute;n de documentos Project.
 	 * @throws Exception */
 	@SuppressWarnings("static-method")
 	@Test
 	public void testProjectDetection() throws Exception {
 		final byte[] file = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream("project.mpp")); //$NON-NLS-1$
-		final String mime = new MimeHelper(file).getMimeType(); 
-		Assert.assertEquals("El MIME-Type obtenido no es correcto para el fichero Excel: " + mime, "application/vnd.ms-project", mime); //$NON-NLS-1$ //$NON-NLS-2$
+		final String mime = new MimeHelper(file).getMimeType();
+		Assert.assertEquals("El MIME-Type obtenido no es correcto para el fichero Project: " + mime, "application/vnd.ms-project", mime); //$NON-NLS-1$ //$NON-NLS-2$
 	}
-	
+
 	/** Prueba la detecci&oacute;n de documentos Visio.
 	 * @throws Exception */
 	@SuppressWarnings("static-method")
 	@Test
 	public void testVisioDetection() throws Exception {
 		final byte[] file = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream("visio.vsd")); //$NON-NLS-1$
-		final String mime = new MimeHelper(file).getMimeType(); 
-		Assert.assertEquals("El MIME-Type obtenido no es correcto para el fichero Excel: " + mime, "application/vnd.visio", mime); //$NON-NLS-1$ //$NON-NLS-2$
+		final String mime = new MimeHelper(file).getMimeType();
+		Assert.assertEquals("El MIME-Type obtenido no es correcto para el fichero Visio: " + mime, "application/vnd.visio", mime); //$NON-NLS-1$ //$NON-NLS-2$
 	}
-	
-	
+
 }
