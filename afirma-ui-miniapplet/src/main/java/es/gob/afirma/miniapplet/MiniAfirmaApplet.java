@@ -77,14 +77,22 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		}
 
 		final Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
-
+		final byte[] dataBinary;
+		try {
+			dataBinary = Base64.decode(dataB64); 
+		}
+		catch (final IOException e) {
+			setErrorMessage(e);
+			throw e;
+		}
+		
 		try {
 			return Base64.encodeBytes(AccessController.doPrivileged(new SignAction(
 					MiniAfirmaApplet.selectSigner(MiniAfirmaApplet.cleanParam(format), null), 
-					Base64.decode(dataB64),
+					dataBinary,
 					MiniAfirmaApplet.cleanParam(algorithm), 
 					this.selectPrivateKey(params), 
-					ExtraParamsProcessor.expandProperties(params)
+					ExtraParamsProcessor.expandProperties(params, format, dataBinary.length)
 			)));
 		}
 		catch (final AOFormatFileException e) {
@@ -95,11 +103,6 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			setErrorMessage(e);
 			throw e;
 		}
-		catch (final IOException e) {
-			setErrorMessage(e);
-			throw e;
-		}
-
 	}
 
 	/** {@inheritDoc} */
@@ -119,16 +122,24 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		}
 
 		final Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
-
+		final byte[] dataBinary;
+		try {
+			dataBinary = Base64.decode(dataB64); 
+		}
+		catch (final IOException e) {
+			setErrorMessage(e);
+			throw e;
+		}
+		
 		try {
 			final byte[] sign = Base64.decode(signB64);
 			return Base64.encodeBytes(AccessController.doPrivileged(new CoSignAction(
 					MiniAfirmaApplet.selectSigner(MiniAfirmaApplet.cleanParam(format), sign), 
 					sign, 
-					(dataB64 == null ? null : Base64.decode(dataB64)),
+					dataBinary,
 					MiniAfirmaApplet.cleanParam(algorithm), 
-					this.selectPrivateKey(params), 
-					ExtraParamsProcessor.expandProperties(params)
+					this.selectPrivateKey(params),
+					ExtraParamsProcessor.expandProperties(params, format, dataBinary != null ? dataBinary.length : 0)
 			)));
 		}
 		catch (final AOFormatFileException e) {

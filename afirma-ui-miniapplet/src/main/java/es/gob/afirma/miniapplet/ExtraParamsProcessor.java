@@ -20,6 +20,17 @@ import es.gob.afirma.core.signers.AOSignConstants;
  * y recogidas desde java en formato <code>Properties<code>. */
 final class ExtraParamsProcessor {
 
+	/** Clave expansible para pol&iacute;ticas de firma. */
+	private static final String EXPANDIBLE_POLICY_KEY = "expPolicy"; //$NON-NLS-1$
+	
+	/** Valor de la pol&iacute;tica de firma de la AGE. */
+	private static final String EXPANDIBLE_POLICY_VALUE_AGE = "FirmaAGE"; //$NON-NLS-1$
+	
+	/** Tama&ntilde;o de datos hasta el que, siguiendo los criterios de la pol&iacute;tica
+	 * de firma de la AGE, establecemos que es obligatorio que las firmas CAdES contengan
+	 * los datos firmados. A partir de este valor no se introducir&aacute;n los datos. */
+	private static final int MAX_IMPLICIT_CADES_SIZE = 3145728; // 3 MegaBytes
+	
 	private ExtraParamsProcessor() {
 		/* Constructor no publico */
 	}
@@ -54,11 +65,7 @@ final class ExtraParamsProcessor {
 		
 		return params;
 	}
-	
-	private static final String EXPANDIBLE_POLICY_KEY = "expPolicy"; //$NON-NLS-1$
-	
-	private static final String EXPANDIBLE_POLICY_VALUE_AGE = "FirmaAGE"; //$NON-NLS-1$
-	
+
 	/**
 	 * Devuelve la colecci&oacute;n de propiedades de entrada con las entradas que correspondan
 	 * expandidos. Se expandiran una serie de claves con valores predefinidos y se les
@@ -80,6 +87,32 @@ final class ExtraParamsProcessor {
 	 * @return Propiedades expandidas.
 	 */
 	static Properties expandProperties(final Properties params) {
+		return expandProperties(params, null, 0);
+	}
+	
+	/**
+	 * Devuelve la colecci&oacute;n de propiedades de entrada con las entradas que correspondan
+	 * expandidos. Se expandiran una serie de claves con valores predefinidos y se les
+	 * asignar&aacute; el valor correspondiente.
+	 * Una vez expandidos, se eliminaran estos par&aacute;metros de la lista. Si el expandir
+	 * los par&aacute;metros implica establer otras propiedades y estas ya est&aacute;n
+	 * definidas en el Properties, prevalecer&aacute;n los valores expandidos.<br/>
+	 * Entre los par&aacute;metros clave se encuentran:
+	 * <ul>
+     *  <li><b>expPolicy</b>: Configuracion de la pol&iacute;tica de firma. Posibles valores:
+     *   <ul><li><b>FirmaAGE</b>:
+     *    Establece los diversions par&aacute;metros para la configuraci&oacute;n de la
+     *    pol&iacute;tica de firma de la AGE.
+     *   </li>
+     *   </ul>
+     *  </li>
+     * </ul>
+	 * @param params Par&aacute;metros definidos para la operaci&oacute;n.
+	 * @param format Formato de firma.
+	 * @param dataSize Tama&ntilde;o de los datos firmados.
+	 * @return Propiedades expandidas.
+	 */
+	static Properties expandProperties(final Properties params, final String format, final int dataSize) {
 		
 		final Properties p = new Properties();
 		for (final String key : params.keySet().toArray(new String[0])) {
@@ -89,17 +122,22 @@ final class ExtraParamsProcessor {
 		if (p.containsKey(EXPANDIBLE_POLICY_KEY)) {
 			if (EXPANDIBLE_POLICY_VALUE_AGE.equals(p.getProperty(EXPANDIBLE_POLICY_KEY))) {
 				p.setProperty("policyIdentifier", //$NON-NLS-1$
-						"urn:oid:2.16.724.1.3.1.1.2.1.8");  //$NON-NLS-1$ 
+					"urn:oid:2.16.724.1.3.1.1.2.1.8");  //$NON-NLS-1$ 
 				p.setProperty("policyIdentifierHash", //$NON-NLS-1$
-						"V8lVVNGDCPen6VELRD1Ja8HARFk=");  //$NON-NLS-1$ 
+					"V8lVVNGDCPen6VELRD1Ja8HARFk=");  //$NON-NLS-1$ 
 				p.setProperty("policyIdentifierHashAlgorithm", //$NON-NLS-1$
-						"http://www.w3.org/2000/09/xmldsig#sha1"); //$NON-NLS-1$ 
+					"http://www.w3.org/2000/09/xmldsig#sha1"); //$NON-NLS-1$ 
 				p.setProperty("policyQualifier", //$NON-NLS-1$
-						"http://administracionelectronica.gob.es/es/ctt/politicafirma/politica_firma_AGE_v1_8.pdf"); //$NON-NLS-1$ 
-				p.setProperty("format", //$NON-NLS-1$
-						AOSignConstants.SIGN_FORMAT_XADES_DETACHED);
-				p.setProperty("mode", //$NON-NLS-1$
-						AOSignConstants.SIGN_MODE_IMPLICIT);
+					"http://administracionelectronica.gob.es/es/ctt/politicafirma/politica_firma_AGE_v1_8.pdf"); //$NON-NLS-1$
+				if (format != null && format.startsWith(AOSignConstants.SIGN_FORMAT_XADES)) {
+					p.setProperty("format", //$NON-NLS-1$
+							AOSignConstants.SIGN_FORMAT_XADES_DETACHED);
+				}
+				if (format != null && format.equals(AOSignConstants.SIGN_FORMAT_CADES)) {
+					p.setProperty("mode", //$NON-NLS-1$
+							dataSize < MAX_IMPLICIT_CADES_SIZE ? 
+									AOSignConstants.SIGN_MODE_IMPLICIT : AOSignConstants.SIGN_MODE_EXPLICIT);
+				}
 			}
 			p.remove(EXPANDIBLE_POLICY_KEY);
 		}
