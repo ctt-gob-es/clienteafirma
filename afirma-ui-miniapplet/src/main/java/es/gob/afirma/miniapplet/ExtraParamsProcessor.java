@@ -14,6 +14,8 @@ import java.io.ByteArrayInputStream;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import es.gob.afirma.core.signers.AOSignConstants;
+
 /** Clase de utilidad para el proceso de propiedades enviadas desde JavaScript
  * y recogidas desde java en formato <code>Properties<code>. */
 final class ExtraParamsProcessor {
@@ -94,6 +96,10 @@ final class ExtraParamsProcessor {
 						"http://www.w3.org/2000/09/xmldsig#sha1"); //$NON-NLS-1$ 
 				p.setProperty("policyQualifier", //$NON-NLS-1$
 						"http://administracionelectronica.gob.es/es/ctt/politicafirma/politica_firma_AGE_v1_8.pdf"); //$NON-NLS-1$ 
+				p.setProperty("format", //$NON-NLS-1$
+						AOSignConstants.SIGN_FORMAT_XADES_DETACHED);
+				p.setProperty("mode", //$NON-NLS-1$
+						AOSignConstants.SIGN_MODE_IMPLICIT);
 			}
 			p.remove(EXPANDIBLE_POLICY_KEY);
 		}
