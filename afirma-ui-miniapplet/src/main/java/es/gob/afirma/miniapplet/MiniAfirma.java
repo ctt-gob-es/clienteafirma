@@ -154,7 +154,7 @@ interface MiniAfirma {
      * @param description Descripci&oacute;n del tipo de fichero que se desea cargar.
      * @return El contenido del fichero codificado en Base64.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
-     * @deprecated
+     * @deprecated Sustituir por {@link #getFileNameContentBase64(String, String, String)}}.
      */
     @Deprecated
     String getFileContent(String title, String extensions, String description) throws PrivilegedActionException;
@@ -226,7 +226,7 @@ interface MiniAfirma {
      * @param description Descripci&oacute;n del tipo de fichero que se desea cargar.
      * @return Nombre del fichero seleccionado.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
-     * @deprecated
+     * @deprecated Esta funcionalidad no es necesaria para el uso del MiniApplet.
      */
     @Deprecated
     String loadFilePath(String title, String extensions, String description) throws PrivilegedActionException;
