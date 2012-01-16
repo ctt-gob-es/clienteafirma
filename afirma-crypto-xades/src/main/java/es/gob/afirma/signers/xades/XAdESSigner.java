@@ -185,23 +185,6 @@ final class XAdESSigner {
      *     </li>
      *    </ul>
      *   </dd>
-     *  <dt><b><i>mode</i></b></dt>
-     *   <dd>Indica si los datos deben contenerse en la firma. Los posibles valores son:
-     *    <ul>
-     *     <li>
-     *      <i>implicit</i> Los datos est&aacute;n contenidos en la firma. Este es el valor por defecto
-     *      y apoyado por el est&aacute;ndar.(<code>AOSignConstants.SIGN_MODE_IMPLICIT</code>)
-     *     </li>
-     *     <li>
-     *      <i>explicit</i> Los datos no están contenidos en la firma, sólo el hash de los mismos.
-     *      Incompatible con la firma enveloped. (<code>AOSignConstants.SIGN_MODE_EXPLICIT</code>)<br/>
-     *      <b>
-     *       <br>Importante: Las firmas XMLDSig expl&iacute;citas no se adec&uacute;an a ninguna normativa,
-     *       y pueden ser rechazadas por sistemas de validaci&oacute;n de firmas.
-     *      </b>
-     *     </li>
-     *    </ul> 
-     *   </dd>
      *  <dt><b><i>policyIdentifier</i></b></dt>
      *   <dd>Identificador de la pol&iacute;tica de firma (normalmente una URL hacia la pol&iacute;tica en formato XML procesable)</dd>
      *  <dt><b><i>policyIdentifierHash</i></b></dt>
