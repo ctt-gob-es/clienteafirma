@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -50,11 +50,11 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.SHA2AltNamesProvider;
 import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSimpleSignInfo;
 import es.gob.afirma.core.signers.AdESPolicy;
+import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
@@ -71,7 +71,7 @@ import es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper;
  *  <li>Firma separada de ficheros adjuntos al documento PDF.</li>
  * </ul>
  * <p>
- *  Estas mismas deficiencias provocan igualmente la incompatibilidad de las firmas generadas con "Carpetas PDF" (<i>Portfolios PDF</i>). 
+ *  Estas mismas deficiencias provocan igualmente la incompatibilidad de las firmas generadas con "Carpetas PDF" (<i>Portfolios PDF</i>).
  *  Cuando se encuentran documentos PDF con ficheros adjuntos o empotrados se imprime informaci&oacute;n relativa en consola.
  * </p>
  * <p>
@@ -80,21 +80,21 @@ import es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper;
  * </p>
  */
 public final class AOPDFSigner implements AOSigner {
-    
+
     private static final int CSIZE = 8000;
-    
+
     private static final String PADES_BES_SUBFILTER = "ETSI.CAdES.detached"; //$NON-NLS-1$
-    
+
     private static final String PDF_FILE_SUFFIX = ".pdf"; //$NON-NLS-1$
     private static final String PDF_FILE_HEADER = "%PDF-"; //$NON-NLS-1$
-    
+
     /** Versi&oacute;n de iText necesaria para el uso de esta clase (2.1.7). */
     private static final String ITEXT_VERSION = "2.1.7"; //$NON-NLS-1$
-    
+
     /** Versi&oacute;n de BouncyCastle necesaria para el uso de esta clase (1.46 o superior). */
     private static final String BC_VERSION = "1.46"; //$NON-NLS-1$
-    
-    /** Construye un firmador PAdES, comprobando que la versiones existentes en el <i>CLASSPATH</i> de iText y BouncyCastle sean las adecuadas. 
+
+    /** Construye un firmador PAdES, comprobando que la versiones existentes en el <i>CLASSPATH</i> de iText y BouncyCastle sean las adecuadas.
      * @throws UnsupportedOperationException si se encuentra bibliotecas iText o BouncyCastle en versiones incompatibles */
     public AOPDFSigner() {
         final String itextVersion = Platform.getITextVersion();
@@ -106,7 +106,7 @@ public final class AOPDFSigner implements AOSigner {
             throw new UnsupportedOperationException("Se necesita BouncyCastle version igual o superior a " + BC_VERSION + ", pero se ha encontrado la version: " + bcVersion); //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
-    
+
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");  //$NON-NLS-1$
 
     /** Referencia a la &uacute;ltima p&aacute;gina del documento PDF. */
@@ -130,7 +130,7 @@ public final class AOPDFSigner implements AOSigner {
      *  Adicionalmente, es posible, si el fichero de entrada estaba cifrado y protegido con contrase&ntilde;a, que la salida sea un documento PDF
      *  igualmente cifrado y protegido con contrase&ntilde;a. Consulte la documentaci&oacute;n de la opci&oacute;n <code>avoidEncryptingSignedPdfs</code>
      *  para m&aacute;s informaci&oacute;n.
-     * </p>  
+     * </p>
      * @param data Documento PDF a firmar
      * @param algorithm Algoritmo a usar para la firma.
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
@@ -153,7 +153,7 @@ public final class AOPDFSigner implements AOSigner {
      *  <dt><b><i>signField</i></b></dt>
      *   <dd>
      *    Nombre del campo en donde insertar la firma.
-     *    Si el documento PDF tiene ya un campo de firma precreado es posible utilizarlo para insertar la firma generada, referenci&aacute;ndolo 
+     *    Si el documento PDF tiene ya un campo de firma precreado es posible utilizarlo para insertar la firma generada, referenci&aacute;ndolo
      *    por su nombre.<br>
      *    Si se indica un nombre de campo de firma que no exista en el documento PDF proporcionado, se generar&aacute; una excepci&oacute;n.
      *   </dd>
@@ -161,7 +161,7 @@ public final class AOPDFSigner implements AOSigner {
      *   <dd>Ciudad en la que se realiza la firma (este dato se a&ntilde;ade al diccionario PDF, y no a la propia firma).</dd>
      *  <dt><b><i>signerContact</i></b></dt>
      *   <dd>
-     *    Contacto del firmante, usualmente una direcci&oacute;n de coreo electr&oacute;nico 
+     *    Contacto del firmante, usualmente una direcci&oacute;n de coreo electr&oacute;nico
      *    (este dato se a&ntilde;ade al diccionario PDF, y no a la propia firma).
      *   </dd>
      *  <dt><b><i>signaturePage</i></b></dt>
@@ -172,16 +172,16 @@ public final class AOPDFSigner implements AOSigner {
      *   </dd>
      *  <dt><b><i>policyIdentifier</i></b></dt>
      *   <dd>
-     *    Identificador de la pol&iacute;tica de firma. Debe ser un OID (o una URN de tipo OID) que identifique 
+     *    Identificador de la pol&iacute;tica de firma. Debe ser un OID (o una URN de tipo OID) que identifique
      *    &uacute;nivocamente la pol&iacute;tica en formato ASN.1 procesable.
      *   </dd>
      *  <dt><b><i>policyIdentifierHash</i></b></dt>
      *   <dd>
      *    Huella digital del documento de pol&iacute;tica de firma (normalmente del mismo fichero en formato ASN.1 procesable).
-     *    Si no se indica una huella digital y el par&aacute;metro <code>policyIdentifier</code> no es una URL accesible 
+     *    Si no se indica una huella digital y el par&aacute;metro <code>policyIdentifier</code> no es una URL accesible
      *    universalmente se usar&aacute; <code>0</code>, mientras que si no se indica una huella digital pero el par&aacute;metro
      *    <code>policyIdentifier</code> es una URL accesible universalmente, se descargara el fichero apuntado por la URL para calcular la huella
-     *    digital <i>al vuelo</i>.     
+     *    digital <i>al vuelo</i>.
      *   </dd>
      *  <dt><b><i>policyIdentifierHashAlgorithm</i></b></dt>
      *   <dd>
@@ -235,7 +235,7 @@ public final class AOPDFSigner implements AOSigner {
 
         String signAlgorithm = algorithm;
 
-        if (!algorithm.equals(AOSignConstants.SIGN_ALGORITHM_MD5WITHRSA) 
+        if (!algorithm.equals(AOSignConstants.SIGN_ALGORITHM_MD5WITHRSA)
         	&& !algorithm.equals(AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA)
             && !algorithm.equals(AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA)
             && !algorithm.equals(AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA)
@@ -255,14 +255,14 @@ public final class AOPDFSigner implements AOSigner {
         }
         catch (final CertificateException e) {
             throw new AOException("Error en el certificado de firma: " + e, e); //$NON-NLS-1$
-        } 
-        catch (NoSuchAlgorithmException e) {
+        }
+        catch (final NoSuchAlgorithmException e) {
         	throw new AOException("Error el en algoritmo de firma: " + e, e); //$NON-NLS-1$
-		} 
-        catch (IOException e) {
+		}
+        catch (final IOException e) {
         	throw new AOException("Error firmando el PDF: " + e, e); //$NON-NLS-1$
-		} 
-        catch (DocumentException e) {
+		}
+        catch (final DocumentException e) {
         	throw new AOException("Error en el tratamiento del PDF: " + e, e); //$NON-NLS-1$
 		}
     }
@@ -312,7 +312,7 @@ public final class AOPDFSigner implements AOSigner {
      *  <dt><b><i>signField</i></b></dt>
      *   <dd>
      *    Nombre del campo en donde insertar la firma.
-     *    Si el documento PDF tiene ya un campo de firma precreado es posible utilizarlo para insertar la firma generada, referenci&aacute;ndolo 
+     *    Si el documento PDF tiene ya un campo de firma precreado es posible utilizarlo para insertar la firma generada, referenci&aacute;ndolo
      *    por su nombre.<br>
      *    Si se indica un nombre de campo de firma que no exista en el documento PDF proporcionado, se generar&aacute; una excepci&oacute;n.
      *   </dd>
@@ -320,7 +320,7 @@ public final class AOPDFSigner implements AOSigner {
      *   <dd>Ciudad en la que se realiza la firma (este dato se a&ntilde;ade al diccionario PDF, y no a la propia firma).</dd>
      *  <dt><b><i>signerContact</i></b></dt>
      *   <dd>
-     *    Contacto del firmante, usualmente una direcci&oacute;n de coreo electr&oacute;nico 
+     *    Contacto del firmante, usualmente una direcci&oacute;n de coreo electr&oacute;nico
      *    (este dato se a&ntilde;ade al diccionario PDF, y no a la propia firma).
      *   </dd>
      *  <dt><b><i>signaturePage</i></b></dt>
@@ -331,16 +331,16 @@ public final class AOPDFSigner implements AOSigner {
      *   </dd>
      *  <dt><b><i>policyIdentifier</i></b></dt>
      *   <dd>
-     *    Identificadora de la pol&iacute;tica de firma. Debe ser un OID (o una URN de tipo OID) que identifique 
+     *    Identificadora de la pol&iacute;tica de firma. Debe ser un OID (o una URN de tipo OID) que identifique
      *    &uacute;nivocamente la pol&iacute;tica en formato ASN.1 procesable.
      *   </dd>
      *  <dt><b><i>policyIdentifierHash</i></b></dt>
      *   <dd>
      *    Huella digital del documento de pol&iacute;tica de firma (normalmente del mismo fichero en formato ASN.1 procesable).
-     *    Si no se indica una huella digital y el par&aacute;metro <code>policyIdentifier</code> no es una URL accesible 
+     *    Si no se indica una huella digital y el par&aacute;metro <code>policyIdentifier</code> no es una URL accesible
      *    universalmente se usar&aacute; <code>0</code>, mientras que si no se indica una huella digital pero el par&aacute;metro
      *    <code>policyIdentifier</code> es una URL accesible universalmente, se descargara el fichero apuntado por la URL para calcular la huella
-     *    digital <i>al vuelo</i>.     
+     *    digital <i>al vuelo</i>.
      *   </dd>
      *  <dt><b><i>policyIdentifierHashAlgorithm</i></b></dt>
      *   <dd>
@@ -390,10 +390,10 @@ public final class AOPDFSigner implements AOSigner {
      * </dl>
      * @return Documento PDF firmado en formato PAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-    public byte[] cosign(final byte[] data, 
-                         final byte[] sign, 
-                         final String algorithm, 
-                         final PrivateKeyEntry keyEntry, 
+    public byte[] cosign(final byte[] data,
+                         final byte[] sign,
+                         final String algorithm,
+                         final PrivateKeyEntry keyEntry,
                          final Properties extraParams) throws AOException {
         return sign(sign, algorithm, keyEntry, extraParams);
     }
@@ -442,7 +442,7 @@ public final class AOPDFSigner implements AOSigner {
      *  <dt><b><i>signField</i></b></dt>
      *   <dd>
      *    Nombre del campo en donde insertar la firma.
-     *    Si el documento PDF tiene ya un campo de firma precreado es posible utilizarlo para insertar la firma generada, referenci&aacute;ndolo 
+     *    Si el documento PDF tiene ya un campo de firma precreado es posible utilizarlo para insertar la firma generada, referenci&aacute;ndolo
      *    por su nombre.<br>
      *    Si se indica un nombre de campo de firma que no exista en el documento PDF proporcionado, se generar&aacute; una excepci&oacute;n.
      *   </dd>
@@ -450,7 +450,7 @@ public final class AOPDFSigner implements AOSigner {
      *   <dd>Ciudad en la que se realiza la firma (este dato se a&ntilde;ade al diccionario PDF, y no a la propia firma).</dd>
      *  <dt><b><i>signerContact</i></b></dt>
      *   <dd>
-     *    Contacto del firmante, usualmente una direcci&oacute;n de coreo electr&oacute;nico 
+     *    Contacto del firmante, usualmente una direcci&oacute;n de coreo electr&oacute;nico
      *    (este dato se a&ntilde;ade al diccionario PDF, y no a la propia firma).
      *   </dd>
      *  <dt><b><i>signaturePage</i></b></dt>
@@ -461,16 +461,16 @@ public final class AOPDFSigner implements AOSigner {
      *   </dd>
      *  <dt><b><i>policyIdentifier</i></b></dt>
      *   <dd>
-     *    Identificadora de la pol&iacute;tica de firma. Debe ser un OID (o una URN de tipo OID) que identifique 
+     *    Identificadora de la pol&iacute;tica de firma. Debe ser un OID (o una URN de tipo OID) que identifique
      *    &uacute;nivocamente la pol&iacute;tica en formato ASN.1 procesable.
      *   </dd>
      *  <dt><b><i>policyIdentifierHash</i></b></dt>
      *   <dd>
      *    Huella digital del documento de pol&iacute;tica de firma (normalmente del mismo fichero en formato ASN.1 procesable).
-     *    Si no se indica una huella digital y el par&aacute;metro <code>policyIdentifier</code> no es una URL accesible 
+     *    Si no se indica una huella digital y el par&aacute;metro <code>policyIdentifier</code> no es una URL accesible
      *    universalmente se usar&aacute; <code>0</code>, mientras que si no se indica una huella digital pero el par&aacute;metro
      *    <code>policyIdentifier</code> es una URL accesible universalmente, se descargara el fichero apuntado por la URL para calcular la huella
-     *    digital <i>al vuelo</i>.     
+     *    digital <i>al vuelo</i>.
      *   </dd>
      *  <dt><b><i>policyIdentifierHashAlgorithm</i></b></dt>
      *   <dd>
@@ -537,7 +537,7 @@ public final class AOPDFSigner implements AOSigner {
     /** Devuelve el nombre de fichero de firma predeterminado que se recomienda usar para
      * un PDF firmado con nombre original igual al proporcionado.
      * En este caso el resultado ser&aacute; siempre el nombre original m&aacute;s un
-     * sufijo adicional (opcional) previo a la extensi&oacute;n. 
+     * sufijo adicional (opcional) previo a la extensi&oacute;n.
      * Siempre se termina el nombre de fichero con la extensi&oacute;n <i>.pdf</i>, incluso si el nombre original carec&iacute;a de esta.
      * @param originalName Nombre del fichero original que se firma.
      * @param inText Sufijo a agregar al nombre de fichero devuelto, inmediatamente anterior a la extensi&oacute;n.
@@ -547,10 +547,10 @@ public final class AOPDFSigner implements AOSigner {
         if (originalName == null) {
             return "signed.pdf"; //$NON-NLS-1$
         }
-        if (originalName.toLowerCase().endsWith(PDF_FILE_SUFFIX)) { 
-            return originalName.substring(0, originalName.length() - PDF_FILE_SUFFIX.length()) + inTextInt + PDF_FILE_SUFFIX; 
+        if (originalName.toLowerCase().endsWith(PDF_FILE_SUFFIX)) {
+            return originalName.substring(0, originalName.length() - PDF_FILE_SUFFIX.length()) + inTextInt + PDF_FILE_SUFFIX;
         }
-        return originalName + inTextInt + PDF_FILE_SUFFIX; 
+        return originalName + inTextInt + PDF_FILE_SUFFIX;
     }
 
     /** Recupera el &aacute;rbol de nodos de firma de una firma electr&oacute;nica.
@@ -570,9 +570,9 @@ public final class AOPDFSigner implements AOSigner {
      *        titulares certificados.
      * @return &Aacute;rbol de nodos de firma o <code>null</code> en caso de error. */
     public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
-        
+
         SHA2AltNamesProvider.install();
-        
+
         final AOTreeNode root = new AOTreeNode("Datos"); //$NON-NLS-1$
         final AcroFields af;
 
@@ -714,16 +714,16 @@ public final class AOPDFSigner implements AOSigner {
         }
     }
 
-    private byte[] signPDF(final PrivateKeyEntry ke, 
-                           final byte[] inPDF, 
-                           final Properties extraParams, 
-                           final String algorithm) throws IOException, 
-                                                          AOException, 
-                                                          DocumentException, 
-                                                          NoSuchAlgorithmException, 
+    private byte[] signPDF(final PrivateKeyEntry ke,
+                           final byte[] inPDF,
+                           final Properties extraParams,
+                           final String algorithm) throws IOException,
+                                                          AOException,
+                                                          DocumentException,
+                                                          NoSuchAlgorithmException,
                                                           CertificateException {
 
-        final boolean useSystemDateTime = Boolean.parseBoolean(extraParams.getProperty("applySystemDate", Boolean.TRUE.toString())); //$NON-NLS-1$ 
+        final boolean useSystemDateTime = Boolean.parseBoolean(extraParams.getProperty("applySystemDate", Boolean.TRUE.toString())); //$NON-NLS-1$
         final String reason = extraParams.getProperty("signReason"); //$NON-NLS-1$
         final String signField = extraParams.getProperty("signField"); //$NON-NLS-1$
         final String signatureProductionCity = extraParams.getProperty("signatureProductionCity"); //$NON-NLS-1$
@@ -732,7 +732,7 @@ public final class AOPDFSigner implements AOSigner {
         try {
             page = Integer.parseInt(extraParams.getProperty("signaturePage")); //$NON-NLS-1$
         }
-        catch (final Exception e) { 
+        catch (final Exception e) {
             /* Se deja la pagina tal y como esta */
         }
 
@@ -750,7 +750,7 @@ public final class AOPDFSigner implements AOSigner {
             // Comprobamos que el signer esta en modo interactivo, y si no lo
             // esta no pedimos contrasena por dialogo, principalmente para no interrumpir un firmado por lotes
             // desatendido
-            if (Boolean.TRUE.toString().equalsIgnoreCase(extraParams.getProperty("headLess"))) { //$NON-NLS-1$ 
+            if (Boolean.TRUE.toString().equalsIgnoreCase(extraParams.getProperty("headLess"))) { //$NON-NLS-1$
                 throw new AOException("La contrasena proporcionada no es valida para el PDF actual", e); //$NON-NLS-1$
             }
             // La contrasena que nos han proporcionada no es buena o no nos
@@ -764,8 +764,8 @@ public final class AOPDFSigner implements AOSigner {
             }
         }
 
-        if (pdfReader.getCertificationLevel() != PdfSignatureAppearance.NOT_CERTIFIED && !Boolean.TRUE.toString().equalsIgnoreCase(extraParams.getProperty("allowSigningCertifiedPdfs"))) { //$NON-NLS-1$ 
-            if (Boolean.FALSE.toString().equalsIgnoreCase(extraParams.getProperty("allowSigningCertifiedPdfs"))) { //$NON-NLS-1$ 
+        if (pdfReader.getCertificationLevel() != PdfSignatureAppearance.NOT_CERTIFIED && !Boolean.TRUE.toString().equalsIgnoreCase(extraParams.getProperty("allowSigningCertifiedPdfs"))) { //$NON-NLS-1$
+            if (Boolean.FALSE.toString().equalsIgnoreCase(extraParams.getProperty("allowSigningCertifiedPdfs"))) { //$NON-NLS-1$
                 throw new UnsupportedOperationException("No se permite la firma de PDF certificados (el paramtro allowSigningCertifiedPdfs estaba establecido a false)"); //$NON-NLS-1$
             }
 
@@ -773,7 +773,7 @@ public final class AOPDFSigner implements AOSigner {
                 throw new UnsupportedOperationException("No se permite la firma de PDF certificados (el paramtro allowSigningCertifiedPdfs no estaba establecido y no se permiten dialogos graficos)"); //$NON-NLS-1$
             }
 
-            if (AOUIFactory.NO_OPTION == AOUIFactory.showConfirmDialog(null, 
+            if (AOUIFactory.NO_OPTION == AOUIFactory.showConfirmDialog(null,
                                                                        PDFMessages.getString("AOPDFSigner.8"), //$NON-NLS-1$
                                                                        PDFMessages.getString("AOPDFSigner.9"), //$NON-NLS-1$
                                                                        AOUIFactory.YES_NO_OPTION,
@@ -884,7 +884,7 @@ public final class AOPDFSigner implements AOSigner {
         }
 
         if (pdfReader.isEncrypted() && ownerPassword != null) {
-            if (Boolean.TRUE.toString().equalsIgnoreCase(extraParams.getProperty("avoidEncryptingSignedPdfs"))) { //$NON-NLS-1$ 
+            if (Boolean.TRUE.toString().equalsIgnoreCase(extraParams.getProperty("avoidEncryptingSignedPdfs"))) { //$NON-NLS-1$
                 LOGGER.info(
                     "Aunque el PDF original estaba encriptado no se encriptara el PDF firmado (se establecio el indicativo 'avoidEncryptingSignedPdfs')" //$NON-NLS-1$
                 );
@@ -970,13 +970,10 @@ public final class AOPDFSigner implements AOSigner {
         // **************** CALCULO DEL SIGNED DATA ***************************************
         // ********************************************************************************
 
-        // La norma PAdES establece que si el algoritmo de huella digital es SHA1 debe usarse SigningCertificateV2, y en cualquier
-        // otro caso SigningCertificateV2
 		byte[] pk = GenCAdESEPESSignedData.generateSignedData(
-            new P7ContentSignerParameters(inPDF, algorithm, chain), 
+            new P7ContentSignerParameters(inPDF, algorithm, chain),
             true, // omitContent
             new AdESPolicy(extraParams),
-            ("SHA1".equals(AOSignConstants.getDigestAlgorithmName(algorithm))) ? false : true, // true -> isSigningCertificateV2, false -> isSigningCertificateV1 //$NON-NLS-1$
             ke,
             MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(algorithm)).digest(AOUtil.getDataFromInputStream(sap.getRangeStream())),
             true // Modo PAdES
@@ -1001,18 +998,18 @@ public final class AOPDFSigner implements AOSigner {
                 else {
                     final String tsaHashAlgorithm = extraParams.getProperty("tsaHashAlgorithm"); //$NON-NLS-1$
                     pk = new CMSTimestamper(
-                         !(Boolean.FALSE.toString()).equalsIgnoreCase(extraParams.getProperty("tsaRequireCert")),  //$NON-NLS-1$ 
-                         tsaPolicy, 
-                         tsaURL, 
+                         !(Boolean.FALSE.toString()).equalsIgnoreCase(extraParams.getProperty("tsaRequireCert")),  //$NON-NLS-1$
+                         tsaPolicy,
+                         tsaURL,
                          extraParams.getProperty("tsaUsr"),  //$NON-NLS-1$
                          extraParams.getProperty("tsaPwd") //$NON-NLS-1$
                      ).addTimestamp(pk, AOAlgorithmID.getOID(AOSignConstants.getDigestAlgorithmName((tsaHashAlgorithm != null) ? tsaHashAlgorithm : "SHA1"))); //$NON-NLS-1$
                 }
             }
-            
+
         }
       //************** FIN SELLO DE TIEMPO ****************
-        
+
 
         // ********************************************************************************
         // *************** FIN CALCULO DEL SIGNED DATA ************************************
@@ -1054,7 +1051,7 @@ public final class AOPDFSigner implements AOSigner {
             return "signed.pdf"; //$NON-NLS-1$
         }
         if (originalName.endsWith(PDF_FILE_SUFFIX)) { //{
-            return originalName.replace(PDF_FILE_SUFFIX, ".signed.pdf"); //$NON-NLS-1$ 
+            return originalName.replace(PDF_FILE_SUFFIX, ".signed.pdf"); //$NON-NLS-1$
         }
         if (originalName.endsWith(".PDF")) { //$NON-NLS-1$
             return originalName.replace(".PDF", ".signed.pdf"); //$NON-NLS-1$ //$NON-NLS-2$

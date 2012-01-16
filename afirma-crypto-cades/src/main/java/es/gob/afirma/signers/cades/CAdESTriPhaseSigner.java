@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -101,7 +101,7 @@ import es.gob.afirma.signers.pkcs7.SigUtils;
  * <p align="center"><img src="doc-files/CAdESTriPhaseSigner-2.png"></p>
  * <ul>
  *  <li>
- *   El dispositivo m&oacute;vil realiza, de forma completamente aislada una firma electr&oacute;nica 
+ *   El dispositivo m&oacute;vil realiza, de forma completamente aislada una firma electr&oacute;nica
  *   simple (computacionalmente ligera) de los datos de la pre-firma. La clave privada del usuario nunca sale
  *   del dispositivo y no se expone externamente en ningún momento.
  *  </li>
@@ -110,24 +110,24 @@ import es.gob.afirma.signers.pkcs7.SigUtils;
  * <p align="center"><img src="doc-files/CAdESTriPhaseSigner-3.png"></p>
  * <ul>
  *  <li>
- *   El dispositivo m&oacute;vil solicita una post-firma al servidor Web indicando un identificador de 
+ *   El dispositivo m&oacute;vil solicita una post-firma al servidor Web indicando un identificador de
  *   documento y proporcionando el resultado de su pre-firma firmada.
  *  </li>
  *  <li>El servidor Web solicita el documento a servidor documental.</li>
  *  <li>El servidor documental entrega el documento al servidor Web.</li>
  *  <li>
- *   El servidor Web calcula la post-firma y compone el documento final firmado, entregando el resultado 
+ *   El servidor Web calcula la post-firma y compone el documento final firmado, entregando el resultado
  *   al servidor documental para su almac&eacute;n.
  *  </li>
  *  <li>El servidor documental almacena el nuevo documento y devuelve un identificador al servidor Web.</li>
  *  <li>
- *   El servidor Web comunica al dispositivo el éxito de la operacion y el identificador del fichero 
+ *   El servidor Web comunica al dispositivo el éxito de la operacion y el identificador del fichero
  *   ya firmado y almacenado.
  *  </li>
  * </ul>
  * <p>
- *  El esquema podr’a ser igualmente implementado sin servidor documental, pudiendo obtener el Servidor Web el documento 
- *  desde otro origen, incluyendo el propio dispositivo m&oacute;vil. Igualmente, una vez firmado el documento, su destino 
+ *  El esquema podr’a ser igualmente implementado sin servidor documental, pudiendo obtener el Servidor Web el documento
+ *  desde otro origen, incluyendo el propio dispositivo m&oacute;vil. Igualmente, una vez firmado el documento, su destino
  *  puede ser cualquiera, incluyendo de nuevo al propio dispositivo.
  * </p>
  * <p>
@@ -137,37 +137,35 @@ import es.gob.afirma.signers.pkcs7.SigUtils;
  * </p>
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class CAdESTriPhaseSigner {
-    
+
     private CAdESTriPhaseSigner() {
      // No permitimos la instanciacion
     }
-    
+
     /**
      * Genera los atributos firmados CAdES (prefirma).
      * @param digestAlgorithmName Algoritmo de huella digital
      * @param content Datos a firmar (usar <code>null</code> si no se desean a&ntilde;adir a la firma)
      * @param signerCertificateChain Cadena de certificados del firmante
      * @param policy Pol&iacute;tica de firma
-     * @param signingCertificateV2 <code>true</code> para usar SigningCertificateV2, <code>false</code> para usar V1
      * @param messageDigest Valor de la huella digital del contenido (usar <code>null</code> si se estableci&oacute; <code>content</code>)
      * @param signDate Fecha de la firma (debe establecerse externamente para evitar desincronismos en la firma trif&aacute;sica)
      * @param padesMode <code>true</code> para generar una firma CAdES compatible PAdES, <code>false</code> para generar una firma CAdES normal
      * @return Atributos CAdES a firmar (prefirma) en formato ASN.1
      * @throws AOException
      */
-    public static byte[] preSign(final String digestAlgorithmName, 
-                          final byte[] content, 
+    public static byte[] preSign(final String digestAlgorithmName,
+                          final byte[] content,
                           final X509Certificate[] signerCertificateChain,
                           final AdESPolicy policy,
-                          final boolean signingCertificateV2,
                           final byte[] messageDigest,
                           final Date signDate,
                           final boolean padesMode) throws AOException {
-                
+
         if (signerCertificateChain == null || signerCertificateChain.length == 0) {
             throw new IllegalArgumentException("La cadena de certificados debe contener al menos una entrada"); //$NON-NLS-1$
-        } 
-        
+        }
+
         // Atributos firmados
         final ASN1Set signedAttributes;
         try {
@@ -178,7 +176,6 @@ public final class CAdESTriPhaseSigner {
                      digestAlgorithmName,
                      content,
                      policy,
-                     signingCertificateV2,
                      messageDigest,
                      signDate,
                      padesMode
@@ -189,7 +186,7 @@ public final class CAdESTriPhaseSigner {
         catch(final Exception e) {
             throw new AOException("Error obteniendo los atributos a firmar", e); //$NON-NLS-1$
         }
-        
+
         try {
             return signedAttributes.getEncoded(ASN1Encodable.DER);
         }
@@ -198,7 +195,7 @@ public final class CAdESTriPhaseSigner {
         }
 
     }
-    
+
     /** Realiza una firma CAdES completa.
      * @param digestAlgorithmName Algoritmo de huella digital
      * @param content Datos a firmar (usar <code>null</code> si no se desean a&ntilde;adir a la firma)
@@ -206,7 +203,7 @@ public final class CAdESTriPhaseSigner {
      * @param signature Firma PKCS#1 v1.5 de los atributos firmados
      * @param signedAttributes Atributos firmados (prefirma)
      * @return Firma CAdES completa
-     * @throws AOException  
+     * @throws AOException
      */
     public static byte[] postSign(final String digestAlgorithmName,
                            final byte[] content,
@@ -214,11 +211,11 @@ public final class CAdESTriPhaseSigner {
                            final byte[] signature,
                            final byte[] signedAttributes
                ) throws AOException {
-        
+
         if (signerCertificateChain == null || signerCertificateChain.length == 0) {
             throw new IllegalArgumentException("La cadena de certificados debe contener al menos una entrada"); //$NON-NLS-1$
         }
-                        
+
         final TBSCertificateStructure tbsCertificateStructure;
         try {
             tbsCertificateStructure = TBSCertificateStructure.getInstance(ASN1Object.fromByteArray(signerCertificateChain[0].getTBSCertificate()));
@@ -226,11 +223,11 @@ public final class CAdESTriPhaseSigner {
         catch(final Exception e) {
             throw new AOException("No se ha podido crear la estructura de certificados", e); //$NON-NLS-1$
         }
-        
+
         final SignerIdentifier signerIdentifier = new SignerIdentifier(
            new IssuerAndSerialNumber(X500Name.getInstance(tbsCertificateStructure.getIssuer()), tbsCertificateStructure.getSerialNumber().getValue())
         );
-        
+
         // Algoritmo de huella digital
         final AlgorithmIdentifier digestAlgorithmOID;
         try {
@@ -239,7 +236,7 @@ public final class CAdESTriPhaseSigner {
         catch (final Exception e) {
             throw new AOException("Error obteniendo el OID en ASN.1 del algoritmo de huella digital", e); //$NON-NLS-1$
         }
-        
+
         // EncryptionAlgorithm
         final AlgorithmIdentifier keyAlgorithmIdentifier;
         try {
@@ -248,7 +245,7 @@ public final class CAdESTriPhaseSigner {
         catch (final Exception e) {
             throw new AOException("Error al codificar el algoritmo de cifrado", e); //$NON-NLS-1$
         }
-        
+
         // Firma PKCS#1 codificada
         final ASN1OctetString encodedPKCS1Signature = new DEROctetString(signature);
 
@@ -256,15 +253,15 @@ public final class CAdESTriPhaseSigner {
         final ASN1Set asn1SignedAttributes;
         try {
             asn1SignedAttributes = (ASN1Set) ASN1Object.fromByteArray(signedAttributes);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new AOException("Error en la inclusion de la recuperacion de los SignedAttibutes", e); //$NON-NLS-1$
         }
-        
+
         // SignerInfo
         final ASN1EncodableVector signerInfo = new ASN1EncodableVector();
         signerInfo.add(new SignerInfo(signerIdentifier, digestAlgorithmOID, asn1SignedAttributes, keyAlgorithmIdentifier, encodedPKCS1Signature, null));
-        
-        
+
+
         // ContentInfo
         final ContentInfo contentInfo;
         if (content != null) {
@@ -293,13 +290,13 @@ public final class CAdESTriPhaseSigner {
             }
         }
         final ASN1Set certificates = SigUtils.createBerSetFromList(ce);
-        
+
         // Algoritmos de huella digital
         final ASN1EncodableVector digestAlgorithms = new ASN1EncodableVector();
         digestAlgorithms.add(digestAlgorithmOID);
 
         return new ContentInfo(
-           PKCSObjectIdentifiers.signedData, 
+           PKCSObjectIdentifiers.signedData,
            new SignedData(
               new DERSet(digestAlgorithms),
               contentInfo,
@@ -308,7 +305,7 @@ public final class CAdESTriPhaseSigner {
               new DERSet(signerInfo)
            )
         ).getDEREncoded();
-        
+
     }
 
 }

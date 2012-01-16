@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -49,22 +49,20 @@ import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.SigUtils;
 
-/** Utilidades varias relacionadas con firmas electr&oacute;nicas CAdES. 
+/** Utilidades varias relacionadas con firmas electr&oacute;nicas CAdES.
  * Se declara como clase p&uacute;blica para permitir su uso en el m&oacute;dulo de multifirmas CAdES */
 public final class CAdESUtils {
-    
+
     private CAdESUtils() {
         // No permitimos la instanciacion
     }
-    
+
     /** Genera la parte que contiene la informaci&oacute;n del
      * Usuario. Se generan los atributos que se necesitan para generar la firma.
      * @param cert Certificado del firmante
      * @param digestAlgorithmName Nombre del algoritmo de huella digital a usar
      * @param datos Datos firmados
      * @param policy Pol&iacute;tica de firma
-     * @param signingCertificateV2 {@code true} para utilizar la versi&oacute;n 2 del campo
-     * signingCertificate, {@code false} para utilizar la versi&oacute;n 1.  
      * @param messageDigest Huella digital de los datos firmados
      * @param signDate Fecha de la firma (debe establecerse externamente para evitar desincronismos en la firma trif&aacute;sica)
      * @param padesMode <code>true</code> para generar una firma CAdES compatible PAdES, <code>false</code> para generar una firma CAdES normal
@@ -76,24 +74,23 @@ public final class CAdESUtils {
                                                   final String digestAlgorithmName,
                                                   final byte[] datos,
                                                   final AdESPolicy policy,
-                                                  final boolean signingCertificateV2,
                                                   final byte[] messageDigest,
                                                   final Date signDate,
                                                   final boolean padesMode) throws NoSuchAlgorithmException,
                                                                                      IOException,
-                                                                                     CertificateEncodingException { 
-        
+                                                                                     CertificateEncodingException {
+
         // ALGORITMO DE HUELLA DIGITAL
         final AlgorithmIdentifier digestAlgorithmOID = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithmName));
-        
+
         // // ATRIBUTOS
 
         // authenticatedAttributes
         final ASN1EncodableVector contexExpecific = initContexExpecific(
-                digestAlgorithmName, 
-                datos, 
-                PKCSObjectIdentifiers.data.getId(), 
-                messageDigest, 
+                digestAlgorithmName,
+                datos,
+                PKCSObjectIdentifiers.data.getId(),
+                messageDigest,
                 signDate,
                 padesMode
         );
@@ -102,7 +99,7 @@ public final class CAdESUtils {
         // comentar lo de abajo para version del rfc 3852
         // contexExpecific.add(new Attribute(RFC4519Style.serialNumber, new DERSet(new DERPrintableString(cert.getSerialNumber().toString()))));
 
-        if (signingCertificateV2) {
+        if (!"SHA1".equals(AOSignConstants.getDigestAlgorithmName(digestAlgorithmName))) { //$NON-NLS-1$
 
             // INICIO SINGING CERTIFICATE-V2
 
@@ -132,7 +129,7 @@ public final class CAdESUtils {
              * PolicyQualifierId, qualifier ANY DEFINED BY policyQualifierId } */
 
             final SigningCertificateV2 scv2;
-            if(policy.getPolicyIdentifier() != null) {                                                
+            if(policy.getPolicyIdentifier() != null) {
 
                 /** SigningCertificateV2 ::= SEQUENCE { certs SEQUENCE OF
                  * ESSCertIDv2, policies SEQUENCE OF PolicyInformation OPTIONAL
@@ -216,7 +213,7 @@ public final class CAdESUtils {
              *     hashValue        OCTET STRING }
              *
              */
-            
+
 
             // Algoritmo para el hash
             final AlgorithmIdentifier hashid;
@@ -241,9 +238,9 @@ public final class CAdESUtils {
             else{
                 hashed = new byte[]{0};
             }
-            
+
             final DigestInfo otherHashAlgAndValue = new DigestInfo(hashid, hashed);
-            
+
             /**
              *   AOSigPolicyQualifierInfo ::= SEQUENCE {
              *       SigPolicyQualifierId  SigPolicyQualifierId,
@@ -253,7 +250,7 @@ public final class CAdESUtils {
             if(policy.getPolicyQualifier()!=null){
                 spqInfo = new AOSigPolicyQualifierInfo(policy.getPolicyQualifier().toString());
             }
-            
+
             /**
              * SignaturePolicyId ::= SEQUENCE {
              *  sigPolicyId           SigPolicyId,
@@ -281,7 +278,7 @@ public final class CAdESUtils {
 
         return contexExpecific;
     }
-    
+
     /**
      * Obtiene un PolicyInformation a partir de los datos de la pol&iacute;tica.
      * Sirve para los datos de SigningCertificate y SigningCertificateV2. Tiene que llevar algunos
@@ -290,9 +287,9 @@ public final class CAdESUtils {
      * PolicyInformation ::= SEQUENCE {
      * policyIdentifier   CertPolicyId,
      * policyQualifiers   SEQUENCE SIZE (1..MAX) OF
-     *                          PolicyQualifierInfo OPTIONAL }                          
-     *                          
-     *                          
+     *                          PolicyQualifierInfo OPTIONAL }
+     *
+     *
      * CertPolicyId ::= OBJECT IDENTIFIER
      *
      * PolicyQualifierInfo ::= SEQUENCE {
@@ -328,22 +325,22 @@ public final class CAdESUtils {
      *      bmpString        BMPString      (SIZE (1..200)),
      *      utf8String       UTF8String     (SIZE (1..200)) }
      * </pre>
-     * 
+     *
      * @param policy    Pol&iacute;tica de la firma.
      * @return          Estructura con la pol&iacute;tica preparada para insertarla en la firma.
      */
     private static PolicyInformation[] getPolicyInformation(final AdESPolicy policy){
-        
+
         if (policy == null) {
             throw new IllegalArgumentException("La politica de firma no puede ser nula en este punto"); //$NON-NLS-1$
         }
-        
+
         /**
          * PolicyQualifierInfo ::= SEQUENCE {
          *          policyQualifierId  PolicyQualifierId,
-         *          qualifier          ANY DEFINED BY policyQualifierId } 
+         *          qualifier          ANY DEFINED BY policyQualifierId }
          */
-        
+
         final PolicyQualifierId pqid = PolicyQualifierId.id_qt_cps;
         DERIA5String uri = null;
 
@@ -358,14 +355,14 @@ public final class CAdESUtils {
             v.add(uri);
             pqi = new PolicyQualifierInfo(new DERSequence(v));
         }
-        
+
         /**
          * PolicyInformation ::= SEQUENCE {
          *     policyIdentifier   CertPolicyId,
          *     policyQualifiers   SEQUENCE SIZE (1..MAX) OF
          *                          PolicyQualifierInfo OPTIONAL }
          */
-        
+
         if (policy.getPolicyQualifier()==null || pqi == null) {
             return new PolicyInformation[] {
                 new PolicyInformation(new DERObjectIdentifier(policy.getPolicyIdentifier().toLowerCase().replace("urn:oid:", ""))) //$NON-NLS-1$ //$NON-NLS-2$
@@ -375,14 +372,14 @@ public final class CAdESUtils {
         return new PolicyInformation[] {
             new PolicyInformation(new DERObjectIdentifier(policy.getPolicyIdentifier().toLowerCase().replace("urn:oid:", "")), new DERSequence(pqi)) //$NON-NLS-1$ //$NON-NLS-2$
         };
-        
+
     }
-    
+
     /** Inicializa el contexto. */
-    static ASN1EncodableVector initContexExpecific(final String digestAlgorithm, 
-                                                   final byte[] datos, 
-                                                   final String dataType, 
-                                                   final byte[] messageDigest, 
+    static ASN1EncodableVector initContexExpecific(final String digestAlgorithm,
+                                                   final byte[] datos,
+                                                   final String dataType,
+                                                   final byte[] messageDigest,
                                                    final Date signDate,
                                                    final boolean padesMode) throws NoSuchAlgorithmException {
         // authenticatedAttributes
@@ -403,5 +400,5 @@ public final class CAdESUtils {
 
         return contexExpecific;
     }
-    
+
 }

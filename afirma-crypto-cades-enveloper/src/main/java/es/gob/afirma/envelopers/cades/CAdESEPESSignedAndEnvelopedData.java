@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -99,7 +99,7 @@ import es.gob.afirma.signers.pkcs7.SignedAndEnvelopedData;
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
 
 final class CAdESEPESSignedAndEnvelopedData {
-    
+
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     private ASN1Set signedAttr2;
@@ -112,10 +112,6 @@ final class CAdESEPESSignedAndEnvelopedData {
      *        Configuraci&oacute;n del algoritmo para firmar
      * @param policy
      *        Pol&iacute;tica del certificado.
-     * @param signingCertificateV2
-     *        <code>true</code> si se desea usar la versi&oacute;n 2 del
-     *        atributo <i>Signing Certificate</i> <code>false</code> para
-     *        usar la versi&oacute;n 1
      * @param certDest
      *        Certificado del destino al cual va dirigido la firma.
      * @param dataType
@@ -134,7 +130,6 @@ final class CAdESEPESSignedAndEnvelopedData {
     byte[] genCADESEPESSignedAndEnvelopedData(final P7ContentSignerParameters parameters,
                                                      final AOCipherConfig config,
                                                      final AdESPolicy policy,
-                                                     final boolean signingCertificateV2,
                                                      final X509Certificate[] certDest,
                                                      final String dataType,
                                                      final PrivateKeyEntry keyEntry) throws IOException,
@@ -193,7 +188,6 @@ final class CAdESEPESSignedAndEnvelopedData {
                                          digestAlgorithm,
                                          parameters.getContent(),
                                          policy,
-                                         signingCertificateV2,
                                          null);
         this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
         final ASN1Set signedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
@@ -293,8 +287,7 @@ final class CAdESEPESSignedAndEnvelopedData {
     byte[] addOriginatorInfo(final InputStream data,
                                     final P7ContentSignerParameters parameters,
                                     final PrivateKeyEntry keyEntry,
-                                    final AdESPolicy policy,
-                                    final boolean signingCertificateV2) {
+                                    final AdESPolicy policy) {
         // boolean isValid = false;
         byte[] retorno = null;
         try {
@@ -359,7 +352,6 @@ final class CAdESEPESSignedAndEnvelopedData {
                                                      digestAlgorithm,
                                                      parameters.getContent(),
                                                      policy,
-                                                     signingCertificateV2,
                                                      null);
                     this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
                     final ASN1Set signedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
@@ -409,5 +401,5 @@ final class CAdESEPESSignedAndEnvelopedData {
         }
         return retorno;
     }
-    
+
 }

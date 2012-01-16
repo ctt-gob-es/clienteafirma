@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -31,7 +31,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 
 /** Funcionalidad de sobres digitales con CAdES. */
 public class AOCAdESEnveloper implements AOEnveloper {
-    
+
     /** M&eacute;todo que realiza el resto de firmas permitidas por CADES. Son
      * las siguientes: <br/>
      * <ul>
@@ -61,7 +61,7 @@ public class AOCAdESEnveloper implements AOEnveloper {
      * @param certDest
      *        Certificados de los usuarios a los que va destinado el sobre
      *        digital.
-     * @param cipherAlgorithm 
+     * @param cipherAlgorithm
      *        Algoritmo utilizado para cifrar
      * @param xParams
      *        Par&aacute;metros adicionales
@@ -70,7 +70,7 @@ public class AOCAdESEnveloper implements AOEnveloper {
      *         Cuando ocurre cualquier problema en el proceso. */
     public byte[] envelop(final InputStream file,
                           final String digestAlgorithm,
-                          String type,
+                          final String type,
                           final PrivateKeyEntry keyEntry,
                           final X509Certificate[] certDest,
                           final AOCipherAlgorithm cipherAlgorithm,
@@ -78,8 +78,6 @@ public class AOCAdESEnveloper implements AOEnveloper {
                           final Properties xParams) throws AOException {
 
         final Properties extraParams = (xParams !=null) ? xParams : new Properties();
-
-        final boolean signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2", "false")); //$NON-NLS-1$ //$NON-NLS-2$
 
         // Comprobamos que el archivo a tratar no sea nulo.
         if (file == null) {
@@ -161,7 +159,6 @@ public class AOCAdESEnveloper implements AOEnveloper {
                         new CAdESEPESSignedAndEnvelopedData().genCADESEPESSignedAndEnvelopedData(csp,
                                                                                                  config,
                                                                                                  new AdESPolicy(extraParams),
-                                                                                                 signingCertificateV2,
                                                                                                  certDest,
                                                                                                  PKCSObjectIdentifiers.signedData.getId(),
                                                                                                  keyEntry);
@@ -193,7 +190,7 @@ public class AOCAdESEnveloper implements AOEnveloper {
      * @param key
      *        Puede ser una clave codificada o una contrase&ntilde;a usada
      *        para cifrar el contenido.
-     * @param cipherAlgorithm 
+     * @param cipherAlgorithm
      *        Algoritmo a usar para los cifrados
      * @param dataType OID del tipo de datos a encriptar
      * @return Contenido firmado

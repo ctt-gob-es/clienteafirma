@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -52,7 +52,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
  * </pre>
  */
 public final class GenCAdESEPESSignedData {
-    
+
     private GenCAdESEPESSignedData() {
         // No permitimos la instanciacion
     }
@@ -67,10 +67,6 @@ public final class GenCAdESEPESSignedData {
      *        <code>false</code> si en la firma se desea incluir el contenido del
      *        fichero o <code>true</code> si s&oacute;lo se desea usar una referencia.
      * @param policy Pol&iacute;tica de firma
-     * @param signingCertificateV2
-     *        <code>true</code> si se desea usar la versi&oacute;n 2 del
-     *        atributo <i>SigningCertificate</i> <code>false</code> para
-     *        usar la versi&oacute;n 1
      * @param keyEntry
      *        Entrada a la clave privada para firma.
      * @param messageDigest
@@ -91,10 +87,9 @@ public final class GenCAdESEPESSignedData {
     public static byte[] generateSignedData(final P7ContentSignerParameters parameters,
                                      final boolean omitContent,
                                      final AdESPolicy policy,
-                                     final boolean signingCertificateV2,
                                      final PrivateKeyEntry keyEntry,
-                                     byte[] messageDigest,
-                                     boolean padesMode) throws NoSuchAlgorithmException, CertificateException, IOException, AOException {
+                                     final byte[] messageDigest,
+                                     final boolean padesMode) throws NoSuchAlgorithmException, CertificateException, IOException, AOException {
 
         if (parameters == null) {
             throw new IllegalArgumentException("Los parametros no pueden ser nulos"); //$NON-NLS-1$
@@ -102,37 +97,35 @@ public final class GenCAdESEPESSignedData {
         final String signatureAlgorithm = parameters.getSignatureAlgorithm();
 
         final X509Certificate[] signerCertificateChain = parameters.getSignerCertificateChain();
-        
+
         final Date signDate = new Date();
-        
+
         final byte[] preSignature = CAdESTriPhaseSigner.preSign(
-            AOSignConstants.getDigestAlgorithmName(signatureAlgorithm), 
-            (omitContent) ? null : parameters.getContent(), 
-            signerCertificateChain, 
-            policy, 
-            signingCertificateV2, 
+            AOSignConstants.getDigestAlgorithmName(signatureAlgorithm),
+            (omitContent) ? null : parameters.getContent(),
+            signerCertificateChain,
+            policy,
             (messageDigest == null && parameters.getContent() != null) ?
                 MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(signatureAlgorithm)).digest(parameters.getContent()) :
                     messageDigest,
             signDate,
             padesMode
         );
-        
+
         final byte[] signature = PKCS1ExternalizableSigner.sign(signatureAlgorithm, keyEntry.getPrivateKey(), preSignature);
-        
+
         return CAdESTriPhaseSigner.postSign(
             AOSignConstants.getDigestAlgorithmName(signatureAlgorithm),
-            (omitContent) ? null : parameters.getContent(), 
-            signerCertificateChain,  
+            (omitContent) ? null : parameters.getContent(),
+            signerCertificateChain,
             signature,
             // Volvemos a crear la prefirma simulando una firma trifasica en la que la postfirma no cuenta con el
             // resultado de la prefirma
             CAdESTriPhaseSigner.preSign(
-                AOSignConstants.getDigestAlgorithmName(signatureAlgorithm), 
-                (omitContent) ? null : parameters.getContent(), 
-                signerCertificateChain, 
-                policy, 
-                signingCertificateV2, 
+                AOSignConstants.getDigestAlgorithmName(signatureAlgorithm),
+                (omitContent) ? null : parameters.getContent(),
+                signerCertificateChain,
+                policy,
                 (messageDigest == null && parameters.getContent() != null) ?
                     MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(signatureAlgorithm)).digest(parameters.getContent()) :
                         messageDigest,

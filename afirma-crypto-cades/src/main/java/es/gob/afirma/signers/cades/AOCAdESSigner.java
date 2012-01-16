@@ -59,9 +59,6 @@ public final class AOCAdESSigner implements AOSigner {
 
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-    /** Indica si por defecto se debe insertar el atributo SigningCertificateV2 en la firma. */
-    private static final boolean DEFAULT_USE_SIGNING_CERTIFICATE_V2 = true;
-
     /** Firma datos en formato CAdES.<br/>
      * @param data Datos que deseamos firmar.
      * @param algorithm Algoritmo a usar para la firma.
@@ -116,12 +113,6 @@ public final class AOCAdESSigner implements AOSigner {
      *     <code>data</code> son la huella digital de los datos a firmar, y no los datos a firmar en si.
      *    </b>
      *   </dd>
-     *  <dt><b><i>signingCertificateV2</i></b></dt>
-     *   <dd>
-     *    Debe establecerse a <code>true</code> si se desea usar la versi&oacute;n 2 del atributo
-     *    <i>Signing Certificate</i> de CAdES. Si no se establece un valor para este par&aacute;metro
-     *    o se hace a <code>false</code> se utilizara la versi&oacute;n 1
-     *   </dd>
      * </dl>
      * @return Firma en formato CAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
@@ -133,8 +124,6 @@ public final class AOCAdESSigner implements AOSigner {
         final Properties extraParams = (xParams != null) ? xParams : new Properties();
 
         final String precalculatedDigest = extraParams.getProperty("precalculatedHashAlgorithm"); //$NON-NLS-1$
-        final boolean signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2", Boolean.toString(DEFAULT_USE_SIGNING_CERTIFICATE_V2))); //$NON-NLS-1$
-
         byte[] messageDigest = null;
 
         if (precalculatedDigest != null) {
@@ -155,7 +144,6 @@ public final class AOCAdESSigner implements AOSigner {
                    csp,
                    omitContent,
                    new AdESPolicy(extraParams),
-                   signingCertificateV2,
                    keyEntry,
                    messageDigest,
                    Boolean.parseBoolean(extraParams.getProperty("padesMode", "false")) //$NON-NLS-1$ //$NON-NLS-2$
@@ -242,12 +230,6 @@ public final class AOCAdESSigner implements AOSigner {
      *     <code>data</code> son la huella digital de los datos a firmar, y no los datos a firmar en si.
      *    </b>
      *   </dd>
-     *  <dt><b><i>signingCertificateV2</i></b></dt>
-     *   <dd>
-     *    Debe establecerse a <code>true</code> si se desea usar la versi&oacute;n 2 del atributo
-     *    <i>Signing Certificate</i> de CAdES. Si no se establece un valor para este par&aacute;metro
-     *    o se hace a <code>false</code> se utilizara la versi&oacute;n 1
-     *   </dd>
      * </dl>
      * @return Firma CAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
@@ -328,12 +310,6 @@ public final class AOCAdESSigner implements AOSigner {
      *   <dd>
      *    URL que apunta al documento descriptivo de la pol&iacute;tica de firma (normalmente un documento PDF con una descripci&oacute;n textual).
      *   </dd>
-     *  <dt><b><i>signingCertificateV2</i></b></dt>
-     *   <dd>
-     *    Debe establecerse a <code>true</code> si se desea usar la versi&oacute;n 2 del atributo
-     *    <i>Signing Certificate</i> de CAdES. Si no se establece un valor para este par&aacute;metro
-     *    o se hace a <code>false</code> se utilizara la versi&oacute;n 1
-     *   </dd>
      * </dl>
      * @return Firma CAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
@@ -404,12 +380,6 @@ public final class AOCAdESSigner implements AOSigner {
      *  <dt><b><i>policyQualifier</i></b></dt>
      *   <dd>
      *    URL que apunta al documento descriptivo de la pol&iacute;tica de firma (normalmente un documento PDF con una descripci&oacute;n textual).
-     *   </dd>
-     *  <dt><b><i>signingCertificateV2</i></b></dt>
-     *   <dd>
-     *    Debe establecerse a <code>true</code> si se desea usar la versi&oacute;n 2 del atributo
-     *    <i>Signing Certificate</i> de CAdES. Si no se establece un valor para este par&aacute;metro
-     *    o se hace a <code>false</code> se utilizara la versi&oacute;n 1
      *   </dd>
      * </dl>
      * @return Contrafirma CAdES

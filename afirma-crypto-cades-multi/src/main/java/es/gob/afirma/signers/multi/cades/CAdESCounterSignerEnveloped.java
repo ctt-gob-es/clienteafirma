@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -67,30 +67,14 @@ final class CAdESCounterSignerEnveloped {
     private ASN1Set signedAttr2;
 
     private AdESPolicy globalPolicy;
-    private boolean globalSigningCertificateV2;
-    
+
     /** Establece la pol&iacute;tica de firma. */
     private void setGlobalPolicy(final AdESPolicy pol) {
         this.globalPolicy = pol;
     }
-    
+
     private AdESPolicy getGlobalPolicy() {
         return this.globalPolicy;
-    }
-
-    /** Obtiene el tipo de atributo firmado signingCertificate o
-     * signingCertificateV2
-     * @return tipo de atributo firmado. */
-    private boolean isGlobalSigningCertificateV2() {
-        return this.globalSigningCertificateV2;
-    }
-
-    /** Define si el atributo firmado es signingCertificate o
-     * signingCertificateV2
-     * @param globalsigningCertificateV2
-     *        tipo de atributo */
-    private void setGlobalsigningCertificateV2(final boolean globalsigningCertificateV2) {
-        this.globalSigningCertificateV2 = globalsigningCertificateV2;
     }
 
     /** Constructor de la clase. Se crea una contrafirma a partir de los datos
@@ -109,10 +93,6 @@ final class CAdESCounterSignerEnveloped {
      * @param keyEntry
      *        Clave privada a usar para firmar.
      * @param policy Pol&iacute;tica de firma
-     * @param signingCertificateV2
-     *        <code>true</code> si se desea usar la versi&oacute;n 2 del
-     *        atributo <i>Signing Certificate</i> <code>false</code> para
-     *        usar la versi&oacute;n 1
      * @return El archivo de firmas con la nueva firma.
      * @throws java.io.IOException
      *         Excepci&oacute;n cuando se produce algun error con lectura
@@ -131,13 +111,11 @@ final class CAdESCounterSignerEnveloped {
                                 final CounterSignTarget targetType,
                                 final int[] targets,
                                 final PrivateKeyEntry keyEntry,
-                                final AdESPolicy policy,
-                                final boolean signingCertificateV2) throws IOException, NoSuchAlgorithmException, CertificateException, AOException {
+                                final AdESPolicy policy) throws IOException, NoSuchAlgorithmException, CertificateException, AOException {
 
         // Introducimos la pol&iacute;tica en variable global por comodidad.
         // &Eacute;sta no var&iacute;a.
         this.setGlobalPolicy(policy);
-        this.setGlobalsigningCertificateV2(signingCertificateV2);
 
         final ASN1InputStream is = new ASN1InputStream(data);
 
@@ -622,8 +600,8 @@ final class CAdESCounterSignerEnveloped {
     private SignerInfo getCounterNodeUnsignedAtributes(final SignerInfo signerInfo,
                                                        final P7ContentSignerParameters parameters,
                                                        final X509Certificate cert,
-                                                       final PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException, 
-                                                                                              IOException, 
+                                                       final PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException,
+                                                                                              IOException,
                                                                                               CertificateException {
 
         final ASN1EncodableVector signerInfosU = new ASN1EncodableVector();
@@ -866,9 +844,9 @@ final class CAdESCounterSignerEnveloped {
      * @throws java.security.NoSuchAlgorithmException
      * @throws java.io.IOException
      * @throws java.security.cert.CertificateException */
-    private SignerInfo unsignedAtributte(final P7ContentSignerParameters parameters, 
-                                         final X509Certificate cert, 
-                                         final SignerInfo si, 
+    private SignerInfo unsignedAtributte(final P7ContentSignerParameters parameters,
+                                         final X509Certificate cert,
+                                         final SignerInfo si,
                                          final PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException,
                                                                                                                                              IOException,
                                                                                                                                              CertificateException {
@@ -884,13 +862,12 @@ final class CAdESCounterSignerEnveloped {
                  digestAlgorithm,
                  si.getEncryptedDigest().getOctets(),
                  getGlobalPolicy(),
-                 isGlobalSigningCertificateV2(),
                  null,
                  new Date(),
                  false
             );
         this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExcepcific));
-        
+
         final ASN1Set unsignedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExcepcific));
 
         // 5. SIGNERINFO
@@ -905,7 +882,7 @@ final class CAdESCounterSignerEnveloped {
         // // FIN ATRIBUTOS
 
         // digEncryptionAlgorithm
-        AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID("RSA")); //$NON-NLS-1$
+        final AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID("RSA")); //$NON-NLS-1$
 
         // Firma del SignerInfo
         // ByteArrayInputStream signerToDigest = new

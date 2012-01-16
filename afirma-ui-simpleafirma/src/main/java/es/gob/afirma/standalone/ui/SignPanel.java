@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -121,7 +121,7 @@ public final class SignPanel extends JPanel {
     final JButton selectButton = new JButton();
 
     final SimpleAfirma saf;
-    
+
     ProgressMonitor pm = new ProgressMonitor(SignPanel.this, Messages.getString("SignPanel.15"), "", 0, 1000);  //$NON-NLS-1$//$NON-NLS-2$
 
     /** Indica si la operaci&oacute;n a realizar es una cofirma. */
@@ -158,7 +158,7 @@ public final class SignPanel extends JPanel {
                     Messages.getString("SignPanel.25"), //$NON-NLS-1$
                     JOptionPane.ERROR_MESSAGE
             );
-            this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));          
+            this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             return;
         }
 
@@ -395,11 +395,11 @@ public final class SignPanel extends JPanel {
             super(true);
             createUI(al, firstTime);
         }
-        
+
         private void createUI(final ActionListener al, final boolean firstTime) {
             this.setLayout(new BorderLayout(5, 5));
             this.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-            
+
             SignPanel.this.selectButton.setText(Messages.getString("SignPanel.32")); //$NON-NLS-1$
             if (al != null) {
                 SignPanel.this.selectButton.addActionListener(al);
@@ -465,9 +465,10 @@ public final class SignPanel extends JPanel {
             this.add(welcomeLabel, BorderLayout.PAGE_START);
 
             String intro = Messages.getString("SignPanel.40"); //$NON-NLS-1$
-            
+
             try {
                 @SuppressWarnings("restriction")
+				final
 				int nReaders = javax.smartcardio.TerminalFactory.getDefault().terminals().list().size();
                 if (nReaders == 1) {
                     intro = intro + Messages.getString("SignPanel.2"); //$NON-NLS-1$
@@ -476,8 +477,8 @@ public final class SignPanel extends JPanel {
                     intro = intro + Messages.getString("SignPanel.4"); //$NON-NLS-1$
                 }
             }
-            catch(Exception e) { /* Ignoramos los errores */ }
-            
+            catch(final Exception e) { /* Ignoramos los errores */ }
+
             final JLabel introText = new JLabel(intro);
             introText.setLabelFor(SignPanel.this.selectButton);
             introText.setFocusable(false);
@@ -497,7 +498,7 @@ public final class SignPanel extends JPanel {
                 selectPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
                 welcomeLabel.setForeground(new Color(3399));
             }
-           
+
         }
     }
 
@@ -556,7 +557,7 @@ public final class SignPanel extends JPanel {
                 SignPanel.this.filePanel.setForeground(Color.LIGHT_GRAY);
                 buttonPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
             }
-            
+
             this.add(buttonPanel, BorderLayout.PAGE_END);
         }
     }
@@ -584,7 +585,7 @@ public final class SignPanel extends JPanel {
                               final String filePath,
                               final String fileDescription,
                               final Date fileLastModified) {
-            
+
             this.setBorder(BorderFactory.createLineBorder(Color.black));
             this.setLayout(new GridBagLayout());
 
@@ -614,7 +615,7 @@ public final class SignPanel extends JPanel {
                 this.setBackground(LookAndFeelManager.WINDOW_COLOR);
                 detailPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
             }
-            
+
             final GridBagConstraints c = new GridBagConstraints();
             c.fill = GridBagConstraints.BOTH;
             c.weightx = 0.0;
@@ -637,10 +638,10 @@ public final class SignPanel extends JPanel {
             c.gridx = 2;
             c.insets = new Insets(11, 6, 11, 11);
             c.anchor = GridBagConstraints.NORTHEAST;
-            
+
             // Si es una firma la abriremos desde el mismo aplicativo
             final boolean isSign = filePath.endsWith(".csig") || filePath.endsWith(".xsig"); //$NON-NLS-1$ //$NON-NLS-2$
-            
+
             if (isSign || UIUtils.hasAssociatedApplication(filePath.substring(filePath.lastIndexOf(".")))) { //$NON-NLS-1$
                 final JButton openFileButton = new JButton(Messages.getString("SignPanel.51")); //$NON-NLS-1$
                 openFileButton.setMnemonic('v');
@@ -701,18 +702,18 @@ public final class SignPanel extends JPanel {
         this.signButton.setEnabled(e);
         this.saf.setSignMenuCommandEnabled(e);
     }
-    
+
     private final class SignTask extends SwingWorker<Void, Void> {
-        
+
         public SignTask() {
             super();
         }
 
         @Override
         public Void doInBackground() {
-            
+
             SignPanel.this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
-            
+
             if (SignPanel.this.signer == null || SignPanel.this.dataToSign == null || SignPanel.this.saf == null) {
                 return null;
             }
@@ -753,15 +754,14 @@ public final class SignPanel extends JPanel {
 
             final Properties p = new Properties();
             p.put("mode", "implicit"); //$NON-NLS-1$ //$NON-NLS-2$
-            p.put("signingCertificateV2", "true"); //$NON-NLS-1$ //$NON-NLS-2$
             p.put("ignoreStyleSheets", "false"); //$NON-NLS-1$ //$NON-NLS-2$
 
             setSignCommandEnabled(false);
-            
+
             SignPanel.this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
-            
+
             SignPanel.this.pm.setProgress(999);
-            
+
             // Deshabilitamos la posibilidad de cancelar el dialogo de espera
             try {
                 final JDialog dialog = (JDialog) SignPanel.this.pm.getAccessibleContext().getAccessibleParent();
@@ -769,33 +769,33 @@ public final class SignPanel extends JPanel {
                 ((JOptionPane)dialog.getContentPane().getComponent(0)).setOptions(new Object[]{});
             }
             catch(final Exception e) { /* Ignoramos los errores */ }
-            
+
             try {
                 final Field jProgressBarField = ProgressMonitor.class.getDeclaredField("myBar"); //$NON-NLS-1$
                 jProgressBarField.setAccessible(true);
-                JProgressBar progressBar = (JProgressBar) jProgressBarField.get(SignPanel.this.pm);
-                
+                final JProgressBar progressBar = (JProgressBar) jProgressBarField.get(SignPanel.this.pm);
+
                 final Method setIndeterminateMethod = JProgressBar.class.getMethod("setIndeterminate", Boolean.TYPE); //$NON-NLS-1$
                 setIndeterminateMethod.invoke(progressBar, Boolean.TRUE);
-                
+
                 if (Platform.OS.MACOSX.equals(Platform.getOS())) {
                     final Method putCLientPropertyMethod = JProgressBar.class.getMethod("putClientProperty", Object.class, Object.class); //$NON-NLS-1$
                     putCLientPropertyMethod.invoke(progressBar, "JProgressBar.style", "circular"); //$NON-NLS-1$ //$NON-NLS-2$
                 }
 
-            } 
+            }
             catch (final Exception e) {
                 Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
                         "No se ha podido mostrar la barra de progreso indeterminado: " + e); //$NON-NLS-1$
             }
-            
+
             try { Thread.sleep(5000); } catch(final Exception e) { /* Ignoramos los errores */ }
 
             final byte[] signResult;
             try {
                 if (SignPanel.this.cosign) {
                     signResult = SignPanel.this.signer.cosign(
-                		SignPanel.this.dataToSign, 
+                		SignPanel.this.dataToSign,
                 		"SHA1withRSA", //$NON-NLS-1$
                         ksm.getKeyEntry(alias, KeyStoreUtilities.getCertificatePC(ksm.getType(), SignPanel.this)),
                         p
@@ -803,7 +803,7 @@ public final class SignPanel extends JPanel {
                 }
                 else {
                     signResult = SignPanel.this.signer.sign(
-                		SignPanel.this.dataToSign, 
+                		SignPanel.this.dataToSign,
                 		"SHA1withRSA", //$NON-NLS-1$
                         ksm.getKeyEntry(alias, KeyStoreUtilities.getCertificatePC(ksm.getType(), SignPanel.this)),
                         p
@@ -987,10 +987,10 @@ public final class SignPanel extends JPanel {
             }
             SignPanel.this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             SignPanel.this.saf.loadResultsPanel(signResult, newFileName, ksm.getCertificate(alias));
-        
+
             return null;
         }
-        
+
     }
-    
+
 }

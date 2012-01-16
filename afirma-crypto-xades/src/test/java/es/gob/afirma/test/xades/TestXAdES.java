@@ -48,7 +48,7 @@ import es.gob.afirma.signers.xml.Utils;
  *
  */
 public final class TestXAdES {
-    
+
     private static final String CERT_PATH = "ANF_PF_Activo.pfx"; //$NON-NLS-1$
     private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
     private static final String CERT_ALIAS = "anf usuario activo"; //$NON-NLS-1$
@@ -56,13 +56,13 @@ public final class TestXAdES {
 //    private static final String CERT_PATH2 = "CATCERT GENCAT SAFP PF Identidad y Firma Reconocida de Clase 1 Caducado.pfx"; //$NON-NLS-1$
 //    private static final String CERT_PASS2 = "1234"; //$NON-NLS-1$
 //    private static final String CERT_ALIAS2 = "{71e526c4-0f27-4f32-8be0-90df52dcbc53}"; //$NON-NLS-1$
-//    
+//
 //    private static final String CERT_PATH3 = "CAMERFIRMA_PF_SW_Clave_usuario_Activo.p12"; //$NON-NLS-1$
 //    private static final String CERT_PASS3 = "1111"; //$NON-NLS-1$
 //    private static final String CERT_ALIAS3 = "1"; //$NON-NLS-1$
-    
+
     private static final Properties[] XADES_MODES;
-    
+
     static {
         final Properties p1 = new Properties();
         p1.setProperty("format", AOSignConstants.SIGN_FORMAT_XADES_DETACHED); //$NON-NLS-1$
@@ -76,8 +76,8 @@ public final class TestXAdES {
         final Properties p2 = new Properties();
         p2.setProperty("format", AOSignConstants.SIGN_FORMAT_XADES_DETACHED); //$NON-NLS-1$
         p2.setProperty("mode", AOSignConstants.SIGN_MODE_EXPLICIT); //$NON-NLS-1$
-        
-        
+
+
         final Properties p3 = new Properties();
         p3.setProperty("format", AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED); //$NON-NLS-1$
         p3.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
@@ -90,26 +90,26 @@ public final class TestXAdES {
         final Properties p5 = new Properties();
         p5.setProperty("format", AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING); //$NON-NLS-1$
         p5.setProperty("mode", AOSignConstants.SIGN_MODE_EXPLICIT); //$NON-NLS-1$
-        
+
         final Properties p6 = new Properties();
         p6.setProperty("format", AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING); //$NON-NLS-1$
         p6.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
         p6.setProperty("encoding", "Base64"); //$NON-NLS-1$ //$NON-NLS-2$
-        
-        
+
+
         XADES_MODES = new Properties[] {
                 p1, p2, p3, p4, p5, p6
         };
     }
-    
+
     /** Algoritmos de firma a probar. */
     private final static String[] ALGOS = new String[] {
-            AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, 
+            AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
             AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
             AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA,
             AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA
     };
-    
+
     // IMPORTANTE: Poner extension ".xml" a los ficheros de prueba con contenido XML
     private static final String[] TEST_FILES_DATA = new String[] {
             "TEST_PDF_Certified.pdf", //$NON-NLS-1$
@@ -122,14 +122,14 @@ public final class TestXAdES {
             "sample-internal-dtd.xml", //$NON-NLS-1$
             "sample-namespace-encoding-us-ascii.xml" //$NON-NLS-1$
     };
-    
+
     private static final String[] TEST_FILES_MULTISIGN = new String[] {
             "sample-factura-firmada-30.xml", //$NON-NLS-1$
             "sample-factura-firmada-31.xml", //$NON-NLS-1$
             "sample-factura-firmada-32v1.xsig.xml", //$NON-NLS-1$
             "sample-facturae-firmada.xsig.xml" //$NON-NLS-1$
     };
-    
+
     /** Pruebas de cofirma.
      * @throws Exception Cuando ocurre un error */
     @SuppressWarnings("static-method")
@@ -143,39 +143,38 @@ public final class TestXAdES {
         pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
 
         final AOSigner signer = new AOXAdESSigner();
-        
+
         final Properties p = new Properties();
         p.put("mode", "implicit"); //$NON-NLS-1$ //$NON-NLS-2$
-        p.put("signingCertificateV2", "true"); //$NON-NLS-1$ //$NON-NLS-2$
         p.put("ignoreStyleSheets", "false"); //$NON-NLS-1$ //$NON-NLS-2$
-        
+
         String prueba;
-        
+
 //        es.gob.afirma.platform.ws.TestSignVerifier verifier = null;
 //        try {
 //          verifier = new es.gob.afirma.platform.ws.TestSignVerifier();
-//        } 
+//        }
 //        catch (Exception e) {
 //          System.out.println("No se ha podido inicializar el validador de firmas, no se validaran como parte de las pruebas: " + e); //$NON-NLS-1$
 //        }
-        
+
         for (final String algo : ALGOS) {
           for(final String filename : TEST_FILES_MULTISIGN) {
-                                
+
             prueba = "Cofirma XAdES con el algoritmo '" + //$NON-NLS-1$
             algo + "' y el fichero '" + filename + "'"; //$NON-NLS-1$ //$NON-NLS-2$
-            
+
             System.out.println();
             System.out.println(prueba);
-            
+
             final byte[] data = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(filename));
-            
+
             final byte[] result = signer.cosign(data, algo, pke, p);
-                
+
             final File f = File.createTempFile(algo + "-" + filename.replace(".xml", "") + "-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-            java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
+            final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
             fos.write(result);
-            try { fos.flush(); fos.close(); } catch (Exception e) { 
+            try { fos.flush(); fos.close(); } catch (final Exception e) {
                 // Ignoramos los errores
             }
             System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
@@ -184,7 +183,7 @@ public final class TestXAdES {
 //            if (verifier != null) {
 //                Assert.assertTrue("Fallo al validar " + filename, verifier.verifyXML(result)); //$NON-NLS-1$
 //            }
-            
+
             Assert.assertTrue(isValidUnsignedProperties(new ByteArrayInputStream(result),null));
 
             Assert.assertNotNull(prueba, result);
@@ -203,18 +202,18 @@ public final class TestXAdES {
 	@Test
     @Ignore
     public void testSignExternalStyle() throws Exception {
-        
+
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
         final PrivateKeyEntry pke;
         final X509Certificate cert;
 
-        KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+        final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
         ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
         pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
         cert = (X509Certificate) ks.getCertificate(CERT_ALIAS);
 
-        AOSigner signer = new AOXAdESSigner();
-        
+        final AOSigner signer = new AOXAdESSigner();
+
         final Properties p1 = new Properties();
         p1.setProperty("format", AOSignConstants.SIGN_FORMAT_XADES_DETACHED); //$NON-NLS-1$
         p1.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
@@ -224,28 +223,28 @@ public final class TestXAdES {
         p1.setProperty("policyIdentifierHashAlgorithm", DigestMethod.SHA1);         //$NON-NLS-1$
         p1.setProperty("policyDescription", "Politica de firma electronica para las Administraciones Publicas en Espana"); //$NON-NLS-1$ //$NON-NLS-2$
         p1.setProperty("policyQualifier", "http://blogs.adobe.com/security/91014620_eusig_wp_ue.pdf"); //$NON-NLS-1$ //$NON-NLS-2$
-        
+
         String prueba;
-        
+
         for (final String algo : ALGOS) {
-                                
+
             prueba = "Firma XAdES con hoja de estilo externa con el algoritmo ': " + //$NON-NLS-1$
             algo +
             "'"; //$NON-NLS-1$
-            
+
             System.out.println();
             System.out.println(prueba);
-            
+
             final String filename = "external-style.xml"; //$NON-NLS-1$
-            
+
             final byte[] data = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(filename));
-            
+
             final byte[] result = signer.sign(data, algo, pke, p1);
-                
-            File f = File.createTempFile(algo + "-" + p1.getProperty("mode") + "-" + filename.replace(".xml", "") + "-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
-            java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
+
+            final File f = File.createTempFile(algo + "-" + p1.getProperty("mode") + "-" + filename.replace(".xml", "") + "-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
+            final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
             fos.write(result);
-            try { fos.flush(); fos.close(); } catch (Exception e) { 
+            try { fos.flush(); fos.close(); } catch (final Exception e) {
                 // Ignoramos los errores
             }
             System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
@@ -254,28 +253,28 @@ public final class TestXAdES {
 //                    if (verifier != null) {
 //                        Assert.assertTrue("Fallo al validar " + filename, verifier.verifyXML(result)); //$NON-NLS-1$
 //                    }
-            
+
             Assert.assertTrue(isValidUnsignedProperties(new ByteArrayInputStream(result),null));
 
             Assert.assertNotNull(prueba, result);
             Assert.assertTrue(signer.isSign(result));
-            
+
             AOTreeModel tree = signer.getSignersStructure(result, false);
             Assert.assertEquals("Datos", ((AOTreeNode) tree.getRoot()).getUserObject()); //$NON-NLS-1$
             Assert.assertEquals("ANF Usuario Activo", ((AOTreeNode) tree.getRoot()).getChildAt(0).getUserObject()); //$NON-NLS-1$
-            
+
             tree = signer.getSignersStructure(result, true);
             Assert.assertEquals("Datos", ((AOTreeNode) tree.getRoot()).getUserObject()); //$NON-NLS-1$
-            AOSimpleSignInfo simpleSignInfo = (AOSimpleSignInfo) ((AOTreeNode) tree.getRoot()).getChildAt(0).getUserObject();
-            
+            final AOSimpleSignInfo simpleSignInfo = (AOSimpleSignInfo) ((AOTreeNode) tree.getRoot()).getChildAt(0).getUserObject();
+
             Assert.assertNotNull(simpleSignInfo.getSigningTime());
-            Assert.assertEquals(cert, simpleSignInfo.getCerts()[0]);    
-                                
+            Assert.assertEquals(cert, simpleSignInfo.getCerts()[0]);
+
         }
-        
+
     }
-    
-    
+
+
     /**
      * Prueba de firma convencional.
      * @throws Exception en cualquier error
@@ -283,38 +282,38 @@ public final class TestXAdES {
     @SuppressWarnings("static-method")
 	@Test
     public void testSignature() throws Exception {
-        
+
 //        TestSignVerifier verifier = null;
 //        try {
 //            verifier = new TestSignVerifier();
-//        } 
+//        }
 //        catch (Exception e) {
 //            System.out.println("No se ha podido inicializar el validador de firmas, no se validaran como parte de las pruebas: " + e); //$NON-NLS-1$
 //        }
 
-        
+
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
         final PrivateKeyEntry pke;
         final X509Certificate cert;
 
-        KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+        final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
         ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
         pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
         cert = (X509Certificate) ks.getCertificate(CERT_ALIAS);
 
-        AOSigner signer = new AOXAdESSigner();
-        
+        final AOSigner signer = new AOXAdESSigner();
+
         String prueba;
-        
+
         for (final Properties extraParams : XADES_MODES) {
             for (final String algo : ALGOS) {
                 for (final String filename : TEST_FILES_DATA) {
-                    
+
                     // Omitimos la firma de binarios en modo enveloped
                     if ("XAdES Enveloped".equals(extraParams.getProperty("format")) && !filename.toLowerCase().endsWith(".xml")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                         break;
                     }
-                
+
                     prueba = "Firma XAdES en modo '" +  //$NON-NLS-1$
                     extraParams.getProperty("mode") +  //$NON-NLS-1$
                     ", formato '" + //$NON-NLS-1$
@@ -323,58 +322,58 @@ public final class TestXAdES {
                     algo +
                     "' y el fichero '" + //$NON-NLS-1$
                     filename + "'"; //$NON-NLS-1$
-                    
+
                     System.out.println();
                     System.out.println(prueba);
-                    
+
                     final byte[] data = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(filename));
-                    
+
                     final byte[] result = signer.sign(data, algo, pke, extraParams);
-                        
+
                     File f = File.createTempFile(algo + "-" + extraParams.getProperty("mode") + "-" + filename.replace(".xml", "") + "-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
                     java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
                     fos.write(result);
-                    try { fos.flush(); fos.close(); } catch (Exception e) { 
+                    try { fos.flush(); fos.close(); } catch (final Exception e) {
                         // Ignoramos los errores
                     }
                     System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
-    
+
 //                    // Enviamos a validar a AFirma
 //                    if (verifier != null) {
 //                        Assert.assertTrue("Fallo al validar " + filename, verifier.verifyXML(result)); //$NON-NLS-1$
 //                    }
-                    
+
                     Assert.assertTrue(isValidUnsignedProperties(new ByteArrayInputStream(result),null));
 
                     Assert.assertNotNull(prueba, result);
                     Assert.assertTrue(signer.isSign(result));
-                    
+
                     if ("implicit".equals(extraParams.getProperty("mode")) && (!filename.toLowerCase().endsWith(".xml")) && (!Arrays.equals(signer.getData(result), data))) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                         f = File.createTempFile(algo + "-" + extraParams.getProperty("mode") + "-" + filename.replace(".xml", "") + "-", "-" + filename); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
                         fos = new java.io.FileOutputStream(f);
                         fos.write(signer.getData(result));
-                        try { fos.flush(); fos.close(); } catch (Exception e) { /* Ignoramos los errores */ }
+                        try { fos.flush(); fos.close(); } catch (final Exception e) { /* Ignoramos los errores */ }
                         System.out.println("Temporal de los datos extraidos para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
                         Assert.fail("Los datos extraidos no coinciden con los originales: " + filename); //$NON-NLS-1$
                     }
-                    
+
                     AOTreeModel tree = signer.getSignersStructure(result, false);
                     Assert.assertEquals("Datos", ((AOTreeNode) tree.getRoot()).getUserObject()); //$NON-NLS-1$
                     Assert.assertEquals("ANF Usuario Activo", ((AOTreeNode) tree.getRoot()).getChildAt(0).getUserObject()); //$NON-NLS-1$
-                    
+
                     tree = signer.getSignersStructure(result, true);
                     Assert.assertEquals("Datos", ((AOTreeNode) tree.getRoot()).getUserObject()); //$NON-NLS-1$
-                    AOSimpleSignInfo simpleSignInfo = (AOSimpleSignInfo) ((AOTreeNode) tree.getRoot()).getChildAt(0).getUserObject();
-                    
+                    final AOSimpleSignInfo simpleSignInfo = (AOSimpleSignInfo) ((AOTreeNode) tree.getRoot()).getChildAt(0).getUserObject();
+
                     Assert.assertNotNull(simpleSignInfo.getSigningTime());
-                    Assert.assertEquals(cert, simpleSignInfo.getCerts()[0]);    
-                                        
+                    Assert.assertEquals(cert, simpleSignInfo.getCerts()[0]);
+
                 }
             }
         }
 
     }
-        
+
     /**
      * Comprueba que el nodo UnsignedSignatureProperties (en caso de aparecer)
      * de la firma XAdES contiene atributos. Busca el nodo con el namespace
@@ -385,22 +384,22 @@ public final class TestXAdES {
      * vac&iacute;o, {@code true} en caso contrario.
      */
     private static boolean isValidUnsignedProperties(final InputStream sign, final String namespace) {
-        
+
         final Document document;
         try {
             document = DocumentBuilderFactory.newInstance().
             newDocumentBuilder().parse(sign);
-        } 
+        }
         catch (final Exception e) {
             System.out.println("No es una firma valida"); //$NON-NLS-1$
             return false;
         }
-        
+
         final String xadesNamespace = (namespace != null) ? namespace : Utils.guessXAdESNamespaceURL(document.getFirstChild());
-        
-        NodeList upNodes = document.getElementsByTagName(xadesNamespace + ":UnsignedProperties"); //$NON-NLS-1$
+
+        final NodeList upNodes = document.getElementsByTagName(xadesNamespace + ":UnsignedProperties"); //$NON-NLS-1$
         for (int i = 0; i < upNodes.getLength(); i++) {
-            NodeList uspNodes = upNodes.item(i).getChildNodes();
+            final NodeList uspNodes = upNodes.item(i).getChildNodes();
             for (int j = 0; j < uspNodes.getLength(); j++) {
                 if (uspNodes.item(i).getNodeName().equals(xadesNamespace + ":UnsignedSignatureProperties")) { //$NON-NLS-1$
                     if (uspNodes.item(i).getChildNodes().getLength() == 0) {
@@ -410,10 +409,10 @@ public final class TestXAdES {
                 }
             }
         }
-    
+
         return true;
     }
-    
+
 //    private byte[] canonicalize(final byte[] in) {
 //        return in;
 //        org.apache.xml.security.Init.init();

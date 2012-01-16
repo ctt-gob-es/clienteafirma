@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -35,13 +35,13 @@ import es.gob.afirma.signers.pkcs7.SignedAndEnvelopedData;
  * validaciones son &uacute;nicamente a nivel de estructura, y no a nivel de validez de la propia firma electr&oacute;ca o
  * los firmantes. */
 public final class CAdESValidator {
-    
+
     private static final Logger LOGGER = Logger.getLogger("es.gob.afima"); //$NON-NLS-1$
-    
+
     private CAdESValidator() {
         // No permitimos la instanciacion
     }
-    
+
     /** Verifica si los datos proporcionados se corresponden con una estructura de tipo <i>Data</i>.
      * @param data Datos PKCS#7/CMS/CAdES.
      * @return <code>true</code> si los datos proporcionados se corresponden con una estructura de tipo <i>Data</i>,
@@ -122,11 +122,9 @@ public final class CAdESValidator {
         while (e.hasMoreElements()) {
             atribute = new Attribute((ASN1Sequence) e.nextElement());
             // si tiene la pol&iacute;tica es CADES.
-            if (atribute.getAttrType().equals(PKCSObjectIdentifiers.id_aa_signingCertificate)) {
-                isSignerValid = true;
-            }
-            if (atribute.getAttrType().equals(PKCSObjectIdentifiers.id_aa_signingCertificateV2)) {
-                isSignerValid = true;
+            if (atribute.getAttrType().equals(PKCSObjectIdentifiers.id_aa_signingCertificate) ||
+                atribute.getAttrType().equals(PKCSObjectIdentifiers.id_aa_signingCertificateV2)) {
+                	isSignerValid = true;
             }
         }
         return isSignerValid;
@@ -193,10 +191,10 @@ public final class CAdESValidator {
              * conversion ha sido correcta. De no ser asi, se pasaria al manejo
              * de la excepcion.
              */
-            
+
             DERInteger.getInstance(asq.getObjectAt(0));
             EncryptedContentInfo.getInstance(asq.getObjectAt(1));
-            
+
             if (asq.size() == 3) {
                 asq.getObjectAt(2);
             }
@@ -278,7 +276,7 @@ public final class CAdESValidator {
         }
         return isValid;
     }
-    
+
     /** Comprueba que un archivo cumple con una estructura de tipo CAdES.
      * Se permite la verificaci&oacute;n de los siguientes tipos de estructuras:
      * <ul>

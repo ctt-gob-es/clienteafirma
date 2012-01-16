@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -37,10 +37,10 @@
  *   con una autoridad de sellado de tiempo (TSA).
  *  </p>
  *  <p>
- *   No se soporta la generaci&oacite;n del modo PAdES-BASIC (firmas CMS), siempre se incrusta una firma CAdES en el PDF utilizando 
+ *   No se soporta la generaci&oacite;n del modo PAdES-BASIC (firmas CMS), siempre se incrusta una firma CAdES en el PDF utilizando
  *   <i>ETSI.CAdES.detached</i> como valor del sub-filtro de la firma.
- *  </p> 
- *  <p>Los datos de firma electr&oacute;nica empotrados dentro de la estructura PDF equivalen a una firma CAdES con Signing Certificate V2.</p>
+ *  </p>
+ *  <p>Los datos de firma electr&oacute;nica empotrados dentro de la estructura PDF equivalen a una firma CAdES.</p>
  *  <p>
  *   En general, no se soportan documentos PDF cifrados con certificados, con algoritmo AES256 o con cualquier otro medio introducido en
  *   versiones de Adobe Acrobat posteriores a la 9.
@@ -52,7 +52,7 @@
  *   <li>Dependencia con el m&oacute;dulo PKCS#7 (<i>afirma-crypto-core-pkcs7</i>) del Cliente.</li>
  *   <li>Dependencia con el m&oacute;dulo CAdES (<i>afirma-crypto-cades</i>) del Cliente.</li>
  *   <li>Dependencia con BouncyCastle 1.46 o superior (Proveedor + TSP + <i>Mail</i>).</li>
- *   <li>Dependencia con iText 2.1.7<sup>*</sup></li> 
+ *   <li>Dependencia con iText 2.1.7<sup>*</sup></li>
  *  </ul>
  *  <p>
  *   <sup>*</sup> No se utilizan versiones m&aacute;s actuales de iText por incompatibilidades de licencias. Las funcionalidades

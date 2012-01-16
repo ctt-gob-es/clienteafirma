@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -134,10 +134,6 @@ final class CAdESCoSigner {
      *        Si se omite el contenido o no, es decir,si se hace de forma
      *        Expl&iacute;cita o Impl&iacute;cita.
      * @param policy Pol&iacute;tica de firma
-     * @param signingCertificateV2
-     *        <code>true</code> si se desea usar la versi&oacute;n 2 del
-     *        atributo <i>Signing Certificate</i> <code>false</code> para
-     *        usar la versi&oacute;n 1
      * @param keyEntry
      *        Clave privada usada para firmar.
      * @param messageDigest
@@ -157,7 +153,6 @@ final class CAdESCoSigner {
                            final byte[] sign,
                            final boolean omitContent,
                            final AdESPolicy policy,
-                           final boolean signingCertificateV2,
                            final PrivateKeyEntry keyEntry,
                            final byte[] messageDigest) throws IOException, NoSuchAlgorithmException, CertificateException {
 
@@ -238,7 +233,6 @@ final class CAdESCoSigner {
                      digestAlgorithm,
                      parameters.getContent(),
                      policy,
-                     signingCertificateV2,
                      null,
                      new Date(),
                      false
@@ -252,7 +246,6 @@ final class CAdESCoSigner {
                      digestAlgorithm,
                      null,
                      policy,
-                     signingCertificateV2,
                      null,
                      new Date(),
                      false
@@ -310,10 +303,6 @@ final class CAdESCoSigner {
      *        de firma.
      * @param data Archivo que contiene las firmas.
      * @param policy Pol&iacute;tica de firma
-     * @param signingCertificateV2
-     *        <code>true</code> si se desea usar la versi&oacute;n 2 del
-     *        atributo <i>Signing Certificate</i> <code>false</code> para
-     *        usar la versi&oacute;n 1
      * @param keyEntry Clave privada usada para firmar.
      * @param md
      *        Huella digital espec&iacute;fica para una firma.
@@ -332,7 +321,6 @@ final class CAdESCoSigner {
                            final X509Certificate[] signerCertificateChain,
                            final InputStream data,
                            final AdESPolicy policy,
-                           final boolean signingCertificateV2,
                            final PrivateKeyEntry keyEntry,
                            final byte[] md) throws IOException, NoSuchAlgorithmException, CertificateException {
 
@@ -401,7 +389,7 @@ final class CAdESCoSigner {
         // introducimos los SignerInfos Existentes
         final ASN1EncodableVector signerInfos = new ASN1EncodableVector();
         // introducimos el nuevo SignerInfo del firmante actual.
-        
+
         byte[] messageDigest = md != null ? md.clone() : null;
 
         for (int i = 0; i < signerInfosSd.size(); i++) {
@@ -434,7 +422,6 @@ final class CAdESCoSigner {
                      digestAlgorithm,
                      contenidoDatos,
                      policy,
-                     signingCertificateV2,
                      null, // MessageDigest
                      new Date(),
                      false
@@ -448,7 +435,6 @@ final class CAdESCoSigner {
                      digestAlgorithm,
                      null,
                      policy,
-                     signingCertificateV2,
                      messageDigest,
                      new Date(),
                      false

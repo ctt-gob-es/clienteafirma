@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -15,13 +15,13 @@ import java.io.IOException;
 import java.security.AlgorithmParameters;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.security.KeyStore.PrivateKeyEntry;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Signature;
 import java.security.SignatureException;
-import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.security.spec.AlgorithmParameterSpec;
@@ -99,11 +99,11 @@ import es.gob.afirma.signers.pkcs7.SigUtils;
 import es.gob.afirma.signers.pkcs7.SignedAndEnvelopedData;
 
 final class CAdESUtils {
-    
+
     private CAdESUtils() {
         // No permitimos la instanciacion
     }
-    
+
     /** Vector de inicializacion de 8 bytes. Un vector de inicializaci&oacute;n
      * de 8 bytes es necesario para el uso de los algoritmos DES y DESede. */
     private static final byte[] IV_8 = {
@@ -130,7 +130,7 @@ final class CAdESUtils {
             (byte) 0x12,
             (byte) 0x6B
     };
-    
+
     /** Semilla para uso en par&aacute;metros de cifrados basados en contrase&ntilde;a. */
     private static final byte[] SALT = {
             (byte) 0xA2, (byte) 0x35, (byte) 0xDC, (byte) 0xA4, (byte) 0x11, (byte) 0x7C, (byte) 0x99, (byte) 0x4B
@@ -211,7 +211,7 @@ final class CAdESUtils {
 
         return infos;
     }
-    
+
     /** M&eacute;todo cifra la clave usada para cifrar el archivo usando para
      * ello la clave p&uacute;blica del certificado del usuario.
      * @param pKey
@@ -238,7 +238,7 @@ final class CAdESUtils {
 
         return ciphered;
     }
-    
+
     /** M&eacute;todo que obtiene el EncriptedContentInfo a partir del archivo a
      * cifrar. El contenido es el siguiente:
      *
@@ -307,7 +307,7 @@ final class CAdESUtils {
         final DERObjectIdentifier contentType = PKCSObjectIdentifiers.encryptedData;
         return new EncryptedContentInfo(contentType, encAlgId, new DEROctetString(ciphered));
     }
-    
+
     /** Crea el cifrador usado para cifrar tanto el fichero como la clave usada
      * para cifrar dicho fichero.
      * @param algName
@@ -354,14 +354,13 @@ final class CAdESUtils {
                                                          final String digestAlgorithmName,
                                                          final byte[] datos,
                                                          final AdESPolicy policy,
-                                                         final boolean signingCertificateV2,
                                                          final byte[] messageDigest) throws NoSuchAlgorithmException,
                                                                               IOException,
                                                                               CertificateEncodingException {
-        
+
         // ALGORITMO DE HUELLA DIGITAL
         final AlgorithmIdentifier digestAlgorithmOID = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithmName));
-        
+
         // // ATRIBUTOS
 
         // authenticatedAttributes
@@ -371,7 +370,7 @@ final class CAdESUtils {
         // comentar lo de abajo para version del rfc 3852
         contexExpecific.add(new Attribute(RFC4519Style.serialNumber, new DERSet(new DERPrintableString(cert.getSerialNumber().toString()))));
 
-        if (signingCertificateV2) {
+        if (!"SHA1".equals(AOSignConstants.getDigestAlgorithmName(digestAlgorithmName))) { //$NON-NLS-1$
 
             //********************************************/
             //***** La Nueva operatividad esta comentada */
@@ -391,8 +390,8 @@ final class CAdESUtils {
             final byte[] certHash = MessageDigest.getInstance(digestAlgorithmName).digest(cert.getEncoded());
             final ESSCertIDv2[] essCertIDv2 = {
                 new ESSCertIDv2(
-                    digestAlgorithmOID, 
-                    certHash, 
+                    digestAlgorithmOID,
+                    certHash,
                     new IssuerSerial(
                          new GeneralNames(new GeneralName(tbs.getIssuer())),
                          tbs.getSerialNumber()
@@ -408,7 +407,7 @@ final class CAdESUtils {
              * PolicyQualifierId, qualifier ANY DEFINED BY policyQualifierId } */
 
             final SigningCertificateV2 scv2;
-            if(policy.getPolicyIdentifier() != null) {                                                
+            if(policy.getPolicyIdentifier() != null) {
 
                 /** SigningCertificateV2 ::= SEQUENCE { certs SEQUENCE OF
                  * ESSCertIDv2, policies SEQUENCE OF PolicyInformation OPTIONAL
@@ -490,7 +489,7 @@ final class CAdESUtils {
              *     hashValue        OCTET STRING }
              *
              */
-            
+
 
             // Algoritmo para el hash
             final AlgorithmIdentifier hashid;
@@ -515,9 +514,9 @@ final class CAdESUtils {
             else{
                 hashed = new byte[]{0};
             }
-            
+
             final DigestInfo otherHashAlgAndValue = new DigestInfo(hashid, hashed);
-            
+
             /*
              *   SigPolicyQualifierInfo ::= SEQUENCE {
              *       SigPolicyQualifierId  SigPolicyQualifierId,
@@ -527,7 +526,7 @@ final class CAdESUtils {
             if(policy.getPolicyQualifier()!=null){
                 spqInfo = new SigPolicyQualifierInfo(policy.getPolicyQualifier().toString());
             }
-            
+
             /*
              * SignaturePolicyId ::= SEQUENCE {
              *  sigPolicyId           SigPolicyId,
@@ -555,7 +554,7 @@ final class CAdESUtils {
 
         return contexExpecific;
     }
-    
+
     /**
      * Obtiene un PolicyInformation a partir de los datos de la pol&iacute;tica.
      * Sirve para los datos de SigningCertificate y SigningCertificateV2. Tiene que llevar algunos
@@ -564,9 +563,9 @@ final class CAdESUtils {
      * PolicyInformation ::= SEQUENCE {
      * policyIdentifier   CertPolicyId,
      * policyQualifiers   SEQUENCE SIZE (1..MAX) OF
-     *                          PolicyQualifierInfo OPTIONAL }                          
-     *                          
-     *                          
+     *                          PolicyQualifierInfo OPTIONAL }
+     *
+     *
      * CertPolicyId ::= OBJECT IDENTIFIER
      *
      * PolicyQualifierInfo ::= SEQUENCE {
@@ -602,22 +601,22 @@ final class CAdESUtils {
      *      bmpString        BMPString      (SIZE (1..200)),
      *      utf8String       UTF8String     (SIZE (1..200)) }
      * </pre>
-     * 
+     *
      * @param policy    Pol&iacute;tica de la firma.
      * @return          Estructura con la pol&iacute;tica preparada para insertarla en la firma.
      */
     private static PolicyInformation[] getPolicyInformation(final AdESPolicy policy){
-        
+
         if (policy == null) {
             throw new IllegalArgumentException("La politica de firma no puede ser nula en este punto"); //$NON-NLS-1$
         }
-        
+
         /*
          * PolicyQualifierInfo ::= SEQUENCE {
          *          policyQualifierId  PolicyQualifierId,
-         *          qualifier          ANY DEFINED BY policyQualifierId } 
+         *          qualifier          ANY DEFINED BY policyQualifierId }
          */
-        
+
         final PolicyQualifierId pqid = PolicyQualifierId.id_qt_cps;
         DERIA5String uri = null;
 
@@ -632,14 +631,14 @@ final class CAdESUtils {
             v.add(uri);
             pqi = new PolicyQualifierInfo(new DERSequence(v));
         }
-        
+
         /*
          * PolicyInformation ::= SEQUENCE {
          *     policyIdentifier   CertPolicyId,
          *     policyQualifiers   SEQUENCE SIZE (1..MAX) OF
          *                          PolicyQualifierInfo OPTIONAL }
          */
-        
+
         if (policy.getPolicyQualifier()==null || pqi == null) {
             return new PolicyInformation[] {
                 new PolicyInformation(new DERObjectIdentifier(policy.getPolicyIdentifier().toLowerCase().replace("urn:oid:", ""))) //$NON-NLS-1$ //$NON-NLS-2$
@@ -649,13 +648,13 @@ final class CAdESUtils {
         return new PolicyInformation[] {
             new PolicyInformation(new DERObjectIdentifier(policy.getPolicyIdentifier().toLowerCase().replace("urn:oid:", "")), new DERSequence(pqi)) //$NON-NLS-1$ //$NON-NLS-2$
         };
-        
+
     }
-    
+
     /** Inicializa el contexto. */
-    static ASN1EncodableVector initContexExpecific(final String digestAlgorithm, 
-                                                   final byte[] datos, 
-                                                   final String dataType, 
+    static ASN1EncodableVector initContexExpecific(final String digestAlgorithm,
+                                                   final byte[] datos,
+                                                   final String dataType,
                                                    final byte[] messageDigest) throws NoSuchAlgorithmException {
         // authenticatedAttributes
         final ASN1EncodableVector contexExpecific = new ASN1EncodableVector();
@@ -698,7 +697,7 @@ final class CAdESUtils {
         return new SignerInfo(identifier, digAlgId, signedAttr, encAlgId, sign2, unSignedAttr);
 
     }
-    
+
     /** Obtiene la estructura ASN.1 de firma usando los atributos del firmante.
      * @param signatureAlgorithm
      *        Algoritmo para la firma
@@ -778,7 +777,7 @@ final class CAdESUtils {
 
         return signCerts;
     }
-    
+
     /** Comprueba que el archivo a tratar no es nulo e inicializa la clave de
      * cifrado
      * @param config
