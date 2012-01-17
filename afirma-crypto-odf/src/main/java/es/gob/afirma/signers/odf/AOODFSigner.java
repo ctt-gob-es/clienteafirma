@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -77,8 +77,8 @@ import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignInfo;
-import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.AOSigner;
+import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.xml.Utils;
@@ -87,16 +87,15 @@ import es.gob.afirma.signers.xml.Utils;
 /** Manejador de firmas electr&oacute;nicas XML de ficheros ODF en formato compatible
  * con OpenOffice.org 3.2 y superiores.
  * @version 0.2 */
-@SuppressWarnings("restriction")
 public final class AOODFSigner implements AOSigner {
-    
+
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     private static final String OPENOFFICE = "urn:oasis:names:tc:opendocument:xmlns:digitalsignature:1.0"; //$NON-NLS-1$
-    
+
     private static final String MANIFEST_PATH = "META-INF/manifest.xml"; //$NON-NLS-1$
     private static final String SIGNATURES_PATH = "META-INF/documentsignatures.xml"; //$NON-NLS-1$
-    
+
     private static final String XMLDSIG_NAMESPACE = "http://www.w3.org/2000/09/xmldsig#"; //$NON-NLS-1$
 
     /** Mimetypes de los formatos ODF soportados. */
@@ -127,13 +126,13 @@ public final class AOODFSigner implements AOSigner {
      * </dl>
      * @return Documento ODF con la nueva firma a&ntilde;adida
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-    public byte[] sign(final byte[] data, 
-                       final String algorithm, 
-                       final PrivateKeyEntry keyEntry, 
+    public byte[] sign(final byte[] data,
+                       final String algorithm,
+                       final PrivateKeyEntry keyEntry,
                        final Properties xParams) throws AOException {
 
         final Properties extraParams = (xParams != null) ? xParams : new Properties();
-        
+
         final String digestMethodAlgorithm = extraParams.getProperty("referencesDigestMethod", DIGEST_METHOD); //$NON-NLS-1$
         final boolean useOpenOffice31Mode = "true".equalsIgnoreCase(extraParams.getProperty("useOpenOffice31Mode")); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -141,7 +140,7 @@ public final class AOODFSigner implements AOSigner {
             throw new AOFormatFileException("El fichero introducido no es un documento ODF"); //$NON-NLS-1$
         }
 
-        String fullPath = MANIFEST_PATH; 
+        String fullPath = MANIFEST_PATH;
         boolean isCofirm = false;
 
         try {
@@ -234,7 +233,7 @@ public final class AOODFSigner implements AOSigner {
                 // Recupera el fichero
                 zf.getInputStream(zf.getEntry("mimetype")))))); //$NON-NLS-1$
 
-                referenceList.add(fac.newReference(MANIFEST_PATH, 
+                referenceList.add(fac.newReference(MANIFEST_PATH,
                                                    dm,
                                                    transformList,
                                                    null,
@@ -292,7 +291,7 @@ public final class AOODFSigner implements AOSigner {
             // si es cofirma
             if (isCofirm) {
                 // recupera el documento de firmas y su raiz
-                docSignatures = dbf.newDocumentBuilder().parse(zf.getInputStream(zf.getEntry(SIGNATURES_PATH))); 
+                docSignatures = dbf.newDocumentBuilder().parse(zf.getInputStream(zf.getEntry(SIGNATURES_PATH)));
                 rootSignatures = docSignatures.getDocumentElement();
             }
             else {
@@ -308,7 +307,7 @@ public final class AOODFSigner implements AOSigner {
                 if (useOpenOffice31Mode) {
                     final Element nodeDocumentSignatures = docManifest.createElement("manifest:file-entry"); //$NON-NLS-1$
                     nodeDocumentSignatures.setAttribute("manifest:media-type", ""); //$NON-NLS-1$ //$NON-NLS-2$
-                    nodeDocumentSignatures.setAttribute("manifest:full-path", SIGNATURES_PATH); //$NON-NLS-1$ 
+                    nodeDocumentSignatures.setAttribute("manifest:full-path", SIGNATURES_PATH); //$NON-NLS-1$
                     rootManifest.appendChild(nodeDocumentSignatures);
 
                     // nuevo elemento de META-INF
@@ -358,14 +357,14 @@ public final class AOODFSigner implements AOSigner {
               fac.newSignedInfo(
                 // CanonicalizationMethod
                  fac.newCanonicalizationMethod(
-                   CanonicalizationMethod.INCLUSIVE, 
+                   CanonicalizationMethod.INCLUSIVE,
                    (C14NMethodParameterSpec) null),
                    fac.newSignatureMethod(SignatureMethod.RSA_SHA1, null),
                    referenceList
                  ),
                  // KeyInfo
                  kif.newKeyInfo(
-                   Collections.singletonList(kif.newX509Data(x509Content)), 
+                   Collections.singletonList(kif.newX509Data(x509Content)),
                    null
                  ),
                  objectList,
@@ -387,21 +386,21 @@ public final class AOODFSigner implements AOSigner {
             while (e.hasMoreElements()) {
                 ze = e.nextElement();
                 zeOut = new ZipEntry(ze.getName());
-                if (!ze.getName().equals(SIGNATURES_PATH) && !ze.getName().equals(MANIFEST_PATH)) { 
+                if (!ze.getName().equals(SIGNATURES_PATH) && !ze.getName().equals(MANIFEST_PATH)) {
                     zos.putNextEntry(zeOut);
                     zos.write(AOUtil.getDataFromInputStream(zf.getInputStream(ze)));
                 }
             }
 
             // anade el documento de firmas
-            zos.putNextEntry(new ZipEntry(SIGNATURES_PATH)); 
+            zos.putNextEntry(new ZipEntry(SIGNATURES_PATH));
             final ByteArrayOutputStream baosXML = new ByteArrayOutputStream();
             writeXML(baosXML, rootSignatures, false);
             zos.write(baosXML.toByteArray());
             zos.closeEntry();
 
             // anade manifest.xml
-            zos.putNextEntry(new ZipEntry(MANIFEST_PATH)); 
+            zos.putNextEntry(new ZipEntry(MANIFEST_PATH));
             final ByteArrayOutputStream baosManifest = new ByteArrayOutputStream();
             writeXML(baosManifest, rootManifest, false);
             zos.write(baosManifest.toByteArray());
@@ -446,10 +445,10 @@ public final class AOODFSigner implements AOSigner {
      * </dl>
      * @return Documento ODF con la nueva firma a&ntilde;adida
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-    public byte[] cosign(final byte[] data, 
-                         final byte[] sign, 
-                         final String algorithm, 
-                         final PrivateKeyEntry keyEntry, 
+    public byte[] cosign(final byte[] data,
+                         final byte[] sign,
+                         final String algorithm,
+                         final PrivateKeyEntry keyEntry,
                          final Properties extraParams) throws AOException {
         return sign(sign, algorithm, keyEntry, extraParams);
     }
@@ -470,9 +469,9 @@ public final class AOODFSigner implements AOSigner {
      * </dl>
      * @return Documento ODF con la nueva firma a&ntilde;adida
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-    public byte[] cosign(final byte[] sign, 
-                         final String algorithm, 
-                         final PrivateKeyEntry keyEntry, 
+    public byte[] cosign(final byte[] sign,
+                         final String algorithm,
+                         final PrivateKeyEntry keyEntry,
                          final Properties extraParams) throws AOException {
         return sign(sign, algorithm, keyEntry, extraParams);
     }
@@ -514,7 +513,7 @@ public final class AOODFSigner implements AOSigner {
             final ZipFile zf = new ZipFile(zipFile);
 
             // obtiene el archivo de firmas
-            final InputStream signIs = zf.getInputStream(zf.getEntry(SIGNATURES_PATH)); 
+            final InputStream signIs = zf.getInputStream(zf.getEntry(SIGNATURES_PATH));
 
             // recupera la raiz del documento de firmas
             final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -522,7 +521,7 @@ public final class AOODFSigner implements AOSigner {
             final Element root = dbf.newDocumentBuilder().parse(signIs).getDocumentElement();
 
             // obtiene todas las firmas
-            final NodeList signatures = root.getElementsByTagNameNS(XMLDSIG_NAMESPACE, "Signature"); //$NON-NLS-1$ 
+            final NodeList signatures = root.getElementsByTagNameNS(XMLDSIG_NAMESPACE, "Signature"); //$NON-NLS-1$
 
             final int numSignatures = signatures.getLength();
 
@@ -534,7 +533,7 @@ public final class AOODFSigner implements AOSigner {
                 final Element signature = (Element) signatures.item(i);
                 final String sigId = signature.getAttribute("Id"); //$NON-NLS-1$
 
-                final String strCert = signature.getElementsByTagNameNS(XMLDSIG_NAMESPACE, "X509Certificate").item(0).getTextContent(); //$NON-NLS-1$ 
+                final String strCert = signature.getElementsByTagNameNS(XMLDSIG_NAMESPACE, "X509Certificate").item(0).getTextContent(); //$NON-NLS-1$
                 AOTreeNode node;
 
                 if (asSimpleSignInfo) {
@@ -547,10 +546,10 @@ public final class AOODFSigner implements AOSigner {
                 arrayNodes[i] = node;
 
                 final String typeReference =
-                        ((Element) signature.getElementsByTagNameNS(XMLDSIG_NAMESPACE, "Reference").item(0)).getAttribute("Type"); //$NON-NLS-1$ //$NON-NLS-2$ 
+                        ((Element) signature.getElementsByTagNameNS(XMLDSIG_NAMESPACE, "Reference").item(0)).getAttribute("Type"); //$NON-NLS-1$ //$NON-NLS-2$
                 if (typeReference.equals("http://uri.etsi.org/01903#CountersignedSignature")) { //$NON-NLS-1$
                     final String uri =
-                            ((Element) signature.getElementsByTagNameNS(XMLDSIG_NAMESPACE, "Reference").item(0)).getAttribute("URI"); //$NON-NLS-1$ //$NON-NLS-2$ 
+                            ((Element) signature.getElementsByTagNameNS(XMLDSIG_NAMESPACE, "Reference").item(0)).getAttribute("URI"); //$NON-NLS-1$ //$NON-NLS-2$
                     arrayRef[i] = uri.substring(1, uri.length() - 5);
                 }
                 else {
@@ -599,7 +598,7 @@ public final class AOODFSigner implements AOSigner {
     }
 
     /** Indica si los datos son un documento ODF susceptible de ser firmado.
-     * @param data Datos a comprobar 
+     * @param data Datos a comprobar
      * @return <cod>true</code> si los datos son un documento ODF susceptible de ser firmado, <code>false</code> en caso contrario */
     public boolean isValidDataFile(final byte[] data) {
 
