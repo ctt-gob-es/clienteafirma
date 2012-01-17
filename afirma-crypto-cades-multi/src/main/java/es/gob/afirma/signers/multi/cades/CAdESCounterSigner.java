@@ -92,6 +92,10 @@ final class CAdESCounterSigner {
      * @param keyEntry
      *        Clave privada a usar para firmar.
      * @param policy Pol&iacute;tica de firma
+     * @param contentType
+     * 		  Tipo de contenido definido por su OID.
+     * @param contentDescription
+     * 		  Descripci&oacute;n textual del tipo de contenido firmado.
      * @return El archivo de firmas con la nueva firma.
      * @throws java.io.IOException
      *         Excepci&oacute;n cuando se produce algun error con lectura
@@ -110,7 +114,9 @@ final class CAdESCounterSigner {
                                 final CounterSignTarget targetType,
                                 final int[] targets,
                                 final PrivateKeyEntry keyEntry,
-                                final AdESPolicy policy) throws IOException, NoSuchAlgorithmException, CertificateException, AOException {
+                                final AdESPolicy policy,
+                                final String contentType,
+                                final String contentDescription) throws IOException, NoSuchAlgorithmException, CertificateException, AOException {
 
         // Introducimos la pol&iacute;tica en variable global por comodidad.
         // &Eacute;sta no var&iacute;a.
@@ -163,11 +169,15 @@ final class CAdESCounterSigner {
 
         // FIRMA EN ARBOL
         if (targetType.equals(CounterSignTarget.TREE)) {
-            signerInfos = counterTree(signerInfosSd, parameters, signerCertificateChain[0], keyEntry);
+            signerInfos = counterTree(
+            		signerInfosSd, parameters, signerCertificateChain[0], keyEntry,
+                    contentType, contentDescription);
         }
         // FIRMA DE LAS HOJAS
         else if (targetType.equals(CounterSignTarget.LEAFS)) {
-            signerInfos = counterLeaf(signerInfosSd, parameters, signerCertificateChain[0], keyEntry);
+            signerInfos = counterLeaf(
+            		signerInfosSd, parameters, signerCertificateChain[0], keyEntry,
+                    contentType, contentDescription);
         }
         // FIRMA DE NODOS
         else if (targetType.equals(CounterSignTarget.NODES)) {
@@ -178,7 +188,9 @@ final class CAdESCounterSigner {
             int nodo = 0;
             for (int i = targets.length - 1; i >= 0; i--) {
                 nodo = targets[i];
-                signerInfos = counterNode(aux, parameters, signerCertificateChain[0], keyEntry, nodo);
+                signerInfos = counterNode(
+                		aux, parameters, signerCertificateChain[0], keyEntry,
+                        contentType, contentDescription, nodo);
                 sigDat = new SignedData(sd.getDigestAlgorithms(), sd.getEncapContentInfo(), certificates, certrevlist, new DERSet(signerInfos));
 
                 // Esto se realiza as&iacute; por problemas con los casting.
@@ -199,7 +211,8 @@ final class CAdESCounterSigner {
             int nodo = 0;
             for (int i = targets.length - 1; i >= 0; i--) {
                 nodo = targets[i];
-                signerInfos = counterNode(aux, parameters, signerCertificateChain[0], keyEntry, nodo);
+                signerInfos = counterNode(aux, parameters, signerCertificateChain[0], keyEntry,
+                        contentType, contentDescription, nodo);
                 sigDat = new SignedData(sd.getDigestAlgorithms(), sd.getEncapContentInfo(), certificates, certrevlist, new DERSet(signerInfos));
 
                 // Esto se realiza as&iacute; por problemas con los casting.
@@ -223,7 +236,7 @@ final class CAdESCounterSigner {
     }
 
     /** M&eacute;todo que contrafirma el arbol completo de forma recursiva, todos
-     * los dodos creando un nuevo contraSigner.<br>
+     * los nodos creando un nuevo contraSigner.<br>
      * @param signerInfosRaiz
      *        Nodo ra&iacute; que contiene todos los signerInfos que se
      *        deben firmar.
@@ -234,6 +247,10 @@ final class CAdESCounterSigner {
      *        Certificado de firma.
      * @param keyEntry
      *        Clave privada a usar para firmar
+     * @param contentType
+     * 		  Tipo de contenido definido por su OID.
+     * @param contentDescription
+     * 		  Descripci&oacute;n textual del tipo de contenido firmado.
      * @return El SignerInfo ra&iacute;z con todos sus nodos Contrafirmados.
      * @throws java.security.NoSuchAlgorithmException
      * @throws java.io.IOException
@@ -242,12 +259,15 @@ final class CAdESCounterSigner {
     private ASN1EncodableVector counterTree(final ASN1Set signerInfosRaiz,
                                             final P7ContentSignerParameters parameters,
                                             final X509Certificate cert,
-                                            final PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException, IOException, CertificateException, AOException {
+                                            final PrivateKeyEntry keyEntry,
+                                            final String contentType,
+                                            final String contentDescription) throws NoSuchAlgorithmException, IOException, CertificateException, AOException {
 
         final ASN1EncodableVector counterSigners = new ASN1EncodableVector();
         for (int i = 0; i < signerInfosRaiz.size(); i++) {
             final SignerInfo si = new SignerInfo((ASN1Sequence) signerInfosRaiz.getObjectAt(i));
-            counterSigners.add(getCounterUnsignedAtributes(si, parameters, cert, keyEntry));
+            counterSigners.add(getCounterSignerInfo(si, parameters, cert, keyEntry,
+                    contentType, contentDescription));
         }
         return counterSigners;
     }
@@ -264,6 +284,8 @@ final class CAdESCounterSigner {
      *        Certificado de firma.
      * @param keyEntry
      *        Clave privada a usar para firmar
+     * @param contentType Tipo de contenido definido por su OID.
+     * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
      * @return El SignerInfo ra&iacute;z con todos sus nodos Contrafirmados.
      * @throws java.security.NoSuchAlgorithmException
      * @throws java.io.IOException
@@ -272,12 +294,15 @@ final class CAdESCounterSigner {
     private ASN1EncodableVector counterLeaf(final ASN1Set signerInfosRaiz,
                                             final P7ContentSignerParameters parameters,
                                             final X509Certificate cert,
-                                            final PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException, IOException, CertificateException, AOException {
+                                            final PrivateKeyEntry keyEntry,
+                                            final String contentType,
+                                            final String contentDescription) throws NoSuchAlgorithmException, IOException, CertificateException, AOException {
 
         final ASN1EncodableVector counterSigners = new ASN1EncodableVector();
         for (int i = 0; i < signerInfosRaiz.size(); i++) {
             final SignerInfo si = new SignerInfo((ASN1Sequence) signerInfosRaiz.getObjectAt(i));
-            counterSigners.add(getCounterLeafUnsignedAtributes(si, parameters, cert, keyEntry));
+            counterSigners.add(getLeafSignerInfo(si, parameters, cert, keyEntry,
+                    contentType, contentDescription));
         }
         return counterSigners;
     }
@@ -293,6 +318,8 @@ final class CAdESCounterSigner {
      *        Certificado de firma.
      * @param keyEntry
      *        Clave privada a usar para firmar
+     * @param contentType Tipo de contenido definido por su OID.
+     * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
      * @param nodo
      *        Nodo signerInfo a firmar.
      * @return El SignerInfo ra&iacute;z con todos sus nodos Contrafirmados.
@@ -304,6 +331,8 @@ final class CAdESCounterSigner {
                                             final P7ContentSignerParameters parameters,
                                             final X509Certificate cert,
                                             final PrivateKeyEntry keyEntry,
+                                            final String contentType,
+                                            final String contentDescription,
                                             final int nodo) throws NoSuchAlgorithmException, IOException, CertificateException, AOException {
 
         final ASN1Set signerInfosRaiz = sd.getSignerInfos();
@@ -318,11 +347,13 @@ final class CAdESCounterSigner {
             final SignerInfo si = new SignerInfo((ASN1Sequence) auxSignerRaiz.getObjectAt(i));
             SignerInfo counterSigner = null;
             if (this.actualIndex == nodo) {
-                counterSigner = getCounterNodeUnsignedAtributes(si, parameters, cert, keyEntry);
+                counterSigner = getNodeSignerInfo(si, parameters, cert, keyEntry,
+                        contentType, contentDescription);
             }
             else {
                 if (this.actualIndex != nodo) {
-                    counterSigner = getCounterNodeUnsignedAtributes(si, parameters, cert, keyEntry, nodo);
+                    counterSigner = getNodeSignerInfo(si, parameters, cert, keyEntry,
+                            contentType, contentDescription, nodo);
                 }
             }
             this.actualIndex++;
@@ -345,16 +376,22 @@ final class CAdESCounterSigner {
      *        Certificado de firma.
      * @param keyEntry
      *        Clave privada a usar para firmar.
+     * @param contentType
+     * 		  Tipo de contenido definido por su OID.
+     * @param contentDescription
+     * 		  Descripci&oacute;n textual del tipo de contenido firmado.
      * @return El SignerInfo ra&iacute;z parcial con todos sus nodos
      *         Contrafirmados.
      * @throws java.security.NoSuchAlgorithmException
      * @throws java.io.IOException
      * @throws java.security.cert.CertificateException
      * @throws es.map.es.map.afirma.exceptions.AOException */
-    private SignerInfo getCounterUnsignedAtributes(final SignerInfo signerInfo,
+    private SignerInfo getCounterSignerInfo(final SignerInfo signerInfo,
                                                    final P7ContentSignerParameters parameters,
                                                    final X509Certificate cert,
-                                                   final PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException,
+                                                   final PrivateKeyEntry keyEntry,
+                                                   final String contentType,
+                                                   final String contentDescription) throws NoSuchAlgorithmException,
                                                                             IOException,
                                                                             CertificateException,
                                                                             AOException {
@@ -371,7 +408,8 @@ final class CAdESCounterSigner {
                     final Enumeration<?> eAtributesData = setInto.getObjects();
                     while (eAtributesData.hasMoreElements()) {
                         final SignerInfo si = new SignerInfo((ASN1Sequence) eAtributesData.nextElement());
-                        signerInfosU.add(getCounterUnsignedAtributes(si, parameters, cert, keyEntry));
+                        signerInfosU.add(getCounterSignerInfo(
+                        		si, parameters, cert, keyEntry, contentType, contentDescription));
 
                     }
                 }
@@ -381,7 +419,13 @@ final class CAdESCounterSigner {
 
             }
             // FIRMA DEL NODO ACTUAL
-            counterSigner = unsignedAtributte(parameters, cert, signerInfo, keyEntry);
+            counterSigner = generateSignerInfo(
+            		parameters,
+            		cert,
+            		signerInfo,
+            		keyEntry,
+                    contentType,
+                    contentDescription);
             signerInfosU.add(counterSigner);
 
             // FIRMA DE CADA UNO DE LOS HIJOS
@@ -413,7 +457,9 @@ final class CAdESCounterSigner {
                         // anadimos el que hay
                         contexExpecific.add(signerInfosU.get(0));
                         // creamos el de la contrafirma.
-                        signerInfosU2.add(unsignedAtributte(parameters, cert, signerInfo, keyEntry));
+                        signerInfosU2.add(generateSignerInfo(
+                        		parameters, cert, signerInfo, keyEntry,
+                                contentType, contentDescription));
                         final Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU2));
                         contexExpecific.add(uAtrib);
 
@@ -450,7 +496,8 @@ final class CAdESCounterSigner {
 
         }
         else {
-            signerInfosU2.add(unsignedAtributte(parameters, cert, signerInfo, keyEntry));
+            signerInfosU2.add(generateSignerInfo(
+            		parameters, cert, signerInfo, keyEntry, contentType, contentDescription));
             final Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU2));
             counterSigner =
                     new SignerInfo(signerInfo.getSID(),
@@ -478,16 +525,22 @@ final class CAdESCounterSigner {
      *        Certificado de firma.
      * @param keyEntry
      *        Clave privada a usar para firmar
+     * @param contentType
+     * 		  Tipo de contenido definido por su OID.
+     * @param contentDescription
+     * 		  Descripci&oacute;n textual del tipo de contenido firmado.
      * @return El SignerInfo ra&iacute;z parcial con todos sus nodos
      *         Contrafirmados.
      * @throws java.security.NoSuchAlgorithmException
      * @throws java.io.IOException
      * @throws java.security.cert.CertificateException
      * @throws es.map.es.map.afirma.exceptions.AOException */
-    private SignerInfo getCounterLeafUnsignedAtributes(final SignerInfo signerInfo,
+    private SignerInfo getLeafSignerInfo(final SignerInfo signerInfo,
                                                        final P7ContentSignerParameters parameters,
                                                        final X509Certificate cert,
-                                                       final PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException,
+                                                       final PrivateKeyEntry keyEntry,
+                                                       final String contentType,
+                                                       final String contentDescription) throws NoSuchAlgorithmException,
                                                                                 IOException,
                                                                                 CertificateException,
                                                                                 AOException {
@@ -505,7 +558,8 @@ final class CAdESCounterSigner {
                     final Enumeration<?> eAtributesData = setInto.getObjects();
                     while (eAtributesData.hasMoreElements()) {
                         final SignerInfo si = new SignerInfo((ASN1Sequence) eAtributesData.nextElement());
-                        signerInfosU.add(getCounterLeafUnsignedAtributes(si, parameters, cert, keyEntry));
+                        signerInfosU.add(getLeafSignerInfo(
+                        		si, parameters, cert, keyEntry, contentType, contentDescription));
                     }
                 }
                 else {
@@ -542,7 +596,8 @@ final class CAdESCounterSigner {
                         // anadimos el que hay
                         contexExpecific.add(signerInfosU.get(0));
                         // creamos el de la contrafirma.
-                        signerInfosU2.add(unsignedAtributte(parameters, cert, signerInfo, keyEntry));
+                        signerInfosU2.add(generateSignerInfo(parameters, cert, signerInfo, keyEntry,
+                                contentType, contentDescription));
                         final Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU2));
                         contexExpecific.add(uAtrib);
 
@@ -575,7 +630,8 @@ final class CAdESCounterSigner {
             }
         }
         else {
-            signerInfosU2.add(unsignedAtributte(parameters, cert, signerInfo, keyEntry));
+            signerInfosU2.add(generateSignerInfo(
+            		parameters, cert, signerInfo, keyEntry, contentType, contentDescription));
             final Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU2));
             counterSigner =
                     new SignerInfo(signerInfo.getSID(),
@@ -604,15 +660,21 @@ final class CAdESCounterSigner {
      *        Certificado de firma.
      * @param keyEntry
      *        Clave privada a usar para firmar
+     * @param contentType
+     * 		  Tipo de contenido definido por su OID.
+     * @param contentDescription
+     * 		  Descripci&oacute;n textual del tipo de contenido firmado.
      * @return El SignerInfo ra&iacute;z parcial con todos sus nodos
      *         Contrafirmados.
      * @throws java.security.NoSuchAlgorithmException
      * @throws java.io.IOException
      * @throws java.security.cert.CertificateException */
-    private SignerInfo getCounterNodeUnsignedAtributes(final SignerInfo signerInfo,
+    private SignerInfo getNodeSignerInfo(final SignerInfo signerInfo,
                                                        final P7ContentSignerParameters parameters,
                                                        final X509Certificate cert,
-                                                       final PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException, IOException, CertificateException {
+                                                       final PrivateKeyEntry keyEntry,
+                                                       final String contentType,
+                                                       final String contentDescription) throws NoSuchAlgorithmException, IOException, CertificateException {
 
         final ASN1EncodableVector signerInfosU = new ASN1EncodableVector();
         final ASN1EncodableVector signerInfosU2 = new ASN1EncodableVector();
@@ -634,7 +696,8 @@ final class CAdESCounterSigner {
 
             }
             // FIRMA DEL NODO ACTUAL
-            signerInfosU.add(unsignedAtributte(parameters, cert, signerInfo, keyEntry));
+            signerInfosU.add(generateSignerInfo(
+            		parameters, cert, signerInfo, keyEntry, contentType, contentDescription));
 
             // FIRMA DE CADA UNO DE LOS HIJOS
             ASN1Set a1;
@@ -665,7 +728,8 @@ final class CAdESCounterSigner {
                         // anadimos el que hay
                         contexExpecific.add(signerInfosU.get(0));
                         // creamos el de la contrafirma.
-                        signerInfosU2.add(unsignedAtributte(parameters, cert, signerInfo, keyEntry));
+                        signerInfosU2.add(generateSignerInfo(
+                        		parameters, cert, signerInfo, keyEntry, contentType, contentDescription));
                         final Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU2));
                         contexExpecific.add(uAtrib);
 
@@ -701,7 +765,8 @@ final class CAdESCounterSigner {
             }
         }
         else {
-            signerInfosU2.add(unsignedAtributte(parameters, cert, signerInfo, keyEntry));
+            signerInfosU2.add(generateSignerInfo(
+            		parameters, cert, signerInfo, keyEntry, contentType, contentDescription));
             final Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU2));
             counterSigner =
                     new SignerInfo(signerInfo.getSID(),
@@ -730,16 +795,22 @@ final class CAdESCounterSigner {
      *        Clave privada a usar para firmar
      * @param node
      *        Nodo espec&iacute;fico a firmar.
+     * @param contentType
+     * 		  Tipo de contenido definido por su OID.
+     * @param contentDescription
+     * 		  Descripci&oacute;n textual del tipo de contenido firmado.
      * @return El SignerInfo ra&iacute;z parcial con todos sus nodos
      *         Contrafirmados.
      * @throws java.security.NoSuchAlgorithmException
      * @throws java.io.IOException
      * @throws java.security.cert.CertificateException
      * @throws es.map.es.map.afirma.exceptions.AOException */
-    private SignerInfo getCounterNodeUnsignedAtributes(final SignerInfo signerInfo,
+    private SignerInfo getNodeSignerInfo(final SignerInfo signerInfo,
                                                        final P7ContentSignerParameters parameters,
                                                        final X509Certificate cert,
                                                        final PrivateKeyEntry keyEntry,
+                                                       final String contentType,
+                                                       final String contentDescription,
                                                        final int node) throws NoSuchAlgorithmException, IOException, CertificateException, AOException {
 
         final ASN1EncodableVector signerInfosU = new ASN1EncodableVector();
@@ -756,14 +827,17 @@ final class CAdESCounterSigner {
                         this.actualIndex++;
                         if (this.actualIndex != node) {
                             if (this.actualIndex < node) {
-                                signerInfosU.add(getCounterNodeUnsignedAtributes(si, parameters, cert, keyEntry, node));
+                                signerInfosU.add(getNodeSignerInfo(
+                                		si, parameters, cert, keyEntry,
+                                        contentType, contentDescription, node));
                             }
                             else {
                                 signerInfosU.add(si);
                             }
                         }
                         else {
-                            final SignerInfo obtained = getCounterNodeUnsignedAtributes(si, parameters, cert, keyEntry);
+                            final SignerInfo obtained = getNodeSignerInfo(
+                            		si, parameters, cert, keyEntry, contentType, contentDescription);
                             signerInfosU.add(obtained);
                         }
                     }
@@ -860,14 +934,20 @@ final class CAdESCounterSigner {
      *        realizar la contrafirma espec&iacute;fica.
      * @param keyEntry
      *        Clave privada a usar para firmar
+     * @param contentType
+     * 		  Tipo de contenido definido por su OID.
+     * @param contentDescription
+     * 		  Descripci&oacute;n textual del tipo de contenido firmado.
      * @return El signerInfo contrafirmado.
      * @throws java.security.NoSuchAlgorithmException
      * @throws java.io.IOException
      * @throws java.security.cert.CertificateException */
-    private SignerInfo unsignedAtributte(final P7ContentSignerParameters parameters,
+    private SignerInfo generateSignerInfo(final P7ContentSignerParameters parameters,
                                          final X509Certificate cert,
                                          final SignerInfo si,
-                                         final PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException,
+                                         final PrivateKeyEntry keyEntry,
+                                         final String contentType,
+                                         final String contentDescription) throws NoSuchAlgorithmException,
                                                                                                                                              IOException,
                                                                                                                                              CertificateException {
         // // UNAUTHENTICATEDATTRIBUTES
@@ -888,7 +968,9 @@ final class CAdESCounterSigner {
                      getGlobalPolicy(),
                      null,
                      new Date(),
-                     false
+                     false,
+                     contentType,
+                     contentDescription
                 );
         this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExcepcific));
         unsignedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExcepcific));

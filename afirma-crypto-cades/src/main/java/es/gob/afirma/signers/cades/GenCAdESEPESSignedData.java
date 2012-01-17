@@ -72,6 +72,8 @@ public final class GenCAdESEPESSignedData {
      * @param messageDigest
      *        Huella digital a aplicar en la firma.
      * @param padesMode <code>true</code> para generar una firma CAdES compatible PAdES, <code>false</code> para generar una firma CAdES normal
+     * @param contentType Tipo de contenido definido por su OID.
+     * @param contentDescription Descripci&oacute;n textual del tipo de contendio.
      * @return La firma generada codificada en ASN.1 binario.
      * @throws java.security.NoSuchAlgorithmException
      *         Si no se soporta alguno de los algoritmos de firma o huella
@@ -89,7 +91,9 @@ public final class GenCAdESEPESSignedData {
                                      final AdESPolicy policy,
                                      final PrivateKeyEntry keyEntry,
                                      final byte[] messageDigest,
-                                     final boolean padesMode) throws NoSuchAlgorithmException, CertificateException, IOException, AOException {
+                                     final boolean padesMode,
+                                     final String contentType,
+                                     final String contentDescription) throws NoSuchAlgorithmException, CertificateException, IOException, AOException {
 
         if (parameters == null) {
             throw new IllegalArgumentException("Los parametros no pueden ser nulos"); //$NON-NLS-1$
@@ -109,7 +113,9 @@ public final class GenCAdESEPESSignedData {
                 MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(signatureAlgorithm)).digest(parameters.getContent()) :
                     messageDigest,
             signDate,
-            padesMode
+            padesMode,
+            contentType,
+            contentDescription
         );
 
         final byte[] signature = PKCS1ExternalizableSigner.sign(signatureAlgorithm, keyEntry.getPrivateKey(), preSignature);
@@ -130,7 +136,9 @@ public final class GenCAdESEPESSignedData {
                     MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(signatureAlgorithm)).digest(parameters.getContent()) :
                         messageDigest,
                 signDate,
-                padesMode
+                padesMode,
+                contentType,
+                contentDescription
             )
         );
 

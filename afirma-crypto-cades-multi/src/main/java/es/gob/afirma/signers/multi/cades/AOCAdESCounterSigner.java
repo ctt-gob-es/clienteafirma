@@ -55,7 +55,9 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
 	                       CounterSignTarget.TREE,
 	                       nodes,
 	                       keyEntry,
-	                       new AdESPolicy(extraParams)
+	                       new AdESPolicy(extraParams),
+	                       extraParams.getProperty("contentTypeOid"), //$NON-NLS-1$
+	                       extraParams.getProperty("contentDescription") //$NON-NLS-1$
                     );
                 }
                 // CASO DE FIRMA DE HOJAS
@@ -70,7 +72,9 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                                 CounterSignTarget.LEAFS,
                                 nodes,
                                 keyEntry,
-                                new AdESPolicy(extraParams)
+                                new AdESPolicy(extraParams),
+                                extraParams.getProperty("contentTypeOid"), //$NON-NLS-1$
+                                extraParams.getProperty("contentDescription") //$NON-NLS-1$
                     		);
                 }
                 // CASO DE FIRMA DE NODOS
@@ -87,7 +91,9 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                                 CounterSignTarget.NODES,
                                 nodesID,
                                 keyEntry,
-                                new AdESPolicy(extraParams)
+                                new AdESPolicy(extraParams),
+                                extraParams.getProperty("contentTypeOid"), //$NON-NLS-1$
+                                extraParams.getProperty("contentDescription") //$NON-NLS-1$
                             );
                 }
                 // CASO DE FIRMA DE NODOS DE UNO O VARIOS FIRMANTES
@@ -107,7 +113,9 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                                 CounterSignTarget.SIGNERS,
                                 nodes2,
                                 keyEntry,
-                                new AdESPolicy(extraParams)
+                                new AdESPolicy(extraParams),
+                                extraParams.getProperty("contentTypeOid"), //$NON-NLS-1$
+                                extraParams.getProperty("contentDescription") //$NON-NLS-1$
                     		);
 
                 }
@@ -135,7 +143,9 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                             CounterSignTarget.TREE,
                             nodes,
                             keyEntry,
-                            new AdESPolicy(extraParams)
+                            new AdESPolicy(extraParams),
+                            extraParams.getProperty("contentTypeOid"), //$NON-NLS-1$
+                            extraParams.getProperty("contentDescription") //$NON-NLS-1$
                         );
             }
             // CASO DE FIRMA DE HOJAS
@@ -150,7 +160,9 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                             CounterSignTarget.LEAFS,
                             nodes,
                             keyEntry,
-                            new AdESPolicy(extraParams)
+                            new AdESPolicy(extraParams),
+                            extraParams.getProperty("contentTypeOid"), //$NON-NLS-1$
+                            extraParams.getProperty("contentDescription") //$NON-NLS-1$
                 		);
             }
             // CASO DE FIRMA DE NODOS
@@ -166,7 +178,9 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                     CounterSignTarget.NODES,
                     nodesID,
                     keyEntry,
-                    new AdESPolicy(extraParams)
+                    new AdESPolicy(extraParams),
+                    extraParams.getProperty("contentTypeOid"), //$NON-NLS-1$
+                    extraParams.getProperty("contentDescription") //$NON-NLS-1$
                 );
             }
             // CASO DE FIRMA DE NODOS DE UNO O VARIOS FIRMANTES
@@ -185,7 +199,9 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                     CounterSignTarget.SIGNERS,
                     nodes2,
                     keyEntry,
-                    new AdESPolicy(extraParams)
+                    new AdESPolicy(extraParams),
+                    extraParams.getProperty("contentTypeOid"), //$NON-NLS-1$
+                    extraParams.getProperty("contentDescription") //$NON-NLS-1$
                 );
 
             }

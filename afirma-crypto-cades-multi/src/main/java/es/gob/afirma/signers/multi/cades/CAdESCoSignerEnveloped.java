@@ -128,6 +128,8 @@ final class CAdESCoSignerEnveloped {
      *        Clave privada usada para firmar.
      * @param messageDigest
      *        Hash espec&iacute;fico para una firma.
+     * @param contentType Tipo de contenido definido por su OID.
+     * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
      * @return El archivo de firmas con la nueva firma.
      * @throws java.io.IOException
      *         Si ocurre alg&uacute;n problema leyendo o escribiendo los
@@ -142,7 +144,9 @@ final class CAdESCoSignerEnveloped {
                            final byte[] sign,
                            final AdESPolicy policy,
                            final PrivateKeyEntry keyEntry,
-                           final byte[] messageDigest) throws IOException, NoSuchAlgorithmException, CertificateException {
+                           final byte[] messageDigest,
+                           final String contentType,
+                           final String contentDescription) throws IOException, NoSuchAlgorithmException, CertificateException {
 
         final ASN1InputStream is = new ASN1InputStream(sign);
 
@@ -202,7 +206,9 @@ final class CAdESCoSignerEnveloped {
                      policy,
                      null,
                      new Date(),
-                     false
+                     false,
+                     contentType,
+                     contentDescription
                  );
 
             this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
@@ -216,7 +222,9 @@ final class CAdESCoSignerEnveloped {
                      policy,
                      messageDigest,
                      new Date(),
-                     false
+                     false,
+                     contentType,
+                     contentDescription
                 );
             this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
             signedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
@@ -276,6 +284,8 @@ final class CAdESCoSignerEnveloped {
      *        Clave privada usada para firmar.
      * @param md
      *        Huella digital espec&iacute;fica para una firma.
+     * @param contentType Tipo de contenido definido por su OID.
+     * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
      * @return El archivo de firmas con la nueva firma.
      * @throws java.io.IOException
      *         Si ocurre alg&uacute;n problema leyendo o escribiendo los
@@ -291,7 +301,9 @@ final class CAdESCoSignerEnveloped {
                            final InputStream data,
                            final AdESPolicy policy,
                            final PrivateKeyEntry keyEntry,
-                           final byte[] md) throws IOException, NoSuchAlgorithmException, CertificateException {
+                           final byte[] md,
+                           final String contentType,
+                           final String contentDescription) throws IOException, NoSuchAlgorithmException, CertificateException {
 
         final ASN1InputStream is = new ASN1InputStream(data);
 
@@ -382,7 +394,9 @@ final class CAdESCoSignerEnveloped {
                      policy,
                      messageDigest,
                      new Date(),
-                     false
+                     false,
+                     contentType,
+                     contentDescription
                 );
             this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
             signedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));

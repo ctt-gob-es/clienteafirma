@@ -26,8 +26,10 @@ import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.DERUTCTime;
+import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.CMSAttributes;
+import org.bouncycastle.asn1.ess.ContentHints;
 import org.bouncycastle.asn1.ess.ESSCertID;
 import org.bouncycastle.asn1.ess.ESSCertIDv2;
 import org.bouncycastle.asn1.ess.SigningCertificate;
@@ -66,6 +68,8 @@ public final class CAdESUtils {
      * @param messageDigest Huella digital de los datos firmados
      * @param signDate Fecha de la firma (debe establecerse externamente para evitar desincronismos en la firma trif&aacute;sica)
      * @param padesMode <code>true</code> para generar una firma CAdES compatible PAdES, <code>false</code> para generar una firma CAdES normal
+     * @param contentType Tipo de contenido definido por su OID.
+     * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
      * @return Los datos necesarios para generar la firma referente a los datos del usuario.
      * @throws java.security.NoSuchAlgorithmException
      * @throws java.io.IOException
@@ -76,7 +80,9 @@ public final class CAdESUtils {
                                                   final AdESPolicy policy,
                                                   final byte[] messageDigest,
                                                   final Date signDate,
-                                                  final boolean padesMode) throws NoSuchAlgorithmException,
+                                                  final boolean padesMode,
+                                                  final String contentType,
+                                                  final String contentDescription) throws NoSuchAlgorithmException,
                                                                                      IOException,
                                                                                      CertificateEncodingException {
 
@@ -275,7 +281,27 @@ public final class CAdESUtils {
             contexExpecific.add(new Attribute(PKCSObjectIdentifiers.id_aa_ets_sigPolicyId, new DERSet(ds.toASN1Object())));
             // FIN SIGPOLICYID ATTRIBUTE
         }
-
+        
+        /**
+         * Secuencia con el tipo de contenido firmado
+         * 
+         * ContentHints ::= SEQUENCE {
+         *	  contentDescription UTF8String (SIZE (1..MAX)) OPTIONAL,
+         *	  contentType ContentType }
+         */
+        if (contentType != null) {
+        	final ContentHints contentHints;
+        	if (contentDescription != null) { 
+        		contentHints = new ContentHints(new DERObjectIdentifier(contentType),
+        										new DERUTF8String(contentDescription));
+        	} else {
+        		contentHints = new ContentHints(new DERObjectIdentifier(contentType));
+        	}
+        	contexExpecific.add(new Attribute(
+        			PKCSObjectIdentifiers.id_aa_contentHint,
+        			new DERSet(contentHints.toASN1Object())));
+        }
+        
         return contexExpecific;
     }
 

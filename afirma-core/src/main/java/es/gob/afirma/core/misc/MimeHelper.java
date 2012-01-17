@@ -28,6 +28,12 @@ public final class MimeHelper {
     /** MimeType por defecto. */
     public static final String DEFAULT_MIMETYPE = "application/octet-stream"; //$NON-NLS-1$
     
+    /** Descriptor por defecto del tipo de contenido. */
+    public static final String DEFAULT_CONTENT_DESCRIPTION = "binary"; //$NON-NLS-1$
+    
+    /** OID del tipo de datos gen&eacute;rico. */
+    public static final String DEFAULT_CONTENT_OID_DATA ="1.2.840.113549.1.7.1"; //$NON-NLS-1$
+    
     /** Tabla que asocia Oids y Mimetypes. */
     private static Properties oidMimetypeProp = null;
 
@@ -85,7 +91,8 @@ public final class MimeHelper {
     }
 
     /** Obtiene el Oid correspondiente a un Mime Type concreto. Si no conoce el
-     * Oid asociado, devuelve <code>null</code>.
+     * Oid asociado, devuelve el OID por defecto para datos binarios
+     * (DEFAULT_CONTENT_OID_DATA).
      * @param mimetype
      *        del que deseamos obtener el Oid.
      * @return OID asociado al Mime Type. */
@@ -93,11 +100,14 @@ public final class MimeHelper {
         if (mimetypeOidProp == null) {
             loadMimetypeOidProperties();
         }
-        return mimetypeOidProp.getProperty(mimetype);
+        return mimetype == null ?
+        		DEFAULT_CONTENT_OID_DATA :
+        			mimetypeOidProp.getProperty(mimetype, DEFAULT_CONTENT_OID_DATA);
     }
 
     /** Obtiene el Mime correspondiente a un Oid concreto. Si no conoce el Mime
-     * Type asociado, devuelve <code>null</code>.
+     * Type asociado, devuelve el gen&eacute;rico de datos binarios
+     * (DEFAULT_MIMETYPE).
      * @param oid
      *        del que deseamos obtener el Mime Type.
      * @return MimeType asociado al OID. */
@@ -105,7 +115,9 @@ public final class MimeHelper {
         if (oidMimetypeProp == null) {
             loadOidMimetypeProperties();
         }
-        return oidMimetypeProp.getProperty(oid);
+        return oid == null ?
+        		DEFAULT_MIMETYPE :
+        			oidMimetypeProp.getProperty(oid, DEFAULT_MIMETYPE);
     }
 
     /** Carga el properties que relaciona OIDs de formato con su mime type
@@ -211,10 +223,11 @@ public final class MimeHelper {
      * se pudo detectar.
      * @return Descripci&oacute;n del tipo de dato. */
     public String getDescription() {
+    	String desc = null;
         if (this.mimeInfo != null) {
-            return this.mimeInfo.getDescription();
+            desc = this.mimeInfo.getDescription();
         }
-        return null;
+        return (desc == null || desc.length() == 0) ? DEFAULT_CONTENT_DESCRIPTION : desc;
     }
 
     /**

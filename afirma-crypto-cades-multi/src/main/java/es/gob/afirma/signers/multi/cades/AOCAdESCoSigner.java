@@ -59,7 +59,9 @@ public class AOCAdESCoSigner implements AOCoSigner {
                     omitContent,
                     new AdESPolicy(extraParams),
                     keyEntry,
-                    messageDigest
+                    messageDigest,
+                    extraParams.getProperty("contentTypeOid"), //$NON-NLS-1$
+                    extraParams.getProperty("contentDescription") //$NON-NLS-1$
                 );
             }
 
@@ -68,7 +70,9 @@ public class AOCAdESCoSigner implements AOCoSigner {
                  sign,
                  new AdESPolicy(extraParams),
                  keyEntry,
-                 messageDigest
+                 messageDigest,
+                 extraParams.getProperty("contentTypeOid"), //$NON-NLS-1$
+                 extraParams.getProperty("contentDescription") //$NON-NLS-1$
             );
 
         }
@@ -98,7 +102,9 @@ public class AOCAdESCoSigner implements AOCoSigner {
                     new ByteArrayInputStream(sign),
                     new AdESPolicy(extraParams),
                     keyEntry,
-                    null // null porque no nos pueden dar un hash en este metodo, tendría que ser en el que incluye datos
+                    null, // null porque no nos pueden dar un hash en este metodo, tendría que ser en el que incluye datos
+                    extraParams.getProperty("contentTypeOid"), //$NON-NLS-1$
+                    extraParams.getProperty("contentDescription") //$NON-NLS-1$
                 );
             }
             catch (final Exception e) {
@@ -114,7 +120,9 @@ public class AOCAdESCoSigner implements AOCoSigner {
                  new ByteArrayInputStream(sign),
                  new AdESPolicy(extraParams),
                  keyEntry,
-                 null // null porque no nos pueden dar un hash en este metodo, tendría que ser en el que incluye datos
+                 null, // null porque no nos pueden dar un hash en este metodo, tendría que ser en el que incluye datos
+                 extraParams.getProperty("contentTypeOid"), //$NON-NLS-1$
+                 extraParams.getProperty("contentDescription") //$NON-NLS-1$
             );
         }
         catch (final Exception e) {

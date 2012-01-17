@@ -113,6 +113,14 @@ public final class AOCAdESSigner implements AOSigner {
      *     <code>data</code> son la huella digital de los datos a firmar, y no los datos a firmar en si.
      *    </b>
      *   </dd>
+     *   <dt><b><i>contentTypeOid</i></b></dt>
+     *   <dd>
+     *    OID del tipo de contenido.
+     *   </dd>
+     *   <dt><b><i>contentDescription</i></b></dt>
+     *   <dd>
+     *    Texto description del tipo de contenido firmado.
+     *   </dd>
      * </dl>
      * @return Firma en formato CAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
@@ -146,7 +154,9 @@ public final class AOCAdESSigner implements AOSigner {
                    new AdESPolicy(extraParams),
                    keyEntry,
                    messageDigest,
-                   Boolean.parseBoolean(extraParams.getProperty("padesMode", "false")) //$NON-NLS-1$ //$NON-NLS-2$
+                   Boolean.parseBoolean(extraParams.getProperty("padesMode", "false")), //$NON-NLS-1$ //$NON-NLS-2$
+                   extraParams.getProperty("contentTypeOid"), //$NON-NLS-1$
+                   extraParams.getProperty("contentDescription") //$NON-NLS-1$
             );
 
         }
@@ -230,6 +240,14 @@ public final class AOCAdESSigner implements AOSigner {
      *     <code>data</code> son la huella digital de los datos a firmar, y no los datos a firmar en si.
      *    </b>
      *   </dd>
+     *   <dt><b><i>contentTypeOid</i></b></dt>
+     *   <dd>
+     *    OID del tipo de contenido.
+     *   </dd>
+     *   <dt><b><i>contentDescription</i></b></dt>
+     *   <dd>
+     *    Texto description del tipo de contenido firmado.
+     *   </dd>
      * </dl>
      * @return Firma CAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
@@ -310,6 +328,14 @@ public final class AOCAdESSigner implements AOSigner {
      *   <dd>
      *    URL que apunta al documento descriptivo de la pol&iacute;tica de firma (normalmente un documento PDF con una descripci&oacute;n textual).
      *   </dd>
+     *   <dt><b><i>contentTypeOid</i></b></dt>
+     *   <dd>
+     *    OID del tipo de contenido.
+     *   </dd>
+     *   <dt><b><i>contentDescription</i></b></dt>
+     *   <dd>
+     *    Texto description del tipo de contenido firmado.
+     *   </dd>
      * </dl>
      * @return Firma CAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
@@ -380,6 +406,14 @@ public final class AOCAdESSigner implements AOSigner {
      *  <dt><b><i>policyQualifier</i></b></dt>
      *   <dd>
      *    URL que apunta al documento descriptivo de la pol&iacute;tica de firma (normalmente un documento PDF con una descripci&oacute;n textual).
+     *   </dd>
+     *   <dt><b><i>contentTypeOid</i></b></dt>
+     *   <dd>
+     *    OID del tipo de contenido.
+     *   </dd>
+     *   <dt><b><i>contentDescription</i></b></dt>
+     *   <dd>
+     *    Texto description del tipo de contenido firmado.
      *   </dd>
      * </dl>
      * @return Contrafirma CAdES
