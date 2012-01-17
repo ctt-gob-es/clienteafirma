@@ -14,6 +14,7 @@ import java.io.ByteArrayInputStream;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.signers.AOSignConstants;
 
 /** Clase de utilidad para el proceso de propiedades enviadas desde JavaScript
@@ -87,7 +88,7 @@ final class ExtraParamsProcessor {
 	 * @return Propiedades expandidas.
 	 */
 	static Properties expandProperties(final Properties params) {
-		return expandProperties(params, null, 0);
+		return expandProperties(params, null, null, 0);
 	}
 	
 	/**
@@ -112,7 +113,7 @@ final class ExtraParamsProcessor {
 	 * @param dataSize Tama&ntilde;o de los datos firmados.
 	 * @return Propiedades expandidas.
 	 */
-	static Properties expandProperties(final Properties params, final String format, final int dataSize) {
+	static Properties expandProperties(final Properties params, final byte[] signedData, final String format, final int dataSize) {
 		
 		final Properties p = new Properties();
 		for (final String key : params.keySet().toArray(new String[0])) {
@@ -123,20 +124,29 @@ final class ExtraParamsProcessor {
 			if (EXPANDIBLE_POLICY_VALUE_AGE.equals(p.getProperty(EXPANDIBLE_POLICY_KEY))) {
 				p.setProperty("policyIdentifier", //$NON-NLS-1$
 					"urn:oid:2.16.724.1.3.1.1.2.1.8");  //$NON-NLS-1$ 
-				p.setProperty("policyIdentifierHash", //$NON-NLS-1$
-					"V8lVVNGDCPen6VELRD1Ja8HARFk=");  //$NON-NLS-1$ 
 				p.setProperty("policyIdentifierHashAlgorithm", //$NON-NLS-1$
 					"http://www.w3.org/2000/09/xmldsig#sha1"); //$NON-NLS-1$ 
 				p.setProperty("policyQualifier", //$NON-NLS-1$
 					"http://administracionelectronica.gob.es/es/ctt/politicafirma/politica_firma_AGE_v1_8.pdf"); //$NON-NLS-1$
+				
 				if (format != null && format.startsWith(AOSignConstants.SIGN_FORMAT_XADES)) {
+					p.setProperty("policyIdentifierHash", //$NON-NLS-1$
+						"V8lVVNGDCPen6VELRD1Ja8HARFk=");  //$NON-NLS-1$ 
 					p.setProperty("format", //$NON-NLS-1$
-							AOSignConstants.SIGN_FORMAT_XADES_DETACHED);
+						AOSignConstants.SIGN_FORMAT_XADES_DETACHED);
 				}
 				if (format != null && format.equals(AOSignConstants.SIGN_FORMAT_CADES)) {
+					p.setProperty("policyIdentifierHash", //$NON-NLS-1$
+						"7SxX3erFuH31TvAw9LZ70N7p1vA=");  //$NON-NLS-1$ 
 					p.setProperty("mode", //$NON-NLS-1$
 							dataSize < MAX_IMPLICIT_CADES_SIZE ? 
 									AOSignConstants.SIGN_MODE_IMPLICIT : AOSignConstants.SIGN_MODE_EXPLICIT);
+					
+					if (signedData != null) {
+						final MimeHelper mimeHelper = new MimeHelper(signedData);
+						p.setProperty("contentDescription", mimeHelper.getDescription()); //$NON-NLS-1$
+						p.setProperty("contentTypeOid", MimeHelper.transformMimeTypeToOid(mimeHelper.getMimeType())); //$NON-NLS-1$
+					}
 				}
 			}
 			p.remove(EXPANDIBLE_POLICY_KEY);
