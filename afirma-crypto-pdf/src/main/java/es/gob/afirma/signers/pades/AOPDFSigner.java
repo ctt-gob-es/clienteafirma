@@ -969,14 +969,15 @@ public final class AOPDFSigner implements AOSigner {
         // ********************************************************************************
         // **************** CALCULO DEL SIGNED DATA ***************************************
         // ********************************************************************************
-
 		byte[] pk = GenCAdESEPESSignedData.generateSignedData(
             new P7ContentSignerParameters(inPDF, algorithm, chain),
             true, // omitContent
             new AdESPolicy(extraParams),
             ke,
             MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(algorithm)).digest(AOUtil.getDataFromInputStream(sap.getRangeStream())),
-            true // Modo PAdES
+            true, // Modo PAdES
+            extraParams.getProperty("contentTypeOid"), //$NON-NLS-1$
+            extraParams.getProperty("contentDescription") //$NON-NLS-1$
         );
 
         //***************** SELLO DE TIEMPO ****************
