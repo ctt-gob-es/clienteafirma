@@ -92,7 +92,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 					dataBinary,
 					MiniAfirmaApplet.cleanParam(algorithm), 
 					this.selectPrivateKey(params), 
-					ExtraParamsProcessor.expandProperties(params, format, dataBinary.length)
+					ExtraParamsProcessor.expandProperties(params, dataBinary, format, dataBinary.length)
 			)));
 		}
 		catch (final AOFormatFileException e) {
@@ -124,7 +124,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		final Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
 		final byte[] dataBinary;
 		try {
-			dataBinary = Base64.decode(dataB64); 
+			dataBinary = dataB64 == null ? null : Base64.decode(dataB64); 
 		}
 		catch (final IOException e) {
 			setErrorMessage(e);
@@ -139,7 +139,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 					dataBinary,
 					MiniAfirmaApplet.cleanParam(algorithm), 
 					this.selectPrivateKey(params),
-					ExtraParamsProcessor.expandProperties(params, format, dataBinary != null ? dataBinary.length : 0)
+					ExtraParamsProcessor.expandProperties(params, dataBinary, format, dataBinary != null ? dataBinary.length : 0)
 			)));
 		}
 		catch (final AOFormatFileException e) {
