@@ -25,6 +25,9 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 /** Operaciones de cofirma CAdES. */
 public class AOCAdESCoSigner implements AOCoSigner {
 
+	private static final String CONTENTTYPE_OID = "contentTypeOid"; //$NON-NLS-1$
+	private static final String CONTENT_DESCRIPTION = "contentDescription"; //$NON-NLS-1$
+
     public byte[] cosign(final byte[] data,
                          final byte[] sign,
                          final String algorithm,
@@ -60,8 +63,8 @@ public class AOCAdESCoSigner implements AOCoSigner {
                     new AdESPolicy(extraParams),
                     keyEntry,
                     messageDigest,
-                    extraParams.getProperty("contentTypeOid"), //$NON-NLS-1$
-                    extraParams.getProperty("contentDescription") //$NON-NLS-1$
+                    extraParams.getProperty(CONTENTTYPE_OID),
+                    extraParams.getProperty(CONTENT_DESCRIPTION)
                 );
             }
 
@@ -71,8 +74,8 @@ public class AOCAdESCoSigner implements AOCoSigner {
                  new AdESPolicy(extraParams),
                  keyEntry,
                  messageDigest,
-                 extraParams.getProperty("contentTypeOid"), //$NON-NLS-1$
-                 extraParams.getProperty("contentDescription") //$NON-NLS-1$
+                 extraParams.getProperty(CONTENTTYPE_OID),
+                 extraParams.getProperty(CONTENT_DESCRIPTION)
             );
 
         }
@@ -103,8 +106,8 @@ public class AOCAdESCoSigner implements AOCoSigner {
                     new AdESPolicy(extraParams),
                     keyEntry,
                     null, // null porque no nos pueden dar un hash en este metodo, tendría que ser en el que incluye datos
-                    extraParams.getProperty("contentTypeOid"), //$NON-NLS-1$
-                    extraParams.getProperty("contentDescription") //$NON-NLS-1$
+                    extraParams.getProperty(CONTENTTYPE_OID),
+                    extraParams.getProperty(CONTENT_DESCRIPTION)
                 );
             }
             catch (final Exception e) {
@@ -121,8 +124,8 @@ public class AOCAdESCoSigner implements AOCoSigner {
                  new AdESPolicy(extraParams),
                  keyEntry,
                  null, // null porque no nos pueden dar un hash en este metodo, tendría que ser en el que incluye datos
-                 extraParams.getProperty("contentTypeOid"), //$NON-NLS-1$
-                 extraParams.getProperty("contentDescription") //$NON-NLS-1$
+                 extraParams.getProperty(CONTENTTYPE_OID),
+                 extraParams.getProperty(CONTENT_DESCRIPTION)
             );
         }
         catch (final Exception e) {
