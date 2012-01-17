@@ -63,7 +63,15 @@ public class MiniTestDNI {
         final boolean omitContent = false;
         final byte[] messageDigest = null; // Se calcula internamente el digest de los datos a firmar.
 
-        final byte[] firma = GenCAdESEPESSignedData.generateSignedData(p7ContentSignerParameters, omitContent, new AdESPolicy(new Properties()), pke, messageDigest, false);
+        final byte[] firma = GenCAdESEPESSignedData.generateSignedData(
+        		p7ContentSignerParameters,
+        		omitContent,
+        		new AdESPolicy(new Properties()),
+        		pke,
+        		messageDigest,
+        		false,
+        		null,
+        		null);
 
         Assert.assertNotNull(firma);
 
