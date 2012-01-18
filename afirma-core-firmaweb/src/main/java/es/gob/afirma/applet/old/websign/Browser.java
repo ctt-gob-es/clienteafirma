@@ -20,7 +20,7 @@ import javax.swing.UIManager;
 /** Clase espec&iacute;fica para firma Web. */
 public final class Browser {
 	
-	private Browser() {
+	public Browser() {
 		// No permitimos la instanciacion
 	}
 
