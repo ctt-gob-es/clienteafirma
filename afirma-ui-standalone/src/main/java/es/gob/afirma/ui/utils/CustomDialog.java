@@ -79,7 +79,7 @@ public final class CustomDialog extends JAccessibilityCustomDialog implements Ac
 	/**
 	 * Campo de texto o campo de contrasena
 	 */
-	JComponent component = null;
+	private JComponent component = null;
 	
 	
 	/**
@@ -100,17 +100,17 @@ public final class CustomDialog extends JAccessibilityCustomDialog implements Ac
 	/**
 	 * Boton de Cancel.
 	 */
-	static JButton cancelButton = null;
+	private static JButton cancelButton = null;
 	
 	/**
 	 * Boton de restaurar.
 	 */
-	JButton restoreButton = null;
+	private JButton restoreButton = null;
 	
 	/**
 	 * Boton de maximizar.
 	 */
-	JButton maximizeButton = null;
+	private JButton maximizeButton = null;
 
 	/**
 	 * Respuesta al mensaje

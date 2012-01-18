@@ -19,6 +19,7 @@ import java.util.List;
 import javax.swing.JPanel;
 
 import es.gob.afirma.ui.principal.Main;
+import es.gob.afirma.ui.utils.Constants;
 import es.gob.afirma.ui.utils.InfoLabel;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
@@ -80,14 +81,14 @@ final class PanelPresentacion extends JAccessibilityDialogWizard {
 
         // Etiqueta con el texto "Bienvenido al asistente..."
         final String textLabel =
-            Messages.getString("Wizard.sobres.presentacion.desclave.presentacion1") + "<br>" //$NON-NLS-1$
-            + "<br>"
+            Messages.getString("Wizard.sobres.presentacion.desclave.presentacion1") + Constants.HTML_SALTO_LINEA //$NON-NLS-1$
+            + Constants.HTML_SALTO_LINEA
             + Messages.getString("Wizard.sobres.presentacion.desclave.presentacion2") //$NON-NLS-1$
-            + "<br>"
-            + "<br>"
+            + Constants.HTML_SALTO_LINEA
+            + Constants.HTML_SALTO_LINEA
             + Messages.getString("Wizard.sobres.presentacion.desclave.presentacion3") //$NON-NLS-1$
-            + "<br>"
-            + "<br>"
+            + Constants.HTML_SALTO_LINEA
+            + Constants.HTML_SALTO_LINEA
             + Messages.getString("Wizard.sobres.presentacion.desclave.presentacion4"); //$NON-NLS-1$
         final InfoLabel presentationLabel = new InfoLabel(textLabel, false);
         // Foco al contenido

@@ -158,18 +158,18 @@ public class CifradoAccessibilityTest {
 		assertTrue(keyCodesSet.size() == keyCodes.size());
 	}
 	
-	/**
-	 * Comprobacion de que el campo nombre accesible para botones, radiobuttons combos y checks
-	 * no este vacio. 
-	 */
-	@Test
-	public void testNotEmptyAccessibleName() {
-		LOGGER.info("testNotEmptyAccessibleName"); //$NON-NLS-1$
-		//Instancia del panel que se va a analizar
-		Cifrado cifrado = new Cifrado();
-		//Se llama al metodo que comprueba que el nombre no sea vacio
-		assertTrue(checkAccessibleName(cifrado));
-	}
+//	/**
+//	 * Comprobacion de que el campo nombre accesible para botones, radiobuttons combos y checks
+//	 * no este vacio. 
+//	 */
+//	@Test
+//	public void testNotEmptyAccessibleName() {
+//		LOGGER.info("testNotEmptyAccessibleName"); //$NON-NLS-1$
+//		//Instancia del panel que se va a analizar
+//		Cifrado cifrado = new Cifrado();
+//		//Se llama al metodo que comprueba que el nombre no sea vacio
+//		assertTrue(checkAccessibleName(cifrado));
+//	}
 	
 	/**
 	 * Recorre el panel comprobando que todos sus componentes (botones, radioButtons, checks y combos)

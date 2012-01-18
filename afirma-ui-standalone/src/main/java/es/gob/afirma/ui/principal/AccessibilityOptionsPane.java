@@ -27,7 +27,7 @@ import es.gob.afirma.ui.utils.Utils;
 public final class AccessibilityOptionsPane {
 
     /** Control de estilo grande. */
-    public static boolean continueBigStyle = false;
+    private static boolean continueBigStyle = false;
 
     /** Clave para la configuraci&oacute;n de tama&ntilde;o del cursor de texto. */
     public static final String MAIN_CURSOR_SIZE = "main.cursorSize"; //$NON-NLS-1$
@@ -51,7 +51,7 @@ public final class AccessibilityOptionsPane {
     public static final String MAIN_WINDOWS_SIZE = "main.windowsSize"; //$NON-NLS-1$
 
     /** Boton aplicar cambios. */
-    JButton aplicar = new JButton();
+    private JButton aplicar = new JButton();
 
     /** Casilla de verificacion del tama&ntilde;o del cursor de texto. */
     private JCheckBox checkCursorSize;
@@ -76,7 +76,7 @@ public final class AccessibilityOptionsPane {
 
     private boolean isBigStyle = false;
 
-    boolean isChangeHighContrast = false;
+    private boolean isChangeHighContrast = false;
 
     /** Pantalla principal de la aplicaci&oacute;n. */
     private final PrincipalGUI mainGui;
@@ -87,7 +87,22 @@ public final class AccessibilityOptionsPane {
     /** Componente padre. */
     private JDialog parent = null;
 
-    /** Constructor.
+    /** Obtiene el valor de la variable continueBigStyle */
+    public static boolean isContinueBigStyle() {
+		return continueBigStyle;
+	}
+
+    /** Modifica el valor de la variable continueBigStyle */
+	public static void setContinueBigStyle(boolean continueBigStyle) {
+		AccessibilityOptionsPane.continueBigStyle = continueBigStyle;
+	}
+
+	/** Obtiene la referencia al bot&oacute;n aplicar */
+	public JButton getAplicar() {
+		return aplicar;
+	}
+
+	/** Constructor.
      * @param parent componente padre
      * @param mainGui principalGUI */
     public AccessibilityOptionsPane(final JDialog parent, final PrincipalGUI mainGui) {
@@ -450,14 +465,14 @@ public final class AccessibilityOptionsPane {
     /** Introduce en un properties la configuraci&oacute;n establecida en el panel.
      * @param config Configuraci&oacute;n para cargar en el panel. */
     public void loadConfig(final Properties config) {
-        this.checkFontSize.setSelected(Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_FONT_SIZE, "false")));
-        this.checkFontStyle.setSelected(Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_FONT_STYLE, "false")));
-        this.checkHighContrast.setSelected(Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_HIGHT_CONTRAST, "false")));
-        this.checkFocusVisible.setSelected(Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_FOCUS_VISIBLE, "false")));
-        this.checkWindowSize.setSelected(Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_WINDOWS_SIZE, "false")));
+        this.checkFontSize.setSelected(Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_FONT_SIZE, String.valueOf(false))));
+        this.checkFontStyle.setSelected(Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_FONT_STYLE, String.valueOf(false))));
+        this.checkHighContrast.setSelected(Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_HIGHT_CONTRAST, String.valueOf(false))));
+        this.checkFocusVisible.setSelected(Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_FOCUS_VISIBLE, String.valueOf(false))));
+        this.checkWindowSize.setSelected(Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_WINDOWS_SIZE, String.valueOf(false))));
         // this.checkWindowAccessibility.setSelected(Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_WINDOWS_ACCESSIBILITY,
-        // "true")));
-        this.checkCursorSize.setSelected(Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_CURSOR_SIZE, "false")));
+        // String.valueOf(true))));
+        this.checkCursorSize.setSelected(Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_CURSOR_SIZE, String.valueOf(false))));
 
         // Comprobamos si esta activada al menos una de las opciones de accesibilidad sobre textos
         if (Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_FONT_SIZE)) || Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_FONT_STYLE))) {

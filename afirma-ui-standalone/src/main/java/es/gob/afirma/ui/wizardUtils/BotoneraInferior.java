@@ -32,13 +32,13 @@ public class BotoneraInferior extends JPanel {
 
     private static final long serialVersionUID = 1L;
     private Dimension dimensiones = new Dimension(603, 47);
-    JButton finalizar = null;
+    private JButton finalizar = null;
     private int posicion;
 
     // private JButton restaurar = null;
     // private JButton maximizar = null;
-    JButton siguiente = null;
-    List<JDialogWizard> ventanas;
+    private JButton siguiente = null;
+    private List<JDialogWizard> ventanas;
 
     /** Genera una botonera con unas dimensiones dadas
      * @param dimensiones Dimensiones de la botonera */

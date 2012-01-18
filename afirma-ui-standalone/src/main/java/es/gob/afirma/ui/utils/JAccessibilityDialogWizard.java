@@ -102,7 +102,7 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 			}
 		} else {
 			if (PrincipalGUI.wizardActualPositionX != -1){
-				if (AccessibilityOptionsPane.continueBigStyle){
+				if (AccessibilityOptionsPane.isContinueBigStyle()){
 					if (Platform.getOS().equals(Platform.OS.LINUX)){
 						setBounds((screenSize.width - Constants.WIZARD_INITIAL_WIDTH) / 2, (screenSize.height - Constants.WIZARD_INITIAL_HEIGHT_LINUX) / 2, Constants.WIZARD_INITIAL_WIDTH_LINUX, Constants.WIZARD_INITIAL_HEIGHT_LINUX);
 					} else {

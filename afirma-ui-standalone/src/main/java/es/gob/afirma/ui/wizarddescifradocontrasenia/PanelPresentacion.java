@@ -20,6 +20,7 @@ import javax.swing.JPanel;
 
 
 import es.gob.afirma.ui.principal.Main;
+import es.gob.afirma.ui.utils.Constants;
 import es.gob.afirma.ui.utils.InfoLabel;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
@@ -103,9 +104,9 @@ public class PanelPresentacion extends JAccessibilityDialogWizard {
 		
 		 //Etiqueta con el texto "Bienvenido al asistente..."
         String textLabel = Messages.getString("Wizard.sobres.presentacion.desclave.presentacion1") +
-        		"<br>"+"<br>"+Messages.getString("Wizard.sobres.presentacion.desclave.presentacion2")+
-        		"<br>"+"<br>"+Messages.getString("Wizard.sobres.presentacion.desclave.presentacion3")+
-        		"<br>"+"<br>"+Messages.getString("Wizard.sobres.presentacion.desclave.presentacion4");
+        Constants.HTML_SALTO_LINEA+Constants.HTML_SALTO_LINEA+Messages.getString("Wizard.sobres.presentacion.desclave.presentacion2")+
+        Constants.HTML_SALTO_LINEA+Constants.HTML_SALTO_LINEA+Messages.getString("Wizard.sobres.presentacion.desclave.presentacion3")+
+        Constants.HTML_SALTO_LINEA+Constants.HTML_SALTO_LINEA+Messages.getString("Wizard.sobres.presentacion.desclave.presentacion4");
         InfoLabel presentationLabel = new InfoLabel(textLabel, false);
         //Foco al contenido
         presentationLabel.addAncestorListener(new RequestFocusListener(false));

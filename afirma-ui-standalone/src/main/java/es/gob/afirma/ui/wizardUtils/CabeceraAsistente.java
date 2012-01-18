@@ -57,11 +57,11 @@ public final class CabeceraAsistente extends JPanel {
     /**
      * Boton de maximizar.
      */
-    JButton maximizeButton = null;
-    private final String MessagesDescripcion;
-    private String MessagesDescripcion2 = "";
+    private JButton maximizeButton = null;
+    private final String messagesDescripcion;
+    private String messagesDescripcion2 = "";
 
-    private final String MessagesTitulo;
+    private final String messagesTitulo;
 
     /**
      * Boton de restaurar.
@@ -70,25 +70,25 @@ public final class CabeceraAsistente extends JPanel {
 
     /**
      * Genera una cabecera para un asistente
-     * @param MessagesTitulo		Texto para obtener del ResourceMessages el titulo del asistente
-     * @param MessagesDescripcion	Texto para obtener del ResourceMessages la descripcion del asistente
+     * @param messagesTitulo		Texto para obtener del ResourceMessages el titulo del asistente
+     * @param messagesDescripcion	Texto para obtener del ResourceMessages la descripcion del asistente
      */
-    public CabeceraAsistente(final String MessagesTitulo, final String MessagesDescripcion) {
-        this.MessagesTitulo = MessagesTitulo;
-        this.MessagesDescripcion = MessagesDescripcion;
+    public CabeceraAsistente(final String messagesTitulo, final String messagesDescripcion) {
+        this.messagesTitulo = messagesTitulo;
+        this.messagesDescripcion = messagesDescripcion;
 
         initComponents();
     }
 
     /**
      * Genera una cabecera para un asistente
-     * @param MessagesTitulo		Texto para obtener del ResourceMessages el titulo del asistente
-     * @param MessagesDescripcion	Texto para obtener del ResourceMessages la descripcion del asistente
+     * @param messagesTitulo		Texto para obtener del ResourceMessages el titulo del asistente
+     * @param messagesDescripcion	Texto para obtener del ResourceMessages la descripcion del asistente
      * @param dimensiones		Dimensiones de la cabecera
      */
-    public CabeceraAsistente(final String MessagesTitulo, final String MessagesDescripcion, final Dimension dimensiones) {
-        this.MessagesTitulo = MessagesTitulo;
-        this.MessagesDescripcion = MessagesDescripcion;
+    public CabeceraAsistente(final String messagesTitulo, final String messagesDescripcion, final Dimension dimensiones) {
+        this.messagesTitulo = messagesTitulo;
+        this.messagesDescripcion = messagesDescripcion;
         this.dimensiones = dimensiones;
 
         initComponents();
@@ -96,16 +96,16 @@ public final class CabeceraAsistente extends JPanel {
 
     /**
      * Genera una cabecera para un asistente
-     * @param MessagesTitulo		Texto para obtener del ResourceMessages el titulo del asistente
-     * @param MessagesDescripcion	Texto para obtener del ResourceMessages la descripcion del asistente
+     * @param messagesTitulo		Texto para obtener del ResourceMessages el titulo del asistente
+     * @param messagesDescripcion	Texto para obtener del ResourceMessages la descripcion del asistente
      * @param dimensiones		Dimensiones de la cabecera. Puede tomar el valor null y en tal caso se
      * 							asignaran las dimensiones predeterminadas
      * @param bloqueTexto		True: La descripcion tiene mas de una linea
      * 							False: La descripcion tiene solo una linea
      */
-    public CabeceraAsistente(final String MessagesTitulo, final String MessagesDescripcion, final Dimension dimensiones, final boolean bloqueTexto) {
-        this.MessagesTitulo = MessagesTitulo;
-        this.MessagesDescripcion = MessagesDescripcion;
+    public CabeceraAsistente(final String messagesTitulo, final String messagesDescripcion, final Dimension dimensiones, final boolean bloqueTexto) {
+        this.messagesTitulo = messagesTitulo;
+        this.messagesDescripcion = messagesDescripcion;
         if (dimensiones != null) {
             this.dimensiones = dimensiones;
         }
@@ -114,19 +114,19 @@ public final class CabeceraAsistente extends JPanel {
     }
     /**
      * Genera una cabecera para un asistente. Con un texto de cabecera de dos l&iacute;neas.
-     * @param MessagesTitulo		Texto para obtener del ResourceMessages el titulo del asistente
-     * @param MessagesDescripcion	Texto para obtener del ResourceMessages la descripcion del asistente
-     * @param MessagesDescripcion2	Segunda parte del texto para obtener del ResourceMessages la descripcion del asistente
+     * @param messagesTitulo		Texto para obtener del ResourceMessages el titulo del asistente
+     * @param messagesDescripcion	Texto para obtener del ResourceMessages la descripcion del asistente
+     * @param messagesDescripcion2	Segunda parte del texto para obtener del ResourceMessages la descripcion del asistente
      * @param dimensiones		Dimensiones de la cabecera. Puede tomar el valor null y en tal caso se
      * 							asignaran las dimensiones predeterminadas
      * @param bloqueTexto		True: La descripcion tiene mas de una linea
      * 							False: La descripcion tiene solo una linea
      */
-    public CabeceraAsistente(final String MessagesTitulo, final String MessagesDescripcion, final String MessagesDescripcion2, final Dimension dimensiones,
+    public CabeceraAsistente(final String messagesTitulo, final String messagesDescripcion, final String messagesDescripcion2, final Dimension dimensiones,
                              final boolean bloqueTexto) {
-        this.MessagesTitulo = MessagesTitulo;
-        this.MessagesDescripcion = MessagesDescripcion;
-        this.MessagesDescripcion2 = MessagesDescripcion2;
+        this.messagesTitulo = messagesTitulo;
+        this.messagesDescripcion = messagesDescripcion;
+        this.messagesDescripcion2 = messagesDescripcion2;
         if (dimensiones != null) {
             this.dimensiones = dimensiones;
         }
@@ -331,7 +331,7 @@ public final class CabeceraAsistente extends JPanel {
         // Etiqueta con el titulo de la ventana
         final JLabel etiquetaTitulo = new JLabel();
         etiquetaTitulo.setFont(new Font(getFont().getFamily(), 1, getFont().getSize()));
-        etiquetaTitulo.setText(Messages.getString(this.MessagesTitulo)); // NOI18N
+        etiquetaTitulo.setText(Messages.getString(this.messagesTitulo)); // NOI18N
         etiquetaTitulo.setFocusable(true);
         //Foco al contenido
         etiquetaTitulo.addAncestorListener(new RequestFocusListener(false));
@@ -346,13 +346,13 @@ public final class CabeceraAsistente extends JPanel {
 
         // Etiqueta HTML con la descripcion de la ventana
         InfoLabel etiquetaDescripcion;
-        if (this.MessagesDescripcion2.equals("")){
-            etiquetaDescripcion = new InfoLabel(Messages.getString(this.MessagesDescripcion), false);
+        if (this.messagesDescripcion2.equals("")){
+            etiquetaDescripcion = new InfoLabel(Messages.getString(this.messagesDescripcion), false);
         }
         else {
-            final String text = Messages.getString(this.MessagesDescripcion) + "<br>" + Messages.getString(this.MessagesDescripcion2);
+            final String text = Messages.getString(this.messagesDescripcion) + Constants.HTML_SALTO_LINEA + Messages.getString(this.messagesDescripcion2);
             etiquetaDescripcion = new InfoLabel(text, false);
-            this.MessagesDescripcion2 = "";
+            this.messagesDescripcion2 = "";
         }
         add(etiquetaDescripcion, c);
     }

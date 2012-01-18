@@ -19,6 +19,7 @@ import java.util.List;
 import javax.swing.JPanel;
 
 import es.gob.afirma.ui.principal.Main;
+import es.gob.afirma.ui.utils.Constants;
 import es.gob.afirma.ui.utils.InfoLabel;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
@@ -78,12 +79,12 @@ final class PanelPresentacion extends JAccessibilityDialogWizard {
 
         // Etiqueta con el texto "Bienvenido al asistente..."
         final String textLabel = Messages.getString("Wizard.multifirma.presentacion.parte1") + //$NON-NLS-1$
-        "<br>"
-        + "<br>" + Messages.getString("Wizard.multifirma.presentacion.parte2") + //$NON-NLS-2$
-        "<br>"
-        + "<br>" + Messages.getString("Wizard.multifirma.presentacion.parte3") + //$NON-NLS-2$
-        "<br>"
-        + "<br>" + Messages.getString("Wizard.multifirma.presentacion.parte4"); //$NON-NLS-2$
+        Constants.HTML_SALTO_LINEA
+        + Constants.HTML_SALTO_LINEA + Messages.getString("Wizard.multifirma.presentacion.parte2") + //$NON-NLS-2$
+        Constants.HTML_SALTO_LINEA
+        + Constants.HTML_SALTO_LINEA + Messages.getString("Wizard.multifirma.presentacion.parte3") + //$NON-NLS-2$
+        Constants.HTML_SALTO_LINEA
+        + Constants.HTML_SALTO_LINEA + Messages.getString("Wizard.multifirma.presentacion.parte4"); //$NON-NLS-2$
         final InfoLabel presentationLabel = new InfoLabel(textLabel, false);
         // Foco al contenido
         presentationLabel.addAncestorListener(new RequestFocusListener(false));

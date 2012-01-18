@@ -20,6 +20,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import es.gob.afirma.ui.principal.Main;
+import es.gob.afirma.ui.utils.Constants;
 import es.gob.afirma.ui.utils.InfoLabel;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
@@ -80,7 +81,7 @@ public class PanelFinalizar extends JAccessibilityDialogWizard {
         c.anchor = GridBagConstraints.NORTHWEST;
 
         // Etiqueta "felicidades" y "Ha finalizado con..."
-        final String textLabel = Messages.getString("Wizard.sobres.final1") + "<br>" + "<br>" + Messages.getString("Wizard.sobres.final2");
+        final String textLabel = Messages.getString("Wizard.sobres.final1") + Constants.HTML_SALTO_LINEA + Constants.HTML_SALTO_LINEA + Messages.getString("Wizard.sobres.final2");
 
         final InfoLabel finalizeLabel = new InfoLabel(textLabel, false);
         // Foco al contenido

@@ -185,7 +185,7 @@ final class Acercade extends JAccessibilityFrameAbout {
         c.gridy = 1;
 
         // Version del interfaz y Version de la aplicacion
-        final String version = Messages.getString("version.interfaz") + "  " + Main.VERSION + "<br>" //$NON-NLS-1$
+        final String version = Messages.getString("version.interfaz") + "  " + Main.VERSION + Constants.HTML_SALTO_LINEA //$NON-NLS-1$
         + Messages.getString("version") + "  " + getVersion(); //$NON-NLS-1$
         final InfoLabel versionInterfaz = new InfoLabel(version, false);
         getContentPane().add(versionInterfaz, c);

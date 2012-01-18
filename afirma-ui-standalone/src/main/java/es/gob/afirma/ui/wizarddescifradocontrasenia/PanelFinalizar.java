@@ -19,6 +19,7 @@ import java.util.List;
 import javax.swing.JPanel;
 
 import es.gob.afirma.ui.principal.Main;
+import es.gob.afirma.ui.utils.Constants;
 import es.gob.afirma.ui.utils.InfoLabel;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
@@ -105,7 +106,7 @@ public class PanelFinalizar extends JAccessibilityDialogWizard {
 		
 		 // Etiqueta "felicidades" y "Ha finalizado con..."
 		String textLabel = Messages.getString("Wizard.sobres.final1") + //$NON-NLS-1$
-				"<br>"+"<br>" + Messages.getString("Wizard.sobres.final.final2") ; //$NON-NLS-3$
+		Constants.HTML_SALTO_LINEA+Constants.HTML_SALTO_LINEA + Messages.getString("Wizard.sobres.final.final2") ; //$NON-NLS-3$
 		
 		InfoLabel finalizeLabel = new InfoLabel(textLabel, false);
 		  //Foco al contenido

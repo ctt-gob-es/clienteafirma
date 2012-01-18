@@ -222,7 +222,7 @@ class Opciones extends JAccessibilityDialog {
 	    				setMinimumSize(new Dimension(Constants.OPTION_FONT_INITIAL_WIDTH, Constants.OPTION_FONT_INITIAL_HEIGHT));
 	    			}
 	    		} else {
-	    			if (AccessibilityOptionsPane.continueBigStyle){
+	    			if (AccessibilityOptionsPane.isContinueBigStyle()){
 	    				if (Platform.getOS().equals(Platform.OS.LINUX)){
 		    				if (PrincipalGUI.optionActualWidth==Constants.OPTION_FONT_INITIAL_WIDTH_LINUX && PrincipalGUI.optionActualHeight==Constants.OPTION_FONT_INITIAL_HEIGHT_LINUX){
 		    					setMinimumSize(new Dimension(Constants.OPTION_INITIAL_WIDTH, Constants.OPTION_INITIAL_HEIGHT));
@@ -360,7 +360,7 @@ class Opciones extends JAccessibilityDialog {
         if (this.aplicar){
         	this.mainPanel.setSelectedIndex(2);
         	if (!this.accesibilidad){
-        		this.accessibilityOptions.aplicar.addAncestorListener(new RequestFocusListener(false));
+        		this.accessibilityOptions.getAplicar().addAncestorListener(new RequestFocusListener(false));
         	}
         	HelpUtils.visualize("opciones.accesibilidad"); //$NON-NLS-1$
         	this.aplicar = false;

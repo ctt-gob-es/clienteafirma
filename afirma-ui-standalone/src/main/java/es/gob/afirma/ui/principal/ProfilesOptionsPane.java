@@ -324,7 +324,7 @@ final class ProfilesOptionsPane {
             if (this.isBigStyle && (!Boolean.parseBoolean(ProfileManager.getAccessibilityOptionValue(AccessibilityOptionsPane.MAIN_FONT_SIZE,
                                                                                                      profileName)) && !Boolean.parseBoolean(ProfileManager.getAccessibilityOptionValue(AccessibilityOptionsPane.MAIN_FONT_STYLE,
                                                                                                                                                                                        profileName)))) {
-                AccessibilityOptionsPane.continueBigStyle = true;
+                AccessibilityOptionsPane.setContinueBigStyle(true);
             }
             if (ProfileManager.DEFAULT_PROFILE_NAME.equals(profileName)) {
                 this.currentProfileTitleLabel.setText(profileName);
