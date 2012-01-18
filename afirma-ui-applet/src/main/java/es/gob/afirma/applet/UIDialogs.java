@@ -1,4 +1,4 @@
-package es.gob.afirma.applet.ui;
+package es.gob.afirma.applet;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -175,6 +175,18 @@ public class UIDialogs {
         }
         return signers;
     }
+    
+	/**
+	 * Introduce los alias de todos los certificados de firma del nodo indicado y todos sus subnodos.
+	 * @param node Nodo de firma.
+	 * @param signersSet Conjunto con los alias de los certificados de firma.
+	 */
+	private static final void getSigners(final DefaultMutableTreeNode node, final Set<String> signersSet) {
+		signersSet.add((String)node.getUserObject());
+		for(int i=0; i<node.getChildCount(); i++) {
+			getSigners((DefaultMutableTreeNode)node.getChildAt(i), signersSet);
+		}
+	}
     
     /** Muestra el di&aacute;logo de selecci&oacute;n de nodos de firma.
      * @param treeModel

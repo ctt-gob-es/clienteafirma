@@ -18,7 +18,6 @@ import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 
-import es.gob.afirma.applet.ui.UIDialogs;
 
 /** Invocar preferentemente de la siguiente manera:<br>
  * <code>SwingUtilities.invokeLater(new AsynchronousSaveData(data, file, desc, exts, parent, true));</code> */

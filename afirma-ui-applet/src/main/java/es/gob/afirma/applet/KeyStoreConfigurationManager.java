@@ -11,14 +11,15 @@
 package es.gob.afirma.applet;
 
 import java.awt.Component;
-import java.security.InvalidKeyException;
-import java.security.KeyException;
+import java.io.IOException;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableEntryException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Vector;
 
 import javax.security.auth.callback.PasswordCallback;
 import javax.swing.JOptionPane;
@@ -151,14 +152,11 @@ final class KeyStoreConfigurationManager {
     }
 
     /** Inicializa el repositorio de certificados establecido.
-     * @param path
-     *        Ruta al repositorio
-     * @param password
-     *        Contrase&ntilde;a del almac&eacute;n de claves
      * @throws AOKeystoreAlternativeException
      *         Cuando ocurre un error durante la inicializaci&oacute;n 
-     * @throws InvalidKeyException */
-    private void initKeyStore(final String path, final String password) throws AOCancelledOperationException, AOKeystoreAlternativeException, InvalidKeyException {
+     * @throws IOException
+     * 		   Cuando la contrase&ntilde;a del almac&eacute;n es incorrecta. */
+    private void initKeyStore() throws AOCancelledOperationException, AOKeystoreAlternativeException, IOException {
 
         if (this.showLoadingWarning) {
             JOptionPane.showMessageDialog(this.parent,
@@ -206,11 +204,6 @@ final class KeyStoreConfigurationManager {
      * solicit&aacute;ndoselo al usuario.
      * @throws AOCancelledOperationException
      *         Cuando el usuario cancela la operaci&oacute;n.
-     * @throws AOCertificateException
-     *         Cuando no se pueda seleccionar un certificado.
-     * @throws AOCertificateKeyException
-     *         Cuando no se puede extraer la clave privada de un
-     *         certificado.
      * @throws AOKeyStoreManagerException
      *         Cuando no se pueda inicializar el almac&eacute;n de
      *         certificados.
@@ -220,12 +213,21 @@ final class KeyStoreConfigurationManager {
      * @throws AOKeystoreAlternativeException
      *         Cuando no se pueda inicializar el almac&eacute;n de
      *         certificados pero existe un almac&eacute;n alternativo 
-     * @throws CertificateException 
-     * @throws KeyException */
+     * @throws CertificateException
+     *         Cuando no se pueda seleccionar un certificado.
+     * @throws KeyStoreException Cuando ocurren errores en el tratamiento del
+     * 		   almac&eacute;n de claves
+     * @throws NoSuchAlgorithmException 
+     * @throws UnrecoverableEntryException 
+     */
     void selectCertificate() throws AOCancelledOperationException,
                             AOKeyStoreManagerException,
                             AOCertificatesNotFoundException,
-                            AOKeystoreAlternativeException, CertificateException, KeyException {
+                            AOKeystoreAlternativeException,
+                            CertificateException,
+                            UnrecoverableEntryException,
+                            NoSuchAlgorithmException,
+                            KeyStoreException {
         this.selectCertificate(true);
     }
 
@@ -249,15 +251,26 @@ final class KeyStoreConfigurationManager {
      *         Cuando no se encuentran certificados v&aacute;lido en el
      *         almac&eacute;n. 
      * @throws CertificateException 
-     * @throws KeyException */
+     * @throws UnrecoverableEntryException
+     * 		   Cuando no se puede extraer la clave privada de un certificado.
+     * @throws NoSuchAlgorithmException
+     * 		   Cuando no se puede identificar el algoritmo para la recuperación de la clave.
+     * @throws KeyStoreException
+     * 		   Cuando ocurren errores en el tratamiento del almacén de claves
+
+     */
     private void selectCertificate(final boolean checkPrivateKey) throws AOCancelledOperationException,
                                                                  AOKeyStoreManagerException,
                                                                  AOCertificatesNotFoundException,
-                                                                 AOKeystoreAlternativeException, CertificateException, KeyException {
+                                                                 AOKeystoreAlternativeException,
+                                                                 CertificateException,
+                                                                 UnrecoverableEntryException,
+                                                                 NoSuchAlgorithmException,
+                                                                 KeyStoreException {
 
         if (this.ksManager == null) {
             try {
-                this.initKeyStore(this.ksPath, this.ksPassword);
+                this.initKeyStore();
             }
             catch (final AOKeystoreAlternativeException e) {
                 throw e;
@@ -302,7 +315,7 @@ final class KeyStoreConfigurationManager {
     Certificate getCertificate(final String alias) throws AOKeyStoreManagerException, AOKeystoreAlternativeException {
         if (this.ksManager == null) {
             try {
-                this.initKeyStore(this.ksPath, this.ksPassword);
+                this.initKeyStore();
             }
             catch (final AOCancelledOperationException e) {
                 throw e;
@@ -329,7 +342,7 @@ final class KeyStoreConfigurationManager {
     String[] getArrayCertificateAlias() throws AOKeyStoreManagerException, AOKeystoreAlternativeException {
         if (this.ksManager == null) {
             try {
-                this.initKeyStore(this.ksPath, this.ksPassword);
+                this.initKeyStore();
             }
             catch (final AOCancelledOperationException e) {
                 throw e;
@@ -355,7 +368,7 @@ final class KeyStoreConfigurationManager {
     AOKeyStoreManager getKeyStoreManager() throws AOKeyStoreManagerException, AOKeystoreAlternativeException {
         if (this.ksManager == null) {
             try {
-                this.initKeyStore(this.ksPath, this.ksPassword);
+                this.initKeyStore();
             }
             catch (final AOCancelledOperationException e) {
                 throw e;
@@ -485,7 +498,7 @@ final class KeyStoreConfigurationManager {
     }
 
     /** Establece si deben mostrarse los certificados caducados.
-     * @param showExpiratedCertificates
+     * @param showExpiratedCerts
      *        {@code true} para mostrar los certificados caducados. */
     void setShowExpiratedCertificates(final boolean showExpiratedCerts) {
         this.showExpiratedCertificates = showExpiratedCerts;
@@ -495,7 +508,7 @@ final class KeyStoreConfigurationManager {
      * s&oacute;lo quede uno despu&eacute;s de pasar los distintos filtros. Si
      * quedase m&aacute;s de un certificado se lanzar&iacute;a una
      * excepci&oacute;n.
-     * @param mandatoryCert
+     * @param mCert
      *        {@code true} para indicar que se seleccione
      *        autom&aacute;ticamente el certificado. */
     void setMandatoryCert(final boolean mCert) {

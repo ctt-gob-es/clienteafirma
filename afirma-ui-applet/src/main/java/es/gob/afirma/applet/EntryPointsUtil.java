@@ -56,12 +56,9 @@ public interface EntryPointsUtil {
      * Returns a file's hash (as previously specified with setFileURI), codified
      * in base 64. Hash is calculated with the client's default hash algorithm.
      * If an error occurs during the operation, <code>null</code> is returned.
-     * @param showProgress
-     *        Mostrar o no ventana de progreso de la lectura del fichero <br>
-     *        Show / Hide File Read Progress window
      * @return El hash del fichero, en base 64. <br>
      *         File's Hash, in base 64. */
-    String getFileHashBase64Encoded(boolean showProgress);
+    String getFileHashBase64Encoded();
 
     /** Devuelve el contenido de un fichero como String.<br>
      * Returns a file's contents as a string.

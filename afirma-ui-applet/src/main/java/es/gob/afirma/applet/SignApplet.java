@@ -25,7 +25,10 @@ import java.security.AccessController;
 import java.security.InvalidKeyException;
 import java.security.KeyException;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.security.KeyStoreException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -44,13 +47,15 @@ import javax.swing.UIManager;
 
 import org.ietf.jgss.Oid;
 
-import es.gob.afirma.applet.ui.UIDialogs;
+import es.gob.afirma.applet.old.websign.Browser;
+import es.gob.afirma.applet.old.websign.FirmadorWeb.FirmaWeb;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.ciphers.CipherConstants.AOCipherAlgorithm;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -111,6 +116,8 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     /** Logger para la visualizaci&oacute;n de los mensajes por consola. */
     static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
+    private String userAgent = null;
+    
     /** Nombre del fichero donde deben guardarse los datos (firmas, datos, etc.). */
     String outputFile = null;
 
@@ -279,8 +286,10 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
         this.setLookAndFeel();
 
+        this.userAgent = getParameter("userAgent"); //$NON-NLS-1$
+        
         // Configuramos el almacen de claves que corresponda
-        final AOKeyStore keyStore = this.configureDefaultStore(Platform.getOS(), Platform.getBrowser(getParameter("userAgent")));
+        final AOKeyStore keyStore = this.configureDefaultStore(Platform.getOS(), Platform.getBrowser(this.userAgent));
         this.ksConfigManager = new KeyStoreConfigurationManager(keyStore, this);
 
         LOGGER.info("Almacen de certificados preestablecido: " + keyStore.getDescription()); //$NON-NLS-1$
@@ -722,7 +731,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         // de script ocupado. En el resto de navegadores dejamos que aparezcan
         // estos
         // dialogos, porque los procesos asincronos pueden causar errores
-        if (Platform.getBrowser().equals(Platform.BROWSER.FIREFOX)) {
+        if (Platform.getBrowser(this.userAgent).equals(Platform.BROWSER.FIREFOX)) {
             new Thread(saveDataDialog).start();
         }
         else {
@@ -932,25 +941,25 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
     public boolean counterSignTree() {
         LOGGER.info("Invocando counterSignTree"); //$NON-NLS-1$
-        return this.counterSign(AOSignConstants.CounterSignTarget.TREE);
+        return this.counterSign(CounterSignTarget.TREE);
     }
 
     public boolean counterSignLeafs() {
         LOGGER.info("Invocando counterSignLeafs"); //$NON-NLS-1$
-        return this.counterSign(AOSignConstants.CounterSignTarget.LEAFS);
+        return this.counterSign(CounterSignTarget.LEAFS);
     }
 
     public boolean counterSignSigners() {
         LOGGER.info("Invocando counterSignSigners"); //$NON-NLS-1$
-        return this.counterSign(AOSignConstants.CounterSignTarget.SIGNERS);
+        return this.counterSign(CounterSignTarget.SIGNERS);
     }
 
     public boolean counterSignIndexes() {
         LOGGER.info("Invocando counterSignIndexes"); //$NON-NLS-1$
-        return this.counterSign(AOSignConstants.CounterSignTarget.NODES);
+        return this.counterSign(CounterSignTarget.NODES);
     }
 
-    private boolean counterSign(final AOSignConstants.CounterSignTarget target) {
+    private boolean counterSign(final CounterSignTarget target) {
 
         return AccessController.doPrivileged(new java.security.PrivilegedAction<Boolean>() {
             public Boolean run() {
@@ -1013,7 +1022,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
                 // Obtenemos los parametros para la contrafirma de
                 // firmantes
-                if (target == AOSignConstants.CounterSignTarget.SIGNERS) {
+                if (target == CounterSignTarget.SIGNERS) {
                     if (SignApplet.this.signersToCounterSign == null || SignApplet.this.signersToCounterSign.length < 1) {
                         try {
                             params = UIDialogs.showSignersSelectionPane(signer.getSignersStructure(originalSign, false), SignApplet.this);
@@ -2274,7 +2283,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                     // Realizamos la firma Web
                     firmaWeb = new Browser().browse(html, hashAlg);
                     if (firmaWeb != null) {
-                        SignApplet.this.setFileuri(firmaWeb.tmpWebDataFile.getAbsolutePath());
+                        SignApplet.this.setFileuri(firmaWeb.getTmpWebDataFile().getAbsolutePath());
                         SignApplet.this.sign();
                     }
                     else {
@@ -2288,7 +2297,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                 }
 
                 if (firmaWeb != null) {
-                    return firmaWeb.tmpWebDataFile.getAbsolutePath();
+                    return firmaWeb.getTmpWebDataFile().getAbsolutePath();
                 }
                 return "ERROR"; //$NON-NLS-1$
             }
@@ -2564,9 +2573,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                                           JOptionPane.WARNING_MESSAGE) != JOptionPane.YES_OPTION) {
             return null; 
         }
-
+        
         try {
-            return getFileBase64Encoded(filename, showProgress);
+            return getFileBase64Encoded(AOUtil.createURI(filename));
         }
         catch (final Exception e) {
             LOGGER.severe("Error al leer el fichero '" + filename + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
@@ -2577,7 +2586,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
     public String getFileBase64Encoded(final boolean showProgress) {
         LOGGER.info("Invocando getFileBase64Encoded"); //$NON-NLS-1$
-        return getFileBase64Encoded(this.fileUri, showProgress);
+        return getFileBase64Encoded(this.fileUri);
     }
 
     /** Recupera el contenido de un fichero codificado en base 64.
@@ -2612,7 +2621,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                 }
                 final InputStream is;
                 try {
-                    is = AOUtil.loadFile(SignApplet.this.fileUri, SignApplet.this, showProgress, SignApplet.this.fileBase64);
+                    is = AOUtil.loadFile(SignApplet.this.fileUri);
                 }
                 catch (final Exception e) {
                     setError(AppletMessages.getString("SignApplet.85")); //$NON-NLS-1$
@@ -2621,7 +2630,12 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                 }
                 final byte[] binaryData;
                 try {
-                    binaryData = AOUtil.getDataFromInputStream(is);
+                	if (SignApplet.this.fileBase64) {
+                		binaryData = Base64.decode(new String(AOUtil.getDataFromInputStream(is)));
+                	} else {
+                		binaryData = AOUtil.getDataFromInputStream(is);	
+                	}
+                    
                 }
                 catch (final Exception e) {
                     LOGGER.severe("Error durante la lectura del fichero " + SignApplet.this.fileUri + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
@@ -2634,9 +2648,11 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                 catch (final IOException e) {
                     LOGGER.warning("Error al cerrar el stream de entrada de datos: " + e); //$NON-NLS-1$
                 }
-                final String digestAlg = AOUtil.getDigestAlgorithm(SignApplet.this.sigAlgo);
+                final String digestAlg = AOSignConstants.getDigestAlgorithmName(SignApplet.this.sigAlgo);
                 try {
-                    return AOBase64.encode(AOCryptoUtil.getMessageDigest(binaryData, digestAlg), false);
+                	final MessageDigest md = MessageDigest.getInstance(digestAlg);
+                	md.update(binaryData);
+                    return AOBase64.encode(md.digest(), false);
                 }
                 catch (final NoSuchAlgorithmException e) {
                     LOGGER.severe("El algoritmo de hash '" + digestAlg + "' no esta soportado: " + e); //$NON-NLS-1$ //$NON-NLS-2$
@@ -3440,7 +3456,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
      * v&aacute;lida.
      * @return <code>true</code> cuando se confirma la operaci&oacute;n <code>false</code> en caso contrario. */
     private boolean showHashMessage() {
-        final String digestAlgo = AOUtil.getDigestAlgorithm(this.sigAlgo);
+        final String digestAlgo = AOSignConstants.getDigestAlgorithmName(this.sigAlgo);
         final String hashData = CryptoUtils.getHexDigestData(digestAlgo);
 
         // Mostramos el mensaje informando del hash de los datos o, en caso de
@@ -3915,12 +3931,20 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                 LOGGER.severe("Error al seleccionar el certificado del repositorio: " + e); //$NON-NLS-1$
                 this.setError(AppletMessages.getString("SignApplet.363")); //$NON-NLS-1$
             }
-            catch (final KeyException e) {
+            catch (final NoSuchAlgorithmException e) {
                 LOGGER.info("Error al extraer la clave privada del certificado: " + e); //$NON-NLS-1$
+                this.setError(AppletMessages.getString("SignApplet.114")); //$NON-NLS-1$
+            }
+            catch (UnrecoverableEntryException e) {
+            	LOGGER.info("Error al extraer la clave privada del certificado: " + e); //$NON-NLS-1$
                 this.setError(AppletMessages.getString("SignApplet.114")); //$NON-NLS-1$
             }
             catch (final AOKeyStoreManagerException e) {
                 LOGGER.severe("Error inicializando el almacen de claves: " + e); //$NON-NLS-1$
+                this.setError(AppletMessages.getString("SignApplet.6")); //$NON-NLS-1$
+            }
+            catch (final KeyStoreException e) {
+                LOGGER.severe("Error al gestionar el almacen de claves: " + e); //$NON-NLS-1$
                 this.setError(AppletMessages.getString("SignApplet.6")); //$NON-NLS-1$
             }
             catch (final AOCertificatesNotFoundException e) {
@@ -3945,7 +3969,6 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                     SignApplet.this.setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
                 }
             }
-
         }
         return this.ksConfigManager.getCertificateKeyEntry();
     }

@@ -17,7 +17,9 @@ import java.net.URI;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyException;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 
 import javax.swing.JOptionPane;
 
@@ -550,9 +552,9 @@ public final class CipherManager {
      * @throws AOCancelledOperationException
      *         Operaci&oacute;n cancelada por el usuario.
      * @throws IOException
-     *         Si se han pueden leer los datos a cifrar.
+     *         Si no se pueden leer los datos a descifrar.
      * @throws AOException
-     *         Si ocurre alg&uacute; error durante el proceso de cifrado.
+     *         Si ocurre alg&uacute; error durante el proceso de descifrado.
      * @throws KeyException Cuando la clave para el descifrado no sea correcta.
      */
     public void decipherData() throws IOException, AOException, KeyException {
@@ -579,7 +581,7 @@ public final class CipherManager {
             final InputStream is =  AOUtil.loadFile(this.fileUri);
             if (this.fileBase64) {
                 dataToDecipher = Base64.decode(
-                        AOUtil.getDataFromInputStream(is));
+                        new String(AOUtil.getDataFromInputStream(is)));
             } else {
                 dataToDecipher = AOUtil.getDataFromInputStream(is);
             }
@@ -747,29 +749,33 @@ public final class CipherManager {
             // Controlamos un maximo de 3 intentos para abrir el almacen cuando
             // no se establecio la contrasena
             AOCipherKeyStoreHelper cKs = null;
-            if (this.cipherKeystorePass != null) {
-                try {
-                    cKs = new AOCipherKeyStoreHelper(this.cipherKeystorePass);
-                }
-                catch (final IOException e) {
-                    throw new AOException("La contrasena del almacen de claves de cifrado no es valida", e); //$NON-NLS-1$
-                }
-            }
-            else {
-                int numTries = 0;
-                do {
-                    numTries++;
-                    try {
-                        cKs = new AOCipherKeyStoreHelper(new UIPasswordCallback(AppletMessages.getString("SignApplet.42"), this.parent).getPassword()); //$NON-NLS-1$
-                    }
-                    catch (final IOException e) {
-                        if (numTries >= 3) {
-                            throw new AOMaxAttemptsExceededException("Se ha sobrepasado el numero maximo de intentos en la insercion de la clave del almacen"); //$NON-NLS-1$
-                        }
-                    }
-                } while (cKs == null);
-            }
+            try {
+            	if (this.cipherKeystorePass != null) {
+            		try {
+            			cKs = new AOCipherKeyStoreHelper(this.cipherKeystorePass);
 
+            		}
+            		catch (final IOException e) {
+            			throw new AOException("La contrasena del almacen de claves de cifrado no es valida", e); //$NON-NLS-1$
+            		}
+            	}
+            	else {
+            		int numTries = 0;
+            		do {
+            			numTries++;
+            			try {
+            				cKs = new AOCipherKeyStoreHelper(new UIPasswordCallback(AppletMessages.getString("SignApplet.42"), this.parent).getPassword()); //$NON-NLS-1$
+            			}
+            			catch (final IOException e) {
+            				if (numTries >= 3) {
+            					throw new AOMaxAttemptsExceededException("Se ha sobrepasado el numero maximo de intentos en la insercion de la clave del almacen"); //$NON-NLS-1$
+            				}
+            			}
+            		} while (cKs == null);
+            	}
+            } catch (final Exception e) {
+            	throw new AOException("No se ha podido cargar el almacen de claves del usuario"); //$NON-NLS-1$
+            }
             String alias = this.cipherKeyAlias;
             if (alias == null) {
                 try {
