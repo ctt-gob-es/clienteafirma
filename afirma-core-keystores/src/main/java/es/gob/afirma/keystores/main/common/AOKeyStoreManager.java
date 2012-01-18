@@ -502,10 +502,14 @@ public class AOKeyStoreManager {
      *        <i>CallBback</i> para obtener la contrase&ntilde;a del
      *        certificado que contiene la clave
      * @return Clave privada del certificado correspondiente al alias
-     * @throws KeyStoreException Cuando ocurren errores en el tratamiento del almac&eacute;n de claves
-     * @throws NoSuchAlgorithmException Cuando ocurren errores obteniendo la clave
-     * @throws UnrecoverableEntryException Si la contrase&ntilde;a proporcionada no es v&aacute;lida para obtener la clave privada
-     * @throws es.gob.afirma.core.AOCancelledOperationException Cuando el usuario cancela el proceso antes de que finalice
+     * @throws KeyStoreException
+     * 		   Cuando ocurren errores en el tratamiento del almac&eacute;n de claves
+     * @throws NoSuchAlgorithmException
+     * 		   Cuando no se puede identificar el algoritmo para la recuperaci&oacute;n de la clave.
+     * @throws UnrecoverableEntryException
+     * 		   Si la contrase&ntilde;a proporcionada no es v&aacute;lida para obtener la clave privada
+     * @throws es.gob.afirma.core.AOCancelledOperationException
+     * 		   Cuando el usuario cancela el proceso antes de que finalice
      */
     public KeyStore.PrivateKeyEntry getKeyEntry(final String alias, 
     		                                    final PasswordCallback pssCallback) throws KeyStoreException, 
