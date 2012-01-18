@@ -333,8 +333,7 @@ public final class Platform {
         if (systemExtDir.exists() && systemExtDir.isDirectory()) {
             return systemExtDir.getAbsolutePath();
         }
-        LOGGER.info("El directorio blobal de extensiones Java no esta creado, se devolvera null"); //$NON-NLS-1$
+        LOGGER.info("El directorio global de extensiones Java no esta creado, se devolvera null"); //$NON-NLS-1$
         return null;
     }
-
 }
