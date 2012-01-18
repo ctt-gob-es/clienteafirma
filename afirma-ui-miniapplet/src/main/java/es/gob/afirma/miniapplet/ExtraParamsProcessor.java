@@ -27,11 +27,6 @@ final class ExtraParamsProcessor {
 	/** Valor de la pol&iacute;tica de firma de la AGE. */
 	private static final String EXPANDIBLE_POLICY_VALUE_AGE = "FirmaAGE"; //$NON-NLS-1$
 	
-	/** Tama&ntilde;o de datos hasta el que, siguiendo los criterios de la pol&iacute;tica
-	 * de firma de la AGE, establecemos que es obligatorio que las firmas CAdES contengan
-	 * los datos firmados. A partir de este valor no se introducir&aacute;n los datos. */
-	private static final int MAX_IMPLICIT_CADES_SIZE = 3145728; // 3 MegaBytes
-	
 	private ExtraParamsProcessor() {
 		/* Constructor no publico */
 	}
@@ -88,7 +83,7 @@ final class ExtraParamsProcessor {
 	 * @return Propiedades expandidas.
 	 */
 	static Properties expandProperties(final Properties params) {
-		return expandProperties(params, null, null, 0);
+		return expandProperties(params, null, null);
 	}
 	
 	/**
@@ -110,16 +105,27 @@ final class ExtraParamsProcessor {
      * </ul>
 	 * @param params Par&aacute;metros definidos para la operaci&oacute;n.
 	 * @param format Formato de firma.
-	 * @param dataSize Tama&ntilde;o de los datos firmados.
 	 * @return Propiedades expandidas.
 	 */
-	static Properties expandProperties(final Properties params, final byte[] signedData, final String format, final int dataSize) {
+	static Properties expandProperties(final Properties params, final byte[] signedData, final String format) {
 		
 		final Properties p = new Properties();
 		for (final String key : params.keySet().toArray(new String[0])) {
 			p.setProperty(key, params.getProperty(key));
 		}
 		
+		expandPolicyKeys(p, signedData, format);
+		
+		return p;
+	}
+	
+	/**
+	 * Expande las propiedades de pol&iacute;tica de firma modificando el conjunto de propiedades.
+	 * @param p Propiedades configuradas.
+	 * @param signedData Datos firmados.
+	 * @param format Formato de firma.
+	 */
+	static void expandPolicyKeys(final Properties p, final byte[] signedData, final String format) {
 		if (p.containsKey(EXPANDIBLE_POLICY_KEY)) {
 			if (EXPANDIBLE_POLICY_VALUE_AGE.equals(p.getProperty(EXPANDIBLE_POLICY_KEY))) {
 				p.setProperty("policyIdentifier", //$NON-NLS-1$
@@ -135,12 +141,11 @@ final class ExtraParamsProcessor {
 					p.setProperty("format", //$NON-NLS-1$
 						AOSignConstants.SIGN_FORMAT_XADES_DETACHED);
 				}
-				if (format != null && format.equals(AOSignConstants.SIGN_FORMAT_CADES)) {
+				if (format != null && (format.equals(AOSignConstants.SIGN_FORMAT_CADES) ||
+						format.equals(AOSignConstants.SIGN_FORMAT_PADES))) {
 					p.setProperty("policyIdentifierHash", //$NON-NLS-1$
 						"7SxX3erFuH31TvAw9LZ70N7p1vA=");  //$NON-NLS-1$ 
-					p.setProperty("mode", //$NON-NLS-1$
-							dataSize < MAX_IMPLICIT_CADES_SIZE ? 
-									AOSignConstants.SIGN_MODE_IMPLICIT : AOSignConstants.SIGN_MODE_EXPLICIT);
+					p.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
 					
 					if (signedData != null) {
 						final MimeHelper mimeHelper = new MimeHelper(signedData);
@@ -151,7 +156,5 @@ final class ExtraParamsProcessor {
 			}
 			p.remove(EXPANDIBLE_POLICY_KEY);
 		}
-		
-		return p;
 	}
 }
