@@ -770,7 +770,7 @@ public final class AOPDFSigner implements AOSigner {
             }
 
             if (Boolean.TRUE.toString().equalsIgnoreCase(extraParams.getProperty("headLess"))) {  //$NON-NLS-1$
-                throw new UnsupportedOperationException("No se permite la firma de PDF certificados (el paramtro allowSigningCertifiedPdfs no estaba establecido y no se permiten dialogos graficos)"); //$NON-NLS-1$
+                throw new UnsupportedOperationException("No se permite la firma de PDF certificados (el parametro allowSigningCertifiedPdfs no estaba establecido y no se permiten dialogos graficos)"); //$NON-NLS-1$
             }
 
             if (AOUIFactory.NO_OPTION == AOUIFactory.showConfirmDialog(null,
