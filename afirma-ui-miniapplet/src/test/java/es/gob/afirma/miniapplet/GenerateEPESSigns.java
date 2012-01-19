@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -12,12 +12,11 @@ package es.gob.afirma.miniapplet;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
-import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Hashtable;
 import java.util.Map;
@@ -27,18 +26,16 @@ import org.junit.Test;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
-import es.gob.afirma.core.signers.CounterSignTarget;
 
 /** Generadoe de conjuntos completos de firmas. */
 public class GenerateEPESSigns {
 
-	private static final boolean applyAlgos = false; 
-	
-	private static final String DEFAULT_ALGO = AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA; 
+	private static final boolean applyAlgos = false;
+
+	private static final String DEFAULT_ALGO = AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA;
 
     private final static String[] ALGOS = new String[] {
         AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA
@@ -46,13 +43,13 @@ public class GenerateEPESSigns {
 //        AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA,
 //        AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA
     };
-	
+
     /**
      * Formatos de los cuales ejecutarse el test.
      * Campo 1: Identificador del formato
      * Campo 2: Nombre para la generacion del nombre de fichero
      * Campo 3: Extension de firma
-     * Campo 4: Soporta contrafirma 
+     * Campo 4: Soporta contrafirma
      */
     private static final String[][] CONFIGS = {
 
@@ -64,7 +61,7 @@ public class GenerateEPESSigns {
     	{"XAdES-EPES_factura31_alt1", AOSignConstants.SIGN_FORMAT_XADES, "xsig", "factura"}, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     	{"XAdES-EPES_factura31_alt2", AOSignConstants.SIGN_FORMAT_XADES, "xsig", "factura"} //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     };
-	
+
     private static final String[][] CONFIG_PARAMS = {
     	{"CAdES-EPES", "mode=implicit"}, //$NON-NLS-1$ //$NON-NLS-2$
     	{"CAdES-EPES", "policyIdentifier=urn:oid:2.16.724.1.3.1.1.2.1.8"}, //$NON-NLS-1$ //$NON-NLS-2$
@@ -110,16 +107,16 @@ public class GenerateEPESSigns {
     	{"XAdES-EPES_factura31_alt2", "policyIdentifierHashAlgorithm=http://www.w3.org/2000/09/xmldsig#sha1"}, //$NON-NLS-1$ //$NON-NLS-2$
     	{"XAdES-EPES_factura31_alt2", "policyQualifier=http://www.facturae.es/politica_de_firma_formato_facturae/politica_de_firma_formato_facturae_v3_1.pdf"} //$NON-NLS-1$ //$NON-NLS-2$
 	};
-    
+
     private static final String CERT_PATH = "ANF_PF_Activo.pfx"; //$NON-NLS-1$
     private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
     private static final String CERT_ALIAS = "anf usuario activo"; //$NON-NLS-1$
 
     private static final String SIGNS_PATH = "src" + File.separator + "test" + File.separator + "signs" + File.separator; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-    
+
     /**
      * Genera todos los tipos de firmas posibles.
-     * @throws AOException 
+     * @throws AOException
      * @throws NoSuchAlgorithmException
      * @throws GeneralSecurityException
      * @throws IOException
@@ -127,50 +124,50 @@ public class GenerateEPESSigns {
     @SuppressWarnings("static-method")
 	@Test
 	public void generateSigns() throws AOException, NoSuchAlgorithmException, GeneralSecurityException, IOException {
-		
-    	KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+
+    	final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
         ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
-        PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
-    	
-    	Map<String, byte[]> files = loadFiles();
-    	
+        final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+
+    	final Map<String, byte[]> files = loadFiles();
+
     	final String[] algos = (applyAlgos ? ALGOS : new String[] {DEFAULT_ALGO});
     	final Properties extraParams = new Properties();
-    	
+
 		AOSigner signer;
-		for(String[] config : CONFIGS) {
-			String configName = config[0];
+		for(final String[] config : CONFIGS) {
+			final String configName = config[0];
 			signer = AOSignerFactory.getSigner(config[1]);
 			if (signer == null) {
 				System.out.println("No se encontro el manejador del formato " + config[1]); //$NON-NLS-1$
 				continue;
 			}
-			
+
 			String paramsString = ""; //$NON-NLS-1$
-			for(String[] params : CONFIG_PARAMS) {
+			for(final String[] params : CONFIG_PARAMS) {
 				if (params[0].equals(configName)) {
 					paramsString += params[1] + "\n"; //$NON-NLS-1$
 				}
 			}
-			
+
 			extraParams.load(new ByteArrayInputStream(paramsString.getBytes()));
-			
-			for(String algo : algos) {
-				byte[] signature = signer.sign(
+
+			for(final String algo : algos) {
+				final byte[] signature = signer.sign(
 					files.get(config[3]),
 					algo,
 					pke,
 					extraParams);
 
 				saveSign(signature, "Firma_" + configName + "_" + config[3] + "_" + algo + "." + config[2]); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			}	
+			}
 		}
 	}
-	
+
     private static Map<String, byte[]> loadFiles() throws IOException {
     	byte[] data;
-    	Hashtable<String, byte[]> files = new Hashtable<String, byte[]>();
-    	for (String[] config : CONFIGS) {
+    	final Hashtable<String, byte[]> files = new Hashtable<String, byte[]>();
+    	for (final String[] config : CONFIGS) {
     		if (!files.contains(config[3])) {
 				data = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(config[3]));
     			files.put(config[3], data);
@@ -178,11 +175,11 @@ public class GenerateEPESSigns {
     	}
     	return files;
 	}
-	
-    private static void saveSign(byte[] signData, String filename) throws IOException {
-    	
-    	File signFile = new File(SIGNS_PATH + filename);
-    	FileOutputStream fos = new FileOutputStream(signFile); 
+
+    private static void saveSign(final byte[] signData, final String filename) throws IOException {
+
+    	final File signFile = new File(SIGNS_PATH + filename);
+    	final FileOutputStream fos = new FileOutputStream(signFile);
     	fos.write(signData);
     	fos.close();
     }

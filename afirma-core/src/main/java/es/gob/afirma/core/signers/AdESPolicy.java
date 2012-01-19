@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -20,31 +20,31 @@ import es.gob.afirma.core.misc.Base64;
 /** Pol&iacute;tica de firma para AdES.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class AdESPolicy {
-    
+
     private String policyIdentifier = null;
     private String policyIdentifierHash = null;
     private String policyIdentifierHashAlgorithm = null;
     private URL policyQualifier = null;
-    
-    
+
+
     private void setValues(final String identifier,
                            final String identifierHash,
                            final String identifierHashAlgorithm,
                            final String qualifier) {
-        
+
         if (identifier == null || "".equals(identifier)) { //$NON-NLS-1$
             throw new IllegalArgumentException("El identificador de politica no puede ser nulo ni vacio"); //$NON-NLS-1$
         }
-        
+
         this.policyIdentifier = identifier;
-        
+
         if (identifierHash != null && (!"0".equals(identifierHash)) && (identifierHashAlgorithm == null || "".equals(identifierHashAlgorithm))) { //$NON-NLS-1$ //$NON-NLS-2$
             throw new IllegalArgumentException("Si se indica la huella digital del identificador de politica es obligatorio indicar tambien el algoritmo"); //$NON-NLS-1$
         }
-        
+
         if (identifierHash == null) {
             try {
-                this.policyIdentifierHash =  Base64.encodeBytes((MessageDigest.getInstance("SHA-512").digest(AOUtil.getDataFromInputStream(new URL(identifier).openStream())))); //$NON-NLS-1$
+                this.policyIdentifierHash =  Base64.encode((MessageDigest.getInstance("SHA-512").digest(AOUtil.getDataFromInputStream(new URL(identifier).openStream())))); //$NON-NLS-1$
                 this.policyIdentifierHashAlgorithm ="SHA-512"; //$NON-NLS-1$
             }
             catch(final Exception e) {
@@ -68,7 +68,7 @@ public final class AdESPolicy {
                 this.policyIdentifierHash = identifierHash;
             }
         }
-        
+
         if (qualifier != null && (!"".equals(qualifier))) { //$NON-NLS-1$
             try {
                 this.policyQualifier = new URL(qualifier);
@@ -77,9 +77,9 @@ public final class AdESPolicy {
                 throw new IllegalArgumentException("El cualificador de la politica debe ser una URL valida", e); //$NON-NLS-1$
             }
         }
-        
+
     }
-    
+
     /** Crea una pol&iacute;tica AdES a partir de un fichero de propiedades.
      * Las propiedades aceptadas son:
      * <ul>
@@ -104,7 +104,7 @@ public final class AdESPolicy {
             );
         }
     }
-    
+
     /** Crea una pol&iacute;tica para firma AdES.
      * @param identifier Identificador de la pol&iacute;tica de firma (URL u OID, directo o como URN)
      * @param identifierHash Huella digital de la pol&iacute;tica de firma en formato ASN.1 procesable identificado por
@@ -136,7 +136,7 @@ public final class AdESPolicy {
         return this.policyIdentifierHash;
     }
 
-    /** Obtiene el algoritmo usado para el c&aaute;lculo de la huella digital del identificador de la pol&iacute;tica de firma. 
+    /** Obtiene el algoritmo usado para el c&aaute;lculo de la huella digital del identificador de la pol&iacute;tica de firma.
      * @return Algoritmo usado para el c&aaute;lculo de la huella digital del identificador de la pol&iacute;tica de firma
      */
     public String getPolicyIdentifierHashAlgorithm() {
@@ -149,5 +149,5 @@ public final class AdESPolicy {
     public URL getPolicyQualifier() {
         return this.policyQualifier;
     }
-    
+
 }

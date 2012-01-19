@@ -78,16 +78,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 		final Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
 		final byte[] dataBinary;
-		try {
-			dataBinary = Base64.decode(dataB64);
-		}
-		catch (final IOException e) {
-			setErrorMessage(e);
-			throw e;
-		}
+		dataBinary = Base64.decode(dataB64);
 
 		try {
-			return Base64.encodeBytes(AccessController.doPrivileged(new SignAction(
+			return Base64.encode(AccessController.doPrivileged(new SignAction(
 					MiniAfirmaApplet.selectSigner(MiniAfirmaApplet.cleanParam(format), null),
 					dataBinary,
 					MiniAfirmaApplet.cleanParam(algorithm),
@@ -122,18 +116,11 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		}
 
 		final Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
-		final byte[] dataBinary;
-		try {
-			dataBinary = dataB64 == null ? null : Base64.decode(dataB64);
-		}
-		catch (final IOException e) {
-			setErrorMessage(e);
-			throw e;
-		}
+		final byte[] dataBinary = dataB64 == null ? null : Base64.decode(dataB64);
 
 		try {
 			final byte[] sign = Base64.decode(signB64);
-			return Base64.encodeBytes(AccessController.doPrivileged(new CoSignAction(
+			return Base64.encode(AccessController.doPrivileged(new CoSignAction(
 					MiniAfirmaApplet.selectSigner(MiniAfirmaApplet.cleanParam(format), sign),
 					sign,
 					dataBinary,
@@ -147,10 +134,6 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			throw e;
 		}
 		catch (final PrivilegedActionException e) {
-			setErrorMessage(e);
-			throw e;
-		}
-		catch (final IOException e) {
 			setErrorMessage(e);
 			throw e;
 		}
@@ -176,7 +159,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 		try {
 			final byte[] sign = Base64.decode(signB64);
-			return Base64.encodeBytes(AccessController.doPrivileged(new CounterSignAction(
+			return Base64.encode(AccessController.doPrivileged(new CounterSignAction(
 					MiniAfirmaApplet.selectSigner(MiniAfirmaApplet.cleanParam(format), sign),
 					sign,
 					MiniAfirmaApplet.cleanParam(algorithm),
@@ -189,10 +172,6 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			throw e;
 		}
 		catch (final PrivilegedActionException e) {
-			setErrorMessage(e);
-			throw e;
-		}
-		catch (final IOException e) {
 			setErrorMessage(e);
 			throw e;
 		}
@@ -215,10 +194,6 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		try {
 			sign = Base64.decode(signB64);
 			signer = MiniAfirmaApplet.getSigner(sign);
-		}
-		catch (final IOException e) {
-			setErrorMessage(e);
-			throw e;
 		}
 		catch (final PrivilegedActionException e) {
 			setErrorMessage(e);
@@ -278,10 +253,6 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			setErrorMessage(e);
 			throw e;
 		}
-		catch (final IOException e) {
-			setErrorMessage(e);
-			throw e;
-		}
 	}
 
 	/** {@inheritDoc} */
@@ -296,7 +267,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		final String descFiles = MiniAfirmaApplet.cleanParam(description);
 
 		try {
-			return Base64.encodeBytes(AccessController.doPrivileged(new GetFileContentAction(
+			return Base64.encode(AccessController.doPrivileged(new GetFileContentAction(
 					titleDialog, exts, descFiles, this)));
 		}
 		catch (final AOCancelledOperationException e) {
@@ -425,14 +396,14 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		final String cleanCharset = MiniAfirmaApplet.cleanParam(charset);
 		if (cleanCharset != null) {
 			try {
-				return Base64.encodeBytes(plainText.getBytes(cleanCharset));
+				return Base64.encode(plainText.getBytes(cleanCharset));
 			}
 			catch (final UnsupportedEncodingException e) {
 				setErrorMessage(e);
 				throw e;
 			}
 		}
-		return Base64.encodeBytes(plainText.getBytes(DEFAULT_CHARSET_NAME));
+		return Base64.encode(plainText.getBytes(DEFAULT_CHARSET_NAME));
 	}
 
 	/**

@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -24,16 +24,16 @@ import es.gob.afirma.core.misc.Base64;
  * @author Carlos Gamuci Mill&aacute;n
  */
 final class GetFileNameContentAction implements PrivilegedExceptionAction<String[]> {
-    
+
 	private static final String SEPARATOR = "|"; //$NON-NLS-1$
-	
+
     private final String title;
     private final String[] exts;
     private final String desc;
     private final boolean multiSel;
     private final boolean asBase64;
     private final Component parent;
-    
+
     /**
      * Crea la acci&oacute;n para la recuperaci&oacute;n del nombre y el contenido de un fichero.
      * @param title T&iacute;tulo del di&aacute;logo.
@@ -49,9 +49,9 @@ final class GetFileNameContentAction implements PrivilegedExceptionAction<String
         this.desc = desc;
         this.multiSel = multiSel;
         this.asBase64 = asBase64;
-        this.parent = parent;        
+        this.parent = parent;
     }
-    
+
     /**
      * Muestra un di&aacute;logo modal para la carga de un fichero y recuperar el nombre
      * del mismo y su contenido.
@@ -61,9 +61,9 @@ final class GetFileNameContentAction implements PrivilegedExceptionAction<String
      * @throws IOException Cuando se produce un error al leer el fichero.
      */
 	public String[] run() throws IOException {
-		
-		FileSelectionDialog fsDialog = new FileSelectionDialog(this.title, this.exts, this.desc, this.multiSel, this.parent);
-		final String[] paths = (this.multiSel ? 
+
+		final FileSelectionDialog fsDialog = new FileSelectionDialog(this.title, this.exts, this.desc, this.multiSel, this.parent);
+		final String[] paths = (this.multiSel ?
 				fsDialog.getPaths() : new String[] { fsDialog.getPath() });
 
 		File file;
@@ -79,16 +79,16 @@ final class GetFileNameContentAction implements PrivilegedExceptionAction<String
 			finally {
 				try {
 					is.close();
-				} 
+				}
 				catch (final Exception e) {
 					/* Ignoramos este error */
 				}
 			}
 
 			filenameContents[i] = file.getName() + SEPARATOR + (this.asBase64 ?
-					Base64.encodeBytes(contentFic) : new String(contentFic));
+					Base64.encode(contentFic) : new String(contentFic));
 		}
-		
+
         return filenameContents;
 	}
 }
