@@ -76,7 +76,9 @@ final class MiniAppletMessages {
 
         if (params != null) {
             for (int i = 0; i < params.length; i++) {
-                text = text.replace("%" + i, params[i]); //$NON-NLS-1$
+            	if (params[i] != null) {
+            		text = text.replace("%" + i, params[i]); //$NON-NLS-1$
+            	}
             }
         }
 
