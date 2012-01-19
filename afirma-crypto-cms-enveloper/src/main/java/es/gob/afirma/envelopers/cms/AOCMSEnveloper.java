@@ -202,7 +202,7 @@ public class AOCMSEnveloper implements AOEnveloper {
      *        Object Identifier. Identificador del objeto a introducir.
      * @param value
      *        Valor asignado */
-    void addSignedAttribute(final org.ietf.jgss.Oid oid, final byte[] value) {
+    public void addSignedAttribute(final org.ietf.jgss.Oid oid, final byte[] value) {
         this.attrib.put(oid, value);
     }
 
@@ -211,7 +211,7 @@ public class AOCMSEnveloper implements AOEnveloper {
      *        Object Identifier. Identificador del atributo a introducir.
      * @param value
      *        Valor asignado */
-    void addUnsignedAttribute(final org.ietf.jgss.Oid oid, final byte[] value) {
+    public void addUnsignedAttribute(final org.ietf.jgss.Oid oid, final byte[] value) {
         this.uattrib.put(oid, value);
     }
 
@@ -256,7 +256,7 @@ public class AOCMSEnveloper implements AOEnveloper {
      *         Cuando el algoritmo de cifrado indicado no est&aacute;
      *         soportado.
      */
-    byte[] createCMSEncryptedData(final byte[] content, final AOCipherConfig cipherConfig, final Key key) throws NoSuchAlgorithmException {
+    public byte[] createCMSEncryptedData(final byte[] content, final AOCipherConfig cipherConfig, final Key key) throws NoSuchAlgorithmException {
 		return CMSEncryptedData.genEncryptedData(content, this.signatureAlgorithm, cipherConfig, key, DATA_TYPE_OID, this.uattrib);
     }
 
@@ -431,7 +431,7 @@ public class AOCMSEnveloper implements AOEnveloper {
      *         Cuando se produce un error al agregar el nuevo remitente.
      * @throws AOInvalidFormatException
      *         Tipo de envoltorio no soportado. */
-    static byte[] addOriginator(final byte[] envelop, final PrivateKeyEntry ke) throws AOException {
+    public static byte[] addOriginator(final byte[] envelop, final PrivateKeyEntry ke) throws AOException {
         final String contentInfo;
         if (ValidateCMS.isCMSEnvelopedData(envelop)) {
             contentInfo = CMS_CONTENTTYPE_ENVELOPEDDATA;
@@ -504,7 +504,7 @@ public class AOCMSEnveloper implements AOEnveloper {
     /** Establece la clave privada del remitente del envoltorio.
      * @param originatorKe
      *        Clave del remitente. */
-    void setOriginatorKe(final PrivateKeyEntry originatorKe) {
+    public void setOriginatorKe(final PrivateKeyEntry originatorKe) {
         this.configuredKe = originatorKe;
     }
 
@@ -512,7 +512,7 @@ public class AOCMSEnveloper implements AOEnveloper {
      * datos.
      * @param keyPass
      *        Clave en base 64 o contrase&ntilda;a de cifrado. */
-    void setCipherKey(final String keyPass) {
+    public void setCipherKey(final String keyPass) {
         this.cipherKey = keyPass;
     }
 
@@ -558,7 +558,7 @@ public class AOCMSEnveloper implements AOEnveloper {
      * @throws IllegalBlockSizeException 
      * @throws InvalidAlgorithmParameterException 
      * @throws NoSuchPaddingException */
-    byte[] recoverData(final byte[] cmsEnvelop) throws 
+    public byte[] recoverData(final byte[] cmsEnvelop) throws 
                                          InvalidKeyException,
                                          CertificateEncodingException,
                                          IOException,
