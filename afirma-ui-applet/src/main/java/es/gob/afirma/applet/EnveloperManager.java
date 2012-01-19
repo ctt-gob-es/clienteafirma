@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.net.URI;
-import java.security.InvalidKeyException;
+import java.security.KeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
@@ -26,11 +26,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.crypto.BadPaddingException;
+
+import es.gob.afirma.applet.pkcs7.CMSInformation;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
-import es.gob.afirma.core.envelopers.AOEnveloper;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.envelopers.cms.AOCMSEnveloper;
@@ -149,7 +152,7 @@ public final class EnveloperManager {
     }
 
     /** Establece el tipo de envoltorio que se debe generar. Los tipos soportados
-     * est&aacute;n declarados en {@link AOConstants}.
+     * est&aacute;n declarados en {@link AOSignConstants}.
      * @param cmsContentType
      *        Tipo de envoltorio. */
     public void setCmsContentType(final String cmsContentType) {
@@ -204,13 +207,16 @@ public final class EnveloperManager {
     /** Agrega un nuevo destinatario al sobre electr&oacute;nico.
      * @param certEncoded
      *        Certificado codificado del nuevo destinatario.
-     * @throws CertificateException */
+     * @throws CertificateException
+     * 		   Cuando no se puede descodificar el certificado indicado.
+     */
     public void addRecipient(final byte[] certEncoded) throws CertificateException {
         addRecipient(encodeCertificate(certEncoded));
     }
 
     /** Elimina un destinatario del sobre electr&oacute;nico.
-     * @param cert */
+     * @param cert Certificado que se desea eliminar.
+     */
     public void removeRecipient(final X509Certificate cert) {
         if (cert == null || this.recipients == null) {
             return;
@@ -225,7 +231,8 @@ public final class EnveloperManager {
     /** Agrega un nuevo destinatario al sobre electr&oacute;nico.
      * @param certEncoded
      *        Certificado codificado del nuevo destinatario.
-     * @throws CertificateException */
+     * @throws CertificateException
+     * 		   Cuando no se puede descodificar el certificado indicado. */
     public void removeRecipient(final byte[] certEncoded) throws CertificateException {
         removeRecipient(encodeCertificate(certEncoded));
     }
@@ -328,8 +335,10 @@ public final class EnveloperManager {
      *         Cuando ocurre cualquier problema durante el proceso
      * @throws NoSuchAlgorithmException
      *         Cuando el algoritmo de cifrado no est&aacute; soportado. * @throws
-     *         IOException */
-    public void encrypt() throws IOException, NoSuchAlgorithmException, AOException {
+     *         IOException 
+     * @throws KeyException Cuando se produce un error al generar la clave de encriptado.
+     */
+    public void encrypt() throws IOException, NoSuchAlgorithmException, AOException, KeyException {
         this.encrypt(getConfigureContent());
     }
 
@@ -339,8 +348,10 @@ public final class EnveloperManager {
      * @throws AOException
      *         Cuando ocurre cualquier problema durante el proceso
      * @throws NoSuchAlgorithmException
-     *         Cuando el algoritmo de cifrado no est&aacute; soportado. */
-    public void encrypt(final byte[] content) throws AOException, NoSuchAlgorithmException {
+     *         Cuando el algoritmo de cifrado no est&aacute; soportado. 
+     * @throws KeyException Cuando se produce un error al generar la clave de encriptado.
+     */
+    public void encrypt(final byte[] content) throws AOException, NoSuchAlgorithmException, KeyException {
         this.envelopedData = createCMSEncryptedData(content);
     }
 
@@ -371,7 +382,7 @@ public final class EnveloperManager {
      * @throws AOInvalidFormatException
      *         Cuando no se ha indicado un envoltorio soportado.
      * @throws AOException
-     *         Cuando se produce un error durante al desenvolver los datos. */
+     *         Cuando se produce un error al desenvolver los datos. */
     public void unwrap(final byte[] envelop) throws CertificateEncodingException,
                                             AOInvalidRecipientException,
                                             AOInvalidFormatException,
@@ -380,20 +391,20 @@ public final class EnveloperManager {
 
         // Comprobamos si requiere un certificado para la extraccion de los
         // datos
-        if (this.enveloper.isCMSValid(envelop, AOSignConstants.CMS_CONTENTTYPE_ENVELOPEDDATA) || this.enveloper.isCMSValid(envelop,
+        if (AOCMSEnveloper.isCMSValid(envelop, AOSignConstants.CMS_CONTENTTYPE_ENVELOPEDDATA) || AOCMSEnveloper.isCMSValid(envelop,
                                                                                                              AOSignConstants.CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA)
-            || this.enveloper.isCMSValid(envelop, AOSignConstants.CMS_CONTENTTYPE_AUTHENVELOPEDDATA)) {
+            || AOCMSEnveloper.isCMSValid(envelop, AOSignConstants.CMS_CONTENTTYPE_AUTHENVELOPEDDATA)) {
             if (!this.ksConfigManager.isSelectedCertificate()) {
                 try {
                     this.ksConfigManager.selectCertificate();
                 }
                 catch (final Exception e) {
-                    throw new AOException("Error al obtener el certificado seleccionado", e);
+                    throw new AOException("Error al obtener el certificado seleccionado", e); //$NON-NLS-1$
                 }
             }
             this.enveloper.setOriginatorKe(this.ksConfigManager.getCertificateKeyEntry());
         }
-        else if (this.enveloper.isCMSValid(envelop, AOSignConstants.CMS_CONTENTTYPE_ENCRYPTEDDATA)) {
+        else if (AOCMSEnveloper.isCMSValid(envelop, AOSignConstants.CMS_CONTENTTYPE_ENCRYPTEDDATA)) {
             if (this.cipherManager.getCipherAlgorithm().supportsKey()) {
                 this.enveloper.setCipherKey(this.cipherManager.getCipherB64Key());
             }
@@ -405,9 +416,11 @@ public final class EnveloperManager {
         try {
             this.contentData = this.enveloper.recoverData(envelop);
         }
-        catch (final InvalidKeyException e) {
+        catch (final BadPaddingException e) {
             throw new AOException("La clave interna del sobre no es valida", e); //$NON-NLS-1$
-        }
+        } catch (final Exception e) {
+        	throw new AOException("No se han podido desenvolver los datos", e); //$NON-NLS-1$
+		}
     }
 
     /** Recupera los datos configurados como entrada para la operacion de
@@ -456,7 +469,10 @@ public final class EnveloperManager {
         // En este punto, tenemos la URI de los datos de entrada
         InputStream is = null;
         try {
-            is = AOUtil.loadFile(this.fileUri, this.parent, true, this.fileBase64);
+            is = AOUtil.loadFile(this.fileUri);
+            if (this.fileBase64) {
+            	return Base64.decode(new String(AOUtil.getDataFromInputStream(is)));	
+            }
             return AOUtil.getDataFromInputStream(is);
         }
         catch (final AOException e) {
@@ -483,8 +499,10 @@ public final class EnveloperManager {
      *         Cuando ocurre un error durante la operaci&oacute;n.
      * @throws NoSuchAlgorithmException
      *         Cuando la configuraci&oacute;n de cifrado no sea
-     *         v&aacute;lida. */
-    private byte[] createCMSEncryptedData(final byte[] content) throws AOException, NoSuchAlgorithmException {
+     *         v&aacute;lida. 
+     * @throws KeyException Cuando se produce un error al generar la clave.
+     */
+    private byte[] createCMSEncryptedData(final byte[] content) throws AOException, NoSuchAlgorithmException, KeyException {
         return this.enveloper.createCMSEncryptedData(content, this.cipherManager.getCipherConfig(), this.cipherManager.getConfiguredKey());
     }
 
@@ -602,7 +620,7 @@ public final class EnveloperManager {
             }
         }
 
-        return this.envelopedData = this.enveloper.addOriginator(envelop, this.ksConfigManager.getCertificateKeyEntry());
+        return this.envelopedData = AOCMSEnveloper.addOriginator(envelop, this.ksConfigManager.getCertificateKeyEntry());
     }
 
     /** Establece el sobre electr&oacute;nico con el que trabajamos.

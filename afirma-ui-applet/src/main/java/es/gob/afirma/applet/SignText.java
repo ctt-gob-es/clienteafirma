@@ -127,7 +127,7 @@ public final class SignText {
             return;
         }
 
-        if (alias == null || alias.length < 1) {
+        if (this.alias == null || this.alias.length < 1) {
             this.result = NO_MATCHING_CERT;
             return;
         }
@@ -227,7 +227,7 @@ public final class SignText {
                 final AOSigner signer = AOSignerFactory.getSigner(
                         this.useCAdES ? AOSignConstants.SIGN_FORMAT_CADES : AOSignConstants.SIGN_FORMAT_CMS);
                 
-                return Base64.encodeBytes(
+                return Base64.encode(
                         signer.sign(
                                 stringToSign.getBytes(),
                                 AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
@@ -359,28 +359,31 @@ public final class SignText {
                                             }, false);
                                         }
                                         catch (final CertificateExpiredException e) {
-                                            errorMessage = "Puede que el certificado haya caducado." + "\r\n" + "Se ha usado la hora local de su ordenador, por lo que la comprobaci\u00F3n puede no ser precisa."
-                                                           + "\r\n" + "Quiz\u00E1s la firma generada no tenga validez legal." + "\r\n" + "\u00BFDesea continuar con la operaci\u00F3n?";
+                                            errorMessage = "Puede que el certificado haya caducado." + "\r\n" + "Se ha usado la hora local de su ordenador, por lo que la comprobaci\u00F3n puede no ser precisa." //$NON-NLS-2$
+                                                           + "\r\n" + "Quiz\u00E1s la firma generada no tenga validez legal." + "\r\n" + "\u00BFDesea continuar con la operaci\u00F3n?"; //$NON-NLS-1$ //$NON-NLS-3$
                                         }
                                         catch (final CertificateNotYetValidException e) {
                                             errorMessage = "Puede que el certificado aun no sea v\u00E1lido." + "\r\n" + "Se ha usado la hora local de su ordenador, por lo que la comprobaci\u00F3n puede no ser precisa."
-                                                           + "\r\n" + "Quiz\u00E1s la firma generada no tenga validez legal." + "\r\n" + "\u00BFDesea continuar con la operaci\u00F3n?";
+                                                           + "\r\n" + "Quiz\u00E1s la firma generada no tenga validez legal." + "\r\n" + "\u00BFDesea continuar con la operaci\u00F3n?"; //$NON-NLS-1$ //$NON-NLS-3$
                                         }
                                         catch (final CertPathValidatorException e) {
                                             errorMessage =
-                                                    "No se ha podido validar la cadena de certificaci\u00F3n del certificado." + "\r\n" + "Es posible que su certificado no tenga correctamente declarada la cadena de\r\ncertificaci\u00F3n o que los certificados de esta no est\u00E1n importados en su almac\u00E9n\r\nde autoridades de confianza." + "\r\n" + "Quiz\u00E1s la firma generada no tenga validez legal.\r\n\u00BFDesea continuar con la operaci\u00F3n?";
+                                                    "No se ha podido validar la cadena de certificaci\u00F3n del certificado." + "\r\n" + "Es posible que su certificado no tenga correctamente declarada la cadena de" + "\r\n" + //$NON-NLS-2$ //$NON-NLS-4$
+                                                    "certificaci\u00F3n o que los certificados de esta no est\u00E1n importados en su almac\u00E9n\r\nde autoridades de confianza." + "\r\n" + //$NON-NLS-2$
+                                                    "Quiz\u00E1s la firma generada no tenga validez legal." + "\r\n" + "\u00BFDesea continuar con la operaci\u00F3n?"; //$NON-NLS-2$ 
                                         }
                                         catch (final AOCertificateRevokedException e) {
                                             errorMessage =
-                                                    "Su certificado est\u00E1 revocado.\r\nLas firmas electr\u00F3nicas generadas con \u00E9l no ser\u00E1n v\u00E1lidas." + "\r\n" + "\u00BFDesea continuar con la operaci\u00F3n?";
+                                                    "Su certificado est\u00E1 revocado.\r\nLas firmas electr\u00F3nicas generadas con \u00E9l no ser\u00E1n v\u00E1lidas." + "\r\n" + //$NON-NLS-2$
+                                                    "\u00BFDesea continuar con la operaci\u00F3n?"; 
                                         }
                                         catch (final Exception e) {
-                                            errorMessage = "Ocurrio un error durante la validacion del certificado";
+                                            errorMessage = "Ocurri\u00F3 un error durante la validacion del certificado";
                                         }
 
                                         if (errorMessage != null) {
                                             Logger.getLogger("es.gob.afirma").warning(errorMessage); //$NON-NLS-1$
-                                            if (JOptionPane.showConfirmDialog(parent, cv.getErrorMessage() + "\r\n" + "Se ha usado la hora local de su ordenador, por lo que la comprobaci\u00F3n puede no ser precisa.",
+                                            if (JOptionPane.showConfirmDialog(this.parent, cv.getErrorMessage() + "\r\n" + "Se ha usado la hora local de su ordenador, por lo que la comprobaci\u00F3n puede no ser precisa.", //$NON-NLS-1$
                                                                               "Advertencia", //$NON-NLS-1$
                                                                               JOptionPane.YES_NO_OPTION,
                                                                               JOptionPane.WARNING_MESSAGE) != JOptionPane.YES_OPTION) {

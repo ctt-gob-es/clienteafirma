@@ -17,10 +17,7 @@ import java.net.URI;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyException;
-import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
-
 import javax.swing.JOptionPane;
 
 import es.gob.afirma.ciphers.AOCipherConstants;
@@ -355,7 +352,7 @@ public final class CipherManager {
     /** Recupera en base 64 los datos cifrados.
      * @return Datos cifrados en base 64. */
     public String getCipheredDataB64Encoded() {
-        return (this.cipheredData == null ? null : Base64.encodeBytes(this.cipheredData));
+        return (this.cipheredData == null ? null : Base64.encode(this.cipheredData));
     }
 
     /** Establece los datos cifrados para descifrar.
@@ -456,7 +453,8 @@ public final class CipherManager {
      *         Algoritmo de cifrado no soportado.
      * @throws AOException
      *         Ocurri&oacute; un error al obtener la clave. 
-     * @throws KeyException */
+     * @throws KeyException Cuando se produce un error al generar la clave.
+     */
     public Key getConfiguredKey() throws NoSuchAlgorithmException, AOException, KeyException {
         return this.getConfiguredKey(new AOSunJCECipher(), this.cipherConfig);
     }
@@ -477,7 +475,8 @@ public final class CipherManager {
      *         Modo de clave no soportado.
      * @throws AOException
      *         Ocurri&oacute; un error al obtener la clave. 
-     * @throws KeyException */
+     * @throws KeyException Cuando se produce un error al generar la clave.
+     */
     private Key getConfiguredKey(final AOCipher cipher, final AOCipherConfig config) throws NoSuchAlgorithmException, AOException, KeyException {
 
         Key cipherKey;
@@ -485,7 +484,7 @@ public final class CipherManager {
         // Tomamos o generamos la clave, segun nos indique el modo de clave.
         if (this.keyMode.equals(AOCipherConstants.KEY_MODE_GENERATEKEY)) {
             cipherKey = cipher.generateKey(config);
-            this.cipherB64Key = Base64.encodeBytes(cipherKey.getEncoded());
+            this.cipherB64Key = Base64.encode(cipherKey.getEncoded());
 
             // Si se permite el almacenamiento de las claves, le damos la
             // posibilidad al usuario

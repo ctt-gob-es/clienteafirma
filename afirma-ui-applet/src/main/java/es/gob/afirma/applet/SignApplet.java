@@ -23,10 +23,8 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.security.AccessController;
 import java.security.InvalidKeyException;
-import java.security.KeyException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.KeyStoreException;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateEncodingException;
@@ -63,23 +61,20 @@ import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.ui.AOUIFactory;
-import es.gob.afirma.core.ui.AOUIManager;
 import es.gob.afirma.envelopers.cms.AOInvalidRecipientException;
+import es.gob.afirma.keystores.filters.rfc.RFC2254CertificateFilter;
 import es.gob.afirma.keystores.main.common.AOCertificatesNotFoundException;
 import es.gob.afirma.keystores.main.common.AOKeyStore;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManagerException;
 import es.gob.afirma.keystores.main.common.AOKeystoreAlternativeException;
 import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
-import es.gob.afirma.keystores.filters.rfc.KeyUsageFilter;
-import es.gob.afirma.keystores.filters.rfc.RFC2254CertificateFilter;
 import es.gob.afirma.massive.DirectorySignatureHelper;
 import es.gob.afirma.massive.MassiveSignatureHelper;
 import es.gob.afirma.massive.MassiveSignatureHelper.MassiveSignConfiguration;
 import es.gob.afirma.massive.MassiveType;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
 import es.gob.afirma.signers.cms.AOCMSSigner;
-import es.gob.afirma.util.AOBase64;
 
 
 /** Reimplementaci&oacute;n del Applet original de firma del cliente AFirma.
@@ -401,7 +396,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                         return new String[0];
                     }
                     if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(SignApplet.this,
-                                                                                AppletMessages.getString("SignApplet.4") + " " + kst.getDescription() + "?", //$NON-NLS-1$ //$NON-NLS-2$
+                                                                                AppletMessages.getString("SignApplet.4") + " " + kst.getDescription() + "?", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                                                                                 AppletMessages.getString("SignApplet.658"), //$NON-NLS-1$
                                                                                 JOptionPane.WARNING_MESSAGE)) {
                         setKeyStore(null, null, kst.toString());
@@ -441,102 +436,78 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
     public final String getCertificate(final String alias) {
         LOGGER.info("Invocando getCertificate: " + alias); //$NON-NLS-1$
-        return AccessController.doPrivileged(new java.security.PrivilegedAction<String>() {
-            public String run() {
-                final X509Certificate cert = SignApplet.this.getCertificateBinary(alias);
-                if (cert == null) {
-                    return null;
-                }
+        final X509Certificate cert = getCertificateBinary(alias); 
+        if (cert == null) {
+        	return null;
+        }
 
-                final String b64CertEncode;
-                try {
-                    b64CertEncode = AOBase64.encode(cert.getEncoded(), false);
-                }
-                catch (final Exception e) {
-                    LOGGER.severe("Error al codificar el certificado, se devolvera null: " + e); //$NON-NLS-1$
-                    return null;
-                }
-
-                return "Bag Attributes\r\n" + //$NON-NLS-1$
-                       "friendlyName: " //$NON-NLS-1$
-                       + AOUtil.getCN(cert)
-                       + "\r\n" + //$NON-NLS-1$
-                       "-----BEGIN CERTIFICATE-----\r\n" //$NON-NLS-1$
-                       + 
-                       b64CertEncode
-                       + "\r\n-----END CERTIFICATE-----"; //$NON-NLS-1$
-            }
-        });
+        final String b64CertEncode;
+        try {
+        	b64CertEncode = Base64.encode(cert.getEncoded());
+        }
+        catch (final Exception e) {
+        	LOGGER.severe("Error al codificar el certificado, se devolvera null: " + e); //$NON-NLS-1$
+        	return null;
+        }
+        return "Bag Attributes\r\n" + //$NON-NLS-1$
+        "friendlyName: " //$NON-NLS-1$
+        + AOUtil.getCN(cert)
+        + "\r\n" + //$NON-NLS-1$
+        "-----BEGIN CERTIFICATE-----\r\n" //$NON-NLS-1$
+        + 
+        b64CertEncode
+        + "\r\n-----END CERTIFICATE-----"; //$NON-NLS-1$
     }
 
     public String getCertificatePublicKey(final String alias) {
-        LOGGER.info("Invocando getCertificatePublicKey: " + alias); //$NON-NLS-1$
-        return AccessController.doPrivileged(new java.security.PrivilegedAction<String>() {
-            public String run() {
-                final X509Certificate cert = SignApplet.this.getCertificateBinary(alias);
-                if (cert == null) {
-                    return null;
-                }
+    	LOGGER.info("Invocando getCertificatePublicKey: " + alias); //$NON-NLS-1$
+    	final X509Certificate cert = getCertificateBinary(alias); 
+    	if (cert == null) {
+    		return null;
+    	}
 
-                final String b64PKEncoded;
-                try {
-                    b64PKEncoded = AOBase64.encode(cert.getPublicKey().getEncoded(), false);
-                }
-                catch (final Exception e) {
-                    LOGGER.severe("Error al codificar la clave publica del certificado, se devolvera null: " + e); //$NON-NLS-1$
-                    return null;
-                }
-
-                return "-----BEGIN RSA PUBLIC KEY-----\r\n" + //$NON-NLS-1$
-                       b64PKEncoded
-                       + "\r\n-----END RSA PUBLIC KEY-----"; //$NON-NLS-1$
-            }
-        });
+    	try {
+    		return "-----BEGIN RSA PUBLIC KEY-----\r\n" + //$NON-NLS-1$
+    		Base64.encode(cert.getPublicKey().getEncoded())
+    		+ "\r\n-----END RSA PUBLIC KEY-----"; //$NON-NLS-1$
+    	}
+    	catch (final Exception e) {
+    		LOGGER.severe("Error al codificar la clave publica del certificado, se devolvera null: " + e); //$NON-NLS-1$
+    		return null;
+    	}
     }
 
-    /** Recupera un certificado del repositorio activo.
-     * @param alias
-     *        Alias del certificado que deseamos recuperar.
-     * @return Certificado. */
     private final X509Certificate getCertificateBinary(final String alias) {
-        return AccessController.doPrivileged(new java.security.PrivilegedAction<X509Certificate>() {
-            public X509Certificate run() {
-                try {
-                    SignApplet.this.setError(null);
-                    return (X509Certificate) SignApplet.this.ksConfigManager.getCertificate(alias);
-                }
-                catch (final AOCancelledOperationException e) {
-                    LOGGER.severe("Operacion cancelada por el usuario: " + e); //$NON-NLS-1$
-                    SignApplet.this.setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
-                    return null;
-                }
-                catch (final AOKeyStoreManagerException e) {
-                    LOGGER.severe("Error al inicializar el repositorio de certificados, se devolvera null: " + e); //$NON-NLS-1$
-                    SignApplet.this.setError(AppletMessages.getString("SignApplet.6")); //$NON-NLS-1$
-                    return null;
-                }
-                catch (final AOKeystoreAlternativeException e) {
-                    final AOKeyStore kst = e.getAlternativeKsm();
-                    if (kst == null) {
-                        LOGGER.severe("Error al inicializar el repositorio de certificados: " + e); //$NON-NLS-1$
-                        SignApplet.this.setError(AppletMessages.getString("SignApplet.6")); //$NON-NLS-1$
-                        return null;
-                    }
-                    if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(SignApplet.this,
-                                                                                AppletMessages.getString("SignApplet.4", kst.getDescription()), //$NON-NLS-1$
-                                                                                AppletMessages.getString("SignApplet.658"), //$NON-NLS-1$
-                                                                                JOptionPane.WARNING_MESSAGE)) {
-                        setKeyStore(null, null, kst.toString());
-                        return getCertificateBinary(alias);
-                    }
-                    LOGGER.severe("Operacion cancelada por el usuario"); //$NON-NLS-1$
-                    SignApplet.this.setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
-                    return null;
-                }
+        final GetCertificateAction getCertAction = new GetCertificateAction(alias, this.ksConfigManager);
+        final X509Certificate cert = AccessController.doPrivileged(getCertAction);
+        if (getCertAction.isError()) {
+            if (getCertAction.getException() instanceof AOKeystoreAlternativeException) {
+            	AOKeystoreAlternativeException e = (AOKeystoreAlternativeException) getCertAction.getException();
+            	final AOKeyStore kst = e.getAlternativeKsm();
+            	if (kst == null) {
+            		LOGGER.severe("Error al inicializar el repositorio de certificados: " + e); //$NON-NLS-1$
+            		this.setError(AppletMessages.getString("SignApplet.6")); //$NON-NLS-1$
+            		return null;
+            	}
+            	if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(this,
+            			AppletMessages.getString("SignApplet.4", kst.getDescription()), //$NON-NLS-1$
+            			AppletMessages.getString("SignApplet.658"), //$NON-NLS-1$
+            			JOptionPane.WARNING_MESSAGE)) {
+            		setKeyStore(null, null, kst.toString());
+            		return getCertificateBinary(alias);
+            	}
+            	LOGGER.severe("Operacion cancelada por el usuario"); //$NON-NLS-1$
+            	SignApplet.this.setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
+            	return null;
             }
-        });
+            LOGGER.severe(getCertAction.getErrorMessage());
+            this.setError(getCertAction.getErrorMessage());
+            return null;
+        }
+        
+        return cert;
     }
-
+    
     void saveDataToStorage(final byte[] binaryData, final String filename) throws AOException {
         if (binaryData == null) {
             throw new IllegalArgumentException("Los datos que desea almacenar no pueden ser nulos"); //$NON-NLS-1$
@@ -749,7 +720,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         AccessController.doPrivileged(new java.security.PrivilegedAction<Void>() {
             public Void run() {
                 try {
-                    SignApplet.this.data = AOBase64.decode(data);
+                    SignApplet.this.data = Base64.decode(data);
                 }
                 catch (final Exception e) {
                     LOGGER.severe("Error al establecer los datos para la firma: " + e); //$NON-NLS-1$
@@ -841,7 +812,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
             return;
         }
 
-        SignApplet.this.hash = AOBase64.decode(hash);
+        SignApplet.this.hash = Base64.decode(hash);
         SignApplet.this.dataMimeType = MimeHelper.DEFAULT_MIMETYPE;
         SignApplet.this.fileUri = null;
         SignApplet.this.fileBase64 = false;
@@ -854,7 +825,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
             this.signData = null;
         }
         else {
-            this.signData = AOBase64.decode(signatureB64);
+            this.signData = Base64.decode(signatureB64);
         }
     }
 
@@ -2048,7 +2019,6 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
                 // Cargamos los datos de la URI configurada
                 final LoadFileAction loadFileAction = new LoadFileAction(this.fileUri);
-                loadFileAction.setBase64Encoded(this.fileBase64);
                 AccessController.doPrivileged(loadFileAction);
                 if (loadFileAction.isError()) {
                     LOGGER.severe(loadFileAction.getErrorMessage());
@@ -2365,7 +2335,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
             SignApplet.this.setError(AppletMessages.getString("SignApplet.278")); //$NON-NLS-1$
             return false;
         }
-        this.data = AOBase64.decode(b64data);
+        this.data = Base64.decode(b64data);
         return sign();
     }
 
@@ -2379,7 +2349,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
             LOGGER.warning("La codificacion del certificado no es valida, se devolvera una cadena vacia: " + e); //$NON-NLS-1$
             return ""; //$NON-NLS-1$
         }
-        return AOBase64.encode(certEnconded, false);
+        return Base64.encode(certEnconded);
     }
 
     public String getSignatureBase64Encoded() {
@@ -2395,7 +2365,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                     );
                     SignApplet.this.setError(AppletMessages.getString("SignApplet.64")); //$NON-NLS-1$
                 }
-                return (sign == null) ? null : AOBase64.encode(sign, false);
+                return (sign == null) ? null : Base64.encode(sign);
             }
         });
     }
@@ -2531,7 +2501,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
     public String getTextFromBase64(final String b64) {
         LOGGER.info("Invocando getTextFromBase64"); //$NON-NLS-1$
-        return new String(AOBase64.decode(b64));
+        return new String(Base64.decode(b64));
     }
 
     public String getBase64FromText(final String plainText) {
@@ -2547,7 +2517,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         }
         if (encoding != null) {
             try {
-                return AOBase64.encode(plainText.getBytes(encoding), false);
+                return Base64.encode(plainText.getBytes(encoding));
             }
             catch (final Exception e) {
                 LOGGER.warning("El XML introducido parece tener una codificacion " + encoding //$NON-NLS-1$
@@ -2555,7 +2525,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                                + e);
             }
         }
-        return AOBase64.encode(plainText.getBytes(), false);
+        return Base64.encode(plainText.getBytes());
     }
 
     public String getFileBase64Encoded(final String filename, final boolean showProgress) {
@@ -2607,7 +2577,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
             return null;
         }
 
-        return this.fileBase64 ? new String(fileContent) : AOBase64.encode(fileContent, false);
+        return this.fileBase64 ? new String(fileContent) : Base64.encode(fileContent);
     }
 
     public String getFileHashBase64Encoded() {
@@ -2650,9 +2620,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                 }
                 final String digestAlg = AOSignConstants.getDigestAlgorithmName(SignApplet.this.sigAlgo);
                 try {
-                	final MessageDigest md = MessageDigest.getInstance(digestAlg);
-                	md.update(binaryData);
-                    return AOBase64.encode(md.digest(), false);
+                    return Base64.encode(CryptoUtils.getMessageDigest(binaryData, digestAlg));
                 }
                 catch (final NoSuchAlgorithmException e) {
                     LOGGER.severe("El algoritmo de hash '" + digestAlg + "' no esta soportado: " + e); //$NON-NLS-1$ //$NON-NLS-2$
@@ -3032,7 +3000,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         if (certB64 == null || certB64.length() == 0) {
             LOGGER.warning("No se han introducido destinatarios"); //$NON-NLS-1$
         }
-        addRecipientToCMS(AOBase64.decode(certB64));
+        addRecipientToCMS(Base64.decode(certB64));
     }
 
     /** Configura un nuevo destinatario para el sobre electr&oacute;nico por
@@ -3060,7 +3028,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         }
 
         try {
-            this.enveloperManager.removeRecipient(AOBase64.decode(certB64));
+            this.enveloperManager.removeRecipient(Base64.decode(certB64));
         }
         catch (final CertificateException e) {
             LOGGER.severe("Error al decodificar el certificado de destinatario, asegurese de que es un certificado valido: " + e); //$NON-NLS-1$
@@ -3138,7 +3106,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
                 // Devolvemos el certificado codificado en Base64
                 try {
-                    return AOBase64.encode(cert.getEncoded(), false);
+                    return Base64.encode(cert.getEncoded());
                 }
                 catch (final Exception e) {
                     LOGGER.severe("Error al codificar el certificado recuperado del directorio LDAP : " + e); //$NON-NLS-1$
@@ -3348,7 +3316,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
      *        Objeto CMS en base 64.
      * @return Informaci&oacute;n del objeto CMS introducido. */
     private String getCMSInfo(final String b64) {
-        return this.enveloperManager.getCMSInfo(AOBase64.decode(b64));
+        return this.enveloperManager.getCMSInfo(Base64.decode(b64));
     }
 
     public void setDataMimeType(final String mimetype) {
@@ -3365,7 +3333,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
             LOGGER.warning("No se dispone de datos de salida, se devolvera cadena vacia"); //$NON-NLS-1$
             return "";  //$NON-NLS-1$
         }
-        return AOBase64.encode(this.data, false);
+        return Base64.encode(this.data);
     }
 
     @Deprecated
@@ -3457,7 +3425,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
      * @return <code>true</code> cuando se confirma la operaci&oacute;n <code>false</code> en caso contrario. */
     private boolean showHashMessage() {
         final String digestAlgo = AOSignConstants.getDigestAlgorithmName(this.sigAlgo);
-        final String hashData = CryptoUtils.getHexDigestData(digestAlgo);
+        final String hashData = this.getHexDigestData(digestAlgo);
 
         // Mostramos el mensaje informando del hash de los datos o, en caso de
         // no haber podido calcularlo,
@@ -3483,7 +3451,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         // Descodificamos los datos introducidos, que son los parametros
         // separados por '#' que
         // definen la operacion a realizar
-        final String[] params = (new String(AOBase64.decode(datos))).split("#"); //$NON-NLS-1$
+        final String[] params = (new String(Base64.decode(datos))).split("#"); //$NON-NLS-1$
 
         // Comprobamos que hemos podido extraer todos los parametros
         if (params == null || params.length < 3) {
@@ -3973,6 +3941,72 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         return this.ksConfigManager.getCertificateKeyEntry();
     }
 
+    /** Recupera el hash en hexadecimal de los datos de entrada del applet para
+     * firma.
+     * @return Hash en hexadecimal formateado o <code>null</code> si no se
+     *         introdujeron o no pudieron leerse los datos. */
+    private String getHexDigestData(final String algorithm) { 
+
+        byte[] hashData = null;
+        // Si estamos firmando datos o si es una firma de hash implicita
+        // (contamos con los datos)
+        if (this.data != null && (this.hash == null || this.sigMode == AOSignConstants.SIGN_MODE_IMPLICIT)) {
+            try {
+                hashData = CryptoUtils.getMessageDigest(this.data, algorithm);
+            }
+            catch (final Exception e) {
+                hashData = null;
+            }
+        }
+        // Si estamos firmando un fichero
+        else if (this.fileUri != null) {
+            try {
+                hashData = CryptoUtils.getMessageDigest(AOUtil.getDataFromInputStream(AOUtil.loadFile(this.fileUri)), algorithm);
+            }
+            catch (final Exception e) {
+                hashData = null;
+            }
+        }
+        // Si estamos firmando un hash en modo explicito (el caso de modo
+        // implicito ya se trato)
+        else if (this.hash != null) {
+            hashData = this.hash;
+        }
+        // Si no se esta firmando nada de lo anterior (que deberia abarcar todos
+        // los casos de firmar y cofirma)
+        // comprobamos si se ha introducido la informacion de una firma
+        // electronica (caso unicamente de
+        // contrafirma ya que la cofirma debe mostrar la informacion de los
+        // datos, no de la firma ya existente).
+        // Comprobamos si se ha introducido la firma directamente
+        else if (this.signData != null) {
+            try {
+                hashData = CryptoUtils.getMessageDigest(this.signData, algorithm);
+            }
+            catch (final Exception e) {
+                hashData = null;
+            }
+        }
+        // Comprobamos si se ha introducido la localizacion de la firma
+        else if (this.electronicSignatureFile != null) {
+            try {
+                hashData =
+                        CryptoUtils.getMessageDigest(AOUtil.getDataFromInputStream(AOUtil.loadFile(this.electronicSignatureFile)),
+                                                      algorithm);
+            }
+            catch (final Exception e) {
+                hashData = null;
+            }
+        }
+
+        if (hashData == null) {
+            LOGGER.severe("No se han indicado o no se han podido leer los datos para el calculo de la huella digital"); //$NON-NLS-1$
+            return null;
+        }
+
+        return AOUtil.hexify(hashData, ":"); //$NON-NLS-1$
+    }
+    
     /** Firma una cadena de texto simulando el funcionamiento del m&eacute;todo {@code [window.]crypto
      * .signText(stringToSign, caOption, [caNameString1, [caNameString2, . . . ]])} de JavaScript en navegadores Mozilla / Firefox.
      * @param stringToSign

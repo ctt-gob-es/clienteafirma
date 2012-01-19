@@ -10,6 +10,7 @@
 package es.gob.afirma.applet;
 
 import java.io.IOException;
+import java.security.KeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
 
@@ -93,7 +94,10 @@ public final class WrapAction extends BasicPrivilegedAction<Boolean, byte[]> {
         catch (final CertificateEncodingException e) {
             setError("El certificado del remitente no es valido", e); //$NON-NLS-1$
             return Boolean.FALSE;
-        }
+        } catch (KeyException e) {
+        	setError("La clave de envoltura generada no es valida", e); //$NON-NLS-1$
+            return Boolean.FALSE;
+		}
 
         this.setResult(this.enveloperManager.getEnvelopedData());
 
