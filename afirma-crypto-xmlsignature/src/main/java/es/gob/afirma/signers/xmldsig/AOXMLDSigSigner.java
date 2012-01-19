@@ -10,9 +10,12 @@
 
 package es.gob.afirma.signers.xmldsig;
 
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.URI;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStore.PrivateKeyEntry;
@@ -60,9 +63,11 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.ls.DOMImplementationLS;
+import org.w3c.dom.ls.LSSerializer;
 import org.xml.sax.SAXException;
 
-import com.sun.org.apache.xml.internal.security.utils.XMLUtils;
+import com.sun.org.apache.xerces.internal.dom.DOMOutputImpl;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
@@ -932,8 +937,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             final List<Object> content = new ArrayList<Object>();
             final X509Certificate cert = (X509Certificate) keyEntry.getCertificate();
             content.add(kif.newKeyValue(cert.getPublicKey()));
-            // content.add(kif.newX509Data(Collections.singletonList(cert)));
-            // //TODO: Con esto solo agregamos el certificado de firma
+
             Certificate[] certs = keyEntry.getCertificateChain();
             if (certs == null) {
                 certs = new Certificate[] {
@@ -1018,7 +1022,6 @@ public final class AOXMLDSigSigner implements AOSigner {
             styleType = null;
         }
         return Utils.writeXML(docSignature.getDocumentElement(), originalXMLProperties, styleHref, styleType);
-
     }
 
     /** Comprueba si la firma es detached.
@@ -1142,7 +1145,7 @@ public final class AOXMLDSigSigner implements AOSigner {
 
         // convierte el documento obtenido en un array de bytes
         final ByteArrayOutputStream baosSig = new ByteArrayOutputStream();
-        XMLUtils.outputDOM(elementRes, baosSig);
+        writeXML(new BufferedWriter(new OutputStreamWriter(baosSig)), elementRes);
         return baosSig.toByteArray();
     }
 
@@ -1376,11 +1379,11 @@ public final class AOXMLDSigSigner implements AOSigner {
 
         // convierte el documento de firmas en un InputStream
         final ByteArrayOutputStream baosSig = new ByteArrayOutputStream();
-        XMLUtils.outputDOM(rootSig, baosSig);
+        writeXML(new BufferedWriter(new OutputStreamWriter(baosSig)), rootSig);
 
         // convierte el documento a firmar en un InputStream
         final ByteArrayOutputStream baosData = new ByteArrayOutputStream();
-        XMLUtils.outputDOM(rootData, baosData);
+        writeXML(new BufferedWriter(new OutputStreamWriter(baosData)), rootData);
 
         return cosign(baosData.toByteArray(), baosSig.toByteArray(), algorithm, keyEntry, extraParams);
     }
@@ -1979,4 +1982,27 @@ public final class AOXMLDSigSigner implements AOSigner {
         return signInfo;
     }
 
+    /**
+     * Escribe el documento especificado al documento dado. La codificaci&oacute;n por
+     * defecto es UTF-8.
+     * @param writer
+     *
+     *
+     * @param out
+     *            the output File
+     * @param document
+     *            the document to be writen
+     *
+     */
+    private static void writeXML(final Writer writer, final Node node) {
+        final Document document = node.getOwnerDocument();
+        final DOMImplementationLS domImplLS = (DOMImplementationLS) document.getImplementation();
+        final LSSerializer serializer = domImplLS.createLSSerializer();
+        serializer.getDomConfig().setParameter("namespaces", Boolean.FALSE); //$NON-NLS-1$
+
+        final DOMOutputImpl output = new DOMOutputImpl();
+        output.setCharacterStream(writer);
+
+        serializer.write(node, output);
+    }
 }
