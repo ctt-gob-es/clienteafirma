@@ -22,7 +22,7 @@ import org.bouncycastle.asn1.DERObject;
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 
-/** Clase base para la implementaci&oacute;n del tipo DigestedData La Estructura
+/** Clase base para la implementaci&oacute;n del tipo DigestedData. La Estructura
  * del mensaje es la siguiente:<br>
  *
  * <pre>
@@ -82,20 +82,32 @@ public final class DigestedData extends ASN1Encodable {
 
     }
 
-    DERInteger getVersion() {
-        return this.version;
+    /**
+     * Recupera la versi&oacute;n del sistema de empaquetado PKCS#7.
+     * @return Versi&oacute;n del empaquetado.
+     */
+    public String getVersion() {
+        return this.version.toString();
     }
 
-    AlgorithmIdentifier getDigestAlgorithm() {
-        return this.digestAlgorithm;
+    /**
+     * Recupera el algoritmo de huella digital configurada para los empaquetados. 
+     * @return Algoritmo.
+     */
+    public String getDigestAlgorithm() {
+        return this.digestAlgorithm.getAlgorithm().toString();
     }
 
     ASN1OctetString getDigest() {
         return this.digest;
     }
 
-    ContentInfo getContentInfo() {
-        return this.contentInfo;
+    /**
+     * Recupera el tipo de contenido.
+     * @return Tipo de contenido.
+     */
+    public String getContentType() {
+        return this.contentInfo.getContentType().toString();
     }
 
     /** Produce an object suitable for an ASN1OutputStream.
