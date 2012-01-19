@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -30,6 +30,7 @@ import es.gob.afirma.core.ciphers.AOCipherConfig;
 import es.gob.afirma.core.ciphers.CipherConstants.AOCipherAlgorithm;
 import es.gob.afirma.core.ciphers.CipherConstants.AOCipherBlockMode;
 import es.gob.afirma.core.ciphers.CipherConstants.AOCipherPadding;
+import es.gob.afirma.core.misc.Base64;
 
 /** Cifrador seg&uacute;n las capacidades del proveedor JCE (<i>Java Cryptography
  * Extension</i>). */
@@ -210,7 +211,6 @@ public final class AOSunJCECipher implements AOCipher {
     }
 
     /** {@inheritDoc} */
-    @SuppressWarnings("restriction")
 	public Key decodeKey(final String base64Key, final AOCipherConfig algorithmConfig, final Object[] params) throws KeyException {
         if (base64Key == null || base64Key.length() < 1) {
             throw new IllegalArgumentException("La clave a descodificar no puede ser nula ni vacia"); //$NON-NLS-1$
@@ -220,7 +220,7 @@ public final class AOSunJCECipher implements AOCipher {
         }
 
         try {
-            return new SecretKeySpec(new sun.misc.BASE64Decoder().decodeBuffer(base64Key), algorithmConfig.getAlgorithm().getName());
+            return new SecretKeySpec(Base64.decode(base64Key), algorithmConfig.getAlgorithm().getName());
         }
         catch (final Exception e) {
             throw new KeyException("Error creando la clave secreta", e); //$NON-NLS-1$

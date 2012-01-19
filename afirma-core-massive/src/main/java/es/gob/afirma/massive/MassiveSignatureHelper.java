@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -24,12 +24,12 @@ import java.util.logging.Logger;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.AOSigner;
-import es.gob.afirma.util.AOBase64;
 import es.gob.afirma.core.signers.AOSignerFactory;
+import es.gob.afirma.core.signers.CounterSignTarget;
 
 
 /** M&oacute;dulo para el soporte de multifirmas m&aacute;sivas. Permite
@@ -38,12 +38,12 @@ import es.gob.afirma.core.signers.AOSignerFactory;
  * entrada se corresponde con el resultado de la ejecuci&oacute;n de una
  * operaci&oacute;n. */
 public final class MassiveSignatureHelper {
-    
+
     private static final String XADES_SIGNER = "es.gob.afirma.signers.xades.AOXAdESSigner"; //$NON-NLS-1$
     private static final String XMLDSIG_SIGNER = "es.gob.afirma.signers.xml.xmldsig.AOXMLDSigSigner"; //$NON-NLS-1$
-    
+
     private static final String REG_FIELD_SEPARATOR = " - "; //$NON-NLS-1$
-    
+
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** Configuracion de la operaci&oacute;n masiva. */
@@ -57,7 +57,7 @@ public final class MassiveSignatureHelper {
 
     /** Indica si el m&oacute;dulo est&aacute; inicializado. */
     private boolean isInitialized;
-    
+
     /** Contruye el m&oacute;dulo de soporte para la multifirma masiva.
      * @param configuration
      *        Configuracion de la operaci&oacute;n.
@@ -78,8 +78,8 @@ public final class MassiveSignatureHelper {
         this.defaultSigner = AOSignerFactory.getSigner(this.massiveConfiguration.getDefaultFormat());
         if (this.defaultSigner == null) {
             throw new AOException("Formato de firma no soportado: " + this.massiveConfiguration.getDefaultFormat()); //$NON-NLS-1$
-        } 
-        
+        }
+
         this.isInitialized = true;
     }
 
@@ -96,7 +96,7 @@ public final class MassiveSignatureHelper {
      * @param massiveOperation
      *        Tipo de operaci&oacute;n.
      * @see MassiveType */
-    public void setMassiveOperation(MassiveType massiveOperation) {
+    public void setMassiveOperation(final MassiveType massiveOperation) {
         this.massiveConfiguration.setMassiveOperation(
             (massiveOperation != null ? massiveOperation : MassiveType.SIGN)
         );
@@ -129,7 +129,7 @@ public final class MassiveSignatureHelper {
 
         final Properties config = (Properties) this.massiveConfiguration.getExtraParams().clone(); // Configuracion
         config.setProperty("headLess", Boolean.toString(true));  //$NON-NLS-1$
-        final byte[] data = AOBase64.decode(b64Data); // Datos a
+        final byte[] data = Base64.decode(b64Data); // Datos a
                                                                 // firmar
         String operation = null; // Para aclarar mensajes por consola
         byte[] signData = null; // Firma resultante
@@ -166,7 +166,7 @@ public final class MassiveSignatureHelper {
 
         this.addLog(MassiveSignMessages.getString("MassiveSignatureHelper.3")); //$NON-NLS-1$
 
-        return AOBase64.encode(signData, false);
+        return Base64.encode(signData);
     }
 
     /** Realiza la firma de un hash. La cofirma y contrafirma de hashes no esta
@@ -187,7 +187,7 @@ public final class MassiveSignatureHelper {
         }
 
         // Transformamos los datos
-        final byte[] hash = AOBase64.decode(b64Hash);
+        final byte[] hash = Base64.decode(b64Hash);
 
         // Solo para aclarar los posibles mensajes por consola, almacenaremos
         String operation = "sign"; //$NON-NLS-1$
@@ -220,7 +220,7 @@ public final class MassiveSignatureHelper {
 
         this.addLog("Operaci\u00F3n sobre hash: Correcta"); //$NON-NLS-1$
 
-        return AOBase64.encode(signData, false);
+        return Base64.encode(signData);
     }
 
     /** Realiza la operaci&oacute;n de multifirma sobre un fichero.
@@ -329,7 +329,7 @@ public final class MassiveSignatureHelper {
 
         this.addLog(MassiveSignMessages.getString("MassiveSignatureHelper.15")); //$NON-NLS-1$
 
-        return AOBase64.encode(signData, false);
+        return Base64.encode(signData);
     }
 
     /** Firma datos con el signer indicado.

@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -25,11 +25,11 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.cms.EncryptedContentInfo;
 import org.bouncycastle.asn1.cms.EncryptedData;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.util.encoders.Base64;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ciphers.AOCipherConfig;
 import es.gob.afirma.core.ciphers.CipherConstants.AOCipherAlgorithm;
+import es.gob.afirma.core.misc.Base64;
 
 /** Clase que descifra el contenido de un fichero en formato EncryptedData de
  * CMS.
@@ -53,19 +53,19 @@ final class CMSDecipherEncryptedData {
      *         (formato o clave incorrecto,...)
      * @throws InvalidKeyException
      *         Cuando se proporciona una clave incorrecta para el
-     *         descifrado. 
-     * @throws BadPaddingException 
-     * @throws IllegalBlockSizeException 
-     * @throws InvalidAlgorithmParameterException 
-     * @throws NoSuchPaddingException 
+     *         descifrado.
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
+     * @throws InvalidAlgorithmParameterException
+     * @throws NoSuchPaddingException
      * @throws NoSuchAlgorithmException */
     @SuppressWarnings("unused")
-    byte[] dechiperEncryptedData(final byte[] encryptedData, final String pass) throws AOException, 
-                                                                                       InvalidKeyException, 
-                                                                                       NoSuchAlgorithmException, 
-                                                                                       NoSuchPaddingException, 
-                                                                                       InvalidAlgorithmParameterException, 
-                                                                                       IllegalBlockSizeException, 
+    byte[] dechiperEncryptedData(final byte[] encryptedData, final String pass) throws AOException,
+                                                                                       InvalidKeyException,
+                                                                                       NoSuchAlgorithmException,
+                                                                                       NoSuchPaddingException,
+                                                                                       InvalidAlgorithmParameterException,
+                                                                                       IllegalBlockSizeException,
                                                                                        BadPaddingException {
 
         AlgorithmIdentifier alg = null;

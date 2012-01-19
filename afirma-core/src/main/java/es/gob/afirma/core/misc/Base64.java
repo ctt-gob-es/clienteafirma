@@ -70,7 +70,7 @@ import java.util.Arrays;
  *         Time: 11:31:11
  */
 
-public class Base64 {
+public final class Base64 {
 
   private static final char[] CA = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".toCharArray(); //$NON-NLS-1$
   private static final int[] IA = new int[256];
@@ -86,7 +86,7 @@ public class Base64 {
    * @param sArr The bytes to convert. If <code>null</code> or length 0 an empty array will be returned.
    * @return A BASE64 encoded array. Never <code>null</code>.
    */
-  public final static String encode(final byte[] sArr) {
+  public static String encode(final byte[] sArr) {
     // Check special case
 	if (sArr == null) {
 		return ""; //$NON-NLS-1$
@@ -143,7 +143,7 @@ public class Base64 {
    * @return The decoded array of bytes. May be of length 0. Will be <code>null</code> if the legal characters
    * (including '=') isn't divideable by 4.  (I.e. definitely corrupted).
    */
-  public final static byte[] decode(final String str) {
+  public static byte[] decode(final String str) {
     // Check special case
 	if (str == null) {
 		return new byte[0];

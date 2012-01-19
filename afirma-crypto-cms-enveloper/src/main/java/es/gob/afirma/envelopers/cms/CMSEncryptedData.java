@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -48,7 +48,7 @@ import es.gob.afirma.core.signers.AOSignConstants;
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
 
 final class CMSEncryptedData {
-	
+
 	private CMSEncryptedData() {
 		// No permitimos la instanciacion
 	}
@@ -70,11 +70,11 @@ final class CMSEncryptedData {
      * @throws java.security.NoSuchAlgorithmException
      *         Si no se soporta alguno de los algoritmos de firma o huella
      *         digital */
-    static byte[] genEncryptedData(final byte[] data, 
-    		                       final String digAlg, 
-    		                       final AOCipherConfig config, 
-    		                       final Key cipherKey, 
-    		                       final Oid dataType, 
+    static byte[] genEncryptedData(final byte[] data,
+    		                       final String digAlg,
+    		                       final AOCipherConfig config,
+    		                       final Key cipherKey,
+    		                       final Oid dataType,
     		                       final Map<Oid, byte[]> uatrib) throws NoSuchAlgorithmException {
 
         // Datos previos &uacute;tiles
@@ -99,65 +99,4 @@ final class CMSEncryptedData {
         return new ContentInfo(PKCSObjectIdentifiers.encryptedData, new EncryptedData(encInfo, unprotectedAttrs)).getDEREncoded();
     }
 
-    // /**
-    // * Asigna la clave para firmar el contenido del fichero que queremos
-    // envolver
-    // * y qeu m&aacute;s tarde ser&aacute; cifrada con la clave p&uacute;blica
-    // del usuario que
-    // * hace la firma.
-    // *
-    // * @param config Configuraci&oacute;n necesaria para crear la clave.
-    // * @param key Contrase&ntilde;a que se va a usar para cifrar.
-    // */
-    // private void assignKey(AOCipherConfig config, String key){
-    //
-    // // Generamos la clave necesaria para el cifrado
-    // if ((config.getAlgorithm().equals(AOCipherAlgorithm.PBEWITHMD5ANDDES)) ||
-    // (config.getAlgorithm().equals(AOCipherAlgorithm.PBEWITHSHA1ANDDESEDE)) ||
-    // (config.getAlgorithm().equals(AOCipherAlgorithm.PBEWITHSHA1ANDRC2_40))){
-    // try {
-    // this.cipherKey =
-    // SecretKeyFactory.getInstance(config.getAlgorithm().getName())
-    // .generateSecret(new PBEKeySpec(key.toCharArray(), SALT,
-    // ITERATION_COUNT));
-    // } catch (Exception ex) {
-    // Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de asignacion de la clave (a partir de password): "
-    // + ex);
-    // }
-    // }
-    // else{
-    // try {
-    // this.cipherKey = new SecretKeySpec(new BASE64Decoder().decodeBuffer(key),
-    // config.getAlgorithm().getName());
-    // } catch (IOException ex) {
-    // Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de asignacion de la clave (a partir de key): "
-    // + ex);
-    // }
-    // }
-    //
-    //
-    // }
-
-    // /**
-    // * Genera el proveedor de cifrado.
-    // *
-    // * @param providerName Nombre del proveedor.
-    // * @return El proveedor.
-    // * @throws java.security.NoSuchProviderException
-    // */
-    // private static Provider getProvider(String providerName)
-    // throws NoSuchProviderException
-    // {
-    // if (providerName != null)
-    // {
-    // Provider prov = Security.getProvider(providerName);
-    // if (prov != null)
-    // {
-    // return prov;
-    // }
-    // throw new NoSuchProviderException("provider " + providerName +
-    // " not found.");
-    // }
-    // return null;
-    // }
 }

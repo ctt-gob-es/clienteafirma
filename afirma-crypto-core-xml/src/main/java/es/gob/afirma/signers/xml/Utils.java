@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -59,19 +59,18 @@ import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSSerializer;
 
 import com.sun.org.apache.xerces.internal.dom.DOMOutputImpl;
-import com.sun.org.apache.xml.internal.security.utils.Base64;
 
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSimpleSignInfo;
 import es.gob.afirma.core.ui.AOUIFactory;
 
 /** Utilidades para las firmas XML. */
-@SuppressWarnings("restriction")
 public final class Utils {
-    
+
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
-    
+
     private Utils() {
         // No permitimos la instanciacion
     }
@@ -79,13 +78,13 @@ public final class Utils {
     /** Hoja de estilo local (rutal local no dereferenciable) a un XML */
     public static final class IsInnerlException extends Exception {
         private static final long serialVersionUID = -8769490831203570286L;
-        
+
         /** Construye la excepci&oacute;n que indica que una referencia apunta al interior del mismo XML.
          * @param e Excepci&oacute;n anterior en la cadena */
         public IsInnerlException(final Throwable e) {
             super(e);
         }
-        
+
     }
 
     /** No se puede dereferenciar la hoja de estilo. */
@@ -139,7 +138,7 @@ public final class Utils {
                                                                                                  IsInnerlException,
                                                                                                  ReferenceIsNotXMLException {
         if (id == null || "".equals(id)) { //$NON-NLS-1$
-            throw new CannotDereferenceException("La hoja de estilo era nula o vacia"); //$NON-NLS-1$ 
+            throw new CannotDereferenceException("La hoja de estilo era nula o vacia"); //$NON-NLS-1$
         }
 
         byte[] xml = null;
@@ -165,11 +164,11 @@ public final class Utils {
             final String fileName = idParts[idParts.length - 1];
 
             if (fileName.startsWith("#")) { //$NON-NLS-1$
-                throw new IsInnerlException(e); 
+                throw new IsInnerlException(e);
             }
             else if (!headLess && id.startsWith("file://")) { //$NON-NLS-1$
             	// Preguntamos al usuario para la dereferenciacion
-            	if (AOUIFactory.showConfirmDialog(null, 
+            	if (AOUIFactory.showConfirmDialog(null,
             			XMLMessages.getString("Utils.5"), //$NON-NLS-1$
             			XMLMessages.getString("Utils.6"), //$NON-NLS-1$
             			AOUIFactory.OK_CANCEL_OPTION,
@@ -225,11 +224,11 @@ public final class Utils {
      *        Reeferncia a la hoja de estilo
      * @return XML con la cabecera de declaraci&oacute;n de hoja de estilo
      *         a&ntilde;adida */
-    private static String addStyleSheetHeader(final String xml, String tpy, final String href) {
+    private static String addStyleSheetHeader(final String xml, final String tpy, final String href) {
         if (href == null) {
             return xml;
         }
-                
+
         final String type = (tpy != null) ? tpy : "text/xsl"; //$NON-NLS-1$
 
         if (xml == null || "".equals(xml)) { //$NON-NLS-1$
@@ -264,7 +263,7 @@ public final class Utils {
         if (startPos == -1) {
             return ret;
         }
-        
+
         String xml = inputXML.substring(startPos);
         xml = xml.substring(0, xml.indexOf('>') + 1)
                    .replace("<?xml-stylesheet ", "").replace("?>", "").replace(" ", "\n").replace("\"", "").replace("'", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$
@@ -321,7 +320,7 @@ public final class Utils {
             else if (Transform.XPATH2.equals(transformType) && transformBody != null) {
                 transformSubtype = extraParams.getProperty("xmlTransform" + Integer.toString(i) + "Subtype"); //$NON-NLS-1$ //$NON-NLS-2$
                 if ("subtract".equals(transformSubtype)) { //$NON-NLS-1$
-                    xPath2TransformFilter = Filter.SUBTRACT; 
+                    xPath2TransformFilter = Filter.SUBTRACT;
                 }
                 else if ("intersect".equals(transformSubtype)) { //$NON-NLS-1$
                     xPath2TransformFilter = Filter.INTERSECT;
@@ -627,7 +626,7 @@ public final class Utils {
         final int numXades122 = countSubstring(signatureText, xades122);
         final int numXades132 = countSubstring(signatureText, xades132);
         final int numXades141 = countSubstring(signatureText, xades141);
-        
+
         // Prioridad: xades132 > latest > xades141 > xades122
         if (numXades132 >= numLatest && numXades132 >= numXades141 && numXades132 >= numXades122) {
             return xades132.replace("\"", ""); //$NON-NLS-1$ //$NON-NLS-2$
@@ -641,7 +640,7 @@ public final class Utils {
         if (numXades122 >= numXades132 && numXades122 >= numLatest && numXades122 >= numXades141) {
             return xades122.replace("\"", ""); //$NON-NLS-1$ //$NON-NLS-2$
         }
-        
+
         return xades132.replace("\"", ""); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
@@ -849,9 +848,9 @@ public final class Utils {
         serializer.write(node, output);
     }
 
-    private static void writeXMLwithJRE(final Writer writer, 
-                                              final Node node, 
-                                              final boolean indent, 
+    private static void writeXMLwithJRE(final Writer writer,
+                                              final Node node,
+                                              final boolean indent,
                                               final Map<String, String> props) {
         try {
             final DOMSource domSource = new DOMSource(node);
@@ -957,7 +956,7 @@ public final class Utils {
         }
         return signatureId;
     }
-    
+
     /** Crea un X509Certificate a partir de un certificado en Base64.
      * @param b64Cert
      *        Certificado en Base64. No debe incluir <i>Bag Attributes</i>

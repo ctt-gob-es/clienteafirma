@@ -57,7 +57,6 @@ import net.java.xades.security.xml.XAdES.SignerRole;
 import net.java.xades.security.xml.XAdES.SignerRoleImpl;
 import net.java.xades.security.xml.XAdES.XAdES;
 import net.java.xades.security.xml.XAdES.XAdES_EPES;
-import net.java.xades.util.Base64;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
@@ -66,6 +65,7 @@ import org.w3c.dom.Element;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.xml.Utils;
@@ -75,11 +75,11 @@ import es.gob.afirma.signers.xml.Utils.ReferenceIsNotXMLException;
 import es.gob.afirma.signers.xml.XMLConstants;
 
 final class XAdESSigner {
-	
+
 	private XAdESSigner() {
 		// No permitimos la instanciacion
 	}
-	
+
     /** Firma datos en formato XAdES.
      * <p>
      * Este m&eacute;todo, al firmar un XML, firmas tambi&eacute;n sus hojas de estilo XSL asociadas, siguiendo el siguiente criterio:
@@ -144,7 +144,7 @@ final class XAdESSigner {
      *   <ul>
      *    <li>No es necesaria ninguna acci&oacute;n</li>
      *   </ul>
-     *  </ul> 
+     *  </ul>
      * </ul>
      * </p>
      * @param data Datos que deseamos firmar.
@@ -172,7 +172,7 @@ final class XAdESSigner {
      *     <li>
      *      <i>XAdES Externally Detached</i> (<code>AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED</code>)
      *      <p>
-     *       Para el uso del formato <i>XAdES Externally Detached</i> es necesario establecer 
+     *       Para el uso del formato <i>XAdES Externally Detached</i> es necesario establecer
      *       tambi&eacute;n el par&aacute;metro <code>uri</code> con una direcci&oacute;n
      *       accesible universalmente.
      *      </p>
@@ -190,7 +190,7 @@ final class XAdESSigner {
      *  <dt><b><i>policyIdentifierHash</i></b></dt>
      *   <dd>
      *    Huella digital del documento de pol&iacute;tica de firma (normlamente del mismo fichero en formato XML procesable).
-     *    Si no se indica, es obligatorio que el par&aacute;metro <code>policyIdentifier</code> sea una URL accesible universalmente 
+     *    Si no se indica, es obligatorio que el par&aacute;metro <code>policyIdentifier</code> sea una URL accesible universalmente
      *   </dd>
      *  <dt><b><i>policyIdentifierHashAlgorithm</i></b></dt>
      *   <dd>Algoritmo usado para el c&aacute;lculo de la huella digital indicada en el par&aacute;metro <code>policyIdentifierHash</code>
@@ -222,7 +222,7 @@ final class XAdESSigner {
      *   <dd>Cuerpo de la transformaci&oacute;n <i>n</i></dd>
      *  <dt><b><i>referencesDigestMethod</i></b></dt>
      *   <dd>
-     *    Algoritmo de huella digital a usar en las referencias XML (referencesDigestMethod). Debe indicarse como una URL, 
+     *    Algoritmo de huella digital a usar en las referencias XML (referencesDigestMethod). Debe indicarse como una URL,
      *    acept&aacute;ndose los siguientes valores:
      *    <ul>
      *     <li><i>http://www.w3.org/2000/09/xmldsig#sha1</i> (SHA-1)</li>
@@ -250,29 +250,29 @@ final class XAdESSigner {
      *   <dd>Prefijo a usar en el espacio de nombres de XMLDSig (normalmente "dsig" o "ds")</dd> -->
      *  <dt><b><i>ignoreStyleSheets</i></b></dt>
      *   <dd>
-     *    Ignora las hojas de estilo externas de los XML (no las firma) si se establece a <code>true</code>, 
+     *    Ignora las hojas de estilo externas de los XML (no las firma) si se establece a <code>true</code>,
      *    si se establece a <code>false</code> act&uacute;a normalmente (s&iacute; las firma)
      *   </dd>
      *  <dt><b><i>avoidBase64Transforms</i></b></dt>
      *   <dd>
-     *    No declara transformaciones Base64 incluso si son necesarias si se establece a <code>true</code>, 
+     *    No declara transformaciones Base64 incluso si son necesarias si se establece a <code>true</code>,
      *    si se establece a <code>false</code> act&uacute;a normalmente (s&iacute; las declara)
      *   </dd>
      *  <dt><b><i>headLess</i></b></dt>
      *   <dd>
-     *    Evita cualquier interacci&oacute;n con el usuario si se establece a <code>true</code>, 
-     *    si se establece a <code>false</code> act&uacute;a normalmente (puede mostrar di&aacute;logos, 
+     *    Evita cualquier interacci&oacute;n con el usuario si se establece a <code>true</code>,
+     *    si se establece a <code>false</code> act&uacute;a normalmente (puede mostrar di&aacute;logos,
      *    por ejemplo, para la dereferenciaci&oacute;n de hojas de estilo enlazadas con rutas relativas).
      *    &Uacute;til para los procesos desatendidos y por lotes
      *   </dd>
      *  <dt><b><i>applySystemDate</i></b></dt>
      *   <dd>
      *    Indica si se debe introducir en la firma el atributo <i>signingTime</i> con la fecha actual
-     *    del sistema. Por defecto, se encuentra a {@code true}. 
+     *    del sistema. Por defecto, se encuentra a {@code true}.
      *   </dd>
      * </dl>
      * <p>
-     *  Respecto al uso de los par&aacute;metros <code>xmlTransform</code>n<code>Type</code>, 
+     *  Respecto al uso de los par&aacute;metros <code>xmlTransform</code>n<code>Type</code>,
      *  <code>xmlTransform</code>n<code>Subtype</code> y <code>xmlTransform</code>n<code>Body</code>,
      *  sus valores van ligados, acept&aacute;ndose las siguientes combinaciones:
      * </p>
@@ -298,16 +298,16 @@ final class XAdESSigner {
      *  &nbsp;&nbsp;-<b>Cuerpo</b>: No tiene cuerpo.
      * </p>
      * <p>
-     *  No es posible especificar transformaciones complejas que incluyan varias sentencias. 
-     *  En su lugar, puede declararse una sucesi&oacute;n de transformaciones simples que produzcan el 
-     *  mismo resultado. Cada una de las transformaciones se aplicar&aacute; de forma ordenada sobre el 
+     *  No es posible especificar transformaciones complejas que incluyan varias sentencias.
+     *  En su lugar, puede declararse una sucesi&oacute;n de transformaciones simples que produzcan el
+     *  mismo resultado. Cada una de las transformaciones se aplicar&aacute; de forma ordenada sobre el
      *  resultado de la anterior.
      * </p>
      * @return Firma en formato XAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-    static byte[] sign(final byte[] data, 
-                       final String algorithm, 
-                       final PrivateKeyEntry keyEntry, 
+    static byte[] sign(final byte[] data,
+                       final String algorithm,
+                       final PrivateKeyEntry keyEntry,
                        final Properties xParams) throws AOException {
 
         final String algoUri = XMLConstants.SIGN_ALGOS_URI.get(algorithm);
@@ -322,7 +322,7 @@ final class XAdESSigner {
         final String digestMethodAlgorithm = extraParams.getProperty("referencesDigestMethod", DIGEST_METHOD); //$NON-NLS-1$
         final String canonicalizationAlgorithm = extraParams.getProperty("canonicalizationAlgorithm", CanonicalizationMethod.INCLUSIVE); //$NON-NLS-1$
         final String xadesNamespace = extraParams.getProperty("xadesNamespace", XADESNS); //$NON-NLS-1$
-        final boolean ignoreStyleSheets = Boolean.parseBoolean(extraParams.getProperty("ignoreStyleSheets", Boolean.TRUE.toString())); //$NON-NLS-1$ 
+        final boolean ignoreStyleSheets = Boolean.parseBoolean(extraParams.getProperty("ignoreStyleSheets", Boolean.TRUE.toString())); //$NON-NLS-1$
         final boolean avoidBase64Transforms = Boolean.parseBoolean(extraParams.getProperty("avoidBase64Transforms", Boolean.FALSE.toString())); //$NON-NLS-1$
         final boolean headLess = Boolean.parseBoolean(extraParams.getProperty("headLess", Boolean.TRUE.toString())); //$NON-NLS-1$
         final String precalculatedHashAlgorithm = extraParams.getProperty("precalculatedHashAlgorithm"); //$NON-NLS-1$
@@ -331,7 +331,7 @@ final class XAdESSigner {
         if ("base64".equalsIgnoreCase(encoding)) { //$NON-NLS-1$
             encoding = XMLConstants.BASE64_ENCODING;
         }
-        String oid = extraParams.getProperty("oid"); //$NON-NLS-1$
+        final String oid = extraParams.getProperty("oid"); //$NON-NLS-1$
         final ObjectIdentifierImpl objectIdentifier = (oid != null) ? new ObjectIdentifierImpl("OIDAsURN", (oid.startsWith("urn:oid:") ? "" : "urn:oid:") + oid, null, new ArrayList<String>(0)) : null; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
         URI uri = null;
@@ -466,9 +466,9 @@ final class XAdESSigner {
                 if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_DETACHED)) {
                     dataElement = docum.createElement(DETACHED_CONTENT_ELEMENT_NAME);
                     dataElement.setAttributeNS(null, "Id", contentId); //$NON-NLS-1$
-                    dataElement.setAttributeNS(null, MIMETYPE_STR, mimeType); 
+                    dataElement.setAttributeNS(null, MIMETYPE_STR, mimeType);
                     if (encoding != null && (!"".equals(encoding))) { //$NON-NLS-1$
-                        dataElement.setAttributeNS(null, ENCODING_STR, encoding); 
+                        dataElement.setAttributeNS(null, ENCODING_STR, encoding);
                     }
                     dataElement.appendChild(docum.getDocumentElement());
 
@@ -478,9 +478,9 @@ final class XAdESSigner {
                             final Element tmpStyleElement = docum.createElement(DETACHED_STYLE_ELEMENT_NAME);
                             tmpStyleElement.setAttributeNS(null, "Id", styleId); //$NON-NLS-1$
                             if (styleType != null) {
-                                tmpStyleElement.setAttributeNS(null, MIMETYPE_STR, styleType); 
+                                tmpStyleElement.setAttributeNS(null, MIMETYPE_STR, styleType);
                             }
-                            tmpStyleElement.setAttributeNS(null, ENCODING_STR, styleEncoding); 
+                            tmpStyleElement.setAttributeNS(null, ENCODING_STR, styleEncoding);
 
                             tmpStyleElement.appendChild(docum.adoptNode(styleElement.cloneNode(true)));
 
@@ -529,12 +529,12 @@ final class XAdESSigner {
                         // Adicionalmente, si es un base 64 intentamos obtener
                         // el tipo del contenido
                         // decodificado para asi reestablecer el MimeType.
-                        final byte[] decodedData = Base64.decode(data);
+                        final byte[] decodedData = Base64.decode(new String(data));
                         final MimeHelper mimeTypeHelper = new MimeHelper(decodedData);
                         final String tempMimeType = mimeTypeHelper.getMimeType();
                         mimeType = tempMimeType != null ? tempMimeType : XMLConstants.DEFAULT_MIMETYPE;
-                        dataElement.setAttributeNS(null, MIMETYPE_STR, mimeType); 
-                        dataElement.setTextContent(Base64.encodeBytes(decodedData));
+                        dataElement.setAttributeNS(null, MIMETYPE_STR, mimeType);
+                        dataElement.setTextContent(Base64.encode(decodedData));
                     }
                     else {
                         if (XMLConstants.BASE64_ENCODING.equals(encoding)) {
@@ -544,13 +544,13 @@ final class XAdESSigner {
                             LOGGER.info("El documento se considera binario, se convertira a Base64 antes de insertarlo en el XML y se declarara la transformacion"); //$NON-NLS-1$
                         }
                         // Usamos el MimeType identificado
-                        dataElement.setAttributeNS(null, MIMETYPE_STR, mimeType); 
-                        dataElement.setTextContent(Base64.encodeBytes(data));
+                        dataElement.setAttributeNS(null, MIMETYPE_STR, mimeType);
+                        dataElement.setTextContent(Base64.encode(data));
                         wasEncodedToBase64 = true;
                     }
                     isBase64 = true;
                     encoding = XMLConstants.BASE64_ENCODING;
-                    dataElement.setAttributeNS(null, ENCODING_STR, encoding); 
+                    dataElement.setAttributeNS(null, ENCODING_STR, encoding);
                 }
                 catch (final Exception ex) {
                     throw new AOException("Error al convertir los datos a base64", ex); //$NON-NLS-1$
@@ -635,12 +635,12 @@ final class XAdESSigner {
             }
 
             dataElement.setAttributeNS(null, "Id", contentId); //$NON-NLS-1$
-            dataElement.setAttributeNS(null, MIMETYPE_STR, mimeType); 
-            dataElement.setAttributeNS(null, ENCODING_STR, encoding); 
+            dataElement.setAttributeNS(null, MIMETYPE_STR, mimeType);
+            dataElement.setAttributeNS(null, ENCODING_STR, encoding);
             if (hashAlgoUri != null) {
                 dataElement.setAttributeNS(null, "hashAlgorithm", hashAlgoUri); //$NON-NLS-1$
             }
-            dataElement.setTextContent(Base64.encodeBytes(digestValue));
+            dataElement.setTextContent(Base64.encode(digestValue));
             isBase64 = true;
 
             // FIN BLOQUE EXPLICITO
@@ -677,7 +677,7 @@ final class XAdESSigner {
             throw new AOException("No se ha podido obtener un generador de huellas digitales para el algoritmo '" + digestMethodAlgorithm + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
         }
         final String referenceId = "Reference-" + UUID.randomUUID().toString(); //$NON-NLS-1$
-        final String referenceStyleId = STYLE_REFERENCE_PREFIX + UUID.randomUUID().toString(); 
+        final String referenceStyleId = STYLE_REFERENCE_PREFIX + UUID.randomUUID().toString();
 
         final List<Transform> transformList = new ArrayList<Transform>();
 
@@ -887,7 +887,7 @@ final class XAdESSigner {
             // Hojas de estilo remotas en Externally Detached
             if (styleHref != null && styleElement == null) {
                 // Comprobamos que la URL es valida
-                if (styleHref.startsWith(HTTP_PROTOCOL_PREFIX) || styleHref.startsWith(HTTPS_PROTOCOL_PREFIX)) {  
+                if (styleHref.startsWith(HTTP_PROTOCOL_PREFIX) || styleHref.startsWith(HTTPS_PROTOCOL_PREFIX)) {
                     try {
                         referenceList.add(fac.newReference(styleHref,
                                                            digestMethod,
@@ -1007,7 +1007,7 @@ final class XAdESSigner {
         }
 
         // SigningTime
-        if (Boolean.parseBoolean(extraParams.getProperty("applySystemDate", Boolean.TRUE.toString()))) { //$NON-NLS-1$ 
+        if (Boolean.parseBoolean(extraParams.getProperty("applySystemDate", Boolean.TRUE.toString()))) { //$NON-NLS-1$
             xades.setSigningTime(new Date());
         }
 

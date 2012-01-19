@@ -94,10 +94,10 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.sun.org.apache.xml.internal.security.signature.XMLSignature;
-import com.sun.org.apache.xml.internal.security.utils.Base64;
 import com.sun.org.apache.xml.internal.security.utils.Constants;
 import com.sun.org.apache.xpath.internal.XPathAPI;
 
+import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.spi.DigestInfo;
 import es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.spi.SignatureService;
@@ -149,15 +149,15 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
         return "XML Document"; //$NON-NLS-1$
     }
 
-    public byte[] preSign(final List<DigestInfo> digestInfos, 
-                          final List<X509Certificate> signingCertificateChain, 
-                          final PrivateKey signingKey) throws NoSuchAlgorithmException, 
-                                                              InvalidAlgorithmParameterException, 
-                                                              ParserConfigurationException, 
-                                                              MarshalException, 
-                                                              XMLSignatureException, 
-                                                              TransformerException, 
-                                                              IOException, 
+    public byte[] preSign(final List<DigestInfo> digestInfos,
+                          final List<X509Certificate> signingCertificateChain,
+                          final PrivateKey signingKey) throws NoSuchAlgorithmException,
+                                                              InvalidAlgorithmParameterException,
+                                                              ParserConfigurationException,
+                                                              MarshalException,
+                                                              XMLSignatureException,
+                                                              TransformerException,
+                                                              IOException,
                                                               SAXException {
         return getSignedXML(getSignatureDigestAlgorithm(), digestInfos, signingCertificateChain, signingKey);
     }
@@ -165,9 +165,9 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
     public byte[] postSign(final byte[] signedXML,
                            final List<X509Certificate> signingCertificateChain,
                            final String signatureId,
-                           final byte[] signatureValue) throws ParserConfigurationException, 
-                                                               SAXException, 
-                                                               IOException, 
+                           final byte[] signatureValue) throws ParserConfigurationException,
+                                                               SAXException,
+                                                               IOException,
                                                                TransformerException {
 
         // Load the signature DOM document.
@@ -366,19 +366,19 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
         if (null == digestAlgo) {
             throw new IllegalArgumentException("digest algo is null"); //$NON-NLS-1$
         }
-        if ("SHA1".equals(AOSignConstants.getDigestAlgorithmName(digestAlgo))) { //$NON-NLS-1$ 
+        if ("SHA1".equals(AOSignConstants.getDigestAlgorithmName(digestAlgo))) { //$NON-NLS-1$
             return SignatureMethod.RSA_SHA1;
         }
-        if ("SHA-256".equals(AOSignConstants.getDigestAlgorithmName(digestAlgo))) { //$NON-NLS-1$ 
+        if ("SHA-256".equals(AOSignConstants.getDigestAlgorithmName(digestAlgo))) { //$NON-NLS-1$
             return XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA256;
         }
-        if ("SHA-512".equals(AOSignConstants.getDigestAlgorithmName(digestAlgo))) { //$NON-NLS-1$ 
+        if ("SHA-512".equals(AOSignConstants.getDigestAlgorithmName(digestAlgo))) { //$NON-NLS-1$
             return XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA512;
         }
-        if ("SHA-384".equals(AOSignConstants.getDigestAlgorithmName(digestAlgo))) { //$NON-NLS-1$ 
+        if ("SHA-384".equals(AOSignConstants.getDigestAlgorithmName(digestAlgo))) { //$NON-NLS-1$
             return XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA384;
         }
-        if ("RIPEMD160".equals(AOSignConstants.getDigestAlgorithmName(digestAlgo))) { //$NON-NLS-1$ 
+        if ("RIPEMD160".equals(AOSignConstants.getDigestAlgorithmName(digestAlgo))) { //$NON-NLS-1$
             return XMLSignature.ALGO_ID_SIGNATURE_RSA_RIPEMD160;
         }
         throw new IllegalArgumentException("unsupported sign algo: " + digestAlgo); //$NON-NLS-1$

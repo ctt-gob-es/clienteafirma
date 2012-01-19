@@ -10,7 +10,6 @@
 
 package es.gob.afirma.envelopers.cades;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.AlgorithmParameters;
 import java.security.InvalidAlgorithmParameterException;
@@ -85,13 +84,12 @@ import org.bouncycastle.asn1.x509.PolicyQualifierInfo;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.TBSCertificateStructure;
 import org.bouncycastle.asn1.x509.X509CertificateStructure;
-import org.bouncycastle.util.encoders.Base64;
-import org.bouncycastle.util.encoders.Base64Encoder;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ciphers.AOCipherConfig;
 import es.gob.afirma.core.ciphers.CipherConstants.AOCipherAlgorithm;
 import es.gob.afirma.core.ciphers.CipherConstants.AOCipherBlockMode;
+import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
@@ -507,9 +505,7 @@ final class CAdESUtils {
             // hash del documento, descifrado en b64
             final byte[] hashed;
             if(policy.getPolicyIdentifierHash()!=null) {
-                final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                new Base64Encoder().decode(policy.getPolicyIdentifierHash(), baos);
-                hashed = baos.toByteArray();
+            	hashed = Base64.decode(policy.getPolicyIdentifierHash());
             }
             else{
                 hashed = new byte[]{0};

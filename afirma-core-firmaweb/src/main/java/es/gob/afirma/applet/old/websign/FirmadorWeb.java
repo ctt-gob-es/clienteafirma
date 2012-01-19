@@ -22,11 +22,13 @@ import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import es.gob.afirma.core.misc.Base64;
+
 /** Clase para la realizaci&oacute;n de firmas de p&aacute;ginas Web XHTML. */
 public final class FirmadorWeb {
-	
+
 	private static final int BUFFER_SIZE = 1024;
-	
+
 	private FirmadorWeb() {
 		// No permitimos la instanciacion
 	}
@@ -35,7 +37,7 @@ public final class FirmadorWeb {
     public static class FirmaWeb {
 
         private final File tmpWebDataFile;
-        
+
         /** Obtiene el fichero temporal de datos Web.
          * @return Fichero temporal de datos Web. */
         public File getTmpWebDataFile() {
@@ -59,7 +61,6 @@ public final class FirmadorWeb {
 
             // Lo usaremos para escribir los ficheros en b64
             final BufferedOutputStream bos = new BufferedOutputStream(dos);
-            // Base64OutputStrea b64os= new Base64OutputStream(dos);
 
             // Escribimos el HTML
             dos.write(html.getBytes());
@@ -90,7 +91,7 @@ public final class FirmadorWeb {
                             // Ignoramos los errores en el cierre
                         }
 
-                        bos.write(new sun.misc.BASE64Encoder().encode(baos.toByteArray()).getBytes());
+                        bos.write(Base64.encode(baos.toByteArray()).getBytes());
                         bos.flush();
                     }
                     finally {

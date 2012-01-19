@@ -40,7 +40,7 @@ import es.gob.afirma.core.misc.Base64;
 /** <code>KeyStore</code> para el manejo de certificados en disco en formato
  * PKCS#7 o X.509 en Base64. */
 public final class SingleCertKeyStore extends KeyStoreSpi {
-    
+
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     private final Map<String, X509Certificate> certificates = new Hashtable<String, X509Certificate>();
@@ -197,7 +197,7 @@ public final class SingleCertKeyStore extends KeyStoreSpi {
     }
 
     private void getCertificatesFromStream(final byte[] certs) {
-        
+
         // Antes de nada un intento en Base64 directo sin cabeceras y con posibilidad de URLEncoding
         Collection<? extends Certificate> tmpColCerts = null;
         try {
@@ -230,7 +230,7 @@ public final class SingleCertKeyStore extends KeyStoreSpi {
             }
             return;
         }
-        
+
         // No es un Base64 directo sin cabeceras, probasmos con cabeceras ASCII
         final BufferedReader br = new BufferedReader(new InputStreamReader(new DataInputStream(new ByteArrayInputStream(certs))));
         String strLine;
@@ -267,7 +267,7 @@ public final class SingleCertKeyStore extends KeyStoreSpi {
 
     private CertificateFactory cf = null;
 
-    private void addCertificate(final String base64Cert, String alias) {
+    private void addCertificate(final String base64Cert, final String alias) {
         if (base64Cert == null) {
             LOGGER.warning("El certificado es nulo, no se anadira al almacen"); //$NON-NLS-1$
             return;

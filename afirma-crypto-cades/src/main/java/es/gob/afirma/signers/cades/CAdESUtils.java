@@ -10,7 +10,6 @@
 
 package es.gob.afirma.signers.cades;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -44,8 +43,8 @@ import org.bouncycastle.asn1.x509.PolicyInformation;
 import org.bouncycastle.asn1.x509.PolicyQualifierId;
 import org.bouncycastle.asn1.x509.PolicyQualifierInfo;
 import org.bouncycastle.asn1.x509.TBSCertificateStructure;
-import org.bouncycastle.util.encoders.Base64Encoder;
 
+import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
@@ -237,9 +236,7 @@ public final class CAdESUtils {
             // hash del documento, descifrado en b64
             final byte[] hashed;
             if(policy.getPolicyIdentifierHash()!=null) {
-                final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                new Base64Encoder().decode(policy.getPolicyIdentifierHash(), baos);
-                hashed = baos.toByteArray();
+                hashed = Base64.decode(policy.getPolicyIdentifierHash());
             }
             else{
                 hashed = new byte[]{0};
@@ -281,17 +278,17 @@ public final class CAdESUtils {
             contexExpecific.add(new Attribute(PKCSObjectIdentifiers.id_aa_ets_sigPolicyId, new DERSet(ds.toASN1Object())));
             // FIN SIGPOLICYID ATTRIBUTE
         }
-        
+
         /**
          * Secuencia con el tipo de contenido firmado
-         * 
+         *
          * ContentHints ::= SEQUENCE {
          *	  contentDescription UTF8String (SIZE (1..MAX)) OPTIONAL,
          *	  contentType ContentType }
          */
         if (contentType != null) {
         	final ContentHints contentHints;
-        	if (contentDescription != null) { 
+        	if (contentDescription != null) {
         		contentHints = new ContentHints(new DERObjectIdentifier(contentType),
         										new DERUTF8String(contentDescription));
         	} else {
@@ -301,7 +298,7 @@ public final class CAdESUtils {
         			PKCSObjectIdentifiers.id_aa_contentHint,
         			new DERSet(contentHints.toASN1Object())));
         }
-        
+
         return contexExpecific;
     }
 

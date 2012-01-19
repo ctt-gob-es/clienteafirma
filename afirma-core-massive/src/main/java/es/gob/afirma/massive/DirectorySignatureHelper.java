@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -29,13 +29,12 @@ import java.util.logging.Logger;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOUnsupportedSignFormatException;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.AOSigner;
-import es.gob.afirma.util.AOBase64;
 import es.gob.afirma.core.signers.AOSignerFactory;
-
+import es.gob.afirma.core.signers.CounterSignTarget;
 
 /** M&oacute;dulo para la ejecuci&oacute;n de multifirmas masivas. La firma
  * masiva puede aplicar sobre distintos tipos de elementos (Ficheros en disco o
@@ -43,21 +42,21 @@ import es.gob.afirma.core.signers.AOSignerFactory;
  * comporta&aacute; de una forma u otra, devolviendo el resultado de forma
  * acorde con el objetivo establecido. */
 public class DirectorySignatureHelper {
-    
+
     private static final String MODE_KEY = "mode"; //$NON-NLS-1$
     private static final String FORMAT_KEY = "format"; //$NON-NLS-1$
-    
+
     private static final String URI_STR = "uri"; //$NON-NLS-1$
-    
-    
+
+
     private static final String XADES_SIGNER = "es.gob.afirma.signers.xades.AOXAdESSigner"; //$NON-NLS-1$
     private static final String XMLDSIG_SIGNER = "es.gob.afirma.signers.xml.xmldsig.AOXMLDSigSigner"; //$NON-NLS-1$
-    
+
     private static final String REG_FIELD_SEPARATOR = " - "; //$NON-NLS-1$
 
     /** Objeto para la impresi&oacute;n de los de consola. */
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
-    
+
     /** Fichero de log por defecto. */
     private static final String DEFAULT_LOG_FILE = "result.log"; //$NON-NLS-1$
 
@@ -104,7 +103,7 @@ public class DirectorySignatureHelper {
     /** Ruta del fichero de log. */
     private String logPath = null;
 
-    
+
     /** Contruye un objeto para la firma masiva. Este objeto se
      * configurar&aacute; con un tipo de firma por defecto. Este tipo
      * (algoritmo, formato, modo) es el que se usar&aacute; para las operaciones
@@ -212,7 +211,7 @@ public class DirectorySignatureHelper {
      * @throws AOException
      *         Error grave durante el proceso de firma masiva. */
     public boolean massiveSign(final MassiveType type,
-                               String startDir,
+                               final String startDir,
                                final boolean recurse,
                                final String outDir,
                                final boolean createOutDir,
@@ -220,7 +219,7 @@ public class DirectorySignatureHelper {
                                final PrivateKeyEntry keyEntry,
                                final Properties config) throws AOException {
 
-        if (config == null || !config.containsKey(FORMAT_KEY) || !config.containsKey(MODE_KEY)) { 
+        if (config == null || !config.containsKey(FORMAT_KEY) || !config.containsKey(MODE_KEY)) {
             throw new IllegalArgumentException("No se ha establecido el formato y modo de firma"); //$NON-NLS-1$
         }
 
@@ -338,7 +337,7 @@ public class DirectorySignatureHelper {
      *         correctamente, <code>false</code> en caso contrario.
      * @throws AOException
      *         Error grave durante el proceso de firma masiva. */
-    public boolean massiveSign(MassiveType type,
+    public boolean massiveSign(final MassiveType type,
                                final String[] filenames,
                                final String outDir,
                                final boolean createOutDir,
@@ -346,7 +345,7 @@ public class DirectorySignatureHelper {
                                final PrivateKeyEntry keyEntry,
                                final Properties config) throws AOException {
 
-        if (config == null || !config.containsKey(FORMAT_KEY) || !config.containsKey(MODE_KEY)) {  
+        if (config == null || !config.containsKey(FORMAT_KEY) || !config.containsKey(MODE_KEY)) {
             throw new IllegalArgumentException("No se ha establecido el formato y modo de firma"); //$NON-NLS-1$
         }
 
@@ -354,11 +353,11 @@ public class DirectorySignatureHelper {
         signConfig.setProperty("headLess", "true"); //$NON-NLS-1$ //$NON-NLS-2$
 
         // Establecemos la configuracion de firma por defecto si no se indica
-        if (!signConfig.containsKey(MODE_KEY)) { 
-            signConfig.setProperty(MODE_KEY, this.mode); 
+        if (!signConfig.containsKey(MODE_KEY)) {
+            signConfig.setProperty(MODE_KEY, this.mode);
         }
-        if (!signConfig.containsKey(FORMAT_KEY)) { 
-            signConfig.setProperty(FORMAT_KEY, this.format); 
+        if (!signConfig.containsKey(FORMAT_KEY)) {
+            signConfig.setProperty(FORMAT_KEY, this.format);
         }
 
         // Indica si todas las operaciones se finalizaron correctamente
@@ -444,7 +443,7 @@ public class DirectorySignatureHelper {
             throw new IllegalArgumentException("Las huellas digitales a firmar y la clave privada no pueden ser nulas"); //$NON-NLS-1$
         }
 
-        if (config == null || !config.containsKey(FORMAT_KEY) || !config.containsKey(MODE_KEY)) {  
+        if (config == null || !config.containsKey(FORMAT_KEY) || !config.containsKey(MODE_KEY)) {
             throw new IllegalArgumentException("No se ha establecido el formato y modo de firma"); //$NON-NLS-1$
         }
 
@@ -459,11 +458,11 @@ public class DirectorySignatureHelper {
         final AOSigner signer = (configuredSigner != null ? configuredSigner : this.defaultSigner);
 
         // Configuramos y ejecutamos la operacion
-        if (!signConfig.containsKey(MODE_KEY)) { 
-            signConfig.setProperty(MODE_KEY, this.mode); 
+        if (!signConfig.containsKey(MODE_KEY)) {
+            signConfig.setProperty(MODE_KEY, this.mode);
         }
-        if (!signConfig.containsKey(FORMAT_KEY)) { 
-            signConfig.setProperty(FORMAT_KEY, this.format); 
+        if (!signConfig.containsKey(FORMAT_KEY)) {
+            signConfig.setProperty(FORMAT_KEY, this.format);
         }
         signConfig.setProperty("precalculatedHashAlgorithm", AOSignConstants.getDigestAlgorithmName(this.algorithm)); //$NON-NLS-1$
 
@@ -484,12 +483,12 @@ public class DirectorySignatureHelper {
 
         final byte[][] signs = new byte[hashes.length][];
         for (int i = 0; i < hashes.length; i++) {
-            signs[i] = signer.sign(AOBase64.decode(hashes[i]), this.algorithm, keyEntry, signConfig);
+            signs[i] = signer.sign(Base64.decode(hashes[i]), this.algorithm, keyEntry, signConfig);
         }
 
         final String[] signsB64 = new String[signs.length];
         for (int i = 0; i < signs.length; i++) {
-            signsB64[i] = AOBase64.encode(signs[i], false);
+            signsB64[i] = Base64.encode(signs[i]);
         }
         return signsB64;
     }
@@ -573,7 +572,7 @@ public class DirectorySignatureHelper {
             }
 
             // Configuramos y ejecutamos la operacion
-            signConfig.setProperty(URI_STR, file.toURI().toASCIIString()); 
+            signConfig.setProperty(URI_STR, file.toURI().toASCIIString());
 
             try {
                 fis = getFileInputStream(file);
@@ -689,7 +688,7 @@ public class DirectorySignatureHelper {
             if (this.defaultSigner.isSign(originalData)) {
                 textAux = "cosign"; //$NON-NLS-1$
                 signer = this.defaultSigner;
-                signConfig.setProperty(URI_STR, file.toURI().toASCIIString()); 
+                signConfig.setProperty(URI_STR, file.toURI().toASCIIString());
                 signedData = this.cosign(signer, originalData, this.algorithm, keyEntry, signConfig);
             }
             else if (originalFormat) {
@@ -751,8 +750,8 @@ public class DirectorySignatureHelper {
             signedData = signer.cosign(signData, algo, keyEntry, signConfig);
         }
         catch (final Exception e) {
-            LOGGER.severe("No ha sido posible cofirmar el fichero '" + signConfig.getProperty(URI_STR) + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$ 
-            this.addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.11") + REG_FIELD_SEPARATOR + signConfig.getProperty(URI_STR)); //$NON-NLS-1$ 
+            LOGGER.severe("No ha sido posible cofirmar el fichero '" + signConfig.getProperty(URI_STR) + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+            this.addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.11") + REG_FIELD_SEPARATOR + signConfig.getProperty(URI_STR)); //$NON-NLS-1$
             signedData = null;
         }
         return signedData;
@@ -799,8 +798,8 @@ public class DirectorySignatureHelper {
             return signer.sign(data, algo, keyEntry, signConfig);
         }
         catch (final Exception e) {
-            LOGGER.severe("No ha sido posible firmar el fichero de datos'" + signConfig.getProperty(URI_STR) + "': " + e);  //$NON-NLS-1$//$NON-NLS-2$ 
-            this.addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.13") + REG_FIELD_SEPARATOR + signConfig.getProperty(URI_STR)); //$NON-NLS-1$ 
+            LOGGER.severe("No ha sido posible firmar el fichero de datos'" + signConfig.getProperty(URI_STR) + "': " + e);  //$NON-NLS-1$//$NON-NLS-2$
+            this.addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.13") + REG_FIELD_SEPARATOR + signConfig.getProperty(URI_STR)); //$NON-NLS-1$
             return null;
         }
 
@@ -884,10 +883,10 @@ public class DirectorySignatureHelper {
             else {
                 LOGGER.severe("El fichero '" + file //$NON-NLS-1$
                                                          + "' no es un fichero de firma en formato '" //$NON-NLS-1$
-                                                         + signConfig.getProperty(FORMAT_KEY) 
+                                                         + signConfig.getProperty(FORMAT_KEY)
                                                          + "'"); //$NON-NLS-1$
                 this.addLogRegistry(Level.SEVERE,
-                    MassiveSignMessages.getString("DirectorySignatureHelper.16") + REG_FIELD_SEPARATOR + file + REG_FIELD_SEPARATOR + signConfig.getProperty(FORMAT_KEY) //$NON-NLS-1$ 
+                    MassiveSignMessages.getString("DirectorySignatureHelper.16") + REG_FIELD_SEPARATOR + file + REG_FIELD_SEPARATOR + signConfig.getProperty(FORMAT_KEY) //$NON-NLS-1$
                 );
                 allOK = false;
                 continue;
@@ -936,7 +935,7 @@ public class DirectorySignatureHelper {
      *        ".countersign" habitualmente).
      * @return Devuelve <code>true</code> si la operaci&oacute;n finaliz&oacute;
      *         correctamente, <code>false</code> en caso contrario. */
-    private boolean saveSignToDirectory(final String filename, final byte[] signData, final File outDirectory, final AOSigner signer, String inText) {
+    private boolean saveSignToDirectory(final String filename, final byte[] signData, final File outDirectory, final AOSigner signer, final String inText) {
 
         final String relativePath = this.getRelativePath(filename);
         final String signFilename = new File(outDirectory, relativePath).getName();
@@ -995,7 +994,7 @@ public class DirectorySignatureHelper {
      * una excepci&oacute;n.
      * @param file
      *        Fichero de firma.
-     * @return Manejador de firma. 
+     * @return Manejador de firma.
      * @throws IOException  */
     private static AOSigner getAppropiatedSigner(final File file) throws IOException {
         final AOSigner signer;
@@ -1231,7 +1230,7 @@ public class DirectorySignatureHelper {
      * devolver&aacute; {@code null}.
      * @param file
      *        Fichero que deseamos analizar.
-     * @return Resultado del an&aacute;lisis. 
+     * @return Resultado del an&aacute;lisis.
      * @throws IOException */
     private static AOSigner determineType(final File file) throws IOException {
         if (file == null) {
@@ -1243,16 +1242,16 @@ public class DirectorySignatureHelper {
         if (!file.canRead()) {
             throw new IOException("No tiene permisos de lectura sobre el fichero indicado"); //$NON-NLS-1$
         }
-        
-        FileInputStream fis = new FileInputStream(file);
+
+        final FileInputStream fis = new FileInputStream(file);
         try {
             return AOSignerFactory.getSigner(AOUtil.getDataFromInputStream(fis));
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new IOException("Ocurrio un error al leer el fichero: " + e); //$NON-NLS-1$
         } finally {
             try {
                 fis.close();
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 /* No hacemos nada. */
             }
         }

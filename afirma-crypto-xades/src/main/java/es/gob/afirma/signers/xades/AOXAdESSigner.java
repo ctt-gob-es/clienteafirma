@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -23,11 +23,11 @@ import javax.xml.crypto.dsig.DigestMethod;
 import javax.xml.crypto.dsig.Transform;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
 import net.java.xades.security.xml.XAdES.SignaturePolicyIdentifier;
 import net.java.xades.security.xml.XAdES.SignaturePolicyIdentifierImpl;
 import net.java.xades.security.xml.XAdES.SignatureProductionPlace;
 import net.java.xades.security.xml.XAdES.SignatureProductionPlaceImpl;
-import net.java.xades.util.Base64;
 import net.java.xades.util.XMLUtils;
 
 import org.w3c.dom.Document;
@@ -37,10 +37,11 @@ import org.w3c.dom.NodeList;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
+import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignInfo;
-import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.AOSigner;
+import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.xml.Utils;
@@ -54,7 +55,7 @@ import es.gob.afirma.signers.xml.XMLConstants;
  *  deben ignorarse, ya que no indican ninguna condici&oacute;n de error ni malfuncionamiento.
  * </p>
  * <p>
- *  Los atributos espec&iacute;ficos XAdES implementados por esta clase (adem&aacute;s de los 
+ *  Los atributos espec&iacute;ficos XAdES implementados por esta clase (adem&aacute;s de los
  *  relativos a las políticas de firma) son:
  * </p>
  * <ul>
@@ -103,9 +104,9 @@ import es.gob.afirma.signers.xml.XMLConstants;
  *   <p>
  *    Cuando se desea firmar un contenido con un formato <i>Detached</i>, pero se quiere eliminar la
  *    dependencia de la disponibilidad externa del contenido firmado, es posible crear una estructura XML
- *    que contenga los propios contenidos y la firma, pero cada uno en una subestructura independiente, 
- *    manteniendo así el concepto de <i>Detached</i> (firma y contenido firmado no se interrelacionan 
- *    directamente).  Para adecuarse al est&aacute;ndar los nodos de firma y contenido debe encontrarse en el 
+ *    que contenga los propios contenidos y la firma, pero cada uno en una subestructura independiente,
+ *    manteniendo así el concepto de <i>Detached</i> (firma y contenido firmado no se interrelacionan
+ *    directamente).  Para adecuarse al est&aacute;ndar los nodos de firma y contenido debe encontrarse en el
  *    mismo nivel dentro del XML.
  *   </p>
  *   <p>
@@ -146,7 +147,7 @@ import es.gob.afirma.signers.xml.XMLConstants;
  *    A esta variante de firma <i>Detached</i> se la conoce como <i>Internally Detached</i>, o "Detached Interna".
  *   </p>
  *   <p>
- *    Para unificar las superestructuras creadas dentro de un formato "Detached Interno", el Cliente @firma 
+ *    Para unificar las superestructuras creadas dentro de un formato "Detached Interno", el Cliente @firma
  *    construye siempre el siguiente esqueleto XML:
  *   </p>
  *   <pre>
@@ -156,13 +157,13 @@ import es.gob.afirma.signers.xml.XMLConstants;
  *   </pre>
  *   <p>
  *    Es decir, el contenido a firmar, ya sea XML o no-XML, se encapsula dentro de una etiqueta XML llamada
- *    CONTENT, en la que se indica la codificaci&oacute;n del contenido (UTF-8, Base64, etc.), el tipo de 
- *    contenido (imagen JPEG, texto, XML, etc.) y el algoritmo utilizado para calcular la huella digital de 
+ *    CONTENT, en la que se indica la codificaci&oacute;n del contenido (UTF-8, Base64, etc.), el tipo de
+ *    contenido (imagen JPEG, texto, XML, etc.) y el algoritmo utilizado para calcular la huella digital de
  *    este (por ejemplo, SHA-1).
  *   </p>
  *   <p>
- *    Como la superestructura es XML, si el contenido tambi&eacute;n es XML la inserci&oacute;n es directa 
- *    (como en el primer ejemplo de "Detached Interna", pero si no es XML se codifica en Base64 antes de 
+ *    Como la superestructura es XML, si el contenido tambi&eacute;n es XML la inserci&oacute;n es directa
+ *    (como en el primer ejemplo de "Detached Interna", pero si no es XML se codifica en Base64 antes de
  *    insertarse, resultando una estructura con una forma similar a la siguiente:
  *   </p>
  *   <pre>
@@ -171,14 +172,14 @@ import es.gob.afirma.signers.xml.XMLConstants;
  *    &lt;/CONTENT&gt;
  *   </pre>
  *   <p>
- *    La larga cadena de caracteres ser&iacute;a una codificaci&oacute;n Base64 del original interpretado en su 
+ *    La larga cadena de caracteres ser&iacute;a una codificaci&oacute;n Base64 del original interpretado en su
  *    forma binaria pura.
  *   </p>
  *  </dd>
  *  <dt><i>Enveloping</i></dt>
  *  <dd>
  *   <p>
- *    Otra variante de firma es la <i>Enveloping</i>, en la que la estructura XML de firma es la &uacute;nica 
+ *    Otra variante de firma es la <i>Enveloping</i>, en la que la estructura XML de firma es la &uacute;nica
  *    en el documento de firma, y esta contiene internamente el contenido firmado (en un nodo propio).
  *   </p>
  *   <pre>
@@ -197,20 +198,20 @@ import es.gob.afirma.signers.xml.XMLConstants;
  *    &lt;/ds:Signature&gt;
  *   </pre>
  *   <p>
- *    En este caso, los datos firmados se encuentran en el nodo <i>Object</i>, referenciados 
+ *    En este caso, los datos firmados se encuentran en el nodo <i>Object</i>, referenciados
  *    internamente al XML mediante el identificador <i>obj</i>.
  *   </p>
  *   <p>
- *    Al igual que ocurr&iacute;a con el formato <i>Detached</i>, si los datos no son XML, no 
- *    es posible insertarlos directamente dentro de una estructura XML, por lo que se codifican 
+ *    Al igual que ocurr&iacute;a con el formato <i>Detached</i>, si los datos no son XML, no
+ *    es posible insertarlos directamente dentro de una estructura XML, por lo que se codifican
  *    previamente en Base64.
  *   </p>
  *  </dd>
  *  <dt><i>Enveloped</i></dt>
  *  <dd>
  *   <p>
- *    Este formato de firma XMLDSig est&aacute; pensado para que un contenido XML pueda auto-contener 
- *    su propia firma digital, insert&aacute;ndola en un nodo propio interno, por lo que, al contrario 
+ *    Este formato de firma XMLDSig est&aacute; pensado para que un contenido XML pueda auto-contener
+ *    su propia firma digital, insert&aacute;ndola en un nodo propio interno, por lo que, al contrario
  *    que en los formatos anteriores, no es posible firmar contenido que no sea XML.
  *   </p>
  *   <p>
@@ -252,15 +253,15 @@ import es.gob.afirma.signers.xml.XMLConstants;
  *    (<i>Signature</i>).
  *   </p>
  *   <p>
- *    Una peculiaridad de la estructura generada es que esta referenciada mediante una URI vac&iacute;a 
+ *    Una peculiaridad de la estructura generada es que esta referenciada mediante una URI vac&iacute;a
  *    (<code>URI=""</code>), lo cual indica que la firma aplica a la totalidad del documento original.
  *   </p>
  *  </dd>
  * @version 0.3 */
 public final class AOXAdESSigner implements AOSigner {
-    
+
     static final Logger LOGGER = Logger.getLogger("es.agob.afirma"); //$NON-NLS-1$
-    
+
     static final String SIGNATURE_TAG = "Signature"; //$NON-NLS-1$
 
     /** URI que define la versi&oacute;n por defecto de XAdES. */
@@ -278,12 +279,12 @@ public final class AOXAdESSigner implements AOSigner {
 
     /** Algoritmo de huella digital por defecto para las referencias XML. */
     static final String DIGEST_METHOD = DigestMethod.SHA1;
-    
+
     static final String HTTP_PROTOCOL_PREFIX = "http://"; //$NON-NLS-1$
     static final String HTTPS_PROTOCOL_PREFIX = "https://"; //$NON-NLS-1$
-    
+
     static final String STYLE_REFERENCE_PREFIX = "StyleReference-"; //$NON-NLS-1$
-    
+
     static final String MIMETYPE_STR = "MimeType"; //$NON-NLS-1$
     static final String ENCODING_STR = "Encoding"; //$NON-NLS-1$
 
@@ -362,7 +363,7 @@ public final class AOXAdESSigner implements AOSigner {
      *   <ul>
      *    <li>No es necesaria ninguna acci&oacute;n</li>
      *   </ul>
-     *  </ul> 
+     *  </ul>
      * </ul>
      * </p>
      * @param data Datos que deseamos firmar.
@@ -390,7 +391,7 @@ public final class AOXAdESSigner implements AOSigner {
      *     <li>
      *      <i>XAdES Externally Detached</i> (<code>AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED</code>)
      *      <p>
-     *       Para el uso del formato <i>XAdES Externally Detached</i> es necesario establecer 
+     *       Para el uso del formato <i>XAdES Externally Detached</i> es necesario establecer
      *       tambi&eacute;n el par&aacute;metro <code>uri</code> con una direcci&oacute;n
      *       accesible universalmente.
      *      </p>
@@ -408,7 +409,7 @@ public final class AOXAdESSigner implements AOSigner {
      *  <dt><b><i>policyIdentifierHash</i></b></dt>
      *   <dd>
      *    Huella digital del documento de pol&iacute;tica de firma (normlamente del mismo fichero en formato XML procesable).
-     *    Si no se indica, es obligatorio que el par&aacute;metro <code>policyIdentifier</code> sea una URL accesible universalmente 
+     *    Si no se indica, es obligatorio que el par&aacute;metro <code>policyIdentifier</code> sea una URL accesible universalmente
      *   </dd>
      *  <dt><b><i>policyIdentifierHashAlgorithm</i></b></dt>
      *   <dd>Algoritmo usado para el c&aacute;lculo de la huella digital indicada en el par&aacute;metro <code>policyIdentifierHash</code>
@@ -440,7 +441,7 @@ public final class AOXAdESSigner implements AOSigner {
      *   <dd>Cuerpo de la transformaci&oacute;n <i>n</i></dd>
      *  <dt><b><i>referencesDigestMethod</i></b></dt>
      *   <dd>
-     *    Algoritmo de huella digital a usar en las referencias XML (referencesDigestMethod). Debe indicarse como una URL, 
+     *    Algoritmo de huella digital a usar en las referencias XML (referencesDigestMethod). Debe indicarse como una URL,
      *    acept&aacute;ndose los siguientes valores:
      *    <ul>
      *     <li><i>http://www.w3.org/2000/09/xmldsig#sha1</i> (SHA-1)</li>
@@ -468,29 +469,29 @@ public final class AOXAdESSigner implements AOSigner {
      *   <dd>Prefijo a usar en el espacio de nombres de XMLDSig (normalmente "dsig" o "ds")</dd> -->
      *  <dt><b><i>ignoreStyleSheets</i></b></dt>
      *   <dd>
-     *    Ignora las hojas de estilo externas de los XML (no las firma) si se establece a <code>true</code>, 
+     *    Ignora las hojas de estilo externas de los XML (no las firma) si se establece a <code>true</code>,
      *    si se establece a <code>false</code> act&uacute;a normalmente (s&iacute; las firma)
      *   </dd>
      *  <dt><b><i>avoidBase64Transforms</i></b></dt>
      *   <dd>
-     *    No declara transformaciones Base64 incluso si son necesarias si se establece a <code>true</code>, 
+     *    No declara transformaciones Base64 incluso si son necesarias si se establece a <code>true</code>,
      *    si se establece a <code>false</code> act&uacute;a normalmente (s&iacute; las declara)
      *   </dd>
      *  <dt><b><i>headLess</i></b></dt>
      *   <dd>
-     *    Evita cualquier interacci&oacute;n con el usuario si se establece a <code>true</code>, 
-     *    si se establece a <code>false</code> act&uacute;a normalmente (puede mostrar di&aacute;logos, 
+     *    Evita cualquier interacci&oacute;n con el usuario si se establece a <code>true</code>,
+     *    si se establece a <code>false</code> act&uacute;a normalmente (puede mostrar di&aacute;logos,
      *    por ejemplo, para la dereferenciaci&oacute;n de hojas de estilo enlazadas con rutas relativas).
      *    &Uacute;til para los procesos desatendidos y por lotes
      *   </dd>
      *  <dt><b><i>applySystemDate</i></b></dt>
      *   <dd>
      *    Indica si se debe introducir en la firma el atributo <i>signingTime</i> con la fecha actual
-     *    del sistema. Por defecto, se encuentra a {@code true}. 
+     *    del sistema. Por defecto, se encuentra a {@code true}.
      *   </dd>
      * </dl>
      * <p>
-     *  Respecto al uso de los par&aacute;metros <code>xmlTransform</code>n<code>Type</code>, 
+     *  Respecto al uso de los par&aacute;metros <code>xmlTransform</code>n<code>Type</code>,
      *  <code>xmlTransform</code>n<code>Subtype</code> y <code>xmlTransform</code>n<code>Body</code>,
      *  sus valores van ligados, acept&aacute;ndose las siguientes combinaciones:
      * </p>
@@ -516,16 +517,16 @@ public final class AOXAdESSigner implements AOSigner {
      *  &nbsp;&nbsp;-<b>Cuerpo</b>: No tiene cuerpo.
      * </p>
      * <p>
-     *  No es posible especificar transformaciones complejas que incluyan varias sentencias. 
-     *  En su lugar, puede declararse una sucesi&oacute;n de transformaciones simples que produzcan el 
-     *  mismo resultado. Cada una de las transformaciones se aplicar&aacute; de forma ordenada sobre el 
+     *  No es posible especificar transformaciones complejas que incluyan varias sentencias.
+     *  En su lugar, puede declararse una sucesi&oacute;n de transformaciones simples que produzcan el
+     *  mismo resultado. Cada una de las transformaciones se aplicar&aacute; de forma ordenada sobre el
      *  resultado de la anterior.
      * </p>
      * @return Firma en formato XAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-    public byte[] sign(final byte[] data, 
-                       final String algorithm, 
-                       final PrivateKeyEntry keyEntry, 
+    public byte[] sign(final byte[] data,
+                       final String algorithm,
+                       final PrivateKeyEntry keyEntry,
                        final Properties xParams) throws AOException {
     	return XAdESSigner.sign(data, algorithm, keyEntry, xParams);
     }
@@ -566,7 +567,7 @@ public final class AOXAdESSigner implements AOSigner {
      *        quiere comprobar
      * @return Valor booleano, siendo verdadero cuando la firma es enveloping */
     public static boolean isEnveloping(final Element element) {
-        if (element.getLocalName().equals(SIGNATURE_TAG) || 
+        if (element.getLocalName().equals(SIGNATURE_TAG) ||
            (element.getLocalName().equals(AFIRMA) && element.getFirstChild().getLocalName().equals(SIGNATURE_TAG))) {
             return true;
         }
@@ -597,7 +598,7 @@ public final class AOXAdESSigner implements AOSigner {
 
                 final Element firstChild = (Element) rootSig.getFirstChild();
                 // si el documento es un xml se extrae como tal
-                if (firstChild.getAttribute(MIMETYPE_STR).equals("text/xml")) { //$NON-NLS-1$ 
+                if (firstChild.getAttribute(MIMETYPE_STR).equals("text/xml")) { //$NON-NLS-1$
                     elementRes = (Element) firstChild.getFirstChild();
                 }
                 // Si el MimeType es de tipo Hash (tipo creado para el cliente
@@ -607,7 +608,7 @@ public final class AOXAdESSigner implements AOSigner {
                 // elementRes = null;
                 // }
                 // si el documento es binario se deshace la codificacion en
-                // Base64 si y solo si esta declarada esta transformacion 
+                // Base64 si y solo si esta declarada esta transformacion
                 else {
                 	//TODO: Deshacer solo el Base64 si existe la transformacion Base64 (COMPROBAR)
                 	return isBase64TransformationDeclared(rootSig, firstChild.getAttribute("Id")) ? //$NON-NLS-1$
@@ -637,11 +638,11 @@ public final class AOXAdESSigner implements AOSigner {
                 // obtiene el nodo Object de la primera firma
                 final Element object = (Element) rootSig.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Object").item(0); //$NON-NLS-1$
                 // si el documento es un xml se extrae como tal
-                if (object.getAttribute(MIMETYPE_STR).equals("text/xml")) { //$NON-NLS-1$ 
+                if (object.getAttribute(MIMETYPE_STR).equals("text/xml")) { //$NON-NLS-1$
                     elementRes = (Element) object.getFirstChild();
                 }
                 // si el documento es binario se deshace la codificacion en
-                // Base64 si y solo si esta declarada esta transformacion 
+                // Base64 si y solo si esta declarada esta transformacion
                 else {
                 	//TODO: Deshacer solo el Base64 si existe la transformacion Base64 (COMPROBAR)
                 	return isBase64TransformationDeclared(rootSig, object.getAttribute("Id")) ? //$NON-NLS-1$
@@ -673,13 +674,13 @@ public final class AOXAdESSigner implements AOSigner {
      * @return Devuelve {@code true} si la transformaci&oacute;n est&aacute; definida, {@code false}
      * en caso contrario.
      */
-    private static boolean isBase64TransformationDeclared(Element rootSig, String objectId) {
+    private static boolean isBase64TransformationDeclared(final Element rootSig, final String objectId) {
     	if (objectId == null || objectId.trim().equals("")) { //$NON-NLS-1$
     		return false;
     	}
-    	
+
     	Element reference = null;
-		NodeList references = rootSig.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Reference"); //$NON-NLS-1$
+		final NodeList references = rootSig.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Reference"); //$NON-NLS-1$
 		for (int i = 0; i < references.getLength(); i++) {
 			reference = (Element) references.item(i);
 			if (reference.hasAttribute("URI") && ("#" + objectId).equals(reference.getAttribute("URI"))) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -688,7 +689,7 @@ public final class AOXAdESSigner implements AOSigner {
 			reference = null;
 		}
 		if (reference != null) {
-			NodeList transforms = reference.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Transform"); //$NON-NLS-1$
+			final NodeList transforms = reference.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Transform"); //$NON-NLS-1$
 			for (int i = 0; i < transforms.getLength(); i++) {
 				if (((Element) transforms.item(i)).hasAttribute("Algorithm") && //$NON-NLS-1$
 						XMLConstants.BASE64_ENCODING.equals(((Element) transforms.item(i)).getAttribute("Algorithm"))) { //$NON-NLS-1$
@@ -698,7 +699,7 @@ public final class AOXAdESSigner implements AOSigner {
 		}
 		return false;
     }
-    
+
     static SignatureProductionPlace getSignatureProductionPlace(final String city,
                                                                  final String province,
                                                                  final String postalCode,
@@ -712,12 +713,12 @@ public final class AOXAdESSigner implements AOSigner {
     static SignaturePolicyIdentifier getPolicy(final String identifier,
                                                 final String identifierHash,
                                                 final String identifierHashAlgorithm,
-                                                final String description, 
+                                                final String description,
                                                 final String qualifier) {
         if (identifier == null) {
             return null;
         }
-        
+
         String hashAlgo = null;
         if (identifierHashAlgorithm != null) {
             String normalDigAlgo = null;
@@ -768,15 +769,15 @@ public final class AOXAdESSigner implements AOSigner {
      *  firmada se introduciran las mismas transformaciones que existiesen en la firma original.
      * </p>
      * <p>
-     *  A nivel de formato interno, cuando cofirmamos un documento ya firmado previamente, esta 
-     *  firma previa no se modifica. Si tenemos en cuenta que XAdES es en realidad un subconjunto 
-     *  de XMLDSig, el resultado de una cofirma XAdES sobre un documento firmado previamente con 
+     *  A nivel de formato interno, cuando cofirmamos un documento ya firmado previamente, esta
+     *  firma previa no se modifica. Si tenemos en cuenta que XAdES es en realidad un subconjunto
+     *  de XMLDSig, el resultado de una cofirma XAdES sobre un documento firmado previamente con
      *  XMLDSig (o viceversa), son dos firmas independientes, una en XAdES y otra en XMLDSig.<br>
-     *  Dado que todas las firmas XAdES son XMLDSig pero no todas las firmas XMLDSig son XAdES, 
+     *  Dado que todas las firmas XAdES son XMLDSig pero no todas las firmas XMLDSig son XAdES,
      *  el resultado global de la firma se adec&uacute;a al estandar mas amplio, XMLDSig en este caso.
      * </p>
      * @param data Datos que deseamos firmar.
-     * @param sign Documento con las firmas iniciales. 
+     * @param sign Documento con las firmas iniciales.
      * @param algorithm Algoritmo a usar para la firma.
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
      * <ul>
@@ -794,7 +795,7 @@ public final class AOXAdESSigner implements AOSigner {
      *  <dt><b><i>policyIdentifierHash</i></b></dt>
      *   <dd>
      *    Huella digital del documento de pol&iacute;tica de firma (normlamente del mismo fichero en formato XML procesable).
-     *    Si no se indica, es obligatorio que el par&aacute;metro <code>policyIdentifier</code> sea una URL accesible universalmente 
+     *    Si no se indica, es obligatorio que el par&aacute;metro <code>policyIdentifier</code> sea una URL accesible universalmente
      *   </dd>
      *  <dt><b><i>policyIdentifierHashAlgorithm</i></b></dt>
      *   <dd>Algoritmo usado para el c&aacute;lculo de la huella digital indicada en el par&aacute;metro <code>policyIdentifierHash</code>
@@ -816,7 +817,7 @@ public final class AOXAdESSigner implements AOSigner {
      *   <dd>Pa&iacute;s en el que se realiza la firma</dd>
      *  <dt><b><i>referencesDigestMethod</i></b></dt>
      *   <dd>
-     *    Algoritmo de huella digital a usar en las referencias XML (referencesDigestMethod). Debe indicarse como una URL, 
+     *    Algoritmo de huella digital a usar en las referencias XML (referencesDigestMethod). Debe indicarse como una URL,
      *    acept&aacute;ndose los siguientes valores:
      *    <ul>
      *     <li><i>http://www.w3.org/2000/09/xmldsig#sha1</i> (SHA-1)</li>
@@ -832,15 +833,15 @@ public final class AOXAdESSigner implements AOSigner {
      *  <dt><b><i>applySystemDate</i></b></dt>
      *   <dd>
      *    Indica si se debe introducir en la firma el atributo <i>signingTime</i> con la fecha actual
-     *    del sistema. Por defecto, se encuentra a {@code true}. 
+     *    del sistema. Por defecto, se encuentra a {@code true}.
      *   </dd>
      * </dl>
      * @return Cofirma en formato XAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-    public byte[] cosign(final byte[] data, 
-                         final byte[] sign, 
-                         final String algorithm, 
-                         final PrivateKeyEntry keyEntry, 
+    public byte[] cosign(final byte[] data,
+                         final byte[] sign,
+                         final String algorithm,
+                         final PrivateKeyEntry keyEntry,
                          final Properties xParams) throws AOException {
     	return XAdESCoSigner.cosign(data, sign, algorithm, keyEntry, xParams);
     }
@@ -852,14 +853,14 @@ public final class AOXAdESSigner implements AOSigner {
      *  firmada se introduciran las mismas transformaciones que existiesen en la firma original.
      * </p>
      * <p>
-     *  A nivel de formato interno, cuando cofirmamos un documento ya firmado previamente, esta 
-     *  firma previa no se modifica. Si tenemos en cuenta que XAdES es en realidad un subconjunto 
-     *  de XMLDSig, el resultado de una cofirma XAdES sobre un documento firmado previamente con 
+     *  A nivel de formato interno, cuando cofirmamos un documento ya firmado previamente, esta
+     *  firma previa no se modifica. Si tenemos en cuenta que XAdES es en realidad un subconjunto
+     *  de XMLDSig, el resultado de una cofirma XAdES sobre un documento firmado previamente con
      *  XMLDSig (o viceversa), son dos firmas independientes, una en XAdES y otra en XMLDSig.<br>
-     *  Dado que todas las firmas XAdES son XMLDSig pero no todas las firmas XMLDSig son XAdES, 
+     *  Dado que todas las firmas XAdES son XMLDSig pero no todas las firmas XMLDSig son XAdES,
      *  el resultado global de la firma se adec&uacute;a al estandar mas amplio, XMLDSig en este caso.
      * </p>
-     * @param sign Documento con las firmas iniciales. 
+     * @param sign Documento con las firmas iniciales.
      * @param algorithm Algoritmo a usar para la firma.
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
      * <ul>
@@ -877,7 +878,7 @@ public final class AOXAdESSigner implements AOSigner {
      *  <dt><b><i>policyIdentifierHash</i></b></dt>
      *   <dd>
      *    Huella digital del documento de pol&iacute;tica de firma (normlamente del mismo fichero en formato XML procesable).
-     *    Si no se indica, es obligatorio que el par&aacute;metro <code>policyIdentifier</code> sea una URL accesible universalmente 
+     *    Si no se indica, es obligatorio que el par&aacute;metro <code>policyIdentifier</code> sea una URL accesible universalmente
      *   </dd>
      *  <dt><b><i>policyIdentifierHashAlgorithm</i></b></dt>
      *   <dd>Algoritmo usado para el c&aacute;lculo de la huella digital indicada en el par&aacute;metro <code>policyIdentifierHash</code>
@@ -899,7 +900,7 @@ public final class AOXAdESSigner implements AOSigner {
      *   <dd>Pa&iacute;s en el que se realiza la firma</dd>
      *  <dt><b><i>referencesDigestMethod</i></b></dt>
      *   <dd>
-     *    Algoritmo de huella digital a usar en las referencias XML (referencesDigestMethod). Debe indicarse como una URL, 
+     *    Algoritmo de huella digital a usar en las referencias XML (referencesDigestMethod). Debe indicarse como una URL,
      *    acept&aacute;ndose los siguientes valores:
      *    <ul>
      *     <li><i>http://www.w3.org/2000/09/xmldsig#sha1</i> (SHA-1)</li>
@@ -915,14 +916,14 @@ public final class AOXAdESSigner implements AOSigner {
      *   <dt><b><i>applySystemDate</i></b></dt>
      *   <dd>
      *    Indica si se debe introducir en la firma el atributo <i>signingTime</i> con la fecha actual
-     *    del sistema. Por defecto, se encuentra a {@code true}. 
+     *    del sistema. Por defecto, se encuentra a {@code true}.
      *   </dd>
      * </dl>
      * @return Cofirma en formato XAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-    public byte[] cosign(final byte[] sign, 
-                         final String algorithm, 
-                         final PrivateKeyEntry keyEntry, 
+    public byte[] cosign(final byte[] sign,
+                         final String algorithm,
+                         final PrivateKeyEntry keyEntry,
                          final Properties extraParams) throws AOException {
     	return XAdESCoSigner.cosign(sign, algorithm, keyEntry, extraParams);
     }
@@ -931,7 +932,7 @@ public final class AOXAdESSigner implements AOSigner {
      * <p>
      * Este m&eacute;todo contrafirma los nodos de firma indicados de un documento de firma.
      * </p>
-     * @param sign Documento con las firmas iniciales. 
+     * @param sign Documento con las firmas iniciales.
      * @param algorithm Algoritmo a usar para la firma.
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
      * <ul>
@@ -963,7 +964,7 @@ public final class AOXAdESSigner implements AOSigner {
      *  <dt><b><i>policyIdentifierHash</i></b></dt>
      *   <dd>
      *    Huella digital del documento de pol&iacute;tica de firma (normlamente del mismo fichero en formato XML procesable).
-     *    Si no se indica, es obligatorio que el par&aacute;metro <code>policyIdentifier</code> sea una URL accesible universalmente 
+     *    Si no se indica, es obligatorio que el par&aacute;metro <code>policyIdentifier</code> sea una URL accesible universalmente
      *   </dd>
      *  <dt><b><i>policyIdentifierHashAlgorithm</i></b></dt>
      *   <dd>Algoritmo usado para el c&aacute;lculo de la huella digital indicada en el par&aacute;metro <code>policyIdentifierHash</code>
@@ -986,7 +987,7 @@ public final class AOXAdESSigner implements AOSigner {
      *  <dt><b><i>applySystemDate</i></b></dt>
      *   <dd>
      *    Indica si se debe introducir en la firma el atributo <i>signingTime</i> con la fecha actual
-     *    del sistema. Por defecto, se encuentra a {@code true}. 
+     *    del sistema. Por defecto, se encuentra a {@code true}.
      *   </dd>
      * </dl>
      * @return Contrafirma en formato XAdES.
