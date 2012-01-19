@@ -39,6 +39,7 @@ import es.gob.afirma.ciphers.AOCipherKeyStoreHelper;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.keystores.main.filters.CertificateFilter;
 import es.gob.afirma.ui.utils.CipherConfig;
 import es.gob.afirma.ui.utils.ConfigureCaret;
@@ -53,7 +54,6 @@ import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
-import es.gob.afirma.util.AOBase64;
 
 /** Clase que muestra el contenido principal del descifrado de una clave. */
 final class PanelClave extends JAccessibilityDialogWizard {
@@ -289,7 +289,7 @@ final class PanelClave extends JAccessibilityDialogWizard {
             throw new AOException("Error seleccionar la clave de cifrado", e); //$NON-NLS-1$
         }
 
-        return AOBase64.encode(cKs.getKey(alias).getEncoded(), false);
+        return Base64.encode(cKs.getKey(alias).getEncoded());
     }
 
     /** Relacion minima para el redimensionado de componentes. */

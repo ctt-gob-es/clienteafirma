@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.security.Key;
 import java.security.KeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.List;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -44,6 +46,7 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ciphers.AOCipherConfig;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.keystores.main.filters.CertificateFilter;
 import es.gob.afirma.ui.utils.CipherConfig;
 import es.gob.afirma.ui.utils.ConfigureCaret;
@@ -59,7 +62,6 @@ import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
-import es.gob.afirma.util.AOBase64;
 
 /** Dialogo con la pagina 2: Clave de cifrado */
 final class PanelClaveCifrado extends JAccessibilityDialogWizard {
@@ -166,7 +168,7 @@ final class PanelClaveCifrado extends JAccessibilityDialogWizard {
             logger.log(Level.SEVERE, null, ex);
         }
 
-        this.campoClave.setText(AOBase64.encode(this.cipherKey.getEncoded(), false));
+        this.campoClave.setText(Base64.encode(this.cipherKey.getEncoded()));
         this.checkGuardar.setEnabled(true);
     }
 
@@ -334,7 +336,7 @@ final class PanelClaveCifrado extends JAccessibilityDialogWizard {
             throw new AOException(Messages.getString("WizardCifrado.almacen.error.seleccionar"), e); //$NON-NLS-1$
         }
 
-        return AOBase64.encode(cKs.getKey(alias).getEncoded(), false);
+        return Base64.encode(cKs.getKey(alias).getEncoded());
     }
 
     /** Relacion minima para el redimensionado de componentes. */
@@ -397,7 +399,7 @@ final class PanelClaveCifrado extends JAccessibilityDialogWizard {
             		this,
                     true,
                     Messages.getString("Cifrado.introducir.alias"),  //$NON-NLS-1$
-                    KeyEvent.VK_I, 
+                    KeyEvent.VK_I,
                     Messages.getString("Cifrado.introducir.alias.titulo"),  //$NON-NLS-1$
                     JOptionPane.QUESTION_MESSAGE
             );
