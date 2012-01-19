@@ -39,9 +39,6 @@ The Legion of the Bouncy Castle - http://www.bouncycastle.org/
 Apache Jakarta-ORO - http://jakarta.apache.org/oro/
   Apache License 2.0 - http://svn.apache.org/repos/asf/jakarta/oro/trunk/LICENSE
   
-Apache Commons-IO / Apache Commons-Codec - http://commons.apache.org/
-  Apache License 2.0 - http://svn.apache.org/repos/asf/jakarta/oro/trunk/LICENSE
-  
 jMimeMagic - http://sourceforge.net/projects/jmimemagic/
   GNU Lesser General Public License - http://www.gnu.org/copyleft/lesser.html
 
