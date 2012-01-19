@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -58,7 +58,7 @@ interface MiniAfirma {
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      */
     String sign(String data, String algorithm, String format, String extraParams) throws AOFormatFileException, PrivilegedActionException, IOException;
-    
+
     /** Realiza la firma paralela (cofirma) de unos datos. La cofirma de una firma requiere
      * que los datos est&eacute;n contenidos en la firma original o que se indiquen de
      * forma externa. Si no se proporcionasen los datos, &uacute;nicamente se realizar&aacute;
@@ -86,7 +86,7 @@ interface MiniAfirma {
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      */
     String coSign(String sign, String data, String algorithm, String format, String extraParams) throws AOFormatFileException, PrivilegedActionException, IOException;
-    
+
     /** Realiza una firma en cascada (Contrafirma) sobre una firma. Se contrafirman todos los
      * nodos hoja salvo que mediante {@code extraParams} se indique el par&aacute;metro
      * "{@code target=tree}", en cuyo caso se contrafirmar&aacute;n todos los nodos del
@@ -109,7 +109,7 @@ interface MiniAfirma {
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      */
     String counterSign(String sign, String algorithm, String format, String extraParams) throws AOFormatFileException, PrivilegedActionException, IOException;
-    
+
     /** Devuelve la estructura de firmantes de una firma electr&oacute;nica. Los
      * firmantes se separan por '\n' y comienzan por tantos '\t' como el nivel
      * en el que est&aacute;n.<br>
@@ -154,7 +154,7 @@ interface MiniAfirma {
      * @param description Descripci&oacute;n del tipo de fichero que se desea cargar.
      * @return El contenido del fichero codificado en Base64.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
-     * @deprecated Sustituir por {@link #getFileNameContentBase64(String, String, String)}}.
+     * @deprecated Sustituir por <code>getFileNameContentBase64(String, String, String)</code>.
      */
     @Deprecated
     String getFileContent(String title, String extensions, String description) throws PrivilegedActionException;
@@ -173,11 +173,11 @@ interface MiniAfirma {
 	 * convertirse a texto con la codificaci&oacute;n que se desee (getTextFromBase64).  */
     @Deprecated
     String getFileNameContentText(final String title, final String extensions, final String description) throws PrivilegedActionException;
-    
+
     /** Muestra un di&aacute;logo modal para la selecci&oacute;n de m&uacute;ltiples ficheros de los
      * que se devolver&aacute; sus nombres y sus contenidos en formato texto unicode. El
      * resultado devuelto es un array en el que cada elemento contiene, por cada fichero seleccionado,
-     * su nombre y su contenido separados por el car&aacute;cter '|'. 
+     * su nombre y su contenido separados por el car&aacute;cter '|'.
      * Si el usuario cancela la operaci&oacute;n de selecci&oacute;n
      * del fichero se devuelve {@code null}.
      * @param title T&iacute;tulo para el di&aacute;logo.
@@ -189,7 +189,7 @@ interface MiniAfirma {
      * despu&eacute;s convertirse a texto con la codificaci&oacute;n que se desee (getTextFromBase64). */
     @Deprecated
     String[] getMultiFileNameContentText(final String title, final String extensions, final String description) throws PrivilegedActionException;
-    
+
     /** Muestra un di&aacute;logo modal para la selecci&oacute;n de un fichero del
      * que se devolver&aacute; su nombre y su contenido en Base64. El resultado
      * devuelto es una cadena con el nombre y el contenido separados por el
@@ -207,7 +207,7 @@ interface MiniAfirma {
     /** Muestra un di&aacute;logo modal para la selecci&oacute;n de m&uacute;ltiples ficheros de los
      * que se devolver&aacute; sus nombres y sus contenidos en Base64. El
      * resultado devuelto es un array en el que cada elemento contiene, por cada fichero seleccionado,
-     * su nombre y su contenido (en Base64) separados por el car&aacute;cter '|'. 
+     * su nombre y su contenido (en Base64) separados por el car&aacute;cter '|'.
      * Si el usuario cancela la operaci&oacute;n de selecci&oacute;n
      * del fichero se devuelve {@code null}.
      * @param title T&iacute;tulo para el di&aacute;logo.
@@ -217,26 +217,12 @@ interface MiniAfirma {
      * @throws IOException Cuando ocurre alg&uacute;n error en la lectura del fichero.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad. */
     String[] getMultiFileNameContentBase64(final String title, final String extensions,final String description) throws IOException, PrivilegedActionException;
-    
-    /** Muestra un di&aacute;logo modal para la selecci&oacute;n de un fichero
-     * del que se recuperar&aacute; su ruta absoluta. Si no se selecciona
-     * ning&uacute;n fichero, se devuelve {@code null}.
-     * @param title T&iacute;tulo para el di&aacute;logo.
-     * @param extensions Extensiones de b&uacute;squeda separadas por comas (',').
-     * @param description Descripci&oacute;n del tipo de fichero que se desea cargar.
-     * @return Nombre del fichero seleccionado.
-     * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
-     * @deprecated Esta funcionalidad no es necesaria para el uso del MiniApplet.
-     */
-    @Deprecated
-    String loadFilePath(String title, String extensions, String description) throws PrivilegedActionException;
-    
-    
+
     /** Decodifica un texto en Base64. Si se introducen datos nulos se
      * devuelve {@code null}.
      * @param data Datos en Base64.
      * @param charset Juego de caracteres a utilizar en el texto de salida.
-     *                El nombre de este debe seguir las convenciones de la <a href="http://ietf.org/rfc/rfc2278.txt">RFC2278</a>, 
+     *                El nombre de este debe seguir las convenciones de la <a href="http://ietf.org/rfc/rfc2278.txt">RFC2278</a>,
      *                soport&aacute;ndose al menos los siguientes:
      *                <ul>
      *                 <li>US-ASCII</li>
@@ -245,18 +231,18 @@ interface MiniAfirma {
      *                 <li>UTF-16BE</li>
      *                 <li>UTF-16LE</li>
      *                 <li>UTF-16</li>
-     *                </ul>  
+     *                </ul>
      * @return Texto decodificado.
      * @throws IOException Cuando se indica una codificaci&oacute;n no v&aacute;lida.
      */
     String getTextFromBase64(String data, String charset) throws IOException;
 
-    
+
     /** Codifica un texto plano a Base64. Si se introduce un texto nulo se
      * devuelve {@code null}.
      * @param plainText Texto plano.
      * @param charset Juego de caracteres del texto.
-     * 				  El nombre de este debe seguir las convenciones de la <a href="http://ietf.org/rfc/rfc2278.txt">RFC2278</a>, 
+     * 				  El nombre de este debe seguir las convenciones de la <a href="http://ietf.org/rfc/rfc2278.txt">RFC2278</a>,
      *                soport&aacute;ndose al menos los siguientes:
      *                <ul>
      *                 <li>US-ASCII</li>
@@ -265,18 +251,18 @@ interface MiniAfirma {
      *                 <li>UTF-16BE</li>
      *                 <li>UTF-16LE</li>
      *                 <li>UTF-16</li>
-     *                </ul>  
+     *                </ul>
      * @return Texto codificado en Base64.
      * @throws UnsupportedEncodingException Cuando se indica una codificaci&oacute;n no v&aacute;lida.
      */
     String getBase64FromText(String plainText, String charset) throws UnsupportedEncodingException;
-    
+
     /**
      * Recupera el error producido durante la &uacute;ltima operaci&oacute;n
      * realizada por el applet. El texto obtenido consiste en la cadena de
      * excepciones cualificadas que produjeron el error, separadas por la cadena ": "
      * y seguidas igualmente por ": " y el mensaje del error. Por ejemplo:
-     * <p>{@code es.gob.afirma.keystores.main.common.AOCertificatesNotFoundException: 
+     * <p>{@code es.gob.afirma.keystores.main.common.AOCertificatesNotFoundException:
      * El almacen no contenia entradas validas}</p>
      * Si no se produjo ning&uacute;n error durante la
      * operaci&oacute;n, se devolver&aacute; {@code null}.
