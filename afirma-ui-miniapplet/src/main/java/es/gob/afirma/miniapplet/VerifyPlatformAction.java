@@ -65,14 +65,15 @@ final class VerifyPlatformAction implements PrivilegedExceptionAction<Void> {
 	}
 
 	/** Indica si la versi&oacute;n de BouncyCastle es la adecuada para ejecutar el MiniApplet.
-	 * @throws InvalidExternalLibraryException Si se encuentra una versi&oacute;n no compatible en en CLASSPATH de la aplicaci&oacute;n */
+	 * @throws InvalidExternalLibraryException Si se encuentra una versi&oacute;n no compatible
+	 * en el CLASSPATH de la aplicaci&oacute;n */
 	private static void verificaBCVersion() throws InvalidExternalLibraryException {
 
 		final String bcVersion = Platform.getBouncyCastleVersion();
 
 		if (bcVersion == null) {
 			throw new InvalidExternalLibraryException(
-				"No se ha econtrado el proveedor BouncyCastleProvider", //$NON-NLS-1$
+				"No se ha encontrado el proveedor BouncyCastleProvider", //$NON-NLS-1$
 				"VerifyPlatformAction.3", //$NON-NLS-1$
 				null
 			);
