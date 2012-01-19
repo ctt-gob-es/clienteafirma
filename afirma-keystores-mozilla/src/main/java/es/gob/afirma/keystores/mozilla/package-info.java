@@ -8,16 +8,12 @@
  * You may contact the copyright holder at: soporte.afirma5@mpt.es
  */
 
-/** M&oacute;dulo del Cliente Afirma de gesti&oacute;n de almacenes de claves y certificados.
- *  <p>
- *   Este m&oacute;dulo incopora tambi&eacute;n los interfaces base que pueden ser implementados
- *   de forma concreta por distintos m&oacute;dulos que asuman funcionalidades relacionadas con
- *   la gesti&oacute;n de almacenes de claves y certificados.
- *  </p>
+/** M&oacute;dulo del Cliente Afirma de gesti&oacute;n de almacenes de claves y certificados de Mozilla.
  *  <p align="center"><br><img src="doc-files/package-info-1.png"></p>
  *  <p>Este m&oacute;dulo presenta las siguientes dependencias directas de primer nivel:</p>
  *  <ul>
  *   <li>Dependencia con el m&oacute;dulo N&uacute;cleo (<i>afirma-core</i>) del Cliente.</li>
+ *   <li>Dependencia con el m&oacute;dulo com&uacute;n de gesti&oacute;n de almacenes de certificados y claves (<i>afirma-core-keystores</i>) del Cliente.</li>
  *  </ul>
  *  <p>Adicionalmente, se presentan las siguientes dependencias din&aacute;micas de primer nivel:</p>
  *  <ul>
@@ -27,10 +23,13 @@
  *   </li>
  *  </ul>
  *  <p>
- *   Este m&oacute;dulo es compatible con cualquier entorno JSE 1.5 o superior y con Android 3 o superior.<br>
+ *   Este m&oacute;dulo es compatible con cualquier entorno JSE 1.5 o superior.<br>
+ *  </p>
+ *  <p>
+ *   Este m&oacute;dulo necesita que el sistema cuente con las bibliotecas NSS (<i>Netscape Security Services</i>) correctamente instaladas y de la misma arquitectura que el JRE.<br>
  *  </p>
  *  <p>
  *   Desde este m&oacute;dulo es posible que se realicen llamadas a interfaces gr&aacute;ficas.<br>
  *  </p>
  */
-package es.gob.afirma.keystores.main;
+package es.gob.afirma.keystores.mozilla;
