@@ -62,6 +62,7 @@ import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.envelopers.cms.AOInvalidRecipientException;
+import es.gob.afirma.keystores.filters.old.OldFilter;
 import es.gob.afirma.keystores.filters.rfc.RFC2254CertificateFilter;
 import es.gob.afirma.keystores.main.common.AOCertificatesNotFoundException;
 import es.gob.afirma.keystores.main.common.AOKeyStore;
@@ -98,7 +99,7 @@ import es.gob.afirma.signers.cms.AOCMSSigner;
  * <li><code>signAndPackFile(final String filename)</code></li>
  * </ul> */
 public final class SignApplet extends JApplet implements EntryPointsCrypto, EntryPointsUtil {
-    
+
     private static final String CR = "\n"; //$NON-NLS-1$
 
     /** Separador utilizado para separar varios valores consecutivos en una
@@ -112,7 +113,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     private String userAgent = null;
-    
+
     /** Nombre del fichero donde deben guardarse los datos (firmas, datos, etc.). */
     String outputFile = null;
 
@@ -282,7 +283,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         this.setLookAndFeel();
 
         this.userAgent = getParameter("userAgent"); //$NON-NLS-1$
-        
+
         // Configuramos el almacen de claves que corresponda
         final AOKeyStore keyStore = this.configureDefaultStore(Platform.getOS(), Platform.getBrowser(this.userAgent));
         this.ksConfigManager = new KeyStoreConfigurationManager(keyStore, this);
@@ -436,7 +437,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
     public final String getCertificate(final String alias) {
         LOGGER.info("Invocando getCertificate: " + alias); //$NON-NLS-1$
-        final X509Certificate cert = getCertificateBinary(alias); 
+        final X509Certificate cert = getCertificateBinary(alias);
         if (cert == null) {
         	return null;
         }
@@ -454,14 +455,14 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         + AOUtil.getCN(cert)
         + "\r\n" + //$NON-NLS-1$
         "-----BEGIN CERTIFICATE-----\r\n" //$NON-NLS-1$
-        + 
+        +
         b64CertEncode
         + "\r\n-----END CERTIFICATE-----"; //$NON-NLS-1$
     }
 
     public String getCertificatePublicKey(final String alias) {
     	LOGGER.info("Invocando getCertificatePublicKey: " + alias); //$NON-NLS-1$
-    	final X509Certificate cert = getCertificateBinary(alias); 
+    	final X509Certificate cert = getCertificateBinary(alias);
     	if (cert == null) {
     		return null;
     	}
@@ -482,7 +483,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         final X509Certificate cert = AccessController.doPrivileged(getCertAction);
         if (getCertAction.isError()) {
             if (getCertAction.getException() instanceof AOKeystoreAlternativeException) {
-            	AOKeystoreAlternativeException e = (AOKeystoreAlternativeException) getCertAction.getException();
+            	final AOKeystoreAlternativeException e = (AOKeystoreAlternativeException) getCertAction.getException();
             	final AOKeyStore kst = e.getAlternativeKsm();
             	if (kst == null) {
             		LOGGER.severe("Error al inicializar el repositorio de certificados: " + e); //$NON-NLS-1$
@@ -504,10 +505,10 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
             this.setError(getCertAction.getErrorMessage());
             return null;
         }
-        
+
         return cert;
     }
-    
+
     void saveDataToStorage(final byte[] binaryData, final String filename) throws AOException {
         if (binaryData == null) {
             throw new IllegalArgumentException("Los datos que desea almacenar no pueden ser nulos"); //$NON-NLS-1$
@@ -709,6 +710,28 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
             saveDataDialog.run();
         }
     }
+
+	@Deprecated
+	public void setCertFilter(final String certFilter) {
+		LOGGER.info("Invocando setCertFilter: " + certFilter); //$NON-NLS-1$
+
+		if (certFilter != null) {
+			this.ksConfigManager.resetFilters();
+			this.ksConfigManager.addCertFilter(new OldFilter(certFilter));
+		}
+        this.ksConfigManager.setMandatoryCert(false);
+	}
+
+	@Deprecated
+	public void setMandatoryCertificateCondition(final String certFilter) {
+		LOGGER.info("Invocando setMandatoryCertificateCondition: " + certFilter); //$NON-NLS-1$
+
+		if (certFilter != null) {
+			this.ksConfigManager.resetFilters();
+			this.ksConfigManager.addCertFilter(new OldFilter(certFilter));
+		}
+		this.ksConfigManager.setMandatoryCert(true);
+	}
 
     public final void setData(final String data) {
         LOGGER.info("Invocando setData"); //$NON-NLS-1$
@@ -973,16 +996,16 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                     SignApplet.this.setError(AppletMessages.getString("SignApplet.95") + format); //$NON-NLS-1$
                     LOGGER.severe("El formato de firma '" + format + //$NON-NLS-1$
                                   "' no esta soportado. Lo formatos soportados son:\n"  //$NON-NLS-1$
-                                  + 
+                                  +
                                   AOSignerFactory.getInstance().toString());
                     return Boolean.FALSE;
                 }
 
-                Properties extraParams = new Properties();
-                
+                final Properties extraParams = new Properties();
+
                 // Establecemos el mimetype de los datos
                 configureDataTypeExtraParams(extraParams);
-                
+
                 // Obtenemos los parametros necesarios segun tipo de
                 // contrafirma. Esto son los firmantes
                 // para la contrafirma de firmantes, los nodos para la
@@ -1308,7 +1331,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                 if (signer == null) {
                     LOGGER.severe("El formato de firma '" + format + //$NON-NLS-1$
                                   "' no esta soportado. Lo formatos soportados son:\n" //$NON-NLS-1$
-                                  + 
+                                  +
                                   AOSignerFactory.getInstance().toString());
                     SignApplet.this.setError(AppletMessages.getString("SignApplet.95") + format); //$NON-NLS-1$
                     return Boolean.FALSE;
@@ -1359,7 +1382,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                 LOGGER.info("Firma con algoritmo " + algorithm + ", formato " + format + " y modo " + mode); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
                 final Properties extraParams = new Properties();
-                
+
                 // Si no se nos ha introducido un listado de hashes
                 // entendemos que debe realizarse
                 // una firma corriente. En este caso, se tomara
@@ -1539,7 +1562,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         }
     }
 
-    private void configureDataTypeExtraParams(Properties extraParams) {
+    private void configureDataTypeExtraParams(final Properties extraParams) {
         final String mimeType = SignApplet.this.extMimeType != null ? SignApplet.this.extMimeType : SignApplet.this.dataMimeType;
         if (mimeType != null) {
             extraParams.setProperty("mimeType", mimeType); //$NON-NLS-1$
@@ -1549,7 +1572,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
             }
         }
     }
-    
+
     /** Agrega los atributos firmados y sin firmar definidos al manejador de
      * firma cuando este corresponda a un formato de firma que los soporte.
      * @param signer
@@ -1662,7 +1685,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                 if (signer == null) {
                     LOGGER.severe("El formato de firma '" + format + //$NON-NLS-1$
                                   "' no esta soportado. Lo formatos soportados son:\n" //$NON-NLS-1$
-                                  + 
+                                  +
                                   AOSignerFactory.getInstance().toString());
                     SignApplet.this.setError(AppletMessages.getString("SignApplet.95") + format); //$NON-NLS-1$
                     return Boolean.FALSE;
@@ -1708,7 +1731,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
                 // Establecemos el formato de los datos
                 configureDataTypeExtraParams(SignApplet.this.genericConfig);
-                
+
                 // Configuramos el certificado
                 final PrivateKeyEntry ke = SignApplet.this.configureCertificate();
                 if (ke == null) {
@@ -2414,7 +2437,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
         // Si es un fichero local eliminamos el esquema de la ruta
         if (path.startsWith("file://")) { //$NON-NLS-1$
-            path = path.substring(7); 
+            path = path.substring(7);
         }
 
         return path;
@@ -2541,9 +2564,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                                           AppletMessages.getString("SignApplet.16"), //$NON-NLS-1$
                                           JOptionPane.YES_NO_OPTION,
                                           JOptionPane.WARNING_MESSAGE) != JOptionPane.YES_OPTION) {
-            return null; 
+            return null;
         }
-        
+
         try {
             return getFileBase64Encoded(AOUtil.createURI(filename));
         }
@@ -2568,7 +2591,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     private String getFileBase64Encoded(final URI uri) {
         if (uri == null) {
             LOGGER.severe("No se ha establecido un fichero que desea obtener en base 64"); //$NON-NLS-1$
-            return null; 
+            return null;
         }
 
         final byte[] fileContent = FileUtils.loadFile(uri);
@@ -2603,9 +2626,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                 	if (SignApplet.this.fileBase64) {
                 		binaryData = Base64.decode(new String(AOUtil.getDataFromInputStream(is)));
                 	} else {
-                		binaryData = AOUtil.getDataFromInputStream(is);	
+                		binaryData = AOUtil.getDataFromInputStream(is);
                 	}
-                    
+
                 }
                 catch (final Exception e) {
                     LOGGER.severe("Error durante la lectura del fichero " + SignApplet.this.fileUri + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
@@ -3440,7 +3463,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         return result == JOptionPane.OK_OPTION;
     }
 
-    
+
 
     public String Firma(final String datos) {
         LOGGER.info("Invocando Firma"); //$NON-NLS-1$
@@ -3808,7 +3831,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         if (cert == null) {
             LOGGER.warning("No se dispone del certificado de firma, se devolvera nulo"); //$NON-NLS-1$
         }
-        
+
         return cert;
     }
 
@@ -3903,7 +3926,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                 LOGGER.info("Error al extraer la clave privada del certificado: " + e); //$NON-NLS-1$
                 this.setError(AppletMessages.getString("SignApplet.114")); //$NON-NLS-1$
             }
-            catch (UnrecoverableEntryException e) {
+            catch (final UnrecoverableEntryException e) {
             	LOGGER.info("Error al extraer la clave privada del certificado: " + e); //$NON-NLS-1$
                 this.setError(AppletMessages.getString("SignApplet.114")); //$NON-NLS-1$
             }
@@ -3945,7 +3968,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
      * firma.
      * @return Hash en hexadecimal formateado o <code>null</code> si no se
      *         introdujeron o no pudieron leerse los datos. */
-    private String getHexDigestData(final String algorithm) { 
+    private String getHexDigestData(final String algorithm) {
 
         byte[] hashData = null;
         // Si estamos firmando datos o si es una firma de hash implicita
@@ -4006,7 +4029,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
         return AOUtil.hexify(hashData, ":"); //$NON-NLS-1$
     }
-    
+
     /** Firma una cadena de texto simulando el funcionamiento del m&eacute;todo {@code [window.]crypto
      * .signText(stringToSign, caOption, [caNameString1, [caNameString2, . . . ]])} de JavaScript en navegadores Mozilla / Firefox.
      * @param stringToSign

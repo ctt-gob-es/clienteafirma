@@ -1036,6 +1036,160 @@ public interface EntryPointsCrypto {
      *        Electronic signature's format to be generated. */
     void setSignatureFormat(String signatureFormat);
 
+	/**
+	 * Establece un filtro para los certificados que se mostrar&aacute;n al usuario.<br>
+	 * Las condiciones simples siguen el siguiente patr&oacute;n:<br>
+	 * {campoDelCertificado operador {"valor"}}<br>
+	 * <b>campoDelCertificado</b>: ISSUER.DN (Domain Name del emisor),
+	 * SUBJECT.DN (Domain Name del certificado), SUBJECT.FP(MD5) (Huella digital
+	 * en MD5 del certificado, en hexadecimal separado por ':',
+	 * (D0:BA:34:4D...)), SUBJECT.FP(SHA1) (Huella digital en SHA1 del
+	 * certificado, en hexadecimal separado por ':', (D0:BA:34:4D...)),
+	 * SUBJECT.SN (N&uacute;mero de serie del certificado)<br>
+	 * <b>operador</b>: = (igual o equivalente), #MATCHES# (cumple un expresi&oacute;n
+	 * regular)<br>
+	 * <b>valor</b>: valor con el que se quiere operar<br>
+	 * <br>
+	 * Ejemplos de condiciones simples:<br>
+	 * {ISSUER.DN={"OU = FNMT Clase 2 CA,O = FNMT,C = ES"}}<br>
+	 * {ISSUER.DN#MATCHES#{"CN=AC DNIE 00(1|2|3),OU=DNIE,O=DIRECCION GENERAL DE
+	 * LA POLICIA,C=ES"}}<br>
+	 * {SUBJECT.DN#MATCHES#{".*ESPAÑOL ESPAÑOL.*"}}<br>
+	 * <br>
+	 * Las condiciones compuestas siguen el siguiente patr&oacute;n:<br>
+	 * {(condicionSimple o condicionCompuesta) (nexo (condicionSimple o
+	 * condicionCompuesta))*}<br>
+	 * nexo: && (Y l&oacute;gico), || (O l&oacute;gico)<br>
+	 * <br>
+	 * Ejemplos de condiciones compuestas:<br>
+	 * {SUBJECT.SN={"1014673794"}&&ISSUER.DN={"OU = FNMT Clase 2 CA,O= FNMT,C =
+	 * ES"}}<br>
+	 * {ISSUER.DN#MATCHES#{"CN=AC DNIE 00(1|2|3),OU=DNIE,O=DIRECCION GENERAL DE
+	 * LA POLICIA,C=ES"}&&{SUBJECT.DN#MATCHES#{".*(FIRMA).*"}}}<br>
+	 *
+	 *
+	 *
+	 * <br><br>
+	 *
+	 * Sets a filter for the certificates that will be shown to the user.<br>
+	 * Simple conditions follow this pattern:<br>
+	 * {Certificatefield operator {"value"}}<br>
+	 * <b>Certificatefield</b>: ISSUER.DN (Issuer Domain Name),
+	 * SUBJECT.DN (Certificate's Domain Name), SUBJECT.FP(MD5) (Certificate's
+	 * Digital fingerprint in MD5, in hexadecimal, separated by ':',
+	 * (D0:BA:34:4D...)), SUBJECT.FP(SHA1) (Certificate's digital fingerprint in SHA1,
+	 * in hexadecimal, separated by ':', (D0:BA:34:4D...)),
+	 * SUBJECT.SN (certificate's serial no.)<br>
+	 * <b>operador</b>: = (equals or equivalent), #MATCHES# (matches a regular expression)<br>
+	 * <b>valor</b>: value desired for the operation<br>
+	 * <br>
+	 * Simple condition examples:<br>
+	 * {ISSUER.DN={"OU = FNMT Clase 2 CA,O = FNMT,C = ES"}}<br>
+	 * {ISSUER.DN#MATCHES#{"CN=AC DNIE 00(1|2|3),OU=DNIE,O=DIRECCION GENERAL DE
+	 * LA POLICIA,C=ES"}}<br>
+	 * {SUBJECT.DN#MATCHES#{".*NAME SURNAME.*"}}<br>
+	 * <br>
+	 * Complex conditions follow this pattern:<br>
+	 * {(SimpleCondition or ComplexCondition) (nexus (simpleCondition or
+	 * complexCondition))*}<br>
+	 * nexus: && (logical AND), || (logical OR)<br>
+	 * <br>
+	 * Complex condition examples:<br>
+	 * {SUBJECT.SN={"1014673794"}&&ISSUER.DN={"OU = FNMT Clase 2 CA,O= FNMT,C =
+	 * ES"}}<br>
+	 * {ISSUER.DN#MATCHES#{"CN=AC DNIE 00(1|2|3),OU=DNIE,O=DIRECCION GENERAL DE
+	 * LA POLICIA,C=ES"}&&{SUBJECT.DN#MATCHES#{".*(FIRMA).*"}}}<br>
+	 *
+	 *
+	 * @param certFilter Filtro para los certificados a mostrar al usuario
+	 * <br> Certificate filter to be shown to the user.
+	 * @deprecated Sustituido por {@link #setCertFilterRFC2254(String, String, boolean)}
+	 * <br> Replaced by {@link #setCertFilterRFC2254(String, String, boolean)}
+	 * @see #setCertFilterRFC2254(String, String, boolean)
+	 */
+	@Deprecated
+	public void setCertFilter(String certFilter);
+
+	/**
+	 * Establece una condici&oacute;n para seleccionar el certificado con el que se ha de firmar. No se permite elegir certificado al usuario
+	 * pues se entiende que se le "obliga" a firmar con uno concreto. Si ning&uacute;n certificado instalado en el navegador cumple la condici&oacute;n,
+	 * se mostrar&aacute; un error. Si m&aacute;s de uno la cumple, tambi&eacute;n (la condici&oacute;n no selecciona un certificado &uacute;nico).<br>
+	 * <br>
+	 * Las condiciones simples siguen el siguiente patr&oacute;n:<br>
+	 * {campoDelCertificado operador {"valor"}}<br>
+	 * <b>campoDelCertificado</b>: ISSUER.DN (Domain Name del emisor),
+	 * SUBJECT.DN (Domain Name del certificado), SUBJECT.FP(MD5) (Huella digital
+	 * en MD5 del certificado, en hexadecimal separado por ':',
+	 * (D0:BA:34:4D...)), SUBJECT.FP(SHA1) (Huella digital en SHA1 del
+	 * certificado, en hexadecimal separado por ':', (D0:BA:34:4D...)),
+	 * SUBJECT.SN (N&uacute;mero de serie del certificado)<br>
+	 * <b>operador</b>: = (igual o equivalente), #MATCHES# (cumple un expresi&oacute;n
+	 * regular)<br>
+	 * <b>valor</b>: valor con el que se quiere operar<br>
+	 * <br>
+	 * Ejemplos de condiciones simples:<br>
+	 * {ISSUER.DN={"OU = FNMT Clase 2 CA,O = FNMT,C = ES"}}<br>
+	 * {ISSUER.DN#MATCHES#{"CN=AC DNIE 00(1|2|3),OU=DNIE,O=DIRECCION GENERAL DE
+	 * LA POLICIA,C=ES"}}<br>
+	 * {SUBJECT.DN#MATCHES#{".*ESPAÑOL ESPAÑOL.*"}}<br>
+	 * <br>
+	 * Las condiciones compuestas siguen el siguiente patr&oacute;n:<br>
+	 * {(condicionSimple o condicionCompuesta) (nexo (condicionSimple o
+	 * condicionCompuesta))*}<br>
+	 * nexo: && (Y l&oacute;gico), || (O l&oacute;gico)<br>
+	 * <br>
+	 * Ejemplos de condiciones compuestas:<br>
+	 * {SUBJECT.SN={"1014673794"}&&ISSUER.DN={"OU = FNMT Clase 2 CA,O= FNMT,C =
+	 * ES"}}<br>
+	 * {ISSUER.DN#MATCHES#{"CN=AC DNIE 00(1|2|3),OU=DNIE,O=DIRECCION GENERAL DE
+	 * LA POLICIA,C=ES"}&&{SUBJECT.DN#MATCHES#{".*(FIRMA).*"}}}<br>
+	 *
+	 *
+	 * <br><br>
+	 *
+	 * Sets a condition to select the certificate for signature. User may not choose a certificate,
+	 * as they are deemed "forced" to sign with a specific one. If no certificate installed in browser meets the condition (or more than one does),
+	 * an error will be displayed. Condition does not select a single certificate.<br>
+	 * <br>
+	 * Simple conditions follow this pattern:<br>
+	 * {certificateField operator {"value"}}<br>
+	 * <b>certificateField</b>: ISSUER.DN (Domain Name del emisor),
+	 * SUBJECT.DN (Certificate's Domain Name), SUBJECT.FP(MD5) (Certificate's Digital Fingerprint
+	 * in MD5, in hexadecimal separated by ':',
+	 * (D0:BA:34:4D...)), SUBJECT.FP(SHA1) (Certificate's Digital Fingerprint in SHA1,
+	 * in hexadecimal separated by ':', (D0:BA:34:4D...)),
+	 * SUBJECT.SN (N&uacute;mero de serie del certificado)<br>
+	 * <b>operador</b>: = (equals or equivalent), #MATCHES# (matches a regular expression)<br>
+	 * <b>valor</b>: value required for operation<br>
+	 * <br>
+	 * Simple condition examples:<br>
+	 * {ISSUER.DN={"OU = FNMT Clase 2 CA,O = FNMT,C = ES"}}<br>
+	 * {ISSUER.DN#MATCHES#{"CN=AC DNIE 00(1|2|3),OU=DNIE,O=DIRECCION GENERAL DE
+	 * LA POLICIA,C=ES"}}<br>
+	 * {SUBJECT.DN#MATCHES#{".*ESPAÑOL ESPAÑOL.*"}}<br>
+	 * <br>
+	 * Complex conditions follow this pattern:<br>
+	 * {(simpleCondition or complexCondition) (nexus (simpleCondition or
+	 * complexCondition))*}<br>
+	 * nexus: && (logical AND), || (logical OR)<br>
+	 * <br>
+	 * Complex conditions examples:<br>
+	 * {SUBJECT.SN={"1014673794"}&&ISSUER.DN={"OU = FNMT Clase 2 CA,O= FNMT,C =
+	 * ES"}}<br>
+	 * {ISSUER.DN#MATCHES#{"CN=AC DNIE 00(1|2|3),OU=DNIE,O=DIRECCION GENERAL DE
+	 * LA POLICIA,C=ES"}&&{SUBJECT.DN#MATCHES#{".*(FIRMA).*"}}}<br>	 *
+	 *
+	 *
+	 * @param certFilter Condici&oacute;n que selecciona un (y s&oacute;lo un) certificado.
+	 * Condition for the selection of one (and only one) certificate.
+	 * @see #setCertFilter(String)
+	 * @deprecated Usar &uacute;nicamente {@link #setMandatoryCertificateConditionRFC2254(String, String, boolean)}
+	 * <br> Only use {@link #setMandatoryCertificateConditionRFC2254(String, String, boolean)}
+	 * @see #setMandatoryCertificateConditionRFC2254(String, String, boolean)
+	 */
+	@Deprecated
+	public void setMandatoryCertificateCondition(String certFilter);
+
     /** Establece los los datos cifrados en base 64 que se van a descifrar
      * mediante una pr&oacute;xima llamada a {@link #decipherData()}. <br>
      * <br>
@@ -2146,7 +2300,7 @@ public interface EntryPointsCrypto {
      *         Absolute route of the directory. */
     String getInputDirectoryToSign();
 
-    /** Selecciona el directorio de donde se tomar&aacute;an los ficheros de
+    /** Selecciona el directorio de donde se tomar&aacute;n los ficheros de
      * firma y datos para la operaci&oacute;n de firma masiva. <br>
      * <br>
      * Selects the directory from where signature files and data for the massive

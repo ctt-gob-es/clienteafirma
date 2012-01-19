@@ -129,7 +129,7 @@ final class KeyStoreConfigurationManager {
         return AOKeyStore.PKCS12;
     }
 
-    private void resetFilters() {
+    void resetFilters() {
         this.certFilters.clear();
     }
 
@@ -153,7 +153,7 @@ final class KeyStoreConfigurationManager {
 
     /** Inicializa el repositorio de certificados establecido.
      * @throws AOKeystoreAlternativeException
-     *         Cuando ocurre un error durante la inicializaci&oacute;n 
+     *         Cuando ocurre un error durante la inicializaci&oacute;n
      * @throws IOException
      * 		   Cuando la contrase&ntilde;a del almac&eacute;n es incorrecta. */
     private void initKeyStore() throws AOCancelledOperationException, AOKeystoreAlternativeException, IOException {
@@ -212,13 +212,13 @@ final class KeyStoreConfigurationManager {
      *         almac&eacute;n.
      * @throws AOKeystoreAlternativeException
      *         Cuando no se pueda inicializar el almac&eacute;n de
-     *         certificados pero existe un almac&eacute;n alternativo 
+     *         certificados pero existe un almac&eacute;n alternativo
      * @throws CertificateException
      *         Cuando no se pueda seleccionar un certificado.
      * @throws KeyStoreException Cuando ocurren errores en el tratamiento del
      * 		   almac&eacute;n de claves
-     * @throws NoSuchAlgorithmException 
-     * @throws UnrecoverableEntryException 
+     * @throws NoSuchAlgorithmException
+     * @throws UnrecoverableEntryException
      */
     void selectCertificate() throws AOCancelledOperationException,
                             AOKeyStoreManagerException,
@@ -249,8 +249,8 @@ final class KeyStoreConfigurationManager {
      *         certificados.
      * @throws AOCertificatesNotFoundException
      *         Cuando no se encuentran certificados v&aacute;lido en el
-     *         almac&eacute;n. 
-     * @throws CertificateException 
+     *         almac&eacute;n.
+     * @throws CertificateException
      * @throws UnrecoverableEntryException
      * 		   Cuando no se puede extraer la clave privada de un certificado.
      * @throws NoSuchAlgorithmException
