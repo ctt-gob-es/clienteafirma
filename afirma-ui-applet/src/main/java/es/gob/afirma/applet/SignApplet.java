@@ -121,7 +121,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     String outputFile = null;
 
     /** URI de la fuente de datos. */
-    private URI fileUri = null;
+    private String fileUri = null;
 
     /** Indica si la propiedad fileUri apunta a un fichero en base 64. */
     private boolean fileBase64 = false;
@@ -740,22 +740,11 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
             return;
         }
 
-        AccessController.doPrivileged(new java.security.PrivilegedAction<Void>() {
-            public Void run() {
-                try {
-                    SignApplet.this.data = Base64.decode(data);
-                }
-                catch (final Exception e) {
-                    LOGGER.severe("Error al establecer los datos para la firma: " + e); //$NON-NLS-1$
-                    SignApplet.this.data = null;
-                }
-                SignApplet.this.fileUri = null;
-                SignApplet.this.fileBase64 = false;
-                SignApplet.this.hash = null;
+        this.data = Base64.decode(data);
+        this.fileUri = null;
+        this.fileBase64 = false;
+        this.hash = null;
 
-                return null;
-            }
-        });
     }
 
     public final void setFileuri(final String uri) {
@@ -771,22 +760,10 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         	return;
         }
 
-        AccessController.doPrivileged(new java.security.PrivilegedAction<Void>() {
-            public Void run() {
-                try {
-                    SignApplet.this.fileUri = AOUtil.createURI(uri);
-                }
-                catch (final Exception e) {
-                    LOGGER.severe("La URI proporcionada no es valida (" + uri + "): " + e); //$NON-NLS-1$ //$NON-NLS-2$
-                    SignApplet.this.fileUri = null;
-                }
-                return null;
-            }
-        });
-
-        SignApplet.this.data = null;
-        SignApplet.this.hash = null;
-        SignApplet.this.fileBase64 = false;
+        this.fileUri = uri;
+        this.data = null;
+        this.hash = null;
+        this.fileBase64 = false;
     }
 
     public final void setFileuriBase64(final String uri) {
@@ -804,23 +781,10 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
             return;
         }
 
-        AccessController.doPrivileged(new java.security.PrivilegedAction<Void>() {
-            public Void run() {
-                try {
-                    SignApplet.this.fileUri = AOUtil.createURI(uri);
-                    SignApplet.this.fileBase64 = true;
-                }
-                catch (final Exception e) {
-                    LOGGER.severe("La URI proporcionada no es valida (" + uri + "): " + e); //$NON-NLS-1$ //$NON-NLS-2$
-                    SignApplet.this.fileUri = null;
-                    SignApplet.this.fileBase64 = false;
-                }
-                SignApplet.this.data = null;
-                SignApplet.this.hash = null;
-
-                return null;
-            }
-        });
+        this.fileUri = uri;
+        this.fileBase64 = true;
+        this.data = null;
+        this.hash = null;
     }
 
     public final void setHash(final String hash) {
@@ -1194,18 +1158,16 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         this.sigFormat = NormalizedNames.normalizeFormatName(signatureFormat);
     }
 
-    public void setSignatureMode(String mode) {
+    public void setSignatureMode(final String mode) {
         LOGGER.info("Invocando setSignatureMode: " + mode); //$NON-NLS-1$
         // Para mantener la interfaz con el exterior intacta, traduciremos
         // cualquier nombre de modo antiguo a su nueva forma
-        mode = NormalizedNames.normalizeModeName(mode);
-
         if (mode == null) {
             LOGGER.warning("El modo de firma no puede ser nulo, se establecera el modo por defecto" //$NON-NLS-1$
             );
-            mode = AOSignConstants.DEFAULT_SIGN_MODE;
+            this.sigMode = AOSignConstants.DEFAULT_SIGN_MODE;
         }
-        this.sigMode = mode;
+        this.sigMode = NormalizedNames.normalizeModeName(mode);
     }
 
     public String getSignatureMode() {
@@ -1483,7 +1445,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                     SignApplet.this.genericConfig.setProperty("mode", mode); //$NON-NLS-1$
                     SignApplet.this.genericConfig.setProperty("format", format); //$NON-NLS-1$
                     if (SignApplet.this.fileUri != null) {
-                        SignApplet.this.genericConfig.setProperty("uri", SignApplet.this.fileUri.toASCIIString()); //$NON-NLS-1$
+                        SignApplet.this.genericConfig.setProperty("uri", SignApplet.this.fileUri); //$NON-NLS-1$
                     }
 
                     final byte[] outputBuffer;
@@ -1744,7 +1706,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                 // Finalmente, configuramos y operamos
                 SignApplet.this.genericConfig.setProperty("mode", mode); //$NON-NLS-1$
                 if (SignApplet.this.fileUri != null) {
-                    SignApplet.this.genericConfig.setProperty("uri", SignApplet.this.fileUri.toASCIIString()); //$NON-NLS-1$
+                    SignApplet.this.genericConfig.setProperty("uri", SignApplet.this.fileUri); //$NON-NLS-1$
                 }
 
                 byte[] outputBuffer;
@@ -2018,7 +1980,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                     }
 
                     try {
-                        this.fileUri = AOUtil.createURI(fileName);
+                        this.fileUri = fileName;
                     }
                     catch (final Exception e) {
                         LOGGER.severe("Se ha proporcionado un nombre de fichero no valido '" + fileName + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
@@ -2414,7 +2376,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
         String path = ""; //$NON-NLS-1$
         try {
-            path = URLDecoder.decode(this.fileUri.toASCIIString(), "UTF-8"); //$NON-NLS-1$
+            path = URLDecoder.decode(this.fileUri, "UTF-8"); //$NON-NLS-1$
         }
         catch (final Exception e) {
             LOGGER.warning("Codificacion de caracteres no valida: " + e); //$NON-NLS-1$
@@ -2557,8 +2519,15 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     }
 
     public String getFileBase64Encoded(final boolean showProgress) {
-        LOGGER.info("Invocando getFileBase64Encoded"); //$NON-NLS-1$
-        return getFileBase64Encoded(this.fileUri);
+    	LOGGER.info("Invocando getFileBase64Encoded"); //$NON-NLS-1$
+    	try {
+    		return getFileBase64Encoded(AOUtil.createURI(this.fileUri));
+    	}
+    	catch (final Exception e) {
+    		LOGGER.severe("Error al leer el fichero '" + this.fileUri + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+    		setError(AppletMessages.getString("SignApplet.81") + this.fileUri); //$NON-NLS-1$
+    		return null;
+    	}
     }
 
     /** Recupera el contenido de un fichero codificado en base 64.
@@ -2593,7 +2562,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                 }
                 final InputStream is;
                 try {
-                    is = AOUtil.loadFile(SignApplet.this.fileUri);
+                    is = AOUtil.loadFile(AOUtil.createURI(SignApplet.this.fileUri));
                 }
                 catch (final Exception e) {
                     setError(AppletMessages.getString("SignApplet.85")); //$NON-NLS-1$
@@ -3939,7 +3908,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         // Si estamos firmando un fichero
         else if (this.fileUri != null) {
             try {
-                hashData = CryptoUtils.getMessageDigest(AOUtil.getDataFromInputStream(AOUtil.loadFile(this.fileUri)), algorithm);
+                hashData = CryptoUtils.getMessageDigest(AOUtil.getDataFromInputStream(AOUtil.loadFile(AOUtil.createURI(this.fileUri))), algorithm);
             }
             catch (final Exception e) {
                 hashData = null;
