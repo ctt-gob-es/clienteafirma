@@ -46,7 +46,7 @@ import es.gob.afirma.keystores.main.common.AOKeyStoreManagerException;
  * de ensobrado y desensobrado y proporciona las funcionalidades b&aacute;sicas
  * para realizar estas operaciones. */
 public final class EnveloperManager {
-    
+
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** Componente padre sobre el que mostrar los di&aacute;logos modales. */
@@ -250,7 +250,7 @@ public final class EnveloperManager {
      * @throws AOCertificateException
      *         Cuando ocurre un error en la decodificaci&oacute;n del
      *         certificado. */
-    private X509Certificate encodeCertificate(final byte[] cert) throws CertificateException {
+    private static X509Certificate encodeCertificate(final byte[] cert) throws CertificateException {
         try {
             return (X509Certificate) CertificateFactory.getInstance("X.509") //$NON-NLS-1$
                                                        .generateCertificate(new ByteArrayInputStream(cert));
@@ -335,7 +335,7 @@ public final class EnveloperManager {
      *         Cuando ocurre cualquier problema durante el proceso
      * @throws NoSuchAlgorithmException
      *         Cuando el algoritmo de cifrado no est&aacute; soportado. * @throws
-     *         IOException 
+     *         IOException
      * @throws KeyException Cuando se produce un error al generar la clave de encriptado.
      */
     public void encrypt() throws IOException, NoSuchAlgorithmException, AOException, KeyException {
@@ -348,7 +348,7 @@ public final class EnveloperManager {
      * @throws AOException
      *         Cuando ocurre cualquier problema durante el proceso
      * @throws NoSuchAlgorithmException
-     *         Cuando el algoritmo de cifrado no est&aacute; soportado. 
+     *         Cuando el algoritmo de cifrado no est&aacute; soportado.
      * @throws KeyException Cuando se produce un error al generar la clave de encriptado.
      */
     public void encrypt(final byte[] content) throws AOException, NoSuchAlgorithmException, KeyException {
@@ -471,7 +471,7 @@ public final class EnveloperManager {
         try {
             is = AOUtil.loadFile(this.fileUri);
             if (this.fileBase64) {
-            	return Base64.decode(new String(AOUtil.getDataFromInputStream(is)));	
+            	return Base64.decode(new String(AOUtil.getDataFromInputStream(is)));
             }
             return AOUtil.getDataFromInputStream(is);
         }
@@ -499,7 +499,7 @@ public final class EnveloperManager {
      *         Cuando ocurre un error durante la operaci&oacute;n.
      * @throws NoSuchAlgorithmException
      *         Cuando la configuraci&oacute;n de cifrado no sea
-     *         v&aacute;lida. 
+     *         v&aacute;lida.
      * @throws KeyException Cuando se produce un error al generar la clave.
      */
     private byte[] createCMSEncryptedData(final byte[] content) throws AOException, NoSuchAlgorithmException, KeyException {
@@ -517,7 +517,7 @@ public final class EnveloperManager {
      * @throws CertificateEncodingException
      *         El certificado de firma no es v&aacute;lido.
      * @throws NoSuchAlgorithmException
-     *         Algoritmo no soportado. 
+     *         Algoritmo no soportado.
      * @throws AOException */
     private byte[] createCMSEnvelopData(final byte[] content) throws IOException, CertificateEncodingException, NoSuchAlgorithmException, AOException {
         return this.enveloper.createCMSEnvelopedData(content, this.ksConfigManager.getCertificateKeyEntry(), // Si hay uno
@@ -672,10 +672,10 @@ public final class EnveloperManager {
      * @param cmsEnvelop
      *        Envoltorio CMS.
      * @return Informaci&oacute;n en texto extra&iacute;da del envoltorio. */
-    public String getCMSInfo(final byte[] cmsEnvelop) {
+    public static String getCMSInfo(final byte[] cmsEnvelop) {
         String cmsInformation;
         try {
-            cmsInformation = new CMSInformation().getInformation(cmsEnvelop);
+			cmsInformation = CMSInformation.getInformation(cmsEnvelop);
         }
         catch (final AOInvalidFormatException e) {
             LOGGER.severe("Formato de dato no valido: " + e); //$NON-NLS-1$

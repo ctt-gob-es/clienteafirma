@@ -222,11 +222,11 @@ public final class SignText {
             return NO_MATCHING_CERT;
         }
         try {
-            
-            
+
+
                 final AOSigner signer = AOSignerFactory.getSigner(
                         this.useCAdES ? AOSignConstants.SIGN_FORMAT_CADES : AOSignConstants.SIGN_FORMAT_CMS);
-                
+
                 return Base64.encode(
                         signer.sign(
                                 stringToSign.getBytes(),
@@ -299,6 +299,9 @@ public final class SignText {
                 else if (o1 != null && o2 == null) {
                     return -1;
                 }
+                else if (o1 == null) { // Este caso no se va a dar jamas
+                	return 0;
+                }
                 return o1.toString().compareToIgnoreCase(o2.toString());
             }
         });
@@ -370,12 +373,12 @@ public final class SignText {
                                             errorMessage =
                                                     "No se ha podido validar la cadena de certificaci\u00F3n del certificado." + "\r\n" + "Es posible que su certificado no tenga correctamente declarada la cadena de" + "\r\n" + //$NON-NLS-2$ //$NON-NLS-4$
                                                     "certificaci\u00F3n o que los certificados de esta no est\u00E1n importados en su almac\u00E9n\r\nde autoridades de confianza." + "\r\n" + //$NON-NLS-2$
-                                                    "Quiz\u00E1s la firma generada no tenga validez legal." + "\r\n" + "\u00BFDesea continuar con la operaci\u00F3n?"; //$NON-NLS-2$ 
+                                                    "Quiz\u00E1s la firma generada no tenga validez legal." + "\r\n" + "\u00BFDesea continuar con la operaci\u00F3n?"; //$NON-NLS-2$
                                         }
                                         catch (final AOCertificateRevokedException e) {
                                             errorMessage =
                                                     "Su certificado est\u00E1 revocado.\r\nLas firmas electr\u00F3nicas generadas con \u00E9l no ser\u00E1n v\u00E1lidas." + "\r\n" + //$NON-NLS-2$
-                                                    "\u00BFDesea continuar con la operaci\u00F3n?"; 
+                                                    "\u00BFDesea continuar con la operaci\u00F3n?";
                                         }
                                         catch (final Exception e) {
                                             errorMessage = "Ocurri\u00F3 un error durante la validacion del certificado";
@@ -397,7 +400,9 @@ public final class SignText {
                                                 this.kss.getCertificate(al));
                                     }
                                 }
-                                catch (final Exception e) {}
+                                catch (final Exception e) {
+                                	// Se ignora
+                                }
                             }
                         }
                     }

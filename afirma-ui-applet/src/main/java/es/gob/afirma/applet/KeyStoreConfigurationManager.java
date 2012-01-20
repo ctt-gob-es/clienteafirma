@@ -113,7 +113,7 @@ final class KeyStoreConfigurationManager {
     /** Recupera el almac&eacute;n de claves por defecto para el sistema
      * operativo actual.
      * @return Almac&eacute;n de claves por defecto. */
-    private AOKeyStore getDefaultKeyStore() {
+    private static AOKeyStore getDefaultKeyStore() {
         if (Platform.getOS().equals(Platform.OS.WINDOWS))
          {
             return AOKeyStore.WINDOWS; // Sistemas Windows

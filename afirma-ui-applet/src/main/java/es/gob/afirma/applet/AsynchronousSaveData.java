@@ -23,12 +23,12 @@ import javax.swing.JOptionPane;
  * <code>SwingUtilities.invokeLater(new AsynchronousSaveData(data, file, desc, exts, parent, true));</code> */
 public final class AsynchronousSaveData implements Runnable {
 
-    private final byte[] dataToSave;
-    private String savingTarget;
-    private final String[] extensions;
-    private String description = "Firma digital";
-    private final Frame parent;
-    private final boolean showDialogIfError;
+    final byte[] dataToSave;
+    String savingTarget;
+    final String[] extensions;
+    String description = "Firma digital";
+    final Frame parent;
+    final boolean showDialogIfError;
 
     /** Crea una clase para el guardado as&iacute;ncrono de datos en disco.
      * @param data
@@ -69,7 +69,7 @@ public final class AsynchronousSaveData implements Runnable {
             public Void run() {
                 if (AsynchronousSaveData.this.savingTarget == null || "".equals(AsynchronousSaveData.this.savingTarget)) { //$NON-NLS-1$
                     try {
-                        AsynchronousSaveData.this.savingTarget = UIDialogs.getSaveFileName(extensions, description, parent);
+                        AsynchronousSaveData.this.savingTarget = UIDialogs.getSaveFileName(AsynchronousSaveData.this.extensions, AsynchronousSaveData.this.description, AsynchronousSaveData.this.parent);
                     }
                     catch (final Exception e) {
                         Logger.getLogger("es.gob.afirma").severe("El nombre de fichero para guardar los datos no es valido: " + e); //$NON-NLS-1$ //$NON-NLS-2$

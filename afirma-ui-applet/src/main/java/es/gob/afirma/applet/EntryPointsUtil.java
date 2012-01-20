@@ -204,9 +204,9 @@ public interface EntryPointsUtil {
      *        T&iacute;tulo del di&aacute;logo modal. <br>
      *        Modal dialog's title.
      * @param exts
-     *        Extensiones de b&uacute;squeda (separadas por {@link es.gob.afirma.cliente.SignApplet#STRING_SEPARATOR
+     *        Extensiones de b&uacute;squeda (separadas por {@link es.gob.afirma.applet.SignApplet#STRING_SEPARATOR
      *        STRING_SEPARATOR}) <br>
-     *        Search extensions (separated by {@link es.gob.afirma.cliente.SignApplet#STRING_SEPARATOR
+     *        Search extensions (separated by {@link es.gob.afirma.applet.SignApplet#STRING_SEPARATOR
      *        STRING_SEPARATOR})
      * @param description
      *        Descripcion del tipo de ficheros buscado. <br>
