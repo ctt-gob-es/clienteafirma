@@ -100,6 +100,9 @@ import es.gob.afirma.signers.cms.AOCMSSigner;
  * </ul> */
 public final class SignApplet extends JApplet implements EntryPointsCrypto, EntryPointsUtil {
 
+	/** Estado del  modo DEBUG. Mantener a {@code false} en la compilaci&oacute;n final. */
+	private static final boolean DEBUG = true;
+
     private static final String CR = "\n"; //$NON-NLS-1$
 
     /** Separador utilizado para separar varios valores consecutivos en una
@@ -547,14 +550,11 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
             return false;
         }
 
-        if (JOptionPane.showConfirmDialog(this,
-                                          AppletMessages.getString("SignApplet.5") + CR + filename //$NON-NLS-1$
-                                                  + CR + AppletMessages.getString("SignApplet.12"), //$NON-NLS-1$
-                                          AppletMessages.getString("SignApplet.16"), //$NON-NLS-1$
-                                          JOptionPane.YES_NO_OPTION,
-                                          JOptionPane.WARNING_MESSAGE) != JOptionPane.YES_OPTION) {
-            return false;
+        if (!checkUserPermision(AppletMessages.getString("SignApplet.5") + CR + filename //$NON-NLS-1$
+    			+ CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
+        	return false;
         }
+
 
         return AccessController.doPrivileged(new java.security.PrivilegedAction<Boolean>() {
             public Boolean run() {
@@ -766,12 +766,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
             return;
         }
 
-        if (JOptionPane.showConfirmDialog(this,
-                                          AppletMessages.getString("SignApplet.19") + CR + uri + CR + AppletMessages.getString("SignApplet.12"), //$NON-NLS-1$ //$NON-NLS-2$
-                                          AppletMessages.getString("SignApplet.16"), //$NON-NLS-1$
-                                          JOptionPane.YES_NO_OPTION,
-                                          JOptionPane.WARNING_MESSAGE) != JOptionPane.YES_OPTION) {
-            return;
+        if (!checkUserPermision(AppletMessages.getString("SignApplet.19") + CR + uri + //$NON-NLS-1$
+        		CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
+        	return;
         }
 
         AccessController.doPrivileged(new java.security.PrivilegedAction<Void>() {
@@ -801,11 +798,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
             return;
         }
 
-        if (JOptionPane.showConfirmDialog(this,
-                                          AppletMessages.getString("SignApplet.19") + CR + uri + CR + AppletMessages.getString("SignApplet.12"), //$NON-NLS-1$ //$NON-NLS-2$
-                                          AppletMessages.getString("SignApplet.16"), //$NON-NLS-1$
-                                          JOptionPane.YES_NO_OPTION,
-                                          JOptionPane.WARNING_MESSAGE) != JOptionPane.YES_OPTION) {
+
+        if (!checkUserPermision(AppletMessages.getString("SignApplet.19") + CR + uri + //$NON-NLS-1$
+        		CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
             return;
         }
 
@@ -850,6 +845,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         else {
             this.signData = Base64.decode(signatureB64);
         }
+        this.electronicSignatureFile = null;
     }
 
     public void setElectronicSignatureFile(final String filename) {
@@ -861,11 +857,8 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
             return;
         }
 
-        if (JOptionPane.showConfirmDialog(this,
-                                          AppletMessages.getString("SignApplet.33") + CR + filename + CR + AppletMessages.getString("SignApplet.12"), //$NON-NLS-1$ //$NON-NLS-2$
-                                          AppletMessages.getString("SignApplet.16"), //$NON-NLS-1$
-                                          JOptionPane.YES_NO_OPTION,
-                                          JOptionPane.WARNING_MESSAGE) != JOptionPane.YES_OPTION) {
+        if (!checkUserPermision(AppletMessages.getString("SignApplet.33") + CR + filename + //$NON-NLS-1$
+        		CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
             return;
         }
         try {
@@ -875,6 +868,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
             LOGGER.severe("La URI proporcionada no es valida (" + filename + "): " + e); //$NON-NLS-1$ //$NON-NLS-2$
             this.electronicSignatureFile = null;
         }
+        this.signData = null;
     }
 
     public void setSignersToCounterSign(final String signers) {
@@ -1144,13 +1138,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
             this.outputFile = null;
             return;
         }
-        if (JOptionPane.showConfirmDialog(this,
-                                          AppletMessages.getString("SignApplet.5") + CR + filename //$NON-NLS-1$
-                                                  + CR + AppletMessages.getString("SignApplet.12"), //$NON-NLS-1$
-                                          AppletMessages.getString("SignApplet.16"), //$NON-NLS-1$
-                                          JOptionPane.YES_NO_OPTION,
-                                          JOptionPane.WARNING_MESSAGE) != JOptionPane.YES_OPTION) {
-            return;
+        if (!checkUserPermision(AppletMessages.getString("SignApplet.5") + CR + filename + //$NON-NLS-1$
+        		CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
+        	return;
         }
         this.outputFile = filename;
     }
@@ -1225,14 +1215,11 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
     public final void setKeyStore(final String filename, final String password, final String type) {
 
-        if ((filename != null) && JOptionPane.showConfirmDialog(this,
-                                                                AppletMessages.getString("SignApplet.19") + CR + filename //$NON-NLS-1$
-                                                                        + CR + AppletMessages.getString("SignApplet.12"), //$NON-NLS-1$
-                                                                AppletMessages.getString("SignApplet.16"), //$NON-NLS-1$
-                                                                JOptionPane.YES_NO_OPTION,
-                                                                JOptionPane.WARNING_MESSAGE) != JOptionPane.YES_OPTION) {
-            return;
-        }
+    	if ((filename != null) && !checkUserPermision(
+    			AppletMessages.getString("SignApplet.19") + CR + filename + //$NON-NLS-1$
+    			CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
+    		return;
+    	}
 
         LOGGER.info("Invocando setKeyStore de tipo '" + type + "' con el path '" + filename + "'"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         AccessController.doPrivileged(new java.security.PrivilegedAction<Void>() {
@@ -1516,6 +1503,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                     catch (final AOException e) {
                         LOGGER.severe(e.toString());
                         SignApplet.this.setError(AppletMessages.getString("SignApplet.101")); //$NON-NLS-1$
+                        e.printStackTrace();
                         return Boolean.FALSE;
                     }
                     catch (final Exception e) {
@@ -2195,11 +2183,8 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
             return null;
         }
 
-        if (JOptionPane.showConfirmDialog(this,
-                                          AppletMessages.getString("SignApplet.33") + CR + filename + CR + AppletMessages.getString("SignApplet.12"), //$NON-NLS-1$ //$NON-NLS-2$
-                                          AppletMessages.getString("SignApplet.16"), //$NON-NLS-1$
-                                          JOptionPane.YES_NO_OPTION,
-                                          JOptionPane.WARNING_MESSAGE) != JOptionPane.YES_OPTION) {
+        if (!checkUserPermision(AppletMessages.getString("SignApplet.33") + CR + filename + //$NON-NLS-1$
+        		CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
             return null;
         }
 
@@ -2485,11 +2470,8 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
             return null;
         }
 
-        if (JOptionPane.showConfirmDialog(this,
-                                          AppletMessages.getString("SignApplet.19") + CR + filename + CR + AppletMessages.getString("SignApplet.12"), //$NON-NLS-1$ //$NON-NLS-2$
-                                          AppletMessages.getString("SignApplet.16"), //$NON-NLS-1$
-                                          JOptionPane.YES_NO_OPTION,
-                                          JOptionPane.WARNING_MESSAGE) != JOptionPane.YES_OPTION) {
+        if (!checkUserPermision(AppletMessages.getString("SignApplet.19") + CR + filename + //$NON-NLS-1$
+        		CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
             return null;
         }
 
@@ -2559,11 +2541,8 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
             return null;
         }
 
-        if (JOptionPane.showConfirmDialog(this,
-                                          AppletMessages.getString("SignApplet.19") + CR + filename + CR + AppletMessages.getString("SignApplet.12"), //$NON-NLS-1$ //$NON-NLS-2$
-                                          AppletMessages.getString("SignApplet.16"), //$NON-NLS-1$
-                                          JOptionPane.YES_NO_OPTION,
-                                          JOptionPane.WARNING_MESSAGE) != JOptionPane.YES_OPTION) {
+        if (!checkUserPermision(AppletMessages.getString("SignApplet.19") + CR + filename +  //$NON-NLS-1$
+        		CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
             return null;
         }
 
@@ -2739,13 +2718,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
             return false;
         }
 
-        if (JOptionPane.showConfirmDialog(this,
-                                          AppletMessages.getString("SignApplet.66") + CR + filename //$NON-NLS-1$
-                                                  + CR + AppletMessages.getString("SignApplet.12"), //$NON-NLS-1$
-                                          AppletMessages.getString("SignApplet.16"), //$NON-NLS-1$
-                                          JOptionPane.YES_NO_OPTION,
-                                          JOptionPane.WARNING_MESSAGE) != JOptionPane.YES_OPTION) {
-            return false;
+        if (!checkUserPermision(AppletMessages.getString("SignApplet.66") + CR + filename + //$NON-NLS-1$
+        		CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
+        	return false;
         }
 
         return AccessController.doPrivileged(new java.security.PrivilegedAction<Boolean>() {
@@ -2778,12 +2753,8 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
             return false;
         }
 
-        if (JOptionPane.showConfirmDialog(this,
-                                          AppletMessages.getString("SignApplet.71") + CR + filename //$NON-NLS-1$
-                                                  + CR + AppletMessages.getString("SignApplet.12"), //$NON-NLS-1$
-                                          AppletMessages.getString("SignApplet.16"), //$NON-NLS-1$
-                                          JOptionPane.YES_NO_OPTION,
-                                          JOptionPane.WARNING_MESSAGE) != JOptionPane.YES_OPTION) {
+        if (!checkUserPermision(AppletMessages.getString("SignApplet.71") + CR + filename + //$NON-NLS-1$
+                                                  CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
             return false;
         }
 
@@ -2815,11 +2786,8 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
             return false;
         }
 
-        if (JOptionPane.showConfirmDialog(this,
-                                          AppletMessages.getString("SignApplet.79") + CR + filename + CR + AppletMessages.getString("SignApplet.12"), //$NON-NLS-1$ //$NON-NLS-2$
-                                          AppletMessages.getString("SignApplet.16"), //$NON-NLS-1$
-                                          JOptionPane.YES_NO_OPTION,
-                                          JOptionPane.WARNING_MESSAGE) != JOptionPane.YES_OPTION) {
+        if (!checkUserPermision(AppletMessages.getString("SignApplet.79") + CR + filename + //$NON-NLS-1$
+        		CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
             return false;
         }
 
@@ -2873,11 +2841,8 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
             return false;
         }
 
-        if (JOptionPane.showConfirmDialog(this,
-                                          AppletMessages.getString("SignApplet.88") + CR + filename + CR + AppletMessages.getString("SignApplet.12"), //$NON-NLS-1$ //$NON-NLS-2$
-                                          AppletMessages.getString("SignApplet.16"), //$NON-NLS-1$
-                                          JOptionPane.YES_NO_OPTION,
-                                          JOptionPane.WARNING_MESSAGE) != JOptionPane.YES_OPTION) {
+        if (!checkUserPermision(AppletMessages.getString("SignApplet.88") + CR + filename + //$NON-NLS-1$
+        		CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
             return false;
         }
 
@@ -3007,7 +2972,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
             return;
         }
 
-        for (final String recipientsCertFile : s.split("\n")) { //$NON-NLS-1$
+        for (final String recipientsCertFile : s.split(CR)) {
 
             final byte[] recipientsCert = FileUtils.loadFile(recipientsCertFile);
             if (recipientsCert == null) {
@@ -3178,12 +3143,8 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
             return false;
         }
 
-        if (JOptionPane.showConfirmDialog(this,
-                                          AppletMessages.getString("SignApplet.94") + CR + filename //$NON-NLS-1$
-                                                  + CR + AppletMessages.getString("SignApplet.12"), //$NON-NLS-1$
-                                          AppletMessages.getString("SignApplet.16"), //$NON-NLS-1$
-                                          JOptionPane.YES_NO_OPTION,
-                                          JOptionPane.WARNING_MESSAGE) != JOptionPane.YES_OPTION) {
+        if (!checkUserPermision(AppletMessages.getString("SignApplet.94") + CR + filename + //$NON-NLS-1$
+        		CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
             return false;
         }
 
@@ -3381,12 +3342,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     public void setInputDirectoryToSign(final String directory) {
         LOGGER.info("Invocando setInputDirectoryToSign: " + directory); //$NON-NLS-1$
 
-        if ((directory != null) && JOptionPane.showConfirmDialog(this,
-                                                                 AppletMessages.getString("SignApplet.103") + CR + directory //$NON-NLS-1$
-                                                                         + CR + AppletMessages.getString("SignApplet.12"), //$NON-NLS-1$
-                                                                 AppletMessages.getString("SignApplet.16"), //$NON-NLS-1$
-                                                                 JOptionPane.YES_NO_OPTION,
-                                                                 JOptionPane.WARNING_MESSAGE) != JOptionPane.YES_OPTION) {
+        if ((directory != null) && !checkUserPermision(
+        		AppletMessages.getString("SignApplet.103") + CR + directory  + //$NON-NLS-1$
+        		CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
             return;
         }
 
@@ -3400,13 +3358,10 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
     public void setOutputDirectoryToSign(final String directory) {
         LOGGER.info("Invocando setOutputDirectoryToSign: " + directory); //$NON-NLS-1$
-        if ((directory != null) && JOptionPane.showConfirmDialog(this,
-                                                                 AppletMessages.getString("SignApplet.88") + CR + directory //$NON-NLS-1$
-                                                                         + CR + AppletMessages.getString("SignApplet.12"), //$NON-NLS-1$
-                                                                 AppletMessages.getString("SignApplet.16"), //$NON-NLS-1$
-                                                                 JOptionPane.YES_NO_OPTION,
-                                                                 JOptionPane.WARNING_MESSAGE) != JOptionPane.YES_OPTION) {
-            return;
+        if ((directory != null) && !checkUserPermision(
+        		AppletMessages.getString("SignApplet.88") + CR + directory + //$NON-NLS-1$
+        		CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
+        	return;
         }
         this.massiveOutputDirectory = directory;
     }
@@ -4028,6 +3983,24 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         }
 
         return AOUtil.hexify(hashData, ":"); //$NON-NLS-1$
+    }
+
+    /**
+     * Muestra un di&aacute;logo modal en el que se solicita al usuario permiso para
+     * realizar una determinada acci&oacute;n.
+     * @param message Mensaje con la petici&oacute;n realizada al usuario
+     * @return {@code true} cuando el usuario da su consentimiento, {@code false} en caso contrario.
+     */
+    private boolean checkUserPermision(final String message) {
+    	if (DEBUG) {
+    		return true;
+    	}
+
+    	return JOptionPane.showConfirmDialog(this,
+    			message,
+    			AppletMessages.getString("SignApplet.16"), //$NON-NLS-1$
+    			JOptionPane.YES_NO_OPTION,
+    			JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION;
     }
 
     /** Firma una cadena de texto simulando el funcionamiento del m&eacute;todo {@code [window.]crypto
