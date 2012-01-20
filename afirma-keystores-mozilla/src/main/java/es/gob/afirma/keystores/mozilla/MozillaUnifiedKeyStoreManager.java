@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -57,7 +57,7 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
      *         claves, ni el NSS interno, ni ning&uacute;n PKCS#11 externo
      *         definido en SecMod */
     @Override
-    public List<KeyStore> init(final AOKeyStore type, final InputStream store, PasswordCallback pssCallBack, final Object[] params) throws AOException {
+    public List<KeyStore> init(final AOKeyStore type, final InputStream store, final PasswordCallback pssCallBack, final Object[] params) throws AOException {
 
         // Por si el proveedor estubiese ya instalado por una ejecucion anterior
         // intentamos obtenerlo directamente
@@ -68,7 +68,10 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
 
                 final String nssDirectory = MozillaKeyStoreUtilities.getSystemNSSLibDir();
                 final String p11NSSConfigFile =
-                        MozillaKeyStoreUtilities.createPKCS11NSSConfigFile(MozillaKeyStoreUtilities.getMozillaUserProfileDirectory(), nssDirectory);
+                    MozillaKeyStoreUtilities.createPKCS11NSSConfigFile(
+                		MozillaKeyStoreUtilities.getMozillaUserProfileDirectory(),
+                		nssDirectory
+            		);
 
                 // Cargamos las dependencias necesarias para la correcta carga
                 // del almacen (en Mac se crean enlaces simbolicos)
@@ -249,7 +252,7 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
 
     /** {@inheritDoc} */
     @Override
-    public KeyStore.PrivateKeyEntry getKeyEntry(final String alias, PasswordCallback pssCallback) {
+    public KeyStore.PrivateKeyEntry getKeyEntry(final String alias, final PasswordCallback pssCallback) {
 
         final KeyStore tmpStore = this.storesByAlias.get(alias);
         if (tmpStore == null) {

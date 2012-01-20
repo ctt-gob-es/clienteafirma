@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -10,8 +10,11 @@
 
 package es.gob.afirma.keystores.mozilla;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,7 +34,7 @@ import es.gob.afirma.core.util.windows.WinRegistryWrapper;
 /** Clase con m&eacute;toos de utilidad para la gesti&oacute;n del almac&eacute;n
  * de certificados de Mozilla. */
 final class MozillaKeyStoreUtilities {
-    
+
     // Bibliotecas Windows de Firefox
     private static final String SOFTOKN3_DLL = "softokn3.dll"; //$NON-NLS-1$
     private static final String PLC4_DLL = "plc4.dll"; //$NON-NLS-1$
@@ -43,19 +46,19 @@ final class MozillaKeyStoreUtilities {
     private static final String FREEBL3_DLL = "freebl3.dll"; //$NON-NLS-1$
     private static final String NSSDBM3_DLL = "nssdbm3.dll";  //$NON-NLS-1$
     private static final String SQLITE3_DLL = "sqlite3.dll"; //$NON-NLS-1$
-    
+
     // Novedades de Firefox 9
     // IMPORTANTE:
     // No se puede cargar el entorno de ejecucion de Visual C++ 8 ("msvcr80.dll") porque requiere
     // que el EXE de carga tenga empotrado un MANIFEST adecuado
     private static final String MOZUTILS_DLL = "mozutils.dll"; //$NON-NLS-1$
-    
+
     private static final String NSPR4_SO = "/lib/libnspr4.so"; //$NON-NLS-1$
-    
+
     private MozillaKeyStoreUtilities() {
         // No permitimos la instanciacion
     }
-    
+
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** Directorio con las bibliotecas de NSS necesarias para el acceso al
@@ -76,7 +79,7 @@ final class MozillaKeyStoreUtilities {
 
         String softoknLib = "libsoftokn3.so"; //$NON-NLS-1$
         if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
-            softoknLib = SOFTOKN3_DLL; 
+            softoknLib = SOFTOKN3_DLL;
         }
         else if (Platform.getOS().equals(Platform.OS.MACOSX)) {
             softoknLib = "libsoftokn3.dylib"; //$NON-NLS-1$
@@ -156,7 +159,7 @@ final class MozillaKeyStoreUtilities {
 
             File tmpFile = new File(dir);
             if (tmpFile.exists() && tmpFile.isDirectory()) {
-                tmpFile = new File(dir + File.separator + SOFTOKN3_DLL); 
+                tmpFile = new File(dir + File.separator + SOFTOKN3_DLL);
                 if (tmpFile.exists()) {
                     try {
                         dir = tmpFile.getParentFile().getCanonicalPath();
@@ -186,50 +189,50 @@ final class MozillaKeyStoreUtilities {
 
                             // Las cuatro primeras bibliotecas son comunes para
                             // todos los Firefox a partir del 2
-                            AOUtil.copyFile(new File(dir + File.separator + SOFTOKN3_DLL), new File(dest + SOFTOKN3_DLL)); 
-                            AOUtil.copyFile(new File(dir + File.separator + PLC4_DLL), new File(dest + PLC4_DLL)); 
-                            AOUtil.copyFile(new File(dir + File.separator + PLDS4_DLL), new File(dest + PLDS4_DLL)); 
-                            AOUtil.copyFile(new File(dir + File.separator + NSPR4_DLL), new File(dest + NSPR4_DLL)); 
+                            AOUtil.copyFile(new File(dir + File.separator + SOFTOKN3_DLL), new File(dest + SOFTOKN3_DLL));
+                            AOUtil.copyFile(new File(dir + File.separator + PLC4_DLL), new File(dest + PLC4_DLL));
+                            AOUtil.copyFile(new File(dir + File.separator + PLDS4_DLL), new File(dest + PLDS4_DLL));
+                            AOUtil.copyFile(new File(dir + File.separator + NSPR4_DLL), new File(dest + NSPR4_DLL));
 
                             // A partir de aqui comprobamos exsitencia antes,
                             // porque no estan en Mozilla 2
 
                             // Cuidado, en Firefox 4 sqlite3.dll pasa a llamarse
                             // mozsqlite3.dll
-                            File tmpFile2 = new File(dir + File.separator + MOZSQLITE3_DLL); 
+                            File tmpFile2 = new File(dir + File.separator + MOZSQLITE3_DLL);
                             if (tmpFile2.exists()) {
-                                AOUtil.copyFile(tmpFile2, new File(dest + MOZSQLITE3_DLL)); 
+                                AOUtil.copyFile(tmpFile2, new File(dest + MOZSQLITE3_DLL));
                             }
                             else {
-                                tmpFile2 = new File(dir + File.separator + SQLITE3_DLL); 
+                                tmpFile2 = new File(dir + File.separator + SQLITE3_DLL);
                                 if (tmpFile2.exists()) {
-                                    AOUtil.copyFile(tmpFile2, new File(dest + SQLITE3_DLL)); 
+                                    AOUtil.copyFile(tmpFile2, new File(dest + SQLITE3_DLL));
                                 }
                             }
 
-                            tmpFile2 = new File(dir + File.separator + MOZCRT19_DLL); 
+                            tmpFile2 = new File(dir + File.separator + MOZCRT19_DLL);
                             if (tmpFile2.exists()) {
-                                AOUtil.copyFile(tmpFile2, new File(dest + MOZCRT19_DLL)); 
+                                AOUtil.copyFile(tmpFile2, new File(dest + MOZCRT19_DLL));
                             }
 
-                            tmpFile2 = new File(dir + File.separator + NSSUTIL3_DLL); 
+                            tmpFile2 = new File(dir + File.separator + NSSUTIL3_DLL);
                             if (tmpFile2.exists()) {
-                                AOUtil.copyFile(tmpFile2, new File(dest + NSSUTIL3_DLL)); 
+                                AOUtil.copyFile(tmpFile2, new File(dest + NSSUTIL3_DLL));
                             }
 
-                            tmpFile2 = new File(dir + File.separator + FREEBL3_DLL); 
+                            tmpFile2 = new File(dir + File.separator + FREEBL3_DLL);
                             if (tmpFile2.exists()) {
-                                AOUtil.copyFile(tmpFile2, new File(dest + FREEBL3_DLL)); 
+                                AOUtil.copyFile(tmpFile2, new File(dest + FREEBL3_DLL));
                             }
 
-                            tmpFile2 = new File(dir + File.separator + NSSDBM3_DLL); 
+                            tmpFile2 = new File(dir + File.separator + NSSDBM3_DLL);
                             if (tmpFile2.exists()) {
-                                AOUtil.copyFile(tmpFile2, new File(dest + NSSDBM3_DLL)); 
+                                AOUtil.copyFile(tmpFile2, new File(dest + NSSDBM3_DLL));
                             }
-                            
-                            tmpFile2 = new File(dir + File.separator + MOZUTILS_DLL); 
+
+                            tmpFile2 = new File(dir + File.separator + MOZUTILS_DLL);
                             if (tmpFile2.exists()) {
-                                AOUtil.copyFile(tmpFile2, new File(dest + MOZUTILS_DLL)); 
+                                AOUtil.copyFile(tmpFile2, new File(dest + MOZUTILS_DLL));
                             }
 
                             return tmp.getCanonicalPath();
@@ -248,7 +251,7 @@ final class MozillaKeyStoreUtilities {
 
     }
 
-    private static String getSystemNSSLibDirMacOSX() throws FileNotFoundException {
+    private static String getSystemNSSLibDirMacOsX() throws FileNotFoundException {
 
         final String[] paths =
             new String[] {
@@ -272,7 +275,7 @@ final class MozillaKeyStoreUtilities {
         return nssLibDir;
     }
 
-    private static String getSystemNSSLibDirUNIX() throws FileNotFoundException {
+    private static String getSystemNSSLibDirUnix() throws FileNotFoundException {
 
         if (nssLibDir != null && (!"".equals(nssLibDir))) { //$NON-NLS-1$
             return nssLibDir;
@@ -282,7 +285,7 @@ final class MozillaKeyStoreUtilities {
         // *********************************************************************
         // Compobamos antes el caso especifico de NSS partido entre /usr/lib y
         // /lib, que se da en Fedora
-        if (new File("/usr/lib/libsoftokn3.so").exists() && new File(NSPR4_SO).exists()) { //$NON-NLS-1$ 
+        if (new File("/usr/lib/libsoftokn3.so").exists() && new File(NSPR4_SO).exists()) { //$NON-NLS-1$
             try {
                 System.load(NSPR4_SO);
                 nssLibDir = "/usr/lib"; //$NON-NLS-1$
@@ -357,10 +360,10 @@ final class MozillaKeyStoreUtilities {
             return getSystemNSSLibDirWindows();
         }
         if (Platform.getOS().equals(Platform.OS.LINUX) || Platform.getOS().equals(Platform.OS.SOLARIS)) {
-            return getSystemNSSLibDirUNIX();
+            return getSystemNSSLibDirUnix();
         }
         if (Platform.getOS().equals(Platform.OS.MACOSX)) {
-            return getSystemNSSLibDirMacOSX();
+            return getSystemNSSLibDirMacOsX();
         }
 
         throw new FileNotFoundException(
@@ -491,9 +494,9 @@ final class MozillaKeyStoreUtilities {
      * @param nssDirectory
      *        Directorio en donde se encuentran las bibliotecas de NSS. */
     static void loadNSSDependencies(final String nssDirectory) {
-    	
+
     	final String dependList[];
-    	
+
         // Compobamos antes el caso especifico de NSS partido entre /usr/lib y
         // /lib, que se da en Fedora
         if (Platform.OS.LINUX.equals(Platform.getOS()) && new File("/usr/lib/libsoftokn3.so").exists() && new File(NSPR4_SO).exists()) { //$NON-NLS-1$
@@ -515,7 +518,7 @@ final class MozillaKeyStoreUtilities {
         	final String path = nssDirectory + (nssDirectory.endsWith(File.separator) ? "" : File.separator); //$NON-NLS-1$
         	dependList = getSoftkn3Dependencies(path);
         }
-        
+
         for (final String libPath : dependList) {
             try {
                 if (new File(libPath).exists()) {
@@ -553,7 +556,7 @@ final class MozillaKeyStoreUtilities {
 
         if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
             return new String[] {
-                nssPath + MOZUTILS_DLL,   // Firefox 9             
+                nssPath + MOZUTILS_DLL,   // Firefox 9
                 nssPath + MOZCRT19_DLL,   // Firefox desde 3 hasta 8
                 nssPath + NSPR4_DLL,      // Firefox 2 y superior
                 nssPath + PLDS4_DLL,      // Firefox 2 y superior
@@ -585,100 +588,151 @@ final class MozillaKeyStoreUtilities {
         return new String[0];
     }
 
-    /** Obtiene el directorio del perfil de usuario de Mozilla / Firefox.
+	private static final byte[] P11_CONFIG_ILLEGAL_CHARS = "·ÈÌÛ˙¡…Õ”⁄‡ËÏÚ˘¸‹Ò—‚ÍÓÙ˚¬ Œ‘€()!#$%&-@^_`¥{}'".getBytes(); //$NON-NLS-1$
+	private static final String DIR_TAG = "<DIR>"; //$NON-NLS-1$
+
+	/** Obtiene el nombre corto (8+3) del &uacute;ltimo directorio de una ruta sobre la misma ruta de directorios (es decir,
+	 * que solo se pasa a nombre corto al &uacute;timo directorio, el resto de elementos de la ruta se dejan largos).
+	 * Es necesario asegurarse de estar sobre MS-Windows antes de llamar a este m&eacute;todo. */
+	private static String getShort(final String longPath) {
+		if (longPath == null) {
+			return longPath;
+		}
+		final File dir = new File(longPath);
+		if (!dir.exists() || !dir.isDirectory()) {
+			return longPath;
+		}
+		try {
+			final Process p = new ProcessBuilder("cmd.exe", "/c", "dir /ad /x " + longPath + "\\..\\?" + longPath.substring(longPath.lastIndexOf("\\")+2, longPath.length())).start(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+			final BufferedReader br = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(AOUtil.getDataFromInputStream(p.getInputStream()))));
+			String line = br.readLine();
+			while (line != null) {
+				if (line.contains(DIR_TAG)) {
+					final String ret =
+						longPath.substring(
+							0,
+							longPath.lastIndexOf("\\") + 1 //$NON-NLS-1$
+						) +
+						line.substring(
+							line.indexOf(DIR_TAG) + DIR_TAG.length(),
+							line.lastIndexOf(" ") //$NON-NLS-1$
+						).trim();
+					if (!"".equals(ret)) { //$NON-NLS-1$
+						return ret;
+					}
+					return longPath;
+				}
+				line = br.readLine();
+			}
+		}
+		catch(final Exception e) {
+			LOGGER.warning("No se ha podido obtener el nombre corto de " + longPath + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		return longPath;
+	}
+
+	private static String getMozillaUserProfileDirectoryUnix() {
+        // Probamos con "profiles.ini" de Firefox
+        final File regFile = new File(Platform.getUserHome() + "/.mozilla/firefox/profiles.ini"); //$NON-NLS-1$
+        try {
+            if (regFile.exists()) {
+                return NSPreferences.getFireFoxUserProfileDirectory(regFile);
+            }
+        }
+        catch (final Exception e) {
+            LOGGER.severe(
+              "Error obteniendo el directorio de perfil de usuario de Firefox (UNIX), se devolvera null: " + e //$NON-NLS-1$
+            );
+        }
+        return null;
+	}
+
+	private static String getMozillaUserProfileDirectoryWindows() {
+		File regFile;
+
+        final String appDataDir = WinRegistryWrapper.getString(
+             WinRegistryWrapper.HKEY_CURRENT_USER,
+             "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders", //$NON-NLS-1$
+             "AppData" //$NON-NLS-1$
+        );
+        if (appDataDir != null) {
+            String finalDir = null;
+            // En Firefox usamos preferentemente el profiles.ini
+            regFile = new File(appDataDir + "\\Mozilla\\Firefox\\profiles.ini"); //$NON-NLS-1$
+            try {
+                if (regFile.exists()) {
+                    finalDir = NSPreferences.getFireFoxUserProfileDirectory(regFile);
+                }
+            }
+            catch (final Exception e) {
+                LOGGER.severe(
+                  "Error obteniendo el directorio de perfil de usuario de Firefox, se devolvera null: " + e //$NON-NLS-1$
+                );
+                return null;
+            }
+            if (finalDir != null) {
+        		for (final byte c : P11_CONFIG_ILLEGAL_CHARS) {
+        			if (finalDir.contains(new String(new byte[] {c}))) {
+        				finalDir = finalDir.replace(Platform.getUserHome(), getShort(Platform.getUserHome()));
+        				break;
+        			}
+        		}
+                return finalDir.replace('\\', '/');
+            }
+        }
+        LOGGER.severe(
+          "Error obteniendo el directorio de perfil de usuario de Mozilla Firefox (Windows), se devolvera null" //$NON-NLS-1$
+        );
+        return null;
+
+	}
+
+	private static String getMozillaUserProfileDirectoryMacOsX() {
+        // Si es un Mac OS X, profiles.ini esta en una ruta distinta...
+        final File regFile = new File(Platform.getUserHome() + "/Library/Application Support/Firefox/profiles.ini"); //$NON-NLS-1$
+        try {
+            if (regFile.exists()) {
+                return NSPreferences.getFireFoxUserProfileDirectory(regFile);
+            }
+        }
+        catch (final Exception e) {
+            LOGGER.severe(
+              "Error obteniendo el directorio de perfil de usuario de Firefox (" + regFile.getAbsolutePath() //$NON-NLS-1$
+                  + "), se devolvera null: " //$NON-NLS-1$
+                  + e
+            );
+        }
+        return null;
+	}
+
+	/** Obtiene el directorio del perfil de usuario de Mozilla / Firefox.
      * @return Ruta completa del directorio del perfil de usuario de Mozilla /
      *         Firefox */
     static String getMozillaUserProfileDirectory() {
-
-        File regFile;
         if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-            final String appDataDir = WinRegistryWrapper.getString(
-                 WinRegistryWrapper.HKEY_CURRENT_USER,
-                 "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders", //$NON-NLS-1$
-                 "AppData" //$NON-NLS-1$
-            );
-            if (appDataDir != null) {
-                String finalDir = null;
-                // En Firefox usamos preferentemente el profiles.ini
-                regFile = new File(appDataDir + "\\Mozilla\\Firefox\\profiles.ini"); //$NON-NLS-1$
-                try {
-                    if (regFile.exists()) {
-                        finalDir = NSPreferences.getFireFoxUserProfileDirectory(regFile);
-                    }
-                }
-                catch (final Exception e) {
-                    LOGGER.severe(
-                      "Error obteniendo el directorio de perfil de usuario de Firefox, se devolvera null: " + e //$NON-NLS-1$
-                    );
-                    return null;
-                }
-                if (finalDir != null) {
-                    return finalDir.replace('\\', '/');
-                }
-            }
-            LOGGER.severe(
-              "Error obteniendo el directorio de perfil de usuario de Mozilla Firefox (Windows), se devolvera null" //$NON-NLS-1$
-            );
-            return null;
+        	return getMozillaUserProfileDirectoryWindows();
         }
 
         else if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-            // Si es un Mac OS X, profiles.ini esta en una ruta distinta...
-            regFile = new File(Platform.getUserHome() + "/Library/Application Support/Firefox/profiles.ini"); //$NON-NLS-1$
-            try {
-                if (regFile.exists()) {
-                    return NSPreferences.getFireFoxUserProfileDirectory(regFile);
-                }
-            }
-            catch (final Exception e) {
-                LOGGER.severe(
-                  "Error obteniendo el directorio de perfil de usuario de Firefox (" + regFile.getAbsolutePath() //$NON-NLS-1$
-                      + "), se devolvera null: " //$NON-NLS-1$
-                      + e
-                );
-                return null;
-            }
+        	return getMozillaUserProfileDirectoryMacOsX();
         }
-        else {
-
-            // No es Windows ni Mac OS X, entonces es UNIX (Linux / Solaris)
-
-            // Probamos con "profiles.ini" de Firefox
-            regFile = new File(Platform.getUserHome() + "/.mozilla/firefox/profiles.ini"); //$NON-NLS-1$
-            try {
-                if (regFile.exists()) {
-                    return NSPreferences.getFireFoxUserProfileDirectory(regFile);
-                }
-            }
-            catch (final Exception e) {
-                LOGGER.severe(
-                  "Error obteniendo el directorio de perfil de usuario de Firefox (UNIX), se devolvera null: " + e //$NON-NLS-1$
-                );
-                return null;
-            }
-
-        }
-
-        LOGGER.severe(
-          "Error obteniendo el directorio de perfil de usuario de Mozilla/Firefox (UNIX), se devolvera null" //$NON-NLS-1$
-        );
-
-        return null;
+        // No es Windows ni Mac OS X, entonces es UNIX (Linux / Solaris)
+    	return getMozillaUserProfileDirectoryUnix();
     }
 
     static void configureMacNSS(final String binDir) throws AOException {
-        
+
         if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
             return;
         }
-        
+
         if (binDir == null) {
             LOGGER.severe("El directorio de NSS para configurar proporcionado es nulo, no se realizara ninguna accion"); //$NON-NLS-1$
             return;
         }
-        
+
         final String nssBinDir = (binDir.endsWith("/")) ? binDir : binDir + "/"; //$NON-NLS-1$ //$NON-NLS-2$
-        
+
         // Intentamos la carga, para ver si es necesaria la reconfiguracion
         try {
             System.load(nssBinDir + "libsoftokn3.dylib"); //$NON-NLS-1$
@@ -717,8 +771,8 @@ final class MozillaKeyStoreUtilities {
             final Class<?> scriptEngineClass = AOUtil.classForName("javax.script.ScriptEngine"); //$NON-NLS-1$
             final Method evalMethod = scriptEngineClass.getMethod("eval", String.class); //$NON-NLS-1$
             evalMethod.invoke(scriptEngine, "do shell script \"" + sb.toString() + "\" with administrator privileges"); //$NON-NLS-1$ //$NON-NLS-2$
-            
-            //new ScriptEngineManager().getEngineByName("AppleScript").eval("do shell script \"" + sb.toString() + "\" with administrator privileges");    
+
+            //new ScriptEngineManager().getEngineByName("AppleScript").eval("do shell script \"" + sb.toString() + "\" with administrator privileges");
         }
         catch(final Exception e) {
             LOGGER.severe("No se ha podido crear los enlaces simbolicos para NSS: " + e); //$NON-NLS-1$
