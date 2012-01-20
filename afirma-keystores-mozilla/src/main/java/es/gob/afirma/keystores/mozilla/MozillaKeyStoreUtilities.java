@@ -603,7 +603,9 @@ final class MozillaKeyStoreUtilities {
 			return longPath;
 		}
 		try {
-			final Process p = new ProcessBuilder("cmd.exe", "/c", "dir /ad /x " + longPath + "\\..\\?" + longPath.substring(longPath.lastIndexOf("\\")+2, longPath.length())).start(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+			final Process p = new ProcessBuilder(
+				"cmd.exe", "/c", "dir /ad /x " + longPath + "\\..\\?" + longPath.substring(longPath.lastIndexOf('\\')+2, longPath.length()) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			).start();
 			final BufferedReader br = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(AOUtil.getDataFromInputStream(p.getInputStream()))));
 			String line = br.readLine();
 			while (line != null) {
@@ -611,11 +613,11 @@ final class MozillaKeyStoreUtilities {
 					final String ret =
 						longPath.substring(
 							0,
-							longPath.lastIndexOf("\\") + 1 //$NON-NLS-1$
+							longPath.lastIndexOf('\\') + 1
 						) +
 						line.substring(
 							line.indexOf(DIR_TAG) + DIR_TAG.length(),
-							line.lastIndexOf(" ") //$NON-NLS-1$
+							line.lastIndexOf(' ')
 						).trim();
 					if (!"".equals(ret)) { //$NON-NLS-1$
 						return ret;
