@@ -1385,26 +1385,40 @@ public interface EntryPointsCrypto {
      * cliente de firma. Este metodo se utiliza principalmente para indicar la
      * firma electr&oacute;nica durante las operaciones de cofirma y contrafirma
      * (en cada una de sus variedades). <br>
+     * Los datos introducidos mediante esta funci&oacuten;n
+     * sobreescribir&aacute;n cualquier otro establecido previamente mediante
+     * el m&eacute;todo setElectronicSignatureFile.<br>
      * <br>
      * Sets an electronic signature in base 64 as input for the signature
      * client. This method is mainly used to indicate the electronic signature
-     * during every type of cosignature and counter-signature operations.
+     * during every type of cosignature and counter-signature operations.<br>
+     * Data entered with this function will overwrite any other which may have
+     * been previously set with setElectronicSignatureFile method.
      * @param inElectronicSignature
      *        Firma electr&oacute;nica en base 64. <br>
-     *        Electronic signature in base 64. */
+     *        Electronic signature in base 64.
+     * @see #setElectronicSignatureFile(String)
+     */
     void setElectronicSignature(String inElectronicSignature);
 
     /** Establece la ruta de un fichero de firma electr&oacute;nica como entrada
      * para el cliente de firma. Este m&eacute;todo se utiliza principalmente
      * para indicar la firma electr&oacute;nica durante las operaciones de
-     * cofirma y contrafirma (en cada una de sus variedades). <br>
+     * cofirma y contrafirma (en cada una de sus variedades).<br>
+     * Los datos introducidos mediante esta funci&oacuten;n
+     * sobreescribir&aacute;n cualquier otro establecido previamente mediante
+     * el m&eacute;todo setElectronicSignature.<br>
      * <br>
      * Sets the route to an electronic signature file as input for the signature
      * client. This method is mainly used to indicate electronic signature
-     * during every type of cosignature and counter-signature operations.
+     * during every type of cosignature and counter-signature operations.<br>
+     * Data entered with this function will overwrite any other which may have
+     * been previously set with setElectronicSignature method.
      * @param inElectronicSignatureFile
      *        Ruta del fichero de firma. <br>
-     *        Route to the signature file. */
+     *        Route to the signature file.
+     * @see #setElectronicSignature(String)
+     */
     void setElectronicSignatureFile(String inElectronicSignatureFile);
 
     /** Establece los nodos que deben contrafirmarse durante las operaciones de
@@ -1412,7 +1426,8 @@ public interface EntryPointsCrypto {
      * contrafirma de firmantes concretos se indicar&aacute;n los nombres de los
      * firmantes tal c&oacute;mo los devuelve {@link #getSignersStructure()}. En
      * el caso de la contrafirma de nodos los indices de los nodos (en donde el
-     * primer nodo es el 0). Los distintos elementos se indican consecutivos en
+     * primer nodo es el 0).<br>
+     * Los distintos elementos se indican consecutivos en
      * forma de cadena y separados por '\n' o '\r\n'. Los nodos s&oacute;lo se
      * contrafirmar&aacute;n una vez por cada operaci&oacute;n, as&iacute;
      * repetir firmantes o nodos no tendr&aacute; efecto sobre la
@@ -1421,10 +1436,11 @@ public interface EntryPointsCrypto {
      * Sets the nodes to counter-sign in signers and nodes' counter-signature
      * operations. When a specific signer's counter-signature is to be
      * performed, signers names will be indicated in the way returned by {@link #getSignersStructure()}. In case of nodes' counter-signature,
-     * nodes' indexes (where first node is 0). Different elements are
-     * consecutively indicated as a string and separated by '\n' or '\r\n'.
-     * Nodes will only be counter-signed once for each operation. Thus,
-     * repeating signers or nodes will have no effect on the operation.
+     * nodes' indexes (where first node is 0).<br>
+     * Different elements are consecutively indicated as a string and
+     * separated by '\n' or '\r\n'. Nodes will only be counter-signed once
+     * for each operation. Thus, repeating signers or nodes will have no
+     * effect on the operation.
      * @param signers
      *        Cadena de nombres de firmantes o &iacute;ndices de los nodos. <br>
      *        Signer names string or node indexes. */
@@ -2575,10 +2591,10 @@ public interface EntryPointsCrypto {
 
     /** Obtiene todos los alias de los certificados disponibles para firmar o
      * cifrar y los devuelve como una &uacute;nica cadena en donde los alias
-     * vienen separados por {@link es.gob.afirma.cliente.SignApplet#STRING_SEPARATOR}. <br>
+     * vienen separados por {@link es.gob.afirma.applet.SignApplet#STRING_SEPARATOR}. <br>
      * <br>
      * Gets all certificate aliases available for signing or encrypting, and
-     * returns them as a single string with aliases separated by {@link es.gob.afirma.cliente.SignApplet#STRING_SEPARATOR}
+     * returns them as a single string with aliases separated by {@link es.gob.afirma.applet.SignApplet#STRING_SEPARATOR}
      * @return Todos los alias de los certificados disponibles. <br>
      *         All available certificate's aliases. */
     String getCertificatesAlias();
@@ -2593,10 +2609,10 @@ public interface EntryPointsCrypto {
     String[] getArrayCertificatesAlias();
 
     /** Obtiene una cadena con todos los certificados del almac&eacute;n actual
-     * en ASCII Base64 separados por {@link es.gob.afirma.cliente.SignApplet#STRING_SEPARATOR}. <br>
+     * en ASCII Base64 separados por {@link es.gob.afirma.applet.SignApplet#STRING_SEPARATOR}. <br>
      * <br>
      * Gets a Base 64 ASCII string with all current keystore certificates,
-     * separated by {@link es.gob.afirma.cliente.SignApplet#STRING_SEPARATOR}.
+     * separated by {@link es.gob.afirma.applet.SignApplet#STRING_SEPARATOR}.
      * @return Cadena con todos los certificados. <br>
      *         String with all certificates. */
     String getCertificates();
