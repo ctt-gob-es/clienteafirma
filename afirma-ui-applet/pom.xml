@@ -16,13 +16,31 @@
   <dependencies>
     <dependency>
       <groupId>es.gob.afirma</groupId>
-      <artifactId>afirma-crypto-cipher</artifactId>
+      <artifactId>afirma-core</artifactId>
       <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>es.gob.afirma</groupId>
       <artifactId>afirma-core-keystores</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>es.gob.afirma</groupId>
+      <artifactId>afirma-crypto-cms-enveloper</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov-jdk15</artifactId>
+      <version>1.46</version>
+    </dependency>
+
+    <dependency>
+      <groupId>es.gob.afirma</groupId>
+      <artifactId>afirma-crypto-cipher</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -35,6 +53,36 @@
     <dependency>
       <groupId>es.gob.afirma</groupId>
       <artifactId>afirma-ui-core-jse</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>es.gob.afirma</groupId>
+      <artifactId>afirma-keystores-filters-rfc</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>es.gob.afirma</groupId>
+      <artifactId>afirma-core-firmaweb</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>es.gob.afirma</groupId>
+      <artifactId>afirma-core-massive</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>es.gob.afirma</groupId>
+      <artifactId>afirma-crypto-cades</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>es.gob.afirma</groupId>
+      <artifactId>afirma-keystores-filters-old</artifactId>
       <version>${project.version}</version>
     </dependency>
 

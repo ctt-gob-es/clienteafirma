@@ -71,6 +71,7 @@
       <modules>
         <module>afirma-ui-standalone</module>
         <module>afirma-ui-simpleafirma</module>
+        <module>afirma-ui-applet</module>
       </modules>
     </profile>
   </profiles>
