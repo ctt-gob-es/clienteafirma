@@ -15,13 +15,12 @@ public final class FileUtils {
      *        Ruta del fichero.
      * @return Contenido del fichero. */
     public static byte[] loadFile(final String path) {
-        final LoadFileAction loadFileAction = new LoadFileAction(path);
-        AccessController.doPrivileged(loadFileAction);
-        if (loadFileAction.isError()) {
-            Logger.getLogger("es.gob.afirma").severe(loadFileAction.getErrorMessage()); //$NON-NLS-1$
-            return null;
-        }
-        return loadFileAction.getResult();
+    	try {
+    		return AccessController.doPrivileged(new LoadFileAction(path));
+    	} catch (final Exception e) {
+    		Logger.getLogger("es.gob.afirma").severe(e.toString()); //$NON-NLS-1$
+    		return null;
+    	}
     }
 
     /** Carga un fichero de datos. Si ocurre un error durante la carga, se
@@ -30,12 +29,11 @@ public final class FileUtils {
      *        Ruta del fichero.
      * @return Contenido del fichero. */
     public static byte[] loadFile(final URI uri) {
-        final LoadFileAction loadFileAction = new LoadFileAction(uri);
-        AccessController.doPrivileged(loadFileAction);
-        if (loadFileAction.isError()) {
-            Logger.getLogger("es.gob.afirma").severe(loadFileAction.getErrorMessage()); //$NON-NLS-1$
-            return null;
-        }
-        return loadFileAction.getResult();
+    	try {
+    		return AccessController.doPrivileged(new LoadFileAction(uri));
+    	} catch (final Exception e) {
+    		Logger.getLogger("es.gob.afirma").severe(e.toString()); //$NON-NLS-1$
+    		return null;
+    	}
     }
 }

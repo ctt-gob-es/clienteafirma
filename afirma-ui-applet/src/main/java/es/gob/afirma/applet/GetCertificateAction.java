@@ -1,5 +1,6 @@
 package es.gob.afirma.applet;
 
+import java.security.PrivilegedExceptionAction;
 import java.security.cert.X509Certificate;
 
 import es.gob.afirma.core.AOCancelledOperationException;
@@ -9,14 +10,14 @@ import es.gob.afirma.keystores.main.common.AOKeystoreAlternativeException;
 /**
  * Recupera un certificado de un almac&eacute;n de claves. Se deber&aacute; indicar
  * tanto el alias del certificado como la configuraci&oacute;n con el repositorio
- * activo. 
+ * activo.
  */
-public class GetCertificateAction extends BasicPrivilegedAction<X509Certificate, Void> {
+public class GetCertificateAction implements PrivilegedExceptionAction<X509Certificate> {
 
-	private String alias;
-	
-	private KeyStoreConfigurationManager ksConfigManager;
-	
+	private final String alias;
+
+	private final KeyStoreConfigurationManager ksConfigManager;
+
 	/**
 	 * Construye la accui&oacute;n para la recuperaci&oacute;n del certificado de usuario.
 	 * @param alias Alias del certificado.
@@ -27,21 +28,19 @@ public class GetCertificateAction extends BasicPrivilegedAction<X509Certificate,
 		this.ksConfigManager = ksConfigManager;
 	}
 
-	public X509Certificate run() {
+	/** {@inheritDoc} */
+	public X509Certificate run() throws AOKeyStoreManagerException, AOKeystoreAlternativeException {
 		try {
             return (X509Certificate) this.ksConfigManager.getCertificate(this.alias);
         }
         catch (final AOCancelledOperationException e) {
-            setError(AppletMessages.getString("SignApplet.68"), e); //$NON-NLS-1$
-            return null;
+            throw e;
         }
         catch (final AOKeyStoreManagerException e) {
-            setError(AppletMessages.getString("SignApplet.6"), e); //$NON-NLS-1$
-            return null;
+        	throw e;
         }
         catch (final AOKeystoreAlternativeException e) {
-        	setError(AppletMessages.getString("SignApplet.6"), e); //$NON-NLS-1$
-        	return null;
+        	throw e;
         }
 	}
 }

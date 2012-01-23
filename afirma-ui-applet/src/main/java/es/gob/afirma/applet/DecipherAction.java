@@ -12,12 +12,13 @@ package es.gob.afirma.applet;
 
 import java.io.IOException;
 import java.security.KeyException;
+import java.security.PrivilegedExceptionAction;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 
 /** Acci&oacute;n privilegiada para el descifrado de datos. */
-public final class DecipherAction extends BasicPrivilegedAction<Boolean, Void> {
+public final class DecipherAction implements PrivilegedExceptionAction<Void> {
 
     /** Manejador de cifrado. */
     private final CipherManager cipherManager;
@@ -43,7 +44,8 @@ public final class DecipherAction extends BasicPrivilegedAction<Boolean, Void> {
         this.data = data;
     }
 
-    public Boolean run() {
+    /** {@inheritDoc} */
+    public Void run() throws IOException, KeyException, AOException {
 
         try {
             if (this.data == null) {
@@ -54,21 +56,17 @@ public final class DecipherAction extends BasicPrivilegedAction<Boolean, Void> {
             }
         }
         catch (final AOCancelledOperationException e) {
-            setError("Operacion cancelada por el usuario", e); //$NON-NLS-1$
-            return Boolean.FALSE;
+            throw e;
         }
         catch (final IOException e) {
-            setError("No se han podido leer los datos a descifrar", e); //$NON-NLS-1$
-            return Boolean.FALSE;
+        	throw new IOException("No se han podido leer los datos a descifrar"); //$NON-NLS-1$
         }
         catch (final KeyException e) {
-            setError("Se ha proporcionado una clave incorrecta", e); //$NON-NLS-1$
-            return Boolean.FALSE;
+            throw new KeyException("Se ha proporcionado una clave incorrecta", e); //$NON-NLS-1$
         }
         catch (final AOException e) {
-            setError("Error durante el proceso de descifrado", e); //$NON-NLS-1$
-            return Boolean.FALSE;
+            throw e;
         }
-        return Boolean.TRUE;
+        return null;
     }
 }

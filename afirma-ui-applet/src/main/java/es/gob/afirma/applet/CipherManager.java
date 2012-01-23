@@ -14,10 +14,10 @@ import java.awt.Component;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyException;
 import java.security.NoSuchAlgorithmException;
+
 import javax.swing.JOptionPane;
 
 import es.gob.afirma.ciphers.AOCipherConstants;
@@ -41,7 +41,7 @@ public final class CipherManager {
 
     /** Caracteres ASCII validos para la contrase&ntilde;a de cifrado. */
     public final static String ACCEPTED_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"; //$NON-NLS-1$
-    
+
     /** Componente sobre el que se mostrar&aacute;n los di6aaclogos modales. */
     private Component parent = null;
 
@@ -379,7 +379,7 @@ public final class CipherManager {
      * @throws NoSuchAlgorithmException
      *         Algoritmo de cifrado no soportado.
      * @throws AOException
-     *         Ocurri&oacute; un error durante el proceso de cifrado. 
+     *         Ocurri&oacute; un error durante el proceso de cifrado.
      * @throws KeyException Cuando la clave de cifrado no sea compatible con el
      * algoritmo de firma configurado.
      */
@@ -427,7 +427,7 @@ public final class CipherManager {
      * @throws IllegalArgumentException
      *         Modo de clave no soportado.
      * @throws AOException
-     *         Error durante el proceso de cifrado. 
+     *         Error durante el proceso de cifrado.
      * @throws KeyException
      *         Cuando se indica una clave no v&aacute;lida para el cifrado.
      */
@@ -452,7 +452,7 @@ public final class CipherManager {
      * @throws NoSuchAlgorithmException
      *         Algoritmo de cifrado no soportado.
      * @throws AOException
-     *         Ocurri&oacute; un error al obtener la clave. 
+     *         Ocurri&oacute; un error al obtener la clave.
      * @throws KeyException Cuando se produce un error al generar la clave.
      */
     public Key getConfiguredKey() throws NoSuchAlgorithmException, AOException, KeyException {
@@ -474,7 +474,7 @@ public final class CipherManager {
      * @throws IllegalArgumentException
      *         Modo de clave no soportado.
      * @throws AOException
-     *         Ocurri&oacute; un error al obtener la clave. 
+     *         Ocurri&oacute; un error al obtener la clave.
      * @throws KeyException Cuando se produce un error al generar la clave.
      */
     private Key getConfiguredKey(final AOCipher cipher, final AOCipherConfig config) throws NoSuchAlgorithmException, AOException, KeyException {
@@ -584,7 +584,7 @@ public final class CipherManager {
             } else {
                 dataToDecipher = AOUtil.getDataFromInputStream(is);
             }
-            
+
             try {
                 is.close();
             }
@@ -604,12 +604,10 @@ public final class CipherManager {
      *         Cuando el usuario cancela la operaci&oacute;n.
      * @throws AOException
      *         Cuando ocurre un error durante el desencriptado.
-     * @throws InvalidKeyException
-     *         Cuando se proporciona una clave incorrecta. 
      * @throws KeyException
      *         Cuando la clave no sea correcta.
      */
-    public void decipherData(final byte[] dataToDecipher) throws AOException, InvalidKeyException, KeyException {
+    public void decipherData(final byte[] dataToDecipher) throws AOException, KeyException {
 
         // Si no esta establecido el algoritmo de cifrado usamos el por
         // defecto, pero solo para esta ocasion

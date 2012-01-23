@@ -9,6 +9,8 @@
  */
 package es.gob.afirma.applet;
 
+import java.security.PrivilegedExceptionAction;
+
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
@@ -17,7 +19,7 @@ import es.gob.afirma.keystores.main.common.AOKeyStoreManagerException;
 
 /** Acci&oacute;n privilegiada para agregar un nuevo remitentes a un sobre
  * electr&oacute;nico. La ejecuci&oacute;n de la acci&oacute;n devuelve {@code true} o {@code false} y el resultado almacenado es un array de bytes. */
-public final class CoEnvelopAction extends BasicPrivilegedAction<Boolean, byte[]> {
+public final class CoEnvelopAction implements PrivilegedExceptionAction<byte[]> {
 
     /** Manejador de ensobrado. */
     private final EnveloperManager enveloperManager;
@@ -39,33 +41,26 @@ public final class CoEnvelopAction extends BasicPrivilegedAction<Boolean, byte[]
         this.envelop = envelop.clone();
     }
 
-    public Boolean run() {
+    /** {@inheritDoc} */
+    public byte[] run() throws AOKeyStoreManagerException, AOCertificatesNotFoundException, AOInvalidFormatException, AOException {
         try {
             this.enveloperManager.coEnvelop(this.envelop);
         }
         catch (final AOCancelledOperationException e) {
-            setError("Operacion cancelada por el usuario", e); //$NON-NLS-1$
-            return Boolean.FALSE;
+            throw e;
         }
         catch (final AOKeyStoreManagerException e) {
-            setError("No se ha podido acceder al almac&eacute;n de certificados seleccionado", e); //$NON-NLS-1$
-            return Boolean.FALSE;
+            throw e;
         }
         catch (final AOCertificatesNotFoundException e) {
-            setError("No se han encontrado certificados en el almacen seleccionado", e); //$NON-NLS-1$
-            return Boolean.FALSE;
+            throw e;
         }
         catch (final AOInvalidFormatException e) {
-            setError("No se ha proporcionado un envoltorio soportado", e); //$NON-NLS-1$
-            return Boolean.FALSE;
+            throw new AOInvalidFormatException("No se ha proporcionado un envoltorio soportado", e); //$NON-NLS-1$
         }
         catch (final AOException e) {
-            setError("Error al agregar el nuevo remitente", e); //$NON-NLS-1$
-            return Boolean.FALSE;
+            throw e;
         }
-
-        this.setResult(this.enveloperManager.getEnvelopedData());
-
-        return Boolean.TRUE;
+        return this.enveloperManager.getEnvelopedData();
     }
 }

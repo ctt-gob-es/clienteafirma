@@ -22,10 +22,12 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.security.AccessController;
-import java.security.InvalidKeyException;
+import java.security.KeyException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
@@ -482,34 +484,32 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     }
 
     private final X509Certificate getCertificateBinary(final String alias) {
-        final GetCertificateAction getCertAction = new GetCertificateAction(alias, this.ksConfigManager);
-        final X509Certificate cert = AccessController.doPrivileged(getCertAction);
-        if (getCertAction.isError()) {
-            if (getCertAction.getException() instanceof AOKeystoreAlternativeException) {
-            	final AOKeystoreAlternativeException e = (AOKeystoreAlternativeException) getCertAction.getException();
-            	final AOKeyStore kst = e.getAlternativeKsm();
-            	if (kst == null) {
-            		LOGGER.severe("Error al inicializar el repositorio de certificados: " + e); //$NON-NLS-1$
-            		this.setError(AppletMessages.getString("SignApplet.6")); //$NON-NLS-1$
-            		return null;
-            	}
-            	if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(this,
-            			AppletMessages.getString("SignApplet.4", kst.getDescription()), //$NON-NLS-1$
-            			AppletMessages.getString("SignApplet.658"), //$NON-NLS-1$
-            			JOptionPane.WARNING_MESSAGE)) {
-            		setKeyStore(null, null, kst.toString());
-            		return getCertificateBinary(alias);
-            	}
-            	LOGGER.severe("Operacion cancelada por el usuario"); //$NON-NLS-1$
-            	SignApplet.this.setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
-            	return null;
-            }
-            LOGGER.severe(getCertAction.getErrorMessage());
-            this.setError(getCertAction.getErrorMessage());
-            return null;
-        }
-
-        return cert;
+    	try {
+    		return AccessController.doPrivileged(new GetCertificateAction(alias, this.ksConfigManager));
+    	} catch (final PrivilegedActionException e) {
+    		if (e.getCause() instanceof AOKeystoreAlternativeException) {
+    			final AOKeyStore kst = ((AOKeystoreAlternativeException) e.getCause()).getAlternativeKsm();
+    			if (kst == null) {
+    				LOGGER.severe("Error al inicializar el repositorio de certificados: " + e.getCause()); //$NON-NLS-1$
+    				this.setError(AppletMessages.getString("SignApplet.6")); //$NON-NLS-1$
+    				return null;
+    			}
+    			if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(this,
+    					AppletMessages.getString("SignApplet.4", kst.getDescription()), //$NON-NLS-1$
+    					AppletMessages.getString("SignApplet.658"), //$NON-NLS-1$
+    					JOptionPane.WARNING_MESSAGE)) {
+    				setKeyStore(null, null, kst.toString());
+    				return getCertificateBinary(alias);
+    			}
+    			LOGGER.severe("Operacion cancelada por el usuario"); //$NON-NLS-1$
+    			SignApplet.this.setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
+    			return null;
+    		} else {
+    			LOGGER.severe(e.toString());
+    			this.setError(e.getMessage());
+    			return null;
+    		}
+    	}
     }
 
     static void saveDataToStorage(final byte[] binaryData, final String filename) throws AOException {
@@ -1998,14 +1998,13 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                 }
 
                 // Cargamos los datos de la URI configurada
-                final LoadFileAction loadFileAction = new LoadFileAction(this.fileUri);
-                AccessController.doPrivileged(loadFileAction);
-                if (loadFileAction.isError()) {
-                    LOGGER.severe(loadFileAction.getErrorMessage());
-                    this.setError(AppletMessages.getString("SignApplet.407")); //$NON-NLS-1$
-                    throw new AOException(loadFileAction.getErrorMessage(), loadFileAction.getException());
+                try {
+                	tempData = AccessController.doPrivileged(new LoadFileAction(this.fileUri));
+                } catch (final Exception e) {
+                	LOGGER.severe(e.toString());
+                	this.setError(AppletMessages.getString("SignApplet.407")); //$NON-NLS-1$
+                	throw new AOException(e.getMessage(), e);
                 }
-                tempData = loadFileAction.getResult();
             } // Se nos ha introducido un hash
             else {
                 tempData = this.hash;
@@ -2792,19 +2791,18 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     public boolean cipherData(final byte[] dat) {
 
         // El resultado queda almacenado en el objeto CipherManager
-        final BasicPrivilegedAction<Boolean, Void> cipherAction = new CipherAction(this.cipherManager, dat);
-        AccessController.doPrivileged(cipherAction);
-        if (cipherAction.isError()) {
-            setError(AppletMessages.getString("SignApplet.93")); //$NON-NLS-1$
-            if (cipherAction.getException() instanceof AOCancelledOperationException) {
-                setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
-            }
-            else {
-                setError(AppletMessages.getString("SignApplet.92")); //$NON-NLS-1$
-            }
-
-            LOGGER.severe(cipherAction.getErrorMessage() + ": " + cipherAction.getException()); //$NON-NLS-1$
-            return false;
+        final PrivilegedExceptionAction<Void> cipherAction = new CipherAction(this.cipherManager, dat);
+        try {
+        	AccessController.doPrivileged(cipherAction);
+        } catch (final PrivilegedActionException e) {
+        	if (e.getCause() instanceof AOCancelledOperationException) {
+        		setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
+        		LOGGER.severe("Error: " + e.toString()); //$NON-NLS-1$
+        		return false;
+        	}
+        	setError(AppletMessages.getString("SignApplet.93")); //$NON-NLS-1$
+        	LOGGER.severe("Error: " + e.toString()); //$NON-NLS-1$
+        	return false;
         }
         return true;
     }
@@ -2847,22 +2845,20 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     public boolean decipherData(final byte[] dat) {
 
         // El resultado quedara almacenado en el objeto CipherManager
-        final BasicPrivilegedAction<Boolean, Void> decipherAction = new DecipherAction(this.cipherManager, dat);
-        AccessController.doPrivileged(decipherAction);
-        if (decipherAction.isError()) {
-            LOGGER.severe(decipherAction.getErrorMessage() + ": " + decipherAction.getException()); //$NON-NLS-1$
-            if (decipherAction.getException() instanceof AOCancelledOperationException) {
-                setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
-            }
-            else if (decipherAction.getException() instanceof InvalidKeyException) {
-                setError(AppletMessages.getString("SignApplet.111")); //$NON-NLS-1$
-            }
-            else {
-                setError(AppletMessages.getString("SignApplet.92")); //$NON-NLS-1$
-            }
-            return false;
-        }
-
+    	try {
+    		AccessController.doPrivileged(new DecipherAction(this.cipherManager, dat));
+    	} catch (final PrivilegedActionException e) {
+    		if (e.getCause() instanceof AOCancelledOperationException) {
+    			setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
+    			return false;
+    		} else if (e.getCause() instanceof KeyException) {
+    			setError(AppletMessages.getString("SignApplet.111")); //$NON-NLS-1$
+    			return false;
+    		} else {
+    			setError(AppletMessages.getString("SignApplet.92")); //$NON-NLS-1$
+    			return false;
+    		}
+    	}
         return true;
     }
 
@@ -3164,22 +3160,19 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         this.enveloperManager.setKsConfigManager(this.ksConfigManager);
         this.enveloperManager.setCipherManager(this.cipherManager);
 
-        final BasicPrivilegedAction<Boolean, byte[]> envelopAction = new WrapAction(this.enveloperManager, contentData);
-        final boolean result = AccessController.doPrivileged(envelopAction).booleanValue();
-        if (envelopAction.isError()) {
-            if (envelopAction.getException() instanceof AOCancelledOperationException) {
-                setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
-            }
-            else {
-                setError(AppletMessages.getString("SignApplet.65")); //$NON-NLS-1$
-            }
-            LOGGER.severe(envelopAction.getErrorMessage());
-            return false;
+        try {
+        	this.data = AccessController.doPrivileged(new WrapAction(this.enveloperManager, contentData));
+        } catch (final PrivilegedActionException e) {
+        	if (e.getCause() instanceof AOCancelledOperationException) {
+        		setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
+        		LOGGER.severe(e.toString());
+        		return false;
+        	}
+        	setError(AppletMessages.getString("SignApplet.65")); //$NON-NLS-1$
+        	LOGGER.severe(e.toString());
+        	return false;
         }
-
-        this.data = envelopAction.getResult();
-
-        return result;
+        return true;
     }
 
     public boolean coEnvelop() {
@@ -3202,23 +3195,19 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         this.enveloperManager.setKsConfigManager(this.ksConfigManager);
         this.enveloperManager.setCipherManager(this.cipherManager);
 
-        final BasicPrivilegedAction<Boolean, byte[]> coEnvelopAction = new CoEnvelopAction(this.enveloperManager, envelop);
-
-        final boolean result = AccessController.doPrivileged(coEnvelopAction).booleanValue();
-        if (coEnvelopAction.isError()) {
-            if (coEnvelopAction.getException() instanceof AOCancelledOperationException) {
-                setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
-            }
-            else {
-                setError("Ocurrio un error al agregar un nuevo remitente al sobre electr\u00F3nico"); //$NON-NLS-1$
-            }
-            LOGGER.severe(coEnvelopAction.getErrorMessage());
-            return false;
+        try {
+        	this.data = AccessController.doPrivileged(new CoEnvelopAction(this.enveloperManager, envelop));
+        } catch (final PrivilegedActionException e) {
+        	if (e.getCause() instanceof AOCancelledOperationException) {
+        		setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
+        		LOGGER.severe(e.toString());
+        		return false;
+        	}
+        	setError("Ocurri\u00F3 un error al agregar un nuevo remitente al sobre electr\u00F3nico");
+        	LOGGER.severe(e.toString());
+        	return false;
         }
-
-        this.data = coEnvelopAction.getResult();
-
-        return result;
+        return true;
     }
 
     public boolean recoverCMS() {
@@ -3238,29 +3227,28 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         this.enveloperManager.setKsConfigManager(this.ksConfigManager);
         this.enveloperManager.setCipherManager(this.cipherManager);
 
-        final BasicPrivilegedAction<Boolean, byte[]> unwrapAction = new UnwrapAction(this.enveloperManager, contentData);
-        final boolean result = AccessController.doPrivileged(unwrapAction).booleanValue();
-
-        if (unwrapAction.isError()) {
-            if (unwrapAction.getException() instanceof AOCancelledOperationException) {
-                setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
-            }
-            else if (unwrapAction.getException() instanceof AOInvalidRecipientException) {
-                setError(AppletMessages.getString("SignApplet.112")); //$NON-NLS-1$
-            }
-            else if (unwrapAction.getException() instanceof AOInvalidFormatException) {
-                setError(AppletMessages.getString("SignApplet.75")); //$NON-NLS-1$
-            }
-            else {
-                setError(AppletMessages.getString("SignApplet.77")); //$NON-NLS-1$
-            }
-            LOGGER.severe(unwrapAction.getErrorMessage());
-            return false;
+        try {
+        	this.data = AccessController.doPrivileged(new UnwrapAction(this.enveloperManager, contentData));
+        } catch (final PrivilegedActionException e) {
+        	if (e.getCause() instanceof AOCancelledOperationException) {
+        		setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
+        		LOGGER.severe(e.toString());
+        		return false;
+        	} else if (e.getCause() instanceof AOInvalidRecipientException) {
+        		setError(AppletMessages.getString("SignApplet.112")); //$NON-NLS-1$
+        		LOGGER.severe(e.toString());
+        		return false;
+        	} else if (e.getCause() instanceof AOInvalidFormatException) {
+        		setError(AppletMessages.getString("SignApplet.75")); //$NON-NLS-1$
+        		LOGGER.severe(e.toString());
+        		return false;
+        	} else {
+        		setError(AppletMessages.getString("SignApplet.77")); //$NON-NLS-1$
+        		LOGGER.severe(e.toString());
+        		return false;
+        	}
         }
-
-        this.data = unwrapAction.getResult();
-
-        return result;
+        return true;
     }
 
     public String formatEncryptedCMS(final String b64) {

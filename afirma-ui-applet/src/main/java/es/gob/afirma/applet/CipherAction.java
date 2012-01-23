@@ -13,14 +13,18 @@ package es.gob.afirma.applet;
 import java.io.IOException;
 import java.security.KeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivilegedExceptionAction;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 
 /** Acci&oacute;n privilegiada para el cifrado de datos. */
-public final class CipherAction extends BasicPrivilegedAction<Boolean, Void> {
+public final class CipherAction implements PrivilegedExceptionAction<Void> {
 
-    /** Manejador de cifrado. */
+    /** Serial Version. */
+	private static final long serialVersionUID = -2065741256850432226L;
+
+	/** Manejador de cifrado. */
     private final CipherManager cipherManager;
 
     /** Datos que se desean cifrar. */
@@ -42,7 +46,8 @@ public final class CipherAction extends BasicPrivilegedAction<Boolean, Void> {
         this.data = data.clone();
     }
 
-    public Boolean run() {
+    /** {@inheritDoc} */
+    public Void run() throws NoSuchAlgorithmException, KeyException, IOException, AOException {
 
         try {
             if (this.data == null) {
@@ -53,30 +58,24 @@ public final class CipherAction extends BasicPrivilegedAction<Boolean, Void> {
             }
         }
         catch (final AOCancelledOperationException e) {
-            setError("Operacion cancelada por el usuario", e); //$NON-NLS-1$
-            return Boolean.FALSE;
+            throw e;
         }
         catch (final IllegalArgumentException e) {
-            setError("Modo de clave no soportado", e); //$NON-NLS-1$
-            return Boolean.FALSE;
+            throw new IllegalArgumentException("Modo de clave no soportado", e); //$NON-NLS-1$
         }
         catch (final NoSuchAlgorithmException e) {
-            setError("Algoritmo de cifrado no soportado", e); //$NON-NLS-1$
-            return Boolean.FALSE;
+        	throw new NoSuchAlgorithmException("Algoritmo de cifrado no soportado", e); //$NON-NLS-1$
         }
         catch (final KeyException e) {
-            setError("Clave de cifrado no valida", e); //$NON-NLS-1$
-            return Boolean.FALSE;
+            throw new KeyException("Clave de cifrado no valida", e); //$NON-NLS-1$
         }
         catch (final IOException e) {
-            setError("No se han podido leer los datos a cifrar", e); //$NON-NLS-1$
-            return Boolean.FALSE;
+            throw new IOException("No se han podido leer los datos a cifrar"); //$NON-NLS-1$
         }
         catch (final AOException e) {
-            setError("Error durante el proceso de cifrado", e); //$NON-NLS-1$
-            return Boolean.FALSE;
+           throw e;
         }
 
-        return Boolean.TRUE;
+        return null;
     }
 }

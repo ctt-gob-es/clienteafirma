@@ -10,6 +10,7 @@
 package es.gob.afirma.applet;
 
 import java.io.IOException;
+import java.security.PrivilegedExceptionAction;
 import java.security.cert.CertificateEncodingException;
 
 import es.gob.afirma.core.AOCancelledOperationException;
@@ -20,7 +21,7 @@ import es.gob.afirma.envelopers.cms.AOInvalidRecipientException;
 /** Acci&oacute;n privilegiada para el desensobrado de datos. La ejecuci&oacute;n
  * de la acci&oacute;n devuelve {@code true} o {@code false} y el resultado
  * almacenado es un array de bytes. */
-public final class UnwrapAction extends BasicPrivilegedAction<Boolean, byte[]> {
+public final class UnwrapAction implements PrivilegedExceptionAction<byte[]> {
 
     /** Manejador de ensobrado. */
     private final EnveloperManager enveloperManager;
@@ -46,43 +47,34 @@ public final class UnwrapAction extends BasicPrivilegedAction<Boolean, byte[]> {
         this.envelop = envelop.clone();
     }
 
-    public Boolean run() {
+    /** {@inheritDoc} */
+    public byte[] run() throws AOInvalidRecipientException, AOInvalidFormatException, IOException, AOException, CertificateEncodingException {
 
         try {
             this.enveloperManager.unwrap(this.envelop);
         }
         catch (final AOCancelledOperationException e) {
-            setError("Operacion cancelada por el usuario", e); //$NON-NLS-1$
-            return Boolean.FALSE;
+            throw e;
         }
         catch (final AOInvalidRecipientException e) {
-            setError("El usuario no es uno de los destinatarios del sobre", e); //$NON-NLS-1$
-            return Boolean.FALSE;
+            throw e;
         }
         catch (final AOInvalidFormatException e) {
-            setError("No se ha proporcionado un envoltorio soportado", e); //$NON-NLS-1$
-            return Boolean.FALSE;
+            throw new AOInvalidFormatException("No se ha proporcionado un envoltorio soportado", e); //$NON-NLS-1$
         }
         catch (final IllegalArgumentException e) {
-            setError("Modo de clave no soportado", e); //$NON-NLS-1$
-            return Boolean.FALSE;
+            throw new IllegalArgumentException("Modo de clave no soportado", e); //$NON-NLS-1$
         }
         catch (final IOException e) {
-            setError("El envoltorio esta corrupto o no ha podido leerse", e); //$NON-NLS-1$
-            return Boolean.FALSE;
+            throw new IOException("El envoltorio esta corrupto o no ha podido leerse"); //$NON-NLS-1$
         }
         catch (final AOException e) {
-            setError("Error durante el proceso de desensobrado", e); //$NON-NLS-1$
-            return Boolean.FALSE;
+            throw e;
         }
         catch (final CertificateEncodingException e) {
-            setError("El certificado del destinatario no es valido", e); //$NON-NLS-1$
-            return Boolean.FALSE;
+            throw new CertificateEncodingException("El certificado del destinatario no es valido", e); //$NON-NLS-1$
         }
-
-        this.setResult(this.enveloperManager.getContentData());
-
-        return Boolean.TRUE;
+       return this.enveloperManager.getContentData();
     }
 
 }

@@ -13,13 +13,14 @@ package es.gob.afirma.applet;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.URI;
+import java.security.PrivilegedExceptionAction;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 
 /** Acci&oacute;n privilegiada que carga el contenido de un fichero y devuelve
  * almacena como resultado su valor en un objeto {@code byte[]}. */
-public final class LoadFileAction extends BasicPrivilegedAction<Boolean, byte[]> {
+public final class LoadFileAction implements PrivilegedExceptionAction<byte[]> {
 
     /** Ruta del fichero que se desea cargar. */
     private URI uri = null;
@@ -35,8 +36,7 @@ public final class LoadFileAction extends BasicPrivilegedAction<Boolean, byte[]>
             this.uri = AOUtil.createURI(strUri);
         }
         catch (final AOException e) {
-            this.setError("La URI '" + strUri + "' no es valida", e); //$NON-NLS-1$ //$NON-NLS-2$
-            throw new IllegalArgumentException(this.getErrorMessage(), e);
+            throw new IllegalArgumentException("La URI '" + strUri + "' no es valida", e); //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
 
@@ -49,20 +49,19 @@ public final class LoadFileAction extends BasicPrivilegedAction<Boolean, byte[]>
         this.uri = fileUri;
     }
 
-    public Boolean run() {
+    /** {@inheritDoc} */
+    public byte[] run() throws FileNotFoundException, Exception {
 
         InputStream is = null;
         try {
             is = AOUtil.loadFile(this.uri);
-            this.setResult(AOUtil.getDataFromInputStream(is));
+            return AOUtil.getDataFromInputStream(is);
         }
         catch (final FileNotFoundException e) {
-            this.setError("El fichero '" + this.uri.toASCIIString() + "' no existe", e); //$NON-NLS-1$ //$NON-NLS-2$
-            return Boolean.FALSE;
+            throw new FileNotFoundException("El fichero '" + this.uri.toASCIIString() + "' no existe"); //$NON-NLS-1$ //$NON-NLS-2$
         }
         catch (final Exception e) {
-            this.setError("No se pudo acceder al fichero '" + this.uri.toASCIIString() + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
-            return Boolean.FALSE;
+            throw new Exception("No se pudo acceder al fichero '" + this.uri.toASCIIString() + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
         }
         finally {
             if (is != null) {
@@ -74,6 +73,5 @@ public final class LoadFileAction extends BasicPrivilegedAction<Boolean, byte[]>
                 }
             }
         }
-        return Boolean.TRUE;
     }
 }
