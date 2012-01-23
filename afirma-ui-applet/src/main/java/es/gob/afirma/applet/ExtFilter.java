@@ -1,3 +1,13 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
 package es.gob.afirma.applet;
 
 import java.io.File;
@@ -12,8 +22,8 @@ import javax.swing.filechooser.FileFilter;
  * @version 0.3 */
 final class ExtFilter extends FileFilter implements java.io.FileFilter {
 
-    private String[] extensions;
-    private String description;
+    private final String[] extensions;
+    private final String description;
 
     /** Construye un filtro para la selecci&oacute;n de ficheros en un <code>JFileChooser</code>.
      * @param exts
@@ -21,7 +31,7 @@ final class ExtFilter extends FileFilter implements java.io.FileFilter {
      * @param desc
      *        Descripci&oacute;n del tipo de fichero correspondiente a
      *        las extensiones */
-    public ExtFilter(final String[] exts, String desc) {
+    public ExtFilter(final String[] exts, final String desc) {
         if (exts == null || exts.length < 1) {
             throw new IllegalArgumentException("No se puede crear un filtro vacio"); //$NON-NLS-1$
         }
