@@ -425,9 +425,6 @@ public class DirectorySignatureHelper {
      *        Referencia a la clave de firma.
      * @param configuredSigner
      *        Configuraci&oacute;n de la operaci&oacute;n de firma.
-     * @param showHashes
-     *        Indica si se debe mostrar un di&acute;logo al usuario para
-     *        idenfificar cada hash que se vaya a firmar.
      * @param config
      *        Configuraci&oacute;n preestablecida de firma.
      * @return Firmas generadas.
@@ -436,7 +433,6 @@ public class DirectorySignatureHelper {
     public String[] hashesMassiveSign(final String[] hashes,
                                       final PrivateKeyEntry keyEntry,
                                       final AOSigner configuredSigner,
-                                      final boolean showHashes,
                                       final Properties config) throws AOException {
 
         if (hashes == null || keyEntry == null) {
@@ -784,7 +780,7 @@ public class DirectorySignatureHelper {
                     signConfig.setProperty("mimeType", mimeType); //$NON-NLS-1$
                     final String dataOid = MimeHelper.transformMimeTypeToOid(mimeType);
                     if (dataOid != null) {
-                    	signConfig.setProperty("oid", MimeHelper.transformMimeTypeToOid(mimeType)); //$NON-NLS-1$
+                    	signConfig.setProperty("contentTypeOid", MimeHelper.transformMimeTypeToOid(mimeType)); //$NON-NLS-1$
                     }
                 }
                 catch (final Exception e) {

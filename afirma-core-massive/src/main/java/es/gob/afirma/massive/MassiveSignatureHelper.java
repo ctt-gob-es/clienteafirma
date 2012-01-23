@@ -364,7 +364,7 @@ public final class MassiveSignatureHelper {
                     config.setProperty("mimeType", mimeType); //$NON-NLS-1$
                     final String dataOid = MimeHelper.transformMimeTypeToOid(mimeType);
                     if (dataOid != null) {
-                    	config.setProperty("oid", MimeHelper.transformMimeTypeToOid(mimeType)); //$NON-NLS-1$
+                    	config.setProperty("contentTypeOid", MimeHelper.transformMimeTypeToOid(mimeType)); //$NON-NLS-1$
                     }
                 }
                 catch (final Exception e) {
@@ -410,7 +410,7 @@ public final class MassiveSignatureHelper {
                 config.setProperty("mimeType", mimeType); //$NON-NLS-1$
                 final String dataOid = MimeHelper.transformMimeTypeToOid(mimeType);
                 if (dataOid != null) {
-                	config.setProperty("oid", MimeHelper.transformMimeTypeToOid(mimeType)); //$NON-NLS-1$
+                	config.setProperty("contentTypeOid", MimeHelper.transformMimeTypeToOid(mimeType)); //$NON-NLS-1$
                 }
             }
             catch (final Exception e) {
