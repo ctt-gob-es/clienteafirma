@@ -503,11 +503,10 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     			LOGGER.severe("Operacion cancelada por el usuario"); //$NON-NLS-1$
     			SignApplet.this.setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
     			return null;
-    		} else {
-    			LOGGER.severe(e.toString());
-    			this.setError(e.getMessage());
-    			return null;
     		}
+			LOGGER.severe(e.toString());
+			this.setError(e.getMessage());
+			return null;
     	}
     }
 
@@ -1955,8 +1954,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     /** Obtiene los datos con los que se deben reaizar las operaciones de firma y
      * ensobrado de datos.
      * @return Datos de entrada.
-     * @throws AOException
-     *         Si ocurren errores obtener los datos. */
+     * @throws AOException Si ocurren errores obtener los datos. */
     byte[] getInData() throws AOException {
         byte[] tempData = null;
 
@@ -3203,7 +3201,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         		LOGGER.severe(e.toString());
         		return false;
         	}
-        	setError("Ocurri\u00F3 un error al agregar un nuevo remitente al sobre electr\u00F3nico");
+        	setError("Error al agregar un nuevo remitente al sobre electr\u00F3nico");
         	LOGGER.severe(e.toString());
         	return false;
         }
