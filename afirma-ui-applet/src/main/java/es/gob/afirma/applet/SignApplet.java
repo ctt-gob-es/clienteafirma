@@ -1400,7 +1400,6 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                                                                 // antes los atributos de firma que
                                                                 // correspondan
                                                                 SignApplet.this.addAttributes(massiveSigner.getDefaultSigner()),
-                                                                SignApplet.this.showHashes,
                                                                 SignApplet.this.genericConfig);
                     }
                     catch (final AOException e) {
@@ -3152,6 +3151,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
         if (contentType != null) {
             this.enveloperManager.setCmsContentType(contentType);
+        }
+        if (this.enveloperManager.getCmsContentType() == null) {
+        	this.enveloperManager.setCmsContentType(AOSignConstants.CMS_CONTENTTYPE_ENVELOPEDDATA);
         }
 
         // Le pasamos la configuracion de almacenes y cifrado establecidas
