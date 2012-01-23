@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -35,12 +35,12 @@ public final class AOCipherConfig {
      *        Modo de bloque para el cifrado
      * @param padd
      *        Relleno (<i>padding</i>) del cifrado */
-    public AOCipherConfig(final AOCipherAlgorithm algo, final AOCipherBlockMode mode, AOCipherPadding padd) {
+    public AOCipherConfig(final AOCipherAlgorithm algo, final AOCipherBlockMode mode, final AOCipherPadding padd) {
 
         // En caso de nulos tomamos defectos y algunas combinaciones
         // predefinidas
-        AOCipherAlgorithm ciphAlgo = (algo != null) ? algo : AOCipherAlgorithm.getDefault();
-        
+        final AOCipherAlgorithm ciphAlgo = (algo != null) ? algo : AOCipherAlgorithm.getDefault();
+
         AOCipherBlockMode ciphMode = mode;
         if (ciphMode == null) {
             if (ciphAlgo.equals(AOCipherAlgorithm.PBEWITHMD5ANDDES) || ciphAlgo.equals(AOCipherAlgorithm.PBEWITHSHA1ANDDESEDE)
@@ -51,7 +51,7 @@ public final class AOCipherConfig {
                 ciphMode = AOCipherBlockMode.ECB;
             }
         }
-        
+
         AOCipherPadding ciphPadding = padd;
         if (ciphPadding == null) {
             if (ciphAlgo.equals(AOCipherAlgorithm.ARCFOUR)) {

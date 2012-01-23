@@ -185,7 +185,7 @@ final class PanelClaveCifrado extends JAccessibilityDialogWizard {
         }
         // Generamos la clave necesaria para el cifrado
         try {
-            this.cipherKey = this.cipherConfig.getCipher().decodeKey(this.campoClave.getText(), this.cipherConfig.getConfig(), null);
+            this.cipherKey = this.cipherConfig.getCipher().decodeKey(Base64.decode(this.campoClave.getText()), this.cipherConfig.getConfig(), null);
         }
         catch (final Exception ex) {
             logger.severe("Error durante el proceso de generacion de claves: " + ex); //$NON-NLS-1$

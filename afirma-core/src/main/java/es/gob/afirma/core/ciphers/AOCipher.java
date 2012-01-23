@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -75,8 +75,8 @@ public interface AOCipher {
     /** Obtiene una clave para el algoritmo seleccionado a partir de su
      * codificaci&oacute;n. Seg&uacute;n el algoritmo puede ser necesario o no
      * el uso de par&aacute;metros adicionales.
-     * @param base64Key
-     *        Clave codificada en Base64.
+     * @param key
+     *        Clave codificada.
      * @param algorithmConfig
      *        Algoritmo de cifrado.
      * @param params
@@ -84,7 +84,7 @@ public interface AOCipher {
      * @return Clave.
      * @throws KeyException
      *         Cuando se produce un error al generar la clave. */
-    Key decodeKey(String base64Key, AOCipherConfig algorithmConfig, Object[] params) throws KeyException;
+    Key decodeKey(byte[] key, AOCipherConfig algorithmConfig, Object[] params) throws KeyException;
 
     /** Obtiene una clave para el algoritmo seleccionado a partir de la
      * contrase&ntilde;a. Seg&uacute;n el algoritmo puede ser necesario o no el

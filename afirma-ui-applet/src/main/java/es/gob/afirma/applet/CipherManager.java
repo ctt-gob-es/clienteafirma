@@ -28,8 +28,6 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ciphers.AOCipher;
 import es.gob.afirma.core.ciphers.AOCipherConfig;
 import es.gob.afirma.core.ciphers.CipherConstants.AOCipherAlgorithm;
-import es.gob.afirma.core.ciphers.CipherConstants.AOCipherBlockMode;
-import es.gob.afirma.core.ciphers.CipherConstants.AOCipherPadding;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.ui.AOUIFactory;
@@ -62,7 +60,7 @@ public final class CipherManager {
     private String keyMode = AOCipherConstants.DEFAULT_KEY_MODE;
 
     /** Clave para el cifrado y desencriptado en base 64 */
-    private String cipherB64Key = null;
+    private byte[] cipherKeyEncoded = null;
 
     /** Contrase&ntilde;a para el cifrado de datos. */
     private char[] cipherPassword = null;
@@ -101,7 +99,7 @@ public final class CipherManager {
         this.cipherKeystorePass = null;
         this.useCipherKeyStore = true;
         this.keyMode = AOCipherConstants.DEFAULT_KEY_MODE;
-        this.cipherB64Key = null;
+        this.cipherKeyEncoded = null;
         this.cipherPassword = null;
         this.plainData = null;
         this.cipheredData = null;
@@ -137,19 +135,11 @@ public final class CipherManager {
         return this.cipherConfig.getAlgorithm();
     }
 
-    /** Recupera la configuraci&oacute;n de cifrado: algoritmo/modo/padding. El
-     * modo y el padding s&oacute;lo aparecer&aacute;n si ambos est&aacute;n
-     * configurados.
-     * @return Configuraci&olacute;n de cifrado. */
-    public String getCipherAlgorithmConfiguration() {
-        return this.cipherConfig.toString();
-    }
-
     /** Configura el algoritmo de cifrado.
      * @param cipAlgo
      *        Algoritmo de cifrado. */
     public void setCipherAlgorithm(final AOCipherAlgorithm cipAlgo) {
-        this.cipherConfig.setAlgorithm(cipAlgo == null ? AOCipherAlgorithm.getDefault() : cipAlgo);
+        this.cipherConfig = new AOCipherConfig(cipAlgo, null, null);
     }
 
     /** Establece la configuraci&oacute;n de cifrado a partir de una cadena que
@@ -200,32 +190,6 @@ public final class CipherManager {
      * @return Configuraci&oacute;n de cifrado. */
     public AOCipherConfig getCipherConfig() {
         return this.cipherConfig;
-    }
-
-    /** Recupera el modo de bloque configurado para el cifrado.
-     * @return Modo de bloque. */
-    public AOCipherBlockMode getCipherBlockMode() {
-        return this.cipherConfig.getBlockMode();
-    }
-
-    /** Establece el modo de bloque para el cifrado.
-     * @param cipBlockMode
-     *        Modo de bloque. */
-    public void setCipherBlockMode(final AOCipherBlockMode cipBlockMode) {
-        this.cipherConfig.setBlockMode(cipBlockMode);
-    }
-
-    /** Recupera el formato de padding para el cifrado.
-     * @return Formato de padding. */
-    public AOCipherPadding getCipherPadding() {
-        return this.cipherConfig.getPadding();
-    }
-
-    /** Establece el formato de padding para el cifrado.
-     * @param cipPadding
-     *        Padding para el cifrado. */
-    public void setCipherPadding(final AOCipherPadding cipPadding) {
-        this.cipherConfig.setPadding(cipPadding);
     }
 
     /** Recupera el alias configurado del almac&eacute;n de claves de cifrado.
@@ -287,16 +251,16 @@ public final class CipherManager {
     }
 
     /** Recupera la clave de cifrado.
-     * @return Clave de cifrado en base 64. */
-    public String getCipherB64Key() {
-        return this.cipherB64Key;
+     * @return Clave de cifrado. */
+    public byte[] getCipherKey() {
+        return this.cipherKeyEncoded;
     }
 
     /** Establece la clave de cifrado.
-     * @param cipherB64Key
-     *        Clave de cifrado en base 64. */
-    public void setCipherB64Key(final String cipherB64Key) {
-        this.cipherB64Key = cipherB64Key;
+     * @param cipherKey
+     *        Clave de cifrado */
+    public void setCipherKey(final byte[] cipherKey) {
+        this.cipherKeyEncoded = cipherKey;
     }
 
     /** recupera la contrase&ntilde;a de cifrado.
@@ -340,7 +304,7 @@ public final class CipherManager {
      * @param plainData
      *        Datos para cifrar. */
     public void setPlainData(final byte[] plainData) {
-        this.plainData = plainData.clone();
+    	this.plainData = plainData == null ? null : plainData.clone();
     }
 
     /** Recupera los dato cifrados.
@@ -349,24 +313,11 @@ public final class CipherManager {
         return this.cipheredData.clone();
     }
 
-    /** Recupera en base 64 los datos cifrados.
-     * @return Datos cifrados en base 64. */
-    public String getCipheredDataB64Encoded() {
-        return (this.cipheredData == null ? null : Base64.encode(this.cipheredData));
-    }
-
     /** Establece los datos cifrados para descifrar.
      * @param cipheredData
      *        Datos cifrados. */
     public void setCipheredData(final byte[] cipheredData) {
-        this.cipheredData = cipheredData.clone();
-    }
-
-    /** Establece los datos cifrados para descifrar.
-     * @param cipheredDataB64
-     *        Datos cifrados en base 64. */
-    public void setCipheredData(final String cipheredDataB64) {
-        this.cipheredData = (cipheredDataB64 == null ? null : Base64.decode(cipheredDataB64));
+        this.cipheredData = cipheredData == null ? null : cipheredData.clone();
     }
 
     /** Cifra los datos con la configuraci&oacute;n establecida.
@@ -484,7 +435,7 @@ public final class CipherManager {
         // Tomamos o generamos la clave, segun nos indique el modo de clave.
         if (this.keyMode.equals(AOCipherConstants.KEY_MODE_GENERATEKEY)) {
             cipherKey = cipher.generateKey(config);
-            this.cipherB64Key = Base64.encode(cipherKey.getEncoded());
+            this.cipherKeyEncoded = cipherKey.getEncoded();
 
             // Si se permite el almacenamiento de las claves, le damos la
             // posibilidad al usuario
@@ -516,8 +467,8 @@ public final class CipherManager {
              * el cifrado - Si no se permite, se indica que no se ha introducido
              * ninguna clave para el cifrado
              */
-            if (this.cipherB64Key != null) {
-                cipherKey = cipher.decodeKey(this.cipherB64Key, config, null);
+            if (this.cipherKeyEncoded != null) {
+                cipherKey = cipher.decodeKey(this.cipherKeyEncoded, config, null);
             }
             else if (this.useCipherKeyStore && AOCipherKeyStoreHelper.storeExists()) {
                 try {
@@ -631,7 +582,7 @@ public final class CipherManager {
             // de cifrado. Si no existe el almacen, se le indica que es
             // obligatorio
             // introducir la clave.
-            if (this.cipherB64Key == null) {
+            if (this.cipherKeyEncoded == null) {
                 if (AOCipherKeyStoreHelper.storeExists()) {
                     try {
                         decipherKey = getKeyFromCipherKeyStore();
@@ -651,7 +602,7 @@ public final class CipherManager {
                 }
             }
             else {
-                decipherKey = decipher.decodeKey(this.cipherB64Key, this.cipherConfig, null);
+                decipherKey = decipher.decodeKey(this.cipherKeyEncoded, this.cipherConfig, null);
             }
         }
 

@@ -158,7 +158,7 @@ final class PanelClave extends JAccessibilityDialogWizard {
 
         byte[] result = null;
         try {
-            final Key tmpKey = this.cipherConfig.getCipher().decodeKey(clave, this.cipherConfig.getConfig(), null);
+            final Key tmpKey = this.cipherConfig.getCipher().decodeKey(Base64.decode(clave), this.cipherConfig.getConfig(), null);
             result = this.cipherConfig.getCipher().decipher(fileContent, this.cipherConfig.getConfig(), tmpKey);
         }
         catch (final InvalidKeyException e) {

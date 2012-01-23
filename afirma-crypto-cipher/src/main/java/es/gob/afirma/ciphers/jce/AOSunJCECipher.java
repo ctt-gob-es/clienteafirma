@@ -30,7 +30,6 @@ import es.gob.afirma.core.ciphers.AOCipherConfig;
 import es.gob.afirma.core.ciphers.CipherConstants.AOCipherAlgorithm;
 import es.gob.afirma.core.ciphers.CipherConstants.AOCipherBlockMode;
 import es.gob.afirma.core.ciphers.CipherConstants.AOCipherPadding;
-import es.gob.afirma.core.misc.Base64;
 
 /** Cifrador seg&uacute;n las capacidades del proveedor JCE (<i>Java Cryptography
  * Extension</i>). */
@@ -148,6 +147,7 @@ public final class AOSunJCECipher implements AOCipher {
             cipher = Cipher.getInstance(algorithmConfig.toString(), PROVIDER);
         }
         catch (final Exception e) {
+        	e.printStackTrace();
             throw new AOException("Error al obtener el cifrador", e); //$NON-NLS-1$
         }
 
@@ -211,8 +211,8 @@ public final class AOSunJCECipher implements AOCipher {
     }
 
     /** {@inheritDoc} */
-	public Key decodeKey(final String base64Key, final AOCipherConfig algorithmConfig, final Object[] params) throws KeyException {
-        if (base64Key == null || base64Key.length() < 1) {
+	public Key decodeKey(final byte[] keyEncoded, final AOCipherConfig algorithmConfig, final Object[] params) throws KeyException {
+        if (keyEncoded == null || keyEncoded.length < 1) {
             throw new IllegalArgumentException("La clave a descodificar no puede ser nula ni vacia"); //$NON-NLS-1$
         }
         if (algorithmConfig == null) {
@@ -220,7 +220,7 @@ public final class AOSunJCECipher implements AOCipher {
         }
 
         try {
-            return new SecretKeySpec(Base64.decode(base64Key), algorithmConfig.getAlgorithm().getName());
+            return new SecretKeySpec(keyEncoded, algorithmConfig.getAlgorithm().getName());
         }
         catch (final Exception e) {
             throw new KeyException("Error creando la clave secreta", e); //$NON-NLS-1$

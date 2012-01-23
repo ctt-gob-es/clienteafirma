@@ -406,7 +406,7 @@ public final class EnveloperManager {
         }
         else if (AOCMSEnveloper.isCMSValid(envelop, AOSignConstants.CMS_CONTENTTYPE_ENCRYPTEDDATA)) {
             if (this.cipherManager.getCipherAlgorithm().supportsKey()) {
-                this.enveloper.setCipherKey(this.cipherManager.getCipherB64Key());
+                this.enveloper.setCipherKey(Base64.encode(this.cipherManager.getCipherKey()));
             }
             else {
                 this.enveloper.setCipherKey(String.valueOf(this.cipherManager.getCipherPassword()));

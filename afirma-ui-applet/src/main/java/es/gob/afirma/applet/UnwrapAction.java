@@ -44,7 +44,7 @@ public final class UnwrapAction implements PrivilegedExceptionAction<byte[]> {
         }
 
         this.enveloperManager = enveloperManager;
-        this.envelop = envelop.clone();
+        this.envelop = envelop != null ? envelop.clone() : null;
     }
 
     /** {@inheritDoc} */

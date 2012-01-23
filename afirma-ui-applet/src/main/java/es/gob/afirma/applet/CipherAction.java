@@ -43,7 +43,7 @@ public final class CipherAction implements PrivilegedExceptionAction<Void> {
             throw new IllegalArgumentException("El CipherManager no puede ser nulo"); //$NON-NLS-1$
         }
         this.cipherManager = cipherManager;
-        this.data = data.clone();
+        this.data = data != null ? data.clone() : null;
     }
 
     /** {@inheritDoc} */

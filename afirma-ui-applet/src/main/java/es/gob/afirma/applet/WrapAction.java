@@ -45,7 +45,7 @@ public final class WrapAction implements PrivilegedExceptionAction<byte[]> {
         }
 
         this.enveloperManager = enveloperManager;
-        this.data = data.clone();
+        this.data = data != null ? data.clone() : null;
     }
 
     /** {@inheritDoc} */

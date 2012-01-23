@@ -27,7 +27,6 @@ import java.security.KeyStore.PrivateKeyEntry;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
 import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
@@ -164,22 +163,22 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     private URI policyQualifier = null;
 
     /** Manejador de las funcionalidades de cifrado del Cliente. */
-    CipherManager cipherManager = null;
+    private CipherManager cipherManager = null;
 
     /** Manejador de las funcionalidades de ensobrado del Cliente. */
     private EnveloperManager enveloperManager = null;
 
     /** URL del servidor LDAP. */
-    String ldapServerUrl = null;
+    private String ldapServerUrl = null;
 
     /** Puerto del servidor LDAP. Por defecto, 389. */
-    int ldapServerPort = DEFAULT_LDAP_PORT;
+    private int ldapServerPort = DEFAULT_LDAP_PORT;
 
     /** Principal del certificado que se desea recuperar del servidor LDAP. */
-    String ldapCertificatePrincipal = null;
+    private String ldapCertificatePrincipal = null;
 
     /** Firmantes o nodos que se desean contrafirmar. */
-    String[] signersToCounterSign = new String[0];
+    private String[] signersToCounterSign = new String[0];
 
     /** Listado de hashes a firmar en una operaci&oacute;n de firma masiva. */
     List<String> hashesToSign = null;
@@ -2610,32 +2609,32 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
     public void setCipherData(final String data) {
         LOGGER.info("Invocando setCipherData"); //$NON-NLS-1$
-        this.cipherManager.setCipheredData(data);
+        this.cipherManager.setCipheredData(data == null ? null : Base64.decode(data));
     }
 
     public void setPlainData(final String data) {
         LOGGER.info("Invocando setPlainData"); //$NON-NLS-1$
-        this.cipherManager.setPlainData(data == null ? null : data.getBytes());
+        this.cipherManager.setPlainData(data == null ? null : Base64.decode(data));
     }
 
     public String getCipherData() {
         LOGGER.info("Invocando getCipherData"); //$NON-NLS-1$
-        return this.cipherManager.getCipheredDataB64Encoded();
+        return Base64.encode(this.cipherManager.getCipheredData());
     }
 
     public String getPlainData() {
         LOGGER.info("Invocando getPlainData"); //$NON-NLS-1$
-        return this.cipherManager.getPlainData() == null ? null : new String(this.cipherManager.getPlainData());
+        return this.cipherManager.getPlainData() == null ? null : Base64.encode(this.cipherManager.getPlainData());
     }
 
     public String getKey() {
         LOGGER.info("Invocando getKey"); //$NON-NLS-1$
-        return this.cipherManager.getCipherB64Key();
+        return Base64.encode(this.cipherManager.getCipherKey());
     }
 
     public void setKey(final String newKey) {
-        LOGGER.info("Invocando setKey: " + newKey); //$NON-NLS-1$
-        this.cipherManager.setCipherB64Key(newKey);
+        LOGGER.info("Invocando setKey"); //$NON-NLS-1$
+        this.cipherManager.setCipherKey(newKey == null ? null : Base64.decode(newKey));
     }
 
     public String getPassword() {
@@ -2666,7 +2665,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
     public String getCipherAlgorithm() {
         LOGGER.info("Invocando getCipherAlgorithm"); //$NON-NLS-1$
-        return this.cipherManager.getCipherAlgorithmConfiguration();
+        return this.cipherManager.getCipherAlgorithm().getName();
     }
 
     public void setKeyMode(final String keyMode) {
@@ -2788,12 +2787,11 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
      *        Datos que deseamos cifrar.
      * @return Devuelve {@code true} si la operaci&oacute; finaliz&oacute;
      *         correctamente. */
-    public boolean cipherData(final byte[] dat) {
+    private boolean cipherData(final byte[] dat) {
 
         // El resultado queda almacenado en el objeto CipherManager
-        final PrivilegedExceptionAction<Void> cipherAction = new CipherAction(this.cipherManager, dat);
         try {
-        	AccessController.doPrivileged(cipherAction);
+        	AccessController.doPrivileged(new CipherAction(this.cipherManager, dat));
         } catch (final PrivilegedActionException e) {
         	if (e.getCause() instanceof AOCancelledOperationException) {
         		setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
@@ -2842,7 +2840,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
      *        Datos que deseamos descifrar.
      * @return Devuelve {@code true} si la operaci&oacute; finaliz&oacute;
      *         correctamente. */
-    public boolean decipherData(final byte[] dat) {
+    private boolean decipherData(final byte[] dat) {
 
         // El resultado quedara almacenado en el objeto CipherManager
     	try {
@@ -3287,12 +3285,6 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         return Base64.encode(this.data);
     }
 
-    @Deprecated
-    public String getCMSData() {
-        LOGGER.info("Invocando getCMSData"); //$NON-NLS-1$
-        return getB64Data();
-    }
-
     public String getData() {
         LOGGER.info("Invocando getData"); //$NON-NLS-1$
         if (this.data == null) {
@@ -3383,94 +3375,6 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                                               JOptionPane.OK_CANCEL_OPTION,
                                               JOptionPane.WARNING_MESSAGE);
         return result == JOptionPane.OK_OPTION;
-    }
-
-
-
-    public String Firma(final String datos) {
-        LOGGER.info("Invocando Firma"); //$NON-NLS-1$
-
-        // Inicializamos los valores por codigo
-        initialize();
-
-        // Descodificamos los datos introducidos, que son los parametros
-        // separados por '#' que
-        // definen la operacion a realizar
-        final String[] params = (new String(Base64.decode(datos))).split("#"); //$NON-NLS-1$
-
-        // Comprobamos que hemos podido extraer todos los parametros
-        if (params == null || params.length < 3) {
-            LOGGER.severe("La cadena codificada con los parametros no es valida"); //$NON-NLS-1$
-            this.setError(AppletMessages.getString("SignApplet.669")); //$NON-NLS-1$
-            return null;
-        }
-
-        // Formato de firma: CMS
-        this.setSignatureFormat(AOSignConstants.SIGN_FORMAT_CMS);
-
-        // Algoritmo de firma: SHA1 con RSA
-        this.setSignatureAlgorithm(AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA);
-
-        // Recogemos de los parametros la operacion que debemos realizar
-        final int operation = Integer.parseInt(params[0]);
-
-        // Incluimos como atributo de firma el segundo
-        // parametro extraido (identificador de transaccion)
-        if (!this.addSignedAttribute("2.5.4.45", params[1])) { //$NON-NLS-1$
-            LOGGER.severe("No se pudo agregar el identificador de transaccion a la firma"); //$NON-NLS-1$
-            this.setError(AppletMessages.getString("SignApplet.673")); //$NON-NLS-1$
-            return null;
-        }
-
-        boolean allOK = false;
-        switch (operation) {
-
-            // Firma
-            case 0:
-                // Establecemos el hash en base 64 para la firma
-                this.setHash(params[2]);
-                allOK = this.sign();
-                LOGGER.info("Se ha realizado una operacion de firma"); //$NON-NLS-1$
-                break;
-
-            // Cofirma (Firma en paralelo)
-            case 1:
-                // Establecemos el hash en base 64 para la firma
-                this.setHash(params[2]);
-                // Establecemos la firma
-                setElectronicSignature(params[3]);
-                // Cofirmamos
-                allOK = this.coSign();
-                LOGGER.info("Se ha realizado una operacion de cofirma"); //$NON-NLS-1$
-                break;
-
-            // Contrafirma (Firma en cascada)
-            case 2:
-                // Establecemos la firma
-                setElectronicSignature(params[2]);
-                // Establecemos los firmantes que se desean contrafirmar
-                setSignersToCounterSign(params[3]);
-                // Contrafirmamos
-                allOK = this.counterSignIndexes();
-                LOGGER.info("Se ha realizado una operacion de contrafirma"); //$NON-NLS-1$
-                break;
-            default:
-                LOGGER.severe("Operacion de firma no soportada"); //$NON-NLS-1$
-                this.setError(AppletMessages.getString("SignApplet.682")); //$NON-NLS-1$
-                return null;
-        }
-
-        if (!allOK) {
-            LOGGER.severe("No se pudo completar la firma de datos"); //$NON-NLS-1$
-            this.setError(AppletMessages.getString("SignApplet.101")); //$NON-NLS-1$
-            return null;
-        }
-
-        // Indicamos que no se ha producido error.
-        SignApplet.this.setError(null);
-
-        // Devolvemos "cert=<CERTIFICADO>;enc=<FIRMA>"
-        return "cert=" + getSignCertificateBase64Encoded() + ";enc=" + getSignatureBase64Encoded(); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     public boolean addSignedAttribute(final String oid, final String value) {

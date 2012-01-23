@@ -136,19 +136,6 @@ public interface EntryPointsCrypto {
      * @see #getSignatureText() */
     boolean signData(String b64data);
 
-    /** Metodo que se mantiene por compatibilidad con las versi&oacute;n 4 y
-     * anteriores de la plataforma @firma. <br>
-     * This method is kept to secure compatibility with v.4 and former versions
-     * of the @firma platform.
-     * @param datos
-     *        Datos codificado en base 64. <br>
-     *        data encoded in base 64.
-     * @return Cadena que contiene el certificado y los datos firmados todo
-     *         codificado en base 64. <br>
-     *         String containing the certificate and signed data, both encoded
-     *         in base 64. */
-    String Firma(String datos);
-
     /** A&ntilde;ade un atributo firmado al formato de firma seleccionado. Este
      * formato debe reconocer el OID especificado, siendo el atributo {@code value} su valor como cadena de texto. <br>
      * <br>
@@ -1502,13 +1489,15 @@ public interface EntryPointsCrypto {
      * usar&aacute; la configuracion por defecto. Puede establecerse el modo de
      * clave con {@link #setKeyMode(String)} para seg&uacute;n deseemos clave
      * autogenerada, clave manual o contrase&ntilde;a. Los datos se pueden
-     * recuperar con {@link #getCipherData()} y almacenar en disco con {@link #saveCipherDataToFile(String)}. <br>
+     * recuperar con {@link #getCipherData()} y almacenar en disco con
+     * {@link #saveCipherDataToFile(String)}. <br>
      * <br>
      * Encrypts indicated data by setPlainData(String) method. If no encryption
      * algorithm, block mode and padding is indicated, default configuration
      * will be used. Key mode can be set with {@link #setKeyMode(String)}, if
      * either self-generated, manual, or password key is desired. Data can be
-     * retrieved with {@link #getCipherData()} and stored to disk with {@link #saveCipherDataToFile(String)}.
+     * retrieved with {@link #getCipherData()} and stored to disk with
+     * {@link #saveCipherDataToFile(String)}.
      * @return true si la operaci&oacute;n se realiz&oacute; con &eacute;xito,
      *         false en caso contrario. <br>
      *         true if operation successful. Else, false. */
@@ -2795,17 +2784,6 @@ public interface EntryPointsCrypto {
      *             depending on system's coding. */
     @Deprecated
     String getData();
-
-    /** Devuelve los datos generados el la &uacute;ltima operaci&oacute;n CMS <br>
-     * <br>
-     * Returns data generated during the last CMS operation.
-     * @deprecated en favor de getB64Data() <br>
-     *             in favor of getB64Data()
-     * @return String en Base 64 <br>
-     *         String in base 64.
-     * @see #getB64Data */
-    @Deprecated
-    String getCMSData();
 
     /** Tras una firma masiva (firma a partir de m&uacute;ltiples hashes),
      * devuelve las firmas en base64 separadas unas de otras por '!' (cierre de
