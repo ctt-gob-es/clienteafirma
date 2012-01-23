@@ -413,6 +413,18 @@ public final class TestXAdES {
         return true;
     }
 
+    /** Prueba de detecci&oacute;n de formato XAdES.
+     * @throws Exception */
+    @SuppressWarnings("static-method")
+	@Test
+    public void TestDetection() throws Exception {
+    	final String[] files = new String[] { "firmaIgae.xsig.xml" }; //$NON-NLS-1$
+    	final AOSigner signer = new AOXAdESSigner();
+    	for (final String f : files) {
+    		Assert.assertTrue("La firma " + f + " no se reconoce como XAdES", signer.isSign(AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(f)))); //$NON-NLS-1$ //$NON-NLS-2$
+    	}
+    }
+
 //    private byte[] canonicalize(final byte[] in) {
 //        return in;
 //        org.apache.xml.security.Init.init();
