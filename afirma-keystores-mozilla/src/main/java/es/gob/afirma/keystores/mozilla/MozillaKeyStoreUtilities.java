@@ -180,7 +180,15 @@ final class MozillaKeyStoreUtilities {
 
                             // Copiamos las DLL necesarias a un temporal y
                             // devolvemos el temporal
-                            final File tmp = File.createTempFile("nss", null); //$NON-NLS-1$
+                        	final File tmp;
+                        	// Intentamos usar antes el temporal del sistema, para evitar el del usuario, que puede tener caracteres especiales
+                        	final File tmpDir = new File(new File(Platform.getSystemLibDir()).getParent() + File.separator + "Temp"); //$NON-NLS-1$
+                        	if (tmpDir.isDirectory() && tmpDir.canWrite() && tmpDir.canRead()) {
+                        		tmp = File.createTempFile("nss", null, tmpDir); //$NON-NLS-1$
+                        	}
+                        	else {
+                        		tmp = File.createTempFile("nss", null); //$NON-NLS-1$
+                        	}
                             tmp.delete();
                             if (!tmp.mkdir()) {
                                 throw new AOException("No se ha creado el directorio temporal"); //$NON-NLS-1$
@@ -235,14 +243,22 @@ final class MozillaKeyStoreUtilities {
                                 AOUtil.copyFile(tmpFile2, new File(dest + MOZUTILS_DLL));
                             }
 
-                            return tmp.getCanonicalPath();
+                            dir = tmp.getCanonicalPath();
 
                         }
                         catch (final Exception e) {
                             LOGGER.warning("No se ha podido duplicar NSS en un directorio temporal, si esta version de JRE esta afectada por el error 6581254 de Java es posible que no pueda cargarse: " + e); //$NON-NLS-1$
                         }
                     }
+
+            		for (final byte c : P11_CONFIG_ILLEGAL_CHARS) {
+            			if (dir.contains(new String(new byte[] {c}))) {
+            				dir = dir.replace(Platform.getUserHome(), getShort(Platform.getUserHome()));
+            				break;
+            			}
+            		}
                     return dir;
+
                 }
             }
         }

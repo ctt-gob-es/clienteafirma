@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -29,7 +29,7 @@ import es.gob.afirma.keystores.main.callbacks.NullPasswordCallback;
  * fragmentos de las clases <code>com.sun.deploy.config.UnixConfig</code> y <code>com.sun.deploy.config.WinConfig</code>
  * @version 0.3 */
 public final class AOKeyStoreManagerFactory {
-    
+
     private AOKeyStoreManagerFactory() {
         // No permitimos la instanciacion
     }
@@ -57,26 +57,26 @@ public final class AOKeyStoreManagerFactory {
      *         Cuando el usuario cancela el proceso (por ejemplo, al
      *         introducir la contrase&ntilde;a)
      * @throws AOKeystoreAlternativeException
-     *         Cuando ocurre cualquier otro problema durante el proceso 
+     *         Cuando ocurre cualquier otro problema durante el proceso
      * @throws IOException
-     *         Cuando la contrase&ntilde;a del almac&eacute;n es incorrecta. 
+     *         Cuando la contrase&ntilde;a del almac&eacute;n es incorrecta.
      */
     public static AOKeyStoreManager getAOKeyStoreManager(final AOKeyStore store,
                                                          final String lib,
                                                          final String description,
                                                          final PasswordCallback pssCallback,
-                                                         final Object parentComponent) throws AOKeystoreAlternativeException, 
+                                                         final Object parentComponent) throws AOKeystoreAlternativeException,
                                                                                               IOException {
 
         final AOKeyStoreManager ksm = new AOKeyStoreManager();
 
         // Fichero P7, X509, P12/PFX o Java JKS, en cualquier sistema operativo
-        if (store == AOKeyStore.PKCS12 || 
-            store == AOKeyStore.JAVA   || 
-            store == AOKeyStore.SINGLE || 
-            store == AOKeyStore.JAVACE || 
+        if (store == AOKeyStore.PKCS12 ||
+            store == AOKeyStore.JAVA   ||
+            store == AOKeyStore.SINGLE ||
+            store == AOKeyStore.JAVACE ||
             store == AOKeyStore.JCEKS) {
-            
+
             String storeFilename = null;
             if (lib != null && !"".equals(lib) && new File(lib).exists()) { //$NON-NLS-1$
                 storeFilename = lib;
@@ -127,7 +127,7 @@ public final class AOKeyStoreManagerFactory {
             }
             return ksm;
         }
-        
+
         // Token PKCS#11, en cualquier sistema operativo
         else if (store == AOKeyStore.PKCS11) {
             String p11Lib = null;
@@ -151,8 +151,8 @@ public final class AOKeyStoreManagerFactory {
                 }
                 p11Lib = AOUIFactory.getLoadFileName(
                      KeyStoreMessages.getString("AOKeyStoreManagerFactory.7"),  //$NON-NLS-1$
-                     exts, 
-                     extsDesc, 
+                     exts,
+                     extsDesc,
                      parentComponent
                 );
             }
@@ -166,8 +166,8 @@ public final class AOKeyStoreManagerFactory {
             }
             catch (final AOException e) {
                 throw new AOKeystoreAlternativeException(
-                     getAlternateKeyStoreType(store), 
-                     "Error al inicializar el modulo PKCS#11", //$NON-NLS-1$ 
+                     getAlternateKeyStoreType(store),
+                     "Error al inicializar el modulo PKCS#11", //$NON-NLS-1$
                      e
                 );
             }
@@ -178,9 +178,9 @@ public final class AOKeyStoreManagerFactory {
         // Solaris, HP-UX o Mac OS X)
         // o Google Chrome en Windows, que tambien usa el almacen de CAPI
         else if (Platform.getOS().equals(Platform.OS.WINDOWS) &&
-                (store == AOKeyStore.WINDOWS || 
-                 store == AOKeyStore.WINROOT || 
-                 store == AOKeyStore.WINADDRESSBOOK || 
+                (store == AOKeyStore.WINDOWS ||
+                 store == AOKeyStore.WINROOT ||
+                 store == AOKeyStore.WINADDRESSBOOK ||
                  store == AOKeyStore.WINCA)) {
             try {
                 ksm.init(store, null, new NullPasswordCallback(), null);
@@ -191,16 +191,16 @@ public final class AOKeyStoreManagerFactory {
                      "Error al inicializar el almacen " + store.getDescription(), //$NON-NLS-1$
                      e
                 );
-            } 
+            }
             return ksm;
         }
-        
+
         else if (store == AOKeyStore.DNIE) {
         	try {
                 ksm.init(
-            		store, 
+            		store,
             		null,
-            		(!(pssCallback instanceof NullPasswordCallback)) ? pssCallback : null, 
+            		(!(pssCallback instanceof NullPasswordCallback)) ? pssCallback : null,
             		null
         		);
             }
@@ -210,7 +210,7 @@ public final class AOKeyStoreManagerFactory {
                      "Error al inicializar el PKCS#11 del DNIe", //$NON-NLS-1$
                      e
                 );
-            } 
+            }
             return ksm;
         }
 
@@ -232,7 +232,7 @@ public final class AOKeyStoreManagerFactory {
             catch (final AOException e) {
                 throw new AOKeystoreAlternativeException(
                     getAlternateKeyStoreType(store),
-                    "Error al inicializar el almacen NSS unificado de Mozilla Firefox", //$NON-NLS-1$
+                    "Error al inicializar el almacen NSS unificado de Mozilla Firefox: " + e, //$NON-NLS-1$
                     e
                 );
             }
@@ -247,9 +247,9 @@ public final class AOKeyStoreManagerFactory {
             // En Mac OS X podemos inicializar un KeyChain en un fichero particular o el "defecto del sistema"
             try {
                 ksm.init(
-                     store, 
+                     store,
                      (lib == null || "".equals(lib)) ? null : new FileInputStream(lib),  //$NON-NLS-1$
-                     new NullPasswordCallback(), 
+                     new NullPasswordCallback(),
                      null
                 );
             }
@@ -260,13 +260,13 @@ public final class AOKeyStoreManagerFactory {
         }
 
         throw new AOKeystoreAlternativeException(
-             getAlternateKeyStoreType(store), 
+             getAlternateKeyStoreType(store),
              "La plataforma de navegador '"  //$NON-NLS-1$
-               + store.getDescription() 
+               + store.getDescription()
                + "' mas sistema operativo '" //$NON-NLS-1$
                + Platform.getOS()
                + "' no esta soportada" //$NON-NLS-1$
-        ); 
+        );
     }
 
     /** @return <code>AOKeyStore</code> alternativo o <code>null</code> si no hay alternativo */
