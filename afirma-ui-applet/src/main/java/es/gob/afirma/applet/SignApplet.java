@@ -2266,7 +2266,14 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         LOGGER.info("Invocando getSignCertificateBase64Encoded"); //$NON-NLS-1$
         final byte[] certEnconded;
         try {
-            certEnconded = this.ksConfigManager.getSelectedCertificate().getEncoded();
+        	certEnconded = this.ksConfigManager.getSelectedCertificate().getEncoded();
+        }
+        catch (final AOKeyStoreManagerException e) {
+        	LOGGER.warning("No se ha inicializado el almacen de certificados: " + e); //$NON-NLS-1$
+        	return ""; //$NON-NLS-1$
+        } catch (final AOKeystoreAlternativeException e) {
+        	LOGGER.warning("Error al acceder al almacen de certificados: " + e); //$NON-NLS-1$
+        	return ""; //$NON-NLS-1$
         }
         catch (final CertificateEncodingException e) {
             LOGGER.warning("La codificacion del certificado no es valida, se devolvera una cadena vacia: " + e); //$NON-NLS-1$
@@ -3581,7 +3588,16 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
     public X509Certificate getSignCertificate() {
         LOGGER.info("Invocando getSignCertificate"); //$NON-NLS-1$
-        final X509Certificate cert = this.ksConfigManager.getSelectedCertificate();
+        X509Certificate cert = null;
+		try {
+			cert = this.ksConfigManager.getSelectedCertificate();
+		} catch (final AOKeyStoreManagerException e) {
+            LOGGER.warning("No se ha inicializado el almacen de certificados: " + e); //$NON-NLS-1$
+			return null;
+		} catch (final AOKeystoreAlternativeException e) {
+            LOGGER.warning("Error al acceder al almacen de certificados: " + e); //$NON-NLS-1$
+			return null;
+		}
         if (cert == null) {
             LOGGER.warning("No se dispone del certificado de firma, se devolvera nulo"); //$NON-NLS-1$
         }

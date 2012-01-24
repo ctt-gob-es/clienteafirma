@@ -13,7 +13,6 @@ package es.gob.afirma.applet;
 import java.security.PrivilegedExceptionAction;
 import java.security.cert.X509Certificate;
 
-import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManagerException;
 import es.gob.afirma.keystores.main.common.AOKeystoreAlternativeException;
 
@@ -40,17 +39,6 @@ public class GetCertificateAction implements PrivilegedExceptionAction<X509Certi
 
 	/** {@inheritDoc} */
 	public X509Certificate run() throws AOKeyStoreManagerException, AOKeystoreAlternativeException {
-		try {
-            return (X509Certificate) this.ksConfigManager.getCertificate(this.alias);
-        }
-        catch (final AOCancelledOperationException e) {
-            throw e;
-        }
-        catch (final AOKeyStoreManagerException e) {
-        	throw e;
-        }
-        catch (final AOKeystoreAlternativeException e) {
-        	throw e;
-        }
+		return (X509Certificate) this.ksConfigManager.getCertificate(this.alias);
 	}
 }
