@@ -75,6 +75,7 @@ final class KeyStoreConfigurationManager {
     private boolean showLoadingWarning = false;
 
     private boolean showExpiratedCertificates = false;
+    private boolean checkPrivateKey = true;
     private boolean mandatoryCert = false;
     private final ArrayList<CertificateFilter> certFilters = new ArrayList<CertificateFilter>();
 
@@ -212,13 +213,15 @@ final class KeyStoreConfigurationManager {
      *         almac&eacute;n.
      * @throws AOKeystoreAlternativeException
      *         Cuando no se pueda inicializar el almac&eacute;n de
-     *         certificados pero existe un almac&eacute;n alternativo
+     *         certificados pero existe un almac&eacute;n alternativo.
      * @throws CertificateException
      *         Cuando no se pueda seleccionar un certificado.
-     * @throws KeyStoreException Cuando ocurren errores en el tratamiento del
-     * 		   almac&eacute;n de claves
+     * @throws KeyStoreException
+     * 		   Cuando ocurren errores en el tratamiento del almac&eacute;n de claves.
      * @throws NoSuchAlgorithmException
+     * 		   Cuando no se puede identificar el algoritmo para la recuperación de la clave.
      * @throws UnrecoverableEntryException
+     * 		   Cuando no se puede extraer la clave privada de un certificado.
      */
     void selectCertificate() throws AOCancelledOperationException,
                             AOKeyStoreManagerException,
@@ -228,47 +231,7 @@ final class KeyStoreConfigurationManager {
                             UnrecoverableEntryException,
                             NoSuchAlgorithmException,
                             KeyStoreException {
-        this.selectCertificate(true);
-    }
-
-    /** Selecciona un certificado del almac&eacute;n, ya sea a trav&eacute;s de
-     * la configuraci&oacute;n proporcionada o solicit&aacute;ndoselo al
-     * usuario.
-     * @param checkPrivateKey
-     *        Si es {@code true}, filtra los certificados que no tienen
-     *        clave privada.
-     * @throws AOCancelledOperationException
-     *         Cuando el usuario cancela la operaci&oacute;n.
-     * @throws AOCertificateException
-     *         Cuando no se pueda seleccionar un certificado.
-     * @throws AOCertificateKeyException
-     *         Cuando no se puede extraer la clave privada de un
-     *         certificado.
-     * @throws AOKeyStoreManagerException
-     *         Cuando no se pueda inicializar el almac&eacute;n de
-     *         certificados.
-     * @throws AOCertificatesNotFoundException
-     *         Cuando no se encuentran certificados v&aacute;lido en el
-     *         almac&eacute;n.
-     * @throws CertificateException
-     * @throws UnrecoverableEntryException
-     * 		   Cuando no se puede extraer la clave privada de un certificado.
-     * @throws NoSuchAlgorithmException
-     * 		   Cuando no se puede identificar el algoritmo para la recuperación de la clave.
-     * @throws KeyStoreException
-     * 		   Cuando ocurren errores en el tratamiento del almacén de claves
-
-     */
-    private void selectCertificate(final boolean checkPrivateKey) throws AOCancelledOperationException,
-                                                                 AOKeyStoreManagerException,
-                                                                 AOCertificatesNotFoundException,
-                                                                 AOKeystoreAlternativeException,
-                                                                 CertificateException,
-                                                                 UnrecoverableEntryException,
-                                                                 NoSuchAlgorithmException,
-                                                                 KeyStoreException {
-
-        if (this.ksManager == null) {
+    	if (this.ksManager == null) {
             try {
                 this.initKeyStore();
             }
@@ -282,7 +245,7 @@ final class KeyStoreConfigurationManager {
 
         if (this.selectedAlias == null) {
             try {
-                this.selectedAlias = this.showCertSelectionDialog(this.ksManager.getAliases(), checkPrivateKey);
+                this.selectedAlias = this.showCertSelectionDialog(this.ksManager.getAliases());
             }
             catch (final AOCancelledOperationException e) {
                 throw e;
@@ -297,7 +260,7 @@ final class KeyStoreConfigurationManager {
 
         // En caso de ser todos certificados con clave privada, obtenemos la
         // referencia a esta
-        if (checkPrivateKey) {
+        if (this.checkPrivateKey) {
             this.ke = this.ksManager.getKeyEntry(this.selectedAlias, this.getCertificatePasswordCallback());
         }
     }
@@ -402,21 +365,18 @@ final class KeyStoreConfigurationManager {
      * @param certAlias
      *        Alias de los certificados sobre los que hay que aplicar el
      *        filtro.
-     * @param checkPrivateKey
-     *        Indica si se deben mostrar &uacute;nicamente los certificados
-     *        con clave privada.
      * @return Alias real (con el que fue dado de alta en el almac&eacute;n de
      *         claves) del certificado seleccionado.
      * @throws AOCertificatesNotFoundException
      *         Cuando no se encuentran certificados que cumplan el filtro.
      * @throws AOCancelledOperationException
      *         Cuando el usuario cancel&oacute; la operaci&oacute;n. */
-    private String showCertSelectionDialog(final String[] certAlias, final boolean checkPrivateKey) throws AOCertificatesNotFoundException,
+    private String showCertSelectionDialog(final String[] certAlias) throws AOCertificatesNotFoundException,
                                                                                                    AOCancelledOperationException {
         return KeyStoreUtilities.showCertSelectionDialog(certAlias, // Aliases
                                                    this.ksManager, // KeyStoreManager
                                                    this.parent, // Panel sobre el que mostrar el dialogo
-                                                   checkPrivateKey, // Comprobar accesibilidad de claves privadas
+                                                   this.checkPrivateKey, // Comprobar accesibilidad de claves privadas
                                                    true, // Advierte si el certificado esta caducado
                                                    this.showExpiratedCertificates, // Muestra certificados caducados
                                                    this.certFilters, // Filtros para los certificados
@@ -502,6 +462,13 @@ final class KeyStoreConfigurationManager {
      *        {@code true} para mostrar los certificados caducados. */
     void setShowExpiratedCertificates(final boolean showExpiratedCerts) {
         this.showExpiratedCertificates = showExpiratedCerts;
+    }
+
+    /** Establece si s&oacute;lo deben mostrarse los certificados de firma.
+     * @param checkPrivateKey
+     *        {@code true} para mostrar s&oacute;lo los certificados de firma. */
+    void setShowOnlySignatureCertificates(final boolean checkPrivateKey) {
+    	this.checkPrivateKey = checkPrivateKey;
     }
 
     /** Establece que se seleccione autom&aacute;ticamente el certificado cuando
