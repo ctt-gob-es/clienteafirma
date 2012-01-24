@@ -10,8 +10,6 @@
 
 package es.gob.afirma.applet;
 
-import java.io.File;
-
 import junit.framework.Assert;
 
 import org.junit.Test;
@@ -22,12 +20,6 @@ import es.gob.afirma.core.signers.AOSignConstants;
 public class EnveloperTest {
 
 	private static final String PLAIN_DATA_FILE = "plain"; //$NON-NLS-1$
-
-	private static final String ENVELOP_DATA_PREFIX = "envelop_"; //$NON-NLS-1$
-
-	private static final String CIPHER_AES_KEY = "41vAOZAQqNLA591mdcBwVw=="; //$NON-NLS-1$
-
-	private static final String CIPHER_PBE_PASS = "(0NtrA5en4"; //$NON-NLS-1$
 
 	private static final String CERT_PATH = "ANF_PF_Activo.pfx"; //$NON-NLS-1$
     private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
@@ -43,8 +35,6 @@ public class EnveloperTest {
     @SuppressWarnings("static-method")
     @Test
     public void encryptedDataTest() {
-
-    	final String path = new File("").getAbsolutePath(); //$NON-NLS-1$
 
     	final String plainDataFile = this.getResourcePathToApplet(PLAIN_DATA_FILE);
 
@@ -82,8 +72,6 @@ public class EnveloperTest {
     @SuppressWarnings("static-method")
 	@Test
 	public void envelopedDataTest() {
-
-    	final String path = new File("").getAbsolutePath(); //$NON-NLS-1$
 
     	final String plainDataFile = this.getResourcePathToApplet(PLAIN_DATA_FILE);
 
@@ -124,8 +112,6 @@ public class EnveloperTest {
     @SuppressWarnings("static-method")
 	@Test
 	public void signedAndEnvelopedDataTest() {
-
-    	final String path = new File("").getAbsolutePath(); //$NON-NLS-1$
 
     	final String plainDataFile = this.getResourcePathToApplet(PLAIN_DATA_FILE);
 
@@ -169,8 +155,6 @@ public class EnveloperTest {
    @SuppressWarnings("static-method")
 	@Test
 	public void authenticatedAndEnvelopedDataTest() {
-
-	   final String path = new File("").getAbsolutePath(); //$NON-NLS-1$
 
 	   final String plainDataFile = this.getResourcePathToApplet(PLAIN_DATA_FILE);
 
