@@ -162,6 +162,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     /** Calificador de la pol&iacute;tica de firma. */
     private URI policyQualifier = null;
 
+    /** Valor de la huella digital de la pol&iacute;tica de firma. */
+    private final String policyHashB64 = null;
+
     /** Manejador de las funcionalidades de cifrado del Cliente. */
     private CipherManager cipherManager = null;
 
@@ -1212,7 +1215,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         });
     }
 
-    public void setPolicy(final String identifier, final String description, final String qualifier) {
+    public void setPolicy(final String identifier, final String description, final String qualifier, final String hashB64) {
         // Configuramos la URL identificadora
         if (identifier != null) {
             try {
@@ -1566,6 +1569,10 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         }
         if (this.policyQualifier != null) {
             this.genericConfig.setProperty("policyQualifier", this.policyQualifier.toString()); //$NON-NLS-1$
+        }
+        if (this.policyHashB64 != null) {
+        	this.genericConfig.setProperty("policyIdentifierHashAlgorithm", "http://www.w3.org/2000/09/xmldsig#sha1"); //$NON-NLS-1$ //$NON-NLS-2$
+            this.genericConfig.setProperty("policyIdentifierHash", this.policyHashB64); //$NON-NLS-1$
         }
     }
 
@@ -2410,14 +2417,14 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
      * establecido.
      * @param errorMsg
      *        Mensaje de error. */
-    void setError(final String errMsg) {
-        if (errMsg == null || errMsg.length() < 1) {
+    void setError(final String errorMsg) {
+        if (errorMsg == null || errorMsg.length() < 1) {
             this.error = false;
             this.errorMsg = ""; //$NON-NLS-1$
         }
         else {
             this.error = true;
-            this.errorMsg = errMsg;
+            this.errorMsg = errorMsg;
         }
 
         // Mostramos, si procede, el mensaje de error que corresponda
@@ -3728,6 +3735,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
      *        certificates are displayed. */
     private void setRFC2254Filter(final String subjectFilter, final String issuerFilter, final boolean onlySignatureCertificates) {
         this.ksConfigManager.addCertFilter(new RFC2254CertificateFilter(subjectFilter, issuerFilter));
+        this.ksConfigManager.setShowOnlySignatureCertificates(onlySignatureCertificates);
     }
 
     /** Selecciona un certificado del usuario y devuelve la referencia a su clave

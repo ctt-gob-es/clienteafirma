@@ -2575,8 +2575,10 @@ public interface EntryPointsCrypto {
      *        URL calificadora de la pol&iacute;tica de firma, en caso de
      *        indicar el calificador como OID debe usarse una URN (por
      *        ejemplo "urn:oid:2.16.724.1.3.2.2.3.1" <br>
-     *        Signature policy's qualifying oid. */
-    void setPolicy(String identifier, String description, String qualifier);
+     *        Signature policy's qualifying oid.
+     * @param hashB64
+     * 		  Huella digital SHA-1 en base64 de la pol&acute;tica de firma. */
+    void setPolicy(String identifier, String description, String qualifier, String hashB64);
 
     /** Obtiene todos los alias de los certificados disponibles para firmar o
      * cifrar y los devuelve como una &uacute;nica cadena en donde los alias
