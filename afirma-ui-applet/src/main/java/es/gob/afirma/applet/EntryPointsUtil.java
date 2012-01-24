@@ -66,8 +66,11 @@ public interface EntryPointsUtil {
      *        URL del fichero a leer. <br>
      *        File's URL to be read.
      * @return El contenido del fichero como java.lang.String <br>
-     *         File contents as java.lang.String */
-    String getTextFileContent(String url);
+     *         File contents as java.lang.String
+     * @deprecated Utilizar {@link #getFileBase64Encoded(String, boolean)}.
+     */
+    @Deprecated
+	String getTextFileContent(String url);
 
     /** Devuelve verdadero si el applet ha quedado en estado de error tras la
      * última operaci&oacute;n. <br>
@@ -160,8 +163,25 @@ public interface EntryPointsUtil {
      *        Texto en base 64. <br>
      *        Text in base 64.
      * @return Texto decodificado. <br>
-     *         Decoded text. */
-    String getTextFromBase64(String b64);
+     *         Decoded text.
+     * @deprecated Usar {@link #getTextFromBase64(String, String)} */
+    @Deprecated
+	String getTextFromBase64(String b64);
+
+    /** Decodifica un texto en base 64. Si se produce alg&uacute;n error se
+     * devuelve <code>null</code>. <br>
+     * <br>
+     * Decodes a text in base 64. If an error occurs, <code>null</code> is
+     * returned.
+     * @param b64
+     *        Texto en base 64. <br>
+     *        Text in base 64.
+     * @param charsetName
+     *        Juego de caracteres. <br>
+     *        Charset.
+     * @return Texto decodificado. <br>
+     *         Decoded text.*/
+    String getTextFromBase64(String b64, String charsetName);
 
     /** Codifica un texto plano a base 64. Si se produce alg&uacute;n error se
      * devuelve <code>null</code>. <br>
@@ -172,8 +192,25 @@ public interface EntryPointsUtil {
      *        Texto plano. <br>
      *        Plain Text.
      * @return Texto codificado. <br>
-     *         Encoded Text. */
+     *         Encoded Text.
+     * @deprecated Usar {@link #getBase64FromText(String, String) */
+    @Deprecated
     String getBase64FromText(String plainText);
+
+    /** Codifica un texto plano a base 64. Si se produce alg&uacute;n error se
+     * devuelve <code>null</code>. <br>
+     * <br>
+     * Encodes plain text to base 64. If an error occurs, <code>null</code> is
+     * returned.
+     * @param plainText
+     *        Texto plano. <br>
+     *        Plain Text.
+     * @param charsetName
+     *        Juego de caracteres. <br>
+     *        Charset.
+     * @return Texto codificado. <br>
+     *         Encoded Text. */
+    String getBase64FromText(String plainText, String charsetName);
 
     /** Recupera la versi&oacute;n del cliente de firma.<br/>
      * El formato de la versi&oacute;n ser&aacute; siempre:<br/>

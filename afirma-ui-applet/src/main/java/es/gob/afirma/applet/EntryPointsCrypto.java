@@ -1237,7 +1237,7 @@ public interface EntryPointsCrypto {
      * @see #getSignatureText() */
     String getSignatureBase64Encoded();
 
-    /** Devuelve la firma generadaen el &uacute;ltimo proceso de firma o
+    /** Devuelve la firma generada en el &uacute;ltimo proceso de firma o
      * establecida por en el cliente como un String (&uacute;til para firmas
      * XAdES, XMLDSign y firma web). Si no se ha generado una firma, se devuelve
      * cadena vac&iacute;a.<br/>
@@ -1256,8 +1256,36 @@ public interface EntryPointsCrypto {
      * If no signature is available, an empty string is returned.
      * @return La &uacute;ltima firma electr&oacute;nica generada o establecida
      *         por el cliente. <br>
-     *         Last generated (or user set) electronic signature. */
+     *         Last generated (or user set) electronic signature.
+     * @deprecated Sustituir por {@link #getSignatureText(String)}.
+     */
+    @Deprecated
     String getSignatureText();
+
+    /** Devuelve la firma generada en el &uacute;ltimo proceso de firma o
+     * establecida por en el cliente como un String (&uacute;til para firmas
+     * XAdES, XMLDSign y firma web). Si no se ha generado una firma, se devuelve
+     * cadena vac&iacute;a.<br/>
+     * El uso de este m&eacute;todo no esta recomendado ya que el resultado de
+     * la que devuelve puede variar seg&uacute;n la codificaci&oacute;n
+     * establecida por defecto. Su principal utilidad es mostrar el resultado de
+     * una firma XML. Para firmas binarias debe utilizarse {@link #getSignatureBase64Encoded()}.
+     * Si no se dispone de una firma, se devuelve cadena vac&iacute;a. <br>
+     * <br>
+     * Returns the signature generated in the last signature process, or set by
+     * the client as a string (useful for XAdES, XMLDSign and web signatures).
+     * If no signature has been generated, an empty string is returned. <br/>
+     * The use of this method is discouraged, since returned results may vary
+     * depending on the encryption set by default. Its main use is showing the
+     * results of a XML signature. For binary signatures {@link #getSignatureBase64Encoded()} should be used.
+     * If no signature is available, an empty string is returned.
+     *
+     * @param charsetName Codificaci&oacute;n del texto. <br>
+     * 					  Encoding.
+     * @return La &uacute;ltima firma electr&oacute;nica generada o establecida
+     *         por el cliente. <br>
+     *         Last generated (or user set) electronic signature. */
+    String getSignatureText(String charsetName);
 
     /** Establece los datos de entrada en base 64 para los procesos de firma,
      * co-firma (firma en paralelo) y generaci&oacute;n de sobres digitales. <br/>

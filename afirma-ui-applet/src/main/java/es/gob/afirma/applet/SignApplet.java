@@ -13,11 +13,11 @@ package es.gob.afirma.applet;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Frame;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -850,17 +850,21 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                 // Tomamos la firma que deseamos analizar
                 final byte[] originalSign;
                 try {
-                    originalSign = SignApplet.this.getSelectedSignature(true);
+                	final GetSignatureAction getSignatureAction = new GetSignatureAction(
+                			SignApplet.this.signData, SignApplet.this.electronicSignatureFile);
+                	getSignatureAction.setSelectFile(true, SignApplet.this.sigFormat, SignApplet.this);
+                	originalSign = AccessController.doPrivileged(getSignatureAction);
+                	SignApplet.this.electronicSignatureFile = getSignatureAction.getSelectedSignatureFile();
                 }
-                catch (final AOCancelledOperationException e) {
-                    LOGGER.info("Operacion cancelada por el usuario"); //$NON-NLS-1$
-                    SignApplet.this.setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
-                    return null;
-                }
-                catch (final AOException e) {
-                    LOGGER.info("Error al seleccionar el fichero de firma: " + e); //$NON-NLS-1$
-                    SignApplet.this.setError(AppletMessages.getString("SignApplet.69")); //$NON-NLS-1$
-                    return null;
+                catch (final PrivilegedActionException e) {
+                	if (e.getCause() instanceof AOCancelledOperationException) {
+                		LOGGER.info("Operacion cancelada por el usuario"); //$NON-NLS-1$
+                		SignApplet.this.setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
+                	} else if (e.getCause() instanceof AOException) {
+                		LOGGER.info("Error al seleccionar el fichero de firma: " + e.getCause()); //$NON-NLS-1$
+                		SignApplet.this.setError(AppletMessages.getString("SignApplet.69")); //$NON-NLS-1$
+                	}
+                	return null;
                 }
 
                 // Probamos si la firma se corresponde con el formato
@@ -916,31 +920,28 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
         return AccessController.doPrivileged(new java.security.PrivilegedAction<Boolean>() {
             public Boolean run() {
-                // Si no hay establecido un algoritmo de firma, tomamos
-                // el por defecto pero
-                // solo para esta ocasion
                 final String algorithm = (SignApplet.this.sigAlgo == null ? AOSignConstants.DEFAULT_SIGN_ALGO : SignApplet.this.sigAlgo);
-
-                // Si no hay establecido un formato de firma, tomamos el
-                // por defecto pero
-                // solo para esta ocasion
                 final String format = (SignApplet.this.sigFormat == null ? AOSignConstants.DEFAULT_SIGN_FORMAT : SignApplet.this.sigFormat);
 
                 // Tomamos la firma sobre la que se realiza la
                 // contrafirma
                 final byte[] originalSign;
                 try {
-                    originalSign = SignApplet.this.getSelectedSignature(true);
+                	final GetSignatureAction getSignatureAction = new GetSignatureAction(
+                			SignApplet.this.signData, SignApplet.this.electronicSignatureFile);
+                	getSignatureAction.setSelectFile(true, SignApplet.this.sigFormat, SignApplet.this);
+                    originalSign = AccessController.doPrivileged(getSignatureAction);
+                    SignApplet.this.electronicSignatureFile = getSignatureAction.getSelectedSignatureFile();
                 }
-                catch (final AOCancelledOperationException e) {
-                    LOGGER.info("Operacion cancelada por el usuario"); //$NON-NLS-1$
-                    SignApplet.this.setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
-                    return Boolean.FALSE;
-                }
-                catch (final AOException e) {
-                    LOGGER.info("Error al recuperar los datos de firma :" + e); //$NON-NLS-1$
-                    SignApplet.this.setError(AppletMessages.getString("SignApplet.64")); //$NON-NLS-1$
-                    return Boolean.FALSE;
+                catch (final PrivilegedActionException e) {
+                	if (e.getCause() instanceof AOCancelledOperationException) {
+                		LOGGER.info("Operacion cancelada por el usuario"); //$NON-NLS-1$
+                		SignApplet.this.setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
+                	} else if (e.getCause() instanceof AOException) {
+                		LOGGER.info("Error al recuperar los datos de firma: " + e.getCause()); //$NON-NLS-1$
+                		SignApplet.this.setError(AppletMessages.getString("SignApplet.64")); //$NON-NLS-1$
+                	}
+                	return Boolean.FALSE;
                 }
 
                 // Configuramos el certificado
@@ -1623,17 +1624,21 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                 // contrafirma
                 final byte[] originalSign;
                 try {
-                    originalSign = SignApplet.this.getSelectedSignature(true);
+                	final GetSignatureAction getSignatureAction = new GetSignatureAction(
+                			SignApplet.this.signData, SignApplet.this.electronicSignatureFile);
+                	getSignatureAction.setSelectFile(true, SignApplet.this.sigFormat, SignApplet.this);
+                    originalSign = AccessController.doPrivileged(getSignatureAction);
+                    SignApplet.this.electronicSignatureFile = getSignatureAction.getSelectedSignatureFile();
                 }
-                catch (final AOCancelledOperationException e) {
-                    LOGGER.info("Operacion cancelada por el usuario"); //$NON-NLS-1$
-                    SignApplet.this.setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
-                    return Boolean.FALSE;
-                }
-                catch (final AOException e) {
-                    LOGGER.info("Error al recuperar los datos de firma: " + e); //$NON-NLS-1$
-                    SignApplet.this.setError(AppletMessages.getString("SignApplet.64")); //$NON-NLS-1$
-                    return Boolean.FALSE;
+                catch (final PrivilegedActionException e) {
+                	if (e.getCause() instanceof AOCancelledOperationException) {
+                		LOGGER.info("Operacion cancelada por el usuario"); //$NON-NLS-1$
+                		SignApplet.this.setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
+                	} else if (e.getCause() instanceof AOException) {
+                		LOGGER.info("Error al recuperar los datos de firma: " + e.getCause()); //$NON-NLS-1$
+                		SignApplet.this.setError(AppletMessages.getString("SignApplet.64")); //$NON-NLS-1$
+                	}
+                	return Boolean.FALSE;
                 }
 
                 // Tomamos el manejador de firma asociado al formato
@@ -1747,68 +1752,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         }).booleanValue();
     }
 
-    /** Muestra un di&aacute;logo para la selecci&oacute;n de un fichero de
-     * firma. En caso de que se indique un formato, se usaran filtros para las
-     * extensiones predeterminadas para el formato de firma concreto. Si no se
-     * selecciona ningun fichero, se devolver&aacute; {@code null}.
-     * @param signFormat
-     *        Formato de la firma que se desea seleccionar.
-     * @return Fichero de firma. */
-    @SuppressWarnings("static-method")
-	private String selectSignFile(final String signFormat) {
 
-        String[] exts = null;
-        String desc = null;
-
-        if (signFormat != null) {
-            if (signFormat.equals(AOSignConstants.SIGN_FORMAT_CMS)) {
-                exts = new String[] {
-                        "csig", "p7s", "sig"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                desc = AppletMessages.getString("SignApplet.29"); //$NON-NLS-1$
-            }
-            else if (signFormat.equals(AOSignConstants.SIGN_FORMAT_CADES)) {
-                exts = new String[] {
-                        "csig", "sig"}; //$NON-NLS-1$ //$NON-NLS-2$
-                desc = AppletMessages.getString("SignApplet.26"); //$NON-NLS-1$
-            }
-            else if (signFormat.equals(AOSignConstants.SIGN_FORMAT_XMLDSIG_DETACHED) || signFormat.equals(AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED)
-                     || signFormat.equals(AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPING)
-                     || signFormat.equals(AOSignConstants.SIGN_FORMAT_XADES_DETACHED)
-                     || signFormat.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED)
-                     || signFormat.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING)) {
-                exts = new String[] {
-                        "xsig", "sig", "xml"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                desc = AppletMessages.getString("SignApplet.27"); //$NON-NLS-1$
-            }
-            else if (signFormat.equals(AOSignConstants.SIGN_FORMAT_PKCS1)) {
-                exts = new String[] {
-                    "sig"}; //$NON-NLS-1$
-                desc = AppletMessages.getString("SignApplet.318"); //$NON-NLS-1$
-            }
-            else if (signFormat.equals(AOSignConstants.SIGN_FORMAT_PDF)) {
-                exts = new String[] {
-                    "pdf"}; //$NON-NLS-1$
-                desc = AppletMessages.getString("SignApplet.28"); //$NON-NLS-1$
-            }
-            else if (signFormat.equals(AOSignConstants.SIGN_FORMAT_ODF)) {
-                exts = new String[] {
-                        "odt", "ods", "odp"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                desc = AppletMessages.getString("SignApplet.32"); //$NON-NLS-1$
-            }
-            else if (signFormat.equals(AOSignConstants.SIGN_FORMAT_OOXML)) {
-                exts = new String[] {
-                        "docx", "xlsx", "pptx"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                desc = AppletMessages.getString("SignApplet.30"); //$NON-NLS-1$
-            }
-        }
-
-        return AOUIFactory.getLoadFileName(
-        		AppletMessages.getString("SignApplet.163"), //$NON-NLS-1$
-                exts,
-                desc,
-                SignApplet.this
-        );
-    }
 
     public void setInIncludeExtensions(final String extensions) {
         LOGGER.info("Invocando setInIncludeExtensions: " + extensions); //$NON-NLS-1$
@@ -2332,39 +2276,49 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     }
 
     public String getSignatureBase64Encoded() {
-        LOGGER.info("Invocando getSignatureBase64Encoded"); //$NON-NLS-1$
-        return AccessController.doPrivileged(new java.security.PrivilegedAction<String>() {
-            public String run() {
-                byte[] sign = null;
-                try {
-                    sign = SignApplet.this.getSelectedSignature(false);
-                }
-                catch (final Exception e) {
-                    LOGGER.severe("No se ha podido recuperar la firma electr&oacute;nica: " + e //$NON-NLS-1$
-                    );
-                    SignApplet.this.setError(AppletMessages.getString("SignApplet.64")); //$NON-NLS-1$
-                }
-                return (sign == null) ? null : Base64.encode(sign);
-            }
-        });
+    	LOGGER.info("Invocando getSignatureBase64Encoded"); //$NON-NLS-1$
+    	byte[] sign = null;
+    	try {
+    		sign = AccessController.doPrivileged(new GetSignatureAction(
+    				SignApplet.this.signData, SignApplet.this.electronicSignatureFile));
+    	}
+    	catch (final Exception e) {
+    		LOGGER.severe("No se ha podido recuperar la firma electronica: " + e); //$NON-NLS-1$
+    		SignApplet.this.setError(AppletMessages.getString("SignApplet.64")); //$NON-NLS-1$
+    	}
+    	return (sign == null) ? null : Base64.encode(sign);
     }
 
+    @Deprecated
     public String getSignatureText() {
         LOGGER.info("Invocando getSignatureText"); //$NON-NLS-1$
-        return AccessController.doPrivileged(new java.security.PrivilegedAction<String>() {
-            public String run() {
-                byte[] sign = null;
-                try {
-                    sign = SignApplet.this.getSelectedSignature(false);
-                }
-                catch (final Exception e) {
-                    LOGGER.severe("No se ha podido recuperar la firma electr&oacute;nica: " + e //$NON-NLS-1$
-                    );
-                    SignApplet.this.setError(AppletMessages.getString("SignApplet.64")); //$NON-NLS-1$
-                }
-                return (sign == null) ? null : new String(sign);
-            }
-        });
+        return getSignatureByText(null);
+    }
+
+    public String getSignatureText(final String charsetName) {
+        LOGGER.info("Invocando getSignatureText(charsetName)"); //$NON-NLS-1$
+        return getSignatureByText(charsetName);
+    }
+
+    private String getSignatureByText(final String charsetName) {
+    	byte[] sign = null;
+    	try {
+    		sign = AccessController.doPrivileged(new GetSignatureAction(
+    				SignApplet.this.signData, SignApplet.this.electronicSignatureFile));
+    	}
+    	catch (final Exception e) {
+    		LOGGER.severe("No se ha podido recuperar la firma electronica: " + e); //$NON-NLS-1$
+    		SignApplet.this.setError(AppletMessages.getString("SignApplet.64")); //$NON-NLS-1$
+    	}
+    	try {
+    		return (sign == null) ?
+    				null : (charsetName == null ?
+    						new String(sign) : new String(sign, charsetName));
+    	} catch (final UnsupportedEncodingException e) {
+    		LOGGER.warning("Codificacion no soportada (" + charsetName + //$NON-NLS-1$
+    		"), se devolvera la firma con la codificacion por defecto"); //$NON-NLS-1$
+    		return new String(sign);
+    	}
     }
 
     public String getFilePath() {
@@ -2433,6 +2387,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         }
     }
 
+    @Deprecated
     public String getTextFileContent(final String filename) {
         LOGGER.info("Invocando getTextFileContent: " + filename); //$NON-NLS-1$
 
@@ -2475,13 +2430,26 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         });
     }
 
+    @Deprecated
     public String getTextFromBase64(final String b64) {
         LOGGER.info("Invocando getTextFromBase64"); //$NON-NLS-1$
         return new String(Base64.decode(b64));
     }
 
+    public String getTextFromBase64(final String b64, final String charsetName) {
+        LOGGER.info("Invocando getTextFromBase64"); //$NON-NLS-1$
+        try {
+        	return new String(Base64.decode(b64), charsetName);
+        } catch (final Exception e) {
+    		LOGGER.warning("Codificacion no soportada (" + charsetName + //$NON-NLS-1$
+    		"), se utilizara la codificacion por defecto"); //$NON-NLS-1$
+        	return new String(Base64.decode(b64));
+        }
+    }
+
+    @Deprecated
     public String getBase64FromText(final String plainText) {
-        LOGGER.info("Invocando getBase64FromText"); //$NON-NLS-1$
+    	LOGGER.info("Invocando getBase64FromText"); //$NON-NLS-1$
         String encoding = null;
         if (plainText.startsWith("<?xml")) { //$NON-NLS-1$
             // Intentamos detectar la codificacion
@@ -2499,6 +2467,20 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                 LOGGER.warning("El XML introducido parece tener una codificacion " + encoding //$NON-NLS-1$
                                + ", pero no ha sido posible usarla para generar el Base64: " //$NON-NLS-1$
                                + e);
+            }
+        }
+        return Base64.encode(plainText.getBytes());
+    }
+
+    public String getBase64FromText(final String plainText, final String charsetName) {
+        LOGGER.info("Invocando getBase64FromText"); //$NON-NLS-1$
+        if (charsetName != null) {
+            try {
+                return Base64.encode(plainText.getBytes(charsetName));
+            }
+            catch (final Exception e) {
+                LOGGER.warning("Codificacion no soportada (" + charsetName + //$NON-NLS-1$
+        		"), se utilizara la codificacion por defecto"); //$NON-NLS-1$
             }
         }
         return Base64.encode(plainText.getBytes());
@@ -2875,67 +2857,6 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                 return SignApplet.this.ksConfigManager.getSelectedAlias();
             }
         });
-    }
-
-    /** Recupera la informaci&oacute;n de firma establecida o generada por el
-     * cliente. Si no hay firma establecida y se ha pedido que no se le deje
-     * seleccionar al usuario, se devolver&aacute; {@code null}.
-     * @param select
-     *        Indica si mostrar un di&aacute;logo al usuario para la
-     *        selecci&oacute;n de la firma cuando no est&eacute;
-     *        establecida.
-     * @return Firma electr&oacute;nica.
-     * @throws AOCancelledOperationException
-     *         Cuando el usuario cancela la operaci&oacute;n.
-     * @throws AOException
-     *         Cuando ocurre un error en la lectura de la informaci&oacute;n
-     *         de firma. */
-    byte[] getSelectedSignature(final boolean select) throws AOCancelledOperationException, AOException {
-        final byte[] originalSign;
-        if (this.signData != null) {
-            originalSign = this.signData;
-        }
-        else if (this.electronicSignatureFile == null && !select) {
-            originalSign = null;
-        }
-        else {
-            if (this.electronicSignatureFile == null) {
-                final String fileName = SignApplet.this.selectSignFile(SignApplet.this.sigFormat);
-                if (fileName == null) {
-                    throw new AOCancelledOperationException("Operacion cancelada por el usuario"); //$NON-NLS-1$
-                }
-                try {
-                    this.electronicSignatureFile = AOUtil.createURI(fileName);
-                }
-                catch (final Exception e) {
-                    LOGGER.severe("La URI proporcionada no es valida (" + fileName + "): " + e); //$NON-NLS-1$ //$NON-NLS-2$
-                    throw new AOException("El nombre de fichero '" + fileName + "' no es valido ", e); //$NON-NLS-1$ //$NON-NLS-2$
-                }
-            } // Fin 'else': Si no habia fichero seleccionado
-
-            // Cargamos el fichero que estaba seleccionado o recien elegido por
-            // el usuario
-            try {
-                final InputStream is = AOUtil.loadFile(this.electronicSignatureFile);
-                originalSign = AOUtil.getDataFromInputStream(is);
-                try {
-                    is.close();
-                }
-                catch (final Exception e) {
-                	// Se ignora
-                }
-            }
-            catch (final FileNotFoundException e) {
-                LOGGER.severe("No se encuentra el fichero de firma '" + this.electronicSignatureFile.getPath() + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
-                throw new AOException("No se encuentra el fichero de firma '" + this.electronicSignatureFile.getPath() + "'"); //$NON-NLS-1$ //$NON-NLS-2$
-            }
-            catch (final Exception e) {
-                LOGGER.severe("Error tratando de leer el fichero de firma original (" + this.electronicSignatureFile.getPath() + "): " + e); //$NON-NLS-1$ //$NON-NLS-2$
-                throw new AOException("Error tratando de leer el fichero de firma '" + this.electronicSignatureFile.getPath() + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
-            }
-        }
-
-        return originalSign;
     }
 
     public void setRecipientsToCMS(final String s) {
