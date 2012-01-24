@@ -1,10 +1,20 @@
 package es.gob.afirma.signers.xades;
 
+import static es.gob.afirma.signers.xades.AOXAdESSigner.DIGEST_METHOD;
+import static es.gob.afirma.signers.xades.AOXAdESSigner.LOGGER;
+import static es.gob.afirma.signers.xades.AOXAdESSigner.SIGNATURE_NODE_NAME;
+import static es.gob.afirma.signers.xades.AOXAdESSigner.SIGNATURE_TAG;
+import static es.gob.afirma.signers.xades.AOXAdESSigner.STYLE_REFERENCE_PREFIX;
+import static es.gob.afirma.signers.xades.AOXAdESSigner.XADESNS;
+import static es.gob.afirma.signers.xades.AOXAdESSigner.XADES_SIGNATURE_PREFIX;
+import static es.gob.afirma.signers.xades.AOXAdESSigner.XADES_SIGNED_PROPERTIES_TYPE;
+import static es.gob.afirma.signers.xades.AOXAdESSigner.XML_SIGNATURE_PREFIX;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.security.InvalidAlgorithmParameterException;
-import java.security.NoSuchAlgorithmException;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,21 +50,12 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.XMLConstants;
 
-import static es.gob.afirma.signers.xades.AOXAdESSigner.LOGGER;
-import static es.gob.afirma.signers.xades.AOXAdESSigner.SIGNATURE_TAG;
-import static es.gob.afirma.signers.xades.AOXAdESSigner.STYLE_REFERENCE_PREFIX;
-import static es.gob.afirma.signers.xades.AOXAdESSigner.DIGEST_METHOD;
-import static es.gob.afirma.signers.xades.AOXAdESSigner.XADES_SIGNATURE_PREFIX;
-import static es.gob.afirma.signers.xades.AOXAdESSigner.XADESNS;
-import static es.gob.afirma.signers.xades.AOXAdESSigner.XML_SIGNATURE_PREFIX;
-import static es.gob.afirma.signers.xades.AOXAdESSigner.SIGNATURE_NODE_NAME;
-
 final class XAdESCoSigner {
-	
+
 	private XAdESCoSigner() {
 		// No permitimos la instanciacion
 	}
-	
+
     /** Cofirma datos en formato XAdES.
      * <p>
      *  Este m&eacute;todo firma todas las referencias a datos declaradas en la firma original,
@@ -62,15 +63,15 @@ final class XAdESCoSigner {
      *  firmada se introduciran las mismas transformaciones que existiesen en la firma original.
      * </p>
      * <p>
-     *  A nivel de formato interno, cuando cofirmamos un documento ya firmado previamente, esta 
-     *  firma previa no se modifica. Si tenemos en cuenta que XAdES es en realidad un subconjunto 
-     *  de XMLDSig, el resultado de una cofirma XAdES sobre un documento firmado previamente con 
+     *  A nivel de formato interno, cuando cofirmamos un documento ya firmado previamente, esta
+     *  firma previa no se modifica. Si tenemos en cuenta que XAdES es en realidad un subconjunto
+     *  de XMLDSig, el resultado de una cofirma XAdES sobre un documento firmado previamente con
      *  XMLDSig (o viceversa), son dos firmas independientes, una en XAdES y otra en XMLDSig.<br>
-     *  Dado que todas las firmas XAdES son XMLDSig pero no todas las firmas XMLDSig son XAdES, 
+     *  Dado que todas las firmas XAdES son XMLDSig pero no todas las firmas XMLDSig son XAdES,
      *  el resultado global de la firma se adec&uacute;a al estandar mas amplio, XMLDSig en este caso.
      * </p>
      * @param data Datos que deseamos firmar.
-     * @param sign Documento con las firmas iniciales. 
+     * @param sign Documento con las firmas iniciales.
      * @param algorithm Algoritmo a usar para la firma.
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
      * <ul>
@@ -88,7 +89,7 @@ final class XAdESCoSigner {
      *  <dt><b><i>policyIdentifierHash</i></b></dt>
      *   <dd>
      *    Huella digital del documento de pol&iacute;tica de firma (normlamente del mismo fichero en formato XML procesable).
-     *    Si no se indica, es obligatorio que el par&aacute;metro <code>policyIdentifier</code> sea una URL accesible universalmente 
+     *    Si no se indica, es obligatorio que el par&aacute;metro <code>policyIdentifier</code> sea una URL accesible universalmente
      *   </dd>
      *  <dt><b><i>policyIdentifierHashAlgorithm</i></b></dt>
      *   <dd>Algoritmo usado para el c&aacute;lculo de la huella digital indicada en el par&aacute;metro <code>policyIdentifierHash</code>
@@ -110,7 +111,7 @@ final class XAdESCoSigner {
      *   <dd>Pa&iacute;s en el que se realiza la firma</dd>
      *  <dt><b><i>referencesDigestMethod</i></b></dt>
      *   <dd>
-     *    Algoritmo de huella digital a usar en las referencias XML (referencesDigestMethod). Debe indicarse como una URL, 
+     *    Algoritmo de huella digital a usar en las referencias XML (referencesDigestMethod). Debe indicarse como una URL,
      *    acept&aacute;ndose los siguientes valores:
      *    <ul>
      *     <li><i>http://www.w3.org/2000/09/xmldsig#sha1</i> (SHA-1)</li>
@@ -122,19 +123,30 @@ final class XAdESCoSigner {
      *  <dt><b><i>canonicalizationAlgorithm</i></b></dt>
      *   <dd>Algoritmo de canonicalizaci&oacute;n</dd>
      *  <dt><b><i>xadesNamespace</i></b></dt>
-     *   <dd>URL de definici&oacute;n del espacio de nombres de XAdES (y por extensi&oacute;n, versi&oacute;n de XAdES)</dd>
+     *   <dd>
+     *    URL de definici&oacute;n del espacio de nombres de XAdES (y por extensi&oacute;n, versi&oacute;n de XAdES).
+     *    Si se establece este par&aacute;metro es posible que se necesite establecer tambi&eacute;n el par&aacute;metro
+     *    <code>signedPropertiesTypeUrl</code> para evitar incoherencias en la versi&oacute;n de XAdES.
+     *   </dd>
+     *  <dt><b><i>signedPropertiesTypeUrl</i></b></dt>
+     *   <dd>
+     *    URL de definici&oacute;n del tipo de las propiedades firmadas (<i>Signed Properties</i>) de XAdES.
+     *    Si se establece este par&aacute;metro es posible que se necesite establecer tambi&eacute;n el par&aacute;metro
+     *    <code>xadesNamespace</code> para evitar incoherencias en la versi&oacute;n de XAdES.<br>
+     *    Si no se establece se usa el valor por defecto: <a href="http://uri.etsi.org/01903#SignedProperties">http://uri.etsi.org/01903#SignedProperties</a>.
+     *   </dd>
      *  <dt><b><i>applySystemDate</i></b></dt>
      *   <dd>
      *    Indica si se debe introducir en la firma el atributo <i>signingTime</i> con la fecha actual
-     *    del sistema. Por defecto, se encuentra a {@code true}. 
+     *    del sistema. Por defecto, se encuentra a {@code true}.
      *   </dd>
      * </dl>
      * @return Cofirma en formato XAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-    static byte[] cosign(final byte[] data, 
-                         final byte[] sign, 
-                         final String algorithm, 
-                         final PrivateKeyEntry keyEntry, 
+    static byte[] cosign(final byte[] data,
+                         final byte[] sign,
+                         final String algorithm,
+                         final PrivateKeyEntry keyEntry,
                          final Properties xParams) throws AOException {
 
         final String algoUri = XMLConstants.SIGN_ALGOS_URI.get(algorithm);
@@ -147,6 +159,7 @@ final class XAdESCoSigner {
         final String digestMethodAlgorithm = extraParams.getProperty("referencesDigestMethod", DIGEST_METHOD); //$NON-NLS-1$
         final String canonicalizationAlgorithm = extraParams.getProperty("canonicalizationAlgorithm", CanonicalizationMethod.INCLUSIVE); //$NON-NLS-1$
         final String xadesNamespace = extraParams.getProperty("xadesNamespace", XADESNS); //$NON-NLS-1$
+        final String signedPropertiesTypeUrl = extraParams.getProperty("signedPropertiesTypeUrl", XADES_SIGNED_PROPERTIES_TYPE); //$NON-NLS-1$
 
         // nueva instancia de DocumentBuilderFactory que permita espacio de
         // nombres (necesario para XML)
@@ -210,7 +223,7 @@ final class XAdESCoSigner {
             final NamedNodeMap currentNodeAttributes = currentElement.getAttributes();
             if (i == 0 || (currentNodeAttributes.getNamedItem("Id") != null && currentNodeAttributes.getNamedItem("Id")  //$NON-NLS-1$//$NON-NLS-2$
                                                                                                     .getNodeValue()
-                                                                                                    .startsWith(STYLE_REFERENCE_PREFIX))) { 
+                                                                                                    .startsWith(STYLE_REFERENCE_PREFIX))) {
 
                 // Buscamos las transformaciones declaradas en la Referencia,
                 // para anadirlas
@@ -234,8 +247,8 @@ final class XAdESCoSigner {
                 String referenceId = null;
                 if ((currentNodeAttributes.getNamedItem("Id") != null && currentNodeAttributes.getNamedItem("Id")  //$NON-NLS-1$//$NON-NLS-2$
                                                                                               .getNodeValue()
-                                                                                              .startsWith(STYLE_REFERENCE_PREFIX))) { 
-                    referenceId = STYLE_REFERENCE_PREFIX + UUID.randomUUID().toString(); 
+                                                                                              .startsWith(STYLE_REFERENCE_PREFIX))) {
+                    referenceId = STYLE_REFERENCE_PREFIX + UUID.randomUUID().toString();
                 }
                 else {
                     referenceId = "Reference-" + UUID.randomUUID().toString(); //$NON-NLS-1$
@@ -250,13 +263,14 @@ final class XAdESCoSigner {
             }
         }
 
-        final XAdES_EPES xades =
-                (XAdES_EPES) XAdES.newInstance(XAdES.EPES,
-                                               xadesNamespace,
-                                               XADES_SIGNATURE_PREFIX,
-                                               XML_SIGNATURE_PREFIX,
-                                               digestMethodAlgorithm,
-                                               rootSig);
+        final XAdES_EPES xades = (XAdES_EPES) XAdES.newInstance(
+    		XAdES.EPES,
+            xadesNamespace,
+            XADES_SIGNATURE_PREFIX,
+            XML_SIGNATURE_PREFIX,
+            digestMethodAlgorithm,
+            rootSig
+        );
 
         // establece el certificado
         final X509Certificate cert = (X509Certificate) keyEntry.getCertificate();
@@ -305,7 +319,7 @@ final class XAdESCoSigner {
         }
 
         // SigningTime
-        if (Boolean.parseBoolean(extraParams.getProperty("applySystemDate", Boolean.TRUE.toString()))) { //$NON-NLS-1$ 
+        if (Boolean.parseBoolean(extraParams.getProperty("applySystemDate", Boolean.TRUE.toString()))) { //$NON-NLS-1$
             xades.setSigningTime(new Date());
         }
 
@@ -317,6 +331,9 @@ final class XAdESCoSigner {
         catch (final Exception e) {
             throw new AOException("No se ha podido instanciar la firma Avanzada XML JXAdES", e); //$NON-NLS-1$
         }
+
+        // Establecemos el tipo de SignedProperties
+        xmlSignature.setSignedPropertiesTypeUrl(signedPropertiesTypeUrl);
 
         try {
             xmlSignature.setDigestMethod(digestMethodAlgorithm);
@@ -348,14 +365,14 @@ final class XAdESCoSigner {
      *  firmada se introduciran las mismas transformaciones que existiesen en la firma original.
      * </p>
      * <p>
-     *  A nivel de formato interno, cuando cofirmamos un documento ya firmado previamente, esta 
-     *  firma previa no se modifica. Si tenemos en cuenta que XAdES es en realidad un subconjunto 
-     *  de XMLDSig, el resultado de una cofirma XAdES sobre un documento firmado previamente con 
+     *  A nivel de formato interno, cuando cofirmamos un documento ya firmado previamente, esta
+     *  firma previa no se modifica. Si tenemos en cuenta que XAdES es en realidad un subconjunto
+     *  de XMLDSig, el resultado de una cofirma XAdES sobre un documento firmado previamente con
      *  XMLDSig (o viceversa), son dos firmas independientes, una en XAdES y otra en XMLDSig.<br>
-     *  Dado que todas las firmas XAdES son XMLDSig pero no todas las firmas XMLDSig son XAdES, 
+     *  Dado que todas las firmas XAdES son XMLDSig pero no todas las firmas XMLDSig son XAdES,
      *  el resultado global de la firma se adec&uacute;a al estandar mas amplio, XMLDSig en este caso.
      * </p>
-     * @param sign Documento con las firmas iniciales. 
+     * @param sign Documento con las firmas iniciales.
      * @param algorithm Algoritmo a usar para la firma.
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
      * <ul>
@@ -373,7 +390,7 @@ final class XAdESCoSigner {
      *  <dt><b><i>policyIdentifierHash</i></b></dt>
      *   <dd>
      *    Huella digital del documento de pol&iacute;tica de firma (normlamente del mismo fichero en formato XML procesable).
-     *    Si no se indica, es obligatorio que el par&aacute;metro <code>policyIdentifier</code> sea una URL accesible universalmente 
+     *    Si no se indica, es obligatorio que el par&aacute;metro <code>policyIdentifier</code> sea una URL accesible universalmente
      *   </dd>
      *  <dt><b><i>policyIdentifierHashAlgorithm</i></b></dt>
      *   <dd>Algoritmo usado para el c&aacute;lculo de la huella digital indicada en el par&aacute;metro <code>policyIdentifierHash</code>
@@ -395,7 +412,7 @@ final class XAdESCoSigner {
      *   <dd>Pa&iacute;s en el que se realiza la firma</dd>
      *  <dt><b><i>referencesDigestMethod</i></b></dt>
      *   <dd>
-     *    Algoritmo de huella digital a usar en las referencias XML (referencesDigestMethod). Debe indicarse como una URL, 
+     *    Algoritmo de huella digital a usar en las referencias XML (referencesDigestMethod). Debe indicarse como una URL,
      *    acept&aacute;ndose los siguientes valores:
      *    <ul>
      *     <li><i>http://www.w3.org/2000/09/xmldsig#sha1</i> (SHA-1)</li>
@@ -407,18 +424,29 @@ final class XAdESCoSigner {
      *  <dt><b><i>canonicalizationAlgorithm</i></b></dt>
      *   <dd>Algoritmo de canonicalizaci&oacute;n</dd>
      *  <dt><b><i>xadesNamespace</i></b></dt>
-     *   <dd>URL de definici&oacute;n del espacio de nombres de XAdES (y por extensi&oacute;n, versi&oacute;n de XAdES)</dd>
-     *   <dt><b><i>applySystemDate</i></b></dt>
+     *   <dd>
+     *    URL de definici&oacute;n del espacio de nombres de XAdES (y por extensi&oacute;n, versi&oacute;n de XAdES).
+     *    Si se establece este par&aacute;metro es posible que se necesite establecer tambi&eacute;n el par&aacute;metro
+     *    <code>signedPropertiesTypeUrl</code> para evitar incoherencias en la versi&oacute;n de XAdES.
+     *   </dd>
+     *  <dt><b><i>signedPropertiesTypeUrl</i></b></dt>
+     *   <dd>
+     *    URL de definici&oacute;n del tipo de las propiedades firmadas (<i>Signed Properties</i>) de XAdES.
+     *    Si se establece este par&aacute;metro es posible que se necesite establecer tambi&eacute;n el par&aacute;metro
+     *    <code>xadesNamespace</code> para evitar incoherencias en la versi&oacute;n de XAdES.<br>
+     *    Si no se establece se usa el valor por defecto: <a href="http://uri.etsi.org/01903#SignedProperties">http://uri.etsi.org/01903#SignedProperties</a>.
+     *   </dd>
+     *  <dt><b><i>applySystemDate</i></b></dt>
      *   <dd>
      *    Indica si se debe introducir en la firma el atributo <i>signingTime</i> con la fecha actual
-     *    del sistema. Por defecto, se encuentra a {@code true}. 
+     *    del sistema. Por defecto, se encuentra a {@code true}.
      *   </dd>
      * </dl>
      * @return Cofirma en formato XAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-    static byte[] cosign(final byte[] sign, 
-                         final String algorithm, 
-                         final PrivateKeyEntry keyEntry, 
+    static byte[] cosign(final byte[] sign,
+                         final String algorithm,
+                         final PrivateKeyEntry keyEntry,
                          final Properties extraParams) throws AOException {
 
         // nueva instancia de DocumentBuilderFactory que permita espacio de
@@ -462,5 +490,5 @@ final class XAdESCoSigner {
 
         return cosign(baosData.toByteArray(), baosSig.toByteArray(), algorithm, keyEntry, extraParams);
     }
-    
+
 }

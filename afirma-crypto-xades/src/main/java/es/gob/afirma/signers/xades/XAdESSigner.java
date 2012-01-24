@@ -14,6 +14,7 @@ import static es.gob.afirma.signers.xades.AOXAdESSigner.SIGNATURE_TAG;
 import static es.gob.afirma.signers.xades.AOXAdESSigner.STYLE_REFERENCE_PREFIX;
 import static es.gob.afirma.signers.xades.AOXAdESSigner.XADESNS;
 import static es.gob.afirma.signers.xades.AOXAdESSigner.XADES_SIGNATURE_PREFIX;
+import static es.gob.afirma.signers.xades.AOXAdESSigner.XADES_SIGNED_PROPERTIES_TYPE;
 import static es.gob.afirma.signers.xades.AOXAdESSigner.XML_SIGNATURE_PREFIX;
 
 import java.io.ByteArrayInputStream;
@@ -245,9 +246,18 @@ final class XAdESSigner {
      *  <dt><b><i>canonicalizationAlgorithm</i></b></dt>
      *   <dd>Algoritmo de canonicalizaci&oacute;n</dd>
      *  <dt><b><i>xadesNamespace</i></b></dt>
-     *   <dd>URL de definici&oacute;n del espacio de nombres de XAdES (y por extensi&oacute;n, versi&oacute;n de XAdES)</dd> <!--
-     *  <dt><b><i>xmlDSigNamespacePrefix</i></b></dt>
-     *   <dd>Prefijo a usar en el espacio de nombres de XMLDSig (normalmente "dsig" o "ds")</dd> -->
+     *   <dd>
+     *    URL de definici&oacute;n del espacio de nombres de XAdES (y por extensi&oacute;n, versi&oacute;n de XAdES).
+     *    Si se establece este par&aacute;metro es posible que se necesite establecer tambi&eacute;n el par&aacute;metro
+     *    <code>signedPropertiesTypeUrl</code> para evitar incoherencias en la versi&oacute;n de XAdES.
+     *   </dd>
+     *  <dt><b><i>signedPropertiesTypeUrl</i></b></dt>
+     *   <dd>
+     *    URL de definici&oacute;n del tipo de las propiedades firmadas (<i>Signed Properties</i>) de XAdES.
+     *    Si se establece este par&aacute;metro es posible que se necesite establecer tambi&eacute;n el par&aacute;metro
+     *    <code>xadesNamespace</code> para evitar incoherencias en la versi&oacute;n de XAdES.<br>
+     *    Si no se establece se usa el valor por defecto: <a href="http://uri.etsi.org/01903#SignedProperties">http://uri.etsi.org/01903#SignedProperties</a>.
+     *   </dd>
      *  <dt><b><i>ignoreStyleSheets</i></b></dt>
      *   <dd>
      *    Ignora las hojas de estilo externas de los XML (no las firma) si se establece a <code>true</code>,
@@ -322,6 +332,7 @@ final class XAdESSigner {
         final String digestMethodAlgorithm = extraParams.getProperty("referencesDigestMethod", DIGEST_METHOD); //$NON-NLS-1$
         final String canonicalizationAlgorithm = extraParams.getProperty("canonicalizationAlgorithm", CanonicalizationMethod.INCLUSIVE); //$NON-NLS-1$
         final String xadesNamespace = extraParams.getProperty("xadesNamespace", XADESNS); //$NON-NLS-1$
+        final String signedPropertiesTypeUrl = extraParams.getProperty("signedPropertiesTypeUrl", XADES_SIGNED_PROPERTIES_TYPE); //$NON-NLS-1$
         final boolean ignoreStyleSheets = Boolean.parseBoolean(extraParams.getProperty("ignoreStyleSheets", Boolean.TRUE.toString())); //$NON-NLS-1$
         final boolean avoidBase64Transforms = Boolean.parseBoolean(extraParams.getProperty("avoidBase64Transforms", Boolean.FALSE.toString())); //$NON-NLS-1$
         final boolean headLess = Boolean.parseBoolean(extraParams.getProperty("headLess", Boolean.TRUE.toString())); //$NON-NLS-1$
@@ -1030,6 +1041,10 @@ final class XAdESSigner {
         catch (final Exception e) {
             throw new AOException("No se ha podido instanciar la firma XML Avanzada de JXAdES", e); //$NON-NLS-1$
         }
+
+        // Establecemos el tipo de propiedades firmadas
+        xmlSignature.setSignedPropertiesTypeUrl(signedPropertiesTypeUrl);
+
         try {
             xmlSignature.setDigestMethod(digestMethodAlgorithm);
             xmlSignature.setCanonicalizationMethod(canonicalizationAlgorithm);

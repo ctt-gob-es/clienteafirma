@@ -257,7 +257,7 @@ import es.gob.afirma.signers.xml.XMLConstants;
  *    (<code>URI=""</code>), lo cual indica que la firma aplica a la totalidad del documento original.
  *   </p>
  *  </dd>
- * @version 0.3 */
+ * @version 0.3.1 */
 public final class AOXAdESSigner implements AOSigner {
 
     static final Logger LOGGER = Logger.getLogger("es.agob.afirma"); //$NON-NLS-1$
@@ -266,6 +266,9 @@ public final class AOXAdESSigner implements AOSigner {
 
     /** URI que define la versi&oacute;n por defecto de XAdES. */
     static final String XADESNS = "http://uri.etsi.org/01903/v1.3.2#"; //$NON-NLS-1$
+
+    /** URI que define el tipo de propiedades firmadas de XAdES (1.4.x). */
+    static final String XADES_SIGNED_PROPERTIES_TYPE = "http://uri.etsi.org/01903#SignedProperties"; //$NON-NLS-1$
 
     /** URI que define una referencia de tipo OBJECT. */
     static final String OBJURI = "http://www.w3.org/2000/09/xmldsig#Object"; //$NON-NLS-1$
@@ -464,9 +467,18 @@ public final class AOXAdESSigner implements AOSigner {
      *  <dt><b><i>canonicalizationAlgorithm</i></b></dt>
      *   <dd>Algoritmo de canonicalizaci&oacute;n</dd>
      *  <dt><b><i>xadesNamespace</i></b></dt>
-     *   <dd>URL de definici&oacute;n del espacio de nombres de XAdES (y por extensi&oacute;n, versi&oacute;n de XAdES)</dd> <!--
-     *  <dt><b><i>xmlDSigNamespacePrefix</i></b></dt>
-     *   <dd>Prefijo a usar en el espacio de nombres de XMLDSig (normalmente "dsig" o "ds")</dd> -->
+     *   <dd>
+     *    URL de definici&oacute;n del espacio de nombres de XAdES (y por extensi&oacute;n, versi&oacute;n de XAdES).
+     *    Si se establece este par&aacute;metro es posible que se necesite establecer tambi&eacute;n el par&aacute;metro
+     *    <code>signedPropertiesTypeUrl</code> para evitar incoherencias en la versi&oacute;n de XAdES.
+     *   </dd>
+     *  <dt><b><i>signedPropertiesTypeUrl</i></b></dt>
+     *   <dd>
+     *    URL de definici&oacute;n del tipo de las propiedades firmadas (<i>Signed Properties</i>) de XAdES.
+     *    Si se establece este par&aacute;metro es posible que se necesite establecer tambi&eacute;n el par&aacute;metro
+     *    <code>xadesNamespace</code> para evitar incoherencias en la versi&oacute;n de XAdES.<br>
+     *    Si no se establece se usa el valor por defecto: <a href="http://uri.etsi.org/01903#SignedProperties">http://uri.etsi.org/01903#SignedProperties</a>.
+     *   </dd>
      *  <dt><b><i>ignoreStyleSheets</i></b></dt>
      *   <dd>
      *    Ignora las hojas de estilo externas de los XML (no las firma) si se establece a <code>true</code>,
@@ -829,7 +841,18 @@ public final class AOXAdESSigner implements AOSigner {
      *  <dt><b><i>canonicalizationAlgorithm</i></b></dt>
      *   <dd>Algoritmo de canonicalizaci&oacute;n</dd>
      *  <dt><b><i>xadesNamespace</i></b></dt>
-     *   <dd>URL de definici&oacute;n del espacio de nombres de XAdES (y por extensi&oacute;n, versi&oacute;n de XAdES)</dd>
+     *   <dd>
+     *    URL de definici&oacute;n del espacio de nombres de XAdES (y por extensi&oacute;n, versi&oacute;n de XAdES).
+     *    Si se establece este par&aacute;metro es posible que se necesite establecer tambi&eacute;n el par&aacute;metro
+     *    <code>signedPropertiesTypeUrl</code> para evitar incoherencias en la versi&oacute;n de XAdES.
+     *   </dd>
+     *  <dt><b><i>signedPropertiesTypeUrl</i></b></dt>
+     *   <dd>
+     *    URL de definici&oacute;n del tipo de las propiedades firmadas (<i>Signed Properties</i>) de XAdES.
+     *    Si se establece este par&aacute;metro es posible que se necesite establecer tambi&eacute;n el par&aacute;metro
+     *    <code>xadesNamespace</code> para evitar incoherencias en la versi&oacute;n de XAdES.<br>
+     *    Si no se establece se usa el valor por defecto: <a href="http://uri.etsi.org/01903#SignedProperties">http://uri.etsi.org/01903#SignedProperties</a>.
+     *   </dd>
      *  <dt><b><i>applySystemDate</i></b></dt>
      *   <dd>
      *    Indica si se debe introducir en la firma el atributo <i>signingTime</i> con la fecha actual
@@ -912,7 +935,18 @@ public final class AOXAdESSigner implements AOSigner {
      *  <dt><b><i>canonicalizationAlgorithm</i></b></dt>
      *   <dd>Algoritmo de canonicalizaci&oacute;n</dd>
      *  <dt><b><i>xadesNamespace</i></b></dt>
-     *   <dd>URL de definici&oacute;n del espacio de nombres de XAdES (y por extensi&oacute;n, versi&oacute;n de XAdES)</dd>
+     *   <dd>
+     *    URL de definici&oacute;n del espacio de nombres de XAdES (y por extensi&oacute;n, versi&oacute;n de XAdES).
+     *    Si se establece este par&aacute;metro es posible que se necesite establecer tambi&eacute;n el par&aacute;metro
+     *    <code>signedPropertiesTypeUrl</code> para evitar incoherencias en la versi&oacute;n de XAdES.
+     *   </dd>
+     *  <dt><b><i>signedPropertiesTypeUrl</i></b></dt>
+     *   <dd>
+     *    URL de definici&oacute;n del tipo de las propiedades firmadas (<i>Signed Properties</i>) de XAdES.
+     *    Si se establece este par&aacute;metro es posible que se necesite establecer tambi&eacute;n el par&aacute;metro
+     *    <code>xadesNamespace</code> para evitar incoherencias en la versi&oacute;n de XAdES.<br>
+     *    Si no se establece se usa el valor por defecto: <a href="http://uri.etsi.org/01903#SignedProperties">http://uri.etsi.org/01903#SignedProperties</a>.
+     *   </dd>
      *   <dt><b><i>applySystemDate</i></b></dt>
      *   <dd>
      *    Indica si se debe introducir en la firma el atributo <i>signingTime</i> con la fecha actual

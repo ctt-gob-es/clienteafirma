@@ -1,8 +1,17 @@
 package es.gob.afirma.signers.xades;
 
+import static es.gob.afirma.signers.xades.AOXAdESSigner.DIGEST_METHOD;
+import static es.gob.afirma.signers.xades.AOXAdESSigner.LOGGER;
+import static es.gob.afirma.signers.xades.AOXAdESSigner.SIGNATURE_NODE_NAME;
+import static es.gob.afirma.signers.xades.AOXAdESSigner.SIGNATURE_TAG;
+import static es.gob.afirma.signers.xades.AOXAdESSigner.XADESNS;
+import static es.gob.afirma.signers.xades.AOXAdESSigner.XADES_SIGNATURE_PREFIX;
+import static es.gob.afirma.signers.xades.AOXAdESSigner.XADES_SIGNED_PROPERTIES_TYPE;
+import static es.gob.afirma.signers.xades.AOXAdESSigner.XML_SIGNATURE_PREFIX;
+
 import java.io.ByteArrayInputStream;
-import java.security.NoSuchAlgorithmException;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,27 +51,19 @@ import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.XMLConstants;
 
-import static es.gob.afirma.signers.xades.AOXAdESSigner.SIGNATURE_TAG;
-import static es.gob.afirma.signers.xades.AOXAdESSigner.LOGGER;
-import static es.gob.afirma.signers.xades.AOXAdESSigner.SIGNATURE_NODE_NAME;
-import static es.gob.afirma.signers.xades.AOXAdESSigner.XADES_SIGNATURE_PREFIX;
-import static es.gob.afirma.signers.xades.AOXAdESSigner.XADESNS;
-import static es.gob.afirma.signers.xades.AOXAdESSigner.XML_SIGNATURE_PREFIX;
-import static es.gob.afirma.signers.xades.AOXAdESSigner.DIGEST_METHOD;
-
 final class XAdESCounterSigner {
-	
+
 	private XAdESCounterSigner() {
 		// No permitimos la instanciacion
 	}
-	
+
 	private static final String CSURI = "http://uri.etsi.org/01903#CountersignedSignature"; //$NON-NLS-1$
-	
+
     /** Contrafirma firmas en formato XAdES.
      * <p>
      * Este m&eacute;todo contrafirma los nodos de firma indicados de un documento de firma.
      * </p>
-     * @param sign Documento con las firmas iniciales. 
+     * @param sign Documento con las firmas iniciales.
      * @param algorithm Algoritmo a usar para la firma.
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
      * <ul>
@@ -94,7 +95,7 @@ final class XAdESCounterSigner {
      *  <dt><b><i>policyIdentifierHash</i></b></dt>
      *   <dd>
      *    Huella digital del documento de pol&iacute;tica de firma (normlamente del mismo fichero en formato XML procesable).
-     *    Si no se indica, es obligatorio que el par&aacute;metro <code>policyIdentifier</code> sea una URL accesible universalmente 
+     *    Si no se indica, es obligatorio que el par&aacute;metro <code>policyIdentifier</code> sea una URL accesible universalmente
      *   </dd>
      *  <dt><b><i>policyIdentifierHashAlgorithm</i></b></dt>
      *   <dd>Algoritmo usado para el c&aacute;lculo de la huella digital indicada en el par&aacute;metro <code>policyIdentifierHash</code>
@@ -117,7 +118,20 @@ final class XAdESCounterSigner {
      *  <dt><b><i>applySystemDate</i></b></dt>
      *   <dd>
      *    Indica si se debe introducir en la firma el atributo <i>signingTime</i> con la fecha actual
-     *    del sistema. Por defecto, se encuentra a {@code true}. 
+     *    del sistema. Por defecto, se encuentra a {@code true}.
+     *   </dd>
+     *  <dt><b><i>xadesNamespace</i></b></dt>
+     *   <dd>
+     *    URL de definici&oacute;n del espacio de nombres de XAdES (y por extensi&oacute;n, versi&oacute;n de XAdES).
+     *    Si se establece este par&aacute;metro es posible que se necesite establecer tambi&eacute;n el par&aacute;metro
+     *    <code>signedPropertiesTypeUrl</code> para evitar incoherencias en la versi&oacute;n de XAdES.
+     *   </dd>
+     *  <dt><b><i>signedPropertiesTypeUrl</i></b></dt>
+     *   <dd>
+     *    URL de definici&oacute;n del tipo de las propiedades firmadas (<i>Signed Properties</i>) de XAdES.
+     *    Si se establece este par&aacute;metro es posible que se necesite establecer tambi&eacute;n el par&aacute;metro
+     *    <code>xadesNamespace</code> para evitar incoherencias en la versi&oacute;n de XAdES.<br>
+     *    Si no se establece se usa el valor por defecto: <a href="http://uri.etsi.org/01903#SignedProperties">http://uri.etsi.org/01903#SignedProperties</a>.
      *   </dd>
      * </dl>
      * @return Contrafirma en formato XAdES.
@@ -135,7 +149,7 @@ final class XAdESCounterSigner {
         if ("base64".equalsIgnoreCase(encoding)) { //$NON-NLS-1$
             encoding = XMLConstants.BASE64_ENCODING;
         }
-        
+
         if (sign == null) {
             throw new IllegalArgumentException("El objeto de firma no puede ser nulo"); //$NON-NLS-1$
         }
@@ -233,7 +247,7 @@ final class XAdESCounterSigner {
 
         return Utils.writeXML(doc.getDocumentElement(), originalXMLProperties, null, null);
     }
-    
+
     /** Realiza la contrafirma de los nodos indicados en el par&aacute;metro
      * targets
      * @param root
@@ -243,7 +257,7 @@ final class XAdESCounterSigner {
      * @throws AOException
      *         Cuando ocurre cualquier problema durante el proceso */
     private static void countersignNodes(final Element root,
-                                  Object[] tgts,
+                                  final Object[] tgts,
                                   final PrivateKeyEntry keyEntry,
                                   final Properties extraParams,
                                   final String algorithm,
@@ -256,7 +270,7 @@ final class XAdESCounterSigner {
                 targetsList.add((Integer) tgts[i]);
             }
         }
-        Object[] targets = targetsList.toArray();
+        final Object[] targets = targetsList.toArray();
 
         // obtiene todas las firmas
         final NodeList signatures = root.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_TAG);
@@ -322,7 +336,7 @@ final class XAdESCounterSigner {
             cs(i.next(), keyEntry, extraParams, algorithm, doc);
         }
     }
-    
+
     /** Realiza la contrafirma de todos los nodos del arbol
      * @param root
      *        Elemento ra&iacute;z del documento xml que contiene las firmas
@@ -330,9 +344,9 @@ final class XAdESCounterSigner {
      *        Algoritmo de firma XML
      * @throws AOException
      *         Cuando ocurre cualquier problema durante el proceso */
-    private static void countersignTree(final Element root, 
-    		                            final PrivateKeyEntry keyEntry, 
-    		                            final Properties extraParams, 
+    private static void countersignTree(final Element root,
+    		                            final PrivateKeyEntry keyEntry,
+    		                            final Properties extraParams,
     		                            final String algorithm,
     		                            final Document doc) throws AOException {
 
@@ -355,7 +369,7 @@ final class XAdESCounterSigner {
             throw new AOException("No se ha podido realizar la contrafirma del arbol", e); //$NON-NLS-1$
         }
     }
-    
+
     /** Realiza la contrafirma de todos los nodos hoja del arbol
      * @param root
      *        Elemento ra&iacute;z del documento xml que contiene las firmas
@@ -363,9 +377,9 @@ final class XAdESCounterSigner {
      *        Algoritmo de firma XML
      * @throws AOException
      *         Cuando ocurre cualquier problema durante el proceso */
-    private static void countersignLeafs(final Element root, 
-    		                      final PrivateKeyEntry keyEntry, 
-    		                      final Properties extraParams, 
+    private static void countersignLeafs(final Element root,
+    		                      final PrivateKeyEntry keyEntry,
+    		                      final Properties extraParams,
     		                      final String algorithm,
     		                      final Document doc) throws AOException {
 
@@ -391,7 +405,7 @@ final class XAdESCounterSigner {
             throw new AOException("No se ha podido realizar la contrafirma de hojas", e); //$NON-NLS-1$
         }
     }
-    
+
     /** Realiza la contrafirma de la firma pasada por par&aacute;metro
      * @param signature
      *        Elemento con el nodo de la firma a contrafirmar
@@ -399,12 +413,12 @@ final class XAdESCounterSigner {
      *        Algoritmo de firma XML
      * @throws AOException
      *         Cuando ocurre cualquier problema durante el proceso */
-    private static void cs(final Element signature, 
-    		        final PrivateKeyEntry keyEntry, 
-    		        final Properties xParams, 
+    private static void cs(final Element signature,
+    		        final PrivateKeyEntry keyEntry,
+    		        final Properties xParams,
     		        final String algorithm,
     		        final Document doc) throws AOException {
-    	
+
     	if (doc == null) {
     		throw new IllegalArgumentException("El documento DOM no puede ser nulo"); //$NON-NLS-1$
     	}
@@ -414,6 +428,7 @@ final class XAdESCounterSigner {
         final String digestMethodAlgorithm = extraParams.getProperty("referencesDigestMethod", DIGEST_METHOD); //$NON-NLS-1$
         final String canonicalizationAlgorithm = extraParams.getProperty("canonicalizationAlgorithm", CanonicalizationMethod.INCLUSIVE); //$NON-NLS-1$
         final String xadesNamespace = extraParams.getProperty("xadesNamespace", XADESNS); //$NON-NLS-1$
+        final String signedPropertiesTypeUrl = extraParams.getProperty("signedPropertiesTypeUrl", XADES_SIGNED_PROPERTIES_TYPE); //$NON-NLS-1$
 
         // crea un nodo CounterSignature
         final Element counterSignature = doc.createElement(XADES_SIGNATURE_PREFIX + ":CounterSignature"); //$NON-NLS-1$
@@ -531,7 +546,7 @@ final class XAdESCounterSigner {
         }
 
         // SigningTime
-        if (Boolean.parseBoolean(extraParams.getProperty("applySystemDate", Boolean.TRUE.toString()))) { //$NON-NLS-1$ 
+        if (Boolean.parseBoolean(extraParams.getProperty("applySystemDate", Boolean.TRUE.toString()))) { //$NON-NLS-1$
             xades.setSigningTime(new Date());
         }
 
@@ -543,6 +558,10 @@ final class XAdESCounterSigner {
         catch (final Exception e) {
             throw new AOException("No se ha podido instanciar la firma Avanzada XML JXAdES", e); //$NON-NLS-1$
         }
+
+        // Establecemos el tipo de propiedades firmadas
+        xmlSignature.setSignedPropertiesTypeUrl(signedPropertiesTypeUrl);
+
         try {
             xmlSignature.setDigestMethod(digestMethodAlgorithm);
             xmlSignature.setCanonicalizationMethod(canonicalizationAlgorithm);
@@ -552,12 +571,12 @@ final class XAdESCounterSigner {
                                                      + "), es posible que el usado en la firma difiera del indicado: " //$NON-NLS-1$
                                                      + e);
         }
-        
+
         try {
             xmlSignature.sign(
-              Arrays.asList((X509Certificate[])keyEntry.getCertificateChain()), 
-              keyEntry.getPrivateKey(), 
-              XMLConstants.SIGN_ALGOS_URI.get(algorithm), 
+              Arrays.asList((X509Certificate[])keyEntry.getCertificateChain()),
+              keyEntry.getPrivateKey(),
+              XMLConstants.SIGN_ALGOS_URI.get(algorithm),
               referenceList, "Signature-" + UUID.randomUUID().toString(), //$NON-NLS-1$
               null /* TSA */
             );
