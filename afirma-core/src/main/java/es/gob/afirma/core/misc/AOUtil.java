@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -24,6 +24,7 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -38,9 +39,9 @@ public final class AOUtil {
     private AOUtil() {
         // No permitimos la instanciacion
     }
-    
+
     private static final int BUFFER_SIZE = 4096;
-    
+
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     private static final String[] SUPPORTED_URI_SCHEMES = new String[] {
@@ -124,7 +125,7 @@ public final class AOUtil {
      *        URI del fichero a leer
      * @return Flujo de entrada hacia el contenido del fichero
      * @throws AOException
-     *         Cuando ocurre cualquier problema obteniendo el flujo 
+     *         Cuando ocurre cualquier problema obteniendo el flujo
      * @throws IOException Cuando no se ha podido abrir el fichero de datos.
      */
     public static InputStream loadFile(final URI uri) throws AOException, IOException {
@@ -146,8 +147,8 @@ public final class AOUtil {
         }
 
         // Es una URL
-        InputStream tmpStream = new BufferedInputStream(uri.toURL().openStream());
-        
+        final InputStream tmpStream = new BufferedInputStream(uri.toURL().openStream());
+
         // Las firmas via URL fallan en la descarga por temas de Sun, asi que
         // descargamos primero
         // y devolvemos un Stream contra un array de bytes
@@ -178,7 +179,7 @@ public final class AOUtil {
         return baos.toByteArray();
     }
 
-    
+
 
     /** Obtiene el nombre com&uacute;n (Common Name, CN) del titular de un
      * certificado X.509. Si no se encuentra el CN, se devuelve la unidad organizativa
@@ -207,26 +208,26 @@ public final class AOUtil {
         if (principal == null) {
             return null;
         }
-        
+
         String rdn = getRDNvalue("cn", principal); //$NON-NLS-1$
         if (rdn == null) {
             rdn = getRDNvalue("ou", principal); //$NON-NLS-1$
         }
-        
+
         if (rdn != null) {
             return rdn;
         }
-        
-        int i = principal.indexOf('=');
+
+        final int i = principal.indexOf('=');
         if (i != -1) {
             LOGGER .warning("No se ha podido obtener el Common Name ni la Organizational Unit, se devolvera el fragmento mas significativo"); //$NON-NLS-1$
             return getRDNvalue(principal.substring(0, i), principal);
         }
-        
+
         LOGGER.warning("Principal no valido, se devolvera la entrada"); //$NON-NLS-1$
         return principal;
     }
-    
+
     /**
      * Recupera el valor de un RDN de un principal. El valor de retorno no incluye
      * el nombre del RDN, el igual, ni las posibles comillas que envuelvan el valor.
@@ -237,7 +238,7 @@ public final class AOUtil {
      * @return Valor del RDN indicado o {@code null} si no se encuentra.
      */
     private static String getRDNvalue(final String rdn, final String principal) {
-        
+
         int offset1 = 0;
         while ((offset1 = principal.toLowerCase().indexOf(rdn.toLowerCase(), offset1)) != -1) {
 
@@ -245,29 +246,29 @@ public final class AOUtil {
                 offset1++;
                 continue;
             }
-            
+
             offset1 += rdn.length();
             while (offset1 < principal.length() && principal.charAt(offset1) == ' ') {
                 offset1++;
             }
-            
+
             if (offset1 >= principal.length()) {
                 return null;
             }
-            
+
             if (principal.charAt(offset1) != '=') {
                 continue;
             }
-            
+
             offset1++;
             while (offset1 < principal.length() && principal.charAt(offset1) == ' ') {
                 offset1++;
             }
-            
+
             if (offset1 >= principal.length()) {
                 return ""; //$NON-NLS-1$
             }
-            
+
             int offset2;
             if (principal.charAt(offset1) == ',') {
                 return ""; //$NON-NLS-1$
@@ -276,7 +277,7 @@ public final class AOUtil {
                 if (offset1 >= principal.length()) {
                     return ""; //$NON-NLS-1$
                 }
-                
+
                 offset2 = principal.indexOf('"', offset1);
                 if (offset2 == offset1) {
                     return ""; //$NON-NLS-1$
@@ -285,19 +286,19 @@ public final class AOUtil {
                 } else {
                     return principal.substring(offset1);
                 }
-            } 
+            }
             else {
                 offset2 = principal.indexOf(',', offset1);
                 if (offset2 != -1) {
                     return principal.substring(offset1, offset2).trim();
-                } 
+                }
                 return principal.substring(offset1).trim();
             }
         }
 
         return null;
     }
-    
+
     /** Caracterres aceptados en una codificaci&oacute;n Base64 seg&uacute;n la
      * <a href="http://www.faqs.org/rfcs/rfc3548.html">RFC 3548</a>. Importante:
      * A&ntilde;adimos el car&aacute;cter &tilde; porque en ciertas
@@ -447,7 +448,7 @@ public final class AOUtil {
      *        Cadena para la identaci&oacute;n de los nodos de firma (por
      *        defecto, tabulador).
      * @return Cadena de texto. */
-    public static String showTreeAsString(final AOTreeModel tree, String linePrefx, String identationString) {
+    public static String showTreeAsString(final AOTreeModel tree, final String linePrefx, final String identationString) {
 
         if (tree == null || tree.getRoot() == null) {
             LOGGER.severe("Se ha proporcionado un arbol de firmas vacio"); //$NON-NLS-1$
@@ -637,7 +638,7 @@ public final class AOUtil {
 
         return parts.toArray(new String[0]);
     }
-    
+
     /** Carga una clase excluyendo de la ruta de b&uacute;squeda de clases las URL que no correspondan con JAR.
      * @param className Nombre de la clase a cargar
      * @return Clase cargada
@@ -647,14 +648,14 @@ public final class AOUtil {
         getCleanClassLoader().loadClass(className);
         return Class.forName(className);
     }
-    
+
     /** Obtiene un ClassLoader que no incluye URL que no referencien directamente a ficheros JAR.
      * @return ClassLoader sin URL adicionales a directorios sueltos Web
      */
     public static ClassLoader getCleanClassLoader() {
         ClassLoader classLoader = AOUtil.class.getClassLoader();
         if (classLoader instanceof URLClassLoader && !classLoader.getClass().toString().contains("sun.plugin2.applet.JNLP2ClassLoader")) { //$NON-NLS-1$
-        	final ArrayList<URL> urls = new ArrayList<URL>();
+        	final List<URL> urls = new ArrayList<URL>();
         	for (final URL url : ((URLClassLoader) classLoader).getURLs()) {
         		if (url.toString().endsWith(".jar")) { //$NON-NLS-1$
         			urls.add(url);

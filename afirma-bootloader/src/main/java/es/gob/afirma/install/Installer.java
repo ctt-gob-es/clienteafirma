@@ -20,7 +20,7 @@ import javax.swing.JOptionPane;
 /** Instalador del cliente AFirma.
  * @version 2.0 */
 final class Installer {
-    
+
     /** Gestor de registro. */
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$;
 
@@ -58,8 +58,12 @@ final class Installer {
      * @param parentComponent Componente padre sobre el que se muestran los di&aacute;logos.
      * @return Indica si se ha aceptado o no el acuerdo de licencia. */
     private boolean prepareInstall() {
-        JOptionPane.showMessageDialog(this.parentComponent,
-                                      BootLoaderMessages.getString("Installer.0"), BootLoaderMessages.getString("Installer.1"), JOptionPane.INFORMATION_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+        JOptionPane.showMessageDialog(
+    		this.parentComponent,
+            BootLoaderMessages.getString("Installer.0"), //$NON-NLS-1$
+            BootLoaderMessages.getString("Installer.1"), //$NON-NLS-1$
+            JOptionPane.INFORMATION_MESSAGE
+        );
         final boolean accepted = new LicenceDialogPanel(this.parentComponent).showDisclaimer();
         if (accepted) {
             LOGGER.info("Se ha aceptado el acuerdo de licencia"); //$NON-NLS-1$

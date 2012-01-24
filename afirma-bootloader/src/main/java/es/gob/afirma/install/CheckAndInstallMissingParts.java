@@ -24,7 +24,7 @@ import es.gob.afirma.install.BootPlatform.OS;
 /** Clase para la comprobaci&oacute;n e instalaci&oacute;n de las dependencias de
  * entorno del Cliente @firma. */
 final class CheckAndInstallMissingParts {
-    
+
     /** Gestor de registro. */
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$;
 
@@ -51,7 +51,9 @@ final class CheckAndInstallMissingParts {
      * @param instalDir Directorio de instalaci&oacute;n. */
     CheckAndInstallMissingParts(final OS ost, final JREVER jreVer, final String bld, final URL filesCodeBase) {
         if (filesCodeBase == null) {
-            throw new IllegalArgumentException("Es necesario proporcionar una URL de descarga para los ficheros de instalacion"); //$NON-NLS-1$
+            throw new IllegalArgumentException(
+        		"Es necesario proporcionar una URL de descarga para los ficheros de instalacion" //$NON-NLS-1$
+    		);
         }
         this.installFilesCodeBase = filesCodeBase;
         this.os = ost;
@@ -66,8 +68,16 @@ final class CheckAndInstallMissingParts {
      * @throws IOException Si ocurre un error de entrada/salida */
     void installEndorsedJava5AFirmaDependencies() throws IOException, URISyntaxException {
         try {
-            AOInstallUtils.copyFileFromURL(AOBootUtil.createURLFile(this.installFilesCodeBase, AFIRMA_JAVA5_JAR + AOInstallUtils.PACK200_SUFIX),
-                                           new File(BootPlatform.getEndorsedDir(), AFIRMA_JAVA5_JAR + AOInstallUtils.PACK200_SUFIX));
+            AOInstallUtils.copyFileFromURL(
+        		AOBootUtil.createURLFile(
+    				this.installFilesCodeBase,
+    				AFIRMA_JAVA5_JAR + AOInstallUtils.PACK200_SUFIX
+				),
+                new File(
+            		BootPlatform.getEndorsedDir(),
+            		AFIRMA_JAVA5_JAR + AOInstallUtils.PACK200_SUFIX
+        		)
+    		);
             AOInstallUtils.unpack(BootPlatform.getEndorsedDir() + File.separator + AFIRMA_JAVA5_JAR + AOInstallUtils.PACK200_SUFIX);
         }
         catch (final Exception e) {
@@ -104,9 +114,9 @@ final class CheckAndInstallMissingParts {
         // Descomprimimos las DLL de SunMSCAPI en el directorio de binarios del JRE
         AOInstallUtils.installZip(
               AOBootUtil.createURLFile(
-                   this.installFilesCodeBase,
+        		   this.installFilesCodeBase,
                    "mscapi_" + BootPlatform.getOsArch() + "_JRE" + BootPlatform.getJavaArch() + ".zip" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-              ), 
+              ),
               new File(BootPlatform.getJavaHome() + File.separator + "bin"), //$NON-NLS-1$
               SigningCert.INTEGRATOR
         );
@@ -149,21 +159,27 @@ final class CheckAndInstallMissingParts {
             for (final File file : tempDir.listFiles()) {
                 filename = file.getName();
                 if (filename.endsWith(".pack.gz")) { //$NON-NLS-1$
-                    AOInstallUtils.unpack(file.getAbsolutePath(),
-                                          BootPlatform.getEndorsedDir() + File.separator + filename.substring(0, filename.lastIndexOf(".pack.gz"))); //$NON-NLS-1$
+                    AOInstallUtils.unpack(
+                		file.getAbsolutePath(),
+                        BootPlatform.getEndorsedDir() + File.separator + filename.substring(0, filename.lastIndexOf(".pack.gz")) //$NON-NLS-1$
+                    );
                 }
             }
         }
         catch (final Exception e) {
-            LOGGER.warning("No se ha podido instalar la version PACK200 de Xalan, se intentara la version JAR: " + e); //$NON-NLS-1$
+            LOGGER.warning(
+        		"No se ha podido instalar la version PACK200 de Xalan, se intentara la version JAR: " + e //$NON-NLS-1$
+    		);
             if (AfirmaBootLoader.DEBUG) {
                 final java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
                 e.printStackTrace(new java.io.PrintStream(baos));
                 LOGGER.warning(new String(baos.toByteArray()));
             }
-            AOInstallUtils.installZip(AOBootUtil.createURLFile(this.installFilesCodeBase, XALAN_JARLIBRARY_ZIP),
-                                      new File(getEndorsedDir()),
-                                      SigningCert.INTEGRATOR);
+            AOInstallUtils.installZip(
+        		AOBootUtil.createURLFile(this.installFilesCodeBase, XALAN_JARLIBRARY_ZIP),
+                new File(getEndorsedDir()),
+                SigningCert.INTEGRATOR
+            );
         }
         finally {
             if (tempDir != null) {

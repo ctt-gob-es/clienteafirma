@@ -30,9 +30,9 @@ import java.util.logging.Logger;
 import java.util.zip.ZipFile;
 
 /** M&eacute;todos generales de utilidad para toda la aplicaci&oacute;n.
- * @version 0.3 */
+ * @version 0.3.1 */
 final class AOBootUtil {
-    
+
     /** Gestor de registro. */
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$;
 
@@ -42,15 +42,15 @@ final class AOBootUtil {
 
     /** Esquemas de ruta soportados. */
     private static final String[] SUPPORTED_URI_SCHEMES = new String[] {
-                                                                        "http", //$NON-NLS-1$
-                                                                        "https", //$NON-NLS-1$
-                                                                        "file" //$NON-NLS-1$
+        "http", //$NON-NLS-1$
+        "https", //$NON-NLS-1$
+        "file" //$NON-NLS-1$
     };
 
     /** Crea una URI a partir de un nombre de fichero local o una URL.
      * @param filename Nombre del fichero local o URL
      * @return URI (<code>file://</code>) del fichero local o URL
-     * @throws URISyntaxException 
+     * @throws URISyntaxException
      * @throws URISyntaxException cuando ocurre cualquier problema creando la URI */
     static URI createURI(final String file) throws URISyntaxException {
 
@@ -84,7 +84,7 @@ final class AOBootUtil {
         if (scheme.length() == 1 && Character.isLetter((char) scheme.getBytes()[0])) {
             return createURI("file://" + filename); //$NON-NLS-1$
         }
-        
+
         throw new IllegalArgumentException("Formato de URI valido pero no soportado '" + filename + "'"); //$NON-NLS-1$ //$NON-NLS-2$
 
     }
@@ -94,9 +94,6 @@ final class AOBootUtil {
      * @return Flujo de entrada hacia el contenido del fichero
      * @throws IOException Cuando ocurre cualquier problema obteniendo el flujo*/
     static InputStream loadFile(final URI uri) throws IOException {
-
-        // Cuidado: Repinta mal el dialogo de espera, hay que tratar con hilos nuevos
-        // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4209604
 
         if (uri == null) {
             throw new IllegalArgumentException("Se ha pedido el contenido de una URI nula"); //$NON-NLS-1$
@@ -132,14 +129,12 @@ final class AOBootUtil {
      * @return Los datos obtenidos del flujo.
      * @throws IOException Si ocurre cualquier error durante la lectura de datos */
     static byte[] getDataFromInputStream(final InputStream input) throws IOException {
-
         int nBytes = 0;
         final byte[] buffer = new byte[1024];
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         while ((nBytes = input.read(buffer)) != -1) {
             baos.write(buffer, 0, nBytes);
         }
-
         return baos.toByteArray();
     }
 
@@ -198,11 +193,13 @@ final class AOBootUtil {
             }
         }
         catch (final Exception e) {
-            LOGGER.severe("No se ha podido copiar el fichero origen '" + source.getName() //$NON-NLS-1$
-                                                     + "' al destino '" //$NON-NLS-1$
-                                                     + dest.getName()
-                                                     + "': " //$NON-NLS-1$
-                                                     + e);
+            LOGGER.severe(
+        		"No se ha podido copiar el fichero origen '" + source.getName() //$NON-NLS-1$
+                  + "' al destino '" //$NON-NLS-1$
+                  + dest.getName()
+                  + "': " //$NON-NLS-1$
+                  + e
+            );
             return false;
         }
         return true;
@@ -276,20 +273,20 @@ final class AOBootUtil {
         }
         return idVersion;
     }
-    
+
     /** Obtiene un ClassLoader que no incluye URL que no referencien directamente a ficheros JAR.
      * @return ClassLoader sin URL adicionales a directorios sueltos Web
      */
     static ClassLoader getCleanClassLoader() {
         ClassLoader classLoader = AOBootUtil.class.getClassLoader();
-        if (classLoader instanceof URLClassLoader) {
-            final List<URL> urls = new ArrayList<URL>();
-            for (final URL url : ((URLClassLoader)classLoader).getURLs()) {
-                if (url.toString().endsWith(".jar")) { //$NON-NLS-1$
-                    urls.add(url);
-                }
-                classLoader = new URLClassLoader(urls.toArray(new URL[0]));
-            }
+        if (classLoader instanceof URLClassLoader && !classLoader.getClass().toString().contains("sun.plugin2.applet.JNLP2ClassLoader")) { //$NON-NLS-1$
+        	final List<URL> urls = new ArrayList<URL>();
+        	for (final URL url : ((URLClassLoader) classLoader).getURLs()) {
+        		if (url.toString().endsWith(".jar")) { //$NON-NLS-1$
+        			urls.add(url);
+        		}
+        	}
+        	classLoader = new URLClassLoader(urls.toArray(new URL[0]));
         }
         return classLoader;
     }
