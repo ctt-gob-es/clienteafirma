@@ -17,7 +17,7 @@
  *  poder realizar llamadas a <i>sunmscapi.dll</i>.
  * </p>
  * <p>
- *  Este m&oacute;dulo es compatible con cualquier entorno JSE 1.6 o superior, siempre en entornos MS-Windows.<br>
+ *  Este m&oacute;dulo es compatible con cualquier entorno JSE 1.6 o superior que incorporen el proveedor de seguridad SunMSCAPI, siempre en entornos MS-Windows.<br>
  * </p>
  * <p>
  *  Desde este m&oacute;dulo no se realizan llamadas a interfaces gr&aacute;ficas.<br>
