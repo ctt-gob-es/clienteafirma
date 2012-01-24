@@ -2051,7 +2051,7 @@ public interface EntryPointsCrypto {
      * in mandatory cases, a dialog will be displayed, promting the user to
      * select it. <br/>
      * Results may me retrieved in base64 with {@link #getB64Data()} and can be
-     * saved to a file with {@link #saveDataToFile()}.
+     * saved to a file with {@link #saveDataToFile(String)}.
      * @return Devuelve <code>true</code> si la operaci&oacute;n finaliz&oacute;
      *         con &eacute;xito. <br>
      *         Returns <code>true</code> if operation ended successfully. */
