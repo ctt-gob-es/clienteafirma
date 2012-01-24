@@ -193,7 +193,7 @@ public interface EntryPointsUtil {
      *        Plain Text.
      * @return Texto codificado. <br>
      *         Encoded Text.
-     * @deprecated Usar {@link #getBase64FromText(String, String) */
+     * @deprecated Usar {@link #getBase64FromText(String, String)} */
     @Deprecated
     String getBase64FromText(String plainText);
 
