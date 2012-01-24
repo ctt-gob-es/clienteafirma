@@ -40,41 +40,41 @@ public class EnveloperTest {
     /**
     * Genera un envoltorio CMS encriptado.
     */
-   @SuppressWarnings("static-method")
-	@Test
-	public void encryptedDataTest() {
+    @SuppressWarnings("static-method")
+    @Test
+    public void encryptedDataTest() {
 
-   	final String path = new File("").getAbsolutePath(); //$NON-NLS-1$
+    	final String path = new File("").getAbsolutePath(); //$NON-NLS-1$
 
-   	final String plainDataFile = this.getResourcePathToApplet(PLAIN_DATA_FILE);
+    	final String plainDataFile = this.getResourcePathToApplet(PLAIN_DATA_FILE);
 
-   	final SignApplet applet = new SignApplet();
-   	final String plainDataB64 = applet.getFileBase64Encoded(plainDataFile, false);
+    	final SignApplet applet = new SignApplet();
+    	final String plainDataB64 = applet.getFileBase64Encoded(plainDataFile, false);
 
-   	applet.setUseCipherKeyStore(false);
-   	applet.setData(plainDataB64);
-   	applet.setCMSContentType(AOSignConstants.CMS_CONTENTTYPE_ENCRYPTEDDATA);
-   	applet.buildCMSStructure();
-   	Assert.assertEquals(applet.isError(), false);
+    	applet.setUseCipherKeyStore(false);
+    	applet.setData(plainDataB64);
+    	applet.setCMSContentType(AOSignConstants.CMS_CONTENTTYPE_ENCRYPTEDDATA);
+    	applet.buildCMSStructure();
+    	Assert.assertEquals(applet.isError(), false);
 
-   	final String b64Data = applet.getB64Data();
-   	Assert.assertNotNull(b64Data);
+    	final String b64Data = applet.getB64Data();
+    	Assert.assertNotNull(b64Data);
 
-   	final String b64Key = applet.getKey();
-   	Assert.assertNotNull(b64Key);
+    	final String b64Key = applet.getKey();
+    	Assert.assertNotNull(b64Key);
 
-   	System.out.println(b64Key);
+    	System.out.println(b64Key);
 
-   	applet.initialize();
+    	applet.initialize();
 
-   	applet.setData(b64Data);
-   	applet.setKey(b64Key);
-   	applet.recoverCMS();
+    	applet.setData(b64Data);
+    	applet.setKey(b64Key);
+    	applet.recoverCMS();
 
-   	final String resultData = applet.getB64Data();
-   	Assert.assertNotNull(resultData);
-   	Assert.assertEquals(plainDataB64, resultData);
-	}
+    	final String resultData = applet.getB64Data();
+    	Assert.assertNotNull(resultData);
+    	Assert.assertEquals(plainDataB64, resultData);
+    }
 
     /**
      * Genera un envoltorio CMS envuelto.
