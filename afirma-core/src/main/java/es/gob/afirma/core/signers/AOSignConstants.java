@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -61,16 +61,16 @@ public final class AOSignConstants {
 
     /** Identificador alternativo n&uacute;mero 1 para el formato OOXML. */
     public static final String SIGN_FORMAT_OOXML_ALT1 = "OOXML"; //$NON-NLS-1$
-    
+
     /** Identificador de la firma ODF (<i>Open Document Format</i>). */
     public static final String SIGN_FORMAT_ODF = "ODF (Open Document Format)"; //$NON-NLS-1$
 
     /** Identificador alternativo n&uacute;mero 1 para el formato ODF. */
     public static final String SIGN_FORMAT_ODF_ALT1 = "ODF"; //$NON-NLS-1$
-    
+
     /** Identificador de la firma Adobe PDF. */
     public static final String SIGN_FORMAT_PDF = "Adobe PDF"; //$NON-NLS-1$
-    
+
     /** Identificador de la firma PAdES. */
     public static final String SIGN_FORMAT_PADES = "PAdES"; //$NON-NLS-1$
 
@@ -78,7 +78,7 @@ public final class AOSignConstants {
     public static final String SIGN_FORMAT_SOAP = "SOAP"; //$NON-NLS-1$
 
     /** Formato de firma por defecto. */
-    public static final String DEFAULT_SIGN_FORMAT = SIGN_FORMAT_CMS;
+    public static final String DEFAULT_SIGN_FORMAT = SIGN_FORMAT_CADES;
 
     /** Identificador de la operaci&oacute;n de firma masiva. */
     public static final String MASSIVE_OPERATION_SIGN = "FIRMAR"; //$NON-NLS-1$
@@ -130,7 +130,7 @@ public final class AOSignConstants {
 
     /** OID por defecto para los datos firmados. */
     public static final String DEFAULT_OID_TO_SIGN = "1.3.6.1.4.1.1466.115.121.1.40"; // Octect //$NON-NLS-1$
-                                                                                      // String    
+                                                                                      // String
     // ************************************************************
     // ************* ALGORITMOS DE FIRMA **************************
     // ************************************************************
@@ -179,14 +179,14 @@ public final class AOSignConstants {
             SIGN_ALGORITHM_SHA1WITHECDSA,
             SIGN_ALGORITHM_NONEWITHECDSA
     };
-    
+
     /** Algoritmo de firma por defecto. */
     public static final String DEFAULT_SIGN_ALGO = SIGN_ALGORITHM_SHA1WITHRSA;
-    
+
     // ************************************************************
     // ****************** MODOS DE FIRMA **************************
     // ************************************************************
-    
+
     /** Identificador del modo de firma Explicita (Los datos NO se incluyen en la
      * firma). */
     public static final String SIGN_MODE_EXPLICIT = "explicit"; //$NON-NLS-1$
@@ -201,7 +201,7 @@ public final class AOSignConstants {
     private AOSignConstants() {
         // No permitimos la instanciacion
     }
-    
+
     /** Obtiene el nombre de un algoritmo de huella digital a partir de una de
      * las variantes de este.
      * @param pseudoName
@@ -213,7 +213,7 @@ public final class AOSignConstants {
             || upperPseudoName.equals("http://www.w3.org/2000/09/xmldsig#sha1".toUpperCase()) //$NON-NLS-1$
             || upperPseudoName.equals("1.3.14.3.2.26") //$NON-NLS-1$
             || upperPseudoName.startsWith("SHA1") //$NON-NLS-1$
-            || upperPseudoName.startsWith("SHA-1")) //$NON-NLS-1$            
+            || upperPseudoName.startsWith("SHA-1")) //$NON-NLS-1$
         {
             return "SHA1"; //$NON-NLS-1$
         }
