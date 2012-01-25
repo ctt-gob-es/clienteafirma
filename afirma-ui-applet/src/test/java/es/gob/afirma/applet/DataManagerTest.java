@@ -22,6 +22,10 @@ import org.junit.Test;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 
+/**
+ * Comprueba los m&eacute;todos de entrada y salida de datos del applet, adem&aacute;s de los
+ * m&eacute;todos de utilidad para conversi&oacute;n de texto y base64.
+ */
 public class DataManagerTest {
 
 	private static final String DATA_FILE = "txt"; //$NON-NLS-1$
@@ -66,6 +70,10 @@ public class DataManagerTest {
 	}
 
 
+	/**
+	 * Comprueba que los datos introducidos y recuperamos mediante los distintos m&eacute;todos
+	 * coincidan.
+	 */
 	@Test
 	public void recoverData() {
 
