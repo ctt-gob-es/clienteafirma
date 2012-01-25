@@ -281,6 +281,8 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     @Override
     public void init() {
 
+    	changeLocale(getParameter("language"), getParameter("country"), getParameter("variant")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
     	LOGGER.info("Cliente @firma V3.2"); //$NON-NLS-1$
         LOGGER.info("Versi\u00F3n: " + getVersion()); //$NON-NLS-1$
 
@@ -3934,9 +3936,25 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         return signText(stringToSign, caOption, null);
     }
 
-    public void changeLanguage(final String locale) {
-        if (locale != null) {
-            Locale.setDefault(new Locale(locale));
-        }
+    /**
+     * Cambia el idioma de la aplicaci&oacute;n.
+     * @param language Idioma.
+     * @param country Pa&iacute;s.
+     * @param variant Variante.
+     */
+    private void changeLocale(final String language, final String country, final String variant) {
+    	if (language != null) {
+    		Locale locale;
+    		if (country != null) {
+    			if (variant != null) {
+    				locale = new Locale(language, country, variant);
+    			} else {
+    				locale = new Locale(language, country);
+    			}
+    		} else {
+    			locale = new Locale(language);
+    		}
+    		Locale.setDefault(locale);
+    	}
     }
 }
