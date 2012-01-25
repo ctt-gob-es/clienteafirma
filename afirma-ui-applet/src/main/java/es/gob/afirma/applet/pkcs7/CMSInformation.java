@@ -341,11 +341,11 @@ public final class CMSInformation {
 		//obtenemos lo atributos opcionales
 		if (envelopeType != TYPE_SIGNED_ENVELOPED_DATA) {
 			if (unprotectedAttrs == null){
-				detalle = detalle + "Atributos : No tiene atributos opcionales" + "\n"; //$NON-NLS-2$
+				detalle = detalle + "Atributos: No tiene atributos opcionales" + "\n"; //$NON-NLS-2$
 			}
 			else{
 				final String atributos = getUnSignedAttributes(unprotectedAttrs.getObjects());
-				detalle = detalle + "Atributos : \n";
+				detalle = detalle + "Atributos:" + "\n"; //$NON-NLS-2$
 				detalle = detalle + atributos;
 			}
 		} else if (envelopeType == TYPE_SIGNED_ENVELOPED_DATA || envelopeType == TYPE_SIGNED_DATA) {
