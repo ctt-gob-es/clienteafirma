@@ -11,33 +11,18 @@
 package es.gob.afirma.applet.pkcs7;
 
 import java.io.IOException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.AlgorithmParameterSpec;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.logging.Logger;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.PBEParameterSpec;
-
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.asn1.DEREncodable;
 import org.bouncycastle.asn1.DERInteger;
-import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DERObjectIdentifier;
-import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERUTCTime;
 import org.bouncycastle.asn1.cms.AuthEnvelopedData;
 import org.bouncycastle.asn1.cms.AuthenticatedData;
@@ -57,8 +42,6 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 
 import es.gob.afirma.core.AOInvalidFormatException;
-import es.gob.afirma.core.ciphers.AOCipherConfig;
-import es.gob.afirma.core.ciphers.CipherConstants;
 import es.gob.afirma.core.ciphers.CipherConstants.AOCipherAlgorithm;
 import es.gob.afirma.signers.pkcs7.DigestedData;
 import es.gob.afirma.signers.pkcs7.SignedAndEnvelopedData;
@@ -82,12 +65,17 @@ import es.gob.afirma.signers.pkcs7.SignedAndEnvelopedData;
  */
 public final class CMSInformation {
 
-	private static final byte[] SALT = {
-		(byte)0xA2, (byte)0x35, (byte)0xDC, (byte)0xA4,
-		(byte)0x11, (byte)0x7C, (byte)0x99, (byte)0x4B
-	};
+	private static final int TYPE_ENVELOPED_DATA = 0;
 
-	private static final int ITERATION_COUNT = 9;
+	private static final int TYPE_AUTHENTICATED_DATA = 1;
+
+	private static final int TYPE_AUTHENTICATED_ENVELOPED_DATA = 2;
+
+	private static final int TYPE_SIGNED_ENVELOPED_DATA = 3;
+
+	private static final int TYPE_SIGNED_DATA = 4;
+
+	private static final int TYPE_ENCRYPTED_DATA = 5;
 
 	/**
 	 * M&eacute;todo principal que obtiene la informaci&oacute;n a partir de un fichero firmado
@@ -98,7 +86,7 @@ public final class CMSInformation {
 	 * @throws AOInvalidFormatException Error de formato no v&aacute;lido.
 	 */
 	public static String getInformation(final byte[] data) throws IOException, AOInvalidFormatException {
-		String datos=""; //$NON-NLS-1$
+		String datos = ""; //$NON-NLS-1$
 
 		final ASN1InputStream is = new ASN1InputStream(data);
 		// LEEMOS EL FICHERO QUE NOS INTRODUCEN
@@ -110,29 +98,29 @@ public final class CMSInformation {
 		// Contenido a obtener informacion
 		final ASN1TaggedObject doj =(ASN1TaggedObject) e.nextElement();
 		if (doi.equals(PKCSObjectIdentifiers.data)){
-			datos = "Tipo: Data\n"; //$NON-NLS-1$
+			datos = "Tipo: Data" + "\n"; //$NON-NLS-2$
 		}
 		else if(doi.equals(PKCSObjectIdentifiers.digestedData)){
 			datos = getFromDigestedData(doj);
 		}
 		else if(doi.equals(PKCSObjectIdentifiers.encryptedData)){
 
-			datos = extractData(doj, "5", "Tipo: Encrypted\n", "CMS"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			datos = extractData(doj, TYPE_ENCRYPTED_DATA, "Tipo: Encrypted\n", "CMS"); //$NON-NLS-1$
 		}
 		else if(doi.equals(PKCSObjectIdentifiers.signedData)){
-			datos = extractData(doj, "4", "Tipo: SignedData\n", "CMS"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			datos = extractData(doj, TYPE_SIGNED_DATA, "Tipo: SignedData\n", "CMS"); //$NON-NLS-1$
 		}
 		else if(doi.equals(PKCSObjectIdentifiers.envelopedData)){
-			datos = extractData(doj, "0", "Tipo: EnvelopedData\n", "CMS"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			datos = extractData(doj, TYPE_ENVELOPED_DATA, "Tipo: EnvelopedData\n", "CMS"); //$NON-NLS-1$
 		}
 		else if(doi.equals(PKCSObjectIdentifiers.signedAndEnvelopedData)){
-			datos = extractData(doj, "3", "Tipo: SignedAndEnvelopedData\n", "CMS"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			datos = extractData(doj, TYPE_SIGNED_ENVELOPED_DATA, "Tipo: SignedAndEnvelopedData\n", "CMS"); //$NON-NLS-1$
 		}
 		else if(doi.equals(PKCSObjectIdentifiers.id_ct_authData)){
-			datos = extractData(doj, "1", "Tipo: AuthenticatedData\n", "CMS"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			datos = extractData(doj, TYPE_AUTHENTICATED_DATA, "Tipo: AuthenticatedData\n", "CMS"); //$NON-NLS-1$
 		}
 		else if(doi.equals(PKCSObjectIdentifiers.id_ct_authEnvelopedData)){
-			datos = extractData(doj, "2", "Tipo: AuthenticatedEnvelopedData\n", "CMS"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			datos = extractData(doj, TYPE_AUTHENTICATED_ENVELOPED_DATA, "Tipo: AuthenticatedEnvelopedData\n", "CMS"); //$NON-NLS-1$
 		}
 		else if(doi.equals(CMSObjectIdentifiers.compressedData)){
 			datos = getFromCompressedData(doj);
@@ -150,19 +138,19 @@ public final class CMSInformation {
 	 */
 	private static String getFromDigestedData(final ASN1TaggedObject doj) {
 		String detalle = ""; //$NON-NLS-1$
-		detalle = detalle + "Tipo: DigestedData\n"; //$NON-NLS-1$
+		detalle = detalle + "Tipo: DigestedData" + "\n"; //$NON-NLS-2$
 
 		//obtenemos el digestedData
 		final DigestedData dd = new DigestedData((ASN1Sequence)doj.getObject());
 
 		//obtenemos la version
-		detalle = detalle + "Version: " + dd.getVersion() + "\n"; //$NON-NLS-1$ //$NON-NLS-2$
+		detalle = detalle + "Version: " + dd.getVersion() + "\n"; //$NON-NLS-2$
 
 		//obtenemos el algoritmo
-		detalle = detalle + "Algoritmo de firma: " + dd.getDigestAlgorithm() + "\n"; //$NON-NLS-1$ //$NON-NLS-2$
+		detalle = detalle + "Algoritmo de firma: " + dd.getDigestAlgorithm() + "\n"; //$NON-NLS-2$
 
 		//obtenemos el tipo de contenido
-		detalle = detalle + "Tipo de Contenido: " + dd.getContentType() + "\n"; //$NON-NLS-1$ //$NON-NLS-2$
+		detalle = detalle + "Tipo de Contenido: " + dd.getContentType() + "\n"; //$NON-NLS-2$
 
 		return detalle;
 	}
@@ -204,7 +192,7 @@ public final class CMSInformation {
 	 * @param signBinaryType Tipo de firmado binario (CADES o CMS)
 	 * @return  Representaci&oacute;n de los datos.
 	 */
-	public static String extractData(final ASN1TaggedObject doj, final String envelopeType,
+	private static String extractData(final ASN1TaggedObject doj, final int envelopeType,
 			final String tipoDetalle, final String signBinaryType) {
 		String detalle = ""; //$NON-NLS-1$
 		detalle = detalle + tipoDetalle;
@@ -219,46 +207,53 @@ public final class CMSInformation {
 		ASN1Set ds = null;
 		ASN1Set signerInfosSd = null;
 
-		if (envelopeType.equals("0")) { //$NON-NLS-1$
-			final EnvelopedData ed = new EnvelopedData((ASN1Sequence)doj.getObject());
-			version = ed.getVersion();
-			rins = ed.getRecipientInfos();
-			encryptedContentInfo = ed.getEncryptedContentInfo();
-			unprotectedAttrs = ed.getUnprotectedAttrs();
-		} else if (envelopeType.equals("1")) { //$NON-NLS-1$
-			final AuthenticatedData ed = new AuthenticatedData((ASN1Sequence)doj.getObject());
-			version = ed.getVersion();
-			rins = ed.getRecipientInfos();
-			aid = ed.getMacAlgorithm();
-			ci = ed.getEncapsulatedContentInfo();
-			authAttrs = ed.getAuthAttrs();
-			unprotectedAttrs = ed.getUnauthAttrs();
-		} else if (envelopeType.equals("2")) { //$NON-NLS-1$
-			final AuthEnvelopedData ed = new AuthEnvelopedData((ASN1Sequence)doj.getObject());
-			version = ed.getVersion();
-			rins = ed.getRecipientInfos();
-			encryptedContentInfo = ed.getAuthEncryptedContentInfo();
-			authAttrs = ed.getAuthAttrs();
-			unprotectedAttrs = ed.getUnauthAttrs();
-		} else if (envelopeType.equals("3")) { //$NON-NLS-1$
-			final SignedAndEnvelopedData ed = new SignedAndEnvelopedData((ASN1Sequence)doj.getObject());
-			version = ed.getVersion();
-			rins = ed.getRecipientInfos();
-			encryptedContentInfo = ed.getEncryptedContentInfo();
-			signerInfosSd = ed.getSignerInfos();
-		} else if (envelopeType.equals("4")) { //$NON-NLS-1$
-			final SignedData ed = new SignedData((ASN1Sequence)doj.getObject());
-			version = ed.getVersion();
-			ds = ed.getDigestAlgorithms();
-			ci = ed.getEncapContentInfo();
-			signerInfosSd = ed.getSignerInfos();
-		} else if (envelopeType.equals("5")) { //$NON-NLS-1$
-			final ASN1Sequence ed = (ASN1Sequence) doj.getObject();
-			version = DERInteger.getInstance(ed.getObjectAt(0));
-			encryptedContentInfo = EncryptedContentInfo.getInstance(ed.getObjectAt(1));
-			if (ed.size() == 3) {
-				unprotectedAttrs = (ASN1Set) ed.getObjectAt(2);
+		switch (envelopeType) {
+		case TYPE_ENVELOPED_DATA:
+			final EnvelopedData enveloped = new EnvelopedData((ASN1Sequence)doj.getObject());
+			version = enveloped.getVersion();
+			rins = enveloped.getRecipientInfos();
+			encryptedContentInfo = enveloped.getEncryptedContentInfo();
+			unprotectedAttrs = enveloped.getUnprotectedAttrs();
+			break;
+		case TYPE_AUTHENTICATED_DATA:
+			final AuthenticatedData authenticated = new AuthenticatedData((ASN1Sequence)doj.getObject());
+			version = authenticated.getVersion();
+			rins = authenticated.getRecipientInfos();
+			aid = authenticated.getMacAlgorithm();
+			ci = authenticated.getEncapsulatedContentInfo();
+			authAttrs = authenticated.getAuthAttrs();
+			unprotectedAttrs = authenticated.getUnauthAttrs();
+			break;
+		case TYPE_AUTHENTICATED_ENVELOPED_DATA:
+			final AuthEnvelopedData authEnveloped = new AuthEnvelopedData((ASN1Sequence)doj.getObject());
+			version = authEnveloped.getVersion();
+			rins = authEnveloped.getRecipientInfos();
+			encryptedContentInfo = authEnveloped.getAuthEncryptedContentInfo();
+			authAttrs = authEnveloped.getAuthAttrs();
+			unprotectedAttrs = authEnveloped.getUnauthAttrs();
+			break;
+		case TYPE_SIGNED_ENVELOPED_DATA:
+			final SignedAndEnvelopedData signedEnv = new SignedAndEnvelopedData((ASN1Sequence)doj.getObject());
+			version = signedEnv.getVersion();
+			rins = signedEnv.getRecipientInfos();
+			encryptedContentInfo = signedEnv.getEncryptedContentInfo();
+			signerInfosSd = signedEnv.getSignerInfos();
+			break;
+		case TYPE_SIGNED_DATA:
+			final SignedData signed = new SignedData((ASN1Sequence)doj.getObject());
+			version = signed.getVersion();
+			ds = signed.getDigestAlgorithms();
+			ci = signed.getEncapContentInfo();
+			signerInfosSd = signed.getSignerInfos();
+			break;
+		case TYPE_ENCRYPTED_DATA:
+			final ASN1Sequence encrypted = (ASN1Sequence) doj.getObject();
+			version = DERInteger.getInstance(encrypted.getObjectAt(0));
+			encryptedContentInfo = EncryptedContentInfo.getInstance(encrypted.getObjectAt(1));
+			if (encrypted.size() == 3) {
+				unprotectedAttrs = (ASN1Set) encrypted.getObjectAt(2);
 			}
+			break;
 		}
 
 		//obtenemos la version
@@ -266,7 +261,7 @@ public final class CMSInformation {
 
 		//recipientInfo
 		if (rins != null) {
-			if (!envelopeType.equals("4") && !envelopeType.equals("5") && rins.size()>0) {
+			if (envelopeType != TYPE_SIGNED_DATA && envelopeType != TYPE_ENCRYPTED_DATA && rins.size() > 0) {
 				detalle = detalle + "Destinatarios:" + "\n"; //$NON-NLS-2$
 			}
 			for (int i=0; i<rins.size(); i++){
@@ -295,17 +290,16 @@ public final class CMSInformation {
 				}
 				else {
 					detalle = detalle + "\tOID del algoritmo de cifrado: " + diAlg.getAlgorithm() + "\n"; //$NON-NLS-2$
-
 				}
 			}
 		}
 
-		if (envelopeType.equals("0") || envelopeType.equals("5")) { //$NON-NLS-1$ //$NON-NLS-2$
+		if (envelopeType == TYPE_ENVELOPED_DATA || envelopeType == TYPE_ENCRYPTED_DATA) {
 			//obtenemos datos de los datos cifrados.
 			detalle = detalle + "Informacion de los datos cifrados:" + "\n"; //$NON-NLS-2$
 			detalle = detalle + getEncryptedContentInfo(encryptedContentInfo);
 		}
-		else if (envelopeType.equals("1") && aid != null && ci != null){ //$NON-NLS-1$
+		else if (envelopeType == TYPE_AUTHENTICATED_DATA && aid != null && ci != null){
 			// mac algorithm
 			detalle = detalle + "OID del Algoritmo de MAC: " + aid.getAlgorithm() + "\n"; //$NON-NLS-2$
 
@@ -320,13 +314,13 @@ public final class CMSInformation {
 
 			detalle = getObligatorieAtrib(signBinaryType, detalle, authAttrs);
 		}
-		else if (envelopeType.equals("2")) { //$NON-NLS-1$
-			detalle = detalle + "Informacion de los datos cifrados:\n";
+		else if (envelopeType == TYPE_AUTHENTICATED_ENVELOPED_DATA) {
+			detalle = detalle + "Informacion de los datos cifrados:" + "\n"; //$NON-NLS-2$
 			detalle = detalle + getEncryptedContentInfo(encryptedContentInfo);
 
 			detalle = getObligatorieAtrib(signBinaryType, detalle, authAttrs);
 		}
-		else if (envelopeType.equals("3")) {
+		else if (envelopeType == TYPE_SIGNED_ENVELOPED_DATA) {
 			//algoritmo de firma
 			final ASN1Sequence seq =(ASN1Sequence)doj.getObject();
 			final ASN1Set da = (ASN1Set)seq.getObjectAt(2);
@@ -334,10 +328,10 @@ public final class CMSInformation {
 			detalle = detalle + "OID del Algoritmo de firma: " + dai.getAlgorithm() + "\n"; //$NON-NLS-2$
 
 			//obtenemos datos de los datos cifrados.
-			detalle = detalle + "Informacion de los datos cifrados:\n";
+			detalle = detalle + "Informacion de los datos cifrados:" + "\n"; //$NON-NLS-2$
 			detalle = detalle + getEncryptedContentInfo(encryptedContentInfo);
 		}
-		else if (envelopeType.equals("4") && ci != null && ds != null) { //$NON-NLS-1$
+		else if (envelopeType == TYPE_SIGNED_DATA && ci != null && ds != null) {
 			//algoritmo de firma
 			final AlgorithmIdentifier dai = AlgorithmIdentifier.getInstance(ds.getObjectAt(0));
 			detalle = detalle + "OID del Algoritmo de firma: " + dai.getAlgorithm() + "\n"; //$NON-NLS-2$
@@ -345,16 +339,16 @@ public final class CMSInformation {
 		}
 
 		//obtenemos lo atributos opcionales
-		if (!envelopeType.equals("3")) {
+		if (envelopeType != TYPE_SIGNED_ENVELOPED_DATA) {
 			if (unprotectedAttrs == null){
-				detalle = detalle + "Atributos : No tiene atributos opcionales\n";
+				detalle = detalle + "Atributos : No tiene atributos opcionales" + "\n"; //$NON-NLS-2$
 			}
 			else{
 				final String atributos = getUnSignedAttributes(unprotectedAttrs.getObjects());
 				detalle = detalle + "Atributos : \n";
 				detalle = detalle + atributos;
 			}
-		} else if (envelopeType.equals("3") || envelopeType.equals("4")) { //$NON-NLS-1$ //$NON-NLS-2$
+		} else if (envelopeType == TYPE_SIGNED_ENVELOPED_DATA || envelopeType == TYPE_SIGNED_DATA) {
 			//obtenemos el(los) firmate(s)
 			if (signerInfosSd != null) {
 				if (signerInfosSd.size()>0){
@@ -382,7 +376,7 @@ public final class CMSInformation {
 					if (sa != null){
 						satributes = getsignedAttributes(sa, signBinaryType);
 					}
-					detalle = detalle + "\tAtributos obligatorios : \n";
+					detalle = detalle + "\tAtributos obligatorios:" + "\n"; //$NON-NLS-2$
 					detalle = detalle + satributes;
 				}
 			}
@@ -409,7 +403,7 @@ public final class CMSInformation {
 		}
 		else{
 			final String atributos = getsignedAttributes(authAttrs, signBinaryType);
-			det = det + "Atributos Autenticados: \n";
+			det = det + "Atributos Autenticados:" + "\n"; //$NON-NLS-2$
 			det = det + atributos;
 		}
 		return det;
@@ -422,7 +416,7 @@ public final class CMSInformation {
 	 * @param binarySignType	Identifica el tipo de firma binaria (CMS o CADES)
 	 * @return              lista de atributos concatenados.
 	 */
-	public static String getsignedAttributes(final ASN1Set attributes, final String binarySignType){
+	private static String getsignedAttributes(final ASN1Set attributes, final String binarySignType){
 		String attributos = ""; //$NON-NLS-1$
 
 		final Enumeration<?> e = attributes.getObjects();
@@ -456,11 +450,11 @@ public final class CMSInformation {
 			if (binarySignType.equals("CADES")) {            //$NON-NLS-1$
 				//atributo signing certificate v2
 				if (derIden.equals(PKCSObjectIdentifiers.id_aa_signingCertificateV2)){
-					attributos = attributos + "\t\tContiene el atributo \"Signing Certificate V2\" \n";
+					attributos = attributos + "\t\tContiene el atributo \"Signing Certificate V2\"" + "\n"; //$NON-NLS-2$
 				}
 				//Politica de firma.
 				if (derIden.equals(PKCSObjectIdentifiers.id_aa_ets_sigPolicyId)){
-					attributos = attributos + "\t\tContiene la politica de la firma \n";
+					attributos = attributos + "\t\tContiene la politica de la firma" + "\n"; //$NON-NLS-2$
 				}
 			}
 		}
@@ -476,14 +470,14 @@ public final class CMSInformation {
 	 * @return              lista de atributos concatenados.
 	 */
 	private static String getUnSignedAttributes(final Enumeration<?> e){
-		String attributos="";
+		String attributos = ""; //$NON-NLS-1$
 
 		while (e.hasMoreElements()){
 			final ASN1Sequence a = (ASN1Sequence)e.nextElement();
 			final DERObjectIdentifier derIden = (DERObjectIdentifier)a.getObjectAt(0);
 			// tipo de contenido de la firma.
 			if (derIden.equals(CMSAttributes.contentType)){
-				attributos = attributos + "\tOID del tipo de contenido: "+ a.getObjectAt(1) +"\n";
+				attributos = attributos + "\tOID del tipo de contenido: "+ a.getObjectAt(1) +"\n"; //$NON-NLS-2$
 			}
 			//Message digest de  la firma
 			if (derIden.equals(CMSAttributes.messageDigest)){
@@ -497,16 +491,16 @@ public final class CMSInformation {
 				try {
 					date = d.getDate();
 				} catch (final ParseException ex) {
-					Logger.getLogger("es.gob.afirma").warning("No es posible convertir la fecha");
+					Logger.getLogger("es.gob.afirma").warning("No es posible convertir la fecha"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
-				final SimpleDateFormat formatter = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss");
+				final SimpleDateFormat formatter = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss"); //$NON-NLS-1$
 				final String ds = formatter.format(date);
 
-				attributos = attributos + "\tContiene fecha de firma: "+ ds +"\n";
+				attributos = attributos + "\tContiene fecha de firma: "+ ds +"\n"; //$NON-NLS-2$
 			}
 			//contrafirma de la firma.
 			if (derIden.equals(CMSAttributes.counterSignature)){
-				attributos = attributos + "\tContiene la contrafirma de la firma \n";
+				attributos = attributos + "\tContiene la contrafirma de la firma" + "\n"; //$NON-NLS-2$
 			}
 
 		}
@@ -519,15 +513,15 @@ public final class CMSInformation {
 	 * @param datos     informacion de los datos cifrados sin formatear.
 	 * @return          informacion de los datos cifrados.
 	 */
-	public static String getEncryptedContentInfo(final EncryptedContentInfo datos){
-		String info = "";
+	private static String getEncryptedContentInfo(final EncryptedContentInfo datos){
+		String info = ""; //$NON-NLS-1$
 
 		//especificamos el tipo de contenido
 		if (datos.getContentType().equals(PKCSObjectIdentifiers.encryptedData)){
 			info = info +"\tTipo: EncryptedData\n";
 		}
 		else{
-			info = info +"\tTipo: "+datos.getContentType()+"\n";
+			info = info +"\tTipo: " + datos.getContentType() + "\n";  //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		// el algoritmo de cifrado de los datos
@@ -543,142 +537,12 @@ public final class CMSInformation {
 		}
 
 		if (algorithm != null){
-			info = info +"\tAlgoritmo de cifrado: " + algorithm.getName() + "\n";
+			info = info +"\tAlgoritmo de cifrado: " + algorithm.getName() + "\n"; //$NON-NLS-2$
 		}
 		else {
-			info = info +"\tOID del Algoritmo de cifrado: " + ai.getAlgorithm().toString() + "\n";
+			info = info +"\tOID del Algoritmo de cifrado: " + ai.getAlgorithm().toString() + "\n"; //$NON-NLS-2$
 		}
 
 		return info;
 	}
-
-	/**
-	 * M&eacute;todo que obtiene el EncriptedContentInfo a partir del archivo
-	 * a cifrar. El contenido es el siguiente:
-	 * <pre><code>
-	 * EncryptedContentInfo ::= SEQUENCE {
-	 *     contentType ContentType,
-	 *     contentEncryptionAlgorithm ContentEncryptionAlgorithmIdentifier,
-	 *     encryptedContent [0] IMPLICIT EncryptedContent OPTIONAL
-	 * }
-	 * </code></pre>
-	 *
-	 * @param file Archivo a cifrar.
-	 * @param config Configuracion de la clave de cifrado
-	 * @param cipherKey 	Clave de cifrado
-	 * @return Un sistema EncryptedContentInfo.
-	 *
-	 * @throws java.security.NoSuchAlgorithmException
-	 * @throws javax.crypto.NoSuchPaddingException
-	 * @throws java.security.InvalidAlgorithmParameterException
-	 * @throws java.security.InvalidKeyException
-	 * @throws java.io.IOException
-	 */
-	public static EncryptedContentInfo getEncryptedContentInfo(final byte[] file, final AOCipherConfig config, final SecretKey cipherKey)
-	throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, InvalidKeyException, IOException {
-
-		final AlgorithmParameterSpec params = getParams(config);
-		final Cipher cipher = createCipher(config.toString());
-		cipher.init(Cipher.ENCRYPT_MODE, cipherKey, params);
-		return getEncryptedContentInfo(file, config, params, cipher);
-	}
-
-	/**
-	 * Obtiene el contenido de un archivo encriptado
-	 * @param file		Archivo con los datos
-	 * @param config	Configuracion de cifrado
-	 * @param params	Parametros
-	 * @param cipher	Encriptador
-	 * @return
-	 * @throws IOException
-	 */
-	private static EncryptedContentInfo getEncryptedContentInfo(final byte[] file,
-			final AOCipherConfig config, final AlgorithmParameterSpec params, final Cipher cipher)
-	throws IOException {
-		byte[] ciphered = null;
-		try {
-			ciphered = cipher.doFinal(file);
-		} catch (final IllegalBlockSizeException ex) {
-			Logger.getLogger("es.gob.afirma").severe(ex.toString()); //$NON-NLS-1$
-		} catch (final BadPaddingException ex) {
-			Logger.getLogger("es.gob.afirma").severe(ex.toString()); //$NON-NLS-1$
-		}
-
-		DEREncodable asn1Params;
-		if (params != null){
-			final ASN1InputStream aIn = new ASN1InputStream(cipher.getParameters().getEncoded("ASN.1")); //$NON-NLS-1$
-			asn1Params = aIn.readObject();
-		}
-		else{
-			asn1Params = new DERNull();
-		}
-
-		// obtenemos el OID del algoritmo de cifrado
-		final AlgorithmIdentifier  encAlgId = new AlgorithmIdentifier(
-				new DERObjectIdentifier(config.getAlgorithm().getOid()),
-				asn1Params);
-
-		// Obtenemos el identificador
-		final DERObjectIdentifier contentType = PKCSObjectIdentifiers.encryptedData;
-		return new EncryptedContentInfo(
-				contentType,
-				encAlgId,
-				new DEROctetString(ciphered)
-		);
-	}
-
-	/**
-	 * Crea el cifrador usado para cifrar tanto el fichero como la clave usada para
-	 * cifrar dicho fichero.
-	 *
-	 * @param algName algoritmo utilizado para cifrar.
-	 * @param provider  Proveedor que se utiliza para cifrar.
-	 * @throws java.security.NoSuchAlgorithmException
-	 * @throws javax.crypto.NoSuchPaddingException
-	 */
-	private static Cipher createCipher(final String algName) throws NoSuchAlgorithmException, NoSuchPaddingException {
-		return Cipher.getInstance(algName);
-	}
-
-	/**
-	 * Genera los par&aacute;metros necesarios para poder operar con una configuracion concreta de cifrado.
-	 * Si no es necesario ning&uacute;n par&aacute;metro especial, devolvemos <code>null</code>.
-	 * @param algorithmConfig Configuracion de cifrado que debemos parametrizar.
-	 * @return Par&aacute;metros para operar.
-	 */
-	public static AlgorithmParameterSpec getParams(final AOCipherConfig algorithmConfig) {
-
-		AlgorithmParameterSpec params = null;
-		if(algorithmConfig.getAlgorithm().supportsPassword()) {
-			params = new PBEParameterSpec(SALT, ITERATION_COUNT);
-		} else {
-			if(!algorithmConfig.getBlockMode().equals(CipherConstants.AOCipherBlockMode.ECB)) {
-				params = new IvParameterSpec(
-						algorithmConfig.getAlgorithm().equals(AOCipherAlgorithm.AES) ? IV_16 : IV_8
-				);
-			}
-		}
-
-		return params;
-	}
-
-	/**
-	 * Vector de inicializacion de 8 bytes. Un vector de inicializaci&oacute;n
-	 * de 8 bytes es necesario para el uso de los algoritmos DES y DESede.
-	 */
-	private static final byte[] IV_8 = {
-		(byte)0xC6, (byte)0xBA, (byte)0xDE, (byte)0xA4,
-		(byte)0x76, (byte)0x43, (byte)0x32, (byte)0x6B
-	};
-
-	/**
-	 * Vector de inicializacion de 16 bytes. Un vector de inicializaci&oacute;n
-	 * de 16 bytes es necesario para el uso de los algoritmos DES y DESede.
-	 */
-	private static final byte[] IV_16 = {
-		(byte)0xB2, (byte)0xBA, (byte)0xDE, (byte)0xA4,
-		(byte)0x41, (byte)0x7F, (byte)0x97, (byte)0x4B,
-		(byte)0xAC, (byte)0x63, (byte)0xAC, (byte)0xAA,
-		(byte)0x76, (byte)0x73, (byte)0x12, (byte)0x6B
-	};
 }
