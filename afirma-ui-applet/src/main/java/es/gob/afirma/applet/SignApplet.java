@@ -3136,7 +3136,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         		LOGGER.severe(e.toString());
         		return false;
         	}
-        	setError("Error al agregar un nuevo remitente al sobre electr\u00F3nico");
+        	setError(AppletMessages.getString("SignApplet.0")); //$NON-NLS-1$
         	LOGGER.severe(e.toString());
         	return false;
         }
