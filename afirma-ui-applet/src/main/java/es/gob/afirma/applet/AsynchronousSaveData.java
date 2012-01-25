@@ -25,7 +25,7 @@ public final class AsynchronousSaveData implements Runnable {
     final byte[] dataToSave;
     String savingTarget;
     final String[] extensions;
-    String description = "Firma digital";
+    String description = AppletMessages.getString("AsynchronousSaveData.0"); //$NON-NLS-1$
     final Frame parent;
     final boolean showDialogIfError;
 
@@ -91,8 +91,8 @@ public final class AsynchronousSaveData implements Runnable {
                     Logger.getLogger("es.gob.afirma").severe("No se pudieron almacenar los datos en disco: " + e);  //$NON-NLS-1$//$NON-NLS-2$
                     if (AsynchronousSaveData.this.showDialogIfError) {
                         JOptionPane.showMessageDialog(AsynchronousSaveData.this.parent,
-                                                      "Error al almacenar los datos en disco,\r\nlos datos no se han guardado.",
-                                                      "Error",
+                                                      AppletMessages.getString("AsynchronousSaveData.1"), //$NON-NLS-1$
+                                                      AppletMessages.getString("SignApplet.156"), //$NON-NLS-1$
                                                       JOptionPane.ERROR_MESSAGE);
                     }
                 }

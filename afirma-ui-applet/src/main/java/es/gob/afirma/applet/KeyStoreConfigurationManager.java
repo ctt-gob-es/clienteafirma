@@ -161,8 +161,8 @@ final class KeyStoreConfigurationManager {
 
         if (this.showLoadingWarning) {
             JOptionPane.showMessageDialog(this.parent,
-                    "Si desea usar su DNI electr\u00F3nico o cualquier otra tarjeta\r\ninteligente criptogr\u00E1fica / almac\u00E9n de certificados\r\n extra\u00EDble (USB, PCMCIA, etc.), por favor, ins\u00E9rtelo ahora\r\ny pulse el bot\u00F3n Aceptar.",
-                    "Advertencia",
+                    AppletMessages.getString("KeyStoreConfigurationManager.0"), //$NON-NLS-1$
+                    AppletMessages.getString("SignApplet.658"), //$NON-NLS-1$
                     JOptionPane.WARNING_MESSAGE);
         }
         this.ksManager = AOKeyStoreManagerFactory.getAOKeyStoreManager(this.ks, this.ksPath, null, this.getKeystorePasswordCallback(), this.parent);

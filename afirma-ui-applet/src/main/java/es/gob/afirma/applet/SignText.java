@@ -1,5 +1,4 @@
-/* Copyright (C) 2011 [Gobierno de Espana]
- * This file is part of "Cliente @Firma".
+/* This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
  *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
@@ -275,7 +274,7 @@ public final class SignText {
         scrollPane.setMinimumSize(new Dimension(400, 300));
         scrollPane.setBounds(10, 30, 500, 300);
 
-        final JLabel label1 = new JLabel("Se va a firmar la siguiente informaci\u00F3n:");
+        final JLabel label1 = new JLabel(AppletMessages.getString("SignText.0")); //$NON-NLS-1$
         label1.setBounds(10, 10, 500, 15);
         label1.setLabelFor(scrollPane);
 
@@ -309,7 +308,7 @@ public final class SignText {
         final JComboBox comboBox = new JComboBox(finalOrderedAliases);
         comboBox.setBounds(10, 370, 500, 20);
 
-        final JLabel label2 = new JLabel("Por favor, seleccione el certificado de firma:");
+        final JLabel label2 = new JLabel(AppletMessages.getString("SignText.1")); //$NON-NLS-1$
         label2.setBounds(10, 350, 500, 15);
         label2.setLabelFor(comboBox);
 
@@ -326,11 +325,11 @@ public final class SignText {
         }
         else {
             offset = -25;
-            label2.setText("Se utilizar\u00E1 el siguiente certificado: " + aliasesByFriendlyName.keySet().iterator().next());
+            label2.setText(AppletMessages.getString("SignText.2") + aliasesByFriendlyName.keySet().iterator().next()); //$NON-NLS-1$
         }
         pane.add(label2);
 
-        final JLabel label3 = new JLabel("Si est\u00E1 conforme en firmar este mensaje pulse el bot\u00F3n Aceptar");
+        final JLabel label3 = new JLabel(AppletMessages.getString("SignText.3")); //$NON-NLS-1$
         label3.setBounds(10, 405 + offset, 500, 15);
 
         pane.add(label3);
@@ -339,7 +338,7 @@ public final class SignText {
         pane.setPreferredSize(new Dimension(520, 440 + offset));
 
         // Mostramos el dialogo
-        if (JOptionPane.showConfirmDialog(this.parent, pane, "Firma Electr\u00F3nica", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE) == JOptionPane.OK_OPTION) {
+        if (JOptionPane.showConfirmDialog(this.parent, pane, AppletMessages.getString("SignText.4"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE) == JOptionPane.OK_OPTION) { //$NON-NLS-1$
             try {
 
                 // ********************************************************************
@@ -362,32 +361,25 @@ public final class SignText {
                                             }, false);
                                         }
                                         catch (final CertificateExpiredException e) {
-                                            errorMessage = "Puede que el certificado haya caducado." + "\r\n" + "Se ha usado la hora local de su ordenador, por lo que la comprobaci\u00F3n puede no ser precisa." //$NON-NLS-2$
-                                                           + "\r\n" + "Quiz\u00E1s la firma generada no tenga validez legal." + "\r\n" + "\u00BFDesea continuar con la operaci\u00F3n?"; //$NON-NLS-1$ //$NON-NLS-3$
+                                            errorMessage = AppletMessages.getString("SignText.5"); //$NON-NLS-1$
                                         }
                                         catch (final CertificateNotYetValidException e) {
-                                            errorMessage = "Puede que el certificado aun no sea v\u00E1lido." + "\r\n" + "Se ha usado la hora local de su ordenador, por lo que la comprobaci\u00F3n puede no ser precisa."
-                                                           + "\r\n" + "Quiz\u00E1s la firma generada no tenga validez legal." + "\r\n" + "\u00BFDesea continuar con la operaci\u00F3n?"; //$NON-NLS-1$ //$NON-NLS-3$
+                                            errorMessage = AppletMessages.getString("SignText.6"); //$NON-NLS-1$
                                         }
                                         catch (final CertPathValidatorException e) {
-                                            errorMessage =
-                                                    "No se ha podido validar la cadena de certificaci\u00F3n del certificado." + "\r\n" + "Es posible que su certificado no tenga correctamente declarada la cadena de" + "\r\n" + //$NON-NLS-2$ //$NON-NLS-4$
-                                                    "certificaci\u00F3n o que los certificados de esta no est\u00E1n importados en su almac\u00E9n\r\nde autoridades de confianza." + "\r\n" + //$NON-NLS-2$
-                                                    "Quiz\u00E1s la firma generada no tenga validez legal." + "\r\n" + "\u00BFDesea continuar con la operaci\u00F3n?"; //$NON-NLS-2$
+                                            errorMessage = AppletMessages.getString("SignText.7"); //$NON-NLS-1$
                                         }
                                         catch (final AOCertificateRevokedException e) {
-                                            errorMessage =
-                                                    "Su certificado est\u00E1 revocado.\r\nLas firmas electr\u00F3nicas generadas con \u00E9l no ser\u00E1n v\u00E1lidas." + "\r\n" + //$NON-NLS-2$
-                                                    "\u00BFDesea continuar con la operaci\u00F3n?";
+                                            errorMessage = AppletMessages.getString("SignText.8"); //$NON-NLS-1$
                                         }
                                         catch (final Exception e) {
-                                            errorMessage = "Ocurri\u00F3 un error durante la validacion del certificado";
+                                            errorMessage = AppletMessages.getString("SignText.9"); //$NON-NLS-1$
                                         }
 
                                         if (errorMessage != null) {
                                             Logger.getLogger("es.gob.afirma").warning(errorMessage); //$NON-NLS-1$
-                                            if (JOptionPane.showConfirmDialog(this.parent, cv.getErrorMessage() + "\r\n" + "Se ha usado la hora local de su ordenador, por lo que la comprobaci\u00F3n puede no ser precisa.", //$NON-NLS-1$
-                                                                              "Advertencia", //$NON-NLS-1$
+                                            if (JOptionPane.showConfirmDialog(this.parent, cv.getErrorMessage() + "\r\n" + AppletMessages.getString("SignText.10"), //$NON-NLS-1$ //$NON-NLS-2$
+                                                                              AppletMessages.getString("SignText.11"), //$NON-NLS-1$
                                                                               JOptionPane.YES_NO_OPTION,
                                                                               JOptionPane.WARNING_MESSAGE) != JOptionPane.YES_OPTION) {
                                                 return;
@@ -411,7 +403,7 @@ public final class SignText {
             }
             catch (final Exception t) {
                 Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de firma de texto: " + t); //$NON-NLS-1$ //$NON-NLS-2$
-                JOptionPane.showMessageDialog(this.parent, "Error durante el proceso de firma", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this.parent, AppletMessages.getString("SignText.12"), AppletMessages.getString("SignText.13"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
             }
         }
     }
