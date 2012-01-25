@@ -8,7 +8,7 @@
  * You may contact the copyright holder at: soporte.afirma5@mpt.es
  */
 
-package es.gob.afirma.applet.pkcs7;
+package es.gob.afirma.applet;
 
 import java.io.IOException;
 import java.text.ParseException;
