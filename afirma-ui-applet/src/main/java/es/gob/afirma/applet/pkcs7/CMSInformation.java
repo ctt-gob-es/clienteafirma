@@ -130,29 +130,29 @@ public final class CMSInformation {
 		// Contenido a obtener informacion
 		final ASN1TaggedObject doj =(ASN1TaggedObject) e.nextElement();
 		if (doi.equals(PKCSObjectIdentifiers.data)){
-			datos = "Tipo:" + SP + DATA + CR;
+			datos = AppletMessages.getString("CMSInformation.0") + SP + DATA + CR; //$NON-NLS-1$
 		}
 		else if(doi.equals(PKCSObjectIdentifiers.digestedData)){
 			datos = getFromDigestedData(doj);
 		}
 		else if(doi.equals(PKCSObjectIdentifiers.encryptedData)){
 
-			datos = extractData(doj, TYPE_ENCRYPTED_DATA, "Tipo:" + SP + ENCRYPTED_DATA, BINARY_SIGN_CMS);
+			datos = extractData(doj, TYPE_ENCRYPTED_DATA, AppletMessages.getString("CMSInformation.0") + SP + ENCRYPTED_DATA, BINARY_SIGN_CMS); //$NON-NLS-1$
 		}
 		else if(doi.equals(PKCSObjectIdentifiers.signedData)){
-			datos = extractData(doj, TYPE_SIGNED_DATA, "Tipo:" + SP + SIGNED_DATA, BINARY_SIGN_CMS);
+			datos = extractData(doj, TYPE_SIGNED_DATA, AppletMessages.getString("CMSInformation.0") + SP + SIGNED_DATA, BINARY_SIGN_CMS); //$NON-NLS-1$
 		}
 		else if(doi.equals(PKCSObjectIdentifiers.envelopedData)){
-			datos = extractData(doj, TYPE_ENVELOPED_DATA, "Tipo:" + SP + ENVELOPED_DATA, BINARY_SIGN_CMS);
+			datos = extractData(doj, TYPE_ENVELOPED_DATA, AppletMessages.getString("CMSInformation.0") + SP + ENVELOPED_DATA, BINARY_SIGN_CMS); //$NON-NLS-1$
 		}
 		else if(doi.equals(PKCSObjectIdentifiers.signedAndEnvelopedData)){
-			datos = extractData(doj, TYPE_SIGNED_ENVELOPED_DATA, "Tipo:" + SP + SIGNED_ENVELOPED_DATA, BINARY_SIGN_CMS);
+			datos = extractData(doj, TYPE_SIGNED_ENVELOPED_DATA, AppletMessages.getString("CMSInformation.0") + SP + SIGNED_ENVELOPED_DATA, BINARY_SIGN_CMS); //$NON-NLS-1$
 		}
 		else if(doi.equals(PKCSObjectIdentifiers.id_ct_authData)){
-			datos = extractData(doj, TYPE_AUTHENTICATED_DATA, "Tipo:" + SP + AUTHENTICATED_DATA, BINARY_SIGN_CMS);
+			datos = extractData(doj, TYPE_AUTHENTICATED_DATA, AppletMessages.getString("CMSInformation.0") + SP + AUTHENTICATED_DATA, BINARY_SIGN_CMS); //$NON-NLS-1$
 		}
 		else if(doi.equals(PKCSObjectIdentifiers.id_ct_authEnvelopedData)){
-			datos = extractData(doj, TYPE_AUTHENTICATED_ENVELOPED_DATA, "Tipo:" + SP + AUTH_ENVELOPED_DATA, BINARY_SIGN_CMS);
+			datos = extractData(doj, TYPE_AUTHENTICATED_ENVELOPED_DATA, AppletMessages.getString("CMSInformation.0") + SP + AUTH_ENVELOPED_DATA, BINARY_SIGN_CMS); //$NON-NLS-1$
 		}
 		else if(doi.equals(CMSObjectIdentifiers.compressedData)){
 			datos = getFromCompressedData(doj);
@@ -170,19 +170,19 @@ public final class CMSInformation {
 	 */
 	private static String getFromDigestedData(final ASN1TaggedObject doj) {
 		String detalle = ""; //$NON-NLS-1$
-		detalle = detalle + "Tipo:" + SP + DIGESTED_DATA + CR;
+		detalle = detalle + AppletMessages.getString("CMSInformation.0") + SP + DIGESTED_DATA + CR; //$NON-NLS-1$
 
 		//obtenemos el digestedData
 		final DigestedData dd = new DigestedData((ASN1Sequence)doj.getObject());
 
 		//obtenemos la version
-		detalle = detalle + "Version:" + SP + dd.getVersion() + CR;
+		detalle = detalle + AppletMessages.getString("CMSInformation.1") + SP + dd.getVersion() + CR; //$NON-NLS-1$
 
 		//obtenemos el algoritmo
-		detalle = detalle + "Algoritmo de firma:" + SP + dd.getDigestAlgorithm() + CR;
+		detalle = detalle + AppletMessages.getString("CMSInformation.9") + SP + dd.getDigestAlgorithm() + CR; //$NON-NLS-1$
 
 		//obtenemos el tipo de contenido
-		detalle = detalle + "Tipo de Contenido:" + SP + dd.getContentType() + CR;
+		detalle = detalle + AppletMessages.getString("CMSInformation.10") + SP + dd.getContentType() + CR; //$NON-NLS-1$
 
 		return detalle;
 	}
@@ -197,7 +197,7 @@ public final class CMSInformation {
 		final CompressedData ed = new CompressedData((ASN1Sequence)doj.getObject());
 
 		//obtenemos la version
-		detalle = detalle + "Version:" + SP + ed.getVersion() + CR;
+		detalle = detalle + AppletMessages.getString("CMSInformation.1") + SP + ed.getVersion() + CR; //$NON-NLS-1$
 
 		final AlgorithmIdentifier aid = ed.getCompressionAlgorithmIdentifier();
 		if (aid.getAlgorithm().toString().equals("1.2.840.113549.1.9.16.3.8")){ //$NON-NLS-1$
@@ -289,23 +289,23 @@ public final class CMSInformation {
 		}
 
 		//obtenemos la version
-		detalle = detalle + "Version:" + SP + version + CR;
+		detalle = detalle + AppletMessages.getString("CMSInformation.1") + SP + version + CR; //$NON-NLS-1$
 
 		//recipientInfo
 		if (rins != null) {
 			if (envelopeType != TYPE_SIGNED_DATA && envelopeType != TYPE_ENCRYPTED_DATA && rins.size() > 0) {
-				detalle = detalle + "Destinatarios:" + CR;
+				detalle = detalle + AppletMessages.getString("CMSInformation.13") + CR; //$NON-NLS-1$
 			}
 			for (int i=0; i<rins.size(); i++){
 				final KeyTransRecipientInfo kti = KeyTransRecipientInfo.getInstance(RecipientInfo.getInstance(rins.getObjectAt(i)).getInfo());
-				detalle = detalle + " - Informacion de destino de firma" + SP + (i+1) + ":" + CR; //$NON-NLS-2$
+				detalle = detalle + AppletMessages.getString("CMSInformation.14") + SP + (i+1) + ":" + CR;  //$NON-NLS-1$//$NON-NLS-2$
 				final AlgorithmIdentifier diAlg= kti.getKeyEncryptionAlgorithm();
 
 				//issuer y serial
 				final IssuerAndSerialNumber iss =
 					(IssuerAndSerialNumber) SignerIdentifier.getInstance(kti.getRecipientIdentifier().getId()).getId();
-				detalle = detalle + TB + "Issuer:" + SP + iss.getName().toString() + CR;
-				detalle = detalle + TB + "Numero de serie:" + SP + iss.getSerialNumber() + CR;
+				detalle = detalle + TB + AppletMessages.getString("CMSInformation.15") + SP + iss.getName().toString() + CR; //$NON-NLS-1$
+				detalle = detalle + TB + AppletMessages.getString("CMSInformation.16") + SP + iss.getSerialNumber() + CR; //$NON-NLS-1$
 
 				// el algoritmo de cifrado de los datos
 				AOCipherAlgorithm algorithm = null;
@@ -318,36 +318,36 @@ public final class CMSInformation {
 					}
 				}
 				if (algorithm != null){
-					detalle = detalle + TB + "Algoritmo de cifrado:" + SP + algorithm.getName() + CR;
+					detalle = detalle + TB + AppletMessages.getString("CMSInformation.17") + SP + algorithm.getName() + CR; //$NON-NLS-1$
 				}
 				else {
-					detalle = detalle + TB + "OID del algoritmo de cifrado:" + SP + diAlg.getAlgorithm() + CR;
+					detalle = detalle + TB + AppletMessages.getString("CMSInformation.18") + SP + diAlg.getAlgorithm() + CR; //$NON-NLS-1$
 				}
 			}
 		}
 
 		if (envelopeType == TYPE_ENVELOPED_DATA || envelopeType == TYPE_ENCRYPTED_DATA) {
 			//obtenemos datos de los datos cifrados.
-			detalle = detalle + "Informacion de los datos cifrados:" + CR;
+			detalle = detalle + AppletMessages.getString("CMSInformation.19") + CR; //$NON-NLS-1$
 			detalle = detalle + getEncryptedContentInfo(encryptedContentInfo);
 		}
 		else if (envelopeType == TYPE_AUTHENTICATED_DATA && aid != null && ci != null){
 			// mac algorithm
-			detalle = detalle + "OID del Algoritmo de MAC:" + SP + aid.getAlgorithm() + CR;
+			detalle = detalle + AppletMessages.getString("CMSInformation.20") + SP + aid.getAlgorithm() + CR; //$NON-NLS-1$
 
 			//digestAlgorithm
 			final ASN1Sequence seq =(ASN1Sequence)doj.getObject();
 			final ASN1TaggedObject da = (ASN1TaggedObject)seq.getObjectAt(4);
 			final AlgorithmIdentifier dai = AlgorithmIdentifier.getInstance(da.getObject());
-			detalle = detalle + "OID del Algoritmo de firma:" + SP + dai.getAlgorithm() + CR;
+			detalle = detalle + AppletMessages.getString("CMSInformation.21") + SP + dai.getAlgorithm() + CR; //$NON-NLS-1$
 
 			//obtenemos datos de los datos cifrados.
-			detalle = detalle + "OID del tipo de contenido:" + SP + ci.getContentType() + CR;
+			detalle = detalle + AppletMessages.getString("CMSInformation.22") + SP + ci.getContentType() + CR; //$NON-NLS-1$
 
 			detalle = getObligatorieAtrib(signBinaryType, detalle, authAttrs);
 		}
 		else if (envelopeType == TYPE_AUTHENTICATED_ENVELOPED_DATA) {
-			detalle = detalle + "Informacion de los datos cifrados:" + CR;
+			detalle = detalle + AppletMessages.getString("CMSInformation.19") + CR; //$NON-NLS-1$
 			detalle = detalle + getEncryptedContentInfo(encryptedContentInfo);
 
 			detalle = getObligatorieAtrib(signBinaryType, detalle, authAttrs);
@@ -357,50 +357,50 @@ public final class CMSInformation {
 			final ASN1Sequence seq =(ASN1Sequence)doj.getObject();
 			final ASN1Set da = (ASN1Set)seq.getObjectAt(2);
 			final AlgorithmIdentifier dai = AlgorithmIdentifier.getInstance(da.getObjectAt(0));
-			detalle = detalle + "OID del Algoritmo de firma:" + SP + dai.getAlgorithm() + CR;
+			detalle = detalle + AppletMessages.getString("CMSInformation.21") + SP + dai.getAlgorithm() + CR; //$NON-NLS-1$
 
 			//obtenemos datos de los datos cifrados.
-			detalle = detalle + "Informacion de los datos cifrados:" + CR;
+			detalle = detalle + AppletMessages.getString("CMSInformation.19") + CR; //$NON-NLS-1$
 			detalle = detalle + getEncryptedContentInfo(encryptedContentInfo);
 		}
 		else if (envelopeType == TYPE_SIGNED_DATA && ci != null && ds != null) {
 			//algoritmo de firma
 			final AlgorithmIdentifier dai = AlgorithmIdentifier.getInstance(ds.getObjectAt(0));
-			detalle = detalle + "OID del Algoritmo de firma:" + SP + dai.getAlgorithm() + CR;
-			detalle = detalle + "OID del tipo de contenido:" + SP + ci.getContentType() + CR;
+			detalle = detalle + AppletMessages.getString("CMSInformation.21") + SP + dai.getAlgorithm() + CR; //$NON-NLS-1$
+			detalle = detalle + AppletMessages.getString("CMSInformation.22") + SP + ci.getContentType() + CR; //$NON-NLS-1$
 		}
 
 		//obtenemos lo atributos opcionales
 		if (envelopeType != TYPE_SIGNED_ENVELOPED_DATA) {
 			if (unprotectedAttrs == null){
-				detalle = detalle + "Atributos: No tiene atributos opcionales" + CR;
+				detalle = detalle + AppletMessages.getString("CMSInformation.28") + CR; //$NON-NLS-1$
 			}
 			else{
 				final String atributos = getUnSignedAttributes(unprotectedAttrs.getObjects());
-				detalle = detalle + "Atributos:" + CR;
+				detalle = detalle + AppletMessages.getString("CMSInformation.29") + CR; //$NON-NLS-1$
 				detalle = detalle + atributos;
 			}
 		} else if (envelopeType == TYPE_SIGNED_ENVELOPED_DATA || envelopeType == TYPE_SIGNED_DATA) {
 			//obtenemos el(los) firmate(s)
 			if (signerInfosSd != null) {
 				if (signerInfosSd.size()>0){
-					detalle = detalle + "Firmantes:" + CR;
+					detalle = detalle + AppletMessages.getString("CMSInformation.30") + CR; //$NON-NLS-1$
 				}
 				for(int i =0; i< signerInfosSd.size(); i++){
 					final SignerInfo si = new SignerInfo((ASN1Sequence)signerInfosSd.getObjectAt(i));
 
-					detalle = detalle + "- firmante" + SP + (i+1) + ":" + CR; //$NON-NLS-2$
+					detalle = detalle + AppletMessages.getString("CMSInformation.31") + SP + (i+1) + ":" + CR;  //$NON-NLS-1$//$NON-NLS-2$
 					// version
-					detalle = detalle + TB + "version:" + SP + si.getVersion() + CR;
+					detalle = detalle + TB + AppletMessages.getString("CMSInformation.1") + SP + si.getVersion() + CR; //$NON-NLS-1$
 					//signerIdentifier
 					final SignerIdentifier sident = si.getSID();
 					final IssuerAndSerialNumber iss = IssuerAndSerialNumber.getInstance(sident.getId());
-					detalle = detalle + TB + "Issuer:" + SP + iss.getName().toString() + CR;
-					detalle = detalle + TB + "Numero de serie:" + SP + iss.getSerialNumber() + CR;
+					detalle = detalle + TB + AppletMessages.getString("CMSInformation.15") + SP + iss.getName().toString() + CR; //$NON-NLS-1$
+					detalle = detalle + TB + AppletMessages.getString("CMSInformation.16") + SP + iss.getSerialNumber() + CR; //$NON-NLS-1$
 
 					//digestAlgorithm
 					final AlgorithmIdentifier algId = si.getDigestAlgorithm();
-					detalle = detalle + TB + "OID del algoritmo de firma de este firmante:" + SP + algId.getAlgorithm() + CR;
+					detalle = detalle + TB + AppletMessages.getString("CMSInformation.35") + SP + algId.getAlgorithm() + CR; //$NON-NLS-1$
 
 					//obtenemos lo atributos obligatorios
 					final ASN1Set sa =si.getAuthenticatedAttributes();
@@ -408,7 +408,7 @@ public final class CMSInformation {
 					if (sa != null){
 						satributes = getsignedAttributes(sa, signBinaryType);
 					}
-					detalle = detalle + TB + "Atributos obligatorios:" + CR;
+					detalle = detalle + TB + AppletMessages.getString("CMSInformation.36") + CR; //$NON-NLS-1$
 					detalle = detalle + satributes;
 				}
 			}
@@ -431,11 +431,11 @@ public final class CMSInformation {
 
 		//obtenemos lo atributos obligatorios
 		if (authAttrs == null){
-			det = det + "Atributos Autenticados: No tiene atributos autenticados" + CR;
+			det = det + AppletMessages.getString("CMSInformation.37") + CR; //$NON-NLS-1$
 		}
 		else{
 			final String atributos = getsignedAttributes(authAttrs, signBinaryType);
-			det = det + "Atributos Autenticados:" + CR;
+			det = det + AppletMessages.getString("CMSInformation.38") + CR; //$NON-NLS-1$
 			det = det + atributos;
 		}
 		return det;
@@ -477,16 +477,16 @@ public final class CMSInformation {
 				final SimpleDateFormat formatter = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss"); //$NON-NLS-1$
 				final String ds = formatter.format(date);
 
-				attributos = attributos + TB + TB + "Contiene fecha de firma:" + SP + ds + CR;
+				attributos = attributos + TB + TB + AppletMessages.getString("CMSInformation.39") + SP + ds + CR; //$NON-NLS-1$
 			}
 			if (binarySignType == BINARY_SIGN_CADES) {
 				//atributo signing certificate v2
 				if (derIden.equals(PKCSObjectIdentifiers.id_aa_signingCertificateV2)){
-					attributos = attributos + TB + TB + "Contiene el atributo \"Signing Certificate V2\"" + CR;
+					attributos = attributos + TB + TB + AppletMessages.getString("CMSInformation.40") + CR; //$NON-NLS-1$
 				}
 				//Politica de firma.
 				if (derIden.equals(PKCSObjectIdentifiers.id_aa_ets_sigPolicyId)){
-					attributos = attributos + TB + TB + "Contiene la politica de la firma" + CR;
+					attributos = attributos + TB + TB + AppletMessages.getString("CMSInformation.41") + CR; //$NON-NLS-1$
 				}
 			}
 		}
@@ -509,11 +509,11 @@ public final class CMSInformation {
 			final DERObjectIdentifier derIden = (DERObjectIdentifier)a.getObjectAt(0);
 			// tipo de contenido de la firma.
 			if (derIden.equals(CMSAttributes.contentType)){
-				attributos = attributos + TB + "OID del tipo de contenido:" + SP + a.getObjectAt(1) + CR;
+				attributos = attributos + TB + AppletMessages.getString("CMSInformation.22") + SP + a.getObjectAt(1) + CR; //$NON-NLS-1$
 			}
 			//Message digest de  la firma
 			if (derIden.equals(CMSAttributes.messageDigest)){
-				attributos = attributos + TB + "Contiene el atributo \"MessageDigest\"" + CR;
+				attributos = attributos + TB + AppletMessages.getString("CMSInformation.43") + CR; //$NON-NLS-1$
 			}
 			//la fecha de firma. obtenemos y casteamos a algo legible.
 			if (derIden.equals(CMSAttributes.signingTime)){
@@ -528,11 +528,11 @@ public final class CMSInformation {
 				final SimpleDateFormat formatter = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss"); //$NON-NLS-1$
 				final String ds = formatter.format(date);
 
-				attributos = attributos + TB + "Contiene fecha de firma:" + SP + ds + CR;
+				attributos = attributos + TB + AppletMessages.getString("CMSInformation.39") + SP + ds + CR; //$NON-NLS-1$
 			}
 			//contrafirma de la firma.
 			if (derIden.equals(CMSAttributes.counterSignature)){
-				attributos = attributos + TB + "Contiene la contrafirma de la firma" + CR;
+				attributos = attributos + TB + AppletMessages.getString("CMSInformation.45") + CR; //$NON-NLS-1$
 			}
 
 		}
@@ -550,10 +550,10 @@ public final class CMSInformation {
 
 		//especificamos el tipo de contenido
 		if (datos.getContentType().equals(PKCSObjectIdentifiers.encryptedData)){
-			info = info + TB + "Tipo:" + SP + ENCRYPTED_DATA + CR;
+			info = info + TB + AppletMessages.getString("CMSInformation.0") + SP + ENCRYPTED_DATA + CR; //$NON-NLS-1$
 		}
 		else{
-			info = info + TB + "Tipo:" + SP + datos.getContentType() + CR;
+			info = info + TB + AppletMessages.getString("CMSInformation.0") + SP + datos.getContentType() + CR; //$NON-NLS-1$
 		}
 
 		// el algoritmo de cifrado de los datos
@@ -569,10 +569,10 @@ public final class CMSInformation {
 		}
 
 		if (algorithm != null){
-			info = info + TB + "Algoritmo de cifrado:" + SP + algorithm.getName() + CR;
+			info = info + TB + AppletMessages.getString("CMSInformation.17") + SP + algorithm.getName() + CR; //$NON-NLS-1$
 		}
 		else {
-			info = info + TB + "OID del Algoritmo de cifrado:" + SP + ai.getAlgorithm().toString() + CR;
+			info = info + TB + AppletMessages.getString("CMSInformation.18") + SP + ai.getAlgorithm().toString() + CR; //$NON-NLS-1$
 		}
 
 		return info;
