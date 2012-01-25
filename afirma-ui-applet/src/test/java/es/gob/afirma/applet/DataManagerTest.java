@@ -38,9 +38,9 @@ public class DataManagerTest {
 
 	static {
 
-		DATA_FILE_URI = DataManagerTest.class.getResource("/" + DATA_FILE).toString();
+		DATA_FILE_URI = DataManagerTest.class.getResource("/" + DATA_FILE).toString(); //$NON-NLS-1$
 
-		final InputStream isData = DataManagerTest.class.getResourceAsStream("/" + DATA_FILE);
+		final InputStream isData = DataManagerTest.class.getResourceAsStream("/" + DATA_FILE); //$NON-NLS-1$
 		byte[] data;
 		try {
 			data = AOUtil.getDataFromInputStream(isData);
@@ -60,7 +60,7 @@ public class DataManagerTest {
 			hash = null;
 		}
 		DATA_HASH_BASE64 = Base64.encode(hash);
-		Assert.assertNotNull("No se ha calculado el hash", DATA_HASH_BASE64);
+		Assert.assertNotNull("No se ha calculado el hash", DATA_HASH_BASE64); //$NON-NLS-1$
 
 		TEXT = new String(DATA);
 	}

@@ -36,7 +36,7 @@ public class EnveloperTest {
     @Test
     public void encryptedDataTest() {
 
-    	final String plainDataFile = this.getResourcePathToApplet(PLAIN_DATA_FILE);
+    	final String plainDataFile = EnveloperTest.getResourcePathToApplet(PLAIN_DATA_FILE);
 
     	final SignApplet applet = new SignApplet();
     	final String plainDataB64 = applet.getFileBase64Encoded(plainDataFile, false);
@@ -73,12 +73,12 @@ public class EnveloperTest {
 	@Test
 	public void envelopedDataTest() {
 
-    	final String plainDataFile = this.getResourcePathToApplet(PLAIN_DATA_FILE);
+    	final String plainDataFile = EnveloperTest.getResourcePathToApplet(PLAIN_DATA_FILE);
 
     	final SignApplet applet = new SignApplet();
     	final String plainDataB64 = applet.getFileBase64Encoded(plainDataFile, false);
 
-    	final String ksPath = this.getResourcePath(CERT_PATH);
+    	final String ksPath = EnveloperTest.getResourcePath(CERT_PATH);
     	applet.setKeyStore(ksPath, CERT_PASS, "PKCS12"); //$NON-NLS-1$
     	applet.setSelectedCertificateAlias(CERT_ALIAS);
 
@@ -113,19 +113,19 @@ public class EnveloperTest {
 	@Test
 	public void signedAndEnvelopedDataTest() {
 
-    	final String plainDataFile = this.getResourcePathToApplet(PLAIN_DATA_FILE);
+    	final String plainDataFile = EnveloperTest.getResourcePathToApplet(PLAIN_DATA_FILE);
 
     	final SignApplet applet = new SignApplet();
     	final String plainDataB64 = applet.getFileBase64Encoded(plainDataFile, false);
 
-    	final String ksPath = this.getResourcePath(CERT_PATH);
+    	final String ksPath = EnveloperTest.getResourcePath(CERT_PATH);
     	applet.setKeyStore(ksPath, CERT_PASS, "PKCS12"); //$NON-NLS-1$
     	applet.setSelectedCertificateAlias(CERT_ALIAS);
 
     	final String certB64 = applet.getSignCertificateBase64Encoded();
     	applet.addRecipientToCMS(certB64);
 
-    	final String ksPath2 = this.getResourcePath(CERT_PATH2);
+    	final String ksPath2 = EnveloperTest.getResourcePath(CERT_PATH2);
     	applet.setKeyStore(ksPath2, CERT_PASS2, "PKCS12"); //$NON-NLS-1$
     	applet.setSelectedCertificateAlias(CERT_ALIAS2);
 
@@ -156,19 +156,19 @@ public class EnveloperTest {
 	@Test
 	public void authenticatedAndEnvelopedDataTest() {
 
-	   final String plainDataFile = this.getResourcePathToApplet(PLAIN_DATA_FILE);
+	   final String plainDataFile = EnveloperTest.getResourcePathToApplet(PLAIN_DATA_FILE);
 
 	   final SignApplet applet = new SignApplet();
 	   final String plainDataB64 = applet.getFileBase64Encoded(plainDataFile, false);
 
-	   final String ksPath = this.getResourcePath(CERT_PATH);
+	   final String ksPath = EnveloperTest.getResourcePath(CERT_PATH);
 	   applet.setKeyStore(ksPath, CERT_PASS, "PKCS12"); //$NON-NLS-1$
 	   applet.setSelectedCertificateAlias(CERT_ALIAS);
 
 	   final String certB64 = applet.getSignCertificateBase64Encoded();
 	   applet.addRecipientToCMS(certB64);
 
-	   final String ksPath2 = this.getResourcePath(CERT_PATH2);
+	   final String ksPath2 = EnveloperTest.getResourcePath(CERT_PATH2);
 	   applet.setKeyStore(ksPath2, CERT_PASS2, "PKCS12"); //$NON-NLS-1$
 	   applet.setSelectedCertificateAlias(CERT_ALIAS2);
 
@@ -192,11 +192,11 @@ public class EnveloperTest {
 	   Assert.assertEquals(plainDataB64, resultData);
    }
 
-    private String getResourcePath(final String filename) {
+    private static String getResourcePath(final String filename) {
     	return EnveloperTest.class.getResource("/" + filename).toString().substring(6); //$NON-NLS-1$
     }
 
-    private String getResourcePathToApplet(final String filename) {
+    private static String getResourcePathToApplet(final String filename) {
     	return EnveloperTest.class.getResource("/" + filename).toString(); //$NON-NLS-1$
     }
 }

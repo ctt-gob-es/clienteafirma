@@ -20,14 +20,15 @@ public class Ticket194001Test {
     private static final String DATA_FILE = "bin"; //$NON-NLS-1$
 
     /** Genera una firma acorde al est&aacute;ndar XAdES 1.2.2. */
-    @Test
+    @SuppressWarnings("static-method")
+	@Test
 	public void signTest() {
 
     	final String path = new File("").getAbsolutePath(); //$NON-NLS-1$
 
     	final SignApplet applet = new SignApplet();
     	applet.initialize();
-    	final String ksPath = this.getResourcePath(CERT_PATH);
+    	final String ksPath = Ticket194001Test.getResourcePath(CERT_PATH);
     	applet.setKeyStore(ksPath, CERT_PASS, "PKCS12"); //$NON-NLS-1$
     	applet.setSelectedCertificateAlias(CERT_ALIAS);
 
@@ -37,7 +38,7 @@ public class Ticket194001Test {
     	applet.addExtraParam("signedPropertiesTypeUrl", "http://uri.etsi.org/01903/v1.2.2#SignedProperties"); //$NON-NLS-1$ //$NON-NLS-2$
 
 
-    	applet.setFileuri(this.getResourcePathToApplet(DATA_FILE));
+    	applet.setFileuri(Ticket194001Test.getResourcePathToApplet(DATA_FILE));
 
     	applet.sign();
     	Assert.assertFalse(applet.getErrorMessage(), applet.isError());
@@ -46,14 +47,15 @@ public class Ticket194001Test {
 	}
 
     /** Genera una cofirma acorde al est&aacute;ndar XAdES 1.2.2. */
-    @Test
+    @SuppressWarnings("static-method")
+	@Test
 	public void cosignTest() {
 
     	final String path = new File("").getAbsolutePath(); //$NON-NLS-1$
 
     	final SignApplet applet = new SignApplet();
     	applet.initialize();
-    	final String ksPath = this.getResourcePath(CERT_PATH);
+    	final String ksPath = Ticket194001Test.getResourcePath(CERT_PATH);
     	applet.setKeyStore(ksPath, CERT_PASS, "PKCS12"); //$NON-NLS-1$
     	applet.setSelectedCertificateAlias(CERT_ALIAS);
 
@@ -63,7 +65,7 @@ public class Ticket194001Test {
     	applet.addExtraParam("signedPropertiesTypeUrl", "http://uri.etsi.org/01903/v1.2.2#SignedProperties"); //$NON-NLS-1$ //$NON-NLS-2$
 
 
-    	applet.setFileuri(this.getResourcePathToApplet(DATA_FILE));
+    	applet.setFileuri(Ticket194001Test.getResourcePathToApplet(DATA_FILE));
 
     	applet.sign();
     	Assert.assertFalse(applet.getErrorMessage(), applet.isError());
@@ -81,7 +83,7 @@ public class Ticket194001Test {
     	applet.addExtraParam("xadesNamespace", "http://uri.etsi.org/01903/v1.2.2#"); //$NON-NLS-1$ //$NON-NLS-2$
     	applet.addExtraParam("signedPropertiesTypeUrl", "http://uri.etsi.org/01903/v1.2.2#SignedProperties"); //$NON-NLS-1$ //$NON-NLS-2$
 
-    	applet.setFileuri(this.getResourcePathToApplet(DATA_FILE));
+    	applet.setFileuri(Ticket194001Test.getResourcePathToApplet(DATA_FILE));
     	applet.setElectronicSignature(signatureB64);
 
     	applet.coSign();
@@ -95,14 +97,15 @@ public class Ticket194001Test {
 	}
 
     /** Genera una cofirma acorde al est&aacute;ndar XAdES 1.2.2. */
-    @Test
+    @SuppressWarnings("static-method")
+	@Test
 	public void countersignTest() {
 
     	final String path = new File("").getAbsolutePath(); //$NON-NLS-1$
 
     	final SignApplet applet = new SignApplet();
     	applet.initialize();
-    	final String ksPath = this.getResourcePath(CERT_PATH);
+    	final String ksPath = Ticket194001Test.getResourcePath(CERT_PATH);
     	applet.setKeyStore(ksPath, CERT_PASS, "PKCS12"); //$NON-NLS-1$
     	applet.setSelectedCertificateAlias(CERT_ALIAS);
 
@@ -111,7 +114,7 @@ public class Ticket194001Test {
     	applet.addExtraParam("xadesNamespace", "http://uri.etsi.org/01903/v1.2.2#"); //$NON-NLS-1$ //$NON-NLS-2$
     	applet.addExtraParam("signedPropertiesTypeUrl", "http://uri.etsi.org/01903/v1.2.2#SignedProperties"); //$NON-NLS-1$ //$NON-NLS-2$
 
-    	applet.setFileuri(this.getResourcePathToApplet(DATA_FILE));
+    	applet.setFileuri(Ticket194001Test.getResourcePathToApplet(DATA_FILE));
 
     	applet.sign();
     	Assert.assertFalse(applet.getErrorMessage(), applet.isError());
@@ -129,7 +132,7 @@ public class Ticket194001Test {
     	applet.addExtraParam("xadesNamespace", "http://uri.etsi.org/01903/v1.2.2#"); //$NON-NLS-1$ //$NON-NLS-2$
     	applet.addExtraParam("signedPropertiesTypeUrl", "http://uri.etsi.org/01903/v1.2.2#SignedProperties"); //$NON-NLS-1$ //$NON-NLS-2$
 
-    	applet.setFileuri(this.getResourcePathToApplet(DATA_FILE));
+    	applet.setFileuri(Ticket194001Test.getResourcePathToApplet(DATA_FILE));
     	applet.setElectronicSignature(signatureB64);
 
     	applet.coSign();
@@ -160,11 +163,11 @@ public class Ticket194001Test {
     	applet.saveSignToFile();
 	}
 
-    private String getResourcePath(final String filename) {
+    private static String getResourcePath(final String filename) {
     	return GenerateAllSigns.class.getResource("/" + filename).toString().substring(6); //$NON-NLS-1$
     }
 
-    private String getResourcePathToApplet(final String filename) {
+    private static String getResourcePathToApplet(final String filename) {
     	return GenerateAllSigns.class.getResource("/" + filename).toString(); //$NON-NLS-1$
     }
 }

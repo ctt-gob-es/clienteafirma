@@ -24,6 +24,7 @@ public class Ticket173308Test {
 	 * Genera la firma de un documento y su guardado mediante el m&eacute;todo
 	 * saveSignToFile().
 	 */
+	@SuppressWarnings("static-method")
 	@Test
 	public void saveSignToFileTest() {
 
@@ -41,6 +42,7 @@ public class Ticket173308Test {
 	 * Genera la firma de un documento y su guardado al recuperarla con el
 	 * m&eacute;todo getSignatureBase64Encoded().
 	 */
+	@SuppressWarnings("static-method")
 	@Test
 	public void getSignatureBase64EncodedTest() {
 
@@ -58,6 +60,7 @@ public class Ticket173308Test {
 	 * Genera la firma de un documento y su guardado al recuperarla con el
 	 * m&eacute;todo getTextFromBase64().
 	 */
+	@SuppressWarnings("static-method")
 	@Test
 	public void getTextFromBase64Test() {
 
@@ -85,6 +88,7 @@ public class Ticket173308Test {
 	 * Genera la firma de un documento y su guardado al recuperarla con el
 	 * m&eacute;todo getBase64FromText().
 	 */
+	@SuppressWarnings("static-method")
 	@Test
 	public void getSignatureTextTest() {
 
@@ -111,6 +115,7 @@ public class Ticket173308Test {
 	 * Genera la firma de un documento y su guardado al recuperarla con el
 	 * m&eacute;todo getSignatureText() y transformar a Base64 con getBase64FromText().
 	 */
+	@SuppressWarnings("static-method")
 	@Test
 	public void getBase64FromTextTest() {
 
@@ -125,12 +130,12 @@ public class Ticket173308Test {
 	}
 
 
-	private String getSignB64(final SignApplet applet) {
-    	final String ksPath = this.getResourcePath(CERT_PATH);
+	private static String getSignB64(final SignApplet applet) {
+    	final String ksPath = Ticket173308Test.getResourcePath(CERT_PATH);
     	applet.setKeyStore(ksPath, CERT_PASS, "PKCS12"); //$NON-NLS-1$
     	applet.setSelectedCertificateAlias(CERT_ALIAS);
 
-    	applet.setFileuri(this.getResourcePathToApplet(DATA_FILE));
+    	applet.setFileuri(Ticket173308Test.getResourcePathToApplet(DATA_FILE));
 		applet.setSignatureFormat(FORMAT);
 		applet.setSignatureMode(MODE);
 
@@ -140,11 +145,11 @@ public class Ticket173308Test {
 		return applet.getSignatureBase64Encoded();
 	}
 
-    private String getResourcePath(final String filename) {
+    private static String getResourcePath(final String filename) {
     	return GenerateAllSigns.class.getResource("/" + filename).toString().substring(6); //$NON-NLS-1$
     }
 
-    private String getResourcePathToApplet(final String filename) {
+    private static String getResourcePathToApplet(final String filename) {
     	return GenerateAllSigns.class.getResource("/" + filename).toString(); //$NON-NLS-1$
     }
 }

@@ -10,8 +10,6 @@
 
 package es.gob.afirma.applet;
 
-import java.io.File;
-
 import junit.framework.Assert;
 
 import org.junit.Test;
@@ -40,10 +38,8 @@ public class CipherTest {
 	@Test
 	public void cipherFile() {
 
-    	final String path = new File("").getAbsolutePath(); //$NON-NLS-1$
-
-    	final String plainDataFile = this.getResourcePath(PLAIN_DATA_FILE);
-    	final String cipherDataFile = this.getResourcePath(CIPHER_DATA_WITH_KEY_FILE);
+    	final String plainDataFile = CipherTest.getResourcePath(PLAIN_DATA_FILE);
+    	final String cipherDataFile = CipherTest.getResourcePath(CIPHER_DATA_WITH_KEY_FILE);
 
     	final SignApplet applet = new SignApplet();
     	final String cipherDataB64 = applet.getFileBase64Encoded(cipherDataFile, false);
@@ -91,9 +87,7 @@ public class CipherTest {
 	@Test
 	public void cipherDataGeneratedKey() {
 
-    	final String path = new File("").getAbsolutePath(); //$NON-NLS-1$
-
-    	final String plainDataFile = this.getResourcePath(PLAIN_DATA_FILE);
+    	final String plainDataFile = CipherTest.getResourcePath(PLAIN_DATA_FILE);
 
     	final SignApplet applet = new SignApplet();
     	final String plainDataB64 = applet.getFileBase64Encoded(plainDataFile, false);
@@ -141,10 +135,8 @@ public class CipherTest {
 	@Test
 	public void cipherDataUserInput() {
 
-    	final String path = new File("").getAbsolutePath(); //$NON-NLS-1$
-
-    	final String plainDataFile = this.getResourcePath(PLAIN_DATA_FILE);
-    	final String cipherDataFile = this.getResourcePath(CIPHER_DATA_WITH_KEY_FILE);
+    	final String plainDataFile = CipherTest.getResourcePath(PLAIN_DATA_FILE);
+    	final String cipherDataFile = CipherTest.getResourcePath(CIPHER_DATA_WITH_KEY_FILE);
 
     	final SignApplet applet = new SignApplet();
     	final String plainDataB64 = applet.getFileBase64Encoded(plainDataFile, false);
@@ -194,10 +186,8 @@ public class CipherTest {
 	@Test
 	public void cipherDataPassword() {
 
-    	final String path = new File("").getAbsolutePath(); //$NON-NLS-1$
-
-    	final String plainDataFile = this.getResourcePath(PLAIN_DATA_FILE);
-    	final String cipherDataFile = this.getResourcePath(CIPHER_DATA_WITH_PASS_FILE);
+    	final String plainDataFile = CipherTest.getResourcePath(PLAIN_DATA_FILE);
+    	final String cipherDataFile = CipherTest.getResourcePath(CIPHER_DATA_WITH_PASS_FILE);
 
     	final SignApplet applet = new SignApplet();
     	final String plainDataB64 = applet.getFileBase64Encoded(plainDataFile, false);
@@ -239,7 +229,7 @@ public class CipherTest {
     	Assert.assertEquals(plainDataB64, resultPlainDataB64);
 	}
 
-    private String getResourcePath(final String filename) {
+    private static String getResourcePath(final String filename) {
     	return CipherTest.class.getResource("/" + filename).toString().substring(6); //$NON-NLS-1$
     }
 }
