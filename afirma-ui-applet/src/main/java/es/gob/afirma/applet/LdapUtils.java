@@ -30,12 +30,10 @@ public final class LdapUtils {
      * @throws Exception Cuando ocurre alg&uacute;n error durante la recuperaci&oacute;n.
      */
     public static X509Certificate getCertificate(final String server, final int port, final String principal) throws Exception {
-        if (server==null || "".equals(server))
-		 {
+        if (server == null || server.length() == 0) {
 			throw new NullPointerException("El servidor no puede ser nulo ni vacio"); //$NON-NLS-1$
 		}
-        if (principal==null || "".equals(principal))
-		 {
+        if (principal == null || principal.length() == 0) {
 			throw new NullPointerException("El Principal del Certificado no puede ser nulo ni vacio"); //$NON-NLS-1$
 		}
 
