@@ -28,7 +28,6 @@ import java.util.logging.Logger;
 
 import javax.crypto.BadPaddingException;
 
-import es.gob.afirma.applet.pkcs7.CMSInformation;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
