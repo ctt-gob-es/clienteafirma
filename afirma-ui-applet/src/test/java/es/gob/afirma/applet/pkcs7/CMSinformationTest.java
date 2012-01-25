@@ -6,6 +6,7 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
+import es.gob.afirma.applet.CMSInformation;
 import es.gob.afirma.applet.GenerateAllSigns;
 import es.gob.afirma.core.misc.AOUtil;
 
