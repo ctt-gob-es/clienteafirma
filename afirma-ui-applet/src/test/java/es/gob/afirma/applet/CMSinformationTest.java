@@ -1,4 +1,4 @@
-package es.gob.afirma.applet.pkcs7;
+package es.gob.afirma.applet;
 
 import java.io.IOException;
 
@@ -7,7 +7,6 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import es.gob.afirma.applet.CMSInformation;
-import es.gob.afirma.applet.GenerateAllSigns;
 import es.gob.afirma.core.misc.AOUtil;
 
 /**
