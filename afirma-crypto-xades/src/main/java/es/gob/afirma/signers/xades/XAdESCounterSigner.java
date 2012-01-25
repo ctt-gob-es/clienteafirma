@@ -434,7 +434,7 @@ final class XAdESCounterSigner {
         final Element counterSignature = doc.createElement(XADES_SIGNATURE_PREFIX + ":CounterSignature"); //$NON-NLS-1$
 
         // recupera o crea un nodo UnsignedSignatureProperties
-        final NodeList usp = signature.getElementsByTagNameNS(xadesNamespace, "UnsignedSignatureProperties"); //$NON-NLS-1$
+        final NodeList usp = signature.getElementsByTagNameNS("*", "UnsignedSignatureProperties"); //$NON-NLS-1$ //$NON-NLS-2$
         Element unsignedSignatureProperties;
         if (usp.getLength() == 0) {
             unsignedSignatureProperties = doc.createElement(XADES_SIGNATURE_PREFIX + ":UnsignedSignatureProperties"); //$NON-NLS-1$
@@ -446,7 +446,7 @@ final class XAdESCounterSigner {
         unsignedSignatureProperties.appendChild(counterSignature);
 
         // recupera o crea un nodo UnsignedProperties
-        final NodeList up = signature.getElementsByTagNameNS(xadesNamespace, "UnsignedProperties"); //$NON-NLS-1$
+        final NodeList up = signature.getElementsByTagNameNS("*", "UnsignedProperties"); //$NON-NLS-1$ //$NON-NLS-2$
         final Element unsignedProperties;
         if (up.getLength() == 0) {
             unsignedProperties = doc.createElement(XADES_SIGNATURE_PREFIX + ":UnsignedProperties"); //$NON-NLS-1$
@@ -458,7 +458,7 @@ final class XAdESCounterSigner {
         unsignedProperties.appendChild(unsignedSignatureProperties);
 
         // inserta el nuevo nodo en QualifyingProperties
-        final Node qualifyingProperties = signature.getElementsByTagNameNS(xadesNamespace, "QualifyingProperties").item(0); //$NON-NLS-1$
+        final Node qualifyingProperties = signature.getElementsByTagNameNS("*", "QualifyingProperties").item(0); //$NON-NLS-1$ //$NON-NLS-2$
         qualifyingProperties.appendChild(unsignedProperties);
 
         // obtiene el nodo SignatureValue

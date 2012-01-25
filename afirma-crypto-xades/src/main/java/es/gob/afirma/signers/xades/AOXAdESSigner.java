@@ -1023,6 +1023,19 @@ public final class AOXAdESSigner implements AOSigner {
      *    Indica si se debe introducir en la firma el atributo <i>signingTime</i> con la fecha actual
      *    del sistema. Por defecto, se encuentra a {@code true}.
      *   </dd>
+     *  <dt><b><i>xadesNamespace</i></b></dt>
+     *   <dd>
+     *    URL de definici&oacute;n del espacio de nombres de XAdES (y por extensi&oacute;n, versi&oacute;n de XAdES).
+     *    Si se establece este par&aacute;metro es posible que se necesite establecer tambi&eacute;n el par&aacute;metro
+     *    <code>signedPropertiesTypeUrl</code> para evitar incoherencias en la versi&oacute;n de XAdES.
+     *   </dd>
+     *  <dt><b><i>signedPropertiesTypeUrl</i></b></dt>
+     *   <dd>
+     *    URL de definici&oacute;n del tipo de las propiedades firmadas (<i>Signed Properties</i>) de XAdES.
+     *    Si se establece este par&aacute;metro es posible que se necesite establecer tambi&eacute;n el par&aacute;metro
+     *    <code>xadesNamespace</code> para evitar incoherencias en la versi&oacute;n de XAdES.<br>
+     *    Si no se establece se usa el valor por defecto: <a href="http://uri.etsi.org/01903#SignedProperties">http://uri.etsi.org/01903#SignedProperties</a>.
+     *   </dd>
      * </dl>
      * @return Contrafirma en formato XAdES.
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
