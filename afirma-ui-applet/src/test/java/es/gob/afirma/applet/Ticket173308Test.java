@@ -9,6 +9,9 @@ import org.junit.Test;
 
 import es.gob.afirma.core.signers.AOSignConstants;
 
+/**
+ * Comprueba la incidencia 173308 abierta contra el Applet de firma.
+ */
 public class Ticket173308Test {
 
     private static final String CERT_PATH = "ANF_PF_Activo.pfx"; //$NON-NLS-1$
