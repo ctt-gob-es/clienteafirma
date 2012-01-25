@@ -2924,7 +2924,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         }
         catch (final CertificateException e) {
             LOGGER.severe("Error al decodificar el certificado de destinatario, asegurese de que es un certificado valido: " + e); //$NON-NLS-1$
-            this.setError(AppletMessages.getString("SignApplet.61")); //$NON-NLS-1$
+            this.setError(AppletMessages.getString("SignApplet.10")); //$NON-NLS-1$
         }
         catch (final Exception e) {
             LOGGER.severe("Error al eliminar el certificado de la lista de destinatarios: " + e); //$NON-NLS-1$

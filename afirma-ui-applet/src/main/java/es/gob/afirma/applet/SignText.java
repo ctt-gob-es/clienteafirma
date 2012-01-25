@@ -338,7 +338,7 @@ public final class SignText {
         pane.setPreferredSize(new Dimension(520, 440 + offset));
 
         // Mostramos el dialogo
-        if (JOptionPane.showConfirmDialog(this.parent, pane, AppletMessages.getString("SignText.4"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE) == JOptionPane.OK_OPTION) { //$NON-NLS-1$
+        if (JOptionPane.showConfirmDialog(this.parent, pane, AppletMessages.getString("SignApplet.25"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE) == JOptionPane.OK_OPTION) { //$NON-NLS-1$
             try {
 
                 // ********************************************************************
@@ -379,7 +379,7 @@ public final class SignText {
                                         if (errorMessage != null) {
                                             Logger.getLogger("es.gob.afirma").warning(errorMessage); //$NON-NLS-1$
                                             if (JOptionPane.showConfirmDialog(this.parent, cv.getErrorMessage() + "\r\n" + AppletMessages.getString("SignText.10"), //$NON-NLS-1$ //$NON-NLS-2$
-                                                                              AppletMessages.getString("SignText.11"), //$NON-NLS-1$
+                                                                              AppletMessages.getString("SignApplet.658"), //$NON-NLS-1$
                                                                               JOptionPane.YES_NO_OPTION,
                                                                               JOptionPane.WARNING_MESSAGE) != JOptionPane.YES_OPTION) {
                                                 return;
@@ -403,7 +403,7 @@ public final class SignText {
             }
             catch (final Exception t) {
                 Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de firma de texto: " + t); //$NON-NLS-1$ //$NON-NLS-2$
-                JOptionPane.showMessageDialog(this.parent, AppletMessages.getString("SignText.12"), AppletMessages.getString("SignText.13"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+                JOptionPane.showMessageDialog(this.parent, AppletMessages.getString("SignApplet.101"), AppletMessages.getString("SignApplet.156"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
             }
         }
     }
