@@ -122,7 +122,7 @@ public class SelectionDialog {
 
         if (data == null) {
             Logger.getLogger("es.gob.afirma").warning("No se han introducido los datos que se desean guardar. Se cancelara la operacion"); //$NON-NLS-1$ //$NON-NLS-2$
-            throw new NullPointerException("No se introdujeron datos que almacenar"); //$NON-NLS-1$
+            throw new IllegalArgumentException("No se introdujeron datos que almacenar"); //$NON-NLS-1$
         }
 
         Component parentComponent = null;

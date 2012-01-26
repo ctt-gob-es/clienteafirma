@@ -79,7 +79,7 @@ public class ProfileManager {
      * <li>Nombre interno de variable utilizado en la configuraci&oacute;n de la herramienta.</li>
      * <li>Valor por defecto</li>
      * </ul> */
-    private static String[][] CONVERSE_VALUES = new String[][] {
+    private static final String[][] CONVERSE_VALUES = new String[][] {
             {
                     KEY_GENERAL_ADVANCED_VIEW, MainOptionsPane.MAIN_ADVANCED_VIEW, "false"}, //$NON-NLS-1$
             {

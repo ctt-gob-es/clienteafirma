@@ -112,7 +112,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
     }
 
     /** log. */
-    private static Logger LOGGER = Logger.getLogger(PanelMultifirma.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(PanelMultifirma.class.getName());
 
     /** UID. */
     private static final long serialVersionUID = 1L;

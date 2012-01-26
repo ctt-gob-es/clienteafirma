@@ -69,7 +69,7 @@ import es.gob.afirma.ui.utils.Utils;
 /** Clase que se encarga de desensobrar el contenido de un fichero. */
 final class Desensobrado extends JPanel {
 
-    private static Logger LOGGER = Logger.getLogger(Desensobrado.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Desensobrado.class.getName());
 
     private static final long serialVersionUID = 1L;
 

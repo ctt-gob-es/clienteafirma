@@ -99,12 +99,12 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
     /** UID. */
     private static final long serialVersionUID = 1L;
     /** Constante sobre autenticado. */
-    public static int SOBRE_AUTENTICADO = 0;
+    public static final int SOBRE_AUTENTICADO = 0;
     /** Constante sobre firmado. */
-    public static int SOBRE_FIRMADO = 1;
+    public static final int SOBRE_FIRMADO = 1;
 
     /** Constante sobre simple. */
-    public static int SOBRE_SIMPLE = 2;
+    public static final int SOBRE_SIMPLE = 2;
 
     /** Etiqueta con el texto "Anadir remitente desde...". */
     private JLabel etiquetaAnadir = new JLabel();
@@ -438,7 +438,7 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
      * @param seleccionado Certificado seleccionado
      * @param kconf1 Configuracion del KeyStore
      * @return
-     * @throws AOException 
+     * @throws AOException
      * @throws UnrecoverableKeyException */
     private PrivateKeyEntry getPrivateKeyEntry(final AOKeyStoreManager keyStoreManager, final String seleccionado, final KeyStoreConfiguration kconf1) throws AOException, UnrecoverableKeyException {
 
