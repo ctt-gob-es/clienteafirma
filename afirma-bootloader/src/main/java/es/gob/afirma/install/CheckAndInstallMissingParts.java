@@ -205,7 +205,7 @@ final class CheckAndInstallMissingParts {
         try {
             AOBootUtil.getCleanClassLoader().loadClass("sun.security.mscapi.SunMSCAPI"); //$NON-NLS-1$
         }
-        catch (final Throwable e) {
+        catch (final Exception e) {
             return true;
         }
         return false;
@@ -217,7 +217,7 @@ final class CheckAndInstallMissingParts {
         try {
             AOBootUtil.getCleanClassLoader().loadClass("sun.security.pkcs11.SunPKCS11"); //$NON-NLS-1$
         }
-        catch (final Throwable e) {
+        catch (final Exception e) {
             return true;
         }
         return false;

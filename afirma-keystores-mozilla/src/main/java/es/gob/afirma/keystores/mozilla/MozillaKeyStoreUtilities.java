@@ -764,8 +764,11 @@ final class MozillaKeyStoreUtilities {
             System.load(nssBinDir + "libsoftokn3.dylib"); //$NON-NLS-1$
             return; // Si funciona salimos sin hacer nada
         }
-        catch (final Throwable e) {
+        catch (final Exception e) {
             // Se ignora el error
+        }
+        catch(final UnsatisfiedLinkError e) {
+        	// Se ignora el error
         }
 
         final String[] libs = new String[] {
@@ -808,8 +811,11 @@ final class MozillaKeyStoreUtilities {
         try {
             System.load(nssBinDir + "libsoftokn3.dylib"); //$NON-NLS-1$
         }
-        catch (final Throwable e) {
-            throw new AOException("La configuracion de NSS para Mac OS X ha fallado: " + e); //$NON-NLS-1$
+        catch (final Exception e) {
+            throw new AOException("La configuracion de NSS para Mac OS X ha fallado por motivos de seguridad: " + e); //$NON-NLS-1$
+        }
+        catch(final UnsatisfiedLinkError e) {
+        	throw new AOException("La configuracion de NSS para Mac OS X ha fallado: " + e); //$NON-NLS-1$
         }
     }
 }
