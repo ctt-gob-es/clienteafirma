@@ -26,7 +26,7 @@ public class FileBean {
 	 */
 	public FileBean(final String path, final byte[] content) {
 		this.path = path;
-		this.content = content;
+		this.content = content.clone();
 	}
 
 	/**

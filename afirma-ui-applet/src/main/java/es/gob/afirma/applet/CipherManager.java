@@ -260,7 +260,7 @@ public final class CipherManager {
      * @param cipherKey
      *        Clave de cifrado */
     public void setCipherKey(final byte[] cipherKey) {
-        this.cipherKeyEncoded = cipherKey;
+        this.cipherKeyEncoded = cipherKey.clone();
     }
 
     /** recupera la contrase&ntilde;a de cifrado.
