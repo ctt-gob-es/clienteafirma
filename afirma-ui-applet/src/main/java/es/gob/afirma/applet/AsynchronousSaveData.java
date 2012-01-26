@@ -58,7 +58,7 @@ public final class AsynchronousSaveData implements Runnable {
         if (desc != null && !"".equals(desc)) { //$NON-NLS-1$
             this.description = desc;
         }
-        this.extensions = exts;
+        this.extensions = exts.clone();
         this.parent = p;
         this.showDialogIfError = errorDialog;
     }
