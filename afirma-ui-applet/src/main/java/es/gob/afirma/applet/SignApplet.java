@@ -281,7 +281,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     @Override
     public void init() {
 
-    	changeLocale(getParameter("language"), getParameter("country"), getParameter("variant")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    	changeLocale(getParameter("locale")); //$NON-NLS-1$
 
     	LOGGER.info("Cliente @firma"); //$NON-NLS-1$
         LOGGER.info("Versi\u00F3n: " + getVersion()); //$NON-NLS-1$
@@ -3949,23 +3949,53 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
      * @param country Pa&iacute;s.
      * @param variant Variante.
      */
-    private void changeLocale(final String language, final String country, final String variant) {
-    	if (language != null) {
-    		Locale locale;
-    		if (country != null) {
-    			if (variant != null) {
-    				locale = new Locale(language, country, variant);
-    			} else {
-    				locale = new Locale(language, country);
+    private void changeLocale(final String locale) {
+    	if (locale != null) {
+    		final Locale newLocale = parseLocale(locale);
+    		if (newLocale != null) {
+    			try {
+    				Locale.setDefault(newLocale);
+    			} catch (final SecurityException e) {
+    				LOGGER.warning("No se pudo cambiar el idioma por restricciones de seguridad en el sistema: " + e); //$NON-NLS-1$
     			}
-    		} else {
-    			locale = new Locale(language);
     		}
-    		try {
-    			Locale.setDefault(locale);
-    		} catch (final SecurityException e) {
-    			LOGGER.warning("No se pudo cambiar el idioma por restricciones de seguridad en el sistema: " + e); //$NON-NLS-1$
-			}
+    	}
+    }
+
+    /**
+     * Obtiene el locale a partir de la cadena de localizaci&oacute;n indicada.
+     * @param locale Cadena de localizaci&oacute;n.
+     * @return Localizaci&oacute;n.
+     */
+    private static Locale parseLocale(final String locale) {
+    	if (locale == null) {
+    		return null;
+    	}
+
+    	try {
+    		final int i1 = locale.indexOf('_');
+    		if (i1 == -1) {
+    			return new Locale(locale);
+    		}
+
+    		final String language = locale.substring(0, locale.indexOf('_'));
+    		if (i1 == locale.length() - 1) {
+    			return new Locale(language);
+    		}
+    		if (locale.indexOf('_', i1 + 1) == -1) {
+    			return new Locale(language, locale.substring(i1 + 1));
+    		}
+
+    		final int i2 = locale.indexOf('_', i1 + 1);
+    		final String country = locale.substring(i1 + 1, i2);
+    		if (i2 == locale.length() - 1) {
+    			return new Locale(language, country);
+    		}
+    		return new Locale(language, country, locale.substring(i2 + 1));
+
+    	} catch (final Exception e) {
+    		LOGGER.warning("No se pudo identificar el idioma a partir del locale indicado: " + e); //$NON-NLS-1$
+    		return null;
     	}
     }
 }
