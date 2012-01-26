@@ -2779,8 +2779,13 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
      * @param dat
      *        Datos que deseamos cifrar.
      * @return Devuelve {@code true} si la operaci&oacute; finaliz&oacute;
-     *         correctamente. */
-    private boolean cipherData(final byte[] dat) {
+     *         correctamente.
+     * @deprecated Utilizar los m&eacute;todos {@link SignApplet#setPlainData(String)} para
+     * indicar los datos en Base64 y {@link SignApplet#cipherData()} para ejecutar la
+     * operaci&oacute;n.
+     */
+    @Deprecated
+    public boolean cipherData(final byte[] dat) {
 
         // El resultado queda almacenado en el objeto CipherManager
         try {
@@ -2832,8 +2837,12 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
      * @param dat
      *        Datos que deseamos descifrar.
      * @return Devuelve {@code true} si la operaci&oacute; finaliz&oacute;
-     *         correctamente. */
-    private boolean decipherData(final byte[] dat) {
+     *         correctamente.
+     * @deprecated Utilizar los m&eacute;todos {@link #setCipherData(String)} para indicar los
+     * datos en Base64 y {@link SignApplet#decipherData()} para ejecutar la operaci&oacute;n.
+     */
+    @Deprecated
+    public boolean decipherData(final byte[] dat) {
 
         // El resultado quedara almacenado en el objeto CipherManager
     	try {
