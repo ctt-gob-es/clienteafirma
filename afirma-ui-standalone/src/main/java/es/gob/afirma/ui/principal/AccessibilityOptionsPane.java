@@ -51,7 +51,7 @@ public final class AccessibilityOptionsPane {
     public static final String MAIN_WINDOWS_SIZE = "main.windowsSize"; //$NON-NLS-1$
 
     /** Boton aplicar cambios. */
-    private JButton aplicar = new JButton();
+    private final JButton aplicar = new JButton();
 
     /** Casilla de verificacion del tama&ntilde;o del cursor de texto. */
     private JCheckBox checkCursorSize;
@@ -93,13 +93,13 @@ public final class AccessibilityOptionsPane {
 	}
 
     /** Modifica el valor de la variable continueBigStyle */
-	public static void setContinueBigStyle(boolean continueBigStyle) {
+	public static void setContinueBigStyle(final boolean continueBigStyle) {
 		AccessibilityOptionsPane.continueBigStyle = continueBigStyle;
 	}
 
 	/** Obtiene la referencia al bot&oacute;n aplicar */
 	public JButton getAplicar() {
-		return aplicar;
+		return this.aplicar;
 	}
 
 	/** Constructor.
@@ -406,25 +406,6 @@ public final class AccessibilityOptionsPane {
         Utils.setFontBold(valores);
         panelValores.add(valores);
         buttonPanel.add(panelValores);
-
-        // JPanel panelGuardar = new JPanel(new GridLayout(1, 1));
-        // //Boton guardar
-        // guardar.setText(Messages.getString("Opciones.accesibilidad.guardar"));
-        // guardar.setMnemonic(KeyEvent.VK_U);
-        // guardar.addActionListener(new ActionListener() {
-        //
-        // @Override
-        // public void actionPerformed(ActionEvent e) {
-        // save();
-        //
-        // }
-        // });
-        // Utils.remarcar(guardar);
-        // Utils.setContrastColor(guardar);
-        // Utils.setFontBold(guardar);
-        //
-        // panelGuardar.add(guardar);
-        // buttonPanel.add(panelGuardar);
 
         final JPanel panelAplicar = new JPanel(new GridLayout(1, 1));
         // Boton aplicar

@@ -80,7 +80,7 @@ final class PanelFinalizar extends JAccessibilityDialogWizard {
         // Etiqueta "felicidades" y "Ha finalizado con..."
         final String textLabel = Messages.getString("Wizard.sobres.final1") + //$NON-NLS-1$
         Constants.HTML_SALTO_LINEA
-        + Constants.HTML_SALTO_LINEA + Messages.getString("Wizard.multifirma.simple.final.descripcion"); //$NON-NLS-2$
+        + Constants.HTML_SALTO_LINEA + Messages.getString("Wizard.multifirma.simple.final.descripcion"); //$NON-NLS-1$
 
         final InfoLabel finalizeLabel = new InfoLabel(textLabel, false);
         // Foco al contenido

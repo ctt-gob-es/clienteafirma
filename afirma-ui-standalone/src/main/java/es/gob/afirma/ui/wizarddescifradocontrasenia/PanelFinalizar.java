@@ -36,7 +36,7 @@ import es.gob.afirma.ui.wizardUtils.JDialogWizard;
  * Panel explicativo de finalizacion
  */
 public class PanelFinalizar extends JAccessibilityDialogWizard {
-	
+
 	/**
 	 * UID.
 	 */
@@ -46,13 +46,13 @@ public class PanelFinalizar extends JAccessibilityDialogWizard {
      * Guarda todas las ventanas del asistente para poder controlar la botonera
      * @param ventanas	Listado con todas las paginas del asistente
      */
-    public void setVentanas(List<JDialogWizard> ventanas) {
+    public void setVentanas(final List<JDialogWizard> ventanas) {
     	this.setBotoneraSuperior(new BotoneraSuperior(ventanas));
     	this.setBotonera(new BotoneraInferior(ventanas, 2));
     	getContentPane().add(getBotoneraSuperior(), BorderLayout.PAGE_START);
     	getContentPane().add(getBotonera(), BorderLayout.PAGE_END);
     }
-    
+
     /**
      * Constructor.
      */
@@ -67,24 +67,24 @@ public class PanelFinalizar extends JAccessibilityDialogWizard {
 	public int getMinimumRelation(){
 		return 9;
 	}
-	
+
     /**
      * Inicializacion de los componentes
      */
     private void initComponents() {
     	// Titulo de la ventana
     	setTitulo(Messages.getString("WizardDescifrado.titulo")); //$NON-NLS-1$
-    	
+
     	// Panel con la imagen lateral
-        ImagenLateral panelIzdo = new ImagenLateral();
+        final ImagenLateral panelIzdo = new ImagenLateral();
         if (Main.isOSHighContrast){
         	panelIzdo.setOpaque(false);
         }
         Utils.setContrastColor(panelIzdo);
         getContentPane().add(panelIzdo, BorderLayout.WEST);
-    	
+
     	// Panel central
-        JPanel panelCentral = new JPanel();
+        final JPanel panelCentral = new JPanel();
         panelCentral.setBackground(Color.WHITE);
         // si el color de fondo ya no es blanco
         if (Main.isOSHighContrast){
@@ -93,9 +93,9 @@ public class PanelFinalizar extends JAccessibilityDialogWizard {
         panelCentral.setLayout(new GridBagLayout());
         Utils.setContrastColor(panelCentral);
         Utils.setFontBold(panelCentral);
-    	
+
         // Configuramos el layout
-        GridBagConstraints c = new GridBagConstraints();
+        final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
         c.insets = new Insets(20, 20, 20, 20);
         c.weightx = 1.0;
@@ -103,16 +103,16 @@ public class PanelFinalizar extends JAccessibilityDialogWizard {
 		c.gridx = 0;
 		c.gridy = 0;
 		c.anchor = GridBagConstraints.NORTHWEST;
-		
+
 		 // Etiqueta "felicidades" y "Ha finalizado con..."
-		String textLabel = Messages.getString("Wizard.sobres.final1") + //$NON-NLS-1$
-		Constants.HTML_SALTO_LINEA+Constants.HTML_SALTO_LINEA + Messages.getString("Wizard.sobres.final.final2") ; //$NON-NLS-3$
-		
-		InfoLabel finalizeLabel = new InfoLabel(textLabel, false);
+		final String textLabel = Messages.getString("Wizard.sobres.final1") + //$NON-NLS-1$
+		Constants.HTML_SALTO_LINEA+Constants.HTML_SALTO_LINEA + Messages.getString("Wizard.sobres.final.final2"); //$NON-NLS-1$
+
+		final InfoLabel finalizeLabel = new InfoLabel(textLabel, false);
 		  //Foco al contenido
         finalizeLabel.addAncestorListener(new RequestFocusListener(false));
 		panelCentral.add(finalizeLabel, c);
-    	
+
     	getContentPane().add(panelCentral, BorderLayout.CENTER);
     }
 }
