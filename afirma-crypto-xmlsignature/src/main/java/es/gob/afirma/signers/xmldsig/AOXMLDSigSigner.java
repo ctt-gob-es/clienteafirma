@@ -309,7 +309,7 @@ public final class AOXMLDSigSigner implements AOSigner {
 
         URI uri = null;
         try {
-            uri = new URI(extraParams.getProperty("uri")); //$NON-NLS-1$
+            uri = AOUtil.createURI(extraParams.getProperty("uri")); //$NON-NLS-1$
         }
         catch (final Exception e) {
             // Se ignora, puede estar ausente
