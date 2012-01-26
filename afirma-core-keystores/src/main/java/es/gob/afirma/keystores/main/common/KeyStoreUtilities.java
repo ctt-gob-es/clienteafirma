@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -21,7 +21,6 @@ import java.security.PrivilegedAction;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
@@ -47,19 +46,20 @@ public final class KeyStoreUtilities {
     private KeyStoreUtilities() {
         // No permitimos la instanciacion
     }
-    
+
     static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
-    
+
     private static final String OPENSC_USR_LIB_LINUX = "/usr/lib/opensc-pkcs11.so"; //$NON-NLS-1$
 
     /** Crea las l&iacute;neas de configuraci&oacute;n para el proveedor PKCS#11
      * de Sun.
      * @param lib Nombre (con o sin ruta) de la biblioteca PKCS#11
-     * @param nameNombre que queremos tenga el proveedor. CUIDADO: SunPKCS11
+     * @param name Nombre que queremos tenga el proveedor. CUIDADO: SunPKCS11
      *            a&ntilde;ade el prefijo <i>SunPKCS11-</i>.
+     * @param slot Lector de tarjetas en el que buscar la biblioteca.
      * @return Fichero con las propiedades de configuracion del proveedor
      *         PKCS#11 de Sun para acceder al KeyStore de un token gen&eacute;rico */
-    static String createPKCS11ConfigFile(final String lib, String name, final Integer slot) {
+    static String createPKCS11ConfigFile(final String lib, final String name, final Integer slot) {
 
         final StringBuilder buffer = new StringBuilder("library="); //$NON-NLS-1$
 
@@ -94,7 +94,7 @@ public final class KeyStoreUtilities {
         return buffer.toString();
     }
 
-    static void cleanCAPIDuplicateAliases(final KeyStore keyStore) throws NoSuchFieldException, 
+    static void cleanCAPIDuplicateAliases(final KeyStore keyStore) throws NoSuchFieldException,
                                                                           IllegalAccessException {
 
         Field field = keyStore.getClass().getDeclaredField("keyStoreSpi"); //$NON-NLS-1$
@@ -131,7 +131,9 @@ public final class KeyStoreUtilities {
     private static final int ALIAS_MAX_LENGTH = 120;
 
     /** Obtiene una mapa con las descripciones usuales de los alias de
-     * certificados (como claves de estas &uacute;ltimas).
+     * certificados (como claves de estas &uacute;ltimas). Se aplicar&acute;n los
+     * filtros de certificados sobre todos ellos y se devolver&acute;n aquellos
+     * certificados que cumplan con alguno de los filtros definidos.
      * @param aliases
      *        Alias de los certificados entre los que el usuario debe
      *        seleccionar uno
@@ -146,7 +148,7 @@ public final class KeyStoreUtilities {
      *        Indica si se deben o no mostrar los certificados caducados o
      *        aun no v&aacute;lidos
      * @param certFilters
-     *        Filtros a aplicar sobre los certificados
+     *        Filtros a aplicar sobre los certificados.
      * @return Alias seleccionado por el usuario */
     public static Map<String, String> getAliasesByFriendlyName(final String[] aliases,
                                                                final AOKeyStoreManager ksm,
@@ -191,7 +193,7 @@ public final class KeyStoreUtilities {
                     continue;
                 }
 
-                if (tmpCert == null) { //TODO: Revisar si debe pasarse a la siguiente iteracion 
+                if (tmpCert == null) { //TODO: Revisar si debe pasarse a la siguiente iteracion
                     LOGGER.warning("El KeyStore no permite extraer el certificado publico para el siguiente alias: " + al); //$NON-NLS-1$
                 }
 
@@ -250,23 +252,22 @@ public final class KeyStoreUtilities {
                     }
                 }
             }
-            
+
             // Aplicamos los filtros de certificados
-            if (certFilters != null) {
-            	Map<String, String> filteredAliases;
+            if (certFilters != null && certFilters.size() > 0) {
+            	final Map<String, String> filteredAliases = new Hashtable<String, String>();
                 for (final CertificateFilter cf : certFilters) {
-                	filteredAliases = new Hashtable<String, String>();
                 	for (final String filteredAlias : cf.matches(aliassesByFriendlyName.keySet().toArray(new String[0]), ksm)) {
                 		filteredAliases.put(filteredAlias, aliassesByFriendlyName.get(filteredAlias));
                 	}
-                	aliassesByFriendlyName.clear();
-                	aliassesByFriendlyName.putAll(filteredAliases);
                 }
+            	aliassesByFriendlyName.clear();
+            	aliassesByFriendlyName.putAll(filteredAliases);
             }
-            
+
             for (final String alias : aliassesByFriendlyName.keySet().toArray(new String[0])) {
             	tmpCN = AOUtil.getCN(ksm.getCertificate(alias));
-            	
+
             	if (tmpCN != null) {
             		aliassesByFriendlyName.put(alias, tmpCN);
             	}
@@ -277,7 +278,7 @@ public final class KeyStoreUtilities {
             		aliassesByFriendlyName.put(alias, alias.trim());
             	}
             }
-            
+
         }
 
         else {
@@ -307,7 +308,7 @@ public final class KeyStoreUtilities {
         return aliassesByFriendlyName;
 
     }
-    
+
     /** Muestra un di&aacute;logo para que el usuario seleccione entre los
      * certificados mostrados.
      * @param alias
@@ -346,7 +347,7 @@ public final class KeyStoreUtilities {
                checkPrivateKeys,
                checkValidity,
                showExpiredCertificates,
-               new ArrayList<CertificateFilter>(0),
+               null,
                false
         );
     }
@@ -418,8 +419,8 @@ public final class KeyStoreUtilities {
         // mayusculas y minusculas
         int i = 0;
         final NameCertificateBean[] orderedFriendlyNames =
-        	new NameCertificateBean[aliassesByFriendlyName.size()]; 
-        for (String certAlias : aliassesByFriendlyName.keySet().toArray(new String[0])) {
+        	new NameCertificateBean[aliassesByFriendlyName.size()];
+        for (final String certAlias : aliassesByFriendlyName.keySet().toArray(new String[0])) {
         	orderedFriendlyNames[i++] = new NameCertificateBean(
         			aliassesByFriendlyName.get(certAlias),
         			ksm.getCertificate(certAlias));
@@ -440,10 +441,10 @@ public final class KeyStoreUtilities {
                 }
             }
         });
-        
+
         final Object o = AOUIFactory.showCertificateSelectionDialog(
                 parentComponent, orderedFriendlyNames);
-        
+
         final String certName;
         if (o != null) {
             certName = o.toString();
@@ -483,7 +484,7 @@ public final class KeyStoreUtilities {
                         if (errorMessage != null) {
                             LOGGER.warning("Error durante la validacion: " + errorMessage); //$NON-NLS-1$
                             if (AOUIFactory.showConfirmDialog(
-                                  parentComponent, 
+                                  parentComponent,
                                   errorMessage,
                                   KeyStoreMessages.getString("KeyStoreUtilities.5"), //$NON-NLS-1$
                                   AOUIFactory.YES_NO_OPTION,
@@ -504,7 +505,7 @@ public final class KeyStoreUtilities {
         }
         return null;
     }
-    
+
     /** Recupera el PasswordCallback que com&uacute;nmente se requiere para el
      * acceso a un almac&eacute;n de claves.
      * @param kStore Almac&eacuten de claves
@@ -518,8 +519,8 @@ public final class KeyStoreUtilities {
                                                                "obtener la PasswordCallBack"); //$NON-NLS-1$
         }
 
-        if (kStore == AOKeyStore.WINDOWS || 
-            kStore == AOKeyStore.WINROOT || 
+        if (kStore == AOKeyStore.WINDOWS ||
+            kStore == AOKeyStore.WINROOT ||
             kStore == AOKeyStore.APPLE) {
                 return new NullPasswordCallback();
         }
@@ -533,19 +534,19 @@ public final class KeyStoreUtilities {
      *               di&aacute;logos modales (normalmente un <code>java.awt.Comonent</code>)
      * @return Manejador para la solicitud de la clave. */
     public static PasswordCallback getCertificatePC(final AOKeyStore store, final Object parent) {
-        if (store == AOKeyStore.WINDOWS || 
-            store == AOKeyStore.WINROOT || 
-            store == AOKeyStore.WINADDRESSBOOK || 
-            store == AOKeyStore.WINCA || 
-            store == AOKeyStore.SINGLE || 
-            store == AOKeyStore.MOZ_UNI || 
-            store == AOKeyStore.PKCS11 || 
+        if (store == AOKeyStore.WINDOWS ||
+            store == AOKeyStore.WINROOT ||
+            store == AOKeyStore.WINADDRESSBOOK ||
+            store == AOKeyStore.WINCA ||
+            store == AOKeyStore.SINGLE ||
+            store == AOKeyStore.MOZ_UNI ||
+            store == AOKeyStore.PKCS11 ||
             store == AOKeyStore.APPLE) {
                 return new NullPasswordCallback();
         }
         return new UIPasswordCallback(KeyStoreMessages.getString("KeyStoreUtilities.7"), parent); //$NON-NLS-1$
     }
-    
+
     static String getPKCS11DNIeLib() throws AOKeyStoreManagerException {
         if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
             final String lib = Platform.getSystemLibDir();
@@ -568,8 +569,8 @@ public final class KeyStoreUtilities {
             if (new File("/Library/OpenSC/lib/libopensc-dnie.1.0.3.dylib").exists()) { //$NON-NLS-1$
                 return "/Library/OpenSC/lib/libopensc-dnie.1.0.3.dylib";  //$NON-NLS-1$
             }
-            if (new File(OPENSC_USR_LIB_LINUX).exists()) { 
-                return OPENSC_USR_LIB_LINUX;  
+            if (new File(OPENSC_USR_LIB_LINUX).exists()) {
+                return OPENSC_USR_LIB_LINUX;
             }
             throw new AOKeyStoreManagerException("No hay controlador PKCS#11 de DNIe instalado en este sistema Mac OS X"); //$NON-NLS-1$
         }
@@ -582,8 +583,8 @@ public final class KeyStoreUtilities {
         if (new File("/lib/libopensc-dnie.so").exists()) { //$NON-NLS-1$
             return "/lib/libopensc-dnie.so"; //$NON-NLS-1$
         }
-        if (new File(OPENSC_USR_LIB_LINUX).exists()) { 
-            return OPENSC_USR_LIB_LINUX;  
+        if (new File(OPENSC_USR_LIB_LINUX).exists()) {
+            return OPENSC_USR_LIB_LINUX;
         }
         if (new File("/lib/opensc-pkcs11.so").exists()) { //$NON-NLS-1$
             return "/lib/opensc-pkcs11.so";  //$NON-NLS-1$
