@@ -18,7 +18,7 @@
  *  <p>Adicionalmente, se presentan las siguientes dependencias din&aacute;micas de primer nivel:</p>
  *  <ul>
  *   <li>
- *    Dependencia din&aacute;mica con el m&oacute;dulo Núcleo UI JSE (<i>afirma-ui-core-jse</i>) del Cliente, utilizado para la solicitud de contrase&ntilde;as.
+ *    Dependencia din&aacute;mica con el m&oacute;dulo N&uacute;cleo UI JSE (<i>afirma-ui-core-jse</i>) del Cliente, utilizado para la solicitud de contrase&ntilde;as.
  *    Este puede sustituirse por cualquier otra clase que implemente el interfaz <code>es.gob.afirma.core.ui.AOUIManager</code>.
  *   </li>
  *  </ul>
