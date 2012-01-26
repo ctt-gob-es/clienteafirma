@@ -25,8 +25,6 @@ import java.io.IOException;
 import java.security.Key;
 import java.security.KeyException;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.spec.InvalidKeySpecException;
 import java.util.List;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -269,8 +267,8 @@ final class PanelClaveCifrado extends JAccessibilityDialogWizard {
      * as&iacute; lo indica el usuario.
      * @param algorithmConfig Configuraci&oacute;n de cifrado.
      * @throws NoSuchAlgorithmException Cuando no se reconoce el algoritmo de cifrado
-     * @throws NoSuchProviderException Cuando no se reconoce el proveedor para la generaci&oacute;n de claves
-     * @throws InvalidKeySpecException Cuando la contrase&ntilde;a introducida no cumple los requisitos necesarios
+     * @throws java.security.NoSuchProviderException Cuando no se reconoce el proveedor para la generaci&oacute;n de claves
+     * @throws java.security.spec.InvalidKeySpecException Cuando la contrase&ntilde;a introducida no cumple los requisitos necesarios
      * @throws AOCipherAlgorithmException Cuando el algoritmo indicado no soporta el modo de generaci&oacute;n de clave
      * @throws AOException Cuando se produce un error al auto generar las claves.
      * @throws NoSuchAlgorithmException Cuando el algoritmo de cifrado no esta soportado. */

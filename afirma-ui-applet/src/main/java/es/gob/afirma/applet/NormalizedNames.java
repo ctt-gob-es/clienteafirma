@@ -12,7 +12,6 @@ package es.gob.afirma.applet;
 
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.keystores.main.common.AOKeyStore;
-import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 
 /** Normaliza las cadenas de texto introducidas por los usuarios/integradores
  * para la configuraci&oacute;n de los distintos almacenes de certificados,
@@ -133,7 +132,7 @@ public final class NormalizedNames {
     }
 
     /** Normaliza el nombre de un keystore para as&iacute; poder obtenerlo a
-     * trav&eacute;s del {@link AOKeyStoreManager}. Si no se consigue
+     * trav&eacute;s del {@link es.gob.afirma.keystores.main.common.AOKeyStoreManager}. Si no se consigue
      * identificar el keystore se devuelve la misma cadena que se ha indicado.
      * @param type
      *        Tipo de keystore.
