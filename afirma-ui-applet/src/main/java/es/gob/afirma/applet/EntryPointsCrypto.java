@@ -1095,7 +1095,7 @@ public interface EntryPointsCrypto {
 	 * @see #setCertFilterRFC2254(String, String, boolean)
 	 */
 	@Deprecated
-	public void setCertFilter(String certFilter);
+	void setCertFilter(String certFilter);
 
 	/**
 	 * Establece una condici&oacute;n para seleccionar el certificado con el que se ha de firmar. No se permite elegir certificado al usuario
@@ -1175,7 +1175,7 @@ public interface EntryPointsCrypto {
 	 * @see #setMandatoryCertificateConditionRFC2254(String, String, boolean)
 	 */
 	@Deprecated
-	public void setMandatoryCertificateCondition(String certFilter);
+	void setMandatoryCertificateCondition(String certFilter);
 
     /** Establece los los datos cifrados en base 64 que se van a descifrar
      * mediante una pr&oacute;xima llamada a {@link #decipherData()}. <br>
