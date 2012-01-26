@@ -24,7 +24,6 @@ import java.security.KeyStore.PrivateKeyEntry;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableEntryException;
-import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
@@ -53,7 +52,6 @@ import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.main.common.AOKeystoreAlternativeException;
 import es.gob.afirma.keystores.main.common.KeyStoreConfiguration;
-import es.gob.afirma.keystores.main.filters.CertificateFilter;
 import es.gob.afirma.ui.listeners.ElementDescriptionFocusListener;
 import es.gob.afirma.ui.listeners.ElementDescriptionMouseListener;
 import es.gob.afirma.ui.utils.ConfigureCaret;
@@ -259,8 +257,8 @@ final class Desensobrado extends JPanel {
         }
     }
 
-    private PrivateKeyEntry getPrivateKeyEntry(final AOKeyStoreManager keyStoreManager, 
-    		                                   final JComboBox comboAlmacen) throws AOException, 
+    private PrivateKeyEntry getPrivateKeyEntry(final AOKeyStoreManager keyStoreManager,
+    		                                   final JComboBox comboAlmacen) throws AOException,
     		                                                                        UnrecoverableEntryException,
     		                                                                        KeyStoreException,
     		                                                                        NoSuchAlgorithmException {
@@ -272,7 +270,7 @@ final class Desensobrado extends JPanel {
             true,
             true,
             true,
-            new ArrayList<CertificateFilter>(0),
+            null,
             false
         );
 

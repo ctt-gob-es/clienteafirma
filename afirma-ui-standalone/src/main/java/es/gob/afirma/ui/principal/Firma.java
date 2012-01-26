@@ -55,7 +55,6 @@ import es.gob.afirma.keystores.main.common.AOKeyStore;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.main.common.KeyStoreConfiguration;
-import es.gob.afirma.keystores.main.filters.CertificateFilter;
 import es.gob.afirma.ui.listeners.ElementDescriptionFocusListener;
 import es.gob.afirma.ui.listeners.ElementDescriptionMouseListener;
 import es.gob.afirma.ui.utils.ConfigureCaret;
@@ -132,7 +131,7 @@ final class Firma extends JPanel {
                Messages.getString("Firma.msg.error.fichero"),  //$NON-NLS-1$
                Messages.getString("error"),  //$NON-NLS-1$
                JOptionPane.ERROR_MESSAGE
-            ); 
+            );
             campoFichero.requestFocusInWindow();
             return;
         }
@@ -170,7 +169,7 @@ final class Firma extends JPanel {
                 pssCallback =
                     new UIPasswordCallbackAccessibility(
                 		Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription() + ". \r\nSi no ha establecido ninguna, deje el campo en blanco.", //$NON-NLS-1$
-                		SwingUtilities.getRoot(this), 
+                		SwingUtilities.getRoot(this),
                         Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title") //$NON-NLS-1$ //$NON-NLS-2$
                     );
             }
@@ -212,7 +211,7 @@ final class Firma extends JPanel {
                     true,
                     true,
                     true,
-                    new ArrayList<CertificateFilter>(0),
+                    null,
                     false
                 );
 
