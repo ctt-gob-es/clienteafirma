@@ -34,7 +34,7 @@ public class GetSignatureAction implements PrivilegedExceptionAction<byte[]> {
 	 * @param electronicSignatureFile Fichero de firma establecido.
 	 */
 	public GetSignatureAction(final byte[] signData, final URI electronicSignatureFile) {
-		this.signData = signData;
+		this.signData = signData.clone();
 		this.electronicSignatureFile = electronicSignatureFile;
 		this.selectSignature = false;
 
