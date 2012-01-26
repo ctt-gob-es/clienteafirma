@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -23,6 +23,10 @@ import es.gob.afirma.standalone.Messages;
  */
 public final class UIUtils {
 
+	private UIUtils() {
+		// No permitimos la instanciacion
+	}
+
     /**
      * Muestra un di&aacute;logo de error de forma modal. Difiere del normal mostrado con <code>JOptionPane</code>
      * en que, siguiendo la gu&iacute;a de estilo de interfaces de Microsoft, el bot&oacute;n no es "OK", sino
@@ -33,13 +37,13 @@ public final class UIUtils {
      * @param messageType Tipo de mensaje
      */
     public static void showErrorMessage(final Component parent, final Object message, final String title, final int messageType) {
-        
+
         // Hay un error extrano por el que no llega el texto acotado por admiraciones
         String buttonTxt = Messages.getString(Messages.getString("UIUtils.0")); //$NON-NLS-1$
         if (buttonTxt.startsWith("!") && buttonTxt.endsWith("!")) { //$NON-NLS-1$ //$NON-NLS-2$
             buttonTxt = buttonTxt.substring(1, buttonTxt.length()-1);
         }
-        
+
         JOptionPane.showOptionDialog(
                 parent,
                 message,
@@ -53,12 +57,12 @@ public final class UIUtils {
                 buttonTxt
         );
     }
-    
+
     static boolean hasAssociatedApplication(final String extension) {
         if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
             if (extension == null || "".equals(extension)) { //$NON-NLS-1$
                 return false;
-            }     
+            }
             final Object o = WinRegistryWrapper.get(WinRegistryWrapper.HKEY_CLASSES_ROOT, (extension.startsWith(".")) ? extension : ("." + extension), ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             if (o == null) {
                 return false;
@@ -67,5 +71,5 @@ public final class UIUtils {
         }
         return true;
     }
-    
+
 }

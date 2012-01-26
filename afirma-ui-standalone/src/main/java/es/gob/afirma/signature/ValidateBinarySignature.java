@@ -33,6 +33,10 @@ import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
  */
 public final class ValidateBinarySignature {
 
+	private ValidateBinarySignature() {
+		// No permitimos la instanciacion
+	}
+
     /**
      * Valida una firma binaria (CMS/CAdES). Si se especifican los datos que se firmaron
      * se comprobar&aacute; que efectivamente fueron estos, mientras que si no se indican

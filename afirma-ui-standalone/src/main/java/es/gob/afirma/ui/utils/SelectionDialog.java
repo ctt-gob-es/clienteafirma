@@ -24,17 +24,21 @@ import es.gob.afirma.ui.principal.Main;
  * Clase para seleccionar un tipo de ventana de dialogo.
  */
 public class SelectionDialog {
-	
+
+	private SelectionDialog() {
+		// No permitimos la instanciacion
+	}
+
 	/**
 	 * Muestra un di&aacute;logo para la selecci&oacute;n de un fichero en disco.
 	 * @param parent Component padre sobre el que se mostrar&aacute; el di&aacute;logo.
 	 * @param title T&iacute;tulo del di&aacute;logo de selecci&oacute;n.
 	 * @return Fichero seleccionado o {@code null} si no se seleccion&oacute;o ninguno.
 	 */
-	public static File showFileOpenDialog(Component parent, String title) {
+	public static File showFileOpenDialog(final Component parent, final String title) {
 		return showOpenDialog(parent, title, JFileChooser.FILES_ONLY, null);
 	}
-	
+
 	/**
 	 * Muestra un di&aacute;logo para la selecci&oacute;n de un fichero en disco
 	 * mostrando s&oacute;lo aquellos que pasen el filtro indicado.
@@ -43,17 +47,17 @@ public class SelectionDialog {
 	 * @param filter Filtro de ficheros.
 	 * @return Fichero seleccionado o {@code null} si no se seleccion&oacute;o ninguno.
 	 */
-	public static File showFileOpenDialog(Component parent, String title, ExtFilter filter) {
+	public static File showFileOpenDialog(final Component parent, final String title, final ExtFilter filter) {
 		return showOpenDialog(parent, title, JFileChooser.FILES_ONLY, filter);
 	}
-	
+
 	/**
 	 * Muestra un di&aacute;logo para la selecci&oacute;n de un directorio en disco.
 	 * @param parent Component padre sobre el que se mostrar&aacute; el di&aacute;logo.
 	 * @param title T&iacute;tulo del di&aacute;logo de selecci&oacute;n.
 	 * @return Directorio seleccionado o {@code null} si no se seleccion&oacute;o ninguno.
 	 */
-	public static File showDirOpenDialog(Component parent, String title) {
+	public static File showDirOpenDialog(final Component parent, final String title) {
 		return showOpenDialog(parent, title, JFileChooser.DIRECTORIES_ONLY, null);
 	}
 
@@ -65,41 +69,41 @@ public class SelectionDialog {
 	 * @param filter Filtro de ficheros.
 	 * @return Archivo seleccionado o {@code null} si no se seleccion&oacute;o ninguno.
 	 */
-	private static File showOpenDialog(Component parent, String title, int selectionMode, ExtFilter filter) {
-	    
+	private static File showOpenDialog(final Component parent, final String title, final int selectionMode, final ExtFilter filter) {
+
         String currentDir = Main.preferences.get("dialog.load.dir", null); //$NON-NLS-1$
         if (currentDir == null) {
             currentDir = "."; //$NON-NLS-1$
         }
-	    
+
 		//Instancia del componente FileChooser accesible
-        JAccessibilityFileChooser fc = new JAccessibilityFileChooser(new File(currentDir));
-		
+        final JAccessibilityFileChooser fc = new JAccessibilityFileChooser(new File(currentDir));
+
 		fc.setDialogTitle(title);
 		fc.setFileSelectionMode(selectionMode);
 		if (filter != null) {
 			fc.setFileFilter(filter);
 		}
-		
+
 		File filePath = null;
-		
+
 		if(fc.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION) {
 			filePath = fc.getSelectedFile();
 			if (filePath.getParentFile() != null) {
 			    Main.preferences.put("dialog.load.dir", filePath.getParentFile().getAbsolutePath()); //$NON-NLS-1$
 			}
 		}
-		
+
 		return filePath;
 	}
-	
+
 	/** Muestra un di&aacute;logo de guardado para almacenar los datos indicados.
      * Los datos ser&aacute;n almacenados en el directorio y con el nombre que
      * indique el usuario. Si el fichero ya existe se le preguntar&aacute; al
      * usuario si desea sobrescribirlo. En caso de cancelar la operaci&oacute;n
      * se devolvera null, si la operaci&oacute;n finaliza correctamente se
      * devolver&aacute; el path completo del fichero.
-     * 
+     *
      * @param dialogTitle
      *        T&iacute;tulo de la ventana de guardado.
      * @param data
@@ -132,11 +136,11 @@ public class SelectionDialog {
         	tryAgain = false;
 	        //Instancia del dialogo de guardado accesible
 	        final JAccessibilityFileChooserToSave fileChooser = new JAccessibilityFileChooserToSave();
-	        String currentDir = Main.preferences.get("dialog.save.dir", null); //$NON-NLS-1$
+	        final String currentDir = Main.preferences.get("dialog.save.dir", null); //$NON-NLS-1$
 	        if (currentDir != null) {
 	            fileChooser.setCurrentDirectory(new File(currentDir));
 	        }
-	        
+
 	        fileChooser.setDialogTitle(dialogTitle); //Se le asigna un titulo al dialogo
             fileChooser.getAccessibleContext().setAccessibleName(Messages.getString("SelectionDialog.saveDialog.accesible.name")); //$NON-NLS-1$
             fileChooser.getAccessibleContext().setAccessibleDescription(Messages.getString("SelectionDialog.saveDialog.accesible.desc")); //$NON-NLS-1$
@@ -161,14 +165,14 @@ public class SelectionDialog {
                 	String filePath = file.getAbsolutePath();
                 	//Comprobacion del numero de caracteres para acortar o no el path que se muestra en la alerta de sobreescritura de fichero
                 	if (filePath.length() >20) {
-                		//Se obtiene el indice del final del primer directorio                		
-                		int indexFirstDirectory = filePath.indexOf(File.separator,1);                		
+                		//Se obtiene el indice del final del primer directorio
+                		final int indexFirstDirectory = filePath.indexOf(File.separator,1);
                 		//Se almacena el primer directorio o unidad en windows
                 		String filePathTemp= filePath.substring(0, indexFirstDirectory + 1);
-                		//Se almacena el path sin incluir el nombre del fichero                		
-                		String subSequence = filePath.substring(0,filePath.lastIndexOf(File.separator));                		
-                		//Se almacena el indice del comienzo del ultimo directorio                		
-                		int indexLastDirectory = subSequence.lastIndexOf(File.separator);                		
+                		//Se almacena el path sin incluir el nombre del fichero
+                		final String subSequence = filePath.substring(0,filePath.lastIndexOf(File.separator));
+                		//Se almacena el indice del comienzo del ultimo directorio
+                		final int indexLastDirectory = subSequence.lastIndexOf(File.separator);
                 		//Si el primer directorio y el ultimo no son el mismo
                 		if (indexFirstDirectory<indexLastDirectory){
                 			//Se anaden unos puntos suspensivos al primer directorio
@@ -224,10 +228,10 @@ public class SelectionDialog {
             if (resultFile != null && resultFile.getParentFile() != null) {
                 Main.preferences.put("dialog.save.dir", resultFile.getParentFile().getAbsolutePath()); //$NON-NLS-1$
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             /* No hacemos nada */
         }
-        
+
         // Devolvemos el path del fichero en el que se han guardado los datos
         return resultFile;
     }

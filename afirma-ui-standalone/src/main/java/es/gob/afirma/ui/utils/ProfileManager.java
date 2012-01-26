@@ -15,7 +15,11 @@ import es.gob.afirma.ui.principal.MainOptionsPane;
 /** Gestor de perfiles de usuario.
  * @author Carlos Gamuci */
 public class ProfileManager {
- 
+
+	private ProfileManager() {
+		// No permitimos la instanciacion
+	}
+
     /** Nombre del perfil por defecto del sistema. */
     public static final String DEFAULT_PROFILE_NAME = '<' + "Predeterminado" + '>'; //$NON-NLS-1$
 
@@ -110,11 +114,11 @@ public class ProfileManager {
                     KEY_ACCESIBILITY_MAXIMIZED, AccessibilityOptionsPane.MAIN_WINDOWS_SIZE, "false"} //$NON-NLS-1$
             };
 
-    private static String getPreference(String preferenceKey) {
+    private static String getPreference(final String preferenceKey) {
         return getPreference(preferenceKey, null);
     }
 
-    private static String getPreference(String preferenceKey, String defaultValue) {
+    private static String getPreference(final String preferenceKey, final String defaultValue) {
         return Main.preferences.get(preferenceKey, defaultValue);
     }
 
@@ -124,9 +128,9 @@ public class ProfileManager {
     private static Set<String> getProfileIdsSet() {
 
         final String profiles = Main.preferences.get(KEY_PROFILES, null);
-        HashSet<String> profilesSet = new HashSet<String>();
+        final HashSet<String> profilesSet = new HashSet<String>();
         if (profiles != null && profiles.trim().length() > 0) {
-            for (String profileId : profiles.split(IDS_SEPARATOR)) {
+            for (final String profileId : profiles.split(IDS_SEPARATOR)) {
                 profilesSet.add(profileId);
             }
         }
@@ -137,7 +141,7 @@ public class ProfileManager {
      * alcanza el l&iacute;mite de identificadores permitidos, se devolver&aacute; {@code null}.
      * @return Identificador disponible para su uso. */
     public static String getFreeProfileId() {
-        Set<String> createdProfiles = getProfileIdsSet();
+        final Set<String> createdProfiles = getProfileIdsSet();
         if (createdProfiles.isEmpty()) {
             return "0"; //$NON-NLS-1$
         }
@@ -157,10 +161,10 @@ public class ProfileManager {
      *         caso contrario. */
     public static boolean existProfileName(final String profileName) {
 
-        Iterator<String> i = getProfileIdsSet().iterator();
+        final Iterator<String> i = getProfileIdsSet().iterator();
         while (i.hasNext()) {
-            String id = i.next();
-            String name = getPreference(PREFIX_KEY + id + KEY_PROFILE_NAME);
+            final String id = i.next();
+            final String name = getPreference(PREFIX_KEY + id + KEY_PROFILE_NAME);
             if (profileName.equals(name)) {
                 return true;
             }
@@ -174,10 +178,10 @@ public class ProfileManager {
      * @param profileName Nombre del perfil.
      * @return Identificador del perfil. */
     public static String getProfileIdByName(final String profileName) {
-        Iterator<String> i = getProfileIdsSet().iterator();
+        final Iterator<String> i = getProfileIdsSet().iterator();
         while (i.hasNext()) {
-            String id = i.next();
-            String name = getPreference(PREFIX_KEY + id + KEY_PROFILE_NAME);
+            final String id = i.next();
+            final String name = getPreference(PREFIX_KEY + id + KEY_PROFILE_NAME);
             if (profileName.equals(name)) {
                 return id;
             }
@@ -203,8 +207,8 @@ public class ProfileManager {
         }
 
         final String profilePrefix = PREFIX_KEY + id;
-        for (int i = 0; i < CONVERSE_VALUES.length; i++) {
-            Main.preferences.put(profilePrefix + CONVERSE_VALUES[i][0], config.getProperty(CONVERSE_VALUES[i][1], CONVERSE_VALUES[i][2]));
+        for (final String[] element : CONVERSE_VALUES) {
+            Main.preferences.put(profilePrefix + element[0], config.getProperty(element[1], element[2]));
         }
         Main.preferences.put(profilePrefix + KEY_PROFILE_NAME, name.trim());
 
@@ -213,11 +217,11 @@ public class ProfileManager {
 
     private static void addNewId(final String id) {
 
-        Set<String> idsSet = getProfileIdsSet();
+        final Set<String> idsSet = getProfileIdsSet();
         idsSet.add(id);
 
         String idsString = ""; //$NON-NLS-1$
-        String[] ids = idsSet.toArray(new String[0]);
+        final String[] ids = idsSet.toArray(new String[0]);
         for (int i = 0; i < ids.length - 1; i++) {
             idsString += ids[i] + IDS_SEPARATOR;
         }
@@ -238,8 +242,8 @@ public class ProfileManager {
         }
 
         final String profilePrefix = PREFIX_KEY + id;
-        for (int i = 0; i < CONVERSE_VALUES.length; i++) {
-            Main.preferences.remove(profilePrefix + CONVERSE_VALUES[i][0]);
+        for (final String[] element : CONVERSE_VALUES) {
+            Main.preferences.remove(profilePrefix + element[0]);
         }
         Main.preferences.remove(profilePrefix + KEY_PROFILE_NAME);
 
@@ -247,11 +251,11 @@ public class ProfileManager {
     }
 
     private static void removeId(final String id) {
-        Set<String> idsSet = getProfileIdsSet();
+        final Set<String> idsSet = getProfileIdsSet();
         idsSet.remove(id);
 
         String idsString = ""; //$NON-NLS-1$
-        String[] ids = idsSet.toArray(new String[0]);
+        final String[] ids = idsSet.toArray(new String[0]);
         for (int i = 0; i < ids.length - 1; i++) {
             idsString += ids[i] + IDS_SEPARATOR;
         }
@@ -277,9 +281,9 @@ public class ProfileManager {
         final String id = getProfileIdByName(name);
         final String profilePrefix = PREFIX_KEY + id;
 
-        Properties config = new Properties();
-        for (int i = 0; i < CONVERSE_VALUES.length; i++) {
-            config.setProperty(CONVERSE_VALUES[i][1], Main.preferences.get(profilePrefix + CONVERSE_VALUES[i][0], CONVERSE_VALUES[i][2]));
+        final Properties config = new Properties();
+        for (final String[] element : CONVERSE_VALUES) {
+            config.setProperty(element[1], Main.preferences.get(profilePrefix + element[0], element[2]));
         }
 
         return config;
@@ -288,9 +292,9 @@ public class ProfileManager {
     /** Recupera la configuraci&oacute;n del perfil por defecto de la aplicaci&oacute;n.
      * @return Configuraci&oacute;n por defecto. */
     public static Properties getDefaultConfiguration() {
-        Properties config = new Properties();
-        for (int i = 0; i < CONVERSE_VALUES.length; i++) {
-            config.setProperty(CONVERSE_VALUES[i][1], CONVERSE_VALUES[i][2]);
+        final Properties config = new Properties();
+        for (final String[] element : CONVERSE_VALUES) {
+            config.setProperty(element[1], element[2]);
         }
         return config;
     }
@@ -308,8 +312,8 @@ public class ProfileManager {
     /** Recupera el listado de nombres de perfiles registrados en la aplicaci&oacute;n.
      * @return Nombres de los perfiles. */
     public static String[] getProfilesNames() {
-        List<String> names = new ArrayList<String>();
-        Iterator<String> i = getProfileIdsSet().iterator();
+        final List<String> names = new ArrayList<String>();
+        final Iterator<String> i = getProfileIdsSet().iterator();
         while (i.hasNext()) {
             names.add(getPreference(PREFIX_KEY + i.next() + KEY_PROFILE_NAME));
         }
@@ -318,7 +322,7 @@ public class ProfileManager {
 
     /** Establece cu&aacute;l fue el nombre del &uacute;ltimo perfil cargado por la herramienta.
      * @param name Nombre de perfil. */
-    public static void setLastProfileName(String name) {
+    public static void setLastProfileName(final String name) {
         if (name == null) {
             Main.preferences.remove(KEY_LAST_PROFILE_NAME);
         }
@@ -338,8 +342,8 @@ public class ProfileManager {
      * @param option Nombre de la opci&oacute;n de accesibilidad.
      * @param name Nombre del perfil.
      * @return Boolean indicando el valor de la opci&oacute;n. */
-    public static String getAccessibilityOptionValue(String option, String name) {
-        Properties properties = getConfiguration(name);
+    public static String getAccessibilityOptionValue(final String option, final String name) {
+        final Properties properties = getConfiguration(name);
         return properties.getProperty(option, null);
     }
 }

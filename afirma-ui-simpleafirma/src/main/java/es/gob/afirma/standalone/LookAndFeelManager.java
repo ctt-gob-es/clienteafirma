@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -28,19 +28,23 @@ import es.gob.afirma.core.misc.Platform;
  */
 public final class LookAndFeelManager {
 
+	private LookAndFeelManager() {
+		// No permitimos la instanciacion
+	}
+
     /** Color de fondo por defecto para los JPanel, JFrame y Applet. */
     public static final Color WINDOW_COLOR = new Color(UIManager.getColor("window").getRGB()); //$NON-NLS-1$
-    
+
     /** Indica si el sistema operativo tiene activada una combinaci&oacute;n de colores de alto contraste. */
     public static final boolean HIGH_CONTRAST;
-    
+
     /** Tama&ntilde;o m&aacute;ximo de las fuentes por defecto antes de considerarse grandes. */
     private static final int LARGE_FONT_LIMIT = 12;
-    
+
     /** Indica si el sistema operativo tiene activada una combinaci&oacute;n de colores de alto contraste. */
     private static final boolean LARGE_FONT;
-     
-    static {        
+
+    static {
         final Object highContrast = Toolkit.getDefaultToolkit().getDesktopProperty("win.highContrast.on"); //$NON-NLS-1$
         if (highContrast instanceof Boolean) {
             HIGH_CONTRAST = ((Boolean) highContrast).booleanValue();
@@ -53,12 +57,12 @@ public final class LookAndFeelManager {
         else {
             HIGH_CONTRAST = false;
         }
-        
+
         final  Object defaultFontHeight = Toolkit.getDefaultToolkit().getDesktopProperty("win.defaultGUI.font.height"); //$NON-NLS-1$
         if (defaultFontHeight != null && defaultFontHeight instanceof Integer) {
            LARGE_FONT = (((Integer) defaultFontHeight).intValue()) > LARGE_FONT_LIMIT;
         }
-        // En Linux usmos siempre una configuracion como si se detectase un tamano de fuente grande 
+        // En Linux usmos siempre una configuracion como si se detectase un tamano de fuente grande
         else if (Platform.OS.LINUX.equals(Platform.getOS())) {
             LARGE_FONT = true;
         }
@@ -66,12 +70,12 @@ public final class LookAndFeelManager {
             LARGE_FONT = false;
         }
     }
-    
+
     /** Establece el decorado de la aplicaci&oacute;n. */
     static void applyLookAndFeel() {
 
         final boolean defaultLookAndFeel = HIGH_CONTRAST || LARGE_FONT;
-        
+
         if (!defaultLookAndFeel) {
             UIManager.put("Button.defaultButtonFollowsFocus", Boolean.TRUE); //$NON-NLS-1$
             UIManager.put("RootPane.background", WINDOW_COLOR); //$NON-NLS-1$
@@ -98,7 +102,7 @@ public final class LookAndFeelManager {
             System.setProperty("apple.awt.graphics.EnableDeferredUpdates", "true"); //$NON-NLS-1$ //$NON-NLS-2$
             System.setProperty("apple.laf.useScreenMenuBar", "true"); //$NON-NLS-1$ //$NON-NLS-2$
         }
-        else { 
+        else {
             try {
                 if (!defaultLookAndFeel) {
                     for (final LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {

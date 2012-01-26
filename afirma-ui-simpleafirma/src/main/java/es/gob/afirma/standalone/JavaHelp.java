@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -23,32 +23,36 @@ import javax.swing.JFrame;
  * Clase con utilidades relacionadas con la ayuda de la aplicacion
  */
 final class JavaHelp {
-	
+
+	private JavaHelp() {
+		// No permitimos la instanciacion
+	}
+
     private static HelpBroker helpBroker;
-    
+
 //	private static final Hashtable<String, Component> components = new Hashtable<String, Component>();
 //	private static HelpSet helpset = null;
-	
+
 	static {
         try {
             // Cargamos el archivo de datos de la ayuda
         	final ClassLoader classLoader = HelpBroker.class.getClassLoader();
             final URL hsURL = classLoader.getResource("help/JavaHelp/help_set-es_ES.hs"); //$NON-NLS-1$
-            
+
             // Creamos la ventana de ayuda
             final HelpSet hset = new HelpSet(classLoader, hsURL);
             helpBroker = hset.createHelpBroker();
             helpBroker.initPresentation();
             final WindowPresentation wp = ((DefaultHelpBroker)helpBroker).getWindowPresentation();
             final JFrame helpwindow = (JFrame) wp.getHelpWindow();
-            
+
             // Introducimos el icono en la ventana
             helpwindow.setIconImage(
                     Toolkit.getDefaultToolkit().createImage(
                     		classLoader.getResource("resources/afirma_ico.png") //$NON-NLS-1$
                     )
-            ); 
-        } 
+            );
+        }
         catch (final Exception ex) {
             ex.printStackTrace();
         }
@@ -68,7 +72,7 @@ final class JavaHelp {
 //				helpBroker.enableHelpKey(components.get(key), key, helpset);
 //			}
 //
-//		} 
+//		}
 //		catch (final Exception ex) {
 //			ex.printStackTrace();
 //		}
@@ -83,7 +87,7 @@ final class JavaHelp {
 //		components.put(key, component);
 //		helpBroker.enableHelpKey(component, key, helpset);
 //	}
-	
+
 	/**
 	 * Visualiza la ayuda por la p&aacute;gina principal.
 	 */
@@ -91,5 +95,5 @@ final class JavaHelp {
 		helpBroker.setDisplayed(true);
 		helpBroker.setCurrentID("SimpleAfirma"); //$NON-NLS-1$
 	}
-	
+
 }

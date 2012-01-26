@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -41,6 +41,10 @@ import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
  * @author Carlos Gamuci
  */
 public final class ValidateBinarySignature {
+
+	private ValidateBinarySignature() {
+		// No permitimos la instanciacion
+	}
 
     /**
      * Valida una firma binaria (CMS/CAdES). Si se especifican los datos que se firmaron
@@ -121,7 +125,7 @@ public final class ValidateBinarySignature {
     private static void verifySignatures(final byte[] sign, final byte[] data) throws CMSException, CertStoreException, CertificateExpiredException, CertificateNotYetValidException, NoSuchAlgorithmException, NoMatchDataException, CRLException, Exception {
 
         final CMSSignedData s = new CMSSignedData(sign);
-        final CertStore certStore = s.getCertificatesAndCRLs("Collection", BouncyCastleProvider.PROVIDER_NAME);  //$NON-NLS-1$ 
+        final CertStore certStore = s.getCertificatesAndCRLs("Collection", BouncyCastleProvider.PROVIDER_NAME);  //$NON-NLS-1$
         final SignerInformationStore signers = s.getSignerInfos();
         final Iterator<?> it = signers.getSigners().iterator();
 
@@ -129,7 +133,7 @@ public final class ValidateBinarySignature {
             final SignerInformation signer = (SignerInformation) it.next();
             final Iterator<?> certIt = certStore.getCertificates(signer.getSID()).iterator();
             final X509Certificate cert = (X509Certificate) certIt.next();
-            
+
             if (!signer.verify(cert, BouncyCastleProvider.PROVIDER_NAME)) {
                 throw new Exception("Firma no valida"); //$NON-NLS-1$
             }

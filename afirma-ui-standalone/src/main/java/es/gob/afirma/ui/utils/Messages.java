@@ -7,6 +7,10 @@ import java.util.ResourceBundle;
 /** Clase para acceder a los mensajes del properties sin lanzar excepciones de error */
 public final class Messages {
 
+	private Messages() {
+		// No permitimos la instanciacion
+	}
+
     private static ResourceBundle bundle = ResourceBundle.getBundle("resources/properties/Idioma", Locale.getDefault()); //$NON-NLS-1$
 
     public static void changeLocale() {

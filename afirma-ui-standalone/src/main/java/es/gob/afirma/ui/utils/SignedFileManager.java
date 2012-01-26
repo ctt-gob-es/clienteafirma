@@ -7,6 +7,10 @@ import es.gob.afirma.core.signers.AOSignConstants;
 /** Operaciones de utilidad para la gesti&oacute;n de ficheros firmados. */
 public final class SignedFileManager {
 
+	private SignedFileManager() {
+		// No permitimos la instanciacion
+	}
+
     /** Obtiene un filtro de fichero correspondiente para los ficheros mas comunes que contienen una firma.
      * @return filtro */
     public static final FileFilter getCommonSignedFileFilter() {

@@ -6,6 +6,10 @@ import es.gob.afirma.core.signers.AOSignConstants;
 
 public class SignFileUtils {
 
+	private SignFileUtils() {
+		// No permitimos la instanciacion
+	}
+
     /** Obtiene un filtro de fichero correspondiente para el almacenamiento de un
      * fichero de firma.
      * @param signFormat

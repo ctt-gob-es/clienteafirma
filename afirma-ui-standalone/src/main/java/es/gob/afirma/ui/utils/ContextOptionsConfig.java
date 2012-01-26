@@ -1,6 +1,11 @@
 package es.gob.afirma.ui.utils;
 
 class ContextOptionsConfig {
+
+	private ContextOptionsConfig() {
+		// No permitimos la instanciacion
+	}
+
     /** Clave del lugar en el que se realiza de firma (com&uacute;nmente, la poblaci&oacute;n). */
     static final String OPTION_PRODUCTION_PLACE = "signProductionPlace";
 

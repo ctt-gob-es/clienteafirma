@@ -18,6 +18,10 @@ import javax.swing.JOptionPane;
  * confirmaci&oacute;n para abrir un fichero. */
 public class OpenFileMessageDialog {
 
+	private OpenFileMessageDialog() {
+		// No permitimos la instanciacion
+	}
+
     /** Muestra un di&aacute;logo que consulta al usuario si desea abrir un fichero.
      * @param parent Componente padre sobre el que se muestra el i&aacute;logo.
      * @param message Contenido del panel del di&aacute;logo.

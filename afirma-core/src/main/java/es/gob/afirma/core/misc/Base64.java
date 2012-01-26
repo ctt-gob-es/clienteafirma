@@ -72,6 +72,10 @@ import java.util.Arrays;
 
 public final class Base64 {
 
+  private Base64() {
+		// No permitimos la instanciacion
+	}
+
   private static final char[] CA = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".toCharArray(); //$NON-NLS-1$
   private static final int[] IA = new int[256];
   static {

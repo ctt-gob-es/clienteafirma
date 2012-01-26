@@ -42,6 +42,10 @@ import es.gob.afirma.signature.SignValidity.VALIDITY_ERROR;
  */
 public final class ValidateXMLSignature {
 
+	private ValidateXMLSignature() {
+		// No permitimos la instanciacion
+	}
+
     /**
      * Valida una firma XML.
      * @param sign Firma a validar
