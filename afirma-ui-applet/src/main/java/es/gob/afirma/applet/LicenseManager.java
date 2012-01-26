@@ -19,6 +19,10 @@ import es.gob.afirma.core.misc.AOUtil;
 /** Clase para la carga del acuerdo de licencia. */
 final class LicenseManager {
 
+	private LicenseManager() {
+		// No permitimos la instanciacion
+	}
+
     private static String LICENSE_FILE = "/resources/licenses"; //$NON-NLS-1$
 
     /** recupera el texto de la licencia del Cliente @firma. Si ocurre un error

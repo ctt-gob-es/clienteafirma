@@ -16,6 +16,10 @@ import java.security.NoSuchAlgorithmException;
 /** Utilidades criptogr&aacute;ficas. */
 final class CryptoUtils {
 
+	private CryptoUtils() {
+		// No permitimos la instanciacion
+	}
+
     static byte[] getMessageDigest(final byte[] data, final String algorithm) throws NoSuchAlgorithmException {
     	return MessageDigest.getInstance(algorithm).digest(data);
     }

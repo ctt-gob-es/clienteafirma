@@ -67,6 +67,10 @@ import es.gob.afirma.ui.principal.PrincipalGUI;
 /** Clase con utilidades relacionadas con la ayuda de la aplicacion */
 public class HelpUtils {
 
+	private HelpUtils() {
+		// No permitimos la instanciacion
+	}
+
     /** Mapa de componentes y su indice en la ayuda. */
     private static Hashtable<String, Component> components = new Hashtable<String, Component>();
     /** Controlador de ayuda. */

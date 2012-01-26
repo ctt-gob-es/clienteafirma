@@ -19,6 +19,10 @@ import java.util.logging.Logger;
  * estas deben tratarse como funciones privilegiadas. */
 public final class FileUtils {
 
+	private FileUtils() {
+		// No permitimos la instanciacion
+	}
+
     /** Carga un fichero de datos. Si ocurre un error durante la carga, se
      * devuelve {@code null}.
      * @param path

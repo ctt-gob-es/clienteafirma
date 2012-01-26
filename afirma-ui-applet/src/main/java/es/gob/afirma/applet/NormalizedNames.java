@@ -18,6 +18,10 @@ import es.gob.afirma.keystores.main.common.AOKeyStore;
  * formatos y algoritmos. */
 public final class NormalizedNames {
 
+	private NormalizedNames() {
+		// No permitimos la instanciacion
+	}
+
     /** Normaliza el nombre identificador de un modo de firma. En caso de no
      * identificar el modo, se devolver&aacute; la misma cadena de entrada.
      * @param name

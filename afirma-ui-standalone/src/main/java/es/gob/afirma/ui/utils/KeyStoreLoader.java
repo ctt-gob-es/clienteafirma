@@ -11,6 +11,10 @@ import es.gob.afirma.keystores.main.common.KeyStoreConfiguration;
  * disponibles para realizar distintas operaciones. */
 public class KeyStoreLoader {
 
+	private KeyStoreLoader() {
+		// No permitimos la instanciacion
+	}
+
     /** Recupera los almacenes compatibles con el sistema y preparados
      * para contener certificados de firma.
      * @return Listado de almacenes. */

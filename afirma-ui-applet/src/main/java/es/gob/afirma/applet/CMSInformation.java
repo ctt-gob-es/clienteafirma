@@ -65,6 +65,10 @@ import es.gob.afirma.signers.pkcs7.SignedAndEnvelopedData;
  */
 public final class CMSInformation {
 
+	private CMSInformation() {
+		// No permitimos la instanciacion
+	}
+
 	private static final int TYPE_ENVELOPED_DATA = 0;
 
 	private static final int TYPE_AUTHENTICATED_DATA = 1;

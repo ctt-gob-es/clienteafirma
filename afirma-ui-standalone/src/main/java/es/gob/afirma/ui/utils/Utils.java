@@ -74,6 +74,10 @@ import es.gob.afirma.ui.principal.PrincipalGUI;
  */
 public final class Utils {
 
+	private Utils() {
+		// No permitimos la instanciacion
+	}
+
 	 private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	/**

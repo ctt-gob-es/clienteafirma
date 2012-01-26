@@ -21,6 +21,10 @@ import java.security.cert.X509Certificate;
  */
 public final class LdapUtils {
 
+	private LdapUtils() {
+		// No permitimos la instanciacion
+	}
+
     /**
      * Recupera un certificado de un LDAP.
      * @param server Servidor LDAP.

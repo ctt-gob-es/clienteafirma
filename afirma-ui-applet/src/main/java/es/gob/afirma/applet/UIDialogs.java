@@ -45,6 +45,10 @@ import es.gob.afirma.ui.core.jse.JSEUtils;
  */
 public class UIDialogs {
 
+	private UIDialogs() {
+		// No permitimos la instanciacion
+	}
+
     /** Pregunta al usuario por un nombre de fichero para salvar datos en disco.
      * @param extensions
      *        Extensiones predeterminadas para el fichero

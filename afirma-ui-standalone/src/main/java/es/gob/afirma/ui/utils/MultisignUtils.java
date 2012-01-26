@@ -30,6 +30,10 @@ import es.gob.afirma.keystores.main.filters.CertificateFilter;
 /** Utilidades para las multifirmas */
 public class MultisignUtils {
 
+	private MultisignUtils() {
+		// No permitimos la instanciacion
+	}
+
     static Logger logger = Logger.getLogger(MultisignUtils.class.toString());
 
     /** Obtiene el manager del almacen o repositorio de certificados
