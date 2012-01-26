@@ -86,10 +86,7 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
         /** Accion para el boton siguiente. */
         @Override
         protected void siguienteActionPerformed(final JButton anterior, final JButton siguiente, final JButton finalizar) {
-
-            final boolean continuar = anadirRemitentes();
-
-            if (continuar == true) {
+            if (anadirRemitentes()) {
                 super.siguienteActionPerformed(anterior, siguiente, finalizar);
             }
         }

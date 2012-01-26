@@ -5,7 +5,7 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 /** Clase para acceder a los mensajes del properties sin lanzar excepciones de error */
-public class Messages {
+public final class Messages {
 
     private static ResourceBundle bundle = ResourceBundle.getBundle("resources/properties/Idioma", Locale.getDefault()); //$NON-NLS-1$
 

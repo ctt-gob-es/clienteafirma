@@ -121,13 +121,8 @@ public final class ValidateXMLSignature {
                     algURI.equalsIgnoreCase(SignatureMethod.DSA_SHA1)) {
                 return true;
             }
-            else if (algName.equalsIgnoreCase("RSA") && //$NON-NLS-1$
-                    algURI.equalsIgnoreCase(SignatureMethod.RSA_SHA1)) {
-                return true;
-            }
-            else {
-                return false;
-            }
+            return algName.equalsIgnoreCase("RSA") && //$NON-NLS-1$
+                    algURI.equalsIgnoreCase(SignatureMethod.RSA_SHA1);
         }
     }
 

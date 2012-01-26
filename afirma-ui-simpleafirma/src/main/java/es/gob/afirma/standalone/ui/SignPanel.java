@@ -641,7 +641,7 @@ public final class SignPanel extends JPanel {
             // Si es una firma la abriremos desde el mismo aplicativo
             final boolean isSign = filePath.endsWith(".csig") || filePath.endsWith(".xsig"); //$NON-NLS-1$ //$NON-NLS-2$
 
-            if (isSign || UIUtils.hasAssociatedApplication(filePath.substring(filePath.lastIndexOf(".")))) { //$NON-NLS-1$
+            if (isSign || UIUtils.hasAssociatedApplication(filePath.substring(filePath.lastIndexOf('.')))) {
                 final JButton openFileButton = new JButton(Messages.getString("SignPanel.51")); //$NON-NLS-1$
                 openFileButton.setMnemonic('v');
                 openFileButton.addActionListener(new ActionListener() {

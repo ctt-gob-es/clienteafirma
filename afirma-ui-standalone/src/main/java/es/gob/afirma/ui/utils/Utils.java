@@ -73,16 +73,16 @@ import es.gob.afirma.ui.principal.PrincipalGUI;
  * Clase con utilidades varias
  */
 public final class Utils {
-	
+
 	 private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
-	
+
 	/**
 	 * Abre un fichero en la aplicaci\u00F3n predefinida por el sistema operativo actual.
 	 * @param filepath Ruta completa al fichero.
 	 */
-	public static void openFile(String filepath){
-		String os = System.getProperty("os.name").toLowerCase();
-		Runtime rt = Runtime.getRuntime();
+	public static void openFile(final String filepath){
+		final String os = System.getProperty("os.name").toLowerCase(); //$NON-NLS-1$
+		final Runtime rt = Runtime.getRuntime();
 		try {
 			if (os.indexOf( "win" ) >= 0) {
 				rt.exec("cmd.exe /C \""+filepath+"\"");
@@ -92,18 +92,18 @@ public final class Utils {
 			}
 			else {
 				//prioritized 'guess' of users' preference
-				List<String> browsers = new ArrayList<String>(Arrays.asList("epiphany", "firefox", "mozilla", "konqueror",
+				final List<String> browsers = new ArrayList<String>(Arrays.asList("epiphany", "firefox", "mozilla", "konqueror",
 						"netscape","opera","links","lynx"));
 
-				StringBuffer cmd = new StringBuffer();
-				for (String browser : browsers){
+				final StringBuffer cmd = new StringBuffer();
+				for (final String browser : browsers){
 					cmd.append( (browsers.get(0).equals(browser)  ? "" : " || " ) + browser +" \"" + filepath + "\" ");
 				}
 
 				rt.exec(new String[] { "sh", "-c", cmd.toString() });
 			}
-		} 
-		catch (IOException e) {
+		}
+		catch (final IOException e) {
 			LOGGER.info(e.getMessage());
 			PrincipalGUI.setNuevoEstado(Messages.getString("Validacion.error.valide")); //$NON-NLS-1$
 		}
@@ -113,25 +113,25 @@ public final class Utils {
      * Abre un fichero en la aplicaci&oacute;n predefinida por el sistema operativo actual.
      * @param file Fichero.
      */
-    public static void openFile(File file){
+    public static void openFile(final File file){
         try {
             openFile(file.getCanonicalPath());
-        } catch (Exception e) {
+        } catch (final Exception e) {
             openFile(file.getAbsolutePath());
         }
     }
-	
+
 	/**
 	 * M&eacute;todo que devuelve un mnem&oacute;nico v&aacute;lido para el lenguaje que recibe como par&aacute;metro.
 	 * @param mnemonicList lista de mnem&oacute;nicos que ya han sido utilizados para otros lenguajes.
 	 * @param actualLanguage lenguaje para el que se est&aacute; buscando un mnem&oacute;nico
 	 * @return mnem&oacute;nico seleccionado o 0 en el caso de que no se haya encontrado ninguno disponible
 	 */
-	public static char getLanguageMnemonic(List<Character> mnemonicList, String actualLanguage){
+	public static char getLanguageMnemonic(final List<Character> mnemonicList, final String actualLanguage){
 		//Se recorren las letras del lenguaje actual
 		for (int i=0; i< actualLanguage.length(); i++) {
 			//Se lee el caracter correspondiente al indice i
-			char caracter = actualLanguage.charAt(i);
+			final char caracter = actualLanguage.charAt(i);
 			//Se comprueba si se ha utilizado
 			if (!mnemonicList.contains(Character.valueOf(caracter))) {
 				//se anade a la lista de caracteres utilizados
@@ -143,28 +143,28 @@ public final class Utils {
 		//TODO: mejorar para que en el caso de que no encuentre mnemonico pueda cambiar alguno de los anteriores
 		return 0;
 	}
-	
+
 	/**
 	 * Configura el formato del remarcado del componente al ser seleccionado.
 	 * @param component El componente seleccionado.
 	 */
-	public static void remarcar(JComponent component){
-		
+	public static void remarcar(final JComponent component){
+
 		if (GeneralConfig.isRemarked()){
 			if (component instanceof JButton){
 				final JButton button = (JButton) component;
 				button.addFocusListener(new FocusListener() {
 					@Override
-                    public void focusLost(FocusEvent e) {
+                    public void focusLost(final FocusEvent e) {
 						if (button.getParent() instanceof JPanel){
 						((JPanel)button.getParent()).setBorder(BorderFactory.createEmptyBorder());
 						} else if (button.getParent() instanceof JToolBar){
 							button.setBorder(BorderFactory.createEmptyBorder());
 						}
 					}
-					
+
 					@Override
-                    public void focusGained(FocusEvent e) {
+                    public void focusGained(final FocusEvent e) {
 						if (GeneralConfig.isHighContrast() || Main.isOSHighContrast){
 							if (button.getParent() instanceof JPanel){
 								((JPanel)button.getParent()).setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
@@ -177,7 +177,7 @@ public final class Utils {
 							} else if (button.getParent() instanceof JToolBar){
 								button.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
 							}
-							
+
 						}
 					}
 				});
@@ -186,16 +186,16 @@ public final class Utils {
 				final JToggleButton button = (JToggleButton) component;
 				button.addFocusListener(new FocusListener() {
 					@Override
-                    public void focusLost(FocusEvent e) {
+                    public void focusLost(final FocusEvent e) {
 						if (button.getParent() instanceof JPanel){
 							((JPanel)button.getParent()).setBorder(BorderFactory.createEmptyBorder());
 						} else if (button.getParent() instanceof JToolBar){
 							button.setBorder(BorderFactory.createEmptyBorder());
 						}
 					}
-					
+
 					@Override
-                    public void focusGained(FocusEvent e) {
+                    public void focusGained(final FocusEvent e) {
 						if (GeneralConfig.isHighContrast()|| Main.isOSHighContrast){
 							if (button.getParent() instanceof JPanel){
 								((JPanel)button.getParent()).setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
@@ -208,20 +208,20 @@ public final class Utils {
 							} else if (button.getParent() instanceof JToolBar) {
 								button.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
 							}
-							
+
 						}
 					}
 				});
-			}		
+			}
 			if (component instanceof JTextField){
 				final JTextField textField = (JTextField) component;
 				textField.addFocusListener(new FocusListener() {
 					@Override
-                    public void focusLost(FocusEvent e) {
+                    public void focusLost(final FocusEvent e) {
 						textField.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
 					}
 					@Override
-                    public void focusGained(FocusEvent e) {
+                    public void focusGained(final FocusEvent e) {
 						if (GeneralConfig.isHighContrast() || Main.isOSHighContrast){
 							textField.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
 						} else {
@@ -234,12 +234,12 @@ public final class Utils {
 				final JComboBox comboBox = (JComboBox) component;
 				comboBox.addFocusListener(new FocusListener() {
 					@Override
-                    public void focusLost(FocusEvent e) {
+                    public void focusLost(final FocusEvent e) {
 						comboBox.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
 					}
-					
+
 					@Override
-                    public void focusGained(FocusEvent e) {
+                    public void focusGained(final FocusEvent e) {
 						if (GeneralConfig.isHighContrast() || Main.isOSHighContrast){
 							comboBox.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
 						} else {
@@ -252,12 +252,12 @@ public final class Utils {
 				final JRadioButton radioButton = (JRadioButton) component;
 				radioButton.addFocusListener(new FocusListener() {
 					@Override
-                    public void focusLost(FocusEvent e) {
+                    public void focusLost(final FocusEvent e) {
 						((JPanel)radioButton.getParent()).setBorder(BorderFactory.createEmptyBorder());
 					}
-					
+
 					@Override
-                    public void focusGained(FocusEvent e) {
+                    public void focusGained(final FocusEvent e) {
 						if (GeneralConfig.isHighContrast() || Main.isOSHighContrast){
 							((JPanel)radioButton.getParent()).setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
 						} else {
@@ -270,11 +270,11 @@ public final class Utils {
 				final JLabel label = (JLabel) component;
 				label.addFocusListener(new FocusListener() {
 					@Override
-                    public void focusLost(FocusEvent e) {
+                    public void focusLost(final FocusEvent e) {
 						label.setBorder(BorderFactory.createEmptyBorder());
 					}
 					@Override
-                    public void focusGained(FocusEvent e) {
+                    public void focusGained(final FocusEvent e) {
 						if (GeneralConfig.isHighContrast() || Main.isOSHighContrast){
 							label.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
 						} else {
@@ -287,12 +287,12 @@ public final class Utils {
 				final JCheckBox checkBox = (JCheckBox) component;
 				checkBox.addFocusListener(new FocusListener() {
 					@Override
-                    public void focusLost(FocusEvent e) {
+                    public void focusLost(final FocusEvent e) {
 						((JPanel)checkBox.getParent()).setBorder(BorderFactory.createEmptyBorder());
 					}
-					
+
 					@Override
-                    public void focusGained(FocusEvent e) {
+                    public void focusGained(final FocusEvent e) {
 						if (GeneralConfig.isHighContrast() || Main.isOSHighContrast){
 							((JPanel)checkBox.getParent()).setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
 						} else {
@@ -305,11 +305,11 @@ public final class Utils {
 				final JTextPane textPane = (JTextPane) component;
 				textPane.addFocusListener(new FocusListener() {
 					@Override
-                    public void focusLost(FocusEvent e) {
+                    public void focusLost(final FocusEvent e) {
 						textPane.setBorder(BorderFactory.createEmptyBorder());
 					}
 					@Override
-                    public void focusGained(FocusEvent e) {
+                    public void focusGained(final FocusEvent e) {
 						if (GeneralConfig.isHighContrast() || Main.isOSHighContrast){
 							textPane.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
 						} else {
@@ -322,11 +322,11 @@ public final class Utils {
 				final JEditorPane editorPane = (JEditorPane) component;
 				editorPane.addFocusListener(new FocusListener() {
 					@Override
-                    public void focusLost(FocusEvent e) {
+                    public void focusLost(final FocusEvent e) {
 						editorPane.setBorder(BorderFactory.createEmptyBorder());
 					}
 					@Override
-                    public void focusGained(FocusEvent e) {
+                    public void focusGained(final FocusEvent e) {
 						if (GeneralConfig.isHighContrast()|| Main.isOSHighContrast){
 							editorPane.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
 						} else {
@@ -339,11 +339,11 @@ public final class Utils {
 				final JTree tree = (JTree) component;
 				tree.addFocusListener(new FocusListener() {
 					@Override
-                    public void focusLost(FocusEvent e) {
+                    public void focusLost(final FocusEvent e) {
 						tree.setBorder(BorderFactory.createEmptyBorder());
 					}
 					@Override
-                    public void focusGained(FocusEvent e) {
+                    public void focusGained(final FocusEvent e) {
 						if (GeneralConfig.isHighContrast()|| Main.isOSHighContrast){
 							tree.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
 						} else {
@@ -356,11 +356,11 @@ public final class Utils {
 				final JList list = (JList) component;
 				list.addFocusListener(new FocusListener() {
 					@Override
-                    public void focusLost(FocusEvent e) {
+                    public void focusLost(final FocusEvent e) {
 						list.setBorder(BorderFactory.createEmptyBorder());
 					}
 					@Override
-                    public void focusGained(FocusEvent e) {
+                    public void focusGained(final FocusEvent e) {
 						if (GeneralConfig.isHighContrast() || Main.isOSHighContrast){
 							list.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
 						} else {
@@ -373,15 +373,15 @@ public final class Utils {
 				final JMenu menu = (JMenu) component;
 				menu.addMenuListener(new MenuListener() {
 					@Override
-                    public void menuSelected(MenuEvent e) {
+                    public void menuSelected(final MenuEvent e) {
 						menu.setFont(new Font(menu.getFont().getName(), menu.getFont().getStyle(), menu.getFont().getSize()+5));
 					}
 					@Override
-                    public void menuDeselected(MenuEvent e) {
+                    public void menuDeselected(final MenuEvent e) {
 						menu.setFont(new Font(menu.getFont().getName(), menu.getFont().getStyle(), menu.getFont().getSize()-5));
 					}
 					@Override
-                    public void menuCanceled(MenuEvent e) {
+                    public void menuCanceled(final MenuEvent e) {
 						// Vacio
 					}
 				});
@@ -390,11 +390,11 @@ public final class Utils {
 				final JScrollPane scrollPane = (JScrollPane) component;
 				scrollPane.addFocusListener( new FocusListener() {
 					@Override
-                    public void focusLost(FocusEvent e) {
+                    public void focusLost(final FocusEvent e) {
 						scrollPane.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
 					}
 					@Override
-                    public void focusGained(FocusEvent e) {
+                    public void focusGained(final FocusEvent e) {
 						if (GeneralConfig.isHighContrast() || Main.isOSHighContrast){
 							scrollPane.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
 						} else {
@@ -408,14 +408,14 @@ public final class Utils {
 				final JButton button = (JButton) component;
 				button.addFocusListener(new FocusListener() {
 					@Override
-                    public void focusLost(FocusEvent e) {
+                    public void focusLost(final FocusEvent e) {
 						if (button.getParent() instanceof JPanel){
 							((JPanel)button.getParent()).setBorder(BorderFactory.createEmptyBorder());
 						}
 					}
-					
+
 					@Override
-                    public void focusGained(FocusEvent e) {
+                    public void focusGained(final FocusEvent e) {
 						if (button.getParent() instanceof JPanel){
 							((JPanel)button.getParent()).setBorder(BorderFactory.createEmptyBorder());
 						}
@@ -424,12 +424,12 @@ public final class Utils {
 			}
 		}
 	}
-	
+
 	/**
 	 * Configura el comportamiento de ciertos componentes en Alto Contraste
 	 * @param component Componente al que aplicar el alto contraste
 	 */
-	public static void setContrastColor (JComponent component){
+	public static void setContrastColor (final JComponent component){
 		if (GeneralConfig.isHighContrast()){
 			if (component instanceof JComboBox || component instanceof JPasswordField || component instanceof JTextField){
 				component.setBackground(Color.WHITE);
@@ -463,17 +463,17 @@ public final class Utils {
 			}
 		}
 	}
-		
+
 	/**
 	 * Aplica el estilo de fuente negrita
 	 * @param component Componente al que aplicar el estilo de fuente negrita.
 	 */
-	public static void setFontBold(JComponent component){
+	public static void setFontBold(final JComponent component){
 		//Se comprueba si el componente es de tipo panel con borde
 		if(component instanceof JPanel){
 			if (component.getBorder()!=null){
-				if (component.getBorder().getClass().getName().equals("javax.swing.border.TitledBorder")){
-					TitledBorder titledBorder = (TitledBorder)component.getBorder(); //Se obtiene el borde
+				if (component.getBorder().getClass().getName().equals("javax.swing.border.TitledBorder")){ //$NON-NLS-1$
+					final TitledBorder titledBorder = (TitledBorder)component.getBorder(); //Se obtiene el borde
 					//Se comprueba que no sea nulo
 					if (titledBorder != null){
 						//Se comprueba si la configuracion pide que la fuente este en negrita
@@ -486,7 +486,7 @@ public final class Utils {
 						}
 					}
 				} //Comprobacion del tipo de borde
-			} 			
+			}
 		} else {
 			//Se comprueba si la configuracion pide que la fuente este en negrita
 			if (GeneralConfig.isFontBold()){
@@ -509,7 +509,7 @@ public final class Utils {
 					//Se indica que la fuente es texto plano
 					component.setFont(new Font(component.getFont().getName(),Font.PLAIN , component.getFont().getSize()));
 				}
-				
+
 			}
 		}
 	}
@@ -532,7 +532,7 @@ public final class Utils {
     /*public static void setPreference(final String key, final String value, Preferences preferences) {
         preferences.put(key, value);
     }*/
-    
+
     /** Muestra un di&aacute;logo para que el usuario seleccione entre los
      * certificados mostrados. Es posible indicar que s&ocuate;lo puede haber un
      * certificado tras recuperarlos del repositorio y aplicar los filtros, en
@@ -581,10 +581,10 @@ public final class Utils {
 
         final Map<String, String> aliassesByFriendlyName =
                 KeyStoreUtilities.getAliasesByFriendlyName(
-                       alias, 
-                       ksm, 
+                       alias,
+                       ksm,
                        checkPrivateKeys,
-                       showExpiredCertificates, 
+                       showExpiredCertificates,
                        certFilters
                 );
 
@@ -691,7 +691,7 @@ public final class Utils {
         }
         return null;
     }
-    
+
     /** Recupera el manejador de claves asociado a un certificado seg&uacute;n el
      * repositorio en el que se aloja.
      * @param store Almace&eacute;n de claves del certificado.
@@ -710,7 +710,7 @@ public final class Utils {
         }
         return new UIPasswordCallbackAccessibility(Messages.getString("CustomDialog.showInputDialog.certificate.pass"), (Component)parent, Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
-    
+
     /**
 	 * Metodo que sumbraya el mnemonico correspondiente para texto HTML.
 	 *
@@ -719,11 +719,11 @@ public final class Utils {
 	 *
 	 * @return	Cadena con el texto subrayado.
 	 */
-	public static String remarkMnemonic( String text, final int key) {
+	public static String remarkMnemonic( final String text, final int key) {
 		String newText = text;
 		int pos = text.indexOf(key); //Se obtiene el indice del caracter
 		if (pos == -1) {//Se busca en minuscula
-			char keyChar = (char) key;
+			final char keyChar = (char) key;
 			pos = text.indexOf(String.valueOf(keyChar).toLowerCase());
 		}
 		if (pos != -1) {
@@ -732,16 +732,15 @@ public final class Utils {
 		}
 		return newText;
 	}
-	
+
 	/**
      * Obtiene un filtro de fichero correspondiente para almacenes de certificados del tipo PCKS#12 y .
      * @return filtro
      */
     public static final FileFilter getRepositoryFileFilter() {
-    	FileFilter fileFilter = new ExtFilter(new String[] {"p12", "pfx"}, Messages.getString("Repository.filefilter")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-    	return fileFilter;
+    	return new ExtFilter(new String[] {"p12", "pfx"}, Messages.getString("Repository.filefilter")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
-    
+
     /**
      * Muestra u oculta un tooltip relacionado con un bot&oacute;n.
      * @param show Boolean que indica si se muestra el tooltip
@@ -749,7 +748,7 @@ public final class Utils {
      * @param boton JButton al que se relaciona el tooltip
      * @param tipText JLabel que muestra el contenido del tooltip
      */
-    public static void showToolTip(boolean show, JWindow tip, JButton boton, JLabel tipText){    	
+    public static void showToolTip(final boolean show, final JWindow tip, final JButton boton, final JLabel tipText){
     	tipText.setText(boton.getToolTipText());
     	tip.setBackground((Color)UIManager.get("ToolTip.background")); //$NON-NLS-1$
     	tipText.setBackground((Color)UIManager.get("ToolTip.background")); //$NON-NLS-1$
@@ -760,8 +759,8 @@ public final class Utils {
     	Point p = new Point();
     	try{
     		p = boton.getLocationOnScreen();
-    	} 
-    	catch(IllegalComponentStateException e){
+    	}
+    	catch(final IllegalComponentStateException e){
     		// Se ignora
     	}
     	int factor = 0;

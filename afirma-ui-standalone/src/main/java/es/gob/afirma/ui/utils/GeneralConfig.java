@@ -17,7 +17,7 @@ import es.gob.afirma.ui.principal.ContextOptionsPane;
 import es.gob.afirma.ui.principal.MainOptionsPane;
 
 /** Configuraci&oacute;n global de la aplicaci&oacute;n. */
-public class GeneralConfig {
+public final class GeneralConfig {
 
     /** Opciones de configuraci&oacute;n general. */
     private static Properties configOptions = new Properties();

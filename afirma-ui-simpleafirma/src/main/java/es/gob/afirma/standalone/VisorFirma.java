@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -40,7 +40,7 @@ public class VisorFirma extends JApplet implements WindowListener {
     private JFrame window;
     private Container container = null;
     private JPanel currentPanel;
-    
+
     private final boolean standalone;
 
     /** Fichero de firma. */
@@ -60,7 +60,7 @@ public class VisorFirma extends JApplet implements WindowListener {
 
     /**
      * Reinicia la pantalla con los datos de una nueva firma.
-     * @param asApplet Indica que si se desea cargar la pantalla en forma de applet. 
+     * @param asApplet Indica que si se desea cargar la pantalla en forma de applet.
      * @param sigFile Nuevo fichero de firma.
      */
     public void initialize(final boolean asApplet, final File sigFile) {
@@ -149,7 +149,7 @@ public class VisorFirma extends JApplet implements WindowListener {
     public void windowClosing(final WindowEvent e) {
         closeApplication(0);
     }
-    
+
     @Override public void windowOpened(final WindowEvent e) { /* No implementado */ }
     @Override public void windowClosed(final WindowEvent e) { /* No implementado */ }
     @Override public void windowIconified(final WindowEvent e) { /* No implementado */ }
@@ -177,6 +177,6 @@ public class VisorFirma extends JApplet implements WindowListener {
         if (sgFile == null) {
             return;
         }
-        initialize(VisorFirma.this.container == VisorFirma.this, sgFile);
+        initialize(VisorFirma.this.equals(VisorFirma.this.container), sgFile);
     }
 }
