@@ -14,6 +14,8 @@ package es.gob.afirma.applet;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import es.gob.afirma.core.misc.AOUtil;
+
 final class AppletMessages {
     private static final String BUNDLE_NAME = "appletmessages"; //$NON-NLS-1$
 
@@ -21,7 +23,7 @@ final class AppletMessages {
 
     static {
         try {
-            RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME, Locale.getDefault());
+            RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME, Locale.getDefault(), AOUtil.getCleanClassLoader());
         }
         catch (final Exception e) {
             RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);

@@ -283,7 +283,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
     	changeLocale(getParameter("language"), getParameter("country"), getParameter("variant")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-    	LOGGER.info("Cliente @firma V3.2"); //$NON-NLS-1$
+    	LOGGER.info("Cliente @firma"); //$NON-NLS-1$
         LOGGER.info("Versi\u00F3n: " + getVersion()); //$NON-NLS-1$
 
         LOGGER.info("Sistema operativo: " + Platform.getOS().toString()); //$NON-NLS-1$
@@ -3954,7 +3954,11 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     		} else {
     			locale = new Locale(language);
     		}
-    		Locale.setDefault(locale);
+    		try {
+    			Locale.setDefault(locale);
+    		} catch (final SecurityException e) {
+    			LOGGER.warning("No se pudo cambiar el idioma por restricciones de seguridad en el sistema: " + e); //$NON-NLS-1$
+			}
     	}
     }
 }
