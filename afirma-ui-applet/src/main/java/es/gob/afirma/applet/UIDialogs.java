@@ -43,7 +43,7 @@ import es.gob.afirma.ui.core.jse.JSEUtils;
  * Funciones para el uso de di&aacute;logos modales.
  * @author Carlos Gamuci
  */
-public class UIDialogs {
+public final class UIDialogs {
 
 	private UIDialogs() {
 		// No permitimos la instanciacion
