@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -33,7 +33,7 @@ public final class CompleteSignInfo {
      * @see #setSignData(byte[])
      */
     public byte[] getSignData() {
-        return this.signData;
+        return this.signData.clone();
     }
 
     /**
@@ -41,7 +41,7 @@ public final class CompleteSignInfo {
      * @param signData Firma.
      */
     public void setSignData(final byte[] signData) {
-        this.signData = signData;
+        this.signData = signData.clone();
     }
 
     /**
@@ -81,7 +81,7 @@ public final class CompleteSignInfo {
      * @return Datos que se firmaron.
      */
     public byte[] getData() {
-        return this.data;
+        return this.data.clone();
     }
 
     /**
@@ -89,6 +89,6 @@ public final class CompleteSignInfo {
      * @param data Datos que se firmaron.
      */
     public void setData(final byte[] data) {
-        this.data = data;
+        this.data = data.clone();
     }
 }
