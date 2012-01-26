@@ -788,7 +788,7 @@ public final class SignPanel extends JPanel {
                         "No se ha podido mostrar la barra de progreso indeterminado: " + e); //$NON-NLS-1$
             }
 
-            try { Thread.sleep(5000); } catch(final Exception e) { /* Ignoramos los errores */ }
+            try { Thread.sleep(2000); } catch(final Exception e) { /* Ignoramos los errores */ }
 
             final byte[] signResult;
             try {
