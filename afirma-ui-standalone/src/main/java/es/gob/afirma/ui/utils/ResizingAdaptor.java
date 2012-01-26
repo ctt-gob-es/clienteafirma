@@ -45,7 +45,7 @@ import es.gob.afirma.core.misc.Platform;
  * 
  */
 @SuppressWarnings("restriction")
-public class ResizingAdaptor extends ComponentAdapter {
+final class ResizingAdaptor extends ComponentAdapter {
 	private final JAccessibilityFrame theWindow;
 	private final JAccessibilityDialog theDialog;
 	private final JAccessibilityDialogWizard theDialogWizard;
@@ -100,7 +100,7 @@ public class ResizingAdaptor extends ComponentAdapter {
 	/**
 	 * Ajusta las fuentes
 	 */
-	public void adjustWindowFonts() {
+	void adjustWindowFonts() {
 		if (this.theWindow != null) {
 			this.adjustFontSize(this.theWindow.getComponents());
 		} else if (this.theDialog != null){
@@ -366,7 +366,7 @@ public class ResizingAdaptor extends ComponentAdapter {
 	 * @para h Height inicial de la imagen
 	 * @param multiplicando Valor de multiplicacion para el nuevo tamano de la imagen. Es mayor cuanto menor sea el tamano inicial de la imagen
 	 */
-	private final void resizeImage(double factor, Component c, int w, int h, int multiplicando) {
+	private void resizeImage(double factor, Component c, int w, int h, int multiplicando) {
 		if (this.theFileChooser==null){			
 			ImageIcon image = new ImageIcon();
 			//Se comprueba si el componente es instancia de IconLabel

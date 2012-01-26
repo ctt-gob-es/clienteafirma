@@ -4,13 +4,14 @@ import javax.swing.filechooser.FileFilter;
 
 import es.gob.afirma.core.signers.AOSignConstants;
 
+/** Operaciones de utilidad para la gesti&oacute;n de ficheros firmados. */
 public final class SignedFileManager {
 
     /** Obtiene un filtro de fichero correspondiente para los ficheros mas comunes que contienen una firma.
      * @return filtro */
     public static final FileFilter getCommonSignedFileFilter() {
         final FileFilter fileFilter = new ExtFilter(new String[] {
-                                                                  "csig", "xsig"
+          "csig", "xsig" //$NON-NLS-1$ //$NON-NLS-2$
         }, Messages.getString("SignedFileManager.commonSignedFile")); //$NON-NLS-1$
         return fileFilter;
     }
@@ -21,7 +22,7 @@ public final class SignedFileManager {
      *        Formato de firma.
      * @return Filtro con las extensiones de fichero v&aacute;lidas para el
      *         formato de firma especificado. */
-    public static final FileFilter getOutFileFilter(final String signFormat) {
+    public static FileFilter getOutFileFilter(final String signFormat) {
 
         if (signFormat.equals(AOSignConstants.SIGN_FORMAT_CMS) || signFormat.equals(AOSignConstants.SIGN_FORMAT_CADES)) {
             return new ExtFilter(new String[] {
@@ -62,7 +63,7 @@ public final class SignedFileManager {
      * @param signFormat
      *        Formato de firma recogido en {@link AOSignConstants AOSignConstants}.
      * @return Nombre de salida del fichero */
-    public static final String getOutFileName(final String inName, final String signFormat) {
+    public static String getOutFileName(final String inName, final String signFormat) {
 
         if (inName == null || inName.equals("")) { //$NON-NLS-1$
             throw new IllegalArgumentException("El nombre de fichero no puede estar vacio"); //$NON-NLS-1$
