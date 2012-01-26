@@ -3686,14 +3686,21 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
      *        certificates are displayed. */
     public void addRFC2254CertificateFilter(final String subjectFilter, final String issuerFilter, final boolean signatureCertificate) {
     	final CertificateFilter filter;
-    	if (signatureCertificate) {
-    		filter = new MultipleCertificateFilter(new CertificateFilter[] {
-    				new RFC2254CertificateFilter(subjectFilter, issuerFilter),
-    				new KeyUsageFilter(KeyUsageFilter.SIGN_CERT_USAGE)});
-    	} else {
-    		filter = new RFC2254CertificateFilter(subjectFilter, issuerFilter);
+    	if (subjectFilter != null || issuerFilter != null || signatureCertificate) {
+    		if (signatureCertificate) {
+    			if (subjectFilter != null || issuerFilter != null) {
+    				filter = new MultipleCertificateFilter(new CertificateFilter[] {
+    						new RFC2254CertificateFilter(subjectFilter, issuerFilter),
+    						new KeyUsageFilter(KeyUsageFilter.SIGN_CERT_USAGE)});
+    			}
+    			else {
+    				filter = new KeyUsageFilter(KeyUsageFilter.SIGN_CERT_USAGE);
+    			}
+    		} else {
+    			filter = new RFC2254CertificateFilter(subjectFilter, issuerFilter);
+    		}
+    		this.ksConfigManager.addCertFilter(filter);
     	}
-    	this.ksConfigManager.addCertFilter(filter);
     }
 
     /**
