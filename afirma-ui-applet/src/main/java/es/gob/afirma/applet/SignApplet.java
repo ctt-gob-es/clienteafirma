@@ -2043,6 +2043,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
         if (!checkUserPermision(AppletMessages.getString("SignApplet.1") + //$NON-NLS-1$
         		CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
+        	return false;
         }
 
         return AccessController.doPrivileged(new java.security.PrivilegedAction<Boolean>() {
