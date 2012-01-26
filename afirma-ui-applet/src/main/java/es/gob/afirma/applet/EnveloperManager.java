@@ -28,7 +28,6 @@ import java.util.logging.Logger;
 
 import javax.crypto.BadPaddingException;
 
-import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.AOUtil;
@@ -271,7 +270,7 @@ public final class EnveloperManager {
      * @throws IllegalArgumentException
      *         Cuando no se ha indicado un par&aacute;metro o se
      *         configur&oacute; uno err&oacute;neo.
-     * @throws AOCancelledOperationException
+     * @throws es.gob.afirma.core.AOCancelledOperationException
      *         Cuando el usuario cancela la operaci&oacute;n. */
     public void envelop() throws IOException, NoSuchAlgorithmException, AOException, CertificateEncodingException {
         this.envelop(getConfigureContent());
@@ -295,13 +294,12 @@ public final class EnveloperManager {
      * @throws IllegalArgumentException
      *         Cuando se configur&oacute; un par&aacute;metro
      *         err&oacute;neo.
-     * @throws AOCancelledOperationException
+     * @throws es.gob.afirma.core.AOCancelledOperationException
      *         Cuando el usuario cancela la operaci&oacute;n. */
     public void envelop(final byte[] content) throws CertificateEncodingException,
                                              NoSuchAlgorithmException,
                                              IOException,
-                                             AOException,
-                                             AOCancelledOperationException {
+                                             AOException {
 
         if (this.contentType == null) {
             LOGGER.severe("No se ha indicado el tipo de sobre electronico"); //$NON-NLS-1$
@@ -597,7 +595,7 @@ public final class EnveloperManager {
      * @return Sobre electr&oacute;nico con el remitente agregado.
      * @throws AOException
      *         Cuando se produce un error durante el proceso de ensobrado.
-     * @throws AOCancelledOperationException
+     * @throws es.gob.afirma.core.AOCancelledOperationException
      *         Cuando el usuario cancela la operaci&oacute;n.
      * @throws AOCertificatesNotFoundException
      *         Cuando no hay certificados en el almac&eacute;n seleccionado.
@@ -606,7 +604,6 @@ public final class EnveloperManager {
      * @throws AOInvalidFormatException
      *         Tipo de envoltorio no soportado. */
     public byte[] coEnvelop(final byte[] envelop) throws AOException,
-                                                 AOCancelledOperationException,
                                                  AOCertificatesNotFoundException,
                                                  AOKeyStoreManagerException,
                                                  AOInvalidFormatException {
