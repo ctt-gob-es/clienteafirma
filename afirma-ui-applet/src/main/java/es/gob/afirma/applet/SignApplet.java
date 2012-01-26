@@ -64,6 +64,7 @@ import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.envelopers.cms.AOInvalidRecipientException;
 import es.gob.afirma.keystores.filters.old.OldFilter;
+import es.gob.afirma.keystores.filters.rfc.KeyUsageFilter;
 import es.gob.afirma.keystores.filters.rfc.RFC2254CertificateFilter;
 import es.gob.afirma.keystores.main.common.AOCertificatesNotFoundException;
 import es.gob.afirma.keystores.main.common.AOKeyStore;
@@ -71,6 +72,8 @@ import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManagerException;
 import es.gob.afirma.keystores.main.common.AOKeystoreAlternativeException;
 import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
+import es.gob.afirma.keystores.main.filters.CertificateFilter;
+import es.gob.afirma.keystores.main.filters.MultipleCertificateFilter;
 import es.gob.afirma.massive.DirectorySignatureHelper;
 import es.gob.afirma.massive.MassiveSignatureHelper;
 import es.gob.afirma.massive.MassiveSignatureHelper.MassiveSignConfiguration;
@@ -425,7 +428,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         return SignApplet.concatStrings(getArrayCertificates(), STRING_SEPARATOR);
     }
 
-    public final String[] getArrayCertificates() {
+    public String[] getArrayCertificates() {
         LOGGER.info("Invocando getArrayCertificates"); //$NON-NLS-1$
 
         String[] certs = new String[0];
@@ -444,7 +447,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         return certs;
     }
 
-    public final String getCertificate(final String alias) {
+    public String getCertificate(final String alias) {
         LOGGER.info("Invocando getCertificate: " + alias); //$NON-NLS-1$
         final X509Certificate cert = getCertificateBinary(alias);
         if (cert == null) {
@@ -544,7 +547,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         }
     }
 
-    public final boolean saveDataToFile(final String filename) {
+    public boolean saveDataToFile(final String filename) {
         LOGGER.info("Invocando setDataToFile: " + filename); //$NON-NLS-1$
 
         if (filename == null || filename.length() < 1) {
@@ -736,7 +739,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 		this.ksConfigManager.setMandatoryCert(true);
 	}
 
-    public final void setData(final String data) {
+    public void setData(final String data) {
         LOGGER.info("Invocando setData"); //$NON-NLS-1$
         if (data == null) {
             this.data = null;
@@ -750,7 +753,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
     }
 
-    public final void setFileuri(final String uri) {
+    public void setFileuri(final String uri) {
         LOGGER.info("Invocando setFileUri: " + uri); //$NON-NLS-1$
 
         if (uri == null || uri.trim().equals("")) { //$NON-NLS-1$
@@ -769,7 +772,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         this.fileBase64 = false;
     }
 
-    public final void setFileuriBase64(final String uri) {
+    public void setFileuriBase64(final String uri) {
 
         LOGGER.info("Invocando setFileuriBase64: " + uri); //$NON-NLS-1$
 
@@ -790,7 +793,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         this.hash = null;
     }
 
-    public final void setHash(final String hash) {
+    public void setHash(final String hash) {
         LOGGER.info("Invocando setHash: " + hash); //$NON-NLS-1$
         if (hash == null) {
             this.hash = null;
@@ -843,7 +846,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         this.signersToCounterSign = (signers == null ? new String[0] : signers.split("(\\r\\n|\\n)")); //$NON-NLS-1$
     }
 
-    public final String getSignersStructure() {
+    public String getSignersStructure() {
         LOGGER.info("Invocando getSignersStructure"); //$NON-NLS-1$
 
         return AccessController.doPrivileged(new java.security.PrivilegedAction<String>() {
@@ -1183,7 +1186,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         return (this.sigMode == null ? AOSignConstants.DEFAULT_SIGN_MODE : this.sigMode);
     }
 
-    public final void setKeyStore(final String filename, final String password, final String type) {
+    public void setKeyStore(final String filename, final String password, final String type) {
 
     	if ((filename != null) && !checkUserPermision(
     			AppletMessages.getString("SignApplet.19") + CR + filename + //$NON-NLS-1$
@@ -2199,7 +2202,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         });
     }
 
-    public final void setSelectedCertificateAlias(final String cAlias) {
+    public void setSelectedCertificateAlias(final String cAlias) {
         LOGGER.info("Invocando setSelectedCertificateAlias: " + cAlias); //$NON-NLS-1$
         this.ksConfigManager.setSelectedAlias(cAlias);
     }
@@ -2248,12 +2251,12 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         javax.swing.JFrame.setDefaultLookAndFeelDecorated(true);
     }
 
-    public final boolean isInitialized() {
+    public boolean isInitialized() {
         LOGGER.info("Invocando isInitialized"); //$NON-NLS-1$
         return this.initializedApplet;
     }
 
-    public final boolean signData(final String b64data) {
+    public boolean signData(final String b64data) {
         LOGGER.info("Invocando signData"); //$NON-NLS-1$
         if (b64data == null) {
             LOGGER.severe("No se han introducido los datos que se desean firmar"); //$NON-NLS-1$
@@ -3294,7 +3297,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         this.showHashes = showHashMessage;
     }
 
-    public final void setShowExpiratedCertificates(final boolean showExpiratedCerts) {
+    public void setShowExpiratedCertificates(final boolean showExpiratedCerts) {
         LOGGER.info("Invocando setShowExpiratedCertificates: " + showExpiratedCerts);//$NON-NLS-1$
         this.ksConfigManager.setShowExpiratedCertificates(showExpiratedCerts);
     }
@@ -3644,22 +3647,24 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         return sb.toString();
     }
 
+    @Deprecated
     public void setCertFilterRFC2254(final String subjectFilter, final String issuerFilter, final boolean onlySignatureCertificates) {
         LOGGER.info("Invocando setCertFilterRFC2254"); //$NON-NLS-1$
-        this.setRFC2254Filter(subjectFilter, issuerFilter, onlySignatureCertificates);
+        this.addRFC2254CertificateFilter(subjectFilter, issuerFilter, onlySignatureCertificates);
         this.ksConfigManager.setMandatoryCert(false);
     }
 
+    @Deprecated
     public void setMandatoryCertificateConditionRFC2254(final String subjectFilter, final String issuerFilter, final boolean onlySignatureCertificates) {
         LOGGER.info("Invocando setMandatoryCertificateConditionRFC2254"); //$NON-NLS-1$
-        this.setRFC2254Filter(subjectFilter, issuerFilter, onlySignatureCertificates);
+        this.addRFC2254CertificateFilter(subjectFilter, issuerFilter, onlySignatureCertificates);
 
         // Si se establecio alguno de los tres filtros, activamos la seleccion
         // de un unico certificado
         this.ksConfigManager.setMandatoryCert(subjectFilter != null || issuerFilter != null || onlySignatureCertificates);
     }
 
-    /** Establece filtros de certificados acorde a la RFC2254 para el Subject, el
+    /** Agrega un filtro de certificados acorde a la RFC2254 para el Subject, el
      * Issuer y seg&uacute;n los KeyUsage de los certificados.
      * @param subjectFilter
      *        Filtro para el titular del certificado, seg&uacute;n formato
@@ -3669,7 +3674,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
      *        Filtro para el emisor del certificado, seg&uacute;n formato
      *        definido en la normativa RFC 2554 <br>
      *        Filter for the certificate issuer, as defined by RFC 2554.
-     * @param onlySignatureCertificates
+     * @param signatureCertificate
      *        Si se establece a <code>true</code> se muestran para
      *        selecci&oacute;n &uacute;nicamente los certificados con el bit
      *        <i>nonRepudiation</i> del campo <i>KeyUsage</i> activado, si
@@ -3679,10 +3684,44 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
      *        <i>nonRepudiation</i> bit in field <i>KeyUsage</i> are
      *        displayed for selection, if set to <code>false</code> all
      *        certificates are displayed. */
-    private void setRFC2254Filter(final String subjectFilter, final String issuerFilter, final boolean onlySignatureCertificates) {
-        this.ksConfigManager.addCertFilter(new RFC2254CertificateFilter(subjectFilter, issuerFilter));
-        this.ksConfigManager.setShowOnlySignatureCertificates(onlySignatureCertificates);
+    public void addRFC2254CertificateFilter(final String subjectFilter, final String issuerFilter, final boolean signatureCertificate) {
+    	final CertificateFilter filter;
+    	if (signatureCertificate) {
+    		filter = new MultipleCertificateFilter(new CertificateFilter[] {
+    				new RFC2254CertificateFilter(subjectFilter, issuerFilter),
+    				new KeyUsageFilter(KeyUsageFilter.SIGN_CERT_USAGE)});
+    	} else {
+    		filter = new RFC2254CertificateFilter(subjectFilter, issuerFilter);
+    	}
+    	this.ksConfigManager.addCertFilter(filter);
     }
+
+    /**
+     * Elimina todos los filtros definidos hasta el momento.
+     */
+    public void resetFilters() {
+    	this.ksConfigManager.resetFilters();
+    }
+
+    /**
+     * Permite indicar si deben o no mostrarse &uacute;nicamente los certificados de firma.
+     * Por defecto, s&oacute;lo se mostrar&aacute;n los certificados de firma.
+     * @param showOnlySignatureCertificates Indica si se deben mostrar s&oacute;lo los
+     * certificados de firma.
+     */
+    public void setShowOnlySignatureCertificates(final boolean showOnlySignatureCertificates) {
+    	this.ksConfigManager.setShowOnlySignatureCertificates(showOnlySignatureCertificates);
+    }
+
+    /**
+     * Inidica si se debe seleccionar autom&aacute;ticamente un certificado si es el
+     * &uacute;nico del almac&eacute;n o el &uacute;nico que pasa los filtros establecidos.
+     * @param mandatoryCertificate Selecci&oacute;n autom&aacute;tica del certificado.
+     */
+    public void setMandatoryCertificate(final boolean mandatoryCertificate) {
+    	this.ksConfigManager.setMandatoryCert(mandatoryCertificate);
+    }
+
 
     /** Selecciona un certificado del usuario y devuelve la referencia a su clave
      * privada. En caso de error configura el mensaje de error correspondiente.
