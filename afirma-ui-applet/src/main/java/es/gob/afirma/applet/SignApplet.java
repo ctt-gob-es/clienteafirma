@@ -696,7 +696,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
      * @param extensions
      *        Extensiones permitidas para el di&aacute;logo de guardado.
      * @param description
-     *        Descrìpci&oacute;n de los datos para el di&aacute;logo de
+     *        Descripci&oacute;n de los datos para el di&aacute;logo de
      *        guardado. */
     void saveFileAsinchronously(final byte[] dat, final String outputPath, final String[] extensions, final String description) {
         final AsynchronousSaveData saveDataDialog =

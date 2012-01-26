@@ -586,7 +586,7 @@ public final class Utils {
         else { // XMLDSig
                // Combinaciones prohibidas
             if (format.equals(AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED) && mode.equals(AOSignConstants.SIGN_MODE_EXPLICIT)) {
-                throw new UnsupportedOperationException("No se puede realizar una firma enveloped sobre un contenido explícito"); //$NON-NLS-1$
+                throw new UnsupportedOperationException("No se puede realizar una firma enveloped sobre un contenido explicito"); //$NON-NLS-1$
             }
             if (format.equals(AOSignConstants.SIGN_FORMAT_XMLDSIG_EXTERNALLY_DETACHED) && mode.equals(AOSignConstants.SIGN_MODE_IMPLICIT)) {
                 throw new UnsupportedOperationException("No se puede realizar una firma XML Externally Detached con contenido Implicito" //$NON-NLS-1$

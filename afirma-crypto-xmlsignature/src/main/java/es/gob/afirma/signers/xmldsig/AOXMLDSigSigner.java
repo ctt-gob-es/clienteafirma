@@ -1138,7 +1138,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             throw new AOInvalidFormatException("Error al leer el fichero de firmas", ex); //$NON-NLS-1$
         }
 
-        // si no se ha recuperado ningún dato se devuelve null
+        // si no se ha recuperado ningun dato se devuelve null
         if (elementRes == null) {
             return null;
         }

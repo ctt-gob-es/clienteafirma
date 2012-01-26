@@ -139,7 +139,7 @@ public final class CMSAuthenticatedEnvelopedData {
 
         OriginatorInfo origInfo = null;
         if (signerCertificateChain.length != 0) {
-            // introducimos una lista vacía en los CRL ya que no podemos
+            // introducimos una lista vacia en los CRL ya que no podemos
             // modificar el codigo de bc.
             certrevlist = SigUtils.createBerSetFromList(new ArrayList<DEREncodable>());
             origInfo = new OriginatorInfo(certificates, certrevlist);

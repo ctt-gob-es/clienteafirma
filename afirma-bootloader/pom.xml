@@ -17,17 +17,31 @@
     <dependency>
       <groupId>plugin</groupId>
       <artifactId>plugin</artifactId>
-      <version>1.5</version>
+      <version>1.6</version>
     </dependency>
   </dependencies>
+
+  <profiles>
+    <profile>
+      <id>default</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <afirma.keytool.keystore>src/main/resources/afirma.keystore</afirma.keytool.keystore>
+        <afirma.keytool.alias>codesign</afirma.keytool.alias>
+        <afirma.keytool.password>afirma</afirma.keytool.password>
+      </properties>
+    </profile>
+  </profiles>
 
   <build>
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
+          <source>1.6</source>
+          <target>1.6</target>
         </configuration>
       </plugin>
 
@@ -75,7 +89,7 @@
       </plugin>
 
       <!-- Proguard -->
-      <!--
+
       <plugin>
         <groupId>com.pyx4me</groupId>
         <artifactId>proguard-maven-plugin</artifactId>
@@ -109,7 +123,6 @@
           </dependency>
         </dependencies>
       </plugin>
-      -->
     </plugins>
   </build>
 </project>

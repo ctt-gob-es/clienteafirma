@@ -31,9 +31,9 @@
       <artifactId>afirma-ui-core-jse</artifactId>
       <version>${project.version}</version>
     </dependency>
-    
+
     <!-- Keystores -->
-    
+
     <dependency>
       <groupId>es.gob.afirma</groupId>
       <artifactId>afirma-core-keystores</artifactId>
@@ -45,19 +45,19 @@
       <artifactId>afirma-keystores-mozilla</artifactId>
       <version>${project.version}</version>
     </dependency>
-    
+
     <dependency>
       <groupId>es.gob.afirma</groupId>
       <artifactId>afirma-keystores-single</artifactId>
       <version>${project.version}</version>
     </dependency>
-    
+
     <dependency>
       <groupId>es.gob.afirma</groupId>
       <artifactId>afirma-keystores-capiaddressbook</artifactId>
       <version>${project.version}</version>
     </dependency>
-    
+
     <!-- Cipher -->
 
     <dependency>
@@ -73,7 +73,7 @@
       <artifactId>afirma-crypto-xades</artifactId>
       <version>${project.version}</version>
     </dependency>
-    
+
     <!-- CAdES -->
 
     <dependency>
@@ -105,9 +105,9 @@
       <artifactId>afirma-crypto-cades-multi</artifactId>
       <version>${project.version}</version>
     </dependency>
-    
+
     <!-- PAdES -->
-    
+
     <dependency>
       <groupId>es.gob.afirma</groupId>
       <artifactId>afirma-crypto-pdf</artifactId>
@@ -127,13 +127,13 @@
       <artifactId>afirma-ui-standalone-help-es_ES</artifactId>
       <version>${project.version}</version>
     </dependency>
-    
+
     <dependency>
       <groupId>es.gob.afirma</groupId>
       <artifactId>afirma-ui-standalone-help-en_UK</artifactId>
       <version>${project.version}</version>
     </dependency>
-    
+
     <!-- jUnit testing -->
 
     <dependency>

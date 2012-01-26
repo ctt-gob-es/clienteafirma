@@ -103,7 +103,7 @@ import es.gob.afirma.signers.pkcs7.SigUtils;
  *  <li>
  *   El dispositivo m&oacute;vil realiza, de forma completamente aislada una firma electr&oacute;nica
  *   simple (computacionalmente ligera) de los datos de la pre-firma. La clave privada del usuario nunca sale
- *   del dispositivo y no se expone externamente en ningún momento.
+ *   del dispositivo y no se expone externamente en ningun momento.
  *  </li>
  * </ul>
  * <p><b>Post-firma:</b></p>
@@ -121,12 +121,12 @@ import es.gob.afirma.signers.pkcs7.SigUtils;
  *  </li>
  *  <li>El servidor documental almacena el nuevo documento y devuelve un identificador al servidor Web.</li>
  *  <li>
- *   El servidor Web comunica al dispositivo el éxito de la operacion y el identificador del fichero
+ *   El servidor Web comunica al dispositivo el exito de la operacion y el identificador del fichero
  *   ya firmado y almacenado.
  *  </li>
  * </ul>
  * <p>
- *  El esquema podr’a ser igualmente implementado sin servidor documental, pudiendo obtener el Servidor Web el documento
+ *  El esquema podria ser igualmente implementado sin servidor documental, pudiendo obtener el Servidor Web el documento
  *  desde otro origen, incluyendo el propio dispositivo m&oacute;vil. Igualmente, una vez firmado el documento, su destino
  *  puede ser cualquiera, incluyendo de nuevo al propio dispositivo.
  * </p>

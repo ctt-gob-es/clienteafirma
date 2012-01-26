@@ -213,7 +213,7 @@ final class KeyStoreConfigurationManager {
      * @throws KeyStoreException
      * 		   Cuando ocurren errores en el tratamiento del almac&eacute;n de claves.
      * @throws NoSuchAlgorithmException
-     * 		   Cuando no se puede identificar el algoritmo para la recuperación de la clave.
+     * 		   Cuando no se puede identificar el algoritmo para la recuperacion de la clave.
      * @throws UnrecoverableEntryException
      * 		   Cuando no se puede extraer la clave privada de un certificado.
      */

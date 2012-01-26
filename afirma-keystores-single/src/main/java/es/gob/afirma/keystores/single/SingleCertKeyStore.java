@@ -136,7 +136,7 @@ public final class SingleCertKeyStore extends KeyStoreSpi {
         // Primero leemos todo el Stream en un ByteArray
         final byte[] certs = AOUtil.getDataFromInputStream(is);
 
-        // Probamos con la factoría de Sun
+        // Probamos con la factoria de Sun
         final Collection<? extends Certificate> tmpColCerts;
         try {
             if (this.cf == null) {

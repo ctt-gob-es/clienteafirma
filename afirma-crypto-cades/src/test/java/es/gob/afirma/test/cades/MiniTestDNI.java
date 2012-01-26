@@ -43,7 +43,7 @@ public class MiniTestDNI {
     private static final String TEXTO_FIRMAR = "Tom\u00F3"; //$NON-NLS-1$
 
     /**
-     * Mini-prueba CAdES espec’fica para DNIe.
+     * Mini-prueba CAdES especifica para DNIe.
      * @throws Exception en caso de cualquier tipo de problema
      */
     @SuppressWarnings({ "static-method" })

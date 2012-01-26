@@ -191,7 +191,7 @@ public class AOKeyStoreManager {
      *        Flujo para la lectura directa del almac&acute;n de claves
      *        (solo para los almacenes en disco)
      * @param pssCallBack
-     *        CallBack encargado de recuperar la contrase¬ntilde;a del
+     *        CallBack encargado de recuperar la contrasenya del
      *        Keystore
      * @param params
      *        Par&aacute;metros adicionales (dependen del tipo de almac&eacute;n)

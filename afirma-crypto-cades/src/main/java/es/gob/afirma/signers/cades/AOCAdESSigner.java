@@ -178,8 +178,8 @@ public final class AOCAdESSigner implements AOSigner {
      *  resultado de una cofirma CAdES sobre un documento firmado previamente con CMS (o viceversa), son dos firmas
      *  independientes, una en CAdES y otra en CMS.<br>
      *  Dado que todas las firmas CAdES son CMS pero no todas las firmas CMS son CAdES, el resultado global de la firma
-     *  se adec&uacute;a al est&aacute;ndar m‡s amplio, CMS en este caso.
-     *  Otro efecto de compatibilidad de formatos de las cofirmas con varios formatos en un œnico documento es la ruptura
+     *  se adec&uacute;a al est&aacute;ndar mas amplio, CMS en este caso.
+     *  Otro efecto de compatibilidad de formatos de las cofirmas con varios formatos en un unico documento es la ruptura
      *  de la compatibilidad con PKCS#7, ya que, aunque las firmas generadas por el cliente mediante CMS son compatibles
      *  con PKCS#7, las generadas con CAdES no lo son, por lo que, en el momento que se introduzca una estructura CAdES,
      *  se pierde la compatibilidad PKCS#7 en el global de la firma.
@@ -277,8 +277,8 @@ public final class AOCAdESSigner implements AOSigner {
      *  resultado de una cofirma CAdES sobre un documento firmado previamente con CMS (o viceversa), son dos firmas
      *  independientes, una en CAdES y otra en CMS.<br>
      *  Dado que todas las firmas CAdES son CMS pero no todas las firmas CMS son CAdES, el resultado global de la firma
-     *  se adec&uacute;a al est&aacute;ndar m‡s amplio, CMS en este caso.
-     *  Otro efecto de compatibilidad de formatos de las cofirmas con varios formatos en un œnico documento es la ruptura
+     *  se adec&uacute;a al est&aacute;ndar mas amplio, CMS en este caso.
+     *  Otro efecto de compatibilidad de formatos de las cofirmas con varios formatos en un unico documento es la ruptura
      *  de la compatibilidad con PKCS#7, ya que, aunque las firmas generadas por el cliente mediante CMS son compatibles
      *  con PKCS#7, las generadas con CAdES no lo son, por lo que, en el momento que se introduzca una estructura CAdES,
      *  se pierde la compatibilidad PKCS#7 en el global de la firma.

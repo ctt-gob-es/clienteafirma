@@ -1041,7 +1041,7 @@ public interface EntryPointsCrypto {
 	 * {ISSUER.DN={"OU = FNMT Clase 2 CA,O = FNMT,C = ES"}}<br>
 	 * {ISSUER.DN#MATCHES#{"CN=AC DNIE 00(1|2|3),OU=DNIE,O=DIRECCION GENERAL DE
 	 * LA POLICIA,C=ES"}}<br>
-	 * {SUBJECT.DN#MATCHES#{".*ESPAÑOL ESPAÑOL.*"}}<br>
+	 * {SUBJECT.DN#MATCHES#{".*ESPANYOL ESPANYOL.*"}}<br>
 	 * <br>
 	 * Las condiciones compuestas siguen el siguiente patr&oacute;n:<br>
 	 * {(condicionSimple o condicionCompuesta) (nexo (condicionSimple o
@@ -1118,7 +1118,7 @@ public interface EntryPointsCrypto {
 	 * {ISSUER.DN={"OU = FNMT Clase 2 CA,O = FNMT,C = ES"}}<br>
 	 * {ISSUER.DN#MATCHES#{"CN=AC DNIE 00(1|2|3),OU=DNIE,O=DIRECCION GENERAL DE
 	 * LA POLICIA,C=ES"}}<br>
-	 * {SUBJECT.DN#MATCHES#{".*ESPAÑOL ESPAÑOL.*"}}<br>
+	 * {SUBJECT.DN#MATCHES#{".*ESPANYOL ESPANYOL.*"}}<br>
 	 * <br>
 	 * Las condiciones compuestas siguen el siguiente patr&oacute;n:<br>
 	 * {(condicionSimple o condicionCompuesta) (nexo (condicionSimple o
@@ -1153,7 +1153,7 @@ public interface EntryPointsCrypto {
 	 * {ISSUER.DN={"OU = FNMT Clase 2 CA,O = FNMT,C = ES"}}<br>
 	 * {ISSUER.DN#MATCHES#{"CN=AC DNIE 00(1|2|3),OU=DNIE,O=DIRECCION GENERAL DE
 	 * LA POLICIA,C=ES"}}<br>
-	 * {SUBJECT.DN#MATCHES#{".*ESPAÑOL ESPAÑOL.*"}}<br>
+	 * {SUBJECT.DN#MATCHES#{".*ESPANYOL ESPANYOL.*"}}<br>
 	 * <br>
 	 * Complex conditions follow this pattern:<br>
 	 * {(simpleCondition or complexCondition) (nexus (simpleCondition or
@@ -1537,7 +1537,7 @@ public interface EntryPointsCrypto {
      * recuperarse la ruta de fichero mediante getFileUsedPath(). <br>
      * <br>
      * Encrypts the specified file. This operation's result is equivalent to
-     * executing {@link #cipherData()} method, after indicating a file with {@link #setFileuri(String)}. The file’s path can’t recovered using
+     * executing {@link #cipherData()} method, after indicating a file with {@link #setFileuri(String)}. The files path cant recovered using
      * getFileUsedPath() method.
      * @param fileUri
      *        Fichero de datos a cifrar <br>

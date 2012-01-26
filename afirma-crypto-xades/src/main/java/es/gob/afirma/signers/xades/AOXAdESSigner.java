@@ -47,7 +47,7 @@ import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.XMLConstants;
 
-/** Manejador de firmas XML XAdES.
+/** Manejador de firmas XML XAdES
  * <p>Soporta XAdES-BES y XAdES-EPES.</p>
  * <p>
  *  Debido a errores en algunas versiones del entorno de ejecuci&oacute;n de Java, esta clase puede generar ocasionalmente
@@ -56,7 +56,7 @@ import es.gob.afirma.signers.xml.XMLConstants;
  * </p>
  * <p>
  *  Los atributos espec&iacute;ficos XAdES implementados por esta clase (adem&aacute;s de los
- *  relativos a las políticas de firma) son:
+ *  relativos a las politicas de firma) son:
  * </p>
  * <ul>
  *  <li><i>SigningTime</i> (opcional)</li>
@@ -105,7 +105,7 @@ import es.gob.afirma.signers.xml.XMLConstants;
  *    Cuando se desea firmar un contenido con un formato <i>Detached</i>, pero se quiere eliminar la
  *    dependencia de la disponibilidad externa del contenido firmado, es posible crear una estructura XML
  *    que contenga los propios contenidos y la firma, pero cada uno en una subestructura independiente,
- *    manteniendo así el concepto de <i>Detached</i> (firma y contenido firmado no se interrelacionan
+ *    manteniendo asi el concepto de <i>Detached</i> (firma y contenido firmado no se interrelacionan
  *    directamente).  Para adecuarse al est&aacute;ndar los nodos de firma y contenido debe encontrarse en el
  *    mismo nivel dentro del XML.
  *   </p>
@@ -151,8 +151,8 @@ import es.gob.afirma.signers.xml.XMLConstants;
  *    construye siempre el siguiente esqueleto XML:
  *   </p>
  *   <pre>
- *    &lt;CONTENT Id="id" Encoding="codificacion" MimeType="MimeType" Algorithm="…"&gt;
- *     &lt;! – CONTENIDO FIRMADO --&gt;
+ *    &lt;CONTENT Id="id" Encoding="codificacion" MimeType="MimeType" Algorithm=""&gt;
+ *     &lt;!  CONTENIDO FIRMADO --&gt;
  *    &lt;/CONTENT&gt;
  *   </pre>
  *   <p>
@@ -167,7 +167,7 @@ import es.gob.afirma.signers.xml.XMLConstants;
  *    insertarse, resultando una estructura con una forma similar a la siguiente:
  *   </p>
  *   <pre>
- *    &lt;CONTENT Id="id" Encoding="Base64" MimeType="application/octect-stream" Algorithm="…"&gt;
+ *    &lt;CONTENT Id="id" Encoding="Base64" MimeType="application/octect-stream" Algorithm=""&gt;
  *     SFGJKASGFJKASEGUYFGEYGEYRGADFJKASGDFSUYFGAUYEGWEYJGDFYKGYKGWJKEGYFWYJ=
  *    &lt;/CONTENT&gt;
  *   </pre>

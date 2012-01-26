@@ -39,12 +39,6 @@
     </dependency>
 
     <dependency>
-      <groupId>es.uji.security</groupId>
-      <artifactId>xmlsec-backport-jdk6</artifactId>
-      <version>1.6.0_15</version>
-    </dependency>
-
-    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.8.2</version>
@@ -57,8 +51,8 @@
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
+          <source>1.6</source>
+          <target>1.6</target>
         </configuration>
       </plugin>
     </plugins>

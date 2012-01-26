@@ -73,10 +73,10 @@ public interface EntryPointsUtil {
 	String getTextFileContent(String url);
 
     /** Devuelve verdadero si el applet ha quedado en estado de error tras la
-     * última operaci&oacute;n. <br>
+     * ultima operaci&oacute;n. <br>
      * <br>
      * Returns true if applet is left in error state after last operation.
-     * @return true si la última ejecuci&oacute;n no se pudo completar
+     * @return true si la ultima ejecuci&oacute;n no se pudo completar
      *         correctamente, false en caso contrario <br>
      *         true if last execution could not be correctly completed.
      *         Otherwise, false. */

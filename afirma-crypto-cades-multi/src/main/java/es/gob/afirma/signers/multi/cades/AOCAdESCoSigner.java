@@ -105,7 +105,7 @@ public class AOCAdESCoSigner implements AOCoSigner {
                     new ByteArrayInputStream(sign),
                     new AdESPolicy(extraParams),
                     keyEntry,
-                    null, // null porque no nos pueden dar un hash en este metodo, tendría que ser en el que incluye datos
+                    null, // null porque no nos pueden dar un hash en este metodo, tendria que ser en el que incluye datos
                     extraParams.getProperty(CONTENTTYPE_OID),
                     extraParams.getProperty(CONTENT_DESCRIPTION)
                 );
@@ -123,7 +123,7 @@ public class AOCAdESCoSigner implements AOCoSigner {
                  new ByteArrayInputStream(sign),
                  new AdESPolicy(extraParams),
                  keyEntry,
-                 null, // null porque no nos pueden dar un hash en este metodo, tendría que ser en el que incluye datos
+                 null, // null porque no nos pueden dar un hash en este metodo, tendria que ser en el que incluye datos
                  extraParams.getProperty(CONTENTTYPE_OID),
                  extraParams.getProperty(CONTENT_DESCRIPTION)
             );

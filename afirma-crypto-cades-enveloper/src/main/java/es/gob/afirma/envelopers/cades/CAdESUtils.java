@@ -491,7 +491,7 @@ final class CAdESUtils {
 
             // Algoritmo para el hash
             final AlgorithmIdentifier hashid;
-            // si tenemos algoritmo de cálculo de hash, lo ponemos
+            // si tenemos algoritmo de calculo de hash, lo ponemos
             if(policy.getPolicyIdentifierHashAlgorithm()!=null){
                 hashid = SigUtils.makeAlgId(
                                     AOAlgorithmID.getOID(

@@ -665,9 +665,9 @@ public class DirectorySignatureHelper {
         // - SI: Comprobamos si el fichero se corresponde con un tipo de firma
         // cualquiera:
         // - SI: Cofirmamos en ese formato.
-        // - NO: Es un fichero de datos (o firma no soportada), así que se
+        // - NO: Es un fichero de datos (o firma no soportada), as&iacute; que se
         // firmara en el formato indicado
-        // - NO: Lo consideramos un fichero de datos, así que se firmara en el
+        // - NO: Lo consideramos un fichero de datos, as&iacute; que se firmara en el
         // formato indicado
         String textAux;
         byte[] signedData;
