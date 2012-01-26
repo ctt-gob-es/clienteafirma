@@ -164,8 +164,7 @@ public interface EntryPointsUtil {
      *        Text in base 64.
      * @return Texto decodificado. <br>
      *         Decoded text.
-     * @deprecated Usar {@link #getTextFromBase64(String, String)} */
-    @Deprecated
+     */
 	String getTextFromBase64(String b64);
 
     /** Decodifica un texto en base 64. Si se produce alg&uacute;n error se
@@ -193,8 +192,7 @@ public interface EntryPointsUtil {
      *        Plain Text.
      * @return Texto codificado. <br>
      *         Encoded Text.
-     * @deprecated Usar {@link #getBase64FromText(String, String)} */
-    @Deprecated
+     */
     String getBase64FromText(String plainText);
 
     /** Codifica un texto plano a base 64. Si se produce alg&uacute;n error se

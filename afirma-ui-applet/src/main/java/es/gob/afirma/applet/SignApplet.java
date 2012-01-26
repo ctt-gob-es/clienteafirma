@@ -2439,7 +2439,6 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         });
     }
 
-    @Deprecated
     public String getTextFromBase64(final String b64) {
         LOGGER.info("Invocando getTextFromBase64"); //$NON-NLS-1$
         return new String(Base64.decode(b64));
@@ -2456,7 +2455,6 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         }
     }
 
-    @Deprecated
     public String getBase64FromText(final String plainText) {
     	LOGGER.info("Invocando getBase64FromText"); //$NON-NLS-1$
         String encoding = null;
