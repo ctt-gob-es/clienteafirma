@@ -97,61 +97,6 @@ public class BotoneraInferior extends JPanel {
         return this.ventanas;
     }
 
-    // /**
-    // * Cambia el tamano de la ventana al tamano maximo de pantalla menos el tamano de la barra de tareas de windows
-    // */
-    // public void maximizarActionPerformed(){
-    // JAccessibilityDialogWizard j = JAccessibilityDialogWizard.getJAccessibilityDialogWizard(this);
-    //
-    // JAccessibilityDialogWizard.actualPositionX = j.getX();
-    // JAccessibilityDialogWizard.actualPositionY = j.getY();
-    // JAccessibilityDialogWizard.actualWidth = j.getWidth();
-    // JAccessibilityDialogWizard.actualHeight = j.getHeight();
-    //
-    // //Se obtienen las dimensiones totales disponibles para mostrar una ventana
-    // Rectangle rect = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
-    //
-    // //Se obtienen las dimensiones de maximizado
-    // int maxWidth = (int)rect.getWidth();
-    // int maxHeight = (int)rect.getHeight();
-    //
-    // //Se hace el resize dependiendo del so
-    // if (!Platform.getOS().equals(Platform.OS.LINUX)){
-    // j.setBounds(0,0, maxWidth, maxHeight);
-    // } else {
-    // j.setBounds(0,0, maxWidth, maxHeight - Constants.maximizeVerticalMarginLinux);
-    // }
-    //
-    // //Se deshabilita el boton de maximizar puesto que se ha pulsado.
-    // // this.maximizar.setEnabled(false);
-    // // this.restaurar.setEnabled(true);
-    // }
-
-    // /**
-    // * Restaura el tamano de la ventana a la posicion anterior al maximizado
-    // */
-    // public void restaurarActionPerformed(){
-    // JAccessibilityDialogWizard j = JAccessibilityDialogWizard.getJAccessibilityDialogWizard(this);
-    // if (JAccessibilityDialogWizard.actualPositionX != -1 && JAccessibilityDialogWizard.actualPositionY != -1 &&
-    // JAccessibilityDialogWizard.actualWidth != -1 && JAccessibilityDialogWizard.actualHeight != -1){
-    // j.setBounds(JAccessibilityDialogWizard.actualPositionX, JAccessibilityDialogWizard.actualPositionY, JAccessibilityDialogWizard.actualWidth,
-    // JAccessibilityDialogWizard.actualHeight);
-    // } else {
-    // Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-    // if (Platform.getOS().equals(Platform.OS.LINUX)){
-    // j.setBounds((screenSize.width - Constants.WIZARD_INITIAL_WIDTH_LINUX) / 2, (screenSize.height - Constants.WIZARD_INITIAL_HEIGHT_LINUX) / 2,
-    // Constants.WIZARD_INITIAL_WIDTH_LINUX, Constants.WIZARD_INITIAL_HEIGHT_LINUX);
-    // } else{
-    // j.setBounds((screenSize.width - Constants.WIZARD_INITIAL_WIDTH) / 2, (screenSize.height - Constants.WIZARD_INITIAL_HEIGHT) / 2,
-    // Constants.WIZARD_INITIAL_WIDTH, Constants.WIZARD_INITIAL_HEIGHT);
-    // }
-    // j.setMinimumSize(new Dimension(j.getSize().width, j.getSize().height));
-    // }
-    // //Se deshabilita el boton de restaurar puesto que se ha pulsado.
-    // // this.maximizar.setEnabled(true);
-    // // this.restaurar.setEnabled(false);
-    // }
-
     /** Inicializacion de parametros */
     private void initParamenters() {
         // Configuracion del panel
