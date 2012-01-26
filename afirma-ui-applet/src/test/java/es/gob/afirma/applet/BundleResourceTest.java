@@ -30,6 +30,7 @@ public class BundleResourceTest {
 	 * Comprueba que todos los recursos secundarios declarados tengan definidas
 	 * las mismas claves que el fichero principal.
 	 */
+	@SuppressWarnings("static-method")
 	@Test
 	public void missingResourcesTest() {
 
@@ -63,6 +64,7 @@ public class BundleResourceTest {
 	 * Comprueba que los recursos secundarios no tengan definidas entradas adicionales
 	 * con respecto al recurso principal.
 	 */
+	@SuppressWarnings("static-method")
 	@Test
 	public void extraResourcesTest() {
 		final Properties mainResource = new Properties();
@@ -96,6 +98,7 @@ public class BundleResourceTest {
 	/**
 	 * Comprueba que no existan cadenas duplicadas dentro del fichero principal.
 	 */
+	@SuppressWarnings("static-method")
 	@Test
 	public void duplicateResourcesTest() {
 		final Properties mainResource = new Properties();

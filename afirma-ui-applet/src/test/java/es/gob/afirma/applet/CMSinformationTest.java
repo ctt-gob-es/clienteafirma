@@ -6,7 +6,6 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import es.gob.afirma.applet.CMSInformation;
 import es.gob.afirma.core.misc.AOUtil;
 
 /**
@@ -26,6 +25,7 @@ public class CMSinformationTest {
 	/**
 	 * Extrae informacion de una firma CMS.
 	 */
+	@SuppressWarnings("static-method")
 	@Test
 	public void cmsSignedDataTest() {
 

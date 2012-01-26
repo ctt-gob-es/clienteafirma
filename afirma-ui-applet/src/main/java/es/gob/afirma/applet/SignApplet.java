@@ -3995,13 +3995,14 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
      * @param country Pa&iacute;s.
      * @param variant Variante.
      */
-    private void changeLocale(final String locale) {
+    private static void changeLocale(final String locale) {
     	if (locale != null) {
     		final Locale newLocale = parseLocale(locale);
     		if (newLocale != null) {
     			try {
     				Locale.setDefault(newLocale);
-    			} catch (final SecurityException e) {
+    			}
+    			catch (final SecurityException e) {
     				LOGGER.warning("No se pudo cambiar el idioma por restricciones de seguridad en el sistema: " + e); //$NON-NLS-1$
     			}
     		}

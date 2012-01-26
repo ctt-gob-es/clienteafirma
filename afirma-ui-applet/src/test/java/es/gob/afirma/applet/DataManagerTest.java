@@ -74,6 +74,7 @@ public class DataManagerTest {
 	 * Comprueba que los datos introducidos y recuperamos mediante los distintos m&eacute;todos
 	 * coincidan.
 	 */
+	@SuppressWarnings("static-method")
 	@Test
 	public void recoverData() {
 
