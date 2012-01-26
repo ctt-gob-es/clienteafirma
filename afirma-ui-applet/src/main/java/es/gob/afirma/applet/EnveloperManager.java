@@ -368,7 +368,7 @@ public final class EnveloperManager {
     }
 
     /** Desenvuelve el sobre electr&oacute;nico proporcionado.
-     * @param envelop
+     * @param env
      *        Sobre electr&oacute;nico a desenvolver
      * @throws AOInvalidRecipientException
      *         Cuando el usuario no es uno de los destinatarios del sobre.
@@ -380,11 +380,18 @@ public final class EnveloperManager {
      *         Cuando no se ha indicado un envoltorio soportado.
      * @throws AOException
      *         Cuando se produce un error al desenvolver los datos. */
-    public void unwrap(final byte[] envelop) throws CertificateEncodingException,
+    public void unwrap(final byte[] env) throws CertificateEncodingException,
                                             AOInvalidRecipientException,
                                             AOInvalidFormatException,
                                             IOException,
                                             AOException {
+
+    	if (env == null) {
+    		throw new IllegalArgumentException("El envoltorio no puede ser nulo"); //$NON-NLS-1$
+    	}
+
+    	// Copia por seguridad
+    	final byte[] envelop = env.clone();
 
         // Comprobamos si requiere un certificado para la extraccion de los
         // datos
