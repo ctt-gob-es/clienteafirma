@@ -171,8 +171,16 @@ final class MozillaKeyStoreUtilities {
                     }
 
                     // Tenemos la ruta del NSS, comprobamos adecuacion por bugs de Java
-
-                    if (dir.contains(")") || dir.contains("(") || dir.contains("\u007E")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                    boolean illegalChars = false;
+                    for (final char c : dir.toCharArray()) {
+            			if (P11_CONFIG_VALID_CHARS.indexOf(c) == -1) {
+            				illegalChars = true;
+            				break;
+            			}
+            		}
+                    // Cuidado, el caracter "tilde" (unicode 007E) es valido para perfil de usuario pero no
+                    // para bibliotecas en java inferior a 6u30
+                    if (illegalChars || dir.contains("\u007E")) { //$NON-NLS-1$
                         // Tenemos una ruta con caracteres ilegales para la
                         // configuracion de SunPKCS#11 por el bug 6581254:
                         // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6581254
@@ -251,8 +259,8 @@ final class MozillaKeyStoreUtilities {
                         }
                     }
 
-            		for (final byte c : P11_CONFIG_ILLEGAL_CHARS) {
-            			if (dir.contains(new String(new byte[] {c}))) {
+            		for (final char c : dir.toCharArray()) {
+            			if (P11_CONFIG_VALID_CHARS.indexOf(c) == -1) {
             				dir = dir.replace(Platform.getUserHome(), getShort(Platform.getUserHome()));
             				break;
             			}
@@ -604,7 +612,7 @@ final class MozillaKeyStoreUtilities {
         return new String[0];
     }
 
-	private static final byte[] P11_CONFIG_ILLEGAL_CHARS = "·ÈÌÛ˙¡…Õ”⁄‡ËÏÚ˘¸‹Ò—‚ÍÓÙ˚¬ Œ‘€()!#$%&-@^_`¥{}'".getBytes(); //$NON-NLS-1$
+	private static final String P11_CONFIG_VALID_CHARS = ":\\0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_.\u007E"; //$NON-NLS-1$
 	private static final String DIR_TAG = "<DIR>"; //$NON-NLS-1$
 
 	/** Obtiene el nombre corto (8+3) del &uacute;ltimo directorio de una ruta sobre la misma ruta de directorios (es decir,
@@ -689,8 +697,8 @@ final class MozillaKeyStoreUtilities {
                 return null;
             }
             if (finalDir != null) {
-        		for (final byte c : P11_CONFIG_ILLEGAL_CHARS) {
-        			if (finalDir.contains(new String(new byte[] {c}))) {
+        		for (final char c : finalDir.toCharArray()) {
+        			if (P11_CONFIG_VALID_CHARS.indexOf(c) == -1) {
         				finalDir = finalDir.replace(Platform.getUserHome(), getShort(Platform.getUserHome()));
         				break;
         			}
