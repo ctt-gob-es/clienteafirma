@@ -21,6 +21,7 @@
     </dependency>
   </dependencies>
 
+  <!--
   <profiles>
     <profile>
       <id>default</id>
@@ -34,6 +35,7 @@
       </properties>
     </profile>
   </profiles>
+  -->
 
   <build>
     <plugins>
@@ -45,7 +47,7 @@
         </configuration>
       </plugin>
 
-      <!-- JAR signature -->
+      <!-- JAR signature
 
       <plugin>
         <artifactId>maven-jar-plugin</artifactId>
@@ -63,9 +65,9 @@
           <signedjar>target/${project.build.finalName}-signed.jar</signedjar>
           <verify>true</verify>
         </configuration>
-      </plugin>
+      </plugin>-->
 
-      <!-- JavaDoc -->
+      <!-- JavaDoc
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -86,7 +88,7 @@
           <show>public</show>
           <subpackages>es.gob.afirma</subpackages>
         </configuration>
-      </plugin>
+      </plugin>-->
 
       <!-- Proguard
 
