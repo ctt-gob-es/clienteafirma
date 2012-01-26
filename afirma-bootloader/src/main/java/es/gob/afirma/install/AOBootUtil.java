@@ -48,9 +48,8 @@ final class AOBootUtil {
     };
 
     /** Crea una URI a partir de un nombre de fichero local o una URL.
-     * @param filename Nombre del fichero local o URL
+     * @param file Nombre del fichero local o URL
      * @return URI (<code>file://</code>) del fichero local o URL
-     * @throws URISyntaxException
      * @throws URISyntaxException cuando ocurre cualquier problema creando la URI */
     static URI createURI(final String file) throws URISyntaxException {
 

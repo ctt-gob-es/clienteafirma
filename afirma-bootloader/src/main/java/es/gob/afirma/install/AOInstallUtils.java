@@ -30,27 +30,26 @@ import java.util.zip.ZipFile;
 
 /** Funciones de utilidad para la instalaci&oacute;n del Cliente Afirma. */
 final class AOInstallUtils {
-    
+
     /** Gestor de registro. */
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$;
 
     private AOInstallUtils() {
         // No permitimos la instanciacion
     }
-    
+
     private static final int BUFFER_SIZE = 1024;
 
     static final String PACK200_SUFIX = ".pack.gz"; //$NON-NLS-1$
     private static final String JAR_SUFIX = ".jar"; //$NON-NLS-1$
-    
+
 
     /** Desempaqueta un fichero Pack200 para obtener el fichero JAR equivalente. El fichero
      * JAR resultante se almacenar&aacute; en el mismo directorio que el original y tendr&aacute;
      * por nombre el mismo sin la extension ".pack.gz" o ".pack" y terminado en ".jar".
      * @param pack200Filename Nombre del del fichero Pack200 origen, incluyendo ruta
-     * @throws URISyntaxException 
-     * @throws IOException 
-     * @throws FileNotFoundException */
+     * @throws URISyntaxException Cuando la ruta del fichero no es v&aacute;lida.
+     * @throws IOException Cuando no se puede cargar o descomprimir el fichero. */
     static void unpack(final String pack200Filename) throws IOException, URISyntaxException {
 
         // Obtenemos el nombre del fichero de salida
@@ -69,9 +68,8 @@ final class AOInstallUtils {
     /** Desempaqueta un fichero Pack200 para obtener el fichero JAR equivalente.
      * @param pack200Filename Nombre del del fichero Pack200 origen, incluyendo ruta
      * @param targetJarFilename Nombre del fichero de salida, incluyendo ruta
-     * @throws URISyntaxException 
-     * @throws IOException 
-     * @throws FileNotFoundException */
+     * @throws URISyntaxException Cuando la ruta del fichero no es v&aacute;lida.
+     * @throws IOException Cuando no se ha podido cargar o descomprimir el recurso. */
     static void unpack(final String pack200Filename, final String targetJarFilename) throws IOException, URISyntaxException {
         if (pack200Filename == null) {
             throw new IllegalArgumentException("El Pack200 origen no puede ser nulo"); //$NON-NLS-1$
@@ -113,7 +111,7 @@ final class AOInstallUtils {
      * @param zipFile Fichero zip
      * @param destDirectory Ruta del directorio en donde deseamos descomprimir
      * @throws IOException El nombre de directorio indicado coincide con el de un fichero */
-    private static void unzip(final ZipFile zipFile, File destDirectory) throws IOException {
+    private static void unzip(final ZipFile zipFile, final File destDirectory) throws IOException {
 
         if (zipFile == null) {
             throw new IllegalArgumentException("El fichero Zip no puede ser nulo"); //$NON-NLS-1$
@@ -144,18 +142,18 @@ final class AOInstallUtils {
             final ZipEntry entry = zipEntries.nextElement();
             try {
                 entryName = entry.getName();
-                
+
                 // No decomprimimos entradas con "..", para evitar problemas de seguridad
                 if (entryName.contains("..")) { //$NON-NLS-1$
                     continue;
                 }
-                
+
                 // Por motivos de seguridad nunca descomprimimos los elementos relacionados con
                 // firmas JAR
                 if (AOJarVerifier.signatureRelated(entryName)) {
                     continue;
                 }
-                
+
                 outputFile = new File(destDirectory, entryName);
                 if (entry.isDirectory()) {
                     outputFile.mkdir();
@@ -165,7 +163,7 @@ final class AOInstallUtils {
                     if (!outputFile.getParentFile().exists()) {
                         outputFile.getParentFile().mkdirs();
                     }
-    
+
                     // Descomprimimos el fichero
                     zeis = zipFile.getInputStream(entry);
                     fos = new FileOutputStream(outputFile);
@@ -197,7 +195,7 @@ final class AOInstallUtils {
 
     /** Copia un fichero indicado por una URL en un directorio local del sistema.
      * @param file Fichero que se desea copiar.
-     * @param dirDest Directorio local.
+     * @param fileDest Fichero de destino.
      * @throws URISyntaxException Si la URI proporcionada no tiene una sintaxis v&aacute;lifa
      * @throws IOException Si ocurre un error de entrada/salida */
     static void copyFileFromURL(final URL file, final File fileDest) throws IOException, URISyntaxException {
@@ -429,5 +427,5 @@ final class AOInstallUtils {
             }
         }
     }
-    
+
 }

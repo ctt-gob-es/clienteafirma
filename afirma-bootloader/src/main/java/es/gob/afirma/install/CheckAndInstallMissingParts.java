@@ -48,7 +48,8 @@ final class CheckAndInstallMissingParts {
      * necesarios para la ejecuci&oacute;n del Cliente y la instalaci&oacute;n de los mismos.
      * @param ost Tipo de sistema operativo.
      * @param jreVer Versi&oacute;n de la m&aacute;quina virtual.
-     * @param instalDir Directorio de instalaci&oacute;n. */
+     * @param bld Construcci&oacute;n del Cliente que se desea cargar.
+     * @param filesCodeBase Directorio en el cual se encuentran los instalables. */
     CheckAndInstallMissingParts(final OS ost, final JREVER jreVer, final String bld, final URL filesCodeBase) {
         if (filesCodeBase == null) {
             throw new IllegalArgumentException(
@@ -63,7 +64,6 @@ final class CheckAndInstallMissingParts {
 
     /** Instala en el directorio endorsed del JRE en uso el pack de compatibilidad de firma
      * del cliente para la generacion de firmas XML con Java 5.
-     * @param installFilesCodeBase Ruta en donde se encuentran los ficheros que se deben instalar.
      * @throws URISyntaxException Si las URI utilizadas no tienen una sintaxis v&aacute;lida
      * @throws IOException Si ocurre un error de entrada/salida */
     void installEndorsedJava5AFirmaDependencies() throws IOException, URISyntaxException {
@@ -100,7 +100,6 @@ final class CheckAndInstallMissingParts {
     }
 
     /** Instala el proveedor de seguridad SunMSCAPI.
-     * @param installFilesCodeBase Localizaci&oacute;n de los ficheros necesarios para la instalaci&oacute;n
      * @throws URISyntaxException Si las URI utilizadas no tienen una sintaxis v&aacute;lida
      * @throws IOException Si ocurre un error de entrada/salida */
     void installSunMSCAPI() throws IOException, URISyntaxException {
@@ -123,7 +122,6 @@ final class CheckAndInstallMissingParts {
     }
 
     /** Instala el proveedor de seguridad SunPKCS11.
-     * @param installFilesCodeBase Localizaci&oacute;n de los ficheros necesarios para la instalaci&oacute;n
      * @throws URISyntaxException Si las URI utilizadas no tienen una sintaxis v&aacute;lida
      * @throws IOException Si ocurre un error de entrada/salida */
     void installSunPKCS11() throws IOException, URISyntaxException {
@@ -143,7 +141,6 @@ final class CheckAndInstallMissingParts {
     }
 
     /** Instala las bibliotecas Xalan para la generaci&oacute;n de firmas XML desde Java 5.
-     * @param installFilesCodeBase Ruta en donde se encuentra el fichero Zip con las bibliotecas que se desean instalar.
      * @throws URISyntaxException Si las URI utilizadas no tienen una sintaxis v&aacute;lida
      * @throws IOException Si ocurre un error de entrada/salida */
     void installEndorsedXalan() throws IOException, URISyntaxException {

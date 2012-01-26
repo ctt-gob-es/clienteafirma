@@ -37,7 +37,8 @@ final class Installer {
     /** Crea el objeto instalador tomando un componente padre como referencia para mostrar los mensajes
      * modales y unos par&aacute;metros de instalaci&oacute;n.
      * @param parentComponent Componente padre, puede ser nulo.
-     * @param params Parametros de instalaci&oacute;n.
+     * @param codeBase Ruta en la cual se encuentran los instalables.
+     * @param build Construcci&oacute;n del Cliente que se desea cargar.
      * @exception NullPointerException Si no se han indicado los par&aacute;metros de la instalaci&oacute;n. */
     Installer(final Component parentComponent, final URL codeBase, final String build) {
 
