@@ -12,7 +12,7 @@ package es.gob.afirma.ui.wizardsobresremitentes;
 import java.util.ArrayList;
 import java.util.List;
 
-import es.gob.afirma.ui.wizardUtils.JDialogWizard;
+import es.gob.afirma.ui.wizardutils.JDialogWizard;
 
 /** Clase principal que contiene la operatividad de movimiento dentro del wizard
  * y que contiene los paneles de explicacion y contenido para anadir nuevos remitentes

@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import es.gob.afirma.keystores.main.common.KeyStoreConfiguration;
-import es.gob.afirma.ui.wizardUtils.JDialogWizard;
+import es.gob.afirma.ui.wizardutils.JDialogWizard;
 
 /** Clase que realiza la multifirma masiva. */
 public final class AsistenteMultifirmaMasiva {

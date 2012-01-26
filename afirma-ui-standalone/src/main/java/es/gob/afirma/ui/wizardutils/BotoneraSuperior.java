@@ -1,4 +1,4 @@
-package es.gob.afirma.ui.wizardUtils;
+package es.gob.afirma.ui.wizardutils;
 
 import java.awt.Color;
 import java.awt.Dimension;

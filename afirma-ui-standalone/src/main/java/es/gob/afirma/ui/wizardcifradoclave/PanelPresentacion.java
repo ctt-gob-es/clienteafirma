@@ -25,10 +25,10 @@ import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.RequestFocusListener;
 import es.gob.afirma.ui.utils.Utils;
-import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
-import es.gob.afirma.ui.wizardUtils.BotoneraSuperior;
-import es.gob.afirma.ui.wizardUtils.ImagenLateral;
-import es.gob.afirma.ui.wizardUtils.JDialogWizard;
+import es.gob.afirma.ui.wizardutils.BotoneraInferior;
+import es.gob.afirma.ui.wizardutils.BotoneraSuperior;
+import es.gob.afirma.ui.wizardutils.ImagenLateral;
+import es.gob.afirma.ui.wizardutils.JDialogWizard;
 
 /** Panel explicativo de presentacion */
 final class PanelPresentacion extends JAccessibilityDialogWizard {

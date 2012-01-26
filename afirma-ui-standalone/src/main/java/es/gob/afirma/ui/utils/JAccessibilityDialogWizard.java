@@ -11,9 +11,9 @@ import java.awt.event.ComponentEvent;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.ui.principal.AccessibilityOptionsPane;
 import es.gob.afirma.ui.principal.PrincipalGUI;
-import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
-import es.gob.afirma.ui.wizardUtils.BotoneraSuperior;
-import es.gob.afirma.ui.wizardUtils.JDialogWizard;
+import es.gob.afirma.ui.wizardutils.BotoneraInferior;
+import es.gob.afirma.ui.wizardutils.BotoneraSuperior;
+import es.gob.afirma.ui.wizardutils.JDialogWizard;
 
 /**
  * Clase para generar un JDialogWizard con la posibilidad de redimension.

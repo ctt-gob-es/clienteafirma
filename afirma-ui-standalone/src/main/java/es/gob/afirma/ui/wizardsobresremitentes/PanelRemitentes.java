@@ -63,10 +63,10 @@ import es.gob.afirma.ui.utils.SelectionDialog;
 import es.gob.afirma.ui.utils.SignFileUtils;
 import es.gob.afirma.ui.utils.UIPasswordCallbackAccessibility;
 import es.gob.afirma.ui.utils.Utils;
-import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
-import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
-import es.gob.afirma.ui.wizardUtils.CertificateDestiny;
-import es.gob.afirma.ui.wizardUtils.JDialogWizard;
+import es.gob.afirma.ui.wizardutils.BotoneraInferior;
+import es.gob.afirma.ui.wizardutils.CabeceraAsistente;
+import es.gob.afirma.ui.wizardutils.CertificateDestiny;
+import es.gob.afirma.ui.wizardutils.JDialogWizard;
 
 /** Clase que contiene los elementos necesarios para crear un grupo de Remitentes
  * a partir de una seleccion de certificados de remitentes. */

@@ -15,8 +15,8 @@ import javax.swing.JPanel;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
-import es.gob.afirma.ui.wizardUtils.JDialogWizard;
+import es.gob.afirma.ui.wizardutils.BotoneraInferior;
+import es.gob.afirma.ui.wizardutils.JDialogWizard;
 
 
 /**

@@ -7,7 +7,7 @@
  * condiciones que figuran en el fichero 'licence' que se acompana.  Si se   distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
-package es.gob.afirma.ui.wizardUtils;
+package es.gob.afirma.ui.wizardutils;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

@@ -30,9 +30,9 @@ import es.gob.afirma.ui.utils.InfoLabel;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.Utils;
-import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
-import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
-import es.gob.afirma.ui.wizardUtils.JDialogWizard;
+import es.gob.afirma.ui.wizardutils.BotoneraInferior;
+import es.gob.afirma.ui.wizardutils.CabeceraAsistente;
+import es.gob.afirma.ui.wizardutils.JDialogWizard;
 
 /** Panel de configuracion para el wizard de multifirma masiva.
  * @author inteco */

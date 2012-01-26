@@ -12,7 +12,7 @@ package es.gob.afirma.ui.wizarddescifradocontrasenia;
 import java.util.ArrayList;
 import java.util.List;
 
-import es.gob.afirma.ui.wizardUtils.JDialogWizard;
+import es.gob.afirma.ui.wizardutils.JDialogWizard;
 
 
 

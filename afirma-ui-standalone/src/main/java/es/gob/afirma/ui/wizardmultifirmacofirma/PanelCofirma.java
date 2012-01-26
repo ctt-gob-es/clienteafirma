@@ -52,9 +52,9 @@ import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.MultisignUtils;
 import es.gob.afirma.ui.utils.SelectionDialog;
 import es.gob.afirma.ui.utils.Utils;
-import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
-import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
-import es.gob.afirma.ui.wizardUtils.JDialogWizard;
+import es.gob.afirma.ui.wizardutils.BotoneraInferior;
+import es.gob.afirma.ui.wizardutils.CabeceraAsistente;
+import es.gob.afirma.ui.wizardutils.JDialogWizard;
 
 /**
  * Clase que muestra el contenido principal de multifirmas - cofirma.

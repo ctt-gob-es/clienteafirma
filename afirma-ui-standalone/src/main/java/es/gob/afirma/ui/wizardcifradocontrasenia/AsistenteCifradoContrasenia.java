@@ -14,7 +14,7 @@ import java.util.List;
 
 import javax.swing.JDialog;
 
-import es.gob.afirma.ui.wizardUtils.JDialogWizard;
+import es.gob.afirma.ui.wizardutils.JDialogWizard;
 
 /** Clase principal del wizard de cifrado de contrasena. */
 public final class AsistenteCifradoContrasenia extends JDialog {
