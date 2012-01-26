@@ -3,7 +3,6 @@ package es.gob.afirma.keystores.main.filters;
 import java.security.cert.X509Certificate;
 
 import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
-import es.gob.afirma.keystores.main.filters.CertificateFilter;
 
 /**
  * Clase que engloba m&uacute;ltiples filtros de certificados, de tal forma que
@@ -23,7 +22,7 @@ public class MultipleCertificateFilter extends CertificateFilter {
 		if (filters == null) {
 			throw new NullPointerException("Listado nulo de filtros de certificados"); //$NON-NLS-1$
 		}
-		this.filters = filters;
+		this.filters = filters.clone();
 	}
 
 	@Override
