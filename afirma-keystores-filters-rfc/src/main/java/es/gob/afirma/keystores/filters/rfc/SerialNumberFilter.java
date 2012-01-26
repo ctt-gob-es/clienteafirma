@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -18,9 +18,9 @@ import es.gob.afirma.keystores.main.filters.CertificateFilter;
 /** Filtro de certificados por su n&uacute;mero de serie.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public class SerialNumberFilter extends CertificateFilter {
-    
+
     private final BigInteger serialNumber;
-    
+
     /** Construye un filtro de certificados por n&uacute;mero de serie.
      * @param serial N&uacute;mero de serie que debe tener el certificado para pasar el filtro
      */
@@ -32,11 +32,11 @@ public class SerialNumberFilter extends CertificateFilter {
     }
 
     @Override
-	public boolean matches(X509Certificate cert) {
+	public boolean matches(final X509Certificate cert) {
         if (cert == null) {
             return false;
         }
-        return cert.getSerialNumber().equals(this.serialNumber);
+        return this.serialNumber.equals(cert.getSerialNumber());
     }
 
 }
