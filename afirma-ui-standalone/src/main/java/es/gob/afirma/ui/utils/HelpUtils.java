@@ -65,7 +65,7 @@ import es.gob.afirma.ui.principal.Main;
 import es.gob.afirma.ui.principal.PrincipalGUI;
 
 /** Clase con utilidades relacionadas con la ayuda de la aplicacion */
-public class HelpUtils {
+public final class HelpUtils {
 
 	private HelpUtils() {
 		// No permitimos la instanciacion

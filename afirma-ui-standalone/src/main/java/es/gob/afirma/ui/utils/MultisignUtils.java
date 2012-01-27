@@ -28,7 +28,7 @@ import es.gob.afirma.keystores.main.common.KeyStoreConfiguration;
 import es.gob.afirma.keystores.main.filters.CertificateFilter;
 
 /** Utilidades para las multifirmas */
-public class MultisignUtils {
+public final class MultisignUtils {
 
 	private MultisignUtils() {
 		// No permitimos la instanciacion

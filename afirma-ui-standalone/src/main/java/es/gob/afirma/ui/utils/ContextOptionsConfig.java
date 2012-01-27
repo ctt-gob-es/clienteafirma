@@ -1,6 +1,6 @@
 package es.gob.afirma.ui.utils;
 
-class ContextOptionsConfig {
+final class ContextOptionsConfig {
 
 	private ContextOptionsConfig() {
 		// No permitimos la instanciacion

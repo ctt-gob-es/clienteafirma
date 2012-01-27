@@ -4,7 +4,7 @@ import javax.swing.filechooser.FileFilter;
 
 import es.gob.afirma.core.signers.AOSignConstants;
 
-public class SignFileUtils {
+public final class SignFileUtils {
 
 	private SignFileUtils() {
 		// No permitimos la instanciacion

@@ -14,7 +14,7 @@ import es.gob.afirma.ui.principal.MainOptionsPane;
 
 /** Gestor de perfiles de usuario.
  * @author Carlos Gamuci */
-public class ProfileManager {
+public final class ProfileManager {
 
 	private ProfileManager() {
 		// No permitimos la instanciacion

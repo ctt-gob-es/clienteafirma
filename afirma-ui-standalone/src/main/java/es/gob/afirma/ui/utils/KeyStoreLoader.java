@@ -9,7 +9,7 @@ import es.gob.afirma.keystores.main.common.KeyStoreConfiguration;
 
 /** Clase para la recuperaci&oacute;n de los distintos almacenes del sistema
  * disponibles para realizar distintas operaciones. */
-public class KeyStoreLoader {
+public final class KeyStoreLoader {
 
 	private KeyStoreLoader() {
 		// No permitimos la instanciacion

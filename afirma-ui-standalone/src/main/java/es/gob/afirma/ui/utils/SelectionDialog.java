@@ -23,7 +23,7 @@ import es.gob.afirma.ui.principal.Main;
 /**
  * Clase para seleccionar un tipo de ventana de dialogo.
  */
-public class SelectionDialog {
+public final class SelectionDialog {
 
 	private SelectionDialog() {
 		// No permitimos la instanciacion

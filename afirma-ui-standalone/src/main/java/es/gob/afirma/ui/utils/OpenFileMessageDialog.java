@@ -16,7 +16,7 @@ import javax.swing.JOptionPane;
 
 /** Clase con m&eacute;todos para mostrar un di&aacute;logo que pide al usuario
  * confirmaci&oacute;n para abrir un fichero. */
-public class OpenFileMessageDialog {
+public final class OpenFileMessageDialog {
 
 	private OpenFileMessageDialog() {
 		// No permitimos la instanciacion

@@ -14,7 +14,7 @@ import javax.swing.ImageIcon;
 /**
  *	Constantes para contrase&ntilde;as
  */
-public class Constants {
+public final class Constants {
 
 	private Constants() {
 		// No permitimos la instanciacion
