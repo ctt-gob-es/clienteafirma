@@ -19,14 +19,14 @@ import es.gob.afirma.core.misc.AOUtil;
 final class AppletMessages {
     private static final String BUNDLE_NAME = "appletmessages"; //$NON-NLS-1$
 
-    private static ResourceBundle RESOURCE_BUNDLE;
+    private static ResourceBundle resourceBundle;
 
     static {
         try {
-            RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME, Locale.getDefault(), AOUtil.getCleanClassLoader());
+            resourceBundle = ResourceBundle.getBundle(BUNDLE_NAME, Locale.getDefault(), AOUtil.getCleanClassLoader());
         }
         catch (final Exception e) {
-            RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
+            resourceBundle = ResourceBundle.getBundle(BUNDLE_NAME);
         }
     }
 
@@ -36,7 +36,7 @@ final class AppletMessages {
 
     static String getString(final String key) {
         try {
-            return RESOURCE_BUNDLE.getString(key);
+            return resourceBundle.getString(key);
         }
         catch (final Exception e) {
             return '!' + key + '!';
@@ -52,7 +52,7 @@ final class AppletMessages {
      * @return Recuerso textual con la subcadena sustituida. */
     static String getString(final String key, final String text) {
         try {
-            return RESOURCE_BUNDLE.getString(key).replace("%0", text); //$NON-NLS-1$
+            return resourceBundle.getString(key).replace("%0", text); //$NON-NLS-1$
         }
         catch (final Exception e) {
             return '!' + key + '!';
@@ -71,7 +71,7 @@ final class AppletMessages {
 
         String text;
         try {
-            text = RESOURCE_BUNDLE.getString(key);
+            text = resourceBundle.getString(key);
         }
         catch (final Exception e) {
             return '!' + key + '!';

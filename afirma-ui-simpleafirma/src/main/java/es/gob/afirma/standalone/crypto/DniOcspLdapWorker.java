@@ -10,7 +10,7 @@ import javax.swing.SwingWorker;
 import es.gob.afirma.util.AOCertVerifier;
 
 final class DniOcspLdapWorker extends SwingWorker<Void, String> {
-	
+
 	private final AOCertVerifier verifier;
 	private final Component comp;
 
@@ -18,9 +18,9 @@ final class DniOcspLdapWorker extends SwingWorker<Void, String> {
 		this.verifier = cv;
 		this.comp = c;
 	}
-	
+
 	@Override
-	protected Void doInBackground() throws Exception {
+	protected Void doInBackground() {
 		if (this.verifier == null) {
 			return null;
 		}
@@ -57,18 +57,18 @@ final class DniOcspLdapWorker extends SwingWorker<Void, String> {
 				null,
 				null
 			);
-			
+
 			// Habilitamos el componente
-			
+
 			if (this.comp != null) {
 				this.comp.setEnabled(true);
 			}
-			
+
 		}
 		catch(final Exception e) {
 			Logger.getLogger("es.gob.afirma").severe("No se ha podido habilitar la validacion OCSP: " + e); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		
+
 		return null;
 	}
 

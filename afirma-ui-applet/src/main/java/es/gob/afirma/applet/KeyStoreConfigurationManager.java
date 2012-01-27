@@ -20,6 +20,7 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.security.auth.callback.PasswordCallback;
 import javax.swing.JOptionPane;
@@ -77,7 +78,7 @@ final class KeyStoreConfigurationManager {
     private boolean showExpiratedCertificates = false;
     private boolean checkPrivateKey = true;
     private boolean mandatoryCert = false;
-    private final ArrayList<CertificateFilter> certFilters = new ArrayList<CertificateFilter>();
+    private final List<CertificateFilter> certFilters = new ArrayList<CertificateFilter>();
 
     /** Construye la configuraci&oacute;n por defecto para el Cliente, pudiendo
      * variar el almac&eacute;n seg&uacute;n el sistema operativo:

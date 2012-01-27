@@ -20,7 +20,7 @@ import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -195,7 +195,7 @@ public final class SignText {
 
         // En "auto" seleccionamos automaticamente el primero de la lista
         if ("auto".equals(caOption)) { //$NON-NLS-1$
-            final Hashtable<String, String> tmpHash = new Hashtable<String, String>(1);
+            final Map<String, String> tmpHash = new HashMap<String, String>(1);
             final String key = aliasesByFriendlyName.keySet().iterator().next();
             tmpHash.put(key, aliasesByFriendlyName.get(key));
             createUI(stringToSign, tmpHash);

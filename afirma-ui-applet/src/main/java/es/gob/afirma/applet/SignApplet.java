@@ -30,13 +30,13 @@ import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.swing.JApplet;
@@ -364,7 +364,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     private Map<org.ietf.jgss.Oid, String> signedAttributes = null;
 
     /** Listado de atributos sin firmar que se deben agregar a una firma. */
-    private Map<org.ietf.jgss.Oid, Vector<String>> unsignedAttributes = null;
+    private Map<org.ietf.jgss.Oid, List<String>> unsignedAttributes = null;
 
     /** Listado de propiedades gen&eacute;ricas establecidas para las firmas. */
     private Properties genericConfig = new Properties();
@@ -1740,7 +1740,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
      * @see #setPolicy(String, String, String, String) */
     void configurePolicy() {
         if (this.policyId != null) {
-            this.genericConfig.setProperty("policyIdentifier", this.policyId.toString()); //$NON-NLS-1$
+            this.genericConfig.setProperty("policyIdentifier", this.policyId); //$NON-NLS-1$
         }
         if (this.policyDesc != null) {
             this.genericConfig.setProperty("policyDescription", this.policyDesc); //$NON-NLS-1$
@@ -2078,7 +2078,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     /** {@inheritDoc} */
     public void addMassiveHash(final String hashData) {
         if (this.hashesToSign == null) {
-            this.hashesToSign = new Vector<String>();
+            this.hashesToSign = new ArrayList<String>();
         }
         this.hashesToSign.add(hashData);
     }
@@ -3668,7 +3668,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
         // Creamos primeramente el listado de atributos si no lo esta ya
         if (this.unsignedAttributes == null) {
-            this.unsignedAttributes = new HashMap<org.ietf.jgss.Oid, Vector<String>>();
+            this.unsignedAttributes = new HashMap<org.ietf.jgss.Oid, List<String>>();
         }
 
         // Comprobamos que OID se valido
@@ -3684,12 +3684,12 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
         // Agregamos el valor del atributo, teniendo en cuenta que el OID
         // especificado ya podria tener otros atributos asignados
-        Vector<String> values = null;
+        List<String> values = null;
         if (this.unsignedAttributes.containsKey(newOid)) {
             values = this.unsignedAttributes.get(newOid);
         }
         else {
-            values = new Vector<String>();
+            values = new ArrayList<String>();
         }
         values.add(value);
 
@@ -3724,7 +3724,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         // Comprobamos que el atributo exista y si tiene mas valores asignados
         // para eliminar lo que corresponda
         if (this.unsignedAttributes != null && this.unsignedAttributes.containsKey(oidToRemove)) {
-            final Vector<String> values = this.unsignedAttributes.get(oidToRemove);
+            final List<String> values = this.unsignedAttributes.get(oidToRemove);
             if (values.contains(value)) {
                 // Si el atributo existe y solo tiene ese valor, eliminamos el
                 // atributo completo
@@ -3777,7 +3777,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     /** {@inheritDoc} */
     public void addXMLTransform(final String type, final String subtype, final String body) {
         if (this.xmlTransforms == null) {
-            this.xmlTransforms = new Vector<AOXMLTransform>();
+            this.xmlTransforms = new ArrayList<AOXMLTransform>();
         }
 
         this.xmlTransforms.add(new AOXMLTransform(type, subtype, body));

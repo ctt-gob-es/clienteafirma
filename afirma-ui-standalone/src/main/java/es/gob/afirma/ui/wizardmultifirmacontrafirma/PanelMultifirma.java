@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractListModel;
@@ -344,9 +345,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
             // El array de nodos debe ir ordenado para asegurar que se firman los nodos correctos
             Arrays.sort(nodesIndexes);
             final int[] nodesIndexesI = new int[nodesIndexes.length];
-            for (int i = 0; i < nodesIndexes.length; i++) {
-                nodesIndexesI[i] = nodesIndexes[i];
-            }
+            System.arraycopy(nodesIndexes, 0, nodesIndexesI, 0, nodesIndexes.length);
             return nodesIndexesI;
         }
         return null;
@@ -372,7 +371,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
     /** Introduce los alias de todos los certificados de firma del nodo indicado y todos sus subnodos.
      * @param node Nodo de firma.
      * @param signersSet Conjunto con los alias de los certificados de firma. */
-    private final void getSigners(final DefaultMutableTreeNode node, final HashSet<String> signersSet) {
+    private final void getSigners(final DefaultMutableTreeNode node, final Set<String> signersSet) {
         signersSet.add((String) node.getUserObject());
         for (int i = 0; i < node.getChildCount(); i++) {
             getSigners((DefaultMutableTreeNode) node.getChildAt(i), signersSet);
