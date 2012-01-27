@@ -100,7 +100,7 @@ final class ResizingAdaptor extends ComponentAdapter {
 	/**
 	 * Ajusta las fuentes
 	 */
-	void adjustWindowFonts() {
+	public void adjustWindowFonts() {
 		if (this.theWindow != null) {
 			this.adjustFontSize(this.theWindow.getComponents());
 		} else if (this.theDialog != null){
