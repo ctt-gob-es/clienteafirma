@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -62,7 +62,7 @@ import es.gob.afirma.standalone.ui.UIUtils;
  * </ul>
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class SimpleAfirma extends JApplet implements PropertyChangeListener, ActionListener, KeyListener, WindowListener {
-	
+
 	private static final String APPLICATION_HOME = Platform.getUserHome() + File.separator + ".afirma" + File.separator + "firmafacil"; //$NON-NLS-1$ //$NON-NLS-2$
 
     /** Clave de la preferencia para el guardado del idioma por defecto. */
@@ -72,8 +72,8 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
     public static final boolean DEBUG = true;
 
     private static final long serialVersionUID = 9146759318663175997L;
-    
-    static Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
+    static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** Preferencias generales establecidas para el aplicativo. */
     private Preferences preferences;
@@ -84,7 +84,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 
     private File currentDir;
 
-   
+
 
     /** Construye la aplicaci&oacute;n principal y establece el
      * <i>Look&Field</i>. */
@@ -96,7 +96,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
                 com.apple.eawt.Application.getApplication().setDefaultMenuBar(this.mainMenu);
             }
             catch (final Exception e) {
-                LOGGER.warning("No se ha podido establecer el menu de Mac OS X, se usara una barra de menu convencional: " + e); //$NON-NLS-1$ 
+                LOGGER.warning("No se ha podido establecer el menu de Mac OS X, se usara una barra de menu convencional: " + e); //$NON-NLS-1$
                 this.window.setJMenuBar(this.mainMenu);
             }
         }
@@ -114,7 +114,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
     }
 
     synchronized void setKeyStoreManager(final AOKeyStoreManager ksm) {
-        LOGGER.info("Establecido KeyStoreManager: " + ksm); //$NON-NLS-1$ 
+        LOGGER.info("Establecido KeyStoreManager: " + ksm); //$NON-NLS-1$
         if (ksm != null) {
             this.ksManager = ksm;
             if (this.currentPanel instanceof SignPanel) {
@@ -138,7 +138,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
             dniManager = new DNIeManager(this);
         }
         catch (final DNIeManagerException e) {
-            LOGGER.warning( 
+            LOGGER.warning(
             "Se omite la pantalla de insercion de DNIe: " + e //$NON-NLS-1$
             );
             showDNIeScreen = false;
@@ -169,7 +169,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
             new SimpleKeyStoreManagerWorker(this, null, false).execute();
         }
         catch (final Exception e) {
-            LOGGER.severe( 
+            LOGGER.severe(
             "No se pudo abrir el almacen por defecto del entorno operativo: " + e //$NON-NLS-1$
             );
             UIUtils.showErrorMessage(
@@ -241,7 +241,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
                 new SimpleKeyStoreManagerWorker(this, null, true).execute();
             }
             catch (final Exception e) {
-                LOGGER.severe( 
+                LOGGER.severe(
                 "Fallo la inicializacion del DNIe, se intentara el almacen por defecto del sistema: " + e //$NON-NLS-1$
                 );
                 loadDefaultKeyStore();
@@ -455,7 +455,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
             ((SignPanel) this.currentPanel).sign();
         }
     }
-    
+
     /** Muestra la ayuda de la aplicaci&oacute;n. */
     public static void showHelp() {
         if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
@@ -467,7 +467,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
                 	if (helpDocument == null || helpDocument.length == 0) {
                 		throw new IOException("No se ha encontrado el fichero de ayuda de Windows"); //$NON-NLS-1$
                 	}
-                	
+
                     if (!helpFile.getParentFile().exists()) {
                     	helpFile.getParentFile().mkdirs();
                     }
@@ -485,7 +485,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
                 return;
             }
             catch(final Exception e) {
-                LOGGER.warning("La ayuda Windows Help no se ha podido cargar, se mostrara JavaHelp: " + e); //$NON-NLS-1$ 
+                LOGGER.warning("La ayuda Windows Help no se ha podido cargar, se mostrara JavaHelp: " + e); //$NON-NLS-1$
             }
         }
         else if (MacHelpHooker.isMacHelpAvailable()) {
@@ -568,7 +568,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
         	}
         	else {
         		JOptionPane.showMessageDialog(
-    				null, 
+    				null,
     				Messages.getString("SimpleAfirma.3"), //$NON-NLS-1$
     				Messages.getString("SimpleAfirma.48"), //$NON-NLS-1$
     				JOptionPane.WARNING_MESSAGE
@@ -576,7 +576,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
         	}
         }
     }
-    
+
     private static boolean isSimpleAfirmaAlreadyRunning() {
     	final File appDir = new File(APPLICATION_HOME);
         if (!appDir.exists()) {
@@ -594,7 +594,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
                             fileLock.release();
                             randomAccessFile.close();
                             file.delete();
-                        } 
+                        }
                         catch (final Exception e) {
                             LOGGER.warning("No se ha podido eliminar el bloqueo de instancia"); //$NON-NLS-1$
                         }
@@ -603,8 +603,8 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
                 return false;
             }
             return true;
-        } 
-        catch (Exception e) {
+        }
+        catch (final Exception e) {
         	LOGGER.warning("No se ha podido comprobar el bloqueo de instancia"); //$NON-NLS-1$
             return false;
         }

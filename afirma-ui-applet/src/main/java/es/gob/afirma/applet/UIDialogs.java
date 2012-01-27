@@ -132,7 +132,7 @@ public final class UIDialogs {
 
         final Set<String> signersSet = new HashSet<String>();
 
-        if (tree == null || tree.getRoot() == null || !(tree.getRoot() instanceof DefaultMutableTreeNode)) {
+        if (tree == null || !(tree.getRoot() instanceof DefaultMutableTreeNode)) {
             throw new AOException("El arbol introducido no es valido"); //$NON-NLS-1$
         }
 

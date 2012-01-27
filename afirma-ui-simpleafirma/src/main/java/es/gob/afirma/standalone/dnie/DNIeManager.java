@@ -20,12 +20,15 @@ import javax.smartcardio.CardException;
 import javax.smartcardio.CardTerminal;
 import javax.smartcardio.TerminalFactory;
 
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.standalone.SimpleAfirma;
 
 /** Gestor de almac&eacute;n (<code>KeyStore</code>) DNIe v&iacute;a PKCS#11 y JSR-268.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class DNIeManager {
+
+	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** Evento que indica que se ha insertado un DNIe. */
     public static final String DNI_INSERTED = "DniInserted"; //$NON-NLS-1$
@@ -143,7 +146,7 @@ public final class DNIeManager {
                     try {
                         this.cardTerminal.waitForCardPresent(0);
                         if (SimpleAfirma.DEBUG) {
-                            System.out.println("Tarjeta insertada en el lector '" + this.cardTerminal.getName() + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+                            LOGGER.info("Tarjeta insertada en el lector '" + this.cardTerminal.getName() + "'"); //$NON-NLS-1$ //$NON-NLS-2$
                         }
                         card = this.cardTerminal.connect("*"); //$NON-NLS-1$
                         validCard = true;
@@ -166,7 +169,7 @@ public final class DNIeManager {
                 try {
                     if (card != null && (!itsDNIe(card.getATR().getBytes()))) {
                         if (SimpleAfirma.DEBUG) {
-                            System.out.println("Detectada tarjeta extrana"); //$NON-NLS-1$
+                            LOGGER.info("Detectada tarjeta extrana: " + AOUtil.hexify(card.getATR().getBytes(), true)); //$NON-NLS-1$
                         }
                         firePropertyChange(NOT_DNI_INSERTED, "", this.cardTerminal.getName()); //$NON-NLS-1$
                         try {
@@ -179,7 +182,7 @@ public final class DNIeManager {
                     }
                     else {
                         if (SimpleAfirma.DEBUG) {
-                            System.out.println("Detectado DNIe"); //$NON-NLS-1$
+                            LOGGER.info("Detectado DNIe"); //$NON-NLS-1$
                         }
                         firePropertyChange(DNI_INSERTED, "", this.cardTerminal.getName()); //$NON-NLS-1$
                         return;

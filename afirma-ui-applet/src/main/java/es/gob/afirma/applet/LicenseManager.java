@@ -23,7 +23,7 @@ final class LicenseManager {
 		// No permitimos la instanciacion
 	}
 
-    private static String LICENSE_FILE = "/resources/licenses"; //$NON-NLS-1$
+    private static final String LICENSE_FILE = "/resources/licenses"; //$NON-NLS-1$
 
     /** recupera el texto de la licencia del Cliente @firma. Si ocurre un error
      * lanza una excepci&oacute;n.

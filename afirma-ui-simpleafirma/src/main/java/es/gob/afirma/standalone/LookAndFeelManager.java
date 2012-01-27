@@ -59,7 +59,7 @@ public final class LookAndFeelManager {
         }
 
         final  Object defaultFontHeight = Toolkit.getDefaultToolkit().getDesktopProperty("win.defaultGUI.font.height"); //$NON-NLS-1$
-        if (defaultFontHeight != null && defaultFontHeight instanceof Integer) {
+        if (defaultFontHeight instanceof Integer) {
            LARGE_FONT = (((Integer) defaultFontHeight).intValue()) > LARGE_FONT_LIMIT;
         }
         // En Linux usmos siempre una configuracion como si se detectase un tamano de fuente grande

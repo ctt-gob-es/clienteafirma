@@ -1,14 +1,15 @@
 package es.gob.afirma.ui.utils;
 
-import javax.swing.*;
-import javax.swing.event.*;
+import javax.swing.JComponent;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 
 /**
  * Clase para dar el foco a un componente determinado.
  */
 public class RequestFocusListener implements AncestorListener
 {
-	private boolean removeListener;
+	private final boolean removeListener;
 
 
 	/**
@@ -23,7 +24,7 @@ public class RequestFocusListener implements AncestorListener
 	 * Constructor.
 	 * @param removeListener
 	 */
-	public RequestFocusListener(boolean removeListener)
+	public RequestFocusListener(final boolean removeListener)
 	{
 		this.removeListener = removeListener;
 	}
@@ -32,18 +33,19 @@ public class RequestFocusListener implements AncestorListener
 	 * Asigna el foco al componente que ha lanzado el evento.
 	 */
 	@Override
-	public void ancestorAdded(AncestorEvent e)
+	public void ancestorAdded(final AncestorEvent e)
 	{
-		JComponent component = e.getComponent();
+		final JComponent component = e.getComponent();
 		component.requestFocusInWindow();
 
-		if (this.removeListener)
+		if (this.removeListener) {
 			component.removeAncestorListener( this );
+		}
 	}
 
 	@Override
-	public void ancestorMoved(AncestorEvent e) { /** No implementado */ }
+	public void ancestorMoved(final AncestorEvent e) { /** No implementado */ }
 
 	@Override
-	public void ancestorRemoved(AncestorEvent e) { /** No implementado */ }
+	public void ancestorRemoved(final AncestorEvent e) { /** No implementado */ }
 }

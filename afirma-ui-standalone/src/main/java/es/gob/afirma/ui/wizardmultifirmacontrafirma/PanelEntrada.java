@@ -71,7 +71,7 @@ final class PanelEntrada extends JAccessibilityDialogWizard {
 	 * Log.
 	 */
 	static Logger logger = Logger.getLogger(PanelEntrada.class.getName());
-	
+
 	/**
 	 * Relacion minima para el redimensionado de componentes.
 	 */
@@ -79,17 +79,17 @@ final class PanelEntrada extends JAccessibilityDialogWizard {
 	public int getMinimumRelation(){
 		return 9;
 	}
-	
+
 	/**
 	 * Configuracion del KeyStore
 	 */
 	private KeyStoreConfiguration kssc = null;
-		
+
 	/**
      * Guarda todas las ventanas del asistente para poder controlar la botonera
      * @param ventanas	Listado con todas las paginas del asistente
      */
-    public void setVentanas(List<JDialogWizard> ventanas) {
+    public void setVentanas(final List<JDialogWizard> ventanas) {
     	this.setBotonera(new Botonera(ventanas, 1));
     	getContentPane().add(getBotonera(), BorderLayout.PAGE_END);
     }
@@ -98,11 +98,11 @@ final class PanelEntrada extends JAccessibilityDialogWizard {
      * Constructor.
      * @param kssc configuracion.
      */
-    public PanelEntrada(KeyStoreConfiguration kssc) {
+    public PanelEntrada(final KeyStoreConfiguration kssc) {
     	this.kssc = kssc;
         initComponents();
     }
-    
+
     // Campo donde se guarda el nombre del fichero de firma
     JTextField campoFirma = new JTextField();
 
@@ -112,71 +112,71 @@ final class PanelEntrada extends JAccessibilityDialogWizard {
     private void initComponents() {
     	// Titulo de la ventana
     	setTitulo(Messages.getString("Wizard.multifirma.simple.contrafirma.titulo")); //$NON-NLS-1$
-    	
+
     	// Panel con la cabecera
-        CabeceraAsistente panelSuperior = new CabeceraAsistente("Wizard.multifirma.simple.contrafirma.ventana1.titulo",  //$NON-NLS-1$
+        final CabeceraAsistente panelSuperior = new CabeceraAsistente("Wizard.multifirma.simple.contrafirma.ventana1.titulo",  //$NON-NLS-1$
         		"Wizard.multifirma.simple.contrafirma.ventana1.titulo.descripcion", null, true); //$NON-NLS-1$
         Utils.setContrastColor(panelSuperior);
         Utils.setFontBold(panelSuperior);
         getContentPane().add(panelSuperior, BorderLayout.NORTH);
 
         // Panel central
-    	JPanel panelCentral = new JPanel();
+    	final JPanel panelCentral = new JPanel();
     	panelCentral.setMinimumSize(new Dimension(603, 289));
     	panelCentral.setLayout(new GridBagLayout());
-        
-    	GridBagConstraints c = new GridBagConstraints();
+
+    	final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
         c.insets = new Insets(20, 20, 0, 20);
         c.gridwidth	= 2;
 		c.weightx = 1.0;
 		c.gridx = 0;
-    	
+
     	// Etiqueta "Fichero de datos:"
-    	JLabel etiquetaFirma = new JLabel();
+    	final JLabel etiquetaFirma = new JLabel();
     	etiquetaFirma.setText(Messages.getString("Wizard.multifirma.simple.contrafirma.ventana1.fichero")); //$NON-NLS-1$
     	Utils.setContrastColor(etiquetaFirma);
     	Utils.setFontBold(etiquetaFirma);
         panelCentral.add(etiquetaFirma, c);
-        
+
         c.insets = new Insets(0, 20, 0, 0);
         c.gridwidth = 1;
         c.gridy	= 1;
-        
+
         // Caja de texto donde se guarda el nombre del archivo de firma
         this.campoFirma.setToolTipText(Messages.getString("Wizard.multifirma.simple.ventana1.fichero.datos.description")); // NOI18N //$NON-NLS-1$
         this.campoFirma.getAccessibleContext().setAccessibleName(etiquetaFirma.getText() + " " + this.campoFirma.getToolTipText() + "ALT + F."); // NOI18N
         this.campoFirma.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.simple.contrafirma.ventana1.fichero.description")); // NOI18N //$NON-NLS-1$
         if (GeneralConfig.isBigCaret()) {
-			Caret caret = new ConfigureCaret();
+			final Caret caret = new ConfigureCaret();
 			this.campoFirma.setCaret(caret);
 		}
         Utils.remarcar(this.campoFirma);
         Utils.setContrastColor(this.campoFirma);
         Utils.setFontBold(this.campoFirma);
         panelCentral.add(this.campoFirma, c);
-        
+
         //Relacion entre etiqueta y campo de texto
         etiquetaFirma.setLabelFor(this.campoFirma);
   		//Asignacion de mnemonico
         etiquetaFirma.setDisplayedMnemonic(KeyEvent.VK_F);
-        
+
         c.insets = new Insets(0, 10, 0, 20);
         c.gridwidth = 1;
         c.weightx = 0.0;
         c.gridy	= 1;
         c.gridx = 1;
-        
-        JPanel panelExaminarFirma = new JPanel(new GridLayout(1, 1));
+
+        final JPanel panelExaminarFirma = new JPanel(new GridLayout(1, 1));
         // Boton examinar (fichero datos)
-        JButton	examinarFirma = new JButton();
+        final JButton	examinarFirma = new JButton();
         examinarFirma.setMnemonic(KeyEvent.VK_E);
         examinarFirma.setText(Messages.getString("PrincipalGUI.Examinar")); //$NON-NLS-1$
         examinarFirma.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description")); //$NON-NLS-1$
         examinarFirma.getAccessibleContext().setAccessibleName(examinarFirma.getText() + " " + examinarFirma.getToolTipText());
         examinarFirma.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent evt) {
+            public void actionPerformed(final ActionEvent evt) {
             	examinarFirmaActionPerformed();
             }
         });
@@ -185,7 +185,7 @@ final class PanelEntrada extends JAccessibilityDialogWizard {
         Utils.setFontBold(examinarFirma);
         panelExaminarFirma.add(examinarFirma);
         panelCentral.add(panelExaminarFirma, c);
-        
+
         c.fill = GridBagConstraints.BOTH;
 		c.insets = new Insets(20, 20, 0, 20);
 		c.gridwidth = 2;
@@ -193,13 +193,13 @@ final class PanelEntrada extends JAccessibilityDialogWizard {
 		c.weighty = 1.0;
 		c.gridx = 0;
 		c.gridy = 2;
-		
+
 		// Panel introducido para poder mantener la linea superior correcta
-		Panel panelVacio = new Panel();
+		final Panel panelVacio = new Panel();
 		panelCentral.add(panelVacio, c);
-        
+
         getContentPane().add(panelCentral, BorderLayout.CENTER);
-    	
+
         // Accesos rapidos al menu de ayuda
         HelpUtils.enableHelpKey(this.campoFirma, "multifirma.wizard.ficherocontrafirma"); //$NON-NLS-1$
 
@@ -209,12 +209,12 @@ final class PanelEntrada extends JAccessibilityDialogWizard {
      * Comprueba si el archivo introducido es correcto y guarda su nombre en el campo de texto
      */
     void examinarFirmaActionPerformed() {
-        File selectedFile = SelectionDialog.showFileOpenDialog(this, Messages.getString("PrincipalGUI.chooser.title")); //$NON-NLS-1$
+        final File selectedFile = SelectionDialog.showFileOpenDialog(this, Messages.getString("PrincipalGUI.chooser.title")); //$NON-NLS-1$
       	if (selectedFile != null) {
       		this.campoFirma.setText(selectedFile.getAbsolutePath());
       	}
     }
-    
+
     /**
 	 * Botonera con funciones para la pagina panel de multifirma - cofirma
 	 */
@@ -230,34 +230,35 @@ final class PanelEntrada extends JAccessibilityDialogWizard {
 		 * @param ventanas lista de ventanas que contiene el wizard.
 		 * @param posicion posicion de la ventana que contiene la botonera.
 		 */
-		public Botonera(List<JDialogWizard> ventanas, int posicion) {
+		public Botonera(final List<JDialogWizard> ventanas, final int posicion) {
 			super(ventanas, posicion);
 		}
 
 		@Override
-		protected void siguienteActionPerformed(JButton anterior,
-				JButton siguiente, JButton finalizar) {
-			
-			String ficheroFirma = PanelEntrada.this.campoFirma.getText();
-			
+		protected void siguienteActionPerformed(final JButton anterior,
+				final JButton siguiente, final JButton finalizar) {
+
+			final String ficheroFirma = PanelEntrada.this.campoFirma.getText();
+
 			if (checkFicheroEntrada(ficheroFirma)) {
-				byte[] dataFile = readFile(ficheroFirma);
-				
-				String formato = getFormatPdfOdfOoxml(dataFile);
-							
+				final byte[] dataFile = readFile(ficheroFirma);
+
+				final String formato = getFormatPdfOdfOoxml(dataFile);
+
 				// Si es PDF, ODF o OOXML lo firmamos y saltamos al final
-				if (formato != null) {	
+				if (formato != null) {
 					CustomDialog.showMessageDialog(getVentanas().get(1), true, Messages.getString("Wizard.multifirma.simple.message"), Messages.getString("informacion"), JOptionPane.INFORMATION_MESSAGE);	  //$NON-NLS-1$//$NON-NLS-2$
-					if (firmarFichero(dataFile, formato, ficheroFirma)) {					
+					if (firmarFichero(dataFile, formato, ficheroFirma)) {
 						// Nos saltamos la pagina 2
 						getVentanas().get(3).setVisibleAndHide(true, getVentanas().get(1));
 					}
 				}
 				else {
 					// Insertamos la ruta del archivo en la siguiente ventana
-					JDialogWizard ventanaSiguiente = getVentanas().get(2);
-					if (((PanelMultifirma) ventanaSiguiente).cargarDatos(ficheroFirma, dataFile))
+					final JDialogWizard ventanaSiguiente = getVentanas().get(2);
+					if (((PanelMultifirma) ventanaSiguiente).cargarDatos(ficheroFirma, dataFile)) {
 						super.siguienteActionPerformed(anterior, siguiente, finalizar);
+					}
 				}
 			}
 		}
@@ -268,53 +269,53 @@ final class PanelEntrada extends JAccessibilityDialogWizard {
 	 * @param ficheroFirma	Ruta del fichero a firmar
 	 * @return	True o false si se ha podido leer bien el fichero
 	 */
-	public boolean checkFicheroEntrada(String ficheroFirma) {
+	public boolean checkFicheroEntrada(final String ficheroFirma) {
 		// Comprobacion de la ruta de fichero de entrada.
 		if (ficheroFirma == null || ficheroFirma.equals("") || !new File(ficheroFirma).exists() && !new File(ficheroFirma).isFile()){ //$NON-NLS-1$
 			CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.simple.error.datos"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Firma el fichero dado
 	 * @param data Datos que se desean firmar.
 	 * @param formato	Formato del archivo a firmar
 	 * @param dataFilepath	Ruta del fichero a firmar
 	 */
-	boolean firmarFichero(byte[] data, String formato, String dataFilepath) {
-		AOSigner aoSigner =  AOSignerFactory.getSigner(formato);
+	boolean firmarFichero(final byte[] data, final String formato, final String dataFilepath) {
+		final AOSigner aoSigner =  AOSignerFactory.getSigner(formato);
 
-		Properties prop = GeneralConfig.getSignConfig();
+		final Properties prop = GeneralConfig.getSignConfig();
 		prop.setProperty("format", formato);
-		
+
 		byte[] signedData = null;
 		try {
-			AOKeyStoreManager keyStoreManager = MultisignUtils.getAOKeyStoreManager(this.kssc, this);
-			
+			final AOKeyStoreManager keyStoreManager = MultisignUtils.getAOKeyStoreManager(this.kssc, this);
+
 			// Recuperamos la clave del certificado
-			PrivateKeyEntry keyEntry = MultisignUtils.getPrivateKeyEntry(this.kssc, keyStoreManager, this);
+			final PrivateKeyEntry keyEntry = MultisignUtils.getPrivateKeyEntry(this.kssc, keyStoreManager, this);
 			signedData = aoSigner.sign(
 					data,
 					GeneralConfig.getSignAlgorithm(),
 					keyEntry,
 					prop
-			);			
-		} 
-		catch (AOException e) {
+			);
+		}
+		catch (final AOException e) {
 			logger.severe("Error al generar la firma electronica: " + e); //$NON-NLS-1$
 			CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.simple.error.generar.firma"),  //$NON-NLS-1$
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
 			return false;
-		} 
-		catch (Exception e) {
+		}
+		catch (final Exception e) {
 			CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.simple.error.generar.firma"),  //$NON-NLS-1$
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
 			return false;
-		} 
-		
+		}
+
 		if (signedData != null) {
 			// Salvamos el fichero de datos
 			final File savedFile = SelectionDialog.saveDataToFile(Messages.getString("Wizard.multifirma.simple.contrafirma.filechooser.save.title"), signedData, //$NON-NLS-1$
@@ -325,60 +326,60 @@ final class PanelEntrada extends JAccessibilityDialogWizard {
 				return false;
 			}
 		}
-		
+
 		return true;
 	}
 
-	byte[] readFile(String filepath) {
+	byte[] readFile(final String filepath) {
 		byte[] data = null;
 		InputStream fileIn = null;
 		try {
 			fileIn = AOUtil.loadFile(AOUtil.createURI(filepath));
 			data = AOUtil.getDataFromInputStream(fileIn);
-		} catch (FileNotFoundException e) {
+		} catch (final FileNotFoundException e) {
 			setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 			CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.simple.error.fichero.encontrar"),  //$NON-NLS-1$
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
 			return null;
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 			CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.simple.error.fichero.leer"),  //$NON-NLS-1$
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
 			return null;
 		}
-		catch (AOException e) {
+		catch (final AOException e) {
 			setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 		} finally {
 			if (fileIn != null) {
-				try { fileIn.close(); } catch (Exception e) { /* se ignora */ }
+				try { fileIn.close(); } catch (final Exception e) { /* se ignora */ }
 			}
 		}
-		
+
 		return data;
 	}
-	
+
 	/**
 	 * Comprueba si los datos correspondientes a la firma son firmas odf, xml o pdf.
-	 * Si no es ninguno de ellos, devuelve {@code null}. 
+	 * Si no es ninguno de ellos, devuelve {@code null}.
 	 * @param sign 	Firma electr&oacute;nica
 	 * @return Formato del archivo
 	 */
-	static String getFormatPdfOdfOoxml(byte[] sign){
-	    
+	static String getFormatPdfOdfOoxml(final byte[] sign){
+
 	    final String[][] signersClass = {
 	            {"es.gob.afirma.signers.pades.AOPDFSigner", AOSignConstants.SIGN_FORMAT_PDF},//$NON-NLS-1$
 	            {"es.gob.afirma.signers.odf.AOODFSigner", AOSignConstants.SIGN_FORMAT_ODF}, //$NON-NLS-1$
 	            {"es.gob.afirma.signers.ooxml.AOOOXMLSigner", AOSignConstants.SIGN_FORMAT_OOXML}, //$NON-NLS-1$
 	    };
-	    
-	    for (String[] signer : signersClass) {
+
+	    for (final String[] signer : signersClass) {
 	        try {
-	            Class<?> signerClass = Class.forName(signer[0]);
-	            AOSigner signerObject = (AOSigner) signerClass.newInstance();
+	            final Class<?> signerClass = Class.forName(signer[0]);
+	            final AOSigner signerObject = (AOSigner) signerClass.newInstance();
 	            if (signerObject.isValidDataFile(sign)) {
 	                return signer[1];
 	            }
-	        } catch (Exception e) {
+	        } catch (final Exception e) {
 	            /* Si falla un signer continuamos con el resto */
 	        	Logger.getLogger("es.gob.afirma").severe("Error en la obtencion del firmador: " + e); //$NON-NLS-1$ //$NON-NLS-2$
 	        }
