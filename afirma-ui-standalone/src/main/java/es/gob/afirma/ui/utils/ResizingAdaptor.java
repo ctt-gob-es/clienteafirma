@@ -319,7 +319,7 @@ final class ResizingAdaptor extends ComponentAdapter {
 					float resizeFactor = 0;
 					if (this.theCustomDialog != null) {
 						resizeFactor = getImageResizeFactor(Constants.RESIZING_IMAGES_FACTOR + 0.0010);
-					} else if(this.theFileChooser != null){
+					} else if(this.theFileChooser != null || this.theFileChooserToSave != null){
 						resizeFactor = getImageResizeFactor(Constants.RESIZING_IMAGES_FACTOR + 0.0005);
 					} else {
 						resizeFactor = getImageResizeFactor(Constants.RESIZING_IMAGES_FACTOR);

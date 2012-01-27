@@ -391,6 +391,11 @@ public class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
     	}
 	}
 	
+	/**
+	 * Genera el panel que contiene los botones de restaurar y maximizar.
+	 * Aplica accesibilidad sobre los botones.
+	 * @return JPanel con los botones de restaurar y maximizar
+	 */
 	private JPanel createAccessibilityButtonsPanel() {
 		JPanel panelAccesibilidad = new JPanel(new GridBagLayout());
 		
@@ -401,14 +406,6 @@ public class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
 		//Panel que va a contener los botones de accesibilidad
 		JPanel panel = new JPanel(new GridBagLayout());
 		
-		//panel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-		//panel.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
-		//panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
-		//panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-		//panel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-		//panel.setBorder(BorderFactory.createCompoundBorder());
-		//panel.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.BLACK));
-		
 		//Restricciones para los botones
 		GridBagConstraints consButtons = new GridBagConstraints();
 		consButtons.fill = GridBagConstraints.BOTH;
@@ -417,13 +414,11 @@ public class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
 		consButtons.weightx = 1.0;
 		consButtons.weighty = 1.0;
 		consButtons.insets = new Insets(0,0,0,0);  //right padding
-		//consButtons.anchor=GridBagConstraints.EAST;
 		
 		Dimension dimension = new Dimension(25, 25);
 		
 		//Restore button
 		JPanel restorePanel = new JPanel();
-		//this.restoreButton = getButton("r", KeyEvent.VK_R );
 		ImageIcon imageIconRestore= new ImageIcon(JAccessibilityFileChooser.class.getResource("/resources/images/restore.png"));
 		imageIconRestore = new ImageIcon(imageIconRestore.getImage().getScaledInstance(dimension.width, dimension.height, Image.SCALE_SMOOTH));
 		this.restoreButton = new JButton(imageIconRestore);
@@ -444,9 +439,7 @@ public class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
 			}
 		});
 		this.restoreButton.setPreferredSize(dimension);
-		
-		//this.restoreButton.setBorder(null); //Eliminar Borde, ayuda a centrar el iconod el boton
-		//this.restoreButton.setContentAreaFilled(false); //area del boton invisible
+
 		this.restoreButton.setName("restaurar");
 		Utils.remarcar(this.restoreButton);
 		restorePanel.add(this.restoreButton);
@@ -463,7 +456,6 @@ public class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
 		
 		
 		consButtons.gridx = 1;
-		//consButtons.weightx = 0.5;
 		consButtons.insets = new Insets(0,0,0,5);  //right padding
 		
 		//Maximize button
@@ -475,16 +467,12 @@ public class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
 		this.maximizeButton.setMnemonic(KeyEvent.VK_M );
 		this.maximizeButton.setToolTipText(Messages.getString("Wizard.maximizar.description"));
 		this.maximizeButton.getAccessibleContext().setAccessibleName(this.maximizeButton.getToolTipText());	
-
-		//this.maximizeButton.setBorder(null); //Eliminar Borde, ayuda a centrar el iconod el boton
-		//this.maximizeButton.setContentAreaFilled(false); //area del boton invisible
 		
 		this.maximizeButton.setName("maximizar");
 		//Se asigna una dimension por defecto
 		this.maximizeButton.setPreferredSize(dimension);
 				
 		Utils.remarcar(this.maximizeButton);
-		//maximizePanel.add(this.maximizeButton, consMaximizePanel);
 		maximizePanel.add(this.maximizeButton);	
 		
 		this.maximizeButton.addFocusListener(new FocusListener() {
@@ -518,7 +506,6 @@ public class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
 		c.gridy = 0;
 		c.weightx = 1.0;
 		c.weighty = 1.0;
-		//c.insets = new Insets(3,3,0,3);
 		c.insets = new Insets(0,0,0,0); 
 		c.anchor=GridBagConstraints.EAST;
 		panelAccesibilidad.add(panel, c);
@@ -555,12 +542,13 @@ public class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
     			setMinimumSize(new Dimension(getSize().width, getSize().height));
     		}
 		}
-//		this.maximizar.setEnabled (true);
-//		this.restaurar.setEnabled (false);
 		this.maximizeButton.setEnabled (true);
 		this.restoreButton.setEnabled (false);
 	}
 	
+	/**
+	 * Maximiza la ventana
+	 */
 	public void maximizarActionPerformed(){
 		actualPositionX = theDialog.getX();
 		actualPositionY = theDialog.getY();
@@ -585,6 +573,10 @@ public class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
 		}
 	}
 
+	/**
+	 * Devuelve el panel de botones de maximizar/restaurar
+	 * @return JPanel con los botones de maximizar/restaurar
+	 */
 	public JPanel getAccesibilityButtonsPanel(){
 		return this.accesibilityButtonsPanel;
 	}
