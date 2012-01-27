@@ -36,21 +36,25 @@ public class JAccessibilityFileChooserAccessibilityTest {
 	public void testNotDuplicatedDisplayedMnemonic() {
 		logger.info("testNotDuplicatedDisplayedMnemonic"); //$NON-NLS-1$
 
-		//Instancia del contenedor que se va a analizar
-		JAccessibilityFileChooser fileChooser= new JAccessibilityFileChooser(null);
-
-		//Lista de mnemonicos
-		List <Integer> keyCodes = new ArrayList<Integer>();
-		//Conjunto de mnemonicos
-		Set <Integer> keyCodesSet = null;
-		
-		//Se llama al metodo que obtiene una lista de codigos de atajos asociados a los componentes del panel
-		getKeyCodeList (fileChooser, keyCodes);
-
-		//Se crea un conjunto a partir de la lista para eliminar duplicados
-		keyCodesSet = new HashSet<Integer>(keyCodes);
-		//Si el tamano de la lista y del conjunto no son iguales, no hay duplicados
-		assertTrue(keyCodesSet.size() == keyCodes.size());
+		try {
+			//Instancia del contenedor que se va a analizar
+			JAccessibilityFileChooser fileChooser= new JAccessibilityFileChooser(null);
+	
+			//Lista de mnemonicos
+			List <Integer> keyCodes = new ArrayList<Integer>();
+			//Conjunto de mnemonicos
+			Set <Integer> keyCodesSet = null;
+			
+			//Se llama al metodo que obtiene una lista de codigos de atajos asociados a los componentes del panel
+			getKeyCodeList (fileChooser, keyCodes);
+	
+			//Se crea un conjunto a partir de la lista para eliminar duplicados
+			keyCodesSet = new HashSet<Integer>(keyCodes);
+			//Si el tamano de la lista y del conjunto no son iguales, no hay duplicados
+			assertTrue(keyCodesSet.size() == keyCodes.size());
+		} catch (final java.awt.HeadlessException e) {
+			// Ignoramos este error, pero no otros, para evitar fallos en tests automaticos en servidor
+		}
 	}
 	
 	/**
