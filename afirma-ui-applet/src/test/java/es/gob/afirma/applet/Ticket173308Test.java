@@ -109,7 +109,7 @@ public class Ticket173308Test {
 	 * Genera la firma de un documento y su guardado al recuperarla con el
 	 * m&eacute;todo getBase64FromText().
 	 */
-	@SuppressWarnings("static-method")
+	@SuppressWarnings({ "static-method", "deprecation" })
 	@Test
 	public void getSignatureTextTest() {
 
@@ -142,7 +142,7 @@ public class Ticket173308Test {
 	 * Genera la firma de un documento y su guardado al recuperarla con el
 	 * m&eacute;todo getSignatureText() y transformar a Base64 con getBase64FromText().
 	 */
-	@SuppressWarnings("static-method")
+	@SuppressWarnings({ "static-method", "deprecation" })
 	@Test
 	public void getBase64FromTextTest() {
 

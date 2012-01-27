@@ -23,11 +23,44 @@ import javax.swing.JOptionPane;
 public final class AsynchronousSaveData implements Runnable {
 
 	private final byte[] dataToSave;
+
+	byte[] getDataToSave() {
+		return this.dataToSave;
+	}
+
 	private String savingTarget;
+
+	void setSavingTarget(final String target) {
+		this.savingTarget = target;
+	}
+
+	String getSavingTarget() {
+		return this.savingTarget;
+	}
+
 	private final String[] extensions;
+
+	String[] getExtensions() {
+		return this.extensions;
+	}
+
 	private String description = AppletMessages.getString("AsynchronousSaveData.0"); //$NON-NLS-1$
+
+	String getDescription() {
+		return this.description;
+	}
+
 	private final Frame parent;
+
+	Frame getParent() {
+		return this.parent;
+	}
+
 	private final boolean showDialogIfError;
+
+	boolean getShowDialogIfError() {
+		return this.showDialogIfError;
+	}
 
     /** Crea una clase para el guardado as&iacute;ncrono de datos en disco.
      * @param data
@@ -66,15 +99,19 @@ public final class AsynchronousSaveData implements Runnable {
     public void run() {
         AccessController.doPrivileged(new java.security.PrivilegedAction<Void>() {
             public Void run() {
-                if (AsynchronousSaveData.this.savingTarget == null || "".equals(AsynchronousSaveData.this.savingTarget)) { //$NON-NLS-1$
+                if (AsynchronousSaveData.this.getSavingTarget() == null || "".equals(AsynchronousSaveData.this.getSavingTarget())) { //$NON-NLS-1$
                     try {
-                        AsynchronousSaveData.this.savingTarget = UIDialogs.getSaveFileName(AsynchronousSaveData.this.extensions, AsynchronousSaveData.this.description, AsynchronousSaveData.this.parent);
+                        AsynchronousSaveData.this.setSavingTarget(UIDialogs.getSaveFileName(
+                    		AsynchronousSaveData.this.getExtensions(),
+                    		AsynchronousSaveData.this.getDescription(),
+                    		AsynchronousSaveData.this.getParent()
+                		));
                     }
                     catch (final Exception e) {
                         Logger.getLogger("es.gob.afirma").severe("El nombre de fichero para guardar los datos no es valido: " + e); //$NON-NLS-1$ //$NON-NLS-2$
                         return null;
                     }
-                    if (AsynchronousSaveData.this.savingTarget == null) {
+                    if (AsynchronousSaveData.this.getSavingTarget() == null) {
                         Logger.getLogger("es.gob.afirma").severe("No se establecio un nombre de fichero de salida"); //$NON-NLS-1$ //$NON-NLS-2$
                         return null;
                     }
@@ -83,14 +120,14 @@ public final class AsynchronousSaveData implements Runnable {
                 // Aqui ya tenemos un nombre de salida
                 OutputStream fos = null;
                 try {
-                    fos = new FileOutputStream(AsynchronousSaveData.this.savingTarget);
-                    fos.write(AsynchronousSaveData.this.dataToSave);
+                    fos = new FileOutputStream(AsynchronousSaveData.this.getSavingTarget());
+                    fos.write(AsynchronousSaveData.this.getDataToSave());
                     fos.flush();
                 }
                 catch (final Exception e) {
                     Logger.getLogger("es.gob.afirma").severe("No se pudieron almacenar los datos en disco: " + e);  //$NON-NLS-1$//$NON-NLS-2$
-                    if (AsynchronousSaveData.this.showDialogIfError) {
-                        JOptionPane.showMessageDialog(AsynchronousSaveData.this.parent,
+                    if (AsynchronousSaveData.this.getShowDialogIfError()) {
+                        JOptionPane.showMessageDialog(AsynchronousSaveData.this.getParent(),
                                                       AppletMessages.getString("AsynchronousSaveData.1"), //$NON-NLS-1$
                                                       AppletMessages.getString("SignApplet.156"), //$NON-NLS-1$
                                                       JOptionPane.ERROR_MESSAGE);
