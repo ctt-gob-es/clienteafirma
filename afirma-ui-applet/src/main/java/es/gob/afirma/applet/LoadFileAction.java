@@ -11,6 +11,7 @@
 package es.gob.afirma.applet;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.security.PrivilegedExceptionAction;
@@ -50,7 +51,7 @@ public final class LoadFileAction implements PrivilegedExceptionAction<byte[]> {
     }
 
     /** {@inheritDoc} */
-    public byte[] run() throws FileNotFoundException, Exception {
+    public byte[] run() throws FileNotFoundException, IOException {
 
         InputStream is = null;
         try {
@@ -61,7 +62,7 @@ public final class LoadFileAction implements PrivilegedExceptionAction<byte[]> {
             throw new FileNotFoundException("El fichero '" + this.uri.toASCIIString() + "' no existe"); //$NON-NLS-1$ //$NON-NLS-2$
         }
         catch (final Exception e) {
-            throw new Exception("No se pudo acceder al fichero '" + this.uri.toASCIIString() + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
+            throw new IOException("No se pudo acceder al fichero '" + this.uri.toASCIIString() + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
         }
         finally {
             if (is != null) {

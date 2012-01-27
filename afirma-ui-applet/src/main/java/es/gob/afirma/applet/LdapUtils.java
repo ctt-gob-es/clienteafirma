@@ -10,7 +10,11 @@
 
 package es.gob.afirma.applet;
 
+import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertStore;
+import java.security.cert.CertStoreException;
 import java.security.cert.Certificate;
 import java.security.cert.LDAPCertStoreParameters;
 import java.security.cert.X509CertSelector;
@@ -31,9 +35,12 @@ public final class LdapUtils {
      * @param port Puerto del servidor.
      * @param principal Principal del certificado a recuperar.
      * @return Certificado recuperado.
-     * @throws Exception Cuando ocurre alg&uacute;n error durante la recuperaci&oacute;n.
+     * @throws IOException
+     * @throws NoSuchAlgorithmException Si no se puede obtener el certificado a partir del <i>Principal</i>
+     * @throws InvalidAlgorithmParameterException Si falla la inicalizaci&oacute;n del <code>CertStore</code>
+     * @throws CertStoreException Si el sistema no soporta los <code>CertStore</code> de tipo LDAP
      */
-    public static X509Certificate getCertificate(final String server, final int port, final String principal) throws Exception {
+    public static X509Certificate getCertificate(final String server, final int port, final String principal) throws IOException, CertStoreException, InvalidAlgorithmParameterException, NoSuchAlgorithmException {
         if (server == null || server.length() == 0) {
 			throw new NullPointerException("El servidor no puede ser nulo ni vacio"); //$NON-NLS-1$
 		}
