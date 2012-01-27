@@ -187,12 +187,12 @@ public final class Constants {
     /**
      * Nombre del nodo en el que se guardan las Preferences
      */
-    public static String ourNodeName = "es.gob.afirma";
+    public static final String ourNodeName = "es.gob.afirma"; //$NON-NLS-1$
 
     /**
      * Nombre del usuario por defecto
      */
-    public static String defaultUser = "Por defecto";
+    public static final String defaultUser = "Por defecto";
 
     /**
      * Margen a restar para calcular el tamano de una ventana maximizada para linux.

@@ -94,7 +94,7 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
         }
     }
     /** Log. */
-    static Logger logger = Logger.getLogger(PanelRemitentes.class.getName());
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** UID. */
     private static final long serialVersionUID = 1L;
@@ -172,7 +172,7 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
             keyStoreManager = AOKeyStoreManagerFactory.getAOKeyStoreManager(ao, lib, null, getPreferredPCB(ao), this);
         }
         catch (final AOCancelledOperationException e) {
-            logger.info("Operacion cancelada por el usuario"); //$NON-NLS-1$
+            LOGGER.info("Operacion cancelada por el usuario"); //$NON-NLS-1$
             return;
         }
         catch (final IOException e) {
@@ -192,7 +192,7 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
             return;
         }
         catch (final Exception e) {
-            logger.severe("No se ha podido abrir el almacen de certificados: " + e); //$NON-NLS-1$
+            LOGGER.severe("No se ha podido abrir el almacen de certificados: " + e); //$NON-NLS-1$
             CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.sobres.error.certificados.almacen"), //$NON-NLS-1$
                                            Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
             return;
@@ -243,7 +243,7 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
                 return;
             }
             catch (final AOException e) {
-                logger.warning("Error al obtener la clave del certificado: " + e); //$NON-NLS-1$
+                LOGGER.warning("Error al obtener la clave del certificado: " + e); //$NON-NLS-1$
                 CustomDialog.showMessageDialog(this, true, Messages.getString("Ensobrado.msg.error.clave"), //$NON-NLS-1$
                                                Messages.getString("error"), //$NON-NLS-1$
                                                JOptionPane.ERROR_MESSAGE);
@@ -365,7 +365,7 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
 
         }
         catch (final AOCancelledOperationException e) {
-            logger.info("La operacion ha sido cancelada por el usuario: " + e); //$NON-NLS-1$
+            LOGGER.info("La operacion ha sido cancelada por el usuario: " + e); //$NON-NLS-1$
             CustomDialog.showMessageDialog(this,
                                            true,
                                            Messages.getString("Ensobrado.msg.error.generacion"), //$NON-NLS-1$
@@ -374,7 +374,7 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
             return false;
         }
         catch (final FileNotFoundException e) {
-            logger.warning("No se puede encontrar el fichero seleccionado: " + e); //$NON-NLS-1$
+            LOGGER.warning("No se puede encontrar el fichero seleccionado: " + e); //$NON-NLS-1$
             CustomDialog.showMessageDialog(this,
                                            true,
                                            Messages.getString("WizardCifrado.error.encontrar.fichero"), //$NON-NLS-1$
@@ -383,7 +383,7 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
             return false;
         }
         catch (final IOException e) {
-            logger.warning("No ha sido posible leer el fichero indicado: " + e); //$NON-NLS-1$
+            LOGGER.warning("No ha sido posible leer el fichero indicado: " + e); //$NON-NLS-1$
             CustomDialog.showMessageDialog(this,
                                            true,
                                            Messages.getString("Cifrado.msg.error.lectura.generico"), //$NON-NLS-1$
@@ -392,7 +392,7 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
             return false;
         }
         catch (final Exception e) {
-            logger.warning("Error durante la desenvoltura: " + e); //$NON-NLS-1$
+            LOGGER.warning("Error durante la desenvoltura: " + e); //$NON-NLS-1$
             CustomDialog.showMessageDialog(this,
                                            true,
                                            Messages.getString("WizardCifrado.error.desenvoltura"), //$NON-NLS-1$
@@ -462,7 +462,7 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
         	throw e;
         }
         catch (final Exception e) {
-            logger.severe("No se ha podido obtener el certicado con el alias '" + seleccionado + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+            LOGGER.severe("No se ha podido obtener el certicado con el alias '" + seleccionado + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
             throw new AOException(e.getMessage());
         }
 

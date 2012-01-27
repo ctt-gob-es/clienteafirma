@@ -85,15 +85,15 @@ final class PanelDestinatarios extends JAccessibilityDialogWizard {
         }
     }
     /** log. */
-    static Logger logger = Logger.getLogger(PanelDestinatarios.class.getName());
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
     /** UID. */
     private static final long serialVersionUID = 1L;
 
     /** Lista de certificados. */
-    List<CertificateDestiny> listaCertificados = new ArrayList<CertificateDestiny>();
+    private final List<CertificateDestiny> listaCertificados = new ArrayList<CertificateDestiny>();
 
     /** Lista con los destinatarios. */
-    JList listaDestinatarios = new JList();
+    private final JList listaDestinatarios = new JList();
 
     /** Constructor. */
     public PanelDestinatarios() {
@@ -130,7 +130,7 @@ final class PanelDestinatarios extends JAccessibilityDialogWizard {
             keyStoreManager = AOKeyStoreManagerFactory.getAOKeyStoreManager(ao, lib, null, getPreferredPCB(ao), this);
         }
         catch (final AOCancelledOperationException e) {
-            logger.info("Operacion cancelada por el usuario"); //$NON-NLS-1$
+            LOGGER.info("Operacion cancelada por el usuario"); //$NON-NLS-1$
             return;
         }
         catch (final IOException e) {
@@ -143,7 +143,7 @@ final class PanelDestinatarios extends JAccessibilityDialogWizard {
             return;
         }
         catch (final Exception e) {
-            logger.severe("No se ha podido abrir el almacen de certificados: " + e); //$NON-NLS-1$
+            LOGGER.severe("No se ha podido abrir el almacen de certificados: " + e); //$NON-NLS-1$
             CustomDialog.showMessageDialog(this,
                                            true,
                                            Messages.getString("Wizard.sobres.error.abrir.almacen"), //$NON-NLS-1$

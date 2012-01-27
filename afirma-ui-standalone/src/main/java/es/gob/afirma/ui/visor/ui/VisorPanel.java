@@ -73,12 +73,12 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
     /**
      * Boton de maximizar.
      */
-    JButton maximizeButton = null;
+    private JButton maximizeButton = null;
 
     /**
      * Boton de restaurar.
      */
-    JButton restoreButton = null;
+    private JButton restoreButton = null;
 
     /** Construye un panel con la informaci&oacute;n extra&iacute;da de una firma. Si no se
      * indica la firma, esta se cargar&aacute; desde un fichero. Es obligatorio introducir

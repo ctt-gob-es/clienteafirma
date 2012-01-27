@@ -75,6 +75,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 
     /** Botonera con funciones para la pagina panel de multifirma - cofirma */
     private class Botonera extends BotoneraInferior {
+
         /** UID. */
         private static final long serialVersionUID = 1L;
 
@@ -118,7 +119,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
     private static final long serialVersionUID = 1L;
 
     // Arbol de firmas
-    final JTree arbolFirmas = new JTree();
+    private final JTree arbolFirmas = new JTree();
 
     // Combo con las opciones de firma
     private final JComboBox comboFirmas = new JComboBox();
@@ -230,13 +231,13 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
         if (this.comboFirmas.getSelectedIndex() == 1) {
             panelArbol.setVisible(false);
             panelLista.setVisible(true);
-            etiqueta.setText(Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.listaFirmantes"));
+            etiqueta.setText(Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.listaFirmantes")); //$NON-NLS-1$
         }
         // Mostramos el arbol para todos los demas casos
         else {
             panelArbol.setVisible(true);
             panelLista.setVisible(false);
-            etiqueta.setText(Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.arbol"));
+            etiqueta.setText(Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.arbol")); //$NON-NLS-1$
         }
     }
     /** Cofirma de un fichero de datos.

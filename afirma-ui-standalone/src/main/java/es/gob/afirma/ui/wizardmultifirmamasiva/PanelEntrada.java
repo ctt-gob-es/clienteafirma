@@ -101,16 +101,16 @@ final class PanelEntrada extends JAccessibilityDialogWizard {
     private static final long serialVersionUID = 1L;
 
     /** Caja de texto donde se guarda el directorio. */
-    final JTextField campoDirectorio = new JTextField();
+    private final JTextField campoDirectorio = new JTextField();
 
     /** Caja de texto para escribir las extensiones. */
-    final JTextField campoExtensiones = new JTextField();
+    private final JTextField campoExtensiones = new JTextField();
 
     /** Checkbox con el texto "Incluir subdirectorios...". */
-    final JCheckBox checkIncluir = new JCheckBox();
+    private final JCheckBox checkIncluir = new JCheckBox();
 
     /** Indica si el asistente se ha saltado la pagina anterior. */
-    boolean salto = false;
+    private boolean salto = false;
 
     /** Constructor. */
     PanelEntrada() {

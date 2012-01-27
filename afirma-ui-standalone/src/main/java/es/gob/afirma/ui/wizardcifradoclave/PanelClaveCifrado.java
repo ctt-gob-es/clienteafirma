@@ -93,7 +93,7 @@ final class PanelClaveCifrado extends JAccessibilityDialogWizard {
         }
     }
     /** Log. */
-    static Logger logger = Logger.getLogger(PanelClaveCifrado.class.getName());
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");
 
     /** UID. */
     private static final long serialVersionUID = 1L;
@@ -137,7 +137,7 @@ final class PanelClaveCifrado extends JAccessibilityDialogWizard {
             this.checkGuardar.setEnabled(false);
         }
         catch (final AOCancelledOperationException e) {
-            logger.warning("El usuario ha cancelado la recuperacion de claves de cifrado del almacen" //$NON-NLS-1$
+            LOGGER.warning("El usuario ha cancelado la recuperacion de claves de cifrado del almacen" //$NON-NLS-1$
             );
         }
         catch (final IOException e) {
@@ -163,7 +163,7 @@ final class PanelClaveCifrado extends JAccessibilityDialogWizard {
             generateKey(this.cipherConfig.getConfig());
         }
         catch (final Exception ex) {
-            logger.log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, null, ex);
         }
 
         this.campoClave.setText(Base64.encode(this.cipherKey.getEncoded()));
@@ -186,7 +186,7 @@ final class PanelClaveCifrado extends JAccessibilityDialogWizard {
             this.cipherKey = this.cipherConfig.getCipher().decodeKey(Base64.decode(this.campoClave.getText()), this.cipherConfig.getConfig(), null);
         }
         catch (final Exception ex) {
-            logger.severe("Error durante el proceso de generacion de claves: " + ex); //$NON-NLS-1$
+            LOGGER.severe("Error durante el proceso de generacion de claves: " + ex); //$NON-NLS-1$
             CustomDialog.showMessageDialog(this,
                                            true,
                                            Messages.getString("Cifrado.msg.error.cifrado"), //$NON-NLS-1$
@@ -201,21 +201,21 @@ final class PanelClaveCifrado extends JAccessibilityDialogWizard {
             fileContent = getFileContent();
         }
         catch (final NullPointerException ex) {
-            logger.warning("No se ha indicado un fichero de datos: " + ex); //$NON-NLS-1$
+            LOGGER.warning("No se ha indicado un fichero de datos: " + ex); //$NON-NLS-1$
             CustomDialog.showMessageDialog(this,
                                            true,
                                            Messages.getString("Cifrado.msg.error.fichero"), Messages.getString("Cifrado.msg.titulo"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
             return false;
         }
         catch (final FileNotFoundException ex) {
-            logger.warning("No se encuentra el fichero: " + ex); //$NON-NLS-1$
+            LOGGER.warning("No se encuentra el fichero: " + ex); //$NON-NLS-1$
             CustomDialog.showMessageDialog(this,
                                            true,
                                            Messages.getString("Cifrado.msg.error.lectura"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
             return false;
         }
         catch (final Exception ex) {
-            logger.warning("Error al leer el fichero: " + ex); //$NON-NLS-1$
+            LOGGER.warning("Error al leer el fichero: " + ex); //$NON-NLS-1$
             CustomDialog.showMessageDialog(this,
                                            true,
                                            Messages.getString("Cifrado.msg.error.lectura"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
@@ -228,13 +228,13 @@ final class PanelClaveCifrado extends JAccessibilityDialogWizard {
             result = this.cipherConfig.getCipher().cipher(fileContent, this.cipherConfig.getConfig(), this.cipherKey);
         }
         catch (final KeyException e) {
-            logger.severe("Clave no valida: " + e); //$NON-NLS-1$
+            LOGGER.severe("Clave no valida: " + e); //$NON-NLS-1$
             CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.error.clave"), //$NON-NLS-1$
                                            Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
             return false;
         }
         catch (final Exception ex) {
-            logger.warning("Error al cifrar: " + ex); //$NON-NLS-1$
+            LOGGER.warning("Error al cifrar: " + ex); //$NON-NLS-1$
             CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.error.operacion"), //$NON-NLS-1$
                                            Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
 

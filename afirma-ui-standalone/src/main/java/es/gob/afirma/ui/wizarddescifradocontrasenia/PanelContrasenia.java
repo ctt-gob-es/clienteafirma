@@ -63,7 +63,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 	/**
 	 * Log.
 	 */
-	static Logger logger = Logger.getLogger(PanelContrasenia.class.getName());
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	/**
 	 * Ruta donde se encuentra el archivo a cifrar
@@ -78,7 +78,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 	/**
 	 * Campo donde se guarda la contrasenia.
 	 */
-    JPasswordField campoContrasenia = new JPasswordField();
+	private final JPasswordField campoContrasenia = new JPasswordField();
 
     /**
 	 * Relacion minima para el redimensionado de componentes.
@@ -282,17 +282,17 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 			fileContent = getFileContent();
 		}
 		catch (final NullPointerException ex) {
-			logger.warning("No se ha indicado un fichero de datos: " + ex); //$NON-NLS-1$
+			LOGGER.warning("No se ha indicado un fichero de datos: " + ex); //$NON-NLS-1$
 			CustomDialog.showMessageDialog(this, true, Messages.getString("Descifrado.msg.fichero"), //$NON-NLS-1$
 					Messages.getString("Descifrado.btndescifrar"),JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$
 			return false;
 		} catch (final FileNotFoundException ex) {
-			logger.warning("Error al leer el fichero: " + ex); //$NON-NLS-1$
+			LOGGER.warning("Error al leer el fichero: " + ex); //$NON-NLS-1$
 			CustomDialog.showMessageDialog(this, true, Messages.getString("Descifrado.msg.fichero2"),  //$NON-NLS-1$
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
 			return false;
 		} catch (final Exception ex) {
-			logger.warning("Error durante la lectura del fichero de datos: " + ex); //$NON-NLS-1$
+			LOGGER.warning("Error durante la lectura del fichero de datos: " + ex); //$NON-NLS-1$
 			CustomDialog.showMessageDialog(this, true, Messages.getString("Descifrado.msg.fichero2"),  //$NON-NLS-1$
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
 			return false;
@@ -304,13 +304,13 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 			result = this.cipherConfig.getCipher().decipher(fileContent, this.cipherConfig.getConfig(), tmpKey);
 		}
 		catch (final InvalidKeyException e) {
-			logger.severe("Contrasena no valida: " + e); //$NON-NLS-1$
+			LOGGER.severe("Contrasena no valida: " + e); //$NON-NLS-1$
 			CustomDialog.showMessageDialog(this, true, Messages.getString("Descifrado.msg.error.contrasenia"),  //$NON-NLS-1$
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
 			return false;
 		}
 		catch (final Exception ex) {
-			logger.severe("Error al descifrar: " + ex); //$NON-NLS-1$
+			LOGGER.severe("Error al descifrar: " + ex); //$NON-NLS-1$
 			CustomDialog.showMessageDialog(this, true,
 					Messages.getString("Descifrado.msg.error.operacion"), Messages.getString("error"), //$NON-NLS-1$ //$NON-NLS-2$
 					JOptionPane.ERROR_MESSAGE);
