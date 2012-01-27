@@ -36,8 +36,6 @@ public class Main {
     /** Preferencias generales establecidas para el aplicativo. */
 	private static final Preferences PREFERENCES = Preferences.userRoot().node(Constants.ourNodeName);
 
-	private static boolean showHelp = false;
-
     /** Versi&oacute;n de la interfaz gr&aacute;fica de escritorio. */
     public static final String VERSION = "2.0"; //$NON-NLS-1$
 

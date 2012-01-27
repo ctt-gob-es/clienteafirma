@@ -143,7 +143,6 @@ final class XAdESCoSigner {
      * </dl>
      * @return Cofirma en formato XAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-    @SuppressWarnings("unused")
 	static byte[] cosign(final byte[] data,
                          final byte[] sign,
                          final String algorithm,

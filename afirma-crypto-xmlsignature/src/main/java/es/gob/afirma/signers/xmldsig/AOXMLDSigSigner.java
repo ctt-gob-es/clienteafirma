@@ -89,7 +89,6 @@ import es.gob.afirma.signers.xml.XMLConstants;
 
 /** Manejador de firmas XML en formato XMLDSig.
  * @version 0.2 */
-@SuppressWarnings("restriction")
 public final class AOXMLDSigSigner implements AOSigner {
 
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$

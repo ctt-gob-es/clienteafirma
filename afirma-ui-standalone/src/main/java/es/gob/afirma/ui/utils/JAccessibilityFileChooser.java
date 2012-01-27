@@ -50,12 +50,12 @@ import es.gob.afirma.ui.principal.PrincipalGUI;
  *
  */
 public class JAccessibilityFileChooser extends JFileChooser{
-	
+
 	/**
 	 * Serial version ID.
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	private JDialog theDialog;
 	private JToolBar jTool;
 	private ResizingAdaptor resizingAdaptor;
@@ -64,7 +64,7 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	private JButton restoreButton = null;
 	private JButton maximizeButton = null;
 	private JPanel accesibilityButtonsPanel = null;
-	
+
 	protected static int actualPositionX = -1;
 	protected static int actualPositionY = -1;
 	protected static int actualWidth = -1;
@@ -76,7 +76,7 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	int getMinimumRelation(){
 		return 9;
 	}
-	
+
 	/**
 	 * Constructor.
 	 */
@@ -91,12 +91,12 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	 * Constructor.
 	 * @param file directorio.
 	 */
-	public JAccessibilityFileChooser (File file)
+	public JAccessibilityFileChooser (final File file)
 	 {
 		super(file);
 		init();
-		
-		
+
+
 
 	 }//constructor
 
@@ -108,23 +108,23 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	    if (GeneralConfig.isHighContrast()){
 			setHighContrast(this);
 		}
-        
+
 		//Asignacion de mnemonics
-		
+
 		//Etiqueta buscar en ...
 		setLabelMnemonics(this, "FileChooser.lookInLabelText", KeyEvent.VK_B); //$NON-NLS-1$
-		
+
 		//Boton Cancelar
 		setButtonMnemonics(this, "FileChooser.cancelButtonText", KeyEvent.VK_C); //$NON-NLS-1$
-		
+
 		//Boton Abrir
 		setButtonMnemonics(this, "FileChooser.openButtonText", KeyEvent.VK_A); //$NON-NLS-1$
-		
+
 		//Toggle buttons
 		//TODO: Revisar puesto que los botones que se hacen accesibles estan predefinidos
 		setToggleButtonMnemonics(this);
 	}
-	
+
 	/**
 	 * Posici&oacute;n X inicial de la ventana dependiendo de la resoluci&oacute;n de pantalla.
 	 * @return int Posici&oacute;n X
@@ -133,7 +133,7 @@ public class JAccessibilityFileChooser extends JFileChooser{
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); //329
 		return (screenSize.width - 426) / 2 ;
 	}*/
-    
+
     /**
 	 * Posici&oacute;n Y inicial de la ventana dependiendo del sistema operativo y de la
 	 * resoluci&oacute;n de pantalla.
@@ -143,48 +143,47 @@ public class JAccessibilityFileChooser extends JFileChooser{
         Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
         if (Platform.getOS().equals(Platform.OS.MACOSX)){
         	return (screenSize.height - 485) / 2;
-        } 
+        }
         return (screenSize.height - 456) / 2;
 	}*/
-	
+
 	/**
 	 * Posici&oacute;n X inicial de la ventana dependiendo de la resoluci&oacute;n de pantalla.
 	 * @return int Posici&oacute;n X
 	 */
     public int getInitialX() {
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); //329
+		final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); //329
 		return (screenSize.width - 426) / 2 ;
 	}
-    
+
     /**
 	 * Posici&oacute;n Y inicial de la ventana dependiendo del sistema operativo y de la
 	 * resoluci&oacute;n de pantalla.
 	 * @return int Posici&oacute;n Y
 	 */
 	public int getInitialY() {
-        Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        final Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
         if (Platform.getOS().equals(Platform.OS.MACOSX)){
         	return (screenSize.height - 485) / 2;
-        } else {
-        	return (screenSize.height - 456) / 2;
         }
+        return (screenSize.height - 456) / 2;
 	}
 
-	
+
 	/**
 	 * Asigna el mnem&oacute;nico indicado al bot&oacute;n identificado por la clave .
 	 * @param c contenedor global
 	 * @param key clave del componente al que se le va a asignar el mnem&oacute;nico.
 	 * @param mnemonic mnem&oacute;nico que se va a asignar al componente
 	 */
-	public void setButtonMnemonics( Container c, String key, int mnemonic ) {
-	    int len = c.getComponentCount(); //Nomero de componentes del contenedor
+	public void setButtonMnemonics( final Container c, final String key, final int mnemonic ) {
+	    final int len = c.getComponentCount(); //Nomero de componentes del contenedor
 	    //Se recorren los elementos que forman el contenedor
 	    for (int i = 0; i < len; i++) {
-	      Component comp = c.getComponent(i); //Se obtiene un componente
+	      final Component comp = c.getComponent(i); //Se obtiene un componente
 	      //Se comprueba si es de tipo boton
 	      if (comp instanceof JButton) {
-		        JButton button = (JButton)comp;
+		        final JButton button = (JButton)comp;
 		        //Se comprueba si su texto es el indicado por la clave
 		        if (button.getText() ==  UIManager.get(key)) {
 		        	//Se le asigna el mnemonico
@@ -196,22 +195,22 @@ public class JAccessibilityFileChooser extends JFileChooser{
 		    }
 	    }//for
 	  }
-	
+
 	/**
 	 * Asigna el mnem&oacute;nico indicado a la etiqueta identificada por la clave .
 	 * @param c contenedor global
 	 * @param key clave del componente al que se le va a asignar el mnem&oacute;nico.
 	 * @param mnemonic mnem&oacute;nico que se va a asignar al componente
 	 */
-	public void setLabelMnemonics( Container c, String key, int mnemonic ) {
+	public void setLabelMnemonics( final Container c, final String key, final int mnemonic ) {
 		 //Nomero de componentes del contenedor
-	    int len = c.getComponentCount();
+	    final int len = c.getComponentCount();
 	    //Se recorren los elementos que forman el contenedor
 	    for (int i = 0; i < len; i++) {
-	      Component comp = c.getComponent(i);  //Se obtiene un componente
+	      final Component comp = c.getComponent(i);  //Se obtiene un componente
 	      //Se comprueba si es de tipo etiqueta
 	      if (comp instanceof JLabel) {
-	        JLabel label = (JLabel)comp;
+	        final JLabel label = (JLabel)comp;
 	        //Se comprueba si su texto es el indicado por la clave
 	        if (label.getText() ==  UIManager.get(key)) {
 	        	//Se le asigna el mnemonico
@@ -223,61 +222,61 @@ public class JAccessibilityFileChooser extends JFileChooser{
 		    }
 	    }//for
 	  }
-	
+
 	/**
 	 * Asigna un mnem&oacute;nico predefinido a ciertos toggleButton contenidos en el componente.
 	 * @param c contenedor global
 	 */
-	public void setToggleButtonMnemonics( Container c) {
+	public void setToggleButtonMnemonics( final Container c) {
 		 //Numero de componentes del contenedor
-	    int len = c.getComponentCount();
-	    String openTag = "<u>";
-	    String closeTag = "</u>";
+	    final int len = c.getComponentCount();
+	    final String openTag = "<u>";
+	    final String closeTag = "</u>";
 	  //Se recorren los elementos que forman el contenedor
 	    for (int i = 0; i < len; i++) {
-	      Component comp = c.getComponent(i); //Se obtiene un componente
+	      final Component comp = c.getComponent(i); //Se obtiene un componente
 	      //Se comprueba si es de tipo JToggleButton
 	      if (comp instanceof JToggleButton) {
-		    	JToggleButton toggleButton = (JToggleButton) comp;
+		    	final JToggleButton toggleButton = (JToggleButton) comp;
 		    	 //Se almacena su texto asociado
-		    	String text = toggleButton.getText();
+		    	final String text = toggleButton.getText();
 		    	//Se comprueba que no esta vacio
 		    	if (text!=null && !text.equalsIgnoreCase("")) { //$NON-NLS-1$
-		    		
+
 		    		//Se tratan los botones segun su texto
 			    	if (text.equalsIgnoreCase("<html><center>Equipo</center></html>")) {
 			    		//Se asigna un mnemonico predefinido
 			    		toggleButton.setMnemonic(KeyEvent.VK_E);
 			    		//Como el texto del boton contiene codigo HTML se hace lo siguiente para que se muestre el mnemonico al usuario
-			    		String newText = text.substring(0, 14) +openTag+text.charAt(14)+closeTag+text.substring(15);
+			    		final String newText = text.substring(0, 14) +openTag+text.charAt(14)+closeTag+text.substring(15);
 			    		toggleButton.setText(newText);
-			    		
+
 			    	} else if (text.equalsIgnoreCase("<html><center>Elementos recientes</center></html>")) {
 			    		//Se asigna un mnemonico predefinido
 			    		toggleButton.setMnemonic(KeyEvent.VK_L);
 			    		//Como el texto del boton contiene codigo HTML se hace lo siguiente para que se muestre el mnemonico al usuario
-			    		String newText = text.substring(0, 15) +openTag+text.charAt(15)+closeTag+text.substring(16);
+			    		final String newText = text.substring(0, 15) +openTag+text.charAt(15)+closeTag+text.substring(16);
 			    		toggleButton.setText(newText);
-			    		
+
 			    	} else if (text.equalsIgnoreCase("<html><center>Escritorio</center></html>")) {
 			    		//Se asigna un mnemonico predefinido
 			    		toggleButton.setMnemonic(KeyEvent.VK_S);
 			    		//Como el texto del boton contiene codigo HTML se hace lo siguiente para que se muestre el mnemonico al usuario
-			    		String newText = text.substring(0, 15) +openTag+text.charAt(15)+closeTag+text.substring(16);
+			    		final String newText = text.substring(0, 15) +openTag+text.charAt(15)+closeTag+text.substring(16);
 			    		toggleButton.setText(newText);
-			    		
+
 			    	} else if (text.equalsIgnoreCase("<html><center>Mis documentos</center></html>")) {
 			    		//Se asigna un mnemonico predefinido
 			    		toggleButton.setMnemonic(KeyEvent.VK_I);
 			    		//Como el texto del boton contiene codigo HTML se hace lo siguiente para que se muestre el mnemonico al usuario
-			    		String newText = text.substring(0, 15) +openTag+text.charAt(15)+closeTag+text.substring(16);
+			    		final String newText = text.substring(0, 15) +openTag+text.charAt(15)+closeTag+text.substring(16);
 			    		toggleButton.setText(newText);
 
 			    	} else if (text.equalsIgnoreCase("<html><center>Red</center></html>")) {
 			    		//Se asigna un mnemonico predefinido
 			    		toggleButton.setMnemonic(KeyEvent.VK_R);
 			    		//Como el texto del boton contiene codigo HTML se hace lo siguiente para que se muestre el mnemonico al usuario
-			    		String newText = text.substring(0, 14) +openTag+text.charAt(14)+closeTag+text.substring(15);
+			    		final String newText = text.substring(0, 14) +openTag+text.charAt(14)+closeTag+text.substring(15);
 			    		toggleButton.setText(newText);
 			    	}
 		    	}
@@ -291,33 +290,33 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	 * Define el modo alto contraste para los componentes de la ventana.
 	 * @param c contenedor global
 	 */
-	public void setHighContrast(Container c) {
+	public void setHighContrast(final Container c) {
 		 //Numero de componentes del contenedor
-	    int len = c.getComponentCount();
+	    final int len = c.getComponentCount();
 	    //Se recorren los elementos que forman el contenedor
 	    for (int i = 0; i < len; i++) {
-	      Component comp = c.getComponent(i);  //Se obtiene un componente
+	      final Component comp = c.getComponent(i);  //Se obtiene un componente
 	      //Se comprueba si es de tipo etiqueta
 	      if (comp instanceof JLabel) {
-	        JLabel label = (JLabel)comp;
+	        final JLabel label = (JLabel)comp;
 	        if (GeneralConfig.isHighContrast()){
 	        	label.setForeground(Color.WHITE);
 	        } else {
 	        	label.setForeground(Color.BLACK);
 	        }
 	      } else if(comp instanceof JToggleButton){
-	    	  JToggleButton toggleButton = (JToggleButton)comp;
+	    	  final JToggleButton toggleButton = (JToggleButton)comp;
 	    	  if (GeneralConfig.isHighContrast()){
 	    		  toggleButton.setForeground(Color.WHITE);
 	    	  } else {
 	    		  toggleButton.setForeground(Color.BLACK);
 	    	  }
 	      } else if (comp instanceof JComboBox){
-	    	  JComboBox comboBox = (JComboBox)comp;
+	    	  final JComboBox comboBox = (JComboBox)comp;
 	    	  if (GeneralConfig.isHighContrast()){
 	    		  comboBox.setBackground(Color.WHITE);
 	    	  } else {
-	    		  comboBox.setBackground(Color.BLACK);  
+	    		  comboBox.setBackground(Color.BLACK);
 	    	  }
 	      } else if (comp instanceof Container) {
 	    	  	//Llamada recursiva
@@ -325,14 +324,14 @@ public class JAccessibilityFileChooser extends JFileChooser{
 		    }
 	    }//for
 	  }
-	
+
 	/**
 	 * Crea la ventana de dialogo.
 	 * @param Component parent
 	 */
 	@Override
-    protected JDialog createDialog(Component parent) throws HeadlessException {
-		String title = getUI().getDialogTitle(this);
+    protected JDialog createDialog(final Component parent) throws HeadlessException {
+		final String title = getUI().getDialogTitle(this);
         putClientProperty(
                 AccessibleContext.ACCESSIBLE_DESCRIPTION_PROPERTY,
                 title);
@@ -345,7 +344,7 @@ public class JAccessibilityFileChooser extends JFileChooser{
         	this.dialog = new JDialog((Frame)parent, title, true);
         }else {
         	//Se obtiene el componente root
-	        Component root = SwingUtilities.getRoot(parent);
+	        final Component root = SwingUtilities.getRoot(parent);
 	        if ((root!=null) && (root instanceof Frame)) {
 	        	this.dialog = new JDialog((Frame)root, title, true);
 	        } else {
@@ -356,47 +355,47 @@ public class JAccessibilityFileChooser extends JFileChooser{
         }
 
         this.dialog.setComponentOrientation(this .getComponentOrientation());
-        
+
       //Se obtienen las dimensiones totales disponibles para mostrar una ventana
-		Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+		final Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
 
 		//Se obtienen las dimensiones de maximizado
-		int maxWidth = (int)rect.getWidth();
-		int maxHeight = (int)rect.getHeight();
-        
-        Container contentPane = this.dialog.getContentPane();
-        
+		final int maxWidth = (int)rect.getWidth();
+		final int maxHeight = (int)rect.getHeight();
+
+        final Container contentPane = this.dialog.getContentPane();
+
 //        if (!GeneralConfig.isAccessibility()){
 //        	contentPane.setLayout(new GridLayout());
 //        	contentPane.add(this , BorderLayout.CENTER);
 //        } else {
         	removeWindowsToolBar();
         	contentPane.setLayout(new GridBagLayout());
-        	
+
         	this.dialog.addComponentListener(new ComponentListener() {
-    			
+
     			@Override
-    			public void componentShown(ComponentEvent e) {
+    			public void componentShown(final ComponentEvent e) {
     				// TODO Auto-generated method stub
-    				
+
     			}
-    			
+
     			@Override
-    			public void componentResized(ComponentEvent e) {
+    			public void componentResized(final ComponentEvent e) {
     				// TODO Auto-generated method stub
     				resized();
     			}
-    			
+
     			@Override
-    			public void componentMoved(ComponentEvent e) {
+    			public void componentMoved(final ComponentEvent e) {
     				// TODO Auto-generated method stub
     				resized();
     			}
-    			
+
     			@Override
-    			public void componentHidden(ComponentEvent e) {
+    			public void componentHidden(final ComponentEvent e) {
     				// TODO Auto-generated method stub
-    				
+
     			}
     		});
         	// Dimensiones de la ventana
@@ -406,7 +405,7 @@ public class JAccessibilityFileChooser extends JFileChooser{
         		if (PrincipalGUI.getFileActualPositionX() != -1){
         			this.dialog.setPreferredSize(new Dimension(PrincipalGUI.getFileActualWidth(), PrincipalGUI.getFileActualHeight()));
         		}
-        		
+
         	}
         	if (GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
         		this.dialog.setMinimumSize(new Dimension(Constants.FILE_FONT_INITIAL_WIDTH, Constants.FILE_INITIAL_HEIGHT));
@@ -422,59 +421,59 @@ public class JAccessibilityFileChooser extends JFileChooser{
                 			final JToggleButton boton = ((JToggleButton)this.jTool.getComponent(j));
                 			// Al cambiar entre vista en lista y detalles se llama a adjustWindowFonts para que calcule el tamano del texto
                 			((JToggleButton)(this.jTool.getComponent(j))).addMouseListener(new MouseListener() {
-        						
+
         						@Override
-        						public void mouseReleased(MouseEvent e) {
+        						public void mouseReleased(final MouseEvent e) {
         							// TODO Auto-generated method stub
-        							
+
         						}
-        						
+
         						@Override
-        						public void mousePressed(MouseEvent e) {
+        						public void mousePressed(final MouseEvent e) {
         							// TODO Auto-generated method stub
-        							
+
         						}
-        						
+
         						@Override
-        						public void mouseExited(MouseEvent e) {
+        						public void mouseExited(final MouseEvent e) {
         							// TODO Auto-generated method stub
-        							
+
         						}
-        						
+
         						@Override
-        						public void mouseEntered(MouseEvent e) {
+        						public void mouseEntered(final MouseEvent e) {
         							// TODO Auto-generated method stub
-        							
+
         						}
-        						
+
         						@Override
-        						public void mouseClicked(MouseEvent e) {
+        						public void mouseClicked(final MouseEvent e) {
         							// TODO Auto-generated method stub
         							callResize();
         						}
         					});
                 			((JToggleButton)(this.jTool.getComponent(j))).addKeyListener(new KeyListener() {
-        						
+
         						@Override
-        						public void keyTyped(KeyEvent e) {
+        						public void keyTyped(final KeyEvent e) {
         							// TODO Auto-generated method stub
         						}
-        						
+
         						@Override
-        						public void keyReleased(KeyEvent e) {
+        						public void keyReleased(final KeyEvent e) {
         							// TODO Auto-generated method stub
         							if (e.getKeyCode() == KeyEvent.VK_SPACE){
         								boton.doClick();
         								callResize();
         							}
         						}
-        						
+
         						@Override
-        						public void keyPressed(KeyEvent e) {
+        						public void keyPressed(final KeyEvent e) {
         							// TODO Auto-generated method stub
         						}
         					});
-                			
+
                 		}
                 		Utils.remarcar((JComponent)this.jTool.getComponent(j));
                     	Utils.setFontBold((JComponent)this.jTool.getComponent(j));
@@ -482,29 +481,29 @@ public class JAccessibilityFileChooser extends JFileChooser{
             	} else {
             		accessibility((JPanel)this.getComponent(i));
             	}
-            	
+
             }
             /*JPanel panelPrueba = new JPanel(new BorderLayout());
             panelPrueba.add(new JLabel("PRUEBA"), BorderLayout.EAST);*/
-            
+
             //Restricciones para los botones
-			GridBagConstraints consButtons = new GridBagConstraints();
+			final GridBagConstraints consButtons = new GridBagConstraints();
 			consButtons.fill = GridBagConstraints.BOTH;
 			consButtons.gridx = 0;
 			consButtons.gridy = 0;
 			consButtons.weightx = 1.0;
 			consButtons.weighty = 0.05;
-            
+
 			this.accesibilityButtonsPanel = createAccessibilityButtonsPanel();
             contentPane.add(this.accesibilityButtonsPanel, consButtons);
-            
+
             consButtons.gridy = 1;
             consButtons.weighty = 0.95;
             contentPane.add(this, consButtons);
 //        }
-        
+
         if (JDialog.isDefaultLookAndFeelDecorated()) {
-            boolean supportsWindowDecorations = UIManager
+            final boolean supportsWindowDecorations = UIManager
                     .getLookAndFeel().getSupportsWindowDecorations();
             if (supportsWindowDecorations) {
                 this.dialog.getRootPane().setWindowDecorationStyle(
@@ -514,37 +513,37 @@ public class JAccessibilityFileChooser extends JFileChooser{
         this.dialog.setResizable(true);
         this.dialog.pack();
         this.dialog.setLocationRelativeTo(parent);
-        
+
 //        if (GeneralConfig.isAccessibility()) {
         	this.resizingAdaptor = new ResizingAdaptor(null,null,null,null,null,this,null,null);
         	this.theDialog = this.dialog;
      		this.dialog.addComponentListener(this.resizingAdaptor);
 //        }
-        
+
         return this.dialog;
 	}
-	
+
 	/**
 	 * Elimina la barra de accesos a carpetas de windows de la ventana
 	 */
 	private void removeWindowsToolBar(){
-		
+
 		for (int i=0; i<this.getComponentCount();i++){
 			if (this.getComponent(i) instanceof JToolBar){
         		if (!this.getComponent(i).getClass().getName().equals("javax.swing.JToolBar")){
         			this.remove(this.getComponent(i));
-        			
+
         		}
         	}
         }
 
 	}
-	
+
 	/**
 	 * Aplica la configuraci&oacute;n de accesibilidad a los componentes del panel
 	 * @param jPanel Panel con los componentes. Puede contener m&aacute;s paneles
 	 */
-	public void accessibility(JPanel jPanel){		
+	public void accessibility(final JPanel jPanel){
 		for (int i=0;i<jPanel.getComponentCount();i++){
 			if (jPanel.getComponent(i) instanceof JPanel){
 				accessibility((JPanel)jPanel.getComponent(i));
@@ -582,52 +581,52 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	    	PrincipalGUI.setFileActualHeight(this.dialog.getHeight());
     	}
 	}
-	
+
 	/**
 	 * Genera el panel que contiene los botones de restaurar y maximizar.
 	 * Aplica accesibilidad sobre los botones.
 	 * @return JPanel con los botones de restaurar y maximizar
 	 */
 	private JPanel createAccessibilityButtonsPanel() {
-		JPanel panelAccesibilidad = new JPanel(new GridBagLayout());
-		
+		final JPanel panelAccesibilidad = new JPanel(new GridBagLayout());
+
 		//Para el tooltip
 		final JWindow tip = new JWindow();
 		final JLabel tipText = new JLabel();
-		
+
 		//Panel que va a contener los botones de accesibilidad
-		JPanel panel = new JPanel(new GridBagLayout());		
-		
+		final JPanel panel = new JPanel(new GridBagLayout());
+
 		//Restricciones para los botones
-		GridBagConstraints consButtons = new GridBagConstraints();
+		final GridBagConstraints consButtons = new GridBagConstraints();
 		consButtons.fill = GridBagConstraints.BOTH;
 		consButtons.gridx = 0;
 		consButtons.gridy = 0;
 		consButtons.weightx = 1.0;
 		consButtons.weighty = 1.0;
 		consButtons.insets = new Insets(0,0,0,0);  //right padding
-		
-		Dimension dimension = new Dimension(25, 25);
-		
+
+		final Dimension dimension = new Dimension(25, 25);
+
 		//Restore button
-		JPanel restorePanel = new JPanel();
+		final JPanel restorePanel = new JPanel();
 		ImageIcon imageIconRestore= new ImageIcon(JAccessibilityFileChooser.class.getResource("/resources/images/restore.png"));
 		imageIconRestore = new ImageIcon(imageIconRestore.getImage().getScaledInstance(dimension.width, dimension.height, Image.SCALE_SMOOTH));
 		this.restoreButton = new JButton(imageIconRestore);
 		this.restoreButton.setMnemonic(KeyEvent.VK_R );
 		this.restoreButton.setToolTipText(Messages.getString("Wizard.restaurar.description"));
 		this.restoreButton.getAccessibleContext().setAccessibleName(this.restoreButton.getToolTipText());
-		
+
 		this.restoreButton.addFocusListener(new FocusListener() {
-			
+
 			@Override
-			public void focusLost(FocusEvent e) {
-				Utils.showToolTip(false, tip, restoreButton, tipText);
+			public void focusLost(final FocusEvent e) {
+				Utils.showToolTip(false, tip, JAccessibilityFileChooser.this.restoreButton, tipText);
 			}
-			
+
 			@Override
-			public void focusGained(FocusEvent e) {
-				Utils.showToolTip(true, tip, restoreButton, tipText);
+			public void focusGained(final FocusEvent e) {
+				Utils.showToolTip(true, tip, JAccessibilityFileChooser.this.restoreButton, tipText);
 			}
 		});
 		this.restoreButton.setPreferredSize(dimension);
@@ -636,71 +635,73 @@ public class JAccessibilityFileChooser extends JFileChooser{
 		Utils.remarcar(this.restoreButton);
 		restorePanel.add(this.restoreButton);
 		this.restoreButton.addActionListener(new ActionListener() {
-	    	public void actionPerformed(ActionEvent e) {
+	    	@Override
+			public void actionPerformed(final ActionEvent e) {
 	    		restaurarActionPerformed();
 			}
 		});
-		
-		
+
+
 		panel.add(restorePanel, consButtons);
-		
-		
+
+
 		consButtons.gridx = 1;
 		consButtons.insets = new Insets(0,0,0,5);  //right padding
-		
+
 		//Maximize button
-		JPanel maximizePanel = new JPanel();
+		final JPanel maximizePanel = new JPanel();
 
 		ImageIcon imageIconMaximize = new ImageIcon(JAccessibilityFileChooser.class.getResource("/resources/images/maximize.png"));
 		imageIconMaximize = new ImageIcon(imageIconMaximize.getImage().getScaledInstance(dimension.width, dimension.height, Image.SCALE_SMOOTH));
 		this.maximizeButton = new JButton(imageIconMaximize);
 		this.maximizeButton.setMnemonic(KeyEvent.VK_M );
 		this.maximizeButton.setToolTipText(Messages.getString("Wizard.maximizar.description"));
-		this.maximizeButton.getAccessibleContext().setAccessibleName(this.maximizeButton.getToolTipText());	
+		this.maximizeButton.getAccessibleContext().setAccessibleName(this.maximizeButton.getToolTipText());
 
 		this.maximizeButton.setName("maximizar");
 		//Se asigna una dimension por defecto
 		this.maximizeButton.setPreferredSize(dimension);
-				
+
 		Utils.remarcar(this.maximizeButton);
-		maximizePanel.add(this.maximizeButton);	
-		
+		maximizePanel.add(this.maximizeButton);
+
 		this.maximizeButton.addFocusListener(new FocusListener() {
-			
+
 			@Override
-			public void focusLost(FocusEvent e) {
-				Utils.showToolTip(false, tip, maximizeButton, tipText);
+			public void focusLost(final FocusEvent e) {
+				Utils.showToolTip(false, tip, JAccessibilityFileChooser.this.maximizeButton, tipText);
 			}
-			
+
 			@Override
-			public void focusGained(FocusEvent e) {
-				Utils.showToolTip(true, tip, maximizeButton, tipText);
+			public void focusGained(final FocusEvent e) {
+				Utils.showToolTip(true, tip, JAccessibilityFileChooser.this.maximizeButton, tipText);
 			}
-			
+
 		});
-		
+
 		this.maximizeButton.addActionListener(new ActionListener() {
-		    	public void actionPerformed(ActionEvent e) {
+		    	@Override
+				public void actionPerformed(final ActionEvent e) {
 		    		maximizarActionPerformed();
 				}
 			});
 
-		
+
 		panel.add(maximizePanel, consButtons);
 
 		//Se añade al panel general
 		//Restricciones para el panel de botones
-		GridBagConstraints c = new GridBagConstraints();
+		final GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.NONE;
 		c.gridx = 0;
 		c.gridy = 0;
 		c.weightx = 1.0;
 		c.weighty = 1.0;
-		c.insets = new Insets(0,0,0,0); 
+		c.insets = new Insets(0,0,0,0);
 		c.anchor=GridBagConstraints.EAST;
 		panelAccesibilidad.add(panel, c);
-		
-		
+
+
 		// Habilitado/Deshabilitado de botones restaurar/maximizar
     	if (GeneralConfig.isMaximized()){
     		//Se deshabilita el botón de maximizado
@@ -715,18 +716,18 @@ public class JAccessibilityFileChooser extends JFileChooser{
     	}
 		return panelAccesibilidad;
 	}
-	
+
 	/**
 	 * Restaura el tama&ntilde;o de la ventana a la posicion anterior al maximizado
 	 */
 	public void restaurarActionPerformed(){
-		
+
 		if (actualPositionX != -1 && actualPositionY != -1 && actualWidth != -1 && actualHeight != -1){
-			theDialog.setBounds(actualPositionX, actualPositionY, actualWidth, actualHeight);
+			this.theDialog.setBounds(actualPositionX, actualPositionY, actualWidth, actualHeight);
 		} else {
 			if (GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
     			setBounds(this.getInitialX(), this.getInitialY(), Constants.FILE_FONT_INITIAL_WIDTH, Constants.FILE_INITIAL_HEIGHT);
-    			setMinimumSize(new Dimension(getSize().width, getSize().height));    			
+    			setMinimumSize(new Dimension(getSize().width, getSize().height));
     		} else {
     			setBounds(this.getInitialX(), this.getInitialY(), Constants.FILE_INITIAL_WIDTH, Constants.FILE_INITIAL_HEIGHT);
     			setMinimumSize(new Dimension(getSize().width, getSize().height));
@@ -735,31 +736,32 @@ public class JAccessibilityFileChooser extends JFileChooser{
 		this.maximizeButton.setEnabled (true);
 		this.restoreButton.setEnabled (false);
 	}
-	
+
 	/**
 	 * Maximiza la ventana
 	 */
 	public void maximizarActionPerformed(){
-		actualPositionX = theDialog.getX();
-		actualPositionY = theDialog.getY();
-		actualWidth = theDialog.getWidth();
-		actualHeight = theDialog.getHeight();
+		actualPositionX = this.theDialog.getX();
+		actualPositionY = this.theDialog.getY();
+		actualWidth = this.theDialog.getWidth();
+		actualHeight = this.theDialog.getHeight();
 
 		//Se obtienen las dimensiones totales disponibles para mostrar una ventana
-		Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
-		
+		final Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+
 		//Se obtienen las dimensiones de maximizado
-		int maxWidth = (int)rect.getWidth();
-		int maxHeight = (int)rect.getHeight();
-		
+		final int maxWidth = (int)rect.getWidth();
+		final int maxHeight = (int)rect.getHeight();
+
 		this.maximizeButton.setEnabled (false);
 		this.restoreButton.setEnabled (true);
-		
+
 		//Se hace el resize dependiendo del so
 		if (!Platform.getOS().equals(Platform.OS.LINUX)){
-			theDialog.setBounds(0,0, maxWidth, maxHeight);
-		} else {
-			theDialog.setBounds(0,0, maxWidth, maxHeight - Constants.maximizeVerticalMarginLinux);
+			this.theDialog.setBounds(0,0, maxWidth, maxHeight);
+		}
+		else {
+			this.theDialog.setBounds(0,0, maxWidth, maxHeight - Constants.maximizeVerticalMarginLinux);
 		}
 	}
 
@@ -770,6 +772,6 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	public JPanel getAccesibilityButtonsPanel(){
 		return this.accesibilityButtonsPanel;
 	}
-	
+
 }
 

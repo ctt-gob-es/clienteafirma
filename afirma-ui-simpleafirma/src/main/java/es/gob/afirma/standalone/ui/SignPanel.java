@@ -108,26 +108,77 @@ public final class SignPanel extends JPanel {
     private static final String FILE_ICON_FACTURAE = "/resources/icon_facturae.svg"; //$NON-NLS-1$
 
     private AOSigner signer;
+
+    AOSigner getSigner() {
+    	return this.signer;
+    }
+
     private byte[] dataToSign = null;
 
+    byte[] getDataToSign() {
+    	return this.dataToSign;
+    }
+
     private JPanel filePanel;
+
+    JPanel getFilePanel() {
+    	return this.filePanel;
+    }
+
+    void setFilePanel(final JPanel panel) {
+    	this.filePanel = panel;
+    }
+
     private JPanel lowerPanel;
 
     private DropTarget dropTarget;
 
+	DropTarget getDropTgt() {
+    	return this.dropTarget;
+    }
+
     private final JFrame window;
 
+    JFrame getWindow() {
+    	return this.window;
+    }
+
     private final JButton signButton = new JButton();
+
+    JButton getSignButton() {
+    	return this.signButton;
+    }
+
     private final JButton selectButton = new JButton();
+
+    JButton getSelectButton() {
+    	return this.selectButton;
+    }
 
     private final SimpleAfirma saf;
 
+    SimpleAfirma getSimpleAfirma() {
+    	return this.saf;
+    }
+
     private final ProgressMonitor pm = new ProgressMonitor(SignPanel.this, Messages.getString("SignPanel.15"), "", 0, 1000);  //$NON-NLS-1$//$NON-NLS-2$
+
+    ProgressMonitor getProgressMonitor() {
+    	return this.pm;
+    }
 
     /** Indica si la operaci&oacute;n a realizar es una cofirma. */
     private boolean cosign = false;
 
+    boolean isCosign() {
+    	return this.cosign;
+    }
+
     private File currentFile = null;
+
+    File getCurrentFile() {
+    	return this.currentFile;
+    }
 
     /** Carga el fichero a firmar.
      * @param filename Nombre (ruta completa incuida) del fichero a firmar
@@ -401,42 +452,42 @@ public final class SignPanel extends JPanel {
             this.setLayout(new BorderLayout(5, 5));
             this.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-            SignPanel.this.selectButton.setText(Messages.getString("SignPanel.32")); //$NON-NLS-1$
+            SignPanel.this.getSelectButton().setText(Messages.getString("SignPanel.32")); //$NON-NLS-1$
             if (al != null) {
-                SignPanel.this.selectButton.addActionListener(al);
+                SignPanel.this.getSelectButton().addActionListener(al);
             }
-            SignPanel.this.selectButton.setMnemonic('S');
-            SignPanel.this.selectButton.getAccessibleContext().setAccessibleDescription(Messages.getString("SignPanel.33") //$NON-NLS-1$
+            SignPanel.this.getSelectButton().setMnemonic('S');
+            SignPanel.this.getSelectButton().getAccessibleContext().setAccessibleDescription(Messages.getString("SignPanel.33") //$NON-NLS-1$
                                        );
-            SignPanel.this.selectButton.getAccessibleContext().setAccessibleName(Messages.getString("SignPanel.34") //$NON-NLS-1$
+            SignPanel.this.getSelectButton().getAccessibleContext().setAccessibleName(Messages.getString("SignPanel.34") //$NON-NLS-1$
                                        );
-            SignPanel.this.selectButton.requestFocusInWindow();
-            SignPanel.this.selectButton.addActionListener(new ActionListener() {
+            SignPanel.this.getSelectButton().requestFocusInWindow();
+            SignPanel.this.getSelectButton().addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent arg0) {
 
                     String fileToLoad;
 
                     if (Platform.OS.MACOSX.equals(Platform.getOS()) || Platform.OS.WINDOWS.equals(Platform.getOS())) {
-                        if (SignPanel.this.saf.getCurrentDir() == null) {
-                            SignPanel.this.saf.setCurrentDir(new File(Platform.getUserHome()));
+                        if (SignPanel.this.getSimpleAfirma().getCurrentDir() == null) {
+                            SignPanel.this.getSimpleAfirma().setCurrentDir(new File(Platform.getUserHome()));
                         }
                         final FileDialog fd = new FileDialog((Frame) null, Messages.getString("SignPanel.35")); //$NON-NLS-1$
-                        fd.setDirectory(SignPanel.this.saf.getCurrentDir().getAbsolutePath());
+                        fd.setDirectory(SignPanel.this.getSimpleAfirma().getCurrentDir().getAbsolutePath());
                         fd.setVisible(true);
                         if (fd.getFile() == null) {
                             return;
                         }
-                        SignPanel.this.saf.setCurrentDir(new File(fd.getDirectory()));
+                        SignPanel.this.getSimpleAfirma().setCurrentDir(new File(fd.getDirectory()));
                         fileToLoad = fd.getDirectory() + fd.getFile();
                     }
                     else {
                         final JFileChooser fc = new JFileChooser();
-                        if (SignPanel.this.saf.getCurrentDir() != null) {
-                            fc.setCurrentDirectory(SignPanel.this.saf.getCurrentDir());
+                        if (SignPanel.this.getSimpleAfirma().getCurrentDir() != null) {
+                            fc.setCurrentDirectory(SignPanel.this.getSimpleAfirma().getCurrentDir());
                         }
                         if (JFileChooser.APPROVE_OPTION == fc.showOpenDialog(UpperPanel.this)) {
-                            SignPanel.this.saf.setCurrentDir(fc.getCurrentDirectory());
+                            SignPanel.this.getSimpleAfirma().setCurrentDir(fc.getCurrentDirectory());
                             fileToLoad = fc.getSelectedFile().getAbsolutePath();
                         }
                         else {
@@ -462,7 +513,7 @@ public final class SignPanel extends JPanel {
             final JLabel welcomeLabel = new JLabel(((firstTime) ? (Messages.getString("SignPanel.14") + " ") : ("")) + Messages.getString("SignPanel.39")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
             welcomeLabel.setFocusable(false);
             welcomeLabel.setFont(welcomeLabel.getFont().deriveFont(Font.PLAIN, 26));
-            welcomeLabel.setLabelFor(SignPanel.this.selectButton);
+            welcomeLabel.setLabelFor(SignPanel.this.getSelectButton());
             this.add(welcomeLabel, BorderLayout.PAGE_START);
 
             String intro = Messages.getString("SignPanel.40"); //$NON-NLS-1$
@@ -480,7 +531,7 @@ public final class SignPanel extends JPanel {
             catch(final Exception e) { /* Ignoramos los errores */ }
 
             final JLabel introText = new JLabel(intro);
-            introText.setLabelFor(SignPanel.this.selectButton);
+            introText.setLabelFor(SignPanel.this.getSelectButton());
             introText.setFocusable(false);
 
             final JPanel introPanel = new JPanel(new BorderLayout());
@@ -488,7 +539,7 @@ public final class SignPanel extends JPanel {
             this.add(introPanel, BorderLayout.CENTER);
 
             final JPanel selectPanel = new JPanel(new FlowLayout(FlowLayout.LEFT), true);
-            selectPanel.add(SignPanel.this.selectButton);
+            selectPanel.add(SignPanel.this.getSelectButton());
             this.add(selectPanel, BorderLayout.PAGE_END);
 
             // Configuramos el color
@@ -520,30 +571,30 @@ public final class SignPanel extends JPanel {
             this.setLayout(new BorderLayout(5, 5));
             this.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-            SignPanel.this.filePanel = new ResizingTextPanel(Messages.getString("SignPanel.41")); //$NON-NLS-1$
-            SignPanel.this.filePanel.getAccessibleContext().setAccessibleDescription(Messages.getString("SignPanel.42")); //$NON-NLS-1$
-            SignPanel.this.filePanel.getAccessibleContext().setAccessibleName(Messages.getString("SignPanel.43")); //$NON-NLS-1$
-            SignPanel.this.filePanel.setToolTipText(Messages.getString("SignPanel.42")); //$NON-NLS-1$
-            SignPanel.this.filePanel.setFocusable(false);
-            SignPanel.this.filePanel.setDropTarget(SignPanel.this.dropTarget);
+            SignPanel.this.setFilePanel(new ResizingTextPanel(Messages.getString("SignPanel.41"))); //$NON-NLS-1$
+            SignPanel.this.getFilePanel().getAccessibleContext().setAccessibleDescription(Messages.getString("SignPanel.42")); //$NON-NLS-1$
+            SignPanel.this.getFilePanel().getAccessibleContext().setAccessibleName(Messages.getString("SignPanel.43")); //$NON-NLS-1$
+            SignPanel.this.getFilePanel().setToolTipText(Messages.getString("SignPanel.42")); //$NON-NLS-1$
+            SignPanel.this.getFilePanel().setFocusable(false);
+            SignPanel.this.getFilePanel().setDropTarget(SignPanel.this.getDropTgt());
 
-            this.add(SignPanel.this.filePanel, BorderLayout.CENTER);
+            this.add(SignPanel.this.getFilePanel(), BorderLayout.CENTER);
 
             final JPanel buttonPanel = new JPanel(true);
-            SignPanel.this.signButton.setPreferredSize(new Dimension(160, 27));
-            if (!SignPanel.this.cosign) {
-                SignPanel.this.signButton.setText(Messages.getString("SignPanel.45")); //$NON-NLS-1$
+            SignPanel.this.getSignButton().setPreferredSize(new Dimension(160, 27));
+            if (!SignPanel.this.isCosign()) {
+                SignPanel.this.getSignButton().setText(Messages.getString("SignPanel.45")); //$NON-NLS-1$
             }
             else {
-                SignPanel.this.signButton.setText(Messages.getString("SignPanel.16")); //$NON-NLS-1$
+                SignPanel.this.getSignButton().setText(Messages.getString("SignPanel.16")); //$NON-NLS-1$
             }
-            SignPanel.this.signButton.setMnemonic('F');
+            SignPanel.this.getSignButton().setMnemonic('F');
             if (al != null) {
-                SignPanel.this.signButton.addActionListener(al);
+                SignPanel.this.getSignButton().addActionListener(al);
             }
-            SignPanel.this.signButton.setEnabled(false);
-            buttonPanel.add(SignPanel.this.signButton);
-            SignPanel.this.signButton.addActionListener(new ActionListener() {
+            SignPanel.this.getSignButton().setEnabled(false);
+            buttonPanel.add(SignPanel.this.getSignButton());
+            SignPanel.this.getSignButton().addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent ae) {
                     sign();
@@ -553,8 +604,8 @@ public final class SignPanel extends JPanel {
             // Establecemos la configuracion de color
             if (!LookAndFeelManager.HIGH_CONTRAST) {
                 this.setBackground(LookAndFeelManager.WINDOW_COLOR);
-                SignPanel.this.filePanel.setBackground(Color.DARK_GRAY);
-                SignPanel.this.filePanel.setForeground(Color.LIGHT_GRAY);
+                SignPanel.this.getFilePanel().setBackground(Color.DARK_GRAY);
+                SignPanel.this.getFilePanel().setForeground(Color.LIGHT_GRAY);
                 buttonPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
             }
 
@@ -608,7 +659,7 @@ public final class SignPanel extends JPanel {
             detailPanel.add(sizeLabel);
 
             // Puede arrastrarse un fichero a cualquiera de estos componentes para cargarlo
-            this.setDropTarget(SignPanel.this.dropTarget);
+            this.setDropTarget(SignPanel.this.getDropTgt());
 
             // Establecemos la configuracion de color
             if (!LookAndFeelManager.HIGH_CONTRAST) {
@@ -714,10 +765,10 @@ public final class SignPanel extends JPanel {
 
             SignPanel.this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
-            if (SignPanel.this.signer == null || SignPanel.this.dataToSign == null || SignPanel.this.saf == null) {
+            if (SignPanel.this.getSigner() == null || SignPanel.this.getDataToSign() == null || SignPanel.this.getSimpleAfirma() == null) {
                 return null;
             }
-            final AOKeyStoreManager ksm = SignPanel.this.saf.getAOKeyStoreManager();
+            final AOKeyStoreManager ksm = SignPanel.this.getSimpleAfirma().getAOKeyStoreManager();
             String alias = null;
 
             try {
@@ -760,11 +811,11 @@ public final class SignPanel extends JPanel {
 
             SignPanel.this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
-            SignPanel.this.pm.setProgress(999);
+            SignPanel.this.getProgressMonitor().setProgress(999);
 
             // Deshabilitamos la posibilidad de cancelar el dialogo de espera
             try {
-                final JDialog dialog = (JDialog) SignPanel.this.pm.getAccessibleContext().getAccessibleParent();
+                final JDialog dialog = (JDialog) SignPanel.this.getProgressMonitor().getAccessibleContext().getAccessibleParent();
                 dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
                 ((JOptionPane)dialog.getContentPane().getComponent(0)).setOptions(new Object[]{});
             }
@@ -773,7 +824,7 @@ public final class SignPanel extends JPanel {
             try {
                 final Field jProgressBarField = ProgressMonitor.class.getDeclaredField("myBar"); //$NON-NLS-1$
                 jProgressBarField.setAccessible(true);
-                final JProgressBar progressBar = (JProgressBar) jProgressBarField.get(SignPanel.this.pm);
+                final JProgressBar progressBar = (JProgressBar) jProgressBarField.get(SignPanel.this.getProgressMonitor());
 
                 final Method setIndeterminateMethod = JProgressBar.class.getMethod("setIndeterminate", Boolean.TYPE); //$NON-NLS-1$
                 setIndeterminateMethod.invoke(progressBar, Boolean.TRUE);
@@ -793,17 +844,17 @@ public final class SignPanel extends JPanel {
 
             final byte[] signResult;
             try {
-                if (SignPanel.this.cosign) {
-                    signResult = SignPanel.this.signer.cosign(
-                		SignPanel.this.dataToSign,
+                if (SignPanel.this.isCosign()) {
+                    signResult = SignPanel.this.getSigner().cosign(
+                		SignPanel.this.getDataToSign(),
                 		"SHA1withRSA", //$NON-NLS-1$
                         ksm.getKeyEntry(alias, KeyStoreUtilities.getCertificatePC(ksm.getType(), SignPanel.this)),
                         p
                     );
                 }
                 else {
-                    signResult = SignPanel.this.signer.sign(
-                		SignPanel.this.dataToSign,
+                    signResult = SignPanel.this.getSigner().sign(
+                		SignPanel.this.getDataToSign(),
                 		"SHA1withRSA", //$NON-NLS-1$
                         ksm.getKeyEntry(alias, KeyStoreUtilities.getCertificatePC(ksm.getType(), SignPanel.this)),
                         p
@@ -834,13 +885,13 @@ public final class SignPanel extends JPanel {
             }
             finally {
                 SignPanel.this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-                SignPanel.this.pm.setProgress(1000);
+                SignPanel.this.getProgressMonitor().setProgress(1000);
             }
 
-            String newFileName = SignPanel.this.currentFile.getName();
+            String newFileName = SignPanel.this.getCurrentFile().getName();
             String[] filterExtensions;
             String filterDescription;
-            if (SignPanel.this.signer instanceof AOPDFSigner) {
+            if (SignPanel.this.getSigner() instanceof AOPDFSigner) {
                 if (!newFileName.toLowerCase().endsWith(".pdf")) { //$NON-NLS-1$
                     newFileName = newFileName + ".pdf"; //$NON-NLS-1$
                 }
@@ -849,7 +900,7 @@ public final class SignPanel extends JPanel {
                     ".pdf"}; //$NON-NLS-1$
                 filterDescription = Messages.getString("SignPanel.72"); //$NON-NLS-1$
             }
-            else if (SignPanel.this.signer instanceof AOXAdESSigner || SignPanel.this.signer instanceof AOFacturaESigner) {
+            else if (SignPanel.this.getSigner() instanceof AOXAdESSigner || SignPanel.this.getSigner() instanceof AOFacturaESigner) {
                 newFileName = newFileName.replace(".", "_") + ".xsig"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 filterExtensions = new String[] {
                         ".xsig", ".xml"}; //$NON-NLS-1$ //$NON-NLS-2$
@@ -870,11 +921,11 @@ public final class SignPanel extends JPanel {
             boolean nameMissingExtension = true;
 
             if (Platform.OS.MACOSX.equals(Platform.getOS()) || Platform.OS.WINDOWS.equals(Platform.getOS())) {
-                if (SignPanel.this.saf.getCurrentDir() == null) {
-                    SignPanel.this.saf.setCurrentDir(new File(Platform.getUserHome()));
+                if (SignPanel.this.getSimpleAfirma().getCurrentDir() == null) {
+                    SignPanel.this.getSimpleAfirma().setCurrentDir(new File(Platform.getUserHome()));
                 }
-                final FileDialog fd = new FileDialog(SignPanel.this.window, Messages.getString("SignPanel.81"), FileDialog.SAVE); //$NON-NLS-1$
-                fd.setDirectory(SignPanel.this.saf.getCurrentDir().getAbsolutePath());
+                final FileDialog fd = new FileDialog(SignPanel.this.getWindow(), Messages.getString("SignPanel.81"), FileDialog.SAVE); //$NON-NLS-1$
+                fd.setDirectory(SignPanel.this.getSimpleAfirma().getCurrentDir().getAbsolutePath());
                 fd.setFile(newFileName);
                 fd.setFilenameFilter(new FilenameFilter() {
                     @Override
@@ -892,13 +943,13 @@ public final class SignPanel extends JPanel {
                     setSignCommandEnabled(true);
                     return null;
                 }
-                SignPanel.this.saf.setCurrentDir(new File(fd.getDirectory()));
+                SignPanel.this.getSimpleAfirma().setCurrentDir(new File(fd.getDirectory()));
                 newFileName = fd.getDirectory() + fd.getFile();
             }
             else {
                 final JFileChooser fc = new JFileChooser();
-                if (SignPanel.this.saf.getCurrentDir() != null) {
-                    fc.setCurrentDirectory(SignPanel.this.saf.getCurrentDir());
+                if (SignPanel.this.getSimpleAfirma().getCurrentDir() != null) {
+                    fc.setCurrentDirectory(SignPanel.this.getSimpleAfirma().getCurrentDir());
                 }
                 fc.setSelectedFile(new File(newFileName));
                 fc.setFileFilter(new FileFilter() {
@@ -917,8 +968,8 @@ public final class SignPanel extends JPanel {
                         return fDescription;
                     }
                 });
-                if (JFileChooser.APPROVE_OPTION == fc.showSaveDialog(SignPanel.this.window)) {
-                    SignPanel.this.saf.setCurrentDir(fc.getCurrentDirectory());
+                if (JFileChooser.APPROVE_OPTION == fc.showSaveDialog(SignPanel.this.getWindow())) {
+                    SignPanel.this.getSimpleAfirma().setCurrentDir(fc.getCurrentDirectory());
                     newFileName = fc.getSelectedFile().getAbsolutePath();
                 }
                 else {
@@ -986,7 +1037,7 @@ public final class SignPanel extends JPanel {
                 catch (final Exception e) { /* Ignoramos los errores */ }
             }
             SignPanel.this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-            SignPanel.this.saf.loadResultsPanel(signResult, newFileName, ksm.getCertificate(alias));
+            SignPanel.this.getSimpleAfirma().loadResultsPanel(signResult, newFileName, ksm.getCertificate(alias));
 
             return null;
         }
