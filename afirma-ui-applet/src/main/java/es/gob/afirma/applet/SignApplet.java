@@ -19,7 +19,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URL;
 import java.net.URLDecoder;
 import java.security.AccessController;
 import java.security.KeyException;
@@ -190,7 +189,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     }
 
     void setSignData(final byte[] data) {
-    	this.signData = data;
+    	this.signData = data.clone();
     }
 
     // /** Indica que parte del buffer de datos ya ha sido le&iacute;do y
@@ -200,8 +199,8 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     // /** Firma electr&oacute;nica en base 64. */
     // private char[] signDataB64 = null;
 
-    /** URL de identificaci&oacute;n de la pol&iacute;tica de firma. */
-    private URL policyId = null;
+    /** Identificador de identificaci&oacute;n de la pol&iacute;tica de firma. */
+    private String policyId = null;
 
     /** Descripcion de la pol&iacute;tica de firma. */
     private String policyDesc = null;
@@ -210,7 +209,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     private URI policyQualifier = null;
 
     /** Valor de la huella digital de la pol&iacute;tica de firma. */
-    private final String policyHashB64 = null;
+    private String policyHashB64 = null;
 
     /** Manejador de las funcionalidades de cifrado del Cliente. */
     private CipherManager cipherManager = null;
@@ -1379,14 +1378,25 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     }
 
     /** {@inheritDoc} */
-    public void setPolicy(final String identifier, final String description, final String qualifier, final String hashB64) {
-        // Configuramos la URL identificadora
+    public void setPolicy(final String identifier,
+    		              final String description,
+    		              final String qualifier,
+    		              final String hashB64) {
+        // El identificador puede ser un OID o una URI (incluyendo una URN de tipo OID)
         if (identifier != null) {
-            try {
-                this.policyId = AOUtil.createURI(identifier).toURL();
+        	// Probamos primero si es un OID
+        	try {
+                this.policyId = new Oid(qualifier.replace("urn:oid:", "")).toString(); //$NON-NLS-1$ //$NON-NLS-2$
             }
-            catch (final Exception e) {
-                LOGGER.severe("No se ha indicado un URL valida para la politica: " + e); //$NON-NLS-1$
+            catch (final Exception e1) {
+            	// No es un OID, probamos una URL
+                try {
+                    this.policyId = AOUtil.createURI(identifier).toURL().toString();
+                }
+                catch (final Exception e) {
+                    LOGGER.warning("No se ha indicado un OID o una URI valida para la politica(" + identifier + "), pero se establecera el valor de todas formas: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+                    this.policyId = identifier;
+                }
             }
         }
         // Configuramos Oid calificador
@@ -1409,6 +1419,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         }
         // Configuramos la descripcion
         this.policyDesc = description;
+
+        // Y la huella digital del identificador
+        this.policyHashB64 = hashB64;
     }
 
     /** {@inheritDoc} */
