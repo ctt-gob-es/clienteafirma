@@ -119,7 +119,7 @@ public final class ProfileManager {
     }
 
     private static String getPreference(final String preferenceKey, final String defaultValue) {
-        return Main.preferences.get(preferenceKey, defaultValue);
+        return Main.getPreferences().get(preferenceKey, defaultValue);
     }
 
     /** Obtiene los identificadores de perfiles creados en el sistema y los devuelve
@@ -127,7 +127,7 @@ public final class ProfileManager {
      * @return Conjunto de identificadores. */
     private static Set<String> getProfileIdsSet() {
 
-        final String profiles = Main.preferences.get(KEY_PROFILES, null);
+        final String profiles = Main.getPreferences().get(KEY_PROFILES, null);
         final HashSet<String> profilesSet = new HashSet<String>();
         if (profiles != null && profiles.trim().length() > 0) {
             for (final String profileId : profiles.split(IDS_SEPARATOR)) {
@@ -208,9 +208,9 @@ public final class ProfileManager {
 
         final String profilePrefix = PREFIX_KEY + id;
         for (final String[] element : CONVERSE_VALUES) {
-            Main.preferences.put(profilePrefix + element[0], config.getProperty(element[1], element[2]));
+            Main.getPreferences().put(profilePrefix + element[0], config.getProperty(element[1], element[2]));
         }
-        Main.preferences.put(profilePrefix + KEY_PROFILE_NAME, name.trim());
+        Main.getPreferences().put(profilePrefix + KEY_PROFILE_NAME, name.trim());
 
         addNewId(id);
     }
@@ -230,7 +230,7 @@ public final class ProfileManager {
             idsString += ids[ids.length - 1];
         }
 
-        Main.preferences.put(KEY_PROFILES, idsString);
+        Main.getPreferences().put(KEY_PROFILES, idsString);
     }
 
     /** Elimina un perfil previamente creado.
@@ -243,9 +243,9 @@ public final class ProfileManager {
 
         final String profilePrefix = PREFIX_KEY + id;
         for (final String[] element : CONVERSE_VALUES) {
-            Main.preferences.remove(profilePrefix + element[0]);
+            Main.getPreferences().remove(profilePrefix + element[0]);
         }
-        Main.preferences.remove(profilePrefix + KEY_PROFILE_NAME);
+        Main.getPreferences().remove(profilePrefix + KEY_PROFILE_NAME);
 
         removeId(id);
     }
@@ -264,7 +264,7 @@ public final class ProfileManager {
             idsString += ids[ids.length - 1];
         }
 
-        Main.preferences.put(KEY_PROFILES, idsString);
+        Main.getPreferences().put(KEY_PROFILES, idsString);
     }
 
     /** Recupera la configuraci&oacute;n correspondiente a un perfil. Si se utiliza
@@ -283,7 +283,7 @@ public final class ProfileManager {
 
         final Properties config = new Properties();
         for (final String[] element : CONVERSE_VALUES) {
-            config.setProperty(element[1], Main.preferences.get(profilePrefix + element[0], element[2]));
+            config.setProperty(element[1], Main.getPreferences().get(profilePrefix + element[0], element[2]));
         }
 
         return config;
@@ -324,10 +324,10 @@ public final class ProfileManager {
      * @param name Nombre de perfil. */
     public static void setLastProfileName(final String name) {
         if (name == null) {
-            Main.preferences.remove(KEY_LAST_PROFILE_NAME);
+            Main.getPreferences().remove(KEY_LAST_PROFILE_NAME);
         }
         else {
-            Main.preferences.put(KEY_LAST_PROFILE_NAME, name);
+            Main.getPreferences().put(KEY_LAST_PROFILE_NAME, name);
         }
     }
 
@@ -335,7 +335,7 @@ public final class ProfileManager {
      * el perfil por defecto devuelve {@code null}.
      * @return Nombre de perfil. */
     public static String getLastProfileName() {
-        return Main.preferences.get(KEY_LAST_PROFILE_NAME, null);
+        return Main.getPreferences().get(KEY_LAST_PROFILE_NAME, null);
     }
 
     /** Recupera el valor de una opci&oacute;n de accesibilidad.

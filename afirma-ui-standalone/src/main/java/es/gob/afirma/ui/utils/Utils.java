@@ -169,7 +169,7 @@ public final class Utils {
 
 					@Override
                     public void focusGained(final FocusEvent e) {
-						if (GeneralConfig.isHighContrast() || Main.isOSHighContrast){
+						if (GeneralConfig.isHighContrast() || Main.isOSHighContrast()){
 							if (button.getParent() instanceof JPanel){
 								((JPanel)button.getParent()).setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
 							} else if (button.getParent() instanceof JToolBar){
@@ -200,7 +200,7 @@ public final class Utils {
 
 					@Override
                     public void focusGained(final FocusEvent e) {
-						if (GeneralConfig.isHighContrast()|| Main.isOSHighContrast){
+						if (GeneralConfig.isHighContrast()|| Main.isOSHighContrast()){
 							if (button.getParent() instanceof JPanel){
 								((JPanel)button.getParent()).setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
 							} else if (button.getParent() instanceof JToolBar){
@@ -226,7 +226,7 @@ public final class Utils {
 					}
 					@Override
                     public void focusGained(final FocusEvent e) {
-						if (GeneralConfig.isHighContrast() || Main.isOSHighContrast){
+						if (GeneralConfig.isHighContrast() || Main.isOSHighContrast()){
 							textField.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
 						} else {
 							textField.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
@@ -244,7 +244,7 @@ public final class Utils {
 
 					@Override
                     public void focusGained(final FocusEvent e) {
-						if (GeneralConfig.isHighContrast() || Main.isOSHighContrast){
+						if (GeneralConfig.isHighContrast() || Main.isOSHighContrast()){
 							comboBox.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
 						} else {
 							comboBox.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
@@ -262,7 +262,7 @@ public final class Utils {
 
 					@Override
                     public void focusGained(final FocusEvent e) {
-						if (GeneralConfig.isHighContrast() || Main.isOSHighContrast){
+						if (GeneralConfig.isHighContrast() || Main.isOSHighContrast()){
 							((JPanel)radioButton.getParent()).setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
 						} else {
 							((JPanel)radioButton.getParent()).setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
@@ -279,7 +279,7 @@ public final class Utils {
 					}
 					@Override
                     public void focusGained(final FocusEvent e) {
-						if (GeneralConfig.isHighContrast() || Main.isOSHighContrast){
+						if (GeneralConfig.isHighContrast() || Main.isOSHighContrast()){
 							label.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
 						} else {
 							label.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
@@ -297,7 +297,7 @@ public final class Utils {
 
 					@Override
                     public void focusGained(final FocusEvent e) {
-						if (GeneralConfig.isHighContrast() || Main.isOSHighContrast){
+						if (GeneralConfig.isHighContrast() || Main.isOSHighContrast()){
 							((JPanel)checkBox.getParent()).setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
 						} else {
 							((JPanel)checkBox.getParent()).setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
@@ -314,7 +314,7 @@ public final class Utils {
 					}
 					@Override
                     public void focusGained(final FocusEvent e) {
-						if (GeneralConfig.isHighContrast() || Main.isOSHighContrast){
+						if (GeneralConfig.isHighContrast() || Main.isOSHighContrast()){
 							textPane.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
 						} else {
 							textPane.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
@@ -331,7 +331,7 @@ public final class Utils {
 					}
 					@Override
                     public void focusGained(final FocusEvent e) {
-						if (GeneralConfig.isHighContrast()|| Main.isOSHighContrast){
+						if (GeneralConfig.isHighContrast()|| Main.isOSHighContrast()){
 							editorPane.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
 						} else {
 							editorPane.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
@@ -348,7 +348,7 @@ public final class Utils {
 					}
 					@Override
                     public void focusGained(final FocusEvent e) {
-						if (GeneralConfig.isHighContrast()|| Main.isOSHighContrast){
+						if (GeneralConfig.isHighContrast()|| Main.isOSHighContrast()){
 							tree.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
 						} else {
 							tree.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
@@ -365,7 +365,7 @@ public final class Utils {
 					}
 					@Override
                     public void focusGained(final FocusEvent e) {
-						if (GeneralConfig.isHighContrast() || Main.isOSHighContrast){
+						if (GeneralConfig.isHighContrast() || Main.isOSHighContrast()){
 							list.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
 						} else {
 							list.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
@@ -399,7 +399,7 @@ public final class Utils {
 					}
 					@Override
                     public void focusGained(final FocusEvent e) {
-						if (GeneralConfig.isHighContrast() || Main.isOSHighContrast){
+						if (GeneralConfig.isHighContrast() || Main.isOSHighContrast()){
 							scrollPane.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
 						} else {
 							scrollPane.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));

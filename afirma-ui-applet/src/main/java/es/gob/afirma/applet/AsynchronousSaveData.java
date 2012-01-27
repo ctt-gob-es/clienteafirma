@@ -22,12 +22,12 @@ import javax.swing.JOptionPane;
  * <code>SwingUtilities.invokeLater(new AsynchronousSaveData(data, file, desc, exts, parent, true));</code> */
 public final class AsynchronousSaveData implements Runnable {
 
-    final byte[] dataToSave;
-    String savingTarget;
-    final String[] extensions;
-    String description = AppletMessages.getString("AsynchronousSaveData.0"); //$NON-NLS-1$
-    final Frame parent;
-    final boolean showDialogIfError;
+	private final byte[] dataToSave;
+	private String savingTarget;
+	private final String[] extensions;
+	private String description = AppletMessages.getString("AsynchronousSaveData.0"); //$NON-NLS-1$
+	private final Frame parent;
+	private final boolean showDialogIfError;
 
     /** Crea una clase para el guardado as&iacute;ncrono de datos en disco.
      * @param data

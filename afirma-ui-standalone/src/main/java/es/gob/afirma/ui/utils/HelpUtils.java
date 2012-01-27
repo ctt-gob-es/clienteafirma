@@ -203,7 +203,7 @@ public final class HelpUtils {
         // Alto contraste
         final WindowPresentation wp = ((DefaultHelpBroker) getHelp()).getWindowPresentation();
         final Window helpwindow = wp.getHelpWindow();
-        if (Main.isOSHighContrast || GeneralConfig.isHighContrast()) {
+        if (Main.isOSHighContrast() || GeneralConfig.isHighContrast()) {
             checkHelpAccessibility(helpwindow, true);
         }
         else {
@@ -329,7 +329,7 @@ public final class HelpUtils {
                 // Alto contraste
                 final WindowPresentation wp = ((DefaultHelpBroker) getHelp()).getWindowPresentation();
                 final Window helpwindow = wp.getHelpWindow();
-                if (Main.isOSHighContrast || GeneralConfig.isHighContrast()) {
+                if (Main.isOSHighContrast() || GeneralConfig.isHighContrast()) {
                     // helpwindow.setBackground(Color.BLACK);
                     checkHelpAccessibility(helpwindow, true);
                 }
@@ -606,7 +606,7 @@ public final class HelpUtils {
             // Alto contraste
             final WindowPresentation wp = ((DefaultHelpBroker) getHelp()).getWindowPresentation();
             final Window helpwindow = wp.getHelpWindow();
-            if (Main.isOSHighContrast || GeneralConfig.isHighContrast()) {
+            if (Main.isOSHighContrast() || GeneralConfig.isHighContrast()) {
                 checkHelpAccessibility(helpwindow, true);
             }
             else {
@@ -639,7 +639,7 @@ public final class HelpUtils {
         // Alto contraste
         final WindowPresentation wp = ((DefaultHelpBroker) getHelp()).getWindowPresentation();
         final Window helpwindow = wp.getHelpWindow();
-        if (Main.isOSHighContrast || GeneralConfig.isHighContrast()) {
+        if (Main.isOSHighContrast() || GeneralConfig.isHighContrast()) {
             checkHelpAccessibility(helpwindow, true);
         }
         else {
@@ -668,7 +668,7 @@ public final class HelpUtils {
         // Alto contraste
         final WindowPresentation wp = ((DefaultHelpBroker) getHelp()).getWindowPresentation();
         final Window helpwindow = wp.getHelpWindow();
-        if (Main.isOSHighContrast || GeneralConfig.isHighContrast()) {
+        if (Main.isOSHighContrast() || GeneralConfig.isHighContrast()) {
             checkHelpAccessibility(helpwindow, true);
         }
         else {

@@ -244,7 +244,7 @@ class UserProfile extends JAccessibilityFrameAdvisor {
     private void initComponents() {
 
         if (getBackground().getRGB() == -16777216) {
-            Main.isOSHighContrast = true;
+            Main.setOSHighContrast(true);
         }
 
         // Dimensiones de la ventana

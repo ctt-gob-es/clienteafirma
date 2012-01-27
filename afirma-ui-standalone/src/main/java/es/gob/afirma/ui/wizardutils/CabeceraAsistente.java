@@ -147,7 +147,7 @@ public final class CabeceraAsistente extends JPanel {
         //Panel que va a contener los botones de accesibilidad
         final JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(Color.WHITE);
-        if (Main.isOSHighContrast){
+        if (Main.isOSHighContrast()){
             panel.setOpaque(false);
         }
         Utils.setContrastColor(panel);
@@ -199,7 +199,7 @@ public final class CabeceraAsistente extends JPanel {
         this.restoreButton.setName("restaurar"); //$NON-NLS-1$
         Utils.remarcar(this.restoreButton);
         restorePanel.setBackground(Color.WHITE);
-        if (Main.isOSHighContrast){
+        if (Main.isOSHighContrast()){
             restorePanel.setOpaque(false);
         }
         Utils.setContrastColor(restorePanel);
@@ -238,7 +238,7 @@ public final class CabeceraAsistente extends JPanel {
         Utils.remarcar(this.maximizeButton);
         //maximizePanel.add(this.maximizeButton, consMaximizePanel);
         maximizePanel.setBackground(Color.WHITE);
-        if (Main.isOSHighContrast){
+        if (Main.isOSHighContrast()){
             maximizePanel.setOpaque(false);
         }
         Utils.setContrastColor(maximizePanel);
@@ -311,7 +311,7 @@ public final class CabeceraAsistente extends JPanel {
         // Configuracion de la ventana
         setBackground(Color.WHITE);
         // si el color de fondo ya no es blanco
-        if (Main.isOSHighContrast){
+        if (Main.isOSHighContrast()){
             setOpaque(false);
         }
         setPreferredSize(this.dimensiones);

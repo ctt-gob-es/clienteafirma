@@ -80,7 +80,7 @@ public class JStatusBar extends JComponent {
             // Se pone el texto en estilo normal
             lb.setFont(new Font(lb.getFont().getName(), Font.PLAIN, lb.getFont().getSize()));
         }
-        if (Main.isOSHighContrast) {
+        if (Main.isOSHighContrast()) {
             lb.setForeground(Color.WHITE);
         }
         lb.setText(status);

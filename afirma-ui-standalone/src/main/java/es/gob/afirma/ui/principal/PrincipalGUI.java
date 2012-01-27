@@ -669,7 +669,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
     /** Inicializacion de los componentes */
     private void initComponents() {
         if (getBackground().getRGB() == -16777216) {
-            Main.isOSHighContrast = true;
+            Main.setOSHighContrast(true);
         }
         // Dimensiones de la ventana
         setBounds(PrincipalGUI.getInitialX(), PrincipalGUI.getInitialY(), Constants.WINDOW_INITIAL_WIDTH, Constants.WINDOW_INITIAL_HEIGHT);

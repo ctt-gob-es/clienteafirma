@@ -170,7 +170,7 @@ final class HorizontalTabbedPanel extends JPanel {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 HelpUtils.visualize(button.getName());
-                Main.helpIndex = button.getName();
+                Main.setHelpIndex(button.getName());
             }
         });
         if (this.firstButton) {

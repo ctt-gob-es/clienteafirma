@@ -26,17 +26,17 @@ import es.gob.afirma.ui.utils.ProfileManager;
 public class Main {
 
     /** Almacena el indice a cargar para la ayuda en alto contraste */
-    static String helpIndex;
+	private static String helpIndex;
 
     /** Indica si el SO tiene activado el alto contraste con color negro de fondo */
-    public static boolean isOSHighContrast = false;
+	private static boolean isOSHighContrast = false;
 
-    static Logger logger = Logger.getLogger(Main.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
 
     /** Preferencias generales establecidas para el aplicativo. */
-    public static Preferences preferences = Preferences.userRoot().node(Constants.ourNodeName);
+	private static final Preferences PREFERENCES = Preferences.userRoot().node(Constants.ourNodeName);
 
-    static boolean showHelp = false;
+	private static boolean showHelp = false;
 
     /** Versi&oacute;n de la interfaz gr&aacute;fica de escritorio. */
     public static final String VERSION = "2.0"; //$NON-NLS-1$
@@ -61,7 +61,7 @@ public class Main {
             }
         }
         catch (final Exception ex) {
-            logger.log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, null, ex);
         }
 
         if (ProfileManager.getProfilesNames().length < 1) {
@@ -72,5 +72,25 @@ public class Main {
             new UserProfile().main();
         }
     }
+
+	static String getHelpIndex() {
+		return helpIndex;
+	}
+
+	static void setHelpIndex(final String helpIndex) {
+		Main.helpIndex = helpIndex;
+	}
+
+	public static boolean isOSHighContrast() {
+		return isOSHighContrast;
+	}
+
+	public static void setOSHighContrast(final boolean isOSHighContrast) {
+		Main.isOSHighContrast = isOSHighContrast;
+	}
+
+	public static Preferences getPreferences() {
+		return PREFERENCES;
+	}
 
 }

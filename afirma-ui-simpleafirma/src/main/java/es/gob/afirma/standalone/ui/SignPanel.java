@@ -107,27 +107,27 @@ public final class SignPanel extends JPanel {
     private static final String FILE_ICON_SIGN = "/resources/icon_sign.svg"; //$NON-NLS-1$
     private static final String FILE_ICON_FACTURAE = "/resources/icon_facturae.svg"; //$NON-NLS-1$
 
-    AOSigner signer;
-    byte[] dataToSign = null;
+    private AOSigner signer;
+    private byte[] dataToSign = null;
 
-    JPanel filePanel;
+    private JPanel filePanel;
     private JPanel lowerPanel;
 
-    DropTarget dropTarget;
+    private DropTarget dropTarget;
 
-    final JFrame window;
+    private final JFrame window;
 
-    final JButton signButton = new JButton();
-    final JButton selectButton = new JButton();
+    private final JButton signButton = new JButton();
+    private final JButton selectButton = new JButton();
 
-    final SimpleAfirma saf;
+    private final SimpleAfirma saf;
 
-    ProgressMonitor pm = new ProgressMonitor(SignPanel.this, Messages.getString("SignPanel.15"), "", 0, 1000);  //$NON-NLS-1$//$NON-NLS-2$
+    private final ProgressMonitor pm = new ProgressMonitor(SignPanel.this, Messages.getString("SignPanel.15"), "", 0, 1000);  //$NON-NLS-1$//$NON-NLS-2$
 
     /** Indica si la operaci&oacute;n a realizar es una cofirma. */
-    boolean cosign = false;
+    private boolean cosign = false;
 
-    File currentFile = null;
+    private File currentFile = null;
 
     /** Carga el fichero a firmar.
      * @param filename Nombre (ruta completa incuida) del fichero a firmar
@@ -241,10 +241,11 @@ public final class SignPanel extends JPanel {
         this.lowerPanel.remove(this.filePanel);
         this.filePanel =
                 new FilePanel(this.fileTypeVectorIcon,
-                              NumberFormat.getInstance().format(fileSize),
-                              filename,
-                              fileDescription,
-                              new Date(fileLastModified));
+                      NumberFormat.getInstance().format(fileSize),
+                      filename,
+                      fileDescription,
+                      new Date(fileLastModified)
+                );
         this.lowerPanel.add(this.filePanel);
         this.lowerPanel.revalidate();
 

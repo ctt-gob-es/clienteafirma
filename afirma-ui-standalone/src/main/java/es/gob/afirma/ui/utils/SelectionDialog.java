@@ -71,7 +71,7 @@ public final class SelectionDialog {
 	 */
 	private static File showOpenDialog(final Component parent, final String title, final int selectionMode, final ExtFilter filter) {
 
-        String currentDir = Main.preferences.get("dialog.load.dir", null); //$NON-NLS-1$
+        String currentDir = Main.getPreferences().get("dialog.load.dir", null); //$NON-NLS-1$
         if (currentDir == null) {
             currentDir = "."; //$NON-NLS-1$
         }
@@ -90,7 +90,7 @@ public final class SelectionDialog {
 		if(fc.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION) {
 			filePath = fc.getSelectedFile();
 			if (filePath.getParentFile() != null) {
-			    Main.preferences.put("dialog.load.dir", filePath.getParentFile().getAbsolutePath()); //$NON-NLS-1$
+			    Main.getPreferences().put("dialog.load.dir", filePath.getParentFile().getAbsolutePath()); //$NON-NLS-1$
 			}
 		}
 
@@ -136,7 +136,7 @@ public final class SelectionDialog {
         	tryAgain = false;
 	        //Instancia del dialogo de guardado accesible
 	        final JAccessibilityFileChooserToSave fileChooser = new JAccessibilityFileChooserToSave();
-	        final String currentDir = Main.preferences.get("dialog.save.dir", null); //$NON-NLS-1$
+	        final String currentDir = Main.getPreferences().get("dialog.save.dir", null); //$NON-NLS-1$
 	        if (currentDir != null) {
 	            fileChooser.setCurrentDirectory(new File(currentDir));
 	        }
@@ -226,7 +226,7 @@ public final class SelectionDialog {
 
         try {
             if (resultFile != null && resultFile.getParentFile() != null) {
-                Main.preferences.put("dialog.save.dir", resultFile.getParentFile().getAbsolutePath()); //$NON-NLS-1$
+                Main.getPreferences().put("dialog.save.dir", resultFile.getParentFile().getAbsolutePath()); //$NON-NLS-1$
             }
         } catch (final Exception e) {
             /* No hacemos nada */

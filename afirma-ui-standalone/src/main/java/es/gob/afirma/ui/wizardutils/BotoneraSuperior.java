@@ -90,7 +90,7 @@ public class BotoneraSuperior extends JPanel {
     	setPreferredSize(this.dimensiones);
         setLayout(new FlowLayout(FlowLayout.RIGHT, 1, 1));
         setBackground(Color.WHITE);
-        if (Main.isOSHighContrast){
+        if (Main.isOSHighContrast()){
         	setOpaque(false);
         }
         setBorder(null);
@@ -162,7 +162,7 @@ public class BotoneraSuperior extends JPanel {
 		//Panel que va a contener los botones de accesibilidad
 		JPanel panel = new JPanel(new GridBagLayout());
 		panel.setBackground(Color.WHITE);
-		if (Main.isOSHighContrast){
+		if (Main.isOSHighContrast()){
         	panel.setOpaque(false);
         }
 		Utils.setContrastColor(panel);
@@ -214,7 +214,7 @@ public class BotoneraSuperior extends JPanel {
 		this.restoreButton.setName("restaurar");
 		Utils.remarcar(this.restoreButton);
 		restorePanel.setBackground(Color.WHITE);
-		if (Main.isOSHighContrast){
+		if (Main.isOSHighContrast()){
         	restorePanel.setOpaque(false);
         }
 		Utils.setContrastColor(restorePanel);
@@ -252,7 +252,7 @@ public class BotoneraSuperior extends JPanel {
 		Utils.remarcar(this.maximizeButton);
 		//maximizePanel.add(this.maximizeButton, consMaximizePanel);
 		maximizePanel.setBackground(Color.WHITE);
-		if (Main.isOSHighContrast){
+		if (Main.isOSHighContrast()){
         	maximizePanel.setOpaque(false);
         }
 		Utils.setContrastColor(maximizePanel);

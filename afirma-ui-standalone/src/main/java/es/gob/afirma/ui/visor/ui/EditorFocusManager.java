@@ -59,7 +59,7 @@ final class EditorFocusManager extends KeyAdapter implements FocusListener, Hype
         final StyleContext sc = new StyleContext();
         this.linkUnfocusedStyle = sc.addStyle("linkUnfocused", sc.getStyle(StyleContext.DEFAULT_STYLE)); //$NON-NLS-1$
         StyleConstants.setUnderline(this.linkUnfocusedStyle, true);
-        if (GeneralConfig.isHighContrast() || Main.isOSHighContrast){
+        if (GeneralConfig.isHighContrast() || Main.isOSHighContrast()){
         	StyleConstants.setForeground(this.linkUnfocusedStyle, new Color(169, 226, 255, 255));
         } else {
         	StyleConstants.setForeground(this.linkUnfocusedStyle, Color.BLUE);
@@ -67,7 +67,7 @@ final class EditorFocusManager extends KeyAdapter implements FocusListener, Hype
         StyleConstants.setBackground(this.linkUnfocusedStyle, new Color(0, 0, 0, 0));
         
         this.linkFocusedStyle = sc.addStyle("linkFocused", sc.getStyle(StyleContext.DEFAULT_STYLE)); //$NON-NLS-1$
-        if (GeneralConfig.isHighContrast() || Main.isOSHighContrast){
+        if (GeneralConfig.isHighContrast() || Main.isOSHighContrast()){
         	StyleConstants.setBackground(this.linkFocusedStyle, Color.WHITE);
             StyleConstants.setForeground(this.linkFocusedStyle, Color.BLACK);
         } else {

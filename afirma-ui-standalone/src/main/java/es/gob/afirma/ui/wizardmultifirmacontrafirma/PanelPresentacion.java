@@ -78,7 +78,7 @@ public class PanelPresentacion extends JAccessibilityDialogWizard {
     	
     	// Panel con la imagen lateral
         ImagenLateral panelIzdo = new ImagenLateral();
-        if (Main.isOSHighContrast){
+        if (Main.isOSHighContrast()){
         	panelIzdo.setOpaque(false);
         }
         Utils.setContrastColor(panelIzdo);
@@ -88,7 +88,7 @@ public class PanelPresentacion extends JAccessibilityDialogWizard {
         JPanel panelCentral = new JPanel();
         panelCentral.setBackground(Color.WHITE);
         // si el color de fondo ya no es blanco
-        if (Main.isOSHighContrast){
+        if (Main.isOSHighContrast()){
         	panelCentral.setOpaque(false);
         }
         Utils.setContrastColor(panelCentral);

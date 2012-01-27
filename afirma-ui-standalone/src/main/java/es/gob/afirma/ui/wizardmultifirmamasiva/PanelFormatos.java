@@ -23,7 +23,6 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -120,23 +119,21 @@ final class PanelFormatos extends JAccessibilityDialogWizard implements ItemList
             }
         }
     }
-    /** Log. */
-    static Logger logger = Logger.getLogger(PanelFormatos.class.getName());
 
     /** UID. */
     private static final long serialVersionUID = 1L;
 
     // Checkbox con el modo del formato
-    final JCheckBox checkFormato = new JCheckBox();
+    private final JCheckBox checkFormato = new JCheckBox();
 
     // Combo con los formatos
-    final JComboBox comboFormatos = new JComboBox();
+    private final JComboBox comboFormatos = new JComboBox();
 
     // Etiqueta para los formatos
     private final JLabel etiquetaFormato = new JLabel();
 
     /** Listado con las constantes de los formatos del combo. */
-    final List<String> formatosV = new ArrayList<String>(Arrays.asList(AOSignConstants.SIGN_FORMAT_XADES_DETACHED,
+    private final List<String> formatosV = new ArrayList<String>(Arrays.asList(AOSignConstants.SIGN_FORMAT_XADES_DETACHED,
                                                                        AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING,
                                                                        AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED,
                                                                        AOSignConstants.SIGN_FORMAT_CADES,
@@ -144,15 +141,19 @@ final class PanelFormatos extends JAccessibilityDialogWizard implements ItemList
                                                                        AOSignConstants.SIGN_FORMAT_ODF,
                                                                        AOSignConstants.SIGN_FORMAT_OOXML));
     // Radio button cofirma
-    final JRadioButton radioCofirma = new JRadioButton();
+    private final JRadioButton radioCofirma = new JRadioButton();
+
     // Radio button contrafirma
     private final JRadioButton radioContrafirma = new JRadioButton();
+
     // Radio button firma
-    final JRadioButton radioFirma = new JRadioButton();
+    private final JRadioButton radioFirma = new JRadioButton();
+
     /** Constructor. */
     PanelFormatos() {
         initComponents();
     }
+
     /** Carga el combo con los diferentes formatos */
     private void cargarCombo() {
         this.comboFormatos.setModel(new DefaultComboBoxModel(new String[] {
