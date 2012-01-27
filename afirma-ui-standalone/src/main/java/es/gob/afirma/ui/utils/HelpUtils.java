@@ -256,8 +256,8 @@ public final class HelpUtils {
         botonAyuda.setToolTipText(Messages.getString("ayudaHTML.contenido")); //$NON-NLS-1$
         botonAyuda.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         if (!pagina.equals("perfiles.usuario")) { //$NON-NLS-1$
-            botonAyuda.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("ayudaHTML.contenido"))); //$NON-NLS-1$
-            botonAyuda.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("ayudaHTML.contenido"))); //$NON-NLS-1$
+            botonAyuda.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(), Messages.getString("ayudaHTML.contenido"))); //$NON-NLS-1$
+            botonAyuda.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(), Messages.getString("ayudaHTML.contenido"))); //$NON-NLS-1$
         }
         botonAyuda.setMnemonic(KeyEvent.VK_H); // Se le asigna un mnemonico al boton de ayuda
         botonAyuda.getAccessibleContext().setAccessibleName(botonAyuda.getToolTipText());

@@ -58,10 +58,10 @@ final class Acercade extends JAccessibilityFrameAbout {
 
     /** Escondemos la ventana */
     void aceptarActionPerformed() {
-        PrincipalGUI.aboutActualPositionX = this.getX();
-        PrincipalGUI.aboutActualPositionY = this.getY();
-        PrincipalGUI.aboutActualWidth = this.getWidth();
-        PrincipalGUI.aboutActualHeight = this.getHeight();
+        PrincipalGUI.setAboutActualPositionX(this.getX());
+        PrincipalGUI.setAboutActualPositionY(this.getY());
+        PrincipalGUI.setAboutActualWidth(this.getWidth());
+        PrincipalGUI.setAboutActualHeight(this.getHeight());
         dispose();
     }
 
@@ -130,11 +130,11 @@ final class Acercade extends JAccessibilityFrameAbout {
         }
         else {
             this.setExtendedState(0);
-            if (PrincipalGUI.aboutActualPositionX != -1) {
-                setBounds(PrincipalGUI.aboutActualPositionX,
-                          PrincipalGUI.aboutActualPositionY,
-                          PrincipalGUI.aboutActualWidth,
-                          PrincipalGUI.aboutActualHeight);
+            if (PrincipalGUI.getAboutActualPositionX() != -1) {
+                setBounds(PrincipalGUI.getAboutActualPositionX(),
+                          PrincipalGUI.getAboutActualPositionY(),
+                          PrincipalGUI.getAboutActualWidth(),
+                          PrincipalGUI.getAboutActualHeight());
                 if (Platform.getOS().equals(Platform.OS.LINUX) || Platform.getOS().equals(Platform.OS.MACOSX)) {
                     setMinimumSize(new Dimension(Constants.ABOUT_WINDOW_INITIAL_WIDTH_LINUX, Constants.ABOUT_WINDOW_INITIAL_HEIGHT_LINUX));
                 }

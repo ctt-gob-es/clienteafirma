@@ -402,10 +402,10 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
         // Guardamos la posicion y tamano actual de la ventana solo en caso de no estar maximizada por configuracion
         if (!GeneralConfig.isMaximized()){
             final JAccessibilityDialogWizard j = JAccessibilityDialogWizard.getJAccessibilityDialogWizard(this);
-            PrincipalGUI.wizardActualPositionX = j.getX();
-            PrincipalGUI.wizardActualPositionY = j.getY();
-            PrincipalGUI.wizardActualWidth = j.getWidth();
-            PrincipalGUI.wizardActualHeight = j.getHeight();
+            PrincipalGUI.setWizardActualPositionX(j.getX());
+            PrincipalGUI.setWizardActualPositionY(j.getY());
+            PrincipalGUI.setWizardActualWidth(j.getWidth());
+            PrincipalGUI.setWizardActualHeight(j.getHeight());
         }
     }
 

@@ -158,8 +158,8 @@ final class Descifrado extends JPanel {
         // Caja con el nombre del archivo seleccionado
         final JTextField campoFichero = new JTextField();
         campoFichero.setToolTipText(Messages.getString("Descifrado.buscar.caja.description")); // NOI18N //$NON-NLS-1$
-        campoFichero.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Descifrado.buscar.caja.description"))); //$NON-NLS-1$
-        campoFichero.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Descifrado.buscar.caja.description"))); //$NON-NLS-1$
+        campoFichero.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(), Messages.getString("Descifrado.buscar.caja.description"))); //$NON-NLS-1$
+        campoFichero.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(), Messages.getString("Descifrado.buscar.caja.description"))); //$NON-NLS-1$
         campoFichero.getAccessibleContext().setAccessibleName(etiquetaFichero.getText() + " ALT + E."); // NOI18N
         campoFichero.getAccessibleContext().setAccessibleDescription(Messages.getString("Cifrado.buscar.caja.description")); // NOI18N //$NON-NLS-1$
         campoFichero.addAncestorListener(new RequestFocusListener(false));
@@ -188,8 +188,8 @@ final class Descifrado extends JPanel {
         examinar.setMnemonic(KeyEvent.VK_X);
         examinar.setText(Messages.getString("PrincipalGUI.Examinar")); // NOI18N //$NON-NLS-1$
         examinar.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description")); // NOI18N //$NON-NLS-1$
-        examinar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.Examinar.description"))); //$NON-NLS-1$
-        examinar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.Examinar.description"))); //$NON-NLS-1$
+        examinar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(), Messages.getString("PrincipalGUI.Examinar.description"))); //$NON-NLS-1$
+        examinar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(), Messages.getString("PrincipalGUI.Examinar.description"))); //$NON-NLS-1$
         examinar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent evt) {
@@ -244,9 +244,9 @@ final class Descifrado extends JPanel {
         // comboMecanismo.getAccessibleContext().setAccessibleName(Messages.getString("Cifrado.origen.clave") +" "+
         // Messages.getString("Descifrado.origen.clave.combo.description")+" ALT + A."); // NOI18N
         comboMecanismo.getAccessibleContext().setAccessibleDescription(Messages.getString("Cifrado.origen.clave.combo.description")); // NOI18N //$NON-NLS-1$
-        comboMecanismo.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar,
+        comboMecanismo.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(),
                                                                             Messages.getString("Descifrado.origen.clave.combo.description"))); //$NON-NLS-1$
-        comboMecanismo.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar,
+        comboMecanismo.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(),
                                                                             Messages.getString("Descifrado.origen.clave.combo.description"))); //$NON-NLS-1$
         comboMecanismo.addItemListener(new ItemListener() {
             @Override
@@ -312,9 +312,9 @@ final class Descifrado extends JPanel {
         comboAlgoritmo.setModel(new DefaultComboBoxModel(new String[] {
                                                                        "Triple Data Encryption Standard (3DES)", "Item 2", "Item 3", "Item 4"})); //$NON-NLS-1$
         comboAlgoritmo.setToolTipText(Messages.getString("Descifrado.formato.combo.description")); // NOI18N //$NON-NLS-1$
-        comboAlgoritmo.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar,
+        comboAlgoritmo.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(),
                                                                             Messages.getString("Descifrado.formato.combo.description"))); //$NON-NLS-1$
-        comboAlgoritmo.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar,
+        comboAlgoritmo.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(),
                                                                             Messages.getString("Descifrado.formato.combo.description"))); //$NON-NLS-1$
         // comboAlgoritmo.getAccessibleContext().setAccessibleName(etiquetaAlgoritmo.getText() +" "+
         // Messages.getString("Descifrado.formato.combo.description")+" ALT + G."); // NOI18N); // NOI18N
@@ -375,8 +375,8 @@ final class Descifrado extends JPanel {
         descifrar.setMaximumSize(null);
         descifrar.setMinimumSize(null);
         descifrar.setPreferredSize(null);
-        descifrar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Desensobrado.btnDescifrar.description"))); //$NON-NLS-1$
-        descifrar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Desensobrado.btnDescifrar.description"))); //$NON-NLS-1$
+        descifrar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(), Messages.getString("Desensobrado.btnDescifrar.description"))); //$NON-NLS-1$
+        descifrar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(), Messages.getString("Desensobrado.btnDescifrar.description"))); //$NON-NLS-1$
         descifrar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent evt) {

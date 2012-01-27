@@ -101,7 +101,7 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 				}
 			}
 		} else {
-			if (PrincipalGUI.wizardActualPositionX != -1){
+			if (PrincipalGUI.getWizardActualPositionX() != -1){
 				if (AccessibilityOptionsPane.isContinueBigStyle()){
 					if (Platform.getOS().equals(Platform.OS.LINUX)){
 						setBounds((screenSize.width - Constants.WIZARD_INITIAL_WIDTH) / 2, (screenSize.height - Constants.WIZARD_INITIAL_HEIGHT_LINUX) / 2, Constants.WIZARD_INITIAL_WIDTH_LINUX, Constants.WIZARD_INITIAL_HEIGHT_LINUX);
@@ -109,7 +109,7 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 						setBounds((screenSize.width - Constants.WIZARD_INITIAL_WIDTH) / 2, (screenSize.height - Constants.WIZARD_INITIAL_HEIGHT) / 2, Constants.WIZARD_INITIAL_WIDTH, Constants.WIZARD_INITIAL_HEIGHT);
 					}
 				} else {
-					setBounds(PrincipalGUI.wizardActualPositionX, PrincipalGUI.wizardActualPositionY, PrincipalGUI.wizardActualWidth, PrincipalGUI.wizardActualHeight);
+					setBounds(PrincipalGUI.getWizardActualPositionX(), PrincipalGUI.getWizardActualPositionY(), PrincipalGUI.getWizardActualWidth(), PrincipalGUI.getWizardActualHeight());
 				}
 	    		if (Platform.getOS().equals(Platform.OS.LINUX)){
 	    			//Se comprueba si esta activado el modo negrita o fuente grande

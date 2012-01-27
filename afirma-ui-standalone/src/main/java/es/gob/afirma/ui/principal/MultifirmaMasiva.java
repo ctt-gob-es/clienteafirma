@@ -100,9 +100,9 @@ final class MultifirmaMasiva extends JPanel {
         comboAlmacen.setToolTipText(Messages.getString("Firma.almacen.certificados.description")); // NOI18N //$NON-NLS-1$
         // comboAlmacen.getAccessibleContext().setAccessibleName(etiquetaAlmacen.getText()+" "+Messages.getString("Firma.almacen.certificados.description")
         // + " ALT + A."); // NOI18N
-        comboAlmacen.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar,
+        comboAlmacen.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(),
                                                                           Messages.getString("Firma.almacen.certificados.description.status"))); //$NON-NLS-1$
-        comboAlmacen.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar,
+        comboAlmacen.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(),
                                                                           Messages.getString("Firma.almacen.certificados.description.status"))); //$NON-NLS-1$
         comboAlmacen.addAncestorListener(new RequestFocusListener(false));
         cargarComboAlmacen(comboAlmacen);
@@ -144,9 +144,9 @@ final class MultifirmaMasiva extends JPanel {
         this.alerta.setSelected(true);
         this.alerta.setText(Messages.getString("PrincipalGUI.multifirma.panel.opciones.timbre")); // NOI18N //$NON-NLS-1$
         this.alerta.setToolTipText(Messages.getString("Ensobrado.check.firmar.description")); // NOI18N //$NON-NLS-1$
-        this.alerta.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar,
+        this.alerta.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(),
                                                                          Messages.getString("PrincipalGUI.multifirma.panel.opciones.timbre.description.status"))); //$NON-NLS-1$
-        this.alerta.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar,
+        this.alerta.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(),
                                                                          Messages.getString("PrincipalGUI.multifirma.panel.opciones.timbre.description.status"))); //$NON-NLS-1$
         // alerta.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.multifirma.panel.opciones.timbre")
         // +" "+Messages.getString("PrincipalGUI.multifirma.panel.opciones.timbre.description")); // NOI18N
@@ -190,8 +190,8 @@ final class MultifirmaMasiva extends JPanel {
         // firmar.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.firmar") + " " +
         // Messages.getString("PrincipalGUI.firmar.description.status"));
         firmar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.firmar.description")); // NOI18N //$NON-NLS-1$
-        firmar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.firmar.description.status"))); //$NON-NLS-1$
-        firmar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.firmar.description.status"))); //$NON-NLS-1$
+        firmar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(), Messages.getString("PrincipalGUI.firmar.description.status"))); //$NON-NLS-1$
+        firmar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(), Messages.getString("PrincipalGUI.firmar.description.status"))); //$NON-NLS-1$
         firmar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent evt) {

@@ -65,25 +65,25 @@ import es.gob.afirma.ui.utils.Utils;
  * ensobrado y desensobrado. */
 public class PrincipalGUI extends JAccessibilityFrame {
 
-    static int aboutActualHeight = -1;
+    private static int aboutActualHeight = -1;
 
-    static int aboutActualPositionX = -1;
+    private static int aboutActualPositionX = -1;
 
-    static int aboutActualPositionY = -1;
+    private static int aboutActualPositionY = -1;
 
-    static int aboutActualWidth = -1;
+    private static int aboutActualWidth = -1;
 
-    public static JStatusBar bar = new JStatusBar();
+    private static JStatusBar bar = new JStatusBar();
 
     private static final String DEFAULT_LOCALE = "es_ES"; //$NON-NLS-1$
 
-    public static int fileActualHeight = -1;
+    private static int fileActualHeight = -1;
 
-    public static int fileActualPositionX = -1;
+    private static int fileActualPositionX = -1;
 
-    public static int fileActualPositionY = -1;
+    private static int fileActualPositionY = -1;
 
-    public static int fileActualWidth = -1;
+    private static int fileActualWidth = -1;
 
     /** Ruta del JAR en donde se almacenan los iconos de la aplicaci&oacute;n. */
     private static final String ICON_DIR_PATH = "/resources/images/"; //$NON-NLS-1$
@@ -93,28 +93,28 @@ public class PrincipalGUI extends JAccessibilityFrame {
 
     private static int linuxMargin = 35;
 
-    static int optionActualHeight = -1;
+    private static int optionActualHeight = -1;
 
-    static int optionActualPositionX = -1;
+    private static int optionActualPositionX = -1;
 
-    static int optionActualPositionY = -1;
+    private static int optionActualPositionY = -1;
 
-    static int optionActualWidth = -1;
+    private static int optionActualWidth = -1;
 
     private static final long serialVersionUID = 1L;
 
-    public static int wizardActualHeight = -1;
+    private static int wizardActualHeight = -1;
 
-    public static int wizardActualPositionX = -1;
+    private static int wizardActualPositionX = -1;
 
-    public static int wizardActualPositionY = -1;
+    private static int wizardActualPositionY = -1;
 
-    public static int wizardActualWidth = -1;
+    private static int wizardActualWidth = -1;
 
     /** Escribe el nuevo estado en la barra de estado.
      * @param nuevoEstado Estado que hay que introducir en la barra de estado. */
     public static void setNuevoEstado(final String nuevoEstado) {
-        bar.setStatus(nuevoEstado);
+        getBar().setStatus(nuevoEstado);
     }
 
     private final boolean accesibilidad = false;
@@ -244,7 +244,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
         else {
             setHighContrast(false);
         }
-        Utils.setContrastColor(bar);
+        Utils.setContrastColor(getBar());
 
         final Icon baseIcon = this.loadIcon("boton_transparente.png"); //$NON-NLS-1$
 
@@ -255,8 +255,8 @@ public class PrincipalGUI extends JAccessibilityFrame {
         buttonFirma.setSelectedToggledIcon(this.loadIcon("boton_firma_sel_ico.png"), baseIcon); //$NON-NLS-1$
 
         buttonFirma.setMnemonic(KeyEvent.VK_F);
-        buttonFirma.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Firma.botonpricipal.status"))); //$NON-NLS-1$
-        buttonFirma.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Firma.botonpricipal.status"))); //$NON-NLS-1$
+        buttonFirma.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(), Messages.getString("Firma.botonpricipal.status"))); //$NON-NLS-1$
+        buttonFirma.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(), Messages.getString("Firma.botonpricipal.status"))); //$NON-NLS-1$
         buttonFirma.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma") + " " + //$NON-NLS-1$ //$NON-NLS-2$
                                                              Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma.description")); //$NON-NLS-1$
         buttonFirma.setName("firma"); //$NON-NLS-1$
@@ -270,8 +270,8 @@ public class PrincipalGUI extends JAccessibilityFrame {
         buttonMultifirma.setSelectedToggledIcon(this.loadIcon("boton_multifirma_sel_ico.png"), baseIcon); //$NON-NLS-1$
 
         buttonMultifirma.setMnemonic(KeyEvent.VK_M);
-        buttonMultifirma.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Multifirma.botonpricipal.status"))); //$NON-NLS-1$
-        buttonMultifirma.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Multifirma.botonpricipal.status"))); //$NON-NLS-1$
+        buttonMultifirma.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(), Messages.getString("Multifirma.botonpricipal.status"))); //$NON-NLS-1$
+        buttonMultifirma.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(), Messages.getString("Multifirma.botonpricipal.status"))); //$NON-NLS-1$
         buttonMultifirma.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma") + " " + //$NON-NLS-1$ //$NON-NLS-2$
                                                                   Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma.description")); //$NON-NLS-1$
         buttonMultifirma.setName("multifirma"); //$NON-NLS-1$
@@ -286,9 +286,9 @@ public class PrincipalGUI extends JAccessibilityFrame {
         buttonMultifirmaMasiva.setSelectedToggledIcon(this.loadIcon("boton_masiva_sel_ico.png"), baseIcon); //$NON-NLS-1$
         buttonMultifirmaMasiva.setDisabledToggledIcon(this.loadIcon("boton_masiva_dis_ico.png"), baseIcon); //$NON-NLS-1$
 
-        buttonMultifirmaMasiva.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar,
+        buttonMultifirmaMasiva.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(),
                                                                                     Messages.getString("Masiva.botonpricipal.status"))); //$NON-NLS-1$
-        buttonMultifirmaMasiva.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar,
+        buttonMultifirmaMasiva.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(),
                                                                                     Messages.getString("Masiva.botonpricipal.status"))); //$NON-NLS-1$
         buttonMultifirmaMasiva.getAccessibleContext()
         .setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirmaMasiva") + " " + //$NON-NLS-1$ //$NON-NLS-2$
@@ -310,8 +310,8 @@ public class PrincipalGUI extends JAccessibilityFrame {
         buttonValidacion.setSelectedToggledIcon(this.loadIcon("boton_validacion_sel_ico.png"), baseIcon); //$NON-NLS-1$
 
         buttonValidacion.setMnemonic(KeyEvent.VK_V);
-        buttonValidacion.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Validacion.botonpricipal.status"))); //$NON-NLS-1$
-        buttonValidacion.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Validacion.botonpricipal.status"))); //$NON-NLS-1$
+        buttonValidacion.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(), Messages.getString("Validacion.botonpricipal.status"))); //$NON-NLS-1$
+        buttonValidacion.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(), Messages.getString("Validacion.botonpricipal.status"))); //$NON-NLS-1$
         buttonValidacion.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleValidacion") + " " + //$NON-NLS-1$ //$NON-NLS-2$
                                                                   Messages.getString("PrincipalGUI.TabConstraints.tabTitleValidacion.description")); //$NON-NLS-1$
         buttonValidacion.setName("validacion"); //$NON-NLS-1$
@@ -325,8 +325,8 @@ public class PrincipalGUI extends JAccessibilityFrame {
         buttonCifrado.setSelectedToggledIcon(this.loadIcon("boton_cifrado_sel_ico.png"), baseIcon); //$NON-NLS-1$
 
         buttonCifrado.setMnemonic(KeyEvent.VK_C);
-        buttonCifrado.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Cifrado.botonpricipal.status"))); //$NON-NLS-1$
-        buttonCifrado.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Cifrado.botonpricipal.status"))); //$NON-NLS-1$
+        buttonCifrado.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(), Messages.getString("Cifrado.botonpricipal.status"))); //$NON-NLS-1$
+        buttonCifrado.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(), Messages.getString("Cifrado.botonpricipal.status"))); //$NON-NLS-1$
         buttonCifrado.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleCifrado") + " " + //$NON-NLS-1$  //$NON-NLS-2$
                                                                Messages.getString("PrincipalGUI.TabConstraints.tabTitleCifrado.description")); //$NON-NLS-1$
         buttonCifrado.setName("cifrado"); //$NON-NLS-1$
@@ -340,8 +340,8 @@ public class PrincipalGUI extends JAccessibilityFrame {
         buttonDescifrado.setSelectedToggledIcon(this.loadIcon("boton_descifrado_sel_ico.png"), baseIcon); //$NON-NLS-1$
 
         buttonDescifrado.setMnemonic(KeyEvent.VK_D);
-        buttonDescifrado.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Descifrado.botonpricipal.status"))); //$NON-NLS-1$
-        buttonDescifrado.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Descifrado.botonpricipal.status"))); //$NON-NLS-1$
+        buttonDescifrado.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(), Messages.getString("Descifrado.botonpricipal.status"))); //$NON-NLS-1$
+        buttonDescifrado.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(), Messages.getString("Descifrado.botonpricipal.status"))); //$NON-NLS-1$
         buttonDescifrado.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleDescifrado") + " " + //$NON-NLS-1$ //$NON-NLS-2$
                                                                   Messages.getString("PrincipalGUI.TabConstraints.tabTitleDescifrado.description")); //$NON-NLS-1$
         buttonDescifrado.setName("descifrado"); //$NON-NLS-1$
@@ -355,8 +355,8 @@ public class PrincipalGUI extends JAccessibilityFrame {
         buttonEnsobrado.setSelectedToggledIcon(this.loadIcon("boton_ensobrado_sel_ico.png"), baseIcon); //$NON-NLS-1$
         buttonEnsobrado.setDisabledToggledIcon(this.loadIcon("boton_ensobrado_dis_ico.png"), baseIcon); //$NON-NLS-1$
 
-        buttonEnsobrado.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Ensobrado.botonpricipal.status"))); //$NON-NLS-1$
-        buttonEnsobrado.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Ensobrado.botonpricipal.status"))); //$NON-NLS-1$
+        buttonEnsobrado.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(), Messages.getString("Ensobrado.botonpricipal.status"))); //$NON-NLS-1$
+        buttonEnsobrado.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(), Messages.getString("Ensobrado.botonpricipal.status"))); //$NON-NLS-1$
         buttonEnsobrado.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleEnsobrado") + " " + //$NON-NLS-1$ //$NON-NLS-2$
                                                                  Messages.getString("PrincipalGUI.TabConstraints.tabTitleEnsobrado.description")); //$NON-NLS-1$
 
@@ -375,9 +375,9 @@ public class PrincipalGUI extends JAccessibilityFrame {
         buttonDesensobrado.setSelectedToggledIcon(this.loadIcon("boton_desensobrado_sel_ico.png"), baseIcon); //$NON-NLS-1$
         buttonDesensobrado.setDisabledToggledIcon(this.loadIcon("boton_desensobrado_dis_ico.png"), baseIcon); //$NON-NLS-1$
 
-        buttonDesensobrado.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar,
+        buttonDesensobrado.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(),
                                                                                 Messages.getString("Desensobrado.botonpricipal.status"))); //$NON-NLS-1$
-        buttonDesensobrado.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar,
+        buttonDesensobrado.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(),
                                                                                 Messages.getString("Desensobrado.botonpricipal.status"))); //$NON-NLS-1$
         buttonDesensobrado.getAccessibleContext()
         .setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleDesensobrado") + " " + //$NON-NLS-1$ //$NON-NLS-2$
@@ -716,11 +716,11 @@ public class PrincipalGUI extends JAccessibilityFrame {
         getContentPane().add(izquierda, BorderLayout.LINE_START);
 
         // Barra de estado
-        bar.setLabelWidth((int) Toolkit.getDefaultToolkit().getScreenSize().getWidth());
-        bar.setStatus(""); //$NON-NLS-1$
-        bar.setLeftMargin(3);
+        getBar().setLabelWidth((int) Toolkit.getDefaultToolkit().getScreenSize().getWidth());
+        getBar().setStatus(""); //$NON-NLS-1$
+        getBar().setLeftMargin(3);
 
-        getContentPane().add(bar, BorderLayout.SOUTH);
+        getContentPane().add(getBar(), BorderLayout.SOUTH);
 
         crearPaneles();
     }
@@ -764,8 +764,8 @@ public class PrincipalGUI extends JAccessibilityFrame {
     public void resized() {
         // Tamano de la ventana
         final Dimension screenSize = this.getSize();
-        bar.setPreferredSize(new Dimension((int) screenSize.getWidth() * 10 / 100, (int) screenSize.getHeight() * 5 / 100));
-        bar.setLabelSize((int) screenSize.getWidth(), (int) screenSize.getHeight() * 4 / 100);
+        getBar().setPreferredSize(new Dimension((int) screenSize.getWidth() * 10 / 100, (int) screenSize.getHeight() * 5 / 100));
+        getBar().setLabelSize((int) screenSize.getWidth(), (int) screenSize.getHeight() * 4 / 100);
 
         // Se guarda la posicion en el caso de que no se haya maximizado por configuracion
         if (!GeneralConfig.isMaximized()) {
@@ -836,10 +836,143 @@ public class PrincipalGUI extends JAccessibilityFrame {
         catch (final Exception e) {
         	Logger.getLogger("es.gob.afirma").severe("Error en el establecimiento del modo de alto contraste: " + e); //$NON-NLS-1$ //$NON-NLS-2$
         }
-        
+
         SwingUtilities.updateComponentTreeUI(this);
 
         this.validate();
         this.repaint();
     }
+
+	static int getAboutActualHeight() {
+		return aboutActualHeight;
+	}
+
+	static void setAboutActualHeight(final int aboutActualHeight) {
+		PrincipalGUI.aboutActualHeight = aboutActualHeight;
+	}
+
+	static int getAboutActualPositionX() {
+		return aboutActualPositionX;
+	}
+
+	static void setAboutActualPositionX(final int aboutActualPositionX) {
+		PrincipalGUI.aboutActualPositionX = aboutActualPositionX;
+	}
+
+	static int getAboutActualPositionY() {
+		return aboutActualPositionY;
+	}
+
+	static void setAboutActualPositionY(final int aboutActualPositionY) {
+		PrincipalGUI.aboutActualPositionY = aboutActualPositionY;
+	}
+
+	static int getAboutActualWidth() {
+		return aboutActualWidth;
+	}
+
+	static void setAboutActualWidth(final int aboutActualWidth) {
+		PrincipalGUI.aboutActualWidth = aboutActualWidth;
+	}
+
+	public static int getFileActualHeight() {
+		return fileActualHeight;
+	}
+
+	public static void setFileActualHeight(final int fileActualHeight) {
+		PrincipalGUI.fileActualHeight = fileActualHeight;
+	}
+
+	public static int getFileActualPositionX() {
+		return fileActualPositionX;
+	}
+
+	public static void setFileActualPositionX(final int fileActualPositionX) {
+		PrincipalGUI.fileActualPositionX = fileActualPositionX;
+	}
+
+	public static int getFileActualPositionY() {
+		return fileActualPositionY;
+	}
+
+	public static void setFileActualPositionY(final int fileActualPositionY) {
+		PrincipalGUI.fileActualPositionY = fileActualPositionY;
+	}
+
+	public static int getFileActualWidth() {
+		return fileActualWidth;
+	}
+
+	public static void setFileActualWidth(final int fileActualWidth) {
+		PrincipalGUI.fileActualWidth = fileActualWidth;
+	}
+
+	public static JStatusBar getBar() {
+		return bar;
+	}
+
+	static int getOptionActualHeight() {
+		return optionActualHeight;
+	}
+
+	static void setOptionActualHeight(final int optionActualHeight) {
+		PrincipalGUI.optionActualHeight = optionActualHeight;
+	}
+
+	static int getOptionActualPositionX() {
+		return optionActualPositionX;
+	}
+
+	static void setOptionActualPositionX(final int optionActualPositionX) {
+		PrincipalGUI.optionActualPositionX = optionActualPositionX;
+	}
+
+	static int getOptionActualPositionY() {
+		return optionActualPositionY;
+	}
+
+	static void setOptionActualPositionY(final int optionActualPositionY) {
+		PrincipalGUI.optionActualPositionY = optionActualPositionY;
+	}
+
+	static int getOptionActualWidth() {
+		return optionActualWidth;
+	}
+
+	static void setOptionActualWidth(final int optionActualWidth) {
+		PrincipalGUI.optionActualWidth = optionActualWidth;
+	}
+
+	public static int getWizardActualHeight() {
+		return wizardActualHeight;
+	}
+
+	public static void setWizardActualHeight(final int wizardActualHeight) {
+		PrincipalGUI.wizardActualHeight = wizardActualHeight;
+	}
+
+	public static int getWizardActualPositionX() {
+		return wizardActualPositionX;
+	}
+
+	public static void setWizardActualPositionX(final int wizardActualPositionX) {
+		PrincipalGUI.wizardActualPositionX = wizardActualPositionX;
+	}
+
+	public static int getWizardActualPositionY() {
+		return wizardActualPositionY;
+	}
+
+	public static void setWizardActualPositionY(final int wizardActualPositionY) {
+		PrincipalGUI.wizardActualPositionY = wizardActualPositionY;
+	}
+
+	public static int getWizardActualWidth() {
+		return wizardActualWidth;
+	}
+
+	public static void setWizardActualWidth(final int wizardActualWidth) {
+		PrincipalGUI.wizardActualWidth = wizardActualWidth;
+	}
+
 }

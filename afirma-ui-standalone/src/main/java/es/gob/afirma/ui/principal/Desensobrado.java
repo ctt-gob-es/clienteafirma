@@ -315,9 +315,9 @@ final class Desensobrado extends JPanel {
         // Campo con el nombre del archivo a extraer
         final JTextField campoFichero = new JTextField();
         campoFichero.setToolTipText(Messages.getString("Desensobrado.buscar.caja.description")); // NOI18N //$NON-NLS-1$
-        campoFichero.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar,
+        campoFichero.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(),
                                                                           Messages.getString("Desensobrado.buscar.caja.description.status"))); //$NON-NLS-1$
-        campoFichero.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar,
+        campoFichero.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(),
                                                                           Messages.getString("Desensobrado.buscar.caja.description.status"))); //$NON-NLS-1$
         campoFichero.getAccessibleContext().setAccessibleName(etiquetaFichero.getText() + " ALT + O."); // NOI18N
         campoFichero.getAccessibleContext().setAccessibleDescription(Messages.getString("Desensobrado.buscar.caja.description")); // NOI18N //$NON-NLS-1$
@@ -345,9 +345,9 @@ final class Desensobrado extends JPanel {
         examinar.setMnemonic(KeyEvent.VK_E);
         examinar.setText(Messages.getString("PrincipalGUI.Examinar")); // NOI18N //$NON-NLS-1$
         examinar.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description")); // NOI18N //$NON-NLS-1$
-        examinar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar,
+        examinar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(),
                                                                       Messages.getString("PrincipalGUI.Examinar.description.status"))); //$NON-NLS-1$
-        examinar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar,
+        examinar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(),
                                                                       Messages.getString("PrincipalGUI.Examinar.description.status"))); //$NON-NLS-1$
         examinar.addActionListener(new ActionListener() {
             @Override
@@ -398,9 +398,9 @@ final class Desensobrado extends JPanel {
         // Combo con el almacen o repositorio de certificados
         final JComboBox comboAlmacen = new JComboBox();
         comboAlmacen.setToolTipText(Messages.getString("Desensobrado.almacen.combo.description")); // NOI18N //$NON-NLS-1$
-        comboAlmacen.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar,
+        comboAlmacen.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(),
                                                                           Messages.getString("Desensobrado.almacen.combo.description.status"))); //$NON-NLS-1$
-        comboAlmacen.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar,
+        comboAlmacen.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(),
                                                                           Messages.getString("Desensobrado.almacen.combo.description.status"))); //$NON-NLS-1$
         // comboAlmacen.getAccessibleContext().setAccessibleName(etiquetaAlmacen.getText()+ " " +
         // Messages.getString("Desensobrado.almacen.combo.description.status") + " ALT + A."); // NOI18N
@@ -449,9 +449,9 @@ final class Desensobrado extends JPanel {
         final JCheckBox checkIniciar = new JCheckBox();
         checkIniciar.setText(Messages.getString("Desensobrado.check")); // NOI18N //$NON-NLS-1$
         checkIniciar.setToolTipText(Messages.getString("Desensobrado.check.check.description")); // NOI18N //$NON-NLS-1$
-        checkIniciar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar,
+        checkIniciar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(),
                                                                           Messages.getString("Desensobrado.check.check.description.status"))); //$NON-NLS-1$
-        checkIniciar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar,
+        checkIniciar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(),
                                                                           Messages.getString("Desensobrado.check.check.description.status"))); //$NON-NLS-1$
         // checkIniciar.getAccessibleContext().setAccessibleName(Messages.getString("Desensobrado.check.check") + " "
         // +Messages.getString("Desensobrado.check.check.description.status")); // NOI18N
@@ -491,9 +491,9 @@ final class Desensobrado extends JPanel {
         extraer.setMnemonic(KeyEvent.VK_X);
         extraer.setText(Messages.getString("Desensobrado.btnDescifrar")); // NOI18N //$NON-NLS-1$
         extraer.setToolTipText(Messages.getString("Desensobrado.btnDescifrar.description")); // NOI18N //$NON-NLS-1$
-        extraer.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar,
+        extraer.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(),
                                                                      Messages.getString("Desensobrado.btnDescifrar.description.status"))); //$NON-NLS-1$
-        extraer.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar,
+        extraer.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(),
                                                                      Messages.getString("Desensobrado.btnDescifrar.description.status"))); //$NON-NLS-1$
         extraer.addActionListener(new ActionListener() {
             @Override

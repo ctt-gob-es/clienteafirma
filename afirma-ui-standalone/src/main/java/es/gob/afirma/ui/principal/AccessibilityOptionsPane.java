@@ -116,10 +116,10 @@ public final class AccessibilityOptionsPane {
     void aplicar() {
         // Guardamos la posicion y tamano actual de la ventana solo en caso de no estar maximizada por configuracion
         if (!GeneralConfig.isMaximized()) {
-            PrincipalGUI.optionActualPositionX = this.parent.getX();
-            PrincipalGUI.optionActualPositionY = this.parent.getY();
-            PrincipalGUI.optionActualWidth = this.parent.getWidth();
-            PrincipalGUI.optionActualHeight = this.parent.getHeight();
+            PrincipalGUI.setOptionActualPositionX(this.parent.getX());
+            PrincipalGUI.setOptionActualPositionY(this.parent.getY());
+            PrincipalGUI.setOptionActualWidth(this.parent.getWidth());
+            PrincipalGUI.setOptionActualHeight(this.parent.getHeight());
         }
         ((Opciones) this.parent).setAplicar(true);
         if (!this.isChangeHighContrast) {

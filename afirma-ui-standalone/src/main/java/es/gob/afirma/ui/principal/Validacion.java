@@ -91,9 +91,9 @@ class Validacion extends JPanel {
         // Campo donde se guarda el nombre del fichero a firmar
         final JTextField signFileField = new JTextField();
         signFileField.setToolTipText(Messages.getString("Validacion.buscar.caja.description")); //$NON-NLS-1$
-        signFileField.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar,
+        signFileField.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(),
                                                                            Messages.getString("Validacion.buscar.caja.description.status"))); //$NON-NLS-1$
-        signFileField.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar,
+        signFileField.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(),
                                                                            Messages.getString("Validacion.buscar.caja.description.status"))); //$NON-NLS-1$
         signFileField.getAccessibleContext().setAccessibleName(browseSignLabel.getText() + " ALT + R."); //$NON-NLS-1$
         signFileField.getAccessibleContext().setAccessibleDescription(Messages.getString("Validacion.buscar.caja.description")); //$NON-NLS-1$
@@ -122,9 +122,9 @@ class Validacion extends JPanel {
         browseSignButton.setMnemonic(KeyEvent.VK_E);
         browseSignButton.setText(Messages.getString("PrincipalGUI.Examinar")); //$NON-NLS-1$
         browseSignButton.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description")); //$NON-NLS-1$
-        browseSignButton.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar,
+        browseSignButton.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(),
                                                                               Messages.getString("PrincipalGUI.Examinar.description.status"))); //$NON-NLS-1$
-        browseSignButton.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar,
+        browseSignButton.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(),
                                                                               Messages.getString("PrincipalGUI.Examinar.description.status"))); //$NON-NLS-1$
         //browseSignButton.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.Examinar") + " " + Messages.getString("PrincipalGUI.Examinar.description.status")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         browseSignButton.addActionListener(new ActionListener() {
@@ -169,9 +169,9 @@ class Validacion extends JPanel {
         checkSignButton.setText(Messages.getString("Validacion.btnValidar")); //$NON-NLS-1$
         checkSignButton.setToolTipText(Messages.getString("Validacion.btnValidar.description")); //$NON-NLS-1$
         //checkSignButton.getAccessibleContext().setAccessibleName(Messages.getString("Validacion.btnValidar") + " " + Messages.getString("Validacion.btnValidar.description.status"));  //$NON-NLS-1$ //$NON-NLS-2$//$NON-NLS-3$
-        checkSignButton.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar,
+        checkSignButton.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(),
                                                                              Messages.getString("Validacion.btnValidar.description.status"))); //$NON-NLS-1$
-        checkSignButton.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar,
+        checkSignButton.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(),
                                                                              Messages.getString("Validacion.btnValidar.description.status"))); //$NON-NLS-1$
         checkSignButton.addActionListener(new ActionListener() {
             @Override

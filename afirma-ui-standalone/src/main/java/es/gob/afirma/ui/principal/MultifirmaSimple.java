@@ -103,9 +103,9 @@ final class MultifirmaSimple extends JPanel {
         comboAlmacen.setToolTipText(Messages.getString("Firma.almacen.certificados.description")); // NOI18N //$NON-NLS-1$
         // comboAlmacen.getAccessibleContext().setAccessibleName(etiquetaAlmacen.getText()+" "+Messages.getString("Firma.almacen.certificados.description")+" ALT + A.");
         // // NOI18N
-        comboAlmacen.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar,
+        comboAlmacen.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(),
                                                                           Messages.getString("Firma.almacen.certificados.description.status"))); //$NON-NLS-1$
-        comboAlmacen.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar,
+        comboAlmacen.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(),
                                                                           Messages.getString("Firma.almacen.certificados.description.status"))); //$NON-NLS-1$
         comboAlmacen.addAncestorListener(new RequestFocusListener(false));
         Utils.remarcar(comboAlmacen);
@@ -148,9 +148,9 @@ final class MultifirmaSimple extends JPanel {
         cofirma.setSelected(true);
         cofirma.setText(Messages.getString("Multifirma.opcion.cofirma." + (GeneralConfig.isAvanzados() ? "av" : "sp") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         ));
-        cofirma.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar,
+        cofirma.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(),
                                                                      Messages.getString("Multifirma.opcion.cofirma.description.status"))); //$NON-NLS-1$
-        cofirma.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar,
+        cofirma.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(),
                                                                      Messages.getString("Multifirma.opcion.cofirma.description.status"))); //$NON-NLS-1$
         // cofirma.getAccessibleContext().setAccessibleName(cofirma.getText() +" "+
         // Messages.getString("Multifirma.opcion.cofirma.description.status")); // NOI18N
@@ -174,9 +174,9 @@ final class MultifirmaSimple extends JPanel {
         final JRadioButton contrafirma = new JRadioButton();
         contrafirma.setText(Messages.getString("Multifirma.opcion.contrafirma." + (GeneralConfig.isAvanzados() ? "av" : "sp") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         ));
-        contrafirma.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar,
+        contrafirma.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(),
                                                                          Messages.getString("Multifirma.opcion.contrafirma.description.status"))); //$NON-NLS-1$
-        contrafirma.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar,
+        contrafirma.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(),
                                                                          Messages.getString("Multifirma.opcion.contrafirma.description.status"))); //$NON-NLS-1$
         // contrafirma.getAccessibleContext().setAccessibleName(contrafirma.getText()+" "+
         // Messages.getString("Multifirma.opcion.contrafirma.description.status")); // NOI18N
@@ -233,8 +233,8 @@ final class MultifirmaSimple extends JPanel {
         // firmar.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.firmar") + " " +
         // Messages.getString("PrincipalGUI.firmar.description.status"));
         firmar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.firmar.description")); // NOI18N //$NON-NLS-1$
-        firmar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.firmar.description.status"))); //$NON-NLS-1$
-        firmar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.firmar.description.status"))); //$NON-NLS-1$
+        firmar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(), Messages.getString("PrincipalGUI.firmar.description.status"))); //$NON-NLS-1$
+        firmar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(), Messages.getString("PrincipalGUI.firmar.description.status"))); //$NON-NLS-1$
         firmar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent evt) {

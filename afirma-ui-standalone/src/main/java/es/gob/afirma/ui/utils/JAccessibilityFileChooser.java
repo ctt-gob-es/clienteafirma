@@ -403,8 +403,8 @@ public class JAccessibilityFileChooser extends JFileChooser{
         	if (GeneralConfig.isMaximized()){
         		this.dialog.setPreferredSize(new Dimension(maxWidth, maxHeight));
         	} else {
-        		if (PrincipalGUI.fileActualPositionX != -1){
-        			this.dialog.setPreferredSize(new Dimension(PrincipalGUI.fileActualWidth, PrincipalGUI.fileActualHeight));
+        		if (PrincipalGUI.getFileActualPositionX() != -1){
+        			this.dialog.setPreferredSize(new Dimension(PrincipalGUI.getFileActualWidth(), PrincipalGUI.getFileActualHeight()));
         		}
         		
         	}
@@ -576,10 +576,10 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	 */
 	void resized(){
 		if (!GeneralConfig.isMaximized()){
-	    	PrincipalGUI.fileActualPositionX = this.dialog.getX();
-	    	PrincipalGUI.fileActualPositionY = this.dialog.getY();
-	    	PrincipalGUI.fileActualWidth = this.dialog.getWidth();
-	    	PrincipalGUI.fileActualHeight = this.dialog.getHeight();
+	    	PrincipalGUI.setFileActualPositionX(this.dialog.getX());
+	    	PrincipalGUI.setFileActualPositionY(this.dialog.getY());
+	    	PrincipalGUI.setFileActualWidth(this.dialog.getWidth());
+	    	PrincipalGUI.setFileActualHeight(this.dialog.getHeight());
     	}
 	}
 	

@@ -176,9 +176,9 @@ final class Cifrado extends JPanel {
         // Caja con el nombre del archivo seleccionado
         final JTextField campoFichero = new JTextField();
         campoFichero.setToolTipText(Messages.getString("Cifrado.buscar.caja.description")); // NOI18N //$NON-NLS-1$
-        campoFichero.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar,
+        campoFichero.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(),
                                                                           Messages.getString("Cifrado.buscar.caja.description.status"))); //$NON-NLS-1$
-        campoFichero.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar,
+        campoFichero.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(),
                                                                           Messages.getString("Cifrado.buscar.caja.description.status"))); //$NON-NLS-1$
         campoFichero.getAccessibleContext().setAccessibleName(etiquetaFichero.getText() + " ALT + T."); // NOI18N
         campoFichero.getAccessibleContext().setAccessibleDescription(Messages.getString("Cifrado.buscar.caja.description")); // NOI18N //$NON-NLS-1$
@@ -209,9 +209,9 @@ final class Cifrado extends JPanel {
         // examinar.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.Examinar") + " " +
         // Messages.getString("PrincipalGUI.Examinar.description.status"));
         examinar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.Examinar.description")); // NOI18N //$NON-NLS-1$
-        examinar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar,
+        examinar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(),
                                                                       Messages.getString("PrincipalGUI.Examinar.description.status"))); //$NON-NLS-1$
-        examinar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar,
+        examinar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(),
                                                                       Messages.getString("PrincipalGUI.Examinar.description.status"))); //$NON-NLS-1$
         examinar.addActionListener(new ActionListener() {
             @Override
@@ -260,9 +260,9 @@ final class Cifrado extends JPanel {
         final JComboBox comboMecanismo = new JComboBox();
         final JComboBox comboAlgoritmo = new JComboBox();
         comboMecanismo.setToolTipText(Messages.getString("Cifrado.origen.clave.combo.description")); // NOI18N //$NON-NLS-1$
-        comboMecanismo.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar,
+        comboMecanismo.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(),
                                                                             Messages.getString("Cifrado.origen.clave.combo.description.status"))); //$NON-NLS-1$
-        comboMecanismo.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar,
+        comboMecanismo.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(),
                                                                             Messages.getString("Cifrado.origen.clave.combo.description.status"))); //$NON-NLS-1$
         comboMecanismo.addItemListener(new ItemListener() {
             @Override
@@ -330,9 +330,9 @@ final class Cifrado extends JPanel {
 
         // Combo algoritmos de cifrado
         comboAlgoritmo.setToolTipText(Messages.getString("Cifrado.formato.combo.description")); // NOI18N //$NON-NLS-1$
-        comboAlgoritmo.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar,
+        comboAlgoritmo.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(),
                                                                             Messages.getString("Cifrado.formato.combo.description.status"))); //$NON-NLS-1$
-        comboAlgoritmo.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar,
+        comboAlgoritmo.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(),
                                                                             Messages.getString("Cifrado.formato.combo.description.status"))); //$NON-NLS-1$
         // comboAlgoritmo.getAccessibleContext().setAccessibleName(etiquetaAlgoritmo.getText() +" "+
         // Messages.getString("Cifrado.formato.combo.description.status")+" ALT + G."); // NOI18N); // NOI18N
@@ -389,8 +389,8 @@ final class Cifrado extends JPanel {
         cifrar.setMnemonic(KeyEvent.VK_R);
         cifrar.setText(Messages.getString("Cifrado.btncifrar")); // NOI18N //$NON-NLS-1$
         cifrar.setToolTipText(Messages.getString("Cifrado.btncifrar.description")); // NOI18N //$NON-NLS-1$
-        cifrar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Cifrado.btncifrar.description.status"))); //$NON-NLS-1$
-        cifrar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Cifrado.btncifrar.description.status"))); //$NON-NLS-1$
+        cifrar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(), Messages.getString("Cifrado.btncifrar.description.status"))); //$NON-NLS-1$
+        cifrar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(), Messages.getString("Cifrado.btncifrar.description.status"))); //$NON-NLS-1$
         cifrar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent evt) {

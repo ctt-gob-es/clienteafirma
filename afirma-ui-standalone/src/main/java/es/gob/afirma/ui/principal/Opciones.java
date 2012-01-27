@@ -213,9 +213,9 @@ class Opciones extends JAccessibilityDialog {
     			setMinimumSize(new Dimension(Constants.OPTION_INITIAL_WIDTH, Constants.OPTION_INITIAL_HEIGHT));
     		}			
     	} else {
-    		if (PrincipalGUI.optionActualPositionX != -1){
+    		if (PrincipalGUI.getOptionActualPositionX() != -1){
 	    		if (GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
-	    			setBounds(PrincipalGUI.optionActualPositionX, PrincipalGUI.optionActualPositionY, PrincipalGUI.optionActualWidth, PrincipalGUI.optionActualHeight);
+	    			setBounds(PrincipalGUI.getOptionActualPositionX(), PrincipalGUI.getOptionActualPositionY(), PrincipalGUI.getOptionActualWidth(), PrincipalGUI.getOptionActualHeight());
 	    			if (Platform.getOS().equals(Platform.OS.LINUX)){
 	    				setMinimumSize(new Dimension(Constants.OPTION_FONT_INITIAL_WIDTH_LINUX, Constants.OPTION_FONT_INITIAL_HEIGHT_LINUX));
 	    			} else {
@@ -224,22 +224,22 @@ class Opciones extends JAccessibilityDialog {
 	    		} else {
 	    			if (AccessibilityOptionsPane.isContinueBigStyle()){
 	    				if (Platform.getOS().equals(Platform.OS.LINUX)){
-		    				if (PrincipalGUI.optionActualWidth==Constants.OPTION_FONT_INITIAL_WIDTH_LINUX && PrincipalGUI.optionActualHeight==Constants.OPTION_FONT_INITIAL_HEIGHT_LINUX){
+		    				if (PrincipalGUI.getOptionActualWidth()==Constants.OPTION_FONT_INITIAL_WIDTH_LINUX && PrincipalGUI.getOptionActualHeight()==Constants.OPTION_FONT_INITIAL_HEIGHT_LINUX){
 		    					setMinimumSize(new Dimension(Constants.OPTION_INITIAL_WIDTH, Constants.OPTION_INITIAL_HEIGHT));
-		    					setBounds(PrincipalGUI.optionActualPositionX, PrincipalGUI.optionActualPositionY, Constants.OPTION_INITIAL_WIDTH, Constants.OPTION_INITIAL_HEIGHT);
+		    					setBounds(PrincipalGUI.getOptionActualPositionX(), PrincipalGUI.getOptionActualPositionY(), Constants.OPTION_INITIAL_WIDTH, Constants.OPTION_INITIAL_HEIGHT);
 			    			} else {
-			    				setBounds(PrincipalGUI.optionActualPositionX, PrincipalGUI.optionActualPositionY, PrincipalGUI.optionActualWidth, PrincipalGUI.optionActualHeight);
+			    				setBounds(PrincipalGUI.getOptionActualPositionX(), PrincipalGUI.getOptionActualPositionY(), PrincipalGUI.getOptionActualWidth(), PrincipalGUI.getOptionActualHeight());
 			    			}
 		    			} else {
-		    				if (PrincipalGUI.optionActualWidth==Constants.OPTION_FONT_INITIAL_WIDTH && PrincipalGUI.optionActualHeight==Constants.OPTION_FONT_INITIAL_HEIGHT){
+		    				if (PrincipalGUI.getOptionActualWidth()==Constants.OPTION_FONT_INITIAL_WIDTH && PrincipalGUI.getOptionActualHeight()==Constants.OPTION_FONT_INITIAL_HEIGHT){
 		    					setMinimumSize(new Dimension(Constants.OPTION_INITIAL_WIDTH, Constants.OPTION_INITIAL_HEIGHT));
-		    					setBounds(PrincipalGUI.optionActualPositionX, PrincipalGUI.optionActualPositionY, Constants.OPTION_INITIAL_WIDTH, Constants.OPTION_INITIAL_HEIGHT);
+		    					setBounds(PrincipalGUI.getOptionActualPositionX(), PrincipalGUI.getOptionActualPositionY(), Constants.OPTION_INITIAL_WIDTH, Constants.OPTION_INITIAL_HEIGHT);
 			    			} else {
-			    				setBounds(PrincipalGUI.optionActualPositionX, PrincipalGUI.optionActualPositionY, PrincipalGUI.optionActualWidth, PrincipalGUI.optionActualHeight);
+			    				setBounds(PrincipalGUI.getOptionActualPositionX(), PrincipalGUI.getOptionActualPositionY(), PrincipalGUI.getOptionActualWidth(), PrincipalGUI.getOptionActualHeight());
 			    			}
 		    			}
 	    			} else {
-	    				setBounds(PrincipalGUI.optionActualPositionX, PrincipalGUI.optionActualPositionY, PrincipalGUI.optionActualWidth, PrincipalGUI.optionActualHeight);
+	    				setBounds(PrincipalGUI.getOptionActualPositionX(), PrincipalGUI.getOptionActualPositionY(), PrincipalGUI.getOptionActualWidth(), PrincipalGUI.getOptionActualHeight());
 	    			}
 	    			setMinimumSize(new Dimension(Constants.OPTION_INITIAL_WIDTH, Constants.OPTION_INITIAL_HEIGHT));
 	    		}
@@ -599,10 +599,10 @@ class Opciones extends JAccessibilityDialog {
 
     	// Guardamos la posicion y tamano actual de la ventana solo en caso de no estar maximizada por configuracion
     	if (!GeneralConfig.isMaximized()){
-	    	PrincipalGUI.optionActualPositionX = this.getX();
-	    	PrincipalGUI.optionActualPositionY = this.getY();
-	    	PrincipalGUI.optionActualWidth = this.getWidth();
-	    	PrincipalGUI.optionActualHeight = this.getHeight();
+	    	PrincipalGUI.setOptionActualPositionX(this.getX());
+	    	PrincipalGUI.setOptionActualPositionY(this.getY());
+	    	PrincipalGUI.setOptionActualWidth(this.getWidth());
+	    	PrincipalGUI.setOptionActualHeight(this.getHeight());
     	}
     	
     	// Si se ha cambiado de vista (simple <-> avanzada) o se ha indicado que se desean todas las ventanas maximizadas o se ha indicado que se desean los cursores de texto grandes o se ha indicado que se desea remarcar los elementos con foco o se ha activado la opcion de alto contraste o se ha activado la opcion de tamano de fuente grande o se ha activado la opcion de fuente en negrita, actualizamos la ventana principal
@@ -642,10 +642,10 @@ class Opciones extends JAccessibilityDialog {
     void cancelarActionPerformed() {
     	// Guardamos la posicion y tamano actual de la ventana solo en caso de no estar maximizada por configuracion
     	if (!GeneralConfig.isMaximized()){
-	    	PrincipalGUI.optionActualPositionX = this.getX();
-	    	PrincipalGUI.optionActualPositionY = this.getY();
-	    	PrincipalGUI.optionActualWidth = this.getWidth();
-	    	PrincipalGUI.optionActualHeight = this.getHeight();
+	    	PrincipalGUI.setOptionActualPositionX(this.getX());
+	    	PrincipalGUI.setOptionActualPositionY(this.getY());
+	    	PrincipalGUI.setOptionActualWidth(this.getWidth());
+	    	PrincipalGUI.setOptionActualHeight(this.getHeight());
     	}
     	dispose();
     	HelpUtils.visualize(Main.helpIndex);
