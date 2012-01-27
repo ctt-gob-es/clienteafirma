@@ -10,12 +10,8 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JTextField;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -103,76 +99,6 @@ public class EnsobradoAccessibilityTest {
 		catch(final java.awt.HeadlessException e) {
 			// Ignoramos este error, pero no otros, para evitar fallos en tests automaticos en servidor
 		}
-	}
-
-	/**
-	 * Comprobacion de que el campo nombre accesible para botones, radiobuttons combos y checks
-	 * no este vacio.
-	 */
-	@Test
-	public void testNotEmptyAccessibleName() {
-		logger.info("testNotEmptyAccessibleName"); //$NON-NLS-1$
-
-		try {
-			//Instancia del panel que se va a analizar
-			final Ensobrado ensobrado = new Ensobrado();
-			//Se llama al metodo que comprueba que el nombre no sea vacio
-			assertTrue(checkAccessibleName(ensobrado));
-		}
-		catch(final java.awt.HeadlessException e) {
-			// Ignoramos este error, pero no otros, para evitar fallos en tests automaticos en servidor
-		}
-	}
-
-	/**
-	 * Recorre el panel comprobando que todos sus componentes (botones, radioButtons, checks y combos)
-	 * tienen un nombre accesible asignado.
-	 * @param panel panel
-	 * @return verdadero -> si los componentes tienen un nombre accesible asignado
-	 * 		   falso -> si algun componente no tiene un nombre accesible asignado
-	 */
-	@Ignore
-	private boolean checkAccessibleName(final JPanel panel) {
-		boolean result = true;
-		//Array de componentes del panel
-		final Component[] components = panel.getComponents();
-		for (int i = 0; i < components.length; i++) {
-			//Se obtiene el componente
-			final Component component = panel.getComponent(i);
-			if (!(component instanceof JPanel)) {
-				if (component instanceof JButton) { //Se comprueba si es un boton
-					final JButton button = (JButton) component;
-					if (button.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) { //$NON-NLS-1$
-						return false; //Si no tiene asignado un nombre accesible se sale del metodo
-					}
-				} else if (component instanceof JCheckBox) { //Se comprueba si es un checkBox
-					final JCheckBox checkBox = (JCheckBox) component;
-					if (checkBox.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) { //$NON-NLS-1$
-						return false; //Si no tiene asignado un nombre accesible se sale del metodo
-					}
-				} else if (component instanceof JComboBox) { //Se comprueba si es un combo
-					final JComboBox comboBox = (JComboBox) component;
-					if (comboBox.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) { //$NON-NLS-1$
-						return false; //Si no tiene asignado un nombre accesible se sale del metodo
-					}
-				} else if (component instanceof JRadioButton) { //Se comprueba si es un radioButton
-					final JRadioButton radioButton = (JRadioButton) component;
-					if (radioButton.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) { //$NON-NLS-1$
-						return false; //Si no tiene asignado un nombre accesible se sale del metodo
-					}
-				} else if (component instanceof JTextField) { //Se comprueba si es un campo de texto
-					final JTextField textField = (JTextField) component;
-					if (textField.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) { //$NON-NLS-1$
-						return false; //Si no tiene asignado un nombre accesible se sale del metodo
-					}
-				}
-
-			} else {
-				//Si es un panel se vuelve a llamar recursivamente al metodo
-				result = checkAccessibleName((JPanel)component);
-			}
-		} //for
-		return result;
 	}
 
 	/**
