@@ -1,17 +1,24 @@
 package es.gob.afirma.ui.utils;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GraphicsEnvironment;
-import java.awt.GridLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.HeadlessException;
+import java.awt.Image;
+import java.awt.Insets;
 import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -19,6 +26,7 @@ import java.awt.event.MouseListener;
 import java.io.File;
 
 import javax.accessibility.AccessibleContext;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -29,8 +37,11 @@ import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
+import javax.swing.JWindow;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+
+import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.ui.principal.PrincipalGUI;
 
 /**
@@ -50,6 +61,14 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	private ResizingAdaptor resizingAdaptor;
 	private JDialog dialog;
 
+	private JButton restoreButton = null;
+	private JButton maximizeButton = null;
+	private JPanel accesibilityButtonsPanel = null;
+	
+	protected static int actualPositionX = -1;
+	protected static int actualPositionY = -1;
+	protected static int actualWidth = -1;
+	protected static int actualHeight = -1;
 	/**
 	 * Relacion minima.
 	 */
@@ -127,6 +146,30 @@ public class JAccessibilityFileChooser extends JFileChooser{
         } 
         return (screenSize.height - 456) / 2;
 	}*/
+	
+	/**
+	 * Posici&oacute;n X inicial de la ventana dependiendo de la resoluci&oacute;n de pantalla.
+	 * @return int Posici&oacute;n X
+	 */
+    public int getInitialX() {
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); //329
+		return (screenSize.width - 426) / 2 ;
+	}
+    
+    /**
+	 * Posici&oacute;n Y inicial de la ventana dependiendo del sistema operativo y de la
+	 * resoluci&oacute;n de pantalla.
+	 * @return int Posici&oacute;n Y
+	 */
+	public int getInitialY() {
+        Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        if (Platform.getOS().equals(Platform.OS.MACOSX)){
+        	return (screenSize.height - 485) / 2;
+        } else {
+        	return (screenSize.height - 456) / 2;
+        }
+	}
+
 	
 	/**
 	 * Asigna el mnem&oacute;nico indicado al bot&oacute;n identificado por la clave .
@@ -328,7 +371,7 @@ public class JAccessibilityFileChooser extends JFileChooser{
 //        	contentPane.add(this , BorderLayout.CENTER);
 //        } else {
         	removeWindowsToolBar();
-        	contentPane.setLayout(new GridLayout());
+        	contentPane.setLayout(new GridBagLayout());
         	
         	this.dialog.addComponentListener(new ComponentListener() {
     			
@@ -441,8 +484,23 @@ public class JAccessibilityFileChooser extends JFileChooser{
             	}
             	
             }
+            /*JPanel panelPrueba = new JPanel(new BorderLayout());
+            panelPrueba.add(new JLabel("PRUEBA"), BorderLayout.EAST);*/
             
-            contentPane.add(this , BorderLayout.CENTER);
+            //Restricciones para los botones
+			GridBagConstraints consButtons = new GridBagConstraints();
+			consButtons.fill = GridBagConstraints.BOTH;
+			consButtons.gridx = 0;
+			consButtons.gridy = 0;
+			consButtons.weightx = 1.0;
+			consButtons.weighty = 0.05;
+            
+			this.accesibilityButtonsPanel = createAccessibilityButtonsPanel();
+            contentPane.add(this.accesibilityButtonsPanel, consButtons);
+            
+            consButtons.gridy = 1;
+            consButtons.weighty = 0.95;
+            contentPane.add(this, consButtons);
 //        }
         
         if (JDialog.isDefaultLookAndFeelDecorated()) {
@@ -524,7 +582,206 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	    	PrincipalGUI.fileActualHeight = this.dialog.getHeight();
     	}
 	}
+	private JPanel createAccessibilityButtonsPanel() {
+		JPanel panelAccesibilidad = new JPanel(new GridBagLayout());
+		
+		//Para el tooltip
+		final JWindow tip = new JWindow();
+		final JLabel tipText = new JLabel();
+		
+		//Panel que va a contener los botones de accesibilidad
+		JPanel panel = new JPanel(new GridBagLayout());
+		
+		//panel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+		//panel.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+		//panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+		//panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+		//panel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+		//panel.setBorder(BorderFactory.createCompoundBorder());
+		//panel.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.BLACK));
+		
+		//Restricciones para los botones
+		GridBagConstraints consButtons = new GridBagConstraints();
+		consButtons.fill = GridBagConstraints.BOTH;
+		consButtons.gridx = 0;
+		consButtons.gridy = 0;
+		consButtons.weightx = 1.0;
+		consButtons.weighty = 1.0;
+		consButtons.insets = new Insets(0,0,0,0);  //right padding
+		//consButtons.anchor=GridBagConstraints.EAST;
+		
+		Dimension dimension = new Dimension(25, 25);
+		
+		//Restore button
+		JPanel restorePanel = new JPanel();
+		//this.restoreButton = getButton("r", KeyEvent.VK_R );
+		ImageIcon imageIconRestore= new ImageIcon(JAccessibilityFileChooser.class.getResource("/resources/images/restore.png"));
+		imageIconRestore = new ImageIcon(imageIconRestore.getImage().getScaledInstance(dimension.width, dimension.height, Image.SCALE_SMOOTH));
+		this.restoreButton = new JButton(imageIconRestore);
+		this.restoreButton.setMnemonic(KeyEvent.VK_R );
+		this.restoreButton.setToolTipText(Messages.getString("Wizard.restaurar.description"));
+		this.restoreButton.getAccessibleContext().setAccessibleName(this.restoreButton.getToolTipText());
+		
+		this.restoreButton.addFocusListener(new FocusListener() {
+			
+			@Override
+			public void focusLost(FocusEvent e) {
+				Utils.showToolTip(false, tip, restoreButton, tipText);
+			}
+			
+			@Override
+			public void focusGained(FocusEvent e) {
+				Utils.showToolTip(true, tip, restoreButton, tipText);
+			}
+		});
+		this.restoreButton.setPreferredSize(dimension);
+		
+		//this.restoreButton.setBorder(null); //Eliminar Borde, ayuda a centrar el iconod el boton
+		//this.restoreButton.setContentAreaFilled(false); //area del boton invisible
+		this.restoreButton.setName("restaurar");
+		Utils.remarcar(this.restoreButton);
+		restorePanel.add(this.restoreButton);
+		this.restoreButton.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent e) {
+	    		restaurarActionPerformed();
+			}
+		});
+		
+		
+		panel.add(restorePanel, consButtons);
+		
+		
+		consButtons.gridx = 1;
+		//consButtons.weightx = 0.5;
+		consButtons.insets = new Insets(0,0,0,5);  //right padding
+		
+		//Maximize button
+		JPanel maximizePanel = new JPanel();
+
+		ImageIcon imageIconMaximize = new ImageIcon(JAccessibilityFileChooser.class.getResource("/resources/images/maximize.png"));
+		imageIconMaximize = new ImageIcon(imageIconMaximize.getImage().getScaledInstance(dimension.width, dimension.height, Image.SCALE_SMOOTH));
+		this.maximizeButton = new JButton(imageIconMaximize);
+		this.maximizeButton.setMnemonic(KeyEvent.VK_M );
+		this.maximizeButton.setToolTipText(Messages.getString("Wizard.maximizar.description"));
+		this.maximizeButton.getAccessibleContext().setAccessibleName(this.maximizeButton.getToolTipText());	
+
+		//this.maximizeButton.setBorder(null); //Eliminar Borde, ayuda a centrar el iconod el boton
+		//this.maximizeButton.setContentAreaFilled(false); //area del boton invisible
+		
+		this.maximizeButton.setName("maximizar");
+		//Se asigna una dimension por defecto
+		this.maximizeButton.setPreferredSize(dimension);
+				
+		Utils.remarcar(this.maximizeButton);
+		//maximizePanel.add(this.maximizeButton, consMaximizePanel);
+		maximizePanel.add(this.maximizeButton);	
+		
+		this.maximizeButton.addFocusListener(new FocusListener() {
+			
+			@Override
+			public void focusLost(FocusEvent e) {
+				Utils.showToolTip(false, tip, maximizeButton, tipText);
+			}
+			
+			@Override
+			public void focusGained(FocusEvent e) {
+				Utils.showToolTip(true, tip, maximizeButton, tipText);
+			}
+			
+		});
+		
+		this.maximizeButton.addActionListener(new ActionListener() {
+		    	public void actionPerformed(ActionEvent e) {
+		    		maximizarActionPerformed();
+				}
+			});
+
+		
+		panel.add(maximizePanel, consButtons);
+
+		//Se añade al panel general
+		//Restricciones para el panel de botones
+		GridBagConstraints c = new GridBagConstraints();
+		c.fill = GridBagConstraints.NONE;
+		c.gridx = 0;
+		c.gridy = 0;
+		c.weightx = 1.0;
+		c.weighty = 1.0;
+		//c.insets = new Insets(3,3,0,3);
+		c.insets = new Insets(0,0,0,0); 
+		c.anchor=GridBagConstraints.EAST;
+		panelAccesibilidad.add(panel, c);
+		
+		
+		// Habilitado/Deshabilitado de botones restaurar/maximizar
+    	if (GeneralConfig.isMaximized()){
+    		//Se deshabilita el botón de maximizado
+    		this.maximizeButton.setEnabled(false);
+    		//Se habilita el botón de restaurar
+    		this.restoreButton.setEnabled(true);
+    	} else {
+    		//Se habilita el botón de maximizado
+    		this.maximizeButton.setEnabled(true);
+    		//Se deshabilita el botón de restaurar
+    		this.restoreButton.setEnabled(false);
+    	}
+		return panelAccesibilidad;
+	}
 	
+	/**
+	 * Restaura el tama&ntilde;o de la ventana a la posicion anterior al maximizado
+	 */
+	public void restaurarActionPerformed(){
+		
+		if (actualPositionX != -1 && actualPositionY != -1 && actualWidth != -1 && actualHeight != -1){
+			theDialog.setBounds(actualPositionX, actualPositionY, actualWidth, actualHeight);
+		} else {
+			if (GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
+    			if (Platform.getOS().equals(Platform.OS.LINUX)){
+    				setBounds(this.getInitialX(), this.getInitialY(), Constants.OPTION_FONT_INITIAL_WIDTH_LINUX, Constants.OPTION_FONT_INITIAL_HEIGHT_LINUX);
+    				setMinimumSize(new Dimension(getSize().width, getSize().height));
+    			} else {
+    				setBounds(this.getInitialX(), this.getInitialY(), Constants.OPTION_FONT_INITIAL_WIDTH, Constants.OPTION_FONT_INITIAL_HEIGHT);
+    				setMinimumSize(new Dimension(getSize().width, getSize().height));
+    			}
+    		} else {
+    			setBounds(this.getInitialX(), this.getInitialY(), Constants.OPTION_INITIAL_WIDTH, Constants.OPTION_INITIAL_HEIGHT);
+    			setMinimumSize(new Dimension(getSize().width, getSize().height));
+    		}
+		}
+//		this.maximizar.setEnabled (true);
+//		this.restaurar.setEnabled (false);
+		this.maximizeButton.setEnabled (true);
+		this.restoreButton.setEnabled (false);
+	}
+	
+	public void maximizarActionPerformed(){
+		actualPositionX = theDialog.getX();
+		actualPositionY = theDialog.getY();
+		actualWidth = theDialog.getWidth();
+		actualHeight = theDialog.getHeight();
+
+		//Se obtienen las dimensiones totales disponibles para mostrar una ventana
+		Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+		
+		//Se obtienen las dimensiones de maximizado
+		int maxWidth = (int)rect.getWidth();
+		int maxHeight = (int)rect.getHeight();
+		
+		this.maximizeButton.setEnabled (false);
+		this.restoreButton.setEnabled (true);
+		
+		//Se hace el resize dependiendo del so
+		if (!Platform.getOS().equals(Platform.OS.LINUX)){
+			theDialog.setBounds(0,0, maxWidth, maxHeight);
+		} else {
+			theDialog.setBounds(0,0, maxWidth, maxHeight - Constants.maximizeVerticalMarginLinux);
+		}
+	}
+
+	public JPanel getAccesibilityButtonsPanel(){
+		return this.accesibilityButtonsPanel;
+	}
 	
 }
 

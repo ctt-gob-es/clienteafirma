@@ -390,7 +390,7 @@ final class ResizingAdaptor extends ComponentAdapter {
 	 */
 	private final void resizeImageButton(double factor, Component c) {
 		
-		if (this.theFileChooser==null && this.theFileChooserToSave==null){
+		if ((this.theFileChooser==null && this.theFileChooserToSave==null) || (isAncestor(theFileChooser.getAccesibilityButtonsPanel(), c))){
 			
 		
 		JButton button = (JButton) c;
@@ -529,4 +529,25 @@ final class ResizingAdaptor extends ComponentAdapter {
 	private static float getResizingFactorCustomDialog(){
 		return 3f;
 	}
+	
+	/**
+	 * Comprueba si un componente es antecesor de otro
+	 * @param ancestor Componente padre
+	 * @param descendant Componente hijo
+	 * @return
+	 */
+	private static boolean isAncestor(Component ancestor, Component descendant){
+		if(descendant != null && ancestor != null){
+			if(descendant.getParent() != null && descendant.getParent().equals(ancestor)){
+				return true;
+			}
+			else{
+				return isAncestor(ancestor, descendant.getParent());
+			}
+		}
+		else{
+			return false;
+		}
+	}
+
 }
