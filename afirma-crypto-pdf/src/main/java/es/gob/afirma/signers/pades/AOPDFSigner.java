@@ -763,6 +763,9 @@ public final class AOPDFSigner implements AOSigner {
                 throw new AOException("La contrasena proporcionada no es valida para el PDF actual", e2); //$NON-NLS-1$
             }
         }
+        catch (final IOException e) {
+        	throw new AOFormatFileException("Error componiendo el PDF de entrada", e); //$NON-NLS-1$
+		}
 
         if (pdfReader.getCertificationLevel() != PdfSignatureAppearance.NOT_CERTIFIED && !Boolean.TRUE.toString().equalsIgnoreCase(extraParams.getProperty("allowSigningCertifiedPdfs"))) { //$NON-NLS-1$
             if (Boolean.FALSE.toString().equalsIgnoreCase(extraParams.getProperty("allowSigningCertifiedPdfs"))) { //$NON-NLS-1$
