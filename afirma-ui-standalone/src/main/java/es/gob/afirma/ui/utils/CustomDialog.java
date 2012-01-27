@@ -1117,7 +1117,7 @@ public final class CustomDialog extends JAccessibilityCustomDialog implements Ac
 	 * @param isInputDialog indica sies una alerta de tipo input
 	 * @return instancia de CustomDialog.
 	 */
-	private static CustomDialog getInstanceCustomDialog(Component componentParent, boolean modal, String message, String title, int typeMessage, boolean isInputDialog){
+	public static CustomDialog getInstanceCustomDialog(Component componentParent, boolean modal, String message, String title, int typeMessage, boolean isInputDialog){
 		CustomDialog customDialog = null;
 		//Se chequea cual sera el componente padre.
 		if (componentParent instanceof JDialog) {
