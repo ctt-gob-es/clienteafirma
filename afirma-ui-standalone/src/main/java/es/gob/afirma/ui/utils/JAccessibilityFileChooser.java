@@ -737,15 +737,10 @@ public class JAccessibilityFileChooser extends JFileChooser{
 			theDialog.setBounds(actualPositionX, actualPositionY, actualWidth, actualHeight);
 		} else {
 			if (GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
-    			if (Platform.getOS().equals(Platform.OS.LINUX)){
-    				setBounds(this.getInitialX(), this.getInitialY(), Constants.OPTION_FONT_INITIAL_WIDTH_LINUX, Constants.OPTION_FONT_INITIAL_HEIGHT_LINUX);
-    				setMinimumSize(new Dimension(getSize().width, getSize().height));
-    			} else {
-    				setBounds(this.getInitialX(), this.getInitialY(), Constants.OPTION_FONT_INITIAL_WIDTH, Constants.OPTION_FONT_INITIAL_HEIGHT);
-    				setMinimumSize(new Dimension(getSize().width, getSize().height));
-    			}
+    			setBounds(this.getInitialX(), this.getInitialY(), Constants.FILE_FONT_INITIAL_WIDTH, Constants.FILE_INITIAL_HEIGHT);
+    			setMinimumSize(new Dimension(getSize().width, getSize().height));    			
     		} else {
-    			setBounds(this.getInitialX(), this.getInitialY(), Constants.OPTION_INITIAL_WIDTH, Constants.OPTION_INITIAL_HEIGHT);
+    			setBounds(this.getInitialX(), this.getInitialY(), Constants.FILE_INITIAL_WIDTH, Constants.FILE_INITIAL_HEIGHT);
     			setMinimumSize(new Dimension(getSize().width, getSize().height));
     		}
 		}

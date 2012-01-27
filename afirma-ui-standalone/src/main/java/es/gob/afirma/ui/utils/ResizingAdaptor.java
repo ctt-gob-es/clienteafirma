@@ -319,6 +319,8 @@ final class ResizingAdaptor extends ComponentAdapter {
 					float resizeFactor = 0;
 					if (this.theCustomDialog != null) {
 						resizeFactor = getImageResizeFactor(Constants.RESIZING_IMAGES_FACTOR + 0.0010);
+					} else if(this.theFileChooser != null){
+						resizeFactor = getImageResizeFactor(Constants.RESIZING_IMAGES_FACTOR + 0.0005);
 					} else {
 						resizeFactor = getImageResizeFactor(Constants.RESIZING_IMAGES_FACTOR);
 					}
@@ -367,7 +369,7 @@ final class ResizingAdaptor extends ComponentAdapter {
 	 * @param multiplicando Valor de multiplicacion para el nuevo tamano de la imagen. Es mayor cuanto menor sea el tamano inicial de la imagen
 	 */
 	private void resizeImage(double factor, Component c, int w, int h, int multiplicando) {
-		if (this.theFileChooser==null){			
+		if (this.theFileChooser==null && this.theFileChooserToSave==null){			
 			ImageIcon image = new ImageIcon();
 			//Se comprueba si el componente es instancia de IconLabel
 			if (c instanceof IconLabel) {
@@ -390,8 +392,7 @@ final class ResizingAdaptor extends ComponentAdapter {
 	 */
 	private final void resizeImageButton(double factor, Component c) {
 		
-		if ((this.theFileChooser==null && this.theFileChooserToSave==null) || (isAncestor(theFileChooser.getAccesibilityButtonsPanel(), c))){
-			
+		if ((this.theFileChooser==null || (isAncestor(theFileChooser.getAccesibilityButtonsPanel(), c))) && (this.theFileChooserToSave==null || (isAncestor(theFileChooserToSave.getAccesibilityButtonsPanel(), c)))){	
 		
 		JButton button = (JButton) c;
 		ImageIcon imageIcon = null;
@@ -408,7 +409,7 @@ final class ResizingAdaptor extends ComponentAdapter {
 			}
 			if (this.theDialogWizard!=null){
 				factorAux = factorAux - 0.3; //0.8999999761581421
-			}
+			}			
 			imageIcon = Constants.IMAGEICONMAXIMIZE; //Se carga la imagen original
 		} else if ((button.getName() != null) && (button.getName().equalsIgnoreCase("restaurar"))) {
 			if (this.theDialog!=null){
@@ -416,7 +417,7 @@ final class ResizingAdaptor extends ComponentAdapter {
 			}
 			if (this.theDialogWizard!=null){
 				factorAux = factorAux - 0.3; //0.8999999761581421
-			}
+			}			
 			imageIcon = Constants.IMAGEICONRESTORE; //Se carga la imagen original
 		} else {
 			imageIcon = (ImageIcon)button.getIcon(); //Se carga la imagen del componente actual
