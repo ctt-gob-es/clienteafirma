@@ -11,13 +11,11 @@ import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JRootPane;
-import javax.swing.JTextField;
 
 import org.junit.Ignore;
 import org.junit.Test;
