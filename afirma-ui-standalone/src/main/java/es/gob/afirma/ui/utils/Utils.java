@@ -407,25 +407,6 @@ public final class Utils {
 					}
 				});
 			}
-		} else {
-			if (component instanceof JButton){
-				final JButton button = (JButton) component;
-				button.addFocusListener(new FocusListener() {
-					@Override
-                    public void focusLost(final FocusEvent e) {
-						if (button.getParent() instanceof JPanel){
-							((JPanel)button.getParent()).setBorder(BorderFactory.createEmptyBorder());
-						}
-					}
-
-					@Override
-                    public void focusGained(final FocusEvent e) {
-						if (button.getParent() instanceof JPanel){
-							((JPanel)button.getParent()).setBorder(BorderFactory.createEmptyBorder());
-						}
-					}
-				});
-			}
 		}
 	}
 
