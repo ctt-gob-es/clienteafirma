@@ -7,7 +7,7 @@ public final class WinRegistry {
     static {
         initIDs();
     }
-    
+
     private WinRegistry() {
         // No permitimos la instanciacion
     }
@@ -33,7 +33,7 @@ public final class WinRegistry {
     private static native void initIDs();
 
     /** Los valores del registro se componen de un tipo y de unos datos. */
-    static class KeyValue {
+    static final class KeyValue {
         private final int type;
         private final byte[] data;
 
