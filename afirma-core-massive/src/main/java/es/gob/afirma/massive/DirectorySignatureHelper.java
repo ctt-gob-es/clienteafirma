@@ -712,7 +712,7 @@ public class DirectorySignatureHelper {
             }
 
             // Guardamos los datos de la firma
-            if (!this.saveSignToDirectory(file.getPath(), signedData, outDir, signer, ".cosign")) { //$NON-NLS-1$
+            if (!this.saveSignToDirectory(file.getPath(), signedData, outDir, signer, "." + textAux)) { //$NON-NLS-1$
                 allOK = false;
                 continue;
             }
@@ -1264,7 +1264,8 @@ public class DirectorySignatureHelper {
      * @param files
      *        Listado de ficheros que se van a procesar durante la
      *        operaci&oacute;n masiva. */
-    protected void prepareOperation(final File[] files) { /* No implementado */ }
+    @SuppressWarnings("unused")
+	protected void prepareOperation(final File[] files) { /* No implementado */ }
 
     /** Liberamos los recursos de la operaci&oacute;n que hayamos ejecutado
      * simult&aacute;neamente a la operaci&oacute;n masiva. */
@@ -1274,6 +1275,7 @@ public class DirectorySignatureHelper {
      * concreto.
      * @param file
      *        El proximo fichero que se va a procesar. */
-    protected void preProcessFile(final File file) { /* No implementado */ }
+    @SuppressWarnings("unused")
+	protected void preProcessFile(final File file) { /* No implementado */ }
 
 }
