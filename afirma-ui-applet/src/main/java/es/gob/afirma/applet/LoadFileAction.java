@@ -62,7 +62,7 @@ public final class LoadFileAction implements PrivilegedExceptionAction<byte[]> {
             throw new FileNotFoundException("El fichero '" + this.uri.toASCIIString() + "' no existe"); //$NON-NLS-1$ //$NON-NLS-2$
         }
         catch (final Exception e) {
-            throw new IOException("No se pudo acceder al fichero '" + this.uri.toASCIIString() + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
+            throw new IOException("No se pudo acceder al fichero '" + this.uri.toASCIIString() + "'"); //$NON-NLS-1$ //$NON-NLS-2$
         }
         finally {
             if (is != null) {
