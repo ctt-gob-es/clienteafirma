@@ -189,7 +189,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     }
 
     void setSignData(final byte[] data) {
-    	this.signData = data.clone();
+    	this.signData = data == null ? null : data.clone();
     }
 
     // /** Indica que parte del buffer de datos ya ha sido le&iacute;do y

@@ -16,7 +16,8 @@ import es.gob.afirma.core.ui.AOUIFactory;
 /**
  * Recupera la firma generada o seleccionada por el usuario. Si no hay una firma generada
  * puede mostrar un di&aacute;logo de selecci&oacute;n para que el usuario seleccione
- * la firma que desee.
+ * la firma que desee. Si no se solicitase mostrar este di&aacute;logo, se devolver&iacute;a
+ * {@code null}.
  */
 public class GetSignatureAction implements PrivilegedExceptionAction<byte[]> {
 
@@ -34,7 +35,7 @@ public class GetSignatureAction implements PrivilegedExceptionAction<byte[]> {
 	 * @param electronicSignatureFile Fichero de firma establecido.
 	 */
 	public GetSignatureAction(final byte[] signData, final URI electronicSignatureFile) {
-		this.signData = signData.clone();
+		this.signData = signData == null ? null : signData.clone();
 		this.electronicSignatureFile = electronicSignatureFile;
 		this.selectSignature = false;
 

@@ -210,7 +210,7 @@ public final class CipherManager {
      * claves.
      * @return Contrase&ntilda;a configurada. */
     public char[] getCipherKeystorePass() {
-        return this.cipherKeystorePass.clone();
+        return this.cipherKeystorePass == null ? null : this.cipherKeystorePass.clone();
     }
 
     /** Establece la contrase&ntilde;a para la apertura del almac&eacute;n de
@@ -218,7 +218,7 @@ public final class CipherManager {
      * @param cipherKeystorePass
      *        Contrase&nmtilde;a del almac&eacute;n. */
     public void setCipherKeystorePass(final char[] cipherKeystorePass) {
-        this.cipherKeystorePass = cipherKeystorePass.clone();
+        this.cipherKeystorePass = cipherKeystorePass == null ? null : cipherKeystorePass.clone();
     }
 
     /** Indica si est&aacute; habilitado el almac&eacute;n de claves de cifrado
@@ -260,20 +260,20 @@ public final class CipherManager {
      * @param cipherKey
      *        Clave de cifrado */
     public void setCipherKey(final byte[] cipherKey) {
-        this.cipherKeyEncoded = cipherKey.clone();
+        this.cipherKeyEncoded = cipherKey == null ? null : cipherKey.clone();
     }
 
     /** recupera la contrase&ntilde;a de cifrado.
      * @return Contrasen&tilde;a de cifrado. */
     public char[] getCipherPassword() {
-        return this.cipherPassword.clone();
+        return this.cipherPassword == null ? null : this.cipherPassword.clone();
     }
 
     /** Establece la contrase&ntilde;a de cifrado.
      * @param cipherPassword
      *        Contrase&ntilde;a de cifrado. */
     public void setCipherPassword(final char[] cipherPassword) {
-        this.cipherPassword = cipherPassword.clone();
+        this.cipherPassword = cipherPassword == null ? null : cipherPassword.clone();
     }
 
     /** Indica si la contrase&ntilde;a introducida es v&aacute;lida para ser
@@ -297,7 +297,7 @@ public final class CipherManager {
     /** Recupera los datos planos para cifrado.
      * @return Datos para cifrar. */
     public byte[] getPlainData() {
-        return this.plainData.clone();
+        return this.plainData == null ? null : this.plainData.clone();
     }
 
     /** Establece los datos planos para cifrar.
@@ -310,7 +310,7 @@ public final class CipherManager {
     /** Recupera los dato cifrados.
      * @return Datos cifrados. */
     public byte[] getCipheredData() {
-        return this.cipheredData.clone();
+        return this.cipheredData == null ? null : this.cipheredData.clone();
     }
 
     /** Establece los datos cifrados para descifrar.

@@ -31,7 +31,7 @@ class FileExtensionFilter extends FileFilter {
 	 * @param description Descripci&oacute;n asignada al tipo de fichero que se busca.
 	 */
 	FileExtensionFilter(final String[] extensions, final String description) {
-		this.exts = extensions.clone();
+		this.exts = extensions == null ? null : extensions.clone();
 		this.desc = description;
 	}
 

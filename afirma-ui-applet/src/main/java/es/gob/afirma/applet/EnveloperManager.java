@@ -630,27 +630,27 @@ public final class EnveloperManager {
      * @param data
      *        Sobre electr&oacute;nico. */
     public void setEnvelopedData(final byte[] data) {
-        this.envelopedData = data.clone();
+        this.envelopedData = data == null ? null : data.clone();
     }
 
     /** Recupera el envoltorio CMS.
      * @return Envoltorio CMS. */
     public byte[] getEnvelopedData() {
-        return this.envelopedData.clone();
+        return this.envelopedData == null ? null : this.envelopedData.clone();
     }
 
     /** Establece los datos que desean ensobrarse.
      * @param data
      *        Datos del sobre. */
     public void setContentData(final byte[] data) {
-        this.contentData = data.clone();
+        this.contentData = data == null ? null : data.clone();
     }
 
     /** Recupera los datos extra&iacute;dos de un envoltorio o preparados para
      * insertarse en el mismo.
      * @return Datos del sobre. */
     public byte[] getContentData() {
-        return this.contentData.clone();
+        return this.contentData == null ? null : this.contentData.clone();
     }
 
     /** Configura un atributo para agregarlo firmado a un envoltorio.

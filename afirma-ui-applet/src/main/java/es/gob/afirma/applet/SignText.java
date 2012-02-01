@@ -254,7 +254,7 @@ public final class SignText {
      *        PassWord callback si el KeyStore necesita contrase&ntilde;a.
      *        Si de especifica <code>null</code> se utilizara un <code>NullPasswordCallback</code> */
     public SignText(final String[] aliases, final AOKeyStoreManager ksm, final Component parentComponent, final PasswordCallback pc) {
-        this.alias = aliases.clone();
+        this.alias = aliases == null ? null : aliases.clone();
         this.kss = ksm;
         this.parent = parentComponent;
         if (pc == null) {

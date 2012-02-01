@@ -41,7 +41,7 @@ public final class DecipherAction implements PrivilegedExceptionAction<Void> {
         }
 
         this.cipherManager = cipherManager;
-        this.data = data != null ? data.clone() : null;
+        this.data = data == null ? null : data.clone();
     }
 
     /** {@inheritDoc} */
