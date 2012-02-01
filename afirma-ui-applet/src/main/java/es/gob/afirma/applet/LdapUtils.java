@@ -35,7 +35,7 @@ public final class LdapUtils {
      * @param port Puerto del servidor.
      * @param principal Principal del certificado a recuperar.
      * @return Certificado recuperado.
-     * @throws IOException
+     * @throws IOException Si el formato del principal no es correcto.
      * @throws NoSuchAlgorithmException Si no se puede obtener el certificado a partir del <i>Principal</i>
      * @throws InvalidAlgorithmParameterException Si falla la inicalizaci&oacute;n del <code>CertStore</code>
      * @throws CertStoreException Si el sistema no soporta los <code>CertStore</code> de tipo LDAP
