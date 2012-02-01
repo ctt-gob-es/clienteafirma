@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -56,7 +56,10 @@ final class AOSecMod {
         len = getShort(secmoddb, namesRunningOffset);
         final String libName = new String(secmoddb, namesRunningOffset + 2, len);
 
-        if (libName.endsWith(".DLL") || libName.endsWith(".dll") || libName.endsWith(".so") || libName.endsWith(".dylib")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+        if (
+        		(Platform.OS.WINDOWS.equals(Platform.getOS()) && (libName.endsWith(".DLL") || libName.endsWith(".dll"))) || //$NON-NLS-1$ //$NON-NLS-2$
+        		(libName.endsWith(".so") || libName.contains(".so.") || libName.endsWith(".dylib")) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		) {
 
             // namesRunningOffset += len + 2;
 
@@ -83,11 +86,11 @@ final class AOSecMod {
      * @throws AOException
      *         Cuando ocurre cualquier problema durante el proceso */
     static List<ModuleName> getModules(final String dir) throws AOException {
-        
+
         if (dir == null || "".equals(dir)) { //$NON-NLS-1$
             throw new IllegalArgumentException("El directorio del perfil de Mozilla no puede ser nulo"); //$NON-NLS-1$
         }
-        
+
         String profileDir = dir;
 
         if (modules == null) {
