@@ -40,7 +40,7 @@ import es.gob.afirma.core.signers.CounterSignTarget;
 public final class MassiveSignatureHelper {
 
     private static final String XADES_SIGNER = "es.gob.afirma.signers.xades.AOXAdESSigner"; //$NON-NLS-1$
-    private static final String XMLDSIG_SIGNER = "es.gob.afirma.signers.xml.xmldsig.AOXMLDSigSigner"; //$NON-NLS-1$
+    private static final String XMLDSIG_SIGNER = "es.gob.afirma.signers.xmldsig.AOXMLDSigSigner"; //$NON-NLS-1$
 
     private static final String REG_FIELD_SEPARATOR = " - "; //$NON-NLS-1$
 
