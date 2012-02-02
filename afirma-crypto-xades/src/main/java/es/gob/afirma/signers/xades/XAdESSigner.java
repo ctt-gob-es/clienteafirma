@@ -241,7 +241,7 @@ final class XAdESSigner {
      *   <dd>
      *    Codificaci&oacute;n de los datos a firmar
      *   </dd>
-     *  <dt><b><i>oid</i></b><dt>
+     *  <dt><b><i>contentTypeOid</i></b><dt>
      *   <dd>OID que identifica el tipo de datos a firmar</dd>
      *  <dt><b><i>canonicalizationAlgorithm</i></b></dt>
      *   <dd>Algoritmo de canonicalizaci&oacute;n</dd>
@@ -337,12 +337,12 @@ final class XAdESSigner {
         final boolean avoidBase64Transforms = Boolean.parseBoolean(extraParams.getProperty("avoidBase64Transforms", Boolean.FALSE.toString())); //$NON-NLS-1$
         final boolean headLess = Boolean.parseBoolean(extraParams.getProperty("headLess", Boolean.TRUE.toString())); //$NON-NLS-1$
         final String precalculatedHashAlgorithm = extraParams.getProperty("precalculatedHashAlgorithm"); //$NON-NLS-1$
-        String mimeType = extraParams.getProperty("mimeType"); //$NON-NLS-1$
+        String mimeType = extraParams.getProperty("mimeType", XMLConstants.DEFAULT_MIMETYPE); //$NON-NLS-1$
         String encoding = extraParams.getProperty("encoding"); //$NON-NLS-1$
         if ("base64".equalsIgnoreCase(encoding)) { //$NON-NLS-1$
             encoding = XMLConstants.BASE64_ENCODING;
         }
-        final String oid = extraParams.getProperty("oid"); //$NON-NLS-1$
+        final String oid = extraParams.getProperty("contentTypeOid"); //$NON-NLS-1$
         final ObjectIdentifierImpl objectIdentifier = (oid != null) ? new ObjectIdentifierImpl("OIDAsURN", (oid.startsWith("urn:oid:") ? "" : "urn:oid:") + oid, null, new ArrayList<String>(0)) : null; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
         URI uri = null;
@@ -554,8 +554,14 @@ final class XAdESSigner {
                         else {
                             LOGGER.info("El documento se considera binario, se convertira a Base64 antes de insertarlo en el XML y se declarara la transformacion"); //$NON-NLS-1$
                         }
-                        // Usamos el MimeType identificado
-                        dataElement.setAttributeNS(null, MIMETYPE_STR, mimeType);
+
+                        if (mimeType == XMLConstants.DEFAULT_MIMETYPE) {
+                        	final MimeHelper mimeTypeHelper = new MimeHelper(data);
+                            final String tempMimeType = mimeTypeHelper.getMimeType();
+                            mimeType = tempMimeType != null ? tempMimeType : XMLConstants.DEFAULT_MIMETYPE;
+                            dataElement.setAttributeNS(null, MIMETYPE_STR, mimeType);
+                        }
+
                         dataElement.setTextContent(Base64.encode(data));
                         wasEncodedToBase64 = true;
                     }

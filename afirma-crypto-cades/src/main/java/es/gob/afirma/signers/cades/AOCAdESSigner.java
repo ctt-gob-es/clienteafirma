@@ -115,7 +115,7 @@ public final class AOCAdESSigner implements AOSigner {
      *   </dd>
      *   <dt><b><i>contentTypeOid</i></b></dt>
      *   <dd>
-     *    OID del tipo de contenido.
+     *    OID que identifica el tipo de datos a firmar.
      *   </dd>
      *   <dt><b><i>contentDescription</i></b></dt>
      *   <dd>

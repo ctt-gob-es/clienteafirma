@@ -462,7 +462,7 @@ public final class AOXAdESSigner implements AOSigner {
      *   <dd>
      *    Codificaci&oacute;n de los datos a firmar
      *   </dd>
-     *  <dt><b><i>oid</i></b><dt>
+     *  <dt><b><i>contentTypeOid</i></b><dt>
      *   <dd>OID que identifica el tipo de datos a firmar</dd>
      *  <dt><b><i>canonicalizationAlgorithm</i></b></dt>
      *   <dd>Algoritmo de canonicalizaci&oacute;n</dd>
