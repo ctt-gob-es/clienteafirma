@@ -11,12 +11,15 @@
 package es.gob.afirma.applet;
 
 import java.awt.Frame;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.security.AccessController;
 import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
+
+import es.gob.afirma.core.ui.AOUIFactory;
 
 /** Invocar preferentemente de la siguiente manera:<br>
  * <code>SwingUtilities.invokeLater(new AsynchronousSaveData(data, file, desc, exts, parent, true));</code> */
@@ -101,11 +104,20 @@ public final class AsynchronousSaveData implements Runnable {
             public Void run() {
                 if (AsynchronousSaveData.this.getSavingTarget() == null || "".equals(AsynchronousSaveData.this.getSavingTarget())) { //$NON-NLS-1$
                     try {
-                        AsynchronousSaveData.this.setSavingTarget(UIDialogs.getSaveFileName(
-                    		AsynchronousSaveData.this.getExtensions(),
-                    		AsynchronousSaveData.this.getDescription(),
-                    		AsynchronousSaveData.this.getParent()
-                		));
+                    	final String[] exts = AsynchronousSaveData.this.getExtensions();
+                    	final ExtFilter fileFilter = new ExtFilter(
+                    			exts,
+                    			AsynchronousSaveData.this.getDescription());
+                    	final File outputFile = AOUIFactory.getSaveDataToFile(
+                    			AsynchronousSaveData.this.getDataToSave(),
+                    			new File("*" + ((exts == null || exts.length == 0) ? "" : exts[0])), //$NON-NLS-1$ //$NON-NLS-2$
+                    			fileFilter,
+                    			AsynchronousSaveData.this.getParent());
+                    	if (outputFile == null) {
+                    		Logger.getLogger("es.gob.afirma").severe("Operacion cancelada por el usuario"); //$NON-NLS-1$ //$NON-NLS-2$
+                            return null;
+                    	}
+                    	AsynchronousSaveData.this.setSavingTarget(outputFile.getAbsolutePath());
                     }
                     catch (final Exception e) {
                         Logger.getLogger("es.gob.afirma").severe("El nombre de fichero para guardar los datos no es valido: " + e); //$NON-NLS-1$ //$NON-NLS-2$
