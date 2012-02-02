@@ -22,7 +22,6 @@ import java.util.logging.Logger;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
@@ -54,9 +53,6 @@ public final class MassiveSignatureHelper {
     /** Manejador de firma para el formato configurado por defecto. */
     private AOSigner defaultSigner = null;
 
-    /** Indica si el m&oacute;dulo est&aacute; inicializado. */
-    private boolean isInitialized;
-
     /** Contruye el m&oacute;dulo de soporte para la multifirma masiva.
      * @param configuration
      *        Configuracion de la operaci&oacute;n.
@@ -78,14 +74,6 @@ public final class MassiveSignatureHelper {
         if (this.defaultSigner == null) {
             throw new AOException("Formato de firma no soportado: " + this.massiveConfiguration.getDefaultFormat()); //$NON-NLS-1$
         }
-
-        this.isInitialized = true;
-    }
-
-    /** Comprueba si el modulo de firma masiva esta inicializado.
-     * @return Devuelve <code>true</code> si est&aacute; inicializado, <code>false</code> en caso contrario. */
-    public boolean isInitialized() {
-        return this.isInitialized;
     }
 
     /** Establece el tipo de operaci&oacute;n (firma, cofirma, contrafirma del
@@ -101,26 +89,13 @@ public final class MassiveSignatureHelper {
         );
     }
 
-    /** Libera la configuraci&oacute;n de la operaci&oacute;n masiva e inhabilita
-     * su uso. El m&oacute;dulo aun conservar&aacute;a la informaci&oacute;n de
-     * log. */
-    public void release() {
-        this.massiveConfiguration = null;
-        this.defaultSigner = null;
-        this.isInitialized = false;
-    }
-
     /** Realiza la firma de datos.
-     * @param b64Data
-     *        Datos en base 64 que se desean firmar.
-     * @return Resultado de la firma en Base64. */
-    public String signData(final String b64Data) {
+     * @param data
+     *        Datos que se desean firmar.
+     * @return Resultado de la firma. */
+    public byte[] signData(final byte[] data) {
 
-        if (!this.isInitialized) {
-            throw new IllegalArgumentException("El modulo de firma masiva no ha sido inicializado"); //$NON-NLS-1$
-        }
-
-        if (b64Data == null) {
+        if (data == null) {
             LOGGER.severe("No se han introducido datos para firmar"); //$NON-NLS-1$
             this.addLog(MassiveSignMessages.getString("MassiveSignatureHelper.0")); //$NON-NLS-1$
             return null;
@@ -128,7 +103,6 @@ public final class MassiveSignatureHelper {
 
         final Properties config = (Properties) this.massiveConfiguration.getExtraParams().clone(); // Configuracion
         config.setProperty("headLess", Boolean.toString(true));  //$NON-NLS-1$
-        final byte[] data = Base64.decode(b64Data); // Datos a firmar
         byte[] signData = null; // Firma resultante
 
         // Ejecutamos la operacion que corresponda
@@ -159,28 +133,21 @@ public final class MassiveSignatureHelper {
 
         this.addLog(MassiveSignMessages.getString("MassiveSignatureHelper.3")); //$NON-NLS-1$
 
-        return Base64.encode(signData);
+        return signData;
     }
 
     /** Realiza la firma de un hash. La cofirma y contrafirma de hashes no esta
      * soportada.
-     * @param b64Hash
-     *        Hash en base 64 que se desea firmar.
-     * @return Resultado de la firma en Base64. */
-    public String signHash(final String b64Hash) {
+     * @param hash
+     *        Hash que se desea firmar.
+     * @return Resultado de la firma. */
+    public byte[] signHash(final byte[] hash) {
 
-        if (!this.isInitialized) {
-            throw new IllegalArgumentException("El modulo de firma masiva no ha sido inicializado"); //$NON-NLS-1$
-        }
-
-        if (b64Hash == null) {
+        if (hash == null) {
             LOGGER.severe("No se ha introducido un hash para firmar"); //$NON-NLS-1$
             this.addLog(MassiveSignMessages.getString("MassiveSignatureHelper.4")); //$NON-NLS-1$
             return null;
         }
-
-        // Transformamos los datos
-        final byte[] hash = Base64.decode(b64Hash);
 
         // Solo para aclarar los posibles mensajes por consola, almacenaremos
         String operation = "sign"; //$NON-NLS-1$
@@ -206,26 +173,21 @@ public final class MassiveSignatureHelper {
             }
         }
         catch (final Exception e) {
-            LOGGER.severe("Error al operar sobre el hash '" + b64Hash + "', '" + operation + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            LOGGER.severe("Error al operar sobre el hash indicado, '" + operation + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
             this.addLog(MassiveSignMessages.getString("MassiveSignatureHelper.5") + REG_FIELD_SEPARATOR + operation + REG_FIELD_SEPARATOR + e.getMessage()); //$NON-NLS-1$
             return null;
         }
 
         this.addLog("Operaci\u00F3n sobre hash: Correcta"); //$NON-NLS-1$
 
-        return Base64.encode(signData);
+        return signData;
     }
 
     /** Realiza la operaci&oacute;n de multifirma sobre un fichero.
      * @param fileUri
      *        Path del fichero que se desea firmar.
-     * @return Multifirma del fichero. */
-    public String signFile(final String fileUri) {
-
-        if (!this.isInitialized) {
-            LOGGER.severe("El modulo de firma masiva no ha sido inicializado"); //$NON-NLS-1$
-            throw new IllegalArgumentException("El modulo de firma masiva no ha sido inicializado"); //$NON-NLS-1$
-        }
+     * @return Resultado de la firma. */
+    public byte[] signFile(final String fileUri) {
 
         if (fileUri == null) {
             LOGGER.severe("No se ha introducido un fichero para firmar"); //$NON-NLS-1$
@@ -322,7 +284,7 @@ public final class MassiveSignatureHelper {
 
         this.addLog(MassiveSignMessages.getString("MassiveSignatureHelper.15")); //$NON-NLS-1$
 
-        return Base64.encode(signData);
+        return signData;
     }
 
     /** Firma datos con el signer indicado.
@@ -342,8 +304,12 @@ public final class MassiveSignatureHelper {
     private byte[] signDataFromData(final AOSigner signer, final byte[] data, final URI uri, final Properties config) throws AOException {
 
         // Configuramos y ejecutamos la operacion
-        config.setProperty("mode", this.massiveConfiguration.getMode()); //$NON-NLS-1$
-        config.setProperty("format", this.massiveConfiguration.getDefaultFormat()); //$NON-NLS-1$
+    	if (!config.containsKey("mode")) { //$NON-NLS-1$
+    		config.setProperty("mode", this.massiveConfiguration.getMode()); //$NON-NLS-1$
+    	}
+    	if (!config.containsKey("format")) { //$NON-NLS-1$
+    		config.setProperty("format", this.massiveConfiguration.getDefaultFormat()); //$NON-NLS-1$
+    	}
         if (uri != null) {
             config.setProperty("uri", uri.toString()); //$NON-NLS-1$
         }
@@ -389,8 +355,12 @@ public final class MassiveSignatureHelper {
     private byte[] signDataFromHash(final AOSigner signer, final byte[] data, final Properties config) throws AOException {
 
         // Configuramos y ejecutamos la operacion
-        config.setProperty("mode", this.massiveConfiguration.getMode()); //$NON-NLS-1$
-        config.setProperty("format", this.massiveConfiguration.getDefaultFormat()); //$NON-NLS-1$
+    	if (!config.containsKey("mode")) { //$NON-NLS-1$
+    		config.setProperty("mode", this.massiveConfiguration.getMode()); //$NON-NLS-1$
+    	}
+    	if (!config.containsKey("format")) { //$NON-NLS-1$
+    		config.setProperty("format", this.massiveConfiguration.getDefaultFormat()); //$NON-NLS-1$
+    	}
         config.setProperty("precalculatedHashAlgorithm", AOSignConstants.getDigestAlgorithmName(this.massiveConfiguration.getAlgorithm())); //$NON-NLS-1$
 
         // Introduccion MIMEType "hash/algo", solo para XAdES y XMLDSig
@@ -423,7 +393,9 @@ public final class MassiveSignatureHelper {
     private byte[] cosign(final AOSigner signer, final byte[] sign, final Properties config) throws AOException {
 
         // Configuramos y ejecutamos la operacion
-        config.setProperty("mode", this.massiveConfiguration.getMode()); //$NON-NLS-1$
+    	if (!config.containsKey("mode")) { //$NON-NLS-1$
+    		config.setProperty("mode", this.massiveConfiguration.getMode()); //$NON-NLS-1$
+    	}
 
         // Tomamos el signer adecuado para la operacion o el obligatorio si se
         // especifico
@@ -578,7 +550,7 @@ public final class MassiveSignatureHelper {
 
         private final PrivateKeyEntry keyEntry;
 
-        private MassiveType massiveOperation = null;
+        private MassiveType massiveOperation = MassiveType.SIGN;
         private String algorithm = AOSignConstants.DEFAULT_SIGN_ALGO;
         private String mode = AOSignConstants.DEFAULT_SIGN_MODE;
         private String defaultFormat = AOSignConstants.DEFAULT_SIGN_FORMAT;
@@ -601,10 +573,13 @@ public final class MassiveSignatureHelper {
         }
 
         /** Establece la operaci&oacute;n masiva que deber&aacute; ejecutarse.
+         * Si se introduce {@code null} se reestablecer&aacute; la operaci&oacute;n
+         * por defecto.
          * @param massiveOperation
          *        Tipo de operaci&oacute;n masiva. */
         public void setMassiveOperation(final MassiveType massiveOperation) {
-            this.massiveOperation = massiveOperation;
+            this.massiveOperation = (massiveOperation != null ?
+            		massiveOperation : MassiveType.SIGN);
         }
 
         /** Recupera el algoritmo de firma configurado.
@@ -613,11 +588,13 @@ public final class MassiveSignatureHelper {
             return this.algorithm;
         }
 
-        /** Estable el algoritmo de firma.
+        /** Estable el algoritmo de firma. Si se introduce {@code null} se
+         * reestablecer&aacute; el algoritmo por defecto.
          * @param algorithm
          *        Algoritmo de firma. */
         public void setAlgorithm(final String algorithm) {
-            this.algorithm = algorithm;
+            this.algorithm = (algorithm != null ?
+            		algorithm : AOSignConstants.DEFAULT_SIGN_ALGO);
         }
 
         /** Recupera el modo de firma configurado.
@@ -626,11 +603,12 @@ public final class MassiveSignatureHelper {
             return this.mode;
         }
 
-        /** Estable el modo de firma.
+        /** Estable el modo de firma. Si se introduce {@code null} se
+         * reestablecer&aacute; el modo por defecto.
          * @param mode
          *        Modo de firma. */
         public void setMode(final String mode) {
-            this.mode = mode;
+            this.mode = (mode != null ? mode : AOSignConstants.DEFAULT_SIGN_MODE);
         }
 
         /** Recupera el formato de firma configurado por defecto.
@@ -640,11 +618,13 @@ public final class MassiveSignatureHelper {
         }
 
         /** Estable el formato de firma por defecto (para cuando no se desee
-         * respetar el original o se realiza una firma masiva).
+         * respetar el original o se realiza una firma masiva). Si se introduce
+         * {@code null} se reestablecer&aacute; el formato por defecto.
          * @param defaultFormat
          *        Formato de firma. */
         public void setDefaultFormat(final String defaultFormat) {
-            this.defaultFormat = defaultFormat;
+            this.defaultFormat = (defaultFormat != null ?
+            		defaultFormat : AOSignConstants.DEFAULT_SIGN_FORMAT);
         }
 
         /** Indica si se ha configurado que las multifirmas respeten el formato
@@ -670,7 +650,8 @@ public final class MassiveSignatureHelper {
         }
 
         /** Establece par&aacute;metros adicionales para la configuraci&oacute;n
-         * de la operaci&oacute;n masiva.
+         * de la operaci&oacute;n masiva. Si se introduce {@code null} se
+         * reestablecer&aacute; la configuraci&oacute;n por defecto.
          * @param extraParams
          *        Par&aacute;metros adicionales. */
         public void setExtraParams(final Properties extraParams) {

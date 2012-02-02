@@ -2070,7 +2070,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
         // Si ya hay una configuracion de firma masiva establecida, la
         // actualizamos con la nueva operacion
-        if (this.massiveSignatureHelper != null && this.massiveSignatureHelper.isInitialized()) {
+        if (this.massiveSignatureHelper != null) {
             this.massiveSignatureHelper.setMassiveOperation(this.massiveOperation);
         }
     }
@@ -2229,78 +2229,102 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     public void endMassiveSignature() {
         LOGGER.info("Invocando endMassiveSignature"); //$NON-NLS-1$
         if (this.massiveSignatureHelper == null) {
-            LOGGER.warning("No se ha inicializado la operacion de firma masiva"); //$NON-NLS-1$
+            LOGGER.warning("No se habia inicializado la operacion de firma masiva"); //$NON-NLS-1$
             return;
         }
-        this.massiveSignatureHelper.release();
+        this.massiveSignatureHelper = null;
     }
 
     /** {@inheritDoc} */
     public String massiveSignatureData(final String b64Data) {
-        LOGGER.info("Invocando massiveSignatureData"); //$NON-NLS-1$
-        this.setError(null);
-        if (this.massiveSignatureHelper == null || !this.massiveSignatureHelper.isInitialized()) {
-            this.setError(AppletMessages.getString("SignApplet.375")); //$NON-NLS-1$
-            return null;
-        }
-
-        // Ejecutamos la operacion
-        return AccessController.doPrivileged(new java.security.PrivilegedAction<String>() {
-            public String run() {
-                final String result = SignApplet.this.massiveSignatureHelper.signData(b64Data);
-                if (result == null) {
-                    SignApplet.this.setError(SignApplet.this.massiveSignatureHelper.getCurrentLogEntry());
-                }
-                return result;
-            }
-        });
+    	LOGGER.info("Invocando massiveSignatureData"); //$NON-NLS-1$
+    	this.setError(null);
+    	if (this.massiveSignatureHelper == null) {
+    		this.setError(AppletMessages.getString("SignApplet.375")); //$NON-NLS-1$
+    		return null;
+    	}
+    	if (b64Data == null) {
+    		this.setError(AppletMessages.getString("SignApplet.89")); //$NON-NLS-1$
+    		return null;
+    	}
+    	final byte[] dataToSign = Base64.decode(b64Data);
+    	// Ejecutamos la operacion
+    	try {
+    		return AccessController.doPrivileged(new java.security.PrivilegedAction<String>() {
+    			public String run() {
+    				final byte[] result = SignApplet.this.massiveSignatureHelper.signData(dataToSign);
+    				if (result == null) {
+    					SignApplet.this.setError(SignApplet.this.massiveSignatureHelper.getCurrentLogEntry());
+    				}
+    				return Base64.encode(result);
+    			}
+    		});
+    	} catch (final Exception e) {
+    		this.setError(AppletMessages.getString("SignApplet.205")); //$NON-NLS-1$
+    		return null;
+    	}
     }
 
     /** {@inheritDoc} */
     public String massiveSignatureHash(final String b64Hash) {
-        LOGGER.info("Invocando massiveSignatureHash"); //$NON-NLS-1$
-        this.setError(null);
-        if (this.massiveSignatureHelper == null || !this.massiveSignatureHelper.isInitialized()) {
-            this.setError(AppletMessages.getString("SignApplet.375")); //$NON-NLS-1$
-            return null;
-        }
-        return AccessController.doPrivileged(new java.security.PrivilegedAction<String>() {
-            public String run() {
-                final String result = SignApplet.this.massiveSignatureHelper.signHash(b64Hash);
-                if (result == null) {
-                    SignApplet.this.setError(SignApplet.this.massiveSignatureHelper.getCurrentLogEntry());
-                }
-                return result;
-            }
-        });
+    	LOGGER.info("Invocando massiveSignatureHash"); //$NON-NLS-1$
+    	this.setError(null);
+    	if (this.massiveSignatureHelper == null) {
+    		this.setError(AppletMessages.getString("SignApplet.375")); //$NON-NLS-1$
+    		return null;
+    	}
+    	if (b64Hash == null) {
+    		this.setError(AppletMessages.getString("SignApplet.89")); //$NON-NLS-1$
+    		return null;
+    	}
+    	final byte[] dataHash = Base64.decode(b64Hash);
+    	try {
+    		return AccessController.doPrivileged(new java.security.PrivilegedAction<String>() {
+    			public String run() {
+    				final byte[] result = SignApplet.this.massiveSignatureHelper.signHash(dataHash);
+    				if (result == null) {
+    					SignApplet.this.setError(SignApplet.this.massiveSignatureHelper.getCurrentLogEntry());
+    				}
+    				return Base64.encode(result);
+    			}
+    		});
+    	} catch (final Exception e) {
+    		this.setError(AppletMessages.getString("SignApplet.205")); //$NON-NLS-1$
+    		return null;
+    	}
     }
 
     /** {@inheritDoc} */
     public String massiveSignatureFile(final String filename) {
 
-        LOGGER.info("Invocando massiveSignatureFile: " + filename); //$NON-NLS-1$
+    	LOGGER.info("Invocando massiveSignatureFile: " + filename); //$NON-NLS-1$
 
-        if (this.massiveSignatureHelper == null || !this.massiveSignatureHelper.isInitialized()) {
-            this.setError(AppletMessages.getString("SignApplet.375")); //$NON-NLS-1$
-            return null;
-        }
+    	if (this.massiveSignatureHelper == null) {
+    		this.setError(AppletMessages.getString("SignApplet.375")); //$NON-NLS-1$
+    		return null;
+    	}
 
-        if (filename == null || "".equals(filename)) { //$NON-NLS-1$
-            setError(AppletMessages.getString("SignApplet.48")); //$NON-NLS-1$
-            return null;
-        }
+    	if (filename == null || "".equals(filename)) { //$NON-NLS-1$
+    		setError(AppletMessages.getString("SignApplet.48")); //$NON-NLS-1$
+    		return null;
+    	}
 
-        this.setError(null);
+    	this.setError(null);
 
-        return AccessController.doPrivileged(new java.security.PrivilegedAction<String>() {
-            public String run() {
-                final String result = SignApplet.this.massiveSignatureHelper.signFile(filename);
-                if (result == null){
-                    SignApplet.this.setError(SignApplet.this.massiveSignatureHelper.getCurrentLogEntry());
-                }
-                return result;
-            }
-        });
+    	try {
+    		return AccessController.doPrivileged(new java.security.PrivilegedAction<String>() {
+    			public String run() {
+    				final byte[] result = SignApplet.this.massiveSignatureHelper.signFile(filename);
+    				if (result == null){
+    					SignApplet.this.setError(SignApplet.this.massiveSignatureHelper.getCurrentLogEntry());
+    				}
+    				return Base64.encode(result);
+    			}
+    		});
+    	} catch (final Exception e) {
+    		this.setError(AppletMessages.getString("SignApplet.205")); //$NON-NLS-1$
+    		return null;
+    	}
     }
 
     /** {@inheritDoc} */
