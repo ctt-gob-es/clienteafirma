@@ -58,7 +58,7 @@ final class AOSecMod {
 
         if (
         		(Platform.OS.WINDOWS.equals(Platform.getOS()) && (libName.endsWith(".DLL") || libName.endsWith(".dll"))) || //$NON-NLS-1$ //$NON-NLS-2$
-        		(libName.endsWith(".so") || libName.contains(".so.") || libName.endsWith(".dylib")) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        		(!Platform.OS.WINDOWS.equals(Platform.getOS()) && (libName.endsWith(".so") || libName.contains(".so.") || libName.endsWith(".dylib"))) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		) {
 
             // namesRunningOffset += len + 2;
