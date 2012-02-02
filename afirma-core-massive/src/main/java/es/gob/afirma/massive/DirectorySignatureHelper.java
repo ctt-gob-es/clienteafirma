@@ -48,7 +48,7 @@ public class DirectorySignatureHelper {
 
     private static final String URI_STR = "uri"; //$NON-NLS-1$
 
-
+    private static final String CADES_SIGNER = "es.gob.afirma.signers.cades.AOCAdESSigner"; //$NON-NLS-1$
     private static final String XADES_SIGNER = "es.gob.afirma.signers.xades.AOXAdESSigner"; //$NON-NLS-1$
     private static final String XMLDSIG_SIGNER = "es.gob.afirma.signers.xml.xmldsig.AOXMLDSigSigner"; //$NON-NLS-1$
 
@@ -464,17 +464,8 @@ public class DirectorySignatureHelper {
 
         // Introduccion MIMEType "hash/algo", solo para XAdES y XMLDSig
         if ((signer.getClass().getName().equals(XADES_SIGNER)) || (signer.getClass().getName().equals(XMLDSIG_SIGNER))) {
-            final String mimeType = "hash/" + AOSignConstants.getDigestAlgorithmName(this.algorithm).toLowerCase(); //$NON-NLS-1$
-            try {
-                signConfig.setProperty("mimeType", mimeType); //$NON-NLS-1$
-                final String dataOid = MimeHelper.transformMimeTypeToOid(mimeType);
-                if (dataOid != null) {
-                	signConfig.setProperty("oid", MimeHelper.transformMimeTypeToOid(mimeType)); //$NON-NLS-1$
-                }
-            }
-            catch (final Exception e) {
-                LOGGER.warning("Error al indicar el MIME-Type, se utilizara el por defecto y este aspecto no se indicara en el registro de firma masiva: " + e); //$NON-NLS-1$
-            }
+        	final String mimeType = "hash/" + AOSignConstants.getDigestAlgorithmName(this.algorithm).toLowerCase(); //$NON-NLS-1$
+        	signConfig.setProperty("mimeType", mimeType); //$NON-NLS-1$
         }
 
         final byte[][] signs = new byte[hashes.length][];
@@ -585,20 +576,22 @@ public class DirectorySignatureHelper {
                 DirectorySignatureHelper.closeStream(fis);
             }
 
-            // Deteccion del MIMEType, solo para XAdES y XMLDSig
-            if ((signer.getClass().getName().equals("es.gob.afirma.signers.AOXAdESSigner")) || (signer.getClass().getName().equals("es.gob.afirma.signers.AOXMLDSigSigner"))) {  //$NON-NLS-1$//$NON-NLS-2$
+            // Deteccion del MIMEType y Oid de los datos, solo para CAdES, XAdES y XMLDSig
+            final String signerClassName = signer.getClass().getName();
+            if (CADES_SIGNER.equals(signerClassName) ||
+            		XADES_SIGNER.equals(signerClassName) ||
+            		XMLDSIG_SIGNER.equals(signerClassName)) {
                 final MimeHelper mimeHelper = new MimeHelper(dataToSign);
                 final String mimeType = mimeHelper.getMimeType();
                 if (mimeType != null) {
-                    try {
+                    final String dataOid = MimeHelper.transformMimeTypeToOid(mimeType);
+                	if (XADES_SIGNER.equals(signerClassName) || XMLDSIG_SIGNER.equals(signerClassName)) {
                         signConfig.setProperty("mimeType", mimeType); //$NON-NLS-1$
-                        final String dataOid = MimeHelper.transformMimeTypeToOid(mimeType);
                         if (dataOid != null) {
-                        	signConfig.setProperty("oid", MimeHelper.transformMimeTypeToOid(mimeType)); //$NON-NLS-1$
+                        	signConfig.setProperty("oid", dataOid); //$NON-NLS-1$
                         }
-                    }
-                    catch (final Exception e) {
-                        LOGGER.warning("No se ha podido detectar el MIME-Type, se utilizara el por defecto y este aspecto no se indicara en el registro de firma masiva: " + e); //$NON-NLS-1$
+                	} else if (dataOid != null) {
+                    	signConfig.setProperty("contentTypeOid", dataOid); //$NON-NLS-1$
                     }
                 }
             }
@@ -771,20 +764,22 @@ public class DirectorySignatureHelper {
                         final PrivateKeyEntry keyEntry,
                         final Properties signConfig) {
 
-        // Deteccion del MIMEType, solo para XAdES y XMLDSig
-        if ((signer.getClass().getName().equals("es.gob.afirma.signers.xades.AOXAdESSigner")) || (signer.getClass().getName().equals("es.gob.afirma.signers.xml.xmldsig.AOXMLDSigSigner"))) {  //$NON-NLS-1$//$NON-NLS-2$
+    	// Deteccion del MIMEType y Oid de los datos, solo para CAdES, XAdES y XMLDSig
+        final String signerClassName = signer.getClass().getName();
+        if (CADES_SIGNER.equals(signerClassName) ||
+        		XADES_SIGNER.equals(signerClassName) ||
+        		XMLDSIG_SIGNER.equals(signerClassName)) {
             final MimeHelper mimeHelper = new MimeHelper(data);
             final String mimeType = mimeHelper.getMimeType();
             if (mimeType != null) {
-                try {
+                final String dataOid = MimeHelper.transformMimeTypeToOid(mimeType);
+            	if (XADES_SIGNER.equals(signerClassName) || XMLDSIG_SIGNER.equals(signerClassName)) {
                     signConfig.setProperty("mimeType", mimeType); //$NON-NLS-1$
-                    final String dataOid = MimeHelper.transformMimeTypeToOid(mimeType);
                     if (dataOid != null) {
-                    	signConfig.setProperty("contentTypeOid", MimeHelper.transformMimeTypeToOid(mimeType)); //$NON-NLS-1$
+                    	signConfig.setProperty("oid", dataOid); //$NON-NLS-1$
                     }
-                }
-                catch (final Exception e) {
-                    LOGGER.warning("No se ha podido detectar el MIME-Type, se utilizara el por defecto y este aspecto no se indicara en el registro de firma masiva: " + e); //$NON-NLS-1$
+            	} else if (dataOid != null) {
+                	signConfig.setProperty("contentTypeOid", dataOid); //$NON-NLS-1$
                 }
             }
         }

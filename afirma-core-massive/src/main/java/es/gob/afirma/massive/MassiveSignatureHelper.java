@@ -358,13 +358,14 @@ public final class MassiveSignatureHelper {
             final MimeHelper mimeHelper = new MimeHelper(data);
             final String mimeType = mimeHelper.getMimeType();
             if (mimeType != null) {
+            	final String dataOid = MimeHelper.transformMimeTypeToOid(mimeType);
             	if (XADES_SIGNER.equals(signerClassName) || XMLDSIG_SIGNER.equals(signerClassName)) {
                     config.setProperty("mimeType", mimeType); //$NON-NLS-1$
-            	} else {
-            		final String dataOid = MimeHelper.transformMimeTypeToOid(mimeType);
-            		if (dataOid != null) {
-            			config.setProperty("contentTypeOid", dataOid); //$NON-NLS-1$
-            		}
+                    if (dataOid != null) {
+                    	config.setProperty("oid", dataOid); //$NON-NLS-1$
+                    }
+            	} else if (dataOid != null) {
+            		config.setProperty("contentTypeOid", dataOid); //$NON-NLS-1$
             	}
             }
         }
