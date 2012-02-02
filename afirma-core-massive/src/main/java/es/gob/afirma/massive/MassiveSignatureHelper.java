@@ -129,27 +129,21 @@ public final class MassiveSignatureHelper {
 
         final Properties config = (Properties) this.massiveConfiguration.getExtraParams().clone(); // Configuracion
         config.setProperty("headLess", Boolean.toString(true));  //$NON-NLS-1$
-        final byte[] data = Base64.decode(b64Data); // Datos a
-                                                                // firmar
-        String operation = null; // Para aclarar mensajes por consola
+        final byte[] data = Base64.decode(b64Data); // Datos a firmar
         byte[] signData = null; // Firma resultante
 
         // Ejecutamos la operacion que corresponda
         try {
             if (this.massiveConfiguration.getMassiveOperation().equals(MassiveType.SIGN)) { // Firma
-                operation = "sign"; //$NON-NLS-1$
                 signData = signDataFromData(this.defaultSigner, data, null, config);
             }
             else if (this.massiveConfiguration.getMassiveOperation().equals(MassiveType.COSIGN)) { // Cofirma
-                operation = "cosign"; //$NON-NLS-1$
                 signData = cosign(this.defaultSigner, data, config);
             }
             else if (this.massiveConfiguration.getMassiveOperation().equals(MassiveType.COUNTERSIGN_ALL)) { // Contraforma del arbol completo
-                operation = "countersign tree"; //$NON-NLS-1$
                 signData = countersignTree(this.defaultSigner, data, config);
             }
             else { // Contrafirma de los nodos hoja
-                operation = "countersign tree leafs"; //$NON-NLS-1$
                 signData = countersignLeafs(this.defaultSigner, data, config);
             }
         }
@@ -159,8 +153,8 @@ public final class MassiveSignatureHelper {
             return null;
         }
         catch (final Exception e) {
-            LOGGER.severe("Error al " + operation + " los datos introducidos: " + e.getMessage());  //$NON-NLS-1$//$NON-NLS-2$
-            this.addLog(MassiveSignMessages.getString("MassiveSignatureHelper.2") + REG_FIELD_SEPARATOR + operation + REG_FIELD_SEPARATOR + e.getMessage()); //$NON-NLS-1$
+            LOGGER.severe("Error durante la operacion " + this.massiveConfiguration.getMassiveOperation() + " sobre los datos introducidos: " + e.getMessage());  //$NON-NLS-1$//$NON-NLS-2$
+            this.addLog(MassiveSignMessages.getString("MassiveSignatureHelper.2") + REG_FIELD_SEPARATOR + this.massiveConfiguration.getMassiveOperation() + REG_FIELD_SEPARATOR + e.getMessage()); //$NON-NLS-1$
             return null;
         }
 
@@ -427,7 +421,9 @@ public final class MassiveSignatureHelper {
     }
 
     /** Cofirma datos con el manejador configurado o con el m&aacute;s apropiado
-     * si se indic&oacute; que se buscase.
+     * si se indic&oacute; que se buscase. Si los datos introducidos no se corresponden
+     * con una firma soportada (por el manejador indicado, o cualquier otro, seg&uacute;n
+     * configuraci&oacute;n), se realizar&aacute; una firma simple sobre los datos.
      * @param signer
      *        Manejador con el que cofirmar los datos.
      * @param sign
@@ -440,14 +436,21 @@ public final class MassiveSignatureHelper {
      *         Cuando ocurre un error durante la operaci&oacute;n de firma. */
     private byte[] cosign(final AOSigner signer, final byte[] sign, final Properties config) throws AOException {
 
-        // Tomamos el signer adecuado para la operacion o el obligatorio si se
-        // especifico
-        final AOSigner validSigner = this.getValidSigner(signer, sign);
-
         // Configuramos y ejecutamos la operacion
         config.setProperty("mode", this.massiveConfiguration.getMode()); //$NON-NLS-1$
 
-        final byte[] signData = validSigner.cosign(sign, this.massiveConfiguration.getAlgorithm(), this.massiveConfiguration.getKeyEntry(), config);
+        // Tomamos el signer adecuado para la operacion o el obligatorio si se
+        // especifico
+        final AOSigner validSigner;
+        byte[] signData;
+        try {
+        	validSigner = this.getValidSigner(signer, sign);
+        	signData = validSigner.cosign(sign, this.massiveConfiguration.getAlgorithm(), this.massiveConfiguration.getKeyEntry(), config);
+        } catch (final AOException e) {
+        	LOGGER.warning("No es posible cofirmar el documento, se realizara una firma simple con el manejador por defecto: " + e.getMessage()); //$NON-NLS-1$
+        	signData = signer.sign(sign, this.massiveConfiguration.getAlgorithm(), this.massiveConfiguration.getKeyEntry(), config);
+        }
+
         if (signData == null) {
             throw new AOException("No se generaron datos de firma"); //$NON-NLS-1$
         }
@@ -527,7 +530,7 @@ public final class MassiveSignatureHelper {
      *        Manejador de firma.
      * @param signData
      *        Firma para la que deseamos obtener un manejador.
-     * @return Manejador compatible con la firma introducida.
+     * @return Manejador de firma por defecto compatible para la firma introducida.
      * @throws AOException
      *         Si la firma introducida no se corresponde con ning&uacute;n
      *         formato soportado o se obliga a usar el manejador por defecto
