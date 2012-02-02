@@ -2202,7 +2202,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
                 // Establecemos la configuracion que se usara para la
                 // firma masiva
-                final MassiveSignConfiguration massiveConfiguration = new MassiveSignConfiguration(ke, (X509Certificate) ke.getCertificate());
+                final MassiveSignConfiguration massiveConfiguration = new MassiveSignConfiguration(ke);
                 massiveConfiguration.setExtraParams(SignApplet.this.getGenericConfig());
                 massiveConfiguration.setAlgorithm(SignApplet.this.getSigAlgo());
                 massiveConfiguration.setDefaultFormat(SignApplet.this.getSigFormat());

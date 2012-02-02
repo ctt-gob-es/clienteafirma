@@ -14,8 +14,6 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.URI;
 import java.security.KeyStore.PrivateKeyEntry;
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -578,7 +576,6 @@ public final class MassiveSignatureHelper {
      * de firma. */
     public static class MassiveSignConfiguration {
 
-        private final X509Certificate certificate;
         private final PrivateKeyEntry keyEntry;
 
         private MassiveType massiveOperation = null;
@@ -591,12 +588,9 @@ public final class MassiveSignatureHelper {
         /** Crea un <i>JavaBean</i> con los par&aacute;metros necesarios para las
          * operaciones de firma masiva.
          * @param keyEntry
-         *        Clave privada para las firmas
-         * @param certificate
-         *        Certificado X.509 firmante */
-        public MassiveSignConfiguration(final PrivateKeyEntry keyEntry, final X509Certificate certificate) {
+         *        Clave privada para las firmas */
+        public MassiveSignConfiguration(final PrivateKeyEntry keyEntry) {
             this.keyEntry = keyEntry;
-            this.certificate = certificate;
             this.extraParams = new Properties();
         }
 
@@ -667,12 +661,6 @@ public final class MassiveSignatureHelper {
          *        Respetar formato original de firma. */
         public void setOriginalFormat(final boolean originalFormat) {
             this.originalFormat = originalFormat;
-        }
-
-        /** Recupera el certificado de firma.
-         * @return Certificado de firma. */
-        public Certificate getCertificate() {
-            return this.certificate;
         }
 
         /** Recupera entrada de la clave de firma.
