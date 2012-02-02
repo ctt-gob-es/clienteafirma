@@ -584,15 +584,11 @@ public class DirectorySignatureHelper {
                 final MimeHelper mimeHelper = new MimeHelper(dataToSign);
                 final String mimeType = mimeHelper.getMimeType();
                 if (mimeType != null) {
-                    final String dataOid = MimeHelper.transformMimeTypeToOid(mimeType);
-                	if (XADES_SIGNER.equals(signerClassName) || XMLDSIG_SIGNER.equals(signerClassName)) {
-                        signConfig.setProperty("mimeType", mimeType); //$NON-NLS-1$
-                        if (dataOid != null) {
-                        	signConfig.setProperty("oid", dataOid); //$NON-NLS-1$
-                        }
-                	} else if (dataOid != null) {
-                    	signConfig.setProperty("contentTypeOid", dataOid); //$NON-NLS-1$
-                    }
+                	signConfig.setProperty("mimeType", mimeType); //$NON-NLS-1$
+                	final String dataOid = MimeHelper.transformMimeTypeToOid(mimeType);
+                	if (dataOid != null) {
+                		signConfig.setProperty("contentTypeOid", dataOid); //$NON-NLS-1$
+                	}
                 }
             }
 
@@ -772,15 +768,11 @@ public class DirectorySignatureHelper {
             final MimeHelper mimeHelper = new MimeHelper(data);
             final String mimeType = mimeHelper.getMimeType();
             if (mimeType != null) {
-                final String dataOid = MimeHelper.transformMimeTypeToOid(mimeType);
-            	if (XADES_SIGNER.equals(signerClassName) || XMLDSIG_SIGNER.equals(signerClassName)) {
-                    signConfig.setProperty("mimeType", mimeType); //$NON-NLS-1$
-                    if (dataOid != null) {
-                    	signConfig.setProperty("oid", dataOid); //$NON-NLS-1$
-                    }
-            	} else if (dataOid != null) {
-                	signConfig.setProperty("contentTypeOid", dataOid); //$NON-NLS-1$
-                }
+            	signConfig.setProperty("mimeType", mimeType); //$NON-NLS-1$
+            	final String dataOid = MimeHelper.transformMimeTypeToOid(mimeType);
+            	if (dataOid != null) {
+            		signConfig.setProperty("contentTypeOid", dataOid); //$NON-NLS-1$
+            	}
             }
         }
 
