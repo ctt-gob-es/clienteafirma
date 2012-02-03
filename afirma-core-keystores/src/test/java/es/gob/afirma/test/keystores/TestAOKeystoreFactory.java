@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -34,7 +34,7 @@ import es.gob.afirma.keystores.main.common.AOKeyStoreManagerFactory;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
  */
 public class TestAOKeystoreFactory {
-    
+
     /** Pruebas de AOKeyStoreFactory de los tipos sin dependencias de otros m&oacute;dulos
      * @throws Exception
      */
@@ -50,36 +50,36 @@ public class TestAOKeystoreFactory {
             Assert.assertNotNull(aliases);
             if (aliases.length > 0) {
                 final String alias = aliases[0];
-                X509Certificate cert = ksm.getCertificate(alias);
+                final X509Certificate cert = ksm.getCertificate(alias);
                 Assert.assertNotNull(cert);
             }
         }
-        
-        byte[] p12file = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream("ANF_PF_Activo.pfx")); //$NON-NLS-1$
+
+        final byte[] p12file = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream("ANF_PF_Activo.pfx")); //$NON-NLS-1$
         Assert.assertTrue("No se ha podido leer el P12", p12file.length > 0); //$NON-NLS-1$
-        File tmpFile = File.createTempFile("temp", "afirma"); //$NON-NLS-1$ //$NON-NLS-2$
+        final File tmpFile = File.createTempFile("temp", "afirma"); //$NON-NLS-1$ //$NON-NLS-2$
         tmpFile.deleteOnExit();
-        OutputStream os = new FileOutputStream(tmpFile);
+        final OutputStream os = new FileOutputStream(tmpFile);
         os.write(p12file);
         os.flush();
         os.close();
 
-        PasswordCallback pc = new PasswordCallback(">", false); //$NON-NLS-1$
+        final PasswordCallback pc = new PasswordCallback(">", false); //$NON-NLS-1$
         pc.setPassword("12341234".toCharArray()); //$NON-NLS-1$
-        
+
         ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
-                    AOKeyStore.PKCS12, 
-                    tmpFile.getAbsolutePath(), 
+                    AOKeyStore.PKCS12,
+                    tmpFile.getAbsolutePath(),
                     null,
-                    pc, 
+                    pc,
                     null
         );
         Assert.assertNotNull(ksm);
         final String[] aliases = ksm.getAliases();
         Assert.assertNotNull(aliases);
-        X509Certificate cert = ksm.getCertificate("anf usuario activo"); //$NON-NLS-1$
+        final X509Certificate cert = ksm.getCertificate("anf usuario activo"); //$NON-NLS-1$
         Assert.assertNotNull(cert);
-        
+
     }
 
 }
