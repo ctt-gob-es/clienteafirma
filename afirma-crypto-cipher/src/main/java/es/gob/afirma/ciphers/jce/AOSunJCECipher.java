@@ -147,8 +147,7 @@ public final class AOSunJCECipher implements AOCipher {
             cipher = Cipher.getInstance(algorithmConfig.toString(), PROVIDER);
         }
         catch (final Exception e) {
-        	e.printStackTrace();
-            throw new AOException("Error al obtener el cifrador", e); //$NON-NLS-1$
+            throw new AOException("Error al obtener el cifrador: " + e, e); //$NON-NLS-1$
         }
 
         // Inicializamos el cipher
