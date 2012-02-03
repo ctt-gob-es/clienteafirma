@@ -47,11 +47,13 @@ public class Ticket173586Test {
 
 		applet.setMassiveOperation(AOSignConstants.MASSIVE_OPERATION_SIGN);
 		final String signatureB64 = applet.massiveSignatureFile(getResourcePathToApplet(DATA_FILE));
+		Assert.assertFalse("Error en la firma masiva: ", applet.isError()); //$NON-NLS-1$
+
 		System.out.println(applet.getMassiveSignatureCurrentLog());
 
 		applet.endMassiveSignature();
 
-		final File outFile = new File("173586_signature"); //$NON-NLS-1$
+		final File outFile = File.createTempFile("AfirmaTest173586", null); //$NON-NLS-1$
 		final FileOutputStream fos = new FileOutputStream(outFile);
 		fos.write(Base64.decode(signatureB64));
 		try { fos.close();} catch (final Exception e) {
@@ -59,9 +61,6 @@ public class Ticket173586Test {
 		}
 
 		System.out.println("Fichero de salida: " + outFile.getAbsolutePath()); //$NON-NLS-1$
-
-		Assert.assertFalse("Error en la firma", applet.isError()); //$NON-NLS-1$
-
 	}
 
     private static String getResourcePath(final String filename) {
