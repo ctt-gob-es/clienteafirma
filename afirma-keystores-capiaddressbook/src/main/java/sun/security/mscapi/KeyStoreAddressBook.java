@@ -21,7 +21,6 @@ import java.util.logging.Logger;
 /** <code>sun.security.mscapi.KeyStore</code> modificada para acceder a los
  * almacenes de CAPI <i>ADDRESSBOOK</i> y <i>CA</i>.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-@SuppressWarnings("restriction")
 public abstract class KeyStoreAddressBook extends KeyStoreSpi {
 
     /** KeyStore <i>CA</i> de CAPI. */
@@ -46,7 +45,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
         // private Key privateKey;
         private final X509Certificate certChain[];
         private String alias;
-        
+
         X509Certificate[] getCertChain() {
             return this.certChain.clone();
         }
@@ -469,16 +468,4 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
         }
     }
 
-//    public static void main(String args[]) {
-//        AOKeyStoreManager ksm = null;
-//        try {
-//            ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(AOConstants.AOKeyStore.WINADDRESSBOOK, null, null, null, null);
-//        }
-//        catch (final Exception e) {
-//            e.printStackTrace();
-//        }
-//        for (String a : ksm.getAliases()) {
-//            System.out.println(a);
-//        }
-//    }
 }
