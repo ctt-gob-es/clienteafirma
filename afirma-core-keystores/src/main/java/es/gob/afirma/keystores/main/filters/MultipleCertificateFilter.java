@@ -20,7 +20,7 @@ public class MultipleCertificateFilter extends CertificateFilter {
 	 */
 	public MultipleCertificateFilter(final CertificateFilter[] filters) {
 		if (filters == null) {
-			throw new NullPointerException("Listado nulo de filtros de certificados"); //$NON-NLS-1$
+			throw new IllegalArgumentException("Listado nulo de filtros de certificados"); //$NON-NLS-1$
 		}
 		this.filters = filters.clone();
 	}

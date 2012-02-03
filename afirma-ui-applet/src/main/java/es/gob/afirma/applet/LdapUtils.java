@@ -42,10 +42,10 @@ public final class LdapUtils {
      */
     public static X509Certificate getCertificate(final String server, final int port, final String principal) throws IOException, CertStoreException, InvalidAlgorithmParameterException, NoSuchAlgorithmException {
         if (server == null || server.length() == 0) {
-			throw new NullPointerException("El servidor no puede ser nulo ni vacio"); //$NON-NLS-1$
+			throw new IllegalArgumentException("El servidor no puede ser nulo ni vacio"); //$NON-NLS-1$
 		}
         if (principal == null || principal.length() == 0) {
-			throw new NullPointerException("El Principal del Certificado no puede ser nulo ni vacio"); //$NON-NLS-1$
+			throw new IllegalArgumentException("El Principal del Certificado no puede ser nulo ni vacio"); //$NON-NLS-1$
 		}
 
         final X509CertSelector certSelector = new X509CertSelector();
