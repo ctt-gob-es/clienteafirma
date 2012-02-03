@@ -149,7 +149,7 @@ public final class PanelContrasenia extends JAccessibilityDialogWizard {
                 return false;
             }
             // Leemos el fichero de datos
-            byte[] fileContent = null;
+            final byte[] fileContent;
             try {
                 fileContent = this.getFileContent();
             }
@@ -228,7 +228,7 @@ public final class PanelContrasenia extends JAccessibilityDialogWizard {
      * @throws FileNotFoundException Cuando no se encuentra o no puede leerse el fichero seleccionado.
      * @throws IOException Cuando ocurre un error durante la lectura de un fichero local.
      * @throws AOException Cuando ocurre un error al formar una ruta remota o al leer un fichero remoto. */
-    private byte[] getFileContent() throws FileNotFoundException, IOException, AOException, NullPointerException {
+    private byte[] getFileContent() throws FileNotFoundException, IOException, AOException {
         if (this.rutaFichero == null) {
             throw new IllegalArgumentException("No se ha indicado un fichero de entrada"); //$NON-NLS-1$
         }

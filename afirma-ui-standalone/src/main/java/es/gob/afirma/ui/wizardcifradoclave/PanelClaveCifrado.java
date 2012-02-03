@@ -93,7 +93,7 @@ final class PanelClaveCifrado extends JAccessibilityDialogWizard {
         }
     }
     /** Log. */
-    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** UID. */
     private static final long serialVersionUID = 1L;
@@ -196,7 +196,7 @@ final class PanelClaveCifrado extends JAccessibilityDialogWizard {
         }
 
         // Leemos el fichero de datos
-        byte[] fileContent = null;
+        final byte[] fileContent;
         try {
             fileContent = getFileContent();
         }
