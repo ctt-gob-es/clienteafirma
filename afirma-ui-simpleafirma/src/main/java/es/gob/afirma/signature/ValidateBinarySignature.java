@@ -12,7 +12,9 @@ package es.gob.afirma.signature;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.Security;
+import java.security.SignatureException;
 import java.security.cert.CRLException;
 import java.security.cert.CertStore;
 import java.security.cert.CertStoreException;
@@ -58,7 +60,7 @@ public final class ValidateBinarySignature {
      */
     public static SignValidity validate(final byte[] sign, final byte[] data) {
     	if (sign == null) {
-    		throw new NullPointerException("La firma a validar no puede ser nula"); //$NON-NLS-1$
+    		throw new IllegalArgumentException("La firma a validar no puede ser nula"); //$NON-NLS-1$
     	}
 
     	AOSigner signer = new AOCMSSigner();
@@ -120,9 +122,9 @@ public final class ValidateBinarySignature {
      * algoritmos utilizados en la firma.
      * @throws NoMatchDataException Cuando los datos introducidos no coinciden con los firmados.
      * @throws CRLException Cuando ocurre un error con las CRL de la firma.
-     * @throws Exception Cuando la firma resulte no v&aacute;lida.
-     */
-    private static void verifySignatures(final byte[] sign, final byte[] data) throws CMSException, CertStoreException, CertificateExpiredException, CertificateNotYetValidException, NoSuchAlgorithmException, NoMatchDataException, CRLException, Exception {
+     * @throws NoSuchProviderException Cuando no se encuentran los proveedores de seguridad necesarios para validar la firma
+     * @throws SignatureException Cuando la firma resulte no v&aacute;lida. */
+    private static void verifySignatures(final byte[] sign, final byte[] data) throws CMSException, CertStoreException, CertificateExpiredException, CertificateNotYetValidException, NoSuchAlgorithmException, NoMatchDataException, CRLException, NoSuchProviderException, SignatureException {
 
         final CMSSignedData s = new CMSSignedData(sign);
         final CertStore certStore = s.getCertificatesAndCRLs("Collection", BouncyCastleProvider.PROVIDER_NAME);  //$NON-NLS-1$
@@ -135,7 +137,7 @@ public final class ValidateBinarySignature {
             final X509Certificate cert = (X509Certificate) certIt.next();
 
             if (!signer.verify(cert, BouncyCastleProvider.PROVIDER_NAME)) {
-                throw new Exception("Firma no valida"); //$NON-NLS-1$
+                throw new SignatureException("Firma no valida"); //$NON-NLS-1$
             }
 
             if (data != null) {

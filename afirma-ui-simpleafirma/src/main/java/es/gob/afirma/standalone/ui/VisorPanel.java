@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -46,13 +46,13 @@ public final class VisorPanel extends JPanel implements KeyListener {
 
     /** Version ID */
     private static final long serialVersionUID = 8309157734617505338L;
-    
+
     final VisorFirma visorFirma;
 
 
     /** Construye un panel con la informaci&oacute;n extra&iacute;da de una firma. Si no se
      * indica la firma, esta se cargar&aacute; desde un fichero. Es obligatorio introducir
-     * alguno de los dos par&aacute;metros. 
+     * alguno de los dos par&aacute;metros.
      * @param signFile Fichero de firma.
      * @param sign Firma.
      * @param vf VisorFirma para las acciones de los botones
@@ -81,7 +81,7 @@ public final class VisorPanel extends JPanel implements KeyListener {
             Logger.getLogger("es.gob.afirma").warning("Se ha intentado abrir una firma nula");  //$NON-NLS-1$ //$NON-NLS-2$
             return;
         }
-        
+
         byte[] sign = (signature != null) ?  signature.clone() : null;
 
         if (sign == null) {
@@ -111,7 +111,7 @@ public final class VisorPanel extends JPanel implements KeyListener {
 
         final JPanel bottonPanel = new JPanel(true);
         bottonPanel.setLayout(new FlowLayout(FlowLayout.TRAILING));
-        
+
         if (addRealoadButton) {
             final JButton openSign = new JButton(Messages.getString("VisorPanel.1")); //$NON-NLS-1$
             openSign.setMnemonic('V');
@@ -126,7 +126,7 @@ public final class VisorPanel extends JPanel implements KeyListener {
                 }
             });
         }
-        
+
         final JButton closeVisor = new JButton(Messages.getString("VisorPanel.0")); //$NON-NLS-1$
         closeVisor.setMnemonic('C');
         closeVisor.addKeyListener(this);
@@ -144,7 +144,7 @@ public final class VisorPanel extends JPanel implements KeyListener {
         if (!LookAndFeelManager.HIGH_CONTRAST) {
             bottonPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
         }
-        
+
         setLayout(new GridBagLayout());
 
         final GridBagConstraints c = new GridBagConstraints();
@@ -162,22 +162,20 @@ public final class VisorPanel extends JPanel implements KeyListener {
         add(bottonPanel, c);
 
         repaint();
-        
+
     }
 
     /**
      * Comprueba la validez de la firma.
      * @param sign Firma que se desea comprobar.
-     * @return {@code true} si la firma es v&acute;lida, {@code false} en caso contrario.
-     * @throws Exception Cuando los datos introducidos no se corresponden con una firma.
-     */
-    private static SignValidity validateSign(final byte[] sign) throws Exception {
+     * @return {@code true} si la firma es v&acute;lida, {@code false} en caso contrario. */
+    private static SignValidity validateSign(final byte[] sign) {
         if (DataAnalizerUtil.isPDF(sign)) {
             return new SignValidity(SIGN_DETAIL_TYPE.OK, null);
-        } 
+        }
         else if (DataAnalizerUtil.isXML(sign)) {
             return ValidateXMLSignature.validate(sign);
-        } 
+        }
         else if(new AOCMSSigner().isSign(sign) || new AOCAdESSigner().isSign(sign)) {
             return ValidateBinarySignature.validate(sign, null);
         }
@@ -185,22 +183,22 @@ public final class VisorPanel extends JPanel implements KeyListener {
     }
 
 	@Override
-	public void keyPressed(KeyEvent e) {
+	public void keyPressed(final KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_ESCAPE && VisorPanel.this.visorFirma != null) {
 			VisorPanel.this.visorFirma.closeApplication(0);
 		}
 	}
 
 	@Override
-	public void keyReleased(KeyEvent e) {
+	public void keyReleased(final KeyEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
-	public void keyTyped(KeyEvent e) {
+	public void keyTyped(final KeyEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

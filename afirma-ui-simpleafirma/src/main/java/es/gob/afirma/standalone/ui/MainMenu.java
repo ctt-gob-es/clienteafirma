@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -50,8 +50,17 @@ public final class MainMenu extends JMenuBar {
     private final JMenuItem abrirMenuItem = new JMenuItem();
     private final JMenuItem ayudaMenuItem = new JMenuItem();
 
+    final JMenu menuAyuda = new JMenu(MacHelpHooker.isMacHelpAvailable() ? "Help" : Messages.getString("MainMenu.9"));  //$NON-NLS-1$//$NON-NLS-2$
+
     private final Component parent;
     final SimpleAfirma saf;
+
+    /** Indica si hay alg&uacute; men&uacute; de primer nivel seleccionado.
+     * @return <code>true</code> si hay alg&uacute; men&uacute; de primer nivel seleccionado,
+     *         <code>false</code> en caso contrario */
+    public boolean isAnyMenuSelected() {
+    	return (this.menuArchivo.isSelected() || this.menuAyuda.isSelected());
+    }
 
     /** Construye la barra de men&uacute; de la aplicaci&oacute;n.
      * @param p Componente padre para la modalidad
@@ -60,7 +69,7 @@ public final class MainMenu extends JMenuBar {
     public MainMenu(final Component p, final SimpleAfirma s) {
         this.saf = s;
         this.parent = p;
-        // Importante: No cargar en un invokeLater, da guerra en Mac OS X 
+        // Importante: No cargar en un invokeLater, da guerra en Mac OS X
         createUI();
     }
 
@@ -83,13 +92,14 @@ public final class MainMenu extends JMenuBar {
      */
 
     private void createUI() {
-        
+
         final boolean isMac = Platform.OS.MACOSX.equals(Platform.getOS());
 
         this.menuArchivo.setText(Messages.getString("MainMenu.0")); //$NON-NLS-1$
         this.menuArchivo.setMnemonic(KeyEvent.VK_A);
-        this.menuArchivo.getAccessibleContext().setAccessibleDescription(Messages.getString("MainMenu.1") //$NON-NLS-1$
-                        );
+        this.menuArchivo.getAccessibleContext().setAccessibleDescription(
+    		Messages.getString("MainMenu.1") //$NON-NLS-1$
+        );
         this.menuArchivo.setEnabled(true);
 
         this.abrirMenuItem.setText(Messages.getString("MainMenu.2")); //$NON-NLS-1$
@@ -224,9 +234,8 @@ public final class MainMenu extends JMenuBar {
 
         // En Mac OS X el menu de ayuda tiene que llamarse "Help" para que el sistema operativo lo
         // detecte como tal
-        final JMenu menuAyuda = new JMenu(MacHelpHooker.isMacHelpAvailable() ? "Help" : Messages.getString("MainMenu.9"));  //$NON-NLS-1$//$NON-NLS-2$
-        menuAyuda.setMnemonic(KeyEvent.VK_Y);
-        menuAyuda.getAccessibleContext().setAccessibleDescription(
+        this.menuAyuda.setMnemonic(KeyEvent.VK_Y);
+        this.menuAyuda.getAccessibleContext().setAccessibleDescription(
           Messages.getString("MainMenu.10") //$NON-NLS-1$
         );
 
@@ -246,11 +255,11 @@ public final class MainMenu extends JMenuBar {
                 SimpleAfirma.showHelp();
             }
         });
-        menuAyuda.add(this.ayudaMenuItem);
+        this.menuAyuda.add(this.ayudaMenuItem);
 
         // En Mac OS X el Acerca de lo gestiona el propio OS
         if (!isMac) {
-            menuAyuda.addSeparator();
+            this.menuAyuda.addSeparator();
             final JMenuItem acercaMenuItem = new JMenuItem(Messages.getString("MainMenu.15")); //$NON-NLS-1$
             acercaMenuItem.getAccessibleContext().setAccessibleDescription(
         		Messages.getString("MainMenu.17") //$NON-NLS-1$
@@ -263,10 +272,10 @@ public final class MainMenu extends JMenuBar {
                 }
             });
             acercaMenuItem.setMnemonic(KeyEvent.VK_R);
-            menuAyuda.add(acercaMenuItem);
+            this.menuAyuda.add(acercaMenuItem);
         }
 
-        this.add(menuAyuda);
+        this.add(this.menuAyuda);
 
         // Los mnemonicos en elementos de menu violan las normas de interfaz de Apple,
         // asi que prescindimos de ellos en Mac OS X
