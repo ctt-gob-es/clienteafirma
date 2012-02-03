@@ -10,7 +10,11 @@ import es.gob.afirma.signers.pades.AOPDFSigner;
  * M&eacute;todos de utilidad para el an&aacute;lisis de ficheros de datos.
  * @author Carlos Gamuci
  */
-public class DataAnalizerUtil {
+public final class DataAnalizerUtil {
+
+	private DataAnalizerUtil() {
+		// No permitimos la instanciacion
+	}
 
     /**
      * Comprueba si los datos introducidos se corresponden a un fichero XML.

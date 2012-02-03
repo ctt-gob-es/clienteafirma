@@ -15,7 +15,11 @@ import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.Utils;
 
 /** Clase para generar bloques de texto */
-public class PanelesTexto {
+public final class PanelesTexto {
+
+	private PanelesTexto() {
+		// No permitimos la instanciacion
+	}
 
     /** Genera un panel con un bloque de texto
      * @param bundleTexto Texto a buscar en el ResourceBundle para el panel
