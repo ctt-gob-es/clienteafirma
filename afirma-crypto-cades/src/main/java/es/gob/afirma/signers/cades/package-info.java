@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -33,7 +33,7 @@
  *  </table></p>
  *  <p>
  *   <sup>*</sup> La generaci&oacute;n de CAdES-T puede realizarse a&ntilde;adiendo un sello de tiempo una vez generada la
- *   firma mediante la clase <code>es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper</code>, perteneciente al m&oacute;dulo PKCS#7 TSP 
+ *   firma mediante la clase <code>es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper</code>, perteneciente al m&oacute;dulo PKCS#7 TSP
  *   del Cliente (<i>afirma-crypto-core-pkcs7-tsp</i>), para lo cual se necesita conexi&oacute;n
  *   con una autoridad de sellado de tiempo (TSA).
  *  </p>
@@ -48,12 +48,12 @@
  *  <ul>
  *   <li>
  *    Dependencia din&aacute;mica con el m&oacute;dulo CAdES Multifirmas (<i>afirma-crypto-cades-multi</i>) del Cliente.
- *    La presencia de este m&oacute;dulo es opcional, &uacute;nicamente siendo necesaria 
+ *    La presencia de este m&oacute;dulo es opcional, &uacute;nicamente siendo necesaria
  *    su presencia para la realizaci&oacute;n de contrafirmas o cofirmas CAdES.
  *   </li>
  *  </ul>
  *  <p>
- *   Este m&oacute;dulo es compatible con cualquier entorno JSE 1.5 o superior y con Android 3 o superior.<br> 
+ *   Este m&oacute;dulo es compatible con cualquier entorno JSE 1.5 o superior y con Android 3 o superior.<br>
  *   Para compatibilidad con Android 2.x es necesario sustituir BouncyCastle por SpongyCastle. No hay llamadas
  *   al Proveedor de BouncyCastle por nombre ni instanciaciones din&aacute;micas de clases de BouncyCastle, por
  *   lo que una simple sustituci&oacute;n de <code>import org.bouncycastle.</code> por <code>org.spongycastle.</code>
