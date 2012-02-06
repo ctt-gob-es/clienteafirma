@@ -1251,7 +1251,6 @@ public class DirectorySignatureHelper {
      * @param files
      *        Listado de ficheros que se van a procesar durante la
      *        operaci&oacute;n masiva. */
-    @SuppressWarnings("unused")
 	protected void prepareOperation(final File[] files) { /* No implementado */ }
 
     /** Liberamos los recursos de la operaci&oacute;n que hayamos ejecutado
@@ -1262,7 +1261,6 @@ public class DirectorySignatureHelper {
      * concreto.
      * @param file
      *        El proximo fichero que se va a procesar. */
-    @SuppressWarnings("unused")
 	protected void preProcessFile(final File file) { /* No implementado */ }
 
 }
