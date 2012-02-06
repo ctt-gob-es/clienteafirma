@@ -314,22 +314,21 @@ public final class AOUtil {
      *         contrario */
     public static boolean isBase64(final byte[] data) {
 
-        // Comprobamos que la cadena tenga una longitud multiplo de 4 caracteres
-        final String b64String = new String(data).trim();
-        if (b64String.replace("\r\n", "").replace("\n", "").length() % 4 != 0) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-            return false;
-        }
+        int count = 0;
 
         // Comprobamos que todos los caracteres de la cadena pertenezcan al
         // alfabeto base 64
         for (final byte b : data) {
-            if (!BASE_64_ALPHABET.contains(new String(new byte[] {
-                b
-            }))) {
-                return false;
-            }
+        	if (BASE_64_ALPHABET.indexOf((char) b) == -1) {
+        		return false;
+        	}
+
+        	if (b != '\n' && b != '\r') {
+        		count++;
+        	}
         }
-        return true;
+        // Comprobamos que la cadena tenga una longitud multiplo de 4 caracteres
+        return count % 4 == 0;
     }
 
     /** Equivalencias de hexadecimal a texto por la posici&oacute;n del vector.
