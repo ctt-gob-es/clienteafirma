@@ -30,6 +30,7 @@ public class Ticket173586Test {
 	 * mayores de 7 megas.
 	 * @throws Exception Cuando se produce alg&uacute;n error durante la prueba.
 	 */
+	@SuppressWarnings("static-method")
 	@Test
 	@Ignore
 	public void pruebaFirmaMasivaDeFicheroMayorDe7Megas() throws Exception {
