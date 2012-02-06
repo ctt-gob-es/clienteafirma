@@ -508,7 +508,7 @@ public final class AOXMLDSigSigner implements AOSigner {
                         final String tempMimeType = mimeTypeHelper.getMimeType();
                         mimeType = tempMimeType != null ? tempMimeType : XMLConstants.DEFAULT_MIMETYPE;
                         dataElement.setAttributeNS(null, MIMETYPE_STR, mimeType);
-                        dataElement.setTextContent(Base64.encode(decodedData));
+                        dataElement.setTextContent(new String(data));
                     }
                     else {
                         if (XMLConstants.BASE64_ENCODING.equals(encoding)) {
@@ -517,7 +517,13 @@ public final class AOXMLDSigSigner implements AOSigner {
                         else {
                             LOGGER.info("El documento se considera binario, se convertira a Base64 antes de insertarlo en el XML y se declarara la transformacion"); //$NON-NLS-1$
                         }
-                        // Usamos el MimeType identificado
+
+                        // Identificamos el MimeType
+                        if (XMLConstants.DEFAULT_MIMETYPE.equals(mimeType)) {
+                        	final MimeHelper mimeTypeHelper = new MimeHelper(data);
+                            final String tempMimeType = mimeTypeHelper.getMimeType();
+                            mimeType = tempMimeType != null ? tempMimeType : XMLConstants.DEFAULT_MIMETYPE;
+                        }
                         dataElement.setAttributeNS(null, MIMETYPE_STR, mimeType);
                         dataElement.setTextContent(Base64.encode(data));
                         wasEncodedToBase64 = true;
