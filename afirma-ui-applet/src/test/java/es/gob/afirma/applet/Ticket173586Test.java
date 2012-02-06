@@ -2,12 +2,14 @@ package es.gob.afirma.applet;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 import junit.framework.Assert;
 
 import org.junit.Ignore;
 import org.junit.Test;
 
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 
@@ -31,6 +33,21 @@ public class Ticket173586Test {
 	 * @throws Exception Cuando se produce alg&uacute;n error durante la prueba.
 	 */
 	@SuppressWarnings("static-method")
+	@Test
+	@Ignore
+	public void pruebaComprobacionPasoBase64() throws Exception {
+
+		final byte[] data = getResource(DATA_FILE);
+
+		Assert.assertFalse(AOUtil.isBase64(data));
+		Assert.assertTrue(AOUtil.isBase64(Base64.encode(data).getBytes()));
+	}
+
+	/**
+	 * Prueba que el sistema de firma masiva programatica no se queda colgado con ficheros
+	 * mayores de 7 megas.
+	 * @throws Exception Cuando se produce alg&uacute;n error durante la prueba.
+	 */
 	@Test
 	@Ignore
 	public void pruebaFirmaMasivaDeFicheroMayorDe7Megas() throws Exception {
@@ -66,6 +83,10 @@ public class Ticket173586Test {
 
     private static String getResourcePath(final String filename) {
     	return GenerateAllSigns.class.getResource("/" + filename).toString().substring(6); //$NON-NLS-1$
+    }
+
+    private static byte[] getResource(final String filename) throws IOException {
+    	return AOUtil.getDataFromInputStream(GenerateAllSigns.class.getResourceAsStream("/" + filename)); //$NON-NLS-1$
     }
 
     private static String getResourcePathToApplet(final String filename) {
