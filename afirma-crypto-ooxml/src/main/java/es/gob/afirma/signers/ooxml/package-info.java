@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -38,17 +38,10 @@
  *   <li>Dependencia con el m&oacute;dulo XML (<i>afirma-crypto-core-xml</i>) del Cliente.</li>
  *  </ul>
  *  <p>
- *   Este m&oacute;dulo es compatible con cualquier entorno JSE 1.6.0_10 o superior.<br>
- *   Para compatibilidad
- *   con JSE 1.5 es necesario incluir las clases Java contenidas en el "Paquete de compatibilidad
- *   con Java 5" del Ciente e instalar los productos Apache Xalan 2.7.1 o superior y Apache Xerces
- *   2.11.0 o superior como API ENDORSED de Java.<br>
- *   Consulte la p&aacute;gina 
- *   <a href="http://docs.oracle.com/javase/1.5.0/docs/guide/standards/index.html">http://docs.oracle.com/javase/1.5.0/docs/guide/standards/index.html</a>
- *   para informaci&oacute;n ampliada sobre los API ENDORSED de Java.
+ *   Este m&oacute;dulo es compatible con cualquier entorno JSE 1.6.0_10 o superior.
  *  </p>
  *  <p>
- *   Desde este m&oacute;dulo no se realizan llamadas a interfaces gr&aacute;ficas.<br> 
+ *   Desde este m&oacute;dulo no se realizan llamadas a interfaces gr&aacute;ficas.<br>
  *  </p>
  */
 package es.gob.afirma.signers.ooxml;
