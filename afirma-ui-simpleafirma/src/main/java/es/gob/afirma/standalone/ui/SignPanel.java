@@ -194,7 +194,7 @@ public final class SignPanel extends JPanel {
             errorMessage = Messages.getString("SignPanel.3"); //$NON-NLS-1$
         }
         else if (file.isDirectory()) {
-        	errorMessage = Messages.getString(Messages.getString("SignPanel.21")); //$NON-NLS-1$
+        	errorMessage = Messages.getString("SignPanel.21"); //$NON-NLS-1$
         }
         else if (!file.canRead()) {
             errorMessage = Messages.getString("SignPanel.7"); //$NON-NLS-1$

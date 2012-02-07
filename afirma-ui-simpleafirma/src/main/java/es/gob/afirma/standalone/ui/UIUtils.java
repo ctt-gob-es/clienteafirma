@@ -39,11 +39,7 @@ public final class UIUtils {
     public static void showErrorMessage(final Component parent, final Object message, final String title, final int messageType) {
 
         // Hay un error extrano por el que no llega el texto acotado por admiraciones
-        String buttonTxt = Messages.getString(Messages.getString("UIUtils.0")); //$NON-NLS-1$
-        if (buttonTxt.startsWith("!") && buttonTxt.endsWith("!")) { //$NON-NLS-1$ //$NON-NLS-2$
-            buttonTxt = buttonTxt.substring(1, buttonTxt.length()-1);
-        }
-
+        final String buttonTxt = Messages.getString("UIUtils.0"); //$NON-NLS-1$
         JOptionPane.showOptionDialog(
                 parent,
                 message,
