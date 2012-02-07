@@ -188,6 +188,8 @@ public class MainOptionsPane {
         c.weighty = 0.0;
         c.fill = GridBagConstraints.HORIZONTAL;
 
+
+
         // Panel Politica de firma
         final JPanel policyPanel = new JPanel(new GridBagLayout());
         policyPanel.setBorder(BorderFactory.createTitledBorder("Pol\u00EDtica de firma")); // NOI18N
@@ -201,6 +203,7 @@ public class MainOptionsPane {
 
         final JPanel panelCheckAddPolicy = new JPanel(new GridLayout(1, 1));
         panelCheckAddPolicy.getAccessibleContext().setAccessibleName("Pol\u00EDtica de firma");
+
         // Checkbox para habilitar las opciones de configuracion avanzada
         this.checkAddPolicy = new JCheckBox("Configurar pol\u00EDtica de firma");
         this.checkAddPolicy.getAccessibleContext().setAccessibleDescription("Habilitar para incorporar una po\u00EDtica a sus firmas.");
@@ -210,6 +213,11 @@ public class MainOptionsPane {
 
         Utils.setContrastColor(this.checkAddPolicy);
         Utils.setFontBold(this.checkAddPolicy);
+
+
+        //TODO: Deshabilitado mientras no se agreguen los campos para el resto de campos de la politica de firma
+        this.checkAddPolicy.setEnabled(false);
+
 
         panelCheckAddPolicy.add(this.checkAddPolicy);
         policyPanel.add(panelCheckAddPolicy, c2);
