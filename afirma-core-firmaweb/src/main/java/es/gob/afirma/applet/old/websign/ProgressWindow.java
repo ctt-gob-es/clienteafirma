@@ -33,7 +33,7 @@ final class ProgressWindow extends JFrame {
      *        T&iacute;tulo de la l&iacute;nea de estado
      * @param max
      *        Valor m&aacute;ximo de la barra de progreso
-     * @throws HeadlessException
+     * @throws java.awt.HeadlessException
      *         Si no hay interfaz gr&aacute;fico */
     ProgressWindow(final String windowTitle, final String statusTitle, final long max) {
         super(windowTitle);
