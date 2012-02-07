@@ -84,7 +84,7 @@ public final class LookAndFeelManager {
             UIManager.put("InternalFrameTitlePane.background", WINDOW_COLOR); //$NON-NLS-1$
             UIManager.put("InternalFrame.background", WINDOW_COLOR); //$NON-NLS-1$
             UIManager.put("Panel.background", WINDOW_COLOR); //$NON-NLS-1$
-            UIManager.put("Label.background", WINDOW_COLOR); //$NON-NLS-1$
+            //UIManager.put("Label.background", WINDOW_COLOR); //$NON-NLS-1$
             UIManager.put("PopupMenuSeparator.background", WINDOW_COLOR); //$NON-NLS-1$
         }
 
