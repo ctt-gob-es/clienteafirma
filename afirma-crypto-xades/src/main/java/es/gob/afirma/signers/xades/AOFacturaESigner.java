@@ -23,7 +23,7 @@ import es.gob.afirma.core.util.tree.AOTreeModel;
 /** Manejador de firmas XML XAdES Factura-E.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class AOFacturaESigner implements AOSigner {
-    
+
     private static final AOSigner XADES_SIGNER = new AOXAdESSigner();
 
     private static final Set<String> ALLOWED_PARAMS = new HashSet<String>(5);
@@ -34,7 +34,7 @@ public final class AOFacturaESigner implements AOSigner {
         ALLOWED_PARAMS.add("signatureProductionPostalCode"); //$NON-NLS-1$
         ALLOWED_PARAMS.add("signatureProductionCountry"); //$NON-NLS-1$
     }
-    
+
     private static final Properties EXTRA_PARAMS = new Properties();
     static {
         EXTRA_PARAMS.setProperty("format", AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED); //$NON-NLS-1$
@@ -43,12 +43,13 @@ public final class AOFacturaESigner implements AOSigner {
         EXTRA_PARAMS.setProperty("policyIdentifierHash", "Ohixl6upD6av8N7pEvDABhEL6hM=");  //$NON-NLS-1$//$NON-NLS-2$
         EXTRA_PARAMS.setProperty("policyIdentifierHashAlgorithm", DigestMethod.SHA1);         //$NON-NLS-1$
         EXTRA_PARAMS.setProperty("policyDescription", "facturae31"); //$NON-NLS-1$ //$NON-NLS-2$
+        EXTRA_PARAMS.setProperty("policyQualifier", "http://www.facturae.es/politica_de_firma_formato_facturae/politica_de_firma_formato_facturae_v3_1"); //$NON-NLS-1$ //$NON-NLS-2$
         EXTRA_PARAMS.setProperty("signerClaimedRole", "emisor"); //$NON-NLS-1$ //$NON-NLS-2$
     }
-    
+
     /** Cofirma Facturas en formato XAdES Factura-E.
      * @param data Factura que deseamos firmar.
-     * @param sign Factura con las firmas iniciales. 
+     * @param sign Factura con las firmas iniciales.
      * @param algorithm Algoritmo a usar para la firma.
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
      * <ul>
@@ -73,10 +74,10 @@ public final class AOFacturaESigner implements AOSigner {
      *   <dd>Pa&iacute;s en el que se realiza la firma</dd>
      * @return Cofirma en formato XAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-    public byte[] cosign(final byte[] data, 
-                         final byte[] sign, 
-                         final String algorithm, 
-                         final PrivateKeyEntry keyEntry, 
+    public byte[] cosign(final byte[] data,
+                         final byte[] sign,
+                         final String algorithm,
+                         final PrivateKeyEntry keyEntry,
                          final Properties extraParams) throws AOException {
         if (!isValidDataFile(data)) {
             throw new IllegalArgumentException("Los datos proporcionados no son una factura electronica"); //$NON-NLS-1$
@@ -93,7 +94,7 @@ public final class AOFacturaESigner implements AOSigner {
     }
 
     /** Cofirma Facturas en formato XAdES Factura-E.
-     * @param sign Factura con las firmas iniciales. 
+     * @param sign Factura con las firmas iniciales.
      * @param algorithm Algoritmo a usar para la firma.
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
      * <ul>
@@ -118,9 +119,9 @@ public final class AOFacturaESigner implements AOSigner {
      *   <dd>Pa&iacute;s en el que se realiza la firma</dd>
      * @return Cofirma en formato XAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-    public byte[] cosign(final byte[] sign, 
-                         final String algorithm, 
-                         final PrivateKeyEntry keyEntry, 
+    public byte[] cosign(final byte[] sign,
+                         final String algorithm,
+                         final PrivateKeyEntry keyEntry,
                          final Properties extraParams) throws AOException {
         if (!isValidDataFile(sign)) {
             throw new IllegalArgumentException("Los datos proporcionados no son una factura electronica"); //$NON-NLS-1$
@@ -147,7 +148,7 @@ public final class AOFacturaESigner implements AOSigner {
     }
 
     /** Firma Facturas en formato XAdES Factura-E.
-     * @param data Factura electr&oacute;nica. 
+     * @param data Factura electr&oacute;nica.
      * @param algorithm Algoritmo a usar para la firma.
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
      * <ul>
@@ -172,8 +173,8 @@ public final class AOFacturaESigner implements AOSigner {
      *   <dd>Pa&iacute;s en el que se realiza la firma</dd>
      * @return Cofirma en formato XAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-    public byte[] sign(final byte[] data, 
-                       final String algorithm, final PrivateKeyEntry keyEntry, 
+    public byte[] sign(final byte[] data,
+                       final String algorithm, final PrivateKeyEntry keyEntry,
                        final Properties extraParams) throws AOException {
         if (!isValidDataFile(data)) {
             throw new IllegalArgumentException("Los datos proporcionados no son una factura electronica"); //$NON-NLS-1$
@@ -209,21 +210,21 @@ public final class AOFacturaESigner implements AOSigner {
         }
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
-        
+
         try {
             final Document doc = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(is));
             final Element rootNode = doc.getDocumentElement();
             final String rootNodePrefix = rootNode.getPrefix();
-            
+
             if (!(((rootNodePrefix != null) ? (rootNodePrefix + ":") : "") + "Facturae").equals(rootNode.getNodeName())) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 return false;
             }
-            
+
             final Set<String> childs = new HashSet<String>(3);
             childs.add("FileHeader"); //$NON-NLS-1$
             childs.add("Parties"); //$NON-NLS-1$
             childs.add("Invoices"); //$NON-NLS-1$
-            
+
             final NodeList nl = rootNode.getChildNodes();
             for (int i=0;i<nl.getLength();i++) {
                 final String nodeName = nl.item(i).getNodeName();
@@ -234,7 +235,7 @@ public final class AOFacturaESigner implements AOSigner {
             if (childs.size() > 0) {
                 return false;
             }
-            
+
         }
         catch (final Exception e) {
             return false;
