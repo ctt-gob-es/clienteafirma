@@ -33,7 +33,7 @@ public final class LookAndFeelManager {
 	}
 
     /** Color de fondo por defecto para los JPanel, JFrame y Applet. */
-    public static final Color WINDOW_COLOR = new Color(UIManager.getColor("window").getRGB()); //$NON-NLS-1$
+    public static final Color WINDOW_COLOR = (UIManager.getColor("window") !=null) ? new Color(UIManager.getColor("window").getRGB()) : Color.WHITE; //$NON-NLS-1$ //$NON-NLS-2$
 
     /** Indica si el sistema operativo tiene activada una combinaci&oacute;n de colores de alto contraste. */
     public static final boolean HIGH_CONTRAST;
