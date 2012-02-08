@@ -100,7 +100,6 @@ public class PanelClaveCifradoAccessibilityTest {
 	public void testNotDuplicatedDisplayedMnemonic() {
 		logger.info("testNotDuplicatedDisplayedMnemonic"); //$NON-NLS-1$
 
-		try {
 			//Instancia del panel que se va a analizar
 			final PanelClaveCifrado panelClaveCifrado = new PanelClaveCifrado("", ""); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -144,10 +143,7 @@ public class PanelClaveCifradoAccessibilityTest {
 			keyCodesSet = new HashSet<Integer>(keyCodes);
 			//Si el tamano de la lista y del conjunto no son iguales, no hay duplicados
 			assertTrue(keyCodesSet.size() == keyCodes.size());
-		}
-		catch(final java.awt.HeadlessException e) {
-			// Ignoramos este error, pero no otros, para evitar fallos en tests automaticos en servidor
-		}
+
 	}
 
 	/**
