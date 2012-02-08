@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -19,8 +19,6 @@ import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.ietf.jgss.Oid;
-
 
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
@@ -49,7 +47,7 @@ final class CMSDigestedData {
 	private CMSDigestedData() {
 		// No permitimos la instanciacion
 	}
-	
+
     /** Genera una estructura de tipo digestedData.
      * @param content
      *        Contenido original
@@ -64,16 +62,16 @@ final class CMSDigestedData {
      * @throws java.io.IOException
      *         Si ocurre alg&uacute;n problema leyendo o escribiendo los
      *         datos */
-    static byte[] genDigestedData(final byte[] content, 
-    		                      final String digestAlgorithm, 
-    		                      final Oid dataType) throws NoSuchAlgorithmException, IOException {
+    static byte[] genDigestedData(final byte[] content,
+    		                      final String digestAlgorithm,
+    		                      final String dataType) throws NoSuchAlgorithmException, IOException {
 
         // Obtenemos el algoritmo para hacer el digest
         final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(
                 AOAlgorithmID.getOID(AOSignConstants.getDigestAlgorithmName(digestAlgorithm)));
-        
+
         // indicamos el tipo de contenido
-        final ASN1ObjectIdentifier contentTypeOID = new ASN1ObjectIdentifier(dataType.toString());
+        final ASN1ObjectIdentifier contentTypeOID = new ASN1ObjectIdentifier(dataType);
         final ContentInfo encInfo = new ContentInfo(contentTypeOID, null);
 
         // digest

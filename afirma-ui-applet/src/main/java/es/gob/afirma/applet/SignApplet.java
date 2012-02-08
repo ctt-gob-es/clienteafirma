@@ -43,8 +43,6 @@ import javax.swing.JApplet;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
-import org.ietf.jgss.Oid;
-
 import es.gob.afirma.applet.old.websign.Browser;
 import es.gob.afirma.applet.old.websign.FirmadorWeb.FirmaWeb;
 import es.gob.afirma.core.AOCancelledOperationException;
@@ -361,10 +359,10 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     private String extMimeType = null;
 
     /** Listado de atributos firmados que se deben agregar a una firma. */
-    private Map<org.ietf.jgss.Oid, String> signedAttributes = null;
+    private Map<String, String> signedAttributes = null;
 
     /** Listado de atributos sin firmar que se deben agregar a una firma. */
-    private Map<org.ietf.jgss.Oid, List<String>> unsignedAttributes = null;
+    private Map<String, List<String>> unsignedAttributes = null;
 
     /** Listado de propiedades gen&eacute;ricas establecidas para las firmas. */
     private Properties genericConfig = new Properties();
@@ -1386,7 +1384,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         if (identifier != null) {
         	// Probamos primero si es un OID
         	try {
-                this.policyId = new Oid(qualifier.replace("urn:oid:", "")).toString(); //$NON-NLS-1$ //$NON-NLS-2$
+                this.policyId = qualifier.replace("urn:oid:", ""); //$NON-NLS-1$ //$NON-NLS-2$
             }
             catch (final Exception e1) {
             	// No es un OID, probamos una URL
@@ -1404,7 +1402,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
             // Miramos a ver si es un OID directamente, en cuyo caso lo pasamos
             // a URN
             try {
-                this.policyQualifier = new URI("urn:oid:" + new Oid(qualifier)); //$NON-NLS-1$
+                this.policyQualifier = new URI("urn:oid:" + qualifier); //$NON-NLS-1$
             }
             catch (final Exception e1) {
                 // No es un OID directamente, miramos si es URI
@@ -1714,18 +1712,18 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
             // Agregamos los atributos firmados
             if (SignApplet.this.signedAttributes != null) {
-                final Iterator<org.ietf.jgss.Oid> itOid = SignApplet.this.signedAttributes.keySet().iterator();
+                final Iterator<String> itOid = SignApplet.this.signedAttributes.keySet().iterator();
                 while (itOid.hasNext()) {
-                    final org.ietf.jgss.Oid oid = itOid.next();
+                    final String oid = itOid.next();
                     ((AOCMSSigner) signer).addSignedAttribute(oid.toString(), SignApplet.this.signedAttributes.get(oid).getBytes());
                 }
             }
 
             // Agregamos los atributos sin firmar
             if (SignApplet.this.unsignedAttributes != null) {
-                final Iterator<org.ietf.jgss.Oid> itOid = SignApplet.this.unsignedAttributes.keySet().iterator();
+                final Iterator<String> itOid = SignApplet.this.unsignedAttributes.keySet().iterator();
                 while (itOid.hasNext()) {
-                    final org.ietf.jgss.Oid oid = itOid.next();
+                    final String oid = itOid.next();
                     for (final String value : SignApplet.this.unsignedAttributes.get(oid)) {
                         ((AOCMSSigner) signer).addUnsignedAttribute(oid.toString(), value.getBytes());
                     }
@@ -3615,19 +3613,10 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
         // Creamos primeramente el listado de atributos si no lo esta ya
         if (this.signedAttributes == null) {
-            this.signedAttributes = new HashMap<org.ietf.jgss.Oid, String>();
+            this.signedAttributes = new HashMap<String, String>();
         }
 
-        // Comprobamos que OID se valido
-        final org.ietf.jgss.Oid newOid;
-        try {
-            newOid = new org.ietf.jgss.Oid(oid);
-        }
-        catch (final Exception e) {
-            LOGGER.severe("El OID especificado no tiene un formato de OID valido: " + e); //$NON-NLS-1$
-            this.setError(AppletMessages.getString("SignApplet.693")); //$NON-NLS-1$
-            return false;
-        }
+        final String newOid = oid;
 
         // Comprobamos que el OID no estuviese ya agregado
         if (this.signedAttributes.containsKey(newOid)) {
@@ -3651,16 +3640,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
             return false;
         }
 
-        // Comprobamos la validez del OID a eliminar
-        final org.ietf.jgss.Oid oidToRemove;
-        try {
-            oidToRemove = new org.ietf.jgss.Oid(oid);
-        }
-        catch (final Exception e) {
-            LOGGER.severe("El OID especificado no tiene un formato valido: " + e); //$NON-NLS-1$
-            this.setError(AppletMessages.getString("SignApplet.693")); //$NON-NLS-1$
-            return false;
-        }
+        final String oidToRemove = oid;
 
         // Comprobamos que el atributo exista
         if (this.signedAttributes == null || !this.signedAttributes.containsKey(oidToRemove)) {
@@ -3692,19 +3672,10 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
         // Creamos primeramente el listado de atributos si no lo esta ya
         if (this.unsignedAttributes == null) {
-            this.unsignedAttributes = new HashMap<org.ietf.jgss.Oid, List<String>>();
+            this.unsignedAttributes = new HashMap<String, List<String>>();
         }
 
-        // Comprobamos que OID se valido
-        org.ietf.jgss.Oid newOid = null;
-        try {
-            newOid = new org.ietf.jgss.Oid(oid);
-        }
-        catch (final Exception e) {
-            LOGGER.severe("El OID especificado no tiene un formato valido: " + e); //$NON-NLS-1$
-            this.setError(AppletMessages.getString("SignApplet.693")); //$NON-NLS-1$
-            return false;
-        }
+        final String newOid = oid;
 
         // Agregamos el valor del atributo, teniendo en cuenta que el OID
         // especificado ya podria tener otros atributos asignados
@@ -3734,16 +3705,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
             return false;
         }
 
-        // Comprobamos la validez del OID a eliminar
-        org.ietf.jgss.Oid oidToRemove = null;
-        try {
-            oidToRemove = new org.ietf.jgss.Oid(oid);
-        }
-        catch (final Exception e) {
-            LOGGER.severe("El OID especificado no tiene un formato valido: " + e); //$NON-NLS-1$
-            this.setError(AppletMessages.getString("SignApplet.693")); //$NON-NLS-1$
-            return false;
-        }
+        final String oidToRemove = oid;
 
         // Comprobamos que el atributo exista y si tiene mas valores asignados
         // para eliminar lo que corresponda

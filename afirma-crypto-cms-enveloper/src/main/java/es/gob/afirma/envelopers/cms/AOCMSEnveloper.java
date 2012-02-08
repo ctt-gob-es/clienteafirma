@@ -30,7 +30,6 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.ietf.jgss.Oid;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
@@ -166,17 +165,17 @@ public class AOCMSEnveloper implements AOEnveloper {
 
     /** Tipo de los datos contenidos en la envoltura. Siempre data por
      * est&aacute;ndar. */
-    private static final Oid DATA_TYPE_OID;
+    private static final String DATA_TYPE_OID = PKCSObjectIdentifiers.data.getId();
 
     /** Algoritmo de firma. */
     private String signatureAlgorithm = AOSignConstants.DEFAULT_SIGN_ALGO;
 
     /** Atributos firmados que se desean agregar a los envoltorios firmados. */
-    private final Map<Oid, byte[]> attrib = new HashMap<Oid, byte[]>();
+    private final Map<String, byte[]> attrib = new HashMap<String, byte[]>();
 
     /** Atributos que no requieren firma y se desean agregar a todos los
      * envoltorios que los soporten. */
-    private final Map<Oid, byte[]> uattrib = new HashMap<Oid, byte[]>();
+    private final Map<String, byte[]> uattrib = new HashMap<String, byte[]>();
 
     /** Clave privada del usuario que genera o abre el envoltorio. */
     private PrivateKeyEntry configuredKe = null;
@@ -186,23 +185,12 @@ public class AOCMSEnveloper implements AOEnveloper {
      * en texto plano. Si es otro algoritmo ser&aacute; su clave en base 64. */
     private String cipherKey = null;
 
-    static {
-        Oid tmpOid = null;
-        try {
-            tmpOid = new Oid( PKCSObjectIdentifiers.data.getId() );
-        }
-        catch (final Exception e) {
-            /* Esto nunca podria fallar */
-        }
-        DATA_TYPE_OID = tmpOid;
-    }
-
     /** Configura un atributo firmado para agregarlo a un envoltorio.
      * @param oid
      *        Object Identifier. Identificador del objeto a introducir.
      * @param value
      *        Valor asignado */
-    public void addSignedAttribute(final org.ietf.jgss.Oid oid, final byte[] value) {
+    public void addSignedAttribute(final String oid, final byte[] value) {
         this.attrib.put(oid, value);
     }
 
@@ -211,7 +199,7 @@ public class AOCMSEnveloper implements AOEnveloper {
      *        Object Identifier. Identificador del atributo a introducir.
      * @param value
      *        Valor asignado */
-    public void addUnsignedAttribute(final org.ietf.jgss.Oid oid, final byte[] value) {
+    public void addUnsignedAttribute(final String oid, final byte[] value) {
         this.uattrib.put(oid, value);
     }
 
@@ -290,11 +278,13 @@ public class AOCMSEnveloper implements AOEnveloper {
 
         // Si se establecion un remitente
         if (ke != null) {
-            return new CMSEnvelopedData().genEnvelopedData(AOCMSEnveloper.createContentSignerParementers(content, ke, this.signatureAlgorithm),
-                                                           cipherConfig,
-                                                           recipientsCerts,
-                                                           DATA_TYPE_OID,
-                                                           this.uattrib);
+            return new CMSEnvelopedData().genEnvelopedData(
+            		AOCMSEnveloper.createContentSignerParementers(content, ke, this.signatureAlgorithm),
+                    cipherConfig,
+                    recipientsCerts,
+                    DATA_TYPE_OID,
+                    this.uattrib
+            );
         }
 
         // Si no se establecio remitente
@@ -327,13 +317,15 @@ public class AOCMSEnveloper implements AOEnveloper {
                                                   final X509Certificate[] recipientsCerts) throws CertificateEncodingException,
                                                                                           NoSuchAlgorithmException,
                                                                                           IOException, AOException {
-        return new CMSSignedAndEnvelopedData().genSignedAndEnvelopedData(AOCMSEnveloper.createContentSignerParementers(content, ke, this.signatureAlgorithm),
-                                                                         cipherConfig,
-                                                                         recipientsCerts,
-                                                                         DATA_TYPE_OID,
-                                                                         ke,
-                                                                         this.attrib,
-                                                                         this.uattrib);
+        return new CMSSignedAndEnvelopedData().genSignedAndEnvelopedData(
+        	 AOCMSEnveloper.createContentSignerParementers(content, ke, this.signatureAlgorithm),
+             cipherConfig,
+             recipientsCerts,
+             DATA_TYPE_OID,
+             ke,
+             this.attrib,
+             this.uattrib
+        );
     }
 
     /** Crea un envoltorio CMS de tipo AuthenticatedData.
@@ -359,14 +351,15 @@ public class AOCMSEnveloper implements AOEnveloper {
     byte[] createCMSAuthenticatedData(final byte[] content, final PrivateKeyEntry ke, final AOCipherConfig cipherConfig, final X509Certificate[] recipientsCerts) throws CertificateEncodingException,
                                                                                                                                          NoSuchAlgorithmException,
                                                                                                                                          IOException, AOException {
-        return new CMSAuthenticatedData().genAuthenticatedData(AOCMSEnveloper.createContentSignerParementers(content, ke, this.signatureAlgorithm), // ContentSignerParameters
-                                                               null, // Algoritmo de autenticacion (usamos el por defecto)
-                                                               cipherConfig, // Configuracion del cipher
-                                                               recipientsCerts, // certificados destino
-                                                               DATA_TYPE_OID, // dataType
-                                                               true, // applySigningTime,
-                                                               this.attrib, // atributos firmados
-                                                               this.uattrib // atributos no firmados
+        return new CMSAuthenticatedData().genAuthenticatedData(
+        		AOCMSEnveloper.createContentSignerParementers(content, ke, this.signatureAlgorithm), // ContentSignerParameters
+                null, // Algoritmo de autenticacion (usamos el por defecto)
+                cipherConfig, // Configuracion del cipher
+                recipientsCerts, // certificados destino
+                DATA_TYPE_OID, // dataType
+                true, // applySigningTime,
+                this.attrib, // atributos firmados
+                this.uattrib // atributos no firmados
         );
     }
 

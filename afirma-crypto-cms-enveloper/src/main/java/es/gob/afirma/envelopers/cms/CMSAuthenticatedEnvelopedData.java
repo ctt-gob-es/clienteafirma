@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -41,7 +41,6 @@ import org.bouncycastle.asn1.cms.CMSAttributes;
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.cms.OriginatorInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.ietf.jgss.Oid;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ciphers.AOCipherConfig;
@@ -84,7 +83,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
 
 public final class CMSAuthenticatedEnvelopedData {
-	
+
 	private CMSAuthenticatedEnvelopedData() {
 		// No permitimos la instanciacion
 	}
@@ -114,7 +113,7 @@ public final class CMSAuthenticatedEnvelopedData {
      *         Si se produce alguna excepci&oacute;n con los certificados de
      *         firma.
      * @throws NoSuchAlgorithmException
-     *         Si no se encuentra un algoritmo v&aacute;lido. 
+     *         Si no se encuentra un algoritmo v&aacute;lido.
      * @throws AOException
      *         Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
      */
@@ -122,12 +121,12 @@ public final class CMSAuthenticatedEnvelopedData {
                                                 final String autenticationAlgorithm,
                                                 final AOCipherConfig config,
                                                 final X509Certificate[] certDest,
-                                                final Oid dataType,
+                                                final String dataType,
                                                 final boolean applySigningTime,
-                                                final Map<Oid, byte[]> atrib,
-                                                final Map<Oid, byte[]> uatrib) throws IOException, 
-                                                                                      CertificateEncodingException, 
-                                                                                      NoSuchAlgorithmException, 
+                                                final Map<String, byte[]> atrib,
+                                                final Map<String, byte[]> uatrib) throws IOException,
+                                                                                      CertificateEncodingException,
+                                                                                      NoSuchAlgorithmException,
                                                                                       AOException {
         final SecretKey cipherKey = Utils.initEnvelopedData(config, certDest);
 
@@ -185,7 +184,9 @@ public final class CMSAuthenticatedEnvelopedData {
      *        Lista de atributos firmados que se insertar&aacute;n dentro
      *        del archivo de firma.
      * @return Los atributos firmados de la firma. */
-    private static ASN1Set generateSignedAtt(final Oid datatype, final boolean signingTime, final Map<Oid, byte[]> atrib) {
+    private static ASN1Set generateSignedAtt(final String datatype,
+    		                                 final boolean signingTime,
+    		                                 final Map<String, byte[]> atrib) {
 
         // // ATRIBUTOS
 
@@ -193,7 +194,7 @@ public final class CMSAuthenticatedEnvelopedData {
         final ASN1EncodableVector contexExpecific = new ASN1EncodableVector();
 
         // tipo de contenido
-        contexExpecific.add(new Attribute(CMSAttributes.contentType, new DERSet(new DERObjectIdentifier(datatype.toString()))));
+        contexExpecific.add(new Attribute(CMSAttributes.contentType, new DERSet(new DERObjectIdentifier(datatype))));
 
         // fecha de firma
         if (signingTime) {
@@ -203,14 +204,15 @@ public final class CMSAuthenticatedEnvelopedData {
         // agregamos la lista de atributos a mayores.
         if (atrib.size() != 0) {
 
-            final Iterator<Map.Entry<Oid, byte[]>> it = atrib.entrySet().iterator();
+            final Iterator<Map.Entry<String, byte[]>> it = atrib.entrySet().iterator();
             while (it.hasNext()) {
-                final Map.Entry<Oid, byte[]> e = it.next();
+                final Map.Entry<String, byte[]> e = it.next();
                 contexExpecific.add(new Attribute(
-                // el oid
-                                                  new DERObjectIdentifier((e.getKey()).toString()),
-                                                  // el array de bytes en formato string
-                                                  new DERSet(new DERPrintableString(e.getValue()))));
+                	  // el oid
+	                  new DERObjectIdentifier((e.getKey()).toString()),
+	                  // el array de bytes en formato string
+	                  new DERSet(new DERPrintableString(e.getValue()))
+                ));
             }
 
         }
@@ -255,12 +257,12 @@ public final class CMSAuthenticatedEnvelopedData {
                     certs = origInfo.getCertificates();
                 }
 
-                OriginatorInfo origInfoChecked = Utils.checkCertificates(signerCertificateChain, certs);
+                final OriginatorInfo origInfoChecked = Utils.checkCertificates(signerCertificateChain, certs);
                 if (origInfoChecked != null) {
                     origInfo = origInfoChecked;
                 }
-                
-                
+
+
                 // Se crea un nuevo AuthenticatedEnvelopedData a partir de los
                 // datos anteriores con los nuevos originantes.
                 return new ContentInfo(PKCSObjectIdentifiers.id_ct_authEnvelopedData, new AuthEnvelopedData(origInfo, // OriginatorInfo

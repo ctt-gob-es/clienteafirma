@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -29,7 +29,6 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.ietf.jgss.Oid;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
@@ -42,9 +41,9 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 
 /** Funcionalidad de sobres digitales con CAdES. */
 public class AOCMSMultiEnveloper {
-    
+
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");  //$NON-NLS-1$
-    
+
     private String dataTypeOID = null;
     private final Map<String, byte[]> atrib = new HashMap<String, byte[]>();
     private final Map<String, byte[]> uatrib = new HashMap<String, byte[]>();
@@ -79,7 +78,7 @@ public class AOCMSMultiEnveloper {
      * @param certDest
      *        Certificados de los usuarios a los que va destinado el sobre
      *        digital.
-     * @param cipherAlgorithm 
+     * @param cipherAlgorithm
      *        Algoritmo utilizado para cifrar
      * @param dataType Tipo de datos
      * @param extraParams
@@ -89,15 +88,15 @@ public class AOCMSMultiEnveloper {
      *         Cuando ocurre cualquier problema en el proceso. */
     public static byte[] coEnvelop(final byte[] cmsData,
                           final String digestAlgorithm,
-                          String type,
+                          final String type,
                           final PrivateKeyEntry keyEntry,
                           final X509Certificate[] certDest,
                           final AOCipherAlgorithm cipherAlgorithm,
-                          String dataType,
-                          Properties extraParams) throws AOException {
+                          final String dataType,
+                          final Properties extraParams) throws AOException {
         return null;
     }
-    
+
   /** Cofirma un sobre digital CMS.
  * @param data Datos contenidos en el sobre digital a cofirmar
  * @param sign Sobre digital
@@ -108,7 +107,7 @@ public class AOCMSMultiEnveloper {
  * @throws AOException
  */
 public byte[] cosign(final byte[] data, final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException {
-      
+
         final String precalculatedDigest = (xParams != null) ? xParams.getProperty("precalculatedHashAlgorithm") : null; //$NON-NLS-1$
 
         byte[] messageDigest = null;
@@ -141,7 +140,7 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
      * @return Sobre cofirmado
      * @throws AOException
      */
-    public byte[] cosign(final byte[] sign, String algorithm, final PrivateKeyEntry keyEntry) throws AOException {
+    public byte[] cosign(final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry) throws AOException {
 
         // tipos de datos a firmar.
         if (this.dataTypeOID == null) {
@@ -159,17 +158,17 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
 
     /** Tipo de los datos contenidos en la envoltura. Siempre data por
      * est&aacute;ndar. */
-    private static final Oid DATA_TYPE_OID;
+    private static final String DATA_TYPE_OID = PKCSObjectIdentifiers.data.getId();
 
     /** Algoritmo de firma. */
     private String signatureAlgorithm = AOSignConstants.DEFAULT_SIGN_ALGO;
 
     /** Atributos firmados que se desean agregar a los envoltorios firmados. */
-    private final Map<Oid, byte[]> attrib = new HashMap<Oid, byte[]>();
+    private final Map<String, byte[]> attrib = new HashMap<String, byte[]>();
 
     /** Atributos que no requieren firma y se desean agregar a todos los
      * envoltorios que los soporten. */
-    private final Map<Oid, byte[]> uattrib = new HashMap<Oid, byte[]>();
+    private final Map<String, byte[]> uattrib = new HashMap<String, byte[]>();
 
     /** Clave privada del usuario que genera o abre el envoltorio. */
     private PrivateKeyEntry configuredKe = null;
@@ -179,23 +178,12 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
      * en texto plano. Si es otro algoritmo ser&aacute; su clave en base 64. */
     private String cipherKey = null;
 
-    static {
-        Oid tmpOid = null;
-        try {
-            tmpOid = new Oid( PKCSObjectIdentifiers.data.getId() );
-        }
-        catch (final Exception e) {
-            /* Esto nunca podria fallar */
-        }
-        DATA_TYPE_OID = tmpOid;
-    }
-
     /** Configura un atributo firmado para agregarlo a un envoltorio.
      * @param oid
      *        Object Identifier. Identificador del objeto a introducir.
      * @param value
      *        Valor asignado */
-    void addSignedAttribute(final org.ietf.jgss.Oid oid, final byte[] value) {
+    void addSignedAttribute(final String oid, final byte[] value) {
         this.attrib.put(oid, value);
     }
 
@@ -204,7 +192,7 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
      *        Object Identifier. Identificador del atributo a introducir.
      * @param value
      *        Valor asignado */
-    void addUnsignedAttribute(final org.ietf.jgss.Oid oid, final byte[] value) {
+    void addUnsignedAttribute(final String oid, final byte[] value) {
         this.uattrib.put(oid, value);
     }
 
@@ -270,7 +258,7 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
      * @throws IOException
      *         Error en la escritura de datos.
      * @throws CertificateEncodingException
-     *         Cuando el certificado del remitente no es v&aacute;lido. 
+     *         Cuando el certificado del remitente no es v&aacute;lido.
      * @throws AOException
      *         Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
      */
@@ -347,7 +335,7 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
      * @throws IOException
      *         Error en la escritura de datos.
      * @throws CertificateEncodingException
-     *         Cuando el certificado del remitente no es v&aacute;lido. 
+     *         Cuando el certificado del remitente no es v&aacute;lido.
      * @throws AOException
      *         Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
      */
@@ -381,7 +369,7 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
      * @throws IOException
      *         Error en la escritura de datos.
      * @throws CertificateEncodingException
-     *         Cuando el certificado del remitente no es v&aacute;lido. 
+     *         Cuando el certificado del remitente no es v&aacute;lido.
      * @throws AOException
      *         Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
      */
@@ -412,8 +400,8 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
      * @param digestAlgorithm
      *        Algoritmo de huella digital.
      * @return Bloque de datos con la informaci&oacute;n del remitente. */
-    private static P7ContentSignerParameters createContentSignerParementers(final byte[] content, 
-    		                                                                final PrivateKeyEntry ke, 
+    private static P7ContentSignerParameters createContentSignerParementers(final byte[] content,
+    		                                                                final PrivateKeyEntry ke,
     		                                                                final String digestAlgorithm) {
         return new P7ContentSignerParameters(content, digestAlgorithm, (X509Certificate[]) ke.getCertificateChain());
     }
@@ -464,8 +452,8 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
      * @throws IllegalArgumentException
      *         Cuando se indica un contentInfo no compatible con
      *         m&uacute;tiples remitentes. */
-    private static byte[] addOriginator(final byte[] envelop, 
-    		                            final String contentInfo, 
+    private static byte[] addOriginator(final byte[] envelop,
+    		                            final String contentInfo,
     		                            final PrivateKeyEntry ke) throws AOException {
 
         final byte[] newEnvelop;
@@ -550,20 +538,20 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
      * @throws AOInvalidFormatException
      *         Cuando no se ha indicado un envoltorio soportado.
      * @throws AOException
-     *         Cuando se produce un error durante al desenvolver los datos. 
-     * @throws NoSuchAlgorithmException 
-     * @throws BadPaddingException 
-     * @throws IllegalBlockSizeException 
-     * @throws InvalidAlgorithmParameterException 
+     *         Cuando se produce un error durante al desenvolver los datos.
+     * @throws NoSuchAlgorithmException
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
+     * @throws InvalidAlgorithmParameterException
      * @throws NoSuchPaddingException */
     byte[] recoverData(final byte[] cmsEnvelop) throws InvalidKeyException,
                                                        CertificateEncodingException,
                                                        IOException,
-                                                       AOException, 
-                                                       NoSuchAlgorithmException, 
-                                                       NoSuchPaddingException, 
-                                                       InvalidAlgorithmParameterException, 
-                                                       IllegalBlockSizeException, 
+                                                       AOException,
+                                                       NoSuchAlgorithmException,
+                                                       NoSuchPaddingException,
+                                                       InvalidAlgorithmParameterException,
+                                                       IllegalBlockSizeException,
                                                        BadPaddingException {
 
         final org.bouncycastle.asn1.ASN1InputStream is = new org.bouncycastle.asn1.ASN1InputStream(cmsEnvelop);
@@ -643,19 +631,19 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
      * @throws InvalidKeyException
      *         Cuando la clave proporcionada no es v&aacute;lida.
      * @throws AOException
-     *         Cuando se produce un error al desenvolver los datos. 
-     * @throws BadPaddingException 
-     * @throws IllegalBlockSizeException 
-     * @throws InvalidAlgorithmParameterException 
-     * @throws NoSuchPaddingException 
+     *         Cuando se produce un error al desenvolver los datos.
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
+     * @throws InvalidAlgorithmParameterException
+     * @throws NoSuchPaddingException
      * @throws NoSuchAlgorithmException */
-    static byte[] recoverCMSEncryptedData(final byte[] encryptedData, 
-    		                              final String passkey) throws InvalidKeyException, 
-                                                                       AOException, 
-                                                                       NoSuchAlgorithmException, 
-                                                                       NoSuchPaddingException, 
-                                                                       InvalidAlgorithmParameterException, 
-                                                                       IllegalBlockSizeException, 
+    static byte[] recoverCMSEncryptedData(final byte[] encryptedData,
+    		                              final String passkey) throws InvalidKeyException,
+                                                                       AOException,
+                                                                       NoSuchAlgorithmException,
+                                                                       NoSuchPaddingException,
+                                                                       InvalidAlgorithmParameterException,
+                                                                       IllegalBlockSizeException,
                                                                        BadPaddingException {
         return new CMSDecipherEncryptedData().dechiperEncryptedData(encryptedData, passkey);
     }
@@ -680,7 +668,7 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
      *         destinatarios del sobre.
      * @throws InvalidKeyException
      *         Cuando la clave almacenada en el sobre no es v&aacute;lida. */
-    static byte[] recoverCMSEnvelopedData(final byte[] envelopedData, 
+    static byte[] recoverCMSEnvelopedData(final byte[] envelopedData,
     		                              final PrivateKeyEntry ke) throws IOException,
                                                                            CertificateEncodingException,
                                                                            AOException,
@@ -708,7 +696,7 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
      *         destinatarios del sobre.
      * @throws InvalidKeyException
      *         Cuando la clave almacenada en el sobre no es v&aacute;lida. */
-    static byte[] recoverCMSSignedEnvelopedData(final byte[] signedEnvelopedData, 
+    static byte[] recoverCMSSignedEnvelopedData(final byte[] signedEnvelopedData,
     		                                    final PrivateKeyEntry ke) throws IOException,
                                                                                  CertificateEncodingException,
                                                                                  AOException,
@@ -733,13 +721,13 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
      *         Cuando ocurre un error durante el proceso de
      *         extracci&oacute;n.
      * @throws InvalidKeyException
-     *         Cuando la clave almacenada en el sobre no es v&aacute;lida. 
+     *         Cuando la clave almacenada en el sobre no es v&aacute;lida.
      * @throws NoSuchAlgorithmException */
-    static byte[] recoverCMSAuthenticatedData(final byte[] authenticatedData, 
+    static byte[] recoverCMSAuthenticatedData(final byte[] authenticatedData,
     		                                  final PrivateKeyEntry ke) throws IOException,
                                                                         CertificateEncodingException,
                                                                         AOException,
-                                                                        InvalidKeyException, 
+                                                                        InvalidKeyException,
                                                                         NoSuchAlgorithmException {
         return new CMSDecipherAuthenticatedData().decipherAuthenticatedData(authenticatedData, ke);
     }
@@ -766,7 +754,7 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
      *         destinatarios del sobre.
      * @throws InvalidKeyException
      *         Cuando la clave almacenada en el sobre no es v&aacute;lida. */
-    static byte[] recoverCMSAuthenticatedEnvelopedData(final byte[] authenticatedEnvelopedData, 
+    static byte[] recoverCMSAuthenticatedEnvelopedData(final byte[] authenticatedEnvelopedData,
     		                                           final PrivateKeyEntry ke) throws IOException,
                                                                                         CertificateEncodingException,
                                                                                         AOException,

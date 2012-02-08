@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -79,7 +79,6 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.TBSCertificateStructure;
 import org.bouncycastle.asn1.x509.X509CertificateStructure;
-import org.ietf.jgss.Oid;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ciphers.AOCipherConfig;
@@ -88,7 +87,7 @@ import es.gob.afirma.core.ciphers.CipherConstants.AOCipherBlockMode;
 
 /** Clase que contiene funciones comunes para CADES y CMS */
 final class Utils {
-    
+
     private Utils() {
         // No permitimos la instancacion
     }
@@ -131,7 +130,7 @@ final class Utils {
 
     /** Objeto para mostrar los logs de la clase. */
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
-    
+
     /** Comprueba que el archivo a tratar no es nulo e inicializa la clave de
      * cifrado
      * @param config
@@ -286,8 +285,8 @@ final class Utils {
      * @throws java.security.InvalidAlgorithmParameterException
      * @throws java.security.InvalidKeyException
      * @throws java.io.IOException
-     * @throws BadPaddingException 
-     * @throws IllegalBlockSizeException 
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
      * @throws org.bouncycastle.cms.CMSException */
     static EncryptedContentInfo getEncryptedContentInfo(final byte[] file, final AOCipherConfig config, final SecretKey cipherKey) throws NoSuchAlgorithmException,
                                                                                                                        NoSuchPaddingException,
@@ -432,13 +431,13 @@ final class Utils {
      * @param messageDigest
      * @return ASN1EncodableVector
      * @throws NoSuchAlgorithmException */
-    static ASN1EncodableVector initContexExpecific(final String digestAlgorithm, final byte[] datos, final Oid dataType, byte[] messageDigest) throws NoSuchAlgorithmException {
+    static ASN1EncodableVector initContexExpecific(final String digestAlgorithm, final byte[] datos, final String dataType, final byte[] messageDigest) throws NoSuchAlgorithmException {
         // authenticatedAttributes
         final ASN1EncodableVector contexExpecific = new ASN1EncodableVector();
 
         // tipo de contenido
         if (dataType != null) {
-            contexExpecific.add(new Attribute(CMSAttributes.contentType, new DERSet(new DERObjectIdentifier(dataType.toString()))));
+            contexExpecific.add(new Attribute(CMSAttributes.contentType, new DERSet(new DERObjectIdentifier(dataType))));
         }
 
         // fecha de firma
@@ -461,7 +460,7 @@ final class Utils {
      *        Lista de atributos no firmados que se insertar&aacute;n dentro
      *        del archivo de firma.
      * @return Los atributos no firmados de la firma. */
-    static ASN1Set generateUnsignedAtt(final Map<Oid, byte[]> uatrib) {
+    static ASN1Set generateUnsignedAtt(final Map<String, byte[]> uatrib) {
 
         // // ATRIBUTOS
 
@@ -470,9 +469,9 @@ final class Utils {
 
         // agregamos la lista de atributos a mayores.
         if (uatrib.size() != 0) {
-            final Iterator<Map.Entry<Oid, byte[]>> it = uatrib.entrySet().iterator();
+            final Iterator<Map.Entry<String, byte[]>> it = uatrib.entrySet().iterator();
             while (it.hasNext()) {
-                final Map.Entry<Oid, byte[]> e = it.next();
+                final Map.Entry<String, byte[]> e = it.next();
                 contexExpecific.add(new Attribute(
                 // el oid
                                                   new DERObjectIdentifier((e.getKey()).toString()),
@@ -748,7 +747,10 @@ final class Utils {
      * @throws java.security.NoSuchAlgorithmException
      * @throws java.security.cert.CertificateException
      * @throws java.io.IOException */
-    static ASN1Set generateSignerInfo(final String digestAlgorithm, final byte[] datos, final Oid dataType, final Map<Oid, byte[]> uatrib) throws NoSuchAlgorithmException {
+    static ASN1Set generateSignerInfo(final String digestAlgorithm,
+    		                          final byte[] datos,
+    		                          final String dataType,
+    		                          final Map<String, byte[]> uatrib) throws NoSuchAlgorithmException {
 
         // // ATRIBUTOS
 
@@ -757,9 +759,9 @@ final class Utils {
 
         // agregamos la lista de atributos a mayores.
         if (uatrib.size() != 0) {
-            final Iterator<Entry<Oid, byte[]>> it = uatrib.entrySet().iterator();
+            final Iterator<Entry<String, byte[]>> it = uatrib.entrySet().iterator();
             while (it.hasNext()) {
-                final Map.Entry<Oid, byte[]> e = it.next();
+                final Map.Entry<String, byte[]> e = it.next();
                 contexExpecific.add(new Attribute(
                 // el oid
                                                   new DERObjectIdentifier((e.getKey()).toString()),

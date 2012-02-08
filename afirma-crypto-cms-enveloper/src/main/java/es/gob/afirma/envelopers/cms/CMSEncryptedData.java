@@ -20,7 +20,6 @@ import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.cms.EncryptedContentInfo;
 import org.bouncycastle.asn1.cms.EncryptedData;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.ietf.jgss.Oid;
 
 import es.gob.afirma.core.ciphers.AOCipherConfig;
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -74,8 +73,8 @@ final class CMSEncryptedData {
     		                       final String digAlg,
     		                       final AOCipherConfig config,
     		                       final Key cipherKey,
-    		                       final Oid dataType,
-    		                       final Map<Oid, byte[]> uatrib) throws NoSuchAlgorithmException {
+    		                       final String dataType,
+    		                       final Map<String, byte[]> uatrib) throws NoSuchAlgorithmException {
 
         // Datos previos &uacute;tiles
         final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(digAlg);

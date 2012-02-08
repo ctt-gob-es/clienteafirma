@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -52,8 +52,6 @@ import org.bouncycastle.asn1.x500.style.RFC4519Style;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.cms.CMSProcessable;
 import org.bouncycastle.cms.CMSProcessableByteArray;
-import org.ietf.jgss.Oid;
-
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ciphers.AOCipherConfig;
@@ -137,10 +135,10 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
                                        final String autenticationAlgorithm,
                                        final AOCipherConfig config,
                                        final X509Certificate[] certDest,
-                                       final Oid dataType,
+                                       final String dataType,
                                        final boolean applyTimestamp,
-                                       final Map<Oid, byte[]> atrib,
-                                       final Map<Oid, byte[]> uatrib) throws IOException, CertificateEncodingException, NoSuchAlgorithmException, AOException {
+                                       final Map<String, byte[]> atrib,
+                                       final Map<String, byte[]> uatrib) throws IOException, CertificateEncodingException, NoSuchAlgorithmException, AOException {
         this.cipherKey = Utils.initEnvelopedData(config, certDest);
 
         // 1. ORIGINATORINFO
@@ -163,18 +161,18 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 
         // 3. MACALGORITHM
         final AlgorithmIdentifier macAlgorithm = SigUtils.makeAlgId(config.getAlgorithm().getOid());
-        
+
         // 4. DIGESTALGORITMIDENTIFIER
         final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(parameters.getSignatureAlgorithm());
         final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
-        
+
 
         // 5. ENCAPSULATEDCONTENTINFO
 
         // si se introduce el contenido o no
 
         ContentInfo encInfo = null;
-        final ASN1ObjectIdentifier contentTypeOID = new ASN1ObjectIdentifier(dataType.toString());
+        final ASN1ObjectIdentifier contentTypeOID = new ASN1ObjectIdentifier(dataType);
         final ByteArrayOutputStream bOut = new ByteArrayOutputStream();
         final byte[] content2 = parameters.getContent();
         final CMSProcessable msg = new CMSProcessableByteArray(content2);
@@ -191,8 +189,8 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
         authAttr = generateSignedAtt(signerCertificateChain[0], digestAlgorithm, parameters.getContent(), dataType, applyTimestamp, atrib);
 
         // 7. MAC
-        byte[] mac = Utils.genMac(autenticationAlgorithm, authAttr.getDEREncoded(), this.cipherKey);
-        
+        final byte[] mac = Utils.genMac(autenticationAlgorithm, authAttr.getDEREncoded(), this.cipherKey);
+
         // 8. ATRIBUTOS NO FIRMADOS.
 
         ASN1Set unAuthAttr = null;
@@ -230,11 +228,11 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
      * @throws java.security.NoSuchAlgorithmException
      *         Si no se encuentra un algoritmo v&aacute;lido. */
     private static ASN1Set generateSignedAtt(final X509Certificate cert,
-                                      String digestAlgorithm,
+                                      final String digestAlgorithm,
                                       final byte[] datos,
-                                      final Oid datatype,
+                                      final String datatype,
                                       final boolean timestamp,
-                                      final Map<Oid, byte[]> atrib) throws NoSuchAlgorithmException {
+                                      final Map<String, byte[]> atrib) throws NoSuchAlgorithmException {
 
         // // ATRIBUTOS
 
@@ -242,7 +240,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
         final ASN1EncodableVector contexExpecific = new ASN1EncodableVector();
 
         // tipo de contenido
-        contexExpecific.add(new Attribute(CMSAttributes.contentType, new DERSet(new DERObjectIdentifier(datatype.toString()))));
+        contexExpecific.add(new Attribute(CMSAttributes.contentType, new DERSet(new DERObjectIdentifier(datatype))));
 
         // fecha de firma
         if (timestamp) {
@@ -262,14 +260,15 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
         // agregamos la lista de atributos a mayores.
         if (atrib.size() != 0) {
 
-            final Iterator<Map.Entry<Oid, byte[]>> it = atrib.entrySet().iterator();
+            final Iterator<Map.Entry<String, byte[]>> it = atrib.entrySet().iterator();
             while (it.hasNext()) {
-                final Map.Entry<Oid, byte[]> e = it.next();
+                final Map.Entry<String, byte[]> e = it.next();
                 contexExpecific.add(new Attribute(
-                // el oid
-                                                  new DERObjectIdentifier((e.getKey()).toString()),
-                                                  // el array de bytes en formato string
-                                                  new DERSet(new DERPrintableString(e.getValue()))));
+                		// el oid
+                        new DERObjectIdentifier((e.getKey()).toString()),
+                        // el array de bytes en formato string
+                        new DERSet(new DERPrintableString(e.getValue()))
+                ));
             }
 
         }
@@ -324,7 +323,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
                     certs = origInfo.getCertificates();
                 }
 
-                OriginatorInfo origInfoChecked = Utils.checkCertificates(signerCertificateChain, certs);
+                final OriginatorInfo origInfoChecked = Utils.checkCertificates(signerCertificateChain, certs);
                 if (origInfoChecked != null) {
                     origInfo = origInfoChecked;
                 }

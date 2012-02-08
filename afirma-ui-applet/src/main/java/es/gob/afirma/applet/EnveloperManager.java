@@ -658,7 +658,7 @@ public final class EnveloperManager {
      *        Identificador del objeto a introducir.
      * @param value
      *        Valor asignado */
-    public void addSignedAttribute(final org.ietf.jgss.Oid oid, final byte[] value) {
+    public void addSignedAttribute(final String oid, final byte[] value) {
         this.enveloper.addSignedAttribute(oid, value);
     }
 
@@ -667,7 +667,7 @@ public final class EnveloperManager {
      *        Identificador del atributo a introducir.
      * @param value
      *        Valor asignado */
-    public void addUnsignedAttribute(final org.ietf.jgss.Oid oid, final byte[] value) {
+    public void addUnsignedAttribute(final String oid, final byte[] value) {
         this.enveloper.addUnsignedAttribute(oid, value);
     }
 

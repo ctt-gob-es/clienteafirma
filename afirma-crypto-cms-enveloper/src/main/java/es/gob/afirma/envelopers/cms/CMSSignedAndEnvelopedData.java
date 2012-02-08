@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -40,7 +40,6 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.RFC4519Style;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.TBSCertificateStructure;
-import org.ietf.jgss.Oid;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ciphers.AOCipherConfig;
@@ -105,17 +104,17 @@ final class CMSSignedAndEnvelopedData {
      *         firma.
      * @throws java.security.NoSuchAlgorithmException
      *         Si no se soporta alguno de los algoritmos de firma o huella
-     *         digital 
+     *         digital
      * @throws AOException
      *         Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
      */
     byte[] genSignedAndEnvelopedData(final P7ContentSignerParameters parameters,
                                             final AOCipherConfig config,
                                             final X509Certificate[] certDest,
-                                            final Oid dataType,
+                                            final String dataType,
                                             final PrivateKeyEntry keyEntry,
-                                            final Map<Oid, byte[]> atrib,
-                                            final Map<Oid, byte[]> uatrib) throws IOException, CertificateEncodingException, NoSuchAlgorithmException, AOException {
+                                            final Map<String, byte[]> atrib,
+                                            final Map<String, byte[]> uatrib) throws IOException, CertificateEncodingException, NoSuchAlgorithmException, AOException {
 
         this.cipherKey = Utils.initEnvelopedData(config, certDest);
 
@@ -129,10 +128,10 @@ final class CMSSignedAndEnvelopedData {
         final String signatureAlgorithm = parameters.getSignatureAlgorithm();
         final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
         final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
-        
+
         final ASN1EncodableVector digestAlgs = new ASN1EncodableVector();
         digestAlgs.add(digAlgId);
-        
+
         // LISTA DE CERTIFICADOS: obtenemos la lista de certificados
         final X509Certificate[] signerCertificateChain = parameters.getSignerCertificateChain();
         final ASN1Set certificates = Utils.fetchCertificatesList(signerCertificateChain);
@@ -157,7 +156,7 @@ final class CMSSignedAndEnvelopedData {
         unSignedAttr = generateUnsignerInfo(uatrib);
 
         // digEncryptionAlgorithm
-        AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID("RSA")); //$NON-NLS-1$
+        final AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID("RSA")); //$NON-NLS-1$
 
         ASN1OctetString sign2 = null;
         try {
@@ -195,7 +194,12 @@ final class CMSSignedAndEnvelopedData {
      * @throws java.security.NoSuchAlgorithmException
      * @throws java.security.cert.CertificateException
      * @throws java.io.IOException */
-    private ASN1Set generateSignerInfo(final X509Certificate cert, final String digestAlgorithm, final byte[] datos, final Oid dataType, final Map<Oid, byte[]> atrib) throws NoSuchAlgorithmException {
+    private ASN1Set generateSignerInfo(final X509Certificate cert,
+    		                           final String digestAlgorithm,
+    		                           final byte[] datos,
+    		                           final String dataType,
+    		                           final Map<String,
+    		                           byte[]> atrib) throws NoSuchAlgorithmException {
         // // ATRIBUTOS
 
         // authenticatedAttributes
@@ -207,9 +211,9 @@ final class CMSSignedAndEnvelopedData {
 
         // agregamos la lista de atributos a mayores.
         if (atrib.size() != 0) {
-            final Iterator<Map.Entry<Oid, byte[]>> it = atrib.entrySet().iterator();
+            final Iterator<Map.Entry<String, byte[]>> it = atrib.entrySet().iterator();
             while (it.hasNext()) {
-                final Map.Entry<Oid, byte[]> e = it.next();
+                final Map.Entry<String, byte[]> e = it.next();
                 contexExpecific.add(new Attribute(
                         // el oid
                         new DERObjectIdentifier((e.getKey()).toString()),
@@ -229,7 +233,7 @@ final class CMSSignedAndEnvelopedData {
      *        Lista de atributos no firmados que se insertar&aacute;n dentro
      *        del archivo de firma.
      * @return Los atributos no firmados de la firma. */
-    private static ASN1Set generateUnsignerInfo(final Map<Oid, byte[]> uatrib) {
+    private static ASN1Set generateUnsignerInfo(final Map<String, byte[]> uatrib) {
 
         // // ATRIBUTOS
 
@@ -238,14 +242,15 @@ final class CMSSignedAndEnvelopedData {
 
         // agregamos la lista de atributos a mayores.
         if (uatrib.size() != 0) {
-            final Iterator<Map.Entry<Oid, byte[]>> it = uatrib.entrySet().iterator();
+            final Iterator<Map.Entry<String, byte[]>> it = uatrib.entrySet().iterator();
             while (it.hasNext()) {
-                final Map.Entry<Oid, byte[]> e = it.next();
+                final Map.Entry<String, byte[]> e = it.next();
                 contexExpecific.add(new Attribute(
-                // el oid
-                                                  new DERObjectIdentifier((e.getKey()).toString()),
-                                                  // el array de bytes en formato string
-                                                  new DERSet(new DERPrintableString(e.getValue()))));
+                		// el oid
+                        new DERObjectIdentifier((e.getKey()).toString()),
+                        // el array de bytes en formato string
+                        new DERSet(new DERPrintableString(e.getValue()))
+                ));
             }
         }
         else {
