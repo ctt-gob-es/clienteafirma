@@ -962,7 +962,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     /** {@inheritDoc} */
     public void setElectronicSignatureFile(final String filename) {
 
-        LOGGER.info("Invocando inElectronicSignatureFile: " + filename); //$NON-NLS-1$
+        LOGGER.info("Invocando setElectronicSignatureFile: " + filename); //$NON-NLS-1$
 
         if (filename == null || filename.length() == 0) {
             this.electronicSignatureFile = null;
