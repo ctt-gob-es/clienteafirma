@@ -83,7 +83,6 @@ public final class HelpUtils {
     /** Devuelve la ayuda. */
     static {
         getHelp();
-
     }
 
     /** Cambia el idioma de la ayuda
@@ -135,15 +134,11 @@ public final class HelpUtils {
                                 if (component3 instanceof JPanel) {
                                     for (final Component component4 : ((JPanel) component3).getComponents()) {
                                         if (component4 instanceof JHelp) {
-
                                             for (final Component component5 : ((JHelp) component4).getComponents()) {
-
                                                 if (component5 instanceof JSplitPane) {
                                                     for (final Component component6 : ((JSplitPane) component5).getComponents()) {
-
                                                         if (component6 instanceof JTabbedPane) {
                                                             jtp = (JTabbedPane) component6;
-
                                                         }
                                                         if (component6 instanceof JHelpContentViewer) {
                                                             for (final Component component7 : ((JHelpContentViewer) component6).getComponents()) {
@@ -154,11 +149,15 @@ public final class HelpUtils {
                                                                                 if (component9 instanceof JEditorPane) {
                                                                                     // component9.setBackground(Color.BLACK);
                                                                                     // Se activa el alto contraste para el editor pane
-                                                                                    setHighContrastComponentTabbedPane(jtp,
-                                                                                                                       (JEditorPane) component9,
-                                                                                                                       activate);
-                                                                                    HelpUtils.setHighContrastEditorPane((JEditorPane) component9,
-                                                                                                                        activate);
+                                                                                    setHighContrastComponentTabbedPane(
+                                                                                           jtp,
+                                                                                           (JEditorPane) component9,
+                                                                                           activate
+                                                                                    );
+                                                                                    HelpUtils.setHighContrastEditorPane(
+                                                                                            (JEditorPane) component9,
+                                                                                            activate
+                                                                                    );
                                                                                 }
                                                                             }
                                                                         }
