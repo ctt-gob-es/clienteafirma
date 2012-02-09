@@ -29,6 +29,7 @@ public class CustomDialogTest {
 	/**
 	 * Comprobaci&oacute;n de las caracter&iacute;sticas de accesibilidad de los CustomDialog
 	 */
+	@Ignore
 	@Test
 	public void testShowMessageDialog(){
 		LOGGER.info("testShowMessageDialog"); //$NON-NLS-1$
@@ -48,6 +49,7 @@ public class CustomDialogTest {
 	/**
 	 * Comprobaci&oacute;n de las caracter&iacute;sticas de accesibilidad de los CustomDialog
 	 */
+	@Ignore
 	@Test
 	public void testShowConfirmDialog(){
 		LOGGER.info("testShowConfirmDialog"); //$NON-NLS-1$
@@ -73,6 +75,7 @@ public class CustomDialogTest {
 	/**
 	 * Comprobaci&oacute;n de las caracter&iacute;sticas de accesibilidad de los CustomDialog
 	 */
+	@Ignore
 	@Test
 	public void testShowInputDialog(){
 		LOGGER.info("testShowInputDialog"); //$NON-NLS-1$
@@ -92,6 +95,7 @@ public class CustomDialogTest {
 	/**
 	 * Comprobaci&oacute;n de las caracter&iacute;sticas de accesibilidad de los CustomDialog
 	 */
+	@Ignore
 	@Test
 	public void testShowInputPasswordDialog(){
 		LOGGER.info("testShowInputPasswordDialog"); //$NON-NLS-1$
