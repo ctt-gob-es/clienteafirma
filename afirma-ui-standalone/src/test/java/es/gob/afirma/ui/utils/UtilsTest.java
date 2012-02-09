@@ -357,13 +357,13 @@ public class UtilsTest {
 		try{
 			// Lista de mnemonicos usados
 	        final List<Character> mnemonicList = new ArrayList<Character>();
-	        mnemonicList.add('a');
-	        mnemonicList.add('b');
-	        mnemonicList.add('c');
+	        mnemonicList.add(new Character('a'));
+	        mnemonicList.add(new Character('b'));
+	        mnemonicList.add(new Character('c'));
 	        
 	        // Nombre del texto al que asignar mnemonico
-	        String nombreConLetraLibre = new String("abcd");
-	        String nombreSinLetraLibre = new String("abc");		
+	        String nombreConLetraLibre = new String("abcd"); //$NON-NLS-1$
+	        String nombreSinLetraLibre = new String("abc");		 //$NON-NLS-1$
 			
 			assertTrue(languageMnemonicSucces(mnemonicList, nombreConLetraLibre));
 			assertTrue(languageMnemonicFail(mnemonicList, nombreSinLetraLibre));
@@ -443,7 +443,7 @@ public class UtilsTest {
 			JPanel jPanel = new JPanel();
 			jPanel.setBorder(BorderFactory.createTitledBorder("Test")); // NOI18N //$NON-NLS-1$
 			JToolBar jToolBar = new JToolBar();
-			JButton jButton = new JButton("Test");
+			JButton jButton = new JButton("Test"); //$NON-NLS-1$
 			jToolBar.add(jButton);
 			//Se activa la opcion de fuente negrita
 			config.setProperty(AccessibilityOptionsPane.MAIN_FONT_STYLE, "true"); //$NON-NLS-1$
@@ -475,8 +475,8 @@ public class UtilsTest {
 		LOGGER.info("testRemarkMnemonic"); //$NON-NLS-1$
 		
 		try {
-			assertTrue(Utils.remarkMnemonic("Test", 'T').equals("<u>T</u>est"));
-			assertTrue(Utils.remarkMnemonic("Test", 'a').equals("Test"));
+			assertTrue(Utils.remarkMnemonic("Test", 'T').equals("<u>T</u>est")); //$NON-NLS-1$ //$NON-NLS-2$
+			assertTrue(Utils.remarkMnemonic("Test", 'a').equals("Test")); //$NON-NLS-1$ //$NON-NLS-2$
 		} catch (final java.awt.HeadlessException e) {
 			// Ignoramos este error, pero no otros, para evitar fallos en tests automaticos en servidor
 		}
@@ -772,11 +772,11 @@ public class UtilsTest {
 	private boolean remarcarJTextField(JTextField component){
 		LineBorder border = (LineBorder)component.getBorder();
 		if (GeneralConfig.isHighContrast()){
-			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.WHITE){
+			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.WHITE){ //$NON-NLS-1$
 				return true;
 			}
 		} else {
-			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.BLACK){
+			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.BLACK){ //$NON-NLS-1$
 				return true;
 			}
 		}		
@@ -794,14 +794,14 @@ public class UtilsTest {
 		LineBorder border = (LineBorder)component.getBorder();
 		LineBorder borderOld = (LineBorder)componentOld.getBorder();
 		if (GeneralConfig.isHighContrast()){
-			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.WHITE){
+			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.WHITE){ //$NON-NLS-1$
 				//Se comprueba que se ha desactivado el remarcado en alto contraste del elemento que ha perdido el foco
 				if (borderOld.getLineColor()==Color.GRAY){
 					return true;
 				}
 			}
 		} else {
-			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.BLACK){
+			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.BLACK){ //$NON-NLS-1$
 				//Se comprueba que se ha desactivado el remarcado en alto contraste del elemento que ha perdido el foco
 				if (borderOld.getLineColor()==Color.GRAY){
 					return true;
@@ -822,14 +822,14 @@ public class UtilsTest {
 		LineBorder border = (LineBorder)component.getBorder();
 		LineBorder borderOld = (LineBorder)componentOld.getBorder();
 		if (GeneralConfig.isHighContrast()){
-			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.WHITE){
+			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.WHITE){ //$NON-NLS-1$
 				//Se comprueba que se ha desactivado el remarcado en alto contraste del elemento que ha perdido el foco
 				if (borderOld.getLineColor()==Color.GRAY){
 					return true;
 				}
 			}
 		} else {
-			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.BLACK){
+			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.BLACK){ //$NON-NLS-1$
 				//Se comprueba que se ha desactivado el remarcado en alto contraste del elemento que ha perdido el foco
 				if (borderOld.getLineColor()==Color.GRAY){
 					return true;
@@ -849,16 +849,16 @@ public class UtilsTest {
 	private boolean remarcarJCheckBox(JCheckBox component, JLabel componentOld){
 		LineBorder border = (LineBorder)((JPanel)(component.getParent())).getBorder();
 		if (GeneralConfig.isHighContrast()){
-			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.WHITE){
+			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.WHITE){ //$NON-NLS-1$
 				//Se comprueba que se ha desactivado el remarcado en alto contraste del elemento que ha perdido el foco
-				if (componentOld.getBorder().getClass().getName().equals("javax.swing.border.EmptyBorder")){
+				if (componentOld.getBorder().getClass().getName().equals("javax.swing.border.EmptyBorder")){ //$NON-NLS-1$
 					return true;
 				}
 			}
 		} else {
-			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.BLACK){
+			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.BLACK){ //$NON-NLS-1$
 				//Se comprueba que se ha desactivado el remarcado en alto contraste del elemento que ha perdido el foco
-				if (componentOld.getBorder().getClass().getName().equals("javax.swing.border.EmptyBorder")){
+				if (componentOld.getBorder().getClass().getName().equals("javax.swing.border.EmptyBorder")){ //$NON-NLS-1$
 					return true;
 				}
 			}
@@ -876,16 +876,16 @@ public class UtilsTest {
 	private boolean remarcarJButton(JButton component, JCheckBox componentOld){
 		LineBorder border = (LineBorder)((JPanel)(component.getParent())).getBorder();
 		if (GeneralConfig.isHighContrast()){
-			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.WHITE){
+			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.WHITE){ //$NON-NLS-1$
 				//Se comprueba que se ha desactivado el remarcado en alto contraste del elemento que ha perdido el foco
-				if (((JPanel)(componentOld.getParent())).getBorder().getClass().getName().equals("javax.swing.border.EmptyBorder")){
+				if (((JPanel)(componentOld.getParent())).getBorder().getClass().getName().equals("javax.swing.border.EmptyBorder")){ //$NON-NLS-1$
 					return true;
 				}
 			}
 		} else {
-			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.BLACK){
+			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.BLACK){ //$NON-NLS-1$
 				//Se comprueba que se ha desactivado el remarcado en alto contraste del elemento que ha perdido el foco
-				if (((JPanel)(componentOld.getParent())).getBorder().getClass().getName().equals("javax.swing.border.EmptyBorder")){
+				if (((JPanel)(componentOld.getParent())).getBorder().getClass().getName().equals("javax.swing.border.EmptyBorder")){ //$NON-NLS-1$
 					return true;
 				}
 			}
@@ -903,16 +903,16 @@ public class UtilsTest {
 	private boolean remarcarJToggleButton(JToggleButton component, JButton componentOld){
 		LineBorder border = (LineBorder)((JPanel)(component.getParent())).getBorder();
 		if (GeneralConfig.isHighContrast()){
-			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.WHITE){
+			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.WHITE){ //$NON-NLS-1$
 				//Se comprueba que se ha desactivado el remarcado en alto contraste del elemento que ha perdido el foco
-				if (((JPanel)(componentOld.getParent())).getBorder().getClass().getName().equals("javax.swing.border.EmptyBorder")){
+				if (((JPanel)(componentOld.getParent())).getBorder().getClass().getName().equals("javax.swing.border.EmptyBorder")){ //$NON-NLS-1$
 					return true;
 				}
 			}
 		} else {
-			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.BLACK){
+			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.BLACK){ //$NON-NLS-1$
 				//Se comprueba que se ha desactivado el remarcado en alto contraste del elemento que ha perdido el foco
-				if (((JPanel)(componentOld.getParent())).getBorder().getClass().getName().equals("javax.swing.border.EmptyBorder")){
+				if (((JPanel)(componentOld.getParent())).getBorder().getClass().getName().equals("javax.swing.border.EmptyBorder")){ //$NON-NLS-1$
 					return true;
 				}
 			}
@@ -930,16 +930,16 @@ public class UtilsTest {
 	private boolean remarcarJRadioButton(JRadioButton component, JToggleButton componentOld){
 		LineBorder border = (LineBorder)((JPanel)(component.getParent())).getBorder();
 		if (GeneralConfig.isHighContrast()){
-			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.WHITE){
+			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.WHITE){ //$NON-NLS-1$
 				//Se comprueba que se ha desactivado el remarcado en alto contraste del elemento que ha perdido el foco
-				if (((JPanel)(componentOld.getParent())).getBorder().getClass().getName().equals("javax.swing.border.EmptyBorder")){
+				if (((JPanel)(componentOld.getParent())).getBorder().getClass().getName().equals("javax.swing.border.EmptyBorder")){ //$NON-NLS-1$
 					return true;
 				}
 			}
 		} else {
-			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.BLACK){
+			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.BLACK){ //$NON-NLS-1$
 				//Se comprueba que se ha desactivado el remarcado en alto contraste del elemento que ha perdido el foco
-				if (((JPanel)(componentOld.getParent())).getBorder().getClass().getName().equals("javax.swing.border.EmptyBorder")){
+				if (((JPanel)(componentOld.getParent())).getBorder().getClass().getName().equals("javax.swing.border.EmptyBorder")){ //$NON-NLS-1$
 					return true;
 				}
 			}
@@ -957,16 +957,16 @@ public class UtilsTest {
 	private boolean remarcarJTextPane(JTextPane component, JRadioButton componentOld){
 		LineBorder border = (LineBorder)component.getBorder();
 		if (GeneralConfig.isHighContrast()){
-			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.WHITE){
+			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.WHITE){ //$NON-NLS-1$
 				//Se comprueba que se ha desactivado el remarcado en alto contraste del elemento que ha perdido el foco
-				if (((JPanel)(componentOld.getParent())).getBorder().getClass().getName().equals("javax.swing.border.EmptyBorder")){
+				if (((JPanel)(componentOld.getParent())).getBorder().getClass().getName().equals("javax.swing.border.EmptyBorder")){ //$NON-NLS-1$
 					return true;
 				}
 			}
 		} else {
-			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.BLACK){
+			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.BLACK){ //$NON-NLS-1$
 				//Se comprueba que se ha desactivado el remarcado en alto contraste del elemento que ha perdido el foco
-				if (((JPanel)(componentOld.getParent())).getBorder().getClass().getName().equals("javax.swing.border.EmptyBorder")){
+				if (((JPanel)(componentOld.getParent())).getBorder().getClass().getName().equals("javax.swing.border.EmptyBorder")){ //$NON-NLS-1$
 					return true;
 				}
 			}
@@ -984,16 +984,16 @@ public class UtilsTest {
 	private boolean remarcarJEditorPane(JEditorPane component, JTextPane componentOld){
 		LineBorder border = (LineBorder)component.getBorder();
 		if (GeneralConfig.isHighContrast()){
-			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.WHITE){
+			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.WHITE){ //$NON-NLS-1$
 				//Se comprueba que se ha desactivado el remarcado en alto contraste del elemento que ha perdido el foco
-				if (componentOld.getBorder().getClass().getName().equals("javax.swing.border.EmptyBorder")){
+				if (componentOld.getBorder().getClass().getName().equals("javax.swing.border.EmptyBorder")){ //$NON-NLS-1$
 					return true;
 				}
 			}
 		} else {
-			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.BLACK){
+			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.BLACK){ //$NON-NLS-1$
 				//Se comprueba que se ha desactivado el remarcado en alto contraste del elemento que ha perdido el foco
-				if (componentOld.getBorder().getClass().getName().equals("javax.swing.border.EmptyBorder")){
+				if (componentOld.getBorder().getClass().getName().equals("javax.swing.border.EmptyBorder")){ //$NON-NLS-1$
 					return true;
 				}
 			}
@@ -1011,16 +1011,16 @@ public class UtilsTest {
 	private boolean remarcarJTree(JTree component, JEditorPane componentOld){
 		LineBorder border = (LineBorder)component.getBorder();
 		if (GeneralConfig.isHighContrast()){
-			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.WHITE){
+			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.WHITE){ //$NON-NLS-1$
 				//Se comprueba que se ha desactivado el remarcado en alto contraste del elemento que ha perdido el foco
-				if (componentOld.getBorder().getClass().getName().equals("javax.swing.border.EmptyBorder")){
+				if (componentOld.getBorder().getClass().getName().equals("javax.swing.border.EmptyBorder")){ //$NON-NLS-1$
 					return true;
 				}
 			}
 		} else {
-			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.BLACK){
+			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.BLACK){ //$NON-NLS-1$
 				//Se comprueba que se ha desactivado el remarcado en alto contraste del elemento que ha perdido el foco
-				if (componentOld.getBorder().getClass().getName().equals("javax.swing.border.EmptyBorder")){
+				if (componentOld.getBorder().getClass().getName().equals("javax.swing.border.EmptyBorder")){ //$NON-NLS-1$
 					return true;
 				}
 			}
@@ -1038,16 +1038,16 @@ public class UtilsTest {
 	private boolean remarcarJList(JList component, JTree componentOld){
 		LineBorder border = (LineBorder)component.getBorder();
 		if (GeneralConfig.isHighContrast()){
-			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.WHITE){
+			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.WHITE){ //$NON-NLS-1$
 				//Se comprueba que se ha desactivado el remarcado en alto contraste del elemento que ha perdido el foco
-				if (componentOld.getBorder().getClass().getName().equals("javax.swing.border.EmptyBorder")){
+				if (componentOld.getBorder().getClass().getName().equals("javax.swing.border.EmptyBorder")){ //$NON-NLS-1$
 					return true;
 				}
 			}
 		} else {
-			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.BLACK){
+			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.BLACK){ //$NON-NLS-1$
 				//Se comprueba que se ha desactivado el remarcado en alto contraste del elemento que ha perdido el foco
-				if (componentOld.getBorder().getClass().getName().equals("javax.swing.border.EmptyBorder")){
+				if (componentOld.getBorder().getClass().getName().equals("javax.swing.border.EmptyBorder")){ //$NON-NLS-1$
 					return true;
 				}
 			}
@@ -1065,16 +1065,16 @@ public class UtilsTest {
 	private boolean remarcarJSrollPane(JScrollPane component, JList componentOld){
 		LineBorder border = (LineBorder)component.getBorder();
 		if (GeneralConfig.isHighContrast()){
-			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.WHITE){
+			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.WHITE){ //$NON-NLS-1$
 				//Se comprueba que se ha desactivado el remarcado en alto contraste del elemento que ha perdido el foco
-				if (componentOld.getBorder().getClass().getName().equals("javax.swing.border.EmptyBorder")){
+				if (componentOld.getBorder().getClass().getName().equals("javax.swing.border.EmptyBorder")){ //$NON-NLS-1$
 					return true;
 				}
 			}
 		} else {
-			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.BLACK){
+			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.BLACK){ //$NON-NLS-1$
 				//Se comprueba que se ha desactivado el remarcado en alto contraste del elemento que ha perdido el foco
-				if (componentOld.getBorder().getClass().getName().equals("javax.swing.border.EmptyBorder")){
+				if (componentOld.getBorder().getClass().getName().equals("javax.swing.border.EmptyBorder")){ //$NON-NLS-1$
 					return true;
 				}
 			}
@@ -1093,7 +1093,7 @@ public class UtilsTest {
 	private boolean remarcarJMenu(JMenu component, JList componentOld, int fontSize){
 		
 		if (component.getFont().getSize()==fontSize+5){
-			if (componentOld.getBorder().getClass().getName().equals("javax.swing.border.EmptyBorder")){
+			if (componentOld.getBorder().getClass().getName().equals("javax.swing.border.EmptyBorder")){ //$NON-NLS-1$
 				return true;
 			}
 		}

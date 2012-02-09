@@ -35,8 +35,8 @@ public class CustomDialogTest {
 		LOGGER.info("testShowMessageDialog"); //$NON-NLS-1$
 		
 		try{
-			String message = new String("Test");
-			String title = new String("Test");
+			String message = new String("Test"); //$NON-NLS-1$
+			String title = new String("Test"); //$NON-NLS-1$
 			CustomDialog.showMessageDialog(null, true, message, title, JOptionPane.INFORMATION_MESSAGE);
 			CustomDialog cD = CustomDialog.getInstanceCustomDialog(null, true, message, title, JOptionPane.INFORMATION_MESSAGE, false);
 			assertTrue(checkComponentMessageDialog(cD));
@@ -55,8 +55,8 @@ public class CustomDialogTest {
 		LOGGER.info("testShowConfirmDialog"); //$NON-NLS-1$
 		
 		try{
-			String message = new String("Test");
-			String title = new String("Test");
+			String message = new String("Test"); //$NON-NLS-1$
+			String title = new String("Test"); //$NON-NLS-1$
 			CustomDialog.showConfirmDialog(null, true, message, title,JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
 			CustomDialog cD = CustomDialog.getInstanceCustomDialog(null, true, message, title, JOptionPane.INFORMATION_MESSAGE, false);
 			assertTrue(checkComponentMessageDialog(cD));
@@ -81,8 +81,8 @@ public class CustomDialogTest {
 		LOGGER.info("testShowInputDialog"); //$NON-NLS-1$
 		
 		try{
-			String message = new String("Test");
-			String title = new String("Test");
+			String message = new String("Test"); //$NON-NLS-1$
+			String title = new String("Test"); //$NON-NLS-1$
 			CustomDialog.showInputDialog(null, true, message,KeyEvent.VK_E ,title, JOptionPane.INFORMATION_MESSAGE);
 			CustomDialog cD = CustomDialog.getInstanceCustomDialog(null, true, message, title, JOptionPane.INFORMATION_MESSAGE, true);
 			assertTrue(checkComponentMessageDialog(cD));
@@ -101,8 +101,8 @@ public class CustomDialogTest {
 		LOGGER.info("testShowInputPasswordDialog"); //$NON-NLS-1$
 		
 		try{
-			String message = new String("Test");
-			String title = new String("Test");
+			String message = new String("Test"); //$NON-NLS-1$
+			String title = new String("Test"); //$NON-NLS-1$
 			String charSet;
 			
 			charSet = null; 
