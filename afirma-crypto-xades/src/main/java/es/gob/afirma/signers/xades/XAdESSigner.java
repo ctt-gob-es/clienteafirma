@@ -1096,7 +1096,7 @@ final class XAdESSigner {
             throw new UnsupportedOperationException("Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
         }
         catch (final Exception e) {
-            throw new AOException("Error al generar la firma XAdES", e); //$NON-NLS-1$
+            throw new AOException("Error al generar la firma XAdES: " + e, e); //$NON-NLS-1$
         }
 
         // Si se esta realizando una firma enveloping simple no tiene sentido el
