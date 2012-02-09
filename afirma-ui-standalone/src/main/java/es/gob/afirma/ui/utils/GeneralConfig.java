@@ -13,7 +13,6 @@ import java.util.Properties;
 
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.ui.principal.AccessibilityOptionsPane;
-import es.gob.afirma.ui.principal.ContextOptionsPane;
 import es.gob.afirma.ui.principal.MainOptionsPane;
 
 /** Configuraci&oacute;n global de la aplicaci&oacute;n. */
@@ -23,14 +22,6 @@ public final class GeneralConfig {
     private static Properties configOptions = new Properties();
     /** Opciones de configuraci&oacute;n de firma. */
     private static Properties configSignatureOptions = new Properties();
-    /** Estancia unica de la clase de configuraci&oacute;n. */
-    private static GeneralConfig instance = null;
-
-    public static final String OPTION_ADVANCED_VIEW = "advancedView"; //$NON-NLS-1$
-
-    public static final String OPTION_ALGORITHM = "algoritmo"; //$NON-NLS-1$
-
-    public static final String OPTION_USE_ALGORITHM_XML = "algoritmoXML"; //$NON-NLS-1$
 
     /** Recupera la configuraci&oacute;n de la ventana de opciones.
      * @return Configuraci&oacute;n de la ventana de opciones. */
@@ -46,16 +37,6 @@ public final class GeneralConfig {
         final Properties defaultConfig = new Properties();
         defaultConfig.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
         return defaultConfig;
-    }
-
-    /** Recupera la configuraci&oacute;n de firma.
-     * @return Devuelve la configurac&oacute;n general de firma configurada. */
-    public static GeneralConfig getInstance() {
-        if (instance == null) {
-            instance = new GeneralConfig();
-        }
-
-        return instance;
     }
 
     /** Recupera el valor de una de las opciones de configuraci&oacute;n.
@@ -79,35 +60,12 @@ public final class GeneralConfig {
         return config;
     }
 
-    public static String getSignContactInfo() {
-        return configOptions.getProperty(ContextOptionsPane.KEY_CONTACT_INFO, ""); //$NON-NLS-1$
-    }
-
-    public static String getSignPolicyOid() {
-        return configOptions.getProperty(MainOptionsPane.MAIN_POLICY_OID, ""); //$NON-NLS-1$
-    }
-
-    public static String getSignPolicyUrl() {
-        return configOptions.getProperty(MainOptionsPane.MAIN_POLICY_URL, ""); //$NON-NLS-1$
-    }
-
-    public static String getSignProductionPlace() {
-        return configOptions.getProperty(ContextOptionsPane.KEY_PRODUCTION_PLACE, ""); //$NON-NLS-1$
-    }
-
-    public static String getSignSubject() {
-        return configOptions.getProperty(ContextOptionsPane.KEY_SUBJECT, ""); //$NON-NLS-1$
-    }
-
+    /** Indica si est&aacute; activada ka vista avanzada de configuraci&oacute;n.
+     * @return <code>true</code> si est&aacute; activada ka vista avanzada de configuraci&oacute;n,
+     *         <code>false</code> en caso contrario */
     public static boolean isAvanzados() {
         return Boolean.parseBoolean(configOptions.getProperty(MainOptionsPane.MAIN_ADVANCED_VIEW, "false")); //$NON-NLS-1$
     }
-
-    /** Indica si el ususario ha activado o desactivado la opcion de desactivar accesibilidad en ventanas de seleci&oacute;n de archivos
-     * @return boolean Indicando el estado de la opcion */
-    // public static boolean isAccessibility() {
-    //		return Boolean.parseBoolean(configOptions.getProperty(AccessibilityOptionsPane.MAIN_WINDOWS_ACCESSIBILITY, "true")); //$NON-NLS-1$
-    // }
 
     /** Indica si el ususario ha activado o desactivado la opcion de cursor de texto grande
      * @return boolean Indicando el estado de la opcion */
@@ -145,14 +103,6 @@ public final class GeneralConfig {
         return Boolean.parseBoolean(configOptions.getProperty(AccessibilityOptionsPane.MAIN_FOCUS_VISIBLE, "false")); //$NON-NLS-1$
     }
 
-    public static boolean isSignAlgorithmUsedToXml() {
-        return Boolean.parseBoolean(configOptions.getProperty(MainOptionsPane.MAIN_ALGORITHM_XML, "false")); //$NON-NLS-1$
-    }
-
-    public static boolean isSignPolicyEstablished() {
-        return Boolean.parseBoolean(configOptions.getProperty(MainOptionsPane.MAIN_POLICY_ESTABLISHED, "false")); //$NON-NLS-1$
-    }
-
     /** Carga la nueva configuraci&oacute;n de la ventana de opciones.
      * @param config Configuraci&oacute;n. */
     public static void loadConfig(final Properties config) {
@@ -169,32 +119,39 @@ public final class GeneralConfig {
         configSignatureOptions.putAll(getDefaultSignatureConfig());
 
         if (config.contains(MainOptionsPane.MAIN_ALGORITHM_XML)) {
-            configSignatureOptions.setProperty("referencesDigestMethod",
-                                               config.getProperty(MainOptionsPane.MAIN_DEFAULT_ALGORITHM, MainOptionsPane.DEFAULT_DEFAULT_ALGORITHM));
+            configSignatureOptions.setProperty(
+               "referencesDigestMethod", //$NON-NLS-1$
+               config.getProperty(MainOptionsPane.MAIN_DEFAULT_ALGORITHM, MainOptionsPane.DEFAULT_DEFAULT_ALGORITHM)
+            );
         }
         if (config.contains(MainOptionsPane.MAIN_POLICY_ESTABLISHED)) {
-            configSignatureOptions.setProperty("policyQualifier", config.getProperty(MainOptionsPane.MAIN_POLICY_OID, ""));
-            configSignatureOptions.setProperty("policyIdentifier", config.getProperty(MainOptionsPane.MAIN_POLICY_URL, ""));
+            configSignatureOptions.setProperty("policyQualifier", config.getProperty(MainOptionsPane.MAIN_POLICY_OID, "")); //$NON-NLS-1$ //$NON-NLS-2$
+            configSignatureOptions.setProperty("policyIdentifier", config.getProperty(MainOptionsPane.MAIN_POLICY_URL, "")); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         if (config.contains(ContextOptionsConfig.OPTION_REASON) && config.getProperty(ContextOptionsConfig.OPTION_REASON).trim().length() > 0) {
-            configSignatureOptions.setProperty("signReason", config.getProperty(ContextOptionsConfig.OPTION_REASON).trim());
+            configSignatureOptions.setProperty("signReason", config.getProperty(ContextOptionsConfig.OPTION_REASON).trim()); //$NON-NLS-1$
         }
         if (config.contains(ContextOptionsConfig.OPTION_PRODUCTION_PLACE) && config.getProperty(ContextOptionsConfig.OPTION_PRODUCTION_PLACE)
                 .trim()
                 .length() > 0) {
-            config.setProperty("signatureProductionCity", config.getProperty(ContextOptionsConfig.OPTION_PRODUCTION_PLACE).trim());
+            config.setProperty("signatureProductionCity", config.getProperty(ContextOptionsConfig.OPTION_PRODUCTION_PLACE).trim()); //$NON-NLS-1$
         }
         if (config.contains(ContextOptionsConfig.OPTION_SIGNER_CONTACT) && config.getProperty(ContextOptionsConfig.OPTION_SIGNER_CONTACT)
                 .trim()
                 .length() > 0) {
-            config.setProperty("signerContact", config.getProperty(ContextOptionsConfig.OPTION_SIGNER_CONTACT).trim());
+            config.setProperty("signerContact", config.getProperty(ContextOptionsConfig.OPTION_SIGNER_CONTACT).trim()); //$NON-NLS-1$
         }
     }
 
+    /** Establece una opci&oacute;n de configuraci&oacute;n.
+     * @param optionKey Nombre de la opci&oacute;n de configuraci&oacute;n
+     * @param optionValue Valor opci&oacute;n de configuraci&oacute;n */
     public static void setOption(final String optionKey, final String optionValue) {
         configOptions.setProperty(optionKey, optionValue);
     }
 
-    private GeneralConfig() {}
+    private GeneralConfig() {
+        // No permitimos la instanciacion
+    }
 }
