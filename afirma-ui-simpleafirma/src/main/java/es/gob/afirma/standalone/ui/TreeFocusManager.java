@@ -34,8 +34,8 @@ class TreeFocusManager extends KeyAdapter implements FocusListener, MouseMotionL
     
     // Como los cursores los usamos dentro de un MouseMotionListener los precreamos para
     // evitar que se creen objetos solo por mover el raton
-    private final Cursor DEFAULT_CURSOR = new Cursor(Cursor.DEFAULT_CURSOR);
-    private final Cursor HAND_CURSOR = new Cursor(Cursor.HAND_CURSOR);
+    private static final Cursor DEFAULT_CURSOR = new Cursor(Cursor.DEFAULT_CURSOR);
+    private static final Cursor HAND_CURSOR = new Cursor(Cursor.HAND_CURSOR);
     
     TreeFocusManager(final JTree t, final TreeFocusManagerAction focusManagerAction) {
         this.tree = t;
