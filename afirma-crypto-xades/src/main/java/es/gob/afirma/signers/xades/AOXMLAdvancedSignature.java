@@ -143,6 +143,9 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
         this.signContext.putNamespacePrefix(XMLSignature.XMLNS, this.xades.getXmlSignaturePrefix());
         this.signContext.putNamespacePrefix(this.xadesNamespace, this.xades.getXadesPrefix());
 
+        System.out.println(this.xadesNamespace + " = " + this.xades.getXadesPrefix());
+        System.out.println(XMLSignature.XMLNS + " = " + this.xades.getXmlSignaturePrefix());
+
         this.signature.sign(this.signContext);
     }
 
