@@ -277,8 +277,8 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
                 this.window.setJMenuBar(this.mainMenu);
                 if (firstTime) {
                 	final ActionMap actionMap = this.window.getRootPane().getActionMap();
-                	final String MENU_ACTION_KEY = "expand_that_first_menu_please"; //$NON-NLS-1$
-                	actionMap.put(MENU_ACTION_KEY, new AbstractAction() {
+                	final String menuActionKey = "expand_that_first_menu_please"; //$NON-NLS-1$
+                	actionMap.put(menuActionKey, new AbstractAction() {
     					private static final long serialVersionUID = -6464408227472473522L;
     					@Override
     					public void actionPerformed(final ActionEvent ae) {
@@ -309,7 +309,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
     						0,
     						true
     					),
-    					MENU_ACTION_KEY
+    					menuActionKey
     				);
                 }
             }
