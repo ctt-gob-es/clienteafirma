@@ -118,7 +118,15 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
             this.xades.setSigningCertificate(certificates.get(0));
         }
 
-        addXMLObject(marshalXMLSignature(this.xadesNamespace, this.signedPropertiesTypeUrl, signatureIdPrefix, referencesIdList, tsaURL));
+        addXMLObject(
+    		marshalXMLSignature(
+				this.xadesNamespace,
+				this.signedPropertiesTypeUrl,
+				signatureIdPrefix,
+				referencesIdList,
+				tsaURL
+			)
+		);
 
         final XMLSignatureFactory fac = getXMLSignatureFactory();
 
@@ -130,14 +138,20 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
         final String keyInfoId = getKeyInfoId(signatureIdPrefix);
         documentReferences.add(fac.newReference("#" + keyInfoId, getDigestMethod())); //$NON-NLS-1$
 
-        this.signature =
-                fac.newXMLSignature(fac.newSignedInfo(fac.newCanonicalizationMethod(this.canonicalizationMethod, (C14NMethodParameterSpec) null),
-                                                      fac.newSignatureMethod(signatureMethod, null),
-                                                      documentReferences),
-                                    newKeyInfo(certificates, keyInfoId),
-                                    getXMLObjects(),
-                                    getSignatureId(signatureIdPrefix),
-                                    getSignatureValueId(signatureIdPrefix));
+        this.signature =fac.newXMLSignature(
+        		fac.newSignedInfo(
+    				fac.newCanonicalizationMethod(
+						this.canonicalizationMethod,
+						(C14NMethodParameterSpec) null
+					),
+                    fac.newSignatureMethod(signatureMethod, null),
+                    documentReferences
+                ),
+                newKeyInfo(certificates, keyInfoId),
+                getXMLObjects(),
+                getSignatureId(signatureIdPrefix),
+                getSignatureValueId(signatureIdPrefix)
+        );
 
         this.signContext = new DOMSignContext(privateKey, this.baseElement);
         this.signContext.putNamespacePrefix(XMLSignature.XMLNS, this.xades.getXmlSignaturePrefix());
