@@ -68,15 +68,14 @@ public final class TestXAdES {
         p1.setProperty("format", AOSignConstants.SIGN_FORMAT_XADES_DETACHED); //$NON-NLS-1$
         p1.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
         p1.setProperty("policyIdentifier", "urn:oid:2.16.724.1.3.1.1.2.1.8"); //$NON-NLS-1$ //$NON-NLS-2$
-        p1.setProperty("policyIdentifierHash", "ESTEESUNHASH=");  //$NON-NLS-1$//$NON-NLS-2$
+        p1.setProperty("policyIdentifierHash", "V8lVVNGDCPen6VELRD1Ja8HARFk=");  //$NON-NLS-1$//$NON-NLS-2$
         p1.setProperty("policyIdentifierHashAlgorithm", DigestMethod.SHA1);         //$NON-NLS-1$
         p1.setProperty("policyDescription", "Politica de firma electronica para las Administraciones Publicas en Espana"); //$NON-NLS-1$ //$NON-NLS-2$
-        p1.setProperty("policyQualifier", "http://blogs.adobe.com/security/91014620_eusig_wp_ue.pdf"); //$NON-NLS-1$ //$NON-NLS-2$
+        p1.setProperty("policyQualifier", "http://administracionelectronica.gob.es/es/ctt/politicafirma/politica_firma_AGE_v1_8.pdf"); //$NON-NLS-1$ //$NON-NLS-2$
 
         final Properties p2 = new Properties();
         p2.setProperty("format", AOSignConstants.SIGN_FORMAT_XADES_DETACHED); //$NON-NLS-1$
         p2.setProperty("mode", AOSignConstants.SIGN_MODE_EXPLICIT); //$NON-NLS-1$
-
 
         final Properties p3 = new Properties();
         p3.setProperty("format", AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED); //$NON-NLS-1$
@@ -105,22 +104,22 @@ public final class TestXAdES {
     /** Algoritmos de firma a probar. */
     private final static String[] ALGOS = new String[] {
             AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
-            AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
-            AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA,
-            AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA
+//            AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
+//            AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA,
+//            AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA
     };
 
     // IMPORTANTE: Poner extension ".xml" a los ficheros de prueba con contenido XML
     private static final String[] TEST_FILES_DATA = new String[] {
             "TEST_PDF_Certified.pdf", //$NON-NLS-1$
-            "ANF_PF_Activo.pfx", //$NON-NLS-1$
-            "base64.b64", //$NON-NLS-1$
-            "sample-class-attributes.xml", //$NON-NLS-1$
-            "sample-facturae.xml", //$NON-NLS-1$
-            "sample-embedded-style.xml", //$NON-NLS-1$
-            "sample-encoding-UTF-8.xml", //$NON-NLS-1$
-            "sample-internal-dtd.xml", //$NON-NLS-1$
-            "sample-namespace-encoding-us-ascii.xml" //$NON-NLS-1$
+//            "ANF_PF_Activo.pfx", //$NON-NLS-1$
+//            "base64.b64", //$NON-NLS-1$
+//            "sample-class-attributes.xml", //$NON-NLS-1$
+//            "sample-facturae.xml", //$NON-NLS-1$
+//            "sample-embedded-style.xml", //$NON-NLS-1$
+//            "sample-encoding-UTF-8.xml", //$NON-NLS-1$
+//            "sample-internal-dtd.xml", //$NON-NLS-1$
+//            "sample-namespace-encoding-us-ascii.xml" //$NON-NLS-1$
     };
 
     private static final String[] TEST_FILES_MULTISIGN = new String[] {
@@ -414,7 +413,8 @@ public final class TestXAdES {
     }
 
     /** Prueba de detecci&oacute;n de formato XAdES.
-     * @throws Exception */
+     * @throws Exception Cuando se produce un error durante la prueba.
+     */
     @SuppressWarnings("static-method")
 	@Test
     public void TestDetection() throws Exception {
