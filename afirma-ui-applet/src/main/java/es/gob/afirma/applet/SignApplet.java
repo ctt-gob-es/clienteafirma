@@ -402,6 +402,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         this.enveloperManager = new EnveloperManager(this);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void init() {
 
@@ -509,8 +510,8 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
         LOGGER.info("Invocando getArrayCertificatesAlias"); //$NON-NLS-1$
         return AccessController.doPrivileged(new java.security.PrivilegedAction<String[]>() {
+        	/** {@inheritDoc} */
             public String[] run() {
-
                 try {
                     SignApplet.this.setError(null);
                     return SignApplet.this.getKsConfigManager().getArrayCertificateAlias();
@@ -693,6 +694,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
 
         return AccessController.doPrivileged(new java.security.PrivilegedAction<Boolean>() {
+        	/** {@inheritDoc} */
             public Boolean run() {
                 final URI uri;
                 try {
@@ -732,6 +734,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         LOGGER.info("Invocando saveDataToFile"); //$NON-NLS-1$
 
         return AccessController.doPrivileged(new java.security.PrivilegedAction<Boolean>() {
+        	/** {@inheritDoc} */
             public Boolean run() {
                 saveFileAsinchronously(SignApplet.this.getInternalData(), SignApplet.this.getOutputFile(), null, null);
                 SignApplet.this.setError(null);
@@ -745,6 +748,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         LOGGER.info("Invocando saveSignToFile"); //$NON-NLS-1$
 
         return AccessController.doPrivileged(new java.security.PrivilegedAction<Boolean>() {
+        	/** {@inheritDoc} */
             public Boolean run() {
                 if (SignApplet.this.getSignData() == null || SignApplet.this.getSignData().length < 1) {
                 	getLogger().severe("No se dispone de datos de firma, no se creara el fichero de firma"); //$NON-NLS-1$
@@ -992,8 +996,8 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         LOGGER.info("Invocando getSignersStructure"); //$NON-NLS-1$
 
         return AccessController.doPrivileged(new java.security.PrivilegedAction<String>() {
+        	/** {@inheritDoc} */
             public String run() {
-
                 // Tomamos la firma que deseamos analizar
                 final byte[] originalSign;
                 try {
@@ -1071,6 +1075,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     private boolean counterSign(final CounterSignTarget target) {
 
         return AccessController.doPrivileged(new java.security.PrivilegedAction<Boolean>() {
+        	/** {@inheritDoc} */
             public Boolean run() {
                 final String algorithm = (SignApplet.this.getSigAlgo() == null ? AOSignConstants.DEFAULT_SIGN_ALGO : SignApplet.this.getSigAlgo());
                 final String format = (SignApplet.this.getSigFormat() == null ? AOSignConstants.DEFAULT_SIGN_FORMAT : SignApplet.this.getSigFormat());
@@ -1350,6 +1355,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
         LOGGER.info("Invocando setKeyStore de tipo '" + type + "' con el path '" + filename + "'"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         AccessController.doPrivileged(new java.security.PrivilegedAction<Void>() {
+        	/** {@inheritDoc} */
             public Void run() {
                 final AOKeyStore newStore = AOKeyStoreManager.getKeyStore(NormalizedNames.normalizeKeyStoreName(type));
 
@@ -1427,6 +1433,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         LOGGER.info("Invocando sign"); //$NON-NLS-1$
 
         return AccessController.doPrivileged(new java.security.PrivilegedAction<Boolean>() {
+        	/** {@inheritDoc} */
             public Boolean run() {
 
                 // Si no esta establecido el algoritmo usamos el por
@@ -1715,7 +1722,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                 final Iterator<String> itOid = SignApplet.this.signedAttributes.keySet().iterator();
                 while (itOid.hasNext()) {
                     final String oid = itOid.next();
-                    ((AOCMSSigner) signer).addSignedAttribute(oid.toString(), SignApplet.this.signedAttributes.get(oid).getBytes());
+                    ((AOCMSSigner) signer).addSignedAttribute(oid, SignApplet.this.signedAttributes.get(oid).getBytes());
                 }
             }
 
@@ -1725,7 +1732,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                 while (itOid.hasNext()) {
                     final String oid = itOid.next();
                     for (final String value : SignApplet.this.unsignedAttributes.get(oid)) {
-                        ((AOCMSSigner) signer).addUnsignedAttribute(oid.toString(), value.getBytes());
+                        ((AOCMSSigner) signer).addUnsignedAttribute(oid, value.getBytes());
                     }
                 }
             }
@@ -1757,6 +1764,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         LOGGER.info("Invocando cosign"); //$NON-NLS-1$
 
         return AccessController.doPrivileged(new java.security.PrivilegedAction<Boolean>() {
+        	/** {@inheritDoc} */
             public Boolean run() {
 
                 // No establecemos algoritmo por defecto, si no esta
@@ -1940,6 +1948,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         LOGGER.info("Invocando signDirectory"); //$NON-NLS-1$
 
         return AccessController.doPrivileged(new java.security.PrivilegedAction<Boolean>() {
+        	/** {@inheritDoc} */
             public Boolean run() {
                 if ((SignApplet.this.getSigFormat().equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED) && SignApplet.this.getSigMode().equals(AOSignConstants.SIGN_MODE_EXPLICIT)) || (SignApplet.this.getSigFormat().equals(AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED) && SignApplet.this.getSigMode().equals(AOSignConstants.SIGN_MODE_EXPLICIT))) {
                     SignApplet.this.setError(true);
@@ -2186,6 +2195,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         }
 
         return AccessController.doPrivileged(new java.security.PrivilegedAction<Boolean>() {
+        	/** {@inheritDoc} */
             public Boolean run() {
 
                 // Configuramos el certificado
@@ -2249,6 +2259,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     	// Ejecutamos la operacion
     	try {
     		return AccessController.doPrivileged(new java.security.PrivilegedAction<String>() {
+    			/** {@inheritDoc} */
     			public String run() {
     				final byte[] result = SignApplet.this.massiveSignatureHelper.signData(dataToSign);
     				if (result == null) {
@@ -2278,6 +2289,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     	final byte[] dataHash = Base64.decode(b64Hash);
     	try {
     		return AccessController.doPrivileged(new java.security.PrivilegedAction<String>() {
+    			/** {@inheritDoc} */
     			public String run() {
     				final byte[] result = SignApplet.this.massiveSignatureHelper.signHash(dataHash);
     				if (result == null) {
@@ -2311,6 +2323,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
     	try {
     		return AccessController.doPrivileged(new java.security.PrivilegedAction<String>() {
+    			/** {@inheritDoc} */
     			public String run() {
     				final byte[] result = SignApplet.this.massiveSignatureHelper.signFile(filename);
     				if (result == null){
@@ -2358,6 +2371,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
         // Guardamos la firma en fichero
         AccessController.doPrivileged(new java.security.PrivilegedAction<Void>() {
+        	/** {@inheritDoc} */
             public Void run() {
                 SignApplet.this.saveFileAsinchronously(
             		SignApplet.this.getMassiveSignatureLog().getBytes(),
@@ -2378,6 +2392,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         LOGGER.info("Invocando webSign: " + html); //$NON-NLS-1$
 
         return AccessController.doPrivileged(new java.security.PrivilegedAction<String>() {
+        	/** {@inheritDoc} */
             public String run() {
                 FirmaWeb firmaWeb;
                 try {
@@ -2635,6 +2650,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         }
 
         return AccessController.doPrivileged(new java.security.PrivilegedAction<String>() {
+        	/** {@inheritDoc} */
             public String run() {
                 final InputStream is;
                 try {
@@ -2783,6 +2799,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     public String getFileHashBase64Encoded() {
         LOGGER.info("Invocando getFileHashBase64Encoded"); //$NON-NLS-1$
         return AccessController.doPrivileged(new java.security.PrivilegedAction<String>() {
+        	/** {@inheritDoc} */
             public String run() {
                 if (SignApplet.this.getFileUri() == null) {
                 	getLogger().severe("No se ha establecido el fichero del que calcular el Hash"); //$NON-NLS-1$
@@ -2935,6 +2952,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         }
 
         return AccessController.doPrivileged(new java.security.PrivilegedAction<Boolean>() {
+        	/** {@inheritDoc} */
             public Boolean run() {
                 try {
                     SignApplet.saveDataToStorage(SignApplet.this.getCipherManager().getPlainData(), filename);
@@ -2971,6 +2989,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         }
 
         return AccessController.doPrivileged(new java.security.PrivilegedAction<Boolean>() {
+        	/** {@inheritDoc} */
             public Boolean run() {
                 try {
                     SignApplet.saveDataToStorage(SignApplet.this.getCipherManager().getCipheredData(), filename);
@@ -3115,6 +3134,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     /** {@inheritDoc} */
     public String showCertSelectionDialog() {
         return AccessController.doPrivileged(new java.security.PrivilegedAction<String>() {
+        	/** {@inheritDoc} */
             public String run() {
                 // Configuramos el certificado
                 final PrivateKeyEntry ke = SignApplet.this.configureCertificate();
@@ -3236,6 +3256,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     public String getLdapCertificate() {
         LOGGER.info("Invocando getLdapCertificate()"); //$NON-NLS-1$
         return AccessController.doPrivileged(new java.security.PrivilegedAction<String>() {
+        	/** {@inheritDoc} */
             public String run() {
 
                 final X509Certificate cert;
@@ -3804,6 +3825,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         LOGGER.info("Invocando loadFilePath"); //$NON-NLS-1$
         try {
             return AccessController.doPrivileged(new java.security.PrivilegedAction<String>() {
+            	/** {@inheritDoc} */
                 public String run() {
                     return AOUIFactory.getLoadFileName(title,
                                                        ((exts == null || exts.trim().length() == 0)
@@ -3831,6 +3853,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         LOGGER.info("Invocando selectDirectory"); //$NON-NLS-1$
         try {
             return AccessController.doPrivileged(new java.security.PrivilegedAction<String>() {
+            	/** {@inheritDoc} */
                 public String run() {
                     return UIDialogs.selectDirectory(SignApplet.this, AppletMessages.getString("SignApplet.104")); //$NON-NLS-1$
                 }
@@ -4162,9 +4185,8 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
      *         </ul> */
     public String signText(final String stringToSign, final String caOption, final String[] caNameN) {
         return AccessController.doPrivileged(new java.security.PrivilegedAction<String>() {
-
+        	/** {@inheritDoc} */
             public String run() {
-
                 final AOKeyStoreManager ksManager;
                 try {
                     ksManager = SignApplet.this.getKsConfigManager().getKeyStoreManager();
