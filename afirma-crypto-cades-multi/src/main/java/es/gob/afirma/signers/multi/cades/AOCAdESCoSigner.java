@@ -28,6 +28,7 @@ public class AOCAdESCoSigner implements AOCoSigner {
 	private static final String CONTENTTYPE_OID = "contentTypeOid"; //$NON-NLS-1$
 	private static final String CONTENT_DESCRIPTION = "contentDescription"; //$NON-NLS-1$
 
+	/** {@inheritDoc} */
     public byte[] cosign(final byte[] data,
                          final byte[] sign,
                          final String algorithm,
@@ -84,6 +85,7 @@ public class AOCAdESCoSigner implements AOCoSigner {
         }
     }
 
+    /** {@inheritDoc} */
     public byte[] cosign(final byte[] sign,
                          final String algorithm,
                          final PrivateKeyEntry keyEntry,

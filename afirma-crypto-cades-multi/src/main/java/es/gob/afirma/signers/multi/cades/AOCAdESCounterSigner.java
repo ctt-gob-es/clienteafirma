@@ -28,6 +28,7 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
 	private static final String CONTENTTYPE_OID = "contentTypeOid"; //$NON-NLS-1$
 	private static final String CONTENT_DESCRIPTION = "contentDescription"; //$NON-NLS-1$
 
+	/** {@inheritDoc} */
     public byte[] countersign(final byte[] sign,
                               final String algorithm,
                               final CounterSignTarget targetType,
