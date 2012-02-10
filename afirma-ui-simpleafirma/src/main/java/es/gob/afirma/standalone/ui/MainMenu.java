@@ -50,10 +50,15 @@ public final class MainMenu extends JMenuBar {
     private final JMenuItem abrirMenuItem = new JMenuItem();
     private final JMenuItem ayudaMenuItem = new JMenuItem();
 
-    final JMenu menuAyuda = new JMenu(MacHelpHooker.isMacHelpAvailable() ? "Help" : Messages.getString("MainMenu.9"));  //$NON-NLS-1$//$NON-NLS-2$
+    private final JMenu menuAyuda = new JMenu(MacHelpHooker.isMacHelpAvailable() ? "Help" : Messages.getString("MainMenu.9"));  //$NON-NLS-1$//$NON-NLS-2$
 
     private final Component parent;
-    final SimpleAfirma saf;
+
+    private final SimpleAfirma saf;
+    SimpleAfirma getSimpleAfirma() {
+    	return this.saf;
+    }
+
 
     /** Indica si hay alg&uacute; men&uacute; de primer nivel seleccionado.
      * @return <code>true</code> si hay alg&uacute; men&uacute; de primer nivel seleccionado,
@@ -111,32 +116,32 @@ public final class MainMenu extends JMenuBar {
             public void actionPerformed(final ActionEvent ae) {
                 String fileToLoad;
                 if (isMac || Platform.OS.WINDOWS.equals(Platform.getOS())) {
-                    if (MainMenu.this.saf.getCurrentDir() == null) {
-                        MainMenu.this.saf.setCurrentDir(new File(Platform.getUserHome()));
+                    if (MainMenu.this.getSimpleAfirma().getCurrentDir() == null) {
+                        MainMenu.this.getSimpleAfirma().setCurrentDir(new File(Platform.getUserHome()));
                     }
                     final FileDialog fd = new FileDialog((Frame) null, Messages.getString("MainMenu.4")); //$NON-NLS-1$
-                    fd.setDirectory(MainMenu.this.saf.getCurrentDir().getAbsolutePath());
+                    fd.setDirectory(MainMenu.this.getSimpleAfirma().getCurrentDir().getAbsolutePath());
                     fd.setVisible(true);
                     if (fd.getFile() == null) {
                         return;
                     }
-                    MainMenu.this.saf.setCurrentDir(new File(fd.getDirectory()));
+                    MainMenu.this.getSimpleAfirma().setCurrentDir(new File(fd.getDirectory()));
                     fileToLoad = fd.getDirectory() + fd.getFile();
                 }
                 else {
                     final JFileChooser fc = new JFileChooser();
-                    if (MainMenu.this.saf.getCurrentDir() != null) {
-                        fc.setCurrentDirectory(MainMenu.this.saf.getCurrentDir());
+                    if (MainMenu.this.getSimpleAfirma().getCurrentDir() != null) {
+                        fc.setCurrentDirectory(MainMenu.this.getSimpleAfirma().getCurrentDir());
                     }
                     if (JFileChooser.APPROVE_OPTION == fc.showOpenDialog(MainMenu.this)) {
-                        MainMenu.this.saf.setCurrentDir(fc.getCurrentDirectory());
+                        MainMenu.this.getSimpleAfirma().setCurrentDir(fc.getCurrentDirectory());
                         fileToLoad = fc.getSelectedFile().getAbsolutePath();
                     }
                     else {
                         return;
                     }
                 }
-                MainMenu.this.saf.loadFileToSign(fileToLoad);
+                MainMenu.this.getSimpleAfirma().loadFileToSign(fileToLoad);
             }
         });
         this.menuArchivo.add(this.abrirMenuItem);
@@ -149,7 +154,7 @@ public final class MainMenu extends JMenuBar {
         this.firmarMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                MainMenu.this.saf.signLoadedFile();
+                MainMenu.this.getSimpleAfirma().signLoadedFile();
             }
         });
         this.menuArchivo.add(this.firmarMenuItem);

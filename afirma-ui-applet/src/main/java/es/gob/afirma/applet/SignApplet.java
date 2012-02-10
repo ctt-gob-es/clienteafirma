@@ -2180,7 +2180,15 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     // ==============================================
 
     /** Manejador de firma masiva. */
-    MassiveSignatureHelper massiveSignatureHelper = null;
+    private MassiveSignatureHelper massiveSignatureHelper = null;
+
+    MassiveSignatureHelper getMassiveSignatureHelper() {
+    	return this.massiveSignatureHelper;
+    }
+
+    void setMassiveSignatureHelper(final MassiveSignatureHelper msh) {
+    	this.massiveSignatureHelper = msh;
+    }
 
     /** {@inheritDoc} */
     public boolean initMassiveSignature() {
@@ -2221,7 +2229,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                                                                                                  : MassiveType.valueOf(AOSignConstants.DEFAULT_MASSIVE_OPERATION));
 
                 try {
-                    SignApplet.this.massiveSignatureHelper = new MassiveSignatureHelper(massiveConfiguration);
+                    SignApplet.this.setMassiveSignatureHelper(new MassiveSignatureHelper(massiveConfiguration));
                 }
                 catch (final AOException e) {
                     getLogger().severe("Error al inicializar el modulo de multifirma masiva: " + e); //$NON-NLS-1$
@@ -2261,9 +2269,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     		return AccessController.doPrivileged(new java.security.PrivilegedAction<String>() {
     			/** {@inheritDoc} */
     			public String run() {
-    				final byte[] result = SignApplet.this.massiveSignatureHelper.signData(dataToSign);
+    				final byte[] result = SignApplet.this.getMassiveSignatureHelper().signData(dataToSign);
     				if (result == null) {
-    					SignApplet.this.setError(SignApplet.this.massiveSignatureHelper.getCurrentLogEntry());
+    					SignApplet.this.setError(SignApplet.this.getMassiveSignatureHelper().getCurrentLogEntry());
     				}
     				return Base64.encode(result);
     			}
@@ -2291,9 +2299,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     		return AccessController.doPrivileged(new java.security.PrivilegedAction<String>() {
     			/** {@inheritDoc} */
     			public String run() {
-    				final byte[] result = SignApplet.this.massiveSignatureHelper.signHash(dataHash);
+    				final byte[] result = SignApplet.this.getMassiveSignatureHelper().signHash(dataHash);
     				if (result == null) {
-    					SignApplet.this.setError(SignApplet.this.massiveSignatureHelper.getCurrentLogEntry());
+    					SignApplet.this.setError(SignApplet.this.getMassiveSignatureHelper().getCurrentLogEntry());
     				}
     				return Base64.encode(result);
     			}
@@ -2325,9 +2333,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     		return AccessController.doPrivileged(new java.security.PrivilegedAction<String>() {
     			/** {@inheritDoc} */
     			public String run() {
-    				final byte[] result = SignApplet.this.massiveSignatureHelper.signFile(filename);
+    				final byte[] result = SignApplet.this.getMassiveSignatureHelper().signFile(filename);
     				if (result == null){
-    					SignApplet.this.setError(SignApplet.this.massiveSignatureHelper.getCurrentLogEntry());
+    					SignApplet.this.setError(SignApplet.this.getMassiveSignatureHelper().getCurrentLogEntry());
     				}
     				return Base64.encode(result);
     			}
