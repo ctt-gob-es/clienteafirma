@@ -37,14 +37,14 @@ import java.util.jar.Manifest;
 import java.util.logging.Logger;
 
 final class AOJarVerifier {
-    
+
     /** Gestor de registro. */
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$;
 
     private boolean hasExpiredCert = false;
     private boolean hasExpiringCert = false;
     private boolean notYetValidCert = false;
-    
+
     private static final int BUFFER_SIZE = 8192;
 
     private static final long SIX_MONTHS = 180 * 24 * 60 * 60 * 1000L; // milliseconds
@@ -85,9 +85,10 @@ final class AOJarVerifier {
                 InputStream is = null;
                 try {
                     is = jf.getInputStream(je);
-                    while (is.read(buffer, 0, buffer.length) != -1) {
-                        // we just read. this will throw a SecurityException
-                        // if a signature/digest check fails.
+                    int readed = 0;
+                    while (readed != -1) {
+                    	// la lectura lanzara un SecurityExceptionsi una firma o huella digital falla
+                    	readed = is.read(buffer, 0, buffer.length);
                     }
                 }
                 finally {
