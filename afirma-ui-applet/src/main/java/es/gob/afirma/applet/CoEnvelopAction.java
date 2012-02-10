@@ -43,7 +43,7 @@ public final class CoEnvelopAction implements PrivilegedExceptionAction<byte[]> 
     }
 
     /** {@inheritDoc} */
-    public byte[] run() throws AOKeyStoreManagerException, AOCertificatesNotFoundException, AOInvalidFormatException, AOException {
+    public byte[] run() throws AOException {
         try {
             this.enveloperManager.coEnvelop(this.envelop);
         }

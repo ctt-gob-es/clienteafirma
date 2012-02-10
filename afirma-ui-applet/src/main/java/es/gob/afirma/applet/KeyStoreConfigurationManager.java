@@ -158,7 +158,7 @@ final class KeyStoreConfigurationManager {
      *         Cuando ocurre un error durante la inicializaci&oacute;n
      * @throws IOException
      * 		   Cuando la contrase&ntilde;a del almac&eacute;n es incorrecta. */
-    private void initKeyStore() throws AOCancelledOperationException, AOKeystoreAlternativeException, IOException {
+    private void initKeyStore() throws AOKeystoreAlternativeException, IOException {
 
         if (this.showLoadingWarning) {
             JOptionPane.showMessageDialog(this.parent,
@@ -198,7 +198,7 @@ final class KeyStoreConfigurationManager {
     /** Selecciona un certificado con clave privada del almac&eacute;n, ya sea a
      * trav&eacute;s de la configuraci&oacute;n proporcionada o
      * solicit&aacute;ndoselo al usuario.
-     * @throws AOCancelledOperationException
+     * @throws es.gob.afirma.core.AOCancelledOperationException
      *         Cuando el usuario cancela la operaci&oacute;n.
      * @throws AOKeyStoreManagerException
      *         Cuando no se pueda inicializar el almac&eacute;n de
@@ -218,8 +218,7 @@ final class KeyStoreConfigurationManager {
      * @throws UnrecoverableEntryException
      * 		   Cuando no se puede extraer la clave privada de un certificado.
      */
-    void selectCertificate() throws AOCancelledOperationException,
-                            AOKeyStoreManagerException,
+    void selectCertificate() throws AOKeyStoreManagerException,
                             AOCertificatesNotFoundException,
                             AOKeystoreAlternativeException,
                             CertificateException,
@@ -253,7 +252,7 @@ final class KeyStoreConfigurationManager {
      * @param alias
      *        Alias del certificado que deseamos recuperar.
      * @return Certificado con el alias seleccionado.
-     * @throws AOCancelledOperationException
+     * @throws es.gob.afirma.core.AOCancelledOperationException
      *         Cuando se cancela la operaci&oacute;n.
      * @throws AOKeyStoreManagerException
      *         Cuando no se ha podido inicializar el almac&eacute;n de
@@ -265,7 +264,7 @@ final class KeyStoreConfigurationManager {
     /** Recupera los alias del almacen seleccionado. Si ocurre alg&uacute;n error
      * durante la operaci&oacute;n se devuelve un array vac&iacute;o.
      * @return Certificado con el alias seleccionado.
-     * @throws AOCancelledOperationException
+     * @throws es.gob.afirma.core.AOCancelledOperationException
      *         Cuando se cancela la operaci&oacute;n.
      * @throws AOKeyStoreManagerException
      *         Cuando no se ha podido inicializar el almac&eacute;n de
@@ -277,7 +276,7 @@ final class KeyStoreConfigurationManager {
     /** Recupera el gestor del almac&eacute;n de certificados actual ya
      * inicializado.
      * @return Gestor del almac&eacute;n de certificados.
-     * @throws AOCancelledOperationException
+     * @throws es.gob.afirma.core.AOCancelledOperationException
      *         Cuando se cancela la operaci&oacute;n.
      * @throws AOKeyStoreManagerException
      *         Cuando no se ha podido inicializar el almac&eacute;n. */
@@ -322,10 +321,9 @@ final class KeyStoreConfigurationManager {
      *         claves) del certificado seleccionado.
      * @throws AOCertificatesNotFoundException
      *         Cuando no se encuentran certificados que cumplan el filtro.
-     * @throws AOCancelledOperationException
+     * @throws es.gob.afirma.core.AOCancelledOperationException
      *         Cuando el usuario cancel&oacute; la operaci&oacute;n. */
-    private String showCertSelectionDialog(final String[] certAlias) throws AOCertificatesNotFoundException,
-                                                                                                   AOCancelledOperationException {
+    private String showCertSelectionDialog(final String[] certAlias) throws AOCertificatesNotFoundException {
         return KeyStoreUtilities.showCertSelectionDialog(certAlias, // Aliases
                                                    this.ksManager, // KeyStoreManager
                                                    this.parent, // Panel sobre el que mostrar el dialogo

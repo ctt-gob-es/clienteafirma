@@ -35,9 +35,6 @@ import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.envelopers.cms.AOCMSEnveloper;
-import es.gob.afirma.envelopers.cms.AOInvalidRecipientException;
-import es.gob.afirma.keystores.main.common.AOCertificatesNotFoundException;
-import es.gob.afirma.keystores.main.common.AOKeyStoreManagerException;
 
 /** Manejador para el ensobrado de datos por parte del Applet Cliente @firma.
  * Esta clase almacena toda la informaci&oacute;n relevante para las operaciones
@@ -353,36 +350,34 @@ public final class EnveloperManager {
     }
 
     /** Desenvuelve el sobre electr&oacute;nico configurado.
-     * @throws AOInvalidRecipientException
+     * @throws es.gob.afirma.envelopers.cms.AOInvalidRecipientException
      *         Cuando el usuario no es uno de los destinatarios del sobre.
      * @throws CertificateEncodingException
      *         Cuando el certificado del destinatario no es v&aacute;lido.
      * @throws IOException
      *         Cuando el envoltorio est&aacute; corrupto o no puede leerse.
-     * @throws AOInvalidFormatException
+     * @throws es.gob.afirma.core.AOInvalidFormatException
      *         Cuando no se ha indicado un envoltorio soportado.
      * @throws AOException
      *         Cuando se produce un error durante al desenvolver los datos. */
-    public void unwrap() throws CertificateEncodingException, AOInvalidRecipientException, AOInvalidFormatException, IOException, AOException {
+    public void unwrap() throws CertificateEncodingException, IOException, AOException {
         this.unwrap(getConfigureEnvelop());
     }
 
     /** Desenvuelve el sobre electr&oacute;nico proporcionado.
      * @param env
      *        Sobre electr&oacute;nico a desenvolver
-     * @throws AOInvalidRecipientException
+     * @throws es.gob.afirma.envelopers.cms.AOInvalidRecipientException
      *         Cuando el usuario no es uno de los destinatarios del sobre.
      * @throws CertificateEncodingException
      *         Cuando el certificado del destinatario no es v&aacute;lido.
      * @throws IOException
      *         Cuando el envoltorio est&aacute; corrupto o no puede leerse.
-     * @throws AOInvalidFormatException
+     * @throws es.gob.afirma.core.AOInvalidFormatException
      *         Cuando no se ha indicado un envoltorio soportado.
      * @throws AOException
      *         Cuando se produce un error al desenvolver los datos. */
     public void unwrap(final byte[] env) throws CertificateEncodingException,
-                                            AOInvalidRecipientException,
-                                            AOInvalidFormatException,
                                             IOException,
                                             AOException {
 
@@ -604,16 +599,13 @@ public final class EnveloperManager {
      *         Cuando se produce un error durante el proceso de ensobrado.
      * @throws es.gob.afirma.core.AOCancelledOperationException
      *         Cuando el usuario cancela la operaci&oacute;n.
-     * @throws AOCertificatesNotFoundException
+     * @throws es.gob.afirma.keystores.main.common.AOCertificatesNotFoundException
      *         Cuando no hay certificados en el almac&eacute;n seleccionado.
-     * @throws AOKeyStoreManagerException
+     * @throws es.gob.afirma.keystores.main.common.AOKeyStoreManagerException
      *         Cuando no se puede acceder al almac&eacute;n de certificados.
-     * @throws AOInvalidFormatException
+     * @throws es.gob.afirma.core.AOInvalidFormatException
      *         Tipo de envoltorio no soportado. */
-    public byte[] coEnvelop(final byte[] envelop) throws AOException,
-                                                 AOCertificatesNotFoundException,
-                                                 AOKeyStoreManagerException,
-                                                 AOInvalidFormatException {
+    public byte[] coEnvelop(final byte[] envelop) throws AOException {
         if (!this.ksConfigManager.isSelectedCertificate()) {
             try {
                 this.ksConfigManager.selectCertificate();

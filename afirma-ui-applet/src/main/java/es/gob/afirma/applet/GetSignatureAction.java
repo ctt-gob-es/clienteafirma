@@ -60,7 +60,7 @@ public class GetSignatureAction implements PrivilegedExceptionAction<byte[]> {
 	}
 
 	/** {@inheritDoc} */
-	public byte[] run() throws AOCancelledOperationException, AOException  {
+	public byte[] run() throws AOException  {
 		final byte[] originalSign;
         if (this.signData != null) {
             originalSign = this.signData;

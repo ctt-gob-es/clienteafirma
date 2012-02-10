@@ -56,10 +56,9 @@ public final class UIDialogs {
      * @return Listado de firmantes seleccionados.
      * @throws AOException
      *         Cuando el &aacute;rbol de firmantes contiene errores.
-     * @throws AOCancelledOperationException
+     * @throws es.gob.afirma.core.AOCancelledOperationException
      *         Cuando el usuario cancel&oacute; la operaci&oacute;n. */
-    public static final String[] showSignersSelectionPane(final AOTreeModel treeModel, final Component parentComponent) throws AOException,
-                                                                                                                                             AOCancelledOperationException {
+    public static final String[] showSignersSelectionPane(final AOTreeModel treeModel, final Component parentComponent) throws AOException {
         final TreeModel tree = JSEUtils.convertToSwingModel(treeModel);
 
         final Set<String> signersSet = new HashSet<String>();
@@ -141,9 +140,9 @@ public final class UIDialogs {
      *        Componente padre sobre el que se mostrar&aacute;n los
      *        di&aacute;logos.
      * @return Listado con los &iacute;ndices de los nodos seleccionados.
-     * @throws AOCancelledOperationException
+     * @throws es.gob.afirma.core.AOCancelledOperationException
      *         Cuando el usuario cancel&oacute; la operaci&oacute;n. */
-    public static final int[] showNodeSignSelectionPane(final AOTreeModel treeModel, final Component parentComponent) throws AOCancelledOperationException {
+    public static final int[] showNodeSignSelectionPane(final AOTreeModel treeModel, final Component parentComponent) {
         final TreeModel tree = JSEUtils.convertToSwingModel(treeModel);
 
         final DefaultTreeCellRenderer treeRenderer = new DefaultTreeCellRenderer();

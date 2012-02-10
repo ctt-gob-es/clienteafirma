@@ -51,7 +51,7 @@ public final class LoadFileAction implements PrivilegedExceptionAction<byte[]> {
     }
 
     /** {@inheritDoc} */
-    public byte[] run() throws FileNotFoundException, IOException {
+    public byte[] run() throws IOException {
 
         InputStream is = null;
         try {
