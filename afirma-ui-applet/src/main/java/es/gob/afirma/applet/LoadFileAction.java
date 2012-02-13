@@ -21,7 +21,7 @@ import es.gob.afirma.core.misc.AOUtil;
 
 /** Acci&oacute;n privilegiada que carga el contenido de un fichero y devuelve
  * almacena como resultado su valor en un objeto {@code byte[]}. */
-public final class LoadFileAction implements PrivilegedExceptionAction<byte[]> {
+final class LoadFileAction implements PrivilegedExceptionAction<byte[]> {
 
     /** Ruta del fichero que se desea cargar. */
     private URI uri = null;
@@ -31,7 +31,7 @@ public final class LoadFileAction implements PrivilegedExceptionAction<byte[]> {
      * @param strUri
      *        Ruta del fichero.
      */
-    public LoadFileAction(final String strUri) {
+    LoadFileAction(final String strUri) {
 
         try {
             this.uri = AOUtil.createURI(strUri);
@@ -46,7 +46,7 @@ public final class LoadFileAction implements PrivilegedExceptionAction<byte[]> {
      * @param fileUri
      *        Ruta del fichero.
      */
-    public LoadFileAction(final URI fileUri) {
+    LoadFileAction(final URI fileUri) {
         this.uri = fileUri;
     }
 

@@ -17,7 +17,7 @@ import java.security.cert.X509Certificate;
  * <br>
  * Contains AFirma cryptographic functionalities access points, for their use as
  * Applet Java. */
-public interface EntryPointsCrypto {
+interface EntryPointsCrypto {
 
     /** Realiza el proceso de firma digital.<br>
      * <br>
@@ -111,13 +111,6 @@ public interface EntryPointsCrypto {
      * </dl>
      * </dd>
      * </dl>
-     * <br>
-     * <br>
-     * @see #setCertFilterRFC2254(String, String, boolean)
-     * @see #setData(String)
-     * @see #setFileuri(String)
-     * @see #setSignatureAlgorithm(String)
-     * @see #setSignatureFormat(String)
      * @return <code>true</code> si se ha ejecutado correctamente, <code>false</code> en caso contrario <br>
      *         <code>true</code> if execution is correct, else <code>false</code>. */
     boolean sign();
@@ -131,9 +124,7 @@ public interface EntryPointsCrypto {
      * @return <code>true</code> si &eacute;xito, <code>false</code> si
      *         ocurri&oacute; alg&uacute;n fallo <br>
      *         <code>true</code> if successful, <code>false</code> in case of
-     *         failure.
-     * @see #getSignatureBase64Encoded()
-     * @see #getSignatureText() */
+     *         failure. */
     boolean signData(String b64data);
 
     /** A&ntilde;ade un atributo firmado al formato de firma seleccionado. Este
@@ -278,27 +269,27 @@ public interface EntryPointsCrypto {
      * <ul>
      * <li><b>Datos a firmar (excluyentes): </b></li>
      * <ul>
-     * <li>{@link #setData(String)}</li>
-     * <li>{@link #setFileuri(String)}</li>
+     * <li><code>setData(String)</code></li>
+     * <li><code>setFileuri(String)</code></li>
      * </ul>
      * <li><b>Firma original que se desea cofirmar (excluyentes): </b></li>
      * <ul>
-     * <li>{@link #setElectronicSignature(String)}</li>
-     * <li>{@link #setElectronicSignatureFile(String)}</li>
+     * <li><code>setElectronicSignature(String)</code></li>
+     * <li><code>setElectronicSignatureFile(String)</code></li>
      * </ul>
      * <li><b>Certificado de firma (excluyentes): </b></li> <li><b>Configuraci&oacute;n de firma: </b></li>
      * <ul>
-     * <li>{@link #setSignatureAlgorithm(String)}</li>
-     * <li>{@link #setSignatureFormat(String)}</li>
-     * <li>{@link #setSignatureMode(String)}</li>
+     * <li><code>setSignatureAlgorithm(String)</code></li>
+     * <li><code>setSignatureFormat(String)</code></li>
+     * <li><code>setSignatureMode(String)</code></li>
      * </ul>
      * </ul> Los par&aacute;mnetros establecidos como resultado de esta
      * operaci&oacute;n son:
      * <ul>
-     * <li>Firma codificada en base 64 ({@link #getSignatureBase64Encoded()})</li>
-     * <li>Firma en modo texto ({@link #getSignatureText()})</li>
-     * <li>Ruta al fichero firmado si no se introdujeron los datos directamente ({@link #getFileUsedPath()})</li>
-     * <li>Certificado de firma en base 64 ( {@link #getSignCertificateBase64Encoded()})</li>
+     * <li>Firma codificada en base 64 (<code>getSignatureBase64Encoded()</code>)</li>
+     * <li>Firma en modo texto (<code>getSignatureText()</code>)</li>
+     * <li>Ruta al fichero firmado si no se introdujeron los datos directamente (<code>getFileUsedPath()</code>)</li>
+     * <li>Certificado de firma en base 64 (<code>getSignCertificateBase64Encoded()</code>)</li>
      * </ul>
      * En caso de error, la descripci&oacute;n del mismo puede recuperarse
      * mediante el m&eacute;todo getErrorMessage() del cliente. <br>
@@ -308,19 +299,19 @@ public interface EntryPointsCrypto {
      * <ul>
      * <li><b>Data to be signed (exclusive): </b></li>
      * <ul>
-     * <li>{@link #setData(String)}</li>
-     * <li>{@link #setFileuri(String)}</li>
+     * <li><code>setData(String)</code></li>
+     * <li><code>setFileuri(String)</code></li>
      * </ul>
      * <li><b>Original signature to be cosigned (exclusive): </b></li>
      * <ul>
-     * <li>{@link #setElectronicSignature(String)}</li>
-     * <li>{@link #setElectronicSignatureFile(String)}</li>
+     * <li><code>setElectronicSignature(String)</code></li>
+     * <li><code>setElectronicSignatureFile(String)</code></li>
      * </ul>
      * <li><b>Signature certificate (exclusive): </b></li> <li><b>Signature configuration: </b></li>
      * <ul>
-     * <li>{@link #setSignatureAlgorithm(String)}</li>
-     * <li>{@link #setSignatureFormat(String)}</li>
-     * <li>{@link #setSignatureMode(String)}</li>
+     * <li><code>setSignatureAlgorithm(String)</code></li>
+     * <li><code>setSignatureFormat(String)</code></li>
+     * <li><code>setSignatureMode(String)</code></li>
      * </ul>
      * </ul> Parameters established as result of this operation are:
      * <ul>

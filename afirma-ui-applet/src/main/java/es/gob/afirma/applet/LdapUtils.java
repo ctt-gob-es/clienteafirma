@@ -23,7 +23,7 @@ import java.security.cert.X509Certificate;
 /**
  * Funciones para el manejo de certificados en servidores LDAP.
  */
-public final class LdapUtils {
+final class LdapUtils {
 
 	private LdapUtils() {
 		// No permitimos la instanciacion
@@ -40,7 +40,7 @@ public final class LdapUtils {
      * @throws InvalidAlgorithmParameterException Si falla la inicalizaci&oacute;n del <code>CertStore</code>
      * @throws CertStoreException Si el sistema no soporta los <code>CertStore</code> de tipo LDAP
      */
-    public static X509Certificate getCertificate(final String server, final int port, final String principal) throws IOException, CertStoreException, InvalidAlgorithmParameterException, NoSuchAlgorithmException {
+    static X509Certificate getCertificate(final String server, final int port, final String principal) throws IOException, CertStoreException, InvalidAlgorithmParameterException, NoSuchAlgorithmException {
         if (server == null || server.length() == 0) {
 			throw new IllegalArgumentException("El servidor no puede ser nulo ni vacio"); //$NON-NLS-1$
 		}

@@ -49,7 +49,7 @@ import es.gob.afirma.util.AOCertificateRevokedException;
 /** Clase para la firma electr&oacute;nica de cadenas de texto simulando el
  * funcionamiento del m&eacute;todo <code>[window.]crypto.signText(stringToSign, caOption, [caNameString1, [caNameString2, . . . ]])</code> de
  * JavaScript en navegadores Mozilla / Firefox. */
-public final class SignText {
+final class SignText {
 
     private static final String USER_CANCEL = "error:userCancel"; //$NON-NLS-1$
     private static final String INTERNAL_ERROR = "error:internalError"; //$NON-NLS-1$
@@ -74,7 +74,7 @@ public final class SignText {
      *         <li>
 	 *         <code>error:internalError</code> si ocurre cualquier error durante el proceso.</li>
      *         </ul> */
-    public String getResult() {
+    String getResult() {
         return this.result;
     }
 
@@ -82,7 +82,7 @@ public final class SignText {
      * @param useit
      *        <code>true</code> para usar CAdES, <code>false</code> (por
      *        defecto) para usar CMS */
-    public void setUseCAdES(final boolean useit) {
+    void setUseCAdES(final boolean useit) {
         this.useCAdES = useit;
     }
 
@@ -112,7 +112,7 @@ public final class SignText {
      *        sobre el formato DN consulte <a
      *        href="http://www.faqs.org/rfcs/rfc1485.html">String
      *        Representation of Distinguished Names</a>. */
-    public void signText(final String stringToSign, final String caOption, final String... caNameN) {
+    void signText(final String stringToSign, final String caOption, final String... caNameN) {
 
         if (stringToSign == null || "".equals(stringToSign)) { //$NON-NLS-1$
             Logger.getLogger("es.gob.afirma").warning("No se ha proporcionado un texto para firmar"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -253,7 +253,7 @@ public final class SignText {
      * @param pc
      *        PassWord callback si el KeyStore necesita contrase&ntilde;a.
      *        Si de especifica <code>null</code> se utilizara un <code>NullPasswordCallback</code> */
-    public SignText(final String[] aliases, final AOKeyStoreManager ksm, final Component parentComponent, final PasswordCallback pc) {
+    SignText(final String[] aliases, final AOKeyStoreManager ksm, final Component parentComponent, final PasswordCallback pc) {
         this.alias = aliases == null ? null : aliases.clone();
         this.kss = ksm;
         this.parent = parentComponent;

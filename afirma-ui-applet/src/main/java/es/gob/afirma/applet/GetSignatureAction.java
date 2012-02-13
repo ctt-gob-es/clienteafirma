@@ -19,7 +19,7 @@ import es.gob.afirma.core.ui.AOUIFactory;
  * la firma que desee. Si no se solicitase mostrar este di&aacute;logo, se devolver&iacute;a
  * {@code null}.
  */
-public class GetSignatureAction implements PrivilegedExceptionAction<byte[]> {
+class GetSignatureAction implements PrivilegedExceptionAction<byte[]> {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -34,7 +34,7 @@ public class GetSignatureAction implements PrivilegedExceptionAction<byte[]> {
 	 * @param signData Datos de firma establecidos.
 	 * @param electronicSignatureFile Fichero de firma establecido.
 	 */
-	public GetSignatureAction(final byte[] signData, final URI electronicSignatureFile) {
+	GetSignatureAction(final byte[] signData, final URI electronicSignatureFile) {
 		this.signData = signData == null ? null : signData.clone();
 		this.electronicSignatureFile = electronicSignatureFile;
 		this.selectSignature = false;
@@ -53,7 +53,7 @@ public class GetSignatureAction implements PrivilegedExceptionAction<byte[]> {
 	 * @param parent Componente sobre el que se muestra el di&aacute;logo de selecci&oacute;n.
 	 * 				(s&oacute;lo cuando se desea cargar desde un fichero)
 	 */
-	public void setSelectFile(final boolean select, final String format, final Component parent) {
+	void setSelectFile(final boolean select, final String format, final Component parent) {
 		this.selectSignature = select;
 		this.signFormat = format;
 		this.parent = parent;
@@ -114,7 +114,7 @@ public class GetSignatureAction implements PrivilegedExceptionAction<byte[]> {
 	 * @return Ruta del fichero seleccionado.
 	 * @see #setSelectFile(boolean, String, Component)
 	 */
-	public URI getSelectedSignatureFile() {
+	URI getSelectedSignatureFile() {
 		return this.electronicSignatureFile;
 	}
 

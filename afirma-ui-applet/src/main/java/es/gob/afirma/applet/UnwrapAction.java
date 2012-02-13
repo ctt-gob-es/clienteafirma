@@ -22,7 +22,7 @@ import es.gob.afirma.envelopers.cms.AOInvalidRecipientException;
 /** Acci&oacute;n privilegiada para el desensobrado de datos. La ejecuci&oacute;n
  * de la acci&oacute;n devuelve {@code true} o {@code false} y el resultado
  * almacenado es un array de bytes. */
-public final class UnwrapAction implements PrivilegedExceptionAction<byte[]> {
+final class UnwrapAction implements PrivilegedExceptionAction<byte[]> {
 
     /** Manejador de ensobrado. */
     private final EnveloperManager enveloperManager;
@@ -38,7 +38,7 @@ public final class UnwrapAction implements PrivilegedExceptionAction<byte[]> {
      * @param envelop
      *        Sobre que se desea desensobrar, {@code null} si se desean
      *        tomar los del manejador. */
-    public UnwrapAction(final EnveloperManager enveloperManager, final byte[] envelop) {
+    UnwrapAction(final EnveloperManager enveloperManager, final byte[] envelop) {
 
         if (enveloperManager == null) {
             throw new IllegalArgumentException("El EnveloperManager no puede ser nulo"); //$NON-NLS-1$

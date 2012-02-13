@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 
 /** Funciones de utilidad orientadas al uso de ficheros, teniendo en cuenta que
  * estas deben tratarse como funciones privilegiadas. */
-public final class FileUtils {
+final class FileUtils {
 
 	private FileUtils() {
 		// No permitimos la instanciacion
@@ -28,7 +28,7 @@ public final class FileUtils {
      * @param path
      *        Ruta del fichero.
      * @return Contenido del fichero. */
-    public static byte[] loadFile(final String path) {
+    static byte[] loadFile(final String path) {
     	try {
     		return AccessController.doPrivileged(new LoadFileAction(path));
     	} catch (final Exception e) {
@@ -42,7 +42,7 @@ public final class FileUtils {
      * @param uri
      *        Ruta del fichero.
      * @return Contenido del fichero. */
-    public static byte[] loadFile(final URI uri) {
+    static byte[] loadFile(final URI uri) {
     	try {
     		return AccessController.doPrivileged(new LoadFileAction(uri));
     	} catch (final Exception e) {

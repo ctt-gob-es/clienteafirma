@@ -23,7 +23,7 @@ import es.gob.afirma.core.signers.AOSignConstants;
 /** Acci&oacute;n privilegiada para el ensobrado de datos. La ejecuci&oacute;n de
  * la acci&oacute;n devuelve {@code true} o {@code false} y el resultado
  * almacenado es un array de bytes. */
-public final class WrapAction implements PrivilegedExceptionAction<byte[]> {
+final class WrapAction implements PrivilegedExceptionAction<byte[]> {
 
     /** Manejador de ensobrado. */
     private final EnveloperManager enveloperManager;
@@ -39,7 +39,7 @@ public final class WrapAction implements PrivilegedExceptionAction<byte[]> {
      * @param data
      *        Datos que se desean ensobrar, {@code null} si se desean tomar
      *        los del manejador. */
-    public WrapAction(final EnveloperManager enveloperManager, final byte[] data) {
+    WrapAction(final EnveloperManager enveloperManager, final byte[] data) {
 
         if (enveloperManager == null) {
             throw new IllegalArgumentException("El EnveloperManager no puede ser nulo"); //$NON-NLS-1$

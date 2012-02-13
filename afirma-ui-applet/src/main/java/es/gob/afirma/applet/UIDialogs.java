@@ -41,7 +41,7 @@ import es.gob.afirma.ui.core.jse.JSEUtils;
  * Funciones para el uso de di&aacute;logos modales.
  * @author Carlos Gamuci
  */
-public final class UIDialogs {
+final class UIDialogs {
 
 	private UIDialogs() {
 		// No permitimos la instanciacion
@@ -58,7 +58,7 @@ public final class UIDialogs {
      *         Cuando el &aacute;rbol de firmantes contiene errores.
      * @throws es.gob.afirma.core.AOCancelledOperationException
      *         Cuando el usuario cancel&oacute; la operaci&oacute;n. */
-    public static final String[] showSignersSelectionPane(final AOTreeModel treeModel, final Component parentComponent) throws AOException {
+    static String[] showSignersSelectionPane(final AOTreeModel treeModel, final Component parentComponent) throws AOException {
         final TreeModel tree = JSEUtils.convertToSwingModel(treeModel);
 
         final Set<String> signersSet = new HashSet<String>();
@@ -126,7 +126,7 @@ public final class UIDialogs {
 	 * @param node Nodo de firma.
 	 * @param signersSet Conjunto con los alias de los certificados de firma.
 	 */
-	private static final void getSigners(final DefaultMutableTreeNode node, final Set<String> signersSet) {
+	private static void getSigners(final DefaultMutableTreeNode node, final Set<String> signersSet) {
 		signersSet.add((String)node.getUserObject());
 		for(int i=0; i<node.getChildCount(); i++) {
 			getSigners((DefaultMutableTreeNode)node.getChildAt(i), signersSet);
@@ -142,7 +142,7 @@ public final class UIDialogs {
      * @return Listado con los &iacute;ndices de los nodos seleccionados.
      * @throws es.gob.afirma.core.AOCancelledOperationException
      *         Cuando el usuario cancel&oacute; la operaci&oacute;n. */
-    public static final int[] showNodeSignSelectionPane(final AOTreeModel treeModel, final Component parentComponent) {
+    static int[] showNodeSignSelectionPane(final AOTreeModel treeModel, final Component parentComponent) {
         final TreeModel tree = JSEUtils.convertToSwingModel(treeModel);
 
         final DefaultTreeCellRenderer treeRenderer = new DefaultTreeCellRenderer();
@@ -206,7 +206,7 @@ public final class UIDialogs {
      * @param title
      *        T&iacute;tulo del di&aacute;logo de selecci&oacute;n
      * @return Ruta absoluta del directorio seleccionado. */
-    public final static String selectDirectory(final Component parentComponent, final String title) {
+    static String selectDirectory(final Component parentComponent, final String title) {
         final JFileChooser jfc = new JFileChooser();
         jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         jfc.setDialogTitle(title);

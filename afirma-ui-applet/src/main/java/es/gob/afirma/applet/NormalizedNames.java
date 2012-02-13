@@ -16,7 +16,7 @@ import es.gob.afirma.keystores.main.common.AOKeyStore;
 /** Normaliza las cadenas de texto introducidas por los usuarios/integradores
  * para la configuraci&oacute;n de los distintos almacenes de certificados,
  * formatos y algoritmos. */
-public final class NormalizedNames {
+final class NormalizedNames {
 
 	private NormalizedNames() {
 		// No permitimos la instanciacion
@@ -27,7 +27,7 @@ public final class NormalizedNames {
      * @param name
      *        Nombre de modo.
      * @return Nombre normalizado del modo. */
-    public static String normalizeModeName(final String name) {
+    static String normalizeModeName(final String name) {
 
         // Dejamos que el objeto que llame al metodo se encargue del error
         if (name == null) {
@@ -49,7 +49,7 @@ public final class NormalizedNames {
      * @param name
      *        Nombre de algoritmo.
      * @return Nombre normalizado del algoritmo. */
-    public static String normalizeAlgorithmName(final String name) {
+    static String normalizeAlgorithmName(final String name) {
 
         // Dejamos que el objeto que llame al metodo se encargue del error
         if (name == null) {
@@ -70,7 +70,7 @@ public final class NormalizedNames {
      * @param name
      *        Nombre de formato.
      * @return Nombre normalizado del formato. */
-    public static final String normalizeFormatName(final String name) {
+    static final String normalizeFormatName(final String name) {
 
         // Dejamos que el objeto que llame al metodo se encargue del error
         if (name == null) {
@@ -141,7 +141,7 @@ public final class NormalizedNames {
      * @param type
      *        Tipo de keystore.
      * @return Nombre normalizado del keystore. */
-    public static String normalizeKeyStoreName(final String type) {
+    static String normalizeKeyStoreName(final String type) {
 
         final String typeLw = type.toLowerCase();
         if (typeLw.equals("windows") || typeLw.equals("internet explorer") //$NON-NLS-1$ //$NON-NLS-2$

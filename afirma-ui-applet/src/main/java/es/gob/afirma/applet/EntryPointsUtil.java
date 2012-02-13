@@ -15,7 +15,7 @@ package es.gob.afirma.applet;
  * <br>
  * Contains AFirma cryptographic functionalities access points, for their use as
  * Applet Java. */
-public interface EntryPointsUtil {
+interface EntryPointsUtil {
 
     /** Devuelve el contenido de un fichero (especificado previamente con
      * setFileURI) en base 64. Si se produce alg&uacute;n error durante la
@@ -27,8 +27,7 @@ public interface EntryPointsUtil {
      *        Mostrar o no ventana de progreso de la lectura <br>
      *        Show / Hide Read Progress window
      * @return El contenido del fichero codificado en base 64. <br>
-     *         File contents, codified in base 64.
-     * @see #getFileBase64Encoded(String, boolean) */
+     *         File contents, codified in base 64. */
     String getFileBase64Encoded(boolean showProgress);
 
     /** Devuelve el contenido de un fichero en base 64. Si se produce
@@ -44,8 +43,7 @@ public interface EntryPointsUtil {
      *        Mostrar o no ventana de progreso de la lectura <br>
      *        Show / Hide Read Progress window
      * @return El contenido del fichero codificado en base 64 <br>
-     *         File contents, codified in base 64.
-     * @see #getFileBase64Encoded(boolean) */
+     *         File contents, codified in base 64. */
     String getFileBase64Encoded(String fileUri, boolean showProgress);
 
     /** Devuelve el hash de un fichero (especificado previamente con setFileURI)
@@ -67,7 +65,7 @@ public interface EntryPointsUtil {
      *        File's URL to be read.
      * @return El contenido del fichero como java.lang.String <br>
      *         File contents as java.lang.String
-     * @deprecated Utilizar {@link #getFileBase64Encoded(String, boolean)}.
+     * @deprecated Utilizar <code>getFileBase64Encoded(String, boolean)</code>.
      */
     @Deprecated
 	String getTextFileContent(String url);

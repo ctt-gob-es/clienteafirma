@@ -40,7 +40,7 @@ import es.gob.afirma.envelopers.cms.AOCMSEnveloper;
  * Esta clase almacena toda la informaci&oacute;n relevante para las operaciones
  * de ensobrado y desensobrado y proporciona las funcionalidades b&aacute;sicas
  * para realizar estas operaciones. */
-public final class EnveloperManager {
+final class EnveloperManager {
 
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -80,7 +80,7 @@ public final class EnveloperManager {
     private AOCMSEnveloper enveloper;
 
     /** Construye el objeto. */
-    public EnveloperManager() {
+    EnveloperManager() {
         this.enveloper = new AOCMSEnveloper();
         this.cipherManager = new CipherManager();
     }
@@ -89,14 +89,14 @@ public final class EnveloperManager {
      * los di&aacute;logos modales.
      * @param parent
      *        Componente sobre el que mostrar los di&aacute;logos. */
-    public EnveloperManager(final Component parent) {
+    EnveloperManager(final Component parent) {
         this();
         this.parent = parent;
     }
 
     /** Inicializa la configuraci&oacute;n del manejador a la
      * configuraci&oacute;n por defecto. */
-    public void initialize() {
+    void initialize() {
         this.signAlgorithm = AOSignConstants.DEFAULT_SIGN_ALGO;
         this.cipherManager.initialize();
         this.contentType = null;
@@ -111,7 +111,7 @@ public final class EnveloperManager {
     /** Recupera la URI del fichero configurado. Si no hay ninguno, se devuelve {@code null}.
      * @return URI del fichero.
      * @see #setFileUri(URI, boolean) */
-    public URI getFileUri() {
+    URI getFileUri() {
         return this.fileUri;
     }
 
@@ -119,7 +119,7 @@ public final class EnveloperManager {
      * es base 64.
      * @return Devuelve {@code true} si el contenido del fichero es Base 64.
      * @see #setFileUri(URI, boolean) */
-    public boolean isFileBase64() {
+    boolean isFileBase64() {
         return this.fileBase64;
     }
 
@@ -128,21 +128,21 @@ public final class EnveloperManager {
      *        Ruta del fichero.
      * @param fileBase64
      *        Indica si el contenido del fichero es base 64. */
-    public void setFileUri(final URI fileUri, final boolean fileBase64) {
+    void setFileUri(final URI fileUri, final boolean fileBase64) {
         this.fileUri = fileUri;
         this.fileBase64 = fileBase64;
     }
 
     /** Recupera el tipo de envoltorio de datos configurado.
      * @return Tipo de envoltorio. */
-    public String getCmsContentType() {
+    String getCmsContentType() {
         return this.contentType;
     }
 
     /** Establece el manejador de cifrado.
      * @param manager
      *        Manejador de cifrado. */
-    public void setCipherManager(final CipherManager manager) {
+    void setCipherManager(final CipherManager manager) {
         this.cipherManager = manager;
     }
 
@@ -150,14 +150,14 @@ public final class EnveloperManager {
      * est&aacute;n declarados en {@link AOSignConstants}.
      * @param cmsContentType
      *        Tipo de envoltorio. */
-    public void setCmsContentType(final String cmsContentType) {
+    void setCmsContentType(final String cmsContentType) {
         this.contentType = cmsContentType;
     }
 
     /** Recupera los certificados de los destinatarios de un sobre
      * electr&oacute;nico.
      * @return Listado de certificados. */
-    public X509Certificate[] getRecipients() {
+    X509Certificate[] getRecipients() {
         return this.recipients.values().toArray(new X509Certificate[0]);
     }
 
@@ -165,27 +165,27 @@ public final class EnveloperManager {
      * uno, se utilizar&aacute; el por defecto.
      * @param signAlgorithm
      *        Algoritmo de firma. */
-    public void setSignAlgorithm(final String signAlgorithm) {
+    void setSignAlgorithm(final String signAlgorithm) {
         this.signAlgorithm = (signAlgorithm == null ? AOSignConstants.DEFAULT_SIGN_ALGO : signAlgorithm);
     }
 
     /** Recupera el algoritmo de firma configurado.
      * @return Algoritmo de firma. */
-    public String getSignAlgorithm() {
+    String getSignAlgorithm() {
         return this.signAlgorithm;
     }
 
     /** Establece el manejador de almacenes a utilizar.
      * @param manager
      *        Manejador de almacenes. */
-    public void setKsConfigManager(final KeyStoreConfigurationManager manager) {
+    void setKsConfigManager(final KeyStoreConfigurationManager manager) {
         this.ksConfigManager = manager;
     }
 
     /** Agrega un nuevo destinatario al sobre electr&oacute;nico.
      * @param cert
      *        Certificado del nuevo destinatario. */
-    public void addRecipient(final X509Certificate cert) {
+    void addRecipient(final X509Certificate cert) {
         if (cert == null) {
             return;
         }
@@ -205,14 +205,14 @@ public final class EnveloperManager {
      * @throws CertificateException
      * 		   Cuando no se puede descodificar el certificado indicado.
      */
-    public void addRecipient(final byte[] certEncoded) throws CertificateException {
+    void addRecipient(final byte[] certEncoded) throws CertificateException {
         addRecipient(encodeCertificate(certEncoded));
     }
 
     /** Elimina un destinatario del sobre electr&oacute;nico.
      * @param cert Certificado que se desea eliminar.
      */
-    public void removeRecipient(final X509Certificate cert) {
+    void removeRecipient(final X509Certificate cert) {
         if (cert == null || this.recipients == null) {
             return;
         }
@@ -228,13 +228,13 @@ public final class EnveloperManager {
      *        Certificado codificado del nuevo destinatario.
      * @throws CertificateException
      * 		   Cuando no se puede descodificar el certificado indicado. */
-    public void removeRecipient(final byte[] certEncoded) throws CertificateException {
+    void removeRecipient(final byte[] certEncoded) throws CertificateException {
         removeRecipient(encodeCertificate(certEncoded));
     }
 
     /** Elimina todos los destinatarios configurados para el sobre
      * electr&oacute;nico. */
-    public void removeAllRecipients() {
+    void removeAllRecipients() {
         this.recipients = null;
     }
 
@@ -269,7 +269,7 @@ public final class EnveloperManager {
      *         configur&oacute; uno err&oacute;neo.
      * @throws es.gob.afirma.core.AOCancelledOperationException
      *         Cuando el usuario cancela la operaci&oacute;n. */
-    public void envelop() throws IOException, NoSuchAlgorithmException, AOException, CertificateEncodingException {
+    void envelop() throws IOException, NoSuchAlgorithmException, AOException, CertificateEncodingException {
         this.envelop(getConfigureContent());
     }
 
@@ -293,7 +293,7 @@ public final class EnveloperManager {
      *         err&oacute;neo.
      * @throws es.gob.afirma.core.AOCancelledOperationException
      *         Cuando el usuario cancela la operaci&oacute;n. */
-    public void envelop(final byte[] content) throws CertificateEncodingException,
+    void envelop(final byte[] content) throws CertificateEncodingException,
                                              NoSuchAlgorithmException,
                                              IOException,
                                              AOException {
@@ -332,7 +332,7 @@ public final class EnveloperManager {
      *         IOException
      * @throws KeyException Cuando se produce un error al generar la clave de encriptado.
      */
-    public void encrypt() throws IOException, NoSuchAlgorithmException, AOException, KeyException {
+    void encrypt() throws IOException, NoSuchAlgorithmException, AOException, KeyException {
         this.encrypt(getConfigureContent());
     }
 
@@ -345,7 +345,7 @@ public final class EnveloperManager {
      *         Cuando el algoritmo de cifrado no est&aacute; soportado.
      * @throws KeyException Cuando se produce un error al generar la clave de encriptado.
      */
-    public void encrypt(final byte[] content) throws AOException, NoSuchAlgorithmException, KeyException {
+    void encrypt(final byte[] content) throws AOException, NoSuchAlgorithmException, KeyException {
         this.envelopedData = createCMSEncryptedData(content);
     }
 
@@ -360,7 +360,7 @@ public final class EnveloperManager {
      *         Cuando no se ha indicado un envoltorio soportado.
      * @throws AOException
      *         Cuando se produce un error durante al desenvolver los datos. */
-    public void unwrap() throws CertificateEncodingException, IOException, AOException {
+    void unwrap() throws CertificateEncodingException, IOException, AOException {
         this.unwrap(getConfigureEnvelop());
     }
 
@@ -377,7 +377,7 @@ public final class EnveloperManager {
      *         Cuando no se ha indicado un envoltorio soportado.
      * @throws AOException
      *         Cuando se produce un error al desenvolver los datos. */
-    public void unwrap(final byte[] env) throws CertificateEncodingException,
+    void unwrap(final byte[] env) throws CertificateEncodingException,
                                             IOException,
                                             AOException {
 
@@ -605,7 +605,7 @@ public final class EnveloperManager {
      *         Cuando no se puede acceder al almac&eacute;n de certificados.
      * @throws es.gob.afirma.core.AOInvalidFormatException
      *         Tipo de envoltorio no soportado. */
-    public byte[] coEnvelop(final byte[] envelop) throws AOException {
+    byte[] coEnvelop(final byte[] envelop) throws AOException {
         if (!this.ksConfigManager.isSelectedCertificate()) {
             try {
                 this.ksConfigManager.selectCertificate();
@@ -621,27 +621,27 @@ public final class EnveloperManager {
     /** Establece el sobre electr&oacute;nico con el que trabajamos.
      * @param data
      *        Sobre electr&oacute;nico. */
-    public void setEnvelopedData(final byte[] data) {
+    void setEnvelopedData(final byte[] data) {
         this.envelopedData = data == null ? null : data.clone();
     }
 
     /** Recupera el envoltorio CMS.
      * @return Envoltorio CMS. */
-    public byte[] getEnvelopedData() {
+    byte[] getEnvelopedData() {
         return this.envelopedData == null ? null : this.envelopedData.clone();
     }
 
     /** Establece los datos que desean ensobrarse.
      * @param data
      *        Datos del sobre. */
-    public void setContentData(final byte[] data) {
+    void setContentData(final byte[] data) {
         this.contentData = data == null ? null : data.clone();
     }
 
     /** Recupera los datos extra&iacute;dos de un envoltorio o preparados para
      * insertarse en el mismo.
      * @return Datos del sobre. */
-    public byte[] getContentData() {
+    byte[] getContentData() {
         return this.contentData == null ? null : this.contentData.clone();
     }
 
@@ -650,7 +650,7 @@ public final class EnveloperManager {
      *        Identificador del objeto a introducir.
      * @param value
      *        Valor asignado */
-    public void addSignedAttribute(final String oid, final byte[] value) {
+    void addSignedAttribute(final String oid, final byte[] value) {
         this.enveloper.addSignedAttribute(oid, value);
     }
 
@@ -659,7 +659,7 @@ public final class EnveloperManager {
      *        Identificador del atributo a introducir.
      * @param value
      *        Valor asignado */
-    public void addUnsignedAttribute(final String oid, final byte[] value) {
+    void addUnsignedAttribute(final String oid, final byte[] value) {
         this.enveloper.addUnsignedAttribute(oid, value);
     }
 
@@ -667,7 +667,7 @@ public final class EnveloperManager {
      * @param cmsEnvelop
      *        Envoltorio CMS.
      * @return Informaci&oacute;n en texto extra&iacute;da del envoltorio. */
-    public static String getCMSInfo(final byte[] cmsEnvelop) {
+    static String getCMSInfo(final byte[] cmsEnvelop) {
         String cmsInformation;
         try {
 			cmsInformation = CMSInformation.getInformation(cmsEnvelop);

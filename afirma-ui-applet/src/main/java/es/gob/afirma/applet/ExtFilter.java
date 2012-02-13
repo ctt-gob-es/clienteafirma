@@ -31,7 +31,7 @@ final class ExtFilter extends FileFilter implements java.io.FileFilter {
      * @param desc
      *        Descripci&oacute;n del tipo de fichero correspondiente a
      *        las extensiones */
-    public ExtFilter(final String[] exts, final String desc) {
+    ExtFilter(final String[] exts, final String desc) {
         if (exts == null || exts.length < 1) {
             throw new IllegalArgumentException("No se puede crear un filtro vacio"); //$NON-NLS-1$
         }

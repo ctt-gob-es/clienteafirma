@@ -21,7 +21,7 @@ import es.gob.afirma.keystores.main.common.AOKeystoreAlternativeException;
  * tanto el alias del certificado como la configuraci&oacute;n con el repositorio
  * activo.
  */
-public class GetCertificateAction implements PrivilegedExceptionAction<X509Certificate> {
+class GetCertificateAction implements PrivilegedExceptionAction<X509Certificate> {
 
 	private final String alias;
 
@@ -32,7 +32,7 @@ public class GetCertificateAction implements PrivilegedExceptionAction<X509Certi
 	 * @param alias Alias del certificado.
 	 * @param ksConfigManager Configuraci&oacute;n con el repositorio de certificados activo.
 	 */
-	public GetCertificateAction(final String alias, final KeyStoreConfigurationManager ksConfigManager) {
+	GetCertificateAction(final String alias, final KeyStoreConfigurationManager ksConfigManager) {
 		this.alias = alias;
 		this.ksConfigManager = ksConfigManager;
 	}
