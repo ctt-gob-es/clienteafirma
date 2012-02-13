@@ -53,10 +53,10 @@ final class Ensobrado extends JPanel {
     private static final long serialVersionUID = 1L;
 
     // Checkbox con texto "Anadir nuevos remitentes al sobre
-    JCheckBox checkAnadir = new JCheckBox();
+    private final JCheckBox checkAnadir = new JCheckBox();
 
     // Combo de tipos de sobre digital
-    JComboBox comboTipos = new JComboBox();
+    private final JComboBox comboTipos = new JComboBox();
     Ensobrado() {
         initComponents();
     }

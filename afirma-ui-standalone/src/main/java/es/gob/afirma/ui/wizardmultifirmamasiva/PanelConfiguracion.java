@@ -37,8 +37,10 @@ import es.gob.afirma.ui.wizardutils.JDialogWizard;
 /** Panel de configuracion para el wizard de multifirma masiva.
  * @author inteco */
 class PanelConfiguracion extends JAccessibilityDialogWizard {
+
     /** Botonera con funciones para la pagina panel de multifirma - cofirma */
     private class Botonera extends BotoneraInferior {
+
         /** UID. */
         private static final long serialVersionUID = 1L;
 
@@ -67,7 +69,7 @@ class PanelConfiguracion extends JAccessibilityDialogWizard {
     private static final long serialVersionUID = 1L;
 
     /** Checkbox con texto "Respetar el formato...". */
-    JCheckBox checkRespectar = new JCheckBox();
+    private final JCheckBox checkRespectar = new JCheckBox();
 
     /** Etiqueta con el texto "Para realizar el proceso...". */
     private final InfoLabel labelTextoRealizar = new InfoLabel(Messages.getString("Wizard.multifirma.ventana2.explicacion2"), false); //$NON-NLS-1$
@@ -76,17 +78,20 @@ class PanelConfiguracion extends JAccessibilityDialogWizard {
     private final JPanel panelRadios = new JPanel();
 
     /** Radio buton "Contrafirmar unicamente". */
-    JRadioButton radioUltimos = new JRadioButton();
+    private final JRadioButton radioUltimos = new JRadioButton();
+
     /** Constructor. */
     PanelConfiguracion() {
         initComponents();
     }
-    /** Relacion minima para el redimensionado de componentes. */
+
+    /** Relaci&oacute;n m&iacute;nima para el redimensionado de componentes. */
     @Override
     public int getMinimumRelation() {
         return 9;
     }
-    /** Inicializacion de componentes */
+
+    /** Inicializaci&oacute;n de componentes */
     private void initComponents() {
         // Titulo de la ventana
         setTitulo(Messages.getString("Wizard.multifirma.titulo.ventana")); //$NON-NLS-1$

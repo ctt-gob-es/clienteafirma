@@ -71,6 +71,7 @@ import es.gob.afirma.ui.wizardutils.JDialogWizard;
 /** Clase que contiene los elementos necesarios para crear un grupo de Remitentes
  * a partir de una seleccion de certificados de remitentes. */
 final class PanelRemitentes extends JAccessibilityDialogWizard {
+
     /** Botonera con funciones para la pagina panel de multifirma - cofirma */
     private class Botonera extends BotoneraInferior {
         /** UID. */
@@ -91,8 +92,9 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
             }
         }
     }
+
     /** Log. */
-    static Logger logger = Logger.getLogger(PanelRemitentes.class.getName());
+    private static Logger logger = Logger.getLogger(PanelRemitentes.class.getName());
 
     /** UID. */
     private static final long serialVersionUID = 1L;
@@ -107,10 +109,10 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
     private AOKeyStoreManager keyStoreManager;
 
     /** Lista con los remitentes */
-    final List<CertificateDestiny> listaCertificadosRe = new ArrayList<CertificateDestiny>();
+    private final List<CertificateDestiny> listaCertificadosRe = new ArrayList<CertificateDestiny>();
 
     /** Lista de remitentes. */
-    final JList listaRemitentes = new JList();
+    private final JList listaRemitentes = new JList();
 
     /** Ruta donde se encuentra el fichero a ensobrar */
     private final String rutafichero;

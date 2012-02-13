@@ -35,23 +35,22 @@ final class ProfilesOptionsPane {
     private String currentProfileName = null;
 
     /** Etiqueta con el nombre del perfil cargado actualmente. */
-    // JLabel currentProfileLabel = null;
-    JLabel currentProfileTitleLabel = null;
+    private JLabel currentProfileTitleLabel = null;
 
     private boolean isBigStyle = false;
 
     /** Panel sobre el que se montan los componentes. */
-    final private JPanel panel;
+    private final JPanel panel;
 
     /** Componente padre sobre el que se mostrar&aacute;n los di&aacute;logos modales. */
-    final private Opciones parent;
+    private final Opciones parent;
 
     /** Listado con los perfiles detectados por la aplicaci&oacute;n. */
-    final JList profileManagmentList;
+    private final JList profileManagmentList;
 
     /** Crea la vista y componentes de la pesta&ntilde;a principal de configuraci&oacute;n.
      * @param parent Ventana de opciones sobre la que se muestra el panel. */
-    public ProfilesOptionsPane(final Opciones parent) {
+    ProfilesOptionsPane(final Opciones parent) {
 
         this.parent = parent;
         this.panel = new JPanel(new GridBagLayout());
@@ -271,7 +270,7 @@ final class ProfilesOptionsPane {
 
     /** Recupera el panel con las opciones disponibles en esta pantalla.
      * @return Panel de opciones. */
-    public JPanel getConfigurationPanel() {
+    JPanel getConfigurationPanel() {
         return this.panel;
     }
 
@@ -295,7 +294,7 @@ final class ProfilesOptionsPane {
 
     /** Recupera los nombres de perfil que aparecen en el listado del panel.
      * @return Listado de nombres de perfil. */
-    public String[] getProfiles() {
+    String[] getProfiles() {
         final List<String> profilesNames = new ArrayList<String>();
         for (int i = 0; i < this.profileManagmentList.getModel().getSize(); i++) {
             profilesNames.add(this.profileManagmentList.getModel().getElementAt(i).toString());

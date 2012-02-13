@@ -378,7 +378,7 @@ public final class CabeceraAsistente extends JPanel {
         if (!Platform.getOS().equals(Platform.OS.LINUX)){
             j.setBounds(0,0, maxWidth, maxHeight);
         } else {
-            j.setBounds(0,0, maxWidth, maxHeight - Constants.maximizeVerticalMarginLinux);
+            j.setBounds(0,0, maxWidth, maxHeight - Constants.MAXIMIZE_VERTICAL_MARGIN_LINUX);
         }
 
         //Se deshabilita el boton de maximizar puesto que se ha pulsado.

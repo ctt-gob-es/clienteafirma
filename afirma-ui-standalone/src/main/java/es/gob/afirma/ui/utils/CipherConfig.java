@@ -17,11 +17,11 @@ import es.gob.afirma.core.ciphers.AOCipherConfig;
 import es.gob.afirma.core.ciphers.CipherConstants.AOCipherAlgorithm;
 
 /** Clase para configurar un cifrador dado un algoritmo */
-public class CipherConfig {
+public final class CipherConfig {
 
     private static class CipherConfigures {
-        AOCipherConfig config = null;
-        AOCipher provider = null;
+        private final AOCipherConfig config;
+        private final AOCipher provider;
 
         CipherConfigures(final AOCipherConfig config, final AOCipher provider) {
             this.config = config;

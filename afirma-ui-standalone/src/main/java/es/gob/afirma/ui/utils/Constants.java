@@ -187,22 +187,22 @@ public final class Constants {
     /**
      * Nombre del nodo en el que se guardan las Preferences
      */
-    public static final String ourNodeName = "es.gob.afirma"; //$NON-NLS-1$
+    public static final String OUR_NODE_NAME = "es.gob.afirma"; //$NON-NLS-1$
 
     /**
      * Nombre del usuario por defecto
      */
-    public static final String defaultUser = "Por defecto";
+    public static final String DEFAULT_USER = "Por defecto";
 
     /**
      * Margen a restar para calcular el tamano de una ventana maximizada para linux.
      */
-    public static int maximizeVerticalMarginLinux = 52;
+    public static final int MAXIMIZE_VERTICAL_MARGIN_LINUX = 52;
 
 	 /**
 	 * Variable que almacena el icono original del boton de maximizar.
 	 */
-	public static final ImageIcon IMAGEICONMAXIMIZE = new ImageIcon(Utils.class.getResource("/resources/images/maximize.png"));
+	public static final ImageIcon IMAGEICON_MAXIMIZE = new ImageIcon(Utils.class.getResource("/resources/images/maximize.png"));
 
 	 /**
 	 * Variable que almacena el icono original del boton de restaurar.

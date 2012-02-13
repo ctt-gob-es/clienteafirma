@@ -88,7 +88,7 @@ public class CifradoAccessibilityTest {
 		try {
 			//Se obtiene la cofiguracion general
 			//Se anade el perfil por defecto
-			UserProfile.setCurrentProfileId(Constants.defaultUser);
+			UserProfile.setCurrentProfileId(Constants.DEFAULT_USER);
 			GeneralConfig.loadConfig(GeneralConfig.getConfig());
 			final Properties config = GeneralConfig.getConfig();
 			//Se cambia al modo avanzado
@@ -142,7 +142,7 @@ public class CifradoAccessibilityTest {
 		try {
 			//Se obtiene la cofiguracion general
 			//Se anade el perfil por defecto
-			UserProfile.setCurrentProfileId(Constants.defaultUser);
+			UserProfile.setCurrentProfileId(Constants.DEFAULT_USER);
 			GeneralConfig.loadConfig(GeneralConfig.getConfig());
 			final Properties config = GeneralConfig.getConfig();
 			//Se cambia al modo avanzado

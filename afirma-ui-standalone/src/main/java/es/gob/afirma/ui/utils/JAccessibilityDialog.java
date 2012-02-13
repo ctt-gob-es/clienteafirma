@@ -105,7 +105,7 @@ public abstract class JAccessibilityDialog extends JDialog {
 		
 		//Se comprueba el so
 		if (Platform.getOS().equals(Platform.OS.LINUX)){
-			maxHeight = maxHeight - Constants.maximizeVerticalMarginLinux;
+			maxHeight = maxHeight - Constants.MAXIMIZE_VERTICAL_MARGIN_LINUX;
 		}
 		
 		//Dimensiones que se van a considerar de maximizado

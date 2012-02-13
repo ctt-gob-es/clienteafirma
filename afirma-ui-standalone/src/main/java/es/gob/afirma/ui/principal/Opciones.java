@@ -201,7 +201,7 @@ class Opciones extends JAccessibilityDialog {
     		if (!Platform.getOS().equals(Platform.OS.LINUX)){
     			this.setBounds(0,0, maxWidth, maxHeight);
     		} else {
-    			this.setBounds(0,0, maxWidth, maxHeight- Constants.maximizeVerticalMarginLinux);
+    			this.setBounds(0,0, maxWidth, maxHeight- Constants.MAXIMIZE_VERTICAL_MARGIN_LINUX);
     		}
 			if (GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
     			if (Platform.getOS().equals(Platform.OS.LINUX)){
@@ -284,7 +284,7 @@ class Opciones extends JAccessibilityDialog {
 		}
 		else {
 
-			if (this.getSize().equals(new Dimension(maxWidth,maxHeight - Constants.maximizeVerticalMarginLinux))){
+			if (this.getSize().equals(new Dimension(maxWidth,maxHeight - Constants.MAXIMIZE_VERTICAL_MARGIN_LINUX))){
 				this.maximizeButton.setEnabled (false);
 	    		this.restoreButton.setEnabled (true);
 			}
@@ -691,7 +691,7 @@ class Opciones extends JAccessibilityDialog {
 		if (!Platform.getOS().equals(Platform.OS.LINUX)){
 			this.setBounds(0,0, maxWidth, maxHeight);
 		} else {
-			this.setBounds(0,0, maxWidth, maxHeight - Constants.maximizeVerticalMarginLinux);
+			this.setBounds(0,0, maxWidth, maxHeight - Constants.MAXIMIZE_VERTICAL_MARGIN_LINUX);
 		}
 	}
 

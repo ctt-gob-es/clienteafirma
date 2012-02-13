@@ -73,10 +73,10 @@ public class MainOptionsPane {
     final private JPanel panel;
 
     /** OID de la pol&iacute;tica de firma. */
-    JTextField textPolicyOid;
+    private final JTextField textPolicyOid;
 
     /** URL de la pol&iacute;tica de firma. */
-    JTextField textPolicyUrl;
+    private final JTextField textPolicyUrl;
 
     /** Crea la vista y componentes de la pesta&ntilde;a principal de configuraci&oacute;n. */
     public MainOptionsPane() {

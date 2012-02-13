@@ -69,9 +69,8 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	protected static int actualPositionY = -1;
 	protected static int actualWidth = -1;
 	protected static int actualHeight = -1;
-	/**
-	 * Relacion minima.
-	 */
+
+	/** Relacion m&iacute;nima. */
 	@SuppressWarnings("static-method")
 	int getMinimumRelation(){
 		return 9;
@@ -129,31 +128,8 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	 * Posici&oacute;n X inicial de la ventana dependiendo de la resoluci&oacute;n de pantalla.
 	 * @return int Posici&oacute;n X
 	 */
-    /*public int getInitialX() {
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); //329
-		return (screenSize.width - 426) / 2 ;
-	}*/
-
-    /**
-	 * Posici&oacute;n Y inicial de la ventana dependiendo del sistema operativo y de la
-	 * resoluci&oacute;n de pantalla.
-	 * @return int Posici&oacute;n Y
-	 */
-	/*public int getInitialY() {
-        Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        if (Platform.getOS().equals(Platform.OS.MACOSX)){
-        	return (screenSize.height - 485) / 2;
-        }
-        return (screenSize.height - 456) / 2;
-	}*/
-
-	/**
-	 * Posici&oacute;n X inicial de la ventana dependiendo de la resoluci&oacute;n de pantalla.
-	 * @return int Posici&oacute;n X
-	 */
     public int getInitialX() {
-		final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); //329
-		return (screenSize.width - 426) / 2 ;
+		return (Toolkit.getDefaultToolkit().getScreenSize().width - 426) / 2 ;
 	}
 
     /**
@@ -761,7 +737,7 @@ public class JAccessibilityFileChooser extends JFileChooser{
 			this.theDialog.setBounds(0,0, maxWidth, maxHeight);
 		}
 		else {
-			this.theDialog.setBounds(0,0, maxWidth, maxHeight - Constants.maximizeVerticalMarginLinux);
+			this.theDialog.setBounds(0,0, maxWidth, maxHeight - Constants.MAXIMIZE_VERTICAL_MARGIN_LINUX);
 		}
 	}
 

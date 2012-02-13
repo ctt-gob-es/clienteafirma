@@ -54,8 +54,10 @@ import es.gob.afirma.ui.wizardutils.JDialogWizard;
 
 /** Dialogo con la pagina 2: Clave de cifrado */
 public final class PanelContrasenia extends JAccessibilityDialogWizard {
+
     /** Botonera con funciones para la pagina panel de cifrado */
     private class Botonera extends BotoneraInferior {
+
         /** UID. */
         private static final long serialVersionUID = 1L;
 
@@ -83,17 +85,18 @@ public final class PanelContrasenia extends JAccessibilityDialogWizard {
             }
         }
     }
+
     /** Log. */
-    static Logger logger = Logger.getLogger(PanelContrasenia.class.getName());
+    private static Logger logger = Logger.getLogger(PanelContrasenia.class.getName());
 
     /** UID. */
     private static final long serialVersionUID = 1L;
 
     /** Campo donde se guarda la contrasenia. */
-    final JPasswordField campoContrasenia = new JPasswordField();
+    private final JPasswordField campoContrasenia = new JPasswordField();
 
     /** Campo donde se guarda la contrasenia repetida. */
-    final JPasswordField campoContraseniaRep = new JPasswordField();
+    private final JPasswordField campoContraseniaRep = new JPasswordField();
 
     /** Cifrador configurado para un algoritmo dado */
     private final CipherConfig cipherConfig;

@@ -70,7 +70,7 @@ final class PanelEntrada extends JAccessibilityDialogWizard {
 	/**
 	 * Log.
 	 */
-	static Logger logger = Logger.getLogger(PanelEntrada.class.getName());
+	private static Logger logger = Logger.getLogger(PanelEntrada.class.getName());
 
 	/**
 	 * Relacion minima para el redimensionado de componentes.
@@ -104,7 +104,7 @@ final class PanelEntrada extends JAccessibilityDialogWizard {
     }
 
     // Campo donde se guarda el nombre del fichero de firma
-    JTextField campoFirma = new JTextField();
+    private final JTextField campoFirma = new JTextField();
 
     /**
      * Inicializacion de componentes

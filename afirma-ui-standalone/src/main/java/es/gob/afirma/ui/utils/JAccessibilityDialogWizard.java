@@ -81,7 +81,7 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 				this.setBounds(0,0, maxWidth, maxHeight);
 			} 
 			else {
-				this.setBounds(0,0, maxWidth, maxHeight - Constants.maximizeVerticalMarginLinux);
+				this.setBounds(0,0, maxWidth, maxHeight - Constants.MAXIMIZE_VERTICAL_MARGIN_LINUX);
 			}
 			
 			if (Platform.getOS().equals(Platform.OS.LINUX)){
@@ -202,7 +202,7 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 		
 		//Se comprueba el so
 		if (Platform.getOS().equals(Platform.OS.LINUX)){
-			maxHeight = maxHeight - Constants.maximizeVerticalMarginLinux;
+			maxHeight = maxHeight - Constants.MAXIMIZE_VERTICAL_MARGIN_LINUX;
 
 		} else {
 			//Dimensiones que se van a considerar de maximizado

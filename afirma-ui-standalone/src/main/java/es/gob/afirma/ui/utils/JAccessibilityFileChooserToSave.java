@@ -46,7 +46,7 @@ import es.gob.afirma.ui.principal.PrincipalGUI;
  * @author lmerayo
  *
  */
-public class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
+public final class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
 
 	/**
 	 * Serial version ID.
@@ -63,10 +63,10 @@ public class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
 	private JButton maximizeButton = null;
 	private JPanel accesibilityButtonsPanel = null;
 
-	protected static int actualPositionX = -1;
-	protected static int actualPositionY = -1;
-	protected static int actualWidth = -1;
-	protected static int actualHeight = -1;
+//	private static int actualPositionX = -1;
+//	private static int actualPositionY = -1;
+//	private static int actualWidth = -1;
+//	private static int actualHeight = -1;
 
 
 	/**
@@ -534,11 +534,13 @@ public class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
 
 		if (actualPositionX != -1 && actualPositionY != -1 && actualWidth != -1 && actualHeight != -1){
 			this.theDialog.setBounds(actualPositionX, actualPositionY, actualWidth, actualHeight);
-		} else {
+		}
+		else {
 			if (GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
     			setBounds(this.getInitialX(), this.getInitialY(), Constants.FILE_FONT_INITIAL_WIDTH, Constants.FILE_INITIAL_HEIGHT);
     			setMinimumSize(new Dimension(getSize().width, getSize().height));
-    		} else {
+    		}
+			else {
     			setBounds(this.getInitialX(), this.getInitialY(), Constants.FILE_INITIAL_WIDTH, Constants.FILE_INITIAL_HEIGHT);
     			setMinimumSize(new Dimension(getSize().width, getSize().height));
     		}
@@ -571,7 +573,7 @@ public class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
 		if (!Platform.getOS().equals(Platform.OS.LINUX)){
 			this.theDialog.setBounds(0,0, maxWidth, maxHeight);
 		} else {
-			this.theDialog.setBounds(0,0, maxWidth, maxHeight - Constants.maximizeVerticalMarginLinux);
+			this.theDialog.setBounds(0,0, maxWidth, maxHeight - Constants.MAXIMIZE_VERTICAL_MARGIN_LINUX);
 		}
 	}
 

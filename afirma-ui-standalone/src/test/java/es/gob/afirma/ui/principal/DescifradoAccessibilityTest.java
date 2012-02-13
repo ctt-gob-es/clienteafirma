@@ -88,7 +88,7 @@ public class DescifradoAccessibilityTest {
 		try {
 			//Se obtiene la cofiguracion general
 			//Se anade el perfil por defecto
-			UserProfile.setCurrentProfileId(Constants.defaultUser);
+			UserProfile.setCurrentProfileId(Constants.DEFAULT_USER);
 			GeneralConfig.loadConfig(GeneralConfig.getConfig());
 			final Properties config = GeneralConfig.getConfig();
 			//Se cambia al modo avanzado
@@ -142,7 +142,7 @@ public class DescifradoAccessibilityTest {
 		try {
 			//Se obtiene la cofiguracion general
 			//Se anade el perfil por defecto
-			UserProfile.setCurrentProfileId(Constants.defaultUser);
+			UserProfile.setCurrentProfileId(Constants.DEFAULT_USER);
 			GeneralConfig.loadConfig(GeneralConfig.getConfig());
 			final Properties config = GeneralConfig.getConfig();
 			//Se cambia al modo avanzado
@@ -168,7 +168,7 @@ public class DescifradoAccessibilityTest {
 		catch(final java.awt.HeadlessException e) {
 			// Ignoramos este error, pero no otros, para evitar fallos en tests automaticos en servidor
 		}
-	}	
+	}
 
 	/**
 	 * Metodo que obtiene una lista de codigos de atajos a los componentes (Etiqueta, Boton) de un panel.

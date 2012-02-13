@@ -409,7 +409,7 @@ final class ResizingAdaptor extends ComponentAdapter {
 			if (this.theDialogWizard!=null){
 				factorAux = factorAux - 0.3; //0.8999999761581421
 			}
-			imageIcon = Constants.IMAGEICONMAXIMIZE; //Se carga la imagen original
+			imageIcon = Constants.IMAGEICON_MAXIMIZE; //Se carga la imagen original
 		} else if ((button.getName() != null) && (button.getName().equalsIgnoreCase("restaurar"))) {
 			if (this.theDialog!=null){
 				factorAux = factorAux - 0.4; //0.8999999761581421
