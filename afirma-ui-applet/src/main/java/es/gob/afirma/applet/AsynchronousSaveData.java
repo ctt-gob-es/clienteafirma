@@ -23,7 +23,7 @@ import es.gob.afirma.core.ui.AOUIFactory;
 
 /** Invocar preferentemente de la siguiente manera:<br>
  * <code>SwingUtilities.invokeLater(new AsynchronousSaveData(data, file, desc, exts, parent, true));</code> */
-public final class AsynchronousSaveData implements Runnable {
+final class AsynchronousSaveData implements Runnable {
 
 	private final byte[] dataToSave;
 
@@ -80,7 +80,7 @@ public final class AsynchronousSaveData implements Runnable {
      *        <code>true</code> si queremos mostrar un di&aacute;logo
      *        gr&aacute;fico en caso de error, <code>false</code> en caso
      *        contrario */
-    public AsynchronousSaveData(final byte[] data,
+    AsynchronousSaveData(final byte[] data,
                                 final String fileName,
                                 final String desc,
                                 final String[] exts,

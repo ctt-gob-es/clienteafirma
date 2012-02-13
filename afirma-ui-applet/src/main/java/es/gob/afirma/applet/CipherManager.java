@@ -35,10 +35,10 @@ import es.gob.afirma.keystores.main.callbacks.UIPasswordCallback;
 import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
 
 /** Manejador de las funcionalidades de cifrado del Cliente @firma. */
-public final class CipherManager {
+final class CipherManager {
 
     /** Caracteres ASCII validos para la contrase&ntilde;a de cifrado. */
-    public final static String ACCEPTED_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"; //$NON-NLS-1$
+    final static String ACCEPTED_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"; //$NON-NLS-1$
 
     /** Componente sobre el que se mostrar&aacute;n los di6aaclogos modales. */
     private Component parent = null;
@@ -79,7 +79,7 @@ public final class CipherManager {
     private boolean fileBase64 = false;
 
     /** Construye el objeto. */
-    public CipherManager() {
+    CipherManager() {
         this.cipherConfig = new AOCipherConfig(AOCipherAlgorithm.getDefault(), null, null);
     }
 
@@ -87,13 +87,13 @@ public final class CipherManager {
      * mostrar los di&aacute;logos modales.
      * @param parent
      *        Componente padre. */
-    public CipherManager(final Component parent) {
+    CipherManager(final Component parent) {
         this();
         this.parent = parent;
     }
 
     /** Reinicia el componente a su configuraci&oacute;n por defecto. */
-    public void initialize() {
+    void initialize() {
         this.cipherConfig = new AOCipherConfig(AOCipherAlgorithm.getDefault(), null, null);
         this.cipherKeyAlias = null;
         this.cipherKeystorePass = null;
@@ -109,13 +109,13 @@ public final class CipherManager {
 
     /** Recupera la ruta de fichero configurada.
      * @return Ruta de fichero. */
-    public URI getFileUri() {
+    URI getFileUri() {
         return this.fileUri;
     }
 
     /** Indica si el contenido del fichero configurado est&aacute; en base 64.
      * @return Devuelve {@code true} si el contenido del fichero es base 64, {@code false} en caso contrario. */
-    public boolean isFileBase64() {
+    boolean isFileBase64() {
         return this.fileBase64;
     }
 
@@ -124,21 +124,21 @@ public final class CipherManager {
      *        Ruta del fichero.
      * @param fileBase64
      *        Indica si el contenido del fichero es base 64. */
-    public void setFileUri(final URI fileUri, final boolean fileBase64) {
+    void setFileUri(final URI fileUri, final boolean fileBase64) {
         this.fileUri = fileUri;
         this.fileBase64 = fileBase64;
     }
 
     /** Recupera el algoritmo de cifrado configurado.
      * @return Algoritmo de cifrado. */
-    public AOCipherAlgorithm getCipherAlgorithm() {
+    AOCipherAlgorithm getCipherAlgorithm() {
         return this.cipherConfig.getAlgorithm();
     }
 
     /** Configura el algoritmo de cifrado.
      * @param cipAlgo
      *        Algoritmo de cifrado. */
-    public void setCipherAlgorithm(final AOCipherAlgorithm cipAlgo) {
+    void setCipherAlgorithm(final AOCipherAlgorithm cipAlgo) {
         this.cipherConfig = new AOCipherConfig(cipAlgo, null, null);
     }
 
@@ -159,7 +159,7 @@ public final class CipherManager {
      * @throws NoSuchAlgorithmException
      *         Cuando el algoritmo de la configuraci&oacute;n no est&aacute;
      *         soportado. */
-    public void setCipherConfig(final String config) throws NoSuchAlgorithmException {
+    void setCipherConfig(final String config) throws NoSuchAlgorithmException {
         // Si se introduce null o cadena vacia, eliminamos la configuracion
         // actual
         if (config == null || config.length() == 0) {
@@ -174,7 +174,7 @@ public final class CipherManager {
      * configurar&aacute; el algoritmo de cifrado por defecto.<br/>
      * @param config
      *        Configuraci&oacute;n de cifrado. */
-    public void setCipherConfig(final AOCipherConfig config) {
+    void setCipherConfig(final AOCipherConfig config) {
 
         if (config == null) {
             this.cipherConfig.setAlgorithm(AOCipherAlgorithm.getDefault());
@@ -188,13 +188,13 @@ public final class CipherManager {
 
     /** Recupera la configuraci&oacute;n de cifrado.
      * @return Configuraci&oacute;n de cifrado. */
-    public AOCipherConfig getCipherConfig() {
+    AOCipherConfig getCipherConfig() {
         return this.cipherConfig;
     }
 
     /** Recupera el alias configurado del almac&eacute;n de claves de cifrado.
      * @return Alias configurado. */
-    public String getCipherKeyAlias() {
+    String getCipherKeyAlias() {
         return this.cipherKeyAlias;
     }
 
@@ -202,14 +202,14 @@ public final class CipherManager {
      * que se desea utilizar.
      * @param cipherKeyAlias
      *        Alias de la clave. */
-    public void setCipherKeyAlias(final String cipherKeyAlias) {
+    void setCipherKeyAlias(final String cipherKeyAlias) {
         this.cipherKeyAlias = cipherKeyAlias;
     }
 
     /** Recupera la contrase&ntilde;a configurada para el almac&eacute;n de
      * claves.
      * @return Contrase&ntilda;a configurada. */
-    public char[] getCipherKeystorePass() {
+    char[] getCipherKeystorePass() {
         return this.cipherKeystorePass == null ? null : this.cipherKeystorePass.clone();
     }
 
@@ -217,14 +217,14 @@ public final class CipherManager {
      * claves.
      * @param cipherKeystorePass
      *        Contrase&nmtilde;a del almac&eacute;n. */
-    public void setCipherKeystorePass(final char[] cipherKeystorePass) {
+    void setCipherKeystorePass(final char[] cipherKeystorePass) {
         this.cipherKeystorePass = cipherKeystorePass == null ? null : cipherKeystorePass.clone();
     }
 
     /** Indica si est&aacute; habilitado el almac&eacute;n de claves de cifrado
      * para el guardado de claves.
      * @return Devuelve {@code true} si est&aacute;a habilitado, {@code false} en caso contrario. */
-    public boolean isUseCipherKeyStore() {
+    boolean isUseCipherKeyStore() {
         return this.useCipherKeyStore;
     }
 
@@ -232,13 +232,13 @@ public final class CipherManager {
      * el guardado de las nuevas claves generadas.
      * @param useCipherKeyStore
      *        Indica si debe usarse el almac&eacute;n. */
-    public void setUseCipherKeyStore(final boolean useCipherKeyStore) {
+    void setUseCipherKeyStore(final boolean useCipherKeyStore) {
         this.useCipherKeyStore = useCipherKeyStore;
     }
 
     /** Recupera el modo de clave configurado.
      * @return Modo de clave. */
-    public String getKeyMode() {
+    String getKeyMode() {
         return this.keyMode;
     }
 
@@ -246,33 +246,33 @@ public final class CipherManager {
      * establecer&aacute;a el modo por defecto.
      * @param keyMode
      *        Modo de clave. */
-    public void setKeyMode(final String keyMode) {
+    void setKeyMode(final String keyMode) {
         this.keyMode = (keyMode == null ? AOCipherConstants.DEFAULT_KEY_MODE : keyMode);
     }
 
     /** Recupera la clave de cifrado.
      * @return Clave de cifrado. */
-    public byte[] getCipherKey() {
+    byte[] getCipherKey() {
         return this.cipherKeyEncoded;
     }
 
     /** Establece la clave de cifrado.
      * @param cipherKey
      *        Clave de cifrado */
-    public void setCipherKey(final byte[] cipherKey) {
+    void setCipherKey(final byte[] cipherKey) {
         this.cipherKeyEncoded = cipherKey == null ? null : cipherKey.clone();
     }
 
     /** recupera la contrase&ntilde;a de cifrado.
      * @return Contrasen&tilde;a de cifrado. */
-    public char[] getCipherPassword() {
+    char[] getCipherPassword() {
         return this.cipherPassword == null ? null : this.cipherPassword.clone();
     }
 
     /** Establece la contrase&ntilde;a de cifrado.
      * @param cipherPassword
      *        Contrase&ntilde;a de cifrado. */
-    public void setCipherPassword(final char[] cipherPassword) {
+    void setCipherPassword(final char[] cipherPassword) {
         this.cipherPassword = cipherPassword == null ? null : cipherPassword.clone();
     }
 
@@ -282,7 +282,7 @@ public final class CipherManager {
      * @param password
      *        Contrase&ntilde;a que queremos evaluar.
      * @return Devuelve {@code true} si la contrase&ntilde;a es v&aacute;lida. */
-    public static boolean isValidPassword(final String password) {
+    static boolean isValidPassword(final String password) {
         if (password == null) {
             return false;
         }
@@ -296,27 +296,27 @@ public final class CipherManager {
 
     /** Recupera los datos planos para cifrado.
      * @return Datos para cifrar. */
-    public byte[] getPlainData() {
+    byte[] getPlainData() {
         return this.plainData == null ? null : this.plainData.clone();
     }
 
     /** Establece los datos planos para cifrar.
      * @param plainData
      *        Datos para cifrar. */
-    public void setPlainData(final byte[] plainData) {
+    void setPlainData(final byte[] plainData) {
     	this.plainData = plainData == null ? null : plainData.clone();
     }
 
     /** Recupera los dato cifrados.
      * @return Datos cifrados. */
-    public byte[] getCipheredData() {
+    byte[] getCipheredData() {
         return this.cipheredData == null ? null : this.cipheredData.clone();
     }
 
     /** Establece los datos cifrados para descifrar.
      * @param cipheredData
      *        Datos cifrados. */
-    public void setCipheredData(final byte[] cipheredData) {
+    void setCipheredData(final byte[] cipheredData) {
         this.cipheredData = cipheredData == null ? null : cipheredData.clone();
     }
 
@@ -334,7 +334,7 @@ public final class CipherManager {
      * @throws KeyException Cuando la clave de cifrado no sea compatible con el
      * algoritmo de firma configurado.
      */
-    public void cipherData() throws IOException, NoSuchAlgorithmException, AOException, KeyException {
+    void cipherData() throws IOException, NoSuchAlgorithmException, AOException, KeyException {
 
         byte[] dataToCipher = null;
         if (this.plainData != null) {
@@ -382,7 +382,7 @@ public final class CipherManager {
      * @throws KeyException
      *         Cuando se indica una clave no v&aacute;lida para el cifrado.
      */
-    public void cipherData(final byte[] dataToCipher) throws NoSuchAlgorithmException, AOException, KeyException {
+    void cipherData(final byte[] dataToCipher) throws NoSuchAlgorithmException, AOException, KeyException {
 
         if (dataToCipher == null) {
             throw new IllegalArgumentException("Los datos a crifar no pueden ser nulos"); //$NON-NLS-1$
@@ -406,7 +406,7 @@ public final class CipherManager {
      *         Ocurri&oacute; un error al obtener la clave.
      * @throws KeyException Cuando se produce un error al generar la clave.
      */
-    public Key getConfiguredKey() throws NoSuchAlgorithmException, AOException, KeyException {
+    Key getConfiguredKey() throws NoSuchAlgorithmException, AOException, KeyException {
         return this.getConfiguredKey(new AOSunJCECipher(), this.cipherConfig);
     }
 
@@ -507,7 +507,7 @@ public final class CipherManager {
      *         Si ocurre alg&uacute; error durante el proceso de descifrado.
      * @throws KeyException Cuando la clave para el descifrado no sea correcta.
      */
-    public void decipherData() throws IOException, AOException, KeyException {
+    void decipherData() throws IOException, AOException, KeyException {
 
         byte[] dataToDecipher = null;
         if (this.cipheredData != null) {
@@ -558,7 +558,7 @@ public final class CipherManager {
      * @throws KeyException
      *         Cuando la clave no sea correcta.
      */
-    public void decipherData(final byte[] dataToDecipher) throws AOException, KeyException {
+    void decipherData(final byte[] dataToDecipher) throws AOException, KeyException {
 
         // Si no esta establecido el algoritmo de cifrado usamos el por
         // defecto, pero solo para esta ocasion

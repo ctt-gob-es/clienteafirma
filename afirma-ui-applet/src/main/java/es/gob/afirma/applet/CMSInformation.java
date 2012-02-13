@@ -63,7 +63,7 @@ import es.gob.afirma.signers.pkcs7.SignedAndEnvelopedData;
  * <li>Authenticated and Enveloped Data</li>
  * </ul>
  */
-public final class CMSInformation {
+final class CMSInformation {
 
 	private CMSInformation() {
 		// No permitimos la instanciacion
@@ -121,7 +121,7 @@ public final class CMSInformation {
 	 * @throws IOException Si ocurre alg&uacute;n problema leyendo o escribiendo los datos
 	 * @throws AOInvalidFormatException Error de formato no v&aacute;lido.
 	 */
-	public static String getInformation(final byte[] data) throws IOException, AOInvalidFormatException {
+	static String getInformation(final byte[] data) throws IOException, AOInvalidFormatException {
 		String datos = ""; //$NON-NLS-1$
 
 		final ASN1InputStream is = new ASN1InputStream(data);

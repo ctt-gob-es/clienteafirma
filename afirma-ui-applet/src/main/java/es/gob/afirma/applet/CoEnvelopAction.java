@@ -20,7 +20,7 @@ import es.gob.afirma.keystores.main.common.AOKeyStoreManagerException;
 
 /** Acci&oacute;n privilegiada para agregar un nuevo remitentes a un sobre
  * electr&oacute;nico. La ejecuci&oacute;n de la acci&oacute;n devuelve {@code true} o {@code false} y el resultado almacenado es un array de bytes. */
-public final class CoEnvelopAction implements PrivilegedExceptionAction<byte[]> {
+final class CoEnvelopAction implements PrivilegedExceptionAction<byte[]> {
 
     /** Manejador de ensobrado. */
     private final EnveloperManager enveloperManager;
@@ -33,7 +33,7 @@ public final class CoEnvelopAction implements PrivilegedExceptionAction<byte[]> 
      *        Gestor de envoltorios
      * @param envelop
      *        Envoltorio */
-    public CoEnvelopAction(final EnveloperManager enveloperManager, final byte[] envelop) {
+    CoEnvelopAction(final EnveloperManager enveloperManager, final byte[] envelop) {
         if (enveloperManager == null) {
             throw new IllegalArgumentException("El EnverloperManager no puede ser nulo"); //$NON-NLS-1$
         }

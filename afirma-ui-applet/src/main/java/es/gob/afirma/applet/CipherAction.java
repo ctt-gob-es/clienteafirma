@@ -19,7 +19,7 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 
 /** Acci&oacute;n privilegiada para el cifrado de datos. */
-public final class CipherAction implements PrivilegedExceptionAction<Void> {
+final class CipherAction implements PrivilegedExceptionAction<Void> {
 
     /** Manejador de cifrado. */
     private final CipherManager cipherManager;
@@ -35,7 +35,7 @@ public final class CipherAction implements PrivilegedExceptionAction<Void> {
      * @param data
      *        Datos que se desean cifrar, {@code null} si se desean tomar
      *        los del manejador. */
-    public CipherAction(final CipherManager cipherManager, final byte[] data) {
+    CipherAction(final CipherManager cipherManager, final byte[] data) {
         if (cipherManager == null) {
             throw new IllegalArgumentException("El CipherManager no puede ser nulo"); //$NON-NLS-1$
         }
