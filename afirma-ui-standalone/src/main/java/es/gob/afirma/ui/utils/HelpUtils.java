@@ -74,7 +74,7 @@ public final class HelpUtils {
     /** Mapa de componentes y su indice en la ayuda. */
     private static Hashtable<String, Component> components = new Hashtable<String, Component>();
     /** Controlador de ayuda. */
-    static HelpBroker helpBroker = null;
+    private static HelpBroker helpBroker = null;
     /** Conjunto de informacion de ayuda. */
     private static HelpSet helpset = null;
     /** Variable que almacena el icono original del boton de ayuda. */
@@ -105,14 +105,6 @@ public final class HelpUtils {
             Logger.getLogger("es.gob.afirma").severe("Error en el cambio de idioma: " + ex);  //$NON-NLS-1$//$NON-NLS-2$
         }
     }
-
-    /** Establece las opciones de accesibilidad para la ayuda.
-     * @param activate Indica si esta activado el alto contraste. */
-  /** public static void checkHelpAccessibility(final boolean activate) {
-        final WindowPresentation wp = ((DefaultHelpBroker) getHelp()).getWindowPresentation();
-        final JFrame helpwindow = (JFrame) wp.getHelpWindow();
-        checkHelpAccessibility(helpwindow, activate);
-    }**/
 
     /** Chequeo de la accesibilidad para la ventana de ayuda.
      * @param frame ventana de ayuda. */
