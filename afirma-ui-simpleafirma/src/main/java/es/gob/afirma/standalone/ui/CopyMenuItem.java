@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -26,16 +26,19 @@ final class CopyMenuItem extends JPopupMenu implements ClipboardOwner {
 
 	private static final long serialVersionUID = 1750985678317829383L;
 
-	final JTextComponent textComponent;
+	private final JTextComponent textComponent;
+	JTextComponent getTextComponent() {
+		return this.textComponent;
+	}
 
 	private void createUI(final String text) {
 		final JMenuItem copyItem = new JMenuItem(text);
 		copyItem.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent ae) {
-				if (CopyMenuItem.this.textComponent != null) {
+				if (CopyMenuItem.this.getTextComponent() != null) {
 					Toolkit.getDefaultToolkit().getSystemClipboard().setContents(
-						new StringSelection((CopyMenuItem.this.textComponent.getSelectedText() != null) ? CopyMenuItem.this.textComponent.getSelectedText() : CopyMenuItem.this.textComponent.getText()), CopyMenuItem.this
+						new StringSelection((CopyMenuItem.this.getTextComponent().getSelectedText() != null) ? CopyMenuItem.this.getTextComponent().getSelectedText() : CopyMenuItem.this.getTextComponent().getText()), CopyMenuItem.this
 					);
 				}
 			}
