@@ -72,7 +72,7 @@ import es.gob.afirma.ui.wizardutils.JDialogWizard;
 
 /** Panel para el wizard de multifirma.
  * @author inteco */
-public class PanelMultifirma extends JAccessibilityDialogWizard {
+public final class PanelMultifirma extends JAccessibilityDialogWizard {
 
     /** Botonera con funciones para la pagina panel de multifirma - cofirma */
     private class Botonera extends BotoneraInferior {
@@ -202,7 +202,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 
             private static final long serialVersionUID = 1L;
 
-            String[] strings = signers;
+            private final String[] strings = signers;
 
             /** Devuelve el elemento contenido en la posicion indicada. */
             @Override
@@ -279,8 +279,8 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
                     if (nodosSeleccionados == null) {
                         CustomDialog.showMessageDialog(this,
                                                        true,
-                                                       Messages.getString("Wizard.multifirma.simple.error.firmante"),
-                                                       Messages.getString("error"),
+                                                       Messages.getString("Wizard.multifirma.simple.error.firmante"), //$NON-NLS-1$
+                                                       Messages.getString("error"), //$NON-NLS-1$
                                                        JOptionPane.ERROR_MESSAGE);
                         return null;
                     }
@@ -496,7 +496,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
             @Override
             public void treeExpanded(final TreeExpansionEvent event) { /* se ignora */ }
         });
-        this.arbolFirmas.setToolTipText(Messages.getString("Wizard.multifirma.simple.contrafirma.arbolFirmas.description")); // NOI18N
+        this.arbolFirmas.setToolTipText(Messages.getString("Wizard.multifirma.simple.contrafirma.arbolFirmas.description")); // NOI18N //$NON-NLS-1$
         this.arbolFirmas.getAccessibleContext().setAccessibleName(etiqueta.getText() + " " + this.arbolFirmas.getToolTipText() + "ALT + R.");
         this.arbolFirmas.setSelectionRow(0);
         this.arbolFirmas.setRootVisible(false);
@@ -516,9 +516,9 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
         Utils.remarcar(this.listaFirmantes);
         Utils.setFontBold(this.listaFirmantes);
         this.listaFirmantes.getAccessibleContext()
-        .setAccessibleName(Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.listaFirmantes")); // NOI18N
+        .setAccessibleName(Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.listaFirmantes")); // NOI18N //$NON-NLS-1$
         this.listaFirmantes.getAccessibleContext()
-        .setAccessibleDescription(Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.listaFirmantes.description")); // NOI18N
+        .setAccessibleDescription(Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.listaFirmantes.description")); // NOI18N //$NON-NLS-1$
 
         // Panel de la lista
         panelLista.setViewportView(this.listaFirmantes);
@@ -532,14 +532,14 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
         getContentPane().add(panelCentral, BorderLayout.CENTER);
 
         // Accesos rapidos al menu de ayuda
-        HelpUtils.enableHelpKey(panelLista, "multifirma.wizard.lista");
-        HelpUtils.enableHelpKey(this.comboFirmas, "multifirma.wizard.lista");
-        HelpUtils.enableHelpKey(panelArbol, "multifirma.wizard.arbolfirmantes");
+        HelpUtils.enableHelpKey(panelLista, "multifirma.wizard.lista"); //$NON-NLS-1$
+        HelpUtils.enableHelpKey(this.comboFirmas, "multifirma.wizard.lista"); //$NON-NLS-1$
+        HelpUtils.enableHelpKey(panelArbol, "multifirma.wizard.arbolfirmantes"); //$NON-NLS-1$
     }
 
     /** Multifirma un fichero dado
      * @return true o false indicando si se ha multifirmado correctamente */
-    public boolean multifirmarFichero() {
+    boolean multifirmarFichero() {
         try {
             final String intText = ".countersign";
             byte[] signedData = null;
@@ -568,7 +568,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 
             // Salvamos el fichero de datos
             final File savedFile =
-                SelectionDialog.saveDataToFile(Messages.getString("Wizard.multifirma.simple.contrafirma.filechooser.save.title"),
+                SelectionDialog.saveDataToFile(Messages.getString("Wizard.multifirma.simple.contrafirma.filechooser.save.title"), //$NON-NLS-1$
                                                signedData,
                                                signer.getSignedName(this.rutaFichero, intText),
                                                null,
@@ -628,7 +628,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 
     /** Guarda todas las ventanas del asistente para poder controlar la botonera
      * @param ventanas Listado con todas las paginas del asistente */
-    public void setVentanas(final List<JDialogWizard> ventanas) {
+    void setVentanas(final List<JDialogWizard> ventanas) {
         this.setBotonera(new Botonera(ventanas, 2));
         getContentPane().add(getBotonera(), BorderLayout.PAGE_END);
     }

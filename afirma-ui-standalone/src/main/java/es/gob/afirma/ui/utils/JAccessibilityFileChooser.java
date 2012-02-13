@@ -65,10 +65,17 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	private JButton maximizeButton = null;
 	private JPanel accesibilityButtonsPanel = null;
 
-	protected static int actualPositionX = -1;
-	protected static int actualPositionY = -1;
-	protected static int actualWidth = -1;
-	protected static int actualHeight = -1;
+	private static int actualPositionX = -1;
+	protected static int getActualPositionX() {
+		return actualPositionX;
+	}
+	protected static void setActualPositionX(final int x) {
+		actualPositionX = x;
+	}
+
+	private static int actualPositionY = -1;
+	private static int actualWidth = -1;
+	private static int actualHeight = -1;
 
 	/** Relacion m&iacute;nima. */
 	@SuppressWarnings("static-method")
@@ -698,8 +705,8 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	 */
 	public void restaurarActionPerformed(){
 
-		if (actualPositionX != -1 && actualPositionY != -1 && actualWidth != -1 && actualHeight != -1){
-			this.theDialog.setBounds(actualPositionX, actualPositionY, actualWidth, actualHeight);
+		if (JAccessibilityFileChooser.actualPositionX != -1 && getActualPositionY() != -1 && getActualWidth() != -1 && getActualHeight() != -1){
+			this.theDialog.setBounds(JAccessibilityFileChooser.actualPositionX, getActualPositionY(), getActualWidth(), getActualHeight());
 		} else {
 			if (GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
     			setBounds(this.getInitialX(), this.getInitialY(), Constants.FILE_FONT_INITIAL_WIDTH, Constants.FILE_INITIAL_HEIGHT);
@@ -717,10 +724,10 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	 * Maximiza la ventana
 	 */
 	public void maximizarActionPerformed(){
-		actualPositionX = this.theDialog.getX();
-		actualPositionY = this.theDialog.getY();
-		actualWidth = this.theDialog.getWidth();
-		actualHeight = this.theDialog.getHeight();
+		setActualPositionX(this.theDialog.getX());
+		setActualPositionY(this.theDialog.getY());
+		setActualWidth(this.theDialog.getWidth());
+		setActualHeight(this.theDialog.getHeight());
 
 		//Se obtienen las dimensiones totales disponibles para mostrar una ventana
 		final Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
@@ -747,6 +754,25 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	 */
 	public JPanel getAccesibilityButtonsPanel(){
 		return this.accesibilityButtonsPanel;
+	}
+
+	protected static int getActualPositionY() {
+		return actualPositionY;
+	}
+	protected static void setActualPositionY(final int actualPositionY) {
+		JAccessibilityFileChooser.actualPositionY = actualPositionY;
+	}
+	protected static int getActualWidth() {
+		return actualWidth;
+	}
+	protected static void setActualWidth(final int actualWidth) {
+		JAccessibilityFileChooser.actualWidth = actualWidth;
+	}
+	protected static int getActualHeight() {
+		return actualHeight;
+	}
+	protected static void setActualHeight(final int actualHeight) {
+		JAccessibilityFileChooser.actualHeight = actualHeight;
 	}
 
 }

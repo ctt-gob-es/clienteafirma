@@ -1,5 +1,12 @@
 package es.gob.afirma.ui.utils;
 
+import static es.gob.afirma.ui.utils.JAccessibilityFileChooser.getActualHeight;
+import static es.gob.afirma.ui.utils.JAccessibilityFileChooser.getActualPositionY;
+import static es.gob.afirma.ui.utils.JAccessibilityFileChooser.getActualWidth;
+import static es.gob.afirma.ui.utils.JAccessibilityFileChooser.setActualHeight;
+import static es.gob.afirma.ui.utils.JAccessibilityFileChooser.setActualPositionY;
+import static es.gob.afirma.ui.utils.JAccessibilityFileChooser.setActualWidth;
+
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -532,8 +539,8 @@ public final class JAccessibilityFileChooserToSave extends JAccessibilityFileCho
 	@Override
 	public void restaurarActionPerformed(){
 
-		if (actualPositionX != -1 && actualPositionY != -1 && actualWidth != -1 && actualHeight != -1){
-			this.theDialog.setBounds(actualPositionX, actualPositionY, actualWidth, actualHeight);
+		if (getActualPositionX() != -1 && getActualPositionY() != -1 && getActualWidth() != -1 && getActualPositionX() != -1){
+			this.theDialog.setBounds(getActualPositionX(), getActualPositionY(), getActualWidth(), getActualHeight());
 		}
 		else {
 			if (GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
@@ -554,10 +561,10 @@ public final class JAccessibilityFileChooserToSave extends JAccessibilityFileCho
 	 */
 	@Override
 	public void maximizarActionPerformed(){
-		actualPositionX = this.theDialog.getX();
-		actualPositionY = this.theDialog.getY();
-		actualWidth = this.theDialog.getWidth();
-		actualHeight = this.theDialog.getHeight();
+		setActualPositionX(this.theDialog.getX());
+		setActualPositionY(this.theDialog.getY());
+		setActualWidth(this.theDialog.getWidth());
+		setActualHeight(this.theDialog.getHeight());
 
 		//Se obtienen las dimensiones totales disponibles para mostrar una ventana
 		final Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
