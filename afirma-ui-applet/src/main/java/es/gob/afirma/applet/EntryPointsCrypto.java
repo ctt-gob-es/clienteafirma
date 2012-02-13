@@ -315,10 +315,10 @@ interface EntryPointsCrypto {
      * </ul>
      * </ul> Parameters established as result of this operation are:
      * <ul>
-     * <li>Encoded signature in base 64 ({@link #getSignatureBase64Encoded()})</li>
-     * <li>Signature as plain text ({@link #getSignatureText()})</li>
-     * <li>Route to the signed file, if data has not been entered directly ( {@link #getFileUsedPath()})</li>
-     * <li>Signature certificate in base 64 ( {@link #getSignCertificateBase64Encoded()})</li>
+     * <li>Encoded signature in base 64 (<code>getSignatureBase64Encoded()</code>)</li>
+     * <li>Signature as plain text (<code>getSignatureText()</code>)</li>
+     * <li>Route to the signed file, if data has not been entered directly (<code>getFileUsedPath()</code>)</li>
+     * <li>Signature certificate in base 64 (<code>getSignCertificateBase64Encoded()</code>)</li>
      * </ul>
      * If error occurs, its description can be retrieved by means of client's
      * getErrorMessage() method. <br>
@@ -338,10 +338,10 @@ interface EntryPointsCrypto {
      * <li>Firma en cascada: "firmante1\n\tfirmante2\n\t\tfirmante3"</li>
      * <li>Firma 'compleja': "firmante1\n\tfirmante2\n\tfirmante3\n\t\tfirmante4\nfirmante5"</li>
      * </ul>
-     * La firma puede ser establecida mediante {@link #setElectronicSignature(String)} o {@link #setElectronicSignatureFile(String)}. El
+     * La firma puede ser establecida mediante <code>setElectronicSignature(String)</code> o <code>setElectronicSignatureFile(String)</code>. El
      * an&aacute;lisis de la
      * firma se realiza primeramente por medio del manejador del formato de
-     * firma establecido con {@link #setSignatureFormat(String)} y, en caso de
+     * firma establecido con <code>setSignatureFormat(String)</code> y, en caso de
      * que este manejador no soporte la firma introducida, se buscar&aacute;
      * entre el resto de manejadores el m&aacute;s adecuado para manejar la
      * firma. Si no se encuentra ninguno, se devuelve <code>null</code>. <br>
@@ -355,9 +355,9 @@ interface EntryPointsCrypto {
      * <li>Cascade Signature: "signer1\n\tsigner2\n\t\tsigner3"</li>
      * <li>'Complex' Signature: "signer1\n\tsigner2\n\tsigner3\n\t\tsigner4\nsigner5"</li>
      * </ul>
-     * Signature may be set with {@link #setElectronicSignature(String)} or {@link #setElectronicSignatureFile(String)}. Signature analysis is
+     * Signature may be set with <code>setElectronicSignature(String)</code> or <code>setElectronicSignatureFile(String)</code>. Signature analysis is
      * performed first by means of the Signature Format Administrator
-     * established with {@link #setSignatureFormat(String)} and, in case it
+     * established with <code>setSignatureFormat(String)</code> and, in case it
      * provides no support for the intoduced signature, a suitable administrator
      * shall be sought. If none is found, <code>null</code> is returned.
      * @return Una cadena en la que se representa la estructura firmas (en
@@ -494,20 +494,6 @@ interface EntryPointsCrypto {
      * <pre>
      * -signCertificateBase64Encoded
      * </pre>
-     *
-     * <br>
-     * <br>
-     * @see #setCertFilterRFC2254(String, String, boolean)
-     * @see #setData(String)
-     * @see #setFileuri(String)
-     * @see #setSignatureAlgorithm(String)
-     * @see #setSignatureFormat(String)
-     * @see #setElectronicSignature(String)
-     * @see #setElectronicSignatureFile(String)
-     * @see #getSignatureBase64Encoded()
-     * @see #getFileUsedPath()
-     * @see #getSignCertificateBase64Encoded()
-     * @see #getSignersStructure()
      * @return true si se ha ejecutado correctamente <br>
      *         true if successful. */
     boolean counterSignSigners();
@@ -649,17 +635,7 @@ interface EntryPointsCrypto {
      * @return Devuelve <codetrue</code>> si la operaci&oacute;n finaliz&oacute;
      *         correctamente, false en caso contrario. <br>
      *         Returns <codetrue</code> if operation ends successfully. Else,
-     *         false.
-     * @see #setCertFilterRFC2254(String, String, boolean)
-     * @see #setData(String)
-     * @see #setFileuri(String)
-     * @see #setSignatureAlgorithm(String)
-     * @see #setSignatureFormat(String)
-     * @see #setElectronicSignature(String)
-     * @see #setElectronicSignatureFile(String)
-     * @see #getSignatureBase64Encoded()
-     * @see #getFileUsedPath()
-     * @see #getSignCertificateBase64Encoded() */
+     *         false. */
     boolean counterSignIndexes();
 
     /** Realiza el proceso de contra-firmado (firma en cascada). Contra-firma
@@ -781,17 +757,7 @@ interface EntryPointsCrypto {
      *
      * <br>
      * @return true si se ha ejecutado correctamente <br>
-     *         true if succesful.
-     * @see #setCertFilterRFC2254(String, String, boolean)
-     * @see #setData(String)
-     * @see #setFileuri(String)
-     * @see #setSignatureAlgorithm(String)
-     * @see #setSignatureFormat(String)
-     * @see #setElectronicSignature(String)
-     * @see #setElectronicSignatureFile(String)
-     * @see #getSignatureBase64Encoded()
-     * @see #getFileUsedPath()
-     * @see #getSignCertificateBase64Encoded() */
+     *         true if succesful. */
     boolean counterSignTree();
 
     /** Realiza el proceso de contra-firmado (firma en cascada). Contra-firma las
@@ -915,29 +881,19 @@ interface EntryPointsCrypto {
      *
      * <br>
      * @return true si se ha ejecutado correctamente <br>
-     *         true if succesful.
-     * @see #setCertFilterRFC2254(String, String, boolean)
-     * @see #setData(String)
-     * @see #setFileuri(String)
-     * @see #setSignatureAlgorithm(String)
-     * @see #setSignatureFormat(String)
-     * @see #setElectronicSignature(String)
-     * @see #setElectronicSignatureFile(String)
-     * @see #getSignatureBase64Encoded()
-     * @see #getFileUsedPath()
-     * @see #getSignCertificateBase64Encoded() */
+     *         true if succesful. */
     boolean counterSignLeafs();
 
     /** Guarda una firma electr&oacute;nica generada anteriormente en un fichero.
      * La firma electr&oacute;nica se habr&aacute; generado mediante una de las
      * operaciones de firma, cofirma o contrafirma. La ruta en donde se
-     * almacenar&aacute; se establece mediante {@link #setOutFilePath(String)}.
+     * almacenar&aacute; se establece mediante <code>setOutFilePath(String)</code>.
      * Si no se ha establecido una ruta en la que almacenar la firma, se
      * mostrar&aacute; un di&aacute;logo de guardado. <br>
      * <br>
      * Stores a previously generated electronic signature in a file. Signature
      * has been generated by a signature, cosignature or counter-signature
-     * operation. Storage route is set with {@link #setOutFilePath(String)}. If
+     * operation. Storage route is set with <code>setOutFilePath(String)</code>. If
      * no storage route has been set, a Save dialog box is displayed.
      * @return true si el proceso termina correctamente, false en otro caso. <br>
      *         true if process ends successfully. Else, false. */
@@ -1081,10 +1037,8 @@ interface EntryPointsCrypto {
 	 *
 	 * @param certFilter Filtro para los certificados a mostrar al usuario
 	 * <br> Certificate filter to be shown to the user.
-	 * @deprecated Sustituido por {@link #setCertFilterRFC2254(String, String, boolean)}
-	 * <br> Replaced by {@link #setCertFilterRFC2254(String, String, boolean)}
-	 * @see #setCertFilterRFC2254(String, String, boolean)
-	 */
+	 * @deprecated Sustituido por <code>setCertFilterRFC2254(String, String, boolean)<code>
+	 * <br> Replaced by <code>setCertFilterRFC2254(String, String, boolean)</code> */
 	@Deprecated
 	void setCertFilter(String certFilter);
 
@@ -1160,27 +1114,24 @@ interface EntryPointsCrypto {
 	 *
 	 * @param certFilter Condici&oacute;n que selecciona un (y s&oacute;lo un) certificado.
 	 * Condition for the selection of one (and only one) certificate.
-	 * @see #setCertFilter(String)
-	 * @deprecated Usar &uacute;nicamente {@link #setMandatoryCertificateConditionRFC2254(String, String, boolean)}
-	 * <br> Only use {@link #setMandatoryCertificateConditionRFC2254(String, String, boolean)}
-	 * @see #setMandatoryCertificateConditionRFC2254(String, String, boolean)
-	 */
+	 * @deprecated Usar &uacute;nicamente <code>setMandatoryCertificateConditionRFC2254(String, String, boolean)</code>
+	 * <br> Only use <code>setMandatoryCertificateConditionRFC2254(String, String, boolean)</code> */
 	@Deprecated
 	void setMandatoryCertificateCondition(String certFilter);
 
     /** Establece los los datos cifrados en base 64 que se van a descifrar
-     * mediante una pr&oacute;xima llamada a {@link #decipherData()}. <br>
+     * mediante una pr&oacute;xima llamada a <code>decipherData()</code>. <br>
      * <br>
-     * Sets the encrypted data in base 64 to be decrypted by a call to {@link #decipherData()}.
+     * Sets the encrypted data in base 64 to be decrypted by a call to <code>decipherData()</code>.
      * @param data
      *        Datos cifrados en base 64. <br>
      *        Encrypted data in base 64. */
     void setCipherData(String data);
 
     /** Define los datos planos que se van a cifrar mediante una pr&oacute;xima
-     * llamada a {@link #cipherData()}. <br>
+     * llamada a <code>cipherData()</code>. <br>
      * <br>
-     * Defines plain data to be encrypted by a call to {@link #cipherData()}.
+     * Defines plain data to be encrypted by a call to <code>cipherData()</code>.
      * @param data
      *        Datos planos a cifrar. <br>
      *        Plain data to be encrypted. */
@@ -1203,9 +1154,7 @@ interface EntryPointsCrypto {
      * conditions are met, <code>null</code> is returned.
      * @return String Texto plano de la operaci&oacute;n de cifrado /
      *         descifrado. <br>
-     *         Plain text string of the encryption/decryption operation.
-     * @see #decipherData()
-     * @see #setPlainData(String) */
+     *         Plain text string of the encryption/decryption operation. */
     String getPlainData();
 
     /** Establece la ruta del fichero en donde se almacenar&aacute;n los datos
@@ -1224,8 +1173,7 @@ interface EntryPointsCrypto {
      * Returns a signature structure generated or set with base 64 encryption.
      * If no signature is available, an empty string is returned.
      * @return La firma en base 64. <br>
-     *         Signature in base 64.
-     * @see #getSignatureText() */
+     *         Signature in base 64. */
     String getSignatureBase64Encoded();
 
     /** Devuelve la firma generada en el &uacute;ltimo proceso de firma o
@@ -1235,7 +1183,7 @@ interface EntryPointsCrypto {
      * El uso de este m&eacute;todo no esta recomendado ya que el resultado de
      * la que devuelve puede variar seg&uacute;n la codificaci&oacute;n
      * establecida por defecto. Su principal utilidad es mostrar el resultado de
-     * una firma XML. Para firmas binarias debe utilizarse {@link #getSignatureBase64Encoded()}.
+     * una firma XML. Para firmas binarias debe utilizarse <code>getSignatureBase64Encoded()</code>.
      * Si no se dispone de una firma, se devuelve cadena vac&iacute;a. <br>
      * <br>
      * Returns the signature generated in the last signature process, or set by
@@ -1243,12 +1191,12 @@ interface EntryPointsCrypto {
      * If no signature has been generated, an empty string is returned. <br/>
      * The use of this method is discouraged, since returned results may vary
      * depending on the encryption set by default. Its main use is showing the
-     * results of a XML signature. For binary signatures {@link #getSignatureBase64Encoded()} should be used.
+     * results of a XML signature. For binary signatures <code>getSignatureBase64Encoded()</code> should be used.
      * If no signature is available, an empty string is returned.
      * @return La &uacute;ltima firma electr&oacute;nica generada o establecida
      *         por el cliente. <br>
      *         Last generated (or user set) electronic signature.
-     * @deprecated Sustituir por {@link #getSignatureText(String)}.
+     * @deprecated Sustituir por <code>getSignatureText(String)</code>.
      */
     @Deprecated
     String getSignatureText();
@@ -1260,7 +1208,7 @@ interface EntryPointsCrypto {
      * El uso de este m&eacute;todo no esta recomendado ya que el resultado de
      * la que devuelve puede variar seg&uacute;n la codificaci&oacute;n
      * establecida por defecto. Su principal utilidad es mostrar el resultado de
-     * una firma XML. Para firmas binarias debe utilizarse {@link #getSignatureBase64Encoded()}.
+     * una firma XML. Para firmas binarias debe utilizarse <code>getSignatureBase64Encoded()</code>.
      * Si no se dispone de una firma, se devuelve cadena vac&iacute;a. <br>
      * <br>
      * Returns the signature generated in the last signature process, or set by
@@ -1268,7 +1216,7 @@ interface EntryPointsCrypto {
      * If no signature has been generated, an empty string is returned. <br/>
      * The use of this method is discouraged, since returned results may vary
      * depending on the encryption set by default. Its main use is showing the
-     * results of a XML signature. For binary signatures {@link #getSignatureBase64Encoded()} should be used.
+     * results of a XML signature. For binary signatures <code>getSignatureBase64Encoded()</code> should be used.
      * If no signature is available, an empty string is returned.
      *
      * @param charsetName Codificaci&oacute;n del texto. <br>
@@ -1291,9 +1239,7 @@ interface EntryPointsCrypto {
      * been previously set with setFileuri or setHash methods.
      * @param data
      *        Datos a operar codificados en base 64. <br>
-     *        Data to operate with, encrypted in base 64.
-     * @see #setHash(String)
-     * @see #setFileuri(String) */
+     *        Data to operate with, encrypted in base 64. */
     void setData(String data);
 
     /** Establece la URI (o URL) que apunta al fichero que contiene los datos de
@@ -1308,10 +1254,7 @@ interface EntryPointsCrypto {
      * been previously set with setData o setHash methods.
      * @param fileuri
      *        URI hacia el fichero de datos. <br>
-     *        URI to the data file.
-     * @see #setData(String)
-     * @see #setHash(String)
-     * @see #setFileuriBase64(String) */
+     *        URI to the data file. */
     void setFileuri(String fileuri);
 
     /** Establece los datos contenidos en el fichero indicado (en donde se
@@ -1328,8 +1271,7 @@ interface EntryPointsCrypto {
      * will not be checked.
      * @param fileuri
      *        URI hacia el fichero de datos. <br>
-     *        URI to the data file.
-     * @see #setFileuri(String) */
+     *        URI to the data file. */
     void setFileuriBase64(String fileuri);
 
     /** Establece el hash de los datos a firmar para los procesos de firma. <br/>
@@ -1340,21 +1282,19 @@ interface EntryPointsCrypto {
      * This entry will have maximum priority when an explicit signature is
      * performed.
      * @param hash
-     *        Hash en base 64 que se desea firmar.
-     * @see #setData(String)
-     * @see #setFileuri(String) */
+     *        Hash en base 64 que se desea firmar. */
     void setHash(final String hash);
 
     /** Ruta al fichero en el que se ha guardado la firma. Esta direcci&oacute;n
-     * puede hacerse establecido program&aacute;ticamente mediante {@link #setOutFilePath(String) setOutFilePath} o mediante la interfaz que
+     * puede hacerse establecido program&aacute;ticamente mediante <code>setOutFilePath(String) setOutFilePath</code> o mediante la interfaz que
      * aparece cuando no hay un valor asignado. Una vez se establece el valor
      * del fichero de salida este permanece a&uacute;n cuando no se completa la
      * operaci&acute;n de firma. Si no hay un fichero de salida establecido se
      * devuelve cadena vac&iacute;a. <br>
      * <br>
      * Route to the file where the signature has been stored. This address may
-     * have been set programmatically by {@link #setOutFilePath(String)
-     * setOutFilePath} or by the interface showing when there is no assigned
+     * have been set programmatically by <code>setOutFilePath(String)
+     * setOutFilePath</code> or by the interface showing when there is no assigned
      * value. Once the output file's value is set, it remains unchanged, even in
      * cases where the signature operation may not be complete. If there is no
      * set output file, an empty string is returned.
@@ -1363,7 +1303,7 @@ interface EntryPointsCrypto {
     String getFilePath();
 
     /** Devuelve la ruta del fichero de entrada. Esta direcci&oacute;n puede
-     * haberse establecido program&aacute;ticamente mediante {@link #setFileuri(String) setFileuri} o mediante la interfaz que aparece
+     * haberse establecido program&aacute;ticamente mediante <code>setFileuri(String) setFileuri</code> o mediante la interfaz que aparece
      * cuando no hay un valor asignado. Una vez se establece el valor del
      * fichero de datos este permanece a&uacute;n cuando no se completa la
      * operaci&acute;n de firma. Si no hay un fichero de datos establecido se
@@ -1375,7 +1315,7 @@ interface EntryPointsCrypto {
      * previamente deberemos obtener una URI. <br>
      * <br>
      * Returns the input file's path. This address may have been set
-     * programmatically by {@link #setFileuri(String) setFileuri} or or by the
+     * programmatically by <code>setFileuri(String) setFileuri</code> or or by the
      * interface showing when there is no assigned value. Once the file's value
      * is set, it remains unchanged, even in cases where the signature operation
      * may not be complete. If there is no set output file, an empty string is
@@ -1402,9 +1342,7 @@ interface EntryPointsCrypto {
      * been previously set with setElectronicSignatureFile method.
      * @param inElectronicSignature
      *        Firma electr&oacute;nica en base 64. <br>
-     *        Electronic signature in base 64.
-     * @see #setElectronicSignatureFile(String)
-     */
+     *        Electronic signature in base 64. */
     void setElectronicSignature(String inElectronicSignature);
 
     /** Establece la ruta de un fichero de firma electr&oacute;nica como entrada
@@ -1422,15 +1360,13 @@ interface EntryPointsCrypto {
      * been previously set with setElectronicSignature method.
      * @param inElectronicSignatureFile
      *        Ruta del fichero de firma. <br>
-     *        Route to the signature file.
-     * @see #setElectronicSignature(String)
-     */
+     *        Route to the signature file. */
     void setElectronicSignatureFile(String inElectronicSignatureFile);
 
     /** Establece los nodos que deben contrafirmarse durante las operaciones de
      * contrafirma de firmantes y de nodos. Cuando se va a realizar la
      * contrafirma de firmantes concretos se indicar&aacute;n los nombres de los
-     * firmantes tal c&oacute;mo los devuelve {@link #getSignersStructure()}. En
+     * firmantes tal c&oacute;mo los devuelve <code>getSignersStructure()</code>. En
      * el caso de la contrafirma de nodos los indices de los nodos (en donde el
      * primer nodo es el 0).<br>
      * Los distintos elementos se indican consecutivos en
@@ -1441,7 +1377,7 @@ interface EntryPointsCrypto {
      * <br>
      * Sets the nodes to counter-sign in signers and nodes' counter-signature
      * operations. When a specific signer's counter-signature is to be
-     * performed, signers names will be indicated in the way returned by {@link #getSignersStructure()}. In case of nodes' counter-signature,
+     * performed, signers names will be indicated in the way returned by <code>getSignersStructure()</code>. In case of nodes' counter-signature,
      * nodes' indexes (where first node is 0).<br>
      * Different elements are consecutively indicated as a string and
      * separated by '\n' or '\r\n'. Nodes will only be counter-signed once
@@ -1506,29 +1442,29 @@ interface EntryPointsCrypto {
     /** Cifra los datos indicados mediante el m&eacute;todo setPlainData(String).
      * Si no se le indica algoritmo de cifrado, modo de bloque y el padding, se
      * usar&aacute; la configuracion por defecto. Puede establecerse el modo de
-     * clave con {@link #setKeyMode(String)} para seg&uacute;n deseemos clave
+     * clave con <code>setKeyMode(String)</code> para seg&uacute;n deseemos clave
      * autogenerada, clave manual o contrase&ntilde;a. Los datos se pueden
-     * recuperar con {@link #getCipherData()} y almacenar en disco con
-     * {@link #saveCipherDataToFile(String)}. <br>
+     * recuperar con <code>getCipherData()</code> y almacenar en disco con
+     * <code>saveCipherDataToFile(String)</code>.<br>
      * <br>
      * Encrypts indicated data by setPlainData(String) method. If no encryption
      * algorithm, block mode and padding is indicated, default configuration
-     * will be used. Key mode can be set with {@link #setKeyMode(String)}, if
+     * will be used. Key mode can be set with <code>setKeyMode(String)</code>, if
      * either self-generated, manual, or password key is desired. Data can be
-     * retrieved with {@link #getCipherData()} and stored to disk with
-     * {@link #saveCipherDataToFile(String)}.
+     * retrieved with <code>getCipherData()</code> and stored to disk with
+     * <code>saveCipherDataToFile(String)</code>.
      * @return true si la operaci&oacute;n se realiz&oacute; con &eacute;xito,
      *         false en caso contrario. <br>
      *         true if operation successful. Else, false. */
     boolean cipherData();
 
     /** Cifra el fichero especificado. El resultado de esta operaci&oacute;n es
-     * el mismo que el de ejecutar el m&eacute;todo {@link #cipherData()} tras
-     * haber indicado un fichero con {@link #setFileuri(String)}. No puede
+     * el mismo que el de ejecutar el m&eacute;todo <code>cipherData()</code> tras
+     * haber indicado un fichero con <code>setFileuri(String)</code>. No puede
      * recuperarse la ruta de fichero mediante getFileUsedPath(). <br>
      * <br>
      * Encrypts the specified file. This operation's result is equivalent to
-     * executing {@link #cipherData()} method, after indicating a file with {@link #setFileuri(String)}. The files path cant recovered using
+     * executing <code>cipherData()</code> method, after indicating a file with <code>setFileuri(String)</code>. The files path cant recovered using
      * getFileUsedPath() method.
      * @param fileUri
      *        Fichero de datos a cifrar <br>
@@ -1538,10 +1474,10 @@ interface EntryPointsCrypto {
     boolean cipherFile(String fileUri);
 
     /** Realiza una operaci&oacute;n de descifrado de datos. Los datos a
-     * descifrar pueden establecerse en base 64 mediante el m&eacute;todo {@link #setCipherData(String)} o, de tratarse de un fichero, a
-     * trav&eacute;s de {@link #setFileuri(String)}. La configuraci&oacute;n de
+     * descifrar pueden establecerse en base 64 mediante el m&eacute;todo <code>setCipherData(String)</code> o, de tratarse de un fichero, a
+     * trav&eacute;s de <code>setFileuri(String)</code>. La configuraci&oacute;n de
      * cifrado que se utiliz&oacute; para los datos debe indicarse por medio del
-     * m&eacute;todo {@link #setCipherAlgorithm(String)} que puede contener el
+     * m&eacute;todo <code>setCipherAlgorithm(String)</code> que puede contener el
      * algoritmo de cifrado &uacute;nicamente o la configuraci&oacute;n completa
      * de algoritmo de cifrado, modo de bloque y padding, con los datos
      * separados por una barra ('/'). Por ejemplo:
@@ -1550,17 +1486,17 @@ interface EntryPointsCrypto {
      * <li>AES/ECB/PKCS5PADDING</li>
      * </ul>
      * Seg&uacute;n el algoritmo de cifrado deberemos indicar mediante el
-     * m&eacute;todo {@link #setKeyMode(String)} y es necesaria una clave de
-     * cifrado, introducida en base 64 mediante {@link #setKey(String)}, o una
+     * m&eacute;todo <code>setKeyMode(String)</code> y es necesaria una clave de
+     * cifrado, introducida en base 64 mediante <code>setKey(String)</code>, o una
      * contrase&ntilde;a que el propio usuario deber&aacute; establecer a
      * trav&eacute;s de un di&aacute;logo modal que se le
      * presentar&aacute;.</br> El resultado de la operaci&oacute;n puede
-     * recuperarse con {@link #getPlainData()} o salvarse directamente a disco
-     * con {@link #savePlainDataToFile(String)}. <br>
+     * recuperarse con <code>getPlainData()</code> o salvarse directamente a disco
+     * con <code>savePlainDataToFile(String)</code>. <br>
      * <br>
      * Performs a decryption operation. Data to decrypt may be set in base 64
-     * with the {@link #setCipherData(String)} method or, if a file, with {@link #setFileuri(String)}. Encryption configuration used for the data
-     * must be indicated with {@link #setCipherAlgorithm(String)} method which
+     * with the <code>setCipherData(String)</code> method or, if a file, with <code>setFileuri(String)</code>. Encryption configuration used for the data
+     * must be indicated with <code>setCipherAlgorithm(String)</code> method which
      * may contain the encryption algorithm only, or the complete encryption
      * algorithm configuration, block mode, and padding, with data separated by
      * a slash ('/'). E.g.:
@@ -1568,10 +1504,10 @@ interface EntryPointsCrypto {
      * <li>AES</li>
      * <li>AES/ECB/PKCS5PADDING</li>
      * </ul>
-     * According to the encryption algorithm, the {@link #setKeyMode(String)} must be used, and a mandatory encryption key in base 64 must be
-     * introduced with {@link #setKey(String)}, or a password set by user with a
+     * According to the encryption algorithm, the <code>setKeyMode(String)</code> must be used, and a mandatory encryption key in base 64 must be
+     * introduced with <code>setKey(String)</code>, or a password set by user with a
      * modal dialog that will be displayed.</br> Operation's result may be
-     * retrieved with {@link #getPlainData()} or be directly saved to disk with {@link #savePlainDataToFile(String)}.
+     * retrieved with <code>getPlainData()</code> or be directly saved to disk with <code>savePlainDataToFile(String)</code>.
      * @return true si la operaci&oacute;n finaliz&oacute; con &eacute;xito,
      *         false en caso contrario. <br>
      *         true if operation successful. Else, false. */
@@ -1579,7 +1515,7 @@ interface EntryPointsCrypto {
 
     /** Desencripta el fichero indicado. La configuraci&oacute;n de cifrado que
      * se utiliz&oacute; para los datos debe indicarse por medio del
-     * m&eacute;todo {@link #setCipherAlgorithm(String)} que puede contener el
+     * m&eacute;todo <code>setCipherAlgorithm(String)</code> que puede contener el
      * algoritmo de cifrado &uacute;nicamente o la configuraci&oacute;n completa
      * de algoritmo de cifrado, modo de bloque y padding, con los datos
      * separados por una barra ('/'). Por ejemplo:
@@ -1588,16 +1524,16 @@ interface EntryPointsCrypto {
      * <li>AES/ECB/PKCS5PADDING</li>
      * </ul>
      * Seg&uacute;n el algoritmo de cifrado deberemos indicar mediante el
-     * m&eacute;todo {@link #setKeyMode(String)} y es necesaria una clave de
-     * cifrado, introducida en base 64 mediante {@link #setKey(String)}, o una
+     * m&eacute;todo <code>setKeyMode(String)</code> y es necesaria una clave de
+     * cifrado, introducida en base 64 mediante <code>setKey(String)</code>, o una
      * contrase&ntilde;a que el propio usuario deber&aacute; establecer a
      * trav&eacute;s de un di&aacute;logo modal que se le
      * presentar&aacute;.</br> El resultado de la operaci&oacute;n puede
-     * recuperarse con {@link #getPlainData()} o salvarse directamente a disco
-     * con {@link #savePlainDataToFile(String)}. <br>
+     * recuperarse con <code>getPlainData()</code> o salvarse directamente a disco
+     * con <code>savePlainDataToFile(String)</code>. <br>
      * <br>
      * Decrypts indicated file. Encryption configuration used for data must be
-     * indicated with {@link #setCipherAlgorithm(String)} method, which may
+     * indicated with <code>setCipherAlgorithm(String)</code> method, which may
      * include the encryption algorithm only, or the complete encryption
      * algorithm configuration, block mode and padding, with data separated by a
      * slash ('/'). Example:
@@ -1605,10 +1541,10 @@ interface EntryPointsCrypto {
      * <li>AES</li>
      * <li>AES/ECB/PKCS5PADDING</li>
      * </ul>
-     * According to the encryption algorithm, the {@link #setKeyMode(String)} method must be used, and a mandatory encryption key in base 64 must be
-     * introduced with {@link #setKey(String)}, or a password set by user with a
+     * According to the encryption algorithm, the <code>setKeyMode(String)</code> method must be used, and a mandatory encryption key in base 64 must be
+     * introduced with <code>setKey(String)</code>, or a password set by user with a
      * modal dialog that will be displayed.</br> Operation's result may be
-     * retrieved with {@link #getPlainData()} or be directly saved to disk with {@link #savePlainDataToFile(String)}.
+     * retrieved with <code>getPlainData()</code> or be directly saved to disk with <code>savePlainDataToFile(String)</code>.
      * @param fileUri
      *        Archivo de datos a descifrar <br>
      *        Data file to decrypt.
@@ -1631,10 +1567,9 @@ interface EntryPointsCrypto {
 
     /** Define una nueva clave sim&eacute;trica para para el cifrado cuando el
      * modo de cifrado es mediante clave introducida por el usuario. Debe ser
-     * especificada en base64, igual que ser&aacute; obtenida mediante {@link #getKey()}.
+     * especificada en base64, igual que ser&aacute; obtenida mediante <code>getKey()</code>.
      * @param newKey
-     *        Clave en base64.
-     * @see #setKeyMode(String) */
+     *        Clave en base64. */
     void setKey(String newKey);
 
     /** Establece la cadena de texto usada como contrase&ntilde;a para el cifrado
@@ -1652,8 +1587,7 @@ interface EntryPointsCrypto {
      *        Text string used as password.
      * @return Devuelve <code>true</code> si la contrase&ntilde;a es
      *         v&aacute;lida, <code>false</code> en caso contrario. <br>
-     *         Returns <code>true</code> if password is valid. Else, <code>false</code>.
-     * @see #setKeyMode(String) */
+     *         Returns <code>true</code> if password is valid. Else, <code>false</code>. */
     boolean setPassword(String password);
 
     /** Devuelve la cadena de texto usada como password en la &uacute;ltima
@@ -1737,10 +1671,7 @@ interface EntryPointsCrypto {
      * </ul>
      * @param algorithm
      *        Algoritmo de encriptaci&oacute;n sim&eacute;trica <br>
-     *        Symmetric encryption algorithm
-     * @see #cipherData()
-     * @see #cipherFile(String)
-     * @see #buildCMSStructure() */
+     *        Symmetric encryption algorithm */
     void setCipherAlgorithm(String algorithm);
 
     /** Devuelve el algoritmo sim&eacute;trico actualmente en uso.<br>
@@ -1782,8 +1713,7 @@ interface EntryPointsCrypto {
      * <br>
      * <br>
      * @return Algoritmo de cifrado. <br>
-     *         Encryption algorithm.
-     * @see #setKeyMode(String) */
+     *         Encryption algorithm. */
     String getCipherAlgorithm();
 
     /** Devuelve el modo de firma electr&oacute;nica empleado en la &uacute;ltima
@@ -1813,8 +1743,7 @@ interface EntryPointsCrypto {
      * <br>
      * Returns the current key generation mode.
      * @return Modo de generaci&oacute;n. <br>
-     *         Generation Mode.
-     * @see #setKeyMode(String) */
+     *         Generation Mode. */
     String getKeyMode();
 
     /** Define el modo de obtenci&oacute;n de clave para cifrado / descifrado
@@ -1893,17 +1822,17 @@ interface EntryPointsCrypto {
     /** Agrega un nuevo destinatario, por medio de su certificado, a la lista de
      * destinatarios a los que se enviar&aacute; un sobre digital. Este
      * destinario se agrega a los que se hayan especificado por medio del
-     * m&eacute;todo {@link #setRecipientsToCMS(String)} de tal forma que usar
+     * m&eacute;todo <code>setRecipientsToCMS(String)</code> de tal forma que usar
      * este m&eacute;todo no afectar&aacute; a los certificados introducidos
      * mediante aquella funci&oacute;n y viceversa. Para eliminar un certificado
-     * de la lista agregado mediante este m&eacute;todo deber&aacute; usarse {@link #removeRecipientToCMS(String)}. <br>
+     * de la lista agregado mediante este m&eacute;todo deber&aacute; usarse <code>removeRecipientToCMS(String)</code>. <br>
      * <br>
      * Adds a new recipient to list of recipients that will be sent a digital
      * envelope, using the former's certificate. This recipient is added to
-     * those specified with {@link #setRecipientsToCMS(String)}. Thus, the use
+     * those specified with <code>setRecipientsToCMS(String)</code>. Thus, the use
      * of this method does not affect certificates introduced using that
      * function, and viceversa. To eliminate a certificate added to the list
-     * with this method, {@link #removeRecipientToCMS(String)} must be used.
+     * with this method, <code>removeRecipientToCMS(String)</code> must be used.
      * @param certB64
      *        Certificado en base 64. <br>
      *        Certificate in base 64. */
@@ -1911,10 +1840,10 @@ interface EntryPointsCrypto {
 
     /** Eliminar un destinatario de la lista de destinatarios a los que se
      * enviar&aacute; un sobre digital siempre y cuando este se haya
-     * especificado mediante el m&eacute;todo {@link #addRecipientToCMS(String)} . <br>
+     * especificado mediante el m&eacute;todo <code>addRecipientToCMS(String)</code> . <br>
      * <br>
      * Eliminates a recipient from the list of recipients that will be sent a
-     * digital envelope, as long as it was specified with {@link #addRecipientToCMS(String)}.
+     * digital envelope, as long as it was specified with <code>addRecipientToCMS(String)</code>.
      * @param certB64
      *        Certificado en base 64 del destinatario que deseamos eliminar. <br>
      *        Certificate in base 64, for the recipient desired for
@@ -1922,91 +1851,89 @@ interface EntryPointsCrypto {
     void removeRecipientToCMS(String certB64);
 
     /** Crea un objeto CMS encriptado (sin informaci&oacute;n de clave, emisor o
-     * receptor) con los datos establecidos mediante {@link #setData(String)} o {@link #setFileuri(String)}. La configuraci&oacute;n del cifrado se
-     * establece con {@link #setKeyMode(String)} para seleccionar el tipo de
+     * receptor) con los datos establecidos mediante <code>setData(String)</code> o <code>setFileuri(String)</code>. La configuraci&oacute;n del cifrado se
+     * establece con <code>setKeyMode(String)</code> para seleccionar el tipo de
      * cifrado (por clave o por password) y, en caso de establecerse el uso de
      * claves (valor por defecto) ser&aacute; obligatorio establecer una clave
-     * mediante {@link #setKey(String)}. En cambio, la contrase&ntilda;a se
+     * mediante <code>setKey(String)</code>. En cambio, la contrase&ntilda;a se
      * pedir&aacute; siempre mediante una interfaz propia del cliente, sin
      * posibilidad de introducirla program&aacute;ticamente. <br/>
-     * El algoritmo de cifrado se establecer&aacute; con {@link #setCipherAlgorithm(String)}, el modo de bloque y el relleno
+     * El algoritmo de cifrado se establecer&aacute; con <code>setCipherAlgorithm(String)</code>, el modo de bloque y el relleno
      * siempre ser&aacute;n "CBC" y "PKCS#5 Padding" respectivamente. <br/>
-     * El resultado se puede recuperar mediante {@link #getData()} en formato
-     * binario o mediante {@link #getB64Data()} en base 64 y puede ser
-     * almacenado en un fichero mediante {@link #saveCipherDataToFile(String)}. <br>
+     * El resultado se puede recuperar mediante <code>getData()</code> en formato
+     * binario o mediante <code>getB64Data()</code> en base 64 y puede ser
+     * almacenado en un fichero mediante <code>saveCipherDataToFile(String)</code>. <br>
      * <br>
      * Creates an encrypted CMS object (w/o key, sender or recipient
-     * information) with the data set with {@link #setData(String)} or {@link #setFileuri(String)}. Encryption configuration is set with
-     * {@link #setKeyMode(String)} to select the kind of encryption (key or
+     * information) with the data set with <code>setData(String)</code> or <code>setFileuri(String)</code>. Encryption configuration is set with
+     * <code>setKeyMode(String)</code> to select the kind of encryption (key or
      * password) and - if the default option of key is used - it will be
-     * mandatory that a key be set with {@link #setKey(String)}. In contrast,
+     * mandatory that a key be set with <code>setKey(String)</code>. In contrast,
      * passwords will always be requested via a client's propietary interface.
      * No programmatic introduction is possible. <br/>
-     * The encryption algorith is set with {@link #setCipherAlgorithm(String)},
+     * The encryption algorith is set with <code>setCipherAlgorithm(String)</code>,
      * block mode and fill will always be "CBC" y "PKCS#5 Padding",
      * respectively. <br/>
-     * Results may be retrieved with {@link #getB64Data()} in binary or with {@link #getB64Data()} in base 64 and they may be stored in a file with
-     * {@link #saveCipherDataToFile(String)}.
+     * Results may be retrieved with <code>getB64Data()</code> in binary or with <code>getB64Data()</code> in base 64 and they may be stored in a file with
+     * <code>saveCipherDataToFile(String)</code>.
      * @return <code>true</code> si la operaci&oacute;n se ha realizado con
      *         &eacute;xito. <br>
      *         <code>true</code>, if successul.
-     * @see #saveDataToFile()
      * @deprecated Sustituir por la configuraci&oacute;n del tipo de contenido
-     *             con {@link #setCMSContentType(String)} y la generaci&oacute;n
-     *             de la estrutura mediante {@link #buildCMSStructure()}. <br>
+     *             con <code>setCMSContentType(String)</code> y la generaci&oacute;n
+     *             de la estrutura mediante <code>buildCMSStructure()</code>.<br>
      * <br>
-     *             Replace with the content type's configuration with {@link #setCMSContentType(String)} and the structure
-     *             generation with {@link #buildCMSStructure()}. */
+     *             Replace with the content type's configuration with <code>getCMSContentType(String)</code> and the structure
+     *             generation with <code>buildCMSStructure()</code>. */
     @Deprecated
     boolean buildCMSEncrypted();
 
-    /** Crea un objeto CMS AuthenticatedData con los datos establecidos mediante {@link #setData(String)} o {@link #setFileuri(String)}. <br>
+    /** Crea un objeto CMS AuthenticatedData con los datos establecidos mediante <code>setData(String)</code> o <code>setFileuri(String)</code>. <br>
      * <br>
-     * Creates a CMS AuthenticatedData object with the data set with {@link #setData(String)} or {@link #setFileuri(String)}.
+     * Creates a CMS AuthenticatedData object with the data set with <code>setData(String)</code> or <code>setFileuri(String)</code>.
      * @return <code>true</code> si la operaci&oacute;n se ha realizado con
      *         &eacute;xito, <code>false</code> en caso contrario. <br>
      *         <code>true</code> if successful. Else, <code>false</code>.
-     * @see #saveDataToFile()
      * @deprecated Sustituir por la configuraci&oacute;n del tipo de contenido
-     *             con {@link #setCMSContentType(String)} y la generaci&oacute;n
-     *             de la estrutura mediante {@link #buildCMSStructure()}. <br>
+     *             con <code>setCMSContentType(String)</code> y la generaci&oacute;n
+     *             de la estrutura mediante <code>buildCMSStructure()</code>.<br>
      * <br>
-     *             Replace with the content type's configuration with {@link #setCMSContentType(String)} and the structure
-     *             generation with {@link #buildCMSStructure()}. */
+     *             Replace with the content type's configuration with <code>setCMSContentType(String)</code> and the structure
+     *             generation with <code>buildCMSStructure()</code>. */
     @Deprecated
     boolean buildCMSAuthenticated();
 
-    /** Crea un objeto CMS envuelto utilizando los datos introducidos con {@link #setData(String)} o {@link #setFileuri(String)} y los certificados
-     * indicados mediante {@link #setRecipientsToCMS(String)} como receptores.
+    /** Crea un objeto CMS envuelto utilizando los datos introducidos con <code>setData(String)</code> o <code>setFileuri(String)</code> y los certificados
+     * indicados mediante <code>setRecipientsToCMS(String)</code> como receptores.
      * Es obligatorio introducir al menos un receptor. Los datos del emisor se
      * introducir&aacute; en el envoltorio si se ha establecido el certificado
-     * del emisor mediante {@link #setSelectedCertificateAlias(String)}, en caso
+     * del emisor mediante <code>setSelectedCertificateAlias(String)</code>, en caso
      * contrario no se incluir&aacute;. <br/>
-     * El resultado se podr&aacute; recuperar en base64 mediante {@link #getB64Data()} y puede ser almacenado en un fichero mediante
-     * {@link #saveDataToFile()}. <br>
+     * El resultado se podr&aacute; recuperar en base64 mediante <code>getB64Data()</code> y puede ser almacenado en un fichero mediante
+     * <code>saveDataToFile()</code>. <br>
      * <br>
-     * Creates an enveloped CMS object, using the data set with {@link #setData(String)} or {@link #setFileuri(String)} and the
-     * certificates indicated with {@link #setRecipientsToCMS(String)} as
+     * Creates an enveloped CMS object, using the data set with <code>setData(String)</code> or <code>setFileuri(String)</code> and the
+     * certificates indicated with <code>setRecipientsToCMS(String)</code> as
      * recipients. It is mandatory to set at least one recipient. Sender data
-     * will be set in the envelope if the sender certificate has been set with {@link #setSelectedCertificateAlias(String)}. Else, it will not be
+     * will be set in the envelope if the sender certificate has been set with <code>setSelectedCertificateAlias(String)</code>. Else, it will not be
      * included. <br/>
-     * Results may be retrieved in base 64 with {@link #getB64Data()} and may be
-     * stored in a file with {@link #saveDataToFile()}.
+     * Results may be retrieved in base 64 with <code>getB64Data()</code> and may be
+     * stored in a file with <xode>saveDataToFile()</code>.
      * @return Devuelve <code>true</code> si la operaci&oacute;n se ha realizado
      *         con &eacute;xito. <br>
      *         Returns <code>true</code> if successful.
      * @deprecated Sustituir por la configuraci&oacute;n del tipo de contenido
-     *             con {@link #setCMSContentType(String)} y la generaci&oacute;n
-     *             de la estrutura mediante {@link #buildCMSStructure()} <br>
+     *             con <code>setCMSContentType(String)</code> y la generaci&oacute;n
+     *             de la estrutura mediante <code>buildCMSStructure()</code> <br>
      * <br>
-     *             Replace with the content type's configuration with {@link #setCMSContentType(String)} and the structure
-     *             generation with {@link #buildCMSStructure()} */
+     *             Replace with the content type's configuration with <code>setCMSContentType(String)</code> and the structure
+     *             generation with <code>buildCMSStructure()</code> */
     @Deprecated
     boolean buildCMSEnveloped();
 
-    /** Crea la estructura CMS del tipo indicado con {@link #setCMSContentType(String)}, por defecto "EnvelopedData".<br/>
+    /** Crea la estructura CMS del tipo indicado con <code>setCMSContentType(String)</code>, por defecto "EnvelopedData".<br/>
      * La estructura de datos se generar&aacute; a partir de los datons
-     * indicados mediante {@link #setData(String)} o {@link #setFileuri(String)} . Adicionalmente, cada estructura requiere la configuraci&oacute;n de
+     * indicados mediante <code>setData(String)</code> o <code>setFileuri(String)</code> . Adicionalmente, cada estructura requiere la configuraci&oacute;n de
      * los
      * siguientes par&aacute;metros:<br/>
      * <ul>
@@ -2018,16 +1945,16 @@ interface EntryPointsCrypto {
      * <li><b>AuthEnvelopedData:</b> Estructura de datos autenticada y envuelta (Sobre digital autenticado). Requiere que se le indiquen los
      * destinatarios del mensaje y el remitente.</li>
      * </ul>
-     * Los destinatarios se deber&aacute;n indicar mediante {@link #setRecipientsToCMS(String)} y/o {@link #addRecipientToCMS(String)} y
-     * {@link #removeRecipientToCMS(String)}. El emisor puede indicarse mediante {@link #setSelectedCertificateAlias(String)}. De no hacerlo y ser
+     * Los destinatarios se deber&aacute;n indicar mediante <code>setRecipientsToCMS(String)</code> y/o <code>addRecipientToCMS(String)</code> y
+     * <code>removeRecipientToCMS(String)</code>. El emisor puede indicarse mediante <code>setSelectedCertificateAlias(String)</code>. De no hacerlo y ser
      * obligatorio, se presentar&aacute; un di&aacute;logo al usuario para su
      * selecci&oacute;n. <br/>
-     * El resultado se podr&aacute; recuperar en base64 mediante {@link #getB64Data()} y puede ser almacenado en un fichero mediante
-     * {@link #saveDataToFile()}. <br>
+     * El resultado se podr&aacute; recuperar en base64 mediante <code>getB64Data()</code> y puede ser almacenado en un fichero mediante
+     * <code>saveDataToFile()</code>. <br>
      * <br>
-     * Creates a CMS structure of the type indicated with {@link #setCMSContentType(String)}. Default content type is
+     * Creates a CMS structure of the type indicated with <code>setCMSContentType(String)</code>. Default content type is
      * "EnvelopedData".<br/>
-     * Data structure will be generated from the data set with {@link #setData(String)} or {@link #setFileuri(String)}. Moreover, each
+     * Data structure will be generated from the data set with <code>setData(String)</code> or <code>setFileuri(String)</code>. Moreover, each
      * structure requires the configuration of the following parameters:<br/>
      * <ul>
      * <li><b>EncryptedData:</b> Symmetrically encrypted data structure. Requires setting an encryption configuration.</li>
@@ -2037,12 +1964,12 @@ interface EntryPointsCrypto {
      * <li><b>AuthEnvelopedData:</b> Authenticated and enveloped data structure (Authenticated digital envelope). Requires messages's recipients and
      * sender to be set.</li>
      * </ul>
-     * Recipients must be indicated with {@link #setRecipientsToCMS(String)} and/or {@link #addRecipientToCMS(String)} and
-     * {@link #removeRecipientToCMS(String)}. Sender may be indicated with {@link #setSelectedCertificateAlias(String)}. If no sender is indicated
+     * Recipients must be indicated with <code>setRecipientsToCMS(String)</code> and/or <code>addRecipientToCMS(String)</code> and
+     * <code>removeRecipientToCMS(String)</code>. Sender may be indicated with <code>setSelectedCertificateAlias(String)</code>. If no sender is indicated
      * in mandatory cases, a dialog will be displayed, promting the user to
      * select it. <br/>
-     * Results may me retrieved in base64 with {@link #getB64Data()} and can be
-     * saved to a file with {@link #saveDataToFile(String)}.
+     * Results may me retrieved in base64 with <code>getB64Data()</code> and can be
+     * saved to a file with <code>saveDataToFile(String)</code>.
      * @return Devuelve <code>true</code> si la operaci&oacute;n finaliz&oacute;
      *         con &eacute;xito. <br>
      *         Returns <code>true</code> if operation ended successfully. */
@@ -2068,8 +1995,7 @@ interface EntryPointsCrypto {
      * </ul>
      * @param contentType
      *        Tipo de contenido. <br>
-     *        Type of contents.
-     * @see #buildCMSStructure() */
+     *        Type of contents. */
     void setCMSContentType(String contentType);
 
     /** Devuelve los datos generados en la &uacute;ltima operaci&oacute;n de
@@ -2080,33 +2006,29 @@ interface EntryPointsCrypto {
      * operation. If no such operation has been executed, an empty string is
      * returned.
      * @return String en Base 64. <br>
-     *         String in base 64.
-     * @see #buildCMSEncrypted
-     * @see #buildCMSEnveloped()
-     * @see #signAndPackData()
-     * @see #signAndPackFile(String) */
+     *         String in base 64. */
     String getB64Data();
 
     /** Recupera el contenido de un sobre digital. El sobre se indicar&aacute;
      * mediante una cadena en Base 64 con <code>setData</code> o mediante un
      * fichero con <code>setFileuri</code>. <br/>
      * En el caso de los sobre <code>EncryptedData</code>, puede indicarse si se
-     * cifr&oacute; con contrase&ntilde; o clave mediante el m&eacute;todo {@link #setKeyMode(String)}, y esta con {@link #setPassword(String)} o
-     * {@link #setKey(String)}, respectivamente. <br/>
+     * cifr&oacute; con contrase&ntilde; o clave mediante el m&eacute;todo <code>setKeyMode(String)</code>, y esta con <code>setPassword(String)</code> o
+     * <code>etKey(String)</code>, respectivamente. <br/>
      * En el caso de los sobres <code>EnvelopedData</code> y <code>SignedAndEnvelopedData</code> se puede indicar el certificado para
-     * descifrar mediante el m&eacute;todo {@link #setSelectedCertificateAlias(String)}. <br/>
-     * El resultado se podr&aacute; recuperar en base64 mediante {@link #getB64Data()} y puede ser almacenado en un fichero mediante
-     * {@link #saveDataToFile()}. <br>
+     * descifrar mediante el m&eacute;todo <code>setSelectedCertificateAlias(String)</code>. <br/>
+     * El resultado se podr&aacute; recuperar en base64 mediante <code>getB64Data()</code> y puede ser almacenado en un fichero mediante
+     * <code>saveDataToFile()</code>.<br>
      * <br>
      * Recovers a digital envelope's contents. Envelope will be indicated with a
      * base 64 string with <code>setData</code> or w<code>setFileuri</code>. <br/>
      * In the case of <code>EncryptedData</code> envelopes, it may be indicated
-     * whether password or key was used for encryption with {@link #setKeyMode(String)} method. In turn, these may be set with
-     * {@link #setPassword(String)} or {@link #setKey(String)}, respectively. <br/>
+     * whether password or key was used for encryption with <code>setKeyMode(String)</code> method. In turn, these may be set with
+     * <code>setPassword(String)</code> or <code>setKey(String)</code>, respectively. <br/>
      * In case of <code>EnvelopedData</code> and <code>SignedAndEnvelopedData</code> envelopes certificate for decryption
-     * may be set with {@link #setSelectedCertificateAlias(String)}. <br/>
-     * Results can be retrieved in base 64 with {@link #getB64Data()} and can be
-     * saved to a file with {@link #saveDataToFile()}.
+     * may be set with <code>setSelectedCertificateAlias(String)</code>. <br/>
+     * Results can be retrieved in base 64 with <code>getB64Data()</code> and can be
+     * saved to a file with <code>saveDataToFile()</code>.
      * @return true si la operaci&oacute;n fue correcta. <br>
      *         true if successful. */
     boolean recoverCMS();
@@ -2141,20 +2063,20 @@ interface EntryPointsCrypto {
      *         String for the CMS object. */
     String formatEncryptedCMS(String b64);
 
-    /** Firma y empaqueta en un sobre digital los datos especificados por {@link #setData(String)} o {@link #setFileuri(String)} El resultado puede
-     * ser recuperado mediante {@link #getB64Data()} <br>
+    /** Firma y empaqueta en un sobre digital los datos especificados por <code>setData(String)</code> o <code>setFileuri(String)</code>. El resultado puede
+     * ser recuperado mediante <code>getB64Data()</code> <br>
      * <br>
-     * Signs and packs in a digital envelope the digital data specified by {@link #setData(String)}. Results can be retrieved with
-     * {@link #getB64Data()} or {@link #setFileuri(String)}.
+     * Signs and packs in a digital envelope the digital data specified by <code>setData(String)</code>. Results can be retrieved with
+     * <code>getB64Data()</code> or <code>setFileuri(String)</code>.
      * @return true si la operaci&oacute;n se ha efectuado correctamente <br>
      *         true if successful. */
     boolean signAndPackData();
 
     /** Firma y empaqueta en un sobre digital el fichero especificado por uri. El
-     * resultado puede ser recuperado mediante {@link #getB64Data()}. <br>
+     * resultado puede ser recuperado mediante <code>getB64Data()</code>. <br>
      * <br>
      * Signs and packs in a digital envelope the file specified by uri. Results
-     * can be retrieved with {@link #getB64Data()}.
+     * can be retrieved with <code>getB64Data()</code>.
      * @param uri
      *        Localizaci&oacute;n en formato URI de los datos a firmar y
      *        empaquetar <br>
@@ -2164,11 +2086,11 @@ interface EntryPointsCrypto {
     boolean signAndPackFile(String uri);
 
     /** Agrega un nuevo remitente a un sobre electr&oacute;nico especificado
-     * mediante {@link #setData(String)} o {@link #setFileuri(String)}. El
-     * resultado puede ser recuperado mediante {@link #getB64Data()}. <br>
+     * mediante <code>setData(String)</code> o <code>setFileuri(String)</code>. El
+     * resultado puede ser recuperado mediante <code>getB64Data()</code>. <br>
      * <br>
-     * Add a new sender in a digital envelope specified with {@link #setData(String)} or {@link #setFileuri(String)}. Results can be
-     * retrieved with {@link #getB64Data()}.
+     * Add a new sender in a digital envelope specified with <code>setData(String)</code> or <code>setFileuri(String)</code>. Results can be
+     * retrieved with <code>getB64Data()</code>.
      * @return true si la operaci&oacute;n se ha efectuado correctamente. <br>
      *         true if successful. */
     boolean coEnvelop();
@@ -2211,9 +2133,7 @@ interface EntryPointsCrypto {
      * previously establish LDAP configuration and the conditions to identify
      * this certificate.
      * @return Certificado descargado en base 64. <br>
-     *         Downloaded certificate in base 64.
-     * @see #setLdapConfiguration(String, String, String)
-     * @see #setLdapCertificatePrincipal(String) */
+     *         Downloaded certificate in base 64. */
     String getLdapCertificate();
 
     // *******************************************************************/
@@ -2237,16 +2157,16 @@ interface EntryPointsCrypto {
     /** Firma todos los archivos de un directorio seg&uacute;n la configuracion
      * establecida. La firma siempre se realizar&aacute; en modo
      * expl&iacute;cito salvo que el formato de firma concreto exija lo
-     * contrario. El directorio de firma se puede establecer con {@link #setInputDirectoryToSign(String)}, si no se hace, se
+     * contrario. El directorio de firma se puede establecer con <code>setInputDirectoryToSign(String)</code>, si no se hace, se
      * mostrar&aacute; un di&aacute;logo para la selecci&oacute;n del
      * directorio. Para indicar que se desea firmar tambi&eacute;n los ficheros
-     * de los subdirectorios del directorio establecido, debe usarse {@link #setInRecursiveDirectorySign(boolean)}. Es posible limitar los
-     * ficheros que deben firmarse mediante un filtro establecido con {@link #setInIncludeExtensions(String)}. <br/>
+     * de los subdirectorios del directorio establecido, debe usarse <code>setInRecursiveDirectorySign(boolean)</code>. Es posible limitar los
+     * ficheros que deben firmarse mediante un filtro establecido con <code>setInIncludeExtensions(String)</code>. <br/>
      * La operaci&oacute;n masiva a realizar ser&aacute; por defecto la de
      * firma, aunque puede modificarse para realizar las operaciones de cofirma
      * o contrafirma (de todo el arbol de firma o s&oacute;lo los nodos hoja).
-     * El tipo de operaci&oacute;n se indica mediante {@link #setMassiveOperation(String)}. <br/>
-     * Si no se indica un directorio de salida con {@link #setOutputDirectoryToSign(String)} el resultado se
+     * El tipo de operaci&oacute;n se indica mediante <code>setMassiveOperation(String)</code>. <br/>
+     * Si no se indica un directorio de salida con <code>setOutputDirectoryToSign(String)</code> el resultado se
      * almacenar&aacute; en el directorio de entrada. Si se indica el directorio
      * de salida y este no existe, se crear&aacute;. </br>Si se produjo
      * alg&uacute;n error durante la firma de un fichero, el proceso
@@ -2256,15 +2176,15 @@ interface EntryPointsCrypto {
      * Signs all of a directory's files, according to established configuration.
      * Signature will always be performed in an explicit way, except in cases
      * where the specific signature format requires otherwise. Signature
-     * directory can be set with {@link #setInputDirectoryToSign(String)}. Else,
-     * a dialog will be displayed, prompting the selection of a directory. {@link #setInRecursiveDirectorySign(boolean)} must be used to indicate
+     * directory can be set with <code>etInputDirectoryToSign(String)</code>. Else,
+     * a dialog will be displayed, prompting the selection of a directory. <code>setInRecursiveDirectorySign(boolean)</code> must be used to indicate
      * that subdirectory files are also meant for signing. A limit may be
-     * established on the files to be signed with a filter set with {@link #setInIncludeExtensions(String)}. <br/>
+     * established on the files to be signed with a filter set with <code>setInIncludeExtensions(String)</code>. <br/>
      * Massive operation to perform will by default be signature, although this
      * can be modified in order to perform cosignature or counter-signature
      * (whole signature tree or just the leave nodes). The kind of operation is
-     * indicated with {@link #setMassiveOperation(String)}. <br/>
-     * If no output directory is indicated with {@link #setOutputDirectoryToSign(String)} results will be saved in the
+     * indicated with <code>setMassiveOperation(String)</code>. <br/>
+     * If no output directory is indicated with <code>setOutputDirectoryToSign(String)</code> results will be saved in the
      * input directory. If indicated output directory does not exist it will be
      * created. </br>If an error occurs during the signature of a file, the
      * process will continue, an entry will be created in the error log in the
@@ -2277,7 +2197,7 @@ interface EntryPointsCrypto {
     boolean signDirectory();
 
     /** Establece la operaci&oacute;n masiva a realizar en el proceso generado
-     * por los m&eacute;todos {@link #signDirectory()}, {@link #massiveSignatureData(String)} y {@link EntryPointsCrypto#massiveSignatureFile(String)}
+     * por los m&eacute;todos <code>signDirectory()</code>, <code>massiveSignatureData(String)</code> y <code>EntryPointsCrypto.massiveSignatureFile(String)</code>
      * . <br/>
      * Los tipos de operaci&oacute;n permitidos son:
      * <ul>
@@ -2289,7 +2209,7 @@ interface EntryPointsCrypto {
      * <br>
      * <br>
      * Sets the massive operation to be performed in the process generated by
-     * the {@link #signDirectory()}, {@link #massiveSignatureData(String)} and {@link EntryPointsCrypto#massiveSignatureFile(String)} methods. <br/>
+     * the <code>signDirectory()</code>, <code>massiveSignatureData(String)</code> and <code>EntryPointsCrypto.massiveSignatureFile(String)</code> methods. <br/>
      * The massive operations are:
      * <ul>
      * <li>FIRMAR: Sign.</li>
@@ -2397,7 +2317,7 @@ interface EntryPointsCrypto {
      * el certificado indicado previamente o durante el proceso de
      * inicializaci&oacute;n.<br/>
      * Una vez finalizado el proceso de firma masiva se recomienda utilizar el
-     * m&eacute;todo {@link #endMassiveSignature()} para eliminar la
+     * m&eacute;todo <code>endMassiveSignature()</code> para eliminar la
      * configuraci&oacute;n del procedimiento. <br>
      * <br>
      * Takes the client's massive signature configuration and prepares the
@@ -2420,19 +2340,13 @@ interface EntryPointsCrypto {
      * specified, but all operations within the massive signature procedure will
      * use the previously defined certificate, or the one set in the
      * initialization process.<br/>
-     * Once the massive signature process is ended, it is advisable to use {@link #endMassiveSignature()} to eliminate the procedure's
+     * Once the massive signature process is ended, it is advisable to use <code>endMassiveSignature()</code> to eliminate the procedure's
      * configuration.
      * @return Devuelve <code>true</code> si la operaci&oacute;n masiva se
      *         inicializ&oacute; correctamente, <code>false</code> en caso
      *         contrario. <br>
      *         Returns <code>true</code> if the massive operation is properly
-     *         initialized. Else, <code>false</code>.
-     * @see #setSignatureAlgorithm(String)
-     * @see #setSignatureFormat(String)
-     * @see #setSignatureMode(String)
-     * @see #setSelectedCertificateAlias(String)
-     * @see #setOriginalFormat(boolean)
-     * @see #setMassiveOperation(String) */
+     *         initialized. Else, <code>false</code>. */
     boolean initMassiveSignature();
 
     /** Libera la configuraci&oacute;n del procedimiento de firma masiva
@@ -2508,12 +2422,12 @@ interface EntryPointsCrypto {
 
     /** Almacena en un fichero todas las trazas de log generadas hasta el momento
      * por el procedimiento de firma masiva. La ruta del fichero se puede
-     * establecer mediante {@link #setOutFilePath(String)}. En caso de no
+     * establecer mediante <code>setOutFilePath(String)</code>. En caso de no
      * hacerlo aparecer&acute; una ventana para seleccionar donde guardar el
      * fichero de log. <br>
      * <br>
      * Stores in a file every log trace generated by the massive signature
-     * procedure. File's route can be set with {@link #setOutFilePath(String)}.
+     * procedure. File's route can be set with <code>setOutFilePath(String)</code>.
      * Else, a window will be displayed, prompting the user where to store the
      * log file. */
 
@@ -2727,8 +2641,7 @@ interface EntryPointsCrypto {
      *        certificados <br>
      *        If set to <code>true</code>, only certificates with an
      *        activated <i>nonRepudiation</i> bit in field <i>KeyUsage</i>
-     *        bit are displayed for selection. If set to <code>false</code> all certificates are displayed.
-     * @see #setMandatoryCertificateConditionRFC2254(String, String, boolean) */
+     *        bit are displayed for selection. If set to <code>false</code> all certificates are displayed. */
     void setCertFilterRFC2254(String subjectFilter, String issuerFilter, boolean onlySignatureCertificates);
 
     /** Establece una condici&oacute;n para seleccionar el certificado con el que
@@ -2763,8 +2676,7 @@ interface EntryPointsCrypto {
      *        If set to <code>true</code> only certificates with an active
      *        <i>nonRepudiation</i> bit in field <i>KeyUsage</i> are
      *        displayed for selection, if set to <code>false</code> all
-     *        certificates are displayed.
-     * @see #setCertFilterRFC2254(String, String, boolean) */
+     *        certificates are displayed. */
     void setMandatoryCertificateConditionRFC2254(String subjectFilter, String issuerFilter, boolean onlySignatureCertificates);
 
     /** Muestra el di&aacute;logo de selecci&oacute;n de certificados del
@@ -2773,13 +2685,13 @@ interface EntryPointsCrypto {
      * selecci&oacute;n o se cancela el di&aacute;logo.<br/>
      * El certificado seleccionado queda establecido como &uacute;ltimo
      * certificado utilizado, con lo cual puede recuperarse mediante los
-     * m&eacute;todos {@link #getSignCertificate()} y {@link #getSignCertificateBase64Encoded()}. <br>
+     * m&eacute;todos <code>getSignCertificate()</code> y <code>getSignCertificateBase64Encoded()</code>.<br>
      * <br>
      * Shows the selected keystore certificate selection dialog, applying
      * filters, if necessary. Returns null if a problem occurs during the
      * selection, or dialog is cancelled.<br/>
      * Selected certificate is set as last used certificate, i.e., it may be
-     * recovered with {@link #getSignCertificate()} and {@link #getSignCertificateBase64Encoded()}.
+     * recovered with <code>getSignCertificate()</code> and <code>getSignCertificateBase64Encoded()</code>.
      * @return Alias real (con el que fue dado de alta en el almac&eacute;n de
      *         claves) del certificado seleccionado. <br>
      *         Selected certificate's real alias (alias used for registering in
