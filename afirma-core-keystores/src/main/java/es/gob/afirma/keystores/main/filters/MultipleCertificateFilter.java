@@ -9,10 +9,10 @@ import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
  * s&oacute;lo pasar&acute;n por el filtro aquellos que cumplan con todos los filtros
  * individualmente.
  */
-public class MultipleCertificateFilter extends CertificateFilter {
+public final class MultipleCertificateFilter extends CertificateFilter {
 
 	/** Listado de filtros que se desean aplicar sobre los certificados. */
-	final CertificateFilter[] filters;
+	private final CertificateFilter[] filters;
 
 	/**
 	 * Crea un filtro m&uacute;ltiple a partir de un listado de filtros.
@@ -27,7 +27,6 @@ public class MultipleCertificateFilter extends CertificateFilter {
 
 	@Override
 	public boolean matches(final X509Certificate cert) {
-
 		for (final CertificateFilter filter : this.filters) {
 			if (!filter.matches(cert)) {
 				return false;
@@ -38,7 +37,6 @@ public class MultipleCertificateFilter extends CertificateFilter {
 
     @Override
 	public String[] matches(final String[] aliases, final AOKeyStoreManager ksm) {
-
     	String[] filteredAliases = aliases.clone();
     	for (final CertificateFilter filter : this.filters) {
     		filteredAliases = filter.matches(filteredAliases, ksm);
