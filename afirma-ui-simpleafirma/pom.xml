@@ -47,6 +47,12 @@
     
     <dependency>
       <groupId>es.gob.afirma</groupId>
+      <artifactId>afirma-crypto-cades-multi</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>es.gob.afirma</groupId>
       <artifactId>afirma-crypto-pdf</artifactId>
       <version>${project.version}</version>
     </dependency>

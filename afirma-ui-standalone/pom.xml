@@ -7,45 +7,32 @@
   <artifactId>afirma-ui-standalone</artifactId>
   <name>afirma-ui-standalone</name>
 
-  <parent>
-    <groupId>es.gob.afirma</groupId>
-    <artifactId>afirma-client</artifactId>
-    <version>3.2.0</version>
-  </parent>
-
   <dependencies>
+  
     <dependency>
       <groupId>es.gob.afirma</groupId>
-      <artifactId>afirma-util</artifactId>
+      <artifactId>afirma-core</artifactId>
       <version>${project.version}</version>
     </dependency>
-
-    <dependency>
-      <groupId>es.gob.afirma</groupId>
-      <artifactId>afirma-core-massive</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
+    
     <dependency>
       <groupId>es.gob.afirma</groupId>
       <artifactId>afirma-ui-core-jse</artifactId>
       <version>${project.version}</version>
     </dependency>
-
-    <!-- Keystores -->
-
+    
     <dependency>
       <groupId>es.gob.afirma</groupId>
       <artifactId>afirma-core-keystores</artifactId>
       <version>${project.version}</version>
     </dependency>
-
+    
     <dependency>
       <groupId>es.gob.afirma</groupId>
       <artifactId>afirma-keystores-mozilla</artifactId>
       <version>${project.version}</version>
     </dependency>
-
+  
     <dependency>
       <groupId>es.gob.afirma</groupId>
       <artifactId>afirma-keystores-single</artifactId>
@@ -57,25 +44,31 @@
       <artifactId>afirma-keystores-capiaddressbook</artifactId>
       <version>${project.version}</version>
     </dependency>
-
-    <!-- Cipher -->
-
+  
     <dependency>
       <groupId>es.gob.afirma</groupId>
-      <artifactId>afirma-crypto-cipher</artifactId>
+      <artifactId>afirma-crypto-core-pkcs7</artifactId>
       <version>${project.version}</version>
     </dependency>
-
-    <!-- XAdES -->
-
+    
     <dependency>
       <groupId>es.gob.afirma</groupId>
-      <artifactId>afirma-crypto-xades</artifactId>
+      <artifactId>afirma-crypto-cades</artifactId>
       <version>${project.version}</version>
     </dependency>
-
-    <!-- CAdES -->
-
+    
+    <dependency>
+      <groupId>es.gob.afirma</groupId>
+      <artifactId>afirma-crypto-cades-multi</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>es.gob.afirma</groupId>
+      <artifactId>afirma-crypto-pdf</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  
     <dependency>
       <groupId>es.gob.afirma</groupId>
       <artifactId>afirma-crypto-cms</artifactId>
@@ -86,35 +79,55 @@
       <groupId>es.gob.afirma</groupId>
       <artifactId>afirma-crypto-cms-enveloper</artifactId>
       <version>${project.version}</version>
-    </dependency>
-
+    </dependency>  
+  
     <dependency>
       <groupId>es.gob.afirma</groupId>
-      <artifactId>afirma-crypto-cades</artifactId>
+      <artifactId>afirma-crypto-core-xml</artifactId>
       <version>${project.version}</version>
     </dependency>
-
+    
     <dependency>
       <groupId>es.gob.afirma</groupId>
-      <artifactId>afirma-crypto-cades-enveloper</artifactId>
+      <artifactId>afirma-crypto-xades</artifactId>
       <version>${project.version}</version>
     </dependency>
-
+  
     <dependency>
       <groupId>es.gob.afirma</groupId>
-      <artifactId>afirma-crypto-cades-multi</artifactId>
+      <artifactId>afirma-crypto-xmlsignature</artifactId>
       <version>${project.version}</version>
     </dependency>
-
-    <!-- PAdES -->
-
+  
     <dependency>
       <groupId>es.gob.afirma</groupId>
-      <artifactId>afirma-crypto-pdf</artifactId>
+      <artifactId>afirma-crypto-odf</artifactId>
       <version>${project.version}</version>
     </dependency>
-
-    <!-- i18n -->
+  
+    <dependency>
+      <groupId>es.gob.afirma</groupId>
+      <artifactId>afirma-crypto-ooxml</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  
+    <dependency>
+      <groupId>es.gob.afirma</groupId>
+      <artifactId>afirma-crypto-cipher</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  
+    <dependency>
+      <groupId>es.gob.afirma</groupId>
+      <artifactId>afirma-core-massive</artifactId>
+      <version>${project.version}</version>
+    </dependency>  
+  
+    <dependency>
+      <groupId>es.gob.afirma</groupId>
+      <artifactId>afirma-util</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>javax.help</groupId>
@@ -133,8 +146,6 @@
       <artifactId>afirma-ui-standalone-help-en_UK</artifactId>
       <version>${project.version}</version>
     </dependency>
-
-    <!-- jUnit testing -->
 
     <dependency>
       <groupId>junit</groupId>
