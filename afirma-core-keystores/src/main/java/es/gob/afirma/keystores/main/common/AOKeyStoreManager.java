@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -44,17 +44,17 @@ import es.gob.afirma.keystores.main.callbacks.UIPasswordCallback;
  * para cada caso
  * @version 0.3 */
 public class AOKeyStoreManager {
-    
+
     protected static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** Instancia del provider de NSS. S&oacute;lo se permite una instancia de
      * esta clase, as&iacute; que la cacheamos. */
     private Provider nssProvider = null;
-    
+
     protected Provider getNSSProvider() {
         return this.nssProvider;
     }
-    
+
     protected void setNSSProvider(final Provider p) {
         this.nssProvider = p;
     }
@@ -74,7 +74,7 @@ public class AOKeyStoreManager {
     public AOKeyStore getType() {
         return this.ksType;
     }
-    
+
     /**
      * Inicializa un almac&eacute;n PKCS#11.
      * @param pssCallBack Callback para la recuperaci&oacute;n de la
@@ -87,7 +87,7 @@ public class AOKeyStoreManager {
      *         apertura del almac&eacute;n.
      */
     private List<KeyStore> initPKCS11(final PasswordCallback pssCallBack, final Object[] params) throws AOException, IOException {
-        
+
         // En el "params" debemos traer los parametros:
         // [0] - p11lib: Biblioteca PKCS#11, debe estar en el Path (Windows) o en el LD_LIBRARY_PATH (UNIX, Linux, Mac OS X)
         // [1] -desc: Descripcion del token PKCS#11 (opcional)
@@ -160,7 +160,7 @@ public class AOKeyStoreManager {
         try {
             this.ks.load(null, (pssCallBack != null) ? pssCallBack.getPassword() : null);
         }
-        catch (IOException e) {
+        catch (final IOException e) {
             if (e.getCause() instanceof UnrecoverableKeyException ||
                     e.getCause() instanceof BadPaddingException) {
                 throw new IOException("Contrasena invalida: " + e); //$NON-NLS-1$
@@ -171,7 +171,7 @@ public class AOKeyStoreManager {
             Security.removeProvider(p11Provider.getName());
             p11Provider = null;
             throw new AOKeyStoreManagerException("No se han podido cargar los certificados del almacen PKCS#11 solicitado", e); //$NON-NLS-1$
-        } 
+        }
         catch (final NoSuchAlgorithmException e) {
             Security.removeProvider(p11Provider.getName());
             p11Provider = null;
@@ -200,12 +200,12 @@ public class AOKeyStoreManager {
      *         externos)
      * @throws AOException
      *         Cuando ocurre cualquier problema durante la
-     *         inicializaci&oacute;n 
+     *         inicializaci&oacute;n
      * @throws IOException
      *         Se ha insertado una contrase&ntilde;a incorrecta para la apertura del
      *         almac&eacute;n de certificados.
      */
-    public List<KeyStore> init(final AOKeyStore type, final InputStream store, PasswordCallback pssCallBack, final Object[] params) throws AOException, IOException {
+    public List<KeyStore> init(final AOKeyStore type, final InputStream store, final PasswordCallback pssCallBack, final Object[] params) throws AOException, IOException {
 
         final List<KeyStore> ret = new ArrayList<KeyStore>(1);
 
@@ -242,7 +242,7 @@ public class AOKeyStoreManager {
             try {
                 this.ks.load(store, (pssCallBack != null) ? pssCallBack.getPassword() : null);
             }
-            catch (IOException e) {
+            catch (final IOException e) {
                 if (e.getCause() instanceof UnrecoverableKeyException ||
                         e.getCause() instanceof BadPaddingException) {
                     throw new IOException("Contrasena invalida: " + e); //$NON-NLS-1$
@@ -251,8 +251,8 @@ public class AOKeyStoreManager {
             }
             catch (final CertificateException e) {
                 throw new AOKeyStoreManagerException("No se han podido cargar los certificados del almacen PKCS#7 / X.509 solicitado", e); //$NON-NLS-1$
-            } 
-            catch (NoSuchAlgorithmException e) {
+            }
+            catch (final NoSuchAlgorithmException e) {
             	throw new AOKeyStoreManagerException("No se ha podido verificar la integridad del almacen PKCS#7 / X.509 solicitado", e); //$NON-NLS-1$
 			}
             ret.add(this.ks);
@@ -285,7 +285,7 @@ public class AOKeyStoreManager {
             try {
                 this.ks.load(store, (pssCallBack != null) ? pssCallBack.getPassword() : null);
             }
-            catch (IOException e) {
+            catch (final IOException e) {
                 if (e.getCause() instanceof UnrecoverableKeyException ||
                         e.getCause() instanceof BadPaddingException) {
                     throw new IOException("Contrasena invalida: " + e); //$NON-NLS-1$
@@ -294,8 +294,8 @@ public class AOKeyStoreManager {
             }
             catch (final CertificateException e) {
                 throw new AOKeyStoreManagerException("No se han podido cargar los certificados del almacen JavaKeyStore solicitado", e); //$NON-NLS-1$
-            } 
-            catch (NoSuchAlgorithmException e) {
+            }
+            catch (final NoSuchAlgorithmException e) {
                 throw new AOKeyStoreManagerException("No se ha podido verificar la integridad del almacen JavaKeyStore solicitado", e); //$NON-NLS-1$
 			}
             ret.add(this.ks);
@@ -327,7 +327,7 @@ public class AOKeyStoreManager {
             try {
                 this.ks.load(store, (pssCallBack != null) ? pssCallBack.getPassword() : null);
             }
-            catch (IOException e) {
+            catch (final IOException e) {
                 if (e.getCause() instanceof UnrecoverableKeyException ||
                     e.getCause() instanceof BadPaddingException ||
                     e.getCause() instanceof ArithmeticException) { // Caso probable de contrasena nula
@@ -337,7 +337,7 @@ public class AOKeyStoreManager {
             }
             catch (final CertificateException e) {
                 throw new AOKeyStoreManagerException("No se han podido cargar los certificados del almacen PKCS#12 / PFX solicitado.", e); //$NON-NLS-1$
-            } 
+            }
             catch (final NoSuchAlgorithmException e) {
                 throw new AOKeyStoreManagerException("No se ha podido verificar la integridad del almacen PKCS#12 / PFX solicitado.", e); //$NON-NLS-1$
 			}
@@ -385,7 +385,7 @@ public class AOKeyStoreManager {
             }
             catch (final CertificateException e) {
                 throw new AOKeyStoreManagerException("No se han podido cargar los certificados del almacen SunMSCAPI.MY", e); //$NON-NLS-1$
-            } 
+            }
             catch (final NoSuchAlgorithmException e) {
             	throw new AOKeyStoreManagerException("No se ha podido verificar la integridad del almacen SunMSCAPI.MY", e); //$NON-NLS-1$
 			}
@@ -420,13 +420,13 @@ public class AOKeyStoreManager {
                     throw new AOKeyStoreManagerException("No se ha podido instanciar el proveedor SunMSCAPI", e); //$NON-NLS-1$
                 }
             }
-            Provider p = Security.getProvider("SunMSCAPIAddressBook"); //$NON-NLS-1$
+            Provider p = Security.getProvider("MSCAPIAddressBook"); //$NON-NLS-1$
             if (p == null) {
                 try {
-                    p = (Provider) AOUtil.classForName("es.gob.afirma.keystores.main.capiaddressbook.SunMSCAPIAddressBook").newInstance(); //$NON-NLS-1$
+                    p = (Provider) AOUtil.classForName("es.gob.afirma.keystores.main.capiaddressbook.MSCAPIAddressBook").newInstance(); //$NON-NLS-1$
                 }
                 catch (final Exception e) {
-                    throw new AOKeyStoreManagerException("No se ha posido instanciar el proveedor SunMSCAPIAddressBook", e); //$NON-NLS-1$
+                    throw new AOKeyStoreManagerException("No se ha posido instanciar el proveedor MSCAPIAddressBook", e); //$NON-NLS-1$
                 }
                 Security.addProvider(p);
             }
@@ -435,14 +435,14 @@ public class AOKeyStoreManager {
                 this.ks = KeyStore.getInstance(this.ksType.getName(), p);
             }
             catch (final Exception e) {
-                throw new AOException("No se ha podido obtener el almacen SunMSCAPIAddressBook.ADDRESSBOOK", e);  //$NON-NLS-1$
+                throw new AOException("No se ha podido obtener el almacen MSCAPIAddressBook.ADDRESSBOOK", e);  //$NON-NLS-1$
             }
 
             try {
                 this.ks.load(null, null);
             }
             catch (final Exception e) {
-                throw new AOException("No se ha podido abrir el almacen SunMSCAPIAddressBook.ADDRESSBOOK", e); //$NON-NLS-1$
+                throw new AOException("No se ha podido abrir el almacen MSCAPIAddressBook.ADDRESSBOOK", e); //$NON-NLS-1$
             }
 
             ret.add(this.ks);
@@ -480,7 +480,7 @@ public class AOKeyStoreManager {
             }
             catch (final CertificateException e) {
                 throw new AOKeyStoreManagerException("No se han podido cargar los certificados del almacen Apple.KeychainStore", e); //$NON-NLS-1$
-            } 
+            }
             catch (final NoSuchAlgorithmException e) {
                 throw new AOKeyStoreManagerException("No se ha podido verificar la integridad del almacen Apple.KeychainStore", e); //$NON-NLS-1$
 			}
@@ -491,7 +491,7 @@ public class AOKeyStoreManager {
         else if (this.ksType.equals(AOKeyStore.DNIE)) {
             return initPKCS11((pssCallBack != null) ? pssCallBack : new UIPasswordCallback(KeyStoreMessages.getString("AOKeyStoreManager.0"), null), new String[] { KeyStoreUtilities.getPKCS11DNIeLib(), "DNIe-Afirma" });  //$NON-NLS-1$//$NON-NLS-2$
         }
-        
+
         throw new UnsupportedOperationException("Tipo de almacen no soportado"); //$NON-NLS-1$
     }
 
@@ -511,9 +511,9 @@ public class AOKeyStoreManager {
      * @throws es.gob.afirma.core.AOCancelledOperationException
      * 		   Cuando el usuario cancela el proceso antes de que finalice
      */
-    public KeyStore.PrivateKeyEntry getKeyEntry(final String alias, 
-    		                                    final PasswordCallback pssCallback) throws KeyStoreException, 
-    		                                                                               NoSuchAlgorithmException, 
+    public KeyStore.PrivateKeyEntry getKeyEntry(final String alias,
+    		                                    final PasswordCallback pssCallback) throws KeyStoreException,
+    		                                                                               NoSuchAlgorithmException,
     		                                                                               UnrecoverableEntryException {
 
         if (this.ks == null) {
