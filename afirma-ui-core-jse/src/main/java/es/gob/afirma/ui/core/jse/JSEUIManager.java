@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -37,9 +37,9 @@ import es.gob.afirma.core.ui.NameCertificateBean;
  * aplicaci&oacute;n de escritorio) de la aplicaci&oacute;n.
  * @version 0.4 */
 public final class JSEUIManager implements AOUIManager {
-    
+
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
-    
+
     private static final int ASCII_LOWER_INDEX = 32;
     private static final int ASCII_HIGHER_INDEX = 126;
 
@@ -56,7 +56,7 @@ public final class JSEUIManager implements AOUIManager {
     public char[] getPassword(final String text, final Object c) {
         return getPassword(text, null, false, c);
     }
-    
+
     /** Muestra un di&aacute;logo para pedir una contrase&ntilde;a al usuario.
      * @param text
      *        Texto con el que se solicitar&aacute; la entrada de texto al
@@ -72,7 +72,7 @@ public final class JSEUIManager implements AOUIManager {
      * @return Array de caracteres del texto introducido como contrase&ntilde;a
      * @throws AOCancelledOperationException
      *         Cuando el usuario cancela o cierra el di&aacute;logo */
-    public char[] getPassword(String text, final String charSet, final boolean beep, final Object c) {
+    public char[] getPassword(final String text, final String charSet, final boolean beep, final Object c) {
         final JPasswordField pwd = new JPasswordField(10);
         if (charSet != null) {
             pwd.setDocument(new JTextFieldFilter(charSet, beep));
@@ -94,12 +94,12 @@ public final class JSEUIManager implements AOUIManager {
                 pwd.requestFocusInWindow();
             }
         };
-        
+
         Component parent = null;
         if (c instanceof Component) {
             parent = (Component) c;
         }
-        
+
         pane.createDialog(parent, JSEUIMessages.getString("JSEUIManager.24")).setVisible(true); //$NON-NLS-1$
 
         final Object selectedValue = pane.getValue();
@@ -109,7 +109,8 @@ public final class JSEUIManager implements AOUIManager {
         if (((Integer) selectedValue).intValue() == JOptionPane.OK_OPTION) {
             return pwd.getPassword();
         }
-        throw new AOCancelledOperationException("La insercion de contrasena ha sido cancelada por el usuario" //$NON-NLS-1$
+        throw new AOCancelledOperationException(
+    		"La insercion de contrasena ha sido cancelada por el usuario" //$NON-NLS-1$
         );
 
     }
@@ -132,7 +133,7 @@ public final class JSEUIManager implements AOUIManager {
         }
         return JOptionPane.showInputDialog(parent, message, title, messageType, dialogIcon, selectionValues, initialSelectionValue);
     }
-    
+
     /** {@inheritDoc} */
     public Object showCertificateSelectionDialog(	final Object parentComponent,
     												final NameCertificateBean[] selectionValues) {
@@ -142,7 +143,7 @@ public final class JSEUIManager implements AOUIManager {
     	}
 		return new CertificateSelectionDialog(selectionValues, parent).showDialog();
     }
-        
+
     /** Original code: <a
      * href="http://tactika.com/realhome/realhome.html">http://
      * tactika.com/realhome/realhome.html</a>
@@ -223,9 +224,9 @@ public final class JSEUIManager implements AOUIManager {
         }
 
     }
-    
+
     /** {@inheritDoc} */
-    public int showConfirmDialog(Object parentComponent, Object message, String title, int optionType, int messageType) {
+    public int showConfirmDialog(final Object parentComponent, final Object message, final String title, final int optionType, final int messageType) {
         Component parent = null;
         if (parentComponent instanceof Component) {
             parent = (Component) parentComponent;
@@ -272,7 +273,7 @@ public final class JSEUIManager implements AOUIManager {
     public int getInformationMessageCode() {
         return JOptionPane.INFORMATION_MESSAGE;
     }
-    
+
     /** Pregunta al usuario por un nombre de fichero para su carga.
      * @param extensions
      *        Extensiones predeterminadas para el fichero
@@ -305,7 +306,7 @@ public final class JSEUIManager implements AOUIManager {
         if (parent instanceof Component) {
             parentComponent = (Component) parent;
         }
-        
+
         final JFileChooser jfc = new JFileChooser();
         if (dialogTitle != null && dialogTitle.length() > 0) {
             jfc.setDialogTitle(dialogTitle);
@@ -319,7 +320,7 @@ public final class JSEUIManager implements AOUIManager {
         }
         return null;
     }
-    
+
     /** Muestra un di&aacute;logo de guardado para almacenar los datos indicados.
      * Los datos ser&aacute;n almacenados en el directorio y con el nombre que
      * indique el usuario. Si el fichero ya existe se le preguntar&aacute; al
@@ -340,7 +341,7 @@ public final class JSEUIManager implements AOUIManager {
      *         No se introdujeron los datos que se desean almacenar. */
     public File saveDataToFile(final byte[] data, final File selectedFile, final Object fileFilter, final Object parent) {
 
-        if (data == null) { 
+        if (data == null) {
             throw new IllegalArgumentException("No se introdujeron datos que almacenar"); //$NON-NLS-1$
         }
 
@@ -348,7 +349,7 @@ public final class JSEUIManager implements AOUIManager {
         if (parent instanceof Component) {
             parentComponent = (Component) parent;
         }
-        
+
         File resultFile = null;
         boolean tryAgain = true;
         File file = null;
@@ -381,7 +382,7 @@ public final class JSEUIManager implements AOUIManager {
                         JOptionPane.showConfirmDialog(parentComponent,
                                 JSEUIMessages.getString("AOUIManager.77", file.getAbsolutePath()), JSEUIMessages.getString("AOUIManager.85"), JOptionPane.YES_NO_CANCEL_OPTION); //$NON-NLS-1$ //$NON-NLS-2$
                     if (selectedOption == JOptionPane.CANCEL_OPTION) {
-                        LOGGER.info("Se ha cancelado la operacion de guardado."); //$NON-NLS-1$ 
+                        LOGGER.info("Se ha cancelado la operacion de guardado."); //$NON-NLS-1$
                         return null;
                     }
                     // Si se ha seleccionado la opcion YES (se desea
@@ -399,7 +400,7 @@ public final class JSEUIManager implements AOUIManager {
                         fos.write(data);
                     }
                     catch (final Exception ex) {
-                        LOGGER.warning("No se pudo guardar la informacion en el fichero indicado: " + ex); //$NON-NLS-1$ 
+                        LOGGER.warning("No se pudo guardar la informacion en el fichero indicado: " + ex); //$NON-NLS-1$
                         JOptionPane.showMessageDialog(parentComponent,
                                 JSEUIMessages.getString("AOUIManager.88"), JSEUIMessages.getString("AOUIManager.89"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
                         fos = null;
@@ -424,7 +425,7 @@ public final class JSEUIManager implements AOUIManager {
         // Devolvemos el path del fichero en el que se han guardado los datos
         return resultFile;
     }
-    
+
     /** Filtra los ficheros por extensi&oacute;n para los di&aacute;logos de
      * carga y guardado. Se declara como p&uacute;blico para que pueda ser usado
      * tambi&eacute;n por el interfaz de aplicaci&oacute;n de escritorio. No
@@ -433,8 +434,8 @@ public final class JSEUIManager implements AOUIManager {
      * @version 0.3 */
     private static final class ExtFilter extends FileFilter implements java.io.FileFilter {
 
-        private String[] extensions;
-        private String description;
+        private final String[] extensions;
+        private final String description;
 
         /** Construye un filtro para la selecci&oacute;n de ficheros en un <code>JFileChooser</code>.
          * @param exts
@@ -442,7 +443,7 @@ public final class JSEUIManager implements AOUIManager {
          * @param desc
          *        Descripci&oacute;n del tipo de fichero correspondiente a
          *        las extensiones */
-        public ExtFilter(final String[] exts, String desc) {
+        public ExtFilter(final String[] exts, final String desc) {
             if (exts == null || exts.length < 1) {
                 throw new IllegalArgumentException("No se puede crear un filtro vacio"); //$NON-NLS-1$
             }
@@ -488,7 +489,7 @@ public final class JSEUIManager implements AOUIManager {
         }
 
     }
-    
+
     /** Pregunta al usuario por la localizaci&oacute;n de un fichero espec&iacute;fico para su carga.
      * @param dialogTitle
      *        T&iacute;tulo de la ventana de di&aacute;logo.
@@ -500,16 +501,16 @@ public final class JSEUIManager implements AOUIManager {
      * @param parent
      *        Componente padre (para la modalidad, debe ser de tipo <code>java.awt.Component</code>)
      * @return Fichero seleccionado por el usuario */
-    public File getLoadFile(final String dialogTitle, 
-                            final String fileName, 
-                            final String description, 
+    public File getLoadFile(final String dialogTitle,
+                            final String fileName,
+                            final String description,
                             final Object parent) {
-        
+
         Component parentComponent = null;
         if (parent instanceof Component) {
             parentComponent = (Component) parent;
         }
-        
+
         final JFileChooser fc = new JFileChooser();
         fc.setDialogTitle(dialogTitle);
         fc.setFileFilter(new FileFilter() {
