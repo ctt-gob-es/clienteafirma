@@ -508,25 +508,23 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
         if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
             final File helpFile = new File(APPLICATION_HOME + "\\FirmaFacil.chm"); //$NON-NLS-1$
             try {
-                if (!helpFile.exists()) {
-                	final byte[] helpDocument = AOUtil.getDataFromInputStream(
-                			ClassLoader.getSystemResourceAsStream("help/WinHelp/FirmaFacil.chm")); //$NON-NLS-1$
-                	if (helpDocument == null || helpDocument.length == 0) {
-                		throw new IOException("No se ha encontrado el fichero de ayuda de Windows"); //$NON-NLS-1$
-                	}
+            	final byte[] helpDocument = AOUtil.getDataFromInputStream(
+            			ClassLoader.getSystemResourceAsStream("help/WinHelp/FirmaFacil.chm")); //$NON-NLS-1$
+            	if (helpDocument == null || helpDocument.length == 0) {
+            		throw new IOException("No se ha encontrado el fichero de ayuda de Windows"); //$NON-NLS-1$
+            	}
 
-                    if (!helpFile.getParentFile().exists()) {
-                    	helpFile.getParentFile().mkdirs();
-                    }
-                    final FileOutputStream fos = new FileOutputStream(helpFile);
-                    fos.write(helpDocument);
-                    try {
-                        fos.flush();
-                        fos.close();
-                    }
-                    catch(final Exception e) {
-                        // Se ignora
-                    }
+                if (!helpFile.getParentFile().exists()) {
+                	helpFile.getParentFile().mkdirs();
+                }
+                final FileOutputStream fos = new FileOutputStream(helpFile);
+                fos.write(helpDocument);
+                try {
+                    fos.flush();
+                    fos.close();
+                }
+                catch(final Exception e) {
+                    // Se ignora
                 }
                 Desktop.getDesktop().open(helpFile);
                 return;
