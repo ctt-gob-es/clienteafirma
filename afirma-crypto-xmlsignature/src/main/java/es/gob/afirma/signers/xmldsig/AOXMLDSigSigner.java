@@ -21,6 +21,7 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.Provider;
 import java.security.Security;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
@@ -125,7 +126,9 @@ public final class AOXMLDSigSigner implements AOSigner {
     static {
         if (Security.getProvider("XMLDSig") == null) { //$NON-NLS-1$
             try {
-                Security.addProvider(new org.jcp.xml.dsig.internal.dom.XMLDSigRI());
+
+                Security.addProvider((Provider)
+                		Class.forName("org.jcp.xml.dsig.internal.dom.XMLDSigRI").newInstance()); //$NON-NLS-1$
             }
             catch (final Exception e) {
                 LOGGER.warning("No se ha podido agregar el proveedor de firma XMLDSig necesario para firmas XML: " + e); //$NON-NLS-1$
