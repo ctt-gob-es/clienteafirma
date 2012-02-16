@@ -25,6 +25,12 @@
       <artifactId>afirma-crypto-core-xml</artifactId>
       <version>${project.version}</version>
     </dependency>
+    
+    <dependency>
+      <groupId>net.java.xades</groupId>
+      <artifactId>jxades</artifactId>
+      <version>0.0.5</version>
+    </dependency>
 
     <dependency>
       <groupId>junit</groupId>
