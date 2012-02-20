@@ -67,7 +67,8 @@ public final class TestFacturaE {
 
     // IMPORTANTE: Poner extension ".xml" a los ficheros de prueba con contenido XML
     private static final String[] TEST_FILES_DATA = new String[] {
-            "facturae_32v1.xml" //$NON-NLS-1$
+            "facturae_32v1.xml", //$NON-NLS-1$
+    		"factura_sinFirmar.xml" //$NON-NLS-1$
     };
 
     /**
