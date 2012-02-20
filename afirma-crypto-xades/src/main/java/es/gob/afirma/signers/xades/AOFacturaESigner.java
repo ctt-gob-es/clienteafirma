@@ -43,8 +43,9 @@ public final class AOFacturaESigner implements AOSigner {
         EXTRA_PARAMS.setProperty("policyIdentifierHash", "Ohixl6upD6av8N7pEvDABhEL6hM=");  //$NON-NLS-1$//$NON-NLS-2$
         EXTRA_PARAMS.setProperty("policyIdentifierHashAlgorithm", DigestMethod.SHA1);         //$NON-NLS-1$
         EXTRA_PARAMS.setProperty("policyDescription", "facturae31"); //$NON-NLS-1$ //$NON-NLS-2$
-        EXTRA_PARAMS.setProperty("policyQualifier", "http://www.facturae.es/politica_de_firma_formato_facturae/politica_de_firma_formato_facturae_v3_1"); //$NON-NLS-1$ //$NON-NLS-2$
         EXTRA_PARAMS.setProperty("signerClaimedRole", "emisor"); //$NON-NLS-1$ //$NON-NLS-2$
+        EXTRA_PARAMS.setProperty("signerClaimedRole", "emisor"); //$NON-NLS-1$ //$NON-NLS-2$:P
+        EXTRA_PARAMS.setProperty("facturaeSign", "true"); //$NON-NLS-1$ //$NON-NLS-2$:P
     }
 
     /** Cofirma Facturas en formato XAdES Factura-E.

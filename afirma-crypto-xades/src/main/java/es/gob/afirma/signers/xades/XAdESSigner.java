@@ -199,6 +199,10 @@ final class XAdESSigner {
      *   <dd>Descripci&oacute;n textual de la pol&iacute;tica</dd>
      *  <dt><b><i>policyQualifier</i></b></dt>
      *   <dd>URL hacia el documento (legible por personas, normalmente en formato PDF) descriptivo de la pol&iacute;tica de firma</dd>
+     *  <dt><b><i>facturaeSign</i></b></dt>
+     *   <dd>Indica, mediante un {@code true} o {@code false}, si se deben realizar las restricciones de comportamiento necesarias para la
+     *   firma de facturas electr&oacute;nicas (FACTURAe). Estas restricciones son, no introducir la transformaci&oacute;n de
+     *   canonicalizaci&oacute;n de la firma, ni la transformaci&oacute;n XPATH en las firmas Enveloped.</dd>
      *  <dt><b><i>signerClaimedRole</i></b></dt>
      *   <dd>Cargo atribuido para el firmante</dd>
      *  <dt><b><i>signerCertifiedRole</i></b></dt>
@@ -337,6 +341,7 @@ final class XAdESSigner {
         final boolean avoidBase64Transforms = Boolean.parseBoolean(extraParams.getProperty("avoidBase64Transforms", Boolean.FALSE.toString())); //$NON-NLS-1$
         final boolean headLess = Boolean.parseBoolean(extraParams.getProperty("headLess", Boolean.TRUE.toString())); //$NON-NLS-1$
         final String precalculatedHashAlgorithm = extraParams.getProperty("precalculatedHashAlgorithm"); //$NON-NLS-1$
+        final boolean facturaeSign = Boolean.parseBoolean(extraParams.getProperty("facturaeSign", Boolean.FALSE.toString())); //$NON-NLS-1$
         String mimeType = extraParams.getProperty("mimeType", XMLConstants.DEFAULT_MIMETYPE); //$NON-NLS-1$
         String encoding = extraParams.getProperty("encoding"); //$NON-NLS-1$
         if ("base64".equalsIgnoreCase(encoding)) { //$NON-NLS-1$
@@ -703,13 +708,16 @@ final class XAdESSigner {
 
         // Solo canonicalizo si es XML
         if (!isBase64) {
-            try {
-                // Transformada para la canonicalizacion inclusiva
-                transformList.add(fac.newTransform(canonicalizationAlgorithm, (TransformParameterSpec) null));
-            }
-            catch (final Exception e) {
-                LOGGER.severe("No se puede encontrar el algoritmo de canonicalizacion, la referencia no se canonicalizara: " + e); //$NON-NLS-1$
-            }
+        	// Las facturas electronicas no se canonicalizan
+        	if (!facturaeSign) {
+        		try {
+        			// Transformada para la canonicalizacion inclusiva
+        			transformList.add(fac.newTransform(canonicalizationAlgorithm, (TransformParameterSpec) null));
+        		}
+        		catch (final Exception e) {
+        			LOGGER.severe("No se puede encontrar el algoritmo de canonicalizacion, la referencia no se canonicalizara: " + e); //$NON-NLS-1$
+        		}
+        	}
         }
         // Si no era XML y tuve que convertir a Base64 yo mismo declaro la
         // transformacion
@@ -934,17 +942,19 @@ final class XAdESSigner {
                 // ejecutado antes otra transformacion
                 transformList.add(fac.newTransform(Transform.ENVELOPED, (TransformParameterSpec) null));
 
-                // Transformacion XPATH para eliminar el resto de firmas del
-                // documento
-                transformList.add(
-                		fac.newTransform(
-                				Transform.XPATH,
-                				new XPathFilterParameterSpec(
-                						"not(ancestor-or-self::" + XML_SIGNATURE_PREFIX + ":Signature)", //$NON-NLS-1$ //$NON-NLS-2$
-                						Collections.singletonMap(XML_SIGNATURE_PREFIX, XMLSignature.XMLNS)
-                				)
-                		)
-                );
+            	// Salvo que sea una factura electronica, se agrega una transformacion XPATH
+                // para eliminar el resto de firmas del documento
+                if (!facturaeSign) {
+                	transformList.add(
+                			fac.newTransform(
+                					Transform.XPATH,
+                					new XPathFilterParameterSpec(
+                							"not(ancestor-or-self::" + XML_SIGNATURE_PREFIX + ":Signature)", //$NON-NLS-1$ //$NON-NLS-2$
+                							Collections.singletonMap(XML_SIGNATURE_PREFIX, XMLSignature.XMLNS)
+                					)
+                			)
+                	);
+                }
 
                 // crea la referencia
                 referenceList.add(fac.newReference("", digestMethod, transformList, null, referenceId)); //$NON-NLS-1$
