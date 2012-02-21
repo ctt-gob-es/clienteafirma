@@ -225,7 +225,7 @@ public class AOKeyStoreManager {
 
             final Provider pkcs7Provider;
             try {
-                pkcs7Provider = (Provider) AOUtil.classForName("es.gob.afirma.keystores.main.single.SingleCertKeyStoreProvider").newInstance(); //$NON-NLS-1$
+                pkcs7Provider = (Provider) AOUtil.classForName("es.gob.afirma.keystores.single.SingleCertKeyStoreProvider").newInstance(); //$NON-NLS-1$
             }
             catch(final Exception e) {
                 throw new AOKeyStoreManagerException("No se ha podido instanciar el proveedor SingleCertKeyStoreProvider", e); //$NON-NLS-1$
@@ -423,7 +423,7 @@ public class AOKeyStoreManager {
             Provider p = Security.getProvider("MSCAPIAddressBook"); //$NON-NLS-1$
             if (p == null) {
                 try {
-                    p = (Provider) AOUtil.classForName("es.gob.afirma.keystores.main.capiaddressbook.MSCAPIAddressBook").newInstance(); //$NON-NLS-1$
+                    p = (Provider) AOUtil.classForName("es.gob.afirma.keystores.capiaddressbook.MSCAPIAddressBook").newInstance(); //$NON-NLS-1$
                 }
                 catch (final Exception e) {
                     throw new AOKeyStoreManagerException("No se ha posido instanciar el proveedor MSCAPIAddressBook", e); //$NON-NLS-1$

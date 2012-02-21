@@ -217,7 +217,9 @@ final class PanelDestinatarios extends JAccessibilityDialogWizard {
         }
 
         PasswordCallback pssCallback;
-        if (kStore == AOKeyStore.WINDOWS || kStore == AOKeyStore.WINROOT || kStore == AOKeyStore.PKCS11 || kStore == AOKeyStore.SINGLE) {
+        if (kStore == AOKeyStore.WINDOWS || kStore == AOKeyStore.WINROOT ||
+        		kStore == AOKeyStore.PKCS11 || kStore == AOKeyStore.SINGLE ||
+        		kStore == AOKeyStore.WINADDRESSBOOK) {
             pssCallback =
                 new NullPasswordCallback();
         }
