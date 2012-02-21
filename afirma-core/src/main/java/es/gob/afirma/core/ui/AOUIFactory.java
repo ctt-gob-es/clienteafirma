@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -20,37 +20,37 @@ import es.gob.afirma.core.misc.Platform;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
  */
 public final class AOUIFactory {
-    
+
     private AOUIFactory() {
         // No permitimos la instanciacion
     }
-    
+
     /** JOptionPane.PLAIN_MESSAGE. */
     public static final int PLAIN_MESSAGE;
-    
+
     /** JOptionPane.YES_NO_OPTION. */
     public static final int YES_NO_OPTION;
-    
+
     /** JOptionPane.WARNING_MESSAGE. */
     public static final int WARNING_MESSAGE;
-    
+
     /** JOptionPane.YES_OPTION. */
     public static final int YES_OPTION;
-    
+
     /** JOptionPane.NO_OPTION. */
     public static final int NO_OPTION;
-    
+
     /** JOptionPane.OK_CANCEL_OPTION. */
     public static final int OK_CANCEL_OPTION;
-    
+
     /** JOptionPane.PK_OPTION. */
     public static final int OK_OPTION;
-    
+
     /** JOptionPane.INFORMATION_MESSAGE. */
     public static final int INFORMATION_MESSAGE;
-    
+
     private static AOUIManager uiManager;
-    
+
     static {
         try {
             if (Platform.OS.ANDROID.equals(Platform.getOS())) {
@@ -70,18 +70,18 @@ public final class AOUIFactory {
             throw new UnsupportedOperationException("No se ha podido instanciar el gestor de interfaces graficas: " + e, e); //$NON-NLS-1$
         }
     }
-    
+
     /**
      * Establece el manejador de interfaces que gestionar&aacute; los di&aacute;logos
      * gr&aacute;ficos que utilizar&aacute; @firma para mostrar o solicitar informaci&oacute;n.
      * @param manager Manejador de interfaces.
      */
-    public static void setUIManager(AOUIManager manager) {
+    public static void setUIManager(final AOUIManager manager) {
     	if (manager != null) {
     		uiManager = manager;
     	}
     }
-    
+
     /** Pregunta al usuario por una contrase&ntilde;a.
      * @param text
      *        Texto que se muestra en el di&aacute;logo para pedir la
@@ -95,12 +95,12 @@ public final class AOUIFactory {
     public static char[] getPassword(final String text, final Object c) {
         return uiManager.getPassword(text, c);
     }
-    
+
     /** Pregunta al usuario por una contrase&ntilde;a. S&oacute;lo admite los caracteres
      * incluidos en el par&aacute;metro {@code charset} y, en caso de insertar un
      * car&aacute;cter no permitido, se emitir&aacute;a una advertencia no bloqueante
      * (sonido, vibraci&oacute;n...) si el par&aacute;metro {@code beep} est&aacute;
-     * activado. 
+     * activado.
      * @param text
      *        Texto que se muestra en el di&aacute;logo para pedir la
      *        contrase&ntilde;a
@@ -108,7 +108,7 @@ public final class AOUIFactory {
      *        Cadena con los caracteres permitidos para la contrase&ntilde;a.
      * @param beep
      *        Indica si se debe dar una se&ntilde;al al usuario al intentar insertar
-     *        un caracter no v&aacute;lido para la contrase&ntilde;a. 
+     *        un caracter no v&aacute;lido para la contrase&ntilde;a.
      * @param c
      *        Componente padre (para la modalidad)
      * @return Contrase&ntilde;a introducida por el usuario
@@ -118,7 +118,7 @@ public final class AOUIFactory {
     public static char[] getPassword(final String text, final String charset, final boolean beep, final Object c) {
         return uiManager.getPassword(text, charset, beep, c);
     }
-    
+
     /**
      * JOptionPane.showConfirmDialog().
      * @param parentComponent Componente padre (se descarta si no es del tipo <code>java.awt.Component</code> en la implementaci&oacute;n Swing
@@ -131,7 +131,7 @@ public final class AOUIFactory {
     public static int showConfirmDialog(final Object parentComponent, final Object message, final String title, final int optionType, final int messageType) {
         return uiManager.showConfirmDialog(parentComponent, message, title, optionType, messageType);
     }
-    
+
     /**
      * JOptionPane.showInputDialog().
      * @param parentComponent Componente padre (se descarta si no es del tipo <code>java.awt.Component</code> en la implementaci&oacute;n Swing
@@ -146,17 +146,17 @@ public final class AOUIFactory {
     public static Object showInputDialog(final Object parentComponent, final Object message, final String title, final int messageType, final Object icon, final Object[] selectionValues, final Object initialSelectionValue) {
         return uiManager.showInputDialog(parentComponent, message, title, messageType, icon, selectionValues, initialSelectionValue);
     }
-    
+
     /**
      * Di&aacute;logo de selecci&oacute;n de certificados.
      * @param parentComponent Componente padre (se descarta si no es del tipo <code>java.awt.Component</code> en la implementaci&oacute;n Swing
      * @param selectionValues Listado de valores seleccionables Nombre-Certificado.
-     * @return Valor seleccionado
+     * @return Alias del certificado seleccionado o {@code null} si no se seleccion&oacute; ninguno.
      */
     public static Object showCertificateSelectionDialog(final Object parentComponent, final NameCertificateBean[] selectionValues) {
         return uiManager.showCertificateSelectionDialog(parentComponent, selectionValues);
     }
-    
+
     /** Pregunta al usuario por un nombre de fichero para su carga.
      * @param extensions
      *        Extensiones predeterminadas para el fichero
@@ -166,7 +166,7 @@ public final class AOUIFactory {
      * @param parentComponent
      *        Componente padre (para la modalidad)
      * @return Nombre de fichero (con ruta) seleccionado por el usuario */
-    public static String getLoadFileName(String[] extensions, String description, Object parentComponent) {
+    public static String getLoadFileName(final String[] extensions, final String description, final Object parentComponent) {
         return uiManager.getLoadFileName(extensions, description, parentComponent);
     }
 
@@ -184,7 +184,7 @@ public final class AOUIFactory {
     public static String getLoadFileName(final String dialogTitle,final String[] extensions, final String description, final Object parentComponent) {
         return uiManager.getLoadFileName(dialogTitle, extensions, description, parentComponent);
     }
-    
+
     /** Pregunta al usuario por la localizaci&oacute;n de un fichero espec&iacute;fico para su carga.
      * @param dialogTitle
      *        T&iacute;tulo de la ventana de di&aacute;logo.
@@ -203,7 +203,7 @@ public final class AOUIFactory {
     /** Pregunta al usuario por la localizaci&oacute;n en la que se desean guardar
      * los datos y los guarda en la misma. Si ocurre un error durante el guardado, se
      * vuelve a preguntar al usuario por una localizaci&oacute;n, Si el usuario
-     * cancela el di&aacute;logo, se devolver&aacute; {@code null}. 
+     * cancela el di&aacute;logo, se devolver&aacute; {@code null}.
      * @param data
      *        Datos que se desean almacenar.
      * @param selectedFile

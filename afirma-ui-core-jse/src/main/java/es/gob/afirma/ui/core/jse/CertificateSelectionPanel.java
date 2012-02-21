@@ -66,13 +66,16 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 
 	private JList/*<CertificateLine>*/ certList;
 
-	private String selectedValue = null;
+	private int selectedIndex;
+
+	private final NameCertificateBean[] certificateBeans;
 
 	CertificateSelectionPanel(final NameCertificateBean[] el) {
-		this.createUI((el == null) ? new NameCertificateBean[0] : el);
+		this.certificateBeans = (el == null) ? new NameCertificateBean[0] : el.clone();
+		this.createUI();
 	}
 
-	private void createUI(final NameCertificateBean[] el) {
+	private void createUI() {
 
 		this.setLayout(new GridBagLayout());
 
@@ -91,7 +94,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		mainMessage.setForeground(Color.decode("0x0033BC")); //$NON-NLS-1$
 		this.add(mainMessage, c);
 
-		if (el.length == 1) {
+		if (this.certificateBeans.length == 1) {
 			c.insets = new Insets(0, 15, 4, 15);
 			c.gridy++;
 
@@ -114,7 +117,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 
 		CertificateLine certLine;
 		final Vector<CertificateLine> certLines = new java.util.Vector<CertificateSelectionPanel.CertificateLine>();
-		for (final NameCertificateBean nameCert : el) {
+		for (final NameCertificateBean nameCert : this.certificateBeans) {
 		    try {
 		    	certLine = createCertLine(nameCert.getName(), nameCert.getCertificate() );
 		    }
@@ -145,7 +148,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		this.certList.addMouseListener(listener);
 
 		this.certList.setSelectedIndex(0);
-		this.selectedValue = this.certList.getSelectedValue().toString();
+		this.selectedIndex = 0;
 
 		sPane.setBorder(null);
 		sPane.setPreferredSize(new Dimension(435, CERT_LIST_ELEMENT_HEIGHT * this.certList.getVisibleRowCount()));
@@ -158,10 +161,10 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		this.certList.requestFocusInWindow();
 	}
 
-	/** Recupera el nombre descriptor del certificado seleccionado.
-	 * @return Nombre del certificado seleccionado. */
+	/** Recupera el alias del certificado seleccionado.
+	 * @return Alias del certificado seleccionado o {@code null} si no se seleccion&oacute; ninguno. */
 	String getSelectedCertificate() {
-		return this.selectedValue;
+		return this.selectedIndex == -1 ? null : this.certificateBeans[this.selectedIndex].getAlias();
 	}
 
 	/** Agrega un gestor de eventos de rat&oacute;n a la lista de certificados para poder
@@ -336,7 +339,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 
 	/** {@inheritDoc} */
 	public void valueChanged(final ListSelectionEvent e) {
-		this.selectedValue = this.certList.getSelectedValue().toString();
+		this.selectedIndex = this.certList.getSelectedIndex();
 	}
 
 	/**
