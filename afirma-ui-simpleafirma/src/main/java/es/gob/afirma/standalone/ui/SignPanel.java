@@ -243,6 +243,23 @@ public final class SignPanel extends JPanel {
             iconTooltip = Messages.getString("SignPanel.17"); //$NON-NLS-1$
             fileDescription = Messages.getString("SignPanel.20"); //$NON-NLS-1$
             this.signer = new AOFacturaESigner();
+
+            if (this.signer.isSign(data)) {
+            	final int selectOption = JOptionPane.showConfirmDialog(this,
+            			Messages.getString("SignPanel.22"), //$NON-NLS-1$
+            			Messages.getString("SignPanel.19"), //$NON-NLS-1$
+            			JOptionPane.YES_NO_OPTION,
+            			JOptionPane.WARNING_MESSAGE);
+            	if (selectOption == JOptionPane.YES_OPTION) {
+                    iconPath = FILE_ICON_BINARY;
+                    iconTooltip = Messages.getString("SignPanel.12"); //$NON-NLS-1$
+                    fileDescription = Messages.getString("SignPanel.11"); //$NON-NLS-1$
+                    this.signer = new AOCAdESSigner();
+            	} else {
+            		this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            		return;
+            	}
+            }
         }
         // Comprobamos si es un fichero de firma (los PDF y las facturas pasaran por la condicion anterior)
         else if ((this.signer = AOSignerFactory.getSigner(data)) != null) {
