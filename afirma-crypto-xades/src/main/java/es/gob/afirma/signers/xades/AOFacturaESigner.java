@@ -48,94 +48,21 @@ public final class AOFacturaESigner implements AOSigner {
         EXTRA_PARAMS.setProperty("facturaeSign", "true"); //$NON-NLS-1$ //$NON-NLS-2$:P
     }
 
-    /** Cofirma Facturas en formato XAdES Factura-E.
-     * @param data Factura que deseamos firmar.
-     * @param sign Factura con las firmas iniciales.
-     * @param algorithm Algoritmo a usar para la firma.
-     * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
-     * <ul>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
-     * </ul>
-     * @param keyEntry Entrada que apunta a la clave privada a usar para firmar.
-     * @param extraParams Par&aacute;metros adicionales para la firma.
-     * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
-     * <dl>
-     *  <dt><b><i>signerCertifiedRole</i></b></dt>
-     *   <dd>Cargo confirmado para el firmante</dd>
-     *  <dt><b><i>signatureProductionCity</i></b></dt>
-     *   <dd>Ciudad en la que se realiza la firma</dd>
-     *  <dt><b><i>signatureProductionProvince</i></b></dt>
-     *   <dd>Provincia en la que se realiza la firma</dd>
-     *  <dt><b><i>signatureProductionPostalCode</i></b></dt>
-     *   <dd>C&oacute;digo postal en el que se realiza la firma</dd>
-     *  <dt><b><i>signatureProductionCountry</i></b></dt>
-     *   <dd>Pa&iacute;s en el que se realiza la firma</dd>
-     * @return Cofirma en formato XAdES
-     * @throws AOException Cuando ocurre cualquier problema durante el proceso */
+    /** Operaci&oacute;n no soportada. */
     public byte[] cosign(final byte[] data,
                          final byte[] sign,
                          final String algorithm,
                          final PrivateKeyEntry keyEntry,
                          final Properties extraParams) throws AOException {
-        if (!isValidDataFile(data)) {
-            throw new IllegalArgumentException("Los datos proporcionados no son una factura electronica"); //$NON-NLS-1$
-        }
-        final Properties xParams = (Properties) EXTRA_PARAMS.clone();
-        if (extraParams != null) {
-            for (final Object key : extraParams.keySet()) {
-                if (ALLOWED_PARAMS.contains(key)) {
-                    xParams.put(key, extraParams.get(key));
-                }
-            }
-        }
-        return XADES_SIGNER.cosign(data, sign, algorithm, keyEntry, xParams);
+    	throw new UnsupportedOperationException("No se soporta la cofirma de facturas"); //$NON-NLS-1$
     }
 
-    /** Cofirma Facturas en formato XAdES Factura-E.
-     * @param sign Factura con las firmas iniciales.
-     * @param algorithm Algoritmo a usar para la firma.
-     * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
-     * <ul>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
-     * </ul>
-     * @param keyEntry Entrada que apunta a la clave privada a usar para firmar.
-     * @param extraParams Par&aacute;metros adicionales para la firma.
-     * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
-     * <dl>
-     *  <dt><b><i>signerCertifiedRole</i></b></dt>
-     *   <dd>Cargo confirmado para el firmante</dd>
-     *  <dt><b><i>signatureProductionCity</i></b></dt>
-     *   <dd>Ciudad en la que se realiza la firma</dd>
-     *  <dt><b><i>signatureProductionProvince</i></b></dt>
-     *   <dd>Provincia en la que se realiza la firma</dd>
-     *  <dt><b><i>signatureProductionPostalCode</i></b></dt>
-     *   <dd>C&oacute;digo postal en el que se realiza la firma</dd>
-     *  <dt><b><i>signatureProductionCountry</i></b></dt>
-     *   <dd>Pa&iacute;s en el que se realiza la firma</dd>
-     * @return Cofirma en formato XAdES
-     * @throws AOException Cuando ocurre cualquier problema durante el proceso */
+    /** Operaci&oacute;n no soportada. */
     public byte[] cosign(final byte[] sign,
                          final String algorithm,
                          final PrivateKeyEntry keyEntry,
                          final Properties extraParams) throws AOException {
-        if (!isValidDataFile(sign)) {
-            throw new IllegalArgumentException("Los datos proporcionados no son una factura electronica"); //$NON-NLS-1$
-        }
-        final Properties xParams = (Properties) EXTRA_PARAMS.clone();
-        if (extraParams != null) {
-            for (final Object key : extraParams.keySet()) {
-                if (ALLOWED_PARAMS.contains(key)) {
-                    xParams.put(key, extraParams.get(key));
-                }
-            }
-        }
-        return XADES_SIGNER.cosign(sign, algorithm, keyEntry, xParams);
+    	throw new UnsupportedOperationException("No se soporta la cofirma de facturas"); //$NON-NLS-1$
     }
 
     /** Operaci&oacute;n no soportada, se lanza una <code>UnsupportedOperationException</code>. */
