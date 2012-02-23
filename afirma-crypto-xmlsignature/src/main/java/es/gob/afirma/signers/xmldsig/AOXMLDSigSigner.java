@@ -126,7 +126,6 @@ public final class AOXMLDSigSigner implements AOSigner {
     static {
         if (Security.getProvider("XMLDSig") == null) { //$NON-NLS-1$
             try {
-
                 Security.addProvider((Provider)
                 		Class.forName("org.jcp.xml.dsig.internal.dom.XMLDSigRI").newInstance()); //$NON-NLS-1$
             }
