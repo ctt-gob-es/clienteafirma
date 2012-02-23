@@ -183,7 +183,7 @@ public final class TestXAdES {
 //                Assert.assertTrue("Fallo al validar " + filename, verifier.verifyXML(result)); //$NON-NLS-1$
 //            }
 
-            Assert.assertTrue(isValidUnsignedProperties(new ByteArrayInputStream(result),null));
+            Assert.assertTrue("UnsignedProperties invalidas", isValidUnsignedProperties(new ByteArrayInputStream(result),null)); //$NON-NLS-1$
 
             Assert.assertNotNull(prueba, result);
             Assert.assertTrue("El resultado no se reconoce como firma", signer.isSign(result)); //$NON-NLS-1$
@@ -328,6 +328,8 @@ public final class TestXAdES {
                     final byte[] data = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(filename));
 
                     final byte[] result = signer.sign(data, algo, pke, extraParams);
+
+                    Assert.assertFalse("El XML contiene '&#13;'", new String(result).contains("&#13;")); //$NON-NLS-1$ //$NON-NLS-2$
 
                     File f = File.createTempFile(algo + "-" + extraParams.getProperty("mode") + "-" + filename.replace(".xml", "") + "-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
                     java.io.FileOutputStream fos = new java.io.FileOutputStream(f);

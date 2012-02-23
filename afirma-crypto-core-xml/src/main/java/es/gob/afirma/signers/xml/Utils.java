@@ -46,10 +46,6 @@ import javax.xml.crypto.dsig.spec.XPathType.Filter;
 import javax.xml.crypto.dsig.spec.XSLTTransformParameterSpec;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -784,7 +780,7 @@ public final class Utils {
         final String xmlEncoding = xmlProps.containsKey(OutputKeys.ENCODING) ? xmlProps.get(OutputKeys.ENCODING) : "UTF-8"; //$NON-NLS-1$
 
         // Primero creamos un writer
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Writer writer = null;
         try {
             writer = new OutputStreamWriter(baos, xmlEncoding);
@@ -794,37 +790,16 @@ public final class Utils {
             writer = new OutputStreamWriter(baos);
         }
 
-        // Ahora escribimos el XML usando XALAN, para el control de los
-        // namespaces
+        // Ahora escribimos el XML usando XALAN
         writeXMLwithXALAN(writer, node, xmlEncoding);
 
-        // Volvemos a cargar el XML en un DOM. Esto se hace porque las
-        // bibliotecas de XALAN hacen
-        // aparecer en ciertas ocasiones unos saltos de pagina unicode en el
-        // base 64 de los
-        // datos contenidos en la firma. Por motivos estilisticos, volvemos a
-        // cargar el XML y a
-        // guardarlo mediante DOM para que no aparezcan.
-        final Document docum;
         try {
-            docum = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
+            DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
         }
         catch (final Exception e) {
             LOGGER.severe("No se ha podido recargar el XML para insertar los atributos de la cabecera, quizas la codificacion se vea afectada: " + e); //$NON-NLS-1$
             return baos.toByteArray();
         }
-
-        // Escribimos por segunda vez el XML, pero ahora con el JRE
-        baos = new ByteArrayOutputStream();
-        try {
-            writer = new OutputStreamWriter(baos, xmlEncoding);
-        }
-        catch (final Exception e) {
-            LOGGER.warning("La codificacion '" + xmlEncoding + "' no es valida, se usara la por defecto: " + e); //$NON-NLS-1$ //$NON-NLS-2$
-            writer = new OutputStreamWriter(baos);
-        }
-
-        writeXMLwithJRE(writer, docum.getDocumentElement(), false, xmlProps);
 
         // Y devolvemos el resultado como array de bytes, insertando antes la
         // cabecera de hoja de estilo
@@ -846,36 +821,6 @@ public final class Utils {
             output.setEncoding(xmlEncoding);
         }
         serializer.write(node, output);
-    }
-
-    private static void writeXMLwithJRE(final Writer writer,
-                                              final Node node,
-                                              final boolean indent,
-                                              final Map<String, String> props) {
-        try {
-            final DOMSource domSource = new DOMSource(node);
-            final StreamResult streamResult = new StreamResult(writer);
-            final TransformerFactory tf = TransformerFactory.newInstance();
-            final Transformer serializer = tf.newTransformer();
-
-            final Map<String, String> properties = (props != null) ? props : new Hashtable<String, String>();
-
-            // Por defecto, si no hay eclarada una codificacion, se utiliza
-            // UTF-8
-            if (!properties.containsKey(OutputKeys.ENCODING) || "".equals(properties.get(OutputKeys.ENCODING))) { //$NON-NLS-1$
-                properties.put(OutputKeys.ENCODING, "UTF-8"); //$NON-NLS-1$
-            }
-            for (final String key : properties.keySet()) {
-                serializer.setOutputProperty(key, properties.get(key));
-            }
-            if (indent) {
-                serializer.setOutputProperty(OutputKeys.INDENT, "yes"); //$NON-NLS-1$
-            }
-            serializer.transform(domSource, streamResult);
-        }
-        catch (final Exception e) {
-            LOGGER.severe("Error escribiendo el XML: " + e); //$NON-NLS-1$
-        }
     }
 
     /** Genera un objeto descriptor de firma.
