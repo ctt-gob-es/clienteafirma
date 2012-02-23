@@ -357,9 +357,9 @@ public final class JSEUIManager implements AOUIManager {
 
             tryAgain = false;
             final JFileChooser fileChooser = new JFileChooser();
-            fileChooser.getAccessibleContext().setAccessibleName(JSEUIMessages.getString("AOUIManager.81")); //$NON-NLS-1$
-            fileChooser.getAccessibleContext().setAccessibleDescription(JSEUIMessages.getString("AOUIManager.82")); //$NON-NLS-1$
-            fileChooser.setToolTipText(JSEUIMessages.getString("AOUIManager.81")); //$NON-NLS-1$
+            fileChooser.getAccessibleContext().setAccessibleName(JSEUIMessages.getString("JSEUIManager.81")); //$NON-NLS-1$
+            fileChooser.getAccessibleContext().setAccessibleDescription(JSEUIMessages.getString("JSEUIManager.82")); //$NON-NLS-1$
+            fileChooser.setToolTipText(JSEUIMessages.getString("JSEUIManager.81")); //$NON-NLS-1$
             fileChooser.setSelectedFile(file);
 
             // Si se nos ha indicado un nombre de fichero por defecto, lo
@@ -380,7 +380,7 @@ public final class JSEUIManager implements AOUIManager {
                 if (file.exists()) {
                     selectedOption =
                         JOptionPane.showConfirmDialog(parentComponent,
-                                JSEUIMessages.getString("AOUIManager.77", file.getAbsolutePath()), JSEUIMessages.getString("AOUIManager.85"), JOptionPane.YES_NO_CANCEL_OPTION); //$NON-NLS-1$ //$NON-NLS-2$
+                                JSEUIMessages.getString("JSEUIManager.77", file.getAbsolutePath()), JSEUIMessages.getString("JSEUIManager.85"), JOptionPane.YES_NO_CANCEL_OPTION); //$NON-NLS-1$ //$NON-NLS-2$
                     if (selectedOption == JOptionPane.CANCEL_OPTION) {
                         LOGGER.info("Se ha cancelado la operacion de guardado."); //$NON-NLS-1$
                         return null;
@@ -402,7 +402,7 @@ public final class JSEUIManager implements AOUIManager {
                     catch (final Exception ex) {
                         LOGGER.warning("No se pudo guardar la informacion en el fichero indicado: " + ex); //$NON-NLS-1$
                         JOptionPane.showMessageDialog(parentComponent,
-                                JSEUIMessages.getString("AOUIManager.88"), JSEUIMessages.getString("AOUIManager.89"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+                                JSEUIMessages.getString("JSEUIManager.88"), JSEUIMessages.getString("JSEUIManager.89"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
                         fos = null;
                         // Volvemos a intentar guardar
                         tryAgain = true;
