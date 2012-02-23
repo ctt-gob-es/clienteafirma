@@ -104,22 +104,22 @@ public final class TestXAdES {
     /** Algoritmos de firma a probar. */
     private final static String[] ALGOS = new String[] {
             AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
-//            AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
-//            AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA,
-//            AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA
+            AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
+            AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA,
+            AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA
     };
 
     // IMPORTANTE: Poner extension ".xml" a los ficheros de prueba con contenido XML
     private static final String[] TEST_FILES_DATA = new String[] {
             "TEST_PDF_Certified.pdf", //$NON-NLS-1$
-//            "ANF_PF_Activo.pfx", //$NON-NLS-1$
-//            "base64.b64", //$NON-NLS-1$
-//            "sample-class-attributes.xml", //$NON-NLS-1$
-//            "sample-facturae.xml", //$NON-NLS-1$
-//            "sample-embedded-style.xml", //$NON-NLS-1$
-//            "sample-encoding-UTF-8.xml", //$NON-NLS-1$
-//            "sample-internal-dtd.xml", //$NON-NLS-1$
-//            "sample-namespace-encoding-us-ascii.xml" //$NON-NLS-1$
+            "ANF_PF_Activo.pfx", //$NON-NLS-1$
+            "base64.b64", //$NON-NLS-1$
+            "sample-class-attributes.xml", //$NON-NLS-1$
+            "sample-facturae.xml", //$NON-NLS-1$
+            "sample-embedded-style.xml", //$NON-NLS-1$
+            "sample-encoding-UTF-8.xml", //$NON-NLS-1$
+            "sample-internal-dtd.xml", //$NON-NLS-1$
+            "sample-namespace-encoding-us-ascii.xml" //$NON-NLS-1$
     };
 
     private static final String[] TEST_FILES_MULTISIGN = new String[] {
@@ -425,15 +425,4 @@ public final class TestXAdES {
     	}
     }
 
-//    private byte[] canonicalize(final byte[] in) {
-//        return in;
-//        org.apache.xml.security.Init.init();
-//        try {
-//            return Canonicalizer.getInstance(Canonicalizer.ALGO_ID_C14N11_WITH_COMMENTS).canonicalize(in);
-//        }
-//        catch (final Exception e) {
-//            System.err.println(e.toString());
-//            return in;
-//        }
-//    }
 }
