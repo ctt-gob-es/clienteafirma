@@ -43,6 +43,8 @@ import javax.swing.JApplet;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
+import org.ietf.jgss.Oid;
+
 import es.gob.afirma.applet.old.websign.Browser;
 import es.gob.afirma.applet.old.websign.FirmadorWeb.FirmaWeb;
 import es.gob.afirma.core.AOCancelledOperationException;
@@ -1390,7 +1392,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         if (identifier != null) {
         	// Probamos primero si es un OID
         	try {
-                this.policyId = qualifier.replace("urn:oid:", ""); //$NON-NLS-1$ //$NON-NLS-2$
+                this.policyId = "urn:oid:" + new Oid(qualifier.replace("urn:oid:", "")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             }
             catch (final Exception e1) {
             	// No es un OID, probamos una URL
@@ -1408,7 +1410,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
             // Miramos a ver si es un OID directamente, en cuyo caso lo pasamos
             // a URN
             try {
-                this.policyQualifier = new URI("urn:oid:" + qualifier); //$NON-NLS-1$
+                this.policyQualifier = new URI("urn:oid:" + new Oid(qualifier.replace("urn:oid:", ""))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             }
             catch (final Exception e1) {
                 // No es un OID directamente, miramos si es URI
