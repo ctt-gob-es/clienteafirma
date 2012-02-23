@@ -12,10 +12,13 @@ package es.gob.afirma.test.cades;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,6 +28,7 @@ import junit.framework.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSimpleSignInfo;
@@ -51,7 +55,22 @@ public final class TestCAdES {
     private static final String CERT_PASS3 = "1111"; //$NON-NLS-1$
     private static final String CERT_ALIAS3 = "1"; //$NON-NLS-1$
 
-    private static final byte[] DATA = "usfusgfusgduifgsifiusdgfigsdiufgsid".getBytes(); //$NON-NLS-1$
+    private static final String[] DATA_FILES = {
+    	"txt", //$NON-NLS-1$
+    	"xml" //$NON-NLS-1$
+    };
+    private static final List<byte[]> DATA = new ArrayList<byte[]>(2);
+    static {
+    	for (final String dataFile : DATA_FILES) {
+        	try {
+    			DATA.add(AOUtil.getDataFromInputStream(TestCAdES.class.getResourceAsStream(dataFile)));
+    		} catch (final IOException e) {
+    			Logger.getLogger("es.gob.afirma").severe("No se ha podido cargar el fichero de pruebas: " + dataFile);  //$NON-NLS-1$//$NON-NLS-2$
+    			DATA.add(null);
+    		}
+    	}
+    }
+
     private static final Properties[] CADES_MODES;
 
     static {
@@ -115,57 +134,61 @@ public final class TestCAdES {
         final AOSigner signer = new AOCAdESSigner();
 
         String prueba;
-
         for (final Properties extraParams : CADES_MODES) {
-            for (final String algo : ALGOS) {
+        	for (final String algo : ALGOS) {
+        		for (int i = 0; i < DATA_FILES.length; i++) {
+        			if (DATA.get(i) == null) {
+        				continue;
+        			}
 
-                prueba = "Firma CAdES en modo '" +  //$NON-NLS-1$
-                extraParams.getProperty("mode") +  //$NON-NLS-1$
-                "' con el algoritmo ': " + //$NON-NLS-1$
-                algo +
-                "' y politica '" + //$NON-NLS-1$
-                extraParams.getProperty("policyIdentifier") + //$NON-NLS-1$
-                "'"; //$NON-NLS-1$
+        			prueba = "Firma CAdES del fichero " + DATA_FILES[i] + " en modo '" +  //$NON-NLS-1$ //$NON-NLS-2$
+        			extraParams.getProperty("mode") +  //$NON-NLS-1$
+        			"' con el algoritmo ': " + //$NON-NLS-1$
+        			algo +
+        			"' y politica '" + //$NON-NLS-1$
+        			extraParams.getProperty("policyIdentifier") + //$NON-NLS-1$
+        			"'"; //$NON-NLS-1$
 
-                System.out.println(prueba);
+        			System.out.println(prueba);
 
-                final byte[] result = signer.sign(DATA, algo, pke, extraParams);
+        			final byte[] result = signer.sign(DATA.get(i), algo, pke, extraParams);
 
-                final File saveFile = File.createTempFile(algo + "-", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
-                final OutputStream os = new FileOutputStream(saveFile);
-                os.write(result);
-                os.flush();
-                os.close();
-                System.out.println("Temporal para comprobacion manual: " + saveFile.getAbsolutePath()); //$NON-NLS-1$
+        			final File saveFile = File.createTempFile(algo + "-", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
+        			final OutputStream os = new FileOutputStream(saveFile);
+        			os.write(result);
+        			os.flush();
+        			os.close();
+        			System.out.println("Temporal para comprobacion manual: " + saveFile.getAbsolutePath()); //$NON-NLS-1$
 
-              // Enviamos a validar a AFirma
-//              if (verifier != null) {
-//                  Assert.assertTrue("Fallo al validar " + saveFile.getAbsolutePath(), verifier.verifyBin(result)); //$NON-NLS-1$
-//              }
+        			// Enviamos a validar a AFirma
+        			//              if (verifier != null) {
+        			//                  Assert.assertTrue("Fallo al validar " + saveFile.getAbsolutePath(), verifier.verifyBin(result)); //$NON-NLS-1$
+        			//              }
 
-                Assert.assertNotNull(prueba, result);
-                Assert.assertTrue(signer.isSign(result));
-                Assert.assertTrue(CAdESValidator.isCAdESValid(result, AOSignConstants.CMS_CONTENTTYPE_SIGNEDDATA));
+        			Assert.assertNotNull(prueba, result);
+        			Assert.assertTrue(signer.isSign(result));
+        			Assert.assertTrue(CAdESValidator.isCAdESValid(result, AOSignConstants.CMS_CONTENTTYPE_SIGNEDDATA));
 
-                AOTreeModel tree = signer.getSignersStructure(result, false);
-                Assert.assertEquals("Datos", ((AOTreeNode) tree.getRoot()).getUserObject()); //$NON-NLS-1$
-                Assert.assertEquals("ANF Usuario Activo", ((AOTreeNode) tree.getRoot()).getChildAt(0).getUserObject()); //$NON-NLS-1$
+        			AOTreeModel tree = signer.getSignersStructure(result, false);
+        			Assert.assertEquals("Datos", ((AOTreeNode) tree.getRoot()).getUserObject()); //$NON-NLS-1$
+        			Assert.assertEquals("ANF Usuario Activo", ((AOTreeNode) tree.getRoot()).getChildAt(0).getUserObject()); //$NON-NLS-1$
 
-                tree = signer.getSignersStructure(result, true);
-                Assert.assertEquals("Datos", ((AOTreeNode) tree.getRoot()).getUserObject()); //$NON-NLS-1$
-                final AOSimpleSignInfo simpleSignInfo = (AOSimpleSignInfo) ((AOTreeNode) tree.getRoot()).getChildAt(0).getUserObject();
+        			tree = signer.getSignersStructure(result, true);
+        			Assert.assertEquals("Datos", ((AOTreeNode) tree.getRoot()).getUserObject()); //$NON-NLS-1$
+        			final AOSimpleSignInfo simpleSignInfo = (AOSimpleSignInfo) ((AOTreeNode) tree.getRoot()).getChildAt(0).getUserObject();
 
-//                Assert.assertEquals("CAdES", simpleSignInfo.getSignFormat());
-//                Assert.assertEquals(algo, simpleSignInfo.getSignAlgorithm());
-                Assert.assertNotNull(simpleSignInfo.getSigningTime());
-                Assert.assertEquals(cert, simpleSignInfo.getCerts()[0]);
+        			//                Assert.assertEquals("CAdES", simpleSignInfo.getSignFormat());
+        			//                Assert.assertEquals(algo, simpleSignInfo.getSignAlgorithm());
+        			Assert.assertNotNull(simpleSignInfo.getSigningTime());
+        			Assert.assertEquals(cert, simpleSignInfo.getCerts()[0]);
 
 
-                //System.out.println(prueba + ": OK"); //$NON-NLS-1$
-            }
+        			//System.out.println(prueba + ": OK"); //$NON-NLS-1$
+        		}
+        	}
         }
 
-        signer.sign(DATA, "SHA1withRSA", pke, null); //$NON-NLS-1$
+        signer.sign(DATA.get(0), "SHA1withRSA", pke, null); //$NON-NLS-1$
 
     }
 
@@ -188,36 +211,38 @@ public final class TestCAdES {
         String prueba;
 
         for (final Properties extraParams : CADES_MODES) {
-            for (final String algo : ALGOS) {
+        	for (final String algo : ALGOS) {
+        		for (int i = 0; i < DATA_FILES.length; i++) {
+        			if (DATA.get(i) == null) {
+        				continue;
+        			}
 
-                prueba = "Cofirma CAdES en modo '" +  //$NON-NLS-1$
-                extraParams.getProperty("mode") +  //$NON-NLS-1$
-                "' con el algoritmo ': " + //$NON-NLS-1$
-                algo +
-                "'"; //$NON-NLS-1$
+        			prueba = "Cofirma CAdES " + DATA_FILES[i] + " en modo '" +  //$NON-NLS-1$ //$NON-NLS-2$
+        			extraParams.getProperty("mode") +  //$NON-NLS-1$
+        			"' con el algoritmo ': " + //$NON-NLS-1$
+        			algo +
+        			"'"; //$NON-NLS-1$
 
-                System.out.println(prueba);
+        			System.out.println(prueba);
 
-                // Firma simple
-                final byte[] sign1 = sign(signer, DATA, algo, pke1, extraParams);
+        			// Firma simple
+        			final byte[] sign1 = sign(signer, DATA.get(i), algo, pke1, extraParams);
 
-                // Cofirma sin indicar los datos
-                final byte[] sign2 = cosign(signer, sign1, algo, pke2, extraParams);
+        			// Cofirma sin indicar los datos
+        			final byte[] sign2 = cosign(signer, sign1, algo, pke2, extraParams);
 
-                checkSign(signer, sign2, new PrivateKeyEntry[] {pke1, pke2}, new String[] {"ANF Usuario Activo", "CPISR-1 Pf\u00EDsica De la Se\u00F1a Pruebasdit"}, prueba); //$NON-NLS-1$ //$NON-NLS-2$
+        			checkSign(signer, sign2, new PrivateKeyEntry[] {pke1, pke2}, new String[] {"ANF Usuario Activo", "CPISR-1 Pf\u00EDsica De la Se\u00F1a Pruebasdit"}, prueba); //$NON-NLS-1$ //$NON-NLS-2$
 
-                // Cofirma indicando los datos
-                final byte[] sign3 = cosign(signer, DATA, sign2, algo, pke3, extraParams);
-                Assert.assertNotNull(sign3);
+        			// Cofirma indicando los datos
+        			final byte[] sign3 = cosign(signer, DATA.get(i), sign2, algo, pke3, extraParams);
+        			Assert.assertNotNull(sign3);
 
-                //checkSign(signer, sign3, new PrivateKeyEntry[] {pke1, pke2, pke3}, new String[] {"ANF Usuario Activo", "CPISR-1 Pf\u00EDsica De la Se\u00F1a Pruebasdit", "Certificado Pruebas Software V\u00E1lido"}, prueba); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        			//checkSign(signer, sign3, new PrivateKeyEntry[] {pke1, pke2, pke3}, new String[] {"ANF Usuario Activo", "CPISR-1 Pf\u00EDsica De la Se\u00F1a Pruebasdit", "Certificado Pruebas Software V\u00E1lido"}, prueba); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-                //System.out.println(prueba + ": OK"); //$NON-NLS-1$
-            }
+        			//System.out.println(prueba + ": OK"); //$NON-NLS-1$
+        		}
+        	}
         }
-
-        signer.sign(DATA, "SHA1withRSA", pke1, null); //$NON-NLS-1$
-
     }
 
     /**
