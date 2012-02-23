@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -12,6 +12,7 @@ package es.gob.afirma.signers.ooxml;
 
 import java.io.ByteArrayInputStream;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.security.Provider;
 import java.security.Security;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
@@ -36,13 +37,13 @@ import es.gob.afirma.signers.xmldsig.AOXMLDSigSigner;
 
 /** Manejador de firmas electr&oacute;nicas XML de documentos OOXML de Microsoft Office. */
 public final class AOOOXMLSigner implements AOSigner {
-    
+
     static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     static {
         if (Security.getProvider("XMLDSig") == null) { //$NON-NLS-1$
             try {
-                Security.addProvider(new org.jcp.xml.dsig.internal.dom.XMLDSigRI());
+                Security.addProvider((Provider) Class.forName("org.jcp.xml.dsig.internal.dom.XMLDSigRI").newInstance()); //$NON-NLS-1$
             }
             catch (final Exception e) {
                 LOGGER.warning("No se ha podido agregar el proveedor de firma XMLDSig necesario para firmas XML: " + e); //$NON-NLS-1$
@@ -185,7 +186,7 @@ public final class AOOOXMLSigner implements AOSigner {
     }
 
     /** Indica si los datos son un documento OOXML susceptible de ser firmado.
-     * @param data Datos a comprobar 
+     * @param data Datos a comprobar
      * @return <cod>true</code> si los datos son un documento OOXML susceptible de ser firmado, <code>false</code> en caso contrario */
     public boolean isValidDataFile(final byte[] data) {
         if (data == null) {
@@ -209,9 +210,9 @@ public final class AOOOXMLSigner implements AOSigner {
      * @param extraParams No usado, se ignora el valor de este par&aacute;metro
      * @return Documento OOXML firmado
      * @throws AOException Cuando ocurre alg&uacute;n error durante el proceso de firma */
-    public byte[] sign(final byte[] data, 
-                       final String algorithm, 
-                       final PrivateKeyEntry keyEntry, 
+    public byte[] sign(final byte[] data,
+                       final String algorithm,
+                       final PrivateKeyEntry keyEntry,
                        final Properties extraParams) throws AOException {
         return signOOXML(data, OOXMLUtil.countOOXMLSignatures(data) + 1, algorithm, keyEntry);
     }
@@ -231,9 +232,9 @@ public final class AOOOXMLSigner implements AOSigner {
      * @param extraParams No usado, se ignora el valor de este par&aacute;metro
      * @return Documento OOXML firmado
      * @throws AOException Cuando ocurre alg&uacute;n error durante el proceso de firma */
-    public byte[] cosign(final byte[] sign, 
-                         final String algorithm, 
-                         final PrivateKeyEntry keyEntry, 
+    public byte[] cosign(final byte[] sign,
+                         final String algorithm,
+                         final PrivateKeyEntry keyEntry,
                          final Properties extraParams) throws AOException {
         return signOOXML(sign, OOXMLUtil.countOOXMLSignatures(sign) + 1, algorithm, keyEntry);
     }
@@ -254,10 +255,10 @@ public final class AOOOXMLSigner implements AOSigner {
      * @param extraParams No usado, se ignora el valor de este par&aacute;metro
      * @return Documento OOXML firmado
      * @throws AOException Cuando ocurre alg&uacute;n error durante el proceso de firma */
-    public byte[] cosign(final byte[] data, 
-                         final byte[] sign, 
-                         final String algorithm, 
-                         final PrivateKeyEntry 
+    public byte[] cosign(final byte[] data,
+                         final byte[] sign,
+                         final String algorithm,
+                         final PrivateKeyEntry
                          keyEntry, final Properties extraParams) throws AOException {
         return signOOXML(sign, OOXMLUtil.countOOXMLSignatures(sign) + 1, algorithm, keyEntry);
     }
