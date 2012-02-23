@@ -1884,8 +1884,12 @@ public final class AOXMLDSigSigner implements AOSigner {
             final Document signDoc = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
             final Element rootNode = signDoc.getDocumentElement();
 
+            final String xmlSignatureName = (XML_SIGNATURE_PREFIX == null || "".equals(XML_SIGNATURE_PREFIX) ? //$NON-NLS-1$
+            		SIGNATURE_STR :
+            			XML_SIGNATURE_PREFIX + ":" + SIGNATURE_STR); //$NON-NLS-1$
+
             final ArrayList<Node> signNodes = new ArrayList<Node>();
-            if (rootNode.getNodeName().equals((XML_SIGNATURE_PREFIX == null || "".equals(XML_SIGNATURE_PREFIX) ? "" : XML_SIGNATURE_PREFIX + ":"))) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            if (rootNode.getNodeName().equals(xmlSignatureName)) {
                 signNodes.add(rootNode);
             }
 
