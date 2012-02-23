@@ -118,6 +118,7 @@ public final class Base64 {
 
       // Add optional line separator
       if (++cc == 19 && d < dLen - 2) {
+        dArr[d++] = '\r';
         dArr[d++] = '\n';
         cc = 0;
       }
