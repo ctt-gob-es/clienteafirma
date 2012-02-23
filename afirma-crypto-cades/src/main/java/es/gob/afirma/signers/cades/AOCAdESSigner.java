@@ -40,7 +40,7 @@ import es.gob.afirma.signers.pkcs7.ReadNodesTree;
  *   extraParams.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT);
  *   extraParams.setProperty("policyIdentifier", "urn:oid:2.16.724.1.3.1.1.2.1.8");
  *   extraParams.setProperty("policyIdentifierHash", "V8lVVNGDCPen6VELRD1Ja8HARFk=");
- *   extraParams.setProperty("policyIdentifierHashAlgorithm", "http://www.w3.org/2000/09/xmldsig#sha1");
+ *   extraParams.setProperty("policyIdentifierHashAlgorithm", "urn:oid:1.3.14.3.2.26");
  *
  *   // Usamos un PKCS#12 / PFX para obtener el certificado y su clave privada
  *   final InputStream fis = new FileInputStream("cert.pfx");
