@@ -2718,14 +2718,14 @@ interface EntryPointsCrypto {
     @Deprecated
     String getData();
 
-    /** Tras una firma masiva (firma a partir de m&uacute;ltiples hashes),
-     * devuelve las firmas en base64 separadas unas de otras por '!' (cierre de
-     * admiraci&oacute;n).<br/>
+    /** Tras una firma masiva de hashes establecidos mediante el m&eacute;todo
+     * <code>addMassiveHash</code>, devuelve las firmas en base64 separadas unas
+     * de otras por '!' (cierre de admiraci&oacute;n).<br/>
      * <b>Advertencia: </b> Una vez se haya recuperado la firma, es aconsejable
      * liberar los recursos del applet mediante el m&eacute;todo <code>initialize</code>. <br>
      * <br>
-     * After a massive signature (signature from multiple hashes), it returns
-     * signatures in base 64 separated by '!' (exclamation mark). If no
+     * After a massive signature from multiple hashes setting by <code>addMassiveHash</code>
+     * method, it returns signatures in base 64 separated by '!' (exclamation mark). If no
      * signatures are set <br/>
      * <b>N.B.: </b> Once the signature has been recovered, it is advisable to
      * free applet resources with <code>initialize</code>.
