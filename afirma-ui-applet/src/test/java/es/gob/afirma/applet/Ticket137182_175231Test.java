@@ -50,7 +50,8 @@ public class Ticket137182_175231Test {
      * Genera una firma XAdES estableciendo una pol&iacute;tica en donde el Identifier
      * es una OID.
      */
-    @Test
+    @SuppressWarnings("static-method")
+	@Test
 	public void configuraPoliticaConIdentifierOID() {
 		try {
 			CONFIG.setProperty("policyIdentifier", INPUT_DATA_OID); //$NON-NLS-1$
@@ -70,7 +71,8 @@ public class Ticket137182_175231Test {
      * Genera una firma XAdES estableciendo una pol&iacute;tica en donde el Identifier
      * es una URN.
      */
-    @Test
+    @SuppressWarnings("static-method")
+	@Test
 	public void configuraPoliticaConIdentifierURN() {
 		try {
 			CONFIG.setProperty("policyIdentifier", INPUT_DATA_URN); //$NON-NLS-1$
@@ -90,7 +92,8 @@ public class Ticket137182_175231Test {
      * Genera una firma XAdES estableciendo una pol&iacute;tica en donde el Identifier
      * es una URL.
      */
-    @Test
+    @SuppressWarnings("static-method")
+	@Test
 	public void configuraPoliticaConIdentifierURL() {
 		try {
 			CONFIG.setProperty("policyIdentifier", INPUT_DATA_URL); //$NON-NLS-1$
@@ -110,6 +113,7 @@ public class Ticket137182_175231Test {
      * Genera una firma XAdES estableciendo una pol&iacute;tica en donde el Identifier
      * es err&oacute;neo.
      */
+	@SuppressWarnings("static-method")
 	@Test
 	public void configuraPoliticaConIdentifierErroneo() {
 		try {
@@ -146,7 +150,7 @@ public class Ticket137182_175231Test {
 		return applet.getSignatureBase64Encoded();
 	}
 
-	private void checkPolicyIdentifier(final SignApplet applet, final String identifier) {
+	private static void checkPolicyIdentifier(final SignApplet applet, final String identifier) {
 
 		final String result = new String(Base64.decode(applet.getSignatureBase64Encoded()));
 

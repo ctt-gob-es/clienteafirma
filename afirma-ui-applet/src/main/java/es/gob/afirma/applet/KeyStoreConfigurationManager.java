@@ -359,7 +359,7 @@ final class KeyStoreConfigurationManager {
     /** Recupera el certificado seleccionado.
      * @return Certificado seleccionado o nulo si no hab&iacute;a ninguno.
      * @throws AOKeyStoreManagerException
-     * 		   Cuando no est&aacute;a inicializado el almac&eacute;n de claves.
+     * 		   Cuando no est&aacute; inicializado el almac&eacute;n de claves.
      * @throws AOKeystoreAlternativeException
      * 		   Cuando ocurre cualquier otro problema al acceder al almac&eacute;n.
      * */
