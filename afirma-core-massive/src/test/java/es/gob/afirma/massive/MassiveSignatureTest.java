@@ -21,7 +21,7 @@ import es.gob.afirma.massive.MassiveSignatureHelper.MassiveSignConfiguration;
  */
 public class MassiveSignatureTest {
 
-	private static final boolean MANUAL_DEBUG = true;
+	private static final boolean MANUAL_DEBUG = false;
 
 	private final static String path = new File("").getAbsolutePath(); //$NON-NLS-1$
 
@@ -163,9 +163,10 @@ public class MassiveSignatureTest {
     			try { fos.flush(); fos.close(); } catch (final Exception e) {
     				// Ignoramos los errores
     			}
-    		} catch (final Exception e) {
+    		}
+    		catch (final Exception e) {
     			Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
-    					"Error al guardar el fichero " + path + File.separator + filename); //$NON-NLS-1$
+					"Error al guardar el fichero " + path + File.separator + filename); //$NON-NLS-1$
     		}
     	}
     }
