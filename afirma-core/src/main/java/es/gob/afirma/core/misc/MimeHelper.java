@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -24,16 +24,16 @@ import javax.xml.parsers.DocumentBuilderFactory;
 public final class MimeHelper {
 
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
-    
+
     /** MimeType por defecto. */
     public static final String DEFAULT_MIMETYPE = "application/octet-stream"; //$NON-NLS-1$
-    
+
     /** Descriptor por defecto del tipo de contenido. */
     public static final String DEFAULT_CONTENT_DESCRIPTION = "binary"; //$NON-NLS-1$
-    
+
     /** OID del tipo de datos gen&eacute;rico. */
     public static final String DEFAULT_CONTENT_OID_DATA ="1.2.840.113549.1.7.1"; //$NON-NLS-1$
-    
+
     /** Tabla que asocia Oids y Mimetypes. */
     private static Properties oidMimetypeProp = null;
 
@@ -64,11 +64,11 @@ public final class MimeHelper {
         this.mimeInfo = new MimeInfo();
 
         try {
-            Method getMagicMatchMethod = AOUtil.classForName("net.sf.jmimemagic.Magic") //$NON-NLS-1$
+            final Method getMagicMatchMethod = AOUtil.classForName("net.sf.jmimemagic.Magic") //$NON-NLS-1$
                 .getMethod("getMagicMatch", new Class[] { byte[].class }); //$NON-NLS-1$
-            Object magicMatchObject = getMagicMatchMethod.invoke(null, this.data);
-        
-            Class<?> magicMatchClass = AOUtil.classForName("net.sf.jmimemagic.MagicMatch"); //$NON-NLS-1$
+            final Object magicMatchObject = getMagicMatchMethod.invoke(null, this.data);
+
+            final Class<?> magicMatchClass = AOUtil.classForName("net.sf.jmimemagic.MagicMatch"); //$NON-NLS-1$
             this.mimeInfo.setMimeType((String) magicMatchClass.getMethod("getMimeType", (Class[]) null).invoke(magicMatchObject, (Object[]) null)); //$NON-NLS-1$
             this.mimeInfo.setExtension((String)magicMatchClass.getMethod("getExtension", (Class[]) null).invoke(magicMatchObject, (Object[]) null)); //$NON-NLS-1$
             this.mimeInfo.setDescription((String) magicMatchClass.getMethod("getDescription", (Class[]) null).invoke(magicMatchObject, (Object[]) null)); //$NON-NLS-1$
@@ -78,13 +78,15 @@ public final class MimeHelper {
         }
         catch (final Exception e) {
             try {
-                Class<?> magicMatchNotFoundException = AOUtil.classForName("net.sf.jmimemagic.MagicMatchNotFoundException"); //$NON-NLS-1$
+                final Class<?> magicMatchNotFoundException = AOUtil.classForName("net.sf.jmimemagic.MagicMatchNotFoundException"); //$NON-NLS-1$
                 if (magicMatchNotFoundException.isInstance(e)) {
                     LOGGER.warning("No se pudo detectar el formato de los datos"); //$NON-NLS-1$
-                } else {
+                }
+                else {
                     LOGGER.warning("Error durante el analisis de la cabecera de los datos: " + e); //$NON-NLS-1$
                 }
-            } catch (final Exception e2) {
+            }
+            catch (final Exception e2) {
                 LOGGER.warning("Error al evaluar el tipo de dato mediante JMimeMagic: " + e2); //$NON-NLS-1$
             }
         }
@@ -179,7 +181,7 @@ public final class MimeHelper {
             if ("application/zip".equals(this.mimeType) || "application/msword".equals(this.mimeType)) { //$NON-NLS-1$ //$NON-NLS-2$
                 this.mimeType = OfficeAnalizer.getMimeType(this.data);
             }
-            
+
             if (this.mimeType == null) {
                 this.mimeType = MimeHelper.DEFAULT_MIMETYPE;
             }
@@ -234,40 +236,39 @@ public final class MimeHelper {
      * Almacena la informaci&oacute;n identificada del tipo de datos.
      */
     static class MimeInfo {
-        
+
         /** MimeType de los datos. */
         private String mType = null;
-        
+
         void setMimeType(final String mimeType) {
             this.mType = mimeType;
         }
-        
+
         String getMimeType() {
             return this.mType;
         }
-        
+
         /** Extensi&oacute;n com&uacute;n para el tipo de fichero. */
         private String extension = null;
-        
+
         String getExtension() {
             return this.extension;
         }
-        
+
         void setExtension(final String ext) {
             this.extension = ext;
         }
-        
+
         String getDescription() {
             return this.description;
         }
-        
+
         void setDescription(final String desc) {
             this.description = desc;
         }
-        
+
         /** Descripci&oacute;n del tipo de datos. */
         private String description = null;
     }
-    
+
 }
- 
