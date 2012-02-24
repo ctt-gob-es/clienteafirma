@@ -102,7 +102,8 @@ public class MassiveSignatureTest {
      * Genera todo tipo de firmas y multifirmas masivas haciendo u
      * @throws Exception Cuando se produce cualquier error durante la ejecuci&oacute;n.
      */
-    @Test
+    @SuppressWarnings("static-method")
+	@Test
     public void pruebaTodasLasCombinacionesDeFirmaProgramatica() throws Exception {
 
     	final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
