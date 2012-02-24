@@ -275,15 +275,19 @@ public final class AOODFSigner implements AOSigner {
 
                     }
 
-                    // si no se trata del documento de firmas se anade la
-                    // referencia
                     if (!fullPath.equals(SIGNATURES_PATH)) {
-                        referenceList.add(reference);
-                    }
-                    else {
-                        isCofirm = true;
+                    	referenceList.add(reference);
+                    } else {
+                        // ¿Para mantener la compatibilidad con OpenOffice 3.1?
+                    	isCofirm = true;
                     }
                 }
+            }
+
+            // Si se encuentra el fichero de firmas en el documento, la nueva firma
+            // se debe agregar a el
+            if (!isCofirm && zf.getEntry(SIGNATURES_PATH) != null) {
+            	isCofirm = true;
             }
 
             final Document docSignatures;
