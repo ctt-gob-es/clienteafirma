@@ -1392,15 +1392,16 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         if (identifier != null) {
         	// Probamos primero si es un OID
         	try {
-                this.policyId = "urn:oid:" + new Oid(qualifier.replace("urn:oid:", "")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                this.policyId = "urn:oid:" + new Oid(identifier.replace("urn:oid:", "")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             }
             catch (final Exception e1) {
             	// No es un OID, probamos una URL
                 try {
-                    this.policyId = AOUtil.createURI(identifier).toURL().toString();
+                	this.policyId = new URI(identifier).toString();
+//                    this.policyId = AOUtil.createURI(identifier).toURL().toString();
                 }
                 catch (final Exception e) {
-                    LOGGER.warning("No se ha indicado un OID o una URI valida para la politica(" + identifier + "), pero se establecera el valor de todas formas: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+                	LOGGER.warning("No se ha indicado un OID o una URI valida para la politica(" + identifier + "), pero se establecera el valor de todas formas: " + e); //$NON-NLS-1$ //$NON-NLS-2$
                     this.policyId = identifier;
                 }
             }
