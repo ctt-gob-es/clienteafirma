@@ -69,6 +69,7 @@ public final class AOODFSignerTest {
 	 * Firma documentos ODF.
 	 * @throws Exception Cuando se produce un error en el proceso de firma.
 	 */
+	@SuppressWarnings("static-method")
 	@Test
     public void firmaODF() throws Exception {
 
@@ -107,6 +108,7 @@ public final class AOODFSignerTest {
      * Prueba a firmar y cofirmar un fichero ODF.
      * @throws Exception Cuando se produce un error durante la operaci&oacute;n de firma o cofirma.
      */
+	@SuppressWarnings("static-method")
 	@Test
     public void firmaYCofirmaODF() throws Exception {
         final PrivateKeyEntry pke = loadKeyEntry(CERT_PATH, CERT_PASS, CERT_ALIAS);
@@ -143,7 +145,7 @@ public final class AOODFSignerTest {
 		}
     }
 
-	private PrivateKeyEntry loadKeyEntry(final String certPath, final String certPass, final String certAlias) throws Exception, CertificateException, IOException {
+	private static PrivateKeyEntry loadKeyEntry(final String certPath, final String certPass, final String certAlias) throws Exception, CertificateException, IOException {
 		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
         ks.load(ClassLoader.getSystemResourceAsStream(certPath), certPass.toCharArray());
         return (PrivateKeyEntry) ks.getEntry(certAlias, new KeyStore.PasswordProtection(certPass.toCharArray()));
