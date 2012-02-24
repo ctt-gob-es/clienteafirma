@@ -1,13 +1,11 @@
 package es.gob.afirma.applet;
 
-import java.io.File;
 import java.util.Properties;
 
 import javax.xml.crypto.dsig.DigestMethod;
 
 import junit.framework.Assert;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.Base64;
@@ -27,6 +25,8 @@ public class Ticket137182_175231Test {
 	private static final String INPUT_DATA_URL = "http://java.com/es/download/"; //$NON-NLS-1$
 
 	private static final String INPUT_DATA_ERROR = "Hola Mundo!!"; //$NON-NLS-1$
+
+	private static final String POLICY_IDENTIFIER_PREFIX = "<xades:SigPolicyId><xades:Identifier>"; //$NON-NLS-1$
 
     private static final String CERT_PATH = "ANF_PF_Activo.pfx"; //$NON-NLS-1$
     private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
@@ -55,19 +55,11 @@ public class Ticket137182_175231Test {
 		try {
 			CONFIG.setProperty("policyIdentifier", INPUT_DATA_OID); //$NON-NLS-1$
 
-			final String path = new File("").getAbsolutePath(); //$NON-NLS-1$
-
 			final SignApplet applet = new SignApplet();
 
 			generateSign(applet, CONFIG);
 
-//			applet.setOutFilePath(path + "/137182_175231_OID_signature.xml"); //$NON-NLS-1$
-//			applet.saveSignToFile();
-
 			checkPolicyIdentifier(applet, URN_OID_PREFIX + INPUT_DATA_OID);
-
-//			final String result = new String(Base64.decode(applet.getSignatureBase64Encoded()));
-//			result.substring(result.indexOf("<xades:SigPolicyId><xades:Identifier>")).equals(URN_OID_PREFIX + INPUT_DATA_OID);
 		}
 		catch(final java.awt.HeadlessException e) {
 			// Ignoramos este error, pero no otros, para evitar fallos en tests automaticos en servidor
@@ -79,19 +71,15 @@ public class Ticket137182_175231Test {
      * es una URN.
      */
     @Test
-    @Ignore
 	public void configuraPoliticaConIdentifierURN() {
 		try {
 			CONFIG.setProperty("policyIdentifier", INPUT_DATA_URN); //$NON-NLS-1$
-
-			final String path = new File("").getAbsolutePath(); //$NON-NLS-1$
 
 			final SignApplet applet = new SignApplet();
 
 			generateSign(applet, CONFIG);
 
-			applet.setOutFilePath(path + "/137182_175231_URN_signature.xml"); //$NON-NLS-1$
-			applet.saveSignToFile();
+			checkPolicyIdentifier(applet, INPUT_DATA_URN);
 		}
 		catch(final java.awt.HeadlessException e) {
 			// Ignoramos este error, pero no otros, para evitar fallos en tests automaticos en servidor
@@ -103,19 +91,15 @@ public class Ticket137182_175231Test {
      * es una URL.
      */
     @Test
-    @Ignore
 	public void configuraPoliticaConIdentifierURL() {
 		try {
-			CONFIG.setProperty("policyIdentifier", "http://java.com/es/download/"); //$NON-NLS-1$ //$NON-NLS-2$
-
-			final String path = new File("").getAbsolutePath(); //$NON-NLS-1$
+			CONFIG.setProperty("policyIdentifier", INPUT_DATA_URL); //$NON-NLS-1$
 
 			final SignApplet applet = new SignApplet();
 
 			generateSign(applet, CONFIG);
 
-			applet.setOutFilePath(path + "/137182_175231_URL_signature.xml"); //$NON-NLS-1$
-			applet.saveSignToFile();
+			checkPolicyIdentifier(applet, INPUT_DATA_URL);
 		}
 		catch(final java.awt.HeadlessException e) {
 			// Ignoramos este error, pero no otros, para evitar fallos en tests automaticos en servidor
@@ -127,19 +111,15 @@ public class Ticket137182_175231Test {
      * es err&oacute;neo.
      */
 	@Test
-	@Ignore
 	public void configuraPoliticaConIdentifierErroneo() {
 		try {
-			CONFIG.setProperty("policyIdentifier", "Hola Mundo!!"); //$NON-NLS-1$ //$NON-NLS-2$
-
-			final String path = new File("").getAbsolutePath(); //$NON-NLS-1$
+			CONFIG.setProperty("policyIdentifier", INPUT_DATA_ERROR); //$NON-NLS-1$
 
 			final SignApplet applet = new SignApplet();
 
 			generateSign(applet, CONFIG);
 
-			applet.setOutFilePath(path + "/137182_175231_Erroneo_signature.xml"); //$NON-NLS-1$
-			applet.saveSignToFile();
+			checkPolicyIdentifier(applet, INPUT_DATA_ERROR);
 		}
 		catch(final java.awt.HeadlessException e) {
 			// Ignoramos este error, pero no otros, para evitar fallos en tests automaticos en servidor
@@ -170,15 +150,15 @@ public class Ticket137182_175231Test {
 
 		final String result = new String(Base64.decode(applet.getSignatureBase64Encoded()));
 
-		System.out.println();
-
-		final int i = result.indexOf("<xades:SigPolicyId><xades:Identifier>"); //$NON-NLS-1$
+		int i = result.indexOf(POLICY_IDENTIFIER_PREFIX);
 		Assert.assertTrue("No se ha encontrado el identificador de la politica", i != -1); //$NON-NLS-1$
+
+		i += POLICY_IDENTIFIER_PREFIX.length();
 
 		final int j = result.indexOf('<', i);
 		Assert.assertTrue("No se ha encontrado el cierre de la etiqueta identificador de la politica", j != -1); //$NON-NLS-1$
 
-		Assert.assertEquals(result.substring(i, j), identifier + "2");
+		Assert.assertEquals(identifier, result.substring(i, j));
 	}
 
     private static String getResourcePath(final String filename) {
