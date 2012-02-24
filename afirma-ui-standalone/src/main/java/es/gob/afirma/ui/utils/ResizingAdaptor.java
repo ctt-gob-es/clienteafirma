@@ -43,7 +43,6 @@ import es.gob.afirma.core.misc.Platform;
  * @author INTECO
  *
  */
-@SuppressWarnings("restriction")
 final class ResizingAdaptor extends ComponentAdapter {
 	private final JAccessibilityFrame theWindow;
 	private final JAccessibilityDialog theDialog;

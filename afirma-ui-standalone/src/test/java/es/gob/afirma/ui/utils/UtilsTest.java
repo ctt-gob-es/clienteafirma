@@ -1,6 +1,6 @@
 package es.gob.afirma.ui.utils;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -51,200 +51,200 @@ public class UtilsTest {
 	 * Log.
 	 */
 	private static Logger LOGGER = Logger.getLogger(UtilsTest.class.getName());
-	
+
 	/**
 	 * Comprobaci&oacute;n de que los componentes se remarcan al recibir el foco
 	 */
-	@Test	
+	@Test
 	public void testRemarcar(){
 		LOGGER.info("testRemarcar"); //$NON-NLS-1$
-		
+
 		try {
 			//Se obtiene la cofiguracion general
 			//Se anade el perfil por defecto
 			GeneralConfig.loadConfig(GeneralConfig.getConfig());
-			Properties config = GeneralConfig.getConfig();		
-			
+			final Properties config = GeneralConfig.getConfig();
+
 			//Se activa la opcion de remarcar elementos con foco
 			config.setProperty(AccessibilityOptionsPane.MAIN_FOCUS_VISIBLE, "true"); //$NON-NLS-1$
 			//Se asigna
 			GeneralConfig.loadConfig(config);
-			
-			JFrame frame = new JFrame();
+
+			final JFrame frame = new JFrame();
 			frame.setLayout(new GridBagLayout());
-			GridBagConstraints c = new GridBagConstraints();
-			JTextField jTF = new JTextField();
+			final GridBagConstraints c = new GridBagConstraints();
+			final JTextField jTF = new JTextField();
 			Utils.remarcar(jTF);
 			frame.add(jTF,c);
 			frame.setBounds(200, 200, 500, 500);
 			frame.setVisible(true);
-			
-			c.gridy = c.gridy + 1;		
-			JComboBox jCB = new JComboBox();
+
+			c.gridy = c.gridy + 1;
+			final JComboBox jCB = new JComboBox();
 			Utils.remarcar(jCB);
 			frame.add(jCB, c);
 			frame.setVisible(true);
-			
-			c.gridy = c.gridy + 1;		
-			JLabel jL = new JLabel();
+
+			c.gridy = c.gridy + 1;
+			final JLabel jL = new JLabel();
 			Utils.remarcar(jL);
 			frame.add(jL, c);
 			frame.setVisible(true);
-			
+
 			c.gridy = c.gridy + 1;
-			JPanel panelJChB = new JPanel();
-			JCheckBox jChB = new JCheckBox();
+			final JPanel panelJChB = new JPanel();
+			final JCheckBox jChB = new JCheckBox();
 			panelJChB.add(jChB);
 			Utils.remarcar(jChB);
 			frame.add(panelJChB, c);
 			frame.setVisible(true);
-			
+
 			c.gridy = c.gridy + 1;
-			JPanel panelJB = new JPanel();
-			JButton jB = new JButton();
+			final JPanel panelJB = new JPanel();
+			final JButton jB = new JButton();
 			panelJB.add(jB);
 			Utils.remarcar(jB);
 			frame.add(panelJB, c);
 			frame.setVisible(true);
-			
+
 			c.gridy = c.gridy + 1;
-			JPanel panelJTB = new JPanel();
-			JToggleButton jTB = new JToggleButton();
+			final JPanel panelJTB = new JPanel();
+			final JToggleButton jTB = new JToggleButton();
 			panelJTB.add(jTB);
 			Utils.remarcar(jTB);
 			frame.add(panelJTB, c);
 			frame.setVisible(true);
-			
+
 			c.gridy = c.gridy + 1;
-			JPanel panelJRB = new JPanel();
-			JRadioButton jRB = new JRadioButton();
+			final JPanel panelJRB = new JPanel();
+			final JRadioButton jRB = new JRadioButton();
 			panelJRB.add(jRB);
 			Utils.remarcar(jRB);
 			frame.add(panelJRB, c);
 			frame.setVisible(true);
-			
+
 			c.gridy = c.gridy + 1;
-			JTextPane jTP = new JTextPane();
+			final JTextPane jTP = new JTextPane();
 			Utils.remarcar(jTP);
 			frame.add(jTP, c);
 			frame.setVisible(true);
-			
+
 			c.gridy = c.gridy + 1;
-			JEditorPane jEP = new JEditorPane();
+			final JEditorPane jEP = new JEditorPane();
 			Utils.remarcar(jEP);
 			frame.add(jEP, c);
 			frame.setVisible(true);
-			
+
 			c.gridy = c.gridy + 1;
-			JTree jT = new JTree();
+			final JTree jT = new JTree();
 			Utils.remarcar(jT);
 			frame.add(jT, c);
 			frame.setVisible(true);
-			
+
 			c.gridy = c.gridy + 1;
-			JList jLi = new JList();
+			final JList jLi = new JList();
 			Utils.remarcar(jLi);
 			frame.add(jLi, c);
 			frame.setVisible(true);
-			
+
 			c.gridy = c.gridy + 1;
-			JScrollPane jSP = new JScrollPane();
+			final JScrollPane jSP = new JScrollPane();
 			Utils.remarcar(jSP);
 			frame.add(jSP, c);
 			frame.setVisible(true);
-			
+
 			c.gridy = c.gridy + 1;
-			JMenu jM = new JMenu();
+			final JMenu jM = new JMenu();
 			Utils.remarcar(jM);
 			frame.add(jM, c);
 			frame.setVisible(true);
-			int fontSize = jM.getFont().getSize();
-			
+			final int fontSize = jM.getFont().getSize();
+
 			//Se testea la correcta aplicacion del remarcado sin alto contraste
 			jTF.requestFocusInWindow();
 			try {
 				Thread.sleep(500);
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
 			assertTrue(remarcarJTextField(jTF));
 			jCB.requestFocusInWindow();
 			try {
 				Thread.sleep(500);
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
 			assertTrue(remarcarJComboBox(jCB, jTF));
 			jL.requestFocusInWindow();
 			try {
 				Thread.sleep(500);
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
 			assertTrue(remarcarJLabel(jL, jCB));
 			jChB.requestFocusInWindow();
 			try {
 				Thread.sleep(500);
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
 			assertTrue(remarcarJCheckBox(jChB,jL));
 			jB.requestFocusInWindow();
 			try {
 				Thread.sleep(500);
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
 			assertTrue(remarcarJButton(jB, jChB));
 			jTB.requestFocusInWindow();
 			try {
 				Thread.sleep(500);
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
 			assertTrue(remarcarJToggleButton(jTB, jB));
 			jRB.requestFocusInWindow();
 			try {
 				Thread.sleep(500);
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
 			assertTrue(remarcarJRadioButton(jRB, jTB));
 			jTP.requestFocusInWindow();
 			try {
 				Thread.sleep(500);
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
 			assertTrue(remarcarJTextPane(jTP,jRB));
 			jEP.requestFocusInWindow();
 			try {
 				Thread.sleep(500);
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
 			assertTrue(remarcarJEditorPane(jEP, jTP));
 			jT.requestFocusInWindow();
 			try {
 				Thread.sleep(500);
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
 			assertTrue(remarcarJTree(jT, jEP));
 			jLi.requestFocusInWindow();
 			try {
 				Thread.sleep(500);
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
 			assertTrue(remarcarJList(jLi, jT));
 			jSP.requestFocusInWindow();
 			try {
 				Thread.sleep(500);
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
-			assertTrue(remarcarJSrollPane(jSP,jLi));	
+			assertTrue(remarcarJSrollPane(jSP,jLi));
 			//Se activa la opcion de alto contraste
 			config.setProperty(AccessibilityOptionsPane.MAIN_HIGHT_CONTRAST, "true"); //$NON-NLS-1$
 			//Se asigna
@@ -253,84 +253,84 @@ public class UtilsTest {
 			jTF.requestFocusInWindow();
 			try {
 				Thread.sleep(500);
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
 			assertTrue(remarcarJTextField(jTF));
 			jCB.requestFocusInWindow();
 			try {
 				Thread.sleep(500);
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
 			assertTrue(remarcarJComboBox(jCB, jTF));
 			jL.requestFocusInWindow();
 			try {
 				Thread.sleep(500);
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
 			assertTrue(remarcarJLabel(jL, jCB));
 			jChB.requestFocusInWindow();
 			try {
 				Thread.sleep(500);
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
 			assertTrue(remarcarJCheckBox(jChB,jL));
 			jB.requestFocusInWindow();
 			try {
 				Thread.sleep(500);
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
 			assertTrue(remarcarJButton(jB, jChB));
 			jTB.requestFocusInWindow();
 			try {
 				Thread.sleep(500);
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
 			assertTrue(remarcarJToggleButton(jTB, jB));
 			jRB.requestFocusInWindow();
 			try {
 				Thread.sleep(500);
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
 			assertTrue(remarcarJRadioButton(jRB, jTB));
 			jTP.requestFocusInWindow();
 			try {
 				Thread.sleep(500);
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
 			assertTrue(remarcarJTextPane(jTP,jRB));
 			jEP.requestFocusInWindow();
 			try {
 				Thread.sleep(500);
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
 			assertTrue(remarcarJEditorPane(jEP, jTP));
 			jT.requestFocusInWindow();
 			try {
 				Thread.sleep(500);
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
 			assertTrue(remarcarJTree(jT, jEP));
 			jLi.requestFocusInWindow();
 			try {
 				Thread.sleep(500);
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
 			assertTrue(remarcarJList(jLi, jT));
 			jSP.requestFocusInWindow();
 			try {
 				Thread.sleep(500);
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
 			assertTrue(remarcarJSrollPane(jSP,jLi));
@@ -338,63 +338,63 @@ public class UtilsTest {
 			jM.setSelected(true);
 			try {
 				Thread.sleep(500);
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
 			assertTrue(remarcarJMenu(jM, jLi, fontSize));
 		} catch (final java.awt.HeadlessException e) {
 			// Ignoramos este error, pero no otros, para evitar fallos en tests automaticos en servidor
 		}
-	}	
-	
+	}
+
 	/**
 	 * Comprobaci&oacute;n de la asignaci&oacute;n autom&aacute;tica de mnem&oacute;nicos
 	 */
-	@Test	
+	@Test
 	public void testGetLanguageMnemonic(){
-		LOGGER.info("testGetLanguageMnemonic"); //$NON-NLS-1$		
-		
+		LOGGER.info("testGetLanguageMnemonic"); //$NON-NLS-1$
+
 		try{
 			// Lista de mnemonicos usados
 	        final List<Character> mnemonicList = new ArrayList<Character>();
 	        mnemonicList.add(new Character('a'));
 	        mnemonicList.add(new Character('b'));
 	        mnemonicList.add(new Character('c'));
-	        
+
 	        // Nombre del texto al que asignar mnemonico
-	        String nombreConLetraLibre = new String("abcd"); //$NON-NLS-1$
-	        String nombreSinLetraLibre = new String("abc");		 //$NON-NLS-1$
-			
+	        final String nombreConLetraLibre = new String("abcd"); //$NON-NLS-1$
+	        final String nombreSinLetraLibre = new String("abc");		 //$NON-NLS-1$
+
 			assertTrue(languageMnemonicSucces(mnemonicList, nombreConLetraLibre));
 			assertTrue(languageMnemonicFail(mnemonicList, nombreSinLetraLibre));
 		} catch (final java.awt.HeadlessException e) {
 			// Ignoramos este error, pero no otros, para evitar fallos en tests automaticos en servidor
 		}
 	}
-	
+
 	/**
 	 * Comprobaci&oacute;n de que los componentes cambian al modo en alto contraste correctamente
 	 */
-	@Test	
+	@Test
 	public void testSetContrastColor(){
-		LOGGER.info("testSetContrastColor"); //$NON-NLS-1$		
-		
+		LOGGER.info("testSetContrastColor"); //$NON-NLS-1$
+
 		try {
 			//Se obtiene la cofiguracion general
 			GeneralConfig.loadConfig(GeneralConfig.getConfig());
-			Properties config = GeneralConfig.getConfig();			
+			final Properties config = GeneralConfig.getConfig();
 			//Se crean los componentes para testear
-			JComboBox jComboBox = new JComboBox();			
-			JPasswordField jPasswordField = new JPasswordField();			
-			JTextField jTextField = new JTextField();			
-			JTree jTree = new JTree();			
-			JList jList = new JList();			
-			JPanel jPanel = new JPanel();
-			jPanel.setBorder(BorderFactory.createTitledBorder("Test")); // NOI18N //$NON-NLS-1$			
-			JStatusBar jStatusBar = new JStatusBar();
+			final JComboBox jComboBox = new JComboBox();
+			final JPasswordField jPasswordField = new JPasswordField();
+			final JTextField jTextField = new JTextField();
+			final JTree jTree = new JTree();
+			final JList jList = new JList();
+			final JPanel jPanel = new JPanel();
+			jPanel.setBorder(BorderFactory.createTitledBorder("Test")); // NOI18N //$NON-NLS-1$
+			final JStatusBar jStatusBar = new JStatusBar();
 			jStatusBar.setLabelWidth((int) Toolkit.getDefaultToolkit().getScreenSize().getWidth());
-			jStatusBar.setStatus("Test"); //$NON-NLS-1$			
-			JEditorPane jEditorPane = new JEditorPane();
+			jStatusBar.setStatus("Test"); //$NON-NLS-1$
+			final JEditorPane jEditorPane = new JEditorPane();
 			//Se activa la opcion de alto contraste
 			config.setProperty(AccessibilityOptionsPane.MAIN_HIGHT_CONTRAST, "true"); //$NON-NLS-1$
 			//Se asigna
@@ -421,59 +421,60 @@ public class UtilsTest {
 			assertTrue(highContrastJPanel(jPanel));
 			assertTrue(highContrastJStatusBar(jStatusBar));
 			assertTrue(highContrastJEditorPane(jEditorPane));
-			
+
 		} catch (final java.awt.HeadlessException e) {
 			// Ignoramos este error, pero no otros, para evitar fallos en tests automaticos en servidor
 		}
 	}
-	
+
 	/**
 	 * Comprobaci&oacute;n de que los componentes cambian al estilo negrita correctamente
 	 */
-	@Test	
+	@Test
 	public void testSetFontBold(){
-		LOGGER.info("testSetFontBold"); //$NON-NLS-1$		
-		
+		LOGGER.info("testSetFontBold"); //$NON-NLS-1$
+
 		try {
 			//Se obtiene la cofiguracion general
 			GeneralConfig.loadConfig(GeneralConfig.getConfig());
-			Properties config = GeneralConfig.getConfig();
+			final Properties config = GeneralConfig.getConfig();
 			//Se crean los componentes para testear
-			JComboBox jComboBox = new JComboBox();
-			JPanel jPanel = new JPanel();
+			final JComboBox jComboBox = new JComboBox();
+			final JPanel jPanel = new JPanel();
 			jPanel.setBorder(BorderFactory.createTitledBorder("Test")); // NOI18N //$NON-NLS-1$
-			JToolBar jToolBar = new JToolBar();
-			JButton jButton = new JButton("Test"); //$NON-NLS-1$
+			final JToolBar jToolBar = new JToolBar();
+			final JButton jButton = new JButton("Test"); //$NON-NLS-1$
 			jToolBar.add(jButton);
 			//Se activa la opcion de fuente negrita
 			config.setProperty(AccessibilityOptionsPane.MAIN_FONT_STYLE, "true"); //$NON-NLS-1$
 			//Se asigna
 			GeneralConfig.loadConfig(config);
-			//Se testea la correcta aplicacion del estilo de fuente en negrita			
-			assertTrue(fontBoldJComboBox(jComboBox));			
-			assertTrue(fontBoldJPanel(jPanel));			
+			//Se testea la correcta aplicacion del estilo de fuente en negrita
+			assertTrue(fontBoldJComboBox(jComboBox));
+			assertTrue(fontBoldJPanel(jPanel));
 			assertTrue(fontBoldJToolBar(jToolBar));
 			//Se desactiva la opcion de fuente negrita
 			config.setProperty(AccessibilityOptionsPane.MAIN_FONT_STYLE, "false"); //$NON-NLS-1$
 			//Se asigna
 			GeneralConfig.loadConfig(config);
-			//Se testea la correcta desactivacion del estilo de fuente en negrita			
-			assertTrue(fontBoldJComboBox(jComboBox));			
-			assertTrue(fontBoldJPanel(jPanel));			
+			//Se testea la correcta desactivacion del estilo de fuente en negrita
+			assertTrue(fontBoldJComboBox(jComboBox));
+			assertTrue(fontBoldJPanel(jPanel));
 			assertTrue(fontBoldJToolBar(jToolBar));
 		} catch (final java.awt.HeadlessException e) {
 			// Ignoramos este error, pero no otros, para evitar fallos en tests automaticos en servidor
 		}
-		
+
 	}
-	
+
 	/**
 	 * Comprobaci&oacute;n del correcto subrayado de los mnem&oacute;nicos para texto HTML
 	 */
+	@SuppressWarnings("static-method")
 	@Test
 	public void testRemarkMnemonic(){
 		LOGGER.info("testRemarkMnemonic"); //$NON-NLS-1$
-		
+
 		try {
 			assertTrue(Utils.remarkMnemonic("Test", 'T').equals("<u>T</u>est")); //$NON-NLS-1$ //$NON-NLS-2$
 			assertTrue(Utils.remarkMnemonic("Test", 'a').equals("Test")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -481,19 +482,20 @@ public class UtilsTest {
 			// Ignoramos este error, pero no otros, para evitar fallos en tests automaticos en servidor
 		}
 	}
-	
+
 	/**
 	 * Comprobaci&oacute;n del correcto visionado u ocultaci&oacute;n del tool tip
 	 */
+	@SuppressWarnings("static-method")
 	@Test
 	public void testShowToolTip(){
 		LOGGER.info("testShowToolTip"); //$NON-NLS-1$
 		try {
 			boolean show;
-			JWindow tip = new JWindow();
-			JButton boton = new JButton();
-			JLabel tipText = new JLabel();
-			
+			final JWindow tip = new JWindow();
+			final JButton boton = new JButton();
+			final JLabel tipText = new JLabel();
+
 			show = true;
 			Utils.showToolTip(show, tip, boton, tipText);
 			assertTrue(tip.isVisible()==true);
@@ -504,14 +506,16 @@ public class UtilsTest {
 			// Ignoramos este error, pero no otros, para evitar fallos en tests automaticos en servidor
 		}
 	}
-	
+
 	/**
 	 * Comprueba si el componente aplica el alto contraste correctamente
 	 * @param jComboBox Componente del tipo JComboBox para el que se comprueba el cambio de color
 	 * @return Boolean indicando si pasa la validaci&oacute;n
 	 */
+	@SuppressWarnings("static-method")
 	@Ignore
-	private boolean highContrastJComboBox(JComboBox jComboBox){
+	@Test
+	private boolean highContrastJComboBox(final JComboBox jComboBox){
 		Utils.setContrastColor(jComboBox);
 		if (GeneralConfig.isHighContrast()){
 			if (jComboBox.getBackground()==Color.WHITE){
@@ -522,14 +526,14 @@ public class UtilsTest {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Comprueba si el componente aplica el alto contraste correctamente
 	 * @param jPasswordField Componente del tipo JPasswordField para el que se comprueba el cambio de color
 	 * @return Boolean indicando si pasa la validaci&oacute;n
 	 */
 	@Ignore
-	private boolean highContrastJPasswordField(JPasswordField jPasswordField){
+	private boolean highContrastJPasswordField(final JPasswordField jPasswordField){
 		Utils.setContrastColor(jPasswordField);
 		if (GeneralConfig.isHighContrast()){
 			if (jPasswordField.getBackground()==Color.WHITE){
@@ -540,14 +544,14 @@ public class UtilsTest {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Comprueba si el componente aplica el alto contraste correctamente
 	 * @param jTextField Componente del tipo JTextField para el que se comprueba el cambio de color
 	 * @return Boolean indicando si pasa la validaci&oacute;n
 	 */
 	@Ignore
-	private boolean highContrastJTextField(JTextField jTextField){
+	private boolean highContrastJTextField(final JTextField jTextField){
 		Utils.setContrastColor(jTextField);
 		if (GeneralConfig.isHighContrast()){
 			if (jTextField.getBackground()==Color.WHITE){
@@ -555,17 +559,17 @@ public class UtilsTest {
 			}
 		} else {
 			return true;
-		}		
+		}
 		return false;
 	}
-	
+
 	/**
 	 * Comprueba si el componente aplica el alto contraste correctamente
 	 * @param jTree Componente del tipo JTree para el que se comprueba el cambio de color
 	 * @return Boolean indicando si pasa la validaci&oacute;n
 	 */
 	@Ignore
-	private boolean highContrastJTree(JTree jTree){
+	private boolean highContrastJTree(final JTree jTree){
 		Utils.setContrastColor(jTree);
 		if (GeneralConfig.isHighContrast()){
 			if (jTree.getForeground()==Color.WHITE){
@@ -576,32 +580,32 @@ public class UtilsTest {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Comprueba si el componente aplica el alto contraste correctamente
 	 * @param jList Componente del tipo JList para el que se comprueba el cambio de color
 	 * @return Boolean indicando si pasa la validaci&oacute;n
 	 */
 	@Ignore
-	private boolean highContrastJList(JList jList){
+	private boolean highContrastJList(final JList jList){
 		Utils.setContrastColor(jList);
 		if (GeneralConfig.isHighContrast()){
 			if (jList.getForeground()==Color.BLACK){
 				return true;
-			}		
+			}
 		} else {
 			return true;
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Comprueba si el componente aplica el alto contraste correctamente
 	 * @param jPanel Componente del tipo JPanel para el que se comprueba el cambio de color
 	 * @return Boolean indicando si pasa la validaci&oacute;n
 	 */
 	@Ignore
-	private boolean highContrastJPanel(JPanel jPanel){
+	private boolean highContrastJPanel(final JPanel jPanel){
 		Utils.setContrastColor(jPanel);
 		if (GeneralConfig.isHighContrast()){
 			if (jPanel.getBorder() != null){
@@ -621,14 +625,14 @@ public class UtilsTest {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Comprueba si el componente aplica el alto contraste correctamente
 	 * @param jStatusBar Componente del tipo JStatusBar para el que se comprueba el cambio de color
 	 * @return Boolean indicando si pasa la validaci&oacute;n
 	 */
 	@Ignore
-	private boolean highContrastJStatusBar(JStatusBar jStatusBar){
+	private boolean highContrastJStatusBar(final JStatusBar jStatusBar){
 		Utils.setContrastColor(jStatusBar);
 		if (GeneralConfig.isHighContrast()){
 			if (((JLabel)jStatusBar.getComponent(0)).getForeground()==Color.WHITE){
@@ -641,14 +645,16 @@ public class UtilsTest {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Comprueba si el componente aplica el alto contraste correctamente
 	 * @param jEditorPane Componente del tipo JEditorPane para el que se comprueba el cambio de color
 	 * @return Boolean indicando si pasa la validaci&oacute;n
 	 */
+	@SuppressWarnings("static-method")
+	@Test
 	@Ignore
-	private boolean highContrastJEditorPane(JEditorPane jEditorPane){
+	private boolean highContrastJEditorPane(final JEditorPane jEditorPane){
 		Utils.setContrastColor(jEditorPane);
 		if (GeneralConfig.isHighContrast()){
 			if (jEditorPane.getBackground()==Color.BLACK){
@@ -659,14 +665,14 @@ public class UtilsTest {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Comprueba si el componente aplica el estilo de fuente negrita correctamente
 	 * @param jComboBox Componente del tipo JComboBox para el que se comprueba el cambio de estilo de fuente
 	 * @return Boolean indicando si pasa la validaci&oacute;n
 	 */
 	@Ignore
-	private boolean fontBoldJComboBox(JComboBox jComboBox){
+	private boolean fontBoldJComboBox(final JComboBox jComboBox){
 		Utils.setFontBold(jComboBox);
 		if (GeneralConfig.isFontBold()){
 			if (jComboBox.getFont().getStyle() == Font.BOLD){
@@ -679,14 +685,14 @@ public class UtilsTest {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Comprueba si el componente aplica el estilo de fuente negrita correctamente
 	 * @param jPanel Componente del tipo JPanel para el que se comprueba el cambio de estilo de fuente
 	 * @return Boolean indicando si pasa la validaci&oacute;n
 	 */
 	@Ignore
-	private boolean fontBoldJPanel(JPanel jPanel){
+	private boolean fontBoldJPanel(final JPanel jPanel){
 		Utils.setFontBold(jPanel);
 		if (GeneralConfig.isFontBold()){
 			if (jPanel.getBorder() != null){
@@ -711,14 +717,14 @@ public class UtilsTest {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Comprueba si el componente aplica el estilo de fuente negrita correctamente
 	 * @param jComboBox Componente del tipo JComboBox para el que se comprueba el cambio de estilo de fuente
 	 * @return Boolean indicando si pasa la validaci&oacute;n
 	 */
 	@Ignore
-	private boolean fontBoldJToolBar(JToolBar jToolBar){
+	private boolean fontBoldJToolBar(final JToolBar jToolBar){
 		Utils.setFontBold(jToolBar);
 		if (GeneralConfig.isFontBold()){
 			for (int i=0;i<jToolBar.getComponentCount();i++){
@@ -735,7 +741,7 @@ public class UtilsTest {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Comprueba si el gestor de mnem&oacute;nicos libres asigna correctamente un mnem&oacute;nico
 	 * @param mnemonicList Lista con los mnem&oacute;nicos empleados
@@ -743,13 +749,13 @@ public class UtilsTest {
 	 * @return Boolean indicando si pasa la validaci&oacute;n
 	 */
 	@Ignore
-	private boolean languageMnemonicSucces(List<Character> mnemonicList, String nombreConLetraLibre){
+	private boolean languageMnemonicSucces(final List<Character> mnemonicList, final String nombreConLetraLibre){
 		if (Utils.getLanguageMnemonic(mnemonicList, nombreConLetraLibre) == 'd'){
 			return true;
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Comprueba si el gestor de mnem&oacute;nicos libres indica que no hay un mnem&oacute;nico disponible
 	 * @param mnemonicList Lista con los mnem&oacute;nicos empleados
@@ -757,7 +763,7 @@ public class UtilsTest {
 	 * @return Boolean indicando si pasa la validaci&oacute;n
 	 */
 	@Ignore
-	private boolean languageMnemonicFail(List<Character> mnemonicList, String nombreConLetraLibre){
+	private boolean languageMnemonicFail(final List<Character> mnemonicList, final String nombreConLetraLibre){
 		if (Utils.getLanguageMnemonic(mnemonicList, nombreConLetraLibre) == 0){
 			return true;
 		}
@@ -769,8 +775,8 @@ public class UtilsTest {
 	 * @return boolean indicando si el borde ha cambiado
 	 */
 	@Ignore
-	private boolean remarcarJTextField(JTextField component){
-		LineBorder border = (LineBorder)component.getBorder();
+	private boolean remarcarJTextField(final JTextField component){
+		final LineBorder border = (LineBorder)component.getBorder();
 		if (GeneralConfig.isHighContrast()){
 			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.WHITE){ //$NON-NLS-1$
 				return true;
@@ -779,10 +785,10 @@ public class UtilsTest {
 			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.BLACK){ //$NON-NLS-1$
 				return true;
 			}
-		}		
+		}
 		return false;
 	}
-	
+
 	/**
 	 * Comprueba si ha cambiado el borde de los componentes
 	 * @param component JComboBox ha comprobar si se ha pintado el borde
@@ -790,9 +796,9 @@ public class UtilsTest {
 	 * @return boolean indicando si los bordes han cambiado correctamente
 	 */
 	@Ignore
-	private boolean remarcarJComboBox(JComboBox component, JTextField componentOld){
-		LineBorder border = (LineBorder)component.getBorder();
-		LineBorder borderOld = (LineBorder)componentOld.getBorder();
+	private boolean remarcarJComboBox(final JComboBox component, final JTextField componentOld){
+		final LineBorder border = (LineBorder)component.getBorder();
+		final LineBorder borderOld = (LineBorder)componentOld.getBorder();
 		if (GeneralConfig.isHighContrast()){
 			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.WHITE){ //$NON-NLS-1$
 				//Se comprueba que se ha desactivado el remarcado en alto contraste del elemento que ha perdido el foco
@@ -810,7 +816,7 @@ public class UtilsTest {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Comprueba si ha cambiado el borde de los componentes
 	 * @param component JLabel ha comprobar si se ha pintado el borde
@@ -818,9 +824,9 @@ public class UtilsTest {
 	 * @return boolean indicando si los bordes han cambiado correctamente
 	 */
 	@Ignore
-	private boolean remarcarJLabel(JLabel component, JComboBox componentOld){
-		LineBorder border = (LineBorder)component.getBorder();
-		LineBorder borderOld = (LineBorder)componentOld.getBorder();
+	private boolean remarcarJLabel(final JLabel component, final JComboBox componentOld){
+		final LineBorder border = (LineBorder)component.getBorder();
+		final LineBorder borderOld = (LineBorder)componentOld.getBorder();
 		if (GeneralConfig.isHighContrast()){
 			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.WHITE){ //$NON-NLS-1$
 				//Se comprueba que se ha desactivado el remarcado en alto contraste del elemento que ha perdido el foco
@@ -838,7 +844,7 @@ public class UtilsTest {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Comprueba si ha cambiado el borde de los componentes
 	 * @param component JCheckBox ha comprobar si se ha pintado el borde
@@ -846,8 +852,8 @@ public class UtilsTest {
 	 * @return boolean indicando si los bordes han cambiado correctamente
 	 */
 	@Ignore
-	private boolean remarcarJCheckBox(JCheckBox component, JLabel componentOld){
-		LineBorder border = (LineBorder)((JPanel)(component.getParent())).getBorder();
+	private boolean remarcarJCheckBox(final JCheckBox component, final JLabel componentOld){
+		final LineBorder border = (LineBorder)((JPanel)(component.getParent())).getBorder();
 		if (GeneralConfig.isHighContrast()){
 			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.WHITE){ //$NON-NLS-1$
 				//Se comprueba que se ha desactivado el remarcado en alto contraste del elemento que ha perdido el foco
@@ -865,7 +871,7 @@ public class UtilsTest {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Comprueba si ha cambiado el borde de los componentes
 	 * @param component JButton ha comprobar si se ha pintado el borde
@@ -873,8 +879,8 @@ public class UtilsTest {
 	 * @return boolean indicando si los bordes han cambiado correctamente
 	 */
 	@Ignore
-	private boolean remarcarJButton(JButton component, JCheckBox componentOld){
-		LineBorder border = (LineBorder)((JPanel)(component.getParent())).getBorder();
+	private boolean remarcarJButton(final JButton component, final JCheckBox componentOld){
+		final LineBorder border = (LineBorder)((JPanel)(component.getParent())).getBorder();
 		if (GeneralConfig.isHighContrast()){
 			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.WHITE){ //$NON-NLS-1$
 				//Se comprueba que se ha desactivado el remarcado en alto contraste del elemento que ha perdido el foco
@@ -892,16 +898,18 @@ public class UtilsTest {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Comprueba si ha cambiado el borde de los componentes
 	 * @param component JToggleButton ha comprobar si se ha pintado el borde
 	 * @param componentOld JButton ha comprobar si se ha quitado el borde
 	 * @return boolean indicando si los bordes han cambiado correctamente
 	 */
+	@SuppressWarnings("static-method")
+	@Test
 	@Ignore
-	private boolean remarcarJToggleButton(JToggleButton component, JButton componentOld){
-		LineBorder border = (LineBorder)((JPanel)(component.getParent())).getBorder();
+	private boolean remarcarJToggleButton(final JToggleButton component, final JButton componentOld){
+		final LineBorder border = (LineBorder)((JPanel)(component.getParent())).getBorder();
 		if (GeneralConfig.isHighContrast()){
 			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.WHITE){ //$NON-NLS-1$
 				//Se comprueba que se ha desactivado el remarcado en alto contraste del elemento que ha perdido el foco
@@ -919,7 +927,7 @@ public class UtilsTest {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Comprueba si ha cambiado el borde de los componentes
 	 * @param component JRadioButton ha comprobar si se ha pintado el borde
@@ -927,8 +935,8 @@ public class UtilsTest {
 	 * @return boolean indicando si los bordes han cambiado correctamente
 	 */
 	@Ignore
-	private boolean remarcarJRadioButton(JRadioButton component, JToggleButton componentOld){
-		LineBorder border = (LineBorder)((JPanel)(component.getParent())).getBorder();
+	private boolean remarcarJRadioButton(final JRadioButton component, final JToggleButton componentOld){
+		final LineBorder border = (LineBorder)((JPanel)(component.getParent())).getBorder();
 		if (GeneralConfig.isHighContrast()){
 			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.WHITE){ //$NON-NLS-1$
 				//Se comprueba que se ha desactivado el remarcado en alto contraste del elemento que ha perdido el foco
@@ -946,7 +954,7 @@ public class UtilsTest {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Comprueba si ha cambiado el borde de los componentes
 	 * @param component JTextPane ha comprobar si se ha pintado el borde
@@ -954,8 +962,8 @@ public class UtilsTest {
 	 * @return boolean indicando si los bordes han cambiado correctamente
 	 */
 	@Ignore
-	private boolean remarcarJTextPane(JTextPane component, JRadioButton componentOld){
-		LineBorder border = (LineBorder)component.getBorder();
+	private boolean remarcarJTextPane(final JTextPane component, final JRadioButton componentOld){
+		final LineBorder border = (LineBorder)component.getBorder();
 		if (GeneralConfig.isHighContrast()){
 			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.WHITE){ //$NON-NLS-1$
 				//Se comprueba que se ha desactivado el remarcado en alto contraste del elemento que ha perdido el foco
@@ -973,7 +981,7 @@ public class UtilsTest {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Comprueba si ha cambiado el borde de los componentes
 	 * @param component JEditorPane ha comprobar si se ha pintado el borde
@@ -981,8 +989,8 @@ public class UtilsTest {
 	 * @return boolean indicando si los bordes han cambiado correctamente
 	 */
 	@Ignore
-	private boolean remarcarJEditorPane(JEditorPane component, JTextPane componentOld){
-		LineBorder border = (LineBorder)component.getBorder();
+	private boolean remarcarJEditorPane(final JEditorPane component, final JTextPane componentOld){
+		final LineBorder border = (LineBorder)component.getBorder();
 		if (GeneralConfig.isHighContrast()){
 			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.WHITE){ //$NON-NLS-1$
 				//Se comprueba que se ha desactivado el remarcado en alto contraste del elemento que ha perdido el foco
@@ -1000,16 +1008,18 @@ public class UtilsTest {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Comprueba si ha cambiado el borde de los componentes
 	 * @param component JTree ha comprobar si se ha pintado el borde
 	 * @param componentOld JEditorPane ha comprobar si se ha quitado el borde
 	 * @return boolean indicando si los bordes han cambiado correctamente
 	 */
+	@SuppressWarnings("static-method")
+	@Test
 	@Ignore
-	private boolean remarcarJTree(JTree component, JEditorPane componentOld){
-		LineBorder border = (LineBorder)component.getBorder();
+	private boolean remarcarJTree(final JTree component, final JEditorPane componentOld){
+		final LineBorder border = (LineBorder)component.getBorder();
 		if (GeneralConfig.isHighContrast()){
 			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.WHITE){ //$NON-NLS-1$
 				//Se comprueba que se ha desactivado el remarcado en alto contraste del elemento que ha perdido el foco
@@ -1027,16 +1037,18 @@ public class UtilsTest {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Comprueba si ha cambiado el borde de los componentes
 	 * @param component JList ha comprobar si se ha pintado el borde
 	 * @param componentOld JTree ha comprobar si se ha quitado el borde
 	 * @return boolean indicando si los bordes han cambiado correctamente
 	 */
+	@SuppressWarnings("static-method")
+	@Test
 	@Ignore
-	private boolean remarcarJList(JList component, JTree componentOld){
-		LineBorder border = (LineBorder)component.getBorder();
+	private boolean remarcarJList(final JList component, final JTree componentOld){
+		final LineBorder border = (LineBorder)component.getBorder();
 		if (GeneralConfig.isHighContrast()){
 			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.WHITE){ //$NON-NLS-1$
 				//Se comprueba que se ha desactivado el remarcado en alto contraste del elemento que ha perdido el foco
@@ -1054,16 +1066,18 @@ public class UtilsTest {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Comprueba si ha cambiado el borde de los componentes
 	 * @param component JList ha comprobar si se ha pintado el borde
 	 * @param componentOld JTree ha comprobar si se ha quitado el borde
 	 * @return boolean indicando si los bordes han cambiado correctamente
 	 */
+	@SuppressWarnings("static-method")
+	@Test
 	@Ignore
-	private boolean remarcarJSrollPane(JScrollPane component, JList componentOld){
-		LineBorder border = (LineBorder)component.getBorder();
+	private boolean remarcarJSrollPane(final JScrollPane component, final JList componentOld){
+		final LineBorder border = (LineBorder)component.getBorder();
 		if (GeneralConfig.isHighContrast()){
 			if (border.getClass().getName().equals("javax.swing.border.LineBorder") && border.getLineColor()==Color.WHITE){ //$NON-NLS-1$
 				//Se comprueba que se ha desactivado el remarcado en alto contraste del elemento que ha perdido el foco
@@ -1081,7 +1095,7 @@ public class UtilsTest {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Comprueba si ha cambiado el borde de los componentes
 	 * @param component JMenu ha comprobar si se ha pintado el borde
@@ -1089,15 +1103,17 @@ public class UtilsTest {
 	 * @param fontSize Integer con el tama&ntilde;o de fuente de inicio del JMenu
 	 * @return boolean indicando si los bordes han cambiado correctamente
 	 */
+	@SuppressWarnings("static-method")
+	@Test
 	@Ignore
-	private boolean remarcarJMenu(JMenu component, JList componentOld, int fontSize){
-		
+	private boolean remarcarJMenu(final JMenu component, final JList componentOld, final int fontSize){
+
 		if (component.getFont().getSize()==fontSize+5){
 			if (componentOld.getBorder().getClass().getName().equals("javax.swing.border.EmptyBorder")){ //$NON-NLS-1$
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
 }

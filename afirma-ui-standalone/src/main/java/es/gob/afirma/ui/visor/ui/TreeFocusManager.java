@@ -16,17 +16,17 @@ import javax.swing.tree.TreePath;
 import es.gob.afirma.core.signers.AOSimpleSignInfo;
 
 class TreeFocusManager extends KeyAdapter implements FocusListener, MouseMotionListener, MouseListener {
-    
+
     private final JTree tree;
     private final TreeFocusManagerAction focusAction;
-    
+
     private TreePath selectedPath;
-    
+
     // Como los cursores los usamos dentro de un MouseMotionListener los precreamos para
     // evitar que se creen objetos solo por mover el raton
     private static final Cursor DEFAULT_CURSOR = new Cursor(Cursor.DEFAULT_CURSOR);
     private static final Cursor HAND_CURSOR = new Cursor(Cursor.HAND_CURSOR);
-    
+
     TreeFocusManager(final JTree t, final TreeFocusManagerAction focusManagerAction) {
         this.tree = t;
         this.focusAction = focusManagerAction;
@@ -57,18 +57,18 @@ class TreeFocusManager extends KeyAdapter implements FocusListener, MouseMotionL
             if (path.getLastPathComponent() instanceof DefaultMutableTreeNode) {
                 final Object o = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
                 if (o instanceof ShowFileLinkAction || o instanceof AOSimpleSignInfo) {
-                    this.tree.setCursor(this.HAND_CURSOR);
+                    this.tree.setCursor(TreeFocusManager.HAND_CURSOR);
                 }
                 else {
-                    this.tree.setCursor(this.DEFAULT_CURSOR);
+                    this.tree.setCursor(TreeFocusManager.DEFAULT_CURSOR);
                 }
             }
             else {
-                this.tree.setCursor(this.DEFAULT_CURSOR);
+                this.tree.setCursor(TreeFocusManager.DEFAULT_CURSOR);
             }
         }
         else {
-            this.tree.setCursor(this.DEFAULT_CURSOR);
+            this.tree.setCursor(TreeFocusManager.DEFAULT_CURSOR);
         }
     }
 
@@ -87,7 +87,7 @@ class TreeFocusManager extends KeyAdapter implements FocusListener, MouseMotionL
     @Override public void mouseExited(final MouseEvent e) { /* No implementado */ }
     @Override public void mousePressed(final MouseEvent e) { /* No implementado */ }
     @Override public void mouseReleased(final MouseEvent e) { /* No implementado */ }
-    
+
     @Override
     public void keyPressed(final KeyEvent e) {
         if (KeyEvent.VK_SPACE == e.getKeyCode() || KeyEvent.VK_ENTER == e.getKeyCode()) {

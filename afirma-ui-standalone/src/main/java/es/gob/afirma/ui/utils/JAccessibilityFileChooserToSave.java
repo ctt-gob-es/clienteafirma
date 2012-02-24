@@ -1,12 +1,5 @@
 package es.gob.afirma.ui.utils;
 
-import static es.gob.afirma.ui.utils.JAccessibilityFileChooser.getActualHeight;
-import static es.gob.afirma.ui.utils.JAccessibilityFileChooser.getActualPositionY;
-import static es.gob.afirma.ui.utils.JAccessibilityFileChooser.getActualWidth;
-import static es.gob.afirma.ui.utils.JAccessibilityFileChooser.setActualHeight;
-import static es.gob.afirma.ui.utils.JAccessibilityFileChooser.setActualPositionY;
-import static es.gob.afirma.ui.utils.JAccessibilityFileChooser.setActualWidth;
-
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -243,11 +236,11 @@ public final class JAccessibilityFileChooserToSave extends JAccessibilityFileCho
         		this.dialog.setMinimumSize(new Dimension(Constants.FILE_INITIAL_WIDTH, Constants.FILE_INITIAL_HEIGHT));
         	}
             for (int i = 0; i<this.getComponentCount();i++){
-            	if (this.getComponent(i).getClass().getName().equals("javax.swing.JToolBar")){
+            	if (this.getComponent(i).getClass().getName().equals("javax.swing.JToolBar")){ //$NON-NLS-1$
             		this.jTool = (JToolBar)this.getComponent(i);
             		for (int j = 0; j<this.jTool.getComponentCount();j++){
                 		// Al cambiar entre vista en lista y detalles se llama a adjustWindowFonts para que calcule el tamano del texto
-                		if (this.jTool.getComponent(j).getClass().getName().equals("javax.swing.JToggleButton")){
+                		if (this.jTool.getComponent(j).getClass().getName().equals("javax.swing.JToggleButton")){ //$NON-NLS-1$
                 			final JToggleButton boton = ((JToggleButton)this.jTool.getComponent(j));
                 			// Al cambiar entre vista en lista y detalles se llama a adjustWindowFonts para que calcule el tamano del texto
                 			((JToggleButton)(this.jTool.getComponent(j))).addMouseListener(new MouseListener() {
@@ -358,7 +351,7 @@ public final class JAccessibilityFileChooserToSave extends JAccessibilityFileCho
 
 		for (int i=0; i<this.getComponentCount();i++){
 			if (this.getComponent(i) instanceof JToolBar){
-        		if (!this.getComponent(i).getClass().getName().equals("javax.swing.JToolBar")){
+        		if (!this.getComponent(i).getClass().getName().equals("javax.swing.JToolBar")){ //$NON-NLS-1$
         			this.remove(this.getComponent(i));
 
         		}
@@ -429,7 +422,7 @@ public final class JAccessibilityFileChooserToSave extends JAccessibilityFileCho
 		imageIconRestore = new ImageIcon(imageIconRestore.getImage().getScaledInstance(dimension.width, dimension.height, Image.SCALE_SMOOTH));
 		this.restoreButton = new JButton(imageIconRestore);
 		this.restoreButton.setMnemonic(KeyEvent.VK_R );
-		this.restoreButton.setToolTipText(Messages.getString("Wizard.restaurar.description"));
+		this.restoreButton.setToolTipText(Messages.getString("Wizard.restaurar.description")); //$NON-NLS-1$
 		this.restoreButton.getAccessibleContext().setAccessibleName(this.restoreButton.getToolTipText());
 
 		this.restoreButton.addFocusListener(new FocusListener() {
@@ -471,7 +464,7 @@ public final class JAccessibilityFileChooserToSave extends JAccessibilityFileCho
 		imageIconMaximize = new ImageIcon(imageIconMaximize.getImage().getScaledInstance(dimension.width, dimension.height, Image.SCALE_SMOOTH));
 		this.maximizeButton = new JButton(imageIconMaximize);
 		this.maximizeButton.setMnemonic(KeyEvent.VK_M );
-		this.maximizeButton.setToolTipText(Messages.getString("Wizard.maximizar.description"));
+		this.maximizeButton.setToolTipText(Messages.getString("Wizard.maximizar.description")); //$NON-NLS-1$
 		this.maximizeButton.getAccessibleContext().setAccessibleName(this.maximizeButton.getToolTipText());
 
 		this.maximizeButton.setName("maximizar");
