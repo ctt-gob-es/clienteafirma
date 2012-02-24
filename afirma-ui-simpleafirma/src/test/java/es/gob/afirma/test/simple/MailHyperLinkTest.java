@@ -13,6 +13,7 @@ public final class MailHyperLinkTest {
 	 * Abre el cliente de correo para enviar un mail.
 	 * @throws Exception Cuando ocurra un error.
 	 */
+	@SuppressWarnings("static-method")
 	@Test
 	@Ignore
 	public void testDesktopMailTo() throws Exception {
