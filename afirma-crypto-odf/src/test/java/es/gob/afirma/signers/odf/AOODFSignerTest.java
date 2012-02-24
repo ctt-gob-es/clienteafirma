@@ -126,7 +126,7 @@ public final class AOODFSignerTest {
 					final byte[] signature = signer.sign(DATA.get(i), "SHA1withRSA", pke, extraParams); //$NON-NLS-1$
 					Assert.assertNotNull(signature);
 
-					final byte[] result = signer.cosign(DATA.get(i), "SHA1withRSA", pke2, extraParams); //$NON-NLS-1$
+					final byte[] result = signer.cosign(signature, "SHA1withRSA", pke2, extraParams); //$NON-NLS-1$
 					Assert.assertNotNull(result);
 
 					fos.write(result);
