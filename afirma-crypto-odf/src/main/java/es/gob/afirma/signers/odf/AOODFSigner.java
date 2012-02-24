@@ -277,8 +277,9 @@ public final class AOODFSigner implements AOSigner {
 
                     if (!fullPath.equals(SIGNATURES_PATH)) {
                     	referenceList.add(reference);
-                    } else {
-                        // ¿Para mantener la compatibilidad con OpenOffice 3.1?
+                    }
+                    else {
+                        // Para mantener la compatibilidad con OpenOffice 3.1?
                     	isCofirm = true;
                     }
                 }
