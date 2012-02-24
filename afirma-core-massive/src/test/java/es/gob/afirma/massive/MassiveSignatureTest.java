@@ -147,7 +147,8 @@ public class MassiveSignatureTest {
     }
 
     private static String getResourcePath(final String filename) {
-    	return MassiveSignatureTest.class.getResource("/" + filename).toString().replace("file:/", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    	return ((System.getProperty("os.name").contains("indows")) ? "" : File.separator) + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			MassiveSignatureTest.class.getResource("/" + filename).toString().replace("file:/", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
 
     private static byte[] getDigestData(final byte[] data) throws Exception {
