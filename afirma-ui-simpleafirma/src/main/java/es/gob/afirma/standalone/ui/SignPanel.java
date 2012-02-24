@@ -239,10 +239,27 @@ public final class SignPanel extends JPanel {
         }
         // Comprobamos si es una factura electronica
         else if (DataAnalizerUtil.isFacturae(data)) {
-            iconPath = FILE_ICON_FACTURAE;
-            iconTooltip = Messages.getString("SignPanel.17"); //$NON-NLS-1$
-            fileDescription = Messages.getString("SignPanel.20"); //$NON-NLS-1$
-            this.signer = new AOFacturaESigner();
+            if (!new AOFacturaESigner().isSign(data)) {
+            	iconPath = FILE_ICON_FACTURAE;
+                iconTooltip = Messages.getString("SignPanel.17"); //$NON-NLS-1$
+                fileDescription = Messages.getString("SignPanel.20"); //$NON-NLS-1$
+                this.signer = new AOFacturaESigner();
+            } else {
+            	final int selectOption = JOptionPane.showConfirmDialog(this,
+            			Messages.getString("SignPanel.22"), //$NON-NLS-1$
+            			Messages.getString("SignPanel.19"), //$NON-NLS-1$
+            			JOptionPane.YES_NO_OPTION,
+            			JOptionPane.WARNING_MESSAGE);
+            	if (selectOption == JOptionPane.YES_OPTION) {
+                    iconPath = FILE_ICON_BINARY;
+                    iconTooltip = Messages.getString("SignPanel.12"); //$NON-NLS-1$
+                    fileDescription = Messages.getString("SignPanel.11"); //$NON-NLS-1$
+                    this.signer = new AOCAdESSigner();
+            	} else {
+            		this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            		return;
+            	}
+            }
 
             if (this.signer.isSign(data)) {
             	final int selectOption = JOptionPane.showConfirmDialog(this,
