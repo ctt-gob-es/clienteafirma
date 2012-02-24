@@ -59,6 +59,7 @@ public final class TestCAdES {
     	"txt", //$NON-NLS-1$
     	"xml" //$NON-NLS-1$
     };
+
     private static final List<byte[]> DATA = new ArrayList<byte[]>(2);
     static {
     	for (final String dataFile : DATA_FILES) {
