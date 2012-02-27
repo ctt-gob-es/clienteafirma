@@ -10,6 +10,7 @@
 
 package es.gob.afirma.signers.odf;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -60,8 +61,15 @@ public final class AOODFSignerTest {
     static {
         final Properties p1 = new Properties();
 
+        final Properties p2 = new Properties();
+        try {
+        p2.load(new ByteArrayInputStream(
+        		"useOpenOffice31Mode=true".getBytes())); //$NON-NLS-1$
+        } catch (final Exception e) {
+        	System.err.println("No se ha podido cargar una de las configuraciones de pruebas de ODF"); //$NON-NLS-1$
+		}
         CONFIGS = new Properties[] {
-                p1
+                p1, p2
         };
     }
 
@@ -81,7 +89,10 @@ public final class AOODFSignerTest {
 			for (int i = 0; i < DATA_FILES.length; i++) {
 				if (DATA.get(i) != null) {
 
-					System.out.println("Se va a firma el documento " + DATA_FILES[i]); //$NON-NLS-1$
+					System.out.println("Se va a firma el documento " + DATA_FILES[i] + (extraParams.size() == 0 ? "" : " con las opciones:")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					for (final String key : extraParams.keySet().toArray(new String[0])) {
+						System.out.println(key + ": " + extraParams.getProperty(key)); //$NON-NLS-1$
+					}
 
 					final File tempFile = File.createTempFile("odfSign", "." + DATA_FILES[i]); //$NON-NLS-1$ //$NON-NLS-2$
 					final FileOutputStream fos = new FileOutputStream(tempFile);
