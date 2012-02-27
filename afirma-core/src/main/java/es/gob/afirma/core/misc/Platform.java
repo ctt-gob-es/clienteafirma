@@ -283,8 +283,8 @@ public final class Platform {
         return "/usr/lib"; //$NON-NLS-1$
     }
 
-    /** Obtiene la versi&oacute; de BouncyCastle en uso.
-     * @return Versi&oacute; del BouncyCastle encontrado primero en el BootClassPath
+    /** Obtiene la versi&oacute;n de BouncyCastle en uso.
+     * @return Versi&oacute;n del BouncyCastle encontrado primero en el BootClassPath
      * o en el ClassPath. Si no se puede recuperar se devuelve {@code null} */
     public static String getBouncyCastleVersion() {
 
