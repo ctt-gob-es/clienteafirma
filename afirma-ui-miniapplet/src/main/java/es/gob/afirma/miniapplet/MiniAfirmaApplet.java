@@ -487,7 +487,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		writer.flush();
 		writer.close();
 
-		Logger.getLogger("es.gob.afirma.MiniAfirmaApplet").severe(new String(baos.toByteArray())); //$NON-NLS-1$
+		LOGGER.severe(new String(baos.toByteArray()));
 	}
 
 	/** Elimina el mensaje de error establecido previamente. */
