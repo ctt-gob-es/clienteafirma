@@ -127,7 +127,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         if (Security.getProvider("XMLDSig") == null) { //$NON-NLS-1$
             try {
                 Security.addProvider((Provider)
-                		Class.forName("org.jcp.xml.dsig.internal.dom.XMLDSigRI").newInstance()); //$NON-NLS-1$
+                		AOUtil.classForName("org.jcp.xml.dsig.internal.dom.XMLDSigRI").newInstance()); //$NON-NLS-1$
             }
             catch (final Exception e) {
                 LOGGER.warning("No se ha podido agregar el proveedor de firma XMLDSig necesario para firmas XML: " + e); //$NON-NLS-1$
