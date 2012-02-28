@@ -545,7 +545,8 @@ public final class AOXAdESSigner implements AOSigner {
     	return XAdESSigner.sign(data, algorithm, keyEntry, xParams);
     }
 
-    /** Comprueba si la firma es detached
+    /** Comprueba si la firma es detached. Previamente debe haberse comprabado que el XML se
+     * corresponde con una firma XAdES.
      * @param element
      *        Elemento que contiene el nodo ra&iacute;z del documento que se
      *        quiere comprobar
@@ -554,13 +555,35 @@ public final class AOXAdESSigner implements AOSigner {
         if (element == null) {
             return false;
         }
-        if (element.getFirstChild().getLocalName() != null && element.getFirstChild().getLocalName().equals(DETACHED_CONTENT_ELEMENT_NAME)) {
-            return true;
+
+        try {
+        	String dataNodeId = null;
+        	final NodeList mainChildNodes = element.getChildNodes();
+        	for (int i = 0; i < mainChildNodes.getLength(); i++) {
+        		if (!mainChildNodes.item(i).getNodeName().equals(SIGNATURE_TAG)) {
+        			dataNodeId = ((Element) mainChildNodes.item(i)).getAttribute("Id"); //$NON-NLS-1$
+        			break;
+        		}
+        	}
+        	if (dataNodeId == null || dataNodeId.length() == 0) {
+        		return false;
+        	}
+
+        	final NodeList transformList = element.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Reference"); //$NON-NLS-1$
+        	for (int i = 0; i < transformList.getLength(); i++) {
+        		if (((Element) transformList.item(i)).getAttribute("URI").equals('#' + dataNodeId)) { //$NON-NLS-1$
+        			return true;
+        		}
+        	}
+        } catch (final Exception e) {
+        	return false;
         }
+
         return false;
     }
 
-    /** Comprueba si la firma es enveloped
+    /** Comprueba si la firma es enveloped. Previamente debe haberse comprabado que el XML se
+     * corresponde con una firma XAdES.
      * @param element
      *        Elemento que contiene el nodo ra&iacute;z del documento que se
      *        quiere comprobar
@@ -575,7 +598,8 @@ public final class AOXAdESSigner implements AOSigner {
         return false;
     }
 
-    /** Comprueba si la firma es enveloping
+    /** Comprueba si la firma es enveloping. Previamente debe haberse comprabado que el XML se
+     * corresponde con una firma XAdES.
      * @param element
      *        Elemento que contiene el nodo ra&iacute;z del documento que se
      *        quiere comprobar
@@ -634,14 +658,7 @@ public final class AOXAdESSigner implements AOSigner {
             // si es enveloped
             else if (AOXAdESSigner.isEnveloped(rootSig)) {
 
-                // TODO: Revisar si es conveniente eliminar las firmas a traves
-                // de transformadas
-
-                // obtiene las firmas y las elimina
-                final NodeList signatures = rootSig.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_TAG);
-                for (int i = 0; i < signatures.getLength(); i++) {
-                    rootSig.removeChild(signatures.item(0));
-                }
+            	removeEnvelopedSignatures(rootSig);
 
                 elementRes = rootSig;
             }
@@ -666,6 +683,7 @@ public final class AOXAdESSigner implements AOSigner {
             }
         }
         catch (final Exception ex) {
+        	ex.printStackTrace();
             throw new AOInvalidFormatException("Error al leer el fichero de firmas", ex); //$NON-NLS-1$
         }
 
@@ -681,7 +699,20 @@ public final class AOXAdESSigner implements AOSigner {
         return baosSig.toByteArray();
     }
 
-    /**
+    private void removeEnvelopedSignatures(final Element rootSig) {
+        // obtiene las firmas y las elimina
+    	final NodeList mainChildNodes = rootSig.getChildNodes();
+    	for (int i = 0; i < mainChildNodes.getLength(); i++) {
+    		if (mainChildNodes.item(i).getNodeType() == Node.ELEMENT_NODE &&
+    				mainChildNodes.item(i).getNodeName().endsWith(":" + SIGNATURE_TAG)) { //$NON-NLS-1$
+    			rootSig.removeChild(mainChildNodes.item(i));
+    			removeEnvelopedSignatures(rootSig);
+    			return;
+    		}
+        }
+	}
+
+	/**
      * Comprueba si unos datos firmados tienen declarados una transformaci&oacute;n de tipo Base64.
      * @param rootSig Nodo raiz de la firma.
      * @param objectId Identificador de los datos.
