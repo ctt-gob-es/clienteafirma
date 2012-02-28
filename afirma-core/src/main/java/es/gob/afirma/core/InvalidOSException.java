@@ -12,7 +12,7 @@ package es.gob.afirma.core;
 
 /** Indica que se necesita un sistema operativo distinto al actual.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-public final class InvalidOSException extends Exception {
+public final class InvalidOSException extends RuntimeException {
 	private static final long serialVersionUID = -6174267665607129065L;
 
 	private final String os;

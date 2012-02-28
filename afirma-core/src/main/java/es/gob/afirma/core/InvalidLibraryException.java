@@ -13,6 +13,6 @@ package es.gob.afirma.core;
 /** Indica que hay una biblioteca inv&aacute;lida en el CLASSPATH o en el BOOTCLASSPATH, a menudo
  * poque se ha instalado un JAR inapropiadamente como extensi&oacute;n del JRE.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-public class InvalidLibraryException extends Exception {
+public class InvalidLibraryException extends RuntimeException {
 	private static final long serialVersionUID = -8418397871871426778L;
 }

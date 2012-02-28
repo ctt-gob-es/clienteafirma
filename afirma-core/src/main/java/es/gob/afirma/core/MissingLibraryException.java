@@ -14,7 +14,7 @@ package es.gob.afirma.core;
  * A menudo es debido a las diferencias entre los JRE de 32 y 64 bits o entre los JRE de
  * Oracle y de IBM.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-public class MissingLibraryException extends Exception {
+public class MissingLibraryException extends RuntimeException {
 
 	/** Crea una nueva instancia de la excepci&oacute;n.
 	 * @param desc Descripci&oacute;n de la excepci&oacute;n
