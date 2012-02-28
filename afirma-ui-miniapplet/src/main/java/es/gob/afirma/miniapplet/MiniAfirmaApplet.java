@@ -602,4 +602,29 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		return appletParam == null || appletParam.trim().length() < 1 ?
 				null : appletParam.trim();
 	}
+
+//	private static String getCharset(final String charset, final String textBase64) {
+//		if ("auto".equalsIgnoreCase(charset)) { //$NON-NLS-1$
+//			if (textBase64 == null) {
+//				throw new IllegalArgumentException(
+//					"No se puede detectar el juego de caracteres de un texto nulo" //$NON-NLS-1$
+//				);
+//			}
+//			final byte[] text = Base64.decode(textBase64);
+//			final UniversalDetector detector = new UniversalDetector(null);
+//			detector.handleData(text, 0, text.length);
+//			detector.dataEnd();
+//			if (detector.isDone()) {
+//				return detector.getDetectedCharset();
+//			}
+//			LOGGER.warning(
+//				"No se ha podido autodetectar el juego de caracteres, se devolvera el por defecto del sistema" //$NON-NLS-1$
+//			);
+//			return getCharset("default", null); //$NON-NLS-1$
+//		}
+//		else if ("default".equalsIgnoreCase(charset)) { //$NON-NLS-1$
+//			return System.getProperty("file.encoding"); //$NON-NLS-1$
+//		}
+//		return charset;
+//	}
 }
