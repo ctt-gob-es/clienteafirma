@@ -35,6 +35,8 @@ import javax.crypto.BadPaddingException;
 import javax.security.auth.callback.PasswordCallback;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.InvalidOSException;
+import es.gob.afirma.core.MissingLibraryException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.main.callbacks.UIPasswordCallback;
@@ -85,9 +87,11 @@ public class AOKeyStoreManager {
      * @throws AOException Cuando ocurre un error durante la inicializaci&oacute;n.
      * @throws IOException Cuando se indique una contrase&ntilde;a incorrecta para la
      *         apertura del almac&eacute;n.
-     */
-    private List<KeyStore> initPKCS11(final PasswordCallback pssCallBack, final Object[] params) throws AOException, IOException {
-
+     * @throws MissingSunPKCS11Exception Si no se encuentra la biblioteca SunPKCS11 */
+    private List<KeyStore> initPKCS11(final PasswordCallback pssCallBack,
+    		                          final Object[] params) throws AOKeyStoreManagerException,
+    		                                                        IOException,
+    		                                                        MissingSunPKCS11Exception {
         // En el "params" debemos traer los parametros:
         // [0] - p11lib: Biblioteca PKCS#11, debe estar en el Path (Windows) o en el LD_LIBRARY_PATH (UNIX, Linux, Mac OS X)
         // [1] -desc: Descripcion del token PKCS#11 (opcional)
@@ -95,7 +99,7 @@ public class AOKeyStoreManager {
 
         // Anadimos el proveedor PKCS11 de Sun
         if (params == null || params.length < 2) {
-            throw new AOException("No se puede acceder al KeyStore PKCS#11 si no se especifica la biblioteca"); //$NON-NLS-1$
+            throw new IOException("No se puede acceder al KeyStore PKCS#11 si no se especifica la biblioteca"); //$NON-NLS-1$
         }
         final String p11lib;
         if (params[0] != null) {
@@ -124,7 +128,7 @@ public class AOKeyStoreManager {
                 sunPKCS11Contructor = AOUtil.classForName("sun.security.pkcs11.SunPKCS11").getConstructor(InputStream.class); //$NON-NLS-1$
             }
             catch (final Exception e) {
-                throw new AOKeyStoreManagerException("No se ha podido obtener el constructor del proveedor SunPKCS11", e); //$NON-NLS-1$
+                throw new MissingSunPKCS11Exception(e);
             }
 
             final byte[] config = KeyStoreUtilities.createPKCS11ConfigFile(p11lib, p11ProviderName, slot).getBytes();
@@ -139,7 +143,7 @@ public class AOKeyStoreManager {
                     p11Provider = (Provider) sunPKCS11Contructor.newInstance(new ByteArrayInputStream(config));
                 }
                 catch (final Exception ex) {
-                    throw new AOException("No se ha podido instanciar el proveedor SunPKCS11 para la la biblioteca " + p11lib, ex); //$NON-NLS-1$
+                    throw new AOKeyStoreManagerException("No se ha podido instanciar el proveedor SunPKCS11 para la la biblioteca " + p11lib, ex); //$NON-NLS-1$
                 }
             }
             Security.addProvider(p11Provider);
@@ -182,6 +186,288 @@ public class AOKeyStoreManager {
         return ret;
     }
 
+    private List<KeyStore> initSingle(final InputStream store,
+            					      final PasswordCallback pssCallBack) throws AOKeyStoreManagerException,
+                                                                                 IOException,
+                                                                                 MissingLibraryException {
+        if (store == null) {
+            throw new AOKeyStoreManagerException("Es necesario proporcionar el fichero X.509 o PKCS#7"); //$NON-NLS-1$
+        }
+
+        final Provider pkcs7Provider;
+        try {
+            pkcs7Provider = (Provider) AOUtil.classForName("es.gob.afirma.keystores.single.SingleCertKeyStoreProvider").newInstance(); //$NON-NLS-1$
+        }
+        catch(final Exception e) {
+            throw new MissingLibraryException("No se ha podido instanciar el proveedor SingleCertKeyStoreProvider: " + e, e); //$NON-NLS-1$
+        }
+        Security.addProvider(pkcs7Provider);
+
+        try {
+            this.ks = KeyStore.getInstance(this.ksType.getName(), pkcs7Provider);
+        }
+        catch (final Exception e) {
+            throw new AOKeyStoreManagerException("No se ha podido obtener el almacen PKCS#7 / X.509", e); //$NON-NLS-1$
+        }
+
+        try {
+            this.ks.load(store, (pssCallBack != null) ? pssCallBack.getPassword() : null);
+        }
+        catch (final IOException e) {
+            if (e.getCause() instanceof UnrecoverableKeyException ||
+                    e.getCause() instanceof BadPaddingException) {
+                throw new IOException("Contrasena invalida: " + e); //$NON-NLS-1$
+            }
+            throw new AOKeyStoreManagerException("No se ha podido abrir el almacen PKCS#7 / X.509 solicitado", e); //$NON-NLS-1$
+        }
+        catch (final CertificateException e) {
+            throw new AOKeyStoreManagerException("No se han podido cargar los certificados del almacen PKCS#7 / X.509 solicitado", e); //$NON-NLS-1$
+        }
+        catch (final NoSuchAlgorithmException e) {
+        	throw new AOKeyStoreManagerException("No se ha podido verificar la integridad del almacen PKCS#7 / X.509 solicitado", e); //$NON-NLS-1$
+		}
+        final List<KeyStore> ret = new ArrayList<KeyStore>(1);
+        ret.add(this.ks);
+        try {
+            store.close();
+        }
+        catch (final Exception e) {
+            // Ignoramos errores en el cierre
+        }
+        return ret;
+
+
+    }
+
+    private List<KeyStore> initJava(final InputStream store,
+                            final PasswordCallback pssCallBack) throws AOKeyStoreManagerException,
+                                                                       IOException {
+        // Suponemos que el proveedor SunJSSE esta instalado. Hay que tener
+        // cuidado con esto
+        // si alguna vez se usa JSS, que a veces lo retira
+        if (store == null) {
+            throw new IOException("Es necesario proporcionar el fichero KeyStore"); //$NON-NLS-1$
+        }
+
+        try {
+            this.ks = KeyStore.getInstance(this.ksType.getName());
+        }
+        catch (final Exception e) {
+            throw new AOKeyStoreManagerException("No se ha podido obtener el almacen JavaKeyStore", e); //$NON-NLS-1$
+        }
+
+        // TODO: Revisar si el KeyStore de Java requiere contrasena
+        try {
+            this.ks.load(store, (pssCallBack != null) ? pssCallBack.getPassword() : null);
+        }
+        catch (final IOException e) {
+            if (e.getCause() instanceof UnrecoverableKeyException ||
+                    e.getCause() instanceof BadPaddingException) {
+                throw new IOException("Contrasena invalida: " + e); //$NON-NLS-1$
+            }
+        }
+        catch (final CertificateException e) {
+            throw new AOKeyStoreManagerException("No se han podido cargar los certificados del almacen JavaKeyStore solicitado", e); //$NON-NLS-1$
+        }
+        catch (final NoSuchAlgorithmException e) {
+            throw new AOKeyStoreManagerException("No se ha podido verificar la integridad del almacen JavaKeyStore solicitado", e); //$NON-NLS-1$
+		}
+        final List<KeyStore> ret = new ArrayList<KeyStore>(1);
+        ret.add(this.ks);
+        try {
+            store.close();
+        }
+        catch (final Exception e) {
+         // Ignoramos errores en el cierre
+        }
+        return ret;
+
+    }
+
+    private List<KeyStore> initPKCS12(final InputStream store,
+                                      final PasswordCallback pssCallBack) throws AOKeyStoreManagerException,
+                                                                                 IOException {
+        // Suponemos que el proveedor SunJSSE esta instalado. Hay que tener
+        // cuidado con esto
+        // si alguna vez se usa JSS, que a veces lo retira
+
+        if (store == null) {
+            throw new IOException("Es necesario proporcionar el fichero PKCS12 / PFX"); //$NON-NLS-1$
+        }
+
+        try {
+            this.ks = KeyStore.getInstance(this.ksType.getName());
+        }
+        catch (final Exception e) {
+            throw new AOKeyStoreManagerException("No se ha podido obtener el almacen PKCS#12 / PFX", e); //$NON-NLS-1$
+        }
+        try {
+            this.ks.load(store, (pssCallBack != null) ? pssCallBack.getPassword() : null);
+        }
+        catch (final IOException e) {
+            if (e.getCause() instanceof UnrecoverableKeyException ||
+                e.getCause() instanceof BadPaddingException ||
+                e.getCause() instanceof ArithmeticException) { // Caso probable de contrasena nula
+                	throw new IOException("Contrasena invalida: " + e); //$NON-NLS-1$
+            }
+        }
+        catch (final CertificateException e) {
+            throw new AOKeyStoreManagerException("No se han podido cargar los certificados del almacen PKCS#12 / PFX solicitado.", e); //$NON-NLS-1$
+        }
+        catch (final NoSuchAlgorithmException e) {
+            throw new AOKeyStoreManagerException("No se ha podido verificar la integridad del almacen PKCS#12 / PFX solicitado.", e); //$NON-NLS-1$
+		}
+        final List<KeyStore> ret = new ArrayList<KeyStore>(1);
+        ret.add(this.ks);
+        try {
+            store.close();
+        }
+        catch (final Exception e) {
+         // Ignoramos errores en el cierre
+        }
+        return ret;
+    }
+
+    private List<KeyStore> initCAPI() throws AOKeyStoreManagerException,
+                                             IOException,
+                                             MissingLibraryException,
+                                             InvalidOSException {
+        if (!Platform.getOS().equals(Platform.OS.WINDOWS)) {
+            throw new InvalidOSException("Microsoft Windows"); //$NON-NLS-1$
+        }
+
+        // Si no se ha agregado el proveedor CAPI de Sun, lo anadimos
+        // En java 6 viene instalado de serie, pero no pasa nada por
+        // reinstalarlo
+        if (sunMSCAPIProvider == null && Security.getProvider("SunMSCAPI") == null) { //$NON-NLS-1$
+            try {
+                sunMSCAPIProvider = (Provider) AOUtil.classForName("sun.security.mscapi.SunMSCAPI").newInstance(); //$NON-NLS-1$
+                Security.addProvider(sunMSCAPIProvider);
+            }
+            catch(final Exception e) {
+            	throw new MissingSunMSCAPIException(e);
+            }
+        }
+
+        // Inicializamos
+        try {
+            this.ks = KeyStore.getInstance(this.ksType.getName());
+        }
+        catch (final Exception e) {
+            throw new AOKeyStoreManagerException("No se ha podido obtener el almacen SunMSCAPI.MY", e); //$NON-NLS-1$
+        }
+
+        LOGGER.info("Cargando KeyStore de Windows"); //$NON-NLS-1$
+        try {
+            this.ks.load(null, null);
+        }
+        catch (final CertificateException e) {
+            throw new AOKeyStoreManagerException("No se han podido cargar los certificados del almacen SunMSCAPI.MY", e); //$NON-NLS-1$
+        }
+        catch (final NoSuchAlgorithmException e) {
+        	throw new AOKeyStoreManagerException("No se ha podido verificar la integridad del almacen SunMSCAPI.MY", e); //$NON-NLS-1$
+		}
+
+        // Tratamos los alias repetidos, situacion problematica afectada por el bug
+        // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6483657
+        // Este solo se da con SunMSCAPI
+        try {
+            KeyStoreUtilities.cleanCAPIDuplicateAliases(this.ks);
+        }
+        catch (final Exception e) {
+            LOGGER.warning("No se han podido tratar los alias duplicados: " + e); //$NON-NLS-1$
+        }
+
+        final List<KeyStore> ret = new ArrayList<KeyStore>(1);
+        ret.add(this.ks);
+        return ret;
+
+    }
+
+    private List<KeyStore> initCAPIAddressBook() throws AOKeyStoreManagerException,
+                                             			MissingLibraryException,
+                                             			InvalidOSException {
+        if (!Platform.getOS().equals(Platform.OS.WINDOWS)) {
+            throw new InvalidOSException("Microsoft Windows"); //$NON-NLS-1$
+        }
+
+        // Nos aseguramos de que SunMSCAPI este cargado, para que la DLL
+        // sunmscapi.dll tambien lo este
+        if (Security.getProvider("SunMSCAPI") == null) { //$NON-NLS-1$
+            try {
+                Security.addProvider((Provider) AOUtil.classForName("sun.security.mscapi.SunMSCAPI").newInstance()); //$NON-NLS-1$
+            }
+            catch (final Exception e) {
+                throw new MissingSunMSCAPIException(e);
+            }
+        }
+        Provider p = Security.getProvider("MSCAPIAddressBook"); //$NON-NLS-1$
+        if (p == null) {
+            try {
+                p = (Provider) AOUtil.classForName("es.gob.afirma.keystores.capiaddressbook.MSCAPIAddressBook").newInstance(); //$NON-NLS-1$
+            }
+            catch (final Exception e) {
+                throw new MissingLibraryException("No se ha posido instanciar el proveedor MSCAPIAddressBook: " + e, e); //$NON-NLS-1$
+            }
+            Security.addProvider(p);
+        }
+
+        try {
+            this.ks = KeyStore.getInstance(this.ksType.getName(), p);
+        }
+        catch (final Exception e) {
+            throw new AOKeyStoreManagerException("No se ha podido obtener el almacen MSCAPIAddressBook.ADDRESSBOOK", e);  //$NON-NLS-1$
+        }
+
+        try {
+            this.ks.load(null, null);
+        }
+        catch (final Exception e) {
+            throw new AOKeyStoreManagerException("No se ha podido abrir el almacen MSCAPIAddressBook.ADDRESSBOOK", e); //$NON-NLS-1$
+        }
+
+        final List<KeyStore> ret = new ArrayList<KeyStore>(1);
+        ret.add(this.ks);
+        return ret;
+    }
+
+    private List<KeyStore> initApple(final InputStream store) throws AOKeyStoreManagerException,
+                                          							 IOException,
+                                          							 MissingLibraryException,
+                                          							 InvalidOSException {
+    	if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
+    		throw new InvalidOSException("Apple Mac OS X"); //$NON-NLS-1$
+    	}
+        // Anadimos el proveedor de Apple
+        try {
+            Security.insertProviderAt((Provider) AOUtil.classForName("com.apple.crypto.provider.Apple").newInstance(), 0); //$NON-NLS-1$
+        }
+        catch (final Exception e) {
+            throw new MissingLibraryException("No se ha podido instanciar el proveedor 'com.apple.crypto.provider.Apple'", e); //$NON-NLS-1$
+        }
+
+        // Inicializamos
+        try {
+            this.ks = KeyStore.getInstance(this.ksType.getName());
+        }
+        catch (final Exception e) {
+            throw new AOKeyStoreManagerException("No se ha podido obtener el almacen Apple.KeychainStore", e); //$NON-NLS-1$
+        }
+
+        try {
+            this.ks.load(store, null);
+        }
+        catch (final CertificateException e) {
+            throw new AOKeyStoreManagerException("No se han podido cargar los certificados del almacen Apple.KeychainStore", e); //$NON-NLS-1$
+        }
+        catch (final NoSuchAlgorithmException e) {
+            throw new AOKeyStoreManagerException("No se ha podido verificar la integridad del almacen Apple.KeychainStore", e); //$NON-NLS-1$
+		}
+        final List<KeyStore> ret = new ArrayList<KeyStore>(1);
+        ret.add(this.ks);
+        return ret;
+    }
+
     /** Obtiene un almac&eacute;n de claves ya inicializado. Se encarga
      * tambi&eacute;n de a&ntilde;adir o retirar los <i>Provider</i> necesarios
      * para operar con dicho almac&eacute;n
@@ -198,17 +484,21 @@ public class AOKeyStoreManager {
      * @return Almac&eacute;n de claves solicitado (<b>ya inicializado</b>,
      *         pueden ser varios en el caso de Mozilla, el interno y los
      *         externos)
-     * @throws AOException
-     *         Cuando ocurre cualquier problema durante la
-     *         inicializaci&oacute;n
+     * @throws AOKeyStoreManagerException
+     *         Cuando ocurre cualquier problema durante la inicializaci&oacute;n
      * @throws IOException
      *         Se ha insertado una contrase&ntilde;a incorrecta para la apertura del
      *         almac&eacute;n de certificados.
-     */
-    public List<KeyStore> init(final AOKeyStore type, final InputStream store, final PasswordCallback pssCallBack, final Object[] params) throws AOException, IOException {
-
-        final List<KeyStore> ret = new ArrayList<KeyStore>(1);
-
+     * @throws MissingLibraryException Cuando faltan bibliotecas necesarias para la inicializaci&oacute;n
+     * @throws InvalidOSException Cuando se pide un almac&eacute;n disponible solo en un sistema operativo
+     *                            distinto al actual */
+    public List<KeyStore> init(final AOKeyStore type,
+    		                   final InputStream store,
+    		                   final PasswordCallback pssCallBack,
+    		                   final Object[] params) throws AOKeyStoreManagerException,
+    		                                                 IOException,
+    		                                                 MissingLibraryException,
+    		                                                 InvalidOSException {
         if (type == null) {
             LOGGER.severe("Se ha solicitado inicializar un AOKeyStore nulo, se intentara inicializar un PKCS#12"); //$NON-NLS-1$
         }
@@ -218,235 +508,23 @@ public class AOKeyStoreManager {
         this.ksType = (type != null) ? type : AOKeyStore.PKCS12;
 
         if (this.ksType.equals(AOKeyStore.SINGLE)) {
-
-            if (store == null) {
-                throw new AOException("Es necesario proporcionar el fichero X.509 o PKCS#7"); //$NON-NLS-1$
-            }
-
-            final Provider pkcs7Provider;
-            try {
-                pkcs7Provider = (Provider) AOUtil.classForName("es.gob.afirma.keystores.single.SingleCertKeyStoreProvider").newInstance(); //$NON-NLS-1$
-            }
-            catch(final Exception e) {
-                throw new AOKeyStoreManagerException("No se ha podido instanciar el proveedor SingleCertKeyStoreProvider", e); //$NON-NLS-1$
-            }
-            Security.addProvider(pkcs7Provider);
-
-            try {
-                this.ks = KeyStore.getInstance(this.ksType.getName(), pkcs7Provider);
-            }
-            catch (final Exception e) {
-                throw new AOKeyStoreManagerException("No se ha podido obtener el almacen PKCS#7 / X.509", e); //$NON-NLS-1$
-            }
-
-            try {
-                this.ks.load(store, (pssCallBack != null) ? pssCallBack.getPassword() : null);
-            }
-            catch (final IOException e) {
-                if (e.getCause() instanceof UnrecoverableKeyException ||
-                        e.getCause() instanceof BadPaddingException) {
-                    throw new IOException("Contrasena invalida: " + e); //$NON-NLS-1$
-                }
-                throw new AOKeyStoreManagerException("No se ha podido abrir el almacen PKCS#7 / X.509 solicitado", e); //$NON-NLS-1$
-            }
-            catch (final CertificateException e) {
-                throw new AOKeyStoreManagerException("No se han podido cargar los certificados del almacen PKCS#7 / X.509 solicitado", e); //$NON-NLS-1$
-            }
-            catch (final NoSuchAlgorithmException e) {
-            	throw new AOKeyStoreManagerException("No se ha podido verificar la integridad del almacen PKCS#7 / X.509 solicitado", e); //$NON-NLS-1$
-			}
-            ret.add(this.ks);
-            try {
-                store.close();
-            }
-            catch (final Exception e) {
-                // Ignoramos errores en el cierre
-            }
-            return ret;
-
+        	return initSingle(store, pssCallBack);
         }
 
         else if (this.ksType.equals(AOKeyStore.JAVA) || this.ksType.equals(AOKeyStore.JAVACE) || this.ksType.equals(AOKeyStore.JCEKS)) {
-            // Suponemos que el proveedor SunJSSE esta instalado. Hay que tener
-            // cuidado con esto
-            // si alguna vez se usa JSS, que a veces lo retira
-            if (store == null) {
-                throw new AOException("Es necesario proporcionar el fichero KeyStore"); //$NON-NLS-1$
-            }
-
-            try {
-                this.ks = KeyStore.getInstance(this.ksType.getName());
-            }
-            catch (final Exception e) {
-                throw new AOKeyStoreManagerException("No se ha podido obtener el almacen JavaKeyStore", e); //$NON-NLS-1$
-            }
-
-            // TODO: Revisar si el KeyStore de Java requiere contrasena
-            try {
-                this.ks.load(store, (pssCallBack != null) ? pssCallBack.getPassword() : null);
-            }
-            catch (final IOException e) {
-                if (e.getCause() instanceof UnrecoverableKeyException ||
-                        e.getCause() instanceof BadPaddingException) {
-                    throw new IOException("Contrasena invalida: " + e); //$NON-NLS-1$
-                }
-                throw new AOKeyStoreManagerException("No se ha podido abrir el almacen JavaKeyStore solicitado", e); //$NON-NLS-1$
-            }
-            catch (final CertificateException e) {
-                throw new AOKeyStoreManagerException("No se han podido cargar los certificados del almacen JavaKeyStore solicitado", e); //$NON-NLS-1$
-            }
-            catch (final NoSuchAlgorithmException e) {
-                throw new AOKeyStoreManagerException("No se ha podido verificar la integridad del almacen JavaKeyStore solicitado", e); //$NON-NLS-1$
-			}
-            ret.add(this.ks);
-            try {
-                store.close();
-            }
-            catch (final Exception e) {
-             // Ignoramos errores en el cierre
-            }
-            return ret;
+        	return initJava(store, pssCallBack);
         }
 
         else if (this.ksType.equals(AOKeyStore.PKCS12)) {
-
-            // Suponemos que el proveedor SunJSSE esta instalado. Hay que tener
-            // cuidado con esto
-            // si alguna vez se usa JSS, que a veces lo retira
-
-            if (store == null) {
-                throw new AOException("Es necesario proporcionar el fichero PKCS12 / PFX"); //$NON-NLS-1$
-            }
-
-            try {
-                this.ks = KeyStore.getInstance(this.ksType.getName());
-            }
-            catch (final Exception e) {
-                throw new AOKeyStoreManagerException("No se ha podido obtener el almacen PKCS#12 / PFX", e); //$NON-NLS-1$
-            }
-            try {
-                this.ks.load(store, (pssCallBack != null) ? pssCallBack.getPassword() : null);
-            }
-            catch (final IOException e) {
-                if (e.getCause() instanceof UnrecoverableKeyException ||
-                    e.getCause() instanceof BadPaddingException ||
-                    e.getCause() instanceof ArithmeticException) { // Caso probable de contrasena nula
-                    	throw new IOException("Contrasena invalida: " + e); //$NON-NLS-1$
-                }
-                throw new AOKeyStoreManagerException("No se ha podido abrir el almacen PKCS#12 / PFX solicitado", e); //$NON-NLS-1$
-            }
-            catch (final CertificateException e) {
-                throw new AOKeyStoreManagerException("No se han podido cargar los certificados del almacen PKCS#12 / PFX solicitado.", e); //$NON-NLS-1$
-            }
-            catch (final NoSuchAlgorithmException e) {
-                throw new AOKeyStoreManagerException("No se ha podido verificar la integridad del almacen PKCS#12 / PFX solicitado.", e); //$NON-NLS-1$
-			}
-            ret.add(this.ks);
-            try {
-                store.close();
-            }
-            catch (final Exception e) {
-             // Ignoramos errores en el cierre
-            }
-            return ret;
-
+        	return initPKCS12(store, pssCallBack);
         }
 
         else if (this.ksType.equals(AOKeyStore.WINDOWS) || this.ksType.equals(AOKeyStore.WINROOT)) {
-
-            if (!Platform.getOS().equals(Platform.OS.WINDOWS)) {
-                throw new AOKeyStoreManagerException("No se puede obtener el KeyStore de Windows en un sistema no Windows:" + Platform.getOS()); //$NON-NLS-1$
-            }
-
-            // Si no se ha agregado el proveedor CAPI de Sun, lo anadimos
-            // En java 6 viene instalado de serie, pero no pasa nada por
-            // reinstalarlo
-            if (sunMSCAPIProvider == null && Security.getProvider("SunMSCAPI") == null) { //$NON-NLS-1$
-                try {
-                    sunMSCAPIProvider = (Provider) AOUtil.classForName("sun.security.mscapi.SunMSCAPI").newInstance(); //$NON-NLS-1$
-                    Security.insertProviderAt(sunMSCAPIProvider, 1);
-                }
-                catch (final Exception e) {
-                    LOGGER.warning("No se ha podido instanciar el proveedor SunMSCAPI: " + e); //$NON-NLS-1$
-                }
-            }
-
-            // Inicializamos
-            try {
-                this.ks = KeyStore.getInstance(this.ksType.getName());
-            }
-            catch (final Exception e) {
-                throw new AOKeyStoreManagerException("No se ha podido obtener el almacen SunMSCAPI.MY", e); //$NON-NLS-1$
-            }
-
-            LOGGER.info("Cargando KeyStore de Windows"); //$NON-NLS-1$
-            try {
-                this.ks.load(null, null);
-            }
-            catch (final CertificateException e) {
-                throw new AOKeyStoreManagerException("No se han podido cargar los certificados del almacen SunMSCAPI.MY", e); //$NON-NLS-1$
-            }
-            catch (final NoSuchAlgorithmException e) {
-            	throw new AOKeyStoreManagerException("No se ha podido verificar la integridad del almacen SunMSCAPI.MY", e); //$NON-NLS-1$
-			}
-
-            // Tratamos los alias repetidos, situacion problematica afectada por el bug
-            // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6483657
-            // Este solo se da con SunMSCAPI
-            try {
-                KeyStoreUtilities.cleanCAPIDuplicateAliases(this.ks);
-            }
-            catch (final Exception e) {
-                LOGGER.warning("No se han podido tratar los alias duplicados: " + e); //$NON-NLS-1$
-            }
-
-            ret.add(this.ks);
-            return ret;
+        	return initCAPI();
         }
 
         else if (this.ksType.equals(AOKeyStore.WINCA) || this.ksType.equals(AOKeyStore.WINADDRESSBOOK)) {
-
-            if (!Platform.getOS().equals(Platform.OS.WINDOWS)) {
-                throw new AOKeyStoreManagerException("No se puede obtener un KeyStore de Windows en un sistema no Windows:" + Platform.getOS()); //$NON-NLS-1$
-            }
-
-            // Nos aseguramos de que SunMSCAPI este cargado, para que la DLL
-            // sunmscapi.dll tambien lo este
-            if (Security.getProvider("SunMSCAPI") == null) { //$NON-NLS-1$
-                try {
-                    Security.addProvider((Provider) AOUtil.classForName("sun.security.mscapi.SunMSCAPI").newInstance()); //$NON-NLS-1$
-                }
-                catch (final Exception e) {
-                    throw new AOKeyStoreManagerException("No se ha podido instanciar el proveedor SunMSCAPI", e); //$NON-NLS-1$
-                }
-            }
-            Provider p = Security.getProvider("MSCAPIAddressBook"); //$NON-NLS-1$
-            if (p == null) {
-                try {
-                    p = (Provider) AOUtil.classForName("es.gob.afirma.keystores.capiaddressbook.MSCAPIAddressBook").newInstance(); //$NON-NLS-1$
-                }
-                catch (final Exception e) {
-                    throw new AOKeyStoreManagerException("No se ha posido instanciar el proveedor MSCAPIAddressBook", e); //$NON-NLS-1$
-                }
-                Security.addProvider(p);
-            }
-
-            try {
-                this.ks = KeyStore.getInstance(this.ksType.getName(), p);
-            }
-            catch (final Exception e) {
-                throw new AOException("No se ha podido obtener el almacen MSCAPIAddressBook.ADDRESSBOOK", e);  //$NON-NLS-1$
-            }
-
-            try {
-                this.ks.load(null, null);
-            }
-            catch (final Exception e) {
-                throw new AOException("No se ha podido abrir el almacen MSCAPIAddressBook.ADDRESSBOOK", e); //$NON-NLS-1$
-            }
-
-            ret.add(this.ks);
-            return ret;
+        	initCAPIAddressBook();
         }
 
         else if (this.ksType.equals(AOKeyStore.PKCS11)) {
@@ -458,34 +536,7 @@ public class AOKeyStoreManager {
         }
 
         else if (this.ksType.equals(AOKeyStore.APPLE)) { // Por ahora no anadimos soporte a llaveros en ficheros sueltos
-
-            // Anadimos el proveedor de Apple
-            try {
-                Security.insertProviderAt((Provider) AOUtil.classForName("com.apple.crypto.provider.Apple").newInstance(), 0); //$NON-NLS-1$
-            }
-            catch (final Exception e) {
-                throw new AOException("No se ha podido instanciar el proveedor Apple", e); //$NON-NLS-1$
-            }
-
-            // Inicializamos
-            try {
-                this.ks = KeyStore.getInstance(this.ksType.getName());
-            }
-            catch (final Exception e) {
-                throw new AOKeyStoreManagerException("No se ha podido obtener el almacen Apple.KeychainStore", e); //$NON-NLS-1$
-            }
-
-            try {
-                this.ks.load(store, null);
-            }
-            catch (final CertificateException e) {
-                throw new AOKeyStoreManagerException("No se han podido cargar los certificados del almacen Apple.KeychainStore", e); //$NON-NLS-1$
-            }
-            catch (final NoSuchAlgorithmException e) {
-                throw new AOKeyStoreManagerException("No se ha podido verificar la integridad del almacen Apple.KeychainStore", e); //$NON-NLS-1$
-			}
-            ret.add(this.ks);
-            return ret;
+        	return initApple(store);
         }
 
         else if (this.ksType.equals(AOKeyStore.DNIE)) {

@@ -19,6 +19,8 @@ import javax.security.auth.callback.PasswordCallback;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.InvalidOSException;
+import es.gob.afirma.core.MissingLibraryException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
@@ -60,13 +62,16 @@ public final class AOKeyStoreManagerFactory {
      *         Cuando ocurre cualquier otro problema durante el proceso
      * @throws IOException
      *         Cuando la contrase&ntilde;a del almac&eacute;n es incorrecta.
+     * @throws InvalidOSException Cuando se pide un almac&eacute; &uacute;nicamente disponible para
+     *                            un sistema operativo distinto del actual
+     * @throws MissingLibraryException
      */
     public static AOKeyStoreManager getAOKeyStoreManager(final AOKeyStore store,
                                                          final String lib,
                                                          final String description,
                                                          final PasswordCallback pssCallback,
                                                          final Object parentComponent) throws AOKeystoreAlternativeException,
-                                                                                              IOException {
+                                                                                              IOException, MissingLibraryException, InvalidOSException {
 
         final AOKeyStoreManager ksm = new AOKeyStoreManager();
 

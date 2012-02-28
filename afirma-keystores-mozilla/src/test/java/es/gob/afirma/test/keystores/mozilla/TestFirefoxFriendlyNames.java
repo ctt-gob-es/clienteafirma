@@ -26,36 +26,38 @@ import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
 
 /**
  * Prueba la conversi&oacute;n de alias en nombres significativos en CAPI.
- * 
+ *
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
  */
 public class TestFirefoxFriendlyNames {
-    public static void main(final String[] args) {
-	final TestFirefoxFriendlyNames test = new TestFirefoxFriendlyNames();
-	try {
-	    test.testWindowsFriendlyNames();
-	} catch (final IOException e) {
-	    System.err.println(e.toString() + e.getCause().toString());
-	} catch (final AOKeystoreAlternativeException e) {
-	    System.err.println(e.toString() + e.getCause().toString());
-	}
+
+    /** Ejecuci&oacute;n de test problem&aacute;ticos en Maven desde main.
+     * @param args
+     * @throws Exception */
+    public static void main(final String[] args) throws Exception {
+    	final TestFirefoxFriendlyNames test = new TestFirefoxFriendlyNames();
+		try {
+		    test.testWindowsFriendlyNames();
+		}
+		catch (final IOException e) {
+		    System.err.println(e.toString() + e.getCause().toString());
+		}
+		catch (final AOKeystoreAlternativeException e) {
+		    System.err.println(e.toString() + e.getCause().toString());
+		}
     }
-    
-    /**
-     * Prueba la conversi&oacute;n de alias en nombres significativos en CAPI.
-     * 
-     * @throws AOKeystoreAlternativeException
-     * @throws IOException
-     */
-    @Test
+
+    /** Prueba la conversi&oacute;n de alias en nombres significativos en CAPI.
+     * @throws Exception */
+    @SuppressWarnings("static-method")
+	@Test
     @Ignore
-    public void testWindowsFriendlyNames() throws IOException,
-	    AOKeystoreAlternativeException {
+    public void testWindowsFriendlyNames() throws Exception {
 	Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
 	final AOKeyStoreManager ksm = AOKeyStoreManagerFactory
 		.getAOKeyStoreManager(AOKeyStore.MOZ_UNI, null, "TEST",  //$NON-NLS-1$
 			null, null);
-	
+
 	System.out.println();
 	final Map<String, String> aliases = KeyStoreUtilities
 		.getAliasesByFriendlyName(ksm.getAliases(), ksm, true, // Check

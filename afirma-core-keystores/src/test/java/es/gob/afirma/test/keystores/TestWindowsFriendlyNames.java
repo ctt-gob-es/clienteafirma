@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -12,9 +12,7 @@ package es.gob.afirma.test.keystores;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
-import java.security.InvalidKeyException;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,46 +28,43 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.main.common.AOKeyStore;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManagerFactory;
-import es.gob.afirma.keystores.main.common.AOKeystoreAlternativeException;
 import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
 
 /** Prueba la conversi&oacute;n de alias en nombres significativos en CAPI.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public class TestWindowsFriendlyNames {
-    
+
 	private static final AOKeyStore KEYSTORE_TYPE = AOKeyStore.WINDOWS;
 	private static final String KEYSTORE_PATH = "ANF_PF_Activo.pfx"; //$NON-NLS-1$
 	private static final String KEYSTORE_PASS = "12341234"; //$NON-NLS-1$
-	
-    /** Prueba la conversi&oacute;n de alias en nombres significativos en CAPI. 
-     * @throws AOKeystoreAlternativeException 
-     * @throws InvalidKeyException 
-     * @throws IOException */
+
+    /** Prueba la conversi&oacute;n de alias en nombres significativos en CAPI.
+     * @throws Exception */
     @SuppressWarnings("static-method")
 	@Test
-    public void testWindowsFriendlyNames() throws InvalidKeyException, AOKeystoreAlternativeException, IOException {
+    public void testWindowsFriendlyNames() throws Exception {
         if (!Platform.OS.WINDOWS.equals(Platform.getOS())) {
             return;
         }
-        
-        byte[] p12file = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(KEYSTORE_PATH));
+
+        final byte[] p12file = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(KEYSTORE_PATH));
         Assert.assertTrue("No se ha podido leer el P12", p12file.length > 0); //$NON-NLS-1$
-        File tmpFile = File.createTempFile("temp", "afirma"); //$NON-NLS-1$ //$NON-NLS-2$
+        final File tmpFile = File.createTempFile("temp", "afirma"); //$NON-NLS-1$ //$NON-NLS-2$
         tmpFile.deleteOnExit();
-        OutputStream os = new FileOutputStream(tmpFile);
+        final OutputStream os = new FileOutputStream(tmpFile);
         os.write(p12file);
         os.flush();
         os.close();
 
-        PasswordCallback pc = new PasswordCallback(">", false); //$NON-NLS-1$
+        final PasswordCallback pc = new PasswordCallback(">", false); //$NON-NLS-1$
         pc.setPassword(KEYSTORE_PASS.toCharArray());
-        
+
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
-        AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+        final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
         		KEYSTORE_TYPE,
-                tmpFile.getAbsolutePath(), 
+                tmpFile.getAbsolutePath(),
                "TEST",  //$NON-NLS-1$
-               pc, 
+               pc,
                null
         );
 //        for(final String al : ksm.getAliases()) {
@@ -77,8 +72,8 @@ public class TestWindowsFriendlyNames {
 //        }
         System.out.println();
         final Map<String, String> aliases = KeyStoreUtilities.getAliasesByFriendlyName(
-               ksm.getAliases(), 
-               ksm, 
+               ksm.getAliases(),
+               ksm,
                true, // Check private keys
                true, // Show expired
                null  // filters

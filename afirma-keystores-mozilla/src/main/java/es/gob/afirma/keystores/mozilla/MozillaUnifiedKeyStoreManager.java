@@ -26,12 +26,12 @@ import java.util.Vector;
 import javax.security.auth.callback.PasswordCallback;
 
 import es.gob.afirma.core.AOCancelledOperationException;
-import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.main.callbacks.UIPasswordCallback;
 import es.gob.afirma.keystores.main.common.AOKeyStore;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
+import es.gob.afirma.keystores.main.common.AOKeyStoreManagerException;
 
 /** Representa a un <i>AOKeyStoreManager</i> para acceso a almacenes de claves de
  * Firefox accedidos v&iacute;a NSS en el que se tratan de forma
@@ -52,12 +52,12 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
     /** Inicializa la clase gestora de almacenes de claves.
      * @return Almac&eacute;n de claves de Firefox correspondiente
      *         &uacute;nicamente el m&oacute;dulo interno principal
-     * @throws AOException
+     * @throws AOKeyStoreManagerException
      *         Si no puede inicializarse ning&uacute;n almac&eacute;n de
      *         claves, ni el NSS interno, ni ning&uacute;n PKCS#11 externo
      *         definido en SecMod */
     @Override
-    public List<KeyStore> init(final AOKeyStore type, final InputStream store, final PasswordCallback pssCallBack, final Object[] params) throws AOException {
+    public List<KeyStore> init(final AOKeyStore type, final InputStream store, final PasswordCallback pssCallBack, final Object[] params) throws AOKeyStoreManagerException {
 
         // Por si el proveedor estubiese ya instalado por una ejecucion anterior
         // intentamos obtenerlo directamente
@@ -214,7 +214,7 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
         }
 
         if (this.kss.isEmpty()) {
-            throw new AOException("No se ha podido inicializar ningun almacen, interno o externo, de Firefox"); //$NON-NLS-1$
+            throw new AOKeyStoreManagerException("No se ha podido inicializar ningun almacen, interno o externo, de Firefox"); //$NON-NLS-1$
         }
 
         return this.kss;
