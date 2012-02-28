@@ -50,7 +50,7 @@ final class ShowFileLinkAction {
                 Desktop.getDesktop().open(tmp);
             }
             catch(final Exception e) {
-            	CustomDialog.showMessageDialog(null, true, Messages.getString("ShowFileLinkAction.2") + " '" + ext + "'", Messages.getString("ShowFileLinkAction.0"), JOptionPane.ERROR_MESSAGE);
+            	CustomDialog.showMessageDialog(null, true, Messages.getString("ShowFileLinkAction.2") + " '" + ext + "'", Messages.getString("ShowFileLinkAction.0"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
             }
         }
         else {
@@ -64,7 +64,8 @@ final class ShowFileLinkAction {
     }
 
     private static String getCommonDataExtension(final byte[] dat) {
-        return new MimeHelper(dat).getExtension();
+    	final String ext = new MimeHelper(dat).getExtension();
+        return (ext == null || ext.length() == 0) ? null : ext;
     }
 
     @Override
