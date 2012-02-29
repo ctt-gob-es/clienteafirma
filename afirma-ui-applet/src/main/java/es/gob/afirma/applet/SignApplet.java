@@ -2100,8 +2100,6 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     byte[] getInData() throws AOException {
         byte[] tempData = null;
 
-        LOGGER.info("BORRAME: Entramos en getInData");
-
         // Comprobamos si se nos han introducido los datos directamente. Aun en
         // caso de que se nos haya
         // introducido directamente, en caso de que tambien se haya introducido
@@ -2159,8 +2157,6 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
             analizeMimeType(tempData);
         }
 
-        LOGGER.info("BORRAME: Salimos de getInData: " + (tempData == null ? null : tempData.length));
-
         return tempData;
     }
 
@@ -2169,16 +2165,11 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
      * @param dataContent
      *        Contenidos que se desean analizar. */
     private void analizeMimeType(final byte[] dataContent) {
-
-    	LOGGER.info("BORRAME: Entramos en analizeMimeType");
-
         // Intentamos extraer el mimetype y su descripcion
         if (dataContent != null) {
             final MimeHelper mtHelper = new MimeHelper(dataContent);
             this.dataMimeType = mtHelper.getMimeType();
         }
-
-        LOGGER.info("BORRAME: Salimos de analizeMimeType");
     }
 
     /** {@inheritDoc} */
@@ -3643,7 +3634,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
     /** {@inheritDoc} */
     public boolean addSignedAttribute(final String oid, final String value) {
-        LOGGER.info("Invocando addSignedAttribute: " + oid + " = " + value); //$NON-NLS-1$ //$NON-NLS-2$
+        LOGGER.warning("Invocando addSignedAttribute: " + oid + " = " + value); //$NON-NLS-1$ //$NON-NLS-2$
 
         // Comprobaciones de seguridad
         if (oid == null || value == null) {
@@ -3672,7 +3663,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
     /** {@inheritDoc} */
     public boolean removeSignedAttribute(final String oid) {
-    	LOGGER.info("Invocando removeSignedAttribute: " + oid); //$NON-NLS-1$
+        LOGGER.warning("Invocando removeSignedAttribute: " + oid); //$NON-NLS-1$
 
         // Comprobamos que el oid no sea nulo
         if (oid == null) {
@@ -3702,7 +3693,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
     /** {@inheritDoc} */
     public boolean addUnsignedAttribute(final String oid, final String value) {
-    	LOGGER.info("Invocando addUnsignedAttribute: " + oid + " = " + value); //$NON-NLS-1$ //$NON-NLS-2$
+        LOGGER.warning("Invocando addUnsignedAttribute: " + oid + " = " + value); //$NON-NLS-1$ //$NON-NLS-2$
 
         // Comprobaciones de seguridad
         if (oid == null || value == null) {
@@ -3737,7 +3728,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
     /** {@inheritDoc} */
     public boolean removeUnsignedAttribute(final String oid, final String value) {
-    	LOGGER.info("Invocando removeUnsignedAttribute: " + oid); //$NON-NLS-1$
+        LOGGER.warning("Invocando removeUnsignedAttribute: " + oid); //$NON-NLS-1$
 
         // Comprobamos que el oid no sea nulo
         if (oid == null) {
@@ -3777,7 +3768,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
     /** {@inheritDoc} */
     public void addExtraParam(final String key, final String value) {
-    	LOGGER.info("Invocando addExtraParam: " + key); //$NON-NLS-1$
+        LOGGER.warning("Invocando addExtraParam: " + key); //$NON-NLS-1$
 
         // Si no se ha indicado una clave o valor, abortamos la operacion
         if (key == null || value == null) {
@@ -3790,7 +3781,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
     /** {@inheritDoc} */
     public void removeExtraParam(final String key) {
-    	LOGGER.info("Invocando removeExtraParam: " + key); //$NON-NLS-1$
+        LOGGER.warning("Invocando removeExtraParam: " + key); //$NON-NLS-1$
 
         // Si no se ha indicado una clave, abortamos la operacion
         if (key == null) {
@@ -3803,7 +3794,6 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
     /** {@inheritDoc} */
     public void addXMLTransform(final String type, final String subtype, final String body) {
-    	LOGGER.info("Invocando addXMLTransform"); //$NON-NLS-1$
         if (this.xmlTransforms == null) {
             this.xmlTransforms = new ArrayList<AOXMLTransform>();
         }
@@ -3813,7 +3803,6 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
     /** {@inheritDoc} */
     public void resetXMLTransforms() {
-    	LOGGER.info("Invocando resetXMLTransform"); //$NON-NLS-1$
         this.xmlTransforms = null;
     }
 
