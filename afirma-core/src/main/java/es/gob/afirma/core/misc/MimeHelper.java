@@ -12,6 +12,7 @@ package es.gob.afirma.core.misc;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -76,6 +77,9 @@ public final class MimeHelper {
         catch (final ClassNotFoundException e) {
             LOGGER.warning("No se encontro la biblioteca JMimeMagic para la deteccion del tipo de dato"); //$NON-NLS-1$
         }
+        catch (final InvocationTargetException e) {
+            LOGGER.warning("Error al cargar las bibliotecas de deteccion del tipo de firma: " + e); //$NON-NLS-1$
+        }
         catch (final Exception e) {
             try {
                 final Class<?> magicMatchNotFoundException = AOUtil.classForName("net.sf.jmimemagic.MagicMatchNotFoundException"); //$NON-NLS-1$
@@ -87,7 +91,7 @@ public final class MimeHelper {
                 }
             }
             catch (final Exception e2) {
-                LOGGER.warning("Error al evaluar el tipo de dato mediante JMimeMagic: " + e2); //$NON-NLS-1$
+                LOGGER.warning("Error al cargar las bibliotecas de deteccion del tipo de dato: " + e2); //$NON-NLS-1$
             }
         }
     }
