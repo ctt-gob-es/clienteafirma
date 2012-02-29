@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
 
@@ -73,6 +74,9 @@ public final class AOKeyStoreManagerFactory {
                                                          final Object parentComponent) throws AOKeystoreAlternativeException,
                                                                                               IOException, MissingLibraryException, InvalidOSException {
 
+    	Logger.getLogger("es.gob.afirma").info("Recuperamos un almacen con los siguientes parametros (" +
+    			store + ", " + lib + ", " + description + ", " + pssCallback + ")");
+
         final AOKeyStoreManager ksm = new AOKeyStoreManager();
 
         // Fichero P7, X509, P12/PFX o Java JKS, en cualquier sistema operativo
@@ -118,9 +122,15 @@ public final class AOKeyStoreManagerFactory {
                     throw new AOCancelledOperationException("No se ha seleccionado el almacen de certificados"); //$NON-NLS-1$
                 }
             }
+
+            Logger.getLogger("es.gob.afirma").info("Vamos a cargar el almacen");
+
             final InputStream is;
             try {
                 is = new FileInputStream(storeFilename);
+
+                Logger.getLogger("es.gob.afirma").info("Tamano del almacen: " + is.available());
+
                 ksm.init(store, is, pssCallback, null);
             }
             catch (final AOException e) {
