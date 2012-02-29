@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -23,14 +23,14 @@ final class ExtraParamsProcessor {
 
 	/** Clave expansible para pol&iacute;ticas de firma. */
 	private static final String EXPANDIBLE_POLICY_KEY = "expPolicy"; //$NON-NLS-1$
-	
+
 	/** Valor de la pol&iacute;tica de firma de la AGE. */
 	private static final String EXPANDIBLE_POLICY_VALUE_AGE = "FirmaAGE"; //$NON-NLS-1$
-	
+
 	private ExtraParamsProcessor() {
 		/* Constructor no publico */
 	}
-	
+
 	/**
 	 * Transforma la entrada introducida en un properties.
 	 * Las entradas deben estar separadas por salto de l&iacute;nea y tener la forma
@@ -52,13 +52,13 @@ final class ExtraParamsProcessor {
 
 		try {
 			params.load(new ByteArrayInputStream(entries.getBytes()));
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
 					"Se han encontrado entradas no validas en la configuracion de la operacion: " //$NON-NLS-1$
 					+ e);
 			return params;
 		}
-		
+
 		return params;
 	}
 
@@ -85,7 +85,7 @@ final class ExtraParamsProcessor {
 	static Properties expandProperties(final Properties params) {
 		return expandProperties(params, null, null);
 	}
-	
+
 	/**
 	 * Devuelve la colecci&oacute;n de propiedades de entrada con las entradas que correspondan
 	 * expandidos. Se expandiran una serie de claves con valores predefinidos y se les
@@ -108,17 +108,17 @@ final class ExtraParamsProcessor {
 	 * @return Propiedades expandidas.
 	 */
 	static Properties expandProperties(final Properties params, final byte[] signedData, final String format) {
-		
+
 		final Properties p = new Properties();
 		for (final String key : params.keySet().toArray(new String[0])) {
 			p.setProperty(key, params.getProperty(key));
 		}
-		
+
 		expandPolicyKeys(p, signedData, format);
-		
+
 		return p;
 	}
-	
+
 	/**
 	 * Expande las propiedades de pol&iacute;tica de firma modificando el conjunto de propiedades.
 	 * @param p Propiedades configuradas.
@@ -129,28 +129,33 @@ final class ExtraParamsProcessor {
 		if (p.containsKey(EXPANDIBLE_POLICY_KEY)) {
 			if (EXPANDIBLE_POLICY_VALUE_AGE.equals(p.getProperty(EXPANDIBLE_POLICY_KEY))) {
 				p.setProperty("policyIdentifier", //$NON-NLS-1$
-					"urn:oid:2.16.724.1.3.1.1.2.1.8");  //$NON-NLS-1$ 
+					"urn:oid:2.16.724.1.3.1.1.2.1.8");  //$NON-NLS-1$
 				p.setProperty("policyIdentifierHashAlgorithm", //$NON-NLS-1$
-					"http://www.w3.org/2000/09/xmldsig#sha1"); //$NON-NLS-1$ 
+					"http://www.w3.org/2000/09/xmldsig#sha1"); //$NON-NLS-1$
 				p.setProperty("policyQualifier", //$NON-NLS-1$
 					"http://administracionelectronica.gob.es/es/ctt/politicafirma/politica_firma_AGE_v1_8.pdf"); //$NON-NLS-1$
-				
+
 				if (format != null && format.startsWith(AOSignConstants.SIGN_FORMAT_XADES)) {
 					p.setProperty("policyIdentifierHash", //$NON-NLS-1$
-						"V8lVVNGDCPen6VELRD1Ja8HARFk=");  //$NON-NLS-1$ 
+						"V8lVVNGDCPen6VELRD1Ja8HARFk=");  //$NON-NLS-1$
 					p.setProperty("format", //$NON-NLS-1$
 						AOSignConstants.SIGN_FORMAT_XADES_DETACHED);
 				}
 				if (format != null && (format.equals(AOSignConstants.SIGN_FORMAT_CADES) ||
 						format.equals(AOSignConstants.SIGN_FORMAT_PADES))) {
 					p.setProperty("policyIdentifierHash", //$NON-NLS-1$
-						"7SxX3erFuH31TvAw9LZ70N7p1vA=");  //$NON-NLS-1$ 
+						"7SxX3erFuH31TvAw9LZ70N7p1vA=");  //$NON-NLS-1$
 					p.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
-					
+
 					if (signedData != null) {
-						final MimeHelper mimeHelper = new MimeHelper(signedData);
-						p.setProperty("contentDescription", mimeHelper.getDescription()); //$NON-NLS-1$
-						p.setProperty("contentTypeOid", MimeHelper.transformMimeTypeToOid(mimeHelper.getMimeType())); //$NON-NLS-1$
+						try {
+							final MimeHelper mimeHelper = new MimeHelper(signedData);
+							p.setProperty("contentDescription", mimeHelper.getDescription()); //$NON-NLS-1$
+							p.setProperty("contentTypeOid", MimeHelper.transformMimeTypeToOid(mimeHelper.getMimeType())); //$NON-NLS-1$
+						} catch (final Exception e) {
+							Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+									"No se han podido cargar las librerias para identificar el tipo de dato firmado: " + e); //$NON-NLS-1$
+						}
 					}
 				}
 			}
