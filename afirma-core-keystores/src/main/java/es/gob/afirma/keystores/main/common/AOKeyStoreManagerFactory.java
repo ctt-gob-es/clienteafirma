@@ -77,6 +77,10 @@ public final class AOKeyStoreManagerFactory {
     	Logger.getLogger("es.gob.afirma").info("Recuperamos un almacen con los siguientes parametros (" +
     			store + ", " + lib + ", " + description + ", " + pssCallback + ")");
 
+    	if (lib != null) {
+    		Logger.getLogger("es.gob.afirma").info("Encontramos el almacen: " + new File(lib).exists());
+    	}
+
         final AOKeyStoreManager ksm = new AOKeyStoreManager();
 
         // Fichero P7, X509, P12/PFX o Java JKS, en cualquier sistema operativo
