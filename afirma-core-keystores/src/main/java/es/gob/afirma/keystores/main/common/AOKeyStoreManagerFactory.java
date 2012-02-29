@@ -14,7 +14,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
 
@@ -65,7 +64,8 @@ public final class AOKeyStoreManagerFactory {
      *         Cuando la contrase&ntilde;a del almac&eacute;n es incorrecta.
      * @throws InvalidOSException Cuando se pide un almac&eacute; &uacute;nicamente disponible para
      *                            un sistema operativo distinto del actual
-     * @throws MissingLibraryException
+     * @throws MissingLibraryException Cuando no se localice una biblioteca necesaria para el
+     * uso del almac&eacute;n.
      */
     public static AOKeyStoreManager getAOKeyStoreManager(final AOKeyStore store,
                                                          final String lib,
@@ -73,13 +73,6 @@ public final class AOKeyStoreManagerFactory {
                                                          final PasswordCallback pssCallback,
                                                          final Object parentComponent) throws AOKeystoreAlternativeException,
                                                                                               IOException, MissingLibraryException, InvalidOSException {
-
-    	Logger.getLogger("es.gob.afirma").info("Recuperamos un almacen con los siguientes parametros (" +
-    			store + ", " + lib + ", " + description + ", " + pssCallback + ")");
-
-    	if (lib != null) {
-    		Logger.getLogger("es.gob.afirma").info("Encontramos el almacen: " + new File(lib).exists());
-    	}
 
         final AOKeyStoreManager ksm = new AOKeyStoreManager();
 
@@ -127,14 +120,9 @@ public final class AOKeyStoreManagerFactory {
                 }
             }
 
-            Logger.getLogger("es.gob.afirma").info("Vamos a cargar el almacen");
-
             final InputStream is;
             try {
                 is = new FileInputStream(storeFilename);
-
-                Logger.getLogger("es.gob.afirma").info("Tamano del almacen: " + is.available());
-
                 ksm.init(store, is, pssCallback, null);
             }
             catch (final AOException e) {
