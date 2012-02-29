@@ -12,6 +12,7 @@ package es.gob.afirma.applet;
 
 import junit.framework.Assert;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.ciphers.AOCipherConstants;
@@ -36,6 +37,7 @@ public class CipherTest {
      */
     @SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void cipherFile() {
 
     	try {
@@ -90,6 +92,7 @@ public class CipherTest {
      */
     @SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void cipherDataGeneratedKey() {
 
     	try {
@@ -143,6 +146,7 @@ public class CipherTest {
      */
     @SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void cipherDataUserInput() {
 
     	try {
@@ -199,6 +203,7 @@ public class CipherTest {
      */
     @SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void cipherDataPassword() {
 
     	try {

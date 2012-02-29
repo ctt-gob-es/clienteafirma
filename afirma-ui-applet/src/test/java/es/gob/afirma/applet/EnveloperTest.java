@@ -12,6 +12,7 @@ package es.gob.afirma.applet;
 
 import junit.framework.Assert;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -76,6 +77,7 @@ public class EnveloperTest {
      */
     @SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void envelopedDataTest() {
 
     	try {
@@ -121,6 +123,7 @@ public class EnveloperTest {
      */
     @SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void signedAndEnvelopedDataTest() {
 
     	try {
@@ -169,6 +172,7 @@ public class EnveloperTest {
     */
    @SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void authenticatedAndEnvelopedDataTest() {
 
 	   try {
