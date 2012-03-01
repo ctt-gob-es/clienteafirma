@@ -30,18 +30,8 @@ final class VerifyPlatformAction implements PrivilegedExceptionAction<Void> {
 
 	/** {@inheritDoc} */
 	public Void run() throws InvalidExternalLibraryException {
-		try {
-			this.verificaSunMSCAPINeeded();
-		}
-		catch(final Throwable e) {
-			Logger.getLogger("es.gob.afirma").warning("Error al verificar la existencia de SunMSCAPI: " + e); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		try {
-			this.verificaBCVersion();
-		}
-		catch(final Throwable e) {
-			Logger.getLogger("es.gob.afirma").warning("Error al verificar la version de BouncyCastle: " + e); //$NON-NLS-1$ //$NON-NLS-2$
-		}
+		this.verificaSunMSCAPINeeded();
+		this.verificaBCVersion();
 		return null;
 	}
 
