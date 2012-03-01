@@ -1,5 +1,6 @@
 package es.gob.afirma.applet;
 
+import java.io.IOException;
 import java.util.Properties;
 
 import javax.xml.crypto.dsig.DigestMethod;
@@ -157,7 +158,13 @@ public class Ticket137182_175231Test {
 
 	private static void checkPolicyIdentifier(final SignApplet applet, final String identifier) {
 
-		final String result = new String(Base64.decode(applet.getSignatureBase64Encoded()));
+		String result;
+		try {
+			result = new String(Base64.decode(applet.getSignatureBase64Encoded()));
+		} catch (final IOException e) {
+			Assert.fail("Error al decodificar el base 64 de la firma"); //$NON-NLS-1$
+			return;
+		}
 
 		int i = result.indexOf(POLICY_IDENTIFIER_PREFIX);
 		Assert.assertTrue("No se ha encontrado el identificador de la politica", i != -1); //$NON-NLS-1$

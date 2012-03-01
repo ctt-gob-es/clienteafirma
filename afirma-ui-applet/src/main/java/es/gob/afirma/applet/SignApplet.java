@@ -14,12 +14,12 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Frame;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.security.AccessController;
 import java.security.KeyException;
 import java.security.KeyStore.PrivateKeyEntry;
@@ -887,7 +887,12 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
             return;
         }
 
-        this.data = Base64.decode(data);
+        try {
+			this.data = Base64.decode(data);
+		} catch (final Exception e) {
+			LOGGER.warning("Los datos insertados no estan en Base64: " + e); //$NON-NLS-1$
+			this.data = null;
+		}
         this.fileUri = null;
         this.fileBase64 = false;
         this.hash = null;
@@ -944,7 +949,12 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
             return;
         }
 
-        SignApplet.this.hash = Base64.decode(hash);
+        try {
+			SignApplet.this.hash = Base64.decode(hash);
+		} catch (final Exception e) {
+			LOGGER.warning("El hash insertado no esta en Base64: " + e); //$NON-NLS-1$
+			SignApplet.this.hash = null;
+		}
         SignApplet.this.dataMimeType = MimeHelper.DEFAULT_MIMETYPE;
         SignApplet.this.fileUri = null;
         SignApplet.this.fileBase64 = false;
@@ -958,7 +968,12 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
             this.signData = null;
         }
         else {
-            this.signData = Base64.decode(signatureB64);
+            try {
+				this.signData = Base64.decode(signatureB64);
+			} catch (final Exception e) {
+				LOGGER.warning("La firma insertada no esta en Base64: " + e); //$NON-NLS-1$
+				this.signData = null;
+			}
         }
         this.electronicSignatureFile = null;
     }
@@ -2266,7 +2281,13 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     		this.setError(AppletMessages.getString("SignApplet.89")); //$NON-NLS-1$
     		return null;
     	}
-    	final byte[] dataToSign = Base64.decode(b64Data);
+    	final byte[] dataToSign;
+		try {
+			dataToSign = Base64.decode(b64Data);
+		} catch (final Exception e1) {
+			this.setError(AppletMessages.getString("SignApplet.90")); //$NON-NLS-1$
+    		return null;
+		}
     	// Ejecutamos la operacion
     	try {
     		return AccessController.doPrivileged(new java.security.PrivilegedAction<String>() {
@@ -2297,7 +2318,13 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     		this.setError(AppletMessages.getString("SignApplet.89")); //$NON-NLS-1$
     		return null;
     	}
-    	final byte[] dataHash = Base64.decode(b64Hash);
+    	final byte[] dataHash;
+		try {
+			dataHash = Base64.decode(b64Hash);
+		} catch (final Exception e1) {
+			this.setError(AppletMessages.getString("SignApplet.91")); //$NON-NLS-1$
+    		return null;
+		}
     	try {
     		return AccessController.doPrivileged(new java.security.PrivilegedAction<String>() {
     			/** {@inheritDoc} */
@@ -2501,7 +2528,12 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
             SignApplet.this.setError(AppletMessages.getString("SignApplet.278")); //$NON-NLS-1$
             return false;
         }
-        this.data = Base64.decode(b64data);
+        try {
+			this.data = Base64.decode(b64data);
+		} catch (final Exception e1) {
+			this.setError(AppletMessages.getString("SignApplet.90")); //$NON-NLS-1$
+    		return false;
+		}
         return sign();
     }
 
@@ -2693,18 +2725,32 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     /** {@inheritDoc} */
     public String getTextFromBase64(final String b64) {
         LOGGER.info("Invocando getTextFromBase64"); //$NON-NLS-1$
-        return new String(Base64.decode(b64));
+        try {
+			return new String(Base64.decode(b64));
+        } catch (final Exception e) {
+			this.setError(AppletMessages.getString("SignApplet.92")); //$NON-NLS-1$
+    		return null;
+		}
     }
 
     /** {@inheritDoc} */
     public String getTextFromBase64(final String b64, final String charsetName) {
         LOGGER.info("Invocando getTextFromBase64"); //$NON-NLS-1$
+        Charset charset = null;
         try {
-        	return new String(Base64.decode(b64), charsetName);
+        	charset = Charset.forName(charsetName);
         } catch (final Exception e) {
-    		LOGGER.warning("Codificacion no soportada (" + charsetName + //$NON-NLS-1$
-    		"), se utilizara la codificacion por defecto"); //$NON-NLS-1$
-        	return new String(Base64.decode(b64));
+        	LOGGER.warning("Codificacion no soportada (" + charsetName + //$NON-NLS-1$
+        	"), se utilizara la codificacion por defecto"); //$NON-NLS-1$
+        }
+        try {
+        	if (charset == null) {
+        		return new String(Base64.decode(b64));
+        	}
+        	return new String(Base64.decode(b64), charset);
+        } catch (final Exception e2) {
+        	this.setError(AppletMessages.getString("SignApplet.92")); //$NON-NLS-1$
+        	return null;
         }
     }
 
@@ -2843,7 +2889,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                 try {
                     is.close();
                 }
-                catch (final IOException e) {
+                catch (final Exception e) {
                 	getLogger().warning("Error al cerrar el stream de entrada de datos: " + e); //$NON-NLS-1$
                 }
                 final String digestAlg = AOSignConstants.getDigestAlgorithmName(SignApplet.this.getSigAlgo());
@@ -2862,13 +2908,23 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     /** {@inheritDoc} */
     public void setCipherData(final String data) {
         LOGGER.info("Invocando setCipherData"); //$NON-NLS-1$
-        this.cipherManager.setCipheredData(data == null ? null : Base64.decode(data));
+        try {
+			this.cipherManager.setCipheredData(data == null ? null : Base64.decode(data));
+		} catch (final Exception e) {
+			LOGGER.warning("Los datos insertados no estan en Base64: " + e); //$NON-NLS-1$
+
+		}
     }
 
     /** {@inheritDoc} */
     public void setPlainData(final String data) {
         LOGGER.info("Invocando setPlainData"); //$NON-NLS-1$
-        this.cipherManager.setPlainData(data == null ? null : Base64.decode(data));
+        try {
+			this.cipherManager.setPlainData(data == null ? null : Base64.decode(data));
+        } catch (final Exception e) {
+			LOGGER.warning("Los datos insertados no estan en Base64: " + e); //$NON-NLS-1$
+			this.data = null;
+		}
     }
 
     /** {@inheritDoc} */
@@ -2892,7 +2948,12 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     /** {@inheritDoc} */
     public void setKey(final String newKey) {
         LOGGER.info("Invocando setKey"); //$NON-NLS-1$
-        this.cipherManager.setCipherKey(newKey == null ? null : Base64.decode(newKey));
+        try {
+			this.cipherManager.setCipherKey(newKey == null ? null : Base64.decode(newKey));
+        } catch (final Exception e) {
+			LOGGER.warning("La clave insertada no esta en Base64: " + e); //$NON-NLS-1$
+			this.data = null;
+		}
     }
 
     /** {@inheritDoc} */
@@ -3185,7 +3246,11 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         if (certB64 == null || certB64.length() == 0) {
             LOGGER.warning("No se han introducido destinatarios"); //$NON-NLS-1$
         }
-        addRecipientToCMS(Base64.decode(certB64));
+        try {
+			addRecipientToCMS(Base64.decode(certB64));
+        } catch (final Exception e) {
+			LOGGER.warning("El certificado no esta en Base64: " + e); //$NON-NLS-1$
+		}
     }
 
     /** Configura un nuevo destinatario para el sobre electr&oacute;nico por
@@ -3509,7 +3574,12 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
      *        Objeto CMS en base 64.
      * @return Informaci&oacute;n del objeto CMS introducido. */
     private static String getCMSInfo(final String b64) {
-        return EnveloperManager.getCMSInfo(Base64.decode(b64));
+        try {
+			return EnveloperManager.getCMSInfo(Base64.decode(b64));
+		} catch (final Exception e) {
+			LOGGER.warning("Los datos insertados no estan en Base64: " + e); //$NON-NLS-1$
+			return null;
+		}
     }
 
     /** {@inheritDoc} */

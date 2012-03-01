@@ -832,7 +832,11 @@ final class CAdESUtils {
             }
         }
         else {
-            return new SecretKeySpec(Base64.decode(key), config.getAlgorithm().getName());
+            try {
+				return new SecretKeySpec(Base64.decode(key), config.getAlgorithm().getName());
+			} catch (final Exception e) {
+				LOGGER.severe("La clave introducida no es un Base64 valido: " + e); //$NON-NLS-1$
+			}
         }
         return null;
     }
