@@ -2285,7 +2285,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 		try {
 			dataToSign = Base64.decode(b64Data);
 		} catch (final Exception e1) {
-			this.setError(AppletMessages.getString("SignApplet.90")); //$NON-NLS-1$
+			this.setError(AppletMessages.getString("SignApplet.490")); //$NON-NLS-1$
     		return null;
 		}
     	// Ejecutamos la operacion
@@ -2322,7 +2322,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 		try {
 			dataHash = Base64.decode(b64Hash);
 		} catch (final Exception e1) {
-			this.setError(AppletMessages.getString("SignApplet.91")); //$NON-NLS-1$
+			this.setError(AppletMessages.getString("SignApplet.491")); //$NON-NLS-1$
     		return null;
 		}
     	try {
@@ -2531,7 +2531,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         try {
 			this.data = Base64.decode(b64data);
 		} catch (final Exception e1) {
-			this.setError(AppletMessages.getString("SignApplet.90")); //$NON-NLS-1$
+			this.setError(AppletMessages.getString("SignApplet.490")); //$NON-NLS-1$
     		return false;
 		}
         return sign();
@@ -2728,7 +2728,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         try {
 			return new String(Base64.decode(b64));
         } catch (final Exception e) {
-			this.setError(AppletMessages.getString("SignApplet.92")); //$NON-NLS-1$
+			this.setError(AppletMessages.getString("SignApplet.492")); //$NON-NLS-1$
     		return null;
 		}
     }
@@ -2749,7 +2749,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         	}
         	return new String(Base64.decode(b64), charset);
         } catch (final Exception e2) {
-        	this.setError(AppletMessages.getString("SignApplet.92")); //$NON-NLS-1$
+        	this.setError(AppletMessages.getString("SignApplet.492")); //$NON-NLS-1$
         	return null;
         }
     }
