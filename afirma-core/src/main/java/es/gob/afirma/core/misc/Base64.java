@@ -136,7 +136,7 @@ public final class Base64 {
       dArr[dLen - 2] = left == 2 ? (byte) CA[i & 0x3f] : (byte) '=';
       dArr[dLen - 1] = '=';
     }
-    return new String(dArr);
+    return new String(dArr).replace("\r", "");
   }
 
   /** Decodes a BASE64 encoded <code>String</code>. All illegal characters will be ignored and can handle both strings with
