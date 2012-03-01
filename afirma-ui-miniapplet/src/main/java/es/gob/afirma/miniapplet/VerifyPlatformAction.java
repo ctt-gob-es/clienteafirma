@@ -30,8 +30,18 @@ final class VerifyPlatformAction implements PrivilegedExceptionAction<Void> {
 
 	/** {@inheritDoc} */
 	public Void run() throws InvalidExternalLibraryException {
-		this.verificaSunMSCAPINeeded();
-		VerifyPlatformAction.verificaBCVersion();
+		try {
+			this.verificaSunMSCAPINeeded();
+		}
+		catch(final Throwable e) {
+			Logger.getLogger("es.gob.afirma").warning("Error al verificar la existencia de SunMSCAPI: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		try {
+			this.verificaBCVersion();
+		}
+		catch(final Throwable e) {
+			Logger.getLogger("es.gob.afirma").warning("Error al verificar la version de BouncyCastle: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+		}
 		return null;
 	}
 
@@ -42,9 +52,9 @@ final class VerifyPlatformAction implements PrivilegedExceptionAction<Void> {
 	 * @throws InvalidExternalLibraryException Cuando no se detecte la biblioteca SunMSCAPI.
 	 */
 	private void verificaSunMSCAPINeeded() throws InvalidExternalLibraryException {
-
-		if (Platform.getOS().equals(Platform.OS.WINDOWS) && (this.userAgent.indexOf("Win64") != -1 ) && //$NON-NLS-1$
-				(!Platform.getBrowser(this.userAgent).equals(Platform.BROWSER.FIREFOX))) {
+		if (Platform.OS.WINDOWS.equals(Platform.getOS()) &&
+		   ("64".equals(Platform.getJavaArch()) && //$NON-NLS-1$
+		   (!Platform.BROWSER.FIREFOX.equals(Platform.getBrowser(this.userAgent))))) {
 			try {
 				AOUtil.classForName("sun.security.mscapi.SunMSCAPI"); //$NON-NLS-1$
 				return;
@@ -55,11 +65,11 @@ final class VerifyPlatformAction implements PrivilegedExceptionAction<Void> {
 				final String sunmscapiDes = Platform.getJavaHome() + File.separator + "lib" + File.separator + "ext" + File.separator; //$NON-NLS-1$ //$NON-NLS-2$
 				final String msCapiOri  = MiniAppletMessages.getString("MSCapiDll.uri"); //$NON-NLS-1$
 				final String msCapiDes = Platform.getJavaHome() + File.separator + "bin" + File.separator; //$NON-NLS-1$
-
 				throw new InvalidExternalLibraryException(
 						"No se tienen instaladas las bibliotecas de SunMSCAPI.", //$NON-NLS-1$
 						"VerifyPlatformAction.0", //$NON-NLS-1$
-						new String[] {sunmscapOri, sunmscapiDes, msCapiOri, msCapiDes} );
+						new String[] {sunmscapOri, sunmscapiDes, msCapiOri, msCapiDes}
+				);
 			}
 		}
 	}
@@ -67,7 +77,8 @@ final class VerifyPlatformAction implements PrivilegedExceptionAction<Void> {
 	/** Indica si la versi&oacute;n de BouncyCastle es la adecuada para ejecutar el MiniApplet.
 	 * @throws InvalidExternalLibraryException Si se encuentra una versi&oacute;n no compatible
 	 * en el CLASSPATH de la aplicaci&oacute;n */
-	private static void verificaBCVersion() throws InvalidExternalLibraryException {
+	@SuppressWarnings("static-method")
+	private void verificaBCVersion() throws InvalidExternalLibraryException {
 
 		final String bcVersion = Platform.getBouncyCastleVersion();
 
