@@ -14,7 +14,6 @@ import java.io.ByteArrayInputStream;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.signers.AOSignConstants;
 
 /** Clase de utilidad para el proceso de propiedades enviadas desde JavaScript
@@ -147,16 +146,16 @@ final class ExtraParamsProcessor {
 						"7SxX3erFuH31TvAw9LZ70N7p1vA=");  //$NON-NLS-1$
 					p.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
 
-					if (signedData != null) {
-						try {
-							final MimeHelper mimeHelper = new MimeHelper(signedData);
-							p.setProperty("contentDescription", mimeHelper.getDescription()); //$NON-NLS-1$
-							p.setProperty("contentTypeOid", MimeHelper.transformMimeTypeToOid(mimeHelper.getMimeType())); //$NON-NLS-1$
-						} catch (final Exception e) {
-							Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-									"No se han podido cargar las librerias para identificar el tipo de dato firmado: " + e); //$NON-NLS-1$
-						}
-					}
+//					if (signedData != null) {
+//						try {
+//							final MimeHelper mimeHelper = new MimeHelper(signedData);
+//							p.setProperty("contentDescription", mimeHelper.getDescription()); //$NON-NLS-1$
+//							p.setProperty("contentTypeOid", MimeHelper.transformMimeTypeToOid(mimeHelper.getMimeType())); //$NON-NLS-1$
+//						} catch (final Exception e) {
+//							Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+//									"No se han podido cargar las librerias para identificar el tipo de dato firmado: " + e); //$NON-NLS-1$
+//						}
+//					}
 				}
 			}
 			p.remove(EXPANDIBLE_POLICY_KEY);

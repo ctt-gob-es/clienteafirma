@@ -269,4 +269,12 @@ interface MiniAfirma {
      * @return Mensaje de error.
      */
     String getErrorMessage();
+
+    /**
+     * Verifica los requisitos m&iacute;nimos de la plataforma en la que se ejecuta el applet.
+	 * Si no cumple los requisitos m&iacute;nimos lanza una excepci&oacute;n con la
+	 * descripci&oacute;n del problema.
+	 * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
+     */
+    void verifyPlatform() throws PrivilegedActionException;
 }
