@@ -470,7 +470,11 @@ public class DirectorySignatureHelper {
 
         final byte[][] signs = new byte[hashes.length][];
         for (int i = 0; i < hashes.length; i++) {
-            signs[i] = signer.sign(Base64.decode(hashes[i]), this.algorithm, keyEntry, signConfig);
+        	try {
+        		signs[i] = signer.sign(Base64.decode(hashes[i]), this.algorithm, keyEntry, signConfig);
+        	} catch (final Exception e) {
+        		throw new AOException("El hash '" + hashes[i] + "' no es un Base64 valido", e);  //$NON-NLS-1$//$NON-NLS-2$
+        	}
         }
 
         final String[] signsB64 = new String[signs.length];
