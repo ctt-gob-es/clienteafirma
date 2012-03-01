@@ -112,9 +112,48 @@ public final class QualifiedCertificatesFilter extends CertificateFilter {
 	 */
 	private String searchQualifiedSignatureCertificate(final X509Certificate cert, final AOKeyStoreManager ksm, final String[] aliases) {
 		X509Certificate cert2;
+
+
+		//Logger.getLogger("es.gob.afirma").info(
+		final StringBuffer buffer = new StringBuffer();
+		buffer.append("El certificado al que corresponde el numero de serie no es un certificado ").
+				append("de firma, se mostrara su informacion ademas de la del resto de certificados ").
+				append("del almacen:\n").
+				append("Certificado original:\n").
+				append("\t- Numero de serie: ").append(cert.getSerialNumber()).append('\n').
+				append("\t- Issuer: ").append(cert.getIssuerDN()).append('\n').
+				append("\t- Fecha de caducidad: ").append(getExpiredDate(cert)).append('\n').
+				append("\t- KeyUsages:\n").
+				append("\t\t+ digitalSignature: ").append(cert.getKeyUsage()[0]).append('\n').
+				append("\t\t+ nonRepudiation: ").append(cert.getKeyUsage()[1]).append('\n').
+				append("\t\t+ keyEncipherment: ").append(cert.getKeyUsage()[2]).append('\n').
+				append("\t\t+ dataEncipherment: ").append(cert.getKeyUsage()[3]).append('\n').
+				append("\t\t+ keyAgreement: ").append(cert.getKeyUsage()[4]).append('\n').
+				append("\t\t+ keyCertSign: ").append(cert.getKeyUsage()[5]).append('\n').
+				append("\t\t+ cRLSign: ").append(cert.getKeyUsage()[6]).append('\n').
+				append("\t\t+ encipherOnly: ").append(cert.getKeyUsage()[7]).append('\n').
+				append("\t\t+ decipherOnly: ").append(cert.getKeyUsage()[8]).append('\n').
+				append(" -----\n");
+
+
 		for (int j = 0; j < aliases.length; j++) {
 			cert2 = ksm.getCertificate(aliases[j]);
 			if (!cert.getSerialNumber().equals(cert2.getSerialNumber())) {
+				buffer.append("Certificado:\n").
+				append("\t- Numero de serie: ").append(cert2.getSerialNumber()).append('\n').
+				append("\t- Issuer: ").append(cert2.getIssuerDN()).append('\n').
+				append("\t- Fecha de caducidad: ").append(getExpiredDate(cert2)).append('\n').
+				append("\t- KeyUsages:\n").
+				append("\t\t+ digitalSignature: ").append(cert2.getKeyUsage()[0]).append('\n').
+				append("\t\t+ nonRepudiation: ").append(cert2.getKeyUsage()[1]).append('\n').
+				append("\t\t+ keyEncipherment: ").append(cert2.getKeyUsage()[2]).append('\n').
+				append("\t\t+ dataEncipherment: ").append(cert2.getKeyUsage()[3]).append('\n').
+				append("\t\t+ keyAgreement: ").append(cert2.getKeyUsage()[4]).append('\n').
+				append("\t\t+ keyCertSign: ").append(cert2.getKeyUsage()[5]).append('\n').
+				append("\t\t+ cRLSign: ").append(cert2.getKeyUsage()[6]).append('\n').
+				append("\t\t+ encipherOnly: ").append(cert2.getKeyUsage()[7]).append('\n').
+				append("\t\t+ decipherOnly: ").append(cert2.getKeyUsage()[8]).append('\n').
+				append(" -----\n");
 				final boolean sameIssuer = (cert.getIssuerDN() == null ?
 						cert2.getIssuerDN() == null : cert.getIssuerDN().equals(cert2.getIssuerDN()));
 				final boolean sameSubjectSN = (getSubjectSN(cert) == null ?
@@ -122,10 +161,14 @@ public final class QualifiedCertificatesFilter extends CertificateFilter {
 				final boolean sameExpiredData = (getExpiredDate(cert) == null ?
 						getExpiredDate(cert2) == null : getExpiredDate(cert).equals(getExpiredDate(cert2)));
 				if (this.isSignatureCert(cert2) && sameIssuer && sameSubjectSN && sameExpiredData) {
+					buffer.append("Se ha elegido el certificado recien mostrado como pareja del original");
+					Logger.getLogger("es.gob.afirma").info(buffer.toString());
 					return aliases[j];
 				}
 			}
 		}
+		buffer.append("NO se ha elegido ningun certificado como pareja del original");
+		Logger.getLogger("es.gob.afirma").info(buffer.toString());
 		return null;
 	}
 
