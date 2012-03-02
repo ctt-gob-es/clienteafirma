@@ -77,8 +77,7 @@ import es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper;
  * <p>
  *  La clase necesita espec&iacute;ficamente iText 2.1.7 (no se usan versiones m&aacute;s actuales por cuestiones de licencia) y
  *  BouncyCastle 1.46 o superior (Proveedor + TSP + <i>Mail</i>).
- * </p>
- */
+ * </p> */
 public final class AOPDFSigner implements AOSigner {
 
     private static final int CSIZE = 8000;
@@ -90,22 +89,6 @@ public final class AOPDFSigner implements AOSigner {
 
     /** Versi&oacute;n de iText necesaria para el uso de esta clase (2.1.7). */
     private static final String ITEXT_VERSION = "2.1.7"; //$NON-NLS-1$
-
-    /** Versi&oacute;n de BouncyCastle necesaria para el uso de esta clase (1.46 o superior). */
-    private static final String BC_VERSION = "1.46"; //$NON-NLS-1$
-
-    /** Construye un firmador PAdES, comprobando que la versiones existentes en el <i>CLASSPATH</i> de iText y BouncyCastle sean las adecuadas.
-     * @throws UnsupportedOperationException si se encuentra bibliotecas iText o BouncyCastle en versiones incompatibles */
-    public AOPDFSigner() {
-        final String itextVersion = Platform.getITextVersion();
-        if (!ITEXT_VERSION.equals(itextVersion)) {
-            throw new UnsupportedOperationException("Se necesita iText version " + ITEXT_VERSION + ", pero se ha encontrado la version: " + itextVersion); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-        final String bcVersion = Platform.getBouncyCastleVersion();
-        if (bcVersion != null && BC_VERSION.compareTo(bcVersion) > 0) {
-            throw new UnsupportedOperationException("Se necesita BouncyCastle version igual o superior a " + BC_VERSION + ", pero se ha encontrado la version: " + bcVersion); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-    }
 
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");  //$NON-NLS-1$
 
@@ -571,6 +554,8 @@ public final class AOPDFSigner implements AOSigner {
      * @return &Aacute;rbol de nodos de firma o <code>null</code> en caso de error. */
     public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
 
+    	checkIText();
+
         SHA2AltNamesProvider.install();
 
         final AOTreeNode root = new AOTreeNode("Datos"); //$NON-NLS-1$
@@ -655,7 +640,9 @@ public final class AOPDFSigner implements AOSigner {
     }
 
     @SuppressWarnings("unused")
-    private static boolean isPdfFile(final byte[] data) {
+    private boolean isPdfFile(final byte[] data) {
+
+    	checkIText();
 
         byte[] buffer = new byte[PDF_FILE_HEADER.length()];
         try {
@@ -722,6 +709,8 @@ public final class AOPDFSigner implements AOSigner {
                                                           DocumentException,
                                                           NoSuchAlgorithmException,
                                                           CertificateException {
+
+    	checkIText();
 
         final boolean useSystemDateTime = Boolean.parseBoolean(extraParams.getProperty("applySystemDate", Boolean.TRUE.toString())); //$NON-NLS-1$
         final String reason = extraParams.getProperty("signReason"); //$NON-NLS-1$
@@ -1097,4 +1086,11 @@ public final class AOPDFSigner implements AOSigner {
         // otros datos de relevancia que se almacenan en el objeto AOSignInfo
     }
 
+    @SuppressWarnings("static-method")
+	private void checkIText() {
+        final String itextVersion = Platform.getITextVersion();
+        if (!ITEXT_VERSION.equals(itextVersion)) {
+            throw new InvalidITextException(ITEXT_VERSION, itextVersion);
+        }
+    }
 }
