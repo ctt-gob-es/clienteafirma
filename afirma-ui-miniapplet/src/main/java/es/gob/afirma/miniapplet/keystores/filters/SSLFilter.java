@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -26,24 +26,24 @@ import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.main.filters.CertificateFilter;
 
 /**
- * Filtro que selecciona los certificados con un n&uacute;mero de serie concreto. 
+ * Filtro que selecciona los certificados con un n&uacute;mero de serie concreto.
  * Un filtrado de este tipo devuelve com&uacute;nmente un &uacute;nico certificado.
  * Si se indica el n&uacute;mero de serie del certificado del DNIe, se devuelve el
  * certificado de firma.
  * @author Carlos Gamuci Mill&aacute;n.
  */
 public final class SSLFilter extends CertificateFilter {
-	
+
 	private static final String[] SUBJECT_SN_PREFIX = new String[] {
 		"serialnumber=", //$NON-NLS-1$
 		"SERIALNUMBER=", //$NON-NLS-1$
 		"2.5.4.5=" //$NON-NLS-1$
 	};
-	
+
 	private final String serialNumber;
 	private final AuthenticationDNIeFilter authenticationDnieCertFilter;
 	private final SignatureDNIeFilter signatureDnieCertFilter;
-	
+
 	/**
 	 * Contruye el filtro a partir del n&uacute;mero de serie en hexadecimal del certificado
 	 * que deseamos obtener.
@@ -54,22 +54,22 @@ public final class SSLFilter extends CertificateFilter {
 		this.authenticationDnieCertFilter = new AuthenticationDNIeFilter();
 		this.signatureDnieCertFilter = new SignatureDNIeFilter();
 	}
-	
+
 	/** {@inheritDoc} */
 	@Override
     public boolean matches(final X509Certificate cert) {
 		return SSLFilter.prepareSerialNumber(SSLFilter.getCertificateSN(cert)).equalsIgnoreCase(this.serialNumber);
 	}
-	
+
 	/** {@inheritDoc} */
 	@Override
-	public String[] matches(String[] aliases, AOKeyStoreManager ksm) {
+	public String[] matches(final String[] aliases, final AOKeyStoreManager ksm) {
 
-		X509Certificate[] certs = new X509Certificate[aliases.length];
+		final X509Certificate[] certs = new X509Certificate[aliases.length];
 		for (int i = 0; i < aliases.length; i++) {
 			certs[i] = ksm.getCertificate(aliases[i]);
 		}
-		
+
 		X509Certificate cert;
 		X509Certificate cert2;
 		final List<String> filteredCerts = new ArrayList<String>();
@@ -80,7 +80,7 @@ public final class SSLFilter extends CertificateFilter {
 					if (this.isAuthenticationDnieCert(cert)) {
 						for (int j = 0; j < aliases.length; j++) {
 							if (i != j) {
-								cert2 = ksm.getCertificate(aliases[j]);				
+								cert2 = ksm.getCertificate(aliases[j]);
 								if (this.isSignatureDnieCert(cert2) && SSLFilter.getSubjectSN(cert2) != null &&
 										SSLFilter.getSubjectSN(cert2).equalsIgnoreCase(SSLFilter.getSubjectSN(cert)) &&
 										SSLFilter.getExpiredDate(cert2).equals(SSLFilter.getExpiredDate(cert))) {
@@ -102,15 +102,15 @@ public final class SSLFilter extends CertificateFilter {
 		}
 		return filteredCerts.toArray(new String[filteredCerts.size()]);
 	}
-	
+
 	private boolean isAuthenticationDnieCert(final X509Certificate cert) {
 		return this.authenticationDnieCertFilter.matches(cert);
 	}
-	
+
 	private boolean isSignatureDnieCert(final X509Certificate cert) {
 		return this.signatureDnieCertFilter.matches(cert);
 	}
-	
+
 	/**
 	 * Recupera el n&uacute;mero de serie del subject de un certificado en formato hexadecimal.
 	 * Los ceros ('0') a la izquierda del n&uacute;mero de serie se eliminan durante el
@@ -124,7 +124,7 @@ public final class SSLFilter extends CertificateFilter {
     	final List<Rdn> rdns;
 		try {
 			rdns = new LdapName(principal).getRdns();
-		} 
+		}
 		catch (final InvalidNameException e) {
 			return null;
 		}
@@ -140,7 +140,7 @@ public final class SSLFilter extends CertificateFilter {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Recupera la fecha de expiraci&oacute;n del certificado en formato "yyyy-MM-dd".
 	 * @param cert Certificado.
@@ -149,7 +149,7 @@ public final class SSLFilter extends CertificateFilter {
 	private static String getExpiredDate(final X509Certificate cert) {
 		return new SimpleDateFormat("yyyy-MM-dd").format(cert.getNotAfter()); //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * Recupera el n&uacute;mero de serie de un certificado en formato hexadecimal.
 	 * Los ceros ('0') a la izquierda del n&uacute;mero de serie se eliminan durante el
@@ -161,11 +161,16 @@ public final class SSLFilter extends CertificateFilter {
 	private static String getCertificateSN(final X509Certificate cert) {
     	return SSLFilter.bigIntegerToHex(cert.getSerialNumber());
 	}
-	
+
+	/**
+	 * Convierte un opbjeto BigInteger a Hexadecimal.
+	 * @param bi Entero que deseamos convertir.
+	 * @return Hexadecimal.
+	 */
 	private static String bigIntegerToHex(final BigInteger bi) {
 		return AOUtil.hexify(bi.toByteArray(), ""); //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * Prepara un n&uacute;mero de serie en hexadecimal para que tenga
 	 * un formato concreto.
