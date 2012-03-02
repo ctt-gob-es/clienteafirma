@@ -10,6 +10,7 @@
 
 package es.gob.afirma.miniapplet.keystores.filters;
 
+import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ import javax.naming.InvalidNameException;
 import javax.naming.ldap.LdapName;
 import javax.naming.ldap.Rdn;
 
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.main.filters.CertificateFilter;
 
@@ -49,21 +51,22 @@ public final class QualifiedCertificatesFilter extends CertificateFilter {
 		"2.5.4.5=" //$NON-NLS-1$
 	};
 
+	/** N&uacute;mero de serie en hexadecimal por el que debemos filtrar los certificados. */
 	private final String serialNumber;
 
 	/**
-	 * Contruye el filtro a partir del n&uacute;mero de serie en decimal del certificado
+	 * Contruye el filtro a partir del n&uacute;mero de serie en hexadecimal del certificado
 	 * que deseamos obtener.
-	 * @param serialNumber N&uacute;mero de serie del certificado en decimal.
+	 * @param serialNumber N&uacute;mero de serie del certificado en hexadecimal.
 	 */
 	public QualifiedCertificatesFilter(final String serialNumber) {
-		this.serialNumber = serialNumber;
+		this.serialNumber = prepareSerialNumber(serialNumber);
 	}
 
 	/** {@inheritDoc} */
 	@Override
     public boolean matches(final X509Certificate cert) {
-		return QualifiedCertificatesFilter.getCertificateSN(cert).equalsIgnoreCase(this.serialNumber);
+		return prepareSerialNumber(getCertificateSN(cert)).equalsIgnoreCase(this.serialNumber);
 	}
 
 	/** {@inheritDoc} */
@@ -221,14 +224,41 @@ public final class QualifiedCertificatesFilter extends CertificateFilter {
 	}
 
 	/**
-	 * Recupera el n&uacute;mero de serie de un certificado en formato decimal.
+	 * Recupera el n&uacute;mero de serie de un certificado en formato hexadecimal.
 	 * Los ceros ('0') a la izquierda del n&uacute;mero de serie se eliminan durante el
 	 * proceso. Si el certificado no tiene n&uacute;mero de serie, devolver&aacute;
 	 * {@code null}.
 	 * @param cert Certificado.
-	 * @return Numero de serie en decimal.
+	 * @return Numero de serie en hexadecimal.
 	 */
 	private static String getCertificateSN(final X509Certificate cert) {
-    	return cert.getSerialNumber() == null ? null : cert.getSerialNumber().toString();
+    	return cert.getSerialNumber() == null ? null : bigIntegerToHex(cert.getSerialNumber());
+	}
+
+	/**
+	 * Convierte un opbjeto BigInteger a Hexadecimal.
+	 * @param bi Entero que deseamos convertir.
+	 * @return Hexadecimal.
+	 */
+	private static String bigIntegerToHex(final BigInteger bi) {
+		return AOUtil.hexify(bi.toByteArray(), ""); //$NON-NLS-1$
+	}
+
+	/**
+	 * Prepara un n&uacute;mero de serie en hexadecimal para que tenga
+	 * un formato concreto.
+	 * @param serialNumber N&uacute;mero de serie en hexadecimal.
+	 * @return N&uacute;mero de serie preparado.
+	 */
+	private static String prepareSerialNumber(final String sn) {
+		final String preparedSn = sn.trim().replace(" ", "").replace("#", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		int n = 0;
+		while(n < preparedSn.length()) {
+			if (preparedSn.charAt(n) != '0') {
+				break;
+			}
+			n++;
+		}
+		return preparedSn.substring(n);
 	}
 }
