@@ -30,8 +30,8 @@ final class VerifyPlatformAction implements PrivilegedExceptionAction<Void> {
 
 	/** {@inheritDoc} */
 	public Void run() throws InvalidExternalLibraryException {
-		this.verificaSunMSCAPINeeded();
-		this.verificaBCVersion();
+//		this.verificaSunMSCAPINeeded();
+//		this.verificaBCVersion();
 		return null;
 	}
 

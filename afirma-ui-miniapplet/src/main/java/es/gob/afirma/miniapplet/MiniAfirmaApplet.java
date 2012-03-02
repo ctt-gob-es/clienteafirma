@@ -419,9 +419,16 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		try {
 			AccessController.doPrivileged(new VerifyPlatformAction(this.userAgent));
 		}
-		catch (final PrivilegedActionException e) {
+		catch (final Exception e) {
 			setErrorMessage(e);
-			throw e;
+			//TODO: Eliminar stackTrace y sustituir por captura y relanzamiento de
+			// PrivilegedActionException cuando se verifique que no sube ningun otro
+			// tipo de excepcion
+			e.printStackTrace();
+			if (e instanceof PrivilegedActionException) {
+				throw (PrivilegedActionException) e;
+			}
+			throw new PrivilegedActionException(e);
 		}
 	}
 
