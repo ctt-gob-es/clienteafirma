@@ -15,6 +15,8 @@ import java.io.UnsupportedEncodingException;
 import java.security.PrivilegedActionException;
 
 import es.gob.afirma.core.AOFormatFileException;
+import es.gob.afirma.core.InvalidLibraryException;
+import es.gob.afirma.core.MissingLibraryException;
 
 /** Contiene los puntos de entrada de las funcionalidades criptogr&aacute;ficas
  * del Mini-Applet del Cliente AFirma.
@@ -55,9 +57,11 @@ interface MiniAfirma {
      * @return Firma electr&oacute;nica resultante en Base64.
      * @throws IOException Cuando se produce un error durante la firma electr&oacute;nica.
      * @throws AOFormatFileException Cuando se indica un formato de firma no soportado.
+     * @throws InvalidLibraryException Cuando se detecta una versi&oacute;n no v&aacute;lida de una biblioteca.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
+     * @throws MissingLibraryException Cuando no se encuentra una biblioteca necesaria para la operaci&oacute;n.
      */
-    String sign(String data, String algorithm, String format, String extraParams) throws AOFormatFileException, PrivilegedActionException, IOException;
+    String sign(String data, String algorithm, String format, String extraParams) throws AOFormatFileException, PrivilegedActionException, IOException, InvalidLibraryException, MissingLibraryException;
 
     /** Realiza la firma paralela (cofirma) de unos datos. La cofirma de una firma requiere
      * que los datos est&eacute;n contenidos en la firma original o que se indiquen de
@@ -83,9 +87,11 @@ interface MiniAfirma {
 	 * @throws IOException Cuando se produce un error durante la cofirma electr&oacute;nica.
      * @throws AOFormatFileException Cuando se indica un formato de firma no soportado o no
      * se puede identificar el formato de la firma.
+     * @throws InvalidLibraryException Cuando se detecta una versi&oacute;n no v&aacute;lida de una biblioteca.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
+     * @throws MissingLibraryException Cuando no se encuentra una biblioteca necesaria para la operaci&oacute;n.
      */
-    String coSign(String sign, String data, String algorithm, String format, String extraParams) throws AOFormatFileException, PrivilegedActionException, IOException;
+    String coSign(String sign, String data, String algorithm, String format, String extraParams) throws AOFormatFileException, PrivilegedActionException, IOException, InvalidLibraryException, MissingLibraryException;
 
     /** Realiza una firma en cascada (Contrafirma) sobre una firma. Se contrafirman todos los
      * nodos hoja salvo que mediante {@code extraParams} se indique el par&aacute;metro
@@ -106,9 +112,11 @@ interface MiniAfirma {
      * @throws IOException Cuando se produce algun error durante la operaci&oacute;n.
      * @throws AOFormatFileException Cuando se indica un formato de firma no soportado o no
      * se puede identificar el formato de la firma.
+     * @throws InvalidLibraryException Cuando se detecta una versi&oacute;n no v&aacute;lida de una biblioteca.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
+     * @throws MissingLibraryException Cuando no se encuentra una biblioteca necesaria para la operaci&oacute;n.
      */
-    String counterSign(String sign, String algorithm, String format, String extraParams) throws AOFormatFileException, PrivilegedActionException, IOException;
+    String counterSign(String sign, String algorithm, String format, String extraParams) throws AOFormatFileException, PrivilegedActionException, IOException, InvalidLibraryException, MissingLibraryException;
 
     /** Devuelve la estructura de firmantes de una firma electr&oacute;nica. Los
      * firmantes se separan por '\n' y comienzan por tantos '\t' como el nivel
@@ -127,8 +135,9 @@ interface MiniAfirma {
      * @throws AOFormatFileException Cuando se indica un formato de firma no soportado.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      * @throws NullPointerException Cuando se introduce un par&aacute;metro nulo.
+     * @throws InvalidLibraryException Cuando se detecta una versi&oacute;n no v&aacute;lida de una biblioteca.
      */
-    String getSignersStructure(String signB64) throws IOException, PrivilegedActionException, AOFormatFileException;
+    String getSignersStructure(String signB64) throws IOException, PrivilegedActionException, AOFormatFileException, InvalidLibraryException;
 
     /** Muestra un di&aacute;logo modal que permite al usuario seleccionar
      * el directorio y el nombre de fichero para el guardado de datos.

@@ -26,6 +26,8 @@ import javax.swing.UIManager;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOFormatFileException;
+import es.gob.afirma.core.InvalidLibraryException;
+import es.gob.afirma.core.MissingLibraryException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
@@ -67,7 +69,9 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			final String format,
 			final String extraParams) throws AOFormatFileException,
 			PrivilegedActionException,
-			IOException {
+			IOException,
+			InvalidLibraryException,
+			MissingLibraryException {
 		this.cleanErrorMessage();
 
 		if (dataB64 == null) {
@@ -97,6 +101,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			setErrorMessage(e);
 			throw e;
 		}
+		catch (final Exception e) {
+			setErrorMessage(e);
+			throw new PrivilegedActionException(e);
+		}
 	}
 
 	/** {@inheritDoc} */
@@ -106,7 +114,9 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			final String format,
 			final String extraParams) throws AOFormatFileException,
 			PrivilegedActionException,
-			IOException {
+			IOException,
+			InvalidLibraryException,
+			MissingLibraryException {
 		this.cleanErrorMessage();
 
 		if (signB64 == null) {
@@ -137,6 +147,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			setErrorMessage(e);
 			throw e;
 		}
+		catch (final Exception e) {
+			setErrorMessage(e);
+			throw new PrivilegedActionException(e);
+		}
 
 	}
 
@@ -146,7 +160,9 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			final String format,
 			final String extraParams) throws AOFormatFileException,
 			PrivilegedActionException,
-			IOException {
+			IOException,
+			InvalidLibraryException,
+			MissingLibraryException {
 		this.cleanErrorMessage();
 
 		if (signB64 == null) {
@@ -175,11 +191,15 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			setErrorMessage(e);
 			throw e;
 		}
-
+		catch (final Exception e) {
+			setErrorMessage(e);
+			throw new PrivilegedActionException(e);
+		}
 	}
 
 	/** {@inheritDoc} */
-	public String getSignersStructure(final String signB64) throws IOException, PrivilegedActionException, AOFormatFileException {
+	public String getSignersStructure(final String signB64)
+		throws IOException, PrivilegedActionException, AOFormatFileException, InvalidLibraryException{
 
 		this.cleanErrorMessage();
 
@@ -198,6 +218,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		catch (final PrivilegedActionException e) {
 			setErrorMessage(e);
 			throw e;
+		}
+		catch (final Exception e) {
+			setErrorMessage(e);
+			throw new PrivilegedActionException(e);
 		}
 
 		if (signer == null) {
@@ -253,6 +277,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			setErrorMessage(e);
 			throw e;
 		}
+		catch (final Exception e) {
+			setErrorMessage(e);
+			throw new PrivilegedActionException(e);
+		}
 	}
 
 	/** {@inheritDoc} */
@@ -276,6 +304,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		catch (final PrivilegedActionException e) {
 			setErrorMessage(e);
 			throw e;
+		}
+		catch (final Exception e) {
+			setErrorMessage(e);
+			throw new PrivilegedActionException(e);
 		}
 	}
 
@@ -313,6 +345,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		catch (final PrivilegedActionException e) {
 			setErrorMessage(e);
 			throw e;
+		}
+		catch (final Exception e) {
+			setErrorMessage(e);
+			throw new PrivilegedActionException(e);
 		}
 	}
 
@@ -363,6 +399,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			setErrorMessage(e);
 			throw e;
 		}
+		catch (final Exception e) {
+			setErrorMessage(e);
+			throw new PrivilegedActionException(e);
+		}
 	}
 
 	/** {@inheritDoc} */
@@ -407,29 +447,13 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	}
 
 	/**
-	 * Verifica los requisitos m&iacute;nimos de la plataforma en la que se ejecuta el applet.
-	 * Si no cumple los requisitos m&iacute;nimos lanza una excepci&oacute;n con la
-	 * descripci&oacute;n del problema.
+	 * Este m&eacute;todo ya no hace nada.
 	 * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
 	 * @deprecated Se externaliza las comprobaciones de entorno.
 	 */
 	@Deprecated
 	public void verifyPlatform() throws PrivilegedActionException {
-		this.cleanErrorMessage();
-		try {
-			AccessController.doPrivileged(new VerifyPlatformAction(this.userAgent));
-		}
-		catch (final Exception e) {
-			setErrorMessage(e);
-			//TODO: Eliminar stackTrace y sustituir por captura y relanzamiento de
-			// PrivilegedActionException cuando se verifique que no sube ningun otro
-			// tipo de excepcion
-			e.printStackTrace();
-			if (e instanceof PrivilegedActionException) {
-				throw (PrivilegedActionException) e;
-			}
-			throw new PrivilegedActionException(e);
-		}
+		// No hacemos nada
 	}
 
 	/**
