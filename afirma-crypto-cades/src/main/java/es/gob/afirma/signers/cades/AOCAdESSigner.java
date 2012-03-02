@@ -26,6 +26,7 @@ import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.util.tree.AOTreeModel;
+import es.gob.afirma.signers.pkcs7.BCChecker;
 import es.gob.afirma.signers.pkcs7.ObtainContentSignedData;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.ReadNodesTree;
@@ -128,6 +129,8 @@ public final class AOCAdESSigner implements AOSigner {
                        final String algorithm,
                        final PrivateKeyEntry keyEntry,
                        final Properties xParams) throws AOException {
+
+    	new BCChecker().checkBouncyCastle();
 
         final Properties extraParams = (xParams != null) ? xParams : new Properties();
 
@@ -256,6 +259,7 @@ public final class AOCAdESSigner implements AOSigner {
                          final String algorithm,
                          final PrivateKeyEntry keyEntry,
                          final Properties extraParams) throws AOException {
+    	new BCChecker().checkBouncyCastle();
         try {
             return ((AOCoSigner)AOUtil.classForName("es.gob.afirma.signers.multi.cades.AOCAdESCoSigner").newInstance()).cosign(data, sign, algorithm, keyEntry, extraParams); //$NON-NLS-1$
         }
@@ -343,6 +347,7 @@ public final class AOCAdESSigner implements AOSigner {
                          final String algorithm,
                          final PrivateKeyEntry keyEntry,
                          final Properties extraParams) throws AOException {
+    	new BCChecker().checkBouncyCastle();
         try {
             return ((AOCoSigner)AOUtil.classForName("es.gob.afirma.signers.multi.cades.AOCAdESCoSigner").newInstance()).cosign(sign, algorithm, keyEntry, extraParams); //$NON-NLS-1$
         }
@@ -424,6 +429,7 @@ public final class AOCAdESSigner implements AOSigner {
                               final Object[] targets,
                               final PrivateKeyEntry keyEntry,
                               final Properties extraParams) throws AOException {
+    	new BCChecker().checkBouncyCastle();
         try {
             return ((AOCounterSigner)AOUtil.classForName("es.gob.afirma.signers.multi.cades.AOCAdESCounterSigner").newInstance()).countersign(sign, algorithm, targetType, targets, keyEntry, extraParams); //$NON-NLS-1$
         }
@@ -450,6 +456,7 @@ public final class AOCAdESSigner implements AOSigner {
      * @return &Aacute;rbol de nodos de firma o <code>null</code> en caso de
      *         error. */
     public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
+    	new BCChecker().checkBouncyCastle();
         try {
             return new ReadNodesTree().readNodesTree(sign, asSimpleSignInfo);
         }
@@ -467,6 +474,7 @@ public final class AOCAdESSigner implements AOSigner {
             LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
             return false;
         }
+        new BCChecker().checkBouncyCastle();
 		return CAdESValidator.isCAdESSignedData(data);
     }
 
@@ -496,6 +504,7 @@ public final class AOCAdESSigner implements AOSigner {
         if (signData == null) {
             throw new IllegalArgumentException("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
         }
+        new BCChecker().checkBouncyCastle();
         if (!CAdESValidator.isCAdESValid(signData)) {
             throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
         }
