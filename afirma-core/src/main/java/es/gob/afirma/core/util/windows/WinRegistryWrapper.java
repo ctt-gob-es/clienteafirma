@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -20,7 +20,7 @@ import es.gob.afirma.core.misc.Platform;
 /** Clase envoltorio para las clases de Sun para acceso al registro de Windows.
  * Garantizan la carga est&aacute;tica de la biblioteca nativa */
 public final class WinRegistryWrapper {
-    
+
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     static {
@@ -36,12 +36,6 @@ public final class WinRegistryWrapper {
         }
     }
 
-//    /** Carga la DLL <i>deploy.dll</i>, o la original de Java o la propia del
-//     * Cliente @firma. */
-//    public static void loadDeployDll() {
-//        // Cuerpo vacio, unicamente para cargar la DLL de forma estatica
-//    }
-
     private WinRegistryWrapper() {
         // No permitimos la instanciacion
     }
@@ -51,7 +45,7 @@ public final class WinRegistryWrapper {
 
     /** Clave <i>HKEY_CURRENT_USER</i> del registro de Windows. */
     public static final int HKEY_CURRENT_USER = 0x80000001;
-    
+
     /** Clave <i>HKEY_CLASSES_ROOT</i> del registro de Windows. */
     public static final int HKEY_CLASSES_ROOT = 0x80000000;
 
@@ -69,7 +63,7 @@ public final class WinRegistryWrapper {
             return WinRegistry.get(hKey, path, name);
         }
         catch (final Exception e) {
-            LOGGER.severe("No se ha podido obtener la clave de registro con ruta '" + path //$NON-NLS-1$ 
+            LOGGER.severe("No se ha podido obtener la clave de registro con ruta '" + path //$NON-NLS-1$
                                                      + "' y nombre '" //$NON-NLS-1$
                                                      + name
                                                      + "', se devolvera null: " //$NON-NLS-1$
@@ -118,7 +112,7 @@ public final class WinRegistryWrapper {
             return WinRegistry.setStringValue(hKey, path, name, value);
         }
         catch (final Exception e) {
-            LOGGER.severe("No se ha podido establecer la clave de registro con ruta '" + path //$NON-NLS-1$ 
+            LOGGER.severe("No se ha podido establecer la clave de registro con ruta '" + path //$NON-NLS-1$
                                                      + "' y nombre '" //$NON-NLS-1$
                                                      + name
                                                      + "', se devolvera false: " //$NON-NLS-1$
