@@ -60,6 +60,7 @@ interface MiniAfirma {
      * @throws InvalidLibraryException Cuando se detecta una versi&oacute;n no v&aacute;lida de una biblioteca.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      * @throws MissingLibraryException Cuando no se encuentra una biblioteca necesaria para la operaci&oacute;n.
+     * @throws Exception Cuando se produce un error no identificado.
      */
     String sign(String data, String algorithm, String format, String extraParams) throws AOFormatFileException, PrivilegedActionException, IOException, InvalidLibraryException, MissingLibraryException, Exception;
 
@@ -90,6 +91,7 @@ interface MiniAfirma {
      * @throws InvalidLibraryException Cuando se detecta una versi&oacute;n no v&aacute;lida de una biblioteca.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      * @throws MissingLibraryException Cuando no se encuentra una biblioteca necesaria para la operaci&oacute;n.
+     * @throws Exception Cuando se produce un error no identificado.
      */
     String coSign(String sign, String data, String algorithm, String format, String extraParams) throws AOFormatFileException, PrivilegedActionException, IOException, InvalidLibraryException, MissingLibraryException, Exception;
 
@@ -115,6 +117,7 @@ interface MiniAfirma {
      * @throws InvalidLibraryException Cuando se detecta una versi&oacute;n no v&aacute;lida de una biblioteca.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      * @throws MissingLibraryException Cuando no se encuentra una biblioteca necesaria para la operaci&oacute;n.
+     * @throws Exception Cuando se produce un error no identificado.
      */
     String counterSign(String sign, String algorithm, String format, String extraParams) throws AOFormatFileException, PrivilegedActionException, IOException, InvalidLibraryException, MissingLibraryException, Exception;
 
@@ -136,6 +139,7 @@ interface MiniAfirma {
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      * @throws NullPointerException Cuando se introduce un par&aacute;metro nulo.
      * @throws InvalidLibraryException Cuando se detecta una versi&oacute;n no v&aacute;lida de una biblioteca.
+     * @throws Exception Cuando se produce un error no identificado.
      */
     String getSignersStructure(String signB64) throws IOException, PrivilegedActionException, AOFormatFileException, InvalidLibraryException, Exception;
 
@@ -151,6 +155,7 @@ interface MiniAfirma {
      * contrario.
      * @throws IOException Cuando ocurre alg&uacute;n error en el guardado del fichero.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
+     * @throws Exception Cuando se produce un error no identificado.
      */
     boolean saveDataToFile(String data, String title, String fileName, String extension, String description) throws PrivilegedActionException, IOException, Exception;
 
@@ -163,6 +168,7 @@ interface MiniAfirma {
      * @param description Descripci&oacute;n del tipo de fichero que se desea cargar.
      * @return El contenido del fichero codificado en Base64.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
+     * @throws Exception Cuando se produce un error no identificado.
      * @deprecated Sustituir por <code>getFileNameContentBase64(String, String, String)</code>.
      */
     @Deprecated
@@ -178,6 +184,7 @@ interface MiniAfirma {
      * @param description Descripci&oacute;n del tipo de fichero que se desea cargar.
      * @return El nombre del fichero y su contenido en unicode.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
+     * @throws Exception Cuando se produce un error no identificado.
      * @deprecated Los ficheros deben cargarse en base64 (getFileNameContentBase64) y despu&eacute;s
 	 * convertirse a texto con la codificaci&oacute;n que se desee (getTextFromBase64).  */
     @Deprecated
@@ -194,6 +201,7 @@ interface MiniAfirma {
      * @param description Descripci&oacute;n del tipo de fichero que se desea cargar.
      * @return Array con los nombres del ficheros y sus contenidos en unicode.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
+     * @throws Exception Cuando se produce un error no identificado.
      * @deprecated Los ficheros deben cargarse en base64 (getMultiFileNameContentBase64) y
      * despu&eacute;s convertirse a texto con la codificaci&oacute;n que se desee (getTextFromBase64). */
     @Deprecated
@@ -210,6 +218,7 @@ interface MiniAfirma {
      * @return El nombre del fichero y su contenido en base64.
      * @throws IOException Cuando ocurre alg&uacute;n error en la lectura del fichero.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
+     * @throws Exception Cuando se produce un error no identificado.
      */
     String getFileNameContentBase64(final String title, final String extensions, final String description) throws IOException, PrivilegedActionException, Exception;
 
@@ -224,7 +233,9 @@ interface MiniAfirma {
      * @param description Descripci&oacute;n del tipo de fichero que se desea cargar.
      * @return Array con los nombres del ficheros y sus contenidos en Base64.
      * @throws IOException Cuando ocurre alg&uacute;n error en la lectura del fichero.
-     * @throws PrivilegedActionException Cuando ocurre un error de seguridad. */
+     * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
+     * @throws Exception Cuando se produce un error no identificado.
+     */
     String[] getMultiFileNameContentBase64(final String title, final String extensions,final String description) throws IOException, PrivilegedActionException, Exception;
 
     /** Decodifica un texto en Base64. Si se introducen datos nulos se
@@ -268,9 +279,10 @@ interface MiniAfirma {
 
     /**
      * Recupera el error producido durante la &uacute;ltima operaci&oacute;n
-     * realizada por el applet. El texto obtenido consiste en la cadena de
-     * excepciones cualificadas que produjeron el error, separadas por la cadena ": "
-     * y seguidas igualmente por ": " y el mensaje del error. Por ejemplo:
+     * realizada por el applet. El texto obtenido ser&aacute; el declarado por el
+     * error producido. En caso de no haber ning&uacute;n mensaje de error, se
+     * utilizar&aacute; el texto completo declarado por este. Com&uacute;nmente,
+     * el tipo cualificado del error seguido del texto del mismo.Por ejemplo:
      * <p>{@code es.gob.afirma.keystores.main.common.AOCertificatesNotFoundException:
      * El almacen no contenia entradas validas}</p>
      * Si no se produjo ning&uacute;n error durante la
@@ -280,10 +292,11 @@ interface MiniAfirma {
     String getErrorMessage();
 
     /**
-     * Verifica los requisitos m&iacute;nimos de la plataforma en la que se ejecuta el applet.
-	 * Si no cumple los requisitos m&iacute;nimos lanza una excepci&oacute;n con la
-	 * descripci&oacute;n del problema.
-	 * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
+     * Recupera el tipo de error producido durante la &uacute;ltima operaci&oacute;n
+     * realizada por el applet. El texto obtenido consiste en el nombre de la
+     * excepci&oacute;n que genero el error. Si no se produjo ning&uacute;n error durante
+     * la operaci&oacute;n, se devolver&aacute; {@code null}.
+     * @return Tipo de error.
      */
-    void verifyPlatform() throws PrivilegedActionException;
+    String getErrorType();
 }
