@@ -10,11 +10,12 @@ public final class BCChecker {
     private static final String BC_VERSION = "1.46"; //$NON-NLS-1$
 
 	/** Comprueba que la versi&oacute;n de BouncyCastle existente sea v1.46 o superior.
-	 * @throws InvalidBouncyCastleException */
+	 * @throws InvalidBouncyCastleException Cuando no se puede detectar la versi&oacute;n de
+	 * BouncyCastle disponible o no es compatible con afirma. */
 	@SuppressWarnings("static-method")
 	public void checkBouncyCastle() {
         final String bcVersion = Platform.getBouncyCastleVersion();
-        if (bcVersion != null && BC_VERSION.compareTo(bcVersion) > 0) {
+        if (bcVersion == null || BC_VERSION.compareTo(bcVersion) > 0) {
             throw new InvalidBouncyCastleException(
         		"igual o superior a " + BC_VERSION, //$NON-NLS-1$
         		bcVersion
