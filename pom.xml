@@ -55,5 +55,6 @@
     <module>afirma-ui-simpleafirma</module>
     <module>afirma-ui-applet</module>
     <module>afirma-lib-jmimemagic</module>
+    <module>afirma-platformcheck</module>
   </modules>
 </project>
