@@ -239,7 +239,7 @@ public final class AOKeyStoreManagerFactory {
             catch (final AOException e) {
                 throw new AOKeystoreAlternativeException(
                     getAlternateKeyStoreType(store),
-                    "Error al inicializar el almacen NSS unificado de Mozilla Firefox: " + e, //$NON-NLS-1$
+                    "Error al inicializar el almacen NSS unificado de Mozilla Firefox", //$NON-NLS-1$
                     e
                 );
             }

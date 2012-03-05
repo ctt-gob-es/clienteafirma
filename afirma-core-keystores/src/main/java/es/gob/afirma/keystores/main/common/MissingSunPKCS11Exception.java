@@ -12,7 +12,7 @@ public class MissingSunPKCS11Exception extends MissingLibraryException {
 	/** Crea una nueva instancia de la excepci&oacute;n.
 	 * @param e Excepci&oacute;n previa en la cadena */
 	public MissingSunPKCS11Exception(final Exception e) {
-		super("No esta instalada la biblioteca SunPKCS11: " + e, e); //$NON-NLS-1$
+		super("No esta instalada la biblioteca SunPKCS11", e); //$NON-NLS-1$
 	}
 
 }

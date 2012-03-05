@@ -407,7 +407,7 @@ public class AOKeyStoreManager {
                 p = (Provider) AOUtil.classForName("es.gob.afirma.keystores.capiaddressbook.MSCAPIAddressBook").newInstance(); //$NON-NLS-1$
             }
             catch (final Exception e) {
-                throw new MissingLibraryException("No se ha posido instanciar el proveedor MSCAPIAddressBook: " + e, e); //$NON-NLS-1$
+                throw new MissingLibraryException("No se ha podido instanciar el proveedor MSCAPIAddressBook", e); //$NON-NLS-1$
             }
             Security.addProvider(p);
         }

@@ -12,7 +12,7 @@ public class MissingSunMSCAPIException extends MissingLibraryException {
 	/** Crea una nueva instancia de la excepci&oacute;n.
 	 * @param e Excepci&oacute;n previa en la cadena */
 	public MissingSunMSCAPIException(final Exception e) {
-		super("No esta instalada la biblioteca SunMSCAPI: " + e, e); //$NON-NLS-1$
+		super("No esta instalada la biblioteca SunMSCAPI", e); //$NON-NLS-1$
 	}
 
 }
