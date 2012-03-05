@@ -56,5 +56,6 @@
     <module>afirma-ui-applet</module>
     <module>afirma-lib-jmimemagic</module>
     <module>afirma-platformcheck</module>
+    <module>afirma-crypto-pdf-itext</module>
   </modules>
 </project>

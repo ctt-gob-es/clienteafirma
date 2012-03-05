@@ -32,11 +32,6 @@
       <version>${project.version}</version>
     </dependency>
 
-    <dependency>
-      <groupId>jmimemagic</groupId>
-      <artifactId>jmimemagic</artifactId>
-      <version>0.1.2</version>
-    </dependency>
 
     <dependency>
       <groupId>org.bouncycastle</groupId>
@@ -55,6 +50,11 @@
       <artifactId>junit</artifactId>
       <version>4.8.2</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+    	<groupId>es.gob.afirma</groupId>
+    	<artifactId>afirma-lib-jmimemagic</artifactId>
+    	<version>${project.version}</version>
     </dependency>
   </dependencies>
 
