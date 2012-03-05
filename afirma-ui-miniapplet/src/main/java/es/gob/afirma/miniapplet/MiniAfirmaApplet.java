@@ -71,7 +71,8 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			PrivilegedActionException,
 			IOException,
 			InvalidLibraryException,
-			MissingLibraryException {
+			MissingLibraryException,
+			Exception {
 		this.cleanErrorMessage();
 
 		if (dataB64 == null) {
@@ -103,7 +104,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		}
 		catch (final Exception e) {
 			setErrorMessage(e);
-			throw new PrivilegedActionException(e);
+			throw e;
 		}
 	}
 
@@ -116,7 +117,8 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			PrivilegedActionException,
 			IOException,
 			InvalidLibraryException,
-			MissingLibraryException {
+			MissingLibraryException,
+			Exception {
 		this.cleanErrorMessage();
 
 		if (signB64 == null) {
@@ -149,7 +151,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		}
 		catch (final Exception e) {
 			setErrorMessage(e);
-			throw new PrivilegedActionException(e);
+			throw e;
 		}
 
 	}
@@ -162,7 +164,8 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			PrivilegedActionException,
 			IOException,
 			InvalidLibraryException,
-			MissingLibraryException {
+			MissingLibraryException,
+			Exception {
 		this.cleanErrorMessage();
 
 		if (signB64 == null) {
@@ -193,13 +196,13 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		}
 		catch (final Exception e) {
 			setErrorMessage(e);
-			throw new PrivilegedActionException(e);
+			throw e;
 		}
 	}
 
 	/** {@inheritDoc} */
 	public String getSignersStructure(final String signB64)
-		throws IOException, PrivilegedActionException, AOFormatFileException, InvalidLibraryException{
+		throws IOException, PrivilegedActionException, AOFormatFileException, InvalidLibraryException, Exception{
 
 		this.cleanErrorMessage();
 
@@ -221,7 +224,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		}
 		catch (final Exception e) {
 			setErrorMessage(e);
-			throw new PrivilegedActionException(e);
+			throw e;
 		}
 
 		if (signer == null) {
@@ -239,7 +242,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			final String title,
 			final String fileName,
 			final String extension,
-			final String description) throws PrivilegedActionException, IOException {
+			final String description) throws PrivilegedActionException, IOException, Exception {
 
 		this.cleanErrorMessage();
 
@@ -279,13 +282,13 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		}
 		catch (final Exception e) {
 			setErrorMessage(e);
-			throw new PrivilegedActionException(e);
+			throw e;
 		}
 	}
 
 	/** {@inheritDoc} */
 	@Deprecated
-	public String getFileContent(final String title, final String extensions, final String description) throws PrivilegedActionException {
+	public String getFileContent(final String title, final String extensions, final String description) throws PrivilegedActionException, Exception {
 
 		this.cleanErrorMessage();
 
@@ -307,26 +310,26 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		}
 		catch (final Exception e) {
 			setErrorMessage(e);
-			throw new PrivilegedActionException(e);
+			throw e;
 		}
 	}
 
 	/** {@inheritDoc} */
 	@Deprecated
-	public String getFileNameContentText(final String title, final String extensions, final String description) throws PrivilegedActionException {
+	public String getFileNameContentText(final String title, final String extensions, final String description) throws PrivilegedActionException, Exception {
 		this.cleanErrorMessage();
 		// Se llama a setError() desde getFileNameContent, no es necesario repetirlo aqui
 		return this.getFileNameContent(title, extensions, description, false);
 	}
 
 	/** {@inheritDoc} */
-	public String getFileNameContentBase64(final String title, final String extensions, final String description) throws PrivilegedActionException {
+	public String getFileNameContentBase64(final String title, final String extensions, final String description) throws PrivilegedActionException, Exception {
 		this.cleanErrorMessage();
 		// Se llama a setError() desde getFileNameContent, no es necesario repetirlo aqui
 		return this.getFileNameContent(title, extensions, description, true);
 	}
 
-	private String getFileNameContent(final String title, final String extensions, final String description, final boolean asBase64) throws PrivilegedActionException {
+	private String getFileNameContent(final String title, final String extensions, final String description, final boolean asBase64) throws PrivilegedActionException, Exception {
 
 		this.cleanErrorMessage();
 
@@ -348,7 +351,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		}
 		catch (final Exception e) {
 			setErrorMessage(e);
-			throw new PrivilegedActionException(e);
+			throw e;
 		}
 	}
 
@@ -357,14 +360,14 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	@Deprecated
 	public String[] getMultiFileNameContentText(final String title,
 			final String extensions,
-			final String description) throws PrivilegedActionException {
+			final String description) throws PrivilegedActionException, Exception {
 		return this.getMultiFileNameContent(title, extensions, description, false);
 	}
 
 	/** {@inheritDoc} */
 	public String[] getMultiFileNameContentBase64(final String title,
 			final String extensions,
-			final String description) throws IOException, PrivilegedActionException {
+			final String description) throws IOException, PrivilegedActionException, Exception {
 		return this.getMultiFileNameContent(title, extensions, description, true);
 	}
 
@@ -379,7 +382,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	 * @return Listado de tuplas "NombreFichero|Contenido".
 	 * @throws PrivilegedActionException Cuando ocurre alg&uacute;n error durante la operaci&oacute;n.
 	 */
-	private String[] getMultiFileNameContent(final String title, final String extensions, final String description, final boolean asBase64) throws PrivilegedActionException {
+	private String[] getMultiFileNameContent(final String title, final String extensions, final String description, final boolean asBase64) throws PrivilegedActionException, Exception {
 
 		this.cleanErrorMessage();
 
@@ -401,7 +404,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		}
 		catch (final Exception e) {
 			setErrorMessage(e);
-			throw new PrivilegedActionException(e);
+			throw e;
 		}
 	}
 
