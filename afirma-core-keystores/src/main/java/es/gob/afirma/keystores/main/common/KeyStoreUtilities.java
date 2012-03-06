@@ -412,7 +412,16 @@ public final class KeyStoreUtilities {
     	// si hay mas de un certificado que se ajuste al filtro, se dara a
     	// elegir
     	if (mandatoryCertificate && aliassesByFriendlyName.size() == 1) {
-    		return aliassesByFriendlyName.keySet().toArray()[0].toString();
+    		if (AOUIFactory.showConfirmDialog(
+				null,
+				KeyStoreMessages.getString("KeyStoreUtilities.8"), //$NON-NLS-1$
+				KeyStoreMessages.getString("KeyStoreUtilities.9"), //$NON-NLS-1$
+				AOUIFactory.YES_NO_OPTION,
+				AOUIFactory.WARNING_MESSAGE
+			) == AOUIFactory.YES_OPTION) {
+    			return aliassesByFriendlyName.keySet().toArray()[0].toString();
+    		}
+    		throw new AOCancelledOperationException();
     	}
 
     	// Ordenamos el array de alias justo antes de mostrarlo, ignorando entre
