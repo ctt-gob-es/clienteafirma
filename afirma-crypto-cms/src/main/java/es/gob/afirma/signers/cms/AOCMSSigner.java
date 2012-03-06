@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -22,10 +22,11 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
+import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.util.tree.AOTreeModel;
+import es.gob.afirma.signers.pkcs7.BCChecker;
 import es.gob.afirma.signers.pkcs7.GenSignedData;
 import es.gob.afirma.signers.pkcs7.ObtainContentSignedData;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
@@ -47,11 +48,13 @@ public final class AOCMSSigner implements AOSigner {
     private String dataType = null;
     private final Map<String, byte[]> atrib = new HashMap<String, byte[]>();
     private final Map<String, byte[]> uatrib = new HashMap<String, byte[]>();
-    
+
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** {@inheritDoc} */
     public byte[] sign(final byte[] data, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException {
+
+    	new BCChecker().checkBouncyCastle();
 
         final Properties extraParams = (xParams != null) ? xParams : new Properties();
 
@@ -90,6 +93,8 @@ public final class AOCMSSigner implements AOSigner {
     /** {@inheritDoc} */
     public byte[] cosign(final byte[] data, final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException {
 
+    	new BCChecker().checkBouncyCastle();
+
         final Properties extraParams = (xParams != null) ? xParams : new Properties();
 
         final String precalculatedDigest = extraParams.getProperty("precalculatedHashAlgorithm"); //$NON-NLS-1$
@@ -125,6 +130,8 @@ public final class AOCMSSigner implements AOSigner {
     /** {@inheritDoc} */
     public byte[] cosign(final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties extraParams) throws AOException {
 
+    	new BCChecker().checkBouncyCastle();
+
         // tipos de datos a firmar.
         if (this.dataType == null) {
             this.dataType = PKCSObjectIdentifiers.data.getId();
@@ -152,6 +159,8 @@ public final class AOCMSSigner implements AOSigner {
                               final Object[] targets,
                               final PrivateKeyEntry keyEntry,
                               final Properties extraParams) throws AOException {
+
+    	new BCChecker().checkBouncyCastle();
 
         final P7ContentSignerParameters csp = new P7ContentSignerParameters(sign, algorithm, (X509Certificate[]) keyEntry.getCertificateChain());
 
@@ -210,12 +219,13 @@ public final class AOCMSSigner implements AOSigner {
         } else {
             throw new AOException("Los datos no se corresponden con una firma CMS valida");     //$NON-NLS-1$
         }
-        
+
         return dataSigned;
     }
 
     /** {@inheritDoc} */
     public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
+    	new BCChecker().checkBouncyCastle();
         final ReadNodesTree rn = new ReadNodesTree();
         try {
             return rn.readNodesTree(sign, asSimpleSignInfo);

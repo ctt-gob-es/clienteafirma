@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -23,9 +23,11 @@ import org.bouncycastle.asn1.cms.SignedData;
 import org.bouncycastle.asn1.cms.SignerInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 
+import es.gob.afirma.signers.pkcs7.BCChecker;
+
 /** Clase que permite verificar si unos datos se corresponden con una firma CMS. */
 final class ValidateCMSSignedData {
-    
+
     private ValidateCMSSignedData() {
         // No permitimos la instanciacion
     }
@@ -35,6 +37,7 @@ final class ValidateCMSSignedData {
      *        Datos CMS.
      * @return si es de este tipo. */
     public static boolean isCMSSignedData(final byte[] data) {
+    	new BCChecker().checkBouncyCastle();
         boolean isValid = true;
         try {
             final ASN1InputStream is = new ASN1InputStream(data);
