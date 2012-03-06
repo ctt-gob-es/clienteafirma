@@ -38,16 +38,38 @@
 			</plugin>
 
 			<!-- Proguard -->
-			<!-- <plugin> <groupId>com.pyx4me</groupId> <artifactId>proguard-maven-plugin</artifactId> 
-				<executions> <execution> <phase>process-classes</phase> <goals> <goal>proguard</goal> 
-				</goals> </execution> </executions> <configuration> <proguardVersion>4.4</proguardVersion> 
-				<obfuscate>true</obfuscate> <proguardInclude>src/main/resources/proguard.conf</proguardInclude> 
-				<injar>classes</injar> <libs> <lib>${java.home}/lib/rt.jar</lib> <lib>${java.home}/lib/jsse.jar</lib> 
-				<lib>${java.home}/lib/ext/sunpkcs11.jar</lib> </libs> <addMavenDescriptor>false</addMavenDescriptor> 
-				</configuration> <dependencies> <dependency> <groupId>net.sf.proguard</groupId> 
-				<artifactId>proguard</artifactId> <version>4.4</version> <scope>runtime</scope> 
-				</dependency> </dependencies> </plugin> -->
-
+			<plugin>
+				<groupId>com.pyx4me</groupId>
+				<artifactId>proguard-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>process-classes</phase>
+						<goals>
+							<goal>proguard</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<proguardVersion>4.4</proguardVersion>
+					<obfuscate>true</obfuscate>
+					<proguardInclude>src/main/resources/proguard.conf</proguardInclude>
+					<injar>classes</injar>
+					<libs>
+						<lib>${java.home}/lib/rt.jar</lib>
+						<lib>${java.home}/lib/jsse.jar</lib>
+						<lib>${java.home}/lib/ext/sunpkcs11.jar</lib>
+					</libs>
+					<addMavenDescriptor>false</addMavenDescriptor>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>net.sf.proguard</groupId>
+						<artifactId>proguard</artifactId>
+						<version>4.4</version>
+						<scope>runtime</scope>
+					</dependency>
+				</dependencies>
+			</plugin>
 		</plugins>
 	</build>
 </project>
