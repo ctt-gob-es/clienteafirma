@@ -73,18 +73,21 @@ public final class QualifiedCertificatesFilter extends CertificateFilter {
 	@Override
 	public String[] matches(final String[] aliases, final AOKeyStoreManager ksm) {
 
-		final X509Certificate[] certs = new X509Certificate[aliases.length];
-		for (int i = 0; i < aliases.length; i++) {
-			certs[i] = ksm.getCertificate(aliases[i]);
-		}
-
 		X509Certificate cert;
 		final List<String> filteredCerts = new ArrayList<String>();
 		for (int i = 0; i < aliases.length; i++) {
 			cert = ksm.getCertificate(aliases[i]);
+			if (cert == null) {
+				Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+						"No se pudo recuperar el certificado: " + aliases[i]); //$NON-NLS-1$
+				continue;
+			}
 			try {
 				if (this.matches(cert)) {
-					if (!this.isSignatureCert(cert)) {
+					if (this.isSignatureCert(cert)) {
+						filteredCerts.add(aliases[i]);
+					}
+					else {
 						final String qualifiedCertAlias = searchQualifiedSignatureCertificate(cert, ksm, aliases);
 						if (qualifiedCertAlias == null) {
 							filteredCerts.add(aliases[i]);
@@ -92,14 +95,12 @@ public final class QualifiedCertificatesFilter extends CertificateFilter {
 							filteredCerts.add(qualifiedCertAlias);
 						}
 					}
-					else {
-						filteredCerts.add(aliases[i]);
-					}
 				}
 			} catch (final Exception e) {
 				Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
 						"Error en la verificacion del certificado '" + //$NON-NLS-1$
 						cert.getSerialNumber() + "': " + e);  //$NON-NLS-1$
+				e.printStackTrace();
 			}
 		}
 		return filteredCerts.toArray(new String[filteredCerts.size()]);
