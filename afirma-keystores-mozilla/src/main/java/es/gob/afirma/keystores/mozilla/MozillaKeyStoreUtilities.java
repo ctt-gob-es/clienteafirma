@@ -370,10 +370,7 @@ final class MozillaKeyStoreUtilities {
      * Services</i>) del sistema.
      * @return Directorio de las bibliotecas NSS del sistema
      * @throws FileNotFoundException
-     *         Si no se puede encontrar NSS en el sistema
-     * @throws AOException
-     *         Cuando no se ha podido encontrar y cargar una versi&oacute;n
-     *         v&aacute;lidad de NSS. */
+     *         Si no se puede encontrar NSS en el sistema */
     static String getSystemNSSLibDir() throws FileNotFoundException {
 
         if (nssLibDir != null) {
@@ -549,7 +546,7 @@ final class MozillaKeyStoreUtilities {
                     System.load(libPath);
                 }
             }
-            catch (final Exception e) {
+            catch (final Error e) {
                LOGGER.warning(
                  "Error al cargar la biblioteca " + libPath + " para el acceso al almacen de claves de Mozilla: " + e //$NON-NLS-1$ //$NON-NLS-2$
                );
@@ -622,29 +619,28 @@ final class MozillaKeyStoreUtilities {
 		if (longPath == null) {
 			return longPath;
 		}
+
 		final File dir = new File(longPath);
 		if (!dir.exists() || !dir.isDirectory()) {
 			return longPath;
 		}
+
 		try {
 			final Process p = new ProcessBuilder(
-				"cmd.exe", "/c", "dir /ad /x " + longPath + "\\..\\?" + longPath.substring(longPath.lastIndexOf('\\')+2, longPath.length()) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				"cmd.exe", "/c", "dir /ad /x \"" + longPath + "\\..\\?" + longPath.substring(longPath.lastIndexOf('\\') + 2) + "\"" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 			).start();
-			final BufferedReader br = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(AOUtil.getDataFromInputStream(p.getInputStream()))));
+
+			final BufferedReader br = new BufferedReader(new InputStreamReader(
+					new ByteArrayInputStream(AOUtil.getDataFromInputStream(p.getInputStream()))));
 			String line = br.readLine();
 			while (line != null) {
 				if (line.contains(DIR_TAG)) {
-					final String ret =
-						longPath.substring(
-							0,
-							longPath.lastIndexOf('\\') + 1
-						) +
-						line.substring(
-							line.indexOf(DIR_TAG) + DIR_TAG.length(),
-							line.lastIndexOf(' ')
-						).trim();
-					if (!"".equals(ret)) { //$NON-NLS-1$
-						return ret;
+					final String path = longPath.substring(0, longPath.lastIndexOf('\\') + 1);
+					final String filenames = line.substring(line.indexOf(DIR_TAG) + DIR_TAG.length()).trim();
+					final String shortName = filenames.substring(0, filenames.indexOf(' '));
+
+					if (!"".equals(shortName)) { //$NON-NLS-1$
+						return path + shortName;
 					}
 					return longPath;
 				}
