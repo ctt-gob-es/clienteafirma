@@ -126,19 +126,22 @@ public final class QualifiedCertificatesFilter extends CertificateFilter {
 				append("Certificado original:\n").
 				append("\t- Numero de serie: ").append(cert.getSerialNumber()).append('\n').
 				append("\t- Issuer: ").append(cert.getIssuerDN()).append('\n').
-				append("\t- Fecha de caducidad: ").append(getExpiredDate(cert)).append('\n').
-				append("\t- KeyUsages:\n").
-				append("\t\t+ digitalSignature: ").append(cert.getKeyUsage()[0]).append('\n').
-				append("\t\t+ nonRepudiation: ").append(cert.getKeyUsage()[1]).append('\n').
-				append("\t\t+ keyEncipherment: ").append(cert.getKeyUsage()[2]).append('\n').
-				append("\t\t+ dataEncipherment: ").append(cert.getKeyUsage()[3]).append('\n').
-				append("\t\t+ keyAgreement: ").append(cert.getKeyUsage()[4]).append('\n').
-				append("\t\t+ keyCertSign: ").append(cert.getKeyUsage()[5]).append('\n').
-				append("\t\t+ cRLSign: ").append(cert.getKeyUsage()[6]).append('\n').
-				append("\t\t+ encipherOnly: ").append(cert.getKeyUsage()[7]).append('\n').
-				append("\t\t+ decipherOnly: ").append(cert.getKeyUsage()[8]).append('\n').
-				append(" -----\n");
-
+				append("\t- Fecha de caducidad: ").append(getExpiredDate(cert)).append('\n');
+				if (cert.getKeyUsage() != null) {
+					buffer.append("\t- KeyUsages:\n").
+					append("\t\t+ digitalSignature: ").append(cert.getKeyUsage()[0]).append('\n').
+					append("\t\t+ nonRepudiation: ").append(cert.getKeyUsage()[1]).append('\n').
+					append("\t\t+ keyEncipherment: ").append(cert.getKeyUsage()[2]).append('\n').
+					append("\t\t+ dataEncipherment: ").append(cert.getKeyUsage()[3]).append('\n').
+					append("\t\t+ keyAgreement: ").append(cert.getKeyUsage()[4]).append('\n').
+					append("\t\t+ keyCertSign: ").append(cert.getKeyUsage()[5]).append('\n').
+					append("\t\t+ cRLSign: ").append(cert.getKeyUsage()[6]).append('\n').
+					append("\t\t+ encipherOnly: ").append(cert.getKeyUsage()[7]).append('\n').
+					append("\t\t+ decipherOnly: ").append(cert.getKeyUsage()[8]).append('\n');
+				} else {
+					buffer.append("\t- El certificado no tiene definidos KeyUsages\n");
+				}
+				buffer.append(" -----\n");
 
 		for (int j = 0; j < aliases.length; j++) {
 			cert2 = ksm.getCertificate(aliases[j]);
@@ -146,18 +149,22 @@ public final class QualifiedCertificatesFilter extends CertificateFilter {
 				buffer.append("Certificado:\n").
 				append("\t- Numero de serie: ").append(cert2.getSerialNumber()).append('\n').
 				append("\t- Issuer: ").append(cert2.getIssuerDN()).append('\n').
-				append("\t- Fecha de caducidad: ").append(getExpiredDate(cert2)).append('\n').
-				append("\t- KeyUsages:\n").
-				append("\t\t+ digitalSignature: ").append(cert2.getKeyUsage()[0]).append('\n').
-				append("\t\t+ nonRepudiation: ").append(cert2.getKeyUsage()[1]).append('\n').
-				append("\t\t+ keyEncipherment: ").append(cert2.getKeyUsage()[2]).append('\n').
-				append("\t\t+ dataEncipherment: ").append(cert2.getKeyUsage()[3]).append('\n').
-				append("\t\t+ keyAgreement: ").append(cert2.getKeyUsage()[4]).append('\n').
-				append("\t\t+ keyCertSign: ").append(cert2.getKeyUsage()[5]).append('\n').
-				append("\t\t+ cRLSign: ").append(cert2.getKeyUsage()[6]).append('\n').
-				append("\t\t+ encipherOnly: ").append(cert2.getKeyUsage()[7]).append('\n').
-				append("\t\t+ decipherOnly: ").append(cert2.getKeyUsage()[8]).append('\n').
-				append(" -----\n");
+				append("\t- Fecha de caducidad: ").append(getExpiredDate(cert2)).append('\n');
+				if (cert2.getKeyUsage() != null) {
+					buffer.append("\t- KeyUsages:\n").
+					append("\t\t+ digitalSignature: ").append(cert2.getKeyUsage()[0]).append('\n').
+					append("\t\t+ nonRepudiation: ").append(cert2.getKeyUsage()[1]).append('\n').
+					append("\t\t+ keyEncipherment: ").append(cert2.getKeyUsage()[2]).append('\n').
+					append("\t\t+ dataEncipherment: ").append(cert2.getKeyUsage()[3]).append('\n').
+					append("\t\t+ keyAgreement: ").append(cert2.getKeyUsage()[4]).append('\n').
+					append("\t\t+ keyCertSign: ").append(cert2.getKeyUsage()[5]).append('\n').
+					append("\t\t+ cRLSign: ").append(cert2.getKeyUsage()[6]).append('\n').
+					append("\t\t+ encipherOnly: ").append(cert2.getKeyUsage()[7]).append('\n').
+					append("\t\t+ decipherOnly: ").append(cert2.getKeyUsage()[8]).append('\n');
+				} else {
+					buffer.append("\t- El certificado no tiene definidos KeyUsages\n");
+				}
+				buffer.append(" -----\n");
 				final boolean sameIssuer = (cert.getIssuerDN() == null ?
 						cert2.getIssuerDN() == null : cert.getIssuerDN().equals(cert2.getIssuerDN()));
 				final boolean sameSubjectSN = (getSubjectSN(cert) == null ?
