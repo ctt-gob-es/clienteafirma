@@ -412,16 +412,18 @@ public final class KeyStoreUtilities {
     	// si hay mas de un certificado que se ajuste al filtro, se dara a
     	// elegir
     	if (mandatoryCertificate && aliassesByFriendlyName.size() == 1) {
-    		if (AOUIFactory.showConfirmDialog(
-    			parentComponent,
-				KeyStoreMessages.getString("KeyStoreUtilities.8"), //$NON-NLS-1$
-				KeyStoreMessages.getString("KeyStoreUtilities.9"), //$NON-NLS-1$
-				AOUIFactory.YES_NO_OPTION,
-				AOUIFactory.WARNING_MESSAGE
-			) == AOUIFactory.YES_OPTION) {
+    		// Mostramos un aviso para asegurar que no se puede realizar una firma sin el
+    		// conocimiento del usuario
+//    		if (AOUIFactory.showConfirmDialog(
+//    			parentComponent,
+//				KeyStoreMessages.getString("KeyStoreUtilities.8"), //$NON-NLS-1$
+//				KeyStoreMessages.getString("KeyStoreUtilities.9"), //$NON-NLS-1$
+//				AOUIFactory.YES_NO_OPTION,
+//				AOUIFactory.WARNING_MESSAGE
+//			) == AOUIFactory.YES_OPTION) {
     			return aliassesByFriendlyName.keySet().toArray()[0].toString();
-    		}
-    		throw new AOCancelledOperationException();
+//    		}
+//    		throw new AOCancelledOperationException();
     	}
 
     	// Ordenamos el array de alias justo antes de mostrarlo, ignorando entre
