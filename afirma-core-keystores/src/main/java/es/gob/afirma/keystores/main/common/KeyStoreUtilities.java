@@ -413,7 +413,7 @@ public final class KeyStoreUtilities {
     	// elegir
     	if (mandatoryCertificate && aliassesByFriendlyName.size() == 1) {
     		if (AOUIFactory.showConfirmDialog(
-				null,
+    			parentComponent,
 				KeyStoreMessages.getString("KeyStoreUtilities.8"), //$NON-NLS-1$
 				KeyStoreMessages.getString("KeyStoreUtilities.9"), //$NON-NLS-1$
 				AOUIFactory.YES_NO_OPTION,
