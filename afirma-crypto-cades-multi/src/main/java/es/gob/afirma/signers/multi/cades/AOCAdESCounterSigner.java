@@ -15,18 +15,17 @@ import java.security.cert.X509Certificate;
 import java.util.Properties;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.signers.AOCounterSigner;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.signers.CounterSignTarget;
+import es.gob.afirma.signers.cades.AOCAdESSigner;
 import es.gob.afirma.signers.cades.CAdESValidator;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.ReadNodesTree;
 
 /** Operaciones de cofirma CAdES. */
 public class AOCAdESCounterSigner implements AOCounterSigner {
-
-	private static final String CONTENTTYPE_OID = "contentTypeOid"; //$NON-NLS-1$
-	private static final String CONTENT_DESCRIPTION = "contentDescription"; //$NON-NLS-1$
 
 	/** {@inheritDoc} */
     public byte[] countersign(final byte[] sign,
@@ -40,12 +39,21 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
 
         final P7ContentSignerParameters csp = new P7ContentSignerParameters(sign, algorithm, (X509Certificate[]) keyEntry.getCertificateChain());
 
+
+
+        String contentTypeOid = MimeHelper.DEFAULT_CONTENT_OID_DATA;
+        String contentDescription = MimeHelper.DEFAULT_CONTENT_DESCRIPTION;
+        final byte[] data = new AOCAdESSigner().getData(sign);
+        if (data != null) {
+        	final MimeHelper mimeHelper = new MimeHelper(data);
+			contentDescription = mimeHelper.getDescription();
+			contentTypeOid = MimeHelper.transformMimeTypeToOid(mimeHelper.getMimeType());
+        }
+
         // Datos firmados.
         byte[] dataSigned = null;
-
         // Si la firma que nos introducen es SignedData
-        final boolean signedData = CAdESValidator.isCAdESSignedData(sign);
-        if (signedData) {
+        if (CAdESValidator.isCAdESSignedData(sign)) {
             try {
                 // CASO DE FIRMA DE ARBOL
                 if (targetType == CounterSignTarget.TREE) {
@@ -60,8 +68,8 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
 	                       nodes,
 	                       keyEntry,
 	                       new AdESPolicy(extraParams),
-	                       extraParams.getProperty(CONTENTTYPE_OID),
-	                       extraParams.getProperty(CONTENT_DESCRIPTION)
+	                       contentTypeOid,
+	                       contentDescription
                     );
                 }
                 // CASO DE FIRMA DE HOJAS
@@ -77,8 +85,8 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                                 nodes,
                                 keyEntry,
                                 new AdESPolicy(extraParams),
-                                extraParams.getProperty(CONTENTTYPE_OID),
-                                extraParams.getProperty(CONTENT_DESCRIPTION)
+                                contentTypeOid,
+                                contentDescription
                     		);
                 }
                 // CASO DE FIRMA DE NODOS
@@ -96,8 +104,8 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                                 nodesID,
                                 keyEntry,
                                 new AdESPolicy(extraParams),
-                                extraParams.getProperty(CONTENTTYPE_OID),
-                                extraParams.getProperty(CONTENT_DESCRIPTION)
+                                contentTypeOid,
+                                contentDescription
                             );
                 }
                 // CASO DE FIRMA DE NODOS DE UNO O VARIOS FIRMANTES
@@ -118,8 +126,8 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                                 nodes2,
                                 keyEntry,
                                 new AdESPolicy(extraParams),
-                                extraParams.getProperty(CONTENTTYPE_OID),
-                                extraParams.getProperty(CONTENT_DESCRIPTION)
+                                contentTypeOid,
+                                contentDescription
                     		);
 
                 }
@@ -148,8 +156,8 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                             nodes,
                             keyEntry,
                             new AdESPolicy(extraParams),
-                            extraParams.getProperty(CONTENTTYPE_OID),
-                            extraParams.getProperty(CONTENT_DESCRIPTION)
+                            contentTypeOid,
+                            contentDescription
                         );
             }
             // CASO DE FIRMA DE HOJAS
@@ -165,8 +173,8 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                             nodes,
                             keyEntry,
                             new AdESPolicy(extraParams),
-                            extraParams.getProperty(CONTENTTYPE_OID),
-                            extraParams.getProperty(CONTENT_DESCRIPTION)
+                            contentTypeOid,
+                            contentDescription
                 		);
             }
             // CASO DE FIRMA DE NODOS
@@ -183,8 +191,8 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                     nodesID,
                     keyEntry,
                     new AdESPolicy(extraParams),
-                    extraParams.getProperty(CONTENTTYPE_OID),
-                    extraParams.getProperty(CONTENT_DESCRIPTION)
+                    contentTypeOid,
+                    contentDescription
                 );
             }
             // CASO DE FIRMA DE NODOS DE UNO O VARIOS FIRMANTES
@@ -204,10 +212,9 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                     nodes2,
                     keyEntry,
                     new AdESPolicy(extraParams),
-                    extraParams.getProperty(CONTENTTYPE_OID),
-                    extraParams.getProperty(CONTENT_DESCRIPTION)
+                    contentTypeOid,
+                    contentDescription
                 );
-
             }
 
             return dataSigned;

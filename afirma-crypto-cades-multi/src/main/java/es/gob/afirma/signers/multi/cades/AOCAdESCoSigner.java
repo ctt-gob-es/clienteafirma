@@ -14,19 +14,19 @@ import java.io.ByteArrayInputStream;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.X509Certificate;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.signers.AOCoSigner;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
+import es.gob.afirma.signers.cades.AOCAdESSigner;
 import es.gob.afirma.signers.cades.CAdESValidator;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 
 /** Operaciones de cofirma CAdES. */
 public class AOCAdESCoSigner implements AOCoSigner {
-
-	private static final String CONTENTTYPE_OID = "contentTypeOid"; //$NON-NLS-1$
-	private static final String CONTENT_DESCRIPTION = "contentDescription"; //$NON-NLS-1$
 
 	/** {@inheritDoc} */
     public byte[] cosign(final byte[] data,
@@ -47,8 +47,20 @@ public class AOCAdESCoSigner implements AOCoSigner {
 
         final P7ContentSignerParameters csp = new P7ContentSignerParameters(data, algorithm, (X509Certificate[]) keyEntry.getCertificateChain());
 
-        try {
+        String contentTypeOid = MimeHelper.DEFAULT_CONTENT_OID_DATA;
+        String contentDescription = MimeHelper.DEFAULT_CONTENT_DESCRIPTION;
+		if (data != null) {
+			try {
+				final MimeHelper mimeHelper = new MimeHelper(data);
+				contentDescription = mimeHelper.getDescription();
+				contentTypeOid = MimeHelper.transformMimeTypeToOid(mimeHelper.getMimeType());
+			} catch (final Exception e) {
+				Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+						"No se han podido cargar las librerias para identificar el tipo de dato firmado: " + e); //$NON-NLS-1$
+			}
+		}
 
+        try {
             // Si la firma que nos introducen es SignedData
             //final boolean signedData = new ValidateCMS().isCMSSignedData(sign);
             final boolean signedData = CAdESValidator.isCAdESSignedData(sign);
@@ -64,8 +76,8 @@ public class AOCAdESCoSigner implements AOCoSigner {
                     new AdESPolicy(extraParams),
                     keyEntry,
                     messageDigest,
-                    extraParams.getProperty(CONTENTTYPE_OID),
-                    extraParams.getProperty(CONTENT_DESCRIPTION)
+                    contentTypeOid,
+                    contentDescription
                 );
             }
 
@@ -75,8 +87,8 @@ public class AOCAdESCoSigner implements AOCoSigner {
                  new AdESPolicy(extraParams),
                  keyEntry,
                  messageDigest,
-                 extraParams.getProperty(CONTENTTYPE_OID),
-                 extraParams.getProperty(CONTENT_DESCRIPTION)
+                 contentTypeOid,
+                 contentDescription
             );
 
         }
@@ -96,10 +108,18 @@ public class AOCAdESCoSigner implements AOCoSigner {
         // algoritmo de firma.
         final String typeAlgorithm = algorithm;
 
+        String contentTypeOid = MimeHelper.DEFAULT_CONTENT_OID_DATA;
+        String contentDescription = MimeHelper.DEFAULT_CONTENT_DESCRIPTION;
+        final byte[] data = new AOCAdESSigner().getData(sign);
+        if (data != null) {
+        	final MimeHelper mimeHelper = new MimeHelper(data);
+			contentDescription = mimeHelper.getDescription();
+			contentTypeOid = MimeHelper.transformMimeTypeToOid(mimeHelper.getMimeType());
+        }
+
+
         // Si la firma que nos introducen es SignedData
-        //final boolean signedData = new ValidateCMS().isCMSSignedData(sign);
-        final boolean signedData = CAdESValidator.isCAdESSignedData(sign);
-        if (signedData) {
+        if (CAdESValidator.isCAdESSignedData(sign)) {
             try {
                 return new CAdESCoSigner().coSigner(
                     typeAlgorithm,
@@ -108,16 +128,16 @@ public class AOCAdESCoSigner implements AOCoSigner {
                     new AdESPolicy(extraParams),
                     keyEntry,
                     null, // null porque no nos pueden dar un hash en este metodo, tendria que ser en el que incluye datos
-                    extraParams.getProperty(CONTENTTYPE_OID),
-                    extraParams.getProperty(CONTENT_DESCRIPTION)
+                    contentTypeOid,
+                    contentDescription
                 );
             }
             catch (final Exception e) {
                 throw new AOException("Error generando la Cofirma CADES", e); //$NON-NLS-1$
             }
         }
-        // Signed And Enveloped.
 
+        // Signed And Enveloped.
         try {
             return new CAdESCoSignerEnveloped().coSigner(
                  typeAlgorithm,
@@ -126,8 +146,8 @@ public class AOCAdESCoSigner implements AOCoSigner {
                  new AdESPolicy(extraParams),
                  keyEntry,
                  null, // null porque no nos pueden dar un hash en este metodo, tendria que ser en el que incluye datos
-                 extraParams.getProperty(CONTENTTYPE_OID),
-                 extraParams.getProperty(CONTENT_DESCRIPTION)
+                 contentTypeOid,
+                 contentDescription
             );
         }
         catch (final Exception e) {

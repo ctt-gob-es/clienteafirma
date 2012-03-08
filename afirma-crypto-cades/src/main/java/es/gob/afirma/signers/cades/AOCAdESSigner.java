@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.signers.AOCoSigner;
 import es.gob.afirma.core.signers.AOCounterSigner;
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -114,14 +115,6 @@ public final class AOCAdESSigner implements AOSigner {
      *     <code>data</code> son la huella digital de los datos a firmar, y no los datos a firmar en si.
      *    </b>
      *   </dd>
-     *   <dt><b><i>contentTypeOid</i></b></dt>
-     *   <dd>
-     *    OID que identifica el tipo de datos a firmar.
-     *   </dd>
-     *   <dt><b><i>contentDescription</i></b></dt>
-     *   <dd>
-     *    Texto description del tipo de contenido firmado.
-     *   </dd>
      * </dl>
      * @return Firma en formato CAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
@@ -151,6 +144,19 @@ public final class AOCAdESSigner implements AOSigner {
                 omitContent = true;
             }
 
+            String contentTypeOid = MimeHelper.DEFAULT_CONTENT_OID_DATA;
+            String contentDescription = MimeHelper.DEFAULT_CONTENT_DESCRIPTION;
+			if (data != null) {
+				try {
+					final MimeHelper mimeHelper = new MimeHelper(data);
+					contentDescription = mimeHelper.getDescription();
+					contentTypeOid = MimeHelper.transformMimeTypeToOid(mimeHelper.getMimeType());
+				} catch (final Exception e) {
+					Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+							"No se han podido cargar las librerias para identificar el tipo de dato firmado: " + e); //$NON-NLS-1$
+				}
+			}
+
 			return GenCAdESEPESSignedData.generateSignedData(
                    csp,
                    omitContent,
@@ -158,10 +164,9 @@ public final class AOCAdESSigner implements AOSigner {
                    keyEntry,
                    messageDigest,
                    Boolean.parseBoolean(extraParams.getProperty("padesMode", "false")), //$NON-NLS-1$ //$NON-NLS-2$
-                   extraParams.getProperty("contentTypeOid"), //$NON-NLS-1$
-                   extraParams.getProperty("contentDescription") //$NON-NLS-1$
+                   contentTypeOid,
+                   contentDescription
             );
-
         }
         catch (final Exception e) {
             throw new AOException("Error generando la firma CAdES", e); //$NON-NLS-1$
@@ -242,14 +247,6 @@ public final class AOCAdESSigner implements AOSigner {
      *     Siempre que se de valor a este par&aacute;metro se supondr&aacute; que los datos proporcionados en el par&aacute;metro
      *     <code>data</code> son la huella digital de los datos a firmar, y no los datos a firmar en si.
      *    </b>
-     *   </dd>
-     *   <dt><b><i>contentTypeOid</i></b></dt>
-     *   <dd>
-     *    OID del tipo de contenido.
-     *   </dd>
-     *   <dt><b><i>contentDescription</i></b></dt>
-     *   <dd>
-     *    Texto description del tipo de contenido firmado.
      *   </dd>
      * </dl>
      * @return Firma CAdES
@@ -332,14 +329,6 @@ public final class AOCAdESSigner implements AOSigner {
      *   <dd>
      *    URL que apunta al documento descriptivo de la pol&iacute;tica de firma (normalmente un documento PDF con una descripci&oacute;n textual).
      *   </dd>
-     *   <dt><b><i>contentTypeOid</i></b></dt>
-     *   <dd>
-     *    OID del tipo de contenido.
-     *   </dd>
-     *   <dt><b><i>contentDescription</i></b></dt>
-     *   <dd>
-     *    Texto description del tipo de contenido firmado.
-     *   </dd>
      * </dl>
      * @return Firma CAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
@@ -411,14 +400,6 @@ public final class AOCAdESSigner implements AOSigner {
      *  <dt><b><i>policyQualifier</i></b></dt>
      *   <dd>
      *    URL que apunta al documento descriptivo de la pol&iacute;tica de firma (normalmente un documento PDF con una descripci&oacute;n textual).
-     *   </dd>
-     *   <dt><b><i>contentTypeOid</i></b></dt>
-     *   <dd>
-     *    OID del tipo de contenido.
-     *   </dd>
-     *   <dt><b><i>contentDescription</i></b></dt>
-     *   <dd>
-     *    Texto description del tipo de contenido firmado.
      *   </dd>
      * </dl>
      * @return Contrafirma CAdES
