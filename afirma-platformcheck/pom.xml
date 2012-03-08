@@ -89,11 +89,9 @@
 			</plugin>
 
 			<!-- Proguard -->
-
 			<plugin>
-				<groupId>com.pyx4me</groupId>
+				<groupId>com.github.wvengen</groupId>
 				<artifactId>proguard-maven-plugin</artifactId>
-
 				<executions>
 					<execution>
 						<phase>process-classes</phase>
@@ -103,8 +101,7 @@
 					</execution>
 				</executions>
 				<configuration>
-					<proguardVersion>4.4</proguardVersion>
-					<obfuscate>true</obfuscate>
+					<proguardVersion>4.7</proguardVersion>
 					<proguardInclude>src/main/resources/proguard.conf</proguardInclude>
 					<injar>classes</injar>
 					<libs>
@@ -117,8 +114,8 @@
 				<dependencies>
 					<dependency>
 						<groupId>net.sf.proguard</groupId>
-						<artifactId>proguard</artifactId>
-						<version>4.4</version>
+						<artifactId>proguard-base</artifactId>
+						<version>4.7</version>
 						<scope>runtime</scope>
 					</dependency>
 				</dependencies>
