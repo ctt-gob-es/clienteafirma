@@ -331,6 +331,7 @@ public final class JAccessibilityFileChooserToSave extends JAccessibilityFileCho
                         JRootPane.FILE_CHOOSER_DIALOG);
             }
         }
+        this.dialog.getRootPane().setDefaultButton(getOpenButton());
         this.dialog.setResizable(true);
         this.dialog.pack();
         this.dialog.setLocationRelativeTo(parent);

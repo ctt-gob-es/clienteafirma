@@ -64,6 +64,7 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	private JButton restoreButton = null;
 	private JButton maximizeButton = null;
 	private JPanel accesibilityButtonsPanel = null;
+	private JButton openButton = null;
 
 	private static int actualPositionX = -1;
 	protected static int getActualPositionX() {
@@ -493,6 +494,7 @@ public class JAccessibilityFileChooser extends JFileChooser{
                         JRootPane.FILE_CHOOSER_DIALOG);
             }
         }
+        this.dialog.getRootPane().setDefaultButton(openButton);
         this.dialog.setResizable(true);
         this.dialog.pack();
         this.dialog.setLocationRelativeTo(parent);
@@ -531,6 +533,10 @@ public class JAccessibilityFileChooser extends JFileChooser{
 			if (jPanel.getComponent(i) instanceof JPanel){
 				accessibility((JPanel)jPanel.getComponent(i));
 			} else {
+				if (jPanel.getComponent(i).getClass().getName().equals("com.sun.java.swing.plaf.windows.WindowsFileChooserUI$9")){
+					openButton = (JButton)jPanel.getComponent(i);
+				}
+				
 				Utils.remarcar((JComponent)jPanel.getComponent(i));
 				Utils.setFontBold((JComponent)jPanel.getComponent(i));
 				Utils.setContrastColor((JComponent)jPanel.getComponent(i));
@@ -773,6 +779,9 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	}
 	protected static void setActualHeight(final int actualHeight) {
 		JAccessibilityFileChooser.actualHeight = actualHeight;
+	}
+	protected JButton getOpenButton(){
+		return this.openButton;
 	}
 
 }
