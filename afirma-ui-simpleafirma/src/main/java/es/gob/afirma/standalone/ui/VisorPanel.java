@@ -31,8 +31,6 @@ import es.gob.afirma.signature.SignValidity;
 import es.gob.afirma.signature.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.signature.ValidateBinarySignature;
 import es.gob.afirma.signature.ValidateXMLSignature;
-import es.gob.afirma.signers.cades.AOCAdESSigner;
-import es.gob.afirma.signers.cms.AOCMSSigner;
 import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.Messages;
@@ -75,7 +73,7 @@ public final class VisorPanel extends JPanel implements KeyListener {
         openSign(signFile, sign, addReloadButton);
     }
 
-    private void openSign(final File signFile, final byte[] signature, final boolean addRealoadButton) {
+    private void openSign(final File signFile, final byte[] signature, final boolean addReloadButton) {
 
         if (signFile == null && signature == null) {
             Logger.getLogger("es.gob.afirma").warning("Se ha intentado abrir una firma nula");  //$NON-NLS-1$ //$NON-NLS-2$
@@ -112,7 +110,7 @@ public final class VisorPanel extends JPanel implements KeyListener {
         final JPanel bottonPanel = new JPanel(true);
         bottonPanel.setLayout(new FlowLayout(FlowLayout.TRAILING));
 
-        if (addRealoadButton) {
+        if (addReloadButton) {
             final JButton openSign = new JButton(Messages.getString("VisorPanel.1")); //$NON-NLS-1$
             openSign.setMnemonic('V');
             bottonPanel.add(openSign);
@@ -170,13 +168,13 @@ public final class VisorPanel extends JPanel implements KeyListener {
      * @param sign Firma que se desea comprobar.
      * @return {@code true} si la firma es v&acute;lida, {@code false} en caso contrario. */
     private static SignValidity validateSign(final byte[] sign) {
-        if (DataAnalizerUtil.isPDF(sign)) {
+        if (DataAnalizerUtil.isSignedPDF(sign)) {
             return new SignValidity(SIGN_DETAIL_TYPE.OK, null);
         }
-        else if (DataAnalizerUtil.isXML(sign)) {
+        else if (DataAnalizerUtil.isSignedXML(sign)) {
             return ValidateXMLSignature.validate(sign);
         }
-        else if(new AOCMSSigner().isSign(sign) || new AOCAdESSigner().isSign(sign)) {
+        else if(DataAnalizerUtil.isSignedBinary(sign)) {
             return ValidateBinarySignature.validate(sign, null);
         }
         return new SignValidity(SIGN_DETAIL_TYPE.KO, null);

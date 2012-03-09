@@ -40,8 +40,6 @@ import es.gob.afirma.signature.SignValidity;
 import es.gob.afirma.signature.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.signature.ValidateBinarySignature;
 import es.gob.afirma.signature.ValidateXMLSignature;
-import es.gob.afirma.signers.cades.AOCAdESSigner;
-import es.gob.afirma.signers.cms.AOCMSSigner;
 import es.gob.afirma.ui.principal.PrincipalGUI;
 import es.gob.afirma.ui.utils.Constants;
 import es.gob.afirma.ui.utils.CustomDialog;
@@ -416,13 +414,13 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
      * @throws Exception Cuando los datos introducidos no se corresponden con una firma.
      */
     private static SignValidity validateSign(final byte[] sign) {
-        if (DataAnalizerUtil.isPDF(sign)) {
+        if (DataAnalizerUtil.isSignedPDF(sign)) {
             return new SignValidity(SIGN_DETAIL_TYPE.OK, null);
         }
-        else if (DataAnalizerUtil.isXML(sign)) {
+        else if (DataAnalizerUtil.isSignedXML(sign)) {
             return ValidateXMLSignature.validate(sign);
         }
-        else if(new AOCMSSigner().isSign(sign) || new AOCAdESSigner().isSign(sign)) {
+        else if(DataAnalizerUtil.isSignedBinary(sign)) {
             return ValidateBinarySignature.validate(sign, null);
         }
         return new SignValidity(SIGN_DETAIL_TYPE.KO, null);
