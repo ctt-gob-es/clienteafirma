@@ -38,7 +38,7 @@ public final class CompleteSignInfo {
      * @see #setSignData(byte[])
      */
     public byte[] getSignData() {
-        return this.signData.clone();
+        return this.signData == null ? null : this.signData.clone();
     }
 
     /**
@@ -86,7 +86,7 @@ public final class CompleteSignInfo {
      * @return Datos que se firmaron.
      */
     public byte[] getData() {
-        return this.data.clone();
+        return this.data == null ? null : this.data.clone();
     }
 
     /**
