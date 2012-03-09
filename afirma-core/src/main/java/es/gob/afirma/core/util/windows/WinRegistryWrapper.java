@@ -62,12 +62,19 @@ public final class WinRegistryWrapper {
         try {
             return WinRegistry.get(hKey, path, name);
         }
+        catch(final NoSuchMethodError e) {
+            LOGGER.severe(
+        		"No se ha podido obtener la clave de registro por una discordancia de version con deploy.dll, se devolvera null: " + e //$NON-NLS-1$
+            );
+        }
         catch (final Exception e) {
-            LOGGER.severe("No se ha podido obtener la clave de registro con ruta '" + path //$NON-NLS-1$
-                                                     + "' y nombre '" //$NON-NLS-1$
-                                                     + name
-                                                     + "', se devolvera null: " //$NON-NLS-1$
-                                                     + e);
+            LOGGER.severe(
+        		"No se ha podido obtener la clave de registro con ruta '" + path //$NON-NLS-1$
+                 + "' y nombre '" //$NON-NLS-1$
+                 + name
+                 + "', se devolvera null: " //$NON-NLS-1$
+                 + e
+             );
         }
         return null;
     }
