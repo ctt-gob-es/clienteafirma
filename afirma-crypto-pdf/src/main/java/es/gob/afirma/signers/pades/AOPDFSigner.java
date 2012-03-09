@@ -567,8 +567,15 @@ public final class AOPDFSigner implements AOSigner {
         }
         catch (final BadPasswordException e) {
             try {
-                pdfReader =
-                        new PdfReader(sign, new String(AOUIFactory.getPassword(PDFMessages.getString("AOPDFSigner.0"), null)).getBytes()); //$NON-NLS-1$
+                pdfReader = new PdfReader(
+            		sign,
+            		new String(
+        				AOUIFactory.getPassword(
+    						PDFMessages.getString("AOPDFSigner.0"), //$NON-NLS-1$
+    						null
+						)
+					).getBytes()
+        		);
             }
             catch (final BadPasswordException e2) {
                 LOGGER.severe("La contrasena del PDF no es valida, se devolvera un arbol vacio: " + e2); //$NON-NLS-1$
@@ -636,7 +643,10 @@ public final class AOPDFSigner implements AOSigner {
             LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
             return false;
         }
-        return isPdfFile(data);
+        if (!isPdfFile(data)) {
+        	return false;
+        }
+        return getSignersStructure(data, false).getCount().intValue() > 0;
     }
 
     @SuppressWarnings("unused")
