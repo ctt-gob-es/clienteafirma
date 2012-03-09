@@ -142,6 +142,7 @@ public class TestPAdES {
      */
     @SuppressWarnings("static-method")
 	@Test
+	@Ignore
     public void testPasswordSignature() throws Exception {
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
         final PrivateKeyEntry pke;
