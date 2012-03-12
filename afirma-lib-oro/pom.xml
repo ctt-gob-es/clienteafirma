@@ -2,8 +2,8 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>afirma-lib-jmimemagic</artifactId>
-	<name>afirma-lib-jmimemagic</name>
+	<artifactId>afirma-lib-oro</artifactId>
+	<name>afirma-lib-oro</name>
 
 	<parent>
 		<artifactId>afirma-client</artifactId>
@@ -18,12 +18,8 @@
 			<version>4.8.2</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>es.gob.afirma</groupId>
-			<artifactId>afirma-lib-oro</artifactId>
-			<version>3.2.0</version>
-		</dependency>
 	</dependencies>
+	
 	<build>
 		<plugins>
 			<plugin>

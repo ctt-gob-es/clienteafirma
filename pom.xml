@@ -57,5 +57,6 @@
     <module>afirma-lib-jmimemagic</module>
     <module>afirma-platformcheck</module>
     <module>afirma-crypto-pdf-itext</module>
+    <module>afirma-lib-oro</module>
   </modules>
 </project>
