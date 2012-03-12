@@ -1,42 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>es.gob.afirma</groupId>
-  <artifactId>afirma-client</artifactId>
-  <name>afirma-client</name>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>es.gob.afirma</groupId>
+	<artifactId>afirma-client</artifactId>
+	<name>afirma-client</name>
 
-  <parent>
-    <groupId>es.gob.afirma</groupId>
-    <artifactId>afirma-client</artifactId>
-    <version>3.2.0</version>
-  </parent>
+	<parent>
+		<groupId>es.gob.afirma</groupId>
+		<artifactId>afirma-client</artifactId>
+		<version>3.2.0</version>
+	</parent>
 
-  <dependencies>
-    <dependency>
-      <groupId>javax.xml</groupId>
-      <artifactId>xmldsign</artifactId>
-      <version>1.0</version>
-    </dependency>
+	<dependencies>
+		<dependency>
+			<groupId>javax.xml</groupId>
+			<artifactId>xmldsign</artifactId>
+			<version>1.0</version>
+		</dependency>
 
-    <dependency>
-      <groupId>org.bouncycastle</groupId>
-      <artifactId>bcprov-jdk16</artifactId>
-      <version>1.46</version>
-    </dependency>
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk16</artifactId>
+			<version>1.46</version>
+		</dependency>
 
-    <dependency>
-      <groupId>org.bouncycastle</groupId>
-      <artifactId>bcmail-jdk16</artifactId>
-      <version>1.46</version>
-    </dependency>
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcmail-jdk16</artifactId>
+			<version>1.46</version>
+		</dependency>
 
-    <dependency>
-      <groupId>jmimemagic</groupId>
-      <artifactId>jmimemagic</artifactId>
-      <version>0.1.2</version>
-    </dependency>
 
     <dependency>
       <groupId>commons-codec</groupId>
@@ -56,11 +51,6 @@
       <version>0.0.3</version>
     </dependency>
 
-    <dependency>
-      <groupId>com.lowagie</groupId>
-      <artifactId>itext</artifactId>
-      <version>2.1.7</version>
-    </dependency>
 
     <dependency>
       <groupId>javax.activation</groupId>
@@ -78,6 +68,12 @@
       <groupId>sunmscapi</groupId>
       <artifactId>sunmscapi</artifactId>
       <version>1.6</version>
+    </dependency>
+    
+    <dependency>
+    	<groupId>es.gob.afirma</groupId>
+    	<artifactId>afirma-lib-jmimemagic</artifactId>
+    	<version>${project.version}</version>
     </dependency>
   </dependencies>
 
