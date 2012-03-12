@@ -808,7 +808,10 @@ public class PrincipalGUI extends JAccessibilityFrame {
                 // UIManager.put("ToolTip.foreground",Color.WHITE);
                 // UIManager.put("ToolTip.background",Color.BLACK);
                 // UIManager.put("Label.foreground",Color.WHITE);
-                UIManager.put("FileChooserUI", "com.sun.java.swing.plaf.windows.WindowsFileChooserUI"); //$NON-NLS-1$//$NON-NLS-2$
+                // 
+                if (!((Platform.getOS().equals(Platform.OS.LINUX) && (System.getProperty("java.version").compareTo("1.7.0") > 0) ))){
+                	UIManager.put("FileChooserUI", "com.sun.java.swing.plaf.windows.WindowsFileChooserUI"); //$NON-NLS-1$//$NON-NLS-2$
+                }
                 // UIManager.put("TableHeader.foreground", Color.WHITE);
 
             }
@@ -828,7 +831,10 @@ public class PrincipalGUI extends JAccessibilityFrame {
                 // UIManager.put("ToolTip.foreground",Color.BLACK);
                 // UIManager.put("ToolTip.background",new Color(255,255,225));
                 // UIManager.put("Label.foreground",Color.BLACK);
-                UIManager.put("FileChooserUI", "com.sun.java.swing.plaf.windows.WindowsFileChooserUI"); //$NON-NLS-1$ //$NON-NLS-2$
+                // 
+                if (!((Platform.getOS().equals(Platform.OS.LINUX) && (System.getProperty("java.version").compareTo("1.7.0") > 0) ))){
+                	UIManager.put("FileChooserUI", "com.sun.java.swing.plaf.windows.WindowsFileChooserUI"); //$NON-NLS-1$//$NON-NLS-2$
+                }
                 // UIManager.put("TableHeader.foreground", Color.BLACK);
             }
 
