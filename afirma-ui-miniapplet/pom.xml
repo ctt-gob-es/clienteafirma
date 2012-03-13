@@ -56,6 +56,11 @@
     	<artifactId>afirma-lib-jmimemagic</artifactId>
     	<version>${project.version}</version>
     </dependency>
+    <dependency>
+    	<groupId>es.gob.afirma</groupId>
+    	<artifactId>afirma-lib-juniversalchardet</artifactId>
+    	<version>${project.version}</version>
+    </dependency>
   </dependencies>
 
   <build>
