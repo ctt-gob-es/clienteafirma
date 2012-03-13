@@ -216,7 +216,7 @@ interface MiniAfirma {
      *                 <li>UTF-16LE</li>
      *                 <li>UTF-16</li>
      *                </ul>
-     *                Adicionalmente, en vez del nombre de la codificaci&oacute;n, se puede usar dos identificadores especiales:
+     *                Adicionalmente, en vez del nombre de la codificaci&oacute;n, se pueden usar dos identificadores especiales:
      *                <dl>
      *                 <dt>default</dt>
      *                  <dd>Se utilizar&aacute; la codificaci&oacute;n por defecto del sistema. Es equivalente a usar <code>null</code>.</dd>
