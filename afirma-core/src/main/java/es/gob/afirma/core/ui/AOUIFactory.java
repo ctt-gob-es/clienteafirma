@@ -11,6 +11,7 @@
 package es.gob.afirma.core.ui;
 
 import java.io.File;
+import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
@@ -56,7 +57,14 @@ public final class AOUIFactory {
             if (Platform.OS.ANDROID.equals(Platform.getOS())) {
                 throw new UnsupportedOperationException("No se soporta GUI en Android"); //$NON-NLS-1$
             }
-            uiManager = (AOUIManager) AOUtil.classForName("es.gob.afirma.ui.core.jse.JSEUIManager").newInstance(); //$NON-NLS-1$
+            try {
+            	uiManager = (AOUIManager) AOUtil.classForName("es.gob.afirma.ui.core.jse.JSEUIManager").newInstance(); //$NON-NLS-1$
+            }
+            catch(final Exception e) {
+            	Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+        			"No se ha podido instanciar la implementacion de gestor de interfaces graficas: " + e //$NON-NLS-1$
+    			);
+            }
             PLAIN_MESSAGE = uiManager.getPlainMessageCode();
             YES_NO_OPTION = uiManager.getYesNoOptionCode();
             WARNING_MESSAGE = uiManager.getWarningMessageCode();
