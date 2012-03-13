@@ -53,6 +53,9 @@ public final class MassiveSignatureHelper {
     /** Manejador de firma para el formato configurado por defecto. */
     private AOSigner defaultSigner = null;
 
+    /** Indica si el objeto esta activo y preparado para ejecutar operaciones de firma. */
+    private boolean enabled = false;
+
     /** Contruye el m&oacute;dulo de soporte para la multifirma masiva.
      * @param configuration
      *        Configuracion de la operaci&oacute;n.
@@ -68,12 +71,32 @@ public final class MassiveSignatureHelper {
         }
 
         this.massiveConfiguration = configuration;
+        this.enabled = true;
 
         // Creamos el manejador de firma por defecto
         this.defaultSigner = AOSignerFactory.getSigner(this.massiveConfiguration.getDefaultFormat());
         if (this.defaultSigner == null) {
             throw new AOException("Formato de firma no soportado: " + this.massiveConfiguration.getDefaultFormat()); //$NON-NLS-1$
         }
+    }
+
+    /**
+     * Indica si el objeto esta inicializado correctamente con una configuraci&oacute;n de firma.
+     * Este m&eacute;todo s&oacute;lo devolver&aacute; {@code false} despu&eacute;s de ejecutar
+     * el m&acute;todo {{@link #disable()}.
+     * @return Indica si el helper esta preparado para ejecutar operaciones.
+     */
+    public boolean isEnabled() {
+    	return this.enabled;
+    }
+
+    /**
+     * Elimina la configuracion establecida inhabilitando la operaci&oacute;n de este objeto.
+     */
+    public void disable() {
+    	this.massiveConfiguration = null;
+    	this.defaultSigner = null;
+    	this.enabled = false;
     }
 
     /** Establece el tipo de operaci&oacute;n (firma, cofirma, contrafirma del
@@ -532,6 +555,18 @@ public final class MassiveSignatureHelper {
         return lastEntry;
     }
 
+    /**
+     * Recupera el formato de firma establecido como por defecto para las operaciones
+     * de firma masiva.
+     * @return Formato de firma o {@code null} si no se ha establecido.
+     */
+    public String getDefaultSignatureFormat() {
+    	if (this.massiveConfiguration != null) {
+    		return this.massiveConfiguration.getDefaultFormat();
+    	}
+    	return null;
+    }
+
     /** Recupera todo el log de la operaci&oacute;n masiva.
      * @return Log de la operaci&oacute;n masiva completa. */
     public String getAllLogEntries() {
@@ -670,5 +705,4 @@ public final class MassiveSignatureHelper {
             return this.extraParams;
         }
     }
-
 }

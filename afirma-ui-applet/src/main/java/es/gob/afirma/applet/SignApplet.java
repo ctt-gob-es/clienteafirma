@@ -1249,7 +1249,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                     return Boolean.FALSE;
                 }
                 catch (final Exception e) {
-                	getLogger().severe("Error durante el proceso de firma: " + e); //$NON-NLS-1$
+                	getLogger().severe("Error durante el proceso de contrafirma: " + e); //$NON-NLS-1$
                     SignApplet.this.setError(AppletMessages.getString("SignApplet.101")); //$NON-NLS-1$
                     return Boolean.FALSE;
                 }
@@ -1517,7 +1517,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                                      || SignApplet.this.getSigFormat().equals(AOSignConstants.SIGN_FORMAT_OOXML) || SignApplet.this.getSigFormat().equals(AOSignConstants.SIGN_FORMAT_PKCS1))) {
 
                 	getLogger().severe("La firma de hash no esta soportada para el formato " + SignApplet.this.getSigFormat()); //$NON-NLS-1$
-                    SignApplet.this.setError(AppletMessages.getString("SignApplet.198") + SignApplet.this.getSigFormat()); //$NON-NLS-1$
+                    SignApplet.this.setError(AppletMessages.getString("SignApplet.198", SignApplet.this.getSigFormat())); //$NON-NLS-1$
                     return Boolean.FALSE;
                 }
 
@@ -1668,7 +1668,6 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                     catch (final AOException e) {
                     	getLogger().severe(e.toString());
                         SignApplet.this.setError(AppletMessages.getString("SignApplet.101")); //$NON-NLS-1$
-                        e.printStackTrace();
                         return Boolean.FALSE;
                     }
                     catch (final Exception e) {
@@ -2188,6 +2187,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     }
 
     /** {@inheritDoc} */
+    @Deprecated
     public String getSignaturesBase64Encoded() {
         LOGGER.info("Invocando getSignaturesBase64Encoded"); //$NON-NLS-1$
         return this.massiveSignData;
@@ -2262,18 +2262,18 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     /** {@inheritDoc} */
     public void endMassiveSignature() {
         LOGGER.info("Invocando endMassiveSignature"); //$NON-NLS-1$
-        if (this.massiveSignatureHelper == null) {
+        if (this.massiveSignatureHelper == null || this.massiveSignatureHelper.isEnabled()) {
             LOGGER.warning("No se habia inicializado la operacion de firma masiva"); //$NON-NLS-1$
             return;
         }
-        this.massiveSignatureHelper = null;
+        this.massiveSignatureHelper.disable();
     }
 
     /** {@inheritDoc} */
     public String massiveSignatureData(final String b64Data) {
     	LOGGER.info("Invocando massiveSignatureData"); //$NON-NLS-1$
     	this.setError(null);
-    	if (this.massiveSignatureHelper == null) {
+    	if (this.massiveSignatureHelper == null || this.massiveSignatureHelper.isEnabled()) {
     		this.setError(AppletMessages.getString("SignApplet.375")); //$NON-NLS-1$
     		return null;
     	}
@@ -2310,7 +2310,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     public String massiveSignatureHash(final String b64Hash) {
     	LOGGER.info("Invocando massiveSignatureHash"); //$NON-NLS-1$
     	this.setError(null);
-    	if (this.massiveSignatureHelper == null) {
+    	if (this.massiveSignatureHelper == null || this.massiveSignatureHelper.isEnabled()) {
     		this.setError(AppletMessages.getString("SignApplet.375")); //$NON-NLS-1$
     		return null;
     	}
@@ -2325,21 +2325,30 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 			this.setError(AppletMessages.getString("SignApplet.491")); //$NON-NLS-1$
     		return null;
 		}
-    	try {
-    		return AccessController.doPrivileged(new java.security.PrivilegedAction<String>() {
-    			/** {@inheritDoc} */
-    			public String run() {
-    				final byte[] result = SignApplet.this.getMassiveSignatureHelper().signHash(dataHash);
-    				if (result == null) {
-    					SignApplet.this.setError(SignApplet.this.getMassiveSignatureHelper().getCurrentLogEntry());
-    				}
-    				return Base64.encode(result);
-    			}
-    		});
-    	} catch (final Exception e) {
-    		this.setError(AppletMessages.getString("SignApplet.205")); //$NON-NLS-1$
-    		return null;
-    	}
+
+		if (!supportHashSign(this.sigFormat)) {
+			getLogger().severe("La firma de hash no esta soportada para el formato " + //$NON-NLS-1$
+					SignApplet.this.getMassiveSignatureHelper().getDefaultSignatureFormat());
+            SignApplet.this.setError(AppletMessages.getString("SignApplet.198", //$NON-NLS-1$
+            		SignApplet.this.getMassiveSignatureHelper().getDefaultSignatureFormat()));
+		}
+
+		try {
+			return AccessController.doPrivileged(new java.security.PrivilegedAction<String>() {
+				/** {@inheritDoc} */
+				public String run() {
+					final byte[] result = SignApplet.this.getMassiveSignatureHelper().signHash(dataHash);
+					if (result == null) {
+						SignApplet.this.setError(SignApplet.this.getMassiveSignatureHelper().getCurrentLogEntry());
+						return null;
+					}
+					return Base64.encode(result);
+				}
+			});
+		} catch (final Exception e) {
+			this.setError(AppletMessages.getString("SignApplet.205")); //$NON-NLS-1$
+			return null;
+		}
     }
 
     /** {@inheritDoc} */
@@ -2347,7 +2356,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
     	LOGGER.info("Invocando massiveSignatureFile: " + filename); //$NON-NLS-1$
 
-    	if (this.massiveSignatureHelper == null) {
+    	if (this.massiveSignatureHelper == null || this.massiveSignatureHelper.isEnabled()) {
     		this.setError(AppletMessages.getString("SignApplet.375")); //$NON-NLS-1$
     		return null;
     	}
@@ -2380,7 +2389,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     public String getMassiveSignatureCurrentLog() {
         LOGGER.info("Invocando getMassiveSignatureCurrentLog"); //$NON-NLS-1$
         this.setError(null);
-        if (this.massiveSignatureHelper == null) {
+        if (this.massiveSignatureHelper == null || this.massiveSignatureHelper.isEnabled()) {
             this.setError(AppletMessages.getString("SignApplet.375")); //$NON-NLS-1$
             return null;
         }
@@ -3639,7 +3648,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     public void setOutputDirectoryToSign(final String directory) {
         LOGGER.info("Invocando setOutputDirectoryToSign: " + directory); //$NON-NLS-1$
         if ((directory != null) && !checkUserPermision(
-        		AppletMessages.getString("SignApplet.88") + CR + directory + //$NON-NLS-1$
+        		AppletMessages.getString("SignApplet.105") + CR + directory + //$NON-NLS-1$
         		CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
         	return;
         }
@@ -4402,5 +4411,22 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     		LOGGER.warning("No se pudo identificar el idioma a partir del locale indicado: " + e); //$NON-NLS-1$
     		return null;
     	}
+    }
+
+    private boolean supportHashSign(final String format) {
+
+    	final String[] unsupportedFormats = new String[] {
+    			AOSignConstants.SIGN_FORMAT_PDF,
+    			AOSignConstants.SIGN_FORMAT_ODF,
+    			AOSignConstants.SIGN_FORMAT_OOXML,
+    			AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED,
+    			AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED
+    	};
+    	for (final String unsupportedFormat : unsupportedFormats) {
+    		if (unsupportedFormat.equals(format)) {
+    			return false;
+    		}
+    	}
+    	return true;
     }
 }
