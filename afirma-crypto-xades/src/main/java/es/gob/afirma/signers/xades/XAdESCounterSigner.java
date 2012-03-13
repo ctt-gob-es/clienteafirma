@@ -42,13 +42,13 @@ import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.XMLConstants;
 
-final class XAdESCounterSigner
-{
-
-	private static final String CSURI = "http://uri.etsi.org/01903#CountersignedSignature"; //$NON-NLS-1$
-
-	private static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
-
+final class XAdESCounterSigner {
+	
+	private static final String						CSURI	= "http://uri.etsi.org/01903#CountersignedSignature";	//$NON-NLS-1$
+																													
+	private static final java.util.logging.Logger	LOGGER	= java.util.logging.Logger
+																	.getLogger("es.gob.afirma");					//$NON-NLS-1$
+																													
 	/**
 	 * Contrafirma firmas en formato XAdES.
 	 * <p>
@@ -161,127 +161,124 @@ final class XAdESCounterSigner
 	 * @throws AOException
 	 *             Cuando ocurre cualquier problema durante el proceso
 	 */
-	static byte[] countersign(final byte[] sign, final String algorithm, final CounterSignTarget targetType, final Object[] targets, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException
-	{
-
-		final Properties extraParams = (xParams != null) ? xParams : new Properties();
-
+	static byte[] countersign(final byte[] sign, final String algorithm,
+			final CounterSignTarget targetType, final Object[] targets,
+			final PrivateKeyEntry keyEntry, final Properties xParams)
+			throws AOException {
+		
+		final Properties extraParams = (xParams != null) ? xParams
+				: new Properties();
+		
 		String encoding = extraParams.getProperty("encoding"); //$NON-NLS-1$
 		if ("base64".equalsIgnoreCase(encoding)) { //$NON-NLS-1$
 			encoding = XMLConstants.BASE64_ENCODING;
 		}
-
-		if (sign == null)
-		{
-			throw new IllegalArgumentException("El objeto de firma no puede ser nulo"); //$NON-NLS-1$
+		
+		if (sign == null) {
+			throw new IllegalArgumentException(
+					"El objeto de firma no puede ser nulo"); //$NON-NLS-1$
 		}
-
+		
 		final String algoUri = XMLConstants.SIGN_ALGOS_URI.get(algorithm);
-		if (algoUri == null)
-		{
-			throw new UnsupportedOperationException("Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+		if (algoUri == null) {
+			throw new UnsupportedOperationException(
+					"Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-
+		
 		// nueva instancia de DocumentBuilderFactory que permita espacio de
 		// nombres (necesario para XML)
 		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		dbf.setNamespaceAware(true);
-
+		
 		// flag que indica si el documento tiene una firma simple o esta
 		// cofirmado
 		// por defecto se considera que es un documento cofirmado
 		boolean esFirmaSimple = false;
-
+		
 		// se carga el documento XML y su raiz
 		final Map<String, String> originalXMLProperties = new Hashtable<String, String>();
 		Element root;
 		Document doc;
-		try
-		{
-			doc = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
-
-			if (encoding == null)
-			{
+		try {
+			doc = dbf.newDocumentBuilder()
+					.parse(new ByteArrayInputStream(sign));
+			
+			if (encoding == null) {
 				encoding = doc.getXmlEncoding();
 			}
-
+			
 			// Ademas del encoding, sacamos otros datos del doc XML original.
 			// Hacemos la comprobacion del base64 por si se establecido desde
 			// fuera
-			if (encoding != null && !XMLConstants.BASE64_ENCODING.equals(encoding))
-			{
+			if (encoding != null
+					&& !XMLConstants.BASE64_ENCODING.equals(encoding)) {
 				originalXMLProperties.put(OutputKeys.ENCODING, encoding);
 			}
 			String tmpXmlProp = doc.getXmlVersion();
-			if (tmpXmlProp != null)
-			{
+			if (tmpXmlProp != null) {
 				originalXMLProperties.put(OutputKeys.VERSION, tmpXmlProp);
 			}
 			final DocumentType dt = doc.getDoctype();
-			if (dt != null)
-			{
+			if (dt != null) {
 				tmpXmlProp = dt.getSystemId();
-				if (tmpXmlProp != null)
-				{
-					originalXMLProperties.put(OutputKeys.DOCTYPE_SYSTEM, tmpXmlProp);
+				if (tmpXmlProp != null) {
+					originalXMLProperties.put(OutputKeys.DOCTYPE_SYSTEM,
+							tmpXmlProp);
 				}
 			}
-
+			
 			root = doc.getDocumentElement();
-
+			
 			// si no es un documento cofirma se anade temporalmente el nodo raiz
 			// AFIRMA
 			// para que las operaciones de contrafirma funcionen correctamente
-			if (root.getNodeName().equals(AOXAdESSigner.SIGNATURE_NODE_NAME))
-			{
+			if (root.getNodeName().equals(AOXAdESSigner.SIGNATURE_NODE_NAME)) {
 				esFirmaSimple = true;
 				doc = AOXAdESSigner.insertarNodoAfirma(doc);
 				root = doc.getDocumentElement();
 			}
-		} catch (final Exception e)
-		{
+		} catch (final Exception e) {
 			throw new AOException("No se ha podido realizar la contrafirma", e); //$NON-NLS-1$
 		}
-
-		try
-		{
-			if (targetType == CounterSignTarget.TREE)
-			{
-				XAdESCounterSigner.countersignTree(root, keyEntry, extraParams, algorithm, doc);
-			} else if (targetType == CounterSignTarget.LEAFS)
-			{
-				XAdESCounterSigner.countersignLeafs(root, keyEntry, extraParams, algorithm, doc);
-			} else if (targetType == CounterSignTarget.NODES)
-			{
-				XAdESCounterSigner.countersignNodes(root, targets, keyEntry, extraParams, algorithm, doc);
-			} else if (targetType == CounterSignTarget.SIGNERS)
-			{
-				XAdESCounterSigner.countersignSigners(root, targets, keyEntry, extraParams, algorithm, doc);
+		
+		try {
+			if (targetType == CounterSignTarget.TREE) {
+				XAdESCounterSigner.countersignTree(root, keyEntry, extraParams,
+						algorithm, doc);
+			} else if (targetType == CounterSignTarget.LEAFS) {
+				XAdESCounterSigner.countersignLeafs(root, keyEntry,
+						extraParams, algorithm, doc);
+			} else if (targetType == CounterSignTarget.NODES) {
+				XAdESCounterSigner.countersignNodes(root, targets, keyEntry,
+						extraParams, algorithm, doc);
+			} else if (targetType == CounterSignTarget.SIGNERS) {
+				XAdESCounterSigner.countersignSigners(root, targets, keyEntry,
+						extraParams, algorithm, doc);
 			}
-		} catch (final Exception e)
-		{
+		} catch (final Exception e) {
 			throw new AOException("Error al generar la contrafirma", e); //$NON-NLS-1$
 		}
-
+		
 		// si el documento recibido no estaba cofirmado se elimina el nodo raiz
 		// temporal AFIRMA
 		// y se vuelve a dejar como raiz el nodo Signature original
-		if (esFirmaSimple)
-		{
-			try
-			{
+		if (esFirmaSimple) {
+			try {
 				final Document newdoc = dbf.newDocumentBuilder().newDocument();
-				newdoc.appendChild(newdoc.adoptNode(doc.getElementsByTagNameNS(XMLConstants.DSIGNNS, AOXAdESSigner.SIGNATURE_TAG).item(0)));
+				newdoc.appendChild(newdoc.adoptNode(doc.getElementsByTagNameNS(
+						XMLConstants.DSIGNNS, AOXAdESSigner.SIGNATURE_TAG)
+						.item(0)));
 				doc = newdoc;
-			} catch (final Exception e)
-			{
-				XAdESCounterSigner.LOGGER.info("No se ha eliminado el nodo padre '<AFIRMA>': " + e); //$NON-NLS-1$
+			} catch (final Exception e) {
+				XAdESCounterSigner.LOGGER
+						.info("No se ha eliminado el nodo padre '<AFIRMA>': " + e); //$NON-NLS-1$
 			}
 		}
-
-		return Utils.writeXML(doc.getDocumentElement(), originalXMLProperties, null, null);
+		
+		return Utils.writeXML(doc.getDocumentElement(), originalXMLProperties,
+				null, null);
 	}
-
+	
 	/**
 	 * Realiza la contrafirma de todos los nodos hoja del arbol
 	 * 
@@ -292,35 +289,37 @@ final class XAdESCounterSigner
 	 * @throws AOException
 	 *             Cuando ocurre cualquier problema durante el proceso
 	 */
-	private static void countersignLeafs(final Element root, final PrivateKeyEntry keyEntry, final Properties extraParams, final String algorithm, final Document doc) throws AOException
-	{
-
+	private static void countersignLeafs(final Element root,
+			final PrivateKeyEntry keyEntry, final Properties extraParams,
+			final String algorithm, final Document doc) throws AOException {
+		
 		// obtiene todas las firmas
-		final NodeList signatures = root.getElementsByTagNameNS(XMLConstants.DSIGNNS, AOXAdESSigner.SIGNATURE_TAG);
+		final NodeList signatures = root.getElementsByTagNameNS(
+				XMLConstants.DSIGNNS, AOXAdESSigner.SIGNATURE_TAG);
 		int numSignatures = signatures.getLength();
-
+		
 		// comprueba cuales son hojas
-		try
-		{
-			for (int i = 0; i < numSignatures; i++)
-			{
+		try {
+			for (int i = 0; i < numSignatures; i++) {
 				final Element signature = (Element) signatures.item(i);
-				final int children = signature.getElementsByTagNameNS(XMLConstants.DSIGNNS, AOXAdESSigner.SIGNATURE_TAG).getLength();
-
+				final int children = signature.getElementsByTagNameNS(
+						XMLConstants.DSIGNNS, AOXAdESSigner.SIGNATURE_TAG)
+						.getLength();
+				
 				// y crea sus contrafirmas
-				if (children == 0)
-				{
-					XAdESCounterSigner.cs(signature, keyEntry, extraParams, algorithm, doc);
+				if (children == 0) {
+					XAdESCounterSigner.cs(signature, keyEntry, extraParams,
+							algorithm, doc);
 					numSignatures++;
 					i++;
 				}
 			}
-		} catch (final Exception e)
-		{
-			throw new AOException("No se ha podido realizar la contrafirma de hojas", e); //$NON-NLS-1$
+		} catch (final Exception e) {
+			throw new AOException(
+					"No se ha podido realizar la contrafirma de hojas", e); //$NON-NLS-1$
 		}
 	}
-
+	
 	/**
 	 * Realiza la contrafirma de los nodos indicados en el par&aacute;metro
 	 * targets
@@ -332,53 +331,50 @@ final class XAdESCounterSigner
 	 * @throws AOException
 	 *             Cuando ocurre cualquier problema durante el proceso
 	 */
-	private static void countersignNodes(final Element root, final Object[] tgts, final PrivateKeyEntry keyEntry, final Properties extraParams, final String algorithm, final Document doc) throws AOException
-	{
-
+	private static void countersignNodes(final Element root,
+			final Object[] tgts, final PrivateKeyEntry keyEntry,
+			final Properties extraParams, final String algorithm,
+			final Document doc) throws AOException {
+		
 		// descarta las posiciones que esten repetidas
 		final List<Integer> targetsList = new ArrayList<Integer>();
-		for (int i = 0; i < tgts.length; i++)
-		{
-			if (!targetsList.contains(tgts[i]))
-			{
+		for (int i = 0; i < tgts.length; i++) {
+			if (!targetsList.contains(tgts[i])) {
 				targetsList.add((Integer) tgts[i]);
 			}
 		}
 		final Object[] targets = targetsList.toArray();
-
+		
 		// obtiene todas las firmas
-		final NodeList signatures = root.getElementsByTagNameNS(XMLConstants.DSIGNNS, AOXAdESSigner.SIGNATURE_TAG);
-
+		final NodeList signatures = root.getElementsByTagNameNS(
+				XMLConstants.DSIGNNS, AOXAdESSigner.SIGNATURE_TAG);
+		
 		// obtiene los nodos indicados en targets
 		final Element[] nodes = new Element[targets.length];
-		try
-		{
-			for (int i = 0; i < targets.length; i++)
-			{
-				nodes[i] = (Element) signatures.item(((Integer) targets[i]).intValue());
-				if (nodes[i] == null)
-				{
+		try {
+			for (int i = 0; i < targets.length; i++) {
+				nodes[i] = (Element) signatures.item(((Integer) targets[i])
+						.intValue());
+				if (nodes[i] == null) {
 					throw new AOException("Posicion de nodo no valida."); //$NON-NLS-1$
 				}
 			}
-		} catch (final ClassCastException e)
-		{
+		} catch (final ClassCastException e) {
 			throw new AOException("Valor de nodo no valido", e); //$NON-NLS-1$
 		}
-
+		
 		// y crea sus contrafirmas
-		try
-		{
-			for (final Element node : nodes)
-			{
-				XAdESCounterSigner.cs(node, keyEntry, extraParams, algorithm, doc);
+		try {
+			for (final Element node : nodes) {
+				XAdESCounterSigner.cs(node, keyEntry, extraParams, algorithm,
+						doc);
 			}
-		} catch (final Exception e)
-		{
-			throw new AOException("No se ha podido realizar la contrafirma de nodos", e); //$NON-NLS-1$
+		} catch (final Exception e) {
+			throw new AOException(
+					"No se ha podido realizar la contrafirma de nodos", e); //$NON-NLS-1$
 		}
 	}
-
+	
 	/**
 	 * Realiza la contrafirma de los firmantes indicados en el par&aacute;metro
 	 * targets
@@ -391,32 +387,36 @@ final class XAdESCounterSigner
 	 * @throws AOException
 	 *             Cuando ocurre cualquier problema durante el proceso
 	 */
-	private static void countersignSigners(final Element root, final Object[] targets, final PrivateKeyEntry keyEntry, final Properties extraParams, final String algorithm, final Document doc) throws AOException
-	{
-
+	private static void countersignSigners(final Element root,
+			final Object[] targets, final PrivateKeyEntry keyEntry,
+			final Properties extraParams, final String algorithm,
+			final Document doc) throws AOException {
+		
 		// obtiene todas las firmas
-		final NodeList signatures = root.getElementsByTagNameNS(XMLConstants.DSIGNNS, AOXAdESSigner.SIGNATURE_TAG);
-
+		final NodeList signatures = root.getElementsByTagNameNS(
+				XMLConstants.DSIGNNS, AOXAdESSigner.SIGNATURE_TAG);
+		
 		final List<Object> signers = Arrays.asList(targets);
 		final List<Element> nodes = new ArrayList<Element>();
-
+		
 		// obtiene los nodos de los firmantes indicados en targets
-		for (int i = 0; i < signatures.getLength(); i++)
-		{
+		for (int i = 0; i < signatures.getLength(); i++) {
 			final Element node = (Element) signatures.item(i);
-			if (signers.contains(AOUtil.getCN(Utils.getCertificate(node.getElementsByTagNameNS(XMLConstants.DSIGNNS, "X509Certificate").item(0))))) { //$NON-NLS-1$
+			if (signers.contains(AOUtil.getCN(Utils.getCertificate(node
+					.getElementsByTagNameNS(XMLConstants.DSIGNNS,
+							"X509Certificate").item(0))))) { //$NON-NLS-1$
 				nodes.add(node);
 			}
 		}
-
+		
 		// y crea sus contrafirmas
 		final Iterator<Element> i = nodes.iterator();
-		while (i.hasNext())
-		{
-			XAdESCounterSigner.cs(i.next(), keyEntry, extraParams, algorithm, doc);
+		while (i.hasNext()) {
+			XAdESCounterSigner.cs(i.next(), keyEntry, extraParams, algorithm,
+					doc);
 		}
 	}
-
+	
 	/**
 	 * Realiza la contrafirma de todos los nodos del arbol
 	 * 
@@ -427,32 +427,32 @@ final class XAdESCounterSigner
 	 * @throws AOException
 	 *             Cuando ocurre cualquier problema durante el proceso
 	 */
-	private static void countersignTree(final Element root, final PrivateKeyEntry keyEntry, final Properties extraParams, final String algorithm, final Document doc) throws AOException
-	{
-
+	private static void countersignTree(final Element root,
+			final PrivateKeyEntry keyEntry, final Properties extraParams,
+			final String algorithm, final Document doc) throws AOException {
+		
 		// obtiene todas las firmas
-		final NodeList signatures = root.getElementsByTagNameNS(XMLConstants.DSIGNNS, AOXAdESSigner.SIGNATURE_TAG);
+		final NodeList signatures = root.getElementsByTagNameNS(
+				XMLConstants.DSIGNNS, AOXAdESSigner.SIGNATURE_TAG);
 		final int numSignatures = signatures.getLength();
-
+		
 		final Element[] nodes = new Element[numSignatures];
-		for (int i = 0; i < numSignatures; i++)
-		{
+		for (int i = 0; i < numSignatures; i++) {
 			nodes[i] = (Element) signatures.item(i);
 		}
-
+		
 		// y crea sus contrafirmas
-		try
-		{
-			for (int i = 0; i < numSignatures; i++)
-			{
-				XAdESCounterSigner.cs(nodes[i], keyEntry, extraParams, algorithm, doc);
+		try {
+			for (int i = 0; i < numSignatures; i++) {
+				XAdESCounterSigner.cs(nodes[i], keyEntry, extraParams,
+						algorithm, doc);
 			}
-		} catch (final Exception e)
-		{
-			throw new AOException("No se ha podido realizar la contrafirma del arbol", e); //$NON-NLS-1$
+		} catch (final Exception e) {
+			throw new AOException(
+					"No se ha podido realizar la contrafirma del arbol", e); //$NON-NLS-1$
 		}
 	}
-
+	
 	/**
 	 * Realiza la contrafirma de la firma pasada por par&aacute;metro
 	 * 
@@ -463,184 +463,199 @@ final class XAdESCounterSigner
 	 * @throws AOException
 	 *             Cuando ocurre cualquier problema durante el proceso
 	 */
-	private static void cs(final Element signature, final PrivateKeyEntry keyEntry, final Properties xParams, final String algorithm, final Document doc) throws AOException
-	{
-
-		if (doc == null)
-		{
-			throw new IllegalArgumentException("El documento DOM no puede ser nulo"); //$NON-NLS-1$
+	private static void cs(final Element signature,
+			final PrivateKeyEntry keyEntry, final Properties xParams,
+			final String algorithm, final Document doc) throws AOException {
+		
+		if (doc == null) {
+			throw new IllegalArgumentException(
+					"El documento DOM no puede ser nulo"); //$NON-NLS-1$
 		}
-
-		final Properties extraParams = (xParams != null) ? xParams : new Properties();
-
-		final String digestMethodAlgorithm = extraParams.getProperty("referencesDigestMethod", AOXAdESSigner.DIGEST_METHOD); //$NON-NLS-1$
-		final String canonicalizationAlgorithm = extraParams.getProperty("canonicalizationAlgorithm", CanonicalizationMethod.INCLUSIVE); //$NON-NLS-1$
-		final String xadesNamespace = extraParams.getProperty("xadesNamespace", AOXAdESSigner.XADESNS); //$NON-NLS-1$
-		final String signedPropertiesTypeUrl = extraParams.getProperty("signedPropertiesTypeUrl", AOXAdESSigner.XADES_SIGNED_PROPERTIES_TYPE); //$NON-NLS-1$
-
+		
+		final Properties extraParams = (xParams != null) ? xParams
+				: new Properties();
+		
+		final String digestMethodAlgorithm = extraParams.getProperty(
+				"referencesDigestMethod", AOXAdESSigner.DIGEST_METHOD); //$NON-NLS-1$
+		final String canonicalizationAlgorithm = extraParams.getProperty(
+				"canonicalizationAlgorithm", CanonicalizationMethod.INCLUSIVE); //$NON-NLS-1$
+		final String xadesNamespace = extraParams.getProperty(
+				"xadesNamespace", AOXAdESSigner.XADESNS); //$NON-NLS-1$
+		final String signedPropertiesTypeUrl = extraParams
+				.getProperty(
+						"signedPropertiesTypeUrl", AOXAdESSigner.XADES_SIGNED_PROPERTIES_TYPE); //$NON-NLS-1$
+		
 		// crea un nodo CounterSignature
-		final Element counterSignature = doc.createElement(AOXAdESSigner.XADES_SIGNATURE_PREFIX + ":CounterSignature"); //$NON-NLS-1$
-
+		final Element counterSignature = doc
+				.createElement(AOXAdESSigner.XADES_SIGNATURE_PREFIX
+						+ ":CounterSignature"); //$NON-NLS-1$
+		
 		// recupera o crea un nodo UnsignedSignatureProperties
-		final NodeList usp = signature.getElementsByTagNameNS("*", "UnsignedSignatureProperties"); //$NON-NLS-1$ //$NON-NLS-2$
+		final NodeList usp = signature.getElementsByTagNameNS(
+				"*", "UnsignedSignatureProperties"); //$NON-NLS-1$ //$NON-NLS-2$
 		Element unsignedSignatureProperties;
-		if (usp.getLength() == 0)
-		{
-			unsignedSignatureProperties = doc.createElement(AOXAdESSigner.XADES_SIGNATURE_PREFIX + ":UnsignedSignatureProperties"); //$NON-NLS-1$
-		} else
-		{
+		if (usp.getLength() == 0) {
+			unsignedSignatureProperties = doc
+					.createElement(AOXAdESSigner.XADES_SIGNATURE_PREFIX
+							+ ":UnsignedSignatureProperties"); //$NON-NLS-1$
+		} else {
 			unsignedSignatureProperties = (Element) usp.item(0);
 		}
-
+		
 		unsignedSignatureProperties.appendChild(counterSignature);
-
+		
 		// recupera o crea un nodo UnsignedProperties
-		final NodeList up = signature.getElementsByTagNameNS("*", "UnsignedProperties"); //$NON-NLS-1$ //$NON-NLS-2$
+		final NodeList up = signature.getElementsByTagNameNS(
+				"*", "UnsignedProperties"); //$NON-NLS-1$ //$NON-NLS-2$
 		final Element unsignedProperties;
-		if (up.getLength() == 0)
-		{
-			unsignedProperties = doc.createElement(AOXAdESSigner.XADES_SIGNATURE_PREFIX + ":UnsignedProperties"); //$NON-NLS-1$
-		} else
-		{
+		if (up.getLength() == 0) {
+			unsignedProperties = doc
+					.createElement(AOXAdESSigner.XADES_SIGNATURE_PREFIX
+							+ ":UnsignedProperties"); //$NON-NLS-1$
+		} else {
 			unsignedProperties = (Element) up.item(0);
 		}
-
+		
 		unsignedProperties.appendChild(unsignedSignatureProperties);
-
+		
 		// inserta el nuevo nodo en QualifyingProperties
-		final Node qualifyingProperties = signature.getElementsByTagNameNS("*", "QualifyingProperties").item(0); //$NON-NLS-1$ //$NON-NLS-2$
+		final Node qualifyingProperties = signature.getElementsByTagNameNS(
+				"*", "QualifyingProperties").item(0); //$NON-NLS-1$ //$NON-NLS-2$
 		qualifyingProperties.appendChild(unsignedProperties);
-
+		
 		// obtiene el nodo SignatureValue
-		final Element signatureValue = (Element) signature.getElementsByTagNameNS(XMLConstants.DSIGNNS, "SignatureValue").item(0); //$NON-NLS-1$
-
+		final Element signatureValue = (Element) signature
+				.getElementsByTagNameNS(XMLConstants.DSIGNNS, "SignatureValue").item(0); //$NON-NLS-1$
+		
 		// crea la referencia a la firma que se contrafirma
 		final List<Reference> referenceList = new ArrayList<Reference>();
 		final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
 		final DigestMethod digestMethod;
-		try
-		{
+		try {
 			digestMethod = fac.newDigestMethod(digestMethodAlgorithm, null);
-		} catch (final Exception e)
-		{
-			throw new AOException("No se ha podido obtener un generador de huellas digitales para el algoritmo '" + digestMethodAlgorithm + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
+		} catch (final Exception e) {
+			throw new AOException(
+					"No se ha podido obtener un generador de huellas digitales para el algoritmo '" + digestMethodAlgorithm + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		final String referenceId = "Reference-" + UUID.randomUUID().toString(); //$NON-NLS-1$
-
-		try
-		{
+		
+		try {
 			// Transformada para la canonicalizacion inclusiva con comentarios
 			final List<Transform> transformList = new ArrayList<Transform>();
-			transformList.add(fac.newTransform(canonicalizationAlgorithm, (TransformParameterSpec) null));
-
+			transformList.add(fac.newTransform(canonicalizationAlgorithm,
+					(TransformParameterSpec) null));
+			
 			// Aunque el metodo utilizado para generar las contrafirmas hacen
 			// que no sea necesario
 			// indicar el tipo de la referencia, lo agregamos por si resultase
 			// de utilidad
-			referenceList.add(fac.newReference("#" + signatureValue.getAttribute("Id"), digestMethod, transformList, XAdESCounterSigner.CSURI, referenceId)); //$NON-NLS-1$ //$NON-NLS-2$
-		} catch (final Exception e)
-		{
+			referenceList
+					.add(fac.newReference(
+							"#" + signatureValue.getAttribute("Id"), digestMethod, transformList, XAdESCounterSigner.CSURI, referenceId)); //$NON-NLS-1$ //$NON-NLS-2$
+		} catch (final Exception e) {
 			throw new AOException("No se ha podido realizar la contrafirma", e); //$NON-NLS-1$
 		}
-
+		
 		// nueva instancia XADES_EPES del nodo a contrafirmar
-		final XAdES_EPES xades = (XAdES_EPES) XAdES.newInstance(XAdES.EPES, xadesNamespace, AOXAdESSigner.XADES_SIGNATURE_PREFIX, AOXAdESSigner.XML_SIGNATURE_PREFIX, digestMethodAlgorithm, counterSignature);
-
+		final XAdES_EPES xades = (XAdES_EPES) XAdES.newInstance(XAdES.EPES,
+				xadesNamespace, AOXAdESSigner.XADES_SIGNATURE_PREFIX,
+				AOXAdESSigner.XML_SIGNATURE_PREFIX, digestMethodAlgorithm,
+				counterSignature);
+		
 		// establece el certificado
-		final X509Certificate cert = (X509Certificate) keyEntry.getCertificate();
+		final X509Certificate cert = (X509Certificate) keyEntry
+				.getCertificate();
 		xades.setSigningCertificate(cert);
-
+		
 		// SignaturePolicyIdentifier
-		final SignaturePolicyIdentifier spi = AOXAdESSigner.getPolicy(extraParams.getProperty("policyIdentifier"), //$NON-NLS-1$
+		final SignaturePolicyIdentifier spi = AOXAdESSigner.getPolicy(
+				extraParams.getProperty("policyIdentifier"), //$NON-NLS-1$
 				extraParams.getProperty("policyIdentifierHash"), //$NON-NLS-1$
 				extraParams.getProperty("policyIdentifierHashAlgorithm"), //$NON-NLS-1$
 				extraParams.getProperty("policyDescription"), //$NON-NLS-1$
 				extraParams.getProperty("policyQualifier")); //$NON-NLS-1$
-		if (spi != null)
-		{
+		if (spi != null) {
 			xades.setSignaturePolicyIdentifier(spi);
 		}
-
+		
 		// SignatureProductionPlace
-		final SignatureProductionPlace spp = AOXAdESSigner.getSignatureProductionPlace(extraParams.getProperty("signatureProductionCity"), //$NON-NLS-1$
-				extraParams.getProperty("signatureProductionProvince"), //$NON-NLS-1$
-				extraParams.getProperty("signatureProductionPostalCode"), //$NON-NLS-1$
-				extraParams.getProperty("signatureProductionCountry")); //$NON-NLS-1$
-		if (spp != null)
-		{
+		final SignatureProductionPlace spp = AOXAdESSigner
+				.getSignatureProductionPlace(extraParams
+						.getProperty("signatureProductionCity"), //$NON-NLS-1$
+						extraParams.getProperty("signatureProductionProvince"), //$NON-NLS-1$
+						extraParams
+								.getProperty("signatureProductionPostalCode"), //$NON-NLS-1$
+						extraParams.getProperty("signatureProductionCountry")); //$NON-NLS-1$
+		if (spp != null) {
 			xades.setSignatureProductionPlace(spp);
 		}
-
+		
 		// SignerRole
 		SignerRole signerRole = null;
-		try
-		{
-			final String claimedRole = extraParams.getProperty("signerClaimedRole"); //$NON-NLS-1$
-			final String certifiedRole = extraParams.getProperty("signerCertifiedRole"); //$NON-NLS-1$
+		try {
+			final String claimedRole = extraParams
+					.getProperty("signerClaimedRole"); //$NON-NLS-1$
+			final String certifiedRole = extraParams
+					.getProperty("signerCertifiedRole"); //$NON-NLS-1$
 			signerRole = new SignerRoleImpl();
-			if (claimedRole != null)
-			{
+			if (claimedRole != null) {
 				signerRole.addClaimedRole(claimedRole);
 			}
-			if (certifiedRole != null)
-			{
+			if (certifiedRole != null) {
 				signerRole.addCertifiedRole(certifiedRole);
 			}
-		} catch (final Exception e)
-		{
+		} catch (final Exception e) {
 			// Se ignoran los errores, los parametros son opcionales
 		}
-		if (signerRole != null)
-		{
+		if (signerRole != null) {
 			xades.setSignerRole(signerRole);
 		}
-
+		
 		// SigningTime
-		if (Boolean.parseBoolean(extraParams.getProperty("applySystemDate", Boolean.TRUE.toString()))) { //$NON-NLS-1$
+		if (Boolean.parseBoolean(extraParams.getProperty(
+				"applySystemDate", Boolean.TRUE.toString()))) { //$NON-NLS-1$
 			xades.setSigningTime(new Date());
 		}
-
+		
 		// crea la firma
 		final AOXMLAdvancedSignature xmlSignature;
-		try
-		{
+		try {
 			xmlSignature = AOXMLAdvancedSignature.newInstance(xades);
-		} catch (final Exception e)
-		{
-			throw new AOException("No se ha podido instanciar la firma Avanzada XML JXAdES", e); //$NON-NLS-1$
+		} catch (final Exception e) {
+			throw new AOException(
+					"No se ha podido instanciar la firma Avanzada XML JXAdES", e); //$NON-NLS-1$
 		}
-
+		
 		// Establecemos el tipo de propiedades firmadas
 		xmlSignature.setSignedPropertiesTypeUrl(signedPropertiesTypeUrl);
-
-		try
-		{
+		
+		try {
 			xmlSignature.setDigestMethod(digestMethodAlgorithm);
 			xmlSignature.setCanonicalizationMethod(canonicalizationAlgorithm);
-		} catch (final Exception e)
-		{
-			XAdESCounterSigner.LOGGER.severe("No se ha podido establecer el algoritmo de huella digital (" + XMLConstants.SIGN_ALGOS_URI.get(algorithm) //$NON-NLS-1$
-					+ "), es posible que el usado en la firma difiera del indicado: " //$NON-NLS-1$
-					+ e);
+		} catch (final Exception e) {
+			XAdESCounterSigner.LOGGER
+					.severe("No se ha podido establecer el algoritmo de huella digital (" + XMLConstants.SIGN_ALGOS_URI.get(algorithm) //$NON-NLS-1$
+							+ "), es posible que el usado en la firma difiera del indicado: " //$NON-NLS-1$
+							+ e);
 		}
-
-		try
-		{
-			xmlSignature.sign(Arrays.asList((X509Certificate[]) keyEntry.getCertificateChain()), keyEntry.getPrivateKey(), XMLConstants.SIGN_ALGOS_URI.get(algorithm), referenceList, "Signature-" + UUID.randomUUID().toString(), //$NON-NLS-1$
+		
+		try {
+			xmlSignature.sign(Arrays.asList((X509Certificate[]) keyEntry
+					.getCertificateChain()), keyEntry.getPrivateKey(),
+					XMLConstants.SIGN_ALGOS_URI.get(algorithm), referenceList,
+					"Signature-" + UUID.randomUUID().toString(), //$NON-NLS-1$
 					null /* TSA */
 			);
-		} catch (final NoSuchAlgorithmException e)
-		{
-			throw new UnsupportedOperationException("Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
-		} catch (final Exception e)
-		{
+		} catch (final NoSuchAlgorithmException e) {
+			throw new UnsupportedOperationException(
+					"Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
+		} catch (final Exception e) {
 			throw new AOException("No se ha podido realizar la contrafirma", e); //$NON-NLS-1$
 		}
 	}
-
-	private XAdESCounterSigner()
-	{
+	
+	private XAdESCounterSigner() {
 		// No permitimos la instanciacion
 	}
-
+	
 }
