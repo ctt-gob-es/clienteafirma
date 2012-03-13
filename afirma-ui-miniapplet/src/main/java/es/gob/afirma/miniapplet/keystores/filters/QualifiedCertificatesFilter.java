@@ -25,8 +25,7 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.main.filters.CertificateFilter;
 
-/**
- * Filtro que selecciona los certificados con un n&uacute;mero de serie concreto,
+/** Filtro que selecciona los certificados con un n&uacute;mero de serie concreto,
  * atendiendo que, si no es un certificado de firma se buscar&aacute; un certificado
  * de firma pareja de aquel del que se pas&oacute; el n&uacute;mero de serie. Si se
  * encontrase, se devolver&iacute;a el alias de este segundo certificado, si no, se
@@ -41,8 +40,7 @@ import es.gob.afirma.keystores.main.filters.CertificateFilter;
  * <li>Mismo n&uacute;mero de serie del titular.</li>
  * <li>Misma fecha de caducidad.</li>
  * </ul>
- * @author Carlos Gamuci Mill&aacute;n.
- */
+ * @author Carlos Gamuci Mill&aacute;n. */
 public final class QualifiedCertificatesFilter extends CertificateFilter {
 
 	private static final String[] SUBJECT_SN_PREFIX = new String[] {
@@ -54,11 +52,9 @@ public final class QualifiedCertificatesFilter extends CertificateFilter {
 	/** N&uacute;mero de serie en hexadecimal por el que debemos filtrar los certificados. */
 	private final String serialNumber;
 
-	/**
-	 * Contruye el filtro a partir del n&uacute;mero de serie en hexadecimal del certificado
+	/** Contruye el filtro a partir del n&uacute;mero de serie en hexadecimal del certificado
 	 * que deseamos obtener.
-	 * @param serialNumber N&uacute;mero de serie del certificado en hexadecimal.
-	 */
+	 * @param serialNumber N&uacute;mero de serie del certificado en hexadecimal. */
 	public QualifiedCertificatesFilter(final String serialNumber) {
 		this.serialNumber = prepareSerialNumber(serialNumber);
 	}
@@ -75,22 +71,22 @@ public final class QualifiedCertificatesFilter extends CertificateFilter {
 
 		X509Certificate cert;
 		final List<String> filteredCerts = new ArrayList<String>();
-		for (int i = 0; i < aliases.length; i++) {
-			cert = ksm.getCertificate(aliases[i]);
+		for (final String aliase : aliases) {
+			cert = ksm.getCertificate(aliase);
 			if (cert == null) {
 				Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-						"No se pudo recuperar el certificado: " + aliases[i]); //$NON-NLS-1$
+						"No se pudo recuperar el certificado: " + aliase); //$NON-NLS-1$
 				continue;
 			}
 			try {
 				if (this.matches(cert)) {
-					if (this.isSignatureCert(cert)) {
-						filteredCerts.add(aliases[i]);
+					if (QualifiedCertificatesFilter.isSignatureCert(cert)) {
+						filteredCerts.add(aliase);
 					}
 					else {
 						final String qualifiedCertAlias = searchQualifiedSignatureCertificate(cert, ksm, aliases);
 						if (qualifiedCertAlias == null) {
-							filteredCerts.add(aliases[i]);
+							filteredCerts.add(aliase);
 						} else {
 							filteredCerts.add(qualifiedCertAlias);
 						}
@@ -106,100 +102,95 @@ public final class QualifiedCertificatesFilter extends CertificateFilter {
 		return filteredCerts.toArray(new String[filteredCerts.size()]);
 	}
 
-	/**
-	 * Recupera el certificado qualificado de firma pareja del certificado indicado.
+	/** Recupera el certificado qualificado de firma pareja del certificado indicado.
 	 * @param cert Certificado del que buscar la pareja de firma.
 	 * @param ksm Gestor del almac&eacute;n de certificados.
 	 * @param aliases Alias de los certificados candidatos.
 	 * @return Alias del certificado pareja del indicado o {@code null} si no se ha
-	 * localizado una pareja satisfactoria.
-	 */
-	private String searchQualifiedSignatureCertificate(final X509Certificate cert, final AOKeyStoreManager ksm, final String[] aliases) {
+	 * localizado una pareja satisfactoria. */
+	private static String searchQualifiedSignatureCertificate(final X509Certificate cert, final AOKeyStoreManager ksm, final String[] aliases) {
 		X509Certificate cert2;
 
 
 		//Logger.getLogger("es.gob.afirma").info(
-		final StringBuffer buffer = new StringBuffer();
-		buffer.append("El certificado al que corresponde el numero de serie no es un certificado ").
-				append("de firma, se mostrara su informacion ademas de la del resto de certificados ").
-				append("del almacen:\n").
-				append("Certificado original:\n").
-				append("\t- Numero de serie: ").append(cert.getSerialNumber()).append('\n').
-				append("\t- Issuer: ").append(cert.getIssuerDN()).append('\n').
-				append("\t- Fecha de caducidad: ").append(getExpiredDate(cert)).append('\n');
+		final StringBuilder buffer = new StringBuilder();
+		buffer.append("El certificado al que corresponde el numero de serie no es un certificado "). //$NON-NLS-1$
+				append("de firma, se mostrara su informacion ademas de la del resto de certificados "). //$NON-NLS-1$
+				append("del almacen:\n"). //$NON-NLS-1$
+				append("Certificado original:\n"). //$NON-NLS-1$
+				append("\t- Numero de serie: ").append(cert.getSerialNumber()).append('\n'). //$NON-NLS-1$
+				append("\t- Issuer: ").append(cert.getIssuerDN()).append('\n'). //$NON-NLS-1$
+				append("\t- Fecha de caducidad: ").append(getExpiredDate(cert)).append('\n'); //$NON-NLS-1$
 				if (cert.getKeyUsage() != null) {
-					buffer.append("\t- KeyUsages:\n").
-					append("\t\t+ digitalSignature: ").append(cert.getKeyUsage()[0]).append('\n').
-					append("\t\t+ nonRepudiation: ").append(cert.getKeyUsage()[1]).append('\n').
-					append("\t\t+ keyEncipherment: ").append(cert.getKeyUsage()[2]).append('\n').
-					append("\t\t+ dataEncipherment: ").append(cert.getKeyUsage()[3]).append('\n').
-					append("\t\t+ keyAgreement: ").append(cert.getKeyUsage()[4]).append('\n').
-					append("\t\t+ keyCertSign: ").append(cert.getKeyUsage()[5]).append('\n').
-					append("\t\t+ cRLSign: ").append(cert.getKeyUsage()[6]).append('\n').
-					append("\t\t+ encipherOnly: ").append(cert.getKeyUsage()[7]).append('\n').
-					append("\t\t+ decipherOnly: ").append(cert.getKeyUsage()[8]).append('\n');
-				} else {
-					buffer.append("\t- El certificado no tiene definidos KeyUsages\n");
+					buffer.append("\t- KeyUsages:\n"). //$NON-NLS-1$
+					append("\t\t+ digitalSignature: ").append(cert.getKeyUsage()[0]).append('\n'). //$NON-NLS-1$
+					append("\t\t+ nonRepudiation: ").append(cert.getKeyUsage()[1]).append('\n'). //$NON-NLS-1$
+					append("\t\t+ keyEncipherment: ").append(cert.getKeyUsage()[2]).append('\n'). //$NON-NLS-1$
+					append("\t\t+ dataEncipherment: ").append(cert.getKeyUsage()[3]).append('\n'). //$NON-NLS-1$
+					append("\t\t+ keyAgreement: ").append(cert.getKeyUsage()[4]).append('\n'). //$NON-NLS-1$
+					append("\t\t+ keyCertSign: ").append(cert.getKeyUsage()[5]).append('\n'). //$NON-NLS-1$
+					append("\t\t+ cRLSign: ").append(cert.getKeyUsage()[6]).append('\n'). //$NON-NLS-1$
+					append("\t\t+ encipherOnly: ").append(cert.getKeyUsage()[7]).append('\n'). //$NON-NLS-1$
+					append("\t\t+ decipherOnly: ").append(cert.getKeyUsage()[8]).append('\n'); //$NON-NLS-1$
 				}
-				buffer.append(" -----\n");
+				else {
+					buffer.append("\t- El certificado no tiene definidos KeyUsages\n"); //$NON-NLS-1$
+				}
+				buffer.append(" -----\n"); //$NON-NLS-1$
 
-		for (int j = 0; j < aliases.length; j++) {
-			cert2 = ksm.getCertificate(aliases[j]);
+		for (final String aliase : aliases) {
+			cert2 = ksm.getCertificate(aliase);
 			if (!cert.getSerialNumber().equals(cert2.getSerialNumber())) {
-				buffer.append("Certificado:\n").
-				append("\t- Numero de serie: ").append(cert2.getSerialNumber()).append('\n').
-				append("\t- Issuer: ").append(cert2.getIssuerDN()).append('\n').
-				append("\t- Fecha de caducidad: ").append(getExpiredDate(cert2)).append('\n');
+				buffer.append("Certificado:\n"). //$NON-NLS-1$
+				append("\t- Numero de serie: ").append(cert2.getSerialNumber()).append('\n'). //$NON-NLS-1$
+				append("\t- Issuer: ").append(cert2.getIssuerDN()).append('\n'). //$NON-NLS-1$
+				append("\t- Fecha de caducidad: ").append(getExpiredDate(cert2)).append('\n'); //$NON-NLS-1$
 				if (cert2.getKeyUsage() != null) {
-					buffer.append("\t- KeyUsages:\n").
-					append("\t\t+ digitalSignature: ").append(cert2.getKeyUsage()[0]).append('\n').
-					append("\t\t+ nonRepudiation: ").append(cert2.getKeyUsage()[1]).append('\n').
-					append("\t\t+ keyEncipherment: ").append(cert2.getKeyUsage()[2]).append('\n').
-					append("\t\t+ dataEncipherment: ").append(cert2.getKeyUsage()[3]).append('\n').
-					append("\t\t+ keyAgreement: ").append(cert2.getKeyUsage()[4]).append('\n').
-					append("\t\t+ keyCertSign: ").append(cert2.getKeyUsage()[5]).append('\n').
-					append("\t\t+ cRLSign: ").append(cert2.getKeyUsage()[6]).append('\n').
-					append("\t\t+ encipherOnly: ").append(cert2.getKeyUsage()[7]).append('\n').
-					append("\t\t+ decipherOnly: ").append(cert2.getKeyUsage()[8]).append('\n');
+					buffer.append("\t- KeyUsages:\n"). //$NON-NLS-1$
+					append("\t\t+ digitalSignature: ").append(cert2.getKeyUsage()[0]).append('\n'). //$NON-NLS-1$
+					append("\t\t+ nonRepudiation: ").append(cert2.getKeyUsage()[1]).append('\n'). //$NON-NLS-1$
+					append("\t\t+ keyEncipherment: ").append(cert2.getKeyUsage()[2]).append('\n'). //$NON-NLS-1$
+					append("\t\t+ dataEncipherment: ").append(cert2.getKeyUsage()[3]).append('\n'). //$NON-NLS-1$
+					append("\t\t+ keyAgreement: ").append(cert2.getKeyUsage()[4]).append('\n'). //$NON-NLS-1$
+					append("\t\t+ keyCertSign: ").append(cert2.getKeyUsage()[5]).append('\n'). //$NON-NLS-1$
+					append("\t\t+ cRLSign: ").append(cert2.getKeyUsage()[6]).append('\n'). //$NON-NLS-1$
+					append("\t\t+ encipherOnly: ").append(cert2.getKeyUsage()[7]).append('\n'). //$NON-NLS-1$
+					append("\t\t+ decipherOnly: ").append(cert2.getKeyUsage()[8]).append('\n'); //$NON-NLS-1$
 				} else {
-					buffer.append("\t- El certificado no tiene definidos KeyUsages\n");
+					buffer.append("\t- El certificado no tiene definidos KeyUsages\n"); //$NON-NLS-1$
 				}
-				buffer.append(" -----\n");
+				buffer.append(" -----\n"); //$NON-NLS-1$
 				final boolean sameIssuer = (cert.getIssuerDN() == null ?
 						cert2.getIssuerDN() == null : cert.getIssuerDN().equals(cert2.getIssuerDN()));
 				final boolean sameSubjectSN = (getSubjectSN(cert) == null ?
 						getSubjectSN(cert2) == null : getSubjectSN(cert).equals(getSubjectSN(cert2)));
 				final boolean sameExpiredData = (getExpiredDate(cert) == null ?
 						getExpiredDate(cert2) == null : getExpiredDate(cert).equals(getExpiredDate(cert2)));
-				if (this.isSignatureCert(cert2) && sameIssuer && sameSubjectSN && sameExpiredData) {
-					buffer.append("Se ha elegido el certificado recien mostrado como pareja del original");
-					Logger.getLogger("es.gob.afirma").info(buffer.toString());
-					return aliases[j];
+				if (QualifiedCertificatesFilter.isSignatureCert(cert2) && sameIssuer && sameSubjectSN && sameExpiredData) {
+					buffer.append("Se ha elegido el certificado recien mostrado como pareja del original"); //$NON-NLS-1$
+					Logger.getLogger("es.gob.afirma").info(buffer.toString()); //$NON-NLS-1$
+					return aliase;
 				}
 			}
 		}
-		buffer.append("NO se ha elegido ningun certificado como pareja del original");
-		Logger.getLogger("es.gob.afirma").info(buffer.toString());
+		buffer.append("NO se ha elegido ningun certificado como pareja del original"); //$NON-NLS-1$
+		Logger.getLogger("es.gob.afirma").info(buffer.toString()); //$NON-NLS-1$
 		return null;
 	}
 
-	/**
-	 * Comprueba si el certificado tiene tiene un <em>KeyUsage</em> de firma (nonRepudiation).
+	/** Comprueba si el certificado tiene tiene un <em>KeyUsage</em> de firma (nonRepudiation).
 	 * @param cert Certificado.
-	 * @return {@code true} si el certificado es de firma.
-	 */
-	private boolean isSignatureCert(final X509Certificate cert) {
+	 * @return {@code true} si el certificado es de firma. */
+	private static boolean isSignatureCert(final X509Certificate cert) {
 		return cert.getKeyUsage() != null && cert.getKeyUsage()[1];
 	}
 
-	/**
-	 * Recupera el n&uacute;mero de serie del titular de un certificado.
+	/** Recupera el n&uacute;mero de serie del titular de un certificado.
 	 * Los ceros ('0') a la izquierda del n&uacute;mero de serie se eliminan durante el
 	 * proceso. Si el certificado no tiene n&uacute;mero de serie, devolver&aacute;
 	 * {@code null}.
 	 * @param cert Certificado.
-	 * @return N&uacute;mero de serie del titular.
-	 */
+	 * @return N&uacute;mero de serie del titular. */
 	private static String getSubjectSN(final X509Certificate cert) {
 		final String principal = cert.getSubjectX500Principal().getName();
     	final List<Rdn> rdns;
@@ -222,42 +213,34 @@ public final class QualifiedCertificatesFilter extends CertificateFilter {
 		return null;
 	}
 
-	/**
-	 * Recupera la fecha de expiraci&oacute;n del certificado en formato "yyyy-MM-dd".
+	/** Recupera la fecha de expiraci&oacute;n del certificado en formato "yyyy-MM-dd".
 	 * @param cert Certificado.
-	 * @return Fecha de caducidad.
-	 */
+	 * @return Fecha de caducidad. */
 	private static String getExpiredDate(final X509Certificate cert) {
 		return new SimpleDateFormat("yyyy-MM-dd").format(cert.getNotAfter()); //$NON-NLS-1$
 	}
 
-	/**
-	 * Recupera el n&uacute;mero de serie de un certificado en formato hexadecimal.
+	/** Recupera el n&uacute;mero de serie de un certificado en formato hexadecimal.
 	 * Los ceros ('0') a la izquierda del n&uacute;mero de serie se eliminan durante el
 	 * proceso. Si el certificado no tiene n&uacute;mero de serie, devolver&aacute;
 	 * {@code null}.
 	 * @param cert Certificado.
-	 * @return Numero de serie en hexadecimal.
-	 */
+	 * @return Numero de serie en hexadecimal. */
 	private static String getCertificateSN(final X509Certificate cert) {
     	return cert.getSerialNumber() == null ? null : bigIntegerToHex(cert.getSerialNumber());
 	}
 
-	/**
-	 * Convierte un opbjeto BigInteger a Hexadecimal.
+	/** Convierte un opbjeto BigInteger a Hexadecimal.
 	 * @param bi Entero que deseamos convertir.
-	 * @return Hexadecimal.
-	 */
+	 * @return Hexadecimal. */
 	private static String bigIntegerToHex(final BigInteger bi) {
 		return AOUtil.hexify(bi.toByteArray(), ""); //$NON-NLS-1$
 	}
 
-	/**
-	 * Prepara un n&uacute;mero de serie en hexadecimal para que tenga
+	/** Prepara un n&uacute;mero de serie en hexadecimal para que tenga
 	 * un formato concreto.
 	 * @param serialNumber N&uacute;mero de serie en hexadecimal.
-	 * @return N&uacute;mero de serie preparado.
-	 */
+	 * @return N&uacute;mero de serie preparado. */
 	private static String prepareSerialNumber(final String sn) {
 		final String preparedSn = sn.trim().replace(" ", "").replace("#", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		int n = 0;

@@ -36,7 +36,6 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.keystores.main.common.AOKeyStore;
 
-
 /** MiniApplet de firma del proyecto Afirma. */
 public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
@@ -315,46 +314,6 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	}
 
 	/** {@inheritDoc} */
-	@Deprecated
-	public String getFileContent(final String title,
-			                     final String extensions,
-			                     final String description) throws PrivilegedActionException {
-
-		this.clearError();
-
-		final String titleDialog = MiniAfirmaApplet.cleanParam(title);
-		final String cleanExts = MiniAfirmaApplet.cleanParam(extensions);
-		final String[] exts = (cleanExts == null ? null : cleanExts.split(",")); //$NON-NLS-1$
-		final String descFiles = MiniAfirmaApplet.cleanParam(description);
-
-		try {
-			return Base64.encode(AccessController.doPrivileged(new GetFileContentAction(
-					titleDialog, exts, descFiles, this)));
-		}
-		catch (final AOCancelledOperationException e) {
-			return null;
-		}
-		catch (final PrivilegedActionException e) {
-			setError(e);
-			throw e;
-		}
-		catch (final RuntimeException e) {
-			setError(e);
-			throw e;
-		}
-	}
-
-	/** {@inheritDoc} */
-	@Deprecated
-	public String getFileNameContentText(final String title,
-			                             final String extensions,
-			                             final String description) throws PrivilegedActionException {
-		this.clearError();
-		// Se llama a setError() desde getFileNameContent, no es necesario repetirlo aqui
-		return this.getFileNameContent(title, extensions, description, false);
-	}
-
-	/** {@inheritDoc} */
 	public String getFileNameContentBase64(final String title,
 			                               final String extensions,
 			                               final String description) throws PrivilegedActionException {
@@ -390,15 +349,6 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			setError(e);
 			throw e;
 		}
-	}
-
-
-	/** {@inheritDoc} */
-	@Deprecated
-	public String[] getMultiFileNameContentText(final String title,
-			                                    final String extensions,
-			                                    final String description) throws PrivilegedActionException {
-		return this.getMultiFileNameContent(title, extensions, description, false);
 	}
 
 	/** {@inheritDoc} */
@@ -481,24 +431,6 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			setError(e);
 			throw e;
 		}
-	}
-
-	/** Este m&eacute;todo no hace nada.
-	 * @deprecated La llamada no tiene ning&uacute;n efecto, ahora las comprobaciones de entorno
-	 *             se realizan en cada m&eacute;todo espec&iacute;fico. */
-	@Deprecated
-	public void verifyPlatform() {
-		// No hacemos nada
-	}
-
-	/** Recupera la version de Java en una cadena de la forma "JX". En donde 'X' es
-	 * la versi&oacute;n principal de Java (J5, J6, J7...).
-	 * @return Versi&oacute;n de la JVM.
-	 * @deprecated No es necesaria la llamada, ahora las comprobaciones de entorno se realizan en
-	 *             cada m&eacute;todo espec&iacute;fico. */
-	@Deprecated
-	public static String getEcoJava() {
-		return AccessController.doPrivileged(new GetEcoJavaVersionAction()).toString();
 	}
 
 	/** {@inheritDoc} */

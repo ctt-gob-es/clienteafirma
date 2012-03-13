@@ -172,54 +172,6 @@ interface MiniAfirma {
     boolean saveDataToFile(String data, String title, String fileName, String extension, String description) throws PrivilegedActionException, IOException, Exception;
 
     /** Muestra un di&aacute;logo modal para la selecci&oacute;n de un fichero del
-     * que se devolver&aacute; el contenido en Base64. Si el usuario cancela la operaci&oacute;n
-     * de selecci&oacute;n del fichero se devuelve {@code null}.
-     * @param title T&iacute;tulo para el di&aacute;logo.
-     * @param extensions Extensiones de b&uacute;squeda separadas por comas (',').
-     * Por ejemplo: "pdf,xml,doc".
-     * @param description Descripci&oacute;n del tipo de fichero que se desea cargar.
-     * @return El contenido del fichero codificado en Base64.
-     * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
-     * @throws Exception Cuando se produce un error no identificado.
-     * @deprecated Sustituir por <code>getFileNameContentBase64(String, String, String)</code>.
-     */
-    @Deprecated
-    String getFileContent(String title, String extensions, String description) throws PrivilegedActionException, Exception;
-
-    /** Muestra un di&aacute;logo modal para la selecci&oacute;n de un fichero del
-     * que se devolver&aacute; su nombre y su contenido en formato texto unicode. El
-     * resultado devuelto es una cadena con el nombre y el contenido separados por el
-     * car&aacute;cter '|'. Si el usuario cancela la operaci&oacute;n de selecci&oacute;n
-     * del fichero se devuelve {@code null}.
-     * @param title T&iacute;tulo para el di&aacute;logo.
-     * @param extensions Extensiones de b&uacute;squeda separadas por comas (',').
-     * @param description Descripci&oacute;n del tipo de fichero que se desea cargar.
-     * @return El nombre del fichero y su contenido en unicode.
-     * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
-     * @throws Exception Cuando se produce un error no identificado.
-     * @deprecated Los ficheros deben cargarse en base64 (getFileNameContentBase64) y despu&eacute;s
-	 * convertirse a texto con la codificaci&oacute;n que se desee (getTextFromBase64).  */
-    @Deprecated
-    String getFileNameContentText(final String title, final String extensions, final String description) throws PrivilegedActionException, Exception;
-
-    /** Muestra un di&aacute;logo modal para la selecci&oacute;n de m&uacute;ltiples ficheros de los
-     * que se devolver&aacute; sus nombres y sus contenidos en formato texto unicode. El
-     * resultado devuelto es un array en el que cada elemento contiene, por cada fichero seleccionado,
-     * su nombre y su contenido separados por el car&aacute;cter '|'.
-     * Si el usuario cancela la operaci&oacute;n de selecci&oacute;n
-     * del fichero se devuelve {@code null}.
-     * @param title T&iacute;tulo para el di&aacute;logo.
-     * @param extensions Extensiones de b&uacute;squeda.
-     * @param description Descripci&oacute;n del tipo de fichero que se desea cargar.
-     * @return Array con los nombres del ficheros y sus contenidos en unicode.
-     * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
-     * @throws Exception Cuando se produce un error no identificado.
-     * @deprecated Los ficheros deben cargarse en base64 (getMultiFileNameContentBase64) y
-     * despu&eacute;s convertirse a texto con la codificaci&oacute;n que se desee (getTextFromBase64). */
-    @Deprecated
-    String[] getMultiFileNameContentText(final String title, final String extensions, final String description) throws PrivilegedActionException, Exception;
-
-    /** Muestra un di&aacute;logo modal para la selecci&oacute;n de un fichero del
      * que se devolver&aacute; su nombre y su contenido en Base64. El resultado
      * devuelto es una cadena con el nombre y el contenido separados por el
      * car&aacute;cter '|'. Si el usuario cancela la operaci&oacute;n de selecci&oacute;n
