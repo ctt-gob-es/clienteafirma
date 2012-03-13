@@ -30,7 +30,7 @@ import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
 
-/** Generadoe de conjuntos completos de firmas. */
+/** Generador de conjuntos completos de firmas. */
 public class GenerateEPESSigns {
 
 	private static final boolean applyAlgos = false;

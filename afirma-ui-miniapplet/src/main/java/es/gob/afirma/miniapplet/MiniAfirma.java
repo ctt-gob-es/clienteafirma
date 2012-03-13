@@ -38,8 +38,7 @@ import es.gob.afirma.core.MissingLibraryException;
  *   En caso de necesitarse un fichero externo (biblioteca, almac&eacute;n en archivo, etc.) o una contrase&ntilde;a, estos se solicitan al usuario mediante di&aacute;logos gr&aacute;ficos
  *  </dd>
  * </dl>
- * @version 1.01
- */
+ * @version 1.01 */
 interface MiniAfirma {
 
     /** Firma unos datos seg&uacute;n la configuracion proporcionada.
@@ -63,6 +62,19 @@ interface MiniAfirma {
      * @throws Exception Cuando se produce un error no identificado.
      */
     String sign(String data, String algorithm, String format, String extraParams) throws AOFormatFileException, PrivilegedActionException, IOException, InvalidLibraryException, MissingLibraryException, Exception;
+
+	/** Fija el firmante que se establezca para ser reutilizado (sin intervenci&oacute;n del usuario) en todas
+	 * las operaciones posteriores hasta que se desactive esta opci&oacute;n.
+	 * En las operaciones de firmante fijado por un filtro, en las que no se muestra ning&uacute;n di&aacute;logo de
+	 * selecci&oacute;n de certificado, controla la aparcici&oacute;n del di&aacute;logo de solicitud de confirmaci&oacute;n de
+	 * firma.
+	 * @param sticky Si se establece a <code>true</code>, el firmante que se seleccione tras este establecimiento se
+	 *               reutilizar&aacute; para todas las operaciones posteriores, hasta que se restablezca a <code>false</code>.
+	 *               Si se establece al <code>false</code> se borra el firmante fijado si lo hubiese, por lo que se preguntar&aacute;
+	 *               al usuario de nuevo con un di&aacute;logo de selecci&oacute;n de certificado la pr&oacute;xima vez que se
+	 *               necesite (o un di&aacute;logo de confirmaci&oacute;n de firma si el certificado se establece un&iacute;vocamente
+	 *               mediante un filtro. */
+    public void setStickySignatory(final boolean sticky);
 
     /** Realiza la firma paralela (cofirma) de unos datos. La cofirma de una firma requiere
      * que los datos est&eacute;n contenidos en la firma original o que se indiquen de
@@ -252,6 +264,13 @@ interface MiniAfirma {
      *                 <li>UTF-16LE</li>
      *                 <li>UTF-16</li>
      *                </ul>
+     *                Adicionalmente, en vez del nombre de la codificaci&oacute;n, se puede usar dos identificadores especiales:
+     *                <dl>
+     *                 <dt>default</dt>
+     *                  <dd>Se utilizar&aacute; la codificaci&oacute;n por defecto del sistema. Es equivalente a usar <code>null</code>.</dd>
+     *                 <dt>auto</dt>
+     *                  <dd>Se realizar&aacute; una autodetecci&oacute;n de la codificaci&oacute;n del texto. Esta autodetecci&oacute;n no tiene una fiabilidad del 100%, y en ciertas ocasiones puede devolver una codificaci&oacute;n inapropiada.</dd>
+     *                </dl>
      * @return Texto decodificado.
      * @throws IOException Cuando se indica una codificaci&oacute;n no v&aacute;lida.
      */
@@ -272,6 +291,11 @@ interface MiniAfirma {
      *                 <li>UTF-16LE</li>
      *                 <li>UTF-16</li>
      *                </ul>
+     *                Adicionalmente, en vez del nombre de la codificaci&oacute;n, se puede usar un identificador especial:
+     *                <dl>
+     *                 <dt>default</dt>
+     *                  <dd>Se utilizar&aacute; la codificaci&oacute;n por defecto del sistema. Es equivalente a usar <code>null</code>.</dd>
+     *                </dl>
      * @return Texto codificado en Base64.
      * @throws UnsupportedEncodingException Cuando se indica una codificaci&oacute;n no v&aacute;lida.
      */
