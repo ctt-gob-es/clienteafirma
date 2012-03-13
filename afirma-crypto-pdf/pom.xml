@@ -18,6 +18,12 @@
 			<artifactId>afirma-core</artifactId>
 			<version>3.2.0</version>
 		</dependency>
+		
+	<dependency>
+      <groupId>es.gob.afirma</groupId>
+      <artifactId>afirma-ui-core-jse</artifactId>
+      <version>3.2.0</version>
+    </dependency>
 
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
