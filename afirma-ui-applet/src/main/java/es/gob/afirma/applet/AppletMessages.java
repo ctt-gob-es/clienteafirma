@@ -50,7 +50,7 @@ final class AppletMessages {
      * @return Recuerso textual con la subcadena sustituida. */
     static String getString(final String key, final String text) {
         try {
-            return resourceBundle.getString(key).replace("%0", text); //$NON-NLS-1$
+            return resourceBundle.getString(key).replace("%0", text != null ? text : "null"); //$NON-NLS-1$ //$NON-NLS-2$
         }
         catch (final Exception e) {
             return '!' + key + '!';
@@ -73,6 +73,9 @@ final class AppletMessages {
         }
         if (params != null) {
             for (int i = 0; i < params.length; i++) {
+            	if (params[i] == null) {
+            		params[i] = "null"; //$NON-NLS-1$
+            	}
                 text = text.replace("%" + i, params[i]); //$NON-NLS-1$
             }
         }
