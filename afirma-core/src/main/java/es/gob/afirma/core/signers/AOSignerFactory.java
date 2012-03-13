@@ -26,9 +26,10 @@ public final class AOSignerFactory {
 
 	private static final Map<String, AOSigner> SIGNERS = new HashMap<String, AOSigner>(7);
 
-	/** Listado de los manejador de firma soportados y los identificadores de formato de firma asociados. */
+	/* Listado de los manejador de firma soportados y los identificadores de formato de firma asociados. */
 	private static final String SIGNER_CLASS_CADES = "es.gob.afirma.signers.cades.AOCAdESSigner"; //$NON-NLS-1$
 	private static final String SIGNER_CLASS_CMS = "es.gob.afirma.signers.cms.AOCMSSigner"; //$NON-NLS-1$
+	private static final String SIGNER_CLASS_FACTURAE = "es.gob.afirma.signers.xades.AOFacturaESigner"; //$NON-NLS-1$
 	private static final String SIGNER_CLASS_XADES = "es.gob.afirma.signers.xades.AOXAdESSigner"; //$NON-NLS-1$
 	private static final String SIGNER_CLASS_XMLDSIG = "es.gob.afirma.signers.xmldsig.AOXMLDSigSigner"; //$NON-NLS-1$
 	private static final String SIGNER_CLASS_PADES = "es.gob.afirma.signers.pades.AOPDFSigner"; //$NON-NLS-1$
@@ -38,6 +39,8 @@ public final class AOSignerFactory {
 	private static final String[][] SIGNERS_CLASSES = new String[][] {
 		{AOSignConstants.SIGN_FORMAT_CADES, SIGNER_CLASS_CADES},
 		{AOSignConstants.SIGN_FORMAT_CMS, SIGNER_CLASS_CMS},
+		{AOSignConstants.SIGN_FORMAT_FACTURAE, SIGNER_CLASS_FACTURAE},
+		{AOSignConstants.SIGN_FORMAT_FACTURAE_ALT1, SIGNER_CLASS_FACTURAE},
 		{AOSignConstants.SIGN_FORMAT_XADES, SIGNER_CLASS_XADES},
 		{AOSignConstants.SIGN_FORMAT_XADES_DETACHED, SIGNER_CLASS_XADES},
 		{AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED, SIGNER_CLASS_XADES},

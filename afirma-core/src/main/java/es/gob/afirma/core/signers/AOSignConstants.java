@@ -77,6 +77,12 @@ public final class AOSignConstants {
     /** Identificador de la firma SOAP. */
     public static final String SIGN_FORMAT_SOAP = "SOAP"; //$NON-NLS-1$
 
+    /** Identificador de la firma Factura-e (derivado de XAdES-EPES). */
+    public static final String SIGN_FORMAT_FACTURAE = "FacturaE"; //$NON-NLS-1$
+
+    /** Identificador alternativo de la firma Factura-e (derivado de XAdES-EPES). */
+    public static final String SIGN_FORMAT_FACTURAE_ALT1 = "Factura-e"; //$NON-NLS-1$
+
     /** Formato de firma por defecto. */
     public static final String DEFAULT_SIGN_FORMAT = SIGN_FORMAT_CADES;
 
