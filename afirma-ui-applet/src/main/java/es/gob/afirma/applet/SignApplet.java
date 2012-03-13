@@ -2732,6 +2732,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     }
 
     /** {@inheritDoc} */
+    @Deprecated
     public String getTextFromBase64(final String b64) {
         LOGGER.info("Invocando getTextFromBase64"); //$NON-NLS-1$
         try {
@@ -2764,8 +2765,23 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     }
 
     /** {@inheritDoc} */
+    @Deprecated
     public String getBase64FromText(final String plainText) {
-    	LOGGER.info("Invocando getBase64FromText"); //$NON-NLS-1$
+        return getBase64FromText(plainText, null);
+    }
+
+    /** {@inheritDoc} */
+    public String getBase64FromText(final String plainText, final String charsetName) {
+        LOGGER.info("Invocando getBase64FromText"); //$NON-NLS-1$
+        if (charsetName != null) {
+            try {
+                return Base64.encode(plainText.getBytes(charsetName));
+            }
+            catch (final Exception e) {
+                LOGGER.warning("Codificacion no soportada (" + charsetName + //$NON-NLS-1$
+        		"), se utilizara la codificacion por defecto"); //$NON-NLS-1$
+            }
+        }
         String encoding = null;
         if (plainText.startsWith("<?xml")) { //$NON-NLS-1$
             // Intentamos detectar la codificacion
@@ -2783,21 +2799,6 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                 LOGGER.warning("El XML introducido parece tener una codificacion " + encoding //$NON-NLS-1$
                                + ", pero no ha sido posible usarla para generar el Base64: " //$NON-NLS-1$
                                + e);
-            }
-        }
-        return Base64.encode(plainText.getBytes());
-    }
-
-    /** {@inheritDoc} */
-    public String getBase64FromText(final String plainText, final String charsetName) {
-        LOGGER.info("Invocando getBase64FromText"); //$NON-NLS-1$
-        if (charsetName != null) {
-            try {
-                return Base64.encode(plainText.getBytes(charsetName));
-            }
-            catch (final Exception e) {
-                LOGGER.warning("Codificacion no soportada (" + charsetName + //$NON-NLS-1$
-        		"), se utilizara la codificacion por defecto"); //$NON-NLS-1$
             }
         }
         return Base64.encode(plainText.getBytes());
