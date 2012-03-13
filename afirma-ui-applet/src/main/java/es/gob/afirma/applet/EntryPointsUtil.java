@@ -162,7 +162,8 @@ interface EntryPointsUtil {
      *        Text in base 64.
      * @return Texto decodificado. <br>
      *         Decoded text.
-     */
+     * @deprecated */
+    @Deprecated
 	String getTextFromBase64(String b64);
 
     /** Decodifica un texto en base 64. Si se produce alg&uacute;n error se
@@ -190,7 +191,8 @@ interface EntryPointsUtil {
      *        Plain Text.
      * @return Texto codificado. <br>
      *         Encoded Text.
-     */
+     * @deprecated */
+    @Deprecated
     String getBase64FromText(String plainText);
 
     /** Codifica un texto plano a base 64. Si se produce alg&uacute;n error se
@@ -202,8 +204,15 @@ interface EntryPointsUtil {
      *        Texto plano. <br>
      *        Plain Text.
      * @param charsetName
-     *        Juego de caracteres. <br>
-     *        Charset.
+     *        Juego de caracteres. Si se especifica <code>null</code> se usar&aacute; el por defecto excepto en los casos de textos que
+     *        representen un XML bien formado, casos en los que se detectar&aacute; la docificaci&oacute;n del XML y se usar&aacute; esta.
+     *        Si especifica un juego de caracteres distinto de <code>null</code> codificando un fichero XML el resultado puede ser la
+     *        introducci&oacute;n de caracteres no soportados por la definici&oacute;n de ese XML y por lo tanto en un XML mal formado. Use
+     *        siempre <code>null</code> cuando codifique ficheros XML a Base64.
+     *        <br>
+     *        Charset. If <code>null</code> is specified the default charset will be used but when the text is a well-formed XML, where the
+     *        XML encodinf will be used. When converting XML files to base64 use allways <code>null</code> as the charser value, as using
+     *        a specify charse can lead to encoding problems and to a non-valid XML.
      * @return Texto codificado. <br>
      *         Encoded Text. */
     String getBase64FromText(String plainText, String charsetName);
