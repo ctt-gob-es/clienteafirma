@@ -4,13 +4,11 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Frame;
-import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.HeadlessException;
 import java.awt.Image;
 import java.awt.Insets;
-import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -107,7 +105,7 @@ public final class JAccessibilityFileChooserToSave extends JAccessibilityFileCho
     @Override
 	public int getInitialX() {
 		final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); //329
-		return (screenSize.width - 426) / 2 ;
+		return (screenSize.width - 620) / 2 ;
 	}
 
     /**
@@ -178,14 +176,7 @@ public final class JAccessibilityFileChooserToSave extends JAccessibilityFileCho
 	        }
         }
 
-        this.dialog.setComponentOrientation(this .getComponentOrientation());
-
-      //Se obtienen las dimensiones totales disponibles para mostrar una ventana
-		final Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
-
-		//Se obtienen las dimensiones de maximizado
-		final int maxWidth = (int)rect.getWidth();
-		final int maxHeight = (int)rect.getHeight();
+        this.dialog.setComponentOrientation(this .getComponentOrientation());     
 
         final Container contentPane = this.dialog.getContentPane();
 
@@ -222,19 +213,7 @@ public final class JAccessibilityFileChooserToSave extends JAccessibilityFileCho
 
     			}
     		});
-        	// Dimensiones de la ventana
-        	if (GeneralConfig.isMaximized()){
-        		this.dialog.setPreferredSize(new Dimension(maxWidth, maxHeight));
-        	} else {
-        		if (PrincipalGUI.getFileActualPositionX() != -1){
-    	    		this.dialog.setPreferredSize(new Dimension(PrincipalGUI.getFileActualWidth(), PrincipalGUI.getFileActualHeight()));
-        		}
-        	}
-        	if (GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
-        		this.dialog.setMinimumSize(new Dimension(Constants.FILE_FONT_INITIAL_WIDTH, Constants.FILE_INITIAL_HEIGHT));
-        	} else {
-        		this.dialog.setMinimumSize(new Dimension(Constants.FILE_INITIAL_WIDTH, Constants.FILE_INITIAL_HEIGHT));
-        	}
+        	
             for (int i = 0; i<this.getComponentCount();i++){
             	if (this.getComponent(i).getClass().getName().equals("javax.swing.JToolBar")){ //$NON-NLS-1$
             		this.jTool = (JToolBar)this.getComponent(i);
@@ -342,6 +321,22 @@ public final class JAccessibilityFileChooserToSave extends JAccessibilityFileCho
      		this.dialog.addComponentListener(this.resizingAdaptor);
 //        }
 
+         	// Dimensiones de la ventana
+     		if (GeneralConfig.isMaximized() || isMaximized()){
+     			this.theDialog.setBounds(0,0, (int)(getMaxDimension().getWidth()), (int)(getMaxDimension().getHeight()));
+            	this.dialog.setPreferredSize(getMaxDimension());
+            } else {
+            	if (PrincipalGUI.getFileActualPositionX() != -1){
+            		this.dialog.setBounds(PrincipalGUI.getFileActualPositionX(),PrincipalGUI.getFileActualPositionY(),PrincipalGUI.getFileActualWidth(), PrincipalGUI.getFileActualHeight());
+            		this.dialog.setPreferredSize(new Dimension(PrincipalGUI.getFileActualWidth(), PrincipalGUI.getFileActualHeight()));
+            	}
+            }
+            if (GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
+            	this.dialog.setMinimumSize(new Dimension(Constants.FILE_FONT_INITIAL_WIDTH, Constants.FILE_INITIAL_HEIGHT));
+            } else {
+            	this.dialog.setMinimumSize(new Dimension(Constants.FILE_INITIAL_WIDTH, Constants.FILE_INITIAL_HEIGHT));
+            }
+
         return this.dialog;
 	}
 
@@ -383,7 +378,7 @@ public final class JAccessibilityFileChooserToSave extends JAccessibilityFileCho
 	 */
 	@Override
 	void resized(){
-		if (!GeneralConfig.isMaximized()){
+		if (!GeneralConfig.isMaximized() || isMaximized()){
 	    	PrincipalGUI.setFileActualPositionX(this.dialog.getX());
 	    	PrincipalGUI.setFileActualPositionY(this.dialog.getY());
 	    	PrincipalGUI.setFileActualWidth(this.dialog.getWidth());
@@ -513,7 +508,7 @@ public final class JAccessibilityFileChooserToSave extends JAccessibilityFileCho
 
 
 		// Habilitado/Deshabilitado de botones restaurar/maximizar
-    	if (GeneralConfig.isMaximized()){
+    	if (GeneralConfig.isMaximized() || isMaximized()){
     		//Se deshabilita el botón de maximizado
     		this.maximizeButton.setEnabled(false);
     		//Se habilita el botón de restaurar
@@ -548,6 +543,8 @@ public final class JAccessibilityFileChooserToSave extends JAccessibilityFileCho
 		}
 		this.maximizeButton.setEnabled (true);
 		this.restoreButton.setEnabled (false);
+		
+		setIsMaximized(false);
 	}
 
 	/**
@@ -559,23 +556,13 @@ public final class JAccessibilityFileChooserToSave extends JAccessibilityFileCho
 		setActualPositionY(this.theDialog.getY());
 		setActualWidth(this.theDialog.getWidth());
 		setActualHeight(this.theDialog.getHeight());
-
-		//Se obtienen las dimensiones totales disponibles para mostrar una ventana
-		final Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
-
-		//Se obtienen las dimensiones de maximizado
-		final int maxWidth = (int)rect.getWidth();
-		final int maxHeight = (int)rect.getHeight();
-
+		
 		this.maximizeButton.setEnabled (false);
 		this.restoreButton.setEnabled (true);
-
-		//Se hace el resize dependiendo del so
-		if (!Platform.getOS().equals(Platform.OS.LINUX)){
-			this.theDialog.setBounds(0,0, maxWidth, maxHeight);
-		} else {
-			this.theDialog.setBounds(0,0, maxWidth, maxHeight - Constants.MAXIMIZE_VERTICAL_MARGIN_LINUX);
-		}
+		
+		this.theDialog.setBounds(0,0, (int)(getMaxDimension().getWidth()), (int)(getMaxDimension().getHeight()));
+		
+		setIsMaximized(true);
 	}
 
 	/**
