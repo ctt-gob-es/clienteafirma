@@ -117,7 +117,7 @@ final class NormalizedNames {
                  name.equalsIgnoreCase("XMLDSIGN_Enveloping") || name.equalsIgnoreCase("XMLDSIG_Enveloping")) { //$NON-NLS-1$ //$NON-NLS-2$
             return AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPING;
         }
-        else if (name.equalsIgnoreCase("PDF") || name.equalsIgnoreCase("Adobe PDF")) { //$NON-NLS-1$ //$NON-NLS-2$
+        else if (name.equalsIgnoreCase("PDF") || name.equalsIgnoreCase("Adobe PDF") || name.equalsIgnoreCase("PAdES")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             return AOSignConstants.SIGN_FORMAT_PDF;
         }
         else if (name.equalsIgnoreCase("ODF (Open Document Format)") || name.equalsIgnoreCase("ODF") || name.equalsIgnoreCase("ODT") || //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
