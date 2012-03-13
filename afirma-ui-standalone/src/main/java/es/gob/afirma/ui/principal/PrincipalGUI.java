@@ -630,7 +630,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
      * @return int Posicion X */
     public static int getInitialX() {
         final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); // 329
-        return (screenSize.width - 500) / 2;
+        return (screenSize.width - 650) / 2;
     }
 
     /** Posicion Y inicial de la ventana dependiendo del sistema operativo y de la
