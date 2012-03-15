@@ -107,7 +107,7 @@ public final class MassiveSignatureHelper {
      *        Tipo de operaci&oacute;n.
      * @see MassiveType */
     public void setMassiveOperation(final MassiveType massiveOperation) {
-        this.massiveConfiguration.setMassiveOperation(
+    	this.massiveConfiguration.setMassiveOperation(
             (massiveOperation != null ? massiveOperation : MassiveType.SIGN)
         );
     }
@@ -424,13 +424,8 @@ public final class MassiveSignatureHelper {
         // especifico
         final AOSigner validSigner;
         byte[] signData;
-        try {
-        	validSigner = this.getValidSigner(signer, sign);
-        	signData = validSigner.cosign(sign, this.massiveConfiguration.getAlgorithm(), this.massiveConfiguration.getKeyEntry(), config);
-        } catch (final AOException e) {
-        	LOGGER.warning("No es posible cofirmar el documento, se realizara una firma simple con el manejador por defecto: " + e.getMessage()); //$NON-NLS-1$
-        	signData = signer.sign(sign, this.massiveConfiguration.getAlgorithm(), this.massiveConfiguration.getKeyEntry(), config);
-        }
+        validSigner = this.getValidSigner(signer, sign);
+        signData = validSigner.cosign(sign, this.massiveConfiguration.getAlgorithm(), this.massiveConfiguration.getKeyEntry(), config);
 
         if (signData == null) {
             throw new AOException("No se generaron datos de firma"); //$NON-NLS-1$
@@ -526,12 +521,40 @@ public final class MassiveSignatureHelper {
             }
         }
         else {
-            validSigner = AOSignerFactory.getSigner(signData);
-            if (validSigner == null) {
-                throw new AOException("La firma introducida no se corresponde con ning\u00FAn formato soportado"); //$NON-NLS-1$
-            }
+        	validSigner = getSpecificSigner(signData);
+        	if (validSigner == null) {
+        		validSigner = AOSignerFactory.getSigner(signData);
+        		if (validSigner == null) {
+        			throw new AOException("La firma introducida no se corresponde con ning\u00FAn formato soportado"); //$NON-NLS-1$
+        		}
+        	}
         }
         return validSigner;
+    }
+
+    /**
+     * Indica si unos datos son compatibles con alguno de los formatos de firma para
+     * documentos espec&iacute;ficos (PDF, ODF u OOXML). Es obligatorio que el manejador
+     * de firma de cada formato este disponible para su uso.
+     * @param data Datos que se desean revisar.
+     * @return Manejador de firma compatible con los datos indicados o {@code null} si
+     * no se encontr&oacute; ninguno.
+     */
+    private AOSigner getSpecificSigner(final byte[] data) {
+    	final String[] specificFormats = new String[] {
+    			AOSignConstants.SIGN_FORMAT_PDF,
+    			AOSignConstants.SIGN_FORMAT_ODF,
+    			AOSignConstants.SIGN_FORMAT_OOXML
+    	};
+
+    	AOSigner signer;
+    	for (final String specificFormat : specificFormats) {
+    		signer = AOSignerFactory.getSigner(specificFormat);
+    		if (signer != null && signer.isValidDataFile(data)) {
+    			return signer;
+    		}
+    	}
+    	return null;
     }
 
     /** Agrega una entrada al log de la operacion de multifirma masiva global.
