@@ -87,6 +87,7 @@ public final class AOOOXMLSigner implements AOSigner {
         }
 
         // Comprobamos si estan todos los ficheros principales del documento
+
         return zipFile.getEntry("[Content_Types].xml") != null && (zipFile.getEntry("_rels/.rels") != null || zipFile.getEntry("_rels\\.rels") != null) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                && (zipFile.getEntry("docProps/app.xml") != null || zipFile.getEntry("docProps\\app.xml") != null) //$NON-NLS-1$ //$NON-NLS-2$
                && (zipFile.getEntry("docProps/core.xml") != null || zipFile.getEntry("docProps\\core.xml") != null); //$NON-NLS-1$ //$NON-NLS-2$
@@ -120,16 +121,16 @@ public final class AOOOXMLSigner implements AOSigner {
             return originalName + inTextInt + ".ooxml"; //$NON-NLS-1$
         }
         if (originalNameLC.endsWith(".docx")) { //$NON-NLS-1$
-            return originalName.substring(0, originalName.length() - 4) + inTextInt + ".docx"; //$NON-NLS-1$
+            return originalName.substring(0, originalName.length() - 5) + inTextInt + ".docx"; //$NON-NLS-1$
         }
         if (originalNameLC.endsWith(".xlsx")) { //$NON-NLS-1$
-            return originalName.substring(0, originalName.length() - 4) + inTextInt + ".xlsx"; //$NON-NLS-1$
+            return originalName.substring(0, originalName.length() - 5) + inTextInt + ".xlsx"; //$NON-NLS-1$
         }
         if (originalNameLC.endsWith(".pptx")) { //$NON-NLS-1$
-            return originalName.substring(0, originalName.length() - 4) + inTextInt + ".pptx"; //$NON-NLS-1$
+            return originalName.substring(0, originalName.length() - 5) + inTextInt + ".pptx"; //$NON-NLS-1$
         }
         if (originalNameLC.endsWith(".ppsx")) { //$NON-NLS-1$
-            return originalName.substring(0, originalName.length() - 4) + inTextInt + ".ppsx"; //$NON-NLS-1$
+            return originalName.substring(0, originalName.length() - 5) + inTextInt + ".ppsx"; //$NON-NLS-1$
         }
         return originalName + inTextInt + ".ooxml"; //$NON-NLS-1$
     }
@@ -183,7 +184,7 @@ public final class AOOOXMLSigner implements AOSigner {
             LOGGER.warning("Se ha introducido una firma nula para su comprobacion"); //$NON-NLS-1$
             return false;
         }
-        return isOOXMLFile(sign);
+        return OOXMLUtil.countOOXMLSignatures(sign) > 0;
     }
 
     /** Indica si los datos son un documento OOXML susceptible de ser firmado.
