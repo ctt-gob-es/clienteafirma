@@ -22,7 +22,6 @@ import java.util.logging.Logger;
 
 import junit.framework.Assert;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -169,7 +168,6 @@ public final class TestCMS {
      */
     @SuppressWarnings("static-method")
 	@Test
-    @Ignore
     public void testCoSignature() throws Exception {
 
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
