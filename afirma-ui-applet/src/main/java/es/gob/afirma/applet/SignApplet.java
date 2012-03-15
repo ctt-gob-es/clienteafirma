@@ -2094,7 +2094,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
         // Si ya hay una configuracion de firma masiva establecida, la
         // actualizamos con la nueva operacion
-        if (this.massiveSignatureHelper != null) {
+        if (this.massiveSignatureHelper != null && this.massiveSignatureHelper.isEnabled()) {
             this.massiveSignatureHelper.setMassiveOperation(this.massiveOperation);
         }
     }
@@ -2242,9 +2242,10 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                 massiveConfiguration.setDefaultFormat(SignApplet.this.getSigFormat());
                 massiveConfiguration.setMode(SignApplet.this.getSigMode());
                 massiveConfiguration.setOriginalFormat(SignApplet.this.isOriginalFormat());
-                massiveConfiguration.setMassiveOperation(SignApplet.this.getMassiveOperation() != null
-                                                                                                 ? SignApplet.this.getMassiveOperation()
-                                                                                                 : MassiveType.valueOf(AOSignConstants.DEFAULT_MASSIVE_OPERATION));
+                massiveConfiguration.setMassiveOperation(
+                		SignApplet.this.getMassiveOperation() != null ?
+                				SignApplet.this.getMassiveOperation() :
+                					MassiveType.valueOf(AOSignConstants.DEFAULT_MASSIVE_OPERATION));
 
                 try {
                     SignApplet.this.setMassiveSignatureHelper(new MassiveSignatureHelper(massiveConfiguration));
@@ -2262,7 +2263,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     /** {@inheritDoc} */
     public void endMassiveSignature() {
         LOGGER.info("Invocando endMassiveSignature"); //$NON-NLS-1$
-        if (this.massiveSignatureHelper == null || this.massiveSignatureHelper.isEnabled()) {
+        if (this.massiveSignatureHelper == null || !this.massiveSignatureHelper.isEnabled()) {
             LOGGER.warning("No se habia inicializado la operacion de firma masiva"); //$NON-NLS-1$
             return;
         }
@@ -2273,7 +2274,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     public String massiveSignatureData(final String b64Data) {
     	LOGGER.info("Invocando massiveSignatureData"); //$NON-NLS-1$
     	this.setError(null);
-    	if (this.massiveSignatureHelper == null || this.massiveSignatureHelper.isEnabled()) {
+    	if (this.massiveSignatureHelper == null || !this.massiveSignatureHelper.isEnabled()) {
     		this.setError(AppletMessages.getString("SignApplet.375")); //$NON-NLS-1$
     		return null;
     	}
@@ -2310,7 +2311,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     public String massiveSignatureHash(final String b64Hash) {
     	LOGGER.info("Invocando massiveSignatureHash"); //$NON-NLS-1$
     	this.setError(null);
-    	if (this.massiveSignatureHelper == null || this.massiveSignatureHelper.isEnabled()) {
+    	if (this.massiveSignatureHelper == null || !this.massiveSignatureHelper.isEnabled()) {
     		this.setError(AppletMessages.getString("SignApplet.375")); //$NON-NLS-1$
     		return null;
     	}
@@ -2356,7 +2357,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
     	LOGGER.info("Invocando massiveSignatureFile: " + filename); //$NON-NLS-1$
 
-    	if (this.massiveSignatureHelper == null || this.massiveSignatureHelper.isEnabled()) {
+    	if (this.massiveSignatureHelper == null || !this.massiveSignatureHelper.isEnabled()) {
     		this.setError(AppletMessages.getString("SignApplet.375")); //$NON-NLS-1$
     		return null;
     	}
@@ -2389,7 +2390,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     public String getMassiveSignatureCurrentLog() {
         LOGGER.info("Invocando getMassiveSignatureCurrentLog"); //$NON-NLS-1$
         this.setError(null);
-        if (this.massiveSignatureHelper == null || this.massiveSignatureHelper.isEnabled()) {
+        if (this.massiveSignatureHelper == null || !this.massiveSignatureHelper.isEnabled()) {
             this.setError(AppletMessages.getString("SignApplet.375")); //$NON-NLS-1$
             return null;
         }
