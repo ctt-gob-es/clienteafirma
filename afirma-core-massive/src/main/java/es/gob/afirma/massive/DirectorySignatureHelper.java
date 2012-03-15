@@ -397,7 +397,6 @@ public class DirectorySignatureHelper {
 
         // Realizamos la operacion masiva correspondiente
         final File[] files = this.getFiles(filenames);
-        this.prepareOperation(files.clone());
         if (MassiveType.SIGN.equals(type) || type == null) { // Asumimos que null es el por defecto: MassiveType.SIGN
             allOK = this.massiveSignOperation(files, od, keyEntry, signConfig);
         }
@@ -410,7 +409,6 @@ public class DirectorySignatureHelper {
         else {
             LOGGER.severe("Operacion masiva no reconocida");  //$NON-NLS-1$
         }
-        this.disposeOperation();
 
         // Cerramos el log de operacion
         this.closeLogRegistry();
@@ -536,19 +534,12 @@ public class DirectorySignatureHelper {
         final AOSigner signer = this.defaultSigner;
         for (final File file : files) {
 
-            try {
-                this.preProcessFile(new File(file.getAbsolutePath()));
-            }
-            catch (final Exception e) {
-               LOGGER.warning("Error en el preproceso del fichero '" + file.getPath() + "': " + e);  //$NON-NLS-1$//$NON-NLS-2$
-            }
-
             // Comprobamos que el fichero actual se pueda firmar con la
             // configuracion de firma actual
             try {
                 if (!this.isValidDataFile(signer, file)) {
-                    LOGGER.warning("El fichero '" + file.getPath() //$NON-NLS-1$
-                                                              + "' no puede ser firmado con la configuracion de firma actual"); //$NON-NLS-1$
+                	LOGGER.warning("El fichero '" + file.getPath() + //$NON-NLS-1$
+                		"' no puede ser firmado con la configuracion de firma actual"); //$NON-NLS-1$
                     this.addLogRegistry(Level.WARNING, MassiveSignMessages.getString("DirectorySignatureHelper.4") + REG_FIELD_SEPARATOR + file.getPath()); //$NON-NLS-1$
                     DirectorySignatureHelper.closeStream(fis);
                     allOK = false;
@@ -654,14 +645,15 @@ public class DirectorySignatureHelper {
         // siguiente especificacion:
         // - Comprobamos que el fichero sea una firma con el formato indicado
         // - SI: Cofirmamos
-        // - NO: Comprobamos si debemos respetar el formato de firma original:
-        // - SI: Comprobamos si el fichero se corresponde con un tipo de firma
-        // cualquiera:
-        // - SI: Cofirmamos en ese formato.
-        // - NO: Es un fichero de datos (o firma no soportada), as&iacute; que se
-        // firmara en el formato indicado
-        // - NO: Lo consideramos un fichero de datos, as&iacute; que se firmara en el
-        // formato indicado
+        // - NO: Comprobamos si debemos respetar el formato de firma original
+        //		 - SI: Comprobamos si el fichero se corresponde con un documento que requiera un formato de firma especifico (PDF, ODF u OOXML).
+        //			   - SI: Comprobamos si es una firma de ese tipo
+        //					 - SI: Cofirmamos en el formato especifico
+        //					 - NO: Firmamos en el formato especifico
+        //			   - NO: Comprobamos si el fichero se corresponde con un tipo de firma cualquiera
+        // 					 - SI: Cofirmamos en ese formato
+        // 					 - NO: Es un fichero de datos (o firma no soportada), asi que se firmara en el formato indicado
+        // 		 - NO: Lo consideramos un fichero de datos, as&iacute; que se firmara en el formato indicado
         String textAux;
         byte[] signedData;
         byte[] originalData;
@@ -674,28 +666,40 @@ public class DirectorySignatureHelper {
                 allOK = false;
                 continue;
             }
+
+            signConfig.setProperty(URI_STR, file.toURI().toASCIIString());
+
+            // Indica si se debe realizar una cofirma o una firma de los datos
+            boolean cosignOperation;
+
             if (this.defaultSigner.isSign(originalData)) {
-                textAux = "cosign"; //$NON-NLS-1$
+                cosignOperation = true;
                 signer = this.defaultSigner;
-                signConfig.setProperty(URI_STR, file.toURI().toASCIIString());
-                signedData = this.cosign(signer, originalData, this.algorithm, keyEntry, signConfig);
-            }
-            else if (originalFormat) {
-                signer = AOSignerFactory.getSigner(originalData);
-                if (signer != null) {
-                    textAux = "cosign"; //$NON-NLS-1$
-                    signedData = this.cosign(signer, originalData, this.algorithm, keyEntry, signConfig);
-                }
-                else {
-                    textAux = "sign"; //$NON-NLS-1$
-                    signer = this.defaultSigner;
-                    signedData = this.sign(signer, originalData, this.algorithm, keyEntry, signConfig);
-                }
-            }
-            else {
-                textAux = "sign"; //$NON-NLS-1$
+            } else if (originalFormat) {
+            	signer = getSpecificSigner(originalData);
+            	if (signer != null) {
+            		cosignOperation = signer.isSign(originalData);
+            	} else {
+            		signer = AOSignerFactory.getSigner(originalData);
+            		if (signer != null) {
+            			cosignOperation = true;
+            		} else {
+            			cosignOperation = false;
+            			signer = this.defaultSigner;
+            		}
+            	}
+            } else {
+    			cosignOperation = false;
                 signer = this.defaultSigner;
-                signedData = this.sign(signer, originalData, this.algorithm, keyEntry, signConfig);
+            }
+
+            // Operamos segun los condicionales definidos
+            if (cosignOperation) {
+            	textAux = "cosign"; //$NON-NLS-1$
+            	signedData = this.cosign(signer, originalData, this.algorithm, keyEntry, signConfig);
+            } else {
+            	textAux = "sign"; //$NON-NLS-1$
+            	signedData = this.sign(signer, originalData, this.algorithm, keyEntry, signConfig);
             }
 
             // Comprobamos si la operacion ha finalizado correctamente
@@ -785,8 +789,12 @@ public class DirectorySignatureHelper {
             return signer.sign(data, algo, keyEntry, signConfig);
         }
         catch (final Exception e) {
-            LOGGER.severe("No ha sido posible firmar el fichero de datos'" + signConfig.getProperty(URI_STR) + "': " + e);  //$NON-NLS-1$//$NON-NLS-2$
+            LOGGER.severe("No ha sido posible firmar el fichero de datos '" + signConfig.getProperty(URI_STR) + "': " + e);  //$NON-NLS-1$//$NON-NLS-2$
             this.addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.13") + REG_FIELD_SEPARATOR + signConfig.getProperty(URI_STR)); //$NON-NLS-1$
+
+            //TODO: Borrar
+            e.printStackTrace();
+
             return null;
         }
 
@@ -1250,21 +1258,28 @@ public class DirectorySignatureHelper {
         return this.signedFilenames.toArray(new String[0]);
     }
 
-    /** Preparamos cualquier operaci&oacute;n que queramos ejecutar a lo largo de
-     * la operaci&oacute;n masiva.
-     * @param files
-     *        Listado de ficheros que se van a procesar durante la
-     *        operaci&oacute;n masiva. */
-	protected void prepareOperation(final File[] files) { /* No implementado */ }
+    /**
+     * Indica si unos datos son compatibles con alguno de los formatos de firma para
+     * documentos espec&iacute;ficos (PDF, ODF u OOXML). Es obligatorio que el manejador
+     * de firma de cada formato este disponible para su uso.
+     * @param data Datos que se desean revisar.
+     * @return Manejador de firma compatible con los datos indicados o {@code null} si
+     * no se encontr&oacute; ninguno.
+     */
+    private AOSigner getSpecificSigner(final byte[] data) {
+    	final String[] specificFormats = new String[] {
+    			AOSignConstants.SIGN_FORMAT_PDF,
+    			AOSignConstants.SIGN_FORMAT_ODF,
+    			AOSignConstants.SIGN_FORMAT_OOXML
+    	};
 
-    /** Liberamos los recursos de la operaci&oacute;n que hayamos ejecutado
-     * simult&aacute;neamente a la operaci&oacute;n masiva. */
-    protected void disposeOperation() { /* No implementado */ }
-
-    /** Ejecutamos cualquier operaci&oacute;n antes del procesado de un fichero
-     * concreto.
-     * @param file
-     *        El proximo fichero que se va a procesar. */
-	protected void preProcessFile(final File file) { /* No implementado */ }
-
+    	AOSigner signer;
+    	for (final String specificFormat : specificFormats) {
+    		signer = AOSignerFactory.getSigner(specificFormat);
+    		if (signer != null && signer.isValidDataFile(data)) {
+    			return signer;
+    		}
+    	}
+    	return null;
+    }
 }
