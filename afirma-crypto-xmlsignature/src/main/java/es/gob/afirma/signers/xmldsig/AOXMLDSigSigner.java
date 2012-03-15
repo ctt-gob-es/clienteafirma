@@ -1,3 +1,4 @@
+
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
@@ -28,7 +29,6 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -1191,7 +1191,7 @@ public final class AOXMLDSigSigner implements AOSigner {
 
             // si el documento contiene una firma simple se inserta como raiz el
             // nodo AFIRMA
-            if (rootSig.getNodeName().equals((xmlSignaturePrefix == null || "".equals(xmlSignaturePrefix) ? "" : xmlSignaturePrefix + ":"))) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            if (rootSig.getNodeName().equals((xmlSignaturePrefix == null || "".equals(xmlSignaturePrefix) ? "" : xmlSignaturePrefix + ":") + SIGNATURE_STR)) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 docSig = insertarNodoAfirma(docSig);
                 rootSig = docSig.getDocumentElement();
             }
@@ -1456,9 +1456,9 @@ public final class AOXMLDSigSigner implements AOSigner {
 
             root = this.doc.getDocumentElement();
 
-            // si el documento contiene una firma simple se inserta como raiz el
+            // si el nodo raiz del documento es una firma simple, se inserta como raiz el
             // nodo AFIRMA
-            if (root.getNodeName().equals((xmlSignaturePrefix == null || "".equals(xmlSignaturePrefix) ? "" : xmlSignaturePrefix + ":"))) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            if (root.getNodeName().equals((xmlSignaturePrefix == null || "".equals(xmlSignaturePrefix) ? "" : xmlSignaturePrefix + ":") + SIGNATURE_STR)) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 this.doc = insertarNodoAfirma(this.doc);
                 root = this.doc.getDocumentElement();
             }
@@ -1496,16 +1496,15 @@ public final class AOXMLDSigSigner implements AOSigner {
 
         // obtiene todas las firmas
         final NodeList signatures = root.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_STR);
-        final int numSignatures = signatures.getLength();
 
-        final Element[] nodes = new Element[numSignatures];
-        for (int i = 0; i < numSignatures; i++) {
+        final Element[] nodes = new Element[signatures.getLength()];
+        for (int i = 0; i < signatures.getLength(); i++) {
             nodes[i] = (Element) signatures.item(i);
         }
 
         // y crea sus contrafirmas
         try {
-            for (int i = 0; i < numSignatures; i++) {
+            for (int i = 0; i < nodes.length; i++) {
                 this.cs(nodes[i], keyEntry, refsDigestMethod, canonicalizationAlgorithm, xmlSignaturePrefix);
             }
         }
@@ -1527,20 +1526,21 @@ public final class AOXMLDSigSigner implements AOSigner {
         final NodeList signatures = root.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_STR);
         final NodeList references = root.getElementsByTagNameNS(XMLConstants.DSIGNNS, REFERENCE_STR);
 
-        final int numSignatures = signatures.getLength();
-        final int numReferences = references.getLength();
+        // obtenemos el ID de los SignatureValue de cada una de las firmas recuperadas
+        final String signatureValueID[] = new String[signatures.getLength()];
+        for (int i = 0; i < signatures.getLength(); i++) {
+        	signatureValueID[i] = ((Element) signatures.item(i)).
+        		getElementsByTagNameNS(XMLConstants.DSIGNNS, "SignatureValue").item(0). //$NON-NLS-1$
+        		getAttributes().getNamedItem("Id").getNodeValue(); //$NON-NLS-1$
+        }
 
-        // comprueba cuales son hojas
+        // hojas seran aquellas firmas cuyo SignatureValue no haya sido referenciado
         try {
-            for (int i = 0; i < numSignatures; i++) {
-                final Element signature = (Element) signatures.item(i);
-                final String refURI = "#" + signature.getAttribute("Id") + "Value"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            for (int i = 0; i < signatureValueID.length; i++) {
+                final String refURI = "#" + signatureValueID[i]; //$NON-NLS-1$
 
                 boolean isLeaf = true;
-
-                // si la firma esta referenciada por otra firma entonces no es
-                // hoja
-                for (int j = 0; j < numReferences; j++) {
+                for (int j = 0; j < references.getLength(); j++) {
                     if (((Element) references.item(j)).getAttribute("URI").equals(refURI)) { //$NON-NLS-1$
                         isLeaf = false;
                     }
@@ -1548,7 +1548,7 @@ public final class AOXMLDSigSigner implements AOSigner {
 
                 // y crea sus contrafirmas
                 if (isLeaf) {
-                    this.cs(signature, keyEntry, refsDigestMethod, canonicalizationAlgorithm, xmlSignaturePrefix);
+                    this.cs((Element) signatures.item(i), keyEntry, refsDigestMethod, canonicalizationAlgorithm, xmlSignaturePrefix);
                 }
             }
         }
@@ -1563,103 +1563,91 @@ public final class AOXMLDSigSigner implements AOSigner {
      * @param tgts Array con las posiciones de los nodos a contrafirmar
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     private void countersignNodes(final Element root,
-                                  final Object[] tgts,
-                                  final PrivateKeyEntry keyEntry,
-                                  final String refsDigestMethod,
-                                  final String canonicalizationAlgorithm,
-                                  final String xmlSignaturePrefix) throws AOException {
+    		final Object[] tgts,
+    		final PrivateKeyEntry keyEntry,
+    		final String refsDigestMethod,
+    		final String canonicalizationAlgorithm,
+    		final String xmlSignaturePrefix) throws AOException {
 
-        if (tgts == null) {
-            throw new IllegalArgumentException("La lista de nodos a contrafirmar no puede ser nula"); //$NON-NLS-1$
-        }
+    	if (tgts == null) {
+    		throw new IllegalArgumentException("La lista de nodos a contrafirmar no puede ser nula"); //$NON-NLS-1$
+    	}
 
-        // descarta las posiciones que esten repetidas
-        final List<Integer> targetsList = new ArrayList<Integer>();
-        for (int i = 0; i < tgts.length; i++) {
-            if (!targetsList.contains(tgts[i])) {
-                targetsList.add((Integer) tgts[i]);
-            }
-        }
-        final Object[] targets = targetsList.toArray();
-
-        final AOTreeNode tree = new AOTreeNode("AFIRMA"); //$NON-NLS-1$
-
-        // obtiene todas las firmas
+        // obtiene todas las firmas y las referencias
         final NodeList signatures = root.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_STR);
 
-        final int numSignatures = signatures.getLength();
-
-        final String[] arrayIds = new String[numSignatures];
-        final String[] arrayRef = new String[numSignatures];
-        final AOTreeNode[] arrayNodes = new AOTreeNode[numSignatures];
-
-        // genera un arbol con las firmas para conocer su posicion
-        for (int i = 0; i < numSignatures; i++) {
-            final Element signature = (Element) signatures.item(i);
-            final String sigId = signature.getAttribute("Id"); //$NON-NLS-1$
-
-            final AOTreeNode node = new AOTreeNode(signature);
-            arrayIds[i] = sigId;
-            arrayNodes[i] = node;
-
-            final String typeReference = ((Element) signature.getElementsByTagNameNS(XMLConstants.DSIGNNS, REFERENCE_STR).item(0)).getAttribute("Type"); //$NON-NLS-1$
-            if (typeReference.equals(CSURI)) {
-                final String uri = ((Element) signature.getElementsByTagNameNS(XMLConstants.DSIGNNS, REFERENCE_STR).item(0)).getAttribute("URI"); //$NON-NLS-1$
-                arrayRef[i] = uri.substring(1, uri.length() - 5);
-            }
-            else {
-                arrayRef[i] = ""; //$NON-NLS-1$
-            }
+        // obtenemos el ID de los SignatureValue de cada una de las firmas recuperadas
+        final String signatureValuesID[] = new String[signatures.getLength()];
+        for (int i = 0; i < signatures.getLength(); i++) {
+        	signatureValuesID[i] = ((Element) signatures.item(i)).
+        		getElementsByTagNameNS(XMLConstants.DSIGNNS, "SignatureValue").item(0). //$NON-NLS-1$
+        		getAttributes().getNamedItem("Id").getNodeValue(); //$NON-NLS-1$
         }
 
-        for (int i = numSignatures - 1; i > 0; i--) {
-            for (int j = 0; j < numSignatures; j++) {
-                if (arrayRef[i].equals(arrayIds[j])) {
-                    arrayNodes[j].add(arrayNodes[i]);
-                }
-            }
+        // ordenamos los nodos de firma en preorden segun el arbol de firmas
+        final List<Element> sortedSignatures = new ArrayList<Element>(signatures.getLength());
+        for (int i = 0; i < signatures.getLength(); i++) {
+
+        	boolean isMainSignature = true;
+        	final NodeList references = ((Element) signatures.item(i)).
+        		getElementsByTagNameNS(XMLConstants.DSIGNNS, REFERENCE_STR);
+        	for (int j = 0; j < references.getLength(); j++) {
+        		if (AOXMLDSigSigner.CSURI.equals(((Element)references.item(j)).getAttribute("Type"))) { //$NON-NLS-1$
+        			isMainSignature = false;
+        			break;
+        		}
+        	}
+
+        	if (isMainSignature) {
+        		sortedSignatures.add((Element) signatures.item(i));
+        		addSubNodes(signatureValuesID[i], signatures, signatureValuesID, sortedSignatures);
+        	}
         }
 
-        for (int i = 0; i < numSignatures; i++){
-            if ("".equals(arrayRef[i])) { //$NON-NLS-1$
-                tree.add(arrayNodes[i]);
-            }
-        }
-
-        // introduce en una lista los nodos del arbol recorrido en preorden
-        final List<Element> listNodes = new ArrayList<Element>();
-        final Enumeration<AOTreeNode> enumTree = tree.preorderEnumeration();
-        enumTree.nextElement();
-        while (enumTree.hasMoreElements()) {
-            listNodes.add((Element) enumTree.nextElement().getUserObject());
-        }
-
-        // obtiene los nodos indicados en targets
-        final Element[] nodes = new Element[targets.length];
-        try {
-            for (int i = 0; i < targets.length; i++) {
-                nodes[i] = listNodes.get(((Integer) targets[i]).intValue());
-            }
-        }
-        catch (final ClassCastException e) {
-            throw new AOException("Valor de nodo no valido", e); //$NON-NLS-1$
-        }
-        catch (final IndexOutOfBoundsException e) {
-            throw new AOException("Posicion de nodo no valida", e); //$NON-NLS-1$
-        }
-
-        // y crea sus contrafirmas
-        try {
-            for (final Element node : nodes) {
-                this.cs(node, keyEntry, refsDigestMethod, canonicalizationAlgorithm, xmlSignaturePrefix);
-            }
-        }
-        catch (final Exception e) {
-            throw new AOException("No se ha podido realizar la contrafirma", e); //$NON-NLS-1$
-        }
+        // Recorremos todos los nodos comprobando si su posicion esta entre las seleccionadas
+        // como nodo objetivo y, dado el caso, se contrafirma
+        final List<Object> targetsList = Arrays.asList(tgts);
+    	for (int i = 0; i < sortedSignatures.size(); i++) {
+    		if (targetsList.contains(new Integer(i))) {
+    			this.cs(sortedSignatures.get(i), keyEntry, refsDigestMethod, canonicalizationAlgorithm, xmlSignaturePrefix);
+    		}
+    	}
     }
 
-    /** Realiza la contrafirma de los firmantes indicados en el par&aacute;metro
+    /**
+     * Funci&oacute;n que busca los nodos de firma que referencian a uno indicado
+     * y, recursivamente, a cada uno de estos. Según los encuentra los inserta en un
+     * listado de nodos.
+     * @param signatureValueID Identificador del valor de firma para el que se deben buscar las
+     * firmas que lo referencian.
+     * @param signatures Listado de firmas.
+     * @param signatureValuesID Listado de indetificadores de valor de firma ordenados
+     * seg&uacute;n el listado de firmas.
+     * @param sortedSignatures Listado donde se monta la sucesi&oacute;n ordenada de firmas.
+     */
+    private void addSubNodes(final String signatureValueID, final NodeList signatures,
+			final String[] signatureValuesID, final List<Element> sortedSignatures) {
+
+    	for (int i = 0; i < signatures.getLength(); i++) {
+    		final NodeList references = ((Element) signatures.item(i)).getElementsByTagNameNS(
+    				XMLConstants.DSIGNNS, REFERENCE_STR);
+
+    		for (int j = 0; j < references.getLength(); j++) {
+    			if (("#" + signatureValueID).equals(((Element)references.item(j)).getAttribute("URI"))) { //$NON-NLS-1$ //$NON-NLS-2$
+    				// Si una firma contiene una referencia a si misma,
+    				// rompemos el ciclo para evitar un bucle infinito
+    				if (signatureValuesID[i].equals(signatureValueID)) {
+    					break;
+    				}
+    				sortedSignatures.add((Element) signatures.item(i));
+    				addSubNodes(signatureValuesID[i], signatures, signatureValuesID, sortedSignatures);
+    				break;
+    			}
+    		}
+    	}
+	}
+
+	/** Realiza la contrafirma de los firmantes indicados en el par&aacute;metro
      * targets.
      * @param root
      *        Elemento ra&iacute;z del documento xml que contiene las firmas
