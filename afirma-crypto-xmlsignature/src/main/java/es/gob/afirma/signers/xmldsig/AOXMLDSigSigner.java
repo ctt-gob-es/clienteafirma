@@ -1616,7 +1616,7 @@ public final class AOXMLDSigSigner implements AOSigner {
 
     /**
      * Funci&oacute;n que busca los nodos de firma que referencian a uno indicado
-     * y, recursivamente, a cada uno de estos. Según los encuentra los inserta en un
+     * y, recursivamente, a cada uno de estos. Seg&uacute;n los encuentra los inserta en un
      * listado de nodos.
      * @param signatureValueID Identificador del valor de firma para el que se deben buscar las
      * firmas que lo referencian.
