@@ -9,7 +9,6 @@ import java.util.logging.Logger;
 
 import junit.framework.Assert;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -21,13 +20,13 @@ import es.gob.afirma.massive.MassiveSignatureHelper.MassiveSignConfiguration;
  * la firma masiva program&aacute;tica.
  */
 public class MassiveSignatureTest {
-	
+
 	private static final String		CERT_ALIAS		= "anf usuario activo";			//$NON-NLS-1$
-																						
+
 	private static final String		CERT_PASS		= "12341234";						//$NON-NLS-1$
-																						
+
 	private static final String		CERT_PATH		= "ANF_PF_Activo.pfx";				//$NON-NLS-1$
-																						
+
 	/**
 	 * Formatos de los cuales ejecutarse el test.
 	 * Campo 1: Identificador del formato
@@ -56,7 +55,7 @@ public class MassiveSignatureTest {
 			"OOXML", "docx", "false", "false" }, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			{ AOSignConstants.SIGN_FORMAT_PDF, "PDF", "pdf", "false", "false" } //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 													};
-	
+
 	private static final String[][]	FORMATS_FILES	= {
 			{ AOSignConstants.SIGN_FORMAT_CMS, "bin" }, //$NON-NLS-1$
 			{ AOSignConstants.SIGN_FORMAT_CADES, "bin" }, //$NON-NLS-1$
@@ -74,10 +73,10 @@ public class MassiveSignatureTest {
 			{ AOSignConstants.SIGN_FORMAT_ODF, "odt" }, //$NON-NLS-1$
 			{ AOSignConstants.SIGN_FORMAT_OOXML, "docx" } //$NON-NLS-1$
 													};
-	
+
 	// private static final boolean[] ORIGINAL_FORMAT = new boolean[] {true,
 	// false};
-	
+
 	private static final String[][]	FORMATS_MODES	= {
 			{ AOSignConstants.SIGN_FORMAT_CMS,
 			AOSignConstants.SIGN_MODE_EXPLICIT },
@@ -115,7 +114,7 @@ public class MassiveSignatureTest {
 			AOSignConstants.SIGN_MODE_IMPLICIT }	};
 	private static final boolean	MANUAL_DEBUG	= false;
 	private final static String		path			= new File("").getAbsolutePath();	//$NON-NLS-1$
-																						
+
 	//    private static final String CERT_PATH2 = "ANF_PJ_Activo.pfx"; //$NON-NLS-1$
 	//    private static final String CERT_PASS2 = "12341234"; //$NON-NLS-1$
 	//    private static final String CERT_ALIAS2 = "anf usuario activo"; //$NON-NLS-1$
@@ -123,22 +122,24 @@ public class MassiveSignatureTest {
 	//    private static final String CERT_PATH3 = "CAMERFIRMA_PF_SW_Clave_usuario_Activo.p12"; //$NON-NLS-1$
 	//    private static final String CERT_PASS3 = "1111"; //$NON-NLS-1$
 	//    private static final String CERT_ALIAS3 = "1"; //$NON-NLS-1$
-	
+
 	private static byte[] getDigestData(final byte[] data) throws Exception {
 		return MessageDigest.getInstance("SHA-1").digest(data); //$NON-NLS-1$
 	}
-	
+
 	private static String getResourcePath(final String filename) {
 		return ((System.getProperty("os.name").contains("indows")) ? "" : File.separator) + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				MassiveSignatureTest.class
 						.getResource("/" + filename).toString().replace("file:/", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
-	
+
 	private static void saveData(final byte[] data, final String filename) {
 		if (MassiveSignatureTest.MANUAL_DEBUG) {
 			try {
 				final java.io.FileOutputStream fos = new java.io.FileOutputStream(
 						MassiveSignatureTest.path + File.separator + filename);
+
+				System.out.println("Guardamos el fichero: " + MassiveSignatureTest.path + File.separator + filename);
 				fos.write(data);
 				try {
 					fos.flush();
@@ -152,17 +153,16 @@ public class MassiveSignatureTest {
 			}
 		}
 	}
-	
+
 	/**
 	 * Genera todo tipo de firmas y multifirmas masivas haciendo u
 	 * @throws Exception Cuando se produce cualquier error durante la ejecuci&oacute;n.
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
 	public void pruebaTodasLasCombinacionesDeFirmaProgramatica()
 			throws Exception {
-		
+
 		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
 		ks.load(ClassLoader
 				.getSystemResourceAsStream(MassiveSignatureTest.CERT_PATH),
@@ -171,7 +171,7 @@ public class MassiveSignatureTest {
 				MassiveSignatureTest.CERT_ALIAS,
 				new KeyStore.PasswordProtection(MassiveSignatureTest.CERT_PASS
 						.toCharArray()));
-		
+
 		final MassiveSignConfiguration config = new MassiveSignConfiguration(
 				pke);
 		for (final String[] format : MassiveSignatureTest.FORMATS) {
@@ -183,21 +183,16 @@ public class MassiveSignatureTest {
 					config.setMode(mode[1]);
 					for (final String[] file : MassiveSignatureTest.FORMATS_FILES) {
 						if (format[0].equals(file[0])) {
-							
-							final String fullpath = MassiveSignatureTest
-									.getResourcePath(file[1]);
-							final FileInputStream fis = new FileInputStream(
-									fullpath);
-							final byte[] data = AOUtil
-									.getDataFromInputStream(fis);
+
+							final String fullpath = MassiveSignatureTest.getResourcePath(file[1]);
+							final FileInputStream fis = new FileInputStream(fullpath);
+							final byte[] data = AOUtil.getDataFromInputStream(fis);
 							fis.close();
-							
-							final MassiveSignatureHelper massive = new MassiveSignatureHelper(
-									config);
+
+							final MassiveSignatureHelper massive = new MassiveSignatureHelper(config);
 							byte[] signature = massive.signFile(fullpath);
 							Assert.assertNotNull(signature);
-							MassiveSignatureTest
-									.saveData(
+							MassiveSignatureTest.saveData(
 											signature,
 											"Firma_file_" + file[1] + "_" + format[1] + "_" + /*originalFormat + "_" +*/mode[1] + "." + format[2]); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 							signature = massive.signData(data);
