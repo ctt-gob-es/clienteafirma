@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -179,7 +179,7 @@ final class CoSigner {
         }
 
         // buscamos que timo de algoritmo es y lo codificamos con su OID
-        
+
         final String signatureAlgorithm = parameters.getSignatureAlgorithm();
         final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
         final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
@@ -283,8 +283,8 @@ final class CoSigner {
                            final Map<String, byte[]> atrib,
                            final Map<String, byte[]> uatrib,
                            final byte[] digest) throws IOException, NoSuchAlgorithmException, CertificateException {
-        
-        byte[] messageDigest = digest.clone();
+
+        byte[] messageDigest = (digest != null ? digest.clone() : null);
 
         final ASN1InputStream is = new ASN1InputStream(sign);
 
@@ -454,7 +454,7 @@ final class CoSigner {
      *        del archivo de firma.
      * @return Los atributos firmados de la firma.
      * @throws java.security.NoSuchAlgorithmException */
-    private ASN1Set generateSignerInfo(String digestAlgorithm, final byte[] datos, final String dataType, final Map<String, byte[]> atrib) throws NoSuchAlgorithmException {
+    private ASN1Set generateSignerInfo(final String digestAlgorithm, final byte[] datos, final String dataType, final Map<String, byte[]> atrib) throws NoSuchAlgorithmException {
 
         // // ATRIBUTOS
 
