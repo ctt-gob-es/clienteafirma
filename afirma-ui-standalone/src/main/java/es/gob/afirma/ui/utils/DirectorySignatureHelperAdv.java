@@ -9,8 +9,6 @@
  */
 package es.gob.afirma.ui.utils;
 
-import java.io.File;
-
 import javax.swing.JDialog;
 
 import es.gob.afirma.core.AOUnsupportedSignFormatException;
@@ -24,7 +22,7 @@ public class DirectorySignatureHelperAdv extends DirectorySignatureHelper {
     private JDialog parent = null;
 
     /** Dialogo con la barra de progreso. */
-    private ProgressDialog progressDialog = null;
+    private final ProgressDialog progressDialog = null;
 
     /** Crea un instancia de la clase con una configuraci&oacute;n y un componente padre asignado.
      * @param algorithm Algoritmo de firma electr&oacute;nica.
@@ -35,21 +33,5 @@ public class DirectorySignatureHelperAdv extends DirectorySignatureHelper {
     public DirectorySignatureHelperAdv(final String algorithm, final String format, final String mode, final JDialog parent) throws AOUnsupportedSignFormatException {
         super(algorithm, format, mode);
         this.parent = parent;
-    }
-
-    @Override
-    protected void disposeOperation() {
-        this.progressDialog.close();
-    }
-
-    @Override
-    protected void prepareOperation(final File[] files) {
-        this.progressDialog = new ProgressDialog(this.parent, files.length, Messages.getString("Wizard.multifirma.progress.titulo")); //$NON-NLS-1$
-        this.progressDialog.show();
-    }
-
-    @Override
-    protected void preProcessFile(final File file) {
-        this.progressDialog.processElement(file.getAbsolutePath());
     }
 }
