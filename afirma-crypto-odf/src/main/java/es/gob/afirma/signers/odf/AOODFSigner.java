@@ -599,13 +599,46 @@ public final class AOODFSigner implements AOSigner {
      * @return Devuelve <code>true</code> si los datos indicados son un documento ODF susceptible de contener una firma
      * electr&oacute;nica, <code>false</code> en caso contrario. */
     public boolean isSign(final byte[] signData) {
-        return isValidDataFile(signData);
+        if(!isValidDataFile(signData)) {
+        	return false;
+        }
+
+    	final File odfFile;
+    	try {
+    		odfFile = createTempFile(signData);
+    		odfFile.deleteOnExit();
+    	} catch (final Exception e) {
+    		LOGGER.warning("No se pudo crear una copia del fichero para su analisis, se devolvera false"); //$NON-NLS-1$
+			return false;
+		}
+
+    	// carga el fichero zip
+    	final ZipFile zf;
+    	try {
+    		zf = new ZipFile(odfFile);
+    	}
+    	catch (final Exception e) {
+    		// Si detectamos que no es un fichero Zip, devolvemos null
+    		return false;
+    	}
+
+    	// obtiene el archivo mimetype
+    	return zf.getEntry(AOODFSigner.SIGNATURES_PATH) != null;
     }
 
     /** Indica si los datos son un documento ODF susceptible de ser firmado.
      * @param data Datos a comprobar
      * @return <cod>true</code> si los datos son un documento ODF susceptible de ser firmado, <code>false</code> en caso contrario */
     public boolean isValidDataFile(final byte[] data) {
+
+    	final File odfFile;
+    	try {
+    		odfFile = createTempFile(data);
+    		odfFile.deleteOnExit();
+    	} catch (final Exception e) {
+    		LOGGER.warning("No se pudo crear una copia del fichero para su analisis, se devolvera false"); //$NON-NLS-1$
+			return false;
+		}
 
         // Si el mimetype del fichero no se ajusta a alguno de los MimeTypes
         // soportados
@@ -614,7 +647,7 @@ public final class AOODFSigner implements AOSigner {
         // fichero valido
         String mimetype = null;
         try {
-            mimetype = AOODFSigner.getODFMimeType(data);
+            mimetype = AOODFSigner.getODFMimeType(odfFile);
         }
         catch (final Exception e) {
             return false;
@@ -693,33 +726,13 @@ public final class AOODFSigner implements AOSigner {
         return new AOSignInfo(AOSignConstants.SIGN_FORMAT_ODF);
     }
 
-    private static String getODFMimeType(final byte[] signData) {
+    private static String getODFMimeType(final File odfFile) {
         String mimetype = null;
         try {
-            // Genera el archivo zip temporal a partir del InputStream de
-            // entrada
-            final File zipFile = File.createTempFile("sign", ".zip"); //$NON-NLS-1$ //$NON-NLS-2$
-            final FileOutputStream fos = new FileOutputStream(zipFile);
-
-            fos.write(signData);
-
-            try {
-                fos.flush();
-            }
-            catch (final Exception e) {
-             // Ignoramos los errores en el vaciado
-            }
-            try {
-                fos.close();
-            }
-            catch (final Exception e) {
-             // Ignoramos los errores en el cierre
-            }
-
             // carga el fichero zip
             final ZipFile zf;
             try {
-                zf = new ZipFile(zipFile);
+                zf = new ZipFile(odfFile);
             }
             catch (final ZipException e) {
                 // Si detectamos que no es un fichero Zip, devolvemos null
@@ -731,20 +744,41 @@ public final class AOODFSigner implements AOSigner {
             if (entry != null) {
                 mimetype = new String(AOUtil.getDataFromInputStream(zf.getInputStream(entry)));
             }
-
-            try {
-                zipFile.delete();
-            }
-            catch (final Exception e) {
-             // Ignoramos los errores en el cierre
-            }
-
         }
         catch (final Exception e) {
             LOGGER.severe("Error al analizar el fichero de firma: " + e); //$NON-NLS-1$
             return null;
         }
         return mimetype;
+    }
+
+    /**
+     * Crea un fichero temporal con los datos.
+     * @param data Datos del fichero.
+     * @return Fichero generado.
+     * @throws IOException Cuando se produce un error durante la generaci&oacute;n.
+     */
+    private static File createTempFile(final byte[] data) throws IOException {
+    	// Genera el archivo zip temporal a partir del InputStream de
+        // entrada
+        final File zipFile = File.createTempFile("sign", ".zip"); //$NON-NLS-1$ //$NON-NLS-2$
+        final FileOutputStream fos = new FileOutputStream(zipFile);
+
+        fos.write(data);
+
+        try {
+            fos.flush();
+        }
+        catch (final Exception e) {
+         // Ignoramos los errores en el vaciado
+        }
+        try {
+            fos.close();
+        }
+        catch (final Exception e) {
+         // Ignoramos los errores en el cierre
+        }
+        return zipFile;
     }
 
 }
