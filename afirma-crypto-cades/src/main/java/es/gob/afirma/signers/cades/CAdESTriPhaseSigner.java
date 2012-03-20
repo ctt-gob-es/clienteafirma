@@ -148,18 +148,20 @@ public final class CAdESTriPhaseSigner {
      * @param content Datos a firmar (usar <code>null</code> si no se desean a&ntilde;adir a la firma)
      * @param signerCertificateChain Cadena de certificados del firmante
      * @param policy Pol&iacute;tica de firma
+     * @param signingCertificateV2 <code>true</code> para usar SigningCertificateV2, <code>false</code> para usar V1
      * @param messageDigest Valor de la huella digital del contenido (usar <code>null</code> si se estableci&oacute; <code>content</code>)
      * @param signDate Fecha de la firma (debe establecerse externamente para evitar desincronismos en la firma trif&aacute;sica)
      * @param padesMode <code>true</code> para generar una firma CAdES compatible PAdES, <code>false</code> para generar una firma CAdES normal
      * @param contentType Tipo de contenido definido por su OID.
      * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
      * @return Atributos CAdES a firmar (prefirma) en formato ASN.1
-     * @throws AOException
+     * @throws AOException Cuando se produce cualquier error durante el proceso.
      */
     public static byte[] preSign(final String digestAlgorithmName,
                           final byte[] content,
                           final X509Certificate[] signerCertificateChain,
                           final AdESPolicy policy,
+                          final boolean signingCertificateV2,
                           final byte[] messageDigest,
                           final Date signDate,
                           final boolean padesMode,
@@ -180,6 +182,7 @@ public final class CAdESTriPhaseSigner {
                      digestAlgorithmName,
                      content,
                      policy,
+                     signingCertificateV2,
                      messageDigest,
                      signDate,
                      padesMode,
@@ -209,7 +212,7 @@ public final class CAdESTriPhaseSigner {
      * @param signature Firma PKCS#1 v1.5 de los atributos firmados
      * @param signedAttributes Atributos firmados (prefirma)
      * @return Firma CAdES completa
-     * @throws AOException
+     * @throws AOException Cuando se produce cualquier error durante el proceso.
      */
     public static byte[] postSign(final String digestAlgorithmName,
                            final byte[] content,

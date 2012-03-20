@@ -211,6 +211,9 @@ public final class AOPDFSigner implements AOSigner {
      *   <dd>Nombre de usuario de la TSA.</dd>
      *  <dt><b><i>tsaPwd</i></b></dt>
      *   <dd>Contrase&ntilde;a del usuario de la TSA. Se ignora si no de ha establecido adem&aacute;s <code>tsaUsr</code>.</dd>
+     *  <dt><b><i>signingCertificateV2</i></b></dt>
+     *   <dd>Si se indica a {@code true} se utilizar SigningCertificateV2, si se indica cualquier otra cosa SigningCertificateV1.
+     *   Si no se indica nada, se utilizar&aacute; V1 para las firmas SHA1 y V2 para el resto.</dd>
      * </dl>
      * @return Documento PDF firmado en formato PAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
@@ -370,6 +373,9 @@ public final class AOPDFSigner implements AOSigner {
      *   <dd>Nombre de usuario de la TSA.</dd>
      *  <dt><b><i>tsaPwd</i></b></dt>
      *   <dd>Contrase&ntilde;a del usuario de la TSA. Se ignora si no de ha establecido adem&aacute;s <code>tsaUsr</code>.</dd>
+     *  <dt><b><i>signingCertificateV2</i></b></dt>
+     *   <dd>Si se indica a {@code true} se utilizar SigningCertificateV2, si se indica cualquier otra cosa SigningCertificateV1.
+     *   Si no se indica nada, se utilizar&aacute; V1 para las firmas SHA1 y V2 para el resto.</dd>
      * </dl>
      * @return Documento PDF firmado en formato PAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
@@ -971,10 +977,21 @@ public final class AOPDFSigner implements AOSigner {
         // ********************************************************************************
         // **************** CALCULO DEL SIGNED DATA ***************************************
         // ********************************************************************************
+
+        // La norma PAdES establece que si el algoritmo de huella digital es SHA1 debe usarse SigningCertificateV2, y en cualquier
+        // otro caso deberia usarse SigningCertificateV2
+        boolean signingCertificateV2;
+        if (extraParams.containsKey("signingCertificateV2")) { //$NON-NLS-1$
+        	signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2")); //$NON-NLS-1$
+        } else {
+        	signingCertificateV2 = !"SHA1".equals(AOSignConstants.getDigestAlgorithmName(algorithm));	 //$NON-NLS-1$
+        }
+
 		byte[] pk = GenCAdESEPESSignedData.generateSignedData(
             new P7ContentSignerParameters(inPDF, algorithm, chain),
             true, // omitContent
             new AdESPolicy(extraParams),
+            signingCertificateV2,
             ke,
             MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(algorithm)).digest(AOUtil.getDataFromInputStream(sap.getRangeStream())),
             true, // Modo PAdES

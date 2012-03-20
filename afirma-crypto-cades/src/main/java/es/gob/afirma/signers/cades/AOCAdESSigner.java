@@ -115,6 +115,13 @@ public final class AOCAdESSigner implements AOSigner {
      *     <code>data</code> son la huella digital de los datos a firmar, y no los datos a firmar en si.
      *    </b>
      *   </dd>
+     *  <dt><b><i>signingCertificateV2</i></b></dt>
+     *   <dd>
+     *    Debe establecerse a <code>true</code> si se desea usar la versi&oacute;n 2 del atributo
+     *    <i>Signing Certificate</i> de CAdES. Si no se establece un valor para este par&aacute;metro
+     *    se utilizar&aacute;a la versi&oacute;n 1 con las firmas realizadas con algoritmos SHA1 y
+     *    la versi&oacute;n 2 con las firmas realizadas con cualquier otro algoritmo.
+     *   </dd>
      * </dl>
      * @return Firma en formato CAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
@@ -132,6 +139,13 @@ public final class AOCAdESSigner implements AOSigner {
 
         if (precalculatedDigest != null) {
             messageDigest = data;
+        }
+
+        boolean signingCertificateV2;
+        if (extraParams.containsKey("signingCertificateV2")) { //$NON-NLS-1$
+        	signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2")); //$NON-NLS-1$
+        } else {
+        	signingCertificateV2 = !"SHA1".equals(AOSignConstants.getDigestAlgorithmName(algorithm));	 //$NON-NLS-1$
         }
 
         final String mode = extraParams.getProperty("mode", AOSignConstants.DEFAULT_SIGN_MODE); //$NON-NLS-1$
@@ -161,6 +175,7 @@ public final class AOCAdESSigner implements AOSigner {
                    csp,
                    omitContent,
                    new AdESPolicy(extraParams),
+                   signingCertificateV2,
                    keyEntry,
                    messageDigest,
                    Boolean.parseBoolean(extraParams.getProperty("padesMode", "false")), //$NON-NLS-1$ //$NON-NLS-2$

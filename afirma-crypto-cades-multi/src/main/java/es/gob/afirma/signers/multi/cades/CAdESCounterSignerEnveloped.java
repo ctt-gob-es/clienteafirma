@@ -67,6 +67,7 @@ final class CAdESCounterSignerEnveloped {
     private ASN1Set signedAttr2;
 
     private AdESPolicy globalPolicy;
+    private boolean globalSigningCertificateV2;
 
     /** Establece la pol&iacute;tica de firma. */
     private void setGlobalPolicy(final AdESPolicy pol) {
@@ -75,6 +76,21 @@ final class CAdESCounterSignerEnveloped {
 
     private AdESPolicy getGlobalPolicy() {
         return this.globalPolicy;
+    }
+
+    /** Obtiene el tipo de atributo firmado signingCertificate o
+     * signingCertificateV2
+     * @return tipo de atributo firmado. */
+    private boolean isGlobalSigningCertificateV2() {
+        return this.globalSigningCertificateV2;
+    }
+
+    /** Define si el atributo firmado es signingCertificate o
+     * signingCertificateV2
+     * @param globalsigningCertificateV2
+     *        tipo de atributo */
+    private void setGlobalsigningCertificateV2(final boolean globalsigningCertificateV2) {
+        this.globalSigningCertificateV2 = globalsigningCertificateV2;
     }
 
     /** Constructor de la clase. Se crea una contrafirma a partir de los datos
@@ -93,6 +109,10 @@ final class CAdESCounterSignerEnveloped {
      * @param keyEntry
      *        Clave privada a usar para firmar.
      * @param policy Pol&iacute;tica de firma
+     * @param signingCertificateV2
+     *        <code>true</code> si se desea usar la versi&oacute;n 2 del
+     *        atributo <i>Signing Certificate</i> <code>false</code> para
+     *        usar la versi&oacute;n 1
      * @param contentType
      * 		  Tipo de contenido definido por su OID.
      * @param contentDescription
@@ -116,12 +136,14 @@ final class CAdESCounterSignerEnveloped {
                                 final int[] targets,
                                 final PrivateKeyEntry keyEntry,
                                 final AdESPolicy policy,
+                                final boolean signingCertificateV2,
                                 final String contentType,
                                 final String contentDescription) throws IOException, NoSuchAlgorithmException, CertificateException, AOException {
 
         // Introducimos la pol&iacute;tica en variable global por comodidad.
         // &Eacute;sta no var&iacute;a.
         this.setGlobalPolicy(policy);
+        this.setGlobalsigningCertificateV2(signingCertificateV2);
 
         final ASN1InputStream is = new ASN1InputStream(data);
 
@@ -942,6 +964,7 @@ final class CAdESCounterSignerEnveloped {
                  digestAlgorithm,
                  si.getEncryptedDigest().getOctets(),
                  getGlobalPolicy(),
+                 isGlobalSigningCertificateV2(),
                  null,
                  new Date(),
                  false,

@@ -66,6 +66,7 @@ public class MiniTestDNI {
         		p7ContentSignerParameters,
         		omitContent,
         		new AdESPolicy(new Properties()),
+        		false,
         		pke,
         		messageDigest,
         		false,

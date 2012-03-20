@@ -124,6 +124,10 @@ final class CAdESCoSignerEnveloped {
      * @param sign
      *        Archivo que contiene las firmas.
      * @param policy Pol&iacute;tica de firma
+     * @param signingCertificateV2
+     *        <code>true</code> si se desea usar la versi&oacute;n 2 del
+     *        atributo <i>Signing Certificate</i> <code>false</code> para
+     *        usar la versi&oacute;n 1
      * @param keyEntry
      *        Clave privada usada para firmar.
      * @param messageDigest
@@ -143,6 +147,7 @@ final class CAdESCoSignerEnveloped {
     byte[] coSigner(final P7ContentSignerParameters parameters,
                            final byte[] sign,
                            final AdESPolicy policy,
+                           final boolean signingCertificateV2,
                            final PrivateKeyEntry keyEntry,
                            final byte[] messageDigest,
                            final String contentType,
@@ -204,6 +209,7 @@ final class CAdESCoSignerEnveloped {
                      digestAlgorithm,
                      parameters.getContent(),
                      policy,
+                     signingCertificateV2,
                      null,
                      new Date(),
                      false,
@@ -220,6 +226,7 @@ final class CAdESCoSignerEnveloped {
                      digestAlgorithm,
                      null,
                      policy,
+                     signingCertificateV2,
                      messageDigest,
                      new Date(),
                      false,
@@ -280,6 +287,10 @@ final class CAdESCoSignerEnveloped {
      * @param data
      *        Archivo que contiene las firmas.
      * @param policy Pol&iacute;tica de firma
+     * @param signingCertificateV2
+     *        <code>true</code> si se desea usar la versi&oacute;n 2 del
+     *        atributo <i>Signing Certificate</i> <code>false</code> para
+     *        usar la versi&oacute;n 1
      * @param keyEntry
      *        Clave privada usada para firmar.
      * @param md
@@ -300,6 +311,7 @@ final class CAdESCoSignerEnveloped {
                            final X509Certificate[] signerCertificateChain,
                            final InputStream data,
                            final AdESPolicy policy,
+                           final boolean signingCertificateV2,
                            final PrivateKeyEntry keyEntry,
                            final byte[] md,
                            final String contentType,
@@ -392,6 +404,7 @@ final class CAdESCoSignerEnveloped {
                      digestAlgorithm,
                      null,
                      policy,
+                     signingCertificateV2,
                      messageDigest,
                      new Date(),
                      false,

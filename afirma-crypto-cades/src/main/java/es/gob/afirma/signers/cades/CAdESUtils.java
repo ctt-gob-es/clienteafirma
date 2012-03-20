@@ -64,19 +64,23 @@ public final class CAdESUtils {
      * @param digestAlgorithmName Nombre del algoritmo de huella digital a usar
      * @param datos Datos firmados
      * @param policy Pol&iacute;tica de firma
+     * @param signingCertificateV2 {@code true} para utilizar la versi&oacute;n 2 del campo
+     * signingCertificate, {@code false} para utilizar la versi&oacute;n 1.
      * @param messageDigest Huella digital de los datos firmados
      * @param signDate Fecha de la firma (debe establecerse externamente para evitar desincronismos en la firma trif&aacute;sica)
      * @param padesMode <code>true</code> para generar una firma CAdES compatible PAdES, <code>false</code> para generar una firma CAdES normal
      * @param contentType Tipo de contenido definido por su OID.
      * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
      * @return Los datos necesarios para generar la firma referente a los datos del usuario.
-     * @throws java.security.NoSuchAlgorithmException
-     * @throws java.io.IOException
-     * @throws CertificateEncodingException */
+     * @throws java.security.NoSuchAlgorithmException Cuando se introduce un algoritmo no v&aacute;lido.
+     * @throws java.io.IOException Cuando se produce un error de entrada/salida.
+     * @throws CertificateEncodingException Error de codificaci&oacute;n en el certificado.
+     */
     public static ASN1EncodableVector generateSignerInfo(final X509Certificate cert,
                                                   final String digestAlgorithmName,
                                                   final byte[] datos,
                                                   final AdESPolicy policy,
+                                                  final boolean signingCertificateV2,
                                                   final byte[] messageDigest,
                                                   final Date signDate,
                                                   final boolean padesMode,
@@ -104,7 +108,7 @@ public final class CAdESUtils {
         // comentar lo de abajo para version del rfc 3852
         // contexExpecific.add(new Attribute(RFC4519Style.serialNumber, new DERSet(new DERPrintableString(cert.getSerialNumber().toString()))));
 
-        if (!"SHA1".equals(AOSignConstants.getDigestAlgorithmName(digestAlgorithmName))) { //$NON-NLS-1$
+        if (signingCertificateV2) {
 
             // INICIO SINGING CERTIFICATE-V2
 

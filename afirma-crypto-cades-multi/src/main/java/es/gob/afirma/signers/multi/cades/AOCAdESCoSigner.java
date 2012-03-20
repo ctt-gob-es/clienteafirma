@@ -37,12 +37,17 @@ public class AOCAdESCoSigner implements AOCoSigner {
 
         final Properties extraParams = (xParams != null) ? xParams : new Properties();
 
-        final String precalculatedDigest = extraParams.getProperty("precalculatedHashAlgorithm"); //$NON-NLS-1$
-
         byte[] messageDigest = null;
-
+        final String precalculatedDigest = extraParams.getProperty("precalculatedHashAlgorithm"); //$NON-NLS-1$
         if (precalculatedDigest != null) {
             messageDigest = data;
+        }
+
+        boolean signingCertificateV2;
+        if (extraParams.containsKey("signingCertificateV2")) { //$NON-NLS-1$
+        	signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2")); //$NON-NLS-1$
+        } else {
+        	signingCertificateV2 = !"SHA1".equals(AOSignConstants.getDigestAlgorithmName(algorithm));	 //$NON-NLS-1$
         }
 
         final P7ContentSignerParameters csp = new P7ContentSignerParameters(data, algorithm, (X509Certificate[]) keyEntry.getCertificateChain());
@@ -74,6 +79,7 @@ public class AOCAdESCoSigner implements AOCoSigner {
                     sign,
                     omitContent,
                     new AdESPolicy(extraParams),
+                    signingCertificateV2,
                     keyEntry,
                     messageDigest,
                     contentTypeOid,
@@ -85,6 +91,7 @@ public class AOCAdESCoSigner implements AOCoSigner {
                  csp,
                  sign,
                  new AdESPolicy(extraParams),
+                 signingCertificateV2,
                  keyEntry,
                  messageDigest,
                  contentTypeOid,
@@ -104,6 +111,13 @@ public class AOCAdESCoSigner implements AOCoSigner {
                          final Properties xParams) throws AOException {
 
         final Properties extraParams = (xParams != null) ? xParams : new Properties();
+
+        boolean signingCertificateV2;
+        if (extraParams.containsKey("signingCertificateV2")) { //$NON-NLS-1$
+        	signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2")); //$NON-NLS-1$
+        } else {
+        	signingCertificateV2 = !"SHA1".equals(AOSignConstants.getDigestAlgorithmName(algorithm));	 //$NON-NLS-1$
+        }
 
         // algoritmo de firma.
         final String typeAlgorithm = algorithm;
@@ -126,6 +140,7 @@ public class AOCAdESCoSigner implements AOCoSigner {
                     (X509Certificate[])keyEntry.getCertificateChain(),
                     new ByteArrayInputStream(sign),
                     new AdESPolicy(extraParams),
+                    signingCertificateV2,
                     keyEntry,
                     null, // null porque no nos pueden dar un hash en este metodo, tendria que ser en el que incluye datos
                     contentTypeOid,
@@ -144,6 +159,7 @@ public class AOCAdESCoSigner implements AOCoSigner {
                  (X509Certificate[])keyEntry.getCertificateChain(),
                  new ByteArrayInputStream(sign),
                  new AdESPolicy(extraParams),
+                 signingCertificateV2,
                  keyEntry,
                  null, // null porque no nos pueden dar un hash en este metodo, tendria que ser en el que incluye datos
                  contentTypeOid,

@@ -134,6 +134,10 @@ final class CAdESCoSigner {
      *        Si se omite el contenido o no, es decir,si se hace de forma
      *        Expl&iacute;cita o Impl&iacute;cita.
      * @param policy Pol&iacute;tica de firma
+     * @param signingCertificateV2
+     *        <code>true</code> si se desea usar la versi&oacute;n 2 del
+     *        atributo <i>Signing Certificate</i> <code>false</code> para
+     *        usar la versi&oacute;n 1
      * @param keyEntry
      *        Clave privada usada para firmar.
      * @param messageDigest
@@ -149,12 +153,12 @@ final class CAdESCoSigner {
      *         digital
      * @throws java.security.cert.CertificateException
      *         Si se produce alguna excepci&oacute;n con los certificados de
-     *         firma.
-     * @throws javax.security.cert.CertificateException */
+     *         firma.*/
     byte[] coSigner(final P7ContentSignerParameters parameters,
                            final byte[] sign,
                            final boolean omitContent,
                            final AdESPolicy policy,
+                           final boolean signingCertificateV2,
                            final PrivateKeyEntry keyEntry,
                            final byte[] messageDigest,
                            final String contentType,
@@ -237,6 +241,7 @@ final class CAdESCoSigner {
                      digestAlgorithm,
                      parameters.getContent(),
                      policy,
+                     signingCertificateV2,
                      null,
                      new Date(),
                      false,
@@ -252,6 +257,7 @@ final class CAdESCoSigner {
                      digestAlgorithm,
                      null,
                      policy,
+                     signingCertificateV2,
                      null,
                      new Date(),
                      false,
@@ -311,6 +317,10 @@ final class CAdESCoSigner {
      *        de firma.
      * @param data Archivo que contiene las firmas.
      * @param policy Pol&iacute;tica de firma
+     * @param signingCertificateV2
+     *        <code>true</code> si se desea usar la versi&oacute;n 2 del
+     *        atributo <i>Signing Certificate</i> <code>false</code> para
+     *        usar la versi&oacute;n 1
      * @param keyEntry Clave privada usada para firmar.
      * @param md
      *        Huella digital espec&iacute;fica para una firma.
@@ -325,12 +335,12 @@ final class CAdESCoSigner {
      *         digital
      * @throws java.security.cert.CertificateException
      *         Si se produce alguna excepci&oacute;n con los certificados de
-     *         firma.
-     * @throws javax.security.cert.CertificateException */
+     *         firma.*/
     byte[] coSigner(final String signatureAlgorithm,
                            final X509Certificate[] signerCertificateChain,
                            final InputStream data,
                            final AdESPolicy policy,
+                           final boolean signingCertificateV2,
                            final PrivateKeyEntry keyEntry,
                            final byte[] md,
                            final String contentType,
@@ -434,6 +444,7 @@ final class CAdESCoSigner {
                      digestAlgorithm,
                      contenidoDatos,
                      policy,
+                     signingCertificateV2,
                      null, // MessageDigest
                      new Date(),
                      false,
@@ -449,6 +460,7 @@ final class CAdESCoSigner {
                      digestAlgorithm,
                      null,
                      policy,
+                     signingCertificateV2,
                      messageDigest,
                      new Date(),
                      false,

@@ -17,6 +17,7 @@ import java.util.Properties;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.signers.AOCounterSigner;
+import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
@@ -36,6 +37,13 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                               final Properties xParams) throws AOException {
 
         final Properties extraParams = (xParams != null) ? xParams : new Properties();
+
+        boolean signingCertificateV2;
+        if (extraParams.containsKey("signingCertificateV2")) { //$NON-NLS-1$
+        	signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2")); //$NON-NLS-1$
+        } else {
+        	signingCertificateV2 = !"SHA1".equals(AOSignConstants.getDigestAlgorithmName(algorithm));	 //$NON-NLS-1$
+        }
 
         final P7ContentSignerParameters csp = new P7ContentSignerParameters(sign, algorithm, (X509Certificate[]) keyEntry.getCertificateChain());
 
@@ -68,6 +76,7 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
 	                       nodes,
 	                       keyEntry,
 	                       new AdESPolicy(extraParams),
+	                       signingCertificateV2,
 	                       contentTypeOid,
 	                       contentDescription
                     );
@@ -85,6 +94,7 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                                 nodes,
                                 keyEntry,
                                 new AdESPolicy(extraParams),
+								signingCertificateV2,
                                 contentTypeOid,
                                 contentDescription
                     		);
@@ -104,6 +114,7 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                                 nodesID,
                                 keyEntry,
                                 new AdESPolicy(extraParams),
+								signingCertificateV2,
                                 contentTypeOid,
                                 contentDescription
                             );
@@ -126,6 +137,7 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                                 nodes2,
                                 keyEntry,
                                 new AdESPolicy(extraParams),
+                                signingCertificateV2,
                                 contentTypeOid,
                                 contentDescription
                     		);
@@ -156,6 +168,7 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                             nodes,
                             keyEntry,
                             new AdESPolicy(extraParams),
+                            signingCertificateV2,
                             contentTypeOid,
                             contentDescription
                         );
@@ -173,6 +186,7 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                             nodes,
                             keyEntry,
                             new AdESPolicy(extraParams),
+                            signingCertificateV2,
                             contentTypeOid,
                             contentDescription
                 		);
@@ -191,6 +205,7 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                     nodesID,
                     keyEntry,
                     new AdESPolicy(extraParams),
+                    signingCertificateV2,
                     contentTypeOid,
                     contentDescription
                 );
@@ -212,6 +227,7 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                     nodes2,
                     keyEntry,
                     new AdESPolicy(extraParams),
+                    signingCertificateV2,
                     contentTypeOid,
                     contentDescription
                 );
