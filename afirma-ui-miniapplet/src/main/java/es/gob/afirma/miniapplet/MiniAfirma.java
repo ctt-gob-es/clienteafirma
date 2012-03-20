@@ -275,4 +275,10 @@ interface MiniAfirma {
      * @return Tipo de error.
      */
     String getErrorType();
+
+    /**
+	 * Imprime en el logger el texto "MiniApplet cargado y en ejecuci&oacute;n". El uso de
+	 * este m&eacute;todo permite determinar si el applet se encuentra inicializado.
+	 */
+	void echo();
 }

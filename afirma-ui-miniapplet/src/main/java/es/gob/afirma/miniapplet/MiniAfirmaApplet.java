@@ -622,6 +622,21 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 				null : appletParam.trim();
 	}
 
+	/**
+	 * En caso de indicarse una expresi&oacute;n clave como juego de caracteres, se calcula el
+	 * juego de caracteres en base al algoritmo determinado para esa expresi&oacute;n. Si no
+	 * es una expresi&oacute;n reconocida se devuelve la propia entrada. Las expresiones
+	 * permitidas son:
+	 * <ul>
+	 *   <li><b>auto</b>: Devuelve el juego de caracteres detectado en el texto proporcionado.
+	 *   Si no puede detectarse, se devolver&aacute; el juego de caracteres del sistema.</li>
+	 *   <li><b>default</b>: Devuelve el juego de caracteres por defecto del sistema.</li>
+	 * </ul>
+	 * @param charset Expresi&oacute;n clave o juego de caracteres.
+	 * @param textBase64 Texto auxiliar para determinar el juego de caracteres.
+	 * @return Juego de caracteres introducido u obtenido a partir de la expresi&oacute;n
+	 * clave.
+	 */
 	private static String getCharset(final String charset, final String textBase64) {
 		if ("auto".equalsIgnoreCase(charset)) { //$NON-NLS-1$
 			if (textBase64 == null) {
@@ -653,4 +668,11 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		return charset;
 	}
 
+	/**
+	 * Imprime en el logger el texto "MiniApplet cargado y en ejecuci&oacute;n". El uso de
+	 * este m&eacute;todo permite determinar si el applet se encuentra inicializado.
+	 */
+	public void echo() {
+		LOGGER.info("MiniApplet cargado y en ejecuci\u00F3n"); //$NON-NLS-1$
+	}
 }
