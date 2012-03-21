@@ -446,24 +446,6 @@ final class SignDataPanel extends JPanel {
         for (int i = 0; i < tree.getRowCount(); i++) {
             tree.expandRow(i);
         }
-        
-        tree.addFocusListener(new FocusListener() {
-            @Override
-            public void focusLost(final FocusEvent fe) { /* vacio */ }
-            @Override
-            public void focusGained(final FocusEvent fe) {
-                try {
-                    Robot robot = new Robot();
-                    // Esperamos a que tenga el foco del todo
-                    Thread.sleep(250);
-                    robot.mousePress(InputEvent.BUTTON1_MASK);
-                    robot.mouseRelease(InputEvent.BUTTON1_MASK);
-                }
-                catch (final Exception e) {
-                    // Se ignoran los errores
-                }
-            }
-        });
 
         return tree;
     }
