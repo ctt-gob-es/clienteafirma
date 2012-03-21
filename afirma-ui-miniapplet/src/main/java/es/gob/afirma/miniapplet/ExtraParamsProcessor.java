@@ -20,6 +20,9 @@ import es.gob.afirma.core.signers.AOSignConstants;
  * y recogidas desde java en formato <code>Properties<code>. */
 final class ExtraParamsProcessor {
 
+	/** Tama&ntilde;o equivalente a 1 MegaBytes en bytes. */
+	private static final int SIZE_1MB = 1024 * 1024;
+
 	/** Clave expansible para pol&iacute;ticas de firma. */
 	private static final String EXPANDIBLE_POLICY_KEY = "expPolicy"; //$NON-NLS-1$
 
@@ -144,7 +147,10 @@ final class ExtraParamsProcessor {
 						format.equals(AOSignConstants.SIGN_FORMAT_PADES))) {
 					p.setProperty("policyIdentifierHash", //$NON-NLS-1$
 						"7SxX3erFuH31TvAw9LZ70N7p1vA=");  //$NON-NLS-1$
-					p.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
+					if (!p.containsKey("mode")) { //$NON-NLS-1$
+						p.setProperty("mode", signedData.length < SIZE_1MB ? //$NON-NLS-1$
+								AOSignConstants.SIGN_MODE_IMPLICIT : AOSignConstants.SIGN_MODE_EXPLICIT);
+					}
 				}
 			}
 			p.remove(EXPANDIBLE_POLICY_KEY);
