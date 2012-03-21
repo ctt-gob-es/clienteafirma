@@ -215,7 +215,20 @@ public final class SignPanel extends JPanel {
 
         final InputStream fis = new FileInputStream(file);
 
-        final byte[] data = AOUtil.getDataFromInputStream(fis);
+        final byte[] data;
+        try {
+            data = AOUtil.getDataFromInputStream(fis);
+        }
+        catch(OutOfMemoryError e) {
+            UIUtils.showErrorMessage(
+                 SignPanel.this, 
+                 Messages.getString("SignPanel.26"), //$NON-NLS-1$ 
+                 Messages.getString("SignPanel.25"), //$NON-NLS-1$
+                 JOptionPane.ERROR_MESSAGE
+            );
+            this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            return;
+        }
         if (data == null || data.length < 1) {
             throw new IOException("No se ha podido leer el fichero"); //$NON-NLS-1$
         }
