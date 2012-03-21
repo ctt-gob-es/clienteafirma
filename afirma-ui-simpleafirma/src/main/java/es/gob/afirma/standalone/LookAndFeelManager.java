@@ -83,7 +83,6 @@ public final class LookAndFeelManager {
             UIManager.put("TextArea.background", WINDOW_COLOR); //$NON-NLS-1$
             UIManager.put("InternalFrameTitlePane.background", WINDOW_COLOR); //$NON-NLS-1$
             UIManager.put("InternalFrame.background", WINDOW_COLOR); //$NON-NLS-1$
-            //UIManager.put("Panel.background", WINDOW_COLOR); //$NON-NLS-1$
             //UIManager.put("Label.background", WINDOW_COLOR); //$NON-NLS-1$
             UIManager.put("PopupMenuSeparator.background", WINDOW_COLOR); //$NON-NLS-1$
         }
@@ -94,6 +93,7 @@ public final class LookAndFeelManager {
         // Propiedades especificas para Mac OS X
         if (Platform.OS.MACOSX.equals(Platform.getOS())) {
             UIManager.put("OptionPane.background", WINDOW_COLOR); //$NON-NLS-1$
+            UIManager.put("Panel.background", WINDOW_COLOR); //$NON-NLS-1$
             System.setProperty("apple.awt.brushMetalLook", "true"); //$NON-NLS-1$ //$NON-NLS-2$
             System.setProperty("apple.awt.antialiasing", "true"); //$NON-NLS-1$ //$NON-NLS-2$
             System.setProperty("apple.awt.textantialiasing", "true"); //$NON-NLS-1$ //$NON-NLS-2$
