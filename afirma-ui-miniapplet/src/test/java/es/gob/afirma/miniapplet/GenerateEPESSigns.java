@@ -33,6 +33,8 @@ import es.gob.afirma.core.signers.AOSignerFactory;
 /** Generador de conjuntos completos de firmas. */
 public class GenerateEPESSigns {
 
+	private static final boolean DEBUG = true;
+
 	private static final boolean applyAlgos = false;
 
 	private static final String DEFAULT_ALGO = AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA;
@@ -54,6 +56,12 @@ public class GenerateEPESSigns {
     private static final String[][] CONFIGS = {
 
     	{"CAdES-EPES", AOSignConstants.SIGN_FORMAT_CADES, "csig", "pdf"}, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    	{"CAdES-SMALL-AGE", AOSignConstants.SIGN_FORMAT_CADES, "csig", "pdf"}, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    	{"CAdES-SMALL-AGE-IMP", AOSignConstants.SIGN_FORMAT_CADES, "csig", "pdf"}, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    	{"CAdES-SMALL-AGE-EXP", AOSignConstants.SIGN_FORMAT_CADES, "csig", "pdf"}, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    	{"CAdES-LARGE-AGE", AOSignConstants.SIGN_FORMAT_CADES, "csig", "large"}, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    	{"CAdES-LARGE-AGE-IMP", AOSignConstants.SIGN_FORMAT_CADES, "csig", "large"}, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    	{"CAdES-LARGE-AGE-EXP", AOSignConstants.SIGN_FORMAT_CADES, "csig", "large"}, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     	{"XAdES-EPES_alt1", AOSignConstants.SIGN_FORMAT_XADES, "xsig", "pdf"}, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     	{"XAdES-EPES_alt2", AOSignConstants.SIGN_FORMAT_XADES, "xsig", "pdf"}, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     	{"XAdES-EPES_factura30_alt1", AOSignConstants.SIGN_FORMAT_XADES, "xsig", "factura"}, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -70,6 +78,16 @@ public class GenerateEPESSigns {
     	{"CAdES-EPES", "policyQualifier=http://administracionelectronica.gob.es/es/ctt/politicafirma/politica_firma_AGE_v1_8.pdf"}, //$NON-NLS-1$ //$NON-NLS-2$
     	{"CAdES-EPES", "contentDescription=Adobe PDF Document"}, //$NON-NLS-1$ //$NON-NLS-2$
     	{"CAdES-EPES", "contentTypeOid=1.2.840.10003.5.109.1"}, //$NON-NLS-1$ //$NON-NLS-2$
+    	{"CAdES-SMALL-AGE", "expPolicy=FirmaAGE"}, //$NON-NLS-1$ //$NON-NLS-2$
+    	{"CAdES-SMALL-AGE-IMP", "expPolicy=FirmaAGE"}, //$NON-NLS-1$ //$NON-NLS-2$
+    	{"CAdES-SMALL-AGE-IMP", "mode=implicit"}, //$NON-NLS-1$ //$NON-NLS-2$
+    	{"CAdES-SMALL-AGE-EXP", "expPolicy=FirmaAGE"}, //$NON-NLS-1$ //$NON-NLS-2$
+    	{"CAdES-SMALL-AGE-EXP", "mode=explicit"}, //$NON-NLS-1$ //$NON-NLS-2$
+    	{"CAdES-LARGE-AGE", "expPolicy=FirmaAGE"}, //$NON-NLS-1$ //$NON-NLS-2$
+    	{"CAdES-LARGE-AGE-IMP", "expPolicy=FirmaAGE"}, //$NON-NLS-1$ //$NON-NLS-2$
+    	{"CAdES-LARGE-AGE-IMP", "mode=implicit"}, //$NON-NLS-1$ //$NON-NLS-2$
+    	{"CAdES-LARGE-AGE-EXP", "expPolicy=FirmaAGE"}, //$NON-NLS-1$ //$NON-NLS-2$
+    	{"CAdES-LARGE-AGE-EXP", "mode=explicit"}, //$NON-NLS-1$ //$NON-NLS-2$
     	{"XAdES-EPES_alt1", "mode=implicit"}, //$NON-NLS-1$ //$NON-NLS-2$
     	{"XAdES-EPES_alt1", "format=XAdES Detached"}, //$NON-NLS-1$ //$NON-NLS-2$
     	{"XAdES-EPES_alt1", "policyIdentifier=urn:oid:2.16.724.1.3.1.1.2.1.8"}, //$NON-NLS-1$ //$NON-NLS-2$
@@ -112,14 +130,12 @@ public class GenerateEPESSigns {
     private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
     private static final String CERT_ALIAS = "anf usuario activo"; //$NON-NLS-1$
 
-    private static final String SIGNS_PATH = "src" + File.separator + "test" + File.separator + "signs" + File.separator; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-
     /**
      * Genera todos los tipos de firmas posibles.
-     * @throws AOException
-     * @throws NoSuchAlgorithmException
-     * @throws GeneralSecurityException
-     * @throws IOException
+     * @throws AOException Cuando ocurre un problema durante la firma.
+     * @throws NoSuchAlgorithmException Cuando no se puede identificar el algoritmo del almac&eacute;n.
+     * @throws GeneralSecurityException Cuando hay un problema en la carga del almac&eacute;n.
+     * @throws IOException Cuando ocurre un error de carga de datos (ficheros, almacen, ...)
      */
     @SuppressWarnings("static-method")
 	@Test
@@ -159,7 +175,9 @@ public class GenerateEPESSigns {
 					pke,
 					extraParams);
 
-				saveSign(signature, "Firma_" + configName + "_" + config[3] + "_" + algo + "." + config[2]); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				if (DEBUG) {
+					saveSign(signature, "Firma_" + configName + "_" + config[3] + "_" + algo + "." + config[2]); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				}
 			}
 		}
 	}
@@ -178,7 +196,9 @@ public class GenerateEPESSigns {
 
     private static void saveSign(final byte[] signData, final String filename) throws IOException {
 
-    	final File signFile = new File(SIGNS_PATH + filename);
+    	final File signFile = File.createTempFile(filename, null);
+    	System.out.println("Fichero para comprobacion manual: " + signFile.getAbsolutePath()); //$NON-NLS-1$
+
     	final FileOutputStream fos = new FileOutputStream(signFile);
     	fos.write(signData);
     	fos.close();
