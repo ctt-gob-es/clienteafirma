@@ -10,13 +10,11 @@
 
 package es.gob.afirma.standalone;
 
-import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Desktop;
 import java.awt.Dimension;
-import java.awt.Robot;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -35,14 +33,11 @@ import java.util.Locale;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
-import javax.swing.AbstractAction;
-import javax.swing.ActionMap;
 import javax.swing.JApplet;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -276,41 +271,13 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
             else {
                 this.window.setJMenuBar(this.mainMenu);
                 if (firstTime) {
-                	final ActionMap actionMap = this.window.getRootPane().getActionMap();
-                	final String menuActionKey = "expand_that_first_menu_please"; //$NON-NLS-1$
-                	actionMap.put(menuActionKey, new AbstractAction() {
-    					private static final long serialVersionUID = -6464408227472473522L;
-    					@Override
-    					public void actionPerformed(final ActionEvent ae) {
-    						if (SimpleAfirma.this.getMainMenu().isAnyMenuSelected()) {
-    							try {
-    								final Robot robot = new Robot();
-    								robot.keyPress(KeyEvent.VK_ESCAPE);
-    								robot.keyRelease(KeyEvent.VK_ESCAPE);
-    							}
-    							catch (final AWTException e) {
-    								// Se ignora
-    							}
-    						}
-    						else {
-    							// TODO: Mejorar el comportamiento, con la tecla ALT deberia seleccionarse el
-    							//       menu, pero no abrirse, y luego tener la posibilidad de operar con las
-    							//       flechas y el enter
-    							SimpleAfirma.this.getMainMenu().getMenu(0).doClick();
-    						}
-
-    					}
-    				});
-                	this.window.getRootPane().getInputMap(
-            			JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
-        			).put(
-    					KeyStroke.getKeyStroke(
-    						KeyEvent.VK_ALT,
-    						0,
-    						true
-    					),
-    					menuActionKey
-    				);
+                	MainMenuManager.setMenuManagement(
+            			this.window.getRootPane().getActionMap(),
+            			this.window.getRootPane().getInputMap(
+                			JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
+            			),
+            			SimpleAfirma.this.getMainMenu()
+        			);
                 }
             }
         }
