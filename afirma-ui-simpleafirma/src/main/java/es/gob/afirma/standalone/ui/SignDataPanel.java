@@ -17,8 +17,12 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Robot;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -283,6 +287,7 @@ final class SignDataPanel extends JPanel {
             signInfo = null;
         }
         final JScrollPane detailPanel = new JScrollPane(signInfo == null ? null : this.getSignDataTree(signInfo, extKeyListener));
+        
         // En Apple siempre hay barras, y es el SO el que las pinta o no si hacen o no falta
         if (Platform.OS.MACOSX.equals(Platform.getOS())) {
             detailPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -441,6 +446,24 @@ final class SignDataPanel extends JPanel {
         for (int i = 0; i < tree.getRowCount(); i++) {
             tree.expandRow(i);
         }
+        
+        tree.addFocusListener(new FocusListener() {
+            @Override
+            public void focusLost(final FocusEvent fe) { /* vacio */ }
+            @Override
+            public void focusGained(final FocusEvent fe) {
+                try {
+                    Robot robot = new Robot();
+                    // Esperamos a que tenga el foco del todo
+                    Thread.sleep(250);
+                    robot.mousePress(InputEvent.BUTTON1_MASK);
+                    robot.mouseRelease(InputEvent.BUTTON1_MASK);
+                }
+                catch (final Exception e) {
+                    // Se ignoran los errores
+                }
+            }
+        });
 
         return tree;
     }

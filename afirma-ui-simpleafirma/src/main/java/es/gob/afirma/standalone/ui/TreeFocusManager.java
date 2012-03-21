@@ -84,6 +84,11 @@ class TreeFocusManager extends KeyAdapter implements FocusListener, MouseMotionL
 
     @Override
     public void mouseClicked(final MouseEvent e) {
+        // El cursor de "mano" es indicativo de que el raton esta sobre un enlace susceptible de ser
+        // abierto
+        if (!this.tree.getCursor().equals(TreeFocusManager.HAND_CURSOR)) {
+            return;
+        }
         final DefaultMutableTreeNode node = (DefaultMutableTreeNode) this.tree.getLastSelectedPathComponent();
         if (node == null) {
             return;
