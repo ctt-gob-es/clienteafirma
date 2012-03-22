@@ -692,9 +692,11 @@ public class AOKeyStoreManager {
 
         LOGGER.info("Componiendo el vector de alias"); //$NON-NLS-1$
 
-        for (; aliases.hasMoreElements();) {
+        while (aliases.hasMoreElements()) {
             currAlias = aliases.nextElement().toString();
             v.add(currAlias);
+
+            LOGGER.info("Alias: " + currAlias);	//TODO: Traza para ayudar a localizar los problemas relacionados con CLAUER
         }
 
         return v.toArray(new String[0]);
