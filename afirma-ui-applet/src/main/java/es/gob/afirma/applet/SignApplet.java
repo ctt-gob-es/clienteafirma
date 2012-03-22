@@ -681,7 +681,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
     /** {@inheritDoc} */
     public boolean saveDataToFile(final String filename) {
-        LOGGER.info("Invocando setDataToFile: " + filename); //$NON-NLS-1$
+        LOGGER.info("Invocando saveDataToFile: " + filename); //$NON-NLS-1$
 
         if (filename == null || filename.length() < 1) {
             LOGGER.severe("El nombre de fichero para guardar datos es incorrecto, no se salvaran los datos"); //$NON-NLS-1$
