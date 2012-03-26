@@ -182,7 +182,31 @@ public final class QualifiedCertificatesFilter extends CertificateFilter {
 	 * @param cert Certificado.
 	 * @return {@code true} si el certificado es de firma. */
 	private static boolean isSignatureCert(final X509Certificate cert) {
-		return cert.getKeyUsage() != null && cert.getKeyUsage()[1];
+		if (cert.getKeyUsage() == null) {
+			return false;
+		}
+
+		final KeyUsagesPattern pattern = new KeyUsagesPattern(cert.getIssuerDN());
+		return checkKeyUsages(cert.getKeyUsage(), pattern.getSignaturePattern());
+	}
+
+	/**
+	 * Comprueba que el KeyUsage del certificado coincide con el patr&oacute;n indicado.
+	 * @param certKeyUsages KeyUsages del certificado.
+	 * @param pattern Patr&oacute;n que debe cumplir el certificado.
+	 * @return
+	 */
+	private static boolean checkKeyUsages(final boolean[] certKeyUsages, final Boolean[] pattern) {
+		for (int i = 0; i < pattern.length; i++) {
+			if (pattern[i] == null) {
+				continue;
+			}
+			if (pattern[i].booleanValue() != certKeyUsages[i]) {
+				return false;
+			}
+		}
+		return true;
+
 	}
 
 	/** Recupera el n&uacute;mero de serie del titular de un certificado.
