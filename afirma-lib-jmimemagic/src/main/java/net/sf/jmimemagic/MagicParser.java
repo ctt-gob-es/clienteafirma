@@ -46,7 +46,7 @@ public final class MagicParser extends DefaultHandler {
     private boolean initialized = false;
     private XMLReader parser = null;
     private final ArrayList<MagicMatcher> stack = new ArrayList<MagicMatcher>();
-    private final Collection<MagicMatcher> matchers = new ArrayList<MagicMatcher>();
+    private Collection<MagicMatcher> matchers = new ArrayList<MagicMatcher>();
     private MagicMatcher matcher = null;
     private MagicMatch match = null;
     private HashMap<String, String> properties = null;
@@ -70,7 +70,6 @@ public final class MagicParser extends DefaultHandler {
             try {
                 //this.parser = XMLReaderFactory.createXMLReader();
             	this.parser = new com.sun.org.apache.xerces.internal.parsers.SAXParser();
-                //System.out.println(this.parser.getClass().getCanonicalName());
             }
             catch (final Exception e) {
                 throw new MagicParseException("unable to instantiate parser"); //$NON-NLS-1$
@@ -109,6 +108,31 @@ public final class MagicParser extends DefaultHandler {
      */
     public Collection<MagicMatcher> getMatchers()
     {
+//    	System.out.println("Serializando matchers...");
+//    	try {
+//    		final java.io.File tmpFile = java.io.File.createTempFile("MagicMatchers-", ".ser");
+//    		final java.io.FileOutputStream fos = new java.io.FileOutputStream(tmpFile);
+//    		final java.io.ObjectOutputStream out = new java.io.ObjectOutputStream(fos);
+//    		out.writeObject(this.matchers);
+//    		out.flush();
+//    		out.close();
+//    		System.out.println("Matchers serializados en " + tmpFile.getAbsolutePath());
+//    	}
+//    	catch(final Exception e) {
+//    		e.printStackTrace();
+//    	}
+
+    	try {
+    		System.out.println("Deserializando Machers");
+    		final java.io.FileInputStream fis = new java.io.FileInputStream(new java.io.File("C:\\Users\\Tomas\\AppData\\Local\\Temp\\MagicMatchers-1219698208736544697.ser"));
+    		final java.io.ObjectInputStream in = new java.io.ObjectInputStream(fis);
+    		this.matchers = (Collection<MagicMatcher>) in.readObject();
+    		in.close();
+    	}
+    	catch(final Exception e) {
+    		e.printStackTrace();
+    	}
+
         return this.matchers;
     }
 

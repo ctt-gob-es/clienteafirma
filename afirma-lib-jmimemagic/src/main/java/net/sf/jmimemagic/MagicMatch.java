@@ -22,6 +22,7 @@ For more information, please email arimus@users.sourceforge.net
 */
 package net.sf.jmimemagic;
 
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,11 +37,14 @@ import java.util.Map;
  * @author $Author: arimus $
  * @version $Revision: 1.10 $
  */
-public class MagicMatch implements Cloneable {
-    private String mimeType = null;
+public class MagicMatch implements Cloneable, Serializable {
+
+	private static final long serialVersionUID = -1070505530849518849L;
+
+	private String mimeType = null;
     private String extension = null;
     private String description = null;
-    private ByteBuffer test = null;
+    private byte[] test = null;
     private int offset = 0;
     private int length = 0;
 
@@ -96,7 +100,7 @@ public class MagicMatch implements Cloneable {
      */
     public void setTest(final ByteBuffer value)
     {
-        this.test = value;
+        this.test = value.array();
     }
 
     /**
@@ -106,7 +110,7 @@ public class MagicMatch implements Cloneable {
      */
     public ByteBuffer getTest()
     {
-        return this.test;
+        return ByteBuffer.wrap(this.test);
     }
 
     /**
@@ -349,7 +353,7 @@ public class MagicMatch implements Cloneable {
 
         clone.setSubMatches(a);
 
-        clone.setTest(this.test);
+        clone.setTest(ByteBuffer.wrap(this.test));
         clone.setType(this.type);
 
         // TODO Auto-generated method stub

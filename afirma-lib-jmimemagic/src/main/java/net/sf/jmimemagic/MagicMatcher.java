@@ -25,6 +25,7 @@ package net.sf.jmimemagic;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.io.Serializable;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.ByteBuffer;
@@ -45,9 +46,11 @@ import org.apache.oro.text.perl.Perl5Util;
  * @version $Revision: 1.1 $
  */
 @SuppressWarnings("javadoc")
-public class MagicMatcher implements Cloneable {
+public class MagicMatcher implements Cloneable, Serializable {
 
-    private final ArrayList<MagicMatcher> subMatchers = new ArrayList<MagicMatcher>(0);
+	private static final long serialVersionUID = -1109707428218614961L;
+
+	private final ArrayList<MagicMatcher> subMatchers = new ArrayList<MagicMatcher>(0);
     private MagicMatch match = null;
 
 
