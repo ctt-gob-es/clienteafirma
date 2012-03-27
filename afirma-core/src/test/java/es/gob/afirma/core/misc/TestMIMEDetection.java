@@ -26,4 +26,14 @@ public final class TestMIMEDetection {
 		final String mime = new MimeHelper(file).getMimeType();
 		Assert.assertEquals("El MIME-Type obtenido no es correcto para un fichero de texto: " + mime, "text/plain", mime); //$NON-NLS-1$ //$NON-NLS-2$
 	}
+
+	/** Prueba la detecci&oacute;n de documentos XML.
+	 * @throws Exception */
+	@SuppressWarnings("static-method")
+	@Test
+	public void testXmlDetection() throws Exception {
+		final byte[] file = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream("xml.xml")); //$NON-NLS-1$
+		final String mime = new MimeHelper(file).getMimeType();
+		Assert.assertEquals("El MIME-Type obtenido no es correcto para un fichero XML: " + mime, "text/xml", mime); //$NON-NLS-1$ //$NON-NLS-2$
+	}
 }
