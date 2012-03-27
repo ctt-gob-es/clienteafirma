@@ -38,15 +38,15 @@
 
 package org.mozilla.universalchardet.prober;
 
-
+@SuppressWarnings("javadoc")
 public class MBCSGroupProber extends CharsetProber
 {
     ////////////////////////////////////////////////////////////////
     // fields
     ////////////////////////////////////////////////////////////////
     private ProbingState        state;
-    private CharsetProber[]     probers;
-    private boolean[]           isActive;
+    private final CharsetProber[]     probers;
+    private final boolean[]           isActive;
     private int                 bestGuess;
     private int                 activeNum;
 
@@ -57,10 +57,10 @@ public class MBCSGroupProber extends CharsetProber
     public MBCSGroupProber()
     {
         super();
-        
+
         this.probers = new CharsetProber[7];
         this.isActive = new boolean[7];
-        
+
         this.probers[0] = new UTF8Prober();
         this.probers[1] = new SJISProber();
         this.probers[2] = new EUCJPProber();
@@ -68,7 +68,7 @@ public class MBCSGroupProber extends CharsetProber
         this.probers[4] = new EUCKRProber();
         this.probers[5] = new Big5Prober();
         this.probers[6] = new EUCTWProber();
-        
+
         reset();
     }
 
@@ -95,11 +95,11 @@ public class MBCSGroupProber extends CharsetProber
         } else if (this.state == ProbingState.NOT_ME) {
             return 0.01f;
         } else {
-            for (int i=0; i<probers.length; ++i) {
+            for (int i=0; i<this.probers.length; ++i) {
                 if (!this.isActive[i]) {
                     continue;
                 }
-                
+
                 cf = this.probers[i].getConfidence();
                 if (bestConf < cf) {
                     bestConf = cf;
@@ -118,15 +118,15 @@ public class MBCSGroupProber extends CharsetProber
     }
 
     @Override
-    public ProbingState handleData(byte[] buf, int offset, int length)
+    public ProbingState handleData(final byte[] buf, final int offset, final int length)
     {
         ProbingState st;
-        
+
         boolean keepNext = true;
-        byte[] highbyteBuf = new byte[length];
+        final byte[] highbyteBuf = new byte[length];
         int highpos = 0;
 
-        int maxPos = offset + length;
+        final int maxPos = offset + length;
         for (int i=offset; i<maxPos; ++i) {
             if ((buf[i] & 0x80) != 0) {
                 highbyteBuf[highpos++] = buf[i];
@@ -139,7 +139,7 @@ public class MBCSGroupProber extends CharsetProber
                 }
             }
         }
-        
+
         for (int i=0; i<this.probers.length; ++i) {
             if (!this.isActive[i]) {
                 continue;
@@ -158,7 +158,7 @@ public class MBCSGroupProber extends CharsetProber
                 }
             }
         }
-        
+
         return this.state;
     }
 
@@ -177,5 +177,5 @@ public class MBCSGroupProber extends CharsetProber
 
     @Override
     public void setOption()
-    {}
+    { /* Not implemented */ }
 }

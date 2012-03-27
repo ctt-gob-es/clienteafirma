@@ -37,18 +37,19 @@
 
 package org.mozilla.universalchardet.prober.sequence;
 
+@SuppressWarnings("javadoc")
 public class BulgarianModel extends SequenceModel
 {
     ////////////////////////////////////////////////////////////////
     // constants
     ////////////////////////////////////////////////////////////////
     public static final float TYPICAL_POSITIVE_RATIO = 0.969392f;
-    
+
 
     ////////////////////////////////////////////////////////////////
     // methods
     ////////////////////////////////////////////////////////////////
-    public BulgarianModel(short[] charToOrderMap, String name)
+    public BulgarianModel(final short[] charToOrderMap, final String name)
     {
         super(
                 charToOrderMap,
@@ -57,8 +58,8 @@ public class BulgarianModel extends SequenceModel
                 false,
                 name);
     }
-    
-    
+
+
     ////////////////////////////////////////////////////////////////
     // constants continued
     ////////////////////////////////////////////////////////////////

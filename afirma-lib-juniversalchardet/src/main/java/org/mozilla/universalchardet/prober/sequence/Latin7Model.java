@@ -39,7 +39,7 @@ package org.mozilla.universalchardet.prober.sequence;
 
 import org.mozilla.universalchardet.Constants;
 
-
+@SuppressWarnings("javadoc")
 public class Latin7Model extends GreekModel
 {
     ////////////////////////////////////////////////////////////////
@@ -49,8 +49,8 @@ public class Latin7Model extends GreekModel
     {
         super(latin7CharToOrderMap, Constants.CHARSET_ISO_8859_7);
     }
-    
-    
+
+
     ////////////////////////////////////////////////////////////////
     // constants
     ////////////////////////////////////////////////////////////////

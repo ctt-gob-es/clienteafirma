@@ -37,6 +37,7 @@
 
 package org.mozilla.universalchardet.prober.distributionanalysis;
 
+@SuppressWarnings("javadoc")
 public class SJISDistributionAnalysis extends JISDistributionAnalysis
 {
     ////////////////////////////////////////////////////////////////
@@ -57,13 +58,13 @@ public class SJISDistributionAnalysis extends JISDistributionAnalysis
     {
         super();
     }
-    
+
     @Override
-    protected int getOrder(final byte[] buf, int offset)
+    protected int getOrder(final byte[] buf, final int offset)
     {
         int order = -1;
-        
-        int highbyte = buf[offset] & 0xFF;
+
+        final int highbyte = buf[offset] & 0xFF;
         if (highbyte >= HIGHBYTE_BEGIN_1 && highbyte <= HIGHBYTE_END_1) {
             order = 188 * (highbyte - HIGHBYTE_BEGIN_1);
         } else if (highbyte >= HIGHBYTE_BEGIN_2 && highbyte <= HIGHBYTE_END_2) {
@@ -71,12 +72,12 @@ public class SJISDistributionAnalysis extends JISDistributionAnalysis
         } else {
             return -1;
         }
-        int lowbyte = buf[offset+1] & 0xFF;
+        final int lowbyte = buf[offset+1] & 0xFF;
         order += lowbyte - LOWBYTE_BEGIN_1;
         if (lowbyte >= LOWBYTE_BEGIN_2) {
             --order;
         }
-        
+
         return order;
     }
 }

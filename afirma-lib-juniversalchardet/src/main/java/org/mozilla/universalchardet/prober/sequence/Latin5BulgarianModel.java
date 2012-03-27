@@ -39,7 +39,7 @@ package org.mozilla.universalchardet.prober.sequence;
 
 import org.mozilla.universalchardet.Constants;
 
-
+@SuppressWarnings("javadoc")
 public class Latin5BulgarianModel extends BulgarianModel
 {
     ////////////////////////////////////////////////////////////////
@@ -49,8 +49,8 @@ public class Latin5BulgarianModel extends BulgarianModel
     {
         super(latin5BulgarianCharToOrderMap, Constants.CHARSET_ISO_8859_5);
     }
-    
-    
+
+
     ////////////////////////////////////////////////////////////////
     // constants
     ////////////////////////////////////////////////////////////////

@@ -37,18 +37,19 @@
 
 package org.mozilla.universalchardet.prober.sequence;
 
+@SuppressWarnings("javadoc")
 public class CyrillicModel extends SequenceModel
 {
     ////////////////////////////////////////////////////////////////
     // constants
     ////////////////////////////////////////////////////////////////
     public static final float TYPICAL_POSITIVE_RATIO = 0.976601f;
-    
+
 
     ////////////////////////////////////////////////////////////////
     // methods
     ////////////////////////////////////////////////////////////////
-    public CyrillicModel(short[] charToOrderMap, String name)
+    public CyrillicModel(final short[] charToOrderMap, final String name)
     {
         super(
                 charToOrderMap,
@@ -58,7 +59,7 @@ public class CyrillicModel extends SequenceModel
                 name
                 );
     }
-    
+
 
     ////////////////////////////////////////////////////////////////
     // constants continued

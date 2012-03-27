@@ -37,29 +37,29 @@
 
 package org.mozilla.universalchardet.prober;
 
+import org.mozilla.universalchardet.Constants;
+import org.mozilla.universalchardet.prober.contextanalysis.SJISContextAnalysis;
+import org.mozilla.universalchardet.prober.distributionanalysis.SJISDistributionAnalysis;
 import org.mozilla.universalchardet.prober.statemachine.CodingStateMachine;
 import org.mozilla.universalchardet.prober.statemachine.SJISSMModel;
 import org.mozilla.universalchardet.prober.statemachine.SMModel;
-import org.mozilla.universalchardet.prober.contextanalysis.SJISContextAnalysis;
-import org.mozilla.universalchardet.prober.distributionanalysis.SJISDistributionAnalysis;
-import org.mozilla.universalchardet.Constants;
 
-
+@SuppressWarnings("javadoc")
 public class SJISProber extends CharsetProber
 {
     ////////////////////////////////////////////////////////////////
     // fields
     ////////////////////////////////////////////////////////////////
-    private CodingStateMachine          codingSM;
+    private final CodingStateMachine          codingSM;
     private ProbingState                state;
-    
-    private SJISContextAnalysis         contextAnalyzer;
-    private SJISDistributionAnalysis    distributionAnalyzer;
-    
-    private byte[]                      lastChar;
-    
+
+    private final SJISContextAnalysis         contextAnalyzer;
+    private final SJISDistributionAnalysis    distributionAnalyzer;
+
+    private final byte[]                      lastChar;
+
     private static final SMModel smModel = new SJISSMModel();
-    
+
 
     ////////////////////////////////////////////////////////////////
     // methods
@@ -83,9 +83,9 @@ public class SJISProber extends CharsetProber
     @Override
     public float getConfidence()
     {
-        float contextCf = this.contextAnalyzer.getConfidence();
-        float distribCf = this.distributionAnalyzer.getConfidence();
-        
+        final float contextCf = this.contextAnalyzer.getConfidence();
+        final float distribCf = this.distributionAnalyzer.getConfidence();
+
         return Math.max(contextCf, distribCf);
     }
 
@@ -96,11 +96,11 @@ public class SJISProber extends CharsetProber
     }
 
     @Override
-    public ProbingState handleData(byte[] buf, int offset, int length)
+    public ProbingState handleData(final byte[] buf, final int offset, final int length)
     {
         int codingState;
-        
-        int maxPos = offset + length;
+
+        final int maxPos = offset + length;
         for (int i=offset; i<maxPos; ++i) {
             codingState = this.codingSM.nextState(buf[i]);
             if (codingState == SMModel.ERROR) {
@@ -112,7 +112,7 @@ public class SJISProber extends CharsetProber
                 break;
             }
             if (codingState == SMModel.START) {
-                int charLen = this.codingSM.getCurrentCharLen();
+                final int charLen = this.codingSM.getCurrentCharLen();
                 if (i == offset) {
                     this.lastChar[1] = buf[offset];
                     this.contextAnalyzer.handleOneChar(this.lastChar, 2-charLen, charLen);
@@ -123,15 +123,15 @@ public class SJISProber extends CharsetProber
                 }
             }
         }
-        
+
         this.lastChar[0] = buf[maxPos-1];
-        
+
         if (this.state == ProbingState.DETECTING) {
             if (this.contextAnalyzer.gotEnoughData() && getConfidence() > SHORTCUT_THRESHOLD) {
                 this.state = ProbingState.FOUND_IT;
             }
         }
-        
+
         return this.state;
     }
 
@@ -147,5 +147,5 @@ public class SJISProber extends CharsetProber
 
     @Override
     public void setOption()
-    {}
+    { /* Not implemented */ }
 }

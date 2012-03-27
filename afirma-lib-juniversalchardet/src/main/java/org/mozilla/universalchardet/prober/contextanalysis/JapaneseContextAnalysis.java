@@ -37,6 +37,7 @@
 
 package org.mozilla.universalchardet.prober.contextanalysis;
 
+@SuppressWarnings("javadoc")
 public abstract class JapaneseContextAnalysis
 {
     ////////////////////////////////////////////////////////////////
@@ -48,7 +49,7 @@ public abstract class JapaneseContextAnalysis
     public static final int MINIMUM_DATA_THRESHOLD  = 4;
     public static final float DONT_KNOW             = -1f;
 
-    
+
     ////////////////////////////////////////////////////////////////
     // inner types
     ////////////////////////////////////////////////////////////////
@@ -56,53 +57,53 @@ public abstract class JapaneseContextAnalysis
     {
         public int order;
         public int charLength;
-        
+
         public Order()
         {
             this.order = -1;
             this.charLength = 0;
         }
     }
-    
+
     ////////////////////////////////////////////////////////////////
     // fields
     ////////////////////////////////////////////////////////////////
-    private int[]   relSample = new int[NUM_OF_CATEGORY];
+    private final int[]   relSample = new int[NUM_OF_CATEGORY];
     private int     totalRel;
     private int     lastCharOrder;
     private int     needToSkipCharNum;
     private boolean done;
-    
-    private Order   tmpOrder;
-    
-    
+
+    private final Order   tmpOrder;
+
+
     ////////////////////////////////////////////////////////////////
     // methods
     ////////////////////////////////////////////////////////////////
     public JapaneseContextAnalysis()
     {
-        tmpOrder = new Order();
+        this.tmpOrder = new Order();
         reset();
     }
-    
-    public void handleData(final byte[] buf, int offset, int length)
+
+    public void handleData(final byte[] buf, final int offset, final int length)
     {
         if (this.done) {
             return;
         }
-        
+
         // The buffer we got is byte oriented, and a character may span in more than one
-        // buffers. In case the last one or two byte in last buffer is not complete, we 
+        // buffers. In case the last one or two byte in last buffer is not complete, we
         // record how many byte needed to complete that character and skip these bytes here.
-        // We can choose to record those bytes as well and analyse the character once it 
+        // We can choose to record those bytes as well and analyse the character once it
         // is complete, but since a character will not make much difference, by simply skipping
         // this character will simply our logic and improve performance.
-        int maxPos = offset + length;
+        final int maxPos = offset + length;
 
         for (int i=this.needToSkipCharNum+offset; i<maxPos; ) {
             getOrder(this.tmpOrder, buf, i);
             i += this.tmpOrder.charLength;
-            
+
             if (i > maxPos) {
                 this.needToSkipCharNum = i - maxPos;
                 this.lastCharOrder = -1;
@@ -118,8 +119,8 @@ public abstract class JapaneseContextAnalysis
             }
         }
     }
-    
-    public void handleOneChar(final byte[] buf, int offset, int charLength)
+
+    public void handleOneChar(final byte[] buf, final int offset, final int charLength)
     {
         if (this.totalRel > MAX_REL_THRESHOLD) {
             this.done = true;
@@ -128,7 +129,7 @@ public abstract class JapaneseContextAnalysis
             return;
         }
 
-        
+
         int orderNum = -1;
         if (charLength == 2) {
             orderNum = getOrder(buf, offset);
@@ -144,11 +145,10 @@ public abstract class JapaneseContextAnalysis
     {
         if (this.totalRel > MINIMUM_DATA_THRESHOLD) {
             return ((float)(this.totalRel - this.relSample[0])) / this.totalRel;
-        } else {
-            return DONT_KNOW;
         }
+        return DONT_KNOW;
     }
-    
+
     public void reset()
     {
         this.totalRel = 0;
@@ -159,15 +159,15 @@ public abstract class JapaneseContextAnalysis
         this.lastCharOrder = -1;
         this.done = false;
     }
-    
+
     public void setOption()
-    {}
-    
+    { /* Not implemented */ }
+
     public boolean gotEnoughData()
     {
         return (this.totalRel > ENOUGH_REL_THRESHOLD);
     }
-    
+
     protected abstract void getOrder(Order order, final byte[] buf, int offset);
     protected abstract int getOrder(final byte[] buf, int offset);
 

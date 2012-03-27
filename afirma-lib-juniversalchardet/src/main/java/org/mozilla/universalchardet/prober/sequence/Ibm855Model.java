@@ -39,7 +39,7 @@ package org.mozilla.universalchardet.prober.sequence;
 
 import org.mozilla.universalchardet.Constants;
 
-
+@SuppressWarnings("javadoc")
 public class Ibm855Model extends CyrillicModel
 {
     ////////////////////////////////////////////////////////////////
@@ -49,8 +49,8 @@ public class Ibm855Model extends CyrillicModel
     {
         super(ibm855CharToOrderMap, Constants.CHARSET_IBM855);
     }
-    
-    
+
+
     ////////////////////////////////////////////////////////////////
     // constants
     ////////////////////////////////////////////////////////////////

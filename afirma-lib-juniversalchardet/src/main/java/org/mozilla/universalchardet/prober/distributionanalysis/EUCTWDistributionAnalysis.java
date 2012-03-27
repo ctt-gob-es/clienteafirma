@@ -37,6 +37,7 @@
 
 package org.mozilla.universalchardet.prober.distributionanalysis;
 
+@SuppressWarnings("javadoc")
 public class EUCTWDistributionAnalysis extends CharDistributionAnalysis
 {
     ////////////////////////////////////////////////////////////////
@@ -48,7 +49,7 @@ public class EUCTWDistributionAnalysis extends CharDistributionAnalysis
     public static final int     LOWBYTE_BEGIN = 0xA1;
     public static final int     LOWBYTE_END = 0xFE;
 
-    
+
     ////////////////////////////////////////////////////////////////
     // methods
     ////////////////////////////////////////////////////////////////
@@ -60,15 +61,14 @@ public class EUCTWDistributionAnalysis extends CharDistributionAnalysis
     }
 
     @Override
-    protected int getOrder(final byte[] buf, int offset)
+    protected int getOrder(final byte[] buf, final int offset)
     {
-        int highbyte = buf[offset] & 0xFF;
+        final int highbyte = buf[offset] & 0xFF;
         if (highbyte >= HIGHBYTE_BEGIN) {
-            int lowbyte = buf[offset+1] & 0xFF;
+            final int lowbyte = buf[offset+1] & 0xFF;
             return (94 * (highbyte - HIGHBYTE_BEGIN) + lowbyte - LOWBYTE_BEGIN);
-        } else {
-            return -1;
         }
+        return -1;
     }
 
 
@@ -413,7 +413,7 @@ public class EUCTWDistributionAnalysis extends CharDistributionAnalysis
          890,3614,3864,8110,1877,3732,3402,8111,2183,2353,3403,1652,8112,8113,8114, 941, // 8086
         2294, 208,3499,4057,2019, 330,4294,3865,2892,2492,3733,4295,8115,8116,8117,8118, // 8102
 
-        /*************************************************************************************** 
+        /***************************************************************************************
          *Everything below is of no interest for detection purpose                             *
          ***************************************************************************************
 

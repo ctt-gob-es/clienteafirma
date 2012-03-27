@@ -37,6 +37,7 @@
 
 package org.mozilla.universalchardet.prober.statemachine;
 
+@SuppressWarnings("javadoc")
 public abstract class SMModel
 {
     ////////////////////////////////////////////////////////////////
@@ -45,7 +46,7 @@ public abstract class SMModel
     public static final int START    = 0;
     public static final int ERROR    = 1;
     public static final int ITSME    = 2;
-    
+
 
     ////////////////////////////////////////////////////////////////
     // fields
@@ -55,17 +56,17 @@ public abstract class SMModel
     protected PkgInt    stateTable;
     protected int[]     charLenTable;
     protected String    name;
-    
-    
+
+
     ////////////////////////////////////////////////////////////////
     // methods
     ////////////////////////////////////////////////////////////////
     public SMModel(
-            PkgInt classTable,
-            int classFactor,
-            PkgInt stateTable,
-            int[] charLenTable,
-            String name)
+            final PkgInt classTable,
+            final int classFactor,
+            final PkgInt stateTable,
+            final int[] charLenTable,
+            final String name)
     {
         this.classTable = classTable;
         this.classFactor = classFactor;
@@ -73,23 +74,23 @@ public abstract class SMModel
         this.charLenTable = charLenTable;
         this.name = name;
     }
-    
-    public int getClass(byte b)
+
+    public int getClass(final byte b)
     {
-        int c = b & 0xFF;
+        final int c = b & 0xFF;
         return this.classTable.unpack(c);
     }
-    
-    public int getNextState(int cls, int currentState)
+
+    public int getNextState(final int cls, final int currentState)
     {
         return this.stateTable.unpack(currentState * this.classFactor + cls);
     }
-    
-    public int getCharLen(int cls)
+
+    public int getCharLen(final int cls)
     {
         return this.charLenTable[cls];
     }
-    
+
     public String getName()
     {
         return this.name;

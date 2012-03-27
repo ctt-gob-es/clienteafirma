@@ -37,7 +37,8 @@
 
 package org.mozilla.universalchardet;
 
+@SuppressWarnings("javadoc")
 public interface CharsetListener
 {
-    public void report(String charset);
+    void report(String charset);
 }

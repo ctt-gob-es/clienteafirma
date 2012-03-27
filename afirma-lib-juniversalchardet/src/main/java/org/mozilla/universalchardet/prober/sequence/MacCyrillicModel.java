@@ -39,7 +39,7 @@ package org.mozilla.universalchardet.prober.sequence;
 
 import org.mozilla.universalchardet.Constants;
 
-
+@SuppressWarnings("javadoc")
 public class MacCyrillicModel extends CyrillicModel
 {
     ////////////////////////////////////////////////////////////////
@@ -49,8 +49,8 @@ public class MacCyrillicModel extends CyrillicModel
     {
         super(macCyrillicCharToOrderMap, Constants.CHARSET_MACCYRILLIC);
     }
-    
-    
+
+
     ////////////////////////////////////////////////////////////////
     // constants
     ////////////////////////////////////////////////////////////////

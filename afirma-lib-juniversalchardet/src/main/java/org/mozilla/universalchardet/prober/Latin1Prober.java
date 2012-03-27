@@ -39,9 +39,10 @@
 package org.mozilla.universalchardet.prober;
 
 import java.nio.ByteBuffer;
+
 import org.mozilla.universalchardet.Constants;
 
-
+@SuppressWarnings("javadoc")
 public class Latin1Prober extends CharsetProber
 {
     ////////////////////////////////////////////////////////////////
@@ -57,15 +58,15 @@ public class Latin1Prober extends CharsetProber
     public static final byte ASO = 7;
     public static final int CLASS_NUM = 8;
     public static final int FREQ_CAT_NUM = 4;
-    
+
 
     ////////////////////////////////////////////////////////////////
     // fields
     ////////////////////////////////////////////////////////////////
     private ProbingState    state;
     private byte            lastCharClass;
-    private int[]           freqCounter;
-    
+    private final int[]           freqCounter;
+
 
     ////////////////////////////////////////////////////////////////
     // methods
@@ -73,9 +74,9 @@ public class Latin1Prober extends CharsetProber
     public Latin1Prober()
     {
         super();
-        
+
         this.freqCounter = new int[FREQ_CAT_NUM];
-        
+
         reset();
     }
 
@@ -91,28 +92,28 @@ public class Latin1Prober extends CharsetProber
         if (this.state == ProbingState.NOT_ME) {
             return 0.01f;
         }
-        
+
         float confidence;
         int total = 0;
         for (int i=0; i<this.freqCounter.length; ++i) {
             total += this.freqCounter[i];
         }
-        
+
         if (total <= 0) {
             confidence = 0.0f;
         } else {
             confidence = this.freqCounter[3] * 1.0f / total;
             confidence -= this.freqCounter[1] * 20.0f / total;
         }
-        
+
         if (confidence < 0.0f) {
             confidence = 0.0f;
         }
-        
-        // lower the confidence of latin1 so that other more accurate detector 
+
+        // lower the confidence of latin1 so that other more accurate detector
         // can take priority.
         confidence *= 0.50f;
-        
+
         return confidence;
     }
 
@@ -123,18 +124,18 @@ public class Latin1Prober extends CharsetProber
     }
 
     @Override
-    public ProbingState handleData(byte[] buf, int offset, int length)
+    public ProbingState handleData(final byte[] buf, final int offset, final int length)
     {
-        ByteBuffer newBufTmp = filterWithEnglishLetters(buf, offset, length);
+        final ByteBuffer newBufTmp = filterWithEnglishLetters(buf, offset, length);
 
         byte charClass;
         byte freq;
-        
-        byte[] newBuf = newBufTmp.array();
-        int newBufLen = newBufTmp.position();
+
+        final byte[] newBuf = newBufTmp.array();
+        final int newBufLen = newBufTmp.position();
 
         for (int i=0; i<newBufLen; ++i) {
-            int c = newBuf[i] & 0xFF;
+            final int c = newBuf[i] & 0xFF;
             charClass = latin1CharToClass[c];
             freq = latin1ClassModel[this.lastCharClass * CLASS_NUM + charClass];
             if (freq == 0) {
@@ -160,9 +161,9 @@ public class Latin1Prober extends CharsetProber
 
     @Override
     public void setOption()
-    {}
+    { /* Not implemented */ }
 
-    
+
     ////////////////////////////////////////////////////////////////
     // constants continued
     ////////////////////////////////////////////////////////////////
@@ -200,16 +201,16 @@ public class Latin1Prober extends CharsetProber
           ASO, ASO, ASV, ASV, ASV, ASV, ASV, OTH,   // F0 - F7
           ASV, ASV, ASV, ASV, ASV, ASO, ASO, ASO,   // F8 - FF
     };
-    
+
     private static final byte[] latin1ClassModel = new byte[] {
         /*      UDF OTH ASC ASS ACV ACO ASV ASO  */
         /*UDF*/  0,  0,  0,  0,  0,  0,  0,  0,
         /*OTH*/  0,  3,  3,  3,  3,  3,  3,  3,
-        /*ASC*/  0,  3,  3,  3,  3,  3,  3,  3, 
+        /*ASC*/  0,  3,  3,  3,  3,  3,  3,  3,
         /*ASS*/  0,  3,  3,  3,  1,  1,  3,  3,
         /*ACV*/  0,  3,  3,  3,  1,  2,  1,  2,
-        /*ACO*/  0,  3,  3,  3,  3,  3,  3,  3, 
-        /*ASV*/  0,  3,  1,  3,  1,  1,  1,  3, 
+        /*ACO*/  0,  3,  3,  3,  3,  3,  3,  3,
+        /*ASV*/  0,  3,  1,  3,  1,  1,  1,  3,
         /*ASO*/  0,  3,  1,  3,  1,  1,  3,  3,
     };
 }

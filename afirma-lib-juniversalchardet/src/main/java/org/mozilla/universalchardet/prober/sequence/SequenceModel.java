@@ -38,6 +38,7 @@
 
 package org.mozilla.universalchardet.prober.sequence;
 
+@SuppressWarnings("javadoc")
 public abstract class SequenceModel
 {
     ////////////////////////////////////////////////////////////////
@@ -48,17 +49,17 @@ public abstract class SequenceModel
     protected float     typicalPositiveRatio;
     protected boolean   keepEnglishLetter;
     protected String    charsetName;
-    
+
 
     ////////////////////////////////////////////////////////////////
     // methods
     ////////////////////////////////////////////////////////////////
     public SequenceModel(
-            short[] charToOrderMap,
-            byte[] precedenceMatrix,
-            float typicalPositiveRatio,
-            boolean keepEnglishLetter,
-            String charsetName)
+            final short[] charToOrderMap,
+            final byte[] precedenceMatrix,
+            final float typicalPositiveRatio,
+            final boolean keepEnglishLetter,
+            final String charsetName)
     {
         this.charToOrderMap = charToOrderMap;
         this.precedenceMatrix = precedenceMatrix;
@@ -66,28 +67,28 @@ public abstract class SequenceModel
         this.keepEnglishLetter = keepEnglishLetter;
         this.charsetName = charsetName;
     }
-    
-    public short getOrder(byte b)
+
+    public short getOrder(final byte b)
     {
-        int c = b & 0xFF;
+        final int c = b & 0xFF;
         return this.charToOrderMap[c];
     }
-    
-    public byte getPrecedence(int pos)
+
+    public byte getPrecedence(final int pos)
     {
         return this.precedenceMatrix[pos];
     }
-    
+
     public float getTypicalPositiveRatio()
     {
         return this.typicalPositiveRatio;
     }
-    
+
     public boolean getKeepEnglishLetter()
     {
         return this.keepEnglishLetter;
     }
-    
+
     public String getCharsetName()
     {
         return this.charsetName;

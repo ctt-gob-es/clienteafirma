@@ -41,14 +41,14 @@ package org.mozilla.universalchardet.prober.sequence;
 
 import org.mozilla.universalchardet.Constants;
 
-
+@SuppressWarnings("javadoc")
 public class HebrewModel extends SequenceModel
 {
     ////////////////////////////////////////////////////////////////
     // constants
     ////////////////////////////////////////////////////////////////
     public static final float TYPICAL_POSITIVE_RATIO = 0.984004f;
-    
+
 
     ////////////////////////////////////////////////////////////////
     // methods
@@ -62,8 +62,8 @@ public class HebrewModel extends SequenceModel
                 false,
                 Constants.CHARSET_WINDOWS_1255);
     }
-    
-    
+
+
     ////////////////////////////////////////////////////////////////
     // constants continued
     ////////////////////////////////////////////////////////////////

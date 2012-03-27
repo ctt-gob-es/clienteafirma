@@ -39,7 +39,7 @@ package org.mozilla.universalchardet.prober.sequence;
 
 import org.mozilla.universalchardet.Constants;
 
-
+@SuppressWarnings("javadoc")
 public class Win1251BulgarianModel extends BulgarianModel
 {
     ////////////////////////////////////////////////////////////////
@@ -49,8 +49,8 @@ public class Win1251BulgarianModel extends BulgarianModel
     {
         super(win1251BulgarianCharToOrderMap, Constants.CHARSET_WINDOWS_1251);
     }
-    
-    
+
+
     ////////////////////////////////////////////////////////////////
     // constants
     ////////////////////////////////////////////////////////////////

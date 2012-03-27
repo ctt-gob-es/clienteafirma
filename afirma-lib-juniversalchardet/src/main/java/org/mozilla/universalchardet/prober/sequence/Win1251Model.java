@@ -39,7 +39,7 @@ package org.mozilla.universalchardet.prober.sequence;
 
 import org.mozilla.universalchardet.Constants;
 
-
+@SuppressWarnings("javadoc")
 public class Win1251Model extends CyrillicModel
 {
     ////////////////////////////////////////////////////////////////
@@ -49,7 +49,7 @@ public class Win1251Model extends CyrillicModel
     {
         super(win1251CharToOrderMap, Constants.CHARSET_WINDOWS_1251);
     }
-    
+
 
     ////////////////////////////////////////////////////////////////
     // constants

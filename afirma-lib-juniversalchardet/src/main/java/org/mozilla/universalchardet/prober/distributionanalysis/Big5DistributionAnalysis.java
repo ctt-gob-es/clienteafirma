@@ -37,6 +37,7 @@
 
 package org.mozilla.universalchardet.prober.distributionanalysis;
 
+@SuppressWarnings("javadoc")
 public class Big5DistributionAnalysis extends CharDistributionAnalysis
 {
     ////////////////////////////////////////////////////////////////
@@ -49,8 +50,8 @@ public class Big5DistributionAnalysis extends CharDistributionAnalysis
     public static final int LOWBYTE_END_1 = 0x7E;
     public static final int LOWBYTE_BEGIN_2 = 0xA1;
     public static final int LOWBYTE_END_2 = 0xFE;
-    
-    
+
+
     ////////////////////////////////////////////////////////////////
     // methods
     ////////////////////////////////////////////////////////////////
@@ -60,23 +61,23 @@ public class Big5DistributionAnalysis extends CharDistributionAnalysis
         this.charToFreqOrder = big5CharToFreqOrder;
         this.typicalDistributionRatio = BIG5_TYPICAL_DISTRIBUTION_RATIO;
     }
-    
-    protected int getOrder(final byte[] buf, int offset)
+
+    @Override
+	protected int getOrder(final byte[] buf, final int offset)
     {
-        int highbyte = buf[offset] & 0xFF;
+        final int highbyte = buf[offset] & 0xFF;
         if (highbyte >= HIGHBYTE_BEGIN) {
-            int lowbyte = buf[offset+1] & 0xFF;
+            final int lowbyte = buf[offset+1] & 0xFF;
             if (lowbyte >= LOWBYTE_BEGIN_2) {
                 return (157 * (highbyte - HIGHBYTE_BEGIN) + lowbyte - LOWBYTE_BEGIN_2 + 63);
-            } else {
-                return (157 * (highbyte - HIGHBYTE_BEGIN) + lowbyte - LOWBYTE_BEGIN_1);
             }
+            return (157 * (highbyte - HIGHBYTE_BEGIN) + lowbyte - LOWBYTE_BEGIN_1);
         }
-        
+
         return -1;
     }
-    
-    
+
+
     ////////////////////////////////////////////////////////////////
     // constants continued
     ////////////////////////////////////////////////////////////////
@@ -418,7 +419,7 @@ public class Big5DistributionAnalysis extends CharDistributionAnalysis
          890,3669,3943,5791,1878,3798,3439,5792,2186,2358,3440,1652,5793,5794,5795, 941, // 5360
         2299, 208,3546,4161,2020, 330,4438,3944,2906,2499,3799,4439,4811,5796,5797,5798, // 5376  //last 512
 
-        /*************************************************************************************** 
+        /***************************************************************************************
          *Everything below is of no interest for detection purpose                             *
          ***************************************************************************************
 

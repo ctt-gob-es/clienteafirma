@@ -38,23 +38,23 @@
 package org.mozilla.universalchardet.prober;
 
 import org.mozilla.universalchardet.prober.statemachine.CodingStateMachine;
-import org.mozilla.universalchardet.prober.statemachine.SMModel;
 import org.mozilla.universalchardet.prober.statemachine.HZSMModel;
 import org.mozilla.universalchardet.prober.statemachine.ISO2022CNSMModel;
 import org.mozilla.universalchardet.prober.statemachine.ISO2022JPSMModel;
 import org.mozilla.universalchardet.prober.statemachine.ISO2022KRSMModel;
+import org.mozilla.universalchardet.prober.statemachine.SMModel;
 
-
+@SuppressWarnings("javadoc")
 public class EscCharsetProber extends CharsetProber
 {
     ////////////////////////////////////////////////////////////////
     // fields
     ////////////////////////////////////////////////////////////////
-    private CodingStateMachine[]    codingSM;
+    private final CodingStateMachine[]    codingSM;
     private int                     activeSM;
     private ProbingState            state;
     private String                  detectedCharset;
-    
+
     private static final HZSMModel hzsModel = new HZSMModel();
     private static final ISO2022CNSMModel iso2022cnModel = new ISO2022CNSMModel();
     private static final ISO2022JPSMModel iso2022jpModel = new ISO2022JPSMModel();
@@ -76,7 +76,7 @@ public class EscCharsetProber extends CharsetProber
 
         reset();
     }
-    
+
     @Override
     public String getCharSetName()
     {
@@ -96,11 +96,11 @@ public class EscCharsetProber extends CharsetProber
     }
 
     @Override
-    public ProbingState handleData(byte[] buf, int offset, int length)
+    public ProbingState handleData(final byte[] buf, final int offset, final int length)
     {
         int codingState;
-        
-        int maxPos = offset + length;
+
+        final int maxPos = offset + length;
         for (int i=offset; i<maxPos && this.state==ProbingState.DETECTING; ++i) {
             for (int j=this.activeSM-1; j>=0; --j) {
                 codingState = this.codingSM[j].nextState(buf[i]);
@@ -122,7 +122,7 @@ public class EscCharsetProber extends CharsetProber
                 }
             }
         }
-        
+
         return this.state;
     }
 
@@ -139,5 +139,5 @@ public class EscCharsetProber extends CharsetProber
 
     @Override
     public void setOption()
-    {}
+    { /* Not imlpemented */ }
 }

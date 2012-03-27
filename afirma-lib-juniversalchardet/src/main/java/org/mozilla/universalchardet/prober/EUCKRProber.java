@@ -37,28 +37,28 @@
 
 package org.mozilla.universalchardet.prober;
 
+import org.mozilla.universalchardet.Constants;
 import org.mozilla.universalchardet.prober.distributionanalysis.EUCKRDistributionAnalysis;
 import org.mozilla.universalchardet.prober.statemachine.CodingStateMachine;
 import org.mozilla.universalchardet.prober.statemachine.EUCKRSMModel;
 import org.mozilla.universalchardet.prober.statemachine.SMModel;
-import org.mozilla.universalchardet.Constants;
 
-
+@SuppressWarnings("javadoc")
 public class EUCKRProber extends CharsetProber
 {
     ////////////////////////////////////////////////////////////////
     // fields
     ////////////////////////////////////////////////////////////////
-    private CodingStateMachine          codingSM;
+    private final CodingStateMachine          codingSM;
     private ProbingState                state;
-    
-    private EUCKRDistributionAnalysis   distributionAnalyzer;
-    
-    private byte[]                      lastChar;
+
+    private final EUCKRDistributionAnalysis   distributionAnalyzer;
+
+    private final byte[]                      lastChar;
 
     private static final SMModel smModel = new EUCKRSMModel();
 
-    
+
     ////////////////////////////////////////////////////////////////
     // methods
     ////////////////////////////////////////////////////////////////
@@ -70,7 +70,7 @@ public class EUCKRProber extends CharsetProber
         this.lastChar = new byte[2];
         reset();
     }
-    
+
     @Override
     public String getCharSetName()
     {
@@ -80,8 +80,8 @@ public class EUCKRProber extends CharsetProber
     @Override
     public float getConfidence()
     {
-        float distribCf = this.distributionAnalyzer.getConfidence();
-        
+        final float distribCf = this.distributionAnalyzer.getConfidence();
+
         return distribCf;
     }
 
@@ -92,13 +92,13 @@ public class EUCKRProber extends CharsetProber
     }
 
     @Override
-    public ProbingState handleData(byte[] buf, int offset, int length)
+    public ProbingState handleData(final byte[] buf, final int offset, final int length)
     {
         int codingState;
-        
-        int maxPos = offset + length;
+
+        final int maxPos = offset + length;
         for (int i=offset; i<maxPos; ++i) {
-            codingState = codingSM.nextState(buf[i]);
+            codingState = this.codingSM.nextState(buf[i]);
             if (codingState == SMModel.ERROR) {
                 this.state = ProbingState.NOT_ME;
                 break;
@@ -108,7 +108,7 @@ public class EUCKRProber extends CharsetProber
                 break;
             }
             if (codingState == SMModel.START) {
-                int charLen = this.codingSM.getCurrentCharLen();
+                final int charLen = this.codingSM.getCurrentCharLen();
                 if (i == offset) {
                     this.lastChar[1] = buf[offset];
                     this.distributionAnalyzer.handleOneChar(this.lastChar, 0, charLen);
@@ -117,15 +117,15 @@ public class EUCKRProber extends CharsetProber
                 }
             }
         }
-        
+
         this.lastChar[0] = buf[maxPos-1];
-        
+
         if (this.state == ProbingState.DETECTING) {
             if (this.distributionAnalyzer.gotEnoughData() && getConfidence() > SHORTCUT_THRESHOLD) {
                 this.state = ProbingState.FOUND_IT;
             }
         }
-        
+
         return this.state;
     }
 
@@ -140,5 +140,5 @@ public class EUCKRProber extends CharsetProber
 
     @Override
     public void setOption()
-    {}
+    { /* Not implemented */ }
 }

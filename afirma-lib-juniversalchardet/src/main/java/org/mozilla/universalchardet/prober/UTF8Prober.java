@@ -37,29 +37,29 @@
 
 package org.mozilla.universalchardet.prober;
 
+import org.mozilla.universalchardet.Constants;
 import org.mozilla.universalchardet.prober.statemachine.CodingStateMachine;
 import org.mozilla.universalchardet.prober.statemachine.SMModel;
 import org.mozilla.universalchardet.prober.statemachine.UTF8SMModel;
-import org.mozilla.universalchardet.Constants;
 
-
+@SuppressWarnings("javadoc")
 public class UTF8Prober extends CharsetProber
 {
     ////////////////////////////////////////////////////////////////
     // constants
     ////////////////////////////////////////////////////////////////
     public static final float ONE_CHAR_PROB = 0.50f;
-    
+
 
     ////////////////////////////////////////////////////////////////
     // fields
     ////////////////////////////////////////////////////////////////
-    private CodingStateMachine  codingSM;
+    private final CodingStateMachine  codingSM;
     private ProbingState        state;
     private int                 numOfMBChar;
-    
+
     private static final SMModel smModel = new UTF8SMModel();
-    
+
 
     ////////////////////////////////////////////////////////////////
     // methods
@@ -73,16 +73,18 @@ public class UTF8Prober extends CharsetProber
         reset();
     }
 
-    public String getCharSetName()
+    @Override
+	public String getCharSetName()
     {
         return Constants.CHARSET_UTF_8;
     }
 
-    public ProbingState handleData(final byte[] buf, int offset, int length)
+    @Override
+	public ProbingState handleData(final byte[] buf, final int offset, final int length)
     {
         int codingState;
 
-        int maxPos = offset + length;
+        final int maxPos = offset + length;
         for (int i=offset; i<maxPos; ++i) {
             codingState = this.codingSM.nextState(buf[i]);
             if (codingState == SMModel.ERROR) {
@@ -99,42 +101,45 @@ public class UTF8Prober extends CharsetProber
                 }
             }
         }
-        
+
         if (this.state == ProbingState.DETECTING) {
             if (getConfidence() > SHORTCUT_THRESHOLD) {
                 this.state = ProbingState.FOUND_IT;
             }
         }
-        
+
         return this.state;
     }
 
-    public ProbingState getState()
+    @Override
+	public ProbingState getState()
     {
         return this.state;
     }
 
-    public void reset()
+    @Override
+	public void reset()
     {
         this.codingSM.reset();
         this.numOfMBChar = 0;
         this.state = ProbingState.DETECTING;
     }
 
-    public float getConfidence()
+    @Override
+	public float getConfidence()
     {
         float unlike = 0.99f;
-        
+
         if (this.numOfMBChar < 6) {
             for (int i=0; i<this.numOfMBChar; ++i) {
                 unlike *= ONE_CHAR_PROB;
             }
             return (1.0f - unlike);
-        } else {
-            return 0.99f;
         }
+        return 0.99f;
     }
 
-    public void setOption()
-    {}
+    @Override
+	public void setOption()
+    { /* Not implemented */ }
 }

@@ -40,6 +40,7 @@ package org.mozilla.universalchardet.prober;
 
 import org.mozilla.universalchardet.prober.sequence.SequenceModel;
 
+@SuppressWarnings("javadoc")
 public class SingleByteCharsetProber extends CharsetProber
 {
     ////////////////////////////////////////////////////////////////
@@ -53,30 +54,30 @@ public class SingleByteCharsetProber extends CharsetProber
     public static final int     NUMBER_OF_SEQ_CAT = 4;
     public static final int     POSITIVE_CAT = NUMBER_OF_SEQ_CAT-1;
     public static final int     NEGATIVE_CAT = 0;
-    
+
 
     ////////////////////////////////////////////////////////////////
     // fields
     ////////////////////////////////////////////////////////////////
     private ProbingState    state;
-    private SequenceModel   model;
-    private boolean         reversed;
-    
+    private final SequenceModel   model;
+    private final boolean         reversed;
+
     private short           lastOrder;
 
     private int             totalSeqs;
-    private int[]           seqCounters;
-    
+    private final int[]           seqCounters;
+
     private int             totalChar;
     private int             freqChar;
-    
-    private CharsetProber   nameProber;
-    
-    
+
+    private final CharsetProber   nameProber;
+
+
     ////////////////////////////////////////////////////////////////
     // methods
     ////////////////////////////////////////////////////////////////
-    public SingleByteCharsetProber(SequenceModel model)
+    public SingleByteCharsetProber(final SequenceModel model)
     {
         super();
         this.model = model;
@@ -85,11 +86,11 @@ public class SingleByteCharsetProber extends CharsetProber
         this.seqCounters = new int[NUMBER_OF_SEQ_CAT];
         reset();
     }
-    
+
     public SingleByteCharsetProber(
-            SequenceModel model,
-            boolean reversed,
-            CharsetProber nameProber)
+            final SequenceModel model,
+            final boolean reversed,
+            final CharsetProber nameProber)
     {
         super();
         this.model = model;
@@ -98,7 +99,7 @@ public class SingleByteCharsetProber extends CharsetProber
         this.seqCounters = new int[NUMBER_OF_SEQ_CAT];
         reset();
     }
-    
+
     boolean keepEnglishLetters()
     {
         return this.model.getKeepEnglishLetter();
@@ -109,9 +110,8 @@ public class SingleByteCharsetProber extends CharsetProber
     {
         if (this.nameProber == null) {
             return this.model.getCharsetName();
-        } else {
-            return this.nameProber.getCharSetName();
         }
+        return this.nameProber.getCharSetName();
     }
 
     @Override
@@ -136,14 +136,14 @@ public class SingleByteCharsetProber extends CharsetProber
     }
 
     @Override
-    public ProbingState handleData(byte[] buf, int offset, int length)
+    public ProbingState handleData(final byte[] buf, final int offset, final int length)
     {
         short order;
-        
-        int maxPos = offset + length;
+
+        final int maxPos = offset + length;
         for (int i=offset; i<maxPos; ++i) {
             order = this.model.getOrder(buf[i]);
-            
+
             if (order < SYMBOL_CAT_ORDER) {
                 ++this.totalChar;
             }
@@ -160,10 +160,10 @@ public class SingleByteCharsetProber extends CharsetProber
             }
             this.lastOrder = order;
         }
-        
+
         if (this.state == ProbingState.DETECTING) {
             if (this.totalSeqs > SB_ENOUGH_REL_THRESHOLD) {
-                float cf = getConfidence();
+                final float cf = getConfidence();
                 if (cf > POSITIVE_SHORTCUT_THRESHOLD) {
                     this.state = ProbingState.FOUND_IT;
                 } else if (cf < NEGATIVE_SHORTCUT_THRESHOLD){
@@ -171,7 +171,7 @@ public class SingleByteCharsetProber extends CharsetProber
                 }
             }
         }
-        
+
         return this.state;
     }
 
@@ -190,5 +190,5 @@ public class SingleByteCharsetProber extends CharsetProber
 
     @Override
     public void setOption()
-    {}
+    { /* Not implemented */ }
 }

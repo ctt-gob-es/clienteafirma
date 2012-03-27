@@ -37,18 +37,19 @@
 
 package org.mozilla.universalchardet.prober.sequence;
 
+@SuppressWarnings("javadoc")
 public class GreekModel extends SequenceModel
 {
     ////////////////////////////////////////////////////////////////
     // constants
     ////////////////////////////////////////////////////////////////
     public static final float TYPICAL_POSITIVE_RATIO = 0.982851f;
-    
+
 
     ////////////////////////////////////////////////////////////////
     // methods
     ////////////////////////////////////////////////////////////////
-    public GreekModel(short[] charToOrderMap, String name)
+    public GreekModel(final short[] charToOrderMap, final String name)
     {
         super(
                 charToOrderMap,
@@ -58,7 +59,7 @@ public class GreekModel extends SequenceModel
                 name
                 );
     }
-    
+
 
     ////////////////////////////////////////////////////////////////
     // constants continued

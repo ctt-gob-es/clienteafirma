@@ -38,7 +38,7 @@ package org.mozilla.universalchardet.prober.sequence;
 
 import org.mozilla.universalchardet.Constants;
 
-
+@SuppressWarnings("javadoc")
 public class Win1253Model extends GreekModel
 {
     ////////////////////////////////////////////////////////////////
@@ -48,8 +48,8 @@ public class Win1253Model extends GreekModel
     {
         super(win1253CharToOrderMap, Constants.CHARSET_WINDOWS_1253);
     }
-    
-    
+
+
     ////////////////////////////////////////////////////////////////
     // constants
     ////////////////////////////////////////////////////////////////
