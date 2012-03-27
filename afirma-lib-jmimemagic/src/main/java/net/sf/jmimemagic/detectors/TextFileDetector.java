@@ -22,14 +22,13 @@ For more information, please email arimus@users.sourceforge.net
 */
 package net.sf.jmimemagic.detectors;
 
+import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.util.Map;
+
 import net.sf.jmimemagic.MagicDetector;
 
 import org.apache.oro.text.perl.Perl5Util;
-
-import java.io.File;
-import java.io.UnsupportedEncodingException;
-
-import java.util.Map;
 
 
 /**
@@ -56,7 +55,7 @@ public class TextFileDetector implements MagicDetector
      */
     public String getDisplayName()
     {
-        return "Text File Detector";
+        return "Text File Detector"; //$NON-NLS-1$
     }
 
     /**
@@ -66,7 +65,7 @@ public class TextFileDetector implements MagicDetector
      */
     public String getVersion()
     {
-        return "0.1";
+        return "0.1"; //$NON-NLS-1$
     }
 
     /**
@@ -76,7 +75,7 @@ public class TextFileDetector implements MagicDetector
      */
     public String[] getHandledExtensions()
     {
-        return new String[] { "txt", "text" };
+        return new String[] { "txt", "text" }; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     /**
@@ -86,7 +85,7 @@ public class TextFileDetector implements MagicDetector
      */
     public String[] getHandledTypes()
     {
-        return new String[] { "text/plain" };
+        return new String[] { "text/plain" }; //$NON-NLS-1$
     }
 
     /**
@@ -96,7 +95,7 @@ public class TextFileDetector implements MagicDetector
      */
     public String getName()
     {
-        return "textfiledetector";
+        return "textfiledetector"; //$NON-NLS-1$
     }
 
     /**
@@ -112,21 +111,21 @@ public class TextFileDetector implements MagicDetector
      *
      * @return DOCUMENT ME!
      */
-    public String[] process(byte[] data, int offset, int length, long bitmask, char comparator,
-        String mimeType, Map params)
+    public String[] process(final byte[] data, final int offset, final int length, final long bitmask, final char comparator,
+        final String mimeType, final Map params)
     {
 
-        Perl5Util util = new Perl5Util();
+        final Perl5Util util = new Perl5Util();
 
         try {
-            String s = new String(data, "UTF-8");
+            final String s = new String(data, "UTF-8"); //$NON-NLS-1$
 
-            if (!util.match("/[^[:ascii:][:space:]]/", s)) {
-                return new String[] { "text/plain" };
+            if (!util.match("/[^[:ascii:][:space:]]/", s)) { //$NON-NLS-1$
+                return new String[] { "text/plain" }; //$NON-NLS-1$
             }
 
             return null;
-        } catch (UnsupportedEncodingException e) {
+        } catch (final UnsupportedEncodingException e) {
 
             return null;
         }
@@ -145,8 +144,8 @@ public class TextFileDetector implements MagicDetector
      *
      * @return DOCUMENT ME!
      */
-    public String[] process(File file, int offset, int length, long bitmask, char comparator,
-        String mimeType, Map params)
+    public String[] process(final File file, final int offset, final int length, final long bitmask, final char comparator,
+        final String mimeType, final Map params)
     {
 
         return new String[] {  };

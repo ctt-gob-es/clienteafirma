@@ -25,11 +25,14 @@ package net.sf.jmimemagic;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.oro.text.perl.Perl5Util;
 
@@ -40,6 +43,7 @@ import org.apache.oro.text.perl.Perl5Util;
  * @author $Author: arimus $
  * @version $Revision: 1.1 $
  */
+@SuppressWarnings("javadoc")
 public class MagicMatcher implements Cloneable {
 
     private final ArrayList<MagicMatcher> subMatchers = new ArrayList<MagicMatcher>(0);
@@ -70,10 +74,10 @@ public class MagicMatcher implements Cloneable {
         final String description = this.match.getDescription();
         final String test = new String(this.match.getTest().array());
 
-        if ((type != null) && !type.equals("") && (comparator != '\0') &&
+        if (!type.equals("") && (comparator != '\0') && //$NON-NLS-1$
                 ((comparator == '=') || (comparator == '!') || (comparator == '>') ||
-                (comparator == '<')) && (description != null) && !description.equals("") &&
-                (test != null) && !test.equals("")) {
+                (comparator == '<')) && (description != null) && !description.equals("") && //$NON-NLS-1$
+                !test.equals("")) { //$NON-NLS-1$
             return true;
         }
 
@@ -94,7 +98,7 @@ public class MagicMatcher implements Cloneable {
      *
      * @param a a collection of submatches
      */
-    public void setSubMatchers(final Collection a)
+    public void setSubMatchers(final Collection<MagicMatcher> a)
     {
         this.subMatchers.clear();
         this.subMatchers.addAll(a);
@@ -105,7 +109,7 @@ public class MagicMatcher implements Cloneable {
      *
      * @return a collection of submatches
      */
-    public Collection getSubMatchers() {
+    public Collection<MagicMatcher> getSubMatchers() {
         return this.subMatchers;
     }
 
@@ -128,33 +132,33 @@ public class MagicMatcher implements Cloneable {
         this.match.getMimeType();
 
         RandomAccessFile file = null;
-        file = new RandomAccessFile(f, "r");
+        file = new RandomAccessFile(f, "r"); //$NON-NLS-1$
 
         try {
             int length = 0;
 
-            if (type.equals("byte")) {
+            if (type.equals("byte")) { //$NON-NLS-1$
                 length = 1;
-            } else if (type.equals("short") || type.equals("leshort") || type.equals("beshort")) {
+            } else if (type.equals("short") || type.equals("leshort") || type.equals("beshort")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 length = 4;
-            } else if (type.equals("long") || type.equals("lelong") || type.equals("belong")) {
+            } else if (type.equals("long") || type.equals("lelong") || type.equals("belong")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 length = 8;
-            } else if (type.equals("string")) {
+            } else if (type.equals("string")) { //$NON-NLS-1$
                 length = this.match.getTest().capacity();
-            } else if (type.equals("regex")) {
+            } else if (type.equals("regex")) { //$NON-NLS-1$
                 length = (int) file.length() - offset;
 
                 if (length < 0) {
                     length = 0;
                 }
-            } else if (type.equals("detector")) {
+            } else if (type.equals("detector")) { //$NON-NLS-1$
                 length = (int) file.length() - offset;
 
                 if (length < 0) {
                     length = 0;
                 }
             } else {
-                throw new UnsupportedTypeException("unsupported test type '" + type + "'");
+                throw new UnsupportedTypeException("unsupported test type '" + type + "'"); //$NON-NLS-1$ //$NON-NLS-2$
             }
 
             // we know this match won't work since there isn't enough data for the test
@@ -173,7 +177,7 @@ public class MagicMatcher implements Cloneable {
                 size = file.read(buf, 0, length - bytesRead);
 
                 if (size == -1) {
-                    throw new IOException("reached end of file before all bytes were read");
+                    throw new IOException("reached end of file before all bytes were read"); //$NON-NLS-1$
                 }
 
                 bytesRead += size;
@@ -183,12 +187,12 @@ public class MagicMatcher implements Cloneable {
                 }
             }
 
-            MagicMatch match = null;
+            MagicMatch match1 = null;
             MagicMatch submatch = null;
 
             if (testInternal(buf)) {
                 // set the top level match to this one
-                match = getMatch();
+                match1 = getMatch();
 
                 // set the data on this match
                 if ((onlyMimeMatch == false) && (this.subMatchers != null) && (this.subMatchers.size() > 0)) {
@@ -198,17 +202,20 @@ public class MagicMatcher implements Cloneable {
                         final MagicMatcher m = this.subMatchers.get(i);
 
                         if ((submatch = m.test(f, false)) != null) {
-                            match.addSubMatch(submatch);
+                            match1.addSubMatch(submatch);
                         }
                     }
                 }
             }
 
-            return match;
-        } finally {
+            return match1;
+        }
+        finally {
             try {
                 file.close();
-            } catch (final Exception fce) {
+            }
+            catch (final Exception fce) {
+            	// Ignorada
             }
         }
     }
@@ -231,27 +238,30 @@ public class MagicMatcher implements Cloneable {
         final int offset = this.match.getOffset();
         this.match.getDescription();
         final String type = this.match.getType();
-        new String(this.match.getTest().array());
         this.match.getMimeType();
 
         int length = 0;
 
-        if (type.equals("byte")) {
+        if (type.equals("byte")) { //$NON-NLS-1$
             length = 1;
-        } else if (type.equals("short") || type.equals("leshort") || type.equals("beshort")) {
+        }
+        else if (type.equals("short") || type.equals("leshort") || type.equals("beshort")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             length = 4;
-        } else if (type.equals("long") || type.equals("lelong") || type.equals("belong")) {
+        }
+        else if (type.equals("long") || type.equals("lelong") || type.equals("belong")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             length = 8;
-        } else if (type.equals("string")) {
+        }
+        else if (type.equals("string")) { //$NON-NLS-1$
             length = this.match.getTest().capacity();
-        } else if (type.equals("regex")) {
+        }
+        else if (type.equals("regex")) { //$NON-NLS-1$
             // FIXME - something wrong here, shouldn't have to subtract 1???
             length = data.length - offset - 1;
 
             if (length < 0) {
                 length = 0;
             }
-        } else if (type.equals("detector")) {
+        } else if (type.equals("detector")) { //$NON-NLS-1$
             // FIXME - something wrong here, shouldn't have to subtract 1???
             length = data.length - offset - 1;
 
@@ -259,7 +269,7 @@ public class MagicMatcher implements Cloneable {
                 length = 0;
             }
         } else {
-            throw new UnsupportedTypeException("unsupported test type " + type);
+            throw new UnsupportedTypeException("unsupported test type " + type); //$NON-NLS-1$
         }
 
         final byte[] buf = new byte[length];
@@ -267,12 +277,12 @@ public class MagicMatcher implements Cloneable {
         if ((offset + length) < data.length) {
             System.arraycopy(data, offset, buf, 0, length);
 
-            MagicMatch match = null;
+            MagicMatch match1 = null;
             MagicMatch submatch = null;
 
             if (testInternal(buf)) {
                 // set the top level match to this one
-                match = getMatch();
+                match1 = getMatch();
 
                 // set the data on this match
                 if ((onlyMimeMatch == false) && (this.subMatchers != null) && (this.subMatchers.size() > 0)) {
@@ -282,16 +292,15 @@ public class MagicMatcher implements Cloneable {
                         final MagicMatcher m = this.subMatchers.get(i);
 
                         if ((submatch = m.test(data, false)) != null) {
-                            match.addSubMatch(submatch);
+                            match1.addSubMatch(submatch);
                         }
                     }
                 }
             }
 
-            return match;
-        } else {
-            return null;
+            return match1;
         }
+        return null;
     }
 
     /**
@@ -314,46 +323,46 @@ public class MagicMatcher implements Cloneable {
 
         ByteBuffer buffer = ByteBuffer.allocate(data.length);
 
-        if ((type != null) && (test != null) && (test.length() > 0)) {
-            if (type.equals("string")) {
+        if ((type != null) && (test.length() > 0)) {
+            if (type.equals("string")) { //$NON-NLS-1$
                 buffer = buffer.put(data);
 
                 return testString(buffer);
-            } else if (type.equals("byte")) {
+            } else if (type.equals("byte")) { //$NON-NLS-1$
                 buffer = buffer.put(data);
 
                 return testByte(buffer);
-            } else if (type.equals("short")) {
+            } else if (type.equals("short")) { //$NON-NLS-1$
                 buffer = buffer.put(data);
 
                 return testShort(buffer);
-            } else if (type.equals("leshort")) {
+            } else if (type.equals("leshort")) { //$NON-NLS-1$
                 buffer = buffer.put(data);
                 buffer.order(ByteOrder.LITTLE_ENDIAN);
 
                 return testShort(buffer);
-            } else if (type.equals("beshort")) {
+            } else if (type.equals("beshort")) { //$NON-NLS-1$
                 buffer = buffer.put(data);
                 buffer.order(ByteOrder.BIG_ENDIAN);
 
                 return testShort(buffer);
-            } else if (type.equals("long")) {
+            } else if (type.equals("long")) { //$NON-NLS-1$
                 buffer = buffer.put(data);
 
                 return testLong(buffer);
-            } else if (type.equals("lelong")) {
+            } else if (type.equals("lelong")) { //$NON-NLS-1$
                 buffer = buffer.put(data);
                 buffer.order(ByteOrder.LITTLE_ENDIAN);
 
                 return testLong(buffer);
-            } else if (type.equals("belong")) {
+            } else if (type.equals("belong")) { //$NON-NLS-1$
                 buffer = buffer.put(data);
                 buffer.order(ByteOrder.BIG_ENDIAN);
 
                 return testLong(buffer);
-            } else if (type.equals("regex")) {
+            } else if (type.equals("regex")) { //$NON-NLS-1$
                 return testRegex(new String(data));
-            } else if (type.equals("detector")) {
+            } else if (type.equals("detector")) { //$NON-NLS-1$
                 buffer = buffer.put(data);
 
                 return testDetector(buffer);
@@ -558,15 +567,14 @@ public class MagicMatcher implements Cloneable {
         if (comparator == '=') {
             if (utility.match(test, text)) {
                 return true;
-            } else {
-                return false;
             }
-        } else if (comparator == '!') {
+            return false;
+        }
+        else if (comparator == '!') {
             if (utility.match(test, text)) {
                 return false;
-            } else {
-                return true;
             }
+            return true;
         }
 
         return false;
@@ -579,15 +587,12 @@ public class MagicMatcher implements Cloneable {
      *
      * @return if we have a match
      */
-    private boolean testDetector(final ByteBuffer data)
-    {
+    private boolean testDetector(final ByteBuffer data) {
 
         final String detectorClass = new String(this.match.getTest().array());
 
         try {
-
-            final Class c = Class.forName(detectorClass);
-            final MagicDetector detector = (MagicDetector) c.newInstance();
+            final MagicDetector detector = (MagicDetector) classForName(detectorClass).newInstance();
             final String[] types = detector.process(data.array(), this.match.getOffset(), this.match.getLength(),
                     this.match.getBitmask(), this.match.getComparator(), this.match.getMimeType(),
                     this.match.getProperties());
@@ -611,41 +616,19 @@ public class MagicMatcher implements Cloneable {
      *
      * @return DOCUMENT ME!
      */
-    public String[] getDetectorExtensions()
-    {
+    public String[] getDetectorExtensions() {
 
         final String detectorClass = new String(this.match.getTest().array());
 
         try {
-
-            final Class c = Class.forName(detectorClass);
-            final MagicDetector detector = (MagicDetector) c.newInstance();
-
+            final MagicDetector detector = (MagicDetector) classForName(detectorClass).newInstance();
             return detector.getHandledTypes();
-        } catch (final Throwable e) {
+        }
+        catch (final Throwable e) {
         	java.util.logging.Logger.getAnonymousLogger().warning(e.toString());
         }
 
         return new String[0];
-    }
-
-    /**
-     * encode a byte as an octal string
-     *
-     * @param b a byte of data
-     *
-     * @return an octal representation of the byte data
-     */
-    private String byteToOctalString(final byte b)
-    {
-        int n1;
-        int n2;
-        int n3;
-        n1 = (b / 32) & 7;
-        n2 = (b / 8) & 7;
-        n3 = b & 7;
-
-        return String.valueOf(n1) + String.valueOf(n2) + String.valueOf(n3);
     }
 
     /**
@@ -655,8 +638,7 @@ public class MagicMatcher implements Cloneable {
      *
      * @return byte array converted to a short
      */
-    private short byteArrayToShort(final ByteBuffer data)
-    {
+    private static short byteArrayToShort(final ByteBuffer data) {
         return data.getShort(0);
     }
 
@@ -667,7 +649,7 @@ public class MagicMatcher implements Cloneable {
      *
      * @return byte arrays (high and low bytes) converted to a long value
      */
-    private long byteArrayToLong(final ByteBuffer data)
+    private static long byteArrayToLong(final ByteBuffer data)
     {
         return data.getInt(0);
     }
@@ -687,16 +669,43 @@ public class MagicMatcher implements Cloneable {
 
         clone.setMatch((MagicMatch) this.match.clone());
 
-        final Iterator i = this.subMatchers.iterator();
-        final ArrayList sub = new ArrayList();
+        final Iterator<MagicMatcher> i = this.subMatchers.iterator();
+        final ArrayList<MagicMatcher> sub = new ArrayList<MagicMatcher>();
 
         while (i.hasNext()) {
-            final MagicMatcher m = (MagicMatcher) i.next();
-            sub.add(m.clone());
+            final MagicMatcher m = i.next();
+            sub.add((MagicMatcher) m.clone());
         }
 
         clone.setSubMatchers(sub);
 
         return clone;
+    }
+
+    /** Carga una clase excluyendo de la ruta de b&uacute;squeda de clases las URL que no correspondan con JAR.
+     * @param className Nombre de la clase a cargar
+     * @return Clase cargada
+     * @throws ClassNotFoundException cuando no se encuentra la clase a cargar
+     */
+    private static Class<?> classForName(final String className) throws ClassNotFoundException {
+        getCleanClassLoader().loadClass(className);
+        return Class.forName(className);
+    }
+
+    /** Obtiene un ClassLoader que no incluye URL que no referencien directamente a ficheros JAR.
+     * @return ClassLoader sin URL adicionales a directorios sueltos Web
+     */
+    private static ClassLoader getCleanClassLoader() {
+        ClassLoader classLoader = MagicMatcher.class.getClassLoader();
+        if (classLoader instanceof URLClassLoader && !classLoader.getClass().toString().contains("sun.plugin2.applet.JNLP2ClassLoader")) { //$NON-NLS-1$
+        	final List<URL> urls = new ArrayList<URL>();
+        	for (final URL url : ((URLClassLoader) classLoader).getURLs()) {
+        		if (url.toString().endsWith(".jar")) { //$NON-NLS-1$
+        			urls.add(url);
+        		}
+        	}
+        	classLoader = new URLClassLoader(urls.toArray(new URL[0]));
+        }
+        return classLoader;
     }
 }

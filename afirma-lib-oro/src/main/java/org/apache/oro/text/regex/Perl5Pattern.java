@@ -26,13 +26,13 @@
  *    Alternately, this acknowledgment may appear in the software itself,
  *    if and wherever such third-party acknowledgments normally appear.
  *
- * 4. The names "Apache" and "Apache Software Foundation", "Jakarta-Oro" 
+ * 4. The names "Apache" and "Apache Software Foundation", "Jakarta-Oro"
  *    must not be used to endorse or promote products derived from this
  *    software without prior written permission. For written
  *    permission, please contact apache@apache.org.
  *
- * 5. Products derived from this software may not be called "Apache" 
- *    or "Jakarta-Oro", nor may "Apache" or "Jakarta-Oro" appear in their 
+ * 5. Products derived from this software may not be called "Apache"
+ *    or "Jakarta-Oro", nor may "Apache" or "Jakarta-Oro" appear in their
  *    name, without prior written permission of the Apache Software Foundation.
  *
  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
@@ -58,7 +58,7 @@
 
 package org.apache.oro.text.regex;
 
-import java.io.*;
+import java.io.Serializable;
 
 /**
  * An implementation of the Pattern interface for Perl5 regular expressions.
@@ -81,7 +81,7 @@ import java.io.*;
 public final class Perl5Pattern implements Pattern, Serializable, Cloneable {
 
 	private static final long serialVersionUID = 2416464270803402709L;
-	
+
   static final int
     _OPT_ANCH_BOL  = 0x01,
     _OPT_ANCH_MBOL = 0x02,
@@ -123,7 +123,7 @@ public final class Perl5Pattern implements Pattern, Serializable, Cloneable {
    * @return The original string representation of the regular expression
    *         pattern.
    */
-  public String getPattern() { return _expression; }
+  public String getPattern() { return this._expression; }
 
 
   /**
@@ -132,7 +132,7 @@ public final class Perl5Pattern implements Pattern, Serializable, Cloneable {
    * <p>
    * @return The compilation options used to compile the pattern.
    */
-  public int getOptions()    { return _options; }
+  public int getOptions()    { return this._options; }
 
   /*
   // For testing

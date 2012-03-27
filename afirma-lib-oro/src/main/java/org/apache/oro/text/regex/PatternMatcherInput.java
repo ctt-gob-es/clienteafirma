@@ -26,13 +26,13 @@
  *    Alternately, this acknowledgment may appear in the software itself,
  *    if and wherever such third-party acknowledgments normally appear.
  *
- * 4. The names "Apache" and "Apache Software Foundation", "Jakarta-Oro" 
+ * 4. The names "Apache" and "Apache Software Foundation", "Jakarta-Oro"
  *    must not be used to endorse or promote products derived from this
  *    software without prior written permission. For written
  *    permission, please contact apache@apache.org.
  *
- * 5. Products derived from this software may not be called "Apache" 
- *    or "Jakarta-Oro", nor may "Apache" or "Jakarta-Oro" appear in their 
+ * 5. Products derived from this software may not be called "Apache"
+ *    or "Jakarta-Oro", nor may "Apache" or "Jakarta-Oro" appear in their
  *    name, without prior written permission of the Apache Software Foundation.
  *
  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
@@ -95,7 +95,7 @@ package org.apache.oro.text.regex;
  * input   = new PatternMatcherInput(someStringInput);
  *
  * while(matcher.contains(input, pattern)) {
- *   result = matcher.getMatch();  
+ *   result = matcher.getMatch();
  *   // Perform whatever processing on the result you want.
  * }
  * // Suppose we want to start searching from the beginning again with
@@ -116,7 +116,7 @@ package org.apache.oro.text.regex;
  * @since 1.0
  * @see PatternMatcher
  */
-public final class PatternMatcherInput {
+final class PatternMatcherInput {
   String _originalStringInput;
   char[] _originalCharInput, _originalBuffer, _toLowerBuffer;
   int _beginOffset, _endOffset, _currentOffset;
@@ -136,7 +136,7 @@ public final class PatternMatcherInput {
    * @param length The length of the reegion starting from the begin offset
    *               to use as the input for pattern matching purposes.
    */
-  public PatternMatcherInput(String input, int begin, int length) {
+  public PatternMatcherInput(final String input, final int begin, final int length) {
     setInput(input, begin, length);
   }
 
@@ -148,7 +148,7 @@ public final class PatternMatcherInput {
    * <p>
    * @param input  The input to associate with the PatternMatcherInput.
    */
-  public PatternMatcherInput(String input) {
+  public PatternMatcherInput(final String input) {
     this(input, 0, input.length());
   }
 
@@ -168,9 +168,9 @@ public final class PatternMatcherInput {
    * @param length The length of the reegion starting from the begin offset
    *               to use as the input for pattern matching purposes.
    */
-  public PatternMatcherInput(char[] input, int begin, int length) {
+  public PatternMatcherInput(final char[] input, final int begin, final int length) {
     setInput(input, begin, length);
-  } 
+  }
 
   /**
    * Like calling:
@@ -180,7 +180,7 @@ public final class PatternMatcherInput {
    * <p>
    * @param input  The input to associate with the PatternMatcherInput.
    */
-  public PatternMatcherInput(char[] input) {
+  public PatternMatcherInput(final char[] input) {
     this(input, 0, input.length);
   }
 
@@ -191,7 +191,7 @@ public final class PatternMatcherInput {
    *         the begin offset.
    */
   public int length()        {
-    return (_endOffset - _beginOffset);
+    return (this._endOffset - this._beginOffset);
     //return _originalBuffer.length;
   }
 
@@ -208,14 +208,14 @@ public final class PatternMatcherInput {
    * @param length The length of the reegion starting from the begin offset
    *               to use as the input for pattern matching purposes.
    */
-  public void setInput(String input, int begin, int length) {
-    _originalStringInput = input;
-    _originalCharInput = null;
-    _toLowerBuffer = null;
-    _originalBuffer = input.toCharArray();
+  public void setInput(final String input, final int begin, final int length) {
+    this._originalStringInput = input;
+    this._originalCharInput = null;
+    this._toLowerBuffer = null;
+    this._originalBuffer = input.toCharArray();
     setCurrentOffset(begin);
     setBeginOffset(begin);
-    setEndOffset(_beginOffset + length);
+    setEndOffset(this._beginOffset + length);
   }
 
   /**
@@ -226,7 +226,7 @@ public final class PatternMatcherInput {
    * <p>
    * @param input  The input to associate with the PatternMatcherInput.
    */
-  public void setInput(String input) {
+  public void setInput(final String input) {
     setInput(input, 0, input.length());
   }
 
@@ -245,13 +245,13 @@ public final class PatternMatcherInput {
    * @param length The length of the reegion starting from the begin offset
    *               to use as the input for pattern matching purposes.
    */
-  public void setInput(char[] input, int begin, int length) {
-    _originalStringInput = null;
-    _toLowerBuffer  = null;
-    _originalBuffer = _originalCharInput = input;
+  public void setInput(final char[] input, final int begin, final int length) {
+    this._originalStringInput = null;
+    this._toLowerBuffer  = null;
+    this._originalBuffer = this._originalCharInput = input;
     setCurrentOffset(begin);
     setBeginOffset(begin);
-    setEndOffset(_beginOffset + length);
+    setEndOffset(this._beginOffset + length);
   }
 
 
@@ -263,7 +263,7 @@ public final class PatternMatcherInput {
    * <p>
    * @param input  The input to associate with the PatternMatcherInput.
    */
-  public void setInput(char[] input) {
+  public void setInput(final char[] input) {
     setInput(input, 0, input.length);
   }
 
@@ -278,8 +278,8 @@ public final class PatternMatcherInput {
    * @exception ArrayIndexOutOfBoundsException If the offset does not occur
    *            within the bounds of the input.
    */
-  public char charAt(int offset) {
-    return _originalBuffer[_beginOffset + offset];
+  public char charAt(final int offset) {
+    return this._originalBuffer[this._beginOffset + offset];
   }
 
   /**
@@ -296,8 +296,8 @@ public final class PatternMatcherInput {
    * @exception ArrayIndexOutOfBoundsException If one of the offsets does
    *        not occur within the bounds of the input.
    */
-  public String substring(int beginOffset, int endOffset) {
-    return new String(_originalBuffer, _beginOffset+beginOffset,
+  public String substring(final int beginOffset, final int endOffset) {
+    return new String(this._originalBuffer, this._beginOffset+beginOffset,
 		      endOffset - beginOffset);
   }
 
@@ -314,8 +314,8 @@ public final class PatternMatcherInput {
    *            within the bounds of the input.
    */
   public String substring(int beginOffset) {
-    beginOffset+=_beginOffset;
-    return new String(_originalBuffer, beginOffset, _endOffset - beginOffset);
+    beginOffset+=this._beginOffset;
+    return new String(this._originalBuffer, beginOffset, this._endOffset - beginOffset);
   }
 
 
@@ -330,9 +330,10 @@ public final class PatternMatcherInput {
    *         PatternMatcherInput instance.
    */
   public Object getInput(){
-    if(_originalStringInput == null)
-      return _originalCharInput;
-    return _originalStringInput;
+    if(this._originalStringInput == null) {
+		return this._originalCharInput;
+	}
+    return this._originalStringInput;
   }
 
   /**
@@ -343,7 +344,7 @@ public final class PatternMatcherInput {
    * @return The char[] buffer to be used as input by PatternMatcher
    *         implementations.
    */
-  public char[] getBuffer() { return _originalBuffer;  }
+  public char[] getBuffer() { return this._originalBuffer;  }
 
   /**
    * Returns whether or not the end of the input has been reached.
@@ -351,7 +352,7 @@ public final class PatternMatcherInput {
    * @return True if the current offset is greater than or equal to the
    *         end offset.
    */
-  public boolean endOfInput(){ return (_currentOffset >= _endOffset); }
+  public boolean endOfInput(){ return (this._currentOffset >= this._endOffset); }
 
 
   /**
@@ -359,7 +360,7 @@ public final class PatternMatcherInput {
    *         of the region to be considered as input by PatternMatcher
    *         methods.
    */
-  public int getBeginOffset()   { return _beginOffset; }
+  public int getBeginOffset()   { return this._beginOffset; }
 
   /**
    * @return The offset of the input that should be considered the end
@@ -367,14 +368,14 @@ public final class PatternMatcherInput {
    *         methods.  This offset is actually 1 plus the last offset
    *         that is part of the input region.
    */
-  public int getEndOffset()     { return _endOffset;  }
+  public int getEndOffset()     { return this._endOffset;  }
 
   /**
    * @return The offset of the input that should be considered the current
    *         offset where PatternMatcher methods should start looking for
    *         matches.
    */
-  public int getCurrentOffset() { return _currentOffset; }
+  public int getCurrentOffset() { return this._currentOffset; }
 
   /**
    * Sets the offset of the input that should be considered the start
@@ -384,7 +385,7 @@ public final class PatternMatcherInput {
    * <p>
    * @param offset  The offset to use as the beginning of the input.
    */
-  public void setBeginOffset(int offset)   { _beginOffset = offset; }
+  public void setBeginOffset(final int offset)   { this._beginOffset = offset; }
 
   /**
    * Sets the offset of the input that should be considered the end
@@ -394,7 +395,7 @@ public final class PatternMatcherInput {
    * <p>
    * @param offset  The offset to use as the end of the input.
    */
-  public void setEndOffset(int offset)     { _endOffset = offset; }
+  public void setEndOffset(final int offset)     { this._endOffset = offset; }
 
   /**
    * Sets the offset of the input that should be considered the current
@@ -406,8 +407,8 @@ public final class PatternMatcherInput {
    * <p>
    * @param offset  The offset to use as the current offset.
    */
-  public void setCurrentOffset(int offset) {
-    _currentOffset    = offset;
+  public void setCurrentOffset(final int offset) {
+    this._currentOffset    = offset;
     setMatchOffsets(-1, -1);
   }
 
@@ -417,8 +418,9 @@ public final class PatternMatcherInput {
    * <p>
    * @return The string representation of the input.
    */
-  public String toString() {
-    return new String(_originalBuffer, _beginOffset, length());
+  @Override
+public String toString() {
+    return new String(this._originalBuffer, this._beginOffset, length());
   }
 
 
@@ -430,8 +432,8 @@ public final class PatternMatcherInput {
    * @return The input preceeding a match.
    */
   public String preMatch() {
-    return new String(_originalBuffer, _beginOffset,
-		      _matchBeginOffset - _beginOffset);
+    return new String(this._originalBuffer, this._beginOffset,
+		      this._matchBeginOffset - this._beginOffset);
   }
 
 
@@ -443,8 +445,8 @@ public final class PatternMatcherInput {
    * @return The input succeeding a contains() match.
    */
   public String postMatch() {
-    return new String(_originalBuffer, _matchEndOffset,
-		      _endOffset - _matchEndOffset);
+    return new String(this._originalBuffer, this._matchEndOffset,
+		      this._endOffset - this._matchEndOffset);
   }
 
 
@@ -459,8 +461,8 @@ public final class PatternMatcherInput {
    * @return The input consisting of the match found by contains().
    */
   public String match() {
-    return new String(_originalBuffer, _matchBeginOffset,
-		      _matchEndOffset - _matchBeginOffset);
+    return new String(this._originalBuffer, this._matchBeginOffset,
+		      this._matchEndOffset - this._matchBeginOffset);
   }
 
 
@@ -480,9 +482,9 @@ public final class PatternMatcherInput {
    * @param matchBeginOffset  The begin offset of a match found by contains().
    * @param matchEndOffset    The end offset of a match found by contains().
    */
-  public void setMatchOffsets(int matchBeginOffset, int matchEndOffset) {
-    _matchBeginOffset    = matchBeginOffset;
-    _matchEndOffset      = matchEndOffset;
+  public void setMatchOffsets(final int matchBeginOffset, final int matchEndOffset) {
+    this._matchBeginOffset    = matchBeginOffset;
+    this._matchEndOffset      = matchEndOffset;
   }
 
   /**
@@ -491,12 +493,12 @@ public final class PatternMatcherInput {
    * <p>
    * @return The begin offset of a contains() match.
    */
-  public int getMatchBeginOffset()    { return _matchBeginOffset; }
+  public int getMatchBeginOffset()    { return this._matchBeginOffset; }
 
   /**
    * Returns the offset marking the end of the match found by contains().
    * <p>
    * @return The end offset of a contains() match.
    */
-  public int getMatchEndOffset()      { return _matchEndOffset; }
+  public int getMatchEndOffset()      { return this._matchEndOffset; }
 }

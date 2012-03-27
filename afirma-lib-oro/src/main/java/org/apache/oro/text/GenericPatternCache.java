@@ -26,13 +26,13 @@
  *    Alternately, this acknowledgment may appear in the software itself,
  *    if and wherever such third-party acknowledgments normally appear.
  *
- * 4. The names "Apache" and "Apache Software Foundation", "Jakarta-Oro" 
+ * 4. The names "Apache" and "Apache Software Foundation", "Jakarta-Oro"
  *    must not be used to endorse or promote products derived from this
  *    software without prior written permission. For written
  *    permission, please contact apache@apache.org.
  *
- * 5. Products derived from this software may not be called "Apache" 
- *    or "Jakarta-Oro", nor may "Apache" or "Jakarta-Oro" appear in their 
+ * 5. Products derived from this software may not be called "Apache"
+ *    or "Jakarta-Oro", nor may "Apache" or "Jakarta-Oro" appear in their
  *    name, without prior written permission of the Apache Software Foundation.
  *
  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
@@ -58,10 +58,10 @@
 
 package org.apache.oro.text;
 
-import java.util.*;
-
-import org.apache.oro.text.regex.*;
-import org.apache.oro.util.*;
+import org.apache.oro.text.regex.MalformedPatternException;
+import org.apache.oro.text.regex.Pattern;
+import org.apache.oro.text.regex.PatternCompiler;
+import org.apache.oro.util.Cache;
 
 /**
  * This is the base class for all cache implementations provided in the
@@ -98,9 +98,9 @@ public abstract class GenericPatternCache implements PatternCache {
    * @param compiler The PatternCompiler that should be used to compile
    *       patterns.
    */
-  GenericPatternCache(Cache cache, PatternCompiler compiler) {
-    _cache    = cache;
-    _compiler = compiler;
+  GenericPatternCache(final Cache cache, final PatternCompiler compiler) {
+    this._cache    = cache;
+    this._compiler = compiler;
   }
 
 
@@ -129,23 +129,24 @@ public abstract class GenericPatternCache implements PatternCache {
    * @exception MalformedPatternException  If there is an error in compiling
    *         the regular expression.
    */
-  public final synchronized Pattern addPattern(String expression, int options)
+  public final synchronized Pattern addPattern(final String expression, final int options)
        throws MalformedPatternException
   {
     Object obj;
     Pattern pattern;
 
-    obj = _cache.getElement(expression);
+    obj = this._cache.getElement(expression);
 
     if(obj != null) {
       pattern = (Pattern)obj;
 
-      if(pattern.getOptions() == options)
-	return pattern;
+      if(pattern.getOptions() == options) {
+		return pattern;
+	}
     }
 
-    pattern = _compiler.compile(expression, options);
-    _cache.addElement(expression, pattern);
+    pattern = this._compiler.compile(expression, options);
+    this._cache.addElement(expression, pattern);
 
     return pattern;
   }
@@ -159,7 +160,7 @@ public abstract class GenericPatternCache implements PatternCache {
    * @exception MalformedPatternException  If there is an error in compiling
    *         the regular expression.
    */
-  public final synchronized Pattern addPattern(String expression)
+  public final synchronized Pattern addPattern(final String expression)
        throws MalformedPatternException
   {
     return addPattern(expression, 0);
@@ -187,16 +188,16 @@ public abstract class GenericPatternCache implements PatternCache {
    * @exception MalformedCachePatternException  If there is an error in
    *     compiling the regular expression.
    */
-  public final synchronized Pattern getPattern(String expression, int options)
-       throws MalformedCachePatternException 
+  public final synchronized Pattern getPattern(final String expression, final int options)
+       throws MalformedCachePatternException
   {
     Pattern result = null;
 
     try {
       result = addPattern(expression, options);
-    } catch(MalformedPatternException e) {
+    } catch(final MalformedPatternException e) {
       throw new MalformedCachePatternException("Invalid expression: " +
-					       expression + "\n" + 
+					       expression + "\n" +
 					       e.getMessage());
     }
 
@@ -210,8 +211,8 @@ public abstract class GenericPatternCache implements PatternCache {
    * getPattern(expression, 0)
    * </pre></blockquote>
    */
-  public final synchronized Pattern getPattern(String expression) 
-       throws MalformedCachePatternException 
+  public final synchronized Pattern getPattern(final String expression)
+       throws MalformedCachePatternException
   {
     return getPattern(expression, 0);
   }
@@ -225,12 +226,12 @@ public abstract class GenericPatternCache implements PatternCache {
    * @return  The current size of the cache (i.e., the number of elements
    *          currently cached).
    */
-  public final int size()     { return _cache.size(); }
+  public final int size()     { return this._cache.size(); }
 
   /**
    * Returns the maximum number of patterns that can be cached at one time.
    * <p>
    * @return The maximum number of patterns that can be cached at one time.
    */
-  public final int capacity() { return _cache.capacity(); }
+  public final int capacity() { return this._cache.capacity(); }
 }

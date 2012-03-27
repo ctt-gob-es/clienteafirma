@@ -31,7 +31,10 @@ package net.sf.jmimemagic;
  */
 public class UnsupportedTypeException extends Exception
 {
-    /**
+
+	private static final long serialVersionUID = 4225590514782456873L;
+
+	/**
      * Default constructor
      */
     public UnsupportedTypeException()
@@ -41,31 +44,31 @@ public class UnsupportedTypeException extends Exception
 
     /**
      * Create exception with error message
-     * 
+     *
      * @param message The error message for this exception
      */
-    public UnsupportedTypeException(String message)
+    public UnsupportedTypeException(final String message)
     {
         super(message);
     }
 
     /**
      * Create exception based on an existing Throwable
-     * 
+     *
      * @param cause The throwable on which we'll base this exception
      */
-    public UnsupportedTypeException(Throwable cause)
+    public UnsupportedTypeException(final Throwable cause)
     {
         super(cause);
     }
 
     /**
      * Create an exception with custom message and throwable info
-     * 
+     *
      * @param message The message
      * @param cause The target Throwable
      */
-    public UnsupportedTypeException(String message, Throwable cause)
+    public UnsupportedTypeException(final String message, final Throwable cause)
     {
         super(message, cause);
     }

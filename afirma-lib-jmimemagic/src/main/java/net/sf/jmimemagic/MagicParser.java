@@ -29,8 +29,6 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
@@ -46,24 +44,24 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * @author $Author$
  * @version $Revision$
   */
-public class MagicParser extends DefaultHandler implements ContentHandler, ErrorHandler
+public class MagicParser extends DefaultHandler
 {
-    private static String magicFile = "/magic.xml";
+    private static String magicFile = "/magic.xml"; //$NON-NLS-1$
 
     // Namespaces feature id (http://xml.org/sax/features/namespaces).
-    protected static final String NAMESPACES_FEATURE_ID = "http://xml.org/sax/features/namespaces";
+    protected static final String NAMESPACES_FEATURE_ID = "http://xml.org/sax/features/namespaces"; //$NON-NLS-1$
 
     // Validation feature id (http://xml.org/sax/features/validation).
-    protected static final String VALIDATION_FEATURE_ID = "http://xml.org/sax/features/validation";
+    protected static final String VALIDATION_FEATURE_ID = "http://xml.org/sax/features/validation"; //$NON-NLS-1$
 
     // Schema validation feature id (http://apache.org/xml/features/validation/schema).
-    protected static final String SCHEMA_VALIDATION_FEATURE_ID = "http://apache.org/xml/features/validation/schema";
+    protected static final String SCHEMA_VALIDATION_FEATURE_ID = "http://apache.org/xml/features/validation/schema"; //$NON-NLS-1$
 
     // Schema full checking feature id (http://apache.org/xml/features/validation/schema-full-checking).
-    protected static final String SCHEMA_FULL_CHECKING_FEATURE_ID = "http://apache.org/xml/features/validation/schema-full-checking";
+    protected static final String SCHEMA_FULL_CHECKING_FEATURE_ID = "http://apache.org/xml/features/validation/schema-full-checking"; //$NON-NLS-1$
 
     // Default parser name.
-    protected static final String DEFAULT_PARSER_NAME = "org.apache.xerces.parsers.SAXParser";
+    protected static final String DEFAULT_PARSER_NAME = "org.apache.xerces.parsers.SAXParser"; //$NON-NLS-1$
 
     // Default namespaces support (true).
     protected static final boolean DEFAULT_NAMESPACES = true;
@@ -78,12 +76,12 @@ public class MagicParser extends DefaultHandler implements ContentHandler, Error
     protected static final boolean DEFAULT_SCHEMA_FULL_CHECKING = false;
     private boolean initialized = false;
     private XMLReader parser = null;
-    private final ArrayList stack = new ArrayList();
-    private final Collection matchers = new ArrayList();
+    private final ArrayList<MagicMatcher> stack = new ArrayList<MagicMatcher>();
+    private final Collection<MagicMatcher> matchers = new ArrayList<MagicMatcher>();
     private MagicMatcher matcher = null;
     private MagicMatch match = null;
-    private HashMap properties = null;
-    private String finalValue = "";
+    private HashMap<String, String> properties = null;
+    private String finalValue = ""; //$NON-NLS-1$
     private boolean isMimeType = false;
     private boolean isExtension = false;
     private boolean isDescription = false;
@@ -111,7 +109,7 @@ public class MagicParser extends DefaultHandler implements ContentHandler, Error
                 try {
                     this.parser = XMLReaderFactory.createXMLReader(DEFAULT_PARSER_NAME);
                 } catch (final Exception ee) {
-                    throw new MagicParseException("unable to instantiate parser");
+                    throw new MagicParseException("unable to instantiate parser"); //$NON-NLS-1$
                 }
             }
 
@@ -120,13 +118,13 @@ public class MagicParser extends DefaultHandler implements ContentHandler, Error
                 this.parser.setFeature(NAMESPACES_FEATURE_ID, namespaces);
             }
             catch (final SAXException e) {
-                java.util.logging.Logger.getAnonymousLogger().warning("Parser does not support feature (" + NAMESPACES_FEATURE_ID + ")");
+                java.util.logging.Logger.getAnonymousLogger().warning("Parser does not support feature (" + NAMESPACES_FEATURE_ID + ")"); //$NON-NLS-1$ //$NON-NLS-2$
             }
 
             try {
                 this.parser.setFeature(VALIDATION_FEATURE_ID, validation);
             } catch (final SAXException e) {
-            	java.util.logging.Logger.getAnonymousLogger().warning("Parser does not support feature (" + VALIDATION_FEATURE_ID + ")");
+            	java.util.logging.Logger.getAnonymousLogger().warning("Parser does not support feature (" + VALIDATION_FEATURE_ID + ")"); //$NON-NLS-1$ //$NON-NLS-2$
             }
 
             try {
@@ -136,7 +134,7 @@ public class MagicParser extends DefaultHandler implements ContentHandler, Error
                 // ignore
             }
             catch (final SAXNotSupportedException e) {
-            	java.util.logging.Logger.getAnonymousLogger().warning("Parser does not support feature (" + SCHEMA_VALIDATION_FEATURE_ID + ")");
+            	java.util.logging.Logger.getAnonymousLogger().warning("Parser does not support feature (" + SCHEMA_VALIDATION_FEATURE_ID + ")"); //$NON-NLS-1$ //$NON-NLS-2$
             }
 
             try {
@@ -146,7 +144,7 @@ public class MagicParser extends DefaultHandler implements ContentHandler, Error
                 // ignore
             }
             catch (final SAXNotSupportedException e) {
-            	java.util.logging.Logger.getAnonymousLogger().warning("Parser does not support feature (" + SCHEMA_FULL_CHECKING_FEATURE_ID + ")");
+            	java.util.logging.Logger.getAnonymousLogger().warning("Parser does not support feature (" + SCHEMA_FULL_CHECKING_FEATURE_ID + ")"); //$NON-NLS-1$ //$NON-NLS-2$
             }
 
             // set handlers
@@ -159,7 +157,7 @@ public class MagicParser extends DefaultHandler implements ContentHandler, Error
                 final String magicURL = MagicParser.class.getResource(magicFile).toString();
 
                 if (magicURL == null) {
-                    throw new MagicParseException("couldn't load '" + magicURL + "'");
+                    throw new MagicParseException("couldn't load '" + magicURL + "'"); //$NON-NLS-1$ //$NON-NLS-2$
                 }
 
                 this.parser.parse(magicURL);
@@ -167,7 +165,7 @@ public class MagicParser extends DefaultHandler implements ContentHandler, Error
                 // ignore
             } catch (final Exception e) {
                 e.printStackTrace();
-                throw new MagicParseException("parse error occurred - " + e.getMessage());
+                throw new MagicParseException("parse error occurred - " + e.getMessage()); //$NON-NLS-1$
             }
 
             this.initialized = true;
@@ -179,16 +177,16 @@ public class MagicParser extends DefaultHandler implements ContentHandler, Error
      *
      * @return DOCUMENT ME!
      */
-    public Collection getMatchers()
+    public Collection<MagicMatcher> getMatchers()
     {
         return this.matchers;
     }
 
     @Override
-	public void startDocument() throws SAXException {}
+	public void startDocument() throws SAXException { /* No implementado */ }
 
     @Override
-	public void endDocument() throws SAXException {}
+	public void endDocument() throws SAXException { /* No implementado */ }
 
     @Override
 	public void processingInstruction(final String target, final String data) throws SAXException {
@@ -244,7 +242,7 @@ public class MagicParser extends DefaultHandler implements ContentHandler, Error
     {
 
         // create a new matcher
-        if (localName.equals("match")) {
+        if (localName.equals("match")) { //$NON-NLS-1$
             // match to hold data
             this.match = new MagicMatch();
             // our matcher
@@ -254,13 +252,13 @@ public class MagicParser extends DefaultHandler implements ContentHandler, Error
 
         // these are subelements of matcher, but also occur elsewhere
         if (this.matcher != null) {
-            if (localName.equals("mimetype")) {
+            if (localName.equals("mimetype")) { //$NON-NLS-1$
                 this.isMimeType = true;
-            } else if (localName.equals("extension")) {
+            } else if (localName.equals("extension")) { //$NON-NLS-1$
                 this.isExtension = true;
-            } else if (localName.equals("description")) {
+            } else if (localName.equals("description")) { //$NON-NLS-1$
                 this.isDescription = true;
-            } else if (localName.equals("test")) {
+            } else if (localName.equals("test")) { //$NON-NLS-1$
                 this.isTest = true;
 
                 final int length = attributes.getLength();
@@ -269,25 +267,25 @@ public class MagicParser extends DefaultHandler implements ContentHandler, Error
                     final String attrLocalName = attributes.getLocalName(i);
                     final String attrValue = attributes.getValue(i);
 
-                    if (attrLocalName.equals("offset")) {
-                        if (!attrValue.equals("")) {
+                    if (attrLocalName.equals("offset")) { //$NON-NLS-1$
+                        if (!attrValue.equals("")) { //$NON-NLS-1$
                             this.match.setOffset(new Integer(attrValue).intValue());
                         }
-                    } else if (attrLocalName.equals("length")) {
-                        if (!attrValue.equals("")) {
+                    } else if (attrLocalName.equals("length")) { //$NON-NLS-1$
+                        if (!attrValue.equals("")) { //$NON-NLS-1$
                             this.match.setLength(new Integer(attrValue).intValue());
                         }
-                    } else if (attrLocalName.equals("type")) {
+                    } else if (attrLocalName.equals("type")) { //$NON-NLS-1$
                         this.match.setType(attrValue);
-                    } else if (attrLocalName.equals("bitmask")) {
-                        if (!attrValue.equals("")) {
+                    } else if (attrLocalName.equals("bitmask")) { //$NON-NLS-1$
+                        if (!attrValue.equals("")) { //$NON-NLS-1$
                             this.match.setBitmask(attrValue);
                         }
-                    } else if (attrLocalName.equals("comparator")) {
+                    } else if (attrLocalName.equals("comparator")) { //$NON-NLS-1$
                         this.match.setComparator(attrValue);
                     }
                 }
-            } else if (localName.equals("property")) {
+            } else if (localName.equals("property")) { //$NON-NLS-1$
                 final int length = attributes.getLength();
                 String name = null;
                 String value = null;
@@ -296,12 +294,12 @@ public class MagicParser extends DefaultHandler implements ContentHandler, Error
                     final String attrLocalName = attributes.getLocalName(i);
                     final String attrValue = attributes.getValue(i);
 
-                    if (attrLocalName.equals("name")) {
-                        if (!attrValue.equals("")) {
+                    if (attrLocalName.equals("name")) { //$NON-NLS-1$
+                        if (!attrValue.equals("")) { //$NON-NLS-1$
                             name = attrValue;
                         }
-                    } else if (attrLocalName.equals("value")) {
-                        if (!attrValue.equals("")) {
+                    } else if (attrLocalName.equals("value")) { //$NON-NLS-1$
+                        if (!attrValue.equals("")) { //$NON-NLS-1$
                             value = attrValue;
                         }
                     }
@@ -310,14 +308,14 @@ public class MagicParser extends DefaultHandler implements ContentHandler, Error
                 // save the property to our map
                 if ((name != null) && (value != null)) {
                     if (this.properties == null) {
-                        this.properties = new HashMap();
+                        this.properties = new HashMap<String, String>();
                     }
 
                     if (!this.properties.containsKey(name)) {
                         this.properties.put(name, value);
                     }
                 }
-            } else if (localName.equals("match-list")) {
+            } else if (localName.equals("match-list")) { //$NON-NLS-1$
                 // this means we are processing a child match, so we need to push
                 // the existing match on the stack
                 this.stack.add(this.matcher);
@@ -358,11 +356,11 @@ public class MagicParser extends DefaultHandler implements ContentHandler, Error
             // do nothing
         }
 
-        this.finalValue = "";
+        this.finalValue = ""; //$NON-NLS-1$
 
         // need to save the current matcher here if it is filled out enough and
         // we have an /matcher
-        if (localName.equals("match")) {
+        if (localName.equals("match")) { //$NON-NLS-1$
             // FIXME - make sure the MagicMatcher isValid() test works
             if (this.matcher.isValid()) {
                 // set the collected properties on this matcher
@@ -374,7 +372,7 @@ public class MagicParser extends DefaultHandler implements ContentHandler, Error
                 } else {
                     // we need to add the match to it's parent which is on the
                     // stack
-                    final MagicMatcher m = (MagicMatcher) this.stack.get(this.stack.size() - 1);
+                    final MagicMatcher m = this.stack.get(this.stack.size() - 1);
                     m.addSubMatcher(this.matcher);
                 }
             }
@@ -383,19 +381,19 @@ public class MagicParser extends DefaultHandler implements ContentHandler, Error
             this.properties = null;
 
             // restore matcher from the stack if we have an /matcher-list
-        } else if (localName.equals("match-list")) {
+        } else if (localName.equals("match-list")) { //$NON-NLS-1$
             if (this.stack.size() > 0) {
-                this.matcher = (MagicMatcher) this.stack.get(this.stack.size() - 1);
+                this.matcher = this.stack.get(this.stack.size() - 1);
                 // pop from the stack
                 this.stack.remove(this.matcher);
             }
-        } else if (localName.equals("mimetype")) {
+        } else if (localName.equals("mimetype")) { //$NON-NLS-1$
             this.isMimeType = false;
-        } else if (localName.equals("extension")) {
+        } else if (localName.equals("extension")) { //$NON-NLS-1$
             this.isExtension = false;
-        } else if (localName.equals("description")) {
+        } else if (localName.equals("description")) { //$NON-NLS-1$
             this.isDescription = false;
-        } else if (localName.equals("test")) {
+        } else if (localName.equals("test")) { //$NON-NLS-1$
             this.isTest = false;
         }
     }

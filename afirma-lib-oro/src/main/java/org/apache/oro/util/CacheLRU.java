@@ -26,13 +26,13 @@
  *    Alternately, this acknowledgment may appear in the software itself,
  *    if and wherever such third-party acknowledgments normally appear.
  *
- * 4. The names "Apache" and "Apache Software Foundation", "Jakarta-Oro" 
+ * 4. The names "Apache" and "Apache Software Foundation", "Jakarta-Oro"
  *    must not be used to endorse or promote products derived from this
  *    software without prior written permission. For written
  *    permission, please contact apache@apache.org.
  *
- * 5. Products derived from this software may not be called "Apache" 
- *    or "Jakarta-Oro", nor may "Apache" or "Jakarta-Oro" appear in their 
+ * 5. Products derived from this software may not be called "Apache"
+ *    or "Jakarta-Oro", nor may "Apache" or "Jakarta-Oro" appear in their
  *    name, without prior written permission of the Apache Software Foundation.
  *
  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
@@ -58,7 +58,6 @@
 
 package org.apache.oro.util;
 
-import java.util.*;
 
 /**
  * This class is a GenericCache subclass implementing an LRU
@@ -67,30 +66,34 @@ import java.util.*;
  * cache is full, when a new value is added to the cache, it replaces
  * the least recently used value currently in the cache.  This is probably
  * the best general purpose cache replacement policy.
- * 
+ *
  * @version @version@
  * @since 1.0
  * @see GenericCache
  */
 public final class CacheLRU extends GenericCache {
+
+  private static final long serialVersionUID = 4464724778400452634L;
+
   private int __head = 0, __tail = 0;
-  private int[] __next, __prev;
+  private final int[] __next, __prev;
 
   /**
    * Creates a CacheLRU instance with a given cache capacity.
    * <p>
    * @param capacity  The capacity of the cache.
    */
-  public CacheLRU(int capacity) { 
+  public CacheLRU(final int capacity) {
     super(capacity);
 
     int i;
 
-    __next = new int[_cache.length];
-    __prev = new int[_cache.length];
+    this.__next = new int[this._cache.length];
+    this.__prev = new int[this._cache.length];
 
-    for(i=0; i < __next.length; i++)
-      __next[i] = __prev[i] = -1;
+    for(i=0; i < this.__next.length; i++) {
+		this.__next[i] = this.__prev[i] = -1;
+	}
   }
 
 
@@ -105,36 +108,38 @@ public final class CacheLRU extends GenericCache {
   }
 
 
-  private void __moveToFront(int index) {
+  private void __moveToFront(final int index) {
     int next, prev;
 
-    if(__head != index) {
-      next = __next[index];
-      prev = __prev[index];
+    if(this.__head != index) {
+      next = this.__next[index];
+      prev = this.__prev[index];
 
       // Only the head has a prev entry that is an invalid index so
       // we don't check.
-      __next[prev] = next;
+      this.__next[prev] = next;
 
       // Make sure index is valid.  If it isn't, we're at the tail
       // and don't set __prev[next].
-      if(next >= 0)
-	__prev[next] = prev;
-      else
-	__tail = prev;
+      if(next >= 0) {
+		this.__prev[next] = prev;
+	} else {
+		this.__tail = prev;
+	}
 
-      __prev[index] = -1;
-      __next[index] = __head;
-      __prev[__head] = index;
-      __head        = index;
+      this.__prev[index] = -1;
+      this.__next[index] = this.__head;
+      this.__prev[this.__head] = index;
+      this.__head        = index;
     }
   }
 
 
-  public synchronized Object getElement(Object key) { 
+  @Override
+  public synchronized Object getElement(final Object key) {
     Object obj;
 
-    obj = _table.get(key);
+    obj = this._table.get(key);
 
     if(obj != null) {
       GenericCacheEntry entry;
@@ -158,10 +163,11 @@ public final class CacheLRU extends GenericCache {
    * @param key   The key referencing the value added to the cache.
    * @param value The value to add to the cache.
    */
-  public final synchronized void addElement(Object key, Object value) {
+  @Override
+public final synchronized void addElement(final Object key, final Object value) {
     Object obj;
 
-    obj = _table.get(key);
+    obj = this._table.get(key);
 
     if(obj != null) {
       GenericCacheEntry entry;
@@ -179,20 +185,20 @@ public final class CacheLRU extends GenericCache {
     // If we haven't filled the cache yet, place in next available spot
     // and move to front.
     if(!isFull()) {
-      if(_numEntries > 0) {
-	__prev[_numEntries] = __tail;
-	__next[_numEntries] = -1;
-	__moveToFront(_numEntries);
+      if(this._numEntries > 0) {
+	this.__prev[this._numEntries] = this.__tail;
+	this.__next[this._numEntries] = -1;
+	__moveToFront(this._numEntries);
       }
-      ++_numEntries;
+      ++this._numEntries;
     } else {
       // We replace the tail of the list.
-      _table.remove(_cache[__tail]._key);
-      __moveToFront(__tail);
+      this._table.remove(this._cache[this.__tail]._key);
+      __moveToFront(this.__tail);
     }
 
-    _cache[__head]._value = value;
-    _cache[__head]._key   = key;
-    _table.put(key, _cache[__head]);
+    this._cache[this.__head]._value = value;
+    this._cache[this.__head]._key   = key;
+    this._table.put(key, this._cache[this.__head]);
   }
 }

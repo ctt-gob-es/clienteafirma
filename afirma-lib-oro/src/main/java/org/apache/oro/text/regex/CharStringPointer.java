@@ -26,13 +26,13 @@
  *    Alternately, this acknowledgment may appear in the software itself,
  *    if and wherever such third-party acknowledgments normally appear.
  *
- * 4. The names "Apache" and "Apache Software Foundation", "Jakarta-Oro" 
+ * 4. The names "Apache" and "Apache Software Foundation", "Jakarta-Oro"
  *    must not be used to endorse or promote products derived from this
  *    software without prior written permission. For written
  *    permission, please contact apache@apache.org.
  *
- * 5. Products derived from this software may not be called "Apache" 
- *    or "Jakarta-Oro", nor may "Apache" or "Jakarta-Oro" appear in their 
+ * 5. Products derived from this software may not be called "Apache"
+ *    or "Jakarta-Oro", nor may "Apache" or "Jakarta-Oro" appear in their
  *    name, without prior written permission of the Apache Software Foundation.
  *
  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
@@ -72,57 +72,59 @@ final class CharStringPointer {
   int _offset;
   char[] _array;
 
-  CharStringPointer(char[] charArray, int offset) {
-    _array  = charArray;
-    _offset = offset;
+  CharStringPointer(final char[] charArray, final int offset) {
+    this._array  = charArray;
+    this._offset = offset;
   }
 
-  CharStringPointer(char[] charArray) {
+  CharStringPointer(final char[] charArray) {
     this(charArray, 0);
   }
 
   char _getValue()  {
-    return _getValue(_offset);
+    return _getValue(this._offset);
   }
 
-  char _getValue(int offset) {
-    if(offset < _array.length && offset >= 0)
-      return _array[offset];
+  char _getValue(final int offset) {
+    if(offset < this._array.length && offset >= 0) {
+		return this._array[offset];
+	}
     return _END_OF_STRING;
   }
 
-  char _getValueRelative(int offset) {
-    return _getValue(_offset + offset);
+  char _getValueRelative(final int offset) {
+    return _getValue(this._offset + offset);
   }
 
-  int _getLength() { return _array.length; }
+  int _getLength() { return this._array.length; }
 
-  int _getOffset() { return _offset; }
+  int _getOffset() { return this._offset; }
 
-  void _setOffset(int offset) { _offset = offset; }
+  void _setOffset(final int offset) { this._offset = offset; }
 
   boolean _isAtEnd() {
-    return (_offset >= _array.length);
+    return (this._offset >= this._array.length);
   }
 
-  char _increment(int inc) {
-    _offset+=inc;
+  char _increment(final int inc) {
+    this._offset+=inc;
     if(_isAtEnd()) {
-      _offset = _array.length;
+      this._offset = this._array.length;
       return _END_OF_STRING;
     }
 
-    return _array[_offset];
+    return this._array[this._offset];
   }
 
   char _increment() { return _increment(1); }
 
-  char _decrement(int inc) {
-    _offset-=inc; 
-    if(_offset < 0)
-      _offset = 0;
+  char _decrement(final int inc) {
+    this._offset-=inc;
+    if(this._offset < 0) {
+		this._offset = 0;
+	}
 
-    return _array[_offset];
+    return this._array[this._offset];
   }
 
   char _decrement() { return _decrement(1); }
@@ -142,10 +144,11 @@ final class CharStringPointer {
   }
 
 
-  String _toString(int offset) {
-    return new String(_array, offset, _array.length - offset);
+  String _toString(final int offset) {
+    return new String(this._array, offset, this._array.length - offset);
   }
 
+  @Override
   public String toString() {
     return _toString(0);
   }

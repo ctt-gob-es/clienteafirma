@@ -31,7 +31,10 @@ package net.sf.jmimemagic;
  */
 public class MagicParseException extends Exception
 {
-    /**
+
+	private static final long serialVersionUID = 8784355416847841008L;
+
+	/**
      * Default constructor
      */
     public MagicParseException()
@@ -41,31 +44,31 @@ public class MagicParseException extends Exception
 
     /**
      * Create exception with error message
-     * 
+     *
      * @param message The error message for this exception
      */
-    public MagicParseException(String message)
+    public MagicParseException(final String message)
     {
         super(message);
     }
 
     /**
      * Create exception based on an existing Throwable
-     * 
+     *
      * @param cause The throwable on which we'll base this exception
      */
-    public MagicParseException(Throwable cause)
+    public MagicParseException(final Throwable cause)
     {
         super(cause);
     }
 
     /**
      * Create an exception with custom message and throwable info
-     * 
+     *
      * @param message The message
      * @param cause The target Throwable
      */
-    public MagicParseException(String message, Throwable cause)
+    public MagicParseException(final String message, final Throwable cause)
     {
         super(message, cause);
     }

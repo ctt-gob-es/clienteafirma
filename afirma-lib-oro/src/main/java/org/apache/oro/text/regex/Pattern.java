@@ -26,13 +26,13 @@
  *    Alternately, this acknowledgment may appear in the software itself,
  *    if and wherever such third-party acknowledgments normally appear.
  *
- * 4. The names "Apache" and "Apache Software Foundation", "Jakarta-Oro" 
+ * 4. The names "Apache" and "Apache Software Foundation", "Jakarta-Oro"
  *    must not be used to endorse or promote products derived from this
  *    software without prior written permission. For written
  *    permission, please contact apache@apache.org.
  *
- * 5. Products derived from this software may not be called "Apache" 
- *    or "Jakarta-Oro", nor may "Apache" or "Jakarta-Oro" appear in their 
+ * 5. Products derived from this software may not be called "Apache"
+ *    or "Jakarta-Oro", nor may "Apache" or "Jakarta-Oro" appear in their
  *    name, without prior written permission of the Apache Software Foundation.
  *
  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
@@ -81,9 +81,9 @@ public interface Pattern {
   /**
    * This method returns the string representation of the pattern.  Its
    * purpose is to allow a pattern to be reconstructed after compilation.
-   * In other words, when you compile a pattern, the resulting data 
+   * In other words, when you compile a pattern, the resulting data
    * structures bear no relation to the string defining the pattern.
-   * It is often useful to be able to access the string defining a pattern 
+   * It is often useful to be able to access the string defining a pattern
    * after it has been compiled.
    * <p>
    * @return The original string representation of the regular expression

@@ -26,13 +26,13 @@
  *    Alternately, this acknowledgment may appear in the software itself,
  *    if and wherever such third-party acknowledgments normally appear.
  *
- * 4. The names "Apache" and "Apache Software Foundation", "Jakarta-Oro" 
+ * 4. The names "Apache" and "Apache Software Foundation", "Jakarta-Oro"
  *    must not be used to endorse or promote products derived from this
  *    software without prior written permission. For written
  *    permission, please contact apache@apache.org.
  *
- * 5. Products derived from this software may not be called "Apache" 
- *    or "Jakarta-Oro", nor may "Apache" or "Jakarta-Oro" appear in their 
+ * 5. Products derived from this software may not be called "Apache"
+ *    or "Jakarta-Oro", nor may "Apache" or "Jakarta-Oro" appear in their
  *    name, without prior written permission of the Apache Software Foundation.
  *
  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
@@ -58,7 +58,7 @@
 
 package org.apache.oro.text.regex;
 
-import java.util.*;
+import java.util.Stack;
 
 /**
  * The Perl5Matcher class is used to match regular expressions
@@ -84,7 +84,8 @@ public final class Perl5Matcher implements PatternMatcher {
   private static final char __EOS = Character.MAX_VALUE;
   private static final int __INITIAL_NUM_OFFSETS = 20;
 
-  private boolean __multiline = false, __lastSuccess = false;
+  private final boolean __multiline = false;
+private boolean __lastSuccess = false;
   private boolean __caseInsensitive = false;
   private char __previousChar, __input[], __originalInput[];
   private Perl5Repetition __currentRep;
@@ -93,35 +94,39 @@ public final class Perl5Matcher implements PatternMatcher {
   private char[] __program;
   private int __expSize, __inputOffset, __lastParen;
   private int[] __beginMatchOffsets, __endMatchOffsets;
-  private Stack __stack = new Stack();
+  private final Stack<int[]> __stack = new Stack<int[]>();
   private Perl5MatchResult __lastMatchResult = null;
 
   private static boolean
-    __compare(char[] s1, int s1Offs, char[] s2, int s2Offs, int n)
+    __compare(final char[] s1, int s1Offs, final char[] s2, int s2Offs, final int n)
   {
     int cnt;
 
     for(cnt = 0; cnt < n; cnt++, s1Offs++, s2Offs++) {
-      if(s1Offs >= s1.length)
-	return false;
-      if(s2Offs >= s2.length)
-	return false;
-      if(s1[s1Offs] != s2[s2Offs])
-	return false;
+      if(s1Offs >= s1.length) {
+		return false;
+	}
+      if(s2Offs >= s2.length) {
+		return false;
+	}
+      if(s1[s1Offs] != s2[s2Offs]) {
+		return false;
+	}
     }
 
     return true;
   }
 
-  private static int __findFirst(char[] input, int current, int endOffset,
-				 char[] mustString)
+  private static int __findFirst(final char[] input, int current, final int endOffset,
+				 final char[] mustString)
   {
     int count, saveCurrent;
     char ch;
 
 
-    if(input.length == 0)
-      return endOffset;
+    if(input.length == 0) {
+		return endOffset;
+	}
 
     ch = mustString[0];
     // Find the offset of the first character of the must string
@@ -131,16 +136,18 @@ public final class Perl5Matcher implements PatternMatcher {
 	count = 0;
 
 	while(current < endOffset && count < mustString.length) {
-	  if(mustString[count] != input[current])
-	    break;
+	  if(mustString[count] != input[current]) {
+		break;
+	}
 	  ++count;
 	  ++current;
 	}
 
 	current = saveCurrent;
 
-	if(count >= mustString.length)
-	  break;
+	if(count >= mustString.length) {
+		break;
+	}
       }
       ++current;
     }
@@ -149,27 +156,28 @@ public final class Perl5Matcher implements PatternMatcher {
   }
 
 
-  private void __pushState(int parenFloor) {
+  private void __pushState(final int parenFloor) {
     int[] state;
     int stateEntries, paren;
 
-    stateEntries = 3*(__expSize - parenFloor);
-    if(stateEntries <= 0)
-      state = new int[3];
-    else
-      state = new int[stateEntries + 3];
+    stateEntries = 3*(this.__expSize - parenFloor);
+    if(stateEntries <= 0) {
+		state = new int[3];
+	} else {
+		state = new int[stateEntries + 3];
+	}
 
-    state[0] = __expSize;
-    state[1] = __lastParen;
-    state[2] = __inputOffset;
+    state[0] = this.__expSize;
+    state[1] = this.__lastParen;
+    state[2] = this.__inputOffset;
 
-    for(paren = __expSize; paren > parenFloor; --paren, stateEntries-=3) {
-      state[stateEntries]     = __endMatchOffsets[paren];
-      state[stateEntries + 1] = __beginMatchOffsets[paren];
+    for(paren = this.__expSize; paren > parenFloor; --paren, stateEntries-=3) {
+      state[stateEntries]     = this.__endMatchOffsets[paren];
+      state[stateEntries + 1] = this.__beginMatchOffsets[paren];
       state[stateEntries + 2] = paren;
     }
 
-    __stack.push(state);
+    this.__stack.push(state);
   }
 
 
@@ -177,69 +185,73 @@ public final class Perl5Matcher implements PatternMatcher {
     int[] state;
     int entry, paren;
 
-    state = (int[])__stack.pop();
+    state = this.__stack.pop();
 
-    __expSize     = state[0];
-    __lastParen   = state[1];
-    __inputOffset = state[2];
+    this.__expSize     = state[0];
+    this.__lastParen   = state[1];
+    this.__inputOffset = state[2];
 
     for(entry = 3; entry < state.length; entry+=3) {
       paren = state[entry + 2];
-      __beginMatchOffsets[paren] = state[entry + 1];
+      this.__beginMatchOffsets[paren] = state[entry + 1];
 
-      if(paren <= __lastParen)
-	__endMatchOffsets[paren] = state[entry];
+      if(paren <= this.__lastParen) {
+		this.__endMatchOffsets[paren] = state[entry];
+	}
     }
 
-    for(paren = __lastParen + 1; paren <= __numParentheses; paren++) {
-      if(paren > __expSize)
-	__beginMatchOffsets[paren] = OpCode._NULL_OFFSET;
-      __endMatchOffsets[paren] = OpCode._NULL_OFFSET;
+    for(paren = this.__lastParen + 1; paren <= this.__numParentheses; paren++) {
+      if(paren > this.__expSize) {
+		this.__beginMatchOffsets[paren] = OpCode._NULL_OFFSET;
+	}
+      this.__endMatchOffsets[paren] = OpCode._NULL_OFFSET;
     }
   }
 
 
   // Initialize globals needed before calling __tryExpression for first time
-  private void __initInterpreterGlobals(Perl5Pattern expression, char[] input,
-					int beginOffset, int endOffset,
-					int currentOffset)
+  private void __initInterpreterGlobals(final Perl5Pattern expression, final char[] input,
+					final int beginOffset, int endOffset,
+					final int currentOffset)
   {
     // Remove this hack after more efficient case-folding and unicode
     // character classes are implemented
-    __caseInsensitive            = expression._isCaseInsensitive;
-    __input                      = input;
-    __endOffset                  = endOffset;
-    __currentRep                 = new Perl5Repetition();
-    __currentRep._numInstances   = 0;
-    __currentRep._lastRepetition = null;
-    __program                    = expression._program;
-    __stack.setSize(0);
+    this.__caseInsensitive            = expression._isCaseInsensitive;
+    this.__input                      = input;
+    this.__endOffset                  = endOffset;
+    this.__currentRep                 = new Perl5Repetition();
+    this.__currentRep._numInstances   = 0;
+    this.__currentRep._lastRepetition = null;
+    this.__program                    = expression._program;
+    this.__stack.setSize(0);
 
     // currentOffset should always be >= beginOffset and should
     // always be equal to zero when beginOffset equals 0, but we
     // make a weak attempt to protect against a violation of this
     // precondition
-    if(currentOffset == beginOffset || currentOffset <= 0)
-      __previousChar = '\n';
-    else {
-      __previousChar = input[currentOffset - 1];
-      if(!__multiline && __previousChar == '\n')
-	__previousChar = '\0';
+    if(currentOffset == beginOffset || currentOffset <= 0) {
+		this.__previousChar = '\n';
+	} else {
+      this.__previousChar = input[currentOffset - 1];
+      if(!this.__multiline && this.__previousChar == '\n') {
+		this.__previousChar = '\0';
+	}
     }
 
-    __numParentheses    = expression._numParentheses;
-    __currentOffset     = currentOffset;
+    this.__numParentheses    = expression._numParentheses;
+    this.__currentOffset     = currentOffset;
 
-    __bol = beginOffset;
-    __eol = endOffset;
+    this.__bol = beginOffset;
+    this.__eol = endOffset;
 
     // Ok, here we're using endOffset as a temporary variable.
-    endOffset = __numParentheses + 1;
-    if(__beginMatchOffsets == null || endOffset > __beginMatchOffsets.length) {
-      if(endOffset < __INITIAL_NUM_OFFSETS)
-	endOffset = __INITIAL_NUM_OFFSETS;
-      __beginMatchOffsets = new int[endOffset];
-      __endMatchOffsets   = new int[endOffset];      
+    endOffset = this.__numParentheses + 1;
+    if(this.__beginMatchOffsets == null || endOffset > this.__beginMatchOffsets.length) {
+      if(endOffset < __INITIAL_NUM_OFFSETS) {
+		endOffset = __INITIAL_NUM_OFFSETS;
+	}
+      this.__beginMatchOffsets = new int[endOffset];
+      this.__endMatchOffsets   = new int[endOffset];
     }
   }
 
@@ -250,44 +262,48 @@ public final class Perl5Matcher implements PatternMatcher {
 
     //endOffset+=dontTry;
 
-    __lastMatchResult = new Perl5MatchResult(__numParentheses + 1);
+    this.__lastMatchResult = new Perl5MatchResult(this.__numParentheses + 1);
 
     // This can happen when using Perl5StreamInput
-    if(__endMatchOffsets[0] > __originalInput.length)
-      throw new ArrayIndexOutOfBoundsException();
+    if(this.__endMatchOffsets[0] > this.__originalInput.length) {
+		throw new ArrayIndexOutOfBoundsException();
+	}
 
-    __lastMatchResult._matchBeginOffset = __beginMatchOffsets[0];
+    this.__lastMatchResult._matchBeginOffset = this.__beginMatchOffsets[0];
 
-    while(__numParentheses >= 0) {
-      offs = __beginMatchOffsets[__numParentheses];
-
-      if(offs >= 0)
-	__lastMatchResult._beginGroupOffset[__numParentheses] =
-	  offs - __lastMatchResult._matchBeginOffset;
-      else
-	__lastMatchResult._beginGroupOffset[__numParentheses] =
-	  OpCode._NULL_OFFSET;
-
-      offs = __endMatchOffsets[__numParentheses];
+    while(this.__numParentheses >= 0) {
+      offs = this.__beginMatchOffsets[this.__numParentheses];
 
       if(offs >= 0) {
-	__lastMatchResult._endGroupOffset[__numParentheses] =
-	  offs - __lastMatchResult._matchBeginOffset;
-	if(offs > maxEndOffs && offs <= __originalInput.length)
-	  maxEndOffs = offs;
-      } else
-	__lastMatchResult._endGroupOffset[__numParentheses] =
-	  OpCode._NULL_OFFSET;
+		this.__lastMatchResult._beginGroupOffset[this.__numParentheses] =
+		  offs - this.__lastMatchResult._matchBeginOffset;
+	} else {
+		this.__lastMatchResult._beginGroupOffset[this.__numParentheses] =
+		  OpCode._NULL_OFFSET;
+	}
 
-      --__numParentheses;
+      offs = this.__endMatchOffsets[this.__numParentheses];
+
+      if(offs >= 0) {
+	this.__lastMatchResult._endGroupOffset[this.__numParentheses] =
+	  offs - this.__lastMatchResult._matchBeginOffset;
+	if(offs > maxEndOffs && offs <= this.__originalInput.length) {
+		maxEndOffs = offs;
+	}
+      } else {
+		this.__lastMatchResult._endGroupOffset[this.__numParentheses] =
+		  OpCode._NULL_OFFSET;
+	}
+
+      --this.__numParentheses;
     }
 
-    __lastMatchResult._match =
-      new String(__originalInput, __beginMatchOffsets[0],
-		 maxEndOffs - __beginMatchOffsets[0]);
+    this.__lastMatchResult._match =
+      new String(this.__originalInput, this.__beginMatchOffsets[0],
+		 maxEndOffs - this.__beginMatchOffsets[0]);
 
     // Free up for garbage collection
-    __originalInput = null;
+    this.__originalInput = null;
   }
 
 
@@ -298,9 +314,9 @@ public final class Perl5Matcher implements PatternMatcher {
   // __lastMatchResult to be set correctly.
   // beginOffset marks the beginning of the string
   // currentOffset marks where to start the pattern search
-  private boolean __interpret(Perl5Pattern expression, char[] input,
-			      int beginOffset, int endOffset,
-			      int currentOffset)
+  private boolean __interpret(final Perl5Pattern expression, final char[] input,
+			      final int beginOffset, int endOffset,
+			      final int currentOffset)
   {
     boolean success;
     int minLength = 0, dontTry = 0, offset;
@@ -317,23 +333,25 @@ public final class Perl5Matcher implements PatternMatcher {
 
       if(mustString != null &&
 	 ((expression._anchor & Perl5Pattern._OPT_ANCH) == 0 ||
-	  ((__multiline || 
+	  ((this.__multiline ||
 	   (expression._anchor & Perl5Pattern._OPT_ANCH_MBOL) != 0)
 	   && expression._back >= 0)))
 	{
 
-	__currentOffset =
-	  __findFirst(__input, __currentOffset, endOffset, mustString);
-	
-	if(__currentOffset >= endOffset) {
-	  if((expression._options & Perl5Compiler.READ_ONLY_MASK) == 0)
-	    expression._mustUtility++;
+	this.__currentOffset =
+	  __findFirst(this.__input, this.__currentOffset, endOffset, mustString);
+
+	if(this.__currentOffset >= endOffset) {
+	  if((expression._options & Perl5Compiler.READ_ONLY_MASK) == 0) {
+		expression._mustUtility++;
+	}
 	  success = false;
 	  break _mainLoop;
 	} else if(expression._back >= 0) {
-	  __currentOffset-=expression._back;
-	  if(__currentOffset < currentOffset)
-	    __currentOffset = currentOffset;
+	  this.__currentOffset-=expression._back;
+	  if(this.__currentOffset < currentOffset) {
+		this.__currentOffset = currentOffset;
+	}
 	  minLength = expression._back + mustString.length;
 	} else if(!expression._isExpensive &&
 		  (expression._options & Perl5Compiler.READ_ONLY_MASK) == 0 &&
@@ -342,32 +360,34 @@ public final class Perl5Matcher implements PatternMatcher {
 	  // so that mustUtility is only decremented if the expression is
 	  // compiled without READ_ONLY_MASK.
 	  mustString = expression._mustString = null;
-	  __currentOffset = currentOffset;
+	  this.__currentOffset = currentOffset;
 	} else {
-	  __currentOffset = currentOffset;
+	  this.__currentOffset = currentOffset;
 	  minLength = mustString.length;
 	}
       }
 
       if((expression._anchor & Perl5Pattern._OPT_ANCH) != 0) {
-	if(__currentOffset == beginOffset && __tryExpression(beginOffset)) {
+	if(this.__currentOffset == beginOffset && __tryExpression(beginOffset)) {
 	  success = true;
 	  break _mainLoop;
-	} else if(__multiline
+	} else if(this.__multiline
 		  || (expression._anchor & Perl5Pattern._OPT_ANCH_MBOL) != 0
 		  || (expression._anchor & Perl5Pattern._OPT_IMPLICIT) != 0)
 	  {
-	    if(minLength > 0)
-	      dontTry = minLength - 1;
+	    if(minLength > 0) {
+			dontTry = minLength - 1;
+		}
 	    endOffset-=dontTry;
 
-	    if(__currentOffset > currentOffset)
-	      --__currentOffset;
+	    if(this.__currentOffset > currentOffset) {
+			--this.__currentOffset;
+		}
 
-	    while(__currentOffset < endOffset) {
-	      if(__input[__currentOffset++] == '\n') {
-		if(__currentOffset < endOffset &&
-		   __tryExpression(__currentOffset)) {
+	    while(this.__currentOffset < endOffset) {
+	      if(this.__input[this.__currentOffset++] == '\n') {
+		if(this.__currentOffset < endOffset &&
+		   __tryExpression(this.__currentOffset)) {
 		  success = true;
 		  break _mainLoop;
 		}
@@ -384,29 +404,30 @@ public final class Perl5Matcher implements PatternMatcher {
 	if((expression._anchor & Perl5Pattern._OPT_SKIP) != 0) {
 	  ch = mustString[0];
 
-	  while(__currentOffset < endOffset) {
-	    if(ch == __input[__currentOffset]) {
-	      if(__tryExpression(__currentOffset)){
+	  while(this.__currentOffset < endOffset) {
+	    if(ch == this.__input[this.__currentOffset]) {
+	      if(__tryExpression(this.__currentOffset)){
 		success = true;
 		break _mainLoop;
 	      }
-	      ++__currentOffset;
-	      while(__currentOffset < endOffset &&
-		    __input[__currentOffset] == ch)
-		    ++__currentOffset;
+	      ++this.__currentOffset;
+	      while(this.__currentOffset < endOffset &&
+		    this.__input[this.__currentOffset] == ch) {
+			++this.__currentOffset;
+		}
 	    }
-	    ++__currentOffset;
+	    ++this.__currentOffset;
 	  }
 	} else {
 
-	  while((__currentOffset =
-		 __findFirst(__input, __currentOffset, endOffset, mustString))
+	  while((this.__currentOffset =
+		 __findFirst(this.__input, this.__currentOffset, endOffset, mustString))
 		< endOffset){
-	    if(__tryExpression(__currentOffset)) {
+	    if(__tryExpression(this.__currentOffset)) {
 	      success = true;
 	      break _mainLoop;
 	    }
-	    ++__currentOffset;
+	    ++this.__currentOffset;
 	  }
 	}
 
@@ -419,27 +440,30 @@ public final class Perl5Matcher implements PatternMatcher {
 
 	doEvery = ((expression._anchor & Perl5Pattern._OPT_SKIP) == 0);
 
-	if(minLength > 0)
-	  dontTry = minLength - 1;
+	if(minLength > 0) {
+		dontTry = minLength - 1;
+	}
 	endOffset -= dontTry;
 	tmp = true;
 
-	switch(op = __program[offset]) {
+	switch(op = this.__program[offset]) {
 	case OpCode._ANYOF:
 	  offset = OpCode._getOperand(offset);
-	  while(__currentOffset < endOffset) {
-	    ch = __input[__currentOffset];
+	  while(this.__currentOffset < endOffset) {
+	    ch = this.__input[this.__currentOffset];
 
 	    if(ch < 256 &&
-	       (__program[offset + (ch >> 4)] & (1 << (ch & 0xf))) == 0) {
-	      if(tmp && __tryExpression(__currentOffset)) {
+	       (this.__program[offset + (ch >> 4)] & (1 << (ch & 0xf))) == 0) {
+	      if(tmp && __tryExpression(this.__currentOffset)) {
 		success = true;
 		break _mainLoop;
-	      } else
-		tmp = doEvery;
-	    } else
-	      tmp = true;
-	    ++__currentOffset;
+	      } else {
+			tmp = doEvery;
+		}
+	    } else {
+			tmp = true;
+		}
+	    ++this.__currentOffset;
 	  }
 
 	  break;
@@ -447,18 +471,20 @@ public final class Perl5Matcher implements PatternMatcher {
 	case OpCode._ANYOFUN:
 	case OpCode._NANYOFUN:
 	  offset = OpCode._getOperand(offset);
-	  while(__currentOffset < endOffset) {
-	    ch = __input[__currentOffset];
+	  while(this.__currentOffset < endOffset) {
+	    ch = this.__input[this.__currentOffset];
 
-	    if(__matchUnicodeClass(ch, __program, offset, op)) {
-	      if(tmp && __tryExpression(__currentOffset)) {
-		success = true;
-		break _mainLoop;
-	      } else
-		tmp = doEvery;
-	    } else
-	      tmp = true;
-	    ++__currentOffset;
+	    if(__matchUnicodeClass(ch, this.__program, offset, op)) {
+	      if(tmp && __tryExpression(this.__currentOffset)) {
+	    	  success = true;
+	    	  break _mainLoop;
+	      }
+		  tmp = doEvery;
+	    }
+	    else {
+			tmp = true;
+		}
+	    ++this.__currentOffset;
 	  }
 
 	  break;
@@ -469,26 +495,27 @@ public final class Perl5Matcher implements PatternMatcher {
 	    --endOffset;
 	  }
 
-	  if(__currentOffset != beginOffset) {
-	    ch = __input[__currentOffset - 1];
+	  if(this.__currentOffset != beginOffset) {
+	    ch = this.__input[this.__currentOffset - 1];
 	    tmp = OpCode._isWordCharacter(ch);
-	  } else
-	    tmp = OpCode._isWordCharacter(__previousChar);
+	  } else {
+		tmp = OpCode._isWordCharacter(this.__previousChar);
+	}
 
-	  while(__currentOffset < endOffset) {
-	    ch = __input[__currentOffset];
+	  while(this.__currentOffset < endOffset) {
+	    ch = this.__input[this.__currentOffset];
 	    if(tmp != OpCode._isWordCharacter(ch)){
 	      tmp = !tmp;
-	      if(__tryExpression(__currentOffset)) {
+	      if(__tryExpression(this.__currentOffset)) {
 		success = true;
 		break _mainLoop;
 	      }
 	    }
-	    ++__currentOffset;
+	    ++this.__currentOffset;
 	  }
 
-	  if((minLength > 0 || tmp) && 
-	     __tryExpression(__currentOffset)) {
+	  if((minLength > 0 || tmp) &&
+	     __tryExpression(this.__currentOffset)) {
 	    success = true;
 	    break _mainLoop;
 	  }
@@ -500,130 +527,144 @@ public final class Perl5Matcher implements PatternMatcher {
 	    --endOffset;
 	  }
 
-	  if(__currentOffset != beginOffset) {
-	    ch = __input[__currentOffset - 1];
+	  if(this.__currentOffset != beginOffset) {
+	    ch = this.__input[this.__currentOffset - 1];
 	    tmp = OpCode._isWordCharacter(ch);
-	  } else
-	    tmp = OpCode._isWordCharacter(__previousChar);
+	  } else {
+		tmp = OpCode._isWordCharacter(this.__previousChar);
+	}
 
-	  while(__currentOffset < endOffset) {
-	    ch = __input[__currentOffset];
-	    if(tmp != OpCode._isWordCharacter(ch))
-	      tmp = !tmp;
-	    else if(__tryExpression(__currentOffset)) {
+	  while(this.__currentOffset < endOffset) {
+	    ch = this.__input[this.__currentOffset];
+	    if(tmp != OpCode._isWordCharacter(ch)) {
+			tmp = !tmp;
+		} else if(__tryExpression(this.__currentOffset)) {
 	      success = true;
 	      break _mainLoop;
 	    }
 
-	    ++__currentOffset;
+	    ++this.__currentOffset;
 	  }
 
 	  if((minLength > 0 || !tmp) &&
-	     __tryExpression(__currentOffset)) {
+	     __tryExpression(this.__currentOffset)) {
 	    success = true;
 	    break _mainLoop;
 	  }
 	  break;
 
 	case OpCode._ALNUM:
-	  while(__currentOffset < endOffset) {
-	    ch = __input[__currentOffset];
+	  while(this.__currentOffset < endOffset) {
+	    ch = this.__input[this.__currentOffset];
 	    if(OpCode._isWordCharacter(ch)) {
-	      if(tmp && __tryExpression(__currentOffset)) {
-		success = true;
-		break _mainLoop;
-	      } else
-		tmp = doEvery;
-	    } else
-	      tmp = true;
-	    ++__currentOffset;
+	      if(tmp && __tryExpression(this.__currentOffset)) {
+	    	  success = true;
+	    	  break _mainLoop;
+	      }
+	      tmp = doEvery;
+	    }
+	    else {
+			tmp = true;
+		}
+	    ++this.__currentOffset;
 	  }
 	  break;
 
 	case OpCode._NALNUM:
-	  while(__currentOffset < endOffset) {
-	    ch = __input[__currentOffset];
+	  while(this.__currentOffset < endOffset) {
+	    ch = this.__input[this.__currentOffset];
 	    if(!OpCode._isWordCharacter(ch)) {
-	      if(tmp && __tryExpression(__currentOffset)) {
+	      if(tmp && __tryExpression(this.__currentOffset)) {
 		success = true;
 		break _mainLoop;
-	      } else
-		tmp = doEvery;
-	    } else
-	      tmp = true;
-	    ++__currentOffset;
+	      } else {
+			tmp = doEvery;
+		}
+	    } else {
+			tmp = true;
+		}
+	    ++this.__currentOffset;
 	  }
 	  break;
 
 	case OpCode._SPACE:
-	  while(__currentOffset < endOffset) {
-	    if(Character.isWhitespace(__input[__currentOffset])) {
-	      if(tmp && __tryExpression(__currentOffset)) {
+	  while(this.__currentOffset < endOffset) {
+	    if(Character.isWhitespace(this.__input[this.__currentOffset])) {
+	      if(tmp && __tryExpression(this.__currentOffset)) {
 		success = true;
 		break _mainLoop;
-	      } else
-		tmp = doEvery;
-	    } else
-	      tmp = true;
-	    ++__currentOffset;
+	      } else {
+			tmp = doEvery;
+		}
+	    } else {
+			tmp = true;
+		}
+	    ++this.__currentOffset;
 	  }
 	  break;
 
 	case OpCode._NSPACE:
-	  while(__currentOffset < endOffset) {
-	    if(!Character.isWhitespace(__input[__currentOffset])) {
-	      if(tmp && __tryExpression(__currentOffset)) {
+	  while(this.__currentOffset < endOffset) {
+	    if(!Character.isWhitespace(this.__input[this.__currentOffset])) {
+	      if(tmp && __tryExpression(this.__currentOffset)) {
 		success = true;
 		break _mainLoop;
-	      } else
-		tmp = doEvery;
-	    } else
-	      tmp = true;
-	    ++__currentOffset;
+	      } else {
+			tmp = doEvery;
+		}
+	    } else {
+			tmp = true;
+		}
+	    ++this.__currentOffset;
 	  }
 	  break;
 
 	case OpCode._DIGIT:
-	  while(__currentOffset < endOffset) {
-	    if(Character.isDigit(__input[__currentOffset])) {
-	      if(tmp && __tryExpression(__currentOffset)) {
+	  while(this.__currentOffset < endOffset) {
+	    if(Character.isDigit(this.__input[this.__currentOffset])) {
+	      if(tmp && __tryExpression(this.__currentOffset)) {
 		success = true;
 		break _mainLoop;
-	      } else
-		tmp = doEvery;
-	    } else
-	      tmp = true;
-	    ++__currentOffset;
+	      } else {
+			tmp = doEvery;
+		}
+	    } else {
+			tmp = true;
+		}
+	    ++this.__currentOffset;
 	  }
 	  break;
 
 
 	case OpCode._NDIGIT:
-	  while(__currentOffset < endOffset) {
-	    if(!Character.isDigit(__input[__currentOffset])) {
-	      if(tmp && __tryExpression(__currentOffset)) {
+	  while(this.__currentOffset < endOffset) {
+	    if(!Character.isDigit(this.__input[this.__currentOffset])) {
+	      if(tmp && __tryExpression(this.__currentOffset)) {
 		success = true;
 		break _mainLoop;
-	      } else
-		tmp = doEvery;
-	    } else
-	      tmp = true;
-	    ++__currentOffset;
+	      } else {
+			tmp = doEvery;
+		}
+	    } else {
+			tmp = true;
+		}
+	    ++this.__currentOffset;
 	  }
 	  break;
 	} // end switch
 
       } else {
-	if(minLength > 0)
-	  dontTry = minLength - 1;
+	if(minLength > 0) {
+		dontTry = minLength - 1;
+	}
 	endOffset-=dontTry;
 
 	do {
-	  if(__tryExpression(__currentOffset)) {
+	  if(__tryExpression(this.__currentOffset)) {
 	    success = true;
 	    break _mainLoop;
 	  }
-	} while(__currentOffset++ < endOffset);
+	} while(this.__currentOffset++ < endOffset);
 
       }
 
@@ -631,14 +672,14 @@ public final class Perl5Matcher implements PatternMatcher {
       break _mainLoop;
     } // end while
 
-    __lastSuccess = success;
-    __lastMatchResult = null;
+    this.__lastSuccess = success;
+    this.__lastMatchResult = null;
 
     return success;
   }
-  
-  private boolean __matchUnicodeClass(char code, char __program[], 
-			     int offset ,char opcode)
+
+  private boolean __matchUnicodeClass(final char code, final char __program[],
+			     int offset ,final char opcode)
   {
     boolean isANYOF = ( opcode == OpCode._ANYOFUN );
 
@@ -653,65 +694,97 @@ public final class Perl5Matcher implements PatternMatcher {
 
       } else if(__program[offset] == OpCode._ONECHAR) {
        	offset++;
-	if(__program[offset++] == code) return isANYOF;
+	if(__program[offset++] == code) {
+		return isANYOF;
+	}
 
       } else {
-	isANYOF = (__program[offset] == OpCode._OPCODE) 
+	isANYOF = (__program[offset] == OpCode._OPCODE)
 	  ? isANYOF : !isANYOF;
 
 	offset++;
 	switch ( __program[offset++] ) {
 	case OpCode._ALNUM:
-	  if(OpCode._isWordCharacter(code)) return isANYOF;
+	  if(OpCode._isWordCharacter(code)) {
+		return isANYOF;
+	}
 	  break;
 	case OpCode._NALNUM:
-	  if(!OpCode._isWordCharacter(code)) return isANYOF;
+	  if(!OpCode._isWordCharacter(code)) {
+		return isANYOF;
+	}
 	  break;
 	case OpCode._SPACE:
-	  if(Character.isWhitespace(code)) return isANYOF;
+	  if(Character.isWhitespace(code)) {
+		return isANYOF;
+	}
 	  break;
 	case OpCode._NSPACE:
-	  if(!Character.isWhitespace(code)) return isANYOF;
+	  if(!Character.isWhitespace(code)) {
+		return isANYOF;
+	}
 	  break;
 	case OpCode._DIGIT:
-	  if(Character.isDigit(code)) return isANYOF;
+	  if(Character.isDigit(code)) {
+		return isANYOF;
+	}
 	  break;
 	case OpCode._NDIGIT:
-	  if(!Character.isDigit(code)) return isANYOF;
+	  if(!Character.isDigit(code)) {
+		return isANYOF;
+	}
 	  break;
 	case OpCode._ALNUMC:
-	  if(Character.isLetterOrDigit(code)) return isANYOF;
+	  if(Character.isLetterOrDigit(code)) {
+		return isANYOF;
+	}
 	  break;
 	case OpCode._ALPHA:
-	  if(Character.isLetter(code)) return isANYOF;
+	  if(Character.isLetter(code)) {
+		return isANYOF;
+	}
 	  break;
 	case OpCode._BLANK:
-	  if(Character.isSpaceChar(code)) return isANYOF;
+	  if(Character.isSpaceChar(code)) {
+		return isANYOF;
+	}
 	  break;
 	case OpCode._CNTRL:
-	  if(Character.isISOControl(code)) return isANYOF;
+	  if(Character.isISOControl(code)) {
+		return isANYOF;
+	}
 	  break;
 	case OpCode._LOWER:
-	  if(Character.isLowerCase(code)) return isANYOF;
+	  if(Character.isLowerCase(code)) {
+		return isANYOF;
+	}
 	  // Remove this hack after more efficient case-folding and unicode
 	  // character classes are implemented
-	  if(__caseInsensitive && Character.isUpperCase(code))
-	    return isANYOF;
+	  if(this.__caseInsensitive && Character.isUpperCase(code)) {
+		return isANYOF;
+	}
 	  break;
 	case OpCode._UPPER:
-	  if(Character.isUpperCase(code)) return isANYOF;
+	  if(Character.isUpperCase(code)) {
+		return isANYOF;
+	}
 	  // Remove this hack after more efficient case-folding and unicode
 	  // character classes are implemented
-	  if(__caseInsensitive && Character.isLowerCase(code))
-	    return isANYOF;
+	  if(this.__caseInsensitive && Character.isLowerCase(code)) {
+		return isANYOF;
+	}
 	  break;
 	case OpCode._PRINT:
-	  if(Character.isSpaceChar(code)) return isANYOF;
+	  if(Character.isSpaceChar(code)) {
+		return isANYOF;
+	}
           // Fall through to check if the character is alphanumeric,
 	  // or a punctuation mark.  Printable characters are either
 	  // alphanumeric, punctuation marks, or spaces.
 	case OpCode._GRAPH:
-	  if(Character.isLetterOrDigit(code)) return isANYOF;
+	  if(Character.isLetterOrDigit(code)) {
+		return isANYOF;
+	}
           // Fall through to check if the character is a punctuation mark.
           // Graph characters are either alphanumeric or punctuation.
 	case OpCode._PUNCT:
@@ -732,58 +805,64 @@ public final class Perl5Matcher implements PatternMatcher {
 	case OpCode._XDIGIT:
 	  if( (code >= '0' && code <= '9') ||
 	      (code >= 'a' && code <= 'f') ||
-	      (code >= 'A' && code <= 'F')) return isANYOF;
+	      (code >= 'A' && code <= 'F')) {
+		return isANYOF;
+	}
 	  break;
 	case OpCode._ASCII:
-	  if(code < 0x80)return isANYOF;
+	  if(code < 0x80) {
+		return isANYOF;
 	}
-      } 
+	}
+      }
     }
     return !isANYOF;
   }
-  
-  private boolean __tryExpression(int offset) {
-    int count;
-    
-    __inputOffset = offset;
-    __lastParen   = 0;
-    __expSize     = 0;
 
-    if(__numParentheses > 0) {
-      for(count=0; count <= __numParentheses; count++) {
-	__beginMatchOffsets[count] = OpCode._NULL_OFFSET;
-	__endMatchOffsets[count]   = OpCode._NULL_OFFSET;
+  private boolean __tryExpression(final int offset) {
+    int count;
+
+    this.__inputOffset = offset;
+    this.__lastParen   = 0;
+    this.__expSize     = 0;
+
+    if(this.__numParentheses > 0) {
+      for(count=0; count <= this.__numParentheses; count++) {
+	this.__beginMatchOffsets[count] = OpCode._NULL_OFFSET;
+	this.__endMatchOffsets[count]   = OpCode._NULL_OFFSET;
       }
     }
 
     if(__match(1)){
-      __beginMatchOffsets[0] = offset;
-      __endMatchOffsets[0]   = __inputOffset;
+      this.__beginMatchOffsets[0] = offset;
+      this.__endMatchOffsets[0]   = this.__inputOffset;
       return true;
     }
 
     return false;
   }
-    
 
-  private int __repeat(int offset, int max) {
+
+  private int __repeat(final int offset, final int max) {
     int scan, eol, operand, ret;
     char ch;
     char op;
 
-    scan = __inputOffset;
-    eol  = __eol;
+    scan = this.__inputOffset;
+    eol  = this.__eol;
 
-    if(max != Character.MAX_VALUE && max < eol - scan)
-      eol = scan + max;
+    if(max != Character.MAX_VALUE && max < eol - scan) {
+		eol = scan + max;
+	}
 
     operand = OpCode._getOperand(offset);
 
-    switch(op = __program[offset]) {
+    switch(op = this.__program[offset]) {
 
     case OpCode._ANY:
-      while(scan < eol && __input[scan] != '\n')
-	++scan;
+      while(scan < eol && this.__input[scan] != '\n') {
+		++scan;
+	}
       break;
 
     case OpCode._SANY:
@@ -792,17 +871,19 @@ public final class Perl5Matcher implements PatternMatcher {
 
     case OpCode._EXACTLY:
       ++operand;
-      while(scan < eol && __program[operand] == __input[scan])
-	++scan;
+      while(scan < eol && this.__program[operand] == this.__input[scan]) {
+		++scan;
+	}
       break;
 
     case OpCode._ANYOF:
-      if(scan < eol && (ch = __input[scan]) < 256) {
-	while((ch < 256  ) && (__program[operand + (ch >> 4)] & (1 << (ch & 0xf))) == 0) {
-	  if(++scan < eol)
-	    ch = __input[scan];
-	  else
-	    break;
+      if(scan < eol && (ch = this.__input[scan]) < 256) {
+	while((ch < 256  ) && (this.__program[operand + (ch >> 4)] & (1 << (ch & 0xf))) == 0) {
+	  if(++scan < eol) {
+		ch = this.__input[scan];
+	} else {
+		break;
+	}
 	}
       }
       break;
@@ -810,44 +891,51 @@ public final class Perl5Matcher implements PatternMatcher {
     case OpCode._ANYOFUN:
     case OpCode._NANYOFUN:
       if(scan < eol) {
-	ch = __input[scan];
-	while(__matchUnicodeClass(ch, __program, operand, op)){
-	  if(++scan < eol)
-	    ch = __input[scan];
-	  else
-	    break;
+	ch = this.__input[scan];
+	while(__matchUnicodeClass(ch, this.__program, operand, op)){
+	  if(++scan < eol) {
+		ch = this.__input[scan];
+	} else {
+		break;
+	}
 	}
       }
       break;
 
     case OpCode._ALNUM:
-      while(scan < eol && OpCode._isWordCharacter(__input[scan]))
-	++scan;
+      while(scan < eol && OpCode._isWordCharacter(this.__input[scan])) {
+		++scan;
+	}
       break;
 
     case OpCode._NALNUM:
-      while(scan < eol && !OpCode._isWordCharacter(__input[scan]))
-	++scan;
+      while(scan < eol && !OpCode._isWordCharacter(this.__input[scan])) {
+		++scan;
+	}
       break;
 
     case OpCode._SPACE:
-      while(scan < eol && Character.isWhitespace(__input[scan]))
-	++scan;
+      while(scan < eol && Character.isWhitespace(this.__input[scan])) {
+		++scan;
+	}
       break;
 
     case OpCode._NSPACE:
-      while(scan < eol && !Character.isWhitespace(__input[scan]))
-	++scan;
+      while(scan < eol && !Character.isWhitespace(this.__input[scan])) {
+		++scan;
+	}
       break;
 
     case OpCode._DIGIT:
-      while(scan < eol && Character.isDigit(__input[scan]))
-	++scan;
+      while(scan < eol && Character.isDigit(this.__input[scan])) {
+		++scan;
+	}
       break;
 
     case OpCode._NDIGIT:
-      while(scan < eol && !Character.isDigit(__input[scan]))
-	++scan;
+      while(scan < eol && !Character.isDigit(this.__input[scan])) {
+		++scan;
+	}
       break;
 
     default:
@@ -855,155 +943,179 @@ public final class Perl5Matcher implements PatternMatcher {
 
     }
 
-    ret = scan - __inputOffset;
-    __inputOffset = scan;
+    ret = scan - this.__inputOffset;
+    this.__inputOffset = scan;
 
     return ret;
   }
 
 
-  private boolean __match(int offset) {
+  private boolean __match(final int offset) {
     char nextChar, op;
     int scan, next, input, maxScan, current, line, arg;
     boolean inputRemains = true, minMod = false;
     Perl5Repetition rep;
 
 
-    input    = __inputOffset;
-    inputRemains = (input < __endOffset);
-    nextChar = (inputRemains ? __input[input] : __EOS);
+    input    = this.__inputOffset;
+    inputRemains = (input < this.__endOffset);
+    nextChar = (inputRemains ? this.__input[input] : __EOS);
 
     scan     = offset;
-    maxScan  = __program.length;
+    maxScan  = this.__program.length;
 
     while(scan < maxScan /*&& scan > 0*/){
-      next = OpCode._getNext(__program, scan);
+      next = OpCode._getNext(this.__program, scan);
 
-      switch(op = __program[scan]) {
+      switch(op = this.__program[scan]) {
 
       case OpCode._BOL:
-	if(input == __bol ? __previousChar == '\n' :
-	   (__multiline && (inputRemains || input < __eol) && 
-	    __input[input - 1] == '\n'))
-	  break;
+	if(input == this.__bol ? this.__previousChar == '\n' :
+	   (this.__multiline && (inputRemains || input < this.__eol) &&
+	    this.__input[input - 1] == '\n')) {
+		break;
+	}
 	return false;
 
       case OpCode._MBOL:
-	if(input == __bol ? __previousChar == '\n' :
-	   ((inputRemains || input < __eol) && __input[input - 1] == '\n'))
-	  break;
+	if(input == this.__bol ? this.__previousChar == '\n' :
+	   ((inputRemains || input < this.__eol) && this.__input[input - 1] == '\n')) {
+		break;
+	}
 	return false;
 
       case OpCode._SBOL:
-	if(input == __bol && __previousChar == '\n')
-	  break;
+	if(input == this.__bol && this.__previousChar == '\n') {
+		break;
+	}
 	return false;
 
       case OpCode._GBOL:
-	if(input == __bol)
-	  break;
+	if(input == this.__bol) {
+		break;
+	}
 	return true;
 
       case OpCode._EOL :
-	if((inputRemains || input < __eol) && nextChar != '\n')
-	  return false;
-	if(!__multiline && __eol - input > 1)
-	  return false;
+	if((inputRemains || input < this.__eol) && nextChar != '\n') {
+		return false;
+	}
+	if(!this.__multiline && this.__eol - input > 1) {
+		return false;
+	}
 	break;
 
       case OpCode._MEOL:
-	if((inputRemains || input < __eol) && nextChar != '\n')
-	  return false;
+	if((inputRemains || input < this.__eol) && nextChar != '\n') {
+		return false;
+	}
 	break;
 
       case OpCode._SEOL:
-	if((inputRemains || input < __eol) && nextChar != '\n')
-	  return false;
-	if(__eol - input > 1)
-	  return false;
+	if((inputRemains || input < this.__eol) && nextChar != '\n') {
+		return false;
+	}
+	if(this.__eol - input > 1) {
+		return false;
+	}
 	break;
 
       case OpCode._SANY:
-	if(!inputRemains && input >= __eol)
-	  return false;
-	inputRemains = (++input < __endOffset);
-	nextChar = (inputRemains ? __input[input] : __EOS);
+	if(!inputRemains && input >= this.__eol) {
+		return false;
+	}
+	inputRemains = (++input < this.__endOffset);
+	nextChar = (inputRemains ? this.__input[input] : __EOS);
 	break;
 
       case OpCode._ANY:
-	if((!inputRemains && input >= __eol) || nextChar == '\n')
-	  return false;
-	inputRemains = (++input < __endOffset);
-	nextChar = (inputRemains ? __input[input] : __EOS);
+	if((!inputRemains && input >= this.__eol) || nextChar == '\n') {
+		return false;
+	}
+	inputRemains = (++input < this.__endOffset);
+	nextChar = (inputRemains ? this.__input[input] : __EOS);
 	break;
 
       case OpCode._EXACTLY:
 	current = OpCode._getOperand(scan);
-	line = __program[current++];
+	line = this.__program[current++];
 
-	if(__program[current] != nextChar)
-	  return false;
-	if(__eol - input < line)
-	  return false;
+	if(this.__program[current] != nextChar) {
+		return false;
+	}
+	if(this.__eol - input < line) {
+		return false;
+	}
 
-	if(line > 1 && !__compare(__program, current, __input, input, line))
-	  return false;
+	if(line > 1 && !__compare(this.__program, current, this.__input, input, line)) {
+		return false;
+	}
 
 	input+=line;
-	inputRemains = (input < __endOffset);
-	nextChar = (inputRemains ? __input[input] : __EOS);
+	inputRemains = (input < this.__endOffset);
+	nextChar = (inputRemains ? this.__input[input] : __EOS);
 	break;
 
       case OpCode._ANYOF:
 	current = OpCode._getOperand(scan);
 
-	if(nextChar == __EOS && inputRemains)
-	  nextChar = __input[input];
+	if(nextChar == __EOS && inputRemains) {
+		nextChar = this.__input[input];
+	}
 
-	if(nextChar >= 256 || (__program[current + (nextChar >> 4)] &
-	    (1 << (nextChar & 0xf))) != 0)
-	  return false;
+	if(nextChar >= 256 || (this.__program[current + (nextChar >> 4)] &
+	    (1 << (nextChar & 0xf))) != 0) {
+		return false;
+	}
 
-	if(!inputRemains && input >= __eol)
-	  return false;
+	if(!inputRemains && input >= this.__eol) {
+		return false;
+	}
 
-	inputRemains = (++input < __endOffset);
-	nextChar = (inputRemains ? __input[input] : __EOS);
+	inputRemains = (++input < this.__endOffset);
+	nextChar = (inputRemains ? this.__input[input] : __EOS);
 	break;
 
       case OpCode._ANYOFUN:
       case OpCode._NANYOFUN:
 	current = OpCode._getOperand(scan);
 
-	if(nextChar == __EOS && inputRemains)
-	  nextChar = __input[input];
+	if(nextChar == __EOS && inputRemains) {
+		nextChar = this.__input[input];
+	}
 
-	if(!__matchUnicodeClass(nextChar, __program, current, op))
-	  return false;
+	if(!__matchUnicodeClass(nextChar, this.__program, current, op)) {
+		return false;
+	}
 
-	if(!inputRemains && input >= __eol)
-	  return false;
+	if(!inputRemains && input >= this.__eol) {
+		return false;
+	}
 
-	inputRemains = (++input < __endOffset);
-	nextChar = (inputRemains ? __input[input] : __EOS);
+	inputRemains = (++input < this.__endOffset);
+	nextChar = (inputRemains ? this.__input[input] : __EOS);
 	break;
 
       case OpCode._ALNUM:
-	if(!inputRemains)
-	  return false;
-	if(!OpCode._isWordCharacter(nextChar))
-	  return false;
-	inputRemains = (++input < __endOffset);
-	nextChar = (inputRemains ? __input[input] : __EOS);
+	if(!inputRemains) {
+		return false;
+	}
+	if(!OpCode._isWordCharacter(nextChar)) {
+		return false;
+	}
+	inputRemains = (++input < this.__endOffset);
+	nextChar = (inputRemains ? this.__input[input] : __EOS);
 	break;
 
       case OpCode._NALNUM:
-	if(!inputRemains && input >= __eol)
-	  return false;
-	if(OpCode._isWordCharacter(nextChar))
-	  return false;
-	inputRemains = (++input < __endOffset);
-	nextChar = (inputRemains ? __input[input] : __EOS);
+	if(!inputRemains && input >= this.__eol) {
+		return false;
+	}
+	if(OpCode._isWordCharacter(nextChar)) {
+		return false;
+	}
+	inputRemains = (++input < this.__endOffset);
+	nextChar = (inputRemains ? this.__input[input] : __EOS);
 	break;
 
 
@@ -1011,79 +1123,94 @@ public final class Perl5Matcher implements PatternMatcher {
       case OpCode._BOUND:
 	boolean a, b;
 
-	if(input == __bol)
-	  a = OpCode._isWordCharacter(__previousChar);
-	else
-	  a = OpCode._isWordCharacter(__input[input - 1]);
+	if(input == this.__bol) {
+		a = OpCode._isWordCharacter(this.__previousChar);
+	} else {
+		a = OpCode._isWordCharacter(this.__input[input - 1]);
+	}
 
 	b = OpCode._isWordCharacter(nextChar);
 
-	if((a == b) == (__program[scan] == OpCode._BOUND))
-	  return false;
+	if((a == b) == (this.__program[scan] == OpCode._BOUND)) {
+		return false;
+	}
 	break;
 
       case OpCode._SPACE:
-	if(!inputRemains && input >= __eol)
-	  return false;
-	if(!Character.isWhitespace(nextChar))
-	  return false;
-	inputRemains = (++input < __endOffset);
-	nextChar = (inputRemains ? __input[input] : __EOS);
+	if(!inputRemains && input >= this.__eol) {
+		return false;
+	}
+	if(!Character.isWhitespace(nextChar)) {
+		return false;
+	}
+	inputRemains = (++input < this.__endOffset);
+	nextChar = (inputRemains ? this.__input[input] : __EOS);
 	break;
 
 
       case OpCode._NSPACE:
-	if(!inputRemains)
-	  return false;
-	if(Character.isWhitespace(nextChar))
-	  return false;
-	inputRemains = (++input < __endOffset);
-	nextChar = (inputRemains ? __input[input] : __EOS);
+	if(!inputRemains) {
+		return false;
+	}
+	if(Character.isWhitespace(nextChar)) {
+		return false;
+	}
+	inputRemains = (++input < this.__endOffset);
+	nextChar = (inputRemains ? this.__input[input] : __EOS);
 	break;
 
       case OpCode._DIGIT:
-	if(!Character.isDigit(nextChar))
-	  return false;
-	inputRemains = (++input < __endOffset);
-	nextChar = (inputRemains ? __input[input] : __EOS);
+	if(!Character.isDigit(nextChar)) {
+		return false;
+	}
+	inputRemains = (++input < this.__endOffset);
+	nextChar = (inputRemains ? this.__input[input] : __EOS);
 	break;
 
       case OpCode._NDIGIT:
-	if(!inputRemains && input >= __eol)
-	  return false;
-	if(Character.isDigit(nextChar))
-	  return false;
-	inputRemains = (++input < __endOffset);
-	nextChar = (inputRemains ? __input[input] : __EOS);
+	if(!inputRemains && input >= this.__eol) {
+		return false;
+	}
+	if(Character.isDigit(nextChar)) {
+		return false;
+	}
+	inputRemains = (++input < this.__endOffset);
+	nextChar = (inputRemains ? this.__input[input] : __EOS);
 	break;
 
       case OpCode._REF:
-	arg = OpCode._getArg1(__program, scan);
-	current = __beginMatchOffsets[arg];
+	arg = OpCode._getArg1(this.__program, scan);
+	current = this.__beginMatchOffsets[arg];
 
-	if(current == OpCode._NULL_OFFSET)
-	  return false;
+	if(current == OpCode._NULL_OFFSET) {
+		return false;
+	}
 
-	if(__endMatchOffsets[arg] == OpCode._NULL_OFFSET)
-	  return false;
+	if(this.__endMatchOffsets[arg] == OpCode._NULL_OFFSET) {
+		return false;
+	}
 
-	if(current == __endMatchOffsets[arg])
-	  break;
+	if(current == this.__endMatchOffsets[arg]) {
+		break;
+	}
 
-	if(__input[current] != nextChar)
-	  return false;
+	if(this.__input[current] != nextChar) {
+		return false;
+	}
 
-	line = __endMatchOffsets[arg] - current;
+	line = this.__endMatchOffsets[arg] - current;
 
-	if(input + line > __eol)
-	  return false;
+	if(input + line > this.__eol) {
+		return false;
+	}
 
-	if(line > 1 && !__compare(__input, current, __input, input, line))
-	  return false;
+	if(line > 1 && !__compare(this.__input, current, this.__input, input, line)) {
+		return false;
+	}
 
 	input+=line;
-	inputRemains = (input < __endOffset);
-	nextChar     = (inputRemains ? __input[input] : __EOS);
+	inputRemains = (input < this.__endOffset);
+	nextChar     = (inputRemains ? this.__input[input] : __EOS);
 	break;
 
       case OpCode._NOTHING:
@@ -1093,30 +1220,32 @@ public final class Perl5Matcher implements PatternMatcher {
 	break;
 
       case OpCode._OPEN:
-	arg = OpCode._getArg1(__program, scan);
-	__beginMatchOffsets[arg] = input;
+	arg = OpCode._getArg1(this.__program, scan);
+	this.__beginMatchOffsets[arg] = input;
 
-	if(arg > __expSize)
-	  __expSize = arg;
+	if(arg > this.__expSize) {
+		this.__expSize = arg;
+	}
 	break;
 
       case OpCode._CLOSE:
-	arg = OpCode._getArg1(__program, scan);
-	__endMatchOffsets[arg] = input;
+	arg = OpCode._getArg1(this.__program, scan);
+	this.__endMatchOffsets[arg] = input;
 
-	if(arg > __lastParen)
-	  __lastParen = arg;
+	if(arg > this.__lastParen) {
+		this.__lastParen = arg;
+	}
 	break;
 
       case OpCode._CURLYX:
 	rep = new Perl5Repetition();
-	rep._lastRepetition = __currentRep;
-	__currentRep = rep;
+	rep._lastRepetition = this.__currentRep;
+	this.__currentRep = rep;
 
-	rep._parenFloor = __lastParen;
+	rep._parenFloor = this.__lastParen;
 	rep._numInstances = -1;
-	rep._min    = OpCode._getArg1(__program, scan);
-	rep._max    = OpCode._getArg2(__program, scan);
+	rep._min    = OpCode._getArg1(this.__program, scan);
+	rep._max    = OpCode._getArg2(this.__program, scan);
 	rep._scan   = OpCode._getNextOperator(scan) + 2;
 	rep._next   = next;
 	rep._minMod = minMod;
@@ -1124,57 +1253,62 @@ public final class Perl5Matcher implements PatternMatcher {
 	// at the beginning of the input the OpCode._WHILEM case will
 	// not work right.
 	rep._lastLocation = -1;
-	__inputOffset = input;
+	this.__inputOffset = input;
 
 	// use minMod as temporary
 	minMod = __match(OpCode._getPrevOperator(next));
 
 	// leave scope call not pertinent?
-	__currentRep = rep._lastRepetition;
+	this.__currentRep = rep._lastRepetition;
 	return minMod;
 
       case OpCode._WHILEM:
-	rep = __currentRep;
+	rep = this.__currentRep;
 
 	arg = rep._numInstances + 1;
-	__inputOffset = input;
+	this.__inputOffset = input;
 
 	if(input == rep._lastLocation) {
-	  __currentRep = rep._lastRepetition;
-	  line = __currentRep._numInstances;
-	  if(__match(rep._next))
-	    return true;
-	  __currentRep._numInstances = line;
-	  __currentRep = rep;
+	  this.__currentRep = rep._lastRepetition;
+	  line = this.__currentRep._numInstances;
+	  if(__match(rep._next)) {
+		return true;
+	}
+	  this.__currentRep._numInstances = line;
+	  this.__currentRep = rep;
 	  return false;
 	}
 
 	if(arg < rep._min) {
 	  rep._numInstances = arg;
 	  rep._lastLocation = input;
-	  if(__match(rep._scan))
-	    return true;
+	  if(__match(rep._scan)) {
+		return true;
+	}
 	  rep._numInstances = arg - 1;
 	  return false;
 	}
 
 	if(rep._minMod) {
-	  __currentRep = rep._lastRepetition;
-	  line = __currentRep._numInstances;
-	  if(__match(rep._next))
-	    return true;
-	  __currentRep._numInstances = line;
-	  __currentRep = rep;
+	  this.__currentRep = rep._lastRepetition;
+	  line = this.__currentRep._numInstances;
+	  if(__match(rep._next)) {
+		return true;
+	}
+	  this.__currentRep._numInstances = line;
+	  this.__currentRep = rep;
 
-	  if(arg >= rep._max)
-	    return false;
+	  if(arg >= rep._max) {
+		return false;
+	}
 
-	  __inputOffset = input;
+	  this.__inputOffset = input;
 	  rep._numInstances = arg;
 	  rep._lastLocation = input;
 
-	  if(__match(rep._scan))
-	    return true;
+	  if(__match(rep._scan)) {
+		return true;
+	}
 
 	  rep._numInstances = arg - 1;
 	  return false;
@@ -1184,45 +1318,49 @@ public final class Perl5Matcher implements PatternMatcher {
 	  __pushState(rep._parenFloor);
 	  rep._numInstances = arg;
 	  rep._lastLocation = input;
-	  if(__match(rep._scan))
-	    return true;
+	  if(__match(rep._scan)) {
+		return true;
+	}
 	  __popState();
-	  __inputOffset = input;
+	  this.__inputOffset = input;
 	}
 
-	__currentRep = rep._lastRepetition;
-	line = __currentRep._numInstances;
-	if(__match(rep._next))
-	  return true;
+	this.__currentRep = rep._lastRepetition;
+	line = this.__currentRep._numInstances;
+	if(__match(rep._next)) {
+		return true;
+	}
 
 	rep._numInstances = line;
-	__currentRep = rep;
+	this.__currentRep = rep;
 	rep._numInstances = arg - 1;
 	return false;
 
       case OpCode._BRANCH:
-	if(__program[next] != OpCode._BRANCH)
-	  next = OpCode._getNextOperator(scan);
-	else {
+	if(this.__program[next] != OpCode._BRANCH) {
+		next = OpCode._getNextOperator(scan);
+	} else {
 	  int lastParen;
 
-	  lastParen = __lastParen;
+	  lastParen = this.__lastParen;
 
 	  do {
 
-	    __inputOffset = input;
+	    this.__inputOffset = input;
 
-	    if(__match(OpCode._getNextOperator(scan)))
-	      return true;
+	    if(__match(OpCode._getNextOperator(scan))) {
+			return true;
+		}
 
-	    for(arg = __lastParen; arg > lastParen; --arg)
-	      //__endMatchOffsets[arg] = 0;
-	      __endMatchOffsets[arg] = OpCode._NULL_OFFSET;
-	    __lastParen = arg;
+	    for(arg = this.__lastParen; arg > lastParen; --arg) {
+			//__endMatchOffsets[arg] = 0;
+			  this.__endMatchOffsets[arg] = OpCode._NULL_OFFSET;
+		}
+	    this.__lastParen = arg;
 
-	    scan = OpCode._getNext(__program, scan);
+	    scan = OpCode._getNext(this.__program, scan);
 	  } while(scan != OpCode._NULL_OFFSET &&
-		  __program[scan] == OpCode._BRANCH);
+		  this.__program[scan] == OpCode._BRANCH);
 	  return false;
 	}
 
@@ -1237,8 +1375,8 @@ public final class Perl5Matcher implements PatternMatcher {
       case OpCode._STAR:
       case OpCode._PLUS:
 	if(op == OpCode._CURLY) {
-	  line = OpCode._getArg1(__program, scan);
-	  arg  = OpCode._getArg2(__program, scan);
+	  line = OpCode._getArg1(this.__program, scan);
+	  arg  = OpCode._getArg2(this.__program, scan);
 	  scan = OpCode._getNextOperator(scan) + 2;
 	} else if(op == OpCode._STAR) {
 	  line = 0;
@@ -1250,20 +1388,21 @@ public final class Perl5Matcher implements PatternMatcher {
 	  scan = OpCode._getNextOperator(scan);
 	}
 
-	if(__program[next] == OpCode._EXACTLY) {
-	  nextChar = __program[OpCode._getOperand(next) + 1];
+	if(this.__program[next] == OpCode._EXACTLY) {
+	  nextChar = this.__program[OpCode._getOperand(next) + 1];
 	  current  = 0;
 	} else {
 	  nextChar = __EOS;
 	  current  = -1000;
 	}
-	__inputOffset = input;
+	this.__inputOffset = input;
 
 	if(minMod) {
 	  minMod = false;
 
-	  if(line > 0 && __repeat(scan, line) < line)
-	    return false;
+	  if(line > 0 && __repeat(scan, line) < line) {
+		return false;
+	}
 
 
 	  while(arg >= line || (arg == Character.MAX_VALUE && line > 0)) {
@@ -1271,42 +1410,46 @@ public final class Perl5Matcher implements PatternMatcher {
 	    // __inputOffset >= __endOffset, but it seems to be right for
 	    // now.  the issue is with __inputOffset being reset later.
 	    // is this test really supposed to happen here?
-	    if(current == -1000 || __inputOffset >= __endOffset ||
-	       __input[__inputOffset] == nextChar) {
-	      if(__match(next))
-		return true;
+	    if(current == -1000 || this.__inputOffset >= this.__endOffset ||
+	       this.__input[this.__inputOffset] == nextChar) {
+	      if(__match(next)) {
+			return true;
+		}
 	    }
 
-	    __inputOffset = input + line;
+	    this.__inputOffset = input + line;
 
 	    if(__repeat(scan, 1) != 0) {
 	      ++line;
-	      __inputOffset = input + line;
-	    } else
-	      return false;
+	      this.__inputOffset = input + line;
+	    } else {
+			return false;
+		}
 	  }
 
 	} else {
 	  arg = __repeat(scan, arg);
 
-	  if(line < arg && OpCode._opType[__program[next]] == OpCode._EOL &&
-	     ((!__multiline && __program[next] != OpCode._MEOL) ||
-              __program[next] == OpCode._SEOL))
-	    line = arg;
+	  if(line < arg && OpCode._opType[this.__program[next]] == OpCode._EOL &&
+	     ((!this.__multiline && this.__program[next] != OpCode._MEOL) ||
+              this.__program[next] == OpCode._SEOL)) {
+		line = arg;
+	}
 
 	  while(arg >= line) {
 	    // there may be a bug here with respect to
 	    // __inputOffset >= __endOffset, but it seems to be right for
 	    // now.  the issue is with __inputOffset being reset later.
 	    // is this test really supposed to happen here?
-	    if(current == -1000 || __inputOffset >= __endOffset ||
-	       __input[__inputOffset] == nextChar) {
-	      if(__match(next))
-		return true;
+	    if(current == -1000 || this.__inputOffset >= this.__endOffset ||
+	       this.__input[this.__inputOffset] == nextChar) {
+	      if(__match(next)) {
+			return true;
+		}
 	    }
 
 	    --arg;
-	    __inputOffset = input + arg;
+	    this.__inputOffset = input + arg;
 	  }
 	}
 
@@ -1314,25 +1457,28 @@ public final class Perl5Matcher implements PatternMatcher {
 
       case OpCode._SUCCEED:
       case OpCode._END:
-	__inputOffset = input;
+	this.__inputOffset = input;
 	// This enforces the rule that two consecutive matches cannot have
 	// the same end offset.
-	if(__inputOffset == __lastMatchInputEndOffset)
-	  return false;
+	if(this.__inputOffset == this.__lastMatchInputEndOffset) {
+		return false;
+	}
 	return true;
 
       case OpCode._IFMATCH:
-	__inputOffset = input;
+	this.__inputOffset = input;
 	scan = OpCode._getNextOperator(scan);
-	if(!__match(scan))
-	  return false;
+	if(!__match(scan)) {
+		return false;
+	}
 	break;
 
       case OpCode._UNLESSM:
-	__inputOffset = input;
+	this.__inputOffset = input;
 	scan = OpCode._getNextOperator(scan);
-	if(__match(scan))
-	  return false;
+	if(__match(scan)) {
+		return false;
+	}
 	break;
 
 
@@ -1351,36 +1497,7 @@ public final class Perl5Matcher implements PatternMatcher {
   }
 
 
-  /**
-   * Set whether or not subsequent calls to {@link #matches matches()}
-   * or {@link #contains contains()} should treat the input as
-   * consisting of multiple lines.  The default behavior is for 
-   * input to be treated as consisting of multiple lines.  This method
-   * should only be called if the Perl5Pattern used for a match was
-   * compiled without either of the Perl5Compiler.MULTILINE_MASK or
-   * Perl5Compiler.SINGLELINE_MASK flags, and you want to alter the
-   * behavior of how the <b>^</b>, <b>$</b>, and <b>.</b> metacharacters are
-   * interpreted on the fly.  The compilation options used when compiling
-   * a pattern ALWAYS override the behavior specified by setMultiline().  See
-   * {@link Perl5Compiler} for more details.
-   * <p>
-   * @param multiline  If set to true treats the input as consisting of
-   *        multiple lines with respect to the <b>^</b> and <b>$</b> 
-   *        metacharacters.  If set to false treats the input as consisting
-   *        of a single line with respect to the <b>^</b> and <b>$</b> 
-   *        metacharacters.
-   */
-  public void setMultiline(boolean multiline) { __multiline = multiline; }
-
-
-  /**
-   * @return True if the matcher is treating input as consisting of multiple
-   *         lines with respect to the <b>^</b> and <b>$</b> metacharacters,
-   *         false otherwise.
-   */
-  public boolean isMultiline() { return __multiline; }
-
-  char[] _toLower(char[] input) {
+  static char[] _toLower(char[] input) {
     int current;
     char[] inp;
     // todo:
@@ -1394,9 +1511,11 @@ public final class Perl5Matcher implements PatternMatcher {
     input = inp;
 
     // todo: Need to inline toLowerCase()
-    for(current = 0; current < input.length; current++)
-      if(Character.isUpperCase(input[current]))
-	input[current] = Character.toLowerCase(input[current]);
+    for(current = 0; current < input.length; current++) {
+		if(Character.isUpperCase(input[current])) {
+			input[current] = Character.toLowerCase(input[current]);
+		}
+	}
 
     return input;
   }
@@ -1417,20 +1536,21 @@ public final class Perl5Matcher implements PatternMatcher {
    * @param offset The offset at which to start searching for the prefix.
    * @return True if input matches pattern, false otherwise.
    */
-  public boolean matchesPrefix(char[] input, Pattern pattern, int offset) {
+  public boolean matchesPrefix(char[] input, final Pattern pattern, final int offset) {
     Perl5Pattern expression;
 
     expression = (Perl5Pattern)pattern;
-    __originalInput = input;
-    if(expression._isCaseInsensitive)
-      input = _toLower(input);
+    this.__originalInput = input;
+    if(expression._isCaseInsensitive) {
+		input = _toLower(input);
+	}
 
     __initInterpreterGlobals(expression, input, 0, input.length, offset);
 
-    __lastSuccess = __tryExpression(offset);
-    __lastMatchResult = null;
+    this.__lastSuccess = __tryExpression(offset);
+    this.__lastMatchResult = null;
 
-    return __lastSuccess;
+    return this.__lastSuccess;
   }
 
 
@@ -1448,7 +1568,7 @@ public final class Perl5Matcher implements PatternMatcher {
    * @param pattern  The Pattern to be matched.
    * @return True if input matches pattern, false otherwise.
    */
-  public boolean matchesPrefix(char[] input, Pattern pattern) {
+  public boolean matchesPrefix(final char[] input, final Pattern pattern) {
     return matchesPrefix(input, pattern, 0);
   }
 
@@ -1466,7 +1586,7 @@ public final class Perl5Matcher implements PatternMatcher {
    * @param pattern  The Pattern to be matched.
    * @return True if input matches pattern, false otherwise.
    */
-  public boolean matchesPrefix(String input, Pattern pattern) {
+  public boolean matchesPrefix(final String input, final Pattern pattern) {
     return matchesPrefix(input.toCharArray(), pattern, 0);
   }
 
@@ -1489,32 +1609,34 @@ public final class Perl5Matcher implements PatternMatcher {
    * @param pattern  The Pattern to be matched.
    * @return True if input matches pattern, false otherwise.
    */
-  public boolean matchesPrefix(PatternMatcherInput input, Pattern pattern) {
+  public boolean matchesPrefix(final PatternMatcherInput input, final Pattern pattern) {
     char[] inp;
     Perl5Pattern expression;
 
     expression = (Perl5Pattern)pattern;
 
-    __originalInput = input._originalBuffer;
+    this.__originalInput = input._originalBuffer;
     if(expression._isCaseInsensitive) {
-      if(input._toLowerBuffer == null)
-	input._toLowerBuffer = _toLower(__originalInput);
+      if(input._toLowerBuffer == null) {
+		input._toLowerBuffer = _toLower(this.__originalInput);
+	}
       inp = input._toLowerBuffer;
-    } else
-      inp = __originalInput;
+    } else {
+		inp = this.__originalInput;
+	}
 
     __initInterpreterGlobals(expression, inp, input._beginOffset,
 			     input._endOffset, input._currentOffset);
-    __lastSuccess = __tryExpression(input._currentOffset);
-    __lastMatchResult = null;
+    this.__lastSuccess = __tryExpression(input._currentOffset);
+    this.__lastMatchResult = null;
 
-    return __lastSuccess;
+    return this.__lastSuccess;
   }
 
 
 
   /**
-   * Determines if a string (represented as a char[]) exactly 
+   * Determines if a string (represented as a char[]) exactly
    * matches a given pattern.  If
    * there is an exact match, a MatchResult instance
    * representing the match is made accesible via
@@ -1551,20 +1673,21 @@ public final class Perl5Matcher implements PatternMatcher {
    * @exception ClassCastException If a Pattern instance other than a
    *         Perl5Pattern is passed as the pattern parameter.
    */
-  public boolean matches(char[] input, Pattern pattern) {
+  public boolean matches(char[] input, final Pattern pattern) {
     Perl5Pattern expression;
 
     expression = (Perl5Pattern)pattern;
-    __originalInput = input;
-    if(expression._isCaseInsensitive)
-      input = _toLower(input);
+    this.__originalInput = input;
+    if(expression._isCaseInsensitive) {
+		input = _toLower(input);
+	}
 
     __initInterpreterGlobals(expression, input, 0, input.length, 0);
-    __lastSuccess = (__tryExpression(0) &&
-		     __endMatchOffsets[0] == input.length);
-    __lastMatchResult = null;
+    this.__lastSuccess = (__tryExpression(0) &&
+		     this.__endMatchOffsets[0] == input.length);
+    this.__lastMatchResult = null;
 
-    return __lastSuccess;
+    return this.__lastSuccess;
   }
 
 
@@ -1605,7 +1728,7 @@ public final class Perl5Matcher implements PatternMatcher {
    * @exception ClassCastException If a Pattern instance other than a
    *         Perl5Pattern is passed as the pattern parameter.
    */
-  public boolean matches(String input, Pattern pattern) {
+  public boolean matches(final String input, final Pattern pattern) {
     return matches(input.toCharArray(), pattern);
   }
 
@@ -1623,7 +1746,7 @@ public final class Perl5Matcher implements PatternMatcher {
    * will be tested for an exact match.
    * <p>
    * The pattern must be a Perl5Pattern instance, otherwise a
-   * ClassCastException will be thrown.  You are not required to, and 
+   * ClassCastException will be thrown.  You are not required to, and
    * indeed should NOT try to (for performance reasons), catch a
    * ClassCastException because it will never be thrown as long as you use
    * a Perl5Pattern as the pattern parameter.
@@ -1654,34 +1777,36 @@ public final class Perl5Matcher implements PatternMatcher {
    * @exception ClassCastException If a Pattern instance other than a
    *         Perl5Pattern is passed as the pattern parameter.
    */
-  public boolean matches(PatternMatcherInput input, Pattern pattern) {
+  public boolean matches(final PatternMatcherInput input, final Pattern pattern) {
     char[] inp;
     Perl5Pattern expression;
 
     expression = (Perl5Pattern)pattern;
 
-    __originalInput = input._originalBuffer;
+    this.__originalInput = input._originalBuffer;
     if(expression._isCaseInsensitive) {
-      if(input._toLowerBuffer == null)
-	input._toLowerBuffer = _toLower(__originalInput);
+      if(input._toLowerBuffer == null) {
+		input._toLowerBuffer = _toLower(this.__originalInput);
+	}
       inp = input._toLowerBuffer;
-    } else
-      inp = __originalInput;
+    } else {
+		inp = this.__originalInput;
+	}
 
     __initInterpreterGlobals(expression, inp, input._beginOffset,
 			     input._endOffset, input._beginOffset);
 
-    __lastMatchResult = null;
+    this.__lastMatchResult = null;
 
     if(__tryExpression(input._beginOffset)) {
-      if(__endMatchOffsets[0] == input._endOffset ||
+      if(this.__endMatchOffsets[0] == input._endOffset ||
 	 input.length() == 0 || input._beginOffset == input._endOffset) {
-	__lastSuccess = true;
+	this.__lastSuccess = true;
 	return true;
       }
     }
 
-    __lastSuccess = false;
+    this.__lastSuccess = false;
 
     return false;
   }
@@ -1691,16 +1816,16 @@ public final class Perl5Matcher implements PatternMatcher {
   /**
    * Determines if a string contains a pattern.  If the pattern is
    * matched by some substring of the input, a MatchResult instance
-   * representing the <b> first </b> such match is made acessible via 
+   * representing the <b> first </b> such match is made acessible via
    * {@link #getMatch()}.  If you want to access
    * subsequent matches you should either use a PatternMatcherInput object
    * or use the offset information in the MatchResult to create a substring
-   * representing the remaining input.  Using the MatchResult offset 
+   * representing the remaining input.  Using the MatchResult offset
    * information is the recommended method of obtaining the parts of the
    * string preceeding the match and following the match.
    * <p>
    * The pattern must be a Perl5Pattern instance, otherwise a
-   * ClassCastException will be thrown.  You are not required to, and 
+   * ClassCastException will be thrown.  You are not required to, and
    * indeed should NOT try to (for performance reasons), catch a
    * ClassCastException because it will never be thrown as long as you use
    * a Perl5Pattern as the pattern parameter.
@@ -1711,7 +1836,7 @@ public final class Perl5Matcher implements PatternMatcher {
    * @exception ClassCastException If a Pattern instance other than a
    *         Perl5Pattern is passed as the pattern parameter.
    */
-  public boolean contains(String input, Pattern pattern) {
+  public boolean contains(final String input, final Pattern pattern) {
     return contains(input.toCharArray(), pattern);
   }
 
@@ -1720,16 +1845,16 @@ public final class Perl5Matcher implements PatternMatcher {
    * Determines if a string (represented as a char[]) contains a pattern.
    * If the pattern is
    * matched by some substring of the input, a MatchResult instance
-   * representing the <b> first </b> such match is made acessible via 
+   * representing the <b> first </b> such match is made acessible via
    * {@link #getMatch()}.  If you want to access
    * subsequent matches you should either use a PatternMatcherInput object
    * or use the offset information in the MatchResult to create a substring
-   * representing the remaining input.  Using the MatchResult offset 
+   * representing the remaining input.  Using the MatchResult offset
    * information is the recommended method of obtaining the parts of the
    * string preceeding the match and following the match.
    * <p>
    * The pattern must be a Perl5Pattern instance, otherwise a
-   * ClassCastException will be thrown.  You are not required to, and 
+   * ClassCastException will be thrown.  You are not required to, and
    * indeed should NOT try to (for performance reasons), catch a
    * ClassCastException because it will never be thrown as long as you use
    * a Perl5Pattern as the pattern parameter.
@@ -1740,15 +1865,16 @@ public final class Perl5Matcher implements PatternMatcher {
    * @exception ClassCastException If a Pattern instance other than a
    *         Perl5Pattern is passed as the pattern parameter.
    */
-  public boolean contains(char[] input, Pattern pattern) {
+  public boolean contains(char[] input, final Pattern pattern) {
     Perl5Pattern expression;
 
     expression = (Perl5Pattern)pattern;
 
-    __originalInput = input;
+    this.__originalInput = input;
 
-    if(expression._isCaseInsensitive)
-      input = _toLower(input);
+    if(expression._isCaseInsensitive) {
+		input = _toLower(input);
+	}
 
     return __interpret(expression, input, 0, input.length, 0);
   }
@@ -1760,7 +1886,7 @@ public final class Perl5Matcher implements PatternMatcher {
    * Determines if the contents of a PatternMatcherInput, starting from the
    * current offset of the input contains a pattern.
    * If a pattern match is found, a MatchResult
-   * instance representing the <b>first</b> such match is made acessible via 
+   * instance representing the <b>first</b> such match is made acessible via
    * {@link #getMatch()}.  The current offset of the
    * PatternMatcherInput is set to the offset corresponding to the end
    * of the match, so that a subsequent call to this method will continue
@@ -1779,7 +1905,7 @@ public final class Perl5Matcher implements PatternMatcher {
    * method for more details.
    * <p>
    * The pattern must be a Perl5Pattern instance, otherwise a
-   * ClassCastException will be thrown.  You are not required to, and 
+   * ClassCastException will be thrown.  You are not required to, and
    * indeed should NOT try to (for performance reasons), catch a
    * ClassCastException because it will never be thrown as long as you use
    * a Perl5Pattern as the pattern parameter.
@@ -1806,7 +1932,7 @@ public final class Perl5Matcher implements PatternMatcher {
    * input   = new PatternMatcherInput(someStringInput);
    *
    * while(matcher.contains(input, pattern)) {
-   *   result = matcher.getMatch();  
+   *   result = matcher.getMatch();
    *   // Perform whatever processing on the result you want.
    * }
    *
@@ -1818,7 +1944,7 @@ public final class Perl5Matcher implements PatternMatcher {
    * @exception ClassCastException If a Pattern instance other than a
    *         Perl5Pattern is passed as the pattern parameter.
    */
-  public boolean contains(PatternMatcherInput input, Pattern pattern) {
+  public boolean contains(final PatternMatcherInput input, final Pattern pattern) {
     char[] inp;
     Perl5Pattern expression;
     boolean matchFound;
@@ -1828,44 +1954,47 @@ public final class Perl5Matcher implements PatternMatcher {
     // We want to allow a null string to match at the end of the input
     // which is why we don't check endOfInput.  Not sure if this is a
     // safe thing to do or not.
-    if(input._currentOffset > input._endOffset)
-      return false;
+    if(input._currentOffset > input._endOffset) {
+		return false;
+	}
     //}
-    /* else 
+    /* else
       if(input._endOfInput())
 	return false;
 	*/
     expression = (Perl5Pattern)pattern;
-    __originalInput = input._originalBuffer;
+    this.__originalInput = input._originalBuffer;
 
     // Todo:
     // Really should only reduce to lowercase that part of the
     // input that is necessary, instead of the whole thing.
     // Adjust MatchResult offsets accordingly.  Actually, pass an adjustment
     // value to __interpret.
-    __originalInput = input._originalBuffer;
+    this.__originalInput = input._originalBuffer;
     if(expression._isCaseInsensitive) {
-      if(input._toLowerBuffer == null)
-	input._toLowerBuffer = _toLower(__originalInput);
+      if(input._toLowerBuffer == null) {
+		input._toLowerBuffer = _toLower(this.__originalInput);
+	}
       inp = input._toLowerBuffer;
-    } else
-      inp = __originalInput;
+    } else {
+		inp = this.__originalInput;
+	}
 
-    __lastMatchInputEndOffset = input.getMatchEndOffset();
+    this.__lastMatchInputEndOffset = input.getMatchEndOffset();
 
     matchFound =
       __interpret(expression, inp, input._beginOffset, input._endOffset,
 		  input._currentOffset);
 
     if(matchFound) {
-      input.setCurrentOffset(__endMatchOffsets[0]);
-      input.setMatchOffsets(__beginMatchOffsets[0], __endMatchOffsets[0]);
+      input.setCurrentOffset(this.__endMatchOffsets[0]);
+      input.setMatchOffsets(this.__beginMatchOffsets[0], this.__endMatchOffsets[0]);
     } else {
       input.setCurrentOffset(input._endOffset + 1);
     }
 
     // Restore so it doesn't interfere with other unrelated matches.
-    __lastMatchInputEndOffset = __DEFAULT_LAST_MATCH_END_OFFSET;
+    this.__lastMatchInputEndOffset = __DEFAULT_LAST_MATCH_END_OFFSET;
 
     return matchFound;
   }
@@ -1884,16 +2013,18 @@ public final class Perl5Matcher implements PatternMatcher {
    * @return A MatchResult instance containing the pattern match found
    *         by the last call to any one of the matches() or contains()
    *         methods.  If no match was found by the last call, returns
-   *         null. 
+   *         null.
    */
-  public MatchResult getMatch() { 
-    if(!__lastSuccess)
-      return null;
+  public MatchResult getMatch() {
+    if(!this.__lastSuccess) {
+		return null;
+	}
 
-    if(__lastMatchResult == null)
-      __setLastMatchResult();
+    if(this.__lastMatchResult == null) {
+		__setLastMatchResult();
+	}
 
-    return __lastMatchResult;
+    return this.__lastMatchResult;
   }
 
 }

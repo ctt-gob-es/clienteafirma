@@ -26,13 +26,13 @@
  *    Alternately, this acknowledgment may appear in the software itself,
  *    if and wherever such third-party acknowledgments normally appear.
  *
- * 4. The names "Apache" and "Apache Software Foundation", "Jakarta-Oro" 
+ * 4. The names "Apache" and "Apache Software Foundation", "Jakarta-Oro"
  *    must not be used to endorse or promote products derived from this
  *    software without prior written permission. For written
  *    permission, please contact apache@apache.org.
  *
- * 5. Products derived from this software may not be called "Apache" 
- *    or "Jakarta-Oro", nor may "Apache" or "Jakarta-Oro" appear in their 
+ * 5. Products derived from this software may not be called "Apache"
+ *    or "Jakarta-Oro", nor may "Apache" or "Jakarta-Oro" appear in their
  *    name, without prior written permission of the Apache Software Foundation.
  *
  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
@@ -58,11 +58,15 @@
 
 package org.apache.oro.text.perl;
 
-import java.util.*;
-
-import org.apache.oro.text.*;
-import org.apache.oro.text.regex.*;
-import org.apache.oro.util.*;
+import org.apache.oro.text.PatternCache;
+import org.apache.oro.text.PatternCacheLRU;
+import org.apache.oro.text.regex.MalformedPatternException;
+import org.apache.oro.text.regex.MatchResult;
+import org.apache.oro.text.regex.Pattern;
+import org.apache.oro.text.regex.Perl5Compiler;
+import org.apache.oro.text.regex.Perl5Matcher;
+import org.apache.oro.util.Cache;
+import org.apache.oro.util.CacheLRU;
 
 /**
  * This is a utility class implementing the 3 most common Perl5 operations
@@ -77,7 +81,7 @@ import org.apache.oro.util.*;
  *  <p>
  * The objective of the class is to minimize the amount of code a Java
  * programmer using Jakarta-ORO
- * has to write to achieve the same results as Perl by 
+ * has to write to achieve the same results as Perl by
  * transparently handling regular expression compilation, caching, and
  * matching.  A second objective is to use the same Perl pattern matching
  * syntax to ease the task of Perl programmers transitioning to Java
@@ -108,7 +112,7 @@ import org.apache.oro.util.*;
  * String line;
  * DataInputStream input;
  * PrintStream output;
- * 
+ *
  * // Initialization of input and output omitted
  * while((line = input.readLine()) != null) {
  *     // First find the line with the string we want to substitute because
@@ -143,7 +147,7 @@ import org.apache.oro.util.*;
  * and MUST be handled by catching MalformedPerl5PatternException for your
  * programs to be robust.
  * <p>
- * Finally, as a convenience Perl5Util implements 
+ * Finally, as a convenience Perl5Util implements
  * the {@link org.apache.oro.text.regex.MatchResult MatchResult} interface.
  * The methods are merely wrappers which call the corresponding method of
  * the last {@link org.apache.oro.text.regex.MatchResult MatchResult}
@@ -169,52 +173,25 @@ import org.apache.oro.util.*;
  */
 public final class Perl5Util implements MatchResult {
   /** The regular expression to use to parse match expression. */
-  private static final String __matchExpression = "m?(\\W)(.*)\\1([imsx]*)";
+  private static final String __matchExpression = "m?(\\W)(.*)\\1([imsx]*)"; //$NON-NLS-1$
 
   /** The pattern cache to compile and store patterns */
-  private PatternCache __patternCache;
+  private final PatternCache __patternCache;
   /** The hashtable to cache higher-level expressions */
-  private Cache __expressionCache;
+  private final Cache __expressionCache;
   /** The pattern matcher to perform matching operations. */
-  private Perl5Matcher __matcher;
+  private final Perl5Matcher __matcher;
   /** The compiled match expression parsing regular expression. */
   private Pattern __matchPattern;
   /** The last match from a successful call to a matching method. */
   private MatchResult __lastMatch;
-  /**
-   * A container for temporarily holding the results of a split before
-   * deleting trailing empty fields.
-   */
-  private ArrayList __splitList;
-
-  /**
-   * Keeps track of the original input (for postMatch() and preMatch())
-   * methods.  This will be discarded if the preMatch() and postMatch()
-   * methods are moved into the MatchResult interface.
-   */
-  private Object __originalInput;
-
-  /**
-   * Keeps track of the begin and end offsets of the original input for
-   * the postMatch() and preMatch() methods.
-   */
-  private int __inputBeginOffset, __inputEndOffset;
-
-  /** Used for default return value of post and pre Match() */
-  private static final String __nullString = "";
-
-  /**
-   * A constant passed to the {@link #split split()} methods indicating
-   * that all occurrences of a pattern should be used to split a string. 
-   */
-  public static final int SPLIT_ALL = Util.SPLIT_ALL;
 
   /**
    * A secondary constructor for Perl5Util.  It initializes the Perl5Matcher
    * used by the class to perform matching operations, but requires the
    * programmer to provide a PatternCache instance for the class
    * to use to compile and store regular expressions.  You would want to
-   * use this constructor if you want to change the capacity or policy 
+   * use this constructor if you want to change the capacity or policy
    * of the cache used.  Example uses might be:
    * <pre>
    * // We know we're going to use close to 50 expressions a whole lot, so
@@ -228,11 +205,10 @@ public final class Perl5Util implements MatchResult {
    * util = new Perl5Util(new PatternCacheFIFO2(10));
    * </pre>
    */
-  public Perl5Util(PatternCache cache) {
-    __splitList    = new ArrayList();
-    __matcher      = new Perl5Matcher();
-    __patternCache = cache;
-    __expressionCache = new CacheLRU(cache.capacity());
+  public Perl5Util(final PatternCache cache) {
+    this.__matcher      = new Perl5Matcher();
+    this.__patternCache = cache;
+    this.__expressionCache = new CacheLRU(cache.capacity());
     __compilePatterns();
   }
 
@@ -240,7 +216,7 @@ public final class Perl5Util implements MatchResult {
    * Default constructor for Perl5Util.  This initializes the Perl5Matcher
    * used by the class to perform matching operations and creates a
    * default PatternCacheLRU instance to use to compile and cache regular
-   * expressions.  The size of this cache is 
+   * expressions.  The size of this cache is
    * GenericPatternCache.DEFAULT_CAPACITY.
    */
   public Perl5Util() {
@@ -252,12 +228,12 @@ public final class Perl5Util implements MatchResult {
    * parse Perl5 expressions.  Right now it initializes __matchPattern.
    */
   private void __compilePatterns() {
-    Perl5Compiler compiler = new Perl5Compiler();
+    final Perl5Compiler compiler = new Perl5Compiler();
 
     try {
-      __matchPattern = 
+      this.__matchPattern =
 	compiler.compile(__matchExpression, Perl5Compiler.SINGLELINE_MASK);
-    } catch(MalformedPatternException e) {
+    } catch(final MalformedPatternException e) {
       // This should only happen during debugging.
       //e.printStackTrace();
       throw new RuntimeException(e.getMessage());
@@ -275,8 +251,8 @@ public final class Perl5Util implements MatchResult {
    * @exception MalformedPerl5PatternException If there is an error parsing
    *            the expression.
    */
-  private Pattern __parseMatchExpression(String pattern)
-       throws MalformedPerl5PatternException 
+  private Pattern __parseMatchExpression(final String pattern)
+       throws MalformedPerl5PatternException
   {
     int index, compileOptions;
     String options, regex;
@@ -284,24 +260,26 @@ public final class Perl5Util implements MatchResult {
     Object obj;
     Pattern ret;
 
-    obj = __expressionCache.getElement(pattern);
+    obj = this.__expressionCache.getElement(pattern);
 
-    // Must catch ClassCastException because someone might incorrectly 
+    // Must catch ClassCastException because someone might incorrectly
     // pass an s/// expression.  try block is cheaper than checking
     // instanceof
     try {
-      if(obj != null)
-	return (Pattern)obj;
-    } catch(ClassCastException e) {
+      if(obj != null) {
+		return (Pattern)obj;
+	}
+    } catch(final ClassCastException e) {
       // Fall through and parse expression
     }
 
-    if(!__matcher.matches(pattern, __matchPattern))
-      throw new
-	MalformedPerl5PatternException("Invalid expression: " +
-				       pattern);
+    if(!this.__matcher.matches(pattern, this.__matchPattern)) {
+		throw new
+		MalformedPerl5PatternException("Invalid expression: " + //$NON-NLS-1$
+					       pattern);
+	}
 
-    result = __matcher.getMatch();
+    result = this.__matcher.getMatch();
 
     regex = result.group(2);
     compileOptions = Perl5Compiler.DEFAULT_MASK;
@@ -321,13 +299,13 @@ public final class Perl5Util implements MatchResult {
 	case 'x' : compileOptions |= Perl5Compiler.EXTENDED_MASK; break;
 	default  :
 	  throw new
-	    MalformedPerl5PatternException("Invalid options: " + options);
+	    MalformedPerl5PatternException("Invalid options: " + options); //$NON-NLS-1$
 	}
       }
     }
 
-    ret = __patternCache.getPattern(regex, compileOptions);
-    __expressionCache.addElement(pattern, ret);
+    ret = this.__patternCache.getPattern(regex, compileOptions);
+    this.__expressionCache.addElement(pattern, ret);
 
     return ret;
   }
@@ -340,7 +318,7 @@ public final class Perl5Util implements MatchResult {
    * </pre></blockquote>
    * The <code>m</code> prefix is optional and the meaning of the optional
    * trailing options are:
-   * <dl compact> 
+   * <dl compact>
    * <dt> i <dd> case insensitive match
    * <dt> m <dd> treat the input as consisting of multiple lines
    * <dt> s <dd> treat the input as consisting of a single line
@@ -363,19 +341,16 @@ public final class Perl5Util implements MatchResult {
    *            the pattern.  You are not forced to catch this exception
    *            because it is derived from RuntimeException.
    */
-  public synchronized boolean match(String pattern, char[] input) 
+  public synchronized boolean match(final String pattern, final char[] input)
        throws MalformedPerl5PatternException
   {
     boolean result;
     __parseMatchExpression(pattern);
 
-    result = __matcher.contains(input, __parseMatchExpression(pattern));
-			 
+    result = this.__matcher.contains(input, __parseMatchExpression(pattern));
+
     if(result) {
-      __lastMatch        = __matcher.getMatch();
-      __originalInput    = input;
-      __inputBeginOffset = 0;
-      __inputEndOffset   = input.length;
+      this.__lastMatch        = this.__matcher.getMatch();
     }
 
     return result;
@@ -390,7 +365,7 @@ public final class Perl5Util implements MatchResult {
    * </pre></blockquote>
    * The <code>m</code> prefix is optional and the meaning of the optional
    * trailing options are:
-   * <dl compact> 
+   * <dl compact>
    * <dt> i <dd> case insensitive match
    * <dt> m <dd> treat the input as consisting of multiple lines
    * <dt> s <dd> treat the input as consisting of a single line
@@ -414,66 +389,10 @@ public final class Perl5Util implements MatchResult {
    *            the pattern.  You are not forced to catch this exception
    *            because it is derived from RuntimeException.
    */
-  public synchronized boolean match(String pattern, String input)
+  public synchronized boolean match(final String pattern, final String input)
        throws MalformedPerl5PatternException
   {
     return match(pattern, input.toCharArray());
-  }
-
-
-  /**
-   * Searches for the next pattern match somewhere in a
-   * org.apache.oro.text.regex.PatternMatcherInput instance, taking
-   * a pattern specified in Perl5 native format:
-   * <blockquote><pre>
-   * [m]/pattern/[i][m][s][x]
-   * </pre></blockquote>
-   * The <code>m</code> prefix is optional and the meaning of the optional
-   * trailing options are:
-   * <dl compact> 
-   * <dt> i <dd> case insensitive match
-   * <dt> m <dd> treat the input as consisting of multiple lines
-   * <dt> s <dd> treat the input as consisting of a single line
-   * <dt> x <dd> enable extended expression syntax incorporating whitespace
-   *             and comments
-   * </dl>
-   * As with Perl, any non-alphanumeric character can be used in lieu of
-   * the slashes.
-   * <p>
-   * If the input contains the pattern, the
-   * {@link org.apache.oro.text.regex.MatchResult MatchResult}
-   * can be obtained by calling {@link #getMatch()}.
-   * However, Perl5Util implements the MatchResult interface as a wrapper
-   * around the last MatchResult found, so you can call its methods to
-   * access match information.
-   * After the call to this method, the PatternMatcherInput current offset
-   * is advanced to the end of the match, so you can use it to repeatedly
-   * search for expressions in the entire input using a while loop as
-   * explained in the {@link org.apache.oro.text.regex.PatternMatcherInput
-   * PatternMatcherInput} documentation.
-   * <p>
-   * @param pattern  The pattern to search for.
-   * @param input    The PatternMatcherInput to search.
-   * @return True if the input contains the pattern, false otherwise.
-   * @exception MalformedPerl5PatternException  If there is an error in
-   *            the pattern.  You are not forced to catch this exception
-   *            because it is derived from RuntimeException.
-   */
-  public synchronized boolean match(String pattern, PatternMatcherInput input)
-       throws MalformedPerl5PatternException
-  {
-    boolean result;
-
-    result = __matcher.contains(input, __parseMatchExpression(pattern));
-
-    if(result) {
-      __lastMatch     = __matcher.getMatch();
-      __originalInput = input.getInput();
-      __inputBeginOffset = input.getBeginOffset();
-      __inputEndOffset   = input.getEndOffset();
-    }
-
-    return result;
   }
 
 
@@ -489,502 +408,7 @@ public final class Perl5Util implements MatchResult {
    *         last match found.
    */
   public synchronized MatchResult getMatch() {
-    return __lastMatch;
-  }
-
-
-  /**
-   * Substitutes a pattern in a given input with a replacement string.
-   * The substitution expression is specified in Perl5 native format:
-   * <blockquote><pre>
-   * s/pattern/replacement/[g][i][m][o][s][x]
-   * </pre></blockquote>
-   * The <code>s</code> prefix is mandatory and the meaning of the optional
-   * trailing options are:
-   * <dl compact> 
-   * <dt> g <dd> Substitute all occurrences of pattern with replacement.
-   *             The default is to replace only the first occurrence.
-   * <dt> i <dd> perform a case insensitive match
-   * <dt> m <dd> treat the input as consisting of multiple lines
-   * <dt> o <dd> If variable interopolation is used, only evaluate the
-   *             interpolation once (the first time).  This is equivalent
-   *             to using a numInterpolations argument of 1 in
-   * {@link org.apache.oro.text.regex.Util#substitute Util.substitute()}.
-   *             The default is to compute each interpolation independently.
-   *             See
-   * {@link org.apache.oro.text.regex.Util#substitute Util.substitute()}
-   * and {@link org.apache.oro.text.regex.Perl5Substitution Perl5Substitution}
-   *             for more details on variable interpolation in
-   *             substitutions.
-   * <dt> s <dd> treat the input as consisting of a single line
-   * <dt> x <dd> enable extended expression syntax incorporating whitespace
-   *             and comments
-   * </dl>
-   * As with Perl, any non-alphanumeric character can be used in lieu of
-   * the slashes.  This is helpful to avoid backslashing.  For example,
-   * using slashes you would have to do:
-   * <blockquote><pre>
-   * numSubs = util.substitute(result, "s/foo\\/bar/goo\\/\\/baz/", input);
-   * </pre></blockquote>
-   * when you could more easily write:
-   * <blockquote><pre>
-   * numSubs = util.substitute(result, "s#foo/bar#goo//baz#", input);
-   * </pre></blockquote>
-   * where the hashmarks are used instead of slashes.
-   * <p>
-   * There is a special case of backslashing that you need to pay attention
-   * to.  As demonstrated above, to denote a delimiter in the substituted
-   * string it must be backslashed.  However, this can be a problem
-   * when you want to denote a backslash at the end of the substituted
-   * string.  As of PerlTools 1.3, a new means of handling this
-   * situation has been implemented.
-   * In previous versions, the behavior was that
-   * <blockquote>
-   * "... a double backslash (quadrupled in the Java String) always
-   * represents two backslashes unless the second backslash is followed
-   * by the delimiter, in which case it represents a single backslash."
-   * </blockquote>
-   * <p>
-   * The new behavior is that a backslash is always a backslash
-   * in the substitution portion of the expression unless it is used to
-   * escape a delimiter.  A backslash is considered to escape a delimiter
-   * if an even number of contiguous backslashes preceed the backslash
-   * and the delimiter following the backslash is not the FINAL delimiter
-   * in the expression.  Therefore, backslashes preceding final delimiters
-   * are never considered to escape the delimiter.  The following, which
-   * used to be an invalid expression and require a special-case extra
-   * backslash, will now replace all instances of / with \:
-   * <blockquote><pre>
-   * numSubs = util.substitute(result, "s#/#\\#g", input);
-   * </pre></blockquote>
-   * <p>
-   * @param result     The StringBuffer in which to store the result of the
-   *                   substitutions. The buffer is only appended to.
-   * @param expression The Perl5 substitution regular expression.
-   * @param input      The input on which to perform substitutions.
-   * @return The number of substitutions made.
-   * @exception MalformedPerl5PatternException  If there is an error in
-   *            the expression.  You are not forced to catch this exception
-   *            because it is derived from RuntimeException.
-   * @since 2.0.6
-   */
-  // Expression parsing will have to be moved into a separate method if
-  // there are going to be variations of this method.
-  public synchronized int substitute(StringBuffer result, String expression,
-				     String input)
-       throws MalformedPerl5PatternException 
-  {
-    boolean backslash, finalDelimiter;
-    int index, compileOptions, numSubstitutions, numInterpolations;
-    int firstOffset, secondOffset, thirdOffset, subCount;
-    StringBuffer replacement;
-    Pattern compiledPattern;
-    char exp[], delimiter;
-    ParsedSubstitutionEntry entry;
-    Perl5Substitution substitution;
-    Object obj;
-
-    obj = __expressionCache.getElement(expression);
-
-  __nullTest:
-    if(obj != null) {
-      // Must catch ClassCastException because someone might incorrectly 
-      // pass an m// expression.  try block is cheaper than checking
-      // instanceof.  We want to go ahead with parsing just in case so
-      // we break.
-      try {
-	entry = (ParsedSubstitutionEntry)obj;
-      } catch(ClassCastException e) {
-	break __nullTest;
-      }
-
-
-      subCount =
-	Util.substitute(result, __matcher, entry._pattern, entry._substitution,
-			input, entry._numSubstitutions);
-
-      __lastMatch = __matcher.getMatch();
-
-      return subCount;
-    }
-
-    exp = expression.toCharArray();
-
-    // Make sure basic conditions for a valid substitution expression hold.
-    if(exp.length < 4 || exp[0] != 's' || Character.isLetterOrDigit(exp[1])
-       || exp[1] == '-')
-      throw new
-	MalformedPerl5PatternException("Invalid expression: " + expression);
-    delimiter    = exp[1];
-    firstOffset  = 2;
-    secondOffset = thirdOffset = -1;
-    backslash    = false;
-
-    // Parse pattern
-    for(index = firstOffset; index < exp.length; index++) {
-      if(exp[index] == '\\')
-	backslash = !backslash;
-      else if(exp[index] == delimiter && !backslash) {
-	secondOffset = index;
-	break;
-      } else if(backslash) 
-	backslash = !backslash;
-    }
-
-    if(secondOffset == -1 || secondOffset == exp.length - 1)
-      throw new
-	MalformedPerl5PatternException("Invalid expression: " + expression);
-
-    // Parse replacement string
-
-    backslash = false;
-    finalDelimiter = true;
-    replacement = new StringBuffer(exp.length - secondOffset);
-    for(index = secondOffset + 1; index < exp.length; index++) {
-      if(exp[index] == '\\') {
-	backslash = !backslash;
-
-	// 05/05/99 dfs
-	// We unbackslash backslashed delimiters in the replacement string
-	// only if we're on an odd backslash and there is another occurrence
-	// of a delimiter later in the string.
-	if(backslash && index + 1 < exp.length && exp[index + 1] == delimiter
-	  && expression.lastIndexOf(delimiter, exp.length - 1) != (index + 1))
-	{
-	  finalDelimiter = false;
-	  continue;
-	}
-      } else if(exp[index] == delimiter && finalDelimiter) {
-	thirdOffset = index;
-	break;
-      } else {
-	backslash      = false;
-	finalDelimiter = true;
-      }
-
-      replacement.append(exp[index]);
-    }
-
-    if(thirdOffset == -1)
-      throw new
-	MalformedPerl5PatternException("Invalid expression: " + expression);
-
-    compileOptions    = Perl5Compiler.DEFAULT_MASK;
-    numSubstitutions  = 1;
-
-    // Single quotes cause no interpolations to be performed in replacement
-    if(delimiter != '\'')
-      numInterpolations = Perl5Substitution.INTERPOLATE_ALL;
-    else
-      numInterpolations = Perl5Substitution.INTERPOLATE_NONE;
-
-    // Parse options
-    for(index = thirdOffset + 1; index < exp.length; index++) {
-      switch(exp[index]) {
-      case 'i' :
-	compileOptions |= Perl5Compiler.CASE_INSENSITIVE_MASK;
-	break;
-      case 'm' : compileOptions |= Perl5Compiler.MULTILINE_MASK; break;
-      case 's' : compileOptions |= Perl5Compiler.SINGLELINE_MASK; break;
-      case 'x' : compileOptions |= Perl5Compiler.EXTENDED_MASK; break;
-      case 'g' : numSubstitutions = Util.SUBSTITUTE_ALL; break;
-      case 'o' : numInterpolations = 1; break;
-      default  :
-	throw new
-	  MalformedPerl5PatternException("Invalid option: " + exp[index]);
-      }
-    }
-
-    compiledPattern =
-      __patternCache.getPattern(new String(exp, firstOffset,
-					   secondOffset - firstOffset),
-				compileOptions);
-    substitution =
-      new Perl5Substitution(replacement.toString(), numInterpolations);
-    entry = new ParsedSubstitutionEntry(compiledPattern, substitution,
-					numSubstitutions);
-    __expressionCache.addElement(expression, entry);
-
-    subCount =
-      Util.substitute(result, __matcher, compiledPattern, substitution,
-		      input, numSubstitutions);
-
-    __lastMatch = __matcher.getMatch();
-
-    return subCount;
-  }
-
-  /**
-   * Substitutes a pattern in a given input with a replacement string.
-   * The substitution expression is specified in Perl5 native format.
-   * <dl compact>
-   *   <dt>Calling this method is the same as:</dt>
-   *   <dd>
-   *     <blockquote><pre>
-   *      String result;
-   *      StringBuffer buffer = new StringBuffer();
-   *      perl.substitute(buffer, expression, input);
-   *      result = buffer.toString();
-   *     </pre></blockquote>
-   *   </dd>
-   * </dl>
-   * @param expression The Perl5 substitution regular expression.
-   * @param input      The input on which to perform substitutions.
-   * @return  The input as a String after substitutions have been performed.
-   * @exception MalformedPerl5PatternException  If there is an error in
-   *            the expression.  You are not forced to catch this exception
-   *            because it is derived from RuntimeException.
-   * @since 1.0
-   * @see #substitute
-   */
-  public synchronized String substitute(String expression, String input)
-    throws MalformedPerl5PatternException
-  {
-    StringBuffer result = new StringBuffer();
-    substitute(result, expression, input);
-    return result.toString();
-  }
- 
-  /**
-   * Splits a String into strings that are appended to a List, but no more
-   * than a specified limit.  The String is split using a regular expression
-   * as the delimiter.  The regular expression is a pattern specified
-   * in Perl5 native format:
-   * <blockquote><pre>
-   * [m]/pattern/[i][m][s][x]
-   * </pre></blockquote>
-   * The <code>m</code> prefix is optional and the meaning of the optional
-   * trailing options are:
-   * <dl compact> 
-   * <dt> i <dd> case insensitive match
-   * <dt> m <dd> treat the input as consisting of multiple lines
-   * <dt> s <dd> treat the input as consisting of a single line
-   * <dt> x <dd> enable extended expression syntax incorporating whitespace
-   *             and comments
-   * </dl>
-   * As with Perl, any non-alphanumeric character can be used in lieu of
-   * the slashes.
-   * <p>
-   * The limit parameter causes the string to be split on at most the first
-   * <b>limit - 1</b> number of pattern occurences.
-   * <p>
-   * Of special note is that this split method performs EXACTLY the same
-   * as the Perl split() function.  In other words, if the split pattern
-   * contains parentheses, additional Vector elements are created from
-   * each of the matching subgroups in the pattern.  Using an example
-   * similar to the one from the Camel book:
-   * <blockquote><pre>
-   * split(list, "/([,-])/", "8-12,15,18")
-   * </pre></blockquote>
-   * produces the Vector containing:
-   * <blockquote><pre>
-   * { "8", "-", "12", ",", "15", ",", "18" }
-   * </pre></blockquote>
-   * Furthermore, the following Perl behavior is observed: "leading empty
-   * fields are preserved, and empty trailing one are deleted."  This
-   * has the effect that a split on a zero length string returns an empty
-   * list.
-   * The {@link org.apache.oro.text.regex.Util#split Util.split()} method
-   * does NOT implement these behaviors because it is intended to
-   * be a general self-consistent and predictable split function usable
-   * with Pattern instances other than Perl5Pattern.
-   * <p>
-   * @param results 
-   *    A <code> Collection </code> to which the substrings of the input
-   *    that occur between the regular expression delimiter occurences
-   *    are appended. The input will not be split into any more substrings
-   *    than the specified 
-   *    limit. A way of thinking of this is that only the first
-   *    <b>limit - 1</b>
-   *    matches of the delimiting regular expression will be used to split the
-   *    input.  The Collection must support the
-   *    <code>addAll(Collection)</code> operation.
-   * @param pattern The regular expression to use as a split delimiter.
-   * @param input The String to split.
-   * @param limit The limit on the size of the returned <code>Vector</code>.
-   *   Values <= 0 produce the same behavior as the SPLIT_ALL constant which
-   *   causes the limit to be ignored and splits to be performed on all
-   *   occurrences of the pattern.  You should use the SPLIT_ALL constant
-   *   to achieve this behavior instead of relying on the default behavior
-   *   associated with non-positive limit values.
-   * @exception MalformedPerl5PatternException  If there is an error in
-   *            the expression.  You are not forced to catch this exception
-   *            because it is derived from RuntimeException.
-   */
-  public synchronized void split(Collection results, String pattern,
-				 String input, int limit)
-       throws MalformedPerl5PatternException 
-  {
-    int beginOffset, groups, index;
-    String group;
-    MatchResult currentResult = null;
-    PatternMatcherInput pinput;
-    Pattern compiledPattern;
-
-    compiledPattern = __parseMatchExpression(pattern);
-
-    pinput = new PatternMatcherInput(input);
-    beginOffset = 0;
-
-    while(--limit != 0 && __matcher.contains(pinput, compiledPattern)) {
-      currentResult = __matcher.getMatch();
-
-      __splitList.add(input.substring(beginOffset,
-				      currentResult.beginOffset(0)));
-
-      if((groups = currentResult.groups()) > 1) {
-	for(index = 1; index < groups; ++index) {
-	  group = currentResult.group(index);
-	  if(group != null && group.length() > 0)
-	    __splitList.add(group);
-	}
-      }
-
-      beginOffset = currentResult.endOffset(0);
-    }
-
-    __splitList.add(input.substring(beginOffset, input.length()));
-
-    // Remove all trailing empty fields.
-    for(int i = __splitList.size() - 1; i >= 0; --i) {
-      String str;
-
-      str = (String)__splitList.get(i);
-      if(str.length() == 0)
-	__splitList.remove(i);
-      else
-	break;
-    }
-
-    results.addAll(__splitList);
-    __splitList.clear();
-
-    // Just for the sake of completeness
-    __lastMatch = currentResult;
-  }
-
-  /**
-   * This method is identical to calling:
-   * <blockquote><pre>
-   * split(results, pattern, input, SPLIT_ALL);
-   * </pre></blockquote>
-   */
-  public synchronized void split(Collection results, String pattern,
-				 String input)
-       throws MalformedPerl5PatternException 
-  {
-    split(results, pattern, input, SPLIT_ALL);
-  }
-
-  /**
-   * Splits input in the default Perl manner, splitting on all whitespace.
-   * This method is identical to calling:
-   * <blockquote><pre>
-   * split(results, "/\\s+/", input);
-   * </pre></blockquote>
-   */
-  public synchronized void split(Collection results, String input)
-       throws MalformedPerl5PatternException
-  {
-    split(results, "/\\s+/", input);
-  }
-
-  /**
-   * Splits a String into strings contained in a Vector of size no greater
-   * than a specified limit.  The String is split using a regular expression
-   * as the delimiter.  The regular expression is a pattern specified
-   * in Perl5 native format:
-   * <blockquote><pre>
-   * [m]/pattern/[i][m][s][x]
-   * </pre></blockquote>
-   * The <code>m</code> prefix is optional and the meaning of the optional
-   * trailing options are:
-   * <dl compact> 
-   * <dt> i <dd> case insensitive match
-   * <dt> m <dd> treat the input as consisting of multiple lines
-   * <dt> s <dd> treat the input as consisting of a single line
-   * <dt> x <dd> enable extended expression syntax incorporating whitespace
-   *             and comments
-   * </dl>
-   * As with Perl, any non-alphanumeric character can be used in lieu of
-   * the slashes.
-   * <p>
-   * The limit parameter causes the string to be split on at most the first
-   * <b>limit - 1</b> number of pattern occurences.
-   * <p>
-   * Of special note is that this split method performs EXACTLY the same
-   * as the Perl split() function.  In other words, if the split pattern
-   * contains parentheses, additional Vector elements are created from
-   * each of the matching subgroups in the pattern.  Using an example
-   * similar to the one from the Camel book:
-   * <blockquote><pre>
-   * split("/([,-])/", "8-12,15,18")
-   * </pre></blockquote>
-   * produces the Vector containing:
-   * <blockquote><pre>
-   * { "8", "-", "12", ",", "15", ",", "18" }
-   * </pre></blockquote>
-   * The {@link org.apache.oro.text.regex.Util#split Util.split()} method
-   * does NOT implement this particular behavior because it is intended to
-   * be usable with Pattern instances other than Perl5Pattern.
-   * <p>
-   * @deprecated Use
-   * {@link #split(Collection results, String pattern, String input, int limit)}
-   *  instead.
-   * @param pattern The regular expression to use as a split delimiter.
-   * @param input The String to split.
-   * @param limit The limit on the size of the returned <code>Vector</code>.
-   *   Values <= 0 produce the same behavior as the SPLIT_ALL constant which
-   *   causes the limit to be ignored and splits to be performed on all
-   *   occurrences of the pattern.  You should use the SPLIT_ALL constant
-   *   to achieve this behavior instead of relying on the default behavior
-   *   associated with non-positive limit values.
-   * @return A <code> Vector </code> containing the substrings of the input
-   *    that occur between the regular expression delimiter occurences. The
-   *    input will not be split into any more substrings than the specified 
-   *    limit. A way of thinking of this is that only the first
-   *    <b>limit - 1</b>
-   *    matches of the delimiting regular expression will be used to split the
-   *    input. 
-   * @exception MalformedPerl5PatternException  If there is an error in
-   *            the expression.  You are not forced to catch this exception
-   *            because it is derived from RuntimeException.
-   */
-  public synchronized Vector split(String pattern, String input, int limit)
-       throws MalformedPerl5PatternException 
-  {
-    Vector results = new Vector(20);
-    split(results, pattern, input, limit);
-    return results;
-  }
-
-  /**
-   * This method is identical to calling:
-   * <blockquote><pre>
-   * split(pattern, input, SPLIT_ALL);
-   * </pre></blockquote>
-   * @deprecated Use
-   * {@link #split(Collection results, String pattern, String input)} instead.
-   */
-  public synchronized Vector split(String pattern, String input)
-       throws MalformedPerl5PatternException 
-  {
-    return split(pattern, input, SPLIT_ALL);
-  }
-
-  /**
-   * Splits input in the default Perl manner, splitting on all whitespace.
-   * This method is identical to calling:
-   * <blockquote><pre>
-   * split("/\\s+/", input);
-   * </pre></blockquote>
-   * @deprecated Use
-   * {@link #split(Collection results, String input)} instead.
-   */
-  public synchronized Vector split(String input)
-       throws MalformedPerl5PatternException 
-  {
-    return split("/\\s+/", input);
+    return this.__lastMatch;
   }
 
   //
@@ -997,17 +421,17 @@ public final class Perl5Util implements MatchResult {
    * @return The length of the last match found.
    */
   public synchronized int length() {
-    return __lastMatch.length();
+    return this.__lastMatch.length();
   }
 
   /**
    * @return The number of groups contained in the last match found.
    *         This number includes the 0th group.  In other words, the
    *         result refers to the number of parenthesized subgroups plus
-   *         the entire match itself.          
+   *         the entire match itself.
    */
   public synchronized int groups() {
-    return __lastMatch.groups();
+    return this.__lastMatch.groups();
   }
 
 
@@ -1021,13 +445,13 @@ public final class Perl5Util implements MatchResult {
    *         matched, it returns null.  This is not to be confused with
    *         a group matching the null string, which will return a String
    *         of length 0.
-   */                       
-  public synchronized String group(int group) {
-    return __lastMatch.group(group);
+   */
+  public synchronized String group(final int group) {
+    return this.__lastMatch.group(group);
   }
 
   /**
-   * Returns the begin offset of the subgroup of the last match found 
+   * Returns the begin offset of the subgroup of the last match found
    * relative the beginning of the match.
    * <p>
    * @param group The pattern subgroup.
@@ -1037,14 +461,14 @@ public final class Perl5Util implements MatchResult {
    *         the null string at the end of a match will have an offset
    *         equal to the length of the string, so you shouldn't blindly
    *         use the offset to index an array or String.
-   */                                                                 
-  public synchronized int begin(int group) {
-    return __lastMatch.begin(group);
+   */
+  public synchronized int begin(final int group) {
+    return this.__lastMatch.begin(group);
   }
 
 
   /**
-   * Returns the end offset of the subgroup of the last match found 
+   * Returns the end offset of the subgroup of the last match found
    * relative the beginning of the match.
    * <p>
    * @param group The pattern subgroup.
@@ -1053,8 +477,8 @@ public final class Perl5Util implements MatchResult {
    *         or does not exist, returns -1.  A group matching the null
    *         string will return its start offset.
    */
-  public synchronized int end(int group) {
-    return __lastMatch.end(group);
+  public synchronized int end(final int group) {
+    return this.__lastMatch.end(group);
   }
 
 
@@ -1066,10 +490,10 @@ public final class Perl5Util implements MatchResult {
    * @param group The pattern subgroup.
    * @return The offset of the first token in the indicated
    *         pattern subgroup.  If a group was never matched or does
-   *         not exist, returns -1.          
+   *         not exist, returns -1.
    */
-  public synchronized int beginOffset(int group) {
-    return __lastMatch.beginOffset(group);
+  public synchronized int beginOffset(final int group) {
+    return this.__lastMatch.beginOffset(group);
   }
 
   /**
@@ -1082,210 +506,22 @@ public final class Perl5Util implements MatchResult {
    *         the indicated pattern subgroup.  If a group was never matched
    *         or does not exist, returns -1.  A group matching the null
    *         string will return its start offset.
-   */                   
-  public synchronized int endOffset(int group) {
-    return __lastMatch.endOffset(group);
+   */
+  public synchronized int endOffset(final int group) {
+    return this.__lastMatch.endOffset(group);
   }
 
   /**
    * Returns the same as group(0).
    * <p>
    * @return A string containing the entire match.
-   */  
+   */
+  @Override
   public synchronized String toString() {
-    if(__lastMatch == null)
-      return null;
-    return __lastMatch.toString();
-  }
-
-
-  /**
-   * Returns the part of the input preceding the last match found.
-   * <p>
-   * @return The part of the input following the last match found.
-   */
-  public synchronized String preMatch() {
-    int begin;
-
-    if(__originalInput == null)
-      return __nullString;
-
-    begin = __lastMatch.beginOffset(0);
-
-    if(begin <= 0)
-      return __nullString;
-
-    if(__originalInput instanceof char[]) {
-      char[] input;
-
-      input = (char[])__originalInput;
-
-      // Just in case we make sure begin offset is in bounds.  It should
-      // be but we're paranoid.
-      if(begin > input.length)
-	begin = input.length;
-
-      return new String(input, __inputBeginOffset, begin);
-    } else if(__originalInput instanceof String) {
-      String input;
-
-      input = (String)__originalInput;
-
-      // Just in case we make sure begin offset is in bounds.  It should
-      // be but we're paranoid.
-      if(begin > input.length())
-	begin = input.length();
-
-      return input.substring(__inputBeginOffset, begin);
-    }
-
-    return __nullString;
-  }
-
-
-  /**
-   * Returns the part of the input following the last match found.
-   * <p>
-   * @return The part of the input following the last match found.
-   */
-  public synchronized String postMatch() {
-    int end;
-
-    if(__originalInput == null)
-      return __nullString;
-
-    end = __lastMatch.endOffset(0);
-
-    if(end < 0)
-      return __nullString;
-
-    if(__originalInput instanceof char[]) {
-      char[] input;
-
-      input = (char[])__originalInput;
-      // Just in case we make sure begin offset is in bounds.  It should
-      // be but we're paranoid.
-      if(end >= input.length)
-	return __nullString;
-
-      return new String(input, end, __inputEndOffset - end);
-    } else if(__originalInput instanceof String) {
-      String input;
-
-      input = (String)__originalInput;
-
-      // Just in case we make sure begin offset is in bounds.  It should
-      // be but we're paranoid.
-      if(end >= input.length())
-	return __nullString;
-
-      return input.substring(end, __inputEndOffset);
-    }
-
-    return __nullString;
-  }
-
-
-  /**
-   * Returns the part of the input preceding the last match found as a
-   * char array.  This method eliminates the extra
-   * buffer copying caused by preMatch().toCharArray().
-   * <p>
-   * @return The part of the input preceding the last match found as a char[].
-   *         If the result is of zero length, returns null instead of a zero
-   *         length array.
-   */
-  public synchronized char[] preMatchCharArray() {
-    int begin;
-    char[] result = null;
-
-    if(__originalInput == null)
-      return null;
-
-    begin = __lastMatch.beginOffset(0);
-
-    if(begin <= 0)
-      return null;
-
-    if(__originalInput instanceof char[]) {
-      char[] input;
-
-      input = (char[])__originalInput;
-
-      // Just in case we make sure begin offset is in bounds.  It should
-      // be but we're paranoid.
-      if(begin >= input.length)
-	begin = input.length;
-
-      result = new char[begin - __inputBeginOffset];
-      System.arraycopy(input, __inputBeginOffset, result, 0, result.length);
-    } else if(__originalInput instanceof String) {
-      String input;
-
-      input = (String)__originalInput;
-
-      // Just in case we make sure begin offset is in bounds.  It should
-      // be but we're paranoid.
-      if(begin >= input.length())
-	begin = input.length();
-
-      result = new char[begin - __inputBeginOffset];
-      input.getChars(__inputBeginOffset, begin, result, 0);
-    }
-
-    return result;
-  }
-
-
-  /**
-   * Returns the part of the input following the last match found as a char
-   * array.  This method eliminates the extra buffer copying caused by
-   * preMatch().toCharArray().
-   * <p>
-   * @return The part of the input following the last match found as a char[].
-   *         If the result is of zero length, returns null instead of a zero
-   *         length array.
-   */
-  public synchronized char[] postMatchCharArray() {
-    int end;
-    char[] result = null;
-
-    if(__originalInput == null)
-      return null;
-
-    end = __lastMatch.endOffset(0);
-
-    if(end < 0)
-      return null;
-
-    if(__originalInput instanceof char[]) {
-      int length;
-      char[] input;
-
-      input = (char[])__originalInput;
-      // Just in case we make sure begin offset is in bounds.  It should
-      // be but we're paranoid.
-      if(end >= input.length)
-	return null;
-
-      length = __inputEndOffset - end;
-      result = new char[length];
-      System.arraycopy(input, end, result, 0, length);
-    } else if(__originalInput instanceof String) {
-      String input;
-
-      input = (String)__originalInput;
-
-      // Just in case we make sure begin offset is in bounds.  It should
-      // be but we're paranoid.
-      if(end >= __inputEndOffset)
-	return null;
-
-      result = new char[__inputEndOffset - end];
-      input.getChars(end, __inputEndOffset, result, 0);
-    }
-
-    return result;
+    if(this.__lastMatch == null) {
+		return null;
+	}
+    return this.__lastMatch.toString();
   }
 
 }
