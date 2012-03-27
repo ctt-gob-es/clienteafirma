@@ -168,13 +168,20 @@ public final class MimeHelper {
             // Probamos a pasear los datos como si fuesen un XML, si no lanzan
             // una excepcion, entonces son
             // datos XML.
-            try {
-                DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(this.data));
-                this.mimeType = "text/xml"; //$NON-NLS-1$
-            }
-            catch (final Exception e) {
-                // Ignoramos, es porque no es XML
-            }
+        	if (this.data.length > 4 &&
+        		this.data[0] == '<' &&
+        		this.data[1] == '?' &&
+        		this.data[2] == 'x' &&
+        		this.data[3] == 'm' &&
+        		this.data[4] == 'l') {
+		            try {
+		                DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(this.data));
+		                this.mimeType = "text/xml"; //$NON-NLS-1$
+		            }
+		            catch (final Exception e) {
+		                // Ignoramos, es porque no es XML
+		            }
+        	}
 
             if (this.mimeType == null && this.mimeInfo != null) {
                 this.mimeType = this.mimeInfo.getMimeType();
