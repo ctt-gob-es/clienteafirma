@@ -2152,7 +2152,7 @@
 	<mimetype>text/xml</mimetype>
 	<extension>xml</extension>
 	<description>XML 1.0 Document</description>
-	<test offset="0" type="string" comparator="=">&lt;?xml version="1.0"?&gt;</test>
+	<test offset="0" type="string" comparator="=">&lt;?xml</test>
 	<match-list>
 		<match>
 			<mimetype>application/msexcel</mimetype>
