@@ -26,13 +26,13 @@
  *    Alternately, this acknowledgment may appear in the software itself,
  *    if and wherever such third-party acknowledgments normally appear.
  *
- * 4. The names "Apache" and "Apache Software Foundation", "Jakarta-Oro" 
+ * 4. The names "Apache" and "Apache Software Foundation", "Jakarta-Oro"
  *    must not be used to endorse or promote products derived from this
  *    software without prior written permission. For written
  *    permission, please contact apache@apache.org.
  *
- * 5. Products derived from this software may not be called "Apache" 
- *    or "Jakarta-Oro", nor may "Apache" or "Jakarta-Oro" appear in their 
+ * 5. Products derived from this software may not be called "Apache"
+ *    or "Jakarta-Oro", nor may "Apache" or "Jakarta-Oro" appear in their
  *    name, without prior written permission of the Apache Software Foundation.
  *
  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
@@ -61,7 +61,7 @@ package org.apache.oro.text.regex;
 
 /**
  * The OpCode class should not be instantiated.  It is a holder of various
- * constants and static methods pertaining to the manipulation of the 
+ * constants and static methods pertaining to the manipulation of the
  * op-codes used in a compiled regular expression.
  *
  * @version @version@
@@ -112,7 +112,7 @@ final class OpCode {
      _WHILEM  = 34,  // no       Do curly processing and see if rest matches.
      _ANYOFUN = 35,  // yes      Match unicode character in this class.
      _NANYOFUN= 36,  // yes      Match unicode character not in this class.
-     _RANGE   = 37,  // yes      Range flag in 
+     _RANGE   = 37,  // yes      Range flag in
     // Change the names of these constants later to make it clear they
     // are POSIX classes.
      _ALPHA   = 38,
@@ -136,8 +136,8 @@ final class OpCode {
     2, 2, 0, 0, 0, 0, 0, 0, 0, 0, // OpCode 10-19
     0, 0, 0, 0, 0, 0, 1, 1, 1, 0, // OpCode 20-29
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // OpCode 30-39
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // OpCode 40-49 
-    0, 0                          // OpCode 50-51 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // OpCode 40-49
+    0, 0                          // OpCode 50-51
   };
 
   static final char _opType[] = {
@@ -155,7 +155,7 @@ final class OpCode {
   };
 
   static final char _opLengthOne[] = {
-    _ANY, _SANY, _ANYOF, _ALNUM, _NALNUM, _SPACE, _NSPACE, _DIGIT, _NDIGIT, 
+    _ANY, _SANY, _ANYOF, _ALNUM, _NALNUM, _SPACE, _NSPACE, _DIGIT, _NDIGIT,
     _ANYOFUN, _NANYOFUN, _ALPHA, _BLANK, _CNTRL, _GRAPH, _LOWER, _PRINT,
     _PUNCT, _UPPER, _XDIGIT, _OPCODE, _NOPCODE, _ONECHAR, _ALNUMC,
     _ASCII
@@ -164,45 +164,50 @@ final class OpCode {
   static final int  _NULL_OFFSET  = -1;
   static final char _NULL_POINTER =  0;
 
-  static final int _getNextOffset(char[] program, int offset) {
-    return ((int)program[offset + 1]); 
+  static final int _getNextOffset(final char[] program, final int offset) {
+    return program[offset + 1];
   }
 
-  static final char _getArg1(char[] program, int offset) {
-    return program[offset + 2]; 
+  static final char _getArg1(final char[] program, final int offset) {
+    return program[offset + 2];
   }
 
-  static final char _getArg2(char[] program, int offset) {
-    return program[offset + 3]; 
+  static final char _getArg2(final char[] program, final int offset) {
+    return program[offset + 3];
   }
 
-  static final int _getOperand(int offset) {
+  static final int _getOperand(final int offset) {
     return (offset + 2);
   }
 
-  static final boolean _isInArray(char ch, char[] array, int start) {
-    while(start < array.length)
-      if(ch == array[start++])
-	return true;
+  static final boolean _isInArray(final char ch, final char[] array, int start) {
+    while(start < array.length) {
+		if(ch == array[start++]) {
+			return true;
+		}
+	}
     return false;
   }
 
-  static final int _getNextOperator(int offset) { return (offset + 2); }
-  static final int _getPrevOperator(int offset) { return (offset - 2); }
+  static final int _getNextOperator(final int offset) { return (offset + 2); }
+  static final int _getPrevOperator(final int offset) { return (offset - 2); }
 
-  static final int _getNext(char[] program, int offset) {
+  static final int _getNext(final char[] program, final int offset) {
     int offs;
 
-    if(program == null)
-      return _NULL_OFFSET;
+    if(program == null) {
+		return _NULL_OFFSET;
+	}
 
 
     offs = _getNextOffset(program, offset);
-    if(offs == _NULL_POINTER)
-      return _NULL_OFFSET;
+    if(offs == _NULL_POINTER) {
+		return _NULL_OFFSET;
+	}
 
-    if(program[offset] == OpCode._BACK)
-      return (offset - offs);
+    if(program[offset] == OpCode._BACK) {
+		return (offset - offs);
+	}
 
     return (offset + offs);
   }
@@ -210,7 +215,7 @@ final class OpCode {
   // doesn't really belong in this class, but we want Perl5Matcher not to
   // depend on Perl5Compiler
   // Matches Perl's definition of \w, which is different from [:alnum:]
-  static final boolean _isWordCharacter(char token) {
+  static final boolean _isWordCharacter(final char token) {
     return (Character.isLetterOrDigit(token) || token == '_');
   }
 }

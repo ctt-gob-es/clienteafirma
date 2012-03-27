@@ -68,7 +68,10 @@ package org.apache.oro.util;
  * @since 1.0
  */
 final class GenericCacheEntry implements java.io.Serializable {
-  /** The cache array index of the entry. */
+
+	private static final long serialVersionUID = 8359756019468404576L;
+
+/** The cache array index of the entry. */
   int _index;
   /** The value stored at this entry. */
   Object _value;

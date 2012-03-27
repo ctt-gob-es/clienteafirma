@@ -26,13 +26,13 @@
  *    Alternately, this acknowledgment may appear in the software itself,
  *    if and wherever such third-party acknowledgments normally appear.
  *
- * 4. The names "Apache" and "Apache Software Foundation", "Jakarta-Oro" 
+ * 4. The names "Apache" and "Apache Software Foundation", "Jakarta-Oro"
  *    must not be used to endorse or promote products derived from this
  *    software without prior written permission. For written
  *    permission, please contact apache@apache.org.
  *
- * 5. Products derived from this software may not be called "Apache" 
- *    or "Jakarta-Oro", nor may "Apache" or "Jakarta-Oro" appear in their 
+ * 5. Products derived from this software may not be called "Apache"
+ *    or "Jakarta-Oro", nor may "Apache" or "Jakarta-Oro" appear in their
  *    name, without prior written permission of the Apache Software Foundation.
  *
  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
@@ -61,7 +61,7 @@ package org.apache.oro.text.regex;
 
 /**
  * The PatternMatcher interface defines the operations a regular
- * expression matcher must implement.  However, the types of the Pattern 
+ * expression matcher must implement.  However, the types of the Pattern
  * implementations recognized by a matcher are not restricted.  Typically
  * PatternMatcher instances will only recognize a specific type of Pattern.
  * For example, the Perl5Matcher only recognizes Perl5Pattern instances.
@@ -198,11 +198,11 @@ public interface PatternMatcher {
   /**
    * Determines if a string contains a pattern.  If the pattern is
    * matched by some substring of the input, a MatchResult instance
-   * representing the <b> first </b> such match is made acessible via 
+   * representing the <b> first </b> such match is made acessible via
    * {@link #getMatch()}.  If you want to access
    * subsequent matches you should either use a PatternMatcherInput object
    * or use the offset information in the MatchResult to create a substring
-   * representing the remaining input.  Using the MatchResult offset 
+   * representing the remaining input.  Using the MatchResult offset
    * information is the recommended method of obtaining the parts of the
    * string preceeding the match and following the match.
    * <p>
@@ -215,11 +215,11 @@ public interface PatternMatcher {
   /**
    * Determines if a string (represented as a char[]) contains a pattern.
    * If the pattern is matched by some substring of the input, a MatchResult
-   * instance representing the <b>first</b> such match is made acessible via 
+   * instance representing the <b>first</b> such match is made acessible via
    * {@link #getMatch()}.  If you want to access
    * subsequent matches you should either use a PatternMatcherInput object
    * or use the offset information in the MatchResult to create a substring
-   * representing the remaining input.  Using the MatchResult offset 
+   * representing the remaining input.  Using the MatchResult offset
    * information is the recommended method of obtaining the parts of the
    * string preceeding the match and following the match.
    * <p>
@@ -233,7 +233,7 @@ public interface PatternMatcher {
    * Determines if the contents of a PatternMatcherInput, starting from the
    * current offset of the input contains a pattern.
    * If a pattern match is found, a MatchResult
-   * instance representing the <b>first</b> such match is made acessible via 
+   * instance representing the <b>first</b> such match is made acessible via
    * {@link #getMatch()}.  The current offset of the
    * PatternMatcherInput is set to the offset corresponding to the end
    * of the match, so that a subsequent call to this method will continue
@@ -244,7 +244,7 @@ public interface PatternMatcher {
    * Matches extending beyond the end offset of the PatternMatcherInput
    * will not be matched.  In other words, a match must occur entirely
    * between the begin and end offsets of the input.  See
-   * {@link PatternMatcherInput} for more details.
+   * <code>PatternMatcherInput</code> for more details.
    * <p>
    * This method is usually used in a loop as follows:
    * <blockquote><pre>
@@ -268,7 +268,7 @@ public interface PatternMatcher {
    * input   = new PatternMatcherInput(someStringInput);
    *
    * while(matcher.contains(input, pattern)) {
-   *   result = matcher.getMatch();  
+   *   result = matcher.getMatch();
    *   // Perform whatever processing on the result you want.
    * }
    *

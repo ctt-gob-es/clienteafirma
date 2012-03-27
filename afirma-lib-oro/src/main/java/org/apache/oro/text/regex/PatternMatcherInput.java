@@ -67,8 +67,8 @@ package org.apache.oro.text.regex;
  * is meant by preserving state is that the end offset of the last match
  * is remembered, so that the next match is performed from that point
  * where the last match left off.  This offset can be accessed from
- * the {@link #getCurrentOffset()} method and can be set with the
- * {@link #setCurrentOffset(int)} method.
+ * the <code>getCurrentOffset()</code> method and can be set with the
+ * <code>setCurrentOffset(int)</code> method.
  * <p>
  * You would use a PatternMatcherInput object when you want to search for
  * more than just the first occurrence of a pattern in a string, or when

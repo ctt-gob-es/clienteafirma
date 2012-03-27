@@ -1897,11 +1897,11 @@ private boolean __lastSuccess = false;
    * Matches extending beyond the end offset of the PatternMatcherInput
    * will not be matched.  In other words, a match must occur entirely
    * between the begin and end offsets of the input.  See
-   * {@link PatternMatcherInput} for more details.
+   * <code>PatternMatcherInput</code> for more details.
    * <p>
    * As a side effect, if a match is found, the PatternMatcherInput match
    * offset information is updated.  See the
-   * {@link PatternMatcherInput#setMatchOffsets(int, int)}
+   * <code>PatternMatcherInput.setMatchOffsets(int, int)</code>
    * method for more details.
    * <p>
    * The pattern must be a Perl5Pattern instance, otherwise a

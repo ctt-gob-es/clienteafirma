@@ -160,7 +160,7 @@ final class Perl5MatchResult implements MatchResult {
 	if(begin < length && end <= length && end > begin) {
 		return this._match.substring(begin, end);
 	} else if(begin <= end) {
-		return "";
+		return ""; //$NON-NLS-1$
 	}
       }
     }

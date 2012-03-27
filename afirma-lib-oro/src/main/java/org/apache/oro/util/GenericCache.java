@@ -75,12 +75,12 @@ import java.util.Iterator;
  * @since 1.0
  * @see Cache
  * @see CacheLRU
- * @see CacheFIFO
- * @see CacheFIFO2
- * @see CacheRandom
  */
 public abstract class GenericCache implements Cache, java.io.Serializable {
-  /**
+
+	private static final long serialVersionUID = 6123461456560210078L;
+
+/**
    * The default capacity to be used by the GenericCache subclasses
    * provided with this package.  Its value is 20.
    */

@@ -99,7 +99,7 @@ public final class Perl5Compiler implements PatternCompiler {
     __READ_ONLY        = 0x8000;
 
   private static final String __HEX_DIGIT =
-  "0123456789abcdef0123456789ABCDEFx";
+  "0123456789abcdef0123456789ABCDEFx"; //$NON-NLS-1$
   private CharStringPointer __input;
   private boolean __sawBackreference;
   private final char[] __modifierFlags = { 0 };
@@ -115,24 +115,24 @@ public final class Perl5Compiler implements PatternCompiler {
   private char[] __program;
 
   /** Lookup table for POSIX character class names */
-  private static final HashMap __hashPOSIX;
+  private static final HashMap<String, Character> __hashPOSIX;
 
   static {
-    __hashPOSIX = new HashMap();
-    __hashPOSIX.put("alnum",     new Character(OpCode._ALNUMC));
-    __hashPOSIX.put("word",      new Character(OpCode._ALNUM));
-    __hashPOSIX.put("alpha",     new Character(OpCode._ALPHA));
-    __hashPOSIX.put("blank",     new Character(OpCode._BLANK));
-    __hashPOSIX.put("cntrl",     new Character(OpCode._CNTRL));
-    __hashPOSIX.put("digit",     new Character(OpCode._DIGIT));
-    __hashPOSIX.put("graph",     new Character(OpCode._GRAPH));
-    __hashPOSIX.put("lower",     new Character(OpCode._LOWER));
-    __hashPOSIX.put("print",     new Character(OpCode._PRINT));
-    __hashPOSIX.put("punct",     new Character(OpCode._PUNCT));
-    __hashPOSIX.put("space",     new Character(OpCode._SPACE));
-    __hashPOSIX.put("upper",     new Character(OpCode._UPPER));
-    __hashPOSIX.put("xdigit",    new Character(OpCode._XDIGIT));
-    __hashPOSIX.put("ascii",     new Character(OpCode._ASCII));
+    __hashPOSIX = new HashMap<String, Character>();
+    __hashPOSIX.put("alnum",     new Character(OpCode._ALNUMC)); //$NON-NLS-1$
+    __hashPOSIX.put("word",      new Character(OpCode._ALNUM)); //$NON-NLS-1$
+    __hashPOSIX.put("alpha",     new Character(OpCode._ALPHA)); //$NON-NLS-1$
+    __hashPOSIX.put("blank",     new Character(OpCode._BLANK)); //$NON-NLS-1$
+    __hashPOSIX.put("cntrl",     new Character(OpCode._CNTRL)); //$NON-NLS-1$
+    __hashPOSIX.put("digit",     new Character(OpCode._DIGIT)); //$NON-NLS-1$
+    __hashPOSIX.put("graph",     new Character(OpCode._GRAPH)); //$NON-NLS-1$
+    __hashPOSIX.put("lower",     new Character(OpCode._LOWER)); //$NON-NLS-1$
+    __hashPOSIX.put("print",     new Character(OpCode._PRINT)); //$NON-NLS-1$
+    __hashPOSIX.put("punct",     new Character(OpCode._PUNCT)); //$NON-NLS-1$
+    __hashPOSIX.put("space",     new Character(OpCode._SPACE)); //$NON-NLS-1$
+    __hashPOSIX.put("upper",     new Character(OpCode._UPPER)); //$NON-NLS-1$
+    __hashPOSIX.put("xdigit",    new Character(OpCode._XDIGIT)); //$NON-NLS-1$
+    __hashPOSIX.put("ascii",     new Character(OpCode._ASCII)); //$NON-NLS-1$
   }
 
 
@@ -256,7 +256,6 @@ public final class Perl5Compiler implements PatternCompiler {
    * In effect, this method is the analog of the Perl5 quotemeta() builtin
    * method.
    * <p>
-   * @param pattern The pattern to convert.
    * @return A String containing a Perl5 regular expression corresponding to
    *         a literal interpretation of the pattern.
    */
@@ -643,7 +642,7 @@ public final class Perl5Compiler implements PatternCompiler {
 	  return OpCode._NULL_OFFSET;
 	}
 
-	throw new MalformedPatternException("Error in expression at " +
+	throw new MalformedPatternException("Error in expression at " + //$NON-NLS-1$
 				   this.__input._toString(this.__input._getOffset()));
 	//break tryAgain;
 
@@ -651,7 +650,7 @@ public final class Perl5Compiler implements PatternCompiler {
       case '+':
       case '*':
 	throw new MalformedPatternException(
-                 "?+* follows nothing in expression");
+                 "?+* follows nothing in expression"); //$NON-NLS-1$
 	//break tryAgain;
 
       case '\\':
@@ -735,8 +734,8 @@ public final class Perl5Compiler implements PatternCompiler {
 	    num = Integer.parseInt(buffer.toString());
 	  } catch(final NumberFormatException e) {
 	    throw new MalformedPatternException(
-	   "Unexpected number format exception.  Please report this bug." +
-	   "NumberFormatException message: " + e.getMessage());
+	   "Unexpected number format exception.  Please report this bug." + //$NON-NLS-1$
+	   "NumberFormatException message: " + e.getMessage()); //$NON-NLS-1$
 	  }
 
 	  if(num > 9 && num >= this.__numParentheses) {
@@ -745,7 +744,7 @@ public final class Perl5Compiler implements PatternCompiler {
 	  } else {
 	    // A backreference may only occur AFTER its group
 	    if(num >= this.__numParentheses) {
-			throw new MalformedPatternException("Invalid backreference: \\" +
+			throw new MalformedPatternException("Invalid backreference: \\" + //$NON-NLS-1$
 							  num);
 		}
 	    this.__sawBackreference = true;
@@ -765,7 +764,7 @@ public final class Perl5Compiler implements PatternCompiler {
 	case CharStringPointer._END_OF_STRING:
 	  if(this.__input._isAtEnd()) {
 		throw new
-	      MalformedPatternException("Trailing \\ in expression.");
+	      MalformedPatternException("Trailing \\ in expression."); //$NON-NLS-1$
 	}
 
 	// fall through to default
@@ -887,8 +886,8 @@ public final class Perl5Compiler implements PatternCompiler {
 		num = Integer.parseInt(buffer.toString());
 	      } catch(final NumberFormatException e) {
 		throw new MalformedPatternException(
-	     "Unexpected number format exception.  Please report this bug." +
-	     "NumberFormatException message: " + e.getMessage());
+	     "Unexpected number format exception.  Please report this bug." + //$NON-NLS-1$
+	     "NumberFormatException message: " + e.getMessage()); //$NON-NLS-1$
 	      }
 
 	      if(!doOctal) {
@@ -909,7 +908,7 @@ public final class Perl5Compiler implements PatternCompiler {
 	  case '\0':
 	    if(pOffset >= maxOffset) {
 			throw new
-			MalformedPatternException("Trailing \\ in expression.");
+			MalformedPatternException("Trailing \\ in expression."); //$NON-NLS-1$
 		}
 	    // fall through to default
 	  default:
@@ -963,7 +962,7 @@ public final class Perl5Compiler implements PatternCompiler {
 
       if(length < 0) {
 		throw new MalformedPatternException(
-		     "Unexpected compilation failure.  Please report this bug!");
+		     "Unexpected compilation failure.  Please report this bug!"); //$NON-NLS-1$
 	}
       if(length > 0) {
 		retFlags[0] |= __NONNULL;
@@ -1276,7 +1275,7 @@ public final class Perl5Compiler implements PatternCompiler {
 	if(range) {
 	  if(lastclss > clss) {
 		throw new MalformedPatternException(
-					"Invalid [] range in expression.");
+					"Invalid [] range in expression."); //$NON-NLS-1$
 	}
 	  range = false;
 	} else {
@@ -1333,7 +1332,7 @@ public final class Perl5Compiler implements PatternCompiler {
       }
 
     if(this.__input._getValue() != ']') {
-		throw new MalformedPatternException("Unmatched [] in expression.");
+		throw new MalformedPatternException("Unmatched [] in expression."); //$NON-NLS-1$
 	}
 
     __getNextChar();
@@ -1349,7 +1348,6 @@ public final class Perl5Compiler implements PatternCompiler {
    * @return OpCode. return 0 when fail parsing POSIX expression.
    */
   private char __parsePOSIX(final boolean negFlag[])
-    throws MalformedPatternException
   {
     final int offset = this.__input._getOffset();
     final int len = this.__input._getLength();
@@ -1438,9 +1436,8 @@ public final class Perl5Compiler implements PatternCompiler {
 	if(value == ',') {
 	  if(pos != maxOffset) {
 		break;
-	} else {
-		pos = next;
-	}
+	  }
+	  pos = next;
 	}
 	++next;
 	value = this.__input._getValue(next);
@@ -1468,8 +1465,8 @@ public final class Perl5Compiler implements PatternCompiler {
 	  min = Integer.parseInt(buffer.toString());
 	} catch(final NumberFormatException e) {
 	  throw new MalformedPatternException(
-	 "Unexpected number format exception.  Please report this bug." +
-	   "NumberFormatException message: " + e.getMessage());
+	 "Unexpected number format exception.  Please report this bug." + //$NON-NLS-1$
+	   "NumberFormatException message: " + e.getMessage()); //$NON-NLS-1$
 	}
 
 	value = this.__input._getValue(pos);
@@ -1496,8 +1493,8 @@ public final class Perl5Compiler implements PatternCompiler {
 	}
 	} catch(final NumberFormatException e) {
 	  throw new MalformedPatternException(
-	 "Unexpected number format exception.  Please report this bug." +
-	   "NumberFormatException message: " + e.getMessage());
+	 "Unexpected number format exception.  Please report this bug." + //$NON-NLS-1$
+	   "NumberFormatException message: " + e.getMessage()); //$NON-NLS-1$
 	}
 
 	if(max == 0 && this.__input._getValue(pos) != '0') {
@@ -1562,7 +1559,7 @@ public final class Perl5Compiler implements PatternCompiler {
 
       if(max != 0 && max < min) {
 		throw new MalformedPatternException(
-		   "Invalid interval {" + min + "," + max + "}");
+		   "Invalid interval {" + min + "," + max + "}"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
       if(this.__program!= null) {
@@ -1580,7 +1577,7 @@ public final class Perl5Compiler implements PatternCompiler {
 
     if(__isComplexRepetitionOp(this.__input._array, this.__input._getOffset())) {
 		throw new MalformedPatternException(
-		    "Nested repetitions *?+ in expression");
+		    "Nested repetitions *?+ in expression"); //$NON-NLS-1$
 	}
 
     return offset;
@@ -1594,7 +1591,7 @@ public final class Perl5Compiler implements PatternCompiler {
 	final char[] posFlags = { 0 }, negFlags = { 0 };
     int nodeOffset = OpCode._NULL_OFFSET, parenthesisNum = 0, br, ender;
     final int[] flags = { 0 };
-    final String modifiers = "iogmsx-";
+    final String modifiers = "iogmsx-"; //$NON-NLS-1$
 
     modifierFlags = posFlags;
     // Initially we assume expression doesn't match null string.
@@ -1617,7 +1614,7 @@ public final class Perl5Compiler implements PatternCompiler {
 	}
 	  if(value != ')') {
 		throw new MalformedPatternException(
-	       "Sequence (?#... not terminated");
+	       "Sequence (?#... not terminated"); //$NON-NLS-1$
 	}
 	  __getNextChar();
 	  hintFlags[0] = __TRYAGAIN;
@@ -1639,7 +1636,7 @@ public final class Perl5Compiler implements PatternCompiler {
 
 	  if(value != ')') {
 		throw new MalformedPatternException(
-	       "Sequence (?" + value + "...) not recognized");
+	       "Sequence (?" + value + "...) not recognized"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	  __getNextChar();
 	  hintFlags[0] = __TRYAGAIN;
@@ -1723,15 +1720,15 @@ public final class Perl5Compiler implements PatternCompiler {
     }
 
     if(paren != 0 && (this.__input._isAtEnd() || __getNextChar() != ')')) {
-      throw new MalformedPatternException("Unmatched parentheses.");
-    } else if(paren == 0 && !this.__input._isAtEnd()) {
+      throw new MalformedPatternException("Unmatched parentheses."); //$NON-NLS-1$
+    }
+    else if(paren == 0 && !this.__input._isAtEnd()) {
       if(this.__input._getValue() == ')') {
-		throw new MalformedPatternException("Unmatched parentheses.");
-	} else {
-		// Should never happen.
-		throw new MalformedPatternException(
-		   "Unreached characters at end of expression.  Please report this bug!");
-	}
+		throw new MalformedPatternException("Unmatched parentheses."); //$NON-NLS-1$
+      }
+      // Should never happen.
+      throw new MalformedPatternException(
+		  "Unreached characters at end of expression.  Please report this bug!"); //$NON-NLS-1$
     }
 
 
@@ -1791,11 +1788,11 @@ public final class Perl5Compiler implements PatternCompiler {
 
     __emitCode((char)0);
     if(__parseExpression(false, flags) == OpCode._NULL_OFFSET) {
-		throw new MalformedPatternException("Unknown compilation error.");
+		throw new MalformedPatternException("Unknown compilation error."); //$NON-NLS-1$
 	}
 
     if(this.__programSize >= Character.MAX_VALUE - 1) {
-		throw new MalformedPatternException("Expression is too large.");
+		throw new MalformedPatternException("Expression is too large."); //$NON-NLS-1$
 	}
 
 
@@ -1813,7 +1810,7 @@ public final class Perl5Compiler implements PatternCompiler {
 
     __emitCode((char)0);
     if(__parseExpression(false, flags) == OpCode._NULL_OFFSET) {
-		throw new MalformedPatternException("Unknown compilation error.");
+		throw new MalformedPatternException("Unknown compilation error."); //$NON-NLS-1$
 	}
 
     caseInsensitive = this.__modifierFlags[0] & __CASE_INSENSITIVE;

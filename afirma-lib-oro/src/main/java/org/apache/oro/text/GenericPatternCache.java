@@ -75,9 +75,6 @@ import org.apache.oro.util.Cache;
  * @since 1.0
  * @see PatternCache
  * @see PatternCacheLRU
- * @see PatternCacheFIFO
- * @see PatternCacheFIFO2
- * @see PatternCacheRandom
  */
 public abstract class GenericPatternCache implements PatternCache {
   PatternCompiler _compiler;
@@ -196,8 +193,8 @@ public abstract class GenericPatternCache implements PatternCache {
     try {
       result = addPattern(expression, options);
     } catch(final MalformedPatternException e) {
-      throw new MalformedCachePatternException("Invalid expression: " +
-					       expression + "\n" +
+      throw new MalformedCachePatternException("Invalid expression: " + //$NON-NLS-1$
+					       expression + "\n" + //$NON-NLS-1$
 					       e.getMessage());
     }
 
