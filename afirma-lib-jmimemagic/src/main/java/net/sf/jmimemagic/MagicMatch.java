@@ -53,22 +53,6 @@ public class MagicMatch implements Cloneable {
     private final ArrayList<MagicMatch> subMatches = new ArrayList<MagicMatch>(0);
     private Map properties;
 
-    /** Print information about this match. */
-    public String print() {
-        final StringBuffer string = new StringBuffer();
-        string.append("\n"); //$NON-NLS-1$
-        string.append("mime type: ").append(this.mimeType).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
-        string.append("description: ").append(this.description).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
-        string.append("extension: ").append(this.extension).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
-        string.append("offset: ").append(this.offset).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
-        string.append("length: ").append(this.length).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
-        string.append("test: ").append(new String(this.test.array())).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
-        string.append("type: ").append(this.type).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
-        string.append("comparator: ").append(this.comparator).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
-        string.append("bitmask: ").append(this.bitmask); //$NON-NLS-1$
-        return string.toString();
-    }
-
     /** Set the mime type for this magic match. */
     public void setMimeType(final String value) {
         this.mimeType = value;

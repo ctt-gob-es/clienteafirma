@@ -64,15 +64,16 @@ public class Magic {
             magicParser.initialize();
 
             // build hint map
-            final Iterator i = magicParser.getMatchers().iterator();
+            final Iterator<MagicMatcher> i = magicParser.getMatchers().iterator();
 
             while (i.hasNext()) {
-                final MagicMatcher matcher = (MagicMatcher) i.next();
+                final MagicMatcher matcher = i.next();
                 final String ext = matcher.getMatch().getExtension();
 
                 if ((ext != null) && !ext.trim().equals("")) { //$NON-NLS-1$
 					addHint(ext, matcher);
-				} else if (matcher.getMatch().getType().equals("detector")) { //$NON-NLS-1$
+				}
+                else if (matcher.getMatch().getType().equals("detector")) { //$NON-NLS-1$
                     final String[] exts = matcher.getDetectorExtensions();
                     for (final String ext2 : exts) {
 						addHint(ext2, matcher);
@@ -96,14 +97,14 @@ public class Magic {
 			initialize();
 		}
 
-        final Collection matchers = magicParser.getMatchers();
+        final Collection<MagicMatcher> matchers = magicParser.getMatchers();
 
         MagicMatcher matcher = null;
         MagicMatch match = null;
-        final Iterator i = matchers.iterator();
+        final Iterator<MagicMatcher> i = matchers.iterator();
 
         while (i.hasNext()) {
-            matcher = (MagicMatcher) i.next();
+            matcher = i.next();
             try {
                 if ((match = matcher.test(data, onlyMimeMatch)) != null) {
 					return match;
