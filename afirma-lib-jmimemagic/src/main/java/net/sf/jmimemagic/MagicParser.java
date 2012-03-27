@@ -33,7 +33,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
-import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
  * DOCUMENT ME!
@@ -69,7 +68,9 @@ public final class MagicParser extends DefaultHandler {
         if (!this.initialized) {
             // use default parser
             try {
-                this.parser = XMLReaderFactory.createXMLReader();
+                //this.parser = XMLReaderFactory.createXMLReader();
+            	this.parser = new com.sun.org.apache.xerces.internal.parsers.SAXParser();
+                //System.out.println(this.parser.getClass().getCanonicalName());
             }
             catch (final Exception e) {
                 throw new MagicParseException("unable to instantiate parser"); //$NON-NLS-1$
