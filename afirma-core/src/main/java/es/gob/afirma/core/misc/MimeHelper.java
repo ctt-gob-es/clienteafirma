@@ -12,7 +12,6 @@ package es.gob.afirma.core.misc;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -77,13 +76,10 @@ public final class MimeHelper {
         catch (final ClassNotFoundException e) {
             LOGGER.warning("No se encontro la biblioteca JMimeMagic para la deteccion del tipo de dato"); //$NON-NLS-1$
         }
-        catch (final InvocationTargetException e) {
-            LOGGER.warning("Error al cargar las bibliotecas de deteccion del tipo de firma: " + e); //$NON-NLS-1$
-        }
         catch (final Exception e) {
             try {
                 final Class<?> magicMatchNotFoundException = AOUtil.classForName("net.sf.jmimemagic.MagicMatchNotFoundException"); //$NON-NLS-1$
-                if (magicMatchNotFoundException.isInstance(e)) {
+                if (e.getCause() != null && magicMatchNotFoundException.isInstance(e.getCause())) {
                     LOGGER.warning("No se pudo detectar el formato de los datos"); //$NON-NLS-1$
                 }
                 else {
@@ -165,26 +161,20 @@ public final class MimeHelper {
         // Comprobamos si ya se calculo previamente el tipo de datos
         if (this.mimeType == null) {
 
-            // Probamos a pasear los datos como si fuesen un XML, si no lanzan
-            // una excepcion, entonces son
-            // datos XML.
-        	if (this.data.length > 4 &&
-        		this.data[0] == '<' &&
-        		this.data[1] == '?' &&
-        		this.data[2] == 'x' &&
-        		this.data[3] == 'm' &&
-        		this.data[4] == 'l') {
-		            try {
-		                DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(this.data));
-		                this.mimeType = "text/xml"; //$NON-NLS-1$
-		            }
-		            catch (final Exception e) {
-		                // Ignoramos, es porque no es XML
-		            }
-        	}
-
-            if (this.mimeType == null && this.mimeInfo != null) {
+            if (this.mimeInfo != null) {
                 this.mimeType = this.mimeInfo.getMimeType();
+            }
+
+        	// Si no hubo analisis inicial o este indico que los datos son XML, comprobamos
+            // si los datos son XML en realidad
+            if (this.mimeInfo == null || "text/xml".equals(this.mimeType)) { //$NON-NLS-1$
+            	try {
+            		DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(this.data));
+            		this.mimeType = "text/xml"; //$NON-NLS-1$
+            	}
+            	catch (final Exception e) {
+            		// Ignoramos, es porque no es XML
+            	}
             }
 
             // Cuando el MimeType sea el de un fichero ZIP o el de Microsoft Word, comprobamos si es en
