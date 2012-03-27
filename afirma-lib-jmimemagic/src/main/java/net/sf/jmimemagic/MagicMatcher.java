@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.apache.oro.text.perl.Perl5Util;
 
@@ -624,8 +625,10 @@ public class MagicMatcher implements Cloneable {
             final MagicDetector detector = (MagicDetector) classForName(detectorClass).newInstance();
             return detector.getHandledTypes();
         }
-        catch (final Throwable e) {
-        	java.util.logging.Logger.getAnonymousLogger().warning(e.toString());
+        catch (final Exception e) {
+        	Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+    			"Error cargando e instanciando la clase " + detectorClass + ": " + e //$NON-NLS-1$ //$NON-NLS-2$
+			);
         }
 
         return new String[0];

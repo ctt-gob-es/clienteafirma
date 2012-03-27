@@ -30,13 +30,10 @@ import java.util.HashMap;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXNotRecognizedException;
-import org.xml.sax.SAXNotSupportedException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
-
 
 /**
  * DOCUMENT ME!
@@ -44,36 +41,9 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * @author $Author$
  * @version $Revision$
   */
-public class MagicParser extends DefaultHandler
-{
+public final class MagicParser extends DefaultHandler {
     private static String magicFile = "/magic.xml"; //$NON-NLS-1$
 
-    // Namespaces feature id (http://xml.org/sax/features/namespaces).
-    protected static final String NAMESPACES_FEATURE_ID = "http://xml.org/sax/features/namespaces"; //$NON-NLS-1$
-
-    // Validation feature id (http://xml.org/sax/features/validation).
-    protected static final String VALIDATION_FEATURE_ID = "http://xml.org/sax/features/validation"; //$NON-NLS-1$
-
-    // Schema validation feature id (http://apache.org/xml/features/validation/schema).
-    protected static final String SCHEMA_VALIDATION_FEATURE_ID = "http://apache.org/xml/features/validation/schema"; //$NON-NLS-1$
-
-    // Schema full checking feature id (http://apache.org/xml/features/validation/schema-full-checking).
-    protected static final String SCHEMA_FULL_CHECKING_FEATURE_ID = "http://apache.org/xml/features/validation/schema-full-checking"; //$NON-NLS-1$
-
-    // Default parser name.
-    protected static final String DEFAULT_PARSER_NAME = "org.apache.xerces.parsers.SAXParser"; //$NON-NLS-1$
-
-    // Default namespaces support (true).
-    protected static final boolean DEFAULT_NAMESPACES = true;
-
-    // Default validation support (false).
-    protected static final boolean DEFAULT_VALIDATION = false;
-
-    // Default Schema validation support (false).
-    protected static final boolean DEFAULT_SCHEMA_VALIDATION = false;
-
-    // Default Schema full checking support (false).
-    protected static final boolean DEFAULT_SCHEMA_FULL_CHECKING = false;
     private boolean initialized = false;
     private XMLReader parser = null;
     private final ArrayList<MagicMatcher> stack = new ArrayList<MagicMatcher>();
@@ -96,55 +66,13 @@ public class MagicParser extends DefaultHandler
     public synchronized void initialize()
         throws MagicParseException
     {
-        final boolean namespaces = DEFAULT_NAMESPACES;
-        final boolean validation = DEFAULT_VALIDATION;
-        final boolean schemaValidation = DEFAULT_SCHEMA_VALIDATION;
-        final boolean schemaFullChecking = DEFAULT_SCHEMA_FULL_CHECKING;
-
         if (!this.initialized) {
             // use default parser
             try {
                 this.parser = XMLReaderFactory.createXMLReader();
-            } catch (final Exception e) {
-                try {
-                    this.parser = XMLReaderFactory.createXMLReader(DEFAULT_PARSER_NAME);
-                } catch (final Exception ee) {
-                    throw new MagicParseException("unable to instantiate parser"); //$NON-NLS-1$
-                }
             }
-
-            // set parser features
-            try {
-                this.parser.setFeature(NAMESPACES_FEATURE_ID, namespaces);
-            }
-            catch (final SAXException e) {
-                java.util.logging.Logger.getAnonymousLogger().warning("Parser does not support feature (" + NAMESPACES_FEATURE_ID + ")"); //$NON-NLS-1$ //$NON-NLS-2$
-            }
-
-            try {
-                this.parser.setFeature(VALIDATION_FEATURE_ID, validation);
-            } catch (final SAXException e) {
-            	java.util.logging.Logger.getAnonymousLogger().warning("Parser does not support feature (" + VALIDATION_FEATURE_ID + ")"); //$NON-NLS-1$ //$NON-NLS-2$
-            }
-
-            try {
-                this.parser.setFeature(SCHEMA_VALIDATION_FEATURE_ID, schemaValidation);
-            }
-            catch (final SAXNotRecognizedException e) {
-                // ignore
-            }
-            catch (final SAXNotSupportedException e) {
-            	java.util.logging.Logger.getAnonymousLogger().warning("Parser does not support feature (" + SCHEMA_VALIDATION_FEATURE_ID + ")"); //$NON-NLS-1$ //$NON-NLS-2$
-            }
-
-            try {
-                this.parser.setFeature(SCHEMA_FULL_CHECKING_FEATURE_ID, schemaFullChecking);
-            }
-            catch (final SAXNotRecognizedException e) {
-                // ignore
-            }
-            catch (final SAXNotSupportedException e) {
-            	java.util.logging.Logger.getAnonymousLogger().warning("Parser does not support feature (" + SCHEMA_FULL_CHECKING_FEATURE_ID + ")"); //$NON-NLS-1$ //$NON-NLS-2$
+            catch (final Exception e) {
+                throw new MagicParseException("unable to instantiate parser"); //$NON-NLS-1$
             }
 
             // set handlers
@@ -161,10 +89,11 @@ public class MagicParser extends DefaultHandler
                 }
 
                 this.parser.parse(magicURL);
-            } catch (final SAXParseException e) {
+            }
+            catch (final SAXParseException e) {
                 // ignore
-            } catch (final Exception e) {
-                e.printStackTrace();
+            }
+            catch (final Exception e) {
                 throw new MagicParseException("parse error occurred - " + e.getMessage()); //$NON-NLS-1$
             }
 
@@ -254,11 +183,14 @@ public class MagicParser extends DefaultHandler
         if (this.matcher != null) {
             if (localName.equals("mimetype")) { //$NON-NLS-1$
                 this.isMimeType = true;
-            } else if (localName.equals("extension")) { //$NON-NLS-1$
+            }
+            else if (localName.equals("extension")) { //$NON-NLS-1$
                 this.isExtension = true;
-            } else if (localName.equals("description")) { //$NON-NLS-1$
+            }
+            else if (localName.equals("description")) { //$NON-NLS-1$
                 this.isDescription = true;
-            } else if (localName.equals("test")) { //$NON-NLS-1$
+            }
+            else if (localName.equals("test")) { //$NON-NLS-1$
                 this.isTest = true;
 
                 final int length = attributes.getLength();
@@ -271,21 +203,26 @@ public class MagicParser extends DefaultHandler
                         if (!attrValue.equals("")) { //$NON-NLS-1$
                             this.match.setOffset(new Integer(attrValue).intValue());
                         }
-                    } else if (attrLocalName.equals("length")) { //$NON-NLS-1$
+                    }
+                    else if (attrLocalName.equals("length")) { //$NON-NLS-1$
                         if (!attrValue.equals("")) { //$NON-NLS-1$
                             this.match.setLength(new Integer(attrValue).intValue());
                         }
-                    } else if (attrLocalName.equals("type")) { //$NON-NLS-1$
+                    }
+                    else if (attrLocalName.equals("type")) { //$NON-NLS-1$
                         this.match.setType(attrValue);
-                    } else if (attrLocalName.equals("bitmask")) { //$NON-NLS-1$
+                    }
+                    else if (attrLocalName.equals("bitmask")) { //$NON-NLS-1$
                         if (!attrValue.equals("")) { //$NON-NLS-1$
                             this.match.setBitmask(attrValue);
                         }
-                    } else if (attrLocalName.equals("comparator")) { //$NON-NLS-1$
+                    }
+                    else if (attrLocalName.equals("comparator")) { //$NON-NLS-1$
                         this.match.setComparator(attrValue);
                     }
                 }
-            } else if (localName.equals("property")) { //$NON-NLS-1$
+            }
+            else if (localName.equals("property")) { //$NON-NLS-1$
                 final int length = attributes.getLength();
                 String name = null;
                 String value = null;
@@ -315,11 +252,13 @@ public class MagicParser extends DefaultHandler
                         this.properties.put(name, value);
                     }
                 }
-            } else if (localName.equals("match-list")) { //$NON-NLS-1$
+            }
+            else if (localName.equals("match-list")) { //$NON-NLS-1$
                 // this means we are processing a child match, so we need to push
                 // the existing match on the stack
                 this.stack.add(this.matcher);
-            } else {
+            }
+            else {
                 // we don't care about this type
             }
         }
@@ -335,24 +274,26 @@ public class MagicParser extends DefaultHandler
      * @throws SAXException DOCUMENT ME!
      */
     @Override
-	public void endElement(final String uri, final String localName, final String qname)
-        throws SAXException
-    {
+	public void endElement(final String uri, final String localName, final String qname) throws SAXException {
 
         // determine which tag these chars are for and save them
         if (this.isMimeType) {
             this.isMimeType = false;
             this.match.setMimeType(this.finalValue);
-        } else if (this.isExtension) {
+        }
+        else if (this.isExtension) {
             this.isExtension = false;
             this.match.setExtension(this.finalValue);
-        } else if (this.isDescription) {
+        }
+        else if (this.isDescription) {
             this.isDescription = false;
             this.match.setDescription(this.finalValue);
-        } else if (this.isTest) {
+        }
+        else if (this.isTest) {
             this.isTest = false;
             this.match.setTest(convertOctals(this.finalValue));
-        } else {
+        }
+        else {
             // do nothing
         }
 
@@ -369,7 +310,8 @@ public class MagicParser extends DefaultHandler
                 // add root match
                 if (this.stack.size() == 0) {
                     this.matchers.add(this.matcher);
-                } else {
+                }
+                else {
                     // we need to add the match to it's parent which is on the
                     // stack
                     final MagicMatcher m = this.stack.get(this.stack.size() - 1);
@@ -381,19 +323,24 @@ public class MagicParser extends DefaultHandler
             this.properties = null;
 
             // restore matcher from the stack if we have an /matcher-list
-        } else if (localName.equals("match-list")) { //$NON-NLS-1$
+        }
+        else if (localName.equals("match-list")) { //$NON-NLS-1$
             if (this.stack.size() > 0) {
                 this.matcher = this.stack.get(this.stack.size() - 1);
                 // pop from the stack
                 this.stack.remove(this.matcher);
             }
-        } else if (localName.equals("mimetype")) { //$NON-NLS-1$
+        }
+        else if (localName.equals("mimetype")) { //$NON-NLS-1$
             this.isMimeType = false;
-        } else if (localName.equals("extension")) { //$NON-NLS-1$
+        }
+        else if (localName.equals("extension")) { //$NON-NLS-1$
             this.isExtension = false;
-        } else if (localName.equals("description")) { //$NON-NLS-1$
+        }
+        else if (localName.equals("description")) { //$NON-NLS-1$
             this.isDescription = false;
-        } else if (localName.equals("test")) { //$NON-NLS-1$
+        }
+        else if (localName.equals("test")) { //$NON-NLS-1$
             this.isTest = false;
         }
     }
@@ -420,9 +367,7 @@ public class MagicParser extends DefaultHandler
      * @throws SAXException DOCUMENT ME!
      */
     @Override
-	public void error(final SAXParseException ex)
-        throws SAXException
-    {
+	public void error(final SAXParseException ex) throws SAXException {
         // FIXME
         throw ex;
     }
@@ -458,38 +403,32 @@ public class MagicParser extends DefaultHandler
 
         while ((end = s.indexOf('\\', beg)) != -1) {
             if (s.charAt(end + 1) != '\\') {
-                //log.debug("appending chunk '"+s.substring(beg, end)+"'");
+
                 for (int z = beg; z < end; z++) {
                     buf.write(s.charAt(z));
                 }
 
-                //log.debug("found \\ at position "+end);
-                //log.debug("converting octal '"+s.substring(end, end+4)+"'");
                 if ((end + 4) <= s.length()) {
                     try {
                         chr = Integer.parseInt(s.substring(end + 1, end + 4), 8);
 
-                        //log.debug("converted octal '"+s.substring(end+1,end+4)+"' to '"+chr);
-                        //log.debug("converted octal back to '"+Integer.toOctalString(chr));
-
-                        //log.debug("converted '"+s.substring(end+1,end+4)+"' to "+chr+"/"+((char)chr));
                         buf.write(chr);
                         beg = end + 4;
                         end = beg;
-                    } catch (final NumberFormatException nfe) {
-                        //log.debug("not an octal");
+                    }
+                    catch (final NumberFormatException nfe) {
                         buf.write('\\');
                         beg = end + 1;
                         end = beg;
                     }
-                } else {
-                    //log.debug("not an octal, not enough chars left in string");
+                }
+                else {
                     buf.write('\\');
                     beg = end + 1;
                     end = beg;
                 }
-            } else {
-                //log.debug("appending \\");
+            }
+            else {
                 buf.write('\\');
                 beg = end + 1;
                 end = beg;
@@ -505,7 +444,8 @@ public class MagicParser extends DefaultHandler
         try {
             final ByteBuffer b = ByteBuffer.allocate(buf.size());
             return b.put(buf.toByteArray());
-        } catch (final Exception e) {
+        }
+        catch (final Exception e) {
             return ByteBuffer.allocate(0);
         }
     }

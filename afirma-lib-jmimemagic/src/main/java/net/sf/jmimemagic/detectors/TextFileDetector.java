@@ -37,7 +37,7 @@ import org.apache.oro.text.perl.Perl5Util;
  * @author $Author$
  * @version $Revision$
   */
-public class TextFileDetector implements MagicDetector
+public final class TextFileDetector implements MagicDetector
 {
 
     /**
