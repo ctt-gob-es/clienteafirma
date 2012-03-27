@@ -22,6 +22,12 @@ For more information, please email arimus@users.sourceforge.net
 */
 package net.sf.jmimemagic;
 
+import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.ErrorHandler;
@@ -32,14 +38,6 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
-
-import java.io.ByteArrayOutputStream;
-
-import java.nio.ByteBuffer;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 
 
 /**
@@ -55,33 +53,33 @@ public class MagicParser extends DefaultHandler implements ContentHandler, Error
     // Namespaces feature id (http://xml.org/sax/features/namespaces).
     protected static final String NAMESPACES_FEATURE_ID = "http://xml.org/sax/features/namespaces";
 
-    // Validation feature id (http://xml.org/sax/features/validation). 
+    // Validation feature id (http://xml.org/sax/features/validation).
     protected static final String VALIDATION_FEATURE_ID = "http://xml.org/sax/features/validation";
 
-    // Schema validation feature id (http://apache.org/xml/features/validation/schema). 
+    // Schema validation feature id (http://apache.org/xml/features/validation/schema).
     protected static final String SCHEMA_VALIDATION_FEATURE_ID = "http://apache.org/xml/features/validation/schema";
 
-    // Schema full checking feature id (http://apache.org/xml/features/validation/schema-full-checking). 
+    // Schema full checking feature id (http://apache.org/xml/features/validation/schema-full-checking).
     protected static final String SCHEMA_FULL_CHECKING_FEATURE_ID = "http://apache.org/xml/features/validation/schema-full-checking";
 
-    // Default parser name. 
+    // Default parser name.
     protected static final String DEFAULT_PARSER_NAME = "org.apache.xerces.parsers.SAXParser";
 
-    // Default namespaces support (true). 
+    // Default namespaces support (true).
     protected static final boolean DEFAULT_NAMESPACES = true;
 
-    // Default validation support (false). 
+    // Default validation support (false).
     protected static final boolean DEFAULT_VALIDATION = false;
 
-    // Default Schema validation support (false). 
+    // Default Schema validation support (false).
     protected static final boolean DEFAULT_SCHEMA_VALIDATION = false;
 
-    // Default Schema full checking support (false). 
+    // Default Schema full checking support (false).
     protected static final boolean DEFAULT_SCHEMA_FULL_CHECKING = false;
     private boolean initialized = false;
     private XMLReader parser = null;
-    private ArrayList stack = new ArrayList();
-    private Collection matchers = new ArrayList();
+    private final ArrayList stack = new ArrayList();
+    private final Collection matchers = new ArrayList();
     private MagicMatcher matcher = null;
     private MagicMatch match = null;
     private HashMap properties = null;
@@ -100,79 +98,79 @@ public class MagicParser extends DefaultHandler implements ContentHandler, Error
     public synchronized void initialize()
         throws MagicParseException
     {
-        boolean namespaces = DEFAULT_NAMESPACES;
-        boolean validation = DEFAULT_VALIDATION;
-        boolean schemaValidation = DEFAULT_SCHEMA_VALIDATION;
-        boolean schemaFullChecking = DEFAULT_SCHEMA_FULL_CHECKING;
+        final boolean namespaces = DEFAULT_NAMESPACES;
+        final boolean validation = DEFAULT_VALIDATION;
+        final boolean schemaValidation = DEFAULT_SCHEMA_VALIDATION;
+        final boolean schemaFullChecking = DEFAULT_SCHEMA_FULL_CHECKING;
 
-        if (!initialized) {
+        if (!this.initialized) {
             // use default parser
             try {
-                parser = XMLReaderFactory.createXMLReader();
-            } catch (Exception e) {
+                this.parser = XMLReaderFactory.createXMLReader();
+            } catch (final Exception e) {
                 try {
-                    parser = XMLReaderFactory.createXMLReader(DEFAULT_PARSER_NAME);
-                } catch (Exception ee) {
+                    this.parser = XMLReaderFactory.createXMLReader(DEFAULT_PARSER_NAME);
+                } catch (final Exception ee) {
                     throw new MagicParseException("unable to instantiate parser");
                 }
             }
 
             // set parser features
             try {
-                parser.setFeature(NAMESPACES_FEATURE_ID, namespaces);
-            } 
-            catch (SAXException e) {
+                this.parser.setFeature(NAMESPACES_FEATURE_ID, namespaces);
+            }
+            catch (final SAXException e) {
                 java.util.logging.Logger.getAnonymousLogger().warning("Parser does not support feature (" + NAMESPACES_FEATURE_ID + ")");
             }
 
             try {
-                parser.setFeature(VALIDATION_FEATURE_ID, validation);
-            } catch (SAXException e) {
+                this.parser.setFeature(VALIDATION_FEATURE_ID, validation);
+            } catch (final SAXException e) {
             	java.util.logging.Logger.getAnonymousLogger().warning("Parser does not support feature (" + VALIDATION_FEATURE_ID + ")");
             }
 
             try {
-                parser.setFeature(SCHEMA_VALIDATION_FEATURE_ID, schemaValidation);
-            } 
-            catch (SAXNotRecognizedException e) {
+                this.parser.setFeature(SCHEMA_VALIDATION_FEATURE_ID, schemaValidation);
+            }
+            catch (final SAXNotRecognizedException e) {
                 // ignore
-            } 
-            catch (SAXNotSupportedException e) {
+            }
+            catch (final SAXNotSupportedException e) {
             	java.util.logging.Logger.getAnonymousLogger().warning("Parser does not support feature (" + SCHEMA_VALIDATION_FEATURE_ID + ")");
             }
 
             try {
-                parser.setFeature(SCHEMA_FULL_CHECKING_FEATURE_ID, schemaFullChecking);
-            } 
-            catch (SAXNotRecognizedException e) {
+                this.parser.setFeature(SCHEMA_FULL_CHECKING_FEATURE_ID, schemaFullChecking);
+            }
+            catch (final SAXNotRecognizedException e) {
                 // ignore
-            } 
-            catch (SAXNotSupportedException e) {
+            }
+            catch (final SAXNotSupportedException e) {
             	java.util.logging.Logger.getAnonymousLogger().warning("Parser does not support feature (" + SCHEMA_FULL_CHECKING_FEATURE_ID + ")");
             }
 
             // set handlers
-            parser.setErrorHandler(this);
-            parser.setContentHandler(this);
+            this.parser.setErrorHandler(this);
+            this.parser.setContentHandler(this);
 
             // parse file
             try {
                 // get the magic file URL
-                String magicURL = MagicParser.class.getResource(magicFile).toString();
+                final String magicURL = MagicParser.class.getResource(magicFile).toString();
 
                 if (magicURL == null) {
                     throw new MagicParseException("couldn't load '" + magicURL + "'");
                 }
 
-                parser.parse(magicURL);
-            } catch (SAXParseException e) {
+                this.parser.parse(magicURL);
+            } catch (final SAXParseException e) {
                 // ignore
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 e.printStackTrace();
                 throw new MagicParseException("parse error occurred - " + e.getMessage());
             }
 
-            initialized = true;
+            this.initialized = true;
         }
     }
 
@@ -183,14 +181,17 @@ public class MagicParser extends DefaultHandler implements ContentHandler, Error
      */
     public Collection getMatchers()
     {
-        return matchers;
+        return this.matchers;
     }
 
-    public void startDocument() throws SAXException {}
+    @Override
+	public void startDocument() throws SAXException {}
 
-    public void endDocument() throws SAXException {}
+    @Override
+	public void endDocument() throws SAXException {}
 
-    public void processingInstruction(String target, String data) throws SAXException {
+    @Override
+	public void processingInstruction(final String target, final String data) throws SAXException {
         // do nothing
     }
 
@@ -203,11 +204,12 @@ public class MagicParser extends DefaultHandler implements ContentHandler, Error
      *
      * @throws SAXException DOCUMENT ME!
      */
-    public void characters(char[] ch, int offset, int length)
+    @Override
+	public void characters(final char[] ch, final int offset, final int length)
         throws SAXException
     {
-        String value = new String(ch, offset, length);
-        finalValue += value;
+        final String value = new String(ch, offset, length);
+        this.finalValue += value;
     }
 
     /**
@@ -219,7 +221,8 @@ public class MagicParser extends DefaultHandler implements ContentHandler, Error
      *
      * @throws SAXException DOCUMENT ME!
      */
-    public void ignorableWhitespace(char[] ch, int offset, int length)
+    @Override
+	public void ignorableWhitespace(final char[] ch, final int offset, final int length)
         throws SAXException
     {
         // do nothing
@@ -235,62 +238,63 @@ public class MagicParser extends DefaultHandler implements ContentHandler, Error
      *
      * @throws SAXException DOCUMENT ME!
      */
-    public void startElement(String uri, String localName, String qname, Attributes attributes)
+    @Override
+	public void startElement(final String uri, final String localName, final String qname, final Attributes attributes)
         throws SAXException
     {
 
         // create a new matcher
         if (localName.equals("match")) {
             // match to hold data
-            match = new MagicMatch();
+            this.match = new MagicMatch();
             // our matcher
-            matcher = new MagicMatcher();
-            matcher.setMatch(match);
+            this.matcher = new MagicMatcher();
+            this.matcher.setMatch(this.match);
         }
 
         // these are subelements of matcher, but also occur elsewhere
-        if (matcher != null) {
+        if (this.matcher != null) {
             if (localName.equals("mimetype")) {
-                isMimeType = true;
+                this.isMimeType = true;
             } else if (localName.equals("extension")) {
-                isExtension = true;
+                this.isExtension = true;
             } else if (localName.equals("description")) {
-                isDescription = true;
+                this.isDescription = true;
             } else if (localName.equals("test")) {
-                isTest = true;
+                this.isTest = true;
 
-                int length = attributes.getLength();
+                final int length = attributes.getLength();
 
                 for (int i = 0; i < length; i++) {
-                    String attrLocalName = attributes.getLocalName(i);
-                    String attrValue = attributes.getValue(i);
+                    final String attrLocalName = attributes.getLocalName(i);
+                    final String attrValue = attributes.getValue(i);
 
                     if (attrLocalName.equals("offset")) {
                         if (!attrValue.equals("")) {
-                            match.setOffset(new Integer(attrValue).intValue());
+                            this.match.setOffset(new Integer(attrValue).intValue());
                         }
                     } else if (attrLocalName.equals("length")) {
                         if (!attrValue.equals("")) {
-                            match.setLength(new Integer(attrValue).intValue());
+                            this.match.setLength(new Integer(attrValue).intValue());
                         }
                     } else if (attrLocalName.equals("type")) {
-                        match.setType(attrValue);
+                        this.match.setType(attrValue);
                     } else if (attrLocalName.equals("bitmask")) {
                         if (!attrValue.equals("")) {
-                            match.setBitmask(attrValue);
+                            this.match.setBitmask(attrValue);
                         }
                     } else if (attrLocalName.equals("comparator")) {
-                        match.setComparator(attrValue);
+                        this.match.setComparator(attrValue);
                     }
                 }
             } else if (localName.equals("property")) {
-                int length = attributes.getLength();
+                final int length = attributes.getLength();
                 String name = null;
                 String value = null;
 
                 for (int i = 0; i < length; i++) {
-                    String attrLocalName = attributes.getLocalName(i);
-                    String attrValue = attributes.getValue(i);
+                    final String attrLocalName = attributes.getLocalName(i);
+                    final String attrValue = attributes.getValue(i);
 
                     if (attrLocalName.equals("name")) {
                         if (!attrValue.equals("")) {
@@ -305,18 +309,18 @@ public class MagicParser extends DefaultHandler implements ContentHandler, Error
 
                 // save the property to our map
                 if ((name != null) && (value != null)) {
-                    if (properties == null) {
-                        properties = new HashMap();
+                    if (this.properties == null) {
+                        this.properties = new HashMap();
                     }
 
-                    if (!properties.containsKey(name)) {
-                        properties.put(name, value);
+                    if (!this.properties.containsKey(name)) {
+                        this.properties.put(name, value);
                     }
                 }
             } else if (localName.equals("match-list")) {
                 // this means we are processing a child match, so we need to push
                 // the existing match on the stack
-                stack.add(matcher);
+                this.stack.add(this.matcher);
             } else {
                 // we don't care about this type
             }
@@ -332,66 +336,67 @@ public class MagicParser extends DefaultHandler implements ContentHandler, Error
      *
      * @throws SAXException DOCUMENT ME!
      */
-    public void endElement(String uri, String localName, String qname)
+    @Override
+	public void endElement(final String uri, final String localName, final String qname)
         throws SAXException
     {
 
         // determine which tag these chars are for and save them
-        if (isMimeType) {
-            isMimeType = false;
-            match.setMimeType(finalValue);
-        } else if (isExtension) {
-            isExtension = false;
-            match.setExtension(finalValue);
-        } else if (isDescription) {
-            isDescription = false;
-            match.setDescription(finalValue);
-        } else if (isTest) {
-            isTest = false;
-            match.setTest(convertOctals(finalValue));
+        if (this.isMimeType) {
+            this.isMimeType = false;
+            this.match.setMimeType(this.finalValue);
+        } else if (this.isExtension) {
+            this.isExtension = false;
+            this.match.setExtension(this.finalValue);
+        } else if (this.isDescription) {
+            this.isDescription = false;
+            this.match.setDescription(this.finalValue);
+        } else if (this.isTest) {
+            this.isTest = false;
+            this.match.setTest(convertOctals(this.finalValue));
         } else {
             // do nothing
         }
 
-        finalValue = "";
+        this.finalValue = "";
 
         // need to save the current matcher here if it is filled out enough and
         // we have an /matcher
         if (localName.equals("match")) {
             // FIXME - make sure the MagicMatcher isValid() test works
-            if (matcher.isValid()) {
+            if (this.matcher.isValid()) {
                 // set the collected properties on this matcher
-                match.setProperties(properties);
+                this.match.setProperties(this.properties);
 
                 // add root match
-                if (stack.size() == 0) {
-                    matchers.add(matcher);
+                if (this.stack.size() == 0) {
+                    this.matchers.add(this.matcher);
                 } else {
                     // we need to add the match to it's parent which is on the
                     // stack
-                    MagicMatcher m = (MagicMatcher) stack.get(stack.size() - 1);
-                    m.addSubMatcher(matcher);
+                    final MagicMatcher m = (MagicMatcher) this.stack.get(this.stack.size() - 1);
+                    m.addSubMatcher(this.matcher);
                 }
             }
 
-            matcher = null;
-            properties = null;
+            this.matcher = null;
+            this.properties = null;
 
             // restore matcher from the stack if we have an /matcher-list
         } else if (localName.equals("match-list")) {
-            if (stack.size() > 0) {
-                matcher = (MagicMatcher) stack.get(stack.size() - 1);
+            if (this.stack.size() > 0) {
+                this.matcher = (MagicMatcher) this.stack.get(this.stack.size() - 1);
                 // pop from the stack
-                stack.remove(matcher);
+                this.stack.remove(this.matcher);
             }
         } else if (localName.equals("mimetype")) {
-            isMimeType = false;
+            this.isMimeType = false;
         } else if (localName.equals("extension")) {
-            isExtension = false;
+            this.isExtension = false;
         } else if (localName.equals("description")) {
-            isDescription = false;
+            this.isDescription = false;
         } else if (localName.equals("test")) {
-            isTest = false;
+            this.isTest = false;
         }
     }
 
@@ -402,7 +407,8 @@ public class MagicParser extends DefaultHandler implements ContentHandler, Error
      *
      * @throws SAXException DOCUMENT ME!
      */
-    public void warning(SAXParseException ex)
+    @Override
+	public void warning(final SAXParseException ex)
         throws SAXException
     {
         // FIXME
@@ -415,7 +421,8 @@ public class MagicParser extends DefaultHandler implements ContentHandler, Error
      *
      * @throws SAXException DOCUMENT ME!
      */
-    public void error(SAXParseException ex)
+    @Override
+	public void error(final SAXParseException ex)
         throws SAXException
     {
         // FIXME
@@ -429,7 +436,8 @@ public class MagicParser extends DefaultHandler implements ContentHandler, Error
      *
      * @throws SAXException DOCUMENT ME!
      */
-    public void fatalError(SAXParseException ex)
+    @Override
+	public void fatalError(final SAXParseException ex)
         throws SAXException
     {
         // FIXME
@@ -443,21 +451,18 @@ public class MagicParser extends DefaultHandler implements ContentHandler, Error
      *
      * @return string with all octals decoded
      */
-    private ByteBuffer convertOctals(String s)
+    private static ByteBuffer convertOctals(final String s)
     {
         int beg = 0;
         int end = 0;
-        int c1;
-        int c2;
-        int c3;
         int chr;
-        ByteArrayOutputStream buf = new ByteArrayOutputStream();
+        final ByteArrayOutputStream buf = new ByteArrayOutputStream();
 
         while ((end = s.indexOf('\\', beg)) != -1) {
             if (s.charAt(end + 1) != '\\') {
                 //log.debug("appending chunk '"+s.substring(beg, end)+"'");
                 for (int z = beg; z < end; z++) {
-                    buf.write((int) s.charAt(z));
+                    buf.write(s.charAt(z));
                 }
 
                 //log.debug("found \\ at position "+end);
@@ -473,21 +478,21 @@ public class MagicParser extends DefaultHandler implements ContentHandler, Error
                         buf.write(chr);
                         beg = end + 4;
                         end = beg;
-                    } catch (NumberFormatException nfe) {
+                    } catch (final NumberFormatException nfe) {
                         //log.debug("not an octal");
-                        buf.write((int) '\\');
+                        buf.write('\\');
                         beg = end + 1;
                         end = beg;
                     }
                 } else {
                     //log.debug("not an octal, not enough chars left in string");
-                    buf.write((int) '\\');
+                    buf.write('\\');
                     beg = end + 1;
                     end = beg;
                 }
             } else {
                 //log.debug("appending \\");
-                buf.write((int) '\\');
+                buf.write('\\');
                 beg = end + 1;
                 end = beg;
             }
@@ -495,14 +500,14 @@ public class MagicParser extends DefaultHandler implements ContentHandler, Error
 
         if (end < s.length()) {
             for (int z = beg; z < s.length(); z++) {
-                buf.write((int) s.charAt(z));
+                buf.write(s.charAt(z));
             }
         }
 
         try {
-            ByteBuffer b = ByteBuffer.allocate(buf.size());
+            final ByteBuffer b = ByteBuffer.allocate(buf.size());
             return b.put(buf.toByteArray());
-        } catch (Exception e) {
+        } catch (final Exception e) {
             return ByteBuffer.allocate(0);
         }
     }

@@ -23,7 +23,6 @@ For more information, please email arimus@users.sourceforge.net
 package net.sf.jmimemagic;
 
 import java.nio.ByteBuffer;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -48,41 +47,41 @@ public class MagicMatch implements Cloneable {
     // possible types:
     //     byte, short, long, string, date, beshort, belong, bedate, leshort,
     //     lelong, ledate, regex
-    private String type = "";
+    private String type = ""; //$NON-NLS-1$
     private long bitmask = 0xFFFFFFFFL;
     private char comparator = '\0';
-    private ArrayList subMatches = new ArrayList(0);
+    private final ArrayList<MagicMatch> subMatches = new ArrayList<MagicMatch>(0);
     private Map properties;
 
     /** Print information about this match. */
     public String print() {
-        StringBuffer string = new StringBuffer();
-        string.append("\n");
-        string.append("mime type: ").append(mimeType).append("\n");
-        string.append("description: ").append(description).append("\n");
-        string.append("extension: ").append(extension).append("\n");
-        string.append("offset: ").append(offset).append("\n");
-        string.append("length: ").append(length).append("\n");
-        string.append("test: ").append(new String(test.array())).append("\n");
-        string.append("type: ").append(type).append("\n");
-        string.append("comparator: ").append(comparator).append("\n");
-        string.append("bitmask: ").append(bitmask);
+        final StringBuffer string = new StringBuffer();
+        string.append("\n"); //$NON-NLS-1$
+        string.append("mime type: ").append(this.mimeType).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        string.append("description: ").append(this.description).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        string.append("extension: ").append(this.extension).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        string.append("offset: ").append(this.offset).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        string.append("length: ").append(this.length).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        string.append("test: ").append(new String(this.test.array())).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        string.append("type: ").append(this.type).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        string.append("comparator: ").append(this.comparator).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        string.append("bitmask: ").append(this.bitmask); //$NON-NLS-1$
         return string.toString();
     }
 
     /** Set the mime type for this magic match. */
-    public void setMimeType(String value) {
-        mimeType = value;
+    public void setMimeType(final String value) {
+        this.mimeType = value;
     }
 
     /** Get the magic match for this magic match. */
     public String getMimeType() {
-        return mimeType;
+        return this.mimeType;
     }
 
     /** Set the extension for this magic match. */
-    public void setExtension(String value) {
-        extension = value;
+    public void setExtension(final String value) {
+        this.extension = value;
     }
 
     /**
@@ -90,12 +89,12 @@ public class MagicMatch implements Cloneable {
      * @return the extension for this magic match
      */
     public String getExtension() {
-        return extension;
+        return this.extension;
     }
 
     /** Set the description for this magic match. */
-    public void setDescription(String value) {
-        description = value;
+    public void setDescription(final String value) {
+        this.description = value;
     }
 
     /**
@@ -103,7 +102,7 @@ public class MagicMatch implements Cloneable {
      * @return the description for thie magic match
      */
     public String getDescription() {
-        return description;
+        return this.description;
     }
 
     /**
@@ -111,9 +110,9 @@ public class MagicMatch implements Cloneable {
      *
      * @param value DOCUMENT ME!
      */
-    public void setTest(ByteBuffer value)
+    public void setTest(final ByteBuffer value)
     {
-        test = value;
+        this.test = value;
     }
 
     /**
@@ -123,7 +122,7 @@ public class MagicMatch implements Cloneable {
      */
     public ByteBuffer getTest()
     {
-        return test;
+        return this.test;
     }
 
     /**
@@ -131,7 +130,7 @@ public class MagicMatch implements Cloneable {
      *
      * @param value DOCUMENT ME!
      */
-    public void setOffset(int value)
+    public void setOffset(final int value)
     {
         this.offset = value;
     }
@@ -143,7 +142,7 @@ public class MagicMatch implements Cloneable {
      */
     public int getOffset()
     {
-        return offset;
+        return this.offset;
     }
 
     /**
@@ -151,7 +150,7 @@ public class MagicMatch implements Cloneable {
      *
      * @param value DOCUMENT ME!
      */
-    public void setLength(int value)
+    public void setLength(final int value)
     {
         this.length = value;
     }
@@ -163,7 +162,7 @@ public class MagicMatch implements Cloneable {
      */
     public int getLength()
     {
-        return length;
+        return this.length;
     }
 
     /**
@@ -171,7 +170,7 @@ public class MagicMatch implements Cloneable {
      *
      * @param value DOCUMENT ME!
      */
-    public void setType(String value)
+    public void setType(final String value)
     {
         this.type = value;
     }
@@ -183,7 +182,7 @@ public class MagicMatch implements Cloneable {
      */
     public String getType()
     {
-        return type;
+        return this.type;
     }
 
     /**
@@ -191,7 +190,7 @@ public class MagicMatch implements Cloneable {
      *
      * @param value DOCUMENT ME!
      */
-    public void setBitmask(String value)
+    public void setBitmask(final String value)
     {
         if (value != null) {
             this.bitmask = Long.decode(value).intValue();
@@ -205,7 +204,7 @@ public class MagicMatch implements Cloneable {
      */
     public long getBitmask()
     {
-        return bitmask;
+        return this.bitmask;
     }
 
     /**
@@ -213,7 +212,7 @@ public class MagicMatch implements Cloneable {
      *
      * @param value DOCUMENT ME!
      */
-    public void setComparator(String value)
+    public void setComparator(final String value)
     {
         this.comparator = value.charAt(0);
     }
@@ -225,7 +224,7 @@ public class MagicMatch implements Cloneable {
      */
     public char getComparator()
     {
-        return comparator;
+        return this.comparator;
     }
 
     /**
@@ -233,7 +232,7 @@ public class MagicMatch implements Cloneable {
      *
      * @param properties DOCUMENT ME!
      */
-    public void setProperties(Map properties)
+    public void setProperties(final Map properties)
     {
         this.properties = properties;
     }
@@ -245,24 +244,24 @@ public class MagicMatch implements Cloneable {
      */
     public Map getProperties()
     {
-        return properties;
+        return this.properties;
     }
 
     /**
      * Add a submatch to this magic match.
      * @param m a magic match
      */
-    public void addSubMatch(MagicMatch m) {
-        subMatches.add(m);
+    public void addSubMatch(final MagicMatch m) {
+        this.subMatches.add(m);
     }
 
     /**
      * Set all submatches.
      * @param a a collection of submatches
      */
-    public void setSubMatches(Collection a) {
-        subMatches.clear();
-        subMatches.addAll(a);
+    public void setSubMatches(final Collection<MagicMatch> a) {
+        this.subMatches.clear();
+        this.subMatches.addAll(a);
     }
 
     /**
@@ -270,9 +269,9 @@ public class MagicMatch implements Cloneable {
      *
      * @return a collection of submatches
      */
-    public Collection getSubMatches()
+    public Collection<MagicMatch> getSubMatches()
     {
-        return subMatches;
+        return this.subMatches;
     }
 
     /**
@@ -282,18 +281,18 @@ public class MagicMatch implements Cloneable {
      *
      * @return whether or not the description matches
      */
-    public boolean descriptionMatches(String desc)
+    public boolean descriptionMatches(final String desc)
     {
-        if ((description != null) && description.equals(desc)) {
+        if ((this.description != null) && this.description.equals(desc)) {
             return true;
         }
 
-        Collection submatches = getSubMatches();
-        Iterator i = submatches.iterator();
+        final Collection<MagicMatch> submatches = getSubMatches();
+        final Iterator<MagicMatch> i = submatches.iterator();
         MagicMatch m = null;
 
         while (i.hasNext()) {
-            m = (MagicMatch) i.next();
+            m = i.next();
 
             if (m.descriptionMatches(desc)) {
                 return true;
@@ -310,18 +309,18 @@ public class MagicMatch implements Cloneable {
      *
      * @return whether or not the description matches
      */
-    public boolean mimeTypeMatches(String desc)
+    public boolean mimeTypeMatches(final String desc)
     {
-        if ((mimeType != null) && mimeType.equals(desc)) {
+        if ((this.mimeType != null) && this.mimeType.equals(desc)) {
             return true;
         }
 
-        Collection submatches = getSubMatches();
-        Iterator i = submatches.iterator();
+        final Collection<MagicMatch> submatches = getSubMatches();
+        final Iterator<MagicMatch> i = submatches.iterator();
         MagicMatch m = null;
 
         while (i.hasNext()) {
-            m = (MagicMatch) i.next();
+            m = i.next();
 
             if (m.mimeTypeMatches(desc)) {
                 return true;
@@ -338,35 +337,36 @@ public class MagicMatch implements Cloneable {
      *
      * @throws CloneNotSupportedException DOCUMENT ME!
      */
-    protected Object clone()
+    @Override
+	protected Object clone()
         throws CloneNotSupportedException
     {
-        MagicMatch clone = new MagicMatch();
-        clone.setBitmask(Long.toString(bitmask, 8));
-        clone.setComparator("" + comparator);
-        clone.setDescription(description);
-        clone.setExtension(extension);
-        clone.setLength(length);
-        clone.setMimeType(mimeType);
-        clone.setOffset(offset);
+        final MagicMatch clone = new MagicMatch();
+        clone.setBitmask(Long.toString(this.bitmask, 8));
+        clone.setComparator("" + this.comparator); //$NON-NLS-1$
+        clone.setDescription(this.description);
+        clone.setExtension(this.extension);
+        clone.setLength(this.length);
+        clone.setMimeType(this.mimeType);
+        clone.setOffset(this.offset);
 
         // these properties should only be String types, so we shouldn't have to clone them
-        HashMap m = new HashMap();
-        m.putAll(properties);
+        final HashMap m = new HashMap();
+        m.putAll(this.properties);
         clone.setProperties(m);
 
-        Iterator i = subMatches.iterator();
-        ArrayList a = new ArrayList();
+        final Iterator<MagicMatch> i = this.subMatches.iterator();
+        final ArrayList<MagicMatch> a = new ArrayList<MagicMatch>();
 
         while (i.hasNext()) {
-            MagicMatch mm = (MagicMatch) i.next();
+            final MagicMatch mm = i.next();
             a.add(mm);
         }
 
         clone.setSubMatches(a);
 
-        clone.setTest(test);
-        clone.setType(type);
+        clone.setTest(this.test);
+        clone.setType(this.type);
 
         // TODO Auto-generated method stub
         return clone;

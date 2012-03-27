@@ -25,10 +25,8 @@ package net.sf.jmimemagic;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -44,11 +42,11 @@ import org.apache.oro.text.perl.Perl5Util;
  */
 public class MagicMatcher implements Cloneable {
 
-    private ArrayList subMatchers = new ArrayList(0);
+    private final ArrayList<MagicMatcher> subMatchers = new ArrayList<MagicMatcher>(0);
     private MagicMatch match = null;
 
 
-    public void setMatch(MagicMatch match) {
+    public void setMatch(final MagicMatch match) {
         this.match = match;
     }
 
@@ -63,14 +61,14 @@ public class MagicMatcher implements Cloneable {
      */
     public boolean isValid() {
 
-        if ((match == null) || (match.getTest() == null)) {
+        if ((this.match == null) || (this.match.getTest() == null)) {
             return false;
         }
 
-        String type = new String(match.getTest().array());
-        char comparator = match.getComparator();
-        String description = match.getDescription();
-        String test = new String(match.getTest().array());
+        final String type = new String(this.match.getTest().array());
+        final char comparator = this.match.getComparator();
+        final String description = this.match.getDescription();
+        final String test = new String(this.match.getTest().array());
 
         if ((type != null) && !type.equals("") && (comparator != '\0') &&
                 ((comparator == '=') || (comparator == '!') || (comparator == '>') ||
@@ -87,8 +85,8 @@ public class MagicMatcher implements Cloneable {
      *
      * @param m a magic match
      */
-    public void addSubMatcher(MagicMatcher m) {
-        subMatchers.add(m);
+    public void addSubMatcher(final MagicMatcher m) {
+        this.subMatchers.add(m);
     }
 
     /**
@@ -96,10 +94,10 @@ public class MagicMatcher implements Cloneable {
      *
      * @param a a collection of submatches
      */
-    public void setSubMatchers(Collection a)
+    public void setSubMatchers(final Collection a)
     {
-        subMatchers.clear();
-        subMatchers.addAll(a);
+        this.subMatchers.clear();
+        this.subMatchers.addAll(a);
     }
 
     /**
@@ -108,7 +106,7 @@ public class MagicMatcher implements Cloneable {
      * @return a collection of submatches
      */
     public Collection getSubMatchers() {
-        return subMatchers;
+        return this.subMatchers;
     }
 
     /**
@@ -122,12 +120,12 @@ public class MagicMatcher implements Cloneable {
      * @throws IOException DOCUMENT ME!
      * @throws UnsupportedTypeException DOCUMENT ME!
      */
-    public MagicMatch test(File f, boolean onlyMimeMatch) throws IOException, UnsupportedTypeException {
+    public MagicMatch test(final File f, final boolean onlyMimeMatch) throws IOException, UnsupportedTypeException {
 
-        int offset = match.getOffset();
-        String description = match.getDescription();
-        String type = match.getType();
-        String mimeType = match.getMimeType();
+        final int offset = this.match.getOffset();
+        this.match.getDescription();
+        final String type = this.match.getType();
+        this.match.getMimeType();
 
         RandomAccessFile file = null;
         file = new RandomAccessFile(f, "r");
@@ -142,7 +140,7 @@ public class MagicMatcher implements Cloneable {
             } else if (type.equals("long") || type.equals("lelong") || type.equals("belong")) {
                 length = 8;
             } else if (type.equals("string")) {
-                length = match.getTest().capacity();
+                length = this.match.getTest().capacity();
             } else if (type.equals("regex")) {
                 length = (int) file.length() - offset;
 
@@ -164,12 +162,11 @@ public class MagicMatcher implements Cloneable {
                 return null;
             }
 
-            byte[] buf = new byte[length];
+            final byte[] buf = new byte[length];
             file.seek(offset);
 
             int bytesRead = 0;
             int size = 0;
-            boolean gotAllBytes = false;
             boolean done = false;
 
             while (!done) {
@@ -182,7 +179,6 @@ public class MagicMatcher implements Cloneable {
                 bytesRead += size;
 
                 if (bytesRead == length) {
-                    gotAllBytes = true;
                     done = true;
                 }
             }
@@ -195,11 +191,11 @@ public class MagicMatcher implements Cloneable {
                 match = getMatch();
 
                 // set the data on this match
-                if ((onlyMimeMatch == false) && (subMatchers != null) && (subMatchers.size() > 0)) {
+                if ((onlyMimeMatch == false) && (this.subMatchers != null) && (this.subMatchers.size() > 0)) {
 
-                    for (int i = 0; i < subMatchers.size(); i++) {
+                    for (int i = 0; i < this.subMatchers.size(); i++) {
 
-                        MagicMatcher m = (MagicMatcher) subMatchers.get(i);
+                        final MagicMatcher m = this.subMatchers.get(i);
 
                         if ((submatch = m.test(f, false)) != null) {
                             match.addSubMatch(submatch);
@@ -212,7 +208,7 @@ public class MagicMatcher implements Cloneable {
         } finally {
             try {
                 file.close();
-            } catch (Exception fce) {
+            } catch (final Exception fce) {
             }
         }
     }
@@ -228,15 +224,15 @@ public class MagicMatcher implements Cloneable {
      * @throws IOException DOCUMENT ME!
      * @throws UnsupportedTypeException DOCUMENT ME!
      */
-    public MagicMatch test(byte[] data, boolean onlyMimeMatch)
+    public MagicMatch test(final byte[] data, final boolean onlyMimeMatch)
         throws IOException, UnsupportedTypeException
     {
 
-        int offset = match.getOffset();
-        String description = match.getDescription();
-        String type = match.getType();
-        String test = new String(match.getTest().array());
-        String mimeType = match.getMimeType();
+        final int offset = this.match.getOffset();
+        this.match.getDescription();
+        final String type = this.match.getType();
+        new String(this.match.getTest().array());
+        this.match.getMimeType();
 
         int length = 0;
 
@@ -247,7 +243,7 @@ public class MagicMatcher implements Cloneable {
         } else if (type.equals("long") || type.equals("lelong") || type.equals("belong")) {
             length = 8;
         } else if (type.equals("string")) {
-            length = match.getTest().capacity();
+            length = this.match.getTest().capacity();
         } else if (type.equals("regex")) {
             // FIXME - something wrong here, shouldn't have to subtract 1???
             length = data.length - offset - 1;
@@ -266,7 +262,7 @@ public class MagicMatcher implements Cloneable {
             throw new UnsupportedTypeException("unsupported test type " + type);
         }
 
-        byte[] buf = new byte[length];
+        final byte[] buf = new byte[length];
 
         if ((offset + length) < data.length) {
             System.arraycopy(data, offset, buf, 0, length);
@@ -279,11 +275,11 @@ public class MagicMatcher implements Cloneable {
                 match = getMatch();
 
                 // set the data on this match
-                if ((onlyMimeMatch == false) && (subMatchers != null) && (subMatchers.size() > 0)) {
+                if ((onlyMimeMatch == false) && (this.subMatchers != null) && (this.subMatchers.size() > 0)) {
 
-                    for (int i = 0; i < subMatchers.size(); i++) {
+                    for (int i = 0; i < this.subMatchers.size(); i++) {
 
-                        MagicMatcher m = (MagicMatcher) subMatchers.get(i);
+                        final MagicMatcher m = this.subMatchers.get(i);
 
                         if ((submatch = m.test(data, false)) != null) {
                             match.addSubMatch(submatch);
@@ -300,21 +296,21 @@ public class MagicMatcher implements Cloneable {
 
     /**
      * internal test switch
-     * 
+     *
      * @param data DOCUMENT ME!
      * @return DOCUMENT ME!
      */
-    private boolean testInternal(byte[] data)
+    private boolean testInternal(final byte[] data)
     {
 
         if (data.length == 0) {
             return false;
         }
 
-        String type = match.getType();
-        String test = new String(match.getTest().array());
-        String mimeType = match.getMimeType();
-        String description = match.getDescription();
+        final String type = this.match.getType();
+        final String test = new String(this.match.getTest().array());
+        this.match.getMimeType();
+        this.match.getDescription();
 
         ByteBuffer buffer = ByteBuffer.allocate(data.length);
 
@@ -381,18 +377,17 @@ public class MagicMatcher implements Cloneable {
      *
      * @return if we have a match
      */
-    private boolean testByte(ByteBuffer data)
+    private boolean testByte(final ByteBuffer data)
     {
-        String test = new String(match.getTest().array());
-        char comparator = match.getComparator();
-        long bitmask = match.getBitmask();
+        final String test = new String(this.match.getTest().array());
+        final char comparator = this.match.getComparator();
+        final long bitmask = this.match.getBitmask();
 
-        String s = test;
         byte b = data.get(0);
         b = (byte) (b & bitmask);
 
-        int tst = Integer.decode(test).byteValue();
-        byte t = (byte) (tst & 0xff);
+        final int tst = Integer.decode(test).byteValue();
+        final byte t = (byte) (tst & 0xff);
 
         switch (comparator) {
         case '=':
@@ -418,14 +413,14 @@ public class MagicMatcher implements Cloneable {
      *
      * @return if we have a match
      */
-    private boolean testString(ByteBuffer data)
+    private boolean testString(final ByteBuffer data)
     {
 
-        ByteBuffer test = match.getTest();
-        char comparator = match.getComparator();
+        final ByteBuffer test = this.match.getTest();
+        final char comparator = this.match.getComparator();
 
-        byte[] b = data.array();
-        byte[] t = test.array();
+        final byte[] b = data.array();
+        final byte[] t = test.array();
 
         boolean diff = false;
         int i = 0;
@@ -463,13 +458,13 @@ public class MagicMatcher implements Cloneable {
      *
      * @return if we have a match
      */
-    private boolean testShort(ByteBuffer data)
+    private boolean testShort(final ByteBuffer data)
     {
 
         short val = 0;
-        String test = new String(match.getTest().array());
-        char comparator = match.getComparator();
-        long bitmask = match.getBitmask();
+        final String test = new String(this.match.getTest().array());
+        final char comparator = this.match.getComparator();
+        final long bitmask = this.match.getBitmask();
 
         val = byteArrayToShort(data);
 
@@ -480,11 +475,11 @@ public class MagicMatcher implements Cloneable {
 
         try {
             tst = Integer.decode(test).shortValue();
-        } catch (NumberFormatException e) {
+        } catch (final NumberFormatException e) {
 
             return false;
 
-            //if (test.length() == 1) {	
+            //if (test.length() == 1) {
             //	tst = new Integer(Character.getNumericValue(test.charAt(0))).shortValue();
             //}
         }
@@ -513,20 +508,20 @@ public class MagicMatcher implements Cloneable {
      *
      * @return if we have a match
      */
-    private boolean testLong(ByteBuffer data)
+    private boolean testLong(final ByteBuffer data)
     {
 
         long val = 0;
-        String test = new String(match.getTest().array());
-        char comparator = match.getComparator();
-        long bitmask = match.getBitmask();
+        final String test = new String(this.match.getTest().array());
+        final char comparator = this.match.getComparator();
+        final long bitmask = this.match.getBitmask();
 
         val = byteArrayToLong(data);
 
         // apply bitmask before the comparison
         val = val & bitmask;
 
-        long tst = Long.decode(test).longValue();
+        final long tst = Long.decode(test).longValue();
 
         switch (comparator) {
         case '=':
@@ -552,13 +547,13 @@ public class MagicMatcher implements Cloneable {
      *
      * @return if we have a match
      */
-    private boolean testRegex(String text)
+    private boolean testRegex(final String text)
     {
 
-        String test = new String(match.getTest().array());
-        char comparator = match.getComparator();
+        final String test = new String(this.match.getTest().array());
+        final char comparator = this.match.getComparator();
 
-        Perl5Util utility = new Perl5Util();
+        final Perl5Util utility = new Perl5Util();
 
         if (comparator == '=') {
             if (utility.match(test, text)) {
@@ -584,27 +579,27 @@ public class MagicMatcher implements Cloneable {
      *
      * @return if we have a match
      */
-    private boolean testDetector(ByteBuffer data)
+    private boolean testDetector(final ByteBuffer data)
     {
 
-        String detectorClass = new String(match.getTest().array());
+        final String detectorClass = new String(this.match.getTest().array());
 
         try {
 
-            Class c = Class.forName(detectorClass);
-            MagicDetector detector = (MagicDetector) c.newInstance();
-            String[] types = detector.process(data.array(), match.getOffset(), match.getLength(),
-                    match.getBitmask(), match.getComparator(), match.getMimeType(),
-                    match.getProperties());
+            final Class c = Class.forName(detectorClass);
+            final MagicDetector detector = (MagicDetector) c.newInstance();
+            final String[] types = detector.process(data.array(), this.match.getOffset(), this.match.getLength(),
+                    this.match.getBitmask(), this.match.getComparator(), this.match.getMimeType(),
+                    this.match.getProperties());
 
             if ((types != null) && (types.length > 0)) {
                 // the match object has no mime type set, so set from the detector class processing
-                match.setMimeType(types[0]);
+                this.match.setMimeType(types[0]);
 
                 return true;
             }
-        } 
-        catch (Throwable e) {
+        }
+        catch (final Throwable e) {
         	java.util.logging.Logger.getAnonymousLogger().warning(e.toString());
         }
 
@@ -619,15 +614,15 @@ public class MagicMatcher implements Cloneable {
     public String[] getDetectorExtensions()
     {
 
-        String detectorClass = new String(match.getTest().array());
+        final String detectorClass = new String(this.match.getTest().array());
 
         try {
 
-            Class c = Class.forName(detectorClass);
-            MagicDetector detector = (MagicDetector) c.newInstance();
+            final Class c = Class.forName(detectorClass);
+            final MagicDetector detector = (MagicDetector) c.newInstance();
 
             return detector.getHandledTypes();
-        } catch (Throwable e) {
+        } catch (final Throwable e) {
         	java.util.logging.Logger.getAnonymousLogger().warning(e.toString());
         }
 
@@ -641,7 +636,7 @@ public class MagicMatcher implements Cloneable {
      *
      * @return an octal representation of the byte data
      */
-    private String byteToOctalString(byte b)
+    private String byteToOctalString(final byte b)
     {
         int n1;
         int n2;
@@ -660,7 +655,7 @@ public class MagicMatcher implements Cloneable {
      *
      * @return byte array converted to a short
      */
-    private short byteArrayToShort(ByteBuffer data)
+    private short byteArrayToShort(final ByteBuffer data)
     {
         return data.getShort(0);
     }
@@ -672,9 +667,9 @@ public class MagicMatcher implements Cloneable {
      *
      * @return byte arrays (high and low bytes) converted to a long value
      */
-    private long byteArrayToLong(ByteBuffer data)
+    private long byteArrayToLong(final ByteBuffer data)
     {
-        return (long) data.getInt(0);
+        return data.getInt(0);
     }
 
     /**
@@ -684,18 +679,19 @@ public class MagicMatcher implements Cloneable {
      *
      * @throws CloneNotSupportedException DOCUMENT ME!
      */
-    protected Object clone()
+    @Override
+	protected Object clone()
         throws CloneNotSupportedException
     {
-        MagicMatcher clone = new MagicMatcher();
+        final MagicMatcher clone = new MagicMatcher();
 
-        clone.setMatch((MagicMatch) match.clone());
+        clone.setMatch((MagicMatch) this.match.clone());
 
-        Iterator i = subMatchers.iterator();
-        ArrayList sub = new ArrayList();
+        final Iterator i = this.subMatchers.iterator();
+        final ArrayList sub = new ArrayList();
 
         while (i.hasNext()) {
-            MagicMatcher m = (MagicMatcher) i.next();
+            final MagicMatcher m = (MagicMatcher) i.next();
             sub.add(m.clone());
         }
 
