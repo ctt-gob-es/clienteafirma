@@ -219,22 +219,10 @@ public final class AOPDFSigner implements AOSigner {
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     public byte[] sign(final byte[] data, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException {
 
-        String signAlgorithm = algorithm;
-
-        if (!algorithm.equals(AOSignConstants.SIGN_ALGORITHM_MD5WITHRSA)
-        	&& !algorithm.equals(AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA)
-            && !algorithm.equals(AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA)
-            && !algorithm.equals(AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA)
-            && !algorithm.equals(AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA)) {
-
-            LOGGER.warning("El algoritmo '" + algorithm + "' no esta soportado por PDF, se usara SHA-1"); //$NON-NLS-1$ //$NON-NLS-2$
-            signAlgorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHDSA;
-        }
-
         final Properties extraParams = (xParams != null) ? xParams : new Properties();
 
         try {
-            return signPDF(keyEntry, data, extraParams, signAlgorithm);
+            return signPDF(keyEntry, data, extraParams, algorithm);
         }
         catch (final InvalidPdfException e) {
             throw new AOFormatFileException("El documento no era un PDF valido", e); //$NON-NLS-1$
