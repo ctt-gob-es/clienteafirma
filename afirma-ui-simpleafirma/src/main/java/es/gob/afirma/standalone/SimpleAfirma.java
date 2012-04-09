@@ -270,6 +270,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
             }
             else {
                 this.window.setJMenuBar(this.mainMenu);
+                this.mainMenu.setEnabledOpenCommand(true);
                 if (firstTime) {
                 	MainMenuManager.setMenuManagement(
             			this.window.getRootPane().getActionMap(),
