@@ -785,8 +785,8 @@ final class MozillaKeyStoreUtilities {
             "libnspr4.dylib", //$NON-NLS-1$
             "libplds4.dylib", //$NON-NLS-1$
             "libplc4.dylib", //$NON-NLS-1$
-            "libmozsqlite3.dylib", //$NON-NLS-1$
-            "libnssutil3.dylib" //$NON-NLS-1$
+            "libnssutil3.dylib", //$NON-NLS-1$
+            "libmozsqlite3.dylib" //$NON-NLS-1$
         };
 
         // Creamos enlaces simbolicos via AppleScript
