@@ -531,6 +531,8 @@ final class MozillaKeyStoreUtilities {
         // /lib, que se da en Fedora
         if (Platform.OS.LINUX.equals(Platform.getOS()) && new File("/usr/lib/libsoftokn3.so").exists() && new File(NSPR4_SO).exists()) { //$NON-NLS-1$
         	dependList = new String[] {
+        		"/lib/libmozglue.so", //$NON-NLS-1$
+        		"/usr/lib/libmozglue.so", //$NON-NLS-1$
     			NSPR4_SO,
     			"/lib/libplds4.so", //$NON-NLS-1$
     			"/usr/lib/libplds4.so", //$NON-NLS-1$
@@ -778,7 +780,8 @@ final class MozillaKeyStoreUtilities {
         }
 
         final String[] libs = new String[] {
-            "libmozutils.dylib", // Firefox 9 y superiores //$NON-NLS-1$
+        	"libmozglue.dylib", // Firefox 11 y superiores //$NON-NLS-1$
+            "libmozutils.dylib", // Firefox 9 y 10 //$NON-NLS-1$
             "libnspr4.dylib", //$NON-NLS-1$
             "libplds4.dylib", //$NON-NLS-1$
             "libplc4.dylib", //$NON-NLS-1$
