@@ -53,6 +53,9 @@ final class MozillaKeyStoreUtilities {
     // que el EXE de carga tenga empotrado un MANIFEST adecuado
     private static final String MOZUTILS_DLL = "mozutils.dll"; //$NON-NLS-1$
 
+    // Novedades de Firefox 11
+    private static final String MOZGLUE_DLL = "mozglue.dll"; //$NON-NLS-1$
+
     private static final String NSPR4_SO = "/lib/libnspr4.so"; //$NON-NLS-1$
 
     private MozillaKeyStoreUtilities() {
@@ -249,6 +252,12 @@ final class MozillaKeyStoreUtilities {
                             tmpFile2 = new File(dir + File.separator + MOZUTILS_DLL);
                             if (tmpFile2.exists()) {
                                 AOUtil.copyFile(tmpFile2, new File(dest + MOZUTILS_DLL));
+                            }
+
+                            // A partir de Firefox 11
+                            tmpFile2 = new File(dir + File.separator + MOZGLUE_DLL);
+                            if (tmpFile2.exists()) {
+                                AOUtil.copyFile(tmpFile2, new File(dest + MOZGLUE_DLL));
                             }
 
                             dir = tmp.getCanonicalPath();
@@ -577,7 +586,8 @@ final class MozillaKeyStoreUtilities {
 
         if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
             return new String[] {
-                nssPath + MOZUTILS_DLL,   // Firefox 9
+            	nssPath + MOZGLUE_DLL,    // Firefox 11
+                nssPath + MOZUTILS_DLL,   // Firefox 9 y 10
                 nssPath + MOZCRT19_DLL,   // Firefox desde 3 hasta 8
                 nssPath + NSPR4_DLL,      // Firefox 2 y superior
                 nssPath + PLDS4_DLL,      // Firefox 2 y superior
