@@ -5,8 +5,6 @@ import java.security.cert.X509Certificate;
 /**
  * Tupla Nombre-Certificado con la que mantener la asociaci&oacute;n entre un nombre
  * identificador y su certificado asociado.
- * @author A122466
- *
  */
 public class NameCertificateBean {
 
