@@ -10,6 +10,7 @@
 
 package es.gob.afirma.core.signers;
 
+
 /** Constantes relativas a las firmas digitales. */
 public final class AOSignConstants {
 
@@ -265,4 +266,15 @@ public final class AOSignConstants {
         throw new IllegalArgumentException("Algoritmo de huella digital no soportado: " + pseudoName); //$NON-NLS-1$
     }
 
+    /**
+     * Comprueba si un algoritmo de firma utiliza un algoritmo de huella digital
+     * perteneciente a la familia de algoritmos SHA2.
+     * @param algorithm Algoritmo de firma.
+     * @return {@code true} cuando el algoritmo es un SHA2, {@code false} en caso contrario.
+     */
+    public static boolean isSHA2SignatureAlgorithm(final String algorithm) {
+    	return SIGN_ALGORITHM_SHA256WITHRSA.equals(algorithm) ||
+    		SIGN_ALGORITHM_SHA384WITHRSA.equals(algorithm) ||
+    		SIGN_ALGORITHM_SHA512WITHRSA.equals(algorithm);
+    }
 }

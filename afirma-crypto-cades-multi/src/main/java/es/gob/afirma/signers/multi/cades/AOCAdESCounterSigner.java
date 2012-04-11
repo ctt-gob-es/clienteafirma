@@ -39,7 +39,9 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
         final Properties extraParams = (xParams != null) ? xParams : new Properties();
 
         boolean signingCertificateV2;
-        if (extraParams.containsKey("signingCertificateV2")) { //$NON-NLS-1$
+        if (AOSignConstants.isSHA2SignatureAlgorithm(algorithm)) {
+        	signingCertificateV2 = true;
+        } else if (extraParams.containsKey("signingCertificateV2")) { //$NON-NLS-1$
         	signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2")); //$NON-NLS-1$
         } else {
         	signingCertificateV2 = !"SHA1".equals(AOSignConstants.getDigestAlgorithmName(algorithm));	 //$NON-NLS-1$
