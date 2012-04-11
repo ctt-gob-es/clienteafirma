@@ -86,8 +86,9 @@ final class PanelClave extends JAccessibilityDialogWizard {
             }
         }
     }
+
     /** Log. */
-    static Logger logger = Logger.getLogger(PanelClave.class.getName());
+    private static Logger logger = Logger.getLogger(PanelClave.class.getName());
 
     /** UID. */
     private static final long serialVersionUID = 1L;
@@ -99,7 +100,7 @@ final class PanelClave extends JAccessibilityDialogWizard {
     private final CipherConfig cipherConfig;
 
     /** Ruta donde se encuentra el archivo a cifrar */
-    private String rutaFichero = "";
+    private String rutaFichero = ""; //$NON-NLS-1$
 
     /** Constructor.
      * @param algoritmo
@@ -117,9 +118,7 @@ final class PanelClave extends JAccessibilityDialogWizard {
         final String clave = this.campoClave.getText();
 
         if (clave == null || clave.equals("")) { //$NON-NLS-1$
-            CustomDialog.showMessageDialog(this,
-                                           true,
-                                           Messages.getString("Cifrado.msg.clave"), //$NON-NLS-1$
+            CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.clave"), //$NON-NLS-1$
                                            Messages.getString("error"), //$NON-NLS-1$
                                            JOptionPane.ERROR_MESSAGE);
             return false;
@@ -130,27 +129,21 @@ final class PanelClave extends JAccessibilityDialogWizard {
         }
         catch (final NullPointerException ex) {
             logger.warning("No se ha indicado un fichero de datos: " + ex); //$NON-NLS-1$
-            CustomDialog.showMessageDialog(this,
-                                           true,
-                                           Messages.getString("Descifrado.msg.fichero"), //$NON-NLS-1$
+            CustomDialog.showMessageDialog(this, true, Messages.getString("Descifrado.msg.fichero"), //$NON-NLS-1$
                                            Messages.getString("Descifrado.btndescifrar"), //$NON-NLS-1$
                                            JOptionPane.WARNING_MESSAGE);
             return false;
         }
         catch (final FileNotFoundException ex) {
             logger.warning("Error al leer el fichero: " + ex); //$NON-NLS-1$
-            CustomDialog.showMessageDialog(this,
-                                           true,
-                                           Messages.getString("Descifrado.msg.fichero2"), //$NON-NLS-1$
+            CustomDialog.showMessageDialog(this, true, Messages.getString("Descifrado.msg.fichero2"), //$NON-NLS-1$
                                            Messages.getString("error"), //$NON-NLS-1$
                                            JOptionPane.ERROR_MESSAGE);
             return false;
         }
         catch (final Exception ex) {
             logger.warning("Ocurri\u00F3 un error durante la lectura del fichero de datos: " + ex); //$NON-NLS-1$
-            CustomDialog.showMessageDialog(this,
-                                           true,
-                                           Messages.getString("Descifrado.msg.fichero2"), //$NON-NLS-1$
+            CustomDialog.showMessageDialog(this, true, Messages.getString("Descifrado.msg.fichero2"), //$NON-NLS-1$
                                            Messages.getString("error"), //$NON-NLS-1$
                                            JOptionPane.ERROR_MESSAGE);
             return false;
@@ -175,9 +168,7 @@ final class PanelClave extends JAccessibilityDialogWizard {
         }
         catch (final Exception ex) {
             logger.severe("Error al descifrar: " + ex); //$NON-NLS-1$
-            CustomDialog.showMessageDialog(this,
-                                           true,
-                                           Messages.getString("Descifrado.msg.error.operacion"), //$NON-NLS-1$
+            CustomDialog.showMessageDialog(this, true, Messages.getString("Descifrado.msg.error.operacion"), //$NON-NLS-1$
                                            Messages.getString("error"), //$NON-NLS-1$
                                            JOptionPane.ERROR_MESSAGE);
             return false;
@@ -185,7 +176,7 @@ final class PanelClave extends JAccessibilityDialogWizard {
 
         // Almacenamos el fichero de salida de la operacion
         final File savedFile =
-            SelectionDialog.saveDataToFile(Messages.getString("WizardDescifrado.clave.filechooser.save.title"), result, "fichero", null, this); //$NON-NLS-1$
+                SelectionDialog.saveDataToFile(Messages.getString("WizardDescifrado.clave.filechooser.save.title"), result, "fichero", null, this); //$NON-NLS-1$ //$NON-NLS-2$
         if (savedFile == null) {
             return false;
         }
@@ -197,9 +188,7 @@ final class PanelClave extends JAccessibilityDialogWizard {
     void examinarActionPerformed() {
         // Comprobamos que el almacen exista.
         if (!AOCipherKeyStoreHelper.storeExists()) {
-            CustomDialog.showMessageDialog(this,
-                                           true,
-                                           Messages.getString("WizardDescifrado.msg.error.almacen"), //$NON-NLS-1$
+            CustomDialog.showMessageDialog(this, true, Messages.getString("WizardDescifrado.msg.error.almacen"), //$NON-NLS-1$
                                            Messages.getString("WizardDescifrado.msg.error.titulo"), //$NON-NLS-1$
                                            JOptionPane.WARNING_MESSAGE);
             return;
@@ -213,16 +202,12 @@ final class PanelClave extends JAccessibilityDialogWizard {
             logger.info("El usuario ha cancelado la recuperacion de claves de cifrado del almacen"); //$NON-NLS-1$
         }
         catch (final IOException e) {
-            CustomDialog.showMessageDialog(this,
-                                           true,
-                                           Messages.getString("Descifrado.msg.error.contrasenia"), //$NON-NLS-1$
+            CustomDialog.showMessageDialog(this, true, Messages.getString("Descifrado.msg.error.contrasenia"), //$NON-NLS-1$
                                            Messages.getString("WizardDescifrado.msg.error.titulo"), //$NON-NLS-1$
                                            JOptionPane.WARNING_MESSAGE);
         }
         catch (final Exception e) {
-            CustomDialog.showMessageDialog(this,
-                                           true,
-                                           Messages.getString("WizardDescifrado.msg.error.clave"), //$NON-NLS-1$
+            CustomDialog.showMessageDialog(this, true, Messages.getString("WizardDescifrado.msg.error.clave"), //$NON-NLS-1$
                                            Messages.getString("WizardDescifrado.msg.error.titulo"), //$NON-NLS-1$
                                            JOptionPane.WARNING_MESSAGE);
         }
@@ -258,14 +243,14 @@ final class PanelClave extends JAccessibilityDialogWizard {
         AOCipherKeyStoreHelper cKs = null;
         try {
             cKs =
-                new AOCipherKeyStoreHelper(CustomDialog.showInputPasswordDialog(this,
-                                                                                true,
-                                                                                null,
-                                                                                false,
-                                                                                Messages.getString("WizardDescifrado.clave.pass"), //$NON-NLS-1$
-                                                                                KeyEvent.VK_O,
-                                                                                Messages.getString("CustomDialog.showInputPasswordDialog.title"), //$NON-NLS-1$
-                                                                                JOptionPane.QUESTION_MESSAGE));
+                    new AOCipherKeyStoreHelper(CustomDialog.showInputPasswordDialog(this,
+                                                                                    true,
+                                                                                    null,
+                                                                                    false,
+                                                                                    Messages.getString("WizardDescifrado.clave.pass"), //$NON-NLS-1$
+                                                                                    KeyEvent.VK_O,
+                                                                                    Messages.getString("CustomDialog.showInputPasswordDialog.title"), //$NON-NLS-1$
+                                                                                    JOptionPane.QUESTION_MESSAGE));
         }
         catch (final AOCancelledOperationException e) {
             throw e;
@@ -305,7 +290,7 @@ final class PanelClave extends JAccessibilityDialogWizard {
 
         // Panel con la cabecera
         final CabeceraAsistente panelSuperior =
-            new CabeceraAsistente("WizardDescifrado.clave.explicacion.titulo", "WizardDescifrado.clave.explicacion", null, true); //$NON-NLS-1$ //$NON-NLS-2$
+                new CabeceraAsistente("WizardDescifrado.clave.explicacion.titulo", "WizardDescifrado.clave.explicacion", null, true); //$NON-NLS-1$ //$NON-NLS-2$
         Utils.setContrastColor(panelSuperior);
         Utils.setFontBold(panelSuperior);
         getContentPane().add(panelSuperior, BorderLayout.NORTH);
@@ -345,7 +330,7 @@ final class PanelClave extends JAccessibilityDialogWizard {
 
         // Caja de texto donde se guarda la clave
         this.campoClave.setToolTipText(Messages.getString("WizardDescifrado.clave.contrasenia.description")); // NOI18N //$NON-NLS-1$
-        this.campoClave.getAccessibleContext().setAccessibleName(keyLabel.getText() + " " + this.campoClave.getToolTipText() + "ALT + L.");
+        this.campoClave.getAccessibleContext().setAccessibleName(keyLabel.getText() + " " + this.campoClave.getToolTipText() + "ALT + L."); //$NON-NLS-1$ //$NON-NLS-2$
         this.campoClave.getAccessibleContext().setAccessibleDescription(this.campoClave.getToolTipText());
         if (GeneralConfig.isBigCaret()) {
             final Caret caret = new ConfigureCaret();
@@ -377,7 +362,7 @@ final class PanelClave extends JAccessibilityDialogWizard {
                 examinarActionPerformed();
             }
         });
-        examinar.getAccessibleContext().setAccessibleName(examinar.getText() + " " + examinar.getToolTipText()); // NOI18N
+        examinar.getAccessibleContext().setAccessibleName(examinar.getText() + " " + examinar.getToolTipText()); // NOI18N //$NON-NLS-1$
         examinar.getAccessibleContext().setAccessibleDescription(examinar.getToolTipText()); // NOI18N
         Utils.remarcar(examinar);
         Utils.setContrastColor(examinar);

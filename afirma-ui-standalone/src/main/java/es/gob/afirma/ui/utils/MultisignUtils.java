@@ -30,11 +30,11 @@ import es.gob.afirma.keystores.main.filters.CertificateFilter;
 /** Utilidades para las multifirmas */
 public final class MultisignUtils {
 
-	private MultisignUtils() {
-		// No permitimos la instanciacion
-	}
+    private MultisignUtils() {
+        // No permitimos la instanciacion
+    }
 
-    static Logger logger = Logger.getLogger(MultisignUtils.class.toString());
+    private static Logger logger = Logger.getLogger(MultisignUtils.class.toString());
 
     /** Obtiene el manager del almacen o repositorio de certificados
      * @param kssc Configuracion del almacen o repositorio de certificados
@@ -53,15 +53,14 @@ public final class MultisignUtils {
             /*pssCallback = new UIPasswordCallback(
             		Messages.getString("Msg.pedir.contraenia", store.getDescription()),  //$NON-NLS-1$
             		null);*/
-            pssCallback =
-                new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription(), //$NON-NLS-1$
-                                                    null,
-                                                    Messages.getString("CustomDialog.showInputPasswordDialog.title"), //$NON-NLS-1$
-                                                    KeyEvent.VK_O,
-                                                    Messages.getString("CustomDialog.showInputPasswordDialog.title")); //$NON-NLS-1$
+            pssCallback = new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription(), //$NON-NLS-1$ //$NON-NLS-2$
+                                                              null,
+                                                              Messages.getString("CustomDialog.showInputPasswordDialog.title"), //$NON-NLS-1$
+                                                              KeyEvent.VK_O,
+                                                              Messages.getString("CustomDialog.showInputPasswordDialog.title")); //$NON-NLS-1$
 
             final File selectedFile =
-                SelectionDialog.showFileOpenDialog(null, Messages.getString("Open.repository"), (ExtFilter) Utils.getRepositoryFileFilter()); //$NON-NLS-1$
+                    SelectionDialog.showFileOpenDialog(null, Messages.getString("Open.repository"), (ExtFilter) Utils.getRepositoryFileFilter()); //$NON-NLS-1$
             if (selectedFile != null) {
                 lib = selectedFile.getAbsolutePath();
             }
@@ -73,12 +72,11 @@ public final class MultisignUtils {
             /*pssCallback = new UIPasswordCallback(
             		Messages.getString("Msg.pedir.contraenia", store.getDescription()),  //$NON-NLS-1$
             		null);*/
-            pssCallback =
-                new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription(), //$NON-NLS-1$
-                                                    null,
-                                                    Messages.getString("CustomDialog.showInputPasswordDialog.title"), //$NON-NLS-1$
-                                                    KeyEvent.VK_O,
-                                                    Messages.getString("CustomDialog.showInputPasswordDialog.title")); //$NON-NLS-1$
+            pssCallback = new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription(), //$NON-NLS-1$ //$NON-NLS-2$
+                                                              null,
+                                                              Messages.getString("CustomDialog.showInputPasswordDialog.title"), //$NON-NLS-1$
+                                                              KeyEvent.VK_O,
+                                                              Messages.getString("CustomDialog.showInputPasswordDialog.title")); //$NON-NLS-1$
         }
 
         try {
@@ -105,18 +103,17 @@ public final class MultisignUtils {
 
         // Seleccionamos un certificado
         final String selectedcert =
-            Utils.showCertSelectionDialog(keyStoreManager.getAliases(),
-                                          keyStoreManager,
-                                          padre,
-                                          true,
-                                          true,
-                                          true,
-                                          new Vector<CertificateFilter>(0),
-                                          false);
+                Utils.showCertSelectionDialog(keyStoreManager.getAliases(),
+                                              keyStoreManager,
+                                              padre,
+                                              true,
+                                              true,
+                                              true,
+                                              new Vector<CertificateFilter>(0),
+                                              false);
 
         // Comprobamos si se ha cancelado la seleccion
-        if (selectedcert == null)
-        {
+        if (selectedcert == null) {
             throw new AOCancelledOperationException("Operacion de firma cancelada por el usuario"); //$NON-NLS-1$
         }
 

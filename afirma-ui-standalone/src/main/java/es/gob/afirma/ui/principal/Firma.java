@@ -78,20 +78,17 @@ final class Firma extends JPanel {
     private static final long serialVersionUID = 1L;
 
     // Nombres de los diferentes formatos de firmado
-    private final List<String> formatosL = new ArrayList<String>(
-       Arrays.asList(
-         "Firma est\u00E1ndar (XAdES Detached)",
-         // "XAdES Enveloping",
-         // "XAdES Enveloped",
-         "CAdES",
-         "PAdES"
-       )
-    );
+    private final List<String> formatosL = new ArrayList<String>(Arrays.asList("Firma est\u00E1ndar (XAdES Detached)", //$NON-NLS-1$
+                                                                               // "XAdES Enveloping",
+                                                                               // "XAdES Enveloped",
+                                                                               "CAdES", //$NON-NLS-1$
+                                                                               "PAdES" //$NON-NLS-1$
+    ));
 
     // Constantes de los diferentes formatos de firmado
     private final List<String> formatosV = new ArrayList<String>(Arrays.asList(AOSignConstants.SIGN_FORMAT_XADES_DETACHED,
-                                                                               // AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING,
-                                                                               // AOConstants.SIGN_FORMAT_XADES_ENVELOPED,
+    // AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING,
+    // AOConstants.SIGN_FORMAT_XADES_ENVELOPED,
                                                                                AOSignConstants.SIGN_FORMAT_CADES,
                                                                                AOSignConstants.SIGN_FORMAT_PDF));
 
@@ -125,13 +122,9 @@ final class Firma extends JPanel {
 
         // Obtenemos la ruta del fichero a firmar
         if (campoFichero.getText() == null || campoFichero.getText().equals("")) { //$NON-NLS-1$
-            CustomDialog.showMessageDialog(
-               SwingUtilities.getRoot(this),
-               true,
-               Messages.getString("Firma.msg.error.fichero"),  //$NON-NLS-1$
-               Messages.getString("error"),  //$NON-NLS-1$
-               JOptionPane.ERROR_MESSAGE
-            );
+            CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Firma.msg.error.fichero"), //$NON-NLS-1$
+                                           Messages.getString("error"), //$NON-NLS-1$
+                                           JOptionPane.ERROR_MESSAGE);
             campoFichero.requestFocusInWindow();
             return;
         }
@@ -151,13 +144,12 @@ final class Firma extends JPanel {
             }
             else if (store == AOKeyStore.PKCS12) {
                 pssCallback =
-                    new UIPasswordCallbackAccessibility(
-                		Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription() + ". \r\nSi no ha establecido ninguna, deje el campo en blanco.", //$NON-NLS-1$
-                		SwingUtilities.getRoot(this),
-                        Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title") //$NON-NLS-1$ //$NON-NLS-2$
-                    );
+                        new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription() + ". \r\nSi no ha establecido ninguna, deje el campo en blanco.", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                                                            SwingUtilities.getRoot(this),
+                                                            Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title") //$NON-NLS-1$ //$NON-NLS-2$
+                        );
                 final File selectedFile =
-                    SelectionDialog.showFileOpenDialog(this, Messages.getString("Open.repository"), (ExtFilter) Utils.getRepositoryFileFilter()); //$NON-NLS-1$
+                        SelectionDialog.showFileOpenDialog(this, Messages.getString("Open.repository"), (ExtFilter) Utils.getRepositoryFileFilter()); //$NON-NLS-1$
                 if (selectedFile != null) {
                     lib = selectedFile.getAbsolutePath();
                 }
@@ -167,11 +159,10 @@ final class Firma extends JPanel {
             }
             else {
                 pssCallback =
-                    new UIPasswordCallbackAccessibility(
-                		Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription() + ". \r\nSi no ha establecido ninguna, deje el campo en blanco.", //$NON-NLS-1$
-                		SwingUtilities.getRoot(this),
-                        Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title") //$NON-NLS-1$ //$NON-NLS-2$
-                    );
+                        new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription() + ". \r\nSi no ha establecido ninguna, deje el campo en blanco.", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                                                            SwingUtilities.getRoot(this),
+                                                            Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title") //$NON-NLS-1$ //$NON-NLS-2$
+                        );
             }
 
             // Keystore
@@ -182,38 +173,28 @@ final class Firma extends JPanel {
             }
             catch (final IOException e) {
                 // Control de la excepcion generada al introducir mal la contrasena para el almacen
-                CustomDialog.showMessageDialog(
-            		SwingUtilities.getRoot(this),
-                    true,
-                    Messages.getString("Firma.msg.error.contrasenia"),  //$NON-NLS-1$
-                    Messages.getString("error"),  //$NON-NLS-1$
-                    JOptionPane.ERROR_MESSAGE
-                );
+                CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Firma.msg.error.contrasenia"), //$NON-NLS-1$
+                                               Messages.getString("error"), //$NON-NLS-1$
+                                               JOptionPane.ERROR_MESSAGE);
                 return;
             }
             catch (final Exception e) {
-                CustomDialog.showMessageDialog(
-            		SwingUtilities.getRoot(this),
-                    true,
-                    Messages.getString("Firma.msg.error.almacen"),  //$NON-NLS-1$
-                    Messages.getString("error"),  //$NON-NLS-1$
-                    JOptionPane.ERROR_MESSAGE
-                );
+                CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Firma.msg.error.almacen"), //$NON-NLS-1$
+                                               Messages.getString("error"), //$NON-NLS-1$
+                                               JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
             // Seleccionamos un certificado
             final String selectedcert =
-                Utils.showCertSelectionDialog(
-            		keyStoreManager.getAliases(),
-                    keyStoreManager,
-                    SwingUtilities.getRoot(this),
-                    true,
-                    true,
-                    true,
-                    null,
-                    false
-                );
+                    Utils.showCertSelectionDialog(keyStoreManager.getAliases(),
+                                                  keyStoreManager,
+                                                  SwingUtilities.getRoot(this),
+                                                  true,
+                                                  true,
+                                                  true,
+                                                  null,
+                                                  false);
 
             // Comprobamos si se ha cancelado la seleccion
             if (selectedcert == null) {
@@ -239,7 +220,7 @@ final class Firma extends JPanel {
                 throw e;
             }
             catch (final Exception e) {
-                throw new AOException("No se ha podido recuperar el certificado seleccionado: " + selectedcert); //$NON-NLS-1$
+                throw new AOException("No se ha podido recuperar el certificado seleccionado: " + selectedcert, e.getCause()); //$NON-NLS-1$
             }
 
             if (privateKeyEntry == null) {
@@ -281,17 +262,13 @@ final class Firma extends JPanel {
                 fileData = AOUtil.getDataFromInputStream(fileIn);
             }
             catch (final FileNotFoundException e) {
-                CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
-                                               true,
-                                               Messages.getString("Firma.msg.error.fichero.noencontrado"), //$NON-NLS-1$
+                CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Firma.msg.error.fichero.noencontrado"), //$NON-NLS-1$
                                                Messages.getString("error"), //$NON-NLS-1$
                                                JOptionPane.ERROR_MESSAGE);
                 return;
             }
             catch (final IOException e) {
-                CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
-                                               true,
-                                               Messages.getString("Firma.msg.error.fichero.leer"), //$NON-NLS-1$
+                CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Firma.msg.error.fichero.leer"), //$NON-NLS-1$
                                                Messages.getString("error"), //$NON-NLS-1$
                                                JOptionPane.ERROR_MESSAGE);
                 return;
@@ -314,7 +291,7 @@ final class Firma extends JPanel {
             String modoFirma = AOSignConstants.SIGN_MODE_IMPLICIT;
             if (formato.equals(AOSignConstants.SIGN_FORMAT_CADES)) {
                 final int incluir = CustomDialog.showConfirmDialog(SwingUtilities.getRoot(this), true, Messages.getString("Firma.incluir.original"), //$NON-NLS-1$
-                                                                   "Firma",
+                                                                   "Firma", //$NON-NLS-1$
                                                                    JOptionPane.YES_NO_OPTION,
                                                                    JOptionPane.INFORMATION_MESSAGE);
                 modoFirma = (incluir == JOptionPane.NO_OPTION ? AOSignConstants.SIGN_MODE_EXPLICIT : AOSignConstants.SIGN_MODE_IMPLICIT);
@@ -359,11 +336,11 @@ final class Firma extends JPanel {
 
             // Guardamos la firma en fichero
             final File savedFile =
-                SelectionDialog.saveDataToFile(Messages.getString("Firma.filechooser.save.title"), //$NON-NLS-1$
-                                               signedData,
-                                               SignedFileManager.getOutFileName(Firma.getFilename(campoFichero.getText()), formato),
-                                               SignedFileManager.getOutFileFilter(formato),
-                                               this);
+                    SelectionDialog.saveDataToFile(Messages.getString("Firma.filechooser.save.title"), //$NON-NLS-1$
+                                                   signedData,
+                                                   SignedFileManager.getOutFileName(Firma.getFilename(campoFichero.getText()), formato),
+                                                   SignedFileManager.getOutFileFilter(formato),
+                                                   this);
 
             if (savedFile != null) {
                 CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Firma.msg.ok"), //$NON-NLS-1$
@@ -378,7 +355,7 @@ final class Firma extends JPanel {
         catch (final AOException e) {
             setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             logger.severe("Error: " + e.getMessage()); //$NON-NLS-1$
-            CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, e.getMessage(), "Firma", JOptionPane.ERROR_MESSAGE);
+            CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, e.getMessage(), "Firma", JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
         }
         catch (final Exception e) {
             setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
@@ -428,7 +405,7 @@ final class Firma extends JPanel {
                                                                           Messages.getString("Firma.buscar.caja.description.status"))); //$NON-NLS-1$
         campoFichero.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(),
                                                                           Messages.getString("Firma.buscar.caja.description.status"))); //$NON-NLS-1$
-        campoFichero.getAccessibleContext().setAccessibleName(etiquetaFichero.getText() + " " + "ALT + G.");
+        campoFichero.getAccessibleContext().setAccessibleName(etiquetaFichero.getText() + " " + "ALT + G."); //$NON-NLS-1$ //$NON-NLS-2$
         campoFichero.getAccessibleContext().setAccessibleDescription(Messages.getString("Firma.buscar.caja.description")); // NOI18N //$NON-NLS-1$
         campoFichero.addAncestorListener(new RequestFocusListener(false));
         Utils.remarcar(campoFichero);
@@ -558,23 +535,25 @@ final class Firma extends JPanel {
         // Combo con los diferentes formatos de firma
         final JComboBox comboFormato = new JComboBox();
         comboFormato.setToolTipText(Messages.getString("Firma.formato.description")); // NOI18N //$NON-NLS-1$
-        comboFormato.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(), Messages.getString("Firma.formato.description.status"))); //$NON-NLS-1$
-        comboFormato.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(), Messages.getString("Firma.formato.description.status"))); //$NON-NLS-1$
+        comboFormato.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(),
+                                                                          Messages.getString("Firma.formato.description.status"))); //$NON-NLS-1$
+        comboFormato.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(),
+                                                                          Messages.getString("Firma.formato.description.status"))); //$NON-NLS-1$
         // comboFormato.getAccessibleContext().setAccessibleName(etiquetaFormato.getText()+" " + Messages.getString("Firma.formato.description") +
         // " ALT + O."); // NOI18N
 
         if (GeneralConfig.isAvanzados()) {
             // XAdES Enveloping (Solo en la vista avanzada)
-            this.formatosL.add("XAdES Enveloping");
+            this.formatosL.add("XAdES Enveloping"); //$NON-NLS-1$
             this.formatosV.add(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING);
             // XAdES Enveloped (Solo en la vista avanzada)
-            this.formatosL.add("XAdES Enveloped");
+            this.formatosL.add("XAdES Enveloped"); //$NON-NLS-1$
             this.formatosV.add(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED);
             // OOXML (Solo en la vista avanzada)
-            this.formatosL.add("OOXML");
+            this.formatosL.add("OOXML"); //$NON-NLS-1$
             this.formatosV.add(AOSignConstants.SIGN_FORMAT_OOXML);
             // ODF (Solo en la vista avanzada)
-            this.formatosL.add("ODF");
+            this.formatosL.add("ODF"); //$NON-NLS-1$
             this.formatosV.add(AOSignConstants.SIGN_FORMAT_ODF);
         }
         comboFormato.setModel(new DefaultComboBoxModel(this.formatosL.toArray()));
@@ -618,8 +597,10 @@ final class Firma extends JPanel {
         firmar.setToolTipText(Messages.getString("PrincipalGUI.firmar.description")); // NOI18N //$NON-NLS-1$
         // firmar.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.firmar") + " " +
         // Messages.getString("PrincipalGUI.firmar.description.status"));
-        firmar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(), Messages.getString("PrincipalGUI.firmar.description.status"))); //$NON-NLS-1$
-        firmar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(), Messages.getString("PrincipalGUI.firmar.description.status"))); //$NON-NLS-1$
+        firmar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(),
+                                                                    Messages.getString("PrincipalGUI.firmar.description.status"))); //$NON-NLS-1$
+        firmar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(),
+                                                                    Messages.getString("PrincipalGUI.firmar.description.status"))); //$NON-NLS-1$
         firmar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent evt) {
@@ -646,8 +627,8 @@ final class Firma extends JPanel {
 
         final JPanel panelAyuda = new JPanel();
         // Boton ayuda
-        final JButton botonAyuda = HelpUtils.helpButton("firma");
-        botonAyuda.setName("helpButton");
+        final JButton botonAyuda = HelpUtils.helpButton("firma"); //$NON-NLS-1$
+        botonAyuda.setName("helpButton"); //$NON-NLS-1$
         panelAyuda.add(botonAyuda);
         panelBotones.add(panelAyuda, cons);
 

@@ -45,7 +45,12 @@ final class MultifirmaMasiva extends JPanel {
 
     private static final long serialVersionUID = 1L;
 
-    JCheckBox alerta;
+    private JCheckBox alerta;
+
+    /** @return the alerta */
+    protected JCheckBox getAlerta() {
+        return this.alerta;
+    }
 
     public MultifirmaMasiva() {
         initComponents();
@@ -60,6 +65,7 @@ final class MultifirmaMasiva extends JPanel {
     /** Firma masivamente haciendo uso del almacen / repositorio
      * @param comboAlmacen Combo con los almacenes / repositorios de certificados
      * @param alerta1 Checkbox para emitir un pitido al finalizar la operacion */
+    @SuppressWarnings("unused")
     void firmarActionPerformed(final JComboBox comboAlmacen, final JCheckBox alerta1) {
 
         // Mensaje que indica que se va a realizar el proceso de firma y que puede llevar un tiempo
@@ -190,12 +196,14 @@ final class MultifirmaMasiva extends JPanel {
         // firmar.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.firmar") + " " +
         // Messages.getString("PrincipalGUI.firmar.description.status"));
         firmar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.firmar.description")); // NOI18N //$NON-NLS-1$
-        firmar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(), Messages.getString("PrincipalGUI.firmar.description.status"))); //$NON-NLS-1$
-        firmar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(), Messages.getString("PrincipalGUI.firmar.description.status"))); //$NON-NLS-1$
+        firmar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(),
+                                                                    Messages.getString("PrincipalGUI.firmar.description.status"))); //$NON-NLS-1$
+        firmar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(),
+                                                                    Messages.getString("PrincipalGUI.firmar.description.status"))); //$NON-NLS-1$
         firmar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent evt) {
-                firmarActionPerformed(comboAlmacen, MultifirmaMasiva.this.alerta);
+                firmarActionPerformed(comboAlmacen, getAlerta());
             }
         });
 

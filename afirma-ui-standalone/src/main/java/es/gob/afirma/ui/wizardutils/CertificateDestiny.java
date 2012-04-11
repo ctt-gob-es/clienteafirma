@@ -29,7 +29,7 @@ import es.gob.afirma.ui.utils.Utils;
 /** Certificado destinatario de un sobre digital. */
 public class CertificateDestiny {
 
-    static Logger logger = Logger.getLogger(CertificateDestiny.class.getName());
+    private static Logger logger = Logger.getLogger(CertificateDestiny.class.getName());
 
     /** Alias del certificado */
     private String alias = null;
@@ -37,18 +37,21 @@ public class CertificateDestiny {
     /** Certificado */
     private Certificate cert = null;
 
+    /** Constructor de la clase
+     * @param keyStoreManager Almacen de certificados
+     * @param dialogo Componente Java donde se mostrar&aacute;n los resultados */
     public CertificateDestiny(final AOKeyStoreManager keyStoreManager, final JDialogWizard dialogo) {
         try {
             // Seleccionamos un certificado
             final String selectedcert =
-                Utils.showCertSelectionDialog(keyStoreManager.getAliases(),
-                                              keyStoreManager,
-                                              dialogo,
-                                              false,
-                                              true,
-                                              true,
-                                              new Vector<CertificateFilter>(0),
-                                              false);
+                    Utils.showCertSelectionDialog(keyStoreManager.getAliases(),
+                                                  keyStoreManager,
+                                                  dialogo,
+                                                  false,
+                                                  true,
+                                                  true,
+                                                  new Vector<CertificateFilter>(0),
+                                                  false);
 
             // Comprobamos si se ha cancelado la seleccion
             if (selectedcert == null) {
@@ -90,15 +93,22 @@ public class CertificateDestiny {
         }
     }
 
+    /** Constructor de clase
+     * @param alias Alias del certificado
+     * @param cert Certificado */
     public CertificateDestiny(final String alias, final Certificate cert) {
         this.alias = alias;
         this.cert = cert;
     }
 
+    /** Proporciona el alias del certificado
+     * @return Una cadena de texto con el nombre del certificado */
     public String getAlias() {
         return this.alias;
     }
 
+    /** Proporciona el certificado almacenado
+     * @return Un objeto de tipo Certificate */
     public Certificate getCertificate() {
         return this.cert;
     }
