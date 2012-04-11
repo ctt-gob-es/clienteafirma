@@ -76,7 +76,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
         }
 
         KeyEntry(final X509Certificate[] chain) {
-            this((String)null, chain);
+            this((String) null, chain);
         }
 
         KeyEntry(final String alias, final X509Certificate[] chain) {
@@ -117,9 +117,9 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
 
     private java.lang.reflect.Method loadKeysOrCertificateChains;
 
-	private final KeyStore.MY nativeWrapper;
+    private final KeyStore.MY nativeWrapper;
 
-	KeyStoreAddressBook(final String storeName) {
+    KeyStoreAddressBook(final String storeName) {
 
         this.nativeWrapper = new KeyStore.MY();
 
@@ -329,10 +329,12 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
         final Iterator<KeyEntry> iter = this.entries.iterator();
 
         return new Enumeration<String>() {
+            @Override
             public boolean hasMoreElements() {
                 return iter.hasNext();
             }
 
+            @Override
             public String nextElement() {
                 final Object o = iter.next();
                 for (final java.lang.reflect.Method m : o.getClass().getDeclaredMethods()) {
@@ -342,7 +344,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
                             return m.invoke(o, new Object[0]).toString();
                         }
                         catch (final Exception e) {
-                            Logger.getLogger("es.atosorigin").severe("No se ha podido invocar a sunmscapi.dll para obtener los alias: " + e);  //$NON-NLS-1$//$NON-NLS-2$
+                            Logger.getLogger("es.atosorigin").severe("No se ha podido invocar a sunmscapi.dll para obtener los alias: " + e); //$NON-NLS-1$//$NON-NLS-2$
                             return null;
                         }
                     }
@@ -422,7 +424,9 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
      *            if compatibility mode is disabled and either parameter is
      *            non-null. */
     @Override
-    public final void engineStore(final OutputStream stream, final char[] password) throws IOException, NoSuchAlgorithmException, CertificateException {
+    public final void engineStore(final OutputStream stream, final char[] password) throws IOException,
+                                                                                   NoSuchAlgorithmException,
+                                                                                   CertificateException {
         // No es necesario hacer nada, se almacena en engineSetEntry()
     }
 
@@ -470,7 +474,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
         }
         catch (final KeyStoreException kse) {
             // Wrap the JNI exception in an IOException
-            throw new IOException(kse.toString());
+            throw new IOException(kse.toString(), kse.getCause());
         }
     }
 
@@ -492,5 +496,4 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
             throw new KeyStoreException(e);
         }
     }
-
 }
