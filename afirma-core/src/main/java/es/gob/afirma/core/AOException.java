@@ -32,4 +32,14 @@ public class AOException extends Exception {
     public AOException(final String msg, final Exception e) {
         super(msg, e);
     }
+
+    /** Contruye una excepci&oacute;n gen&eacute;rica con mensaje y define su
+     * causa.
+     * @param msg
+     *        Descripcion del error.
+     * @param cause
+     *        Causa del error. */
+    public AOException(final String msg, final Throwable cause) {
+        super(msg, cause);
+    }
 }
