@@ -837,6 +837,12 @@
 	</match-list>
 </match>
 <match>
+ <mimetype>application/x-rar-compressed</mimetype>
+ <extension>rar</extension>
+ <description>RAR compressed file</description>
+ <test offset="0" type="string" comparator="=">Rar!</test><!--  0x526172211a0700 -->
+</match>
+<match>
 	<mimetype>???</mimetype>
 	<extension>???</extension>
 	<description>realaudio sound file</description>
