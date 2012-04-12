@@ -118,29 +118,29 @@ public final class GeneralConfig {
         configSignatureOptions = new Properties();
         configSignatureOptions.putAll(getDefaultSignatureConfig());
 
-        if (config.contains(MainOptionsPane.MAIN_ALGORITHM_XML)) {
+        if (config.containsKey(MainOptionsPane.MAIN_ALGORITHM_XML) && Boolean.parseBoolean(config.getProperty(MainOptionsPane.MAIN_ALGORITHM_XML))) {
             configSignatureOptions.setProperty(
                "referencesDigestMethod", //$NON-NLS-1$
                config.getProperty(MainOptionsPane.MAIN_DEFAULT_ALGORITHM, MainOptionsPane.DEFAULT_DEFAULT_ALGORITHM)
             );
         }
-        if (config.contains(MainOptionsPane.MAIN_POLICY_ESTABLISHED)) {
+        if (config.containsKey(MainOptionsPane.MAIN_POLICY_ESTABLISHED) && Boolean.parseBoolean(config.getProperty(MainOptionsPane.MAIN_POLICY_ESTABLISHED))) {
             configSignatureOptions.setProperty("policyQualifier", config.getProperty(MainOptionsPane.MAIN_POLICY_OID, "")); //$NON-NLS-1$ //$NON-NLS-2$
             configSignatureOptions.setProperty("policyIdentifier", config.getProperty(MainOptionsPane.MAIN_POLICY_URL, "")); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
-        if (config.contains(ContextOptionsConfig.OPTION_REASON) && config.getProperty(ContextOptionsConfig.OPTION_REASON).trim().length() > 0) {
+        if (config.containsKey(ContextOptionsConfig.OPTION_REASON) && config.getProperty(ContextOptionsConfig.OPTION_REASON).trim().length() > 0) {
             configSignatureOptions.setProperty("signReason", config.getProperty(ContextOptionsConfig.OPTION_REASON).trim()); //$NON-NLS-1$
         }
-        if (config.contains(ContextOptionsConfig.OPTION_PRODUCTION_PLACE) && config.getProperty(ContextOptionsConfig.OPTION_PRODUCTION_PLACE)
+        if (config.containsKey(ContextOptionsConfig.OPTION_PRODUCTION_PLACE) && config.getProperty(ContextOptionsConfig.OPTION_PRODUCTION_PLACE)
                 .trim()
                 .length() > 0) {
-            config.setProperty("signatureProductionCity", config.getProperty(ContextOptionsConfig.OPTION_PRODUCTION_PLACE).trim()); //$NON-NLS-1$
+        	configSignatureOptions.setProperty("signatureProductionCity", config.getProperty(ContextOptionsConfig.OPTION_PRODUCTION_PLACE).trim()); //$NON-NLS-1$
         }
-        if (config.contains(ContextOptionsConfig.OPTION_SIGNER_CONTACT) && config.getProperty(ContextOptionsConfig.OPTION_SIGNER_CONTACT)
+        if (config.containsKey(ContextOptionsConfig.OPTION_SIGNER_CONTACT) && config.getProperty(ContextOptionsConfig.OPTION_SIGNER_CONTACT)
                 .trim()
                 .length() > 0) {
-            config.setProperty("signerContact", config.getProperty(ContextOptionsConfig.OPTION_SIGNER_CONTACT).trim()); //$NON-NLS-1$
+        	configSignatureOptions.setProperty("signerContact", config.getProperty(ContextOptionsConfig.OPTION_SIGNER_CONTACT).trim()); //$NON-NLS-1$
         }
     }
 
