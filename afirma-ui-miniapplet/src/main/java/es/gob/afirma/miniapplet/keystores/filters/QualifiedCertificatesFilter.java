@@ -85,8 +85,17 @@ public final class QualifiedCertificatesFilter extends CertificateFilter {
 					}
 					else {
 						final String qualifiedCertAlias = searchQualifiedSignatureCertificate(cert, ksm, aliases);
+
 						if (qualifiedCertAlias == null) {
-							filteredCerts.add(aliase);
+							// FIXME: En ese caso siempre se deberia agregar el certificado al que
+							// corresponde el numero de serie, aunque no sea de firma. Por problemas
+							// en algunos sistemas en los que al indicar el certificado de autenticacion
+							// del DNIe se localiza este y no el de firma (ocurre al insertar una vez
+							// mal la contrasena) no seleccionaremos ninguno para evitar que se utilice
+							// el certificado de autenticacion para firma.
+							if (!new AuthenticationDNIeFilter().matches(cert)) {
+								filteredCerts.add(aliase);
+							}
 						} else {
 							filteredCerts.add(qualifiedCertAlias);
 						}
