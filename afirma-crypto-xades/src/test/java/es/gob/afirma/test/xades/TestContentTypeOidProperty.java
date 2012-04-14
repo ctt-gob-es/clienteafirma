@@ -13,7 +13,6 @@ package es.gob.afirma.test.xades;
 import java.io.File;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
-import java.security.cert.X509Certificate;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -73,13 +72,10 @@ public final class TestContentTypeOidProperty {
     public void testSignature() throws Exception {
 
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
-        final PrivateKeyEntry pke;
-        final X509Certificate cert;
 
         final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
         ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
-        pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
-        cert = (X509Certificate) ks.getCertificate(CERT_ALIAS);
+        final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
 
         final AOSigner signer = new AOXAdESSigner();
 
