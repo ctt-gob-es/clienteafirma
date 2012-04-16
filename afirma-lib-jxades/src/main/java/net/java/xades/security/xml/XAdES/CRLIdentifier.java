@@ -21,7 +21,7 @@ import org.w3c.dom.Node;
  */
 
 /**
- * 
+ *
  * @author miro
  */
 public class CRLIdentifier extends XAdESStructure
@@ -41,7 +41,7 @@ public class CRLIdentifier extends XAdESStructure
     //
     // URI crlURI = revocationStatus.getCrlURI();
     // if(crlURI != null)
-    // setAttribute("URI", crlURI.toString());
+    // setAttributeNS(null, "URI", crlURI.toString());
     //
     // X509CRL crl = revocationStatus.getCheckedCRL();
     //
@@ -70,57 +70,61 @@ public class CRLIdentifier extends XAdESStructure
     // }
     // }
 
-    public CRLIdentifier(Node node, String xadesPrefix, String xadesNamespace,
-            String xmlSignaturePrefix)
+    public CRLIdentifier(final Node node, final String xadesPrefix, final String xadesNamespace,
+            final String xmlSignaturePrefix)
     {
         super(node, xadesPrefix, xadesNamespace, xmlSignaturePrefix);
     }
 
     public X500Principal getIssuer()
     {
-        if (issuer == null)
+        if (this.issuer == null)
         {
-            String value = getChildElementTextContent("Issuer");
-            if (value != null)
-                issuer = new X500Principal(value);
+            final String value = getChildElementTextContent("Issuer");
+            if (value != null) {
+				this.issuer = new X500Principal(value);
+			}
         }
 
-        return issuer;
+        return this.issuer;
     }
 
     public Date getIssueTime() throws ParseException
     {
-        if (issueTime == null)
+        if (this.issueTime == null)
         {
-            String value = getChildElementTextContent("IssueTime");
-            if (value != null)
-                issueTime = SystemUtils.parseDate(value);
+            final String value = getChildElementTextContent("IssueTime");
+            if (value != null) {
+				this.issueTime = SystemUtils.parseDate(value);
+			}
         }
 
-        return issueTime;
+        return this.issueTime;
     }
 
     public BigInteger getCRLNumber()
     {
-        if (crlNumber == null)
+        if (this.crlNumber == null)
         {
-            String value = getChildElementTextContent("Number");
-            if (value != null)
-                crlNumber = new BigInteger(value);
+            final String value = getChildElementTextContent("Number");
+            if (value != null) {
+				this.crlNumber = new BigInteger(value);
+			}
         }
 
-        return crlNumber;
+        return this.crlNumber;
     }
 
     public URI getCrlURI() throws URISyntaxException
     {
-        if (crlURI == null)
+        if (this.crlURI == null)
         {
-            String value = getAttribute("URI");
-            if (value != null)
-                crlURI = new URI(value);
+            final String value = getAttribute("URI");
+            if (value != null) {
+				this.crlURI = new URI(value);
+			}
         }
 
-        return crlURI;
+        return this.crlURI;
     }
 }

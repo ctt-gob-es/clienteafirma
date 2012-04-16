@@ -25,7 +25,7 @@ import org.w3c.dom.Node;
  */
 
 /**
- * 
+ *
  * @author miro
  */
 public class OCSPIdentifier extends XAdESStructure
@@ -43,7 +43,7 @@ public class OCSPIdentifier extends XAdESStructure
     //
     // Element thisElement = getElement();
     // if(ocspResponderURI != null)
-    // setAttribute("URI", ocspResponderURI.toString());
+    // setAttributeNS(null, "URI", ocspResponderURI.toString());
     //
     // Element responderElement = createElement("ResponderID");
     // thisElement.appendChild(responderElement);
@@ -53,7 +53,7 @@ public class OCSPIdentifier extends XAdESStructure
     // if(key != null && key.length > 0)
     // {
     // Element element = createElement("ByKey");
-    //            
+    //
     // String keyValue = Base64.encode(key);
     // element.setTextContent(keyValue);
     // responderElement.appendChild(element);
@@ -70,15 +70,15 @@ public class OCSPIdentifier extends XAdESStructure
     // element.setTextContent(SystemUtils.formatDate(basicOCSPResponse.getProducedAt()));
     // }
 
-    public OCSPIdentifier(Node node, String xadesPrefix, String xadesNamespace,
-            String xmlSignaturePrefix)
+    public OCSPIdentifier(final Node node, final String xadesPrefix, final String xadesNamespace,
+            final String xmlSignaturePrefix)
     {
         super(node, xadesPrefix, xadesNamespace, xmlSignaturePrefix);
     }
 
     public X500Principal getResponderName()
     {
-        if (responderName == null)
+        if (this.responderName == null)
         {
             Element element = getChildElementNS("ResponderID");
             if (element != null)
@@ -87,18 +87,19 @@ public class OCSPIdentifier extends XAdESStructure
                 if (element != null)
                 {
                     String value = element.getTextContent();
-                    if (value != null && (value = value.trim()).length() > 0)
-                        responderName = new X500Principal(value);
+                    if (value != null && (value = value.trim()).length() > 0) {
+						this.responderName = new X500Principal(value);
+					}
                 }
             }
         }
 
-        return responderName;
+        return this.responderName;
     }
 
     public byte[] getResponderKey() throws IOException
     {
-        if (responderKey == null)
+        if (this.responderKey == null)
         {
             Element element = getChildElementNS("ResponderID");
             if (element != null)
@@ -107,24 +108,26 @@ public class OCSPIdentifier extends XAdESStructure
                 if (element != null)
                 {
                     String value = element.getTextContent();
-                    if (value != null && (value = value.trim()).length() > 0)
-                        responderKey = Base64.decode(value);
+                    if (value != null && (value = value.trim()).length() > 0) {
+						this.responderKey = Base64.decode(value);
+					}
                 }
             }
         }
 
-        return responderKey;
+        return this.responderKey;
     }
 
     public Date getProducedAt() throws ParseException
     {
-        if (producedAt == null)
+        if (this.producedAt == null)
         {
-            String value = getChildElementTextContent("ProducedAt");
-            if (value != null)
-                producedAt = SystemUtils.parseDate(value);
+            final String value = getChildElementTextContent("ProducedAt");
+            if (value != null) {
+				this.producedAt = SystemUtils.parseDate(value);
+			}
         }
 
-        return producedAt;
+        return this.producedAt;
     }
 }

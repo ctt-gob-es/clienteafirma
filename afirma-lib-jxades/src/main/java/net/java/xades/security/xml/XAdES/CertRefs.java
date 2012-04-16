@@ -26,62 +26,63 @@ import org.w3c.dom.Node;
  */
 
 /**
- * 
+ *
  * @author miro
  */
 public class CertRefs extends XAdESStructure
 {
     private List<Cert> certs;
 
-    public CertRefs(XAdESStructure parent, Collection<X509Certificate> certificates,
-            String signatureIdPrefix, String xadesPrefix, String xadesNamespace,
-            String xmlSignaturePrefix) throws GeneralSecurityException
+    public CertRefs(final XAdESStructure parent, final Collection<X509Certificate> certificates,
+            final String signatureIdPrefix, final String xadesPrefix, final String xadesNamespace,
+            final String xmlSignaturePrefix) throws GeneralSecurityException
     {
         super(parent, "CertRefs", xadesPrefix, xadesNamespace, xmlSignaturePrefix);
 
-        if (certificates == null || certificates.isEmpty())
-            throw new IllegalArgumentException(
+        if (certificates == null || certificates.isEmpty()) {
+			throw new IllegalArgumentException(
                     "The certificates collection can not be NULL or empty.");
+		}
 
-        Element thisElement = getElement();
+        getElement();
         if (signatureIdPrefix != null)
         {
-            setAttribute("Id", signatureIdPrefix + "-CertRefs");
+            setAttributeNS(null, "Id", signatureIdPrefix + "-CertRefs");
         }
 
-        certs = new ArrayList<Cert>(certificates.size());
+        this.certs = new ArrayList<Cert>(certificates.size());
 
-        for (X509Certificate certificate : certificates)
+        for (final X509Certificate certificate : certificates)
         {
-            Cert cert = new Cert(this, certificate, xadesPrefix, xadesNamespace, xmlSignaturePrefix);
-            certs.add(cert);
+            final Cert cert = new Cert(this, certificate, xadesPrefix, xadesNamespace, xmlSignaturePrefix);
+            this.certs.add(cert);
         }
     }
 
-    public CertRefs(Node node, String xadesPrefix, String xadesNamespace, String xmlSignaturePrefix)
+    public CertRefs(final Node node, final String xadesPrefix, final String xadesNamespace, final String xmlSignaturePrefix)
     {
         super(node, xadesPrefix, xadesNamespace, xmlSignaturePrefix);
     }
 
     public List<Cert> getCerts()
     {
-        if (certs == null)
+        if (this.certs == null)
         {
-            List<Element> elements = getChildElementsNS("Cert");
+            final List<Element> elements = getChildElementsNS("Cert");
             if (elements != null && elements.size() > 0)
             {
-                certs = new ArrayList<Cert>(elements.size());
-                for (Element element : elements)
+                this.certs = new ArrayList<Cert>(elements.size());
+                for (final Element element : elements)
                 {
-                    certs.add(new Cert(element, xadesPrefix, xadesNamespace, xmlSignaturePrefix));
+                    this.certs.add(new Cert(element, this.xadesPrefix, this.xadesNamespace, this.xmlSignaturePrefix));
                 }
             }
             else
             {
-                certs = Collections.<Cert> emptyList();
+                this.certs = Collections.<Cert> emptyList();
             }
         }
 
-        return certs;
+        return this.certs;
     }
 }

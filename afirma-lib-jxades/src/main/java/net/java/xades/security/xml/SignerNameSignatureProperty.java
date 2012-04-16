@@ -1,7 +1,7 @@
 package net.java.xades.security.xml;
 
 import javax.xml.crypto.dom.DOMStructure;
-import org.w3c.dom.Document;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -12,7 +12,7 @@ import org.w3c.dom.Node;
 public class SignerNameSignatureProperty
     extends DOMStructure
 {
-    public SignerNameSignatureProperty(Node node)
+    public SignerNameSignatureProperty(final Node node)
     {
         super(node.getOwnerDocument().createElement("SignerName"));
     }
@@ -22,9 +22,9 @@ public class SignerNameSignatureProperty
         return (Element)getNode();
     }
 
-    public void setUserId(String userId)
+    public void setUserId(final String userId)
     {
-        getElement().setAttribute("UserId", userId);
+        getElement().setAttributeNS(null, "UserId", userId);
     }
 
     public String getUserId()
@@ -32,9 +32,9 @@ public class SignerNameSignatureProperty
         return getElement().getAttribute("UserId");
     }
 
-    public void setUsername(String username)
+    public void setUsername(final String username)
     {
-        getElement().setAttribute("Username", username);
+        getElement().setAttributeNS(null, "Username", username);
     }
 
     public String getUsername()
@@ -42,7 +42,7 @@ public class SignerNameSignatureProperty
         return getElement().getAttribute("Username");
     }
 
-    public void setPersonName(String personName)
+    public void setPersonName(final String personName)
     {
         getElement().setTextContent(personName);
     }

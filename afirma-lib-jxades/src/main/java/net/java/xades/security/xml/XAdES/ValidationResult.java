@@ -54,7 +54,7 @@ public class ValidationResult
     extends XAdESStructure
 {
 
-    public ValidationResult(Node node, String xadesPrefix, String xadesNamespace, String xmlSignaturePrefix)
+    public ValidationResult(final Node node, final String xadesPrefix, final String xadesNamespace, final String xmlSignaturePrefix)
     {
         super(node, xadesPrefix, xadesNamespace, xmlSignaturePrefix);
     }
@@ -64,7 +64,7 @@ public class ValidationResult
 //        this(parent);
 //        Element thisElement = getElement();
 //
-//        thisElement.setAttribute("Status", certValidationInfo.getStatus().name());
+//        thisElement.setAttributeNS(null, "Status", certValidationInfo.getStatus().name());
 //
 //        Date validationTime = certValidationInfo.getValidationTime();
 //        if(validationTime != null)
@@ -93,11 +93,11 @@ public class ValidationResult
 //        OCSPResponse ocspResponse = revocationStatus.getOCSPResponse();
 //        if(ocspResponse != null)
 //        {
-//            thisElement.setAttribute("OCSPResponseStatus", ocspResponse.getOCSPResponseStatus().name());
+//            thisElement.setAttributeNS(null, "OCSPResponseStatus", ocspResponse.getOCSPResponseStatus().name());
 //            SingleResponse singleResponse = ocspResponse.getSingleResponse();
 //            if(singleResponse != null)
 //            {
-//                thisElement.setAttribute("OCSPCertStatus", singleResponse.getCertStatus().name());
+//                thisElement.setAttributeNS(null, "OCSPCertStatus", singleResponse.getCertStatus().name());
 //            }
 //        }
 //
@@ -106,7 +106,7 @@ public class ValidationResult
 //            CertPathRevocationStatus status = revocationStatus.getStatus();
 //            if(status != null && status instanceof CRLReasonStatus)
 //            {
-//                thisElement.setAttribute("CRLReasonStatus", ((Enum)status).name());
+//                thisElement.setAttributeNS(null, "CRLReasonStatus", ((Enum)status).name());
 //            }
 //        }
 //

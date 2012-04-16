@@ -10,34 +10,34 @@ import org.w3c.dom.Element;
  *     <p:DocumentationReference>http://tempuri.org</p:DocumentationReference>
  *   </p:DocumentationReferences>
  * </p:ObjectIdentifier>
- * 
+ *
  */
 
 public class ObjectIdentifierDetails extends XAdESStructure
 {
-    public ObjectIdentifierDetails(DataObjectFormatDetails dataObjectFormatDetails,
-            ObjectIdentifier objectIdentifier, String xadesPrefix, String xadesNamespace,
-            String xmlSignaturePrefix)
+    public ObjectIdentifierDetails(final DataObjectFormatDetails dataObjectFormatDetails,
+            final ObjectIdentifier objectIdentifier, final String xadesPrefix, final String xadesNamespace,
+            final String xmlSignaturePrefix)
     {
         super(dataObjectFormatDetails, "ObjectIdentifier", xadesPrefix, xadesNamespace,
                 xmlSignaturePrefix);
 
-        Element identifier = createElement("Identifier");
+        final Element identifier = createElement("Identifier");
         identifier.setTextContent(objectIdentifier.getIdentifier());
-        identifier.setAttribute("Qualifier", objectIdentifier.getQualifier());
+        identifier.setAttributeNS(null, "Qualifier", objectIdentifier.getQualifier());
         getNode().appendChild(identifier);
 
-        Element description = createElement("Description");
+        final Element description = createElement("Description");
         description.setTextContent(objectIdentifier.getDescription());
         getNode().appendChild(description);
 
         if (objectIdentifier.getDocumentationReferences().size() > 0)
         {
-            Element documentationReferences = createElement("DocumentationReferences");
+            final Element documentationReferences = createElement("DocumentationReferences");
 
-            for (String reference : objectIdentifier.getDocumentationReferences())
+            for (final String reference : objectIdentifier.getDocumentationReferences())
             {
-                Element documentationReference = createElement("DocumentationReference");
+                final Element documentationReference = createElement("DocumentationReference");
                 documentationReference.setTextContent(reference);
                 documentationReferences.appendChild(documentationReference);
             }

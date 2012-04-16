@@ -20,7 +20,7 @@ import org.w3c.dom.Node;
  */
 
 /**
- * 
+ *
  * @author miro
  */
 public class DigestAlgAndValue extends XAdESStructure
@@ -35,43 +35,43 @@ public class DigestAlgAndValue extends XAdESStructure
     // this(parent, "DigestAlgAndValue", ocspResponse.getResponseData());
     // }
 
-    public DigestAlgAndValue(XAdESStructure parent, X509CRL crl, String xadesPrefix,
-            String xadesNamespace, String xmlSignaturePrefix) throws GeneralSecurityException
+    public DigestAlgAndValue(final XAdESStructure parent, final X509CRL crl, final String xadesPrefix,
+            final String xadesNamespace, final String xmlSignaturePrefix) throws GeneralSecurityException
     {
         this(parent, "DigestAlgAndValue", crl.getEncoded(), xadesPrefix, xadesNamespace,
                 xmlSignaturePrefix);
     }
 
-    protected DigestAlgAndValue(XAdESStructure parent, String elementName, byte[] data,
-            String xadesPrefix, String xadesNamespace, String xmlSignaturePrefix)
+    protected DigestAlgAndValue(final XAdESStructure parent, final String elementName, final byte[] data,
+            final String xadesPrefix, final String xadesNamespace, final String xmlSignaturePrefix)
             throws GeneralSecurityException
     {
         super(parent, elementName, xadesPrefix, xadesNamespace, xmlSignaturePrefix);
 
-        Element thisElement = getElement();
+        final Element thisElement = getElement();
 
         Element element = createElement(DIGEST_METHOD_ELEMENT);
         element.setPrefix(xmlSignaturePrefix);
         thisElement.appendChild(element);
-        element.setAttribute(ALGORITHM_ATTR, DigestMethod.SHA1);
+        element.setAttributeNS(null, ALGORITHM_ATTR, DigestMethod.SHA1);
 
-        MessageDigest md = MessageDigest.getInstance("SHA-1");
+        final MessageDigest md = MessageDigest.getInstance("SHA-1");
 
-        String digestValue = Base64.encodeBytes(md.digest(data));
+        final String digestValue = Base64.encodeBytes(md.digest(data));
         element = createElement(DIGEST_VALUE_ELEMENT);
         element.setPrefix(xmlSignaturePrefix);
         thisElement.appendChild(element);
         element.setTextContent(digestValue);
     }
 
-    protected DigestAlgAndValue(XAdESStructure parent, String xadesPrefix, String xadesNamespace,
-            String xmlSignaturePrefix) throws GeneralSecurityException
+    protected DigestAlgAndValue(final XAdESStructure parent, final String xadesPrefix, final String xadesNamespace,
+            final String xmlSignaturePrefix) throws GeneralSecurityException
     {
         super(parent, "DigestAlgAndValue", xadesPrefix, xadesNamespace, xmlSignaturePrefix);
     }
 
-    public DigestAlgAndValue(Node node, String xadesPrefix, String xadesNamespace,
-            String xmlSignaturePrefix)
+    public DigestAlgAndValue(final Node node, final String xadesPrefix, final String xadesNamespace,
+            final String xmlSignaturePrefix)
     {
         super(node, xadesPrefix, xadesNamespace, xmlSignaturePrefix);
     }
