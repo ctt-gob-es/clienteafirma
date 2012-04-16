@@ -11,6 +11,8 @@
 package es.gob.afirma.applet;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.logging.Logger;
 
 import junit.framework.Assert;
 
@@ -110,7 +112,12 @@ public class GenerateAllSigns {
 	@Test
 	public void generateSigns() {
 
-    	final String path = new File("").getAbsolutePath(); //$NON-NLS-1$
+    	String path = null;
+		try {
+			path = File.createTempFile("temp", null).getParent(); //$NON-NLS-1$
+		} catch (final IOException e) {
+			Assert.fail("No se pudo obtener el directorio temporal para la prueba de los datos: " + e.toString()); //$NON-NLS-1$
+		}
 
     	final SignApplet applet = new SignApplet();
     	applet.initialize();
@@ -133,7 +140,9 @@ public class GenerateAllSigns {
 								applet.setSignatureAlgorithm(algo);
 								applet.sign();
 								Assert.assertFalse("Error al firmar en formato " + format[1] + " y modo " + mode[1] + ": " + applet.getErrorMessage(), applet.isError()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-								applet.setOutFilePath(path + "/" + "Firma_" + format[1] + "_" + mode[1] + "_" + file[1] + "_" + algo + "." + format[2]); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+								final String signaturePath = path + "/" + "Firma_" + format[1] + "_" + mode[1] + "_" + file[1] + "_" + algo + "." + format[2]; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+								applet.setOutFilePath(signaturePath);
+								Logger.getLogger("es.gob.afirma").info("Se almacenara la firma para su posterior validacion: " + signaturePath); //$NON-NLS-1$ //$NON-NLS-2$
 								applet.saveSignToFile();
 							}
 						}
