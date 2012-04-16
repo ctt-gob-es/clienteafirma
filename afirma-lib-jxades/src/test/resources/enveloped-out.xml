@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<acta>
+  <nombre Id="base">perico</nombre>
+<dsign:Signature Id="S0-Signature" xmlns:dsign="http://www.w3.org/2000/09/xmldsig#"><dsign:SignedInfo><dsign:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments"/><dsign:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/><dsign:Reference URI="#base"><dsign:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/><dsign:DigestValue>LjMRA5mRY3XeAVQCPSbH+4QaCk8=</dsign:DigestValue></dsign:Reference><dsign:Reference Type="http://uri.etsi.org/01903#SignedProperties" URI="#S0-SignedProperties"><dsign:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/><dsign:DigestValue>g7SS7HNj9zMH+zfkXEt0TKFCEP8=</dsign:DigestValue></dsign:Reference><dsign:Reference URI="#S0-KeyInfo"><dsign:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/><dsign:DigestValue>uQdTnb2cNflbQ0+rPLcbV278ilU=</dsign:DigestValue></dsign:Reference></dsign:SignedInfo><dsign:SignatureValue Id="S0-SignatureValue">aiCJcbuHMJJxod/QBP6x4pMPjvSwjw7NpY0/1NYrk08TJrpJJRMxnktky0cYoWZ/riXId63+FIQ8
+wtRfjMxCRFzF5fpcUkLh5/0qQvTfVxK+/2xH71ixPoXFLZmkSL1CYFN/SBJg5Y/Xw0X2fVLs4mMk
+umGhmsMMKFp94iSnbi8=</dsign:SignatureValue><dsign:KeyInfo Id="S0-KeyInfo"><dsign:KeyValue><dsign:RSAKeyValue><dsign:Modulus>vFCKVP4PWGtDKTh5INtGK7tUbqL8cSWU5lYrYt0ArqzdgUGT0l7HUDeXmNdbA0k51DFsJOTS5S7o
+1vTn3+4pjcJaSzLV/NcoaL6nopllyhxx+Gjm5O4XFGsDn1qInmmECT0ihjR7QZpC1HQK8f18Dw62
+p/FXy2Y98Ly4e8A4ygk=</dsign:Modulus><dsign:Exponent>AQAB</dsign:Exponent></dsign:RSAKeyValue></dsign:KeyValue><dsign:X509Data><dsign:X509Certificate>MIIDKTCCApKgAwIBAgIBATANBgkqhkiG9w0BAQUFADCBnTELMAkGA1UEBhMCRVMxHjAcBgNVBAgU
+FUNhc3RlbGzzbiBkZSBsYSBQbGFuYTESMBAGA1UEBxQJQ2FzdGVsbPNuMRwwGgYDVQQKExNVbml2
+ZXJzaXRhdCBKYXVtZSBJMR0wGwYDVQQLFBRTZXJ2ZWkgZCdJbmZvcm3gdGljYTEdMBsGA1UEAxMU
+Q3J5cHRvQXBwbGV0IFRlc3QgQ0EwHhcNMDkwNjA1MTE1MzU2WhcNMTIwNjA0MTE1MzU2WjCBmTEL
+MAkGA1UEBhMCRVMxHjAcBgNVBAgUFUNhc3RlbGzzbiBkZSBsYSBQbGFuYTESMBAGA1UEBxQJQ2Fz
+dGVsbPNuMRwwGgYDVQQKExNVbml2ZXJzaXRhdCBKYXVtZSBJMR0wGwYDVQQLFBRTZXJ2ZWkgZCdJ
+bmZvcm3gdGljYTEZMBcGA1UEAxMQVGVzdCBDZXJ0aWZpY2F0ZTCBnzANBgkqhkiG9w0BAQEFAAOB
+jQAwgYkCgYEAvFCKVP4PWGtDKTh5INtGK7tUbqL8cSWU5lYrYt0ArqzdgUGT0l7HUDeXmNdbA0k5
+1DFsJOTS5S7o1vTn3+4pjcJaSzLV/NcoaL6nopllyhxx+Gjm5O4XFGsDn1qInmmECT0ihjR7QZpC
+1HQK8f18Dw62p/FXy2Y98Ly4e8A4ygkCAwEAAaN7MHkwCQYDVR0TBAIwADAsBglghkgBhvhCAQ0E
+HxYdT3BlblNTTCBHZW5lcmF0ZWQgQ2VydGlmaWNhdGUwHQYDVR0OBBYEFBmkEPYOF7rsiLKdKhOy
+Y/PvbE5GMB8GA1UdIwQYMBaAFEf+1nzOVqYgZOXM7VLer4LWuvvvMA0GCSqGSIb3DQEBBQUAA4GB
+ADKEfpy6pjOxVb/AhVPKcrw1K+P0CXyHqVsrXMmvixJShyS4Td/BLBdIEiDSKzuptZcequpQ2oJi
+pbKM/6agq4g2bLd/tUTzSxkLKJn48KG/0EvvkI1t0YT5jivxNMLhNjmtn4M9BKCv5Pq8ZzwEx5iM
+Oyer3qbgZRCc8V9nrFbm</dsign:X509Certificate><dsign:X509SubjectName>CN=Test Certificate,OU=Servei d'Inform�tica,O=Universitat Jaume I,L=Castell�,ST=Castell�n de la Plana,C=ES</dsign:X509SubjectName><dsign:X509IssuerSerial><dsign:X509IssuerName>CN=CryptoApplet Test CA, OU=Servei d'Informàtica, O=Universitat Jaume I, L=Castellón, ST=Castellón de la Plana, C=ES</dsign:X509IssuerName><dsign:X509SerialNumber>1</dsign:X509SerialNumber></dsign:X509IssuerSerial></dsign:X509Data></dsign:KeyInfo><dsign:Object><xades:QualifyingProperties Id="S0-QualifyingProperties" Target="#S0-Signature" xmlns:dsign="http://www.w3.org/2000/09/xmldsig#" xmlns:xades="http://uri.etsi.org/01903/v1.3.2#"><xades:SignedProperties Id="S0-SignedProperties"><xades:SignedSignatureProperties><xades:SigningTime>2010-07-13T16:27:53+02:00</xades:SigningTime><xades:SignatureProductionPlace><xades:City>CastellÃ³</xades:City><xades:StateOrProvince>CastellÃ³ de la Plana</xades:StateOrProvince><xades:PostalCode>12071</xades:PostalCode><xades:CountryName>Spain</xades:CountryName></xades:SignatureProductionPlace><xades:SignerRole><xades:ClaimedRoles><xades:ClaimedRole>PDI</xades:ClaimedRole></xades:ClaimedRoles></xades:SignerRole><xades:SignaturePolicyIdentifier><xades:SignaturePolicyId><xades:SigPolicyId><xades:Identifier>http://www.google.com</xades:Identifier><xades:Description>Policy description</xades:Description></xades:SigPolicyId><xades:SigPolicyHash><xades:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/><xades:DigestValue>O93Orlq/gGPrS/PIKuyvbySTRfE=</xades:DigestValue></xades:SigPolicyHash><xades:SigPolicyQualifiers><xades:SigPolicyQualifier><xades:SPURI>urn:oid:1.3.6.1.4.1.24491</xades:SPURI></xades:SigPolicyQualifier></xades:SigPolicyQualifiers></xades:SignaturePolicyId></xades:SignaturePolicyIdentifier></xades:SignedSignatureProperties><xades:SignedDataObjectProperties><xades:DataObjectFormat ObjectReference="#base"><xades:ObjectIdentifier><xades:Identifier Qualifier="q">i</xades:Identifier><xades:Description>desc</xades:Description></xades:ObjectIdentifier><xades:Description>test</xades:Description><xades:MimeType>text/plain</xades:MimeType><xades:Encoding>ISO-8859-1</xades:Encoding></xades:DataObjectFormat><xades:CommitmentTypeIndication><xades:CommitmentTypeId><xades:Identifier Qualifier="x">id</xades:Identifier><xades:Description>desc</xades:Description><xades:DocumentationReferences><xades:DocumentationReference>ref1</xades:DocumentationReference><xades:DocumentationReference>ref2</xades:DocumentationReference></xades:DocumentationReferences></xades:CommitmentTypeId><xades:ObjectReference>reference</xades:ObjectReference><xades:CommitmentTypeQualifiers><xades:CommitmentTypeQualifier>ref1</xades:CommitmentTypeQualifier><xades:CommitmentTypeQualifier>ref2</xades:CommitmentTypeQualifier></xades:CommitmentTypeQualifiers></xades:CommitmentTypeIndication></xades:SignedDataObjectProperties></xades:SignedProperties><xades:UnsignedProperties><xades:UnsignedSignatureProperties><xades:CompleteCertificateRefs><xades:CertRefs Id="S0-CertRefs"><xades:Cert><xades:CertDigest><dsign:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/><dsign:DigestValue>GX1Yf00SeG8iM92b3QPVfUlSpfU=</dsign:DigestValue></xades:CertDigest><xades:IssuerSerial><xades:X509IssuerName>CN=CryptoApplet Test CA,OU=Servei d'Inform�tica,O=Universitat Jaume I,L=Castell�,ST=Castell�n de la Plana,C=ES</xades:X509IssuerName><xades:X509SerialNumber>17769166719834658215</xades:X509SerialNumber></xades:IssuerSerial></xades:Cert></xades:CertRefs></xades:CompleteCertificateRefs><xades:SignatureTimeStamp Id="TS1-SignatureTimeStamp"><xades:EncapsulatedTimeStamp>MIIDnwYJKoZIhvcNAQcCoIIDkDCCA4wCAQMxCzAJBgUrDgMCGgUAMIG7BgsqhkiG9w0BCRABBKCB
+qwSBqDCBpQIBAQYMKwYBBAG/VQMCAQEAMB8wBwYFKw4DAhoEFN2yfUbOt0PGmKU41JJjx1fZTUAd
+AgQAqvrVGA8yMDEwMDcxMzE0MjU0OFoBAf+gV6RVMFMxCzAJBgNVBAYTAkVTMR8wHQYDVQQKExZH
+ZW5lcmFsaXRhdCBWYWxlbmNpYW5hMQ8wDQYDVQQLEwZQS0lHVkExEjAQBgNVBAMTCVRTQTEgQUND
+VjGCArowggK2AgEBMHAwaDELMAkGA1UEBhMCRVMxHzAdBgNVBAoTFkdlbmVyYWxpdGF0IFZhbGVu
+Y2lhbmExDzANBgNVBAsTBlBLSUdWQTEnMCUGA1UEAxMeUm9vdCBDQSBHZW5lcmFsaXRhdCBWYWxl
+bmNpYW5hAgRFYzz2MAkGBSsOAwIaBQCgggEfMBoGCSqGSIb3DQEJAzENBgsqhkiG9w0BCRABBDAc
+BgkqhkiG9w0BCQUxDxcNMTAwNzEzMTQyNTQ4WjAjBgkqhkiG9w0BCQQxFgQU5Fc2g2oq8Hsu6tz0
+NoHBcB29958wgb0GCyqGSIb3DQEJEAIMMYGtMIGqMIGnMBYEFBocdoV/v0QImB514nMBThkR9apz
+MIGMBBSgc+XFvUNhDYZMIRMKhVhXzJzqRjB0MGykajBoMQswCQYDVQQGEwJFUzEfMB0GA1UEChMW
+R2VuZXJhbGl0YXQgVmFsZW5jaWFuYTEPMA0GA1UECxMGUEtJR1ZBMScwJQYDVQQDEx5Sb290IENB
+IEdlbmVyYWxpdGF0IFZhbGVuY2lhbmECBDtF5WgwDQYJKoZIhvcNAQEBBQAEggEAHyr1QiLcvbFd
+ObegLkYFe6kX8zMHrC/dwCGZCdPoseUcV0o0b2kcjQIrZocXYG/IayzHqqF3ZcIcI4ugu0wPwxEO
+inhpbZY3CmAVm35X2ErCfHUuozQom5+bu1laAqKvjkKDxxLDBgbD5Pn1TKQVfb2Vz3N5mi54Zz9B
+nk9GjL7qeNt6b8d649E/YliZgQVErcYOAQwpmbfYfNo58Wuw7J4HuB8OCCtftluRHIxHinsQ2kty
+aaRGA2CiiXu79NBg+ReAJgzUWYDBEk5Sgy1gtXn6Fsl8KxPIwC4Id9w7i6ZLTvMQaIQLX4DeKEm5
+OLfQoZUo6b24+y2JfE3Tb08dBw==</xades:EncapsulatedTimeStamp></xades:SignatureTimeStamp><xades:SignatureTimeStamp Id="TS1-SignatureTimeStamp"><xades:EncapsulatedTimeStamp>MIIDnwYJKoZIhvcNAQcCoIIDkDCCA4wCAQMxCzAJBgUrDgMCGgUAMIG7BgsqhkiG9w0BCRABBKCB
+qwSBqDCBpQIBAQYMKwYBBAG/VQMCAQEAMB8wBwYFKw4DAhoEFN2yfUbOt0PGmKU41JJjx1fZTUAd
+AgQAqvrWGA8yMDEwMDcxMzE0MjU0OFoBAf+gV6RVMFMxCzAJBgNVBAYTAkVTMR8wHQYDVQQKExZH
+ZW5lcmFsaXRhdCBWYWxlbmNpYW5hMQ8wDQYDVQQLEwZQS0lHVkExEjAQBgNVBAMTCVRTQTEgQUND
+VjGCArowggK2AgEBMHAwaDELMAkGA1UEBhMCRVMxHzAdBgNVBAoTFkdlbmVyYWxpdGF0IFZhbGVu
+Y2lhbmExDzANBgNVBAsTBlBLSUdWQTEnMCUGA1UEAxMeUm9vdCBDQSBHZW5lcmFsaXRhdCBWYWxl
+bmNpYW5hAgRFYzz2MAkGBSsOAwIaBQCgggEfMBoGCSqGSIb3DQEJAzENBgsqhkiG9w0BCRABBDAc
+BgkqhkiG9w0BCQUxDxcNMTAwNzEzMTQyNTQ4WjAjBgkqhkiG9w0BCQQxFgQUfekk+OL5R8ReRKPe
+bD1XH9gFNbwwgb0GCyqGSIb3DQEJEAIMMYGtMIGqMIGnMBYEFBocdoV/v0QImB514nMBThkR9apz
+MIGMBBSgc+XFvUNhDYZMIRMKhVhXzJzqRjB0MGykajBoMQswCQYDVQQGEwJFUzEfMB0GA1UEChMW
+R2VuZXJhbGl0YXQgVmFsZW5jaWFuYTEPMA0GA1UECxMGUEtJR1ZBMScwJQYDVQQDEx5Sb290IENB
+IEdlbmVyYWxpdGF0IFZhbGVuY2lhbmECBDtF5WgwDQYJKoZIhvcNAQEBBQAEggEAOdstNzRgjyEQ
+NdEsIjTjos00r8iJae0F1iOyNHW+zN9YUHK4tFnP2U80gHE7vNa6/6scOkFP78Qq8JO/EkOjJlGc
+Jip2KHWUjyBpeB853nC/Jk3pOU2WM4GtZK5Zu3Mq0dUaXjCjg/xv7dq89j/wguSb90BAogExOZHc
+dpj4bVIPCSkL9e8xMG+8KjSa/Kolk5so/8YjYmPtpu7ODBobRno1am40J8JWE6pMFsNVFxW04w3i
+tktWgtqi4GvYL0DRIWt0O/FU+zft25r1GAAbvr+8F40caYKpoCOUUX3mrXiTz7hmt6Mnd4RfDnSv
+baOTzIf3Hkl0k0OV9rrbo1MTzA==</xades:EncapsulatedTimeStamp></xades:SignatureTimeStamp></xades:UnsignedSignatureProperties></xades:UnsignedProperties></xades:QualifyingProperties></dsign:Object></dsign:Signature></acta>
