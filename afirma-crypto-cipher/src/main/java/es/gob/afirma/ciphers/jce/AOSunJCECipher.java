@@ -16,6 +16,7 @@ import java.security.KeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.AlgorithmParameterSpec;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKeyFactory;
@@ -192,7 +193,7 @@ public final class AOSunJCECipher implements AOCipher {
             cipher.init(Cipher.DECRYPT_MODE, decipherKey, AOSunJCECipher.getParams(algorithmConfig));
         }
         catch (final InvalidKeyException e) {
-            throw new KeyException("La clave de descifrado introducida no es valida para el algoritmo '" //$NON-NLS-1$
+            throw new InvalidKeyException("La clave de descifrado introducida no es valida para el algoritmo '" //$NON-NLS-1$
                     + algorithmConfig.getAlgorithm().getName() + "'", //$NON-NLS-1$
                     e);
         }
@@ -203,6 +204,9 @@ public final class AOSunJCECipher implements AOCipher {
         // Realizamos el descifrado
         try {
             return cipher.doFinal(data);
+        }
+        catch(final BadPaddingException e) {
+        	throw new InvalidKeyException("La clave de descifrado introducida no es correcta", e); //$NON-NLS-1$
         }
         catch (final Exception e) {
             throw new AOException("Error descifrando los datos", e); //$NON-NLS-1$
