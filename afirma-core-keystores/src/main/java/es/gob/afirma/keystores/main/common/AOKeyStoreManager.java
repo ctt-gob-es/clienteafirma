@@ -524,7 +524,7 @@ public class AOKeyStoreManager {
         }
 
         else if (this.ksType.equals(AOKeyStore.WINCA) || this.ksType.equals(AOKeyStore.WINADDRESSBOOK)) {
-        	initCAPIAddressBook();
+        	return initCAPIAddressBook();
         }
 
         else if (this.ksType.equals(AOKeyStore.PKCS11)) {
