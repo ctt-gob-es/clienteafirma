@@ -423,6 +423,12 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
         else if(DataAnalizerUtil.isSignedBinary(sign)) {
             return ValidateBinarySignature.validate(sign, null);
         }
+        else if (DataAnalizerUtil.isSignedODF(sign)) {
+            return new SignValidity(SIGN_DETAIL_TYPE.OK, null);
+        }
+        else if (DataAnalizerUtil.isSignedOOXML(sign)) {
+            return new SignValidity(SIGN_DETAIL_TYPE.OK, null);
+        }
         return new SignValidity(SIGN_DETAIL_TYPE.KO, null);
     }
 }
