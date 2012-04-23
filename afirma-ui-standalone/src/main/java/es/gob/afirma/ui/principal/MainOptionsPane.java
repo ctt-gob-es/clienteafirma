@@ -70,10 +70,16 @@ public class MainOptionsPane {
     private final JComboBox comboAlgoritmo;
 
     /** Panel sobre el que se montan los componentes. */
-    final private JPanel panel;
+    private final JPanel panel;
+
+    /** Etiqueta del campo para la inserci&oacute;n del OID de la pol&iacute;tica. */
+    private final JLabel policyOidLabel;
 
     /** OID de la pol&iacute;tica de firma. */
     private final JTextField textPolicyOid;
+
+    /** Etiqueta del campo para la inserci&oacute;n de la URL de la pol&iacute;tica. */
+    private final JLabel policyUrlLabel;
 
     /** URL de la pol&iacute;tica de firma. */
     private final JTextField textPolicyUrl;
@@ -223,16 +229,17 @@ public class MainOptionsPane {
         policyPanel.add(panelCheckAddPolicy, c2);
         c2.gridy = c2.gridy + 1;
 
-        final JLabel policyOidLabel = new JLabel("Identificador de la pol\u00EDtica de firma (OID):");
+        this.policyOidLabel = new JLabel("Identificador de la pol\u00EDtica de firma (OID):");
+        this.policyOidLabel.setEnabled(false);
 
         // Accesibilidad -- Lectores de pantalla
-        policyOidLabel.setFocusable(true);
-        policyOidLabel.getAccessibleContext().setAccessibleName(policyOidLabel.getText() + ". Este cuadro de texto esta deshabilitado por defecto.");
+        this.policyOidLabel.setFocusable(true);
+        this.policyOidLabel.getAccessibleContext().setAccessibleName(this.policyOidLabel.getText() + ". Este cuadro de texto esta deshabilitado por defecto.");
 
-        Utils.remarcar(policyOidLabel);
-        Utils.setContrastColor(policyOidLabel);
-        Utils.setFontBold(policyOidLabel);
-        policyPanel.add(policyOidLabel, c2);
+        Utils.remarcar(this.policyOidLabel);
+        Utils.setContrastColor(this.policyOidLabel);
+        Utils.setFontBold(this.policyOidLabel);
+        policyPanel.add(this.policyOidLabel, c2);
         c2.gridy = c2.gridy + 1;
 
         this.textPolicyOid = new JTextField();
@@ -244,21 +251,22 @@ public class MainOptionsPane {
         Utils.setFontBold(this.textPolicyOid);
 
         // Relacion entre etiqueta y campo de texto
-        policyOidLabel.setLabelFor(this.textPolicyOid);
+        this.policyOidLabel.setLabelFor(this.textPolicyOid);
 
         policyPanel.add(this.textPolicyOid, c2);
         c2.gridy = c2.gridy + 1;
 
-        final JLabel policyUrlLabel = new JLabel("Ruta de la pol\u00EDtica de firma (URL):");
+        this.policyUrlLabel = new JLabel("Ruta de la pol\u00EDtica de firma (URL):");
+        this.policyUrlLabel.setEnabled(false);
 
         // Accesibilidad -- Lectores de pantalla
-        policyUrlLabel.setFocusable(true);
-        policyUrlLabel.getAccessibleContext().setAccessibleName(policyUrlLabel.getText() + ". Este cuadro de texto esta deshabilitado por defecto.");
+        this.policyUrlLabel.setFocusable(true);
+        this.policyUrlLabel.getAccessibleContext().setAccessibleName(this.policyUrlLabel.getText() + ". Este cuadro de texto esta deshabilitado por defecto.");
 
-        Utils.remarcar(policyUrlLabel);
-        Utils.setContrastColor(policyUrlLabel);
-        Utils.setFontBold(policyUrlLabel);
-        policyPanel.add(policyUrlLabel, c2);
+        Utils.remarcar(this.policyUrlLabel);
+        Utils.setContrastColor(this.policyUrlLabel);
+        Utils.setFontBold(this.policyUrlLabel);
+        policyPanel.add(this.policyUrlLabel, c2);
         c2.gridy = c2.gridy + 1;
 
         this.textPolicyUrl = new JTextField();
@@ -270,7 +278,7 @@ public class MainOptionsPane {
         Utils.setFontBold(this.textPolicyUrl);
 
         // Relacion entre etiqueta y campo de texto
-        policyUrlLabel.setLabelFor(this.textPolicyUrl);
+        this.policyUrlLabel.setLabelFor(this.textPolicyUrl);
 
         policyPanel.add(this.textPolicyUrl, c2);
 
@@ -311,26 +319,28 @@ public class MainOptionsPane {
             @Override
             public void itemStateChanged(final ItemEvent e) {
                 final boolean state = (e.getStateChange() == ItemEvent.SELECTED);
+                MainOptionsPane.this.policyOidLabel.setEnabled(state);
+                MainOptionsPane.this.policyUrlLabel.setEnabled(state);
                 MainOptionsPane.this.textPolicyOid.setEnabled(state);
                 MainOptionsPane.this.textPolicyUrl.setEnabled(state);
                 // Asignacion de mnemonicos segun el estado
                 if (state) {
-                    policyOidLabel.setDisplayedMnemonic(KeyEvent.VK_I);
-                    policyOidLabel.getAccessibleContext().setAccessibleName(policyOidLabel.getText() + "ALT + I.");
-                    policyOidLabel.setFocusable(false);
-                    policyUrlLabel.setDisplayedMnemonic(KeyEvent.VK_T);
-                    policyUrlLabel.getAccessibleContext().setAccessibleName(policyUrlLabel.getText() + "ALT + T.");
-                    policyUrlLabel.setFocusable(false);
+                    MainOptionsPane.this.policyOidLabel.setDisplayedMnemonic(KeyEvent.VK_I);
+                    MainOptionsPane.this.policyOidLabel.getAccessibleContext().setAccessibleName(MainOptionsPane.this.policyOidLabel.getText() + "ALT + I.");
+                    MainOptionsPane.this.policyOidLabel.setFocusable(false);
+                    MainOptionsPane.this.policyUrlLabel.setDisplayedMnemonic(KeyEvent.VK_T);
+                    MainOptionsPane.this.policyUrlLabel.getAccessibleContext().setAccessibleName(MainOptionsPane.this.policyUrlLabel.getText() + "ALT + T.");
+                    MainOptionsPane.this.policyUrlLabel.setFocusable(false);
 
                 }
                 else {
                     // Se eliminan los atajos porque los cuadros de texto estan deshabilitados
-                    policyOidLabel.setDisplayedMnemonic(0);
-                    policyOidLabel.getAccessibleContext()
-                    .setAccessibleName(policyOidLabel.getText() + ". Este cuadro de texto esta deshabilitado por defecto.");
-                    policyUrlLabel.setDisplayedMnemonic(0);
-                    policyUrlLabel.getAccessibleContext()
-                    .setAccessibleName(policyUrlLabel.getText() + ". Este cuadro de texto esta deshabilitado por defecto.");
+                    MainOptionsPane.this.policyOidLabel.setDisplayedMnemonic(0);
+                    MainOptionsPane.this.policyOidLabel.getAccessibleContext()
+                    .setAccessibleName(MainOptionsPane.this.policyOidLabel.getText() + ". Este cuadro de texto esta deshabilitado por defecto.");
+                    MainOptionsPane.this.policyUrlLabel.setDisplayedMnemonic(0);
+                    MainOptionsPane.this.policyUrlLabel.getAccessibleContext()
+                    .setAccessibleName(MainOptionsPane.this.policyUrlLabel.getText() + ". Este cuadro de texto esta deshabilitado por defecto.");
                 }
             }
         });
