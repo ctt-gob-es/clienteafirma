@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -34,7 +34,7 @@ public enum AOKeyStore {
     JAVACE("Java KeyStore / JKS (Case Exact)", 9, "CaseExactJKS"), //$NON-NLS-1$ //$NON-NLS-2$
     /** Windows / Internet Explorer (CAPI, certificados ra&iacute;z). */
     WINROOT("Windows / Internet Explorer (raiz)", 10, "Windows-ROOT"),  //$NON-NLS-1$//$NON-NLS-2$
-    /** Windows / INternet Explorer (CAPI, certificados de otras personas /
+    /** Windows / Internet Explorer (CAPI, certificados de otras personas /
      * libreta de direcciones). */
     WINADDRESSBOOK("Windows / Internet Explorer (otras personas / libreta de direcciones)", 11, "Windows-ADDRESSBOOK"),  //$NON-NLS-1$//$NON-NLS-2$
     /** Windows / Internet Explorer (CAPI, certificados CA intermedias). */
