@@ -57,16 +57,12 @@ public final class TestCMS {
         p1.setProperty("format", AOSignConstants.SIGN_FORMAT_CMS); //$NON-NLS-1$
         p1.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
 
-        final Properties p2 = new Properties();
-        p2.setProperty("format", AOSignConstants.SIGN_FORMAT_CMS); //$NON-NLS-1$
-        p2.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
-
         final Properties p3 = new Properties();
         p3.setProperty("format", AOSignConstants.SIGN_FORMAT_CMS); //$NON-NLS-1$
         p3.setProperty("mode", AOSignConstants.SIGN_MODE_EXPLICIT); //$NON-NLS-1$
 
         CMS_MODES = new Properties[] {
-                p1, p2, p3
+                p1, p3
         };
     }
 
