@@ -173,7 +173,7 @@ public final class AOSunJCECipher implements AOCipher {
     }
 
     /** {@inheritDoc} */
-    public byte[] decipher(final byte[] data, final AOCipherConfig algorithmConfig, final Key decipherKey) throws AOException, KeyException {
+    public byte[] decipher(final byte[] data, final AOCipherConfig algorithmConfig, final Key decipherKey) throws AOException, InvalidKeyException {
 
         if (data == null || algorithmConfig == null || decipherKey == null) {
             throw new AOException("Los parametros de la funcion de descifrado no pueden ser nulos"); //$NON-NLS-1$
