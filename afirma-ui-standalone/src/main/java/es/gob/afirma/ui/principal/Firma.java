@@ -55,6 +55,9 @@ import es.gob.afirma.keystores.main.common.AOKeyStore;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.main.common.KeyStoreConfiguration;
+import es.gob.afirma.signers.xades.AOFacturaESigner;
+import es.gob.afirma.signers.xades.AOXAdESSigner;
+import es.gob.afirma.signers.xmldsig.AOXMLDSigSigner;
 import es.gob.afirma.ui.listeners.ElementDescriptionFocusListener;
 import es.gob.afirma.ui.listeners.ElementDescriptionMouseListener;
 import es.gob.afirma.ui.utils.ConfigureCaret;
@@ -285,15 +288,26 @@ final class Firma extends JPanel {
                 }
             }
 
+            // Se introduce la logica necesaria para que no se pueda firmar en formato XAdES o XMLdSign
+            // una factura electronica ya firmada
+            if (signer instanceof AOXAdESSigner || signer instanceof AOXMLDSigSigner) {
+            	if (new AOFacturaESigner().isSign(fileData)) {
+            		CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
+            				true, Messages.getString("Firma.dialog.msg"), //$NON-NLS-1$
+            				Messages.getString("Firma.dialog.title"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$
+            		return;
+            	}
+            }
+
             // En el caso de firma CAdES, preguntamos al usuario si desea incluir el documento que
             // se firma en la propia firma. El documento se incluira en la firma, salvo que se indique
             // los contrario
             String modoFirma = AOSignConstants.SIGN_MODE_IMPLICIT;
             if (formato.equals(AOSignConstants.SIGN_FORMAT_CADES)) {
-                final int incluir = CustomDialog.showConfirmDialog(SwingUtilities.getRoot(this), true, Messages.getString("Firma.incluir.original"), //$NON-NLS-1$
-                                                                   "Firma", //$NON-NLS-1$
-                                                                   JOptionPane.YES_NO_OPTION,
-                                                                   JOptionPane.INFORMATION_MESSAGE);
+            	final int incluir = CustomDialog.showConfirmDialog(SwingUtilities.getRoot(this), true, Messages.getString("Firma.incluir.original"), //$NON-NLS-1$
+            			Messages.getString("Firma.dialog.title"), //$NON-NLS-1$
+            			JOptionPane.YES_NO_OPTION,
+            			JOptionPane.INFORMATION_MESSAGE);
                 modoFirma = (incluir == JOptionPane.NO_OPTION ? AOSignConstants.SIGN_MODE_EXPLICIT : AOSignConstants.SIGN_MODE_IMPLICIT);
             }
 
