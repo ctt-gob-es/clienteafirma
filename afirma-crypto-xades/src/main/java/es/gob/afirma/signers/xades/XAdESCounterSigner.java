@@ -265,15 +265,23 @@ final class XAdESCounterSigner {
 		if (esFirmaSimple) {
 			try {
 				final Document newdoc = dbf.newDocumentBuilder().newDocument();
-				newdoc.appendChild(newdoc.adoptNode(doc.getElementsByTagNameNS(
-						XMLConstants.DSIGNNS, AOXAdESSigner.SIGNATURE_TAG)
-						.item(0)));
+				newdoc.appendChild(
+					newdoc.adoptNode(
+						doc.getElementsByTagNameNS(
+							XMLConstants.DSIGNNS,
+							AOXAdESSigner.SIGNATURE_TAG
+						).item(0)
+					)
+				);
 				doc = newdoc;
-			} catch (final Exception e) {
+			}
+			catch (final Exception e) {
 				XAdESCounterSigner.LOGGER
 						.info("No se ha eliminado el nodo padre '<AFIRMA>': " + e); //$NON-NLS-1$
 			}
 		}
+
+		checkXadesNamespace(doc, (xParams != null) ? xParams.getProperty("xadesNamespace") : AOXAdESSigner.XADESNS); //$NON-NLS-1$
 
 		return Utils.writeXML(doc.getDocumentElement(), originalXMLProperties,
 				null, null);
@@ -644,6 +652,23 @@ final class XAdESCounterSigner {
 
 	private XAdESCounterSigner() {
 		// No permitimos la instanciacion
+	}
+
+	/** Comprueba que el espacio de nombres de XAdES este correctamente declarado, y si no lo esta lo declara en el
+	 * primer nodo UnsignedProperties que encuentre en el espacio no declarado. */
+	private static void checkXadesNamespace(final Document doc, final String namespaceUri) {
+		final NodeList nl = doc.getElementsByTagName(AOXAdESSigner.XADES_SIGNATURE_PREFIX + ":UnsignedProperties"); //$NON-NLS-1$
+		boolean xadesNamespaceDeclared = false;
+		for (int i=0;i<nl.getLength();i++) {
+			final String xadesNamespace = ((Element)nl.item(i)).getAttribute("xmlns:" + AOXAdESSigner.XADES_SIGNATURE_PREFIX); //$NON-NLS-1$
+			if (!"".equals(xadesNamespace)) { //$NON-NLS-1$
+				xadesNamespaceDeclared = true;
+			}
+		}
+		if (!xadesNamespaceDeclared) {
+			final String namespace = (namespaceUri != null) ? namespaceUri : AOXAdESSigner.XADESNS;
+			((Element)doc.getElementsByTagName(AOXAdESSigner.XADES_SIGNATURE_PREFIX + ":UnsignedProperties").item(0)).setAttribute("xmlns:" + AOXAdESSigner.XADES_SIGNATURE_PREFIX, namespace); //$NON-NLS-1$ //$NON-NLS-2$
+		}
 	}
 
 }
