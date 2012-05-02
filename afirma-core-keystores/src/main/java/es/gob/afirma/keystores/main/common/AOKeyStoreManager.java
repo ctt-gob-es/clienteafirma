@@ -468,6 +468,42 @@ public class AOKeyStoreManager {
         return ret;
     }
 
+    private List<KeyStore> initDnieJava(final PasswordCallback pssCallBack) throws AOKeyStoreManagerException {
+    	final Provider p;
+    	if (Security.getProvider("AfirmaDnie") == null) { //$NON-NLS-1$
+    		try {
+    			p = (Provider) AOUtil.classForName("es.gob.jmulticard.jse.provider.DnieProvider").newInstance(); //$NON-NLS-1$
+    			Security.addProvider(p);
+    		}
+    		catch (final Exception e) {
+    			throw new AOKeyStoreManagerException(
+					"No se ha podido instanciar e instalar el proveedor 100% Java para DNIe de Afirma: " + e, //$NON-NLS-1$
+					e
+				);
+    		}
+    	}
+
+        // Inicializamos
+        try {
+            this.ks = KeyStore.getInstance(this.ksType.getName());
+        }
+        catch (final Exception e) {
+            throw new AOKeyStoreManagerException("No se ha podido obtener el almacen DNIe 100% Java: " + e, e); //$NON-NLS-1$
+        }
+
+        LOGGER.info("Cargando KeyStore DNIe 100% Java"); //$NON-NLS-1$
+        try {
+			this.ks.load(null, pssCallBack.getPassword());
+		}
+        catch (final Exception e) {
+			throw new AOKeyStoreManagerException("No se ha podido obtener el almacen DNIe 100% Java: " + e, e);  //$NON-NLS-1$
+		}
+
+        final List<KeyStore> ret = new ArrayList<KeyStore>(1);
+        ret.add(this.ks);
+        return ret;
+    }
+
     /** Obtiene un almac&eacute;n de claves ya inicializado. Se encarga
      * tambi&eacute;n de a&ntilde;adir o retirar los <i>Provider</i> necesarios
      * para operar con dicho almac&eacute;n
@@ -509,6 +545,10 @@ public class AOKeyStoreManager {
 
         if (this.ksType.equals(AOKeyStore.SINGLE)) {
         	return initSingle(store, pssCallBack);
+        }
+
+        if (this.ksType.equals(AOKeyStore.DNIEJAVA)) {
+        	return initDnieJava(pssCallBack);
         }
 
         else if (this.ksType.equals(AOKeyStore.JAVA) || this.ksType.equals(AOKeyStore.JAVACE) || this.ksType.equals(AOKeyStore.JCEKS)) {
@@ -696,7 +736,7 @@ public class AOKeyStoreManager {
             currAlias = aliases.nextElement().toString();
             v.add(currAlias);
 
-            LOGGER.info("Alias: " + currAlias);	//TODO: Traza para ayudar a localizar los problemas relacionados con CLAUER
+            LOGGER.info("Alias: " + currAlias);	//TODO: Traza para ayudar a localizar los problemas relacionados con CLAUER //$NON-NLS-1$
         }
 
         return v.toArray(new String[0]);
