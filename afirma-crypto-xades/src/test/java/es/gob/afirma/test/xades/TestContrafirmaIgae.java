@@ -28,7 +28,10 @@ import es.gob.afirma.signers.xades.AOXAdESSigner;
  */
 public class TestContrafirmaIgae {
 
-	private static final String IGAE_SIGN_PATH = "firmaIgae.xsig.xml"; //$NON-NLS-1$
+	private static final String[] SIGNATURE_FILES = new String[] {
+		"firmaIgae.xsig.xml", //$NON-NLS-1$
+		"firmaAfirma.xsig" //$NON-NLS-1$
+	};
 
     private static final String CERT_PATH = "ANF_PF_Activo.pfx"; //$NON-NLS-1$
     private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
@@ -60,22 +63,25 @@ public class TestContrafirmaIgae {
     	final Properties p = new Properties();
     	final String algorithm = "SHA1withRSA"; //$NON-NLS-1$
 
-    	System.out.println("\nContrafirma XAdES Detached con el algoritmo '" + //$NON-NLS-1$
-    			algorithm + "' sobre la firma de la IGAE '" + IGAE_SIGN_PATH + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+    	for (final String signFile : SIGNATURE_FILES) {
 
-    	final byte[] sign = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(IGAE_SIGN_PATH));
+        	System.out.println("\nContrafirma XAdES Detached con el algoritmo '" + //$NON-NLS-1$
+        			algorithm + "' sobre la firma de la IGAE '" + signFile + "'"); //$NON-NLS-1$ //$NON-NLS-2$
 
-    	final byte[] result = signer.countersign(
-    			sign, algorithm, CounterSignTarget.TREE, null, pke, p);
+    		final byte[] sign = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(signFile));
 
-    	final File f = File.createTempFile("ContrafirmaIGAE", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
-    	final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
-    	fos.write(result);
-    	try { fos.flush(); fos.close(); } catch (final Exception e) {
-    		// Ignoramos los errores
+    		final byte[] result = signer.countersign(
+    				sign, algorithm, CounterSignTarget.TREE, null, pke, p);
+
+    		final File f = File.createTempFile("Contrafirma-" + signFile, ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
+    		final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
+    		fos.write(result);
+    		try { fos.flush(); fos.close(); } catch (final Exception e) {
+    			// Ignoramos los errores
+    		}
+    		System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
+
+    		Assert.assertTrue("El resultado no se reconoce como firma", signer.isSign(result)); //$NON-NLS-1$
     	}
-    	System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
-
-    	Assert.assertTrue("El resultado no se reconoce como firma", signer.isSign(result)); //$NON-NLS-1$
     }
 }
