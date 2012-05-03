@@ -663,7 +663,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			}
 		}
 		else if ("default".equalsIgnoreCase(charset) || charset == null) { //$NON-NLS-1$
-			return System.getProperty("file.encoding"); //$NON-NLS-1$
+			return AccessController.doPrivileged(new GetPropertyAction("file.encoding")); //$NON-NLS-1$
 		}
 		return charset;
 	}
