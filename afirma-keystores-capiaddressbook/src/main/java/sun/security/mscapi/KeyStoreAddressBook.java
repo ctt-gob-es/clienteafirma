@@ -329,12 +329,11 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
         final Iterator<KeyEntry> iter = this.entries.iterator();
 
         return new Enumeration<String>() {
-            @Override
+
             public boolean hasMoreElements() {
                 return iter.hasNext();
             }
 
-            @Override
             public String nextElement() {
                 final Object o = iter.next();
                 for (final java.lang.reflect.Method m : o.getClass().getDeclaredMethods()) {
