@@ -544,7 +544,8 @@ public final class KeyStoreUtilities {
             store == AOKeyStore.SINGLE ||
             store == AOKeyStore.MOZ_UNI ||
             store == AOKeyStore.PKCS11 ||
-            store == AOKeyStore.APPLE) {
+            store == AOKeyStore.APPLE ||
+            store == AOKeyStore.DNIEJAVA) {
                 return new NullPasswordCallback();
         }
         return new UIPasswordCallback(KeyStoreMessages.getString("KeyStoreUtilities.7"), parent); //$NON-NLS-1$
