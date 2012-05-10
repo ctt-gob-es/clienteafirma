@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.security.auth.callback.PasswordCallback;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -60,9 +59,7 @@ import javax.swing.filechooser.FileFilter;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.ui.AOUIFactory;
-import es.gob.afirma.keystores.main.callbacks.NullPasswordCallback;
 import es.gob.afirma.keystores.main.common.AOCertificatesNotFoundException;
-import es.gob.afirma.keystores.main.common.AOKeyStore;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
 import es.gob.afirma.keystores.main.filters.CertificateFilter;
@@ -675,25 +672,6 @@ public final class Utils {
             }
         }
         return null;
-    }
-
-    /** Recupera el manejador de claves asociado a un certificado seg&uacute;n el
-     * repositorio en el que se aloja.
-     * @param store Almace&eacute;n de claves del certificado.
-     * @param parent Componente sobre el que se deben visualizar los
-     *               di&aacute;logos modales (normalmente un <code>java.awt.Comonent</code>)
-     * @return Manejador para la solicitud de la clave. */
-    public static PasswordCallback getCertificatePC(final AOKeyStore store, final Object parent) {
-        if (store == AOKeyStore.WINDOWS || store == AOKeyStore.WINROOT
-            || store == AOKeyStore.WINADDRESSBOOK
-            || store == AOKeyStore.WINCA
-            || store == AOKeyStore.SINGLE
-            || store == AOKeyStore.MOZ_UNI
-            || store == AOKeyStore.PKCS11
-            || store == AOKeyStore.APPLE) {
-                return new NullPasswordCallback();
-        }
-        return new UIPasswordCallbackAccessibility(Messages.getString("CustomDialog.showInputDialog.certificate.pass"), (Component)parent, Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
 
     /**

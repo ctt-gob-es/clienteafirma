@@ -25,6 +25,7 @@ import es.gob.afirma.keystores.main.common.AOKeyStore;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.main.common.KeyStoreConfiguration;
+import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
 import es.gob.afirma.keystores.main.filters.CertificateFilter;
 
 /** Utilidades para las multifirmas */
@@ -119,7 +120,7 @@ public final class MultisignUtils {
 
         final AOKeyStore store = kssc.getType();
         try {
-            privateKeyEntry = keyStoreManager.getKeyEntry(selectedcert, Utils.getCertificatePC(store, padre));
+            privateKeyEntry = keyStoreManager.getKeyEntry(selectedcert, KeyStoreUtilities.getCertificatePC(store, padre));
         }
         catch (final AOCancelledOperationException e) {
             // Si se ha cancelado la operacion lo informamos en el nivel superior para que se trate.

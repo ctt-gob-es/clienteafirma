@@ -53,6 +53,7 @@ import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.main.common.AOKeystoreAlternativeException;
 import es.gob.afirma.keystores.main.common.KeyStoreConfiguration;
+import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
 import es.gob.afirma.ui.utils.CustomDialog;
 import es.gob.afirma.ui.utils.ExtFilter;
 import es.gob.afirma.ui.utils.GeneralConfig;
@@ -442,7 +443,7 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
         // Recuperamos la clave del certificado
         final PrivateKeyEntry privateKeyEntry1;
         try {
-            privateKeyEntry1 = keyStoreManager.getKeyEntry(seleccionado, Utils.getCertificatePC(kconf1.getType(), this));
+            privateKeyEntry1 = keyStoreManager.getKeyEntry(seleccionado, KeyStoreUtilities.getCertificatePC(kconf1.getType(), this));
         }
         catch (final AOCancelledOperationException e) {
             // Si se ha cancelado la operacion lo informamos en el nivel superior para que se trate.

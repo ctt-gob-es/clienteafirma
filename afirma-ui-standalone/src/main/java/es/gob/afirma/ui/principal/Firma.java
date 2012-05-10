@@ -55,6 +55,7 @@ import es.gob.afirma.keystores.main.common.AOKeyStore;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.main.common.KeyStoreConfiguration;
+import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
 import es.gob.afirma.signers.xmldsig.AOXMLDSigSigner;
@@ -207,7 +208,7 @@ final class Firma extends JPanel {
             // Recuperamos la clave del certificado
             final PrivateKeyEntry privateKeyEntry;
             try {
-                privateKeyEntry = keyStoreManager.getKeyEntry(selectedcert, Utils.getCertificatePC(store, SwingUtilities.getRoot(this)));
+                privateKeyEntry = keyStoreManager.getKeyEntry(selectedcert, KeyStoreUtilities.getCertificatePC(store, SwingUtilities.getRoot(this)));
             }
             catch (final java.security.UnrecoverableEntryException e) {
                 // Control de la excepcion generada al introducir mal la contrasena para el certificado
