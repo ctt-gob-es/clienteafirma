@@ -3,9 +3,16 @@ package es.gob.afirma.ui.utils;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.Image;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.image.BufferedImage;
 
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -71,6 +78,22 @@ final class ResizingAdaptor extends ComponentAdapter {
 		this.theFileChooserToSave = fileChooserToSave;
 	}
 
+    private static Image iconToImage(Icon icon) {
+        if (icon instanceof ImageIcon) {
+            return ((ImageIcon)icon).getImage();
+        } 
+        int w = icon.getIconWidth();
+        int h = icon.getIconHeight();
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice gd = ge.getDefaultScreenDevice();
+        GraphicsConfiguration gc = gd.getDefaultConfiguration();
+        BufferedImage image = gc.createCompatibleImage(w, h);
+        Graphics2D g = image.createGraphics();
+        icon.paintIcon(null, g, 0, 0);
+        g.dispose();
+        return image;
+    }
+	
 	@Override
 	/**
 	 * Evento de redimensionado
@@ -373,9 +396,10 @@ final class ResizingAdaptor extends ComponentAdapter {
 			if (c instanceof IconLabel) {
 				final IconLabel iconLabel = (IconLabel) c;
 				//Se selecciona la imagen original del icono para hacer el resize
-				image = (ImageIcon)iconLabel.getOriginalIcon();
-			} else {
-				image = (ImageIcon)((JLabel)c).getIcon();
+				image = new ImageIcon(iconToImage(iconLabel.getOriginalIcon()));
+			} 
+			else {
+				image = new ImageIcon(iconToImage(((JLabel)c).getIcon()));
 			}
 			final ImageIcon newImage = new ImageIcon(image.getImage().getScaledInstance((int) Math.round(w * multiplicando * factor), (int) Math.round(h * multiplicando * factor), java.awt.Image.SCALE_SMOOTH));
 			((JLabel)c).setIcon(newImage);
@@ -418,7 +442,7 @@ final class ResizingAdaptor extends ComponentAdapter {
 			}
 			imageIcon = Constants.IMAGEICONRESTORE; //Se carga la imagen original
 		} else {
-			imageIcon = (ImageIcon)button.getIcon(); //Se carga la imagen del componente actual
+			imageIcon = new ImageIcon(iconToImage((button.getIcon()))); //Se carga la imagen del componente actual
 		}
 		//Se redimensionan las imagenes
 		final ImageIcon newImage = new ImageIcon(imageIcon.getImage().getScaledInstance((int) Math.round(25 * 2 * factorAux),
