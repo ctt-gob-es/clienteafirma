@@ -330,10 +330,10 @@ public final class Base64 {
         }
     }	// end getAlphabet
 
-
-
-    /** Defeats instantiation. */
-    private Base64(){}
+    
+    private Base64(){
+        /* Defeats instantiation. */
+    }
 
 
 
