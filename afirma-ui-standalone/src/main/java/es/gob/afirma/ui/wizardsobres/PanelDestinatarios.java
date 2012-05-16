@@ -223,6 +223,9 @@ final class PanelDestinatarios extends JAccessibilityDialogWizard {
             pssCallback =
                 new NullPasswordCallback();
         }
+        else if (kStore == AOKeyStore.DNIEJAVA) {
+            pssCallback = null;
+        }
         else {
             pssCallback =
                 new UIPasswordCallbackAccessibility(Messages.getString("Wizard.sobres.almacen.pass") + " " + kStore.getDescription(), //$NON-NLS-1$

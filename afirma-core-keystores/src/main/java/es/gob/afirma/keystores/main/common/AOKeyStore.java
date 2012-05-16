@@ -42,7 +42,7 @@ public enum AOKeyStore {
     /** DNIe, en cualquier plataforma soportada mediante PKCS#11. */
     DNIE("DNI Electronico", 13, "PKCS11"), //$NON-NLS-1$ //$NON-NLS-2$
     /** DNIe con controlador nativo Java. */
-    DNIEJAVA("DNIe 100% Java", 14, "Afirma-DNIE") //$NON-NLS-1$ //$NON-NLS-2$
+    DNIEJAVA("DNIe 100% Java", 14, "DNI") //$NON-NLS-1$ //$NON-NLS-2$
     // /** Windows (MY) con proveedor alternativo (JRE Deploy). */
     // WINDEPLOY("Windows / Internet Explorer (despliegue)", 15, "WIExplorerMy")
     ;

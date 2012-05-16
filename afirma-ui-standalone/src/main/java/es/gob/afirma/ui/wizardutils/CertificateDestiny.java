@@ -82,6 +82,19 @@ public class CertificateDestiny {
         catch (final AOCancelledOperationException e) {
             logger.severe("Operacion cancelada por el usuario"); //$NON-NLS-1$
         }
+        catch (final java.security.ProviderException e) {
+        	// Comprobacion especifica para el proveedor Java de DNIe
+        	if (e.getCause() != null && e.getCause().getClass().getName().equals("es.gob.jmulticard.card.AuthenticationModeLockedException")) { //$NON-NLS-1$
+        		CustomDialog.showMessageDialog(dialogo,
+                        true,
+                        Messages.getString("Firma.msg.error.dnie.AuthenticationModeLockedException"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+        		return;
+        	}
+            CustomDialog.showMessageDialog(dialogo,
+                                           true,
+                                           Messages.getString("Firma.msg.error.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+            return;
+        }
         catch (final AOException e) {
             logger.severe(e.getMessage() + ": " + e); //$NON-NLS-1$
             CustomDialog.showMessageDialog(dialogo, true, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$

@@ -415,6 +415,9 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
         if (kStore == AOKeyStore.WINDOWS || kStore == AOKeyStore.WINROOT || kStore == AOKeyStore.PKCS11 || kStore == AOKeyStore.SINGLE) {
             pssCallback = new NullPasswordCallback();
         }
+        else if (kStore == AOKeyStore.DNIEJAVA) {
+            pssCallback = null;
+        }
         else {
             // pssCallback = new UIPasswordCallback(Messages.getString("Wizard.sobres.almacen.pass")+" "+kStore.getDescription(), this);
             pssCallback =

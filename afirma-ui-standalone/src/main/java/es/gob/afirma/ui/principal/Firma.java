@@ -146,6 +146,9 @@ final class Firma extends JPanel {
             if (store == AOKeyStore.WINDOWS || store == AOKeyStore.WINROOT || store == AOKeyStore.SINGLE) {
                 pssCallback = new NullPasswordCallback();
             }
+            else if (store == AOKeyStore.DNIEJAVA) {
+                pssCallback = null;
+            }
             else if (store == AOKeyStore.PKCS12) {
                 pssCallback =
                         new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription() + ". \r\nSi no ha establecido ninguna, deje el campo en blanco.", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -176,39 +179,66 @@ final class Firma extends JPanel {
                 keyStoreManager = AOKeyStoreManagerFactory.getAOKeyStoreManager(store, lib, kssc.toString(), pssCallback, this);
             }
             catch (final IOException e) {
+            	// Condiciones especificas para el proveedor Java de DNIe
+            	String msg = Messages.getString("es.gob.jmulticard.card.Firma.msg.error.contrasenia"); //$NON-NLS-1$
+            	if (e.getClass().getName().equals("es.gob.jmulticard.card.BurnedDnieCardException")) { //$NON-NLS-1$
+            		msg = Messages.getString("Firma.msg.error.dnie.BurnedDnieCardException"); //$NON-NLS-1$
+            	} else if (e.getClass().getName().equals("es.gob.jmulticard.card.InvalidCardException")) { //$NON-NLS-1$
+            		msg = Messages.getString("Firma.msg.error.dnie.InvalidCardException"); //$NON-NLS-1$
+            	} else if (e.getClass().getName().equals("es.gob.jmulticard.apdu.connection.CardNotPresentException")) { //$NON-NLS-1$
+            		msg = Messages.getString("Firma.msg.error.dnie.CardNotPresentException"); //$NON-NLS-1$
+            	} else if (e.getClass().getName().equals("es.gob.jmulticard.apdu.connection.NoReadersFoundException")) { //$NON-NLS-1$
+            		msg = Messages.getString("Firma.msg.error.dnie.NoReadersFoundException"); //$NON-NLS-1$
+            	}
+
                 // Control de la excepcion generada al introducir mal la contrasena para el almacen
-                CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Firma.msg.error.contrasenia"), //$NON-NLS-1$
-                                               Messages.getString("error"), //$NON-NLS-1$
-                                               JOptionPane.ERROR_MESSAGE);
+                CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, msg,
+                								Messages.getString("error"), //$NON-NLS-1$
+                								JOptionPane.ERROR_MESSAGE);
                 return;
             }
             catch (final Exception e) {
+            	e.printStackTrace();
                 CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Firma.msg.error.almacen"), //$NON-NLS-1$
                                                Messages.getString("error"), //$NON-NLS-1$
                                                JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            // Seleccionamos un certificado
-            final String selectedcert =
-                    Utils.showCertSelectionDialog(keyStoreManager.getAliases(),
-                                                  keyStoreManager,
-                                                  SwingUtilities.getRoot(this),
-                                                  true,
-                                                  true,
-                                                  true,
-                                                  null,
-                                                  false);
-
-            // Comprobamos si se ha cancelado la seleccion
-            if (selectedcert == null) {
-                throw new AOCancelledOperationException("Operacion de firma cancelada por el usuario"); //$NON-NLS-1$
-            }
 
             // Recuperamos la clave del certificado
             final PrivateKeyEntry privateKeyEntry;
             try {
-                privateKeyEntry = keyStoreManager.getKeyEntry(selectedcert, KeyStoreUtilities.getCertificatePC(store, SwingUtilities.getRoot(this)));
+            	// Seleccionamos un certificado
+            	final String selectedcert =
+            		Utils.showCertSelectionDialog(keyStoreManager.getAliases(),
+            				keyStoreManager,
+            				SwingUtilities.getRoot(this),
+            				true,
+            				true,
+            				true,
+            				null,
+            				false);
+
+            	// Comprobamos si se ha cancelado la seleccion
+            	if (selectedcert == null) {
+            		throw new AOCancelledOperationException("Operacion de firma cancelada por el usuario"); //$NON-NLS-1$
+            	}
+
+            	privateKeyEntry = keyStoreManager.getKeyEntry(selectedcert, KeyStoreUtilities.getCertificatePC(store, SwingUtilities.getRoot(this)));
+            }
+            catch (final java.security.ProviderException e) {
+            	// Comprobacion especifica para el proveedor Java de DNIe
+            	if (e.getCause() != null && e.getCause().getClass().getName().equals("es.gob.jmulticard.card.AuthenticationModeLockedException")) { //$NON-NLS-1$
+            		CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
+                            true,
+                            Messages.getString("Firma.msg.error.dnie.AuthenticationModeLockedException"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+            		return;
+            	}
+                CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
+                                               true,
+                                               Messages.getString("Firma.msg.error.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+                return;
             }
             catch (final java.security.UnrecoverableEntryException e) {
                 // Control de la excepcion generada al introducir mal la contrasena para el certificado
@@ -224,7 +254,8 @@ final class Firma extends JPanel {
                 throw e;
             }
             catch (final Exception e) {
-                throw new AOException("No se ha podido recuperar el certificado seleccionado: " + selectedcert, e.getCause()); //$NON-NLS-1$
+            	e.printStackTrace();
+                throw new AOException("No se ha podido recuperar el certificado seleccionado", e.getCause()); //$NON-NLS-1$
             }
 
             if (privateKeyEntry == null) {

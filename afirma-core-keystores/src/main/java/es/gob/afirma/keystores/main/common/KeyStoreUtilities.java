@@ -18,6 +18,7 @@ import java.security.KeyStoreException;
 import java.security.KeyStoreSpi;
 import java.security.PrivateKey;
 import java.security.PrivilegedAction;
+import java.security.ProviderException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
@@ -177,6 +178,9 @@ public final class KeyStoreUtilities {
                     try {
                         tmpCert = (X509Certificate) tmpKs.getCertificate(al);
                     }
+                    catch (final ProviderException e) {
+                        throw e;
+                    }
                     catch (final Exception e) {
                         LOGGER.warning("No se ha inicializado el KeyStore indicado: " + e); //$NON-NLS-1$
                         continue;
@@ -231,7 +235,7 @@ public final class KeyStoreUtilities {
                                 }
                             });
                         }
-                        else if (!(ks.getEntry(al, new KeyStore.PasswordProtection(new char[0])) instanceof KeyStore.PrivateKeyEntry)) {
+                        else if (!(ks.getEntry(al, new KeyStore.PasswordProtection(new char[0])) instanceof KeyStore.PrivateKeyEntry)) { //TODO: Solo DNIe
                             aliassesByFriendlyName.remove(al);
                             LOGGER.info(
                               "El certificado '" + al + "' no era tipo trusted pero su clave tampoco era de tipo privada, no se mostrara" //$NON-NLS-1$ //$NON-NLS-2$
@@ -544,9 +548,10 @@ public final class KeyStoreUtilities {
             store == AOKeyStore.SINGLE ||
             store == AOKeyStore.MOZ_UNI ||
             store == AOKeyStore.PKCS11 ||
-            store == AOKeyStore.APPLE ||
-            store == AOKeyStore.DNIEJAVA) {
+            store == AOKeyStore.APPLE) {
                 return new NullPasswordCallback();
+        } else if (store == AOKeyStore.DNIEJAVA) {
+        	return null;
         }
         return new UIPasswordCallback(KeyStoreMessages.getString("KeyStoreUtilities.7"), parent); //$NON-NLS-1$
     }

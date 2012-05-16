@@ -12,6 +12,7 @@ package es.gob.afirma.ui.utils;
 import java.awt.Component;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.io.IOException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -41,8 +42,9 @@ public final class MultisignUtils {
      * @param kssc Configuracion del almacen o repositorio de certificados
      * @param padre Componente padre
      * @return <code>AOKeyStoreManager</code> solicitado
-     * @throws AOException Si ocurre cualquier error al intentar obtener el gestor del almac&eacute;n o repositorio de certificados */
-    public static AOKeyStoreManager getAOKeyStoreManager(final KeyStoreConfiguration kssc, final Component padre) throws AOException {
+     * @throws AOException Si ocurre cualquier error al intentar obtener el gestor del almac&eacute;n o repositorio de certificados
+     * @throws IOException Cuando ocurre alg&uacute;n error en el acceso al almac&eacute;n. */
+    public static AOKeyStoreManager getAOKeyStoreManager(final KeyStoreConfiguration kssc, final Component padre) throws AOException, IOException {
         PasswordCallback pssCallback;
 
         final AOKeyStore store = kssc.getType();
@@ -86,6 +88,9 @@ public final class MultisignUtils {
         catch (final AOCancelledOperationException e) {
             throw e;
         }
+        catch (final IOException e) {
+        	throw e;
+		}
         catch (final Exception e) {
             throw new AOException("Error inicializando el almacen", e); //$NON-NLS-1$
         }

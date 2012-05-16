@@ -33,6 +33,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.text.Caret;
 
 import es.gob.afirma.core.AOCancelledOperationException;
@@ -425,6 +426,19 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 		}
 		catch (final AOCancelledOperationException e) {
             logger.severe(e.toString());
+            return false;
+        }
+        catch (final java.security.ProviderException e) {
+        	// Comprobacion especifica para el proveedor Java de DNIe
+        	if (e.getCause() != null && e.getCause().getClass().getName().equals("es.gob.jmulticard.card.AuthenticationModeLockedException")) { //$NON-NLS-1$
+        		CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
+                        true,
+                        Messages.getString("Firma.msg.error.dnie.AuthenticationModeLockedException"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+        		return false;
+        	}
+            CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
+                                           true,
+                                           Messages.getString("Firma.msg.error.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
             return false;
         }
 		catch (final Exception e) {

@@ -22,6 +22,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
 import java.security.KeyException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.ArrayList;
@@ -36,6 +37,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.text.Caret;
 
 import es.gob.afirma.core.AOCancelledOperationException;
@@ -471,6 +473,9 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
             if (store == AOKeyStore.WINDOWS || store == AOKeyStore.WINROOT || store == AOKeyStore.SINGLE) {
                 pssCallback = new NullPasswordCallback();
             }
+            else if (store == AOKeyStore.DNIEJAVA) {
+                pssCallback = null;
+            }
             else if (store == AOKeyStore.PKCS12) {
                 pssCallback =
                         new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription() + ". \r\nSi no ha establecido ninguna, deje el campo en blanco.", null, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -528,10 +533,40 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
                 throw new KeyException("No se pudo obtener la informacion del certificado, no se firmara el fichero."); //$NON-NLS-1$
             }
         }
+        catch (final java.security.ProviderException e) {
+        	// Comprobacion especifica para el proveedor Java de DNIe
+        	if (e.getCause() != null && e.getCause().getClass().getName().equals("es.gob.jmulticard.card.AuthenticationModeLockedException")) { //$NON-NLS-1$
+        		CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
+                        true,
+                        Messages.getString("Firma.msg.error.dnie.AuthenticationModeLockedException"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+        		return false;
+        	}
+            CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
+                                           true,
+                                           Messages.getString("Firma.msg.error.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+            return false;
+        }
         catch (final AOException e) {
             LOGGER.severe(e.toString());
             // El pop-up muestra el mensaje de la excepcion
             CustomDialog.showMessageDialog(this, true, e.getMessage(), Messages.getString("Wizard.multifirma.ok.titulo"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
+            return false;
+        }
+        catch (final IOException e) {
+            LOGGER.severe(e.toString());
+
+        	// Condiciones especificas para el proveedor Java de DNIe
+        	String msg = e.getMessage();
+        	if (e.getClass().getName().equals("BurnedDnieCardException")) { //$NON-NLS-1$
+        		msg = Messages.getString("Firma.msg.error.dnie.BurnedDnieCardException"); //$NON-NLS-1$
+        	} else if (e.getClass().getName().equals("es.gob.jmulticard.card.InvalidCardException")) { //$NON-NLS-1$
+        		msg = Messages.getString("Firma.msg.error.dnie.InvalidCardException"); //$NON-NLS-1$
+        	} else if (e.getClass().getName().equals("es.gob.jmulticard.apdu.connection.CardNotPresentException")) { //$NON-NLS-1$
+        		msg = Messages.getString("Firma.msg.error.dnie.CardNotPresentException"); //$NON-NLS-1$
+        	} else if (e.getClass().getName().equals("es.gob.jmulticard.apdu.connection.NoReadersFoundException")) { //$NON-NLS-1$
+        		msg = Messages.getString("Firma.msg.error.dnie.NoReadersFoundException"); //$NON-NLS-1$
+        	}
+            CustomDialog.showMessageDialog(this, true, msg, Messages.getString("Wizard.multifirma.ok.titulo"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
             return false;
         }
         catch (final Exception e) {

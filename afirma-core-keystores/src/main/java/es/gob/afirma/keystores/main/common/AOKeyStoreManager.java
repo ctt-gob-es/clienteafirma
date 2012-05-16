@@ -468,9 +468,9 @@ public class AOKeyStoreManager {
         return ret;
     }
 
-    private List<KeyStore> initDnieJava(final PasswordCallback pssCallBack) throws AOKeyStoreManagerException {
+    private List<KeyStore> initDnieJava(final PasswordCallback pssCallBack) throws AOKeyStoreManagerException, IOException {
     	final Provider p;
-    	if (Security.getProvider("AfirmaDnie") == null) { //$NON-NLS-1$
+    	if (Security.getProvider(AOKeyStore.DNIEJAVA.getName()) == null) {
     		try {
     			p = (Provider) AOUtil.classForName("es.gob.jmulticard.jse.provider.DnieProvider").newInstance(); //$NON-NLS-1$
     			Security.addProvider(p);
@@ -493,7 +493,10 @@ public class AOKeyStoreManager {
 
         LOGGER.info("Cargando KeyStore DNIe 100% Java"); //$NON-NLS-1$
         try {
-			this.ks.load(null, pssCallBack.getPassword());
+			this.ks.load(null, pssCallBack == null ? null : pssCallBack.getPassword());
+		}
+        catch (final IOException e) {
+			throw e;
 		}
         catch (final Exception e) {
 			throw new AOKeyStoreManagerException("No se ha podido obtener el almacen DNIe 100% Java: " + e, e);  //$NON-NLS-1$
@@ -633,7 +636,7 @@ public class AOKeyStoreManager {
                 throw new UnrecoverableEntryException(e.toString());
             }
         }
-        return (KeyStore.PrivateKeyEntry) this.ks.getEntry(alias, new KeyStore.PasswordProtection((pssCallback != null) ? pssCallback.getPassword() : null));
+        return (KeyStore.PrivateKeyEntry) this.ks.getEntry(alias, (pssCallback != null) ? new KeyStore.PasswordProtection(pssCallback.getPassword()) : null);
     }
 
     /** Obtiene el certificado correspondiente a una clave privada.
