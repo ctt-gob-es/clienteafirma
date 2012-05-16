@@ -137,6 +137,7 @@ public final class CustomDialog extends JAccessibilityCustomDialog implements Ac
 		super(componentParent, modal);
 		initComponents(message, title, typeMessage, isInputDialog);
 		setLocationRelativeTo(componentParent);
+		pack();
 	}
 	
 	/**
@@ -154,7 +155,7 @@ public final class CustomDialog extends JAccessibilityCustomDialog implements Ac
 		this.setModal(modal);
 		initComponents(message, title, typeMessage, isInputDialog);
 		setLocationRelativeTo(componentParent);
-		
+		pack();
 	}
 	
 	/**
@@ -171,6 +172,7 @@ public final class CustomDialog extends JAccessibilityCustomDialog implements Ac
 		super(componentParent, modal);
 		initComponents(message, title, typeMessage, isInputDialog);
 		setLocationRelativeTo(componentParent);
+		pack();
 	}
 	
     /**
@@ -322,6 +324,8 @@ public final class CustomDialog extends JAccessibilityCustomDialog implements Ac
         
         //Se anade el panel de botones
         container.add(this.buttonsPanel, cons);
+        
+        pack();
 
 	}
 
@@ -336,11 +340,14 @@ public final class CustomDialog extends JAccessibilityCustomDialog implements Ac
   		if (typeMessage != JOptionPane.PLAIN_MESSAGE) {
 	  		if (typeMessage == JOptionPane.ERROR_MESSAGE) {
 	  			icon = UIManager.getIcon("OptionPane.errorIcon"); //$NON-NLS-1$
-	  		} else if (typeMessage == JOptionPane.WARNING_MESSAGE) {
+	  		} 
+	  		else if (typeMessage == JOptionPane.WARNING_MESSAGE) {
 	  			icon = UIManager.getIcon("OptionPane.warningIcon"); //$NON-NLS-1$
-	  		} else if (typeMessage == JOptionPane.QUESTION_MESSAGE) {
+	  		} 
+	  		else if (typeMessage == JOptionPane.QUESTION_MESSAGE) {
 	  			icon = UIManager.getIcon("OptionPane.questionIcon"); //$NON-NLS-1$
-	  		} else {
+	  		} 
+	  		else {
 				icon = UIManager.getIcon("OptionPane.informationIcon"); //$NON-NLS-1$
 	  		}
 	  		this.iconLabel.setIcon(icon);
@@ -430,16 +437,12 @@ public final class CustomDialog extends JAccessibilityCustomDialog implements Ac
 		this.maximizeButton.setMnemonic(KeyEvent.VK_M );
 		this.maximizeButton.setToolTipText(Messages.getString("Wizard.maximizar.description")); //$NON-NLS-1$
 		this.maximizeButton.getAccessibleContext().setAccessibleName(this.maximizeButton.getToolTipText());
-
-		//this.maximizeButton.setBorder(null); //Eliminar Borde, ayuda a centrar el iconod el boton
-		//this.maximizeButton.setContentAreaFilled(false); //area del boton invisible
 		
 		this.maximizeButton.setName("maximizar");
 		//Se asigna una dimension por defecto
 		this.maximizeButton.setPreferredSize(dimension);
 				
 		Utils.remarcar(this.maximizeButton);
-		//maximizePanel.add(this.maximizeButton, consMaximizePanel);
 		maximizePanel.add(this.maximizeButton);
 
 		this.maximizeButton.addFocusListener(new FocusListener() {
@@ -492,7 +495,8 @@ public final class CustomDialog extends JAccessibilityCustomDialog implements Ac
     		this.maximizeButton.setEnabled(false);
     		//Se habilita el boton de restaurar
     		this.restoreButton.setEnabled(true);
-    	} else {
+    	} 
+    	else {
     		//Se habilita el boton de maximizado
     		this.maximizeButton.setEnabled(true);
     		//Se deshabilita el boton de restaurar
@@ -539,10 +543,8 @@ public final class CustomDialog extends JAccessibilityCustomDialog implements Ac
 	 */
 	public static void showMessageDialog(Component componentParent, boolean modal, String message, String title, int typeMessage){
 		//Instancia de CustomDialog
-		CustomDialog customDialog = CustomDialog.getInstanceCustomDialog(componentParent, modal, message, title, typeMessage, false);
-	
+		final CustomDialog customDialog = CustomDialog.getInstanceCustomDialog(componentParent, modal, message, title, typeMessage, false);
 		customDialog.infoLabel.setHorizontalAlignment(SwingConstants.CENTER); //Se centra el texto
-		//customDialog.component.setVisible(false); //Se oculta el campo de texto
 		customDialog.setVisible(true);
 	}
 
@@ -558,7 +560,7 @@ public final class CustomDialog extends JAccessibilityCustomDialog implements Ac
 	 */
 	public static int showConfirmDialog(Component componentParent, boolean modal, String message, String title, int typeOption, int typeMessage){
 		
-		CustomDialog customDialog = CustomDialog.getInstanceCustomDialog(componentParent, modal, message, title, typeMessage, false);
+		final CustomDialog customDialog = CustomDialog.getInstanceCustomDialog(componentParent, modal, message, title, typeMessage, false);
 		
 		//Restricciones
 		GridBagConstraints cons = new GridBagConstraints();
@@ -578,7 +580,8 @@ public final class CustomDialog extends JAccessibilityCustomDialog implements Ac
 			noPanel.add(customDialog.noButton);
 			customDialog.buttonsPanel.add(noPanel, cons);
 			customDialog.noButton.addActionListener(customDialog);
-		} else if (typeOption == JOptionPane.YES_NO_CANCEL_OPTION) {
+		} 
+		else if (typeOption == JOptionPane.YES_NO_CANCEL_OPTION) {
 			//Boton Si
 			customDialog.okButton.setText(Messages.getString("CustomDialog.confirmDialog.yes")); //$NON-NLS-1$
 			customDialog.okButton.setMnemonic(KeyEvent.VK_S);
@@ -606,8 +609,11 @@ public final class CustomDialog extends JAccessibilityCustomDialog implements Ac
 		}
 		
 		customDialog.infoLabel.setHorizontalAlignment(SwingConstants.CENTER); //Se centra el texto
-				
-		customDialog.setVisible(true);
+		
+		customDialog.pack();
+        customDialog.setSize(customDialog.getWidth()+1, customDialog.getHeight()+1); // Hacemos un resize para forzar un repintado
+		
+        customDialog.setVisible(true);
 		return customDialog.getAnswer();
 	}
 
@@ -750,6 +756,8 @@ public final class CustomDialog extends JAccessibilityCustomDialog implements Ac
 		
 		cancelButton.addActionListener(customDialog);
 		
+		customDialog.pack();
+        customDialog.setSize(customDialog.getWidth()+1, customDialog.getHeight()+1); // Hacemos un resize para forzar un repintado
 		customDialog.setVisible(true);
 		
 		//Control para saber si se ha pulsado el boton cancelar
