@@ -531,6 +531,9 @@ public final class KeyStoreUtilities {
             kStore == AOKeyStore.APPLE) {
                 return new NullPasswordCallback();
         }
+        else if (kStore == AOKeyStore.DNIEJAVA) {
+                    return null;
+        }
         return new UIPasswordCallback(KeyStoreMessages.getString("KeyStoreUtilities.6", kStore.getDescription()), parent); //$NON-NLS-1$
     }
 
