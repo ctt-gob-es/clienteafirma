@@ -1,6 +1,5 @@
 package es.gob.afirma.ui.utils;
 
-import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -13,10 +12,14 @@ public final class Messages {
 
     private static ResourceBundle bundle = ResourceBundle.getBundle("resources/properties/Idioma"/*, Locale.getDefault()*/); //$NON-NLS-1$
 
+    /** Sin efecto, no es posible cambiar el idioma. */
     public static void changeLocale() {
         //bundle = ResourceBundle.getBundle("properties/Idioma", Locale.getDefault()); //$NON-NLS-1$
     }
 
+    /** Obtiene la cadena de texto asociada al identificador.
+     * @param codeString Identificador del texto
+     * @return Cadena de texto asociada al identificador */
     public static String getString(final String codeString) {
         try {
             return bundle.getString(codeString);
