@@ -11,10 +11,10 @@ public final class Messages {
 		// No permitimos la instanciacion
 	}
 
-    private static ResourceBundle bundle = ResourceBundle.getBundle("resources/properties/Idioma", Locale.getDefault()); //$NON-NLS-1$
+    private static ResourceBundle bundle = ResourceBundle.getBundle("resources/properties/Idioma"/*, Locale.getDefault()*/); //$NON-NLS-1$
 
     public static void changeLocale() {
-        bundle = ResourceBundle.getBundle("properties/Idioma", Locale.getDefault()); //$NON-NLS-1$
+        //bundle = ResourceBundle.getBundle("properties/Idioma", Locale.getDefault()); //$NON-NLS-1$
     }
 
     public static String getString(final String codeString) {
@@ -22,7 +22,7 @@ public final class Messages {
             return bundle.getString(codeString);
         }
         catch (final MissingResourceException e) {
-            return "##ERROR## Cadena no disponible."; //$NON-NLS-1$
+            return "##ERROR## Cadena no disponible: " + codeString; //$NON-NLS-1$
         }
     }
 
