@@ -180,15 +180,24 @@ final class Firma extends JPanel {
             }
             catch (final IOException e) {
             	// Condiciones especificas para el proveedor Java de DNIe
-            	String msg = Messages.getString("es.gob.jmulticard.card.Firma.msg.error.contrasenia"); //$NON-NLS-1$
+            	final String msg;
             	if (e.getClass().getName().equals("es.gob.jmulticard.card.BurnedDnieCardException")) { //$NON-NLS-1$
             		msg = Messages.getString("Firma.msg.error.dnie.BurnedDnieCardException"); //$NON-NLS-1$
-            	} else if (e.getClass().getName().equals("es.gob.jmulticard.card.InvalidCardException")) { //$NON-NLS-1$
+            	} 
+            	else if (e.getClass().getName().equals("es.gob.jmulticard.card.InvalidCardException")) { //$NON-NLS-1$
             		msg = Messages.getString("Firma.msg.error.dnie.InvalidCardException"); //$NON-NLS-1$
-            	} else if (e.getClass().getName().equals("es.gob.jmulticard.apdu.connection.CardNotPresentException")) { //$NON-NLS-1$
+            	} 
+            	else if (e.getClass().getName().equals("es.gob.jmulticard.apdu.connection.CardNotPresentException")) { //$NON-NLS-1$
             		msg = Messages.getString("Firma.msg.error.dnie.CardNotPresentException"); //$NON-NLS-1$
-            	} else if (e.getClass().getName().equals("es.gob.jmulticard.apdu.connection.NoReadersFoundException")) { //$NON-NLS-1$
+            	} 
+            	else if (e.getClass().getName().equals("es.gob.jmulticard.apdu.connection.NoReadersFoundException")) { //$NON-NLS-1$
             		msg = Messages.getString("Firma.msg.error.dnie.NoReadersFoundException"); //$NON-NLS-1$
+            	}
+            	else if ("es.gob.jmulticard.apdu.connection.ApduConnectionException".equals(e.getClass().getName())) { //$NON-NLS-1$
+            	    msg = Messages.getString("Firma.msg.error.dnie.ApduConnectionException"); //$NON-NLS-1$
+            	}
+            	else {
+            	    msg = Messages.getString("Firma.msg.error.contrasenia"); //$NON-NLS-1$
             	}
 
                 // Control de la excepcion generada al introducir mal la contrasena para el almacen
