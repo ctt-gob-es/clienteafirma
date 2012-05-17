@@ -71,6 +71,9 @@ public final class MultisignUtils {
                 throw new AOCancelledOperationException();
             }
         }
+        else if (store == AOKeyStore.DNIEJAVA) {
+        	pssCallback = null;
+        }
         else {
             /*pssCallback = new UIPasswordCallback(
             		Messages.getString("Msg.pedir.contraenia", store.getDescription()),  //$NON-NLS-1$

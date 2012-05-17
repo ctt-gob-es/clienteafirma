@@ -392,6 +392,7 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 		        keyEntry = MultisignUtils.getPrivateKeyEntry(this.kssc, keyStoreManager, this);
 		    } catch (final AOException e) {
 		    	CustomDialog.showMessageDialog(this, true, Messages.getString("Desensobrado.msg.error.certificado"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+		    	e.printStackTrace();
 		        return false;
 		    }
 
