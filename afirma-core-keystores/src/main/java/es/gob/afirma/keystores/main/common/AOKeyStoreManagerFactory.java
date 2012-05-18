@@ -117,7 +117,7 @@ public final class AOKeyStoreManagerFactory {
         }
 
         else if (AOKeyStore.DNIEJAVA.equals(store)) {
-        	return getDnieJavaKeyStoreManager(store, pssCallback);
+        	return getDnieJavaKeyStoreManager(store, pssCallback, parentComponent);
         }
 
         throw new AOKeystoreAlternativeException(
@@ -131,12 +131,14 @@ public final class AOKeyStoreManagerFactory {
     }
 
     private static AOKeyStoreManager getDnieJavaKeyStoreManager(final AOKeyStore store,
-    		                                                    final PasswordCallback pssCallback)
+    		                                                    final PasswordCallback pssCallback,
+    	                                                         final Object parentComponent)
     															throws AOKeystoreAlternativeException,
     															IOException {
     	final AOKeyStoreManager ksm = new AOKeyStoreManager();
     	try {
-    		ksm.init(store, null, pssCallback, null);
+    		// Proporcionamos el componente padre como parametro
+    		ksm.init(store, null, pssCallback, new Object[] { parentComponent });
     	}
     	catch (final IOException e) {
     		throw e;

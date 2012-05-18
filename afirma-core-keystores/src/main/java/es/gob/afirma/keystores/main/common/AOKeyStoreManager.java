@@ -10,11 +10,13 @@
 
 package es.gob.afirma.keystores.main.common;
 
+import java.awt.Component;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -468,7 +470,7 @@ public class AOKeyStoreManager {
         return ret;
     }
 
-    private List<KeyStore> initDnieJava(final PasswordCallback pssCallBack) throws AOKeyStoreManagerException, IOException {
+    private List<KeyStore> initDnieJava(final PasswordCallback pssCallBack, final Object parentComponent) throws AOKeyStoreManagerException, IOException {
     	final Provider p;
     	if (Security.getProvider(AOKeyStore.DNIEJAVA.getName()) == null) {
     		try {
@@ -481,6 +483,15 @@ public class AOKeyStoreManager {
 					e
 				);
     		}
+    	}
+
+    	try {
+    		final Class<?> managerClass = AOUtil.classForName("es.gob.jmulticard.ui.passwordcallback.PasswordCallbackManager"); //$NON-NLS-1$
+    		final Method setDialogOwnerFrameMethod = managerClass.getMethod("setDialogOwner", Component.class); //$NON-NLS-1$
+    		setDialogOwnerFrameMethod.invoke(null, parentComponent);
+    	} catch (final Exception e) {
+    		e.printStackTrace();
+    		LOGGER.warning("No se ha podido establecer el componente padre para los dialogos del almacen"); //$NON-NLS-1$
     	}
 
         // Inicializamos
@@ -551,7 +562,7 @@ public class AOKeyStoreManager {
         }
 
         if (this.ksType.equals(AOKeyStore.DNIEJAVA)) {
-        	return initDnieJava(pssCallBack);
+        	return initDnieJava(pssCallBack, (params != null && params.length > 0) ? params[0] : null);
         }
 
         else if (this.ksType.equals(AOKeyStore.JAVA) || this.ksType.equals(AOKeyStore.JAVACE) || this.ksType.equals(AOKeyStore.JCEKS)) {
