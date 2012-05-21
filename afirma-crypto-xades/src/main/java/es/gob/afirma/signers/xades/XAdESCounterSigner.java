@@ -1,3 +1,13 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
 package es.gob.afirma.signers.xades;
 
 import java.io.ByteArrayInputStream;
@@ -30,7 +40,6 @@ import net.java.xades.security.xml.XAdES.SignerRole;
 import net.java.xades.security.xml.XAdES.SignerRoleImpl;
 import net.java.xades.security.xml.XAdES.XAdES;
 import net.java.xades.security.xml.XAdES.XAdES_EPES;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 import org.w3c.dom.Element;
@@ -281,8 +290,6 @@ final class XAdESCounterSigner {
 			}
 		}
 
-		checkXadesNamespace(doc, (xParams != null) ? xParams.getProperty("xadesNamespace") : AOXAdESSigner.XADESNS); //$NON-NLS-1$
-
 		return Utils.writeXML(doc.getDocumentElement(), originalXMLProperties,
 				null, null);
 	}
@@ -456,23 +463,21 @@ final class XAdESCounterSigner {
 		}
 	}
 
-	/**
-	 * Realiza la contrafirma de la firma pasada por par&aacute;metro
-	 *
-	 * @param signature
-	 *            Elemento con el nodo de la firma a contrafirmar
-	 * @param algorithm
-	 *            Algoritmo de firma XML
-	 * @throws AOException
-	 *             Cuando ocurre cualquier problema durante el proceso
-	 */
+	/** Realiza la contrafirma de la firma pasada por par&aacute;metro
+	 * @param signature Elemento con el nodo de la firma a contrafirmar
+	 * @param algorithm Algoritmo de firma XML
+	 * @throws AOException Cuando ocurre cualquier problema durante el proceso */
 	private static void cs(final Element signature,
-			final PrivateKeyEntry keyEntry, final Properties xParams,
-			final String algorithm, final Document doc) throws AOException {
+			               final PrivateKeyEntry keyEntry, 
+			               final Properties xParams,
+			               final String algorithm, 
+			               final Document doc) throws AOException {
+	    
+	    final String sigPrefix = Utils.guessXAdESNamespacePrefix(signature);
 
 		if (doc == null) {
 			throw new IllegalArgumentException(
-					"El documento DOM no puede ser nulo"); //$NON-NLS-1$
+				"El documento DOM no puede ser nulo"); //$NON-NLS-1$
 		}
 
 		final Properties extraParams = (xParams != null) ? xParams : new Properties();
@@ -488,7 +493,7 @@ final class XAdESCounterSigner {
 
 		// crea un nodo CounterSignature
 		final Element counterSignature = doc.createElement(
-				AOXAdESSigner.XADES_SIGNATURE_PREFIX + ":CounterSignature"); //$NON-NLS-1$
+				sigPrefix + ":CounterSignature"); //$NON-NLS-1$
 
 		// recupera o crea un nodo UnsignedSignatureProperties
 		final NodeList usp = signature.getElementsByTagNameNS(
@@ -496,21 +501,23 @@ final class XAdESCounterSigner {
 		Element unsignedSignatureProperties;
 		if (usp.getLength() == 0) {
 			unsignedSignatureProperties = doc.createElement(
-					AOXAdESSigner.XADES_SIGNATURE_PREFIX + ":UnsignedSignatureProperties"); //$NON-NLS-1$
+					sigPrefix + ":UnsignedSignatureProperties"); //$NON-NLS-1$
 		} else {
 			unsignedSignatureProperties = (Element) usp.item(0);
 		}
 
 		unsignedSignatureProperties.appendChild(counterSignature);
-
+		
 		// recupera o crea un nodo UnsignedProperties
 		final NodeList up = signature.getElementsByTagNameNS(
 				"*", "UnsignedProperties"); //$NON-NLS-1$ //$NON-NLS-2$
 		final Element unsignedProperties;
 		if (up.getLength() == 0) {
 			unsignedProperties = doc.createElement(
-					AOXAdESSigner.XADES_SIGNATURE_PREFIX + ":UnsignedProperties"); //$NON-NLS-1$
-		} else {
+				sigPrefix + ":UnsignedProperties" //$NON-NLS-1$
+			);
+		} 
+		else {
 			unsignedProperties = (Element) up.item(0);
 		}
 
@@ -555,10 +562,14 @@ final class XAdESCounterSigner {
 		}
 
 		// nueva instancia XADES_EPES del nodo a contrafirmar
-		final XAdES_EPES xades = (XAdES_EPES) XAdES.newInstance(XAdES.EPES,
-				xadesNamespace, AOXAdESSigner.XADES_SIGNATURE_PREFIX,
-				AOXAdESSigner.XML_SIGNATURE_PREFIX, digestMethodAlgorithm,
-				counterSignature);
+		final XAdES_EPES xades = (XAdES_EPES) XAdES.newInstance(
+                XAdES.EPES,
+				xadesNamespace, 
+				sigPrefix,
+				AOXAdESSigner.XML_SIGNATURE_PREFIX, 
+				digestMethodAlgorithm,
+				counterSignature
+		);
 
 		// establece el certificado
 		final X509Certificate cert = (X509Certificate) keyEntry
@@ -652,23 +663,6 @@ final class XAdESCounterSigner {
 
 	private XAdESCounterSigner() {
 		// No permitimos la instanciacion
-	}
-
-	/** Comprueba que el espacio de nombres de XAdES este correctamente declarado, y si no lo esta lo declara en el
-	 * primer nodo UnsignedProperties que encuentre en el espacio no declarado. */
-	private static void checkXadesNamespace(final Document doc, final String namespaceUri) {
-		final NodeList nl = doc.getElementsByTagName(AOXAdESSigner.XADES_SIGNATURE_PREFIX + ":UnsignedProperties"); //$NON-NLS-1$
-		boolean xadesNamespaceDeclared = false;
-		for (int i=0;i<nl.getLength();i++) {
-			final String xadesNamespace = ((Element)nl.item(i)).getAttribute("xmlns:" + AOXAdESSigner.XADES_SIGNATURE_PREFIX); //$NON-NLS-1$
-			if (!"".equals(xadesNamespace)) { //$NON-NLS-1$
-				xadesNamespaceDeclared = true;
-			}
-		}
-		if (!xadesNamespaceDeclared) {
-			final String namespace = (namespaceUri != null) ? namespaceUri : AOXAdESSigner.XADESNS;
-			((Element)doc.getElementsByTagName(AOXAdESSigner.XADES_SIGNATURE_PREFIX + ":UnsignedProperties").item(0)).setAttribute("xmlns:" + AOXAdESSigner.XADES_SIGNATURE_PREFIX, namespace); //$NON-NLS-1$ //$NON-NLS-2$
-		}
 	}
 
 }

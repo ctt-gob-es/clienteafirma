@@ -657,9 +657,8 @@ public final class Utils {
         return numXmlDsig >= numXmlDsig11 ? "http://www.w3.org/2000/09/xmldsig#" : "http://www.w3.org/2009/xmldsig11#"; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
-    /** Intenta determinar el prefijo del espacio de nombres de la firma.
-     * @param el
-     *        Firma XMLDSig
+    /** Intenta determinar el prefijo del espacio de nombres de la firma XMLDSig.
+     * @param el Firma XMLDSig
      * @return Prefijo del espacio de nombres */
     public static String guessXMLDSigNamespacePrefix(final Element el) {
 
@@ -684,6 +683,17 @@ public final class Utils {
             return "dsig11"; //$NON-NLS-1$
         }
         return "ds"; //$NON-NLS-1$
+    }
+    
+    /** Intenta determinar el prefijo del espacio de nombres de XAdES.
+     * @param el Firma XAdES
+     * @return Prefijo del espacio de nombres */
+    public static String guessXAdESNamespacePrefix(final Element el) {
+        final String signatureText = new String(writeXML(el, null, null, null));
+        if (signatureText.contains("xmlns:etsi=\"http://uri.etsi.org/")) { //$NON-NLS-1$
+            return "etsi"; //$NON-NLS-1$
+        }
+        return "xades"; //$NON-NLS-1$
     }
 
     /** Cuenta las repeticiones de una subcadena dentro de una cadena. Las
