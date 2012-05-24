@@ -40,6 +40,7 @@ import net.java.xades.security.xml.XAdES.SignerRole;
 import net.java.xades.security.xml.XAdES.SignerRoleImpl;
 import net.java.xades.security.xml.XAdES.XAdES;
 import net.java.xades.security.xml.XAdES.XAdES_EPES;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 import org.w3c.dom.Element;
@@ -130,6 +131,11 @@ final class XAdESCounterSigner {
 	 *            <dt><b><i>policyQualifier</i></b></dt>
 	 *            <dd>URL hacia el documento (legible por personas, normalmente
 	 *            en formato PDF) descriptivo de la pol&iacute;tica de firma</dd>
+	 *            <dt><b><i>includeOnlySignningCertificate</i></b></dt>
+	 *            <dd>Indica, mediante un {@code true} o {@code false}, que debe
+	 *            indicarse en la firma &uacute;nicamente el certificado utilizado
+	 *            para firmar y no su cadena de certificaci&oacute;n completa.
+	 *            Por defecto, se incluir&aacute; toda la cadena de certificaci&oacute;n.</dd>
 	 *            <dt><b><i>signerClaimedRole</i></b></dt>
 	 *            <dd>Cargo atribuido para el firmante</dd>
 	 *            <dt><b><i>signerCertifiedRole</i></b></dt>
@@ -468,11 +474,11 @@ final class XAdESCounterSigner {
 	 * @param algorithm Algoritmo de firma XML
 	 * @throws AOException Cuando ocurre cualquier problema durante el proceso */
 	private static void cs(final Element signature,
-			               final PrivateKeyEntry keyEntry, 
+			               final PrivateKeyEntry keyEntry,
 			               final Properties xParams,
-			               final String algorithm, 
+			               final String algorithm,
 			               final Document doc) throws AOException {
-	    
+
 	    final String sigPrefix = Utils.guessXAdESNamespacePrefix(signature);
 
 		if (doc == null) {
@@ -507,7 +513,7 @@ final class XAdESCounterSigner {
 		}
 
 		unsignedSignatureProperties.appendChild(counterSignature);
-		
+
 		// recupera o crea un nodo UnsignedProperties
 		final NodeList up = signature.getElementsByTagNameNS(
 				"*", "UnsignedProperties"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -516,7 +522,7 @@ final class XAdESCounterSigner {
 			unsignedProperties = doc.createElement(
 				sigPrefix + ":UnsignedProperties" //$NON-NLS-1$
 			);
-		} 
+		}
 		else {
 			unsignedProperties = (Element) up.item(0);
 		}
@@ -564,9 +570,9 @@ final class XAdESCounterSigner {
 		// nueva instancia XADES_EPES del nodo a contrafirmar
 		final XAdES_EPES xades = (XAdES_EPES) XAdES.newInstance(
                 XAdES.EPES,
-				xadesNamespace, 
+				xadesNamespace,
 				sigPrefix,
-				AOXAdESSigner.XML_SIGNATURE_PREFIX, 
+				AOXAdESSigner.XML_SIGNATURE_PREFIX,
 				digestMethodAlgorithm,
 				counterSignature
 		);
@@ -647,12 +653,18 @@ final class XAdESCounterSigner {
 		}
 
 		try {
-			xmlSignature.sign(Arrays.asList((X509Certificate[]) keyEntry
-					.getCertificateChain()), keyEntry.getPrivateKey(),
-					XMLConstants.SIGN_ALGOS_URI.get(algorithm), referenceList,
-					"Signature-" + UUID.randomUUID().toString(), //$NON-NLS-1$
-					null /* TSA */
-			);
+			final boolean onlySignningCert = Boolean.parseBoolean(extraParams
+					.getProperty("includeOnlySignningCertificate", Boolean.FALSE.toString())); //$NON-NLS-1$
+			if (onlySignningCert) {
+				xmlSignature.sign((X509Certificate) keyEntry.getCertificate(),
+						keyEntry.getPrivateKey(), XMLConstants.SIGN_ALGOS_URI.get(algorithm), referenceList,
+						"Signature-" + UUID.randomUUID().toString(), null /* TSA */); //$NON-NLS-1$
+			}
+			else {
+				xmlSignature.sign(Arrays.asList((X509Certificate[]) keyEntry.getCertificateChain()),
+						keyEntry.getPrivateKey(), XMLConstants.SIGN_ALGOS_URI.get(algorithm), referenceList,
+						"Signature-" + UUID.randomUUID().toString(), null /* TSA */); //$NON-NLS-1$
+			}
 		} catch (final NoSuchAlgorithmException e) {
 			throw new UnsupportedOperationException(
 					"Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'", e); //$NON-NLS-1$ //$NON-NLS-2$

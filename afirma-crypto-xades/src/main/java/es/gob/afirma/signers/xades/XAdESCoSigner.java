@@ -107,6 +107,11 @@ final class XAdESCoSigner {
      *   <dd>Descripci&oacute;n textual de la pol&iacute;tica</dd>
      *  <dt><b><i>policyQualifier</i></b></dt>
      *   <dd>URL hacia el documento (legible por personas, normalmente en formato PDF) descriptivo de la pol&iacute;tica de firma</dd>
+	 *	<dt><b><i>includeOnlySignningCertificate</i></b></dt>
+	 *   <dd>Indica, mediante un {@code true} o {@code false}, que debe
+	 *   indicarse en la firma &uacute;nicamente el certificado utilizado
+	 *   para firmar y no su cadena de certificaci&oacute;n completa.
+	 *   Por defecto, se incluir&aacute; toda la cadena de certificaci&oacute;n.</dd>
      *  <dt><b><i>signerClaimedRole</i></b></dt>
      *   <dd>Cargo atribuido para el firmante</dd>
      *  <dt><b><i>signerCertifiedRole</i></b></dt>
@@ -356,7 +361,18 @@ final class XAdESCoSigner {
         }
 
         try {
-            xmlSignature.sign(Arrays.asList((X509Certificate[])keyEntry.getCertificateChain()), keyEntry.getPrivateKey(), algoUri, referenceList, "Signature-" + UUID.randomUUID().toString(), null/*TSA*/); //$NON-NLS-1$
+        	final boolean onlySignningCert = Boolean.parseBoolean(extraParams
+        			.getProperty("includeOnlySignningCertificate", Boolean.FALSE.toString())); //$NON-NLS-1$
+        	if (onlySignningCert) {
+        		xmlSignature.sign((X509Certificate) keyEntry.getCertificate(),
+        				keyEntry.getPrivateKey(), algoUri, referenceList,
+        				"Signature-" + UUID.randomUUID().toString(), null /* TSA */); //$NON-NLS-1$
+        	}
+        	else {
+        		xmlSignature.sign(Arrays.asList((X509Certificate[]) keyEntry.getCertificateChain()),
+        				keyEntry.getPrivateKey(), algoUri, referenceList,
+        				"Signature-" + UUID.randomUUID().toString(), null/*TSA*/); //$NON-NLS-1$
+        	}
         }
         catch (final NoSuchAlgorithmException e) {
             throw new UnsupportedOperationException("No se soporta el algoritmo de firma '" + algorithm + "': " + e, e); //$NON-NLS-1$ //$NON-NLS-2$
