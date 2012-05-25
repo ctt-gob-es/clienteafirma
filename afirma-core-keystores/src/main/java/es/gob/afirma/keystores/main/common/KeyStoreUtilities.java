@@ -18,7 +18,6 @@ import java.security.KeyStoreException;
 import java.security.KeyStoreSpi;
 import java.security.PrivateKey;
 import java.security.PrivilegedAction;
-import java.security.ProviderException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
@@ -178,8 +177,15 @@ public final class KeyStoreUtilities {
                     try {
                         tmpCert = (X509Certificate) tmpKs.getCertificate(al);
                     }
-                    catch (final ProviderException e) {
-                        throw e;
+                    catch (final RuntimeException e) {
+
+                    	// Comprobaciones especifica para la compatibilidad con el proveedor de DNIe
+                    	if ("es.gob.jmulticard.ui.passwordcallback.CancelledOperationException".equals(e.getClass().getName()) || //$NON-NLS-1$
+                    		"es.gob.jmulticard.card.AuthenticationModeLockedException".equals(e.getClass().getName())) { //$NON-NLS-1$
+                    			throw e;
+                    	}
+                        LOGGER.warning("No se ha inicializado el KeyStore indicado: " + e); //$NON-NLS-1$
+                        continue;
                     }
                     catch (final Exception e) {
                         LOGGER.warning("No se ha inicializado el KeyStore indicado: " + e); //$NON-NLS-1$
