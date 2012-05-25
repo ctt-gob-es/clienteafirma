@@ -137,7 +137,7 @@ public final class AOODFSigner implements AOSigner {
         final boolean useOpenOffice31Mode = "true".equalsIgnoreCase(extraParams.getProperty("useOpenOffice31Mode")); //$NON-NLS-1$ //$NON-NLS-2$
 
         if (!isValidDataFile(data)) {
-            throw new AOFormatFileException("El fichero introducido no es un documento ODF"); //$NON-NLS-1$
+            throw new AOFormatFileException("Los datos introducidos no se corresponden con un documento ODF"); //$NON-NLS-1$
         }
 
         String fullPath = MANIFEST_PATH;

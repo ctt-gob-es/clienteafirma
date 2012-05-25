@@ -757,7 +757,7 @@ public final class AOPDFSigner implements AOSigner {
             }
         }
         catch (final IOException e) {
-        	throw new AOFormatFileException("Error componiendo el PDF de entrada", e); //$NON-NLS-1$
+        	throw new AOFormatFileException("Los datos introducidos no se corresponden con un documento PDF", e); //$NON-NLS-1$
 		}
 
         if (pdfReader.getCertificationLevel() != PdfSignatureAppearance.NOT_CERTIFIED && !Boolean.TRUE.toString().equalsIgnoreCase(extraParams.getProperty("allowSigningCertifiedPdfs"))) { //$NON-NLS-1$

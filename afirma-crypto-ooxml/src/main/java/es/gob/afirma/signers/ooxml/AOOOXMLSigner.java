@@ -100,7 +100,7 @@ public final class AOOOXMLSigner implements AOSigner {
         }
 
         if (!isSign(sign)) {
-            throw new AOInvalidFormatException("Los datos introducidos no se corresponden con documento OOXML"); //$NON-NLS-1$
+            throw new AOFormatFileException("Los datos introducidos no se corresponden con documento OOXML"); //$NON-NLS-1$
         }
 
         // Aqui vendria el analisis de la firma buscando alguno de los otros
@@ -184,7 +184,7 @@ public final class AOOOXMLSigner implements AOSigner {
             LOGGER.warning("Se ha introducido una firma nula para su comprobacion"); //$NON-NLS-1$
             return false;
         }
-        return OOXMLUtil.countOOXMLSignatures(sign) > 0;
+        return isOOXMLFile(sign) && OOXMLUtil.countOOXMLSignatures(sign) > 0;
     }
 
     /** Indica si los datos son un documento OOXML susceptible de ser firmado.
@@ -216,6 +216,12 @@ public final class AOOOXMLSigner implements AOSigner {
                        final String algorithm,
                        final PrivateKeyEntry keyEntry,
                        final Properties extraParams) throws AOException {
+
+        // Comprobamos si es un documento OOXML valido.
+        if (!OfficeAnalizer.isOOXMLDocument(data)) {
+            throw new AOFormatFileException("Los datos introducidos no se corresponden con un documento OOXML"); //$NON-NLS-1$
+        }
+
         return signOOXML(data, OOXMLUtil.countOOXMLSignatures(data) + 1, algorithm, keyEntry);
     }
 
@@ -238,7 +244,7 @@ public final class AOOOXMLSigner implements AOSigner {
                          final String algorithm,
                          final PrivateKeyEntry keyEntry,
                          final Properties extraParams) throws AOException {
-        return signOOXML(sign, OOXMLUtil.countOOXMLSignatures(sign) + 1, algorithm, keyEntry);
+    	return sign(sign, algorithm, keyEntry, extraParams);
     }
 
     /** Agrega una firma electr&oacute;nica a un documento OOXML.
@@ -262,7 +268,7 @@ public final class AOOOXMLSigner implements AOSigner {
                          final String algorithm,
                          final PrivateKeyEntry
                          keyEntry, final Properties extraParams) throws AOException {
-        return signOOXML(sign, OOXMLUtil.countOOXMLSignatures(sign) + 1, algorithm, keyEntry);
+    	return cosign(sign, algorithm, keyEntry, extraParams);
     }
 
     /** M&eacute;todo no implementado. No es posible realizar contrafirmas de
@@ -294,11 +300,6 @@ public final class AOOOXMLSigner implements AOSigner {
                              final int signNum,
                              final String algorithm,
                              final PrivateKeyEntry keyEntry) throws AOException {
-
-        // Comprobamos si es un documento OOXML valido.
-        if (!OfficeAnalizer.isOOXMLDocument(ooxmlDocument)) {
-            throw new AOFormatFileException("El fichero introducido no es un documento OOXML"); //$NON-NLS-1$
-        }
 
         // Pasamos la cadena de certificacion a una lista
         if (keyEntry == null) {
