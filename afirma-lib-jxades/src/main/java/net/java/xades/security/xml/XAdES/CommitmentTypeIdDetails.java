@@ -25,7 +25,7 @@ public class CommitmentTypeIdDetails extends XAdESStructure
 
         final Element identifier = createElement("Identifier");
         identifier.setTextContent(commitmentTypeId.getIdentifier());
-        identifier.setAttributeNS(null, "Qualifier", commitmentTypeId.getQualifier());
+        identifier.setAttributeNS(xadesNamespace, "Qualifier", commitmentTypeId.getQualifier());
         getNode().appendChild(identifier);
 
         final Element description = createElement("Description");

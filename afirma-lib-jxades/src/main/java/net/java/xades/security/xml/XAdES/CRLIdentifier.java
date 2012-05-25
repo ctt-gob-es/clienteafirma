@@ -31,45 +31,6 @@ public class CRLIdentifier extends XAdESStructure
     private Date issueTime;
     private BigInteger crlNumber;
 
-    // public CRLIdentifier(XAdESStructure parent,
-    // XAdESRevocationStatus revocationStatus)
-    // throws GeneralSecurityException
-    // {
-    // super(parent, "CRLIdentifier");
-    //
-    // Element thisElement = getElement();
-    //
-    // URI crlURI = revocationStatus.getCrlURI();
-    // if(crlURI != null)
-    // setAttributeNS(null, "URI", crlURI.toString());
-    //
-    // X509CRL crl = revocationStatus.getCheckedCRL();
-    //
-    // Element element = createElement("Issuer");
-    // thisElement.appendChild(element);
-    // element.setTextContent(crl.getIssuerX500Principal().getName());
-    //
-    // element = createElement("IssueTime");
-    // thisElement.appendChild(element);
-    // element.setTextContent(SystemUtils.formatDate(crl.getThisUpdate()));
-    //
-    // X509CRLImpl crlImpl = X509CRLImpl.toImpl(crl);
-    // try
-    // {
-    // BigInteger crlNumber = crlImpl.getCRLNumber();
-    // if(crlNumber != null)
-    // {
-    // element = createElement("Number");
-    // thisElement.appendChild(element);
-    // element.setTextContent(crlNumber.toString());
-    // }
-    // }
-    // catch(IOException ex)
-    // {
-    // ex.printStackTrace();
-    // }
-    // }
-
     public CRLIdentifier(final Node node, final String xadesPrefix, final String xadesNamespace,
             final String xmlSignaturePrefix)
     {

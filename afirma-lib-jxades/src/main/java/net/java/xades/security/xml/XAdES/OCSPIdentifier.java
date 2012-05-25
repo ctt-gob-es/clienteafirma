@@ -34,42 +34,6 @@ public class OCSPIdentifier extends XAdESStructure
     private byte[] responderKey;
     private Date producedAt;
 
-    // public OCSPIdentifier(XAdESStructure parent,
-    // OCSPResponse ocspResponse,
-    // URI ocspResponderURI)
-    // throws GeneralSecurityException
-    // {
-    // super(parent, "OCSPIdentifier");
-    //
-    // Element thisElement = getElement();
-    // if(ocspResponderURI != null)
-    // setAttributeNS(null, "URI", ocspResponderURI.toString());
-    //
-    // Element responderElement = createElement("ResponderID");
-    // thisElement.appendChild(responderElement);
-    //
-    // BasicOCSPResponse basicOCSPResponse = ocspResponse.getBasicOCSPResponse();
-    // byte[] key = basicOCSPResponse.getResponderKey();
-    // if(key != null && key.length > 0)
-    // {
-    // Element element = createElement("ByKey");
-    //
-    // String keyValue = Base64.encode(key);
-    // element.setTextContent(keyValue);
-    // responderElement.appendChild(element);
-    // }
-    // else
-    // {
-    // Element element = createElement("ByName");
-    // element.setTextContent(basicOCSPResponse.getResponderName());
-    // responderElement.appendChild(element);
-    // }
-    //
-    // Element element = createElement("ProducedAt");
-    // thisElement.appendChild(element);
-    // element.setTextContent(SystemUtils.formatDate(basicOCSPResponse.getProducedAt()));
-    // }
-
     public OCSPIdentifier(final Node node, final String xadesPrefix, final String xadesNamespace,
             final String xmlSignaturePrefix)
     {
