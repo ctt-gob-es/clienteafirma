@@ -1242,10 +1242,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                 }
                 catch (final UnsupportedOperationException e) {
                 	getLogger().severe(e.getMessage());
-                    SignApplet.this.setError(AppletMessages.getString("SignApplet.2")); //$NON-NLS-1$
-                    JOptionPane.showMessageDialog(SignApplet.this, AppletMessages.getString(AppletMessages.getString("SignApplet.682")), //$NON-NLS-1$
-                                                  AppletMessages.getString("SignApplet.156"), //$NON-NLS-1$
-                                                  JOptionPane.ERROR_MESSAGE);
+                    SignApplet.this.setError(AppletMessages.getString("SignApplet.682"), true); //$NON-NLS-1$
                     return Boolean.FALSE;
                 }
                 catch (final Exception e) {
@@ -1657,7 +1654,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                     }
                     catch (final UnsupportedOperationException e) {
                     	getLogger().severe(e.getMessage());
-                        SignApplet.this.setError(AppletMessages.getString(AppletMessages.getString("SignApplet.682"))); //$NON-NLS-1$
+                        SignApplet.this.setError(AppletMessages.getString("SignApplet.682")); //$NON-NLS-1$
                         return Boolean.FALSE;
                     }
                     catch (final AOFormatFileException e) {
@@ -2672,6 +2669,21 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
      * @param errorMsg
      *        Mensaje de error. */
     void setError(final String errorMsg) {
+    	this.setError(errorMsg, false);
+    }
+
+    /** Establece un mensaje de error y almacena que este se ha producido o, en
+     * caso de introducirse <code>null</code> o cadena vac&iacute;a, se indica
+     * que no hay error. Tambi&eacute;n muestra este error por consola siempre y
+     * cuando no sea nulo. En caso de estar configurado el cliente para mostrar
+     * los errores, se mostrar&aacute; una ventana modal al usuario con el error
+     * establecido.
+     * @param errorMsg
+     *        Mensaje de error.
+     * @param forceToShow
+     * 		  Obliga a que se muestre el error mediante un di&aacute;logo modal.
+     *             */
+    void setError(final String errorMsg, final boolean forceToShow) {
         if (errorMsg == null || errorMsg.length() < 1) {
             this.error = false;
             this.errorMsg = ""; //$NON-NLS-1$
@@ -2682,7 +2694,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         }
 
         // Mostramos, si procede, el mensaje de error que corresponda
-        if (this.showErrors && this.error) {
+        if (this.error && (forceToShow || this.showErrors)) {
             JOptionPane.showMessageDialog(this, this.errorMsg, AppletMessages.getString("SignApplet.156"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
         }
     }
