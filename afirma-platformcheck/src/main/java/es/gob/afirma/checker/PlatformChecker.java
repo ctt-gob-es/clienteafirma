@@ -24,31 +24,31 @@ import javax.swing.table.DefaultTableModel;
 /**
  * Comprueba el entorno de ejecuci&oacute;n para determinar si es adecuado para
  * la ejecuci&oacute;n del Cliente Afirma.
- * 
+ *
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
  */
 public final class PlatformChecker extends JApplet {
-	
+
 	private static class Check {
 		private final int		code;
-		
+
 		private final String	description;
-		
+
 		Check(final int cod, final String desc) {
 			this.code = cod;
 			this.description = desc;
 		}
-		
+
 		int getCode() {
 			return this.code;
 		}
-		
+
 		@Override
 		public String toString() {
 			return this.description;
 		}
 	}
-	
+
 	/**
 	 * TableModel personalizado que bloquea la edicion de las celdas de la
 	 * tabla.
@@ -56,27 +56,27 @@ public final class PlatformChecker extends JApplet {
 	private class CheckTableModel extends DefaultTableModel {
 		/** Default Serial UID */
 		private static final long	serialVersionUID	= -4843738929661752061L;
-		
+
 		public CheckTableModel(final Object[][] rowData,
 				final Object[] columnNames) {
 			super(rowData, columnNames);
 		}
-		
+
 		@Override
 		public boolean isCellEditable(final int row, final int column) {
 			return false;
 		}
 	}
-	
-	private static final String	ITEXT_VERSION					= "2.1.7";							//$NON-NLS-1$																									
-	private static final String	MINIMUM_BOUNCYCASTLE_VERSION	= "1.46";							//$NON-NLS-1$																									
-	private static final String	MINIMUM_JAVA					= "1.6.0_18";						//$NON-NLS-1$																									
-	private static final String	MINIMUM_MACOSX_VERSION			= "10.6";							//$NON-NLS-1$																									
-	private static final String	MINIMUM_WINDOWS_VERSION			= "5.1";							//$NON-NLS-1$																									
-	private static final String	OS_NAME							= System.getProperty("os.name");	//$NON-NLS-1$																									
-	private static final String	RECOMMENDED_JAVA				= "1.6.0_30";						//$NON-NLS-1$																									
+
+	private static final String	ITEXT_VERSION					= "2.1.7";							//$NON-NLS-1$
+	private static final String	MINIMUM_BOUNCYCASTLE_VERSION	= "1.46";							//$NON-NLS-1$
+	private static final String	MINIMUM_JAVA					= "1.6.0_18";						//$NON-NLS-1$
+	private static final String	MINIMUM_MACOSX_VERSION			= "10.6";							//$NON-NLS-1$
+	private static final String	MINIMUM_WINDOWS_VERSION			= "5.1";							//$NON-NLS-1$
+	private static final String	OS_NAME							= System.getProperty("os.name");	//$NON-NLS-1$
+	private static final String	RECOMMENDED_JAVA				= "1.6.0_30";						//$NON-NLS-1$
 	private static final long	serialVersionUID				= -7446595885819219127L;
-	
+
 	private static Check checkBC() {
 		final String bcVersion;
 		try {
@@ -102,7 +102,7 @@ public final class PlatformChecker extends JApplet {
 		}
 		return new Check(901, CheckerMessages.getString("PlatformChecker.11")); //$NON-NLS-1$
 	}
-	
+
 	private static Check checkIText() {
 		final String itextVersion;
 		try {
@@ -124,7 +124,7 @@ public final class PlatformChecker extends JApplet {
 						.getString(
 								"PlatformChecker.13", new String[] { itextVersion, PlatformChecker.ITEXT_VERSION })); //$NON-NLS-1$
 	}
-	
+
 	private static Check checkJavaVersion() {
 		final String currentJava = System.getProperty("java.version"); //$NON-NLS-1$
 		if (PlatformChecker.MINIMUM_JAVA.compareTo(currentJava) > 0) {
@@ -143,7 +143,7 @@ public final class PlatformChecker extends JApplet {
 		}
 		return new Check(0, null);
 	}
-	
+
 	private static Check checkOS() {
 		final String osVersion = System.getProperty("os.version"); //$NON-NLS-1$
 		if (PlatformChecker.OS_NAME.contains("indows")) { //$NON-NLS-1$
@@ -162,13 +162,13 @@ public final class PlatformChecker extends JApplet {
 								.getString(
 										"PlatformChecker.8", new String[] { osVersion, PlatformChecker.MINIMUM_MACOSX_VERSION })); //$NON-NLS-1$
 			}
-		} else if (!PlatformChecker.OS_NAME.contains("inux") || !PlatformChecker.OS_NAME.contains("SunOS") || !PlatformChecker.OS_NAME.contains("olaris")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		} else if (!PlatformChecker.OS_NAME.contains("inux") && !PlatformChecker.OS_NAME.contains("SunOS") && !PlatformChecker.OS_NAME.contains("olaris")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			return new Check(103,
 					CheckerMessages.getString("PlatformChecker.9")); //$NON-NLS-1$
 		}
 		return new Check(0, null);
 	}
-	
+
 	private static Check checkSunMSCAPI() {
 		if (!PlatformChecker.OS_NAME.contains("indows")) { //$NON-NLS-1$
 			return new Check(0, null);
@@ -182,7 +182,7 @@ public final class PlatformChecker extends JApplet {
 		}
 		return new Check(0, null);
 	}
-	
+
 	private static Check checkSunPKCS11() {
 		try {
 			PlatformChecker.class.getClassLoader().loadClass(
@@ -193,10 +193,10 @@ public final class PlatformChecker extends JApplet {
 		}
 		return new Check(0, null);
 	}
-	
+
 	private static Object[][] getChecks() {
 		final List<Check> checks = new ArrayList<Check>();
-		
+
 		Check check = PlatformChecker.checkJavaVersion();
 		if (check.getCode() != 0) {
 			checks.add(check);
@@ -221,24 +221,24 @@ public final class PlatformChecker extends JApplet {
 		if (check.getCode() != 0) {
 			checks.add(check);
 		}
-		
+
 		if (checks.isEmpty()) {
 			return new String[0][2];
 		}
-		
+
 		final Object[][] ret = new Object[checks.size()][2];
 		for (int i = 0; i < checks.size(); i++) {
 			ret[i][0] = Integer.toString(checks.get(i).getCode());
 			ret[i][1] = checks.get(i).toString();
 		}
-		
+
 		return ret;
 	}
-	
+
 	@Override
 	public void init() {
 		this.setBackground(Color.WHITE);
-		
+
 		final Object[][] checkItems = PlatformChecker.getChecks();
 		if (checkItems.length == 0) {
 			this.setLayout(new BorderLayout());
@@ -248,7 +248,7 @@ public final class PlatformChecker extends JApplet {
 			this.add(okLabel, BorderLayout.PAGE_START);
 			return;
 		}
-		
+
 		final JTable table = new JTable(
 				new CheckTableModel(
 						checkItems,
