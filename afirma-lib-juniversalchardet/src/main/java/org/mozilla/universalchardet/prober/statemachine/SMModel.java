@@ -37,7 +37,6 @@
 
 package org.mozilla.universalchardet.prober.statemachine;
 
-@SuppressWarnings("javadoc")
 public abstract class SMModel
 {
     ////////////////////////////////////////////////////////////////

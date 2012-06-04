@@ -38,7 +38,6 @@
 
 package org.mozilla.universalchardet.prober.sequence;
 
-@SuppressWarnings("javadoc")
 public abstract class SequenceModel
 {
     ////////////////////////////////////////////////////////////////

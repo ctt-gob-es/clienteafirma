@@ -45,7 +45,6 @@ import static org.mozilla.universalchardet.prober.statemachine.PkgInt.UNIT_MASK_
 
 import org.mozilla.universalchardet.Constants;
 
-@SuppressWarnings("javadoc")
 public class ISO2022JPSMModel extends SMModel
 {
     ////////////////////////////////////////////////////////////////

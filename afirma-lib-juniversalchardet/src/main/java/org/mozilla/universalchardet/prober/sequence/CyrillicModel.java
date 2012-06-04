@@ -37,7 +37,6 @@
 
 package org.mozilla.universalchardet.prober.sequence;
 
-@SuppressWarnings("javadoc")
 public class CyrillicModel extends SequenceModel
 {
     ////////////////////////////////////////////////////////////////

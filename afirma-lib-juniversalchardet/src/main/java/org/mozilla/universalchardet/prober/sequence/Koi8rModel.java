@@ -39,7 +39,6 @@ package org.mozilla.universalchardet.prober.sequence;
 
 import org.mozilla.universalchardet.Constants;
 
-@SuppressWarnings("javadoc")
 public class Koi8rModel extends CyrillicModel
 {
     ////////////////////////////////////////////////////////////////

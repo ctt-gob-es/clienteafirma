@@ -38,7 +38,6 @@
 
 package org.mozilla.universalchardet.prober;
 
-@SuppressWarnings("javadoc")
 public class MBCSGroupProber extends CharsetProber
 {
     ////////////////////////////////////////////////////////////////

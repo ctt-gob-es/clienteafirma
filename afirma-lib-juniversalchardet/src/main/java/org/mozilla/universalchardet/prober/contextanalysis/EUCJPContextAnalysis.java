@@ -37,7 +37,6 @@
 
 package org.mozilla.universalchardet.prober.contextanalysis;
 
-@SuppressWarnings("javadoc")
 public class EUCJPContextAnalysis extends JapaneseContextAnalysis
 {
     ////////////////////////////////////////////////////////////////

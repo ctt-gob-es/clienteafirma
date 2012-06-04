@@ -41,7 +41,6 @@ package org.mozilla.universalchardet.prober.sequence;
 
 import org.mozilla.universalchardet.Constants;
 
-@SuppressWarnings("javadoc")
 public class HebrewModel extends SequenceModel
 {
     ////////////////////////////////////////////////////////////////

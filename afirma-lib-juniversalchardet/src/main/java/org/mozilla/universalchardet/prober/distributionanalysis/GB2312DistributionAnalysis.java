@@ -37,7 +37,6 @@
 
 package org.mozilla.universalchardet.prober.distributionanalysis;
 
-@SuppressWarnings("javadoc")
 public class GB2312DistributionAnalysis extends CharDistributionAnalysis
 {
     ////////////////////////////////////////////////////////////////

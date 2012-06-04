@@ -69,8 +69,6 @@ public abstract class CharsetProber
     ////////////////////////////////////////////////////////////////
     // methods
     ////////////////////////////////////////////////////////////////
-    public CharsetProber()
-    {}
 
     public abstract String getCharSetName();
     public abstract ProbingState handleData(final byte[] buf, int offset, int length);

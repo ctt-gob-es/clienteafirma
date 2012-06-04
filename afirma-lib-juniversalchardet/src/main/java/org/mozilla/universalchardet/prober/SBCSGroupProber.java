@@ -52,7 +52,6 @@ import org.mozilla.universalchardet.prober.sequence.Win1251BulgarianModel;
 import org.mozilla.universalchardet.prober.sequence.Win1251Model;
 import org.mozilla.universalchardet.prober.sequence.Win1253Model;
 
-@SuppressWarnings("javadoc")
 public class SBCSGroupProber extends CharsetProber
 {
     ////////////////////////////////////////////////////////////////

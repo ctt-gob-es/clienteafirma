@@ -37,7 +37,6 @@
 
 package org.mozilla.universalchardet.prober.statemachine;
 
-@SuppressWarnings("javadoc")
 public class CodingStateMachine
 {
     protected SMModel    model;
