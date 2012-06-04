@@ -44,8 +44,7 @@ import org.mozilla.universalchardet.prober.statemachine.CodingStateMachine;
 import org.mozilla.universalchardet.prober.statemachine.SJISSMModel;
 import org.mozilla.universalchardet.prober.statemachine.SMModel;
 
-@SuppressWarnings("javadoc")
-public class SJISProber extends CharsetProber
+class SJISProber extends CharsetProber
 {
     ////////////////////////////////////////////////////////////////
     // fields
@@ -64,7 +63,7 @@ public class SJISProber extends CharsetProber
     ////////////////////////////////////////////////////////////////
     // methods
     ////////////////////////////////////////////////////////////////
-    public SJISProber()
+    SJISProber()
     {
         super();
         this.codingSM = new CodingStateMachine(smModel);

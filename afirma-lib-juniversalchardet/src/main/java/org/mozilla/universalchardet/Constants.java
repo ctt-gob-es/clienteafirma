@@ -1,6 +1,5 @@
 package org.mozilla.universalchardet;
 
-@SuppressWarnings("javadoc")
 public final class Constants
 {
     public static final String CHARSET_ISO_2022_JP  = "ISO-2022-JP".intern(); //$NON-NLS-1$

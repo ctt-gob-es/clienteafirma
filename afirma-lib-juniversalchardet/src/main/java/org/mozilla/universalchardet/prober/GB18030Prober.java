@@ -44,8 +44,7 @@ import org.mozilla.universalchardet.prober.statemachine.CodingStateMachine;
 import org.mozilla.universalchardet.prober.statemachine.GB18030SMModel;
 import org.mozilla.universalchardet.prober.statemachine.SMModel;
 
-@SuppressWarnings("javadoc")
-public class GB18030Prober extends CharsetProber
+class GB18030Prober extends CharsetProber
 {
     ////////////////////////////////////////////////////////////////
     // fields
@@ -63,7 +62,7 @@ public class GB18030Prober extends CharsetProber
     ////////////////////////////////////////////////////////////////
     // methods
     ////////////////////////////////////////////////////////////////
-    public GB18030Prober()
+    GB18030Prober()
     {
         super();
         this.codingSM = new CodingStateMachine(smModel);

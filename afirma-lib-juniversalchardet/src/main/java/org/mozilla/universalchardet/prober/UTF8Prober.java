@@ -42,13 +42,12 @@ import org.mozilla.universalchardet.prober.statemachine.CodingStateMachine;
 import org.mozilla.universalchardet.prober.statemachine.SMModel;
 import org.mozilla.universalchardet.prober.statemachine.UTF8SMModel;
 
-@SuppressWarnings("javadoc")
-public class UTF8Prober extends CharsetProber
+class UTF8Prober extends CharsetProber
 {
     ////////////////////////////////////////////////////////////////
     // constants
     ////////////////////////////////////////////////////////////////
-    public static final float ONE_CHAR_PROB = 0.50f;
+    static final float ONE_CHAR_PROB = 0.50f;
 
 
     ////////////////////////////////////////////////////////////////
@@ -64,7 +63,7 @@ public class UTF8Prober extends CharsetProber
     ////////////////////////////////////////////////////////////////
     // methods
     ////////////////////////////////////////////////////////////////
-    public UTF8Prober()
+    UTF8Prober()
     {
         super();
         this.numOfMBChar = 0;

@@ -40,20 +40,19 @@ package org.mozilla.universalchardet.prober;
 
 import org.mozilla.universalchardet.prober.sequence.SequenceModel;
 
-@SuppressWarnings("javadoc")
-public class SingleByteCharsetProber extends CharsetProber
+class SingleByteCharsetProber extends CharsetProber
 {
     ////////////////////////////////////////////////////////////////
     // constants
     ////////////////////////////////////////////////////////////////
-    public static final int     SAMPLE_SIZE = 64;
-    public static final int     SB_ENOUGH_REL_THRESHOLD = 1024;
-    public static final float   POSITIVE_SHORTCUT_THRESHOLD = 0.95f;
-    public static final float   NEGATIVE_SHORTCUT_THRESHOLD = 0.05f;
-    public static final int     SYMBOL_CAT_ORDER = 250;
-    public static final int     NUMBER_OF_SEQ_CAT = 4;
-    public static final int     POSITIVE_CAT = NUMBER_OF_SEQ_CAT-1;
-    public static final int     NEGATIVE_CAT = 0;
+    static final int     SAMPLE_SIZE = 64;
+    static final int     SB_ENOUGH_REL_THRESHOLD = 1024;
+    static final float   POSITIVE_SHORTCUT_THRESHOLD = 0.95f;
+    static final float   NEGATIVE_SHORTCUT_THRESHOLD = 0.05f;
+    static final int     SYMBOL_CAT_ORDER = 250;
+    static final int     NUMBER_OF_SEQ_CAT = 4;
+    static final int     POSITIVE_CAT = NUMBER_OF_SEQ_CAT-1;
+    static final int     NEGATIVE_CAT = 0;
 
 
     ////////////////////////////////////////////////////////////////
@@ -77,7 +76,7 @@ public class SingleByteCharsetProber extends CharsetProber
     ////////////////////////////////////////////////////////////////
     // methods
     ////////////////////////////////////////////////////////////////
-    public SingleByteCharsetProber(final SequenceModel model)
+    SingleByteCharsetProber(final SequenceModel model)
     {
         super();
         this.model = model;

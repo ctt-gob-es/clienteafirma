@@ -44,21 +44,18 @@ import org.mozilla.universalchardet.prober.Latin1Prober;
 import org.mozilla.universalchardet.prober.MBCSGroupProber;
 import org.mozilla.universalchardet.prober.SBCSGroupProber;
 
-@SuppressWarnings("javadoc")
-public class UniversalDetector
-{
+
+public class UniversalDetector {
     ////////////////////////////////////////////////////////////////
     // constants
     ////////////////////////////////////////////////////////////////
-    public static final float SHORTCUT_THRESHOLD = 0.95f;
-    public static final float MINIMUM_THRESHOLD = 0.20f;
+    private static final float MINIMUM_THRESHOLD = 0.20f;
 
 
     ////////////////////////////////////////////////////////////////
     // inner types
     ////////////////////////////////////////////////////////////////
-    public enum InputState
-    {
+    private enum InputState {
         PURE_ASCII,
         ESC_ASCII,
         HIGHBYTE
@@ -78,8 +75,6 @@ public class UniversalDetector
     private final CharsetProber[]     probers;
     private CharsetProber       escCharsetProber;
 
-    private CharsetListener     listener;
-
 
     ////////////////////////////////////////////////////////////////
     // methods
@@ -88,9 +83,7 @@ public class UniversalDetector
      * @param listener a listener object that is notified of
      *         the detected encocoding. Can be null.
      */
-    public UniversalDetector(final CharsetListener listener)
-    {
-        this.listener = listener;
+    public UniversalDetector() {
         this.escCharsetProber = null;
         this.probers = new CharsetProber[3];
         for (int i=0; i<this.probers.length; ++i) {
@@ -112,16 +105,6 @@ public class UniversalDetector
     public String getDetectedCharset()
     {
         return this.detectedCharset;
-    }
-
-    public void setListener(final CharsetListener listener)
-    {
-        this.listener = listener;
-    }
-
-    public CharsetListener getListener()
-    {
-        return this.listener;
     }
 
     public void handleData(final byte[] buf, final int offset, final int length)
@@ -240,9 +223,6 @@ public class UniversalDetector
 
         if (this.detectedCharset != null) {
             this.done = true;
-            if (this.listener != null) {
-                this.listener.report(this.detectedCharset);
-            }
             return;
         }
 
@@ -261,9 +241,6 @@ public class UniversalDetector
 
             if (maxProberConfidence > MINIMUM_THRESHOLD) {
                 this.detectedCharset = this.probers[maxProber].getCharSetName();
-                if (this.listener != null) {
-                    this.listener.report(this.detectedCharset);
-                }
             }
         } else if (this.inputState == InputState.ESC_ASCII) {
             // do nothing
@@ -272,7 +249,7 @@ public class UniversalDetector
         }
     }
 
-    public void reset()
+    private void reset()
     {
         this.done = false;
         this.start = true;

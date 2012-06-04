@@ -42,22 +42,21 @@ import java.nio.ByteBuffer;
 
 import org.mozilla.universalchardet.Constants;
 
-@SuppressWarnings("javadoc")
 public class Latin1Prober extends CharsetProber
 {
     ////////////////////////////////////////////////////////////////
     // constants
     ////////////////////////////////////////////////////////////////
-    public static final byte UDF = 0;
-    public static final byte OTH = 1;
-    public static final byte ASC = 2;
-    public static final byte ASS = 3;
-    public static final byte ACV = 4;
-    public static final byte ACO = 5;
-    public static final byte ASV = 6;
-    public static final byte ASO = 7;
-    public static final int CLASS_NUM = 8;
-    public static final int FREQ_CAT_NUM = 4;
+    static final byte UDF = 0;
+    static final byte OTH = 1;
+    static final byte ASC = 2;
+    static final byte ASS = 3;
+    static final byte ACV = 4;
+    static final byte ACO = 5;
+    static final byte ASV = 6;
+    static final byte ASO = 7;
+    static final int CLASS_NUM = 8;
+    static final int FREQ_CAT_NUM = 4;
 
 
     ////////////////////////////////////////////////////////////////

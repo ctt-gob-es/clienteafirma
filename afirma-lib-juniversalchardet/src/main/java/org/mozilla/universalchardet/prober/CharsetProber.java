@@ -40,7 +40,6 @@ package org.mozilla.universalchardet.prober;
 
 import java.nio.ByteBuffer;
 
-@SuppressWarnings("javadoc")
 public abstract class CharsetProber
 {
     ////////////////////////////////////////////////////////////////

@@ -44,8 +44,7 @@ import org.mozilla.universalchardet.prober.statemachine.Big5SMModel;
 import org.mozilla.universalchardet.prober.statemachine.CodingStateMachine;
 import org.mozilla.universalchardet.prober.statemachine.SMModel;
 
-@SuppressWarnings("javadoc")
-public class Big5Prober extends CharsetProber
+class Big5Prober extends CharsetProber
 {
     ////////////////////////////////////////////////////////////////
     // fields
@@ -63,7 +62,7 @@ public class Big5Prober extends CharsetProber
     ////////////////////////////////////////////////////////////////
     // methods
     ////////////////////////////////////////////////////////////////
-    public Big5Prober()
+    Big5Prober()
     {
         super();
         this.codingSM = new CodingStateMachine(smModel);

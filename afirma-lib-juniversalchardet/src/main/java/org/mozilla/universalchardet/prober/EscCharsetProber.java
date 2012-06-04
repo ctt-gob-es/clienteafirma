@@ -44,7 +44,6 @@ import org.mozilla.universalchardet.prober.statemachine.ISO2022JPSMModel;
 import org.mozilla.universalchardet.prober.statemachine.ISO2022KRSMModel;
 import org.mozilla.universalchardet.prober.statemachine.SMModel;
 
-@SuppressWarnings("javadoc")
 public class EscCharsetProber extends CharsetProber
 {
     ////////////////////////////////////////////////////////////////

@@ -44,8 +44,7 @@ import org.mozilla.universalchardet.prober.statemachine.CodingStateMachine;
 import org.mozilla.universalchardet.prober.statemachine.EUCJPSMModel;
 import org.mozilla.universalchardet.prober.statemachine.SMModel;
 
-@SuppressWarnings("javadoc")
-public class EUCJPProber extends CharsetProber
+class EUCJPProber extends CharsetProber
 {
     ////////////////////////////////////////////////////////////////
     // fields
@@ -64,7 +63,7 @@ public class EUCJPProber extends CharsetProber
     ////////////////////////////////////////////////////////////////
     // methods
     ////////////////////////////////////////////////////////////////
-    public EUCJPProber()
+    EUCJPProber()
     {
         super();
         this.codingSM = new CodingStateMachine(smModel);

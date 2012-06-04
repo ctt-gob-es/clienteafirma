@@ -1,7 +1,7 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
- * The contents of this file are subject to the Mozilla Public License Version
+ * The contents of this file are subject to the Mozilla License Version
  * 1.1 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
  * http://www.mozilla.org/MPL/
@@ -22,8 +22,8 @@
  *   Kohei TAKETA <k-tak@void.in> (Java port)
  *
  * Alternatively, the contents of this file may be used under the terms of
- * either the GNU General Public License Version 2 or later (the "GPL"), or
- * the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
+ * either the GNU General License Version 2 or later (the "GPL"), or
+ * the GNU Lesser General License Version 2.1 or later (the "LGPL"),
  * in which case the provisions of the GPL or the LGPL are applicable instead
  * of those above. If you wish to allow use of your version of this file only
  * under the terms of either the GPL or the LGPL, and not to allow others to
@@ -39,27 +39,26 @@ package org.mozilla.universalchardet.prober;
 
 import org.mozilla.universalchardet.Constants;
 
-@SuppressWarnings("javadoc")
-public class HebrewProber extends CharsetProber
+class HebrewProber extends CharsetProber
 {
     ////////////////////////////////////////////////////////////////
     // fields
     ////////////////////////////////////////////////////////////////
-    public static final int FINAL_KAF   = 0xEA;
-    public static final int NORMAL_KAF  = 0xEB;
-    public static final int FINAL_MEM   = 0xED;
-    public static final int NORMAL_MEM  = 0xEE;
-    public static final int FINAL_NUN   = 0xEF;
-    public static final int NORMAL_NUN  = 0xF0;
-    public static final int FINAL_PE    = 0xF3;
-    public static final int NORMAL_PE   = 0xF4;
-    public static final int FINAL_TSADI = 0xF5;
-    public static final int NORMAL_TSADI= 0xF6;
+    static final int FINAL_KAF   = 0xEA;
+    static final int NORMAL_KAF  = 0xEB;
+    static final int FINAL_MEM   = 0xED;
+    static final int NORMAL_MEM  = 0xEE;
+    static final int FINAL_NUN   = 0xEF;
+    static final int NORMAL_NUN  = 0xF0;
+    static final int FINAL_PE    = 0xF3;
+    static final int NORMAL_PE   = 0xF4;
+    static final int FINAL_TSADI = 0xF5;
+    static final int NORMAL_TSADI= 0xF6;
 
-    public static final byte SPACE      = 0x20;
+    static final byte SPACE      = 0x20;
 
-    public static final int MIN_FINAL_CHAR_DISTANCE = 5;
-    public static final float MIN_MODEL_DISTANCE = 0.01f;
+    static final int MIN_FINAL_CHAR_DISTANCE = 5;
+    static final float MIN_MODEL_DISTANCE = 0.01f;
 
 
     ////////////////////////////////////////////////////////////////
@@ -77,7 +76,7 @@ public class HebrewProber extends CharsetProber
     ////////////////////////////////////////////////////////////////
     // methods
     ////////////////////////////////////////////////////////////////
-    public HebrewProber()
+    HebrewProber()
     {
         super();
         this.logicalProber = null;
@@ -85,7 +84,7 @@ public class HebrewProber extends CharsetProber
         reset();
     }
 
-    public void setModalProbers(final CharsetProber logicalProber, final CharsetProber visualProber)
+    void setModalProbers(final CharsetProber logicalProber, final CharsetProber visualProber)
     {
         this.logicalProber = logicalProber;
         this.visualProber = visualProber;
