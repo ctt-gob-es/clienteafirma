@@ -305,7 +305,7 @@ final class SignText {
             }
         });
 
-        final JComboBox<Object> comboBox = new JComboBox<Object>(finalOrderedAliases);
+        final JComboBox comboBox = new JComboBox(finalOrderedAliases);
         comboBox.setBounds(10, 370, 500, 20);
 
         final JLabel label2 = new JLabel(AppletMessages.getString("SignText.1")); //$NON-NLS-1$
