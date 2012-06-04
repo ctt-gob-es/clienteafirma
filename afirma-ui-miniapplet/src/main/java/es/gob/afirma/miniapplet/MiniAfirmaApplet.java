@@ -655,7 +655,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 				);
 				return getCharset("default", null); //$NON-NLS-1$
 			}
-			final UniversalDetector detector = new UniversalDetector(null);
+			final UniversalDetector detector = new UniversalDetector();
 			detector.handleData(text, 0, text.length);
 			detector.dataEnd();
 			if (detector.isDone()) {
