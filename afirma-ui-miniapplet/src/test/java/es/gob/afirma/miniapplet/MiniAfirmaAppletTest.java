@@ -10,16 +10,11 @@
 
 package es.gob.afirma.miniapplet;
 
-import java.io.IOException;
-import java.security.PrivilegedActionException;
-
 import junit.framework.Assert;
 
 import org.junit.Ignore;
 import org.junit.Test;
 
-import es.gob.afirma.core.AOFormatFileException;
-import es.gob.afirma.core.InvalidLibraryException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 
@@ -50,6 +45,7 @@ public final class MiniAfirmaAppletTest {
 	/** Prueba de obtenci&oacute;n de la estructura de firmantes.
 	 * @throws Exception */
 	@Test
+	@SuppressWarnings("static-method")
 	public void testGetSignersStructure() throws Exception {
 	    final MiniAfirmaApplet applet = new MiniAfirmaApplet();
 	    String ss = applet.getSignersStructure(Base64.encode(AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream("SHA512withRSA.pdf")))); //$NON-NLS-1$
