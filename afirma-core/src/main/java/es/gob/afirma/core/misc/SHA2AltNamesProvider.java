@@ -18,9 +18,14 @@ import java.security.Security;
  * en el proveedor Sun. */
 public final class SHA2AltNamesProvider extends Provider {
 
+    private static final String PROVIDER_NAME = "AOSHA2AltNamesProvider"; //$NON-NLS-1$
+    
     /** Comprueba si es necesario un proveedor para nombre de huella digital SHA2 sin gui&oacute;n
      *  y lo instala en ese caso. */
     public static void install() {
+        if (Security.getProvider(PROVIDER_NAME) != null) {
+            return;
+        }
         try {
             MessageDigest.getInstance("SHA256"); //$NON-NLS-1$
             sha256Class = null;
@@ -76,7 +81,7 @@ public final class SHA2AltNamesProvider extends Provider {
     /** Construye un nuevo proveedor de huellas digitales SHA-2 con nombres
      * alternativos. */
     public SHA2AltNamesProvider() {
-        super("AOSHA2AltNamesProvider", 1.0, "Proveedor para huellas digitales SHA-2 con nombres alternativos");  //$NON-NLS-1$//$NON-NLS-2$
+        super(PROVIDER_NAME, 1.0, "Proveedor para huellas digitales SHA-2 con nombres alternativos");  //$NON-NLS-1$
         if (sha256Class != null) {
             put("MessageDigest.SHA256", sha256Class); //$NON-NLS-1$
         }
