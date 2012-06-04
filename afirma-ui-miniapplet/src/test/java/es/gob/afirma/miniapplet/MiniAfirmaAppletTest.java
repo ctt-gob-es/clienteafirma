@@ -10,9 +10,17 @@
 
 package es.gob.afirma.miniapplet;
 
+import java.io.IOException;
+import java.security.PrivilegedActionException;
+
+import junit.framework.Assert;
+
 import org.junit.Ignore;
 import org.junit.Test;
 
+import es.gob.afirma.core.AOFormatFileException;
+import es.gob.afirma.core.InvalidLibraryException;
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 
 /** Pruebas del MiniApplet.  */
@@ -23,9 +31,7 @@ public final class MiniAfirmaAppletTest {
 	@Test
 	@Ignore
 	public void signWithDNIe() {
-
 		final MiniAfirmaApplet applet = new MiniAfirmaApplet();
-
 		try {
 			applet.sign(
 					Base64.encode("Hola Mundo!!".getBytes()), //$NON-NLS-1$
@@ -39,5 +45,15 @@ public final class MiniAfirmaAppletTest {
 			System.out.println("Error: " + e); //$NON-NLS-1$
 			return;
 		}
+	}
+	
+	/** Prueba de obtenci&oacute;n de la estructura de firmantes.
+	 * @throws Exception */
+	@Test
+	public void testGetSignersStructure() throws Exception {
+	    final MiniAfirmaApplet applet = new MiniAfirmaApplet();
+	    String ss = applet.getSignersStructure(Base64.encode(AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream("SHA512withRSA.pdf")))); //$NON-NLS-1$
+	    Assert.assertNotNull(ss);
+	    System.out.println(ss);
 	}
 }
