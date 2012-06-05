@@ -22,7 +22,6 @@ import es.gob.afirma.keystores.main.common.AOKeyStore;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManagerException;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManagerFactory;
-import es.gob.afirma.keystores.main.common.AOKeystoreAlternativeException;
 import es.gob.afirma.standalone.ui.DNIePasswordCallback;
 
 /** Gestor simple de <code>KeyStores</code>. Obtiene o un <code>KeyStore</code> de DNIe
@@ -99,7 +98,6 @@ final class SimpleKeyStoreManager {
                  );
             }
             catch(final AOCancelledOperationException e) { /* Operacion cancelada por el usuario */ }
-            catch(final AOKeystoreAlternativeException e) { /* No tratamos un almacen alternativo */ }
             catch(final Exception e) {
                 Logger.getLogger("es.gob.afirma").warning("No se ha podido inicializar el controlador PKCS#11 del DNIe (" + lib + "): " + e);  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
             }

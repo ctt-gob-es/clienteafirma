@@ -61,9 +61,6 @@ public final class DNIeManager {
         if (this.terminals.isEmpty()) {
         	throw new DNIeManagerException("No se ha detectado ningun lector de tarjetas"); //$NON-NLS-1$
         }
-        if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-        	throw new DNIeManagerException("No se gestiona directamente DNIe en Mac OS X"); //$NON-NLS-1$
-        }
         for (final CardTerminal terminal : this.terminals) {
             Logger.getLogger("es.gob.afirma").info("Detectado lector de tarjetas: " + terminal.getName());  //$NON-NLS-1$//$NON-NLS-2$
         }

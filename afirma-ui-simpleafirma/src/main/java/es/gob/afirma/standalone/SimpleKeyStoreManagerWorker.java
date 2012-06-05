@@ -11,6 +11,7 @@
 package es.gob.afirma.standalone;
 
 import java.awt.Component;
+import java.util.logging.Logger;
 
 import javax.swing.SwingWorker;
 
@@ -33,6 +34,9 @@ final class SimpleKeyStoreManagerWorker extends SwingWorker<Void, String> {
 
     @Override
     protected Void doInBackground() throws AOKeyStoreManagerException {
+        if (SimpleAfirma.DEBUG) {
+            Logger.getLogger("es.gob.afirma").info("Solicitado establecimiento de KeyStore (DNIe=" + this.dnie + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        }
         this.ksm = SimpleKeyStoreManager.getKeyStore(this.dnie, this.parent);
         return null;
     }
