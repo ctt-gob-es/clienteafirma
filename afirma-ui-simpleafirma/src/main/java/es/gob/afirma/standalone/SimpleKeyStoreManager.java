@@ -88,18 +88,12 @@ final class SimpleKeyStoreManager {
     static AOKeyStoreManager getKeyStore(final boolean dnie, final Component parent) throws AOKeyStoreManagerException {
 
         if (dnie) {
-            final String lib = getPKCS11DNIeLib();
+            System.setProperty("es.gob.jmulticard.fastmode", "true"); //$NON-NLS-1$ //$NON-NLS-2$
             try {
-                return AOKeyStoreManagerFactory.getAOKeyStoreManager(AOKeyStore.PKCS11,
-                     lib,
-                     "DNIe", //$NON-NLS-1$
-                     new DNIePasswordCallback(parent),
-                     parent
-                 );
+                return AOKeyStoreManagerFactory.getAOKeyStoreManager(AOKeyStore.DNIEJAVA, null, null, null, parent);
             }
-            catch(final AOCancelledOperationException e) { /* Operacion cancelada por el usuario */ }
-            catch(final Exception e) {
-                Logger.getLogger("es.gob.afirma").warning("No se ha podido inicializar el controlador PKCS#11 del DNIe (" + lib + "): " + e);  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+            catch (final Exception e) {
+                Logger.getLogger("es.gob.afirma").warning("No se ha podido inicializar el controlador 100% Java del DNIe: " + e); //$NON-NLS-1$ //$NON-NLS-2$
             }
         }
 
