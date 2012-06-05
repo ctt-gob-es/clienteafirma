@@ -237,8 +237,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
             return;
         }
         else if (DNIeManager.DNI_INSERTED.equals(evt.getPropertyName())) {
-            if (DEBUG)
-             {
+            if (DEBUG) {
                 LOGGER.info("Recibido evento de DNI INSERTED"); //$NON-NLS-1$
             }
             this.container.setCursor(new Cursor(Cursor.WAIT_CURSOR));
@@ -247,7 +246,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
             }
             catch (final Exception e) {
                 LOGGER.severe(
-                "Fallo la inicializacion del DNIe, se intentara el almacen por defecto del sistema: " + e //$NON-NLS-1$
+                      "Fallo la inicializacion del DNIe, se intentara el almacen por defecto del sistema: " + e //$NON-NLS-1$
                 );
                 loadDefaultKeyStore();
             }

@@ -11,10 +11,8 @@
 package es.gob.afirma.standalone;
 
 import java.awt.Component;
-import java.io.File;
 import java.util.logging.Logger;
 
-import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.main.callbacks.NullPasswordCallback;
 import es.gob.afirma.keystores.main.callbacks.UIPasswordCallback;
@@ -22,7 +20,6 @@ import es.gob.afirma.keystores.main.common.AOKeyStore;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManagerException;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManagerFactory;
-import es.gob.afirma.standalone.ui.DNIePasswordCallback;
 
 /** Gestor simple de <code>KeyStores</code>. Obtiene o un <code>KeyStore</code> de DNIe
  * v&iacute;a PKCS#11 o el <code>KeyStore</code> por defecto del sistema operativo
@@ -30,54 +27,6 @@ import es.gob.afirma.standalone.ui.DNIePasswordCallback;
 final class SimpleKeyStoreManager {
 
     private SimpleKeyStoreManager() { /* No permitimos la instanciacion */ }
-
-    private static String getPKCS11DNIeLib() throws AOKeyStoreManagerException {
-        if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-            final String lib = Platform.getSystemLibDir();
-            if (new File(lib + "\\UsrPkcs11.dll").exists()) { //$NON-NLS-1$
-                return lib + "\\UsrPkcs11.dll";  //$NON-NLS-1$
-            }
-            // if (new File(lib + "\\AutBioPkcs11.dll").exists()) lib = lib + "\\AutBioPkcs11.dll";
-            if (new File(lib + "\\opensc-pkcs11.dll").exists()) { //$NON-NLS-1$
-                return lib + "\\opensc-pkcs11.dll";  //$NON-NLS-1$
-            }
-            throw new AOKeyStoreManagerException("No hay controlador PKCS#11 de DNIe instalado en este sistema Windows"); //$NON-NLS-1$
-        }
-        if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-            if (new File("/Library/OpenSC/lib/libopensc-dnie.dylib").exists()) { //$NON-NLS-1$
-                return "/Library/OpenSC/lib/libopensc-dnie.dylib";  //$NON-NLS-1$
-            }
-            if (new File("/Library/OpenSC/lib/opensc-pkcs11.so").exists()) { //$NON-NLS-1$
-                return "/Library/OpenSC/lib/opensc-pkcs11.so"; //$NON-NLS-1$
-            }
-            if (new File("/Library/OpenSC/lib/libopensc-dnie.1.0.3.dylib").exists()) { //$NON-NLS-1$
-                return "/Library/OpenSC/lib/libopensc-dnie.1.0.3.dylib";  //$NON-NLS-1$
-            }
-            if (new File("/usr/lib/opensc-pkcs11.so").exists()) { //$NON-NLS-1$
-                return "/usr/lib/opensc-pkcs11.so";  //$NON-NLS-1$
-            }
-            throw new AOKeyStoreManagerException("No hay controlador PKCS#11 de DNIe instalado en este sistema Mac OS X"); //$NON-NLS-1$
-        }
-        if (new File("/usr/local/lib/libopensc-dnie.so").exists()) { //$NON-NLS-1$
-            return "/usr/local/lib/libopensc-dnie.so"; //$NON-NLS-1$
-        }
-        if (new File("/usr/lib/libopensc-dnie.so").exists()) { //$NON-NLS-1$
-            return "/usr/lib/libopensc-dnie.so"; //$NON-NLS-1$
-        }
-        if (new File("/lib/libopensc-dnie.so").exists()) { //$NON-NLS-1$
-            return "/lib/libopensc-dnie.so"; //$NON-NLS-1$
-        }
-        if (new File("/usr/lib/opensc-pkcs11.so").exists()) { //$NON-NLS-1$
-            return "/usr/lib/opensc-pkcs11.so";  //$NON-NLS-1$
-        }
-        if (new File("/lib/opensc-pkcs11.so").exists()) { //$NON-NLS-1$
-            return "/lib/opensc-pkcs11.so";  //$NON-NLS-1$
-        }
-        if (new File("/usr/local/lib/opensc-pkcs11.so").exists()) { //$NON-NLS-1$
-            return "/usr/local/lib/opensc-pkcs11.so"; //$NON-NLS-1$
-        }
-        throw new AOKeyStoreManagerException("No hay controlador PKCS#11 de DNIe instalado en este sistema"); //$NON-NLS-1$
-    }
 
     /** Obtiene un <code>KeyStore</code>.
      * @param dnie <code>true</code> si desea obtenerse un <code>KeyStore</code> para DNIe v&iacute;a PKCS#11, <code>false</code> si desea obtenerse

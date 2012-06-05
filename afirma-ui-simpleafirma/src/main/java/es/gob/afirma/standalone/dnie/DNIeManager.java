@@ -19,6 +19,7 @@ import javax.smartcardio.Card;
 import javax.smartcardio.CardException;
 import javax.smartcardio.CardTerminal;
 import javax.smartcardio.TerminalFactory;
+import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
@@ -61,10 +62,10 @@ public final class DNIeManager {
         if (this.terminals.isEmpty()) {
         	throw new DNIeManagerException("No se ha detectado ningun lector de tarjetas"); //$NON-NLS-1$
         }
-//        // Mac OS X no puede recuperar el canal en caso de perdida por javax.smartcardio.CardException: sun.security.smartcardio.PCSCException: SCARD_E_NOT_TRANSACTED
-//        if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-//            throw new DNIeManagerException("No se gestiona directamente DNIe en Mac OS X"); //$NON-NLS-1$
-//        }
+        // Mac OS X no puede recuperar el canal en caso de perdida por javax.smartcardio.CardException: sun.security.smartcardio.PCSCException: SCARD_E_NOT_TRANSACTED
+        if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+            throw new DNIeManagerException("No se gestiona directamente DNIe en Mac OS X"); //$NON-NLS-1$
+        }
         for (final CardTerminal terminal : this.terminals) {
             Logger.getLogger("es.gob.afirma").info("Detectado lector de tarjetas: " + terminal.getName());  //$NON-NLS-1$//$NON-NLS-2$
         }
@@ -185,7 +186,7 @@ public final class DNIeManager {
                             LOGGER.info("Detectado DNIe"); //$NON-NLS-1$
                         }
                         try {
-                            card.disconnect(false);
+                            card.disconnect(true);
                         }
                         catch(final Exception e) {
                             LOGGER.warning("No se ha podido reiniciar el DNIe, es posible que se necesite una reinsercion"); //$NON-NLS-1$
