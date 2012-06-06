@@ -25,9 +25,7 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 import java.util.logging.Logger;
-import java.util.zip.ZipFile;
 
 /** M&eacute;todos generales de utilidad para toda la aplicaci&oacute;n.
  * @version 0.3.1 */
@@ -202,75 +200,6 @@ final class AOBootUtil {
             return false;
         }
         return true;
-    }
-
-    /** Recupera el texto con un identificador de versi&oacute;n a partir de un properties indicado
-     * a trav&eacute;s de un <code>InputStream</code>. Las propiedades del properties que definen la
-     * versi&oacute;n son:<br/>
-     * <code><ul><li>version.mayor: Versi&oacute;n.</li>
-     * <li>version.minor: Versi&oacute;n menor.</li>
-     * <li>version.build: Contrucci&oacute;n</li>
-     * <li>version.description: Descripci&oacute;n</li></ul></code> El formato en el que se devuelve la versi&oacute;n ser&aacute; siempre:<br/>
-     * <code>X.Y.Z Descripci&oacute;n</code><br/>
-     * En donde <code>X</code>, <code>Y</code> y <code>Z</code> son la versi&oacute;n, subversi&oacute;n
-     * y contrucci&oacute;n del cliente y puede tener uno o m&aacute;s d&iacute;gitos; y <code>Descripci&oacute;n</code> es un texto libre opcional
-     * que puede completar la
-     * identificaci&oacute;n de la versi&oacute;n del cliente.</br>
-     * Si no se indica alg&uacute;n de los n&uacute;meros de versi&oacute;n se indicar&aacute; cero ('0')
-     * y si no se indica la descripci&oacute;n no se mostrar&aacute; nada.
-     * @param is Datos del properties cobn la versi&oacute;n.
-     * @return Identificador de la versi&oacute;n. */
-    static String getVersion(final InputStream is) {
-        final Properties p = new Properties();
-        try {
-            p.load(is);
-        }
-        catch (final Exception e) {
-            LOGGER.warning("No se han podido obtener los datos de version"); //$NON-NLS-1$
-        }
-        final StringBuilder version = new StringBuilder();
-        version.append(p.getProperty("version.mayor", "0")).append(".") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-        .append(p.getProperty("version.minor", "0")).append(".") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-        .append(p.getProperty("version.build", "0")).append(" ") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-        .append(p.getProperty("build", "")); //$NON-NLS-1$ //$NON-NLS-2$
-        if (p.containsKey("java")) {//$NON-NLS-1$
-            version.append(" para Java ").append(p.getProperty("java")).append(" o superior"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-        }
-        if (p.containsKey("description")) {//$NON-NLS-1$
-            version.append(" (").append(p.getProperty("description")).append(")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-        }
-        return version.toString().trim();
-    }
-
-    /** Recupera la versi&oacute;n indicada en un fichero "version.properties" en el directorio
-     * ra&iacute;z de un fichero ZIP.
-     * @param zipFilePath Ruta del fichero Zip.
-     * @return Versi&oacute;n del m&oacute;dulo que contiene el Zip. */
-    static String getVersionFromZip(final String zipFilePath) {
-
-        String idVersion;
-        try {
-            final ZipFile zipFile = new ZipFile(zipFilePath);
-            final InputStream is = zipFile.getInputStream(zipFile.getEntry("version.properties")); //$NON-NLS-1$
-            idVersion = AOBootUtil.getVersion(is);
-            try {
-                is.close();
-            }
-            catch (final Exception e) {
-                // Ignoramos los errores en el cierre
-            }
-            try {
-                zipFile.close();
-            }
-            catch (final Exception e) {
-                // Ignoramos los errores en el cierre
-            }
-        }
-        catch (final Exception e) {
-            LOGGER.warning("No se ha podido identificar el cliente de firma instalado"); //$NON-NLS-1$
-            idVersion = "0.0.0"; //$NON-NLS-1$
-        }
-        return idVersion;
     }
 
     /** Obtiene un ClassLoader que no incluye URL que no referencien directamente a ficheros JAR.
