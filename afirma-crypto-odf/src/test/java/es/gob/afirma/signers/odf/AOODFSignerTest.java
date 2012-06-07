@@ -41,7 +41,7 @@ public final class AOODFSignerTest {
     private static final String CERT_ALIAS2 = "{71e526c4-0f27-4f32-8be0-90df52dcbc53}"; //$NON-NLS-1$
 
     private static final String[] DATA_FILES = {
-    	"odt", //$NON-NLS-1$
+    	"odt", "ods", "odp" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     };
 
     private static final List<byte[]> DATA = new ArrayList<byte[]>(2);
