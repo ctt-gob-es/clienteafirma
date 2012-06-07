@@ -16,9 +16,9 @@ import java.security.cert.X509Certificate;
 /** Certificados permitidas para la firma de ficheros JAR y ZIP. */
 enum SigningCert {
     /** Certificado de Sun/Oracle con el que se firman las extensiones de Java. */
-    SUN("/resources/sun/Sun_Microsystem_Inc.cer"), //$NON-NLS-1$
+    SUN("resources/sun/Sun_Microsystem_Inc.cer"), //$NON-NLS-1$
     /** Certificado del integrador con el que se firman las dependencias del Cliente. */
-    INTEGRATOR("/resources/integrator_Code_Signing.cer"); //$NON-NLS-1$
+    INTEGRATOR("resources/integrator_Code_Signing.cer"); //$NON-NLS-1$
 
     /** Define el certificado con su  ruta interna en el JAR.
      * @param sigCertificatePath Ruta interna del certificado. */
@@ -26,7 +26,7 @@ enum SigningCert {
         try {
             this.sgCert =
                 (X509Certificate) CertificateFactory.getInstance("X.509") //$NON-NLS-1$
-                .generateCertificate(AOInstallUtils.class.getResourceAsStream(sigCertificatePath));
+                .generateCertificate(AOBootUtil.getCleanClassLoader().getResourceAsStream(sigCertificatePath));
         }
         catch (final Exception e) {
             throw new IllegalArgumentException("No se ha podido cargar el certificado firmante: " + sigCertificatePath, e); //$NON-NLS-1$

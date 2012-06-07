@@ -47,13 +47,13 @@ final class LicenceDialogPanel {
 
         // Leemos el acuerdo de licencia desde un fichero
         String licenseText;
-        InputStream licenseIs = AOBootUtil.getCleanClassLoader().getResourceAsStream("/resources/licenses_" + Locale.getDefault() + ".txt"); //$NON-NLS-1$ //$NON-NLS-2$
+        InputStream licenseIs = AOBootUtil.getCleanClassLoader().getResourceAsStream("resources/licenses_" + Locale.getDefault() + ".txt"); //$NON-NLS-1$ //$NON-NLS-2$
         if (licenseIs == null) {
-            licenseIs = AOBootUtil.getCleanClassLoader().getResourceAsStream("/resources/licenses_" + Locale.getDefault().getLanguage() + ".txt"); //$NON-NLS-1$ //$NON-NLS-2$
+            licenseIs = AOBootUtil.getCleanClassLoader().getResourceAsStream("resources/licenses_" + Locale.getDefault().getLanguage() + ".txt"); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         if (licenseIs == null) {
-            licenseIs = AOBootUtil.getCleanClassLoader().getResourceAsStream("/resources/licenses.txt"); //$NON-NLS-1$
+            licenseIs = AOBootUtil.getCleanClassLoader().getResourceAsStream("resources/licenses.txt"); //$NON-NLS-1$
         }
 
         try {
