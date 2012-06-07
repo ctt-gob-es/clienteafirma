@@ -1608,7 +1608,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         // como nodo objetivo y, dado el caso, se contrafirma
         final List<Object> targetsList = Arrays.asList(tgts);
     	for (int i = 0; i < sortedSignatures.size(); i++) {
-    		if (targetsList.contains(new Integer(i))) {
+    		if (targetsList.contains(Integer.valueOf(i))) {
     			this.cs(sortedSignatures.get(i), keyEntry, refsDigestMethod, canonicalizationAlgorithm, xmlSignaturePrefix);
     		}
     	}
