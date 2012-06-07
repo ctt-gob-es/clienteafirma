@@ -75,7 +75,7 @@ public final class WinRegistryWrapper {
         try {
         	final Method getMethod = AOUtil.classForName("com.sun.deploy.util.WinRegistry") //$NON-NLS-1$
     			.getDeclaredMethod("get", new Class[] { Integer.TYPE, String.class, String.class }); //$NON-NLS-1$
-            return getMethod.invoke(null, new Object[] { new Integer(hKey), path, name });
+            return getMethod.invoke(null, new Object[] { Integer.valueOf(hKey), path, name });
         }
         catch(final NoSuchMethodError e) {
             LOGGER.severe(
@@ -113,7 +113,7 @@ public final class WinRegistryWrapper {
         try {
         	final Method getStringMethod = AOUtil.classForName("com.sun.deploy.util.WinRegistry") //$NON-NLS-1$
 				.getDeclaredMethod("getString", new Class[] { Integer.TYPE, String.class, String.class }); //$NON-NLS-1$
-        	return (String) getStringMethod.invoke(null, new Object[] { new Integer(hKey), path, name });
+        	return (String) getStringMethod.invoke(null, new Object[] { Integer.valueOf(hKey), path, name });
         }
         catch (final InvocationTargetException e) {
         	LOGGER.severe(
@@ -145,7 +145,7 @@ public final class WinRegistryWrapper {
         try {
         	final Method setStringValueMethod = AOUtil.classForName("com.sun.deploy.util.WinRegistry") //$NON-NLS-1$
 				.getDeclaredMethod("setStringValue", new Class[] { Integer.TYPE, String.class, String.class, String.class }); //$NON-NLS-1$
-        	return ((Boolean) setStringValueMethod.invoke(null, new Object[] { new Integer(hKey), path, name, value })).booleanValue();
+        	return ((Boolean) setStringValueMethod.invoke(null, new Object[] { Integer.valueOf(hKey), path, name, value })).booleanValue();
         }
         catch (final InvocationTargetException e) {
         	LOGGER.severe(
