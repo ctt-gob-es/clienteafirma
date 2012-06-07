@@ -1,12 +1,12 @@
-/*******************************************************************************
- * Este fichero forma parte del Cliente @firma.
- * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
- * y descargado desde http://forja-ctt.administracionelectronica.gob.es/
- * Copyright 2009,2010,2011 Gobierno de Espana
- * Este fichero se distribuye bajo  bajo licencia GPL version 2  segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
- * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
- ******************************************************************************/
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
 
 package es.gob.afirma.install;
 
@@ -41,6 +41,8 @@ final class Installer {
      * @param build Construcci&oacute;n del Cliente que se desea cargar.
      * @exception NullPointerException Si no se han indicado los par&aacute;metros de la instalaci&oacute;n. */
     Installer(final Component parentComponent, final URL codeBase, final String build) {
+
+    	System.out.println("DEBUG: Constructor de Installer");
 
         // Establecemos el componente padre sobre el que se mostraran los dialogos del instalador
         // (puede ser nulo).
@@ -79,6 +81,8 @@ final class Installer {
 
         boolean allOK = true;
         boolean licenciaMostrada = false;
+
+        System.out.println("DEBUG: Installer.install");
 
         try {
             if (this.enviromentInstaller.isEndorsedJava5AFirmaDependenciesNeeded()) {

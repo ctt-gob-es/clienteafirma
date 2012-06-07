@@ -1,12 +1,12 @@
-/*******************************************************************************
- * Este fichero forma parte del Cliente @firma.
- * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
- * y descargado desde http://forja-ctt.administracionelectronica.gob.es/
- * Copyright 2009,2010,2011 Gobierno de Espana
- * Este fichero se distribuye bajo  bajo licencia GPL version 2  segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
- * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
- ******************************************************************************/
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
 
 package es.gob.afirma.install;
 
@@ -19,7 +19,7 @@ final class BootPlatform {
 
     /** Gestor de registro. */
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$;
-    
+
     /** Sistema operativo. */
     enum OS {
         /** Microsoft Windows. */
@@ -66,7 +66,7 @@ final class BootPlatform {
 
     /** Directorio del usuario. */
     private static String userHome = null;
-    
+
     /** Directorio de extensiones del JRE. */
     private static String javaExtDir = null;
 
@@ -167,7 +167,7 @@ final class BootPlatform {
             return OS.OTHER;
         }
     }
-    
+
     /** Obtiene el directorio de instalaci&oacute;n del entorno de ejecuci&oacute;n de Java
      * actualmente en uso. Si no se puede obtener, se devolver&aacute; {@code null}.
      * Copiado de com.sun.deploy.config.Config.
@@ -211,7 +211,7 @@ final class BootPlatform {
         }
         return endorsedDir;
     }
-    
+
     /** Obtiene el directorio de extensiones del entorno de ejecuci&oacute;n de Java en uso.
      * @return Directorio de extensiones del JRE o {@code null} si no se pudo identificar */
     static String getJavaExtDir() {
@@ -223,5 +223,5 @@ final class BootPlatform {
         }
         return javaExtDir;
     }
-    
+
 }
