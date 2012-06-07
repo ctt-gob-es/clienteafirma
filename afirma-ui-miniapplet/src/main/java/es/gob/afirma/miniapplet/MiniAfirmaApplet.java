@@ -28,6 +28,7 @@ import org.mozilla.universalchardet.UniversalDetector;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOFormatFileException;
+import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.InvalidLibraryException;
 import es.gob.afirma.core.MissingLibraryException;
 import es.gob.afirma.core.misc.AOUtil;
@@ -257,8 +258,15 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			throw e;
 		}
 
-		return AOUtil.showTreeAsString(signer.getSignersStructure(sign, false), null, null);
-
+		try {
+			return AOUtil.showTreeAsString(signer.getSignersStructure(sign, false), null, null);
+		} catch (final AOInvalidFormatException ex) {
+			final AOFormatFileException e = new AOFormatFileException(
+					"Los datos introducidos no se corresponden con una firma soportada", ex //$NON-NLS-1$
+				);
+				setError(e);
+				throw e;
+		}
 	}
 
 	/** {@inheritDoc} */

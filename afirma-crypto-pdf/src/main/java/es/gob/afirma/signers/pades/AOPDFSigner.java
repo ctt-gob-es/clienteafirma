@@ -548,7 +548,7 @@ public final class AOPDFSigner implements AOSigner {
      * @return &Aacute;rbol de nodos de firma o <code>null</code> en caso de error. */
     public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
 
-    	checkIText();
+    	isPdfFile(sign);
 
         SHA2AltNamesProvider.install();
 

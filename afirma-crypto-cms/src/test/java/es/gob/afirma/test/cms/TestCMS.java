@@ -24,6 +24,7 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
+import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSimpleSignInfo;
@@ -240,7 +241,7 @@ public final class TestCMS {
     }
 
     /** Hace las comprobaciones b&aacute;sicas de una firma. */
-    private static void checkSign(final AOSigner signer, final byte[] sign, final PrivateKeyEntry[] pke, final String[] signsAlias, final String prueba) {
+    private static void checkSign(final AOSigner signer, final byte[] sign, final PrivateKeyEntry[] pke, final String[] signsAlias, final String prueba) throws AOException {
         Assert.assertNotNull(prueba, sign);
         Assert.assertTrue(signer.isSign(sign));
 

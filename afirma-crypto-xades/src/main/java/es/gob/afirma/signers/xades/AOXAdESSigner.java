@@ -1104,7 +1104,7 @@ public final class AOXAdESSigner implements AOSigner {
     }
 
     /** {@inheritDoc} */
-    public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
+    public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) throws AOInvalidFormatException {
 
         // Obtenemos el arbol del documento
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();

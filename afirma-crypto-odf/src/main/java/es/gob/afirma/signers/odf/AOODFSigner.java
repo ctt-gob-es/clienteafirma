@@ -493,7 +493,11 @@ public final class AOODFSigner implements AOSigner {
     }
 
     /** {@inheritDoc} */
-    public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
+    public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) throws AOInvalidFormatException {
+
+    	if (!isSign(sign)) {
+    		throw new AOInvalidFormatException("Los datos indicados no se corresponden con un ODF firmado"); //$NON-NLS-1$
+    	}
 
         try {
             // genera el archivo zip temporal a partir del InputStream de

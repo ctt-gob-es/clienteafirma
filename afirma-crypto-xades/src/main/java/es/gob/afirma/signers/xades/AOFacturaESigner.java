@@ -24,6 +24,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
@@ -129,7 +130,7 @@ public final class AOFacturaESigner implements AOSigner {
     }
 
     /** {@inheritDoc} */
-    public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
+    public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) throws AOInvalidFormatException {
         return XADES_SIGNER.getSignersStructure(sign, asSimpleSignInfo);
     }
 

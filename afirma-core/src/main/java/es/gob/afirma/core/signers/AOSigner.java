@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -14,6 +14,7 @@ import java.security.KeyStore.PrivateKeyEntry;
 import java.util.Properties;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 
 /** Define los requerimientos de las clases capaces de efectuar firmas digitales.
@@ -44,8 +45,10 @@ public interface AOSigner extends AOCoSigner, AOCounterSigner {
      *        informaci&oacute;n b&aacute;sica de cada firma individual
      *        mediante objetos <code>AOSimpleSignInfo</code>, si es <code>false</code> un &aacute;rbol con los nombres (CN X.500) de los
      *        titulares de los certificados.
-     * @return &Aacute;rbol de nodos de firma o <code>null</code> en caso de error. */
-    AOTreeModel getSignersStructure(byte[] sign, boolean asSimpleSignInfo);
+     * @return &Aacute;rbol de nodos de firma o <code>null</code> en caso de error.
+     * @throws AOInvalidFormatException
+     *         Si no se ha introducido un fichero de firma v&aacute;lido del formato correspondiente. */
+    AOTreeModel getSignersStructure(byte[] sign, boolean asSimpleSignInfo) throws AOInvalidFormatException;
 
     /** Indica si un dato es una firma compatible con la implementaci&oacute;n concreta.
      * @param is Dato que deseamos comprobar.
@@ -56,11 +59,11 @@ public interface AOSigner extends AOCoSigner, AOCounterSigner {
     /** Comprueba si el dato introducido es v&aacute;lido para ser firmado por
      * este manejador de firma.<br/>
      * @param is Dato que deseamos comprobar.
-     * @return Devuelve <code>true</code> si el dato es susceptible de ser firmado por la implementaci&oacute;n concreta, 
+     * @return Devuelve <code>true</code> si el dato es susceptible de ser firmado por la implementaci&oacute;n concreta,
      *         <code>false</code> en caso contrario. */
     boolean isValidDataFile(byte[] is);
 
-    /** Devuelve el nombre de fichero de firma recomendado para el resultado de firmar un fichero 
+    /** Devuelve el nombre de fichero de firma recomendado para el resultado de firmar un fichero
      * con el nombre proporcionado. Si se indica una part&iacute;cula intermedia, se a&ntilde;ade esta al
      * nombre resultante seg&uacute;n el criterio de la implementaci&oacute;n concreta.
      * @param originalName Nombre del fichero original que se firma
@@ -69,7 +72,7 @@ public interface AOSigner extends AOCoSigner, AOCounterSigner {
      * @return Nombre apropiado para el fichero de firma o fichero firmado. */
     String getSignedName(String originalName, String inText);
 
-    /** Recupera los datos originalmente firmados de una firma. 
+    /** Recupera los datos originalmente firmados de una firma.
      * En el caso de que la firma no contenga los datos firmados, se
      * devuelve <code>null</code>.
      * @param signData Datos de firma o fichero firmado.

@@ -278,7 +278,7 @@ public final class TestCAdES {
     }
 
     /** Hace las comprobaciones b&aacute;sicas de una firma. */
-    private static void checkSign(final AOSigner signer, final byte[] sign, final PrivateKeyEntry[] pke, final String[] signsAlias, final String prueba) {
+    private static void checkSign(final AOSigner signer, final byte[] sign, final PrivateKeyEntry[] pke, final String[] signsAlias, final String prueba) throws Exception {
         Assert.assertNotNull(prueba, sign);
         Assert.assertTrue(signer.isSign(sign));
         Assert.assertTrue(CAdESValidator.isCAdESValid(sign, AOSignConstants.CMS_CONTENTTYPE_SIGNEDDATA));

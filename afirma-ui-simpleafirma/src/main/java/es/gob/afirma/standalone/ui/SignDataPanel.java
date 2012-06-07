@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -75,7 +75,9 @@ final class SignDataPanel extends JPanel {
     private final JLabel certIcon = new JLabel();
     private final JEditorPane certDescription = new JEditorPane();
     private JButton validateCertButton = null;
-    
+
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
     SignDataPanel(final File signFile, final byte[] sign, final JComponent fileTypeIcon, final X509Certificate cert, final KeyListener extKeyListener) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -92,7 +94,7 @@ final class SignDataPanel extends JPanel {
         filePath.getAccessibleContext().setAccessibleName(Messages.getString("SignDataPanel.0")); //$NON-NLS-1$
         filePath.getAccessibleContext().setAccessibleDescription(Messages.getString("SignDataPanel.1")); //$NON-NLS-1$
         filePath.setBorder(BorderFactory.createEmptyBorder());
-        
+
         filePath.setEditable(false);
         filePath.setFocusable(false);
         filePath.setText(signFile == null ? Messages.getString("SignDataPanel.24") : signFile.getAbsolutePath());  //$NON-NLS-1$
@@ -117,7 +119,7 @@ final class SignDataPanel extends JPanel {
         filePathPanel.add(Box.createRigidArea(new Dimension(5, 0)));
 
         final boolean isPDF = new AOPDFSigner().isValidDataFile(sign);
-        
+
         if (fileTypeIcon != null) {
             filePathPanel.add(fileTypeIcon);
         }
@@ -141,7 +143,7 @@ final class SignDataPanel extends JPanel {
             iconLabel.setFocusable(false);
             filePathPanel.add(iconLabel);
         }
-        
+
         // Boton de apertura del fichero firmado
         JButton openFileButton = null;
         if (isPDF && signFile != null && UIUtils.hasAssociatedApplication(signFile.getName().substring(signFile.getName().lastIndexOf(".")))) { //$NON-NLS-1$
@@ -177,7 +179,7 @@ final class SignDataPanel extends JPanel {
             filePathPanel.add(openFileButton);
             filePathPanel.add(Box.createRigidArea(new Dimension(5, 0)));
         }
-        
+
         JPanel certDescPanel = null;
 
         // Panel con los datos del certificado
@@ -192,14 +194,14 @@ final class SignDataPanel extends JPanel {
 	            // Para que se detecten apropiadamente los hipervinculos hay que establecer
 	            // el tipo de contenido antes que el contenido
 	            this.certDescription.setContentType("text/html"); //$NON-NLS-1$
-	                            
+
 	            this.certDescription.setEditable(false);
 	            this.certDescription.setOpaque(false);
 	            this.certDescription.setText(certInfo.getDescriptionText());
 	            this.certDescription.setToolTipText(Messages.getString("SignDataPanel.12")); //$NON-NLS-1$
 	            this.certDescription.getAccessibleContext().setAccessibleName(Messages.getString("SignDataPanel.13")); //$NON-NLS-1$
 	            this.certDescription.getAccessibleContext().setAccessibleDescription(Messages.getString("SignDataPanel.14")); //$NON-NLS-1$
-	            
+
 	            final EditorFocusManager editorFocusManager = new EditorFocusManager (this.certDescription, new EditorFocusManagerAction() {
                     @Override
                     public void openHyperLink(final HyperlinkEvent he, final int linkIndex) {
@@ -209,7 +211,7 @@ final class SignDataPanel extends JPanel {
                 this.certDescription.addFocusListener(editorFocusManager);
                 this.certDescription.addKeyListener(editorFocusManager);
 	            this.certDescription.addHyperlinkListener(editorFocusManager);
-	            
+
 	            if (certInfo.getCertVerifier() != null) {
 	            	this.validateCertButton = new JButton();
 	            	this.validateCertButton.setEnabled(false);
@@ -227,7 +229,7 @@ final class SignDataPanel extends JPanel {
 							try {
 								certInfo.getCertVerifier().checkCertificate(new X509Certificate[] { cert }, true);
 								JOptionPane.showMessageDialog(
-									SignDataPanel.this, 
+									SignDataPanel.this,
 									Messages.getString("SignDataPanel.19"),  //$NON-NLS-1$
 									Messages.getString("SignDataPanel.20"),  //$NON-NLS-1$
 									JOptionPane.INFORMATION_MESSAGE
@@ -278,12 +280,12 @@ final class SignDataPanel extends JPanel {
         CompleteSignInfo signInfo;
         try {
             signInfo = SignDataPanel.getSignInfo(sign);
-        } 
+        }
         catch (final Exception e) {
             signInfo = null;
         }
         final JScrollPane detailPanel = new JScrollPane(signInfo == null ? null : this.getSignDataTree(signInfo, extKeyListener));
-        
+
         // En Apple siempre hay barras, y es el SO el que las pinta o no si hacen o no falta
         if (Platform.OS.MACOSX.equals(Platform.getOS())) {
             detailPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -299,9 +301,9 @@ final class SignDataPanel extends JPanel {
             filePath.setBackground(LookAndFeelManager.WINDOW_COLOR);
             filePathPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
         }
-        
+
         this.setLayout(new GridBagLayout());
-        
+
         final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 1.0;
@@ -360,21 +362,26 @@ final class SignDataPanel extends JPanel {
         signInfo.setSignData(signData);
         final AOSigner signer = AOSignerFactory.getSigner(signData);
         if (signer == null) {
-            Logger.getLogger("es.gob.afirma").warning("Formato de firma no reconocido"); //$NON-NLS-1$ //$NON-NLS-2$
+        	LOGGER.warning("Formato de firma no reconocido"); //$NON-NLS-1$
             throw new IllegalArgumentException("Formato de firma no reconocido"); //$NON-NLS-1$
         }
         try {
             signInfo.setSignInfo(signer.getSignInfo(signData));
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").warning("Error al leer la informacion de la firma: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+        	LOGGER.warning("Error al leer la informacion de la firma: " + e); //$NON-NLS-1$
         }
-        signInfo.setSignsTree(signer.getSignersStructure(signData, true));
+        try {
+        	signInfo.setSignsTree(signer.getSignersStructure(signData, true));
+        }
+        catch (final Exception e) {
+        	LOGGER.warning("Error al extraer el arbol de firmantes: " + e);  //$NON-NLS-1$
+        }
         try {
             signInfo.setData(signer.getData(signData));
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").warning("Error al extraer los datos firmados: " + e);  //$NON-NLS-1$//$NON-NLS-2$
+        	LOGGER.warning("Error al extraer los datos firmados: " + e);  //$NON-NLS-1$
         }
         return signInfo;
     }
@@ -416,7 +423,7 @@ final class SignDataPanel extends JPanel {
         tree.putClientProperty("JTree.lineStyle", "None"); //$NON-NLS-1$ //$NON-NLS-2$
         tree.getSelectionModel().setSelectionMode(
                 TreeSelectionModel.SINGLE_TREE_SELECTION);
-        
+
         final TreeFocusManager treeFocusManager = new TreeFocusManager(tree, new TreeFocusManagerAction() {
             @Override
             public void openTreeNode(final Object nodeInfo) {
@@ -425,10 +432,10 @@ final class SignDataPanel extends JPanel {
                 }
                 else if (nodeInfo instanceof ShowFileLinkAction) {
                     ((ShowFileLinkAction) nodeInfo).action();
-                }  
+                }
             }
         });
-        
+
         tree.addMouseMotionListener(treeFocusManager);
         tree.addFocusListener(treeFocusManager);
         tree.addMouseListener(treeFocusManager);
