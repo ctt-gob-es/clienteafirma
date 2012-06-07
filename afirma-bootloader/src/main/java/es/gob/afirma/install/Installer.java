@@ -42,8 +42,6 @@ final class Installer {
      * @exception NullPointerException Si no se han indicado los par&aacute;metros de la instalaci&oacute;n. */
     Installer(final Component parentComponent, final URL codeBase, final String build) {
 
-    	System.out.println("DEBUG: Constructor de Installer");
-
         // Establecemos el componente padre sobre el que se mostraran los dialogos del instalador
         // (puede ser nulo).
         this.parentComponent = parentComponent;
@@ -82,10 +80,9 @@ final class Installer {
         boolean allOK = true;
         boolean licenciaMostrada = false;
 
-        System.out.println("DEBUG: Installer.install");
-
         try {
             if (this.enviromentInstaller.isEndorsedJava5AFirmaDependenciesNeeded()) {
+
                 if (!licenciaMostrada && !prepareInstall()) {
                     return;
                 }
@@ -174,7 +171,6 @@ final class Installer {
                                           BootLoaderMessages.getString("Installer.26"), //$NON-NLS-1$
                                           JOptionPane.ERROR_MESSAGE);
         }
-
     }
 
 }
