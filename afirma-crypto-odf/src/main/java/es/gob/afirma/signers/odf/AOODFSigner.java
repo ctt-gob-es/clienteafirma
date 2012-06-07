@@ -492,7 +492,7 @@ public final class AOODFSigner implements AOSigner {
         throw new UnsupportedOperationException("No es posible realizar contrafirmas de ficheros ODF"); //$NON-NLS-1$
     }
 
-    /** { {@inheritDoc} */
+    /** {@inheritDoc} */
     public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
 
         try {
@@ -658,7 +658,7 @@ public final class AOODFSigner implements AOSigner {
         return mimetype != null && SUPPORTED_FORMATS.contains(mimetype);
     }
 
-    /** { {@inheritDoc} */
+    /** {@inheritDoc} */
     public String getSignedName(final String originalName, final String inText) {
 
         final String inTextInt = (inText != null ? inText : ""); //$NON-NLS-1$
@@ -715,7 +715,7 @@ public final class AOODFSigner implements AOSigner {
         return signData;
     }
 
-    /** { {@inheritDoc} */
+    /** {@inheritDoc} */
     public AOSignInfo getSignInfo(final byte[] signData) throws AOException {
         if (signData == null) {
             throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$
