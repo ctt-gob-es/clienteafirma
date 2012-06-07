@@ -33,6 +33,10 @@ import es.gob.afirma.standalone.ui.MainMenu;
  * Si se a&ntilde;adiesen m&aacute;s men&uacute;s habr&iacute;a que modificar el comportamiento manualmente.</p>
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 final class MainMenuManager {
+    
+    private MainMenuManager() {
+        // No permitimos la instanciacion
+    }
 
 	static void setMenuManagement(final ActionMap actionMap, final InputMap inputMap, final MainMenu mMenu) {
 

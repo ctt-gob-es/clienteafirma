@@ -12,6 +12,7 @@ package es.gob.afirma.standalone;
 
 import java.awt.Toolkit;
 import java.net.URL;
+import java.util.logging.Logger;
 
 import javax.help.DefaultHelpBroker;
 import javax.help.HelpBroker;
@@ -54,7 +55,7 @@ final class JavaHelp {
             );
         }
         catch (final Exception ex) {
-            ex.printStackTrace();
+            Logger.getLogger("es.gob.afirma").severe("No se ha podido cargar la ayuda: " + ex); //$NON-NLS-1$ //$NON-NLS-2$
         }
 	}
 

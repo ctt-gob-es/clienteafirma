@@ -190,10 +190,8 @@ final class EditorFocusManager extends KeyAdapter implements FocusListener, Hype
 
     @Override
     public void hyperlinkUpdate(final HyperlinkEvent he) {
-        if (HyperlinkEvent.EventType.ACTIVATED.equals(he.getEventType())) {
-            if (this.hlAction != null) {
-                this.hlAction.openHyperLink(he, this.selectedLink);
-            }
+        if (HyperlinkEvent.EventType.ACTIVATED.equals(he.getEventType()) && this.hlAction != null) {
+            this.hlAction.openHyperLink(he, this.selectedLink);
         }
     }
     

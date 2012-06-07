@@ -105,14 +105,12 @@ class TreeFocusManager extends KeyAdapter implements FocusListener, MouseMotionL
 
     @Override
     public void keyPressed(final KeyEvent e) {
-        if (KeyEvent.VK_SPACE == e.getKeyCode() || KeyEvent.VK_ENTER == e.getKeyCode()) {
-            if (this.focusAction != null) {
-                final DefaultMutableTreeNode node = (DefaultMutableTreeNode) this.tree.getLastSelectedPathComponent();
-                if (node == null) {
-                    return;
-                }
-                this.focusAction.openTreeNode(node.getUserObject());
+        if ((KeyEvent.VK_SPACE == e.getKeyCode() || KeyEvent.VK_ENTER == e.getKeyCode()) && this.focusAction != null) {
+            final DefaultMutableTreeNode node = (DefaultMutableTreeNode) this.tree.getLastSelectedPathComponent();
+            if (node == null) {
+                return;
             }
+            this.focusAction.openTreeNode(node.getUserObject());
         }
     }
 

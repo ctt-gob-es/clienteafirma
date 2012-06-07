@@ -45,7 +45,11 @@ public final class VisorPanel extends JPanel implements KeyListener {
     /** Version ID */
     private static final long serialVersionUID = 8309157734617505338L;
 
-    final VisorFirma visorFirma;
+    private final VisorFirma visorFirma;
+    
+    VisorFirma getVisorFirma() {
+        return this.visorFirma;
+    }
 
 
     /** Construye un panel con la informaci&oacute;n extra&iacute;da de una firma. Si no se
@@ -82,16 +86,14 @@ public final class VisorPanel extends JPanel implements KeyListener {
 
         byte[] sign = (signature != null) ?  signature.clone() : null;
 
-        if (sign == null) {
-            if (signFile != null) {
-                try {
-                    final FileInputStream fis = new FileInputStream(signFile);
-                    sign = AOUtil.getDataFromInputStream(fis);
-                    try { fis.close(); } catch (final Exception e) { /* Ignoramos los errores */ }
-                }
-                catch (final Exception e) {
-                    Logger.getLogger("es.gob.afirma").warning("No se ha podido cargar el fichero de firma: " + e); //$NON-NLS-1$ //$NON-NLS-2$
-                }
+        if (sign == null && signFile != null) {
+            try {
+                final FileInputStream fis = new FileInputStream(signFile);
+                sign = AOUtil.getDataFromInputStream(fis);
+                try { fis.close(); } catch (final Exception e) { /* Ignoramos los errores */ }
+            }
+            catch (final Exception e) {
+                Logger.getLogger("es.gob.afirma").warning("No se ha podido cargar el fichero de firma: " + e); //$NON-NLS-1$ //$NON-NLS-2$
             }
         }
 
@@ -118,8 +120,8 @@ public final class VisorPanel extends JPanel implements KeyListener {
             openSign.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
-                    if (VisorPanel.this.visorFirma != null) {
-                        VisorPanel.this.visorFirma.loadNewSign();
+                    if (VisorPanel.this.getVisorFirma() != null) {
+                        VisorPanel.this.getVisorFirma().loadNewSign();
                     }
                 }
             });
@@ -131,8 +133,8 @@ public final class VisorPanel extends JPanel implements KeyListener {
         closeVisor.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                if (VisorPanel.this.visorFirma != null) {
-                    VisorPanel.this.visorFirma.closeApplication(0);
+                if (VisorPanel.this.getVisorFirma() != null) {
+                    VisorPanel.this.getVisorFirma().closeApplication(0);
                 }
             }
         });

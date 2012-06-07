@@ -27,6 +27,8 @@ import es.gob.afirma.core.misc.Platform;
  * @author Carlos Gamuci
  */
 public final class LookAndFeelManager {
+    
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private LookAndFeelManager() {
 		// No permitimos la instanciacion
@@ -108,8 +110,8 @@ public final class LookAndFeelManager {
                     for (final LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
                         if ("Nimbus".equals(info.getName())) { //$NON-NLS-1$
                             UIManager.setLookAndFeel(info.getClassName());
-                            Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
-                            "Establecido 'Look&Feel' Nimbus" //$NON-NLS-1$
+                            LOGGER.info(
+                                 "Establecido 'Look&Feel' Nimbus" //$NON-NLS-1$
                             );
                             return;
                         }
@@ -117,21 +119,21 @@ public final class LookAndFeelManager {
                 }
             }
             catch (final Exception e) {
-                Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-                "No se ha podido establecer el 'Look&Feel' Nimbus: " + e //$NON-NLS-1$
+                LOGGER.warning(
+                       "No se ha podido establecer el 'Look&Feel' Nimbus: " + e //$NON-NLS-1$
                 );
             }
         }
 
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
-            "Establecido 'Look&Feel' " + UIManager.getLookAndFeel().getName() //$NON-NLS-1$
+            LOGGER.info(
+                 "Establecido 'Look&Feel' " + UIManager.getLookAndFeel().getName() //$NON-NLS-1$
             );
         }
         catch (final Exception e2) {
-            Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-            "No se ha podido establecer ningun 'Look&Feel': " + e2 //$NON-NLS-1$
+            LOGGER.warning(
+                "No se ha podido establecer ningun 'Look&Feel': " + e2 //$NON-NLS-1$
             );
         }
 

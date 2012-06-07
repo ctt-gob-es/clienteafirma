@@ -17,12 +17,8 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Robot;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -356,12 +352,10 @@ final class SignDataPanel extends JPanel {
         }
     }
 
-    /**
-     * Recupera la informaci&oacute;n de la firma indicada.
+    /** Recupera la informaci&oacute;n de la firma indicada.
      * @param signData Firma.
-     * @return Informaci&oacute;n de la firma.
-     */
-    private static CompleteSignInfo getSignInfo(final byte[] signData) throws IllegalArgumentException {
+     * @return Informaci&oacute;n de la firma. */
+    private static CompleteSignInfo getSignInfo(final byte[] signData) {
         final CompleteSignInfo signInfo = new CompleteSignInfo();
         signInfo.setSignData(signData);
         final AOSigner signer = AOSignerFactory.getSigner(signData);

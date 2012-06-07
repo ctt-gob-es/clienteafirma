@@ -115,17 +115,16 @@ public final class FileUIManager {
 
         final File outputFile = new File(newFileName);
 
-        if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-            if (newFileName.toLowerCase().endsWith(".pdf") && outputFile.exists()) { //$NON-NLS-1$
-                if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(
+        if (Platform.OS.MACOSX.equals(Platform.getOS()) && 
+            newFileName.toLowerCase().endsWith(".pdf") &&  //$NON-NLS-1$
+            outputFile.exists() && 
+            JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(
                         parent,
                         Messages.getString("SignPanel.84"), //$NON-NLS-1$
                         Messages.getString("SignPanel.19"), //$NON-NLS-1$
                         JOptionPane.YES_NO_OPTION,
                         JOptionPane.WARNING_MESSAGE)) {
                     return null;
-                }
-            }
         }
 
         OutputStream fos = null;
