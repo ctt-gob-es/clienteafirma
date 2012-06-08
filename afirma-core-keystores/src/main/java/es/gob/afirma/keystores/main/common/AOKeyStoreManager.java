@@ -36,7 +36,6 @@ import java.util.logging.Logger;
 import javax.crypto.BadPaddingException;
 import javax.security.auth.callback.PasswordCallback;
 
-import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.InvalidOSException;
 import es.gob.afirma.core.MissingLibraryException;
 import es.gob.afirma.core.misc.AOUtil;
@@ -86,14 +85,13 @@ public class AOKeyStoreManager {
      * @param params Parametros adicionales para la configuraci&oacute;n del
      *        almac&eacute;n.
      * @return Array con los almacenes configurados.
-     * @throws AOException Cuando ocurre un error durante la inicializaci&oacute;n.
+     * @throws AOKeyStoreManagerException Cuando ocurre un error durante la inicializaci&oacute;n.
      * @throws IOException Cuando se indique una contrase&ntilde;a incorrecta para la
      *         apertura del almac&eacute;n.
-     * @throws MissingSunPKCS11Exception Si no se encuentra la biblioteca SunPKCS11 */
+     * @throws es.gob.afirma.keystores.main.common.MissingSunPKCS11Exception Si no se encuentra la biblioteca SunPKCS11 */
     private List<KeyStore> initPKCS11(final PasswordCallback pssCallBack,
     		                          final Object[] params) throws AOKeyStoreManagerException,
-    		                                                        IOException,
-    		                                                        MissingSunPKCS11Exception {
+    		                                                        IOException {
         // En el "params" debemos traer los parametros:
         // [0] - p11lib: Biblioteca PKCS#11, debe estar en el Path (Windows) o en el LD_LIBRARY_PATH (UNIX, Linux, Mac OS X)
         // [1] -desc: Descripcion del token PKCS#11 (opcional)
@@ -190,8 +188,7 @@ public class AOKeyStoreManager {
 
     private List<KeyStore> initSingle(final InputStream store,
             					      final PasswordCallback pssCallBack) throws AOKeyStoreManagerException,
-                                                                                 IOException,
-                                                                                 MissingLibraryException {
+                                                                                 IOException {
         if (store == null) {
             throw new AOKeyStoreManagerException("Es necesario proporcionar el fichero X.509 o PKCS#7"); //$NON-NLS-1$
         }
@@ -331,9 +328,7 @@ public class AOKeyStoreManager {
     }
 
     private List<KeyStore> initCAPI() throws AOKeyStoreManagerException,
-                                             IOException,
-                                             MissingLibraryException,
-                                             InvalidOSException {
+                                             IOException {
         if (!Platform.getOS().equals(Platform.OS.WINDOWS)) {
             throw new InvalidOSException("Microsoft Windows"); //$NON-NLS-1$
         }
@@ -386,9 +381,7 @@ public class AOKeyStoreManager {
 
     }
 
-    private List<KeyStore> initCAPIAddressBook() throws AOKeyStoreManagerException,
-                                             			MissingLibraryException,
-                                             			InvalidOSException {
+    private List<KeyStore> initCAPIAddressBook() throws AOKeyStoreManagerException {
         if (!Platform.getOS().equals(Platform.OS.WINDOWS)) {
             throw new InvalidOSException("Microsoft Windows"); //$NON-NLS-1$
         }
@@ -434,9 +427,7 @@ public class AOKeyStoreManager {
     }
 
     private List<KeyStore> initApple(final InputStream store) throws AOKeyStoreManagerException,
-                                          							 IOException,
-                                          							 MissingLibraryException,
-                                          							 InvalidOSException {
+                                          							 IOException {
     	if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
     		throw new InvalidOSException("Apple Mac OS X"); //$NON-NLS-1$
     	}
@@ -489,9 +480,9 @@ public class AOKeyStoreManager {
     		final Class<?> managerClass = AOUtil.classForName("es.gob.jmulticard.ui.passwordcallback.PasswordCallbackManager"); //$NON-NLS-1$
     		final Method setDialogOwnerFrameMethod = managerClass.getMethod("setDialogOwner", Component.class); //$NON-NLS-1$
     		setDialogOwnerFrameMethod.invoke(null, parentComponent);
-    	} catch (final Exception e) {
-    		e.printStackTrace();
-    		LOGGER.warning("No se ha podido establecer el componente padre para los dialogos del almacen"); //$NON-NLS-1$
+    	}
+    	catch (final Exception e) {
+    		LOGGER.warning("No se ha podido establecer el componente padre para los dialogos del almacen: " + e); //$NON-NLS-1$
     	}
 
         // Inicializamos
@@ -539,16 +530,14 @@ public class AOKeyStoreManager {
      * @throws IOException
      *         Se ha insertado una contrase&ntilde;a incorrecta para la apertura del
      *         almac&eacute;n de certificados.
-     * @throws MissingLibraryException Cuando faltan bibliotecas necesarias para la inicializaci&oacute;n
-     * @throws InvalidOSException Cuando se pide un almac&eacute;n disponible solo en un sistema operativo
+     * @throws es.gob.afirma.core.MissingLibraryException Cuando faltan bibliotecas necesarias para la inicializaci&oacute;n
+     * @throws es.gob.afirma.core.InvalidOSException Cuando se pide un almac&eacute;n disponible solo en un sistema operativo
      *                            distinto al actual */
     public List<KeyStore> init(final AOKeyStore type,
     		                   final InputStream store,
     		                   final PasswordCallback pssCallBack,
     		                   final Object[] params) throws AOKeyStoreManagerException,
-    		                                                 IOException,
-    		                                                 MissingLibraryException,
-    		                                                 InvalidOSException {
+    		                                                 IOException {
         if (type == null) {
             LOGGER.severe("Se ha solicitado inicializar un AOKeyStore nulo, se intentara inicializar un PKCS#12"); //$NON-NLS-1$
         }
