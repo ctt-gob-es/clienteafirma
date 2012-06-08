@@ -3,7 +3,7 @@
 CLIENTe es un applet de libre distribución cuyo código fuente puede ser consultado y descargado desde www.ctt.map.es. Las presentes condiciones de uso establecen las clásulas y condiciones de uso del CLIENTe:
 
 1. Licencia
-El CLIENTe @firma se encuentra bajo licencia GNU GPL versión 3.0.
+El CLIENTe @firma se encuentra bajo licencia GNU GPL versión 2.0 y EUPL versión 1.1.
 Usted puede elegir acogerse a los derechos que le proporcionan una o ambas licencias, a su conveniencia, siempre que cumpla con las condiciones que cada una de ellas le impone.
 
 2. Usted declara y garantiza que está autorizado a aceptar y cumplir las clásulas y condiciones del CLIENTe @firma.
