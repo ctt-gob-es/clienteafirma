@@ -46,9 +46,6 @@ public final class DNIeWaitPanel extends JPanel implements KeyListener {
 
     private static final long serialVersionUID = -8543615798397861866L;
 
-
-//    private final SimpleAfirma saf;
-
     private void createUI(final PropertyChangeListener pcl) {
 
     	this.addPropertyChangeListener(pcl);
@@ -136,45 +133,13 @@ public final class DNIeWaitPanel extends JPanel implements KeyListener {
         c.ipady = 0;
         this.add(dniePanel, c);
 
-//        // Listado de idiomas disponibles
-//        final Locale[] locales = SimpleAfirma.getAvailableLocales();
-//        if (locales != null && locales.length > 1) {
-//            final JComboBox languagesList = new JComboBox(locales);
-//            languagesList.setRenderer(new LocaleCellRenderer());
-//            languagesList.setSelectedItem(Locale.getDefault());
-//            languagesList.addItemListener(new ItemListener() {
-//                @Override
-//                public void itemStateChanged(ItemEvent e) {
-//                    if (e.getStateChange() == ItemEvent.SELECTED) {
-//                        try {
-//                            DNIeWaitPanel.this.saf.setDefaultLocale((Locale) e.getItem());
-//                        }
-//                        catch (final Exception ex) {
-//                            Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-//                               "No se ha podido cambiar el idioma de la interfaz: " + ex //$NON-NLS-1$
-//                            );
-//                            return;
-//                        }
-//                    }
-//                }
-//            });
-//            if (kl != null) languagesList.addKeyListener(kl);
-//            c.fill = GridBagConstraints.NONE;
-//            c.gridx = 1;
-//            c.gridy = 0;
-//            c.anchor = GridBagConstraints.EAST;
-//            this.noDNIPanel.add(languagesList, c);
-//        }
-
     }
 
     /** Construye un panel de espera a insercci&oacute;n de DNIe.
      * @param pcl <code>PropertyChangeListener</code> para la detecci&oacute;n de las teclas ESC para el
      *        cierre del aplicativo y F1 para mostrar la ayuda y para el control de los botones */
-    // @param safirma SimpleAfirma para establecer el <code>Locale</code> seleccionado en el men&uacute; desplegable
     public DNIeWaitPanel(final PropertyChangeListener pcl) {
         super(true);
-//        this.saf = safirma;
         createUI(pcl);
     }
 
@@ -193,25 +158,6 @@ public final class DNIeWaitPanel extends JPanel implements KeyListener {
 
 	@Override
 	public void keyTyped(final KeyEvent arg0) { /* No necesario */ }
-
-//    private static final class LocaleCellRenderer extends DefaultListCellRenderer {
-//
-//        private static final long serialVersionUID = -6516072256082631760L;
-//
-//        @Override
-//        public Component getListCellRendererComponent(final JList list,
-//                                                      final Object value,
-//                                                      final int index,
-//                                                      final boolean isSelected,
-//                                                      final boolean cellHasFocus) {
-//            String language = null;
-//            if (value instanceof Locale) {
-//                final Locale locale = (Locale) value;
-//                language = locale.getDisplayName(locale).substring(0, 1).toUpperCase() + locale.getDisplayName(locale).substring(1);
-//            }
-//            return super.getListCellRendererComponent(list, language != null ? language : value, index, isSelected, cellHasFocus);
-//        }
-//    }
 
 }
 
