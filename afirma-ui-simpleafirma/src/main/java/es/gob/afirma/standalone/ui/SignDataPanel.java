@@ -376,6 +376,7 @@ final class SignDataPanel extends JPanel {
         }
         catch (final Exception e) {
         	LOGGER.warning("Error al extraer el arbol de firmantes: " + e);  //$NON-NLS-1$
+        	signInfo.setSignsTree(null);
         }
         try {
             signInfo.setData(signer.getData(signData));

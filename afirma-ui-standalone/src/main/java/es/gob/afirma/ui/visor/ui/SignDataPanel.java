@@ -61,6 +61,8 @@ final class SignDataPanel extends JPanel {
     private static final String FILE_ICON_PDF = "/resources/images/icon_pdf_small.png";  //$NON-NLS-1$
     private static final String FILE_ICON_SIGN = "/resources/images/icon_sign_small.png"; //$NON-NLS-1$
 
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
     private final JLabel certDescText = new JLabel();
     private final JLabel filePathText = new JLabel();
     private final JLabel certIcon = new JLabel();
@@ -78,7 +80,7 @@ final class SignDataPanel extends JPanel {
         filePath.getAccessibleContext().setAccessibleName(Messages.getString("SignDataPanel.0")); //$NON-NLS-1$
         filePath.getAccessibleContext().setAccessibleDescription(Messages.getString("SignDataPanel.1")); //$NON-NLS-1$
         filePath.setBorder(BorderFactory.createEmptyBorder());
-        
+
         filePath.setEditable(false);
         filePath.setFocusable(true);
         filePath.setText(signFile == null ? Messages.getString("SignDataPanel.24") : signFile.getAbsolutePath());  //$NON-NLS-1$
@@ -94,19 +96,19 @@ final class SignDataPanel extends JPanel {
         Utils.remarcar(filePath);
         Utils.setFontBold(filePath);
         Utils.setContrastColor(filePath);
-        
+
         filePath.addFocusListener(new FocusListener() {
-			
+
 			@Override
-			public void focusLost(FocusEvent e) {
+			public void focusLost(final FocusEvent e) {
 				// TODO Auto-generated method stub
 				filePath.setBorder(BorderFactory.createEmptyBorder());
 			}
-			
+
 			@Override
-			public void focusGained(FocusEvent e) {
+			public void focusGained(final FocusEvent e) {
 				// TODO Auto-generated method stub
-				
+
 			}
 		});
 
@@ -124,7 +126,7 @@ final class SignDataPanel extends JPanel {
         filePathPanel.add(Box.createRigidArea(new Dimension(5, 0)));
 
         final boolean isPDF = new AOPDFSigner().isValidDataFile(sign);
-        
+
         if (fileTypeIcon != null) {
             filePathPanel.add(fileTypeIcon);
         }
@@ -144,8 +146,8 @@ final class SignDataPanel extends JPanel {
             iconLabel.setFocusable(false);
             filePathPanel.add(iconLabel);
         }
-        
-        JPanel panelOpenFileButton = new JPanel(new GridLayout(1, 1));
+
+        final JPanel panelOpenFileButton = new JPanel(new GridLayout(1, 1));
         // Boton de apertura del fichero firmado
         JButton openFileButton = null;
         if (isPDF && signFile != null && SignDataPanel.hasAssociatedApplication(signFile.getName().substring(signFile.getName().lastIndexOf(".")))) { //$NON-NLS-1$
@@ -153,7 +155,7 @@ final class SignDataPanel extends JPanel {
             //openFileButton.setPreferredSize(new Dimension(150, 24));
             openFileButton.setMnemonic(KeyEvent.VK_E);
             openFileButton.setToolTipText(Messages.getString("SignDataPanel.4")); //$NON-NLS-1$
-            openFileButton.getAccessibleContext().setAccessibleName(Messages.getString("SignDataPanel.3")+ ". " + Messages.getString("SignDataPanel.5")); //$NON-NLS-1$ //$NON-NLS-3$
+            openFileButton.getAccessibleContext().setAccessibleName(Messages.getString("SignDataPanel.3")+ ". " + Messages.getString("SignDataPanel.5")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             openFileButton.getAccessibleContext().setAccessibleDescription(Messages.getString("SignDataPanel.6")); //$NON-NLS-1$
             openFileButton.addActionListener(new ActionListener() {
                 @Override
@@ -178,13 +180,13 @@ final class SignDataPanel extends JPanel {
             filePathPanel.add(panelOpenFileButton);
             filePathPanel.add(Box.createRigidArea(new Dimension(5, 0)));
         }
-        
+
 
         JPanel certDescPanel = null;
 
         // Panel con los datos del certificado
         if (cert != null) {
-        	JPanel panelValidateCertButton = new JPanel(new GridLayout(1, 1));
+        	final JPanel panelValidateCertButton = new JPanel(new GridLayout(1, 1));
             final CertificateInfo certInfo = CertAnalyzer.getCertInformation(cert);
 
             if (certInfo != null) {
@@ -195,14 +197,14 @@ final class SignDataPanel extends JPanel {
 	            // Para que se detecten apropiadamente los hipervinculos hay que establecer
 	            // el tipo de contenido antes que el contenido
 	            this.certDescription.setContentType("text/html"); //$NON-NLS-1$
-	                            
+
 	            this.certDescription.setEditable(false);
 	            this.certDescription.setOpaque(false);
 	            this.certDescription.setText(certInfo.getDescriptionText());
 	            this.certDescription.setToolTipText(Messages.getString("SignDataPanel.12")); //$NON-NLS-1$
 	            this.certDescription.getAccessibleContext().setAccessibleName(Messages.getString("SignDataPanel.13")); //$NON-NLS-1$
 	            this.certDescription.getAccessibleContext().setAccessibleDescription(Messages.getString("SignDataPanel.14")); //$NON-NLS-1$
-	            
+
 	            final EditorFocusManager editorFocusManager = new EditorFocusManager (this.certDescription, new EditorFocusManagerAction() {
                     @Override
                     public void openHyperLink(final HyperlinkEvent he, final int linkIndex) {
@@ -212,8 +214,8 @@ final class SignDataPanel extends JPanel {
                 this.certDescription.addFocusListener(editorFocusManager);
                 this.certDescription.addKeyListener(editorFocusManager);
 	            this.certDescription.addHyperlinkListener(editorFocusManager);
-	            
-	            
+
+
 	            if (certInfo.getCertVerifier() != null) {
 	                this.validateCertButton = new JButton();
 	                //this.validateCertButton.setPreferredSize(new Dimension(150, 24));
@@ -232,14 +234,14 @@ final class SignDataPanel extends JPanel {
 								CustomDialog.showMessageDialog(SignDataPanel.this, true, Messages.getString("SignDataPanel.19"), Messages.getString("SignDataPanel.20"), JOptionPane.INFORMATION_MESSAGE);  //$NON-NLS-1$//$NON-NLS-2$
 							}
 							catch(final Exception e) {
-								Logger.getLogger("es.gob.afirma").severe("Error en la validacion del certificado: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+								LOGGER.severe("Error en la validacion del certificado: " + e); //$NON-NLS-1$
 							}
 							finally {
 							    SignDataPanel.this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 							}
 						}
 					});
-	                
+
 	                Utils.remarcar(this.validateCertButton);
 	                Utils.setContrastColor(this.validateCertButton);
 	                Utils.setFontBold(this.validateCertButton);
@@ -286,9 +288,9 @@ final class SignDataPanel extends JPanel {
         detailPanelText.setDisplayedMnemonic(KeyEvent.VK_D);
         Utils.setContrastColor(detailPanelText);
         Utils.setFontBold(detailPanelText);
-        
+
         this.setLayout(new GridBagLayout());
-        
+
         final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 1.0;
@@ -344,21 +346,27 @@ final class SignDataPanel extends JPanel {
         signInfo.setSignData(signData);
         final AOSigner signer = AOSignerFactory.getSigner(signData);
         if (signer == null) {
-            Logger.getLogger("es.gob.afirma").warning("Formato de firma no reconocido"); //$NON-NLS-1$ //$NON-NLS-2$
+            LOGGER.warning("Formato de firma no reconocido"); //$NON-NLS-1$
             throw new IllegalArgumentException("Formato de firma no reconocido"); //$NON-NLS-1$
         }
         try {
             signInfo.setSignInfo(signer.getSignInfo(signData));
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").warning("Error al leer la informacion de la firma: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+        	LOGGER.warning("Error al leer la informacion de la firma: " + e); //$NON-NLS-1$
         }
-        signInfo.setSignsTree(signer.getSignersStructure(signData, true));
+        try {
+        	signInfo.setSignsTree(signer.getSignersStructure(signData, true));
+        }
+        catch (final Exception e) {
+        	LOGGER.warning("Error al extraer la estructura de firmantes: " + e);  //$NON-NLS-1$
+        	signInfo.setSignsTree(null);
+        }
         try {
             signInfo.setData(signer.getData(signData));
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").warning("Error al extraer los datos firmados: " + e);  //$NON-NLS-1$//$NON-NLS-2$
+        	LOGGER.warning("Error al extraer los datos firmados: " + e);  //$NON-NLS-1$
         }
         return signInfo;
     }
@@ -401,7 +409,7 @@ final class SignDataPanel extends JPanel {
         tree.putClientProperty("JTree.lineStyle", "None"); //$NON-NLS-1$ //$NON-NLS-2$
         tree.getSelectionModel().setSelectionMode(
                 TreeSelectionModel.SINGLE_TREE_SELECTION);
-        
+
         final TreeFocusManager treeFocusManager = new TreeFocusManager(tree, new TreeFocusManagerAction() {
             @Override
             public void openTreeNode(final Object nodeInfo) {
@@ -410,10 +418,10 @@ final class SignDataPanel extends JPanel {
                 }
                 else if (nodeInfo instanceof ShowFileLinkAction) {
                     ((ShowFileLinkAction) nodeInfo).action();
-                }  
+                }
             }
         });
-        
+
         tree.addMouseMotionListener(treeFocusManager);
         tree.addFocusListener(treeFocusManager);
         tree.addMouseListener(treeFocusManager);
@@ -433,7 +441,7 @@ final class SignDataPanel extends JPanel {
         if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
             if (extension == null || "".equals(extension)) { //$NON-NLS-1$
                 return false;
-            }     
+            }
             final Object o = WinRegistryWrapper.get(WinRegistryWrapper.HKEY_CLASSES_ROOT, (extension.startsWith(".")) ? extension : ("." + extension), ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             if (o == null) {
                 return false;
