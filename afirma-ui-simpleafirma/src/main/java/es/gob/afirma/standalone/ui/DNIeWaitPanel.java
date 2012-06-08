@@ -33,7 +33,7 @@ import es.gob.afirma.standalone.Messages;
 
 /** Panel para la espera y detecci&oacute;n autom&aacute;tica de insercci&oacute;n de DNIe.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-public final class DNIeWaitPanel extends JPanel {
+public final class DNIeWaitPanel extends JPanel implements KeyListener {
 
 	/** Evento de DNIe solicitado. */
 	public static final String PROP_HELP_REQUESTED = "F1"; //$NON-NLS-1$
@@ -56,12 +56,26 @@ public final class DNIeWaitPanel extends JPanel {
         this.setLayout(new GridBagLayout());
         this.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-        // Boton para saltar de pantalla
-        final JPanel noDNIPanel = new JPanel();
-        noDNIPanel.setLayout(new GridBagLayout());
+        final JPanel dniePanel = new JPanel();
+        dniePanel.setLayout(new GridBagLayout());
 
-        final JButton noDNIButton = new JButton();
-        noDNIButton.setText(Messages.getString("DNIeWaitPanel.0")); //$NON-NLS-1$
+        // Boton para cargar DNIe
+        final JButton DNIButton = new JButton(Messages.getString("DNIeWaitPanel.4")); //$NON-NLS-1$
+        DNIButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				DNIeWaitPanel.this.firePropertyChange(PROP_DNIE_REQUESTED, false, true);
+			}
+		});
+        DNIButton.setMnemonic('C');
+        DNIButton.getAccessibleContext().setAccessibleDescription(Messages.getString(Messages.getString("DNIeWaitPanel.5"))); //$NON-NLS-1$
+        DNIButton.getAccessibleContext().setAccessibleName(Messages.getString(Messages.getString("DNIeWaitPanel.6"))); //$NON-NLS-1$
+        DNIButton.requestFocus();
+        DNIButton.addKeyListener(this);
+        dniePanel.add(DNIButton);
+
+        // Boton para saltar de pantalla
+        final JButton noDNIButton = new JButton(Messages.getString("DNIeWaitPanel.0")); //$NON-NLS-1$
         noDNIButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -71,27 +85,8 @@ public final class DNIeWaitPanel extends JPanel {
         noDNIButton.setMnemonic('n');
         noDNIButton.getAccessibleContext().setAccessibleDescription(Messages.getString("DNIeWaitPanel.1")); //$NON-NLS-1$
         noDNIButton.getAccessibleContext().setAccessibleName(Messages.getString("DNIeWaitPanel.2")); //$NON-NLS-1$
-        noDNIButton.addKeyListener(new KeyListener() {
-
-			@Override
-			public void keyPressed(final KeyEvent ke) {
-				if (ke != null && ke.getKeyCode() == KeyEvent.VK_ESCAPE) {
-					DNIeWaitPanel.this.firePropertyChange(PROP_DNIE_REJECTED, false, true);
-		        }
-		        else if (ke != null && ke.getKeyCode() == KeyEvent.VK_F1 && (!Platform.OS.MACOSX.equals(Platform.getOS()))) {
-		        	DNIeWaitPanel.this.firePropertyChange(PROP_HELP_REQUESTED, false, true);
-		        }
-			}
-
-			@Override
-			public void keyReleased(final KeyEvent arg0) { /* No necesario */ }
-
-			@Override
-			public void keyTyped(final KeyEvent arg0) { /* No necesario */ }
-
-		});
-        noDNIButton.requestFocus();
-        noDNIPanel.add(noDNIButton);
+        noDNIButton.addKeyListener(this);
+        dniePanel.add(noDNIButton);
 
         // Texto informativo
         final ResizingTextPanel textPanel = new ResizingTextPanel(Messages.getString("DNIeWaitPanel.3")); //$NON-NLS-1$
@@ -119,7 +114,7 @@ public final class DNIeWaitPanel extends JPanel {
         // Configuramos los colores
         if (!LookAndFeelManager.HIGH_CONTRAST) {
             this.setBackground(LookAndFeelManager.WINDOW_COLOR);
-            noDNIPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
+            dniePanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
             textPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
         }
 
@@ -139,7 +134,7 @@ public final class DNIeWaitPanel extends JPanel {
         c.insets = new Insets(0, 0, 0, 0);
         c.gridy = 2;
         c.ipady = 0;
-        this.add(noDNIPanel, c);
+        this.add(dniePanel, c);
 
 //        // Listado de idiomas disponibles
 //        final Locale[] locales = SimpleAfirma.getAvailableLocales();
@@ -182,6 +177,22 @@ public final class DNIeWaitPanel extends JPanel {
 //        this.saf = safirma;
         createUI(pcl);
     }
+
+	@Override
+	public void keyPressed(final KeyEvent ke) {
+		if (ke != null && ke.getKeyCode() == KeyEvent.VK_ESCAPE) {
+			DNIeWaitPanel.this.firePropertyChange(PROP_DNIE_REJECTED, false, true);
+        }
+        else if (ke != null && ke.getKeyCode() == KeyEvent.VK_F1 && (!Platform.OS.MACOSX.equals(Platform.getOS()))) {
+        	DNIeWaitPanel.this.firePropertyChange(PROP_HELP_REQUESTED, false, true);
+        }
+	}
+
+	@Override
+	public void keyReleased(final KeyEvent arg0) { /* No necesario */ }
+
+	@Override
+	public void keyTyped(final KeyEvent arg0) { /* No necesario */ }
 
 //    private static final class LocaleCellRenderer extends DefaultListCellRenderer {
 //
