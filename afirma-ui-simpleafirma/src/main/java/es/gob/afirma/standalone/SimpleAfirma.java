@@ -15,10 +15,6 @@ import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Desktop;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.beans.PropertyChangeEvent;
@@ -33,6 +29,7 @@ import java.util.Locale;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
+import javax.smartcardio.TerminalFactory;
 import javax.swing.JApplet;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -45,8 +42,6 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.signature.SignValidity;
 import es.gob.afirma.signature.SignValidity.SIGN_DETAIL_TYPE;
-import es.gob.afirma.standalone.dnie.DNIeManager;
-import es.gob.afirma.standalone.dnie.DNIeManagerException;
 import es.gob.afirma.standalone.ui.DNIeWaitPanel;
 import es.gob.afirma.standalone.ui.MacHelpHooker;
 import es.gob.afirma.standalone.ui.MainMenu;
@@ -62,7 +57,7 @@ import es.gob.afirma.standalone.ui.UIUtils;
  * <li>-2 - Imposibilidad de abrir el almac&eacute;n local por defecto</li>
  * </ul>
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-public final class SimpleAfirma extends JApplet implements PropertyChangeListener, ActionListener, KeyListener, WindowListener {
+public final class SimpleAfirma extends JApplet implements PropertyChangeListener, WindowListener {
 
 	private static final String APPLICATION_HOME = Platform.getUserHome() + File.separator + ".afirma" + File.separator + "firmafacil"; //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -138,32 +133,24 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
         // por eso usamos un booleano para ver si fallo, en vez de una comprobacion
         // de igualdad a null
         boolean showDNIeScreen = true;
-        DNIeManager dniManager = null;
         try {
-            dniManager = new DNIeManager(this);
+        	showDNIeScreen = !TerminalFactory.getDefault().terminals().list().isEmpty();
         }
-        catch (final DNIeManagerException e) {
-            LOGGER.warning(
-            "Se omite la pantalla de insercion de DNIe: " + e //$NON-NLS-1$
-            );
-            showDNIeScreen = false;
+        catch(final Exception e) {
+        	LOGGER.info("No se ha podido obtener la lista de lectores de tarjetas del sistema"); //$NON-NLS-1$
+        	showDNIeScreen = false;
         }
         if (asApplet) {
             this.container = this;
         }
         else {
-            this.currentPanel = new DNIeWaitPanel(this, this, this);
+            this.currentPanel = new DNIeWaitPanel(this);
             this.container = new MainScreen(this, this.currentPanel, 780, 500);
             this.window = (JFrame) this.container;
             this.window.setTitle(Messages.getString("SimpleAfirma.10")); //$NON-NLS-1$
         }
-        if (showDNIeScreen && dniManager != null) {
-            dniManager.waitForDnie();
-        }
-        else {
-            loadDefaultKeyStore();
-        }
-        if (this.ksManager == null) {
+        if (!showDNIeScreen) {
+        	loadDefaultKeyStore();
         	loadMainApp(true);
         }
     }
@@ -195,58 +182,21 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
     	if (this.ksManager != null) {
     		return;
     	}
-        if (DNIeManager.BLOWN_DNI_INSERTED.equals(evt.getPropertyName())) {
-            if (DEBUG)
-             {
-                LOGGER.info("Recibido evento de BLOWN DNI INSERTED");  //$NON-NLS-1$
-            }
-            loadDefaultKeyStore();
+    	if (DNIeWaitPanel.PROP_DNIE_REJECTED.equals(evt.getPropertyName())) {
+    		loadDefaultKeyStore();
             loadMainApp(true);
-            UIUtils.showErrorMessage(
-                    this.container,
-                    Messages.getString("SimpleAfirma.6"), //$NON-NLS-1$
-                    Messages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-                    JOptionPane.ERROR_MESSAGE
-            );
-            return;
-        }
-        else if (DNIeManager.CARD_EXCEPTION.equals(evt.getPropertyName())) {
-            if (DEBUG)
-             {
-                LOGGER.info("Recibido evento de CARD EXCEPTION"); //$NON-NLS-1$
-            }
-            UIUtils.showErrorMessage(
-                    this.container,
-                    Messages.getString("SimpleAfirma.1"), //$NON-NLS-1$
-                    Messages.getString("SimpleAfirma.13"), //$NON-NLS-1$
-                    JOptionPane.WARNING_MESSAGE
-            );
-            return;
-        }
-        else if (DNIeManager.NOT_DNI_INSERTED.equals(evt.getPropertyName())) {
-            if (DEBUG)
-             {
-                LOGGER.info("Recibido evento de NOT DNI INSERTED"); //$NON-NLS-1$
-            }
-            UIUtils.showErrorMessage(
-                    this.container,
-                    Messages.getString("SimpleAfirma.12"), //$NON-NLS-1$
-                    Messages.getString("SimpleAfirma.13"), //$NON-NLS-1$
-                    JOptionPane.WARNING_MESSAGE
-            );
-            return;
-        }
-        else if (DNIeManager.DNI_INSERTED.equals(evt.getPropertyName())) {
-            if (DEBUG) {
-                LOGGER.info("Recibido evento de DNI INSERTED"); //$NON-NLS-1$
-            }
+    	}
+    	if (DNIeWaitPanel.PROP_HELP_REQUESTED.equals(evt.getPropertyName())) {
+    		showHelp();
+    	}
+    	if (DNIeWaitPanel.PROP_DNIE_REQUESTED.equals(evt.getPropertyName())) {
             this.container.setCursor(new Cursor(Cursor.WAIT_CURSOR));
             try {
                 new SimpleKeyStoreManagerWorker(this, null, true).execute();
             }
             catch (final Exception e) {
                 LOGGER.severe(
-                      "Fallo la inicializacion del DNIe, se intentara el almacen por defecto del sistema: " + e //$NON-NLS-1$
+                  "Fallo la inicializacion del DNIe, se intentara el almacen por defecto del sistema: " + e //$NON-NLS-1$
                 );
                 loadDefaultKeyStore();
             }
@@ -254,8 +204,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
                 this.container.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             }
             loadMainApp(true);
-        }
-
+    	}
     }
 
     /** Carga el panel de firma en el interfaz.
@@ -293,28 +242,6 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
     }
 
     @Override
-    public void actionPerformed(final ActionEvent ae) {
-        loadDefaultKeyStore();
-        loadMainApp(true);
-    }
-
-    @Override
-    public void keyPressed(final KeyEvent ke) {
-        if (ke != null && ke.getKeyCode() == KeyEvent.VK_ESCAPE) {
-            loadDefaultKeyStore();
-            loadMainApp(true);
-        }
-        else if (ke != null && ke.getKeyCode() == KeyEvent.VK_F1 && (!Platform.OS.MACOSX.equals(Platform.getOS()))) {
-            showHelp();
-        }
-        else {
-            if (ke!=null && DEBUG) {
-                LOGGER.info("Tecla pulsada: " + ke.getKeyCode()); //$NON-NLS-1$
-            }
-        }
-    }
-
-    @Override
     public void windowClosing(final WindowEvent we) {
         if (JOptionPane.showConfirmDialog(this.container, Messages.getString("SimpleAfirma.47"), //$NON-NLS-1$
                                           Messages.getString("SimpleAfirma.48"), //$NON-NLS-1$
@@ -323,9 +250,6 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
             closeApplication(0);
         }
     }
-
-    @Override public void keyTyped(final KeyEvent ke) { /* No implementado */ }
-    @Override public void keyReleased(final KeyEvent ke) { /* No implementado */ }
 
     @Override public void windowOpened(final WindowEvent we) { /* No implementado */ }
     @Override public void windowClosed(final WindowEvent we) { /* No implementado */ }
@@ -540,7 +464,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
         }
         this.setSize(new Dimension(780, 500));
         this.setLayout(new BorderLayout());
-        this.currentPanel = new DNIeWaitPanel(this, this, this);
+        this.currentPanel = new DNIeWaitPanel(this);
         this.add(this.currentPanel, BorderLayout.CENTER);
         this.setVisible(true);
     }
