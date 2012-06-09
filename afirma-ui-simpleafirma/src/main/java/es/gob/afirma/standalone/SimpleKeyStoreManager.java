@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -12,6 +12,8 @@ package es.gob.afirma.standalone;
 
 import java.awt.Component;
 import java.util.logging.Logger;
+
+import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.main.callbacks.NullPasswordCallback;
@@ -42,6 +44,16 @@ final class SimpleKeyStoreManager {
                 return AOKeyStoreManagerFactory.getAOKeyStoreManager(AOKeyStore.DNIEJAVA, null, null, null, parent);
             }
             catch (final Exception e) {
+            	if ("es.gob.jmulticard.apdu.connection.CardNotPresentException".equals(e.getClass().getName())) { //$NON-NLS-1$
+            		if (0 == JOptionPane.showConfirmDialog(parent, Messages.getString("SimpleKeyStoreManager.1"), Messages.getString("SimpleKeyStoreManager.2"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE)) { //$NON-NLS-1$ //$NON-NLS-2$
+            			return getKeyStore(true, parent);
+            		}
+            	}
+            	else if ("es.gob.jmulticard.card.InvalidCardException".equals(e.getClass().getName())) { //$NON-NLS-1$
+            		if (0 == JOptionPane.showConfirmDialog(parent, Messages.getString("SimpleKeyStoreManager.3"), Messages.getString("SimpleKeyStoreManager.4"), JOptionPane.WARNING_MESSAGE)) { //$NON-NLS-1$ //$NON-NLS-2$
+            			return getKeyStore(true, parent);
+            		}
+            	}
                 Logger.getLogger("es.gob.afirma").warning("No se ha podido inicializar el controlador 100% Java del DNIe: " + e); //$NON-NLS-1$ //$NON-NLS-2$
             }
         }
