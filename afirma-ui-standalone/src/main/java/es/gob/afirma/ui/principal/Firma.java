@@ -181,15 +181,15 @@ final class Firma extends JPanel {
             catch (final IOException e) {
             	// Condiciones especificas para el proveedor Java de DNIe
             	final String msg;
-            	if (e.getClass().getName().equals("es.gob.jmulticard.card.BurnedDnieCardException")) { //$NON-NLS-1$
+            	if (e.getClass().getName().equals("es.gob.jmulticard.card.dnie.BurnedDnieCardException")) { //$NON-NLS-1$
             		msg = Messages.getString("Firma.msg.error.dnie.BurnedDnieCardException"); //$NON-NLS-1$
-            	} 
+            	}
             	else if (e.getClass().getName().equals("es.gob.jmulticard.card.InvalidCardException")) { //$NON-NLS-1$
             		msg = Messages.getString("Firma.msg.error.dnie.InvalidCardException"); //$NON-NLS-1$
-            	} 
+            	}
             	else if (e.getClass().getName().equals("es.gob.jmulticard.apdu.connection.CardNotPresentException")) { //$NON-NLS-1$
             		msg = Messages.getString("Firma.msg.error.dnie.CardNotPresentException"); //$NON-NLS-1$
-            	} 
+            	}
             	else if (e.getClass().getName().equals("es.gob.jmulticard.apdu.connection.NoReadersFoundException")) { //$NON-NLS-1$
             		msg = Messages.getString("Firma.msg.error.dnie.NoReadersFoundException"); //$NON-NLS-1$
             	}
