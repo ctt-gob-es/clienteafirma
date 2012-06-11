@@ -44,6 +44,7 @@ final class SimpleKeyStoreManager {
                 return AOKeyStoreManagerFactory.getAOKeyStoreManager(AOKeyStore.DNIEJAVA, null, null, null, parent);
             }
             catch (final Exception e) {
+            	System.out.println(e.getClass().getName());
             	if ("es.gob.jmulticard.apdu.connection.CardNotPresentException".equals(e.getClass().getName())) { //$NON-NLS-1$
             		if (0 == JOptionPane.showConfirmDialog(parent, Messages.getString("SimpleKeyStoreManager.1"), Messages.getString("SimpleKeyStoreManager.2"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE)) { //$NON-NLS-1$ //$NON-NLS-2$
             			return getKeyStore(true, parent);
@@ -54,7 +55,7 @@ final class SimpleKeyStoreManager {
             			return getKeyStore(true, parent);
             		}
             	}
-            	else if ("es.gob.jmulticard.card.BurnedDnieCardException".equals(e.getClass().getName())) { //$NON-NLS-1$
+            	else if ("es.gob.jmulticard.card.dnie.BurnedDnieCardException".equals(e.getClass().getName())) { //$NON-NLS-1$
             		JOptionPane.showMessageDialog(parent, Messages.getString("SimpleKeyStoreManager.5"), Messages.getString("SimpleKeyStoreManager.6"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
             	}
             	else {
