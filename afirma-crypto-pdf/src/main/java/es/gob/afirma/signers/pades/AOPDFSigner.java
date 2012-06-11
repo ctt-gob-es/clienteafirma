@@ -345,10 +345,12 @@ public final class AOPDFSigner implements AOSigner {
      *   </dd>
      *  <dt><b><i>allowSigningCertifiedPdfs</i></b></dt>
      *   <dd>
-     *    Si se establece a <code>true</code> permite la firma o cofirma de PDF certificados, si no se establece o se establece a <code>false</code> se
-     *    lanza una excepci&oacute;n en caso de intentar firmar o cofirmar un PDF certificado.<br>
-     *    <b>Solo tiene efecto cuando <code>headLess</code> est&aacute;
-     *    establecido a <code>true</code>, si <code>headLess</code> est&aacute; a <code>false</code> se ignora este par&aacute;metro.</b><br>
+     *    Si se establece a <code>true</code> permite la firma o cofirma de PDF certificados sin consultarlo al usuario, si se establece a
+     *    <code>false</code> o cualquier otro valor se lanza una excepci&oacute;n en caso de intentar firmar o cofirmar un PDF certificado y
+     *    si no se establece se mostrar&aacute; un di&aacute;logo al usuario para que confirme que desea realizar la firma a pesar de que
+     *    el resultado ser&aacute;n una firma no v&aacute;lida.<br>
+     *    <b>Si el par&aacute;metro <code>headLess</code> est&aacute; establecido a <code>true</code>, no podr&aacute; mostrar el di&aacute;logo
+     *    de confirmaci&oacute;n as&iacute; que llegados a este punto se lanzar&aacute; una excepci&oacute;n.</b><br>
      *    No se soporta el cifrado de documentos PDF con certificados o con algoritmo AES256.
      *   </dd>
      *  <dt><b><i>tsaURL</i></b></dt>
@@ -478,10 +480,12 @@ public final class AOPDFSigner implements AOSigner {
      *   </dd>
      *  <dt><b><i>allowSigningCertifiedPdfs</i></b></dt>
      *   <dd>
-     *    Si se establece a <code>true</code> permite la firma o cofirma de PDF certificados, si no se establece o se establece a <code>false</code> se
-     *    lanza una excepci&oacute;n en caso de intentar firmar o cofirmar un PDF certificado.<br>
-     *    <b>Solo tiene efecto cuando <code>headLess</code> est&aacute;
-     *    establecido a <code>true</code>, si <code>headLess</code> est&aacute; a <code>false</code> se ignora este par&aacute;metro.</b><br>
+     *    Si se establece a <code>true</code> permite la firma o cofirma de PDF certificados sin consultarlo al usuario, si se establece a
+     *    <code>false</code> o cualquier otro valor se lanza una excepci&oacute;n en caso de intentar firmar o cofirmar un PDF certificado y
+     *    si no se establece se mostrar&aacute; un di&aacute;logo al usuario para que confirme que desea realizar la firma a pesar de que
+     *    el resultado ser&aacute;n una firma no v&aacute;lida.<br>
+     *    <b>Si el par&aacute;metro <code>headLess</code> est&aacute; establecido a <code>true</code>, no podr&aacute; mostrar el di&aacute;logo
+     *    de confirmaci&oacute;n as&iacute; que llegados a este punto se lanzar&aacute; una excepci&oacute;n.</b><br>
      *    No se soporta el cifrado de documentos PDF con certificados o con algoritmo AES256.
      *   </dd>
      *  <dt><b><i>tsaURL</i></b></dt>
