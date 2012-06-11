@@ -22,8 +22,8 @@ import java.util.logging.Logger;
 
 import junit.framework.Assert;
 
-import org.junit.Test;
 import org.junit.Ignore;
+import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
