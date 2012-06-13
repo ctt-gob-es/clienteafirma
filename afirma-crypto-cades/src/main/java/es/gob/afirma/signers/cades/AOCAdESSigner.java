@@ -452,10 +452,14 @@ public final class AOCAdESSigner implements AOSigner {
      *        mediante objetos <code>AOSimpleSignInfo</code>, si es <code>false</code> un &aacute;rbol con los nombres comunes de los
      *        titulares de los certificados usados para cada firma.
      * @return &Aacute;rbol de nodos de firma o <code>null</code> en caso de
-     *         error. */
-    public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
+     *         error.
+     * @throws AOInvalidFormatException Cuando los datos introducidos no son una firma CAdES. */
+    public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) throws AOInvalidFormatException {
     	new BCChecker().checkBouncyCastle();
-        try {
+    	if (!CAdESValidator.isCAdESValid(sign)) {
+    		throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
+    	}
+    	try {
             return new ReadNodesTree().readNodesTree(sign, asSimpleSignInfo);
         }
         catch (final Exception ex) {
