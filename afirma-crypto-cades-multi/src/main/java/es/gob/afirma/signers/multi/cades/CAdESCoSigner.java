@@ -471,7 +471,7 @@ final class CAdESCoSigner {
             signedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
         }
         else {
-            throw new IllegalStateException("No se puede crear la firma ya que no se ha encontrado un message digest valido"); //$NON-NLS-1$
+            throw new IllegalStateException("No se puede crear la cofirma ya que no se han encontrado ni los datos firmados ni una huella digital valida en la firma"); //$NON-NLS-1$
         }
 
         final ASN1OctetString sign2;
