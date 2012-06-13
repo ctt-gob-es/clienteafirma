@@ -673,6 +673,9 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 				}
 			}
 			// Si no se ha podido detectar, devolvemos la codificacion por defecto
+			LOGGER.warning(
+					"No se ha podido autodetectar el juego de caracteres, se devolvera el por defecto del sistema" //$NON-NLS-1$
+			);
 			return getCharset("default", null); //$NON-NLS-1$
 		}
 		else if ("default".equalsIgnoreCase(charset) || charset == null) { //$NON-NLS-1$
