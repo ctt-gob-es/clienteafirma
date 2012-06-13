@@ -667,8 +667,13 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			detector.handleData(text, 0, text.length);
 			detector.dataEnd();
 			if (detector.isDone()) {
-				return detector.getDetectedCharset();
+				final String detectedCharset = detector.getDetectedCharset();
+				if (detectedCharset != null) {
+					return detectedCharset;
+				}
 			}
+			// Si no se ha podido detectar, devolvemos la codificacion por defecto
+			return getCharset("default", null); //$NON-NLS-1$
 		}
 		else if ("default".equalsIgnoreCase(charset) || charset == null) { //$NON-NLS-1$
 			return AccessController.doPrivileged(new GetPropertyAction("file.encoding")); //$NON-NLS-1$
