@@ -55,10 +55,6 @@
     <module>afirma-ui-standalone</module>
     <module>afirma-ui-simpleafirma</module>
     <module>afirma-ui-applet</module>
-    <module>afirma-lib-jmimemagic</module>
-    <module>afirma-lib-oro</module>
-    <module>afirma-lib-juniversalchardet</module>
     <module>afirma-platformcheck</module>
-   
   </modules>
 </project>
