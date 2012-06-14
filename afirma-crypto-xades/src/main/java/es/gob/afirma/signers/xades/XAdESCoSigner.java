@@ -78,107 +78,6 @@ final class XAdESCoSigner {
      *  Dado que todas las firmas XAdES son XMLDSig pero no todas las firmas XMLDSig son XAdES,
      *  el resultado global de la firma se adec&uacute;a al estandar mas amplio, XMLDSig en este caso.
      * </p>
-     * @param data No se utiliza.
-     * @param sign Documento con las firmas iniciales.
-     * @param algorithm Algoritmo a usar para la firma.
-     * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
-     * <ul>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
-     * </ul>
-     * @param keyEntry Entrada que apunta a la clave privada a usar para firmar.
-     * @param xParams Par&aacute;metros adicionales para la firma.
-     * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
-     * <dl>
-     *  <dt><b><i>policyIdentifier</i></b></dt>
-     *   <dd>Identificador de la pol&iacute;tica de firma (normalmente una URL hacia la pol&iacute;tica en formato XML procesable)</dd>
-     *  <dt><b><i>policyIdentifierHash</i></b></dt>
-     *   <dd>
-     *    Huella digital del documento de pol&iacute;tica de firma (normlamente del mismo fichero en formato XML procesable).
-     *    Si no se indica, es obligatorio que el par&aacute;metro <code>policyIdentifier</code> sea una URL accesible universalmente
-     *   </dd>
-     *  <dt><b><i>policyIdentifierHashAlgorithm</i></b></dt>
-     *   <dd>Algoritmo usado para el c&aacute;lculo de la huella digital indicada en el par&aacute;metro <code>policyIdentifierHash</code>
-     *  <dt><b><i>policyDescription</i></b></dt>
-     *   <dd>Descripci&oacute;n textual de la pol&iacute;tica</dd>
-     *  <dt><b><i>policyQualifier</i></b></dt>
-     *   <dd>URL hacia el documento (legible por personas, normalmente en formato PDF) descriptivo de la pol&iacute;tica de firma</dd>
-	 *	<dt><b><i>includeOnlySignningCertificate</i></b></dt>
-	 *   <dd>Indica, mediante un {@code true} o {@code false}, que debe
-	 *   indicarse en la firma &uacute;nicamente el certificado utilizado
-	 *   para firmar y no su cadena de certificaci&oacute;n completa.
-	 *   Por defecto, se incluir&aacute; toda la cadena de certificaci&oacute;n.</dd>
-     *  <dt><b><i>signerClaimedRole</i></b></dt>
-     *   <dd>Cargo atribuido para el firmante</dd>
-     *  <dt><b><i>signerCertifiedRole</i></b></dt>
-     *   <dd>Cargo confirmado para el firmante</dd>
-     *  <dt><b><i>signatureProductionCity</i></b></dt>
-     *   <dd>Ciudad en la que se realiza la firma</dd>
-     *  <dt><b><i>signatureProductionProvince</i></b></dt>
-     *   <dd>Provincia en la que se realiza la firma</dd>
-     *  <dt><b><i>signatureProductionPostalCode</i></b></dt>
-     *   <dd>C&oacute;digo postal en el que se realiza la firma</dd>
-     *  <dt><b><i>signatureProductionCountry</i></b></dt>
-     *   <dd>Pa&iacute;s en el que se realiza la firma</dd>
-     *  <dt><b><i>referencesDigestMethod</i></b></dt>
-     *   <dd>
-     *    Algoritmo de huella digital a usar en las referencias XML (referencesDigestMethod). Debe indicarse como una URL,
-     *    acept&aacute;ndose los siguientes valores:
-     *    <ul>
-     *     <li><i>http://www.w3.org/2000/09/xmldsig#sha1</i> (SHA-1)</li>
-     *     <li><i>http://www.w3.org/2001/04/xmlenc#sha256</i> (SHA-256, valor recomendado)</li>
-     *     <li><i>http://www.w3.org/2001/04/xmlenc#sha512</i> (SHA-512)</li>
-     *     <li><i>http://www.w3.org/2001/04/xmlenc#ripemd160 (RIPEMD-160)</i></li>
-     *    </ul>
-     *   </dd>
-     *  <dt><b><i>canonicalizationAlgorithm</i></b></dt>
-     *   <dd>Algoritmo de canonicalizaci&oacute;n</dd>
-     *  <dt><b><i>xadesNamespace</i></b></dt>
-     *   <dd>
-     *    URL de definici&oacute;n del espacio de nombres de XAdES (y por extensi&oacute;n, versi&oacute;n de XAdES).
-     *    Si se establece este par&aacute;metro es posible que se necesite establecer tambi&eacute;n el par&aacute;metro
-     *    <code>signedPropertiesTypeUrl</code> para evitar incoherencias en la versi&oacute;n de XAdES.
-     *   </dd>
-     *  <dt><b><i>signedPropertiesTypeUrl</i></b></dt>
-     *   <dd>
-     *    URL de definici&oacute;n del tipo de las propiedades firmadas (<i>Signed Properties</i>) de XAdES.
-     *    Si se establece este par&aacute;metro es posible que se necesite establecer tambi&eacute;n el par&aacute;metro
-     *    <code>xadesNamespace</code> para evitar incoherencias en la versi&oacute;n de XAdES.<br>
-     *    Si no se establece se usa el valor por defecto: <a href="http://uri.etsi.org/01903#SignedProperties">http://uri.etsi.org/01903#SignedProperties</a>.
-     *   </dd>
-     *  <dt><b><i>applySystemDate</i></b></dt>
-     *   <dd>
-     *    Indica si se debe introducir en la firma el atributo <i>signingTime</i> con la fecha actual
-     *    del sistema. Por defecto, se encuentra a {@code true}.
-     *   </dd>
-     * </dl>
-     * @return Cofirma en formato XAdES
-     * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-	static byte[] cosign(final byte[] data,
-                         final byte[] sign,
-                         final String algorithm,
-                         final PrivateKeyEntry keyEntry,
-                         final Properties xParams) throws AOException {
-
-		return cosign(sign, algorithm, keyEntry, xParams);
-    }
-
-    /** Cofirma datos en formato XAdES.
-     * <p>
-     *  Este m&eacute;todo firma todas las referencias a datos declaradas en la firma original,
-     *  ya apunten estas a datos, hojas de estilo o cualquier otro elemento. En cada referencia
-     *  firmada se introduciran las mismas transformaciones que existiesen en la firma original.
-     * </p>
-     * <p>
-     *  A nivel de formato interno, cuando cofirmamos un documento ya firmado previamente, esta
-     *  firma previa no se modifica. Si tenemos en cuenta que XAdES es en realidad un subconjunto
-     *  de XMLDSig, el resultado de una cofirma XAdES sobre un documento firmado previamente con
-     *  XMLDSig (o viceversa), son dos firmas independientes, una en XAdES y otra en XMLDSig.<br>
-     *  Dado que todas las firmas XAdES son XMLDSig pero no todas las firmas XMLDSig son XAdES,
-     *  el resultado global de la firma se adec&uacute;a al estandar mas amplio, XMLDSig en este caso.
-     * </p>
      * @param sign Documento con las firmas iniciales.
      * @param algorithm Algoritmo a usar para la firma.
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
@@ -474,5 +373,4 @@ final class XAdESCoSigner {
 
         return Utils.writeXML(rootSig, originalXMLProperties, null, null);
     }
-
 }

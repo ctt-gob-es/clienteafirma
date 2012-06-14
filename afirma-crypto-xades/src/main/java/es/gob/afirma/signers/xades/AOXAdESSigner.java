@@ -833,7 +833,7 @@ public final class AOXAdESSigner implements AOSigner {
      *  Dado que todas las firmas XAdES son XMLDSig pero no todas las firmas XMLDSig son XAdES,
      *  el resultado global de la firma se adec&uacute;a al estandar mas amplio, XMLDSig en este caso.
      * </p>
-     * @param data Datos que deseamos firmar.
+     * @param data No se utiliza.
      * @param sign Documento con las firmas iniciales.
      * @param algorithm Algoritmo a usar para la firma.
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
@@ -916,7 +916,7 @@ public final class AOXAdESSigner implements AOSigner {
                          final String algorithm,
                          final PrivateKeyEntry keyEntry,
                          final Properties xParams) throws AOException {
-    	return XAdESCoSigner.cosign(data, sign, algorithm, keyEntry, xParams);
+    	return XAdESCoSigner.cosign(sign, algorithm, keyEntry, xParams);
     }
 
     /** Cofirma datos en formato XAdES.
@@ -1014,6 +1014,11 @@ public final class AOXAdESSigner implements AOSigner {
                          final String algorithm,
                          final PrivateKeyEntry keyEntry,
                          final Properties extraParams) throws AOException {
+
+    	if (!isSign(sign)) {
+    		throw new AOInvalidFormatException("No se ha indicado una firma XAdES para cofirmar"); //$NON-NLS-1$
+    	}
+
     	return XAdESCoSigner.cosign(sign, algorithm, keyEntry, extraParams);
     }
 
@@ -1100,11 +1105,19 @@ public final class AOXAdESSigner implements AOSigner {
                               final Object[] targets,
                               final PrivateKeyEntry keyEntry,
                               final Properties xParams) throws AOException {
+    	if (!isSign(sign)) {
+    		throw new AOInvalidFormatException("No se ha indicado una firma XAdES para contrafirmar"); //$NON-NLS-1$
+    	}
+
     	return XAdESCounterSigner.countersign(sign, algorithm, targetType, targets, keyEntry, xParams);
     }
 
     /** {@inheritDoc} */
     public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) throws AOInvalidFormatException {
+
+    	if (!isSign(sign)) {
+    		throw new AOInvalidFormatException("Los datos indicados no son una firma XAdES compatible"); //$NON-NLS-1$
+    	}
 
         // Obtenemos el arbol del documento
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -1248,8 +1261,7 @@ public final class AOXAdESSigner implements AOSigner {
         return true;
     }
 
-    /** Comprueba que los nodos de firma proporcionados sean firmas en el formato
-     * dado.
+    /** Comprueba que los nodos de firma proporcionados sean firmas en formato XAdES.
      * @param signNodes
      *        Listado de nodos de firma.
      * @return Devuelve {@code true} cuando todos los nodos sean firmas en este
