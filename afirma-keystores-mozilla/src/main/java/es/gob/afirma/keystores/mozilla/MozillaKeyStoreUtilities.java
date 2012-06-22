@@ -345,7 +345,9 @@ final class MozillaKeyStoreUtilities {
                     "/lib", //$NON-NLS-1$
                     "/usr/lib", //$NON-NLS-1$
                     "/usr/lib/nss", //$NON-NLS-1$
-                    "/opt/fedora-ds/clients/lib" //$NON-NLS-1$
+                    "/opt/fedora-ds/clients/lib", //$NON-NLS-1$
+                    "/opt/google/chrome", /* NSS de Chrome cuando no hay NSS de Mozilla de la misma arquietctura */ //$NON-NLS-1$
+                    "/usr/lib64" /* NSS cuando solo hay Firefox de 64 en el sistema */ //$NON-NLS-1$
                 };
 
         for (final String path : paths) {
@@ -622,10 +624,10 @@ final class MozillaKeyStoreUtilities {
     }
 
 	private static final String P11_CONFIG_VALID_CHARS = ":\\0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_.\u007E"; //$NON-NLS-1$
-	
+
 	private static final String DIR_TAG = "<DIR>"; //$NON-NLS-1$
     private static final String JUNCTION_TAG = "<JUNCTION>"; //$NON-NLS-1$
-   
+
     private static String getShortPath(final String originalPath) {
           if (originalPath == null) {
                  return originalPath;
