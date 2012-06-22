@@ -2324,13 +2324,6 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     		return null;
 		}
 
-		if (!supportHashSign(this.sigFormat)) {
-			getLogger().severe("La firma de hash no esta soportada para el formato " + //$NON-NLS-1$
-					SignApplet.this.getMassiveSignatureHelper().getDefaultSignatureFormat());
-            SignApplet.this.setError(AppletMessages.getString("SignApplet.198", //$NON-NLS-1$
-            		SignApplet.this.getMassiveSignatureHelper().getDefaultSignatureFormat()));
-		}
-
 		try {
 			return AccessController.doPrivileged(new java.security.PrivilegedAction<String>() {
 				/** {@inheritDoc} */
@@ -3149,8 +3142,21 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     @Deprecated
     public boolean cipherData(final byte[] dat) {
 
+    	// Establecemos el fichero seleccionado (si es que lo hay) para que se procese
+    	// si no se indicaron los datos en claro para cifrar
+
+    	if (getFileUri() != null) {
+    		try {
+				this.cipherManager.setFileUri(AOUtil.createURI(getFileUri()), false);
+			} catch (final AOException e) {
+				setError(AppletMessages.getString("SignApplet.15") + getFileUri()); //$NON-NLS-1$
+	        	LOGGER.severe("Error: " + e.toString()); //$NON-NLS-1$
+	        	return false;
+			}
+    	}
+
         // El resultado queda almacenado en el objeto CipherManager
-        try {
+    	try {
         	AccessController.doPrivileged(new CipherAction(this.cipherManager, dat));
         } catch (final PrivilegedActionException e) {
         	if (e.getCause() instanceof AOCancelledOperationException) {
@@ -3207,6 +3213,18 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
      */
     @Deprecated
     public boolean decipherData(final byte[] dat) {
+
+    	// Establecemos el fichero seleccionado (si es que lo hay) para que se procese
+    	// si no se indicaron los datos en claro para descifrar
+    	if (getFileUri() != null) {
+    		try {
+				this.cipherManager.setFileUri(AOUtil.createURI(getFileUri()), false);
+			} catch (final AOException e) {
+				setError(AppletMessages.getString("SignApplet.15") + getFileUri()); //$NON-NLS-1$
+	        	LOGGER.severe("Error: " + e.toString()); //$NON-NLS-1$
+	        	return false;
+			}
+    	}
 
         // El resultado quedara almacenado en el objeto CipherManager
     	try {
@@ -4425,22 +4443,5 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     		LOGGER.warning("No se pudo identificar el idioma a partir del locale indicado: " + e); //$NON-NLS-1$
     		return null;
     	}
-    }
-
-    private boolean supportHashSign(final String format) {
-
-    	final String[] unsupportedFormats = new String[] {
-    			AOSignConstants.SIGN_FORMAT_PDF,
-    			AOSignConstants.SIGN_FORMAT_ODF,
-    			AOSignConstants.SIGN_FORMAT_OOXML,
-    			AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED,
-    			AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED
-    	};
-    	for (final String unsupportedFormat : unsupportedFormats) {
-    		if (unsupportedFormat.equals(format)) {
-    			return false;
-    		}
-    	}
-    	return true;
     }
 }
