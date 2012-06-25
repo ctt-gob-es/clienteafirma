@@ -2958,7 +2958,10 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     /** {@inheritDoc} */
     public String getKey() {
         LOGGER.info("Invocando getKey"); //$NON-NLS-1$
-        return Base64.encode(this.cipherManager.getCipherKey());
+        if (this.cipherManager.getCipherKey() != null) {
+        	return Base64.encode(this.cipherManager.getCipherKey());
+        }
+        return null;
     }
 
     /** {@inheritDoc} */
