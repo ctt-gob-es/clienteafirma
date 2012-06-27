@@ -279,6 +279,12 @@ public final class AOXMLDSigSigner implements AOSigner {
      *    normalmente (puede mostrar di&aacute;logos, por ejemplo, para la dereferenciaci&oacute;n de hojas de estilo enlazadas con rutas relativas).
      *    &Uacute;til para los procesos desatendidos y por lotes
      *   </dd>
+     *  <dt><b><i>includeOnlySignningCertificate</i></b></dt>
+	 *   <dd>Indica, mediante un {@code true} o {@code false}, que debe
+	 *   incluirse en la firma &uacute;nicamente el certificado utilizado
+	 *   para firmar y no su cadena de certificaci&oacute;n completa.
+	 *   Por defecto, se incluir&aacute; toda la cadena de certificaci&oacute;n.
+	 *   </dd>
      * </dl>
      * @return Firma en formato XMLDSig 1.0
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
@@ -945,7 +951,16 @@ public final class AOXMLDSigSigner implements AOSigner {
             final X509Certificate cert = (X509Certificate) keyEntry.getCertificate();
             content.add(kif.newKeyValue(cert.getPublicKey()));
 
-            Certificate[] certs = keyEntry.getCertificateChain();
+            // Si se nos ha pedido expresamente que no insertemos la cadena de certificacion,
+            // insertamos unicamente el certificado firmante. Tambien lo haremos cuando al
+            // recuperar la cadena nos devuelva null
+            Certificate[] certs = null;
+            final boolean onlySignningCert = Boolean.parseBoolean(
+            		extraParams.getProperty(
+            				"includeOnlySignningCertificate", Boolean.FALSE.toString())); //$NON-NLS-1$
+			if (!onlySignningCert) {
+				certs = keyEntry.getCertificateChain();
+			}
             if (certs == null) {
                 certs = new Certificate[] {
                     keyEntry.getCertificate()
@@ -1156,7 +1171,52 @@ public final class AOXMLDSigSigner implements AOSigner {
         return baosSig.toByteArray();
     }
 
-    /** {@inheritDoc} */
+    /** Cofirma una firma en formato XMLdSig.
+     * <p>
+     *  Este m&eacute;todo firma todas las referencias a datos declaradas en la firma original,
+     *  ya apunten estas a datos, hojas de estilo o cualquier otro elemento. En cada referencia
+     *  firmada se introduciran las mismas transformaciones que existiesen en la firma original.
+     * </p>
+     * <p>
+     *  A nivel de formato interno, cuando cofirmamos un documento ya firmado previamente, esta
+     *  firma previa no se modifica. Si tenemos en cuenta que XAdES es en realidad un subconjunto
+     *  de XMLDSig, el resultado de una cofirma XMLdSig sobre un documento firmado previamente con
+     *  XAdES (o viceversa), son dos firmas independientes, una en XAdES y otra en XMLDSig.<br>
+     *  Dado que todas las firmas XAdES son XMLDSig pero no todas las firmas XMLDSig son XAdES,
+     *  el resultado global de la firma se adec&uacute;a al estandar mas amplio, XMLDSig en este caso.
+     * </p>
+     * @param data No se utiliza.
+     * @param sign Firma que se desea cofirmar.
+     * @param algorithm Algoritmo a usar para la firma.
+     * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
+     * <ul>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i><br>(<code>AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA</code>)</li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i><br>(<code>AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA</code>)</li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i><br>(<code>AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA</code>)</li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i><br>(<code>AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA</code>)</li>
+     * </ul>
+     * @param keyEntry Entrada que apunta a la clave privada a usar para firmar
+     * @param xParams Par&aacute;metros adicionales para la firma.
+     * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
+     * <dl>
+     *  <dt><b><i>xmlSignaturePrefix</i></b></dt>
+     *   <dd>
+     *    Prefijo de espacio de nombres XML para los nodos de firma. Si no se especifica este par&aacute;metro
+     *    se usa el valor por defecto (<i>ds</i>).
+     *   </dd>
+     *  <dt><b><i>referencesDigestMethod</i></b></dt>
+     *   <dd>Algoritmo de huella digital a usar en las referencias XML</dd>
+     *  <dt><b><i>canonicalizationAlgorithm</i></b></dt>
+     *   <dd>Algoritmo de canonicalizaci&oacute;n<i>n</i></dd>
+     *  <dt><b><i>includeOnlySignningCertificate</i></b></dt>
+	 *   <dd>Indica, mediante un {@code true} o {@code false}, que debe
+	 *   incluirse en la firma &uacute;nicamente el certificado utilizado
+	 *   para firmar y no su cadena de certificaci&oacute;n completa.
+	 *   Por defecto, se incluir&aacute; toda la cadena de certificaci&oacute;n.
+	 *   </dd>
+     * </dl>
+     * @return Firma en formato XMLDSig 1.0
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     public byte[] cosign(final byte[] data,
                          final byte[] sign,
                          final String algorithm,
@@ -1313,13 +1373,27 @@ public final class AOXMLDSigSigner implements AOSigner {
 
             // KeyInfo
             final KeyInfoFactory kif = fac.getKeyInfoFactory();
-            final List<Object> x509Content = new ArrayList<Object>();
             final X509Certificate cert = (X509Certificate) keyEntry.getCertificate();
-            x509Content.add(cert);
 
             final List<Object> content = new ArrayList<Object>();
             content.add(kif.newKeyValue(cert.getPublicKey()));
-            content.add(kif.newX509Data(x509Content));
+
+            // Si se nos ha pedido expresamente que no insertemos la cadena de certificacion,
+            // insertamos unicamente el certificado firmante. Tambien lo haremos cuando al
+            // recuperar la cadena nos devuelva null
+            Certificate[] certs = null;
+            final boolean onlySignningCert = Boolean.parseBoolean(
+            		extraParams.getProperty(
+            				"includeOnlySignningCertificate", Boolean.FALSE.toString())); //$NON-NLS-1$
+			if (!onlySignningCert) {
+				certs = keyEntry.getCertificateChain();
+			}
+            if (certs == null) {
+                certs = new Certificate[] {
+                    cert
+                };
+            }
+            content.add(kif.newX509Data(Arrays.asList(certs)));
 
             final DOMSignContext signContext = new DOMSignContext(keyEntry.getPrivateKey(), rootSig);
             signContext.putNamespacePrefix(XMLConstants.DSIGNNS, xmlSignaturePrefix);
@@ -1341,8 +1415,52 @@ public final class AOXMLDSigSigner implements AOSigner {
         return Utils.writeXML(rootSig, originalXMLProperties, null, null);
     }
 
-    /** {@inheritDoc} */
-    public byte[] cosign(final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties extraParams) throws AOException {
+    /** Cofirma una firma en formato XMLdSig.
+     * <p>
+     *  Este m&eacute;todo firma todas las referencias a datos declaradas en la firma original,
+     *  ya apunten estas a datos, hojas de estilo o cualquier otro elemento. En cada referencia
+     *  firmada se introduciran las mismas transformaciones que existiesen en la firma original.
+     * </p>
+     * <p>
+     *  A nivel de formato interno, cuando cofirmamos un documento ya firmado previamente, esta
+     *  firma previa no se modifica. Si tenemos en cuenta que XAdES es en realidad un subconjunto
+     *  de XMLDSig, el resultado de una cofirma XMLdSig sobre un documento firmado previamente con
+     *  XAdES (o viceversa), son dos firmas independientes, una en XAdES y otra en XMLDSig.<br>
+     *  Dado que todas las firmas XAdES son XMLDSig pero no todas las firmas XMLDSig son XAdES,
+     *  el resultado global de la firma se adec&uacute;a al estandar mas amplio, XMLDSig en este caso.
+     * </p>
+     * @param sign Firma que se desea cofirmar.
+     * @param algorithm Algoritmo a usar para la firma.
+     * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
+     * <ul>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i><br>(<code>AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA</code>)</li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i><br>(<code>AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA</code>)</li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i><br>(<code>AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA</code>)</li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i><br>(<code>AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA</code>)</li>
+     * </ul>
+     * @param keyEntry Entrada que apunta a la clave privada a usar para firmar
+     * @param xParams Par&aacute;metros adicionales para la firma.
+     * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
+     * <dl>
+     *  <dt><b><i>xmlSignaturePrefix</i></b></dt>
+     *   <dd>
+     *    Prefijo de espacio de nombres XML para los nodos de firma. Si no se especifica este par&aacute;metro
+     *    se usa el valor por defecto (<i>ds</i>).
+     *   </dd>
+     *  <dt><b><i>referencesDigestMethod</i></b></dt>
+     *   <dd>Algoritmo de huella digital a usar en las referencias XML</dd>
+     *  <dt><b><i>canonicalizationAlgorithm</i></b></dt>
+     *   <dd>Algoritmo de canonicalizaci&oacute;n<i>n</i></dd>
+     *  <dt><b><i>includeOnlySignningCertificate</i></b></dt>
+	 *   <dd>Indica, mediante un {@code true} o {@code false}, que debe
+	 *   incluirse en la firma &uacute;nicamente el certificado utilizado
+	 *   para firmar y no su cadena de certificaci&oacute;n completa.
+	 *   Por defecto, se incluir&aacute; toda la cadena de certificaci&oacute;n.
+	 *   </dd>
+     * </dl>
+     * @return Firma en formato XMLDSig 1.0
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso */
+    public byte[] cosign(final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException {
 
         // nueva instancia de DocumentBuilderFactory que permita espacio de
         // nombres (necesario para XML)
@@ -1392,10 +1510,57 @@ public final class AOXMLDSigSigner implements AOSigner {
         final ByteArrayOutputStream baosData = new ByteArrayOutputStream();
         writeXML(new BufferedWriter(new OutputStreamWriter(baosData)), rootData);
 
-        return cosign(baosData.toByteArray(), baosSig.toByteArray(), algorithm, keyEntry, extraParams);
+        return cosign(baosData.toByteArray(), baosSig.toByteArray(), algorithm, keyEntry, xParams);
     }
 
-    /** {@inheritDoc} */
+    /** Contrafirma firmas en formato XMLdSig.
+     * <p>
+     * Este m&eacute;todo contrafirma los nodos de firma indicados de un documento de firma.
+     * </p>
+     * @param sign Documento con las firmas iniciales.
+     * @param algorithm Algoritmo a usar para la firma.
+     * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
+     * <ul>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
+     * </ul>
+     * @param targetType Mecanismo de selecci&oacute;n de los nodos de firma que se deben
+     * contrafirmar.
+     * <p>Las distintas opciones son:</p>
+     * <ul>
+     * <li>Todos los nodos del &aacute;rbol de firma</li>
+     * <li>Los nodos hoja del &aacute;rbol de firma</li>
+     * <li>Los nodos de firma cuyas posiciones se especifican en <code>target</code></li>
+     * <li>Los nodos de firma realizados por los firmantes cuyo <i>Common Name</i> se indica en <code>target</code></li>
+     * </ul>
+     * <p>Cada uno de estos tipos se define en {@link es.gob.afirma.core.signers.CounterSignTarget}.
+     * @param targets Listado de nodos o firmantes que se deben contrafirmar seg&uacute;n el
+     * {@code targetType} seleccionado.
+     * @param keyEntry Entrada que apunta a la clave privada a usar para firmar.
+     * @param xParams Par&aacute;metros adicionales para la firma.
+     * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
+     * <dl>
+     *  <dt><b><i>encoding</i></b></dt>
+     *   <dd>Fuerza la codificaci&oacute;n del XML de salida (utf-8, iso-8859-1,...)</dd>
+     *  <dt><b><i>xmlSignaturePrefix</i></b></dt>
+     *   <dd>
+     *    Prefijo de espacio de nombres XML para los nodos de firma. Si no se especifica este par&aacute;metro
+     *    se usa el valor por defecto (<i>ds</i>).
+     *   </dd>
+     *  <dt><b><i>referencesDigestMethod</i></b></dt>
+     *   <dd>Algoritmo de huella digital a usar en las referencias XML</dd>
+     *  <dt><b><i>canonicalizationAlgorithm</i></b></dt>
+     *   <dd>Algoritmo de canonicalizaci&oacute;n<i>n</i></dd>
+     *  <dt><b><i>includeOnlySignningCertificate</i></b></dt>
+	 *   <dd>Indica, mediante un {@code true} o {@code false}, que debe
+	 *   incluirse en la firma &uacute;nicamente el certificado utilizado
+	 *   para firmar y no su cadena de certificaci&oacute;n completa.
+	 *   Por defecto, se incluir&aacute; toda la cadena de certificaci&oacute;n.</dd>
+     * </dl>
+     * @return Contrafirma en formato XMLdSig.
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     public byte[] countersign(final byte[] sign,
                               final String algorithm,
                               final CounterSignTarget targetType,
@@ -1417,6 +1582,8 @@ public final class AOXMLDSigSigner implements AOSigner {
             encoding = XMLConstants.BASE64_ENCODING;
         }
         final String xmlSignaturePrefix = extraParams.getProperty("xmlSignaturePrefix", XML_SIGNATURE_PREFIX); //$NON-NLS-1$
+        final boolean onlySignningCert = Boolean.parseBoolean(
+        		extraParams.getProperty("includeOnlySignningCertificate", Boolean.FALSE.toString())); //$NON-NLS-1$
 
         this.algo = algorithm;
 
@@ -1464,16 +1631,16 @@ public final class AOXMLDSigSigner implements AOSigner {
             }
 
             if (targetType == CounterSignTarget.TREE) {
-                this.countersignTree(root, keyEntry, digestMethodAlgorithm, canonicalizationAlgorithm, xmlSignaturePrefix);
+                this.countersignTree(root, keyEntry, onlySignningCert, digestMethodAlgorithm, canonicalizationAlgorithm, xmlSignaturePrefix);
             }
             else if (targetType == CounterSignTarget.LEAFS) {
-                this.countersignLeafs(root, keyEntry, digestMethodAlgorithm, canonicalizationAlgorithm, xmlSignaturePrefix);
+                this.countersignLeafs(root, keyEntry, onlySignningCert, digestMethodAlgorithm, canonicalizationAlgorithm, xmlSignaturePrefix);
             }
             else if (targetType == CounterSignTarget.NODES) {
-                this.countersignNodes(root, targets, keyEntry, digestMethodAlgorithm, canonicalizationAlgorithm, xmlSignaturePrefix);
+                this.countersignNodes(root, targets, keyEntry, onlySignningCert, digestMethodAlgorithm, canonicalizationAlgorithm, xmlSignaturePrefix);
             }
             else if (targetType == CounterSignTarget.SIGNERS) {
-                this.countersignSigners(root, targets, keyEntry, digestMethodAlgorithm, canonicalizationAlgorithm, xmlSignaturePrefix);
+                this.countersignSigners(root, targets, keyEntry, onlySignningCert, digestMethodAlgorithm, canonicalizationAlgorithm, xmlSignaturePrefix);
             }
 
         }
@@ -1490,6 +1657,7 @@ public final class AOXMLDSigSigner implements AOSigner {
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     private void countersignTree(final Element root,
                                  final PrivateKeyEntry keyEntry,
+                                 final boolean onlySignningCert,
                                  final String refsDigestMethod,
                                  final String canonicalizationAlgorithm,
                                  final String xmlSignaturePrefix) throws AOException {
@@ -1505,7 +1673,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         // y crea sus contrafirmas
         try {
             for (int i = 0; i < nodes.length; i++) {
-                this.cs(nodes[i], keyEntry, refsDigestMethod, canonicalizationAlgorithm, xmlSignaturePrefix);
+                this.cs(nodes[i], keyEntry, onlySignningCert, refsDigestMethod, canonicalizationAlgorithm, xmlSignaturePrefix);
             }
         }
         catch (final Exception e) {
@@ -1518,6 +1686,7 @@ public final class AOXMLDSigSigner implements AOSigner {
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     private void countersignLeafs(final Element root,
                                   final PrivateKeyEntry keyEntry,
+                                  final boolean onlySignningCert,
                                   final String refsDigestMethod,
                                   final String canonicalizationAlgorithm,
                                   final String xmlSignaturePrefix) throws AOException {
@@ -1548,7 +1717,7 @@ public final class AOXMLDSigSigner implements AOSigner {
 
                 // y crea sus contrafirmas
                 if (isLeaf) {
-                    this.cs((Element) signatures.item(i), keyEntry, refsDigestMethod, canonicalizationAlgorithm, xmlSignaturePrefix);
+                    this.cs((Element) signatures.item(i), keyEntry, onlySignningCert, refsDigestMethod, canonicalizationAlgorithm, xmlSignaturePrefix);
                 }
             }
         }
@@ -1565,7 +1734,8 @@ public final class AOXMLDSigSigner implements AOSigner {
     private void countersignNodes(final Element root,
     		final Object[] tgts,
     		final PrivateKeyEntry keyEntry,
-    		final String refsDigestMethod,
+    		final boolean onlySignningCert,
+            final String refsDigestMethod,
     		final String canonicalizationAlgorithm,
     		final String xmlSignaturePrefix) throws AOException {
 
@@ -1609,7 +1779,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         final List<Object> targetsList = Arrays.asList(tgts);
     	for (int i = 0; i < sortedSignatures.size(); i++) {
     		if (targetsList.contains(Integer.valueOf(i))) {
-    			this.cs(sortedSignatures.get(i), keyEntry, refsDigestMethod, canonicalizationAlgorithm, xmlSignaturePrefix);
+    			this.cs(sortedSignatures.get(i), keyEntry, onlySignningCert, refsDigestMethod, canonicalizationAlgorithm, xmlSignaturePrefix);
     		}
     	}
     }
@@ -1659,6 +1829,7 @@ public final class AOXMLDSigSigner implements AOSigner {
     private void countersignSigners(final Element root,
                                     final Object[] targets,
                                     final PrivateKeyEntry keyEntry,
+                                    final boolean onlySignningCert,
                                     final String refsDigestMethod,
                                     final String canonicalizationAlgorithm,
                                     final String xmlSignaturePrefix) throws AOException {
@@ -1681,15 +1852,21 @@ public final class AOXMLDSigSigner implements AOSigner {
         // y crea sus contrafirmas
         final Iterator<Element> i = nodes.iterator();
         while (i.hasNext()) {
-            this.cs(i.next(), keyEntry, refsDigestMethod, canonicalizationAlgorithm, xmlSignaturePrefix);
+            this.cs(i.next(), keyEntry, onlySignningCert, refsDigestMethod, canonicalizationAlgorithm, xmlSignaturePrefix);
         }
     }
 
     /** Realiza la contrafirma de la firma pasada por par&aacute;metro.
      * @param signature Elemento con el nodo de la firma a contrafirmar
+     * @param keyEntry Referencia a la clave privada de firma
+     * @param onlySignningCert Indica si debe incluirse solo el certificado de firma o toda la cadena
+     * @param refsDigestMethod Algoritmo de huella digital
+     * @param canonicalizationAlgorithm Algoritmo de canonicalizaci&oacute;n
+     * @param xmlSignaturePrefix Prefijo del namespace de firma
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     private void cs(final Element signature,
                     final PrivateKeyEntry keyEntry,
+                    final boolean onlySignningCert,
                     final String refsDigestMethod,
                     final String canonicalizationAlgorithm,
                     final String xmlSignaturePrefix) throws AOException {
@@ -1732,13 +1909,24 @@ public final class AOXMLDSigSigner implements AOSigner {
 
             // KeyInfo
             final KeyInfoFactory kif = fac.getKeyInfoFactory();
-            final List<Object> x509Content = new ArrayList<Object>();
             final X509Certificate cert = (X509Certificate) keyEntry.getCertificate();
-            x509Content.add(cert);
 
             final List<Object> content = new ArrayList<Object>();
             content.add(kif.newKeyValue(cert.getPublicKey()));
-            content.add(kif.newX509Data(x509Content));
+
+            // Si se nos ha pedido expresamente que no insertemos la cadena de certificacion,
+            // insertamos unicamente el certificado firmante. Tambien lo haremos cuando al
+            // recuperar la cadena nos devuelva null
+            Certificate[] certs = null;
+			if (!onlySignningCert) {
+				certs = keyEntry.getCertificateChain();
+			}
+            if (certs == null) {
+                certs = new Certificate[] {
+                    cert
+                };
+            }
+            content.add(kif.newX509Data(Arrays.asList(certs)));
 
             final XMLSignature sign =
                     fac.newXMLSignature(fac.newSignedInfo(fac.newCanonicalizationMethod(canonicalizationAlgorithm, (C14NMethodParameterSpec) null),
