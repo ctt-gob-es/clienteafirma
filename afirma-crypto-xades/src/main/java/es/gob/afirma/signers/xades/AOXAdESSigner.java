@@ -424,7 +424,7 @@ public final class AOXAdESSigner implements AOSigner {
      *   <dd>URL hacia el documento (legible por personas, normalmente en formato PDF) descriptivo de la pol&iacute;tica de firma</dd>
      *  <dt><b><i>includeOnlySignningCertificate</i></b></dt>
 	 *   <dd>Indica, mediante un {@code true} o {@code false}, que debe
-	 *   indicarse en la firma &uacute;nicamente el certificado utilizado
+	 *   incluirse en la firma &uacute;nicamente el certificado utilizado
 	 *   para firmar y no su cadena de certificaci&oacute;n completa.
 	 *   Por defecto, se incluir&aacute; toda la cadena de certificaci&oacute;n.</dd>
 	 *  <dt><b><i>facturaeSign</i></b></dt>
@@ -862,7 +862,7 @@ public final class AOXAdESSigner implements AOSigner {
      *   <dd>URL hacia el documento (legible por personas, normalmente en formato PDF) descriptivo de la pol&iacute;tica de firma</dd>
      *  <dt><b><i>includeOnlySignningCertificate</i></b></dt>
 	 *   <dd>Indica, mediante un {@code true} o {@code false}, que debe
-	 *   indicarse en la firma &uacute;nicamente el certificado utilizado
+	 *   incluirse en la firma &uacute;nicamente el certificado utilizado
 	 *   para firmar y no su cadena de certificaci&oacute;n completa.
 	 *   Por defecto, se incluir&aacute; toda la cadena de certificaci&oacute;n.</dd>
      *  <dt><b><i>signerClaimedRole</i></b></dt>
@@ -961,7 +961,7 @@ public final class AOXAdESSigner implements AOSigner {
      *   <dd>URL hacia el documento (legible por personas, normalmente en formato PDF) descriptivo de la pol&iacute;tica de firma</dd>
      *  <dt><b><i>includeOnlySignningCertificate</i></b></dt>
 	 *   <dd>Indica, mediante un {@code true} o {@code false}, que debe
-	 *   indicarse en la firma &uacute;nicamente el certificado utilizado
+	 *   incluirse en la firma &uacute;nicamente el certificado utilizado
 	 *   para firmar y no su cadena de certificaci&oacute;n completa.
 	 *   Por defecto, se incluir&aacute; toda la cadena de certificaci&oacute;n.</dd>
      *  <dt><b><i>signerClaimedRole</i></b></dt>
@@ -1066,7 +1066,12 @@ public final class AOXAdESSigner implements AOSigner {
      *   <dd>Descripci&oacute;n textual de la pol&iacute;tica</dd>
      *  <dt><b><i>policyQualifier</i></b></dt>
      *   <dd>URL hacia el documento (legible por personas, normalmente en formato PDF) descriptivo de la pol&iacute;tica de firma</dd>
-     *  <dt><b><i>signerClaimedRole</i></b></dt>
+     *  <dt><b><i>includeOnlySignningCertificate</i></b></dt>
+	 *   <dd>Indica, mediante un {@code true} o {@code false}, que debe
+	 *   incluirse en la firma &uacute;nicamente el certificado utilizado
+	 *   para firmar y no su cadena de certificaci&oacute;n completa.
+	 *   Por defecto, se incluir&aacute; toda la cadena de certificaci&oacute;n.</dd>
+	 *  <dt><b><i>signerClaimedRole</i></b></dt>
      *   <dd>Cargo atribuido para el firmante</dd>
      *  <dt><b><i>signerCertifiedRole</i></b></dt>
      *   <dd>Cargo confirmado para el firmante</dd>
