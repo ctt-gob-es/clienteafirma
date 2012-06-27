@@ -53,6 +53,9 @@ public final class MassiveSignatureHelper {
     /** Manejador de firma para el formato configurado por defecto. */
     private AOSigner defaultSigner = null;
 
+    /** Manejador de firma exclusivo para la operaci&oacute;n de firma masiva. */
+    private AOSigner massiveSignSigner = null;
+
     /** Indica si el objeto esta activo y preparado para ejecutar operaciones de firma. */
     private boolean enabled = false;
 
@@ -78,6 +81,7 @@ public final class MassiveSignatureHelper {
         if (this.defaultSigner == null) {
             throw new AOException("Formato de firma no soportado: " + this.massiveConfiguration.getDefaultFormat()); //$NON-NLS-1$
         }
+        this.massiveSignSigner = this.defaultSigner;
     }
 
     /**
@@ -112,6 +116,32 @@ public final class MassiveSignatureHelper {
         );
     }
 
+    /** Establece el formato de firma para una operaci&oacute;n de firma masiva. Este
+     * m&eacute;todo s&oacute;lo debe utilizarse cuando el formato de firma cambie durante
+     * el proceso de firma masiva. Si no es llama a este m&eacute;todo se usar&aacute;
+     * siempre el formato indicado como "defaultFormat".<br/>
+     * Por uniformidad en el resultado, cuando se encuentran configuradas las operaciones
+     * masivas cofirma, contrafirma del &aacute;rbol de firma o contrafirma de nodos hojas,
+     * se usar&aacute; siempre el formato de firma por defecto. Si se indica <code>null</code>
+     * se establece la configuraci&oacute;n por defecto (defaultFormat).
+     * @param signatureFormat Formato de firma.*/
+    public void setSignatureFormat(final String signatureFormat) {
+
+    	// Si el formato establecido es el actual, se evita volver a cargar un manejador de firma
+    	if (this.massiveConfiguration.getSignatureFormat().equals(signatureFormat)) {
+    		return;
+    	}
+
+    	this.massiveConfiguration.setSignatureFormat(signatureFormat);
+    	this.massiveSignSigner = AOSignerFactory.getSigner(this.massiveConfiguration.getSignatureFormat());
+    	if (this.massiveSignSigner == null) {
+    		LOGGER.warning("No hay disponible un manejador de firma para el formato " + signatureFormat + //$NON-NLS-1$
+    				", se utilizara el formato de firma por defecto: " + this.massiveConfiguration.getDefaultFormat()); //$NON-NLS-1$
+    		this.massiveConfiguration.setSignatureFormat(this.massiveConfiguration.getDefaultFormat());
+    		this.massiveSignSigner = this.defaultSigner;
+        }
+    }
+
     /** Realiza la firma de datos.
      * @param data
      *        Datos que se desean firmar.
@@ -131,7 +161,7 @@ public final class MassiveSignatureHelper {
         // Ejecutamos la operacion que corresponda
         try {
             if (this.massiveConfiguration.getMassiveOperation().equals(MassiveType.SIGN)) { // Firma
-                signData = signDataFromData(this.defaultSigner, data, null, config);
+                signData = signDataFromData(this.massiveSignSigner, data, null, config);
             }
             else if (this.massiveConfiguration.getMassiveOperation().equals(MassiveType.COSIGN)) { // Cofirma
                 signData = cosign(this.defaultSigner, data, config);
@@ -184,7 +214,7 @@ public final class MassiveSignatureHelper {
         try {
             if (this.massiveConfiguration.getMassiveOperation().equals(MassiveType.SIGN)) { // Firma
                 operation = "sign"; //$NON-NLS-1$
-                signData = signDataFromHash(this.defaultSigner, hash, config);
+                signData = signDataFromHash(this.massiveSignSigner, hash, config);
             }
             else if (this.massiveConfiguration.getMassiveOperation().equals(MassiveType.COSIGN)) { // Cofirma
                 operation = "cosign"; //$NON-NLS-1$
@@ -277,7 +307,7 @@ public final class MassiveSignatureHelper {
 
         try {
             if (this.massiveConfiguration.getMassiveOperation().equals(MassiveType.SIGN)) { // Firma
-                signData = signDataFromData(this.defaultSigner, data, uri, config);
+                signData = signDataFromData(this.massiveSignSigner, data, uri, config);
             }
             else if (this.massiveConfiguration.getMassiveOperation().equals(MassiveType.COSIGN)) { // Cofirma
                 signData = cosign(this.defaultSigner, data, config);
@@ -331,7 +361,7 @@ public final class MassiveSignatureHelper {
     		config.setProperty("mode", this.massiveConfiguration.getMode()); //$NON-NLS-1$
     	}
     	if (!config.containsKey("format")) { //$NON-NLS-1$
-    		config.setProperty("format", this.massiveConfiguration.getDefaultFormat()); //$NON-NLS-1$
+    		config.setProperty("format", this.massiveConfiguration.getSignatureFormat()); //$NON-NLS-1$
     	}
         if (uri != null) {
             config.setProperty("uri", uri.toString()); //$NON-NLS-1$
@@ -382,7 +412,7 @@ public final class MassiveSignatureHelper {
     		config.setProperty("mode", this.massiveConfiguration.getMode()); //$NON-NLS-1$
     	}
     	if (!config.containsKey("format")) { //$NON-NLS-1$
-    		config.setProperty("format", this.massiveConfiguration.getDefaultFormat()); //$NON-NLS-1$
+    		config.setProperty("format", this.massiveConfiguration.getSignatureFormat()); //$NON-NLS-1$
     	}
         config.setProperty("precalculatedHashAlgorithm", AOSignConstants.getDigestAlgorithmName(this.massiveConfiguration.getAlgorithm())); //$NON-NLS-1$
 
@@ -612,6 +642,7 @@ public final class MassiveSignatureHelper {
         private String algorithm = AOSignConstants.DEFAULT_SIGN_ALGO;
         private String mode = AOSignConstants.DEFAULT_SIGN_MODE;
         private String defaultFormat = AOSignConstants.DEFAULT_SIGN_FORMAT;
+        private String signatureFormat = AOSignConstants.DEFAULT_SIGN_FORMAT;
         private boolean originalFormat = true;
         private Properties extraParams;
 
@@ -624,7 +655,7 @@ public final class MassiveSignatureHelper {
             this.extraParams = new Properties();
         }
 
-        /** Recupera la operaci&oacute;n masiva configurada.
+		/** Recupera la operaci&oacute;n masiva configurada.
          * @return Tipo de operaci&oacute;n masiva. */
         public MassiveType getMassiveOperation() {
             return this.massiveOperation;
@@ -684,6 +715,25 @@ public final class MassiveSignatureHelper {
             this.defaultFormat = (defaultFormat != null ?
             		defaultFormat : AOSignConstants.DEFAULT_SIGN_FORMAT);
         }
+
+        /**
+         * Recupera el formato de firma utilizado para las operaciones de firma masiva.
+         * @return Formato de firma utilizado en las operaciones de firma masiva.
+         */
+        public String getSignatureFormat() {
+			return this.signatureFormat;
+		}
+
+        /**
+         * Establece el formato de firma para la operaci&oacute;n de firma masiva que, a diferencia
+         * del resto de operaciones, permite ser cambiado durante el proceso de firma masiva.<br/>
+         * Si se establece {@code null} se configura el formato de firma establecido por defecto.
+         * @param signatureFormat Formato de firma.
+         */
+        public void setSignatureFormat(final String signatureFormat) {
+			this.signatureFormat = (signatureFormat != null ?
+					signatureFormat : this.defaultFormat);
+		}
 
         /** Indica si se ha configurado que las multifirmas respeten el formato
          * de firma original.

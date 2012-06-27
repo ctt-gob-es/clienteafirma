@@ -1136,10 +1136,8 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                     return Boolean.FALSE;
                 }
 
-                final Properties extraParams = new Properties();
-
                 // Establecemos el mimetype de los datos
-                configureDataTypeExtraParams(extraParams);
+                configureDataTypeExtraParams(SignApplet.this.getGenericConfig());
 
                 // Obtenemos los parametros necesarios segun tipo de
                 // contrafirma. Esto son los firmantes
@@ -1238,7 +1236,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                 // Contrafirmamos finalmente
                 final byte[] outputBuffer;
                 try {
-                    outputBuffer = signer.countersign(originalSign, algorithm, target, params, ke, extraParams);
+                    outputBuffer = signer.countersign(originalSign, algorithm, target, params, ke, SignApplet.this.getGenericConfig());
                 }
                 catch (final UnsupportedOperationException e) {
                 	getLogger().severe(e.getMessage());
@@ -1329,8 +1327,8 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
         // Si no se establece formato alguno, se mantiene el por defecto
         if (signatureFormat == null) {
-            LOGGER.warning("El formato de firma no puede ser nulo, se establecera el formato por defecto: " + AOSignConstants.DEFAULT_SIGN_FORMAT //$NON-NLS-1$
-            );
+            LOGGER.warning("El formato de firma no puede ser nulo, se establecera el formato por defecto: " + //$NON-NLS-1$
+            		AOSignConstants.DEFAULT_SIGN_FORMAT);
             signatureFormat = AOSignConstants.DEFAULT_SIGN_FORMAT;
         }
 
@@ -2286,6 +2284,10 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 			this.setError(AppletMessages.getString("SignApplet.490")); //$NON-NLS-1$
     		return null;
 		}
+
+		// Establecemos el formato de firma para las operaciones de firma masiva
+		this.massiveSignatureHelper.setSignatureFormat(this.sigFormat);
+
     	// Ejecutamos la operacion
     	try {
     		return AccessController.doPrivileged(new java.security.PrivilegedAction<String>() {
@@ -2324,6 +2326,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     		return null;
 		}
 
+		// Establecemos el formato de firma para las operaciones de firma masiva
+		this.massiveSignatureHelper.setSignatureFormat(this.sigFormat);
+
 		try {
 			return AccessController.doPrivileged(new java.security.PrivilegedAction<String>() {
 				/** {@inheritDoc} */
@@ -2346,20 +2351,20 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     public String massiveSignatureFile(final String filename) {
 
     	LOGGER.info("Invocando massiveSignatureFile: " + filename); //$NON-NLS-1$
-
+    	this.setError(null);
     	if (this.massiveSignatureHelper == null || !this.massiveSignatureHelper.isEnabled()) {
     		this.setError(AppletMessages.getString("SignApplet.375")); //$NON-NLS-1$
     		return null;
     	}
-
     	if (filename == null || "".equals(filename)) { //$NON-NLS-1$
     		setError(AppletMessages.getString("SignApplet.48")); //$NON-NLS-1$
     		return null;
     	}
 
-    	this.setError(null);
+		// Establecemos el formato de firma para las operaciones de firma masiva
+		this.massiveSignatureHelper.setSignatureFormat(this.sigFormat);
 
-    	try {
+		try {
     		return AccessController.doPrivileged(new java.security.PrivilegedAction<String>() {
     			/** {@inheritDoc} */
     			public String run() {
