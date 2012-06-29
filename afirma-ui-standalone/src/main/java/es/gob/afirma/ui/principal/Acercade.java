@@ -17,8 +17,6 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
-import java.util.Properties;
-import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -34,7 +32,6 @@ import es.gob.afirma.ui.utils.InfoLabel;
 import es.gob.afirma.ui.utils.JAccessibilityFrameAbout;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.Utils;
-import es.gob.afirma.ui.wizardcifradocontrasenia.PanelContrasenia;
 
 /** Muestra el panel de acerca de */
 final class Acercade extends JAccessibilityFrameAbout {
@@ -90,29 +87,6 @@ final class Acercade extends JAccessibilityFrameAbout {
     @Override
     public int getMinimumRelation() {
         return 9;
-    }
-
-    /** Devuelve la version.
-     * @return version. */
-    public String getVersion() {
-
-        final Properties p = new Properties();
-        try {
-            p.load(this.getClass().getResourceAsStream("/version.properties")); //$NON-NLS-1$
-        }
-        catch (final Exception e) {
-            Logger.getLogger(PanelContrasenia.class.getName()).warning("No se han podido obtener los datos de version del cliente de firma"); //$NON-NLS-1$
-        }
-        final StringBuilder version = new StringBuilder();
-        version.append(p.getProperty("version.mayor", "0")).append(".") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-        .append(p.getProperty("version.minor", "0")).append(".") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-        .append(p.getProperty("version.build", "0")); //$NON-NLS-1$ //$NON-NLS-2$
-
-        final String desc = p.getProperty("build"); //$NON-NLS-1$
-        if (desc != null && !desc.trim().equals("")) { //$NON-NLS-1$
-            version.append(" ").append(desc); //$NON-NLS-1$
-        }
-        return version.toString();
     }
 
     /** Iniciamos componentes */
@@ -185,15 +159,14 @@ final class Acercade extends JAccessibilityFrameAbout {
         c.gridy = 1;
 
         // Version del interfaz y Version de la aplicacion
-        final String version = Messages.getString("version.interfaz") + "  " + Main.VERSION + Constants.HTML_SALTO_LINEA //$NON-NLS-1$
-        + Messages.getString("version") + "  " + getVersion(); //$NON-NLS-1$
+        final String version = Messages.getString("version.interfaz") + "  " + Main.VERSION; //$NON-NLS-1$ //$NON-NLS-2$
         final InfoLabel versionInterfaz = new InfoLabel(version, false);
         getContentPane().add(versionInterfaz, c);
 
         c.insets = new Insets(15, 20, 0, 20);
         c.gridy = 2;
         // Parrafo con el texto Cliente @firma... y con el texto El Ministerio de Politica...
-        final String desc = Messages.getString("acercade.descripcion2") + "<br><br>" + Messages.getString("acercade.descripcion"); //$NON-NLS-1$ //$NON-NLS-3$
+        final String desc = Messages.getString("acercade.descripcion2") + "<br><br>" + Messages.getString("acercade.descripcion"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         final InfoLabel descLabel = new InfoLabel(desc, false);
         getContentPane().add(descLabel, c);
 
