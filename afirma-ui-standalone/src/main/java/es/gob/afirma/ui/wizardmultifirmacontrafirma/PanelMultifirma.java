@@ -57,6 +57,7 @@ import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.main.common.KeyStoreConfiguration;
+import es.gob.afirma.signers.xades.AOXAdESSigner;
 import es.gob.afirma.ui.core.jse.JSEUtils;
 import es.gob.afirma.ui.utils.CustomDialog;
 import es.gob.afirma.ui.utils.GeneralConfig;
@@ -255,6 +256,11 @@ public final class PanelMultifirma extends JAccessibilityDialogWizard {
         try {
             // Configuramos la operacion
             final Properties prop = GeneralConfig.getSignConfig();
+
+            // En el caso de firmas XAdES no incluimos la cadena de certificacion
+            if (signer instanceof AOXAdESSigner) {
+            	prop.setProperty("includeOnlySignningCertificate", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+            }
 
             switch (this.comboFirmas.getSelectedIndex()) {
                 // NODOS SELECCIONADOS

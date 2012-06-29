@@ -358,6 +358,11 @@ final class Firma extends JPanel {
             prop.setProperty("mode", modoFirma); //$NON-NLS-1$
             prop.setProperty("uri", uri.toASCIIString()); //$NON-NLS-1$
 
+            // En el caso de firmas XAdES no incluimos la cadena de certificacion
+            if (signer instanceof AOXAdESSigner) {
+            	prop.setProperty("includeOnlySignningCertificate", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+            }
+
             final byte[] signedData;
             try {
                 signedData = signer.sign(fileData, GeneralConfig.getSignAlgorithm(), privateKeyEntry, prop);

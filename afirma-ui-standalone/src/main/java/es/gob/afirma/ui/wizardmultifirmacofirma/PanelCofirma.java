@@ -44,6 +44,7 @@ import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.main.common.KeyStoreConfiguration;
+import es.gob.afirma.signers.xades.AOXAdESSigner;
 import es.gob.afirma.ui.utils.ConfigureCaret;
 import es.gob.afirma.ui.utils.CustomDialog;
 import es.gob.afirma.ui.utils.GeneralConfig;
@@ -476,6 +477,11 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 
 		// Respetaremos si la firma original contenia o no los datos firmados
 		prop.setProperty("mode", signer.getData(sign) == null ? AOSignConstants.SIGN_MODE_EXPLICIT : AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
+
+        // En el caso de firmas XAdES no incluimos la cadena de certificacion
+        if (signer instanceof AOXAdESSigner) {
+        	prop.setProperty("includeOnlySignningCertificate", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+        }
 
 		// Realizamos la cofirma
 		return signer.cosign(data, sign, GeneralConfig.getSignAlgorithm(),	keyEntry, prop);

@@ -43,6 +43,7 @@ import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.main.common.KeyStoreConfiguration;
+import es.gob.afirma.signers.xades.AOXAdESSigner;
 import es.gob.afirma.ui.utils.ConfigureCaret;
 import es.gob.afirma.ui.utils.CustomDialog;
 import es.gob.afirma.ui.utils.GeneralConfig;
@@ -145,7 +146,7 @@ final class PanelEntrada extends JAccessibilityDialogWizard {
 
         // Caja de texto donde se guarda el nombre del archivo de firma
         this.campoFirma.setToolTipText(Messages.getString("Wizard.multifirma.simple.ventana1.fichero.datos.description")); // NOI18N //$NON-NLS-1$
-        this.campoFirma.getAccessibleContext().setAccessibleName(etiquetaFirma.getText() + " " + this.campoFirma.getToolTipText() + "ALT + F."); // NOI18N
+        this.campoFirma.getAccessibleContext().setAccessibleName(etiquetaFirma.getText() + " " + this.campoFirma.getToolTipText() + "ALT + F."); // NOI18N //$NON-NLS-1$ //$NON-NLS-2$
         this.campoFirma.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.simple.contrafirma.ventana1.fichero.description")); // NOI18N //$NON-NLS-1$
         if (GeneralConfig.isBigCaret()) {
 			final Caret caret = new ConfigureCaret();
@@ -173,7 +174,7 @@ final class PanelEntrada extends JAccessibilityDialogWizard {
         examinarFirma.setMnemonic(KeyEvent.VK_E);
         examinarFirma.setText(Messages.getString("PrincipalGUI.Examinar")); //$NON-NLS-1$
         examinarFirma.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description")); //$NON-NLS-1$
-        examinarFirma.getAccessibleContext().setAccessibleName(examinarFirma.getText() + " " + examinarFirma.getToolTipText());
+        examinarFirma.getAccessibleContext().setAccessibleName(examinarFirma.getText() + " " + examinarFirma.getToolTipText()); //$NON-NLS-1$
         examinarFirma.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent evt) {
@@ -289,7 +290,12 @@ final class PanelEntrada extends JAccessibilityDialogWizard {
 		final AOSigner aoSigner =  AOSignerFactory.getSigner(formato);
 
 		final Properties prop = GeneralConfig.getSignConfig();
-		prop.setProperty("format", formato);
+		prop.setProperty("format", formato); //$NON-NLS-1$
+
+		// En el caso de firmas XAdES no incluimos la cadena de certificacion
+        if (aoSigner instanceof AOXAdESSigner) {
+        	prop.setProperty("includeOnlySignningCertificate", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+        }
 
 		byte[] signedData = null;
 		try {
