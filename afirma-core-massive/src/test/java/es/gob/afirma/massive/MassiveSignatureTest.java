@@ -130,7 +130,7 @@ public class MassiveSignatureTest {
 	private static String getResourcePath(final String filename) {
 		return ((System.getProperty("os.name").contains("indows")) ? "" : File.separator) + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				MassiveSignatureTest.class
-						.getResource("/" + filename).toString().replace("file:/", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						.getResource("/" + filename).toString().replace("%20", " ").replace("file:/", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 	}
 
 	private static void saveData(final byte[] data, final String filename) {
@@ -139,7 +139,8 @@ public class MassiveSignatureTest {
 				final java.io.FileOutputStream fos = new java.io.FileOutputStream(
 						MassiveSignatureTest.path + File.separator + filename);
 
-				System.out.println("Guardamos el fichero: " + MassiveSignatureTest.path + File.separator + filename);
+				Logger.getLogger("es.gob.afirma").info("Guardamos el fichero: " + //$NON-NLS-1$ //$NON-NLS-2$
+						MassiveSignatureTest.path + File.separator + filename);
 				fos.write(data);
 				try {
 					fos.flush();
