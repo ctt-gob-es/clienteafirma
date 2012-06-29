@@ -95,7 +95,7 @@ import es.gob.afirma.standalone.VisorFirma;
 /** Panel de selecci&oacute;n y firma del fichero objetivo.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class SignPanel extends JPanel {
-    
+
     static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     private static final long serialVersionUID = -4828575650695534417L;
@@ -221,10 +221,10 @@ public final class SignPanel extends JPanel {
         try {
             data = AOUtil.getDataFromInputStream(fis);
         }
-        catch(OutOfMemoryError e) {
+        catch(final OutOfMemoryError e) {
             UIUtils.showErrorMessage(
-                 SignPanel.this, 
-                 Messages.getString("SignPanel.26"), //$NON-NLS-1$ 
+                 SignPanel.this,
+                 Messages.getString("SignPanel.26"), //$NON-NLS-1$
                  Messages.getString("SignPanel.25"), //$NON-NLS-1$
                  JOptionPane.ERROR_MESSAGE
             );
@@ -274,7 +274,7 @@ public final class SignPanel extends JPanel {
                 info = this.signer.getSignInfo(data);
             }
             catch (final Exception e) {
-                LOGGER.warning("no se pudo extraer la informacion de firma: " + e); //$NON-NLS-1$ 
+                LOGGER.warning("no se pudo extraer la informacion de firma: " + e); //$NON-NLS-1$
             }
             iconPath = FILE_ICON_SIGN;
             iconTooltip = Messages.getString("SignPanel.6") + (info != null ? info.getFormat() : ""); //$NON-NLS-1$ //$NON-NLS-2$
@@ -302,7 +302,7 @@ public final class SignPanel extends JPanel {
             this.fileTypeVectorIcon.setDocument(dbf.newDocumentBuilder().parse(this.getClass().getResourceAsStream(iconPath)));
         }
         catch (final Exception e) {
-            LOGGER.warning( 
+            LOGGER.warning(
                 "No se ha podido cargar el icono del tipo de fichero/firma, este no se mostrara: " + e //$NON-NLS-1$
             );
         }
@@ -373,7 +373,7 @@ public final class SignPanel extends JPanel {
                         transData = tr.getTransferData(DataFlavor.javaFileListFlavor);
                     }
                     catch (final Exception e) {
-                        LOGGER.warning( 
+                        LOGGER.warning(
                             "Ha fallado la operacion de arrastrar y soltar: " + e //$NON-NLS-1$
                         );
                         dtde.dropComplete(false);
@@ -413,7 +413,7 @@ public final class SignPanel extends JPanel {
                                 fileName = new File(new URI(fileName)).getPath();
                             }
                             catch (final Exception e) {
-                                LOGGER.warning( 
+                                LOGGER.warning(
                                 "Ha fallado la operacion de arrastrar y soltar al obtener la ruta del fichero arrastrado: " + e //$NON-NLS-1$
                                 );
                                 dtde.dropComplete(false);
@@ -424,7 +424,7 @@ public final class SignPanel extends JPanel {
                             loadFile(fileName);
                         }
                         catch (final IOException e) {
-                            LOGGER.warning( 
+                            LOGGER.warning(
                                 "Ha fallado la operacion de arrastrar y soltar al cargar el fichero arrastrado: " + e //$NON-NLS-1$
                             );
                             dtde.dropComplete(false);
@@ -829,6 +829,7 @@ public final class SignPanel extends JPanel {
             final Properties p = new Properties();
             p.put("mode", "implicit"); //$NON-NLS-1$ //$NON-NLS-2$
             p.put("ignoreStyleSheets", "false"); //$NON-NLS-1$ //$NON-NLS-2$
+            p.put("includeOnlySignningCertificate", "true"); //$NON-NLS-1$ //$NON-NLS-2$
 
             setSignCommandEnabled(false);
 
@@ -859,7 +860,7 @@ public final class SignPanel extends JPanel {
 
             }
             catch (final Exception e) {
-                LOGGER.warning( 
+                LOGGER.warning(
                         "No se ha podido mostrar la barra de progreso indeterminado: " + e); //$NON-NLS-1$
             }
 
@@ -885,7 +886,7 @@ public final class SignPanel extends JPanel {
                 }
             }
             catch (final Exception e) {
-                LOGGER.severe("Error durante el proceso de firma: " + e); //$NON-NLS-1$ 
+                LOGGER.severe("Error durante el proceso de firma: " + e); //$NON-NLS-1$
                 UIUtils.showErrorMessage(
                         SignPanel.this,
                         Messages.getString("SignPanel.65"), //$NON-NLS-1$
@@ -896,7 +897,7 @@ public final class SignPanel extends JPanel {
                 return null;
             }
             catch(final OutOfMemoryError ooe) {
-                LOGGER.severe("Falta de memoria en el proceso de firma: " + ooe); //$NON-NLS-1$ 
+                LOGGER.severe("Falta de memoria en el proceso de firma: " + ooe); //$NON-NLS-1$
                 UIUtils.showErrorMessage(
                     SignPanel.this,
                     Messages.getString("SignPanel.1"), //$NON-NLS-1$
@@ -1022,7 +1023,7 @@ public final class SignPanel extends JPanel {
                 bos.write(signResult);
             }
             catch (final Exception e) {
-                LOGGER.severe( 
+                LOGGER.severe(
                   "No se ha podido guardar el resultado de la firma: " + e //$NON-NLS-1$
                 );
                 UIUtils.showErrorMessage(
