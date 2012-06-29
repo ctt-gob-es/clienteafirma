@@ -1,6 +1,6 @@
 ﻿Se va a proceder a la descarga del CLIENTe @firma para firma y certificación electrónica, facilitado por el Gobierno de España
 
-CLIENTe es un applet de libre distribución cuyo código fuente puede ser consultado y descargado desde www.ctt.map.es. Las presentes condiciones de uso establecen las clásulas y condiciones de uso del CLIENTe:
+CLIENTe es un applet de libre distribución cuyo código fuente puede ser consultado y descargado desde http://forja-ctt.administracionelectronica.gob.es. Las presentes condiciones de uso establecen las clásulas y condiciones de uso del CLIENTe:
 
 1. Licencia
 El CLIENTe @firma se encuentra bajo licencia GNU GPL versión 2.0 y EUPL versión 1.1.
