@@ -36,8 +36,6 @@ public final class KeyStoreLoader {
 
         stores.add(new KeyStoreConfiguration(AOKeyStore.PKCS12, null, null));
 
-        stores.add(new KeyStoreConfiguration(AOKeyStore.DNIEJAVA, null, null));
-
         return stores.toArray(new KeyStoreConfiguration[0]);
     }
 
