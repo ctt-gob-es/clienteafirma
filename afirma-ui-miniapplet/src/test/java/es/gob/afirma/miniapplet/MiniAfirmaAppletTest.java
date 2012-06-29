@@ -10,6 +10,8 @@
 
 package es.gob.afirma.miniapplet;
 
+import java.util.logging.Logger;
+
 import junit.framework.Assert;
 
 import org.junit.Ignore;
@@ -41,14 +43,26 @@ public final class MiniAfirmaAppletTest {
 			return;
 		}
 	}
-	
+
 	/** Prueba de obtenci&oacute;n de la estructura de firmantes.
-	 * @throws Exception */
+	 * @throws Exception Cuando se produce un error al cargar o procesar la firma. */
 	@Test
 	@SuppressWarnings("static-method")
 	public void testGetSignersStructure() throws Exception {
 	    final MiniAfirmaApplet applet = new MiniAfirmaApplet();
-	    String ss = applet.getSignersStructure(Base64.encode(AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream("SHA512withRSA.pdf")))); //$NON-NLS-1$
+
+	    final byte[] signature = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream("SHA512withRSA.pdf")); //$NON-NLS-1$
+	    Logger.getLogger("es.gob.afirma").info("Tamano de la firma (bytes): " + signature.length); //$NON-NLS-1$ //$NON-NLS-2$
+
+	    try {
+	    	AOUtil.classForName("es.gob.afirma.signers.pades.AOPDFSigner"); //$NON-NLS-1$
+	    	Logger.getLogger("es.gob.afirma").info("Se ha encontrado el Signer de PAdES"); //$NON-NLS-1$ //$NON-NLS-2$
+	    } catch (final Exception e) {
+	    	Logger.getLogger("es.gob.afirma").severe("El Signer de PAdES no esta enlazado: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+	    	throw e;
+		}
+
+	    final String ss = applet.getSignersStructure(Base64.encode(signature));
 	    Assert.assertNotNull(ss);
 	    System.out.println(ss);
 	}
