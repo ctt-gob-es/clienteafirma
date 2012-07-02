@@ -13,6 +13,7 @@ package es.gob.afirma.keystores.mozilla;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.security.KeyStore;
+import java.security.KeyStore.PrivateKeyEntry;
 import java.security.Provider;
 import java.security.Security;
 import java.security.cert.X509Certificate;
@@ -222,8 +223,7 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
 
     /** Establece la interfaz de entrada de la contrase&ntilde;a del
      * almac&eacute;n interno de Firefox. Si no se indica o se establece a <code>null</code> se utilizar&aacute; el por defecto.
-     * @param externallPC
-     *        Interfaz de entrada de contrase&ntilde;a. */
+     * @param externallPC Interfaz de entrada de contrase&ntilde;a. */
     public void setPasswordCallback(final PasswordCallback externallPC) {
         this.externallPasswordCallback = externallPC;
     }
@@ -252,11 +252,19 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
 
     /** {@inheritDoc} */
     @Override
+    public X509Certificate[] getCertificateChain(final String alias) {
+    	final PrivateKeyEntry key = this.getKeyEntry(alias, this.externallPasswordCallback);
+    	return (key != null) ? (X509Certificate[]) key.getCertificateChain() : null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public KeyStore.PrivateKeyEntry getKeyEntry(final String alias, final PasswordCallback pssCallback) {
 
         final KeyStore tmpStore = this.storesByAlias.get(alias);
         if (tmpStore == null) {
-            throw new IllegalStateException("No hay ningun almacen de Firefox que contenga un certificado con el alias '" + alias + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+            LOGGER.warning("No hay ningun almacen de Firefox que contenga un certificado con el alias '" + alias + "', se devolvera null"); //$NON-NLS-1$ //$NON-NLS-2$
+            return null;
         }
         final KeyStore.PrivateKeyEntry keyEntry;
         try {
