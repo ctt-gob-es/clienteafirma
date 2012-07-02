@@ -36,7 +36,7 @@ import es.gob.afirma.signers.xades.AOXAdESSigner;
 
 /**
  * Pruebas del m&oacute;dulo XAdES de Afirma.
- * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
+ * @author Carlos Gamuci
  *
  */
 public final class Test_Ticket_209544_OnlySignningCert {
