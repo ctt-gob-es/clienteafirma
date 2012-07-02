@@ -146,7 +146,7 @@ public final class AOKeyStoreManagerFactory {
     	catch(final Exception e) {
     		throw new AOKeystoreAlternativeException(
                 getAlternateKeyStoreType(store),
-                "Error al inicializar el modulo DNIe 100% Java", //$NON-NLS-1$
+                "Error al inicializar el modulo DNIe 100% Java: " + e, //$NON-NLS-1$
                 e
            );
     	}

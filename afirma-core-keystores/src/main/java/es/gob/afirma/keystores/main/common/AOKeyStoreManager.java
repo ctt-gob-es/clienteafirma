@@ -754,21 +754,6 @@ public class AOKeyStoreManager {
         return ret;
     }
 
-    /** Recupera el repositorio que posea la descripci&oacute;n indicada. Si no
-     * existe un keystore con la descripci&oacute;n indicada, se devuelve <code>null</code>.
-     * @param description
-     *        Descripci&oacute;n del repositorio que se desea recuperar.
-     * @return KeyStore Repositorio de certificados. */
-    public static AOKeyStore getKeyStore(final String description) {
-        final AOKeyStore keystore = null;
-        for (final AOKeyStore tempKs : AOKeyStore.values()) {
-            if (tempKs.getDescription().equals(description)) {
-                return tempKs;
-            }
-        }
-        return keystore;
-    }
-
     @Override
     public String toString() {
         final StringBuilder ret = new StringBuilder("Gestor de almacenes de claves"); //$NON-NLS-1$
