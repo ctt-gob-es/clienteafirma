@@ -17,8 +17,6 @@ import java.util.logging.Logger;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.x500.X500Principal;
 
-import es.gob.afirma.core.InvalidOSException;
-import es.gob.afirma.core.MissingLibraryException;
 import es.gob.afirma.keystores.main.common.AOKeyStore;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManagerException;
@@ -60,12 +58,8 @@ public class DnieUnifiedKeyStoreManager extends AOKeyStoreManager {
 	/** Crea un almc&eacute;n de claves en base a un agregado del DNIe con controlador 100% Java y un segundo almac&eacute;n
 	 * indicado como par&aacute;metro.
 	 * @param originalKsm ALmac&eacute;n de claves original
-	 * @param parent Componente padre para la modalidad
-	 * @throws MissingLibraryException Si el entorno de ejecuci&oacute;n carece de alguna de las bibliotecas necesarias
-	 * @throws InvalidOSException Si el sistema operativo no soporta alguno de los almacenes
-	 * @throws AOKeyStoreManagerException Si no se puede inicializar el almac&eacute;n
-	 * @throws IOException Si se producen errores de entrada-salida en la inicializaci&oacute;n de los almacenes */
-	public DnieUnifiedKeyStoreManager(final AOKeyStoreManager originalKsm, final Object parent) throws MissingLibraryException, InvalidOSException, AOKeyStoreManagerException, IOException {
+	 * @param parent Componente padre para la modalidad */
+	public DnieUnifiedKeyStoreManager(final AOKeyStoreManager originalKsm, final Object parent) {
 		if (originalKsm == null) {
 			throw new IllegalArgumentException("Es necesario un almacen al que anadir los certificados de DNIe, no puede ser nulo"); //$NON-NLS-1$
 		}
