@@ -11,7 +11,6 @@
 package es.gob.afirma.keystores.filters;
 
 import java.io.File;
-import java.io.IOException;
 
 import junit.framework.Assert;
 
@@ -22,7 +21,6 @@ import es.gob.afirma.keystores.main.callbacks.CachePasswordCallback;
 import es.gob.afirma.keystores.main.common.AOKeyStore;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManagerFactory;
-import es.gob.afirma.keystores.main.common.AOKeystoreAlternativeException;
 import es.gob.afirma.miniapplet.keystores.filters.QualifiedCertificatesFilter;
 
 
@@ -43,15 +41,12 @@ public class QualifiedCertificateFilterTest {
 
     private static final String CERT_ALIAS = "{7f50af22-691e-4d84-b466-a5c33cab2683}"; //$NON-NLS-1$
 
-	/**
-	 * Comprobaci&oacute;n del filtrado.
-	 * @throws IOException Clave no v&aacute;lida.
-	 * @throws AOKeystoreAlternativeException Cuando no se puede abrir el almacen de claves.
-	 */
+	/** Comprobaci&oacute;n del filtrado.
+	 * @throws Exception */
 	@SuppressWarnings("static-method")
 	@Test
 	@Ignore
-	public void filtraCertificadosCualificados() throws IOException, AOKeystoreAlternativeException {
+	public void filtraCertificadosCualificados() throws Exception {
 
 		final QualifiedCertificatesFilter filter = new QualifiedCertificatesFilter(CERT_SN);
 

@@ -11,7 +11,6 @@
 package es.gob.afirma.keystores.filters;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -20,7 +19,6 @@ import es.gob.afirma.keystores.main.callbacks.CachePasswordCallback;
 import es.gob.afirma.keystores.main.common.AOKeyStore;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManagerFactory;
-import es.gob.afirma.keystores.main.common.AOKeystoreAlternativeException;
 import es.gob.afirma.miniapplet.keystores.filters.SSLFilter;
 
 /**
@@ -37,14 +35,11 @@ public class SSLFilterTest {
 
     private static final String CERT_ALIAS = "anf usuario activo"; //$NON-NLS-1$
 
-	/**
-	 * Comprobaci&oacute;n del filtrado.
-	 * @throws IOException Clave no v&aacute;lida.
-	 * @throws AOKeystoreAlternativeException Cuando no se puede abrir el almacen de claves.
-	 */
+	/** Comprobaci&oacute;n del filtrado.
+	 * @throws Exception */
 	@SuppressWarnings("static-method")
 	@Test
-	public void match() throws IOException, AOKeystoreAlternativeException {
+	public void match() throws Exception {
 
 		final SSLFilter filter = new SSLFilter(CERT_SN);
 
