@@ -25,8 +25,8 @@ import es.gob.afirma.core.misc.Platform.BROWSER;
 import es.gob.afirma.core.misc.Platform.OS;
 import es.gob.afirma.keystores.main.common.AOKeyStore;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
-import es.gob.afirma.keystores.main.common.AOKeyStoreManagerException;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManagerFactory;
+import es.gob.afirma.keystores.main.common.AOKeystoreAlternativeException;
 import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
 import es.gob.afirma.keystores.main.filters.CertificateFilter;
 
@@ -92,9 +92,8 @@ final class SelectPrivateKeyAction implements PrivilegedExceptionAction<PrivateK
 	}
 
 	/** {@inheritDoc} */
-	@Override
 	public PrivateKeyEntry run() throws KeyException,
-										AOKeyStoreManagerException,
+	                                    AOKeystoreAlternativeException,
 	                                    AOException,
 	                                    UnrecoverableEntryException,
 	                                    NoSuchAlgorithmException,
