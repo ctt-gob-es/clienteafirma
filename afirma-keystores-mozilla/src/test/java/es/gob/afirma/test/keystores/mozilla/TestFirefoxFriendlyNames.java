@@ -31,43 +31,64 @@ import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
  */
 public class TestFirefoxFriendlyNames {
 
-    /** Ejecuci&oacute;n de test problem&aacute;ticos en Maven desde main.
-     * @param args
-     * @throws Exception */
-    public static void main(final String[] args) throws Exception {
-    	final TestFirefoxFriendlyNames test = new TestFirefoxFriendlyNames();
+	/** Ejecuci&oacute;n de test problem&aacute;ticos en Maven desde main.
+	 * @param args
+	 * @throws Exception */
+	public static void main(final String[] args) throws Exception {
+		final TestFirefoxFriendlyNames test = new TestFirefoxFriendlyNames();
 		try {
-		    test.testWindowsFriendlyNames();
+			test.testWindowsFriendlyNames();
 		}
 		catch (final IOException e) {
-		    System.err.println(e.toString() + e.getCause().toString());
+			System.err.println(e.toString() + e.getCause().toString());
 		}
 		catch (final AOKeystoreAlternativeException e) {
-		    System.err.println(e.toString() + e.getCause().toString());
+			System.err.println(e.toString() + e.getCause().toString());
 		}
-    }
+	}
 
-    /** Prueba la conversi&oacute;n de alias en nombres significativos en CAPI.
-     * @throws Exception */
+	/** Prueba la conversi&oacute;n de alias en nombres significativos en CAPI.
+	 * @throws Exception */
+	@SuppressWarnings("static-method")
+	@Test
+	@Ignore
+	public void testWindowsFriendlyNames() throws Exception {
+		Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
+		final AOKeyStoreManager ksm = AOKeyStoreManagerFactory
+		.getAOKeyStoreManager(AOKeyStore.MOZ_UNI, null, "TEST",  //$NON-NLS-1$
+				null, null);
+
+		System.out.println();
+		final Map<String, String> aliases = KeyStoreUtilities
+		.getAliasesByFriendlyName(ksm.getAliases(), ksm, true, // Check
+				// private
+				// keys
+				true, // Show expired
+				null  // filters
+		);
+		for (final String key : aliases.keySet()) {
+			System.out.println(key + "\n\t" + aliases.get(key)); //$NON-NLS-1$
+		}
+	}
+
+
+    /** El acceso al almacen de certificados de Mozilla a traves de la factoria de almacenes.
+     * @throws Exception Cuando ocurre cualquier error.
+     */
     @SuppressWarnings("static-method")
 	@Test
-    @Ignore
-    public void testWindowsFriendlyNames() throws Exception {
-	Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
-	final AOKeyStoreManager ksm = AOKeyStoreManagerFactory
-		.getAOKeyStoreManager(AOKeyStore.MOZ_UNI, null, "TEST",  //$NON-NLS-1$
-			null, null);
+	@Ignore
+    public void testMozillaKeystoreFromAOKeyStoreManagerFactory() throws Exception {
 
-	System.out.println();
-	final Map<String, String> aliases = KeyStoreUtilities
-		.getAliasesByFriendlyName(ksm.getAliases(), ksm, true, // Check
-								       // private
-								       // keys
-			true, // Show expired
-			null  // filters
-		);
-	for (final String key : aliases.keySet()) {
-	    System.out.println(key + "\n\t" + aliases.get(key)); //$NON-NLS-1$
-	}
+    	final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+    			AOKeyStore.MOZ_UNI,
+    			null,
+    			"KeyStore Mozilla + DNIe", //$NON-NLS-1$
+    			null,
+    			null);
+
+    	for (final String alias : ksm.getAliases()) {
+    		System.out.println(alias);
+    	}
     }
 }
