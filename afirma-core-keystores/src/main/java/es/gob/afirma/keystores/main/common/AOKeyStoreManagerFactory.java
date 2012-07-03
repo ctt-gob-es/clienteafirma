@@ -95,7 +95,7 @@ public final class AOKeyStoreManagerFactory {
         // biblioteca y hay un DNIe insertado
         else if (Platform.getOS().equals(Platform.OS.WINDOWS) &&
                 AOKeyStore.WINDOWS.equals(store)) {
-        	return new DnieUnifiedKeyStoreManager(getWindowsCapiKeyStoreManager(store), parentComponent);
+        	return getWindowsCapiKeyStoreManager(store);
         }
 
         // Almacen de certificados de Windows (distintos a los personales)
@@ -115,7 +115,10 @@ public final class AOKeyStoreManagerFactory {
         // que agregue los certificados de este mediante el controlador Java del DNIe si se encuentra
         // la biblioteca y hay un DNIe insertado
         else if (AOKeyStore.MOZ_UNI.equals(store)) {
-        	return new DnieUnifiedKeyStoreManager(getMozillaUnifiedKeyStoreManager(store, pssCallback), parentComponent);
+        	if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+        		return new DnieUnifiedKeyStoreManager(getMozillaUnifiedKeyStoreManager(store, pssCallback), parentComponent);
+        	}
+        	return getMozillaUnifiedKeyStoreManager(store, pssCallback);
         }
 
         // Apple Safari sobre Mac OS X. Le agregamos el gestor de DNIe para que agregue los
