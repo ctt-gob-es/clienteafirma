@@ -20,8 +20,8 @@ import org.junit.Test;
 
 import es.gob.afirma.keystores.main.common.AOKeyStore;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
+import es.gob.afirma.keystores.main.common.AOKeyStoreManagerException;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManagerFactory;
-import es.gob.afirma.keystores.main.common.AOKeystoreAlternativeException;
 import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
 
 /**
@@ -42,7 +42,7 @@ public class TestFirefoxFriendlyNames {
 		catch (final IOException e) {
 			System.err.println(e.toString() + e.getCause().toString());
 		}
-		catch (final AOKeystoreAlternativeException e) {
+		catch (final AOKeyStoreManagerException e) {
 			System.err.println(e.toString() + e.getCause().toString());
 		}
 	}

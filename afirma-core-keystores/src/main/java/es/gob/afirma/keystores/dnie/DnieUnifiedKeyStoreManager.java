@@ -23,7 +23,6 @@ import es.gob.afirma.keystores.main.common.AOKeyStore;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManagerException;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManagerFactory;
-import es.gob.afirma.keystores.main.common.AOKeystoreAlternativeException;
 
 /** Representa a un <i>AOKeyStoreManager</i> para acceso a almacenes de claves de DNIe mediante controlador
  * 100% Java m&aacute;s un segundo almac&eacute;n en el que los certificados de ambos se tratan de forma unificada
@@ -64,9 +63,9 @@ public class DnieUnifiedKeyStoreManager extends AOKeyStoreManager {
 	 * @param parent Componente padre para la modalidad
 	 * @throws MissingLibraryException Si el entorno de ejecuci&oacute;n carece de alguna de las bibliotecas necesarias
 	 * @throws InvalidOSException Si el sistema operativo no soporta alguno de los almacenes
-	 * @throws AOKeystoreAlternativeException Si no se puede inicializar el almac&eacute;n pero existe una alternativa de uso
+	 * @throws AOKeyStoreManagerException Si no se puede inicializar el almac&eacute;n
 	 * @throws IOException Si se producen errores de entrada-salida en la inicializaci&oacute;n de los almacenes */
-	public DnieUnifiedKeyStoreManager(final AOKeyStoreManager originalKsm, final Object parent) throws MissingLibraryException, InvalidOSException, AOKeystoreAlternativeException, IOException {
+	public DnieUnifiedKeyStoreManager(final AOKeyStoreManager originalKsm, final Object parent) throws MissingLibraryException, InvalidOSException, AOKeyStoreManagerException, IOException {
 		if (originalKsm == null) {
 			throw new IllegalArgumentException("Es necesario un almacen al que anadir los certificados de DNIe, no puede ser nulo"); //$NON-NLS-1$
 		}
@@ -128,9 +127,9 @@ public class DnieUnifiedKeyStoreManager extends AOKeyStoreManager {
 			return this.ORIGINAL_KSM.getCertificateChain(alias);
 		}
 		final X509Certificate[] chain = new X509Certificate[3];
-		System.out.println(this.DNIE_KSM.getCertificateChain(alias)[0].getClass().getName());
-		chain[0] = this.DNIE_KSM.getCertificateChain(alias)[0];
-		chain[1] = this.DNIE_KSM.getCertificateChain(alias)[1];
+		final X509Certificate[] originalDnieChain = this.DNIE_KSM.getCertificateChain(alias);
+		chain[0] = originalDnieChain[0];
+		chain[1] = originalDnieChain[1];
 		chain[2] = dnieRootCertificate;
 		return chain;
 	}

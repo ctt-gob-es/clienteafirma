@@ -60,7 +60,7 @@ public final class AOKeyStoreManagerFactory {
      * @throws AOCancelledOperationException
      *         Cuando el usuario cancela el proceso (por ejemplo, al
      *         introducir la contrase&ntilde;a)
-     * @throws AOKeystoreAlternativeException
+     * @throws AOKeyStoreManagerException
      *         Cuando ocurre cualquier otro problema durante el proceso
      * @throws IOException
      *         Cuando la contrase&ntilde;a del almac&eacute;n es incorrecta.
@@ -73,7 +73,7 @@ public final class AOKeyStoreManagerFactory {
                                                          final String lib,
                                                          final String description,
                                                          final PasswordCallback pssCallback,
-                                                         final Object parentComponent) throws AOKeystoreAlternativeException,
+                                                         final Object parentComponent) throws AOKeyStoreManagerException,
                                                                                               IOException, MissingLibraryException, InvalidOSException {
 
         // Fichero P7, X509, P12/PFX o Java JKS, en cualquier sistema operativo
@@ -95,7 +95,7 @@ public final class AOKeyStoreManagerFactory {
         // biblioteca y hay un DNIe insertado
         else if (Platform.getOS().equals(Platform.OS.WINDOWS) &&
                 AOKeyStore.WINDOWS.equals(store)) {
-        	return new DnieUnifiedKeyStoreManager(getWindowsCapiKeyStoreManager(store), parentComponent);
+        	return getWindowsCapiKeyStoreManager(store);
         }
 
         // Almacen de certificados de Windows (distintos a los personales)
@@ -115,7 +115,10 @@ public final class AOKeyStoreManagerFactory {
         // que agregue los certificados de este mediante el controlador Java del DNIe si se encuentra
         // la biblioteca y hay un DNIe insertado
         else if (AOKeyStore.MOZ_UNI.equals(store)) {
-        	return new DnieUnifiedKeyStoreManager(getMozillaUnifiedKeyStoreManager(store, pssCallback), parentComponent);
+        	if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+        		return new DnieUnifiedKeyStoreManager(getMozillaUnifiedKeyStoreManager(pssCallback), parentComponent);
+        	}
+        	return getMozillaUnifiedKeyStoreManager(pssCallback);
         }
 
         // Apple Safari sobre Mac OS X. Le agregamos el gestor de DNIe para que agregue los
@@ -129,8 +132,7 @@ public final class AOKeyStoreManagerFactory {
         	return getDnieJavaKeyStoreManager(store, pssCallback, parentComponent);
         }
 
-        throw new AOKeystoreAlternativeException(
-             getAlternateKeyStoreType(store),
+        throw new AOKeyStoreManagerException(
              "La plataforma de navegador '"  //$NON-NLS-1$
                + store.getDescription()
                + "' mas sistema operativo '" //$NON-NLS-1$
@@ -142,7 +144,7 @@ public final class AOKeyStoreManagerFactory {
     private static AOKeyStoreManager getDnieJavaKeyStoreManager(final AOKeyStore store,
     		                                                    final PasswordCallback pssCallback,
     	                                                         final Object parentComponent)
-    															throws AOKeystoreAlternativeException,
+    															throws AOKeyStoreManagerException,
     															IOException {
     	final AOKeyStoreManager ksm = new AOKeyStoreManager();
     	try {
@@ -153,8 +155,7 @@ public final class AOKeyStoreManagerFactory {
     		throw e;
 		}
     	catch(final Exception e) {
-    		throw new AOKeystoreAlternativeException(
-                getAlternateKeyStoreType(store),
+    		throw new AOKeyStoreManagerException(
                 "Error al inicializar el modulo DNIe 100% Java: " + e, //$NON-NLS-1$
                 e
            );
@@ -168,7 +169,7 @@ public final class AOKeyStoreManagerFactory {
                                                             final Object parentComponent) throws MissingLibraryException,
                                                                                                  InvalidOSException,
                                                                                                  IOException,
-                                                                                                 AOKeystoreAlternativeException {
+                                                                                                 AOKeyStoreManagerException {
     	final AOKeyStoreManager ksm = new AOKeyStoreManager();
         String storeFilename = null;
         if (lib != null && !"".equals(lib) && new File(lib).exists()) { //$NON-NLS-1$
@@ -213,8 +214,7 @@ public final class AOKeyStoreManagerFactory {
             ksm.init(store, is, pssCallback, null);
         }
         catch (final AOException e) {
-            throw new AOKeystoreAlternativeException(
-               getAlternateKeyStoreType(store),
+            throw new AOKeyStoreManagerException(
                "No se ha podido abrir el almacen de tipo " + store.getDescription(), //$NON-NLS-1$
                e
             );
@@ -229,7 +229,7 @@ public final class AOKeyStoreManagerFactory {
                                                               final Object parentComponent) throws MissingLibraryException,
                                                                                                    InvalidOSException,
                                                                                                    IOException,
-                                                                                                   AOKeystoreAlternativeException {
+                                                                                                   AOKeyStoreManagerException {
     	final AOKeyStoreManager ksm = new AOKeyStoreManager();
         String p11Lib = null;
         if (lib != null && !"".equals(lib) && new File(lib).exists()) { //$NON-NLS-1$
@@ -266,8 +266,7 @@ public final class AOKeyStoreManagerFactory {
             });
         }
         catch (final AOException e) {
-            throw new AOKeystoreAlternativeException(
-                 getAlternateKeyStoreType(store),
+            throw new AOKeyStoreManagerException(
                  "Error al inicializar el modulo PKCS#11", //$NON-NLS-1$
                  e
             );
@@ -278,14 +277,13 @@ public final class AOKeyStoreManagerFactory {
     private static AOKeyStoreManager getWindowsCapiKeyStoreManager(final AOKeyStore store) throws MissingLibraryException,
                                                                                                   InvalidOSException,
                                                                                                   IOException,
-                                                                                                  AOKeystoreAlternativeException {
+                                                                                                  AOKeyStoreManagerException {
     	final AOKeyStoreManager ksm = new AOKeyStoreManager();
         try {
             ksm.init(store, null, new NullPasswordCallback(), null);
         }
         catch (final AOException e) {
-            throw new AOKeystoreAlternativeException(
-                 getAlternateKeyStoreType(store),
+            throw new AOKeyStoreManagerException(
                  "Error al inicializar el almacen " + store.getDescription(), //$NON-NLS-1$
                  e
             );
@@ -297,7 +295,7 @@ public final class AOKeyStoreManagerFactory {
                                                                   final PasswordCallback pssCallback) throws MissingLibraryException,
                                                                                                              InvalidOSException,
                                                                                                              IOException,
-                                                                                                             AOKeystoreAlternativeException {
+                                                                                                             AOKeyStoreManagerException {
     	final AOKeyStoreManager ksm = new AOKeyStoreManager();
     	try {
             ksm.init(
@@ -308,8 +306,7 @@ public final class AOKeyStoreManagerFactory {
     		);
         }
         catch (final AOException e) {
-            throw new AOKeystoreAlternativeException(
-                 getAlternateKeyStoreType(store),
+            throw new AOKeyStoreManagerException(
                  "Error al inicializar el PKCS#11 del DNIe", //$NON-NLS-1$
                  e
             );
@@ -317,8 +314,7 @@ public final class AOKeyStoreManagerFactory {
         return ksm;
     }
 
-    private static AOKeyStoreManager getMozillaUnifiedKeyStoreManager(final AOKeyStore store,
-    		                                                          final PasswordCallback pssCallback) throws AOKeystoreAlternativeException,
+    private static AOKeyStoreManager getMozillaUnifiedKeyStoreManager(final PasswordCallback pssCallback) throws AOKeyStoreManagerException,
     		                                                                                                     MissingLibraryException,
     		                                                                                                     InvalidOSException,
     		                                                                                                     IOException {
@@ -327,8 +323,7 @@ public final class AOKeyStoreManagerFactory {
             ksmUni = (AOKeyStoreManager) AOUtil.classForName("es.gob.afirma.keystores.mozilla.MozillaUnifiedKeyStoreManager").newInstance(); //$NON-NLS-1$
         }
         catch(final Exception e) {
-            throw new AOKeystoreAlternativeException(
-                 getAlternateKeyStoreType(store),
+            throw new AOKeyStoreManagerException(
                  "Error al obtener dinamicamente el almacen NSS unificado de Mozilla Firefox", //$NON-NLS-1$
                  e
              );
@@ -337,8 +332,7 @@ public final class AOKeyStoreManagerFactory {
             ksmUni.init(AOKeyStore.MOZ_UNI, null, pssCallback, null);
         }
         catch (final AOException e) {
-            throw new AOKeystoreAlternativeException(
-                getAlternateKeyStoreType(store),
+            throw new AOKeyStoreManagerException(
                 "Error al inicializar el almacen NSS unificado de Mozilla Firefox", //$NON-NLS-1$
                 e
             );
@@ -350,7 +344,7 @@ public final class AOKeyStoreManagerFactory {
                                                                                                         InvalidOSException,
                                                                                                         FileNotFoundException,
                                                                                                         IOException,
-                                                                                                        AOKeystoreAlternativeException {
+                                                                                                        AOKeyStoreManagerException {
     	final AOKeyStoreManager ksm = new AOKeyStoreManager();
         // En Mac OS X podemos inicializar un KeyChain en un fichero particular o el "defecto del sistema"
         try {
@@ -362,23 +356,9 @@ public final class AOKeyStoreManagerFactory {
             );
         }
         catch (final AOException e) {
-            throw new AOKeystoreAlternativeException(getAlternateKeyStoreType(store), "Error al inicializar el Llavero de Mac OS X", e); //$NON-NLS-1$
+            throw new AOKeyStoreManagerException("Error al inicializar el Llavero de Mac OS X", e); //$NON-NLS-1$
         }
         return ksm;
-    }
-
-    /** @return <code>AOKeyStore</code> alternativo o <code>null</code> si no hay alternativo */
-    private static AOKeyStore getAlternateKeyStoreType(final AOKeyStore currentStore) {
-        if (AOKeyStore.PKCS12.equals(currentStore)) {
-            return null;
-        }
-        if (Platform.OS.WINDOWS.equals(Platform.getOS()) && (!AOKeyStore.WINDOWS.equals(currentStore))) {
-            return AOKeyStore.WINDOWS;
-        }
-        if (Platform.OS.MACOSX.equals(Platform.getOS()) && (!AOKeyStore.APPLE.equals(currentStore))) {
-            return AOKeyStore.APPLE;
-        }
-        return AOKeyStore.PKCS12;
     }
 
 }
