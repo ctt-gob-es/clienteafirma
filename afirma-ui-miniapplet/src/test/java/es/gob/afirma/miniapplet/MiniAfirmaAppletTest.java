@@ -67,16 +67,19 @@ public final class MiniAfirmaAppletTest {
 	    System.out.println(ss);
 	}
 
+	/** Realiza una firma con el almac&eacute;n por defecto.
+	 * @throws Exception */
+	@SuppressWarnings("static-method")
 	@Test
 	@Ignore
-	public void signWithMozilla() throws Exception {
+	public void signWithDefault() throws Exception {
 		final MiniAfirmaApplet applet = new MiniAfirmaApplet();
 
 		System.out.println(
 				applet.sign(
-						Base64.encode("Hola".getBytes()),
-						"SHA1withRSA",
-						"CAdES",
+						Base64.encode("Hola".getBytes()), //$NON-NLS-1$
+						"SHA1withRSA", //$NON-NLS-1$
+						"CAdES", //$NON-NLS-1$
 						null)
 		);
 
