@@ -14,7 +14,6 @@ import java.util.logging.Logger;
 
 import junit.framework.Assert;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -26,7 +25,6 @@ public final class MiniAfirmaAppletTest {
 	/** Prueba de firma simple con DNIe. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
 	public void signWithDNIe() {
 		final MiniAfirmaApplet applet = new MiniAfirmaApplet();
 		try {
@@ -71,7 +69,6 @@ public final class MiniAfirmaAppletTest {
 	 * @throws Exception */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
 	public void signWithDefault() throws Exception {
 		final MiniAfirmaApplet applet = new MiniAfirmaApplet();
 
@@ -82,7 +79,7 @@ public final class MiniAfirmaAppletTest {
 						"CAdES", //$NON-NLS-1$
 						null)
 		);
-
+		System.out.println("Done"); //$NON-NLS-1$
 
 	}
 }
