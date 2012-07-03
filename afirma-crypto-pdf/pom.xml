@@ -68,6 +68,7 @@
 			</plugin>
 
 			<!-- Proguard -->
+	<!-- 
 			<plugin>
 				<groupId>com.github.wvengen</groupId>
 				<artifactId>proguard-maven-plugin</artifactId>
@@ -100,7 +101,7 @@
 					</dependency>
 				</dependencies>
 			</plugin>
-
+	 -->
 		</plugins>
 	</build>
 </project>
