@@ -25,6 +25,7 @@ import es.gob.afirma.core.MissingLibraryException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.keystores.dnie.DnieUnifiedKeyStoreManager;
 import es.gob.afirma.keystores.main.callbacks.NullPasswordCallback;
 
 /** Obtiene clases de tipo AOKeyStoreManager seg&uacute;n se necesiten,
@@ -89,12 +90,17 @@ public final class AOKeyStoreManagerFactory {
         	return getPkcs11KeyStoreManager(store, lib, description, pssCallback, parentComponent);
         }
 
-        // Internet Explorer en Windows (descartamos Internet Explorer en
-        // Solaris, HP-UX o Mac OS X)
-        // o Google Chrome en Windows, que tambien usa el almacen de CAPI
+        // Almacen de certificados personales de Windows. Le agregamos el gestor de DNIe para
+        // que agregue los certificados mediante el controlador Java del DNIe si se encuentra la
+        // biblioteca y hay un DNIe insertado
         else if (Platform.getOS().equals(Platform.OS.WINDOWS) &&
-                (AOKeyStore.WINDOWS.equals(store) ||
-        		 AOKeyStore.WINROOT.equals(store) ||
+                AOKeyStore.WINDOWS.equals(store)) {
+        	return new DnieUnifiedKeyStoreManager(getWindowsCapiKeyStoreManager(store), parentComponent);
+        }
+
+        // Almacen de certificados de Windows (distintos a los personales)
+        else if (Platform.getOS().equals(Platform.OS.WINDOWS) &&
+                (AOKeyStore.WINROOT.equals(store) ||
         		 AOKeyStore.WINADDRESSBOOK.equals(store) ||
         		 AOKeyStore.WINCA.equals(store))) {
         	return getWindowsCapiKeyStoreManager(store);
@@ -104,16 +110,19 @@ public final class AOKeyStoreManagerFactory {
         	return getDniePkcs11KeyStoreManager(store, pssCallback);
         }
 
+        // Almacen de Mozilla que muestra tanto los certificados del almacen interno como los de
+        // los dispositivos externos configuramos. A esto, le agregamos el gestor de DNIe para
+        // que agregue los certificados de este mediante el controlador Java del DNIe si se encuentra
+        // la biblioteca y hay un DNIe insertado
         else if (AOKeyStore.MOZ_UNI.equals(store)) {
-        	return getMozillaUnifiedKeyStoreManager(store, pssCallback);
+        	return new DnieUnifiedKeyStoreManager(getMozillaUnifiedKeyStoreManager(store, pssCallback), parentComponent);
         }
 
-        // Apple Safari sobre Mac OS X
-        // Identificacion del sistema operativo segun (anadiendo mayusculas
-        // donde se necesitaba)
-        // http://developer.apple.com/technotes/tn2002/tn2110.html
+        // Apple Safari sobre Mac OS X. Le agregamos el gestor de DNIe para que agregue los
+        // certificados mediante el controlador Java del DNIe si se encuentra la biblioteca y
+        // hay un DNIe insertado
         else if (Platform.getOS().equals(Platform.OS.MACOSX) && AOKeyStore.APPLE.equals(store)) {
-        	return getMacOSXKeyStoreManager(store, lib);
+        	return new DnieUnifiedKeyStoreManager(getMacOSXKeyStoreManager(store, lib), parentComponent);
         }
 
         else if (AOKeyStore.DNIEJAVA.equals(store)) {
