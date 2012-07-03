@@ -66,4 +66,20 @@ public final class MiniAfirmaAppletTest {
 	    Assert.assertNotNull(ss);
 	    System.out.println(ss);
 	}
+
+	@Test
+	@Ignore
+	public void signWithMozilla() throws Exception {
+		final MiniAfirmaApplet applet = new MiniAfirmaApplet();
+
+		System.out.println(
+				applet.sign(
+						Base64.encode("Hola".getBytes()),
+						"SHA1withRSA",
+						"CAdES",
+						null)
+		);
+
+
+	}
 }
