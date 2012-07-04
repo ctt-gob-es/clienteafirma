@@ -2547,7 +2547,7 @@ interface EntryPointsCrypto {
      * @return Array con todos los certificados. */
     String[] getArrayCertificates();
 
-    /** Recupera un certificado del repositorio activo en la forma:
+    /** Recupera un certificado del repositorio activo. El certificado se recupera en la forma:
      * <p>
      * <code>
      * Bag Attributes<br/>
@@ -2576,8 +2576,8 @@ interface EntryPointsCrypto {
      *         Retrieved certificate or <code>null</code> if error occurs. */
     String getCertificate(String alias);
 
-    /** Recupera la clave p&uacute;blica de un certificado del repositorio activo
-     * en la forma:
+    /** Recupera la clave p&uacute;blica de un certificado del repositorio activo.
+     *  La clave se recupera en la forma en la forma:
      * <p>
      * <code>
      * -----BEGIN RSA KEY-----<br/>
