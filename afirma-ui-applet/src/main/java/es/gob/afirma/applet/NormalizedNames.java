@@ -146,63 +146,51 @@ final class NormalizedNames {
         final String typeLw = type.toLowerCase();
         if (typeLw.equals("windows") || typeLw.equals("internet explorer") //$NON-NLS-1$ //$NON-NLS-2$
             || typeLw.equals("ie") || typeLw.equals("microsoft") //$NON-NLS-1$ //$NON-NLS-2$
-            || typeLw.equals("windows-my") || typeLw.equals("windowsmy")  //$NON-NLS-1$ //$NON-NLS-2$
-            || typeLw.equalsIgnoreCase(AOKeyStore.WINDOWS.getDescription())) {
+            || typeLw.equals("windows-my") || typeLw.equals("windowsmy")) { //$NON-NLS-1$ //$NON-NLS-2$
             return AOKeyStore.WINDOWS.getName();
         }
         else if (typeLw.equals("winaddressbook") || typeLw.equals("addressbook") //$NON-NLS-1$ //$NON-NLS-2$
                  || typeLw.equals("win-others") || typeLw.equals("winothers") //$NON-NLS-1$ //$NON-NLS-2$
-                 || typeLw.equals("windows-others") || typeLw.equals("windowsothers")  //$NON-NLS-1$ //$NON-NLS-2$
-                 || typeLw.equalsIgnoreCase(AOKeyStore.WINADDRESSBOOK.getDescription())) {
+                 || typeLw.equals("windows-others") || typeLw.equals("windowsothers")) { //$NON-NLS-1$ //$NON-NLS-2$
             return AOKeyStore.WINADDRESSBOOK.getName();
         }
         else if (typeLw.equals("mac os x") || typeLw.equals("macos x") //$NON-NLS-1$ //$NON-NLS-2$
                  || typeLw.equals("macosx") || typeLw.equals("safari") //$NON-NLS-1$ //$NON-NLS-2$
                  || typeLw.equals("apple") || typeLw.equals("apple safari") //$NON-NLS-1$ //$NON-NLS-2$
-                 || typeLw.equals("keychainstore")  //$NON-NLS-1$
-                 || typeLw.equalsIgnoreCase(AOKeyStore.APPLE.getDescription())) {
+                 || typeLw.equals("keychainstore")) { //$NON-NLS-1$
             return AOKeyStore.APPLE.getName();
         }
-        else if (typeLw.equals("mozilla") || typeLw.equals("firefox") || typeLw.equals("ff")  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                || typeLw.equalsIgnoreCase(AOKeyStore.MOZ_UNI.getDescription())) {
+        else if (typeLw.equals("mozilla") || typeLw.equals("firefox") || typeLw.equals("ff")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             return AOKeyStore.MOZ_UNI.getName();
         }
         else if (typeLw.equals("pkcs#12") || typeLw.equals("pkcs12") || typeLw.equals("p12")  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                 || typeLw.equals("pfx")  //$NON-NLS-1$
-                 || typeLw.equalsIgnoreCase(AOKeyStore.PKCS12.getDescription())) {
+                 || typeLw.equals("pfx")) { //$NON-NLS-1$
             return AOKeyStore.PKCS12.getName();
         }
-        else if (typeLw.equals("pkcs#11") || typeLw.equals("pkcs11") || typeLw.equals("p11")  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                || typeLw.equalsIgnoreCase(AOKeyStore.PKCS11.getDescription())) {
+        else if (typeLw.equals("pkcs#11") || typeLw.equals("pkcs11") || typeLw.equals("p11")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             return AOKeyStore.PKCS11.getName();
         }
         else if (typeLw.equals("java") || typeLw.equals("jks") || typeLw.equals("java keystore") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                 || typeLw.equals("javakeystore")  //$NON-NLS-1$
-                 || typeLw.equalsIgnoreCase(AOKeyStore.JAVA.getDescription())) {
+                 || typeLw.equals("javakeystore")) { //$NON-NLS-1$
             return AOKeyStore.JAVA.getName();
         }
         else if (typeLw.equals("single") || typeLw.equals("pkcs7") || typeLw.equals("pkcs#7") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                 || typeLw.equals("x509") || typeLw.equals("x.509") || typeLw.equals("cer")  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                 || typeLw.equalsIgnoreCase(AOKeyStore.SINGLE.getDescription())) {
+                 || typeLw.equals("x509") || typeLw.equals("x.509") || typeLw.equals("cer")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             return AOKeyStore.SINGLE.getName();
         }
-        else if (typeLw.equals("jceks") || typeLw.equals("java cryptography extension keystore")  //$NON-NLS-1$ //$NON-NLS-2$
-                || typeLw.equalsIgnoreCase(AOKeyStore.JCEKS.getDescription())) {
+        else if (typeLw.equals("jceks") || typeLw.equals("java cryptography extension keystore")) { //$NON-NLS-1$ //$NON-NLS-2$
             return AOKeyStore.JCEKS.getName();
         }
         else if (typeLw.equals("javace") || typeLw.equals("caseexactjks") //$NON-NLS-1$ //$NON-NLS-2$
-                 || typeLw.equals("java keystore (case exact)") || typeLw.equals("jks (case exact)")  //$NON-NLS-1$ //$NON-NLS-2$
-                 || typeLw.equalsIgnoreCase(AOKeyStore.JAVACE.getDescription())) {
+                 || typeLw.equals("java keystore (case exact)") || typeLw.equals("jks (case exact)")) { //$NON-NLS-1$ //$NON-NLS-2$
             return AOKeyStore.JAVACE.getName();
         }
         else if (typeLw.equals("win-ca") || typeLw.equals("winca") //$NON-NLS-1$ //$NON-NLS-2$
-                 || typeLw.equals("windows-ca") || typeLw.equals("windowsca")  //$NON-NLS-1$ //$NON-NLS-2$
-                 || typeLw.equalsIgnoreCase(AOKeyStore.WINCA.getDescription())) {
+                 || typeLw.equals("windows-ca") || typeLw.equals("windowsca")) { //$NON-NLS-1$ //$NON-NLS-2$
             return AOKeyStore.WINCA.getName();
         }
         else if (typeLw.equals("windows-root") || typeLw.equals("windowsroot") //$NON-NLS-1$ //$NON-NLS-2$
-                 || typeLw.equals("winroot")  //$NON-NLS-1$
-                 || typeLw.equalsIgnoreCase(AOKeyStore.WINROOT.getDescription())) {
+                 || typeLw.equals("winroot")) { //$NON-NLS-1$
             return AOKeyStore.WINROOT.getName();
         }
         return type;

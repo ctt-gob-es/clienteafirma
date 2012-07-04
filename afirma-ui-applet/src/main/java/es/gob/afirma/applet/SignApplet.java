@@ -424,7 +424,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         final AOKeyStore keyStore = SignApplet.configureDefaultStore(Platform.getOS(), Platform.getBrowser(this.userAgent));
         this.ksConfigManager = new KeyStoreConfigurationManager(keyStore, this);
 
-        LOGGER.info("Almacen de certificados preestablecido: " + keyStore.getDescription()); //$NON-NLS-1$
+        LOGGER.info("Almacen de certificados preestablecido: " + keyStore.getName()); //$NON-NLS-1$
 
         // Configuramos si se debe mostrar en los navegadores Mozilla un dialogo
         // de advertencia
@@ -536,7 +536,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                         return new String[0];
                     }
                     if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(SignApplet.this,
-                                                                                AppletMessages.getString("SignApplet.4") + " " + kst.getDescription() + "?", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                                                                                AppletMessages.getString("SignApplet.4") + " " + kst.getName() + "?", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                                                                                 AppletMessages.getString("SignApplet.658"), //$NON-NLS-1$
                                                                                 JOptionPane.WARNING_MESSAGE)) {
                         setKeyStore(null, null, kst.toString());
@@ -633,7 +633,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     				return null;
     			}
     			if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(this,
-    					AppletMessages.getString("SignApplet.4", kst.getDescription()), //$NON-NLS-1$
+    					AppletMessages.getString("SignApplet.4", kst.getName()), //$NON-NLS-1$
     					AppletMessages.getString("SignApplet.658"), //$NON-NLS-1$
     					JOptionPane.WARNING_MESSAGE)) {
     				setKeyStore(null, null, kst.toString());
@@ -4182,7 +4182,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                     SignApplet.this.setError(AppletMessages.getString("SignApplet.6")); //$NON-NLS-1$
                 }
                 else if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(SignApplet.this,
-                                                                                 AppletMessages.getString("SignApplet.80") + kst.getDescription() + "?", //$NON-NLS-1$ //$NON-NLS-2$
+                                                                                 AppletMessages.getString("SignApplet.80") + kst.getName() + "?", //$NON-NLS-1$ //$NON-NLS-2$
                                                                                  AppletMessages.getString("SignApplet.658"), //$NON-NLS-1$
                                                                                  JOptionPane.WARNING_MESSAGE)) {
                     setKeyStore(null, null, kst.toString());
@@ -4338,7 +4338,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                         return "error:internalError"; //$NON-NLS-1$
                     }
                     if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(SignApplet.this,
-                                                                                AppletMessages.getString("SignApplet.80") + kst.getDescription() + "?", //$NON-NLS-1$ //$NON-NLS-2$
+                                                                                AppletMessages.getString("SignApplet.80") + kst.getName() + "?", //$NON-NLS-1$ //$NON-NLS-2$
                                                                                 AppletMessages.getString("SignApplet.658"), //$NON-NLS-1$
                                                                                 JOptionPane.WARNING_MESSAGE)) {
                         setKeyStore(null, null, kst.toString());

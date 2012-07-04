@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -16,23 +16,23 @@ package es.gob.afirma.keystores.main.common;
 public final class KeyStoreConfiguration {
 
     private final AOKeyStore type;
-    private final String description;
+    private final String name;
     private final String lib;
 
     /** Crea una configuraci&oacute;n para un almac&eacute;n de claves.
      * @param t
      *        Typo de almac&eacute;n de claves
-     * @param d
-     *        Descripci&oacute;n del almac&eacute;n de claves
+     * @param n
+     *        Nombre del almac&eacute;n de claves
      * @param l
      *        Biblioteca PKCS#11 correspondiente al almac&eacute;n de claves
      *        (&uacute;nicamente en almacenes tipo PKCS#11) */
-    public KeyStoreConfiguration(final AOKeyStore t, final String d, final String l) {
+    public KeyStoreConfiguration(final AOKeyStore t, final String n, final String l) {
         this.type = t;
         if (t == null) {
             throw new IllegalArgumentException("Es necesario indicar el tipo de almacen"); //$NON-NLS-1$
         }
-        this.description = (d != null) ? d : t.getDescription();
+        this.name = (n != null) ? n : t.getName();
         this.lib = l;
     }
 
@@ -52,6 +52,6 @@ public final class KeyStoreConfiguration {
 
     @Override
     public String toString() {
-        return this.description;
+        return this.name;
     }
 }

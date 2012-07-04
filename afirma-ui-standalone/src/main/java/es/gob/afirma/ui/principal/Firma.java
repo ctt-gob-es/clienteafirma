@@ -151,7 +151,7 @@ final class Firma extends JPanel {
             }
             else if (store == AOKeyStore.PKCS12) {
                 pssCallback =
-                        new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription() + ". \r\nSi no ha establecido ninguna, deje el campo en blanco.", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                        new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getName() + ". \r\nSi no ha establecido ninguna, deje el campo en blanco.", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                                                             SwingUtilities.getRoot(this),
                                                             Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title") //$NON-NLS-1$ //$NON-NLS-2$
                         );
@@ -166,7 +166,7 @@ final class Firma extends JPanel {
             }
             else {
                 pssCallback =
-                        new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription() + ". \r\nSi no ha establecido ninguna, deje el campo en blanco.", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                        new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getName() + ". \r\nSi no ha establecido ninguna, deje el campo en blanco.", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                                                             SwingUtilities.getRoot(this),
                                                             Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title") //$NON-NLS-1$ //$NON-NLS-2$
                         );

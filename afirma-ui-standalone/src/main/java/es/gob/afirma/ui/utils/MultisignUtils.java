@@ -56,7 +56,7 @@ public final class MultisignUtils {
             /*pssCallback = new UIPasswordCallback(
             		Messages.getString("Msg.pedir.contraenia", store.getDescription()),  //$NON-NLS-1$
             		null);*/
-            pssCallback = new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription(), //$NON-NLS-1$ //$NON-NLS-2$
+            pssCallback = new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getName(), //$NON-NLS-1$ //$NON-NLS-2$
                                                               null,
                                                               Messages.getString("CustomDialog.showInputPasswordDialog.title"), //$NON-NLS-1$
                                                               KeyEvent.VK_O,
@@ -78,7 +78,7 @@ public final class MultisignUtils {
             /*pssCallback = new UIPasswordCallback(
             		Messages.getString("Msg.pedir.contraenia", store.getDescription()),  //$NON-NLS-1$
             		null);*/
-            pssCallback = new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription(), //$NON-NLS-1$ //$NON-NLS-2$
+            pssCallback = new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getName(), //$NON-NLS-1$ //$NON-NLS-2$
                                                               null,
                                                               Messages.getString("CustomDialog.showInputPasswordDialog.title"), //$NON-NLS-1$
                                                               KeyEvent.VK_O,

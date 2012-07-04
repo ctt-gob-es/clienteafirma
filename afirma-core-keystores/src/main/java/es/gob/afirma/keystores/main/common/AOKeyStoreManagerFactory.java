@@ -135,7 +135,7 @@ public final class AOKeyStoreManagerFactory {
         throw new AOKeystoreAlternativeException(
              getAlternateKeyStoreType(store),
              "La plataforma de navegador '"  //$NON-NLS-1$
-               + store.getDescription()
+               + store.getName()
                + "' mas sistema operativo '" //$NON-NLS-1$
                + Platform.getOS()
                + "' no esta soportada" //$NON-NLS-1$
@@ -204,7 +204,7 @@ public final class AOKeyStoreManagerFactory {
                 };
                 desc = KeyStoreMessages.getString("AOKeyStoreManagerFactory.3"); //$NON-NLS-1$
             }
-            storeFilename = AOUIFactory.getLoadFileName(KeyStoreMessages.getString("AOKeyStoreManagerFactory.4") + " " + store.getDescription(), exts, desc, parentComponent); //$NON-NLS-1$ //$NON-NLS-2$
+            storeFilename = AOUIFactory.getLoadFileName(KeyStoreMessages.getString("AOKeyStoreManagerFactory.4") + " " + store.getName(), exts, desc, parentComponent); //$NON-NLS-1$ //$NON-NLS-2$
             if (storeFilename == null) {
                 throw new AOCancelledOperationException("No se ha seleccionado el almacen de certificados"); //$NON-NLS-1$
             }
@@ -218,7 +218,7 @@ public final class AOKeyStoreManagerFactory {
         catch (final AOException e) {
             throw new AOKeystoreAlternativeException(
                getAlternateKeyStoreType(store),
-               "No se ha podido abrir el almacen de tipo " + store.getDescription(), //$NON-NLS-1$
+               "No se ha podido abrir el almacen de tipo " + store.getName(), //$NON-NLS-1$
                e
             );
         }
@@ -289,7 +289,7 @@ public final class AOKeyStoreManagerFactory {
         catch (final AOException e) {
             throw new AOKeystoreAlternativeException(
                  getAlternateKeyStoreType(store),
-                 "Error al inicializar el almacen " + store.getDescription(), //$NON-NLS-1$
+                 "Error al inicializar el almacen " + store.getName(), //$NON-NLS-1$
                  e
             );
         }

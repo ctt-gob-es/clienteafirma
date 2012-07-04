@@ -228,7 +228,7 @@ final class PanelDestinatarios extends JAccessibilityDialogWizard {
         }
         else {
             pssCallback =
-                new UIPasswordCallbackAccessibility(Messages.getString("Wizard.sobres.almacen.pass") + " " + kStore.getDescription(), //$NON-NLS-1$
+                new UIPasswordCallbackAccessibility(Messages.getString("Wizard.sobres.almacen.pass") + " " + kStore.getName(), //$NON-NLS-1$
                                                     this,
                                                     Messages.getString("CustomDialog.showInputPasswordDialog.title"), //$NON-NLS-1$
                                                     KeyEvent.VK_O,

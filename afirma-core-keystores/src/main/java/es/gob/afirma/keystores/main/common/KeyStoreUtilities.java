@@ -540,7 +540,7 @@ public final class KeyStoreUtilities {
         else if (kStore == AOKeyStore.DNIEJAVA) {
                     return null;
         }
-        return new UIPasswordCallback(KeyStoreMessages.getString("KeyStoreUtilities.6", kStore.getDescription()), parent); //$NON-NLS-1$
+        return new UIPasswordCallback(KeyStoreMessages.getString("KeyStoreUtilities.6", kStore.getName()), parent); //$NON-NLS-1$
     }
 
     /** Recupera el manejador de claves asociado a un certificado seg&uacute;n el

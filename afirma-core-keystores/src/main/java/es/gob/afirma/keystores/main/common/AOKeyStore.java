@@ -47,26 +47,27 @@ public enum AOKeyStore {
     // WINDEPLOY("Windows / Internet Explorer (despliegue)", 15, "WIExplorerMy")
     ;
 
-    private String description;
+    private String name;
     private final int ordinal;
-    private final String name;
+    private final String providerName;
 
-    private AOKeyStore(final String d, final int o, final String n) {
-        this.description = d;
-        this.ordinal = o;
+    private AOKeyStore(final String n, final int o, final String pn) {
         this.name = n;
+        this.ordinal = o;
+        this.providerName = pn;
     }
 
     @Override
     public String toString() {
-        return getDescription();
+        return getName();
     }
 
 
-    /** Obtiene el nombre del almac&eacute;n de claves y certificados.
-     * @return Nombre del almac&eacute;n de claves y certificados */
-    public String getName() {
-        return this.name;
+    /** Obtiene el nombre del proveedor de seguridad que da acceso al almac&eacute;n de
+     * claves y certificados.
+     * @return Nombre del proveedor */
+    public String getProviderName() {
+        return this.providerName;
     }
 
     /** Obtiene el n&uacute;mero interno del n del almac&eacute;n de claves.
@@ -75,10 +76,10 @@ public enum AOKeyStore {
         return this.ordinal;
     }
 
-    /** Obtiene la descripci&oacute;n del almac&eacute;n de claves.
-     * @return Descripci&oacute;n del almac&eacute;n de claves */
-    public String getDescription() {
-        return this.description;
+    /** Obtiene el Nombre del almac&eacute;n de claves.
+     * @return Nombre del almac&eacute;n de claves */
+    public String getName() {
+        return this.name;
     }
 
     /** Recupera el repositorio con el nombre indicado. Si no existe un keystore con

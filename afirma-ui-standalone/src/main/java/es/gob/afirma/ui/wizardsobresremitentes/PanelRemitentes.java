@@ -391,7 +391,7 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
         }
         else {
             // pssCallback = new UIPasswordCallback(Messages.getString("Wizard.sobres.almacen.pass")+" "+kStore.getDescription(), this);
-            pssCallback = new UIPasswordCallbackAccessibility(Messages.getString("Wizard.sobres.almacen.pass") + " " + kStore.getDescription(), //$NON-NLS-1$ //$NON-NLS-2$
+            pssCallback = new UIPasswordCallbackAccessibility(Messages.getString("Wizard.sobres.almacen.pass") + " " + kStore.getName(), //$NON-NLS-1$ //$NON-NLS-2$
                                                               this,
                                                               Messages.getString("CustomDialog.showInputPasswordDialog.title"), //$NON-NLS-1$
                                                               KeyEvent.VK_O,

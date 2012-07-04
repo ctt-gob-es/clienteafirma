@@ -226,7 +226,7 @@ final class Desensobrado extends JPanel {
         }
         else if (store == AOKeyStore.PKCS12) {
             pssCallback =
-                new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription(), SwingUtilities.getRoot(this), //$NON-NLS-1$
+                new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getName(), SwingUtilities.getRoot(this), //$NON-NLS-1$
                                                     Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title")); //$NON-NLS-1$ //$NON-NLS-2$
             final File selectedFile =
                 SelectionDialog.showFileOpenDialog(this, Messages.getString("Open.repository"), (ExtFilter) Utils.getRepositoryFileFilter()); //$NON-NLS-1$
@@ -240,7 +240,7 @@ final class Desensobrado extends JPanel {
         }
         else {
             pssCallback =
-                new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription(), SwingUtilities.getRoot(this), //$NON-NLS-1$
+                new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getName(), SwingUtilities.getRoot(this), //$NON-NLS-1$
                                                     Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title")); //$NON-NLS-1$ //$NON-NLS-2$
         }
 

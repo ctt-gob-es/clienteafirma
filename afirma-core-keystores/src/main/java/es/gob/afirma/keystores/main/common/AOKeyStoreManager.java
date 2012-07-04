@@ -153,7 +153,7 @@ public class AOKeyStoreManager {
         }
 
         try {
-            this.ks = KeyStore.getInstance(this.ksType.getName(), p11Provider);
+            this.ks = KeyStore.getInstance(this.ksType.getProviderName(), p11Provider);
         }
         catch (final Exception e) {
             Security.removeProvider(p11Provider.getName());
@@ -203,7 +203,7 @@ public class AOKeyStoreManager {
         Security.addProvider(pkcs7Provider);
 
         try {
-            this.ks = KeyStore.getInstance(this.ksType.getName(), pkcs7Provider);
+            this.ks = KeyStore.getInstance(this.ksType.getProviderName(), pkcs7Provider);
         }
         catch (final Exception e) {
             throw new AOKeyStoreManagerException("No se ha podido obtener el almacen PKCS#7 / X.509", e); //$NON-NLS-1$
@@ -249,7 +249,7 @@ public class AOKeyStoreManager {
         }
 
         try {
-            this.ks = KeyStore.getInstance(this.ksType.getName());
+            this.ks = KeyStore.getInstance(this.ksType.getProviderName());
         }
         catch (final Exception e) {
             throw new AOKeyStoreManagerException("No se ha podido obtener el almacen JavaKeyStore", e); //$NON-NLS-1$
@@ -295,7 +295,7 @@ public class AOKeyStoreManager {
         }
 
         try {
-            this.ks = KeyStore.getInstance(this.ksType.getName());
+            this.ks = KeyStore.getInstance(this.ksType.getProviderName());
         }
         catch (final Exception e) {
             throw new AOKeyStoreManagerException("No se ha podido obtener el almacen PKCS#12 / PFX", e); //$NON-NLS-1$
@@ -348,7 +348,7 @@ public class AOKeyStoreManager {
 
         // Inicializamos
         try {
-            this.ks = KeyStore.getInstance(this.ksType.getName());
+            this.ks = KeyStore.getInstance(this.ksType.getProviderName());
         }
         catch (final Exception e) {
             throw new AOKeyStoreManagerException("No se ha podido obtener el almacen SunMSCAPI.MY", e); //$NON-NLS-1$
@@ -408,7 +408,7 @@ public class AOKeyStoreManager {
         }
 
         try {
-            this.ks = KeyStore.getInstance(this.ksType.getName(), p);
+            this.ks = KeyStore.getInstance(this.ksType.getProviderName(), p);
         }
         catch (final Exception e) {
             throw new AOKeyStoreManagerException("No se ha podido obtener el almacen MSCAPIAddressBook.ADDRESSBOOK", e);  //$NON-NLS-1$
@@ -441,7 +441,7 @@ public class AOKeyStoreManager {
 
         // Inicializamos
         try {
-            this.ks = KeyStore.getInstance(this.ksType.getName());
+            this.ks = KeyStore.getInstance(this.ksType.getProviderName());
         }
         catch (final Exception e) {
             throw new AOKeyStoreManagerException("No se ha podido obtener el almacen Apple.KeychainStore", e); //$NON-NLS-1$
@@ -463,7 +463,7 @@ public class AOKeyStoreManager {
 
     private List<KeyStore> initDnieJava(final PasswordCallback pssCallBack, final Object parentComponent) throws AOKeyStoreManagerException, IOException {
     	final Provider p;
-    	if (Security.getProvider(AOKeyStore.DNIEJAVA.getName()) == null) {
+    	if (Security.getProvider(AOKeyStore.DNIEJAVA.getProviderName()) == null) {
     		try {
     			p = (Provider) AOUtil.classForName("es.gob.jmulticard.jse.provider.DnieProvider").newInstance(); //$NON-NLS-1$
     			Security.addProvider(p);
@@ -487,7 +487,7 @@ public class AOKeyStoreManager {
 
         // Inicializamos
         try {
-            this.ks = KeyStore.getInstance(this.ksType.getName());
+            this.ks = KeyStore.getInstance(this.ksType.getProviderName());
         }
         catch (final Exception e) {
             throw new AOKeyStoreManagerException("No se ha podido obtener el almacen DNIe 100% Java: " + e, e); //$NON-NLS-1$
@@ -758,7 +758,7 @@ public class AOKeyStoreManager {
     public String toString() {
         final StringBuilder ret = new StringBuilder("Gestor de almacenes de claves"); //$NON-NLS-1$
         if (this.ksType != null) {
-            String tmpStr = this.ksType.getDescription();
+            String tmpStr = this.ksType.getName();
             if (tmpStr != null) {
                 ret.append(" de tipo "); //$NON-NLS-1$
                 ret.append(tmpStr);
