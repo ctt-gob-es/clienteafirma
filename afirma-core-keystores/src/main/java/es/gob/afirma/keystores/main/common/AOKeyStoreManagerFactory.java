@@ -90,19 +90,12 @@ public final class AOKeyStoreManagerFactory {
         	return getPkcs11KeyStoreManager(store, lib, description, pssCallback, parentComponent);
         }
 
-        // Almacen de certificados personales de Windows. Le agregamos el gestor de DNIe para
-        // que agregue los certificados mediante el controlador Java del DNIe si se encuentra la
-        // biblioteca y hay un DNIe insertado
+        // Almacenes de certificados de Windows
         else if (Platform.getOS().equals(Platform.OS.WINDOWS) &&
-                AOKeyStore.WINDOWS.equals(store)) {
-        	return getWindowsCapiKeyStoreManager(store);
-        }
-
-        // Almacen de certificados de Windows (distintos a los personales)
-        else if (Platform.getOS().equals(Platform.OS.WINDOWS) &&
-                (AOKeyStore.WINROOT.equals(store) ||
-        		 AOKeyStore.WINADDRESSBOOK.equals(store) ||
-        		 AOKeyStore.WINCA.equals(store))) {
+        		(AOKeyStore.WINDOWS.equals(store) ||
+        				AOKeyStore.WINROOT.equals(store) ||
+        				AOKeyStore.WINADDRESSBOOK.equals(store) ||
+        				AOKeyStore.WINCA.equals(store))) {
         	return getWindowsCapiKeyStoreManager(store);
         }
 
@@ -111,12 +104,13 @@ public final class AOKeyStoreManagerFactory {
         }
 
         // Almacen de Mozilla que muestra tanto los certificados del almacen interno como los de
-        // los dispositivos externos configuramos. A esto, le agregamos el gestor de DNIe para
-        // que agregue los certificados de este mediante el controlador Java del DNIe si se encuentra
-        // la biblioteca y hay un DNIe insertado
+        // los dispositivos externos configuramos. A esto, le agregamos en Mac OS X el gestor de
+        // DNIe para que agregue los certificados de este mediante el controlador Java del DNIe si
+        // se encuentra la biblioteca y hay un DNIe insertado
         else if (AOKeyStore.MOZ_UNI.equals(store)) {
         	if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-        		return new DnieUnifiedKeyStoreManager(getMozillaUnifiedKeyStoreManager(store, pssCallback), parentComponent);
+        		return new DnieUnifiedKeyStoreManager(
+        				getMozillaUnifiedKeyStoreManager(store, pssCallback), parentComponent);
         	}
         	return getMozillaUnifiedKeyStoreManager(store, pssCallback);
         }
