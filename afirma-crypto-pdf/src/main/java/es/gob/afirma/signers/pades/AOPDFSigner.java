@@ -32,7 +32,6 @@ import com.lowagie.text.Rectangle;
 import com.lowagie.text.exceptions.BadPasswordException;
 import com.lowagie.text.exceptions.InvalidPdfException;
 import com.lowagie.text.pdf.AcroFields;
-import com.lowagie.text.pdf.PRStream;
 import com.lowagie.text.pdf.PdfArray;
 import com.lowagie.text.pdf.PdfDate;
 import com.lowagie.text.pdf.PdfDictionary;
@@ -839,12 +838,8 @@ public final class AOPDFSigner implements AOSigner {
                                 LOGGER.warning("Se ha encontrado un fichero empotrado (" + filespec.getAsString((PdfName) key) //$NON-NLS-1$
                                                + ") en el PDF, pero no se firmara de forma independiente"); //$NON-NLS-1$
 
-                                final byte[] embeddedData = PdfReader.getStreamBytes((PRStream) PdfReader.getPdfObject(refs.getAsIndirectObject((PdfName) key)));
-                                System.out.println(
-                            		new String(
-                        				embeddedData
-                    				)
-                        		);
+//                                final byte[] embeddedData = PdfReader.getStreamBytes((PRStream) PdfReader.getPdfObject(refs.getAsIndirectObject((PdfName) key)));
+//                                System.out.println(new String(embeddedData));
                             }
                         }
                     }
