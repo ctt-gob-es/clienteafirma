@@ -104,7 +104,7 @@ import es.gob.afirma.signers.cms.AOCMSSigner;
 public final class SignApplet extends JApplet implements EntryPointsCrypto, EntryPointsUtil {
 
 	/** Estado del  modo DEBUG. Mantener a {@code false} en la compilaci&oacute;n final. */
-	private static final boolean DEBUG = true;
+	private static final boolean DEBUG = false;
 
     private static final String CR = "\n"; //$NON-NLS-1$
 
@@ -1369,8 +1369,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         AccessController.doPrivileged(new java.security.PrivilegedAction<Void>() {
         	/** {@inheritDoc} */
             public Void run() {
-                final AOKeyStore newStore = AOKeyStoreManager.getKeyStore(NormalizedNames.normalizeKeyStoreName(type));
-
+                final AOKeyStore newStore = AOKeyStore.getKeyStore(NormalizedNames.normalizeKeyStoreName(type));
                 if (newStore == null) {
                     setError(AppletMessages.getString("SignApplet.3")); //$NON-NLS-1$
                     return null;

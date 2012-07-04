@@ -47,6 +47,10 @@ public enum AOKeyStore {
     // WINDEPLOY("Windows / Internet Explorer (despliegue)", 15, "WIExplorerMy")
     ;
 
+    private String description;
+    private final int ordinal;
+    private final String name;
+
     private AOKeyStore(final String d, final int o, final String n) {
         this.description = d;
         this.ordinal = o;
@@ -58,9 +62,6 @@ public enum AOKeyStore {
         return getDescription();
     }
 
-    private String description;
-    private final int ordinal;
-    private final String name;
 
     /** Obtiene el nombre del almac&eacute;n de claves y certificados.
      * @return Nombre del almac&eacute;n de claves y certificados */
@@ -80,4 +81,17 @@ public enum AOKeyStore {
         return this.description;
     }
 
+    /** Recupera el repositorio con el nombre indicado. Si no existe un keystore con
+     * ese nombre, se devuelve <code>null</code>.
+     * @param name
+     *        nombre del repositorio que se desea recuperar.
+     * @return KeyStore Repositorio de certificados. */
+    public static AOKeyStore getKeyStore(final String name) {
+        for (final AOKeyStore tempKs : AOKeyStore.values()) {
+            if (tempKs.getName().equals(name)) {
+                return tempKs;
+            }
+        }
+        return null;
+    }
 }
