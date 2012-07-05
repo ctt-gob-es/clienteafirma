@@ -410,9 +410,6 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
     	changeLocale(getParameter("locale")); //$NON-NLS-1$
 
-    	System.out.println("Hola mundo!!"); //TODO: BORRAR
-
-
     	LOGGER.info("Cliente @firma"); //$NON-NLS-1$
         LOGGER.info("Versi\u00F3n: " + getVersion()); //$NON-NLS-1$
 
@@ -2048,7 +2045,6 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                 }
                 catch (final Exception e) {
                 	getLogger().severe("Error grave durante la operacion de firma masiva: " + e); //$NON-NLS-1$
-                	e.printStackTrace();
                     SignApplet.this.setError(AppletMessages.getString("SignApplet.205")); //$NON-NLS-1$
                     return Boolean.FALSE;
                 }
