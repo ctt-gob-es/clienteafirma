@@ -223,11 +223,11 @@ public class DirectorySignatureHelper {
             throw new IllegalArgumentException("No se ha establecido el formato y modo de firma"); //$NON-NLS-1$
         }
 
-        if (startDir == null) {
+        if (startDir == null || startDir.trim().length() < 1) {
             LOGGER.warning("No se ha indicado un directorio de inicio, se usara el actual"); //$NON-NLS-1$
         }
 
-        final File id = new File((startDir != null) ? startDir : "."); //$NON-NLS-1$
+        final File id = new File((startDir != null && startDir.trim().length() > 0) ? startDir.trim() : "."); //$NON-NLS-1$
         this.inDir = id.getAbsolutePath();
         if (!id.exists() || !id.isDirectory()) {
             throw new AOException("El directorio de entrada no existe"); //$NON-NLS-1$
@@ -250,9 +250,13 @@ public class DirectorySignatureHelper {
                 }
             }
             else if (recurse) {
-                for (final File file : files.get(i).listFiles()) {
-                    files.add(file);
-                }
+            	if (files.get(i).canRead()) {
+            		for (final File file : files.get(i).listFiles()) {
+                        files.add(file);
+                    }
+            	} else {
+            		LOGGER.warning("Por falta de permisos no se procesaran los ficheros del subdirectorio: " + files.get(i).getAbsolutePath()); //$NON-NLS-1$
+            	}
             }
         }
 
