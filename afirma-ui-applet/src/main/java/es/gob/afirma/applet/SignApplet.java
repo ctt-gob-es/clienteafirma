@@ -410,6 +410,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
     	changeLocale(getParameter("locale")); //$NON-NLS-1$
 
+    	System.out.println("Hola mundo!!"); //TODO: BORRAR
+
+
     	LOGGER.info("Cliente @firma"); //$NON-NLS-1$
         LOGGER.info("Versi\u00F3n: " + getVersion()); //$NON-NLS-1$
 
@@ -683,7 +686,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     public boolean saveDataToFile(final String filename) {
         LOGGER.info("Invocando saveDataToFile: " + filename); //$NON-NLS-1$
 
-        if (filename == null || filename.length() < 1) {
+        if (filename == null || filename.trim().length() < 1) {
             LOGGER.severe("El nombre de fichero para guardar datos es incorrecto, no se salvaran los datos"); //$NON-NLS-1$
             SignApplet.this.setError(AppletMessages.getString("SignApplet.14")); //$NON-NLS-1$
             return false;
@@ -903,7 +906,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     public void setFileuri(final String uri) {
         LOGGER.info("Invocando setFileUri: " + uri); //$NON-NLS-1$
 
-        if (uri == null || uri.trim().equals("")) { //$NON-NLS-1$
+        if (uri == null || uri.trim().length() < 1) {
             this.fileUri = null;
             return;
         }
@@ -924,7 +927,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
         LOGGER.info("Invocando setFileuriBase64: " + uri); //$NON-NLS-1$
 
-        if (uri == null || uri.trim().equals("")) { //$NON-NLS-1$
+        if (uri == null || uri.trim().length() < 1) {
             this.fileUri = null;
             return;
         }
@@ -983,7 +986,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
         LOGGER.info("Invocando setElectronicSignatureFile: " + filename); //$NON-NLS-1$
 
-        if (filename == null || filename.length() == 0) {
+        if (filename == null || filename.trim().length() < 1) {
             this.electronicSignatureFile = null;
             return;
         }
@@ -1269,7 +1272,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     /** {@inheritDoc} */
     public void setOutFilePath(final String filename) {
         LOGGER.info("Invocando setOutFilePath: " + filename); //$NON-NLS-1$
-        if (filename == null || "".equals(filename)) { //$NON-NLS-1$
+        if (filename == null || filename.trim().length() < 1) {
             LOGGER.info("Se ha establecido el nombre de fichero de salida a null" //$NON-NLS-1$
             );
             this.outputFile = null;
@@ -1359,7 +1362,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     /** {@inheritDoc} */
     public void setKeyStore(final String filename, final String password, final String type) {
 
-    	if ((filename != null) && !checkUserPermision(
+    	if ((filename != null && filename.trim().length() > 0) && !checkUserPermision(
     			AppletMessages.getString("SignApplet.19") + CR + filename + //$NON-NLS-1$
     			CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
     		return;
@@ -2045,6 +2048,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                 }
                 catch (final Exception e) {
                 	getLogger().severe("Error grave durante la operacion de firma masiva: " + e); //$NON-NLS-1$
+                	e.printStackTrace();
                     SignApplet.this.setError(AppletMessages.getString("SignApplet.205")); //$NON-NLS-1$
                     return Boolean.FALSE;
                 }
@@ -2701,7 +2705,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     public String getTextFileContent(final String filename) {
         LOGGER.info("Invocando getTextFileContent: " + filename); //$NON-NLS-1$
 
-        if (filename == null || "".equals(filename)) { //$NON-NLS-1$
+        if (filename == null || filename.trim().length() < 1) {
             setError(AppletMessages.getString("SignApplet.54")); //$NON-NLS-1$
             return null;
         }
@@ -2818,7 +2822,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     public String getFileBase64Encoded(final String filename, final boolean showProgress) {
         LOGGER.info("Invocando getFileBase64Encoded: " + filename); //$NON-NLS-1$
 
-        if (filename == null || "".equals(filename)) { //$NON-NLS-1$
+        if (filename == null || filename.trim().length() < 1) {
             setError(AppletMessages.getString("SignApplet.58")); //$NON-NLS-1$
             return null;
         }
@@ -3035,7 +3039,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
             SignApplet.this.setError(AppletMessages.getString("SignApplet.394")); //$NON-NLS-1$
             return false;
         }
-        if (filename == null) {
+        if (filename == null || filename.trim().length() < 1) {
             LOGGER.severe("El fichero de salida para los datos no puede ser nulo"); //$NON-NLS-1$
             this.setError(AppletMessages.getString("SignApplet.396")); //$NON-NLS-1$
             return false;
@@ -3072,7 +3076,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
             return false;
         }
 
-        if (filename == null) {
+        if (filename == null || filename.trim().length() < 1) {
             LOGGER.severe("El fichero de salida para los datos no puede ser nulo"); //$NON-NLS-1$
             this.setError(AppletMessages.getString("SignApplet.396")); //$NON-NLS-1$
             return false;
@@ -3109,7 +3113,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     public boolean cipherFile(final String filename) {
         LOGGER.info("Invocando cipherFile: " + filename); //$NON-NLS-1$
 
-        if (filename == null || "".equals(filename)) { //$NON-NLS-1$
+        if (filename == null || filename.trim().length() < 1) {
             setError(AppletMessages.getString("SignApplet.78")); //$NON-NLS-1$
             return false;
         }
@@ -3182,7 +3186,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     public boolean decipherFile(final String filename) {
         LOGGER.info("Invocando decipherFile: " + filename); //$NON-NLS-1$
 
-        if (filename == null || "".equals(filename)) { //$NON-NLS-1$
+        if (filename == null || filename.trim().length() < 1) {
             setError(AppletMessages.getString("SignApplet.87")); //$NON-NLS-1$
             return false;
         }
@@ -3461,7 +3465,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     public boolean signAndPackFile(final String filename) {
         LOGGER.info("Invocando signAndPackFile: " + filename); //$NON-NLS-1$
 
-        if (filename == null || "".equals(filename)) { //$NON-NLS-1$
+        if (filename == null || filename.trim().length() < 1) {
             setError(AppletMessages.getString("SignApplet.91")); //$NON-NLS-1$
             return false;
         }
@@ -3668,7 +3672,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     public void setInputDirectoryToSign(final String directory) {
         LOGGER.info("Invocando setInputDirectoryToSign: " + directory); //$NON-NLS-1$
 
-        if ((directory != null) && !checkUserPermision(
+        if (directory != null && directory.trim().length() > 0 && !checkUserPermision(
         		AppletMessages.getString("SignApplet.103") + CR + directory  + //$NON-NLS-1$
         		CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
             return;
@@ -3686,7 +3690,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     /** {@inheritDoc} */
     public void setOutputDirectoryToSign(final String directory) {
         LOGGER.info("Invocando setOutputDirectoryToSign: " + directory); //$NON-NLS-1$
-        if ((directory != null) && !checkUserPermision(
+        if (directory != null && directory.trim().length() > 0 && !checkUserPermision(
         		AppletMessages.getString("SignApplet.105") + CR + directory + //$NON-NLS-1$
         		CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
         	return;
