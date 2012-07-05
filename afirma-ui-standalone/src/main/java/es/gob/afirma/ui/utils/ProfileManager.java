@@ -47,7 +47,9 @@ public final class ProfileManager {
 
     private static final String KEY_GENERAL_POLICY_OID = GENERAL_PREFIX_KEY + "policy.oid"; //$NON-NLS-1$
 
-    private static final String KEY_GENERAL_POLICY_URL = GENERAL_PREFIX_KEY + "polici.url"; //$NON-NLS-1$
+    private static final String KEY_GENERAL_POLICY_URL = GENERAL_PREFIX_KEY + "policy.url"; //$NON-NLS-1$
+
+    private static final String KEY_GENERAL_POLICY_HASH = GENERAL_PREFIX_KEY + "policy.hash"; //$NON-NLS-1$
 
     private static final String CONTEXT_PREFIX_KEY = ".context."; //$NON-NLS-1$
 
@@ -90,9 +92,11 @@ public final class ProfileManager {
             {
                     KEY_GENERAL_USE_POLICY, MainOptionsPane.MAIN_POLICY_ESTABLISHED, "false"}, //$NON-NLS-1$
             {
-                    KEY_GENERAL_POLICY_OID, MainOptionsPane.MAIN_POLICY_OID, ""}, //$NON-NLS-1$
+                    KEY_GENERAL_POLICY_OID, MainOptionsPane.MAIN_POLICY_IDENTIFIER, ""}, //$NON-NLS-1$
             {
-                    KEY_GENERAL_POLICY_URL, MainOptionsPane.MAIN_POLICY_URL, ""}, //$NON-NLS-1$
+                    KEY_GENERAL_POLICY_URL, MainOptionsPane.MAIN_POLICY_QUALIFIER, ""}, //$NON-NLS-1$
+            {
+                    KEY_GENERAL_POLICY_HASH, MainOptionsPane.MAIN_POLICY_HASH, ""}, //$NON-NLS-1$
             {
                     KEY_CONTEXT_SUBJECT, ContextOptionsPane.KEY_SUBJECT, ""}, //$NON-NLS-1$
             {

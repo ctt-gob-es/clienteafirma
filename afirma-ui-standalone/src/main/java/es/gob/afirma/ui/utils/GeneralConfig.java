@@ -125,8 +125,10 @@ public final class GeneralConfig {
             );
         }
         if (config.containsKey(MainOptionsPane.MAIN_POLICY_ESTABLISHED) && Boolean.parseBoolean(config.getProperty(MainOptionsPane.MAIN_POLICY_ESTABLISHED))) {
-            configSignatureOptions.setProperty("policyQualifier", config.getProperty(MainOptionsPane.MAIN_POLICY_OID, "")); //$NON-NLS-1$ //$NON-NLS-2$
-            configSignatureOptions.setProperty("policyIdentifier", config.getProperty(MainOptionsPane.MAIN_POLICY_URL, "")); //$NON-NLS-1$ //$NON-NLS-2$
+            configSignatureOptions.setProperty("policyIdentifier", config.getProperty(MainOptionsPane.MAIN_POLICY_IDENTIFIER, "")); //$NON-NLS-1$ //$NON-NLS-2$
+            configSignatureOptions.setProperty("policyQualifier", config.getProperty(MainOptionsPane.MAIN_POLICY_QUALIFIER, "")); //$NON-NLS-1$ //$NON-NLS-2$
+            configSignatureOptions.setProperty("policyIdentifierHash", config.getProperty(MainOptionsPane.MAIN_POLICY_HASH, "")); //$NON-NLS-1$ //$NON-NLS-2$
+            configSignatureOptions.setProperty("policyIdentifierHashAlgorithm", config.getProperty(MainOptionsPane.MAIN_POLICY_HASH) != null ? MainOptionsPane.DEFAULT_POLICY_HASH_ALGORITHM : ""); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         if (config.containsKey(ContextOptionsConfig.OPTION_REASON) && config.getProperty(ContextOptionsConfig.OPTION_REASON).trim().length() > 0) {
