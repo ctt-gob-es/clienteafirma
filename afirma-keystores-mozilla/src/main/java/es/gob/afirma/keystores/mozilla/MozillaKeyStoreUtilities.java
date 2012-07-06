@@ -338,8 +338,8 @@ final class MozillaKeyStoreUtilities {
 
         final String[] paths =
                 new String[] {
+                	"/usr/lib/firefox", //$NON-NLS-1$
                     "/usr/lib/firefox-" + searchLastFirefoxVersion("/usr/lib/"), //$NON-NLS-1$ //$NON-NLS-2$
-                    "/usr/lib/firefox", //$NON-NLS-1$
                     "/opt/firefox", //$NON-NLS-1$
                     "/opt/firefox-" + searchLastFirefoxVersion("/opt/"), //$NON-NLS-1$ //$NON-NLS-2$
                     "/lib", //$NON-NLS-1$
@@ -347,6 +347,8 @@ final class MozillaKeyStoreUtilities {
                     "/usr/lib/nss", //$NON-NLS-1$
                     "/opt/fedora-ds/clients/lib", //$NON-NLS-1$
                     "/opt/google/chrome", /* NSS de Chrome cuando no hay NSS de Mozilla de la misma arquietctura */ //$NON-NLS-1$
+                    "/usr/lib/i386-linux-gnu/nss", /* En algunos Ubuntu */ //$NON-NLS-1$
+                    "/usr/lib/thunderbird", /* Si hay Thunderbird pero no Firefox */ //$NON-NLS-1$
                     "/usr/lib64" /* NSS cuando solo hay Firefox de 64 en el sistema */ //$NON-NLS-1$
                 };
 
