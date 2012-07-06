@@ -26,6 +26,7 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.dnie.DnieUnifiedKeyStoreManager;
+import es.gob.afirma.keystores.dnie.pkcs12.Pkcs12KeyStoreManager;
 import es.gob.afirma.keystores.main.callbacks.NullPasswordCallback;
 
 /** Obtiene clases de tipo AOKeyStoreManager seg&uacute;n se necesiten,
@@ -75,8 +76,12 @@ public final class AOKeyStoreManagerFactory {
                                                          final PasswordCallback pssCallback,
                                                          final Object parentComponent) throws AOKeystoreAlternativeException,
                                                                                               IOException, MissingLibraryException, InvalidOSException {
+    	if (AOKeyStore.PKCS12.equals(store)) {
+    		return getPkcs12KeyStoreManager(lib, pssCallback, parentComponent);
+    	}
 
-        // Fichero P7, X509, P12/PFX o Java JKS, en cualquier sistema operativo
+
+    	// Fichero P7, X509 o Java JKS, en cualquier sistema operativo
         if (AOKeyStore.PKCS12.equals(store) ||
     		AOKeyStore.JAVA.equals(store)   ||
     		AOKeyStore.SINGLE.equals(store) ||
@@ -136,7 +141,43 @@ public final class AOKeyStoreManagerFactory {
         );
     }
 
-    private static AOKeyStoreManager getDnieJavaKeyStoreManager(final AOKeyStore store,
+    private static AOKeyStoreManager getPkcs12KeyStoreManager(final String lib,
+    		                                                  final PasswordCallback pssCallback,
+    		                                                  final Object parentComponent) throws IOException,
+    		                                                  						               AOKeystoreAlternativeException {
+    	final AOKeyStoreManager ksm = new Pkcs12KeyStoreManager();
+        String storeFilename = null;
+        if (lib != null && !"".equals(lib) && new File(lib).exists()) { //$NON-NLS-1$
+            storeFilename = lib;
+        }
+        if (storeFilename == null) {
+            String desc = null;
+            final String[] exts = new String[] {
+                        "pfx", "p12" //$NON-NLS-1$ //$NON-NLS-2$
+            };
+            desc = KeyStoreMessages.getString("AOKeyStoreManagerFactory.0"); //$NON-NLS-1$
+            storeFilename = AOUIFactory.getLoadFileName(KeyStoreMessages.getString("AOKeyStoreManagerFactory.4") + " " + "PKCS#12", exts, desc, parentComponent); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            if (storeFilename == null) {
+                throw new AOCancelledOperationException("No se ha seleccionado el almacen de certificados"); //$NON-NLS-1$
+            }
+        }
+
+        final InputStream is;
+        try {
+            is = new FileInputStream(storeFilename);
+            ksm.init(null, is, pssCallback, null);
+        }
+        catch (final AOException e) {
+            throw new AOKeystoreAlternativeException(
+        	   AOKeyStore.JAVA,
+               "No se ha podido abrir el almacen de tipo PKCS#12 para el fichero " + lib, //$NON-NLS-1$
+               e
+            );
+        }
+        return ksm;
+	}
+
+	private static AOKeyStoreManager getDnieJavaKeyStoreManager(final AOKeyStore store,
     		                                                    final PasswordCallback pssCallback,
     	                                                         final Object parentComponent)
     															throws AOKeystoreAlternativeException,

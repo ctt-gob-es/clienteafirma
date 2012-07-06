@@ -67,7 +67,7 @@ public class AOKeyStoreManager {
     private static Provider sunMSCAPIProvider = null;
 
     /** Almac&eacute;n de claves. */
-    private KeyStore ks;
+    protected KeyStore ks;
 
     /** Tipo de almac&eacute;n. */
     private AOKeyStore ksType;
@@ -283,50 +283,6 @@ public class AOKeyStoreManager {
 
     }
 
-    private List<KeyStore> initPKCS12(final InputStream store,
-                                      final PasswordCallback pssCallBack) throws AOKeyStoreManagerException,
-                                                                                 IOException {
-        // Suponemos que el proveedor SunJSSE esta instalado. Hay que tener
-        // cuidado con esto
-        // si alguna vez se usa JSS, que a veces lo retira
-
-        if (store == null) {
-            throw new IOException("Es necesario proporcionar el fichero PKCS12 / PFX"); //$NON-NLS-1$
-        }
-
-        try {
-            this.ks = KeyStore.getInstance(this.ksType.getProviderName());
-        }
-        catch (final Exception e) {
-            throw new AOKeyStoreManagerException("No se ha podido obtener el almacen PKCS#12 / PFX", e); //$NON-NLS-1$
-        }
-        try {
-            this.ks.load(store, (pssCallBack != null) ? pssCallBack.getPassword() : null);
-        }
-        catch (final IOException e) {
-            if (e.getCause() instanceof UnrecoverableKeyException ||
-                e.getCause() instanceof BadPaddingException ||
-                e.getCause() instanceof ArithmeticException) { // Caso probable de contrasena nula
-                	throw new IOException("Contrasena invalida: " + e); //$NON-NLS-1$
-            }
-        }
-        catch (final CertificateException e) {
-            throw new AOKeyStoreManagerException("No se han podido cargar los certificados del almacen PKCS#12 / PFX solicitado.", e); //$NON-NLS-1$
-        }
-        catch (final NoSuchAlgorithmException e) {
-            throw new AOKeyStoreManagerException("No se ha podido verificar la integridad del almacen PKCS#12 / PFX solicitado.", e); //$NON-NLS-1$
-		}
-        final List<KeyStore> ret = new ArrayList<KeyStore>(1);
-        ret.add(this.ks);
-        try {
-            store.close();
-        }
-        catch (final Exception e) {
-         // Ignoramos errores en el cierre
-        }
-        return ret;
-    }
-
     private List<KeyStore> initCAPI() throws AOKeyStoreManagerException,
                                              IOException {
         if (!Platform.getOS().equals(Platform.OS.WINDOWS)) {
@@ -539,12 +495,11 @@ public class AOKeyStoreManager {
     		                   final Object[] params) throws AOKeyStoreManagerException,
     		                                                 IOException {
         if (type == null) {
-            LOGGER.severe("Se ha solicitado inicializar un AOKeyStore nulo, se intentara inicializar un PKCS#12"); //$NON-NLS-1$
+            throw new IllegalArgumentException("Se ha solicitado inicializar un AOKeyStore nulo"); //$NON-NLS-1$
         }
-        else {
-            LOGGER.info("Inicializamos el almacen de tipo: " + type); //$NON-NLS-1$
-        }
-        this.ksType = (type != null) ? type : AOKeyStore.PKCS12;
+        LOGGER.info("Inicializamos el almacen de tipo: " + type); //$NON-NLS-1$
+
+        this.ksType = type;
 
         if (this.ksType.equals(AOKeyStore.SINGLE)) {
         	return initSingle(store, pssCallBack);
@@ -556,10 +511,6 @@ public class AOKeyStoreManager {
 
         else if (this.ksType.equals(AOKeyStore.JAVA) || this.ksType.equals(AOKeyStore.JAVACE) || this.ksType.equals(AOKeyStore.JCEKS)) {
         	return initJava(store, pssCallBack);
-        }
-
-        else if (this.ksType.equals(AOKeyStore.PKCS12)) {
-        	return initPKCS12(store, pssCallBack);
         }
 
         else if (this.ksType.equals(AOKeyStore.WINDOWS) || this.ksType.equals(AOKeyStore.WINROOT)) {
