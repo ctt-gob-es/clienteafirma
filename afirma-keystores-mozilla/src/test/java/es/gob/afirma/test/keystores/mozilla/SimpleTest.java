@@ -44,6 +44,7 @@ public final class SimpleTest {
      * @throws Exception */
     @SuppressWarnings("static-method")
     @Test
+    @Ignore
     public void testKeyStoreManagerCreationWithDnieAggregation() throws Exception {
     	AOKeyStoreManager ksm = AOKeyStoreManagerFactory
 		 .getAOKeyStoreManager(AOKeyStore.MOZ_UNI, null,
