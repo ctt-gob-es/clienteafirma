@@ -102,54 +102,54 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
         Enumeration<String> tmpAlias = new Vector<String>(0).elements();
         this.storesByAlias = new Hashtable<String, KeyStore>();
 
-        KeyStore ks = null;
+        KeyStore keyStore = null;
 
         if (getNSSProvider() != null) {
             try {
-                ks = KeyStore.getInstance("PKCS11", getNSSProvider()); //$NON-NLS-1$
+                keyStore = KeyStore.getInstance("PKCS11", getNSSProvider()); //$NON-NLS-1$
             }
             catch (final Exception e) {
                 LOGGER.warning("No se ha podido obtener el KeyStore PKCS#11 NSS del proveedor SunPKCS11, se continuara con los almacenes externos: " + e); //$NON-NLS-1$
-                ks = null;
+                keyStore = null;
             }
         }
-        if (ks != null) {
+        if (keyStore != null) {
             try {
-                ks.load(null, new char[0]);
+                keyStore.load(null, new char[0]);
             }
             catch (final Exception e) {
                 try {
-                    ks.load(null, (this.externallPasswordCallback != null
+                    keyStore.load(null, (this.externallPasswordCallback != null
                                                                     ? this.externallPasswordCallback.getPassword()
                                                                     : new UIPasswordCallback(FirefoxKeyStoreMessages.getString("MozillaUnifiedKeyStoreManager.0"), //$NON-NLS-1$
                                                                                              this.parentComponent).getPassword()));
                 }
                 catch (final AOCancelledOperationException e1) {
-                    ks = null;
+                    keyStore = null;
                     throw e1;
                 }
                 catch (final Exception e2) {
                     LOGGER.warning("No se ha podido abrir el almacen PKCS#11 NSS del proveedor SunPKCS11, se continuara con los almacenes externos: " + e2); //$NON-NLS-1$
-                    ks = null;
+                    keyStore = null;
                 }
             }
 
-            if (ks != null) {
+            if (keyStore != null) {
                 try {
-                    tmpAlias = ks.aliases();
+                    tmpAlias = keyStore.aliases();
                 }
                 catch (final Exception e) {
                     LOGGER.warning("El almacen interno de Firefox no devolvio certificados, se continuara con los externos: " + e); //$NON-NLS-1$
-                    ks = null;
+                    keyStore = null;
                 }
                 while (tmpAlias.hasMoreElements()) {
-                    this.storesByAlias.put(tmpAlias.nextElement().toString(), ks);
+                    this.storesByAlias.put(tmpAlias.nextElement().toString(), keyStore);
                 }
             }
         }
 
-        if (ks != null) {
-            this.kss.add(ks);
+        if (keyStore != null) {
+            this.kss.add(keyStore);
         }
 
         // Vamos ahora con los almacenes externos
@@ -193,8 +193,8 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
 
             LOGGER.info("El almacen externo '" + descr + "' ha podido inicializarse, se anadiran sus entradas"); //$NON-NLS-1$ //$NON-NLS-2$
 
-            if (ks == null) {
-                ks = tmpStore;
+            if (keyStore == null) {
+                keyStore = tmpStore;
             }
 
             tmpAlias = new Vector<String>(0).elements();
@@ -302,14 +302,14 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
             LOGGER.warning("El KeyStore actual no esta inicializado, por lo que no se pudo recuperar el certificado '" + alias + "'"); //$NON-NLS-1$ //$NON-NLS-2$
             return null;
         }
-        for (final KeyStore ks : this.kss) {
+        for (final KeyStore keyStore : this.kss) {
             try {
-                if (ks.containsAlias(alias)) {
-                    return (X509Certificate) ks.getCertificate(alias);
+                if (keyStore.containsAlias(alias)) {
+                    return (X509Certificate) keyStore.getCertificate(alias);
                 }
             }
             catch (final Exception e) {
-                LOGGER.info("El KeyStore '" + ks + "' no contenia o no pudo recuperar el certificado '" + alias + "', se probara con el siguiente: " + e); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                LOGGER.info("El KeyStore '" + keyStore + "' no contenia o no pudo recuperar el certificado '" + alias + "', se probara con el siguiente: " + e); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             }
         }
         LOGGER.warning("Ningun KeyStore de Firefox contenia el certificado '" + alias + "', se devolvera null"); //$NON-NLS-1$ //$NON-NLS-2$
