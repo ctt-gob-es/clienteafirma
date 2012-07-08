@@ -56,7 +56,9 @@ final class MozillaKeyStoreUtilities {
     // Novedades de Firefox 11
     private static final String MOZGLUE_DLL = "mozglue.dll"; //$NON-NLS-1$
 
-    private static final String NSPR4_SO = "/lib/libnspr4.so"; //$NON-NLS-1$
+    private static final String LIB_NSPR4_SO = "/lib/libnspr4.so"; //$NON-NLS-1$
+
+    private static final String SOFTOKN3_SO = "libsoftokn3.so"; //$NON-NLS-1$
 
     private MozillaKeyStoreUtilities() {
         // No permitimos la instanciacion
@@ -80,7 +82,7 @@ final class MozillaKeyStoreUtilities {
      *         NSS. */
     static String createPKCS11NSSConfigFile(final String userProfileDirectory, final String libDir) {
 
-        String softoknLib = "libsoftokn3.so"; //$NON-NLS-1$
+        String softoknLib = SOFTOKN3_SO;
         if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
             softoknLib = SOFTOKN3_DLL;
         }
@@ -318,9 +320,9 @@ final class MozillaKeyStoreUtilities {
         // *********************************************************************
         // Compobamos antes el caso especifico de NSS partido entre /usr/lib y
         // /lib, que se da en Fedora
-        if (new File("/usr/lib/libsoftokn3.so").exists() && new File(NSPR4_SO).exists()) { //$NON-NLS-1$
+        if (new File("/usr/lib/" + SOFTOKN3_SO).exists() && new File(LIB_NSPR4_SO).exists()) { //$NON-NLS-1$
             try {
-                System.load(NSPR4_SO);
+                System.load(LIB_NSPR4_SO);
                 nssLibDir = "/usr/lib"; //$NON-NLS-1$
             }
             catch (final Exception e) {
@@ -353,7 +355,7 @@ final class MozillaKeyStoreUtilities {
                 };
 
         for (final String path : paths) {
-            if (new File(path + "/libsoftokn3.so").exists() && new File(path + "/libnspr4.so").exists()) { //$NON-NLS-1$ //$NON-NLS-2$
+            if (new File(path + "/" + SOFTOKN3_SO).exists() && new File(path + "/libnspr4.so").exists()) { //$NON-NLS-1$ //$NON-NLS-2$
                 try {
                     System.load(path + "/libnspr4.so"); //$NON-NLS-1$
                     nssLibDir = path;
@@ -529,15 +531,48 @@ final class MozillaKeyStoreUtilities {
      *        Directorio en donde se encuentran las bibliotecas de NSS. */
     static void loadNSSDependencies(final String nssDirectory) {
 
+    	// Comprobamos el caso de Ubuntu en el que el sistema tiene un NSS antiguo en el sistema y
+    	// un NSS moderno para Firefox, que se detecta por libmozsqlite3.so vs. libsqlite3.so
+    	if (Platform.OS.LINUX.equals(Platform.getOS())) {
+    		String lddStr = null;
+    		try {
+    			lddStr = new String(
+					AOUtil.getDataFromInputStream(
+						Runtime.getRuntime().exec(
+							"ldd " + nssDirectory + (nssDirectory.endsWith(File.separator) ? "" : File.separator) + SOFTOKN3_SO //$NON-NLS-1$ //$NON-NLS-2$
+						).getInputStream()
+					)
+				);
+    		}
+    		catch(final Exception e) {
+    			LOGGER.warning("No se ha podido comprobar si las dependencias de NSS en Linux se detectan con ldd: " + e); //$NON-NLS-1$
+    		}
+			// Si solo falta libmozsqlite.so es porque en el LD_LIBRARY_PATH o en el PATH esta la version
+			// antigua, libsqlite.so, asi que cargamos esta dependencia unicamente
+			if (lddStr != null &&
+				lddStr.contains("libmozsqlite3.so => not found") &&  //$NON-NLS-1$
+			  (!lddStr.replace("libmozsqlite3.so => not found", "").contains("not found"))) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				try {
+					System.load(nssDirectory + (nssDirectory.endsWith(File.separator) ? "" : File.separator) + "libmozsqlite3.so"); //$NON-NLS-1$ //$NON-NLS-2$
+					return;
+				}
+				catch(final Exception e) {
+					LOGGER.warning(
+						"No se ha posido cargar libmozsqlite3.so en prevision de que el sistema apunte a libsqlite3.so, se continuara con la precarga normal: " + e //$NON-NLS-1$
+					);
+				}
+			}
+    	}
+
     	final String dependList[];
 
-        // Compobamos antes el caso especifico de NSS partido entre /usr/lib y
+        // Compobamos despues el caso especifico de NSS partido entre /usr/lib y
         // /lib, que se da en Fedora
-        if (Platform.OS.LINUX.equals(Platform.getOS()) && new File("/usr/lib/libsoftokn3.so").exists() && new File(NSPR4_SO).exists()) { //$NON-NLS-1$
+        if (Platform.OS.LINUX.equals(Platform.getOS()) && new File("/usr/lib/" + SOFTOKN3_SO).exists() && new File(LIB_NSPR4_SO).exists()) { //$NON-NLS-1$
         	dependList = new String[] {
         		"/lib/libmozglue.so", //$NON-NLS-1$
         		"/usr/lib/libmozglue.so", //$NON-NLS-1$
-    			NSPR4_SO,
+    			LIB_NSPR4_SO,
     			"/lib/libplds4.so", //$NON-NLS-1$
     			"/usr/lib/libplds4.so", //$NON-NLS-1$
     			"/lib/libplc4.so", //$NON-NLS-1$
