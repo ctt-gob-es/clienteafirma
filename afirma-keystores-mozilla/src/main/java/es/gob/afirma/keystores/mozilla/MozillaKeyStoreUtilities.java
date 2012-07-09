@@ -554,6 +554,7 @@ final class MozillaKeyStoreUtilities {
 			  (!lddStr.replace("libmozsqlite3.so => not found", "").contains("not found"))) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				try {
 					System.load(nssDirectory + (nssDirectory.endsWith(File.separator) ? "" : File.separator) + "libmozsqlite3.so"); //$NON-NLS-1$ //$NON-NLS-2$
+					LOGGER.info("Cargada predependencia unica de NSS con libmozsqlite3.so");
 					return;
 				}
 				catch(final Exception e) {

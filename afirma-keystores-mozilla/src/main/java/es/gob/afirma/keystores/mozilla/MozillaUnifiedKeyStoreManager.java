@@ -97,6 +97,7 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
         }
         catch (final Exception e) {
             LOGGER.severe("Error inicializando NSS, se continuara con los almacenes externos de Firefox, pero los certificados del almacen interno no estaran disponibles: " + e); //$NON-NLS-1$
+            e.printStackTrace();
         }
 
         Enumeration<String> tmpAlias = new Vector<String>(0).elements();
