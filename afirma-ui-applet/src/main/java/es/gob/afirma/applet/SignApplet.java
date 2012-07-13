@@ -450,16 +450,6 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
         // Indicamos que el cliente ya se ha inicializado
         this.initializedApplet = true;
-
-        // Imprimimos por consola el acuerdo de licencia por si el applet se ha
-        // cargado sin la
-        // ayuda del bootloader, que ya se encarga de mostrarsela al usuario.
-        try {
-            Logger.getLogger("es.gob.afirma").info(LicenseManager.getLicenceText()); //$NON-NLS-1$
-        }
-        catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").warning("No se ha podido mostrar el acuerdo de licencia"); //$NON-NLS-1$ //$NON-NLS-2$
-        }
     }
 
     /** {@inheritDoc} */
