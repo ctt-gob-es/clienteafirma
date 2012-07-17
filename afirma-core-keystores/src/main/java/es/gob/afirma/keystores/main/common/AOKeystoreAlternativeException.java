@@ -27,7 +27,7 @@ public final class AOKeystoreAlternativeException extends Exception {
      *        Mensaje descriptivo de la excepci&oacute;n.
      * @param e
      *        Excepci&oacute;n que ha causado el lanzamiento de esta. */
-    AOKeystoreAlternativeException(final AOKeyStore ks, final String desc, final Exception e) {
+    public AOKeystoreAlternativeException(final AOKeyStore ks, final String desc, final Exception e) {
         super(desc, e);
         this.alternativeKs = ks;
     }
@@ -38,7 +38,7 @@ public final class AOKeystoreAlternativeException extends Exception {
      *        Almac&eacute;n de claves y certificados alternativo
      * @param desc
      *        Mensaje descriptivo de la excepci&oacute;n. */
-    AOKeystoreAlternativeException(final AOKeyStore ks, final String desc) {
+    public AOKeystoreAlternativeException(final AOKeyStore ks, final String desc) {
         super(desc);
         this.alternativeKs = ks;
     }
