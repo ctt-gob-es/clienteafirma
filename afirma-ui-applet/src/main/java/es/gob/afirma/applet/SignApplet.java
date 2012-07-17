@@ -526,7 +526,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                         return new String[0];
                     }
                     if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(SignApplet.this,
-                                                                                AppletMessages.getString("SignApplet.4") + " " + kst.getName() + "?", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                                                                                AppletMessages.getString("SignApplet.4", kst.getName()), //$NON-NLS-1$
                                                                                 AppletMessages.getString("SignApplet.658"), //$NON-NLS-1$
                                                                                 JOptionPane.WARNING_MESSAGE)) {
                         setKeyStore(null, null, kst.toString());
