@@ -27,6 +27,7 @@ import javax.swing.JOptionPane;
 
 import es.gob.afirma.applet.callbacks.CachePasswordCallback;
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.MissingLibraryException;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.main.common.AOCertificatesNotFoundException;
 import es.gob.afirma.keystores.main.common.AOKeyStore;
@@ -235,6 +236,9 @@ final class KeyStoreConfigurationManager {
             catch (final AOCertificatesNotFoundException e) {
                 throw e;
             }
+            catch (final AOKeystoreAlternativeException e) {
+                throw e;
+            }
             catch (final Exception e) {
                 throw new CertificateException("Error al seleccionar un certificado del repositorio", e); //$NON-NLS-1$
             }
@@ -291,6 +295,12 @@ final class KeyStoreConfigurationManager {
             catch (final AOKeystoreAlternativeException e) {
                 throw e;
             }
+            catch (final MissingLibraryException e) {
+            	throw new AOKeystoreAlternativeException(
+            			getAlternateKeyStoreType(this.ks),
+            			"No es posible cargar el almacen por falta de una biblioteca necesaria, se cargara el siguiente almacen disponible", //$NON-NLS-1$
+            			e);
+			}
             catch (final Exception e) {
                 throw new AOKeyStoreManagerException("No se ha podido inicializar el almacen de certificados", e); //$NON-NLS-1$
             }
@@ -454,5 +464,19 @@ final class KeyStoreConfigurationManager {
      * @return Mensaje de error. */
     String getErrorMessage() {
         return this.errorMessage;
+    }
+
+    /** @return <code>AOKeyStore</code> alternativo o <code>null</code> si no hay alternativo */
+    private static AOKeyStore getAlternateKeyStoreType(final AOKeyStore currentStore) {
+        if (AOKeyStore.PKCS12.equals(currentStore)) {
+            return null;
+        }
+        if (Platform.OS.WINDOWS.equals(Platform.getOS()) && (!AOKeyStore.WINDOWS.equals(currentStore))) {
+            return AOKeyStore.WINDOWS;
+        }
+        if (Platform.OS.MACOSX.equals(Platform.getOS()) && (!AOKeyStore.APPLE.equals(currentStore))) {
+            return AOKeyStore.APPLE;
+        }
+        return AOKeyStore.PKCS12;
     }
 }
