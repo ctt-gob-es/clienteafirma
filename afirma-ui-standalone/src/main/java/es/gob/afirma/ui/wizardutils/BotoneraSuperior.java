@@ -220,7 +220,8 @@ public class BotoneraSuperior extends JPanel {
 		Utils.setContrastColor(restorePanel);
 		restorePanel.add(this.restoreButton);
 		this.restoreButton.addActionListener(new ActionListener() {
-	    	public void actionPerformed(ActionEvent e) {
+	    	@Override
+			public void actionPerformed(ActionEvent e) {
 	    		restaurarActionPerformed();
 			}
 		});
@@ -272,7 +273,8 @@ public class BotoneraSuperior extends JPanel {
 		});
 		
 		this.maximizeButton.addActionListener(new ActionListener() {
-		    	public void actionPerformed(ActionEvent e) {
+		    	@Override
+				public void actionPerformed(ActionEvent e) {
 		    		maximizarActionPerformed();
 				}
 			});
