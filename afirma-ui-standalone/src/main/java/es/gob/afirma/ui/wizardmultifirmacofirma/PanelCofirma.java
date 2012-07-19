@@ -419,7 +419,7 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 		    }
 
 		    final File savedFile = SelectionDialog.saveDataToFile(Messages.getString("Wizard.multifirma.simple.filechooser.save.title"), coSignedData, //$NON-NLS-1$
-		            signer.getSignedName(ficheroDatos, intText), null, this);
+		            signer.getSignedName(ficheroFirma, intText), null, this);
 		    // Si el usuario cancela el guardado de los datos, no nos desplazamos a la ultima pantalla
 		    if (savedFile == null) {
 		        return false;
