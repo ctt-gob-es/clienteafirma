@@ -64,230 +64,52 @@ final class SignDataPanel extends JPanel {
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     private final JLabel certDescText = new JLabel();
-    private final JLabel filePathText = new JLabel();
+	private final JTextField filePath = new JTextField();
+    private final JPanel filePathPanel = new JPanel();
+    private JPanel certDescPanel = null;
+    private final JScrollPane detailPanel = new JScrollPane();
     private final JLabel certIcon = new JLabel();
     private final JEditorPane certDescription = new JEditorPane();
     private JButton validateCertButton = null;
 
     SignDataPanel(final File signFile, final byte[] sign, final JComponent fileTypeIcon, final X509Certificate cert) {
-    	createUI(signFile, sign, fileTypeIcon, cert);
+    	this(signFile, sign, null, fileTypeIcon, cert);
     }
 
-    void createUI(final File signFile, final byte[] sign, final JComponent fileTypeIcon, final X509Certificate cert) {
+    SignDataPanel(final File signFile, final byte[] sign, final File dataFile, final JComponent fileTypeIcon, final X509Certificate cert) {
+    	createUI(signFile, sign, dataFile, fileTypeIcon, cert);
+    }
 
-        // Texto con la ruta del fichero
-        final JTextField filePath = new JTextField();
-        filePath.getAccessibleContext().setAccessibleName(Messages.getString("SignDataPanel.0")); //$NON-NLS-1$
-        filePath.getAccessibleContext().setAccessibleDescription(Messages.getString("SignDataPanel.1")); //$NON-NLS-1$
-        filePath.setBorder(BorderFactory.createEmptyBorder());
+    SignDataPanel() {
+    	createUI(null, null, null, null, null);
+    }
 
-        filePath.setEditable(false);
-        filePath.setFocusable(true);
-        filePath.setText(signFile == null ? Messages.getString("SignDataPanel.24") : signFile.getAbsolutePath());  //$NON-NLS-1$
-        filePath.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(final MouseEvent me) {
-                // me.isPopupTrigger() depende del Look & Feel y no se puede usar
-                if (me.getButton() == MouseEvent.BUTTON3 && me.getClickCount() == 1) {
-                    new CopyMenuItem(filePath, Messages.getString("SignDataPanel.30")).show(me.getComponent(), me.getX(), me.getY()); //$NON-NLS-1$
-                }
-            }
-        });
-        Utils.remarcar(filePath);
-        Utils.setFontBold(filePath);
-        Utils.setContrastColor(filePath);
+    void createUI(final File signFile, final byte[] sign, final File dataFile, final JComponent fileTypeIcon, final X509Certificate cert) {
 
-        filePath.addFocusListener(new FocusListener() {
+    	// Etiqueta encima del cuadro con la ruta de fichero
+        final JLabel filePathText = new JLabel();
+    	filePathText.setText(Messages.getString("SignDataPanel.2")); //$NON-NLS-1$
+    	filePathText.setLabelFor(this.filePath);
+    	filePathText.setDisplayedMnemonic(KeyEvent.VK_F);
+    	Utils.setContrastColor(filePathText);
+    	Utils.setFontBold(filePathText);
 
-			@Override
-			public void focusLost(final FocusEvent e) {
-				// TODO Auto-generated method stub
-				filePath.setBorder(BorderFactory.createEmptyBorder());
-			}
+    	// Panel con la informacion de los datos cargados
+        this.filePathPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
 
-			@Override
-			public void focusGained(final FocusEvent e) {
-				// TODO Auto-generated method stub
+        loadSignatureFileProperties(signFile, sign, fileTypeIcon);
 
-			}
-		});
+        // Panel con los datos del certificado. Si este es nulo, no se creara
+       	createCertificateDescriptionPanel(cert);
 
-        // Etiqueta encima del cuadro con la ruta de fichero
-        this.filePathText.setText(Messages.getString("SignDataPanel.2")); //$NON-NLS-1$
-        this.filePathText.setLabelFor(filePath);
-        this.filePathText.setDisplayedMnemonic(KeyEvent.VK_F);
-        Utils.setContrastColor(this.filePathText);
-        Utils.setFontBold(this.filePathText);
-
-        final JPanel filePathPanel = new JPanel();
-        filePathPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-        filePathPanel.setLayout(new BoxLayout(filePathPanel, BoxLayout.X_AXIS));
-        filePathPanel.add(Box.createRigidArea(new Dimension(0, 40)));
-        filePathPanel.add(Box.createRigidArea(new Dimension(5, 0)));
-
-        final boolean isPDF = new AOPDFSigner().isValidDataFile(sign);
-
-        if (fileTypeIcon != null) {
-            filePathPanel.add(fileTypeIcon);
-        }
-        else {
-            final String fileIcon;
-            final String fileTooltip;
-            if (isPDF) {
-                fileIcon = FILE_ICON_PDF;
-                fileTooltip = Messages.getString("SignDataPanel.9"); //$NON-NLS-1$
-            }
-            else {
-                fileIcon = FILE_ICON_SIGN;
-                fileTooltip = Messages.getString("SignDataPanel.31"); //$NON-NLS-1$
-            }
-            final JLabel iconLabel = new JLabel(new ImageIcon(SignDataPanel.class.getResource(fileIcon)));
-            iconLabel.setToolTipText(fileTooltip);
-            iconLabel.setFocusable(false);
-            filePathPanel.add(iconLabel);
-        }
-
-        final JPanel panelOpenFileButton = new JPanel(new GridLayout(1, 1));
-        // Boton de apertura del fichero firmado
-        JButton openFileButton = null;
-        if (isPDF && signFile != null && SignDataPanel.hasAssociatedApplication(signFile.getName().substring(signFile.getName().lastIndexOf(".")))) { //$NON-NLS-1$
-            openFileButton = new JButton(Messages.getString("SignDataPanel.3")); //$NON-NLS-1$
-            //openFileButton.setPreferredSize(new Dimension(150, 24));
-            openFileButton.setMnemonic(KeyEvent.VK_E);
-            openFileButton.setToolTipText(Messages.getString("SignDataPanel.4")); //$NON-NLS-1$
-            openFileButton.getAccessibleContext().setAccessibleName(Messages.getString("SignDataPanel.3")+ ". " + Messages.getString("SignDataPanel.5")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            openFileButton.getAccessibleContext().setAccessibleDescription(Messages.getString("SignDataPanel.6")); //$NON-NLS-1$
-            openFileButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent ae) {
-                    try {
-                        Desktop.getDesktop().open(signFile);
-                    }
-                    catch (final Exception e) {
-                    	CustomDialog.showMessageDialog(SignDataPanel.this, true, Messages.getString("SignDataPanel.7"), Messages.getString("SignDataPanel.8"), JOptionPane.ERROR_MESSAGE);  //$NON-NLS-1$//$NON-NLS-2$
-                    }
-                }
-            });
-            Utils.setFontBold(openFileButton);
-            Utils.remarcar(openFileButton);
-        }
-
-        filePathPanel.add(Box.createRigidArea(new Dimension(11, 0)));
-        filePathPanel.add(filePath);
-        filePathPanel.add(Box.createRigidArea(new Dimension(11, 0)));
-        if (openFileButton != null) {
-        	panelOpenFileButton.add(openFileButton);
-            filePathPanel.add(panelOpenFileButton);
-            filePathPanel.add(Box.createRigidArea(new Dimension(5, 0)));
-        }
-
-
-        JPanel certDescPanel = null;
-
-        // Panel con los datos del certificado
-        if (cert != null) {
-        	final JPanel panelValidateCertButton = new JPanel(new GridLayout(1, 1));
-            final CertificateInfo certInfo = CertAnalyzer.getCertInformation(cert);
-
-            if (certInfo != null) {
-
-	            this.certIcon.setIcon(certInfo.getIcon());
-	            this.certIcon.setToolTipText(certInfo.getIconTooltip());
-
-	            // Para que se detecten apropiadamente los hipervinculos hay que establecer
-	            // el tipo de contenido antes que el contenido
-	            this.certDescription.setContentType("text/html"); //$NON-NLS-1$
-
-	            this.certDescription.setEditable(false);
-	            this.certDescription.setOpaque(false);
-	            this.certDescription.setText(certInfo.getDescriptionText());
-	            this.certDescription.setToolTipText(Messages.getString("SignDataPanel.12")); //$NON-NLS-1$
-	            this.certDescription.getAccessibleContext().setAccessibleName(Messages.getString("SignDataPanel.13")); //$NON-NLS-1$
-	            this.certDescription.getAccessibleContext().setAccessibleDescription(Messages.getString("SignDataPanel.14")); //$NON-NLS-1$
-
-	            final EditorFocusManager editorFocusManager = new EditorFocusManager (this.certDescription, new EditorFocusManagerAction() {
-                    @Override
-                    public void openHyperLink(final HyperlinkEvent he, final int linkIndex) {
-                        openCertificate(cert);
-                    }
-                });
-                this.certDescription.addFocusListener(editorFocusManager);
-                this.certDescription.addKeyListener(editorFocusManager);
-	            this.certDescription.addHyperlinkListener(editorFocusManager);
-
-
-	            if (certInfo.getCertVerifier() != null) {
-	                this.validateCertButton = new JButton();
-	                //this.validateCertButton.setPreferredSize(new Dimension(150, 24));
-	                this.validateCertButton.setText(Messages.getString("SignDataPanel.15")); //$NON-NLS-1$
-	                this.validateCertButton.setMnemonic(KeyEvent.VK_V);
-	                this.validateCertButton.setToolTipText(Messages.getString("SignDataPanel.16")); //$NON-NLS-1$
-	                this.validateCertButton.getAccessibleContext().setAccessibleName(Messages.getString("SignDataPanel.17")); //$NON-NLS-1$
-	                this.validateCertButton.getAccessibleContext()
-	                .setAccessibleDescription(Messages.getString("SignDataPanel.18")); //$NON-NLS-1$
-	                this.validateCertButton.addActionListener(new ActionListener() {
-						@Override
-						public void actionPerformed(final ActionEvent ae) {
-						    SignDataPanel.this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
-							try {
-								certInfo.getCertVerifier().checkCertificate(new X509Certificate[] { cert }, true);
-								CustomDialog.showMessageDialog(SignDataPanel.this, true, Messages.getString("SignDataPanel.19"), Messages.getString("SignDataPanel.20"), JOptionPane.INFORMATION_MESSAGE);  //$NON-NLS-1$//$NON-NLS-2$
-							}
-							catch(final Exception e) {
-								LOGGER.severe("Error en la validacion del certificado: " + e); //$NON-NLS-1$
-							}
-							finally {
-							    SignDataPanel.this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-							}
-						}
-					});
-
-	                Utils.remarcar(this.validateCertButton);
-	                Utils.setContrastColor(this.validateCertButton);
-	                Utils.setFontBold(this.validateCertButton);
-	            }
-
-            }
-
-            certDescPanel = new JPanel();
-            certDescPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-            certDescPanel.setLayout(new BoxLayout(certDescPanel, BoxLayout.X_AXIS));
-            certDescPanel.add(Box.createRigidArea(new Dimension(0, 40)));
-            certDescPanel.add(Box.createRigidArea(new Dimension(5, 0)));
-            certDescPanel.add(this.certIcon);
-            certDescPanel.add(Box.createRigidArea(new Dimension(11, 0)));
-            certDescPanel.add(this.certDescription);
-            certDescPanel.add(Box.createRigidArea(new Dimension(11, 0)));
-            if (this.validateCertButton != null) {
-            	panelValidateCertButton.add(this.validateCertButton);
-                certDescPanel.add(panelValidateCertButton);
-                certDescPanel.add(Box.createRigidArea(new Dimension(5, 0)));
-            }
-
-            this.certDescText.setText(Messages.getString("SignDataPanel.21")); //$NON-NLS-1$
-            this.certDescText.setLabelFor(this.certDescription);
-            this.certDescText.setDisplayedMnemonic(KeyEvent.VK_U);
-        }
-
-        // Panel el detalle de la firma
-        CompleteSignInfo signInfo;
-        try {
-            signInfo = SignDataPanel.getSignInfo(sign);
-        } catch (final Exception e) {
-            signInfo = null;
-        }
-        final JScrollPane detailPanel = new JScrollPane(signInfo == null ? null : this.getSignDataTree(signInfo));
-        // En Apple siempre hay barras, y es el SO el que las pinta o no si hacen o no falta
-        if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-            detailPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-            detailPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-        }
-
+        // Panel con el detalle de la firma
         final JLabel detailPanelText = new JLabel(Messages.getString("SignDataPanel.22")); //$NON-NLS-1$
-        detailPanelText.setLabelFor(detailPanel);
+        detailPanelText.setLabelFor(this.detailPanel);
         detailPanelText.setDisplayedMnemonic(KeyEvent.VK_D);
         Utils.setContrastColor(detailPanelText);
         Utils.setFontBold(detailPanelText);
+
+        loadSignatureDataProperties(sign, dataFile);
 
         this.setLayout(new GridBagLayout());
 
@@ -296,17 +118,23 @@ final class SignDataPanel extends JPanel {
         c.weightx = 1.0;
         c.gridy = 0;
         c.insets = new Insets(11, 0, 0, 0);
-        this.add(this.filePathText, c);
+        this.add(filePathText, c);
         c.gridy = 1;
         c.insets = new Insets(0, 0, 0, 0);
-        this.add(filePathPanel, c);
+        this.add(this.filePathPanel, c);
         c.gridy = 2;
         c.insets = new Insets(11, 0, 0, 0);
-        if (certDescPanel != null) {
+        if (cert == null) {
+        	if (this.certDescPanel != null) {
+        		this.remove(this.certDescPanel);
+        		this.certDescPanel = null;
+        	}
+        }
+        else {
             this.add(this.certDescText, c);
             c.gridy = 3;
             c.insets = new Insets(0, 0, 0, 0);
-            this.add(certDescPanel, c);
+            this.add(this.certDescPanel, c);
             c.gridy = 4;
             c.insets = new Insets(11, 0, 0, 0);
         }
@@ -315,10 +143,223 @@ final class SignDataPanel extends JPanel {
         c.weighty = 1.0;
         c.gridy = 5;
         c.insets = new Insets(0, 0, 0, 0);
-        this.add(detailPanel, c);
+        this.add(this.detailPanel, c);
     }
 
-    @SuppressWarnings("static-method")
+    private void createCertificateDescriptionPanel(final X509Certificate cert) {
+
+    	if (cert == null) {
+    		return;
+    	}
+
+    	final JPanel panelValidateCertButton = new JPanel(new GridLayout(1, 1));
+        final CertificateInfo certInfo = CertAnalyzer.getCertInformation(cert);
+
+        if (certInfo != null) {
+            this.certIcon.setIcon(certInfo.getIcon());
+            this.certIcon.setToolTipText(certInfo.getIconTooltip());
+
+            // Para que se detecten apropiadamente los hipervinculos hay que establecer
+            // el tipo de contenido antes que el contenido
+            this.certDescription.setContentType("text/html"); //$NON-NLS-1$
+
+            this.certDescription.setEditable(false);
+            this.certDescription.setOpaque(false);
+            this.certDescription.setText(certInfo.getDescriptionText());
+            this.certDescription.setToolTipText(Messages.getString("SignDataPanel.12")); //$NON-NLS-1$
+            this.certDescription.getAccessibleContext().setAccessibleName(Messages.getString("SignDataPanel.13")); //$NON-NLS-1$
+            this.certDescription.getAccessibleContext().setAccessibleDescription(Messages.getString("SignDataPanel.14")); //$NON-NLS-1$
+
+            final EditorFocusManager editorFocusManager = new EditorFocusManager (this.certDescription, new EditorFocusManagerAction() {
+                @Override
+                public void openHyperLink(final HyperlinkEvent he, final int linkIndex) {
+                    openCertificate(cert);
+                }
+            });
+            this.certDescription.addFocusListener(editorFocusManager);
+            this.certDescription.addKeyListener(editorFocusManager);
+            this.certDescription.addHyperlinkListener(editorFocusManager);
+
+
+            if (certInfo.getCertVerifier() != null) {
+                this.validateCertButton = new JButton();
+                //this.validateCertButton.setPreferredSize(new Dimension(150, 24));
+                this.validateCertButton.setText(Messages.getString("SignDataPanel.15")); //$NON-NLS-1$
+                this.validateCertButton.setMnemonic(KeyEvent.VK_V);
+                this.validateCertButton.setToolTipText(Messages.getString("SignDataPanel.16")); //$NON-NLS-1$
+                this.validateCertButton.getAccessibleContext().setAccessibleName(Messages.getString("SignDataPanel.17")); //$NON-NLS-1$
+                this.validateCertButton.getAccessibleContext()
+                .setAccessibleDescription(Messages.getString("SignDataPanel.18")); //$NON-NLS-1$
+                this.validateCertButton.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(final ActionEvent ae) {
+					    SignDataPanel.this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+						try {
+							certInfo.getCertVerifier().checkCertificate(new X509Certificate[] { cert }, true);
+							CustomDialog.showMessageDialog(SignDataPanel.this, true, Messages.getString("SignDataPanel.19"), Messages.getString("SignDataPanel.20"), JOptionPane.INFORMATION_MESSAGE);  //$NON-NLS-1$//$NON-NLS-2$
+						}
+						catch(final Exception e) {
+							LOGGER.severe("Error en la validacion del certificado: " + e); //$NON-NLS-1$
+						}
+						finally {
+						    SignDataPanel.this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+						}
+					}
+				});
+
+                Utils.remarcar(this.validateCertButton);
+                Utils.setContrastColor(this.validateCertButton);
+                Utils.setFontBold(this.validateCertButton);
+            }
+
+        }
+
+        this.certDescPanel = new JPanel();
+        this.certDescPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        this.certDescPanel.setLayout(new BoxLayout(this.certDescPanel, BoxLayout.X_AXIS));
+        this.certDescPanel.add(Box.createRigidArea(new Dimension(0, 40)));
+        this.certDescPanel.add(Box.createRigidArea(new Dimension(5, 0)));
+        this.certDescPanel.add(this.certIcon);
+        this.certDescPanel.add(Box.createRigidArea(new Dimension(11, 0)));
+        this.certDescPanel.add(this.certDescription);
+        this.certDescPanel.add(Box.createRigidArea(new Dimension(11, 0)));
+        if (this.validateCertButton != null) {
+        	panelValidateCertButton.add(this.validateCertButton);
+            this.certDescPanel.add(panelValidateCertButton);
+            this.certDescPanel.add(Box.createRigidArea(new Dimension(5, 0)));
+        }
+
+        this.certDescText.setText(Messages.getString("SignDataPanel.21")); //$NON-NLS-1$
+        this.certDescText.setLabelFor(this.certDescription);
+        this.certDescText.setDisplayedMnemonic(KeyEvent.VK_U);
+	}
+
+	private void loadSignatureFileProperties(final File signFile, final byte[] sign, final JComponent fileTypeIcon) {
+
+		this.filePathPanel.removeAll();
+
+        this.filePathPanel.setLayout(new BoxLayout(this.filePathPanel, BoxLayout.X_AXIS));
+        this.filePathPanel.add(Box.createRigidArea(new Dimension(0, 40)));
+        this.filePathPanel.add(Box.createRigidArea(new Dimension(5, 0)));
+
+    	// Si no se indica una firma
+    	if (signFile == null && sign == null) {
+    		return;
+    	}
+
+
+    	// Texto con la ruta del fichero
+    	this.filePath.getAccessibleContext().setAccessibleName(Messages.getString("SignDataPanel.0")); //$NON-NLS-1$
+    	this.filePath.getAccessibleContext().setAccessibleDescription(Messages.getString("SignDataPanel.1")); //$NON-NLS-1$
+    	this.filePath.setBorder(BorderFactory.createEmptyBorder());
+
+    	this.filePath.setEditable(false);
+    	this.filePath.setFocusable(true);
+    	this.filePath.setText(signFile == null ? Messages.getString("SignDataPanel.24") : signFile.getAbsolutePath());  //$NON-NLS-1$
+    	this.filePath.addMouseListener(new MouseAdapter() {
+    		@Override
+    		public void mousePressed(final MouseEvent me) {
+    			// me.isPopupTrigger() depende del Look & Feel y no se puede usar
+    			if (me.getButton() == MouseEvent.BUTTON3 && me.getClickCount() == 1) {
+    				new CopyMenuItem(SignDataPanel.this.filePath, Messages.getString("SignDataPanel.30")).show(me.getComponent(), me.getX(), me.getY()); //$NON-NLS-1$
+    			}
+    		}
+    	});
+    	Utils.remarcar(this.filePath);
+    	Utils.setFontBold(this.filePath);
+    	Utils.setContrastColor(this.filePath);
+
+    	this.filePath.addFocusListener(new FocusListener() {
+    		@Override
+    		public void focusLost(final FocusEvent e) {
+    			SignDataPanel.this.filePath.setBorder(BorderFactory.createEmptyBorder());
+    		}
+    		@Override
+    		public void focusGained(final FocusEvent e) { /* Metodo vacio */ }
+    	});
+
+    	final boolean isPDF = new AOPDFSigner().isValidDataFile(sign);
+
+    	if (fileTypeIcon != null) {
+    		this.filePathPanel.add(fileTypeIcon);
+    	}
+    	else {
+    		final String fileIcon;
+    		final String fileTooltip;
+    		if (isPDF) {
+    			fileIcon = FILE_ICON_PDF;
+    			fileTooltip = Messages.getString("SignDataPanel.9"); //$NON-NLS-1$
+    		}
+    		else {
+    			fileIcon = FILE_ICON_SIGN;
+    			fileTooltip = Messages.getString("SignDataPanel.31"); //$NON-NLS-1$
+    		}
+    		final JLabel iconLabel = new JLabel(new ImageIcon(SignDataPanel.class.getResource(fileIcon)));
+    		iconLabel.setToolTipText(fileTooltip);
+    		iconLabel.setFocusable(false);
+    		this.filePathPanel.add(iconLabel);
+    	}
+
+    	final JPanel panelOpenFileButton = new JPanel(new GridLayout(1, 1));
+    	// Boton de apertura del fichero firmado
+    	JButton openFileButton = null;
+    	if (isPDF && signFile != null && SignDataPanel.hasAssociatedApplication(signFile.getName().substring(signFile.getName().lastIndexOf(".")))) { //$NON-NLS-1$
+    		openFileButton = new JButton(Messages.getString("SignDataPanel.3")); //$NON-NLS-1$
+    		//openFileButton.setPreferredSize(new Dimension(150, 24));
+    		openFileButton.setMnemonic(KeyEvent.VK_E);
+    		openFileButton.setToolTipText(Messages.getString("SignDataPanel.4")); //$NON-NLS-1$
+    		openFileButton.getAccessibleContext().setAccessibleName(Messages.getString("SignDataPanel.3")+ ". " + Messages.getString("SignDataPanel.5")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    		openFileButton.getAccessibleContext().setAccessibleDescription(Messages.getString("SignDataPanel.6")); //$NON-NLS-1$
+    		openFileButton.addActionListener(new ActionListener() {
+    			@Override
+    			public void actionPerformed(final ActionEvent ae) {
+    				try {
+    					Desktop.getDesktop().open(signFile);
+    				}
+    				catch (final Exception e) {
+    					CustomDialog.showMessageDialog(SignDataPanel.this, true, Messages.getString("SignDataPanel.7"), Messages.getString("SignDataPanel.8"), JOptionPane.ERROR_MESSAGE);  //$NON-NLS-1$//$NON-NLS-2$
+    				}
+    			}
+    		});
+    		Utils.setFontBold(openFileButton);
+    		Utils.remarcar(openFileButton);
+    	}
+
+    	this.filePathPanel.add(Box.createRigidArea(new Dimension(11, 0)));
+    	this.filePathPanel.add(this.filePath);
+    	this.filePathPanel.add(Box.createRigidArea(new Dimension(11, 0)));
+    	if (openFileButton != null) {
+    		panelOpenFileButton.add(openFileButton);
+    		this.filePathPanel.add(panelOpenFileButton);
+    		this.filePathPanel.add(Box.createRigidArea(new Dimension(5, 0)));
+    	}
+    }
+
+    private void loadSignatureDataProperties(final byte[] sign, final File dataFile) {
+
+    	// Si no se indica una firma
+    	if (sign == null) {
+    		this.detailPanel.setViewportView(null);
+    		return;
+    	}
+
+        CompleteSignInfo signInfo;
+        try {
+            signInfo = SignDataPanel.getSignInfo(sign);
+        } catch (final Exception e) {
+            signInfo = null;
+        }
+
+        this.detailPanel.setViewportView(signInfo == null ? null : this.getSignDataTree(signInfo, dataFile));
+
+        // En Apple siempre hay barras, y es el SO el que las pinta o no si hacen o no falta
+        if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+            this.detailPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+            this.detailPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+        }
+    }
+
+	@SuppressWarnings("static-method")
 	void openCertificate(final X509Certificate cert) {
         try {
             final File tmp = File.createTempFile("afirma", ".cer");  //$NON-NLS-1$//$NON-NLS-2$
@@ -371,7 +412,7 @@ final class SignDataPanel extends JPanel {
         return signInfo;
     }
 
-    private JTree getSignDataTree(final CompleteSignInfo signInfo) {
+    private JTree getSignDataTree(final CompleteSignInfo signInfo, final File dataFile) {
         final DefaultMutableTreeNode root = new DefaultMutableTreeNode();
 
         // Formato de firma
@@ -381,11 +422,12 @@ final class SignDataPanel extends JPanel {
 
         // Datos firmados
         final DefaultMutableTreeNode dataInfoBranch = new DefaultMutableTreeNode(Messages.getString("SignDataPanel.26")); //$NON-NLS-1$
-        if (signInfo.getData() == null) {
-            dataInfoBranch.add(new DefaultMutableTreeNode(Messages.getString("SignDataPanel.27"))); //$NON-NLS-1$
-        }
-        else {
-            dataInfoBranch.add(new DefaultMutableTreeNode(new ShowFileLinkAction(Messages.getString("SignDataPanel.28"), signInfo.getData()))); //$NON-NLS-1$
+        if (dataFile != null) {
+        	dataInfoBranch.add(new DefaultMutableTreeNode(new ShowFileLinkAction(Messages.getString("SignDataPanel.28"), dataFile, this))); //$NON-NLS-1$
+        } else if (signInfo.getData() != null) {
+            dataInfoBranch.add(new DefaultMutableTreeNode(new ShowFileLinkAction(Messages.getString("SignDataPanel.28"), signInfo.getData(), this))); //$NON-NLS-1$
+        } else {
+        	dataInfoBranch.add(new DefaultMutableTreeNode(new LoadFileLinkAction(Messages.getString("SignDataPanel.27"), this))); //$NON-NLS-1$
         }
         root.add(dataInfoBranch);
 
@@ -419,6 +461,11 @@ final class SignDataPanel extends JPanel {
                 else if (nodeInfo instanceof ShowFileLinkAction) {
                     ((ShowFileLinkAction) nodeInfo).action();
                 }
+                else if (nodeInfo instanceof LoadFileLinkAction) {
+                    ((LoadFileLinkAction) nodeInfo).action();
+                    SignDataPanel.this.firePropertyChange(
+                    		"dataLoaded", null, ((LoadFileLinkAction) nodeInfo).getFile()); //$NON-NLS-1$
+                }
             }
         });
 
@@ -449,5 +496,11 @@ final class SignDataPanel extends JPanel {
             return (WinRegistryWrapper.get(WinRegistryWrapper.HKEY_CLASSES_ROOT, o.toString() + "\\shell\\open\\command", "") != null);  //$NON-NLS-1$//$NON-NLS-2$
         }
         return true;
+    }
+
+    void load(final File signFile, final byte[] sign, final File dataFile, final byte[] data) {
+
+    	this.loadSignatureFileProperties(signFile, sign, null);	//TODO: Introducir el tipo de icono
+    	this.loadSignatureDataProperties(sign, dataFile);
     }
 }

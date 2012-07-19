@@ -56,7 +56,8 @@ class TreeFocusManager extends KeyAdapter implements FocusListener, MouseMotionL
         if (path != null) {
             if (path.getLastPathComponent() instanceof DefaultMutableTreeNode) {
                 final Object o = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
-                if (o instanceof ShowFileLinkAction || o instanceof AOSimpleSignInfo) {
+                if (o instanceof ShowFileLinkAction || o instanceof LoadFileLinkAction ||
+                		o instanceof AOSimpleSignInfo) {
                     this.tree.setCursor(TreeFocusManager.HAND_CURSOR);
                 }
                 else {

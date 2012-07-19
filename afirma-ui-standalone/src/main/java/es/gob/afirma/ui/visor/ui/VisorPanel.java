@@ -24,6 +24,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.logging.Logger;
@@ -78,6 +80,21 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
      */
     private JButton restoreButton = null;
 
+    /**
+     * Panel con los resultados de la validaci&oacute;n.
+     */
+    SignResultPanel resultPanel;
+
+    /**
+     * Panel con los datos de la firma validada.
+     */
+    SignDataPanel dataPanel;
+
+    /**
+     * Manejador de las peticiones de carga de datos.
+     */
+    PropertyChangeListener loadExternalDataListener = null;
+
     /** Construye un panel con la informaci&oacute;n extra&iacute;da de una firma. Si no se
      * indica la firma, esta se cargar&aacute; desde un fichero. Es obligatorio introducir
      * alguno de los dos par&aacute;metros.
@@ -85,7 +102,28 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
      * @param sign Firma.
      */
     public VisorPanel(final File signFile, final byte[] sign) {
-        createUI(signFile, sign);
+        this(signFile, sign, null);
+    }
+
+    /** Construye un panel con la informaci&oacute;n extra&iacute;da de una firma. Si no se
+     * indica la firma, esta se cargar&aacute; desde un fichero. Es obligatorio introducir
+     * alguno de los dos par&aacute;metros.
+     * @param signFile Fichero de firma.
+     * @param sign Firma.
+     * @param dataFile Fichero de datos.
+     */
+    public VisorPanel(final File signFile, final byte[] sign, final File dataFile) {
+
+    	byte[] signature = (sign == null ? null : sign.clone());
+        if (signature == null) {
+            signature = (signFile == null ? null : loadFile(signFile));
+        }
+
+    	final byte[] data = (dataFile == null ? null : loadFile(dataFile));
+
+    	createUI();
+
+    	this.openSign(signFile, signature, dataFile, data);
     }
 
     /**
@@ -155,9 +193,7 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
             }
         });
 
-
         panel.add(restorePanel, consButtons);
-
 
         consButtons.gridx = 1;
         //consButtons.weightx = 0.5;
@@ -235,10 +271,92 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
 
     }
 
-    private void createUI(final File signFile, final byte[] sign) {
-        this.setLayout(new GridBagLayout());
+    private void createUI() {
 
-        openSign(signFile, sign);
+        createAccessibilityButtonsPanel();
+        this.resultPanel = new SignResultPanel(new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, null));
+        this.dataPanel = new SignDataPanel();
+
+        final JPanel bottonPanel = new JPanel(true);
+        bottonPanel.setLayout(new FlowLayout(FlowLayout.TRAILING));
+
+        //Espacio entre botones
+        final JPanel panelVacio = new JPanel();
+        panelVacio.setPreferredSize(new Dimension(300, 10));
+        bottonPanel.add(panelVacio);
+
+        final JPanel panelClose = new JPanel(new GridLayout(1, 1));
+        final JButton bClose = new JButton(Messages.getString("VisorPanel.1")); //$NON-NLS-1$
+        bClose.setMnemonic(KeyEvent.VK_C);
+        bClose.setToolTipText(Messages.getString("VisorPanel.2")); //$NON-NLS-1$
+        bClose.getAccessibleContext().setAccessibleName(Messages.getString("VisorPanel.1") + ". " +Messages.getString("VisorPanel.3"));  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+        Utils.remarcar(bClose);
+        Utils.setContrastColor(bClose);
+        Utils.setFontBold(bClose);
+
+        bClose.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent arg0) {
+                saveSizePosition();
+                VisorPanel.this.dispose();
+            }
+        });
+
+        panelClose.add(bClose);
+        bottonPanel.add(panelClose);
+
+        setLayout(new GridBagLayout());
+
+        final GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.BOTH;
+        c.weightx = 0;
+        c.gridy = 0;
+        add(this.accessibilityButtonsPanel,c);
+        c.weightx = 1.0;
+        c.gridy = c.gridy + 1;
+        add(this.resultPanel, c);
+        c.weighty = 1.0;
+        c.gridy = c.gridy + 1;
+        c.insets = new Insets(0, 11, 11, 11);
+        add(this.dataPanel, c);
+        c.weighty = 0.0;
+        c.gridy = c.gridy + 1;
+        c.insets = new Insets(0, 11, 11, 11);
+        add(bottonPanel, c);
+
+        repaint();
+    }
+
+    /**
+     * Analiza una firma indicada mediante un fichero o como un array de
+     * bytes y muestra la informaci&oacute;n extra&iacute;da en un di&aacute;logo.
+     * Si se indican ambos par&aacute;metros, se dar&aacute; prioridad al
+     * byte array introducido.
+     * @param signFile Fichero de firma.
+     * @param signature Firma.
+     * @param dataFile Fichero de datos.
+     * @param data Datos.
+     */
+    public void openSign(final File signFile, final byte[] signature, final File dataFile, final byte[] data) {
+
+    	SignValidity validity = new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, null);
+        if (signature != null) {
+            try {
+                validity = validateSign(signature, data);
+            } catch (final Exception e) {
+                validity = new SignValidity(SIGN_DETAIL_TYPE.KO, null);
+            }
+        }
+
+    	this.resultPanel.update(validity);
+    	this.dataPanel.load(signFile, signature, dataFile, null);
+    	if (this.loadExternalDataListener != null) {
+    		this.dataPanel.removePropertyChangeListener(this.loadExternalDataListener);
+    	}
+    	this.loadExternalDataListener = new LoadExternalDataListener(signFile, signature);
+        this.dataPanel.addPropertyChangeListener(this.loadExternalDataListener);
+
     }
 
     @Override
@@ -277,99 +395,83 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
         this.restoreButton.setEnabled(true);
     }
 
-    /**
-     * Analiza una firma indicada mediante un fichero o como un array de
-     * bytes y muestra la informaci&oacute;n extra&iacute;da en un di&aacute;logo.
-     * Si se indican ambos par&aacute;metros, se dar&aacute; prioridad al
-     * byte array introducido.
-     * @param signFile Fichero de firma.
-     * @param signature Firma.
-     */
-    public void openSign(final File signFile, final byte[] signature) {
-
-        if (signFile == null && signature == null) {
-            Logger.getLogger("es.gob.afirma").warning("Se ha intentado abrir una firma nula");  //$NON-NLS-1$ //$NON-NLS-2$
-            return;
-        }
-
-        byte[] sign = (signature != null) ?  signature.clone() : null;
-
-        if (sign == null) {
-            if (signFile != null) {
-                try {
-                    final FileInputStream fis = new FileInputStream(signFile);
-                    sign = AOUtil.getDataFromInputStream(fis);
-                    try { fis.close(); } catch (final Exception e) { /* Ignoramos los errores */ }
-                }
-                catch (final Exception e) {
-                    Logger.getLogger("es.gob.afirma").warning("No se ha podido cargar el fichero de firma: " + e); //$NON-NLS-1$ //$NON-NLS-2$
-                }
-            }
-        }
-
-        SignValidity validity = new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, null);
-        if (sign != null) {
-            try {
-                validity = validateSign(sign);
-            } catch (final Exception e) {
-                validity = new SignValidity(SIGN_DETAIL_TYPE.KO, null);
-            }
-        }
-        createAccessibilityButtonsPanel();
-        final JPanel resultPanel = new SignResultPanel(validity);
-        final JPanel dataPanel = new SignDataPanel(signFile, sign, null, null);
-
-        final JPanel bottonPanel = new JPanel(true);
-        bottonPanel.setLayout(new FlowLayout(FlowLayout.TRAILING));
-
-        //Espacio entre botones
-        final JPanel panelVacio = new JPanel();
-        panelVacio.setPreferredSize(new Dimension(300, 10));
-        bottonPanel.add(panelVacio);
-
-        final JPanel panelClose = new JPanel(new GridLayout(1, 1));
-        final JButton bClose = new JButton(Messages.getString("VisorPanel.1")); //$NON-NLS-1$
-        bClose.setMnemonic(KeyEvent.VK_C);
-        bClose.setToolTipText(Messages.getString("VisorPanel.2")); //$NON-NLS-1$
-        bClose.getAccessibleContext().setAccessibleName(Messages.getString("VisorPanel.1") + ". " +Messages.getString("VisorPanel.3"));  //$NON-NLS-1$ //$NON-NLS-3$
-
-        Utils.remarcar(bClose);
-        Utils.setContrastColor(bClose);
-        Utils.setFontBold(bClose);
-
-        bClose.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent arg0) {
-                saveSizePosition();
-                VisorPanel.this.dispose();
-            }
-        });
-
-        panelClose.add(bClose);
-        bottonPanel.add(panelClose);
-
-        setLayout(new GridBagLayout());
-
-        final GridBagConstraints c = new GridBagConstraints();
-        c.fill = GridBagConstraints.BOTH;
-        c.weightx = 0;
-        c.gridy = 0;
-        add(this.accessibilityButtonsPanel,c);
-        c.weightx = 1.0;
-        c.gridy = c.gridy +1;
-        add(resultPanel, c);
-        c.weighty = 1.0;
-        c.gridy = c.gridy +1;
-        c.insets = new Insets(0, 11, 11, 11);
-        add(dataPanel, c);
-        c.weighty = 0.0;
-        c.gridy = c.gridy +1;
-        c.insets = new Insets(0, 11, 11, 11);
-        add(bottonPanel, c);
-
-        repaint();
-
-    }
+//    /**
+//     * Analiza una firma indicada mediante un fichero o como un array de
+//     * bytes y muestra la informaci&oacute;n extra&iacute;da en un di&aacute;logo.
+//     * Si se indican ambos par&aacute;metros, se dar&aacute; prioridad al
+//     * byte array introducido.
+//     * @param signFile Fichero de firma.
+//     * @param signature Firma.
+//     * @param dataFile Fichero de datos.
+//     * @param data Datos.
+//     */
+//    public void openSign(final File signFile, final byte[] signature, final File dataFile, final byte[] data) {
+//
+//        SignValidity validity = new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, null);
+//        if (signature != null) {
+//            try {
+//                validity = validateSign(signature, data);
+//            } catch (final Exception e) {
+//                validity = new SignValidity(SIGN_DETAIL_TYPE.KO, null);
+//            }
+//        }
+//        createAccessibilityButtonsPanel();
+//        final JPanel resultPanel = new SignResultPanel(validity);
+//        final JPanel dataPanel = new SignDataPanel(signFile, signature, dataFile, null, null);
+//
+//        dataPanel.addPropertyChangeListener(new LoadExternalDataListener(signFile, signature));
+//
+//        final JPanel bottonPanel = new JPanel(true);
+//        bottonPanel.setLayout(new FlowLayout(FlowLayout.TRAILING));
+//
+//        //Espacio entre botones
+//        final JPanel panelVacio = new JPanel();
+//        panelVacio.setPreferredSize(new Dimension(300, 10));
+//        bottonPanel.add(panelVacio);
+//
+//        final JPanel panelClose = new JPanel(new GridLayout(1, 1));
+//        final JButton bClose = new JButton(Messages.getString("VisorPanel.1")); //$NON-NLS-1$
+//        bClose.setMnemonic(KeyEvent.VK_C);
+//        bClose.setToolTipText(Messages.getString("VisorPanel.2")); //$NON-NLS-1$
+//        bClose.getAccessibleContext().setAccessibleName(Messages.getString("VisorPanel.1") + ". " +Messages.getString("VisorPanel.3"));  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+//
+//        Utils.remarcar(bClose);
+//        Utils.setContrastColor(bClose);
+//        Utils.setFontBold(bClose);
+//
+//        bClose.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(final ActionEvent arg0) {
+//                saveSizePosition();
+//                VisorPanel.this.dispose();
+//            }
+//        });
+//
+//        panelClose.add(bClose);
+//        bottonPanel.add(panelClose);
+//
+//        setLayout(new GridBagLayout());
+//
+//        final GridBagConstraints c = new GridBagConstraints();
+//        c.fill = GridBagConstraints.BOTH;
+//        c.weightx = 0;
+//        c.gridy = 0;
+//        add(this.accessibilityButtonsPanel,c);
+//        c.weightx = 1.0;
+//        c.gridy = c.gridy + 1;
+//        add(resultPanel, c);
+//        c.weighty = 1.0;
+//        c.gridy = c.gridy + 1;
+//        c.insets = new Insets(0, 11, 11, 11);
+//        add(dataPanel, c);
+//        c.weighty = 0.0;
+//        c.gridy = c.gridy + 1;
+//        c.insets = new Insets(0, 11, 11, 11);
+//        add(bottonPanel, c);
+//
+//        repaint();
+//
+//    }
 
     /**
      * Restaura el tamano de la ventana a la posicion anterior al maximizado
@@ -413,7 +515,7 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
      * @return {@code true} si la firma es v&acute;lida, {@code false} en caso contrario.
      * @throws Exception Cuando los datos introducidos no se corresponden con una firma.
      */
-    private static SignValidity validateSign(final byte[] sign) {
+    private static SignValidity validateSign(final byte[] sign, final byte[] data) {
         if (DataAnalizerUtil.isSignedPDF(sign)) {
             return new SignValidity(SIGN_DETAIL_TYPE.OK, null);
         }
@@ -421,7 +523,7 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
             return ValidateXMLSignature.validate(sign);
         }
         else if(DataAnalizerUtil.isSignedBinary(sign)) {
-            return ValidateBinarySignature.validate(sign, null);
+            return ValidateBinarySignature.validate(sign, data);
         }
         else if (DataAnalizerUtil.isSignedODF(sign)) {
             return new SignValidity(SIGN_DETAIL_TYPE.OK, null);
@@ -430,5 +532,52 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
             return new SignValidity(SIGN_DETAIL_TYPE.OK, null);
         }
         return new SignValidity(SIGN_DETAIL_TYPE.KO, null);
+    }
+
+    private class LoadExternalDataListener implements PropertyChangeListener {
+
+    	private File signFile = null;
+    	private byte[] sign = null;
+
+    	public LoadExternalDataListener(final File signatureFile, final byte[] signatureData) {
+    		this.signFile = signatureFile;
+    		this.sign = signatureData;
+		}
+
+		@Override
+		public void propertyChange(final PropertyChangeEvent event) {
+			if (event.getNewValue() != null && event.getNewValue() instanceof File) {
+				byte[] signature = this.sign;
+				if (signature == null) {
+					signature = VisorPanel.loadFile(this.signFile);
+				}
+				final byte[] data = loadFile((File) event.getNewValue());
+				openSign(this.signFile, signature, (File) event.getNewValue(), data);
+			}
+		}
+    }
+
+
+    /**
+     * Recupera el contenido de un fichero.
+     * @param file Fichero.
+     * @return Datos contenidos en el fichero o {@code null} si ocurri&oacute; alg&uacute;n error.
+     */
+    static byte[] loadFile(final File file) {
+    	FileInputStream fis = null;
+    	try {
+			fis = new FileInputStream(file);
+			return AOUtil.getDataFromInputStream(fis);
+
+		}
+		catch (final Exception e) {
+			Logger.getLogger("es.gob.afirma").warning("No se ha podido cargar el fichero: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			return null;
+		}
+		finally {
+			if (fis != null) {
+				try { fis.close(); } catch (final Exception e) { /* Ignoramos los errores */ }
+			}
+		}
     }
 }
