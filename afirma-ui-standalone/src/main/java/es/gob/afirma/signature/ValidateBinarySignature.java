@@ -52,9 +52,9 @@ public final class ValidateBinarySignature {
             throw new IllegalArgumentException("La firma a validar no puede ser nula"); //$NON-NLS-1$
         }
 
-        AOSigner signer = new AOCMSSigner();
+        AOSigner signer = new AOCAdESSigner();
         if (!signer.isSign(sign)) {
-            signer = new AOCAdESSigner();
+            signer = new AOCMSSigner();
             if (!signer.isSign(sign)) {
                 return new SignValidity(SIGN_DETAIL_TYPE.KO, null);
             }
@@ -63,14 +63,14 @@ public final class ValidateBinarySignature {
         Security.addProvider(new BouncyCastleProvider());
 
         try {
-            byte[] signedData = null;
-            if (data == null) {
-                signedData = signer.getData(sign);
-                if (signedData == null) {
-                    return new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.NO_DATA);
-                }
-            }
-            verifySignatures(sign, data != null ? data : signedData);
+        	byte[] signedData = data;
+        	if (signedData == null) {
+        		signedData = signer.getData(sign);
+        		if (signedData == null) {
+        			return new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.NO_DATA);
+        		}
+        	}
+        	verifySignatures(sign, signedData);
         } catch (final CertStoreException e) {
             // Ocurrio un error al recuperar los certificados o estos no son validos
             return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_PROBLEM);
@@ -127,6 +127,9 @@ public final class ValidateBinarySignature {
             final Iterator<?> certIt = certStore.getCertificates(signer.getSID()).iterator();
             final X509Certificate cert = (X509Certificate) certIt.next();
 
+
+            //TODO: Corregir para que se validen correctamente las firmas explicitas
+
             if (!signer.verify(cert, BouncyCastleProvider.PROVIDER_NAME)) {
                 throw new CMSException("Firma no valida"); //$NON-NLS-1$
             }
@@ -173,5 +176,4 @@ public final class ValidateBinarySignature {
             throw new CRLException("Error en la estructura de CRLs de la firma"); //$NON-NLS-1$
         }
     }
-
 }
