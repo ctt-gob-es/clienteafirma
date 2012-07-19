@@ -415,7 +415,8 @@ public final class CustomDialog extends JAccessibilityCustomDialog implements Ac
 			/**
 			 * Accion del boton.
 			 */
-	    	public void actionPerformed(ActionEvent e) {
+	    	@Override
+			public void actionPerformed(ActionEvent e) {
 	    		restaurarActionPerformed();
 			}
 		});
@@ -467,7 +468,8 @@ public final class CustomDialog extends JAccessibilityCustomDialog implements Ac
 				/**
 				 * Accion del boton.
 				 */
-		    	public void actionPerformed(ActionEvent e) {
+		    	@Override
+				public void actionPerformed(ActionEvent e) {
 		    		maximizarActionPerformed();
 				}
 			});
@@ -1044,6 +1046,7 @@ public final class CustomDialog extends JAccessibilityCustomDialog implements Ac
 				/**
 				 * Indica que la accion es la de pulsar el boton cancelar.
 				 */
+				@Override
 				public void actionPerformed (ActionEvent event) {
     				CustomDialog.cancelButton.doClick ();
     			}
