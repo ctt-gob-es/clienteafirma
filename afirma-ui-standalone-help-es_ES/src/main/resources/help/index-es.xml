@@ -40,11 +40,11 @@
 		<indexitem text="Almacén de certificados" target="almacen.certificados" />
 		<indexitem text="Cifrado de datos" target="cifrado.datos">
 			<indexitem text="Claves de cifrado" target="claves.cifrado">
-				<indexitem text="Algoritmos PBE" target="algoritmos.pbe">
+				<indexitem text="Algoritmos PBE" target="algoritmos.pbe" />
 			</indexitem>	
 			<indexitem text="Cifrado simétrico" target="cifrado.simetrico"/>
 			<indexitem text="Cifrado asimétrico" target="cifrado.asimetrico" />
-		</indexitem>		
+		</indexitem>
 		<indexitem text="Sobres digitales" target="sobres.digitales" />		
 	</indexitem>
 	<indexitem text="Interfaz de escritorio" target="interfaz.escritorio">

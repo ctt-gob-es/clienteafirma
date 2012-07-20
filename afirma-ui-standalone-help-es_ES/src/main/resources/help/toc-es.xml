@@ -45,7 +45,7 @@
 		<tocitem text="Cifrado de datos" target="cifrado.datos">
 			<tocitem text="Claves de cifrado" target="claves.cifrado">
 				<tocitem text="Algoritmos PBE" target="algoritmos.pbe"/>
-			</tocitem>	
+			</tocitem>
 			<tocitem text="Cifrado simétrico" target="cifrado.simetrico"/>
 			<tocitem text="Cifrado asimétrico" target="cifrado.asimetrico" />
 		</tocitem>		
