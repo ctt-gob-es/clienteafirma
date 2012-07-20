@@ -50,7 +50,10 @@ public class DirectorySignatureHelper {
 
     private static final String CADES_SIGNER = "es.gob.afirma.signers.cades.AOCAdESSigner"; //$NON-NLS-1$
     private static final String XADES_SIGNER = "es.gob.afirma.signers.xades.AOXAdESSigner"; //$NON-NLS-1$
-    private static final String XMLDSIG_SIGNER = "es.gob.afirma.signers.xml.xmldsig.AOXMLDSigSigner"; //$NON-NLS-1$
+    private static final String XMLDSIG_SIGNER = "es.gob.afirma.signers.xmldsig.AOXMLDSigSigner"; //$NON-NLS-1$
+    private static final String PDF_SIGNER = "es.gob.afirma.signers.pades.AOPDFSigner"; //$NON-NLS-1$
+    private static final String ODF_SIGNER = "es.gob.afirma.signers.odf.AOODFSSigner"; //$NON-NLS-1$
+    private static final String OOXML_SIGNER = "es.gob.afirma.signers.ooxml.AOOOXMLSigner"; //$NON-NLS-1$
 
     private static final String REG_FIELD_SEPARATOR = " - "; //$NON-NLS-1$
 
@@ -610,8 +613,19 @@ public class DirectorySignatureHelper {
                 continue;
             }
 
+        	// Para los formatos PDF, ODF y OOXML, en los que la firma de un documento firmado es
+        	// una cofirma, se agrega la particula "cosign" en lugar de "signed" si los datos estaban
+            // firmados
+            String textAux = ".signed"; //$NON-NLS-1$
+        	if ((PDF_SIGNER.equals(signerClassName) ||
+        			ODF_SIGNER.equals(signerClassName) ||
+        			OOXML_SIGNER.equals(signerClassName)) &&
+        			signer.isSign(dataToSign)) {
+        		textAux = ".cosign"; //$NON-NLS-1$
+        	}
+
             // Guardamos la firma en disco
-            if (!this.saveSignToDirectory(file.getPath(), signData, outDir, signer, ".signed")) { //$NON-NLS-1$
+            if (!this.saveSignToDirectory(file.getPath(), signData, outDir, signer, textAux)) {
                 allOK = false;
                 continue;
             }
