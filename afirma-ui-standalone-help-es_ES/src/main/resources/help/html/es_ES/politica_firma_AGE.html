@@ -1,0 +1,46 @@
+<html>
+<head>
+	<title>Pol&iacute;tica de firma de la AGE</title>
+</head>
+<body>
+<h2><a name="_Toc275937502">Pol&iacute;tica de firma de la AGE</a></h2>
+
+<p>La pol&iacute;tica de firma de la AGE define un marco legal de firma electr&oacute;nica concreto
+y com&uacute;n para la administraci&oacute;n p&uacute;blica espa&ntilde;ola. La declaraci&oacute;n de esta pol&iacute;tica de
+firma indica que se han cumplido los requisitos exigidos por la pol&iacute;tica durante el
+proceso de firma electr&oacute;nica.</p>
+
+<p>Actualmente, se encuentra en vigencia la versi&oacute;n 1.8 de la pol&iacute;tica de la AGE, de la
+que puede consultar su contenido en el siguiente documento:</p>
+
+<a href="http://administracionelectronica.gob.es/es/ctt/politicafirma/politica_firma_AGE_v1_8.pdf">
+http://administracionelectronica.gob.es/es/ctt/politicafirma/politica_firma_AGE_v1_8.pdf</a>
+
+<p>Para la configuraci&oacute;n de la pol&iacute;tica de la interfaz de escritorio del Cliente @firma
+deber&aacute; configurar los atributos apropiados en el men&uacute; de opciones de la aplicaci&oacute;n. Los
+valores asignados a las distintas propiedades son:</p>
+
+<table border="1px">
+<tr><td><b>Propiedad</b></td><td><b>Valor</b></td></tr>
+<tr><td>Identificador de la pol&iacute;tica de firma</td><td>urn:oid:2.16.724.1.3.1.1.2.1.8</td></tr>
+<tr><td>Cualificador de la pol&iacute;tica de firma</td><td>
+<a href="http://administracionelectronica.gob.es/es/ctt/politicafirma/politica_firma_AGE_v1_8.pdf">
+http://administracionelectronica.gob.es/es/ctt/politicafirma/politica_firma_AGE_v1_8.pdf</a></td></tr>
+<tr><td>Huella digital SHA1 (para firmas CAdES)</td><td>7SxX3erFuH31TvAw9LZ70N7p1vA=</td></tr>
+<tr><td>Huella digital SHA1 (para firmas XAdES)</td><td>V8lVVNGDCPen6VELRD1Ja8HARFk=</td></tr>
+</table>
+
+<p><b>ADVERTENCIA:</b> Debido a que las firmas CAdES y XAdES deben declarar una huella digital
+distinta para la pol&iacute;tica de firma, se debe configurar cuidadosamente esta propiedad seg&uacute;n el
+tipo de formato de firma electr&oacute;nica que desee utilizar. Tenga en cuenta que algunos validadores
+compatibles con la pol&iacute;tica de firma definida (como VALIDe en el caso de la pol&iacute;tica de firma de
+la AGE) pueden validar la huella digital de la pol&iacute;tica y determinar que la firma es incorrecta
+si no define la huella digital correspondiente al formato de firma.</p>
+
+<p>Para la realizaci&oacute;n de firmas PAdES con pol&iacute;tica de firma, utilice la huella digital
+definida para las firmas CAdES.</p>
+
+<p>Las firmas ODF y OOXML no definen una pol&iacute;tica de firma.</p>
+
+</body>
+</html>

@@ -34,6 +34,7 @@
 		</indexitem>	
 		<indexitem text="Modos de firma" target="modos.firma" />
 		<indexitem text="Política de firma" target="politica.firma" />
+		<indexitem text="Política de firma de la AGE" target="politica.firma.age" />
 		<indexitem text="Cofirma" target="cofirma" />
 		<indexitem text="Contrafirma" target="contrafirma" />
 		<indexitem text="Almacén de certificados" target="almacen.certificados" />

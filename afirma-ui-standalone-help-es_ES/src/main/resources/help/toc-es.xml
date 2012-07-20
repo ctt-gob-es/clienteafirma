@@ -38,6 +38,7 @@
 		</tocitem>	
 		<tocitem text="Modos de firma" target="modos.firma" />
 		<tocitem text="Política de firma" target="politica.firma" />
+		<tocitem text="Política de firma de la AGE" target="politica.firma.age" />
 		<tocitem text="Cofirma" target="cofirma" />
 		<tocitem text="Contrafirma" target="contrafirma" />
 		<tocitem text="Almacén de certificados" target="almacen.certificados" />

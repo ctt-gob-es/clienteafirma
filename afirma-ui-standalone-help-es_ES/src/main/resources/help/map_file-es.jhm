@@ -31,6 +31,7 @@
 					<mapID target="pades" url="html/es_ES/pades.html" />
 		<mapID target="modos.firma" url="html/es_ES/modos_firma.html" />
 		<mapID target="politica.firma" url="html/es_ES/politica_firma.html" />
+		<mapID target="politica.firma.age" url="html/es_ES/politica_firma_AGE.html" />
 		<mapID target="cofirma" url="html/es_ES/cofirma.html" />
 		<mapID target="contrafirma" url="html/es_ES/contrafirma.html" />
 		<mapID target="almacen.certificados" url="html/es_ES/almacen_certificados.html" />
