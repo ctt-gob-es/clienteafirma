@@ -75,7 +75,7 @@
 			<tocitem text="Clave de cifrado" target="descifrado.clave" />
 		</tocitem>
 		<tocitem text="Ensobrado digital" target="ensobrado" >
-			<tocitem text="Añadir remitentes" target="ensobrado.anadirremitentes" />
+			<!-- <tocitem text="Añadir remitentes" target="ensobrado.anadirremitentes" /> -->
 		</tocitem>
 		<tocitem text="Desensobrado digital" target="desensobrado" />		
 	</tocitem>
