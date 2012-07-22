@@ -41,6 +41,10 @@ public class DnieUnifiedKeyStoreManager extends AOKeyStoreManager {
 			dnieRootCertificate = null;
 		}
 	}
+
+	/** Longitud de la cadena de confianza del DNIe. */
+	private static final int DNIE_CERTCHAIN_LENGTH = 2;
+
 	private static final List<String> DNIE_ALIASES = new ArrayList<String>(2);
 
 	private final String[] aliases;
@@ -52,8 +56,8 @@ public class DnieUnifiedKeyStoreManager extends AOKeyStoreManager {
 
 	private static final X500Principal DNIE_ISSUER = new X500Principal("CN=AC DNIE 001, OU=DNIE, O=DIRECCION GENERAL DE LA POLICIA, C=ES"); //$NON-NLS-1$
 
-	private final AOKeyStoreManager ORIGINAL_KSM;
-	private AOKeyStoreManager DNIE_KSM = null;
+	private final AOKeyStoreManager originalKsm;
+	private AOKeyStoreManager dnieKsm = null;
 
 	/** Crea un almc&eacute;n de claves en base a un agregado del DNIe con controlador 100% Java y un segundo almac&eacute;n
 	 * indicado como par&aacute;metro.
@@ -64,7 +68,7 @@ public class DnieUnifiedKeyStoreManager extends AOKeyStoreManager {
 			throw new IllegalArgumentException("Es necesario un almacen al que anadir los certificados de DNIe, no puede ser nulo"); //$NON-NLS-1$
 		}
 
-		this.ORIGINAL_KSM = originalKsm;
+		this.originalKsm = originalKsm;
 
 		boolean dnieNeeded = true;
 
@@ -76,7 +80,7 @@ public class DnieUnifiedKeyStoreManager extends AOKeyStoreManager {
 		}
 		if (dnieNeeded) {
 			try {
-				this.DNIE_KSM = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+				this.dnieKsm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
 					AOKeyStore.DNIEJAVA,
 					null, // Lib
 					originalKsm.getType() + "_PLUS_DNIE", // Description //$NON-NLS-1$
@@ -91,9 +95,9 @@ public class DnieUnifiedKeyStoreManager extends AOKeyStoreManager {
 
 		// Unificamos los alias
 		final String[] originalAliases = originalKsm.getAliases();
-		this.aliases = new String[originalAliases.length + ((this.DNIE_KSM != null) ? 2 : 0)];
+		this.aliases = new String[originalAliases.length + ((this.dnieKsm != null) ? 2 : 0)];
 		System.arraycopy(originalAliases, 0, this.aliases, 0, originalAliases.length);
-		if (this.DNIE_KSM != null) {
+		if (this.dnieKsm != null) {
 			this.aliases[this.aliases.length-1] = DNIE_ALIASES.get(0);
 			this.aliases[this.aliases.length-2] = DNIE_ALIASES.get(1);
 		}
@@ -108,20 +112,20 @@ public class DnieUnifiedKeyStoreManager extends AOKeyStoreManager {
 	/** {@inheritDoc} */
 	@Override
 	public X509Certificate getCertificate(final String alias) {
-		if (!DNIE_ALIASES.contains(alias) || this.DNIE_KSM == null) {
-			return this.ORIGINAL_KSM.getCertificate(alias);
+		if (!DNIE_ALIASES.contains(alias) || this.dnieKsm == null) {
+			return this.originalKsm.getCertificate(alias);
 		}
-		return this.DNIE_KSM.getCertificate(alias);
+		return this.dnieKsm.getCertificate(alias);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public X509Certificate[] getCertificateChain(final String alias) {
-		if (!DNIE_ALIASES.contains(alias) || this.DNIE_KSM == null) {
-			return this.ORIGINAL_KSM.getCertificateChain(alias);
+		if (!DNIE_ALIASES.contains(alias) || this.dnieKsm == null) {
+			return this.originalKsm.getCertificateChain(alias);
 		}
-		final X509Certificate[] chain = new X509Certificate[3];
-		final X509Certificate[] originalDnieChain = this.DNIE_KSM.getCertificateChain(alias);
+		final X509Certificate[] chain = new X509Certificate[DNIE_CERTCHAIN_LENGTH];
+		final X509Certificate[] originalDnieChain = this.dnieKsm.getCertificateChain(alias);
 		chain[0] = originalDnieChain[0];
 		chain[1] = originalDnieChain[1];
 		chain[2] = dnieRootCertificate;
@@ -134,28 +138,28 @@ public class DnieUnifiedKeyStoreManager extends AOKeyStoreManager {
                                                 final PasswordCallback pssCallback) throws KeyStoreException,
                                                        									   NoSuchAlgorithmException,
                                                        									   UnrecoverableEntryException {
-		if (!DNIE_ALIASES.contains(alias) || this.DNIE_KSM == null) {
-			return this.ORIGINAL_KSM.getKeyEntry(alias, pssCallback);
+		if (!DNIE_ALIASES.contains(alias) || this.dnieKsm == null) {
+			return this.originalKsm.getKeyEntry(alias, pssCallback);
 		}
-		return new PrivateKeyEntry(this.DNIE_KSM.getKeyEntry(alias, null).getPrivateKey(), this.getCertificateChain(alias));
+		return new PrivateKeyEntry(this.dnieKsm.getKeyEntry(alias, null).getPrivateKey(), this.getCertificateChain(alias));
 	}
 
 	/** {@inheritDoc} */
     @Override
 	public List<KeyStore> getKeyStores() {
-    	if (this.DNIE_KSM == null) {
-    		return this.ORIGINAL_KSM.getKeyStores();
+    	if (this.dnieKsm == null) {
+    		return this.originalKsm.getKeyStores();
     	}
-    	final List<KeyStore> ksms = new ArrayList<KeyStore>(this.ORIGINAL_KSM.getKeyStores().size() + 1);
-    	ksms.addAll(this.ORIGINAL_KSM.getKeyStores());
-    	ksms.addAll(this.DNIE_KSM.getKeyStores());
+    	final List<KeyStore> ksms = new ArrayList<KeyStore>(this.originalKsm.getKeyStores().size() + 1);
+    	ksms.addAll(this.originalKsm.getKeyStores());
+    	ksms.addAll(this.dnieKsm.getKeyStores());
     	return ksms;
     }
 
     /** {@inheritDoc} */
     @Override
 	public AOKeyStore getType() {
-        return this.ORIGINAL_KSM.getType();
+        return this.originalKsm.getType();
     }
 
     /** {@inheritDoc} */
