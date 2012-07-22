@@ -74,7 +74,7 @@ interface MiniAfirma {
 	 *               al usuario de nuevo con un di&aacute;logo de selecci&oacute;n de certificado la pr&oacute;xima vez que se
 	 *               necesite (o un di&aacute;logo de confirmaci&oacute;n de firma si el certificado se establece un&iacute;vocamente
 	 *               mediante un filtro. */
-    public void setStickySignatory(boolean sticky);
+    void setStickySignatory(boolean sticky);
 
     /** Realiza la firma paralela (cofirma) de unos datos. La cofirma de una firma requiere
      * que los datos est&eacute;n contenidos en la firma original o que se indiquen de
