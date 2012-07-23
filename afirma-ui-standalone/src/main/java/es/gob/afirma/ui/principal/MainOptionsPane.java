@@ -159,7 +159,6 @@ public class MainOptionsPane {
 
         c2.insets = new Insets(5, 13, 0, 13);
         c2.gridy = 1;
-        c2.weighty = 0.1;
         c2.fill = GridBagConstraints.BOTH;
 
         // Combo con los algoritmos de huella digital
