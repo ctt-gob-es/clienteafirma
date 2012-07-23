@@ -38,7 +38,7 @@ import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
 final class CipherManager {
 
     /** Caracteres ASCII validos para la contrase&ntilde;a de cifrado. */
-    final static String ACCEPTED_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"; //$NON-NLS-1$
+	private static final String ACCEPTED_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"; //$NON-NLS-1$
 
     /** Componente sobre el que se mostrar&aacute;n los di6aaclogos modales. */
     private Component parent = null;

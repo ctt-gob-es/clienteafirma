@@ -33,9 +33,9 @@ import es.gob.afirma.ui.utils.Utils;
 public class MainOptionsPane {
 
     // Constantes de los algoritmos de huella digital
-    final static List<String> ALGORITHM_K = new ArrayList<String>(Arrays.asList("SHA-1", "SHA-512", "SHA-384", "SHA-256")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+	static final List<String> ALGORITHM_K = new ArrayList<String>(Arrays.asList("SHA-1", "SHA-512", "SHA-384", "SHA-256")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
-    final static List<String> ALGORITHM_V = new ArrayList<String>(Arrays.asList("SHA1withRSA", "SHA512withRSA", "SHA384withRSA", "SHA256withRSA")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+	static final List<String> ALGORITHM_V = new ArrayList<String>(Arrays.asList("SHA1withRSA", "SHA512withRSA", "SHA384withRSA", "SHA256withRSA")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
     /** Algoritmo por defecto para su uso por defecto en las firmas. */
     public static final String DEFAULT_DEFAULT_ALGORITHM = "SHA1withRSA"; //$NON-NLS-1$
@@ -436,12 +436,12 @@ public class MainOptionsPane {
      * @param config Configuraci&oacute;n para cargar en el panel. */
     public void loadConfig(final Properties config) {
 
-        this.checkHabilitar.setSelected(Boolean.parseBoolean(config.getProperty(MainOptionsPane.MAIN_ADVANCED_VIEW, "false")));
-        this.checkXML.setSelected(Boolean.parseBoolean(config.getProperty(MainOptionsPane.MAIN_ALGORITHM_XML, "false")));
-        this.checkAddPolicy.setSelected(Boolean.parseBoolean(config.getProperty(MainOptionsPane.MAIN_POLICY_ESTABLISHED, "false")));
-        this.textPolicyIdentifier.setText(config.getProperty(MainOptionsPane.MAIN_POLICY_IDENTIFIER, ""));
-        this.textPolicyQualifier.setText(config.getProperty(MainOptionsPane.MAIN_POLICY_QUALIFIER, ""));
-        this.textPolicyHash.setText(config.getProperty(MainOptionsPane.MAIN_POLICY_HASH, ""));
+        this.checkHabilitar.setSelected(Boolean.parseBoolean(config.getProperty(MainOptionsPane.MAIN_ADVANCED_VIEW, "false"))); //$NON-NLS-1$
+        this.checkXML.setSelected(Boolean.parseBoolean(config.getProperty(MainOptionsPane.MAIN_ALGORITHM_XML, "false"))); //$NON-NLS-1$
+        this.checkAddPolicy.setSelected(Boolean.parseBoolean(config.getProperty(MainOptionsPane.MAIN_POLICY_ESTABLISHED, "false"))); //$NON-NLS-1$
+        this.textPolicyIdentifier.setText(config.getProperty(MainOptionsPane.MAIN_POLICY_IDENTIFIER, "")); //$NON-NLS-1$
+        this.textPolicyQualifier.setText(config.getProperty(MainOptionsPane.MAIN_POLICY_QUALIFIER, "")); //$NON-NLS-1$
+        this.textPolicyHash.setText(config.getProperty(MainOptionsPane.MAIN_POLICY_HASH, "")); //$NON-NLS-1$
 
         this.comboAlgoritmo.setSelectedIndex(0);
         for (int i = 0; i < ALGORITHM_V.size(); i++) {
@@ -456,7 +456,7 @@ public class MainOptionsPane {
     private void restore(final JPanel panel1) {
         for (int i = 0; i < panel1.getComponentCount(); i++) {
             if (panel1.getComponent(i) instanceof JTextField) {
-                ((JTextField) panel1.getComponent(i)).setText("");
+                ((JTextField) panel1.getComponent(i)).setText(""); //$NON-NLS-1$
             }
             else if (panel1.getComponent(i) instanceof JCheckBox) {
                 ((JCheckBox) panel1.getComponent(i)).setSelected(false);

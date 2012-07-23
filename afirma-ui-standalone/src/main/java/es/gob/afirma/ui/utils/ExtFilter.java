@@ -17,7 +17,7 @@ public final class ExtFilter extends FileFilter implements java.io.FileFilter {
      *        Fichero del cual queremos conocer la extensi&oacute;n
      * @return Extensi&oacute;n del fichero o cadena vac&iacute;a si este no
      *         tiene extensi&oacute;n */
-    private final static String getExtension(final File f) {
+    private static final String getExtension(final File f) {
         final String s = f.getName();
         final int i = s.lastIndexOf('.');
         if (i > 0 && i < s.length() - 1) {
