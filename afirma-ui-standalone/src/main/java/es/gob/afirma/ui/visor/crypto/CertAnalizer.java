@@ -17,9 +17,9 @@ import java.util.logging.Logger;
  * Analizador de certificados para visualizaci&oacute;n de detalles en pantalla.
  *
  */
-public abstract class CertAnalyzer {
+public abstract class CertAnalizer {
 
-    private static final String[] analyzers = new String[] {
+    private static final String[] ANALIZERS = new String[] {
             "es.gob.afirma.standalone.crypto.DnieCertAnalyzer",   //$NON-NLS-1$
             "es.gob.afirma.standalone.crypto.GenericCertAnalyzer" //$NON-NLS-1$
     };
@@ -29,10 +29,10 @@ public abstract class CertAnalyzer {
      * @param cert Certificado.
      * @return Informaci&oacute;n del certificado. */
     public static CertificateInfo getCertInformation(final X509Certificate cert) {
-        for (final String analyzerClassName : analyzers) {
+        for (final String analyzerClassName : ANALIZERS) {
             try {
                 final Class<?> analyzerClass = Class.forName(analyzerClassName);
-                final CertAnalyzer analyzer = CertAnalyzer.class.cast(analyzerClass.newInstance());
+                final CertAnalizer analyzer = CertAnalizer.class.cast(analyzerClass.newInstance());
                 if (analyzer.isValidCert(cert)) {
                     return analyzer.analyzeCert(cert);
                 }

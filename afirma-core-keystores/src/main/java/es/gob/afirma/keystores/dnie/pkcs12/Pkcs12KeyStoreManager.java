@@ -31,7 +31,7 @@ import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManagerException;
 
 /** Representa a un <i>AOKeyStoreManager</i> para acceso a almacenes de claves tipo PKCS#12 / PFX.
- * Contempla la posibilidad de que el almacén y las claves tengan distintas contrase&ntilde;as
+ * Contempla la posibilidad de que el almac&eacute;n y las claves tengan distintas contrase&ntilde;as
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class Pkcs12KeyStoreManager extends AOKeyStoreManager {
 

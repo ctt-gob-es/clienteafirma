@@ -180,7 +180,7 @@ final class Cifrado extends JPanel {
                                                                           Messages.getString("Cifrado.buscar.caja.description.status"))); //$NON-NLS-1$
         campoFichero.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(),
                                                                           Messages.getString("Cifrado.buscar.caja.description.status"))); //$NON-NLS-1$
-        campoFichero.getAccessibleContext().setAccessibleName(etiquetaFichero.getText() + " ALT + T."); // NOI18N
+        campoFichero.getAccessibleContext().setAccessibleName(etiquetaFichero.getText() + " ALT + T."); // NOI18N //$NON-NLS-1$
         campoFichero.getAccessibleContext().setAccessibleDescription(Messages.getString("Cifrado.buscar.caja.description")); // NOI18N //$NON-NLS-1$
         if (GeneralConfig.isBigCaret()) {
             final Caret caret = new ConfigureCaret();
@@ -287,8 +287,8 @@ final class Cifrado extends JPanel {
             etiquetaMecanismo.setFocusable(true);
             Utils.remarcar(etiquetaMecanismo);
             etiquetaMecanismo.getAccessibleContext()
-            .setAccessibleName(etiquetaMecanismo.getText() + " " + Messages.getString("Cifrado.origen.clave.combo.defaultOpcion") //$NON-NLS-2$
-                               + Messages.getString("Cifrado.origenL.0") + " " + Messages.getString("Cifrado.origen.clave.combo.disabled")); //$NON-NLS-1$ //$NON-NLS-3$
+            .setAccessibleName(etiquetaMecanismo.getText() + " " + Messages.getString("Cifrado.origen.clave.combo.defaultOpcion")  //$NON-NLS-1$//$NON-NLS-2$
+                               + Messages.getString("Cifrado.origenL.0") + " " + Messages.getString("Cifrado.origen.clave.combo.disabled")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         }
         else {
             // Para la vista avanzada se asigna mnemonico puesto que esta opcion estara habilitada
@@ -350,8 +350,8 @@ final class Cifrado extends JPanel {
             etiquetaAlgoritmo.setFocusable(true);
             Utils.remarcar(etiquetaAlgoritmo);
             etiquetaAlgoritmo.getAccessibleContext()
-            .setAccessibleName(etiquetaAlgoritmo.getText() + " " + Messages.getString("Cifrado.origen.clave.combo.defaultOpcion") //$NON-NLS-2$
-                               + Messages.getString("Cifrado.origenLc.0") + " " + Messages.getString("Cifrado.origen.clave.combo.disabled")); //$NON-NLS-1$ //$NON-NLS-3$
+            .setAccessibleName(etiquetaAlgoritmo.getText() + " " + Messages.getString("Cifrado.origen.clave.combo.defaultOpcion")  //$NON-NLS-1$//$NON-NLS-2$
+                               + Messages.getString("Cifrado.origenLc.0") + " " + Messages.getString("Cifrado.origen.clave.combo.disabled")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         }
         else {
             // Para la vista avanzada se asigna mnemonico puesto que esta opcion estara habilitada

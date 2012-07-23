@@ -50,7 +50,7 @@ import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.ui.utils.CustomDialog;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.Utils;
-import es.gob.afirma.ui.visor.crypto.CertAnalyzer;
+import es.gob.afirma.ui.visor.crypto.CertAnalizer;
 import es.gob.afirma.ui.visor.crypto.CertificateInfo;
 import es.gob.afirma.ui.visor.crypto.CompleteSignInfo;
 
@@ -153,7 +153,7 @@ final class SignDataPanel extends JPanel {
     	}
 
     	final JPanel panelValidateCertButton = new JPanel(new GridLayout(1, 1));
-        final CertificateInfo certInfo = CertAnalyzer.getCertInformation(cert);
+        final CertificateInfo certInfo = CertAnalizer.getCertInformation(cert);
 
         if (certInfo != null) {
             this.certIcon.setIcon(certInfo.getIcon());

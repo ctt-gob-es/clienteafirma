@@ -231,7 +231,7 @@ public class BotoneraInferior extends JPanel {
             @Override
             public void actionPerformed(final ActionEvent evt) {
                 saveSizePosition();
-                for (final JDialogWizard ventana : BotoneraInferior.this.ventanas) {
+                for (final JDialogWizard ventana : BotoneraInferior.this.getVentanas()) {
                     ventana.dispose();
                 }
             }
@@ -259,7 +259,7 @@ public class BotoneraInferior extends JPanel {
             @Override
             public void actionPerformed(final ActionEvent evt) {
                 saveSizePosition();
-                for (final JDialogWizard ventana : BotoneraInferior.this.ventanas) {
+                for (final JDialogWizard ventana : BotoneraInferior.this.getVentanas()) {
                     ventana.dispose();
                 }
             }

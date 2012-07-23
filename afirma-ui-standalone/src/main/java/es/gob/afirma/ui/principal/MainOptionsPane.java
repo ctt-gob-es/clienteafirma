@@ -33,12 +33,12 @@ import es.gob.afirma.ui.utils.Utils;
 public class MainOptionsPane {
 
     // Constantes de los algoritmos de huella digital
-    final static List<String> algoritmoK = new ArrayList<String>(Arrays.asList("SHA-1", "SHA-512", "SHA-384", "SHA-256"));
+    final static List<String> ALGORITHM_K = new ArrayList<String>(Arrays.asList("SHA-1", "SHA-512", "SHA-384", "SHA-256")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
-    final static List<String> algoritmoV = new ArrayList<String>(Arrays.asList("SHA1withRSA", "SHA512withRSA", "SHA384withRSA", "SHA256withRSA"));
+    final static List<String> ALGORITHM_V = new ArrayList<String>(Arrays.asList("SHA1withRSA", "SHA512withRSA", "SHA384withRSA", "SHA256withRSA")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
     /** Algoritmo por defecto para su uso por defecto en las firmas. */
-    public static final String DEFAULT_DEFAULT_ALGORITHM = "SHA1withRSA";
+    public static final String DEFAULT_DEFAULT_ALGORITHM = "SHA1withRSA"; //$NON-NLS-1$
 
     /** Clave para la configuraci&oacute;n de vista. */
     public static final String MAIN_ADVANCED_VIEW = "main.advancedView"; //$NON-NLS-1$
@@ -167,7 +167,7 @@ public class MainOptionsPane {
         this.comboAlgoritmo.getAccessibleContext().setAccessibleName(etiquetaAlgoritmo.getText() + " ALT + R."); // NOI18N
         this.comboAlgoritmo.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.criptografia.algoritmo.parte")); // NOI18N //$NON-NLS-1$
         // comboAlgoritmo.setModel(new DefaultComboBoxModel(Arrays.asList("SHA-1","SHA-512","SHA-384","SHA-256").toArray()));
-        this.comboAlgoritmo.setModel(new DefaultComboBoxModel(algoritmoK.toArray()));
+        this.comboAlgoritmo.setModel(new DefaultComboBoxModel(ALGORITHM_K.toArray()));
 
         Utils.remarcar(this.comboAlgoritmo);
 
@@ -402,7 +402,7 @@ public class MainOptionsPane {
     Properties getConfig() {
         final Properties config = new Properties();
         config.setProperty(MainOptionsPane.MAIN_ADVANCED_VIEW, Boolean.toString(this.checkHabilitar.isSelected()));
-        config.setProperty(MainOptionsPane.MAIN_DEFAULT_ALGORITHM, algoritmoV.get(this.comboAlgoritmo.getSelectedIndex()));
+        config.setProperty(MainOptionsPane.MAIN_DEFAULT_ALGORITHM, ALGORITHM_V.get(this.comboAlgoritmo.getSelectedIndex()));
         config.setProperty(MainOptionsPane.MAIN_ALGORITHM_XML, Boolean.toString(this.checkXML.isSelected()));
         config.setProperty(MainOptionsPane.MAIN_POLICY_ESTABLISHED, Boolean.toString(this.checkAddPolicy.isSelected()));
         config.setProperty(MainOptionsPane.MAIN_POLICY_IDENTIFIER, this.textPolicyIdentifier.getText());
@@ -444,8 +444,8 @@ public class MainOptionsPane {
         this.textPolicyHash.setText(config.getProperty(MainOptionsPane.MAIN_POLICY_HASH, ""));
 
         this.comboAlgoritmo.setSelectedIndex(0);
-        for (int i = 0; i < algoritmoV.size(); i++) {
-            if (algoritmoV.get(i).equals(config.getProperty(MainOptionsPane.MAIN_DEFAULT_ALGORITHM))) {
+        for (int i = 0; i < ALGORITHM_V.size(); i++) {
+            if (ALGORITHM_V.get(i).equals(config.getProperty(MainOptionsPane.MAIN_DEFAULT_ALGORITHM))) {
                 this.comboAlgoritmo.setSelectedIndex(i);
                 break;
             }
