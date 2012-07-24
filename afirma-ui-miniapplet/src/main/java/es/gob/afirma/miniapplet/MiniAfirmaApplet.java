@@ -29,8 +29,6 @@ import org.mozilla.universalchardet.UniversalDetector;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.AOInvalidFormatException;
-import es.gob.afirma.core.InvalidLibraryException;
-import es.gob.afirma.core.MissingLibraryException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
@@ -85,9 +83,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 					   final String format,
 					   final String extraParams) throws AOFormatFileException,
 			                                            PrivilegedActionException,
-			                                            IOException,
-			                                            InvalidLibraryException,
-			                                            MissingLibraryException {
+			                                            IOException {
 		this.clearError();
 
 		if (dataB64 == null) {
@@ -132,9 +128,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			             final String format,
 			             final String extraParams) throws AOFormatFileException,
 			             							      PrivilegedActionException,
-			             							      IOException,
-			             							      InvalidLibraryException,
-			             							      MissingLibraryException {
+			             							      IOException {
 		this.clearError();
 
 		if (signB64 == null) {
@@ -180,9 +174,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			                  final String format,
 			                  final String extraParams) throws AOFormatFileException,
 			                  								   PrivilegedActionException,
-			                  								   IOException,
-			                  								   InvalidLibraryException,
-			                  								   MissingLibraryException {
+			                  								   IOException {
 		this.clearError();
 
 		if (signB64 == null) {
@@ -222,8 +214,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	/** {@inheritDoc} */
 	public String getSignersStructure(final String signB64) throws IOException,
 	                                                               PrivilegedActionException,
-	                                                               AOFormatFileException,
-	                                                               InvalidLibraryException {
+	                                                               AOFormatFileException {
 
 		this.clearError();
 

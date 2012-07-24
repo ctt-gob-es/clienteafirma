@@ -56,10 +56,8 @@ interface MiniAfirma {
      * @throws AOFormatFileException Cuando se indica un formato de firma no soportado.
      * @throws es.gob.afirma.core.InvalidLibraryException Cuando se detecta una versi&oacute;n no v&aacute;lida de una biblioteca.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
-     * @throws es.gob.afirma.core.MissingLibraryException Cuando no se encuentra una biblioteca necesaria para la operaci&oacute;n.
-     * @throws Exception Cuando se produce un error no identificado.
-     */
-    String sign(String data, String algorithm, String format, String extraParams) throws AOFormatFileException, PrivilegedActionException, IOException, Exception;
+     * @throws es.gob.afirma.core.MissingLibraryException Cuando no se encuentra una biblioteca necesaria para la operaci&oacute;n. */
+    String sign(String data, String algorithm, String format, String extraParams) throws AOFormatFileException, PrivilegedActionException, IOException;
 
 	/** Fija el firmante que se establezca para ser reutilizado (sin intervenci&oacute;n del usuario) en todas
 	 * las operaciones posteriores hasta que se desactive esta opci&oacute;n.
@@ -100,10 +98,8 @@ interface MiniAfirma {
      * se puede identificar el formato de la firma.
      * @throws es.gob.afirma.core.InvalidLibraryException Cuando se detecta una versi&oacute;n no v&aacute;lida de una biblioteca.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
-     * @throws es.gob.afirma.core.MissingLibraryException Cuando no se encuentra una biblioteca necesaria para la operaci&oacute;n.
-     * @throws Exception Cuando se produce un error no identificado.
-     */
-    String coSign(String sign, String data, String algorithm, String format, String extraParams) throws AOFormatFileException, PrivilegedActionException, IOException, Exception;
+     * @throws es.gob.afirma.core.MissingLibraryException Cuando no se encuentra una biblioteca necesaria para la operaci&oacute;n. */
+    String coSign(String sign, String data, String algorithm, String format, String extraParams) throws AOFormatFileException, PrivilegedActionException, IOException;
 
     /** Realiza una firma en cascada (Contrafirma) sobre una firma. Se contrafirman todos los
      * nodos hoja salvo que mediante {@code extraParams} se indique el par&aacute;metro
@@ -126,10 +122,8 @@ interface MiniAfirma {
      * se puede identificar el formato de la firma.
      * @throws es.gob.afirma.core.InvalidLibraryException Cuando se detecta una versi&oacute;n no v&aacute;lida de una biblioteca.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
-     * @throws es.gob.afirma.core.MissingLibraryException Cuando no se encuentra una biblioteca necesaria para la operaci&oacute;n.
-     * @throws Exception Cuando se produce un error no identificado.
-     */
-    String counterSign(String sign, String algorithm, String format, String extraParams) throws AOFormatFileException, PrivilegedActionException, IOException, Exception;
+     * @throws es.gob.afirma.core.MissingLibraryException Cuando no se encuentra una biblioteca necesaria para la operaci&oacute;n. */
+    String counterSign(String sign, String algorithm, String format, String extraParams) throws AOFormatFileException, PrivilegedActionException, IOException;
 
     /** Devuelve la estructura de firmantes de una firma electr&oacute;nica. Los
      * firmantes se separan por '\n' y comienzan por tantos '\t' como el nivel
@@ -148,10 +142,8 @@ interface MiniAfirma {
      * @throws AOFormatFileException Cuando se indica un formato de firma no soportado.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      * @throws NullPointerException Cuando se introduce un par&aacute;metro nulo.
-     * @throws es.gob.afirma.core.InvalidLibraryException Cuando se detecta una versi&oacute;n no v&aacute;lida de una biblioteca.
-     * @throws Exception Cuando se produce un error no identificado.
-     */
-    String getSignersStructure(String signB64) throws IOException, PrivilegedActionException, AOFormatFileException, Exception;
+     * @throws es.gob.afirma.core.InvalidLibraryException Cuando se detecta una versi&oacute;n no v&aacute;lida de una biblioteca. */
+    String getSignersStructure(String signB64) throws IOException, PrivilegedActionException, AOFormatFileException;
 
     /** Muestra un di&aacute;logo modal que permite al usuario seleccionar
      * el directorio y el nombre de fichero para el guardado de datos.
@@ -164,10 +156,8 @@ interface MiniAfirma {
      * @return {@code true} en caso de guardarse correctamente, {@code false} en caso
      * contrario.
      * @throws IOException Cuando ocurre alg&uacute;n error en el guardado del fichero.
-     * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
-     * @throws Exception Cuando se produce un error no identificado.
-     */
-    boolean saveDataToFile(String data, String title, String fileName, String extension, String description) throws PrivilegedActionException, IOException, Exception;
+     * @throws PrivilegedActionException Cuando ocurre un error de seguridad. */
+    boolean saveDataToFile(String data, String title, String fileName, String extension, String description) throws PrivilegedActionException, IOException;
 
     /** Muestra un di&aacute;logo modal para la selecci&oacute;n de un fichero del
      * que se devolver&aacute; su nombre y su contenido en Base64. El resultado
@@ -179,10 +169,8 @@ interface MiniAfirma {
      * @param description Descripci&oacute;n del tipo de fichero que se desea cargar.
      * @return El nombre del fichero y su contenido en base64.
      * @throws IOException Cuando ocurre alg&uacute;n error en la lectura del fichero.
-     * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
-     * @throws Exception Cuando se produce un error no identificado.
-     */
-    String getFileNameContentBase64(final String title, final String extensions, final String description) throws IOException, PrivilegedActionException, Exception;
+     * @throws PrivilegedActionException Cuando ocurre un error de seguridad. */
+    String getFileNameContentBase64(final String title, final String extensions, final String description) throws IOException, PrivilegedActionException;
 
     /** Muestra un di&aacute;logo modal para la selecci&oacute;n de m&uacute;ltiples ficheros de los
      * que se devolver&aacute; sus nombres y sus contenidos en Base64. El
@@ -195,10 +183,8 @@ interface MiniAfirma {
      * @param description Descripci&oacute;n del tipo de fichero que se desea cargar.
      * @return Array con los nombres del ficheros y sus contenidos en Base64.
      * @throws IOException Cuando ocurre alg&uacute;n error en la lectura del fichero.
-     * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
-     * @throws Exception Cuando se produce un error no identificado.
-     */
-    String[] getMultiFileNameContentBase64(final String title, final String extensions,final String description) throws IOException, PrivilegedActionException, Exception;
+     * @throws PrivilegedActionException Cuando ocurre un error de seguridad. */
+    String[] getMultiFileNameContentBase64(final String title, final String extensions,final String description) throws IOException, PrivilegedActionException;
 
     /** Decodifica un texto en Base64. Si se introducen datos nulos se
      * devuelve {@code null}.
