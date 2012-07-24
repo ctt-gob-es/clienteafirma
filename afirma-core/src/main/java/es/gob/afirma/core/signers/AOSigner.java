@@ -10,29 +10,17 @@
 
 package es.gob.afirma.core.signers;
 
-import java.security.KeyStore.PrivateKeyEntry;
-import java.util.Properties;
-
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 
 /** Define los requerimientos de las clases capaces de efectuar firmas digitales.
  * @version 1.0 */
-public interface AOSigner extends AOCoSigner, AOCounterSigner {
-
-    /** Firma electr&oacute;nicamente unos datos (t&iacute;picamente el contenido de un fichero).
-     * @param data Datos que deseamos firmar.
-     * @param algorithm Algoritmo a usar para la firma (cada implementaci&oacute;n puede aceptar unos valores diferentes)
-     * @param keyEntry Entrada que apunta a la clave privada a usar para firmar
-     * @param extraParams Par&aacute;metros adicionales para la firma (dependientes de cada implementaci&oacute;n)
-     * @return Contenido firmado
-     * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-    byte[] sign(byte[] data, String algorithm, PrivateKeyEntry keyEntry, Properties extraParams) throws AOException;
+public interface AOSigner extends AOCoSigner, AOCounterSigner, AOSimpleSigner {
 
     /** Recupera el &aacute;rbol de nodos de firma de una firma electr&oacute;nica.
-     * Los nodos del &aacute;rbol ser&aacute;n cadena de texto con el CommonName (CN X.500)
-     * del titular del certificado u objetos de tipo AOSimpleSignInfo con la
+     * Los nodos del &aacute;rbol ser&aacute;n cadena de texto con el <i>CommonName</i> (CN X.500)
+     * del titular del certificado u objetos de tipo <code>AOSimpleSignInfo</code> con la
      * informaci&oacute;n b&aacute;sica de las firmas individuales, seg&uacute;n
      * el valor del par&aacute;metro <code>asSimpleSignInfo</code>. Los nodos se
      * mostrar&aacute;n en el mismo orden y con la misma estructura con el que
