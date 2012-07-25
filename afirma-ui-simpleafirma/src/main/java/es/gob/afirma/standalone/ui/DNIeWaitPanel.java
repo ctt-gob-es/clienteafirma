@@ -57,19 +57,19 @@ public final class DNIeWaitPanel extends JPanel implements KeyListener {
         dniePanel.setLayout(new GridBagLayout());
 
         // Boton para cargar DNIe
-        final JButton DNIButton = new JButton(Messages.getString("DNIeWaitPanel.4")); //$NON-NLS-1$
-        DNIButton.addActionListener(new ActionListener() {
+        final JButton dniButton = new JButton(Messages.getString("DNIeWaitPanel.4")); //$NON-NLS-1$
+        dniButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				DNIeWaitPanel.this.firePropertyChange(PROP_DNIE_REQUESTED, false, true);
 			}
 		});
-        DNIButton.setMnemonic('C');
-        DNIButton.getAccessibleContext().setAccessibleDescription(Messages.getString(Messages.getString("DNIeWaitPanel.5"))); //$NON-NLS-1$
-        DNIButton.getAccessibleContext().setAccessibleName(Messages.getString(Messages.getString("DNIeWaitPanel.6"))); //$NON-NLS-1$
-        DNIButton.requestFocus();
-        DNIButton.addKeyListener(this);
-        dniePanel.add(DNIButton);
+        dniButton.setMnemonic('C');
+        dniButton.getAccessibleContext().setAccessibleDescription(Messages.getString(Messages.getString("DNIeWaitPanel.5"))); //$NON-NLS-1$
+        dniButton.getAccessibleContext().setAccessibleName(Messages.getString(Messages.getString("DNIeWaitPanel.6"))); //$NON-NLS-1$
+        dniButton.requestFocus();
+        dniButton.addKeyListener(this);
+        dniePanel.add(dniButton);
 
         // Boton para saltar de pantalla
         final JButton noDNIButton = new JButton(Messages.getString("DNIeWaitPanel.0")); //$NON-NLS-1$
