@@ -541,7 +541,7 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
 
     	public LoadExternalDataListener(final File signatureFile, final byte[] signatureData) {
     		this.signFile = signatureFile;
-    		this.sign = signatureData;
+    		this.sign = signatureData.clone();
 		}
 
 		@Override
