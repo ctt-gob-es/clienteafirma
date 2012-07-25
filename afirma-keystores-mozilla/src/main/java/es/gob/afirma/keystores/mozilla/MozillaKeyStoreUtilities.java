@@ -542,41 +542,6 @@ final class MozillaKeyStoreUtilities {
 	 *        Directorio en donde se encuentran las bibliotecas de NSS. */
 	static void loadNSSDependencies(final String nssDirectory) {
 
-		//    	// Comprobamos el caso de Ubuntu en el que el sistema tiene un NSS antiguo en el sistema y
-		//    	// un NSS moderno para Firefox, que se detecta por libmozsqlite3.so vs. libsqlite3.so
-		//    	if (Platform.OS.LINUX.equals(Platform.getOS())) {
-		//    		String lddStr = null;
-		//    		try {
-		//    			lddStr = new String(
-		//					AOUtil.getDataFromInputStream(
-		//						Runtime.getRuntime().exec(
-		//							"ldd " + nssDirectory + (nssDirectory.endsWith(File.separator) ? "" : File.separator) + SOFTOKN3_SO //$NON-NLS-1$ //$NON-NLS-2$
-		//						).getInputStream()
-		//					)
-		//				);
-		//    		}
-		//    		catch(final Exception e) {
-		//    			LOGGER.warning("No se ha podido comprobar si las dependencias de NSS en Linux se detectan con ldd: " + e); //$NON-NLS-1$
-		//    		}
-		//			// Si solo falta libmozsqlite.so es porque en el LD_LIBRARY_PATH o en el PATH esta la version
-		//			// antigua, libsqlite.so, asi que cargamos esta dependencia unicamente
-		//			if (lddStr != null &&
-		//				lddStr.contains("libmozsqlite3.so => not found") &&  //$NON-NLS-1$
-		//			  (!lddStr.replace("libmozsqlite3.so => not found", "").contains("not found"))) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		//				try {
-		//					System.load(nssDirectory + (nssDirectory.endsWith(File.separator) ? "" : File.separator) + "libmozsqlite3.so"); //$NON-NLS-1$ //$NON-NLS-2$
-		//					LOGGER.info("Cargada predependencia unica de NSS con libmozsqlite3.so");
-		//					JOptionPane.showMessageDialog(null, nssDirectory + (nssDirectory.endsWith(File.separator) ? "" : File.separator) + "libmozsqlite3.so");
-		//					return;
-		//				}
-		//				catch(final Exception e) {
-		//					LOGGER.warning(
-		//						"No se ha posido cargar libmozsqlite3.so en prevision de que el sistema apunte a libsqlite3.so, se continuara con la precarga normal: " + e //$NON-NLS-1$
-		//					);
-		//				}
-		//			}
-		//    	}
-
 		final String dependList[];
 
 		// Compobamos despues el caso especifico de NSS partido entre /usr/lib y
@@ -722,7 +687,6 @@ final class MozillaKeyStoreUtilities {
 		}
 
 		try {
-			//System.out.println("cmd.exe /c dir /ad /x \"" + longPath + "\\..\\?" + longPath.substring(longPath.lastIndexOf('\\') + 2) + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			final Process p = new ProcessBuilder(
 					"cmd.exe", "/c", "dir /ad /x \"" + longPath + "\\..\\?" + longPath.substring(longPath.lastIndexOf('\\') + 2) + "\"" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 			).start();
@@ -900,6 +864,7 @@ final class MozillaKeyStoreUtilities {
 			}
 		}
 		try {
+			// Equivalencia por reflexion de la linea: new ScriptEngineManager().getEngineByName("AppleScript").eval("do shell script \"" + sb.toString() + "\" with administrator privileges");
 			final Class<?> scriptEngineManagerClass = AOUtil.classForName("javax.script.ScriptEngineManager"); //$NON-NLS-1$
 			final Object scriptEngineManager = scriptEngineManagerClass.newInstance();
 			final Method getEngineByNameMethod = scriptEngineManagerClass.getMethod("getEngineByName", String.class); //$NON-NLS-1$
@@ -908,7 +873,6 @@ final class MozillaKeyStoreUtilities {
 			final Method evalMethod = scriptEngineClass.getMethod("eval", String.class); //$NON-NLS-1$
 			evalMethod.invoke(scriptEngine, "do shell script \"" + sb.toString() + "\" with administrator privileges"); //$NON-NLS-1$ //$NON-NLS-2$
 
-			//new ScriptEngineManager().getEngineByName("AppleScript").eval("do shell script \"" + sb.toString() + "\" with administrator privileges");
 		}
 		catch(final Exception e) {
 			LOGGER.severe("No se ha podido crear los enlaces simbolicos para NSS: " + e); //$NON-NLS-1$
