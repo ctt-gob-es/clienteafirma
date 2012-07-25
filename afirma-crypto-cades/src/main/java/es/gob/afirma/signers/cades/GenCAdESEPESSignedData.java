@@ -19,6 +19,7 @@ import java.security.cert.X509Certificate;
 import java.util.Date;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.signers.AOPkcs1Signer;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
@@ -124,7 +125,7 @@ public final class GenCAdESEPESSignedData {
             contentDescription
         );
 
-        final byte[] signature = PKCS1ExternalizableSigner.sign(signatureAlgorithm, keyEntry.getPrivateKey(), preSignature);
+        final byte[] signature = new AOPkcs1Signer().sign(preSignature, signatureAlgorithm, keyEntry, null);
 
         return CAdESTriPhaseSigner.postSign(
             AOSignConstants.getDigestAlgorithmName(signatureAlgorithm),
