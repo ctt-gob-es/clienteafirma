@@ -225,11 +225,19 @@ final class ResizingAdaptor extends ComponentAdapter {
 			}
 			relation = Math.round(relWidth * relHeight * this.theCustomDialog.getMinimumRelation());
 		} else if (this.theFileChooser != null){
-			relWidth = this.theFileChooser.getDialog().getSize().getWidth() / Constants.FILE_INITIAL_WIDTH;
+			if (Platform.getOS().equals(Platform.OS.MACOSX) || Platform.getOS().equals(Platform.OS.LINUX)){
+				relWidth = this.theFileChooser.getDialog().getSize().getWidth() / Constants.FILE_INITIAL_WIDTH_MAC;
+			} else {
+				relWidth = this.theFileChooser.getDialog().getSize().getWidth() / Constants.FILE_INITIAL_WIDTH;
+			}
 			relHeight = this.theFileChooser.getDialog().getSize().getHeight() / Constants.FILE_INITIAL_HEIGHT;
 			relation = Math.round(relWidth * relHeight * this.theFileChooser.getMinimumRelation());
 		} else {
-			relWidth = this.theFileChooserToSave.getDialog().getSize().getWidth() / Constants.FILE_INITIAL_WIDTH;
+			if (Platform.getOS().equals(Platform.OS.MACOSX) || Platform.getOS().equals(Platform.OS.LINUX)){
+				relWidth = this.theFileChooserToSave.getDialog().getSize().getWidth() / Constants.FILE_INITIAL_WIDTH_MAC;
+			} else {
+				relWidth = this.theFileChooserToSave.getDialog().getSize().getWidth() / Constants.FILE_INITIAL_WIDTH;
+			}
 			relHeight = this.theFileChooserToSave.getDialog().getSize().getHeight() / Constants.FILE_INITIAL_HEIGHT;
 			relation = Math.round(relWidth * relHeight * this.theFileChooserToSave.getMinimumRelation());
 		}

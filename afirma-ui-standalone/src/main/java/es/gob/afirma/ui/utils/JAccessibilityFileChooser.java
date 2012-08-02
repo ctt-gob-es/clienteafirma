@@ -499,7 +499,12 @@ public class JAccessibilityFileChooser extends JFileChooser{
         if (GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
         	this.dialog.setMinimumSize(new Dimension(Constants.FILE_FONT_INITIAL_WIDTH, Constants.FILE_INITIAL_HEIGHT));
         } else {
-        	this.dialog.setMinimumSize(new Dimension(Constants.FILE_INITIAL_WIDTH, Constants.FILE_INITIAL_HEIGHT));
+        	//En entornos Linux y MAC pinta la pantalla con un tamaño de fuente diferente al estándar
+        	if (Platform.getOS().equals(Platform.OS.MACOSX) || Platform.getOS().equals(Platform.OS.LINUX)){
+        		this.dialog.setMinimumSize(new Dimension(Constants.FILE_INITIAL_WIDTH_MAC, Constants.FILE_INITIAL_HEIGHT));
+        	} else {
+        		this.dialog.setMinimumSize(new Dimension(Constants.FILE_INITIAL_WIDTH, Constants.FILE_INITIAL_HEIGHT));
+        	}
         }
         return this.dialog;
 	}
@@ -720,7 +725,11 @@ public class JAccessibilityFileChooser extends JFileChooser{
     			setBounds(this.getInitialX(), this.getInitialY(), Constants.FILE_FONT_INITIAL_WIDTH, Constants.FILE_INITIAL_HEIGHT);
     			setMinimumSize(new Dimension(getSize().width, getSize().height));
     		} else {
-    			setBounds(this.getInitialX(), this.getInitialY(), Constants.FILE_INITIAL_WIDTH, Constants.FILE_INITIAL_HEIGHT);
+    			if (Platform.getOS().equals(Platform.OS.MACOSX) || Platform.getOS().equals(Platform.OS.LINUX)){
+    				setBounds(this.getInitialX(), this.getInitialY(), Constants.FILE_INITIAL_WIDTH_MAC, Constants.FILE_INITIAL_HEIGHT);
+    			} else {
+    				setBounds(this.getInitialX(), this.getInitialY(), Constants.FILE_INITIAL_WIDTH, Constants.FILE_INITIAL_HEIGHT);
+    			}
     			setMinimumSize(new Dimension(getSize().width, getSize().height));
     		}
 		}

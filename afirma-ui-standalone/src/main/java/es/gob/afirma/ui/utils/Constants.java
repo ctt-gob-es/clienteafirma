@@ -138,6 +138,11 @@ public final class Constants {
      * Width inicial de los JAccessibilityFileChooser de la aplicacion.
      */
     public static final int FILE_INITIAL_WIDTH = 620;
+    
+    /**
+     * Width inicial de los JAccessibilityFileChooser de la aplicacion en Mac OS.
+     */
+    public static final int FILE_INITIAL_WIDTH_MAC = 736;
 
     /**
      * Height inicial de los JAccessibilityFileChooser de la aplicacion.
