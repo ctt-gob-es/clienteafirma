@@ -43,6 +43,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.misc.Platform;
 /**
  * Componente dialogo que define los alerts de la aplicacion.
  * @author inteco
@@ -137,7 +138,6 @@ public final class CustomDialog extends JAccessibilityCustomDialog implements Ac
 		super(componentParent, modal);
 		initComponents(message, title, typeMessage, isInputDialog);
 		setLocationRelativeTo(componentParent);
-		pack();
 	}
 	
 	/**
@@ -155,7 +155,6 @@ public final class CustomDialog extends JAccessibilityCustomDialog implements Ac
 		this.setModal(modal);
 		initComponents(message, title, typeMessage, isInputDialog);
 		setLocationRelativeTo(componentParent);
-		pack();
 	}
 	
 	/**
@@ -172,7 +171,6 @@ public final class CustomDialog extends JAccessibilityCustomDialog implements Ac
 		super(componentParent, modal);
 		initComponents(message, title, typeMessage, isInputDialog);
 		setLocationRelativeTo(componentParent);
-		pack();
 	}
 	
     /**
@@ -324,9 +322,6 @@ public final class CustomDialog extends JAccessibilityCustomDialog implements Ac
         
         //Se anade el panel de botones
         container.add(this.buttonsPanel, cons);
-        
-        pack();
-
 	}
 
 	/**
@@ -612,8 +607,10 @@ public final class CustomDialog extends JAccessibilityCustomDialog implements Ac
 		
 		customDialog.infoLabel.setHorizontalAlignment(SwingConstants.CENTER); //Se centra el texto
 		
-		customDialog.pack();
-        customDialog.setSize(customDialog.getWidth()+1, customDialog.getHeight()+1); // Hacemos un resize para forzar un repintado
+		//Se fuerza el repintado de la pantalla para entornos MAC por problemas de renderizado
+		if (Platform.getOS().equals(Platform.OS.MACOSX)){
+			customDialog.repaint();			
+		}
 		
         customDialog.setVisible(true);
 		return customDialog.getAnswer();
@@ -758,8 +755,11 @@ public final class CustomDialog extends JAccessibilityCustomDialog implements Ac
 		
 		cancelButton.addActionListener(customDialog);
 		
-		customDialog.pack();
-        customDialog.setSize(customDialog.getWidth()+1, customDialog.getHeight()+1); // Hacemos un resize para forzar un repintado
+		//Se fuerza el repintado de la pantalla para entornos MAC por problemas de renderizado
+		if (Platform.getOS().equals(Platform.OS.MACOSX)){
+			customDialog.repaint();			
+		}
+		
 		customDialog.setVisible(true);
 		
 		//Control para saber si se ha pulsado el boton cancelar
