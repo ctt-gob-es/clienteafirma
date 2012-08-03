@@ -293,7 +293,8 @@ class UserProfile extends JAccessibilityFrameAdvisor {
 
         add(label, c);
         c.gridy = c.gridy + 1;
-
+        c.weighty = 0.02;
+        
         // Lista de usuarios
         final List<String> profileNames = new ArrayList<String>();
         profileNames.add(ProfileManager.DEFAULT_PROFILE_NAME);

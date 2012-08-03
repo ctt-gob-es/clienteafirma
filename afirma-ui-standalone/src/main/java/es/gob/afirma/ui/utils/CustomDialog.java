@@ -710,7 +710,7 @@ public final class CustomDialog extends JAccessibilityCustomDialog implements Ac
 		c.gridx = 1;   
 		c.gridy = 1;
 		c.weightx = 0.0;
-		c.weighty = 0.5;
+		c.weighty = 0.02;
         c.gridwidth = 2;
         c.insets = new Insets(0,0,0,10);  //right padding
         
