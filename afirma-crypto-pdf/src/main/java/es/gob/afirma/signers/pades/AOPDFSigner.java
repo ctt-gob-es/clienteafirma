@@ -43,6 +43,7 @@ import com.lowagie.text.pdf.PdfSignatureAppearance;
 import com.lowagie.text.pdf.PdfStamper;
 import com.lowagie.text.pdf.PdfString;
 
+import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.AOInvalidFormatException;
@@ -239,11 +240,26 @@ public final class AOPDFSigner implements AOSigner {
         	throw new AOException("Error el en algoritmo de firma: " + e, e); //$NON-NLS-1$
 		}
         catch (final IOException e) {
+        	e.printStackTrace();
         	throw new AOException("Error firmando el PDF: " + e, e); //$NON-NLS-1$
 		}
         catch (final DocumentException e) {
         	throw new AOException("Error en el tratamiento del PDF: " + e, e); //$NON-NLS-1$
 		}
+        catch(final PdfIsPasswordProtectedException e) {
+        	// El PDF se puede abrir sin contrasena pero la necesita para poder firmarse,
+        	// asi que solicitamos una contrasena al usuario
+        	// Esto no se hace dentro del propio metodo de firma porque la proteccion se comprueba
+        	// al crear la firma, y el documento ya esta abierto sin contrasena
+            // Comprobamos que el signer esta en modo interactivo, y si no lo
+            // esta no pedimos contrasena por dialogo, principalmente para no interrumpir un firmado por lotes
+            // desatendido
+            if (Boolean.TRUE.toString().equalsIgnoreCase(extraParams.getProperty("headLess"))) { //$NON-NLS-1$
+                throw new BadPdfPasswordException(e);
+            }
+        	extraParams.put("ownerPassword", new String(AOUIFactory.getPassword(PDFMessages.getString("AOPDFSigner.0"), null))); //$NON-NLS-1$ //$NON-NLS-2$)
+        	return sign(data, algorithm, keyEntry, extraParams);
+        }
     }
 
     /** A&ntilde;ade una firma PAdES a un documento PDF. El comportamiento es exactamente el mismo que una llamada al m&eacute;todo <code>sign(...)</code>
@@ -753,16 +769,21 @@ public final class AOPDFSigner implements AOSigner {
             // esta no pedimos contrasena por dialogo, principalmente para no interrumpir un firmado por lotes
             // desatendido
             if (Boolean.TRUE.toString().equalsIgnoreCase(extraParams.getProperty("headLess"))) { //$NON-NLS-1$
-                throw new AOException("La contrasena proporcionada no es valida para el PDF actual", e); //$NON-NLS-1$
+                throw new BadPdfPasswordException(e);
             }
             // La contrasena que nos han proporcionada no es buena o no nos
             // proporcionaron ninguna
-            ownerPassword = new String(AOUIFactory.getPassword(PDFMessages.getString("AOPDFSigner.0"), null)); //$NON-NLS-1$
+            ownerPassword = new String(
+        		AOUIFactory.getPassword(
+    				(ownerPassword == null) ? PDFMessages.getString("AOPDFSigner.0") : PDFMessages.getString("AOPDFSigner.1"), //$NON-NLS-1$ //$NON-NLS-2$
+    				null
+				)
+    		);
             try {
                 pdfReader = new PdfReader(inPDF, ownerPassword.getBytes());
             }
             catch (final BadPasswordException e2) {
-                throw new AOException("La contrasena proporcionada no es valida para el PDF actual", e2); //$NON-NLS-1$
+                throw new BadPdfPasswordException(e2);
             }
         }
         catch (final IOException e) {
@@ -771,19 +792,21 @@ public final class AOPDFSigner implements AOSigner {
 
         if (pdfReader.getCertificationLevel() != PdfSignatureAppearance.NOT_CERTIFIED && !Boolean.TRUE.toString().equalsIgnoreCase(extraParams.getProperty("allowSigningCertifiedPdfs"))) { //$NON-NLS-1$
             if (extraParams.getProperty("allowSigningCertifiedPdfs") != null) { //$NON-NLS-1$
-                throw new UnsupportedOperationException("No se permite la firma de PDF certificados (el paramtro allowSigningCertifiedPdfs estaba establecido a false)"); //$NON-NLS-1$
+                throw new PdfIsCertifiedException();
             }
 
             if (Boolean.TRUE.toString().equalsIgnoreCase(extraParams.getProperty("headLess"))) {  //$NON-NLS-1$
-                throw new UnsupportedOperationException("No se permite la firma de PDF certificados (el parametro allowSigningCertifiedPdfs no estaba establecido y no se permiten dialogos graficos)"); //$NON-NLS-1$
+            	throw new PdfIsCertifiedException();
             }
 
-            if (AOUIFactory.NO_OPTION == AOUIFactory.showConfirmDialog(null,
-                                                                       PDFMessages.getString("AOPDFSigner.8"), //$NON-NLS-1$
-                                                                       PDFMessages.getString("AOPDFSigner.9"), //$NON-NLS-1$
-                                                                       AOUIFactory.YES_NO_OPTION,
-                                                                       AOUIFactory.WARNING_MESSAGE)) {
-                throw new UnsupportedOperationException("No se ha permitido la firma de un PDF certificado"); //$NON-NLS-1$
+            if (AOUIFactory.NO_OPTION == AOUIFactory.showConfirmDialog(
+        		null,
+                PDFMessages.getString("AOPDFSigner.8"), //$NON-NLS-1$
+                PDFMessages.getString("AOPDFSigner.9"), //$NON-NLS-1$
+                AOUIFactory.YES_NO_OPTION,
+                AOUIFactory.WARNING_MESSAGE)
+            ) {
+        		throw new AOCancelledOperationException("El usuario no ha permitido la firma de un PDF certificado"); //$NON-NLS-1$
             }
         }
 
@@ -864,13 +887,20 @@ public final class AOPDFSigner implements AOSigner {
         // para la primera firma y activado para las subsiguientes. Un error incorporado
         // en un PDF erroneo puede quedar subsanado en su version firmada, haciendo
         // posible incorporar nuevas firmas agregando revisiones del documento.
-        final PdfStamper stp = PdfStamper.createSignature(
-              pdfReader, // PDF de entrada
-              baos, // Salida
-              '\0', // Mantener version
-              null, // No crear temporal
-              pdfReader.getAcroFields().getSignatureNames().size() > 0 // Si hay mas firmas, creo una revision
-        );
+        final PdfStamper stp;
+        try {
+	        stp = PdfStamper.createSignature(
+	              pdfReader, // PDF de entrada
+	              baos, // Salida
+	              '\0', // Mantener version
+	              null, // No crear temporal
+	              pdfReader.getAcroFields().getSignatureNames().size() > 0 // Si hay mas firmas, creo una revision
+	        );
+        }
+        catch(final BadPasswordException e) {
+        	throw new PdfIsPasswordProtectedException(e);
+        }
+
 
         // Aplicamos todos los atributos de firma
         final PdfSignatureAppearance sap = stp.getSignatureAppearance();

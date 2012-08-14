@@ -84,6 +84,8 @@ import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
 import es.gob.afirma.signers.pades.AOPDFSigner;
+import es.gob.afirma.signers.pades.BadPdfPasswordException;
+import es.gob.afirma.signers.pades.PdfIsCertifiedException;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
 import es.gob.afirma.standalone.DataAnalizerUtil;
@@ -830,6 +832,7 @@ public final class SignPanel extends JPanel {
             p.put("mode", "implicit"); //$NON-NLS-1$ //$NON-NLS-2$
             p.put("ignoreStyleSheets", "false"); //$NON-NLS-1$ //$NON-NLS-2$
             p.put("includeOnlySignningCertificate", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+            p.put("allowSigningCertifiedPdfs", "false"); //$NON-NLS-1$ //$NON-NLS-2$
 
             setSignCommandEnabled(false);
 
@@ -885,7 +888,33 @@ public final class SignPanel extends JPanel {
                     );
                 }
             }
-            catch (final Exception e) {
+            catch(final AOCancelledOperationException e) {
+                setSignCommandEnabled(true);
+                return null;
+            }
+            catch(final PdfIsCertifiedException e) {
+            	LOGGER.warning("PDF no firmado por estar certificado: " + e); //$NON-NLS-1$
+                UIUtils.showErrorMessage(
+                        SignPanel.this,
+                        Messages.getString("SignPanel.27"), //$NON-NLS-1$
+                        Messages.getString("SignPanel.25"), //$NON-NLS-1$
+                        JOptionPane.ERROR_MESSAGE
+                );
+                setSignCommandEnabled(true);
+                return null;
+            }
+            catch(final BadPdfPasswordException e) {
+            	LOGGER.warning("PDF protegido con contrasena mal proporcionada: " + e); //$NON-NLS-1$
+                UIUtils.showErrorMessage(
+                        SignPanel.this,
+                        Messages.getString("SignPanel.23"), //$NON-NLS-1$
+                        Messages.getString("SignPanel.25"), //$NON-NLS-1$
+                        JOptionPane.ERROR_MESSAGE
+                );
+                setSignCommandEnabled(true);
+                return null;
+            }
+            catch(final Exception e) {
                 LOGGER.severe("Error durante el proceso de firma: " + e); //$NON-NLS-1$
                 UIUtils.showErrorMessage(
                         SignPanel.this,
