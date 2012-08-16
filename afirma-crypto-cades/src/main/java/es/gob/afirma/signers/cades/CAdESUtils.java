@@ -284,13 +284,13 @@ public final class CAdESUtils {
         }
 
         /**
-         * Secuencia con el tipo de contenido firmado
+         * Secuencia con el tipo de contenido firmado. No se agrega en firmas PAdES.
          *
          * ContentHints ::= SEQUENCE {
          *	  contentDescription UTF8String (SIZE (1..MAX)) OPTIONAL,
          *	  contentType ContentType }
          */
-        if (contentType != null) {
+        if (contentType != null && !padesMode) {
         	final ContentHints contentHints;
         	if (contentDescription != null) {
         		contentHints = new ContentHints(new DERObjectIdentifier(contentType),
