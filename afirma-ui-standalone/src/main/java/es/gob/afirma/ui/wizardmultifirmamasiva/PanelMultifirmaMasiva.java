@@ -102,6 +102,14 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
 
         ExtensionsFileFilter(final String[] extensions) {
             this.exts = extensions.clone();
+            for (int i=0;i<this.exts.length;i++) {
+            	if (this.exts[i].startsWith("*.")) { //$NON-NLS-1$
+            		this.exts[i] = this.exts[i].substring(2);
+            	}
+            	else if (this.exts[i].startsWith(".")) { //$NON-NLS-1$
+            		this.exts[i] = this.exts[i].substring(1);
+            	}
+            }
         }
 
         /** Accion aceptar. */
