@@ -1051,7 +1051,13 @@ public class DirectorySignatureHelper {
      *         Cuando no se pudo leer el fichero. */
     private boolean isValidDataFile(final AOSigner signer, final File file) throws IOException {
         final InputStream is = this.getFileInputStream(file);
-        final boolean isValidDataFile = signer.isValidDataFile(AOUtil.getDataFromInputStream(is));
+        final boolean isValidDataFile;
+        try {
+        	isValidDataFile = signer.isValidDataFile(AOUtil.getDataFromInputStream(is));
+        }
+        catch(final OutOfMemoryError e) {
+        	throw new IOException("El fichero es demasiado grande", e); //$NON-NLS-1$
+        }
         DirectorySignatureHelper.closeStream(is);
         return isValidDataFile;
     }
@@ -1284,7 +1290,7 @@ public class DirectorySignatureHelper {
      * @return Manejador de firma compatible con los datos indicados o {@code null} si
      * no se encontr&oacute; ninguno.
      */
-    private AOSigner getSpecificSigner(final byte[] data) {
+    private static AOSigner getSpecificSigner(final byte[] data) {
     	final String[] specificFormats = new String[] {
     			AOSignConstants.SIGN_FORMAT_PDF,
     			AOSignConstants.SIGN_FORMAT_ODF,
