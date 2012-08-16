@@ -305,17 +305,25 @@ final class Firma extends JPanel {
                 fileIn = AOUtil.loadFile(uri);
                 fileData = AOUtil.getDataFromInputStream(fileIn);
             }
-            catch (final FileNotFoundException e) {
+            catch(final FileNotFoundException e) {
                 CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Firma.msg.error.fichero.noencontrado"), //$NON-NLS-1$
                                                Messages.getString("error"), //$NON-NLS-1$
                                                JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            catch (final IOException e) {
+            catch(final IOException e) {
                 CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Firma.msg.error.fichero.leer"), //$NON-NLS-1$
                                                Messages.getString("error"), //$NON-NLS-1$
                                                JOptionPane.ERROR_MESSAGE);
                 return;
+            }
+            catch(final OutOfMemoryError e) {
+            	CustomDialog.showMessageDialog(
+        			SwingUtilities.getRoot(this), true, Messages.getString("Firma.msg.error.fichero.tamano"), //$NON-NLS-1$
+                    Messages.getString("error"), //$NON-NLS-1$
+                    JOptionPane.ERROR_MESSAGE
+                );
+            	return;
             }
             finally {
                 setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
