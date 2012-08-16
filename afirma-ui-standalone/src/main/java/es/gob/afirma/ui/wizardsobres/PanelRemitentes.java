@@ -40,6 +40,7 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
@@ -316,9 +317,10 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
         if (this.tipo == SOBRE_AUTENTICADO || this.tipo == SOBRE_FIRMADO) {
             final DefaultListModel listModel = (DefaultListModel) this.listaRemitentes.getModel();
             if (listModel.isEmpty()) {
-                CustomDialog.showMessageDialog(this,
-                                               true,
-                                               Messages.getString("WizardCifrado.error.remitente"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+                CustomDialog.showMessageDialog(
+                		this,
+                        true,
+                        Messages.getString("WizardCifrado.error.remitente"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
                 return false;
             }
         }
@@ -336,7 +338,19 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
 
             // por defecto se realizara un sobre envelopedData
             byte[] envelopedData = null;
-            final byte[] contentData = readFile(this.rutafichero);
+
+            byte[] contentData = null;
+            try {
+            	contentData = readFile(this.rutafichero);
+            }
+            catch(final OutOfMemoryError e) {
+            	CustomDialog.showMessageDialog(
+        			SwingUtilities.getRoot(this), true, Messages.getString("WizardCifrado.error.tamanodatos"), //$NON-NLS-1$
+                    Messages.getString("error"), //$NON-NLS-1$
+                    JOptionPane.ERROR_MESSAGE
+                );
+            	this.getBotonera().getCancelar().doClick();
+            }
             try {
                 if (this.tipo == SOBRE_AUTENTICADO) {
                     envelopedData = enveloper.createCMSAuthenticatedEnvelopedData(contentData, this.privateKeyEntry, cipherConfig, certs);

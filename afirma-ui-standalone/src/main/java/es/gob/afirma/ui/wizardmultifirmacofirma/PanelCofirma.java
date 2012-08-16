@@ -353,9 +353,18 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 		try {
 		    signIs = new FileInputStream(ficheroFirma);
 		    sign = AOUtil.getDataFromInputStream(signIs);
-		} catch (final Exception e) {
+		}
+		catch (final Exception e) {
 			CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.simple.error.firma"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
             return false;
+        }
+		catch(final OutOfMemoryError e) {
+        	CustomDialog.showMessageDialog(
+    			SwingUtilities.getRoot(this), true, Messages.getString("Wizard.multifirma.simple.error.firma.tamano"), //$NON-NLS-1$
+                Messages.getString("error"), //$NON-NLS-1$
+                JOptionPane.ERROR_MESSAGE
+            );
+        	return false;
         }
 
 		final AOSigner signer = AOSignerFactory.getSigner(sign);

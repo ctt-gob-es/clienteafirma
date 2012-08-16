@@ -115,17 +115,26 @@ final class Desensobrado extends JPanel {
                                            true,
                                            Messages.getString("Firma.msg.info"), Messages.getString("PrincipalGUI.TabConstraints.tabTitleDesensobrado"), JOptionPane.INFORMATION_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
 
-            byte[] envelopData = null;
+            final byte[] envelopData;
             try {
                 final FileInputStream envelopFis = new FileInputStream(new File(envelopPath));
                 envelopData = AOUtil.getDataFromInputStream(envelopFis);
             }
-            catch (final Exception e) {
+            catch(final Exception e) {
                 LOGGER.severe("No se ha encontrado o no se ha podido leer el fichero: " + envelopPath); //$NON-NLS-1$
-                CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
-                                               true,
-                                               Messages.getString("Desensobrado.msg.error.fichero2"), "Error", JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
+                CustomDialog.showMessageDialog(
+                		SwingUtilities.getRoot(this),
+                        true,
+                        Messages.getString("Desensobrado.msg.error.fichero2"), "Error", JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
                 return;
+            }
+            catch(final OutOfMemoryError e) {
+            	CustomDialog.showMessageDialog(
+        			SwingUtilities.getRoot(this), true, Messages.getString("Desensobrado.msg.error.ficherotamano"), //$NON-NLS-1$
+                    Messages.getString("error"), //$NON-NLS-1$
+                    JOptionPane.ERROR_MESSAGE
+                );
+            	return;
             }
 
             // Se carga el almacen y el certificado
