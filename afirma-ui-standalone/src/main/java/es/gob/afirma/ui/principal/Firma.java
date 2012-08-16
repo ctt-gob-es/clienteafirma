@@ -56,6 +56,7 @@ import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.main.common.KeyStoreConfiguration;
 import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
+import es.gob.afirma.signers.pades.BadPdfPasswordException;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
 import es.gob.afirma.signers.xmldsig.AOXMLDSigSigner;
@@ -77,7 +78,7 @@ import es.gob.afirma.ui.utils.Utils;
 /** Clase que muestra los elementos necesarios para realizar una firma. */
 final class Firma extends JPanel {
 
-    private static Logger logger = Logger.getLogger(Firma.class.getName());
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     private static final long serialVersionUID = 1L;
 
@@ -277,7 +278,7 @@ final class Firma extends JPanel {
                 signer = AOSignerFactory.getSigner(formato);
             }
             catch (final Exception e) {
-                logger.warning("Formato de firma no soportado: " + e); //$NON-NLS-1$
+                LOGGER.warning("Formato de firma no soportado: " + e); //$NON-NLS-1$
                 CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
                                                true,
                                                Messages.getString("Firma.msg.error.formato"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$//$NON-NLS-2$
@@ -290,7 +291,7 @@ final class Firma extends JPanel {
                 uri = AOUtil.createURI(campoFichero.getText());
             }
             catch (final Exception e) {
-                logger.severe("La ruta del fichero de datos no es valida: " + e); //$NON-NLS-1$
+                LOGGER.severe("La ruta del fichero de datos no es valida: " + e); //$NON-NLS-1$
                 CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
                                                true,
                                                Messages.getString("Firma.msg.error.ruta"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
@@ -375,22 +376,32 @@ final class Firma extends JPanel {
             try {
                 signedData = signer.sign(fileData, GeneralConfig.getSignAlgorithm(), privateKeyEntry, prop);
             }
-            catch (final AOFormatFileException e) {
-                logger.severe("Error al generar la firma electronica: " + e); //$NON-NLS-1$
+            catch(final AOFormatFileException e) {
+                LOGGER.severe("Error al generar la firma electronica: " + e); //$NON-NLS-1$
                 CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
                                                true,
                                                Messages.getString("Firma.msg.error.generar.formato"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
                 return;
             }
+            catch(final BadPdfPasswordException e) {
+            	LOGGER.warning("No se ha proporcionado la contrasena correcta para abrir o modificar el PDF"); //$NON-NLS-1$
+            	CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
+                    true,
+                    Messages.getString("Firma.msg.error.generar.protectedpdf"), //$NON-NLS-1$
+                    Messages.getString("error"), //$NON-NLS-1$
+                    JOptionPane.ERROR_MESSAGE
+                );
+            	return;
+            }
             catch (final AOException e) {
-                logger.severe("Error al generar la firma electronica: " + e); //$NON-NLS-1$
+                LOGGER.severe("Error al generar la firma electronica: " + e); //$NON-NLS-1$
                 CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
                                                true,
                                                Messages.getString("Firma.msg.error.generar.firma"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
                 return;
             }
             catch (final Exception e) {
-                logger.severe("Error al generar la firma electronica: " + e); //$NON-NLS-1$
+                LOGGER.severe("Error al generar la firma electronica: " + e); //$NON-NLS-1$
                 CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
                                                true,
                                                Messages.getString("Firma.msg.error.generar.firma"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
@@ -418,16 +429,16 @@ final class Firma extends JPanel {
         }
         catch (final AOCancelledOperationException e) {
             setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-            logger.info("Operacion cancelada por el usuario"); //$NON-NLS-1$
+            LOGGER.info("Operacion cancelada por el usuario"); //$NON-NLS-1$
         }
         catch (final AOException e) {
             setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-            logger.severe("Error: " + e.getMessage()); //$NON-NLS-1$
+            LOGGER.severe("Error: " + e.getMessage()); //$NON-NLS-1$
             CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, e.getMessage(), "Firma", JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
         }
         catch (final Exception e) {
             setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-            logger.severe("Error al generar la firma electronica: " + e); //$NON-NLS-1$
+            LOGGER.severe("Error al generar la firma electronica: " + e); //$NON-NLS-1$
         }
     }
 
