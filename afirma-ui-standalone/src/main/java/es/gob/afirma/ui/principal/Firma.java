@@ -83,17 +83,13 @@ final class Firma extends JPanel {
     private static final long serialVersionUID = 1L;
 
     // Nombres de los diferentes formatos de firmado
-    private final List<String> formatosL = new ArrayList<String>(Arrays.asList("Firma est\u00E1ndar (XAdES Detached)", //$NON-NLS-1$
-                                                                               // "XAdES Enveloping",
-                                                                               // "XAdES Enveloped",
+    private static final List<String> FORMATOS_AVANZADOS = new ArrayList<String>(Arrays.asList("Firma est\u00E1ndar (XAdES Detached)", //$NON-NLS-1$
                                                                                "CAdES", //$NON-NLS-1$
                                                                                "PAdES" //$NON-NLS-1$
     ));
 
     // Constantes de los diferentes formatos de firmado
-    private final List<String> formatosV = new ArrayList<String>(Arrays.asList(AOSignConstants.SIGN_FORMAT_XADES_DETACHED,
-    // AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING,
-    // AOConstants.SIGN_FORMAT_XADES_ENVELOPED,
+    private static final List<String> FORMATOS = new ArrayList<String>(Arrays.asList(AOSignConstants.SIGN_FORMAT_XADES_DETACHED,
                                                                                AOSignConstants.SIGN_FORMAT_CADES,
                                                                                AOSignConstants.SIGN_FORMAT_PDF));
 
@@ -123,7 +119,7 @@ final class Firma extends JPanel {
      * @param campoFichero Campo con el nombre del archivo a firmar */
     void firmarActionPerformed(final JComboBox comboAlmacen, final JComboBox comboFormato, final JTextField campoFichero) {// GEN-FIRST:event_firmarActionPerformed
         // Obtenemos la constante del formato a utilizar
-        final String formato = this.formatosV.get(comboFormato.getSelectedIndex());
+        final String formato = Firma.FORMATOS.get(comboFormato.getSelectedIndex());
 
         // Obtenemos la ruta del fichero a firmar
         if (campoFichero.getText() == null || campoFichero.getText().equals("")) { //$NON-NLS-1$
@@ -264,7 +260,6 @@ final class Firma extends JPanel {
                 throw e;
             }
             catch (final Exception e) {
-            	e.printStackTrace();
                 throw new AOException("No se ha podido recuperar el certificado seleccionado", e.getCause()); //$NON-NLS-1$
             }
 
@@ -300,7 +295,7 @@ final class Firma extends JPanel {
                 return;
             }
 
-            byte[] fileData;
+            final byte[] fileData;
             InputStream fileIn = null;
             try {
                 fileIn = AOUtil.loadFile(uri);
@@ -514,8 +509,6 @@ final class Firma extends JPanel {
                                                                       Messages.getString("PrincipalGUI.Examinar.description.status"))); //$NON-NLS-1$
         examinar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(),
                                                                       Messages.getString("PrincipalGUI.Examinar.description.status"))); //$NON-NLS-1$
-        // examinar.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.Examinar") + " " +
-        // Messages.getString("PrincipalGUI.Examinar.description.status"));
         examinar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent evt) {
@@ -567,8 +560,6 @@ final class Firma extends JPanel {
                                                                           Messages.getString("Firma.almacen.certificados.description"))); //$NON-NLS-1$
         comboAlmacen.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(),
                                                                           Messages.getString("Firma.almacen.certificados.description"))); //$NON-NLS-1$
-        // comboAlmacen.getAccessibleContext().setAccessibleName(etiquetaAlmacen.getText()+" "+Messages.getString("Firma.almacen.certificados.description")
-        // + " ALT + A."); // NOI18N
 
         Utils.remarcar(comboAlmacen);
         cargarComboAlmacen(comboAlmacen);
@@ -618,24 +609,22 @@ final class Firma extends JPanel {
                                                                           Messages.getString("Firma.formato.description.status"))); //$NON-NLS-1$
         comboFormato.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(),
                                                                           Messages.getString("Firma.formato.description.status"))); //$NON-NLS-1$
-        // comboFormato.getAccessibleContext().setAccessibleName(etiquetaFormato.getText()+" " + Messages.getString("Firma.formato.description") +
-        // " ALT + O."); // NOI18N
 
         if (GeneralConfig.isAvanzados()) {
             // XAdES Enveloping (Solo en la vista avanzada)
-            this.formatosL.add("XAdES Enveloping"); //$NON-NLS-1$
-            this.formatosV.add(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING);
+            Firma.FORMATOS_AVANZADOS.add("XAdES Enveloping"); //$NON-NLS-1$
+            Firma.FORMATOS.add(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING);
             // XAdES Enveloped (Solo en la vista avanzada)
-            this.formatosL.add("XAdES Enveloped"); //$NON-NLS-1$
-            this.formatosV.add(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED);
+            Firma.FORMATOS_AVANZADOS.add("XAdES Enveloped"); //$NON-NLS-1$
+            Firma.FORMATOS.add(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED);
             // OOXML (Solo en la vista avanzada)
-            this.formatosL.add("OOXML"); //$NON-NLS-1$
-            this.formatosV.add(AOSignConstants.SIGN_FORMAT_OOXML);
+            Firma.FORMATOS_AVANZADOS.add("OOXML"); //$NON-NLS-1$
+            Firma.FORMATOS.add(AOSignConstants.SIGN_FORMAT_OOXML);
             // ODF (Solo en la vista avanzada)
-            this.formatosL.add("ODF"); //$NON-NLS-1$
-            this.formatosV.add(AOSignConstants.SIGN_FORMAT_ODF);
+            Firma.FORMATOS_AVANZADOS.add("ODF"); //$NON-NLS-1$
+            Firma.FORMATOS.add(AOSignConstants.SIGN_FORMAT_ODF);
         }
-        comboFormato.setModel(new DefaultComboBoxModel(this.formatosL.toArray()));
+        comboFormato.setModel(new DefaultComboBoxModel(Firma.FORMATOS_AVANZADOS.toArray()));
         Utils.remarcar(comboFormato);
         Utils.setContrastColor(comboFormato);
         Utils.setFontBold(comboFormato);
@@ -674,8 +663,6 @@ final class Firma extends JPanel {
         firmar.setMnemonic(KeyEvent.VK_R);
         firmar.setText(Messages.getString("PrincipalGUI.firmar")); // NOI18N //$NON-NLS-1$
         firmar.setToolTipText(Messages.getString("PrincipalGUI.firmar.description")); // NOI18N //$NON-NLS-1$
-        // firmar.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.firmar") + " " +
-        // Messages.getString("PrincipalGUI.firmar.description.status"));
         firmar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(),
                                                                     Messages.getString("PrincipalGUI.firmar.description.status"))); //$NON-NLS-1$
         firmar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(),
