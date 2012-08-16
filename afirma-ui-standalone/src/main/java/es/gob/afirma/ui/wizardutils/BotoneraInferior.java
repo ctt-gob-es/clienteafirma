@@ -32,12 +32,15 @@ public class BotoneraInferior extends JPanel {
 
     private static final long serialVersionUID = 1L;
     private Dimension dimensiones = new Dimension(603, 47);
-    private JButton finalizar = null;
+
+    private JButton finalizar;
+
+    private final JButton cancelar = new JButton();
+
     private int posicion;
 
-    // private JButton restaurar = null;
-    // private JButton maximizar = null;
-    private JButton siguiente = null;
+    private JButton siguiente;
+
     private List<JDialogWizard> ventanas;
 
     /** Genera una botonera con unas dimensiones dadas
@@ -87,13 +90,19 @@ public class BotoneraInferior extends JPanel {
         return this.finalizar;
     }
 
-    /** Devuelve el boton de siguiente.
-     * @return boton de siguiente. */
+    /** Devuelve el bot&oacute;n de siguiente.
+     * @return Bot&oacute;n de siguiente. */
     public JButton getSiguiente() {
         return this.siguiente;
     }
 
-    public List<JDialogWizard> getVentanas() {
+    /** Devuelve el bot&oacute;n de cancelar.
+     * @return Bot&oacute;n de cancelar. */
+    public JButton getCancelar() {
+    	return this.cancelar;
+    }
+
+    protected List<JDialogWizard> getVentanas() {
         return this.ventanas;
     }
 
@@ -105,58 +114,9 @@ public class BotoneraInferior extends JPanel {
         setLayout(new FlowLayout(FlowLayout.CENTER, 1, 1));
 
         // Definicion de botones
-        // maximizar = new JButton();
         final JButton anterior = new JButton();
         this.siguiente = new JButton();
-        final JButton cancelar = new JButton();
         this.finalizar = new JButton();
-
-        // JPanel panelMaximizar = new JPanel(new GridLayout(1, 1));
-        // //Boton maximizar
-        // maximizar.setText(Messages.getString("Wizard.maximizar"));
-        // maximizar.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.maximizar") + ". " +
-        // Messages.getString("Wizard.maximizar.description"));
-        // maximizar.setName("maximizar");
-        // maximizar.setMnemonic(KeyEvent.VK_M);
-        // maximizar.addActionListener(new ActionListener() {
-        // public void actionPerformed(ActionEvent e) {
-        // maximizarActionPerformed();
-        // }
-        // });
-        // Utils.remarcar(maximizar);
-        // Utils.setContrastColor(maximizar);
-        // Utils.setFontBold(maximizar);
-        //
-        // panelMaximizar.add(maximizar);
-        // //add(panelMaximizar);
-        //
-        // JPanel panelRestaurar = new JPanel(new GridLayout(1, 1));
-        // // Boton restaurar
-        // restaurar = new JButton();
-        // restaurar.setText(Messages.getString("Wizard.restaurar"));
-        // restaurar.setName("restaurar");
-        // restaurar.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.restaurar") + ". " +
-        // Messages.getString("Wizard.restaurar.description"));
-        // restaurar.setMnemonic(KeyEvent.VK_R);
-        // restaurar.addActionListener(new ActionListener() {
-        // public void actionPerformed(ActionEvent e) {
-        // restaurarActionPerformed();
-        // }
-        // });
-        // Utils.remarcar(restaurar);
-        // Utils.setContrastColor(restaurar);
-        // Utils.setFontBold(restaurar);
-        //
-        // panelRestaurar.add(restaurar);
-        // //add(panelRestaurar);
-        //
-        // //Control de habilitado de los botones de maximizar y restaurar segun la configuracion de
-        // //accesibilidad
-        // if (GeneralConfig.isMaximized()){
-        // maximize.setEnabled(false);
-        // } else {
-        // restaurar.setEnabled(false);
-        // }
 
         // Espacio entre botones
         JPanel panelVacio = new JPanel();
@@ -178,7 +138,7 @@ public class BotoneraInferior extends JPanel {
         anterior.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent evt) {
-                anteriorActionPerformed(anterior, BotoneraInferior.this.siguiente, BotoneraInferior.this.finalizar);
+                anteriorActionPerformed(anterior, BotoneraInferior.this.getSiguiente(), BotoneraInferior.this.getFinalizar());
             }
         });
         Utils.remarcar(anterior);
@@ -202,7 +162,7 @@ public class BotoneraInferior extends JPanel {
         this.siguiente.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent evt) {
-                siguienteActionPerformed(anterior, BotoneraInferior.this.siguiente, BotoneraInferior.this.finalizar);
+                siguienteActionPerformed(anterior, BotoneraInferior.this.getSiguiente(), BotoneraInferior.this.getFinalizar());
             }
         });
         Utils.remarcar(this.siguiente);
@@ -220,14 +180,14 @@ public class BotoneraInferior extends JPanel {
         final JPanel panelCancelar = new JPanel(new GridLayout(1, 1));
         // Boton cancelar
         if (paginas == this.posicion) {
-            cancelar.setVisible(false);
+            this.cancelar.setVisible(false);
         }
         else {
-            cancelar.setMnemonic(KeyEvent.VK_C); // Mnemonico para el boton de cancelar
-            cancelar.setVisible(true);
+            this.cancelar.setMnemonic(KeyEvent.VK_C); // Mnemonico para el boton de cancelar
+            this.cancelar.setVisible(true);
         }
-        cancelar.setText(Messages.getString("Wizard.cancelar")); // NOI18N //$NON-NLS-1$
-        cancelar.addActionListener(new ActionListener() {
+        this.cancelar.setText(Messages.getString("Wizard.cancelar")); // NOI18N //$NON-NLS-1$
+        this.cancelar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent evt) {
                 saveSizePosition();
@@ -236,11 +196,11 @@ public class BotoneraInferior extends JPanel {
                 }
             }
         });
-        Utils.remarcar(cancelar);
-        Utils.setContrastColor(cancelar);
-        Utils.setFontBold(cancelar);
+        Utils.remarcar(this.cancelar);
+        Utils.setContrastColor(this.cancelar);
+        Utils.setFontBold(this.cancelar);
 
-        panelCancelar.add(cancelar);
+        panelCancelar.add(this.cancelar);
         add(panelCancelar);
 
         final JPanel panelFinalizar = new JPanel(new GridLayout(1, 1));

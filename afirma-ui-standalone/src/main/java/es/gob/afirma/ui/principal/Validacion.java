@@ -18,6 +18,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.io.FileInputStream;
+import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -27,6 +29,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.text.Caret;
 
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.ui.listeners.ElementDescriptionFocusListener;
 import es.gob.afirma.ui.listeners.ElementDescriptionMouseListener;
 import es.gob.afirma.ui.utils.ConfigureCaret;
@@ -217,30 +220,66 @@ class Validacion extends JPanel {
      * @param signPath Ruta del fichero de firma. */
     void validateActionPerformance(final String signPath) {
         if (signPath == null || signPath.trim().length() <= 0) {
-            CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
-                                           true,
-                                           Messages.getString("Validacion.msg.error.fichero"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+            CustomDialog.showMessageDialog(
+            		SwingUtilities.getRoot(this),
+            		true,
+            		Messages.getString("Validacion.msg.error.fichero"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
             return;
         }
 
         final File signFile = new File(signPath);
         if (!signFile.exists() || !signFile.isFile()) {
-            CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
-                                           true,
-                                           Messages.getString("Validacion.msg.error.nofichero", signPath), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+            CustomDialog.showMessageDialog(
+            		SwingUtilities.getRoot(this),
+                    true,
+                    Messages.getString("Validacion.msg.error.nofichero", signPath), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
             return;
         }
 
         if (!signFile.canRead()) {
             CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
-                                           true,
-                                           Messages.getString("Validacion.msg.error.noLectura"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+                    true,
+                    Messages.getString("Validacion.msg.error.noLectura"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
             return;
         }
 
-        final VisorPanel visorPanel = new VisorPanel(signFile, null);
-        visorPanel.setTitle(Messages.getString("Visor.window.title")); //$NON-NLS-1$
+        final byte[] signBytes = loadFile(signFile);
 
-        visorPanel.setVisible(true);
+        if (signBytes != null) {
+        	final VisorPanel visorPanel = new VisorPanel(signFile, null);
+        	visorPanel.setTitle(Messages.getString("Visor.window.title")); //$NON-NLS-1$
+        	visorPanel.setVisible(true);
+        }
+    }
+
+    /**
+     * Recupera el contenido de un fichero.
+     * @param file Fichero.
+     * @return Datos contenidos en el fichero o {@code null} si ocurri&oacute; alg&uacute;n error.
+     */
+    private byte[] loadFile(final File file) {
+    	FileInputStream fis = null;
+    	try {
+			fis = new FileInputStream(file);
+			return AOUtil.getDataFromInputStream(fis);
+
+		}
+        catch(final OutOfMemoryError e) {
+        	CustomDialog.showMessageDialog(
+    			SwingUtilities.getRoot(this), true, Messages.getString("Firma.msg.error.fichero.tamano"), //$NON-NLS-1$
+                Messages.getString("error"), //$NON-NLS-1$
+                JOptionPane.ERROR_MESSAGE
+            );
+        	return null;
+        }
+		catch (final Exception e) {
+			Logger.getLogger("es.gob.afirma").warning("No se ha podido cargar el fichero: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			return null;
+		}
+		finally {
+			if (fis != null) {
+				try { fis.close(); } catch (final Exception e) { /* Ignoramos los errores */ }
+			}
+		}
     }
 }

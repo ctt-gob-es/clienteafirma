@@ -18,111 +18,108 @@ import es.gob.afirma.ui.wizardutils.JDialogWizard;
 /**
  * Clase para generar un JDialogWizard con la posibilidad de redimension.
  * Extiende JDialogWizard.
- * @author inteco
+ * @author INTECO
  *
  */
 public abstract class JAccessibilityDialogWizard extends JDialogWizard{
-	
-	/**
-	 * uid.
-	 */
+
+	/** UID. */
 	private static final long serialVersionUID = 1L;
-	
-	/**
-	 * Posicion X actual.
-	 */
+
+	/** Posici&oacute;n X actual. */
 	private static int actualPositionX = -1;
-	
-	/**
-	 * Posicion Y actual.
-	 */
+
+	/** Posici&oacute;n Y actual. */
 	private static int actualPositionY = -1;
-	
-	/**
-	 * Ancho actual.
-	 */
+
+	/** Ancho actual. */
 	private static int actualWidth = -1;
-	
+
 	/**
 	 * Alto actual.
 	 */
 	private static int actualHeight = -1;
-	
-	/**
-	 * Botonera.
-	 */
+
+	/** Botonera inferior. */
 	private BotoneraInferior botonera = null;
-	
-	/**
-	 * Botonera.
-	 */
+
+	/** Botonera superior. */
 	private BotoneraSuperior botoneraSuperior = null;
-	
+
 	/**
 	 * Constructor.
 	 */
 	public JAccessibilityDialogWizard(){
 		super();
-		ResizingAdaptor adaptador = new ResizingAdaptor(null,null,this,null,null,null,null,null);
+		final ResizingAdaptor adaptador = new ResizingAdaptor(null,null,this,null,null,null,null,null);
 		this.addComponentListener(adaptador);
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		
+		final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+
 		//Se obtienen las dimensiones totales disponibles para mostrar una ventana
-		Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+		final Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
 
 		//Se obtienen las dimensiones de maximizado
-		int maxWidth = (int)rect.getWidth();
-		int maxHeight = (int)rect.getHeight();
-		
+		final int maxWidth = (int)rect.getWidth();
+		final int maxHeight = (int)rect.getHeight();
+
 		if (GeneralConfig.isMaximized()){
-			
+
 			//Se hace el resize dependiendo del so
 			if (!Platform.getOS().equals(Platform.OS.LINUX)){
 				this.setBounds(0,0, maxWidth, maxHeight);
-			} 
+			}
 			else {
 				this.setBounds(0,0, maxWidth, maxHeight - Constants.MAXIMIZE_VERTICAL_MARGIN_LINUX);
 			}
-			
+
 			if (Platform.getOS().equals(Platform.OS.LINUX)){
 				//Se comprueba si esta activado el modo negrita o fuente grande
 				if(GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
 					setMinimumSize(new Dimension(Constants.WIZARD_FONT_INITIAL_WIDTH_LINUX, Constants.WIZARD_FONT_INITIAL_HEIGHT_LINUX));
-				} else {
+				}
+				else {
 					setMinimumSize(new Dimension(Constants.WIZARD_INITIAL_WIDTH_LINUX, Constants.WIZARD_INITIAL_HEIGHT_LINUX));
 				}
-				
-			} else {
+
+			}
+			else {
 				//Se comprueba si esta activado el modo negrita o fuente grande
 				if(GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
 					setMinimumSize(new Dimension(Constants.WIZARD_FONT_INITIAL_WIDTH, Constants.WIZARD_FONT_INITIAL_HEIGHT));
-				} else {
+				}
+				else {
 					setMinimumSize(new Dimension(Constants.WIZARD_INITIAL_WIDTH, Constants.WIZARD_INITIAL_HEIGHT));
 				}
 			}
-		} else {
+		}
+		else {
 			if (PrincipalGUI.getWizardActualPositionX() != -1){
 				if (AccessibilityOptionsPane.isContinueBigStyle()){
 					if (Platform.getOS().equals(Platform.OS.LINUX)){
 						setBounds((screenSize.width - Constants.WIZARD_INITIAL_WIDTH) / 2, (screenSize.height - Constants.WIZARD_INITIAL_HEIGHT_LINUX) / 2, Constants.WIZARD_INITIAL_WIDTH_LINUX, Constants.WIZARD_INITIAL_HEIGHT_LINUX);
-					} else {
+					}
+					else {
 						setBounds((screenSize.width - Constants.WIZARD_INITIAL_WIDTH) / 2, (screenSize.height - Constants.WIZARD_INITIAL_HEIGHT) / 2, Constants.WIZARD_INITIAL_WIDTH, Constants.WIZARD_INITIAL_HEIGHT);
 					}
-				} else {
+				}
+				else {
 					setBounds(PrincipalGUI.getWizardActualPositionX(), PrincipalGUI.getWizardActualPositionY(), PrincipalGUI.getWizardActualWidth(), PrincipalGUI.getWizardActualHeight());
 				}
 	    		if (Platform.getOS().equals(Platform.OS.LINUX)){
 	    			//Se comprueba si esta activado el modo negrita o fuente grande
 					if(GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
 						setMinimumSize(new Dimension(Constants.WIZARD_FONT_INITIAL_WIDTH_LINUX, Constants.WIZARD_FONT_INITIAL_HEIGHT_LINUX));
-					} else {
+					}
+					else {
 						setMinimumSize(new Dimension(Constants.WIZARD_INITIAL_WIDTH_LINUX, Constants.WIZARD_INITIAL_HEIGHT_LINUX));
 					}
-	    		} else {
+	    		}
+	    		else {
 	    			//Se comprueba si esta activado el modo negrita o fuente grande
 					if(GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
 						setMinimumSize(new Dimension(Constants.WIZARD_FONT_INITIAL_WIDTH, Constants.WIZARD_FONT_INITIAL_HEIGHT));
-					} else {
+					}
+					else {
 						setMinimumSize(new Dimension(Constants.WIZARD_INITIAL_WIDTH, Constants.WIZARD_INITIAL_HEIGHT));
 					}
 	    		}
@@ -132,16 +129,18 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 					if(GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
 						 setBounds((screenSize.width - Constants.WIZARD_FONT_INITIAL_WIDTH_LINUX) / 2, (screenSize.height - Constants.WIZARD_FONT_INITIAL_HEIGHT_LINUX) / 2, Constants.WIZARD_FONT_INITIAL_WIDTH_LINUX, Constants.WIZARD_FONT_INITIAL_HEIGHT_LINUX);
 				         setMinimumSize(new Dimension(Constants.WIZARD_FONT_INITIAL_WIDTH_LINUX, Constants.WIZARD_FONT_INITIAL_HEIGHT_LINUX));
-					} else {
+					}
+					else {
 			          setBounds((screenSize.width - Constants.WIZARD_INITIAL_WIDTH_LINUX) / 2, (screenSize.height - Constants.WIZARD_INITIAL_HEIGHT_LINUX) / 2, Constants.WIZARD_INITIAL_WIDTH_LINUX, Constants.WIZARD_INITIAL_HEIGHT_LINUX);
 			          setMinimumSize(new Dimension(Constants.WIZARD_INITIAL_WIDTH_LINUX, Constants.WIZARD_INITIAL_HEIGHT_LINUX));
 					}
-				} else {
+				}
+				else {
 					//Se comprueba si esta activado el modo negrita o fuente grande
 					if(GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
 						 setBounds((screenSize.width - Constants.WIZARD_FONT_INITIAL_WIDTH) / 2, (screenSize.height - Constants.WIZARD_FONT_INITIAL_HEIGHT) / 2, Constants.WIZARD_FONT_INITIAL_WIDTH, Constants.WIZARD_FONT_INITIAL_HEIGHT);
 				         setMinimumSize(new Dimension(Constants.WIZARD_FONT_INITIAL_WIDTH, Constants.WIZARD_FONT_INITIAL_HEIGHT));
-					} 
+					}
 					else {
 			          setBounds((screenSize.width - Constants.WIZARD_INITIAL_WIDTH) / 2, (screenSize.height - Constants.WIZARD_INITIAL_HEIGHT) / 2, Constants.WIZARD_INITIAL_WIDTH, Constants.WIZARD_INITIAL_HEIGHT);
 			          setMinimumSize(new Dimension(Constants.WIZARD_INITIAL_WIDTH, Constants.WIZARD_INITIAL_HEIGHT));
@@ -149,84 +148,84 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 				}
     		}
 		}
-		
-		
-		
+
+
+
 	}
-	
+
 	/**
 	 * Relaci&oacute;n m&iacute;nima que se aplica para la redimensi&oacute;n de los componentes.
 	 * Cuanto menor es este n&uacute;mero menor es la redimensi&oacute;n aplicada.
 	 * @return int Relaci&oacute;n m&iacute;nima
 	 */
 	public abstract int getMinimumRelation();
-	
+
 	/**
 	 * Obtiene un componente de un contenedor a traves de su nombre
 	 * @param name Nombre del componente a buscar
 	 * @param container Contenedor donde se encuentra el componente a buscar
 	 * @return componente
 	 */
-	private Component getComponentByName(String name, Container container){
+	private Component getComponentByName(final String name, final Container container){
 		if(name.equals(container.getName())){
 			return container;
 		}
-		Component[] componentes = container.getComponents();
-		for(int i = 0; i < componentes.length; i++){
-			if(componentes[i] instanceof Container){
-				Component res = getComponentByName(name, (Container) componentes[i]);
+		final Component[] componentes = container.getComponents();
+		for (final Component componente : componentes) {
+			if(componente instanceof Container){
+				final Component res = getComponentByName(name, (Container) componente);
 				if(res != null){
 					return res;
 				}
 			}
 			else{
-				if(componentes[i].getName().equals(name)){
-					return componentes[i];
+				if(componente.getName().equals(name)){
+					return componente;
 				}
 			}
 		}
 		return null;
 	}
-	
-	
+
+
 	/**
 	 * Evento de redimensionado. Comprueba el tama&ntilde;o de la ventana para habilitar o deshabilitar el bot&oacute;n
 	 *  de Maximizar ventana
 	 */
 	@Override
-	public void componentResized(ComponentEvent e) {
+	public void componentResized(final ComponentEvent e) {
 		//Se obtienen las dimensiones totales disponibles para mostrar una ventana
-		Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
-		int maxWidth = (int)rect.getWidth();
+		final Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+		final int maxWidth = (int)rect.getWidth();
 		int maxHeight = (int)rect.getHeight();
-		
+
 		//Se comprueba el so
 		if (Platform.getOS().equals(Platform.OS.LINUX)){
 			maxHeight = maxHeight - Constants.MAXIMIZE_VERTICAL_MARGIN_LINUX;
 
 		} else {
 			//Dimensiones que se van a considerar de maximizado
-			Dimension fullScreen = new Dimension(maxWidth, maxHeight);//new Dimension((int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
+			final Dimension fullScreen = new Dimension(maxWidth, maxHeight);//new Dimension((int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
 
 		    //Dimensiones actuales del dialogo
-		    Dimension actualSize = getJAccessibilityDialogWizard(this).getSize();
+		    final Dimension actualSize = getJAccessibilityDialogWizard(this).getSize();
 		    if (actualSize.equals(fullScreen)){
 		    	this.setResizable(false);
 		    } else {
 		    	this.setResizable(true);
 		    }
 		}
-	    
+
 		//Control de activacion y desactivacion de los botones de maximizado y restaurado
-	    Component botonMaximizar = getComponentByName("maximizar", getJAccessibilityDialogWizard(this)); //$NON-NLS-1$
-		Component botonRestaurar = getComponentByName("restaurar", getJAccessibilityDialogWizard(this)); //$NON-NLS-1$
-		
+	    final Component botonMaximizar = getComponentByName("maximizar", getJAccessibilityDialogWizard(this)); //$NON-NLS-1$
+		final Component botonRestaurar = getComponentByName("restaurar", getJAccessibilityDialogWizard(this)); //$NON-NLS-1$
+
 		if (botonMaximizar!=null && botonRestaurar!=null) {
 			//Se comprueba el estado de los botones de maximizado y restauracion
 			if (this.getSize().equals(new Dimension(maxWidth,maxHeight))){
 				botonMaximizar.setEnabled (false);
 				botonRestaurar.setEnabled (true);
-			} 
+			}
 			else {
 				botonMaximizar.setEnabled (true);
 				botonRestaurar.setEnabled (false);
@@ -245,9 +244,9 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 			component.setEnabled(enabled);
 		}
 	}*/
-	
-	
-	
+
+
+
 	/**
 	 * Busca el JAccessibilityDialogWizard padre de un componente.
 	 * @param c El componente.
@@ -274,7 +273,7 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 	public BotoneraInferior getBotonera() {
 		return this.botonera;
 	}
-	
+
 	/**
 	 * Devuelve la botonera superior.
 	 * @return botonera
@@ -287,14 +286,15 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 	 * Asigna la botonera.
 	 * @param botonera
 	 */
-	public void setBotonera(BotoneraInferior botonera) {
-		this.botonera=botonera;
+	public void setBotonera(final BotoneraInferior botonera) {
+		this.botonera = botonera;
 	}
+
 	/**
 	 * Asigna la botonera.
 	 * @param botonera
 	 */
-	public void setBotoneraSuperior(BotoneraSuperior botonera) {
+	public void setBotoneraSuperior(final BotoneraSuperior botonera) {
 		this.botoneraSuperior=botonera;
 		Utils.setContrastColor(this.botoneraSuperior);
 	}
@@ -309,7 +309,7 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 	/**
      * Setter para la variable ActualPositionX.
      */
-	public static void setActualPositionX(int actualPositionX) {
+	public static void setActualPositionX(final int actualPositionX) {
 		JAccessibilityDialogWizard.actualPositionX = actualPositionX;
 	}
 	/**
@@ -322,7 +322,7 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 	/**
      * Setter para la variable ActualPositionY.
      */
-	public static void setActualPositionY(int actualPositionY) {
+	public static void setActualPositionY(final int actualPositionY) {
 		JAccessibilityDialogWizard.actualPositionY = actualPositionY;
 	}
 	/**
@@ -335,7 +335,7 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 	/**
      * Setter para la variable ActualWidth.
      */
-	public static void setActualWidth(int actualWidth) {
+	public static void setActualWidth(final int actualWidth) {
 		JAccessibilityDialogWizard.actualWidth = actualWidth;
 	}
 	/**
@@ -348,7 +348,7 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 	/**
      * Setter para la variable ActualHeight.
      */
-	public static void setActualHeight(int actualHeight) {
+	public static void setActualHeight(final int actualHeight) {
 		JAccessibilityDialogWizard.actualHeight = actualHeight;
 	}
 }
