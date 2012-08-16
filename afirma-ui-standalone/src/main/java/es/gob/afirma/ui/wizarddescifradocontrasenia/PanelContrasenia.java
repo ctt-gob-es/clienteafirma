@@ -32,6 +32,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.SwingUtilities;
 import javax.swing.text.Caret;
 
 import es.gob.afirma.core.AOException;
@@ -68,16 +69,14 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 	/**
 	 * Ruta donde se encuentra el archivo a cifrar
 	 */
-	private String rutaFichero = "";
+	private String rutaFichero;
 
 	/**
 	 * Cifrador configurado para un algoritmo dado
 	 */
 	private CipherConfig cipherConfig;
 
-	/**
-	 * Campo donde se guarda la contrasenia.
-	 */
+	/** Campo donde se guarda la contrase&ntilde;a. */
 	private final JPasswordField campoContrasenia = new JPasswordField();
 
     /**
@@ -196,15 +195,15 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
             public void itemStateChanged(final ItemEvent evt) {
 				if (evt.getStateChange() == ItemEvent.SELECTED){
 					//Se muestra la contrasena
-					PanelContrasenia.this.campoContrasenia.setEchoChar((char)0);
+					PanelContrasenia.this.getCampoContrasenia().setEchoChar((char)0);
 
 				} else if (evt.getStateChange() == ItemEvent.DESELECTED){
 					//Se oculta la contrasena
-					PanelContrasenia.this.campoContrasenia.setEchoChar(defaultChar);
+					PanelContrasenia.this.getCampoContrasenia().setEchoChar(defaultChar);
 				}
 
 				//Foco al input
-				PanelContrasenia.this.campoContrasenia.requestFocus();
+				PanelContrasenia.this.getCampoContrasenia().requestFocus();
 			}
 		});
 		Utils.remarcar(showPassCheckBox);
@@ -250,14 +249,26 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 		 */
 		@Override
 		protected void siguienteActionPerformed(final JButton anterior,
-				final JButton siguiente, final JButton finalizar) {
+												final JButton siguiente,
+												final JButton finalizar) {
 
-			boolean continuar = true;
-			continuar = descifrarFichero();
+			boolean continuar = false;
+			try {
+				continuar = descifrarFichero();
+			}
+			catch(final OutOfMemoryError e) {
+	        	CustomDialog.showMessageDialog(
+        			SwingUtilities.getRoot(this), true, Messages.getString("Firma.msg.error.fichero.tamano"), //$NON-NLS-1$
+                    Messages.getString("error"), //$NON-NLS-1$
+                    JOptionPane.ERROR_MESSAGE
+                );
+	        	getBotonera().getCancelar().doClick();
+			}
 
 			if (continuar) {
 				super.siguienteActionPerformed(anterior, siguiente, finalizar);
-			} else {
+			}
+			else {
 				//Si ha ocurrido algun error durante el proceso de descifrado mediante contrasenia
 				//el foco vuelve al campo de insercion de contrasenia
 				getCampoContrasenia().requestFocusInWindow();
