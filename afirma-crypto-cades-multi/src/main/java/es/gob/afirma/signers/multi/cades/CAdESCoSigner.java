@@ -184,9 +184,12 @@ final class CAdESCoSigner {
         ContentInfo encInfo = null;
         final ASN1ObjectIdentifier contentTypeOID = new ASN1ObjectIdentifier(PKCSObjectIdentifiers.data.getId());
 
+        // Ya que el contenido puede ser grande, lo recuperamos solo una vez
+        byte[] content2 = null;
+
         if (!omitContent) {
             final ByteArrayOutputStream bOut = new ByteArrayOutputStream();
-            final byte[] content2 = parameters.getContent();
+            content2 = parameters.getContent();
             final CMSProcessable msg = new CMSProcessableByteArray(content2);
             try {
                 msg.write(bOut);
@@ -239,7 +242,7 @@ final class CAdESCoSigner {
             final ASN1EncodableVector contextExpecific =
                 CAdESUtils.generateSignerInfo(signerCertificateChain[0],
                      digestAlgorithm,
-                     parameters.getContent(),
+                     content2 != null ? content2 : parameters.getContent(),
                      policy,
                      signingCertificateV2,
                      null,

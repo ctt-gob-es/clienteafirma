@@ -136,8 +136,11 @@ final class CMSSignedAndEnvelopedData {
         final X509Certificate[] signerCertificateChain = parameters.getSignerCertificateChain();
         final ASN1Set certificates = Utils.fetchCertificatesList(signerCertificateChain);
 
+        // Ya que el contenido puede ser grande, lo recuperamos solo una vez
+        final byte[] content2 = parameters.getContent();
+
         // 2. RECIPIENTINFOS
-        final Info infos = Utils.initVariables(parameters.getContent(), config, certDest, this.cipherKey);
+        final Info infos = Utils.initVariables(content2, config, certDest, this.cipherKey);
 
         // 4. SIGNERINFO
         // raiz de la secuencia de SignerInfo
@@ -150,7 +153,7 @@ final class CMSSignedAndEnvelopedData {
         final SignerIdentifier identifier = new SignerIdentifier(encSid);
 
         // // ATRIBUTOS
-        final ASN1Set signedAttr = generateSignerInfo(signerCertificateChain[0], digestAlgorithm, parameters.getContent(), dataType, atrib);
+        final ASN1Set signedAttr = generateSignerInfo(signerCertificateChain[0], digestAlgorithm, content2, dataType, atrib);
 
         ASN1Set unSignedAttr = null;
         unSignedAttr = generateUnsignerInfo(uatrib);

@@ -134,9 +134,12 @@ final class CoSigner {
         ContentInfo encInfo = null;
         final ASN1ObjectIdentifier contentTypeOID = new ASN1ObjectIdentifier(dataType);
 
+        // Ya que el contenido puede ser grande, lo recuperamos solo una vez
+        byte[] content2 = null;
+
         if (!omitContent) {
             final ByteArrayOutputStream bOut = new ByteArrayOutputStream();
-            final byte[] content2 = parameters.getContent();
+            content2 = parameters.getContent();
             final CMSProcessable msg = new CMSProcessableByteArray(content2);
             try {
                 msg.write(bOut);
@@ -195,7 +198,11 @@ final class CoSigner {
         ASN1Set signedAttr = null;
         if (messageDigest == null) {
             signedAttr =
-                    generateSignerInfo(digestAlgorithm, parameters.getContent(), dataType, atrib);
+            	generateSignerInfo(
+            			digestAlgorithm,
+            			(content2 != null ? content2 : parameters.getContent()),
+            			dataType,
+            			atrib);
         }
         else {
             signedAttr = generateSignerInfoFromHash(signerCertificateChain[0], messageDigest, dataType, atrib);

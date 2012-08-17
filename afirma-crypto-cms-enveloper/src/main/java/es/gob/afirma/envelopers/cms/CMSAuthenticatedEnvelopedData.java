@@ -130,6 +130,9 @@ public final class CMSAuthenticatedEnvelopedData {
                                                                                       AOException {
         final SecretKey cipherKey = Utils.initEnvelopedData(config, certDest);
 
+        // Ya que el contenido puede ser grande, lo recuperamos solo una vez
+        final byte[] content2 = parameters.getContent();
+
         // 1. ORIGINATORINFO
         // obtenemos la lista de certificados
         final X509Certificate[] signerCertificateChain = parameters.getSignerCertificateChain();
@@ -145,13 +148,13 @@ public final class CMSAuthenticatedEnvelopedData {
         }
 
         // 2. RECIPIENTINFOS
-        final Info infos = Utils.initVariables(parameters.getContent(), config, certDest, cipherKey);
+        final Info infos = Utils.initVariables(content2, config, certDest, cipherKey);
 
         // 4. ATRIBUTOS FIRMADOS
         final ASN1Set authAttr = generateSignedAtt(dataType, applySigningTime, atrib);
 
         // 5. MAC
-        final byte[] mac = Utils.genMac(autenticationAlgorithm, genPack(authAttr.getDEREncoded(), parameters.getContent()), cipherKey);
+        final byte[] mac = Utils.genMac(autenticationAlgorithm, genPack(authAttr.getDEREncoded(), content2), cipherKey);
 
         // 6. ATRIBUTOS NO FIRMADOS.
         final ASN1Set unAuthAttr = Utils.generateUnsignedAtt(uatrib);

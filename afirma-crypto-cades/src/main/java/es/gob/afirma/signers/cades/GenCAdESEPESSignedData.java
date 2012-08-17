@@ -110,14 +110,17 @@ public final class GenCAdESEPESSignedData {
 
         final Date signDate = new Date();
 
+        // Ya que el contenido de la firma puede ser grande, lo obtenemos solo al principio
+        final byte[] content = parameters.getContent();
+
         final byte[] preSignature = CAdESTriPhaseSigner.preSign(
             AOSignConstants.getDigestAlgorithmName(signatureAlgorithm),
-            (omitContent) ? null : parameters.getContent(),
+            (omitContent) ? null : content,
             signerCertificateChain,
             policy,
             signingCertificateV2,
-            (messageDigest == null && parameters.getContent() != null) ?
-                MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(signatureAlgorithm)).digest(parameters.getContent()) :
+            (messageDigest == null && content != null) ?
+                MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(signatureAlgorithm)).digest(content) :
                     messageDigest,
             signDate,
             padesMode,
@@ -129,19 +132,19 @@ public final class GenCAdESEPESSignedData {
 
         return CAdESTriPhaseSigner.postSign(
             AOSignConstants.getDigestAlgorithmName(signatureAlgorithm),
-            (omitContent) ? null : parameters.getContent(),
+            (omitContent) ? null : content,
             signerCertificateChain,
             signature,
             // Volvemos a crear la prefirma simulando una firma trifasica en la que la postfirma no cuenta con el
             // resultado de la prefirma
             CAdESTriPhaseSigner.preSign(
                 AOSignConstants.getDigestAlgorithmName(signatureAlgorithm),
-                (omitContent) ? null : parameters.getContent(),
+                (omitContent) ? null : content,
                 signerCertificateChain,
                 policy,
                 signingCertificateV2,
-                (messageDigest == null && parameters.getContent() != null) ?
-                    MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(signatureAlgorithm)).digest(parameters.getContent()) :
+                (messageDigest == null && content != null) ?
+                    MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(signatureAlgorithm)).digest(content) :
                         messageDigest,
                 signDate,
                 padesMode,

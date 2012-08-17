@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -157,9 +157,12 @@ public final class GenSignedData {
         ContentInfo encInfo;
         final ASN1ObjectIdentifier contentTypeOID = new ASN1ObjectIdentifier(dataType);
 
+        // Ya que el contenido puede ser grande, lo recuperamos solo una vez
+        byte[] content2 = null;
+
         if (!omitContent) {
             final ByteArrayOutputStream bOut = new ByteArrayOutputStream();
-            final byte[] content2 = parameters.getContent();
+            content2 = parameters.getContent();
             final CMSProcessable msg = new CMSProcessableByteArray(content2);
             try {
                 msg.write(bOut);
@@ -210,7 +213,7 @@ public final class GenSignedData {
         // ATRIBUTOS FIRMADOS
         final ASN1Set signedAttr =
                 generateSignedInfo(digestAlgorithm,
-                                   parameters.getContent(),
+                                   content2 != null ? content2 : parameters.getContent(),
                                    dataType,
                                    applyTimestamp,
                                    atrib,

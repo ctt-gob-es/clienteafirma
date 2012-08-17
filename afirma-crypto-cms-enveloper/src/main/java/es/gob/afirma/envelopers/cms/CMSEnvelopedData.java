@@ -94,6 +94,9 @@ public final class CMSEnvelopedData {
                                    final Map<String, byte[]> uatrib) throws IOException, CertificateEncodingException, NoSuchAlgorithmException, AOException {
         this.cipherKey = Utils.initEnvelopedData(config, certDest);
 
+        // Ya que el contenido puede ser grande, lo recuperamos solo una vez
+        final byte[] content2 = parameters.getContent();
+
         // Datos previos &uacute;tiles
         final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(parameters.getSignatureAlgorithm());
 
@@ -109,10 +112,10 @@ public final class CMSEnvelopedData {
         }
 
         // 2. RECIPIENTINFOS
-        final Info infos = Utils.initVariables(parameters.getContent(), config, certDest, this.cipherKey);
+        final Info infos = Utils.initVariables(content2, config, certDest, this.cipherKey);
 
         // 4. ATRIBUTOS
-        final ASN1Set unprotectedAttrs = Utils.generateSignerInfo(digestAlgorithm, parameters.getContent(), dataType, uatrib);
+        final ASN1Set unprotectedAttrs = Utils.generateSignerInfo(digestAlgorithm, content2, dataType, uatrib);
 
         // construimos el Enveloped Data y lo devolvemos
         return new ContentInfo(PKCSObjectIdentifiers.envelopedData, new EnvelopedData(origInfo,

@@ -141,6 +141,9 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
                                        final Map<String, byte[]> uatrib) throws IOException, CertificateEncodingException, NoSuchAlgorithmException, AOException {
         this.cipherKey = Utils.initEnvelopedData(config, certDest);
 
+        // Ya que el contenido puede ser grande, lo recuperamos solo una vez
+        final byte[] content2 = parameters.getContent();
+
         // 1. ORIGINATORINFO
         // obtenemos la lista de certificados
         final X509Certificate[] signerCertificateChain = parameters.getSignerCertificateChain();
@@ -157,7 +160,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
         }
 
         // 2. RECIPIENTINFOS
-        final Info infos = Utils.initVariables(parameters.getContent(), config, certDest, this.cipherKey);
+        final Info infos = Utils.initVariables(content2, config, certDest, this.cipherKey);
 
         // 3. MACALGORITHM
         final AlgorithmIdentifier macAlgorithm = SigUtils.makeAlgId(config.getAlgorithm().getOid());
@@ -174,7 +177,6 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
         ContentInfo encInfo = null;
         final ASN1ObjectIdentifier contentTypeOID = new ASN1ObjectIdentifier(dataType);
         final ByteArrayOutputStream bOut = new ByteArrayOutputStream();
-        final byte[] content2 = parameters.getContent();
         final CMSProcessable msg = new CMSProcessableByteArray(content2);
         try {
             msg.write(bOut);
@@ -186,7 +188,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 
         // 6. ATRIBUTOS FIRMADOS
         ASN1Set authAttr = null;
-        authAttr = generateSignedAtt(signerCertificateChain[0], digestAlgorithm, parameters.getContent(), dataType, applyTimestamp, atrib);
+        authAttr = generateSignedAtt(signerCertificateChain[0], digestAlgorithm, content2, dataType, applyTimestamp, atrib);
 
         // 7. MAC
         final byte[] mac = Utils.genMac(autenticationAlgorithm, authAttr.getDEREncoded(), this.cipherKey);
