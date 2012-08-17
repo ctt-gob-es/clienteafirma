@@ -45,11 +45,11 @@ import org.bouncycastle.asn1.x509.TBSCertificateStructure;
 import org.bouncycastle.asn1.x509.X509CertificateStructure;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.signers.AOPkcs1Signer;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.signers.cades.CAdESUtils;
-import es.gob.afirma.signers.cades.PKCS1ExternalizableSigner;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.SigUtils;
@@ -1024,6 +1024,6 @@ final class CAdESCounterSignerEnveloped {
             throw new AOException("Error obteniendo los atributos firmados: " + ex); //$NON-NLS-1$
         }
 
-        return new DEROctetString(PKCS1ExternalizableSigner.sign(signatureAlgorithm, keyEntry.getPrivateKey(), tmp));
+        return new DEROctetString(new AOPkcs1Signer().sign(tmp, signatureAlgorithm, keyEntry, null));
     }
 }
