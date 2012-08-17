@@ -183,6 +183,11 @@ public final class MassiveSignatureHelper {
             this.addLog(MassiveSignMessages.getString("MassiveSignatureHelper.2") + REG_FIELD_SEPARATOR + this.massiveConfiguration.getMassiveOperation() + REG_FIELD_SEPARATOR + e.getMessage()); //$NON-NLS-1$
             return null;
         }
+		catch (final OutOfMemoryError e) {
+			LOGGER.severe("Error de falta de memoria durante la firma: " + e); //$NON-NLS-1$
+			this.addLog(MassiveSignMessages.getString("MassiveSignatureHelper.16")); //$NON-NLS-1$
+			return null;
+		}
 
         this.addLog(MassiveSignMessages.getString("MassiveSignatureHelper.3")); //$NON-NLS-1$
 
@@ -230,6 +235,11 @@ public final class MassiveSignatureHelper {
             this.addLog(MassiveSignMessages.getString("MassiveSignatureHelper.5") + REG_FIELD_SEPARATOR + operation + REG_FIELD_SEPARATOR + e.getMessage()); //$NON-NLS-1$
             return null;
         }
+		catch (final OutOfMemoryError e) {
+			LOGGER.severe("Error de falta de memoria durante la firma: " + e); //$NON-NLS-1$
+			this.addLog(MassiveSignMessages.getString("MassiveSignatureHelper.16")); //$NON-NLS-1$
+			return null;
+		}
 
         this.addLog("Operaci\u00F3n sobre hash: Correcta"); //$NON-NLS-1$
 
@@ -334,6 +344,11 @@ public final class MassiveSignatureHelper {
             this.addLog(MassiveSignMessages.getString("MassiveSignatureHelper.14") + REG_FIELD_SEPARATOR + e.getMessage()); //$NON-NLS-1$
             return null;
         }
+		catch (final OutOfMemoryError e) {
+			LOGGER.severe("Error de falta de memoria durante la firma: " + e); //$NON-NLS-1$
+			this.addLog(MassiveSignMessages.getString("MassiveSignatureHelper.16")); //$NON-NLS-1$
+			return null;
+		}
 
         this.addLog(MassiveSignMessages.getString("MassiveSignatureHelper.15")); //$NON-NLS-1$
 

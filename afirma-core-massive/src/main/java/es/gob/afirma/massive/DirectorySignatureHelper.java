@@ -612,6 +612,13 @@ public class DirectorySignatureHelper {
                 allOK = false;
                 continue;
             }
+			catch (final OutOfMemoryError e) {
+				LOGGER.severe("Error de falta de memoria durante la firma: " + e); //$NON-NLS-1$
+				this.addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.8")); //$NON-NLS-1$
+                DirectorySignatureHelper.closeStream(fis);
+                allOK = false;
+                continue;
+			}
 
         	// Para los formatos PDF, ODF y OOXML, en los que la firma de un documento firmado es
         	// una cofirma, se agrega la particula "cosign" en lugar de "signed" si los datos estaban
@@ -765,6 +772,11 @@ public class DirectorySignatureHelper {
             this.addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.11") + REG_FIELD_SEPARATOR + signConfig.getProperty(URI_STR)); //$NON-NLS-1$
             signedData = null;
         }
+		catch (final OutOfMemoryError e) {
+			LOGGER.severe("Error de falta de memoria durante la cofirma: " + e); //$NON-NLS-1$
+			this.addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.8")); //$NON-NLS-1$
+            signedData = null;
+		}
         return signedData;
     }
 
@@ -809,10 +821,6 @@ public class DirectorySignatureHelper {
         catch (final Exception e) {
             LOGGER.severe("No ha sido posible firmar el fichero de datos '" + signConfig.getProperty(URI_STR) + "': " + e);  //$NON-NLS-1$//$NON-NLS-2$
             this.addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.13") + REG_FIELD_SEPARATOR + signConfig.getProperty(URI_STR)); //$NON-NLS-1$
-
-            //TODO: Borrar
-            e.printStackTrace();
-
             return null;
         }
 
@@ -889,6 +897,12 @@ public class DirectorySignatureHelper {
                     allOK = false;
                     continue;
                 }
+    			catch (final OutOfMemoryError e) {
+    				LOGGER.severe("Error de falta de memoria durante la firma: " + e); //$NON-NLS-1$
+    				this.addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.8")); //$NON-NLS-1$
+                    allOK = false;
+                    continue;
+    			}
                 finally {
                     DirectorySignatureHelper.closeStream(fis);
                 }
