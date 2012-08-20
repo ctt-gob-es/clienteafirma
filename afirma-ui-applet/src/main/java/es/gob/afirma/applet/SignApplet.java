@@ -189,7 +189,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 	}
 
 	void setSignData(final byte[] data) {
-		this.signData = data == null ? null : data.clone();
+		// Establecemos los datos sin clonarlos ya que este metodo solo se utiliza internamenamente y
+		// no se modificara su contenido
+		this.signData = data == null ? null : data;
 	}
 
 	// /** Indica que parte del buffer de datos ya ha sido le&iacute;do y
@@ -1538,10 +1540,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 					catch (final AOException e) {
 						// El metodo getInDataStream ya se habra
 						// encargado de establecer el mensaje en caso de
-						// error
+						// error (Incluido el OutOfMemoryError)
 						return Boolean.FALSE;
 					}
-
 					// Configuramos el mimetype de los datos
 					configureDataTypeExtraParams(SignApplet.this.getGenericConfig());
 				}
@@ -1810,6 +1811,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 				catch (final AOException e) {
 					// El metodo getInDataStream ya se habra encargado
 					// de establecer el mensaje en caso de error
+					// (Incluido el OutOfMemoryError)
 					return Boolean.FALSE;
 				}
 
@@ -1942,9 +1944,10 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 					SignApplet.this.setError(AppletMessages.getString("SignApplet.154")); //$NON-NLS-1$
 					return Boolean.FALSE;
 				}
-				SignApplet.this.setSignData(outputBuffer);
 
 				SignApplet.this.setError(null);
+
+				SignApplet.this.setSignData(outputBuffer);
 
 				return Boolean.TRUE;
 			}
@@ -2154,6 +2157,11 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 					this.setError(AppletMessages.getString("SignApplet.407")); //$NON-NLS-1$
 					throw new AOException(e.getMessage(), e);
 				}
+				catch (final OutOfMemoryError e) {
+					LOGGER.severe("Error de falta de memoria al cargar los datos de entrada: " + e); //$NON-NLS-1$
+					this.setError(AppletMessages.getString("SignApplet.493")); //$NON-NLS-1$
+					throw new AOException(e.getMessage(), e);
+				}
 			} // Se nos ha introducido un hash
 			else {
 				tempData = this.hash;
@@ -2165,7 +2173,14 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
 		// Si la entrada son datos o un fichero lo analizamos
 		if (this.data != null || this.fileUri != null) {
-			analizeMimeType(tempData);
+			try {
+				analizeMimeType(tempData);
+			}
+			catch (final OutOfMemoryError e) {
+				LOGGER.severe("Error de falta de memoria al analizar los datos de entrada: " + e); //$NON-NLS-1$
+				this.setError(AppletMessages.getString("SignApplet.493")); //$NON-NLS-1$
+				throw new AOException(e.getMessage(), e);
+			}
 		}
 
 		return tempData;
@@ -2465,7 +2480,6 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 				catch (final OutOfMemoryError e) {
 					SignApplet.this.setError(AppletMessages.getString("SignApplet.493")); //$NON-NLS-1$
 					getLogger().severe("Error de falta de memoria durante la firma: " + e); //$NON-NLS-1$
-					SignApplet.this.setError(AppletMessages.getString("SignApplet.493")); //$NON-NLS-1$
 					firmaWeb = null;
 				}
 
@@ -2582,12 +2596,21 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 		catch (final Exception e) {
 			LOGGER.severe("No se ha podido recuperar la firma electronica: " + e); //$NON-NLS-1$
 			SignApplet.this.setError(AppletMessages.getString("SignApplet.64")); //$NON-NLS-1$
+			return ""; //$NON-NLS-1$
 		}
 		catch (final OutOfMemoryError e) {
-			getLogger().severe("Error de falta de memoria durante el descifrado: " + e); //$NON-NLS-1$
+			LOGGER.severe("Error de falta de memoria al recuperar la firma electronica: " + e); //$NON-NLS-1$
 			SignApplet.this.setError(AppletMessages.getString("SignApplet.493")); //$NON-NLS-1$
+			return ""; //$NON-NLS-1$
 		}
-		return (sign == null) ? null : Base64.encode(sign);
+
+		try {
+			return (sign == null) ? null : Base64.encode(sign);
+		} catch (final OutOfMemoryError e) {
+			LOGGER.severe("Error de falta de memoria al recuperar la firma electronica: " + e); //$NON-NLS-1$
+			SignApplet.this.setError(AppletMessages.getString("SignApplet.493")); //$NON-NLS-1$
+			return ""; //$NON-NLS-1$
+		}
 	}
 
 	/** {@inheritDoc} */
@@ -2956,6 +2979,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 		} catch (final Exception e) {
 			LOGGER.warning("Los datos insertados no estan en Base64: " + e); //$NON-NLS-1$
 
+		} catch (final OutOfMemoryError e) {
+			LOGGER.severe("Error de falta de memoria al establecer los datos cifrados: " + e); //$NON-NLS-1$
+			SignApplet.this.setError(AppletMessages.getString("SignApplet.493")); //$NON-NLS-1$
 		}
 	}
 
@@ -2967,19 +2993,35 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 		} catch (final Exception e) {
 			LOGGER.warning("Los datos insertados no estan en Base64: " + e); //$NON-NLS-1$
 			this.data = null;
+		} catch (final OutOfMemoryError e) {
+			LOGGER.severe("Error de falta de memoria al establecer los datos en claro: " + e); //$NON-NLS-1$
+			SignApplet.this.setError(AppletMessages.getString("SignApplet.493")); //$NON-NLS-1$
 		}
 	}
 
 	/** {@inheritDoc} */
 	public String getCipherData() {
 		LOGGER.info("Invocando getCipherData"); //$NON-NLS-1$
-		return Base64.encode(this.cipherManager.getCipheredData());
+		try {
+			return Base64.encode(this.cipherManager.getCipheredData());
+		} catch (final OutOfMemoryError e) {
+			LOGGER.severe("Error de falta de memoria al recuperar los datos cifrados: " + e); //$NON-NLS-1$
+			SignApplet.this.setError(AppletMessages.getString("SignApplet.493")); //$NON-NLS-1$
+			return ""; //$NON-NLS-1$
+		}
 	}
 
 	/** {@inheritDoc} */
 	public String getPlainData() {
 		LOGGER.info("Invocando getPlainData"); //$NON-NLS-1$
-		return this.cipherManager.getPlainData() == null ? null : Base64.encode(this.cipherManager.getPlainData());
+		try {
+			return this.cipherManager.getPlainData() == null ?
+					null : Base64.encode(this.cipherManager.getPlainData());
+		} catch (final OutOfMemoryError e) {
+			LOGGER.severe("Error de falta de memoria al establecer los datos cifrados: " + e); //$NON-NLS-1$
+			SignApplet.this.setError(AppletMessages.getString("SignApplet.493")); //$NON-NLS-1$
+			return ""; //$NON-NLS-1$
+		}
 	}
 
 	/** {@inheritDoc} */
@@ -3190,16 +3232,16 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 			AccessController.doPrivileged(new CipherAction(this.cipherManager, dat));
 		} catch (final PrivilegedActionException e) {
 			if (e.getCause() instanceof AOCancelledOperationException) {
-				setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
 				LOGGER.severe("Error: " + e.toString()); //$NON-NLS-1$
+				setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
 				return false;
 			}
-			setError(AppletMessages.getString("SignApplet.93")); //$NON-NLS-1$
 			LOGGER.severe("Error: " + e.toString()); //$NON-NLS-1$
+			setError(AppletMessages.getString("SignApplet.93")); //$NON-NLS-1$
 			return false;
 		}
 		catch (final OutOfMemoryError e) {
-			getLogger().severe("Error de falta de memoria durante el cifrado: " + e); //$NON-NLS-1$
+			LOGGER.severe("Error de falta de memoria durante el cifrado: " + e); //$NON-NLS-1$
 			SignApplet.this.setError(AppletMessages.getString("SignApplet.493")); //$NON-NLS-1$
 			return false;
 		}
@@ -3530,7 +3572,8 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 			contentData = (dat != null ? dat : getInData());
 		}
 		catch (final AOException e) {
-			return false; // getInData() establece el mensaje en caso de error
+			// getInData() establece el mensaje en caso de error (Incluido el OutOfMemoryError)
+			return false;
 		}
 
 		if (contentType != null) {
@@ -3548,17 +3591,17 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 			this.data = AccessController.doPrivileged(new WrapAction(this.enveloperManager, contentData));
 		} catch (final PrivilegedActionException e) {
 			if (e.getCause() instanceof AOCancelledOperationException) {
-				setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
 				LOGGER.severe(e.toString());
+				setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
 				return false;
 			}
-			setError(AppletMessages.getString("SignApplet.65")); //$NON-NLS-1$
 			LOGGER.severe(e.toString());
+			setError(AppletMessages.getString("SignApplet.65")); //$NON-NLS-1$
 			return false;
 		}
 		catch (final OutOfMemoryError e) {
-			setError(AppletMessages.getString("SignApplet.493")); //$NON-NLS-1$
 			LOGGER.severe("Error de falta de memoria durante el ensobrado: " + e); //$NON-NLS-1$
+			setError(AppletMessages.getString("SignApplet.493")); //$NON-NLS-1$
 			return false;
 		}
 		return true;
@@ -3622,26 +3665,26 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 			this.data = AccessController.doPrivileged(new UnwrapAction(this.enveloperManager, contentData));
 		} catch (final PrivilegedActionException e) {
 			if (e.getCause() instanceof AOCancelledOperationException) {
-				setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
 				LOGGER.severe(e.toString());
+				setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
 				return false;
 			} else if (e.getCause() instanceof AOInvalidRecipientException) {
-				setError(AppletMessages.getString("SignApplet.112")); //$NON-NLS-1$
 				LOGGER.severe(e.toString());
+				setError(AppletMessages.getString("SignApplet.112")); //$NON-NLS-1$
 				return false;
 			} else if (e.getCause() instanceof AOInvalidFormatException) {
-				setError(AppletMessages.getString("SignApplet.75")); //$NON-NLS-1$
 				LOGGER.severe(e.toString());
+				setError(AppletMessages.getString("SignApplet.75")); //$NON-NLS-1$
 				return false;
 			} else {
-				setError(AppletMessages.getString("SignApplet.77")); //$NON-NLS-1$
 				LOGGER.severe(e.toString());
+				setError(AppletMessages.getString("SignApplet.77")); //$NON-NLS-1$
 				return false;
 			}
 		}
 		catch (final OutOfMemoryError e) {
-			setError(AppletMessages.getString("SignApplet.493")); //$NON-NLS-1$
 			LOGGER.severe("Error de falta de memoria al recuperar desensobrar: " + e); //$NON-NLS-1$
+			setError(AppletMessages.getString("SignApplet.493")); //$NON-NLS-1$
 			return false;
 		}
 		return true;
@@ -3689,7 +3732,13 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 			LOGGER.warning("No se dispone de datos de salida, se devolvera cadena vacia"); //$NON-NLS-1$
 			return "";  //$NON-NLS-1$
 		}
-		return Base64.encode(this.data);
+		try {
+			return Base64.encode(this.data);
+		} catch (final OutOfMemoryError e) {
+			LOGGER.severe("Error de falta de memoria al recuperar los datos: " + e); //$NON-NLS-1$
+			SignApplet.this.setError(AppletMessages.getString("SignApplet.493")); //$NON-NLS-1$
+			return ""; //$NON-NLS-1$
+		}
 	}
 
 	/** {@inheritDoc} */
@@ -3698,7 +3747,13 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 		if (this.data == null) {
 			LOGGER.warning("No se dispone de datos de salida, se devolvera cadena vacia"); //$NON-NLS-1$
 		}
-		return (this.data == null ? "" : new String(this.data)); //$NON-NLS-1$
+		try {
+			return (this.data == null ? "" : new String(this.data)); //$NON-NLS-1$
+		} catch (final OutOfMemoryError e) {
+			LOGGER.severe("Error de falta de memoria al recuperar los datos: " + e); //$NON-NLS-1$
+			SignApplet.this.setError(AppletMessages.getString("SignApplet.493")); //$NON-NLS-1$
+			return ""; //$NON-NLS-1$
+		}
 	}
 
 	/** {@inheritDoc} */

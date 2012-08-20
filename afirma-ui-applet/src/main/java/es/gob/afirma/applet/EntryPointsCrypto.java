@@ -1120,9 +1120,11 @@ interface EntryPointsCrypto {
 	void setMandatoryCertificateCondition(String certFilter);
 
     /** Establece los los datos cifrados en base 64 que se van a descifrar
-     * mediante una pr&oacute;xima llamada a <code>decipherData()</code>. <br>
+     * mediante una pr&oacute;xima llamada a <code>decipherData()</code>. Si los datos son
+     * demasiado grandes, se obtendr&aacute; un error.<br>
      * <br>
      * Sets the encrypted data in base 64 to be decrypted by a call to <code>decipherData()</code>.
+     * If data is too large, a error will setting.
      * @param data
      *        Datos cifrados en base 64. <br>
      *        Encrypted data in base 64. */
@@ -1137,21 +1139,23 @@ interface EntryPointsCrypto {
      *        Plain data to be encrypted. */
     void setPlainData(String data);
 
-    /** Devuelve los datos cifrados. Si no se han establecido datos cifrados, se
+    /** Devuelve los datos cifrados. Si se produce un error o no se han establecido datos cifrados, se
      * devolver&aacute; <code>null</code> <br>
      * <br>
-     * Returns the encrypted data. If no encrypted data have been set, <code>null</code> will be returned.
+     * Returns the encrypted data. If the operation doesn't end succesfully or no encrypted data have
+     * been set, <code>null</code> will be returned.
      * @return String en Base64 con el texto cifrado. <br>
      *         Base64 string, with the encrypted text. */
     String getCipherData();
 
     /** Devuelve los datos planos que se han introducido para cifrar o el texto
      * resultado de un descifrado (lo &uacute;ltimo que haya ocurrido). En caso
-     * de no haber ocurrido ninguna de estas condiciones, se devolver&aacute; <code>null</code>. <br>
+     * de ocurrir un error durante la operaci&oacute;n o no haber ocurrido ninguna
+     * de estas condiciones, se devolver&aacute; <code>null</code>. <br>
      * <br>
      * Returns the plain data that has been introduced to encrypt, or the text
-     * resulting from a decryption (whichever comes last). If none of this
-     * conditions are met, <code>null</code> is returned.
+     * resulting from a decryption (whichever comes last). If the operation doesn't end succesfully or
+     * none of this conditions are met, <code>null</code> is returned.
      * @return String Texto plano de la operaci&oacute;n de cifrado /
      *         descifrado. <br>
      *         Plain text string of the encryption/decryption operation. */
