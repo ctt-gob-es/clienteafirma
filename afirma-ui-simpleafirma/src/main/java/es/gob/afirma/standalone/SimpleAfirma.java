@@ -31,7 +31,6 @@ import java.util.prefs.Preferences;
 
 import javax.smartcardio.TerminalFactory;
 import javax.swing.JApplet;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -219,15 +218,15 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
             else {
                 this.window.setJMenuBar(this.mainMenu);
                 this.mainMenu.setEnabledOpenCommand(true);
-                if (firstTime) {
-                	MainMenuManager.setMenuManagement(
-            			this.window.getRootPane().getActionMap(),
-            			this.window.getRootPane().getInputMap(
-                			JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
-            			),
-            			SimpleAfirma.this.getMainMenu()
-        			);
-                }
+//                if (firstTime) {
+//                	MainMenuManager.setMenuManagement(
+//            			this.window.getRootPane().getActionMap(),
+//            			this.window.getRootPane().getInputMap(
+//                			JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
+//            			),
+//            			SimpleAfirma.this.getMainMenu()
+//        			);
+//                }
             }
         }
         final JPanel newPanel = new SignPanel(this.window, this, firstTime);
@@ -323,8 +322,8 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 
     /** Listado de localizaciones soportadas por la aplicaci&oacute;n. */
     private static Locale[] locales = new Locale[] {
-            Locale.getDefault(), new Locale("en") //$NON-NLS-1$
-            };
+        Locale.getDefault()
+    };
 
     /** Obtiene los idiomas disponibles para la aplicaci&oacute;n
      * @return Locales disponibles para la aplicaci&oacute;n */
@@ -333,8 +332,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
     }
 
     /** Establece el idioma de la aplicaci&oacute;n.
-     * @param l
-     *        Locale a establecer */
+     * @param l Locale a establecer */
     public void setDefaultLocale(final Locale l) {
         if (l != null) {
             Locale.setDefault(l);

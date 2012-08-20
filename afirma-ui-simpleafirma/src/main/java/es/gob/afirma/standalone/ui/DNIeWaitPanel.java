@@ -143,6 +143,7 @@ public final class DNIeWaitPanel extends JPanel implements KeyListener {
         createUI(pcl);
     }
 
+    /** {@inheritDoc} */
 	@Override
 	public void keyPressed(final KeyEvent ke) {
 		if (ke != null && ke.getKeyCode() == KeyEvent.VK_ESCAPE) {
@@ -153,9 +154,11 @@ public final class DNIeWaitPanel extends JPanel implements KeyListener {
         }
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public void keyReleased(final KeyEvent arg0) { /* No necesario */ }
 
+	/** {@inheritDoc} */
 	@Override
 	public void keyTyped(final KeyEvent arg0) { /* No necesario */ }
 
