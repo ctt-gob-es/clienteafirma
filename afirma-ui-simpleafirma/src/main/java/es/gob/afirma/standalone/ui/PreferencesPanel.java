@@ -22,6 +22,7 @@ import java.util.prefs.Preferences;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -31,6 +32,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
+import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
 
 @SuppressWarnings("nls")
@@ -125,10 +127,30 @@ final class PreferencesPanel extends JPanel {
 		return this.policyQualifier;
 	}
 
+	private final JTextField padesSignReason = new JTextField();
+	private final JTextField padesSignProductionCity = new JTextField();
+	private final JTextField padesSignerContact = new JTextField();
+	
+	private final JCheckBox cadesImplicit = new JCheckBox("Incluir una copia de los datos firmados en la propia firma");
+	
+	private final JTextField xadesSignatureProductionCity = new JTextField();
+	private final JTextField xadesSignatureProductionProvince = new JTextField();
+	private final JTextField xadesSignatureProductionPostalCode = new JTextField();
+	private final JTextField xadesSignatureProductionCountry = new JTextField();
+	private final JTextField xadesSignerClaimedRole = new JTextField();
+	private final JTextField xadesSignerCertifiedRole = new JTextField();
+	private final JComboBox xadesSignFormat = new JComboBox(new String[] {
+      AOSignConstants.SIGN_FORMAT_XADES_DETACHED,
+      AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED,
+      AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING,
+	});
 
 	void createUI() {
 		final JTabbedPane tabbedPane = new JTabbedPane();
 		tabbedPane.addTab("General", createGeneralPanel());
+		tabbedPane.addTab("Firmas PAdES (PDF)", createPadesPanel());
+		tabbedPane.addTab("Firmas CAdES (binarias)", createCadesPanel());
+		tabbedPane.addTab("Firmas XAdES (XML)", createXadesPanel());
 
 		add(tabbedPane);
 		add(createButtonsPanel());
@@ -148,7 +170,7 @@ final class PreferencesPanel extends JPanel {
 			catch(final Exception e) {
 				JOptionPane.showMessageDialog(
 					this,
-					"<html><p>" + "Los datos de la política de firma son inválidos" + ":<br>" + e.getLocalizedMessage() + "</p></html>", //$NON-NLS-1$ //$NON-NLS-3$ //$NON-NLS-4$
+					"<html><p>" + "Los datos de la pol\u00EDtica de firma son inv\u00E1lidos" + ":<br>" + e.getLocalizedMessage() + "</p></html>", //$NON-NLS-1$ //$NON-NLS-3$ //$NON-NLS-4$
 					"Error",
 					JOptionPane.ERROR_MESSAGE
 				);
@@ -169,9 +191,64 @@ final class PreferencesPanel extends JPanel {
 		PreferencesPanel.PREFERENCES.put(PREFERENCE_SIGNATURE_ALGORITHM, this.signarureAlgorithms.getSelectedItem().toString());
 	}
 
+	private JPanel createXadesPanel() {
+        final JPanel panel = new JPanel();
+        
+        final JPanel metadata = new JPanel();
+        metadata.setBorder(BorderFactory.createTitledBorder("Metadatos de las firmas XAdES"));
+        metadata.setLayout(new GridLayout(0,1));
+        
+        final JLabel xadesSignatureProductionProvinceLabel = new JLabel("Provincia o regi\u00F3n en la que se realiza la firma");
+        xadesSignatureProductionProvinceLabel.setLabelFor(this.xadesSignatureProductionProvince);
+        metadata.add(xadesSignatureProductionProvinceLabel);
+        metadata.add(this.xadesSignatureProductionProvince);
+        
+        final JLabel xadesSignatureProductionPostalCodeLabel = new JLabel("C\u00F3digo postal del lugar en el que se realiza la firma");
+        xadesSignatureProductionPostalCodeLabel.setLabelFor(this.xadesSignatureProductionPostalCode);
+        metadata.add(xadesSignatureProductionPostalCodeLabel);
+        metadata.add(this.xadesSignatureProductionPostalCode);
+        
+        final JLabel xadesSignatureProductionCityLabel = new JLabel("Ciudad en la que se realiza la firma");
+        xadesSignatureProductionCityLabel.setLabelFor(this.xadesSignatureProductionCity);
+        metadata.add(xadesSignatureProductionCityLabel);
+        metadata.add(this.xadesSignatureProductionCity);
+        
+        final JLabel xadesSignatureProductionCountryLabel = new JLabel("Pa\u00EDs en el que se realiza la firma");
+        xadesSignatureProductionCountryLabel.setLabelFor(this.xadesSignatureProductionCountry);
+        metadata.add(xadesSignatureProductionCountryLabel);
+        metadata.add(this.xadesSignatureProductionCountry);
+        
+        final JLabel xadesSignerClaimedRoleLabel = new JLabel("Cargo atribuido al firmante");
+        xadesSignerClaimedRoleLabel.setLabelFor(this.xadesSignerClaimedRole);
+        metadata.add(xadesSignerClaimedRoleLabel);
+        metadata.add(this.xadesSignerClaimedRole);
+        
+        final JLabel xadesSignerCertifiedRoleLabel = new JLabel("Cargo real del firmante");
+        xadesSignerCertifiedRoleLabel.setLabelFor(this.xadesSignerCertifiedRole);
+        metadata.add(xadesSignerCertifiedRoleLabel);
+        metadata.add(this.xadesSignerCertifiedRole);
+        
+        final JPanel format = new JPanel();
+        format.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), "Formato de las firmas XAdES"));
+        format.add(this.xadesSignFormat);
+        
+        panel.add(metadata);
+        panel.add(format);
+        return panel;
+	}
+	
+	private JPanel createCadesPanel() {
+	    final JPanel panel = new JPanel();
+	    final JPanel signatureMode = new JPanel();
+	    signatureMode.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), "Opciones de firma"));
+	    signatureMode.add(this.cadesImplicit);
+	    panel.add(signatureMode);
+	    return panel;
+	}
+	
 	private JPanel createGeneralPanel() {
 		final JPanel panel = new JPanel();
-		panel.setBorder(BorderFactory.createTitledBorder("Opciones de firma"));
+		panel.setBorder(BorderFactory.createTitledBorder("Opciones generales de firma"));
 		final JPanel signatureAgorithmPanel = new JPanel();
 		signatureAgorithmPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), "Algoritmo de firma"));
 		this.signarureAlgorithms.setModel(new DefaultComboBoxModel(new String[] {
@@ -186,20 +263,45 @@ final class PreferencesPanel extends JPanel {
 		panel.add(createPolicyPanel());
 		return panel;
 	}
+	
+	private JPanel createPadesPanel() {
+	    final JPanel panel = new JPanel();
+	    
+        panel.setLayout(new GridLayout(0,1));
+	        
+	    panel.setBorder(BorderFactory.createTitledBorder("Metadatos de las firmas PAdES"));
+	    
+	    final JLabel padesSignReasonLabel = new JLabel("Raz\u00F3n por la que se firma el documento");
+	    padesSignReasonLabel.setLabelFor(this.padesSignReason);
+	    panel.add(padesSignReasonLabel);
+	    panel.add(this.padesSignReason);
+	    
+	    final JLabel padesSignProductionCityLabel = new JLabel("Ciudad en la que se realiza la firma");
+	    padesSignProductionCityLabel.setLabelFor(this.padesSignProductionCity);
+	    panel.add(padesSignProductionCityLabel);
+	    panel.add(this.padesSignProductionCity);
+	    
+	    final JLabel padesSignerContactLabel = new JLabel("Contacto del firmante (usualmente una direcci\u00F3n de coreo electr\u00F3nico)");
+	    padesSignerContactLabel.setLabelFor(this.padesSignerContact);
+	    panel.add(padesSignerContactLabel);
+	    panel.add(this.padesSignerContact);
+	    
+	      
+	    return panel;
+	}
 
 	private JPanel createPolicyPanel() {
 		final JPanel panel = new JPanel();
 
-		final GridLayout layout = new GridLayout(0,1);
-		panel.setLayout(layout);
+		panel.setLayout(new GridLayout(0,1));
 
-		panel.setBorder(BorderFactory.createTitledBorder("Política de firma"));
+		panel.setBorder(BorderFactory.createTitledBorder("Pol\u00EDtica de firma"));
 
 		// Los elementos del menu desplegable se identifican por su orden
 		this.policies.setModel(new DefaultComboBoxModel(new String[] {
-			"Ninguna política",				// Ninguna política, debe ser el primer elemento
-			"Política de firma de la AGE",	// Politica de la AGE, debe ser el segundo elemento
-			"Política a medida"				// Politica a medida, debe ser el último elemento
+			"Ninguna pol\u00EDtica",			// Ninguna política, debe ser el primer elemento
+			"Pol\u00EDtica de firma de la AGE",	// Politica de la AGE, debe ser el segundo elemento
+			"Pol\u00EDtica a medida"			// Politica a medida, debe ser el último elemento
 		}));
 		panel.add(this.policies);
 		this.policies.addItemListener(new ItemListener() {
@@ -220,25 +322,25 @@ final class PreferencesPanel extends JPanel {
 		final boolean enableTextFields = this.policies.getSelectedIndex() == (this.policies.getItemCount()-1);
 
 		this.policyIdentifier.setEnabled(enableTextFields);
-		final JLabel policyIdentifierLabel = new JLabel("Identificador de la política (URI)");
+		final JLabel policyIdentifierLabel = new JLabel("Identificador de la pol\u00EDtica (URI)");
 		policyIdentifierLabel.setLabelFor(this.policyIdentifier);
 		panel.add(policyIdentifierLabel);
 		panel.add(this.policyIdentifier);
 
 		this.policyIdentifierHash.setEnabled(enableTextFields);
-		final JLabel policyIdentifierHashLabel = new JLabel("Huella digital del identificador de la política (en Base64)");
+		final JLabel policyIdentifierHashLabel = new JLabel("Huella digital del identificador de la pol\u00EDtica (en Base64)");
 		policyIdentifierHashLabel.setLabelFor(this.policyIdentifierHash);
 		panel.add(policyIdentifierHashLabel);
 		panel.add(this.policyIdentifierHash);
 
 		this.policyIdentifierHashAlgorithm.setEnabled(enableTextFields);
-		final JLabel policyIdentifierHashAlgorithmLabel = new JLabel("Algoritmo de la huella digital del identificador de la política");
+		final JLabel policyIdentifierHashAlgorithmLabel = new JLabel("Algoritmo de la huella digital del identificador de la pol\u00EDtica");
 		policyIdentifierHashAlgorithmLabel.setLabelFor(this.policyIdentifierHashAlgorithm);
 		panel.add(policyIdentifierHashAlgorithmLabel);
 		panel.add(this.policyIdentifierHashAlgorithm);
 
 		this.policyQualifier.setEnabled(enableTextFields);
-		final JLabel policyQualifierLabel = new JLabel("Calificador de la política (URL)");
+		final JLabel policyQualifierLabel = new JLabel("Calificador de la pol\u00EDtica (URL)");
 		policyQualifierLabel.setLabelFor(this.policyQualifier);
 		panel.add(policyQualifierLabel);
 		panel.add(this.policyQualifier);
@@ -262,7 +364,7 @@ final class PreferencesPanel extends JPanel {
 		final JButton cancelButton = new JButton("Cancelar");
 		cancelButton.setMnemonic('C');
 		cancelButton.getAccessibleContext().setAccessibleDescription(
-			"Cancela el establecimiento de preferencias descartando los cambios realizados desde la última vez que se guardaron"
+			"Cancela el establecimiento de preferencias descartando los cambios realizados desde la \u00FAltima vez que se guardaron"
 		);
 		panel.add(cancelButton);
 		final JButton acceptButton = new JButton("Aceptar");
@@ -295,13 +397,18 @@ final class PreferencesPanel extends JPanel {
 	}
 
 	PreferencesPanel() {
-		SwingUtilities.invokeLater(new Runnable() {
-			/** {@inheritDoc} */
-			@Override
-			public void run() {
-				createUI();
-			}
-		});
+		try {
+            SwingUtilities.invokeAndWait(new Runnable() {
+            	/** {@inheritDoc} */
+            	@Override
+            	public void run() {
+            		createUI();
+            	}
+            });
+        }
+        catch (final Exception e) {
+            throw new IllegalStateException("No se ha podido crear el GUI: " + e, e);
+        }
 	}
 
 	void loadPolicy(final AdESPolicy policy) {
