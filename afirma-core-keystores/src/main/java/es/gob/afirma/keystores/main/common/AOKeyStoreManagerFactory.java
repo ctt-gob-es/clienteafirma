@@ -24,8 +24,8 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.dnie.DnieUnifiedKeyStoreManager;
-import es.gob.afirma.keystores.dnie.pkcs12.Pkcs12KeyStoreManager;
 import es.gob.afirma.keystores.main.callbacks.NullPasswordCallback;
+import es.gob.afirma.keystores.pkcs12.Pkcs12KeyStoreManager;
 
 /** Obtiene clases de tipo AOKeyStoreManager seg&uacute;n se necesiten,
  * proporcionando adem&aacute;s ciertos m&eacute;todos de utilidad. Contiene

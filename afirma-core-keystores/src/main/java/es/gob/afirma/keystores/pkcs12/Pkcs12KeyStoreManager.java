@@ -8,7 +8,7 @@
  * You may contact the copyright holder at: soporte.afirma5@mpt.es
  */
 
-package es.gob.afirma.keystores.dnie.pkcs12;
+package es.gob.afirma.keystores.pkcs12;
 
 import java.io.IOException;
 import java.io.InputStream;
