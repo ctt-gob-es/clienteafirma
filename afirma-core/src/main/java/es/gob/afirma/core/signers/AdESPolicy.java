@@ -150,4 +150,22 @@ public final class AdESPolicy {
         return this.policyQualifier;
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public boolean equals(final Object o) {
+    	if (!(o instanceof AdESPolicy)) {
+    		return false;
+    	}
+    	final AdESPolicy other = (AdESPolicy) o;
+    	return other.getPolicyIdentifier().equals(getPolicyIdentifier()) &&
+    		   other.getPolicyIdentifierHash().equals(getPolicyIdentifierHash()) &&
+    		   other.getPolicyIdentifierHashAlgorithm().equals(getPolicyIdentifierHashAlgorithm()) /*&&
+    		   other.getPolicyQualifier().equals(getPolicyQualifier())*/;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public int hashCode() {
+    	return getPolicyIdentifier().hashCode();
+    }
 }
