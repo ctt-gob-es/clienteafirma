@@ -27,6 +27,7 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import com.lowagie.text.DocumentException;
+import com.lowagie.text.Image;
 import com.lowagie.text.Jpeg;
 import com.lowagie.text.Rectangle;
 import com.lowagie.text.exceptions.BadPasswordException;
@@ -48,6 +49,7 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.SHA2AltNamesProvider;
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -133,29 +135,66 @@ public final class AOPDFSigner implements AOSigner {
      * @param xParams Par&aacute;metros adicionales para la firma.
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
      * <dl>
-     *  <dt><b><i>applySystemDate</i></b></dt>
-     *   <dd><code>true</code> si se desea usar la hora y fecha del sistema como hora y fecha de firma, <code>false</code> en caso contrario.
-     *  <dt><b><i>signReason</i></b></dt>
-     *   <dd>Raz&oacute;n por la que se realiza la firma (este dato se a&ntilde;ade al diccionario PDF, y no a la propia firma).</dd>
-     *  <dt><b><i>signField</i></b></dt>
+     *  <dt><b><i>signatureField</i></b></dt>
      *   <dd>
      *    Nombre del campo en donde insertar la firma.
      *    Si el documento PDF tiene ya un campo de firma precreado es posible utilizarlo para insertar la firma generada, referenci&aacute;ndolo
      *    por su nombre.<br>
      *    Si se indica un nombre de campo de firma que no exista en el documento PDF proporcionado, se generar&aacute; una excepci&oacute;n.
      *   </dd>
+     *  <dt><b><i>signatureRubricImage</i></b></dt>
+     *   <dd>Imagen JPEG codificada en Base64 de la r&uacute;brica de la firma manuscrita que se desea aparezca como firma visible en el PDF.</dd>
+     *  <dt><b><i>signaturePage</i></b></dt>
+     *   <dd>
+     *    P&aacute;gina del documento PDF donde insertar la firma. Puede usarse la constante <code>LAST_PAGE</code>
+     *    para referirse a la &uacute;ltima p&aacute;gina del documento PDF si se desconoce el n&uacute;mero total de
+     *    p&aacute;ginas de este.<br>
+     *    Este par&aacute;metro se ignora si se ha establecido valor al par&aacute;metro <i>signatureField</i> y necesita que se
+     *    establezcan valores v&aacute;lidos a los par&aacute;metros <i>signaturePositionOnPageLowerLeftX</i>, <i>signaturePositionOnPageLowerLeftY</i>,
+     *    <i>signaturePositionOnPageUpperRightX</i> y <i>signaturePositionOnPageUpperRightY</i>.
+     *   </dd>
+     *  <dt><b><i>signaturePositionOnPageLowerLeftX</i></b></dt>
+     *   <dd>
+     *    Coordenada horizontal inferior izquiera de la posici&oacute;n del recuadro visible de la fimra dentro de la p&aacute;gina.<br>
+     *    Es necesario indicar el resto de coordenadas del recuadro mediante los par&aacute;metros <i>signaturePositionOnPageLowerLeftY</i>,
+     *    <i>signaturePositionOnPageUpperRightX</i> y <i>signaturePositionOnPageUpperRightY</i>.<br>
+     *    Si no se indica una p&aacute;gina en el par&aacute;metro <i>signaturePage</i> la firma se inserta en la &uacute;ltima p&aacute;gina
+     *    del documento.
+     *   </dd>
+     *  <dt><b><i>signaturePositionOnPageLowerLeftY</i></b></dt>
+     *   <dd>
+     *    Coordenada vertical inferior izquiera de la posici&oacute;n del recuadro visible de la fimra dentro de la p&aacute;gina.<br>
+     *    Es necesario indicar el resto de coordenadas del recuadro mediante los par&aacute;metros <i>signaturePositionOnPageLowerLeftX</i>,
+     *    <i>signaturePositionOnPageUpperRightX</i> y <i>signaturePositionOnPageUpperRightY</i>.<br>
+     *    Si no se indica una p&aacute;gina en el par&aacute;metro <i>signaturePage</i> la firma se inserta en la &uacute;ltima p&aacute;gina
+     *    del documento.
+     *   </dd>
+     *  <dt><b><i>signaturePositionOnPageUpperRightX</i></b></dt>
+     *   <dd>
+     *    Coordenada horizontal superior derecha de la posici&oacute;n del recuadro visible de la fimra dentro de la p&aacute;gina.<br>
+     *    Es necesario indicar el resto de coordenadas del recuadro mediante los par&aacute;metros <i>signaturePositionOnPageLowerLeftX</i>,
+     *    <i>signaturePositionOnPageLowerLeftY</i> y <i>signaturePositionOnPageUpperRightY</i>.<br>
+     *    Si no se indica una p&aacute;gina en el par&aacute;metro <i>signaturePage</i> la firma se inserta en la &uacute;ltima p&aacute;gina
+     *    del documento.
+     *   </dd>
+     *  <dt><b><i>signaturePositionOnPageUpperRightY</i></b></dt>
+     *   <dd>
+     *    Coordenada vertical superior derecha de la posici&oacute;n del recuadro visible de la fimra dentro de la p&aacute;gina.<br>
+     *    Es necesario indicar el resto de coordenadas del recuadro mediante los par&aacute;metros <i>signaturePositionOnPageLowerLeftX</i>,
+     *    <i>signaturePositionOnPageLowerLeftY</i> y <i>signaturePositionOnPageUpperRightX</i>.<br>
+     *    Si no se indica una p&aacute;gina en el par&aacute;metro <i>signaturePage</i> la firma se inserta en la &uacute;ltima p&aacute;gina
+     *    del documento.
+     *   </dd>
+     *  <dt><b><i>applySystemDate</i></b></dt>
+     *   <dd><code>true</code> si se desea usar la hora y fecha del sistema como hora y fecha de firma, <code>false</code> en caso contrario.
+     *  <dt><b><i>signReason</i></b></dt>
+     *   <dd>Raz&oacute;n por la que se realiza la firma (este dato se a&ntilde;ade al diccionario PDF, y no a la propia firma).</dd>
      *  <dt><b><i>signatureProductionCity</i></b></dt>
      *   <dd>Ciudad en la que se realiza la firma (este dato se a&ntilde;ade al diccionario PDF, y no a la propia firma).</dd>
      *  <dt><b><i>signerContact</i></b></dt>
      *   <dd>
      *    Contacto del firmante, usualmente una direcci&oacute;n de coreo electr&oacute;nico
      *    (este dato se a&ntilde;ade al diccionario PDF, y no a la propia firma).
-     *   </dd>
-     *  <dt><b><i>signaturePage</i></b></dt>
-     *   <dd>
-     *    P&aacute;gina del documento PDF donde insertar la firma. Puede usarse la constante <code>LAST_PAGE</code>
-     *    para referirse a la &uacute;ltima p&aacute;gina del documento PDF si se desconoce el n&uacute;mero total de
-     *    p&aacute;ginas de este.
      *   </dd>
      *  <dt><b><i>policyIdentifier</i></b></dt>
      *   <dd>
@@ -300,17 +339,60 @@ public final class AOPDFSigner implements AOSigner {
      * @param extraParams Par&aacute;metros adicionales para la firma.
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>extraParams</code>:</p>
      * <dl>
-     *  <dt><b><i>applySystemDate</i></b></dt>
-     *   <dd><code>true</code> si se desea usar la hora y fecha del sistema como hora y fecha de firma, <code>false</code> en caso contrario.
-     *  <dt><b><i>signReason</i></b></dt>
-     *   <dd>Raz&oacute;n por la que se realiza la firma (este dato se a&ntilde;ade al diccionario PDF, y no a la propia firma).</dd>
-     *  <dt><b><i>signField</i></b></dt>
+     *  <dt><b><i>signatureField</i></b></dt>
      *   <dd>
      *    Nombre del campo en donde insertar la firma.
      *    Si el documento PDF tiene ya un campo de firma precreado es posible utilizarlo para insertar la firma generada, referenci&aacute;ndolo
      *    por su nombre.<br>
      *    Si se indica un nombre de campo de firma que no exista en el documento PDF proporcionado, se generar&aacute; una excepci&oacute;n.
      *   </dd>
+     *  <dt><b><i>signatureRubricImage</i></b></dt>
+     *   <dd>Imagen JPEG codificada en Base64 de la r&uacute;brica de la firma manuscrita que se desea aparezca como firma visible en el PDF.</dd>
+     *  <dt><b><i>signaturePage</i></b></dt>
+     *   <dd>
+     *    P&aacute;gina del documento PDF donde insertar la firma. Puede usarse la constante <code>LAST_PAGE</code>
+     *    para referirse a la &uacute;ltima p&aacute;gina del documento PDF si se desconoce el n&uacute;mero total de
+     *    p&aacute;ginas de este.<br>
+     *    Este par&aacute;metro se ignora si se ha establecido valor al par&aacute;metro <i>signatureField</i> y necesita que se
+     *    establezcan valores v&aacute;lidos a los par&aacute;metros <i>signaturePositionOnPageLowerLeftX</i>, <i>signaturePositionOnPageLowerLeftY</i>,
+     *    <i>signaturePositionOnPageUpperRightX</i> y <i>signaturePositionOnPageUpperRightY</i>.
+     *   </dd>
+     *  <dt><b><i>signaturePositionOnPageLowerLeftX</i></b></dt>
+     *   <dd>
+     *    Coordenada horizontal inferior izquiera de la posici&oacute;n del recuadro visible de la fimra dentro de la p&aacute;gina.<br>
+     *    Es necesario indicar el resto de coordenadas del recuadro mediante los par&aacute;metros <i>signaturePositionOnPageLowerLeftY</i>,
+     *    <i>signaturePositionOnPageUpperRightX</i> y <i>signaturePositionOnPageUpperRightY</i>.<br>
+     *    Si no se indica una p&aacute;gina en el par&aacute;metro <i>signaturePage</i> la firma se inserta en la &uacute;ltima p&aacute;gina
+     *    del documento.
+     *   </dd>
+     *  <dt><b><i>signaturePositionOnPageLowerLeftY</i></b></dt>
+     *   <dd>
+     *    Coordenada vertical inferior izquiera de la posici&oacute;n del recuadro visible de la fimra dentro de la p&aacute;gina.<br>
+     *    Es necesario indicar el resto de coordenadas del recuadro mediante los par&aacute;metros <i>signaturePositionOnPageLowerLeftX</i>,
+     *    <i>signaturePositionOnPageUpperRightX</i> y <i>signaturePositionOnPageUpperRightY</i>.<br>
+     *    Si no se indica una p&aacute;gina en el par&aacute;metro <i>signaturePage</i> la firma se inserta en la &uacute;ltima p&aacute;gina
+     *    del documento.
+     *   </dd>
+     *  <dt><b><i>signaturePositionOnPageUpperRightX</i></b></dt>
+     *   <dd>
+     *    Coordenada horizontal superior derecha de la posici&oacute;n del recuadro visible de la fimra dentro de la p&aacute;gina.<br>
+     *    Es necesario indicar el resto de coordenadas del recuadro mediante los par&aacute;metros <i>signaturePositionOnPageLowerLeftX</i>,
+     *    <i>signaturePositionOnPageLowerLeftY</i> y <i>signaturePositionOnPageUpperRightY</i>.<br>
+     *    Si no se indica una p&aacute;gina en el par&aacute;metro <i>signaturePage</i> la firma se inserta en la &uacute;ltima p&aacute;gina
+     *    del documento.
+     *   </dd>
+     *  <dt><b><i>signaturePositionOnPageUpperRightY</i></b></dt>
+     *   <dd>
+     *    Coordenada vertical superior derecha de la posici&oacute;n del recuadro visible de la fimra dentro de la p&aacute;gina.<br>
+     *    Es necesario indicar el resto de coordenadas del recuadro mediante los par&aacute;metros <i>signaturePositionOnPageLowerLeftX</i>,
+     *    <i>signaturePositionOnPageLowerLeftY</i> y <i>signaturePositionOnPageUpperRightX</i>.<br>
+     *    Si no se indica una p&aacute;gina en el par&aacute;metro <i>signaturePage</i> la firma se inserta en la &uacute;ltima p&aacute;gina
+     *    del documento.
+     *   </dd>
+     *  <dt><b><i>applySystemDate</i></b></dt>
+     *   <dd><code>true</code> si se desea usar la hora y fecha del sistema como hora y fecha de firma, <code>false</code> en caso contrario.
+     *  <dt><b><i>signReason</i></b></dt>
+     *   <dd>Raz&oacute;n por la que se realiza la firma (este dato se a&ntilde;ade al diccionario PDF, y no a la propia firma).</dd>
      *  <dt><b><i>signatureProductionCity</i></b></dt>
      *   <dd>Ciudad en la que se realiza la firma (este dato se a&ntilde;ade al diccionario PDF, y no a la propia firma).</dd>
      *  <dt><b><i>signerContact</i></b></dt>
@@ -318,15 +400,9 @@ public final class AOPDFSigner implements AOSigner {
      *    Contacto del firmante, usualmente una direcci&oacute;n de coreo electr&oacute;nico
      *    (este dato se a&ntilde;ade al diccionario PDF, y no a la propia firma).
      *   </dd>
-     *  <dt><b><i>signaturePage</i></b></dt>
-     *   <dd>
-     *    P&aacute;gina del documento PDF donde insertar la firma. Puede usarse la constante <code>LAST_PAGE</code>
-     *    para referirse a la &uacute;ltima p&aacute;gina del documento PDF si se desconoce el n&uacute;mero total de
-     *    p&aacute;ginas de este.
-     *   </dd>
      *  <dt><b><i>policyIdentifier</i></b></dt>
      *   <dd>
-     *    Identificadora de la pol&iacute;tica de firma. Debe ser un OID (o una URN de tipo OID) que identifique
+     *    Identificador de la pol&iacute;tica de firma. Debe ser un OID (o una URN de tipo OID) que identifique
      *    &uacute;nivocamente la pol&iacute;tica en formato ASN.1 procesable.
      *   </dd>
      *  <dt><b><i>policyIdentifierHash</i></b></dt>
@@ -435,17 +511,60 @@ public final class AOPDFSigner implements AOSigner {
      * @param extraParams Par&aacute;metros adicionales para la firma.
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>extraParams</code>:</p>
      * <dl>
-     *  <dt><b><i>applySystemDate</i></b></dt>
-     *   <dd><code>true</code> si se desea usar la hora y fecha del sistema como hora y fecha de firma, <code>false</code> en caso contrario.
-     *  <dt><b><i>signReason</i></b></dt>
-     *   <dd>Raz&oacute;n por la que se realiza la firma (este dato se a&ntilde;ade al diccionario PDF, y no a la propia firma).</dd>
-     *  <dt><b><i>signField</i></b></dt>
+     *  <dt><b><i>signatureField</i></b></dt>
      *   <dd>
      *    Nombre del campo en donde insertar la firma.
      *    Si el documento PDF tiene ya un campo de firma precreado es posible utilizarlo para insertar la firma generada, referenci&aacute;ndolo
      *    por su nombre.<br>
      *    Si se indica un nombre de campo de firma que no exista en el documento PDF proporcionado, se generar&aacute; una excepci&oacute;n.
      *   </dd>
+     *  <dt><b><i>signatureRubricImage</i></b></dt>
+     *   <dd>Imagen JPEG codificada en Base64 de la r&uacute;brica de la firma manuscrita que se desea aparezca como firma visible en el PDF.</dd>
+     *  <dt><b><i>signaturePage</i></b></dt>
+     *   <dd>
+     *    P&aacute;gina del documento PDF donde insertar la firma. Puede usarse la constante <code>LAST_PAGE</code>
+     *    para referirse a la &uacute;ltima p&aacute;gina del documento PDF si se desconoce el n&uacute;mero total de
+     *    p&aacute;ginas de este.<br>
+     *    Este par&aacute;metro se ignora si se ha establecido valor al par&aacute;metro <i>signatureField</i> y necesita que se
+     *    establezcan valores v&aacute;lidos a los par&aacute;metros <i>signaturePositionOnPageLowerLeftX</i>, <i>signaturePositionOnPageLowerLeftY</i>,
+     *    <i>signaturePositionOnPageUpperRightX</i> y <i>signaturePositionOnPageUpperRightY</i>.
+     *   </dd>
+     *  <dt><b><i>signaturePositionOnPageLowerLeftX</i></b></dt>
+     *   <dd>
+     *    Coordenada horizontal inferior izquiera de la posici&oacute;n del recuadro visible de la fimra dentro de la p&aacute;gina.<br>
+     *    Es necesario indicar el resto de coordenadas del recuadro mediante los par&aacute;metros <i>signaturePositionOnPageLowerLeftY</i>,
+     *    <i>signaturePositionOnPageUpperRightX</i> y <i>signaturePositionOnPageUpperRightY</i>.<br>
+     *    Si no se indica una p&aacute;gina en el par&aacute;metro <i>signaturePage</i> la firma se inserta en la &uacute;ltima p&aacute;gina
+     *    del documento.
+     *   </dd>
+     *  <dt><b><i>signaturePositionOnPageLowerLeftY</i></b></dt>
+     *   <dd>
+     *    Coordenada vertical inferior izquiera de la posici&oacute;n del recuadro visible de la fimra dentro de la p&aacute;gina.<br>
+     *    Es necesario indicar el resto de coordenadas del recuadro mediante los par&aacute;metros <i>signaturePositionOnPageLowerLeftX</i>,
+     *    <i>signaturePositionOnPageUpperRightX</i> y <i>signaturePositionOnPageUpperRightY</i>.<br>
+     *    Si no se indica una p&aacute;gina en el par&aacute;metro <i>signaturePage</i> la firma se inserta en la &uacute;ltima p&aacute;gina
+     *    del documento.
+     *   </dd>
+     *  <dt><b><i>signaturePositionOnPageUpperRightX</i></b></dt>
+     *   <dd>
+     *    Coordenada horizontal superior derecha de la posici&oacute;n del recuadro visible de la fimra dentro de la p&aacute;gina.<br>
+     *    Es necesario indicar el resto de coordenadas del recuadro mediante los par&aacute;metros <i>signaturePositionOnPageLowerLeftX</i>,
+     *    <i>signaturePositionOnPageLowerLeftY</i> y <i>signaturePositionOnPageUpperRightY</i>.<br>
+     *    Si no se indica una p&aacute;gina en el par&aacute;metro <i>signaturePage</i> la firma se inserta en la &uacute;ltima p&aacute;gina
+     *    del documento.
+     *   </dd>
+     *  <dt><b><i>signaturePositionOnPageUpperRightY</i></b></dt>
+     *   <dd>
+     *    Coordenada vertical superior derecha de la posici&oacute;n del recuadro visible de la fimra dentro de la p&aacute;gina.<br>
+     *    Es necesario indicar el resto de coordenadas del recuadro mediante los par&aacute;metros <i>signaturePositionOnPageLowerLeftX</i>,
+     *    <i>signaturePositionOnPageLowerLeftY</i> y <i>signaturePositionOnPageUpperRightX</i>.<br>
+     *    Si no se indica una p&aacute;gina en el par&aacute;metro <i>signaturePage</i> la firma se inserta en la &uacute;ltima p&aacute;gina
+     *    del documento.
+     *   </dd>
+     *  <dt><b><i>applySystemDate</i></b></dt>
+     *   <dd><code>true</code> si se desea usar la hora y fecha del sistema como hora y fecha de firma, <code>false</code> en caso contrario.
+     *  <dt><b><i>signReason</i></b></dt>
+     *   <dd>Raz&oacute;n por la que se realiza la firma (este dato se a&ntilde;ade al diccionario PDF, y no a la propia firma).</dd>
      *  <dt><b><i>signatureProductionCity</i></b></dt>
      *   <dd>Ciudad en la que se realiza la firma (este dato se a&ntilde;ade al diccionario PDF, y no a la propia firma).</dd>
      *  <dt><b><i>signerContact</i></b></dt>
@@ -453,15 +572,9 @@ public final class AOPDFSigner implements AOSigner {
      *    Contacto del firmante, usualmente una direcci&oacute;n de coreo electr&oacute;nico
      *    (este dato se a&ntilde;ade al diccionario PDF, y no a la propia firma).
      *   </dd>
-     *  <dt><b><i>signaturePage</i></b></dt>
-     *   <dd>
-     *    P&aacute;gina del documento PDF donde insertar la firma. Puede usarse la constante <code>LAST_PAGE</code>
-     *    para referirse a la &uacute;ltima p&aacute;gina del documento PDF si se desconoce el n&uacute;mero total de
-     *    p&aacute;ginas de este.
-     *   </dd>
      *  <dt><b><i>policyIdentifier</i></b></dt>
      *   <dd>
-     *    Identificadora de la pol&iacute;tica de firma. Debe ser un OID (o una URN de tipo OID) que identifique
+     *    Identificador de la pol&iacute;tica de firma. Debe ser un OID (o una URN de tipo OID) que identifique
      *    &uacute;nivocamente la pol&iacute;tica en formato ASN.1 procesable.
      *   </dd>
      *  <dt><b><i>policyIdentifierHash</i></b></dt>
@@ -519,6 +632,9 @@ public final class AOPDFSigner implements AOSigner {
      *   <dd>Nombre de usuario de la TSA.</dd>
      *  <dt><b><i>tsaPwd</i></b></dt>
      *   <dd>Contrase&ntilde;a del usuario de la TSA. Se ignora si no de ha establecido adem&aacute;s <code>tsaUsr</code>.</dd>
+     *  <dt><b><i>signingCertificateV2</i></b></dt>
+     *   <dd>Si se indica a {@code true} se utilizar SigningCertificateV2, si se indica cualquier otra cosa SigningCertificateV1.
+     *   Si no se indica nada, se utilizar&aacute; V1 para las firmas SHA1 y V2 para el resto.</dd>
      * </dl>
      * @return Documento PDF firmado en formato PAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
@@ -726,6 +842,7 @@ public final class AOPDFSigner implements AOSigner {
             );
         }
         catch (final Exception e) {
+        	LOGGER.severe("Se ha indicado una posicion de firma invalida: " + e); //$NON-NLS-1$
             return null;
         }
     }
@@ -743,7 +860,7 @@ public final class AOPDFSigner implements AOSigner {
 
         final boolean useSystemDateTime = Boolean.parseBoolean(extraParams.getProperty("applySystemDate", Boolean.TRUE.toString())); //$NON-NLS-1$
         final String reason = extraParams.getProperty("signReason"); //$NON-NLS-1$
-        final String signField = extraParams.getProperty("signField"); //$NON-NLS-1$
+        final String signatureField = extraParams.getProperty("signatureField"); //$NON-NLS-1$
         final String signatureProductionCity = extraParams.getProperty("signatureProductionCity"); //$NON-NLS-1$
         final String signerContact = extraParams.getProperty("signerContact"); //$NON-NLS-1$
         int page = 1;
@@ -948,11 +1065,11 @@ public final class AOPDFSigner implements AOSigner {
 
         // Posicion de la firma
         final Rectangle signaturePositionOnPage = getSignaturePositionOnPage(extraParams);
-        if (signaturePositionOnPage != null && signField == null) {
+        if (signaturePositionOnPage != null && signatureField == null) {
             sap.setVisibleSignature(signaturePositionOnPage, page, null);
         }
-        else if (signField != null) {
-            sap.setVisibleSignature(signField);
+        else if (signatureField != null) {
+            sap.setVisibleSignature(signatureField);
         }
 
         // Localizacion en donde se produce la firma
@@ -966,15 +1083,9 @@ public final class AOPDFSigner implements AOSigner {
         }
 
         // Rubrica de la firma
-        if (this.rubric != null) {
-            try {
-                sap.setImage(new Jpeg(this.rubric));
-            }
-            catch (final Exception e) {
-                LOGGER.severe(
-                  "No se pudo establecer la imagen de firma para el documento PDF, no se usara imagen: " + e //$NON-NLS-1$
-                );
-            }
+        final Image rubric = getRubricImage(extraParams.getProperty("signatureRubricImage")); //$NON-NLS-1$
+        if (rubric != null) {
+            sap.setImage(rubric);
         }
 
         final X509Certificate[] chain = (X509Certificate[]) ke.getCertificateChain();
@@ -1080,16 +1191,6 @@ public final class AOPDFSigner implements AOSigner {
         return baos.toByteArray();
     }
 
-    /** R&uacute;brica de la firma. */
-    private byte[] rubric = null;
-
-    /** Establece la r&uacute;brica de la firma.
-     * @param rubric
-     *        Imagen de la r&uacute;brica (JPEG en binario). */
-    public void setRubric(final byte[] rubric) {
-        this.rubric = (rubric != null) ? rubric.clone() : null;
-    }
-
     /** Obtiene el nombre con el que deber&iacute;a guardarse un PDF tras ser
      * firmado. B&aacute;sicamente se le anexa el sufijo <i>.signed</i> al
      * nombre original, manteniendo la extensi&oacute;n (se respetan
@@ -1151,4 +1252,26 @@ public final class AOPDFSigner implements AOSigner {
             throw new InvalidITextException(ITEXT_VERSION, itextVersion);
         }
     }
+
+    private static com.lowagie.text.Image getRubricImage(final String imagebase64Encoded) {
+    	if (imagebase64Encoded == null || "".equals(imagebase64Encoded)) { //$NON-NLS-1$
+    		return null;
+    	}
+    	final byte[] image;
+    	try {
+			image = Base64.decode(imagebase64Encoded);
+		}
+    	catch (final Exception e) {
+    		LOGGER.severe("Se ha proporcionado una imagen de rubrica que no esta codificada en Base64: " + e); //$NON-NLS-1$
+			return null;
+		}
+    	try {
+			return new Jpeg(image);
+		}
+    	catch (final Exception e) {
+    		LOGGER.severe("Se ha proporcionado una imagen de rubrica que no esta codificada en JPEG: " + e); //$NON-NLS-1$
+			return null;
+		}
+    }
+
 }
