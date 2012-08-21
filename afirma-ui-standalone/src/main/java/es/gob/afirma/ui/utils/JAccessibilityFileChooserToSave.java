@@ -57,8 +57,6 @@ public final class JAccessibilityFileChooserToSave extends JAccessibilityFileCho
 	private ResizingAdaptor resizingAdaptor;
 	private JDialog dialog;
 
-	private JButton restoreButton = null;
-	private JButton maximizeButton = null;
 	private JPanel accesibilityButtonsPanel = null;
 
 //	private static int actualPositionX = -1;
@@ -419,7 +417,7 @@ public final class JAccessibilityFileChooserToSave extends JAccessibilityFileCho
 
 		//Restore button
 		final JPanel restorePanel = new JPanel();
-		ImageIcon imageIconRestore= new ImageIcon(JAccessibilityFileChooser.class.getResource("/resources/images/restore.png"));
+		ImageIcon imageIconRestore= new ImageIcon(JAccessibilityFileChooser.class.getResource("/resources/images/restore.png")); //$NON-NLS-1$
 		imageIconRestore = new ImageIcon(imageIconRestore.getImage().getScaledInstance(dimension.width, dimension.height, Image.SCALE_SMOOTH));
 		this.restoreButton = new JButton(imageIconRestore);
 		this.restoreButton.setMnemonic(KeyEvent.VK_R );
@@ -461,7 +459,7 @@ public final class JAccessibilityFileChooserToSave extends JAccessibilityFileCho
 		//Maximize button
 		final JPanel maximizePanel = new JPanel();
 
-		ImageIcon imageIconMaximize = new ImageIcon(JAccessibilityFileChooser.class.getResource("/resources/images/maximize.png"));
+		ImageIcon imageIconMaximize = new ImageIcon(JAccessibilityFileChooser.class.getResource("/resources/images/maximize.png")); //$NON-NLS-1$
 		imageIconMaximize = new ImageIcon(imageIconMaximize.getImage().getScaledInstance(dimension.width, dimension.height, Image.SCALE_SMOOTH));
 		this.maximizeButton = new JButton(imageIconMaximize);
 		this.maximizeButton.setMnemonic(KeyEvent.VK_M );
@@ -514,14 +512,14 @@ public final class JAccessibilityFileChooserToSave extends JAccessibilityFileCho
 
 		// Habilitado/Deshabilitado de botones restaurar/maximizar
     	if (GeneralConfig.isMaximized() || isMaximized()){
-    		//Se deshabilita el botón de maximizado
+    		//Se deshabilita el boton de maximizado
     		this.maximizeButton.setEnabled(false);
-    		//Se habilita el botón de restaurar
+    		//Se habilita el boton de restaurar
     		this.restoreButton.setEnabled(true);
     	} else {
-    		//Se habilita el botón de maximizado
+    		//Se habilita el boton de maximizado
     		this.maximizeButton.setEnabled(true);
-    		//Se deshabilita el botón de restaurar
+    		//Se deshabilita el boton de restaurar
     		this.restoreButton.setEnabled(false);
     	}
 		return panelAccesibilidad;
