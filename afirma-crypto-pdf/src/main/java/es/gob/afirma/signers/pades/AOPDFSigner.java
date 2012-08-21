@@ -863,7 +863,7 @@ public final class AOPDFSigner implements AOSigner {
         final String signatureField = extraParams.getProperty("signatureField"); //$NON-NLS-1$
         final String signatureProductionCity = extraParams.getProperty("signatureProductionCity"); //$NON-NLS-1$
         final String signerContact = extraParams.getProperty("signerContact"); //$NON-NLS-1$
-        int page = 1;
+        int page = LAST_PAGE;
         try {
             page = Integer.parseInt(extraParams.getProperty("signaturePage")); //$NON-NLS-1$
         }
