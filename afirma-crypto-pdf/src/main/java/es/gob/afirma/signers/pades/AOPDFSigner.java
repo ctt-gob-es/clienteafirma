@@ -1084,8 +1084,6 @@ public final class AOPDFSigner implements AOSigner {
         final Image rubric = getRubricImage(extraParams.getProperty("signatureRubricImage")); //$NON-NLS-1$
         if (rubric != null) {
             sap.setImage(rubric);
-        }
-        else {
             sap.setLayer2Text(""); //$NON-NLS-1$
             sap.setLayer4Text(""); //$NON-NLS-1$
         }

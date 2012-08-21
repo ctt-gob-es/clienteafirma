@@ -13,10 +13,8 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.signers.pades.AOPDFSigner;
 
-/**
- *
- * @author Carlos Gamuci
- */
+/** Pruebas de firmas PDF visibles.
+ * @author Carlos Gamuci */
 public class TestSignField {
 
 	private final static String TEST_FILE = "TEST_PDF.pdf"; //$NON-NLS-1$
@@ -29,6 +27,9 @@ public class TestSignField {
 	private final static String CERT_PASS = "12341234"; //$NON-NLS-1$
 	private final static String CERT_ALIAS = "anf usuario activo"; //$NON-NLS-1$
 
+	/** Prueba de firma PDF visible sin r&uacute;brica.
+	 * @throws Exception */
+	@SuppressWarnings("static-method")
 	@Test
 	public void testCampoDeFirmaSoloConPosiciones() throws Exception {
 
@@ -63,6 +64,9 @@ public class TestSignField {
 				tempFile.getAbsolutePath());
 	}
 
+	/** Prueba de firma PDF visible con r&uacute;brica.
+	 * @throws Exception */
+	@SuppressWarnings("static-method")
 	@Test
 	public void testCampoDeFirmaConPosicionesYRubrica() throws Exception {
 
