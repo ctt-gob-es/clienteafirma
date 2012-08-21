@@ -176,7 +176,7 @@ public final class JAccessibilityFileChooserToSave extends JAccessibilityFileCho
 	        }
         }
 
-        this.dialog.setComponentOrientation(this .getComponentOrientation());     
+        this.dialog.setComponentOrientation(this .getComponentOrientation());
 
         final Container contentPane = this.dialog.getContentPane();
 
@@ -213,7 +213,7 @@ public final class JAccessibilityFileChooserToSave extends JAccessibilityFileCho
 
     			}
     		});
-        	
+
             for (int i = 0; i<this.getComponentCount();i++){
             	if (this.getComponent(i).getClass().getName().equals("javax.swing.JToolBar")){ //$NON-NLS-1$
             		this.jTool = (JToolBar)this.getComponent(i);
@@ -334,7 +334,7 @@ public final class JAccessibilityFileChooserToSave extends JAccessibilityFileCho
             if (GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
             	this.dialog.setMinimumSize(new Dimension(Constants.FILE_FONT_INITIAL_WIDTH, Constants.FILE_INITIAL_HEIGHT));
             } else {
-            	//En entornos Linux y MAC pinta la pantalla con un tamaño de fuente diferente al estándar
+            	//En entornos Linux y MAC pinta la pantalla con un tamano de fuente diferente al estandar
             	if (Platform.getOS().equals(Platform.OS.MACOSX) || Platform.getOS().equals(Platform.OS.LINUX)){
             		this.dialog.setMinimumSize(new Dimension(Constants.FILE_INITIAL_WIDTH_MAC, Constants.FILE_INITIAL_HEIGHT));
             	} else {
@@ -499,7 +499,7 @@ public final class JAccessibilityFileChooserToSave extends JAccessibilityFileCho
 
 		panel.add(maximizePanel, consButtons);
 
-		//Se aÃ±ade al panel general
+		//Se anade al panel general
 		//Restricciones para el panel de botones
 		final GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.NONE;
@@ -552,7 +552,7 @@ public final class JAccessibilityFileChooserToSave extends JAccessibilityFileCho
 		}
 		this.maximizeButton.setEnabled (true);
 		this.restoreButton.setEnabled (false);
-		
+
 		setIsMaximized(false);
 	}
 
@@ -565,12 +565,12 @@ public final class JAccessibilityFileChooserToSave extends JAccessibilityFileCho
 		setActualPositionY(this.theDialog.getY());
 		setActualWidth(this.theDialog.getWidth());
 		setActualHeight(this.theDialog.getHeight());
-		
+
 		this.maximizeButton.setEnabled (false);
 		this.restoreButton.setEnabled (true);
-		
+
 		this.theDialog.setBounds(0,0, (int)(getMaxDimension().getWidth()), (int)(getMaxDimension().getHeight()));
-		
+
 		setIsMaximized(true);
 	}
 

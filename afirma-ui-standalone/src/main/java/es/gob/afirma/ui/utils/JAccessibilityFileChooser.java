@@ -339,7 +339,7 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	        }
         }
 
-        this.dialog.setComponentOrientation(this .getComponentOrientation());    
+        this.dialog.setComponentOrientation(this .getComponentOrientation());
 
         final Container contentPane = this.dialog.getContentPane();
 
@@ -376,7 +376,7 @@ public class JAccessibilityFileChooser extends JFileChooser{
 
     			}
     		});
-        	
+
             for (int i = 0; i<this.getComponentCount();i++){
             	if (this.getComponent(i).getClass().getName().equals("javax.swing.JToolBar")){ //$NON-NLS-1$
             		this.jTool = (JToolBar)this.getComponent(i);
@@ -475,7 +475,7 @@ public class JAccessibilityFileChooser extends JFileChooser{
                         JRootPane.FILE_CHOOSER_DIALOG);
             }
         }
-        this.dialog.getRootPane().setDefaultButton(openButton);
+        this.dialog.getRootPane().setDefaultButton(this.openButton);
         this.dialog.setResizable(true);
         this.dialog.pack();
         this.dialog.setLocationRelativeTo(parent);
@@ -499,7 +499,7 @@ public class JAccessibilityFileChooser extends JFileChooser{
         if (GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
         	this.dialog.setMinimumSize(new Dimension(Constants.FILE_FONT_INITIAL_WIDTH, Constants.FILE_INITIAL_HEIGHT));
         } else {
-        	//En entornos Linux y MAC pinta la pantalla con un tamaño de fuente diferente al estándar
+        	//En entornos Linux y MAC pinta la pantalla con un tamano de fuente diferente al estandar
         	if (Platform.getOS().equals(Platform.OS.MACOSX) || Platform.getOS().equals(Platform.OS.LINUX)){
         		this.dialog.setMinimumSize(new Dimension(Constants.FILE_INITIAL_WIDTH_MAC, Constants.FILE_INITIAL_HEIGHT));
         	} else {
@@ -535,9 +535,9 @@ public class JAccessibilityFileChooser extends JFileChooser{
 				accessibility((JPanel)jPanel.getComponent(i));
 			} else {
 				if (jPanel.getComponent(i).getClass().getName().equals("com.sun.java.swing.plaf.windows.WindowsFileChooserUI$9")){
-					openButton = (JButton)jPanel.getComponent(i);
+					this.openButton = (JButton)jPanel.getComponent(i);
 				}
-				
+
 				Utils.remarcar((JComponent)jPanel.getComponent(i));
 				Utils.setFontBold((JComponent)jPanel.getComponent(i));
 				Utils.setContrastColor((JComponent)jPanel.getComponent(i));
@@ -569,8 +569,8 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	    	PrincipalGUI.setFileActualPositionY(this.dialog.getY());
 	    	PrincipalGUI.setFileActualWidth(this.dialog.getWidth());
 	    	PrincipalGUI.setFileActualHeight(this.dialog.getHeight());
-    	}		
-		
+    	}
+
 		if (getParent().getParent().getParent().getParent().getSize().equals(getMaxDimension())){
 	    	this.dialog.setResizable(false);
 	    } else {
@@ -735,7 +735,7 @@ public class JAccessibilityFileChooser extends JFileChooser{
 		}
 		this.maximizeButton.setEnabled (true);
 		this.restoreButton.setEnabled (false);
-		
+
 		isMaximized = false;
 	}
 
@@ -746,13 +746,13 @@ public class JAccessibilityFileChooser extends JFileChooser{
 		setActualPositionX(this.theDialog.getX());
 		setActualPositionY(this.theDialog.getY());
 		setActualWidth(this.theDialog.getWidth());
-		setActualHeight(this.theDialog.getHeight());		
+		setActualHeight(this.theDialog.getHeight());
 
 		this.maximizeButton.setEnabled (false);
-		this.restoreButton.setEnabled (true);	
-		
+		this.restoreButton.setEnabled (true);
+
 		this.theDialog.setBounds(0,0, (int)(getMaxDimension().getWidth()), (int)(getMaxDimension().getHeight()));
-				
+
 		isMaximized = true;
 	}
 
@@ -763,29 +763,29 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	public JPanel getAccesibilityButtonsPanel(){
 		return this.accesibilityButtonsPanel;
 	}
-	
+
 	/**
 	 * Devuelve el tama&ntilde;o m&aacute;ximo disponible para una ventana
 	 * @return Dimension m&aacute;ximo disponible.
 	 */
 	public Dimension getMaxDimension(){
-		
-		Dimension result = new Dimension();
+
+		final Dimension result = new Dimension();
 		//Se obtienen las dimensiones totales disponibles para mostrar una ventana
 		final Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
 
 		//Se obtienen las dimensiones de maximizado
 		final int maxWidth = (int)rect.getWidth();
 		final int maxHeight = (int)rect.getHeight();
-		
+
 		//Se hace el resize dependiendo del so
 		if (!Platform.getOS().equals(Platform.OS.LINUX)){
-			result.setSize(maxWidth, maxHeight);			
+			result.setSize(maxWidth, maxHeight);
 		}
 		else {
 			result.setSize(maxWidth, maxHeight - Constants.MAXIMIZE_VERTICAL_MARGIN_LINUX);
 		}
-		
+
 		return result;
 	}
 
@@ -813,7 +813,7 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	protected Boolean isMaximized(){
 		return isMaximized;
 	}
-	protected void setIsMaximized(Boolean actualIsMaximized){
+	protected void setIsMaximized(final Boolean actualIsMaximized){
 		isMaximized = actualIsMaximized;
 	}
 
