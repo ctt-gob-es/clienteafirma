@@ -1023,8 +1023,6 @@ public final class AOPDFSigner implements AOSigner {
         final PdfSignatureAppearance sap = stp.getSignatureAppearance();
         stp.setFullCompression();
         sap.setAcro6Layers(true);
-        sap.setLayer2Text(""); //$NON-NLS-1$
-        sap.setLayer4Text(""); //$NON-NLS-1$
 
         // iText antiguo
         sap.setRender(PdfSignatureAppearance.SignatureRenderDescription);
@@ -1086,6 +1084,10 @@ public final class AOPDFSigner implements AOSigner {
         final Image rubric = getRubricImage(extraParams.getProperty("signatureRubricImage")); //$NON-NLS-1$
         if (rubric != null) {
             sap.setImage(rubric);
+        }
+        else {
+            sap.setLayer2Text(""); //$NON-NLS-1$
+            sap.setLayer4Text(""); //$NON-NLS-1$
         }
 
         final X509Certificate[] chain = (X509Certificate[]) ke.getCertificateChain();
