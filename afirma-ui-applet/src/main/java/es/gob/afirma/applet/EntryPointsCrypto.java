@@ -494,8 +494,8 @@ interface EntryPointsCrypto {
      * <pre>
      * -signCertificateBase64Encoded
      * </pre>
-     * @return true si se ha ejecutado correctamente <br>
-     *         true if successful. */
+     * @return {@code true} si se ha ejecutado correctamente <br>
+     *         {@code true} if successful. */
     boolean counterSignSigners();
 
     /** Realiza el proceso de contra-firmado (firma en cascada). Contra-firma los
@@ -632,9 +632,9 @@ interface EntryPointsCrypto {
      *
      * <br>
      * <br>
-     * @return Devuelve <codetrue</code>> si la operaci&oacute;n finaliz&oacute;
+     * @return Devuelve {@code true} si la operaci&oacute;n finaliz&oacute;
      *         correctamente, false en caso contrario. <br>
-     *         Returns <codetrue</code> if operation ends successfully. Else,
+     *         Returns {@code true} if operation ends successfully. Else,
      *         false. */
     boolean counterSignIndexes();
 
