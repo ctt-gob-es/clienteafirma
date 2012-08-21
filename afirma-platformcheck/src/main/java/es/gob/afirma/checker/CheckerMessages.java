@@ -6,7 +6,8 @@ import java.util.ResourceBundle;
 /**
  * Manejador para la recuperaci&opacute;n de mensajes del Applet de comprobaci&oacute;n.
  */
-public class CheckerMessages {
+final class CheckerMessages {
+
 	private static final String BUNDLE_NAME = "es.gob.afirma.checker.messages"; //$NON-NLS-1$
 
 	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle
@@ -21,14 +22,14 @@ public class CheckerMessages {
 	 * @param key Clave del mensaje que se desea recuperar.
 	 * @return Mensaje recuperado.
 	 */
-	public static String getString(String key) {
+	static String getString(final String key) {
 		try {
 			return RESOURCE_BUNDLE.getString(key);
-		} catch (MissingResourceException e) {
+		} catch (final MissingResourceException e) {
 			return '!' + key + '!';
 		}
 	}
-	
+
 	/** Recupera el texto identificado con la clave proporcionada y sustituye la
      * subcadenas "%0" por el texto proporcionado.
      * @param key
@@ -44,11 +45,11 @@ public class CheckerMessages {
             return '!' + key + '!';
         }
     }
-    
+
     /** Recupera el texto identificado con la clave proporcionada y sustituye las
      * subcadenas de tipo "%i" por el texto en la posici&oacute;n 'i' del array
      * proporcionado. Introducir m&aacute;s de 10 cadenas distintas para sustituir
-     * conllevar&aacute; errores en el resultado. 
+     * conllevar&aacute; errores en el resultado.
      * @param key
      *        Clave del texto.
      * @param params
