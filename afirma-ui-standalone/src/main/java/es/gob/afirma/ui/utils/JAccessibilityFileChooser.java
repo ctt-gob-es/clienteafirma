@@ -18,7 +18,6 @@ import java.awt.Frame;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.HeadlessException;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Rectangle;
@@ -330,12 +329,11 @@ class JAccessibilityFileChooser extends JFileChooser{
 	    }//for
 	  }
 
-	/**
-	 * Crea la ventana de di&aacute;logo.
-	 * @param Component parent
-	 */
+	/** Crea la ventana de di&aacute;logo.
+	 * @param Component Componente padre
+	 * @throws java.awt.HeadlessException */
 	@Override
-    protected JDialog createDialog(final Component parent) throws HeadlessException {
+    protected JDialog createDialog(final Component parent)  {
 		final String title = getUI().getDialogTitle(this);
         putClientProperty(
                 AccessibleContext.ACCESSIBLE_DESCRIPTION_PROPERTY,

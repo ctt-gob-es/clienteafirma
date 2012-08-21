@@ -675,12 +675,12 @@ final class CipherManager {
      *        Clave de cifrado que se desea almacenar. <code>false</code>
      * @throws AOCancelledOperationException
      *         Operacion cancelada por el usuario.
-     * @throws AOMaxAttemptsExceededException
+     * @throws es.gob.afirma.applet.AOMaxAttemptsExceededException
      *         Cuando se supera el n&uacute;mero m&aacute;ximo de intentos
      *         fallidos al almac&eacute;n.
      * @throws AOException
      *         Error al almacenar la clave de cifrado. */
-    private void saveCipherKey(final AOCipherConfig config, final Key cipherKey) throws AOMaxAttemptsExceededException, AOException {
+    private void saveCipherKey(final AOCipherConfig config, final Key cipherKey) throws AOException {
         // Preguntamos si se desea almacenar en el almacen de claves de cifrado
         // y si se acepta y no existe este almacen, lo creamos
         final int selectedOption = JOptionPane.showConfirmDialog(this.parent, AppletMessages.getString("SignApplet.40"), //$NON-NLS-1$

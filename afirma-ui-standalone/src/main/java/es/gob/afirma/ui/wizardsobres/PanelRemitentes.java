@@ -660,9 +660,9 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
     /** Lectura de fichero.
      * @param filepath
      * @return
-     * @throws FileNotFoundException
+     * @throws java.io.FileNotFoundException
      * @throws IOException */
-    private static byte[] readFile(final String filepath) throws FileNotFoundException, IOException {
+    private static byte[] readFile(final String filepath) throws IOException {
         byte[] data = null;
         InputStream fileIn = null;
         try {
