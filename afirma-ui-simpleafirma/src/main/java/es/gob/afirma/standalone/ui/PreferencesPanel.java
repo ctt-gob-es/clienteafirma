@@ -411,9 +411,9 @@ final class PreferencesPanel extends JPanel {
 
 		// Los elementos del menu desplegable se identifican por su orden
 		this.policies.setModel(new DefaultComboBoxModel(new String[] {
-			"Ninguna pol\u00EDtica",			// Ninguna política, debe ser el primer elemento
+			"Ninguna pol\u00EDtica",			// Ninguna politica, debe ser el primer elemento
 			"Pol\u00EDtica de firma de la AGE",	// Politica de la AGE, debe ser el segundo elemento
-			"Pol\u00EDtica a medida"			// Politica a medida, debe ser el último elemento
+			"Pol\u00EDtica a medida"			// Politica a medida, debe ser el ultimo elemento
 		}));
 		panel.add(this.policies);
 		this.policies.addItemListener(new ItemListener() {
