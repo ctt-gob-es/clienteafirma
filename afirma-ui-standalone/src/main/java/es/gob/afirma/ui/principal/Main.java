@@ -23,7 +23,11 @@ import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.ProfileManager;
 
 /** Entrada de la aplicacion */
-public class Main {
+public final class Main {
+
+	private Main() {
+		// Constructor privado
+	}
 
     /** Almacena el indice a cargar para la ayuda en alto contraste */
 	private static String helpIndex;
@@ -31,7 +35,7 @@ public class Main {
     /** Indica si el SO tiene activado el alto contraste con color negro de fondo */
 	private static boolean isOSHighContrast = false;
 
-	private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** Preferencias generales establecidas para el aplicativo. */
 	private static final Preferences PREFERENCES = Preferences.userRoot().node(Constants.OUR_NODE_NAME);
@@ -42,7 +46,7 @@ public class Main {
     /** Arranca la interfaz de escritorio del Cliente @firma.
      * @param args Par&aacute;metros de entrada. */
     public static void main(final String[] args) {
-        if (System.getProperty("java.version").compareTo("1.6.0_18") < 0) { //$NON-NLS-1$
+        if (System.getProperty("java.version").compareTo("1.6.0_18") < 0) { //$NON-NLS-1$ //$NON-NLS-2$
             CustomDialog.showMessageDialog(null, true, Messages.getString("main.requerido") + //$NON-NLS-1$
                                            System.getProperty("java.version") + ".<br>" + //$NON-NLS-1$
                                            Messages.getString("main.porfavor"), //$NON-NLS-1$
