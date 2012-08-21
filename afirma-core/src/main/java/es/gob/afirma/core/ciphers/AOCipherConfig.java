@@ -67,14 +67,12 @@ public final class AOCipherConfig {
     }
 
     /** Genera un objeto AOCipherConfig a partir de una cadena que siga uno de
-     * los siguientes patrones: <list>
+     * los siguientes patrones:
      * <ul>
-     * Algoritmo/ModoBloque/Padding
+     * <li>Algoritmo/ModoBloque/Padding</li>
+     * <li>Algoritmo</li>
      * </ul>
-     * <ul>
-     * Algoritmo
-     * </ul>
-     * </list> Si s&oacute;lo se especifica el algoritmo de cifrado, se tomara
+     * Si s&oacute;lo se especifica el algoritmo de cifrado, se tomara
      * el modo y el padding configurados por defecto para ese algoritmo.
      * @return AOCipherConfig con una configuraci&oacute; espec&iacute;fica de
      *         cifrado
