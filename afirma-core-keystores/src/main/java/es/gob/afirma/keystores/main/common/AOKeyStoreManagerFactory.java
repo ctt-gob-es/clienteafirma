@@ -19,7 +19,6 @@ import javax.security.auth.callback.PasswordCallback;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.InvalidOSException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
@@ -63,7 +62,7 @@ public final class AOKeyStoreManagerFactory {
      *         Cuando ocurre cualquier otro problema durante el proceso
      * @throws IOException
      *         Cuando la contrase&ntilde;a del almac&eacute;n es incorrecta.
-     * @throws InvalidOSException Cuando se pide un almac&eacute; &uacute;nicamente disponible para
+     * @throws es.gob.afirma.core.InvalidOSException Cuando se pide un almac&eacute; &uacute;nicamente disponible para
      *                            un sistema operativo distinto del actual
      * @throws es.gob.afirma.core.MissingLibraryException Cuando no se localice una biblioteca necesaria para el
      * uso del almac&eacute;n.
@@ -73,7 +72,7 @@ public final class AOKeyStoreManagerFactory {
                                                          final String description,
                                                          final PasswordCallback pssCallback,
                                                          final Object parentComponent) throws AOKeystoreAlternativeException,
-                                                                                              IOException, InvalidOSException {
+                                                                                              IOException {
     	if (AOKeyStore.PKCS12.equals(store)) {
     		return getPkcs12KeyStoreManager(lib, pssCallback, parentComponent);
     	}
@@ -201,8 +200,7 @@ public final class AOKeyStoreManagerFactory {
     private static AOKeyStoreManager getFileKeyStoreManager(final AOKeyStore store,
                                                             final String lib,
                                                             final PasswordCallback pssCallback,
-                                                            final Object parentComponent) throws InvalidOSException,
-                                                                                                 IOException,
+                                                            final Object parentComponent) throws IOException,
                                                                                                  AOKeystoreAlternativeException {
     	final AOKeyStoreManager ksm = new AOKeyStoreManager();
         String storeFilename = null;
@@ -261,8 +259,7 @@ public final class AOKeyStoreManagerFactory {
                                                               final String lib,
                                                               final String description,
                                                               final PasswordCallback pssCallback,
-                                                              final Object parentComponent) throws InvalidOSException,
-                                                                                                   IOException,
+                                                              final Object parentComponent) throws IOException,
                                                                                                    AOKeystoreAlternativeException {
     	final AOKeyStoreManager ksm = new AOKeyStoreManager();
         String p11Lib = null;
@@ -309,8 +306,7 @@ public final class AOKeyStoreManagerFactory {
         return ksm;
     }
 
-    private static AOKeyStoreManager getWindowsCapiKeyStoreManager(final AOKeyStore store) throws InvalidOSException,
-                                                                                                  IOException,
+    private static AOKeyStoreManager getWindowsCapiKeyStoreManager(final AOKeyStore store) throws IOException,
                                                                                                   AOKeystoreAlternativeException {
     	final AOKeyStoreManager ksm = new AOKeyStoreManager();
         try {
@@ -327,8 +323,7 @@ public final class AOKeyStoreManagerFactory {
     }
 
     private static AOKeyStoreManager getDniePkcs11KeyStoreManager(final AOKeyStore store,
-                                                                  final PasswordCallback pssCallback) throws InvalidOSException,
-                                                                                                             IOException,
+                                                                  final PasswordCallback pssCallback) throws IOException,
                                                                                                              AOKeystoreAlternativeException {
     	final AOKeyStoreManager ksm = new AOKeyStoreManager();
     	try {
@@ -351,7 +346,6 @@ public final class AOKeyStoreManagerFactory {
 
     private static AOKeyStoreManager getMozillaUnifiedKeyStoreManager(final AOKeyStore store,
     		                                                          final PasswordCallback pssCallback) throws AOKeystoreAlternativeException,
-    		                                                                                                     InvalidOSException,
     		                                                                                                     IOException {
         final AOKeyStoreManager ksmUni;
         try {
@@ -377,8 +371,7 @@ public final class AOKeyStoreManagerFactory {
         return ksmUni;
     }
 
-    private static AOKeyStoreManager getMacOSXKeyStoreManager(final AOKeyStore store, final String lib) throws InvalidOSException,
-                                                                                                        IOException,
+    private static AOKeyStoreManager getMacOSXKeyStoreManager(final AOKeyStore store, final String lib) throws IOException,
                                                                                                         AOKeystoreAlternativeException {
     	final AOKeyStoreManager ksm = new AOKeyStoreManager();
         // En Mac OS X podemos inicializar un KeyChain en un fichero particular o el "defecto del sistema"

@@ -377,12 +377,10 @@ final class SignDataPanel extends JPanel {
         }
     }
 
-    /**
-     * Recupera la informaci&oacute;n de la firma indicada.
+    /** Recupera la informaci&oacute;n de la firma indicada.
      * @param signData Firma.
-     * @return Informaci&oacute;n de la firma.
-     */
-    private static CompleteSignInfo getSignInfo(final byte[] signData) throws IllegalArgumentException {
+     * @return Informaci&oacute;n de la firma. */
+    private static CompleteSignInfo getSignInfo(final byte[] signData) {
         final CompleteSignInfo signInfo = new CompleteSignInfo();
         signInfo.setSignData(signData);
         final AOSigner signer = AOSignerFactory.getSigner(signData);
@@ -424,9 +422,11 @@ final class SignDataPanel extends JPanel {
         final DefaultMutableTreeNode dataInfoBranch = new DefaultMutableTreeNode(Messages.getString("SignDataPanel.26")); //$NON-NLS-1$
         if (dataFile != null) {
         	dataInfoBranch.add(new DefaultMutableTreeNode(new ShowFileLinkAction(Messages.getString("SignDataPanel.28"), dataFile, this))); //$NON-NLS-1$
-        } else if (signInfo.getData() != null) {
+        }
+        else if (signInfo.getData() != null) {
             dataInfoBranch.add(new DefaultMutableTreeNode(new ShowFileLinkAction(Messages.getString("SignDataPanel.28"), signInfo.getData(), this))); //$NON-NLS-1$
-        } else {
+        }
+        else {
         	dataInfoBranch.add(new DefaultMutableTreeNode(new LoadFileLinkAction(Messages.getString("SignDataPanel.27"), this))); //$NON-NLS-1$
         }
         root.add(dataInfoBranch);

@@ -50,7 +50,7 @@ final class WrapAction implements PrivilegedExceptionAction<byte[]> {
     }
 
     /** {@inheritDoc} */
-    public byte[] run() throws IllegalArgumentException, NoSuchAlgorithmException, IOException,
+    public byte[] run() throws NoSuchAlgorithmException, IOException,
     AOException, CertificateEncodingException, KeyException {
 
     	try {

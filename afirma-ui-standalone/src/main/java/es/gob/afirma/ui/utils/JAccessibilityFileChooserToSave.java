@@ -16,7 +16,6 @@ import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.HeadlessException;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Toolkit;
@@ -137,12 +136,11 @@ final class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
 		setToggleButtonMnemonics(this);
 	}
 
-	/**
-	 * Crea la ventana de dialogo.
-	 * @param Component parent
-	 */
+	/** Crea la ventana de di&aacute;logo.
+	 * @param Component Componente padre
+	 * @throws java.awt.HeadlessException */
 	@Override
-	protected JDialog createDialog(final Component parent) throws HeadlessException {
+	protected JDialog createDialog(final Component parent) {
 		final String title = getUI().getDialogTitle(this);
         putClientProperty(
                 AccessibleContext.ACCESSIBLE_DESCRIPTION_PROPERTY,
@@ -151,9 +149,11 @@ final class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
         //Se comprueba el tipo de componente padre, para asignar el correcto y que asi se muestre el icono asociado.
         if (parent instanceof JDialog) {
         	this.dialog = new JDialog((JDialog)parent, title, true);
-        } else if (parent instanceof Frame){
+        }
+        else if (parent instanceof Frame){
         	this.dialog = new JDialog((Frame)parent, title, true);
-        }else {
+        }
+        else {
         	//Se obtiene el componente root
 	        final Component root = SwingUtilities.getRoot(parent);
 	        if ((root!=null) && (root instanceof Frame)) {
