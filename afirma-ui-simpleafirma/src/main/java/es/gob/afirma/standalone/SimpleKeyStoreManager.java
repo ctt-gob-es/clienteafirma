@@ -44,7 +44,6 @@ final class SimpleKeyStoreManager {
                 return AOKeyStoreManagerFactory.getAOKeyStoreManager(AOKeyStore.DNIEJAVA, null, null, null, parent);
             }
             catch (final Exception e) {
-            	System.out.println(e.getClass().getName());
             	if ("es.gob.jmulticard.apdu.connection.CardNotPresentException".equals(e.getClass().getName())) { //$NON-NLS-1$
             		if (0 == JOptionPane.showConfirmDialog(parent, Messages.getString("SimpleKeyStoreManager.1"), Messages.getString("SimpleKeyStoreManager.2"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE)) { //$NON-NLS-1$ //$NON-NLS-2$
             			return getKeyStore(true, parent);

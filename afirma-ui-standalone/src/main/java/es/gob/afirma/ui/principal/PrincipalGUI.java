@@ -789,10 +789,6 @@ public class PrincipalGUI extends JAccessibilityFrame {
      * @param highContrast Boolean que indica el estado del Alto Contraste */
     public void setHighContrast(final boolean highContrast) {
         // TODO Alto contraste en ventanas de Cargar / Guardar fichero
-        // UIDefaults d = UIManager.getDefaults();
-        // Enumeration<Object> claves = d.keys();
-        // while (claves.hasMoreElements())
-        // System.out.println(claves.nextElement());
         try {
             if (highContrast) {
                 // Tema de alto contraste
@@ -803,16 +799,9 @@ public class PrincipalGUI extends JAccessibilityFrame {
                 // set Metal look and feel
                 UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel"); //$NON-NLS-1$
 
-                // UIManager.put("OptionPane.messageForeground",Color.WHITE);
-                // UIManager.put("Button.foreground",Color.WHITE);
-                // UIManager.put("ToolTip.foreground",Color.WHITE);
-                // UIManager.put("ToolTip.background",Color.BLACK);
-                // UIManager.put("Label.foreground",Color.WHITE);
-                // 
                 if (!((Platform.getOS().equals(Platform.OS.LINUX) && (System.getProperty("java.version").compareTo("1.7.0") > 0) ))){
                 	UIManager.put("FileChooserUI", "com.sun.java.swing.plaf.windows.WindowsFileChooserUI"); //$NON-NLS-1$//$NON-NLS-2$
                 }
-                // UIManager.put("TableHeader.foreground", Color.WHITE);
 
             }
             else {
@@ -826,16 +815,10 @@ public class PrincipalGUI extends JAccessibilityFrame {
                 // Se asigna el lookAndFeel que habia por defecto
                 UIManager.setLookAndFeel(this.defaultLookAndFeel);
 
-                // UIManager.put("OptionPane.messageForeground",Color.BLACK);
-                // UIManager.put("Button.foreground",Color.BLACK);
-                // UIManager.put("ToolTip.foreground",Color.BLACK);
-                // UIManager.put("ToolTip.background",new Color(255,255,225));
-                // UIManager.put("Label.foreground",Color.BLACK);
-                // 
                 if (!((Platform.getOS().equals(Platform.OS.LINUX) && (System.getProperty("java.version").compareTo("1.7.0") > 0) ))){
                 	UIManager.put("FileChooserUI", "com.sun.java.swing.plaf.windows.WindowsFileChooserUI"); //$NON-NLS-1$//$NON-NLS-2$
                 }
-                // UIManager.put("TableHeader.foreground", Color.BLACK);
+
             }
 
         }

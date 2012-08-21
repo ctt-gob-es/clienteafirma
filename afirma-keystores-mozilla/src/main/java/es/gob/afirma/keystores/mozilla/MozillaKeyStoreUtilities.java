@@ -695,7 +695,6 @@ final class MozillaKeyStoreUtilities {
 			String line = br.readLine();
 			String token;
 			while (line != null) {
-				//System.out.println(line);
 				if (line.contains(DIR_TAG)) {
 					token = DIR_TAG;
 				}
@@ -722,7 +721,7 @@ final class MozillaKeyStoreUtilities {
 			}
 		}
 		catch(final Exception e) {
-			System.out.println("No se ha podido obtener el nombre corto de " + longPath + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			LOGGER.warning("No se ha podido obtener el nombre corto de " + longPath + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		return longPath;
 	}
