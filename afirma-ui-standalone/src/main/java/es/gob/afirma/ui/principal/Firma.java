@@ -204,7 +204,6 @@ final class Firma extends JPanel {
                 return;
             }
             catch (final Exception e) {
-            	e.printStackTrace();
                 CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Firma.msg.error.almacen"), //$NON-NLS-1$
                                                Messages.getString("error"), //$NON-NLS-1$
                                                JOptionPane.ERROR_MESSAGE);

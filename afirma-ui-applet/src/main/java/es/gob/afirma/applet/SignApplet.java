@@ -613,7 +613,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 		}
 	}
 
-	private final X509Certificate getCertificateBinary(final String alias) {
+	private X509Certificate getCertificateBinary(final String alias) {
 		try {
 			return AccessController.doPrivileged(new GetCertificateAction(alias, this.ksConfigManager));
 		} catch (final PrivilegedActionException e) {
@@ -1217,12 +1217,10 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
 				// Si se nos pide que mostremos el hash de los datos a
 				// firmar, lo hacemos
-				if (SignApplet.this.getShowHashes()) {
-					if (!SignApplet.this.showHashMessage()) {
-						getLogger().info("Operacion cancelada por el usuario"); //$NON-NLS-1$
-						SignApplet.this.setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
-						return Boolean.FALSE;
-					}
+				if (SignApplet.this.getShowHashes() && (!SignApplet.this.showHashMessage())) {
+					getLogger().info("Operacion cancelada por el usuario"); //$NON-NLS-1$
+					SignApplet.this.setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
+					return Boolean.FALSE;
 				}
 
 				// Contrafirmamos finalmente
@@ -1624,12 +1622,10 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
 					// Si se nos pide que mostremos el hash de los datos
 					// a firmar, lo hacemos
-					if (SignApplet.this.getShowHashes()) {
-						if (!SignApplet.this.showHashMessage()) {
-							getLogger().info("Operacion cancelada por el usuario"); //$NON-NLS-1$
-							SignApplet.this.setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
-							return Boolean.FALSE;
-						}
+					if (SignApplet.this.getShowHashes() && (!SignApplet.this.showHashMessage())) {
+						getLogger().info("Operacion cancelada por el usuario"); //$NON-NLS-1$
+						SignApplet.this.setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
+						return Boolean.FALSE;
 					}
 
 					// Agregamos las ultimas configuraciones y firmamos
@@ -1902,12 +1898,10 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
 				// Si se nos pide que mostremos el hash de los datos a
 				// firmar, lo hacemos
-				if (SignApplet.this.getShowHashes()) {
-					if (!SignApplet.this.showHashMessage()) {
-						getLogger().info("Operacion cancelada por el usuario"); //$NON-NLS-1$
-						SignApplet.this.setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
-						return Boolean.FALSE;
-					}
+				if (SignApplet.this.getShowHashes() && (!SignApplet.this.showHashMessage())) {
+					getLogger().info("Operacion cancelada por el usuario"); //$NON-NLS-1$
+					SignApplet.this.setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
+					return Boolean.FALSE;
 				}
 
 				// Finalmente, configuramos y operamos
@@ -2525,7 +2519,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 		return AOKeyStore.PKCS12;
 	}
 
-	private final static void setLookAndFeel() {
+	private static void setLookAndFeel() {
 		final String lookandfeel = UIManager.getSystemLookAndFeelClassName();
 		try {
 			UIManager.setLookAndFeel(lookandfeel);
@@ -2675,7 +2669,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
 		// Si es un fichero local eliminamos el esquema de la ruta
 		if (path.startsWith("file://")) { //$NON-NLS-1$
-			path = path.substring(7);
+			path = path.substring("file://".length()); //$NON-NLS-1$
 		}
 
 		return path;

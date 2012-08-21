@@ -279,7 +279,6 @@ public final class AOPDFSigner implements AOSigner {
         	throw new AOException("Error el en algoritmo de firma: " + e, e); //$NON-NLS-1$
 		}
         catch (final IOException e) {
-        	e.printStackTrace();
         	throw new AOException("Error firmando el PDF: " + e, e); //$NON-NLS-1$
 		}
         catch (final DocumentException e) {

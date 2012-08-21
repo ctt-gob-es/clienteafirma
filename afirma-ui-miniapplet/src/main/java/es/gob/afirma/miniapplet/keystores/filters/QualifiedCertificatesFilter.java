@@ -101,11 +101,11 @@ public final class QualifiedCertificatesFilter extends CertificateFilter {
 						}
 					}
 				}
-			} catch (final Exception e) {
+			}
+			catch (final Exception e) {
 				Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
 						"Error en la verificacion del certificado '" + //$NON-NLS-1$
 						cert.getSerialNumber() + "': " + e);  //$NON-NLS-1$
-				e.printStackTrace();
 			}
 		}
 		return filteredCerts.toArray(new String[filteredCerts.size()]);

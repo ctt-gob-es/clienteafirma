@@ -695,8 +695,7 @@ public final class AOXAdESSigner implements AOSigner {
             }
         }
         catch (final Exception ex) {
-        	ex.printStackTrace();
-            throw new AOInvalidFormatException("Error al leer el fichero de firmas", ex); //$NON-NLS-1$
+            throw new AOInvalidFormatException("Error al leer el fichero de firmas: " + ex, ex); //$NON-NLS-1$
         }
 
         // si no se ha recuperado ningun dato se devuelve null
