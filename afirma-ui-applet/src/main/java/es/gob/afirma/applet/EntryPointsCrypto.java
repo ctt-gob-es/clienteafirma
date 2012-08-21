@@ -220,7 +220,7 @@ interface EntryPointsCrypto {
      * <li><b>http://www.w3.org/2000/09/xmldsig#base64</b>: Transformaci&oacute;n de tipo BASE64.</li>
      * <li><b>http://www.w3.org/2000/09/xmldsig#enveloped-signature</b>: Transformaci&oacute;n de tipo ENVELOPED.</li>
      * </ul>
-     * En el caso en que una transformaci&oaute;n no tenga subtipo, se
+     * En el caso en que una transformaci&oacute;n no tenga subtipo, se
      * indicar&aacute; {@code null}. Las transformaciones de tipo BASE64 y
      * ENVELOPED no necesitan cuerpo (se usar&aacute; {@code null}) <br>
      * <br>
@@ -993,13 +993,13 @@ interface EntryPointsCrypto {
 	 * Las condiciones compuestas siguen el siguiente patr&oacute;n:<br>
 	 * {(condicionSimple o condicionCompuesta) (nexo (condicionSimple o
 	 * condicionCompuesta))*}<br>
-	 * nexo: && (Y l&oacute;gico), || (O l&oacute;gico)<br>
+	 * nexo: &amp;&amp; (Y l&oacute;gico), || (O l&oacute;gico)<br>
 	 * <br>
 	 * Ejemplos de condiciones compuestas:<br>
-	 * {SUBJECT.SN={"1014673794"}&&ISSUER.DN={"OU = FNMT Clase 2 CA,O= FNMT,C =
+	 * {SUBJECT.SN={"1014673794"}&amp;&amp;ISSUER.DN={"OU = FNMT Clase 2 CA,O= FNMT,C =
 	 * ES"}}<br>
 	 * {ISSUER.DN#MATCHES#{"CN=AC DNIE 00(1|2|3),OU=DNIE,O=DIRECCION GENERAL DE
-	 * LA POLICIA,C=ES"}&&{SUBJECT.DN#MATCHES#{".*(FIRMA).*"}}}<br>
+	 * LA POLICIA,C=ES"}&amp;&amp;{SUBJECT.DN#MATCHES#{".*(FIRMA).*"}}}<br>
 	 *
 	 *
 	 *
@@ -1026,13 +1026,13 @@ interface EntryPointsCrypto {
 	 * Complex conditions follow this pattern:<br>
 	 * {(SimpleCondition or ComplexCondition) (nexus (simpleCondition or
 	 * complexCondition))*}<br>
-	 * nexus: && (logical AND), || (logical OR)<br>
+	 * nexus: &amp;&amp; (logical AND), || (logical OR)<br>
 	 * <br>
 	 * Complex condition examples:<br>
-	 * {SUBJECT.SN={"1014673794"}&&ISSUER.DN={"OU = FNMT Clase 2 CA,O= FNMT,C =
+	 * {SUBJECT.SN={"1014673794"}&amp;&amp;ISSUER.DN={"OU = FNMT Clase 2 CA,O= FNMT,C =
 	 * ES"}}<br>
 	 * {ISSUER.DN#MATCHES#{"CN=AC DNIE 00(1|2|3),OU=DNIE,O=DIRECCION GENERAL DE
-	 * LA POLICIA,C=ES"}&&{SUBJECT.DN#MATCHES#{".*(FIRMA).*"}}}<br>
+	 * LA POLICIA,C=ES"}&amp;&amp;{SUBJECT.DN#MATCHES#{".*(FIRMA).*"}}}<br>
 	 *
 	 *
 	 * @param certFilter Filtro para los certificados a mostrar al usuario
@@ -1068,13 +1068,13 @@ interface EntryPointsCrypto {
 	 * Las condiciones compuestas siguen el siguiente patr&oacute;n:<br>
 	 * {(condicionSimple o condicionCompuesta) (nexo (condicionSimple o
 	 * condicionCompuesta))*}<br>
-	 * nexo: && (Y l&oacute;gico), || (O l&oacute;gico)<br>
+	 * nexo: &amp;&amp; (Y l&oacute;gico), || (O l&oacute;gico)<br>
 	 * <br>
 	 * Ejemplos de condiciones compuestas:<br>
-	 * {SUBJECT.SN={"1014673794"}&&ISSUER.DN={"OU = FNMT Clase 2 CA,O= FNMT,C =
+	 * {SUBJECT.SN={"1014673794"}&amp;&amp;ISSUER.DN={"OU = FNMT Clase 2 CA,O= FNMT,C =
 	 * ES"}}<br>
 	 * {ISSUER.DN#MATCHES#{"CN=AC DNIE 00(1|2|3),OU=DNIE,O=DIRECCION GENERAL DE
-	 * LA POLICIA,C=ES"}&&{SUBJECT.DN#MATCHES#{".*(FIRMA).*"}}}<br>
+	 * LA POLICIA,C=ES"}&amp;&amp;{SUBJECT.DN#MATCHES#{".*(FIRMA).*"}}}<br>
 	 *
 	 *
 	 * <br><br>
@@ -1103,13 +1103,13 @@ interface EntryPointsCrypto {
 	 * Complex conditions follow this pattern:<br>
 	 * {(simpleCondition or complexCondition) (nexus (simpleCondition or
 	 * complexCondition))*}<br>
-	 * nexus: && (logical AND), || (logical OR)<br>
+	 * nexus: &amp;&amp; (logical AND), || (logical OR)<br>
 	 * <br>
 	 * Complex conditions examples:<br>
-	 * {SUBJECT.SN={"1014673794"}&&ISSUER.DN={"OU = FNMT Clase 2 CA,O= FNMT,C =
+	 * {SUBJECT.SN={"1014673794"}&amp;&amp;ISSUER.DN={"OU = FNMT Clase 2 CA,O= FNMT,C =
 	 * ES"}}<br>
 	 * {ISSUER.DN#MATCHES#{"CN=AC DNIE 00(1|2|3),OU=DNIE,O=DIRECCION GENERAL DE
-	 * LA POLICIA,C=ES"}&&{SUBJECT.DN#MATCHES#{".*(FIRMA).*"}}}<br>	 *
+	 * LA POLICIA,C=ES"}&amp;&amp;{SUBJECT.DN#MATCHES#{".*(FIRMA).*"}}}<br>	 *
 	 *
 	 *
 	 * @param certFilter Condici&oacute;n que selecciona un (y s&oacute;lo un) certificado.
@@ -1232,7 +1232,7 @@ interface EntryPointsCrypto {
 
     /** Establece los datos de entrada en base 64 para los procesos de firma,
      * co-firma (firma en paralelo) y generaci&oacute;n de sobres digitales. <br/>
-     * Los datos introducidos mediante esta funci&oacuten;n
+     * Los datos introducidos mediante esta funci&oacute;n
      * sobreescribir&aacute;n cualquier otro establecido previamente mediante
      * los m&eacute;todos setFileuri o setHash. <br>
      * <br>
@@ -1248,7 +1248,7 @@ interface EntryPointsCrypto {
 
     /** Establece la URI (o URL) que apunta al fichero que contiene los datos de
      * entrada para operar (cifrar, firmar, leer...) Se soporta el protocolo <code>file://</code> para ficheros en almacenamiento local. <br/>
-     * Los datos introducidos mediante esta funci&oacuten;n
+     * Los datos introducidos mediante esta funci&oacute;n
      * sobreescribir&aacute;n cualquier otro establecido previamente mediante
      * los m&eacute;todos setData o setHash. <br>
      * <br>
@@ -1335,7 +1335,7 @@ interface EntryPointsCrypto {
      * cliente de firma. Este metodo se utiliza principalmente para indicar la
      * firma electr&oacute;nica durante las operaciones de cofirma y contrafirma
      * (en cada una de sus variedades). <br>
-     * Los datos introducidos mediante esta funci&oacuten;n
+     * Los datos introducidos mediante esta funci&oacute;n
      * sobreescribir&aacute;n cualquier otro establecido previamente mediante
      * el m&eacute;todo setElectronicSignatureFile.<br>
      * <br>
@@ -1353,7 +1353,7 @@ interface EntryPointsCrypto {
      * para el cliente de firma. Este m&eacute;todo se utiliza principalmente
      * para indicar la firma electr&oacute;nica durante las operaciones de
      * cofirma y contrafirma (en cada una de sus variedades).<br>
-     * Los datos introducidos mediante esta funci&oacuten;n
+     * Los datos introducidos mediante esta funci&oacute;n
      * sobreescribir&aacute;n cualquier otro establecido previamente mediante
      * el m&eacute;todo setElectronicSignature.<br>
      * <br>
@@ -1494,7 +1494,7 @@ interface EntryPointsCrypto {
      * cifrado, introducida en base 64 mediante <code>setKey(String)</code>, o una
      * contrase&ntilde;a que el propio usuario deber&aacute; establecer a
      * trav&eacute;s de un di&aacute;logo modal que se le
-     * presentar&aacute;.</br> El resultado de la operaci&oacute;n puede
+     * presentar&aacute;.<br/> El resultado de la operaci&oacute;n puede
      * recuperarse con <code>getPlainData()</code> o salvarse directamente a disco
      * con <code>savePlainDataToFile(String)</code>. <br>
      * <br>
@@ -1510,7 +1510,7 @@ interface EntryPointsCrypto {
      * </ul>
      * According to the encryption algorithm, the <code>setKeyMode(String)</code> must be used, and a mandatory encryption key in base 64 must be
      * introduced with <code>setKey(String)</code>, or a password set by user with a
-     * modal dialog that will be displayed.</br> Operation's result may be
+     * modal dialog that will be displayed.<br/> Operation's result may be
      * retrieved with <code>getPlainData()</code> or be directly saved to disk with <code>savePlainDataToFile(String)</code>.
      * @return true si la operaci&oacute;n finaliz&oacute; con &eacute;xito,
      *         false en caso contrario. <br>
@@ -1532,7 +1532,7 @@ interface EntryPointsCrypto {
      * cifrado, introducida en base 64 mediante <code>setKey(String)</code>, o una
      * contrase&ntilde;a que el propio usuario deber&aacute; establecer a
      * trav&eacute;s de un di&aacute;logo modal que se le
-     * presentar&aacute;.</br> El resultado de la operaci&oacute;n puede
+     * presentar&aacute;.<br/> El resultado de la operaci&oacute;n puede
      * recuperarse con <code>getPlainData()</code> o salvarse directamente a disco
      * con <code>savePlainDataToFile(String)</code>. <br>
      * <br>
@@ -1547,7 +1547,7 @@ interface EntryPointsCrypto {
      * </ul>
      * According to the encryption algorithm, the <code>setKeyMode(String)</code> method must be used, and a mandatory encryption key in base 64 must be
      * introduced with <code>setKey(String)</code>, or a password set by user with a
-     * modal dialog that will be displayed.</br> Operation's result may be
+     * modal dialog that will be displayed.<br/> Operation's result may be
      * retrieved with <code>getPlainData()</code> or be directly saved to disk with <code>savePlainDataToFile(String)</code>.
      * @param fileUri
      *        Archivo de datos a descifrar <br>
@@ -1753,18 +1753,18 @@ interface EntryPointsCrypto {
     /** Define el modo de obtenci&oacute;n de clave para cifrado / descifrado
      * sim&eacute;trico. Los modos de obtenci&oacute;n de clave son:
      * <ul>
-     * <li>GENERATEKEY:</li> El Cliente genera una clave de cifrado aleatoria.
-     * <li>USERINPUT:</li> El usuario introduce una clave.
-     * <li>PASSWORD:</li> El usuario introduce una contrase&tilde;a.
+     * <li><b>GENERATEKEY:</b> El Cliente genera una clave de cifrado aleatoria.</li>
+     * <li><b>USERINPUT:</b> El usuario introduce una clave.</li>
+     * <li><b>PASSWORD:</b> El usuario introduce una contrase&tilde;a.</li>
      * </ul>
      * <br>
      * <br>
      * Defines the mode of acquiring a symmetric encryption/decryption key. Key
      * acquiring modes are:
      * <ul>
-     * <li>GENERATEKEY:</li> The Client generate a random cipher key.
-     * <li>USERINPUT:</li> The user insert a cipher key.
-     * <li>PASSWORD:</li> The user insert a password.
+     * <li><b>GENERATEKEY:</b> The Client generate a random cipher key.</li>
+     * <li><b>USERINPUT:</b> The user insert a cipher key.</li>
+     * <li><b>PASSWORD:</b> The user insert a password.</li>
      * </ul>
      * @param keyMode
      *        Modo de obtenci&oacute;n de clave. <br>
@@ -1859,7 +1859,7 @@ interface EntryPointsCrypto {
      * establece con <code>setKeyMode(String)</code> para seleccionar el tipo de
      * cifrado (por clave o por password) y, en caso de establecerse el uso de
      * claves (valor por defecto) ser&aacute; obligatorio establecer una clave
-     * mediante <code>setKey(String)</code>. En cambio, la contrase&ntilda;a se
+     * mediante <code>setKey(String)</code>. En cambio, la contrase&ntilde;a se
      * pedir&aacute; siempre mediante una interfaz propia del cliente, sin
      * posibilidad de introducirla program&aacute;ticamente. <br/>
      * El algoritmo de cifrado se establecer&aacute; con <code>setCipherAlgorithm(String)</code>, el modo de bloque y el relleno
@@ -1922,7 +1922,7 @@ interface EntryPointsCrypto {
      * will be set in the envelope if the sender certificate has been set with <code>setSelectedCertificateAlias(String)</code>. Else, it will not be
      * included. <br/>
      * Results may be retrieved in base 64 with <code>getB64Data()</code> and may be
-     * stored in a file with <xode>saveDataToFile()</code>.
+     * stored in a file with <code>saveDataToFile()</code>.
      * @return Devuelve <code>true</code> si la operaci&oacute;n se ha realizado
      *         con &eacute;xito. <br>
      *         Returns <code>true</code> if successful.
@@ -2172,7 +2172,7 @@ interface EntryPointsCrypto {
      * El tipo de operaci&oacute;n se indica mediante <code>setMassiveOperation(String)</code>. <br/>
      * Si no se indica un directorio de salida con <code>setOutputDirectoryToSign(String)</code> el resultado se
      * almacenar&aacute; en el directorio de entrada. Si se indica el directorio
-     * de salida y este no existe, se crear&aacute;. </br>Si se produjo
+     * de salida y este no existe, se crear&aacute;. <br/>Si se produjo
      * alg&uacute;n error durante la firma de un fichero, el proceso
      * continuar&aacute;, se crear&aacute; un registro en el log de error en el
      * directorio de salida de firmas y se devolver&aacute; <code>false</code> para que se realicen las operaciones adecuadas. <br>
@@ -2190,7 +2190,7 @@ interface EntryPointsCrypto {
      * indicated with <code>setMassiveOperation(String)</code>. <br/>
      * If no output directory is indicated with <code>setOutputDirectoryToSign(String)</code> results will be saved in the
      * input directory. If indicated output directory does not exist it will be
-     * created. </br>If an error occurs during the signature of a file, the
+     * created. <br/>If an error occurs during the signature of a file, the
      * process will continue, an entry will be created in the error log in the
      * signature output directory, and <code>false</code> will be returned, for
      * the adequate operations to be performed.
@@ -2395,7 +2395,7 @@ interface EntryPointsCrypto {
     /** Firma un fichero con la configuraci&oacute;n de firma masiva establecida.
      * En el caso de la operacion de firma masiva tendremos que indicar el
      * fichero con los datos que deseamos firmar, mientras que para la
-     * operaci&oacte;n de contrafirma masiva se indicar&aacute; el fichero con
+     * operaci&oacute;n de contrafirma masiva se indicar&aacute; el fichero con
      * la firma que se desea contrafirmar. <br>
      * <br>
      * Signs a file with the set massive signature configuration. In case of a
@@ -2410,7 +2410,7 @@ interface EntryPointsCrypto {
      *         occurs. */
     String massiveSignatureFile(String fileuri);
 
-    /** Devuelve la traza de log de la &uacte;ltima operaci&oacute;n del
+    /** Devuelve la traza de log de la &uacute;ltima operaci&oacute;n del
      * procedimiento de firma masiva. <br>
      * <br>
      * Returns the log trace for the last massive signature procedure operation.
