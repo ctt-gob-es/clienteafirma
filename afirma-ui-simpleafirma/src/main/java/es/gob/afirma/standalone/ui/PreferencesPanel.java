@@ -44,6 +44,20 @@ final class PreferencesPanel extends JPanel {
 	private static final String PREFERENCE_POLICY_IDENTIFIER_HASH_ALGORITHM = "policyIdentifierHashAlgorithm"; //$NON-NLS-1$
 	private static final String PREFERENCE_POLICY_QUALIFIER = "policyQualifier"; //$NON-NLS-1$
 
+	private static final String PREFERENCE_CADES_IMPLICIT = "cadesImplicitMode"; //$NON-NLS-1$
+
+	private static final String PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY = "xadesSignatureProductionCity"; //$NON-NLS-1$
+	private static final String PREFERENCE_XADES_SIGNATURE_PRODUCTION_PROVINCE = "xadesSignatureProductionProvince"; //$NON-NLS-1$
+	private static final String PREFERENCE_XADES_SIGNATURE_PRODUCTION_POSTAL_CODE = "xadesSignatureProductionPostalCode"; //$NON-NLS-1$
+	private static final String PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY = "xadesSignatureProductionCountry"; //$NON-NLS-1$
+	private static final String PREFERENCE_XADES_SIGNER_CLAIMED_ROLE = "xadesSignerClaimedRole"; //$NON-NLS-1$
+	private static final String PREFERENCE_XADES_SIGNER_CERTIFIED_ROLE = "xadesSignerCertifiedRole"; //$NON-NLS-1$
+	private static final String PREFERENCE_XADES_SIGN_FORMAT = "xadesSignFormat"; //$NON-NLS-1$
+
+	private static final String PREFERENCE_PADES_SIGN_REASON = "padesSignReason"; //$NON-NLS-1$
+	private static final String PREFERENCE_PADES_SIGN_PRODUCTION_CITY = "padesSignProductionCity"; //$NON-NLS-1$
+	private static final String PREFERENCE_PADES_SIGNER_CONTACT = "padesSignerContact"; //$NON-NLS-1$
+
 	private static final long serialVersionUID = -3168095095548385291L;
 
 	private static final Preferences PREFERENCES = Preferences.userRoot();
@@ -127,22 +141,43 @@ final class PreferencesPanel extends JPanel {
 		return this.policyQualifier;
 	}
 
-	private final JTextField padesSignReason = new JTextField();
-	private final JTextField padesSignProductionCity = new JTextField();
-	private final JTextField padesSignerContact = new JTextField();
-	
-	private final JCheckBox cadesImplicit = new JCheckBox("Incluir una copia de los datos firmados en la propia firma");
-	
-	private final JTextField xadesSignatureProductionCity = new JTextField();
-	private final JTextField xadesSignatureProductionProvince = new JTextField();
-	private final JTextField xadesSignatureProductionPostalCode = new JTextField();
-	private final JTextField xadesSignatureProductionCountry = new JTextField();
-	private final JTextField xadesSignerClaimedRole = new JTextField();
-	private final JTextField xadesSignerCertifiedRole = new JTextField();
+	private final JTextField padesSignReason = new JTextField(
+		PREFERENCES.get(PREFERENCE_PADES_SIGN_REASON, "")
+	);
+	private final JTextField padesSignProductionCity = new JTextField(
+		PREFERENCES.get(PREFERENCE_PADES_SIGN_PRODUCTION_CITY, "")
+	);
+	private final JTextField padesSignerContact = new JTextField(
+		PREFERENCES.get(PREFERENCE_PADES_SIGNER_CONTACT, "")
+	);
+
+	private final JCheckBox cadesImplicit = new JCheckBox(
+		"Incluir una copia de los datos firmados en la propia firma",
+		Boolean.parseBoolean(PREFERENCES.get(PREFERENCE_CADES_IMPLICIT, "true"))
+	);
+
+	private final JTextField xadesSignatureProductionCity = new JTextField(
+		PREFERENCES.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY, "")
+	);
+	private final JTextField xadesSignatureProductionProvince = new JTextField(
+		PREFERENCES.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_PROVINCE, "")
+	);
+	private final JTextField xadesSignatureProductionPostalCode = new JTextField(
+		PREFERENCES.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_POSTAL_CODE, "")
+	);
+	private final JTextField xadesSignatureProductionCountry = new JTextField(
+		PREFERENCES.get(PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY, "")
+	);
+	private final JTextField xadesSignerClaimedRole = new JTextField(
+		PREFERENCES.get(PREFERENCE_XADES_SIGNER_CLAIMED_ROLE, "")
+	);
+	private final JTextField xadesSignerCertifiedRole = new JTextField(
+		PREFERENCES.get(PREFERENCE_XADES_SIGNER_CERTIFIED_ROLE, "")
+	);
 	private final JComboBox xadesSignFormat = new JComboBox(new String[] {
+	  AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING,
       AOSignConstants.SIGN_FORMAT_XADES_DETACHED,
-      AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED,
-      AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING,
+      AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED
 	});
 
 	void createUI() {
@@ -157,6 +192,11 @@ final class PreferencesPanel extends JPanel {
 	}
 
 	void savePreferences() {
+		// Lo primero que hay que guardar es la politica, porque puede dar error
+
+		//****************************************************************************
+		//**** PREFERENCIAS GENERALES ************************************************
+		//****************************************************************************
 		if (this.policies.getSelectedIndex() != POLICY_INDEX_NONE) {
 			try {
 				// Construimos el objeto para ver si los datos son correctos, ya que se comprueban en el constructor
@@ -189,54 +229,126 @@ final class PreferencesPanel extends JPanel {
 		}
 
 		PreferencesPanel.PREFERENCES.put(PREFERENCE_SIGNATURE_ALGORITHM, this.signarureAlgorithms.getSelectedItem().toString());
+
+		//****************************************************************************
+		//**** PREFERENCIAS CADES ****************************************************
+		//****************************************************************************
+		PreferencesPanel.PREFERENCES.put(PREFERENCE_CADES_IMPLICIT, Boolean.valueOf(this.cadesImplicit.isSelected()).toString());
+
+		//****************************************************************************
+		//**** PREFERENCIAS PADES ****************************************************
+		//****************************************************************************
+		if ("".equals(this.padesSignerContact.getText())) {
+			PreferencesPanel.PREFERENCES.remove(PREFERENCE_PADES_SIGNER_CONTACT);
+		}
+		else {
+			PreferencesPanel.PREFERENCES.put(PREFERENCE_PADES_SIGNER_CONTACT, this.padesSignerContact.getText());
+		}
+		if ("".equals(this.padesSignProductionCity.getText())) {
+			PreferencesPanel.PREFERENCES.remove(PREFERENCE_PADES_SIGN_PRODUCTION_CITY);
+		}
+		else {
+			PreferencesPanel.PREFERENCES.put(PREFERENCE_PADES_SIGN_PRODUCTION_CITY, this.padesSignProductionCity.getText());
+		}
+		if ("".equals(this.padesSignReason.getText())) {
+			PreferencesPanel.PREFERENCES.remove(PREFERENCE_PADES_SIGN_REASON);
+		}
+		else {
+			PreferencesPanel.PREFERENCES.put(PREFERENCE_PADES_SIGN_REASON, this.padesSignReason.getText());
+		}
+
+		//****************************************************************************
+		//**** PREFERENCIAS XADES ****************************************************
+		//****************************************************************************
+		PreferencesPanel.PREFERENCES.put(PREFERENCE_XADES_SIGN_FORMAT, this.xadesSignFormat.getSelectedItem().toString());
+		if ("".equals(this.xadesSignatureProductionCity.getText())) {
+			PreferencesPanel.PREFERENCES.remove(PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY);
+		}
+		else {
+			PreferencesPanel.PREFERENCES.put(PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY, this.xadesSignatureProductionCity.getText());
+		}
+		if ("".equals(this.xadesSignatureProductionCountry.getText())) {
+			PreferencesPanel.PREFERENCES.remove(PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY);
+		}
+		else {
+			PreferencesPanel.PREFERENCES.put(PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY, this.xadesSignatureProductionCountry.getText());
+		}
+		if ("".equals(this.xadesSignatureProductionPostalCode.getText())) {
+			PreferencesPanel.PREFERENCES.remove(PREFERENCE_XADES_SIGNATURE_PRODUCTION_POSTAL_CODE);
+		}
+		else {
+			PreferencesPanel.PREFERENCES.put(PREFERENCE_XADES_SIGNATURE_PRODUCTION_POSTAL_CODE, this.xadesSignatureProductionPostalCode.getText());
+		}
+		if ("".equals(this.xadesSignatureProductionProvince.getText())) {
+			PreferencesPanel.PREFERENCES.remove(PREFERENCE_XADES_SIGNATURE_PRODUCTION_PROVINCE);
+		}
+		else {
+			PreferencesPanel.PREFERENCES.put(PREFERENCE_XADES_SIGNATURE_PRODUCTION_PROVINCE, this.xadesSignatureProductionProvince.getText());
+		}
+		if ("".equals(this.xadesSignerCertifiedRole.getText())) {
+			PreferencesPanel.PREFERENCES.remove(PREFERENCE_XADES_SIGNER_CERTIFIED_ROLE);
+		}
+		else {
+			PreferencesPanel.PREFERENCES.put(PREFERENCE_XADES_SIGNER_CERTIFIED_ROLE, this.xadesSignerCertifiedRole.getText());
+		}
+		if ("".equals(this.xadesSignerClaimedRole.getText())) {
+			PreferencesPanel.PREFERENCES.remove(PREFERENCE_XADES_SIGNER_CLAIMED_ROLE);
+		}
+		else {
+			PreferencesPanel.PREFERENCES.put(PREFERENCE_XADES_SIGNER_CLAIMED_ROLE, this.xadesSignerClaimedRole.getText());
+		}
+
 	}
 
 	private JPanel createXadesPanel() {
         final JPanel panel = new JPanel();
-        
+
         final JPanel metadata = new JPanel();
         metadata.setBorder(BorderFactory.createTitledBorder("Metadatos de las firmas XAdES"));
         metadata.setLayout(new GridLayout(0,1));
-        
+
         final JLabel xadesSignatureProductionProvinceLabel = new JLabel("Provincia o regi\u00F3n en la que se realiza la firma");
         xadesSignatureProductionProvinceLabel.setLabelFor(this.xadesSignatureProductionProvince);
         metadata.add(xadesSignatureProductionProvinceLabel);
         metadata.add(this.xadesSignatureProductionProvince);
-        
+
         final JLabel xadesSignatureProductionPostalCodeLabel = new JLabel("C\u00F3digo postal del lugar en el que se realiza la firma");
         xadesSignatureProductionPostalCodeLabel.setLabelFor(this.xadesSignatureProductionPostalCode);
         metadata.add(xadesSignatureProductionPostalCodeLabel);
         metadata.add(this.xadesSignatureProductionPostalCode);
-        
+
         final JLabel xadesSignatureProductionCityLabel = new JLabel("Ciudad en la que se realiza la firma");
         xadesSignatureProductionCityLabel.setLabelFor(this.xadesSignatureProductionCity);
         metadata.add(xadesSignatureProductionCityLabel);
         metadata.add(this.xadesSignatureProductionCity);
-        
+
         final JLabel xadesSignatureProductionCountryLabel = new JLabel("Pa\u00EDs en el que se realiza la firma");
         xadesSignatureProductionCountryLabel.setLabelFor(this.xadesSignatureProductionCountry);
         metadata.add(xadesSignatureProductionCountryLabel);
         metadata.add(this.xadesSignatureProductionCountry);
-        
+
         final JLabel xadesSignerClaimedRoleLabel = new JLabel("Cargo atribuido al firmante");
         xadesSignerClaimedRoleLabel.setLabelFor(this.xadesSignerClaimedRole);
         metadata.add(xadesSignerClaimedRoleLabel);
         metadata.add(this.xadesSignerClaimedRole);
-        
+
         final JLabel xadesSignerCertifiedRoleLabel = new JLabel("Cargo real del firmante");
         xadesSignerCertifiedRoleLabel.setLabelFor(this.xadesSignerCertifiedRole);
         metadata.add(xadesSignerCertifiedRoleLabel);
         metadata.add(this.xadesSignerCertifiedRole);
-        
+
         final JPanel format = new JPanel();
         format.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), "Formato de las firmas XAdES"));
+        this.xadesSignFormat.setSelectedItem(
+    		PREFERENCES.get(PREFERENCE_XADES_SIGN_FORMAT, AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING)
+		);
         format.add(this.xadesSignFormat);
-        
+
         panel.add(metadata);
         panel.add(format);
         return panel;
 	}
-	
+
 	private JPanel createCadesPanel() {
 	    final JPanel panel = new JPanel();
 	    final JPanel signatureMode = new JPanel();
@@ -245,7 +357,7 @@ final class PreferencesPanel extends JPanel {
 	    panel.add(signatureMode);
 	    return panel;
 	}
-	
+
 	private JPanel createGeneralPanel() {
 		final JPanel panel = new JPanel();
 		panel.setBorder(BorderFactory.createTitledBorder("Opciones generales de firma"));
@@ -263,30 +375,30 @@ final class PreferencesPanel extends JPanel {
 		panel.add(createPolicyPanel());
 		return panel;
 	}
-	
+
 	private JPanel createPadesPanel() {
 	    final JPanel panel = new JPanel();
-	    
+
         panel.setLayout(new GridLayout(0,1));
-	        
+
 	    panel.setBorder(BorderFactory.createTitledBorder("Metadatos de las firmas PAdES"));
-	    
+
 	    final JLabel padesSignReasonLabel = new JLabel("Raz\u00F3n por la que se firma el documento");
 	    padesSignReasonLabel.setLabelFor(this.padesSignReason);
 	    panel.add(padesSignReasonLabel);
 	    panel.add(this.padesSignReason);
-	    
+
 	    final JLabel padesSignProductionCityLabel = new JLabel("Ciudad en la que se realiza la firma");
 	    padesSignProductionCityLabel.setLabelFor(this.padesSignProductionCity);
 	    panel.add(padesSignProductionCityLabel);
 	    panel.add(this.padesSignProductionCity);
-	    
+
 	    final JLabel padesSignerContactLabel = new JLabel("Contacto del firmante (usualmente una direcci\u00F3n de coreo electr\u00F3nico)");
 	    padesSignerContactLabel.setLabelFor(this.padesSignerContact);
 	    panel.add(padesSignerContactLabel);
 	    panel.add(this.padesSignerContact);
-	    
-	      
+
+
 	    return panel;
 	}
 
