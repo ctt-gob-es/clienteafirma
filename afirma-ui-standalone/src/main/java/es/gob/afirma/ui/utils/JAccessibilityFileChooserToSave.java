@@ -1,3 +1,13 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
 package es.gob.afirma.ui.utils;
 
 import java.awt.Component;
@@ -39,18 +49,13 @@ import javax.swing.UIManager;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.ui.principal.PrincipalGUI;
 
-/**
- * Clase que extiende JFileChooser para hacerla accesible.
+/** Clase que extiende JFileChooser para hacerla accesible.
  * @author lmerayo
  *
  */
-public final class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
+final class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
 
-	/**
-	 * Serial version ID.
-	 */
 	private static final long serialVersionUID = 1L;
-
 
 	private JDialog theDialog;
 	private JToolBar jTool;
@@ -59,25 +64,15 @@ public final class JAccessibilityFileChooserToSave extends JAccessibilityFileCho
 
 	private JPanel accesibilityButtonsPanel = null;
 
-//	private static int actualPositionX = -1;
-//	private static int actualPositionY = -1;
-//	private static int actualWidth = -1;
-//	private static int actualHeight = -1;
-
-
-	/**
-	 * Relacion minima.
-	 */
+	/** Relaci&oacute;n m&iacute;nima. */
 	@Override
 	public int getMinimumRelation(){
 		return 9;
 	}
 
-	/**
-	 * Constructor.
-	 * @param file directorio.
-	 */
-	public JAccessibilityFileChooserToSave (final File file)
+	/** Constructor.
+	 * @param file directorio. */
+	JAccessibilityFileChooserToSave (final File file)
 	 {
 		super(file);
 		init();
@@ -85,11 +80,8 @@ public final class JAccessibilityFileChooserToSave extends JAccessibilityFileCho
 
 	 }//constructor
 
-	/**
-	 * Constructor.
-	 */
-	public JAccessibilityFileChooserToSave ()
-	 {
+	/** Constructor. */
+	JAccessibilityFileChooserToSave() {
 		super();
 		init();
 
@@ -156,7 +148,6 @@ public final class JAccessibilityFileChooserToSave extends JAccessibilityFileCho
                 AccessibleContext.ACCESSIBLE_DESCRIPTION_PROPERTY,
                 title);
 
-        //dialog = new JDialog((Frame) this.getParent(), title, true);
         //Se comprueba el tipo de componente padre, para asignar el correcto y que asi se muestre el icono asociado.
         if (parent instanceof JDialog) {
         	this.dialog = new JDialog((JDialog)parent, title, true);
@@ -178,127 +169,96 @@ public final class JAccessibilityFileChooserToSave extends JAccessibilityFileCho
 
         final Container contentPane = this.dialog.getContentPane();
 
-//        if (!GeneralConfig.isAccessibility()){
-//        	contentPane.setLayout(new GridLayout());
-//        	contentPane.add(this , BorderLayout.CENTER);
-//        } else {
-        	removeWindowsToolBar();
-        	contentPane.setLayout(new GridBagLayout());
+    	removeWindowsToolBar();
+    	contentPane.setLayout(new GridBagLayout());
 
-        	this.dialog.addComponentListener(new ComponentListener() {
+    	this.dialog.addComponentListener(new ComponentListener() {
 
-    			@Override
-    			public void componentShown(final ComponentEvent e) {
-    				// TODO Auto-generated method stub
+			@Override
+			public void componentShown(final ComponentEvent e) { /* Vacio */ }
 
-    			}
+			@Override
+			public void componentResized(final ComponentEvent e) {
+				resized();
+			}
 
-    			@Override
-    			public void componentResized(final ComponentEvent e) {
-    				// TODO Auto-generated method stub
-    				resized();
-    			}
+			@Override
+			public void componentMoved(final ComponentEvent e) {
+				resized();
+			}
 
-    			@Override
-    			public void componentMoved(final ComponentEvent e) {
-    				// TODO Auto-generated method stub
-    				resized();
-    			}
+			@Override
+			public void componentHidden(final ComponentEvent e) { /* Vacio */ }
+		});
 
-    			@Override
-    			public void componentHidden(final ComponentEvent e) {
-    				// TODO Auto-generated method stub
+        for (int i = 0; i<this.getComponentCount();i++){
+        	if (this.getComponent(i).getClass().getName().equals("javax.swing.JToolBar")){ //$NON-NLS-1$
+        		this.jTool = (JToolBar)this.getComponent(i);
+        		for (int j = 0; j<this.jTool.getComponentCount();j++){
+            		// Al cambiar entre vista en lista y detalles se llama a adjustWindowFonts para que calcule el tamano del texto
+            		if (this.jTool.getComponent(j).getClass().getName().equals("javax.swing.JToggleButton")){ //$NON-NLS-1$
+            			final JToggleButton boton = ((JToggleButton)this.jTool.getComponent(j));
+            			// Al cambiar entre vista en lista y detalles se llama a adjustWindowFonts para que calcule el tamano del texto
+            			((JToggleButton)(this.jTool.getComponent(j))).addMouseListener(new MouseListener() {
 
-    			}
-    		});
+    						@Override
+    						public void mouseReleased(final MouseEvent e) { /* Vacio */ }
 
-            for (int i = 0; i<this.getComponentCount();i++){
-            	if (this.getComponent(i).getClass().getName().equals("javax.swing.JToolBar")){ //$NON-NLS-1$
-            		this.jTool = (JToolBar)this.getComponent(i);
-            		for (int j = 0; j<this.jTool.getComponentCount();j++){
-                		// Al cambiar entre vista en lista y detalles se llama a adjustWindowFonts para que calcule el tamano del texto
-                		if (this.jTool.getComponent(j).getClass().getName().equals("javax.swing.JToggleButton")){ //$NON-NLS-1$
-                			final JToggleButton boton = ((JToggleButton)this.jTool.getComponent(j));
-                			// Al cambiar entre vista en lista y detalles se llama a adjustWindowFonts para que calcule el tamano del texto
-                			((JToggleButton)(this.jTool.getComponent(j))).addMouseListener(new MouseListener() {
+    						@Override
+    						public void mousePressed(final MouseEvent e) { /* Vacio */ }
 
-        						@Override
-        						public void mouseReleased(final MouseEvent e) {
-        							// TODO Auto-generated method stub
+    						@Override
+    						public void mouseExited(final MouseEvent e) { /* Vacio */ }
 
-        						}
+    						@Override
+    						public void mouseEntered(final MouseEvent e) { /* Vacio */ }
 
-        						@Override
-        						public void mousePressed(final MouseEvent e) {
-        							// TODO Auto-generated method stub
+    						@Override
+    						public void mouseClicked(final MouseEvent e) {
+    							callResize();
+    						}
+    					});
+            			((JToggleButton)(this.jTool.getComponent(j))).addKeyListener(new KeyListener() {
 
-        						}
+    						@Override
+    						public void keyTyped(final KeyEvent e) { /* Vacio */ }
 
-        						@Override
-        						public void mouseExited(final MouseEvent e) {
-        							// TODO Auto-generated method stub
+    						@Override
+    						public void keyReleased(final KeyEvent e) {
+    							if (e.getKeyCode() == KeyEvent.VK_SPACE){
+    								boton.doClick();
+    								callResize();
+    							}
+    						}
 
-        						}
+    						@Override
+    						public void keyPressed(final KeyEvent e) { /* Vacio */ }
+    					});
 
-        						@Override
-        						public void mouseEntered(final MouseEvent e) {
-        							// TODO Auto-generated method stub
-
-        						}
-
-        						@Override
-        						public void mouseClicked(final MouseEvent e) {
-        							// TODO Auto-generated method stub
-        							callResize();
-        						}
-        					});
-                			((JToggleButton)(this.jTool.getComponent(j))).addKeyListener(new KeyListener() {
-
-        						@Override
-        						public void keyTyped(final KeyEvent e) {
-        							// TODO Auto-generated method stub
-        						}
-
-        						@Override
-        						public void keyReleased(final KeyEvent e) {
-        							// TODO Auto-generated method stub
-        							if (e.getKeyCode() == KeyEvent.VK_SPACE){
-        								boton.doClick();
-        								callResize();
-        							}
-        						}
-
-        						@Override
-        						public void keyPressed(final KeyEvent e) {
-        							// TODO Auto-generated method stub
-        						}
-        					});
-
-                		}
-                		Utils.remarcar((JComponent)this.jTool.getComponent(j));
-                    	Utils.setFontBold((JComponent)this.jTool.getComponent(j));
-                	}
-            	} else {
-            		accessibility((JPanel)this.getComponent(i));
+            		}
+            		Utils.remarcar((JComponent)this.jTool.getComponent(j));
+                	Utils.setFontBold((JComponent)this.jTool.getComponent(j));
             	}
+        	} else {
+        		accessibility((JPanel)this.getComponent(i));
+        	}
 
-            }
+        }
 
-          //Restricciones para los botones
-			final GridBagConstraints consButtons = new GridBagConstraints();
-			consButtons.fill = GridBagConstraints.BOTH;
-			consButtons.gridx = 0;
-			consButtons.gridy = 0;
-			consButtons.weightx = 1.0;
-			consButtons.weighty = 0.05;
+      //Restricciones para los botones
+		final GridBagConstraints consButtons = new GridBagConstraints();
+		consButtons.fill = GridBagConstraints.BOTH;
+		consButtons.gridx = 0;
+		consButtons.gridy = 0;
+		consButtons.weightx = 1.0;
+		consButtons.weighty = 0.05;
 
-			this.accesibilityButtonsPanel = createAccessibilityButtonsPanel();
-            contentPane.add(this.accesibilityButtonsPanel, consButtons);
+		this.accesibilityButtonsPanel = createAccessibilityButtonsPanel();
+        contentPane.add(this.accesibilityButtonsPanel, consButtons);
 
-            consButtons.gridy = 1;
-            consButtons.weighty = 0.95;
-            contentPane.add(this, consButtons);
-//        }
+        consButtons.gridy = 1;
+        consButtons.weighty = 0.95;
+        contentPane.add(this, consButtons);
 
         if (JDialog.isDefaultLookAndFeelDecorated()) {
             final boolean supportsWindowDecorations = UIManager
@@ -313,32 +273,32 @@ public final class JAccessibilityFileChooserToSave extends JAccessibilityFileCho
         this.dialog.pack();
         this.dialog.setLocationRelativeTo(parent);
 
-//        if (GeneralConfig.isAccessibility()) {
-        	this.resizingAdaptor = new ResizingAdaptor(null,null,null,null,null,null,null,this);
-        	this.theDialog = this.dialog;
-     		this.dialog.addComponentListener(this.resizingAdaptor);
-//        }
+    	this.resizingAdaptor = new ResizingAdaptor(null,null,null,null,null,null,null,this);
+    	this.theDialog = this.dialog;
+ 		this.dialog.addComponentListener(this.resizingAdaptor);
 
-         	// Dimensiones de la ventana
-     		if (GeneralConfig.isMaximized() || isMaximized()){
-     			this.theDialog.setBounds(0,0, (int)(getMaxDimension().getWidth()), (int)(getMaxDimension().getHeight()));
-            	this.dialog.setPreferredSize(getMaxDimension());
-            } else {
-            	if (PrincipalGUI.getFileActualPositionX() != -1){
-            		this.dialog.setBounds(PrincipalGUI.getFileActualPositionX(),PrincipalGUI.getFileActualPositionY(),PrincipalGUI.getFileActualWidth(), PrincipalGUI.getFileActualHeight());
-            		this.dialog.setPreferredSize(new Dimension(PrincipalGUI.getFileActualWidth(), PrincipalGUI.getFileActualHeight()));
-            	}
-            }
-            if (GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
-            	this.dialog.setMinimumSize(new Dimension(Constants.FILE_FONT_INITIAL_WIDTH, Constants.FILE_INITIAL_HEIGHT));
-            } else {
-            	//En entornos Linux y MAC pinta la pantalla con un tamano de fuente diferente al estandar
-            	if (Platform.getOS().equals(Platform.OS.MACOSX) || Platform.getOS().equals(Platform.OS.LINUX)){
-            		this.dialog.setMinimumSize(new Dimension(Constants.FILE_INITIAL_WIDTH_MAC, Constants.FILE_INITIAL_HEIGHT));
-            	} else {
-            		this.dialog.setMinimumSize(new Dimension(Constants.FILE_INITIAL_WIDTH, Constants.FILE_INITIAL_HEIGHT));
-            	}
-            }
+     	// Dimensiones de la ventana
+ 		if (GeneralConfig.isMaximized() || isMaximized()){
+ 			this.theDialog.setBounds(0,0, (int)(getMaxDimension().getWidth()), (int)(getMaxDimension().getHeight()));
+        	this.dialog.setPreferredSize(getMaxDimension());
+        }
+ 		else {
+        	if (PrincipalGUI.getFileActualPositionX() != -1){
+        		this.dialog.setBounds(PrincipalGUI.getFileActualPositionX(),PrincipalGUI.getFileActualPositionY(),PrincipalGUI.getFileActualWidth(), PrincipalGUI.getFileActualHeight());
+        		this.dialog.setPreferredSize(new Dimension(PrincipalGUI.getFileActualWidth(), PrincipalGUI.getFileActualHeight()));
+        	}
+        }
+        if (GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
+        	this.dialog.setMinimumSize(new Dimension(Constants.FILE_FONT_INITIAL_WIDTH, Constants.FILE_INITIAL_HEIGHT));
+        }
+        else {
+        	//En entornos Linux y MAC pinta la pantalla con un tamano de fuente diferente al estandar
+        	if (Platform.getOS().equals(Platform.OS.MACOSX) || Platform.getOS().equals(Platform.OS.LINUX)){
+        		this.dialog.setMinimumSize(new Dimension(Constants.FILE_INITIAL_WIDTH_MAC, Constants.FILE_INITIAL_HEIGHT));
+        	} else {
+        		this.dialog.setMinimumSize(new Dimension(Constants.FILE_INITIAL_WIDTH, Constants.FILE_INITIAL_HEIGHT));
+        	}
+        }
 
         return this.dialog;
 	}
@@ -347,38 +307,28 @@ public final class JAccessibilityFileChooserToSave extends JAccessibilityFileCho
 	 * Elimina la barra de accesos a carpetas de windows de la ventana
 	 */
 	private void removeWindowsToolBar(){
-
 		for (int i=0; i<this.getComponentCount();i++){
 			if (this.getComponent(i) instanceof JToolBar){
         		if (!this.getComponent(i).getClass().getName().equals("javax.swing.JToolBar")){ //$NON-NLS-1$
         			this.remove(this.getComponent(i));
-
         		}
         	}
         }
-
 	}
 
-	/**
-	 * Devuelve el dialogo.
-	 * return dialogo
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public JDialog getDialog(){
 		return this.theDialog;
 	}
 
-	/**
-	 * Ajuste de fuentes.
-	 */
+	/** Ajuste de fuentes. */
 	@Override
 	final void callResize(){
 		this.resizingAdaptor.adjustWindowFonts();
 	}
 
-	/**
-	 * Se almacena la posicion actual.
-	 */
+	/** Se almacena la posici&oacute;n actual. */
 	@Override
 	void resized(){
 		if (!GeneralConfig.isMaximized() || isMaximized()){

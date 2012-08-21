@@ -1,3 +1,13 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
 package es.gob.afirma.ui.utils;
 
 import java.awt.Color;
@@ -49,7 +59,7 @@ import es.gob.afirma.ui.principal.PrincipalGUI;
  * @author lmerayo
  *
  */
-public class JAccessibilityFileChooser extends JFileChooser{
+class JAccessibilityFileChooser extends JFileChooser{
 
 	/**
 	 * Serial version ID.
@@ -96,7 +106,7 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	/**
 	 * Constructor.
 	 */
-	public JAccessibilityFileChooser() {
+	JAccessibilityFileChooser() {
 		super();
 		init();
 	}//constructor
@@ -105,7 +115,7 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	 * Constructor.
 	 * @param file directorio.
 	 */
-	public JAccessibilityFileChooser(final File file) {
+	JAccessibilityFileChooser(final File file) {
 		super(file);
 		init();
 	}//constructor
@@ -165,7 +175,7 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	 * @param key clave del componente al que se le va a asignar el mnem&oacute;nico.
 	 * @param mnemonic mnem&oacute;nico que se va a asignar al componente
 	 */
-	public void setButtonMnemonics( final Container c, final String key, final int mnemonic ) {
+	protected void setButtonMnemonics( final Container c, final String key, final int mnemonic ) {
 	    final int len = c.getComponentCount(); //Nomero de componentes del contenedor
 	    //Se recorren los elementos que forman el contenedor
 	    for (int i = 0; i < len; i++) {
@@ -191,7 +201,7 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	 * @param key clave del componente al que se le va a asignar el mnem&oacute;nico.
 	 * @param mnemonic mnem&oacute;nico que se va a asignar al componente
 	 */
-	public void setLabelMnemonics( final Container c, final String key, final int mnemonic ) {
+	protected void setLabelMnemonics( final Container c, final String key, final int mnemonic ) {
 		 //Nomero de componentes del contenedor
 	    final int len = c.getComponentCount();
 	    //Se recorren los elementos que forman el contenedor
@@ -216,7 +226,7 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	 * Asigna un mnem&oacute;nico predefinido a ciertos toggleButton contenidos en el componente.
 	 * @param c contenedor global
 	 */
-	public void setToggleButtonMnemonics( final Container c) {
+	protected void setToggleButtonMnemonics( final Container c) {
 		 //Numero de componentes del contenedor
 	    final int len = c.getComponentCount();
 	    final String openTag = "<u>";
@@ -279,7 +289,7 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	 * Define el modo alto contraste para los componentes de la ventana.
 	 * @param c contenedor global
 	 */
-	public void setHighContrast(final Container c) {
+	protected void setHighContrast(final Container c) {
 		 //Numero de componentes del contenedor
 	    final int len = c.getComponentCount();
 	    //Se recorren los elementos que forman el contenedor
@@ -331,7 +341,6 @@ public class JAccessibilityFileChooser extends JFileChooser{
                 AccessibleContext.ACCESSIBLE_DESCRIPTION_PROPERTY,
                 title);
 
-       // this.dialog = new JDialog((Frame) this.getParent(), title, true);
         //Se comprueba el tipo de componente padre, para asignar el correcto y que asi se muestre el icono asociado.
         if (parent instanceof JDialog) {
         	this.dialog = new JDialog((JDialog)parent, title, true);
@@ -508,7 +517,7 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	 * Aplica la configuraci&oacute;n de accesibilidad a los componentes del panel
 	 * @param jPanel Panel con los componentes. Puede contener m&aacute;s paneles
 	 */
-	public void accessibility(final JPanel jPanel){
+	protected void accessibility(final JPanel jPanel){
 		for (int i=0;i<jPanel.getComponentCount();i++){
 			if (jPanel.getComponent(i) instanceof JPanel){
 				accessibility((JPanel)jPanel.getComponent(i));
@@ -693,7 +702,7 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	/**
 	 * Restaura el tama&ntilde;o de la ventana a la posicion anterior al maximizado
 	 */
-	public void restaurarActionPerformed(){
+	protected void restaurarActionPerformed(){
 
 		if (JAccessibilityFileChooser.actualPositionX != -1 && getActualPositionY() != -1 && getActualWidth() != -1 && getActualHeight() != -1){
 			this.theDialog.setBounds(JAccessibilityFileChooser.actualPositionX, getActualPositionY(), getActualWidth(), getActualHeight());
@@ -722,7 +731,7 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	/**
 	 * Maximiza la ventana
 	 */
-	public void maximizarActionPerformed(){
+	protected void maximizarActionPerformed(){
 		setActualPositionX(this.theDialog.getX());
 		setActualPositionY(this.theDialog.getY());
 		setActualWidth(this.theDialog.getWidth());
@@ -740,7 +749,7 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	 * Devuelve el panel de botones de maximizar/restaurar
 	 * @return JPanel con los botones de maximizar/restaurar
 	 */
-	public JPanel getAccesibilityButtonsPanel(){
+	protected JPanel getAccesibilityButtonsPanel(){
 		return this.accesibilityButtonsPanel;
 	}
 
@@ -748,7 +757,7 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	 * Devuelve el tama&ntilde;o m&aacute;ximo disponible para una ventana
 	 * @return Dimension m&aacute;ximo disponible.
 	 */
-	public static Dimension getMaxDimension(){
+	protected static Dimension getMaxDimension(){
 
 		final Dimension result = new Dimension();
 		//Se obtienen las dimensiones totales disponibles para mostrar una ventana
