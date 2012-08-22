@@ -815,7 +815,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
                 // Se asigna el lookAndFeel que habia por defecto
                 UIManager.setLookAndFeel(this.defaultLookAndFeel);
 
-                if (!((Platform.getOS().equals(Platform.OS.LINUX) && (System.getProperty("java.version").compareTo("1.7.0") > 0) ))){
+                if (!((Platform.getOS().equals(Platform.OS.LINUX) && (System.getProperty("java.version").compareTo("1.7.0") > 0) ))){ //$NON-NLS-1$ //$NON-NLS-2$
                 	UIManager.put("FileChooserUI", "com.sun.java.swing.plaf.windows.WindowsFileChooserUI"); //$NON-NLS-1$//$NON-NLS-2$
                 }
 
@@ -896,6 +896,8 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		PrincipalGUI.fileActualWidth = fileActualWidth;
 	}
 
+	/** Obtiene la barra de estado
+	 * @return Barra de estado */
 	public static JStatusBar getBar() {
 		return bar;
 	}
