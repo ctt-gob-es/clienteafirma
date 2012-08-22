@@ -288,12 +288,10 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
 		this.parentComponent = parent;
 	}
 
-	/**
-	 * Carga e instala el proveedor de seguridad para el acceso al almac&eacute;n de NSS. Si
+	/** Carga e instala el proveedor de seguridad para el acceso al almac&eacute;n de NSS. Si
 	 * ya estaba cargado, lo recupera directamente.
-	 * @return Proveedor para el acceso a NSS.
-	 */
-	private static final Provider getNssProvider() {
+	 * @return Proveedor para el acceso a NSS. */
+	private static Provider getNssProvider() {
 
 		if (nssProvider != null) {
 			return nssProvider;
@@ -301,7 +299,8 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
 
 		try {
 			nssProvider = MozillaKeyStoreUtilities.loadNSS();
-		} catch (final Exception e) {
+		} 
+		catch (final Exception e) {
 			LOGGER.severe("Error inicializando el proveedor NSS: " + e); //$NON-NLS-1$
 			nssProvider = null;
 		}
