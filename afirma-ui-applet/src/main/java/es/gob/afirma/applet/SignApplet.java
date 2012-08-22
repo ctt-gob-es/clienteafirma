@@ -2909,6 +2909,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 			return null;
 		}
 
+		setError(null);
 		return this.fileBase64 ? new String(fileContent) : Base64.encode(fileContent);
 	}
 
