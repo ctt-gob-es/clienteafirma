@@ -11,10 +11,13 @@
 package es.gob.afirma.standalone.ui;
 
 import java.awt.GridLayout;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
@@ -37,7 +40,16 @@ import es.gob.afirma.core.signers.AdESPolicy;
 
 @SuppressWarnings("nls")
 final class PreferencesPanel extends JPanel {
+    
+    final JButton applyButton = new JButton("Aplicar");
+    
+    private final Window window;
+    Window getParentWindow() {
+        return this.window;
+    }
 
+    private final ModificationListener modificationListener;
+    
 	private static final String PREFERENCE_SIGNATURE_ALGORITHM = "signatureAlgorithm"; //$NON-NLS-1$
 	private static final String PREFERENCE_POLICY_IDENTIFIER = "policyIdentifier"; //$NON-NLS-1$
 	private static final String PREFERENCE_POLICY_IDENTIFIER_HASH = "policyIdentifierHash"; //$NON-NLS-1$
@@ -191,7 +203,8 @@ final class PreferencesPanel extends JPanel {
 		add(createButtonsPanel());
 	}
 
-	void savePreferences() {
+	@SuppressWarnings("unused")
+    boolean savePreferences() {
 		// Lo primero que hay que guardar es la politica, porque puede dar error
 
 		//****************************************************************************
@@ -214,7 +227,7 @@ final class PreferencesPanel extends JPanel {
 					"Error",
 					JOptionPane.ERROR_MESSAGE
 				);
-				return;
+				return false;
 			}
 			PreferencesPanel.PREFERENCES.put(PREFERENCE_POLICY_IDENTIFIER, this.policyIdentifier.getText());
 			PreferencesPanel.PREFERENCES.put(PREFERENCE_POLICY_IDENTIFIER_HASH, this.policyIdentifierHash.getText());
@@ -297,6 +310,8 @@ final class PreferencesPanel extends JPanel {
 		else {
 			PreferencesPanel.PREFERENCES.put(PREFERENCE_XADES_SIGNER_CLAIMED_ROLE, this.xadesSignerClaimedRole.getText());
 		}
+		
+	    return true;
 
 	}
 
@@ -310,31 +325,37 @@ final class PreferencesPanel extends JPanel {
         final JLabel xadesSignatureProductionProvinceLabel = new JLabel("Provincia o regi\u00F3n en la que se realiza la firma");
         xadesSignatureProductionProvinceLabel.setLabelFor(this.xadesSignatureProductionProvince);
         metadata.add(xadesSignatureProductionProvinceLabel);
+        this.xadesSignatureProductionProvince.addKeyListener(this.modificationListener);
         metadata.add(this.xadesSignatureProductionProvince);
 
         final JLabel xadesSignatureProductionPostalCodeLabel = new JLabel("C\u00F3digo postal del lugar en el que se realiza la firma");
         xadesSignatureProductionPostalCodeLabel.setLabelFor(this.xadesSignatureProductionPostalCode);
         metadata.add(xadesSignatureProductionPostalCodeLabel);
+        this.xadesSignatureProductionPostalCode.addKeyListener(this.modificationListener);
         metadata.add(this.xadesSignatureProductionPostalCode);
 
         final JLabel xadesSignatureProductionCityLabel = new JLabel("Ciudad en la que se realiza la firma");
         xadesSignatureProductionCityLabel.setLabelFor(this.xadesSignatureProductionCity);
         metadata.add(xadesSignatureProductionCityLabel);
+        this.xadesSignatureProductionCity.addKeyListener(this.modificationListener);
         metadata.add(this.xadesSignatureProductionCity);
 
         final JLabel xadesSignatureProductionCountryLabel = new JLabel("Pa\u00EDs en el que se realiza la firma");
         xadesSignatureProductionCountryLabel.setLabelFor(this.xadesSignatureProductionCountry);
         metadata.add(xadesSignatureProductionCountryLabel);
+        this.xadesSignatureProductionCountry.addKeyListener(this.modificationListener);
         metadata.add(this.xadesSignatureProductionCountry);
 
         final JLabel xadesSignerClaimedRoleLabel = new JLabel("Cargo atribuido al firmante");
         xadesSignerClaimedRoleLabel.setLabelFor(this.xadesSignerClaimedRole);
         metadata.add(xadesSignerClaimedRoleLabel);
+        this.xadesSignerClaimedRole.addKeyListener(this.modificationListener);
         metadata.add(this.xadesSignerClaimedRole);
 
         final JLabel xadesSignerCertifiedRoleLabel = new JLabel("Cargo real del firmante");
         xadesSignerCertifiedRoleLabel.setLabelFor(this.xadesSignerCertifiedRole);
         metadata.add(xadesSignerCertifiedRoleLabel);
+        this.xadesSignerCertifiedRole.addKeyListener(this.modificationListener);
         metadata.add(this.xadesSignerCertifiedRole);
 
         final JPanel format = new JPanel();
@@ -478,6 +499,13 @@ final class PreferencesPanel extends JPanel {
 		cancelButton.getAccessibleContext().setAccessibleDescription(
 			"Cancela el establecimiento de preferencias descartando los cambios realizados desde la \u00FAltima vez que se guardaron"
 		);
+		cancelButton.addActionListener(new ActionListener() {
+		    /** {@inheritDoc} */
+            @Override
+            public void actionPerformed(final ActionEvent ae) {
+                PreferencesPanel.this.getParentWindow().dispose();
+            }
+        });
 		panel.add(cancelButton);
 		final JButton acceptButton = new JButton("Aceptar");
 		acceptButton.setMnemonic('A');
@@ -488,27 +516,36 @@ final class PreferencesPanel extends JPanel {
 			/** {@inheritDoc} */
 			@Override
 			public void actionPerformed(final ActionEvent ae) {
-				savePreferences();
+				if (savePreferences()) {
+				    PreferencesPanel.this.getParentWindow().dispose();
+				}
 			}
 		});
 		panel.add(acceptButton);
-		final JButton applyButton = new JButton("Aplicar");
-		applyButton.setMnemonic('p');
-		applyButton.getAccessibleContext().setAccessibleDescription(
+		this.applyButton.setMnemonic('p');
+		this.applyButton.getAccessibleContext().setAccessibleDescription(
 			"Guarda los valores establecidos para las preferencias permitiendo continuar con el proceso de establecimiento de estas"
 		);
-		applyButton.addActionListener(new ActionListener() {
+		this.applyButton.addActionListener(new ActionListener() {
 			/** {@inheritDoc} */
 			@Override
 			public void actionPerformed(final ActionEvent ae) {
-				savePreferences();
+				if (savePreferences()) {
+				    setModified(false);
+				}
 			}
 		});
-		panel.add(applyButton);
+		this.applyButton.setEnabled(false);
+		panel.add(this.applyButton);
 		return panel;
 	}
 
-	PreferencesPanel() {
+	PreferencesPanel(final Window w) {
+	    if (w==null) {
+	        throw new IllegalArgumentException("Es necesario proporcionar una referencia a la ventana contenedora");
+	    }
+	    this.window = w;
+	    this.modificationListener = new ModificationListener(this);
 		try {
             SwingUtilities.invokeAndWait(new Runnable() {
             	/** {@inheritDoc} */
@@ -523,6 +560,11 @@ final class PreferencesPanel extends JPanel {
         }
 	}
 
+	/** Indica si se ha modificado algun dato desde el &ucuate;ltimo guardado, y por lo tanto si hay algo nuevo para guardar. */
+	void setModified(boolean mod) {
+	    this.applyButton.setEnabled(mod);
+	}
+	
 	void loadPolicy(final AdESPolicy policy) {
 		if (policy != null) {
 			PreferencesPanel.this.getPolicyIdentifier().setText(policy.getPolicyIdentifier());
@@ -537,7 +579,23 @@ final class PreferencesPanel extends JPanel {
 		}
 	}
 
+	private static final class ModificationListener extends KeyAdapter {
 
+	    private final PreferencesPanel prefPanel;
+	    
+        public ModificationListener(final PreferencesPanel pp) {
+            if (pp == null) {
+                throw new IllegalArgumentException("Se necesita un ModificationListener para indicar que ha habido modificaciones, no puede ser nulo");
+            }
+            this.prefPanel = pp;
+        }
+
+        @Override
+        public void keyReleased(KeyEvent arg0) {
+            this.prefPanel.setModified(true);
+        }
+	    
+	}
 
 
 
@@ -546,7 +604,7 @@ final class PreferencesPanel extends JPanel {
 
 public static void main(final String args[]) {
 	final javax.swing.JFrame frame = new javax.swing.JFrame();
-	frame.add(new PreferencesPanel());
+	frame.add(new PreferencesPanel(frame));
 	frame.setBounds(50,50,800,600);
 	frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	frame.setVisible(true);
