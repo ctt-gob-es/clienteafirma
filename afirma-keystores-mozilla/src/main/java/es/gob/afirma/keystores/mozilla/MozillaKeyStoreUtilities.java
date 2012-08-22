@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.Provider;
 import java.security.Security;
@@ -889,7 +890,15 @@ final class MozillaKeyStoreUtilities {
 		}
 	}
 
-	static Provider loadNSS() throws Exception {
+	static Provider loadNSS() throws FileNotFoundException,
+	                                 AOException, 
+	                                 IllegalArgumentException, 
+	                                 SecurityException, 
+	                                 InstantiationException, 
+	                                 IllegalAccessException, 
+	                                 InvocationTargetException, 
+	                                 NoSuchMethodException, 
+	                                 ClassNotFoundException {
 
 		final String nssDirectory = MozillaKeyStoreUtilities.getSystemNSSLibDir();
 		final String p11NSSConfigFile =

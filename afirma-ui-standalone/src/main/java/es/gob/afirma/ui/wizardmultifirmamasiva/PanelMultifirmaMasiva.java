@@ -586,7 +586,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
 
         try {
             final DirectorySignatureHelperAdv dSigner =
-                    new DirectorySignatureHelperAdv(GeneralConfig.getSignAlgorithm(), this.algoritmo, AOSignConstants.SIGN_MODE_IMPLICIT, this);
+                    new DirectorySignatureHelperAdv(GeneralConfig.getSignAlgorithm(), this.algoritmo, AOSignConstants.SIGN_MODE_IMPLICIT);
 
             // Establecemos el filtro de ficheros por extension
             dSigner.setFileFilter(getExtensionFileFilter(this.extensiones));

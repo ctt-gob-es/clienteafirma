@@ -9,8 +9,6 @@
  */
 package es.gob.afirma.ui.utils;
 
-import javax.swing.JDialog;
-
 import es.gob.afirma.core.AOUnsupportedSignFormatException;
 import es.gob.afirma.massive.DirectorySignatureHelper;
 
@@ -18,20 +16,13 @@ import es.gob.afirma.massive.DirectorySignatureHelper;
  * se muestra una barra de progreso que informa de la situaci&oacute;n. */
 public class DirectorySignatureHelperAdv extends DirectorySignatureHelper {
 
-    /** Componente padre sobre el que se mostrara el di&aacute;logo con la barra de progreso. */
-    private JDialog parent = null;
-
-    /** Dialogo con la barra de progreso. */
-    private final ProgressDialog progressDialog = null;
-
     /** Crea un instancia de la clase con una configuraci&oacute;n y un componente padre asignado.
      * @param algorithm Algoritmo de firma electr&oacute;nica.
      * @param format Formato de firma por defecto.
      * @param mode Modo de firma.
      * @param parent Componente padre.
      * @throws AOUnsupportedSignFormatException */
-    public DirectorySignatureHelperAdv(final String algorithm, final String format, final String mode, final JDialog parent) throws AOUnsupportedSignFormatException {
+    public DirectorySignatureHelperAdv(final String algorithm, final String format, final String mode) throws AOUnsupportedSignFormatException {
         super(algorithm, format, mode);
-        this.parent = parent;
     }
 }
