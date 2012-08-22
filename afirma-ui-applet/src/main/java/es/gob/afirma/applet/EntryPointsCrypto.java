@@ -1290,24 +1290,26 @@ interface EntryPointsCrypto {
     void setHash(final String hash);
 
     /** Ruta al fichero en el que se ha guardado la firma. Esta direcci&oacute;n
-     * puede hacerse establecido program&aacute;ticamente mediante <code>setOutFilePath(String) setOutFilePath</code> o mediante la interfaz que
-     * aparece cuando no hay un valor asignado. Una vez se establece el valor
+     * puede hacerse establecido program&aacute;ticamente mediante <code>setOutFilePath(String)</code>
+     * o mediante la interfaz que aparece cuando no hay un valor asignado. Una vez se establece el valor
      * del fichero de salida este permanece a&uacute;n cuando no se completa la
      * operaci&acute;n de firma. Si no hay un fichero de salida establecido se
      * devuelve cadena vac&iacute;a. <br>
      * <br>
      * Route to the file where the signature has been stored. This address may
-     * have been set programmatically by <code>setOutFilePath(String)
-     * setOutFilePath</code> or by the interface showing when there is no assigned
-     * value. Once the output file's value is set, it remains unchanged, even in
+     * have been set programmatically by <code>setOutFilePath(String)</code> or by the interface
+     * showing when there is no assigned value.
+     * Once the output file's value is set, it remains unchanged, even in
      * cases where the signature operation may not be complete. If there is no
      * set output file, an empty string is returned.
      * @return Ruta al fichero en que se ha guardado la firma. <br>
-     *         Route to the file containing the signature. */
+     *         Route to the file containing the signature.
+     * @see #setOutFilePath(String)*/
     String getFilePath();
 
     /** Devuelve la ruta del fichero de entrada. Esta direcci&oacute;n puede
-     * haberse establecido program&aacute;ticamente mediante <code>setFileuri(String) setFileuri</code> o mediante la interfaz que aparece
+     * haberse establecido program&aacute;ticamente mediante <code>setFileuri(String)</code>
+     * o mediante la interfaz que aparece
      * cuando no hay un valor asignado. Una vez se establece el valor del
      * fichero de datos este permanece a&uacute;n cuando no se completa la
      * operaci&acute;n de firma. Si no hay un fichero de datos establecido se
@@ -1319,7 +1321,7 @@ interface EntryPointsCrypto {
      * previamente deberemos obtener una URI. <br>
      * <br>
      * Returns the input file's path. This address may have been set
-     * programmatically by <code>setFileuri(String) setFileuri</code> or or by the
+     * programmatically by <code>setFileuri(String)</code> or or by the
      * interface showing when there is no assigned value. Once the file's value
      * is set, it remains unchanged, even in cases where the signature operation
      * may not be complete. If there is no set output file, an empty string is
@@ -1328,7 +1330,8 @@ interface EntryPointsCrypto {
      * changes will be executed such as replacing (' ') by "%20". This method
      * does not allow directly acquiring a file by the class {@link java.io.File}. An URI must be previously acquired.
      * @return Fichero que seleccion&oacute; el usuario para firmar <br>
-     *         File selected by the user for signature. */
+     *         File selected by the user for signature.
+     * @see #setFileuri(String)*/
     String getFileUsedPath();
 
     /** Establece una firma electr&oacute;nica en base 64 como entrada para el
@@ -1412,16 +1415,14 @@ interface EntryPointsCrypto {
      *         <code>true</code> if data has been stored successfully. Else, <code>false</code> */
     boolean saveDataToFile();
 
-    /** Define el tipo de datos mime de los datos tras introducirlos. Si se
-     * especifica un archivo, el mimetype se intentar&aacute; obtener
-     * autom&aacute;ticamente a partir de la extensi&oacute;n del archivo. En
-     * caso de que no se especifiquen y no se puedan obtener
-     * autom&aacute;ticamente se tomar&aacute; como mimetype por defecto
-     * application/octet-string <br>
+    /** Define el tipo de datos mime de los datos tras introducirlos. Si no se
+     * especifica se intentar&aacute; identificar el tipo autom&aacute;ticamente.
+     * Si no es posible identificar el tipo, se utilizar&aacute; como mimetype
+     * por defecto "application/octet-string"<br>
      * <br>
-     * Defines the type of entered mime data. If a file is specified, it will be
-     * automatically attempted to obtain mimetype from the file's extension. If
-     * no file is specified, and mimetype cannnot be automatically obtained,
+     * Defines the type of entered mime data. If it isn't specified, it will be
+     * automatically attempted to obtain mimetype from the data. If
+     * mimetype cannnot be automatically obtained,
      * application/octet-string will be regarded as default mimetype.
      * @param mimetype
      *        Tipo de datos para los datos actuales. <br>
