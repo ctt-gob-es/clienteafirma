@@ -51,17 +51,11 @@ final class CheckAndInstallMissingParts {
      * @param bld Construcci&oacute;n del Cliente que se desea cargar.
      * @param filesCodeBase Directorio en el cual se encuentran los instalables. */
     CheckAndInstallMissingParts(final OS ost, final JREVER jreVer, final String bld, final URL filesCodeBase) {
-
-    	System.out.println("DEBUG: Constructor de CheckAndInstallMissingParts");
-
         if (filesCodeBase == null) {
             throw new IllegalArgumentException(
         		"Es necesario proporcionar una URL de descarga para los ficheros de instalacion" //$NON-NLS-1$
     		);
         }
-
-        System.out.println("DEBUG: Constructor de CheckAndInstallMissingParts 2");
-
         this.installFilesCodeBase = filesCodeBase;
         this.os = ost;
         this.jreVersion = jreVer;
