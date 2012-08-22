@@ -93,36 +93,16 @@ public final class CabeceraAsistente extends JPanel {
         initComponents();
     }
 
-    /** Genera una cabecera para un asistente
-     * @param messagesTitulo Texto para obtener del ResourceMessages el titulo del asistente
-     * @param messagesDescripcion Texto para obtener del ResourceMessages la descripcion del asistente
-     * @param dimensiones Dimensiones de la cabecera. Puede tomar el valor null y en tal caso se
-     *        asignaran las dimensiones predeterminadas
-     * @param bloqueTexto True: La descripcion tiene mas de una linea
-     *        False: La descripcion tiene solo una linea */
-    public CabeceraAsistente(final String messagesTitulo, final String messagesDescripcion, final Dimension dimensiones, final boolean bloqueTexto) {
-        this.messagesTitulo = messagesTitulo;
-        this.messagesDescripcion = messagesDescripcion;
-        if (dimensiones != null) {
-            this.dimensiones = dimensiones;
-        }
-
-        initComponents();
-    }
-
     /** Genera una cabecera para un asistente. Con un texto de cabecera de dos l&iacute;neas.
      * @param messagesTitulo Texto para obtener del ResourceMessages el titulo del asistente
      * @param messagesDescripcion Texto para obtener del ResourceMessages la descripcion del asistente
      * @param messagesDescripcion2 Segunda parte del texto para obtener del ResourceMessages la descripcion del asistente
      * @param dimensiones Dimensiones de la cabecera. Puede tomar el valor null y en tal caso se
-     *        asignaran las dimensiones predeterminadas
-     * @param bloqueTexto True: La descripcion tiene mas de una linea
-     *        False: La descripcion tiene solo una linea */
+     *        asignaran las dimensiones predeterminadas */
     public CabeceraAsistente(final String messagesTitulo,
                              final String messagesDescripcion,
                              final String messagesDescripcion2,
-                             final Dimension dimensiones,
-                             final boolean bloqueTexto) {
+                             final Dimension dimensiones) {
         this.messagesTitulo = messagesTitulo;
         this.messagesDescripcion = messagesDescripcion;
         this.messagesDescripcion2 = messagesDescripcion2;

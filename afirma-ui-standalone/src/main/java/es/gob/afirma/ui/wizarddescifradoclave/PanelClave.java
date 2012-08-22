@@ -290,7 +290,7 @@ final class PanelClave extends JAccessibilityDialogWizard {
 
         // Panel con la cabecera
         final CabeceraAsistente panelSuperior =
-                new CabeceraAsistente("WizardDescifrado.clave.explicacion.titulo", "WizardDescifrado.clave.explicacion", null, true); //$NON-NLS-1$ //$NON-NLS-2$
+                new CabeceraAsistente("WizardDescifrado.clave.explicacion.titulo", "WizardDescifrado.clave.explicacion", null); //$NON-NLS-1$ //$NON-NLS-2$
         Utils.setContrastColor(panelSuperior);
         Utils.setFontBold(panelSuperior);
         getContentPane().add(panelSuperior, BorderLayout.NORTH);

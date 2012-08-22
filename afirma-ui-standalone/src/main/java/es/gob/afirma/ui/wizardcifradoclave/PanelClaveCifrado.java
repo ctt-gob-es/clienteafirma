@@ -421,7 +421,7 @@ final class PanelClaveCifrado extends JAccessibilityDialogWizard {
         setTitulo(Messages.getString("WizardCifrado.titulo")); //$NON-NLS-1$
 
         // Panel con la cabecera
-        final CabeceraAsistente panelSuperior = new CabeceraAsistente("WizardCifrado.explicacion.titulo", "WizardCifrado.explicacion", null, true); //$NON-NLS-1$ //$NON-NLS-2$
+        final CabeceraAsistente panelSuperior = new CabeceraAsistente("WizardCifrado.explicacion.titulo", "WizardCifrado.explicacion", null); //$NON-NLS-1$ //$NON-NLS-2$
         Utils.setContrastColor(panelSuperior);
         Utils.setFontBold(panelSuperior);
         getContentPane().add(panelSuperior, BorderLayout.NORTH);

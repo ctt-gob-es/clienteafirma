@@ -273,7 +273,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
 
         // Panel con la cabecera
         final CabeceraAsistente panelSuperior =
-                new CabeceraAsistente("Wizard.multifirma.ventana4.titulo", "Wizard.multifirma.ventana4.titulo.descripcion", null, true); //$NON-NLS-1$ //$NON-NLS-2$
+                new CabeceraAsistente("Wizard.multifirma.ventana4.titulo", "Wizard.multifirma.ventana4.titulo.descripcion", null); //$NON-NLS-1$ //$NON-NLS-2$
         Utils.setContrastColor(panelSuperior);
         Utils.setFontBold(panelSuperior);
         getContentPane().add(panelSuperior, BorderLayout.NORTH);

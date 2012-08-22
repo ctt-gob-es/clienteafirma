@@ -243,7 +243,7 @@ public final class PanelContrasenia extends JAccessibilityDialogWizard implement
 
         // Panel con la cabecera
         final CabeceraAsistente panelSuperior =
-            new CabeceraAsistente("WizardCifrado.contrasenia.explicacion.titulo", "wizardCifrado.contrasenia.explicacion", null, true);  //$NON-NLS-1$//$NON-NLS-2$
+            new CabeceraAsistente("WizardCifrado.contrasenia.explicacion.titulo", "wizardCifrado.contrasenia.explicacion", null);  //$NON-NLS-1$//$NON-NLS-2$
         Utils.setContrastColor(panelSuperior);
         Utils.setFontBold(panelSuperior);
         getContentPane().add(panelSuperior, BorderLayout.NORTH);

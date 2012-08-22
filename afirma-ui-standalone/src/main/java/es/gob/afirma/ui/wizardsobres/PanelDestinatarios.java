@@ -248,8 +248,7 @@ final class PanelDestinatarios extends JAccessibilityDialogWizard {
             new CabeceraAsistente("Wizard.sobres.pagina1.titulo", //$NON-NLS-1$
                                   "Wizard.sobres.pagina1.titulo.explicacion1", //$NON-NLS-1$
                                   "Wizard.sobres.pagina1.titulo.explicacion2", //$NON-NLS-1$
-                                  null,
-                                  true);
+                                  null);
         Utils.setContrastColor(panelSuperior);
         Utils.setFontBold(panelSuperior);
         getContentPane().add(panelSuperior, BorderLayout.NORTH);

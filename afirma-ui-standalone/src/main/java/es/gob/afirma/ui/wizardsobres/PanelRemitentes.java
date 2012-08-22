@@ -486,7 +486,7 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
 
         // Panel con la cabecera
         final CabeceraAsistente panelSuperior =
-                new CabeceraAsistente("Wizard.sobres.pagina2.titulo", "Wizard.sobres.pagina2.titulo.explicacion1", "Wizard.sobres.pagina2.titulo.explicacion2", null, true); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                new CabeceraAsistente("Wizard.sobres.pagina2.titulo", "Wizard.sobres.pagina2.titulo.explicacion1", "Wizard.sobres.pagina2.titulo.explicacion2", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         Utils.setContrastColor(panelSuperior);
         Utils.setFontBold(panelSuperior);
         getContentPane().add(panelSuperior, BorderLayout.NORTH);
