@@ -16,11 +16,6 @@ public class IconLabel extends JLabel {
     /** Icono original. */
     private Icon originalIcon = null;
 
-    /** Constructor. */
-    public IconLabel() {
-
-    }
-
     /** {@inheritDoc} */
     @Override
     public Icon getIcon() {
