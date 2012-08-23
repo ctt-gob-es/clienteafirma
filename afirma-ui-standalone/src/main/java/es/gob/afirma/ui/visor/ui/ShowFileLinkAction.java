@@ -40,19 +40,17 @@ final class ShowFileLinkAction {
     }
 
     void action() {
-
         if (this.dataFile != null) {
         	openFile(this.dataFile, this.parent);
-        } else if (this.data != null) {
+        }
+        else if (this.data != null) {
         	openData(this.data, this.parent);
         }
     }
 
-    /**
-     * Abre un fichero de datos.
-     * @param dataFile Fichero de datos.
-     */
-    private static final void openFile(final File dataFile, final Component parent) {
+    /** Abre un fichero de datos.
+     * @param dataFile Fichero de datos. */
+    private static void openFile(final File dataFile, final Component parent) {
 
     	if (!dataFile.exists()) {
     		CustomDialog.showMessageDialog(parent, true,
@@ -76,11 +74,9 @@ final class ShowFileLinkAction {
         }
     }
 
-    /**
-     * Abre unos datos en la aplicaci&oacute;n por defecto del sistema.
-     * @param data Datos.
-     */
-    private static final void openData(final byte[] data, final Component parent) {
+    /** Abre unos datos en la aplicaci&oacute;n por defecto del sistema.
+     * @param data Datos. */
+    private static void openData(final byte[] data, final Component parent) {
     	final String ext = ShowFileLinkAction.getCommonDataExtension(data);
 
         // Si conocemos la extension, intentamos abrir el fichero. Si no, permitimos

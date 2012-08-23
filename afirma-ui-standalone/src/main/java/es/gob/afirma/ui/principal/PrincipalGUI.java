@@ -117,8 +117,6 @@ public class PrincipalGUI extends JAccessibilityFrame {
         getBar().setStatus(nuevoEstado);
     }
 
-    private final boolean accesibilidad = false;
-
     private int actualHeight = -1;
 
     private int actualPositionX = -1;
@@ -560,8 +558,8 @@ public class PrincipalGUI extends JAccessibilityFrame {
             final File[] listFiles = languagesDirectory.listFiles();
 
             for (final File listFile : listFiles) {
-                if (listFile != null && listFile.isFile() && listFile.getName().startsWith("help")) {
-                    final String locale = listFile.getName().substring(5, listFile.getName().indexOf(".jar"));
+                if (listFile != null && listFile.isFile() && listFile.getName().startsWith("help")) { //$NON-NLS-1$
+                    final String locale = listFile.getName().substring(5, listFile.getName().indexOf(".jar")); //$NON-NLS-1$
                     languages.add(locale);
                 }
             }
@@ -752,7 +750,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
     /** Seleccion menu opciones: Muestra la ventana modal con las opciones */
     void opcionesActionPerformed() {
         HelpUtils.visualize("opciones.configuracion"); //$NON-NLS-1$
-        final Opciones ventanaOpciones = new Opciones(PrincipalGUI.this, this.aplicar, this.accesibilidad);
+        final Opciones ventanaOpciones = new Opciones(PrincipalGUI.this, this.aplicar, false);
         ventanaOpciones.setModal(true);
         ventanaOpciones.setVisible(true);
         setAplicar(false);

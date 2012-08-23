@@ -308,10 +308,8 @@ final class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
 	 */
 	private void removeWindowsToolBar(){
 		for (int i=0; i<this.getComponentCount();i++){
-			if (this.getComponent(i) instanceof JToolBar){
-        		if (!this.getComponent(i).getClass().getName().equals("javax.swing.JToolBar")){ //$NON-NLS-1$
-        			this.remove(this.getComponent(i));
-        		}
+			if (this.getComponent(i) instanceof JToolBar && (!this.getComponent(i).getClass().getName().equals("javax.swing.JToolBar"))) { //$NON-NLS-1$
+    			this.remove(this.getComponent(i));
         	}
         }
 	}
@@ -324,7 +322,7 @@ final class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
 
 	/** Ajuste de fuentes. */
 	@Override
-	final void callResize(){
+	void callResize(){
 		this.resizingAdaptor.adjustWindowFonts();
 	}
 
@@ -466,7 +464,8 @@ final class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
     		this.maximizeButton.setEnabled(false);
     		//Se habilita el boton de restaurar
     		this.restoreButton.setEnabled(true);
-    	} else {
+    	}
+    	else {
     		//Se habilita el boton de maximizado
     		this.maximizeButton.setEnabled(true);
     		//Se deshabilita el boton de restaurar
@@ -492,7 +491,8 @@ final class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
 			else {
 				if (Platform.getOS().equals(Platform.OS.MACOSX)){
     				setBounds(this.getInitialX(), this.getInitialY(), Constants.FILE_INITIAL_WIDTH_MAC, Constants.FILE_INITIAL_HEIGHT);
-    			} else {
+    			}
+				else {
     				setBounds(this.getInitialX(), this.getInitialY(), Constants.FILE_INITIAL_WIDTH, Constants.FILE_INITIAL_HEIGHT);
     			}
     			setMinimumSize(new Dimension(getSize().width, getSize().height));

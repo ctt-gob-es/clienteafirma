@@ -25,14 +25,13 @@ import es.gob.afirma.ui.principal.Main;
 public class JStatusBar extends JComponent {
 
     private static final long serialVersionUID = 1L;
-    private final int leftMargin = 0;
 
     /** Genera una barra de estado */
     public JStatusBar() {
         setPreferredSize(new Dimension(10, 20));
         setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
         setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLoweredBevelBorder(),
-                                                     BorderFactory.createEmptyBorder(0, this.leftMargin, 0, 0)));
+                                                     BorderFactory.createEmptyBorder(0, 0, 0, 0)));
     }
 
     /** Devuelve el valor de la barra de estado

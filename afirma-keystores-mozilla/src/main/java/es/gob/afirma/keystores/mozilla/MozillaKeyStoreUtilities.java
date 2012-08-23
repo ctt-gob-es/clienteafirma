@@ -891,13 +891,11 @@ final class MozillaKeyStoreUtilities {
 	}
 
 	static Provider loadNSS() throws FileNotFoundException,
-	                                 AOException, 
-	                                 IllegalArgumentException, 
-	                                 SecurityException, 
-	                                 InstantiationException, 
-	                                 IllegalAccessException, 
-	                                 InvocationTargetException, 
-	                                 NoSuchMethodException, 
+	                                 AOException,
+	                                 InstantiationException,
+	                                 IllegalAccessException,
+	                                 InvocationTargetException,
+	                                 NoSuchMethodException,
 	                                 ClassNotFoundException {
 
 		final String nssDirectory = MozillaKeyStoreUtilities.getSystemNSSLibDir();

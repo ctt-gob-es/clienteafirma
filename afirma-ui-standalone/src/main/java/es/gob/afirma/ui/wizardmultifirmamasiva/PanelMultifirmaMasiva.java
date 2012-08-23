@@ -96,7 +96,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
     }
 
     /** Clave para el filtrado de ficheros seg&uacute;n su extensi&oacute;n. */
-    private class ExtensionsFileFilter implements java.io.FileFilter {
+    private static final class ExtensionsFileFilter implements java.io.FileFilter {
 
         private final String[] exts;
 
@@ -133,7 +133,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
          *        Fichero del cual queremos conocer la extensi&oacute;n
          * @return Extensi&oacute;n del fichero o cadena vac&iacute;a si este no
          *         tiene extensi&oacute;n */
-        private final String getExtension(final File f) {
+        private static String getExtension(final File f) {
             final String s = f.getName();
             final int i = s.lastIndexOf('.');
             if (i > 0 && i < s.length() - 1) {
@@ -192,11 +192,11 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
     /** Tipo de firma a desarrollar */
     private int tipo;
 
-    /** Tipo de contrafirma (todos o ultimos) */
+    /** Tipo de contrafirma (todos o &uacute;ltimos) */
     private boolean tipoContrafirma = false;
 
-    /** Carga la pagina con los parametros
-     * @param kssc Configuracion del KeyStore
+    /** Carga la p&aacute;gina con los parametros
+     * @param kssc Configuraci&oacute;n del KeyStore
      * @param beep Indica si debe emitir un "beep" al finalizar */
     PanelMultifirmaMasiva(final KeyStoreConfiguration kssc, final boolean beep) {
         this.kssc = kssc;
@@ -233,7 +233,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
     /** Filtro para extensiones
      * @param extensiones1 extensiones recogidas del wizard
      * @return filtro de extensiones */
-    private FileFilter getExtensionFileFilter(final String extensiones1) {
+    private static FileFilter getExtensionFileFilter(final String extensiones1) {
         if (extensiones1 == null || extensiones1.trim().equals("")) { //$NON-NLS-1$
             return null;
         }

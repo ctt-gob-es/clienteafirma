@@ -377,14 +377,14 @@ public final class PanelMultifirma extends JAccessibilityDialogWizard {
     /** Introduce los alias de todos los certificados de firma del nodo indicado y todos sus subnodos.
      * @param node Nodo de firma.
      * @param signersSet Conjunto con los alias de los certificados de firma. */
-    private final void getSigners(final DefaultMutableTreeNode node, final Set<String> signersSet) {
+    private void getSigners(final DefaultMutableTreeNode node, final Set<String> signersSet) {
         signersSet.add((String) node.getUserObject());
         for (int i = 0; i < node.getChildCount(); i++) {
             getSigners((DefaultMutableTreeNode) node.getChildAt(i), signersSet);
         }
     }
 
-    /** Inicializacion de componentes */
+    /** Inicializaci&oacute;n de componentes */
     private void initComponents() {
         // Titulo de la ventana
         setTitulo(Messages.getString("Wizard.multifirma.simple.contrafirma.titulo")); //$NON-NLS-1$

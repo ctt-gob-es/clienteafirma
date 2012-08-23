@@ -78,22 +78,22 @@ final class ResizingAdaptor extends ComponentAdapter {
 		this.theFileChooserToSave = fileChooserToSave;
 	}
 
-    private static Image iconToImage(Icon icon) {
+    private static Image iconToImage(final Icon icon) {
         if (icon instanceof ImageIcon) {
             return ((ImageIcon)icon).getImage();
-        } 
-        int w = icon.getIconWidth();
-        int h = icon.getIconHeight();
-        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        GraphicsDevice gd = ge.getDefaultScreenDevice();
-        GraphicsConfiguration gc = gd.getDefaultConfiguration();
-        BufferedImage image = gc.createCompatibleImage(w, h);
-        Graphics2D g = image.createGraphics();
+        }
+        final int w = icon.getIconWidth();
+        final int h = icon.getIconHeight();
+        final GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        final GraphicsDevice gd = ge.getDefaultScreenDevice();
+        final GraphicsConfiguration gc = gd.getDefaultConfiguration();
+        final BufferedImage image = gc.createCompatibleImage(w, h);
+        final Graphics2D g = image.createGraphics();
         icon.paintIcon(null, g, 0, 0);
         g.dispose();
         return image;
     }
-	
+
 	@Override
 	/**
 	 * Evento de redimensionado
@@ -343,19 +343,18 @@ final class ResizingAdaptor extends ComponentAdapter {
 			}
 
 			//imagenes dentro de JButton
-			if (actualComponent instanceof JButton) {
-				if (((JButton)actualComponent).getIcon() != null) {
-					float resizeFactor = 0;
-					if (this.theCustomDialog != null) {
-						resizeFactor = getImageResizeFactor(Constants.RESIZING_IMAGES_FACTOR + 0.0010);
-					} else if(this.theFileChooser != null || this.theFileChooserToSave != null){
-						resizeFactor = getImageResizeFactor(Constants.RESIZING_IMAGES_FACTOR + 0.0005);
-					} else {
-						resizeFactor = getImageResizeFactor(Constants.RESIZING_IMAGES_FACTOR);
-					}
-
-					resizeImageButton(resizeFactor, actualComponent);
+			if ((actualComponent instanceof JButton) && (((JButton)actualComponent).getIcon() != null)) {
+				float resizeFactor = 0;
+				if (this.theCustomDialog != null) {
+					resizeFactor = getImageResizeFactor(Constants.RESIZING_IMAGES_FACTOR + 0.0010);
 				}
+				else if(this.theFileChooser != null || this.theFileChooserToSave != null){
+					resizeFactor = getImageResizeFactor(Constants.RESIZING_IMAGES_FACTOR + 0.0005);
+				}
+				else {
+					resizeFactor = getImageResizeFactor(Constants.RESIZING_IMAGES_FACTOR);
+				}
+				resizeImageButton(resizeFactor, actualComponent);
 			}
 		}
 	}
@@ -370,19 +369,26 @@ final class ResizingAdaptor extends ComponentAdapter {
 		float resizeFactor = 0;
 		if(this.theWindow != null){
 			resizeFactor = (float) (this.theWindow.getHeight() * factor);
-		} else if(this.theDialog != null) {
+		}
+		else if(this.theDialog != null) {
 			resizeFactor = (float) (this.theDialog.getHeight() * factor);
-		} else if (this.theDialogWizard != null){
+		}
+		else if (this.theDialogWizard != null){
 			resizeFactor = (float) (this.theDialogWizard.getHeight() * factor);
-		} else if (this.theDialogAdvisor != null){
+		}
+		else if (this.theDialogAdvisor != null){
 			resizeFactor = (float) (this.theDialogAdvisor.getHeight() * factor);
-		} else if (this.theWindowAbout != null){
+		}
+		else if (this.theWindowAbout != null){
 			resizeFactor = (float) (this.theWindowAbout.getHeight() * factor);
-		}  else if (this.theCustomDialog != null){
+		}
+		else if (this.theCustomDialog != null){
 			resizeFactor = (float) (this.theCustomDialog.getHeight() * factor);
-		} else if (this.theFileChooser != null){
+		}
+		else if (this.theFileChooser != null){
 			resizeFactor = (float) (this.theFileChooser.getHeight() * factor);
-		} else {
+		}
+		else {
 			resizeFactor = (float) (this.theFileChooserToSave.getHeight() * factor);
 		}
 		return resizeFactor;
@@ -405,7 +411,7 @@ final class ResizingAdaptor extends ComponentAdapter {
 				final IconLabel iconLabel = (IconLabel) c;
 				//Se selecciona la imagen original del icono para hacer el resize
 				image = new ImageIcon(iconToImage(iconLabel.getOriginalIcon()));
-			} 
+			}
 			else {
 				image = new ImageIcon(iconToImage(((JLabel)c).getIcon()));
 			}
@@ -414,13 +420,10 @@ final class ResizingAdaptor extends ComponentAdapter {
 		}
 	}
 
-	/**
-	 * Redimensiona una imagen contenida en un JButton
-	 *
-	 * @param factor factor de redimensi&oacute;n
-	 * @param c Componente de tipo JButton en el que se encuentra la imagen
-	 */
-	private final void resizeImageButton(final double factor, final Component c) {
+	/** Redimensiona una imagen contenida en un <code>JButton</code>.
+	 * @param factor Factor de redimensi&oacute;n
+	 * @param c Componente de tipo JButton en el que se encuentra la imagen */
+	private void resizeImageButton(final double factor, final Component c) {
 
 		if ((this.theFileChooser==null || (isAncestor(this.theFileChooser.getAccesibilityButtonsPanel(), c))) && (this.theFileChooserToSave==null || (isAncestor(this.theFileChooserToSave.getAccesibilityButtonsPanel(), c)))){
 
@@ -433,7 +436,8 @@ final class ResizingAdaptor extends ComponentAdapter {
 		//Se comprueba si se trata del boton de ayuda
 		if ((button.getName() != null) && (button.getName().equalsIgnoreCase("helpButton"))) {
 			imageIcon = HelpUtils.IMAGEICONHELP; //Se carga la imagen original
-		} else if ((button.getName() != null) && (button.getName().equalsIgnoreCase("maximizar"))) {
+		}
+		else if ((button.getName() != null) && (button.getName().equalsIgnoreCase("maximizar"))) {
 			if (this.theDialog!=null){
 				factorAux = factorAux - 0.4; //0.8999999761581421
 			}
@@ -441,7 +445,8 @@ final class ResizingAdaptor extends ComponentAdapter {
 				factorAux = factorAux - 0.3; //0.8999999761581421
 			}
 			imageIcon = Constants.IMAGEICON_MAXIMIZE; //Se carga la imagen original
-		} else if ((button.getName() != null) && (button.getName().equalsIgnoreCase("restaurar"))) {
+		}
+		else if ((button.getName() != null) && (button.getName().equalsIgnoreCase("restaurar"))) {
 			if (this.theDialog!=null){
 				factorAux = factorAux - 0.4; //0.8999999761581421
 			}
@@ -449,7 +454,8 @@ final class ResizingAdaptor extends ComponentAdapter {
 				factorAux = factorAux - 0.3; //0.8999999761581421
 			}
 			imageIcon = Constants.IMAGEICONRESTORE; //Se carga la imagen original
-		} else {
+		}
+		else {
 			imageIcon = new ImageIcon(iconToImage((button.getIcon()))); //Se carga la imagen del componente actual
 		}
 		//Se redimensionan las imagenes
