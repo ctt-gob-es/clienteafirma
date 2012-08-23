@@ -51,6 +51,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
+import java.util.prefs.Preferences;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -828,12 +829,6 @@ public final class SignPanel extends JPanel {
                 }
             }
 
-            final Properties p = new Properties();
-            p.put("mode", "implicit"); //$NON-NLS-1$ //$NON-NLS-2$
-            p.put("ignoreStyleSheets", "false"); //$NON-NLS-1$ //$NON-NLS-2$
-            p.put("includeOnlySignningCertificate", "true"); //$NON-NLS-1$ //$NON-NLS-2$
-            p.put("allowSigningCertifiedPdfs", "false"); //$NON-NLS-1$ //$NON-NLS-2$
-
             setSignCommandEnabled(false);
 
             SignPanel.this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
@@ -867,14 +862,124 @@ public final class SignPanel extends JPanel {
                         "No se ha podido mostrar la barra de progreso indeterminado: " + e); //$NON-NLS-1$
             }
 
-            try { Thread.sleep(2000); } catch(final Exception e) { /* Ignoramos los errores */ }
+            try { Thread.sleep(1000); } catch(final Exception e) { /* Ignoramos los errores */ }
 
+            final Preferences preferences = Preferences.userRoot();
+
+            final Properties p = new Properties();
+            p.put("mode", "implicit"); //$NON-NLS-1$ //$NON-NLS-2$
+            p.put("ignoreStyleSheets", "false"); //$NON-NLS-1$ //$NON-NLS-2$
+            p.put("includeOnlySignningCertificate", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+            p.put("allowSigningCertifiedPdfs", "false"); //$NON-NLS-1$ //$NON-NLS-2$
+
+            // Preferencias generales (politica)
+            if (!"".equals(preferences.get(PreferencesPanel.PREFERENCE_POLICY_IDENTIFIER, ""))) { //$NON-NLS-1$ //$NON-NLS-2$
+	            p.put(
+	        		"policyIdentifier", //$NON-NLS-1$
+	        		preferences.get(PreferencesPanel.PREFERENCE_POLICY_IDENTIFIER, "") //$NON-NLS-1$
+	    		);
+            }
+            if (!"".equals(preferences.get(PreferencesPanel.PREFERENCE_POLICY_IDENTIFIER_HASH, ""))) { //$NON-NLS-1$ //$NON-NLS-2$
+	            p.put(
+	        		"policyIdentifierHash", //$NON-NLS-1$
+	        		preferences.get(PreferencesPanel.PREFERENCE_POLICY_IDENTIFIER_HASH, "") //$NON-NLS-1$
+	    		);
+            }
+            if (!"".equals(preferences.get(PreferencesPanel.PREFERENCE_POLICY_IDENTIFIER_HASH_ALGORITHM, ""))) { //$NON-NLS-1$ //$NON-NLS-2$
+	            p.put(
+	        		"policyIdentifierHashAlgorithm", //$NON-NLS-1$
+	        		preferences.get(PreferencesPanel.PREFERENCE_POLICY_IDENTIFIER_HASH_ALGORITHM, "") //$NON-NLS-1$
+	    		);
+            }
+            if (!"".equals(preferences.get(PreferencesPanel.PREFERENCE_POLICY_QUALIFIER, ""))) { //$NON-NLS-1$ //$NON-NLS-2$
+	            p.put(
+	        		"policyQualifier", //$NON-NLS-1$
+	        		preferences.get(PreferencesPanel.PREFERENCE_POLICY_QUALIFIER, "") //$NON-NLS-1$
+	    		);
+            }
+
+            // Preferencias de XAdES
+            if (!"".equals(preferences.get(PreferencesPanel.PREFERENCE_XADES_SIGNER_CLAIMED_ROLE, ""))) { //$NON-NLS-1$ //$NON-NLS-2$
+	            p.put(
+	        		"signerClaimedRole", //$NON-NLS-1$
+	        		preferences.get(PreferencesPanel.PREFERENCE_XADES_SIGNER_CLAIMED_ROLE, "") //$NON-NLS-1$
+	    		);
+            }
+            if (!"".equals(preferences.get(PreferencesPanel.PREFERENCE_XADES_SIGNER_CERTIFIED_ROLE, ""))) {  //$NON-NLS-1$//$NON-NLS-2$
+            	p.put(
+        			"signerCertifiedRole", //$NON-NLS-1$
+        			preferences.get(PreferencesPanel.PREFERENCE_XADES_SIGNER_CERTIFIED_ROLE, "") //$NON-NLS-1$
+    			);
+            }
+            // Esta propiedad se comparte con PAdES, hay que comprobar que signer tenemos
+            if (!"".equals(preferences.get(PreferencesPanel.PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY, "")) && (SignPanel.this.getSigner() instanceof AOXAdESSigner)) {  //$NON-NLS-1$//$NON-NLS-2$
+            	p.put(
+        			"signatureProductionCity", //$NON-NLS-1$
+        			preferences.get(PreferencesPanel.PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY, "") //$NON-NLS-1$
+    			);
+            }
+            if (!"".equals(preferences.get(PreferencesPanel.PREFERENCE_XADES_SIGNATURE_PRODUCTION_PROVINCE, ""))) {  //$NON-NLS-1$//$NON-NLS-2$
+            	p.put(
+        			"signatureProductionProvince", //$NON-NLS-1$
+        			preferences.get(PreferencesPanel.PREFERENCE_XADES_SIGNATURE_PRODUCTION_PROVINCE, "") //$NON-NLS-1$
+    			);
+            }
+            if (!"".equals(preferences.get(PreferencesPanel.PREFERENCE_XADES_SIGNATURE_PRODUCTION_POSTAL_CODE, ""))) {  //$NON-NLS-1$//$NON-NLS-2$
+            	p.put(
+        			"signatureProductionPostalCode", //$NON-NLS-1$
+        			preferences.get(PreferencesPanel.PREFERENCE_XADES_SIGNATURE_PRODUCTION_POSTAL_CODE, "") //$NON-NLS-1$
+    			);
+            }
+            if (!"".equals(preferences.get(PreferencesPanel.PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY, ""))) {  //$NON-NLS-1$//$NON-NLS-2$
+            	p.put(
+        			"signatureProductionCountry", //$NON-NLS-1$
+        			preferences.get(PreferencesPanel.PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY, "") //$NON-NLS-1$
+    			);
+            }
+            if (!"".equals(preferences.get(PreferencesPanel.PREFERENCE_XADES_SIGN_FORMAT, ""))) {  //$NON-NLS-1$//$NON-NLS-2$
+            	p.put(
+        			"format", //$NON-NLS-1$
+        			preferences.get(PreferencesPanel.PREFERENCE_XADES_SIGN_FORMAT, "") //$NON-NLS-1$
+    			);
+            }
+
+            // Preferencias de PAdES
+            if (!"".equals(preferences.get(PreferencesPanel.PREFERENCE_PADES_SIGN_REASON, ""))) {  //$NON-NLS-1$//$NON-NLS-2$
+            	p.put(
+        			"signReason", //$NON-NLS-1$
+        			preferences.get(PreferencesPanel.PREFERENCE_PADES_SIGN_REASON, "") //$NON-NLS-1$
+    			);
+            }
+            // Esta propiedad se comparte con XAdES, hay que comprobar que signer tenemos
+            if (!"".equals(preferences.get(PreferencesPanel.PREFERENCE_PADES_SIGN_PRODUCTION_CITY, "")) && (SignPanel.this.getSigner() instanceof AOPDFSigner)) {  //$NON-NLS-1$//$NON-NLS-2$
+            	p.put(
+        			"signatureProductionCity", //$NON-NLS-1$
+        			preferences.get(PreferencesPanel.PREFERENCE_PADES_SIGN_PRODUCTION_CITY, "") //$NON-NLS-1$
+    			);
+            }
+            if (!"".equals(preferences.get(PreferencesPanel.PREFERENCE_PADES_SIGNER_CONTACT, ""))) {  //$NON-NLS-1$//$NON-NLS-2$
+            	p.put(
+        			"signerContact", //$NON-NLS-1$
+        			preferences.get(PreferencesPanel.PREFERENCE_PADES_SIGNER_CONTACT, "") //$NON-NLS-1$
+    			);
+            }
+
+            // Preferencias de CAdES
+            // Esta propiedad se comparte con otros formatos, hay que comprobar que signer tenemos
+            if (SignPanel.this.getSigner() instanceof AOCAdESSigner) {
+            	p.put(
+        			"mode", //$NON-NLS-1$
+        			Boolean.valueOf(preferences.getBoolean(PreferencesPanel.PREFERENCE_CADES_IMPLICIT, true))
+    			);
+            }
+
+            final String signatureAlgorithm = preferences.get(PreferencesPanel.PREFERENCE_SIGNATURE_ALGORITHM, "SHA1withRSA"); //$NON-NLS-1$
             final byte[] signResult;
             try {
                 if (SignPanel.this.isCosign()) {
                     signResult = SignPanel.this.getSigner().cosign(
                 		SignPanel.this.getDataToSign(),
-                		"SHA1withRSA", //$NON-NLS-1$
+                		signatureAlgorithm,
                         ksm.getKeyEntry(alias, KeyStoreUtilities.getCertificatePC(ksm.getType(), SignPanel.this)),
                         p
                     );
@@ -882,7 +987,7 @@ public final class SignPanel extends JPanel {
                 else {
                     signResult = SignPanel.this.getSigner().sign(
                 		SignPanel.this.getDataToSign(),
-                		"SHA1withRSA", //$NON-NLS-1$
+                		signatureAlgorithm,
                         ksm.getKeyEntry(alias, KeyStoreUtilities.getCertificatePC(ksm.getType(), SignPanel.this)),
                         p
                     );
