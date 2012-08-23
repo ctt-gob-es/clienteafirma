@@ -54,8 +54,8 @@ import es.gob.afirma.ui.wizardutils.BotoneraInferior;
 import es.gob.afirma.ui.wizardutils.CabeceraAsistente;
 import es.gob.afirma.ui.wizardutils.JDialogWizard;
 
-/** Dialogo con la pagina 2: Clave de cifrado */
-public final class PanelContrasenia extends JAccessibilityDialogWizard implements KeyListener {
+/** Di&aacute;logo con la pagina 2: Clave de cifrado */
+final class PanelContrasenia extends JAccessibilityDialogWizard implements KeyListener {
 
     /** Botonera con funciones para la pagina panel de cifrado */
     private final class Botonera extends BotoneraInferior {

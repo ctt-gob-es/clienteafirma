@@ -15,7 +15,7 @@ import java.util.List;
 import es.gob.afirma.ui.wizardutils.JDialogWizard;
 
 /** Clase principal del wizard de descifrado de clave. */
-public class AsistenteDescifradoClave {
+public final class AsistenteDescifradoClave {
 
     private final String algoritmo;
 

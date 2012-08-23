@@ -32,7 +32,7 @@ import es.gob.afirma.ui.wizardutils.ImagenLateral;
 import es.gob.afirma.ui.wizardutils.JDialogWizard;
 
 /** Panel explicativo de finalizacion. */
-public class PanelFinalizar extends JAccessibilityDialogWizard {
+final class PanelFinalizar extends JAccessibilityDialogWizard {
     /** UID. */
     private static final long serialVersionUID = 1L;
 
@@ -81,7 +81,7 @@ public class PanelFinalizar extends JAccessibilityDialogWizard {
         c.anchor = GridBagConstraints.NORTHWEST;
 
         // Etiqueta "felicidades" y "Ha finalizado con..."
-        final String textLabel = Messages.getString("Wizard.sobres.final1") + Constants.HTML_SALTO_LINEA + Constants.HTML_SALTO_LINEA + Messages.getString("Wizard.sobres.final2");
+        final String textLabel = Messages.getString("Wizard.sobres.final1") + Constants.HTML_SALTO_LINEA + Constants.HTML_SALTO_LINEA + Messages.getString("Wizard.sobres.final2"); //$NON-NLS-1$ //$NON-NLS-2$
 
         final InfoLabel finalizeLabel = new InfoLabel(textLabel, false);
         // Foco al contenido
@@ -92,13 +92,13 @@ public class PanelFinalizar extends JAccessibilityDialogWizard {
 
         // Imagen de DNIe
         final JLabel etiquetaDNIe = new JLabel();
-        etiquetaDNIe.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/dnie.png")));
+        etiquetaDNIe.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/dnie.png"))); //$NON-NLS-1$
         panelCentral.add(etiquetaDNIe, c);
 
         c.gridy = 2;
 
         // Etiqueta con el texto "Recuerde que si ha..."
-        final InfoLabel rememberLabel = new InfoLabel(Messages.getString("Wizard.sobres.final3"), false);
+        final InfoLabel rememberLabel = new InfoLabel(Messages.getString("Wizard.sobres.final3"), false); //$NON-NLS-1$
         panelCentral.add(rememberLabel, c);
 
         getContentPane().add(panelCentral, BorderLayout.CENTER);

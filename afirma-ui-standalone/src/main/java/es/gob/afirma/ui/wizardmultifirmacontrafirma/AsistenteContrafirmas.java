@@ -19,8 +19,8 @@ import es.gob.afirma.ui.wizardutils.JDialogWizard;
  *
  * Clase que realiza contrafirma
  */
-public class AsistenteContrafirmas {
-	
+public final class AsistenteContrafirmas {
+
 	/**
 	 * Configuracion del KeyStore
 	 */
@@ -28,42 +28,42 @@ public class AsistenteContrafirmas {
 
     /** Construye un nuevo asistente de contrafirma.
      * @param kss Configuraci&oacute;n del almac&eacute;n de claves */
-    public AsistenteContrafirmas(KeyStoreConfiguration kss ) {
+    public AsistenteContrafirmas(final KeyStoreConfiguration kss ) {
         this.kssc = kss;
         initComponents();
     }
-	
+
 	/**
 	 * Inicializar componentes
 	 */
 	private void initComponents() {
 		// Generamos la lista para el control de la botonera
     	final List<JDialogWizard> ventanas = new ArrayList<JDialogWizard>();
-    	
+
     	// Obtenemos todas las paginas
     	// Pagina 1: Panel presentacion
-    	PanelPresentacion panelPresentacion = new PanelPresentacion();
+    	final PanelPresentacion panelPresentacion = new PanelPresentacion();
     	ventanas.add(panelPresentacion);
-    	
+
     	// Pagina 2: Panel entrada de un archivo
-    	PanelEntrada panelEntrada = new PanelEntrada(this.kssc);
+    	final PanelEntrada panelEntrada = new PanelEntrada(this.kssc);
     	ventanas.add(panelEntrada);
-    	
+
     	// Pagina 3: Panel multifirma de un archivo
-    	PanelMultifirma panelMultifirma = new PanelMultifirma(this.kssc);
+    	final PanelMultifirma panelMultifirma = new PanelMultifirma(this.kssc);
     	ventanas.add(panelMultifirma);
-    	
+
     	// Pagina 4: Dialogo finalizar
-    	PanelFinalizar panelFinalizar = new PanelFinalizar();
+    	final PanelFinalizar panelFinalizar = new PanelFinalizar();
     	ventanas.add(panelFinalizar);
-        
+
         // Cargamos el listado de ventanas en todas las paginas con controles
     	// para inicializar sus botoneras
         panelPresentacion.setVentanas(ventanas);
         panelEntrada.setVentanas(ventanas);
         panelMultifirma.setVentanas(ventanas);
         panelFinalizar.setVentanas(ventanas);
-        
+
         // Mostramos la primera ventana
         panelPresentacion.setVisible(true);
 	}

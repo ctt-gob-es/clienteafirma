@@ -35,7 +35,7 @@ import es.gob.afirma.ui.wizardutils.JDialogWizard;
  *
  * Panel explicativo de finalizacion
  */
-public class PanelFinalizar extends JAccessibilityDialogWizard {
+final class PanelFinalizar extends JAccessibilityDialogWizard {
 
 	/**
 	 * UID.

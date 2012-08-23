@@ -32,7 +32,7 @@ import es.gob.afirma.ui.wizardutils.ImagenLateral;
 import es.gob.afirma.ui.wizardutils.JDialogWizard;
 
 /** Panel explicativo de finalizacion. */
-class PanelFinalizar extends JAccessibilityDialogWizard {
+final class PanelFinalizar extends JAccessibilityDialogWizard {
     /** UID. */
     private static final long serialVersionUID = 1L;
 
@@ -83,7 +83,7 @@ class PanelFinalizar extends JAccessibilityDialogWizard {
         // Etiqueta "felicidades" y "Ha finalizado con..."
         final String textLabel = Messages.getString("Wizard.sobres.final1") + //$NON-NLS-1$
         Constants.HTML_SALTO_LINEA
-        + Constants.HTML_SALTO_LINEA + Messages.getString("Wizard.sobres.final2");
+        + Constants.HTML_SALTO_LINEA + Messages.getString("Wizard.sobres.final2"); //$NON-NLS-1$
 
         final InfoLabel finalizeLabel = new InfoLabel(textLabel, false);
         // Foco al contenido

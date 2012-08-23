@@ -49,7 +49,7 @@ final class PanelPresentacion extends JAccessibilityDialogWizard {
     /** Inicializacion de los componentes */
     private void initComponents() {
         // Titulo de la ventana
-        setTitulo(Messages.getString("WizardCifrado.titulo"));
+        setTitulo(Messages.getString("WizardCifrado.titulo")); //$NON-NLS-1$
 
         // Panel con la imagen lateral
         final ImagenLateral panelIzdo = new ImagenLateral();
@@ -81,12 +81,12 @@ final class PanelPresentacion extends JAccessibilityDialogWizard {
 
         // Etiqueta con el texto "Bienvenido al asistente..."
         final String textLabel =
-            Messages.getString("Wizard.sobres.presentacion.pass.presentacion1") + Constants.HTML_SALTO_LINEA
+            Messages.getString("Wizard.sobres.presentacion.pass.presentacion1") + Constants.HTML_SALTO_LINEA //$NON-NLS-1$
             + Constants.HTML_SALTO_LINEA
-            + Messages.getString("Wizard.sobres.presentacion.pass.presentacion2")
+            + Messages.getString("Wizard.sobres.presentacion.pass.presentacion2") //$NON-NLS-1$
             + Constants.HTML_SALTO_LINEA
             + Constants.HTML_SALTO_LINEA
-            + Messages.getString("Wizard.sobres.presentacion.pass.presentacion3");
+            + Messages.getString("Wizard.sobres.presentacion.pass.presentacion3"); //$NON-NLS-1$
         final InfoLabel presentationLabel = new InfoLabel(textLabel, false);
         // Foco al contenido
         presentationLabel.addAncestorListener(new RequestFocusListener(false));

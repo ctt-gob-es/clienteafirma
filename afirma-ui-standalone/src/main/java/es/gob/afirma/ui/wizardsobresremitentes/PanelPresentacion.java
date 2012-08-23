@@ -31,7 +31,7 @@ import es.gob.afirma.ui.wizardutils.ImagenLateral;
 import es.gob.afirma.ui.wizardutils.JDialogWizard;
 
 /** Panel explicativo de presentacion. */
-public class PanelPresentacion extends JAccessibilityDialogWizard {
+final class PanelPresentacion extends JAccessibilityDialogWizard {
     /** UID. */
     private static final long serialVersionUID = 1L;
 
@@ -49,7 +49,7 @@ public class PanelPresentacion extends JAccessibilityDialogWizard {
     /** Inicializacion de componentes */
     private void initComponents() {
         // Titulo de la ventana
-        setTitulo(Messages.getString("Wizard.sobres.titulo"));
+        setTitulo(Messages.getString("Wizard.sobres.titulo")); //$NON-NLS-1$
 
         // Panel con la imagen lateral
         final ImagenLateral panelIzdo = new ImagenLateral();
@@ -81,18 +81,18 @@ public class PanelPresentacion extends JAccessibilityDialogWizard {
 
         // Etiqueta con el texto "Bienvenido al asistente..."
         final String textLabel =
-            Messages.getString("Wizard.sobres.presentacion1") + Constants.HTML_SALTO_LINEA
+            Messages.getString("Wizard.sobres.presentacion1") + Constants.HTML_SALTO_LINEA //$NON-NLS-1$
             + Constants.HTML_SALTO_LINEA
-            + Messages.getString("Wizard.sobres.presentacion2")
-            + Constants.HTML_SALTO_LINEA
-            + Constants.HTML_SALTO_LINEA
-            + Messages.getString("Wizard.sobres.presentacion3")
+            + Messages.getString("Wizard.sobres.presentacion2") //$NON-NLS-1$
             + Constants.HTML_SALTO_LINEA
             + Constants.HTML_SALTO_LINEA
-            + Messages.getString("Wizard.sobres.presentacion4")
+            + Messages.getString("Wizard.sobres.presentacion3") //$NON-NLS-1$
             + Constants.HTML_SALTO_LINEA
             + Constants.HTML_SALTO_LINEA
-            + Messages.getString("Wizard.sobres.presentacion5");
+            + Messages.getString("Wizard.sobres.presentacion4") //$NON-NLS-1$
+            + Constants.HTML_SALTO_LINEA
+            + Constants.HTML_SALTO_LINEA
+            + Messages.getString("Wizard.sobres.presentacion5"); //$NON-NLS-1$
         final InfoLabel presentationLabel = new InfoLabel(textLabel, false);
         // Foco al contenido
         presentationLabel.addAncestorListener(new RequestFocusListener(false));

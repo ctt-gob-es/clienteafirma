@@ -31,7 +31,7 @@ import es.gob.afirma.ui.wizardutils.ImagenLateral;
 import es.gob.afirma.ui.wizardutils.JDialogWizard;
 
 /** Panel explicativo de presentacion. */
-public class PanelPresentacion extends JAccessibilityDialogWizard {
+final class PanelPresentacion extends JAccessibilityDialogWizard {
     /** UID. */
     private static final long serialVersionUID = 1L;
 

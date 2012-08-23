@@ -33,7 +33,7 @@ import es.gob.afirma.ui.wizardutils.JDialogWizard;
 /**
  * Panel explicativo de presentacion
  */
-public class PanelPresentacion extends JAccessibilityDialogWizard {
+final class PanelPresentacion extends JAccessibilityDialogWizard {
 	/**
 	 * UID.
 	 */
@@ -51,12 +51,12 @@ public class PanelPresentacion extends JAccessibilityDialogWizard {
 	public int getMinimumRelation(){
 		return 9;
 	}
-	
+
     /**
      * Guarda todas las ventanas del asistente para poder controlar la botonera
      * @param ventanas	Listado con todas las paginas del asistente
      */
-    public void setVentanas(List<JDialogWizard> ventanas) {
+    public void setVentanas(final List<JDialogWizard> ventanas) {
     	this.setBotoneraSuperior(new BotoneraSuperior(ventanas));
     	this.setBotonera(new BotoneraInferior(ventanas, 0));
     	getContentPane().add(getBotoneraSuperior(), BorderLayout.PAGE_START);
@@ -64,24 +64,24 @@ public class PanelPresentacion extends JAccessibilityDialogWizard {
     	//Se asigna el boton por defecto
     	this.getRootPane().setDefaultButton(getBotonera().getSiguiente());
     }
-    
+
     /**
      * Inicializacion de componentes
      */
-    private void initComponents() {    	
+    private void initComponents() {
     	// Titulo de la ventana
-    	setTitulo(Messages.getString("Wizard.multifirma.simple.cofirma.titulo"));
-    	
+    	setTitulo(Messages.getString("Wizard.multifirma.simple.cofirma.titulo")); //$NON-NLS-1$
+
     	// Panel con la imagen lateral
-        ImagenLateral panelIzdo = new ImagenLateral();
+        final ImagenLateral panelIzdo = new ImagenLateral();
         if (Main.isOSHighContrast()){
         	panelIzdo.setOpaque(false);
         }
         Utils.setContrastColor(panelIzdo);
         getContentPane().add(panelIzdo, BorderLayout.WEST);
-        
+
         // Panel con el contenido
-        JPanel panelCentral = new JPanel();
+        final JPanel panelCentral = new JPanel();
         panelCentral.setBackground(Color.WHITE);
 
         // si el color de fondo ya no es blanco
@@ -92,7 +92,7 @@ public class PanelPresentacion extends JAccessibilityDialogWizard {
         panelCentral.setLayout(new GridBagLayout());
 
         // Configuramos el layout
-        GridBagConstraints c = new GridBagConstraints();
+        final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
         c.insets = new Insets(20, 20, 20, 20);
 		c.weightx = 1.0;
@@ -100,18 +100,18 @@ public class PanelPresentacion extends JAccessibilityDialogWizard {
 		c.gridx = 0;
 		c.gridy = 0;
 		c.anchor = GridBagConstraints.NORTHWEST;
-		
+
 		//Etiqueta con el texto "Bienvenido al asistente..."
-        String textLabel = Messages.getString("Wizard.multifirma.simple.cofirma.presentacion.texto1") +
-        Constants.HTML_SALTO_LINEA+Constants.HTML_SALTO_LINEA+Messages.getString("Wizard.multifirma.simple.cofirma.presentacion.texto2")+
-        Constants.HTML_SALTO_LINEA+Constants.HTML_SALTO_LINEA+Messages.getString("Wizard.multifirma.simple.cofirma.presentacion.texto3")+
-        Constants.HTML_SALTO_LINEA+Constants.HTML_SALTO_LINEA+Messages.getString("Wizard.multifirma.simple.cofirma.presentacion.texto4");
-        InfoLabel presentationLabel = new InfoLabel(textLabel, false);
+        final String textLabel = Messages.getString("Wizard.multifirma.simple.cofirma.presentacion.texto1") + //$NON-NLS-1$
+        Constants.HTML_SALTO_LINEA+Constants.HTML_SALTO_LINEA+Messages.getString("Wizard.multifirma.simple.cofirma.presentacion.texto2")+ //$NON-NLS-1$
+        Constants.HTML_SALTO_LINEA+Constants.HTML_SALTO_LINEA+Messages.getString("Wizard.multifirma.simple.cofirma.presentacion.texto3")+ //$NON-NLS-1$
+        Constants.HTML_SALTO_LINEA+Constants.HTML_SALTO_LINEA+Messages.getString("Wizard.multifirma.simple.cofirma.presentacion.texto4"); //$NON-NLS-1$
+        final InfoLabel presentationLabel = new InfoLabel(textLabel, false);
         //Foco al contenido
         presentationLabel.addAncestorListener(new RequestFocusListener(false));
-        
+
         panelCentral.add(presentationLabel, c);
-        
+
         getContentPane().add(panelCentral, BorderLayout.CENTER);
     }
 }

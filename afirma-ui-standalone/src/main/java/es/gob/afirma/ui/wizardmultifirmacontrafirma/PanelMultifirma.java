@@ -73,7 +73,7 @@ import es.gob.afirma.ui.wizardutils.JDialogWizard;
 
 /** Panel para el wizard de multifirma.
  * @author inteco */
-public final class PanelMultifirma extends JAccessibilityDialogWizard {
+final class PanelMultifirma extends JAccessibilityDialogWizard {
 
     /** Botonera con funciones para la pagina panel de multifirma - cofirma */
     private class Botonera extends BotoneraInferior {
@@ -408,7 +408,7 @@ public final class PanelMultifirma extends JAccessibilityDialogWizard {
 
         // Etiqueta con el texto "Firmas que desea..."
         final JLabel etiquetaFirmas = new JLabel();
-        etiquetaFirmas.setText(Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.combo.firmas"));
+        etiquetaFirmas.setText(Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.combo.firmas")); //$NON-NLS-1$
         Utils.setContrastColor(etiquetaFirmas);
         Utils.setFontBold(etiquetaFirmas);
         panelCentral.add(etiquetaFirmas, c);
@@ -475,7 +475,7 @@ public final class PanelMultifirma extends JAccessibilityDialogWizard {
             leafIcon = new ImageIcon(getClass().getResource("/resources/images/firma_mini_ico.png")); //$NON-NLS-1$
         }
         catch (final Exception e) {
-            LOGGER.warning("No se ha podido cargar la imagen para los nodos del arbol de firmantes: " + e);
+            LOGGER.warning("No se ha podido cargar la imagen para los nodos del arbol de firmantes: " + e); //$NON-NLS-1$
         }
 
         c.fill = GridBagConstraints.BOTH;
@@ -547,7 +547,7 @@ public final class PanelMultifirma extends JAccessibilityDialogWizard {
      * @return true o false indicando si se ha multifirmado correctamente */
     boolean multifirmarFichero() {
         try {
-            final String intText = ".countersign";
+            final String intText = ".countersign"; //$NON-NLS-1$
             byte[] signedData = null;
             final AOKeyStoreManager keyStoreManager = MultisignUtils.getAOKeyStoreManager(this.kssc, this);
 

@@ -36,7 +36,7 @@ import es.gob.afirma.ui.wizardutils.JDialogWizard;
 
 /** Panel de configuracion para el wizard de multifirma masiva.
  * @author inteco */
-class PanelConfiguracion extends JAccessibilityDialogWizard {
+final class PanelConfiguracion extends JAccessibilityDialogWizard {
 
     /** Botonera con funciones para la pagina panel de multifirma - cofirma */
     private class Botonera extends BotoneraInferior {

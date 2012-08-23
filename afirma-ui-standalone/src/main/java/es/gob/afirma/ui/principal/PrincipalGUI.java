@@ -63,7 +63,7 @@ import es.gob.afirma.ui.utils.Utils;
 /** Ventana principal de la aplicacion. Desde aqui se invocan a todas los paneles
  * que contienen el resto de objetos: firma, validacion, cifrado, descifrado,
  * ensobrado y desensobrado. */
-public class PrincipalGUI extends JAccessibilityFrame {
+public final class PrincipalGUI extends JAccessibilityFrame {
 
     private static int aboutActualHeight = -1;
 

@@ -17,7 +17,7 @@ import es.gob.afirma.ui.wizardutils.JDialogWizard;
 /** Clase principal que contiene la operatividad de movimiento dentro del wizard
  * y que contiene los paneles de explicacion y contenido para anadir nuevos remitentes
  * a un sobre digital. */
-public class AsistenteRemitentes {
+public final class AsistenteRemitentes {
 
     /** Ruta del fichero a ensobrar */
     private final String rutaFichero;

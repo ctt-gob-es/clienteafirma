@@ -56,7 +56,7 @@ import es.gob.afirma.ui.wizardutils.JDialogWizard;
 /**
  * Clase que muestra el contenido principal del descifrado de una contrasenia.
  */
-public class PanelContrasenia extends JAccessibilityDialogWizard {
+final class PanelContrasenia extends JAccessibilityDialogWizard {
 	/**
 	 * UID.
 	 */
