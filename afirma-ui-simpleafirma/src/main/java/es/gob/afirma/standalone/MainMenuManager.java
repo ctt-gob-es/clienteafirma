@@ -13,8 +13,6 @@ package es.gob.afirma.standalone;
 import java.awt.AWTException;
 import java.awt.Robot;
 import java.awt.event.ActionEvent;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
@@ -33,35 +31,24 @@ import es.gob.afirma.standalone.ui.MainMenu;
  * Si se a&ntilde;adiesen m&aacute;s men&uacute;s habr&iacute;a que modificar el comportamiento manualmente.</p>
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 final class MainMenuManager {
-    
+
+	private static final int INDEX_MENU_FILE = 0;
+	private static final int INDEX_MENU_OPTIONS = 1;
+	private static final int INDEX_MENU_HELP = 3;
+
     private MainMenuManager() {
         // No permitimos la instanciacion
     }
 
 	static void setMenuManagement(final ActionMap actionMap, final InputMap inputMap, final MainMenu mMenu) {
 
-		mMenu.getMenu(0).addFocusListener(new FocusListener() {
-			@Override public void focusGained(final FocusEvent e) {/* Vacio */ }
-			@Override
-			public void focusLost(final FocusEvent e) {
-				mMenu.getMenu(0).setSelected(false);
-			}
-		});
-		mMenu.getMenu(2).addFocusListener(new FocusListener() {
-			@Override public void focusGained(final FocusEvent e) {/* Vacio */ }
-			@Override
-			public void focusLost(final FocusEvent e) {
-				mMenu.getMenu(2).setSelected(false);
-			}
-		});
-
     	final String cancelMenu = "cancel_menu"; //$NON-NLS-1$
     	actionMap.put(cancelMenu, new AbstractAction() {
 			private static final long serialVersionUID = -6464408227472473522L;
 			@Override
 			public void actionPerformed(final ActionEvent ae) {
-				if (mMenu.getMenu(0).isSelected()) {
-					mMenu.getMenu(0).setSelected(false);
+				if (mMenu.getMenu(INDEX_MENU_FILE).isSelected()) {
+					mMenu.getMenu(INDEX_MENU_FILE).setSelected(false);
 					try {
 						final Robot robot = new Robot();
 						robot.keyPress(KeyEvent.VK_TAB);
@@ -69,8 +56,17 @@ final class MainMenuManager {
 					}
 					catch (final AWTException e) { /* Se ignora */ }
 				}
-				else if (mMenu.getMenu(2).isSelected()) {
-					mMenu.getMenu(2).setSelected(false);
+				else if (mMenu.getMenu(INDEX_MENU_OPTIONS).isSelected()) {
+					mMenu.getMenu(INDEX_MENU_OPTIONS).setSelected(false);
+					try {
+						final Robot robot = new Robot();
+						robot.keyPress(KeyEvent.VK_TAB);
+						robot.keyRelease(KeyEvent.VK_TAB);
+					}
+					catch (final AWTException e) { /* Se ignora */ }
+				}
+				else if (mMenu.getMenu(INDEX_MENU_HELP).isSelected()) {
+					mMenu.getMenu(INDEX_MENU_HELP).setSelected(false);
 					try {
 						final Robot robot = new Robot();
 						robot.keyPress(KeyEvent.VK_TAB);
@@ -80,20 +76,47 @@ final class MainMenuManager {
 				}
 			}
     	});
-    	final String moveSelectedMenu = "move_menu_selection"; //$NON-NLS-1$
-    	actionMap.put(moveSelectedMenu, new AbstractAction() {
+    	final String moveSelectedMenuRight = "move_menu_selection_right"; //$NON-NLS-1$
+    	actionMap.put(moveSelectedMenuRight, new AbstractAction() {
 			private static final long serialVersionUID = -6464408227472473522L;
 			@Override
 			public void actionPerformed(final ActionEvent ae) {
-				if (mMenu.getMenu(0).isSelected() && !mMenu.getMenu(0).getPopupMenu().isVisible()) {
-					mMenu.getMenu(0).setSelected(false);
-					mMenu.getMenu(2).setSelected(true);
-					mMenu.getMenu(2).requestFocus();
+				if (mMenu.getMenu(INDEX_MENU_FILE).isSelected() && !mMenu.getMenu(INDEX_MENU_FILE).getPopupMenu().isVisible()) {
+					mMenu.getMenu(INDEX_MENU_FILE).setSelected(false);
+					mMenu.getMenu(INDEX_MENU_OPTIONS).setSelected(true);
+					mMenu.getMenu(INDEX_MENU_OPTIONS).requestFocus();
 				}
-				else if (mMenu.getMenu(2).isSelected() && !mMenu.getMenu(2).getPopupMenu().isVisible()) {
-					mMenu.getMenu(2).setSelected(false);
-					mMenu.getMenu(0).setSelected(true);
-					mMenu.getMenu(0).requestFocus();
+				else if (mMenu.getMenu(INDEX_MENU_OPTIONS).isSelected() && !mMenu.getMenu(INDEX_MENU_OPTIONS).getPopupMenu().isVisible()) {
+					mMenu.getMenu(INDEX_MENU_OPTIONS).setSelected(false);
+					mMenu.getMenu(INDEX_MENU_HELP).setSelected(true);
+					mMenu.getMenu(INDEX_MENU_HELP).requestFocus();
+				}
+				else if (mMenu.getMenu(INDEX_MENU_HELP).isSelected() && !mMenu.getMenu(INDEX_MENU_HELP).getPopupMenu().isVisible()) {
+					mMenu.getMenu(INDEX_MENU_HELP).setSelected(false);
+					mMenu.getMenu(INDEX_MENU_FILE).setSelected(true);
+					mMenu.getMenu(INDEX_MENU_FILE).requestFocus();
+				}
+			}
+    	});
+    	final String moveSelectedMenuLeft = "move_menu_selection_left"; //$NON-NLS-1$
+    	actionMap.put(moveSelectedMenuLeft, new AbstractAction() {
+			private static final long serialVersionUID = -6464408227472473522L;
+			@Override
+			public void actionPerformed(final ActionEvent ae) {
+				if (mMenu.getMenu(INDEX_MENU_FILE).isSelected() && !mMenu.getMenu(INDEX_MENU_FILE).getPopupMenu().isVisible()) {
+					mMenu.getMenu(INDEX_MENU_FILE).setSelected(false);
+					mMenu.getMenu(INDEX_MENU_HELP).setSelected(true);
+					mMenu.getMenu(INDEX_MENU_HELP).requestFocus();
+				}
+				else if (mMenu.getMenu(INDEX_MENU_OPTIONS).isSelected() && !mMenu.getMenu(INDEX_MENU_OPTIONS).getPopupMenu().isVisible()) {
+					mMenu.getMenu(INDEX_MENU_OPTIONS).setSelected(false);
+					mMenu.getMenu(INDEX_MENU_FILE).setSelected(true);
+					mMenu.getMenu(INDEX_MENU_FILE).requestFocus();
+				}
+				else if (mMenu.getMenu(INDEX_MENU_HELP).isSelected() && !mMenu.getMenu(INDEX_MENU_HELP).getPopupMenu().isVisible()) {
+					mMenu.getMenu(INDEX_MENU_HELP).setSelected(false);
+					mMenu.getMenu(INDEX_MENU_OPTIONS).setSelected(true);
+					mMenu.getMenu(INDEX_MENU_OPTIONS).requestFocus();
 				}
 			}
     	});
@@ -102,8 +125,8 @@ final class MainMenuManager {
 			private static final long serialVersionUID = -6464408227472473522L;
 			@Override
 			public void actionPerformed(final ActionEvent ae) {
-    			if (mMenu.getMenu(0).isSelected() && !mMenu.getMenu(0).getPopupMenu().isVisible()) {
-					mMenu.getMenu(0).doClick();
+    			if (mMenu.getMenu(INDEX_MENU_FILE).isSelected() && !mMenu.getMenu(INDEX_MENU_FILE).getPopupMenu().isVisible()) {
+					mMenu.getMenu(INDEX_MENU_FILE).doClick();
 					try {
 						final Robot robot = new Robot();
 						robot.keyPress(KeyEvent.VK_DOWN);
@@ -111,8 +134,17 @@ final class MainMenuManager {
 					}
 					catch (final AWTException e) { /* Se ignora */ }
 				}
-    			else if (mMenu.getMenu(2).isSelected() && !mMenu.getMenu(2).getPopupMenu().isVisible()) {
-					mMenu.getMenu(2).doClick();
+    			else if (mMenu.getMenu(INDEX_MENU_OPTIONS).isSelected() && !mMenu.getMenu(INDEX_MENU_OPTIONS).getPopupMenu().isVisible()) {
+					mMenu.getMenu(INDEX_MENU_OPTIONS).doClick();
+					try {
+						final Robot robot = new Robot();
+						robot.keyPress(KeyEvent.VK_DOWN);
+						robot.keyRelease(KeyEvent.VK_DOWN);
+					}
+					catch (final AWTException e) { /* Se ignora */ }
+				}
+    			else if (mMenu.getMenu(INDEX_MENU_HELP).isSelected() && !mMenu.getMenu(INDEX_MENU_HELP).getPopupMenu().isVisible()) {
+					mMenu.getMenu(INDEX_MENU_HELP).doClick();
 					try {
 						final Robot robot = new Robot();
 						robot.keyPress(KeyEvent.VK_DOWN);
@@ -127,8 +159,8 @@ final class MainMenuManager {
 			private static final long serialVersionUID = -6464408227472473522L;
 			@Override
 			public void actionPerformed(final ActionEvent ae) {
-				if (mMenu.getMenu(0).isSelected() && !mMenu.getMenu(0).getPopupMenu().isVisible()) {
-					mMenu.getMenu(0).setSelected(false);
+				if (mMenu.getMenu(INDEX_MENU_FILE).isSelected() && !mMenu.getMenu(INDEX_MENU_FILE).getPopupMenu().isVisible()) {
+					mMenu.getMenu(INDEX_MENU_FILE).setSelected(false);
 					try {
 						final Robot robot = new Robot();
 						robot.keyPress(KeyEvent.VK_TAB);
@@ -136,8 +168,8 @@ final class MainMenuManager {
 					}
 					catch (final AWTException e) { /* Se ignora */ }
 				}
-				else if (mMenu.getMenu(2).isSelected() && !mMenu.getMenu(2).getPopupMenu().isVisible()) {
-					mMenu.getMenu(2).setSelected(false);
+				else if (mMenu.getMenu(INDEX_MENU_OPTIONS).isSelected() && !mMenu.getMenu(INDEX_MENU_OPTIONS).getPopupMenu().isVisible()) {
+					mMenu.getMenu(INDEX_MENU_OPTIONS).setSelected(false);
 					try {
 						final Robot robot = new Robot();
 						robot.keyPress(KeyEvent.VK_TAB);
@@ -145,19 +177,22 @@ final class MainMenuManager {
 					}
 					catch (final AWTException e) { /* Se ignora */ }
 				}
-				else if (mMenu.getMenu(0).getPopupMenu().isVisible() || mMenu.getMenu(2).getPopupMenu().isVisible()) {
+				else if (mMenu.getMenu(INDEX_MENU_HELP).isSelected() && !mMenu.getMenu(INDEX_MENU_HELP).getPopupMenu().isVisible()) {
+					mMenu.getMenu(INDEX_MENU_HELP).setSelected(false);
 					try {
 						final Robot robot = new Robot();
-						robot.keyPress(KeyEvent.VK_ESCAPE);
-						robot.keyRelease(KeyEvent.VK_ESCAPE);
 						robot.keyPress(KeyEvent.VK_TAB);
 						robot.keyRelease(KeyEvent.VK_TAB);
 					}
 					catch (final AWTException e) { /* Se ignora */ }
 				}
-				else {
-					mMenu.getMenu(0).setSelected(true);
-					mMenu.getMenu(0).requestFocus();
+				// Deberiamos cerrar con un ESC de robot al pulsar la tecla ALT, pero no podemos distinguir cuando es para cerrar o si se
+				// ha pulsado ALT+Tecla para abrir un menu con un atajo de teclado
+				else if (!(mMenu.getMenu(INDEX_MENU_FILE).getPopupMenu().isVisible() ||
+						 mMenu.getMenu(INDEX_MENU_OPTIONS).getPopupMenu().isVisible() ||
+						 mMenu.getMenu(INDEX_MENU_HELP).getPopupMenu().isVisible())) {
+					mMenu.getMenu(INDEX_MENU_FILE).setSelected(true);
+					mMenu.getMenu(INDEX_MENU_FILE).requestFocus();
 				}
 			}
 		});
@@ -199,7 +234,7 @@ final class MainMenuManager {
 				0,
 				true
 			),
-			moveSelectedMenu
+			moveSelectedMenuRight
 		);
     	inputMap.put(
 			KeyStroke.getKeyStroke(
@@ -207,7 +242,7 @@ final class MainMenuManager {
 				0,
 				true
 			),
-			moveSelectedMenu
+			moveSelectedMenuLeft
 		);
     	inputMap.put(
 			KeyStroke.getKeyStroke(

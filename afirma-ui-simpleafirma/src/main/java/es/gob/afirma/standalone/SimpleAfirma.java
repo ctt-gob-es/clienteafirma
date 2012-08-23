@@ -31,6 +31,7 @@ import java.util.prefs.Preferences;
 
 import javax.smartcardio.TerminalFactory;
 import javax.swing.JApplet;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -218,15 +219,15 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
             else {
                 this.window.setJMenuBar(this.mainMenu);
                 this.mainMenu.setEnabledOpenCommand(true);
-//                if (firstTime) {
-//                	MainMenuManager.setMenuManagement(
-//            			this.window.getRootPane().getActionMap(),
-//            			this.window.getRootPane().getInputMap(
-//                			JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
-//            			),
-//            			SimpleAfirma.this.getMainMenu()
-//        			);
-//                }
+                if (firstTime) {
+                	MainMenuManager.setMenuManagement(
+            			this.window.getRootPane().getActionMap(),
+            			this.window.getRootPane().getInputMap(
+                			JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
+            			),
+            			SimpleAfirma.this.getMainMenu()
+        			);
+                }
             }
         }
         final JPanel newPanel = new SignPanel(this.window, this, firstTime);
