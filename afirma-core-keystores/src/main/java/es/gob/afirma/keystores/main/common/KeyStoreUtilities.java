@@ -225,6 +225,7 @@ public final class KeyStoreUtilities {
                         if ("KeychainStore".equals(ks.getType())) { //$NON-NLS-1$
                             final KeyStore tmpKs = ks;
                             AccessController.doPrivileged(new PrivilegedAction<Void>() {
+                            	/** {@inheritDoc} */
                                 public Void run() {
                                     final PrivateKey key;
                                     try {
@@ -448,6 +449,7 @@ public final class KeyStoreUtilities {
     				ksm.getCertificate(certAlias));
     	}
     	Arrays.sort(orderedFriendlyNames, new Comparator<NameCertificateBean>() {
+    		/** {@inheritDoc} */
     		public int compare(final NameCertificateBean o1, final NameCertificateBean o2) {
     			if (o1 == null && o2 == null) {
     				return 0;
