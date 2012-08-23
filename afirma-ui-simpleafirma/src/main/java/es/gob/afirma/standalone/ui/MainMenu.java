@@ -222,13 +222,7 @@ public final class MainMenu extends JMenuBar {
             	/** {@inheritDoc} */
 				@Override
 				public void actionPerformed(final ActionEvent ae) {
-					final JDialog preferencesDialog = new JDialog(MainMenu.this.getParentComponent(), true);
-					preferencesDialog.setTitle(Messages.getString("MainMenu.24")); //$NON-NLS-1$
-					preferencesDialog.add(new PreferencesPanel(preferencesDialog));
-					preferencesDialog.setSize(800,600);
-					preferencesDialog.setLocationRelativeTo(MainMenu.this.getParentComponent());
-					preferencesDialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-					preferencesDialog.setVisible(true);
+				    showPreferences();
 				}});
             optionsMenu.add(preferencesMenuItem);
 
@@ -256,22 +250,23 @@ public final class MainMenu extends JMenuBar {
             	/** {@inheritDoc} */
                 @Override
                 public void handlePreferences(final PreferencesEvent pe) {
-                    final String[] localesDescs = new String[locales.length];
-                    for (int i = 0; i < locales.length; i++) {
-                        final String localeText = locales[i].getDisplayName(locales[i]);
-                        localesDescs[i] = localeText.substring(0, 1).toUpperCase() + localeText.substring(1);
-                    }
-                    final Object o = JOptionPane.showInputDialog(MainMenu.this.getParentComponent(), Messages.getString("MainMenu.22"), //$NON-NLS-1$
-                                                                 Messages.getString("MainMenu.23"), //$NON-NLS-1$
-                                                                 JOptionPane.PLAIN_MESSAGE,
-                                                                 null,
-                                                                 localesDescs,
-                                                                 null);
-                    for (int i = 0; i < locales.length; i++) {
-                        if (localesDescs[i].equals(o)) {
-                            MainMenu.this.getSimpleAfirma().setDefaultLocale(locales[i]);
-                        }
-                    }
+//                    final String[] localesDescs = new String[locales.length];
+//                    for (int i = 0; i < locales.length; i++) {
+//                        final String localeText = locales[i].getDisplayName(locales[i]);
+//                        localesDescs[i] = localeText.substring(0, 1).toUpperCase() + localeText.substring(1);
+//                    }
+//                    final Object o = JOptionPane.showInputDialog(MainMenu.this.getParentComponent(), Messages.getString("MainMenu.22"), //$NON-NLS-1$
+//                                                                 Messages.getString("MainMenu.23"), //$NON-NLS-1$
+//                                                                 JOptionPane.PLAIN_MESSAGE,
+//                                                                 null,
+//                                                                 localesDescs,
+//                                                                 null);
+//                    for (int i = 0; i < locales.length; i++) {
+//                        if (localesDescs[i].equals(o)) {
+//                            MainMenu.this.getSimpleAfirma().setDefaultLocale(locales[i]);
+//                        }
+//                    }
+                    showPreferences();
                 }
             });
         }
@@ -374,9 +369,18 @@ public final class MainMenu extends JMenuBar {
             this.menuArchivo.setEnabled(en);
         }
     }
+    
+    void showPreferences() {
+        final JDialog preferencesDialog = new JDialog(MainMenu.this.getParentComponent(), true);
+        preferencesDialog.setTitle(Messages.getString("MainMenu.24")); //$NON-NLS-1$
+        preferencesDialog.add(new PreferencesPanel(preferencesDialog));
+        preferencesDialog.setSize(800,600);
+        preferencesDialog.setLocationRelativeTo(MainMenu.this.getParentComponent());
+        preferencesDialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        preferencesDialog.setVisible(true);
+    }
 
     void showAbout() {
-        // EL texto del "Acerca de" no se externaliza
         JOptionPane.showMessageDialog((this.parent == null) ? MainMenu.this : this.parent,
         							  Messages.getString("MainMenu.14"), //$NON-NLS-1$,
                                       Messages.getString("MainMenu.15"), //$NON-NLS-1$
