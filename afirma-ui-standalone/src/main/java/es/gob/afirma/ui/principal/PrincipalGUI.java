@@ -779,7 +779,7 @@ public final class PrincipalGUI extends JAccessibilityFrame {
         System.exit(0);
     }
 
-    public void setAplicar(final boolean aplicar) {
+    void setAplicar(final boolean aplicar) {
         this.aplicar = aplicar;
     }
 
