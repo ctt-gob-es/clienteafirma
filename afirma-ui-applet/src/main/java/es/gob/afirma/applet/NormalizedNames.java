@@ -70,7 +70,7 @@ final class NormalizedNames {
      * @param name
      *        Nombre de formato.
      * @return Nombre normalizado del formato. */
-    static final String normalizeFormatName(final String name) {
+    static String normalizeFormatName(final String name) {
 
         // Dejamos que el objeto que llame al metodo se encargue del error
         if (name == null) {

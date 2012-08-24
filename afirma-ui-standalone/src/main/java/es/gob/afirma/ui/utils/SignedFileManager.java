@@ -13,7 +13,7 @@ public final class SignedFileManager {
 
     /** Obtiene un filtro de fichero correspondiente para los ficheros mas comunes que contienen una firma.
      * @return filtro */
-    public static final FileFilter getCommonSignedFileFilter() {
+    public static FileFilter getCommonSignedFileFilter() {
         final FileFilter fileFilter = new ExtFilter(new String[] {
           "csig", "xsig" //$NON-NLS-1$ //$NON-NLS-2$
         }, Messages.getString("SignedFileManager.commonSignedFile")); //$NON-NLS-1$

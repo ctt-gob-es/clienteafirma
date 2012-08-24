@@ -66,9 +66,7 @@ import es.gob.afirma.keystores.main.filters.CertificateFilter;
 import es.gob.afirma.ui.principal.Main;
 import es.gob.afirma.ui.principal.PrincipalGUI;
 
-/**
- * Clase con utilidades varias
- */
+/** Utilidades varias */
 public final class Utils {
 
 	private Utils() {
@@ -700,7 +698,7 @@ public final class Utils {
      * Obtiene un filtro de fichero correspondiente para almacenes de certificados del tipo PCKS#12 y .
      * @return filtro
      */
-    public static final FileFilter getRepositoryFileFilter() {
+    public static FileFilter getRepositoryFileFilter() {
     	return new ExtFilter(new String[] {"p12", "pfx"}, Messages.getString("Repository.filefilter")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
 
