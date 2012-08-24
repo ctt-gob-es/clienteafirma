@@ -2,10 +2,8 @@ package es.gob.afirma.signature;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.security.Security;
 import java.security.cert.CRLException;
 import java.security.cert.CertStoreException;
 import java.security.cert.CertificateException;
@@ -19,6 +17,7 @@ import javax.help.UnsupportedOperationException;
 
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cms.CMSException;
+import org.bouncycastle.cms.CMSProcessableByteArray;
 import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.cms.SignerId;
 import org.bouncycastle.cms.SignerInformation;
@@ -35,22 +34,17 @@ import es.gob.afirma.signature.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.signature.SignValidity.VALIDITY_ERROR;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
 import es.gob.afirma.signers.cms.AOCMSSigner;
-import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 
-/**
- * Validador de firmas Adobe PDF.
- * La validaci&oacute;n de firmas est&aacute; basada en el c&oacute;digo de pruebas
- * proporcionado con las bibliotecas de BouncyCastle.
+/** Validador de firmas binarias.
  * @author Carlos Gamuci
- */
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class ValidateBinarySignature {
 
 	private ValidateBinarySignature() {
 		// No permitimos la instanciacion
 	}
 
-    /**
-     * Valida una firma binaria (CMS/CAdES). Si se especifican los datos que se firmaron
+    /** Valida una firma binaria (CMS/CAdES). Si se especifican los datos que se firmaron
      * se comprobar&aacute; que efectivamente fueron estos, mientras que si no se indican
      * se extraer&aacute;n de la propia firma. Si la firma no contiene los datos no se realizara
      * esta comprobaci&oacute;n.
@@ -72,17 +66,8 @@ public final class ValidateBinarySignature {
             }
         }
 
-        Security.addProvider(new BouncyCastleProvider());
-
         try {
-        	byte[] signedData = data;
-        	if (signedData == null) {
-        		signedData = signer.getData(sign);
-        		if (signedData == null) {
-        			return new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.NO_DATA);
-        		}
-        	}
-        	verifySignatures(sign, signedData);
+        	verifySignatures(sign, data);
         }
         catch (final CertStoreException e) {
             // Error al recuperar los certificados o estos no son validos
@@ -118,8 +103,7 @@ public final class ValidateBinarySignature {
         return new SignValidity(SIGN_DETAIL_TYPE.OK, null);
     }
 
-    /**
-     * Verifica la valides de una firma. Si la firma es v&aacute;lida, no hace nada. Si no es
+    /** Verifica la valides de una firma. Si la firma es v&aacute;lida, no hace nada. Si no es
      * v&aacute;lida, lanza una excepci&oacute;n.
      * @param sign Firma que se desea validar.
      * @param data Datos para la comprobaci&oacute;n.
@@ -134,8 +118,7 @@ public final class ValidateBinarySignature {
      * @throws IOException
      * @throws CertificateException
      * @throws OperatorCreationException
-     * @throws Exception Cuando la firma resulte no v&aacute;lida.
-     */
+     * @throws Exception Cuando la firma resulte no v&aacute;lida. */
     private static void verifySignatures(final byte[] sign, final byte[] data) throws CMSException,
                                                                                       CertStoreException,
                                                                                       NoSuchAlgorithmException,
@@ -146,7 +129,14 @@ public final class ValidateBinarySignature {
                                                                                       IOException,
                                                                                       OperatorCreationException {
 
-        final CMSSignedData s = new CMSSignedData(sign);
+        final CMSSignedData s;
+        if (data == null) {
+        	s = new CMSSignedData(sign);
+        }
+        else {
+        	s = new CMSSignedData(new CMSProcessableByteArray(sign), data);
+        	System.out.println("Exp");
+        }
         final Store store = s.getCertificates();
 
         final CertificateFactory certFactory = CertificateFactory.getInstance("X.509"); //$NON-NLS-1$
@@ -168,40 +158,6 @@ public final class ValidateBinarySignature {
             	throw new CMSException("Firma no valida"); //$NON-NLS-1$
             }
 
-            if (data != null) {
-                if (signer.getDigestAlgorithmID() == null) {
-                    throw new CMSException("No se ha podido localizar el algoritmo de huella digital"); //$NON-NLS-1$
-                }
-
-                String mdAlgorithm;
-                final String mdAlgorithmOID = signer.getDigestAlgorithmID().getAlgorithm().toString();
-                if (AOAlgorithmID.getOID("MD2").equals(mdAlgorithmOID)) { //$NON-NLS-1$
-                    mdAlgorithm = "MD2"; //$NON-NLS-1$
-                }
-                else if (AOAlgorithmID.getOID("MD5").equals(mdAlgorithmOID)) { //$NON-NLS-1$
-                    mdAlgorithm = "MD5"; //$NON-NLS-1$
-                }
-                else if (AOAlgorithmID.getOID("SHA1").equals(mdAlgorithmOID)) { //$NON-NLS-1$
-                    mdAlgorithm = "SHA1"; //$NON-NLS-1$
-                }
-                else if (AOAlgorithmID.getOID("SHA-256").equals(mdAlgorithmOID)) { //$NON-NLS-1$
-                    mdAlgorithm = "SHA-256"; //$NON-NLS-1$
-                }
-                else if (AOAlgorithmID.getOID("SHA-384").equals(mdAlgorithmOID)) { //$NON-NLS-1$
-                    mdAlgorithm = "SHA-384"; //$NON-NLS-1$
-                }
-                else if (AOAlgorithmID.getOID("SHA-512").equals(mdAlgorithmOID)) { //$NON-NLS-1$
-                    mdAlgorithm = "SHA-512"; //$NON-NLS-1$
-                }
-                else {
-                    throw new NoSuchAlgorithmException("Algoritmo de huella digital no reconocido"); //$NON-NLS-1$
-                }
-
-                if (!MessageDigest.isEqual(MessageDigest.getInstance(mdAlgorithm).digest(data),
-                                           signer.getContentDigest())) {
-                    throw new NoMatchDataException("Los datos introducidos no coinciden con los firmados"); //$NON-NLS-1$
-                }
-            }
         }
 
     }
