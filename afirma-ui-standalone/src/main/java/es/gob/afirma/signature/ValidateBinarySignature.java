@@ -1,22 +1,34 @@
 package es.gob.afirma.signature;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.Security;
 import java.security.cert.CRLException;
-import java.security.cert.CertStore;
 import java.security.cert.CertStoreException;
+import java.security.cert.CertificateException;
 import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateFactory;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.Iterator;
 
+import javax.help.UnsupportedOperationException;
+
+import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedData;
+import org.bouncycastle.cms.SignerId;
 import org.bouncycastle.cms.SignerInformation;
-import org.bouncycastle.cms.SignerInformationStore;
+import org.bouncycastle.cms.SignerInformationVerifier;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
+import org.bouncycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
+import org.bouncycastle.util.Selector;
+import org.bouncycastle.util.Store;
 
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.signature.SignValidity.SIGN_DETAIL_TYPE;
@@ -71,25 +83,34 @@ public final class ValidateBinarySignature {
         		}
         	}
         	verifySignatures(sign, signedData);
-        } catch (final CertStoreException e) {
-            // Ocurrio un error al recuperar los certificados o estos no son validos
+        }
+        catch (final CertStoreException e) {
+            // Error al recuperar los certificados o estos no son validos
             return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_PROBLEM);
-        } catch (final CertificateExpiredException e) {
+        }
+        catch (final CertificateExpiredException e) {
             // Certificado caducado
             return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_EXPIRED);
-        } catch (final CertificateNotYetValidException e) {
+        }
+        catch (final CertificateNotYetValidException e) {
             // Certificado aun no valido
             return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_NOT_VALID_YET);
-        } catch (final NoSuchAlgorithmException e) {
+        }
+        catch (final NoSuchAlgorithmException e) {
             // Algoritmo no reconocido
             return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.ALGORITHM_NOT_SUPPORTED);
-        } catch (final NoMatchDataException e) {
+        }
+        catch (final NoMatchDataException e) {
+        	e.printStackTrace();
             // Los datos indicados no coinciden con los datos de firma
             return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA);
-        } catch (final CRLException e) {
+        }
+        catch (final CRLException e) {
             // Problema en la validacion de las CRLs de la firma
             return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CRL_PROBLEM);
-        } catch (final Exception e) {
+        }
+        catch (final Exception e) {
+        	e.printStackTrace();
             // La firma no es una firma binaria valida
             return new SignValidity(SIGN_DETAIL_TYPE.KO, null);
         }
@@ -105,33 +126,46 @@ public final class ValidateBinarySignature {
      * @throws CMSException Cuando la firma no tenga una estructura v&aacute;lida.
      * @throws CertStoreException Cuando se encuentra un error en los certificados de
      * firma o estos no pueden recuperarse.
-     * @throws CertificateExpiredException Cuando el certificado est&aacute;a caducado.
-     * @throws CertificateNotYetValidException Cuando el certificado aun no es v&aacute;lido.
      * @throws NoSuchAlgorithmException Cuando no se reconoce o soporta alguno de los
      * algoritmos utilizados en la firma.
      * @throws NoMatchDataException Cuando los datos introducidos no coinciden con los firmados.
      * @throws CRLException Cuando ocurre un error con las CRL de la firma.
      * @throws NoSuchProviderException
+     * @throws IOException
+     * @throws CertificateException
+     * @throws OperatorCreationException
      * @throws Exception Cuando la firma resulte no v&aacute;lida.
      */
-    @SuppressWarnings("deprecation")
-    private static void verifySignatures(final byte[] sign, final byte[] data) throws CMSException, CertStoreException, CertificateExpiredException, CertificateNotYetValidException, NoSuchAlgorithmException, NoMatchDataException, CRLException, NoSuchProviderException {
+    private static void verifySignatures(final byte[] sign, final byte[] data) throws CMSException,
+                                                                                      CertStoreException,
+                                                                                      NoSuchAlgorithmException,
+                                                                                      NoMatchDataException,
+                                                                                      CRLException,
+                                                                                      NoSuchProviderException,
+                                                                                      CertificateException,
+                                                                                      IOException,
+                                                                                      OperatorCreationException {
 
         final CMSSignedData s = new CMSSignedData(sign);
-        final CertStore certStore = s.getCertificatesAndCRLs("Collection", BouncyCastleProvider.PROVIDER_NAME);  //$NON-NLS-1$
-        final SignerInformationStore signers = s.getSignerInfos();
-        final Iterator<?> it = signers.getSigners().iterator();
+        final Store store = s.getCertificates();
 
-        while (it.hasNext()) {
-            final SignerInformation signer = (SignerInformation) it.next();
-            final Iterator<?> certIt = certStore.getCertificates(signer.getSID()).iterator();
-            final X509Certificate cert = (X509Certificate) certIt.next();
+        final CertificateFactory certFactory = CertificateFactory.getInstance("X.509"); //$NON-NLS-1$
 
+        for (final Object si : s.getSignerInfos().getSigners()) {
+        	final SignerInformation signer = (SignerInformation) si;
 
-            //TODO: Corregir para que se validen correctamente las firmas explicitas
+            final Iterator<X509CertificateHolder> certIt = store.getMatches(new CertHolderBySignerIdSelector(signer.getSID())).iterator();
+            final X509Certificate cert = (X509Certificate) certFactory.generateCertificate(
+        		new ByteArrayInputStream(
+    				certIt.next().getEncoded()
+				)
+    		);
 
-            if (!signer.verify(cert, BouncyCastleProvider.PROVIDER_NAME)) {
-                throw new CMSException("Firma no valida"); //$NON-NLS-1$
+            if (!signer.verify(new SignerInformationVerifier(
+        		new JcaContentVerifierProviderBuilder().setProvider(new BouncyCastleProvider()).build(cert),
+        		new BcDigestCalculatorProvider()
+    		))) {
+            	throw new CMSException("Firma no valida"); //$NON-NLS-1$
             }
 
             if (data != null) {
@@ -158,7 +192,8 @@ public final class ValidateBinarySignature {
                 }
                 else if (AOAlgorithmID.getOID("SHA-512").equals(mdAlgorithmOID)) { //$NON-NLS-1$
                     mdAlgorithm = "SHA-512"; //$NON-NLS-1$
-                } else {
+                }
+                else {
                     throw new NoSuchAlgorithmException("Algoritmo de huella digital no reconocido"); //$NON-NLS-1$
                 }
 
@@ -169,11 +204,32 @@ public final class ValidateBinarySignature {
             }
         }
 
-        if (certStore.getCertificates(null).size() != s.getCertificates().getMatches(null).size()) {
-            throw new CertStoreException("Error en la estructura de certificados de la firma");  //$NON-NLS-1$
-        }
-        if (certStore.getCRLs(null).size() != s.getCRLs().getMatches(null).size()) {
-            throw new CRLException("Error en la estructura de CRLs de la firma"); //$NON-NLS-1$
-        }
+    }
+
+    private static final class CertHolderBySignerIdSelector implements Selector {
+
+    	private final SignerId signerId;
+    	private CertHolderBySignerIdSelector(final SignerId sid) {
+    		if (sid == null) {
+    			throw new IllegalArgumentException("El ID del firmante no puede ser nulo"); //$NON-NLS-1$
+    		}
+    		this.signerId = sid;
+    	}
+
+    	/** {@inheritDoc} */
+		@Override
+		public boolean match(final Object o) {
+			if (!(o instanceof X509CertificateHolder)) {
+				return false;
+			}
+			return CertHolderBySignerIdSelector.this.signerId.getSerialNumber().equals(((X509CertificateHolder)o).getSerialNumber());
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public Object clone() {
+			throw new UnsupportedOperationException();
+		}
+
     }
 }
