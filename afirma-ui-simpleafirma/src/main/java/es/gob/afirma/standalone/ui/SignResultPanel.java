@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -56,7 +56,7 @@ final class SignResultPanel extends JPanel {
         // Para que se detecten apropiadamente los hipervinculos hay que establecer
         // el tipo de contenido antes que el contenido
         this.descTextLabel.setContentType("text/html"); //$NON-NLS-1$
-        
+
         final JSVGCanvas resultOperationIcon = new JSVGCanvas();
         resultOperationIcon.setFocusable(false);
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -111,7 +111,7 @@ final class SignResultPanel extends JPanel {
                     default:
                         errorMessage = Messages.getString("SignResultPanel.6"); //$NON-NLS-1$
                     }
-                } 
+                }
                 else {
                     errorMessage = Messages.getString("SignResultPanel.6"); //$NON-NLS-1$
                 }
@@ -126,7 +126,7 @@ final class SignResultPanel extends JPanel {
                     default:
                         errorMessage = Messages.getString("SignResultPanel.12"); //$NON-NLS-1$
                     }
-                } 
+                }
                 else {
                     errorMessage = Messages.getString("SignResultPanel.12"); //$NON-NLS-1$
                 }
@@ -137,9 +137,9 @@ final class SignResultPanel extends JPanel {
         resultOperationIcon.setPreferredSize(new Dimension(120, 120));
         resultOperationIcon.setToolTipText(resultOperationIconTooltip);
 
-        final EditorFocusManager editorFocusManager = new EditorFocusManager (this.descTextLabel, new EditorFocusManagerAction() {  
+        final EditorFocusManager editorFocusManager = new EditorFocusManager (this.descTextLabel, new EditorFocusManagerAction() {
             @Override
-            public void openHyperLink(final HyperlinkEvent he, int linkIndex) {
+            public void openHyperLink(final HyperlinkEvent he, final int linkIndex) {
                 try {
                     if (he.getURL() != null) {
                         Desktop.getDesktop().browse(he.getURL().toURI());
@@ -152,23 +152,23 @@ final class SignResultPanel extends JPanel {
                     UIUtils.showErrorMessage(
                         SignResultPanel.this,
                         Messages.getString("SignResultPanel.0") + he.getURL(), //$NON-NLS-1$
-                        Messages.getString("SignResultPanel.1"), //$NON-NLS-1$
+                        Messages.getString("SimpleAfirma.7"), //$NON-NLS-1$
                         JOptionPane.ERROR_MESSAGE
                     );
                 }
             }
         });
-        
+
         this.descTextLabel.addFocusListener(editorFocusManager);
         this.descTextLabel.addHyperlinkListener(editorFocusManager);
         this.descTextLabel.addKeyListener(editorFocusManager);
         if (extKeyListener != null) {
         	this.descTextLabel.addKeyListener(extKeyListener);
         }
-        
+
         this.descTextLabel.setEditable(false);
         this.descTextLabel.setOpaque(false);
-        
+
         this.resultTextLabel.setFont(this.getFont().deriveFont(Font.PLAIN, 26));
         this.resultTextLabel.setLabelFor(this.descTextLabel);
 
@@ -177,9 +177,9 @@ final class SignResultPanel extends JPanel {
             setBackground(LookAndFeelManager.WINDOW_COLOR);
             this.resultTextLabel.setForeground(new Color(3399));
         }
-        
+
         this.setLayout(new GridBagLayout());
-        
+
         final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 0.0;

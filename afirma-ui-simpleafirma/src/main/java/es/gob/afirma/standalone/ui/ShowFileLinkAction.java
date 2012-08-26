@@ -61,7 +61,7 @@ final class ShowFileLinkAction {
                 UIUtils.showErrorMessage(
                         null,
                         Messages.getString("ShowFileLinkAction.2") + " '" + ext + "'",  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-                        Messages.getString("ShowFileLinkAction.0"), //$NON-NLS-1$
+                        Messages.getString("SimpleAfirma.7"), //$NON-NLS-1$
                         JOptionPane.ERROR_MESSAGE
                 );
             }

@@ -10,6 +10,24 @@
 
 package es.gob.afirma.standalone.ui;
 
+import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_CADES_IMPLICIT;
+import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_OMIT_ASKONCLOSE;
+import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_PADES_SIGNER_CONTACT;
+import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_PADES_SIGN_PRODUCTION_CITY;
+import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_PADES_SIGN_REASON;
+import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_POLICY_IDENTIFIER;
+import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_POLICY_IDENTIFIER_HASH;
+import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_POLICY_IDENTIFIER_HASH_ALGORITHM;
+import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_POLICY_QUALIFIER;
+import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_SIGNATURE_ALGORITHM;
+import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY;
+import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY;
+import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_XADES_SIGNATURE_PRODUCTION_POSTAL_CODE;
+import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_XADES_SIGNATURE_PRODUCTION_PROVINCE;
+import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_XADES_SIGNER_CERTIFIED_ROLE;
+import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_XADES_SIGNER_CLAIMED_ROLE;
+import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_XADES_SIGN_FORMAT;
+
 import java.awt.GridLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -48,26 +66,6 @@ final class PreferencesPanel extends JPanel {
     }
 
     private final ModificationListener modificationListener;
-
-	static final String PREFERENCE_SIGNATURE_ALGORITHM = "signatureAlgorithm"; //$NON-NLS-1$
-	static final String PREFERENCE_POLICY_IDENTIFIER = "policyIdentifier"; //$NON-NLS-1$
-	static final String PREFERENCE_POLICY_IDENTIFIER_HASH = "policyIdentifierHash"; //$NON-NLS-1$
-	static final String PREFERENCE_POLICY_IDENTIFIER_HASH_ALGORITHM = "policyIdentifierHashAlgorithm"; //$NON-NLS-1$
-	static final String PREFERENCE_POLICY_QUALIFIER = "policyQualifier"; //$NON-NLS-1$
-
-	static final String PREFERENCE_CADES_IMPLICIT = "cadesImplicitMode"; //$NON-NLS-1$
-
-	static final String PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY = "xadesSignatureProductionCity"; //$NON-NLS-1$
-	static final String PREFERENCE_XADES_SIGNATURE_PRODUCTION_PROVINCE = "xadesSignatureProductionProvince"; //$NON-NLS-1$
-	static final String PREFERENCE_XADES_SIGNATURE_PRODUCTION_POSTAL_CODE = "xadesSignatureProductionPostalCode"; //$NON-NLS-1$
-	static final String PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY = "xadesSignatureProductionCountry"; //$NON-NLS-1$
-	static final String PREFERENCE_XADES_SIGNER_CLAIMED_ROLE = "xadesSignerClaimedRole"; //$NON-NLS-1$
-	static final String PREFERENCE_XADES_SIGNER_CERTIFIED_ROLE = "xadesSignerCertifiedRole"; //$NON-NLS-1$
-	static final String PREFERENCE_XADES_SIGN_FORMAT = "xadesSignFormat"; //$NON-NLS-1$
-
-	static final String PREFERENCE_PADES_SIGN_REASON = "padesSignReason"; //$NON-NLS-1$
-	static final String PREFERENCE_PADES_SIGN_PRODUCTION_CITY = "padesSignProductionCity"; //$NON-NLS-1$
-	static final String PREFERENCE_PADES_SIGNER_CONTACT = "padesSignerContact"; //$NON-NLS-1$
 
 	private static final long serialVersionUID = -3168095095548385291L;
 
@@ -153,6 +151,11 @@ final class PreferencesPanel extends JPanel {
 		return this.policyQualifier;
 	}
 
+	private final JCheckBox avoidAskForClose = new JCheckBox(
+		Messages.getString("PreferencesPanel.36"), //$NON-NLS-1$
+		PREFERENCES.getBoolean(PREFERENCE_OMIT_ASKONCLOSE, false)
+	);
+
 	private final JTextField padesSignReason = new JTextField(
 		PREFERENCES.get(PREFERENCE_PADES_SIGN_REASON, "") //$NON-NLS-1$
 	);
@@ -224,7 +227,7 @@ final class PreferencesPanel extends JPanel {
 				JOptionPane.showMessageDialog(
 					this,
 					"<html><p>" + Messages.getString("PreferencesPanel.6") + ":<br>" + e.getLocalizedMessage() + "</p></html>", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-					Messages.getString("PreferencesPanel.7"), //$NON-NLS-1$
+					Messages.getString("SimpleAfirma.7"), //$NON-NLS-1$
 					JOptionPane.ERROR_MESSAGE
 				);
 				return false;
@@ -242,6 +245,7 @@ final class PreferencesPanel extends JPanel {
 		}
 
 		PreferencesPanel.PREFERENCES.put(PREFERENCE_SIGNATURE_ALGORITHM, this.signarureAlgorithms.getSelectedItem().toString());
+		PreferencesPanel.PREFERENCES.putBoolean(PREFERENCE_OMIT_ASKONCLOSE, this.avoidAskForClose.isSelected());
 
 		//****************************************************************************
 		//**** PREFERENCIAS CADES ****************************************************
@@ -404,6 +408,13 @@ final class PreferencesPanel extends JPanel {
 		signatureAgorithmPanel.add(this.signarureAlgorithms);
 		panel.add(signatureAgorithmPanel);
 		panel.add(createPolicyPanel());
+
+		final JPanel generalPreferencesPanel = new JPanel();
+		generalPreferencesPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages.getString("PreferencesPanel.37"))); //$NON-NLS-1$
+		this.avoidAskForClose.addItemListener(this.modificationListener);
+		generalPreferencesPanel.add(this.avoidAskForClose);
+		panel.add(generalPreferencesPanel);
+
 		return panel;
 	}
 

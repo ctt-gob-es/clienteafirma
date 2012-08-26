@@ -115,13 +115,13 @@ public final class FileUIManager {
 
         final File outputFile = new File(newFileName);
 
-        if (Platform.OS.MACOSX.equals(Platform.getOS()) && 
+        if (Platform.OS.MACOSX.equals(Platform.getOS()) &&
             newFileName.toLowerCase().endsWith(".pdf") &&  //$NON-NLS-1$
-            outputFile.exists() && 
+            outputFile.exists() &&
             JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(
                         parent,
                         Messages.getString("SignPanel.84"), //$NON-NLS-1$
-                        Messages.getString("SignPanel.19"), //$NON-NLS-1$
+                        Messages.getString("SimpleAfirma.48"), //$NON-NLS-1$
                         JOptionPane.YES_NO_OPTION,
                         JOptionPane.WARNING_MESSAGE)) {
                     return null;
@@ -141,7 +141,7 @@ public final class FileUIManager {
             UIUtils.showErrorMessage(
                     parent,
                     Messages.getString("SignPanel.89"), //$NON-NLS-1$
-                    Messages.getString("SignPanel.25"), //$NON-NLS-1$
+                    Messages.getString("SimpleAfirma.7"), //$NON-NLS-1$
                     JOptionPane.ERROR_MESSAGE
             );
         }

@@ -369,7 +369,7 @@ public final class MainMenu extends JMenuBar {
             this.menuArchivo.setEnabled(en);
         }
     }
-    
+
     void showPreferences() {
         final JDialog preferencesDialog = new JDialog(MainMenu.this.getParentComponent(), true);
         preferencesDialog.setTitle(Messages.getString("MainMenu.24")); //$NON-NLS-1$
@@ -388,14 +388,7 @@ public final class MainMenu extends JMenuBar {
     }
 
     boolean exitApplication() {
-        if (JOptionPane.showConfirmDialog(this.parent, Messages.getString("MainMenu.26"), //$NON-NLS-1$
-                                          Messages.getString("MainMenu.27"), //$NON-NLS-1$
-                                          JOptionPane.YES_NO_OPTION,
-                                          JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
-            this.saf.closeApplication(0);
-            return true;
-        }
-        return false;
+        return this.saf.askForClosing();
     }
 
 }

@@ -94,6 +94,7 @@ import es.gob.afirma.signers.xades.AOXAdESSigner;
 import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.Messages;
+import es.gob.afirma.standalone.PreferencesNames;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.VisorFirma;
 
@@ -213,7 +214,7 @@ public final class SignPanel extends JPanel {
             UIUtils.showErrorMessage(
                     SignPanel.this,
                     errorMessage,
-                    Messages.getString("SignPanel.25"), //$NON-NLS-1$
+                    Messages.getString("SimpleAfirma.7"), //$NON-NLS-1$
                     JOptionPane.ERROR_MESSAGE
             );
             this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
@@ -230,7 +231,7 @@ public final class SignPanel extends JPanel {
             UIUtils.showErrorMessage(
                  SignPanel.this,
                  Messages.getString("SignPanel.26"), //$NON-NLS-1$
-                 Messages.getString("SignPanel.25"), //$NON-NLS-1$
+                 Messages.getString("SimpleAfirma.7"), //$NON-NLS-1$
                  JOptionPane.ERROR_MESSAGE
             );
             this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
@@ -262,7 +263,7 @@ public final class SignPanel extends JPanel {
         	if (new AOFacturaESigner().isSign(data)) {
         		UIUtils.showErrorMessage(this,
         				Messages.getString("SignPanel.22"), //$NON-NLS-1$
-        				Messages.getString("SignPanel.25"), //$NON-NLS-1$
+        				Messages.getString("SimpleAfirma.7"), //$NON-NLS-1$
         				JOptionPane.WARNING_MESSAGE);
         		this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         		return;
@@ -395,7 +396,7 @@ public final class SignPanel extends JPanel {
                             UIUtils.showErrorMessage(
                                     SignPanel.this,
                                     Messages.getString("SignPanel.18"), //$NON-NLS-1$
-                                    Messages.getString("SignPanel.19"), //$NON-NLS-1$
+                                    Messages.getString("SimpleAfirma.48"), //$NON-NLS-1$
                                     JOptionPane.WARNING_MESSAGE
                             );
                         }
@@ -407,7 +408,7 @@ public final class SignPanel extends JPanel {
                             UIUtils.showErrorMessage(
                                     SignPanel.this,
                                     Messages.getString("SignPanel.24"), //$NON-NLS-1$
-                                    Messages.getString("SignPanel.25"), //$NON-NLS-1$
+                                    Messages.getString("SimpleAfirma.7"), //$NON-NLS-1$
                                     JOptionPane.ERROR_MESSAGE
                             );
                             dtde.dropComplete(false);
@@ -530,7 +531,7 @@ public final class SignPanel extends JPanel {
                         UIUtils.showErrorMessage(
                                 UpperPanel.this,
                                 Messages.getString("SignPanel.36"), //$NON-NLS-1$
-                                Messages.getString("SignPanel.25"), //$NON-NLS-1$
+                                Messages.getString("SimpleAfirma.7"), //$NON-NLS-1$
                                 JOptionPane.ERROR_MESSAGE
                         );
                     }
@@ -738,7 +739,7 @@ public final class SignPanel extends JPanel {
                                 UIUtils.showErrorMessage(
                                         FilePanel.this,
                                         Messages.getString("SignPanel.53"), //$NON-NLS-1$
-                                        Messages.getString("SignPanel.25"), //$NON-NLS-1$
+                                        Messages.getString("SimpleAfirma.7"), //$NON-NLS-1$
                                         JOptionPane.ERROR_MESSAGE
                                 );
                                 return;
@@ -818,7 +819,7 @@ public final class SignPanel extends JPanel {
                     UIUtils.showErrorMessage(
                             SignPanel.this,
                             Messages.getString("SignPanel.55"), //$NON-NLS-1$
-                            Messages.getString("SignPanel.19"), //$NON-NLS-1$
+                            Messages.getString("SimpleAfirma.48"), //$NON-NLS-1$
                             JOptionPane.WARNING_MESSAGE
                     );
                     return null;
@@ -875,10 +876,11 @@ public final class SignPanel extends JPanel {
             p.put("allowSigningCertifiedPdfs", "false"); //$NON-NLS-1$ //$NON-NLS-2$
 
             // Preferencias generales (politica)
-            final String policyId = preferences.get(PreferencesPanel.PREFERENCE_POLICY_IDENTIFIER, ""); //$NON-NLS-1$
+            final String policyId = preferences.get(PreferencesNames.PREFERENCE_POLICY_IDENTIFIER, ""); //$NON-NLS-1$
             if (!"".equals(policyId)) { //$NON-NLS-1$
             	boolean policyIdIsOid = false;
             	try {
+            		// No nos interesa el resultado, solo si construye sin excepciones
 					new Oid(policyId.replace("urn:oid:", ""));
 					policyIdIsOid = true;
 				}
@@ -887,24 +889,24 @@ public final class SignPanel extends JPanel {
             	if ((SignPanel.this.getSigner() instanceof AOXAdESSigner) || ((!(SignPanel.this.getSigner() instanceof AOXAdESSigner)) && policyIdIsOid)) {
 		            p.put(
 		        		"policyIdentifier", //$NON-NLS-1$
-		        		preferences.get(PreferencesPanel.PREFERENCE_POLICY_IDENTIFIER, "") //$NON-NLS-1$
+		        		preferences.get(PreferencesNames.PREFERENCE_POLICY_IDENTIFIER, "") //$NON-NLS-1$
 		    		);
-		            if (!"".equals(preferences.get(PreferencesPanel.PREFERENCE_POLICY_IDENTIFIER_HASH, ""))) { //$NON-NLS-1$ //$NON-NLS-2$
+		            if (!"".equals(preferences.get(PreferencesNames.PREFERENCE_POLICY_IDENTIFIER_HASH, ""))) { //$NON-NLS-1$ //$NON-NLS-2$
 			            p.put(
 			        		"policyIdentifierHash", //$NON-NLS-1$
-			        		preferences.get(PreferencesPanel.PREFERENCE_POLICY_IDENTIFIER_HASH, "") //$NON-NLS-1$
+			        		preferences.get(PreferencesNames.PREFERENCE_POLICY_IDENTIFIER_HASH, "") //$NON-NLS-1$
 			    		);
 		            }
-		            if (!"".equals(preferences.get(PreferencesPanel.PREFERENCE_POLICY_IDENTIFIER_HASH_ALGORITHM, ""))) { //$NON-NLS-1$ //$NON-NLS-2$
+		            if (!"".equals(preferences.get(PreferencesNames.PREFERENCE_POLICY_IDENTIFIER_HASH_ALGORITHM, ""))) { //$NON-NLS-1$ //$NON-NLS-2$
 			            p.put(
 			        		"policyIdentifierHashAlgorithm", //$NON-NLS-1$
-			        		preferences.get(PreferencesPanel.PREFERENCE_POLICY_IDENTIFIER_HASH_ALGORITHM, "") //$NON-NLS-1$
+			        		preferences.get(PreferencesNames.PREFERENCE_POLICY_IDENTIFIER_HASH_ALGORITHM, "") //$NON-NLS-1$
 			    		);
 		            }
-		            if (!"".equals(preferences.get(PreferencesPanel.PREFERENCE_POLICY_QUALIFIER, ""))) { //$NON-NLS-1$ //$NON-NLS-2$
+		            if (!"".equals(preferences.get(PreferencesNames.PREFERENCE_POLICY_QUALIFIER, ""))) { //$NON-NLS-1$ //$NON-NLS-2$
 			            p.put(
 			        		"policyQualifier", //$NON-NLS-1$
-			        		preferences.get(PreferencesPanel.PREFERENCE_POLICY_QUALIFIER, "") //$NON-NLS-1$
+			        		preferences.get(PreferencesNames.PREFERENCE_POLICY_QUALIFIER, "") //$NON-NLS-1$
 			    		);
 		            }
             	}
@@ -916,68 +918,68 @@ public final class SignPanel extends JPanel {
 
 
             // Preferencias de XAdES
-            if (!"".equals(preferences.get(PreferencesPanel.PREFERENCE_XADES_SIGNER_CLAIMED_ROLE, ""))) { //$NON-NLS-1$ //$NON-NLS-2$
+            if (!"".equals(preferences.get(PreferencesNames.PREFERENCE_XADES_SIGNER_CLAIMED_ROLE, ""))) { //$NON-NLS-1$ //$NON-NLS-2$
 	            p.put(
 	        		"signerClaimedRole", //$NON-NLS-1$
-	        		preferences.get(PreferencesPanel.PREFERENCE_XADES_SIGNER_CLAIMED_ROLE, "") //$NON-NLS-1$
+	        		preferences.get(PreferencesNames.PREFERENCE_XADES_SIGNER_CLAIMED_ROLE, "") //$NON-NLS-1$
 	    		);
             }
-            if (!"".equals(preferences.get(PreferencesPanel.PREFERENCE_XADES_SIGNER_CERTIFIED_ROLE, ""))) {  //$NON-NLS-1$//$NON-NLS-2$
+            if (!"".equals(preferences.get(PreferencesNames.PREFERENCE_XADES_SIGNER_CERTIFIED_ROLE, ""))) {  //$NON-NLS-1$//$NON-NLS-2$
             	p.put(
         			"signerCertifiedRole", //$NON-NLS-1$
-        			preferences.get(PreferencesPanel.PREFERENCE_XADES_SIGNER_CERTIFIED_ROLE, "") //$NON-NLS-1$
+        			preferences.get(PreferencesNames.PREFERENCE_XADES_SIGNER_CERTIFIED_ROLE, "") //$NON-NLS-1$
     			);
             }
             // Esta propiedad se comparte con PAdES, hay que comprobar que signer tenemos
-            if (!"".equals(preferences.get(PreferencesPanel.PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY, "")) && (SignPanel.this.getSigner() instanceof AOXAdESSigner)) {  //$NON-NLS-1$//$NON-NLS-2$
+            if (!"".equals(preferences.get(PreferencesNames.PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY, "")) && (SignPanel.this.getSigner() instanceof AOXAdESSigner)) {  //$NON-NLS-1$//$NON-NLS-2$
             	p.put(
         			"signatureProductionCity", //$NON-NLS-1$
-        			preferences.get(PreferencesPanel.PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY, "") //$NON-NLS-1$
+        			preferences.get(PreferencesNames.PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY, "") //$NON-NLS-1$
     			);
             }
-            if (!"".equals(preferences.get(PreferencesPanel.PREFERENCE_XADES_SIGNATURE_PRODUCTION_PROVINCE, ""))) {  //$NON-NLS-1$//$NON-NLS-2$
+            if (!"".equals(preferences.get(PreferencesNames.PREFERENCE_XADES_SIGNATURE_PRODUCTION_PROVINCE, ""))) {  //$NON-NLS-1$//$NON-NLS-2$
             	p.put(
         			"signatureProductionProvince", //$NON-NLS-1$
-        			preferences.get(PreferencesPanel.PREFERENCE_XADES_SIGNATURE_PRODUCTION_PROVINCE, "") //$NON-NLS-1$
+        			preferences.get(PreferencesNames.PREFERENCE_XADES_SIGNATURE_PRODUCTION_PROVINCE, "") //$NON-NLS-1$
     			);
             }
-            if (!"".equals(preferences.get(PreferencesPanel.PREFERENCE_XADES_SIGNATURE_PRODUCTION_POSTAL_CODE, ""))) {  //$NON-NLS-1$//$NON-NLS-2$
+            if (!"".equals(preferences.get(PreferencesNames.PREFERENCE_XADES_SIGNATURE_PRODUCTION_POSTAL_CODE, ""))) {  //$NON-NLS-1$//$NON-NLS-2$
             	p.put(
         			"signatureProductionPostalCode", //$NON-NLS-1$
-        			preferences.get(PreferencesPanel.PREFERENCE_XADES_SIGNATURE_PRODUCTION_POSTAL_CODE, "") //$NON-NLS-1$
+        			preferences.get(PreferencesNames.PREFERENCE_XADES_SIGNATURE_PRODUCTION_POSTAL_CODE, "") //$NON-NLS-1$
     			);
             }
-            if (!"".equals(preferences.get(PreferencesPanel.PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY, ""))) {  //$NON-NLS-1$//$NON-NLS-2$
+            if (!"".equals(preferences.get(PreferencesNames.PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY, ""))) {  //$NON-NLS-1$//$NON-NLS-2$
             	p.put(
         			"signatureProductionCountry", //$NON-NLS-1$
-        			preferences.get(PreferencesPanel.PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY, "") //$NON-NLS-1$
+        			preferences.get(PreferencesNames.PREFERENCE_XADES_SIGNATURE_PRODUCTION_COUNTRY, "") //$NON-NLS-1$
     			);
             }
-            if (!"".equals(preferences.get(PreferencesPanel.PREFERENCE_XADES_SIGN_FORMAT, ""))) {  //$NON-NLS-1$//$NON-NLS-2$
+            if (!"".equals(preferences.get(PreferencesNames.PREFERENCE_XADES_SIGN_FORMAT, ""))) {  //$NON-NLS-1$//$NON-NLS-2$
             	p.put(
         			"format", //$NON-NLS-1$
-        			preferences.get(PreferencesPanel.PREFERENCE_XADES_SIGN_FORMAT, "") //$NON-NLS-1$
+        			preferences.get(PreferencesNames.PREFERENCE_XADES_SIGN_FORMAT, "") //$NON-NLS-1$
     			);
             }
 
             // Preferencias de PAdES
-            if (!"".equals(preferences.get(PreferencesPanel.PREFERENCE_PADES_SIGN_REASON, ""))) {  //$NON-NLS-1$//$NON-NLS-2$
+            if (!"".equals(preferences.get(PreferencesNames.PREFERENCE_PADES_SIGN_REASON, ""))) {  //$NON-NLS-1$//$NON-NLS-2$
             	p.put(
         			"signReason", //$NON-NLS-1$
-        			preferences.get(PreferencesPanel.PREFERENCE_PADES_SIGN_REASON, "") //$NON-NLS-1$
+        			preferences.get(PreferencesNames.PREFERENCE_PADES_SIGN_REASON, "") //$NON-NLS-1$
     			);
             }
             // Esta propiedad se comparte con XAdES, hay que comprobar que signer tenemos
-            if (!"".equals(preferences.get(PreferencesPanel.PREFERENCE_PADES_SIGN_PRODUCTION_CITY, "")) && (SignPanel.this.getSigner() instanceof AOPDFSigner)) {  //$NON-NLS-1$//$NON-NLS-2$
+            if (!"".equals(preferences.get(PreferencesNames.PREFERENCE_PADES_SIGN_PRODUCTION_CITY, "")) && (SignPanel.this.getSigner() instanceof AOPDFSigner)) {  //$NON-NLS-1$//$NON-NLS-2$
             	p.put(
         			"signatureProductionCity", //$NON-NLS-1$
-        			preferences.get(PreferencesPanel.PREFERENCE_PADES_SIGN_PRODUCTION_CITY, "") //$NON-NLS-1$
+        			preferences.get(PreferencesNames.PREFERENCE_PADES_SIGN_PRODUCTION_CITY, "") //$NON-NLS-1$
     			);
             }
-            if (!"".equals(preferences.get(PreferencesPanel.PREFERENCE_PADES_SIGNER_CONTACT, ""))) {  //$NON-NLS-1$//$NON-NLS-2$
+            if (!"".equals(preferences.get(PreferencesNames.PREFERENCE_PADES_SIGNER_CONTACT, ""))) {  //$NON-NLS-1$//$NON-NLS-2$
             	p.put(
         			"signerContact", //$NON-NLS-1$
-        			preferences.get(PreferencesPanel.PREFERENCE_PADES_SIGNER_CONTACT, "") //$NON-NLS-1$
+        			preferences.get(PreferencesNames.PREFERENCE_PADES_SIGNER_CONTACT, "") //$NON-NLS-1$
     			);
             }
 
@@ -986,11 +988,11 @@ public final class SignPanel extends JPanel {
             if (SignPanel.this.getSigner() instanceof AOCAdESSigner) {
             	p.put(
         			"mode", //$NON-NLS-1$
-        			Boolean.valueOf(preferences.getBoolean(PreferencesPanel.PREFERENCE_CADES_IMPLICIT, true))
+        			Boolean.valueOf(preferences.getBoolean(PreferencesNames.PREFERENCE_CADES_IMPLICIT, true))
     			);
             }
 
-            final String signatureAlgorithm = preferences.get(PreferencesPanel.PREFERENCE_SIGNATURE_ALGORITHM, "SHA1withRSA"); //$NON-NLS-1$
+            final String signatureAlgorithm = preferences.get(PreferencesNames.PREFERENCE_SIGNATURE_ALGORITHM, "SHA1withRSA"); //$NON-NLS-1$
             final byte[] signResult;
             try {
                 if (SignPanel.this.isCosign()) {
@@ -1019,7 +1021,7 @@ public final class SignPanel extends JPanel {
                 UIUtils.showErrorMessage(
                         SignPanel.this,
                         Messages.getString("SignPanel.27"), //$NON-NLS-1$
-                        Messages.getString("SignPanel.25"), //$NON-NLS-1$
+                        Messages.getString("SimpleAfirma.7"), //$NON-NLS-1$
                         JOptionPane.ERROR_MESSAGE
                 );
                 setSignCommandEnabled(true);
@@ -1030,7 +1032,7 @@ public final class SignPanel extends JPanel {
                 UIUtils.showErrorMessage(
                         SignPanel.this,
                         Messages.getString("SignPanel.23"), //$NON-NLS-1$
-                        Messages.getString("SignPanel.25"), //$NON-NLS-1$
+                        Messages.getString("SimpleAfirma.7"), //$NON-NLS-1$
                         JOptionPane.ERROR_MESSAGE
                 );
                 setSignCommandEnabled(true);
@@ -1041,7 +1043,7 @@ public final class SignPanel extends JPanel {
                 UIUtils.showErrorMessage(
                         SignPanel.this,
                         Messages.getString("SignPanel.65"), //$NON-NLS-1$
-                        Messages.getString("SignPanel.25"), //$NON-NLS-1$
+                        Messages.getString("SimpleAfirma.7"), //$NON-NLS-1$
                         JOptionPane.ERROR_MESSAGE
                 );
                 setSignCommandEnabled(true);
@@ -1052,7 +1054,7 @@ public final class SignPanel extends JPanel {
                 UIUtils.showErrorMessage(
                     SignPanel.this,
                     Messages.getString("SignPanel.1"), //$NON-NLS-1$
-                    Messages.getString("SignPanel.25"), //$NON-NLS-1$
+                    Messages.getString("SimpleAfirma.7"), //$NON-NLS-1$
                     JOptionPane.ERROR_MESSAGE
                 );
                 setSignCommandEnabled(true);
@@ -1180,7 +1182,7 @@ public final class SignPanel extends JPanel {
                 UIUtils.showErrorMessage(
                         SignPanel.this,
                         Messages.getString("SignPanel.88"), //$NON-NLS-1$
-                        Messages.getString("SignPanel.25"), //$NON-NLS-1$
+                        Messages.getString("SimpleAfirma.7"), //$NON-NLS-1$
                         JOptionPane.ERROR_MESSAGE
                 );
                 setSignCommandEnabled(true);

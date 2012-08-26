@@ -42,6 +42,7 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.signature.SignValidity;
 import es.gob.afirma.signature.SignValidity.SIGN_DETAIL_TYPE;
+import es.gob.afirma.standalone.ui.ClosePanel;
 import es.gob.afirma.standalone.ui.DNIeWaitPanel;
 import es.gob.afirma.standalone.ui.MacHelpHooker;
 import es.gob.afirma.standalone.ui.MainMenu;
@@ -243,12 +244,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 
     @Override
     public void windowClosing(final WindowEvent we) {
-        if (JOptionPane.showConfirmDialog(this.container, Messages.getString("SimpleAfirma.47"), //$NON-NLS-1$
-                                          Messages.getString("SimpleAfirma.48"), //$NON-NLS-1$
-                                          JOptionPane.YES_NO_OPTION,
-                                          JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
-            closeApplication(0);
-        }
+    	askForClosing();
     }
 
     @Override public void windowOpened(final WindowEvent we) { /* No implementado */ }
@@ -546,4 +542,23 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
     }
 
 
+    /** Pregunta al usuario si desea cerrar la aplicaci&oacute;n.
+     * @return <code>true</code> si el usuario responde que s&iacute;, <code>false</code> en caso contrario */
+    public boolean askForClosing() {
+    	if (Preferences.userRoot().getBoolean(PreferencesNames.PREFERENCE_OMIT_ASKONCLOSE, false)) {
+    		closeApplication(0);
+            return true;
+    	}
+        if (JOptionPane.showConfirmDialog(
+    		this.container,
+    		new ClosePanel(),
+            Messages.getString("SimpleAfirma.48"), //$NON-NLS-1$
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.WARNING_MESSAGE
+        ) == JOptionPane.YES_OPTION) {
+            closeApplication(0);
+            return true;
+        }
+        return false;
+    }
 }

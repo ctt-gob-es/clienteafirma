@@ -163,7 +163,7 @@ final class SignDataPanel extends JPanel {
                         UIUtils.showErrorMessage(
                                 SignDataPanel.this,
                                 Messages.getString("SignDataPanel.7"), //$NON-NLS-1$
-                                Messages.getString("SignDataPanel.8"), //$NON-NLS-1$
+                                Messages.getString("SimpleAfirma.7"), //$NON-NLS-1$
                                 JOptionPane.ERROR_MESSAGE
                         );
                     }
@@ -239,7 +239,7 @@ final class SignDataPanel extends JPanel {
 								JOptionPane.showMessageDialog(
 									SignDataPanel.this,
 									Messages.getString("SignDataPanel.11"), //$NON-NLS-1$
-									Messages.getString("SignDataPanel.32"), //$NON-NLS-1$
+									Messages.getString("SimpleAfirma.7"), //$NON-NLS-1$
 									JOptionPane.ERROR_MESSAGE
 								);
 								if (SimpleAfirma.DEBUG) {
@@ -348,7 +348,7 @@ final class SignDataPanel extends JPanel {
             UIUtils.showErrorMessage(
                     SignDataPanel.this,
                     Messages.getString("SignDataPanel.23"), //$NON-NLS-1$
-                    Messages.getString("SignDataPanel.8"), //$NON-NLS-1$
+                    Messages.getString("SimpleAfirma.7"), //$NON-NLS-1$
                     JOptionPane.ERROR_MESSAGE
             );
         }
