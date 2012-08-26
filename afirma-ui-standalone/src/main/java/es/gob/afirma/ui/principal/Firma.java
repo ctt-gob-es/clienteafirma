@@ -334,14 +334,12 @@ final class Firma extends JPanel {
 
             // Se introduce la logica necesaria para que no se pueda firmar en formato XAdES o XMLdSign
             // una factura electronica ya firmada
-            if (signer instanceof AOXAdESSigner || signer instanceof AOXMLDSigSigner) {
-            	if (new AOFacturaESigner().isSign(fileData)) {
-            		CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
-            				true, Messages.getString("Firma.dialog.msg"), //$NON-NLS-1$
-            				Messages.getString("Firma.dialog.title"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$
-            		return;
-            	}
-            }
+            if ((signer instanceof AOXAdESSigner || signer instanceof AOXMLDSigSigner) && (new AOFacturaESigner().isSign(fileData))) {
+        		CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
+        				true, Messages.getString("Firma.dialog.msg"), //$NON-NLS-1$
+        				Messages.getString("Firma.dialog.title"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$
+        		return;
+        	}
 
             // En el caso de firma CAdES, preguntamos al usuario si desea incluir el documento que
             // se firma en la propia firma. El documento se incluira en la firma, salvo que se indique
@@ -509,6 +507,7 @@ final class Firma extends JPanel {
         examinar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(),
                                                                       Messages.getString("PrincipalGUI.Examinar.description.status"))); //$NON-NLS-1$
         examinar.addActionListener(new ActionListener() {
+        	/** {@inheritDoc} */
             @Override
             public void actionPerformed(final ActionEvent evt) {
                 examinarActionPerformed(campoFichero);
@@ -667,6 +666,7 @@ final class Firma extends JPanel {
         firmar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(),
                                                                     Messages.getString("PrincipalGUI.firmar.description.status"))); //$NON-NLS-1$
         firmar.addActionListener(new ActionListener() {
+        	/** {@inheritDoc} */
             @Override
             public void actionPerformed(final ActionEvent evt) {
                 firmarActionPerformed(comboAlmacen, comboFormato, campoFichero);

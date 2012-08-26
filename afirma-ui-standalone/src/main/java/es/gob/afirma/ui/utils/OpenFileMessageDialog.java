@@ -38,12 +38,9 @@ public final class OpenFileMessageDialog {
      * @param file Fichero que se desea abrir.
      * @param optionType Tipo de di&aacute;logo. */
     public static void show(final Component parent, final Object message, final String title, final File file, final int optionType) {
-
-        if (file == null)
-        {
+        if (file == null) {
             throw new IllegalArgumentException("No se ha indicado el fichero que desea abrir"); //$NON-NLS-1$
         }
-
         if (CustomDialog.showConfirmDialog(parent, true, (String) message, title, JOptionPane.OK_CANCEL_OPTION, optionType) == JOptionPane.OK_OPTION) {
             Utils.openFile(file.getAbsolutePath());
         }

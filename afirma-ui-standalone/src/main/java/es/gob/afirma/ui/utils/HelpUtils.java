@@ -534,24 +534,20 @@ public final class HelpUtils {
     /** Establece el modo alto contraste para el editorPane que recibe como parametro.
      * @param editorPane panel de edicion. */
     static void setHighContrastEditorPane(final JEditorPane editorPane, final boolean activate) {
-        if (editorPane != null) {
-            if (editorPane.getDocument() instanceof HTMLDocument) {
-                final HTMLDocument h = (HTMLDocument) editorPane.getDocument();
-                // Se establece el color de la la letra a blanco
-                editorPane.setContentType("text/html"); //$NON-NLS-1$
-                final String bodyRule;
-                if (activate) {
-                    bodyRule = "body { color: \"white\";}";
-                    editorPane.setBackground(Color.BLACK);
-                }
-                else {
-                    // h.getStyleSheet().
-                    bodyRule = "body { color: \"black\";}";
-                    editorPane.setBackground(Color.WHITE);
-                }
-
-                h.getStyleSheet().addRule(bodyRule);
+        if (editorPane != null && (editorPane.getDocument() instanceof HTMLDocument)) {
+            final HTMLDocument h = (HTMLDocument) editorPane.getDocument();
+            // Se establece el color de la la letra a blanco
+            editorPane.setContentType("text/html"); //$NON-NLS-1$
+            final String bodyRule;
+            if (activate) {
+                bodyRule = "body { color: \"white\";}"; //$NON-NLS-1$
+                editorPane.setBackground(Color.BLACK);
             }
+            else {
+                bodyRule = "body { color: \"black\";}"; //$NON-NLS-1$
+                editorPane.setBackground(Color.WHITE);
+            }
+            h.getStyleSheet().addRule(bodyRule);
         }
     }
 

@@ -99,8 +99,6 @@ final class CMSInformation {
 
 	private static final String ENCRYPTED_DATA = "EncryptedData"; //$NON-NLS-1$
 
-
-
 	private static final int BINARY_SIGN_CMS = 0;
 
 	private static final int BINARY_SIGN_CADES = 1;
@@ -111,8 +109,6 @@ final class CMSInformation {
 
 	private static final String TB = "\t"; //$NON-NLS-1$
 
-
-
 	/**
 	 * M&eacute;todo principal que obtiene la informaci&oacute;n a partir de un fichero firmado
 	 * de tipo CMS.
@@ -122,17 +118,21 @@ final class CMSInformation {
 	 * @throws AOInvalidFormatException Error de formato no v&aacute;lido.
 	 */
 	static String getInformation(final byte[] data) throws IOException, AOInvalidFormatException {
-		String datos = ""; //$NON-NLS-1$
 
 		final ASN1InputStream is = new ASN1InputStream(data);
+
 		// LEEMOS EL FICHERO QUE NOS INTRODUCEN
-		ASN1Sequence dsq = null;
-		dsq=(ASN1Sequence)is.readObject();
+		final ASN1Sequence dsq = (ASN1Sequence)is.readObject();
+
 		final Enumeration<?> e = dsq.getObjects();
+
 		// Elementos que contienen los elementos OID Data
 		final DERObjectIdentifier doi = (DERObjectIdentifier)e.nextElement();
+
 		// Contenido a obtener informacion
 		final ASN1TaggedObject doj =(ASN1TaggedObject) e.nextElement();
+
+		final String datos;
 		if (doi.equals(PKCSObjectIdentifiers.data)){
 			datos = AppletMessages.getString("CMSInformation.0") + SP + DATA + CR; //$NON-NLS-1$
 		}
@@ -379,42 +379,41 @@ final class CMSInformation {
 			if (unprotectedAttrs == null){
 				detalle = detalle + AppletMessages.getString("CMSInformation.28") + CR; //$NON-NLS-1$
 			}
-			else{
+			else {
 				final String atributos = getUnSignedAttributes(unprotectedAttrs.getObjects());
 				detalle = detalle + AppletMessages.getString("CMSInformation.29") + CR; //$NON-NLS-1$
 				detalle = detalle + atributos;
 			}
-		} else if (envelopeType == TYPE_SIGNED_ENVELOPED_DATA || envelopeType == TYPE_SIGNED_DATA) {
+		}
+		else if ((envelopeType == TYPE_SIGNED_ENVELOPED_DATA || envelopeType == TYPE_SIGNED_DATA) &&  (signerInfosSd != null)) {
 			//obtenemos el(los) firmate(s)
-			if (signerInfosSd != null) {
-				if (signerInfosSd.size()>0){
-					detalle = detalle + AppletMessages.getString("CMSInformation.30") + CR; //$NON-NLS-1$
+			if (signerInfosSd.size()>0){
+				detalle = detalle + AppletMessages.getString("CMSInformation.30") + CR; //$NON-NLS-1$
+			}
+			for(int i =0; i< signerInfosSd.size(); i++){
+				final SignerInfo si = new SignerInfo((ASN1Sequence)signerInfosSd.getObjectAt(i));
+
+				detalle = detalle + AppletMessages.getString("CMSInformation.31") + SP + (i+1) + ":" + CR;  //$NON-NLS-1$//$NON-NLS-2$
+				// version
+				detalle = detalle + TB + AppletMessages.getString("CMSInformation.1") + SP + si.getVersion() + CR; //$NON-NLS-1$
+				//signerIdentifier
+				final SignerIdentifier sident = si.getSID();
+				final IssuerAndSerialNumber iss = IssuerAndSerialNumber.getInstance(sident.getId());
+				detalle = detalle + TB + AppletMessages.getString("CMSInformation.15") + SP + iss.getName().toString() + CR; //$NON-NLS-1$
+				detalle = detalle + TB + AppletMessages.getString("CMSInformation.16") + SP + iss.getSerialNumber() + CR; //$NON-NLS-1$
+
+				//digestAlgorithm
+				final AlgorithmIdentifier algId = si.getDigestAlgorithm();
+				detalle = detalle + TB + AppletMessages.getString("CMSInformation.35") + SP + algId.getAlgorithm() + CR; //$NON-NLS-1$
+
+				//obtenemos lo atributos obligatorios
+				final ASN1Set sa =si.getAuthenticatedAttributes();
+				String satributes = ""; //$NON-NLS-1$
+				if (sa != null){
+					satributes = getsignedAttributes(sa, signBinaryType);
 				}
-				for(int i =0; i< signerInfosSd.size(); i++){
-					final SignerInfo si = new SignerInfo((ASN1Sequence)signerInfosSd.getObjectAt(i));
-
-					detalle = detalle + AppletMessages.getString("CMSInformation.31") + SP + (i+1) + ":" + CR;  //$NON-NLS-1$//$NON-NLS-2$
-					// version
-					detalle = detalle + TB + AppletMessages.getString("CMSInformation.1") + SP + si.getVersion() + CR; //$NON-NLS-1$
-					//signerIdentifier
-					final SignerIdentifier sident = si.getSID();
-					final IssuerAndSerialNumber iss = IssuerAndSerialNumber.getInstance(sident.getId());
-					detalle = detalle + TB + AppletMessages.getString("CMSInformation.15") + SP + iss.getName().toString() + CR; //$NON-NLS-1$
-					detalle = detalle + TB + AppletMessages.getString("CMSInformation.16") + SP + iss.getSerialNumber() + CR; //$NON-NLS-1$
-
-					//digestAlgorithm
-					final AlgorithmIdentifier algId = si.getDigestAlgorithm();
-					detalle = detalle + TB + AppletMessages.getString("CMSInformation.35") + SP + algId.getAlgorithm() + CR; //$NON-NLS-1$
-
-					//obtenemos lo atributos obligatorios
-					final ASN1Set sa =si.getAuthenticatedAttributes();
-					String satributes = ""; //$NON-NLS-1$
-					if (sa != null){
-						satributes = getsignedAttributes(sa, signBinaryType);
-					}
-					detalle = detalle + TB + AppletMessages.getString("CMSInformation.36") + CR; //$NON-NLS-1$
-					detalle = detalle + satributes;
-				}
+				detalle = detalle + TB + AppletMessages.getString("CMSInformation.36") + CR; //$NON-NLS-1$
+				detalle = detalle + satributes;
 			}
 		}
 		return detalle;
@@ -430,7 +429,6 @@ final class CMSInformation {
 	private static String getObligatorieAtrib(final int signBinaryType,
 			                                  final String detalle,
 			                                  final ASN1Set authAttrs) {
-
 		String det = detalle;
 
 		//obtenemos lo atributos obligatorios
@@ -462,11 +460,11 @@ final class CMSInformation {
 			final DERObjectIdentifier derIden = (DERObjectIdentifier)a.getObjectAt(0);
 			// tipo de contenido de la firma.
 			if (derIden.equals(CMSAttributes.contentType)){
-				attributos = attributos + TB + TB + "OID del tipo de contenido:" + SP + a.getObjectAt(1) + CR; //$NON-NLS-1$
+				attributos = attributos + TB + TB + "OID del tipo de contenido:" + SP + a.getObjectAt(1) + CR;
 			}
 			//Message digest de  la firma
 			if (derIden.equals(CMSAttributes.messageDigest)){
-				attributos = attributos + TB + TB + "Contiene el atributo \"MessageDigest\"" + CR; //$NON-NLS-1$
+				attributos = attributos + TB + TB + "Contiene el atributo \"MessageDigest\"" + CR;
 			}
 			//la fecha de firma. obtenemos y casteamos a algo legible.
 			if (derIden.equals(CMSAttributes.signingTime)){

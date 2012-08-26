@@ -25,7 +25,7 @@ import javax.swing.tree.TreePath;
 
 import es.gob.afirma.core.signers.AOSimpleSignInfo;
 
-class TreeFocusManager extends KeyAdapter implements FocusListener, MouseMotionListener, MouseListener {
+final class TreeFocusManager extends KeyAdapter implements FocusListener, MouseMotionListener, MouseListener {
 
     private final JTree tree;
     private final TreeFocusManagerAction focusAction;
@@ -43,6 +43,7 @@ class TreeFocusManager extends KeyAdapter implements FocusListener, MouseMotionL
         this.selectedPath = this.tree.getPathForRow(0);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void focusGained(final FocusEvent fe) {
         if (this.tree.getRowCount() > 0) {
@@ -51,15 +52,18 @@ class TreeFocusManager extends KeyAdapter implements FocusListener, MouseMotionL
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void focusLost(final FocusEvent fe) {
         this.selectedPath = this.tree.getSelectionPath();
         this.tree.setSelectionPath(null);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void mouseDragged(final MouseEvent e) { /* No imlementado */}
 
+    /** {@inheritDoc} */
     @Override
     public void mouseMoved(final MouseEvent e) {
         final TreePath path = this.tree.getPathForLocation((int) e.getPoint().getX(), (int) e.getPoint().getY());
@@ -82,6 +86,7 @@ class TreeFocusManager extends KeyAdapter implements FocusListener, MouseMotionL
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void mouseClicked(final MouseEvent e) {
         // El cursor de "mano" es indicativo de que el raton esta sobre un enlace susceptible de ser
@@ -98,11 +103,19 @@ class TreeFocusManager extends KeyAdapter implements FocusListener, MouseMotionL
         }
     }
 
+    /** {@inheritDoc} */
     @Override public void mouseEntered(final MouseEvent e) { /* No implementado */}
+
+    /** {@inheritDoc} */
     @Override public void mouseExited(final MouseEvent e) { /* No implementado */ }
+
+    /** {@inheritDoc} */
     @Override public void mousePressed(final MouseEvent e) { /* No implementado */ }
+
+    /** {@inheritDoc} */
     @Override public void mouseReleased(final MouseEvent e) { /* No implementado */ }
 
+    /** {@inheritDoc} */
     @Override
     public void keyPressed(final KeyEvent e) {
         if ((KeyEvent.VK_SPACE == e.getKeyCode() || KeyEvent.VK_ENTER == e.getKeyCode()) && this.focusAction != null) {

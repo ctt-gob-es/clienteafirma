@@ -11,6 +11,7 @@ package es.gob.afirma.ui.utils;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Desktop;
 import java.awt.Font;
 import java.awt.IllegalComponentStateException;
 import java.awt.Point;
@@ -24,7 +25,6 @@ import java.security.KeyStoreException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -80,32 +80,7 @@ public final class Utils {
 	 * @param filepath Ruta completa al fichero.
 	 */
 	public static void openFile(final String filepath){
-		final String os = System.getProperty("os.name").toLowerCase(); //$NON-NLS-1$
-		final Runtime rt = Runtime.getRuntime();
-		try {
-			if (os.indexOf( "win" ) >= 0) {
-				rt.exec("cmd.exe /C \""+filepath+"\"");
-			}
-			else if (os.indexOf( "mac" ) >= 0){
-				rt.exec( "open " + filepath);
-			}
-			else {
-				//prioritized 'guess' of users' preference
-				final List<String> browsers = new ArrayList<String>(Arrays.asList("epiphany", "firefox", "mozilla", "konqueror",
-						"netscape","opera","links","lynx"));
-
-				final StringBuffer cmd = new StringBuffer();
-				for (final String browser : browsers){
-					cmd.append( (browsers.get(0).equals(browser)  ? "" : " || " ) + browser +" \"" + filepath + "\" ");
-				}
-
-				rt.exec(new String[] { "sh", "-c", cmd.toString() });
-			}
-		}
-		catch (final IOException e) {
-			LOGGER.info(e.getMessage());
-			PrincipalGUI.setNuevoEstado(Messages.getString("Validacion.error.valide")); //$NON-NLS-1$
-		}
+		openFile(new File(filepath));
 	}
 
 	/**
@@ -113,11 +88,13 @@ public final class Utils {
      * @param file Fichero.
      */
     public static void openFile(final File file){
-        try {
-            openFile(file.getCanonicalPath());
-        } catch (final Exception e) {
-            openFile(file.getAbsolutePath());
-        }
+    	try {
+			Desktop.getDesktop().open(file);
+		}
+		catch (final IOException e) {
+			LOGGER.info("Error al intentar abrir el fichero " + file.getAbsolutePath() + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			PrincipalGUI.setNuevoEstado(Messages.getString("Validacion.error.valide")); //$NON-NLS-1$
+		}
     }
 
 	/**
@@ -188,7 +165,8 @@ public final class Utils {
                     public void focusLost(final FocusEvent e) {
 						if (button.getParent() instanceof JPanel){
 							((JPanel)button.getParent()).setBorder(BorderFactory.createEmptyBorder());
-						} else if (button.getParent() instanceof JToolBar){
+						}
+						else if (button.getParent() instanceof JToolBar){
 							button.setBorder(BorderFactory.createEmptyBorder());
 						}
 					}
@@ -198,13 +176,16 @@ public final class Utils {
 						if (GeneralConfig.isHighContrast()|| Main.isOSHighContrast()){
 							if (button.getParent() instanceof JPanel){
 								((JPanel)button.getParent()).setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
-							} else if (button.getParent() instanceof JToolBar){
+							}
+							else if (button.getParent() instanceof JToolBar){
 								button.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
 							}
-						} else {
+						}
+						else {
 							if (button.getParent() instanceof JPanel){
 								((JPanel)button.getParent()).setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
-							} else if (button.getParent() instanceof JToolBar) {
+							}
+							else if (button.getParent() instanceof JToolBar) {
 								button.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
 							}
 
@@ -413,27 +394,32 @@ public final class Utils {
 		if (GeneralConfig.isHighContrast()){
 			if (component instanceof JComboBox || component instanceof JPasswordField || component instanceof JTextField){
 				component.setBackground(Color.WHITE);
-			} else if(component instanceof JCheckBox) {
+			}
+			else if(component instanceof JCheckBox) {
 				component.setForeground(Color.WHITE);
-			} else if(component instanceof JTree){
+			}
+			else if(component instanceof JTree){
 				component.setForeground(Color.WHITE);
-			} else if(component instanceof JList){
+			}
+			else if(component instanceof JList){
 				component.setForeground(Color.BLACK);
-			} else if(component instanceof JPanel){
-				if (component.getBorder()!=null){
-					if (component.getBorder().getClass().getName().equals("javax.swing.border.TitledBorder")){ //$NON-NLS-1$
-						if (((TitledBorder)component.getBorder())!=null){
-							((TitledBorder)component.getBorder()).setTitleColor(Color.WHITE);
-						}
-					}
+			}
+			else if(component instanceof JPanel){
+				if (component.getBorder()!=null &&
+				   (component.getBorder().getClass().getName().equals("javax.swing.border.TitledBorder")) && //$NON-NLS-1$
+				   (((TitledBorder)component.getBorder())!=null)){
+						((TitledBorder)component.getBorder()).setTitleColor(Color.WHITE);
 				}
 				component.setForeground(Color.WHITE);
 				component.setBackground(Color.BLACK);
-			} else if (component instanceof JStatusBar){
+			}
+			else if (component instanceof JStatusBar){
 				((JLabel)component.getComponent(0)).setForeground(Color.WHITE);
-			} else if (component instanceof JEditorPane){
+			}
+			else if (component instanceof JEditorPane){
 				component.setBackground(Color.BLACK);
-			} else {
+			}
+			else {
 				component.setForeground(Color.WHITE);
 				component.setBackground(Color.BLACK);
 			}
@@ -451,23 +437,23 @@ public final class Utils {
 	public static void setFontBold(final JComponent component){
 		//Se comprueba si el componente es de tipo panel con borde
 		if(component instanceof JPanel){
-			if (component.getBorder()!=null){
-				if (component.getBorder().getClass().getName().equals("javax.swing.border.TitledBorder")){ //$NON-NLS-1$
-					final TitledBorder titledBorder = (TitledBorder)component.getBorder(); //Se obtiene el borde
-					//Se comprueba que no sea nulo
-					if (titledBorder != null){
-						//Se comprueba si la configuracion pide que la fuente este en negrita
-						if (GeneralConfig.isFontBold()){
-							//Se indica que la fuente es negrita
-							titledBorder.setTitleFont(new Font(component.getFont().getName(),Font.BOLD , component.getFont().getSize()));
-						} else {
-							//Se indica que la fuente es texto plano
-							titledBorder.setTitleFont(new Font(component.getFont().getName(),Font.PLAIN , component.getFont().getSize()));
-						}
+			if (component.getBorder()!=null && (component.getBorder().getClass().getName().equals("javax.swing.border.TitledBorder"))) { //$NON-NLS-1$
+				final TitledBorder titledBorder = (TitledBorder)component.getBorder(); //Se obtiene el borde
+				//Se comprueba que no sea nulo
+				if (titledBorder != null){
+					//Se comprueba si la configuracion pide que la fuente este en negrita
+					if (GeneralConfig.isFontBold()){
+						//Se indica que la fuente es negrita
+						titledBorder.setTitleFont(new Font(component.getFont().getName(),Font.BOLD , component.getFont().getSize()));
+					}
+					else {
+						//Se indica que la fuente es texto plano
+						titledBorder.setTitleFont(new Font(component.getFont().getName(),Font.PLAIN , component.getFont().getSize()));
 					}
 				} //Comprobacion del tipo de borde
 			}
-		} else {
+		}
+		else {
 			//Se comprueba si la configuracion pide que la fuente este en negrita
 			if (GeneralConfig.isFontBold()){
 				if (component instanceof JToolBar){
@@ -689,7 +675,7 @@ public final class Utils {
 		}
 		if (pos != -1) {
 			//Se subraya
-			newText = text.substring(0, pos) + "<u>" + text.charAt(pos) + "</u>" + text.substring(pos + 1);
+			newText = text.substring(0, pos) + "<u>" + text.charAt(pos) + "</u>" + text.substring(pos + 1); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		return newText;
 	}

@@ -49,9 +49,7 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.ui.principal.PrincipalGUI;
 
 /** Clase que extiende JFileChooser para hacerla accesible.
- * @author lmerayo
- *
- */
+ * @author lmerayo */
 final class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
 
 	private static final long serialVersionUID = 1L;
