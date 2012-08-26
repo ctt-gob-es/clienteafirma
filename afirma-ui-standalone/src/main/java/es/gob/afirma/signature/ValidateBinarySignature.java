@@ -1,9 +1,20 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
 package es.gob.afirma.signature;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.SignatureException;
 import java.security.cert.CRLException;
 import java.security.cert.CertStoreException;
 import java.security.cert.CertificateException;
@@ -86,7 +97,6 @@ public final class ValidateBinarySignature {
             return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.ALGORITHM_NOT_SUPPORTED);
         }
         catch (final NoMatchDataException e) {
-        	e.printStackTrace();
             // Los datos indicados no coinciden con los datos de firma
             return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA);
         }
@@ -95,7 +105,6 @@ public final class ValidateBinarySignature {
             return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CRL_PROBLEM);
         }
         catch (final Exception e) {
-        	e.printStackTrace();
             // La firma no es una firma binaria valida
             return new SignValidity(SIGN_DETAIL_TYPE.KO, null);
         }
@@ -110,15 +119,16 @@ public final class ValidateBinarySignature {
      * @throws CMSException Cuando la firma no tenga una estructura v&aacute;lida.
      * @throws CertStoreException Cuando se encuentra un error en los certificados de
      * firma o estos no pueden recuperarse.
+     * @throws CertificateExpiredException Cuando el certificado est&aacute;a caducado.
+     * @throws CertificateNotYetValidException Cuando el certificado aun no es v&aacute;lido.
      * @throws NoSuchAlgorithmException Cuando no se reconoce o soporta alguno de los
      * algoritmos utilizados en la firma.
      * @throws NoMatchDataException Cuando los datos introducidos no coinciden con los firmados.
      * @throws CRLException Cuando ocurre un error con las CRL de la firma.
-     * @throws NoSuchProviderException
-     * @throws IOException
-     * @throws CertificateException
-     * @throws OperatorCreationException
-     * @throws Exception Cuando la firma resulte no v&aacute;lida. */
+     * @throws NoSuchProviderException Cuando no se encuentran los proveedores de seguridad necesarios para validar la firma
+     * @throws SignatureException Cuando la firma resulte no v&aacute;lida.
+     * @throws IOException Cuando no se puede crear un certificado desde la firma para validarlo
+     * @throws OperatorCreationException Cuando no se puede crear el validado de contenido de firma*/
     private static void verifySignatures(final byte[] sign, final byte[] data) throws CMSException,
                                                                                       CertStoreException,
                                                                                       NoSuchAlgorithmException,
@@ -135,7 +145,6 @@ public final class ValidateBinarySignature {
         }
         else {
         	s = new CMSSignedData(new CMSProcessableByteArray(sign), data);
-        	System.out.println("Exp");
         }
         final Store store = s.getCertificates();
 
@@ -165,7 +174,7 @@ public final class ValidateBinarySignature {
     private static final class CertHolderBySignerIdSelector implements Selector {
 
     	private final SignerId signerId;
-    	private CertHolderBySignerIdSelector(final SignerId sid) {
+    	CertHolderBySignerIdSelector(final SignerId sid) {
     		if (sid == null) {
     			throw new IllegalArgumentException("El ID del firmante no puede ser nulo"); //$NON-NLS-1$
     		}
