@@ -55,7 +55,7 @@ public final class AOPkcs1Signer implements AOSimpleSigner {
             return sig.sign();
         }
         catch (final Exception e) {
-            throw new AOException("Error durante el proceso de firma", e); //$NON-NLS-1$
+            throw new AOException("Error durante el proceso de firma: " + e, e); //$NON-NLS-1$
         }
 	}
 

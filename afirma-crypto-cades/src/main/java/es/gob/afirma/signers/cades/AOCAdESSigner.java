@@ -186,7 +186,7 @@ public final class AOCAdESSigner implements AOSigner {
             );
         }
         catch (final Exception e) {
-            throw new AOException("Error generando la firma CAdES", e); //$NON-NLS-1$
+            throw new AOException("Error generando la firma CAdES: " + e, e); //$NON-NLS-1$
         }
     }
 

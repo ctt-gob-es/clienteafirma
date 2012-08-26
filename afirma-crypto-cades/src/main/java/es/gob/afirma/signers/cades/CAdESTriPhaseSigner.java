@@ -193,7 +193,7 @@ public final class CAdESTriPhaseSigner {
             );
         }
         catch(final Exception e) {
-            throw new AOException("Error obteniendo los atributos a firmar", e); //$NON-NLS-1$
+            throw new AOException("Error obteniendo los atributos a firmar: " + e, e); //$NON-NLS-1$
         }
 
         try {
