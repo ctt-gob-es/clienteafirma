@@ -14,7 +14,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.security.SignatureException;
 import java.security.cert.CRLException;
 import java.security.cert.CertStoreException;
 import java.security.cert.CertificateException;
@@ -126,7 +125,6 @@ public final class ValidateBinarySignature {
      * @throws NoMatchDataException Cuando los datos introducidos no coinciden con los firmados.
      * @throws CRLException Cuando ocurre un error con las CRL de la firma.
      * @throws NoSuchProviderException Cuando no se encuentran los proveedores de seguridad necesarios para validar la firma
-     * @throws SignatureException Cuando la firma resulte no v&aacute;lida.
      * @throws IOException Cuando no se puede crear un certificado desde la firma para validarlo
      * @throws OperatorCreationException Cuando no se puede crear el validado de contenido de firma*/
     private static void verifySignatures(final byte[] sign, final byte[] data) throws CMSException,

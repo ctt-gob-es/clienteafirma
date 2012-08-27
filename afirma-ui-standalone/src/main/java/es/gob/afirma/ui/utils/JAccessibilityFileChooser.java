@@ -225,7 +225,7 @@ class JAccessibilityFileChooser extends JFileChooser{
 	 * Asigna un mnem&oacute;nico predefinido a ciertos toggleButton contenidos en el componente.
 	 * @param c contenedor global
 	 */
-	protected void setToggleButtonMnemonics( final Container c) {
+	protected void setToggleButtonMnemonics(final Container c) {
 		 //Numero de componentes del contenedor
 	    final int len = c.getComponentCount();
 	    final String openTag = "<u>";
@@ -503,10 +503,8 @@ class JAccessibilityFileChooser extends JFileChooser{
 	 */
 	private void removeWindowsToolBar(){
 		for (int i=0; i<this.getComponentCount();i++){
-			if (this.getComponent(i) instanceof JToolBar){
-        		if (!this.getComponent(i).getClass().getName().equals("javax.swing.JToolBar")) {
-        			this.remove(this.getComponent(i));
-        		}
+			if ((this.getComponent(i) instanceof JToolBar) && (!this.getComponent(i).getClass().getName().equals("javax.swing.JToolBar"))) { //$NON-NLS-1$
+       			this.remove(this.getComponent(i));
         	}
         }
 	}
@@ -519,7 +517,8 @@ class JAccessibilityFileChooser extends JFileChooser{
 		for (int i=0;i<jPanel.getComponentCount();i++){
 			if (jPanel.getComponent(i) instanceof JPanel){
 				accessibility((JPanel)jPanel.getComponent(i));
-			} else {
+			}
+			else {
 				if (jPanel.getComponent(i).getClass().getName().equals("com.sun.java.swing.plaf.windows.WindowsFileChooserUI$9")){
 					this.openButton = (JButton)jPanel.getComponent(i);
 				}

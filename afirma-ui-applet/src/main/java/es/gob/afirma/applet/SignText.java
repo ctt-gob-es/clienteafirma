@@ -348,53 +348,51 @@ final class SignText {
                 final String certName = comboBox.getSelectedItem().toString();
 
                 for (final String al : aliasesByFriendlyName.keySet().toArray(new String[aliasesByFriendlyName.size()])) {
-                    if (aliasesByFriendlyName.get(al).equals(certName)) {
-                        if (this.kss != null) {
-                            final AOCertVerifier cv = new AOCertVerifier();
-                            for (final KeyStore ks : this.kss.getKeyStores()) {
-                                String errorMessage = null;
-                                try {
-                                    if (ks.containsAlias(al)) {
-                                        try {
-                                            cv.checkCertificate(new java.security.cert.Certificate[] {
-                                                ks.getCertificate(al)
-                                            }, false);
-                                        }
-                                        catch (final CertificateExpiredException e) {
-                                            errorMessage = AppletMessages.getString("SignText.5"); //$NON-NLS-1$
-                                        }
-                                        catch (final CertificateNotYetValidException e) {
-                                            errorMessage = AppletMessages.getString("SignText.6"); //$NON-NLS-1$
-                                        }
-                                        catch (final CertPathValidatorException e) {
-                                            errorMessage = AppletMessages.getString("SignText.7"); //$NON-NLS-1$
-                                        }
-                                        catch (final AOCertificateRevokedException e) {
-                                            errorMessage = AppletMessages.getString("SignText.8"); //$NON-NLS-1$
-                                        }
-                                        catch (final Exception e) {
-                                            errorMessage = AppletMessages.getString("SignText.9"); //$NON-NLS-1$
-                                        }
-
-                                        if (errorMessage != null) {
-                                            Logger.getLogger("es.gob.afirma").warning(errorMessage); //$NON-NLS-1$
-                                            if (JOptionPane.showConfirmDialog(this.parent, cv.getErrorMessage() + "\r\n" + AppletMessages.getString("SignText.10"), //$NON-NLS-1$ //$NON-NLS-2$
-                                                                              AppletMessages.getString("SignApplet.658"), //$NON-NLS-1$
-                                                                              JOptionPane.YES_NO_OPTION,
-                                                                              JOptionPane.WARNING_MESSAGE) != JOptionPane.YES_OPTION) {
-                                                return;
-                                            }
-                                        }
-
-                                        this.result = firmar(
-                                                stringToSign,
-                                                this.kss.getKeyEntry(al, this.passCbk),
-                                                this.kss.getCertificate(al));
+                    if (aliasesByFriendlyName.get(al).equals(certName) && (this.kss != null)) {
+                        final AOCertVerifier cv = new AOCertVerifier();
+                        for (final KeyStore ks : this.kss.getKeyStores()) {
+                            String errorMessage = null;
+                            try {
+                                if (ks.containsAlias(al)) {
+                                    try {
+                                        cv.checkCertificate(new java.security.cert.Certificate[] {
+                                            ks.getCertificate(al)
+                                        }, false);
                                     }
+                                    catch (final CertificateExpiredException e) {
+                                        errorMessage = AppletMessages.getString("SignText.5"); //$NON-NLS-1$
+                                    }
+                                    catch (final CertificateNotYetValidException e) {
+                                        errorMessage = AppletMessages.getString("SignText.6"); //$NON-NLS-1$
+                                    }
+                                    catch (final CertPathValidatorException e) {
+                                        errorMessage = AppletMessages.getString("SignText.7"); //$NON-NLS-1$
+                                    }
+                                    catch (final AOCertificateRevokedException e) {
+                                        errorMessage = AppletMessages.getString("SignText.8"); //$NON-NLS-1$
+                                    }
+                                    catch (final Exception e) {
+                                        errorMessage = AppletMessages.getString("SignText.9"); //$NON-NLS-1$
+                                    }
+
+                                    if (errorMessage != null) {
+                                        Logger.getLogger("es.gob.afirma").warning(errorMessage); //$NON-NLS-1$
+                                        if (JOptionPane.showConfirmDialog(this.parent, cv.getErrorMessage() + "\r\n" + AppletMessages.getString("SignText.10"), //$NON-NLS-1$ //$NON-NLS-2$
+                                                                          AppletMessages.getString("SignApplet.658"), //$NON-NLS-1$
+                                                                          JOptionPane.YES_NO_OPTION,
+                                                                          JOptionPane.WARNING_MESSAGE) != JOptionPane.YES_OPTION) {
+                                            return;
+                                        }
+                                    }
+
+                                    this.result = firmar(
+                                            stringToSign,
+                                            this.kss.getKeyEntry(al, this.passCbk),
+                                            this.kss.getCertificate(al));
                                 }
-                                catch (final Exception e) {
-                                	// Se ignora
-                                }
+                            }
+                            catch (final Exception e) {
+                            	// Se ignora
                             }
                         }
                     }

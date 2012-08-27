@@ -23,9 +23,11 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.security.cert.X509Certificate;
 import java.util.logging.Logger;
 
@@ -243,7 +245,12 @@ final class SignDataPanel extends JPanel {
 									JOptionPane.ERROR_MESSAGE
 								);
 								if (SimpleAfirma.DEBUG) {
-									e.printStackTrace();
+									final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+									final PrintWriter writer = new PrintWriter(baos);
+									e.printStackTrace(writer);
+									writer.flush();
+									writer.close();
+									Logger.getLogger("es.gob.afirma").severe(new String(baos.toByteArray())); //$NON-NLS-1$
 								}
 							}
 							finally {
