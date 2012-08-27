@@ -833,18 +833,24 @@ public final class AOPDFSigner implements AOSigner {
      * el eje horizontal de izquierda a derecha y en el vertical de abajo a
      * arriba. */
     private static Rectangle getSignaturePositionOnPage(final Properties extraParams) {
-        try {
-            return new Rectangle(Integer.parseInt(extraParams.getProperty("signaturePositionOnPageLowerLeftX")), //$NON-NLS-1$
-                                 Integer.parseInt(extraParams.getProperty("signaturePositionOnPageLowerLeftY")), //$NON-NLS-1$
-                                 Integer.parseInt(extraParams.getProperty("signaturePositionOnPageUpperRightX")), //$NON-NLS-1$
-                                 Integer.parseInt(extraParams.getProperty("signaturePositionOnPageUpperRightY")) //$NON-NLS-1$
-            );
+    	if (extraParams.getProperty("signaturePositionOnPageLowerLeftX") != null && //$NON-NLS-1$
+        		extraParams.getProperty("signaturePositionOnPageLowerLeftY") != null && //$NON-NLS-1$
+    			extraParams.getProperty("signaturePositionOnPageUpperRightX") != null && //$NON-NLS-1$
+    			extraParams.getProperty("signaturePositionOnPageUpperRightY") != null //$NON-NLS-1$
+    		) {
+    	        try {
+    	            return new Rectangle(Integer.parseInt(extraParams.getProperty("signaturePositionOnPageLowerLeftX")), //$NON-NLS-1$
+    	                                 Integer.parseInt(extraParams.getProperty("signaturePositionOnPageLowerLeftY")), //$NON-NLS-1$
+    	                                 Integer.parseInt(extraParams.getProperty("signaturePositionOnPageUpperRightX")), //$NON-NLS-1$
+    	                                 Integer.parseInt(extraParams.getProperty("signaturePositionOnPageUpperRightY")) //$NON-NLS-1$
+    	            );
+    	        }
+    	        catch (final Exception e) {
+    	        	LOGGER.severe("Se ha indicado una posicion de firma invalida: " + e); //$NON-NLS-1$
+    	        }
+        	}
+        	return null;
         }
-        catch (final Exception e) {
-        	LOGGER.severe("Se ha indicado una posicion de firma invalida: " + e); //$NON-NLS-1$
-            return null;
-        }
-    }
 
     private byte[] signPDF(final PrivateKeyEntry ke,
                            final byte[] inPDF,
