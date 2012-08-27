@@ -80,7 +80,6 @@ import es.gob.afirma.massive.MassiveType;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
 import es.gob.afirma.signers.cms.AOCMSSigner;
 
-
 /** Reimplementaci&oacute;n del Applet original de firma del cliente AFirma.
  * Por seguridad los siguientes m&eacute;todos piden confirmaci&oacute;n directamente al usuario:
  * <ul>
@@ -784,6 +783,12 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 						description = AppletMessages.getString("SignApplet.27"); //$NON-NLS-1$
 						extensions = new String[] {
 								"xsig", "xml"}; //$NON-NLS-1$ //$NON-NLS-2$
+					}
+
+					else if (AOSignConstants.SIGN_FORMAT_FACTURAE.equals(SignApplet.this.getSigFormat())) {
+						description = AppletMessages.getString("SignApplet.31"); //$NON-NLS-1$
+						extensions = new String[] {
+						"xml"}; //$NON-NLS-1$
 					}
 
 					else if (AOSignConstants.SIGN_FORMAT_PDF.equals(SignApplet.this.getSigFormat())) {
@@ -1502,7 +1507,8 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 				// La firma de hashes solo esta soportada por los
 				// formatos de firma: CMS, CAdES, XMLdSig y XAdES
 				if (SignApplet.this.getHash() != null && (SignApplet.this.getSigFormat().equals(AOSignConstants.SIGN_FORMAT_PDF) || SignApplet.this.getSigFormat().equals(AOSignConstants.SIGN_FORMAT_ODF)
-						|| SignApplet.this.getSigFormat().equals(AOSignConstants.SIGN_FORMAT_OOXML) || SignApplet.this.getSigFormat().equals(AOSignConstants.SIGN_FORMAT_PKCS1))) {
+						|| SignApplet.this.getSigFormat().equals(AOSignConstants.SIGN_FORMAT_OOXML) || SignApplet.this.getSigFormat().equals(AOSignConstants.SIGN_FORMAT_PKCS1)
+						|| SignApplet.this.getSigFormat().equals(AOSignConstants.SIGN_FORMAT_FACTURAE))) {
 
 					getLogger().severe("La firma de hash no esta soportada para el formato " + SignApplet.this.getSigFormat()); //$NON-NLS-1$
 					SignApplet.this.setError(AppletMessages.getString("SignApplet.198", SignApplet.this.getSigFormat())); //$NON-NLS-1$

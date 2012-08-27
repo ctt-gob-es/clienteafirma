@@ -72,67 +72,71 @@ final class NormalizedNames {
      * @return Nombre normalizado del formato. */
     static String normalizeFormatName(final String name) {
 
-        // Dejamos que el objeto que llame al metodo se encargue del error
-        if (name == null) {
-            return null;
-        }
+    	// Dejamos que el objeto que llame al metodo se encargue del error
+    	if (name == null) {
+    		return null;
+    	}
 
-        if (name.equalsIgnoreCase("CMS") || name.equalsIgnoreCase("CMS-BES") || //$NON-NLS-1$ //$NON-NLS-2$
-            name.equalsIgnoreCase("PKCS7") || name.equalsIgnoreCase("PKCS#7")) { //$NON-NLS-1$ //$NON-NLS-2$
-            return AOSignConstants.SIGN_FORMAT_CMS;
-        }
-        else if (name.equalsIgnoreCase("CADES") || name.equalsIgnoreCase("CADES-BES")) { //$NON-NLS-1$ //$NON-NLS-2$
-            return AOSignConstants.SIGN_FORMAT_CADES;
-        }
-        else if (name.equalsIgnoreCase("NONE") || name.equalsIgnoreCase("RAW") || //$NON-NLS-1$ //$NON-NLS-2$
-                 name.equalsIgnoreCase("PKCS1") || name.equalsIgnoreCase("PKCS#1")) { //$NON-NLS-1$ //$NON-NLS-2$
-            return AOSignConstants.SIGN_FORMAT_PKCS1;
-        }
-        else if (name.equalsIgnoreCase("XADES") || name.equalsIgnoreCase("XADES-BES") || //$NON-NLS-1$ //$NON-NLS-2$
-                 name.equalsIgnoreCase("XAdES Detached") || name.equalsIgnoreCase("XADES_DETACHED")) { //$NON-NLS-1$ //$NON-NLS-2$
-            return AOSignConstants.SIGN_FORMAT_XADES_DETACHED;
-            //		} else if(oldName.equalsIgnoreCase("XAdES Externally Detached") || oldName.equalsIgnoreCase("XADES_EXTERNALLY_DETACHED")) { //$NON-NLS-1$ //$NON-NLS-2$
-            // return AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED;
-        }
-        else if (name.equalsIgnoreCase("XAdES Enveloped") || name.equalsIgnoreCase("XAdES_Enveloped")) { //$NON-NLS-1$ //$NON-NLS-2$
-            return AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED;
-        }
-        else if (name.equalsIgnoreCase("XAdES Enveloping") || name.equalsIgnoreCase("XAdES_Enveloping")) { //$NON-NLS-1$ //$NON-NLS-2$
-            return AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING;
-        }
-        else if (name.equalsIgnoreCase("XMLDSIGN") || name.equalsIgnoreCase("XMLDSIGN-BES") || //$NON-NLS-1$ //$NON-NLS-2$
-                 name.equalsIgnoreCase("XMLDSIG") || name.equalsIgnoreCase("XMLDSIG-BES") || //$NON-NLS-1$ //$NON-NLS-2$
-                 name.equalsIgnoreCase("XMLDSign Detached") || name.equalsIgnoreCase("XMLDSig Detached") || //$NON-NLS-1$ //$NON-NLS-2$
-                 name.equalsIgnoreCase("XMLDSIGN_DETACHED") || name.equalsIgnoreCase("XMLDSIG_DETACHED")) { //$NON-NLS-1$ //$NON-NLS-2$
-            return AOSignConstants.SIGN_FORMAT_XMLDSIG_DETACHED;
-            //		} else if(oldName.equalsIgnoreCase("XMLdSig Externally Detached") || oldName.equalsIgnoreCase("XMLDSIG_EXTERNALLY_DETACHED") || //$NON-NLS-1$ //$NON-NLS-2$
-            //				oldName.equalsIgnoreCase("XMLdSign Externally Detached") || oldName.equalsIgnoreCase("XMLDSIGN_EXTERNALLY_DETACHED")) { //$NON-NLS-1$ //$NON-NLS-2$
-            // return AOSignConstants.SIGN_FORMAT_XMLDSIG_EXTERNALLY_DETACHED;
-        }
-        else if (name.equalsIgnoreCase("XMLDSign Enveloped") || name.equalsIgnoreCase("XMLDSig Enveloped") || //$NON-NLS-1$ //$NON-NLS-2$
-                 name.equalsIgnoreCase("XMLDSIGN_Enveloped") || name.equalsIgnoreCase("XMLDSIG_Enveloped")) { //$NON-NLS-1$ //$NON-NLS-2$
-            return AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED;
-        }
-        else if (name.equalsIgnoreCase("XMLDSign Enveloping") || name.equalsIgnoreCase("XMLDSig Enveloping") || //$NON-NLS-1$ //$NON-NLS-2$
-                 name.equalsIgnoreCase("XMLDSIGN_Enveloping") || name.equalsIgnoreCase("XMLDSIG_Enveloping")) { //$NON-NLS-1$ //$NON-NLS-2$
-            return AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPING;
-        }
-        else if (name.equalsIgnoreCase("PDF") || name.equalsIgnoreCase("Adobe PDF") || name.equalsIgnoreCase("PAdES")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            return AOSignConstants.SIGN_FORMAT_PDF;
-        }
-        else if (name.equalsIgnoreCase("ODF (Open Document Format)") || name.equalsIgnoreCase("ODF") || name.equalsIgnoreCase("ODT") || //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                 name.equalsIgnoreCase("ODS") || name.equalsIgnoreCase("ODP") //$NON-NLS-1$ //$NON-NLS-2$
-                 || name.equalsIgnoreCase("OpenOffice") || name.equalsIgnoreCase("OOo") || name.equalsIgnoreCase("OpenOffice.org")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            return AOSignConstants.SIGN_FORMAT_ODF;
-        }
-        else if (name.equalsIgnoreCase("OOXML (Office Open XML)") || name.equalsIgnoreCase("OOXML") || name.equalsIgnoreCase("DOCX") || //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                 name.equalsIgnoreCase("XSLX") || name.equalsIgnoreCase("PPTX") || name.equalsIgnoreCase("PPSX") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                 || name.equalsIgnoreCase("Office") || name.equalsIgnoreCase("Microsoft Office")) { //$NON-NLS-1$ //$NON-NLS-2$
-            return AOSignConstants.SIGN_FORMAT_OOXML;
-        }
+    	if (name.equalsIgnoreCase("CMS") || name.equalsIgnoreCase("CMS-BES") || //$NON-NLS-1$ //$NON-NLS-2$
+    			name.equalsIgnoreCase("PKCS7") || name.equalsIgnoreCase("PKCS#7")) { //$NON-NLS-1$ //$NON-NLS-2$
+    		return AOSignConstants.SIGN_FORMAT_CMS;
+    	}
+    	else if (name.equalsIgnoreCase("CADES") || name.equalsIgnoreCase("CADES-BES")) { //$NON-NLS-1$ //$NON-NLS-2$
+    		return AOSignConstants.SIGN_FORMAT_CADES;
+    	}
+    	else if (name.equalsIgnoreCase("NONE") || name.equalsIgnoreCase("RAW") || //$NON-NLS-1$ //$NON-NLS-2$
+    			name.equalsIgnoreCase("PKCS1") || name.equalsIgnoreCase("PKCS#1")) { //$NON-NLS-1$ //$NON-NLS-2$
+    		return AOSignConstants.SIGN_FORMAT_PKCS1;
+    	}
+    	else if (name.equalsIgnoreCase("XADES") || name.equalsIgnoreCase("XADES-BES") || //$NON-NLS-1$ //$NON-NLS-2$
+    			name.equalsIgnoreCase("XAdES Detached") || name.equalsIgnoreCase("XADES_DETACHED")) { //$NON-NLS-1$ //$NON-NLS-2$
+    		return AOSignConstants.SIGN_FORMAT_XADES_DETACHED;
+    		//		} else if(oldName.equalsIgnoreCase("XAdES Externally Detached") || oldName.equalsIgnoreCase("XADES_EXTERNALLY_DETACHED")) { //$NON-NLS-1$ //$NON-NLS-2$
+    		// return AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED;
+    	}
+    	else if (name.equalsIgnoreCase("XAdES Enveloped") || name.equalsIgnoreCase("XAdES_Enveloped")) { //$NON-NLS-1$ //$NON-NLS-2$
+    		return AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED;
+    	}
+    	else if (name.equalsIgnoreCase("XAdES Enveloping") || name.equalsIgnoreCase("XAdES_Enveloping")) { //$NON-NLS-1$ //$NON-NLS-2$
+    		return AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING;
+    	}
+    	else if (name.equalsIgnoreCase("XMLDSIGN") || name.equalsIgnoreCase("XMLDSIGN-BES") || //$NON-NLS-1$ //$NON-NLS-2$
+    			name.equalsIgnoreCase("XMLDSIG") || name.equalsIgnoreCase("XMLDSIG-BES") || //$NON-NLS-1$ //$NON-NLS-2$
+    			name.equalsIgnoreCase("XMLDSign Detached") || name.equalsIgnoreCase("XMLDSig Detached") || //$NON-NLS-1$ //$NON-NLS-2$
+    			name.equalsIgnoreCase("XMLDSIGN_DETACHED") || name.equalsIgnoreCase("XMLDSIG_DETACHED")) { //$NON-NLS-1$ //$NON-NLS-2$
+    		return AOSignConstants.SIGN_FORMAT_XMLDSIG_DETACHED;
+    		//		} else if(oldName.equalsIgnoreCase("XMLdSig Externally Detached") || oldName.equalsIgnoreCase("XMLDSIG_EXTERNALLY_DETACHED") || //$NON-NLS-1$ //$NON-NLS-2$
+    		//				oldName.equalsIgnoreCase("XMLdSign Externally Detached") || oldName.equalsIgnoreCase("XMLDSIGN_EXTERNALLY_DETACHED")) { //$NON-NLS-1$ //$NON-NLS-2$
+    		// return AOSignConstants.SIGN_FORMAT_XMLDSIG_EXTERNALLY_DETACHED;
+    	}
+    	else if (name.equalsIgnoreCase("XMLDSign Enveloped") || name.equalsIgnoreCase("XMLDSig Enveloped") || //$NON-NLS-1$ //$NON-NLS-2$
+    			name.equalsIgnoreCase("XMLDSIGN_Enveloped") || name.equalsIgnoreCase("XMLDSIG_Enveloped")) { //$NON-NLS-1$ //$NON-NLS-2$
+    		return AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED;
+    	}
+    	else if (name.equalsIgnoreCase("XMLDSign Enveloping") || name.equalsIgnoreCase("XMLDSig Enveloping") || //$NON-NLS-1$ //$NON-NLS-2$
+    			name.equalsIgnoreCase("XMLDSIGN_Enveloping") || name.equalsIgnoreCase("XMLDSIG_Enveloping")) { //$NON-NLS-1$ //$NON-NLS-2$
+    		return AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPING;
+    	}
+    	else if (name.equalsIgnoreCase("PDF") || name.equalsIgnoreCase("Adobe PDF") || name.equalsIgnoreCase("PAdES")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    		return AOSignConstants.SIGN_FORMAT_PDF;
+    	}
+    	else if (name.equalsIgnoreCase("ODF (Open Document Format)") || name.equalsIgnoreCase("ODF") || name.equalsIgnoreCase("ODT") || //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    			name.equalsIgnoreCase("ODS") || name.equalsIgnoreCase("ODP") //$NON-NLS-1$ //$NON-NLS-2$
+    			|| name.equalsIgnoreCase("OpenOffice") || name.equalsIgnoreCase("OOo") || name.equalsIgnoreCase("OpenOffice.org")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    		return AOSignConstants.SIGN_FORMAT_ODF;
+    	}
+    	else if (name.equalsIgnoreCase("OOXML (Office Open XML)") || name.equalsIgnoreCase("OOXML") || name.equalsIgnoreCase("DOCX") || //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    			name.equalsIgnoreCase("XSLX") || name.equalsIgnoreCase("PPTX") || name.equalsIgnoreCase("PPSX") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    			|| name.equalsIgnoreCase("Office") || name.equalsIgnoreCase("Microsoft Office")) { //$NON-NLS-1$ //$NON-NLS-2$
+    		return AOSignConstants.SIGN_FORMAT_OOXML;
+    	}
+    	else if (name.equalsIgnoreCase("FacturaE") || name.equalsIgnoreCase("Factura-e") || name.equalsIgnoreCase("Factura Electronica") || //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    			name.equalsIgnoreCase("Factura Electr\u00F3nica") || name.equalsIgnoreCase("Factura")) { //$NON-NLS-1$ //$NON-NLS-2$
+    		return AOSignConstants.SIGN_FORMAT_FACTURAE;
+    	}
 
-        // Si no es conocido el formato, dejamos el nombre tal cual
-        return name;
+    	// Si no es conocido el formato, dejamos el nombre tal cual
+    	return name;
     }
 
     /** Normaliza el nombre de un keystore para as&iacute; poder obtenerlo a

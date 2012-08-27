@@ -51,6 +51,7 @@ public class DirectorySignatureHelper {
     private static final String CADES_SIGNER = "es.gob.afirma.signers.cades.AOCAdESSigner"; //$NON-NLS-1$
     private static final String XADES_SIGNER = "es.gob.afirma.signers.xades.AOXAdESSigner"; //$NON-NLS-1$
     private static final String XMLDSIG_SIGNER = "es.gob.afirma.signers.xmldsig.AOXMLDSigSigner"; //$NON-NLS-1$
+    private static final String FACTURAE_SIGNER = "es.gob.afirma.signers.xades.AOFacturaESSigner"; //$NON-NLS-1$
     private static final String PDF_SIGNER = "es.gob.afirma.signers.pades.AOPDFSigner"; //$NON-NLS-1$
     private static final String ODF_SIGNER = "es.gob.afirma.signers.odf.AOODFSSigner"; //$NON-NLS-1$
     private static final String OOXML_SIGNER = "es.gob.afirma.signers.ooxml.AOOOXMLSigner"; //$NON-NLS-1$
