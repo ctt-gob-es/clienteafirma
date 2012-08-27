@@ -73,8 +73,6 @@ import javax.swing.filechooser.FileFilter;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.batik.swing.JSVGCanvas;
-import org.ietf.jgss.GSSException;
-import org.ietf.jgss.Oid;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
@@ -875,46 +873,85 @@ public final class SignPanel extends JPanel {
             p.put("includeOnlySignningCertificate", "true"); //$NON-NLS-1$ //$NON-NLS-2$
             p.put("allowSigningCertifiedPdfs", "false"); //$NON-NLS-1$ //$NON-NLS-2$
 
-            // Preferencias generales (politica)
-            final String policyId = preferences.get(PreferencesNames.PREFERENCE_POLICY_IDENTIFIER, ""); //$NON-NLS-1$
+            // Preferencias de politica de firma
+
+            String policyId = ""; //$NON-NLS-1$
+            if (SignPanel.this.getSigner() instanceof AOXAdESSigner) {
+            	policyId = preferences.get(PreferencesNames.PREFERENCE_XADES_POLICY_IDENTIFIER, ""); //$NON-NLS-1$
+            }
+            else if (SignPanel.this.getSigner() instanceof AOPDFSigner) {
+            	policyId = preferences.get(PreferencesNames.PREFERENCE_PADES_POLICY_IDENTIFIER, ""); //$NON-NLS-1$
+            }
+            else if (SignPanel.this.getSigner() instanceof AOCAdESSigner) {
+            	policyId = preferences.get(PreferencesNames.PREFERENCE_CADES_POLICY_IDENTIFIER, ""); //$NON-NLS-1$
+            }
             if (!"".equals(policyId)) { //$NON-NLS-1$
-            	boolean policyIdIsOid = false;
-            	try {
-            		// No nos interesa el resultado, solo si construye sin excepciones
-					new Oid(policyId.replace("urn:oid:", ""));
-					policyIdIsOid = true;
-				}
-            	catch (final GSSException e) { /* Se ignora */ }
-            	// Si la politica no es de tipo URL evitamos usarla en CAdES o PAdES
-            	if ((SignPanel.this.getSigner() instanceof AOXAdESSigner) || ((!(SignPanel.this.getSigner() instanceof AOXAdESSigner)) && policyIdIsOid)) {
-		            p.put(
-		        		"policyIdentifier", //$NON-NLS-1$
-		        		preferences.get(PreferencesNames.PREFERENCE_POLICY_IDENTIFIER, "") //$NON-NLS-1$
-		    		);
-		            if (!"".equals(preferences.get(PreferencesNames.PREFERENCE_POLICY_IDENTIFIER_HASH, ""))) { //$NON-NLS-1$ //$NON-NLS-2$
+            	p.put(
+	        		"policyIdentifier", //$NON-NLS-1$
+	        		policyId
+	    		);
+                if (SignPanel.this.getSigner() instanceof AOXAdESSigner) {
+		            if (!"".equals(preferences.get(PreferencesNames.PREFERENCE_XADES_POLICY_IDENTIFIER_HASH, ""))) { //$NON-NLS-1$ //$NON-NLS-2$
 			            p.put(
 			        		"policyIdentifierHash", //$NON-NLS-1$
-			        		preferences.get(PreferencesNames.PREFERENCE_POLICY_IDENTIFIER_HASH, "") //$NON-NLS-1$
+			        		preferences.get(PreferencesNames.PREFERENCE_XADES_POLICY_IDENTIFIER_HASH, "") //$NON-NLS-1$
 			    		);
 		            }
-		            if (!"".equals(preferences.get(PreferencesNames.PREFERENCE_POLICY_IDENTIFIER_HASH_ALGORITHM, ""))) { //$NON-NLS-1$ //$NON-NLS-2$
+		            if (!"".equals(preferences.get(PreferencesNames.PREFERENCE_XADES_POLICY_IDENTIFIER_HASH_ALGORITHM, ""))) { //$NON-NLS-1$ //$NON-NLS-2$
 			            p.put(
 			        		"policyIdentifierHashAlgorithm", //$NON-NLS-1$
-			        		preferences.get(PreferencesNames.PREFERENCE_POLICY_IDENTIFIER_HASH_ALGORITHM, "") //$NON-NLS-1$
+			        		preferences.get(PreferencesNames.PREFERENCE_XADES_POLICY_IDENTIFIER_HASH_ALGORITHM, "") //$NON-NLS-1$
 			    		);
 		            }
-		            if (!"".equals(preferences.get(PreferencesNames.PREFERENCE_POLICY_QUALIFIER, ""))) { //$NON-NLS-1$ //$NON-NLS-2$
+		            if (!"".equals(preferences.get(PreferencesNames.PREFERENCE_XADES_POLICY_QUALIFIER, ""))) { //$NON-NLS-1$ //$NON-NLS-2$
 			            p.put(
 			        		"policyQualifier", //$NON-NLS-1$
-			        		preferences.get(PreferencesNames.PREFERENCE_POLICY_QUALIFIER, "") //$NON-NLS-1$
+			        		preferences.get(PreferencesNames.PREFERENCE_XADES_POLICY_QUALIFIER, "") //$NON-NLS-1$
 			    		);
 		            }
-            	}
-            	else {
-            		LOGGER.info("Evitamos usar la politica porque su identificador no es de tipo OID: " + policyId); //$NON-NLS-1$
-            	}
-            }
+                }
+                else if (SignPanel.this.getSigner() instanceof AOPDFSigner) {
+		            if (!"".equals(preferences.get(PreferencesNames.PREFERENCE_PADES_POLICY_IDENTIFIER_HASH, ""))) { //$NON-NLS-1$ //$NON-NLS-2$
+			            p.put(
+			        		"policyIdentifierHash", //$NON-NLS-1$
+			        		preferences.get(PreferencesNames.PREFERENCE_PADES_POLICY_IDENTIFIER_HASH, "") //$NON-NLS-1$
+			    		);
+		            }
+		            if (!"".equals(preferences.get(PreferencesNames.PREFERENCE_PADES_POLICY_IDENTIFIER_HASH_ALGORITHM, ""))) { //$NON-NLS-1$ //$NON-NLS-2$
+			            p.put(
+			        		"policyIdentifierHashAlgorithm", //$NON-NLS-1$
+			        		preferences.get(PreferencesNames.PREFERENCE_PADES_POLICY_IDENTIFIER_HASH_ALGORITHM, "") //$NON-NLS-1$
+			    		);
+		            }
+		            if (!"".equals(preferences.get(PreferencesNames.PREFERENCE_PADES_POLICY_QUALIFIER, ""))) { //$NON-NLS-1$ //$NON-NLS-2$
+			            p.put(
+			        		"policyQualifier", //$NON-NLS-1$
+			        		preferences.get(PreferencesNames.PREFERENCE_PADES_POLICY_QUALIFIER, "") //$NON-NLS-1$
+			    		);
+		            }
+                }
+                else if (SignPanel.this.getSigner() instanceof AOCAdESSigner) {
+		            if (!"".equals(preferences.get(PreferencesNames.PREFERENCE_CADES_POLICY_IDENTIFIER_HASH, ""))) { //$NON-NLS-1$ //$NON-NLS-2$
+			            p.put(
+			        		"policyIdentifierHash", //$NON-NLS-1$
+			        		preferences.get(PreferencesNames.PREFERENCE_CADES_POLICY_IDENTIFIER_HASH, "") //$NON-NLS-1$
+			    		);
+		            }
+		            if (!"".equals(preferences.get(PreferencesNames.PREFERENCE_CADES_POLICY_IDENTIFIER_HASH_ALGORITHM, ""))) { //$NON-NLS-1$ //$NON-NLS-2$
+			            p.put(
+			        		"policyIdentifierHashAlgorithm", //$NON-NLS-1$
+			        		preferences.get(PreferencesNames.PREFERENCE_CADES_POLICY_IDENTIFIER_HASH_ALGORITHM, "") //$NON-NLS-1$
+			    		);
+		            }
+		            if (!"".equals(preferences.get(PreferencesNames.PREFERENCE_CADES_POLICY_QUALIFIER, ""))) { //$NON-NLS-1$ //$NON-NLS-2$
+			            p.put(
+			        		"policyQualifier", //$NON-NLS-1$
+			        		preferences.get(PreferencesNames.PREFERENCE_CADES_POLICY_QUALIFIER, "") //$NON-NLS-1$
+			    		);
+		            }
+                }
 
+            }
 
 
             // Preferencias de XAdES

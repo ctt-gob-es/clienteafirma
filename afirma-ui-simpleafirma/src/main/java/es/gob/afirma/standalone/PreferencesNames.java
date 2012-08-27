@@ -21,23 +21,53 @@ public final class PreferencesNames {
 	/** Algoritmo de firma. */
 	public static final String PREFERENCE_SIGNATURE_ALGORITHM = "signatureAlgorithm"; //$NON-NLS-1$
 
-	/** Identificador de la pol&iacute;tica de firma. */
-	public static final String PREFERENCE_POLICY_IDENTIFIER = "policyIdentifier"; //$NON-NLS-1$
 
-	/** Huella digital del identificador de la pol&iacute;tica de firma. */
-	public static final String PREFERENCE_POLICY_IDENTIFIER_HASH = "policyIdentifierHash"; //$NON-NLS-1$
+	/** Identificador de la pol&iacute;tica de firma para XAdES. */
+	public static final String PREFERENCE_XADES_POLICY_IDENTIFIER = "xadesPolicyIdentifier"; //$NON-NLS-1$
 
-	/** Algoritmo de la huella digital del identificador de la pol&iacute;tica de firma. */
-	public static final String PREFERENCE_POLICY_IDENTIFIER_HASH_ALGORITHM = "policyIdentifierHashAlgorithm"; //$NON-NLS-1$
+	/** Huella digital del identificador de la pol&iacute;tica de firma para XAdES. */
+	public static final String PREFERENCE_XADES_POLICY_IDENTIFIER_HASH = "xadesPolicyIdentifierHash"; //$NON-NLS-1$
 
-	/** Calificador de la pol&iacute;tica de firma. */
-	public static final String PREFERENCE_POLICY_QUALIFIER = "policyQualifier"; //$NON-NLS-1$
+	/** Algoritmo de la huella digital del identificador de la pol&iacute;tica de firma para XAdES. */
+	public static final String PREFERENCE_XADES_POLICY_IDENTIFIER_HASH_ALGORITHM = "xadesPolicyIdentifierHashAlgorithm"; //$NON-NLS-1$
+
+	/** Calificador de la pol&iacute;tica de firma para XAdES. */
+	public static final String PREFERENCE_XADES_POLICY_QUALIFIER = "xadesPolicyQualifier"; //$NON-NLS-1$
+
+
+	/** Identificador de la pol&iacute;tica de firma para PAdES. */
+	public static final String PREFERENCE_PADES_POLICY_IDENTIFIER = "padesPolicyIdentifier"; //$NON-NLS-1$
+
+	/** Huella digital del identificador de la pol&iacute;tica de firma para PAdES. */
+	public static final String PREFERENCE_PADES_POLICY_IDENTIFIER_HASH = "padesPolicyIdentifierHash"; //$NON-NLS-1$
+
+	/** Algoritmo de la huella digital del identificador de la pol&iacute;tica de firma para PAdES. */
+	public static final String PREFERENCE_PADES_POLICY_IDENTIFIER_HASH_ALGORITHM = "padesPolicyIdentifierHashAlgorithm"; //$NON-NLS-1$
+
+	/** Calificador de la pol&iacute;tica de firma para PAdES. */
+	public static final String PREFERENCE_PADES_POLICY_QUALIFIER = "padesPolicyQualifier"; //$NON-NLS-1$
+
+
+	/** Identificador de la pol&iacute;tica de firma para CAdES. */
+	public static final String PREFERENCE_CADES_POLICY_IDENTIFIER = "cadesPolicyIdentifier"; //$NON-NLS-1$
+
+	/** Huella digital del identificador de la pol&iacute;tica de firma para CAdES. */
+	public static final String PREFERENCE_CADES_POLICY_IDENTIFIER_HASH = "cadesPolicyIdentifierHash"; //$NON-NLS-1$
+
+	/** Algoritmo de la huella digital del identificador de la pol&iacute;tica de firma para CAdES. */
+	public static final String PREFERENCE_CADES_POLICY_IDENTIFIER_HASH_ALGORITHM = "cadesPolicyIdentifierHashAlgorithm"; //$NON-NLS-1$
+
+	/** Calificador de la pol&iacute;tica de firma para CAdES. */
+	public static final String PREFERENCE_CADES_POLICY_QUALIFIER = "cadesPolicyQualifier"; //$NON-NLS-1$
+
 
 	/** Evitar la pregunta al cerrar la aplicaci&oacute;n o no. */
 	public static final String PREFERENCE_OMIT_ASKONCLOSE = "omitAskOnClose"; //$NON-NLS-1$
 
+
 	/** CAdES en modo impl&iacute;cito (attached) o no. */
 	public static final String PREFERENCE_CADES_IMPLICIT = "cadesImplicitMode"; //$NON-NLS-1$
+
 
 	/** Ciudad de firma para firmas XAdES. */
 	public static final String PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY = "xadesSignatureProductionCity"; //$NON-NLS-1$
@@ -59,6 +89,7 @@ public final class PreferencesNames {
 
 	/** Formato de las firmas XAdES. */
 	public static final String PREFERENCE_XADES_SIGN_FORMAT = "xadesSignFormat"; //$NON-NLS-1$
+
 
 	/** Motivo de la firma en firmas PAdES. */
 	public static final String PREFERENCE_PADES_SIGN_REASON = "padesSignReason"; //$NON-NLS-1$
