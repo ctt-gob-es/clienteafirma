@@ -277,17 +277,19 @@ public class TestPAdES {
 
         Assert.assertTrue("No se ha reconocido como un PDF", signer.isValidDataFile(testPdf)); //$NON-NLS-1$
 
-        final String prueba = "Firma PAdES de PDF certificado en SHA512withRSA"; //$NON-NLS-1$
+        String prueba = "Firma PAdES de PDF certificado en SHA512withRSA indicando allowSigningCertifiedPdfs=true"; //$NON-NLS-1$
 
         System.out.println(prueba);
 
         Properties extraParams = new Properties();
         extraParams.put("allowSigningCertifiedPdfs", "true"); //$NON-NLS-1$ //$NON-NLS-2$
-
         byte[] result = signer.sign(testPdf, "SHA512withRSA", pke, extraParams); //$NON-NLS-1$
 
         Assert.assertNotNull(prueba, result);
         Assert.assertTrue(signer.isSign(result));
+
+        prueba = "Firma PAdES de PDF certificado en SHA512withRSA indicando unicamente headLess=true"; //$NON-NLS-1$
+        System.out.println(prueba);
 
         extraParams = new Properties();
         extraParams.put("headLess", "true"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -300,6 +302,9 @@ public class TestPAdES {
             failed = true;
         }
         Assert.assertTrue("Deberia haber fallado", failed); //$NON-NLS-1$
+
+        prueba = "Firma PAdES de PDF certificado en SHA512withRSA indicando unicamente allowSigningCertifiedPdfs=false"; //$NON-NLS-1$
+        System.out.println(prueba);
 
         extraParams = new Properties();
         extraParams.put("allowSigningCertifiedPdfs", "false"); //$NON-NLS-1$ //$NON-NLS-2$

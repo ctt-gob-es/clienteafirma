@@ -906,12 +906,13 @@ public final class AOPDFSigner implements AOSigner {
         	throw new AOFormatFileException("Los datos introducidos no se corresponden con un documento PDF", e); //$NON-NLS-1$
 		}
 
-        if (pdfReader.getCertificationLevel() != PdfSignatureAppearance.NOT_CERTIFIED && !Boolean.parseBoolean(extraParams.getProperty("allowSigningCertifiedPdfs"))) { //$NON-NLS-1$
-
-            if (Boolean.TRUE.toString().equalsIgnoreCase(extraParams.getProperty("headLess"))) {  //$NON-NLS-1$
+        if (pdfReader.getCertificationLevel() != PdfSignatureAppearance.NOT_CERTIFIED && (!Boolean.parseBoolean(extraParams.getProperty("allowSigningCertifiedPdfs")))) { //$NON-NLS-1$
+        	// Si no permitimos dialogos graficos o directamente hemos indicado que no permitimos firmar PDF certificados lanzamos
+        	// una excepcion
+            if (Boolean.parseBoolean(extraParams.getProperty("headLess")) || "false".equalsIgnoreCase(extraParams.getProperty("allowSigningCertifiedPdfs"))) {  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             	throw new PdfIsCertifiedException();
             }
-
+            // En otro caso, perguntamos al usuario
             if (AOUIFactory.NO_OPTION == AOUIFactory.showConfirmDialog(
         		null,
                 PDFMessages.getString("AOPDFSigner.8"), //$NON-NLS-1$
