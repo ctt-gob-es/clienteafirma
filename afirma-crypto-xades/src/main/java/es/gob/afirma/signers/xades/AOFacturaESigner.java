@@ -110,12 +110,13 @@ public final class AOFacturaESigner implements AOSigner {
      *  <dt><b><i>signatureProductionCountry</i></b></dt>
      *   <dd>Pa&iacute;s en el que se realiza la firma</dd>
      * @return Cofirma en formato XAdES
+     * @throws InvalidEFacturaDataException Cuando se proporcionan datos que no son una factura electr&oacute;nica
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     public byte[] sign(final byte[] data,
                        final String algorithm, final PrivateKeyEntry keyEntry,
                        final Properties extraParams) throws AOException {
         if (!isValidDataFile(data)) {
-            throw new IllegalArgumentException("Los datos proporcionados no son una factura electronica"); //$NON-NLS-1$
+            throw new InvalidEFacturaDataException();
         }
         final Properties xParams = (Properties) EXTRA_PARAMS.clone();
         if (extraParams != null) {
