@@ -7,6 +7,7 @@
  * condiciones que figuran en el fichero 'licence' que se acompana.  Si se   distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
+
 package es.gob.afirma.ui.utils;
 
 import java.util.Vector;
@@ -20,8 +21,16 @@ import es.gob.afirma.core.ciphers.CipherConstants.AOCipherAlgorithm;
 public final class CipherConfig {
 
     private static class CipherConfigures {
+
         private final AOCipherConfig config;
+        AOCipherConfig getConfig() {
+        	return this.config;
+        }
+
         private final AOCipher provider;
+        AOCipher getProvider() {
+        	return this.provider;
+        }
 
         CipherConfigures(final AOCipherConfig config, final AOCipher provider) {
             this.config = config;
@@ -81,8 +90,8 @@ public final class CipherConfig {
      * @return Proveedor que soporta la configuraci&oacute;n indicada. */
     public static AOCipher getCipher(final AOCipherConfig algorithmConfig) {
         for (final CipherConfigures configure : configures) {
-            if (configure.config.equals(algorithmConfig)) {
-                return configure.provider;
+            if (configure.getConfig().equals(algorithmConfig)) {
+                return configure.getProvider();
             }
         }
         return null;
