@@ -36,6 +36,9 @@ import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_XADES_SIGNER_
 import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_XADES_SIGNER_CLAIMED_ROLE;
 import static es.gob.afirma.standalone.PreferencesNames.PREFERENCE_XADES_SIGN_FORMAT;
 
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -342,8 +345,20 @@ final class PreferencesPanel extends JPanel {
 		tabbedPane.addTab(Messages.getString("PreferencesPanel.4"), createCadesPanel()); //$NON-NLS-1$
 		tabbedPane.addTab(Messages.getString("PreferencesPanel.5"), createXadesPanel()); //$NON-NLS-1$
 
-		add(tabbedPane);
-		add(createButtonsPanel());
+		this.setLayout(new GridBagLayout());
+
+		final GridBagConstraints c = new GridBagConstraints();
+		c.fill = GridBagConstraints.BOTH;
+		c.weightx = 1.0;
+		c.gridy = 0;
+
+		add(tabbedPane, c);
+		c.gridy++;
+		c.weighty = 1.0;
+		add(new JPanel(), c); // Relleno en blanco
+		c.gridy++;
+		c.weighty = 0.0;
+		add(createButtonsPanel(), c);
 	}
 
 	@SuppressWarnings("unused")
@@ -550,8 +565,14 @@ final class PreferencesPanel extends JPanel {
 
 	private JPanel createXadesPanel() {
         final JPanel panel = new JPanel();
+        panel.setLayout(new GridBagLayout());
 
-        panel.add(createXadesPolicyPanel());
+        final GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.BOTH;
+        c.weightx = 1.0;
+        c.gridy = 0;
+
+        panel.add(createXadesPolicyPanel(), c);
 
         final JPanel metadata = new JPanel();
         metadata.setBorder(BorderFactory.createTitledBorder(Messages.getString("PreferencesPanel.8"))); //$NON-NLS-1$
@@ -593,7 +614,8 @@ final class PreferencesPanel extends JPanel {
         this.xadesSignerCertifiedRole.addKeyListener(this.modificationListener);
         metadata.add(this.xadesSignerCertifiedRole);
 
-        final JPanel format = new JPanel();
+        final FlowLayout fLayout = new FlowLayout(FlowLayout.LEADING);
+	    final JPanel format = new JPanel(fLayout);
         format.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages.getString("PreferencesPanel.15"))); //$NON-NLS-1$
         this.xadesSignFormat.setSelectedItem(
     		PREFERENCES.get(PREFERENCE_XADES_SIGN_FORMAT, AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING)
@@ -601,28 +623,60 @@ final class PreferencesPanel extends JPanel {
         this.xadesSignFormat.addItemListener(this.modificationListener);
         format.add(this.xadesSignFormat);
 
-        panel.add(metadata);
-        panel.add(format);
+        //TODO: Descomentar
+//        c.gridy++;
+//        panel.add(metadata, c);
+
+        c.gridy++;
+        panel.add(format, c);
+
+        c.gridy++;
+        c.weighty = 1.0;
+        panel.add(new JPanel(), c);
+
         return panel;
 	}
 
 	private JPanel createCadesPanel() {
 	    final JPanel panel = new JPanel();
+        panel.setLayout(new GridBagLayout());
 
-	    panel.add(createCadesPolicyPanel());
+        final GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.BOTH;
+        c.weightx = 1.0;
+        c.gridy = 0;
 
-	    final JPanel signatureMode = new JPanel();
+	    panel.add(createCadesPolicyPanel(), c);
+
+	    final FlowLayout fLayout = new FlowLayout(FlowLayout.LEADING);
+	    final JPanel signatureMode = new JPanel(fLayout);
 	    signatureMode.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages.getString("PreferencesPanel.16"))); //$NON-NLS-1$
 	    this.cadesImplicit.addItemListener(this.modificationListener);
 	    signatureMode.add(this.cadesImplicit);
-	    panel.add(signatureMode);
+
+	    c.gridy++;
+	    panel.add(signatureMode, c);
+
+	    c.gridy++;
+	    c.weighty = 1.0;
+	    panel.add(new JPanel(), c);
+
 	    return panel;
 	}
 
 	private JPanel createGeneralPanel() {
 		final JPanel panel = new JPanel();
 		panel.setBorder(BorderFactory.createTitledBorder(Messages.getString("PreferencesPanel.17"))); //$NON-NLS-1$
-		final JPanel signatureAgorithmPanel = new JPanel();
+		panel.setLayout(new GridBagLayout());
+
+		final GridBagConstraints c = new GridBagConstraints();
+		c.fill = GridBagConstraints.BOTH;
+		c.weightx = 1.0;
+		c.gridx = 0;
+		c.gridy = 0;
+
+		final FlowLayout fLayout = new FlowLayout(FlowLayout.LEADING);
+		final JPanel signatureAgorithmPanel = new JPanel(fLayout);
 		signatureAgorithmPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages.getString("PreferencesPanel.18"))); //$NON-NLS-1$
 		this.signarureAlgorithms.addItemListener(this.modificationListener);
 		this.signarureAlgorithms.setModel(new DefaultComboBoxModel(new String[] {
@@ -633,43 +687,72 @@ final class PreferencesPanel extends JPanel {
 		}));
 		this.signarureAlgorithms.setSelectedItem(PreferencesPanel.PREFERENCES.get(PREFERENCE_SIGNATURE_ALGORITHM, "SHA1withRSA")); //$NON-NLS-1$
 		signatureAgorithmPanel.add(this.signarureAlgorithms);
-		panel.add(signatureAgorithmPanel);
 
-		final JPanel generalPreferencesPanel = new JPanel();
+		panel.add(signatureAgorithmPanel, c);
+
+		final JPanel generalPreferencesPanel = new JPanel(fLayout);
 		generalPreferencesPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages.getString("PreferencesPanel.37"))); //$NON-NLS-1$
 		this.avoidAskForClose.addItemListener(this.modificationListener);
 		generalPreferencesPanel.add(this.avoidAskForClose);
-		panel.add(generalPreferencesPanel);
+
+		c.gridy++;
+		panel.add(generalPreferencesPanel, c);
+
+		c.weighty = 1.0;
+		c.gridy++;
+		panel.add(new JPanel(), c);
 
 		return panel;
 	}
 
 	private JPanel createPadesPanel() {
 	    final JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createTitledBorder(Messages.getString("PreferencesPanel.19"))); //$NON-NLS-1$
+        panel.setLayout(new GridBagLayout());
 
-        panel.setLayout(new GridLayout(0,1));
+        final GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.BOTH;
+        c.weightx = 1.0;
+        c.gridy = 0;
 
-        panel.add(createPadesPolicyPanel());
+        panel.add(createPadesPolicyPanel(), c);
 
-	    panel.setBorder(BorderFactory.createTitledBorder(Messages.getString("PreferencesPanel.19"))); //$NON-NLS-1$
+        c.gridy++;
 
 	    final JLabel padesSignReasonLabel = new JLabel(Messages.getString("PreferencesPanel.20")); //$NON-NLS-1$
 	    padesSignReasonLabel.setLabelFor(this.padesSignReason);
-	    panel.add(padesSignReasonLabel);
+	    panel.add(padesSignReasonLabel, c);
+
+	    c.gridy++;
+
 	    this.padesSignReason.addKeyListener(this.modificationListener);
-	    panel.add(this.padesSignReason);
+	    panel.add(this.padesSignReason, c);
+
+	    c.gridy++;
 
 	    final JLabel padesSignProductionCityLabel = new JLabel(Messages.getString("PreferencesPanel.21")); //$NON-NLS-1$
 	    padesSignProductionCityLabel.setLabelFor(this.padesSignProductionCity);
-	    panel.add(padesSignProductionCityLabel);
+	    panel.add(padesSignProductionCityLabel, c);
+
+	    c.gridy++;
+
 	    this.padesSignProductionCity.addKeyListener(this.modificationListener);
-	    panel.add(this.padesSignProductionCity);
+	    panel.add(this.padesSignProductionCity, c);
+
+	    c.gridy++;
 
 	    final JLabel padesSignerContactLabel = new JLabel(Messages.getString("PreferencesPanel.22")); //$NON-NLS-1$
 	    padesSignerContactLabel.setLabelFor(this.padesSignerContact);
-	    panel.add(padesSignerContactLabel);
+	    panel.add(padesSignerContactLabel, c);
+
+	    c.gridy++;
+
 	    this.padesSignerContact.addKeyListener(this.modificationListener);
-	    panel.add(this.padesSignerContact);
+	    panel.add(this.padesSignerContact, c);
+
+	    c.gridy++;
+	    c.weighty = 1.0;
+	    panel.add(new JPanel(), c);
 
 	    return panel;
 	}
@@ -924,12 +1007,16 @@ final class PreferencesPanel extends JPanel {
 	}
 
 	private JPanel createButtonsPanel() {
+
 		final JPanel panel = new JPanel();
+		panel.setLayout(new FlowLayout(FlowLayout.TRAILING));
+
 		final JButton cancelButton = new JButton(Messages.getString("PreferencesPanel.31")); //$NON-NLS-1$
 		cancelButton.setMnemonic('C');
 		cancelButton.getAccessibleContext().setAccessibleDescription(
 			Messages.getString("PreferencesPanel.32") //$NON-NLS-1$
 		);
+
 		cancelButton.addActionListener(new ActionListener() {
 		    /** {@inheritDoc} */
             @Override
