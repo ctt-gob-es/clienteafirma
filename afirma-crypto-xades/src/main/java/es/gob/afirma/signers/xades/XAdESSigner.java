@@ -1178,13 +1178,12 @@ final class XAdESSigner {
 		}
 
 		// SignatureProductionPlace
-		final SignatureProductionPlace spp = AOXAdESSigner
-				.getSignatureProductionPlace(extraParams
-						.getProperty("signatureProductionCity"), //$NON-NLS-1$
-						extraParams.getProperty("signatureProductionProvince"), //$NON-NLS-1$
-						extraParams
-								.getProperty("signatureProductionPostalCode"), //$NON-NLS-1$
-						extraParams.getProperty("signatureProductionCountry")); //$NON-NLS-1$
+		final SignatureProductionPlace spp = AOXAdESSigner.getSignatureProductionPlace(
+			extraParams.getProperty("signatureProductionCity"), //$NON-NLS-1$
+			extraParams.getProperty("signatureProductionProvince"), //$NON-NLS-1$
+			extraParams.getProperty("signatureProductionPostalCode"), //$NON-NLS-1$
+			extraParams.getProperty("signatureProductionCountry") //$NON-NLS-1$
+		);
 		if (spp != null) {
 			xades.setSignatureProductionPlace(spp);
 		}
