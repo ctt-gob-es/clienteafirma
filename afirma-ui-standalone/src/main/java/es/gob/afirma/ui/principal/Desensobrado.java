@@ -235,7 +235,7 @@ final class Desensobrado extends JPanel {
         }
         else if (store == AOKeyStore.PKCS12) {
             pssCallback =
-                new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getName(), SwingUtilities.getRoot(this), //$NON-NLS-1$
+                new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getName(), SwingUtilities.getRoot(this), //$NON-NLS-1$ //$NON-NLS-2$
                                                     Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title")); //$NON-NLS-1$ //$NON-NLS-2$
             final File selectedFile =
                 SelectionDialog.showFileOpenDialog(this, Messages.getString("Open.repository"), (ExtFilter) Utils.getRepositoryFileFilter()); //$NON-NLS-1$
@@ -249,7 +249,7 @@ final class Desensobrado extends JPanel {
         }
         else {
             pssCallback =
-                new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getName(), SwingUtilities.getRoot(this), //$NON-NLS-1$
+                new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getName(), SwingUtilities.getRoot(this), //$NON-NLS-1$ //$NON-NLS-2$
                                                     Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title")); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
@@ -329,7 +329,7 @@ final class Desensobrado extends JPanel {
                                                                           Messages.getString("Desensobrado.buscar.caja.description.status"))); //$NON-NLS-1$
         campoFichero.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(),
                                                                           Messages.getString("Desensobrado.buscar.caja.description.status"))); //$NON-NLS-1$
-        campoFichero.getAccessibleContext().setAccessibleName(etiquetaFichero.getText() + " ALT + O."); // NOI18N
+        campoFichero.getAccessibleContext().setAccessibleName(etiquetaFichero.getText() + " ALT + O."); // NOI18N //$NON-NLS-1$
         campoFichero.getAccessibleContext().setAccessibleDescription(Messages.getString("Desensobrado.buscar.caja.description")); // NOI18N //$NON-NLS-1$
         campoFichero.addAncestorListener(new RequestFocusListener(false));
         if (GeneralConfig.isBigCaret()) {
@@ -365,8 +365,7 @@ final class Desensobrado extends JPanel {
                 examinarActionPerformed(campoFichero);
             }
         });
-        // examinar.getAccessibleContext().setAccessibleName(examinar.getText() + " " + Messages.getString("PrincipalGUI.Examinar.description.status")
-        // ); // NOI18N
+
         examinar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.Examinar.description")); // NOI18N //$NON-NLS-1$
         Utils.remarcar(examinar);
         Utils.setContrastColor(examinar);
@@ -412,8 +411,7 @@ final class Desensobrado extends JPanel {
                                                                           Messages.getString("Desensobrado.almacen.combo.description.status"))); //$NON-NLS-1$
         comboAlmacen.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(),
                                                                           Messages.getString("Desensobrado.almacen.combo.description.status"))); //$NON-NLS-1$
-        // comboAlmacen.getAccessibleContext().setAccessibleName(etiquetaAlmacen.getText()+ " " +
-        // Messages.getString("Desensobrado.almacen.combo.description.status") + " ALT + A."); // NOI18N
+
         comboAlmacen.getAccessibleContext().setAccessibleDescription(Messages.getString("Desensobrado.almacen.combo.description")); // NOI18N //$NON-NLS-1$
         cargarComboAlmacen(comboAlmacen);
         Utils.remarcar(comboAlmacen);
@@ -463,8 +461,7 @@ final class Desensobrado extends JPanel {
                                                                           Messages.getString("Desensobrado.check.check.description.status"))); //$NON-NLS-1$
         checkIniciar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(),
                                                                           Messages.getString("Desensobrado.check.check.description.status"))); //$NON-NLS-1$
-        // checkIniciar.getAccessibleContext().setAccessibleName(Messages.getString("Desensobrado.check.check") + " "
-        // +Messages.getString("Desensobrado.check.check.description.status")); // NOI18N
+
         checkIniciar.getAccessibleContext().setAccessibleDescription(Messages.getString("Desensobrado.check.check.description")); // NOI18N //$NON-NLS-1$
         checkIniciar.setMnemonic(KeyEvent.VK_R); // Se asigna un atajo
         Utils.remarcar(checkIniciar);
@@ -511,8 +508,7 @@ final class Desensobrado extends JPanel {
                 extraerActionPerformed(comboAlmacen, campoFichero, checkIniciar);
             }
         });
-        // extraer.getAccessibleContext().setAccessibleName(extraer.getText() + " " +
-        // Messages.getString("Desensobrado.btnDescifrar.description.status")); // NOI18N
+
         extraer.getAccessibleContext().setAccessibleDescription(Messages.getString("Desensobrado.btnDescifrar.description")); // NOI18N //$NON-NLS-1$
         Utils.remarcar(extraer);
         Utils.setContrastColor(extraer);

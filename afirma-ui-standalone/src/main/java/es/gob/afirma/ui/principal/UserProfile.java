@@ -1,3 +1,13 @@
+/*
+ * Este fichero forma parte del Cliente @firma.
+ * El Cliente @firma es un applet de libre distribucion cuyo codigo fuente puede ser consultado
+ * y descargado desde www.ctt.map.es.
+ * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de Espana
+ * Este fichero se distribuye bajo licencia GPL version 3 segun las
+ * condiciones que figuran en el fichero 'licence' que se acompana.  Si se   distribuyera este
+ * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
+ */
+
 package es.gob.afirma.ui.principal;
 
 import java.awt.BorderLayout;
@@ -40,7 +50,7 @@ import es.gob.afirma.ui.utils.ProfileManager;
 
 /** Ventana de seleccion de perfiles.
  * @author inteco */
-class UserProfile extends JAccessibilityFrameAdvisor {
+final class UserProfile extends JAccessibilityFrameAdvisor {
 
     /** Perfil actual. */
     private static String currentProfileId;
@@ -49,28 +59,22 @@ class UserProfile extends JAccessibilityFrameAdvisor {
     private static final long serialVersionUID = 1L;
 
     /** Combo perfiles. */
-    private JComboBox comboPerfiles = new JComboBox();
+    private final JComboBox comboPerfiles = new JComboBox();
 
     /** Constructor. */
     public UserProfile() {
         super();
         initComponents();
         HelpUtils.visualize("perfiles.usuario"); //$NON-NLS-1$
-    }      
+    }
 
     public static String getCurrentProfileId() {
 		return currentProfileId;
 	}
 
-
-
-
-	public static void setCurrentProfileId(String currentProfileId) {
+	public static void setCurrentProfileId(final String currentProfileId) {
 		UserProfile.currentProfileId = currentProfileId;
 	}
-
-
-
 
 	/** Accion aceptar. */
     void aceptarPerformed() {
@@ -294,7 +298,7 @@ class UserProfile extends JAccessibilityFrameAdvisor {
         add(label, c);
         c.gridy = c.gridy + 1;
         c.weighty = 0.02;
-        
+
         // Lista de usuarios
         final List<String> profileNames = new ArrayList<String>();
         profileNames.add(ProfileManager.DEFAULT_PROFILE_NAME);

@@ -110,7 +110,7 @@ public class MainOptionsPane {
 
         // Panel general
         final JPanel generalPanel = new JPanel(new GridBagLayout());
-        generalPanel.setBorder(BorderFactory.createTitledBorder(Messages.getString("Opciones.general"))); // NOI18N //$NON-NLS-1$
+        generalPanel.setBorder(BorderFactory.createTitledBorder(Messages.getString("Opciones.general"))); //$NON-NLS-1$
         Utils.setContrastColor(generalPanel);
         Utils.setFontBold(generalPanel);
 
@@ -124,8 +124,8 @@ public class MainOptionsPane {
         panelCheckHabilitar.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.general")); //$NON-NLS-1$
         // Checkbox para habilitar las opciones de configuracion avanzada
         this.checkHabilitar = new JCheckBox();
-        this.checkHabilitar.setText(Messages.getString("Opciones.general.habilitar")); // NOI18N //$NON-NLS-1$
-        this.checkHabilitar.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.general.habilitar")); // NOI18N //$NON-NLS-1$
+        this.checkHabilitar.setText(Messages.getString("Opciones.general.habilitar")); //$NON-NLS-1$
+        this.checkHabilitar.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.general.habilitar")); //$NON-NLS-1$
         this.checkHabilitar.setSelected(GeneralConfig.isAvanzados());
         this.checkHabilitar.setBounds(12, 20, 340, 23);
         this.checkHabilitar.setMnemonic(KeyEvent.VK_B); // Asignacion de mnemonico al checkbox
@@ -142,7 +142,7 @@ public class MainOptionsPane {
 
         // Panel criptografia
         final JPanel criptografiaPanel = new JPanel(new GridBagLayout());
-        criptografiaPanel.setBorder(BorderFactory.createTitledBorder(Messages.getString("Opciones.criptografia"))); // NOI18N //$NON-NLS-1$
+        criptografiaPanel.setBorder(BorderFactory.createTitledBorder(Messages.getString("Opciones.criptografia"))); //$NON-NLS-1$
         Utils.setContrastColor(criptografiaPanel);
         Utils.setFontBold(criptografiaPanel);
 
@@ -163,9 +163,8 @@ public class MainOptionsPane {
 
         // Combo con los algoritmos de huella digital
         this.comboAlgoritmo = new JComboBox();
-        this.comboAlgoritmo.getAccessibleContext().setAccessibleName(etiquetaAlgoritmo.getText() + " ALT + R."); // NOI18N
-        this.comboAlgoritmo.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.criptografia.algoritmo.parte")); // NOI18N //$NON-NLS-1$
-        // comboAlgoritmo.setModel(new DefaultComboBoxModel(Arrays.asList("SHA-1","SHA-512","SHA-384","SHA-256").toArray()));
+        this.comboAlgoritmo.getAccessibleContext().setAccessibleName(etiquetaAlgoritmo.getText() + " ALT + R."); // NOI18N //$NON-NLS-1$
+        this.comboAlgoritmo.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.criptografia.algoritmo.parte")); //$NON-NLS-1$
         this.comboAlgoritmo.setModel(new DefaultComboBoxModel(ALGORITHM_K.toArray()));
 
         Utils.remarcar(this.comboAlgoritmo);
@@ -188,8 +187,8 @@ public class MainOptionsPane {
         panelCheckXML.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.criptografia")); //$NON-NLS-1$
         // Checkbox para utilizar XML
         this.checkXML = new JCheckBox();
-        this.checkXML.setText(Messages.getString("Opciones.criptografia.utilizar")); // NOI18N //$NON-NLS-1$
-        this.checkXML.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.criptografia.utilizar")); // NOI18N //$NON-NLS-1$
+        this.checkXML.setText(Messages.getString("Opciones.criptografia.utilizar")); //$NON-NLS-1$
+        this.checkXML.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.criptografia.utilizar")); //$NON-NLS-1$
         this.checkXML.setMnemonic(KeyEvent.VK_U); // Asignacion de mnemonico al checkbox
 
         Utils.remarcar(this.checkXML);
@@ -241,7 +240,7 @@ public class MainOptionsPane {
 
         // Accesibilidad -- Lectores de pantalla
         this.policyIdentifierLabel.setFocusable(true);
-        this.policyIdentifierLabel.getAccessibleContext().setAccessibleName(this.policyIdentifierLabel.getText() + ". Este cuadro de texto esta deshabilitado por defecto.");
+        this.policyIdentifierLabel.getAccessibleContext().setAccessibleName(this.policyIdentifierLabel.getText() + ". " + "Este cuadro de texto esta deshabilitado por defecto.");
 
         Utils.remarcar(this.policyIdentifierLabel);
         Utils.setContrastColor(this.policyIdentifierLabel);
@@ -268,7 +267,7 @@ public class MainOptionsPane {
 
         // Accesibilidad -- Lectores de pantalla
         this.policyQualifierLabel.setFocusable(true);
-        this.policyQualifierLabel.getAccessibleContext().setAccessibleName(this.policyQualifierLabel.getText() + ". Este cuadro de texto esta deshabilitado por defecto.");
+        this.policyQualifierLabel.getAccessibleContext().setAccessibleName(this.policyQualifierLabel.getText() + ". " + "Este cuadro de texto esta deshabilitado por defecto.");
 
         Utils.remarcar(this.policyQualifierLabel);
         Utils.setContrastColor(this.policyQualifierLabel);
@@ -295,7 +294,7 @@ public class MainOptionsPane {
 
         // Accesibilidad -- Lectores de pantalla
         this.policyHashLabel.setFocusable(true);
-        this.policyHashLabel.getAccessibleContext().setAccessibleName(this.policyHashLabel.getText() + ". Este cuadro de texto esta deshabilitado por defecto.");
+        this.policyHashLabel.getAccessibleContext().setAccessibleName(this.policyHashLabel.getText() + ". " + "Este cuadro de texto esta deshabilitado por defecto.");
 
         Utils.remarcar(this.policyHashLabel);
         Utils.setContrastColor(this.policyHashLabel);
@@ -330,7 +329,7 @@ public class MainOptionsPane {
         // Boton Valores por defecto
         valores.setText(Messages.getString("Opciones.accesibilidad.valores")); //$NON-NLS-1$
         valores.addActionListener(new ActionListener() {
-
+        	/** {@inheritDoc} */
             @Override
             public void actionPerformed(final ActionEvent e) {
                 valoresActionPerformed();
@@ -350,6 +349,7 @@ public class MainOptionsPane {
         this.panel.add(new JPanel(), c);
 
         this.checkAddPolicy.addItemListener(new ItemListener() {
+        	/** {@inheritDoc} */
             @Override
             public void itemStateChanged(final ItemEvent e) {
                 final boolean state = (e.getStateChange() == ItemEvent.SELECTED);
@@ -376,15 +376,15 @@ public class MainOptionsPane {
                     // Se eliminan los atajos porque los cuadros de texto estan deshabilitados
                     MainOptionsPane.this.policyIdentifierLabel.setDisplayedMnemonic(0);
                     MainOptionsPane.this.policyIdentifierLabel.getAccessibleContext()
-                    .setAccessibleName(MainOptionsPane.this.policyIdentifierLabel.getText() + ". Este cuadro de texto esta deshabilitado por defecto.");
+                    .setAccessibleName(MainOptionsPane.this.policyIdentifierLabel.getText() + ". " + "Este cuadro de texto esta deshabilitado por defecto.");
                     MainOptionsPane.this.policyIdentifierLabel.setFocusable(true);
                     MainOptionsPane.this.policyQualifierLabel.setDisplayedMnemonic(0);
                     MainOptionsPane.this.policyQualifierLabel.getAccessibleContext()
-                    .setAccessibleName(MainOptionsPane.this.policyQualifierLabel.getText() + ". Este cuadro de texto esta deshabilitado por defecto.");
+                    .setAccessibleName(MainOptionsPane.this.policyQualifierLabel.getText() + ". " + "Este cuadro de texto esta deshabilitado por defecto.");
                     MainOptionsPane.this.policyQualifierLabel.setFocusable(true);
                     MainOptionsPane.this.policyHashLabel.setDisplayedMnemonic(0);
                     MainOptionsPane.this.policyHashLabel.getAccessibleContext()
-                    .setAccessibleName(MainOptionsPane.this.policyHashLabel.getText() + ". Este cuadro de texto esta deshabilitado por defecto.");
+                    .setAccessibleName(MainOptionsPane.this.policyHashLabel.getText() + ". " + "Este cuadro de texto esta deshabilitado por defecto.");
                     MainOptionsPane.this.policyHashLabel.setFocusable(true);
                 }
             }

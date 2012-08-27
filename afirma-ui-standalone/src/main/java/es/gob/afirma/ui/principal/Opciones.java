@@ -7,6 +7,7 @@
  * condiciones que figuran en el fichero 'licence' que se acompana.  Si se   distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
+
 package es.gob.afirma.ui.principal;
 
 
@@ -23,10 +24,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.Properties;
 
 import javax.swing.ImageIcon;
@@ -51,7 +52,7 @@ import es.gob.afirma.ui.utils.Utils;
 /**
  * Clase que muestra el panel de opciones.
  */
-class Opciones extends JAccessibilityDialog {
+final class Opciones extends JAccessibilityDialog {
 
 	private static final long serialVersionUID = 1L;
 
@@ -87,12 +88,6 @@ class Opciones extends JAccessibilityDialog {
 
     /** Panel con las pesta&ntilde;as de opciones. */
     private JTabbedPane mainPanel;
-
-//    /** Bot&oacute;n para maximizar la ventana */
-//    private JButton maximizar = new JButton();
-//
-//    /** Bot&oacute;n para restaurar la ventana una vez maximizada */
-//    private JButton restaurar = new JButton();
 
     private boolean aplicar = false;
 
@@ -382,17 +377,10 @@ class Opciones extends JAccessibilityDialog {
         	this.accesibilidad = false;
         }
 
-        this.mainPanel.addMouseListener(new MouseListener() {
-
-			@Override
-			public void mouseReleased(final MouseEvent e) {
-				// TODO Auto-generated method stub
-
-			}
+        this.mainPanel.addMouseListener(new MouseAdapter() {
 
 			@Override
 			public void mousePressed(final MouseEvent e) {
-				// TODO Auto-generated method stub
 				final int index = ((JTabbedPane)e.getSource()).getSelectedIndex();
 				switch (index) {
 				case 0:
@@ -412,42 +400,13 @@ class Opciones extends JAccessibilityDialog {
 				}
 			}
 
-			@Override
-			public void mouseExited(final MouseEvent e) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void mouseEntered(final MouseEvent e) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void mouseClicked(final MouseEvent e) {
-				// TODO Auto-generated method stub
-
-			}
 		});
 
-        this.mainPanel.addKeyListener(new KeyListener() {
+        this.mainPanel.addKeyListener(new KeyAdapter() {
 
-			@Override
-			public void keyTyped(final KeyEvent e) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void keyReleased(final KeyEvent e) {
-				// TODO Auto-generated method stub
-
-			}
-
+        	/** {@inheritDoc} */
 			@Override
 			public void keyPressed(final KeyEvent e) {
-				// TODO Auto-generated method stub
 				if (e.getKeyCode()==KeyEvent.VK_RIGHT){
 					int index = ((JTabbedPane)e.getSource()).getSelectedIndex();
 					index++;
@@ -470,7 +429,8 @@ class Opciones extends JAccessibilityDialog {
 					default:
 						break;
 					}
-				} else if(e.getKeyCode()==KeyEvent.VK_LEFT){
+				}
+				else if(e.getKeyCode()==KeyEvent.VK_LEFT){
 					int index = ((JTabbedPane)e.getSource()).getSelectedIndex();
 					index--;
 					if (index==-1){
@@ -561,8 +521,7 @@ class Opciones extends JAccessibilityDialog {
         c.insets = new Insets(0, 0, 0, 20);
 
 		buttonPanel.add(panelAceptar, c);
-		 c.insets = new Insets(0, 0, 0, 0);
-		//buttonPanel.add(panelVacio, c);
+		c.insets = new Insets(0, 0, 0, 0);
 		buttonPanel.add(panelCancelar,c);
 
 
@@ -579,13 +538,10 @@ class Opciones extends JAccessibilityDialog {
 		botonAyuda.addActionListener(new OpenHelpActionListener(this.mainPanel));
 
 		final GridBagConstraints cons = new GridBagConstraints();
-		//cons.anchor = GridBagConstraints.FIRST_LINE_START; //control de la orientacion de componentes
 		cons.fill = GridBagConstraints.BOTH;
-		//cons.ipadx = 0;
 		cons.gridx = 0;
 		cons.gridy = 0;
 
-		//cons.ipadx = 0;
         cons.weighty = 1.0;
 		cons.weightx = 1.0;
 		cons.gridx = 0;
@@ -669,7 +625,7 @@ class Opciones extends JAccessibilityDialog {
     /**
 	 * Cambia el tama&ntilde;o de la ventana al tama&ntilde;o m&aacute;ximo de pantalla menos el tama&ntilde;o de la barra de tareas de windows
 	 */
-	public void maximizarActionPerformed(){
+	void maximizarActionPerformed(){
 		setActualPositionX(this.getX());
 		setActualPositionY(this.getY());
 		setActualWidth(this.getWidth());
@@ -682,15 +638,14 @@ class Opciones extends JAccessibilityDialog {
 		final int maxWidth = (int)rect.getWidth();
 		final int maxHeight = (int)rect.getHeight();
 
-//		this.maximizar.setEnabled (false);
-//		this.restaurar.setEnabled (true);
 		this.maximizeButton.setEnabled (false);
 		this.restoreButton.setEnabled (true);
 
 		//Se hace el resize dependiendo del so
 		if (!Platform.getOS().equals(Platform.OS.LINUX)){
 			this.setBounds(0,0, maxWidth, maxHeight);
-		} else {
+		}
+		else {
 			this.setBounds(0,0, maxWidth, maxHeight - Constants.MAXIMIZE_VERTICAL_MARGIN_LINUX);
 		}
 	}
@@ -698,31 +653,32 @@ class Opciones extends JAccessibilityDialog {
 	/**
 	 * Restaura el tama&ntilde;o de la ventana a la posicion anterior al maximizado
 	 */
-	public void restaurarActionPerformed(){
+	void restaurarActionPerformed(){
 
 		if (getActualPositionX() != -1 && getActualPositionY() != -1 && getActualWidth() != -1 && getActualHeight() != -1){
 			this.setBounds(getActualPositionX(), getActualPositionY(), getActualWidth(), getActualHeight());
-		} else {
+		}
+		else {
 			if (GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
     			if (Platform.getOS().equals(Platform.OS.LINUX)){
     				setBounds(Opciones.getInitialX(), Opciones.getInitialY(), Constants.OPTION_FONT_INITIAL_WIDTH_LINUX, Constants.OPTION_FONT_INITIAL_HEIGHT_LINUX);
     				setMinimumSize(new Dimension(getSize().width, getSize().height));
-    			} else {
+    			}
+    			else {
     				setBounds(Opciones.getInitialX(), Opciones.getInitialY(), Constants.OPTION_FONT_INITIAL_WIDTH, Constants.OPTION_FONT_INITIAL_HEIGHT);
     				setMinimumSize(new Dimension(getSize().width, getSize().height));
     			}
-    		} else {
+    		}
+			else {
     			setBounds(Opciones.getInitialX(), Opciones.getInitialY(), Constants.OPTION_INITIAL_WIDTH, Constants.OPTION_INITIAL_HEIGHT);
     			setMinimumSize(new Dimension(getSize().width, getSize().height));
     		}
 		}
-//		this.maximizar.setEnabled (true);
-//		this.restaurar.setEnabled (false);
 		this.maximizeButton.setEnabled (true);
 		this.restoreButton.setEnabled (false);
 	}
 
-	private class OpenHelpActionListener implements ActionListener {
+	private static final class OpenHelpActionListener implements ActionListener {
 
 	    private final JTabbedPane tabbedPane;
 
@@ -730,6 +686,7 @@ class Opciones extends JAccessibilityDialog {
 	        this.tabbedPane = tabbedpane;
         }
 
+	    /** {@inheritDoc} */
         @Override
         public void actionPerformed(final ActionEvent e) {
 
@@ -738,7 +695,7 @@ class Opciones extends JAccessibilityDialog {
                 HelpUtils.showHelp("opciones.accesibilidad"); //$NON-NLS-1$
                 break;
             case PDF_OPTIONS_IDX:
-                HelpUtils.showHelp("");
+                HelpUtils.showHelp(""); //$NON-NLS-1$
                 break;
             case PROFILE_OPTIONS_IDX:
             	HelpUtils.showHelp("opciones.perfil"); //$NON-NLS-1$
@@ -808,14 +765,6 @@ class Opciones extends JAccessibilityDialog {
 		//Panel que va a contener los botones de accesibilidad
 		final JPanel panel = new JPanel(new GridBagLayout());
 
-		//panel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-		//panel.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
-		//panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
-		//panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-		//panel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-		//panel.setBorder(BorderFactory.createCompoundBorder());
-		//panel.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.BLACK));
-
 		//Restricciones para los botones
 		final GridBagConstraints consButtons = new GridBagConstraints();
 		consButtons.fill = GridBagConstraints.BOTH;
@@ -824,11 +773,9 @@ class Opciones extends JAccessibilityDialog {
 		consButtons.weightx = 1.0;
 		consButtons.weighty = 1.0;
 		consButtons.insets = new Insets(0,0,0,0);  //right padding
-		//consButtons.anchor=GridBagConstraints.EAST;
 
 		//Restore button
 		final JPanel restorePanel = new JPanel();
-		//this.restoreButton = getButton("r", KeyEvent.VK_R );
 		final ImageIcon imageIconRestore= new ImageIcon(CustomDialog.class.getResource("/resources/images/restore.png")); //$NON-NLS-1$
 		this.restoreButton = new JButton(imageIconRestore);
 		this.restoreButton.setMnemonic(KeyEvent.VK_R );
@@ -837,11 +784,13 @@ class Opciones extends JAccessibilityDialog {
 
 		this.restoreButton.addFocusListener(new FocusListener() {
 
+			/** {@inheritDoc} */
 			@Override
 			public void focusLost(final FocusEvent e) {
 				Utils.showToolTip(false, tip, Opciones.this.restoreButton, tipText);
 			}
 
+			/** {@inheritDoc} */
 			@Override
 			public void focusGained(final FocusEvent e) {
 				Utils.showToolTip(true, tip, Opciones.this.restoreButton, tipText);
@@ -850,24 +799,20 @@ class Opciones extends JAccessibilityDialog {
 		final Dimension dimension = new Dimension(20,20);
 		this.restoreButton.setPreferredSize(dimension);
 
-		//this.restoreButton.setBorder(null); //Eliminar Borde, ayuda a centrar el iconod el boton
-		//this.restoreButton.setContentAreaFilled(false); //area del boton invisible
 		this.restoreButton.setName("restaurar");
 		Utils.remarcar(this.restoreButton);
 		restorePanel.add(this.restoreButton);
 		this.restoreButton.addActionListener(new ActionListener() {
+			/** {@inheritDoc} */
 	    	@Override
             public void actionPerformed(final ActionEvent e) {
 	    		restaurarActionPerformed();
 			}
 		});
 
-
 		panel.add(restorePanel, consButtons);
 
-
 		consButtons.gridx = 1;
-		//consButtons.weightx = 0.5;
 		consButtons.insets = new Insets(0,0,0,0);  //right padding
 
 		//Maximize button
@@ -879,15 +824,11 @@ class Opciones extends JAccessibilityDialog {
 		this.maximizeButton.setToolTipText(Messages.getString("Wizard.maximizar.description")); //$NON-NLS-1$
 		this.maximizeButton.getAccessibleContext().setAccessibleName(this.maximizeButton.getToolTipText());
 
-		//this.maximizeButton.setBorder(null); //Eliminar Borde, ayuda a centrar el iconod el boton
-		//this.maximizeButton.setContentAreaFilled(false); //area del boton invisible
-
 		this.maximizeButton.setName("maximizar");
 		//Se asigna una dimension por defecto
 		this.maximizeButton.setPreferredSize(dimension);
 
 		Utils.remarcar(this.maximizeButton);
-		//maximizePanel.add(this.maximizeButton, consMaximizePanel);
 		maximizePanel.add(this.maximizeButton);
 
 		this.maximizeButton.addFocusListener(new FocusListener() {
@@ -921,7 +862,6 @@ class Opciones extends JAccessibilityDialog {
 		c.gridy = 0;
 		c.weightx = 1.0;
 		c.weighty = 1.0;
-		//c.insets = new Insets(3,3,0,3);
 		c.insets = new Insets(0,0,0,0);
 		c.anchor=GridBagConstraints.EAST;
 		this.accessibilityButtonsPanel.add(panel, c);
@@ -933,7 +873,8 @@ class Opciones extends JAccessibilityDialog {
     		this.maximizeButton.setEnabled(false);
     		//Se habilita el boton de restaurar
     		this.restoreButton.setEnabled(true);
-    	} else {
+    	}
+    	else {
     		//Se habilita el boton de maximizado
     		this.maximizeButton.setEnabled(true);
     		//Se deshabilita el boton de restaurar

@@ -52,17 +52,25 @@ import es.gob.afirma.ui.wizarddescifradocontrasenia.AsistenteDescifradoContrasen
 final class Descifrado extends JPanel {
 
     // Algoritmos para mecanismo contrasena de cifrado
-    private static final List<String> ALGORITMO_LC = new ArrayList<String>(Arrays.asList("Contrase\u00F1a con SHA1 y 3DES",
-                                                                                         "Contrase\u00F1a con SHA1 y RC2",
-    "Contrase\u00F1a con MD5 y DES"));
+    private static final List<String> ALGORITMO_LC = new ArrayList<String>(
+		Arrays.asList(
+			"Contrase\u00F1a con SHA1 y 3DES",
+            "Contrase\u00F1a con SHA1 y RC2",
+			"Contrase\u00F1a con MD5 y DES"
+        )
+    );
 
     // Algoritmos para mecanismo clave de cifrado
-    private static final List<String> ALGORITMO_LR = new ArrayList<String>(Arrays.asList("Advanced Encryption Standard (AES)",
-                                                                                         "Alleged RC4",
-                                                                                         "Blowfish",
-                                                                                         "Data Encryption Standard (DES)",
-                                                                                         "Triple DES (3DES)",
-    "RC2"));
+    private static final List<String> ALGORITMO_LR = new ArrayList<String>(
+		Arrays.asList(
+			"Advanced Encryption Standard (AES)",
+            "Alleged RC4",
+            "Blowfish",
+            "Data Encryption Standard (DES)",
+            "Triple DES (3DES)",
+			"RC2"
+        )
+    );
 
     private static final List<String> ALGORITMO_VC =
         new ArrayList<String>(Arrays.asList("PBEWithSHA1AndDESede", "PBEWithSHA1AndRC2_40", "PBEWithMD5AndDES")); //$NON-NLS-1$ //$NON-NLS-2$//$NON-NLS-3$
@@ -160,7 +168,7 @@ final class Descifrado extends JPanel {
         campoFichero.setToolTipText(Messages.getString("Descifrado.buscar.caja.description")); // NOI18N //$NON-NLS-1$
         campoFichero.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(), Messages.getString("Descifrado.buscar.caja.description"))); //$NON-NLS-1$
         campoFichero.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(), Messages.getString("Descifrado.buscar.caja.description"))); //$NON-NLS-1$
-        campoFichero.getAccessibleContext().setAccessibleName(etiquetaFichero.getText() + " ALT + E."); // NOI18N
+        campoFichero.getAccessibleContext().setAccessibleName(etiquetaFichero.getText() + " ALT + E."); // NOI18N //$NON-NLS-1$
         campoFichero.getAccessibleContext().setAccessibleDescription(Messages.getString("Cifrado.buscar.caja.description")); // NOI18N //$NON-NLS-1$
         campoFichero.addAncestorListener(new RequestFocusListener(false));
 
@@ -268,8 +276,8 @@ final class Descifrado extends JPanel {
             etiquetaMecanismo.setFocusable(true);
             Utils.remarcar(etiquetaMecanismo);
             etiquetaMecanismo.getAccessibleContext()
-            .setAccessibleName(etiquetaMecanismo.getText() + " " + Messages.getString("Cifrado.origen.clave.combo.defaultOpcion") //$NON-NLS-2$
-                               + Messages.getString("Cifrado.origenL.0") + " " + Messages.getString("Cifrado.origen.clave.combo.disabled")); //$NON-NLS-1$ //$NON-NLS-3$
+            .setAccessibleName(etiquetaMecanismo.getText() + " " + Messages.getString("Cifrado.origen.clave.combo.defaultOpcion")  //$NON-NLS-1$//$NON-NLS-2$
+                               + Messages.getString("Cifrado.origenL.0") + " " + Messages.getString("Cifrado.origen.clave.combo.disabled")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         }
         else {
             // Para la vista avanzada se asigna mnemonico puesto que esta opcion estara habilitada
@@ -309,15 +317,19 @@ final class Descifrado extends JPanel {
         c.fill = GridBagConstraints.BOTH;
 
         // Combo con los algoritmos de descifrado
-        comboAlgoritmo.setModel(new DefaultComboBoxModel(new String[] {
-                                                                       "Triple Data Encryption Standard (3DES)", "Item 2", "Item 3", "Item 4"})); //$NON-NLS-1$
+        comboAlgoritmo.setModel(
+    		new DefaultComboBoxModel(new String[] {
+    				"Triple Data Encryption Standard (3DES)",
+    				"Item 2",
+    				"Item 3",
+    				"Item 4"
+			})
+		);
         comboAlgoritmo.setToolTipText(Messages.getString("Descifrado.formato.combo.description")); // NOI18N //$NON-NLS-1$
         comboAlgoritmo.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(),
                                                                             Messages.getString("Descifrado.formato.combo.description"))); //$NON-NLS-1$
         comboAlgoritmo.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(),
                                                                             Messages.getString("Descifrado.formato.combo.description"))); //$NON-NLS-1$
-        // comboAlgoritmo.getAccessibleContext().setAccessibleName(etiquetaAlgoritmo.getText() +" "+
-        // Messages.getString("Descifrado.formato.combo.description")+" ALT + G."); // NOI18N); // NOI18N
         comboAlgoritmo.getAccessibleContext().setAccessibleDescription(Messages.getString("Descifrado.formato.combo.description")); // NOI18N //$NON-NLS-1$
         comboAlgoritmo.setModel(new DefaultComboBoxModel(ALGORITMO_LC.toArray()));
 
@@ -333,8 +345,8 @@ final class Descifrado extends JPanel {
             etiquetaAlgoritmo.setFocusable(true);
             Utils.remarcar(etiquetaAlgoritmo);
             etiquetaAlgoritmo.getAccessibleContext()
-            .setAccessibleName(etiquetaAlgoritmo.getText() + " " + Messages.getString("Cifrado.origen.clave.combo.defaultOpcion") //$NON-NLS-2$
-                               + Messages.getString("Cifrado.origenLc.0") + " " + Messages.getString("Cifrado.origen.clave.combo.disabled")); //$NON-NLS-1$ //$NON-NLS-3$
+            .setAccessibleName(etiquetaAlgoritmo.getText() + " " + Messages.getString("Cifrado.origen.clave.combo.defaultOpcion")  //$NON-NLS-1$//$NON-NLS-2$
+                               + Messages.getString("Cifrado.origenLc.0") + " " + Messages.getString("Cifrado.origen.clave.combo.disabled")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         }
         else {
             // Para la vista avanzada se asigna mnemonico puesto que esta opcion estara habilitada

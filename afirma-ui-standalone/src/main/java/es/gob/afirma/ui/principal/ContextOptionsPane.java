@@ -83,7 +83,7 @@ public final class ContextOptionsPane {
 
         // Caja de texto para el motivo de la firma
         this.campoMotivo = new JTextField();
-        this.campoMotivo.getAccessibleContext().setAccessibleName(etiquetaMotivo.getText() + " ALT + O."); // NOI18N
+        this.campoMotivo.getAccessibleContext().setAccessibleName(etiquetaMotivo.getText() + " ALT + O."); // NOI18N //$NON-NLS-1$
         this.campoMotivo.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.firmas.motivo")); // NOI18N //$NON-NLS-1$
         if (GeneralConfig.isBigCaret()) {
             final Caret caret = new ConfigureCaret();
@@ -114,7 +114,7 @@ public final class ContextOptionsPane {
 
         // Caja de texto para el lugar donde se realiza la firma
         this.campoLugar = new JTextField();
-        this.campoLugar.getAccessibleContext().setAccessibleName(etiquetaLugar.getText() + " ALT + L."); // NOI18N
+        this.campoLugar.getAccessibleContext().setAccessibleName(etiquetaLugar.getText() + " ALT + L."); // NOI18N //$NON-NLS-1$
         this.campoLugar.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.firmas.lugar")); // NOI18N //$NON-NLS-1$
         if (GeneralConfig.isBigCaret()) {
             final Caret caret = new ConfigureCaret();
@@ -145,7 +145,7 @@ public final class ContextOptionsPane {
 
         // Caja de texto para los datos de contacto
         this.campoDatos = new JTextField();
-        this.campoDatos.getAccessibleContext().setAccessibleName(etiquetaDatos.getText() + " ALT + D."); // NOI18N
+        this.campoDatos.getAccessibleContext().setAccessibleName(etiquetaDatos.getText() + " ALT + D."); // NOI18N //$NON-NLS-1$
         this.campoDatos.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.firmas.datos")); // NOI18N //$NON-NLS-1$
         if (GeneralConfig.isBigCaret()) {
             final Caret caret = new ConfigureCaret();
@@ -212,7 +212,7 @@ public final class ContextOptionsPane {
         return config;
     }
 
-    public JPanel getConfigurationPanel() {
+    JPanel getConfigurationPanel() {
         return this.panel;
     }
 
@@ -221,13 +221,13 @@ public final class ContextOptionsPane {
     public Properties getSignatureConfig() {
         final Properties config = new Properties();
         if (this.campoMotivo.getText().trim().length() > 0) {
-            config.setProperty("signReason", this.campoMotivo.getText().trim());
+            config.setProperty("signReason", this.campoMotivo.getText().trim()); //$NON-NLS-1$
         }
         if (this.campoLugar.getText().trim().length() > 0) {
-            config.setProperty("signatureProductionCity", this.campoLugar.getText().trim());
+            config.setProperty("signatureProductionCity", this.campoLugar.getText().trim()); //$NON-NLS-1$
         }
         if (this.campoDatos.getText().trim().length() > 0) {
-            config.setProperty("signerContact", this.campoDatos.getText().trim());
+            config.setProperty("signerContact", this.campoDatos.getText().trim()); //$NON-NLS-1$
         }
         return config;
     }

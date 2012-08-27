@@ -29,11 +29,8 @@ public final class KeyStoreLoader {
             stores.add(new KeyStoreConfiguration(AOKeyStore.APPLE, null, null));
         }
 
-        // try {
-        // MozillaKeyStoreUtilities.getSystemNSSLibDir();
         stores.add(new KeyStoreConfiguration(AOKeyStore.MOZ_UNI, null, null));
-        // } catch (Exception e) {}
-
+        stores.add(new KeyStoreConfiguration(AOKeyStore.DNIEJAVA, null, null));
         stores.add(new KeyStoreConfiguration(AOKeyStore.PKCS12, null, null));
 
         return stores.toArray(new KeyStoreConfiguration[0]);

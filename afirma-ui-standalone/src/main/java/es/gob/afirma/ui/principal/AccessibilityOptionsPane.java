@@ -93,12 +93,12 @@ public final class AccessibilityOptionsPane {
 	}
 
     /** Modifica el valor de la variable continueBigStyle */
-	public static void setContinueBigStyle(final boolean continueBigStyle) {
+	static void setContinueBigStyle(final boolean continueBigStyle) {
 		AccessibilityOptionsPane.continueBigStyle = continueBigStyle;
 	}
 
 	/** Obtiene la referencia al bot&oacute;n aplicar */
-	public JButton getAplicar() {
+	JButton getAplicar() {
 		return this.aplicar;
 	}
 
@@ -254,7 +254,7 @@ public final class AccessibilityOptionsPane {
         this.checkHighContrast.setBounds(12, 20, 340, 23);
         this.checkHighContrast.setMnemonic(KeyEvent.VK_L); // AsignaciÃ³n de mnemÃ³nico al checkbox
         this.checkHighContrast.addActionListener(new ActionListener() {
-
+        	/** {@inheritDoc} */
             @Override
             public void actionPerformed(final ActionEvent e) {
                 if (AccessibilityOptionsPane.this.isChangeHighContrast) {

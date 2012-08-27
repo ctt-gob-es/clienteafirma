@@ -141,18 +141,18 @@ public final class PrincipalGUI extends JAccessibilityFrame {
 
     private JMenuBar menu;
 
-    // private JTabbedPane panelPest = null;
-
     PrincipalGUI() {
         super();
         initComponents();
         iniciarProveedores();
         this.addComponentListener(new ComponentAdapter() {
+        	/** {@inheritDoc} */
             @Override
             public void componentMoved(final ComponentEvent e) {
                 resized();
             }
 
+            /** {@inheritDoc} */
             @Override
             public void componentResized(final ComponentEvent e) {
                 resized();
@@ -161,17 +161,17 @@ public final class PrincipalGUI extends JAccessibilityFrame {
 
     }
 
-    /** Seleccion menu acerca de: Muestra la ventana con la informacion de aFirma */
+    /** Selecci&oacute;n men&uacute; acerca de: Muestra la ventana con la informaci&oacute;n de aFirma */
     static void acercaActionPerformed() {
         Acercade.main();
     }
 
-    /** Seleccion menu ayuda: Muestra la ventana con el panel de ayuda */
+    /** Selecci&oacute;n men&uacute; ayuda: Muestra la ventana con el panel de ayuda */
     static void ayudaHTMLActionPerformed() {
         HelpUtils.visualize(true);
     }
 
-    /** Seleccion idiomas: Cambia el idioma de la aplicacion
+    /** Selecci&oacute;n idiomas: Cambia el idioma de la aplicaci&oacute;n
      * @param locale Nuevo Locale */
     void cambiarIdioma(final Locale locale) {
         Locale.setDefault(locale);
@@ -471,6 +471,7 @@ public final class PrincipalGUI extends JAccessibilityFrame {
         ayudaHTML.setText(Messages.getString("ayudaHTML.contenido")); // NOI18N //$NON-NLS-1$
         ayudaHTML.setMnemonic(KeyEvent.VK_U); // Se asigna un atajo al menu
         ayudaHTML.addActionListener(new ActionListener() {
+        	/** {@inheritDoc} */
             @Override
             public void actionPerformed(final ActionEvent evt) {
                 ayudaHTMLActionPerformed();
@@ -485,6 +486,7 @@ public final class PrincipalGUI extends JAccessibilityFrame {
         acerca.setText(Messages.getString("ayuda.contenido")); // NOI18N //$NON-NLS-1$
         acerca.setMnemonic(KeyEvent.VK_C); // Se asigna un atajo al menu
         acerca.addActionListener(new ActionListener() {
+        	/** {@inheritDoc} */
             @Override
             public void actionPerformed(final ActionEvent evt) {
                 acercaActionPerformed();
@@ -518,6 +520,7 @@ public final class PrincipalGUI extends JAccessibilityFrame {
         opciones.setText(Messages.getString("Opciones.opciones")); //$NON-NLS-1$
         opciones.setMnemonic(KeyEvent.VK_O); // Se asigna un atajo al menu
         opciones.addActionListener(new ActionListener() {
+        	/** {@inheritDoc} */
             @Override
             public void actionPerformed(final ActionEvent evt) {
                 opcionesActionPerformed();
@@ -589,6 +592,7 @@ public final class PrincipalGUI extends JAccessibilityFrame {
                 }
 
                 opcionIdioma.addItemListener(new ItemListener() {
+                	/** {@inheritDoc} */
                     @Override
                     public void itemStateChanged(final ItemEvent e) {
                         if (e.getStateChange() == ItemEvent.SELECTED) {
@@ -612,6 +616,7 @@ public final class PrincipalGUI extends JAccessibilityFrame {
         salir.setText(Messages.getString("PrincipalGUI.salir")); // NOI18N //$NON-NLS-1$
         salir.setMnemonic(KeyEvent.VK_L); // Se asigna un atajo al menu
         salir.addActionListener(new ActionListener() {
+        	/** {@inheritDoc} */
             @Override
             public void actionPerformed(final ActionEvent evt) {
                 salirActionPerformed();
@@ -646,6 +651,7 @@ public final class PrincipalGUI extends JAccessibilityFrame {
         return this.menu;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int getMinimumRelation() {
         return 7;
@@ -740,6 +746,7 @@ public final class PrincipalGUI extends JAccessibilityFrame {
     /** Muestra la ventana de la aplicacion */
     public void main() {
         EventQueue.invokeLater(new Runnable() {
+        	/** {@inheritDoc} */
             @Override
             public void run() {
                 setVisible(true);
@@ -774,7 +781,7 @@ public final class PrincipalGUI extends JAccessibilityFrame {
         }
     }
 
-    /** Seleccion menu salir: Cierra la aplicacion */
+    /** Selecci&oacute;n men&uacute; salir: Cierra la aplicaci&oacute;n */
     static void salirActionPerformed() {
         System.exit(0);
     }
@@ -797,7 +804,7 @@ public final class PrincipalGUI extends JAccessibilityFrame {
                 // set Metal look and feel
                 UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel"); //$NON-NLS-1$
 
-                if (!((Platform.getOS().equals(Platform.OS.LINUX) && (System.getProperty("java.version").compareTo("1.7.0") > 0) ))){
+                if (!((Platform.getOS().equals(Platform.OS.LINUX) && (System.getProperty("java.version").compareTo("1.7.0") > 0) ))){ //$NON-NLS-1$ //$NON-NLS-2$
                 	UIManager.put("FileChooserUI", "com.sun.java.swing.plaf.windows.WindowsFileChooserUI"); //$NON-NLS-1$//$NON-NLS-2$
                 }
 

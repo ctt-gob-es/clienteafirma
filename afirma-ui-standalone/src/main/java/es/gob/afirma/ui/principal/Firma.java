@@ -59,6 +59,7 @@ import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
 import es.gob.afirma.signers.pades.BadPdfPasswordException;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
+import es.gob.afirma.signers.xades.InvalidEFacturaDataException;
 import es.gob.afirma.signers.xmldsig.AOXMLDSigSigner;
 import es.gob.afirma.ui.listeners.ElementDescriptionFocusListener;
 import es.gob.afirma.ui.listeners.ElementDescriptionMouseListener;
@@ -83,15 +84,24 @@ final class Firma extends JPanel {
     private static final long serialVersionUID = 1L;
 
     // Nombres de los diferentes formatos de firmado
-    private static final List<String> FORMATOS_AVANZADOS = new ArrayList<String>(Arrays.asList("Firma est\u00E1ndar (XAdES Detached)", //$NON-NLS-1$
-                                                                               "CAdES", //$NON-NLS-1$
-                                                                               "PAdES" //$NON-NLS-1$
-    ));
+    private static final List<String> FORMATOS_AVANZADOS = new ArrayList<String>(
+		Arrays.asList(
+			"Firma est\u00E1ndar (XAdES Detached)",
+			"CAdES", //$NON-NLS-1$
+			"PAdES", //$NON-NLS-1$
+			"Factura Electr\u00F3nica"
+		)
+	);
 
     // Constantes de los diferentes formatos de firmado
-    private static final List<String> FORMATOS = new ArrayList<String>(Arrays.asList(AOSignConstants.SIGN_FORMAT_XADES_DETACHED,
-                                                                               AOSignConstants.SIGN_FORMAT_CADES,
-                                                                               AOSignConstants.SIGN_FORMAT_PDF));
+    private static final List<String> FORMATOS = new ArrayList<String>(
+		Arrays.asList(
+			AOSignConstants.SIGN_FORMAT_XADES_DETACHED,
+            AOSignConstants.SIGN_FORMAT_CADES,
+            AOSignConstants.SIGN_FORMAT_PDF,
+            AOSignConstants.SIGN_FORMAT_FACTURAE
+        )
+    );
 
     Firma() {
         initComponents();
@@ -103,7 +113,7 @@ final class Firma extends JPanel {
         comboAlmacen.setModel(new DefaultComboBoxModel(KeyStoreLoader.getKeyStoresToSign()));
     }
 
-    /** Pulsar boton examinar: Muestra una ventana para seleccinar un archivo.
+    /** Pulsar bot&oacute;n examinar: Muestra una ventana para seleccinar un archivo.
      * Modifica el valor de la caja con el nombre del archivo seleccionado
      * @param campoFichero Campo en el que se escribe el nombre del fichero seleccionado */
     void examinarActionPerformed(final JTextField campoFichero) {
@@ -368,11 +378,25 @@ final class Firma extends JPanel {
             try {
                 signedData = signer.sign(fileData, GeneralConfig.getSignAlgorithm(), privateKeyEntry, prop);
             }
+            catch(final InvalidEFacturaDataException e) {
+        		CustomDialog.showMessageDialog(
+    				SwingUtilities.getRoot(this),
+    				true,
+    				"<html><p>Los datos proporcionados no son una factura electronica.<br>Con formato de factura electrónica solo es posible firmar facturas electrónicas válidas</p></html>",
+    				Messages.getString("error"),  //$NON-NLS-1$
+    				JOptionPane.ERROR_MESSAGE
+    			);
+        		return;
+            }
             catch(final AOFormatFileException e) {
                 LOGGER.severe("Error al generar la firma electronica: " + e); //$NON-NLS-1$
-                CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
-                                               true,
-                                               Messages.getString("Firma.msg.error.generar.formato"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+                CustomDialog.showMessageDialog(
+            		SwingUtilities.getRoot(this),
+                    true,
+                    Messages.getString("Firma.msg.error.generar.formato"),  //$NON-NLS-1$
+                    Messages.getString("error"),  //$NON-NLS-1$
+                    JOptionPane.ERROR_MESSAGE
+                );
                 return;
             }
             catch(final BadPdfPasswordException e) {
@@ -445,7 +469,7 @@ final class Firma extends JPanel {
         return path;
     }
 
-    /** Inicializacion de los componentes */
+    /** Inicializaci&oacute;n de los componentes */
     private void initComponents() {
         setLayout(new GridBagLayout());
 

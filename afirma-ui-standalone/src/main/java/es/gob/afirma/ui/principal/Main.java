@@ -48,7 +48,7 @@ public final class Main {
     public static void main(final String[] args) {
         if (System.getProperty("java.version").compareTo("1.6.0_18") < 0) { //$NON-NLS-1$ //$NON-NLS-2$
             CustomDialog.showMessageDialog(null, true, Messages.getString("main.requerido") + //$NON-NLS-1$
-                                           System.getProperty("java.version") + ".<br>" + //$NON-NLS-1$
+                                           System.getProperty("java.version") + ".<br>" + //$NON-NLS-1$ //$NON-NLS-2$
                                            Messages.getString("main.porfavor"), //$NON-NLS-1$
                                            Messages.getString("main.cliente"), //$NON-NLS-1$
                                            JOptionPane.ERROR_MESSAGE);
@@ -83,6 +83,9 @@ public final class Main {
 		Main.helpIndex = helpIndex;
 	}
 
+	/** Indica si el sistema operativo est&aacute; configurado en modo gr&aacute;fico de alto contraste.
+	 * @return <code>true</code> si el sistema operativo est&aacute; configurado en modo gr&aacute;fico de alto contraste,
+	 *         <code>false</code> en caso contrario */
 	public static boolean isOSHighContrast() {
 		return isOSHighContrast;
 	}
