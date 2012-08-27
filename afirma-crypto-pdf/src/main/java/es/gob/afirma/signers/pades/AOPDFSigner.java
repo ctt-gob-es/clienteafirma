@@ -906,10 +906,7 @@ public final class AOPDFSigner implements AOSigner {
         	throw new AOFormatFileException("Los datos introducidos no se corresponden con un documento PDF", e); //$NON-NLS-1$
 		}
 
-        if (pdfReader.getCertificationLevel() != PdfSignatureAppearance.NOT_CERTIFIED && !Boolean.TRUE.toString().equalsIgnoreCase(extraParams.getProperty("allowSigningCertifiedPdfs"))) { //$NON-NLS-1$
-            if (extraParams.getProperty("allowSigningCertifiedPdfs") != null) { //$NON-NLS-1$
-                throw new PdfIsCertifiedException();
-            }
+        if (pdfReader.getCertificationLevel() != PdfSignatureAppearance.NOT_CERTIFIED && !Boolean.parseBoolean(extraParams.getProperty("allowSigningCertifiedPdfs"))) { //$NON-NLS-1$
 
             if (Boolean.TRUE.toString().equalsIgnoreCase(extraParams.getProperty("headLess"))) {  //$NON-NLS-1$
             	throw new PdfIsCertifiedException();
@@ -1016,7 +1013,6 @@ public final class AOPDFSigner implements AOSigner {
         catch(final BadPasswordException e) {
         	throw new PdfIsPasswordProtectedException(e);
         }
-
 
         // Aplicamos todos los atributos de firma
         final PdfSignatureAppearance sap = stp.getSignatureAppearance();
