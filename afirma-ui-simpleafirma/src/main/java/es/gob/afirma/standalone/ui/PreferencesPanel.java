@@ -578,17 +578,17 @@ final class PreferencesPanel extends JPanel {
         metadata.setBorder(BorderFactory.createTitledBorder(Messages.getString("PreferencesPanel.8"))); //$NON-NLS-1$
         metadata.setLayout(new GridLayout(0,1));
 
-        final JLabel xadesSignatureProductionProvinceLabel = new JLabel(Messages.getString("PreferencesPanel.9")); //$NON-NLS-1$
-        xadesSignatureProductionProvinceLabel.setLabelFor(this.xadesSignatureProductionProvince);
-        metadata.add(xadesSignatureProductionProvinceLabel);
-        this.xadesSignatureProductionProvince.addKeyListener(this.modificationListener);
-        metadata.add(this.xadesSignatureProductionProvince);
+//        final JLabel xadesSignatureProductionProvinceLabel = new JLabel(Messages.getString("PreferencesPanel.9")); //$NON-NLS-1$
+//        xadesSignatureProductionProvinceLabel.setLabelFor(this.xadesSignatureProductionProvince);
+//        metadata.add(xadesSignatureProductionProvinceLabel);
+//        this.xadesSignatureProductionProvince.addKeyListener(this.modificationListener);
+//        metadata.add(this.xadesSignatureProductionProvince);
 
-        final JLabel xadesSignatureProductionPostalCodeLabel = new JLabel(Messages.getString("PreferencesPanel.10")); //$NON-NLS-1$
-        xadesSignatureProductionPostalCodeLabel.setLabelFor(this.xadesSignatureProductionPostalCode);
-        metadata.add(xadesSignatureProductionPostalCodeLabel);
-        this.xadesSignatureProductionPostalCode.addKeyListener(this.modificationListener);
-        metadata.add(this.xadesSignatureProductionPostalCode);
+//        final JLabel xadesSignatureProductionPostalCodeLabel = new JLabel(Messages.getString("PreferencesPanel.10")); //$NON-NLS-1$
+//        xadesSignatureProductionPostalCodeLabel.setLabelFor(this.xadesSignatureProductionPostalCode);
+//        metadata.add(xadesSignatureProductionPostalCodeLabel);
+//        this.xadesSignatureProductionPostalCode.addKeyListener(this.modificationListener);
+//        metadata.add(this.xadesSignatureProductionPostalCode);
 
         final JLabel xadesSignatureProductionCityLabel = new JLabel(Messages.getString("PreferencesPanel.11")); //$NON-NLS-1$
         xadesSignatureProductionCityLabel.setLabelFor(this.xadesSignatureProductionCity);
@@ -602,11 +602,11 @@ final class PreferencesPanel extends JPanel {
         this.xadesSignatureProductionCountry.addKeyListener(this.modificationListener);
         metadata.add(this.xadesSignatureProductionCountry);
 
-        final JLabel xadesSignerClaimedRoleLabel = new JLabel(Messages.getString("PreferencesPanel.13")); //$NON-NLS-1$
-        xadesSignerClaimedRoleLabel.setLabelFor(this.xadesSignerClaimedRole);
-        metadata.add(xadesSignerClaimedRoleLabel);
-        this.xadesSignerClaimedRole.addKeyListener(this.modificationListener);
-        metadata.add(this.xadesSignerClaimedRole);
+//        final JLabel xadesSignerClaimedRoleLabel = new JLabel(Messages.getString("PreferencesPanel.13")); //$NON-NLS-1$
+//        xadesSignerClaimedRoleLabel.setLabelFor(this.xadesSignerClaimedRole);
+//        metadata.add(xadesSignerClaimedRoleLabel);
+//        this.xadesSignerClaimedRole.addKeyListener(this.modificationListener);
+//        metadata.add(this.xadesSignerClaimedRole);
 
         final JLabel xadesSignerCertifiedRoleLabel = new JLabel(Messages.getString("PreferencesPanel.14")); //$NON-NLS-1$
         xadesSignerCertifiedRoleLabel.setLabelFor(this.xadesSignerCertifiedRole);
@@ -624,8 +624,8 @@ final class PreferencesPanel extends JPanel {
         format.add(this.xadesSignFormat);
 
         //TODO: Descomentar
-//        c.gridy++;
-//        panel.add(metadata, c);
+        c.gridy++;
+        panel.add(metadata, c);
 
         c.gridy++;
         panel.add(format, c);
@@ -706,53 +706,66 @@ final class PreferencesPanel extends JPanel {
 	}
 
 	private JPanel createPadesPanel() {
-	    final JPanel panel = new JPanel();
-        panel.setBorder(BorderFactory.createTitledBorder(Messages.getString("PreferencesPanel.19"))); //$NON-NLS-1$
-        panel.setLayout(new GridBagLayout());
+
+		final JPanel panel = new JPanel();
+
+		panel.setLayout(new GridBagLayout());
+
+        final GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1.0;
+        gbc.gridy = 0;
+
+		panel.add(createPadesPolicyPanel(), gbc);
+
+
+	    final JPanel cadesMetadataPanel = new JPanel();
+        cadesMetadataPanel.setBorder(BorderFactory.createTitledBorder(Messages.getString("PreferencesPanel.19"))); //$NON-NLS-1$
+        cadesMetadataPanel.setLayout(new GridBagLayout());
 
         final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 1.0;
         c.gridy = 0;
 
-        panel.add(createPadesPolicyPanel(), c);
-
-        c.gridy++;
-
 	    final JLabel padesSignReasonLabel = new JLabel(Messages.getString("PreferencesPanel.20")); //$NON-NLS-1$
 	    padesSignReasonLabel.setLabelFor(this.padesSignReason);
-	    panel.add(padesSignReasonLabel, c);
+	    cadesMetadataPanel.add(padesSignReasonLabel, c);
 
 	    c.gridy++;
 
 	    this.padesSignReason.addKeyListener(this.modificationListener);
-	    panel.add(this.padesSignReason, c);
+	    cadesMetadataPanel.add(this.padesSignReason, c);
 
 	    c.gridy++;
 
 	    final JLabel padesSignProductionCityLabel = new JLabel(Messages.getString("PreferencesPanel.21")); //$NON-NLS-1$
 	    padesSignProductionCityLabel.setLabelFor(this.padesSignProductionCity);
-	    panel.add(padesSignProductionCityLabel, c);
+	    cadesMetadataPanel.add(padesSignProductionCityLabel, c);
 
 	    c.gridy++;
 
 	    this.padesSignProductionCity.addKeyListener(this.modificationListener);
-	    panel.add(this.padesSignProductionCity, c);
+	    cadesMetadataPanel.add(this.padesSignProductionCity, c);
 
 	    c.gridy++;
 
 	    final JLabel padesSignerContactLabel = new JLabel(Messages.getString("PreferencesPanel.22")); //$NON-NLS-1$
 	    padesSignerContactLabel.setLabelFor(this.padesSignerContact);
-	    panel.add(padesSignerContactLabel, c);
+	    cadesMetadataPanel.add(padesSignerContactLabel, c);
 
 	    c.gridy++;
 
 	    this.padesSignerContact.addKeyListener(this.modificationListener);
-	    panel.add(this.padesSignerContact, c);
+	    cadesMetadataPanel.add(this.padesSignerContact, c);
 
 	    c.gridy++;
 	    c.weighty = 1.0;
-	    panel.add(new JPanel(), c);
+	    cadesMetadataPanel.add(new JPanel(), c);
+
+	    gbc.gridy++;
+
+	    panel.add(cadesMetadataPanel, gbc);
 
 	    return panel;
 	}
@@ -785,7 +798,9 @@ final class PreferencesPanel extends JPanel {
 
 				PreferencesPanel.this.getXadesPolicyIdentifier().setEditable(editable);
 				PreferencesPanel.this.getXadesPolicyIdentifierHash().setEditable(editable);
-				PreferencesPanel.this.getXadesPolicyIdentifierHashAlgorithm().setEnabled(editable);
+				if (enabled) {
+					PreferencesPanel.this.getXadesPolicyIdentifierHashAlgorithm().setEnabled(editable);
+				}
 				PreferencesPanel.this.getXadesPolicyQualifier().setEditable(editable);
 
 				loadXadesPolicy(getXadesPreloadedPolicies().get(PreferencesPanel.this.getXadesPolicies().getSelectedIndex()));
@@ -868,7 +883,9 @@ final class PreferencesPanel extends JPanel {
 
 				PreferencesPanel.this.getPadesPolicyIdentifier().setEditable(editable);
 				PreferencesPanel.this.getPadesPolicyIdentifierHash().setEditable(editable);
-				PreferencesPanel.this.getPadesPolicyIdentifierHashAlgorithm().setEnabled(editable);
+				if (enabled) {
+					PreferencesPanel.this.getPadesPolicyIdentifierHashAlgorithm().setEnabled(editable);
+				}
 				PreferencesPanel.this.getPadesPolicyQualifier().setEditable(editable);
 
 				loadPadesPolicy(getPadesPreloadedPolicies().get(PreferencesPanel.this.getPadesPolicies().getSelectedIndex()));
@@ -951,7 +968,9 @@ final class PreferencesPanel extends JPanel {
 
 				PreferencesPanel.this.getCadesPolicyIdentifier().setEditable(editable);
 				PreferencesPanel.this.getCadesPolicyIdentifierHash().setEditable(editable);
-				PreferencesPanel.this.getCadesPolicyIdentifierHashAlgorithm().setEnabled(editable);
+				if (enabled) {
+					PreferencesPanel.this.getCadesPolicyIdentifierHashAlgorithm().setEnabled(editable);
+				}
 				PreferencesPanel.this.getCadesPolicyQualifier().setEditable(editable);
 
 				loadCadesPolicy(getCadesPreloadedPolicies().get(PreferencesPanel.this.getCadesPolicies().getSelectedIndex()));
