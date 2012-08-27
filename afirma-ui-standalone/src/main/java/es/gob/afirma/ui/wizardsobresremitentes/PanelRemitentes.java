@@ -222,7 +222,7 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
             // Anadimos solo el ultimo
             final PrivateKeyEntry privateKey =
                     getPrivateKeyEntry(this.keyStoreManager, this.listaCertificadosRe.get(this.listaCertificadosRe.size() - 1).getAlias(), this.kconf);
-            final String contentType = comprobarTipo(envelopedData, privateKey);
+            final String contentType = comprobarTipo(envelopedData);
             if (contentType == null) {
                 return false;
             }
@@ -278,9 +278,8 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
 
     /** Comprueba el tipo de todos los certificados
      * @param data Sobre electr&oacute;nico.
-     * @param privateKey Certificado
      * @return Tipo de sobre */
-    private String comprobarTipo(final byte[] data, final PrivateKeyEntry privateKey) {
+    private String comprobarTipo(final byte[] data) {
         String tipo = null;
         if (AOCMSEnveloper.isCMSValid(data, AOSignConstants.CMS_CONTENTTYPE_ENVELOPEDDATA)) {
             tipo = AOSignConstants.CMS_CONTENTTYPE_ENVELOPEDDATA;
