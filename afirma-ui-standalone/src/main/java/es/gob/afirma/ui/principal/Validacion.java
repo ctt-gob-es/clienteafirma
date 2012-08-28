@@ -47,7 +47,7 @@ import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.visor.ui.VisorPanel;
 
 /** Clase que muestra el panel de validacion VALIDe */
-class Validacion extends JPanel {
+final class Validacion extends JPanel {
 
     private static final long serialVersionUID = 1L;
 

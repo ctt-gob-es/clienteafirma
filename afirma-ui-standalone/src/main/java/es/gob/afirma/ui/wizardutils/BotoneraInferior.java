@@ -106,8 +106,8 @@ public class BotoneraInferior extends JPanel {
         return this.ventanas;
     }
 
-    /** Inicializacion de parametros */
-    private void initParamenters() {
+    /** Inicializaci&oacute;n de par&aacute;metros */
+    private final void initParamenters() {
         // Configuracion del panel
         setBorder(BorderFactory.createEtchedBorder());
         setPreferredSize(this.dimensiones);

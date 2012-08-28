@@ -288,7 +288,7 @@ class JAccessibilityFileChooser extends JFileChooser{
 	 * Define el modo alto contraste para los componentes de la ventana.
 	 * @param c contenedor global
 	 */
-	protected void setHighContrast(final Container c) {
+	protected final void setHighContrast(final Container c) {
 		 //Numero de componentes del contenedor
 	    final int len = c.getComponentCount();
 	    //Se recorren los elementos que forman el contenedor
@@ -568,7 +568,7 @@ class JAccessibilityFileChooser extends JFileChooser{
 	 * Aplica accesibilidad sobre los botones.
 	 * @return JPanel con los botones de restaurar y maximizar
 	 */
-	private JPanel createAccessibilityButtonsPanel() {
+	private final JPanel createAccessibilityButtonsPanel() {
 		final JPanel panelAccesibilidad = new JPanel(new GridBagLayout());
 
 		//Para el tooltip
@@ -754,7 +754,7 @@ class JAccessibilityFileChooser extends JFileChooser{
 	 * Devuelve el tama&ntilde;o m&aacute;ximo disponible para una ventana
 	 * @return Dimension m&aacute;ximo disponible.
 	 */
-	protected static Dimension getMaxDimension(){
+	protected final static Dimension getMaxDimension(){
 
 		final Dimension result = new Dimension();
 		//Se obtienen las dimensiones totales disponibles para mostrar una ventana
@@ -775,31 +775,31 @@ class JAccessibilityFileChooser extends JFileChooser{
 		return result;
 	}
 
-	protected static int getActualPositionY() {
+	protected final static int getActualPositionY() {
 		return actualPositionY;
 	}
-	protected static void setActualPositionY(final int actualPositionY) {
+	protected final static void setActualPositionY(final int actualPositionY) {
 		JAccessibilityFileChooser.actualPositionY = actualPositionY;
 	}
-	protected static int getActualWidth() {
+	protected final static int getActualWidth() {
 		return actualWidth;
 	}
-	protected static void setActualWidth(final int actualWidth) {
+	protected final static void setActualWidth(final int actualWidth) {
 		JAccessibilityFileChooser.actualWidth = actualWidth;
 	}
-	protected static int getActualHeight() {
+	protected final static int getActualHeight() {
 		return actualHeight;
 	}
-	protected static void setActualHeight(final int actualHeight) {
+	protected final static void setActualHeight(final int actualHeight) {
 		JAccessibilityFileChooser.actualHeight = actualHeight;
 	}
-	protected JButton getOpenButton(){
+	protected final JButton getOpenButton(){
 		return this.openButton;
 	}
-	protected static boolean isMaximized(){
+	protected final static boolean isMaximized(){
 		return isMaximized;
 	}
-	protected static void setIsMaximized(final boolean actualIsMaximized){
+	protected final static void setIsMaximized(final boolean actualIsMaximized){
 		isMaximized = actualIsMaximized;
 	}
 
