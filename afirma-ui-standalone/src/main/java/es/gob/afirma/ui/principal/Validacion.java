@@ -27,6 +27,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.text.Caret;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -54,13 +56,25 @@ class Validacion extends JPanel {
         initComponents();
     }
 
-    /** Pulsar boton examinar: Muestra una ventana para seleccinar un archivo.
+    /** Pulsar boton examinar del fichero de firma: Muestra una ventana para seleccinar un archivo.
      * Modifica el valor de la caja con el nombre del archivo seleccionado
      * @param campoFichero Campo en el que se escribe el nombre del fichero seleccionado */
     void browseSignActionPerformed(final JTextField campoFichero) {
         final File selectedFile =
             SelectionDialog.showFileOpenDialog(this,
                                                Messages.getString("Validacion.chooser.title"), (ExtFilter) SignedFileManager.getCommonSignedFileFilter()); //$NON-NLS-1$
+        if (selectedFile != null) {
+            campoFichero.setText(selectedFile.getAbsolutePath());
+        }
+    }
+
+    /** Pulsar boton examinar del fichero de datos: Muestra una ventana para seleccinar un archivo.
+     * Modifica el valor de la caja con el nombre del archivo seleccionado
+     * @param campoFichero Campo en el que se escribe el nombre del fichero seleccionado */
+    void browseDataActionPerformed(final JTextField campoFichero) {
+        final File selectedFile =
+            SelectionDialog.showFileOpenDialog(this,
+                                               Messages.getString("Validacion.chooser.title")); //$NON-NLS-1$
         if (selectedFile != null) {
             campoFichero.setText(selectedFile.getAbsolutePath());
         }
@@ -78,7 +92,7 @@ class Validacion extends JPanel {
         c.gridwidth = 2;
         c.insets = new Insets(13, 13, 0, 13);
 
-        // Componentes para la seleccion de fichero
+        // Componentes para la seleccion del fichero de firma
         final JLabel browseSignLabel = new JLabel();
         browseSignLabel.setText(Messages.getString("Validacion.buscar")); //$NON-NLS-1$
         browseSignLabel.getAccessibleContext().setAccessibleDescription(Messages.getString("Validacion.buscar.description")); //$NON-NLS-1$
@@ -98,6 +112,20 @@ class Validacion extends JPanel {
                                                                            Messages.getString("Validacion.buscar.caja.description.status"))); //$NON-NLS-1$
         signFileField.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(),
                                                                            Messages.getString("Validacion.buscar.caja.description.status"))); //$NON-NLS-1$
+        signFileField.getDocument().addDocumentListener(new DocumentListener() {
+			@Override
+			public void removeUpdate(final DocumentEvent docEvent) {
+				//TODO: Llamar funcion comprobacion fichero
+			}
+
+			@Override
+			public void insertUpdate(final DocumentEvent docEvent) {
+				//TODO: Llamar funcion comprobacion fichero
+			}
+
+			@Override
+			public void changedUpdate(final DocumentEvent docEvent) {}
+		});
         signFileField.getAccessibleContext().setAccessibleName(browseSignLabel.getText() + " ALT + R."); //$NON-NLS-1$
         signFileField.getAccessibleContext().setAccessibleDescription(Messages.getString("Validacion.buscar.caja.description")); //$NON-NLS-1$
         signFileField.addAncestorListener(new RequestFocusListener(false));
@@ -129,7 +157,6 @@ class Validacion extends JPanel {
                                                                               Messages.getString("PrincipalGUI.Examinar.description.status"))); //$NON-NLS-1$
         browseSignButton.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(),
                                                                               Messages.getString("PrincipalGUI.Examinar.description.status"))); //$NON-NLS-1$
-        //browseSignButton.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.Examinar") + " " + Messages.getString("PrincipalGUI.Examinar.description.status")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         browseSignButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent evt) {
@@ -142,11 +169,86 @@ class Validacion extends JPanel {
         panelExaminar.add(browseSignButton);
         add(panelExaminar, c);
 
+        c.insets = new Insets(13, 13, 0, 13);
+        c.weightx = 1.0;
+        c.gridx = 0;
+        c.gridy = 2;
+
+        // Componentes para la seleccion del fichero de datos
+        final JLabel browseDataLabel = new JLabel();
+        browseDataLabel.setText(Messages.getString("Validacion.datos.buscar")); //$NON-NLS-1$
+        browseDataLabel.getAccessibleContext().setAccessibleDescription(Messages.getString("Validacion.datos.buscar.description")); //$NON-NLS-1$
+        Utils.setContrastColor(browseDataLabel);
+        Utils.setFontBold(browseDataLabel);
+        add(browseDataLabel, c);
+
+        browseDataLabel.setEnabled(false);
+
+        c.insets = new Insets(0, 13, 0, 13);
+        c.gridx = 0;
+        c.gridy = 3;
+
+        // Campo donde se guarda el nombre del fichero de datos
+        final JTextField dataFileField = new JTextField();
+        dataFileField.setToolTipText(Messages.getString("Validacion.datos.buscar.caja.description")); //$NON-NLS-1$
+        dataFileField.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(),
+                                                                           Messages.getString("Validacion.datos.buscar.caja.description.status"))); //$NON-NLS-1$
+        dataFileField.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(),
+                                                                           Messages.getString("Validacion.datos.buscar.caja.description.status"))); //$NON-NLS-1$
+        dataFileField.getAccessibleContext().setAccessibleName(browseDataLabel.getText() + " ALT + O."); //$NON-NLS-1$
+        dataFileField.getAccessibleContext().setAccessibleDescription(Messages.getString("Validacion.datos.buscar.caja.description")); //$NON-NLS-1$
+        dataFileField.addAncestorListener(new RequestFocusListener(false));
+
+        Utils.remarcar(dataFileField);
+        if (GeneralConfig.isBigCaret()) {
+            final Caret caret = new ConfigureCaret();
+            dataFileField.setCaret(caret);
+        }
+        Utils.setFontBold(dataFileField);
+        add(dataFileField, c);
+
+        dataFileField.setEnabled(false);
+
+        // Relacion entre etiqueta y campo de texto
+        browseDataLabel.setLabelFor(dataFileField);
+        // Asignacion de mnemonico
+        browseDataLabel.setDisplayedMnemonic(KeyEvent.VK_O);
+
+
+        c.insets = new Insets(0, 10, 0, 13);
+        c.weightx = 0.0;
+        c.gridx = 1;
+
+        final JPanel panelExaminar2 = new JPanel(new GridLayout(1, 1));
+        // Boton examinar
+        final JButton browseDataButton = new JButton();
+        browseDataButton.setMnemonic(KeyEvent.VK_X);
+        browseDataButton.setText(Messages.getString("PrincipalGUI.Examinar")); //$NON-NLS-1$
+        browseDataButton.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description")); //$NON-NLS-1$
+        browseDataButton.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(),
+                                                                              Messages.getString("PrincipalGUI.Examinar.description.status"))); //$NON-NLS-1$
+        browseDataButton.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(),
+                                                                              Messages.getString("PrincipalGUI.Examinar.description.status"))); //$NON-NLS-1$
+        browseDataButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent evt) {
+                browseDataActionPerformed(dataFileField);
+            }
+        });
+        Utils.remarcar(browseDataButton);
+        Utils.setContrastColor(browseDataButton);
+        Utils.setFontBold(browseDataButton);
+        panelExaminar2.add(browseDataButton);
+        add(panelExaminar2, c);
+
+        browseDataButton.setEnabled(false);
+
+
         c.gridwidth = 2;
         c.insets = new Insets(0, 13, 0, 13);
         c.weighty = 1.0;
         c.gridx = 0;
-        c.gridy = 2;
+        c.gridy = 4;
 
         // Panel vacio para alinear el boton de aceptar en la parte de abajo de la pantalla
         final JPanel emptyPanel = new JPanel();
@@ -187,6 +289,8 @@ class Validacion extends JPanel {
         Utils.setContrastColor(checkSignButton);
         Utils.setFontBold(checkSignButton);
 
+        checkSignButton.setEnabled(false);
+
         cons.ipadx = 0;
         cons.gridx = 1;
         cons.weightx = 1.0;
@@ -210,7 +314,7 @@ class Validacion extends JPanel {
         c.insets = new Insets(13, 13, 13, 13);
         c.weighty = 0.0;
         c.weightx = 1.0;
-        c.gridy = 3;
+        c.gridy = 5;
 
         add(panelBotones, c);
     }
