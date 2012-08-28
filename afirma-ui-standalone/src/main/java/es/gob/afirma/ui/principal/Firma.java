@@ -382,7 +382,7 @@ final class Firma extends JPanel {
         		CustomDialog.showMessageDialog(
     				SwingUtilities.getRoot(this),
     				true,
-    				"<html><p>Los datos proporcionados no son una factura electronica.<br>Con formato de factura electrónica solo es posible firmar facturas electrónicas válidas</p></html>",
+    				"<html><p>Los datos proporcionados no son una factura electr\u00F3nica.<br>Con formato de factura electr\u00F3nica solo es posible firmar facturas electr\u00F3nicas v\u00E1lidas</p></html>",
     				Messages.getString("error"),  //$NON-NLS-1$
     				JOptionPane.ERROR_MESSAGE
     			);
