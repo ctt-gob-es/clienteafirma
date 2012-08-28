@@ -356,12 +356,12 @@ final class XAdESCoSigner {
         	if (onlySignningCert) {
         		xmlSignature.sign((X509Certificate) keyEntry.getCertificate(),
         				keyEntry.getPrivateKey(), algoUri, referenceList,
-        				"Signature-" + UUID.randomUUID().toString(), null /* TSA */); //$NON-NLS-1$
+        				"Signature-" + UUID.randomUUID().toString()); //$NON-NLS-1$
         	}
         	else {
         		xmlSignature.sign(Arrays.asList((X509Certificate[]) keyEntry.getCertificateChain()),
         				keyEntry.getPrivateKey(), algoUri, referenceList,
-        				"Signature-" + UUID.randomUUID().toString(), null/*TSA*/); //$NON-NLS-1$
+        				"Signature-" + UUID.randomUUID().toString()); //$NON-NLS-1$
         	}
         }
         catch (final NoSuchAlgorithmException e) {

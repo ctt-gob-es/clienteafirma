@@ -109,8 +109,7 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
                      final PrivateKey privateKey,
                      final String signatureMethod,
                      final List<?> refsIdList,
-                     final String signatureIdPrefix,
-                     final String tsaURL) throws MarshalException, XMLSignatureException, GeneralSecurityException {
+                     final String signatureIdPrefix) throws MarshalException, XMLSignatureException, GeneralSecurityException {
 
         final List<?> referencesIdList = new ArrayList<Object>(refsIdList);
 
@@ -123,8 +122,7 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
 				this.xadesNamespace,
 				this.signedPropertiesTypeUrl,
 				signatureIdPrefix,
-				referencesIdList,
-				tsaURL
+				referencesIdList
 			)
 		);
 

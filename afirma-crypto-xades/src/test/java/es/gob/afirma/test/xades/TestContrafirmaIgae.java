@@ -48,7 +48,8 @@ public class TestContrafirmaIgae {
      * @throws NoSuchAlgorithmException Cuando no se encuentra el algoritmo de firma.
      * @throws UnrecoverableEntryException Cuando no se puede recuperar la clave de firma.
      */
-    @Test
+    @SuppressWarnings("static-method")
+	@Test
     public void testContrafirmaXAdESDeFirmasDeIgae() throws IOException, KeyStoreException, AOException, NoSuchAlgorithmException, CertificateException, UnrecoverableEntryException {
 
     	Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
