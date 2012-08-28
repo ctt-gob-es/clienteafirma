@@ -29,7 +29,8 @@ import es.gob.afirma.signers.pkcs7.ReadNodesTree;
 public class AOCAdESCounterSigner implements AOCounterSigner {
 
 	/** {@inheritDoc} */
-    public byte[] countersign(final byte[] sign,
+    @Override
+	public byte[] countersign(final byte[] sign,
                               final String algorithm,
                               final CounterSignTarget targetType,
                               final Object[] targets,
@@ -47,7 +48,13 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
         	signingCertificateV2 = !"SHA1".equals(AOSignConstants.getDigestAlgorithmName(algorithm));	 //$NON-NLS-1$
         }
 
-        final P7ContentSignerParameters csp = new P7ContentSignerParameters(sign, algorithm, (X509Certificate[]) keyEntry.getCertificateChain());
+        final P7ContentSignerParameters csp = new P7ContentSignerParameters(
+    		sign,
+    		algorithm,
+    		(Boolean.parseBoolean(extraParams.getProperty("includeOnlySignningCertificate"))) ? //$NON-NLS-1$
+    			new X509Certificate[] { (X509Certificate) keyEntry.getCertificateChain()[0] } :
+				(X509Certificate[]) keyEntry.getCertificateChain()
+			);
 
 
 

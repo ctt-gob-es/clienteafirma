@@ -77,6 +77,11 @@ public final class AOCAdESSigner implements AOSigner {
      * @param xParams Par&aacute;metros adicionales para la firma.
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
      * <dl>
+     *  <dt><b><i>includeOnlySignningCertificate</i></b></dt>
+	 *   <dd>
+	 *    Si se establece a {@code true} se incluye en la firma &uacute;nicamente el certificado del firmante (y no la cadena de certificaci&oacute;n completa).
+	 *    Si no se establece o se establece a o {@code false} se incluir&aacute; toda la cadena de certificaci&oacute;n.
+	 *   </dd>
      *  <dt><b><i>mode</i></b></dt>
      *   <dd>
      *    Modo de firma a usar. El valor <code>explicit</code> indica que no se incluyen los datos firmados, sino una
@@ -144,15 +149,23 @@ public final class AOCAdESSigner implements AOSigner {
         boolean signingCertificateV2;
         if (AOSignConstants.isSHA2SignatureAlgorithm(algorithm)) {
         	signingCertificateV2 = true;
-        } else if (extraParams.containsKey("signingCertificateV2")) { //$NON-NLS-1$
+        }
+        else if (extraParams.containsKey("signingCertificateV2")) { //$NON-NLS-1$
        		signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2")); //$NON-NLS-1$
-        } else {
+        }
+        else {
         	signingCertificateV2 = !"SHA1".equals(AOSignConstants.getDigestAlgorithmName(algorithm));	 //$NON-NLS-1$
         }
 
         final String mode = extraParams.getProperty("mode", AOSignConstants.DEFAULT_SIGN_MODE); //$NON-NLS-1$
 
-        final P7ContentSignerParameters csp = new P7ContentSignerParameters(data, algorithm, (X509Certificate[]) keyEntry.getCertificateChain());
+        final P7ContentSignerParameters csp = new P7ContentSignerParameters(
+    		data,
+    		algorithm,
+    		(Boolean.parseBoolean(extraParams.getProperty("includeOnlySignningCertificate"))) ? //$NON-NLS-1$
+    			new X509Certificate[] { (X509Certificate) keyEntry.getCertificateChain()[0] } :
+				(X509Certificate[]) keyEntry.getCertificateChain()
+		);
 
         try {
             boolean omitContent = false;
@@ -227,6 +240,11 @@ public final class AOCAdESSigner implements AOSigner {
      * Par&aacute;metros adicionales para la cofirma.
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>extraParams</code>:</p>
      * <dl>
+     *  <dt><b><i>includeOnlySignningCertificate</i></b></dt>
+	 *   <dd>
+	 *    Si se establece a {@code true} se incluye en la firma &uacute;nicamente el certificado del firmante (y no la cadena de certificaci&oacute;n completa).
+	 *    Si no se establece o se establece a o {@code false} se incluir&aacute; toda la cadena de certificaci&oacute;n.
+	 *   </dd>
      *  <dt><b><i>mode</i></b></dt>
      *   <dd>
      *    Modo de firma a usar. El valor <code>explicit</code> indica que no se incluyen los datos firmados, sino una
@@ -318,6 +336,11 @@ public final class AOCAdESSigner implements AOSigner {
      * Par&aacute;metros adicionales para la cofirma.
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>extraParams</code>:</p>
      * <dl>
+     *  <dt><b><i>includeOnlySignningCertificate</i></b></dt>
+	 *   <dd>
+	 *    Si se establece a {@code true} se incluye en la firma &uacute;nicamente el certificado del firmante (y no la cadena de certificaci&oacute;n completa).
+	 *    Si no se establece o se establece a o {@code false} se incluir&aacute; toda la cadena de certificaci&oacute;n.
+	 *   </dd>
      *  <dt><b><i>mode</i></b></dt>
      *   <dd>
      *    Modo de firma a usar. El valor <code>explicit</code> indica que no se incluyen los datos firmados, sino una
@@ -390,6 +413,11 @@ public final class AOCAdESSigner implements AOSigner {
      * Par&aacute;metros adicionales para la contrafirma.
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>extraParams</code>:</p>
      * <dl>
+     *  <dt><b><i>includeOnlySignningCertificate</i></b></dt>
+	 *   <dd>
+	 *    Si se establece a {@code true} se incluye en la firma &uacute;nicamente el certificado del firmante (y no la cadena de certificaci&oacute;n completa).
+	 *    Si no se establece o se establece a o {@code false} se incluir&aacute; toda la cadena de certificaci&oacute;n.
+	 *   </dd>
      *  <dt><b><i>mode</i></b></dt>
      *   <dd>
      *    Modo de firma a usar. El valor <code>explicit</code> indica que no se incluyen los datos firmados, sino una

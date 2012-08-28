@@ -29,7 +29,8 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 public class AOCAdESCoSigner implements AOCoSigner {
 
 	/** {@inheritDoc} */
-    public byte[] cosign(final byte[] data,
+    @Override
+	public byte[] cosign(final byte[] data,
                          final byte[] sign,
                          final String algorithm,
                          final PrivateKeyEntry keyEntry,
@@ -52,7 +53,13 @@ public class AOCAdESCoSigner implements AOCoSigner {
         	signingCertificateV2 = !"SHA1".equals(AOSignConstants.getDigestAlgorithmName(algorithm));	 //$NON-NLS-1$
         }
 
-        final P7ContentSignerParameters csp = new P7ContentSignerParameters(data, algorithm, (X509Certificate[]) keyEntry.getCertificateChain());
+        final P7ContentSignerParameters csp = new P7ContentSignerParameters(
+    		data,
+    		algorithm,
+    		(Boolean.parseBoolean(extraParams.getProperty("includeOnlySignningCertificate"))) ? //$NON-NLS-1$
+    			new X509Certificate[] { (X509Certificate) keyEntry.getCertificateChain()[0] } :
+				(X509Certificate[]) keyEntry.getCertificateChain()
+		);
 
         String contentTypeOid = MimeHelper.DEFAULT_CONTENT_OID_DATA;
         String contentDescription = MimeHelper.DEFAULT_CONTENT_DESCRIPTION;
@@ -107,7 +114,8 @@ public class AOCAdESCoSigner implements AOCoSigner {
     }
 
     /** {@inheritDoc} */
-    public byte[] cosign(final byte[] sign,
+    @Override
+	public byte[] cosign(final byte[] sign,
                          final String algorithm,
                          final PrivateKeyEntry keyEntry,
                          final Properties xParams) throws AOException {
@@ -141,7 +149,9 @@ public class AOCAdESCoSigner implements AOCoSigner {
             try {
                 return new CAdESCoSigner().coSigner(
                     typeAlgorithm,
-                    (X509Certificate[])keyEntry.getCertificateChain(),
+                    (Boolean.parseBoolean(extraParams.getProperty("includeOnlySignningCertificate"))) ? //$NON-NLS-1$
+            			new X509Certificate[] { (X509Certificate) keyEntry.getCertificateChain()[0] } :
+        				(X509Certificate[]) keyEntry.getCertificateChain(),
                     new ByteArrayInputStream(sign),
                     new AdESPolicy(extraParams),
                     signingCertificateV2,
@@ -160,7 +170,9 @@ public class AOCAdESCoSigner implements AOCoSigner {
         try {
             return new CAdESCoSignerEnveloped().coSigner(
                  typeAlgorithm,
-                 (X509Certificate[])keyEntry.getCertificateChain(),
+                 (Boolean.parseBoolean(extraParams.getProperty("includeOnlySignningCertificate"))) ? //$NON-NLS-1$
+         			new X509Certificate[] { (X509Certificate) keyEntry.getCertificateChain()[0] } :
+     				(X509Certificate[]) keyEntry.getCertificateChain(),
                  new ByteArrayInputStream(sign),
                  new AdESPolicy(extraParams),
                  signingCertificateV2,
