@@ -15,13 +15,6 @@
  *   <li>Dependencia con el m&oacute;dulo N&uacute;cleo (<i>afirma-core</i>) del Cliente.</li>
  *   <li>Dependencia con el m&oacute;dulo com&uacute;n de gesti&oacute;n de almacenes de certificados y claves (<i>afirma-core-keystores</i>) del Cliente.</li>
  *  </ul>
- *  <p>Adicionalmente, se presentan las siguientes dependencias din&aacute;micas de primer nivel:</p>
- *  <ul>
- *   <li>
- *    Dependencia din&aacute;mica con el m&oacute;dulo N&uacute;cleo UI JSE (<i>afirma-ui-core-jse</i>) del Cliente, utilizado para la solicitud de contrase&ntilde;as.
- *    Este puede sustituirse por cualquier otra clase que implemente el interfaz <code>es.gob.afirma.core.ui.AOUIManager</code>.
- *   </li>
- *  </ul>
  *  <p>
  *   Este m&oacute;dulo es compatible con cualquier entorno JSE 1.5 o superior.<br>
  *  </p>
