@@ -112,9 +112,6 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
     /** Etiqueta con el texto "Anadir remitente desde...". */
     private JLabel etiquetaAnadir = new JLabel();
 
-    /** Configuracion del KeyStore */
-    private KeyStoreConfiguration kconf;
-
     /** Lista con los certificados a utilizar */
     private List<CertificateDestiny> listaCertificados;
 
@@ -148,11 +145,12 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
      * @param eliminar Boton para eliminar un remitente del listado de repositorios
      * @param anadir Boton para anadir un remitente al listado de repositorios */
     void anadirActionPerformed(final JComboBox comboRepositorios, final JButton eliminar, final JButton anadir) {
-        this.kconf = (KeyStoreConfiguration) comboRepositorios.getSelectedItem();
+
+    	final KeyStoreConfiguration kconf = (KeyStoreConfiguration) comboRepositorios.getSelectedItem();
 
         final AOKeyStoreManager keyStoreManager;
         try {
-            final AOKeyStore ao = this.kconf.getType();
+            final AOKeyStore ao = kconf.getType();
             String lib = null;
             if (ao == AOKeyStore.PKCS12 || ao == AOKeyStore.SINGLE) {
                 ExtFilter filter;
@@ -234,7 +232,7 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
         // Preguntamos por la contrasena del certificado
         if (!this.listaCertificadosRe.isEmpty()) {
             try {
-                this.privateKeyEntry = getPrivateKeyEntry(keyStoreManager, certDest.getAlias(), this.kconf);
+                this.privateKeyEntry = getPrivateKeyEntry(keyStoreManager, certDest.getAlias(), kconf);
             }
             catch (final UnrecoverableKeyException e) {
                 // Control de la excepcion generada al introducir mal la contrasena para el certificado

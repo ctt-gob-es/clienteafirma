@@ -14,21 +14,15 @@ public abstract class JAccessibilityFrameAbout extends JFrame {
 	 * UID.
 	 */
 	private static final long serialVersionUID = 1L;
-	
-	/**
-	 * Adaptador de redimensionado.
-	 */
-	private ResizingAdaptor resizingAdaptor;
 
 	/**
 	 * Constructor.
 	 */
 	public JAccessibilityFrameAbout(){
 		super();
-		this.resizingAdaptor = new ResizingAdaptor(null, null, null,null,this,null,null,null);
-		this.addComponentListener(this.resizingAdaptor);
+		this.addComponentListener(new ResizingAdaptor(null,null,null,null,this,null,null,null));
 	}
-	
+
 	/**
 	 * Relacion minima que se aplica para la redimension de los componentes.
 	 * Cuanto menor es este numero menor es la redimension aplicada.
@@ -42,7 +36,7 @@ public abstract class JAccessibilityFrameAbout extends JFrame {
 	/*public final void callResize(){
 		this.resizingAdaptor.adjustWindowFonts();
 	}*/
-	
+
 	/**
 	 * Busca el JAccessibilityFrame padre de un componente.
 	 * @param component El componente.

@@ -45,15 +45,22 @@ public final class BotoneraSuperior extends JPanel {
 	 * Lista de ventanas del wizard.
 	 */
 	private List<JDialogWizard> ventanas;
+
 	/**
 	 * Boton de restaurar.
 	 */
 	private JButton restoreButton = null;
+	JButton getRestoreButton() {
+		return this.restoreButton;
+	}
 
 	/**
 	 * Boton de maximizar.
 	 */
 	private JButton maximizeButton = null;
+	JButton getMaximizeButton() {
+		return this.maximizeButton;
+	}
 
 	/**
 	 * Devuelve la lista de ventanas del wizard.
@@ -84,7 +91,7 @@ public final class BotoneraSuperior extends JPanel {
 	/**
 	 * Inicializacion de parametros
 	 */
-	private void initParamenters() {
+	private final void initParamenters() {
 		// Configuracion del panel
     	setBorder(BorderFactory.createEtchedBorder());
     	setPreferredSize(this.dimensiones);
@@ -135,11 +142,13 @@ public final class BotoneraSuperior extends JPanel {
 		final JAccessibilityDialogWizard j = JAccessibilityDialogWizard.getJAccessibilityDialogWizard(this);
 		if (JAccessibilityDialogWizard.getActualPositionX() != -1 && JAccessibilityDialogWizard.getActualPositionY() != -1 && JAccessibilityDialogWizard.getActualWidth() != -1 && JAccessibilityDialogWizard.getActualHeight() != -1){
 			j.setBounds(JAccessibilityDialogWizard.getActualPositionX(), JAccessibilityDialogWizard.getActualPositionY(), JAccessibilityDialogWizard.getActualWidth(), JAccessibilityDialogWizard.getActualHeight());
-		} else {
+		}
+		else {
 			final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 			if (Platform.getOS().equals(Platform.OS.LINUX)){
 	            j.setBounds((screenSize.width - Constants.WIZARD_INITIAL_WIDTH_LINUX) / 2, (screenSize.height - Constants.WIZARD_INITIAL_HEIGHT_LINUX) / 2, Constants.WIZARD_INITIAL_WIDTH_LINUX, Constants.WIZARD_INITIAL_HEIGHT_LINUX);
-			} else{
+			}
+			else{
 	            j.setBounds((screenSize.width - Constants.WIZARD_INITIAL_WIDTH) / 2, (screenSize.height - Constants.WIZARD_INITIAL_HEIGHT) / 2, Constants.WIZARD_INITIAL_WIDTH, Constants.WIZARD_INITIAL_HEIGHT);
 			}
     		j.setMinimumSize(new Dimension(j.getSize().width, j.getSize().height));
@@ -153,7 +162,6 @@ public final class BotoneraSuperior extends JPanel {
 	 * Se crea el panel de botones de accesibilidad.
 	 */
 	private void createAccessibilityButtonsPanel() {
-		//this.accessibilityButtonsPanel = new JPanel(new GridBagLayout());
 
 		//Para el tooltip
 		final JWindow tip = new JWindow();
@@ -167,14 +175,6 @@ public final class BotoneraSuperior extends JPanel {
         }
 		Utils.setContrastColor(panel);
 
-		//panel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-		//panel.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
-		//panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
-		//panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-		//panel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-		//panel.setBorder(BorderFactory.createCompoundBorder());
-		//panel.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.BLACK));
-
 		//Restricciones para los botones
 		final GridBagConstraints consButtons = new GridBagConstraints();
 		consButtons.fill = GridBagConstraints.BOTH;
@@ -183,11 +183,9 @@ public final class BotoneraSuperior extends JPanel {
 		consButtons.weightx = 1.0;
 		consButtons.weighty = 1.0;
 		consButtons.insets = new Insets(0,0,0,0);  //right padding
-		//consButtons.anchor=GridBagConstraints.EAST;
 
 		//Restore button
 		final JPanel restorePanel = new JPanel();
-		//this.restoreButton = getButton("r", KeyEvent.VK_R );
 		final ImageIcon imageIconRestore= new ImageIcon(CustomDialog.class.getResource("/resources/images/restore.png")); //$NON-NLS-1$
 		this.restoreButton = new JButton(imageIconRestore);
 		this.restoreButton.setMnemonic(KeyEvent.VK_R );
@@ -198,19 +196,17 @@ public final class BotoneraSuperior extends JPanel {
 
 			@Override
 			public void focusLost(final FocusEvent e) {
-				Utils.showToolTip(false, tip, BotoneraSuperior.this.restoreButton, tipText);
+				Utils.showToolTip(false, tip, BotoneraSuperior.this.getRestoreButton(), tipText);
 			}
 
 			@Override
 			public void focusGained(final FocusEvent e) {
-				Utils.showToolTip(true, tip, BotoneraSuperior.this.restoreButton, tipText);
+				Utils.showToolTip(true, tip, BotoneraSuperior.this.getRestoreButton(), tipText);
 			}
 		});
 		final Dimension dimension = new Dimension(20,20);
 		this.restoreButton.setPreferredSize(dimension);
 
-		//this.restoreButton.setBorder(null); //Eliminar Borde, ayuda a centrar el iconod el boton
-		//this.restoreButton.setContentAreaFilled(false); //area del boton invisible
 		this.restoreButton.setName("restaurar");
 		Utils.remarcar(this.restoreButton);
 		restorePanel.setBackground(Color.WHITE);
@@ -226,12 +222,9 @@ public final class BotoneraSuperior extends JPanel {
 			}
 		});
 
-
 		panel.add(restorePanel, consButtons);
 
-
 		consButtons.gridx = 1;
-		//consButtons.weightx = 0.5;
 		consButtons.insets = new Insets(0,0,0,0);  //right padding
 
 		//Maximize button
@@ -243,15 +236,11 @@ public final class BotoneraSuperior extends JPanel {
 		this.maximizeButton.setToolTipText(Messages.getString("Wizard.maximizar.description")); //$NON-NLS-1$
 		this.maximizeButton.getAccessibleContext().setAccessibleName(this.maximizeButton.getToolTipText());
 
-		//this.maximizeButton.setBorder(null); //Eliminar Borde, ayuda a centrar el iconod el boton
-		//this.maximizeButton.setContentAreaFilled(false); //area del boton invisible
-
 		this.maximizeButton.setName("maximizar"); //$NON-NLS-1$
 		//Se asigna una dimension por defecto
 		this.maximizeButton.setPreferredSize(dimension);
 
 		Utils.remarcar(this.maximizeButton);
-		//maximizePanel.add(this.maximizeButton, consMaximizePanel);
 		maximizePanel.setBackground(Color.WHITE);
 		if (Main.isOSHighContrast()){
         	maximizePanel.setOpaque(false);
@@ -263,12 +252,12 @@ public final class BotoneraSuperior extends JPanel {
 
 			@Override
 			public void focusLost(final FocusEvent e) {
-				Utils.showToolTip(false, tip, BotoneraSuperior.this.maximizeButton, tipText);
+				Utils.showToolTip(false, tip, BotoneraSuperior.this.getMaximizeButton(), tipText);
 			}
 
 			@Override
 			public void focusGained(final FocusEvent e) {
-				Utils.showToolTip(true, tip, BotoneraSuperior.this.maximizeButton, tipText);
+				Utils.showToolTip(true, tip, BotoneraSuperior.this.getMaximizeButton(), tipText);
 			}
 		});
 
@@ -290,7 +279,6 @@ public final class BotoneraSuperior extends JPanel {
 		c.gridy = 0;
 		c.weightx = 1.0;
 		c.weighty = 1.0;
-		//c.insets = new Insets(3,3,0,3);
 		c.insets = new Insets(0,0,0,0);
 		c.anchor=GridBagConstraints.EAST;
 		this.add(panel, c);
@@ -302,7 +290,8 @@ public final class BotoneraSuperior extends JPanel {
     		this.maximizeButton.setEnabled(false);
     		//Se habilita el boton de restaurar
     		this.restoreButton.setEnabled(true);
-    	} else {
+    	}
+    	else {
     		//Se habilita el boton de maximizado
     		this.maximizeButton.setEnabled(true);
     		//Se deshabilita el boton de restaurar

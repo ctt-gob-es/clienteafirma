@@ -348,10 +348,13 @@ public class AOCMSEnveloper implements AOEnveloper {
      * @throws AOException
      *         Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
      */
-    byte[] createCMSAuthenticatedData(final byte[] content, final PrivateKeyEntry ke, final AOCipherConfig cipherConfig, final X509Certificate[] recipientsCerts) throws CertificateEncodingException,
-                                                                                                                                         NoSuchAlgorithmException,
-                                                                                                                                         IOException, AOException {
-        return new CMSAuthenticatedData().genAuthenticatedData(
+    byte[] createCMSAuthenticatedData(final byte[] content,
+    		                          final PrivateKeyEntry ke,
+    		                          final AOCipherConfig cipherConfig,
+    		                          final X509Certificate[] recipientsCerts) throws CertificateEncodingException,
+                                                                                      NoSuchAlgorithmException,
+                                                                                      IOException, AOException {
+		return CMSAuthenticatedData.genAuthenticatedData(
         		AOCMSEnveloper.createContentSignerParementers(content, ke, this.signatureAlgorithm), // ContentSignerParameters
                 null, // Algoritmo de autenticacion (usamos el por defecto)
                 cipherConfig, // Configuracion del cipher

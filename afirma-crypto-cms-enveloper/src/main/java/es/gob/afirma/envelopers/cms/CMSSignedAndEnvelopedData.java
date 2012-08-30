@@ -75,8 +75,6 @@ import es.gob.afirma.signers.pkcs7.SignedAndEnvelopedData;
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
 final class CMSSignedAndEnvelopedData {
 
-    /** Clave de cifrado. La almacenamos internamente. */
-    private SecretKey cipherKey;
     private ASN1Set signedAttr2;
 
     /** M&eacute;todo que genera la firma de tipo SignedAndEnvelopedData.
@@ -116,7 +114,7 @@ final class CMSSignedAndEnvelopedData {
                                             final Map<String, byte[]> atrib,
                                             final Map<String, byte[]> uatrib) throws IOException, CertificateEncodingException, NoSuchAlgorithmException, AOException {
 
-        this.cipherKey = Utils.initEnvelopedData(config, certDest);
+    	final SecretKey cipherKey = Utils.initEnvelopedData(config, certDest);
 
         // 1. VERSION
         // la version se mete en el constructor del signedAndEnvelopedData y es
@@ -140,7 +138,7 @@ final class CMSSignedAndEnvelopedData {
         final byte[] content2 = parameters.getContent();
 
         // 2. RECIPIENTINFOS
-        final Info infos = Utils.initVariables(content2, config, certDest, this.cipherKey);
+        final Info infos = Utils.initVariables(content2, config, certDest, cipherKey);
 
         // 4. SIGNERINFO
         // raiz de la secuencia de SignerInfo

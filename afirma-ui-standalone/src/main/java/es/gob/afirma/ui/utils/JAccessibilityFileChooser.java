@@ -122,7 +122,7 @@ class JAccessibilityFileChooser extends JFileChooser{
 	/**
 	 * Inicializa el dialogo haciendo accesibles sus componentes.
 	 */
-	private void init(){
+	private final void init(){
 		//Se comprueba si se esta en el modo Alto contraste
 	    if (GeneralConfig.isHighContrast()){
 			setHighContrast(this);
@@ -249,28 +249,32 @@ class JAccessibilityFileChooser extends JFileChooser{
 			    		final String newText = text.substring(0, 14) +openTag+text.charAt(14)+closeTag+text.substring(15);
 			    		toggleButton.setText(newText);
 
-			    	} else if (text.equalsIgnoreCase("<html><center>Elementos recientes</center></html>")) {
+			    	}
+			    	else if (text.equalsIgnoreCase("<html><center>Elementos recientes</center></html>")) {
 			    		//Se asigna un mnemonico predefinido
 			    		toggleButton.setMnemonic(KeyEvent.VK_L);
 			    		//Como el texto del boton contiene codigo HTML se hace lo siguiente para que se muestre el mnemonico al usuario
 			    		final String newText = text.substring(0, 15) +openTag+text.charAt(15)+closeTag+text.substring(16);
 			    		toggleButton.setText(newText);
 
-			    	} else if (text.equalsIgnoreCase("<html><center>Escritorio</center></html>")) {
+			    	}
+			    	else if (text.equalsIgnoreCase("<html><center>Escritorio</center></html>")) {
 			    		//Se asigna un mnemonico predefinido
 			    		toggleButton.setMnemonic(KeyEvent.VK_S);
 			    		//Como el texto del boton contiene codigo HTML se hace lo siguiente para que se muestre el mnemonico al usuario
 			    		final String newText = text.substring(0, 15) +openTag+text.charAt(15)+closeTag+text.substring(16);
 			    		toggleButton.setText(newText);
 
-			    	} else if (text.equalsIgnoreCase("<html><center>Mis documentos</center></html>")) {
+			    	}
+			    	else if (text.equalsIgnoreCase("<html><center>Mis documentos</center></html>")) {
 			    		//Se asigna un mnemonico predefinido
 			    		toggleButton.setMnemonic(KeyEvent.VK_I);
 			    		//Como el texto del boton contiene codigo HTML se hace lo siguiente para que se muestre el mnemonico al usuario
 			    		final String newText = text.substring(0, 15) +openTag+text.charAt(15)+closeTag+text.substring(16);
 			    		toggleButton.setText(newText);
 
-			    	} else if (text.equalsIgnoreCase("<html><center>Red</center></html>")) {
+			    	}
+			    	else if (text.equalsIgnoreCase("<html><center>Red</center></html>")) {
 			    		//Se asigna un mnemonico predefinido
 			    		toggleButton.setMnemonic(KeyEvent.VK_R);
 			    		//Como el texto del boton contiene codigo HTML se hace lo siguiente para que se muestre el mnemonico al usuario
@@ -278,7 +282,8 @@ class JAccessibilityFileChooser extends JFileChooser{
 			    		toggleButton.setText(newText);
 			    	}
 		    	}
-		    } else if (comp instanceof Container) {
+		    }
+	      else if (comp instanceof Container) {
 		    	//Llamada recursiva
 		    	setToggleButtonMnemonics((Container)comp);
 		    }

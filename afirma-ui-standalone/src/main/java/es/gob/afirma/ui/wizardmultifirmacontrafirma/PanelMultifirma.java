@@ -93,12 +93,12 @@ final class PanelMultifirma extends JAccessibilityDialogWizard {
         protected void siguienteActionPerformed(final JButton anterior, final JButton siguiente, final JButton finalizar) {
 
             // Si solo hay un elemento, se selecciona automaticamente
-            if (PanelMultifirma.this.arbolFirmas.getRowCount() == 1) {
-                PanelMultifirma.this.arbolFirmas.setSelectionRow(0);
+            if (PanelMultifirma.this.getArbolFirmas().getRowCount() == 1) {
+                PanelMultifirma.this.getArbolFirmas().setSelectionRow(0);
             }
 
             // Comprobamos si se ha seleccionado algun elemento
-            if (PanelMultifirma.this.arbolFirmas.isVisible() && PanelMultifirma.this.arbolFirmas.getSelectionCount() == 0) {
+            if (PanelMultifirma.this.getArbolFirmas().isVisible() && PanelMultifirma.this.getArbolFirmas().getSelectionCount() == 0) {
                 CustomDialog.showMessageDialog(this,
                                                true,
                                                Messages.getString("Wizard.multifirma.simple.error.lista"), //$NON-NLS-1$
@@ -122,6 +122,9 @@ final class PanelMultifirma extends JAccessibilityDialogWizard {
 
     // Arbol de firmas
     private final JTree arbolFirmas = new JTree();
+    JTree getArbolFirmas() {
+    	return this.arbolFirmas;
+    }
 
     // Combo con las opciones de firma
     private final JComboBox comboFirmas = new JComboBox();
@@ -132,14 +135,8 @@ final class PanelMultifirma extends JAccessibilityDialogWizard {
     // Listado de firmantes
     private final JList listaFirmantes = new JList();
 
-    /** Modelo de la lista */
-    private AbstractListModel modeloLista;
-
     /** Ruta del fichero a multifirmar */
     private String rutaFichero;
-
-    /** Firma que se desea multifirmar. */
-    private byte[] signData;
 
     /** Constructor.
      * @param kssc configuracion. */
@@ -154,12 +151,14 @@ final class PanelMultifirma extends JAccessibilityDialogWizard {
      * @return {@code true} si se ha cargado correctamente. */
     public boolean cargarDatos(final String signPath, final byte[] sign) {
         this.rutaFichero = signPath;
-        this.signData = sign.clone();
+        /** Firma que se desea multifirmar. */
+
+        final byte[] signData = sign.clone();
 
         // Generamos el modelo del arbol a partir del fichero
         javax.swing.tree.DefaultTreeModel modeloArbolSwing;
         try {
-            final AOTreeModel modeloArbol = AOSignerFactory.getSigner(this.signData).getSignersStructure(this.signData, false);
+            final AOTreeModel modeloArbol = AOSignerFactory.getSigner(signData).getSignersStructure(signData, false);
             modeloArbolSwing = JSEUtils.convertToSwingModel(modeloArbol);
 
             this.arbolFirmas.setModel(modeloArbolSwing);
@@ -199,7 +198,9 @@ final class PanelMultifirma extends JAccessibilityDialogWizard {
         final String[] signers = new String[signersSet.size()];
         signersSet.toArray(signers);
 
-        this.modeloLista = new AbstractListModel() {
+
+        /** Modelo de la lista */
+        final AbstractListModel modeloLista = new AbstractListModel() {
 
             private static final long serialVersionUID = 1L;
 
@@ -219,7 +220,7 @@ final class PanelMultifirma extends JAccessibilityDialogWizard {
         };
 
         // Asignamos el modelo
-        this.listaFirmantes.setModel(this.modeloLista);
+        this.listaFirmantes.setModel(modeloLista);
 
         return true;
     }
@@ -360,15 +361,13 @@ final class PanelMultifirma extends JAccessibilityDialogWizard {
     /** Recuperamos el listado de nodos de firma seleccionados.
      * @return &Iacute;ndices de los nodos de firma seleccionados. */
     private String[] getSelectedSignNodesS() {
-        if (this.listaFirmantes.getSelectedValues() != null) {
+    	final List selectedValues = this.listaFirmantes.getSelectedValuesList();
+        if (selectedValues != null && (!selectedValues.isEmpty())) {
             // Devolvemos los firmantes seleccionados
-            final Object[] selectedValues = this.listaFirmantes.getSelectedValues();
-
-            final String[] signers = new String[selectedValues.length];
-            for (int i = 0; i < selectedValues.length; i++) {
-                signers[i] = (String) selectedValues[i];
+            final String[] signers = new String[selectedValues.size()];
+            for (int i = 0; i < selectedValues.size(); i++) {
+                signers[i] = (String) selectedValues.get(i);
             }
-
             return signers;
         }
         return null;
@@ -433,14 +432,14 @@ final class PanelMultifirma extends JAccessibilityDialogWizard {
             }
         });
         this.comboFirmas.setModel(new DefaultComboBoxModel(new String[] {
-                                                                         Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.combo.firmas.opcion1"), //$NON-NLS-1$
-                                                                         Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.combo.firmas.opcion2"), //$NON-NLS-1$
-                                                                         Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.combo.firmas.opcion3"), //$NON-NLS-1$
-                                                                         Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.combo.firmas.opcion4")} //$NON-NLS-1$
+             Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.combo.firmas.opcion1"), //$NON-NLS-1$
+             Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.combo.firmas.opcion2"), //$NON-NLS-1$
+             Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.combo.firmas.opcion3"), //$NON-NLS-1$
+             Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.combo.firmas.opcion4")} //$NON-NLS-1$
         ));
 
         this.comboFirmas.setToolTipText(Messages.getString("Wizard.multifirma.simple.contrafirma.comboFirmas.description")); // NOI18N //$NON-NLS-1$
-        this.comboFirmas.getAccessibleContext().setAccessibleName(etiquetaFirmas.getText() + " " + this.comboFirmas.getToolTipText() + "ALT + F.");
+        this.comboFirmas.getAccessibleContext().setAccessibleName(etiquetaFirmas.getText() + " " + this.comboFirmas.getToolTipText() + "ALT + F."); //$NON-NLS-1$ //$NON-NLS-2$
         this.comboFirmas.getAccessibleContext().setAccessibleDescription(this.comboFirmas.getToolTipText());
         Utils.remarcar(this.comboFirmas);
         Utils.setContrastColor(this.comboFirmas);
@@ -503,7 +502,7 @@ final class PanelMultifirma extends JAccessibilityDialogWizard {
             public void treeExpanded(final TreeExpansionEvent event) { /* se ignora */ }
         });
         this.arbolFirmas.setToolTipText(Messages.getString("Wizard.multifirma.simple.contrafirma.arbolFirmas.description")); // NOI18N //$NON-NLS-1$
-        this.arbolFirmas.getAccessibleContext().setAccessibleName(etiqueta.getText() + " " + this.arbolFirmas.getToolTipText() + "ALT + R.");
+        this.arbolFirmas.getAccessibleContext().setAccessibleName(etiqueta.getText() + " " + this.arbolFirmas.getToolTipText() + "ALT + R.");  //$NON-NLS-1$//$NON-NLS-2$
         this.arbolFirmas.setSelectionRow(0);
         this.arbolFirmas.setRootVisible(false);
         Utils.remarcar(this.arbolFirmas);

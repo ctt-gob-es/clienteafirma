@@ -98,10 +98,6 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 
  final class CMSAuthenticatedData {
 
-    /** Clave de cifrado. La almacenamos internamente porque no hay forma de
-     * mostrarla directamente al usuario. */
-    private SecretKey cipherKey;
-
     /** @param parameters
      *        Par&aacute;metros necesarios que contienen tanto la firma del
      *        archivo a firmar como los datos del firmante.
@@ -131,7 +127,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
      * @throws AOException
      *         Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
      */
-    byte[] genAuthenticatedData(final P7ContentSignerParameters parameters,
+    static byte[] genAuthenticatedData(final P7ContentSignerParameters parameters,
                                        final String autenticationAlgorithm,
                                        final AOCipherConfig config,
                                        final X509Certificate[] certDest,
@@ -139,7 +135,8 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
                                        final boolean applyTimestamp,
                                        final Map<String, byte[]> atrib,
                                        final Map<String, byte[]> uatrib) throws IOException, CertificateEncodingException, NoSuchAlgorithmException, AOException {
-        this.cipherKey = Utils.initEnvelopedData(config, certDest);
+
+    	final SecretKey cipherKey = Utils.initEnvelopedData(config, certDest);
 
         // Ya que el contenido puede ser grande, lo recuperamos solo una vez
         final byte[] content2 = parameters.getContent();
@@ -160,7 +157,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
         }
 
         // 2. RECIPIENTINFOS
-        final Info infos = Utils.initVariables(content2, config, certDest, this.cipherKey);
+        final Info infos = Utils.initVariables(content2, config, certDest, cipherKey);
 
         // 3. MACALGORITHM
         final AlgorithmIdentifier macAlgorithm = SigUtils.makeAlgId(config.getAlgorithm().getOid());
@@ -191,7 +188,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
         authAttr = generateSignedAtt(signerCertificateChain[0], digestAlgorithm, content2, dataType, applyTimestamp, atrib);
 
         // 7. MAC
-        final byte[] mac = Utils.genMac(autenticationAlgorithm, authAttr.getDEREncoded(), this.cipherKey);
+        final byte[] mac = Utils.genMac(autenticationAlgorithm, authAttr.getDEREncoded(), cipherKey);
 
         // 8. ATRIBUTOS NO FIRMADOS.
 

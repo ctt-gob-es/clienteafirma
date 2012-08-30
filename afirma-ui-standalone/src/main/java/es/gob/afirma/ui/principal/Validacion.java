@@ -124,7 +124,7 @@ final class Validacion extends JPanel {
 			}
 
 			@Override
-			public void changedUpdate(final DocumentEvent docEvent) {}
+			public void changedUpdate(final DocumentEvent docEvent) { /* Vacio */ }
 		});
         signFileField.getAccessibleContext().setAccessibleName(browseSignLabel.getText() + " ALT + R."); //$NON-NLS-1$
         signFileField.getAccessibleContext().setAccessibleDescription(Messages.getString("Validacion.buscar.caja.description")); //$NON-NLS-1$

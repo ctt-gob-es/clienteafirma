@@ -28,11 +28,6 @@ public abstract class JAccessibilityFrameAdvisor extends JFrame {
 	/** Ruta del JAR en donde se almacenan los iconos de la aplicaci&oacute;n. */
     private static final String ICON_DIR_PATH = "/resources/images/"; //$NON-NLS-1$
 
-    /**
-     * Adaptador de redimensionado.,
-     */
-	private final ResizingAdaptor resizingAdaptor;
-
 	/**
 	 * Constructor.
 	 */
@@ -40,8 +35,8 @@ public abstract class JAccessibilityFrameAdvisor extends JFrame {
 		super();
 		// Icono de @firma
         setIconImage(this.loadIcon("afirma_ico.png").getImage()); //$NON-NLS-1$
-		this.resizingAdaptor = new ResizingAdaptor(null, null, null,this,null,null,null,null);
-		this.addComponentListener(this.resizingAdaptor);
+        final ResizingAdaptor resizingAdaptor = new ResizingAdaptor(null, null, null, this, null, null, null, null);
+		this.addComponentListener(resizingAdaptor);
 	}
 
 	/**
