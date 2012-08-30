@@ -313,8 +313,8 @@ final class PanelMultifirma extends JAccessibilityDialogWizard {
             }
         }
         catch (final AOException e) {
-            LOGGER.warning(e.getMessage() + ": " + e);
-            CustomDialog.showMessageDialog(this, true, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            LOGGER.warning(e.getMessage() + ": " + e); //$NON-NLS-1$
+            CustomDialog.showMessageDialog(this, true, e.getMessage(), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
             return null;
         }
         catch (final UnsupportedOperationException e) {
