@@ -361,12 +361,12 @@ final class PanelMultifirma extends JAccessibilityDialogWizard {
     /** Recuperamos el listado de nodos de firma seleccionados.
      * @return &Iacute;ndices de los nodos de firma seleccionados. */
     private String[] getSelectedSignNodesS() {
-    	final List selectedValues = this.listaFirmantes.getSelectedValuesList();
-        if (selectedValues != null && (!selectedValues.isEmpty())) {
+        if (this.listaFirmantes.getSelectedValues() != null) {
             // Devolvemos los firmantes seleccionados
-            final String[] signers = new String[selectedValues.size()];
-            for (int i = 0; i < selectedValues.size(); i++) {
-                signers[i] = (String) selectedValues.get(i);
+            final Object[] selectedValues = this.listaFirmantes.getSelectedValues();
+            final String[] signers = new String[selectedValues.length];
+            for (int i = 0; i < selectedValues.length; i++) {
+                signers[i] = (String) selectedValues[i];
             }
             return signers;
         }
