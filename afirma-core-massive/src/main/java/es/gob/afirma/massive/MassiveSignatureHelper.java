@@ -585,7 +585,7 @@ public final class MassiveSignatureHelper {
      * @return Manejador de firma compatible con los datos indicados o {@code null} si
      * no se encontr&oacute; ninguno.
      */
-    private AOSigner getSpecificSigner(final byte[] data) {
+    private static AOSigner getSpecificSigner(final byte[] data) {
     	final String[] specificFormats = new String[] {
     			AOSignConstants.SIGN_FORMAT_PDF,
     			AOSignConstants.SIGN_FORMAT_ODF,
