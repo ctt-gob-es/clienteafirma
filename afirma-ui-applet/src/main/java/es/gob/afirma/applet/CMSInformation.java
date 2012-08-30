@@ -460,11 +460,11 @@ final class CMSInformation {
 			final DERObjectIdentifier derIden = (DERObjectIdentifier)a.getObjectAt(0);
 			// tipo de contenido de la firma.
 			if (derIden.equals(CMSAttributes.contentType)){
-				attributos = attributos + TB + TB + AppletMessages.getString("CMSInformation.46") + SP + a.getObjectAt(1) + CR; //$NON-NLS-1$
+				attributos = attributos + TB + TB + AppletMessages.getString("CMSInformation.22") + SP + a.getObjectAt(1) + CR; //$NON-NLS-1$
 			}
 			//Message digest de  la firma
 			if (derIden.equals(CMSAttributes.messageDigest)){
-				attributos = attributos + TB + TB + AppletMessages.getString("CMSInformation.47") + CR; //$NON-NLS-1$
+				attributos = attributos + TB + TB + AppletMessages.getString("CMSInformation.43") + CR; //$NON-NLS-1$
 			}
 			//la fecha de firma. obtenemos y casteamos a algo legible.
 			if (derIden.equals(CMSAttributes.signingTime)){
