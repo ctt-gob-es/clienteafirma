@@ -45,8 +45,8 @@
 
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
-			<artifactId>itext</artifactId>
-			<version>2.1.7</version>
+			<artifactId>afirma-crypto-pdf-itext</artifactId>
+			<version>3.2.0</version>
 		</dependency>
 
 		<dependency>
@@ -102,6 +102,7 @@
 				</dependencies>
 			</plugin>
 	 -->
+	 
 		</plugins>
 	</build>
 </project>
