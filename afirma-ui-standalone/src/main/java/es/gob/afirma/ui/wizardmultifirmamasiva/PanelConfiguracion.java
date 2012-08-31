@@ -47,7 +47,7 @@ final class PanelConfiguracion extends JAccessibilityDialogWizard {
         /** Constructor.
          * @param ventanas Lista de ventanas que componen el wizard.
          * @param posicion posicion de la ventana donde se inserta esta botonera. */
-        public Botonera(final List<JDialogWizard> ventanas, final int posicion) {
+        Botonera(final List<JDialogWizard> ventanas, final int posicion) {
             super(ventanas, posicion);
         }
 
@@ -56,10 +56,10 @@ final class PanelConfiguracion extends JAccessibilityDialogWizard {
         protected void siguienteActionPerformed(final JButton anterior, final JButton siguiente, final JButton finalizar) {
 
             // Cargamos el tipo de contrafirma
-            ((PanelMultifirmaMasiva) getVentanas().get(4)).setTipoContrafirma(PanelConfiguracion.this.radioUltimos.isSelected());
+            ((PanelMultifirmaMasiva) getVentanas().get(4)).setTipoContrafirma(PanelConfiguracion.this.getRadioUltimos().isSelected());
 
             // Cargamos el valor del check respetar
-            ((PanelMultifirmaMasiva) getVentanas().get(4)).setRespetar(PanelConfiguracion.this.checkRespectar.isSelected());
+            ((PanelMultifirmaMasiva) getVentanas().get(4)).setRespetar(PanelConfiguracion.this.getCheckRespectar().isSelected());
 
             super.siguienteActionPerformed(anterior, siguiente, finalizar);
         }
@@ -70,6 +70,9 @@ final class PanelConfiguracion extends JAccessibilityDialogWizard {
 
     /** Checkbox con texto "Respetar el formato...". */
     private final JCheckBox checkRespectar = new JCheckBox();
+    JCheckBox getCheckRespectar() {
+    	return this.checkRespectar;
+    }
 
     /** Etiqueta con el texto "Para realizar el proceso...". */
     private final InfoLabel labelTextoRealizar = new InfoLabel(Messages.getString("Wizard.multifirma.ventana2.explicacion2"), false); //$NON-NLS-1$
@@ -79,6 +82,9 @@ final class PanelConfiguracion extends JAccessibilityDialogWizard {
 
     /** Radio buton "Contrafirmar unicamente". */
     private final JRadioButton radioUltimos = new JRadioButton();
+    JRadioButton getRadioUltimos() {
+    	return this.radioUltimos;
+    }
 
     /** Constructor. */
     PanelConfiguracion() {
@@ -131,7 +137,7 @@ final class PanelConfiguracion extends JAccessibilityDialogWizard {
 
         // Checkbox con texto "Respetar el formato..."
         this.checkRespectar.setText(Messages.getString("Wizard.multifirma.ventana2.check.respetar")); //$NON-NLS-1$
-        this.checkRespectar.getAccessibleContext().setAccessibleName(this.checkRespectar.getText() + " "
+        this.checkRespectar.getAccessibleContext().setAccessibleName(this.checkRespectar.getText() + " " //$NON-NLS-1$
                                                                      + Messages.getString("Wizard.multifirma.ventana2.check.respetar.description")); //$NON-NLS-1$
         this.checkRespectar.getAccessibleContext()
         .setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana2.check.respetar.description")); //$NON-NLS-1$
@@ -163,7 +169,7 @@ final class PanelConfiguracion extends JAccessibilityDialogWizard {
         // Radio button "Contrafirmar a todos"
         final JRadioButton radioTodos = new JRadioButton();
         radioTodos.setText(Messages.getString("Wizard.multifirma.ventana2.panel.radio1")); //$NON-NLS-1$
-        radioTodos.getAccessibleContext().setAccessibleName(radioTodos.getText() + " "
+        radioTodos.getAccessibleContext().setAccessibleName(radioTodos.getText() + " " //$NON-NLS-1$
                                                             + Messages.getString("Wizard.multifirma.ventana2.panel.radio1.description")); //$NON-NLS-1$
         radioTodos.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana2.panel.radio1.description")); //$NON-NLS-1$
         radioTodos.setMnemonic(KeyEvent.VK_O); // Se asigna un atajo al boton de radio
@@ -178,7 +184,7 @@ final class PanelConfiguracion extends JAccessibilityDialogWizard {
         // Radio buton "Contrafirmar unicamente"
         this.radioUltimos.setText(Messages.getString("Wizard.multifirma.ventana2.panel.radio2")); //$NON-NLS-1$
         this.radioUltimos.getAccessibleContext()
-        .setAccessibleName(this.radioUltimos.getText() + " " + Messages.getString("Wizard.multifirma.ventana2.panel.radio2.description")); //$NON-NLS-2$
+        .setAccessibleName(this.radioUltimos.getText() + " " + Messages.getString("Wizard.multifirma.ventana2.panel.radio2.description"));  //$NON-NLS-1$//$NON-NLS-2$
         this.radioUltimos.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana2.panel.radio2.description")); //$NON-NLS-1$
         this.radioUltimos.setMnemonic(KeyEvent.VK_N); // Se asigna un atajo al boton de radio
         Utils.remarcar(this.radioUltimos);

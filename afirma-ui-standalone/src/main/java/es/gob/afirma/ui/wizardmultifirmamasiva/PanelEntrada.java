@@ -53,7 +53,7 @@ final class PanelEntrada extends JAccessibilityDialogWizard {
         /** Constructor.
          * @param ventanas Lista de ventanas que componen el wizard.
          * @param posicion posicion de la ventana donde se inserta esta botonera. */
-        public Botonera(final List<JDialogWizard> ventanas, final int posicion) {
+        Botonera(final List<JDialogWizard> ventanas, final int posicion) {
             super(ventanas, posicion);
         }
 
@@ -61,7 +61,7 @@ final class PanelEntrada extends JAccessibilityDialogWizard {
         @Override
         protected void anteriorActionPerformed(final JButton anterior, final JButton siguiente, final JButton finalizar) {
 
-            if (PanelEntrada.this.salto) {
+            if (PanelEntrada.this.isSalto()) {
                 // Se asigna un boton por defecto al wizard
                 if (getVentanas().get(1) instanceof JAccessibilityDialogWizard) {
                     getVentanas().get(1)
@@ -84,13 +84,13 @@ final class PanelEntrada extends JAccessibilityDialogWizard {
 
             if (continuar) {
                 // Carga las extensiones
-                ((PanelMultifirmaMasiva) getVentanas().get(4)).setExtensiones(PanelEntrada.this.campoExtensiones.getText());
+                ((PanelMultifirmaMasiva) getVentanas().get(4)).setExtensiones(PanelEntrada.this.getCampoExtensiones().getText());
 
                 // Carga el directorio de entrada
-                ((PanelMultifirmaMasiva) getVentanas().get(4)).setDirectorioEntrada(PanelEntrada.this.campoDirectorio.getText());
+                ((PanelMultifirmaMasiva) getVentanas().get(4)).setDirectorioEntrada(PanelEntrada.this.getCampoDirectorio().getText());
 
                 // Indica si se deben incluir los subdirectorios
-                ((PanelMultifirmaMasiva) getVentanas().get(4)).setIncluir(PanelEntrada.this.checkIncluir.isSelected());
+                ((PanelMultifirmaMasiva) getVentanas().get(4)).setIncluir(PanelEntrada.this.getCheckIncluir().isSelected());
 
                 super.siguienteActionPerformed(anterior, siguiente, finalizar);
             }
@@ -102,20 +102,33 @@ final class PanelEntrada extends JAccessibilityDialogWizard {
 
     /** Caja de texto donde se guarda el directorio. */
     private final JTextField campoDirectorio = new JTextField();
+    JTextField getCampoDirectorio() {
+    	return this.campoDirectorio;
+    }
 
     /** Caja de texto para escribir las extensiones. */
     private final JTextField campoExtensiones = new JTextField();
+    JTextField getCampoExtensiones() {
+    	return this.campoExtensiones;
+    }
 
     /** Checkbox con el texto "Incluir subdirectorios...". */
     private final JCheckBox checkIncluir = new JCheckBox();
+    JCheckBox getCheckIncluir() {
+    	return this.checkIncluir;
+    }
 
     /** Indica si el asistente se ha saltado la pagina anterior. */
     private boolean salto = false;
+    boolean isSalto() {
+    	return this.salto;
+    }
 
     /** Constructor. */
     PanelEntrada() {
         initComponents();
     }
+
     /** Comprueba que el fichero seleccionado es valido y guarda su nombre en el campo de texto */
     void examinarActionPerformed() {
         final File selectedFile = SelectionDialog.showDirOpenDialog(this, Messages.getString("PrincipalGUI.chooser.dir.title")); //$NON-NLS-1$
@@ -123,6 +136,7 @@ final class PanelEntrada extends JAccessibilityDialogWizard {
             this.campoDirectorio.setText(selectedFile.getAbsolutePath());
         }
     }
+
     /** Relacion minima para el redimensionado de componentes. */
     @Override
     public int getMinimumRelation() {
@@ -168,9 +182,9 @@ final class PanelEntrada extends JAccessibilityDialogWizard {
 
         // Caja de texto donde se guarda el directorio de entrada
         this.campoDirectorio.setToolTipText(Messages.getString("Wizard.multifirma.ventana3.directorio.description")); //$NON-NLS-1$
-        this.campoDirectorio.getAccessibleContext().setAccessibleName(etiquetaFirma.getText() + " "
+        this.campoDirectorio.getAccessibleContext().setAccessibleName(etiquetaFirma.getText() + " " //$NON-NLS-1$
                                                                       + this.campoDirectorio.getToolTipText()
-                                                                      + "ALT + D.");
+                                                                      + "ALT + D."); //$NON-NLS-1$
         this.campoDirectorio.getAccessibleContext().setAccessibleDescription(this.campoDirectorio.getToolTipText());
         if (GeneralConfig.isBigCaret()) {
             final Caret caret = new ConfigureCaret();
@@ -197,7 +211,7 @@ final class PanelEntrada extends JAccessibilityDialogWizard {
         examinar.setMnemonic(KeyEvent.VK_E);
         examinar.setText(Messages.getString("PrincipalGUI.Examinar")); //$NON-NLS-1$
         examinar.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description")); //$NON-NLS-1$
-        examinar.getAccessibleContext().setAccessibleName(examinar.getText() + " " + examinar.getToolTipText());
+        examinar.getAccessibleContext().setAccessibleName(examinar.getText() + " " + examinar.getToolTipText()); //$NON-NLS-1$
         examinar.getAccessibleContext().setAccessibleDescription(examinar.getToolTipText());
         examinar.addActionListener(new ActionListener() {
             /** Accion del boton examinar. */
@@ -222,7 +236,7 @@ final class PanelEntrada extends JAccessibilityDialogWizard {
         // Checkbox con el texto "Incluir subdirectorios..."
         this.checkIncluir.setText(Messages.getString("Wizard.multifirma.ventana3.check.incluir")); //$NON-NLS-1$
         this.checkIncluir.setToolTipText(Messages.getString("Wizard.multifirma.ventana3.check.incluir.description")); //$NON-NLS-1$
-        this.checkIncluir.getAccessibleContext().setAccessibleName(this.checkIncluir.getText() + " " + this.checkIncluir.getToolTipText());
+        this.checkIncluir.getAccessibleContext().setAccessibleName(this.checkIncluir.getText() + " " + this.checkIncluir.getToolTipText()); //$NON-NLS-1$
         this.checkIncluir.getAccessibleContext().setAccessibleDescription(this.checkIncluir.getToolTipText());
         this.checkIncluir.setMnemonic(KeyEvent.VK_I); // Se asigna un atajo al checkbox
         Utils.remarcar(this.checkIncluir);
@@ -245,10 +259,10 @@ final class PanelEntrada extends JAccessibilityDialogWizard {
         c.gridy = 4;
 
         // Caja de texto para escribir las extensiones
-        this.campoExtensiones.setToolTipText(Messages.getString("Wizard.multifirma.ventana3.aplicar.description"));
-        this.campoExtensiones.getAccessibleContext().setAccessibleName(etiquetaAplicar.getText() + " "
+        this.campoExtensiones.setToolTipText(Messages.getString("Wizard.multifirma.ventana3.aplicar.description")); //$NON-NLS-1$
+        this.campoExtensiones.getAccessibleContext().setAccessibleName(etiquetaAplicar.getText() + " " //$NON-NLS-1$
                                                                        + this.campoExtensiones.getToolTipText()
-                                                                       + "ALT + P.");
+                                                                       + "ALT + P."); //$NON-NLS-1$
         this.campoExtensiones.getAccessibleContext().setAccessibleDescription(etiquetaAplicar.getToolTipText());
         if (GeneralConfig.isBigCaret()) {
             final Caret caret = new ConfigureCaret();

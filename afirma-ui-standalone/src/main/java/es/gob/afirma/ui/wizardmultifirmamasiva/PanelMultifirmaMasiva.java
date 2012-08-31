@@ -155,22 +155,22 @@ final class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
     /** Indica si debe emitir un beep al finalizar */
     private final boolean beep;
 
-    // Caja de texto donde se guarda el nombre del directorio de firmas
+    /** Caja de texto donde se guarda el nombre del directorio de firmas. */
     private final JTextField campoDirectorio = new JTextField();
 
-    // Caja de texto donde se guarda el nombre del fichero log
+    /** Caja de texto donde se guarda el nombre del fichero log. */
     private final JTextField campoFicheroLog = new JTextField();
 
-    // Checkbox con el texto "Sobrescribir ficheros"
+    /** Checkbox con el texto "Sobrescribir ficheros". */
     private final JCheckBox checkSobrescribir = new JCheckBox();
 
     /** Ruta del directorio de entrada */
     private String directorioEntrada;
 
-    // Etiqueta con el texto "Fichero de log"
+    /** Etiqueta con el texto "Fichero de log". */
     private final JLabel etiquetaFichero = new JLabel();
 
-    // Boton para seleccionar el fichero de log
+    /** Boton para seleccionar el fichero de log. */
     private JButton examinarFichero = new JButton();
 
     /** Cadena con las extensiones de los ficheros a firmar */
@@ -210,7 +210,9 @@ final class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         final File selectedFile = SelectionDialog.showDirOpenDialog(this, Messages.getString("PrincipalGUI.chooser.dir.outtitle")); //$NON-NLS-1$
         if (selectedFile != null) {
             this.campoDirectorio.setText(selectedFile.getAbsolutePath());
-            this.campoFicheroLog.setText(new File(selectedFile.getAbsoluteFile().getParent(), "result.txt").getAbsolutePath()); //$NON-NLS-1$
+            if ("".equals(this.campoFicheroLog.getText().trim())) { //$NON-NLS-1$
+            	this.campoFicheroLog.setText(new File(selectedFile.getAbsoluteFile().getParent(), "result.txt").getAbsolutePath()); //$NON-NLS-1$
+            }
         }
 
         // Asignacion de mnemonico
@@ -385,7 +387,6 @@ final class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         c.gridy = 4;
 
         // Caja de texto donde se guarda el nombre del fichero log
-        this.campoFicheroLog.setEnabled(false);
         this.campoFicheroLog.setToolTipText(Messages.getString("Wizard.multifirma.ventana4.log.description")); //$NON-NLS-1$
         this.campoFicheroLog.getAccessibleContext().setAccessibleName(this.etiquetaFichero.getText() + " " //$NON-NLS-1$
                                                                       + this.campoFicheroLog.getToolTipText()
@@ -410,7 +411,6 @@ final class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         final JPanel panelExaminarFichero = new JPanel(new GridLayout(1, 1));
         // Boton examinar fichero log
         this.examinarFichero = new JButton();
-        this.examinarFichero.setEnabled(false);
         this.examinarFichero.setMnemonic(0); // mnemonico vacio puesto que por defecto esta deshabilitado
         this.examinarFichero.setText(Messages.getString("PrincipalGUI.Examinar")); //$NON-NLS-1$
         this.examinarFichero.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description")); //$NON-NLS-1$
@@ -462,9 +462,11 @@ final class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         // Comprobacion de las extensiones.
         final String log = this.campoFicheroLog.getText();
         if (log == null || log.equals("")) { //$NON-NLS-1$
-            CustomDialog.showMessageDialog(this,
-                                           true,
-                                           Messages.getString("Wizard.multifirma.error.fichero.log"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+            CustomDialog.showMessageDialog(
+        		this,
+                true,
+                Messages.getString("Wizard.multifirma.error.fichero.log"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE //$NON-NLS-1$ //$NON-NLS-2$
+    		);
             return false;
         }
 

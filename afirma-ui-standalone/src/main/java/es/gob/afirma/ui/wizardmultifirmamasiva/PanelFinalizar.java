@@ -39,6 +39,7 @@ final class PanelFinalizar extends JAccessibilityDialogWizard {
         initComponents();
     }
 
+    /** {@inheritDoc} */
     @Override
     public int getMinimumRelation() {
         return 9;
