@@ -85,10 +85,10 @@ public class MainOptionsPane {
     /** Identificador de la pol&iacute;tica (puede ser una URN, OID,...). */
     private final JTextField textPolicyIdentifier;
 
-    /** Etiqueta del cualificador de la pol&iacute;tica. */
+    /** Etiqueta del calificador de la pol&iacute;tica. */
     private final JLabel policyQualifierLabel;
 
-    /** Cualificador de la pol&iacute;tica de firma. */
+    /** Calificador de la pol&iacute;tica de firma. */
     private final JTextField textPolicyQualifier;
 
     /** Etiqueta de la huella digital SHA 1 de la pol&iacute;tica. */
@@ -262,7 +262,7 @@ public class MainOptionsPane {
         policyPanel.add(this.textPolicyIdentifier, c2);
         c2.gridy = c2.gridy + 1;
 
-        this.policyQualifierLabel = new JLabel("Cualificador de la pol\u00EDtica de firma (URL):");
+        this.policyQualifierLabel = new JLabel("Calificador de la pol\u00EDtica de firma (URL):");
         this.policyQualifierLabel.setEnabled(false);
 
         // Accesibilidad -- Lectores de pantalla

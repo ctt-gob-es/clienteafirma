@@ -74,7 +74,7 @@ public final class AdESPolicy {
                 this.policyQualifier = new URL(qualifier);
             }
             catch (final Exception e) {
-                throw new IllegalArgumentException("El cualificador de la politica debe ser una URL valida", e); //$NON-NLS-1$
+                throw new IllegalArgumentException("El calificador de la politica debe ser una URL valida", e); //$NON-NLS-1$
             }
         }
 
@@ -143,8 +143,8 @@ public final class AdESPolicy {
         return this.policyIdentifierHashAlgorithm;
     }
 
-    /** Obtiene el cualificador de la pol&iacute;tica de firma.
-     * @return Cualificador de la pol&iacute;tica de firma
+    /** Obtiene el calificador de la pol&iacute;tica de firma.
+     * @return Calificador de la pol&iacute;tica de firma
      */
     public URL getPolicyQualifier() {
         return this.policyQualifier;
