@@ -400,7 +400,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 				);
         		// No nos interesa el resultado, solo si construye sin excepciones
 				try {
-					new Oid(PreferencesPanel.this.getXadesPolicyIdentifier().getText().replace("urn:oid:", "")); //$NON-NLS-1$ //$NON-NLS-2$
+					new Oid(PreferencesPanel.this.getPadesPolicyIdentifier().getText().replace("urn:oid:", "")); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 				catch (final GSSException e) {
 					throw new AOException("El identificador debe ser un OID"); //$NON-NLS-1$
@@ -428,7 +428,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 				);
         		// No nos interesa el resultado, solo si construye sin excepciones
 				try {
-					new Oid(PreferencesPanel.this.getXadesPolicyIdentifier().getText().replace("urn:oid:", "")); //$NON-NLS-1$ //$NON-NLS-2$
+					new Oid(PreferencesPanel.this.getCadesPolicyIdentifier().getText().replace("urn:oid:", "")); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 				catch (final GSSException e) {
 					throw new AOException("El identificador debe ser un OID"); //$NON-NLS-1$
