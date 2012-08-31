@@ -214,14 +214,6 @@ final class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
             	this.campoFicheroLog.setText(new File(selectedFile.getAbsoluteFile().getParent(), "result.txt").getAbsolutePath()); //$NON-NLS-1$
             }
         }
-
-        // Asignacion de mnemonico
-        this.etiquetaFichero.setDisplayedMnemonic(KeyEvent.VK_F);
-        // Activamos el boton de examinar el directorio del log y el campo para introducirlo
-        this.examinarFichero.setEnabled(true);
-        this.examinarFichero.setMnemonic(KeyEvent.VK_X); // mnemonico asignado puesto que se habilita el boton
-        this.campoFicheroLog.setEnabled(true);
-        this.etiquetaFichero.setFocusable(false); // Ahora el elemento focusable sera el campo de texto, no la etiqueta
     }
 
     /** Comprueba que el archivo log seleccionado es correcto y guarda su nombre en el campo de texto */
@@ -374,10 +366,14 @@ final class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         // Etiqueta con el texto "Fichero de log"
         this.etiquetaFichero.setText(Messages.getString("Wizard.multifirma.ventana4.log")); //$NON-NLS-1$
         this.etiquetaFichero.setFocusable(true); // Se hace focusable por temas de accesibilidad
-        this.etiquetaFichero.getAccessibleContext()
-                            .setAccessibleName(this.etiquetaFichero.getText() + Messages.getString("Wizard.multifirma.ventana4.log.description") //$NON-NLS-1$
-                                               + " " //$NON-NLS-1$
-                                               + Messages.getString("Wizard.multifirma.chooserLog.disabled")); //$NON-NLS-1$
+        this.etiquetaFichero.setDisplayedMnemonic(KeyEvent.VK_F);
+        this.etiquetaFichero.setLabelFor(this.campoFicheroLog);
+        this.etiquetaFichero.getAccessibleContext().setAccessibleName(
+    		this.etiquetaFichero.getText() +
+    			Messages.getString("Wizard.multifirma.ventana4.log.description") + //$NON-NLS-1$
+    			" " + //$NON-NLS-1$
+                Messages.getString("Wizard.multifirma.chooserLog.disabled") //$NON-NLS-1$
+        );
         Utils.setContrastColor(this.etiquetaFichero);
         Utils.setFontBold(this.etiquetaFichero);
         panelCentral.add(this.etiquetaFichero, c);
@@ -387,10 +383,13 @@ final class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         c.gridy = 4;
 
         // Caja de texto donde se guarda el nombre del fichero log
+        // Asignacion de mnemonico
         this.campoFicheroLog.setToolTipText(Messages.getString("Wizard.multifirma.ventana4.log.description")); //$NON-NLS-1$
-        this.campoFicheroLog.getAccessibleContext().setAccessibleName(this.etiquetaFichero.getText() + " " //$NON-NLS-1$
-                                                                      + this.campoFicheroLog.getToolTipText()
-                                                                      + "ALT + F"); //$NON-NLS-1$
+        this.campoFicheroLog.getAccessibleContext().setAccessibleName(
+    		this.etiquetaFichero.getText() + " " //$NON-NLS-1$
+            	+ this.campoFicheroLog.getToolTipText()
+                + "ALT + F" //$NON-NLS-1$
+        );
         this.campoFicheroLog.getAccessibleContext().setAccessibleDescription(this.etiquetaFichero.getToolTipText());
         if (GeneralConfig.isBigCaret()) {
             final Caret caret = new ConfigureCaret();
@@ -409,9 +408,10 @@ final class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         c.gridx = 1;
 
         final JPanel panelExaminarFichero = new JPanel(new GridLayout(1, 1));
+
         // Boton examinar fichero log
         this.examinarFichero = new JButton();
-        this.examinarFichero.setMnemonic(0); // mnemonico vacio puesto que por defecto esta deshabilitado
+        this.examinarFichero.setMnemonic(KeyEvent.VK_X); // mnemonico asignado puesto que se habilita el boton
         this.examinarFichero.setText(Messages.getString("PrincipalGUI.Examinar")); //$NON-NLS-1$
         this.examinarFichero.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description")); //$NON-NLS-1$
         this.examinarFichero.getAccessibleContext().setAccessibleName(this.examinarFichero.getText() + " " + this.examinarFichero.getToolTipText()); //$NON-NLS-1$

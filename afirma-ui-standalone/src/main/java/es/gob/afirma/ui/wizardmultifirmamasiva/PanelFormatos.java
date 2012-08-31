@@ -59,20 +59,20 @@ final class PanelFormatos extends JAccessibilityDialogWizard implements ItemList
             super(ventanas, posicion);
         }
 
-        /** Accion para el boton siguiente. */
+        /** Accion para el bot&oacute;n siguiente. */
         @Override
         protected void siguienteActionPerformed(final JButton anterior, final JButton siguiente, final JButton finalizar) {
 
             // Carga el formato de firmado
-            final String formato = PanelFormatos.this.formatosV.get(PanelFormatos.this.comboFormatos.getSelectedIndex());
+            final String formato = PanelFormatos.getFormats().get(PanelFormatos.this.getComboFormatos().getSelectedIndex());
             ((PanelMultifirmaMasiva) getVentanas().get(4)).setAlgoritmo(formato);
 
-            if (PanelFormatos.this.radioFirma.isSelected()) {
+            if (PanelFormatos.this.getRadioFirma().isSelected()) {
                 // Carga Firma
                 ((PanelMultifirmaMasiva) getVentanas().get(4)).setTipo(0);
 
                 // Modo de la firma (solo si es CADES)
-                ((PanelMultifirmaMasiva) getVentanas().get(4)).setModoFormato(PanelFormatos.this.checkFormato.isSelected());
+                ((PanelMultifirmaMasiva) getVentanas().get(4)).setModoFormato(PanelFormatos.this.getCheckFormato().isSelected());
 
                 // Registramos en la pagina 3 que hemos saltado la 2
                 ((PanelEntrada) getVentanas().get(3)).setSalto(true);
@@ -101,7 +101,7 @@ final class PanelFormatos extends JAccessibilityDialogWizard implements ItemList
                 // Nos saltamos la pagina 2
                 getVentanas().get(indice).setVisibleAndHide(true, getVentanas().get(1));
             }
-            else if (PanelFormatos.this.radioCofirma.isSelected()) {
+            else if (PanelFormatos.this.getRadioCofirma().isSelected()) {
                 // Carga Cofirma
                 ((PanelMultifirmaMasiva) getVentanas().get(4)).setTipo(1);
 
@@ -125,29 +125,50 @@ final class PanelFormatos extends JAccessibilityDialogWizard implements ItemList
 
     // Checkbox con el modo del formato
     private final JCheckBox checkFormato = new JCheckBox();
+    JCheckBox getCheckFormato() {
+    	return this.checkFormato;
+    }
 
     // Combo con los formatos
     private final JComboBox comboFormatos = new JComboBox();
+    JComboBox getComboFormatos() {
+    	return this.comboFormatos;
+    }
+
 
     // Etiqueta para los formatos
     private final JLabel etiquetaFormato = new JLabel();
 
     /** Listado con las constantes de los formatos del combo. */
-    private final List<String> formatosV = new ArrayList<String>(Arrays.asList(AOSignConstants.SIGN_FORMAT_XADES_DETACHED,
-                                                                       AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING,
-                                                                       AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED,
-                                                                       AOSignConstants.SIGN_FORMAT_CADES,
-                                                                       AOSignConstants.SIGN_FORMAT_PDF,
-                                                                       AOSignConstants.SIGN_FORMAT_ODF,
-                                                                       AOSignConstants.SIGN_FORMAT_OOXML));
+    private static final List<String> FORMATS = new ArrayList<String>(Arrays.asList(
+		AOSignConstants.SIGN_FORMAT_XADES_DETACHED,
+        AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING,
+        AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED,
+        AOSignConstants.SIGN_FORMAT_CADES,
+        AOSignConstants.SIGN_FORMAT_PDF,
+        AOSignConstants.SIGN_FORMAT_ODF,
+        AOSignConstants.SIGN_FORMAT_OOXML,
+        AOSignConstants.SIGN_FORMAT_FACTURAE
+    ));
+    static List<String> getFormats() {
+    	return FORMATS;
+    }
+
     // Radio button cofirma
     private final JRadioButton radioCofirma = new JRadioButton();
+    JRadioButton getRadioCofirma() {
+    	return this.radioCofirma;
+    }
 
     // Radio button contrafirma
     private final JRadioButton radioContrafirma = new JRadioButton();
 
     // Radio button firma
     private final JRadioButton radioFirma = new JRadioButton();
+    JRadioButton getRadioFirma() {
+    	return this.radioFirma;
+    }
+
 
     /** Constructor. */
     PanelFormatos() {
@@ -157,22 +178,22 @@ final class PanelFormatos extends JAccessibilityDialogWizard implements ItemList
     /** Carga el combo con los diferentes formatos */
     private void cargarCombo() {
         this.comboFormatos.setModel(new DefaultComboBoxModel(new String[] {
-                                                                           "Firma est\u00E1ndar (XAdES Detached)",
-                                                                           "XAdES Enveloping",
-                                                                           "XAdES Enveloped",
-                                                                           "CAdES",
-                                                                           "PAdES",
-                                                                           "ODF (Open Document Format)",
-                                                                           "OOXML (Office Open XML)"
+               "Firma est\u00E1ndar (XAdES Detached)",
+               "XAdES Enveloping",
+               "XAdES Enveloped",
+               "CAdES",
+               "PAdES",
+               "ODF (Open Document Format)",
+               "OOXML (Office Open XML)",
+               "Factura Electr\u00F3nica"
         }));
     }
 
-    /** Activa y desactiva el checkbox del modo del formato dependiendo de la opcion
+    /** Activa y desactiva el checkbox del modo del formato dependiendo de la opci&oacute;n
      * elegida */
     void checkFormatoModo() {
-        if (this.formatosV.get(this.comboFormatos.getSelectedIndex()).equals(AOSignConstants.SIGN_FORMAT_CADES)) {
-            if (this.radioFirma.isSelected())
-            {
+        if (FORMATS.get(this.comboFormatos.getSelectedIndex()).equals(AOSignConstants.SIGN_FORMAT_CADES)) {
+            if (this.radioFirma.isSelected()) {
                 this.checkFormato.setEnabled(true); // Se habilita el checkbox
             }
             this.checkFormato.setMnemonic(KeyEvent.VK_I); // Se asigna un atajo al checkbox
@@ -181,15 +202,25 @@ final class PanelFormatos extends JAccessibilityDialogWizard implements ItemList
             this.checkFormato.setEnabled(false);
             this.checkFormato.setMnemonic(0); // Se quita el atajo al deshabilitar el checkbox
         }
+        // En factura no se admiten multifirmas
+        if (FORMATS.get(this.comboFormatos.getSelectedIndex()).equals(AOSignConstants.SIGN_FORMAT_FACTURAE)) {
+        	this.radioFirma.setSelected(true);
+        	this.radioCofirma.setEnabled(false);
+        	this.radioContrafirma.setEnabled(false);
+        }
+        else {
+        	this.radioCofirma.setEnabled(true);
+        	this.radioContrafirma.setEnabled(true);
+        }
     }
 
-    /** Relacion minima para el redimensionado de componentes. */
+    /** Relaci&oacute;n m&iacute;nima para el redimensionado de componentes. */
     @Override
     public int getMinimumRelation() {
         return 8;
     }
 
-    /** Inicializacion de componentes */
+    /** Inicializaci&oacute;n de componentes */
     private void initComponents() {
         // Titulo de la ventana
         setTitulo(Messages.getString("Wizard.multifirma.titulo.ventana")); //$NON-NLS-1$
@@ -240,7 +271,7 @@ final class PanelFormatos extends JAccessibilityDialogWizard implements ItemList
         // Radio button firma
         this.radioFirma.setText(Messages.getString("Wizard.multifirma.ventana1.radio.firma")); //$NON-NLS-1$
         this.radioFirma.getAccessibleContext()
-        .setAccessibleName(this.radioFirma.getText() + " " + Messages.getString("Wizard.multifirma.ventana1.radio.firma.description")); //$NON-NLS-2$
+        .setAccessibleName(this.radioFirma.getText() + " " + Messages.getString("Wizard.multifirma.ventana1.radio.firma.description"));  //$NON-NLS-1$//$NON-NLS-2$
         this.radioFirma.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana1.radio.firma.description")); //$NON-NLS-1$
         this.radioFirma.addItemListener(this);
         this.radioFirma.setName("radioFirma"); //$NON-NLS-1$
@@ -260,7 +291,7 @@ final class PanelFormatos extends JAccessibilityDialogWizard implements ItemList
         // Radio button cofirma
         this.radioCofirma.setText(Messages.getString("Wizard.multifirma.ventana1.radio.cofirma")); //$NON-NLS-1$
         this.radioCofirma.getAccessibleContext()
-        .setAccessibleName(this.radioCofirma.getText() + " " + Messages.getString("Wizard.multifirma.ventana1.radio.cofirma.description")); //$NON-NLS-2$
+        .setAccessibleName(this.radioCofirma.getText() + " " + Messages.getString("Wizard.multifirma.ventana1.radio.cofirma.description"));  //$NON-NLS-1$//$NON-NLS-2$
         this.radioCofirma.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana1.radio.cofirma.description")); //$NON-NLS-1$
         this.radioCofirma.addItemListener(this);
         this.radioCofirma.setName("radioCofirma"); //$NON-NLS-1$
@@ -279,7 +310,7 @@ final class PanelFormatos extends JAccessibilityDialogWizard implements ItemList
         // Radio button contrafirma
         this.radioContrafirma.setText(Messages.getString("Wizard.multifirma.ventana1.radio.contrafirma")); //$NON-NLS-1$
         this.radioContrafirma.getAccessibleContext()
-        .setAccessibleName(this.radioContrafirma.getText() + " " + Messages.getString("Wizard.multifirma.ventana1.radio.contrafirma.description")); //$NON-NLS-2$
+        .setAccessibleName(this.radioContrafirma.getText() + " " + Messages.getString("Wizard.multifirma.ventana1.radio.contrafirma.description"));  //$NON-NLS-1$//$NON-NLS-2$
         this.radioContrafirma.getAccessibleContext()
         .setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana1.radio.contrafirma.description")); //$NON-NLS-1$
         this.radioContrafirma.addItemListener(this);
@@ -317,9 +348,9 @@ final class PanelFormatos extends JAccessibilityDialogWizard implements ItemList
 
         // Combo con los formatos
         this.comboFormatos.setToolTipText(Messages.getString("Firma.formato.description")); //$NON-NLS-1$
-        this.comboFormatos.getAccessibleContext().setAccessibleName(this.etiquetaFormato.getText() + " "
+        this.comboFormatos.getAccessibleContext().setAccessibleName(this.etiquetaFormato.getText() + " " //$NON-NLS-1$
                                                                     + this.comboFormatos.getToolTipText()
-                                                                    + "ALT + R.");
+                                                                    + "ALT + R."); //$NON-NLS-1$
         this.comboFormatos.getAccessibleContext().setAccessibleDescription(this.comboFormatos.getToolTipText());
         this.comboFormatos.addActionListener(new ActionListener() {
             @Override
@@ -347,9 +378,9 @@ final class PanelFormatos extends JAccessibilityDialogWizard implements ItemList
         final JPanel panelCheckFormato = new JPanel(new GridLayout(1, 1));
         // Checkbox con el modo de CADES
         this.checkFormato.setSelected(true);
-        this.checkFormato.setText(Messages.getString("Firma.modo.formato")); // NOI18N
+        this.checkFormato.setText(Messages.getString("Firma.modo.formato")); // NOI18N //$NON-NLS-1$
         this.checkFormato.setToolTipText(Messages.getString("Firma.modo.formato.description")); // NOI18N //$NON-NLS-1$
-        this.checkFormato.getAccessibleContext().setAccessibleName(this.checkFormato.getText() + " " + this.checkFormato.getToolTipText()); // NOI18N
+        this.checkFormato.getAccessibleContext().setAccessibleName(this.checkFormato.getText() + " " + this.checkFormato.getToolTipText()); // NOI18N //$NON-NLS-1$
         this.checkFormato.getAccessibleContext().setAccessibleDescription(this.checkFormato.getToolTipText()); // NOI18N
         this.checkFormato.setMnemonic(0); // Se quita el atajo al deshabilitar el checkbox
         this.checkFormato.setEnabled(false);
@@ -365,8 +396,8 @@ final class PanelFormatos extends JAccessibilityDialogWizard implements ItemList
         HelpUtils.enableHelpKey(this.radioFirma, "multifirma.masiva.wizard.operacion"); //$NON-NLS-1$
         HelpUtils.enableHelpKey(this.radioContrafirma, "multifirma.masiva.wizard.operacion"); //$NON-NLS-1$
         HelpUtils.enableHelpKey(this.radioCofirma, "multifirma.masiva.wizard.operacion"); //$NON-NLS-1$
-        HelpUtils.enableHelpKey(this.comboFormatos, "multifirma.masiva.wizard.formato");
-        HelpUtils.enableHelpKey(this.checkFormato, "multifirma.masiva.wizard.formato.modo");
+        HelpUtils.enableHelpKey(this.comboFormatos, "multifirma.masiva.wizard.formato"); //$NON-NLS-1$
+        HelpUtils.enableHelpKey(this.checkFormato, "multifirma.masiva.wizard.formato.modo"); //$NON-NLS-1$
     }
 
     /** Activa y desactiva el combo en funcion de la operacion */
@@ -374,17 +405,17 @@ final class PanelFormatos extends JAccessibilityDialogWizard implements ItemList
     public void itemStateChanged(final ItemEvent e) {
         final JRadioButton radio = (JRadioButton) e.getSource();
         // El listado de seleccion de formato solo se mantiene activo para la firma y la cofirma
-        if (radio.getName().equals("radioFirma")) {
+        if (radio.getName().equals("radioFirma")) { //$NON-NLS-1$
             this.comboFormatos.setEnabled(true);
             this.etiquetaFormato.setDisplayedMnemonic(KeyEvent.VK_R); // Se asigna un atajo a la etiqueta
-            if (this.comboFormatos.getItemCount() != 0 && this.formatosV.get(this.comboFormatos.getSelectedIndex())
+            if (this.comboFormatos.getItemCount() != 0 && this.FORMATS.get(this.comboFormatos.getSelectedIndex())
                     .equals(AOSignConstants.SIGN_FORMAT_CADES)) {
                 this.checkFormato.setSelected(true);
                 this.checkFormato.setMnemonic(KeyEvent.VK_I); // Se asigna un atajo al checkbox
                 this.checkFormato.setEnabled(true);
             }
         }
-        else if (radio.getName().equals("radioCofirma")) {
+        else if (radio.getName().equals("radioCofirma")) { //$NON-NLS-1$
             this.comboFormatos.setEnabled(true);
             this.etiquetaFormato.setDisplayedMnemonic(KeyEvent.VK_R); // Se asigna un atajo a la etiqueta
             this.checkFormato.setSelected(true);
