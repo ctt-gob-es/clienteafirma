@@ -423,7 +423,8 @@ public final class Utils {
 				component.setForeground(Color.WHITE);
 				component.setBackground(Color.BLACK);
 			}
-		} else {
+		}
+		else {
 			if (component instanceof JStatusBar){
 				((JLabel)component.getComponent(0)).setForeground(Color.BLACK);
 			}
@@ -479,25 +480,6 @@ public final class Utils {
 			}
 		}
 	}
-
-	 /** Recupera una de las preferencias establecidas para la aplicaci&oacute;n.
-     * @param key
-     *        Clave de la preferencia.
-     * @param defaultValue
-     *        Valor por defecto.
-     * @return Devuelve el valor de la preferencia indicada o {@code defaultValue} si no est&aacute;a establecida. */
-    /*public static String getPreference(final String key, final String defaultValue, Preferences preferences) {
-        return preferences.get(key, defaultValue);
-    }*/
-
-    /** Establece una preferencia para la aplicaci&oacute;n.
-     * @param key
-     *        Clave de la preferencia.
-     * @param value
-     *        Valor asignado. */
-    /*public static void setPreference(final String key, final String value, Preferences preferences) {
-        preferences.put(key, value);
-    }*/
 
     /** Muestra un di&aacute;logo para que el usuario seleccione entre los
      * certificados mostrados. Es posible indicar que s&ocuate;lo puede haber un
@@ -689,7 +671,7 @@ public final class Utils {
     }
 
     /**
-     * Muestra u oculta un tooltip relacionado con un bot&oacute;n.
+     * Muestra u oculta un <i>tooltip</i> relacionado con un bot&oacute;n.
      * @param show Boolean que indica si se muestra el tooltip
      * @param tip JWindow que muestra el contenido del tooltip
      * @param boton JButton al que se relaciona el tooltip

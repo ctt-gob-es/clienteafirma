@@ -21,9 +21,13 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import org.ietf.jgss.Oid;
+
+import es.gob.afirma.ui.utils.CustomDialog;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.Messages;
@@ -64,7 +68,7 @@ public class MainOptionsPane {
     /** Algoritmo de huella digital utilizado por defecto para la pol&iacute;tica. */
     public static final String DEFAULT_POLICY_HASH_ALGORITHM = "http://www.w3.org/2000/09/xmldsig#sha1"; //$NON-NLS-1$
 
-    /** Casilla para activar el uso de politica de firma. */
+    /** Casilla para activar el uso de pol&iacute;tica de firma. */
     private final JCheckBox checkAddPolicy;
 
     /** Casilla de verificacion con el modo de vista a mostrar. */
@@ -476,4 +480,31 @@ public class MainOptionsPane {
         Opciones.setUpdate(true);
         restore(this.panel);
     }
+
+    /** Comprueba si el identificador del la pol&iacute;tica de firma es un OID o un URN de tipo OID
+     * y advierte al usuario en caso contrario.
+     * @return <code>true</code> si el identificador del la pol&iacute;tica de firma es un OID o un URN de tipo OID,
+     *         <code>false</code> en caso contrario */
+    public boolean checkAboutBadPolicyId() {
+    	if (this.checkAddPolicy.isSelected()) {
+			try {
+				new Oid(this.textPolicyIdentifier.getText().replace("urn:oid:", "")); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			catch(final Exception e) {
+				CustomDialog.showMessageDialog(
+					this.textPolicyIdentifier,
+					true,
+					"El identificador de la pol\u00EDtica de firma debe ser un OID o un URN de tipo OID",
+					"Identificador incorrecto para la pol\u00EDtica de firma",
+					JOptionPane.ERROR_MESSAGE
+				);
+				this.textPolicyIdentifier.requestFocus();
+				this.textPolicyIdentifier.setSelectionStart(0);
+				this.textPolicyIdentifier.setSelectionEnd(this.textPolicyIdentifier.getText().length());
+				return false;
+			}
+    	}
+    	return true;
+    }
+
 }

@@ -6,6 +6,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.logging.Logger;
+import java.util.prefs.BackingStoreException;
 
 import es.gob.afirma.ui.principal.AccessibilityOptionsPane;
 import es.gob.afirma.ui.principal.ContextOptionsPane;
@@ -15,6 +17,8 @@ import es.gob.afirma.ui.principal.MainOptionsPane;
 /** Gestor de perfiles de usuario.
  * @author Carlos Gamuci */
 public final class ProfileManager {
+
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private ProfileManager() {
 		// No permitimos la instanciacion
@@ -201,22 +205,26 @@ public final class ProfileManager {
      * @param config Configuraci&oacute;n que se desea almacenar.
      * @throws IllegalArgumentException Cuando se indique un nombre de fichero no v&aacute;lido. */
     public static void saveConfiguration(final String id, final String name, final Properties config) {
-
         if (id == null) {
             return;
         }
-
         if (name == null || name.indexOf('<') != -1 || name.indexOf('>') != -1) {
             throw new IllegalArgumentException();
         }
-
         final String profilePrefix = PREFIX_KEY + id;
         for (final String[] element : CONVERSE_VALUES) {
             Main.getPreferences().put(profilePrefix + element[0], config.getProperty(element[1], element[2]));
         }
         Main.getPreferences().put(profilePrefix + KEY_PROFILE_NAME, name.trim());
-
         addNewId(id);
+	    try {
+			Main.getPreferences().flush();
+		}
+	    catch (final BackingStoreException e) {
+			LOGGER.warning(
+				"No se han podido guardar las preferencias de configuracion de la aplicacion: " + e //$NON-NLS-1$
+			);
+		}
     }
 
     private static void addNewId(final String id) {
@@ -240,18 +248,23 @@ public final class ProfileManager {
     /** Elimina un perfil previamente creado.
      * @param id Identificador del perfil que se desea eliminar. */
     public static void removeConfiguration(final String id) {
-
         if (id == null) {
             return;
         }
-
         final String profilePrefix = PREFIX_KEY + id;
         for (final String[] element : CONVERSE_VALUES) {
             Main.getPreferences().remove(profilePrefix + element[0]);
         }
         Main.getPreferences().remove(profilePrefix + KEY_PROFILE_NAME);
-
         removeId(id);
+	    try {
+			Main.getPreferences().flush();
+		}
+	    catch (final BackingStoreException e) {
+			LOGGER.warning(
+				"No se han podido guardar las preferencias de configuracion de la aplicacion: " + e //$NON-NLS-1$
+			);
+		}
     }
 
     private static void removeId(final String id) {
@@ -333,6 +346,14 @@ public final class ProfileManager {
         else {
             Main.getPreferences().put(KEY_LAST_PROFILE_NAME, name);
         }
+	    try {
+			Main.getPreferences().flush();
+		}
+	    catch (final BackingStoreException e) {
+			LOGGER.warning(
+				"No se ha podido guardar el nombre del ultimo perfil creado: " + e //$NON-NLS-1$
+			);
+		}
     }
 
     /** Recupera el nombre del &uacute;ltimo perfil cargado por la herramienta. Si se estableci&oacute;

@@ -13,6 +13,7 @@ import java.awt.Component;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.logging.Logger;
+import java.util.prefs.BackingStoreException;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -91,6 +92,14 @@ public final class SelectionDialog {
 			filePath = fc.getSelectedFile();
 			if (filePath.getParentFile() != null) {
 			    Main.getPreferences().put("dialog.load.dir", filePath.getAbsolutePath()); //$NON-NLS-1$
+			    try {
+					Main.getPreferences().flush();
+				}
+			    catch (final BackingStoreException e) {
+					Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+						"No se ha podido guardar el directorio actual de apertura de ficheros" //$NON-NLS-1$
+					);
+				}
 			}
 		}
 
@@ -176,7 +185,7 @@ public final class SelectionDialog {
                 		//Si el primer directorio y el ultimo no son el mismo
                 		if (indexFirstDirectory<indexLastDirectory){
                 			//Se anaden unos puntos suspensivos al primer directorio
-                			filePathTemp = filePathTemp +"...";
+                			filePathTemp = filePathTemp +"..."; //$NON-NLS-1$
                 			//Se anade el ultimo directorio y el nombre del fichero
                 			filePathTemp = filePathTemp + filePath.substring(indexLastDirectory, filePath.length());
                 			//Se sustituye el path completo por el path acortado
@@ -227,6 +236,14 @@ public final class SelectionDialog {
         try {
             if (resultFile != null && resultFile.getParentFile() != null) {
                 Main.getPreferences().put("dialog.save.dir", resultFile.getAbsolutePath()); //$NON-NLS-1$
+			    try {
+					Main.getPreferences().flush();
+				}
+			    catch (final BackingStoreException e) {
+					Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+						"No se ha podido guardar el directorio actual de guardado de ficheros" //$NON-NLS-1$
+					);
+				}
             }
         } catch (final Exception e) {
             /* No hacemos nada */

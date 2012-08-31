@@ -94,6 +94,8 @@ public final class Main {
 		Main.isOSHighContrast = isOSHighContrast;
 	}
 
+	/** Obtiene el objeto de preferencias de configuraci&oacute;n de la aplicaci&oacute;n.
+	 * @return Objeto de preferencias de configuraci&oacute;n de la aplicaci&oacute;n */
 	public static Preferences getPreferences() {
 		return PREFERENCES;
 	}
