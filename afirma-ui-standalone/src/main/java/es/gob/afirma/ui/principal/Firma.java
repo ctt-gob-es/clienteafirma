@@ -59,6 +59,7 @@ import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
 import es.gob.afirma.signers.pades.BadPdfPasswordException;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
+import es.gob.afirma.signers.xades.EFacturaAlreadySignedException;
 import es.gob.afirma.signers.xades.InvalidEFacturaDataException;
 import es.gob.afirma.signers.xmldsig.AOXMLDSigSigner;
 import es.gob.afirma.ui.listeners.ElementDescriptionFocusListener;
@@ -387,6 +388,17 @@ final class Firma extends JPanel {
     				JOptionPane.ERROR_MESSAGE
     			);
         		return;
+            }
+            catch(final EFacturaAlreadySignedException e) {
+                LOGGER.severe("La factura ya tiene una firma electronica y no admite firmas adicionales: " + e); //$NON-NLS-1$
+                CustomDialog.showMessageDialog(
+            		SwingUtilities.getRoot(this),
+                    true,
+                    "La factura ya tiene una firma electr\u00F3nica y no admite firmas adicionales",
+                    Messages.getString("error"),  //$NON-NLS-1$
+                    JOptionPane.ERROR_MESSAGE
+                );
+                return;
             }
             catch(final AOFormatFileException e) {
                 LOGGER.severe("Error al generar la firma electronica: " + e); //$NON-NLS-1$

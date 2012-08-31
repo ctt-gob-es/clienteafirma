@@ -111,12 +111,16 @@ public final class AOFacturaESigner implements AOSigner {
      *   <dd>Pa&iacute;s en el que se realiza la firma</dd>
      * @return Cofirma en formato XAdES
      * @throws InvalidEFacturaDataException Cuando se proporcionan datos que no son una factura electr&oacute;nica
+     * @throws EFacturaAlreadySignedException Cuando se proporciona un factura ya firmada
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     public byte[] sign(final byte[] data,
                        final String algorithm, final PrivateKeyEntry keyEntry,
                        final Properties extraParams) throws AOException {
         if (!isValidDataFile(data)) {
             throw new InvalidEFacturaDataException();
+        }
+        if (isSign(data)) {
+        	throw new EFacturaAlreadySignedException();
         }
         final Properties xParams = (Properties) EXTRA_PARAMS.clone();
         if (extraParams != null) {
@@ -140,6 +144,8 @@ public final class AOFacturaESigner implements AOSigner {
     }
 
     /** Indica si los datos son una factura electr&oacute;nica.
+     * Importante: El que los datos sean una factura electr&oacute;nica no implica que puedan ser firmados, si esta
+     * ya est&aacute; firmada el a&ntilde;adido de una firma adicional invalidar&iacute;a la factura
      * @param is Datos a comprobar
      * @return <code>true</code> si los datos son una <a href="http://www.facturae.es/">factura electr&oacute;nica</a>,
      *         <code>false</code> en caso contrario */

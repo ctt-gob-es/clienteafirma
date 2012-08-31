@@ -607,6 +607,14 @@ public class DirectorySignatureHelper {
                 continue;
             }
             catch (final Exception e) {
+            	// Esta excepcion se comprueba por nombre para no acoplar los proyectos
+            	if ("es.gob.afirma.signers.xades.EFacturaAlreadySignedException".equals(e.getClass().getName())) { //$NON-NLS-1$
+                	LOGGER.warning("La factura ya estaba firmada y no admite firmas adicionales '" + file + "': " + e);   //$NON-NLS-1$//$NON-NLS-2$
+                	this.addLogRegistry(Level.WARNING, "La factura ya estaba firmada y no admite firmas adicionales" + REG_FIELD_SEPARATOR + file);
+                	DirectorySignatureHelper.closeStream(fis);
+                    allOK = false;
+                    continue;
+            	}
                 LOGGER.severe("No ha sido posible firmar el fichero '" + file + "': " + e);   //$NON-NLS-1$//$NON-NLS-2$
                 this.addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.7") + REG_FIELD_SEPARATOR + file); //$NON-NLS-1$
                 DirectorySignatureHelper.closeStream(fis);
@@ -1210,7 +1218,7 @@ public class DirectorySignatureHelper {
             }
             if (this.logHandler != null) {
                 try {
-                    this.logHandler.write(("\n" + typeLog.getName() + ": " + logRegistry).getBytes()); //$NON-NLS-1$ //$NON-NLS-2$
+                    this.logHandler.write(("\r\n" + typeLog.getName() + ": " + logRegistry).getBytes()); //$NON-NLS-1$ //$NON-NLS-2$
                 }
                 catch (final IOException e1) {
                     LOGGER.warning("Se ha pudo insertar una entrada en el log de error: " + e1); //$NON-NLS-1$
@@ -1243,8 +1251,8 @@ public class DirectorySignatureHelper {
 
         if (this.logHandler != null) {
             try {
-                this.logHandler.write(("\n\n" + MassiveSignMessages.getString("DirectorySignatureHelper.25") + ": " + this.warnCount).getBytes()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                this.logHandler.write(("\n" + MassiveSignMessages.getString("DirectorySignatureHelper.26") + ": " + this.errorCount).getBytes()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                this.logHandler.write(("\r\n\r\n" + MassiveSignMessages.getString("DirectorySignatureHelper.25") + ": " + this.warnCount).getBytes()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                this.logHandler.write(("\r\n" + MassiveSignMessages.getString("DirectorySignatureHelper.26") + ": " + this.errorCount).getBytes()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             }
             catch (final Exception e) {
                 LOGGER.warning("No se ha podido almacenar el resultado de la operacion en el fichero de log"); //$NON-NLS-1$
