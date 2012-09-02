@@ -783,7 +783,7 @@ public final class SignPanel extends JPanel {
 
     private final class SignTask extends SwingWorker<Void, Void> {
 
-        public SignTask() {
+        SignTask() {
             super();
         }
 

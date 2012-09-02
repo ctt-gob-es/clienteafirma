@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -40,118 +40,118 @@ import javax.swing.text.html.HTMLDocument;
 import es.gob.afirma.standalone.LookAndFeelManager;
 
 final class EditorFocusManager extends KeyAdapter implements FocusListener, HyperlinkListener, ComponentListener {
-    
+
     private final JEditorPane displayPane;
-    
+
     private final Style linkUnfocusedStyle;
     private final Style linkFocusedStyle;
-    
+
     private final AbstractList<AccessibleHyperlink> hyperLinks;
-    
+
     private int selectedLink = 0;
-    
+
     private final EditorFocusManagerAction hlAction;
-    
-    public EditorFocusManager (final JEditorPane displayPane, final EditorFocusManagerAction efma) {
-        
+
+    EditorFocusManager (final JEditorPane displayPane, final EditorFocusManagerAction efma) {
+
         super();
         this.displayPane = displayPane;
         this.hlAction = efma;
-        
+
         final Font defaultFont = new Font(new JLabel().getFont().getAttributes());
         final String bodyRule = "body { font-family: " + defaultFont.getFamily() + "; font-size: " + defaultFont.getSize() + "pt; }";  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
         ((HTMLDocument) this.displayPane.getDocument()).getStyleSheet().addRule(bodyRule);
-        
+
         if (LookAndFeelManager.HIGH_CONTRAST) {
             final Color color = new JLabel().getForeground();
             final String colorConfig = "rgb(" + color.getRed() + ", " + color.getGreen() + ", " + color.getBlue() + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
             final String highContrastColorRule = "body {color: " + colorConfig + "; }";  //$NON-NLS-1$//$NON-NLS-2$
             ((HTMLDocument) this.displayPane.getDocument()).getStyleSheet().addRule(highContrastColorRule);
         }
-        
+
         final StyleContext sc = new StyleContext();
         this.linkUnfocusedStyle = sc.addStyle("linkUnfocused", sc.getStyle(StyleContext.DEFAULT_STYLE)); //$NON-NLS-1$
         StyleConstants.setUnderline(this.linkUnfocusedStyle, true);
         StyleConstants.setForeground(this.linkUnfocusedStyle, Color.BLUE);
         StyleConstants.setBackground(
-    		this.linkUnfocusedStyle, 
+    		this.linkUnfocusedStyle,
     		(UIManager.getColor("TREE.background")!=null) ? UIManager.getColor("TREE.background") : Color.WHITE  //$NON-NLS-1$ //$NON-NLS-2$
 		);
         this.linkFocusedStyle = sc.addStyle("linkFocused", sc.getStyle(StyleContext.DEFAULT_STYLE)); //$NON-NLS-1$
         StyleConstants.setBackground(
-    		this.linkFocusedStyle, 
+    		this.linkFocusedStyle,
     		(UIManager.getColor("TREE.selectionBackground")!=null) ? UIManager.getColor("TREE.selectionBackground") : Color.BLUE //$NON-NLS-1$ //$NON-NLS-2$
 		);
         StyleConstants.setForeground(
-    		this.linkFocusedStyle, 
+    		this.linkFocusedStyle,
     		(UIManager.getColor("TREE.selectionForeground")!=null) ? UIManager.getColor("TREE.selectionForeground") : Color.WHITE //$NON-NLS-1$ //$NON-NLS-2$
 		);
-        
-        final AccessibleHypertext accessibleHypertext = (AccessibleHypertext) this.displayPane.getAccessibleContext().getAccessibleText();        
+
+        final AccessibleHypertext accessibleHypertext = (AccessibleHypertext) this.displayPane.getAccessibleContext().getAccessibleText();
         this.hyperLinks = new Vector<AccessibleHyperlink>(accessibleHypertext.getLinkCount());
         for (int i=0; i<accessibleHypertext.getLinkCount(); i++) {
             this.hyperLinks.add(accessibleHypertext.getLink(i));
         }
 
     }
-    
+
     @Override
     public void keyPressed(final KeyEvent e) {
-        
+
         switch (e.getKeyCode()) {
             case KeyEvent.VK_RIGHT:
-            case KeyEvent.VK_DOWN:                
+            case KeyEvent.VK_DOWN:
 
                 if (this.hyperLinks.size() > 1) {
-                    
+
                     int startIndex = this.hyperLinks.get(this.selectedLink).getStartIndex();
                     ((HTMLDocument) this.displayPane.getDocument()).setCharacterAttributes(
                          startIndex,
-                         this.hyperLinks.get(this.selectedLink).getEndIndex() - startIndex, 
-                         this.linkUnfocusedStyle, 
+                         this.hyperLinks.get(this.selectedLink).getEndIndex() - startIndex,
+                         this.linkUnfocusedStyle,
                          false
                     );
-                    
+
                     this.selectedLink = this.selectedLink + 1;
                     if (this.selectedLink == this.hyperLinks.size()) {
                         this.selectedLink = 0;
                     }
-                    
+
                     startIndex = this.hyperLinks.get(this.selectedLink).getStartIndex();
-                    ((HTMLDocument) this.displayPane.getDocument()).setCharacterAttributes(                                                                  
-                         startIndex, 
-                         this.hyperLinks.get(this.selectedLink).getEndIndex() - startIndex, 
-                         this.linkFocusedStyle, 
+                    ((HTMLDocument) this.displayPane.getDocument()).setCharacterAttributes(
+                         startIndex,
+                         this.hyperLinks.get(this.selectedLink).getEndIndex() - startIndex,
+                         this.linkFocusedStyle,
                          false
                     );
-                    
+
                 }
                 break;
             case KeyEvent.VK_LEFT:
             case KeyEvent.VK_UP:
                 if (this.hyperLinks.size() > 1) {
-                    
+
                     int startIndex = this.hyperLinks.get(this.selectedLink).getStartIndex();
                     ((HTMLDocument) this.displayPane.getDocument()).setCharacterAttributes(
                          startIndex,
-                         this.hyperLinks.get(this.selectedLink).getEndIndex() - startIndex, 
-                         this.linkUnfocusedStyle, 
+                         this.hyperLinks.get(this.selectedLink).getEndIndex() - startIndex,
+                         this.linkUnfocusedStyle,
                          false
                     );
-                    
+
                     this.selectedLink = this.selectedLink - 1;
                     if (this.selectedLink == -1) {
                         this.selectedLink = this.hyperLinks.size()-1;
                     }
-                    
+
                     startIndex = this.hyperLinks.get(this.selectedLink).getStartIndex();
-                    ((HTMLDocument) this.displayPane.getDocument()).setCharacterAttributes(                                                                  
-                         startIndex, 
-                         this.hyperLinks.get(this.selectedLink).getEndIndex() - startIndex, 
-                         this.linkFocusedStyle, 
+                    ((HTMLDocument) this.displayPane.getDocument()).setCharacterAttributes(
+                         startIndex,
+                         this.hyperLinks.get(this.selectedLink).getEndIndex() - startIndex,
+                         this.linkFocusedStyle,
                          false
                     );
-                    
+
                 }
                 break;
             case KeyEvent.VK_SPACE:
@@ -161,28 +161,28 @@ final class EditorFocusManager extends KeyAdapter implements FocusListener, Hype
                 }
         }
     }
-        
+
     @Override
     public void focusGained(final FocusEvent e) {
         if (this.hyperLinks.size() > 0) {
             final int startIndex = this.hyperLinks.get(this.selectedLink).getStartIndex();
-            ((HTMLDocument) this.displayPane.getDocument()).setCharacterAttributes(                                                                  
-                 startIndex, 
-                 this.hyperLinks.get(this.selectedLink).getEndIndex() - startIndex, 
-                 this.linkFocusedStyle, 
+            ((HTMLDocument) this.displayPane.getDocument()).setCharacterAttributes(
+                 startIndex,
+                 this.hyperLinks.get(this.selectedLink).getEndIndex() - startIndex,
+                 this.linkFocusedStyle,
                  false
             );
         }
     }
-    
+
     @Override
-    public void focusLost(FocusEvent e) {
+    public void focusLost(final FocusEvent e) {
         if (this.hyperLinks.size() > 0) {
             final int startIndex = this.hyperLinks.get(this.selectedLink).getStartIndex();
             ((HTMLDocument) this.displayPane.getDocument()).setCharacterAttributes(
                  startIndex,
-                 this.hyperLinks.get(this.selectedLink).getEndIndex() - startIndex, 
-                 this.linkUnfocusedStyle, 
+                 this.hyperLinks.get(this.selectedLink).getEndIndex() - startIndex,
+                 this.linkUnfocusedStyle,
                  false
             );
         }
@@ -194,25 +194,25 @@ final class EditorFocusManager extends KeyAdapter implements FocusListener, Hype
             this.hlAction.openHyperLink(he, this.selectedLink);
         }
     }
-    
+
     private static int getBestFontSizeForJOptionPane(final int width, final int height, final String text, final String fontFamily, final int minSize) {
-        
+
         final String bodyRule = "body { font-family: " + fontFamily + "; font-size: %f%pt; }";  //$NON-NLS-1$//$NON-NLS-2$
-        
+
         for (int i = minSize; i < 100; i++) {
-            
+
             final JEditorPane editorPane = new JEditorPane("text/html", text); //$NON-NLS-1$
-            
+
             ((HTMLDocument) editorPane.getDocument()).getStyleSheet().addRule(bodyRule.replace("%f%", Integer.toString(i))); //$NON-NLS-1$
-            
+
             editorPane.setSize(width, Integer.MAX_VALUE);
             editorPane.setEditable(false);
-            
+
             final JPopupMenu popup = new JPopupMenu();
             popup.add(new JScrollPane(editorPane));
             final Dimension d = popup.getPreferredSize();
             popup.setPopupSize(Math.min(width, d.width), d.height);
-            
+
             if (popup.getPreferredSize().height > height) {
                 return i-1;
             }
@@ -221,7 +221,7 @@ final class EditorFocusManager extends KeyAdapter implements FocusListener, Hype
     }
 
     private boolean editorFirstShow = true;
-    @Override public void componentResized(ComponentEvent e) {
+    @Override public void componentResized(final ComponentEvent e) {
         if (this.editorFirstShow) {
             final int bestFontSize = getBestFontSizeForJOptionPane(this.displayPane.getWidth(), this.displayPane.getHeight(), this.displayPane.getText(), UIManager.getFont("Label.font").getFamily(), UIManager.getFont("Label.font").getSize()); //$NON-NLS-1$ //$NON-NLS-2$
             final String bodyRule = "body { font-family: " + UIManager.getFont("Label.font").getFamily() + "; font-size: " + bestFontSize + "pt; }"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
@@ -230,10 +230,10 @@ final class EditorFocusManager extends KeyAdapter implements FocusListener, Hype
         }
     }
 
-    @Override public void componentMoved(ComponentEvent e) { /* No implementado */ }
+    @Override public void componentMoved(final ComponentEvent e) { /* No implementado */ }
 
-    @Override public void componentHidden(ComponentEvent e) { /* No implementado */ }
-    
-    @Override public void componentShown(ComponentEvent e) { /* No implementado */ }
+    @Override public void componentHidden(final ComponentEvent e) { /* No implementado */ }
+
+    @Override public void componentShown(final ComponentEvent e) { /* No implementado */ }
 
 }
