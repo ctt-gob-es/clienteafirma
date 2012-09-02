@@ -64,7 +64,7 @@ public final class Pkcs12KeyStoreManager extends AOKeyStoreManager {
             throw new IllegalArgumentException("Es necesario proporcionar el fichero PKCS12 / PFX"); //$NON-NLS-1$
         }
         try {
-        	this.ks = KeyStore.getInstance(getType().getProviderName());
+        	this.setKeyStore(KeyStore.getInstance(getType().getProviderName()));
         }
         catch (final Exception e) {
             throw new AOKeyStoreManagerException("No se ha podido obtener el almacen PKCS#12 / PFX", e); //$NON-NLS-1$
@@ -72,7 +72,7 @@ public final class Pkcs12KeyStoreManager extends AOKeyStoreManager {
 
         this.cachePasswordCallback = (pssCallBack != null) ? new CachePasswordCallback(pssCallBack.getPassword()) : new NullPasswordCallback();
         try {
-            this.ks.load(store, this.cachePasswordCallback.getPassword());
+            this.getKeyStore().load(store, this.cachePasswordCallback.getPassword());
         }
         catch (final IOException e) {
             if (e.getCause() instanceof UnrecoverableKeyException ||
@@ -88,7 +88,7 @@ public final class Pkcs12KeyStoreManager extends AOKeyStoreManager {
             throw new AOKeyStoreManagerException("No se ha podido verificar la integridad del almacen PKCS#12 / PFX solicitado.", e); //$NON-NLS-1$
 		}
         final List<KeyStore> ret = new ArrayList<KeyStore>(1);
-        ret.add(this.ks);
+        ret.add(this.getKeyStore());
         try {
             store.close();
         }
@@ -119,26 +119,26 @@ public final class Pkcs12KeyStoreManager extends AOKeyStoreManager {
     		                                    final PasswordCallback pssCallback) throws KeyStoreException,
     		                                                                               NoSuchAlgorithmException,
     		                                                                               UnrecoverableEntryException {
-        if (this.ks == null) {
+        if (this.getKeyStore() == null) {
             throw new IllegalStateException("Se han pedido claves a un almacen no inicializado"); //$NON-NLS-1$
         }
 
         // Primero probamos si la contrasena de la clave es la misma que la del certificado
         try {
-        	return (KeyStore.PrivateKeyEntry) this.ks.getEntry(alias, new KeyStore.PasswordProtection(this.cachePasswordCallback.getPassword()));
+        	return (KeyStore.PrivateKeyEntry) this.getKeyStore().getEntry(alias, new KeyStore.PasswordProtection(this.cachePasswordCallback.getPassword()));
         }
         catch(final Exception e) {
         	// Se ignora
         }
         // Luego probamos con null
         try {
-        	return (KeyStore.PrivateKeyEntry) this.ks.getEntry(alias, null);
+        	return (KeyStore.PrivateKeyEntry) this.getKeyStore().getEntry(alias, null);
         }
         catch(final Exception e) {
         	// Se ignora
         }
         // Fnalmente pedimos la contrasena
-        return (KeyStore.PrivateKeyEntry) this.ks.getEntry(alias, (pssCallback != null) ? new KeyStore.PasswordProtection(pssCallback.getPassword()) : null);
+        return (KeyStore.PrivateKeyEntry) this.getKeyStore().getEntry(alias, (pssCallback != null) ? new KeyStore.PasswordProtection(pssCallback.getPassword()) : null);
     }
 
 }
