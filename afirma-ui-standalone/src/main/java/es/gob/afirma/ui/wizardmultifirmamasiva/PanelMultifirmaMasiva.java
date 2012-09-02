@@ -170,9 +170,6 @@ final class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
     /** Etiqueta con el texto "Fichero de log". */
     private final JLabel etiquetaFichero = new JLabel();
 
-    /** Boton para seleccionar el fichero de log. */
-    private JButton examinarFichero = new JButton();
-
     /** Cadena con las extensiones de los ficheros a firmar */
     private String extensiones;
 
@@ -410,22 +407,22 @@ final class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         final JPanel panelExaminarFichero = new JPanel(new GridLayout(1, 1));
 
         // Boton examinar fichero log
-        this.examinarFichero = new JButton();
-        this.examinarFichero.setMnemonic(KeyEvent.VK_X); // mnemonico asignado puesto que se habilita el boton
-        this.examinarFichero.setText(Messages.getString("PrincipalGUI.Examinar")); //$NON-NLS-1$
-        this.examinarFichero.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description")); //$NON-NLS-1$
-        this.examinarFichero.getAccessibleContext().setAccessibleName(this.examinarFichero.getText() + " " + this.examinarFichero.getToolTipText()); //$NON-NLS-1$
-        this.examinarFichero.getAccessibleContext().setAccessibleDescription(this.examinarFichero.getToolTipText());
-        this.examinarFichero.addActionListener(new ActionListener() {
+        final JButton examinarFichero = new JButton();
+        examinarFichero.setMnemonic(KeyEvent.VK_X); // mnemonico asignado puesto que se habilita el boton
+        examinarFichero.setText(Messages.getString("PrincipalGUI.Examinar")); //$NON-NLS-1$
+        examinarFichero.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description")); //$NON-NLS-1$
+        examinarFichero.getAccessibleContext().setAccessibleName(examinarFichero.getText() + " " + examinarFichero.getToolTipText()); //$NON-NLS-1$
+        examinarFichero.getAccessibleContext().setAccessibleDescription(examinarFichero.getToolTipText());
+        examinarFichero.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent evt) {
                 examinarFicheroLogActionPerformed();
             }
         });
-        Utils.remarcar(this.examinarFichero);
-        Utils.setContrastColor(this.examinarFichero);
-        Utils.setFontBold(this.examinarFichero);
-        panelExaminarFichero.add(this.examinarFichero);
+        Utils.remarcar(examinarFichero);
+        Utils.setContrastColor(examinarFichero);
+        Utils.setFontBold(examinarFichero);
+        panelExaminarFichero.add(examinarFichero);
         panelCentral.add(panelExaminarFichero, c);
 
         c.fill = GridBagConstraints.BOTH;

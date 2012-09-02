@@ -91,7 +91,7 @@ public final class BotoneraSuperior extends JPanel {
 	/**
 	 * Inicializacion de parametros
 	 */
-	private final void initParamenters() {
+	private void initParamenters() {
 		// Configuracion del panel
     	setBorder(BorderFactory.createEtchedBorder());
     	setPreferredSize(this.dimensiones);

@@ -26,7 +26,6 @@ import javax.security.auth.callback.PasswordCallback;
 import javax.swing.JOptionPane;
 
 import es.gob.afirma.applet.callbacks.CachePasswordCallback;
-import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.MissingLibraryException;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.main.common.AOCertificatesNotFoundException;
@@ -227,21 +226,7 @@ final class KeyStoreConfigurationManager {
                             NoSuchAlgorithmException,
                             KeyStoreException {
         if (this.selectedAlias == null) {
-            try {
-                this.selectedAlias = this.showCertSelectionDialog(this.getKeyStoreManager().getAliases());
-            }
-            catch (final AOCancelledOperationException e) {
-                throw e;
-            }
-            catch (final AOCertificatesNotFoundException e) {
-                throw e;
-            }
-            catch (final AOKeystoreAlternativeException e) {
-                throw e;
-            }
-            catch (final Exception e) {
-                throw new CertificateException("Error al seleccionar un certificado del repositorio", e); //$NON-NLS-1$
-            }
+            this.selectedAlias = this.showCertSelectionDialog(this.getKeyStoreManager().getAliases());
         }
 
         // En caso de ser todos certificados con clave privada, obtenemos la
@@ -289,23 +274,16 @@ final class KeyStoreConfigurationManager {
             try {
                 this.initKeyStore();
             }
-            catch (final AOCancelledOperationException e) {
-                throw e;
-            }
-            catch (final AOKeystoreAlternativeException e) {
-                throw e;
-            }
             catch (final MissingLibraryException e) {
             	throw new AOKeystoreAlternativeException(
             			getAlternateKeyStoreType(this.ks),
             			"No es posible cargar el almacen por falta de una biblioteca necesaria, se cargara el siguiente almacen disponible", //$NON-NLS-1$
             			e);
 			}
-            catch (final Exception e) {
-                throw new AOKeyStoreManagerException("No se ha podido inicializar el almacen de certificados", e); //$NON-NLS-1$
-            }
+            catch (final IOException e) {
+            	throw new AOKeyStoreManagerException("No se ha podido inicializar el almacen de certificados", e); //$NON-NLS-1$
+			}
         }
-
         return this.ksManager;
     }
 

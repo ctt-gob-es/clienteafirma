@@ -16,7 +16,9 @@ import java.io.InputStream;
 import java.net.URI;
 import java.security.Key;
 import java.security.KeyException;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 
 import javax.swing.JOptionPane;
 
@@ -390,7 +392,19 @@ final class CipherManager {
 
         // Ya tenemos el stream con los datos, vamos a ver que Cipher uso
         final AOCipher cipher = new AOSunJCECipher();
-        final Key cipherKey = getConfiguredKey(cipher, this.cipherConfig);
+        final Key cipherKey;
+		try {
+			cipherKey = getConfiguredKey(cipher, this.cipherConfig);
+		}
+		catch (final CertificateException e) {
+			throw new AOException("Error en un certificado del almacen de cifrado: " + e, e); //$NON-NLS-1$
+		}
+		catch (final KeyStoreException e) {
+			throw new AOException("Error en el almacen de cifrado: " + e, e); //$NON-NLS-1$
+		}
+		catch (final IOException e) {
+			throw new AOException("Error al acceder al almacen de cifrado: " + e, e); //$NON-NLS-1$
+		}
 
         // realizamos la operacion de cifrado
         this.cipheredData = cipher.cipher(dataToCipher, this.cipherConfig, cipherKey);
@@ -407,7 +421,18 @@ final class CipherManager {
      * @throws KeyException Cuando se produce un error al generar la clave.
      */
     Key getConfiguredKey() throws NoSuchAlgorithmException, AOException, KeyException {
-        return this.getConfiguredKey(new AOSunJCECipher(), this.cipherConfig);
+        try {
+			return this.getConfiguredKey(new AOSunJCECipher(), this.cipherConfig);
+		}
+        catch (final CertificateException e) {
+        	throw new AOException("Error en un certificado del almacen de cifrado: " + e, e); //$NON-NLS-1$
+		}
+        catch (final KeyStoreException e) {
+        	throw new AOException("Error en el almacen de cifrado: " + e, e); //$NON-NLS-1$
+		}
+        catch (final IOException e) {
+        	throw new AOException("Error al acceder al almacen de cifrado: " + e, e); //$NON-NLS-1$
+		}
     }
 
     /** Obtiene una clave compatible para una configuraci&oacute;n de cifrado. La
@@ -427,9 +452,16 @@ final class CipherManager {
      * @throws AOException
      *         Ocurri&oacute; un error al obtener la clave.
      * @throws KeyException Cuando se produce un error al generar la clave.
+     * @throws IOException
+     * @throws KeyStoreException
+     * @throws CertificateException
      */
-    private Key getConfiguredKey(final AOCipher cipher, final AOCipherConfig config) throws NoSuchAlgorithmException, AOException, KeyException {
-
+    private Key getConfiguredKey(final AOCipher cipher, final AOCipherConfig config) throws NoSuchAlgorithmException,
+                                                                                            AOException,
+                                                                                            KeyException,
+                                                                                            CertificateException,
+                                                                                            KeyStoreException,
+                                                                                            IOException {
         Key cipherKey;
 
         // Tomamos o generamos la clave, segun nos indique el modo de clave.
@@ -471,15 +503,7 @@ final class CipherManager {
                 cipherKey = cipher.decodeKey(this.cipherKeyEncoded, config, null);
             }
             else if (this.useCipherKeyStore && AOCipherKeyStoreHelper.storeExists()) {
-                try {
-                    cipherKey = getKeyFromCipherKeyStore();
-                }
-                catch (final AOCancelledOperationException e) {
-                    throw e;
-                }
-                catch (final Exception e) {
-                    throw new AOException("Error al extraer una clave del almacen de clave de cifrado", e); //$NON-NLS-1$
-                }
+                cipherKey = getKeyFromCipherKeyStore();
             }
             else {
                 throw new AOException("No se ha establecido una clave de cifrado"); //$NON-NLS-1$
@@ -532,7 +556,8 @@ final class CipherManager {
             if (this.fileBase64) {
                 dataToDecipher = Base64.decode(
                         new String(AOUtil.getDataFromInputStream(is)));
-            } else {
+            }
+            else {
                 dataToDecipher = AOUtil.getDataFromInputStream(is);
             }
 
@@ -575,27 +600,27 @@ final class CipherManager {
             decipherKey = decipher.decodePassphrase(this.cipherPassword, this.cipherConfig, null);
         }
         else {
-            // En el caso de trabajar con claves, si no se indico cual debe
-            // usarse,
-            // se ofrecera al usuario la posibilidad de tomar una del almacen de
-            // claves
-            // de cifrado. Si no existe el almacen, se le indica que es
-            // obligatorio
+            // En el caso de trabajar con claves, si no se indico cual debe usarse,
+            // se ofrecera al usuario la posibilidad de tomar una del almacen de claves
+            // de cifrado. Si no existe el almacen, se le indica que es obligatorio
             // introducir la clave.
             if (this.cipherKeyEncoded == null) {
                 if (AOCipherKeyStoreHelper.storeExists()) {
                     try {
-                        decipherKey = getKeyFromCipherKeyStore();
-                    }
-                    catch (final AOCancelledOperationException e) {
-                        throw e;
-                    }
-                    catch (final AOException e) {
-                        throw e;
-                    }
-                    catch (final Exception e) {
-                        throw new AOException("Error al extraer una clave del almacen de clave de cifrado", e); //$NON-NLS-1$
-                    }
+						decipherKey = getKeyFromCipherKeyStore();
+					}
+                    catch (final NoSuchAlgorithmException e) {
+						throw new AOException("Error en el algoritmo de cifrado: " + e, e); //$NON-NLS-1$
+					}
+                    catch (final CertificateException e) {
+                    	throw new AOException("Error en un certificado del almacen de cifrado: " + e, e); //$NON-NLS-1$
+					}
+                    catch (final KeyStoreException e) {
+                    	throw new AOException("Error en el almacen de cifrado: " + e, e); //$NON-NLS-1$
+					}
+                    catch (final IOException e) {
+                    	throw new AOException("Error al acceder al almacen de cifrado: " + e, e); //$NON-NLS-1$
+					}
                 }
                 else {
                     throw new AOException("No se ha indicado la clave para el descifrado de datos y no hay almacen de claves"); //$NON-NLS-1$
@@ -615,10 +640,11 @@ final class CipherManager {
      * y/o no se ha seleccionado un alias, se solicita al usuario mediante una
      * ventana modal.
      * @return Clave de cifrado/descifrado.
-     * @throws AOException
-     *         Ocurri&oacute; un error durate el proceso de
-     *         configuraci&oacute;n. */
-    private Key getKeyFromCipherKeyStore() throws AOException {
+     * @throws IOException
+     * @throws KeyStoreException
+     * @throws CertificateException
+     * @throws NoSuchAlgorithmException */
+    private Key getKeyFromCipherKeyStore() throws AOException, NoSuchAlgorithmException, CertificateException, KeyStoreException, IOException {
         // Si el almacen no existe devolvemos un error
         if (!AOCipherKeyStoreHelper.storeExists()) {
             throw new AOException("No existe un almacen de claves de cifrado asociado al usuario"); //$NON-NLS-1$
@@ -626,20 +652,11 @@ final class CipherManager {
         // Abrimos el Almacen de claves de cifrado preguntandole al usuario la
         // clave si no
         // la indico
-        AOCipherKeyStoreHelper cKs = null;
-        try {
-            cKs =
-                    new AOCipherKeyStoreHelper(this.cipherKeystorePass != null
-                                                                         ? this.cipherKeystorePass
-                                                                         : AOUIFactory.getPassword(AppletMessages.getString("SignApplet.52"), this.parent) //$NON-NLS-1$
-                    );
-        }
-        catch (final AOCancelledOperationException e) {
-            throw e;
-        }
-        catch (final Exception e) {
-            throw new AOException("Error al abrir el repositorio de claves del usuario", e); //$NON-NLS-1$
-        }
+        final AOCipherKeyStoreHelper cKs = new AOCipherKeyStoreHelper(
+        		this.cipherKeystorePass != null
+                	? this.cipherKeystorePass
+                    	: AOUIFactory.getPassword(AppletMessages.getString("SignApplet.52"), this.parent) //$NON-NLS-1$
+        );
 
         // Si no se establecio el alias de la clave de cifrado, se la pedimos al
         // usuario
@@ -716,13 +733,16 @@ final class CipherManager {
             			}
             			catch (final IOException e) {
             				if (numTries >= 3) {
-            					throw new AOMaxAttemptsExceededException("Se ha sobrepasado el numero maximo de intentos en la insercion de la clave del almacen"); //$NON-NLS-1$
+            					throw new AOMaxAttemptsExceededException(
+        							"Se ha sobrepasado el numero maximo de intentos en la insercion de la clave del almacen", //$NON-NLS-1$
+        							e
+    							);
             				}
             			}
             		} while (cKs == null);
             	}
             } catch (final Exception e) {
-            	throw new AOException("No se ha podido cargar el almacen de claves del usuario"); //$NON-NLS-1$
+            	throw new AOException("No se ha podido cargar el almacen de claves del usuario", e); //$NON-NLS-1$
             }
             String alias = this.cipherKeyAlias;
             if (alias == null) {
@@ -732,7 +752,7 @@ final class CipherManager {
                                                         JOptionPane.QUESTION_MESSAGE);
                 }
                 catch (final Exception e) {
-                    throw new AOException("Error al almacenar la clave de cifrado, la clave quedara sin almacenar"); //$NON-NLS-1$
+                    throw new AOException("Error al almacenar la clave de cifrado, la clave quedara sin almacenar", e); //$NON-NLS-1$
                 }
                 alias += " (" + config.toString() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
             }

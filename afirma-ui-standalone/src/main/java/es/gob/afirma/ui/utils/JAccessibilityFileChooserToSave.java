@@ -365,29 +365,29 @@ final class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
 		final JPanel restorePanel = new JPanel();
 		ImageIcon imageIconRestore= new ImageIcon(JAccessibilityFileChooser.class.getResource("/resources/images/restore.png")); //$NON-NLS-1$
 		imageIconRestore = new ImageIcon(imageIconRestore.getImage().getScaledInstance(dimension.width, dimension.height, Image.SCALE_SMOOTH));
-		this.restoreButton = new JButton(imageIconRestore);
-		this.restoreButton.setMnemonic(KeyEvent.VK_R );
-		this.restoreButton.setToolTipText(Messages.getString("Wizard.restaurar.description")); //$NON-NLS-1$
-		this.restoreButton.getAccessibleContext().setAccessibleName(this.restoreButton.getToolTipText());
+		this.getRestoreButton().setIcon(imageIconRestore);
+		this.getRestoreButton().setMnemonic(KeyEvent.VK_R );
+		this.getRestoreButton().setToolTipText(Messages.getString("Wizard.restaurar.description")); //$NON-NLS-1$
+		this.getRestoreButton().getAccessibleContext().setAccessibleName(this.getRestoreButton().getToolTipText());
 
-		this.restoreButton.addFocusListener(new FocusListener() {
+		this.getRestoreButton().addFocusListener(new FocusListener() {
 
 			@Override
 			public void focusLost(final FocusEvent e) {
-				Utils.showToolTip(false, tip, JAccessibilityFileChooserToSave.this.restoreButton, tipText);
+				Utils.showToolTip(false, tip, JAccessibilityFileChooserToSave.this.getRestoreButton(), tipText);
 			}
 
 			@Override
 			public void focusGained(final FocusEvent e) {
-				Utils.showToolTip(true, tip, JAccessibilityFileChooserToSave.this.restoreButton, tipText);
+				Utils.showToolTip(true, tip, JAccessibilityFileChooserToSave.this.getRestoreButton(), tipText);
 			}
 		});
-		this.restoreButton.setPreferredSize(dimension);
+		this.getRestoreButton().setPreferredSize(dimension);
 
-		this.restoreButton.setName("restaurar");
-		Utils.remarcar(this.restoreButton);
-		restorePanel.add(this.restoreButton);
-		this.restoreButton.addActionListener(new ActionListener() {
+		this.getRestoreButton().setName("restaurar"); //$NON-NLS-1$
+		Utils.remarcar(this.getRestoreButton());
+		restorePanel.add(this.getRestoreButton());
+		this.getRestoreButton().addActionListener(new ActionListener() {
 
 			@Override
 	    	public void actionPerformed(final ActionEvent e) {
@@ -412,7 +412,7 @@ final class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
 		this.maximizeButton.setToolTipText(Messages.getString("Wizard.maximizar.description")); //$NON-NLS-1$
 		this.maximizeButton.getAccessibleContext().setAccessibleName(this.maximizeButton.getToolTipText());
 
-		this.maximizeButton.setName("maximizar");
+		this.maximizeButton.setName("maximizar"); //$NON-NLS-1$
 		//Se asigna una dimension por defecto
 		this.maximizeButton.setPreferredSize(dimension);
 
@@ -461,13 +461,13 @@ final class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
     		//Se deshabilita el boton de maximizado
     		this.maximizeButton.setEnabled(false);
     		//Se habilita el boton de restaurar
-    		this.restoreButton.setEnabled(true);
+    		this.getRestoreButton().setEnabled(true);
     	}
     	else {
     		//Se habilita el boton de maximizado
     		this.maximizeButton.setEnabled(true);
     		//Se deshabilita el boton de restaurar
-    		this.restoreButton.setEnabled(false);
+    		this.getRestoreButton().setEnabled(false);
     	}
 		return panelAccesibilidad;
 	}
@@ -497,7 +497,7 @@ final class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
     		}
 		}
 		this.maximizeButton.setEnabled (true);
-		this.restoreButton.setEnabled (false);
+		this.getRestoreButton().setEnabled (false);
 
 		setIsMaximized(false);
 	}
@@ -513,7 +513,7 @@ final class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
 		setActualHeight(this.theDialog.getHeight());
 
 		this.maximizeButton.setEnabled (false);
-		this.restoreButton.setEnabled (true);
+		this.getRestoreButton().setEnabled (true);
 
 		this.theDialog.setBounds(0,0, (int)(getMaxDimension().getWidth()), (int)(getMaxDimension().getHeight()));
 

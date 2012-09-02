@@ -74,7 +74,7 @@ import es.gob.afirma.standalone.Messages;
 
 final class PreferencesPanel extends JPanel implements KeyListener {
 
-    final JButton applyButton = new JButton(Messages.getString("PreferencesPanel.0")); //$NON-NLS-1$
+    private final JButton applyButton = new JButton(Messages.getString("PreferencesPanel.0")); //$NON-NLS-1$
 
     private final Window window;
     Window getParentWindow() {
@@ -403,7 +403,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 					new Oid(PreferencesPanel.this.getPadesPolicyIdentifier().getText().replace("urn:oid:", "")); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 				catch (final GSSException e) {
-					throw new AOException("El identificador debe ser un OID"); //$NON-NLS-1$
+					throw new AOException("El identificador debe ser un OID", e); //$NON-NLS-1$
 				}
 			}
 			catch(final Exception e) {
@@ -431,7 +431,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 					new Oid(PreferencesPanel.this.getCadesPolicyIdentifier().getText().replace("urn:oid:", "")); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 				catch (final GSSException e) {
-					throw new AOException("El identificador debe ser un OID"); //$NON-NLS-1$
+					throw new AOException("El identificador debe ser un OID", e); //$NON-NLS-1$
 				}
 			}
 			catch(final Exception e) {

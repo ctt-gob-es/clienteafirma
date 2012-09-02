@@ -83,17 +83,17 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
     /**
      * Panel con los resultados de la validaci&oacute;n.
      */
-    SignResultPanel resultPanel;
+    private SignResultPanel resultPanel;
 
     /**
      * Panel con los datos de la firma validada.
      */
-    SignDataPanel dataPanel;
+    private SignDataPanel dataPanel;
 
     /**
      * Manejador de las peticiones de carga de datos.
      */
-    PropertyChangeListener loadExternalDataListener = null;
+    private PropertyChangeListener loadExternalDataListener = null;
 
     /** Construye un panel con la informaci&oacute;n extra&iacute;da de una firma. Si no se
      * indica la firma, esta se cargar&aacute; desde un fichero. Es obligatorio introducir

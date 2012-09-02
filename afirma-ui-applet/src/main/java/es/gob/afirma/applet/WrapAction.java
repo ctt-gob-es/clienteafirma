@@ -50,9 +50,11 @@ final class WrapAction implements PrivilegedExceptionAction<byte[]> {
     }
 
     /** {@inheritDoc} */
-    public byte[] run() throws NoSuchAlgorithmException, IOException,
-    AOException, CertificateEncodingException, KeyException {
-
+    public byte[] run() throws NoSuchAlgorithmException,
+                               IOException,
+                               AOException,
+                               CertificateEncodingException,
+                               KeyException {
     	try {
     		if (this.enveloperManager.getCmsContentType().equals(AOSignConstants.CMS_CONTENTTYPE_ENCRYPTEDDATA)) {
     			if (this.data == null) {
@@ -76,7 +78,7 @@ final class WrapAction implements PrivilegedExceptionAction<byte[]> {
     		throw e;
     	}
     	catch (final IllegalArgumentException e) {
-    		throw new IllegalArgumentException("Modo de clave no soportado"); //$NON-NLS-1$
+    		throw new IllegalArgumentException("Modo de clave no soportado", e); //$NON-NLS-1$
     	}
     	catch (final NullPointerException e) {
     		throw new IllegalArgumentException("No se ha indicado el tipo de envoltorio o los destinatarios del mismo", e); //$NON-NLS-1$
@@ -87,12 +89,10 @@ final class WrapAction implements PrivilegedExceptionAction<byte[]> {
     	catch (final IOException e) {
     		throw new IOException("No se han podido leer los datos a ensobrar"); //$NON-NLS-1$
     	}
-    	catch (final AOException e) {
-    		throw e;
-    	}
     	catch (final CertificateEncodingException e) {
     		throw new CertificateEncodingException("El certificado del remitente no es valido", e); //$NON-NLS-1$
-    	} catch (final KeyException e) {
+    	}
+    	catch (final KeyException e) {
     		throw new KeyException("La clave de envoltura generada no es valida", e); //$NON-NLS-1$
     	}
     }

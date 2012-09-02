@@ -98,6 +98,10 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 
  final class CMSAuthenticatedData {
 
+	 private CMSAuthenticatedData() {
+		 // No instanciable
+	 }
+
     /** @param parameters
      *        Par&aacute;metros necesarios que contienen tanto la firma del
      *        archivo a firmar como los datos del firmante.

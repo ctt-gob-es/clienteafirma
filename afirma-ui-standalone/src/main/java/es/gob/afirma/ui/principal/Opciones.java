@@ -569,10 +569,8 @@ final class Opciones extends JAccessibilityDialog {
     public void aceptarActionPerformed(final Properties config, final String[] remainderProfilesNames) {
 
     	// Comprobamos que el ID de la politica sea un OID correcto
-    	if (this.mainOptions != null) {
-    		if (!this.mainOptions.checkAboutBadPolicyId()) {
-    			return;
-    		}
+    	if (this.mainOptions != null && (!this.mainOptions.checkAboutBadPolicyId())) {
+			return;
     	}
 
     	// Guardamos la posicion y tamano actual de la ventana solo en caso de no estar maximizada por configuracion

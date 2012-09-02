@@ -14,8 +14,10 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableEntryException;
 import java.util.Vector;
-import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
 
@@ -24,7 +26,9 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.keystores.main.callbacks.NullPasswordCallback;
 import es.gob.afirma.keystores.main.common.AOKeyStore;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
+import es.gob.afirma.keystores.main.common.AOKeyStoreManagerException;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManagerFactory;
+import es.gob.afirma.keystores.main.common.AOKeystoreAlternativeException;
 import es.gob.afirma.keystores.main.common.KeyStoreConfiguration;
 import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
 import es.gob.afirma.keystores.main.filters.CertificateFilter;
@@ -35,8 +39,6 @@ public final class MultisignUtils {
     private MultisignUtils() {
         // No permitimos la instanciacion
     }
-
-    private static Logger logger = Logger.getLogger(MultisignUtils.class.toString());
 
     /** Obtiene el manager del almacen o repositorio de certificados
      * @param kssc Configuracion del almacen o repositorio de certificados
@@ -75,28 +77,21 @@ public final class MultisignUtils {
         	pssCallback = null;
         }
         else {
-            /*pssCallback = new UIPasswordCallback(
-            		Messages.getString("Msg.pedir.contraenia", store.getDescription()),  //$NON-NLS-1$
-            		null);*/
-            pssCallback = new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getName(), //$NON-NLS-1$ //$NON-NLS-2$
-                                                              null,
-                                                              Messages.getString("CustomDialog.showInputPasswordDialog.title"), //$NON-NLS-1$
-                                                              KeyEvent.VK_O,
-                                                              Messages.getString("CustomDialog.showInputPasswordDialog.title")); //$NON-NLS-1$
+            pssCallback = new UIPasswordCallbackAccessibility(
+        		Messages.getString("Msg.pedir.contraenia") + " " + store.getName(), //$NON-NLS-1$ //$NON-NLS-2$
+                null,
+                Messages.getString("CustomDialog.showInputPasswordDialog.title"), //$NON-NLS-1$
+                KeyEvent.VK_O,
+                Messages.getString("CustomDialog.showInputPasswordDialog.title") //$NON-NLS-1$
+    		);
         }
 
         try {
             return AOKeyStoreManagerFactory.getAOKeyStoreManager(store, lib, kssc.toString(), pssCallback, padre);
         }
-        catch (final AOCancelledOperationException e) {
-            throw e;
-        }
-        catch (final IOException e) {
-        	throw e;
+        catch (final AOKeystoreAlternativeException e) {
+        	throw new AOException("Error inicializando el almacen", e); //$NON-NLS-1$
 		}
-        catch (final Exception e) {
-            throw new AOException("Error inicializando el almacen", e); //$NON-NLS-1$
-        }
 
     }
 
@@ -130,16 +125,19 @@ public final class MultisignUtils {
         try {
             privateKeyEntry = keyStoreManager.getKeyEntry(selectedcert, KeyStoreUtilities.getCertificatePC(store, padre));
         }
-        catch (final AOCancelledOperationException e) {
-            // Si se ha cancelado la operacion lo informamos en el nivel superior para que se trate.
-            // Este relanzamiento se realiza para evitar la siguiente captura generica de excepciones
-            // que las relanza en forma de AOException
-            throw e;
-        }
-        catch (final Exception e) {
-            logger.severe("No se ha podido obtener el certicado con el alias '" + selectedcert + "': " + e); //$NON-NLS-1$//$NON-NLS-2$
-            throw new AOException("No se ha podido recuperar el certificado seleccionado", e); //$NON-NLS-1$
-        }
+        catch (final KeyStoreException e) {
+        	throw new AOKeyStoreManagerException("No se ha podido recuperar el certificado seleccionado: " + selectedcert, e); //$NON-NLS-1$
+		}
+        catch (final NoSuchAlgorithmException e) {
+        	throw new AOKeyStoreManagerException(
+    			"No se ha podido recuperar el certificado seleccionado (" + selectedcert + "), el algoritmo es invalido", e //$NON-NLS-1$ //$NON-NLS-2$
+			);
+		}
+        catch (final UnrecoverableEntryException e) {
+        	throw new AOKeyStoreManagerException(
+    			"No se ha podido recuperar el certificado seleccionado (" + selectedcert + "), la clave es invalida", e //$NON-NLS-1$ //$NON-NLS-2$
+			);
+		}
 
         return privateKeyEntry;
     }

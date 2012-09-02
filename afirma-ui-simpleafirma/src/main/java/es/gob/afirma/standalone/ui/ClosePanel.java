@@ -30,7 +30,10 @@ public final class ClosePanel extends JPanel {
 
 	static final Preferences PREFERENCES = Preferences.userRoot();
 
-	final JCheckBox ask = new JCheckBox(Messages.getString("ClosePanel.0")); //$NON-NLS-1$
+	private final JCheckBox ask = new JCheckBox(Messages.getString("ClosePanel.0")); //$NON-NLS-1$
+	JCheckBox getAskCheckBox() {
+		return this.ask;
+	}
 
 	/** Construye el panel para preguntar si se desea cerrar la aplicaci&oacute;n. */
 	public ClosePanel() {
@@ -41,7 +44,7 @@ public final class ClosePanel extends JPanel {
 			/** {@inheritDoc} */
 			@Override
 			public void itemStateChanged(final ItemEvent e) {
-				PREFERENCES.putBoolean(PreferencesNames.PREFERENCE_OMIT_ASKONCLOSE, ClosePanel.this.ask.isSelected());
+				PREFERENCES.putBoolean(PreferencesNames.PREFERENCE_OMIT_ASKONCLOSE, ClosePanel.this.getAskCheckBox().isSelected());
 			}
 		});
 		add(this.ask);

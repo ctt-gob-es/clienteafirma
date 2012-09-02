@@ -25,4 +25,11 @@ final class AOMaxAttemptsExceededException extends AOException {
     AOMaxAttemptsExceededException(final String msg) {
         super(msg);
     }
+
+    /** Crea la excepci&oacute;n con un mensaje determinado y una excepci&oacute;n origen.
+     * @param msg Mensaje descriptivo de la excepci&oacute;n.
+     * @param t Excepci&oacute;n origen */
+    AOMaxAttemptsExceededException(final String msg, final Throwable t) {
+        super(msg, t);
+    }
 }

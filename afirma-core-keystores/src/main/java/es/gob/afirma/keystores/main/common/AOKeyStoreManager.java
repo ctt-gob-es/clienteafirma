@@ -67,7 +67,13 @@ public class AOKeyStoreManager {
     private static Provider sunMSCAPIProvider = null;
 
     /** Almac&eacute;n de claves. */
-    protected KeyStore ks;
+    private KeyStore ks;
+    protected void setKeyStore(final KeyStore k) {
+    	this.ks = k;
+    }
+    protected KeyStore getKeyStore() {
+    	return this.ks;
+    }
 
     /** Tipo de almac&eacute;n. */
     private AOKeyStore ksType;
