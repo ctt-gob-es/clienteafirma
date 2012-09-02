@@ -268,8 +268,6 @@ final class PanelDestinatarios extends JAccessibilityDialogWizard {
 
         // Etiqueta con el texto "Puede anadir uno o..."
         final InfoLabel labelText = new InfoLabel(Messages.getString("Wizard.sobres.pagina1.contenido.explicacion1"), false); //$NON-NLS-1$
-        /*JTextPane panelTexto = PanelesTexto.generarPanelTexto("Wizard.sobres.pagina1.contenido.explicacion1", false);
-        panelCentral.add(panelTexto, c);*/
 
         c.gridy = 1;
         c.gridwidth = 1;
@@ -362,7 +360,7 @@ final class PanelDestinatarios extends JAccessibilityDialogWizard {
         // Lista con los destinatarios
         this.listaDestinatarios.setToolTipText(Messages.getString("wizard.listaDestinatarios.description")); //$NON-NLS-1$
         this.listaDestinatarios.setModel(new DefaultListModel());
-        this.listaDestinatarios.getAccessibleContext().setAccessibleName(destLabel.getText() + " " + this.listaDestinatarios.getToolTipText());
+        this.listaDestinatarios.getAccessibleContext().setAccessibleName(destLabel.getText() + " " + this.listaDestinatarios.getToolTipText()); //$NON-NLS-1$
         this.listaDestinatarios.getAccessibleContext().setAccessibleDescription(this.listaDestinatarios.getToolTipText());
         Utils.remarcar(this.listaDestinatarios);
         Utils.setContrastColor(this.listaDestinatarios);

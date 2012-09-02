@@ -65,9 +65,6 @@ public final class AccessibilityOptionsPane {
     /** Casilla de verificacion de fuente en negrita. */
     private JCheckBox checkFontStyle;
 
-    /** Casilla de verificacion de la desactivaci&oacute;n de la accesibilidad en las ventanas de selecci&oacute;n de archivos. */
-    // private JCheckBox checkWindowAccessibility;
-
     /** Casilla de verificacion de alto contraste. */
     private JCheckBox checkHighContrast;
 
@@ -160,7 +157,6 @@ public final class AccessibilityOptionsPane {
         config.setProperty(AccessibilityOptionsPane.MAIN_HIGHT_CONTRAST, Boolean.toString(this.checkHighContrast.isSelected()));
         config.setProperty(AccessibilityOptionsPane.MAIN_FOCUS_VISIBLE, Boolean.toString(this.checkFocusVisible.isSelected()));
         config.setProperty(AccessibilityOptionsPane.MAIN_WINDOWS_SIZE, Boolean.toString(this.checkWindowSize.isSelected()));
-        // config.setProperty(AccessibilityOptionsPane.MAIN_WINDOWS_ACCESSIBILITY, Boolean.toString(this.checkWindowAccessibility.isSelected()));
         config.setProperty(AccessibilityOptionsPane.MAIN_CURSOR_SIZE, Boolean.toString(this.checkCursorSize.isSelected()));
 
         // Comprobamos si se han desactivados las dos opciones de accesibilidad sobre texto
@@ -203,10 +199,9 @@ public final class AccessibilityOptionsPane {
         // Checkbox para habilitar la opcion de configuracion del tama&ntilde;o de fuente
         this.checkFontSize = new JCheckBox();
         this.checkFontSize.setText(Messages.getString("Opciones.accesibilidad.texto.tamano")); // NOI18N //$NON-NLS-1$
-        // checkFontSize.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.general.habilitar")); // NOI18N
         this.checkFontSize.setSelected(GeneralConfig.isAvanzados());
         this.checkFontSize.setBounds(12, 20, 340, 23);
-        this.checkFontSize.setMnemonic(KeyEvent.VK_D); // AsignaciÃ³n de mnemÃ³nico al checkbox
+        this.checkFontSize.setMnemonic(KeyEvent.VK_D); // Asignacion de mnemonico al checkbox
         Utils.remarcar(this.checkFontSize);
         Utils.setContrastColor(this.checkFontSize);
         Utils.setFontBold(this.checkFontSize);
@@ -219,10 +214,9 @@ public final class AccessibilityOptionsPane {
         // Checkbox para habilitar la opcion de configuracion del estilo de fuente
         this.checkFontStyle = new JCheckBox();
         this.checkFontStyle.setText(Messages.getString("Opciones.accesibilidad.texto.estilo")); // NOI18N //$NON-NLS-1$
-        // checkFontStyle.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.general.habilitar")); // NOI18N
         this.checkFontStyle.setSelected(GeneralConfig.isAvanzados());
         this.checkFontStyle.setBounds(12, 20, 340, 23);
-        this.checkFontStyle.setMnemonic(KeyEvent.VK_N); // AsignaciÃ³n de mnemÃ³nico al checkbox
+        this.checkFontStyle.setMnemonic(KeyEvent.VK_N); // Asignacion de mnemonico al checkbox
         Utils.remarcar(this.checkFontStyle);
         Utils.setContrastColor(this.checkFontStyle);
         Utils.setFontBold(this.checkFontStyle);
@@ -249,10 +243,9 @@ public final class AccessibilityOptionsPane {
         // Checkbox para habilitar la opcion de configuracion de alto contraste
         this.checkHighContrast = new JCheckBox();
         this.checkHighContrast.setText(Messages.getString("Opciones.accesibilidad.color.contraste")); // NOI18N //$NON-NLS-1$
-        // checkFontSize.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.general.habilitar")); // NOI18N
         this.checkHighContrast.setSelected(GeneralConfig.isAvanzados());
         this.checkHighContrast.setBounds(12, 20, 340, 23);
-        this.checkHighContrast.setMnemonic(KeyEvent.VK_L); // AsignaciÃ³n de mnemÃ³nico al checkbox
+        this.checkHighContrast.setMnemonic(KeyEvent.VK_L); // Asignacion de mnemonico al checkbox
         this.checkHighContrast.addActionListener(new ActionListener() {
         	/** {@inheritDoc} */
             @Override
@@ -291,10 +284,9 @@ public final class AccessibilityOptionsPane {
         // Checkbox para habilitar la opcion de configuracion de la visibilidad del foco
         this.checkFocusVisible = new JCheckBox();
         this.checkFocusVisible.setText(Messages.getString("Opciones.accesibilidad.foco.remarcar")); // NOI18N //$NON-NLS-1$
-        // checkFontSize.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.general.habilitar")); // NOI18N
         this.checkFocusVisible.setSelected(GeneralConfig.isAvanzados());
         this.checkFocusVisible.setBounds(12, 20, 340, 23);
-        this.checkFocusVisible.setMnemonic(KeyEvent.VK_F); // AsignaciÃ³n de mnemÃ³nico al checkbox
+        this.checkFocusVisible.setMnemonic(KeyEvent.VK_F); // Asignacion de mnemonico al checkbox
         Utils.remarcar(this.checkFocusVisible);
         Utils.setContrastColor(this.checkFocusVisible);
         Utils.setFontBold(this.checkFocusVisible);
@@ -321,34 +313,15 @@ public final class AccessibilityOptionsPane {
         // Checkbox para habilitar la opcion de configuracion de ventanas maximizadas
         this.checkWindowSize = new JCheckBox();
         this.checkWindowSize.setText(Messages.getString("Opciones.accesibilidad.ventana.tamano")); // NOI18N //$NON-NLS-1$
-        // checkFontSize.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.general.habilitar")); // NOI18N
         this.checkWindowSize.setSelected(GeneralConfig.isAvanzados());
         this.checkWindowSize.setBounds(12, 20, 340, 23);
-        this.checkWindowSize.setMnemonic(KeyEvent.VK_V); // AsignaciÃ³n de mnemÃ³nico al checkbox
+        this.checkWindowSize.setMnemonic(KeyEvent.VK_V); // Asignacion de mnemonico al checkbox
         Utils.remarcar(this.checkWindowSize);
         Utils.setContrastColor(this.checkWindowSize);
         Utils.setFontBold(this.checkWindowSize);
 
         panelWindowSize.add(this.checkWindowSize);
         windowPanel.add(panelWindowSize, c2);
-
-        // c2.gridy = c2.gridy + 1;
-        // JPanel panelWindowAccessibility = new JPanel(new GridLayout(1, 1));
-        // panelWindowAccessibility.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.accesibilidad.ventana"));
-        // //Checkbox para deshabilitar la accesibilidad en los dialogos de seleccion de archivo
-        // this.checkWindowAccessibility = new JCheckBox();
-        // this.checkWindowAccessibility.setText(Messages.getString("Opciones.accesibilidad.ventana.accesibilidad")); // NOI18N
-        // //checkWindowAccessibility.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.general.habilitar")); // NOI18N
-        // this.checkWindowAccessibility.setSelected(GeneralConfig.isAvanzados());
-        // this.checkWindowAccessibility.setBounds(12, 20, 340, 23);
-        // this.checkWindowAccessibility.setMnemonic(KeyEvent.VK_B); // AsignaciÃ³n de mnemÃ³nico al checkbox
-        // this.checkWindowAccessibility.setName("accesibilidadVentanas");
-        // Utils.remarcar(this.checkWindowAccessibility);
-        // Utils.setContrastColor(this.checkWindowAccessibility);
-        // Utils.setFontBold(this.checkWindowAccessibility);
-        //
-        // panelWindowAccessibility.add(this.checkWindowAccessibility);
-        // windowPanel.add(panelWindowAccessibility, c2);
 
         this.panel.add(windowPanel, c);
         c.gridy = c.gridy + 1;
@@ -369,10 +342,9 @@ public final class AccessibilityOptionsPane {
         // Checkbox para habilitar la opcion de configuracion del tama&ntilde;o del cursor
         this.checkCursorSize = new JCheckBox();
         this.checkCursorSize.setText(Messages.getString("Opciones.accesibilidad.cursor.tamano")); // NOI18N //$NON-NLS-1$
-        // checkFontSize.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.general.habilitar")); // NOI18N
         this.checkCursorSize.setSelected(GeneralConfig.isAvanzados());
         this.checkCursorSize.setBounds(12, 20, 340, 23);
-        this.checkCursorSize.setMnemonic(KeyEvent.VK_E); // AsignaciÃ³n de mnemÃ³nico al checkbox
+        this.checkCursorSize.setMnemonic(KeyEvent.VK_E); // Asignacion de mnemonico al checkbox
         Utils.remarcar(this.checkCursorSize);
         Utils.setContrastColor(this.checkCursorSize);
         Utils.setFontBold(this.checkCursorSize);
@@ -451,8 +423,6 @@ public final class AccessibilityOptionsPane {
         this.checkHighContrast.setSelected(Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_HIGHT_CONTRAST, String.valueOf(false))));
         this.checkFocusVisible.setSelected(Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_FOCUS_VISIBLE, String.valueOf(false))));
         this.checkWindowSize.setSelected(Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_WINDOWS_SIZE, String.valueOf(false))));
-        // this.checkWindowAccessibility.setSelected(Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_WINDOWS_ACCESSIBILITY,
-        // String.valueOf(true))));
         this.checkCursorSize.setSelected(Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_CURSOR_SIZE, String.valueOf(false))));
 
         // Comprobamos si esta activada al menos una de las opciones de accesibilidad sobre textos
