@@ -73,7 +73,11 @@ public final class MassiveSignatureHelper {
             throw new IllegalArgumentException("La configuracion indicada no tiene establecida ninguna operacion masiva"); //$NON-NLS-1$
         }
 
+        // Establecemos los valores y nos aseguramos de que el formato de firma
+        // inicialmente establecido es el formato de firma que hemos configurado
+        // por defecto
         this.massiveConfiguration = configuration;
+        this.massiveConfiguration.setSignatureFormat(this.massiveConfiguration.getDefaultFormat());
         this.enabled = true;
 
         // Creamos el manejador de firma por defecto
@@ -341,6 +345,7 @@ public final class MassiveSignatureHelper {
                     + fileUri
                     + "': " //$NON-NLS-1$
                     + e.getMessage());
+            e.printStackTrace();
             this.addLog(MassiveSignMessages.getString("MassiveSignatureHelper.14") + REG_FIELD_SEPARATOR + e.getMessage()); //$NON-NLS-1$
             return null;
         }
@@ -722,13 +727,15 @@ public final class MassiveSignatureHelper {
         }
 
         /** Estable el formato de firma por defecto (para cuando no se desee
-         * respetar el original o se realiza una firma masiva). Si se introduce
-         * {@code null} se reestablecer&aacute; el formato por defecto.
+         * respetar el original o se realiza una firma masiva). Este valor sustituye
+         * al formato inicial para firmas masivas.<br/>
+         * Si se introduce {@code null} se reestablecer&aacute; el formato por defecto.
          * @param defaultFormat
          *        Formato de firma. */
         public void setDefaultFormat(final String defaultFormat) {
             this.defaultFormat = (defaultFormat != null ?
             		defaultFormat : AOSignConstants.DEFAULT_SIGN_FORMAT);
+            this.signatureFormat = this.defaultFormat;
         }
 
         /**
@@ -743,6 +750,8 @@ public final class MassiveSignatureHelper {
          * Establece el formato de firma para la operaci&oacute;n de firma masiva que, a diferencia
          * del resto de operaciones, permite ser cambiado durante el proceso de firma masiva.<br/>
          * Si se establece {@code null} se configura el formato de firma establecido por defecto.
+         * Al inicio del proceso de firma masiva este formato siempre tendr&aacute; el mismo valor
+         * que el formato por defecto configurado.
          * @param signatureFormat Formato de firma.
          */
         public void setSignatureFormat(final String signatureFormat) {
