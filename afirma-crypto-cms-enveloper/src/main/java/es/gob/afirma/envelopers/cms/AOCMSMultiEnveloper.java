@@ -339,23 +339,23 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
      * @throws AOException
      *         Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
      */
-    byte[] createCMSAuthenticatedData(final byte[] content,
-    		                          final PrivateKeyEntry ke,
-    		                          final AOCipherConfig cipherConfig,
-    		                          final X509Certificate[] recipientsCerts) throws CertificateEncodingException,
-                                                                                      NoSuchAlgorithmException,
-                                                                                      IOException,
-                                                                                      AOException {
-		return CMSAuthenticatedData.genAuthenticatedData(
-				AOCMSMultiEnveloper.createContentSignerParementers(content, ke, this.signatureAlgorithm), // ContentSignerParameters
-                null, // Algoritmo de autenticacion (usamos el por defecto)
-                cipherConfig, // Configuracion del cipher
-                recipientsCerts, // certificados destino
-                DATA_TYPE_OID, // dataType
-                true, // applySigningTime,
-                this.attrib, // atributos firmados
-                this.uattrib // atributos no firmados
-        );
+    byte[] createCMSAuthenticatedData(	final byte[] content,
+    									final PrivateKeyEntry ke,
+    									final AOCipherConfig cipherConfig,
+    									final X509Certificate[] recipientsCerts) throws CertificateEncodingException,
+    																				NoSuchAlgorithmException,
+    																				IOException,
+    																				AOException {
+    	return CMSAuthenticatedData.genAuthenticatedData(
+    			AOCMSMultiEnveloper.createContentSignerParementers(content, ke, this.signatureAlgorithm), // ContentSignerParameters
+    			null, // Algoritmo de autenticacion (usamos el por defecto)
+    			cipherConfig, // Configuracion del cipher
+    			recipientsCerts, // certificados destino
+    			DATA_TYPE_OID, // dataType
+    			true, // applySigningTime,
+    			this.attrib, // atributos firmados
+    			this.uattrib // atributos no firmados
+    	);
     }
 
     /** Crea un envoltorio CMS de tipo AuthenticatedEnvelopedData.

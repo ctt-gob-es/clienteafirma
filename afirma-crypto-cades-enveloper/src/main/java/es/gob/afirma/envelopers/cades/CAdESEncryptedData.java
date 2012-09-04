@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -10,7 +10,6 @@
 
 package es.gob.afirma.envelopers.cades;
 
-import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 
 import javax.crypto.SecretKey;
@@ -24,7 +23,6 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ciphers.AOCipherConfig;
-import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.pkcs7.SigUtils;
 
@@ -49,14 +47,14 @@ import es.gob.afirma.signers.pkcs7.SigUtils;
  * para crear un mensaje EncryptedData de BouncyCastle: <a
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
 final class CAdESEncryptedData {
-	
+
 	private CAdESEncryptedData() {
 		// No permitimos la instanciacion
 	}
 
     /** M&eacute;todo principal que genera la firma de tipo EncryptedData.
-     * @param file
-     *        Archivo espec&iacute;fico a cifrar.
+     * @param data
+     *        Datos a cifrar.
      * @param digAlg
      *        ALgoritmo para realizar el Digest.
      * @param config
@@ -69,21 +67,11 @@ final class CAdESEncryptedData {
      * @throws java.security.NoSuchAlgorithmException
      *         Si no se soporta alguno de los algoritmos de firma o huella
      *         digital */
-    static byte[] genEncryptedData(final InputStream file, 
-                            final String digAlg, 
-                            final AOCipherConfig config, 
-                            final String pass, 
+    static byte[] genEncryptedData(final byte[] data,
+                            final String digAlg,
+                            final AOCipherConfig config,
+                            final String pass,
                             final String dataType) throws NoSuchAlgorithmException, AOException {
-        
-        
-
-        final byte[] codeFile;
-        try {
-            codeFile = AOUtil.getDataFromInputStream(file);
-        }
-        catch(final Exception e) {
-            throw new AOException("No se ha podido leer el fujo de entrada", e); //$NON-NLS-1$
-        }
 
         // Asignamos la clave de cifrado
         final SecretKey cipherKey = CAdESUtils.assignKey(config, pass);
@@ -95,7 +83,7 @@ final class CAdESEncryptedData {
         final EncryptedContentInfo encInfo;
         try {
             // 3. ENCRIPTEDCONTENTINFO
-            encInfo = CAdESUtils.getEncryptedContentInfo(codeFile, config, cipherKey);
+            encInfo = CAdESUtils.getEncryptedContentInfo(data, config, cipherKey);
         }
         catch (final Exception ex) {
             throw new AOException("Error durante el proceso de cifrado", ex); //$NON-NLS-1$
@@ -103,7 +91,7 @@ final class CAdESEncryptedData {
 
         // 4. ATRIBUTOS
         // obtenemos la lista de certificados
-        final ASN1Set unprotectedAttrs = SigUtils.getAttributeSet(new AttributeTable(CAdESUtils.initContexExpecific(digestAlgorithm, codeFile, dataType, null)));
+        final ASN1Set unprotectedAttrs = SigUtils.getAttributeSet(new AttributeTable(CAdESUtils.initContexExpecific(digestAlgorithm, data, dataType, null)));
 
         // construimos el Enveloped Data y lo devolvemos
         return new ContentInfo(PKCSObjectIdentifiers.encryptedData, new EncryptedData(encInfo, unprotectedAttrs)).getDEREncoded();

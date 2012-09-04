@@ -10,7 +10,6 @@
 
 package es.gob.afirma.envelopers.cades;
 
-import java.io.InputStream;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
@@ -24,7 +23,6 @@ import es.gob.afirma.core.ciphers.CipherConstants.AOCipherAlgorithm;
 import es.gob.afirma.core.ciphers.CipherConstants.AOCipherBlockMode;
 import es.gob.afirma.core.ciphers.CipherConstants.AOCipherPadding;
 import es.gob.afirma.core.envelopers.AOEnveloper;
-import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
@@ -50,8 +48,8 @@ public class AOCAdESEnveloper implements AOEnveloper {
      * al usuario destinatario.
      * Nota: El par&aacute;metro algorithm no es el agoritmo de cifrado, es para
      * el digestAlgorithm usado en los "Unsigned Attributes".
-     * @param file
-     *        Flujo de lectura de los datos a firmar.
+     * @param data
+     *        Datos a envolver.
      * @param digestAlgorithm
      *        Algoritmo a usar para la firma (SHA1withRSA, MD5withRSA,...)
      * @param type
@@ -68,7 +66,7 @@ public class AOCAdESEnveloper implements AOEnveloper {
      * @return Envoltorio CADES.
      * @throws AOException
      *         Cuando ocurre cualquier problema en el proceso. */
-    public byte[] envelop(final InputStream file,
+    public byte[] envelop(final byte[] data,
                           final String digestAlgorithm,
                           final String type,
                           final PrivateKeyEntry keyEntry,
@@ -80,16 +78,8 @@ public class AOCAdESEnveloper implements AOEnveloper {
         final Properties extraParams = (xParams !=null) ? xParams : new Properties();
 
         // Comprobamos que el archivo a tratar no sea nulo.
-        if (file == null) {
+        if (data == null) {
             throw new IllegalArgumentException("El archivo a tratar no puede ser nulo."); //$NON-NLS-1$
-        }
-
-        final byte[] plainData;
-        try {
-            plainData = AOUtil.getDataFromInputStream(file);
-        }
-        catch (final Exception e1) {
-            throw new AOException("No se han podido leer los datos a firmar", e1); //$NON-NLS-1$
         }
 
         P7ContentSignerParameters csp = null;
@@ -109,7 +99,7 @@ public class AOCAdESEnveloper implements AOEnveloper {
                 }
             }
 
-            csp = new P7ContentSignerParameters(plainData, digestAlgorithm, xCerts);
+            csp = new P7ContentSignerParameters(data, digestAlgorithm, xCerts);
 
         }
 
@@ -150,7 +140,7 @@ public class AOCAdESEnveloper implements AOEnveloper {
                     dataSigned = new CAdESEnvelopedData().genEnvelopedData(csp, config, certDest, dataType);
                 }
                 else {
-                    dataSigned = new CAdESEnvelopedData().genEnvelopedData(plainData, digestAlgorithm, config, certDest, dataType);
+                    dataSigned = new CAdESEnvelopedData().genEnvelopedData(data, digestAlgorithm, config, certDest, dataType);
                 }
             }
             // Es Signed and Enveloped Data.
@@ -183,8 +173,8 @@ public class AOCAdESEnveloper implements AOEnveloper {
      * se usar&aacute; un algoritmo de tipo PBE.
      * Nota: El par&aacute;metro algorithm no es el agoritmo de cifrado, es para
      * el digestAlgorithm usado en los "Unsigned Attributes".
-     * @param file
-     *        Flujo de lectura de los datos a firmar
+     * @param data
+     *        Datos a encriptar.
      * @param digestAlgorithm
      *        Algoritmo a usar para la firma (SHA1withRSA, MD5withRSA,...)
      * @param key
@@ -196,10 +186,10 @@ public class AOCAdESEnveloper implements AOEnveloper {
      * @return Contenido firmado
      * @throws AOException
      *         Cuando ocurre cualquier problema durante el proceso */
-    public byte[] encrypt(final InputStream file, final String digestAlgorithm, final String key, final AOCipherAlgorithm cipherAlgorithm, final String dataType) throws AOException {
+    public byte[] encrypt(final byte[] data, final String digestAlgorithm, final String key, final AOCipherAlgorithm cipherAlgorithm, final String dataType) throws AOException {
 
         // Comprobamos que el archivo a cifrar no sea nulo.
-        if (file == null) {
+        if (data == null) {
             throw new IllegalArgumentException("El archivo a cifrar no puede ser nulo."); //$NON-NLS-1$
         }
 
@@ -219,7 +209,7 @@ public class AOCAdESEnveloper implements AOEnveloper {
         }
 
         try {
-			return CAdESEncryptedData.genEncryptedData(file, digestAlgorithm, config, key, (dataType != null) ? dataType : PKCSObjectIdentifiers.data.getId());
+			return CAdESEncryptedData.genEncryptedData(data, digestAlgorithm, config, key, (dataType != null) ? dataType : PKCSObjectIdentifiers.data.getId());
         }
         catch (final Exception e) {
             throw new AOException("Error generando el enveloped de CADES", e); //$NON-NLS-1$

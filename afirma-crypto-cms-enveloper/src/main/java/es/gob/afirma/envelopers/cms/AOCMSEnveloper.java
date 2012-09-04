@@ -11,7 +11,6 @@
 package es.gob.afirma.envelopers.cms;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
@@ -77,8 +76,8 @@ public class AOCMSEnveloper implements AOEnveloper {
     public static final String DEFAULT_CMS_CONTENTTYPE = CMS_CONTENTTYPE_ENVELOPEDDATA;
 
   //TODO
-    /** M&eacute;todo que realiza el resto de firmas permitidas por CADES. Son
-     * las siguientes: <br/>
+    /** M&eacute;todo para la generaci&oacute;n de envolturas de datos. Los tipos de
+     * envoltura definidos para CMS son: <br/>
      * <ul>
      * <li>Data</li>
      * <li>Signed Data</li>
@@ -87,7 +86,7 @@ public class AOCMSEnveloper implements AOEnveloper {
      * <li>Signed and Enveloped Data</li>
      * </ul>
      * Para la generaci&oacute;n de la clave interna se utiliza por defecto el
-     * AES.
+     * algoritmo AES.
      * En el caso de que sea tipo "Enveloped data" o
      * "Signed and enveloped data", la clave se generar&aacute; usando el
      * algoritmo pasado como par&aacute;metro. Dicha clave se cifrar&aacute;
@@ -95,12 +94,12 @@ public class AOCMSEnveloper implements AOEnveloper {
      * al usuario destinatario.
      * Nota: El par&aacute;metro algorithm no es el agoritmo de cifrado, es para
      * el digestAlgorithm usado en los "Unsigned Attributes".
-     * @param file
-     *        Flujo de lectura de los datos a firmar.
+     * @param data
+     *        Datos que se desean envolver.
      * @param digestAlgorithm
-     *        Algoritmo a usar para la firma (SHA1withRSA, MD5withRSA,...)
+     *        Algoritmo a usar para la envoltura (SHA1withRSA, MD5withRSA,...)
      * @param type
-     *        Tipo de "envelop" que se quiere hacer.
+     *        Tipo de envoltura que se quiere hacer.
      * @param keyEntry
      *        Clave privada a usar para firmar.
      * @param certDest
@@ -113,7 +112,7 @@ public class AOCMSEnveloper implements AOEnveloper {
      * @return Envoltorio CADES.
      * @throws AOException
      *         Cuando ocurre cualquier problema en el proceso. */
-    public byte[] envelop(final InputStream file,
+    public byte[] envelop(final byte[] data,
                           final String digestAlgorithm,
                           final String type,
                           final PrivateKeyEntry keyEntry,
@@ -129,20 +128,19 @@ public class AOCMSEnveloper implements AOEnveloper {
 
 
     //TODO
-    /** Cifra un contenido (t&iacute;picamente un fichero) usando para ello una
-     * contrase&ntilde;a.<br/>
+    /** Cifra datos usando para ello una clave de cifrado.<br/>
      * Se usar&aacute; por defecto el algoritmo de cifrado "AES".
      * La clave usada para cifrar el contenido puede ser tanto un password como
-     * una clave privada del usuario codificada.
+     * una clave privada codificada.
      * En el caso de que sea una clave codificada en base 64, se usar&aacute;
      * como algoritmos los tipo AES, DES ... En el caso de que sea un password,
      * se usar&aacute; un algoritmo de tipo PBE.
-     * Nota: El par&aacute;metro algorithm no es el agoritmo de cifrado, es para
-     * el digestAlgorithm usado en los "Unsigned Attributes".
-     * @param file
-     *        Flujo de lectura de los datos a firmar
+     * Nota: El digestAlgorithm no es el agoritmo de cifrado, es el algoritmo de
+     * huella digital usado en los "Unsigned Attributes".
+     * @param data
+     *        Datos a envolver.
      * @param digestAlgorithm
-     *        Algoritmo a usar para la firma (SHA1withRSA, MD5withRSA,...)
+     *        Algoritmo a usar para la envoltura (SHA1withRSA, MD5withRSA,...)
      * @param key
      *        Puede ser una clave codificada o una contrase&ntilde;a usada
      *        para cifrar el contenido.
@@ -152,11 +150,11 @@ public class AOCMSEnveloper implements AOEnveloper {
      * @return Contenido firmado
      * @throws AOException
      *         Cuando ocurre cualquier problema durante el proceso */
-    public byte[] encrypt(final InputStream file, final String digestAlgorithm, final String key, final AOCipherAlgorithm cipherAlgorithm, final String dataType) throws AOException {
+    public byte[] encrypt(final byte[] data, final String digestAlgorithm, final String key, final AOCipherAlgorithm cipherAlgorithm, final String dataType) throws AOException {
 
         // Comprobamos que el archivo a cifrar no sea nulo.
-        if (file == null) {
-            throw new IllegalArgumentException("El archivo a cifrar no puede ser nulo."); //$NON-NLS-1$
+        if (data == null) {
+            throw new IllegalArgumentException("Los datos a cifrar no pueden ser nulo."); //$NON-NLS-1$
         }
 
         return null;
