@@ -175,9 +175,6 @@ public class AOCMSEnveloper implements AOEnveloper {
      * envoltorios que los soporten. */
     private final Map<String, byte[]> uattrib = new HashMap<String, byte[]>();
 
-    /** Clave privada del usuario que genera o abre el envoltorio. */
-    private PrivateKeyEntry configuredKe = null;
-
     /** Clave para el descifrado de los datos de un envoltorio EncryptedData. Si
      * se utiliza un algoritmo PBE de cifrado, ser&aacute; una contrase&ntilde;a
      * en texto plano. Si es otro algoritmo ser&aacute; su clave en base 64. */
@@ -495,13 +492,6 @@ public class AOCMSEnveloper implements AOEnveloper {
         this.signatureAlgorithm = (algorithm == null ? AOSignConstants.DEFAULT_SIGN_ALGO : algorithm);
     }
 
-    /** Establece la clave privada del remitente del envoltorio.
-     * @param originatorKe
-     *        Clave del remitente. */
-    public void setOriginatorKe(final PrivateKeyEntry originatorKe) {
-        this.configuredKe = originatorKe;
-    }
-
     /** Establece la contrase&ntilde;a o clave para la encriptaci&oacute;n de los
      * datos.
      * @param keyPass
@@ -517,12 +507,6 @@ public class AOCMSEnveloper implements AOEnveloper {
         return this.signatureAlgorithm;
     }
 
-    /** Recupera la clave privada del remitente del envoltorio.
-     * @return Clave del remitente. */
-    PrivateKeyEntry getOriginatorKe() {
-        return this.configuredKe;
-    }
-
     /** Recupera la clave o contrascontrase&ntilde;a para la encriptaci&oacute;n
      * de los datos.
      * @return Clave en base 64 o contrase&ntilda;a de cifrado. */
@@ -533,91 +517,87 @@ public class AOCMSEnveloper implements AOEnveloper {
     /** Recupera el contenido de un envoltorio CMS.
      * @param cmsEnvelop
      *        Envoltorio CMS.
+     * @param addresseePke
+     *        Clave privada del destinatario que desea desensobrar.
      * @return Contenido del envoltorio.
-     * @throws AOInvalidRecipientException
-     *         Cuando el usuario no es uno de los destinatarios del sobre.
      * @throws InvalidKeyException
-     *         Cuando la clave de descifrado configurada no es
-     *         v&aacute;lida.
-     * @throws CertificateEncodingException
-     *         Cuando el certificado del destinatario no es v&aacute;lido.
-     * @throws IOException
-     *         Cuando el envoltorio est&aacute; corrupto o no puede leerse.
-     * @throws AOInvalidFormatException
-     *         Cuando no se ha indicado un envoltorio soportado.
+     *         Cuando la clave de descifrado configurada no sea v&aacute;lida o pertenezca a un destinatario.
      * @throws AOException
-     *         Cuando se produce un error durante al desenvolver los datos.
-     * @throws NoSuchAlgorithmException
-     * @throws BadPaddingException
-     * @throws IllegalBlockSizeException
-     * @throws InvalidAlgorithmParameterException
-     * @throws NoSuchPaddingException */
-    public byte[] recoverData(final byte[] cmsEnvelop) throws
-                                         InvalidKeyException,
-                                         CertificateEncodingException,
-                                         IOException,
-                                         AOException,
-                                         NoSuchAlgorithmException,
-                                         NoSuchPaddingException,
-                                         InvalidAlgorithmParameterException,
-                                         IllegalBlockSizeException,
-                                         BadPaddingException {
+     *         Cuando se produce un error durante al desenvolver los datos. */
+    public byte[] recoverData(final byte[] cmsEnvelop, final PrivateKeyEntry addresseePke) throws InvalidKeyException, AOException {
 
-        final org.bouncycastle.asn1.ASN1InputStream is = new org.bouncycastle.asn1.ASN1InputStream(cmsEnvelop);
+    	final org.bouncycastle.asn1.ASN1InputStream is = new org.bouncycastle.asn1.ASN1InputStream(cmsEnvelop);
 
-        // Leemos los datos
-        final org.bouncycastle.asn1.ASN1Sequence dsq;
-        try {
-            dsq = (org.bouncycastle.asn1.ASN1Sequence) is.readObject();
-        }
-        finally {
-            try {
-                is.close();
-            }
-            catch (final Exception e) {
-                // Ignoramos los errores en el cierre
-            }
-        }
+    	// Leemos los datos
+    	final org.bouncycastle.asn1.ASN1Sequence dsq;
+    	try {
+    		dsq = (org.bouncycastle.asn1.ASN1Sequence) is.readObject();
+    	}
+    	catch (final IOException e) {
+    		throw new AOException("Ocurrio un error al leer la informacion del envoltorio", e); //$NON-NLS-1$
+    	}
+    	finally {
+    		try {
+    			is.close();
+    		}
+    		catch (final Exception e) {
+    			// Ignoramos los errores en el cierre
+    		}
+    	}
 
-        final Enumeration<?> objects = dsq.getObjects();
+    	final Enumeration<?> objects = dsq.getObjects();
 
-        // Elementos que contienen los elementos OID Data
-        final org.bouncycastle.asn1.DERObjectIdentifier doi = (org.bouncycastle.asn1.DERObjectIdentifier) objects.nextElement();
+    	// Elementos que contienen los elementos OID Data
+    	final org.bouncycastle.asn1.DERObjectIdentifier doi = (org.bouncycastle.asn1.DERObjectIdentifier) objects.nextElement();
 
-        byte[] datos;
-        if (doi.equals(org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.data)) {
-            Logger.getLogger("es.gob.afirma").warning("La extraccion de datos de los envoltorios CMS Data no esta implementada"); //$NON-NLS-1$ //$NON-NLS-2$
-            datos = null;
-            // datos = this.recoverCMSEncryptedData(cmsEnvelop, cipherKey);
-        }
-        else if (doi.equals(org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.digestedData)) {
-            Logger.getLogger("es.gob.afirma").warning("La extraccion de datos de los envoltorios CMS DigestedData no esta implementada"); //$NON-NLS-1$ //$NON-NLS-2$
-            datos = null;
-            // datos = this.recoverCMSEncryptedData(cmsEnvelop, cipherKey);
-        }
-        else if (doi.equals(org.bouncycastle.asn1.cms.CMSObjectIdentifiers.compressedData)) {
-            datos = AOCMSEnveloper.recoverCMSCompressedData(cmsEnvelop);
-        }
-        else if (doi.equals(org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.encryptedData)) {
-            datos = AOCMSEnveloper.recoverCMSEncryptedData(cmsEnvelop, this.cipherKey);
-        }
-        else if (doi.equals(org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.envelopedData)) {
-            datos = AOCMSEnveloper.recoverCMSEnvelopedData(cmsEnvelop, this.configuredKe);
-        }
-        else if (doi.equals(org.bouncycastle.asn1.cms.CMSObjectIdentifiers.authEnvelopedData)) {
-            datos = AOCMSEnveloper.recoverCMSAuthenticatedEnvelopedData(cmsEnvelop, this.configuredKe);
-        }
-        else if (doi.equals(org.bouncycastle.asn1.cms.CMSObjectIdentifiers.authenticatedData)) {
-            datos = AOCMSEnveloper.recoverCMSAuthenticatedData(cmsEnvelop, this.configuredKe);
-        }
-        else if (doi.equals(org.bouncycastle.asn1.cms.CMSObjectIdentifiers.signedAndEnvelopedData)) {
-            datos = AOCMSEnveloper.recoverCMSSignedEnvelopedData(cmsEnvelop, this.configuredKe);
-        }
-        else {
-            throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un tipo de objeto CMS soportado"); //$NON-NLS-1$
-        }
+    	byte[] datos;
+    	try {
+    		if (doi.equals(org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.data)) {
+    			Logger.getLogger("es.gob.afirma").warning("La extraccion de datos de los envoltorios CMS Data no esta implementada"); //$NON-NLS-1$ //$NON-NLS-2$
+    			datos = null;
+    			// datos = this.recoverCMSEncryptedData(cmsEnvelop, cipherKey);
+    		}
+    		else if (doi.equals(org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.digestedData)) {
+    			Logger.getLogger("es.gob.afirma").warning("La extraccion de datos de los envoltorios CMS DigestedData no esta implementada"); //$NON-NLS-1$ //$NON-NLS-2$
+    			datos = null;
+    			// datos = this.recoverCMSEncryptedData(cmsEnvelop, cipherKey);
+    		}
+    		else if (doi.equals(org.bouncycastle.asn1.cms.CMSObjectIdentifiers.compressedData)) {
+    			datos = AOCMSEnveloper.recoverCMSCompressedData(cmsEnvelop);
+    		}
+    		else if (doi.equals(org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.encryptedData)) {
+    			datos = AOCMSEnveloper.recoverCMSEncryptedData(cmsEnvelop, this.cipherKey);
+    		}
+    		else if (doi.equals(org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.envelopedData)) {
+    			datos = AOCMSEnveloper.recoverCMSEnvelopedData(cmsEnvelop, addresseePke);
+    		}
+    		else if (doi.equals(org.bouncycastle.asn1.cms.CMSObjectIdentifiers.authEnvelopedData)) {
+    			datos = AOCMSEnveloper.recoverCMSAuthenticatedEnvelopedData(cmsEnvelop, addresseePke);
+    		}
+    		else if (doi.equals(org.bouncycastle.asn1.cms.CMSObjectIdentifiers.authenticatedData)) {
+    			datos = AOCMSEnveloper.recoverCMSAuthenticatedData(cmsEnvelop, addresseePke);
+    		}
+    		else if (doi.equals(org.bouncycastle.asn1.cms.CMSObjectIdentifiers.signedAndEnvelopedData)) {
+    			datos = AOCMSEnveloper.recoverCMSSignedEnvelopedData(cmsEnvelop, addresseePke);
+    		}
+    		else {
+    			throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un tipo de objeto CMS soportado"); //$NON-NLS-1$
+    		}
+    	} catch (final InvalidKeyException e) {
+    		throw e;
+    	} catch (final AOInvalidRecipientException e) {
+    		throw new InvalidKeyException("La clave indicada no pertenece a ninguno de los destinatarios del envoltorio", e); //$NON-NLS-1$
+    	} catch (final CertificateEncodingException e) {
+    		throw new AOException("Error al descodificar los certificados del envoltorio", e); //$NON-NLS-1$
+    	} catch (final IOException e) {
+    		throw new AOException("Error durante la lectura del envoltorio", e); //$NON-NLS-1$
+    	} catch (final NoSuchAlgorithmException e) {
+    		throw new AOException("No se reconoce el algoritmo indicado", e); //$NON-NLS-1$
+    	} catch (final Exception e) {
+    		throw new AOException("Error en el desencriptado de los datos", e); //$NON-NLS-1$
+    	}
 
-        return datos;
+    	return datos;
     }
 
     /** Recupera el contenido de un envoltorio CompressedData.
@@ -731,7 +711,8 @@ public class AOCMSEnveloper implements AOEnveloper {
      *         extracci&oacute;n.
      * @throws InvalidKeyException
      *         Cuando la clave almacenada en el sobre no es v&aacute;lida.
-     * @throws NoSuchAlgorithmException
+     * @throws NoSuchAlgorithmException Cuando no se reconoce el algoritmo
+     * utilizado para generar el código de autenticación.
      */
     static byte[] recoverCMSAuthenticatedData(final byte[] authenticatedData,
     		                                  final PrivateKeyEntry ke) throws IOException,

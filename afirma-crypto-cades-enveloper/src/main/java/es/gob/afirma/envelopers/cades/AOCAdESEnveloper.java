@@ -10,6 +10,7 @@
 
 package es.gob.afirma.envelopers.cades;
 
+import java.security.InvalidKeyException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
@@ -216,5 +217,13 @@ public class AOCAdESEnveloper implements AOEnveloper {
         }
 
     }
+
+
+	public byte[] recoverData(final byte[] envelop, final PrivateKeyEntry addresseePke)
+			throws InvalidKeyException, AOException {
+
+		//TODO: Implementar la apetura de envoltorios CAdES
+		throw new UnsupportedOperationException("No se soporta la apertura de envoltorios CAdES"); //$NON-NLS-1$
+	}
 
 }

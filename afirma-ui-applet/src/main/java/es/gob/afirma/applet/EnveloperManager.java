@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.net.URI;
 import java.security.KeyException;
+import java.security.KeyStore.PrivateKeyEntry;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
@@ -390,6 +391,7 @@ final class EnveloperManager {
 
         // Comprobamos si requiere un certificado para la extraccion de los
         // datos
+    	PrivateKeyEntry pke = null;
         if (AOCMSEnveloper.isCMSValid(envelop, AOSignConstants.CMS_CONTENTTYPE_ENVELOPEDDATA) || AOCMSEnveloper.isCMSValid(envelop,
                                                                                                              AOSignConstants.CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA)
             || AOCMSEnveloper.isCMSValid(envelop, AOSignConstants.CMS_CONTENTTYPE_AUTHENVELOPEDDATA)) {
@@ -401,7 +403,7 @@ final class EnveloperManager {
                     throw new AOException("Error al obtener el certificado seleccionado", e); //$NON-NLS-1$
                 }
             }
-            this.enveloper.setOriginatorKe(this.ksConfigManager.getCertificateKeyEntry());
+            pke = this.ksConfigManager.getCertificateKeyEntry();
         }
         else if (AOCMSEnveloper.isCMSValid(envelop, AOSignConstants.CMS_CONTENTTYPE_ENCRYPTEDDATA)) {
             if (this.cipherManager.getCipherAlgorithm().supportsKey()) {
@@ -413,11 +415,11 @@ final class EnveloperManager {
         }
 
         try {
-            this.contentData = this.enveloper.recoverData(envelop);
-        }
-        catch (final BadPaddingException e) {
-            throw new AOException("La clave interna del sobre no es valida", e); //$NON-NLS-1$
+            this.contentData = this.enveloper.recoverData(envelop, pke);
         } catch (final Exception e) {
+        	if (e.getCause() instanceof BadPaddingException) {
+                throw new AOException("La clave interna del sobre no es valida", e); //$NON-NLS-1$
+        	}
         	throw new AOException("No se han podido desenvolver los datos", e); //$NON-NLS-1$
 		}
     }

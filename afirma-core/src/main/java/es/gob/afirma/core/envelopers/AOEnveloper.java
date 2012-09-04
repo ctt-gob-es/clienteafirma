@@ -10,6 +10,7 @@
 
 package es.gob.afirma.core.envelopers;
 
+import java.security.InvalidKeyException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.X509Certificate;
 import java.util.Properties;
@@ -59,4 +60,19 @@ public interface AOEnveloper {
      * @throws AOException
      *         Cuando ocurre cualquier problema durante el proceso */
     byte[] encrypt(byte[] data, String digestAlgorithm, String key, AOCipherAlgorithm cipherAlgorithm, String dataType) throws AOException;
+
+
+    /**
+     * Recupera los datos contenidos en un envoltorio.
+     * @param envelop
+     * 			Envoltorio de datos.
+     * @param addresseePke
+     * 			Clave privada del receptor del envoltorio (si es necesario)
+     * @return Datos contenidos en el envoltorio.
+     * @throws InvalidKeyException
+     * 			Si la clave indicada no es v&aacute;lida o no pertenece a un destinatario del envoltorio.
+     * @throws AOException
+     * 			Cuando ocurre algun problema en la apetura del envoltorio.
+     */
+    byte[] recoverData(byte[] envelop, PrivateKeyEntry addresseePke) throws InvalidKeyException, AOException;
 }
