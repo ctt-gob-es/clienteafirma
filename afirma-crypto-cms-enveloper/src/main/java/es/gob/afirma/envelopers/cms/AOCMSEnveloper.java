@@ -712,7 +712,7 @@ public class AOCMSEnveloper implements AOEnveloper {
      * @throws InvalidKeyException
      *         Cuando la clave almacenada en el sobre no es v&aacute;lida.
      * @throws NoSuchAlgorithmException Cuando no se reconoce el algoritmo
-     * utilizado para generar el código de autenticación.
+     * utilizado para generar el c&oacute;digo de autenticaci&oacute;n.
      */
     static byte[] recoverCMSAuthenticatedData(final byte[] authenticatedData,
     		                                  final PrivateKeyEntry ke) throws IOException,
