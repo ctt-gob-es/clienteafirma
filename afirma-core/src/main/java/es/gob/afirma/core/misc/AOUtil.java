@@ -25,7 +25,6 @@ import java.nio.channels.FileChannel;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
@@ -393,48 +392,6 @@ public final class AOUtil {
             stringbuffer.append(HEX_CHARS[abyte0[j] & 0xf]);
         }
         return stringbuffer.toString();
-    }
-
-    /** Recupera el texto con un identificador de versi&oacute;n a partir de un
-     * properties indicado a trav&eacute;s de un <code>InputStream</code>. Las
-     * propiedades del properties que definen la versi&oacute;n son:<br/>
-     * <code><ul><li>version.mayor: Versi&oacute;n.</li>
-     * <li>version.minor: Versi&oacute;n menor.</li>
-     * <li>version.build: Contrucci&oacute;n</li>
-     * <li>version.description: Descripci&oacute;n</li></ul></code> El formato
-     * en el que se devuelve la versi&oacute;n ser&aacute; siempre:<br/>
-     * <code>X.Y.Z Descripci&oacute;n</code><br/>
-     * En donde <code>X</code>, <code>Y</code> y <code>Z</code> son la
-     * versi&oacute;n, subversi&oacute;n y contrucci&oacute;n del cliente y
-     * puede tener uno o m&aacute;s d&iacute;gitos; y <code>Descripci&oacute;n</code> es un texto libre opcional que puede
-     * completar la identificaci&oacute;n de la versi&oacute;n del cliente.</br>
-     * Si no se indica alg&uacute;n de los n&uacute;meros de versi&oacute;n se
-     * indicar&aacute; cero ('0') y si no se indica la descripci&oacute;n no se
-     * mostrar&aacute; nada.
-     * @param is
-     *        Datos del properties con la versi&oacute;n.
-     * @return Identificador de la versi&oacute;n. */
-    public static String getVersion(final InputStream is) {
-        final Properties p = new Properties();
-        try {
-            p.load(is);
-        }
-        catch (final Exception e) {
-            LOGGER.warning("No se han podido obtener los datos de version del cliente de firma"); //$NON-NLS-1$
-        }
-        final StringBuilder version = new StringBuilder();
-        version.append(p.getProperty("version.mayor", "0")) //$NON-NLS-1$ //$NON-NLS-2$
-               .append(".") //$NON-NLS-1$
-               .append(p.getProperty("version.minor", "0")) //$NON-NLS-1$ //$NON-NLS-2$
-               .append(".") //$NON-NLS-1$
-               .append(p.getProperty("version.build", "0")); //$NON-NLS-1$ //$NON-NLS-2$
-
-        final String desc = p.getProperty("version.description"); //$NON-NLS-1$
-        if (desc != null && !desc.trim().equals("")) { //$NON-NLS-1$
-            version.append(" ").append(desc); //$NON-NLS-1$
-        }
-        return version.toString();
-
     }
 
     /** Genera una cadena representativa del &aacute;rbol que recibe.
