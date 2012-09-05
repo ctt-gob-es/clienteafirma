@@ -66,8 +66,6 @@ public final class PrincipalGUI extends JAccessibilityFrame {
 
     private static JStatusBar bar = new JStatusBar();
 
-    private static final String DEFAULT_LOCALE = "es_ES"; //$NON-NLS-1$
-
     private static int fileActualHeight = -1;
 
     private static int fileActualPositionX = -1;
@@ -161,19 +159,6 @@ public final class PrincipalGUI extends JAccessibilityFrame {
     static void ayudaHTMLActionPerformed() {
         HelpUtils.visualize(true);
     }
-
-//    /** Selecci&oacute;n idiomas: Cambia el idioma de la aplicaci&oacute;n
-//     * @param locale Nuevo Locale */
-//    void cambiarIdioma(final Locale locale) {
-//        Locale.setDefault(locale);
-//        HelpUtils.change(locale.toString());
-//        this.getContentPane().removeAll();
-//
-//        // Cambia el idioma de los mensajes
-//        Messages.changeLocale();
-//        initComponents();
-//        SwingUtilities.updateComponentTreeUI(this);
-//    }
 
     /** Construye el panel principal de la aplicaci&oacute;n con las pesta&ntilde;as de
      * las distintas funcionalidades. */
@@ -521,83 +506,6 @@ public final class PrincipalGUI extends JAccessibilityFrame {
         Utils.setFontBold(opciones);
         herramientas.add(opciones);
 
-//        // Subopcion menu Herramientas - Idiomas
-//        final JMenu menuIdioma = new JMenu();
-//        menuIdioma.setText(Messages.getString("Opciones.general.idioma")); //$NON-NLS-1$
-//        menuIdioma.setMnemonic(KeyEvent.VK_I); // Se asigna un atajo al menu
-//
-//        // Obtenemos ruta donde se encuentra la aplicacion
-//        final URL baseDirectory = getClass().getProtectionDomain().getCodeSource().getLocation();
-//        File languagesDirectory = null;
-//
-//        // Obtenemos el contenido del directorio languages
-//        try {
-//            File fileDirectory = new File(baseDirectory.toURI());
-//            if (fileDirectory.isFile()) {
-//                fileDirectory = fileDirectory.getParentFile();
-//            }
-//            languagesDirectory = new File(fileDirectory, "languages"); //$NON-NLS-1$
-//        }
-//        catch (final Exception ex) {
-//        	Logger.getLogger("es.gob.afirma").severe("Error en la obtencion del contenido del directorio de lenguajes: " + ex); //$NON-NLS-1$ //$NON-NLS-2$
-//        }
-//
-//        // Inicialmente introducimos el espanol
-//        final List<String> languages = new ArrayList<String>();
-//        languages.add(DEFAULT_LOCALE);
-//
-//        // Parseamos los nombres de las librerias de idiomas para obtener los codigos
-//        // del idioma.
-//        if ((languagesDirectory != null) && (languagesDirectory.isDirectory())) {
-//            final File[] listFiles = languagesDirectory.listFiles();
-//
-//            for (final File listFile : listFiles) {
-//                if (listFile != null && listFile.isFile() && listFile.getName().startsWith("help")) { //$NON-NLS-1$
-//                    final String locale = listFile.getName().substring(5, listFile.getName().indexOf(".jar")); //$NON-NLS-1$
-//                    languages.add(locale);
-//                }
-//            }
-//        }
-//
-//        // Lista de mnemonicos usados para los radio buttons de lenguajes
-//        final List<Character> mnemonicList = new ArrayList<Character>();
-//
-//        // Generamos las opciones del menu idiomas
-//        final ButtonGroup grupo = new ButtonGroup();
-//        for (final String language : languages) {
-//            if (language != null) {
-//                final Locale locale = new Locale(language.substring(0, 2), language.substring(3));
-//                final String languageName = locale.getDisplayLanguage(locale);
-//                final JRadioButtonMenuItem opcionIdioma = new JRadioButtonMenuItem(languageName.substring(0, 1).toUpperCase() + languageName.substring(1));
-//
-//                // Se asigna un mnemonico que no haya sido utilizado
-//                opcionIdioma.setMnemonic(Utils.getLanguageMnemonic(mnemonicList, languageName.toLowerCase()));
-//
-//                Utils.setContrastColor(opcionIdioma);
-//                Utils.setFontBold(opcionIdioma);
-//                menuIdioma.add(opcionIdioma);
-//                grupo.add(opcionIdioma);
-//
-//                if (Locale.getDefault().equals(locale)) {
-//                    opcionIdioma.setSelected(true);
-//                }
-//
-//                opcionIdioma.addItemListener(new ItemListener() {
-//                	/** {@inheritDoc} */
-//                    @Override
-//                    public void itemStateChanged(final ItemEvent e) {
-//                        if (e.getStateChange() == ItemEvent.SELECTED) {
-//                            cambiarIdioma(locale);
-//                        }
-//                    }
-//                });
-//            }
-//        }
-//
-//        Utils.setContrastColor(menuIdioma);
-//        Utils.setFontBold(menuIdioma);
-//        herramientas.add(menuIdioma);
-
         // Separador
         final JSeparator separador = new JSeparator();
         herramientas.add(separador);
@@ -860,34 +768,50 @@ public final class PrincipalGUI extends JAccessibilityFrame {
 		PrincipalGUI.aboutActualWidth = aboutActualWidth;
 	}
 
+	/** Obtiene el alto para los di&aacute;logos de ficheros de la aplicaci&oacute;n.
+	 * @return Alto para los di&aacute;logos de ficheros de la aplicaci&oacute;n */
 	public static int getFileActualHeight() {
 		return fileActualHeight;
 	}
 
+	/** Establece el alto para los di&aacute;logos de ficheros de la aplicaci&oacute;n.
+	 * @param fileActualHeight Alto para los di&aacute;logos de ficheros de la aplicaci&oacute;n */
 	public static void setFileActualHeight(final int fileActualHeight) {
 		PrincipalGUI.fileActualHeight = fileActualHeight;
 	}
 
+	/** Obtiene la coordenada horizontal de la posici&oacute;n de los di&aacute;logos de ficheros de la aplicaci&oacute;n.
+	 * @return Coordenada horizontal de la posici&oacute;n de los di&aacute;logos de ficheros de la aplicaci&oacute;n */
 	public static int getFileActualPositionX() {
 		return fileActualPositionX;
 	}
 
+	/** Establece la coordenada horizontal de la posici&oacute;n de los di&aacute;logos de ficheros de la aplicaci&oacute;n.
+	 * @param fileActualPositionX Coordenada horizontal de la posici&oacute;n de los di&aacute;logos de ficheros de la aplicaci&oacute;n */
 	public static void setFileActualPositionX(final int fileActualPositionX) {
 		PrincipalGUI.fileActualPositionX = fileActualPositionX;
 	}
 
+	/** Obtiene la coordenada vertical de la posici&oacute;n de los di&aacute;logos de ficheros de la aplicaci&oacute;n.
+	 * @return Coordenada vertical de la posici&oacute;n de los di&aacute;logos de ficheros de la aplicaci&oacute;n */
 	public static int getFileActualPositionY() {
 		return fileActualPositionY;
 	}
 
+	/** Establece la coordenada vertical de la posici&oacute;n de los di&aacute;logos de ficheros de la aplicaci&oacute;n.
+	 * @param fileActualPositionY Coordenada vertical de la posici&oacute;n de los di&aacute;logos de ficheros de la aplicaci&oacute;n */
 	public static void setFileActualPositionY(final int fileActualPositionY) {
 		PrincipalGUI.fileActualPositionY = fileActualPositionY;
 	}
 
+	/** Obtiene el ancho para los di&aacute;logos de ficheros de la aplicaci&oacute;n.
+	 * @return Ancho para los di&aacute;logos de ficheros de la aplicaci&oacute;n */
 	public static int getFileActualWidth() {
 		return fileActualWidth;
 	}
 
+	/** Establece el ancho para los di&aacute;logos de ficheros de la aplicaci&oacute;n.
+	 * @param fileActualWidth Ancho para los di&aacute;logos de ficheros de la aplicaci&oacute;n */
 	public static void setFileActualWidth(final int fileActualWidth) {
 		PrincipalGUI.fileActualWidth = fileActualWidth;
 	}
@@ -930,34 +854,50 @@ public final class PrincipalGUI extends JAccessibilityFrame {
 		PrincipalGUI.optionActualWidth = optionActualWidth;
 	}
 
+	/** Obtiene el alto de los asistentes de la aplicaci&oacute;n.
+	 * @return Alto de los asistentes de la aplicaci&oacute;n */
 	public static int getWizardActualHeight() {
 		return wizardActualHeight;
 	}
 
+	/** Establece el alto para los asistentes de la aplicaci&oacute;n.
+	 * @param wizardActualHeight Alto para los di&aacute;logos de ficheros de la aplicaci&oacute;n */
 	public static void setWizardActualHeight(final int wizardActualHeight) {
 		PrincipalGUI.wizardActualHeight = wizardActualHeight;
 	}
 
+	/** Obtiene la coordenada horizontal de la posici&oacute;n de los asistentes de la aplicaci&oacute;n.
+	 * @return Coordenada horizontal de la posici&oacute;n de los asistentes de la aplicaci&oacute;n */
 	public static int getWizardActualPositionX() {
 		return wizardActualPositionX;
 	}
 
+	/** Establece la coordenada horizontal de la posici&oacute;n de los asistentes de la aplicaci&oacute;n.
+	 * @param wizardActualPositionX Coordenada horizontal de la posici&oacute;n de los asistentes de la aplicaci&oacute;n */
 	public static void setWizardActualPositionX(final int wizardActualPositionX) {
 		PrincipalGUI.wizardActualPositionX = wizardActualPositionX;
 	}
 
+	/** Obtiene la coordenada vertical de la posici&oacute;n de los asistentes de la aplicaci&oacute;n.
+	 * @return Coordenada vertical de la posici&oacute;n de los asistentes de la aplicaci&oacute;n */
 	public static int getWizardActualPositionY() {
 		return wizardActualPositionY;
 	}
 
+	/** Establece la coordenada vertical de la posici&oacute;n de los asistentes de la aplicaci&oacute;n.
+	 * @param wizardActualPositionY Coordenada vertical de la posici&oacute;n de los asistentes de la aplicaci&oacute;n */
 	public static void setWizardActualPositionY(final int wizardActualPositionY) {
 		PrincipalGUI.wizardActualPositionY = wizardActualPositionY;
 	}
 
+	/** Obtiene el ancho de los asistentes de la aplicaci&oacute;n.
+	 * @return Ancho de los asistentes de la aplicaci&oacute;n */
 	public static int getWizardActualWidth() {
 		return wizardActualWidth;
 	}
 
+	/** Establece el ancho para los asistentes de la aplicaci&oacute;n.
+	 * @param wizardActualWidth Ancho para los di&aacute;logos de ficheros de la aplicaci&oacute;n */
 	public static void setWizardActualWidth(final int wizardActualWidth) {
 		PrincipalGUI.wizardActualWidth = wizardActualWidth;
 	}
