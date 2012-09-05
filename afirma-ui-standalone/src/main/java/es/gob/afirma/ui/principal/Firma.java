@@ -62,6 +62,7 @@ import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
 import es.gob.afirma.signers.xades.EFacturaAlreadySignedException;
 import es.gob.afirma.signers.xades.InvalidEFacturaDataException;
+import es.gob.afirma.signers.xml.InvalidXMLException;
 import es.gob.afirma.signers.xmldsig.AOXMLDSigSigner;
 import es.gob.afirma.ui.listeners.ElementDescriptionFocusListener;
 import es.gob.afirma.ui.listeners.ElementDescriptionMouseListener;
@@ -408,6 +409,17 @@ final class Firma extends JPanel {
     				SwingUtilities.getRoot(this),
     				true,
     				"<html><p>Los datos proporcionados no son son un documento PDF soportado.<br>Con formato de firma PAdES solo es posible firmar documentos PDF.</p></html>",
+    				Messages.getString("error"),  //$NON-NLS-1$
+    				JOptionPane.ERROR_MESSAGE
+    			);
+        		return;
+            }
+            catch(final InvalidXMLException e) {
+            	LOGGER.severe("Se ha enviado a firmar con XAdES/XMLDSig Enveloped datos que no son un documento XML: " + e); //$NON-NLS-1$
+        		CustomDialog.showMessageDialog(
+    				SwingUtilities.getRoot(this),
+    				true,
+    				"<html><p>Los datos proporcionados no son son un documento XML.<br>Con formatos de firma XMLDSig/XAdES <i>Enveloped</i> solo es posible firmar documentos XML.</p></html>",
     				Messages.getString("error"),  //$NON-NLS-1$
     				JOptionPane.ERROR_MESSAGE
     			);

@@ -71,7 +71,6 @@ import org.xml.sax.SAXException;
 import com.sun.org.apache.xerces.internal.dom.DOMOutputImpl;
 
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
@@ -82,6 +81,7 @@ import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
+import es.gob.afirma.signers.xml.InvalidXMLException;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.Utils.CannotDereferenceException;
 import es.gob.afirma.signers.xml.Utils.IsInnerlException;
@@ -481,7 +481,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             // captura de error en caso de no ser un documento xml
             catch (final Exception e) {
                 if (format.equals(AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED)) {
-                    throw new AOFormatFileException("El modo Enveloped solo permite firmar datos XML", e); //$NON-NLS-1$
+                    throw new InvalidXMLException(e);
                 }
                 // para los formatos de firma internally detached y enveloping
                 // se trata de convertir el documento a base64
@@ -1672,8 +1672,8 @@ public final class AOXMLDSigSigner implements AOSigner {
 
         // y crea sus contrafirmas
         try {
-            for (int i = 0; i < nodes.length; i++) {
-                this.cs(nodes[i], keyEntry, onlySignningCert, refsDigestMethod, canonicalizationAlgorithm, xmlSignaturePrefix);
+            for (final Element node : nodes) {
+                this.cs(node, keyEntry, onlySignningCert, refsDigestMethod, canonicalizationAlgorithm, xmlSignaturePrefix);
             }
         }
         catch (final Exception e) {

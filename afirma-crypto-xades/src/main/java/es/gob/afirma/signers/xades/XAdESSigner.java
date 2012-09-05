@@ -57,11 +57,11 @@ import org.w3c.dom.DocumentType;
 import org.w3c.dom.Element;
 
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.signers.xml.InvalidXMLException;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.Utils.CannotDereferenceException;
 import es.gob.afirma.signers.xml.Utils.IsInnerlException;
@@ -604,8 +604,7 @@ final class XAdESSigner {
 			// captura de error en caso de no ser un documento xml
 			catch (final Exception e) {
 				if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED)) {
-					throw new AOFormatFileException(
-							"El modo Enveloped solo permite firmar datos XML", e); //$NON-NLS-1$
+					throw new InvalidXMLException(e);
 				}
 				// para los formatos de firma internally detached y enveloping
 				// se trata de convertir el documento a base64
