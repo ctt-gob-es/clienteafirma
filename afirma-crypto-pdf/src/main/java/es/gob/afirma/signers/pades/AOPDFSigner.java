@@ -31,7 +31,6 @@ import com.lowagie.text.Image;
 import com.lowagie.text.Jpeg;
 import com.lowagie.text.Rectangle;
 import com.lowagie.text.exceptions.BadPasswordException;
-import com.lowagie.text.exceptions.InvalidPdfException;
 import com.lowagie.text.pdf.AcroFields;
 import com.lowagie.text.pdf.PdfArray;
 import com.lowagie.text.pdf.PdfDate;
@@ -46,7 +45,6 @@ import com.lowagie.text.pdf.PdfString;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
@@ -269,8 +267,8 @@ public final class AOPDFSigner implements AOSigner {
         try {
             return signPDF(keyEntry, data, extraParams, algorithm);
         }
-        catch (final InvalidPdfException e) {
-            throw new AOFormatFileException("El documento no era un PDF valido", e); //$NON-NLS-1$
+        catch (final  com.lowagie.text.exceptions.InvalidPdfException e) {
+        	throw new InvalidPdfException(e);
         }
         catch (final CertificateException e) {
             throw new AOException("Error en el certificado de firma: " + e, e); //$NON-NLS-1$
@@ -909,7 +907,7 @@ public final class AOPDFSigner implements AOSigner {
             }
         }
         catch (final IOException e) {
-        	throw new AOFormatFileException("Los datos introducidos no se corresponden con un documento PDF", e); //$NON-NLS-1$
+        	throw new InvalidPdfException(e);
 		}
 
         if (pdfReader.getCertificationLevel() != PdfSignatureAppearance.NOT_CERTIFIED && (!Boolean.parseBoolean(extraParams.getProperty("allowSigningCertifiedPdfs")))) { //$NON-NLS-1$

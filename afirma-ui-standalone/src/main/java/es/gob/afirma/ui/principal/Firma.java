@@ -57,6 +57,7 @@ import es.gob.afirma.keystores.main.common.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.main.common.KeyStoreConfiguration;
 import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
 import es.gob.afirma.signers.pades.BadPdfPasswordException;
+import es.gob.afirma.signers.pades.InvalidPdfException;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
 import es.gob.afirma.signers.xades.EFacturaAlreadySignedException;
@@ -380,6 +381,7 @@ final class Firma extends JPanel {
                 signedData = signer.sign(fileData, GeneralConfig.getSignAlgorithm(), privateKeyEntry, prop);
             }
             catch(final InvalidEFacturaDataException e) {
+            	LOGGER.severe("Se ha enviado a firmar como E-Factura datos que no son una factura electronica: " + e); //$NON-NLS-1$
         		CustomDialog.showMessageDialog(
     				SwingUtilities.getRoot(this),
     				true,
@@ -399,6 +401,17 @@ final class Firma extends JPanel {
                     JOptionPane.ERROR_MESSAGE
                 );
                 return;
+            }
+            catch(final InvalidPdfException e) {
+            	LOGGER.severe("Se ha enviado a firmar con PAdES datos que no son un documento PDF: " + e); //$NON-NLS-1$
+        		CustomDialog.showMessageDialog(
+    				SwingUtilities.getRoot(this),
+    				true,
+    				"<html><p>Los datos proporcionados no son son un documento PDF soportado.<br>Con formato de firma PAdES solo es posible firmar documentos PDF.</p></html>",
+    				Messages.getString("error"),  //$NON-NLS-1$
+    				JOptionPane.ERROR_MESSAGE
+    			);
+        		return;
             }
             catch(final AOFormatFileException e) {
                 LOGGER.severe("Error al generar la firma electronica: " + e); //$NON-NLS-1$
