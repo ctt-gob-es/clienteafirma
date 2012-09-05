@@ -67,11 +67,9 @@ final class ProfilesOptionsPane {
         Utils.remarcar(this.currentProfileTitleLabel);
         Utils.setContrastColor(this.currentProfileTitleLabel);
         Utils.setFontBold(this.currentProfileTitleLabel);
-        // this.currentProfileLabel = new JLabel(ProfileManager.getProfileName(this.getCurrentProfileId()));
 
         final JPanel currentProfilePanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
         currentProfilePanel.add(this.currentProfileTitleLabel);
-        // currentProfilePanel.add(this.currentProfileLabel);
 
         this.panel.add(currentProfilePanel, c);
 

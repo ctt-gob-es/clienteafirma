@@ -273,7 +273,6 @@ final class Validacion extends JPanel {
         checkSignButton.setMnemonic(KeyEvent.VK_V);
         checkSignButton.setText(Messages.getString("Validacion.btnValidar")); //$NON-NLS-1$
         checkSignButton.setToolTipText(Messages.getString("Validacion.btnValidar.description")); //$NON-NLS-1$
-        //checkSignButton.getAccessibleContext().setAccessibleName(Messages.getString("Validacion.btnValidar") + " " + Messages.getString("Validacion.btnValidar.description.status"));  //$NON-NLS-1$ //$NON-NLS-2$//$NON-NLS-3$
         checkSignButton.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(),
                                                                              Messages.getString("Validacion.btnValidar.description.status"))); //$NON-NLS-1$
         checkSignButton.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(),
