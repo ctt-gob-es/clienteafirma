@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -66,7 +66,7 @@ public final class AOSimpleSignInfo {
         return this.signAlgorithm;
     }
 
-    /** Establece el algoritmo de firma 
+    /** Establece el algoritmo de firma
      * @param algorithm Algoritmo de firma
      */
     public void setSignAlgorithm(final String algorithm) {
@@ -88,24 +88,24 @@ public final class AOSimpleSignInfo {
     }
 
     /** Obtiene las fechas de los sellos de tiempo de la firma.
-     * @return Fechas de los sellos de tiempo 
+     * @return Fechas de los sellos de tiempo
      */
     public Date[] getTimestampingTime() {
-        return this.timestampingTime.clone();
+        return this.timestampingTime == null ? null : this.timestampingTime.clone();
     }
 
     /** Establece las fechas de los sellos de tiempo de la firma.
-     * @param timestampingTime Fechas de los sellos de tiempo 
+     * @param timestampingTime Fechas de los sellos de tiempo
      */
     public void setTimestampingTime(final Date[] timestampingTime) {
-        this.timestampingTime = timestampingTime.clone();
+        this.timestampingTime = (timestampingTime == null ? null : timestampingTime.clone());
     }
 
-    /** Obtiene el certificado (con su cadena de confianza) de la firma. 
+    /** Obtiene el certificado (con su cadena de confianza) de la firma.
      * @return Certificado (con su cadena de confianza) de la firma
      */
     public X509Certificate[] getCerts() {
-        return this.certs.clone();
+        return this.certs == null ? null : this.certs.clone();
     }
 
     /** Obtiene la fecha de la firma.
@@ -124,14 +124,14 @@ public final class AOSimpleSignInfo {
     /** Recupera el PKCS#1 de la firma en cuesti&oacute;n. Devuelve {@code null} si no se preestablecio.
      * @return PKCS#1 de la firma. */
     public byte[] getPkcs1() {
-        return this.pkcs1.clone();
+        return this.pkcs1 == null ? null : this.pkcs1.clone();
     }
 
     /** Establece el PKCS#1 de la firma.
      * @param pkcs1
      *        PKCS#1 que gener&oacute; la firma. */
     public void setPkcs1(final byte[] pkcs1) {
-        this.pkcs1 = pkcs1.clone();
+        this.pkcs1 = (pkcs1 == null ? null : pkcs1.clone());
     }
 
     @Override
