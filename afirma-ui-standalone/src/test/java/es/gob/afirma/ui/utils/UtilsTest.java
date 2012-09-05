@@ -33,27 +33,28 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.ui.principal.AccessibilityOptionsPane;
 
 /**
  * Testeo de funcionalidades relativas a la accesibilidad de la clase Utils
- * 
+ *
  * @author inteco
- * 
+ *
  */
 public class UtilsTest {
-    
+
     /**
      * Log.
      */
     private static Logger LOGGER = Logger.getLogger(UtilsTest.class.getName());
-    
+
     /**
      * Comprueba si el componente aplica el estilo de fuente negrita
      * correctamente
-     * 
+     *
      * @param jComboBox
      *            Componente del tipo JComboBox para el que se comprueba el
      *            cambio de estilo de fuente
@@ -73,11 +74,11 @@ public class UtilsTest {
 	}
 	return false;
     }
-    
+
     /**
      * Comprueba si el componente aplica el estilo de fuente negrita
      * correctamente
-     * 
+     *
      * @param jPanel
      *            Componente del tipo JPanel para el que se comprueba el cambio
      *            de estilo de fuente
@@ -113,11 +114,11 @@ public class UtilsTest {
 	}
 	return false;
     }
-    
+
     /**
      * Comprueba si el componente aplica el estilo de fuente negrita
      * correctamente
-     * 
+     *
      * @param jComboBox
      *            Componente del tipo JComboBox para el que se comprueba el
      *            cambio de estilo de fuente
@@ -141,10 +142,10 @@ public class UtilsTest {
 	}
 	return false;
     }
-    
+
     /**
      * Comprueba si el componente aplica el alto contraste correctamente
-     * 
+     *
      * @param jComboBox
      *            Componente del tipo JComboBox para el que se comprueba el
      *            cambio de color
@@ -162,10 +163,10 @@ public class UtilsTest {
 	}
 	return false;
     }
-    
+
     /**
      * Comprueba si el componente aplica el alto contraste correctamente
-     * 
+     *
      * @param jEditorPane
      *            Componente del tipo JEditorPane para el que se comprueba el
      *            cambio de color
@@ -183,10 +184,10 @@ public class UtilsTest {
 	}
 	return false;
     }
-    
+
     /**
      * Comprueba si el componente aplica el alto contraste correctamente
-     * 
+     *
      * @param jList
      *            Componente del tipo JList para el que se comprueba el cambio
      *            de color
@@ -204,10 +205,10 @@ public class UtilsTest {
 	}
 	return false;
     }
-    
+
     /**
      * Comprueba si el componente aplica el alto contraste correctamente
-     * 
+     *
      * @param jPanel
      *            Componente del tipo JPanel para el que se comprueba el cambio
      *            de color
@@ -236,10 +237,10 @@ public class UtilsTest {
 	}
 	return false;
     }
-    
+
     /**
      * Comprueba si el componente aplica el alto contraste correctamente
-     * 
+     *
      * @param jPasswordField
      *            Componente del tipo JPasswordField para el que se comprueba el
      *            cambio de color
@@ -258,10 +259,10 @@ public class UtilsTest {
 	}
 	return false;
     }
-    
+
     /**
      * Comprueba si el componente aplica el alto contraste correctamente
-     * 
+     *
      * @param jStatusBar
      *            Componente del tipo JStatusBar para el que se comprueba el
      *            cambio de color
@@ -281,10 +282,10 @@ public class UtilsTest {
 	}
 	return false;
     }
-    
+
     /**
      * Comprueba si el componente aplica el alto contraste correctamente
-     * 
+     *
      * @param jTextField
      *            Componente del tipo JTextField para el que se comprueba el
      *            cambio de color
@@ -302,10 +303,10 @@ public class UtilsTest {
 	}
 	return false;
     }
-    
+
     /**
      * Comprueba si el componente aplica el alto contraste correctamente
-     * 
+     *
      * @param jTree
      *            Componente del tipo JTree para el que se comprueba el cambio
      *            de color
@@ -323,11 +324,11 @@ public class UtilsTest {
 	}
 	return false;
     }
-    
+
     /**
      * Comprueba si el gestor de mnem&oacute;nicos libres indica que no hay un
      * mnem&oacute;nico disponible
-     * 
+     *
      * @param mnemonicList
      *            Lista con los mnem&oacute;nicos empleados
      * @param nombreConLetraLibre
@@ -343,11 +344,11 @@ public class UtilsTest {
 	}
 	return false;
     }
-    
+
     /**
      * Comprueba si el gestor de mnem&oacute;nicos libres asigna correctamente
      * un mnem&oacute;nico
-     * 
+     *
      * @param mnemonicList
      *            Lista con los mnem&oacute;nicos empleados
      * @param nombreConLetraLibre
@@ -363,10 +364,10 @@ public class UtilsTest {
 	}
 	return false;
     }
-    
+
     /**
      * Comprueba si ha cambiado el borde de los componentes
-     * 
+     *
      * @param component
      *            JButton ha comprobar si se ha pintado el borde
      * @param componentOld
@@ -403,10 +404,10 @@ public class UtilsTest {
 	}
 	return false;
     }
-    
+
     /**
      * Comprueba si ha cambiado el borde de los componentes
-     * 
+     *
      * @param component
      *            JCheckBox ha comprobar si se ha pintado el borde
      * @param componentOld
@@ -441,10 +442,10 @@ public class UtilsTest {
 	}
 	return false;
     }
-    
+
     /**
      * Comprueba si ha cambiado el borde de los componentes
-     * 
+     *
      * @param component
      *            JComboBox ha comprobar si se ha pintado el borde
      * @param componentOld
@@ -477,10 +478,10 @@ public class UtilsTest {
 	}
 	return false;
     }
-    
+
     /**
      * Comprueba si ha cambiado el borde de los componentes
-     * 
+     *
      * @param component
      *            JEditorPane ha comprobar si se ha pintado el borde
      * @param componentOld
@@ -514,10 +515,10 @@ public class UtilsTest {
 	}
 	return false;
     }
-    
+
     /**
      * Comprueba si ha cambiado el borde de los componentes
-     * 
+     *
      * @param component
      *            JLabel ha comprobar si se ha pintado el borde
      * @param componentOld
@@ -550,10 +551,10 @@ public class UtilsTest {
 	}
 	return false;
     }
-    
+
     /**
      * Comprueba si ha cambiado el borde de los componentes
-     * 
+     *
      * @param component
      *            JList ha comprobar si se ha pintado el borde
      * @param componentOld
@@ -587,10 +588,10 @@ public class UtilsTest {
 	}
 	return false;
     }
-    
+
     /**
      * Comprueba si ha cambiado el borde de los componentes
-     * 
+     *
      * @param component
      *            JMenu ha comprobar si se ha pintado el borde
      * @param componentOld
@@ -602,20 +603,20 @@ public class UtilsTest {
     @SuppressWarnings("static-method")
     private boolean remarcarJMenu(final JMenu component,
 	    final JList componentOld, final int fontSize) {
-	
+
 	if (component.getFont().getSize() == fontSize + 5) {
 	    if (componentOld.getBorder().getClass().getName()
 		    .equals("javax.swing.border.EmptyBorder")) { //$NON-NLS-1$
 		return true;
 	    }
 	}
-	
+
 	return false;
     }
-    
+
     /**
      * Comprueba si ha cambiado el borde de los componentes
-     * 
+     *
      * @param component
      *            JRadioButton ha comprobar si se ha pintado el borde
      * @param componentOld
@@ -652,10 +653,10 @@ public class UtilsTest {
 	}
 	return false;
     }
-    
+
     /**
      * Comprueba si ha cambiado el borde de los componentes
-     * 
+     *
      * @param component
      *            JList ha comprobar si se ha pintado el borde
      * @param componentOld
@@ -689,10 +690,10 @@ public class UtilsTest {
 	}
 	return false;
     }
-    
+
     /**
      * Comprueba si ha cambiado el borde del componente
-     * 
+     *
      * @param component
      *            JTextField ha comprobar
      * @return boolean indicando si el borde ha cambiado
@@ -713,10 +714,10 @@ public class UtilsTest {
 	}
 	return false;
     }
-    
+
     /**
      * Comprueba si ha cambiado el borde de los componentes
-     * 
+     *
      * @param component
      *            JTextPane ha comprobar si se ha pintado el borde
      * @param componentOld
@@ -752,10 +753,10 @@ public class UtilsTest {
 	}
 	return false;
     }
-    
+
     /**
      * Comprueba si ha cambiado el borde de los componentes
-     * 
+     *
      * @param component
      *            JToggleButton ha comprobar si se ha pintado el borde
      * @param componentOld
@@ -792,10 +793,10 @@ public class UtilsTest {
 	}
 	return false;
     }
-    
+
     /**
      * Comprueba si ha cambiado el borde de los componentes
-     * 
+     *
      * @param component
      *            JTree ha comprobar si se ha pintado el borde
      * @param componentOld
@@ -829,7 +830,7 @@ public class UtilsTest {
 	}
 	return false;
     }
-    
+
     /**
      * Comprobaci&oacute;n de la asignaci&oacute;n autom&aacute;tica de
      * mnem&oacute;nicos
@@ -837,18 +838,18 @@ public class UtilsTest {
     @Test
     public void testGetLanguageMnemonic() {
 	UtilsTest.LOGGER.info("testGetLanguageMnemonic"); //$NON-NLS-1$
-	
+
 	try {
 	    // Lista de mnemonicos usados
 	    final List<Character> mnemonicList = new ArrayList<Character>();
 	    mnemonicList.add(new Character('a'));
 	    mnemonicList.add(new Character('b'));
 	    mnemonicList.add(new Character('c'));
-	    
+
 	    // Nombre del texto al que asignar mnemonico
 	    final String nombreConLetraLibre = new String("abcd"); //$NON-NLS-1$
 	    final String nombreSinLetraLibre = new String("abc");		 //$NON-NLS-1$
-	    
+
 	    Assert.assertTrue(this.languageMnemonicSucces(mnemonicList,
 		    nombreConLetraLibre));
 	    Assert.assertTrue(this.languageMnemonicFail(mnemonicList,
@@ -858,26 +859,27 @@ public class UtilsTest {
 	    // automaticos en servidor
 	}
     }
-    
+
     /**
      * Comprobaci&oacute;n de que los componentes se remarcan al recibir el foco
      */
     @Test
+    @Ignore
     public void testRemarcar() {
 	UtilsTest.LOGGER.info("testRemarcar"); //$NON-NLS-1$
-	
+
 	try {
 	    // Se obtiene la cofiguracion general
 	    // Se anade el perfil por defecto
 	    GeneralConfig.loadConfig(GeneralConfig.getConfig());
 	    final Properties config = GeneralConfig.getConfig();
-	    
+
 	    // Se activa la opcion de remarcar elementos con foco
 	    config.setProperty(AccessibilityOptionsPane.MAIN_FOCUS_VISIBLE,
 		    "true"); //$NON-NLS-1$
 	    // Se asigna
 	    GeneralConfig.loadConfig(config);
-	    
+
 	    final JFrame frame = new JFrame();
 	    frame.setLayout(new GridBagLayout());
 	    final GridBagConstraints c = new GridBagConstraints();
@@ -886,19 +888,19 @@ public class UtilsTest {
 	    frame.add(jTF, c);
 	    frame.setBounds(200, 200, 500, 500);
 	    frame.setVisible(true);
-	    
+
 	    c.gridy = c.gridy + 1;
 	    final JComboBox jCB = new JComboBox();
 	    Utils.remarcar(jCB);
 	    frame.add(jCB, c);
 	    frame.setVisible(true);
-	    
+
 	    c.gridy = c.gridy + 1;
 	    final JLabel jL = new JLabel();
 	    Utils.remarcar(jL);
 	    frame.add(jL, c);
 	    frame.setVisible(true);
-	    
+
 	    c.gridy = c.gridy + 1;
 	    final JPanel panelJChB = new JPanel();
 	    final JCheckBox jChB = new JCheckBox();
@@ -906,7 +908,7 @@ public class UtilsTest {
 	    Utils.remarcar(jChB);
 	    frame.add(panelJChB, c);
 	    frame.setVisible(true);
-	    
+
 	    c.gridy = c.gridy + 1;
 	    final JPanel panelJB = new JPanel();
 	    final JButton jB = new JButton();
@@ -914,7 +916,7 @@ public class UtilsTest {
 	    Utils.remarcar(jB);
 	    frame.add(panelJB, c);
 	    frame.setVisible(true);
-	    
+
 	    c.gridy = c.gridy + 1;
 	    final JPanel panelJTB = new JPanel();
 	    final JToggleButton jTB = new JToggleButton();
@@ -922,7 +924,7 @@ public class UtilsTest {
 	    Utils.remarcar(jTB);
 	    frame.add(panelJTB, c);
 	    frame.setVisible(true);
-	    
+
 	    c.gridy = c.gridy + 1;
 	    final JPanel panelJRB = new JPanel();
 	    final JRadioButton jRB = new JRadioButton();
@@ -930,44 +932,44 @@ public class UtilsTest {
 	    Utils.remarcar(jRB);
 	    frame.add(panelJRB, c);
 	    frame.setVisible(true);
-	    
+
 	    c.gridy = c.gridy + 1;
 	    final JTextPane jTP = new JTextPane();
 	    Utils.remarcar(jTP);
 	    frame.add(jTP, c);
 	    frame.setVisible(true);
-	    
+
 	    c.gridy = c.gridy + 1;
 	    final JEditorPane jEP = new JEditorPane();
 	    Utils.remarcar(jEP);
 	    frame.add(jEP, c);
 	    frame.setVisible(true);
-	    
+
 	    c.gridy = c.gridy + 1;
 	    final JTree jT = new JTree();
 	    Utils.remarcar(jT);
 	    frame.add(jT, c);
 	    frame.setVisible(true);
-	    
+
 	    c.gridy = c.gridy + 1;
 	    final JList jLi = new JList();
 	    Utils.remarcar(jLi);
 	    frame.add(jLi, c);
 	    frame.setVisible(true);
-	    
+
 	    c.gridy = c.gridy + 1;
 	    final JScrollPane jSP = new JScrollPane();
 	    Utils.remarcar(jSP);
 	    frame.add(jSP, c);
 	    frame.setVisible(true);
-	    
+
 	    c.gridy = c.gridy + 1;
 	    final JMenu jM = new JMenu();
 	    Utils.remarcar(jM);
 	    frame.add(jM, c);
 	    frame.setVisible(true);
 	    final int fontSize = jM.getFont().getSize();
-	    
+
 	    // Se testea la correcta aplicacion del remarcado sin alto contraste
 	    jTF.requestFocusInWindow();
 	    try {
@@ -1156,7 +1158,7 @@ public class UtilsTest {
 	    // automaticos en servidor
 	}
     }
-    
+
     /**
      * Comprobaci&oacute;n del correcto subrayado de los mnem&oacute;nicos para
      * texto HTML
@@ -1164,7 +1166,7 @@ public class UtilsTest {
     @Test
     public void testRemarkMnemonic() {
 	UtilsTest.LOGGER.info("testRemarkMnemonic"); //$NON-NLS-1$
-	
+
 	try {
 	    Assert.assertTrue(Utils
 		    .remarkMnemonic("Test", 'T').equals("<u>T</u>est")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1174,7 +1176,7 @@ public class UtilsTest {
 	    // automaticos en servidor
 	}
     }
-    
+
     /**
      * Comprobaci&oacute;n de que los componentes cambian al modo en alto
      * contraste correctamente
@@ -1182,7 +1184,7 @@ public class UtilsTest {
     @Test
     public void testSetContrastColor() {
 	UtilsTest.LOGGER.info("testSetContrastColor"); //$NON-NLS-1$
-	
+
 	try {
 	    // Se obtiene la cofiguracion general
 	    GeneralConfig.loadConfig(GeneralConfig.getConfig());
@@ -1228,13 +1230,13 @@ public class UtilsTest {
 	    Assert.assertTrue(this.highContrastJPanel(jPanel));
 	    Assert.assertTrue(this.highContrastJStatusBar(jStatusBar));
 	    Assert.assertTrue(this.highContrastJEditorPane(jEditorPane));
-	    
+
 	} catch (final java.awt.HeadlessException e) {
 	    // Ignoramos este error, pero no otros, para evitar fallos en tests
 	    // automaticos en servidor
 	}
     }
-    
+
     /**
      * Comprobaci&oacute;n de que los componentes cambian al estilo negrita
      * correctamente
@@ -1242,7 +1244,7 @@ public class UtilsTest {
     @Test
     public void testSetFontBold() {
 	UtilsTest.LOGGER.info("testSetFontBold"); //$NON-NLS-1$
-	
+
 	try {
 	    // Se obtiene la cofiguracion general
 	    GeneralConfig.loadConfig(GeneralConfig.getConfig());
@@ -1276,9 +1278,9 @@ public class UtilsTest {
 	    // Ignoramos este error, pero no otros, para evitar fallos en tests
 	    // automaticos en servidor
 	}
-	
+
     }
-    
+
     /**
      * Comprobaci&oacute;n del correcto visionado u ocultaci&oacute;n del tool
      * tip
@@ -1291,7 +1293,7 @@ public class UtilsTest {
 	    final JWindow tip = new JWindow();
 	    final JButton boton = new JButton();
 	    final JLabel tipText = new JLabel();
-	    
+
 	    show = true;
 	    Utils.showToolTip(show, tip, boton, tipText);
 	    Assert.assertTrue(tip.isVisible() == true);
