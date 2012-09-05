@@ -172,14 +172,14 @@ public final class TestXMLdSig {
                     }
 
                     AOTreeModel tree = signer.getSignersStructure(result, false);
-                    Assert.assertEquals("Datos", ((AOTreeNode) tree.getRoot()).getUserObject()); //$NON-NLS-1$
-                    Assert.assertEquals("ANF Usuario Activo", ((AOTreeNode) tree.getRoot()).getChildAt(0).getUserObject()); //$NON-NLS-1$
+                    Assert.assertEquals("Los datos del nodo raiz no son los esperados", "Datos", ((AOTreeNode) tree.getRoot()).getUserObject()); //$NON-NLS-1$ //$NON-NLS-2$
+                    Assert.assertEquals("El firmante encontrado en la firma no es el esperado", "ANF Usuario Activo", ((AOTreeNode) tree.getRoot()).getChildAt(0).getUserObject()); //$NON-NLS-1$ //$NON-NLS-2$
 
                     tree = signer.getSignersStructure(result, true);
-                    Assert.assertEquals("Datos", ((AOTreeNode) tree.getRoot()).getUserObject()); //$NON-NLS-1$
+                    Assert.assertEquals("Los datos del nodo raiz no son los esperados", "Datos", ((AOTreeNode) tree.getRoot()).getUserObject()); //$NON-NLS-1$
                     final AOSimpleSignInfo simpleSignInfo = (AOSimpleSignInfo) ((AOTreeNode) tree.getRoot()).getChildAt(0).getUserObject();
 
-                    Assert.assertEquals(cert, simpleSignInfo.getCerts()[0]);
+                    Assert.assertEquals("El certificado del firmante encontrado en la firma no es el esperado", cert, simpleSignInfo.getCerts()[0]); //$NON-NLS-1$
                 }
             }
         }
