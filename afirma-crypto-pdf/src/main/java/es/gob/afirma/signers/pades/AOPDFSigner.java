@@ -293,7 +293,7 @@ public final class AOPDFSigner implements AOSigner {
             if (Boolean.TRUE.toString().equalsIgnoreCase(extraParams.getProperty("headLess"))) { //$NON-NLS-1$
                 throw new BadPdfPasswordException(e);
             }
-        	extraParams.put("ownerPassword", new String(AOUIFactory.getPassword(PDFMessages.getString("AOPDFSigner.0"), null))); //$NON-NLS-1$ //$NON-NLS-2$)
+        	extraParams.put("userPassword", new String(AOUIFactory.getPassword(PDFMessages.getString("AOPDFSigner.0"), null))); //$NON-NLS-1$ //$NON-NLS-2$)
         	return sign(data, algorithm, keyEntry, extraParams);
         }
     }
@@ -876,12 +876,17 @@ public final class AOPDFSigner implements AOSigner {
 
         PdfReader pdfReader;
         String ownerPassword = extraParams.getProperty("ownerPassword"); //$NON-NLS-1$
+        final String userPassword =  extraParams.getProperty("userPassword"); //$NON-NLS-1$
+
         try {
-            if (ownerPassword == null) {
-                pdfReader = new PdfReader(inPDF);
+            if (ownerPassword != null) {
+            	pdfReader = new PdfReader(inPDF, ownerPassword.getBytes());
+            }
+            else if (userPassword != null) {
+            	pdfReader = new PdfReader(inPDF, userPassword.getBytes());
             }
             else {
-                pdfReader = new PdfReader(inPDF, ownerPassword.getBytes());
+            	pdfReader = new PdfReader(inPDF);
             }
         }
         catch (final BadPasswordException e) {
@@ -1034,8 +1039,7 @@ public final class AOPDFSigner implements AOSigner {
         if (useSystemDateTime) {
             sap.setSignDate(new GregorianCalendar());
         }
-
-        if (pdfReader.isEncrypted() && ownerPassword != null) {
+        if (pdfReader.isEncrypted() && (ownerPassword != null || userPassword != null)) {
             if (Boolean.TRUE.toString().equalsIgnoreCase(extraParams.getProperty("avoidEncryptingSignedPdfs"))) { //$NON-NLS-1$
                 LOGGER.info(
                     "Aunque el PDF original estaba encriptado no se encriptara el PDF firmado (se establecio el indicativo 'avoidEncryptingSignedPdfs')" //$NON-NLS-1$
@@ -1046,7 +1050,12 @@ public final class AOPDFSigner implements AOSigner {
                     "El PDF original estaba encriptado, se intentara encriptar tambien el PDF firmado" //$NON-NLS-1$
                 );
                 try {
-                    stp.setEncryption(ownerPassword.getBytes(), ownerPassword.getBytes(), pdfReader.getPermissions(), pdfReader.getCryptoMode());
+                    stp.setEncryption(
+                		(ownerPassword != null) ? ownerPassword.getBytes() : null,
+        				(userPassword != null) ? userPassword.getBytes() : null,
+                		pdfReader.getPermissions(),
+                		pdfReader.getCryptoMode()
+            		);
                 }
                 catch (final DocumentException de) {
                     LOGGER.warning(
