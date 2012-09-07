@@ -6,6 +6,8 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import junit.framework.Assert;
+
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -20,8 +22,6 @@ import es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper;
 public class TestAttachments {
 
 	private static final String[] TEST_FILES = { "TEST_PDF.pdf" }; //$NON-NLS-1$
-
-	private static final Properties[] PADES_MODES;
 
     private static final String CERT_PATH = "ANF_PF_Activo.pfx"; //$NON-NLS-1$
     private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
@@ -38,12 +38,12 @@ public class TestAttachments {
         p1.setProperty("policyIdentifier", "2.16.724.1.3.1.1.2"); //$NON-NLS-1$ //$NON-NLS-2$
         p1.setProperty("policyIdentifierHash", "0"); //$NON-NLS-1$ //$NON-NLS-2$
 
-        PADES_MODES = new Properties[] {
-                p1
-        };
     }
 
-    @Ignore
+    /** Prueba de la firma de adjuntos (incompleta).
+     * @throws Exception */
+    @SuppressWarnings("static-method")
+	@Ignore
 	@Test
 	public void testAttachmentSignature() throws Exception {
 
@@ -69,5 +69,7 @@ public class TestAttachments {
         extraParams.put("tsaHashAlgorithm", "SHA1"); //$NON-NLS-1$ //$NON-NLS-2$
 
         final byte[] result = signer.sign(testPdf, "SHA512withRSA", pke, extraParams); //$NON-NLS-1$
+
+        Assert.assertNotNull(result);
 	}
 }
