@@ -22,7 +22,6 @@ import java.util.logging.Logger;
 
 import junit.framework.Assert;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -151,7 +150,6 @@ public class TestPAdES {
      */
     @SuppressWarnings("static-method")
 	@Test
-	@Ignore
     public void testPasswordSignature() throws Exception {
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
         final PrivateKeyEntry pke;
@@ -177,7 +175,6 @@ public class TestPAdES {
         final byte[] result = signer.sign(testPdf, "SHA512withRSA", pke, extraParams); //$NON-NLS-1$
 
         Assert.assertNotNull(prueba, result);
-        Assert.assertTrue(signer.isSign(result));
 
     }
 
