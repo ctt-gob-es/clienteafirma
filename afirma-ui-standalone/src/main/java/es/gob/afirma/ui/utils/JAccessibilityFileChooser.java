@@ -75,7 +75,7 @@ class JAccessibilityFileChooser extends JFileChooser{
 		return this.restoreButton;
 	}
 
-	protected JButton maximizeButton = null;
+	private final JButton maximizeButton = new JButton();
 	JButton getMaximizeButton() {
 		return this.maximizeButton;
 	}
@@ -637,7 +637,7 @@ class JAccessibilityFileChooser extends JFileChooser{
 
 		ImageIcon imageIconMaximize = new ImageIcon(JAccessibilityFileChooser.class.getResource("/resources/images/maximize.png")); //$NON-NLS-1$
 		imageIconMaximize = new ImageIcon(imageIconMaximize.getImage().getScaledInstance(dimension.width, dimension.height, Image.SCALE_SMOOTH));
-		this.maximizeButton = new JButton(imageIconMaximize);
+		this.maximizeButton.setIcon(imageIconMaximize);
 		this.maximizeButton.setMnemonic(KeyEvent.VK_M );
 		this.maximizeButton.setToolTipText(Messages.getString("Wizard.maximizar.description")); //$NON-NLS-1$
 		this.maximizeButton.getAccessibleContext().setAccessibleName(this.maximizeButton.getToolTipText());

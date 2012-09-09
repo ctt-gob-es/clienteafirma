@@ -33,7 +33,6 @@ import java.io.File;
 
 import javax.accessibility.AccessibleContext;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -407,33 +406,33 @@ final class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
 
 		ImageIcon imageIconMaximize = new ImageIcon(JAccessibilityFileChooser.class.getResource("/resources/images/maximize.png")); //$NON-NLS-1$
 		imageIconMaximize = new ImageIcon(imageIconMaximize.getImage().getScaledInstance(dimension.width, dimension.height, Image.SCALE_SMOOTH));
-		this.maximizeButton = new JButton(imageIconMaximize);
-		this.maximizeButton.setMnemonic(KeyEvent.VK_M );
-		this.maximizeButton.setToolTipText(Messages.getString("Wizard.maximizar.description")); //$NON-NLS-1$
-		this.maximizeButton.getAccessibleContext().setAccessibleName(this.maximizeButton.getToolTipText());
+		this.getMaximizeButton().setIcon(imageIconMaximize);
+		this.getMaximizeButton().setMnemonic(KeyEvent.VK_M );
+		this.getMaximizeButton().setToolTipText(Messages.getString("Wizard.maximizar.description")); //$NON-NLS-1$
+		this.getMaximizeButton().getAccessibleContext().setAccessibleName(this.getMaximizeButton().getToolTipText());
 
-		this.maximizeButton.setName("maximizar"); //$NON-NLS-1$
+		this.getMaximizeButton().setName("maximizar"); //$NON-NLS-1$
 		//Se asigna una dimension por defecto
-		this.maximizeButton.setPreferredSize(dimension);
+		this.getMaximizeButton().setPreferredSize(dimension);
 
-		Utils.remarcar(this.maximizeButton);
-		maximizePanel.add(this.maximizeButton);
+		Utils.remarcar(this.getMaximizeButton());
+		maximizePanel.add(this.getMaximizeButton());
 
-		this.maximizeButton.addFocusListener(new FocusListener() {
+		this.getMaximizeButton().addFocusListener(new FocusListener() {
 
 			@Override
 			public void focusLost(final FocusEvent e) {
-				Utils.showToolTip(false, tip, JAccessibilityFileChooserToSave.this.maximizeButton, tipText);
+				Utils.showToolTip(false, tip, JAccessibilityFileChooserToSave.this.getMaximizeButton(), tipText);
 			}
 
 			@Override
 			public void focusGained(final FocusEvent e) {
-				Utils.showToolTip(true, tip, JAccessibilityFileChooserToSave.this.maximizeButton, tipText);
+				Utils.showToolTip(true, tip, JAccessibilityFileChooserToSave.this.getMaximizeButton(), tipText);
 			}
 
 		});
 
-		this.maximizeButton.addActionListener(new ActionListener() {
+		this.getMaximizeButton().addActionListener(new ActionListener() {
 		    	@Override
 				public void actionPerformed(final ActionEvent e) {
 		    		maximizarActionPerformed();
@@ -459,22 +458,20 @@ final class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
 		// Habilitado/Deshabilitado de botones restaurar/maximizar
     	if (GeneralConfig.isMaximized() || isMaximized()){
     		//Se deshabilita el boton de maximizado
-    		this.maximizeButton.setEnabled(false);
+    		this.getMaximizeButton().setEnabled(false);
     		//Se habilita el boton de restaurar
     		this.getRestoreButton().setEnabled(true);
     	}
     	else {
     		//Se habilita el boton de maximizado
-    		this.maximizeButton.setEnabled(true);
+    		this.getMaximizeButton().setEnabled(true);
     		//Se deshabilita el boton de restaurar
     		this.getRestoreButton().setEnabled(false);
     	}
 		return panelAccesibilidad;
 	}
 
-	/**
-	 * Restaura el tama&ntilde;o de la ventana a la posicion anterior al maximizado
-	 */
+	/** Restaura el tama&ntilde;o de la ventana a la posici&oacute;n anterior al maximizado. */
 	@Override
 	public void restaurarActionPerformed(){
 
@@ -496,7 +493,7 @@ final class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
     			setMinimumSize(new Dimension(getSize().width, getSize().height));
     		}
 		}
-		this.maximizeButton.setEnabled (true);
+		this.getMaximizeButton().setEnabled (true);
 		this.getRestoreButton().setEnabled (false);
 
 		setIsMaximized(false);
@@ -512,7 +509,7 @@ final class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
 		setActualWidth(this.theDialog.getWidth());
 		setActualHeight(this.theDialog.getHeight());
 
-		this.maximizeButton.setEnabled (false);
+		this.getMaximizeButton().setEnabled (false);
 		this.getRestoreButton().setEnabled (true);
 
 		this.theDialog.setBounds(0,0, (int)(getMaxDimension().getWidth()), (int)(getMaxDimension().getHeight()));

@@ -176,24 +176,20 @@ public final class AOKeyStoreManagerFactory {
 
 	private static AOKeyStoreManager getDnieJavaKeyStoreManager(final AOKeyStore store,
     		                                                    final PasswordCallback pssCallback,
-    	                                                         final Object parentComponent)
-    															throws AOKeystoreAlternativeException,
-    															IOException {
+    	                                                        final Object parentComponent) throws AOKeystoreAlternativeException,
+    																								 IOException {
     	final AOKeyStoreManager ksm = new AOKeyStoreManager();
     	try {
     		// Proporcionamos el componente padre como parametro
     		ksm.init(store, null, pssCallback, new Object[] { parentComponent });
     	}
-    	catch (final IOException e) {
-    		throw e;
-		}
-    	catch(final Exception e) {
-    		throw new AOKeystoreAlternativeException(
+    	catch (final AOKeyStoreManagerException e) {
+    	   throw new AOKeystoreAlternativeException(
                 getAlternateKeyStoreType(store),
                 "Error al inicializar el modulo DNIe 100% Java: " + e, //$NON-NLS-1$
                 e
            );
-    	}
+		}
     	return ksm;
     }
 

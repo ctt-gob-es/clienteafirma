@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -49,7 +49,7 @@ import es.gob.afirma.signers.pkcs7.SignedAndEnvelopedData;
  * <li>Authenticated and Enveloped Data</li>
  * </ul> */
 final class ValidateCMS {
-	
+
 	private ValidateCMS() {
 		// No permitimos la instanciacion
 	}
@@ -83,8 +83,6 @@ final class ValidateCMS {
             }
         }
         catch (final Exception ex) {
-            // Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de conversion "
-            // + ex);
             isValid = false;
         }
 
@@ -120,8 +118,6 @@ final class ValidateCMS {
             }
         }
         catch (final Exception ex) {
-            // Logger.getLogger("es.gob.afirma").severe(
-            //      "Error durante el proceso de conversion " + ex);
             isValid = false;
         }
         return isValid;
@@ -179,8 +175,6 @@ final class ValidateCMS {
             }
         }
         catch (final Exception ex) {
-            // Logger.getLogger("es.gob.afirma").severe(
-            //      "Error durante el proceso de conversion " + ex);
             isValid = false;
         }
 
@@ -216,8 +210,6 @@ final class ValidateCMS {
             }
         }
         catch (final Exception ex) {
-            // Logger.getLogger("es.gob.afirma").severe(
-            //      "Error durante el proceso de conversion " + ex);
             isValid = false;
         }
 
@@ -253,8 +245,6 @@ final class ValidateCMS {
 
         }
         catch (final Exception ex) {
-            // Logger.getLogger("es.gob.afirma").severe(
-            //      "Error durante el proceso de conversion " + ex);
             isValid = false;
         }
 
@@ -292,8 +282,6 @@ final class ValidateCMS {
 
         }
         catch (final Exception ex) {
-            // Logger.getLogger("es.gob.afirma").severe(
-            //      "Error durante el proceso de conversion " + ex);
             isValid = false;
         }
         return isValid;
@@ -325,8 +313,6 @@ final class ValidateCMS {
             }
         }
         catch (final Exception ex) {
-            // Logger.getLogger("es.gob.afirma").severe(
-            //      "El fichero no contiene un tipo AuthenticatedData: " + ex);
             isValid = false;
         }
         return isValid;
@@ -360,8 +346,6 @@ final class ValidateCMS {
 
         }
         catch (final Exception ex) {
-            // Logger.getLogger("es.gob.afirma").severe(
-            //      "El fichero no contiene un tipo AuthenticatedEnvelopedData: " + ex);
             isValid = false;
         }
         return isValid;
@@ -392,8 +376,6 @@ final class ValidateCMS {
             }
         }
         catch (final Exception ex) {
-            // Logger.getLogger("es.gob.afirma").severe(
-            //      "El fichero no contiene un tipo CompressedData: " + ex);
             isValid = false;
         }
         return isValid;

@@ -292,7 +292,6 @@ final class Opciones extends JAccessibilityDialog {
     	// Configuracion de la ventana
     	setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(Messages.getString("Opciones.opciones")); // NOI18N //$NON-NLS-1$
-        //setResizable(false);
         getContentPane().removeAll();
         getContentPane().setLayout(new GridBagLayout());
 
@@ -528,7 +527,7 @@ final class Opciones extends JAccessibilityDialog {
 		final JPanel panelAyuda = new JPanel();
         // Boton ayuda
 		final JButton botonAyuda = HelpUtils.helpButton("opciones.configuracion"); //$NON-NLS-1$
-		botonAyuda.setName("helpButton");
+		botonAyuda.setName("helpButton"); //$NON-NLS-1$
 
 		// Sustituimos el listener por defecto por otro que abrir la ventana de ayuda
 		// correspondiente a la pestana seleccionada

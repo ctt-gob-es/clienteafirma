@@ -155,39 +155,46 @@ final class ResizingAdaptor extends ComponentAdapter {
 			relWidth = this.theWindow.getSize().getWidth() / Constants.WINDOW_INITIAL_WIDTH;
 			relHeight = this.theWindow.getSize().getHeight() / Constants.WINDOW_INITIAL_HEIGHT;
 			relation = Math.round(relWidth * relHeight * this.theWindow.getMinimumRelation());
-		} else if (this.theDialog != null) {
+		}
+		else if (this.theDialog != null) {
 			if(GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
 				if (Platform.getOS().equals(Platform.OS.LINUX)){
 					relWidth = this.theDialog.getSize().getWidth() / (Constants.OPTION_FONT_INITIAL_WIDTH_LINUX);
 					relHeight = this.theDialog.getSize().getHeight() / (Constants.OPTION_FONT_INITIAL_HEIGHT_LINUX);
 					relation = Math.round(relWidth * relHeight * this.theDialog.getMinimumRelation());
-				} else {
+				}
+				else {
 					relWidth = this.theDialog.getSize().getWidth() / (Constants.OPTION_FONT_INITIAL_WIDTH);
 					relHeight = this.theDialog.getSize().getHeight() / (Constants.OPTION_FONT_INITIAL_HEIGHT);
 					relation = Math.round(relWidth * relHeight * this.theDialog.getMinimumRelation());
 				}
-			} else{
+			}
+			else{
 				relWidth = this.theDialog.getSize().getWidth() / Constants.OPTION_INITIAL_WIDTH;
 				relHeight = this.theDialog.getSize().getHeight() / Constants.OPTION_INITIAL_HEIGHT;
 				relation = Math.round(relWidth * relHeight * this.theDialog.getMinimumRelation());
 			}
-		} else if (this.theDialogWizard != null){
+		}
+		else if (this.theDialogWizard != null){
 			//Se comprueba si el sistema operativo es linux
 			if (Platform.getOS().equals(Platform.OS.LINUX)){
 				//Se comprueba si esta activado el modo negrita o fuente grande
 				if(GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
 					relWidth = this.theDialogWizard.getSize().getWidth() / Constants.WIZARD_FONT_INITIAL_WIDTH_LINUX;
 					relHeight = this.theDialogWizard.getSize().getHeight() / Constants.WIZARD_FONT_INITIAL_HEIGHT_LINUX;
-				} else {
+				}
+				else {
 					relWidth = this.theDialogWizard.getSize().getWidth() / Constants.WIZARD_INITIAL_WIDTH_LINUX;
 					relHeight = this.theDialogWizard.getSize().getHeight() / Constants.WIZARD_INITIAL_HEIGHT_LINUX;
 				}
-			} else {
+			}
+			else {
 				//Se comprueba si esta activado el modo negrita o fuente grande
 				if(GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
 					relWidth = this.theDialogWizard.getSize().getWidth() / Constants.WIZARD_FONT_INITIAL_WIDTH;
 					relHeight = this.theDialogWizard.getSize().getHeight() / Constants.WIZARD_FONT_INITIAL_HEIGHT;
-				} else {
+				}
+				else {
 					relWidth = this.theDialogWizard.getSize().getWidth() / Constants.WIZARD_INITIAL_WIDTH;
 					relHeight = this.theDialogWizard.getSize().getHeight() / Constants.WIZARD_INITIAL_HEIGHT;
 				}
@@ -196,46 +203,56 @@ final class ResizingAdaptor extends ComponentAdapter {
 			//Se calcula la relacion de los valores obtenidos
 			relation = Math.round(relWidth * relHeight * this.theDialogWizard.getMinimumRelation());
 
-		} else if (this.theDialogAdvisor != null){
+		}
+		else if (this.theDialogAdvisor != null){
 			relWidth = this.theDialogAdvisor.getSize().getWidth() / Constants.INIT_WINDOW_INITIAL_WIDTH;
 			relHeight = this.theDialogAdvisor.getSize().getHeight() / Constants.INIT_WINDOW_INITIAL_HEIGHT;
 			relation = Math.round(relWidth * relHeight * this.theDialogAdvisor.getMinimumRelation());
-		} else if (this.theWindowAbout != null){
+		}
+		else if (this.theWindowAbout != null){
 			if (Platform.getOS().equals(Platform.OS.LINUX) || Platform.getOS().equals(Platform.OS.MACOSX)){
 				relWidth = this.theWindowAbout.getSize().getWidth() / Constants.ABOUT_WINDOW_INITIAL_WIDTH_LINUX;
 				relHeight = this.theWindowAbout.getSize().getHeight() / Constants.ABOUT_WINDOW_INITIAL_HEIGHT_LINUX;
 				relation = Math.round(relWidth * relHeight * this.theWindowAbout.getMinimumRelation());
-			} else {
+			}
+			else {
 				relWidth = this.theWindowAbout.getSize().getWidth() / Constants.ABOUT_WINDOW_INITIAL_WIDTH;
 				relHeight = this.theWindowAbout.getSize().getHeight() / Constants.ABOUT_WINDOW_INITIAL_HEIGHT;
 				relation = Math.round(relWidth * relHeight * this.theWindowAbout.getMinimumRelation());
 			}
-		} else if (this.theWindowAbout != null){
+		}
+		else if (this.theWindowAbout != null){
 			relWidth = this.theWindowAbout.getSize().getWidth() / Constants.ABOUT_WINDOW_INITIAL_WIDTH;
 			relHeight = this.theWindowAbout.getSize().getHeight() / Constants.ABOUT_WINDOW_INITIAL_HEIGHT;
 			relation = Math.round(relWidth * relHeight * this.theWindowAbout.getMinimumRelation());
-		} else if (this.theCustomDialog != null){
+		}
+		else if (this.theCustomDialog != null){
 			//Se comprueba si esta activado el modo negrita, fuente grande o si es necesario que la ventana sea grande por defecto
 			if(GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold() || this.theCustomDialog.isBigSizeDefault()){
 				relWidth = this.theCustomDialog.getSize().getWidth() / Constants.CUSTOMDIALOG_FONT_INITIAL_WIDTH;
 				relHeight = this.theCustomDialog.getSize().getHeight() / Constants.CUSTOMDIALOG_FONT_INITIAL_HEIGHT;
-			} else {
+			}
+			else {
 				relWidth = this.theCustomDialog.getSize().getWidth() / Constants.CUSTOMDIALOG_INITIAL_WIDTH;
 				relHeight = this.theCustomDialog.getSize().getHeight() / Constants.CUSTOMDIALOG_INITIAL_HEIGHT;
 			}
 			relation = Math.round(relWidth * relHeight * this.theCustomDialog.getMinimumRelation());
-		} else if (this.theFileChooser != null){
+		}
+		else if (this.theFileChooser != null){
 			if (Platform.getOS().equals(Platform.OS.MACOSX) || Platform.getOS().equals(Platform.OS.LINUX)){
 				relWidth = this.theFileChooser.getDialog().getSize().getWidth() / Constants.FILE_INITIAL_WIDTH_MAC;
-			} else {
+			}
+			else {
 				relWidth = this.theFileChooser.getDialog().getSize().getWidth() / Constants.FILE_INITIAL_WIDTH;
 			}
 			relHeight = this.theFileChooser.getDialog().getSize().getHeight() / Constants.FILE_INITIAL_HEIGHT;
 			relation = Math.round(relWidth * relHeight * this.theFileChooser.getMinimumRelation());
-		} else {
+		}
+		else {
 			if (Platform.getOS().equals(Platform.OS.MACOSX) || Platform.getOS().equals(Platform.OS.LINUX)){
 				relWidth = this.theFileChooserToSave.getDialog().getSize().getWidth() / Constants.FILE_INITIAL_WIDTH_MAC;
-			} else {
+			}
+			else {
 				relWidth = this.theFileChooserToSave.getDialog().getSize().getWidth() / Constants.FILE_INITIAL_WIDTH;
 			}
 			relHeight = this.theFileChooserToSave.getDialog().getSize().getHeight() / Constants.FILE_INITIAL_HEIGHT;
@@ -249,28 +266,28 @@ final class ResizingAdaptor extends ComponentAdapter {
 					float resizeFactor = 0;
 					if (this.theWindow != null) {
 						resizeFactor = Math.round(relation / getResizingFactorFrame());
-						//actualComponent.setFont(actualComponent.getFont().deriveFont((float) (getFontSize() + resizeFactor)));
-					} else if (this.theDialog != null){
+					}
+					else if (this.theDialog != null){
 						resizeFactor = Math.round(relation / getResizingFactorDialog());
-						//actualComponent.setFont(actualComponent.getFont().deriveFont((float) (getFontSize() + resizeFactor)));
-					} else if (this.theDialogWizard != null){
+					}
+					else if (this.theDialogWizard != null){
 						resizeFactor = Math.round(relation / getResizingFactorDialogWizard());
-						//actualComponent.setFont(actualComponent.getFont().deriveFont((float) (getFontSize() + resizeFactor)));
-					} else if (this.theDialogAdvisor != null){
+					}
+					else if (this.theDialogAdvisor != null){
 						resizeFactor = Math.round(relation / getResizingFactorFrameAdvisor());
-						//actualComponent.setFont(actualComponent.getFont().deriveFont((float) (getFontSize() + resizeFactor)));
-					} else if (this.theWindowAbout != null) {
+					}
+					else if (this.theWindowAbout != null) {
 						resizeFactor = Math.round(relation / getResizingFactorFrameAbout());
-						//actualComponent.setFont(actualComponent.getFont().deriveFont((float) (getFontSize() + resizeFactor)));
-					} else if (this.theCustomDialog != null) {
+					}
+					else if (this.theCustomDialog != null) {
 						resizeFactor = Math.round(relation / getResizingFactorCustomDialog());
-						//actualComponent.setFont(actualComponent.getFont().deriveFont((float) (getFontSize() + resizeFactor)));
-					}else {
+					}
+					else {
 						resizeFactor = Math.round(relation / getResizingFactorFileChooser());
-						//actualComponent.setFont(actualComponent.getFont().deriveFont((float) (getFontSize() + resizeFactor)));
 					}
 					actualComponent.setFont(actualComponent.getFont().deriveFont((getFontSize() + resizeFactor)));
-				} else {
+				}
+				else {
 					if (actualComponent instanceof JComboBox){
 						// TODO Workaround buscar solucion mejor
 						actualComponent.setPreferredSize(new Dimension(100,25));
@@ -285,7 +302,7 @@ final class ResizingAdaptor extends ComponentAdapter {
 					//Se comprueba si el panel tiene un nombre asignado
 					final String name = actualComponent.getName();
 					//Se hara el resize del titulo en el caso de que el componente no sea el panel de botones de accesibilidad de los alerts
-					if ((name==null) || (!name.equalsIgnoreCase("AccessibilityButtonsPanel"))) {
+					if ((name==null) || (!name.equalsIgnoreCase("AccessibilityButtonsPanel"))) { //$NON-NLS-1$
 						final TitledBorder b = (TitledBorder) componentBorder;
 						final float resizeFactor = Math.round(relation / getResizingFactorFrame());
 						if (b.getTitleFont() != null) {
@@ -313,7 +330,7 @@ final class ResizingAdaptor extends ComponentAdapter {
 					final JEditorPane editorPanel = (JEditorPane) actualComponent;
 					// Resize del texto contenido en el EditorPane
 					final float resizeFactor = Math.round(relation / getResizingFactorDialogWizard());
-					final String bodyRule = "body { font-family: " + actualComponent.getFont().getFamily() + "; " + "font-size: " + (7 + resizeFactor) + "pt; }";
+					final String bodyRule = "body { font-family: " + actualComponent.getFont().getFamily() + "; " + "font-size: " + (7 + resizeFactor) + "pt; }"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 					((HTMLDocument)editorPanel.getDocument()).getStyleSheet().addRule(bodyRule);
 					// Resize del texto del enlace, porque tiene un estilo a nivel de linea entonces es necesario cambiar el tamano del texto a nivel de linea
 					Style link;
@@ -434,10 +451,10 @@ final class ResizingAdaptor extends ComponentAdapter {
 		double factorAux = factor;
 
 		//Se comprueba si se trata del boton de ayuda
-		if ((button.getName() != null) && (button.getName().equalsIgnoreCase("helpButton"))) {
+		if ((button.getName() != null) && (button.getName().equalsIgnoreCase("helpButton"))) { //$NON-NLS-1$
 			imageIcon = HelpUtils.IMAGEICONHELP; //Se carga la imagen original
 		}
-		else if ((button.getName() != null) && (button.getName().equalsIgnoreCase("maximizar"))) {
+		else if ((button.getName() != null) && (button.getName().equalsIgnoreCase("maximizar"))) { //$NON-NLS-1$
 			if (this.theDialog!=null){
 				factorAux = factorAux - 0.4; //0.8999999761581421
 			}
@@ -446,7 +463,7 @@ final class ResizingAdaptor extends ComponentAdapter {
 			}
 			imageIcon = Constants.IMAGEICON_MAXIMIZE; //Se carga la imagen original
 		}
-		else if ((button.getName() != null) && (button.getName().equalsIgnoreCase("restaurar"))) {
+		else if ((button.getName() != null) && (button.getName().equalsIgnoreCase("restaurar"))) { //$NON-NLS-1$
 			if (this.theDialog!=null){
 				factorAux = factorAux - 0.4; //0.8999999761581421
 			}
@@ -475,9 +492,11 @@ final class ResizingAdaptor extends ComponentAdapter {
 		if(GeneralConfig.isBigFontSize()){
 			if (this.theDialogWizard != null){
 				return 15;
-			} else if (this.theFileChooser != null || this.theFileChooserToSave != null){
+			}
+			else if (this.theFileChooser != null || this.theFileChooserToSave != null){
 				return 13;
-			} else {
+			}
+			else {
 				return 16;
 			}
 		}

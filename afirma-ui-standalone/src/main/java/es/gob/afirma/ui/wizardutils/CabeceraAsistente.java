@@ -115,7 +115,6 @@ public final class CabeceraAsistente extends JPanel {
 
     /** Se crea el panel de botones de accesibilidad. */
     private void createAccessibilityButtonsPanel() {
-        // this.accessibilityButtonsPanel = new JPanel(new GridBagLayout());
 
         // Para el tooltip
         final JWindow tip = new JWindow();
@@ -129,14 +128,6 @@ public final class CabeceraAsistente extends JPanel {
         }
         Utils.setContrastColor(panel);
 
-        // panel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-        // panel.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
-        // panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
-        // panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-        // panel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        // panel.setBorder(BorderFactory.createCompoundBorder());
-        // panel.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.BLACK));
-
         // Restricciones para los botones
         final GridBagConstraints consButtons = new GridBagConstraints();
         consButtons.fill = GridBagConstraints.NONE;
@@ -145,11 +136,9 @@ public final class CabeceraAsistente extends JPanel {
         consButtons.weightx = 0;
         consButtons.weighty = 0;
         consButtons.insets = new Insets(0, 0, 0, 0); // right padding
-        // consButtons.anchor=GridBagConstraints.EAST;
 
         // Restore button
         final JPanel restorePanel = new JPanel();
-        // this.restoreButton = getButton("r", KeyEvent.VK_R );
         final ImageIcon imageIconRestore = new ImageIcon(CustomDialog.class.getResource("/resources/images/restore.png")); //$NON-NLS-1$
         this.restoreButton = new JButton(imageIconRestore);
         this.restoreButton.setMnemonic(KeyEvent.VK_R);
@@ -171,8 +160,6 @@ public final class CabeceraAsistente extends JPanel {
         final Dimension dimension = new Dimension(20, 20);
         this.restoreButton.setPreferredSize(dimension);
 
-        // this.restoreButton.setBorder(null); //Eliminar Borde, ayuda a centrar el iconod el boton
-        // this.restoreButton.setContentAreaFilled(false); //area del boton invisible
         this.restoreButton.setName("restaurar"); //$NON-NLS-1$
         Utils.remarcar(this.restoreButton);
         restorePanel.setBackground(Color.WHITE);
@@ -191,7 +178,6 @@ public final class CabeceraAsistente extends JPanel {
         panel.add(restorePanel, consButtons);
 
         consButtons.gridx = 1;
-        // consButtons.weightx = 0.5;
         consButtons.insets = new Insets(0, 0, 0, 0); // right padding
 
         // Maximize button
@@ -203,15 +189,11 @@ public final class CabeceraAsistente extends JPanel {
         this.maximizeButton.setToolTipText(Messages.getString("Wizard.maximizar.description")); //$NON-NLS-1$
         this.maximizeButton.getAccessibleContext().setAccessibleName(this.maximizeButton.getToolTipText());
 
-        // this.maximizeButton.setBorder(null); //Eliminar Borde, ayuda a centrar el iconod el boton
-        // this.maximizeButton.setContentAreaFilled(false); //area del boton invisible
-
         this.maximizeButton.setName("maximizar"); //$NON-NLS-1$
         // Se asigna una dimension por defecto
         this.maximizeButton.setPreferredSize(dimension);
 
         Utils.remarcar(this.maximizeButton);
-        // maximizePanel.add(this.maximizeButton, consMaximizePanel);
         maximizePanel.setBackground(Color.WHITE);
         if (Main.isOSHighContrast()) {
             maximizePanel.setOpaque(false);
@@ -249,7 +231,6 @@ public final class CabeceraAsistente extends JPanel {
         c.gridy = 0;
         c.weightx = 0;
         c.weighty = 0;
-        // c.insets = new Insets(3,3,0,3);
         c.insets = new Insets(0, 0, 0, 0);
         c.anchor = GridBagConstraints.EAST;
         this.add(panel, c);

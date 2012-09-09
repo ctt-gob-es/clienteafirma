@@ -13,7 +13,10 @@ package es.gob.afirma.keystores.mozilla;
 import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
+import java.security.UnrecoverableEntryException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -234,10 +237,15 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
 		try {
 			keyEntry = (KeyStore.PrivateKeyEntry) tmpStore.getEntry(alias, new KeyStore.PasswordProtection((pssCallback != null) ? pssCallback.getPassword() : null));
 		}
-		catch (final AOCancelledOperationException e) {
-			throw e;
+		catch (final KeyStoreException e) {
+			LOGGER.severe("Erro al acceder al almacen para obtener la clave privada del certicado '" + alias + "', se devolvera null: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			return null;
 		}
-		catch (final Exception e) {
+		catch (final NoSuchAlgorithmException e) {
+			LOGGER.severe("No se soporta el algoritmo de la clave privada del certicado '" + alias + "', se devolvera null: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			return null;
+		}
+		catch (final UnrecoverableEntryException e) {
 			LOGGER.severe("No se ha podido obtener la clave privada del certicado '" + alias + "', se devolvera null: " + e); //$NON-NLS-1$ //$NON-NLS-2$
 			return null;
 		}
@@ -299,7 +307,7 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
 
 		try {
 			nssProvider = MozillaKeyStoreUtilities.loadNSS();
-		} 
+		}
 		catch (final Exception e) {
 			LOGGER.severe("Error inicializando el proveedor NSS: " + e); //$NON-NLS-1$
 			nssProvider = null;

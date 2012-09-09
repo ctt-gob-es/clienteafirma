@@ -1,5 +1,16 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
 package es.gob.afirma.ui.utils;
 
+import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -9,66 +20,65 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 
 
-
 /**
- * Componente que define un dialogo de alerta. 
+ * Componente que define un dialogo de alerta.
  * @author inteco
  *
  */
-public abstract class JAccessibilityCustomDialog extends JDialog {
+abstract class JAccessibilityCustomDialog extends JDialog {
+
+	/** Ruta del JAR en donde se almacenan los iconos de la aplicaci&oacute;n. */
+    private static final String ICON_DIR_PATH = "/resources/images/"; //$NON-NLS-1$
+
+	private static final String AFIRMA_ICON_FILE = "afirma_ico.png"; //$NON-NLS-1$
+
+	private final Image afirmaIcon = new ImageIcon(JAccessibilityCustomDialog.this.getClass().getResource(ICON_DIR_PATH + AFIRMA_ICON_FILE)).getImage();
+
 	/**
 	 * uid.
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	/**
 	 * Posicion X actual.
 	 */
 	private static int actualPositionX = -1;
-	
+
 	/**
 	 * Posicion Y actual.
 	 */
 	private static int actualPositionY = -1;
-	
+
 	/**
 	 * Ancho actual.
 	 */
 	private static int actualWidth = -1;
-	
+
 	/**
 	 * Alto actual.
 	 */
 	private static int actualHeight = -1;
 
 	/**
-	 * Indica si la ventana esta maximizada.
-	 */
-	//private static boolean isMaximized = false;
-
-	/**
 	 * Indica si el dialogo requiere un tamano grande por defecto.
 	 */
 	private boolean bigSizeDefault = false;
-	
-	/** Ruta del JAR en donde se almacenan los iconos de la aplicaci&oacute;n. */
-    private static final String ICON_DIR_PATH = "/resources/images/";
-	
+
 	/**
 	 * Constructor con parametros.
 	 */
-	JAccessibilityCustomDialog(JDialog dialog, boolean modal){
+	JAccessibilityCustomDialog(final JDialog dialog, final boolean modal){
 		super(dialog, modal);
 		// Icono de @firma
-        setIconImage(this.loadIcon("afirma_ico.png").getImage());
-		ResizingAdaptor adaptador = new ResizingAdaptor(null,null,null,null,null,null,this,null);
+        setIconImage(this.afirmaIcon);
+		final ResizingAdaptor adaptador = new ResizingAdaptor(null,null,null,null,null,null,this,null);
 		this.addComponentListener(adaptador);
 		this.addComponentListener(new ComponentAdapter() {
 			/**
 			 * Evento que se lanza cuando el componente se redimensiona.
 			 */
 		    @Override
-			public void componentResized(ComponentEvent e)
+			public void componentResized(final ComponentEvent e)
 		    {
 		    	resized(e);
 		    }
@@ -76,28 +86,28 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 			 * Evento que se lanza cuando el componente se mueve.
 			 */
 		    @Override
-			public void componentMoved(ComponentEvent e)
+			public void componentMoved(final ComponentEvent e)
 		    {
 		    	resized(e);
 		    }
 		});
 	}
-	
+
 	/**
 	 * Constructor con parametros.
 	 */
-	JAccessibilityCustomDialog(JFrame frame, boolean modal){
+	JAccessibilityCustomDialog(final JFrame frame, final boolean modal){
 		super(frame, modal);
 		// Icono de @firma
-        setIconImage(this.loadIcon("afirma_ico.png").getImage());
-		ResizingAdaptor adaptador = new ResizingAdaptor(null,null,null,null,null,null,this,null);
+        setIconImage(this.afirmaIcon);
+		final ResizingAdaptor adaptador = new ResizingAdaptor(null,null,null,null,null,null,this,null);
 		this.addComponentListener(adaptador);
 		this.addComponentListener(new ComponentAdapter() {
 			/**
 			 * Evento que se lanza cuando el componente se redimensiona.
 			 */
 		    @Override
-			public void componentResized(ComponentEvent e)
+			public void componentResized(final ComponentEvent e)
 		    {
 		    	resized(e);
 		    }
@@ -105,28 +115,28 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 			 * Evento que se lanza cuando el componente se mueve.
 			 */
 		    @Override
-			public void componentMoved(ComponentEvent e)
+			public void componentMoved(final ComponentEvent e)
 		    {
 		    	resized(e);
 		    }
 		});
 	}
-	
+
 	/**
 	 * Constructor.
 	 */
-	public JAccessibilityCustomDialog(){
+	JAccessibilityCustomDialog(){
 		super();
 		// Icono de @firma
-        setIconImage(this.loadIcon("afirma_ico.png").getImage());
-		ResizingAdaptor adaptador = new ResizingAdaptor(null,null,null,null,null,null,this,null);
+        setIconImage(this.afirmaIcon);
+		final ResizingAdaptor adaptador = new ResizingAdaptor(null,null,null,null,null,null,this,null);
 		this.addComponentListener(adaptador);
 		this.addComponentListener(new ComponentAdapter() {
 			/**
 			 * Evento que se lanza cuando el componente se redimensiona.
 			 */
 		    @Override
-			public void componentResized(ComponentEvent e)
+			public void componentResized(final ComponentEvent e)
 		    {
 		    	resized(e);
 		    }
@@ -134,40 +144,40 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 			 * Evento que se lanza cuando el componente se mueve.
 			 */
 		    @Override
-			public void componentMoved(ComponentEvent e)
+			public void componentMoved(final ComponentEvent e)
 		    {
 		    	resized(e);
 		    }
 		});
-		
-		
+
+
 	}
-	
+
 	/**
 	 * Relacion minima que se aplica para la redimension de los componentes.
 	 * Cuanto menor es este numero menor es la redimension aplicada.
 	 * @return int Relacion minima
 	 */
-	public abstract int getMinimumRelation();
+	abstract int getMinimumRelation();
 
-	
+
 	/**
 	 * Evento de redimensionado. Comprueba el tamanio de la ventana para habilitar o deshabilitar el boton
 	 *  de Maximizar ventana. Tambien almacena el tamano y posicion de la ventana para su restauracion.
 	 */
-	void resized(ComponentEvent e) {
+	void resized(final ComponentEvent e) {
 		//Variable que controlara sin las dimensiones van a exceder el limite
 		boolean limitControl = false;
-		
+
 		//Se obtienen las dimensiones de maximizado
-		int maxWidth = Constants.CUSTOMDIALOG_MAX_WIDTH;
-		int maxHeight = Constants.CUSTOMDIALOG_MAX_HEIGHT;
-	    
+		final int maxWidth = Constants.CUSTOMDIALOG_MAX_WIDTH;
+		final int maxHeight = Constants.CUSTOMDIALOG_MAX_HEIGHT;
+
 	    //Se comprueba las bounds del dialogo actual
 	    if (e.getSource() instanceof CustomDialog) {
-	    	CustomDialog customDialog = (CustomDialog) e.getSource();
-	    	Rectangle rect = customDialog.getBounds();
-	    	
+	    	final CustomDialog customDialog = (CustomDialog) e.getSource();
+	    	final Rectangle rect = customDialog.getBounds();
+
 	    	//Se comprueba que no sobrepasen el limite
 	    	if (rect.width > maxWidth) {
 	    		rect.width = maxWidth;
@@ -183,122 +193,59 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 	    		this.setSize(rect.width, rect.height);
 	    	}
 	    }
-	    
-	    //Se comprueba el so
-//	    if (!Platform.getOS().equals(Platform.OS.LINUX)){
-//		    //Dimensiones que se van a considerar de maximizado
-//			Dimension fullScreen = new Dimension(maxWidth, maxHeight);//new Dimension((int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
-//
-//		    //Dimensiones actuales del dialogo
-//		    Dimension actualSize = this.getSize();
-//		    if (actualSize.equals(fullScreen)){
-//		    	this.setResizable(false);
-//		    } else {
-//		    	this.setResizable(true);
-//		    }
-//	    }
-	    
-	   /* Component botonMaximizar = getComponentByName("maximizar", this);
-		Component botonRestaurar = getComponentByName("restaurar", this);
-	    
-	    //Control de posibilidad de redimensionado y habilitado/deshabilitado de botones
-	    if (actualSize.equals(fullScreen)){
-	    	//this.setResizable(false);
-	    	isMaximized = true;
-	    	if ((botonMaximizar!=null) && (botonRestaurar!=null)) {
-	    		botonMaximizar.setEnabled (false);
-	    		botonRestaurar.setEnabled (true);
-	    	}
-	    } else {
-	    	//this.setResizable(true);
-	    	isMaximized = false;
-	    	if ((botonMaximizar!=null) && (botonRestaurar!=null)) {
-	    		botonMaximizar.setEnabled (true);
-	    		botonRestaurar.setEnabled (false);
-	    	}
-	    }*/
 	}
-	
-	
-	/**
-	 * Busca el JAccessibilityCustomDialog padre de un componente.
-	 * @param component El componente.
-	 * @return El JAccessibilityCustomDialog buscado.
-	 */
-	/*public static JAccessibilityCustomDialog getJAccessibilityCustomDialog(Component component)
-	{
-		JAccessibilityCustomDialog  resultingJAccessibilityCustomDialog = null;
-		while (component != null && resultingJAccessibilityCustomDialog == null)
-		{
-	        if (component instanceof JAccessibilityDialog){
-	        	resultingJAccessibilityCustomDialog = (JAccessibilityCustomDialog)component;
-	        }
-	        else{
-	        	component = component.getParent();
-	        }
-		 }
-		 return resultingJAccessibilityCustomDialog;
-	 }*/
-	
-    /**
-     * Carga un icono contenido en el directorio de iconos del proyecto.
-     * @param filename Nombre del icono.
-     * @return Icono.
-     */
-    private ImageIcon loadIcon(final String filename) {
-        return new ImageIcon(this.getClass().getResource(ICON_DIR_PATH + filename));
-    }
-    
+
+
     /**
      * Getter para la variable ActualPositionX.
      * @return ActualPositionX
      */
-	public static int getActualPositionX() {
+	static int getActualPositionX() {
 		return actualPositionX;
 	}
 	/**
      * Setter para la variable ActualPositionX.
      */
-	static void setActualPositionX(int actualPositionX) {
+	static void setActualPositionX(final int actualPositionX) {
 		JAccessibilityCustomDialog.actualPositionX = actualPositionX;
 	}
 	/**
      * Getter para la variable ActualPositionY.
      * @return ActualPositionY
      */
-	public static int getActualPositionY() {
+	static int getActualPositionY() {
 		return actualPositionY;
 	}
 	/**
      * Setter para la variable ActualPositionY.
      */
-	static void setActualPositionY(int actualPositionY) {
+	static void setActualPositionY(final int actualPositionY) {
 		JAccessibilityCustomDialog.actualPositionY = actualPositionY;
 	}
 	/**
      * Getter para la variable ActualWidth.
      * @return ActualWidth
      */
-	public static int getActualWidth() {
+	static int getActualWidth() {
 		return actualWidth;
 	}
 	/**
      * Setter para la variable ActualWidth.
      */
-	static void setActualWidth(int actualWidth) {
+	static void setActualWidth(final int actualWidth) {
 		JAccessibilityCustomDialog.actualWidth = actualWidth;
 	}
 	/**
      * Getter para la variable ActualHeight.
      * @return ActualHeight
      */
-	public static int getActualHeight() {
+	static int getActualHeight() {
 		return actualHeight;
 	}
 	/**
      * Setter para la variable ActualHeight.
      */
-	static void setActualHeight(int actualHeight) {
+	static void setActualHeight(final int actualHeight) {
 		JAccessibilityCustomDialog.actualHeight = actualHeight;
 	}
 
@@ -306,7 +253,7 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 	 * Indica si el dialogo debe tener un tamano grande por defecto.
 	 * @return boolean
 	 */
-	public boolean isBigSizeDefault() {
+	boolean isBigSizeDefault() {
 		return this.bigSizeDefault;
 	}
 
@@ -314,7 +261,7 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 	 * Asigna la variable que indica si el dialogo debe tener un tamano grande por defecto.
 	 * @param bigSizeDefault
 	 */
-	public void setBigSizeDefault(boolean bigSizeDefault) {
+	void setBigSizeDefault(final boolean bigSizeDefault) {
 		this.bigSizeDefault = bigSizeDefault;
 	}
 

@@ -459,11 +459,11 @@ public class AOKeyStoreManager {
         try {
 			this.ks.load(null, pssCallBack == null ? null : pssCallBack.getPassword());
 		}
-        catch (final IOException e) {
-			throw e;
+        catch (final NoSuchAlgorithmException e) {
+        	throw new AOKeyStoreManagerException("Error de algoritmo al obtener el almacen DNIe 100% Java: " + e, e);  //$NON-NLS-1$
 		}
-        catch (final Exception e) {
-			throw new AOKeyStoreManagerException("No se ha podido obtener el almacen DNIe 100% Java: " + e, e);  //$NON-NLS-1$
+        catch (final CertificateException e) {
+			throw new AOKeyStoreManagerException("Error de certificado al obtener el almacen DNIe 100% Java: " + e, e);  //$NON-NLS-1$
 		}
 
         final List<KeyStore> ret = new ArrayList<KeyStore>(1);
