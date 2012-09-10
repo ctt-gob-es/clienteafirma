@@ -610,7 +610,7 @@ public class DirectorySignatureHelper {
             	// Esta excepcion se comprueba por nombre para no acoplar los proyectos
             	if ("es.gob.afirma.signers.xades.EFacturaAlreadySignedException".equals(e.getClass().getName())) { //$NON-NLS-1$
                 	LOGGER.warning("La factura ya estaba firmada y no admite firmas adicionales '" + file + "': " + e);   //$NON-NLS-1$//$NON-NLS-2$
-                	this.addLogRegistry(Level.WARNING, "La factura ya estaba firmada y no admite firmas adicionales" + REG_FIELD_SEPARATOR + file);
+                	this.addLogRegistry(Level.WARNING, MassiveSignMessages.getString("DirectorySignatureHelper.27") + REG_FIELD_SEPARATOR + file); //$NON-NLS-1$
                 	DirectorySignatureHelper.closeStream(fis);
                     allOK = false;
                     continue;
@@ -1079,7 +1079,7 @@ public class DirectorySignatureHelper {
         	isValidDataFile = signer.isValidDataFile(AOUtil.getDataFromInputStream(is));
         }
         catch(final OutOfMemoryError e) {
-        	throw new IOException("El fichero es demasiado grande", e); //$NON-NLS-1$
+        	throw new IOException("El fichero es demasiado grande: " + e); //$NON-NLS-1$
         }
         DirectorySignatureHelper.closeStream(is);
         return isValidDataFile;
