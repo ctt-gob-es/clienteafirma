@@ -34,21 +34,21 @@ public final class AOPkcs1Signer implements AOSimpleSigner {
             sig = Signature.getInstance(algorithm);
         }
         catch (final Exception e) {
-            throw new AOException("Error obteniendo la clase de firma para el algoritmo " + algorithm, e); //$NON-NLS-1$
+            throw new AOException("Error obteniendo la clase de firma para el algoritmo " + algorithm + ": " + e, e); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         try {
             sig.initSign(keyEntry.getPrivateKey());
         }
         catch (final Exception e) {
-            throw new AOException("Error al inicializar la firma con la clave privada", e); //$NON-NLS-1$
+            throw new AOException("Error al inicializar la firma con la clave privada: " + e, e); //$NON-NLS-1$
         }
 
         try {
             sig.update(data);
         }
         catch (final SignatureException e) {
-            throw new AOException("Error al configurar los datos a firmar", e); //$NON-NLS-1$
+            throw new AOException("Error al configurar los datos a firmar: " + e, e); //$NON-NLS-1$
         }
 
         try {
