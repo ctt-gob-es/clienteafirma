@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -17,6 +17,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -33,8 +34,10 @@ import es.gob.afirma.core.misc.Platform;
 /** Utilidades para el manejo de claves de cifrado en el almac&eacute;n privado
  * de AFirma. */
 public final class AOCipherKeyStoreHelper {
-    
+
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
+	private static final String STORE_FILENAME = "ciphkeys.jceks"; //$NON-NLS-1$
 
     /** Almac&eacute;n de claves de cifrado. */
     private KeyStore ks;
@@ -42,6 +45,27 @@ public final class AOCipherKeyStoreHelper {
     /** Interfaz para la inserci&oacute;n de la contrase&ntilde;a del
      * almac&eacute;n. */
     private final char[] pss;
+
+    /** Crea un <code>AOCipherKeyStoreHelper</code>.
+     * @param p
+     *        Contrase&ntilde;a del almac&eacute;n de claves
+     * @throws AOException
+     *         Cuando ocurre cualquier problema durante la carga del
+     *         almac&eacute;n.
+     * @throws IOException
+     *         Cuando la contrase&ntilde;a es incorrecta.
+     * @throws GeneralSecurityException
+     *         Cuando existe alg&uacute;n problema en el almac&eacute;n.
+	*/
+    public AOCipherKeyStoreHelper(final char[] p) throws AOException,
+                                                         IOException,
+                                                         GeneralSecurityException {
+        if (p == null) {
+            throw new IllegalArgumentException("Se necesita una contrasena para instanciar la clase"); //$NON-NLS-1$
+        }
+        this.pss = p.clone();
+        loadCipherKeyStore();
+    }
 
     /** Almacena una clave en el almac&eacute;n privado de AFirma.
      * @param alias
@@ -125,27 +149,25 @@ public final class AOCipherKeyStoreHelper {
      * @throws AOException
      *         Cuando ocurre cualquier problema durante la carga.
      * @throws IOException
-     *         Cuando se inserta una clave incorrecta. 
-     * @throws CertificateException 
-     * @throws NoSuchAlgorithmException 
-     * @throws KeyStoreException */
-    public void loadCipherKeyStore() throws AOException, 
-                                            IOException, 
-                                            NoSuchAlgorithmException, 
-                                            CertificateException, 
+     *         Cuando se inserta una clave incorrecta.
+     */
+    private void loadCipherKeyStore() throws AOException,
+                                            IOException,
+                                            NoSuchAlgorithmException,
+                                            CertificateException,
                                             KeyStoreException {
         if (this.ks == null) {
             this.ks = KeyStore.getInstance("JCEKS"); //$NON-NLS-1$
         }
-        
+
         if (!storeExists()) {
             LOGGER.warning("El almacen no existe, se creara uno nuevo"); //$NON-NLS-1$
             createCipherKeyStore();
         }
-        
+
         final InputStream ksIs = new FileInputStream(getCipherKeystore());
         this.ks.load(new BufferedInputStream(ksIs), this.pss);
-        
+
         try {
             ksIs.close();
         }
@@ -170,29 +192,6 @@ public final class AOCipherKeyStoreHelper {
         }
     }
 
-    /** Crea un <code>AOCipherKeyStoreHelper</code>.
-     * @param p
-     *        Contrase&ntilde;a del almac&eacute;n de claves
-     * @throws AOException
-     *         Cuando ocurre cualquier problema durante la carga del
-     *         almac&eacute;n.
-     * @throws IOException
-     *         Cuando la contrase&ntilde;a es incorrecta. 
-     * @throws KeyStoreException 
-     * @throws CertificateException 
-     * @throws NoSuchAlgorithmException */
-    public AOCipherKeyStoreHelper(final char[] p) throws AOException, 
-                                                         IOException, 
-                                                         NoSuchAlgorithmException, 
-                                                         CertificateException, 
-                                                         KeyStoreException {
-        if (p == null) {
-            throw new IllegalArgumentException("Se necesita una contrasena para instanciar la clase"); //$NON-NLS-1$
-        }
-        this.pss = p.clone();
-        loadCipherKeyStore();
-    }
-
     /** Indica si el almac&eacute;n privado de claves de cifrado de AFirma ha
      * sido ya creado.
      * @return <code>true</code> si el almac&eacute;n ya existe, <code>false</code> en caso contrario */
@@ -205,15 +204,15 @@ public final class AOCipherKeyStoreHelper {
      * consulta de verificaci&oacute;n de la orden.
      * @return Devuelve <code>true</code> si el keystore exist&iacute;a y se
      *         borr&oacute; correctamente. */
-    public static boolean removeStore() {
+    public boolean removeStore() {
         final File storeFile = new File(getCipherKeystore());
         return storeFile.exists() && storeFile.delete();
     }
-    
+
     /** Obtiene la ruta absoluta del fichero de almac&eacute;n de las claves de
      * cifrado.
      * @return Ruta absoluta del fichero. */
-    public static String getCipherKeystore() {
-        return Platform.getUserHome() + File.separator + "ciphkeys.jceks"; //$NON-NLS-1$
+    private static String getCipherKeystore() {
+        return Platform.getUserHome() + File.separator + STORE_FILENAME;
     }
 }
