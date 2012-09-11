@@ -89,10 +89,10 @@ final class Firma extends JPanel {
     // Nombres de los diferentes formatos de firmado
     private static final List<String> FORMATOS_AVANZADOS = new ArrayList<String>(
 		Arrays.asList(
-			"Firma est\u00E1ndar (XAdES Detached)",
+			Messages.getString("Firma.formato.estandar"), //$NON-NLS-1$
 			"CAdES", //$NON-NLS-1$
 			"PAdES", //$NON-NLS-1$
-			"Factura Electr\u00F3nica"
+			Messages.getString("Firma.formato.facturae") //$NON-NLS-1$
 		)
 	);
 
@@ -367,7 +367,6 @@ final class Firma extends JPanel {
             }
 
             final Properties prop = GeneralConfig.getSignConfig();
-
             prop.setProperty("format", formato); //$NON-NLS-1$
             prop.setProperty("mode", modoFirma); //$NON-NLS-1$
             prop.setProperty("uri", uri.toASCIIString()); //$NON-NLS-1$
@@ -386,7 +385,7 @@ final class Firma extends JPanel {
         		CustomDialog.showMessageDialog(
     				SwingUtilities.getRoot(this),
     				true,
-    				"<html><p>Los datos proporcionados no son una factura electr\u00F3nica.<br>Con formato de factura electr\u00F3nica solo es posible firmar facturas electr\u00F3nicas v\u00E1lidas</p></html>",
+    				Messages.getString("Firma.msg.error.facturae.InvalidEFacturaDataException"), //$NON-NLS-1$
     				Messages.getString("error"),  //$NON-NLS-1$
     				JOptionPane.ERROR_MESSAGE
     			);
@@ -397,7 +396,7 @@ final class Firma extends JPanel {
                 CustomDialog.showMessageDialog(
             		SwingUtilities.getRoot(this),
                     true,
-                    "La factura ya tiene una firma electr\u00F3nica y no admite firmas adicionales",
+                    Messages.getString("Firma.msg.error.facturae.EFacturaAlreadySignedException"), //$NON-NLS-1$
                     Messages.getString("error"),  //$NON-NLS-1$
                     JOptionPane.ERROR_MESSAGE
                 );
@@ -408,7 +407,7 @@ final class Firma extends JPanel {
         		CustomDialog.showMessageDialog(
     				SwingUtilities.getRoot(this),
     				true,
-    				"<html><p>Los datos proporcionados no son son un documento PDF soportado.<br>Con formato de firma PAdES solo es posible firmar documentos PDF.</p></html>",
+    				Messages.getString("Firma.msg.error.pades.InvalidPdfException"), //$NON-NLS-1$
     				Messages.getString("error"),  //$NON-NLS-1$
     				JOptionPane.ERROR_MESSAGE
     			);
@@ -419,7 +418,7 @@ final class Firma extends JPanel {
         		CustomDialog.showMessageDialog(
     				SwingUtilities.getRoot(this),
     				true,
-    				"<html><p>Los datos proporcionados no son son un documento XML.<br>Con formatos de firma XMLDSig/XAdES <i>Enveloped</i> solo es posible firmar documentos XML.</p></html>",
+    				Messages.getString("Firma.msg.error.xml.InvalidXMLException"), //$NON-NLS-1$
     				Messages.getString("error"),  //$NON-NLS-1$
     				JOptionPane.ERROR_MESSAGE
     			);
