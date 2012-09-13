@@ -19,54 +19,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package es.gob.jmulticard.jse.provider.digest;
 
-/**
- * interface that a message digest conforms to.
- */
-public interface Digest
-{
-    /**
-     * return the algorithm name
-     *
-     * @return the algorithm name
-     */
-    public String getAlgorithmName();
+/** Interfaz para la clases generadoras de huellas digitales.
+ * C&oacute;digo fuente proveniente de
+ * <i>The Legion Of The Bouncy Castle (<a href="http://www.bouncycastle.org">http://www.bouncycastle.org</a>)</i> */
+public interface Digest {
 
-    /**
-     * return the size, in bytes, of the digest produced by this message digest.
-     *
-     * @return the size, in bytes, of the digest produced by this message digest.
-     */
-    public int getDigestSize();
+    /** Obtiene el tama&ntilde;o (en octetos) de la huella digital producida.
+     * @return Tama&ntilde;o (en octetos) de la huella digital producida */
+    int getDigestSize();
 
-    /**
-     * update the message digest with a single byte.
-     *
-     * @param in the input byte to be entered.
-     */
-    public void update(byte in);
+    /** A&ntilde;ade un octeto a los datos sobre los que calcular la huella digital.
+     * @param in Octeto a a&ntilde;adir a los datos sobre los que calcular la huella digital */
+    void update(byte in);
 
-    /**
-     * update the message digest with a block of bytes.
-     *
-     * @param in the byte array containing the data.
-     * @param inOff the offset into the byte array where the data starts.
-     * @param len the length of the data.
-     */
-    public void update(byte[] in, int inOff, int len);
+    /** A&ntilde;ade un conjunto de octetos a los datos sobre los que calcular la huella digital.
+     * @param in Array de octetos a a&ntilde;adir a los datos sobre los que calcular la huella digital
+     * @param inOff Desplazamiento desde el que empiezan los datos a a&ntilde;adir dentro del array
+     * @param len N&uacute;mero de octetos a a&ntilde;adir  */
+    void update(byte[] in, int inOff, int len);
 
-    /**
-     * close the digest, producing the final digest value. The doFinal
-     * call leaves the digest reset.
-     *
-     * @param out the array the digest is to be copied into.
-     * @param outOff the offset into the out array the digest is to start at.
-     */
-    public int doFinal(byte[] out, int outOff);
+    /** Calcula la huella digital final y borra los datos sobre los que se ha calculado.
+     * @param out Array de octetos sobre el que copiar la huella digital
+     * @param outOff Desplazamiento sobre el que empezar a copiar la huella digital en el array
+     * @return Valor final de la huella digital */
+    int doFinal(byte[] out, int outOff);
 
-    /**
-     * reset the digest back to it's initial state.
-     */
-    public void reset();
+    /** Borra los datos actualmente establecidos sobre los que calcular la huella digital. */
+    void reset();
 }

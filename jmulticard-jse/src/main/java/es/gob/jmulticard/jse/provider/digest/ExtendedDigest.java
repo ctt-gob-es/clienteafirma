@@ -19,16 +19,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package es.gob.jmulticard.jse.provider.digest;
 
-public interface ExtendedDigest 
-    extends Digest
-{
-    /**
-     * Return the size in bytes of the internal buffer the digest applies it's compression
+/** C&oacute;digo fuente proveniente de
+ * <i>The Legion Of The Bouncy Castle (<a href="http://www.bouncycastle.org">http://www.bouncycastle.org</a>)</i> */
+interface ExtendedDigest extends Digest {
+    /** Return the size in bytes of the internal buffer the digest applies it's compression
      * function to.
-     * 
-     * @return byte length of the digests internal buffer.
-     */
-    public int getByteLength();
+     * @return byte length of the digests internal buffer. */
+    int getByteLength();
 }
