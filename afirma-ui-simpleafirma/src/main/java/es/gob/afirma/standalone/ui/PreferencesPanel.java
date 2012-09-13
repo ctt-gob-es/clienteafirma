@@ -611,6 +611,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
         xadesSignatureProductionCityLabel.setLabelFor(this.xadesSignatureProductionCity);
         c.gridy++;
         metadata.add(xadesSignatureProductionCityLabel, c);
+        this.xadesSignatureProductionCity.getAccessibleContext().setAccessibleDescription(Messages.getString("PreferencesPanel.66")); //$NON-NLS-1$
         this.xadesSignatureProductionCity.addKeyListener(this.modificationListener);
         this.xadesSignatureProductionCity.addKeyListener(this);
         c.gridy++;
@@ -620,6 +621,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
         xadesSignatureProductionCountryLabel.setLabelFor(this.xadesSignatureProductionCountry);
         c.gridy++;
         metadata.add(xadesSignatureProductionCountryLabel, c);
+        this.xadesSignatureProductionCountry.getAccessibleContext().setAccessibleDescription(Messages.getString("PreferencesPanel.67")); //$NON-NLS-1$
         this.xadesSignatureProductionCountry.addKeyListener(this.modificationListener);
         this.xadesSignatureProductionCountry.addKeyListener(this);
         c.gridy++;
@@ -638,6 +640,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
         xadesSignerCertifiedRoleLabel.setLabelFor(this.xadesSignerCertifiedRole);
         c.gridy++;
         metadata.add(xadesSignerCertifiedRoleLabel, c);
+        this.xadesSignerCertifiedRole.getAccessibleContext().setAccessibleDescription(Messages.getString("PreferencesPanel.68")); //$NON-NLS-1$
         this.xadesSignerCertifiedRole.addKeyListener(this.modificationListener);
         this.xadesSignerCertifiedRole.addKeyListener(this);
         c.gridy++;
@@ -649,6 +652,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
         this.xadesSignFormat.setSelectedItem(
     		PREFERENCES.get(PREFERENCE_XADES_SIGN_FORMAT, AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING)
 		);
+        this.xadesSignFormat.getAccessibleContext().setAccessibleDescription(Messages.getString("PreferencesPanel.53")); //$NON-NLS-1$
         this.xadesSignFormat.addItemListener(this.modificationListener);
         this.xadesSignFormat.addKeyListener(this);
         format.add(this.xadesSignFormat);
@@ -680,6 +684,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 	    final FlowLayout fLayout = new FlowLayout(FlowLayout.LEADING);
 	    final JPanel signatureMode = new JPanel(fLayout);
 	    signatureMode.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages.getString("PreferencesPanel.16"))); //$NON-NLS-1$
+	    this.cadesImplicit.getAccessibleContext().setAccessibleDescription(Messages.getString("PreferencesPanel.45")); //$NON-NLS-1$
 	    this.cadesImplicit.addItemListener(this.modificationListener);
 	    this.cadesImplicit.addKeyListener(this);
 	    signatureMode.add(this.cadesImplicit);
@@ -708,6 +713,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 		final FlowLayout fLayout = new FlowLayout(FlowLayout.LEADING);
 		final JPanel signatureAgorithmPanel = new JPanel(fLayout);
 		signatureAgorithmPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages.getString("PreferencesPanel.18"))); //$NON-NLS-1$
+		this.signarureAlgorithms.getAccessibleContext().setAccessibleDescription(Messages.getString("PreferencesPanel.46")); //$NON-NLS-1$
 		this.signarureAlgorithms.addItemListener(this.modificationListener);
 		this.signarureAlgorithms.addKeyListener(this);
 		this.signarureAlgorithms.setModel(new DefaultComboBoxModel(new String[] {
@@ -723,6 +729,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 
 		final JPanel generalPreferencesPanel = new JPanel(fLayout);
 		generalPreferencesPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages.getString("PreferencesPanel.37"))); //$NON-NLS-1$
+		this.avoidAskForClose.getAccessibleContext().setAccessibleDescription(Messages.getString("PreferencesPanel.44")); //$NON-NLS-1$
 		this.avoidAskForClose.addItemListener(this.modificationListener);
 		this.avoidAskForClose.addKeyListener(this);
 		generalPreferencesPanel.add(this.avoidAskForClose);
@@ -766,6 +773,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 
 	    c.gridy++;
 
+	    this.padesSignReason.getAccessibleContext().setAccessibleDescription(Messages.getString("PreferencesPanel.63")); //$NON-NLS-1$
 	    this.padesSignReason.addKeyListener(this.modificationListener);
 	    this.padesSignReason.addKeyListener(this);
 	    metadataPanel.add(this.padesSignReason, c);
@@ -778,6 +786,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 
 	    c.gridy++;
 
+	    this.padesSignProductionCity.getAccessibleContext().setAccessibleDescription(Messages.getString("PreferencesPanel.64")); //$NON-NLS-1$
 	    this.padesSignProductionCity.addKeyListener(this.modificationListener);
 	    this.padesSignProductionCity.addKeyListener(this);
 	    metadataPanel.add(this.padesSignProductionCity, c);
@@ -790,6 +799,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 
 	    c.gridy++;
 
+	    this.padesSignerContact.getAccessibleContext().setAccessibleDescription(Messages.getString("PreferencesPanel.65")); //$NON-NLS-1$
 	    this.padesSignerContact.addKeyListener(this.modificationListener);
 	    this.padesSignerContact.addKeyListener(this);
 	    metadataPanel.add(this.padesSignerContact, c);
@@ -826,6 +836,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 			Messages.getString("PreferencesPanel.26")	// Politica a medida, debe ser el ultimo elemento //$NON-NLS-1$
 		}));
 		panel.add(this.xadesPolicies, c);
+		this.xadesPolicies.getAccessibleContext().setAccessibleDescription(Messages.getString("PreferencesPanel.47")); //$NON-NLS-1$
 		this.xadesPolicies.addKeyListener(this);
 		this.xadesPolicies.addItemListener(this.modificationListener);
 		this.xadesPolicies.addItemListener(new ItemListener() {
@@ -857,6 +868,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 
 		this.xadesPolicyIdentifier.setEnabled(enableTextFields);
 		this.xadesPolicyIdentifier.setEditable(editableTextFields);
+		this.xadesPolicyIdentifier.getAccessibleContext().setAccessibleDescription(Messages.getString("PreferencesPanel.54")); //$NON-NLS-1$
 		this.xadesPolicyIdentifier.addKeyListener(this);
 		this.xadesPolicyIdentifier.addKeyListener(this.modificationListener);
 		final JLabel policyIdentifierLabel = new JLabel(Messages.getString("PreferencesPanel.27")); //$NON-NLS-1$
@@ -868,6 +880,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 
 		this.xadesPolicyIdentifierHash.setEnabled(enableTextFields);
 		this.xadesPolicyIdentifierHash.setEditable(editableTextFields);
+		this.xadesPolicyIdentifierHash.getAccessibleContext().setAccessibleDescription(Messages.getString("PreferencesPanel.55")); //$NON-NLS-1$
 		this.xadesPolicyIdentifierHash.addKeyListener(this);
 		this.xadesPolicyIdentifierHash.addKeyListener(this.modificationListener);
 		final JLabel policyIdentifierHashLabel = new JLabel(Messages.getString("PreferencesPanel.28")); //$NON-NLS-1$
@@ -878,6 +891,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 		panel.add(this.xadesPolicyIdentifierHash, c);
 
 		this.xadesPolicyIdentifierHashAlgorithm.setEnabled(enableTextFields);
+		this.xadesPolicyIdentifierHashAlgorithm.getAccessibleContext().setAccessibleDescription(Messages.getString("PreferencesPanel.50")); //$NON-NLS-1$
 		this.xadesPolicyIdentifierHashAlgorithm.addKeyListener(this);
 		this.xadesPolicyIdentifierHashAlgorithm.addItemListener(this.modificationListener);
 		final JLabel policyIdentifierHashAlgorithmLabel = new JLabel(Messages.getString("PreferencesPanel.29")); //$NON-NLS-1$
@@ -889,6 +903,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 
 		this.xadesPolicyQualifier.setEnabled(enableTextFields);
 		this.xadesPolicyQualifier.setEditable(editableTextFields);
+		this.xadesPolicyQualifier.getAccessibleContext().setAccessibleDescription(Messages.getString("PreferencesPanel.56")); //$NON-NLS-1$
 		this.xadesPolicyQualifier.addKeyListener(this);
 		this.xadesPolicyQualifier.addKeyListener(this.modificationListener);
 		final JLabel policyQualifierLabel = new JLabel(Messages.getString("PreferencesPanel.30")); //$NON-NLS-1$
@@ -929,6 +944,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 			Messages.getString("PreferencesPanel.26")	// Politica a medida, debe ser el ultimo elemento //$NON-NLS-1$
 		}));
 		panel.add(this.padesPolicies, c);
+		this.padesPolicies.getAccessibleContext().setAccessibleDescription(Messages.getString("PreferencesPanel.48")); //$NON-NLS-1$
 		this.padesPolicies.addItemListener(this.modificationListener);
 		this.padesPolicies.addKeyListener(this);
 		this.padesPolicies.addItemListener(new ItemListener() {
@@ -960,6 +976,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 
 		this.padesPolicyIdentifier.setEnabled(enableTextFields);
 		this.padesPolicyIdentifier.setEditable(editableTextFields);
+		this.padesPolicyIdentifier.getAccessibleContext().setAccessibleDescription(Messages.getString("PreferencesPanel.60")); //$NON-NLS-1$
 		this.padesPolicyIdentifier.addKeyListener(this);
 		this.padesPolicyIdentifier.addKeyListener(this.modificationListener);
 		final JLabel policyIdentifierLabel = new JLabel(Messages.getString("PreferencesPanel.39")); //$NON-NLS-1$
@@ -971,6 +988,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 
 		this.padesPolicyIdentifierHash.setEnabled(enableTextFields);
 		this.padesPolicyIdentifierHash.setEditable(editableTextFields);
+		this.padesPolicyIdentifierHash.getAccessibleContext().setAccessibleDescription(Messages.getString("PreferencesPanel.61")); //$NON-NLS-1$
 		this.padesPolicyIdentifierHash.addKeyListener(this);
 		this.padesPolicyIdentifierHash.addKeyListener(this.modificationListener);
 		final JLabel policyIdentifierHashLabel = new JLabel(Messages.getString("PreferencesPanel.28")); //$NON-NLS-1$
@@ -981,6 +999,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 		panel.add(this.padesPolicyIdentifierHash, c);
 
 		this.padesPolicyIdentifierHashAlgorithm.setEnabled(enableTextFields);
+		this.padesPolicyIdentifierHashAlgorithm.getAccessibleContext().setAccessibleDescription(Messages.getString("PreferencesPanel.52")); //$NON-NLS-1$
 		this.padesPolicyIdentifierHashAlgorithm.addKeyListener(this);
 		this.padesPolicyIdentifierHashAlgorithm.addItemListener(this.modificationListener);
 		final JLabel policyIdentifierHashAlgorithmLabel = new JLabel(Messages.getString("PreferencesPanel.29")); //$NON-NLS-1$
@@ -992,6 +1011,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 
 		this.padesPolicyQualifier.setEnabled(enableTextFields);
 		this.padesPolicyQualifier.setEditable(editableTextFields);
+		this.padesPolicyQualifier.getAccessibleContext().setAccessibleDescription(Messages.getString("PreferencesPanel.62")); //$NON-NLS-1$
 		this.padesPolicyQualifier.addKeyListener(this);
 		this.padesPolicyQualifier.addKeyListener(this.modificationListener);
 		final JLabel policyQualifierLabel = new JLabel(Messages.getString("PreferencesPanel.30")); //$NON-NLS-1$
@@ -1032,6 +1052,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 			Messages.getString("PreferencesPanel.26")	// Politica a medida, debe ser el ultimo elemento //$NON-NLS-1$
 		}));
 		panel.add(this.cadesPolicies, c);
+		this.cadesPolicies.getAccessibleContext().setAccessibleDescription(Messages.getString("PreferencesPanel.49")); //$NON-NLS-1$
 		this.cadesPolicies.addKeyListener(this);
 		this.cadesPolicies.addItemListener(this.modificationListener);
 		this.cadesPolicies.addItemListener(new ItemListener() {
@@ -1063,6 +1084,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 
 		this.cadesPolicyIdentifier.setEnabled(enableTextFields);
 		this.cadesPolicyIdentifier.setEditable(editableTextFields);
+		this.cadesPolicyIdentifier.getAccessibleContext().setAccessibleDescription(Messages.getString("PreferencesPanel.57")); //$NON-NLS-1$
 		this.cadesPolicyIdentifier.addKeyListener(this);
 		this.cadesPolicyIdentifier.addKeyListener(this.modificationListener);
 		final JLabel policyIdentifierLabel = new JLabel(Messages.getString("PreferencesPanel.39")); //$NON-NLS-1$
@@ -1074,6 +1096,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 
 		this.cadesPolicyIdentifierHash.setEnabled(enableTextFields);
 		this.cadesPolicyIdentifierHash.setEditable(editableTextFields);
+		this.cadesPolicyIdentifierHash.getAccessibleContext().setAccessibleDescription(Messages.getString("PreferencesPanel.58")); //$NON-NLS-1$
 		this.cadesPolicyIdentifierHash.addKeyListener(this);
 		this.cadesPolicyIdentifierHash.addKeyListener(this.modificationListener);
 		final JLabel policyIdentifierHashLabel = new JLabel(Messages.getString("PreferencesPanel.28")); //$NON-NLS-1$
@@ -1084,6 +1107,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 		panel.add(this.cadesPolicyIdentifierHash, c);
 
 		this.cadesPolicyIdentifierHashAlgorithm.setEnabled(enableTextFields);
+		this.cadesPolicyIdentifierHashAlgorithm.getAccessibleContext().setAccessibleDescription(Messages.getString("PreferencesPanel.51")); //$NON-NLS-1$
 		this.cadesPolicyIdentifierHashAlgorithm.addKeyListener(this);
 		this.cadesPolicyIdentifierHashAlgorithm.addItemListener(this.modificationListener);
 		final JLabel policyIdentifierHashAlgorithmLabel = new JLabel(Messages.getString("PreferencesPanel.29")); //$NON-NLS-1$
@@ -1095,6 +1119,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 
 		this.cadesPolicyQualifier.setEnabled(enableTextFields);
 		this.cadesPolicyQualifier.setEditable(editableTextFields);
+		this.cadesPolicyQualifier.getAccessibleContext().setAccessibleDescription(Messages.getString("PreferencesPanel.59")); //$NON-NLS-1$
 		this.cadesPolicyQualifier.addKeyListener(this);
 		this.cadesPolicyQualifier.addKeyListener(this.modificationListener);
 		final JLabel policyQualifierLabel = new JLabel(Messages.getString("PreferencesPanel.30")); //$NON-NLS-1$
