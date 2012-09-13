@@ -1,41 +1,41 @@
 /*
- * Controlador Java de la Secretaría de Estado de Administraciones Públicas
- * para el DNI electrónico.
+ * Controlador Java de la Secretaria de Estado de Administraciones PÃºblicas
+ * para el DNI electrÃ³nico.
  *
- * El Controlador Java para el DNI electrónico es un proveedor de seguridad de JCA/JCE 
- * que permite el acceso y uso del DNI electrónico en aplicaciones Java de terceros 
- * para la realización de procesos de autenticación, firma electrónica y validación 
- * de firma. Para ello, se implementan las funcionalidades KeyStore y Signature para 
- * el acceso a los certificados y claves del DNI electrónico, así como la realización 
- * de operaciones criptográficas de firma con el DNI electrónico. El Controlador ha 
- * sido diseñado para su funcionamiento independiente del sistema operativo final.
- * 
- * Copyright (C) 2012 Dirección General de Modernización Administrativa, Procedimientos 
- * e Impulso de la Administración Electrónica
- * 
+ * El Controlador Java para el DNI electrÃ³nico es un proveedor de seguridad de JCA/JCE
+ * que permite el acceso y uso del DNI electrÃ³nico en aplicaciones Java de terceros
+ * para la realizaciÃ³n de procesos de autenticaciÃ³n, firma electrÃ³nica y validaciÃ³n
+ * de firma. Para ello, se implementan las funcionalidades KeyStore y Signature para
+ * el acceso a los certificados y claves del DNI electrÃ³nico, asi como la realizaciÃ³n
+ * de operaciones criptogrÃ¡ficas de firma con el DNI electrÃ³nico. El Controlador ha
+ * sido diseÃ±ado para su funcionamiento independiente del sistema operativo final.
+ *
+ * Copyright (C) 2012 DirecciÃ³n General de ModernizaciÃ³n Administrativa, Procedimientos
+ * e Impulso de la AdministraciÃ³n ElectrÃ³nica
+ *
  * Este programa es software libre y utiliza un licenciamiento dual (LGPL 2.1+
- * o EUPL 1.1+), lo cual significa que los usuarios podrán elegir bajo cual de las
- * licencias desean utilizar el código fuente. Su elección deberá reflejarse 
- * en las aplicaciones que integren o distribuyan el Controlador, ya que determinará
+ * o EUPL 1.1+), lo cual significa que los usuarios podrÃ¡n elegir bajo cual de las
+ * licencias desean utilizar el cÃ³digo fuente. Su elecciÃ³n deberÃ¡ reflejarse
+ * en las aplicaciones que integren o distribuyan el Controlador, ya que determinarÃ¡
  * su compatibilidad con otros componentes.
  *
- * El Controlador puede ser redistribuido y/o modificado bajo los términos de la 
- * Lesser GNU General Public License publicada por la Free Software Foundation, 
- * tanto en la versión 2.1 de la Licencia, o en una versión posterior.
- * 
- * El Controlador puede ser redistribuido y/o modificado bajo los términos de la 
- * European Union Public License publicada por la Comisión Europea, 
- * tanto en la versión 1.1 de la Licencia, o en una versión posterior.
- * 
- * Debería recibir una copia de la GNU Lesser General Public License, si aplica, junto
- * con este programa. Si no, consúltelo en <http://www.gnu.org/licenses/>.
- * 
- * Debería recibir una copia de la European Union Public License, si aplica, junto
- * con este programa. Si no, consúltelo en <http://joinup.ec.europa.eu/software/page/eupl>.
+ * El Controlador puede ser redistribuido y/o modificado bajo los tÃ©rminos de la
+ * Lesser GNU General Public License publicada por la Free Software Foundation,
+ * tanto en la versiÃ³n 2.1 de la Licencia, o en una versiÃ³n posterior.
  *
- * Este programa es distribuido con la esperanza de que sea útil, pero
- * SIN NINGUNA GARANTÍA; incluso sin la garantía implícita de comercialización
- * o idoneidad para un propósito particular.
+ * El Controlador puede ser redistribuido y/o modificado bajo los tÃ©rminos de la
+ * European Union Public License publicada por la ComisiÃ³n Europea,
+ * tanto en la versiÃ³n 1.1 de la Licencia, o en una versiÃ³n posterior.
+ *
+ * Deberia recibir una copia de la GNU Lesser General Public License, si aplica, junto
+ * con este programa. Si no, consÃºltelo en <http://www.gnu.org/licenses/>.
+ *
+ * Deberia recibir una copia de la European Union Public License, si aplica, junto
+ * con este programa. Si no, consÃºltelo en <http://joinup.ec.europa.eu/software/page/eupl>.
+ *
+ * Este programa es distribuido con la esperanza de que sea Ãºtil, pero
+ * SIN NINGUNA GARANTÃ�A; incluso sin la garantia implicita de comercializaciÃ³n
+ * o idoneidad para un propÃ³sito particular.
  */
 package es.gob.jmulticard.card.dnie;
 
@@ -251,7 +251,7 @@ public final class Dnie extends Iso7816EightCard implements CryptoCard, Cwa14890
     }
 
     /** {@inheritDoc} */
-    public String getCardName() {
+	public String getCardName() {
         return "DNIe"; //$NON-NLS-1$
     }
 
@@ -554,7 +554,6 @@ public final class Dnie extends Iso7816EightCard implements CryptoCard, Cwa14890
                 verifyPin(this.passwordCallback);
                 if (this.passwordCallback != null) {
                 	this.passwordCallback.clearPassword();
-                	System.gc();
                 }
             }
             catch (final ApduConnectionException e) {
@@ -589,7 +588,7 @@ public final class Dnie extends Iso7816EightCard implements CryptoCard, Cwa14890
 		}
     }
 
-    protected void selectMasterFile() throws ApduConnectionException, FileNotFoundException {
+	protected void selectMasterFile() throws ApduConnectionException, FileNotFoundException {
     	selectFileByName(MASTER_FILE_NAME);
     }
 
