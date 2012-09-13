@@ -22,6 +22,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.Iterator;
+import java.util.logging.Logger;
 
 import javax.help.UnsupportedOperationException;
 
@@ -104,7 +105,7 @@ public final class ValidateBinarySignature {
             return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CRL_PROBLEM);
         }
         catch (final Exception e) {
-            // La firma no es una firma binaria valida
+            Logger.getLogger("es.gob.afirma").info("Los datos no son una firma binaria valida: " + e); //$NON-NLS-1$ //$NON-NLS-2$
             return new SignValidity(SIGN_DETAIL_TYPE.KO, null);
         }
 
@@ -142,7 +143,7 @@ public final class ValidateBinarySignature {
         	s = new CMSSignedData(sign);
         }
         else {
-        	s = new CMSSignedData(new CMSProcessableByteArray(sign), data);
+        	s = new CMSSignedData(new CMSProcessableByteArray(data), sign);
         }
         final Store store = s.getCertificates();
 

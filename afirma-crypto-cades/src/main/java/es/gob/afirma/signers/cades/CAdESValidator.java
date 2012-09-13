@@ -104,6 +104,7 @@ public final class CAdESValidator {
 
         }
         catch (final Exception ex) {
+        	LOGGER.info("Los datos proporcionados no son un SignedData de CAdES: " + ex); //$NON-NLS-1$
             return false;
         }
         return isValid;

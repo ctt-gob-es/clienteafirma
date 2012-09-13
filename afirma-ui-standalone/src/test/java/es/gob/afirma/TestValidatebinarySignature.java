@@ -86,6 +86,10 @@ public class TestValidatebinarySignature {
 		final InputStream signIs = AOUtil.getCleanClassLoader().getResourceAsStream(signatureFile);
 		final byte[] signature = AOUtil.getDataFromInputStream(signIs);
 
+		if (signature == null || signature.length == 0) {
+			Assert.fail("No se ha cargado correctamente la firma a validar"); //$NON-NLS-1$
+		}
+
 		try {
 			signIs.close();
 		} catch (final Exception e) {
@@ -96,6 +100,9 @@ public class TestValidatebinarySignature {
 
 		final InputStream dataIs = AOUtil.getCleanClassLoader().getResourceAsStream(dataFile);
 		final byte[] data = AOUtil.getDataFromInputStream(dataIs);
+		if (data == null || data.length == 0) {
+			Assert.fail("No se han cargado correctamente los datos de la firma a validar"); //$NON-NLS-1$
+		}
 
 		try {
 			dataIs.close();
