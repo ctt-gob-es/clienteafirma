@@ -10,6 +10,8 @@ import es.gob.afirma.signature.SignValidity;
 import es.gob.afirma.signature.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.signature.ValidateBinarySignature;
 
+/** Prueba de validaci&oacute;n de firma binaria. */
+@SuppressWarnings({ "static-method", "null" })
 public class TestValidatebinarySignature {
 
 	private static final String SIGNATURE_CADES_IMPLICIT_FILENAME = "cades_implicita.csig"; //$NON-NLS-1$
@@ -19,6 +21,8 @@ public class TestValidatebinarySignature {
 	private static final String DATA_FILENAME = "data.jpg"; //$NON-NLS-1$
 
 
+	/** Prueba de validaci&oacute;n de firma CAdES impl&iacute;cita.
+	 * @throws Exception */
 	@Test
 	public void testValidarFirmaCadesImplicita() throws Exception {
 
@@ -36,7 +40,8 @@ public class TestValidatebinarySignature {
 		SignValidity validity = null;
 		try {
 			validity = ValidateBinarySignature.validate(signature, null);
-		} catch (final Exception e) {
+		}
+		catch (final Exception e) {
 			Assert.fail("Ocurrio el siguiente error durante la validacion de la firma " + signatureFile + ": " + e.toString()); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
@@ -44,6 +49,8 @@ public class TestValidatebinarySignature {
 		Assert.assertEquals("El resultado de la validacion no es correcto para la firma " + signatureFile, SIGN_DETAIL_TYPE.OK, validity.getValidity()); //$NON-NLS-1$
 	}
 
+	/** Prueba de validaci&oacute;n de firma CMS impl&iacute;cita.
+	 * @throws Exception */
 	@Test
 	public void testValidarFirmaCmsImplicita() throws Exception {
 
@@ -69,6 +76,8 @@ public class TestValidatebinarySignature {
 		Assert.assertEquals("El resultado de la validacion no es correcto para la firma " + signatureFile, SIGN_DETAIL_TYPE.OK, validity.getValidity()); //$NON-NLS-1$
 	}
 
+	/** Prueba de validaci&oacute;n de firma CAdES expl&iacute;cita.
+	 * @throws Exception */
 	@Test
 	public void testValidarFirmaCadesExplicita() throws Exception {
 
@@ -105,6 +114,8 @@ public class TestValidatebinarySignature {
 		Assert.assertEquals("El resultado de la validacion no es correcto para la firma " + signatureFile, SIGN_DETAIL_TYPE.OK, validity.getValidity()); //$NON-NLS-1$
 	}
 
+	/** Prueba de validaci&oacute;n de firma CMS expl&iacute;cita.
+	 * @throws Exception */
 	@Test
 	public void testValidarFirmaCmsExplicita() throws Exception {
 
