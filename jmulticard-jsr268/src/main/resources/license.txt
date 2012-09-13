@@ -1,0 +1,68 @@
+Aviso Legal y Licencia de uso del software "Controlador Java para el DNI electrónico"
+
+Dirección General de Modernización Administrativa, Procedimientos e Impulso de la Administración Electrónica,
+perteneciente al Ministerio de Hacienda y Administración Pública.
+C/ María de Molina 50, 9ª pl, 28071, Madrid.
+CIF: S-2833002-E
+
+AVISO IMPORTANTE -- LEA ATENTAMENTE ESTE DOCUMENTO: El presente documento establece el uso del software "Controlador Java para el DNI electrónico" de la Dirección General de Modernización Administrativa, Procedimientos e Impulso de la Administración Electrónica y la documentación adjunta (en adelante "software"). El hecho de descargar, copiar o utilizar el software, implica que usted acepta plenamente y sin reservas de todas y cada una de las condiciones de este documento. Si no acepta las condiciones no utilice el software. Asimismo, el uso de este software por parte del usuario da lugar a la aceptación de los términos del presente acuerdo.
+
+CONSIDERACIONES PRELIMINARES
+
+El presente acuerdo establece únicamente las condiciones de uso del software y sobre el Código Fuente del mismo. En la medida en que sea permitido por las leyes, lo dispuesto en el presente documento sustituye toda comunicación o publicidad sobre el programa o documentación en la medida en que estas últimas se opongan a alguno de los términos de lo indicado en el presente documento y/o en la Licencia de código aplicada.
+La aceptación de las condiciones del presente documento no concede al usuario ningún derecho no especificado sobre este software.
+
+1. DEFINICIONES
+
+1.1 Usuario.
+El Usuario es el particular o la entidad comercial que descarga el software o ejecuta el programa.
+
+2. USO DEL SOFTWARE
+
+2.1 Derechos y limitaciones de la concesión.
+La Dirección General de Modernización Administrativa, Procedimientos e Impulso de la Administración Electrónica concede al Usuario el derecho no exclusivo e intransferible de utilizar el software. Además deberán tenerse en cuenta las limitaciones siguientes:
+
+2.1.1 Derechos.
+El Usuario podrá utilizar el software del modo y en la forma contenida en el presente documento.
+
+2.1.2 Limitaciones.
+El usuario acepta que la Dirección General de Modernización Administrativa, Procedimientos e Impulso de la Administración Electrónica pueda variar los servicios por motivos de evolución tecnológica.
+El usuario acepta todos estos cambios sin exigir compensación económica ni de otro tipo. 
+El usuario deberá tener en cuenta que el software ha podido sufrir modificaciones para adaptarse técnicamente a la nueva tecnología. Estas modificaciones son aceptadas por el usuario con la descarga de software, por ello, antes de descargarse y ejecutar el programa en su ordenador, compruebe las posibles modificaciones.
+El usuario reconoce y acepta el derecho de la Dirección General de Modernización Administrativa, Procedimientos e Impulso de la Administración Electrónica a proporcionar actualizaciones o complementos al software que se descarguen de manera automática.
+Queda prohibido al usuario el arrendamiento o la venta del software o de sus componentes (incluyendo el código fuente) a otra persona o entidad. 
+
+3. LICENCIA DEL CÓDIGO FUENTE
+El código se liberará bajo licencia dual LGPL 2.1+ o EUPL 1.1+, disponibles en http://www.gnu.org/licenses/ y http://joinup.ec.europa.eu/software/page/eupl, respectivamente.
+
+4. ANULACIÓN 
+La aceptación de las condiciones presentadas en el presente documento quedarán automáticamente anuladas si el usuario no cumple las condiciones establecidas. En tal caso, el usuario destruirá todas las copias del software y sus componentes.
+
+5. DERECHOS DE PROPIEDAD
+Todos los derechos de propiedad intelectual y de copyright sobre el software (incluidas imágenes, fotografías, animación, vídeo, audio, música, texto y otros elementos que forman parte del software), la documentación adjunta y todas las copias del software corresponden a la Dirección General de Modernización Administrativa, Procedimientos e Impulso de la Administración Electrónica, así como los demás servicios que resultarán cedidos por la Dirección General de Modernización Administrativa, Procedimientos e Impulso de la Administración Electrónica al usuario en cumplimiento del presente acuerdo. 
+El software está protegido por las leyes y tratados internacionales relativos al derecho de propiedad. Por consiguiente, el Usuario deberá utilizar el software como cualquier otro material protegido por las leyes de propiedad intelectual, salvo que se disponga lo contrario en virtud del presente documento.
+ 
+La Dirección General de Modernización Administrativa, Procedimientos e Impulso de la Administración Electrónica hace reserva expresa de cualesquiera derechos pudieran corresponderle y que no fueran otorgados al usuario en virtud del presente documento.
+
+Todo ello sin perjuicio de las disposiciones de carácter particular que la Dirección General de Modernización Administrativa, Procedimientos e Impulso de la Administración Electrónica haga de sus productos, debidamente formalizadas por escrito con el usuario.
+
+6. LEGISLACIÓN VIGENTE
+Se tendrá en cuenta que el presente acuerdo se ha establecido y debe interpretarse de conformidad con la legislación española. En caso de que surjan dudas y/o divergencias en cuanto a su interpretación y/o efectos, únicamente serán competentes los tribunales de la ciudad de Madrid, renunciando las partes a cualquier otro fuero que pudiera corresponderles.
+
+7. EXENCIÓN DE GARANTÍAS Y LIMITACIÓN DE RESPONSABILIDADES
+
+7.1 No existe garantía alguna.
+En la medida en que lo permita la legislación aplicable, el software se facilita "tal cual" y ni la Dirección General de Modernización Administrativa, Procedimientos e Impulso de la Administración Electrónica ofrece ninguna garantía, explícita ni implícita, incluso sin la garantía mercantil implícita o sin garantizar la convención para uso privado.
+La Dirección General de Modernización Administrativa, Procedimientos e Impulso de la Administración Electrónica tampoco garantiza que el programa esté libre de errores, ni que su funcionamiento sea ininterrumpido.
+
+7.2 No existe responsabilidad alguna sobre daños y perjuicios.
+En la medida en que lo permita la legislación aplicable, en ningún caso se podrá considerar a la Dirección General de Modernización Administrativa, Procedimientos e Impulso de la Administración Electrónica responsable, con ninguna personas o entidad, de cualesquiera daños ya sean especiales, directos o indirectos (incluidos, a título informativo pero no limitativo, los de lucro cesante, interrupción de las actividades comerciales, pérdidas económicas o pérdida de información) derivados del uso o la imposibilidad de uso de los materiales, incluso aunque la Dirección General de Modernización Administrativa, Procedimientos e Impulso de la Administración Electrónica haya recibido aviso de la posibilidad de este tipo de daños.
+El software se entrega tal y como es, no aceptándose reclamaciones por supuestas especificaciones que debiera cumplir el programa.
+
+La Dirección General de Modernización Administrativa, Procedimientos e Impulso de la Administración Electrónica se exime de cualquier tipo de responsabilidad por modificaciones que se produzcan en el Código fuente o en otras partes del software sin consentimiento expreso de la Dirección General de Modernización Administrativa, Procedimientos e Impulso de la Administración Electrónica así como del uso incorrecto que se haga del software ya sea del original distribuido por la Dirección General de Modernización Administrativa, Procedimientos e Impulso de la Administración Electrónica como de modificaciones o productos derivados del software (incluidos los derivados del código fuente) autorizadas y no autorizadas por la Dirección General de Modernización Administrativa, Procedimientos e Impulso de la Administración Electrónica.
+
+El usuario es responsable del uso que del programa hagan las demás personas que lo utilicen. El usuario asume, cualesquiera daños, perjuicios y/o costes que pudieran derivarse de incompatibilidades entre el programa o sus actualizaciones y el software propiedad de terceras compañías que el usuario pudiera tener instalado en un ordenador, así como otros problemas que pudieran originarse por interactuación entre programas o por cadenas de código coincidentes.
+
+8. OTRAS CONSIDERACIONES
+Si alguna disposición del presente documento no es conforme a la legislación o no se puede aplicar en virtud de la misma, dicha disposición será limitada en la medida necesaria para que sea conforme a la legislación y sea totalmente aplicable en virtud de la misma, esta circunstancia no afecta ni supone la nulidad total del acuerdo. El presente acuerdo es el acuerdo final, completo y exclusivo entre las partes sobre el asunto principal que se ha tratado, y reemplaza a todos los acuerdos o disposiciones anteriores o actuales que versen sobre el asunto principal, independientemente de que sean orales o escritas. El Usuario se compromete a no enviar, transferir o exportar el software a ningún país, ni utilizar el software de ningún modo, que esté prohibido por las leyes, restricciones o reglamentos en materia de exportación. Sólo se podrá modificar el presente documento mediante un escrito firmado por una persona autorizada por la Dirección General de Modernización Administrativa, Procedimientos e Impulso de la Administración Electrónica.
+El usuario sabe y acepta que la Dirección General de Modernización Administrativa, Procedimientos e Impulso de la Administración Electrónica puede acudir a los tribunales en caso de incumplimiento de los términos recogidos en este documento.

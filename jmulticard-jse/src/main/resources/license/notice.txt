@@ -1,0 +1,29 @@
+﻿This license file applies to the [Controlador Java para el DNI electrónico] software 
+except as described below. 
+
+This product is Copyright 2012 Dirección General de Modernización Administrativa, 
+Procedimientos e Impulso de la Administración Electrónica.
+
+This program is free software: you can redistribute it and/or modify it under 
+the terms of the GNU Lesser General Public License as published by the Free Software 
+Foundation (available at http://www.gnu.org/licenses/gpl-3.0.html), either 
+version 2.1 of the License, or (at your option) any later version, or under 
+the terms of the European Union Public License as published by the European Commision
+(available at http://joinup.ec.europa.eu/software/page/eupl), either 
+version 1.1 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with 
+this program. If not, see <http://www.gnu.org/licenses/>.
+
+You should have received a copy of the European Union Public License along with 
+this program. If not, see <http://joinup.ec.europa.eu/software/page/eupl>.
+
+Some portions of the Software are provided by third parties are available under other 
+licensing terms. In this distribution, they are:
+- Bouncycastle: Adaptation of MIT X11 license
+- Apache License Version 2.0
+- GNU General Public License
