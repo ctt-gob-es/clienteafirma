@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -22,6 +22,7 @@ import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 
+import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.DEROctetString;
@@ -60,7 +61,7 @@ final class CMSDecipherAuthenticatedData {
      *         Cuando se indica un certificado que no est&aacute; entre los
      *         destinatarios del sobre.
      * @throws InvalidKeyException
-     *         Cuando la clave almacenada en el sobre no es v&aacute;lida. 
+     *         Cuando la clave almacenada en el sobre no es v&aacute;lida.
      * @throws NoSuchAlgorithmException
      *         Cuando no se reconozca el algoritmo utilizado para generar el
      *         c&oacute;digo de autenticaci&oacute;n.
@@ -92,8 +93,8 @@ final class CMSDecipherAuthenticatedData {
 
         final ASN1Set authAttr = authenticated.getAuthAttrs();
 
-        final byte[] macGenerada = Utils.genMac(this.macAlgorithmConfig.getName(), authAttr.getDEREncoded(), this.cipherKey);
-        
+        final byte[] macGenerada = Utils.genMac(this.macAlgorithmConfig.getName(), authAttr.getEncoded(ASN1Encoding.DER), this.cipherKey);
+
         final byte[] macObtenida = authenticated.getMac().getOctets();
 
         if (java.util.Arrays.equals(macGenerada, macObtenida)) {

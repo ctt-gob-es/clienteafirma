@@ -23,10 +23,11 @@ import java.util.logging.Logger;
 import javax.crypto.SecretKey;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1Object;
+import org.bouncycastle.asn1.ASN1Encoding;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
+import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.cms.Attribute;
@@ -144,7 +145,7 @@ final class CMSSignedAndEnvelopedData {
         // raiz de la secuencia de SignerInfo
         final ASN1EncodableVector signerInfos = new ASN1EncodableVector();
 
-        final TBSCertificateStructure tbs2 = TBSCertificateStructure.getInstance(ASN1Object.fromByteArray(signerCertificateChain[0].getTBSCertificate()));
+        final TBSCertificateStructure tbs2 = TBSCertificateStructure.getInstance(ASN1Primitive.fromByteArray(signerCertificateChain[0].getTBSCertificate()));
 
         final IssuerAndSerialNumber encSid = new IssuerAndSerialNumber(X500Name.getInstance(tbs2.getIssuer()), tbs2.getSerialNumber().getValue());
 
@@ -177,7 +178,7 @@ final class CMSSignedAndEnvelopedData {
                                                                                                         infos.getEncInfo(),
                                                                                                         certificates,
                                                                                                         certrevlist,
-                                                                                                        new DERSet(signerInfos))).getDEREncoded();
+                                                                                                        new DERSet(signerInfos))).getEncoded(ASN1Encoding.DER);
     }
 
     /** M&eacute;todo que genera la parte que contiene la informaci&oacute;n del
@@ -217,9 +218,10 @@ final class CMSSignedAndEnvelopedData {
                 final Map.Entry<String, byte[]> e = it.next();
                 contexExpecific.add(new Attribute(
                         // el oid
-                        new DERObjectIdentifier((e.getKey()).toString()),
+                        new ASN1ObjectIdentifier((e.getKey()).toString()),
                         // el array de bytes en formato string
-                        new DERSet(new DERPrintableString(e.getValue()))));
+                        new DERSet(new DERPrintableString(new String(e.getValue()))))
+                );
             }
         }
 
@@ -248,9 +250,9 @@ final class CMSSignedAndEnvelopedData {
                 final Map.Entry<String, byte[]> e = it.next();
                 contexExpecific.add(new Attribute(
                 		// el oid
-                        new DERObjectIdentifier((e.getKey()).toString()),
+                        new ASN1ObjectIdentifier((e.getKey()).toString()),
                         // el array de bytes en formato string
-                        new DERSet(new DERPrintableString(e.getValue()))
+                        new DERSet(new DERPrintableString(new String(e.getValue())))
                 ));
             }
         }

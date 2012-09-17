@@ -10,11 +10,13 @@
 
 package es.gob.afirma.envelopers.cms;
 
+import java.io.IOException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.cms.EncryptedContentInfo;
@@ -74,7 +76,7 @@ final class CMSEncryptedData {
     		                       final AOCipherConfig config,
     		                       final Key cipherKey,
     		                       final String dataType,
-    		                       final Map<String, byte[]> uatrib) throws NoSuchAlgorithmException {
+    		                       final Map<String, byte[]> uatrib) throws NoSuchAlgorithmException, IOException {
 
         // Datos previos &uacute;tiles
         final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(digAlg);
@@ -95,7 +97,7 @@ final class CMSEncryptedData {
         unprotectedAttrs = Utils.generateSignerInfo(digestAlgorithm, data, dataType, uatrib);
 
         // construimos el Enveloped Data y lo devolvemos
-        return new ContentInfo(PKCSObjectIdentifiers.encryptedData, new EncryptedData(encInfo, unprotectedAttrs)).getDEREncoded();
+        return new ContentInfo(PKCSObjectIdentifiers.encryptedData, new EncryptedData(encInfo, unprotectedAttrs)).getEncoded(ASN1Encoding.DER);
     }
 
 }

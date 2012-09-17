@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.cms.ContentInfo;
@@ -78,6 +79,6 @@ final class CMSDigestedData {
         final DEROctetString digest = new DEROctetString(MessageDigest.getInstance(digestAlgorithm).digest(content));
 
         // construimos el digestedData.
-        return new ContentInfo(PKCSObjectIdentifiers.digestedData, new DigestedData(digAlgId, encInfo, digest)).getDEREncoded();
+        return new ContentInfo(PKCSObjectIdentifiers.digestedData, new DigestedData(digAlgId, encInfo, digest)).getEncoded(ASN1Encoding.DER);
     }
 }

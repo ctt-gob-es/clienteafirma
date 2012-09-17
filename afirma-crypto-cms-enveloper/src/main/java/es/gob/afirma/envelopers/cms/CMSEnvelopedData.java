@@ -19,6 +19,7 @@ import java.util.Map;
 
 import javax.crypto.SecretKey;
 
+import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
@@ -121,7 +122,7 @@ public final class CMSEnvelopedData {
         return new ContentInfo(PKCSObjectIdentifiers.envelopedData, new EnvelopedData(origInfo,
                                                                                       new DERSet(infos.getRecipientInfos()),
                                                                                       infos.getEncInfo(),
-                                                                                      unprotectedAttrs)).getDEREncoded();
+                                                                                      unprotectedAttrs)).getEncoded(ASN1Encoding.DER);
     }
 
     /** M&eacute;todo que genera la firma de tipo EnvelopedData.
@@ -175,7 +176,7 @@ public final class CMSEnvelopedData {
         return new ContentInfo(PKCSObjectIdentifiers.envelopedData, new EnvelopedData(origInfo,
                                                                                       new DERSet(infos.getRecipientInfos()),
                                                                                       infos.getEncInfo(),
-                                                                                      unprotectedAttrs)).getDEREncoded();
+                                                                                      unprotectedAttrs)).getEncoded(ASN1Encoding.DER);
 
     }
 
@@ -225,7 +226,7 @@ public final class CMSEnvelopedData {
                         new ContentInfo(PKCSObjectIdentifiers.envelopedData, new EnvelopedData(origInfo,
                                                                                                ed.getRecipientInfos(),
                                                                                                ed.getEncryptedContentInfo(),
-                                                                                               ed.getUnprotectedAttrs())).getDEREncoded();
+                                                                                               ed.getUnprotectedAttrs())).getEncoded(ASN1Encoding.DER);
             }
         }
         catch (final Exception ex) {

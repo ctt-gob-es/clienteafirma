@@ -27,14 +27,15 @@ import java.util.logging.Logger;
 
 import javax.crypto.SecretKey;
 
+import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.asn1.BERConstructedOctetString;
-import org.bouncycastle.asn1.DEREncodable;
+import org.bouncycastle.asn1.BEROctetString;
 import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERPrintableString;
@@ -155,7 +156,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
         if (signerCertificateChain.length != 0) {
             // introducimos una lista vacia en los CRL ya que no podemos
             // modificar el codigo de bc.
-            final List<DEREncodable> crl = new ArrayList<DEREncodable>();
+            final List<ASN1Encodable> crl = new ArrayList<ASN1Encodable>();
             certrevlist = SigUtils.createBerSetFromList(crl);
             origInfo = new OriginatorInfo(certificates, certrevlist);
         }
@@ -185,14 +186,14 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
         catch (final Exception ex) {
             throw new IOException("Error en la escritura del procesable CMS: " + ex); //$NON-NLS-1$
         }
-        encInfo = new ContentInfo(contentTypeOID, new BERConstructedOctetString(bOut.toByteArray()));
+        encInfo = new ContentInfo(contentTypeOID, new BEROctetString(bOut.toByteArray()));
 
         // 6. ATRIBUTOS FIRMADOS
         ASN1Set authAttr = null;
         authAttr = generateSignedAtt(signerCertificateChain[0], digestAlgorithm, content2, dataType, applyTimestamp, atrib);
 
         // 7. MAC
-        final byte[] mac = Utils.genMac(autenticationAlgorithm, authAttr.getDEREncoded(), cipherKey);
+        final byte[] mac = Utils.genMac(autenticationAlgorithm, authAttr.getEncoded(ASN1Encoding.DER), cipherKey);
 
         // 8. ATRIBUTOS NO FIRMADOS.
 
@@ -208,7 +209,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
                                                                                            authAttr, // ASN1Set
                                                                                            new DEROctetString(mac), // ASN1OctetString
                                                                                            unAuthAttr // ASN1Set
-                               )).getDEREncoded();
+                               )).getEncoded(ASN1Encoding.DER);
 
     }
 
@@ -268,9 +269,9 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
                 final Map.Entry<String, byte[]> e = it.next();
                 contexExpecific.add(new Attribute(
                 		// el oid
-                        new DERObjectIdentifier((e.getKey()).toString()),
+                        new ASN1ObjectIdentifier((e.getKey()).toString()),
                         // el array de bytes en formato string
-                        new DERSet(new DERPrintableString(e.getValue()))
+                        new DERSet(new DERPrintableString(new String(e.getValue())))
                 ));
             }
 
@@ -343,7 +344,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
                                                                                                       auth.getAuthAttrs(), // ASN1Set
                                                                                                       auth.getMac(), // ASN1OctetString
                                                                                                       auth.getUnauthAttrs() // ASN1Set
-                                          )).getDEREncoded();
+                                          )).getEncoded(ASN1Encoding.DER);
             }
         }
         catch (final Exception ex) {

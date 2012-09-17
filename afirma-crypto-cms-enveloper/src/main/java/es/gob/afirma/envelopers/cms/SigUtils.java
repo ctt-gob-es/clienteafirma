@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -14,12 +14,12 @@ import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.BERSet;
-import org.bouncycastle.asn1.DEREncodable;
 import org.bouncycastle.asn1.DERNull;
-import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.cms.AttributeTable;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
@@ -27,7 +27,7 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 /** Clase que contiene una serie de m&eacute;todos utilizados por GenSignedData,
  * GenCadesSignedData, CoSigner y CounterSigner. */
 final class SigUtils {
-    
+
     private SigUtils() {
         // No permitimos la instanciacion
     }
@@ -39,16 +39,16 @@ final class SigUtils {
      *         en el cms.
      * @throws java.io.IOException */
     static AlgorithmIdentifier makeAlgId(final String oid) throws IOException {
-        return new AlgorithmIdentifier(new DERObjectIdentifier(oid), new DERNull());
+        return new AlgorithmIdentifier(new ASN1ObjectIdentifier(oid), new DERNull());
     }
 
     /** Genera un estructura de tipo SET de formato ASN1.
      * @param derObjects
      *        Una lista con los objetos a obtener el tipo SET
      * @return Un SET de ASN1 con los elementos de la lista introducida. */
-    static ASN1Set createBerSetFromList(final List<DEREncodable> derObjects) {
+    static ASN1Set createBerSetFromList(final List<ASN1Encodable> derObjects) {
         final ASN1EncodableVector v = new ASN1EncodableVector();
-        for (final DEREncodable d : derObjects) {
+        for (final ASN1Encodable d : derObjects) {
             v.add(d);
         }
         return new BERSet(v);

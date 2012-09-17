@@ -49,14 +49,15 @@ import javax.crypto.spec.PBEParameterSpec;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.ASN1Object;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
+import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.BERSet;
-import org.bouncycastle.asn1.DEREncodable;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
@@ -76,9 +77,9 @@ import org.bouncycastle.asn1.cms.RecipientInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.TBSCertificateStructure;
-import org.bouncycastle.asn1.x509.X509CertificateStructure;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ciphers.AOCipherConfig;
@@ -176,9 +177,9 @@ final class Utils {
         ASN1Set certificates = null;
 
         if (signerCertificateChain.length != 0) {
-            final List<DEREncodable> ce = new ArrayList<DEREncodable>();
+            final List<ASN1Encodable> ce = new ArrayList<ASN1Encodable>();
             for (final X509Certificate element : signerCertificateChain) {
-                ce.add(X509CertificateStructure.getInstance(ASN1Object.fromByteArray(element.getEncoded())));
+                ce.add(Certificate.getInstance(ASN1Primitive.fromByteArray(element.getEncoded())));
             }
             certificates = SigUtils.createBerSetFromList(ce);
         }
@@ -221,7 +222,7 @@ final class Utils {
 
         for (final X509Certificate element : certDest) {
             cert = element;
-            tbs = TBSCertificateStructure.getInstance(ASN1Object.fromByteArray(cert.getTBSCertificate()));
+            tbs = TBSCertificateStructure.getInstance(ASN1Primitive.fromByteArray(cert.getTBSCertificate()));
             // Obtenemos el Isuer & serial number
             isse = new IssuerAndSerialNumber(X500Name.getInstance(tbs.getIssuer()), tbs.getSerialNumber().getValue());
             // Creamos el recipientInfo
@@ -231,7 +232,7 @@ final class Utils {
             // obtenemos la informacion de la clave publica
             info = tbs.getSubjectPublicKeyInfo();
             // obtenemos el algoritmo de cifrado.
-            keyEncAlg = info.getAlgorithmId();
+            keyEncAlg = info.getAlgorithm();
 
             try {
                 // ciframos la clave
@@ -349,7 +350,7 @@ final class Utils {
      * @param cipher Encriptador */
     private static EncryptedContentInfo getEncryptedContentInfo(final byte[] file, final AOCipherConfig config, final AlgorithmParameterSpec params, final Cipher cipher) throws IOException, IllegalBlockSizeException, BadPaddingException {
 
-        DEREncodable asn1Params;
+    	ASN1Encodable asn1Params;
         if (params != null) {
             final ASN1InputStream aIn = new ASN1InputStream(cipher.getParameters().getEncoded("ASN.1")); //$NON-NLS-1$
             asn1Params = aIn.readObject();
@@ -359,11 +360,15 @@ final class Utils {
         }
 
         // obtenemos el OID del algoritmo de cifrado
-        final AlgorithmIdentifier encAlgId = new AlgorithmIdentifier(new DERObjectIdentifier(config.getAlgorithm().getOid()), asn1Params);
+        final AlgorithmIdentifier encAlgId = new AlgorithmIdentifier(new ASN1ObjectIdentifier(config.getAlgorithm().getOid()), asn1Params);
 
         // Obtenemos el identificador
-        final DERObjectIdentifier contentType = PKCSObjectIdentifiers.encryptedData;
-        return new EncryptedContentInfo(contentType, encAlgId, new DEROctetString(cipher.doFinal(file)));
+        final ASN1ObjectIdentifier contentType = PKCSObjectIdentifiers.encryptedData;
+        return new EncryptedContentInfo(
+    		contentType,
+    		encAlgId,
+    		new DEROctetString(cipher.doFinal(file))
+		);
     }
 
     /** Crea el cifrador usado para cifrar tanto el fichero como la clave usada
@@ -473,10 +478,11 @@ final class Utils {
             while (it.hasNext()) {
                 final Map.Entry<String, byte[]> e = it.next();
                 contexExpecific.add(new Attribute(
-                // el oid
-                                                  new DERObjectIdentifier((e.getKey()).toString()),
-                                                  // el array de bytes en formato string
-                                                  new DERSet(new DERPrintableString(e.getValue()))));
+            		// el oid
+                    new ASN1ObjectIdentifier((e.getKey()).toString()),
+                    // el array de bytes en formato string
+                    new DERSet(new DERPrintableString(new String(e.getValue()))))
+                );
             }
         }
         else {
@@ -512,10 +518,10 @@ final class Utils {
             if (certs == null) {
                 ASN1Set certificates = null;
                 final ASN1Set certrevlist = null;
-                final List<DEREncodable> ce = new ArrayList<DEREncodable>();
+                final List<ASN1Encodable> ce = new ArrayList<ASN1Encodable>();
                 for (final X509Certificate element : signerCertificateChain) {
                     if (element != null) {
-                        ce.add(X509CertificateStructure.getInstance(ASN1Object.fromByteArray(element.getEncoded())));
+                        ce.add(Certificate.getInstance(ASN1Primitive.fromByteArray(element.getEncoded())));
                     }
                 }
                 // se introducen la nueva cadena de certificados.
@@ -543,10 +549,10 @@ final class Utils {
 
                 ASN1Set certificates = null;
                 final ASN1Set certrevlist = new BERSet(new ASN1EncodableVector());
-                final List<DEREncodable> ce = new ArrayList<DEREncodable>();
+                final List<ASN1Encodable> ce = new ArrayList<ASN1Encodable>();
                 for (final X509Certificate element : signerCertificateChain) {
                     if (element != null) {
-                        ce.add(X509CertificateStructure.getInstance(ASN1Object.fromByteArray(element.getEncoded())));
+                        ce.add(Certificate.getInstance(ASN1Primitive.fromByteArray(element.getEncoded())));
                     }
                 }
                 // se introducen la nueva cadena de certificados.
@@ -581,7 +587,7 @@ final class Utils {
         IssuerAndSerialNumber isse;
         TBSCertificateStructure tbs = null;
 
-        tbs = TBSCertificateStructure.getInstance(ASN1Object.fromByteArray(userCert.getTBSCertificate()));
+        tbs = TBSCertificateStructure.getInstance(ASN1Primitive.fromByteArray(userCert.getTBSCertificate()));
         // Obtenemos el Isuer & serial number
         isse = new IssuerAndSerialNumber(X500Name.getInstance(tbs.getIssuer()), tbs.getSerialNumber().getValue());
 
@@ -591,8 +597,8 @@ final class Utils {
             // obtengo los recipientInfo
             final ASN1Sequence intermedio = (ASN1Sequence) elementRecipient.nextElement();
             reci = RecipientInfo.getInstance(intermedio);
-            final KeyTransRecipientInfo kri = KeyTransRecipientInfo.getInstance(reci.getDERObject());
-            final IssuerAndSerialNumber actual = IssuerAndSerialNumber.getInstance(kri.getRecipientIdentifier().getDERObject());
+            final KeyTransRecipientInfo kri = KeyTransRecipientInfo.getInstance(reci.toASN1Primitive());
+            final IssuerAndSerialNumber actual = IssuerAndSerialNumber.getInstance(kri.getRecipientIdentifier().toASN1Primitive());
             // Comparo el issuer y el serial number con el certificado que me
             // pasan para descifrar.
             if (actual.equals(isse)) {
@@ -763,10 +769,11 @@ final class Utils {
             while (it.hasNext()) {
                 final Map.Entry<String, byte[]> e = it.next();
                 contexExpecific.add(new Attribute(
-                // el oid
-                                                  new DERObjectIdentifier((e.getKey()).toString()),
-                                                  // el array de bytes en formato string
-                                                  new DERSet(new DERPrintableString(e.getValue()))));
+            		// el oid
+                    new ASN1ObjectIdentifier((e.getKey()).toString()),
+                    // el array de bytes en formato string
+                    new DERSet(new DERPrintableString(new String(e.getValue()))))
+                );
             }
         }
         else {
@@ -799,7 +806,7 @@ final class Utils {
         final byte[] tmp;
 
         try {
-            tmp = signedAttr2.getEncoded(ASN1Encodable.DER);
+            tmp = signedAttr2.getEncoded(ASN1Encoding.DER);
         }
         catch (final IOException ex) {
             throw new AOException("No se han podido codificar en ASN.1 los atributos firmados", ex); //$NON-NLS-1$

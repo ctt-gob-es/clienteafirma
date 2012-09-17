@@ -23,12 +23,14 @@ import java.util.logging.Logger;
 
 import javax.crypto.SecretKey;
 
+import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.asn1.DEREncodable;
 import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERPrintableString;
@@ -143,7 +145,7 @@ public final class CMSAuthenticatedEnvelopedData {
         if (signerCertificateChain.length != 0) {
             // introducimos una lista vacia en los CRL ya que no podemos
             // modificar el codigo de bc.
-            certrevlist = SigUtils.createBerSetFromList(new ArrayList<DEREncodable>());
+            certrevlist = SigUtils.createBerSetFromList(new ArrayList<ASN1Encodable>());
             origInfo = new OriginatorInfo(certificates, certrevlist);
         }
 
@@ -154,7 +156,7 @@ public final class CMSAuthenticatedEnvelopedData {
         final ASN1Set authAttr = generateSignedAtt(dataType, applySigningTime, atrib);
 
         // 5. MAC
-        final byte[] mac = Utils.genMac(autenticationAlgorithm, genPack(authAttr.getDEREncoded(), content2), cipherKey);
+        final byte[] mac = Utils.genMac(autenticationAlgorithm, genPack(authAttr.getEncoded(ASN1Encoding.DER), content2), cipherKey);
 
         // 6. ATRIBUTOS NO FIRMADOS.
         final ASN1Set unAuthAttr = Utils.generateUnsignedAtt(uatrib);
@@ -166,7 +168,7 @@ public final class CMSAuthenticatedEnvelopedData {
                                                                                                     authAttr, // authAttrs
                                                                                                     new DEROctetString(mac), // mac
                                                                                                     unAuthAttr // unauthAttrs
-                               )).getDEREncoded();
+                               )).getEncoded(ASN1Encoding.DER);
 
     }
 
@@ -212,9 +214,9 @@ public final class CMSAuthenticatedEnvelopedData {
                 final Map.Entry<String, byte[]> e = it.next();
                 contexExpecific.add(new Attribute(
                 	  // el oid
-	                  new DERObjectIdentifier((e.getKey()).toString()),
+	                  new ASN1ObjectIdentifier((e.getKey()).toString()),
 	                  // el array de bytes en formato string
-	                  new DERSet(new DERPrintableString(e.getValue()))
+	                  new DERSet(new DERPrintableString(new String(e.getValue())))
                 ));
             }
 
@@ -273,7 +275,7 @@ public final class CMSAuthenticatedEnvelopedData {
                                                                                                              authEnv.getAuthEncryptedContentInfo(),
                                                                                                              authEnv.getAuthAttrs(),
                                                                                                              authEnv.getMac(),
-                                                                                                             authEnv.getUnauthAttrs())).getDEREncoded();
+                                                                                                             authEnv.getUnauthAttrs())).getEncoded(ASN1Encoding.DER);
             }
 
         }

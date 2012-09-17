@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -12,10 +12,11 @@ package es.gob.afirma.envelopers.cms;
 
 import java.io.IOException;
 
+import org.bouncycastle.asn1.ASN1Encoding;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.BERConstructedOctetString;
-import org.bouncycastle.asn1.DERObjectIdentifier;
+import org.bouncycastle.asn1.BEROctetString;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.cms.CMSObjectIdentifiers;
 import org.bouncycastle.asn1.cms.CompressedData;
@@ -43,7 +44,7 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
  * para crear un mensaje Compressed Data de BouncyCastle: <a
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
 final class CMSCompressedData {
-	
+
 	private CMSCompressedData() {
 		// No permitimos la instanciacion
 	}
@@ -54,21 +55,22 @@ final class CMSCompressedData {
     /** Obtiene un tipo CompressedData.
      * @param data
      *        Datos a comprimir
-     * @return Tipo CompressedData. */
-    static byte[] genCompressedData(final byte[] data) {
+     * @return Tipo CompressedData.
+     * @throws IOException */
+    static byte[] genCompressedData(final byte[] data) throws IOException {
 
         // Algoritmo de compresion
-        final AlgorithmIdentifier comAlgId = new AlgorithmIdentifier(new DERObjectIdentifier(ZLIB));
+        final AlgorithmIdentifier comAlgId = new AlgorithmIdentifier(new ASN1ObjectIdentifier(ZLIB));
 
         // Se comprimen los datos
         final byte[] compressed = BinaryUtils.compress(data);
 
-        final ASN1OctetString comOcts = new BERConstructedOctetString(compressed);
+        final ASN1OctetString comOcts = new BEROctetString(compressed);
 
         // Contenido comprimido
         final ContentInfo comContent = new ContentInfo(CMSObjectIdentifiers.data, comOcts);
 
-        return new ContentInfo(CMSObjectIdentifiers.compressedData, new CompressedData(comAlgId, comContent)).getDEREncoded();
+        return new ContentInfo(CMSObjectIdentifiers.compressedData, new CompressedData(comAlgId, comContent)).getEncoded(ASN1Encoding.DER);
 
     }
 

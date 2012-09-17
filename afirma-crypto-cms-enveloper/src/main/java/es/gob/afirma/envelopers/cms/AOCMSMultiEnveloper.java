@@ -199,8 +199,9 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
     /** Crea un envoltorio CMS de tipo Data.
      * @param content
      *        Datos que se desean envolver.
-     * @return Envoltorio Data. */
-    static byte[] createCMSData(final byte[] content) {
+     * @return Envoltorio Data.
+     * @throws IOException */
+    static byte[] createCMSData(final byte[] content) throws IOException {
 		return CMSData.genData(content);
     }
 
@@ -220,8 +221,9 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
     /** Crea un envoltorio CMS de tipo CompressedData.
      * @param content
      *        Datos que se desean envolver.
-     * @return Envoltorio Compressed Data. */
-    static byte[] createCMSCompressedData(final byte[] content) {
+     * @return Envoltorio Compressed Data.
+     * @throws IOException */
+    static byte[] createCMSCompressedData(final byte[] content) throws IOException {
 		return CMSCompressedData.genCompressedData(content);
     }
 
@@ -236,8 +238,9 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
      * @throws NoSuchAlgorithmException
      *         Cuando el algoritmo de cifrado indicado no est&aacute;
      *         soportado.
+     * @throws IOException
      */
-    byte[] createCMSEncryptedData(final byte[] content, final AOCipherConfig cipherConfig, final Key key) throws NoSuchAlgorithmException {
+    byte[] createCMSEncryptedData(final byte[] content, final AOCipherConfig cipherConfig, final Key key) throws NoSuchAlgorithmException, IOException {
 		return CMSEncryptedData.genEncryptedData(content, this.signatureAlgorithm, cipherConfig, key, DATA_TYPE_OID, this.uattrib);
     }
 
