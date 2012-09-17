@@ -186,6 +186,8 @@ final class Firma extends JPanel {
             final AOKeyStoreManager keyStoreManager;
 
             try {
+            	setCursor(new Cursor(Cursor.WAIT_CURSOR));
+
                 keyStoreManager = AOKeyStoreManagerFactory.getAOKeyStoreManager(store, lib, kssc.toString(), pssCallback, this);
             }
             catch (final IOException e) {
@@ -222,6 +224,9 @@ final class Firma extends JPanel {
                                                JOptionPane.ERROR_MESSAGE);
                 return;
             }
+            finally {
+            	setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+			}
 
 
             // Recuperamos la clave del certificado
