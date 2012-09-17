@@ -10,6 +10,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
+import java.net.URL;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -27,6 +29,7 @@ import javax.swing.JTextField;
 
 import org.ietf.jgss.Oid;
 
+import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.ui.utils.CustomDialog;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
@@ -335,7 +338,7 @@ public class MainOptionsPane {
         valores.addActionListener(new ActionListener() {
         	/** {@inheritDoc} */
             @Override
-            public void actionPerformed(final ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
                 valoresActionPerformed();
             }
         });
@@ -355,7 +358,7 @@ public class MainOptionsPane {
         this.checkAddPolicy.addItemListener(new ItemListener() {
         	/** {@inheritDoc} */
             @Override
-            public void itemStateChanged(final ItemEvent e) {
+			public void itemStateChanged(final ItemEvent e) {
                 final boolean state = (e.getStateChange() == ItemEvent.SELECTED);
                 MainOptionsPane.this.policyIdentifierLabel.setEnabled(state);
                 MainOptionsPane.this.policyQualifierLabel.setEnabled(state);
@@ -485,7 +488,8 @@ public class MainOptionsPane {
      * y advierte al usuario en caso contrario.
      * @return <code>true</code> si el identificador del la pol&iacute;tica de firma es un OID o un URN de tipo OID,
      *         <code>false</code> en caso contrario */
-    public boolean checkAboutBadPolicyId() {
+    @SuppressWarnings("unused")
+	public boolean checkAboutBadPolicyId() {
     	if (this.checkAddPolicy.isSelected()) {
 			try {
 				new Oid(this.textPolicyIdentifier.getText().replace("urn:oid:", "")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -505,6 +509,64 @@ public class MainOptionsPane {
 			}
     	}
     	return true;
+    }
+
+    /**
+     * Comprueba que el valor del calificador sea v&aacute;lido para una
+     * pol&iacute;tica de firma. Un cualificador debe ser una URL.
+     * @return {@code true} si el qualificador es una URL, {@code false} en caso
+     * contrario.
+     */
+	@SuppressWarnings("unused")
+	public boolean checkSignaturePolicyQualifier() {
+    	try {
+    		new URL(this.textPolicyQualifier.getText());
+    	}
+    	catch (final Exception e) {
+    		// Si se obtiene una excepcion es que la URL estaba mal formada
+			CustomDialog.showMessageDialog(
+					this.textPolicyQualifier,
+					true,
+					"El calificador de la pol\u00EDtica de firma debe ser una URL",
+					"Calificador incorrecto para la pol\u00EDtica de firma",
+					JOptionPane.ERROR_MESSAGE
+				);
+				this.textPolicyQualifier.requestFocus();
+				this.textPolicyQualifier.setSelectionStart(0);
+				this.textPolicyQualifier.setSelectionEnd(this.textPolicyQualifier.getText().length());
+    		return false;
+    	}
+    	return true;
+    }
+
+    /**
+     * Comprueba que la huella digital de la politica en base 64 tenga la longitud propia
+     * de una huella digital de tipo SHA1.
+     * @return {@code true} si la huella digital tiene la longitud correcta, {@code false}
+     * en caso contrario.
+     */
+    public boolean checkSha1MessageDigestLength() {
+
+    	try {
+    		final MessageDigest md = MessageDigest.getInstance("SHA1"); //$NON-NLS-1$
+    		if (Base64.decode(this.textPolicyHash.getText()).length == md.getDigestLength()) {
+    			return true;
+    		}
+    	} catch (final Exception e) {
+    		// Ignoramos ya que este caso no debe darse nunca
+    	}
+    	// Si se obtiene una excepcion es que la URL estaba mal formada
+    	CustomDialog.showMessageDialog(
+    			this.textPolicyHash,
+    			true,
+    			"No se ha insertado una huella digital SHA1 correcta. Inserte una huella digital correcta en base 64.",
+    			"Huella digital incorrecta para la pol\u00EDtica de firma",
+    			JOptionPane.ERROR_MESSAGE
+    			);
+    	this.textPolicyHash.requestFocus();
+    	this.textPolicyHash.setSelectionStart(0);
+    	this.textPolicyHash.setSelectionEnd(this.textPolicyHash.getText().length());
+		return false;
     }
 
 }

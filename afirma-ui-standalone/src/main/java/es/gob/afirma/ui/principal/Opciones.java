@@ -149,6 +149,7 @@ final class Opciones extends JAccessibilityDialog {
 		Opciones.update = update;
 	}
 
+
 	@Override
 	public int getMinimumRelation(){
 		return 9;
@@ -348,10 +349,10 @@ final class Opciones extends JAccessibilityDialog {
         this.profilesOptions =  new ProfilesOptionsPane(this);
 
         this.mainPanel.addTab(
-                "Perfiles de usuario",
+                Messages.getString("Opciones.perfiles.pestana"), //$NON-NLS-1$
         		null,
         		this.profilesOptions.getConfigurationPanel(),
-        		"Gesti\u00F3n de los perfiles de usuario");
+        		Messages.getString("Opciones.perfiles.descripcion")); //$NON-NLS-1$
 
         Utils.setContrastColor(this.mainPanel);
         Utils.setFontBold(this.mainPanel); //Control letra en negrita
@@ -377,6 +378,7 @@ final class Opciones extends JAccessibilityDialog {
         }
 
         this.mainPanel.addMouseListener(new MouseAdapter() {
+
 
 			@Override
 			public void mousePressed(final MouseEvent e) {
@@ -404,6 +406,7 @@ final class Opciones extends JAccessibilityDialog {
         this.mainPanel.addKeyListener(new KeyAdapter() {
 
         	/** {@inheritDoc} */
+
 			@Override
 			public void keyPressed(final KeyEvent e) {
 				if (e.getKeyCode()==KeyEvent.VK_RIGHT){
@@ -475,7 +478,7 @@ final class Opciones extends JAccessibilityDialog {
         this.getRootPane().setDefaultButton(this.aceptar); //Se asigna el boton por defecto para la ventana
         this.aceptar.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(final ActionEvent evt) {
+			public void actionPerformed(final ActionEvent evt) {
 
             	final Properties config = new Properties();
             	config.putAll(Opciones.this.mainOptions.getConfig());
@@ -499,7 +502,7 @@ final class Opciones extends JAccessibilityDialog {
         cancelar.setMnemonic(KeyEvent.VK_C); //Se asigna un atajo al boton cancelar
         cancelar.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(final ActionEvent evt) {
+			public void actionPerformed(final ActionEvent evt) {
                 cancelarActionPerformed();
             }
         });
@@ -567,8 +570,11 @@ final class Opciones extends JAccessibilityDialog {
 	 */
     public void aceptarActionPerformed(final Properties config, final String[] remainderProfilesNames) {
 
-    	// Comprobamos que el ID de la politica sea un OID correcto
-    	if (this.mainOptions != null && (!this.mainOptions.checkAboutBadPolicyId())) {
+    	// Comprobamos que la politica de firma sea correcta
+    	if (this.mainOptions != null && Boolean.parseBoolean(config.getProperty(MainOptionsPane.MAIN_POLICY_ESTABLISHED, "false")) && //$NON-NLS-1$
+    			(!this.mainOptions.checkAboutBadPolicyId() ||
+    			!this.mainOptions.checkSignaturePolicyQualifier() ||
+    			!this.mainOptions.checkSha1MessageDigestLength())) {
 			return;
     	}
 
@@ -692,7 +698,7 @@ final class Opciones extends JAccessibilityDialog {
 
 	    /** {@inheritDoc} */
         @Override
-        public void actionPerformed(final ActionEvent e) {
+		public void actionPerformed(final ActionEvent e) {
 
             switch (this.tabbedPane.getSelectedIndex()) {
             case ACCESIBILITY_OPTIONS_IDX:
@@ -789,12 +795,14 @@ final class Opciones extends JAccessibilityDialog {
 		this.restoreButton.addFocusListener(new FocusListener() {
 
 			/** {@inheritDoc} */
+
 			@Override
 			public void focusLost(final FocusEvent e) {
 				Utils.showToolTip(false, tip, Opciones.this.restoreButton, tipText);
 			}
 
 			/** {@inheritDoc} */
+
 			@Override
 			public void focusGained(final FocusEvent e) {
 				Utils.showToolTip(true, tip, Opciones.this.restoreButton, tipText);
@@ -803,13 +811,14 @@ final class Opciones extends JAccessibilityDialog {
 		final Dimension dimension = new Dimension(20,20);
 		this.restoreButton.setPreferredSize(dimension);
 
-		this.restoreButton.setName("restaurar");
+		this.restoreButton.setName(Messages.getString("Wizard.restaurar")); //$NON-NLS-1$
 		Utils.remarcar(this.restoreButton);
 		restorePanel.add(this.restoreButton);
 		this.restoreButton.addActionListener(new ActionListener() {
 			/** {@inheritDoc} */
-	    	@Override
-            public void actionPerformed(final ActionEvent e) {
+
+            @Override
+			public void actionPerformed(final ActionEvent e) {
 	    		restaurarActionPerformed();
 			}
 		});
@@ -828,7 +837,7 @@ final class Opciones extends JAccessibilityDialog {
 		this.maximizeButton.setToolTipText(Messages.getString("Wizard.maximizar.description")); //$NON-NLS-1$
 		this.maximizeButton.getAccessibleContext().setAccessibleName(this.maximizeButton.getToolTipText());
 
-		this.maximizeButton.setName("maximizar");
+		this.maximizeButton.setName(Messages.getString("Wizard.maximizar")); //$NON-NLS-1$
 		//Se asigna una dimension por defecto
 		this.maximizeButton.setPreferredSize(dimension);
 
@@ -837,10 +846,12 @@ final class Opciones extends JAccessibilityDialog {
 
 		this.maximizeButton.addFocusListener(new FocusListener() {
 
+
 			@Override
 			public void focusLost(final FocusEvent e) {
 				Utils.showToolTip(false, tip, Opciones.this.maximizeButton, tipText);
 			}
+
 
 			@Override
 			public void focusGained(final FocusEvent e) {
@@ -849,8 +860,9 @@ final class Opciones extends JAccessibilityDialog {
 		});
 
 		this.maximizeButton.addActionListener(new ActionListener() {
-		    	@Override
-                public void actionPerformed(final ActionEvent e) {
+
+                @Override
+				public void actionPerformed(final ActionEvent e) {
 		    		maximizarActionPerformed();
 				}
 			});
