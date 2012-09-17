@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.DERObject;
+import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.cmp.PKIFailureInfo;
@@ -77,7 +77,7 @@ public final class CMSTimestamper {
                      final String tsaPwd) {
         this.tsqGenerator = new TimeStampRequestGenerator();
         this.tsqGenerator.setCertReq(requireCert);
-        this.tsqGenerator.setReqPolicy(policy);
+        this.tsqGenerator.setReqPolicy(new ASN1ObjectIdentifier(policy));
         this.tsaURL = tsa;
         this.tsaPassword = tsaPwd;
         this.tsaUsername = tsaUsr;
@@ -112,7 +112,7 @@ public final class CMSTimestamper {
              final SignerInformation si = (SignerInformation) name;
              final byte[] tsToken = getTimeStampToken(si.getSignature(), hashAlgorithm);
 
-             final DERObject derObj = new ASN1InputStream(new ByteArrayInputStream(tsToken)).readObject();
+             final ASN1Primitive derObj = new ASN1InputStream(new ByteArrayInputStream(tsToken)).readObject();
              final DERSet derSet = new DERSet(derObj);
 
              final Attribute unsignAtt = new Attribute(new ASN1ObjectIdentifier(SIGNATURE_TIMESTAMP_TOKEN_OID), derSet);
@@ -167,7 +167,7 @@ public final class CMSTimestamper {
      private byte[] getTimeStampToken(final byte[] imprint, final String hashAlgorithm) throws AOException, IOException {
 
          final TimeStampRequest request = this.tsqGenerator.generate(
-               (hashAlgorithm != null) ? AOAlgorithmID.getOID(hashAlgorithm) : X509ObjectIdentifiers.id_SHA1.getId() ,
+               new ASN1ObjectIdentifier((hashAlgorithm != null) ? AOAlgorithmID.getOID(hashAlgorithm) : X509ObjectIdentifiers.id_SHA1.getId()),
                imprint,
                BigInteger.valueOf(System.currentTimeMillis())
           );
