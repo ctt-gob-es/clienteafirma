@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -15,10 +15,10 @@ import java.util.Enumeration;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1OctetString;
+import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.BERSequence;
 import org.bouncycastle.asn1.DERInteger;
-import org.bouncycastle.asn1.DERObject;
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 
@@ -40,7 +40,7 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
  * La implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios
  * para crear un mensaje DigestedData de BouncyCastle: <a
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
-public final class DigestedData extends ASN1Encodable {
+public final class DigestedData implements ASN1Encodable {
     private final DERInteger version;
     private final AlgorithmIdentifier digestAlgorithm;
     private final ContentInfo contentInfo;
@@ -91,7 +91,7 @@ public final class DigestedData extends ASN1Encodable {
     }
 
     /**
-     * Recupera el algoritmo de huella digital configurada para los empaquetados. 
+     * Recupera el algoritmo de huella digital configurada para los empaquetados.
      * @return Algoritmo.
      */
     public String getDigestAlgorithm() {
@@ -122,8 +122,7 @@ public final class DigestedData extends ASN1Encodable {
      *
      * Digest ::= OCTET STRING
      * </pre> */
-    @Override
-    public DERObject toASN1Object() {
+    public ASN1Primitive toASN1Primitive() {
         final ASN1EncodableVector v = new ASN1EncodableVector();
 
         v.add(this.version);

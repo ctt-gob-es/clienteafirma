@@ -52,7 +52,7 @@ final class ValidateCMSSignedData {
                 // Contenido de SignedData
                 final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
                 final ASN1Sequence datos = (ASN1Sequence) doj.getObject();
-                final SignedData sd = new SignedData(datos);
+                final SignedData sd = SignedData.getInstance(datos);
                 final ASN1Set signerInfosSd = sd.getSignerInfos();
 
                 for (int i = 0; isValid && i < signerInfosSd.size(); i++) {
@@ -81,7 +81,7 @@ final class ValidateCMSSignedData {
         final Enumeration<?> e = attrib.getObjects();
         Attribute atribute;
         while (isSignerValid && e.hasMoreElements()) {
-            atribute = new Attribute((ASN1Sequence) e.nextElement());
+            atribute = Attribute.getInstance(e.nextElement());
             // si tiene la pol&iacute;tica es CADES.
             if (atribute.getAttrType().equals(PKCSObjectIdentifiers.id_aa_ets_sigPolicyId)) {
                 isSignerValid = false;

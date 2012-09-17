@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -45,7 +45,7 @@ import es.gob.afirma.core.util.tree.AOTreeNode;
 public final class ReadNodesTree {
 
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
-    
+
     private String stringRetorn = ""; //$NON-NLS-1$
     private AOTreeNode rama;
     private AOTreeNode rama2;
@@ -101,7 +101,7 @@ public final class ReadNodesTree {
         ASN1Set signerInfosSd = null;
         ASN1Set certificates = null;
         try {
-            final SignedData sd = new SignedData(contentSignedData);
+            final SignedData sd = SignedData.getInstance(contentSignedData);
             signerInfosSd = sd.getSignerInfos();
             certificates = sd.getCertificates();
         }
@@ -159,7 +159,7 @@ public final class ReadNodesTree {
         if (signerInfouAtrib != null) {
             final Enumeration<?> eAtributes = signerInfouAtrib.getObjects();
             while (eAtributes.hasMoreElements()) {
-                final Attribute data = new Attribute((ASN1Sequence) eAtributes.nextElement());
+                final Attribute data = Attribute.getInstance(eAtributes.nextElement());
                 if (!data.getAttrType().equals(PKCSObjectIdentifiers.id_aa_signatureTimeStampToken)) {
                     final ASN1Set setInto = data.getAttrValues();
                     final Enumeration<?> eAtributesData = setInto.getObjects();
@@ -197,7 +197,7 @@ public final class ReadNodesTree {
         if (signerInfouAtrib != null) {
             final Enumeration<?> eAtributes = signerInfouAtrib.getObjects();
             while (eAtributes.hasMoreElements()) {
-                final Attribute data = new Attribute((ASN1Sequence) eAtributes.nextElement());
+                final Attribute data = Attribute.getInstance(eAtributes.nextElement());
                 if (!data.getAttrType().equals(PKCSObjectIdentifiers.id_aa_signatureTimeStampToken)) {
                     final ASN1Set setInto = data.getAttrValues();
                     final Enumeration<?> eAtributesData = setInto.getObjects();
@@ -334,7 +334,7 @@ public final class ReadNodesTree {
         if (si.getAuthenticatedAttributes() != null) {
             final Enumeration<?> eAtributes = si.getAuthenticatedAttributes().getObjects();
             while (eAtributes.hasMoreElements()) {
-                final Attribute data = new Attribute((ASN1Sequence) eAtributes.nextElement());
+                final Attribute data = Attribute.getInstance(eAtributes.nextElement());
                 if (data.getAttrType().equals(CMSAttributes.signingTime)) {
                     final ASN1Set time = data.getAttrValues();
                     final DERUTCTime d = (DERUTCTime) time.getObjectAt(0);

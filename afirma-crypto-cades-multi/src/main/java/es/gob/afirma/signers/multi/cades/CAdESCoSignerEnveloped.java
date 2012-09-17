@@ -23,13 +23,13 @@ import java.util.List;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.ASN1OctetString;
+import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.asn1.DEREncodable;
 import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSet;
@@ -42,8 +42,8 @@ import org.bouncycastle.asn1.cms.SignerInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.TBSCertificateStructure;
-import org.bouncycastle.asn1.x509.X509CertificateStructure;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOPkcs1Signer;
@@ -179,13 +179,13 @@ final class CAdESCoSignerEnveloped {
 
         // COGEMOS LOS CERTIFICADOS EXISTENTES EN EL FICHERO
         while (certs.hasMoreElements()) {
-            vCertsSig.add((DEREncodable) certs.nextElement());
+            vCertsSig.add((ASN1Encodable) certs.nextElement());
         }
 
         if (signerCertificateChain.length != 0) {
-            final List<DEREncodable> ce = new ArrayList<DEREncodable>();
+            final List<ASN1Encodable> ce = new ArrayList<ASN1Encodable>();
             for (final X509Certificate element : signerCertificateChain) {
-                ce.add(X509CertificateStructure.getInstance(ASN1Object.fromByteArray(element.getEncoded())));
+                ce.add(Certificate.getInstance(ASN1Primitive.fromByteArray(element.getEncoded())));
             }
             certificates = SigUtils.fillRestCerts(ce, vCertsSig);
         }
@@ -196,7 +196,7 @@ final class CAdESCoSignerEnveloped {
         final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
 
         // Identificador del firmante ISSUER AND SERIAL-NUMBER
-        final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Object.fromByteArray(signerCertificateChain[0].getTBSCertificate()));
+        final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Primitive.fromByteArray(signerCertificateChain[0].getTBSCertificate()));
         final IssuerAndSerialNumber encSid = new IssuerAndSerialNumber(X500Name.getInstance(tbs.getIssuer()), tbs.getSerialNumber().getValue());
         final SignerIdentifier identifier = new SignerIdentifier(encSid);
 
@@ -267,13 +267,17 @@ final class CAdESCoSignerEnveloped {
         ));
 
         // construimos el Signed Data y lo devolvemos
-        return new ContentInfo(PKCSObjectIdentifiers.signedAndEnvelopedData, new SignedAndEnvelopedData(sd.getRecipientInfos(),
-                                                                                                        sd.getDigestAlgorithms(),
-                                                                                                        sd.getEncryptedContentInfo(),
-                                                                                                        certificates,
-                                                                                                        null,
-                                                                                                        new DERSet(signerInfos)// unsignedAttr
-                               )).getDEREncoded();
+        return new ContentInfo(
+        		PKCSObjectIdentifiers.signedAndEnvelopedData,
+        		new SignedAndEnvelopedData(
+    				sd.getRecipientInfos(),
+    				sd.getDigestAlgorithms(),
+    				sd.getEncryptedContentInfo(),
+    				certificates,
+    				null,
+    				new DERSet(signerInfos)// unsignedAttr
+				)
+		).getEncoded(ASN1Encoding.DER);
 
     }
 
@@ -341,13 +345,13 @@ final class CAdESCoSignerEnveloped {
 
         // COGEMOS LOS CERTIFICADOS EXISTENTES EN EL FICHERO
         while (certs.hasMoreElements()) {
-            vCertsSig.add((DEREncodable) certs.nextElement());
+            vCertsSig.add((ASN1Encodable) certs.nextElement());
         }
 
         if (signerCertificateChain.length != 0) {
-            final List<DEREncodable> ce = new ArrayList<DEREncodable>();
+            final List<ASN1Encodable> ce = new ArrayList<ASN1Encodable>();
             for (final X509Certificate element : signerCertificateChain) {
-                ce.add(X509CertificateStructure.getInstance(ASN1Object.fromByteArray(element.getEncoded())));
+                ce.add(Certificate.getInstance(ASN1Primitive.fromByteArray(element.getEncoded())));
             }
             certificates = SigUtils.fillRestCerts(ce, vCertsSig);
         }
@@ -357,7 +361,7 @@ final class CAdESCoSignerEnveloped {
         final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
 
         // Identificador del firmante ISSUER AND SERIAL-NUMBER
-        final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Object.fromByteArray(signerCertificateChain[0].getTBSCertificate()));
+        final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Primitive.fromByteArray(signerCertificateChain[0].getTBSCertificate()));
         final IssuerAndSerialNumber encSid = new IssuerAndSerialNumber(X500Name.getInstance(tbs.getIssuer()), tbs.getSerialNumber().getValue());
         final SignerIdentifier identifier = new SignerIdentifier(encSid);
 
@@ -437,7 +441,7 @@ final class CAdESCoSignerEnveloped {
                                                                                                         certificates,
                                                                                                         null,
                                                                                                         new DERSet(signerInfos)// unsignedAttr
-                               )).getDEREncoded();
+                               )).getEncoded(ASN1Encoding.DER);
 
     }
 
@@ -452,7 +456,7 @@ final class CAdESCoSignerEnveloped {
 
         final byte[] tmp;
         try {
-            tmp = this.signedAttr2.getEncoded(ASN1Encodable.DER);
+            tmp = this.signedAttr2.getEncoded(ASN1Encoding.DER);
         }
         catch (final IOException ex) {
             throw new AOException("Error al obtener los datos a firmar", ex); //$NON-NLS-1$

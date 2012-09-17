@@ -22,13 +22,13 @@ import java.util.List;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.ASN1OctetString;
+import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.asn1.DEREncodable;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.cms.Attribute;
@@ -41,8 +41,8 @@ import org.bouncycastle.asn1.cms.SignerInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.TBSCertificateStructure;
-import org.bouncycastle.asn1.x509.X509CertificateStructure;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOPkcs1Signer;
@@ -172,13 +172,13 @@ final class CAdESCounterSignerEnveloped {
 
         // COGEMOS LOS CERTIFICADOS EXISTENTES EN EL FICHERO
         while (certs.hasMoreElements()) {
-            vCertsSig.add((DEREncodable) certs.nextElement());
+            vCertsSig.add((ASN1Encodable) certs.nextElement());
         }
         // e introducimos los del firmante actual.
         if (signerCertificateChain.length != 0) {
-            final List<DEREncodable> ce = new ArrayList<DEREncodable>();
+            final List<ASN1Encodable> ce = new ArrayList<ASN1Encodable>();
             for (final X509Certificate element : signerCertificateChain) {
-                ce.add(X509CertificateStructure.getInstance(ASN1Object.fromByteArray(element.getEncoded())));
+                ce.add(Certificate.getInstance(ASN1Primitive.fromByteArray(element.getEncoded())));
             }
             certificates = SigUtils.fillRestCerts(ce, vCertsSig);
         }
@@ -222,13 +222,13 @@ final class CAdESCounterSignerEnveloped {
                                                    new DERSet(signerInfos));
 
                 // Esto se realiza as&iacute; por problemas con los casting.
-                final ASN1InputStream sd2 = new ASN1InputStream(sigDat.getDEREncoded());
+                final ASN1InputStream sd2 = new ASN1InputStream(sigDat.toASN1Primitive().getEncoded(ASN1Encoding.DER));
                 final ASN1Sequence contentSignedData2 = (ASN1Sequence) sd2.readObject();// contenido del SignedAndEnvelopedData
                 aux = new SignedAndEnvelopedData(contentSignedData2);
             }
 
             // construimos el Signed Data y lo devolvemos
-            return new ContentInfo(PKCSObjectIdentifiers.signedAndEnvelopedData, aux).getDEREncoded();
+            return new ContentInfo(PKCSObjectIdentifiers.signedAndEnvelopedData, aux).getEncoded(ASN1Encoding.DER);
         }
         // FIRMA DE LOS SIGNERS
         else if (targetType.equals(CounterSignTarget.SIGNERS)) {
@@ -250,14 +250,14 @@ final class CAdESCounterSignerEnveloped {
                                                    new DERSet(signerInfos));
 
                 // Esto se realiza as&iacute; por problemas con los casting.
-                final ASN1InputStream sd2 = new ASN1InputStream(sigDat.getDEREncoded());
+                final ASN1InputStream sd2 = new ASN1InputStream(sigDat.getEncoded(ASN1Encoding.DER));
                 final ASN1Sequence contentSignedData2 = (ASN1Sequence) sd2.readObject();// contenido del SignedAndEnvelopedData
 
                 aux = new SignedAndEnvelopedData(contentSignedData2);
             }
 
             // construimos el Signed Data y lo devolvemos
-            return new ContentInfo(PKCSObjectIdentifiers.signedAndEnvelopedData, aux).getDEREncoded();
+            return new ContentInfo(PKCSObjectIdentifiers.signedAndEnvelopedData, aux).getEncoded(ASN1Encoding.DER);
         }
 
         // construimos el Signed Data y lo devolvemos
@@ -266,7 +266,7 @@ final class CAdESCounterSignerEnveloped {
                                                                                                         sd.getEncryptedContentInfo(),
                                                                                                         certificates,
                                                                                                         certrevlist,
-                                                                                                        new DERSet(signerInfos))).getDEREncoded();
+                                                                                                        new DERSet(signerInfos))).getEncoded(ASN1Encoding.DER);
 
     }
 
@@ -447,7 +447,7 @@ final class CAdESCounterSignerEnveloped {
             final Enumeration<?> eAtributes = signerInfo.getUnauthenticatedAttributes().getObjects();
 
             while (eAtributes.hasMoreElements()) {
-                final Attribute data = new Attribute((ASN1Sequence) eAtributes.nextElement());
+                final Attribute data = Attribute.getInstance(eAtributes.nextElement());
                 if (!data.getAttrType().equals(PKCSObjectIdentifiers.id_aa_signatureTimeStampToken)) {
                     final ASN1Set setInto = data.getAttrValues();
                     final Enumeration<?> eAtributesData = setInto.getObjects();
@@ -589,7 +589,7 @@ final class CAdESCounterSignerEnveloped {
             final Enumeration<?> eAttributes = signerInfo.getUnauthenticatedAttributes().getObjects();
 
             while (eAttributes.hasMoreElements()) {
-                final Attribute data = new Attribute((ASN1Sequence) eAttributes.nextElement());
+                final Attribute data = Attribute.getInstance(eAttributes.nextElement());
                 if (!data.getAttrType().equals(PKCSObjectIdentifiers.id_aa_signatureTimeStampToken)) {
                     final ASN1Set setInto = data.getAttrValues();
                     final Enumeration<?> eAtributesData = setInto.getObjects();
@@ -693,7 +693,7 @@ final class CAdESCounterSignerEnveloped {
         if (signerInfo.getUnauthenticatedAttributes() != null) {
             final Enumeration<?> eAttributes = signerInfo.getUnauthenticatedAttributes().getObjects();
             while (eAttributes.hasMoreElements()) {
-                final Attribute data = new Attribute((ASN1Sequence) eAttributes.nextElement());
+                final Attribute data = Attribute.getInstance(eAttributes.nextElement());
                 if (!data.getAttrType().equals(PKCSObjectIdentifiers.id_aa_signatureTimeStampToken)) {
                     final ASN1Set setInto = data.getAttrValues();
                     final Enumeration<?> eAtributesData = setInto.getObjects();
@@ -824,7 +824,7 @@ final class CAdESCounterSignerEnveloped {
         if (signerInfo.getUnauthenticatedAttributes() != null) {
             final Enumeration<?> eAtributes = signerInfo.getUnauthenticatedAttributes().getObjects();
             while (eAtributes.hasMoreElements()) {
-                final Attribute data = new Attribute((ASN1Sequence) eAtributes.nextElement());
+                final Attribute data = Attribute.getInstance(eAtributes.nextElement());
                 if (!data.getAttrType().equals(PKCSObjectIdentifiers.id_aa_signatureTimeStampToken)) {
                     final Enumeration<?> eAtributesData = data.getAttrValues().getObjects();
                     while (eAtributesData.hasMoreElements()) {
@@ -977,7 +977,7 @@ final class CAdESCounterSignerEnveloped {
 
         // 5. SIGNERINFO
         // raiz de la secuencia de SignerInfo
-        final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Object.fromByteArray(cert.getTBSCertificate()));
+        final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Primitive.fromByteArray(cert.getTBSCertificate()));
         final IssuerAndSerialNumber encSid = new IssuerAndSerialNumber(X500Name.getInstance(tbs.getIssuer()), tbs.getSerialNumber().getValue());
         final SignerIdentifier identifier = new SignerIdentifier(encSid);
 
@@ -1018,7 +1018,7 @@ final class CAdESCounterSignerEnveloped {
 
         final byte[] tmp;
         try {
-            tmp = this.signedAttr2.getEncoded(ASN1Encodable.DER);
+            tmp = this.signedAttr2.getEncoded(ASN1Encoding.DER);
         }
         catch (final Exception ex) {
             throw new AOException("Error obteniendo los atributos firmados: " + ex); //$NON-NLS-1$

@@ -20,12 +20,12 @@ import java.util.logging.Logger;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1Object;
+import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
+import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.BERConstructedOctetString;
-import org.bouncycastle.asn1.DEREncodable;
+import org.bouncycastle.asn1.BEROctetString;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.cms.AttributeTable;
@@ -37,8 +37,8 @@ import org.bouncycastle.asn1.cms.SignerInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.TBSCertificateStructure;
-import org.bouncycastle.asn1.x509.X509CertificateStructure;
 import org.bouncycastle.cms.CMSProcessable;
 import org.bouncycastle.cms.CMSProcessableByteArray;
 
@@ -197,7 +197,7 @@ public final class CAdESTriPhaseSigner {
         }
 
         try {
-            return signedAttributes.getEncoded(ASN1Encodable.DER);
+            return signedAttributes.getEncoded(ASN1Encoding.DER);
         }
         catch (final Exception ex) {
             throw new AOException("Error al codificar los datos ASN.1 a firmar finalmente", ex); //$NON-NLS-1$
@@ -227,7 +227,7 @@ public final class CAdESTriPhaseSigner {
 
         final TBSCertificateStructure tbsCertificateStructure;
         try {
-            tbsCertificateStructure = TBSCertificateStructure.getInstance(ASN1Object.fromByteArray(signerCertificateChain[0].getTBSCertificate()));
+            tbsCertificateStructure = TBSCertificateStructure.getInstance(ASN1Primitive.fromByteArray(signerCertificateChain[0].getTBSCertificate()));
         }
         catch(final Exception e) {
             throw new AOException("No se ha podido crear la estructura de certificados", e); //$NON-NLS-1$
@@ -261,7 +261,7 @@ public final class CAdESTriPhaseSigner {
         // Atributos firmados
         final ASN1Set asn1SignedAttributes;
         try {
-            asn1SignedAttributes = (ASN1Set) ASN1Object.fromByteArray(signedAttributes);
+            asn1SignedAttributes = (ASN1Set) ASN1Primitive.fromByteArray(signedAttributes);
         } catch (final IOException e) {
             throw new AOException("Error en la inclusion de la recuperacion de los SignedAttibutes", e); //$NON-NLS-1$
         }
@@ -282,17 +282,17 @@ public final class CAdESTriPhaseSigner {
             catch (final Exception e) {
                 throw new AOException("Error en la escritura del contenido implicito en el ContentInfo", e); //$NON-NLS-1$
             }
-            contentInfo = new ContentInfo(new ASN1ObjectIdentifier(PKCSObjectIdentifiers.data.getId()), new BERConstructedOctetString(baos.toByteArray()));
+            contentInfo = new ContentInfo(new ASN1ObjectIdentifier(PKCSObjectIdentifiers.data.getId()), new BEROctetString(baos.toByteArray()));
         }
         else {
             contentInfo = new ContentInfo(new ASN1ObjectIdentifier(PKCSObjectIdentifiers.data.getId()), null);
         }
 
         // Certificados
-        final List<DEREncodable> ce = new ArrayList<DEREncodable>();
+        final List<ASN1Encodable> ce = new ArrayList<ASN1Encodable>();
         for (final X509Certificate cert : signerCertificateChain) {
             try {
-                ce.add(X509CertificateStructure.getInstance(ASN1Object.fromByteArray(cert.getEncoded())));
+                ce.add(Certificate.getInstance(ASN1Primitive.fromByteArray(cert.getEncoded())));
             }
             catch(final Exception e) {
                 Logger.getLogger("es.gob.afirma").severe("Error insertando el certificado '" + AOUtil.getCN(cert) + "' en la cadena de confianza"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -304,16 +304,21 @@ public final class CAdESTriPhaseSigner {
         final ASN1EncodableVector digestAlgorithms = new ASN1EncodableVector();
         digestAlgorithms.add(digestAlgorithmOID);
 
-        return new ContentInfo(
-           PKCSObjectIdentifiers.signedData,
-           new SignedData(
-              new DERSet(digestAlgorithms),
-              contentInfo,
-              certificates,
-              null,
-              new DERSet(signerInfo)
-           )
-        ).getDEREncoded();
+        try {
+			return new ContentInfo(
+			   PKCSObjectIdentifiers.signedData,
+			   new SignedData(
+			      new DERSet(digestAlgorithms),
+			      contentInfo,
+			      certificates,
+			      null,
+			      new DERSet(signerInfo)
+			   )
+			).getEncoded(ASN1Encoding.DER);
+		}
+        catch (final IOException e) {
+			throw new AOException("Error creando el ContentInfo de CAdES: " + e, e); //$NON-NLS-1$
+		}
 
     }
 

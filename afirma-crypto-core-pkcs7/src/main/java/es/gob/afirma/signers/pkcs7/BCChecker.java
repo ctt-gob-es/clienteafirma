@@ -1,6 +1,5 @@
 package es.gob.afirma.signers.pkcs7;
 
-import es.gob.afirma.core.misc.Platform;
 
 /** Comprobador de la versi&oacute;n de Bouncycastle del sistema.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -14,13 +13,14 @@ public final class BCChecker {
 	 * BouncyCastle disponible o no es compatible con afirma. */
 	@SuppressWarnings("static-method")
 	public void checkBouncyCastle() {
-        final String bcVersion = Platform.getBouncyCastleVersion();
-        if (bcVersion == null || BC_VERSION.compareTo(bcVersion) > 0) {
-            throw new InvalidBouncyCastleException(
-        		"igual o superior a " + BC_VERSION, //$NON-NLS-1$
-        		bcVersion
-    		);
-        }
+		//TODO: Ajustar a BC 1.47
+//        final String bcVersion = Platform.getBouncyCastleVersion();
+//        if (bcVersion == null || BC_VERSION.compareTo(bcVersion) > 0) {
+//            throw new InvalidBouncyCastleException(
+//        		"igual o superior a " + BC_VERSION, //$NON-NLS-1$
+//        		bcVersion
+//    		);
+//        }
 	}
 
 }

@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -10,14 +10,14 @@
 
 package es.gob.afirma.signers.pkcs7;
 
-import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1Object;
+import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.BERSequence;
 import org.bouncycastle.asn1.DERInteger;
-import org.bouncycastle.asn1.DERObject;
 import org.bouncycastle.asn1.DERTaggedObject;
 import org.bouncycastle.asn1.cms.EncryptedContentInfo;
 
@@ -26,7 +26,7 @@ import org.bouncycastle.asn1.cms.EncryptedContentInfo;
  * La implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios
  * para crear un SignedAndEnvelopedData desarrollado en BouncyCastle: <a
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
-public final class SignedAndEnvelopedData extends ASN1Encodable {
+public final class SignedAndEnvelopedData extends ASN1Object {
 
     private final DERInteger version;
     private final ASN1Set recipientInfos;
@@ -103,7 +103,7 @@ public final class SignedAndEnvelopedData extends ASN1Encodable {
         throw new IllegalArgumentException("EnvelopedData invalido: " + obj.getClass().getName()); //$NON-NLS-1$
     }
 
-    /** Obtiene la versi&oacute;n de la especificaci&oacute;n usada. 
+    /** Obtiene la versi&oacute;n de la especificaci&oacute;n usada.
      * @return La versi&oacute;n es siempre <code>1</code>*/
     public DERInteger getVersion() {
         return this.version;
@@ -111,7 +111,7 @@ public final class SignedAndEnvelopedData extends ASN1Encodable {
 
     /** Obtiene los RecipientInfo en forma de Set ASN.1.
      * @return RecipientInfos
-     */    
+     */
     public ASN1Set getRecipientInfos() {
         return this.recipientInfos;
     }
@@ -125,7 +125,7 @@ public final class SignedAndEnvelopedData extends ASN1Encodable {
 
     /** Obtiene el EncryptedContentInfo.
      * @return EncryptedContentInfo
-     */       
+     */
     public EncryptedContentInfo getEncryptedContentInfo() {
         return this.encryptedContentInfo;
     }
@@ -161,7 +161,7 @@ public final class SignedAndEnvelopedData extends ASN1Encodable {
      *
      * </pre> */
     @Override
-    public DERObject toASN1Object() {
+	public ASN1Primitive toASN1Primitive() {
         final ASN1EncodableVector v = new ASN1EncodableVector();
 
         v.add(this.version);

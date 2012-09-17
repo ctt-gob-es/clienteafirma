@@ -12,9 +12,8 @@ package es.gob.afirma.signers.cades;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.DEREncodable;
+import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.DERIA5String;
-import org.bouncycastle.asn1.DERObject;
 import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
@@ -31,10 +30,10 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
  * para crear un Signature Policy qualifiers basandose en BouncyCastle: <a
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> de la clase
  * Policy qualifiers. */
-final class AOSigPolicyQualifierInfo extends ASN1Encodable {
+final class AOSigPolicyQualifierInfo implements ASN1Encodable {
 
     private final DERObjectIdentifier sigPolicyQualifierId;
-    private final DEREncodable sigQualifier;
+    private final ASN1Encodable sigQualifier;
 
     /** Crea un nuevo <code>AOSigPolicyQualifierInfo</code> con su calificador
      * cPSuri.
@@ -53,14 +52,13 @@ final class AOSigPolicyQualifierInfo extends ASN1Encodable {
 
     /** Devuelve el Calificador de la estancia.
      * @return el Calificador. */
-    DEREncodable getSigQualifier() {
+    ASN1Encodable getSigQualifier() {
         return this.sigQualifier;
     }
 
     /** Devuelve una representaci&oacute;n DER-encodable the esta estancia.
      * @return un valor <code>DERObject</code>. */
-    @Override
-    public DERObject toASN1Object() {
+    public ASN1Primitive toASN1Primitive() {
         final ASN1EncodableVector dev = new ASN1EncodableVector();
         dev.add(this.sigPolicyQualifierId);
         dev.add(this.sigQualifier);

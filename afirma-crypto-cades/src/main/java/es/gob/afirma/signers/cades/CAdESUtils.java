@@ -18,7 +18,8 @@ import java.security.cert.X509Certificate;
 import java.util.Date;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1Object;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.DERIA5String;
 import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
@@ -115,7 +116,7 @@ public final class CAdESUtils {
             /** IssuerSerial ::= SEQUENCE { issuer GeneralNames, serialNumber
              * CertificateSerialNumber */
 
-            final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Object.fromByteArray(cert.getTBSCertificate()));
+            final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Primitive.fromByteArray(cert.getTBSCertificate()));
             final GeneralNames gns = new GeneralNames(new GeneralName(tbs.getIssuer()));
 
             final IssuerSerial isuerSerial = new IssuerSerial(gns, tbs.getSerialNumber());
@@ -162,7 +163,7 @@ public final class CAdESUtils {
             /** IssuerSerial ::= SEQUENCE { issuer GeneralNames, serialNumber
              * CertificateSerialNumber } */
 
-            final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Object.fromByteArray(cert.getTBSCertificate()));
+            final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Primitive.fromByteArray(cert.getTBSCertificate()));
             final GeneralName gn = new GeneralName(tbs.getIssuer());
             final GeneralNames gns = new GeneralNames(gn);
 
@@ -194,8 +195,7 @@ public final class CAdESUtils {
                 final ASN1EncodableVector v = new ASN1EncodableVector();
                 v.add(new DERSequence(essCertID));
                 v.add(new DERSequence(getPolicyInformation(policy)));
-                scv = new SigningCertificate(new DERSequence(v)); // con
-                                                                  // politica
+                scv = SigningCertificate.getInstance(new DERSequence(v)); // con politica
             }
             else {
                 scv = new SigningCertificate(essCertID); // Sin politica
@@ -270,16 +270,16 @@ public final class CAdESUtils {
             // sigPolicyId
             v.add(doiSigPolicyId);
             // sigPolicyHash
-            v.add(otherHashAlgAndValue.toASN1Object()); // como sequence
+            v.add(otherHashAlgAndValue.toASN1Primitive()); // como sequence
             // sigPolicyQualifiers
             if(spqInfo!=null) {
-                v.add(spqInfo.toASN1Object());
+                v.add(spqInfo.toASN1Primitive());
             }
 
             final DERSequence ds = new DERSequence(v);
 
             // Secuencia con singningCertificate
-            contexExpecific.add(new Attribute(PKCSObjectIdentifiers.id_aa_ets_sigPolicyId, new DERSet(ds.toASN1Object())));
+            contexExpecific.add(new Attribute(PKCSObjectIdentifiers.id_aa_ets_sigPolicyId, new DERSet(ds.toASN1Primitive())));
             // FIN SIGPOLICYID ATTRIBUTE
         }
 
@@ -293,14 +293,15 @@ public final class CAdESUtils {
         if (contentType != null && !padesMode) {
         	final ContentHints contentHints;
         	if (contentDescription != null) {
-        		contentHints = new ContentHints(new DERObjectIdentifier(contentType),
+        		contentHints = new ContentHints(new ASN1ObjectIdentifier(contentType),
         										new DERUTF8String(contentDescription));
-        	} else {
-        		contentHints = new ContentHints(new DERObjectIdentifier(contentType));
+        	}
+        	else {
+        		contentHints = new ContentHints(new ASN1ObjectIdentifier(contentType));
         	}
         	contexExpecific.add(new Attribute(
         			PKCSObjectIdentifiers.id_aa_contentHint,
-        			new DERSet(contentHints.toASN1Object())));
+        			new DERSet(contentHints.toASN1Primitive())));
         }
 
         return contexExpecific;
@@ -392,12 +393,12 @@ public final class CAdESUtils {
 
         if (policy.getPolicyQualifier()==null || pqi == null) {
             return new PolicyInformation[] {
-                new PolicyInformation(new DERObjectIdentifier(policy.getPolicyIdentifier().toLowerCase().replace("urn:oid:", ""))) //$NON-NLS-1$ //$NON-NLS-2$
+                new PolicyInformation(new ASN1ObjectIdentifier(policy.getPolicyIdentifier().toLowerCase().replace("urn:oid:", ""))) //$NON-NLS-1$ //$NON-NLS-2$
             };
         }
 
         return new PolicyInformation[] {
-            new PolicyInformation(new DERObjectIdentifier(policy.getPolicyIdentifier().toLowerCase().replace("urn:oid:", "")), new DERSequence(pqi)) //$NON-NLS-1$ //$NON-NLS-2$
+            new PolicyInformation(new ASN1ObjectIdentifier(policy.getPolicyIdentifier().toLowerCase().replace("urn:oid:", "")), new DERSequence(pqi)) //$NON-NLS-1$ //$NON-NLS-2$
         };
 
     }

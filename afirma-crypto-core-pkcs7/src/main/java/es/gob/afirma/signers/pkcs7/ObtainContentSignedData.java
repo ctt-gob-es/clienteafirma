@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -25,11 +25,11 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 /** Clase que obtiene el contenido de un fichero en formato SignedData. de CMS o
  * CADES. */
 public final class ObtainContentSignedData {
-    
+
     private ObtainContentSignedData() {
         // No permitimos la instanciacion
     }
-    
+
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** M&eacute;todo que obtiene el contenido firmado de un tipo Signed Data
@@ -52,7 +52,7 @@ public final class ObtainContentSignedData {
             // buscamos si es signedData
             if (doi.equals(PKCSObjectIdentifiers.signedData)) {
                 // obtenemos el signed Data
-                final SignedData sd = new SignedData((ASN1Sequence) doj.getObject());
+                final SignedData sd = SignedData.getInstance(doj.getObject());
                 final ContentInfo ci = sd.getEncapContentInfo();
                 // obtenemos el contenido si lo tiene.
                 if (ci.getContent() != null) {

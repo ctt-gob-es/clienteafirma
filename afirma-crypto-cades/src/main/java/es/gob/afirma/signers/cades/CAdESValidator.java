@@ -14,6 +14,7 @@ import java.util.Enumeration;
 import java.util.logging.Logger;
 
 import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.ASN1TaggedObject;
@@ -93,7 +94,7 @@ public final class CAdESValidator {
             // Contenido de SignedData
             final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
             final ASN1Sequence datos = (ASN1Sequence) doj.getObject();
-            final SignedData sd = new SignedData(datos);
+            final SignedData sd = SignedData.getInstance(datos);
 
             final ASN1Set signerInfosSd = sd.getSignerInfos();
 
@@ -112,7 +113,7 @@ public final class CAdESValidator {
 
     /** Verifica que los <code>SignerInfos</code> tengan el par&aacute;metro
      * que identifica que los datos son de tipo CAdES.
-     * @param si <code>SignerInfo</code> para la verificaci&oacute;n del p&aacute;rametro
+     * @param si <code>SignerInfo</code> para la verificaci&oacute;n del par&aacute;metro
      *        adecuado.
      * @return si contiene el par&aacute;metro. */
     private static boolean verifySignerInfo(final SignerInfo si) {
@@ -121,7 +122,11 @@ public final class CAdESValidator {
         final Enumeration<?> e = attrib.getObjects();
         Attribute atribute;
         while (e.hasMoreElements()) {
-            atribute = new Attribute((ASN1Sequence) e.nextElement());
+        	final ASN1Sequence seq = (ASN1Sequence) e.nextElement();
+            atribute = new Attribute(
+        		(ASN1ObjectIdentifier)seq.getObjectAt(0),
+        		(ASN1Set)seq.getObjectAt(1)
+    		);
             // si tiene la pol&iacute;tica es CADES.
             if (atribute.getAttrType().equals(PKCSObjectIdentifiers.id_aa_signingCertificate) ||
                 atribute.getAttrType().equals(PKCSObjectIdentifiers.id_aa_signingCertificateV2)) {
