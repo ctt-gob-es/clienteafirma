@@ -24,7 +24,7 @@ public final class SignValidity {
         NO_DATA,
         /** Cuando la informacion contenida en la firma no sea consistente (certificados corruptos,...). */
         CORRUPTED_SIGN,
-        /** Cuando la firma no se corresponda con los datos firmados. */
+        /** Cuando la firma no se corresponda con los datos indicados. */
         NO_MATCH_DATA,
         /** Cuando no se encuentra la firma dentro del documento. */
         NO_SIGN,
