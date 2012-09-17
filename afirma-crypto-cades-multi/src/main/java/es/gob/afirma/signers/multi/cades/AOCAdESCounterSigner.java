@@ -29,7 +29,6 @@ import es.gob.afirma.signers.pkcs7.ReadNodesTree;
 public class AOCAdESCounterSigner implements AOCounterSigner {
 
 	/** {@inheritDoc} */
-    @Override
 	public byte[] countersign(final byte[] sign,
                               final String algorithm,
                               final CounterSignTarget targetType,
