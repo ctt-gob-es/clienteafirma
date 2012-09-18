@@ -345,8 +345,10 @@ final class EnveloperManager {
      * @throws NoSuchAlgorithmException
      *         Cuando el algoritmo de cifrado no est&aacute; soportado.
      * @throws KeyException Cuando se produce un error al generar la clave de encriptado.
+     * @throws IOException
+     * 		   Cuando se produce un error al codificar los datos.
      */
-    void encrypt(final byte[] content) throws AOException, NoSuchAlgorithmException, KeyException {
+    void encrypt(final byte[] content) throws AOException, NoSuchAlgorithmException, KeyException, IOException {
         this.envelopedData = createCMSEncryptedData(content);
     }
 
@@ -502,8 +504,9 @@ final class EnveloperManager {
      *         Cuando la configuraci&oacute;n de cifrado no sea
      *         v&aacute;lida.
      * @throws KeyException Cuando se produce un error al generar la clave.
+     * @throws IOException Cuando se produce un error al codificar los datos.
      */
-    private byte[] createCMSEncryptedData(final byte[] content) throws AOException, NoSuchAlgorithmException, KeyException {
+    private byte[] createCMSEncryptedData(final byte[] content) throws AOException, NoSuchAlgorithmException, KeyException, IOException {
         return this.enveloper.createCMSEncryptedData(content, this.cipherManager.getCipherConfig(), this.cipherManager.getConfiguredKey());
     }
 
