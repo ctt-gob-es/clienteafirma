@@ -37,32 +37,68 @@
  * SIN NINGUNA GARANTÍA; incluso sin la garantía implícita de comercialización
  * o idoneidad para un propósito particular.
  */
-package es.gob.jmulticard.ui.passwordcallback;
+package es.gob.jmulticard.ui.passwordcallback.gui;
 
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
+import java.awt.Dimension;
 
-/** Gestor de textos con soporte multi-idioma. */
-public final class Messages {
+import javax.swing.Icon;
+import javax.swing.JLabel;
 
-	private Messages() {
-		// No permitimos la instanciacion
-	}
+/** Componente etiqueta que contiene un icono.
+ * @author Inteco */
+final class IconLabel extends JLabel {
 
-    private static ResourceBundle bundle = ResourceBundle.getBundle(
-		"properties/messages" //$NON-NLS-1$
-	);
+    /** UID. */
+    private static final long serialVersionUID = 1L;
 
-    /** Recupera el texto identificado con la clave proporcionada.
-     * @param codeString Clave del texto
-     * @return Texto identificado con la clave proporcionada */
-    public static String getString(final String codeString) {
-        try {
-            return bundle.getString(codeString);
-        }
-        catch (final MissingResourceException e) {
-            return "##ERROR## Cadena no disponible: " + codeString; //$NON-NLS-1$
-        }
+    /** Icono. */
+    private Icon icon = null;
+
+    /** Icono original. */
+    private Icon originalIcon = null;
+    
+    /** Dimension original */
+    private Dimension originalDimension;
+
+    /** {@inheritDoc} */
+    @Override
+    public Icon getIcon() {
+        return this.icon;
     }
 
+    /** Obtener el icono original.
+     * @return icono original. */
+    Icon getOriginalIcon() {
+        return this.originalIcon;
+    }
+
+    /** Asigna el icono.
+     * @param icon */
+    @Override
+    public void setIcon(final Icon icon) {
+        this.icon = icon;
+    }
+
+    /** Asignar el icono original.
+     * @param originalIcon */
+    void setOriginalIcon(final Icon originalIcon) {
+        this.originalIcon = originalIcon;
+    }
+
+    /**
+     * Retorna la dimension inicial del icono
+     * @return dimension inicial del icono
+     */
+    public Dimension getOriginalDimension(){
+    	return this.originalDimension;
+    }
+    
+    /**
+     * Establece la dimension inicial del icono
+     * @param d Dimension inicial del icono
+     */
+    public void setOriginalDimension(Dimension d){
+    	this.originalDimension = d;
+    }
+    
 }

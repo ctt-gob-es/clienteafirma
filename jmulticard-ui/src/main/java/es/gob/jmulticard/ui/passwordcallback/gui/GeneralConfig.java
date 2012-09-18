@@ -37,18 +37,52 @@
  * SIN NINGUNA GARANTÍA; incluso sin la garantía implícita de comercialización
  * o idoneidad para un propósito particular.
  */
-package es.gob.jmulticard.ui.passwordcallback;
+/*
+ * Este fichero forma parte del Cliente @firma.
+ * El Cliente @firma es un applet de libre distribucion cuyo codigo fuente puede ser consultado
+ * y descargado desde www.ctt.map.es.
+ * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de Espana
+ * Este fichero se distribuye bajo licencia GPL version 3 segun las
+ * condiciones que figuran en el fichero 'licence' que se acompana.  Si se   distribuyera este
+ * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
+ */
+package es.gob.jmulticard.ui.passwordcallback.gui;
 
-/** Excepci&oacute;n que indica que no se ha podido obtener la consola del sistema
- * @author jlescanciano */
-public final class NoConsoleException extends RuntimeException {
 
-	private static final long serialVersionUID = -7334724850280997156L;
+/** Configuraci&oacute;n global de la aplicaci&oacute;n. */
+final class GeneralConfig {
 
-    /** Crea la excepci&oacute;n con un mensaje determinado.
-     * @param message Mensaje descriptivo de la excepci&oacute;n. */
-	public NoConsoleException(final String message) {
-		super(message);
-	}
+    /** Indica si el ususario ha activado o desactivado la opci&oacute;n de tama&ntilde;o de fuente grande
+     * @return boolean Indicando el estado de la opcion */
+    static boolean isBigFontSize() {
+        return false;
+    }
 
+    /** Indica si el ususario ha activado o desactivado la opcion de fuente en negrita
+     * @return boolean Indicando el estado de la opcion */
+    static boolean isFontBold() {
+        return false;
+    }
+
+    /** Indica si el ususario ha activado o desactivado la opcion de alto contraste
+     * @return boolean Indicando el estado de la opcion */
+    static boolean isHighContrast() {
+        return false;
+    }
+
+    /** Indica si el ususario ha activado o desactivado la opcion de maximizar todas las ventanas
+     * @return boolean Indicando el estado de la opcion */
+    static boolean isMaximized() {
+        return false;
+    }
+
+    /** Indica si el ususario ha activado o desactivado la opcion de remarcar elementos con foco
+     * @return boolean Indicando el estado de la opcion */
+    static boolean isRemarked() {
+        return false;
+    }
+
+    private GeneralConfig() {
+        // No permitimos la instanciacion
+    }
 }

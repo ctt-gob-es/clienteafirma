@@ -37,32 +37,41 @@
  * SIN NINGUNA GARANTÍA; incluso sin la garantía implícita de comercialización
  * o idoneidad para un propósito particular.
  */
-package es.gob.jmulticard.ui.passwordcallback;
+package es.gob.jmulticard.ui.passwordcallback.gui;
 
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
+import javax.swing.JLabel;
 
-/** Gestor de textos con soporte multi-idioma. */
-public final class Messages {
+/** Etiquetas de presentaci&oacute;n de texto.
+ * @author lmerayo */
+final class InfoLabel extends JLabel {
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
 
-	private Messages() {
-		// No permitimos la instanciacion
-	}
+    /** Constructor sencillo.
+     * Se utilizar&aacute; para etiquetas con un componente asociado.
+     * @param text texto de la etiqueta */
+    InfoLabel(final String text) {
+        super("<HTML>" + text + "</HTML>"); //$NON-NLS-1$ //$NON-NLS-2$
+        this.setOpaque(false);
+        Utils.remarcar(this);
+        Utils.setContrastColor(this);
+        Utils.setFontBold(this);
 
-    private static ResourceBundle bundle = ResourceBundle.getBundle(
-		"properties/messages" //$NON-NLS-1$
-	);
-
-    /** Recupera el texto identificado con la clave proporcionada.
-     * @param codeString Clave del texto
-     * @return Texto identificado con la clave proporcionada */
-    public static String getString(final String codeString) {
-        try {
-            return bundle.getString(codeString);
-        }
-        catch (final MissingResourceException e) {
-            return "##ERROR## Cadena no disponible: " + codeString; //$NON-NLS-1$
-        }
     }
 
+    /** Constructor de la clase
+     * @param text
+     *        Texto a mostrar
+     * @param opaque
+     *        Indica si el componente ser&aacute; opaco */
+    InfoLabel(final String text, final boolean opaque) {
+        super("<HTML>" + text + "</HTML>"); //$NON-NLS-1$ //$NON-NLS-2$
+        this.setFocusable(true); // Focusable
+        this.setOpaque(opaque);
+        Utils.remarcar(this);
+        Utils.setContrastColor(this);
+        Utils.setFontBold(this);
+    }
 }

@@ -37,32 +37,48 @@
  * SIN NINGUNA GARANTÍA; incluso sin la garantía implícita de comercialización
  * o idoneidad para un propósito particular.
  */
-package es.gob.jmulticard.ui.passwordcallback;
+package es.gob.jmulticard.ui.passwordcallback.gui;
 
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
+import javax.swing.JComponent;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 
-/** Gestor de textos con soporte multi-idioma. */
-public final class Messages {
+/** Clase para dar el foco a un componente determinado. */
+final class RequestFocusListener implements AncestorListener {
+	private final boolean removeListener;
 
-	private Messages() {
-		// No permitimos la instanciacion
+
+	/**
+	 * Constructor por defecto.
+	 */
+	RequestFocusListener() {
+		this(true);
 	}
 
-    private static ResourceBundle bundle = ResourceBundle.getBundle(
-		"properties/messages" //$NON-NLS-1$
-	);
+	/**
+	 * Constructor.
+	 * @param removeListener
+	 */
+	RequestFocusListener(final boolean removeListener) {
+		this.removeListener = removeListener;
+	}
 
-    /** Recupera el texto identificado con la clave proporcionada.
-     * @param codeString Clave del texto
-     * @return Texto identificado con la clave proporcionada */
-    public static String getString(final String codeString) {
-        try {
-            return bundle.getString(codeString);
-        }
-        catch (final MissingResourceException e) {
-            return "##ERROR## Cadena no disponible: " + codeString; //$NON-NLS-1$
-        }
-    }
+	/**
+	 * Asigna el foco al componente que ha lanzado el evento.
+	 */
+	@Override
+	public void ancestorAdded(final AncestorEvent e) {
+		final JComponent component = e.getComponent();
+		component.requestFocusInWindow();
 
+		if (this.removeListener) {
+			component.removeAncestorListener( this );
+		}
+	}
+
+	@Override
+	public void ancestorMoved(final AncestorEvent e) { /** No implementado */ }
+
+	@Override
+	public void ancestorRemoved(final AncestorEvent e) { /** No implementado */ }
 }
