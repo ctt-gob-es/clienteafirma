@@ -10,10 +10,12 @@
 
 package es.gob.afirma.envelopers.cades;
 
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
 import javax.crypto.SecretKey;
 
+import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.cms.AttributeTable;
 import org.bouncycastle.asn1.cms.ContentInfo;
@@ -66,12 +68,13 @@ final class CAdESEncryptedData {
      * @return la firma de tipo EncryptedData.
      * @throws java.security.NoSuchAlgorithmException
      *         Si no se soporta alguno de los algoritmos de firma o huella
-     *         digital */
+     *         digital
+     * @throws IOException */
     static byte[] genEncryptedData(final byte[] data,
                             final String digAlg,
                             final AOCipherConfig config,
                             final String pass,
-                            final String dataType) throws NoSuchAlgorithmException, AOException {
+                            final String dataType) throws NoSuchAlgorithmException, AOException, IOException {
 
         // Asignamos la clave de cifrado
         final SecretKey cipherKey = CAdESUtils.assignKey(config, pass);
@@ -94,7 +97,7 @@ final class CAdESEncryptedData {
         final ASN1Set unprotectedAttrs = SigUtils.getAttributeSet(new AttributeTable(CAdESUtils.initContexExpecific(digestAlgorithm, data, dataType, null)));
 
         // construimos el Enveloped Data y lo devolvemos
-        return new ContentInfo(PKCSObjectIdentifiers.encryptedData, new EncryptedData(encInfo, unprotectedAttrs)).getDEREncoded();
+        return new ContentInfo(PKCSObjectIdentifiers.encryptedData, new EncryptedData(encInfo, unprotectedAttrs)).getEncoded(ASN1Encoding.DER);
 
     }
 

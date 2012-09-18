@@ -43,12 +43,13 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.ASN1Object;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
+import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.DEREncodable;
 import org.bouncycastle.asn1.DERIA5String;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DERObjectIdentifier;
@@ -74,6 +75,7 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.RFC4519Style;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.DigestInfo;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
@@ -83,7 +85,6 @@ import org.bouncycastle.asn1.x509.PolicyQualifierId;
 import org.bouncycastle.asn1.x509.PolicyQualifierInfo;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.TBSCertificateStructure;
-import org.bouncycastle.asn1.x509.X509CertificateStructure;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ciphers.AOCipherConfig;
@@ -170,17 +171,17 @@ final class CAdESUtils {
 
         for (final X509Certificate element : certDest) {
             cert = element;
-            tbs = TBSCertificateStructure.getInstance(ASN1Object.fromByteArray(cert.getTBSCertificate()));
+            tbs = TBSCertificateStructure.getInstance(ASN1Primitive.fromByteArray(cert.getTBSCertificate()));
             // Obtenemos el Isuer & serial number
             isse = new IssuerAndSerialNumber(X500Name.getInstance(tbs.getIssuer()), tbs.getSerialNumber().getValue());
             // Creamos el recipientInfo
             rid = new RecipientIdentifier(isse);
             // Obtenemos la clave publica
             pubKey = cert.getPublicKey();
-            // obtenemos la información de la clave publica
+            // obtenemos la informacion de la clave publica
             info = tbs.getSubjectPublicKeyInfo();
             // obtenemos el algoritmo de cifrado.
-            keyEncAlg = info.getAlgorithmId();
+            keyEncAlg = info.getAlgorithm();
 
             try {
                 // ciframos la clave
@@ -289,7 +290,7 @@ final class CAdESUtils {
             return null;
         }
 
-        DEREncodable asn1Params;
+        ASN1Encodable asn1Params;
         if (params != null) {
             final ASN1InputStream aIn = new ASN1InputStream(cipher.getParameters().getEncoded("ASN.1")); //$NON-NLS-1$
             asn1Params = aIn.readObject();
@@ -299,10 +300,10 @@ final class CAdESUtils {
         }
 
         // obtenemos el OID del algoritmo de cifrado
-        final AlgorithmIdentifier encAlgId = new AlgorithmIdentifier(new DERObjectIdentifier(config.getAlgorithm().getOid()), asn1Params);
+        final AlgorithmIdentifier encAlgId = new AlgorithmIdentifier(new ASN1ObjectIdentifier(config.getAlgorithm().getOid()), asn1Params);
 
         // Obtenemos el identificador
-        final DERObjectIdentifier contentType = PKCSObjectIdentifiers.encryptedData;
+        final ASN1ObjectIdentifier contentType = PKCSObjectIdentifiers.encryptedData;
         return new EncryptedContentInfo(contentType, encAlgId, new DEROctetString(ciphered));
     }
 
@@ -378,7 +379,7 @@ final class CAdESUtils {
             /** IssuerSerial ::= SEQUENCE { issuer GeneralNames, serialNumber
              * CertificateSerialNumber */
 
-            final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Object.fromByteArray(cert.getTBSCertificate()));
+            final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Primitive.fromByteArray(cert.getTBSCertificate()));
 
             /** ESSCertIDv2 ::= SEQUENCE { hashAlgorithm AlgorithmIdentifier
              * DEFAULT {algorithm id-sha256}, certHash Hash, issuerSerial
@@ -430,7 +431,7 @@ final class CAdESUtils {
             /** IssuerSerial ::= SEQUENCE { issuer GeneralNames, serialNumber
              * CertificateSerialNumber } */
 
-            final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Object.fromByteArray(cert.getTBSCertificate()));
+            final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Primitive.fromByteArray(cert.getTBSCertificate()));
 
             final IssuerSerial isuerSerial = new IssuerSerial(new GeneralNames(new GeneralName(tbs.getIssuer())), tbs.getSerialNumber());
 
@@ -459,8 +460,7 @@ final class CAdESUtils {
                 final ASN1EncodableVector v = new ASN1EncodableVector();
                 v.add(new DERSequence(essCertID));
                 v.add(new DERSequence(getPolicyInformation(policy)));
-                scv = new SigningCertificate(new DERSequence(v)); // con
-                                                                  // politica
+                scv = SigningCertificate.getInstance(new DERSequence(v)); // con politica
             }
             else {
                 scv = new SigningCertificate(essCertID); // Sin politica
@@ -479,7 +479,7 @@ final class CAdESUtils {
             /*
              * SigPolicyId ::= OBJECT IDENTIFIER Politica de firma.
              */
-            final DERObjectIdentifier doiSigPolicyId = new DERObjectIdentifier(policy.getPolicyIdentifier().toLowerCase().replace("urn:oid:", "")); //$NON-NLS-1$ //$NON-NLS-2$
+            final ASN1ObjectIdentifier doiSigPolicyId = new ASN1ObjectIdentifier(policy.getPolicyIdentifier().toLowerCase().replace("urn:oid:", "")); //$NON-NLS-1$ //$NON-NLS-2$
 
             /*
              *   OtherHashAlgAndValue ::= SEQUENCE {
@@ -535,16 +535,16 @@ final class CAdESUtils {
             // sigPolicyId
             v.add(doiSigPolicyId);
             // sigPolicyHash
-            v.add(otherHashAlgAndValue.toASN1Object()); // como sequence
+            v.add(otherHashAlgAndValue.toASN1Primitive()); // como sequence
             // sigPolicyQualifiers
             if(spqInfo!=null) {
-                v.add(spqInfo.toASN1Object());
+                v.add(spqInfo.toASN1Primitive());
             }
 
             final DERSequence ds = new DERSequence(v);
 
             // Secuencia con singningCertificate
-            contexExpecific.add(new Attribute(PKCSObjectIdentifiers.id_aa_ets_sigPolicyId, new DERSet(ds.toASN1Object())));
+            contexExpecific.add(new Attribute(PKCSObjectIdentifiers.id_aa_ets_sigPolicyId, new DERSet(ds.toASN1Primitive())));
             // FIN SIGPOLICYID ATTRIBUTE
         }
 
@@ -637,12 +637,12 @@ final class CAdESUtils {
 
         if (policy.getPolicyQualifier()==null || pqi == null) {
             return new PolicyInformation[] {
-                new PolicyInformation(new DERObjectIdentifier(policy.getPolicyIdentifier().toLowerCase().replace("urn:oid:", ""))) //$NON-NLS-1$ //$NON-NLS-2$
+                new PolicyInformation(new ASN1ObjectIdentifier(policy.getPolicyIdentifier().toLowerCase().replace("urn:oid:", ""))) //$NON-NLS-1$ //$NON-NLS-2$
             };
         }
 
         return new PolicyInformation[] {
-            new PolicyInformation(new DERObjectIdentifier(policy.getPolicyIdentifier().toLowerCase().replace("urn:oid:", "")), new DERSequence(pqi)) //$NON-NLS-1$ //$NON-NLS-2$
+            new PolicyInformation(new ASN1ObjectIdentifier(policy.getPolicyIdentifier().toLowerCase().replace("urn:oid:", "")), new DERSequence(pqi)) //$NON-NLS-1$ //$NON-NLS-2$
         };
 
     }
@@ -716,7 +716,7 @@ final class CAdESUtils {
 
         final byte[] tmp;
         try {
-            tmp = signedAttr2.getEncoded(ASN1Encodable.DER);
+            tmp = signedAttr2.getEncoded(ASN1Encoding.DER);
         }
         catch (final IOException ex) {
             throw new AOException("Error obteniendo el contenido a firmar", ex); //$NON-NLS-1$
@@ -767,7 +767,7 @@ final class CAdESUtils {
 
         if (signerCertificateChain.length != 0) {
             for (final X509Certificate element : signerCertificateChain) {
-                signCerts.add(X509CertificateStructure.getInstance(ASN1Object.fromByteArray(element.getEncoded())));
+                signCerts.add(Certificate.getInstance(ASN1Primitive.fromByteArray(element.getEncoded())));
             }
         }
 
@@ -851,9 +851,9 @@ final class CAdESUtils {
         ASN1Set certificates = null;
 
         if (signerCertificateChain.length != 0) {
-            final List<DEREncodable> ce = new ArrayList<DEREncodable>();
+            final List<ASN1Encodable> ce = new ArrayList<ASN1Encodable>();
             for (final X509Certificate element : signerCertificateChain) {
-                ce.add(X509CertificateStructure.getInstance(ASN1Object.fromByteArray(element.getEncoded())));
+                ce.add(Certificate.getInstance(ASN1Primitive.fromByteArray(element.getEncoded())));
             }
             certificates = SigUtils.createBerSetFromList(ce);
         }

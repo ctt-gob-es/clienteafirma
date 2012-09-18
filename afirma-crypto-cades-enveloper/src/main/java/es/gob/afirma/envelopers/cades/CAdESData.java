@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -10,6 +10,9 @@
 
 package es.gob.afirma.envelopers.cades;
 
+import java.io.IOException;
+
+import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
@@ -35,7 +38,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
 
 final class CAdESData {
-	
+
 	private CAdESData() {
 		// No permitimos la instanciacion
 	}
@@ -46,10 +49,11 @@ final class CAdESData {
      * @param parameters
      *        Par&aacute;metros necesarios para obtener los datos de
      *        SignedData.
-     * @return El contenido del fichero en formato Data. */
-    static byte[] genData(final P7ContentSignerParameters parameters) {
+     * @return El contenido del fichero en formato Data.
+     * @throws IOException */
+    static byte[] genData(final P7ContentSignerParameters parameters) throws IOException {
         // construimos el Data y lo devolvemos
-        return new ContentInfo(PKCSObjectIdentifiers.data, new DEROctetString(parameters.getContent())).getDEREncoded();
+        return new ContentInfo(PKCSObjectIdentifiers.data, new DEROctetString(parameters.getContent())).getEncoded(ASN1Encoding.DER);
     }
 
 }

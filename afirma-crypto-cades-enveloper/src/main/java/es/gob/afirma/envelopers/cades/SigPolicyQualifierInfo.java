@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -11,9 +11,8 @@ package es.gob.afirma.envelopers.cades;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.DEREncodable;
+import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.DERIA5String;
-import org.bouncycastle.asn1.DERObject;
 import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
@@ -30,10 +29,10 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
  * para crear un Signature Policy qualifiers basandose en BouncyCastle: <a
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> de la clase
  * Policy qualifiers. */
-final class SigPolicyQualifierInfo extends ASN1Encodable {
+final class SigPolicyQualifierInfo implements ASN1Encodable {
 
     private final DERObjectIdentifier sigPolicyQualifierId;
-    private final DEREncodable sigQualifier;
+    private final ASN1Encodable sigQualifier;
 
     /** Crea un nuevo <code>SigPolicyQualifierInfo</code> con su calificador
      * cPSuri.
@@ -52,14 +51,13 @@ final class SigPolicyQualifierInfo extends ASN1Encodable {
 
     /** Devuelve el Cualificador de la estancia.
      * @return el Cualificador. */
-    DEREncodable getSigQualifier() {
+    ASN1Encodable getSigQualifier() {
         return this.sigQualifier;
     }
 
     /** Devuelve una representaci&oacute;n DER-encodable the esta estancia.
      * @return un valor <code>DERObject</code>. */
-    @Override
-    public DERObject toASN1Object() {
+    public ASN1Primitive toASN1Primitive() {
         final ASN1EncodableVector dev = new ASN1EncodableVector();
         dev.add(this.sigPolicyQualifierId);
         dev.add(this.sigQualifier);

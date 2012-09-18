@@ -23,11 +23,12 @@ import java.util.logging.Logger;
 
 import javax.crypto.SecretKey;
 
-import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.ASN1Object;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
+import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.ASN1TaggedObject;
@@ -173,14 +174,14 @@ final class CAdESEPESSignedAndEnvelopedData {
         // raiz de la secuencia de SignerInfo
         final ASN1EncodableVector signerInfos = new ASN1EncodableVector();
 
-        final TBSCertificateStructure tbs2 = TBSCertificateStructure.getInstance(ASN1Object.fromByteArray(signerCertificateChain[0].getTBSCertificate()));
+        final TBSCertificateStructure tbs2 = TBSCertificateStructure.getInstance(ASN1Primitive.fromByteArray(signerCertificateChain[0].getTBSCertificate()));
 
         final IssuerAndSerialNumber encSid = new IssuerAndSerialNumber(X500Name.getInstance(tbs2.getIssuer()), tbs2.getSerialNumber().getValue());
 
         final SignerIdentifier identifier = new SignerIdentifier(encSid);
 
         // AlgorithmIdentifier
-        final AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(new DERObjectIdentifier(AOAlgorithmID.getOID(digestAlgorithm)), new DERNull());
+        final AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(new ASN1ObjectIdentifier(AOAlgorithmID.getOID(digestAlgorithm)), new DERNull());
 
         // // ATRIBUTOS
         final ASN1EncodableVector contextExpecific =
@@ -220,7 +221,7 @@ final class CAdESEPESSignedAndEnvelopedData {
                                                                                                         infos.getEncInfo(),
                                                                                                         certificates,
                                                                                                         certrevlist,
-                                                                                                        new DERSet(signerInfos))).getDEREncoded();
+                                                                                                        new DERSet(signerInfos))).getEncoded(ASN1Encoding.DER);
     }
 
     /** Realiza la firma usando los atributos del firmante.
@@ -242,7 +243,7 @@ final class CAdESEPESSignedAndEnvelopedData {
 
         final byte[] tmp;
         try {
-            tmp = this.signedAttr2.getEncoded(ASN1Encodable.DER);
+            tmp = this.signedAttr2.getEncoded(ASN1Encoding.DER);
         }
         catch (final IOException ex) {
             throw new AOException("Error obteniendo los atributos firmados", ex); //$NON-NLS-1$
@@ -335,7 +336,7 @@ final class CAdESEPESSignedAndEnvelopedData {
                     }
 
                     final TBSCertificateStructure tbs2 =
-                            TBSCertificateStructure.getInstance(ASN1Object.fromByteArray(signerCertificateChain[0].getTBSCertificate()));
+                            TBSCertificateStructure.getInstance(ASN1Primitive.fromByteArray(signerCertificateChain[0].getTBSCertificate()));
 
                     final IssuerAndSerialNumber encSid =
                             new IssuerAndSerialNumber(X500Name.getInstance(tbs2.getIssuer()), tbs2.getSerialNumber().getValue());
@@ -344,7 +345,7 @@ final class CAdESEPESSignedAndEnvelopedData {
 
                     // AlgorithmIdentifier
                     final AlgorithmIdentifier digAlgId =
-                            new AlgorithmIdentifier(new DERObjectIdentifier(AOAlgorithmID.getOID(digestAlgorithm)), new DERNull());
+                            new AlgorithmIdentifier(new ASN1ObjectIdentifier(AOAlgorithmID.getOID(digestAlgorithm)), new DERNull());
 
                     // // ATRIBUTOS
                     final ASN1EncodableVector contextExpecific =
@@ -384,14 +385,17 @@ final class CAdESEPESSignedAndEnvelopedData {
                 // Se crea un nuevo AuthenticatedEnvelopedData a partir de los
                 // datos anteriores con los nuevos originantes.
                 retorno =
-                        new ContentInfo(PKCSObjectIdentifiers.signedAndEnvelopedData, new SignedAndEnvelopedData(signEnv.getRecipientInfos(),// new
-                                                                                                                                             // DERSet(recipientInfos),
-                                                                                                                 signEnv.getDigestAlgorithms(),// new
-                                                                                                                                               // DERSet(digestAlgs),
-                                                                                                                 signEnv.getEncryptedContentInfo(),// encInfo,
-                                                                                                                 new DERSet(signCerts),// certificates,
-                                                                                                                 certrevlist,// certrevlist,
-                                                                                                                 new DERSet(signerInfos))).getDEREncoded();
+                        new ContentInfo(
+                    		PKCSObjectIdentifiers.signedAndEnvelopedData,
+                    		new SignedAndEnvelopedData(
+                				signEnv.getRecipientInfos(),
+                				signEnv.getDigestAlgorithms(),
+                				signEnv.getEncryptedContentInfo(),// encInfo,
+                				new DERSet(signCerts),// certificates,
+                				certrevlist,// certrevlist,
+                                new DERSet(signerInfos)
+            				)
+                		).getEncoded(ASN1Encoding.DER);
             }
 
         }

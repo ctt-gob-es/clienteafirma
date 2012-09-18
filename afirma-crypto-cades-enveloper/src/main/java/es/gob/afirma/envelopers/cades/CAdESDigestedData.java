@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.cms.ContentInfo;
@@ -46,7 +47,7 @@ import es.gob.afirma.signers.pkcs7.SigUtils;
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
 
 final class CAdESDigestedData {
-	
+
 	private CAdESDigestedData() {
 		// No permitimos la instanciacion
 	}
@@ -85,7 +86,7 @@ final class CAdESDigestedData {
         final DEROctetString digest = new DEROctetString(MessageDigest.getInstance(digestAlgorithm).digest(parameters.getContent()));
 
         // construimos el digestedData.
-        return (new ContentInfo(PKCSObjectIdentifiers.digestedData, new DigestedData(digAlgId, encInfo, digest))).getDEREncoded();
+        return (new ContentInfo(PKCSObjectIdentifiers.digestedData, new DigestedData(digAlgId, encInfo, digest))).getEncoded(ASN1Encoding.DER);
     }
 
 }
