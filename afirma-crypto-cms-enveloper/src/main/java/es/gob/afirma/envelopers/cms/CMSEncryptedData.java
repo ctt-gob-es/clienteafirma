@@ -70,7 +70,10 @@ final class CMSEncryptedData {
      * @return la firma de tipo EncryptedData.
      * @throws java.security.NoSuchAlgorithmException
      *         Si no se soporta alguno de los algoritmos de firma o huella
-     *         digital */
+     *         digital
+     * @throws IOException
+     *         Cuando se produce algun error al codificar los datos.
+     */
     static byte[] genEncryptedData(final byte[] data,
     		                       final String digAlg,
     		                       final AOCipherConfig config,

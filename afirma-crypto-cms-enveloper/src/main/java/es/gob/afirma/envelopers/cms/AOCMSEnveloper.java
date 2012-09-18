@@ -241,6 +241,7 @@ public class AOCMSEnveloper implements AOEnveloper {
      *         Cuando el algoritmo de cifrado indicado no est&aacute;
      *         soportado.
      * @throws IOException
+     * 		   Cuando se produce algun error al codificar los datos.
      */
     public byte[] createCMSEncryptedData(final byte[] content, final AOCipherConfig cipherConfig, final Key key) throws NoSuchAlgorithmException, IOException {
 		return CMSEncryptedData.genEncryptedData(content, this.signatureAlgorithm, cipherConfig, key, DATA_TYPE_OID, this.uattrib);

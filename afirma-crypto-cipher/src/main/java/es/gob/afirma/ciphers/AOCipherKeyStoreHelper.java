@@ -17,7 +17,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -54,12 +53,16 @@ public final class AOCipherKeyStoreHelper {
      *         almac&eacute;n.
      * @throws IOException
      *         Cuando la contrase&ntilde;a es incorrecta.
-     * @throws GeneralSecurityException
-     *         Cuando existe alg&uacute;n problema en el almac&eacute;n.
+     * @throws NoSuchAlgorithmException
+     * 		   Cuando no se soporta la codificacion del almac&eacute;n encontrado.
+     * @throws CertificateException
+     *         Cuando no se puede acceder al almac&eacute;n.
+     * @throws KeyStoreException
+     * 		   Cuando el tipo de almac&eacute;n solicitado no este soportado.
 	*/
     public AOCipherKeyStoreHelper(final char[] p) throws AOException,
                                                          IOException,
-                                                         GeneralSecurityException {
+                                                         NoSuchAlgorithmException, CertificateException, KeyStoreException {
         if (p == null) {
             throw new IllegalArgumentException("Se necesita una contrasena para instanciar la clase"); //$NON-NLS-1$
         }
