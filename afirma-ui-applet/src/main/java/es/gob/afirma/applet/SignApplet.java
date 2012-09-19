@@ -4391,10 +4391,10 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 	 * @param caOption
 	 *        Puede ser una de las siguientes opciones:
 	 *        <ul>
-	 *        <li>"auto" indica que el programa seleccionar&aacute; autom&aacute;ticamente un certificado. Si se ha indicado uno o m&aacute;s nombre
+	 *        <li>"auto" indica que el programa seleccionar&aacute; autom&aacute;ticamente un certificado. Si se ha indicado uno o m&aacute;s nombres
 	 *        de CA mediante los par&aacute;metros caNameN la selecci&oacute;n autom&aacute;tica se limita a los certificado emitidos por las CA
 	 *        indicadas.</li>
-	 *        <li>"ask" indica que se debe solicitar al usuario que seleccione un certificado. Si se ha indicado uno o m&aacute;s nombre de CA
+	 *        <li>"ask" indica que se debe solicitar al usuario que seleccione un certificado. Si se ha indicado uno o m&aacute;s nombres de CA
 	 *        mediante los par&aacute;metros caNameN la selecci&oacute;n autom&aacute;tica se limita a los certificado emitidos por las CA indicadas.</li>
 	 *        </ul>
 	 * @param caNameN
@@ -4477,10 +4477,10 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 	 * @param caOption
 	 *        Puede ser una de las siguientes opciones:
 	 *        <ul>
-	 *        <li>"auto" indica que el programa seleccionar&aacute; autom&aacute;ticamente un certificado. Si se ha indicado uno o m&aacute;s nombre
+	 *        <li>"auto" indica que el programa seleccionar&aacute; autom&aacute;ticamente un certificado. Si se ha indicado uno o m&aacute;s nombres
 	 *        de CA mediante los par&aacute;metros caNameN la selecci&oacute;n autom&aacute;tica se limita a los certificado emitidos por las CA
 	 *        indicadas.</li>
-	 *        <li>"ask" indica que se debe solicitar al usuario que seleccione un certificado. Si se ha indicado uno o m&aacute;s nombre de CA
+	 *        <li>"ask" indica que se debe solicitar al usuario que seleccione un certificado. Si se ha indicado uno o m&aacute;s nombres de CA
 	 *        mediante los par&aacute;metros caNameN la selecci&oacute;n autom&aacute;tica se limita a los certificado emitidos por las CA indicadas.</li>
 	 *        </ul>
 	 * @return Si el usuario aprob&oacute; la operaci&oacute;n y esta
