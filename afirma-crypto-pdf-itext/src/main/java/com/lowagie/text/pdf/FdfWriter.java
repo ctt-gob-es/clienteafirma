@@ -49,6 +49,7 @@ package com.lowagie.text.pdf;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -72,10 +73,11 @@ public class FdfWriter {
 
     /** Writes the content to a stream.
      * @param os the stream
+     * @param globalDate 
      * @throws IOException on error
      */    
-    public void writeTo(OutputStream os) throws IOException {
-        Wrt wrt = new Wrt(os, this);
+    public void writeTo(OutputStream os, Calendar globalDate) throws IOException {
+        Wrt wrt = new Wrt(os, this, globalDate);
         wrt.writeTo();
     }
     
@@ -308,8 +310,8 @@ public class FdfWriter {
     static class Wrt extends PdfWriter {
         private FdfWriter fdf;
        
-        Wrt(OutputStream os, FdfWriter fdf) throws IOException {
-            super(new PdfDocument(), os);
+        Wrt(OutputStream os, FdfWriter fdf, Calendar globalDate) throws IOException {
+            super(new PdfDocument(globalDate), os);
             this.fdf = fdf;
             this.os.write(HEADER_FDF);
             body = new PdfBody(this);

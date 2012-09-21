@@ -50,6 +50,7 @@ package com.lowagie.text.pdf;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -87,12 +88,12 @@ class PdfCopyFieldsImp extends PdfWriter {
     private ArrayList calculationOrderRefs;
     private boolean hasSignature;
     
-    PdfCopyFieldsImp(OutputStream os) throws DocumentException {
-        this(os, '\0');
+    PdfCopyFieldsImp(OutputStream os, Calendar globalDate) throws DocumentException {
+        this(os, '\0', globalDate);
     }
     
-    PdfCopyFieldsImp(OutputStream os, char pdfVersion) throws DocumentException {
-        super(new PdfDocument(), os);
+    PdfCopyFieldsImp(OutputStream os, char pdfVersion, Calendar globalDate) throws DocumentException {
+        super(new PdfDocument(globalDate), os);
         pdf.addWriter(this);
         if (pdfVersion != 0)
             super.setPdfVersion(pdfVersion);

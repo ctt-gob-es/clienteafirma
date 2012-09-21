@@ -54,6 +54,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.security.MessageDigest;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
 
 import com.lowagie.text.Document;
@@ -74,9 +75,10 @@ public class PdfSmartCopy extends PdfCopy {
 	/** the cache with the streams and references. */
     private HashMap streamMap = null;
 
-    /** Creates a PdfSmartCopy instance. */
-    public PdfSmartCopy(Document document, OutputStream os) throws DocumentException {
-        super(document, os);
+    /** Creates a PdfSmartCopy instance. 
+     * @param globalDate */
+    public PdfSmartCopy(Document document, OutputStream os, Calendar globalDate) throws DocumentException {
+        super(document, os, globalDate);
         this.streamMap = new HashMap();
     }
     /**

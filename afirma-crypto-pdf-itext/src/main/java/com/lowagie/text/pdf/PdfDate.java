@@ -114,9 +114,9 @@ public class PdfDate extends PdfString {
  * Constructs a <CODE>PdfDate</CODE>-object, representing the current day and time.
  */
     
-    public PdfDate() {
-        this(new GregorianCalendar());
-    }
+//    public PdfDate() {
+//        this(PdfDateProvider.getCalendar());
+//    }
     
 /**
  * Adds a number of leading zeros to a given <CODE>String</CODE> in order to get a <CODE>String</CODE>

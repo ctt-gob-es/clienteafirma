@@ -49,6 +49,7 @@
 package com.lowagie.tools;
 
 import java.io.FileOutputStream;
+import java.util.Calendar;
 import java.util.HashMap;
 
 import com.lowagie.text.pdf.PdfEncryptor;
@@ -118,7 +119,7 @@ public class EncryptPdf {
             for (int k = MOREINFO; k < args.length - 1; k += 2)
                 moreInfo.put(args[k], args[k + 1]);
             PdfEncryptor.encrypt(reader, new FileOutputStream(args[OUTPUT_FILE]),
-                args[USER_PASSWORD].getBytes(), args[OWNER_PASSWORD].getBytes(), permissions, args[STRENGTH].equals("128"), moreInfo);
+                args[USER_PASSWORD].getBytes(), args[OWNER_PASSWORD].getBytes(), permissions, args[STRENGTH].equals("128"), moreInfo, Calendar.getInstance());
             System.out.println("Done.");
         }
         catch (Exception e) {

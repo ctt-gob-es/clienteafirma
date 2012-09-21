@@ -49,6 +49,7 @@ package com.lowagie.text.pdf;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.cert.Certificate;
+import java.util.Calendar;
 import java.util.List;
 
 import com.lowagie.text.DocWriter;
@@ -70,20 +71,22 @@ public class PdfCopyFields
     /**
      * Creates a new instance.
      * @param os the output stream
+     * @param globalDate 
      * @throws DocumentException on error
      */    
-    public PdfCopyFields(OutputStream os) throws DocumentException {
-        fc = new PdfCopyFieldsImp(os);
+    public PdfCopyFields(OutputStream os, Calendar globalDate) throws DocumentException {
+        fc = new PdfCopyFieldsImp(os, globalDate);
     }
     
     /**
      * Creates a new instance.
      * @param os the output stream
      * @param pdfVersion the pdf version the output will have
+     * @param globalDate 
      * @throws DocumentException on error
      */    
-    public PdfCopyFields(OutputStream os, char pdfVersion) throws DocumentException {
-        fc = new PdfCopyFieldsImp(os, pdfVersion);
+    public PdfCopyFields(OutputStream os, char pdfVersion, Calendar globalDate) throws DocumentException {
+        fc = new PdfCopyFieldsImp(os, pdfVersion, globalDate);
     }
     
     /**

@@ -51,7 +51,9 @@ package com.lowagie.text.pdf;
 
 import java.awt.Color;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -85,7 +87,6 @@ import com.lowagie.text.pdf.collection.PdfCollection;
 import com.lowagie.text.pdf.draw.DrawInterface;
 import com.lowagie.text.pdf.internal.PdfAnnotationsImp;
 import com.lowagie.text.pdf.internal.PdfViewerPreferencesImp;
-import java.text.DecimalFormat;
 
 /**
  * <CODE>PdfDocument</CODE> is the class that is used by <CODE>PdfWriter</CODE>
@@ -111,6 +112,7 @@ public class PdfDocument extends Document {
      * should be strings.<BR>
      * This object is described in the 'Portable Document Format Reference Manual version 1.3'
      * section 6.10 (page 120-121)
+     * @param globalDate 
      * @since	2.0.8 (PdfDocument was package-private before)
      */
 
@@ -120,10 +122,10 @@ public class PdfDocument extends Document {
          * Construct a <CODE>PdfInfo</CODE>-object.
          */
 
-        PdfInfo() {
+        PdfInfo(Calendar globalDate) {
             super();
             addProducer();
-            addCreationDate();
+            addCreationDate(globalDate);
         }
 
         /**
@@ -134,8 +136,8 @@ public class PdfDocument extends Document {
          * @param		subject		subject of the document
          */
 
-        PdfInfo(String author, String title, String subject) {
-            this();
+        PdfInfo(String author, String title, String subject, Calendar globalDate) {
+            this(globalDate);
             addTitle(title);
             addSubject(subject);
             addAuthor(author);
@@ -203,8 +205,8 @@ public class PdfDocument extends Document {
          * Adds the date of creation to the document.
          */
 
-        void addCreationDate() {
-            PdfString date = new PdfDate();
+        void addCreationDate(Calendar globalDate) {
+            PdfString date = new PdfDate(globalDate);
             put(PdfName.CREATIONDATE, date);
             put(PdfName.MODDATE, date);
         }
@@ -319,11 +321,14 @@ public class PdfDocument extends Document {
 
     /**
      * Constructs a new PDF document.
+     * @param globalDate 
      */
-    public PdfDocument() {
+    public PdfDocument(Calendar globalDate) {
         super();
         addProducer();
-        addCreationDate();
+        addCreationDate(globalDate);
+        
+        info = new PdfInfo(globalDate);
     }
 
     /** The <CODE>PdfWriter</CODE>. */
@@ -401,10 +406,11 @@ public class PdfDocument extends Document {
      * Signals that an <CODE>Element</CODE> was added to the <CODE>Document</CODE>.
      *
      * @param element the element to add
+     * @param globalDate 
      * @return <CODE>true</CODE> if the element was added, <CODE>false</CODE> if not.
      * @throws DocumentException when a document isn't open yet, or has been closed
      */
-    public boolean add(Element element) throws DocumentException {
+    public boolean add(Element element, Calendar globalDate) throws DocumentException {
         if (writer != null && writer.isPaused()) {
             return false;
         }
@@ -435,7 +441,7 @@ public class PdfDocument extends Document {
                     break;
                 case Element.CREATIONDATE:
                     // you can not set the creation date, only reset it
-                    info.addCreationDate();
+                    info.addCreationDate(globalDate);
                     break;
 
                 // content (text)
@@ -1801,7 +1807,7 @@ public class PdfDocument extends Document {
 //	Info Dictionary and Catalog
 
     /** some meta information about the Document. */
-    protected PdfInfo info = new PdfInfo();
+    protected PdfInfo info;
 
     /**
      * Gets the <CODE>PdfInfo</CODE>-object.

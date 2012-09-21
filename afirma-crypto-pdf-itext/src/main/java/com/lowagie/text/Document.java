@@ -51,7 +51,7 @@ package com.lowagie.text;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Calendar;
 import java.util.Iterator;
 
 /**
@@ -613,16 +613,17 @@ public class Document implements DocListener {
     
 	/**
  * Adds the current date and time to a Document.
+	 * @param globalDate 
  *
  * @return	<CODE>true</CODE> if successful, <CODE>false</CODE> otherwise
  */
     
-    public boolean addCreationDate() {
+    public boolean addCreationDate(Calendar globalDate) {
         try {
 			/* bugfix by 'taqua' (Thomas) */
 			final SimpleDateFormat sdf = new SimpleDateFormat(
 					"EEE MMM dd HH:mm:ss zzz yyyy");
-			return add(new Meta(Element.CREATIONDATE, sdf.format(new Date())));
+			return add(new Meta(Element.CREATIONDATE, sdf.format(globalDate.getTime())));
 		} catch (DocumentException de) {
             throw new ExceptionConverter(de);
         }

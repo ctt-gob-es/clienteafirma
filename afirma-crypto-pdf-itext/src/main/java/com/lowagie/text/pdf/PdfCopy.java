@@ -50,6 +50,7 @@ package com.lowagie.text.pdf;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -127,9 +128,10 @@ public class PdfCopy extends PdfWriter {
      * Constructor
      * @param document
      * @param os outputstream
+     * @param globalDate 
      */
-    public PdfCopy(Document document, OutputStream os) throws DocumentException {
-        super(new PdfDocument(), os);
+    public PdfCopy(Document document, OutputStream os, Calendar globalDate) throws DocumentException {
+        super(new PdfDocument(globalDate), os);
         document.addDocListener(pdf);
         pdf.addWriter(this);
         indirectMap = new HashMap();

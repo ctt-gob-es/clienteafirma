@@ -50,6 +50,7 @@
 package com.lowagie.tools;
 
 import java.io.FileOutputStream;
+import java.util.Calendar;
 
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
@@ -91,8 +92,8 @@ public class SplitPdf extends java.lang.Object {
 				Document document1 = new Document(reader.getPageSizeWithRotation(1));
 				Document document2 = new Document(reader.getPageSizeWithRotation(pagenumber));
 				// step 2: we create a writer that listens to the document
-				PdfWriter writer1 = PdfWriter.getInstance(document1, new FileOutputStream(args[1]));
-				PdfWriter writer2 = PdfWriter.getInstance(document2, new FileOutputStream(args[2]));
+				PdfWriter writer1 = PdfWriter.getInstance(document1, new FileOutputStream(args[1]), Calendar.getInstance());
+				PdfWriter writer2 = PdfWriter.getInstance(document2, new FileOutputStream(args[2]), Calendar.getInstance());
 				// step 3: we open the document
 				document1.open();
 				PdfContentByte cb1 = writer1.getDirectContent();

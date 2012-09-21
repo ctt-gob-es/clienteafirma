@@ -50,6 +50,7 @@ package com.lowagie.text.pdf;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Calendar;
 import java.util.HashMap;
 
 import com.lowagie.text.DocumentException;
@@ -76,12 +77,13 @@ public final class PdfEncryptor {
      * @param ownerPassword the owner password. Can be null or empty
      * @param permissions the user permissions
      * @param strength128Bits <code>true</code> for 128 bit key length, <code>false</code> for 40 bit key length
+     * @param globalDate 
      * @throws DocumentException on error
      * @throws IOException on error */
-    public static void encrypt(PdfReader reader, OutputStream os, byte userPassword[], byte ownerPassword[], int permissions, boolean strength128Bits) throws DocumentException, IOException {
-        PdfStamper stamper = new PdfStamper(reader, os);
+    public static void encrypt(PdfReader reader, OutputStream os, byte userPassword[], byte ownerPassword[], int permissions, boolean strength128Bits, Calendar globalDate) throws DocumentException, IOException {
+        PdfStamper stamper = new PdfStamper(reader, os, globalDate);
         stamper.setEncryption(userPassword, ownerPassword, permissions, strength128Bits);
-        stamper.close();
+        stamper.close(globalDate);
     }
     
     /** Entry point to encrypt a PDF document. The encryption parameters are the same as in
@@ -100,14 +102,15 @@ public final class PdfEncryptor {
      * @param newInfo an optional <CODE>String</CODE> map to add or change
      * the info dictionary. Entries with <CODE>null</CODE>
      * values delete the key in the original info dictionary
+     * @param globalDate 
      * @throws DocumentException on error
      * @throws IOException on error
      */
-    public static void encrypt(PdfReader reader, OutputStream os, byte userPassword[], byte ownerPassword[], int permissions, boolean strength128Bits, HashMap newInfo) throws DocumentException, IOException {
-        PdfStamper stamper = new PdfStamper(reader, os);
+    public static void encrypt(PdfReader reader, OutputStream os, byte userPassword[], byte ownerPassword[], int permissions, boolean strength128Bits, HashMap newInfo, Calendar globalDate) throws DocumentException, IOException {
+        PdfStamper stamper = new PdfStamper(reader, os, globalDate);
         stamper.setEncryption(userPassword, ownerPassword, permissions, strength128Bits);
         stamper.setMoreInfo(newInfo);
-        stamper.close();
+        stamper.close(globalDate);
     }
     
     /** Entry point to encrypt a PDF document. The encryption parameters are the same as in
@@ -123,12 +126,13 @@ public final class PdfEncryptor {
      * @param userPassword the user password. Can be null or empty
      * @param ownerPassword the owner password. Can be null or empty
      * @param permissions the user permissions
+     * @param globalDate 
      * @throws DocumentException on error
      * @throws IOException on error */
-    public static void encrypt(PdfReader reader, OutputStream os, boolean strength, String userPassword, String ownerPassword, int permissions) throws DocumentException, IOException {
-        PdfStamper stamper = new PdfStamper(reader, os);
+    public static void encrypt(PdfReader reader, OutputStream os, boolean strength, String userPassword, String ownerPassword, int permissions, Calendar globalDate) throws DocumentException, IOException {
+        PdfStamper stamper = new PdfStamper(reader, os, globalDate);
         stamper.setEncryption(strength, userPassword, ownerPassword, permissions);
-        stamper.close();
+        stamper.close(globalDate);
     }
     
     /** Entry point to encrypt a PDF document. The encryption parameters are the same as in
@@ -147,14 +151,15 @@ public final class PdfEncryptor {
      * @param newInfo an optional <CODE>String</CODE> map to add or change
      * the info dictionary. Entries with <CODE>null</CODE>
      * values delete the key in the original info dictionary
+     * @param globalDate 
      * @throws DocumentException on error
      * @throws IOException on error
      */
-    public static void encrypt(PdfReader reader, OutputStream os, boolean strength, String userPassword, String ownerPassword, int permissions, HashMap newInfo) throws DocumentException, IOException {
-        PdfStamper stamper = new PdfStamper(reader, os);
+    public static void encrypt(PdfReader reader, OutputStream os, boolean strength, String userPassword, String ownerPassword, int permissions, HashMap newInfo, Calendar globalDate) throws DocumentException, IOException {
+        PdfStamper stamper = new PdfStamper(reader, os, globalDate);
         stamper.setEncryption(strength, userPassword, ownerPassword, permissions);
         stamper.setMoreInfo(newInfo);
-        stamper.close();
+        stamper.close(globalDate);
     }
 
     
@@ -175,14 +180,15 @@ public final class PdfEncryptor {
      * @param newInfo an optional <CODE>String</CODE> map to add or change
      * the info dictionary. Entries with <CODE>null</CODE>
      * values delete the key in the original info dictionary
+     * @param globalDate 
      * @throws DocumentException on error
      * @throws IOException on error
      */
-    public static void encrypt(PdfReader reader, OutputStream os, int type, String userPassword, String ownerPassword, int permissions, HashMap newInfo) throws DocumentException, IOException {
-        PdfStamper stamper = new PdfStamper(reader, os);
+    public static void encrypt(PdfReader reader, OutputStream os, int type, String userPassword, String ownerPassword, int permissions, HashMap newInfo, Calendar globalDate) throws DocumentException, IOException {
+        PdfStamper stamper = new PdfStamper(reader, os, globalDate);
         stamper.setEncryption(type, userPassword, ownerPassword, permissions);
         stamper.setMoreInfo(newInfo);
-        stamper.close();
+        stamper.close(globalDate);
     }
     
     /** Entry point to encrypt a PDF document. The encryption parameters are the same as in
@@ -200,13 +206,14 @@ public final class PdfEncryptor {
      * @param ownerPassword the owner password. Can be null or empty
      * @param permissions the user permissions
      * values delete the key in the original info dictionary
+     * @param globalDate 
      * @throws DocumentException on error
      * @throws IOException on error
      */
-    public static void encrypt(PdfReader reader, OutputStream os, int type, String userPassword, String ownerPassword, int permissions) throws DocumentException, IOException {
-        PdfStamper stamper = new PdfStamper(reader, os);
+    public static void encrypt(PdfReader reader, OutputStream os, int type, String userPassword, String ownerPassword, int permissions, Calendar globalDate) throws DocumentException, IOException {
+        PdfStamper stamper = new PdfStamper(reader, os, globalDate);
         stamper.setEncryption(type, userPassword, ownerPassword, permissions);
-        stamper.close();
+        stamper.close(globalDate);
     }
     
     /**

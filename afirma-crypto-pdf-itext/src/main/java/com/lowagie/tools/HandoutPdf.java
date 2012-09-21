@@ -50,6 +50,7 @@
 package com.lowagie.tools;
 
 import java.io.FileOutputStream;
+import java.util.Calendar;
 
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
@@ -107,7 +108,7 @@ public class HandoutPdf extends java.lang.Object {
 				// step 1: creation of a document-object
 				Document document = new Document(PageSize.A4);
 				// step 2: we create a writer that listens to the document
-				PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(args[1]));
+				PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(args[1]), Calendar.getInstance());
 				// step 3: we open the document
 				document.open();
 				PdfContentByte cb = writer.getDirectContent();

@@ -51,6 +51,7 @@ package com.lowagie.text.pdf;
 
 import com.lowagie.text.DocumentException;
 import java.io.OutputStream;
+import java.util.Calendar;
 import java.util.HashMap;
 
 /**
@@ -63,10 +64,11 @@ class PdfCopyFormsImp extends PdfCopyFieldsImp {
     /**
    * This sets up the output document 
    * @param os The Outputstream pointing to the output document
+     * @param globalDate 
    * @throws DocumentException
    */
-    PdfCopyFormsImp(OutputStream os) throws DocumentException {
-        super(os);
+    PdfCopyFormsImp(OutputStream os, Calendar globalDate) throws DocumentException {
+        super(os, globalDate);
     }
     
     /**

@@ -56,6 +56,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.LinkedHashMap;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -607,14 +608,15 @@ public class PdfWriter extends DocWriter implements
      *
      * @param	document	The <CODE>Document</CODE> that has to be written
      * @param	os	The <CODE>OutputStream</CODE> the writer has to write to.
+     * @param globalDate 
      * @return	a new <CODE>PdfWriter</CODE>
      *
      * @throws	DocumentException on error
      */
 
-    public static PdfWriter getInstance(Document document, OutputStream os)
+    public static PdfWriter getInstance(Document document, OutputStream os, Calendar globalDate)
     throws DocumentException {
-        PdfDocument pdf = new PdfDocument();
+        PdfDocument pdf = new PdfDocument(globalDate);
         document.addDocListener(pdf);
         PdfWriter writer = new PdfWriter(pdf, os);
         pdf.addWriter(writer);
@@ -628,12 +630,13 @@ public class PdfWriter extends DocWriter implements
      * @param document The <CODE>Document</CODE> that has to be written
      * @param os The <CODE>OutputStream</CODE> the writer has to write to.
      * @param listener A <CODE>DocListener</CODE> to pass to the PdfDocument.
+     * @param globalDate 
      * @throws DocumentException on error
      */
 
-    public static PdfWriter getInstance(Document document, OutputStream os, DocListener listener)
+    public static PdfWriter getInstance(Document document, OutputStream os, DocListener listener, Calendar globalDate)
     throws DocumentException {
-        PdfDocument pdf = new PdfDocument();
+        PdfDocument pdf = new PdfDocument(globalDate);
         pdf.addDocListener(listener);
         document.addDocListener(pdf);
         PdfWriter writer = new PdfWriter(pdf, os);

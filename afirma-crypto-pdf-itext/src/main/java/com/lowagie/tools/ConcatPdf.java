@@ -51,6 +51,7 @@ package com.lowagie.tools;
 
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import com.lowagie.text.Document;
@@ -101,7 +102,7 @@ public class ConcatPdf {
                         // step 1: creation of a document-object
                         document = new Document(reader.getPageSizeWithRotation(1));
                         // step 2: we create a writer that listens to the document
-                        writer = new PdfCopy(document, new FileOutputStream(outFile));
+                        writer = new PdfCopy(document, new FileOutputStream(outFile), Calendar.getInstance());
                         // step 3: we open the document
                         document.open();
                     }
