@@ -192,7 +192,7 @@ public final class AOUtil {
         if (c == null) {
             return null;
         }
-        return getCN(c.getSubjectDN().toString());
+        return getCN(c.getSubjectX500Principal().toString());
     }
 
     /** Obtiene el nombre com&uacute;n (Common Name, CN) de un <i>Principal</i>
