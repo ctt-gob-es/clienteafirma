@@ -30,10 +30,12 @@ import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSProcessableByteArray;
 import org.bouncycastle.cms.CMSSignedData;
+import org.bouncycastle.cms.DefaultCMSSignatureAlgorithmNameGenerator;
 import org.bouncycastle.cms.SignerId;
 import org.bouncycastle.cms.SignerInformation;
 import org.bouncycastle.cms.SignerInformationVerifier;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.operator.DefaultSignatureAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
 import org.bouncycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
@@ -160,6 +162,8 @@ public final class ValidateBinarySignature {
     		);
 
             if (!signer.verify(new SignerInformationVerifier(
+            	new	DefaultCMSSignatureAlgorithmNameGenerator(),
+            	new DefaultSignatureAlgorithmIdentifierFinder(),
         		new JcaContentVerifierProviderBuilder().setProvider(new BouncyCastleProvider()).build(cert),
         		new BcDigestCalculatorProvider()
     		))) {
