@@ -3834,7 +3834,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 		if (directory != null && directory.trim().length() > 0 && !checkUserPermision(
 				AppletMessages.getString("SignApplet.105") + CR + directory + //$NON-NLS-1$
 				CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
-			setError(AppletMessages.getString("SignApplet.495", directory));
+			setError(AppletMessages.getString("SignApplet.495", directory)); //$NON-NLS-1$
 			return;
 		}
 		this.massiveOutputDirectory = directory;
