@@ -276,7 +276,7 @@ final class CMSInformation {
 			signerInfosSd = signedEnv.getSignerInfos();
 			break;
 		case TYPE_SIGNED_DATA:
-			final SignedData signed = new SignedData((ASN1Sequence)doj.getObject());
+			final SignedData signed = SignedData.getInstance(doj.getObject());
 			version = signed.getVersion();
 			ds = signed.getDigestAlgorithms();
 			ci = signed.getEncapContentInfo();
