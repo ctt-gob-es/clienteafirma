@@ -110,10 +110,6 @@ public final class AOKeyStoreManagerFactory {
         // DNIe para que agregue los certificados de este mediante el controlador Java del DNIe si
         // se encuentra la biblioteca y hay un DNIe insertado
         else if (AOKeyStore.MOZ_UNI.equals(store)) {
-        	if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-        		return new DnieUnifiedKeyStoreManager(
-        				getMozillaUnifiedKeyStoreManager(store, pssCallback), parentComponent);
-        	}
         	return getMozillaUnifiedKeyStoreManager(store, pssCallback);
         }
 
