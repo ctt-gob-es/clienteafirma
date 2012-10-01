@@ -400,7 +400,7 @@ public class PdfPKCS7 {
             if (!objId.getId().equals(ID_PKCS7_SIGNED_DATA)) {
 				throw new IllegalArgumentException("Not a valid PKCS#7 object - not signed data");
 			}
-            final ASN1Sequence content = (ASN1Sequence)((DERTaggedObject)signedData.getObjectAt(1)).getObject();
+            final ASN1Sequence content = (ASN1Sequence)((ASN1TaggedObject)signedData.getObjectAt(1)).getObject();
             // the positions that we care are:
             //     0 - version
             //     1 - digestAlgorithms
@@ -521,10 +521,12 @@ public class PdfPKCS7 {
             }
             if (provider == null) {
 				this.sig = Signature.getInstance(getDigestAlgorithm());
-			} else {
+			}
+            else {
 				this.sig = Signature.getInstance(getDigestAlgorithm(), provider);
 			}
-            this.sig.initVerify(this.signCert.getPublicKey());
+            //TODO: Comprobar por que no hay clave publica en el certificado
+            //this.sig.initVerify(this.signCert.getPublicKey());
         }
         catch (final Exception e) {
             throw new ExceptionConverter(e);
