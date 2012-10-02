@@ -63,16 +63,16 @@ public final class CAdESTriPhaseCoSigner {
      * @throws NoSuchAlgorithmException
      * @throws IOException */
     public static byte[] preCoSign(final byte[] content,
-            final String signatureAlgorithm,
-            final X509Certificate[] signerCertificateChain,
-            final AdESPolicy policy,
-            final boolean signingCertificateV2,
-            final byte[] messageDigest,
-            final String contentType,
-            final String contentDescription,
-            final Date signDate) throws CertificateEncodingException,
-                                                    NoSuchAlgorithmException,
-                                                    IOException {
+                                   final String signatureAlgorithm,
+                                   final X509Certificate[] signerCertificateChain,
+                                   final AdESPolicy policy,
+                                   final boolean signingCertificateV2,
+                                   final byte[] messageDigest,
+                                   final String contentType,
+                                   final String contentDescription,
+                                   final Date signDate) throws CertificateEncodingException,
+                                                               NoSuchAlgorithmException,
+                                                               IOException {
     	return getSignedAttributes(
     			messageDigest,
     			signerCertificateChain,
@@ -87,16 +87,16 @@ public final class CAdESTriPhaseCoSigner {
     }
 
 	private static ASN1Set getSignedAttributes(final byte[] messageDigest,
-     	   final X509Certificate[] signerCertificateChain,
-     	   final String digestAlgorithm,
-     	   final byte[] content,
-     	   final boolean signingCertificateV2,
-     	   final AdESPolicy policy,
-     	   final String contentType,
-     	   final String contentDescription,
-     	   final Date signDate) throws CertificateEncodingException,
-     	                                                      NoSuchAlgorithmException,
-     	                                                      IOException {
+     	                                       final X509Certificate[] signerCertificateChain,
+     	                                       final String digestAlgorithm,
+     	                                       final byte[] content,
+     	                                       final boolean signingCertificateV2,
+     	                                       final AdESPolicy policy,
+     	                                       final String contentType,
+     	                                       final String contentDescription,
+     	                                       final Date signDate) throws CertificateEncodingException,
+     	                                                      	           NoSuchAlgorithmException,
+     	                                                                   IOException {
 		if (messageDigest == null) {
 			final ASN1EncodableVector contextExpecific =
 				CAdESUtils.generateSignerInfo(signerCertificateChain[0],
@@ -134,7 +134,7 @@ public final class CAdESTriPhaseCoSigner {
     /** Realiza una post-cofirma CAdES.
      * @param pkcs1sign Firma PKCS#1 de la pre-cofirma (de los SignedAttributes)
      * @param preCoSign Pre-cofirma CAdES (SignedAttributes)
-     * @param content Contenido a post-cofirmar
+     * @param content Contenido a post-cofirmar (indicar null si se desea omitir su inclusi&oacute;n en la firma)
      * @param signatureAlgorithm Algoritmo de firma
      * @param signerCertificateChain Cadena de certificados del firmante
      * @param sign Firma donde insertar la cofirma
@@ -254,4 +254,5 @@ public final class CAdESTriPhaseCoSigner {
         final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
         return (ASN1Sequence) doj.getObject();
     }
+
 }
