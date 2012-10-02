@@ -1293,7 +1293,7 @@ interface EntryPointsCrypto {
      * puede hacerse establecido program&aacute;ticamente mediante <code>setOutFilePath(String)</code>
      * o mediante la interfaz que aparece cuando no hay un valor asignado. Una vez se establece el valor
      * del fichero de salida este permanece a&uacute;n cuando no se completa la
-     * operaci&acute;n de firma. Si no hay un fichero de salida establecido se
+     * operaci&oacute;n de firma. Si no hay un fichero de salida establecido se
      * devuelve cadena vac&iacute;a. <br>
      * <br>
      * Route to the file where the signature has been stored. This address may
