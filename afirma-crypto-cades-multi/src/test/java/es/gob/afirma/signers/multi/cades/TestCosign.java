@@ -91,48 +91,6 @@ public class TestCosign {
 	}
 
 	/**
-	 * Prueba de cofirma implicita de una firma implicita indicando nulo como datos de firma.
-	 * @throws Exception Cuando se produce un error.
-	 */
-	@Test
-	public void prueba_cofirmar_firma_implicita_con_datos_nulos() throws Exception {
-
-		final InputStream is = AOUtil.getCleanClassLoader().getResourceAsStream(IMPLICIT_SHA1_SIGN_FILE);
-
-		final byte[] sign = AOUtil.getDataFromInputStream(is);
-
-		final Properties config = new Properties();
-		config.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT);
-
-		final AOCAdESSigner signer = new AOCAdESSigner();
-		final byte[] cosign = signer.cosign(
-				null,
-				sign,
-				AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
-				(PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray())),
-				config);
-
-		try {
-			is.close();
-		} catch (final Exception e) {
-			// Se obvia el error
-		}
-
-		final File tempFile = File.createTempFile("CosignCades", ".csig");
-
-		System.out.println("Prueba de cofirma implicita sobre firma implicita indicando datos nulos.");
-		System.out.println("El resultado de almacena en: " + tempFile.getAbsolutePath());
-
-		final FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(cosign);
-		try {
-			fos.close();
-		} catch (final Exception e) {
-			// Se obvia el error
-		}
-	}
-
-	/**
 	 * Prueba de cofirma implicita de una firma implicita indicando los datos firmados.
 	 * @throws Exception Cuando se produce un error.
 	 */
@@ -204,48 +162,6 @@ public class TestCosign {
 		final File tempFile = File.createTempFile("CosignCades", ".csig");
 
 		System.out.println("Prueba de cofirma implicita sobre firma explicita sin indicar los datos.");
-		System.out.println("El resultado de almacena en: " + tempFile.getAbsolutePath());
-
-		final FileOutputStream fos = new FileOutputStream(tempFile);
-		fos.write(cosign);
-		try {
-			fos.close();
-		} catch (final Exception e) {
-			// Se obvia el error
-		}
-	}
-
-	/**
-	 * Prueba de cofirma implicita de una firma explicita indicando nulo como datos de firma.
-	 * @throws Exception Cuando se produce un error.
-	 */
-	@Test
-	public void prueba_cofirma_implicita_de_firma_explicita_con_datos_nulos() throws Exception {
-
-		final InputStream is = AOUtil.getCleanClassLoader().getResourceAsStream(EXPLICIT_SHA1_SIGN_FILE);
-
-		final byte[] sign = AOUtil.getDataFromInputStream(is);
-
-		final Properties config = new Properties();
-		config.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT);
-
-		final AOCAdESSigner signer = new AOCAdESSigner();
-		final byte[] cosign = signer.cosign(
-				null,
-				sign,
-				AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
-				(PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray())),
-				config);
-
-		try {
-			is.close();
-		} catch (final Exception e) {
-			// Se obvia el error
-		}
-
-		final File tempFile = File.createTempFile("CosignCades", ".csig");
-
-		System.out.println("Prueba de cofirma implicita sobre firma explicita indicando datos nulos.");
 		System.out.println("El resultado de almacena en: " + tempFile.getAbsolutePath());
 
 		final FileOutputStream fos = new FileOutputStream(tempFile);
