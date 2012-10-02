@@ -195,13 +195,99 @@ final class CAdESCoSigner {
                          final String contentType,
                          final String contentDescription) throws IOException, NoSuchAlgorithmException, CertificateException {
 
+    	final byte[] preCosign = preCoSign(
+			content,
+			signatureAlgorithm,
+			signerCertificateChain,
+			policy,
+			signingCertificateV2,
+			messageDigest,
+			contentType,
+			contentDescription
+		);
+
+        // PKCS#1
+        final byte[] pkcs1sign;
+        try {
+	        pkcs1sign = sign(
+				signatureAlgorithm,
+				keyEntry,
+				preCosign
+			);
+        }
+        catch (final AOException ex) {
+            throw new IOException("Error al realizar la firma: " + ex); //$NON-NLS-1$
+        }
+
+        return postCoSign(
+    		pkcs1sign,
+    		preCosign,
+    		(omitContent) ? null : content,
+    		signatureAlgorithm,
+    		signerCertificateChain,
+    		sign
+		);
+
+    }
+
+    private static ASN1Sequence getContentSignedData(final byte[] sign) {
+        // LEEMOS LOS DATOS PROPORCIONADOS (la firma previa)
+        final ASN1Sequence dsq = ASN1Sequence.getInstance(sign);
+        final Enumeration<?> e = dsq.getObjects();
+        // Elementos que contienen los elementos OID SignedData
+        e.nextElement();
+        // Contenido de SignedData
+        final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+        return (ASN1Sequence) doj.getObject();
+    }
+
+    private static byte[] preCoSign(final byte[] content,
+			                        final String signatureAlgorithm,
+			                        final X509Certificate[] signerCertificateChain,
+			                        final AdESPolicy policy,
+			                        final boolean signingCertificateV2,
+			                        final byte[] messageDigest,
+			                        final String contentType,
+			                        final String contentDescription) throws CertificateEncodingException,
+			                                                                NoSuchAlgorithmException,
+			                                                                IOException {
+        // ATRIBUTOS
+        return getSignedAttributes(
+    		messageDigest,
+    		signerCertificateChain,
+    		AOSignConstants.getDigestAlgorithmName(signatureAlgorithm),
+    		content,
+    		signingCertificateV2,
+    		policy,
+    		contentType,
+    		contentDescription
+		).getEncoded(ASN1Encoding.DER);
+    }
+
+    private static byte[] postCoSign(final byte[] pkcs1sign,
+    								 final byte[] preCoSign,
+    		                         final byte[] content,
+    		                         final String signatureAlgorithm,
+    		                         final X509Certificate[] signerCertificateChain,
+    		                         final byte[] sign
+    		                         ) throws IOException, CertificateEncodingException {
+
+        // Firma en ASN.1
+        final ASN1OctetString asn1sign = new DEROctetString(pkcs1sign);
+
+        // Identificador del firmante ISSUER AND SERIAL-NUMBER
+        final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Primitive.fromByteArray(signerCertificateChain[0].getTBSCertificate()));
+        final IssuerAndSerialNumber encSid = new IssuerAndSerialNumber(X500Name.getInstance(tbs.getIssuer()), tbs.getSerialNumber().getValue());
+        final SignerIdentifier identifier = new SignerIdentifier(encSid);
+
+        // digEncryptionAlgorithm
+        final AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID("RSA")); //$NON-NLS-1$
+        final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(AOSignConstants.getDigestAlgorithmName(signatureAlgorithm)));
+
     	final ASN1Sequence contentSignedData = getContentSignedData(sign);
     	final SignedData sd = SignedData.getInstance(contentSignedData);
 
-        // buscamos que tipo de algoritmo es y lo codificamos con su OID
-        final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
-
-        // 4. CERTIFICADOS
+        // CERTIFICADOS
         // Obtenemos la lista de certificados
 
         final ASN1Set certificatesSigned = sd.getCertificates();
@@ -222,7 +308,7 @@ final class CAdESCoSigner {
           certificates = SigUtils.fillRestCerts(ce, vCertsSig);
         }
 
-        // 5. SIGNERINFO
+        // SIGNERINFO
         // raiz de la secuencia de SignerInfo
         // Obtenemos los signerInfos del SignedData
         final ASN1Set signerInfosSd = sd.getSignerInfos();
@@ -236,50 +322,19 @@ final class CAdESCoSigner {
             signerInfos.add(si);
         }
 
-        // // ATRIBUTOS
-        final ASN1Set signedAttr = getSignedAttributes(
-    		messageDigest,
-    		signerCertificateChain,
-    		digestAlgorithm,
-    		content,
-    		signingCertificateV2,
-    		policy,
-    		contentType,
-    		contentDescription
-		);
-
-        // PKCS#1 + ASN.1
-        final ASN1OctetString asn1sign;
-        try {
-            asn1sign = new DEROctetString(
-        		firma(
-    				signatureAlgorithm,
-    				keyEntry,
-    				signedAttr.getEncoded(ASN1Encoding.DER)
-				)
-			);
-        }
-        catch (final AOException ex) {
-            throw new IOException("Error al realizar la firma: " + ex); //$NON-NLS-1$
-        }
-
-        // Identificador del firmante ISSUER AND SERIAL-NUMBER
-        final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Primitive.fromByteArray(signerCertificateChain[0].getTBSCertificate()));
-        final IssuerAndSerialNumber encSid = new IssuerAndSerialNumber(X500Name.getInstance(tbs.getIssuer()), tbs.getSerialNumber().getValue());
-        final SignerIdentifier identifier = new SignerIdentifier(encSid);
-
-        // digEncryptionAlgorithm
-        final AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID("RSA")); //$NON-NLS-1$
-        final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(AOSignConstants.getDigestAlgorithmName(signatureAlgorithm)));
-
         // Creamos los signerInfos del SignedData
         signerInfos.add(
     		new SignerInfo(
-				identifier, digAlgId, signedAttr, encAlgId, asn1sign, null // unsignedAttr
+				identifier,
+				digAlgId,
+				ASN1Set.getInstance(preCoSign),
+				encAlgId,
+				asn1sign,
+				null // unsignedAttr
 			)
 		);
 
-        final ContentInfo encInfo = getContentInfoFromContent((omitContent) ? null : content);
+        final ContentInfo encInfo = getContentInfoFromContent(content);
 
         // Construimos el Signed Data y lo devolvemos
         return new ContentInfo(
@@ -295,16 +350,39 @@ final class CAdESCoSigner {
 
     }
 
-    private static ASN1Sequence getContentSignedData(final byte[] sign) {
-        // LEEMOS LOS DATOS PROPORCIONADOS (la firma previa)
-        final ASN1Sequence dsq = ASN1Sequence.getInstance(sign);
-        final Enumeration<?> e = dsq.getObjects();
-        // Elementos que contienen los elementos OID SignedData
-        e.nextElement();
-        // Contenido de SignedData
-        final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-        return (ASN1Sequence) doj.getObject();
-    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /** Crea una cofirma a partir de los datos del firmante y del archivo que contiene las firmas.
      * @param signatureAlgorithm Algoritmo para la firma
@@ -406,7 +484,6 @@ final class CAdESCoSigner {
                     }
                 }
             }
-
             signerInfos.add(si);
         }
 
@@ -432,7 +509,7 @@ final class CAdESCoSigner {
         final ASN1OctetString asn1sign;
         try {
             asn1sign = new DEROctetString(
-        		firma(
+        		sign(
     				signatureAlgorithm,
     				keyEntry,
     				signedAttr.getEncoded(ASN1Encoding.DER)
@@ -500,7 +577,7 @@ final class CAdESCoSigner {
      *        Clave para firmar.
      * @return Firma de los atributos.
      * @throws es.map.es.map.afirma.exceptions.AOException */
-    private static byte[] firma(final String signatureAlgorithm, final PrivateKeyEntry keyEntry, final byte[] signedAttr) throws AOException {
+    private static byte[] sign(final String signatureAlgorithm, final PrivateKeyEntry keyEntry, final byte[] signedAttr) throws AOException {
         return new AOPkcs1Signer().sign(signedAttr, signatureAlgorithm, keyEntry, null);
     }
 

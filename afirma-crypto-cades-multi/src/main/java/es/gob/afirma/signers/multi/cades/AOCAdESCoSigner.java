@@ -29,7 +29,6 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 public class AOCAdESCoSigner implements AOCoSigner {
 
 	/** {@inheritDoc} */
-
 	public byte[] cosign(final byte[] data,
                          final byte[] sign,
                          final String algorithm,
