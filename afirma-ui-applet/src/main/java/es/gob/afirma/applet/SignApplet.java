@@ -851,6 +851,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 		else {
 			saveDataDialog.run();
 		}
+		this.outputFile = saveDataDialog.getSavingTarget();
 	}
 
 	/** {@inheritDoc} */

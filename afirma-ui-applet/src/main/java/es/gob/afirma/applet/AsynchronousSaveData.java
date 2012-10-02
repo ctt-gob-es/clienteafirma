@@ -37,7 +37,7 @@ final class AsynchronousSaveData implements Runnable {
 		this.savingTarget = target;
 	}
 
-	String getSavingTarget() {
+	public String getSavingTarget() {
 		return this.savingTarget;
 	}
 
