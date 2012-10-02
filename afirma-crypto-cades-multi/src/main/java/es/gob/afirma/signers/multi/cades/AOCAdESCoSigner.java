@@ -30,7 +30,6 @@ public class AOCAdESCoSigner implements AOCoSigner {
 
 	/** {@inheritDoc} */
 
-	@Override
 	public byte[] cosign(final byte[] data,
                          final byte[] sign,
                          final String algorithm,
@@ -120,7 +119,6 @@ public class AOCAdESCoSigner implements AOCoSigner {
     }
 
     /** {@inheritDoc} */
-	@Override
 	public byte[] cosign(final byte[] sign,
                          final String algorithm,
                          final PrivateKeyEntry keyEntry,
