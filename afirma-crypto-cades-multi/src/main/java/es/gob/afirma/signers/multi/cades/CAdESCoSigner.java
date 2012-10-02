@@ -12,9 +12,9 @@ package es.gob.afirma.signers.multi.cades;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -25,7 +25,6 @@ import java.util.List;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Encoding;
-import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Primitive;
@@ -59,7 +58,6 @@ import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.signers.cades.CAdESUtils;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
-import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.SigUtils;
 
 /** Clase que implementa la cofirma digital CADES SignedData La
@@ -121,15 +119,57 @@ import es.gob.afirma.signers.pkcs7.SigUtils;
  * </pre> */
 final class CAdESCoSigner {
 
-    private ASN1Set signedAttr2;
+	private CAdESCoSigner() {
+		// No permitimos la instanciacion
+	}
 
-    /** Constructor de la clase. Se crea una cofirma a partir de los datos del
-     * firmante, el archivo que se firma y del archivo que contiene las firmas.
+	private static ASN1Set getSignedAttributes(final byte[] messageDigest,
+			                            	   final X509Certificate[] signerCertificateChain,
+			                            	   final String digestAlgorithm,
+			                            	   final byte[] content,
+			                            	   final boolean signingCertificateV2,
+			                            	   final AdESPolicy policy,
+			                            	   final String contentType,
+			                            	   final String contentDescription) throws CertificateEncodingException,
+			                            	                                                      NoSuchAlgorithmException,
+			                            	                                                      IOException {
+        if (messageDigest == null) {
+            final ASN1EncodableVector contextExpecific =
+                CAdESUtils.generateSignerInfo(signerCertificateChain[0],
+                     digestAlgorithm,
+                     content,
+                     policy,
+                     signingCertificateV2,
+                     null,
+                     new Date(),
+                     false,
+                     contentType,
+                     contentDescription
+                 );
+            return SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
+        }
+
+        final ASN1EncodableVector contextExpecific =
+            CAdESUtils.generateSignerInfo(signerCertificateChain[0],
+                 digestAlgorithm,
+                 null,
+                 policy,
+                 signingCertificateV2,
+                 null,
+                 new Date(),
+                 false,
+                 contentType,
+                 contentDescription
+            );
+        return SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
+
+	}
+
+    /** Crea una cofirma a partir de los datos del firmante, el archivo que se firma y el archivo que contiene las firmas.
      * @param parameters
      *        par&aacute;metros necesarios que contienen tanto la firma del
      *        archivo a firmar como los datos del firmante.
-     * @param sign
-     *        Archivo que contiene las firmas.
+     * @param sign Archivo que contiene las firmas.
      * @param omitContent
      *        Si se omite el contenido o no, es decir,si se hace de forma
      *        Expl&iacute;cita o Impl&iacute;cita.
@@ -138,59 +178,36 @@ final class CAdESCoSigner {
      *        <code>true</code> si se desea usar la versi&oacute;n 2 del
      *        atributo <i>Signing Certificate</i> <code>false</code> para
      *        usar la versi&oacute;n 1
-     * @param keyEntry
-     *        Clave privada usada para firmar.
-     * @param messageDigest
-     *        Hash espec&iacute;fico para una firma.
+     * @param keyEntry Clave privada usada para firmar.
+     * @param messageDigest Hash espec&iacute;fico para una firma.
      * @param contentType Tipo de contenido definido por su OID.
      * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
      * @return El archivo de firmas con la nueva firma.
-     * @throws java.io.IOException
-     *         Si ocurre alg&uacute;n problema leyendo o escribiendo los
-     *         datos
-     * @throws java.security.NoSuchAlgorithmException
-     *         Si no se soporta alguno de los algoritmos de firma o huella
-     *         digital
-     * @throws java.security.cert.CertificateException
-     *         Si se produce alguna excepci&oacute;n con los certificados de
-     *         firma.*/
-    byte[] coSigner(final P7ContentSignerParameters parameters,
-                           final byte[] sign,
-                           final boolean omitContent,
-                           final AdESPolicy policy,
-                           final boolean signingCertificateV2,
-                           final PrivateKeyEntry keyEntry,
-                           final byte[] messageDigest,
-                           final String contentType,
-                           final String contentDescription) throws IOException, NoSuchAlgorithmException, CertificateException {
+     * @throws java.io.IOException Si ocurre alg&uacute;n problema leyendo o escribiendo los datos
+     * @throws java.security.NoSuchAlgorithmException Si no se soporta alguno de los algoritmos de firma o huella digital
+     * @throws java.security.cert.CertificateException Si se produce alguna excepci&oacute;n con los certificados de firma.*/
+    static byte[] coSign(final byte[] content,
+    					 final String signatureAlgorithm,
+                         final X509Certificate[] signerCertificateChain,
+                         final byte[] sign,
+                         final boolean omitContent, //
+                         final AdESPolicy policy,
+                         final boolean signingCertificateV2,
+                         final PrivateKeyEntry keyEntry,
+                         final byte[] messageDigest,
+                         final String contentType,
+                         final String contentDescription) throws IOException, NoSuchAlgorithmException, CertificateException {
 
-        final ASN1InputStream is = new ASN1InputStream(sign);
-
-        // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-        final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
-        final Enumeration<?> e = dsq.getObjects();
-        // Elementos que contienen los elementos OID SignedData
-        e.nextElement();
-        // Contenido de SignedData
-        final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-        final ASN1Sequence contentSignedData = (ASN1Sequence) doj.getObject();// contenido
-                                                                        // del
-                                                                        // SignedData
-
-        final SignedData sd = SignedData.getInstance(contentSignedData);
+    	final ASN1Sequence contentSignedData = getContentSignedData(sign);
 
         // 3. CONTENTINFO
-        // si se introduce el contenido o no
-        ContentInfo encInfo = null;
-        final ASN1ObjectIdentifier contentTypeOID = new ASN1ObjectIdentifier(PKCSObjectIdentifiers.data.getId());
-
         // Ya que el contenido puede ser grande, lo recuperamos solo una vez
-        byte[] content2 = null;
-
+        final ASN1ObjectIdentifier contentTypeOID = new ASN1ObjectIdentifier(PKCSObjectIdentifiers.data.getId());
+        final ContentInfo encInfo;
+        // si se introduce el contenido o no
         if (!omitContent) {
             final ByteArrayOutputStream bOut = new ByteArrayOutputStream();
-            content2 = parameters.getContent();
-            final CMSProcessable msg = new CMSProcessableByteArray(content2);
+            final CMSProcessable msg = new CMSProcessableByteArray(content);
             try {
                 msg.write(bOut);
             }
@@ -203,76 +220,31 @@ final class CAdESCoSigner {
             encInfo = new ContentInfo(contentTypeOID, null);
         }
 
+        // buscamos que tipo de algoritmo es y lo codificamos con su OID
+        final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
+
         // 4. CERTIFICADOS
-        // obtenemos la lista de certificados
-        ASN1Set certificates = null;
-        final X509Certificate[] signerCertificateChain = parameters.getSignerCertificateChain();
+        // Obtenemos la lista de certificados
+
+        final SignedData sd = SignedData.getInstance(contentSignedData);
 
         final ASN1Set certificatesSigned = sd.getCertificates();
-        final ASN1EncodableVector vCertsSig = new ASN1EncodableVector();
         final Enumeration<?> certs = certificatesSigned.getObjects();
+        final ASN1EncodableVector vCertsSig = new ASN1EncodableVector();
 
         // COGEMOS LOS CERTIFICADOS EXISTENTES EN EL FICHERO
         while (certs.hasMoreElements()) {
-            vCertsSig.add((ASN1Encodable) certs.nextElement());
+          vCertsSig.add((ASN1Encodable) certs.nextElement());
         }
 
+        ASN1Set certificates = null;
         if (signerCertificateChain.length != 0) {
-            final List<ASN1Encodable> ce = new ArrayList<ASN1Encodable>();
-            for (final X509Certificate element : signerCertificateChain) {
-                ce.add(Certificate.getInstance(ASN1Primitive.fromByteArray(element.getEncoded())));
-            }
-            certificates = SigUtils.fillRestCerts(ce, vCertsSig);
+          final List<ASN1Encodable> ce = new ArrayList<ASN1Encodable>();
+          for (final X509Certificate element : signerCertificateChain) {
+              ce.add(Certificate.getInstance(ASN1Primitive.fromByteArray(element.getEncoded())));
+          }
+          certificates = SigUtils.fillRestCerts(ce, vCertsSig);
         }
-
-        // buscamos que timo de algoritmo es y lo codificamos con su OID
-        final String signatureAlgorithm = parameters.getSignatureAlgorithm();
-        final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
-        final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(AOSignConstants.getDigestAlgorithmName(signatureAlgorithm)));
-
-        // Identificador del firmante ISSUER AND SERIAL-NUMBER
-        final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Primitive.fromByteArray(signerCertificateChain[0].getTBSCertificate()));
-        final IssuerAndSerialNumber encSid = new IssuerAndSerialNumber(X500Name.getInstance(tbs.getIssuer()), tbs.getSerialNumber().getValue());
-        final SignerIdentifier identifier = new SignerIdentifier(encSid);
-
-        // // ATRIBUTOS
-
-        ASN1Set signedAttr = null;
-        if (messageDigest == null) {
-            final ASN1EncodableVector contextExpecific =
-                CAdESUtils.generateSignerInfo(signerCertificateChain[0],
-                     digestAlgorithm,
-                     content2 != null ? content2 : parameters.getContent(),
-                     policy,
-                     signingCertificateV2,
-                     null,
-                     new Date(),
-                     false,
-                     contentType,
-                     contentDescription
-                 );
-            this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
-            signedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
-        }
-        else {
-            final ASN1EncodableVector contextExpecific =
-                CAdESUtils.generateSignerInfo(signerCertificateChain[0],
-                     digestAlgorithm,
-                     null,
-                     policy,
-                     signingCertificateV2,
-                     null,
-                     new Date(),
-                     false,
-                     contentType,
-                     contentDescription
-                );
-            this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
-            signedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
-        }
-
-        // digEncryptionAlgorithm
-        final AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID("RSA")); //$NON-NLS-1$
 
         // 5. SIGNERINFO
         // raiz de la secuencia de SignerInfo
@@ -281,44 +253,86 @@ final class CAdESCoSigner {
 
         // introducimos los SignerInfos Existentes
         final ASN1EncodableVector signerInfos = new ASN1EncodableVector();
-        // introducimos el nuevo SignerInfo del firmante actual.
 
+        // introducimos el nuevo SignerInfo del firmante actual.
         for (int i = 0; i < signerInfosSd.size(); i++) {
             final SignerInfo si = new SignerInfo((ASN1Sequence) signerInfosSd.getObjectAt(i));
             signerInfos.add(si);
         }
 
-        final ASN1OctetString sign2;
+        // // ATRIBUTOS
+        final ASN1Set signedAttr = getSignedAttributes(
+    		messageDigest,
+    		signerCertificateChain,
+    		digestAlgorithm,
+    		content,
+    		signingCertificateV2,
+    		policy,
+    		contentType,
+    		contentDescription
+		);
+
+        // PKCS#1 + ASN.1
+        final ASN1OctetString asn1sign;
         try {
-            sign2 = firma(signatureAlgorithm, keyEntry);
+            asn1sign = new DEROctetString(
+        		firma(
+    				signatureAlgorithm,
+    				keyEntry,
+    				signedAttr.getEncoded(ASN1Encoding.DER)
+				)
+			);
         }
         catch (final AOException ex) {
             throw new IOException("Error al realizar la firma: " + ex); //$NON-NLS-1$
         }
 
+        // Identificador del firmante ISSUER AND SERIAL-NUMBER
+        final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Primitive.fromByteArray(signerCertificateChain[0].getTBSCertificate()));
+        final IssuerAndSerialNumber encSid = new IssuerAndSerialNumber(X500Name.getInstance(tbs.getIssuer()), tbs.getSerialNumber().getValue());
+        final SignerIdentifier identifier = new SignerIdentifier(encSid);
+
+        // digEncryptionAlgorithm
+        final AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID("RSA")); //$NON-NLS-1$
+        final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(AOSignConstants.getDigestAlgorithmName(signatureAlgorithm)));
+
         // Creamos los signerInfos del SignedData
-        signerInfos.add(new SignerInfo(identifier, digAlgId, signedAttr, encAlgId, sign2, null // unsignedAttr
-        ));
+        signerInfos.add(
+    		new SignerInfo(
+				identifier, digAlgId, signedAttr, encAlgId, asn1sign, null // unsignedAttr
+			)
+		);
 
-        // CRLS no usado
-        final ASN1Set certrevlist = null;
-
-        // construimos el Signed Data y lo devolvemos
-        return new ContentInfo(PKCSObjectIdentifiers.signedData, new SignedData(sd.getDigestAlgorithms(),
-                                                                                encInfo,
-                                                                                certificates,
-                                                                                certrevlist,
-                                                                                new DERSet(signerInfos)// unsignedAttr
-                               )).getEncoded(ASN1Encoding.DER);
+        // Construimos el Signed Data y lo devolvemos
+        return new ContentInfo(
+    		PKCSObjectIdentifiers.signedData,
+    		new SignedData(
+				sd.getDigestAlgorithms(),
+                encInfo,
+                certificates,
+                (ASN1Set) null, // CRLS no usado
+                new DERSet(signerInfos) // UnsignedAttr
+            )
+		).getEncoded(ASN1Encoding.DER);
 
     }
 
-    /** Constructor de la clase. Se crea una cofirma a partir de los datos del
-     * firmante y del archivo que contiene las firmas.
+    private static ASN1Sequence getContentSignedData(final byte[] sign) {
+        // LEEMOS LOS DATOS PROPORCIONADOS (la firma previa)
+        final ASN1Sequence dsq = ASN1Sequence.getInstance(sign);
+        final Enumeration<?> e = dsq.getObjects();
+        // Elementos que contienen los elementos OID SignedData
+        e.nextElement();
+        // Contenido de SignedData
+        final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+        return (ASN1Sequence) doj.getObject();
+    }
+
+    /** Crea una cofirma a partir de los datos del firmante y del archivo que contiene las firmas.
      * @param signatureAlgorithm Algoritmo para la firma
      * @param signerCertificateChain Cadena de certificados para la construccion de los parametros
      *        de firma.
-     * @param data Archivo que contiene las firmas.
+     * @param sign Archivo que contiene las firmas.
      * @param policy Pol&iacute;tica de firma
      * @param signingCertificateV2
      *        <code>true</code> si se desea usar la versi&oacute;n 2 del
@@ -339,33 +353,24 @@ final class CAdESCoSigner {
      * @throws java.security.cert.CertificateException
      *         Si se produce alguna excepci&oacute;n con los certificados de
      *         firma.*/
-    byte[] coSigner(final String signatureAlgorithm,
-                           final X509Certificate[] signerCertificateChain,
-                           final InputStream data,
-                           final AdESPolicy policy,
-                           final boolean signingCertificateV2,
-                           final PrivateKeyEntry keyEntry,
-                           final byte[] md,
-                           final String contentType,
-                           final String contentDescription) throws IOException, NoSuchAlgorithmException, CertificateException {
+    static byte[] coSign(final String signatureAlgorithm,
+                         final X509Certificate[] signerCertificateChain,
+                         final byte[] sign,
+                         final AdESPolicy policy,
+                         final boolean signingCertificateV2,
+                         final PrivateKeyEntry keyEntry,
+                         final byte[] md,
+                         final String contentType,
+                         final String contentDescription) throws IOException,
+                                                                 NoSuchAlgorithmException,
+                                                                 CertificateException {
 
-        final ASN1InputStream is = new ASN1InputStream(data);
-
-        // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-        final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
-        final Enumeration<?> e = dsq.getObjects();
-        // Elementos que contienen los elementos OID SignedData
-        e.nextElement();
-        // Contenido de SignedData
-        final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-        final ASN1Sequence contentSignedData = (ASN1Sequence) doj.getObject();// contenido
-                                                                        // del
-                                                                        // SignedData
+        final ASN1Sequence contentSignedData = getContentSignedData(sign);
 
         final SignedData sd = SignedData.getInstance(contentSignedData);
 
         // 3. CONTENTINFO
-        // si se introduce el contenido o no
+        // Si se introduce el contenido o no
         final ContentInfo encInfo = sd.getEncapContentInfo();
 
         final DEROctetString contenido = (DEROctetString) encInfo.getContent();
@@ -396,18 +401,10 @@ final class CAdESCoSigner {
 
         // buscamos que timo de algoritmo es y lo codificamos con su OID
         final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
-        final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
-
-        // Identificador del firmante ISSUER AND SERIAL-NUMBER
-        final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Primitive.fromByteArray(signerCertificateChain[0].getTBSCertificate()));
-        final IssuerAndSerialNumber encSid = new IssuerAndSerialNumber(X500Name.getInstance(tbs.getIssuer()), tbs.getSerialNumber().getValue());
-        final SignerIdentifier identifier = new SignerIdentifier(encSid);
-
-        // digEncryptionAlgorithm
-        final AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID("RSA")); //$NON-NLS-1$
 
         // 5. SIGNERINFO
         // raiz de la secuencia de SignerInfo
+
         // Obtenemos los signerInfos del SignedData
         final ASN1Set signerInfosSd = sd.getSignerInfos();
 
@@ -437,65 +434,65 @@ final class CAdESCoSigner {
         }
 
         // // ATRIBUTOS
-
-        ASN1Set signedAttr;
-        // atributos firmados
-        if (contenidoDatos != null) {
-            final ASN1EncodableVector contextExpecific =
-                CAdESUtils.generateSignerInfo(
-                     signerCertificateChain[0],
-                     digestAlgorithm,
-                     contenidoDatos,
-                     policy,
-                     signingCertificateV2,
-                     null, // MessageDigest
-                     new Date(),
-                     false,
-                     contentType,
-                     contentDescription
-                 );
-            this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
-            signedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
-        }
-        else if (messageDigest != null) {
-            final ASN1EncodableVector contextExpecific =
-                CAdESUtils.generateSignerInfo(signerCertificateChain[0],
-                     digestAlgorithm,
-                     null,
-                     policy,
-                     signingCertificateV2,
-                     messageDigest,
-                     new Date(),
-                     false,
-                     contentType,
-                     contentDescription
-                );
-            this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
-            signedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
-        }
-        else {
-            throw new IllegalStateException("No se puede crear la cofirma ya que no se han encontrado ni los datos firmados ni una huella digital valida en la firma"); //$NON-NLS-1$
+        if (contenidoDatos == null && messageDigest == null) {
+            throw new IllegalStateException(
+        		"No se puede crear la cofirma ya que no se han encontrado ni los datos firmados ni una huella digital valida en la firma" //$NON-NLS-1$
+    		);
         }
 
-        final ASN1OctetString sign2;
+        final ASN1Set signedAttr = getSignedAttributes(
+    		messageDigest,
+    		signerCertificateChain,
+    		digestAlgorithm,
+    		contenidoDatos,
+    		signingCertificateV2,
+    		policy,
+    		contentType,
+    		contentDescription
+		);
+
+        // PKCS#1 + ASN.1
+        final ASN1OctetString asn1sign;
         try {
-            sign2 = firma(signatureAlgorithm, keyEntry);
+            asn1sign = new DEROctetString(
+        		firma(
+    				signatureAlgorithm,
+    				keyEntry,
+    				signedAttr.getEncoded(ASN1Encoding.DER)
+				)
+    		);
         }
         catch (final AOException ex) {
             throw new IOException("Error al realizar la firma: " + ex); //$NON-NLS-1$
         }
 
-        // Creamos los signerInfos del SignedData
-        signerInfos.add(new SignerInfo(identifier, digAlgId, signedAttr, encAlgId, sign2, null // unsignedAttr
-        ));
+        // Identificador del firmante ISSUER AND SERIAL-NUMBER
+        final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Primitive.fromByteArray(signerCertificateChain[0].getTBSCertificate()));
+        final IssuerAndSerialNumber encSid = new IssuerAndSerialNumber(X500Name.getInstance(tbs.getIssuer()), tbs.getSerialNumber().getValue());
+        final SignerIdentifier identifier = new SignerIdentifier(encSid);
 
-        // construimos el Signed Data y lo devolvemos
-        return new ContentInfo(PKCSObjectIdentifiers.signedData, new SignedData(sd.getDigestAlgorithms(),
-                                                                                encInfo,
-                                                                                certificates,
-                                                                                null,
-                                                                                new DERSet(signerInfos)// unsignedAttr
-                               )).getEncoded(ASN1Encoding.DER);
+        // digEncryptionAlgorithm
+        final AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID("RSA")); //$NON-NLS-1$
+        final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
+
+        // Creamos los signerInfos del SignedData
+        signerInfos.add(
+    		new SignerInfo(
+				identifier, digAlgId, signedAttr, encAlgId, asn1sign, null // unsignedAttr
+			)
+		);
+
+        // Construimos el Signed Data y lo devolvemos
+        return new ContentInfo(
+    		PKCSObjectIdentifiers.signedData,
+    		new SignedData(
+				sd.getDigestAlgorithms(),
+                encInfo,
+                certificates,
+                null,
+                new DERSet(signerInfos) // UnsignedAttr
+            )
+		).getEncoded(ASN1Encoding.DER);
 
     }
 
@@ -506,17 +503,8 @@ final class CAdESCoSigner {
      *        Clave para firmar.
      * @return Firma de los atributos.
      * @throws es.map.es.map.afirma.exceptions.AOException */
-    private ASN1OctetString firma(final String signatureAlgorithm, final PrivateKeyEntry keyEntry) throws AOException {
-
-        final byte[] tmp;
-        try {
-            tmp = this.signedAttr2.getEncoded(ASN1Encoding.DER);
-        }
-        catch (final IOException ex) {
-            throw new AOException("Error al obtener los datos a firmar", ex); //$NON-NLS-1$
-        }
-
-        return new DEROctetString(new AOPkcs1Signer().sign(tmp, signatureAlgorithm, keyEntry, null));
-
+    private static byte[] firma(final String signatureAlgorithm, final PrivateKeyEntry keyEntry, final byte[] signedAttr) throws AOException {
+        return new AOPkcs1Signer().sign(signedAttr, signatureAlgorithm, keyEntry, null);
     }
+
 }
