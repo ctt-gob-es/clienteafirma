@@ -166,9 +166,6 @@ final class CAdESCoSigner {
 	}
 
     /** Crea una cofirma a partir de los datos del firmante, el archivo que se firma y el archivo que contiene las firmas.
-     * @param parameters
-     *        par&aacute;metros necesarios que contienen tanto la firma del
-     *        archivo a firmar como los datos del firmante.
      * @param sign Archivo que contiene las firmas.
      * @param omitContent
      *        Si se omite el contenido o no, es decir,si se hace de forma
@@ -199,34 +196,13 @@ final class CAdESCoSigner {
                          final String contentDescription) throws IOException, NoSuchAlgorithmException, CertificateException {
 
     	final ASN1Sequence contentSignedData = getContentSignedData(sign);
-
-        // 3. CONTENTINFO
-        // Ya que el contenido puede ser grande, lo recuperamos solo una vez
-        final ASN1ObjectIdentifier contentTypeOID = new ASN1ObjectIdentifier(PKCSObjectIdentifiers.data.getId());
-        final ContentInfo encInfo;
-        // si se introduce el contenido o no
-        if (!omitContent) {
-            final ByteArrayOutputStream bOut = new ByteArrayOutputStream();
-            final CMSProcessable msg = new CMSProcessableByteArray(content);
-            try {
-                msg.write(bOut);
-            }
-            catch (final CMSException ex) {
-                throw new IOException("Error en la escritura del procesable CMS: " + ex); //$NON-NLS-1$
-            }
-            encInfo = new ContentInfo(contentTypeOID, new BEROctetString(bOut.toByteArray()));
-        }
-        else {
-            encInfo = new ContentInfo(contentTypeOID, null);
-        }
+    	final SignedData sd = SignedData.getInstance(contentSignedData);
 
         // buscamos que tipo de algoritmo es y lo codificamos con su OID
         final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
 
         // 4. CERTIFICADOS
         // Obtenemos la lista de certificados
-
-        final SignedData sd = SignedData.getInstance(contentSignedData);
 
         final ASN1Set certificatesSigned = sd.getCertificates();
         final Enumeration<?> certs = certificatesSigned.getObjects();
@@ -303,6 +279,8 @@ final class CAdESCoSigner {
 			)
 		);
 
+        final ContentInfo encInfo = getContentInfoFromContent((omitContent) ? null : content);
+
         // Construimos el Signed Data y lo devolvemos
         return new ContentInfo(
     		PKCSObjectIdentifiers.signedData,
@@ -366,7 +344,6 @@ final class CAdESCoSigner {
                                                                  CertificateException {
 
         final ASN1Sequence contentSignedData = getContentSignedData(sign);
-
         final SignedData sd = SignedData.getInstance(contentSignedData);
 
         // 3. CONTENTINFO
@@ -495,6 +472,26 @@ final class CAdESCoSigner {
 		).getEncoded(ASN1Encoding.DER);
 
     }
+
+    private static ContentInfo getContentInfoFromContent(final byte[] content) throws IOException {
+        // 3. CONTENTINFO
+        // Ya que el contenido puede ser grande, lo recuperamos solo una vez
+        final ASN1ObjectIdentifier contentTypeOID = new ASN1ObjectIdentifier(PKCSObjectIdentifiers.data.getId());
+        // si se introduce el contenido o no
+        if (content != null) {
+            final ByteArrayOutputStream bOut = new ByteArrayOutputStream();
+            final CMSProcessable msg = new CMSProcessableByteArray(content);
+            try {
+                msg.write(bOut);
+            }
+            catch (final CMSException ex) {
+                throw new IOException("Error en la escritura del procesable CMS: " + ex); //$NON-NLS-1$
+            }
+            return new ContentInfo(contentTypeOID, new BEROctetString(bOut.toByteArray()));
+        }
+        return new ContentInfo(contentTypeOID, null);
+    }
+
 
     /** Realiza la firma usando los atributos del firmante.
      * @param signatureAlgorithm
