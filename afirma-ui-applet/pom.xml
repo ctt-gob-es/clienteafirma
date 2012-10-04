@@ -26,7 +26,6 @@
       <version>${project.version}</version>
     </dependency>
 
-	
     <dependency>
       <groupId>es.gob.afirma</groupId>
       <artifactId>afirma-core-keystores</artifactId>
