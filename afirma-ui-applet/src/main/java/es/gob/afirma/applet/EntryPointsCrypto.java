@@ -1162,7 +1162,9 @@ interface EntryPointsCrypto {
     String getPlainData();
 
     /** Establece la ruta del fichero en donde se almacenar&aacute;n los datos
-     * resultados de la operaci&oacute;n realizada. <br>
+     * resultados de la operaci&oacute;n realizada. Se muestra un di&aacute;logo al usuario
+     * para que consienta la operaci&oacute;n. Si no lo hace, se aborta la operaci&oacute;n
+     * y se establece un error.<br>
      * <br>
      * Sets the route to the file where the operation's resulting data will be
      * stored.
@@ -1251,6 +1253,9 @@ interface EntryPointsCrypto {
      * Los datos introducidos mediante esta funci&oacute;n
      * sobreescribir&aacute;n cualquier otro establecido previamente mediante
      * los m&eacute;todos setData o setHash. <br>
+     * Se muestra un di&aacute;logo al usuario
+     * para que consienta la operaci&oacute;n. Si no lo hace, se aborta la operaci&oacute;n
+     * y se establece un error.<br>
      * <br>
      * Sets the URI (or URL) pointing to the file which contains input data to
      * operate (i.e., encrypt, sign, read, etc.) with. <code>file://</code> protocol is supported, for locally stored files. <br/>
@@ -1267,6 +1272,9 @@ interface EntryPointsCrypto {
      * introducida como ruta de entrada.<br/>
      * El contenido del fichero se interpretar&aacute; siempre como datos en
      * base 64 no realiz&aacute;ndose la comprobaci&oacute;n de los mismos. <br>
+     *  Se muestra un di&aacute;logo al usuario
+     * para que consienta la operaci&oacute;n. Si no lo hace, se aborta la operaci&oacute;n
+     * y se establece un error.<br>
      * <br>
      * Sets the data contained in the indicated base 64-encrypted file as the
      * input data for cryptographic operations, and sets the indicated route as
@@ -1359,6 +1367,9 @@ interface EntryPointsCrypto {
      * Los datos introducidos mediante esta funci&oacute;n
      * sobreescribir&aacute;n cualquier otro establecido previamente mediante
      * el m&eacute;todo setElectronicSignature.<br>
+     * Se muestra un di&aacute;logo al usuario
+     * para que consienta la operaci&oacute;n. Si no lo hace, se aborta la operaci&oacute;n
+     * y se establece un error.<br>
      * <br>
      * Sets the route to an electronic signature file as input for the signature
      * client. This method is mainly used to indicate electronic signature
@@ -1396,7 +1407,9 @@ interface EntryPointsCrypto {
     void setSignersToCounterSign(String signers);
 
     /** Guarda los datos provenientes de la funci&oacute;n realizada
-     * anteriormente en un fichero especificado. <br>
+     * anteriormente en un fichero especificado. Se muestra un di&aacute;logo al usuario
+     * para que consienta la operaci&oacute;n. Si no lo hace, se aborta la operaci&oacute;n
+     * y se establece un error.<br>
      * <br>
      * Stores data originating in the function previously performed on a
      * specified file.
@@ -1467,6 +1480,8 @@ interface EntryPointsCrypto {
      * el mismo que el de ejecutar el m&eacute;todo <code>cipherData()</code> tras
      * haber indicado un fichero con <code>setFileuri(String)</code>. No puede
      * recuperarse la ruta de fichero mediante getFileUsedPath(). <br>
+     * Se muestra un di&aacute;logo al usuario para que consienta la operaci&oacute;n.
+     * Si no lo hace, se aborta la operaci&oacute;n y se establece un error.<br>
      * <br>
      * Encrypts the specified file. This operation's result is equivalent to
      * executing <code>cipherData()</code> method, after indicating a file with <code>setFileuri(String)</code>. The files path cant recovered using
@@ -1536,6 +1551,8 @@ interface EntryPointsCrypto {
      * presentar&aacute;.<br/> El resultado de la operaci&oacute;n puede
      * recuperarse con <code>getPlainData()</code> o salvarse directamente a disco
      * con <code>savePlainDataToFile(String)</code>. <br>
+     * Se muestra un di&aacute;logo al usuario para que consienta la operaci&oacute;n.
+     * Si no lo hace, se aborta la operaci&oacute;n y se establece un error.<br/>
      * <br>
      * Decrypts indicated file. Encryption configuration used for data must be
      * indicated with <code>setCipherAlgorithm(String)</code> method, which may
@@ -1772,7 +1789,9 @@ interface EntryPointsCrypto {
      *        Key acquiring mode. */
     void setKeyMode(String keyMode);
 
-    /** Graba los datos cifrados en un fichero. <br>
+    /** Graba los datos cifrados en un fichero.  Se muestra un di&aacute;logo al usuario
+     * para que consienta la operaci&oacute;n. Si no lo hace, se aborta la operaci&oacute;n
+     * y se establece un error.<br>
      * <br>
      * Saves the encrypted data to a file.
      * @param fileUri
@@ -1786,6 +1805,8 @@ interface EntryPointsCrypto {
     /** Guarda los datos descrifrados en una anterior operaci&oacute;n de
      * desencriptado o el texto plano introducido anteriormente, seg&uacute;n
      * sea lo &uacute;ltimo que ocurra, en un fichero especificado. <br>
+     * Se muestra un di&aacute;logo al usuario para que consienta la operaci&oacute;n.
+     * Si no lo hace, se aborta la operaci&oacute;n y se establece un error.<br>
      * <br>
      * Saves the data decrypted during a previous decryption operation or a
      * previously entered plain text (whichever comes last) in a specified file.
@@ -2078,7 +2099,9 @@ interface EntryPointsCrypto {
     boolean signAndPackData();
 
     /** Firma y empaqueta en un sobre digital el fichero especificado por uri. El
-     * resultado puede ser recuperado mediante <code>getB64Data()</code>. <br>
+     * resultado puede ser recuperado mediante <code>getB64Data()</code>.
+     * Se muestra un di&aacute;logo al usuario para que consienta la operaci&oacute;n.
+     * Si no lo hace, se aborta la operaci&oacute;n y se establece un error.<br>
      * <br>
      * Signs and packs in a digital envelope the file specified by uri. Results
      * can be retrieved with <code>getB64Data()</code>.
@@ -2250,7 +2273,10 @@ interface EntryPointsCrypto {
     String getInputDirectoryToSign();
 
     /** Selecciona el directorio de donde se tomar&aacute;n los ficheros de
-     * firma y datos para la operaci&oacute;n de firma masiva. <br>
+     * firma y datos para la operaci&oacute;n de firma masiva.
+     * Se muestra un di&aacute;logo al usuario
+     * para que consienta la operaci&oacute;n. Si no lo hace, se aborta la operaci&oacute;n
+     * y se establece un error.<br>
      * <br>
      * Selects the directory from where signature files and data for the massive
      * signature operation will be taken from.
@@ -2269,7 +2295,10 @@ interface EntryPointsCrypto {
     String getOutputDirectoryToSign();
 
     /** Selecciona el directorio donde se depositar&aacute;n las firmas masivas
-     * de los archivos situados en <code>InputDirectoryToSign</code>. <br>
+     * de los archivos situados en <code>InputDirectoryToSign</code>.
+     * Se muestra un di&aacute;logo al usuario
+     * para que consienta la operaci&oacute;n. Si no lo hace, se aborta la operaci&oacute;n
+     * y se establece un error.<br>
      * <br>
      * Sets the output directory where massive signatures of files located in <code>InputDirectoryToSign</code> will be saved.
      * @param directory
@@ -2324,6 +2353,9 @@ interface EntryPointsCrypto {
      * Una vez finalizado el proceso de firma masiva se recomienda utilizar el
      * m&eacute;todo <code>endMassiveSignature()</code> para eliminar la
      * configuraci&oacute;n del procedimiento. <br>
+     * Al iniciar el proceso se muestra un di&aacute;logo al usuario
+     * para que consienta que se acceda a ficheros en disco durante la operaci&oacute;n.
+     * Si no lo hace, se aborta la operaci&oacute;n y se establece un error.<br>
      * <br>
      * Takes the client's massive signature configuration and prepares the
      * massive signature process. Data taken from the client's configuration:
@@ -2462,6 +2494,9 @@ interface EntryPointsCrypto {
      * </ul>
      * Se recomienda utilizar {@code initialize()} antes de usar este
      * m&eacute;todo. <br>
+     * Si el almac&eacute;n es o requiere un fichero en disco (PKCS#12, PKCS#11, JKS,...) se muestra
+     * un di&aacute;logo al usuario para que consienta la operaci&oacute;n. Si no lo hace, se aborta la
+     * operaci&oacute;n y se establece un error.<br>
      * <br>
      * Sets the active repository. This will be accessed for certificate
      * retrieval, in signature and other cryptographic operations. Accepted

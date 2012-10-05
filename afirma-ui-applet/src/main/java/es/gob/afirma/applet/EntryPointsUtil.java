@@ -31,7 +31,9 @@ interface EntryPointsUtil {
     String getFileBase64Encoded(boolean showProgress);
 
     /** Devuelve el contenido de un fichero en base 64. Si se produce
-     * alg&uacute;n error durante la operaci&oacute;n se devolver&aacute; <code>null</code>. <br>
+     * alg&uacute;n error durante la operaci&oacute;n se devolver&aacute; {@code null}. <br>
+     * Se muestra un di&aacute;logo al usuario para que consienta la operaci&oacute;n. Si no lo hace,
+     * se aborta la operaci&oacute;n (devolvi&eacute;ndose {@code null} y se establece un error.
      * <br>
      * Returns the contents of a file in base 64. If fileUri parameter has been
      * previously set (with setFileUri), modifications are kept. If errors ocurr
@@ -58,7 +60,9 @@ interface EntryPointsUtil {
      *         File's Hash, in base 64. */
     String getFileHashBase64Encoded();
 
-    /** Devuelve el contenido de un fichero como String.<br>
+    /** Devuelve el contenido de un fichero como String. Se muestra un di&aacute;logo al usuario
+     * para que consienta la operaci&oacute;n. Si no lo hace, se aborta la operaci&oacute;n
+     * y se establece un error.<br>
      * Returns a file's contents as a string.
      * @param url
      *        URL del fichero a leer. <br>
