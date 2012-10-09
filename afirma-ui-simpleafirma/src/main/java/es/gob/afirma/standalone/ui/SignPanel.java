@@ -1025,7 +1025,8 @@ public final class SignPanel extends JPanel {
             if (SignPanel.this.getSigner() instanceof AOCAdESSigner) {
             	p.put(
         			"mode", //$NON-NLS-1$
-        			Boolean.valueOf(preferences.getBoolean(PreferencesNames.PREFERENCE_CADES_IMPLICIT, true))
+        			preferences.getBoolean(PreferencesNames.PREFERENCE_CADES_IMPLICIT, true) ?
+        					"implicit" : "explicit" //$NON-NLS-1$ //$NON-NLS-2$
     			);
             }
 
