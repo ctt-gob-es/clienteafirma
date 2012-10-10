@@ -154,30 +154,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>es.gob</groupId>
-			<artifactId>jmulticard-ui</artifactId>
-			<version>1.4</version>
-		</dependency>
-
-		<dependency>
-			<groupId>es.gob</groupId>
-			<artifactId>jmulticard-jsr268</artifactId>
-			<version>1.4</version>
-		</dependency>
-
-		<dependency>
-			<groupId>es.gob</groupId>
-			<artifactId>jmulticard</artifactId>
-			<version>1.4</version>
-		</dependency>
-
-		<dependency>
-			<groupId>es.gob</groupId>
-			<artifactId>jmulticard-jse</artifactId>
-			<version>1.4</version>
-		</dependency>
-
-		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.8.2</version>

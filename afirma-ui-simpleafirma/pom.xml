@@ -88,30 +88,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>es.gob</groupId>
-			<artifactId>jmulticard-ui</artifactId>
-			<version>1.4</version>
-		</dependency>
-
-		<dependency>
-			<groupId>es.gob</groupId>
-			<artifactId>jmulticard-jsr268</artifactId>
-			<version>1.4</version>
-		</dependency>
-
-		<dependency>
-			<groupId>es.gob</groupId>
-			<artifactId>jmulticard</artifactId>
-			<version>1.4</version>
-		</dependency>
-
-		<dependency>
-			<groupId>es.gob</groupId>
-			<artifactId>jmulticard-jse</artifactId>
-			<version>1.4</version>
-		</dependency>
-
-		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcprov-ext-jdk15on</artifactId>
 			<version>1.47</version>
