@@ -33,6 +33,7 @@ public final class AOSignerFactory {
 	private static final String SIGNER_CLASS_XADES = "es.gob.afirma.signers.xades.AOXAdESSigner"; //$NON-NLS-1$
 	private static final String SIGNER_CLASS_XMLDSIG = "es.gob.afirma.signers.xmldsig.AOXMLDSigSigner"; //$NON-NLS-1$
 	private static final String SIGNER_CLASS_PADES = "es.gob.afirma.signers.pades.AOPDFSigner"; //$NON-NLS-1$
+	private static final String SIGNER_CLASS_PADES_TRI = "es.gob.afirma.signers.padestri.client.AOPDFTriPhaseSigner"; //$NON-NLS-1$
 	private static final String SIGNER_CLASS_ODF = "es.gob.afirma.signers.odf.AOODFSigner"; //$NON-NLS-1$
 	private static final String SIGNER_CLASS_OOXML = "es.gob.afirma.signers.ooxml.AOOOXMLSigner"; //$NON-NLS-1$
 
@@ -50,6 +51,7 @@ public final class AOSignerFactory {
 		{AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED, SIGNER_CLASS_XMLDSIG},
 		{AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPING, SIGNER_CLASS_XMLDSIG},
 		{AOSignConstants.SIGN_FORMAT_PDF, SIGNER_CLASS_PADES},
+		{AOSignConstants.SIGN_FORMAT_PDF_TRI, SIGNER_CLASS_PADES_TRI},
 		{AOSignConstants.SIGN_FORMAT_PADES, SIGNER_CLASS_PADES},
 		{AOSignConstants.SIGN_FORMAT_ODF, SIGNER_CLASS_ODF},
 		{AOSignConstants.SIGN_FORMAT_ODF_ALT1, SIGNER_CLASS_ODF},
