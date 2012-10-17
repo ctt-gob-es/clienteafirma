@@ -120,6 +120,10 @@ final class NormalizedNames {
     	else if (name.equalsIgnoreCase("PDF") || name.equalsIgnoreCase("Adobe PDF") || name.equalsIgnoreCase("PAdES")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     		return AOSignConstants.SIGN_FORMAT_PDF;
     	}
+    	else if (name.equalsIgnoreCase("PDFtri") || name.equalsIgnoreCase("PDF tri") || name.equalsIgnoreCase("PDF trifase") || //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    			name.equalsIgnoreCase("PAdEStri") || name.equalsIgnoreCase("PAdES tri") || name.equalsIgnoreCase("PAdES trifase")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    		return AOSignConstants.SIGN_FORMAT_PDF_TRI;
+    	}
     	else if (name.equalsIgnoreCase("ODF (Open Document Format)") || name.equalsIgnoreCase("ODF") || name.equalsIgnoreCase("ODT") || //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     			name.equalsIgnoreCase("ODS") || name.equalsIgnoreCase("ODP") //$NON-NLS-1$ //$NON-NLS-2$
     			|| name.equalsIgnoreCase("OpenOffice") || name.equalsIgnoreCase("OOo") || name.equalsIgnoreCase("OpenOffice.org")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
