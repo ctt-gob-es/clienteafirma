@@ -24,7 +24,7 @@ public final class AOSignerFactory {
 
 	private static AOSignerFactory signerFactory = null;
 
-	private static final Map<String, AOSigner> SIGNERS = new HashMap<String, AOSigner>(7);
+	private static final Map<String, AOSigner> SIGNERS = new HashMap<String, AOSigner>(20);
 
 	/* Listado de los manejador de firma soportados y los identificadores de formato de firma asociados. */
 	private static final String SIGNER_CLASS_CADES = "es.gob.afirma.signers.cades.AOCAdESSigner"; //$NON-NLS-1$
