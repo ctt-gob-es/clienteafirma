@@ -14,7 +14,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.net.URL;
+import java.net.URI;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -63,6 +63,7 @@ import es.gob.afirma.signers.cades.GenCAdESEPESSignedData;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper;
+import es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper.TsaRequestExtension;
 
 /** Manejador de firmas binarias de ficheros Adobe PDF en formato PAdES.
  * <p>Para compatibilidad estricta con PAdES-BES/EPES se utiliza <i>ETSI.CAdES.detached</i> como nombre del subfiltro.</p>
@@ -1151,10 +1152,10 @@ public final class AOPDFSigner implements AOSigner {
 
         //***************** SELLO DE TIEMPO ****************
         final String tsa = extraParams.getProperty("tsaURL"); //$NON-NLS-1$
-        URL tsaURL;
+        URI tsaURL;
         if (tsa != null) {
             try {
-                tsaURL = new URL(tsa);
+                tsaURL = new URI(tsa);
             }
             catch(final Exception e) {
                 LOGGER.warning("Se ha indicado una URL de TSA invalida (" + tsa + "), no se anadira sello de tiempo: " + e); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1172,7 +1173,16 @@ public final class AOPDFSigner implements AOSigner {
                          tsaPolicy,
                          tsaURL,
                          extraParams.getProperty("tsaUsr"),  //$NON-NLS-1$
-                         extraParams.getProperty("tsaPwd") //$NON-NLS-1$
+                         extraParams.getProperty("tsaPwd"), //$NON-NLS-1$
+                         ((extraParams.getProperty("tsaExtensionOid") != null) && (extraParams.getProperty("tsaExtensionValueBase64") != null)) ? //$NON-NLS-1$ //$NON-NLS-2$
+                    		 new TsaRequestExtension[] {
+                        		 new TsaRequestExtension(
+                    				 extraParams.getProperty("tsaExtensionOid"), //$NON-NLS-1$
+                    				 Boolean.getBoolean(extraParams.getProperty("tsaExtensionCritical", "false")), //$NON-NLS-1$ //$NON-NLS-2$
+                    				 Base64.decode(extraParams.getProperty("tsaExtensionValueBase64")) //$NON-NLS-1$
+                				 )
+                             } :
+                			 null
                      ).addTimestamp(completeCAdESSignature, AOAlgorithmID.getOID(AOSignConstants.getDigestAlgorithmName((tsaHashAlgorithm != null) ? tsaHashAlgorithm : "SHA1"))); //$NON-NLS-1$
                 }
             }
