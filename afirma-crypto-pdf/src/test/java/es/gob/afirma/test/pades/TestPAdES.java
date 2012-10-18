@@ -31,6 +31,7 @@ import es.gob.afirma.core.signers.AOSimpleSignInfo;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.pades.AOPDFSigner;
+import es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper;
 
 /**
  * Pruebas del m&oacute;dulo PAdES de Afirma.
@@ -123,28 +124,29 @@ public class TestPAdES {
         System.out.println(prueba);
 
         final Properties extraParams = new Properties();
-//        //********* TSA CATCERT ********************************************************************
-//        //******************************************************************************************
-//        extraParams.put("tsaURL", CMSTimestamper.CATCERT_TSP); //$NON-NLS-1$
-//        extraParams.put("tsaPolicy", CMSTimestamper.CATCERT_POLICY); //$NON-NLS-1$
-//        extraParams.put("tsaRequireCert", CMSTimestamper.CATCERT_REQUIRECERT); //$NON-NLS-1$
-//        extraParams.put("tsaHashAlgorithm", "SHA1"); //$NON-NLS-1$ //$NON-NLS-2$
-//        //******************************************************************************************
-//        //********* FIN TSA CATCERT ****************************************************************
+        //********* TSA CATCERT ********************************************************************
+        //******************************************************************************************
+        extraParams.put("tsaURL", CMSTimestamper.CATCERT_TSP); //$NON-NLS-1$
+        extraParams.put("tsaPolicy", CMSTimestamper.CATCERT_POLICY); //$NON-NLS-1$
+        extraParams.put("tsaRequireCert", CMSTimestamper.CATCERT_REQUIRECERT); //$NON-NLS-1$
+        extraParams.put("tsaHashAlgorithm", "SHA1"); //$NON-NLS-1$ //$NON-NLS-2$
+        //******************************************************************************************
+        //********* FIN TSA CATCERT ****************************************************************
 
-        //********** TSA AFIRMA ********************************************************************
-        //******************************************************************************************
-        extraParams.put("tsaURL", "socket://10.253.252.184:318/tsamap/TspHttpServer"/*"http://des-tsafirma.redsara.es:318/tsamap/TspHttpServer"*/); //$NON-NLS-1$ //$NON-NLS-2$
-        extraParams.put("tsaPolicy", "1.3.4.6.1.3.4.6"); //$NON-NLS-1$ //$NON-NLS-2$
-        extraParams.put("tsaRequireCert", "true"); //$NON-NLS-1$ //$NON-NLS-2$
-        extraParams.put("tsaHashAlgorithm", "SHA1"); //$NON-NLS-1$ //$NON-NLS-2$
-        extraParams.put("tsaHashAlgorithm", "SHA1"); //$NON-NLS-1$ //$NON-NLS-2$
-        extraParams.put("tsaExtensionOid", "1.3.4.6.1.3.4.6");  //$NON-NLS-1$//$NON-NLS-2$
-        extraParams.put("tsaExtensionValueBase64", "NOMBRE_DE_APLICACION"); /* dipucr.sigem_tsa */ //$NON-NLS-1$ //$NON-NLS-2$
-        extraParams.put("tsaUsr", "user"); //$NON-NLS-1$ //$NON-NLS-2$
-		extraParams.put("tsaPwd", "password"); //$NON-NLS-1$ //$NON-NLS-2$
-        //******************************************************************************************
-        //********** FIN TSA AFIRMA ****************************************************************
+//        //********** TSA AFIRMA ********************************************************************
+//        //******************************************************************************************
+//        extraParams.put("tsaURL", "https://10.253.252.184:10318/tsamap/TspHttpServer"); //$NON-NLS-1$ //$NON-NLS-2$
+//        //extraParams.put("tsaURL", "socket://10.253.252.184:318/tsamap/TspHttpServer"/*"http://des-tsafirma.redsara.es:318/tsamap/TspHttpServer"*/); //$NON-NLS-1$ //$NON-NLS-2$
+//        extraParams.put("tsaPolicy", "1.3.4.6.1.3.4.6"); //$NON-NLS-1$ //$NON-NLS-2$
+//        extraParams.put("tsaRequireCert", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+//        extraParams.put("tsaHashAlgorithm", "SHA1"); //$NON-NLS-1$ //$NON-NLS-2$
+//        extraParams.put("tsaHashAlgorithm", "SHA1"); //$NON-NLS-1$ //$NON-NLS-2$
+//        extraParams.put("tsaExtensionOid", "1.3.4.6.1.3.4.6");  //$NON-NLS-1$//$NON-NLS-2$
+//        extraParams.put("tsaExtensionValueBase64", "NOMBRE_APP_AFIRMA_EN_BASE64"); //$NON-NLS-1$ //$NON-NLS-2$
+//        extraParams.put("tsaUsr", "USUARIO"); //$NON-NLS-1$ //$NON-NLS-2$
+//        extraParams.put("tsaPwd", "CONTRASENA"); //$NON-NLS-1$ //$NON-NLS-2$
+//        //******************************************************************************************
+//        //********** FIN TSA AFIRMA ****************************************************************
 
         final byte[] result = signer.sign(testPdf, "SHA512withRSA", pke, extraParams); //$NON-NLS-1$
 
