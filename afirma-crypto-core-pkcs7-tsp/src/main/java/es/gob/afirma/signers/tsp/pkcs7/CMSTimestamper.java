@@ -114,7 +114,9 @@ public final class CMSTimestamper {
      * @param tsa URL de la autoridad de sellado de tiempo
      * @param tsaUsr Nombre de usuario si la TSA requiere autenticaci&oacute;n (puede ser <code>null</code> si no se necesita autenticaci&oacute;n)
      * @param tsaPwd Contrase&ntilde;a del usuario de la TSA (puede ser <code>null</code> si no se necesita autenticaci&oacute;n)
-     * @param extensions Extensiones a a&ntilde;adir a la petici&oacute;n de sello de tiempo */
+     * @param extensions Extensiones a a&ntilde;adir a la petici&oacute;n de sello de tiempo
+     * @param useSsl <code>true</code> si se debe establecer la conexi&oacute;n por SSL,
+     *               <code>false</code> en caso contrario */
     public CMSTimestamper(final boolean requireCert,
                      final String policy,
                      final URI tsa,
@@ -195,13 +197,17 @@ public final class CMSTimestamper {
     		return getTSAResponseHttp(request);
     	}
     	else {
-			throw new UnsupportedOperationException("Protocolo de conexion con TSA no soportado"); //$NON-NLS-1$
+			throw new UnsupportedOperationException("Protocolo de conexion con TSA no soportado: " + this.tsaURL.getScheme()); //$NON-NLS-1$
 		}
     }
 
     private byte[] getTSAResponseSocket(final byte[] request) throws IOException {
     	final Socket socket = new Socket(this.tsaURL.getHost(), this.tsaURL.getPort());
     	socket.setSoTimeout(500000);
+    	return getTSAResponseExternalSocket(request, socket);
+    }
+
+    private static byte[] getTSAResponseExternalSocket(final byte[] request, final Socket socket) throws IOException {
 
     	// Envio de datos...
     	final DataOutputStream dataoutputstream = new DataOutputStream(socket.getOutputStream());
@@ -222,7 +228,6 @@ public final class CMSTimestamper {
     	}
     	socket.close();
 
-    	System.out.println(new String(resp));
     	return resp;
     }
 
