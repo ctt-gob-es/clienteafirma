@@ -2722,15 +2722,16 @@ interface EntryPointsCrypto {
 
     /** Muestra el di&aacute;logo de selecci&oacute;n de certificados del
      * almac&eacute;n seleccionado, aplicando los filtros de certificado de ser
-     * necesario. Devuelve nulo si hay alg&uacute;n problema durante la
+     * necesario. Si ya exist&iacute;a un certificado seleccionado, lo devuelve
+     * directamente. Devuelve nulo si hay alg&uacute;n problema durante la
      * selecci&oacute;n o se cancela el di&aacute;logo.<br/>
      * El certificado seleccionado queda establecido como &uacute;ltimo
      * certificado utilizado, con lo cual puede recuperarse mediante los
      * m&eacute;todos <code>getSignCertificate()</code> y <code>getSignCertificateBase64Encoded()</code>.<br>
      * <br>
      * Shows the selected keystore certificate selection dialog, applying
-     * filters, if necessary. Returns null if a problem occurs during the
-     * selection, or dialog is cancelled.<br/>
+     * filters, if necessary. If a certificate is selected already, it's returned.
+     * Returns null if a problem occurs during the selection, or dialog is cancelled.<br/>
      * Selected certificate is set as last used certificate, i.e., it may be
      * recovered with <code>getSignCertificate()</code> and <code>getSignCertificateBase64Encoded()</code>.
      * @return Alias real (con el que fue dado de alta en el almac&eacute;n de
