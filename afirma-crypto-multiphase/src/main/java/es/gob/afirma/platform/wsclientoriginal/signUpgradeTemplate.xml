@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<dss:VerifyRequest 
+		 Profile="urn:afirma:dss:1.0:profile:XSS"
+		 xmlns:dss="urn:oasis:names:tc:dss:1.0:core:schema" 
+		 xmlns:afxp="urn:afirma:dss:1.0:profile:XSS:schema" 
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		 xsi:schemaLocation="urn:afirma:dss:1.0:profile:XSS:schema http://afirma.redsara.es/afirmaws/xsd/dss/afirma-dss-1.0-profiles-XSS-schema.xsd urn:oasis:names:tc:dss:1.0:core:schema http://docs.oasis-open.org/dss/v1.0/oasis-dss-core-schema-v1.0-os.xsd">
+		
+	<dss:OptionalInputs>
+		<dss:ClaimedIdentity>
+			<dss:Name>%%APPNAME%%</dss:Name>
+		</dss:ClaimedIdentity>
+		<dss:ReturnUpdatedSignature Type="urn:oasis:names:tc:dss:1.0:profiles:AdES:forms:ES-%%RETURNTYPE%%"/>
+		<afxp:UpdatedSignatureMode>urn:afirma:dss:1.0:profile:XSS:upgrade:NoCertificateValidation</afxp:UpdatedSignatureMode>
+	</dss:OptionalInputs>
+	
+	<dss:SignatureObject>
+		<dss:Base64Signature>
+			<![CDATA[%%SIGN%%]]>
+		</dss:Base64Signature>
+	</dss:SignatureObject>	
+</dss:VerifyRequest>

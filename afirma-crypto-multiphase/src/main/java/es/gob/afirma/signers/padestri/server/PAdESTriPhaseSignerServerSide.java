@@ -12,7 +12,7 @@ package es.gob.afirma.signers.padestri.server;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
@@ -43,10 +43,11 @@ import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
+import es.gob.afirma.platform.wsclientoriginal.TestClient;
 import es.gob.afirma.signers.cades.CAdESTriPhaseSigner;
-import es.gob.afirma.signers.padestri.server.BadPdfPasswordException;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper;
+import es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper.TsaRequestExtension;
 
 /** Clase para la firma electr&oacute;nica en tres fases de ficheros Adobe PDF en formato PAdES.
  * <p>No firma PDF cifrados.</p>
@@ -106,7 +107,7 @@ import es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper;
  *  <li>
  *   El dispositivo m&oacute;vil realiza, de forma completamente aislada una firma electr&oacute;nica
  *   simple (computacionalmente ligera) de los datos de la pre-firma. La clave privada del usuario nunca sale
- *   del dispositivo y no se expone externamente en ning�n momento.
+ *   del dispositivo y no se expone externamente en ning&uacute;n momento.
  *  </li>
  * </ul>
  * <p><b>Post-firma:</b></p>
@@ -180,7 +181,7 @@ public final class PAdESTriPhaseSignerServerSide {
         }
     }
 
-    private static final int CSIZE = 8000;
+    private static final int CSIZE = 27000;
 
     /** Obtiene la pre-firma PAdES/CAdES de un PDF (atributos CAdES a firmar)
      * @param digestAlgorithmName Nombre del algoritmo de huella digital usado para la firma. Debe usarse exactamente el mismo valor en la post-firma.
@@ -530,14 +531,23 @@ public final class PAdESTriPhaseSignerServerSide {
 
         byte[] completeCAdESSignature = CAdESTriPhaseSigner.postSign(digestAlgorithmName, null, signerCertificateChain, signature, signedAttributes);
 
+
+        //*************** MEJORA DE FIRMA CONTRA PLATAFORMA AFIRMA *********************************
+        //******************************************************************************************
+        //TODO: Sustituir por cliente de plataforma "limpio"
+        final TestClient testClient = new TestClient();
+        completeCAdESSignature = testClient.upgradeSign(completeCAdESSignature, "dipucr.sigem", "A"); //$NON-NLS-1$ //$NON-NLS-2$
+        //******************************************************************************************
+        //*************** FIN MEJORA DE FIRMA CONTRA PLATAFORMA AFIRMA *****************************
+
         final Properties extraParams = (xParams != null) ? xParams : new Properties();
 
         //***************** SELLO DE TIEMPO ****************
         final String tsa = extraParams.getProperty("tsaURL"); //$NON-NLS-1$
-        URL tsaURL;
+        URI tsaURL;
         if (tsa != null) {
             try {
-                tsaURL = new URL(tsa);
+                tsaURL = new URI(tsa);
             }
             catch(final Exception e) {
                 LOGGER.warning("Se ha indicado una URL de TSA invalida (" + tsa + "), no se anadira sello de tiempo: " + e); //$NON-NLS-1$ //$NON-NLS-2$
@@ -555,7 +565,16 @@ public final class PAdESTriPhaseSignerServerSide {
                          tsaPolicy,
                          tsaURL,
                          extraParams.getProperty("tsaUsr"),  //$NON-NLS-1$
-                         extraParams.getProperty("tsaPwd") //$NON-NLS-1$
+                         extraParams.getProperty("tsaPwd"), //$NON-NLS-1$
+                         ((extraParams.getProperty("tsaExtensionOid") != null) && (extraParams.getProperty("tsaExtensionValueBase64") != null)) ? //$NON-NLS-1$ //$NON-NLS-2$
+                    		 new TsaRequestExtension[] {
+                        		 new TsaRequestExtension(
+                    				 extraParams.getProperty("tsaExtensionOid"), //$NON-NLS-1$
+                    				 Boolean.getBoolean(extraParams.getProperty("tsaExtensionCritical", "false")), //$NON-NLS-1$ //$NON-NLS-2$
+                    				 Base64.decode(extraParams.getProperty("tsaExtensionValueBase64")) //$NON-NLS-1$
+                				 )
+                             } :
+                			 null
                      ).addTimestamp(completeCAdESSignature, AOAlgorithmID.getOID(AOSignConstants.getDigestAlgorithmName((tsaHashAlgorithm != null) ? tsaHashAlgorithm : "SHA1"))); //$NON-NLS-1$
                 }
             }
@@ -564,6 +583,12 @@ public final class PAdESTriPhaseSignerServerSide {
         //************** FIN SELLO DE TIEMPO ****************
 
         final byte[] outc = new byte[CSIZE];
+
+        if (completeCAdESSignature.length > CSIZE) {
+        	throw new AOException(
+    			"El tamano de la firma (" + completeCAdESSignature.length + ") supera el maximo permitido para un PDF (" + CSIZE + ")" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			);
+        }
 
         final PdfDictionary dic2 = new PdfDictionary();
         System.arraycopy(completeCAdESSignature, 0, outc, 0, completeCAdESSignature.length);
@@ -578,10 +603,15 @@ public final class PAdESTriPhaseSignerServerSide {
            sap.close(dic2);
         }
         catch (final Exception e) {
+        	baos.close();
             throw new AOException("Error al cerrar el PDF para finalizar el proceso de firma", e); //$NON-NLS-1$
         }
 
-        return new String(baos.toByteArray(), "ISO-8859-1").replace(badFileID, fileID).getBytes("ISO-8859-1"); //$NON-NLS-1$ //$NON-NLS-2$
+        final byte[] ret = new String(baos.toByteArray(), "ISO-8859-1").replace(badFileID, fileID).getBytes("ISO-8859-1"); //$NON-NLS-1$ //$NON-NLS-2$
+
+        baos.close();
+
+        return ret;
     }
 
     /** Resultado de una pre-firma (como primera parte de un firma trif&aacute;sica) PAdES. */
