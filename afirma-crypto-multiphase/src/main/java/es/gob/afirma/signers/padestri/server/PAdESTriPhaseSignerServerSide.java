@@ -43,7 +43,6 @@ import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
-import es.gob.afirma.platform.wsclientoriginal.TestClient;
 import es.gob.afirma.signers.cades.CAdESTriPhaseSigner;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper;
@@ -516,9 +515,13 @@ public final class PAdESTriPhaseSignerServerSide {
      * @param signedAttributes Resultado de la pre-firma CAdES/PAdES (atributos CAdES a firmar)
      * @param fileID FileID del PDF generado en la pre-firma
      * @param signTime  Momento de la firma (debe ser el mismo que el usado en la pre-firma).
+     * @param enhancer Manejador para la generaci&oacute;n de nuevos modos de firma (con
+     * sello de tiempo, archivo longevo, etc.)
+     * @param enhancerConfig Configuraci&oacute;n para generar el nuevo modo de firma.
      * @return PDF firmado
      * @throws AOException en caso de cualquier tipo de error
-     * @throws IOException
+     * @throws IOException Cuando ocurre algun error en la conversi&oacute;n o generaci&oacute;n
+     * de estructuras.
      * @throws NoSuchAlgorithmException Si hay problemas con el algoritmo durante el sello de tiempo */
     public static byte[] postSign(final String digestAlgorithmName,
                     final byte[] inPDF,
@@ -527,18 +530,15 @@ public final class PAdESTriPhaseSignerServerSide {
                     final byte[] signature,
                     final byte[] signedAttributes,
                     final String fileID,
-                    final Calendar signTime) throws AOException, IOException, NoSuchAlgorithmException {
+                    final Calendar signTime,
+                    final SignEnhancer enhancer,
+                    final Properties enhancerConfig) throws AOException, IOException, NoSuchAlgorithmException {
 
         byte[] completeCAdESSignature = CAdESTriPhaseSigner.postSign(digestAlgorithmName, null, signerCertificateChain, signature, signedAttributes);
 
-
-        //*************** MEJORA DE FIRMA CONTRA PLATAFORMA AFIRMA *********************************
-        //******************************************************************************************
-        //TODO: Sustituir por cliente de plataforma "limpio"
-        final TestClient testClient = new TestClient();
-        completeCAdESSignature = testClient.upgradeSign(completeCAdESSignature, "dipucr.sigem", "A"); //$NON-NLS-1$ //$NON-NLS-2$
-        //******************************************************************************************
-        //*************** FIN MEJORA DE FIRMA CONTRA PLATAFORMA AFIRMA *****************************
+        if (enhancer != null) {
+        	completeCAdESSignature = enhancer.enhance(completeCAdESSignature, enhancerConfig);
+        }
 
         final Properties extraParams = (xParams != null) ? xParams : new Properties();
 
@@ -897,5 +897,4 @@ public final class PAdESTriPhaseSignerServerSide {
 			return null;
 		}
     }
-
 }
