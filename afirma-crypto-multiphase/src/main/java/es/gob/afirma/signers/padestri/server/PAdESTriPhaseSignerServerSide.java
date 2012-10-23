@@ -150,7 +150,7 @@ import es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper;
  * </p>
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
  * */
-public final class PAdESTriPhaseSigner {
+public final class PAdESTriPhaseSignerServerSide {
 
 	private static final String PDF_OID = "1.2.826.0.1089.1.5"; //$NON-NLS-1$
 	private static final String PDF_DESC = "Documento en formato PDF"; //$NON-NLS-1$
@@ -169,7 +169,7 @@ public final class PAdESTriPhaseSigner {
     /** Construye un firmador PAdES trif&aacute;sico, comprobando que la versiones existentes de iText y Bouncycastle sean las adecuadas.
      * @throws UnsupportedOperationException si se encuentra bibliotecas iText o BouncyCastle en versiones incompatibles
      */
-    public PAdESTriPhaseSigner() {
+    public PAdESTriPhaseSignerServerSide() {
         final String itextVersion = Platform.getITextVersion();
         if (!ITEXT_VERSION.equals(itextVersion)) {
             throw new UnsupportedOperationException("Se necesita iText version " + ITEXT_VERSION + ", pero se ha encontrado la version: " + itextVersion); //$NON-NLS-1$ //$NON-NLS-2$
