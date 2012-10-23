@@ -1,4 +1,4 @@
-package es.gob.afirma.signers.pades;
+package es.gob.afirma.signers.padestri.server;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -30,8 +30,6 @@ import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.signers.cades.CAdESBiPhaseSigner;
-import es.gob.afirma.signers.cades.CAdESBiPhaseSigner.CAdESBiPhasePreSignResult;
 
 /** Clase para la firma electr&oacute;nica en tres fases de ficheros Adobe PDF en formato PAdES.
  * <p>No firma PDF cifrados.</p>

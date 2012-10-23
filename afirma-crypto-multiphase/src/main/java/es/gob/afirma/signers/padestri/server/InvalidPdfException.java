@@ -8,7 +8,7 @@
  * You may contact the copyright holder at: soporte.afirma5@mpt.es
  */
 
-package es.gob.afirma.signers.pades;
+package es.gob.afirma.signers.padestri.server;
 
 import es.gob.afirma.core.AOFormatFileException;
 
