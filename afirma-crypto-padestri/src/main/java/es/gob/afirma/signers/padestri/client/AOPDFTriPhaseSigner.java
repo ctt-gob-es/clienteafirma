@@ -85,6 +85,9 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
     private static final String PDF_FILE_HEADER = "%PDF-"; //$NON-NLS-1$
     private static final String PDF_FILE_SUFFIX = ".pdf"; //$NON-NLS-1$
 
+    /** Indicador de finalizaci&oacute;n correcta de proceso. */
+    private static final String SUCCESS = "OK"; //$NON-NLS-1$
+
 	/** Crea un firmador PAdES en tres fases.
 	 * @param urlManager Gestor de comunicaciones con el servidor de firma  */
 	public AOPDFTriPhaseSigner(final UrlHttpManager urlManager) {
@@ -96,6 +99,7 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 		this.urlMgr = new UrlHttpManagerImpl();
 	}
 
+	@Override
 	public byte[] sign(final byte[] data,
 			           final String algorithm,
 			           final PrivateKeyEntry keyEntry,
@@ -120,7 +124,7 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 			signServerUrl = new URL(extraParams.getProperty(PROPERTY_NAME_SIGN_SERVER_URL));
 		}
 		catch (final MalformedURLException e) {
-			throw new IllegalArgumentException("No se ha proporcionado la URL del servidor de firma"); //$NON-NLS-1$
+			throw new IllegalArgumentException("No se ha proporcionado la URL del servidor de firma: " + e, e); //$NON-NLS-1$
 		}
 
 		if (extraParams.keySet().size() > 1) {
@@ -217,7 +221,7 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 			throw new AOException("Error en la llamada de postfirma al servidor: " + e, e); //$NON-NLS-1$
 		}
 
-		if (!"OK".equals(new String(triSignFinalResult).trim())) { //$NON-NLS-1$
+		if (!SUCCESS.equals(new String(triSignFinalResult).trim())) {
 			throw new AOException("La firma trifasica no ha finalizado correctamente: " + new String(triSignFinalResult)); //$NON-NLS-1$
 		}
 
@@ -237,6 +241,7 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 		return p;
 	}
 
+	@Override
 	public byte[] cosign(final byte[] data,
 			             final byte[] sign,
 			             final String algorithm,
@@ -245,6 +250,7 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 		return sign(null, null, keyEntry, extraParams);
 	}
 
+	@Override
 	public byte[] cosign(final byte[] sign,
 			             final String algorithm,
 			             final PrivateKeyEntry keyEntry,
@@ -252,6 +258,7 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 		return sign(null, null, keyEntry, extraParams);
 	}
 
+	@Override
 	public byte[] countersign(final byte[] sign,
 			                  final String algorithm,
 			                  final CounterSignTarget targetType,
@@ -261,6 +268,7 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 		throw new UnsupportedOperationException("No se soportan contrafirmas en PAdES"); //$NON-NLS-1$
 	}
 
+	@Override
 	public AOTreeModel getSignersStructure(final byte[] sign,
 										   final boolean asSimpleSignInfo) {
     	isPdfFile(sign);
@@ -318,6 +326,7 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
         return new AOTreeModel(root, root.getChildCount());
 	}
 
+	@Override
 	public boolean isSign(final byte[] data) {
         if (data == null) {
             LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
@@ -329,6 +338,7 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
         return getSignersStructure(data, false).getCount().intValue() > 0;
 	}
 
+	@Override
 	public boolean isValidDataFile(final byte[] data) {
         if (data == null) {
             LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
@@ -337,6 +347,7 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
         return isPdfFile(data);
 	}
 
+	@Override
 	public String getSignedName(final String originalName, final String inText) {
         final String inTextInt = (inText != null ? inText : ""); //$NON-NLS-1$
         if (originalName == null) {
@@ -348,6 +359,7 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
         return originalName + inTextInt + PDF_FILE_SUFFIX;
 	}
 
+	@Override
 	public byte[] getData(final byte[] sign) throws AOException {
         // Si no es una firma PDF valida, lanzamos una excepcion
         if (!isSign(sign)) {
@@ -357,6 +369,7 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
         return sign;
 	}
 
+	@Override
 	public AOSignInfo getSignInfo(final byte[] data) throws AOException {
         if (data == null) {
             throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$
