@@ -16,20 +16,25 @@ import es.gob.afirma.signers.padestri.server.SignEnhancer;
  * <li>signType: Tipo de firma: "A": Archivo longevo, "T": Con sello de tiempo,...</li>
  * </ul>
  */
-public class PDFEnhancer implements SignEnhancer{
+public class PDFEnhancer implements SignEnhancer {
 
-	private static final String APPLICATION_NAME_OPTION = "appName"; //$NON-NLS-1$
+	/**
+	 * Valor clave para la configuraci&oacute;n del nombre de aplicaci&oacute;n que accede
+	 * a la plataforma @firma.
+	 */
+	public static final String APPLICATION_NAME_OPTION = "appName"; //$NON-NLS-1$
 
-	private static final String SIGN_TYPE_OPTION = "signType"; //$NON-NLS-1$
+	/**
+	 * Valor clave para la configuraci&oacute;n del tipo de firma extendida que se desea generar.
+	 */
+	public static final String SIGN_TYPE_OPTION = "signType"; //$NON-NLS-1$
 
 	public byte[] enhance(final byte[] signature, final Properties options) throws IOException {
 
-        //TODO: Sustituir por cliente de plataforma "limpio"
 		return TestClient.upgradeSign(
 				signature,
 				options.getProperty(APPLICATION_NAME_OPTION),
 				options.getProperty(SIGN_TYPE_OPTION));
-        //return TestClient.upgradeSign(signature, "dipucr.sigem", "A"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 
