@@ -1,4 +1,4 @@
-package es.gob.afirma.signer.pades;
+package es.gob.afirma.signers.pades;
 
 import java.io.IOException;
 import java.util.Properties;
