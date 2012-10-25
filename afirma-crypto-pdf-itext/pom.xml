@@ -8,7 +8,7 @@
   <parent>
     <artifactId>afirma-client</artifactId>
     <groupId>es.gob.afirma</groupId>
-    <version>3.3.1</version>
+    <version>3.3.2-SNAPSHOT</version>
   </parent>
 
   <dependencies>

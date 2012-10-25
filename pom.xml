@@ -3,7 +3,7 @@
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>es.gob.afirma</groupId>
-  <version>3.3.1</version>
+  <version>3.3.2-SNAPSHOT</version>
   <artifactId>afirma-client</artifactId>
   <packaging>pom</packaging>
   <name>afirma-client</name>
@@ -57,8 +57,8 @@
   </modules>
 
   <scm>
-    <connection>scm:svn:http://svn-ctt.administracionelectronica.gob.es/svn/clienteafirma/projects/afirma/tags/afirma-client_3.3.1</connection>
-    <url>http://svn-ctt.administracionelectronica.gob.es/svn/clienteafirma/projects/afirma/tags/afirma-client_3.3.1</url>
+    <connection>scm:svn:http://svn-ctt.administracionelectronica.gob.es/svn/clienteafirma/projects/afirma/trunk</connection>
+    <url>http://svn-ctt.administracionelectronica.gob.es/svn/clienteafirma/projects/afirma/trunk</url>
   </scm>
 
   <distributionManagement>
