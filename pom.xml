@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>es.gob.afirma</groupId>
-  <version>3.3.1-SNAPSHOT</version>
+  <version>3.3.1</version>
   <artifactId>afirma-client</artifactId>
   <packaging>pom</packaging>
   <name>afirma-client</name>
@@ -59,8 +57,8 @@
   </modules>
 
   <scm>
-    <connection>scm:svn:http://svn-ctt.administracionelectronica.gob.es/svn/clienteafirma/projects/afirma/trunk</connection>
-    <url>http://svn-ctt.administracionelectronica.gob.es/svn/clienteafirma/projects/afirma/trunk</url>
+    <connection>scm:svn:http://svn-ctt.administracionelectronica.gob.es/svn/clienteafirma/projects/afirma/tags/afirma-client_3.3.1</connection>
+    <url>http://svn-ctt.administracionelectronica.gob.es/svn/clienteafirma/projects/afirma/tags/afirma-client_3.3.1</url>
   </scm>
 
   <distributionManagement>
