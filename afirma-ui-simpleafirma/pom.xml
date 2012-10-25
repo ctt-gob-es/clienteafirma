@@ -1,133 +1,119 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>es.gob.afirma</groupId>
-	<artifactId>afirma-ui-simpleafirma</artifactId>
-	<name>afirma-ui-simpleafirma</name>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>es.gob.afirma</groupId>
+  <artifactId>afirma-ui-simpleafirma</artifactId>
+  <name>afirma-ui-simpleafirma</name>
 
-	<parent>
-		<groupId>es.gob.afirma</groupId>
-		<artifactId>afirma-client</artifactId>
-		<version>3.2.0</version>
-	</parent>
+  <parent>
+    <groupId>es.gob.afirma</groupId>
+    <artifactId>afirma-client</artifactId>
+    <version>3.3.1-SNAPSHOT</version>
+  </parent>
 
-	<dependencies>
+  <dependencies>
+    <dependency>
+      <groupId>es.gob.afirma</groupId>
+      <artifactId>afirma-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
-		<dependency>
-			<groupId>es.gob.afirma</groupId>
-			<artifactId>afirma-core</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+    <dependency>
+      <groupId>es.gob.afirma</groupId>
+      <artifactId>afirma-ui-core-jse</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
-		<dependency>
-			<groupId>es.gob.afirma</groupId>
-			<artifactId>afirma-ui-core-jse</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+    <dependency>
+      <groupId>es.gob.afirma</groupId>
+      <artifactId>afirma-core-keystores</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
-		<dependency>
-			<groupId>es.gob.afirma</groupId>
-			<artifactId>afirma-core-keystores</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+    <dependency>
+      <groupId>es.gob.afirma</groupId>
+      <artifactId>afirma-keystores-mozilla</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
-		<dependency>
-			<groupId>es.gob.afirma</groupId>
-			<artifactId>afirma-keystores-mozilla</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+    <dependency>
+      <groupId>es.gob.afirma</groupId>
+      <artifactId>afirma-crypto-core-pkcs7</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
-		<dependency>
-			<groupId>es.gob.afirma</groupId>
-			<artifactId>afirma-crypto-core-pkcs7</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+    <dependency>
+      <groupId>es.gob.afirma</groupId>
+      <artifactId>afirma-crypto-cms</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
-		<dependency>
-			<groupId>es.gob.afirma</groupId>
-			<artifactId>afirma-crypto-cms</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+    <dependency>
+      <groupId>es.gob.afirma</groupId>
+      <artifactId>afirma-crypto-cades</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
-		<dependency>
-			<groupId>es.gob.afirma</groupId>
-			<artifactId>afirma-crypto-cades</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+    <dependency>
+      <groupId>es.gob.afirma</groupId>
+      <artifactId>afirma-crypto-cades-multi</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
-		<dependency>
-			<groupId>es.gob.afirma</groupId>
-			<artifactId>afirma-crypto-cades-multi</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+    <dependency>
+      <groupId>es.gob.afirma</groupId>
+      <artifactId>afirma-crypto-pdf</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
-		<dependency>
-			<groupId>es.gob.afirma</groupId>
-			<artifactId>afirma-crypto-pdf</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+    <dependency>
+      <groupId>es.gob.afirma</groupId>
+      <artifactId>afirma-crypto-core-xml</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
-		<dependency>
-			<groupId>es.gob.afirma</groupId>
-			<artifactId>afirma-crypto-core-xml</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+    <dependency>
+      <groupId>es.gob.afirma</groupId>
+      <artifactId>afirma-crypto-xades</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
-		<dependency>
-			<groupId>es.gob.afirma</groupId>
-			<artifactId>afirma-crypto-xades</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+    <dependency>
+      <groupId>es.gob.afirma</groupId>
+      <artifactId>afirma-util</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
-		<dependency>
-			<groupId>es.gob.afirma</groupId>
-			<artifactId>afirma-util</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov-ext-jdk15on</artifactId>
+      <version>1.47</version>
+    </dependency>
 
-		<dependency>
-			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcprov-ext-jdk15on</artifactId>
-			<version>1.47</version>
-		</dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcpkix-jdk15on</artifactId>
+      <version>1.47</version>
+    </dependency>
 
-		<dependency>
-			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcpkix-jdk15on</artifactId>
-			<version>1.47</version>
-		</dependency>
+    <dependency>
+      <groupId>com.apple</groupId>
+      <artifactId>applejavaextensions</artifactId>
+      <version>1.5.4</version>
+    </dependency>
 
+    <dependency>
+      <groupId>batik</groupId>
+      <artifactId>batik-swing</artifactId>
+      <version>1.6-1</version>
+    </dependency>
 
-		<dependency>
-			<groupId>com.apple</groupId>
-			<artifactId>applejavaextensions</artifactId>
-			<version>1.5.4</version>
-		</dependency>
-
-		<dependency>
-			<groupId>batik</groupId>
-			<artifactId>batik-swing</artifactId>
-			<version>1.6-1</version>
-		</dependency>
-
-		<dependency>
-			<groupId>javax.help</groupId>
-			<artifactId>javahelp</artifactId>
-			<version>2.0.05</version>
-		</dependency>
-	</dependencies>
-
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+    <dependency>
+      <groupId>javax.help</groupId>
+      <artifactId>javahelp</artifactId>
+      <version>2.0.05</version>
+    </dependency>
+  </dependencies>
 </project>

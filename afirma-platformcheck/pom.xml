@@ -1,126 +1,79 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>es.gob.afirma</groupId>
-	<artifactId>afirma-platformcheck</artifactId>
-	<name>afirma-platformcheck</name>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>es.gob.afirma</groupId>
+  <artifactId>afirma-platformcheck</artifactId>
+  <name>afirma-platformcheck</name>
 
-	<parent>
-		<groupId>es.gob.afirma</groupId>
-		<artifactId>afirma-client</artifactId>
-		<version>3.2.0</version>
-	</parent>
+  <parent>
+    <groupId>es.gob.afirma</groupId>
+    <artifactId>afirma-client</artifactId>
+    <version>3.3.1-SNAPSHOT</version>
+  </parent>
 
-	<dependencies>
-		<dependency>
-			<groupId>plugin</groupId>
-			<artifactId>plugin</artifactId>
-			<version>1.6</version>
-		</dependency>
-	</dependencies>
+  <dependencies>
+    <dependency>
+      <groupId>plugin</groupId>
+      <artifactId>plugin</artifactId>
+      <version>1.6</version>
+    </dependency>
+  </dependencies>
 
-	<profiles>
-		<profile>
-			<id>default</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<properties>
-				<afirma.keytool.keystore>src/main/resources/afirma.keystore</afirma.keytool.keystore>
-				<afirma.keytool.alias>codesign</afirma.keytool.alias>
-				<afirma.keytool.password>afirma</afirma.keytool.password>
-			</properties>
-		</profile>
-	</profiles>
-	
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-				</configuration>
-			</plugin>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>javadoc</goal>
+            </goals>
+            <phase>package</phase>
+          </execution>
+        </executions>
+        <configuration>
+          <encoding>iso-8859-1</encoding>
+          <verbose>false</verbose>
+          <show>public</show>
+          <subpackages>es.gob.afirma</subpackages>
+        </configuration>
+      </plugin>
 
-			<!-- JAR signature -->
-
-			<plugin>
-				<artifactId>maven-jar-plugin</artifactId>
-				<executions>
-					<execution>
-						<goals>
-							<goal>sign</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<keystore>${afirma.keytool.keystore}</keystore>
-					<alias>${afirma.keytool.alias}</alias>
-					<storepass>${afirma.keytool.password}</storepass>
-					<signedjar>target/${project.build.finalName}-signed.jar</signedjar>
-					<verify>true</verify>
-				</configuration>
-			</plugin>
-
-			<!-- JavaDoc -->
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-
-				<executions>
-					<execution>
-						<goals>
-							<goal>javadoc</goal>
-						</goals>
-						<phase>package</phase>
-					</execution>
-				</executions>
-
-				<configuration>
-					<encoding>iso-8859-1</encoding>
-					<verbose>false</verbose>
-					<show>public</show>
-					<subpackages>es.gob.afirma</subpackages>
-				</configuration>
-			</plugin>
-
-			<!-- Proguard -->
-			<plugin>
-				<groupId>com.github.wvengen</groupId>
-				<artifactId>proguard-maven-plugin</artifactId>
-				<version>2.0.5</version>
-				<executions>
-					<execution>
-						<phase>process-classes</phase>
-						<goals>
-							<goal>proguard</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<proguardVersion>4.7</proguardVersion>
-					<proguardInclude>src/main/resources/proguard.conf</proguardInclude>
-					<injar>classes</injar>
-					<libs>
-						<lib>${java.home}/lib/rt.jar</lib>
-						<lib>${java.home}/lib/jsse.jar</lib>
-						<lib>${java.home}/lib/ext/sunpkcs11.jar</lib>
-					</libs>
-					<addMavenDescriptor>false</addMavenDescriptor>
-				</configuration>
-				<dependencies>
-					<dependency>
-						<groupId>net.sf.proguard</groupId>
-						<artifactId>proguard-base</artifactId>
-						<version>4.7</version>
-						<scope>runtime</scope>
-					</dependency>
-				</dependencies>
-			</plugin>
-		</plugins>
-	</build>
+      <plugin>
+        <groupId>com.github.wvengen</groupId>
+        <artifactId>proguard-maven-plugin</artifactId>
+        <version>2.0.5</version>
+        <executions>
+          <execution>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>proguard</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <proguardVersion>4.7</proguardVersion>
+          <proguardInclude>src/main/resources/proguard.conf</proguardInclude>
+          <injar>classes</injar>
+          <libs>
+            <lib>${java.home}/lib/rt.jar</lib>
+            <lib>${java.home}/lib/jsse.jar</lib>
+            <lib>${java.home}/lib/ext/sunpkcs11.jar</lib>
+          </libs>
+          <addMavenDescriptor>false</addMavenDescriptor>
+        </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>net.sf.proguard</groupId>
+            <artifactId>proguard-base</artifactId>
+            <version>4.7</version>
+            <scope>runtime</scope>
+          </dependency>
+        </dependencies>
+      </plugin>
+    </plugins>
+  </build>
 </project>

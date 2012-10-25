@@ -1,90 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>es.gob.afirma</groupId>
-	<artifactId>afirma-crypto-core-pkcs7</artifactId>
-	<name>afirma-crypto-core-pkcs7</name>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>es.gob.afirma</groupId>
+  <artifactId>afirma-crypto-core-pkcs7</artifactId>
+  <name>afirma-crypto-core-pkcs7</name>
 
-	<parent>
-		<groupId>es.gob.afirma</groupId>
-		<artifactId>afirma-client</artifactId>
-		<version>3.2.0</version>
-	</parent>
+  <parent>
+    <groupId>es.gob.afirma</groupId>
+    <artifactId>afirma-client</artifactId>
+    <version>3.3.1-SNAPSHOT</version>
+  </parent>
 
-	<dependencies>
-		<dependency>
-			<groupId>es.gob.afirma</groupId>
-			<artifactId>afirma-core</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+  <dependencies>
+    <dependency>
+      <groupId>es.gob.afirma</groupId>
+      <artifactId>afirma-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
-		<dependency>
-			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcprov-ext-jdk15on</artifactId>
-			<version>1.47</version>
-		</dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov-ext-jdk15on</artifactId>
+      <version>1.47</version>
+    </dependency>
 
-		<dependency>
-			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcpkix-jdk15on</artifactId>
-			<version>1.47</version>
-		</dependency>
-
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.8.2</version>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
-
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-				</configuration>
-			</plugin>
-
-			<!-- Proguard -->
-			<!--
-			<plugin>
-				<groupId>com.github.wvengen</groupId>
-				<artifactId>proguard-maven-plugin</artifactId>
-				<version>2.0.5</version>
-				<executions>
-					<execution>
-						<phase>process-classes</phase>
-						<goals>
-							<goal>proguard</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<proguardVersion>4.7</proguardVersion>
-					<proguardInclude>src/main/resources/proguard.conf</proguardInclude>
-					<injar>classes</injar>
-					<libs>
-						<lib>${java.home}/lib/rt.jar</lib>
-						<lib>${java.home}/lib/jsse.jar</lib>
-						<lib>${java.home}/lib/ext/sunpkcs11.jar</lib>
-					</libs>
-					<addMavenDescriptor>false</addMavenDescriptor>
-				</configuration>
-				<dependencies>
-					<dependency>
-						<groupId>net.sf.proguard</groupId>
-						<artifactId>proguard-base</artifactId>
-						<version>4.7</version>
-						<scope>runtime</scope>
-					</dependency>
-				</dependencies>
-			</plugin>
-			-->
-		</plugins>
-	</build>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcpkix-jdk15on</artifactId>
+      <version>1.47</version>
+    </dependency>
+  </dependencies>
 </project>

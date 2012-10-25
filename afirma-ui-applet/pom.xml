@@ -10,7 +10,7 @@
   <parent>
     <groupId>es.gob.afirma</groupId>
     <artifactId>afirma-client</artifactId>
-    <version>3.2.0</version>
+    <version>3.3.1-SNAPSHOT</version>
   </parent>
 
   <dependencies>
@@ -44,13 +44,13 @@
       <version>${project.version}</version>
     </dependency>
 
-	<dependency>
+    <dependency>
       <groupId>es.gob.afirma</groupId>
       <artifactId>afirma-crypto-cades-multi</artifactId>
       <version>${project.version}</version>
     </dependency>
-	
-	<dependency>
+
+    <dependency>
       <groupId>es.gob.afirma</groupId>
       <artifactId>afirma-crypto-cipher</artifactId>
       <version>${project.version}</version>
@@ -62,132 +62,106 @@
       <version>${project.version}</version>
     </dependency>
 
-	
     <dependency>
       <groupId>es.gob.afirma</groupId>
       <artifactId>afirma-crypto-cms-enveloper</artifactId>
       <version>${project.version}</version>
     </dependency>
 
-	<dependency>
+    <dependency>
       <groupId>es.gob.afirma</groupId>
       <artifactId>afirma-crypto-core-pkcs7</artifactId>
       <version>${project.version}</version>
     </dependency>
-    
-	<dependency>
+
+    <dependency>
       <groupId>es.gob.afirma</groupId>
       <artifactId>afirma-crypto-core-pkcs7-tsp</artifactId>
       <version>${project.version}</version>
-    </dependency>	
-    
+    </dependency>
+
     <dependency>
       <groupId>es.gob.afirma</groupId>
       <artifactId>afirma-crypto-core-xml</artifactId>
       <version>${project.version}</version>
-    </dependency>	
-	
-	<dependency>
+    </dependency>
+
+    <dependency>
       <groupId>es.gob.afirma</groupId>
       <artifactId>afirma-crypto-odf</artifactId>
       <version>${project.version}</version>
     </dependency>
-	
-	<dependency>
+
+    <dependency>
       <groupId>es.gob.afirma</groupId>
-     <artifactId>afirma-crypto-ooxml</artifactId>
+      <artifactId>afirma-crypto-ooxml</artifactId>
       <version>${project.version}</version>
     </dependency>
-	
+
     <dependency>
       <groupId>es.gob.afirma</groupId>
       <artifactId>afirma-crypto-pdf</artifactId>
       <version>${project.version}</version>
     </dependency>
-	
-	<dependency>
+
+    <dependency>
       <groupId>es.gob.afirma</groupId>
       <artifactId>afirma-crypto-xades</artifactId>
       <version>${project.version}</version>
     </dependency>
-	
-	<dependency>
+
+    <dependency>
       <groupId>es.gob.afirma</groupId>
       <artifactId>afirma-crypto-xmlsignature</artifactId>
       <version>${project.version}</version>
     </dependency>
-	
-	<dependency>
+
+    <dependency>
       <groupId>es.gob.afirma</groupId>
       <artifactId>afirma-keystores-capiaddressbook</artifactId>
       <version>${project.version}</version>
     </dependency>
-	
-	<dependency>
+
+    <dependency>
       <groupId>es.gob.afirma</groupId>
       <artifactId>afirma-keystores-filters-old</artifactId>
       <version>${project.version}</version>
     </dependency>
-	
+
     <dependency>
       <groupId>es.gob.afirma</groupId>
       <artifactId>afirma-keystores-filters-rfc</artifactId>
       <version>${project.version}</version>
     </dependency>
-	
-	<dependency>
+
+    <dependency>
       <groupId>es.gob.afirma</groupId>
       <artifactId>afirma-keystores-mozilla</artifactId>
       <version>${project.version}</version>
     </dependency>
-	
-	<dependency>
+
+    <dependency>
       <groupId>es.gob.afirma</groupId>
       <artifactId>afirma-keystores-single</artifactId>
       <version>${project.version}</version>
     </dependency>
-	
-	<dependency>
-      <groupId>es.gob.afirma</groupId>
-      <artifactId>afirma-keystores-single</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-	
-	<dependency>
+
+    <dependency>
       <groupId>es.gob.afirma</groupId>
       <artifactId>afirma-ui-core-jse</artifactId>
       <version>${project.version}</version>
     </dependency>
-	
+
     <dependency>
       <groupId>es.gob.afirma</groupId>
       <artifactId>afirma-util</artifactId>
       <version>${project.version}</version>
     </dependency>
 
-	<dependency>
+    <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcprov-ext-jdk15on</artifactId>
       <version>1.47</version>
     </dependency>
-    
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.8.2</version>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>
