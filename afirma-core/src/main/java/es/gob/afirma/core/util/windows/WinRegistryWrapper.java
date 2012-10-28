@@ -162,11 +162,9 @@ public final class WinRegistryWrapper {
         return false;
     }
 
-    /**
-     * Agrega una URL al PATH de bibliotecas de Java.
+    /** Agrega una URL al PATH de bibliotecas de Java.
      * @param u URL que se desea agregar al PATH.
-     * @throws IOException Cuando ocurre un error al agregar la ruta.
-     */
+     * @throws IOException Cuando ocurre un error al agregar la ruta. */
 	private static void addURL(final URL u) throws IOException {
 		final URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
 		final Class<?> sysclass = URLClassLoader.class;
@@ -177,8 +175,11 @@ public final class WinRegistryWrapper {
 		}
 		catch (final Exception e) {
 			throw new IOException(
-				"No se ha podido anadir la URL al classloader( " + u + "): " + e //$NON-NLS-1$ //$NON-NLS-2$
+				"No se ha podido anadir la URL al classloader( " + u + "): " + e, e //$NON-NLS-1$ //$NON-NLS-2$
 			);
+		}
+		finally {
+			sysloader.close();
 		}
 	}
 }

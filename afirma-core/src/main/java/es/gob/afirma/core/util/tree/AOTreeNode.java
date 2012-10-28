@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -21,11 +21,13 @@ public final class AOTreeNode {
     /** An enumeration that is always empty. This is used when an enumeration of
      * a leaf node's children is requested. */
     private static final Enumeration<AOTreeNode> EMPTY_ENUMERATION = new Enumeration<AOTreeNode>() {
-        public boolean hasMoreElements() {
+        @Override
+		public boolean hasMoreElements() {
             return false;
         }
 
-        public AOTreeNode nextElement() {
+        @Override
+		public AOTreeNode nextElement() {
             throw new NoSuchElementException("No hay mas elementos"); //$NON-NLS-1$
         }
     };
@@ -317,7 +319,7 @@ public final class AOTreeNode {
                 retval = false;
             }
             else {
-                retval = (aNode.getParent() == this);
+                retval = aNode.getParent() == this;
             }
         }
 
@@ -335,7 +337,7 @@ public final class AOTreeNode {
      * @see #getAllowsChildren
      * @return true if this node has no children */
     public boolean isLeaf() {
-        return (getChildCount() == 0);
+        return getChildCount() == 0;
     }
 
     //
@@ -365,12 +367,14 @@ public final class AOTreeNode {
         }
 
         /** {@inheritDoc} */
-        public boolean hasMoreElements() {
-            return (!this.stack.empty() && (this.stack.peek()).hasMoreElements());
+        @Override
+		public boolean hasMoreElements() {
+            return !this.stack.empty() && this.stack.peek().hasMoreElements();
         }
 
         /** {@inheritDoc} */
-        public AOTreeNode nextElement() {
+        @Override
+		public AOTreeNode nextElement() {
             final Enumeration<AOTreeNode> enumer = this.stack.peek();
             final AOTreeNode node = enumer.nextElement();
             final Enumeration<AOTreeNode> child = node.children();

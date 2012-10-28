@@ -10,6 +10,7 @@
 
 package es.gob.afirma.core.signers;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -76,8 +77,9 @@ public final class AOSignerFactory {
     /** Recupera un manejador de firma capaz de tratar la firma indicada. En caso
      * de no tener ning&uacute;n manejador compatible se devolver&aacute; <code>null</code>.
      * @param signData Firma electr&oacute;nica
-     * @return Manejador de firma */
-    public static AOSigner getSigner(final byte[] signData) {
+     * @return Manejador de firma
+     * @throws IOException Si ocurren problemas relacionados con la lectura de la firma */
+    public static AOSigner getSigner(final byte[] signData) throws IOException {
         if (signData == null) {
             throw new IllegalArgumentException("No se han indicado datos de firma"); //$NON-NLS-1$
         }

@@ -10,6 +10,7 @@
 
 package es.gob.afirma.signers.cades;
 
+import java.io.IOException;
 import java.util.Enumeration;
 import java.util.logging.Logger;
 
@@ -48,20 +49,32 @@ public final class CAdESValidator {
      * @return <code>true</code> si los datos proporcionados se corresponden con una estructura de tipo <i>Data</i>,
      * <code>false</code> en caso contrario. */
     @SuppressWarnings("unused")
-	static boolean isCAdESData(final byte[] data) {
-        try {
-            // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-            final Enumeration<?> e = ((ASN1Sequence) new ASN1InputStream(data).readObject()).getObjects();
-            // Elementos que contienen los elementos OID Data
-            final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
-            if (!doi.equals(PKCSObjectIdentifiers.data)) {
-                return false;
-            }
-            // Contenido de Data
-            final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+	static boolean isCAdESData(final byte[] data) throws IOException {
 
-            /*
-             * Los valores de retorno no se usan, solo es para verificar que la
+        // LEEMOS EL FICHERO QUE NOS INTRODUCEN
+    	final ASN1InputStream is = new ASN1InputStream(data);
+    	final Enumeration<?> e;
+    	try {
+    		e = ((ASN1Sequence) is.readObject()).getObjects();
+    	}
+    	catch(final ClassCastException ex) {
+        	// No es una secuencia
+        	return false;
+        }
+        finally {
+        	is.close();
+        }
+
+        // Elementos que contienen los elementos OID Data
+        final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+        if (!doi.equals(PKCSObjectIdentifiers.data)) {
+            return false;
+        }
+        // Contenido de Data
+        final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+
+        try {
+            /* Los valores de retorno no se usan, solo es para verificar que la
              * conversion ha sido correcta. De no ser asi, se pasaria al manejo
              * de la excepcion.
              */
@@ -69,6 +82,7 @@ public final class CAdESValidator {
 
         }
         catch (final Exception ex) {
+        	LOGGER.info("Lo datos proporcionados no son de tipo CAdESData: " + ex); //$NON-NLS-1$
             return false;
         }
 
@@ -78,36 +92,42 @@ public final class CAdESValidator {
     /** Verifica si los datos proporcionados se corresponden con una estructura de tipo <i>SignedData</i>.
      * @param data Datos PKCS#7/CMS/CAdES.
      * @return <code>true</code> si los datos proporcionados se corresponden con una estructura de tipo <i>SignedData</i>,
-     * <code>false</code> en caso contrario. */
-    public static boolean isCAdESSignedData(final byte[] data) {
+     * <code>false</code> en caso contrario.
+     * @throws IOException Si ocurren problemas leyendo los datos */
+    public static boolean isCAdESSignedData(final byte[] data) throws IOException {
         boolean isValid = false;
-        try {
-            final ASN1InputStream is = new ASN1InputStream(data);
-            // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-            final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
-            final Enumeration<?> e = dsq.getObjects();
-            // Elementos que contienen los elementos OID Data
-            final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
-            if (doi.equals(PKCSObjectIdentifiers.signedData)) {
-                isValid = true;
-            }
-            // Contenido de SignedData
-            final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-            final ASN1Sequence datos = (ASN1Sequence) doj.getObject();
-            final SignedData sd = SignedData.getInstance(datos);
 
-            final ASN1Set signerInfosSd = sd.getSignerInfos();
-
-            for (int i = 0; i < signerInfosSd.size(); i++) {
-                final SignerInfo si = new SignerInfo((ASN1Sequence) signerInfosSd.getObjectAt(i));
-                isValid = verifySignerInfo(si);
-            }
-
+        // LEEMOS EL FICHERO QUE NOS INTRODUCEN
+    	final ASN1InputStream is = new ASN1InputStream(data);
+    	final ASN1Sequence dsq;
+    	try {
+    		dsq = (ASN1Sequence) is.readObject();
+    	}
+    	catch(final ClassCastException e) {
+    		// No es una secuencia
+    		return false;
+    	}
+    	finally {
+    		is.close();
+    	}
+        final Enumeration<?> e = dsq.getObjects();
+        // Elementos que contienen los elementos OID Data
+        final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+        if (doi.equals(PKCSObjectIdentifiers.signedData)) {
+            isValid = true;
         }
-        catch (final Exception ex) {
-        	LOGGER.info("Los datos proporcionados no son un SignedData de CAdES: " + ex); //$NON-NLS-1$
-            return false;
+        // Contenido de SignedData
+        final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+        final ASN1Sequence datos = (ASN1Sequence) doj.getObject();
+        final SignedData sd = SignedData.getInstance(datos);
+
+        final ASN1Set signerInfosSd = sd.getSignerInfos();
+
+        for (int i = 0; i < signerInfosSd.size(); i++) {
+            final SignerInfo si = new SignerInfo((ASN1Sequence) signerInfosSd.getObjectAt(i));
+            isValid = verifySignerInfo(si);
         }
+
         return isValid;
     }
 
@@ -139,32 +159,43 @@ public final class CAdESValidator {
     /** Verifica si los datos proporcionados se corresponden con una estructura de tipo <i>DigestedData</i>.
      * @param data Datos PKCS#7/CMS/CAdES.
      * @return <code>true</code> si los datos proporcionados se corresponden con una estructura de tipo <i>DigestedData</i>,
-     * <code>false</code> en caso contrario. */
+     * <code>false</code> en caso contrario.
+     * @throws IOException Si ocurren problemas relacionados con la lectura de los datos */
     @SuppressWarnings("unused")
-	static boolean isCAdESDigestedData(final byte[] data) {
+	static boolean isCAdESDigestedData(final byte[] data) throws IOException {
         boolean isValid = false;
-        try {
-            final ASN1InputStream is = new ASN1InputStream(data);
-            // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-            final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
-            final Enumeration<?> e = dsq.getObjects();
-            // Elementos que contienen los elementos OID Data
-            final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
-            if (doi.equals(PKCSObjectIdentifiers.digestedData)) {
-                isValid = true;
-            }
-            // Contenido de Data
-            final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
 
-            /*
-             * Los resultados no se usan, solo es para verificar que la
+        // LEEMOS EL FICHERO QUE NOS INTRODUCEN
+        final ASN1InputStream is = new ASN1InputStream(data);
+        final ASN1Sequence dsq;
+        try {
+        	dsq = (ASN1Sequence) is.readObject();
+        }
+        catch(final ClassCastException e) {
+        	// No es una secuencia
+        	return false;
+        }
+        finally {
+        	is.close();
+        }
+        final Enumeration<?> e = dsq.getObjects();
+        // Elementos que contienen los elementos OID Data
+        final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+        if (doi.equals(PKCSObjectIdentifiers.digestedData)) {
+            isValid = true;
+        }
+        // Contenido de Data
+        final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+
+        try {
+            /* Los resultados no se usan, solo es para verificar que la
              * conversion ha sido correcta. De no ser asi, se pasaria al manejo
-             * de la excepcion.
-             */
+             * de la excepcion. */
             new DigestedData((ASN1Sequence) doj.getObject());
 
         }
         catch (final Exception ex) {
+        	LOGGER.info("Los datos proporcionados no son de tipo CAdESDigestedData: " + ex); //$NON-NLS-1$
             return false;
         }
 
@@ -174,29 +205,41 @@ public final class CAdESValidator {
     /** Verifica si los datos proporcionados se corresponden con una estructura de tipo <i>EncryptedData</i>.
      * @param data Datos PKCS#7/CMS/CAdES.
      * @return <code>true</code> si los datos proporcionados se corresponden con una estructura de tipo <i>EncryptedData</i>,
-     * <code>false</code> en caso contrario. */
-    static boolean isCAdESEncryptedData(final byte[] data) {
+     * <code>false</code> en caso contrario.
+     * @throws IOException Si ocurren problemas relacionados con la lectura de los datos */
+    static boolean isCAdESEncryptedData(final byte[] data) throws IOException {
         boolean isValid = false;
+
+        // LEEMOS EL FICHERO QUE NOS INTRODUCEN
+        final ASN1InputStream is = new ASN1InputStream(data);
+        final ASN1Sequence dsq;
         try {
-            final ASN1InputStream is = new ASN1InputStream(data);
-            // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-            final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
-            final Enumeration<?> e = dsq.getObjects();
-            // Elementos que contienen los elementos OID Data
-            final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
-            if (doi.equals(PKCSObjectIdentifiers.encryptedData)) {
-                isValid = true;
-            }
-            // Contenido de Data
-            final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+        	dsq = (ASN1Sequence) is.readObject();
+        }
+        catch(final ClassCastException e) {
+        	// No es una secuencia
+        	return false;
+        }
+        finally {
+        	is.close();
+        }
+        final Enumeration<?> e = dsq.getObjects();
 
-            final ASN1Sequence asq = (ASN1Sequence) doj.getObject();
+        // Elementos que contienen los elementos OID Data
+        final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+        if (doi.equals(PKCSObjectIdentifiers.encryptedData)) {
+            isValid = true;
+        }
+        // Contenido de Data
+        final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
 
-            /*
-             * Los resultados de las llamadas no se usan, solo es para verificar que la
+        final ASN1Sequence asq = (ASN1Sequence) doj.getObject();
+
+        try {
+
+            /* Los resultados de las llamadas no se usan, solo es para verificar que la
              * conversion ha sido correcta. De no ser asi, se pasaria al manejo
-             * de la excepcion.
-             */
+             * de la excepcion. */
 
             DERInteger.getInstance(asq.getObjectAt(0));
             EncryptedContentInfo.getInstance(asq.getObjectAt(1));
@@ -207,6 +250,7 @@ public final class CAdESValidator {
 
         }
         catch (final Exception ex) {
+        	LOGGER.info("Lo datos proporcionados no son de tipo CAdESEncryptedData: " + ex); //$NON-NLS-1$
             return false;
         }
 
@@ -216,32 +260,42 @@ public final class CAdESValidator {
     /** Verifica si los datos proporcionados se corresponden con una estructura de tipo <i>EnvelopedData</i>.
      * @param data Datos PKCS#7/CMS/CAdES.
      * @return <code>true</code> si los datos proporcionados se corresponden con una estructura de tipo <i>EnvelopedData</i>,
-     * <code>false</code> en caso contrario. */
+     * <code>false</code> en caso contrario.
+     * @throws IOException Si ocurren problemas relacionados con la lectura de los datos */
     @SuppressWarnings("unused")
-	static boolean isCAdESEnvelopedData(final byte[] data) {
+	static boolean isCAdESEnvelopedData(final byte[] data) throws IOException {
         boolean isValid = false;
+
+        // LEEMOS EL FICHERO QUE NOS INTRODUCEN
+        final ASN1InputStream is = new ASN1InputStream(data);
+        final ASN1Sequence dsq;
         try {
-            final ASN1InputStream is = new ASN1InputStream(data);
-            // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-            final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
-            final Enumeration<?> e = dsq.getObjects();
-            // Elementos que contienen los elementos OID Data
-            final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
-            if (doi.equals(PKCSObjectIdentifiers.envelopedData)) {
-                isValid = true;
-            }
-            // Contenido de Data
-            final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+        	dsq = (ASN1Sequence) is.readObject();
+        }
+        catch(final ClassCastException e) {
+        	// No es una secuencia
+        	return false;
+        }
+        finally {
+        	is.close();
+        }
+        final Enumeration<?> e = dsq.getObjects();
+        // Elementos que contienen los elementos OID Data
+        final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+        if (doi.equals(PKCSObjectIdentifiers.envelopedData)) {
+            isValid = true;
+        }
+        // Contenido de Data
+        final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
 
-            /*
-             * los retornos no se usan, solo es para verificar que la conversion
+        try {
+            /* los retornos no se usan, solo es para verificar que la conversion
              * ha sido correcta. De no ser asi, se pasaria al manejo de la
-             * excepcion.
-             */
+             * excepcion. */
             new EnvelopedData((ASN1Sequence) doj.getObject());
-
         }
         catch (final Exception ex) {
+        	LOGGER.info("Lo datos proporcionados no son de tipo CAdESEnvelopedData: " + ex); //$NON-NLS-1$
             return false;
         }
 
@@ -251,35 +305,44 @@ public final class CAdESValidator {
     /** Verifica si los datos proporcionados se corresponden con una estructura de tipo <i>SignedAndEnvelopedData</i>.
      * @param data Datos PKCS#7/CMS/CAdES.
      * @return <code>true</code> si los datos proporcionados se corresponden con una estructura de tipo <i>SignedAndEnvelopedData</i>,
-     * <code>false</code> en caso contrario. */
-    static boolean isCAdESSignedAndEnvelopedData(final byte[] data) {
+     * <code>false</code> en caso contrario.
+     * @throws IOException Si ocurren problemas relacionados con la lectura de los datos */
+    static boolean isCAdESSignedAndEnvelopedData(final byte[] data) throws IOException {
         boolean isValid = false;
+
+        // LEEMOS EL FICHERO QUE NOS INTRODUCEN
+        final ASN1InputStream is = new ASN1InputStream(data);
+        final ASN1Sequence dsq;
         try {
-            final ASN1InputStream is = new ASN1InputStream(data);
-            // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-            final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
-            final Enumeration<?> e = dsq.getObjects();
-            // Elementos que contienen los elementos OID Data
-            final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
-            if (doi.equals(PKCSObjectIdentifiers.signedData)) {
-                isValid = true;
-            }
-            // Contenido de SignedData
-            final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-            final ASN1Sequence datos = (ASN1Sequence) doj.getObject();
-            final SignedAndEnvelopedData sd = new SignedAndEnvelopedData(datos);
-
-            final ASN1Set signerInfosSd = sd.getSignerInfos();
-
-            for (int i = 0; i < signerInfosSd.size(); i++) {
-                final SignerInfo si = new SignerInfo((ASN1Sequence) signerInfosSd.getObjectAt(i));
-                isValid = verifySignerInfo(si);
-            }
-
+        	dsq = (ASN1Sequence) is.readObject();
         }
-        catch (final Exception ex) {
-            return false;
+        catch(final ClassCastException e) {
+        	// No es una secuencia
+        	return false;
         }
+        finally {
+        	is.close();
+        }
+        is.close();
+        final Enumeration<?> e = dsq.getObjects();
+
+        // Elementos que contienen los elementos OID Data
+        final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+        if (doi.equals(PKCSObjectIdentifiers.signedData)) {
+            isValid = true;
+        }
+        // Contenido de SignedData
+        final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+        final ASN1Sequence datos = (ASN1Sequence) doj.getObject();
+        final SignedAndEnvelopedData sd = new SignedAndEnvelopedData(datos);
+
+        final ASN1Set signerInfosSd = sd.getSignerInfos();
+
+        for (int i = 0; i < signerInfosSd.size(); i++) {
+            final SignerInfo si = new SignerInfo((ASN1Sequence) signerInfosSd.getObjectAt(i));
+            isValid = verifySignerInfo(si);
+        }
+
         return isValid;
     }
 
@@ -304,8 +367,9 @@ public final class CAdESValidator {
      *              <li><code>AOSignConstants.CMS_CONTENTTYPE_DIGESTEDDATA</code></li>
      *             </ul>
      * @return <code>true</code> si los datos proporcionados se corresponden con la estructura CAdES
-     *         indicada, <code>false</code> en caso contrario. */
-    public static boolean isCAdESValid(final byte[] signData, final String type) {
+     *         indicada, <code>false</code> en caso contrario.
+     * @throws IOException Si ocurren problemas en la lectura de la firma */
+    public static boolean isCAdESValid(final byte[] signData, final String type) throws IOException {
         if (type.equals(AOSignConstants.CMS_CONTENTTYPE_DATA)) {
 			return CAdESValidator.isCAdESData(signData);
         }
@@ -340,8 +404,9 @@ public final class CAdESValidator {
      * </ul>
      * @param data Datos que se desean comprobar.
      * @return <code>true</code> si los datos proporcionados se corresponden con la estructura CAdES
-     *         indicada, <code>false</code> en caso contrario. */
-    public static boolean isCAdESValid(final byte[] data) {
+     *         indicada, <code>false</code> en caso contrario.
+     * @throws IOException SI ocurren problemas en la lectura de los datos */
+    public static boolean isCAdESValid(final byte[] data) throws IOException {
         // si se lee en el CMSDATA, el inputstream ya esta leido y en los demas
         // siempre sera nulo
         if (data == null) {

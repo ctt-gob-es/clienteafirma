@@ -1228,7 +1228,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 			PreferencesPanel.this.getXadesPolicyIdentifierHash().setText(policy.getPolicyIdentifierHash());
 			PreferencesPanel.this.getXadesPolicyIdentifierHashAlgorithm().setSelectedItem(policy.getPolicyIdentifierHashAlgorithm());
 			PreferencesPanel.this.getXadesPolicyQualifier().setText(
-				(policy.getPolicyQualifier() != null) ? policy.getPolicyQualifier().toString() : "" //$NON-NLS-1$
+				policy.getPolicyQualifier() != null ? policy.getPolicyQualifier().toString() : "" //$NON-NLS-1$
 			);
 		}
 		else {
@@ -1244,7 +1244,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 			PreferencesPanel.this.getPadesPolicyIdentifierHash().setText(policy.getPolicyIdentifierHash());
 			PreferencesPanel.this.getPadesPolicyIdentifierHashAlgorithm().setSelectedItem(policy.getPolicyIdentifierHashAlgorithm());
 			PreferencesPanel.this.getPadesPolicyQualifier().setText(
-				(policy.getPolicyQualifier() != null) ? policy.getPolicyQualifier().toString() : "" //$NON-NLS-1$
+				policy.getPolicyQualifier() != null ? policy.getPolicyQualifier().toString() : "" //$NON-NLS-1$
 			);
 		}
 		else {
@@ -1260,7 +1260,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 			PreferencesPanel.this.getCadesPolicyIdentifierHash().setText(policy.getPolicyIdentifierHash());
 			PreferencesPanel.this.getCadesPolicyIdentifierHashAlgorithm().setSelectedItem(policy.getPolicyIdentifierHashAlgorithm());
 			PreferencesPanel.this.getCadesPolicyQualifier().setText(
-				(policy.getPolicyQualifier() != null) ? policy.getPolicyQualifier().toString() : "" //$NON-NLS-1$
+				policy.getPolicyQualifier() != null ? policy.getPolicyQualifier().toString() : "" //$NON-NLS-1$
 			);
 		}
 		else {
@@ -1305,7 +1305,7 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 	@Override
 	public void keyReleased(final KeyEvent ke) {
 		// En Mac no cerramos los dialogos con Escape
-		if (ke != null && ke.getKeyCode() == KeyEvent.VK_ESCAPE && (!Platform.OS.MACOSX.equals(Platform.getOS()))) {
+		if (ke != null && ke.getKeyCode() == KeyEvent.VK_ESCAPE && !Platform.OS.MACOSX.equals(Platform.getOS())) {
 			PreferencesPanel.this.getParentWindow().dispose();
 		}
 	}

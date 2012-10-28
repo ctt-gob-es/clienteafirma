@@ -12,6 +12,7 @@ package es.gob.afirma.test.cms;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
@@ -240,8 +241,9 @@ public final class TestCMS {
         return signer.cosign(data, sign, algorithm, pke, params);
     }
 
-    /** Hace las comprobaciones b&aacute;sicas de una firma. */
-    private static void checkSign(final AOSigner signer, final byte[] sign, final PrivateKeyEntry[] pke, final String[] signsAlias, final String prueba) throws AOException {
+    /** Hace las comprobaciones b&aacute;sicas de una firma.
+     * @throws IOException */
+    private static void checkSign(final AOSigner signer, final byte[] sign, final PrivateKeyEntry[] pke, final String[] signsAlias, final String prueba) throws AOException, IOException {
         Assert.assertNotNull(prueba, sign);
         Assert.assertTrue(signer.isSign(sign));
 

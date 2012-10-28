@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -21,7 +21,7 @@ import java.util.List;
  * Inspirada en la clase com.sun.deploy.net.proxy.NSPreferences de Sun
  * Microsystems. */
 final class NSPreferences {
-    
+
     private NSPreferences() {
         // No permitimos la instanciacion
     }
@@ -95,58 +95,47 @@ final class NSPreferences {
         String line = null;
         final List<FirefoxProfile> profiles = new ArrayList<FirefoxProfile>();
         final BufferedReader in = new BufferedReader(new FileReader(iniFile));
-        try {
-            while ((line = in.readLine()) != null) {
 
-                // Buscamos un nuevo bloque de perfil
-                if (!line.trim().toLowerCase().startsWith("[profile")) { //$NON-NLS-1$
-                    continue;
+        while ((line = in.readLine()) != null) {
+
+            // Buscamos un nuevo bloque de perfil
+            if (!line.trim().toLowerCase().startsWith("[profile")) { //$NON-NLS-1$
+                continue;
+            }
+
+            final FirefoxProfile profile = new FirefoxProfile();
+            while ((line = in.readLine()) != null && line.trim().length() > 0 && !line.trim().toLowerCase().startsWith("[profile")) { //$NON-NLS-1$
+                if (line.trim().toLowerCase().startsWith(nameAtr)) {
+                    profile.setName(line.trim().substring(nameAtr.length()));
                 }
-
-                final FirefoxProfile profile = new FirefoxProfile();
-                while ((line = in.readLine()) != null && line.trim().length() > 0 && !line.trim().toLowerCase().startsWith("[profile")) { //$NON-NLS-1$
-                    if (line.trim().toLowerCase().startsWith(nameAtr)) {
-                        profile.setName(line.trim().substring(nameAtr.length()));
-                    }
-                    else if (line.trim().toLowerCase().startsWith(isRelativeAtr)) {
-                        profile.setRelative(
-                                line.trim().substring(isRelativeAtr.length()).equals("1") //$NON-NLS-1$
-                        );
-                    }
-                    else if (line.trim().toLowerCase().startsWith(pathProfilesAtr)) {
-                        profile.setPath(
-                                line.trim().substring(pathProfilesAtr.length())
-                        );
-                    }
-                    else if (line.trim().toLowerCase().startsWith(isDefaultAtr)) {
-                        profile.setDefault(
-                                line.trim().substring(isDefaultAtr.length()).equals("1") //$NON-NLS-1$
-                        );
-                    }
-                    else {
-                        break;
-                    }
+                else if (line.trim().toLowerCase().startsWith(isRelativeAtr)) {
+                    profile.setRelative(
+                            line.trim().substring(isRelativeAtr.length()).equals("1") //$NON-NLS-1$
+                    );
                 }
-
-                // Debemos encontrar al menos el nombre y la ruta del perfil
-                if (profile.getName() != null || profile.getPath() != null) {
-                    profile.setAbsolutePath(profile.isRelative() ? new File(iniFile.getParent(), profile.getPath()).toString() : profile.getPath());
-
-                    profiles.add(profile);
+                else if (line.trim().toLowerCase().startsWith(pathProfilesAtr)) {
+                    profile.setPath(
+                            line.trim().substring(pathProfilesAtr.length())
+                    );
+                }
+                else if (line.trim().toLowerCase().startsWith(isDefaultAtr)) {
+                    profile.setDefault(
+                            line.trim().substring(isDefaultAtr.length()).equals("1") //$NON-NLS-1$
+                    );
+                }
+                else {
+                    break;
                 }
             }
-        }
-        catch (final Exception e) {
-            throw new IOException("Error al leer la configuracion de los perfiles de Firefox: " + e); //$NON-NLS-1$
-        }
-        finally {
-            try {
-                in.close();
-            }
-            catch (final Exception e) {
-             // Ignoramos los errores en el cierre
+
+            // Debemos encontrar al menos el nombre y la ruta del perfil
+            if (profile.getName() != null || profile.getPath() != null) {
+                profile.setAbsolutePath(profile.isRelative() ? new File(iniFile.getParent(), profile.getPath()).toString() : profile.getPath());
+
+                profiles.add(profile);
             }
         }
+        in.close();
 
         return profiles.toArray(new FirefoxProfile[profiles.size()]);
     }
@@ -165,51 +154,51 @@ final class NSPreferences {
      * perfil de Mozilla Firefox. */
     static final class FirefoxProfile {
         private String name = null;
-        
+
         String getName() {
             return this.name;
         }
-        
+
         void setName(final String n) {
             this.name = n;
         }
-        
+
         private boolean relative = true;
-        
+
         boolean isRelative() {
             return this.relative;
         }
-        
+
         void setRelative(final boolean r) {
             this.relative = r;
         }
-        
+
         private String path = null;
-        
+
         String getPath() {
             return this.path;
         }
-        
+
         void setPath(final String p) {
             this.path = p;
         }
-        
+
         private String absolutePath = null;
-        
+
         String getAbsolutePath() {
             return this.absolutePath;
         }
-        
+
         void setAbsolutePath(final String ap) {
             this.absolutePath = ap;
         }
-        
+
         private boolean def = false;
-        
+
         boolean isDefault() {
             return this.def;
         }
-        
+
         void setDefault(final boolean d) {
             this.def = d;
         }

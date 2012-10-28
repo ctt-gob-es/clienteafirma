@@ -28,6 +28,7 @@ public final class AOPkcs1Signer implements AOSimpleSigner {
      * @return Firma PKCS#1 en binario puro no tratado
      * @throws AOException en caso de cualquier problema durante la firma
      */
+	@Override
 	public byte[] sign(final byte[] data, final String algorithm, final PrivateKeyEntry keyEntry, final Properties extraParams) throws AOException {
         final Signature sig;
         try {

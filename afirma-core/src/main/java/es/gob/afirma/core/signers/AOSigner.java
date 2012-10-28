@@ -10,6 +10,8 @@
 
 package es.gob.afirma.core.signers;
 
+import java.io.IOException;
+
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.util.tree.AOTreeModel;
@@ -35,21 +37,24 @@ public interface AOSigner extends AOCoSigner, AOCounterSigner, AOSimpleSigner {
      *        titulares de los certificados.
      * @return &Aacute;rbol de nodos de firma o <code>null</code> en caso de error.
      * @throws AOInvalidFormatException
-     *         Si no se ha introducido un fichero de firma v&aacute;lido del formato correspondiente. */
-    AOTreeModel getSignersStructure(byte[] sign, boolean asSimpleSignInfo) throws AOInvalidFormatException;
+     *         Si no se ha introducido un fichero de firma v&aacute;lido del formato correspondiente.
+     * @throws IOException Si ocurren problemas relacionados con la lectura de la firma */
+    AOTreeModel getSignersStructure(byte[] sign, boolean asSimpleSignInfo) throws AOInvalidFormatException, IOException;
 
     /** Indica si un dato es una firma compatible con la implementaci&oacute;n concreta.
      * @param is Dato que deseamos comprobar.
      * @return <code>true</code> si el dato es una firma reconocida por
-     *         esta clase, <code>false</code> en caso contrario. */
-    boolean isSign(byte[] is);
+     *         esta clase, <code>false</code> en caso contrario.
+     * @throws IOException Si ocurren problemas relacionados con la lectura de los datos */
+    boolean isSign(byte[] is) throws IOException;
 
     /** Comprueba si el dato introducido es v&aacute;lido para ser firmado por
      * este manejador de firma.<br/>
      * @param is Dato que deseamos comprobar.
      * @return Devuelve <code>true</code> si el dato es susceptible de ser firmado por la implementaci&oacute;n concreta,
-     *         <code>false</code> en caso contrario. */
-    boolean isValidDataFile(byte[] is);
+     *         <code>false</code> en caso contrario.
+     * @throws IOException Cuando ocurre alg&uacute;n error durante la lectura de los datos */
+    boolean isValidDataFile(byte[] is) throws IOException;
 
     /** Devuelve el nombre de fichero de firma recomendado para el resultado de firmar un fichero
      * con el nombre proporcionado. Si se indica una part&iacute;cula intermedia, se a&ntilde;ade esta al
@@ -71,9 +76,8 @@ public interface AOSigner extends AOCoSigner, AOCounterSigner, AOSimpleSigner {
      * @throws AOException
      *         En caso de cualquier error durante la recuperaci&oacute;n de los
      *         datos.
-     * @throws NullPointerException
-     *         Si la firma introducida es nula. */
-    byte[] getData(byte[] signData) throws AOException;
+     * @throws IOException Si no se puede leer la firma. */
+    byte[] getData(byte[] signData) throws AOException, IOException;
 
     /** Obtiene la informaci&oacute;n general de un objeto de firma. Ya que un objeto de
      * firma puede contener muchas firmas, se considera informaci&oacute;n
@@ -87,8 +91,7 @@ public interface AOSigner extends AOCoSigner, AOCounterSigner, AOSimpleSigner {
      * @throws AOException
      *         Ocurri&oacute; un error durante la recuperaci&oacute;n de los
      *         datos.
-     * @throws NullPointerException
-     *         La firma introducida es nula. */
-    AOSignInfo getSignInfo(byte[] signData) throws AOException;
+     * @throws IOException Si ocurren problemas relacionados con la lectura de la firma. */
+    AOSignInfo getSignInfo(byte[] signData) throws AOException, IOException;
 
 }

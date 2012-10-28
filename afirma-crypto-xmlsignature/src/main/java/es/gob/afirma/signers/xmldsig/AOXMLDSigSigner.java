@@ -288,7 +288,8 @@ public final class AOXMLDSigSigner implements AOSigner {
      * </dl>
      * @return Firma en formato XMLDSig 1.0
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-    public byte[] sign(final byte[] data,
+    @Override
+	public byte[] sign(final byte[] data,
                        final String algorithm,
                        final PrivateKeyEntry keyEntry,
                        final Properties xParams) throws AOException {
@@ -298,7 +299,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             throw new UnsupportedOperationException("Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'"); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
-        final Properties extraParams = (xParams != null) ? xParams : new Properties();
+        final Properties extraParams = xParams != null ? xParams : new Properties();
 
         final String format = extraParams.getProperty("format", AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPING); //$NON-NLS-1$
         final String mode = extraParams.getProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
@@ -505,7 +506,7 @@ public final class AOXMLDSigSigner implements AOSigner {
                     // extranos para el XML,
                     // realizamos una decodificacion y recodificacion para asi
                     // homogenizar el formato.
-                    if (AOUtil.isBase64(data) && (XMLConstants.BASE64_ENCODING.equals(encoding) || ((encoding != null) ? encoding : "").toLowerCase().equals("base64"))) { //$NON-NLS-1$ //$NON-NLS-2$
+                    if (AOUtil.isBase64(data) && (XMLConstants.BASE64_ENCODING.equals(encoding) || (encoding != null ? encoding : "").toLowerCase().equals("base64"))) { //$NON-NLS-1$ //$NON-NLS-2$
                         LOGGER.info("El documento se ha indicado como Base64, se insertara como tal en el XML"); //$NON-NLS-1$
 
                         // Adicionalmente, si es un base 64 intentamos obtener
@@ -735,7 +736,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             }
 
             // Hojas de estilo para enveloping en Externally Detached. Comprobamos si la referencia al estilo es externa
-            if ((styleHref != null && styleElement == null) && (styleHref.startsWith(HTTP_PROTOCOL_PREFIX) || styleHref.startsWith(HTTPS_PROTOCOL_PREFIX))) {
+            if (styleHref != null && styleElement == null && (styleHref.startsWith(HTTP_PROTOCOL_PREFIX) || styleHref.startsWith(HTTPS_PROTOCOL_PREFIX))) {
                 try {
                     referenceList.add(fac.newReference(styleHref,
                                                        digestMethod,
@@ -782,7 +783,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             }
 
             // Hojas de estilo remotas para detached. Comprobamos si la referencia al estilo es externa
-            if ((styleHref != null && styleElement == null) && (styleHref.startsWith(HTTP_PROTOCOL_PREFIX) || styleHref.startsWith(HTTPS_PROTOCOL_PREFIX))) {
+            if (styleHref != null && styleElement == null && (styleHref.startsWith(HTTP_PROTOCOL_PREFIX) || styleHref.startsWith(HTTPS_PROTOCOL_PREFIX))) {
                 try {
                     referenceList.add(fac.newReference(styleHref,
                                                        digestMethod,
@@ -920,7 +921,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             }
 
             // Hojas de estilo remotas para enveloped. Comprobamos si la referencia al estilo es externa
-            if ((styleHref != null && styleElement == null) && (styleHref.startsWith(HTTP_PROTOCOL_PREFIX) || styleHref.startsWith(HTTPS_PROTOCOL_PREFIX))) {
+            if (styleHref != null && styleElement == null && (styleHref.startsWith(HTTP_PROTOCOL_PREFIX) || styleHref.startsWith(HTTPS_PROTOCOL_PREFIX))) {
                 try {
                     referenceList.add(fac.newReference(styleHref,
                                                        digestMethod,
@@ -973,7 +974,7 @@ public final class AOXMLDSigSigner implements AOSigner {
 
             // en el caso de formato enveloping se inserta el elemento Object
             // con el documento a firmar
-            if (format.equals(AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPING) && (envelopingObject != null)) {
+            if (format.equals(AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPING) && envelopingObject != null) {
                 objectList.add(envelopingObject);
                 if (envelopingStyleObject != null) {
                     objectList.add(envelopingStyleObject);
@@ -983,7 +984,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             // Si es enveloped hay que anadir la hoja de estilo dentro de la
             // firma y
             // referenciarla
-            if ((format.equals(AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED)) && (styleElement != null)) {
+            if (format.equals(AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED) && styleElement != null) {
                 objectList.add(fac.newXMLObject(Collections.singletonList(new DOMStructure(styleElement)), styleId, styleType, styleEncoding));
                 try {
                     referenceList.add(fac.newReference(tmpStyleUri,
@@ -1085,9 +1086,9 @@ public final class AOXMLDSigSigner implements AOSigner {
         if (element == null) {
             return false;
         }
-        if (element.getLocalName().equals(SIGNATURE_STR) || (element.getLocalName().equals(AFIRMA) && element.getFirstChild()
+        if (element.getLocalName().equals(SIGNATURE_STR) || element.getLocalName().equals(AFIRMA) && element.getFirstChild()
                                                                                                            .getLocalName()
-                                                                                                           .equals(SIGNATURE_STR))) {
+                                                                                                           .equals(SIGNATURE_STR)) {
             return true;
         }
 
@@ -1095,7 +1096,8 @@ public final class AOXMLDSigSigner implements AOSigner {
     }
 
     /** {@inheritDoc} */
-    public byte[] getData(final byte[] sign) throws AOInvalidFormatException {
+    @Override
+	public byte[] getData(final byte[] sign) throws AOInvalidFormatException {
         // nueva instancia de DocumentBuilderFactory que permita espacio de
         // nombres (necesario para XML)
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -1217,7 +1219,8 @@ public final class AOXMLDSigSigner implements AOSigner {
      * </dl>
      * @return Firma en formato XMLDSig 1.0
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-    public byte[] cosign(final byte[] data,
+    @Override
+	public byte[] cosign(final byte[] data,
                          final byte[] sign,
                          final String algorithm,
                          final PrivateKeyEntry keyEntry,
@@ -1228,7 +1231,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             throw new UnsupportedOperationException("Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'"); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
-        final Properties extraParams = (xParams != null) ? xParams : new Properties();
+        final Properties extraParams = xParams != null ? xParams : new Properties();
 
         final String digestMethodAlgorithm = extraParams.getProperty("referencesDigestMethod", DIGEST_METHOD); //$NON-NLS-1$
         final String canonicalizationAlgorithm = extraParams.getProperty("canonicalizationAlgorithm", CanonicalizationMethod.INCLUSIVE); //$NON-NLS-1$
@@ -1306,9 +1309,9 @@ public final class AOXMLDSigSigner implements AOSigner {
             // comience por STYLE_REFERENCE_PREFIX.
             // TODO: Identificar las hojas de estilo de un modo generico.
             final NamedNodeMap currentNodeAttributes = currentElement.getAttributes();
-            if (i == 0 || (currentNodeAttributes.getNamedItem("Id") != null && currentNodeAttributes.getNamedItem("Id") //$NON-NLS-1$ //$NON-NLS-2$
+            if (i == 0 || currentNodeAttributes.getNamedItem("Id") != null && currentNodeAttributes.getNamedItem("Id") //$NON-NLS-1$ //$NON-NLS-2$
                                                                                                     .getNodeValue()
-                                                                                                    .startsWith(STYLE_REFERENCE_PREFIX))) {
+                                                                                                    .startsWith(STYLE_REFERENCE_PREFIX)) {
 
                 // Buscamos las transformaciones declaradas en la Referencia,
                 // para anadirlas
@@ -1332,9 +1335,9 @@ public final class AOXMLDSigSigner implements AOSigner {
                 // de estilo lo creamos con un
                 // identificador descriptivo
                 String referenceId = null;
-                if ((currentNodeAttributes.getNamedItem("Id") != null && currentNodeAttributes.getNamedItem("Id") //$NON-NLS-1$ //$NON-NLS-2$
+                if (currentNodeAttributes.getNamedItem("Id") != null && currentNodeAttributes.getNamedItem("Id") //$NON-NLS-1$ //$NON-NLS-2$
                                                                                               .getNodeValue()
-                                                                                              .startsWith(STYLE_REFERENCE_PREFIX))) {
+                                                                                              .startsWith(STYLE_REFERENCE_PREFIX)) {
                     referenceId = STYLE_REFERENCE_PREFIX + UUID.randomUUID().toString();
                 }
                 else {
@@ -1460,7 +1463,8 @@ public final class AOXMLDSigSigner implements AOSigner {
      * </dl>
      * @return Firma en formato XMLDSig 1.0
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-    public byte[] cosign(final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException {
+    @Override
+	public byte[] cosign(final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException {
 
         // nueva instancia de DocumentBuilderFactory que permita espacio de
         // nombres (necesario para XML)
@@ -1561,7 +1565,8 @@ public final class AOXMLDSigSigner implements AOSigner {
      * </dl>
      * @return Contrafirma en formato XMLdSig.
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-    public byte[] countersign(final byte[] sign,
+    @Override
+	public byte[] countersign(final byte[] sign,
                               final String algorithm,
                               final CounterSignTarget targetType,
                               final Object[] targets,
@@ -1573,7 +1578,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             throw new UnsupportedOperationException("Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'"); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
-        final Properties extraParams = (xParams != null) ? xParams : new Properties();
+        final Properties extraParams = xParams != null ? xParams : new Properties();
 
         final String digestMethodAlgorithm = extraParams.getProperty("referencesDigestMethod", DIGEST_METHOD); //$NON-NLS-1$
         final String canonicalizationAlgorithm = extraParams.getProperty("canonicalizationAlgorithm", CanonicalizationMethod.INCLUSIVE); //$NON-NLS-1$
@@ -1947,7 +1952,8 @@ public final class AOXMLDSigSigner implements AOSigner {
     }
 
     /** {@inheritDoc} */
-    public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
+    @Override
+	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
 
         // recupera la raiz del documento de firmas
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -1963,7 +1969,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             if (xmlDSigNSPrefix == null) {
                 xmlDSigNSPrefix = XML_SIGNATURE_PREFIX;
             }
-            completePrefix = ("".equals(xmlDSigNSPrefix) ? "" : xmlDSigNSPrefix + ":"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            completePrefix = "".equals(xmlDSigNSPrefix) ? "" : xmlDSigNSPrefix + ":"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
             // Si el documento tiene como nodo raiz el nodo de firma, se agrega
             // un nodo raiz previo para que la lectura de las firmas del
@@ -2046,7 +2052,8 @@ public final class AOXMLDSigSigner implements AOSigner {
     }
 
     /** {@inheritDoc} */
-    public boolean isSign(final byte[] sign) {
+    @Override
+	public boolean isSign(final byte[] sign) {
 
         if (sign == null) {
             LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
@@ -2060,9 +2067,9 @@ public final class AOXMLDSigSigner implements AOSigner {
             final Document signDoc = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
             final Element rootNode = signDoc.getDocumentElement();
 
-            final String xmlSignatureName = (XML_SIGNATURE_PREFIX == null || "".equals(XML_SIGNATURE_PREFIX) ? //$NON-NLS-1$
+            final String xmlSignatureName = XML_SIGNATURE_PREFIX == null || "".equals(XML_SIGNATURE_PREFIX) ? //$NON-NLS-1$
             		SIGNATURE_STR :
-            			XML_SIGNATURE_PREFIX + ":" + SIGNATURE_STR); //$NON-NLS-1$
+            			XML_SIGNATURE_PREFIX + ":" + SIGNATURE_STR; //$NON-NLS-1$
 
             final ArrayList<Node> signNodes = new ArrayList<Node>();
             if (rootNode.getNodeName().equals(xmlSignatureName)) {
@@ -2087,7 +2094,8 @@ public final class AOXMLDSigSigner implements AOSigner {
     }
 
     /** {@inheritDoc} */
-    public boolean isValidDataFile(final byte[] data) {
+    @Override
+	public boolean isValidDataFile(final byte[] data) {
         if (data == null) {
             LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
             return false;
@@ -2096,7 +2104,8 @@ public final class AOXMLDSigSigner implements AOSigner {
     }
 
     /** {@inheritDoc} */
-    public String getSignedName(final String originalName, final String inText) {
+    @Override
+	public String getSignedName(final String originalName, final String inText) {
         return originalName + (inText != null ? inText : "") + ".xsig"; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
@@ -2124,7 +2133,8 @@ public final class AOXMLDSigSigner implements AOSigner {
     }
 
     /** {@inheritDoc} */
-    public AOSignInfo getSignInfo(final byte[] sign) throws AOException {
+    @Override
+	public AOSignInfo getSignInfo(final byte[] sign) throws AOException {
         if (sign == null) {
             throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$
         }

@@ -66,7 +66,7 @@ import es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.signer.AbstractX
  * signatures.
  * @author Frank Cornelis */
 public abstract class AbstractOOXMLSignatureService extends AbstractXmlSignatureService {
-    
+
     private static final String RELATIONSHIPS_SCHEMA = "http://schemas.openxmlformats.org/package/2006/relationships"; //$NON-NLS-1$
 
     protected AbstractOOXMLSignatureService() {
@@ -78,7 +78,8 @@ public abstract class AbstractOOXMLSignatureService extends AbstractXmlSignature
         return "Office OpenXML Document"; //$NON-NLS-1$
     }
 
-    public final String getFilesDigestAlgorithm() {
+    @Override
+	public final String getFilesDigestAlgorithm() {
         return null;
     }
 
@@ -165,14 +166,14 @@ public abstract class AbstractOOXMLSignatureService extends AbstractXmlSignature
                 final Document relsDocument = loadDocumentNoClose(zipInputStream);
 
                 final Element nsElement = relsDocument.createElement("ns"); //$NON-NLS-1$
-                nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:tns", RELATIONSHIPS_SCHEMA); //$NON-NLS-1$ 
+                nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:tns", RELATIONSHIPS_SCHEMA); //$NON-NLS-1$
                 final NodeList nodeList =
                         XPathAPI.selectNodeList(relsDocument,
                                                 "/tns:Relationships/tns:Relationship[@Type='http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/origin']", //$NON-NLS-1$
                                                 nsElement);
                 if (0 == nodeList.getLength()) {
                     final Element relationshipElement =
-                            relsDocument.createElementNS(RELATIONSHIPS_SCHEMA, "Relationship"); //$NON-NLS-1$ 
+                            relsDocument.createElementNS(RELATIONSHIPS_SCHEMA, "Relationship"); //$NON-NLS-1$
                     relationshipElement.setAttribute("Id", "rel-id-" + UUID.randomUUID().toString()); //$NON-NLS-1$ //$NON-NLS-2$
                     relationshipElement.setAttribute("Type", "http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/origin"); //$NON-NLS-1$ //$NON-NLS-2$
                     relationshipElement.setAttribute("Target", "_xmlsignatures/origin.sigs"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -188,7 +189,7 @@ public abstract class AbstractOOXMLSignatureService extends AbstractXmlSignature
                 final Document originSignRelsDocument = loadDocumentNoClose(zipInputStream);
 
                 final Element relationshipElement =
-                        originSignRelsDocument.createElementNS(RELATIONSHIPS_SCHEMA, "Relationship"); //$NON-NLS-1$ 
+                        originSignRelsDocument.createElementNS(RELATIONSHIPS_SCHEMA, "Relationship"); //$NON-NLS-1$
                 relationshipElement.setAttribute("Id", "rel-" + UUID.randomUUID().toString()); //$NON-NLS-1$ //$NON-NLS-2$
                 relationshipElement.setAttribute("Type", "http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/signature"); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -226,12 +227,12 @@ public abstract class AbstractOOXMLSignatureService extends AbstractXmlSignature
         final Document originSignRelsDocument = documentBuilderFactory.newDocumentBuilder().newDocument();
 
         final Element relationshipsElement =
-                originSignRelsDocument.createElementNS(RELATIONSHIPS_SCHEMA, "Relationships"); //$NON-NLS-1$ 
-        relationshipsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns", RELATIONSHIPS_SCHEMA); //$NON-NLS-1$ 
+                originSignRelsDocument.createElementNS(RELATIONSHIPS_SCHEMA, "Relationships"); //$NON-NLS-1$
+        relationshipsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns", RELATIONSHIPS_SCHEMA); //$NON-NLS-1$
         originSignRelsDocument.appendChild(relationshipsElement);
 
         final Element relationshipElement =
-                originSignRelsDocument.createElementNS(RELATIONSHIPS_SCHEMA, "Relationship"); //$NON-NLS-1$ 
+                originSignRelsDocument.createElementNS(RELATIONSHIPS_SCHEMA, "Relationship"); //$NON-NLS-1$
         final String relationshipId = "rel-" + UUID.randomUUID().toString(); //$NON-NLS-1$
         relationshipElement.setAttribute("Id", relationshipId); //$NON-NLS-1$
         relationshipElement.setAttribute("Type", "http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/signature"); //$NON-NLS-1$ //$NON-NLS-2$

@@ -67,7 +67,8 @@ public class AOCAdESEnveloper implements AOEnveloper {
      * @return Envoltorio CADES.
      * @throws AOException
      *         Cuando ocurre cualquier problema en el proceso. */
-    public byte[] envelop(final byte[] data,
+    @Override
+	public byte[] envelop(final byte[] data,
                           final String digestAlgorithm,
                           final String type,
                           final PrivateKeyEntry keyEntry,
@@ -76,7 +77,7 @@ public class AOCAdESEnveloper implements AOEnveloper {
                           final String datTyp,
                           final Properties xParams) throws AOException {
 
-        final Properties extraParams = (xParams !=null) ? xParams : new Properties();
+        final Properties extraParams = xParams !=null ? xParams : new Properties();
 
         // Comprobamos que el archivo a tratar no sea nulo.
         if (data == null) {
@@ -88,7 +89,7 @@ public class AOCAdESEnveloper implements AOEnveloper {
 
             X509Certificate[] xCerts = new X509Certificate[0];
             final Certificate[] certs = keyEntry.getCertificateChain();
-            if (certs != null && (certs instanceof X509Certificate[])) {
+            if (certs != null && certs instanceof X509Certificate[]) {
                 xCerts = (X509Certificate[]) certs;
             }
             else {
@@ -105,7 +106,7 @@ public class AOCAdESEnveloper implements AOEnveloper {
         }
 
         // tipos de datos a firmar.
-        final String dataType = (datTyp != null) ? datTyp : PKCSObjectIdentifiers.data.getId();
+        final String dataType = datTyp != null ? datTyp : PKCSObjectIdentifiers.data.getId();
 
         // Datos firmados.
         byte[] dataSigned = null;
@@ -187,7 +188,8 @@ public class AOCAdESEnveloper implements AOEnveloper {
      * @return Contenido firmado
      * @throws AOException
      *         Cuando ocurre cualquier problema durante el proceso */
-    public byte[] encrypt(final byte[] data, final String digestAlgorithm, final String key, final AOCipherAlgorithm cipherAlgorithm, final String dataType) throws AOException {
+    @Override
+	public byte[] encrypt(final byte[] data, final String digestAlgorithm, final String key, final AOCipherAlgorithm cipherAlgorithm, final String dataType) throws AOException {
 
         // Comprobamos que el archivo a cifrar no sea nulo.
         if (data == null) {
@@ -210,7 +212,7 @@ public class AOCAdESEnveloper implements AOEnveloper {
         }
 
         try {
-			return CAdESEncryptedData.genEncryptedData(data, digestAlgorithm, config, key, (dataType != null) ? dataType : PKCSObjectIdentifiers.data.getId());
+			return CAdESEncryptedData.genEncryptedData(data, digestAlgorithm, config, key, dataType != null ? dataType : PKCSObjectIdentifiers.data.getId());
         }
         catch (final Exception e) {
             throw new AOException("Error generando el enveloped de CADES", e); //$NON-NLS-1$
@@ -219,6 +221,7 @@ public class AOCAdESEnveloper implements AOEnveloper {
     }
 
 
+	@Override
 	public byte[] recoverData(final byte[] envelop, final PrivateKeyEntry addresseePke)
 			throws InvalidKeyException, AOException {
 

@@ -11,12 +11,16 @@
 package es.gob.afirma.core.misc;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.SAXException;
 
 
 /** M&eacute;todos de utilidad para la gesti&oacute;n de MimeType y OID
@@ -97,8 +101,9 @@ public final class MimeHelper {
      * (DEFAULT_CONTENT_OID_DATA).
      * @param mimetype
      *        del que deseamos obtener el Oid.
-     * @return OID asociado al Mime Type. */
-    public static String transformMimeTypeToOid(final String mimetype) {
+     * @return OID asociado al Mime Type.
+     * @throws IOException Si no se puede cargar la tabla de correspondencias entre MIMEType y OID */
+    public static String transformMimeTypeToOid(final String mimetype) throws IOException {
         if (mimetypeOidProp == null) {
             loadMimetypeOidProperties();
         }
@@ -112,8 +117,9 @@ public final class MimeHelper {
      * (DEFAULT_MIMETYPE).
      * @param oid
      *        del que deseamos obtener el Mime Type.
-     * @return MimeType asociado al OID. */
-    public static String transformOidToMimeType(final String oid) {
+     * @return MimeType asociado al OID.
+     * @throws IOException Si no se puede cargar la tabla de correspondencias entre MIMEType y OID */
+    public static String transformOidToMimeType(final String oid) throws IOException {
         if (oidMimetypeProp == null) {
             loadOidMimetypeProperties();
         }
@@ -124,26 +130,15 @@ public final class MimeHelper {
 
     /** Carga el properties que relaciona OIDs de formato con su mime type
      * correspondiente. */
-    private static void loadOidMimetypeProperties() {
+    private static void loadOidMimetypeProperties() throws IOException {
         oidMimetypeProp = new Properties();
-
         final InputStream isProp = AOUtil.getCleanClassLoader().getResourceAsStream("resources/mimetypes_oids.properties"); //$NON-NLS-1$
-        try {
-            oidMimetypeProp.load(isProp);
-        }
-        catch (final Exception e) {
-            LOGGER.warning("No se ha podido cargar la tabla de relaciones Oid-Mimetype: " + e); //$NON-NLS-1$
-        }
-        try {
-            isProp.close();
-        }
-        catch (final Exception e) {
-            // Ignoramos errores en el cierre
-        }
+        oidMimetypeProp.load(isProp);
+        isProp.close();
     }
 
     /** Carga la tabla de relacion de MimeTypes y Oids. */
-    private static void loadMimetypeOidProperties() {
+    private static void loadMimetypeOidProperties() throws IOException {
         if (oidMimetypeProp == null) {
             loadOidMimetypeProperties();
         }
@@ -155,8 +150,9 @@ public final class MimeHelper {
 
     /** Recupera el MimeType de los datos analizados, <code>null</code> si no se
      * pudo detectar.
-     * @return MimeType de los datos. */
-    public String getMimeType() {
+     * @return MimeType de los datos.
+     * @throws IOException Si no se pueden analizar los datos */
+    public String getMimeType() throws IOException {
 
         // Comprobamos si ya se calculo previamente el tipo de datos
         if (this.mimeType == null) {
@@ -172,9 +168,12 @@ public final class MimeHelper {
             		DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(this.data));
             		this.mimeType = "text/xml"; //$NON-NLS-1$
             	}
-            	catch (final Exception e) {
-            		// Ignoramos, es porque no es XML
+            	catch (final ParserConfigurationException e) {
+            		LOGGER.severe("No se ha podido crear un DocumentBuilder XML, no se comprobara si es XML: " + e); //$NON-NLS-1$
             	}
+            	catch (final SAXException e) {
+            		// Ignoramos, es porque no es XML
+				}
             }
 
             // Cuando el MimeType sea el de un fichero ZIP o el de Microsoft Word, comprobamos si es en
@@ -216,7 +215,12 @@ public final class MimeHelper {
         // realidad alguno de los ficheros ofimaticos soportados (que son ZIP con una
         // estructura concreta)
         if (extension != null && extension.equals("zip")) { //$NON-NLS-1$
-            extension = OfficeAnalizer.getExtension(this.data);
+            try {
+				extension = OfficeAnalizer.getExtension(this.data);
+			}
+            catch (final IOException e) {
+				LOGGER.severe("No se ha podido comprobar si el ZIP corresponde a un ODF o a un OOXML, se tomara como ZIP: " + e); //$NON-NLS-1$
+			}
         }
 
         return extension;
@@ -230,7 +234,7 @@ public final class MimeHelper {
         if (this.mimeInfo != null) {
             desc = this.mimeInfo.getDescription();
         }
-        return (desc == null || desc.length() == 0) ? DEFAULT_CONTENT_DESCRIPTION : desc;
+        return desc == null || desc.length() == 0 ? DEFAULT_CONTENT_DESCRIPTION : desc;
     }
 
     /**

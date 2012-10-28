@@ -127,9 +127,7 @@ public final class Test_Ticket_209544_OnlySignningCert {
                     final File f = File.createTempFile(algo + "-" + extraParams.getProperty("mode") + "-" + filename.replace(".xml", "") + "-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
                     final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
                     fos.write(result);
-                    try { fos.flush(); fos.close(); } catch (final Exception e) {
-                        // Ignoramos los errores
-                    }
+                    fos.flush(); fos.close();
                     System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
 
                     final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -207,9 +205,8 @@ public final class Test_Ticket_209544_OnlySignningCert {
                     final File f = File.createTempFile(algo + "-" + extraParams.getProperty("mode") + "-" + filename.replace(".xml", "") + "-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
                     final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
                     fos.write(cosignResult);
-                    try { fos.flush(); fos.close(); } catch (final Exception e) {
-                        // Ignoramos los errores
-                    }
+                    fos.flush(); fos.close();
+
                     System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
 
                     final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -287,9 +284,7 @@ public final class Test_Ticket_209544_OnlySignningCert {
                     final File f = File.createTempFile(algo + "-" + extraParams.getProperty("mode") + "-" + filename.replace(".xml", "") + "-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
                     final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
                     fos.write(countersignResult);
-                    try { fos.flush(); fos.close(); } catch (final Exception e) {
-                        // Ignoramos los errores
-                    }
+                    fos.flush(); fos.close();
                     System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
 
                     final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();

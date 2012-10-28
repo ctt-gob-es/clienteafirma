@@ -83,18 +83,18 @@ public final class ReadNodesTree {
      *         datos */
     public AOTreeModel readNodesTree(final byte[] data, final boolean asSimpleSignInfo) throws IOException {
 
-        final ASN1InputStream is = new ASN1InputStream(data);
-
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
+    	final ASN1InputStream is = new ASN1InputStream(data);
         final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+        is.close();
         final Enumeration<?> contentsData = dsq.getObjects();
+
         // Elementos que contienen los elementos OID SignedData
         contentsData.nextElement();
+
         // Contenido de SignedData
         final ASN1TaggedObject doj = (ASN1TaggedObject) contentsData.nextElement();
-        final ASN1Sequence contentSignedData = (ASN1Sequence) doj.getObject();// contenido
-                                                                        // del
-                                                                        // SignedData
+        final ASN1Sequence contentSignedData = (ASN1Sequence) doj.getObject();
 
         // Raiz de la secuencia de SignerInfo
         // Obtenemos los signerInfos del SignedData

@@ -85,7 +85,7 @@ import com.sun.org.apache.xpath.internal.XPathAPI;
  * <a href="http://openiso.org/Ecma/376/Part2/12.2.4#26">http://openiso.org/Ecma/376/Part2/12.2.4#26</a>
  * @author Frank Cornelis */
 public final class RelationshipTransformService extends TransformService {
-    
+
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     static final String TRANSFORM_URI = "http://schemas.openxmlformats.org/package/2006/RelationshipTransform"; //$NON-NLS-1$
@@ -160,12 +160,14 @@ public final class RelationshipTransformService extends TransformService {
     }
 
     /** {@inheritDoc} */
-    public AlgorithmParameterSpec getParameterSpec() {
+    @Override
+	public AlgorithmParameterSpec getParameterSpec() {
         return null;
     }
 
     /** {@inheritDoc} */
-    public Data transform(final Data data, final XMLCryptoContext context) throws TransformException {
+    @Override
+	public Data transform(final Data data, final XMLCryptoContext context) throws TransformException {
 
         final OctetStreamData octetStreamData = (OctetStreamData) data;
 
@@ -267,12 +269,14 @@ public final class RelationshipTransformService extends TransformService {
     }
 
     /** {@inheritDoc} */
-    public Data transform(final Data data, final XMLCryptoContext context, final OutputStream os) throws TransformException {
+    @Override
+	public Data transform(final Data data, final XMLCryptoContext context, final OutputStream os) throws TransformException {
         return null;
     }
 
     /** {@inheritDoc} */
-    public boolean isFeatureSupported(final String feature) {
+    @Override
+	public boolean isFeatureSupported(final String feature) {
         return false;
     }
 }

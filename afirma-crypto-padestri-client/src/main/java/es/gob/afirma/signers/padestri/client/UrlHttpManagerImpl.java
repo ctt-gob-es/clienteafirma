@@ -5,12 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-import es.gob.afirma.signers.padestri.client.UrlHttpManager;
-
-/**
- * Implementacion de ua clase para la lectura del contenido de una URL.
- * @author Carlos Gamuci
- */
+/** Implementacion de ua clase para la lectura del contenido de una URL.
+ * @author Carlos Gamuci */
 public class UrlHttpManagerImpl implements UrlHttpManager {
 
 	private static final int BUFFER_SIZE = 1024;
@@ -20,7 +16,7 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		final URL uri = new URL(url);
 		final InputStream is = uri.openStream();
 		final byte[] data = getDataFromInputStream(is);
-		try { is.close(); } catch (final Exception e) { /* Ignoramos el error */ }
+		is.close();
 		return data;
 	}
 

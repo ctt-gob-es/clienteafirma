@@ -10,6 +10,7 @@
 
 package es.gob.afirma.signers.pkcs7;
 
+import java.io.IOException;
 import java.util.Enumeration;
 import java.util.logging.Logger;
 
@@ -36,41 +37,38 @@ public final class ObtainContentSignedData {
      * tanto en CADES como en CMS. Si la firma no contiene los datos, devuelve <code>null</code>.
      * @param data
      *        datos que contienen la firma.
-     * @return el contenido firmado. */
-    public static byte[] obtainData(final byte[] data) {
+     * @return el contenido firmado.
+     * @throws IOException Si no se pueden leer los datos */
+    public static byte[] obtainData(final byte[] data) throws IOException {
         byte[] contenido = null;
-        try {
-            final ASN1InputStream is = new ASN1InputStream(data);
-            // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-            final ASN1Sequence dsq  = (ASN1Sequence) is.readObject();
-            final Enumeration<?> e = dsq.getObjects();
-            // Elementos que contienen los elementos OID Data
-            final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
-            // Contenido a obtener informacion
-            final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
 
-            // buscamos si es signedData
-            if (doi.equals(PKCSObjectIdentifiers.signedData)) {
-                // obtenemos el signed Data
-                final SignedData sd = SignedData.getInstance(doj.getObject());
-                final ContentInfo ci = sd.getEncapContentInfo();
-                // obtenemos el contenido si lo tiene.
-                if (ci.getContent() != null) {
-                    final DEROctetString os = (DEROctetString) ci.getContent();
-                    contenido = os.getOctets();
-                }
-                else {
-                    LOGGER.warning("No existe contenido en esta firma."); //$NON-NLS-1$
-                }
+        // LEEMOS EL FICHERO QUE NOS INTRODUCEN
+        final ASN1InputStream is = new ASN1InputStream(data);
+        final ASN1Sequence dsq  = (ASN1Sequence) is.readObject();
+        is.close();
+
+        final Enumeration<?> e = dsq.getObjects();
+        // Elementos que contienen los elementos OID Data
+        final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+        // Contenido a obtener informacion
+        final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+
+        // buscamos si es signedData
+        if (doi.equals(PKCSObjectIdentifiers.signedData)) {
+            // obtenemos el signed Data
+            final SignedData sd = SignedData.getInstance(doj.getObject());
+            final ContentInfo ci = sd.getEncapContentInfo();
+            // obtenemos el contenido si lo tiene.
+            if (ci.getContent() != null) {
+                final DEROctetString os = (DEROctetString) ci.getContent();
+                contenido = os.getOctets();
             }
             else {
-                LOGGER.warning("No se puede obtener el contenido de esta firma."); //$NON-NLS-1$
+                LOGGER.warning("No existe contenido en esta firma."); //$NON-NLS-1$
             }
-
         }
-        catch (final Exception e) {
-            LOGGER.severe("No se pudieron recuperar los datos contenidos en la firma, se devolvera null: " + e); //$NON-NLS-1$
-            return null;
+        else {
+            LOGGER.warning("No se puede obtener el contenido de esta firma."); //$NON-NLS-1$
         }
 
         return contenido;

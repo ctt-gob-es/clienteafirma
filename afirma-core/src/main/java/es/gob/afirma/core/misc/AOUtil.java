@@ -156,7 +156,6 @@ public final class AOUtil {
         return new java.io.ByteArrayInputStream(tmpBuffer);
     }
 
-
     /** Lee un flujo de datos de entrada y los recupera en forma de array de
      * bytes. Este m&eacute;todo consume pero no cierra el flujo de datos de
      * entrada.
@@ -177,8 +176,6 @@ public final class AOUtil {
         }
         return baos.toByteArray();
     }
-
-
 
     /** Obtiene el nombre com&uacute;n (Common Name, CN) del titular de un
      * certificado X.509. Si no se encuentra el CN, se devuelve la unidad organizativa
@@ -422,7 +419,7 @@ public final class AOUtil {
         // del arbol
         final AOTreeNode root = (AOTreeNode) tree.getRoot();
         for (int i = 0; i < root.getChildCount(); i++) {
-            archiveTreeNode(root.getChildAt(i), 0, (linePrefx != null) ? linePrefx : "", (identationString != null) ? identationString : "\t", buffer);  //$NON-NLS-1$//$NON-NLS-2$
+            archiveTreeNode(root.getChildAt(i), 0, linePrefx != null ? linePrefx : "", identationString != null ? identationString : "\t", buffer);  //$NON-NLS-1$//$NON-NLS-2$
         }
 
         return buffer.toString();
@@ -453,107 +450,60 @@ public final class AOUtil {
         for (int i = 0; i < depth; i++) {
             buffer.append(identationString);
         }
-        buffer.append((node).getUserObject());
+        buffer.append(node.getUserObject());
         for (int i = 0; i < node.getChildCount(); i++) {
             archiveTreeNode(node.getChildAt(i), depth + 1, linePrefx, identationString, buffer);
         }
     }
 
     /** Carga una librer&iacute;a nativa del sistema.
-     * @param path
-     *        Ruta a la libreria de sistema. */
-    public static void loadNativeLibrary(final String path) {
+     * @param path Ruta a la libreria de sistema.
+     * @throws IOException Si ocurre alg&uacute;n problema durante la carga */
+    public static void loadNativeLibrary(final String path) throws IOException {
         if (path == null) {
             LOGGER.warning("No se puede cargar una biblioteca nula"); //$NON-NLS-1$
             return;
         }
-        boolean copyOK = false;
         final int pos = path.lastIndexOf('.');
         final File file = new File(path);
-        File tempLibrary = null;
-        try {
-            tempLibrary =
-                    File.createTempFile(pos < 1 ? file.getName() : file.getName().substring(0, file.getName().indexOf('.')),
-                                        pos < 1 || pos == path.length() - 1 ? null : path.substring(pos));
+        final File tempLibrary =
+            File.createTempFile(pos < 1 ? file.getName() : file.getName().substring(0, file.getName().indexOf('.')),
+                pos < 1 || pos == path.length() - 1 ? null : path.substring(pos));
 
-            // Copiamos el fichero
-            copyOK = copyFile(file, tempLibrary);
-        }
-        catch (final Exception e) {
-            LOGGER.warning("Error al generar una nueva instancia de la libreria " + path + " para su carga: " + e); //$NON-NLS-1$ //$NON-NLS-2$
-        }
+        // Copiamos el fichero
+        copyFile(file, tempLibrary);
 
         // Pedimos borrar los temporales cuando se cierre la JVM
         if (tempLibrary != null) {
-            try {
-                tempLibrary.deleteOnExit();
-            }
-            catch (final Exception e) {
-                // Ignoramos los errores, el usuario debe limpiar los temporales regularmente
-            }
+            tempLibrary.deleteOnExit();
         }
 
         LOGGER.info("Cargamos " + (tempLibrary == null ? path : tempLibrary.getAbsolutePath())); //$NON-NLS-1$
-        System.load((copyOK && tempLibrary != null) ? tempLibrary.getAbsolutePath() : path);
+        System.load(tempLibrary != null ? tempLibrary.getAbsolutePath() : path);
 
     }
 
     /** Copia un fichero.
-     * @param source
-     *        Fichero origen con el contenido que queremos copiar.
-     * @param dest
-     *        Fichero destino de los datos.
-     * @return Devuelve <code>true</code> si la operac&oacute;n finaliza
-     *         correctamente, <code>false</code> en caso contrario. */
-    public static boolean copyFile(final File source, final File dest) {
+     * @param source Fichero origen con el contenido que queremos copiar.
+     * @param dest Fichero destino de los datos.
+     * @throws IOException SI ocurre algun problema durante la copia */
+    public static void copyFile(final File source, final File dest) throws IOException {
         if (source == null || dest == null) {
-            return false;
+            throw new IllegalArgumentException("Ni origen ni destino de la copia pueden ser nulos"); //$NON-NLS-1$
         }
-        try {
-            final FileInputStream is = new FileInputStream(source);
-            final FileOutputStream os = new FileOutputStream(dest);
-            final FileChannel in = is.getChannel();
-            final FileChannel out = os.getChannel();
-            final MappedByteBuffer buf = in.map(FileChannel.MapMode.READ_ONLY, 0, in.size());
-            out.write(buf);
 
-            // Cerramos los canales sin preocuparnos de que lo haga
-            // correctamente
-            try {
-                in.close();
-            }
-            catch (final Exception e) {
-                // Ignoramos los errores de cierre
-            }
-            try {
-                out.close();
-            }
-            catch (final Exception e) {
-             // Ignoramos los errores de cierre
-            }
-            try {
-                is.close();
-            }
-            catch (final Exception e) {
-             // Ignoramos los errores de cierre
-            }
-            try {
-                os.close();
-            }
-            catch (final Exception e) {
-             // Ignoramos los errores de cierre
-            }
+        final FileInputStream is = new FileInputStream(source);
+        final FileOutputStream os = new FileOutputStream(dest);
+        final FileChannel in = is.getChannel();
+        final FileChannel out = os.getChannel();
+        final MappedByteBuffer buf = in.map(FileChannel.MapMode.READ_ONLY, 0, in.size());
+        out.write(buf);
 
-        }
-        catch (final Exception e) {
-            LOGGER.severe("No se ha podido copiar el fichero origen '" + source.getName() //$NON-NLS-1$
-                                                     + "' al destino '" //$NON-NLS-1$
-                                                     + dest.getName()
-                                                     + "': " //$NON-NLS-1$
-                                                     + e);
-            return false;
-        }
-        return true;
+        in.close();
+        out.close();
+        is.close();
+        os.close();
+
     }
 
     /** Genera una lista de cadenas compuesta por los fragmentos de texto

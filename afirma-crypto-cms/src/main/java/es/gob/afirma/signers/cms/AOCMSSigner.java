@@ -10,6 +10,7 @@
 
 package es.gob.afirma.signers.cms;
 
+import java.io.IOException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
@@ -52,11 +53,12 @@ public final class AOCMSSigner implements AOSigner {
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** {@inheritDoc} */
-    public byte[] sign(final byte[] data, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException {
+    @Override
+	public byte[] sign(final byte[] data, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException {
 
     	new BCChecker().checkBouncyCastle();
 
-        final Properties extraParams = (xParams != null) ? xParams : new Properties();
+        final Properties extraParams = xParams != null ? xParams : new Properties();
 
         final String precalculatedDigest = extraParams.getProperty("precalculatedHashAlgorithm"); //$NON-NLS-1$
 
@@ -91,11 +93,12 @@ public final class AOCMSSigner implements AOSigner {
     }
 
     /** {@inheritDoc} */
-    public byte[] cosign(final byte[] data, final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException {
+    @Override
+	public byte[] cosign(final byte[] data, final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException, IOException {
 
     	new BCChecker().checkBouncyCastle();
 
-        final Properties extraParams = (xParams != null) ? xParams : new Properties();
+        final Properties extraParams = xParams != null ? xParams : new Properties();
 
         final String precalculatedDigest = extraParams.getProperty("precalculatedHashAlgorithm"); //$NON-NLS-1$
 
@@ -128,7 +131,8 @@ public final class AOCMSSigner implements AOSigner {
     }
 
     /** {@inheritDoc} */
-    public byte[] cosign(final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties extraParams) throws AOException {
+    @Override
+	public byte[] cosign(final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties extraParams) throws AOException, IOException {
 
     	new BCChecker().checkBouncyCastle();
 
@@ -153,12 +157,13 @@ public final class AOCMSSigner implements AOSigner {
     }
 
     /** {@inheritDoc} */
-    public byte[] countersign(final byte[] sign,
+    @Override
+	public byte[] countersign(final byte[] sign,
                               final String algorithm,
                               final CounterSignTarget targetType,
                               final Object[] targets,
                               final PrivateKeyEntry keyEntry,
-                              final Properties extraParams) throws AOException {
+                              final Properties extraParams) throws AOException, IOException {
 
     	new BCChecker().checkBouncyCastle();
 
@@ -224,7 +229,8 @@ public final class AOCMSSigner implements AOSigner {
     }
 
     /** {@inheritDoc} */
-    public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) throws AOInvalidFormatException {
+    @Override
+	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) throws AOInvalidFormatException {
     	new BCChecker().checkBouncyCastle();
         final ReadNodesTree rn = new ReadNodesTree();
         try {
@@ -237,7 +243,8 @@ public final class AOCMSSigner implements AOSigner {
     }
 
     /** {@inheritDoc} */
-    public boolean isSign(final byte[] signData) {
+    @Override
+	public boolean isSign(final byte[] signData) throws IOException {
         if (signData == null) {
             LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
             return false;
@@ -247,7 +254,8 @@ public final class AOCMSSigner implements AOSigner {
     }
 
     /** {@inheritDoc} */
-    public boolean isValidDataFile(final byte[] data) {
+    @Override
+	public boolean isValidDataFile(final byte[] data) {
         if (data == null) {
             LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
             return false;
@@ -276,7 +284,8 @@ public final class AOCMSSigner implements AOSigner {
     }
 
     /** {@inheritDoc} */
-    public byte[] getData(final byte[] signData) throws AOException {
+    @Override
+	public byte[] getData(final byte[] signData) throws AOException, IOException {
         if (signData == null) {
             throw new IllegalArgumentException("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
         }
@@ -287,12 +296,15 @@ public final class AOCMSSigner implements AOSigner {
     }
 
     /** {@inheritDoc} */
-    public String getSignedName(final String originalName, final String inText) {
+    @Override
+	public String getSignedName(final String originalName, final String inText) {
         return originalName + (inText != null ? inText : "") + ".csig";  //$NON-NLS-1$//$NON-NLS-2$
     }
 
-    /** {@inheritDoc} */
-    public AOSignInfo getSignInfo(final byte[] signData) throws AOException {
+    /** {@inheritDoc}
+     * @throws IOException */
+    @Override
+	public AOSignInfo getSignInfo(final byte[] signData) throws AOException, IOException {
 
         if (signData == null) {
             throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$

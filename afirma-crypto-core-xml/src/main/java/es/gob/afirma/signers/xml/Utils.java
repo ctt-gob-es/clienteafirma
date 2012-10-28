@@ -183,12 +183,7 @@ public final class Utils {
             		try {
             			final InputStream is = new FileInputStream(xmlStyleFile);
             			xml = AOUtil.getDataFromInputStream(is);
-            			try {
-            				is.close();
-            			}
-            			catch (final Exception ex) {
-            				// Ignoramos los errores en el cierre
-            			}
+        				is.close();
             		}
             		catch (final Exception ex) {
             			throw new CannotDereferenceException("No se ha podido dereferenciar la hoja de estilo", ex); //$NON-NLS-1$
@@ -225,7 +220,7 @@ public final class Utils {
             return xml;
         }
 
-        final String type = (tpy != null) ? tpy : "text/xsl"; //$NON-NLS-1$
+        final String type = tpy != null ? tpy : "text/xsl"; //$NON-NLS-1$
 
         if (xml == null || "".equals(xml)) { //$NON-NLS-1$
             return "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><?xml-stylesheet type=\"" + //$NON-NLS-1$
@@ -287,8 +282,8 @@ public final class Utils {
 
         final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
 
-        final List<Transform> transformList = (transforms != null) ? transforms : new ArrayList<Transform>();
-        final Properties extraParams = (xParams != null) ? xParams : new Properties();
+        final List<Transform> transformList = transforms != null ? transforms : new ArrayList<Transform>();
+        final Properties extraParams = xParams != null ? xParams : new Properties();
 
         // primero compruebo si hay transformaciones a medida
         final int numTransforms = Integer.parseInt(extraParams.getProperty("xmlTransforms", "0")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -684,7 +679,7 @@ public final class Utils {
         }
         return "ds"; //$NON-NLS-1$
     }
-    
+
     /** Intenta determinar el prefijo del espacio de nombres de XAdES.
      * @param el Firma XAdES
      * @return Prefijo del espacio de nombres */
@@ -705,8 +700,8 @@ public final class Utils {
      * @return N&uacute;mero de coincidencias. */
     private static int countSubstring(final String text, final String substring) {
         int count = 0;
-        for (int i = 0; i <= (text.length() - substring.length()); i++) {
-            if ((substring.charAt(0) == text.charAt(i)) && (substring.equals(text.substring(i, i + substring.length())))) {
+        for (int i = 0; i <= text.length() - substring.length(); i++) {
+            if (substring.charAt(0) == text.charAt(i) && substring.equals(text.substring(i, i + substring.length()))) {
                 count++;
                 i += substring.length() - 1;
             }
@@ -784,7 +779,7 @@ public final class Utils {
      * @return Cadena de texto con el XML en forma de array de octetos */
     public static byte[] writeXML(final Node node, final Map<String, String> props, final String styleHref, final String styleType) {
 
-        final Map<String, String> xmlProps = (props != null) ? props : new Hashtable<String, String>(0);
+        final Map<String, String> xmlProps = props != null ? props : new Hashtable<String, String>(0);
 
         // La codificacion por defecto sera UTF-8
         final String xmlEncoding = xmlProps.containsKey(OutputKeys.ENCODING) ? xmlProps.get(OutputKeys.ENCODING) : "UTF-8"; //$NON-NLS-1$
@@ -846,9 +841,9 @@ public final class Utils {
         Date signingTime = null;
         if (namespace != null) {
             try {
-                signingTime =
-                        new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse(((Element) signature.getElementsByTagNameNS(namespace, "SigningTime") //$NON-NLS-1$ //$NON-NLS-2$
-                                                                                                .item(0)).getTextContent());
+                signingTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse( //$NON-NLS-1$
+            		((Element) signature.getElementsByTagNameNS(namespace, "SigningTime").item(0)).getTextContent() //$NON-NLS-1$
+        		);
             }
             catch (final Exception e) {
                 LOGGER.warning("No se ha podido recuperar la fecha de firma: " + e); //$NON-NLS-1$

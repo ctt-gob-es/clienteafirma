@@ -30,7 +30,7 @@ import es.gob.afirma.core.misc.AOUtil;
 
 
 /** Comprueba la ejecuci&oacute;n de firmas electr&oacute;nicas ODF. */
-public final class AOODFSignerTest {
+public final class TestAOODFSignerTest {
 
     private static final String CERT_PATH = "ANF_PF_Activo.pfx"; //$NON-NLS-1$
     private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
@@ -48,7 +48,7 @@ public final class AOODFSignerTest {
     static {
     	for (final String dataFile : DATA_FILES) {
         	try {
-    			DATA.add(AOUtil.getDataFromInputStream(AOODFSignerTest.class.getResourceAsStream("/" + dataFile))); //$NON-NLS-1$
+    			DATA.add(AOUtil.getDataFromInputStream(TestAOODFSignerTest.class.getResourceAsStream("/" + dataFile))); //$NON-NLS-1$
     		} catch (final IOException e) {
     			Logger.getLogger("es.gob.afirma").severe("No se ha podido cargar el fichero de pruebas: " + dataFile);  //$NON-NLS-1$//$NON-NLS-2$
     			DATA.add(null);
@@ -101,12 +101,8 @@ public final class AOODFSignerTest {
 					Assert.assertNotNull(result);
 
 					fos.write(result);
-					try {
-						fos.flush();
-						fos.close();
-					} catch (final Exception e) {
-						// No hacemos nada
-					}
+					fos.flush();
+					fos.close();
 
 					System.out.println("Temporal para comprobacion manual: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 				}
@@ -143,12 +139,8 @@ public final class AOODFSignerTest {
 					Assert.assertNotNull(result);
 
 					fos.write(result);
-					try {
-						fos.flush();
-						fos.close();
-					} catch (final Exception e) {
-						// No hacemos nada
-					}
+					fos.flush();
+					fos.close();
 
 					System.out.println("Temporal para comprobacion manual: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 				}

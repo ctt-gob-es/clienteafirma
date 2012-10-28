@@ -550,7 +550,8 @@ public final class AOXAdESSigner implements AOSigner {
      * </p>
      * @return Firma en formato XAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-    public byte[] sign(final byte[] data,
+    @Override
+	public byte[] sign(final byte[] data,
                        final String algorithm,
                        final PrivateKeyEntry keyEntry,
                        final Properties xParams) throws AOException {
@@ -618,14 +619,15 @@ public final class AOXAdESSigner implements AOSigner {
      * @return Valor booleano, siendo verdadero cuando la firma es enveloping */
     public static boolean isEnveloping(final Element element) {
         if (element.getLocalName().equals(SIGNATURE_TAG) ||
-           (element.getLocalName().equals(AFIRMA) && element.getFirstChild().getLocalName().equals(SIGNATURE_TAG))) {
+           element.getLocalName().equals(AFIRMA) && element.getFirstChild().getLocalName().equals(SIGNATURE_TAG)) {
             return true;
         }
         return false;
     }
 
     /** {@inheritDoc} */
-    public byte[] getData(final byte[] sign) throws AOInvalidFormatException {
+    @Override
+	public byte[] getData(final byte[] sign) throws AOInvalidFormatException {
         // nueva instancia de DocumentBuilderFactory que permita espacio de
         // nombres (necesario para XML)
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -799,7 +801,7 @@ public final class AOXAdESSigner implements AOSigner {
         }
         final SignaturePolicyIdentifier spi = new SignaturePolicyIdentifierImpl(false);
         try {
-            spi.setIdentifier(identifier, (hashAlgo != null) ? identifierHash : null, hashAlgo);
+            spi.setIdentifier(identifier, hashAlgo != null ? identifierHash : null, hashAlgo);
         }
         catch (final Exception e) {
             LOGGER.warning("No se ha podido acceder al identificador ('" + identifier //$NON-NLS-1$
@@ -809,7 +811,7 @@ public final class AOXAdESSigner implements AOSigner {
         }
         // FIXME: Error en JXAdES. Si la descripcion es nula toda la firma
         // falla.
-        final String desc = (description != null ? description : ""); //$NON-NLS-1$
+        final String desc = description != null ? description : ""; //$NON-NLS-1$
         spi.setDescription(desc);
 
         if (qualifier != null) {
@@ -910,7 +912,8 @@ public final class AOXAdESSigner implements AOSigner {
      * </dl>
      * @return Cofirma en formato XAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-    public byte[] cosign(final byte[] data,
+    @Override
+	public byte[] cosign(final byte[] data,
                          final byte[] sign,
                          final String algorithm,
                          final PrivateKeyEntry keyEntry,
@@ -1009,7 +1012,8 @@ public final class AOXAdESSigner implements AOSigner {
      * </dl>
      * @return Cofirma en formato XAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-    public byte[] cosign(final byte[] sign,
+    @Override
+	public byte[] cosign(final byte[] sign,
                          final String algorithm,
                          final PrivateKeyEntry keyEntry,
                          final Properties extraParams) throws AOException {
@@ -1103,7 +1107,8 @@ public final class AOXAdESSigner implements AOSigner {
      * </dl>
      * @return Contrafirma en formato XAdES.
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-    public byte[] countersign(final byte[] sign,
+    @Override
+	public byte[] countersign(final byte[] sign,
                               final String algorithm,
                               final CounterSignTarget targetType,
                               final Object[] targets,
@@ -1117,7 +1122,8 @@ public final class AOXAdESSigner implements AOSigner {
     }
 
     /** {@inheritDoc} */
-    public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) throws AOInvalidFormatException {
+    @Override
+	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) throws AOInvalidFormatException {
 
     	if (!isSign(sign)) {
     		throw new AOInvalidFormatException("Los datos indicados no son una firma XAdES compatible"); //$NON-NLS-1$
@@ -1225,7 +1231,8 @@ public final class AOXAdESSigner implements AOSigner {
     }
 
     /** {@inheritDoc} */
-    public boolean isSign(final byte[] sign) {
+    @Override
+	public boolean isSign(final byte[] sign) {
 
         if (sign == null) {
             LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
@@ -1282,7 +1289,8 @@ public final class AOXAdESSigner implements AOSigner {
     }
 
     /** {@inheritDoc} */
-    public boolean isValidDataFile(final byte[] data) {
+    @Override
+	public boolean isValidDataFile(final byte[] data) {
         if (data == null) {
             LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
             return false;
@@ -1291,7 +1299,8 @@ public final class AOXAdESSigner implements AOSigner {
     }
 
     /** {@inheritDoc} */
-    public String getSignedName(final String originalName, final String inText) {
+    @Override
+	public String getSignedName(final String originalName, final String inText) {
         return originalName + (inText != null ? inText : "") + ".xsig"; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
@@ -1321,7 +1330,8 @@ public final class AOXAdESSigner implements AOSigner {
     }
 
     /** {@inheritDoc} */
-    public AOSignInfo getSignInfo(final byte[] sign) throws AOException {
+    @Override
+	public AOSignInfo getSignInfo(final byte[] sign) throws AOException {
         if (sign == null) {
             throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$
         }

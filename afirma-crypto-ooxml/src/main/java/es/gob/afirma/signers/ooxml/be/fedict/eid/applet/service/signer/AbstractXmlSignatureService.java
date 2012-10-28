@@ -149,7 +149,8 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
         return "XML Document"; //$NON-NLS-1$
     }
 
-    public byte[] preSign(final List<DigestInfo> digestInfos,
+    @Override
+	public byte[] preSign(final List<DigestInfo> digestInfos,
                           final List<X509Certificate> signingCertificateChain,
                           final PrivateKey signingKey) throws NoSuchAlgorithmException,
                                                               InvalidAlgorithmParameterException,
@@ -162,7 +163,8 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
         return getSignedXML(getSignatureDigestAlgorithm(), digestInfos, signingCertificateChain, signingKey);
     }
 
-    public byte[] postSign(final byte[] signedXML,
+    @Override
+	public byte[] postSign(final byte[] signedXML,
                            final List<X509Certificate> signingCertificateChain,
                            final String signatureId,
                            final byte[] signatureValue) throws ParserConfigurationException,

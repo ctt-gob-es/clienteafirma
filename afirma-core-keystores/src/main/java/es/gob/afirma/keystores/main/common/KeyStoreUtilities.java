@@ -82,7 +82,7 @@ public final class KeyStoreUtilities {
         // proveedor PKCS#11 de Sun
         // falla si llegan espacios o caracteres raros
               .append("name=") //$NON-NLS-1$
-              .append((name != null) ? name : "AFIRMA-PKCS11") //$NON-NLS-1$
+              .append(name != null ? name : "AFIRMA-PKCS11") //$NON-NLS-1$
               .append("\r\n") //$NON-NLS-1$
               .append("showInfo=true\r\n"); //$NON-NLS-1$
 
@@ -226,7 +226,8 @@ public final class KeyStoreUtilities {
                             final KeyStore tmpKs = ks;
                             AccessController.doPrivileged(new PrivilegedAction<Void>() {
                             	/** {@inheritDoc} */
-                                public Void run() {
+                                @Override
+								public Void run() {
                                     final PrivateKey key;
                                     try {
                                         LOGGER.info("Detectado almacen Llavero de Mac OS X, se trataran directamente las claves privadas"); //$NON-NLS-1$
@@ -450,7 +451,8 @@ public final class KeyStoreUtilities {
     	}
     	Arrays.sort(orderedFriendlyNames, new Comparator<NameCertificateBean>() {
     		/** {@inheritDoc} */
-    		public int compare(final NameCertificateBean o1, final NameCertificateBean o2) {
+    		@Override
+			public int compare(final NameCertificateBean o1, final NameCertificateBean o2) {
     			if (o1 == null && o2 == null) {
     				return 0;
     			}

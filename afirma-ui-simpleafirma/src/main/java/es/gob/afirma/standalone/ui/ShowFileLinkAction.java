@@ -52,9 +52,9 @@ final class ShowFileLinkAction {
                 final OutputStream fos = new FileOutputStream(tmp);
                 final OutputStream bos = new BufferedOutputStream(fos);
                 bos.write(this.data);
-                try { bos.flush(); } catch(final Exception e) { /* Ignoramos los errores */ }
-                try { bos.close(); } catch(final Exception e) { /* Ignoramos los errores */ }
-                try { fos.close(); } catch(final Exception e) { /* Ignoramos los errores */ }
+                bos.flush();
+                bos.close();
+                fos.close();
                 Desktop.getDesktop().open(tmp);
             }
             catch(final Exception e) {
@@ -80,7 +80,7 @@ final class ShowFileLinkAction {
 
     private static String getCommonDataExtension(final byte[] dat) {
     	final String ext = new MimeHelper(dat).getExtension();
-        return (ext == null || ext.length() == 0) ? null : ext;
+        return ext == null || ext.length() == 0 ? null : ext;
     }
 
     @Override

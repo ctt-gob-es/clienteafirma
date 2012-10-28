@@ -120,9 +120,7 @@ public final class TestFacturaE {
                     final File f = File.createTempFile("Factura_firmada_" + filename.replace(".xml", "") + "-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
                     final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
                     fos.write(result);
-                    try { fos.flush(); fos.close(); } catch (final Exception e) {
-                        // Ignoramos los errores
-                    }
+                    fos.flush(); fos.close();
                     System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
 
 //                    // Enviamos a validar a AFirma
@@ -172,7 +170,7 @@ public final class TestFacturaE {
             return false;
         }
 
-        final String xadesNamespace = (namespace != null) ? namespace : Utils.guessXAdESNamespaceURL(document.getFirstChild());
+        final String xadesNamespace = namespace != null ? namespace : Utils.guessXAdESNamespaceURL(document.getFirstChild());
 
         final NodeList upNodes = document.getElementsByTagName(xadesNamespace + ":UnsignedProperties"); //$NON-NLS-1$
         for (int i = 0; i < upNodes.getLength(); i++) {

@@ -164,10 +164,10 @@ final class CAdESCoSigner {
                            final String contentType,
                            final String contentDescription) throws IOException, NoSuchAlgorithmException, CertificateException {
 
-        final ASN1InputStream is = new ASN1InputStream(sign);
-
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
+    	final ASN1InputStream is = new ASN1InputStream(sign);
         final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+        is.close();
         final Enumeration<?> e = dsq.getObjects();
         // Elementos que contienen los elementos OID SignedData
         e.nextElement();
@@ -349,10 +349,10 @@ final class CAdESCoSigner {
                            final String contentType,
                            final String contentDescription) throws IOException, NoSuchAlgorithmException, CertificateException {
 
-        final ASN1InputStream is = new ASN1InputStream(data);
-
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
+    	final ASN1InputStream is = new ASN1InputStream(data);
         final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+        is.close();
         final Enumeration<?> e = dsq.getObjects();
         // Elementos que contienen los elementos OID SignedData
         e.nextElement();

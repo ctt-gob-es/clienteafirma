@@ -20,6 +20,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -46,7 +47,7 @@ public final class VisorPanel extends JPanel implements KeyListener {
     private static final long serialVersionUID = 8309157734617505338L;
 
     private final VisorFirma visorFirma;
-    
+
     VisorFirma getVisorFirma() {
         return this.visorFirma;
     }
@@ -84,13 +85,13 @@ public final class VisorPanel extends JPanel implements KeyListener {
             return;
         }
 
-        byte[] sign = (signature != null) ?  signature.clone() : null;
+        byte[] sign = signature != null ?  signature.clone() : null;
 
         if (sign == null && signFile != null) {
             try {
                 final FileInputStream fis = new FileInputStream(signFile);
                 sign = AOUtil.getDataFromInputStream(fis);
-                try { fis.close(); } catch (final Exception e) { /* Ignoramos los errores */ }
+                fis.close();
             }
             catch (final Exception e) {
                 Logger.getLogger("es.gob.afirma").warning("No se ha podido cargar el fichero de firma: " + e); //$NON-NLS-1$ //$NON-NLS-2$
@@ -168,8 +169,9 @@ public final class VisorPanel extends JPanel implements KeyListener {
     /**
      * Comprueba la validez de la firma.
      * @param sign Firma que se desea comprobar.
-     * @return {@code true} si la firma es v&acute;lida, {@code false} en caso contrario. */
-    private static SignValidity validateSign(final byte[] sign) {
+     * @return {@code true} si la firma es v&acute;lida, {@code false} en caso contrario.
+     * @throws IOException Si ocurren problemas relacionados con la lectura de la firma */
+    private static SignValidity validateSign(final byte[] sign) throws IOException {
         if (DataAnalizerUtil.isSignedPDF(sign)) {
             return new SignValidity(SIGN_DETAIL_TYPE.OK, null);
         }

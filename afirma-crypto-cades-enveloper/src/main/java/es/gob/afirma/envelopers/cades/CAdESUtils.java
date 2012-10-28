@@ -294,6 +294,7 @@ final class CAdESUtils {
         if (params != null) {
             final ASN1InputStream aIn = new ASN1InputStream(cipher.getParameters().getEncoded("ASN.1")); //$NON-NLS-1$
             asn1Params = aIn.readObject();
+            aIn.close();
         }
         else {
             asn1Params = new DERNull();
@@ -664,7 +665,7 @@ final class CAdESUtils {
         contexExpecific.add(new Attribute(CMSAttributes.signingTime, new DERSet(new DERUTCTime(new Date()))));
 
         // MessageDigest
-        contexExpecific.add(new Attribute(CMSAttributes.messageDigest, new DERSet(new DEROctetString((messageDigest != null) ? messageDigest : MessageDigest.getInstance(digestAlgorithm).digest(datos)))));
+        contexExpecific.add(new Attribute(CMSAttributes.messageDigest, new DERSet(new DEROctetString(messageDigest != null ? messageDigest : MessageDigest.getInstance(digestAlgorithm).digest(datos)))));
 
         return contexExpecific;
     }
@@ -820,8 +821,8 @@ final class CAdESUtils {
     static SecretKey assignKey(final AOCipherConfig config, final String key) {
 
         // Generamos la clave necesaria para el cifrado
-        if ((config.getAlgorithm().equals(AOCipherAlgorithm.PBEWITHMD5ANDDES)) || (config.getAlgorithm().equals(AOCipherAlgorithm.PBEWITHSHA1ANDDESEDE))
-            || (config.getAlgorithm().equals(AOCipherAlgorithm.PBEWITHSHA1ANDRC2_40))) {
+        if (config.getAlgorithm().equals(AOCipherAlgorithm.PBEWITHMD5ANDDES) || config.getAlgorithm().equals(AOCipherAlgorithm.PBEWITHSHA1ANDDESEDE)
+            || config.getAlgorithm().equals(AOCipherAlgorithm.PBEWITHSHA1ANDRC2_40)) {
             try {
                 return SecretKeyFactory.getInstance(config.getAlgorithm().getName()).generateSecret(new PBEKeySpec(key.toCharArray(),
                                                                                                                    SALT,

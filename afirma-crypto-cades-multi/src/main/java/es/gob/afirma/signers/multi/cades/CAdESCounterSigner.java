@@ -113,10 +113,10 @@ final class CAdESCounterSigner {
                                 final String contentType,
                                 final String contentDescription) throws IOException, NoSuchAlgorithmException, CertificateException, AOException {
 
-        final ASN1InputStream is = new ASN1InputStream(data);
-
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
+    	final ASN1InputStream is = new ASN1InputStream(data);
         final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+        is.close();
         final Enumeration<?> e = dsq.getObjects();
         // Elementos que contienen los elementos OID SignedData
         e.nextElement();
@@ -215,6 +215,7 @@ final class CAdESCounterSigner {
                 // Esto se realiza asi por problemas con los casting.
                 final ASN1InputStream sd2 = new ASN1InputStream(sigDat.getEncoded(ASN1Encoding.DER));
                 final ASN1Sequence contentSignedData2 = (ASN1Sequence) sd2.readObject();// contenido del SignedData
+                sd2.close();
                 aux = SignedData.getInstance(contentSignedData2);
             }
 
@@ -246,6 +247,7 @@ final class CAdESCounterSigner {
                 // Esto se realiza as&iacute; por problemas con los casting.
                 final ASN1InputStream sd2 = new ASN1InputStream(sigDat.getEncoded(ASN1Encoding.DER));
                 final ASN1Sequence contentSignedData2 = (ASN1Sequence) sd2.readObject();// contenido del SignedData
+                sd2.close();
 
                 aux = SignedData.getInstance(contentSignedData2);
             }

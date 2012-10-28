@@ -10,6 +10,7 @@
 
 package es.gob.afirma.signers.cades;
 
+import java.io.IOException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.X509Certificate;
 import java.util.Properties;
@@ -130,14 +131,15 @@ public final class AOCAdESSigner implements AOSigner {
      * </dl>
      * @return Firma en formato CAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-    public byte[] sign(final byte[] data,
+    @Override
+	public byte[] sign(final byte[] data,
                        final String algorithm,
                        final PrivateKeyEntry keyEntry,
                        final Properties xParams) throws AOException {
 
     	new BCChecker().checkBouncyCastle();
 
-        final Properties extraParams = (xParams != null) ? xParams : new Properties();
+        final Properties extraParams = xParams != null ? xParams : new Properties();
 
         final String precalculatedDigest = extraParams.getProperty("precalculatedHashAlgorithm"); //$NON-NLS-1$
         byte[] messageDigest = null;
@@ -162,7 +164,7 @@ public final class AOCAdESSigner implements AOSigner {
         final P7ContentSignerParameters csp = new P7ContentSignerParameters(
     		data,
     		algorithm,
-    		(Boolean.parseBoolean(extraParams.getProperty("includeOnlySignningCertificate"))) ? //$NON-NLS-1$
+    		Boolean.parseBoolean(extraParams.getProperty("includeOnlySignningCertificate")) ? //$NON-NLS-1$
     			new X509Certificate[] { (X509Certificate) keyEntry.getCertificateChain()[0] } :
 				(X509Certificate[]) keyEntry.getCertificateChain()
 		);
@@ -286,7 +288,8 @@ public final class AOCAdESSigner implements AOSigner {
      * </dl>
      * @return Firma CAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-    public byte[] cosign(final byte[] data,
+    @Override
+	public byte[] cosign(final byte[] data,
                          final byte[] sign,
                          final String algorithm,
                          final PrivateKeyEntry keyEntry,
@@ -372,7 +375,8 @@ public final class AOCAdESSigner implements AOSigner {
      * </dl>
      * @return Firma CAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-    public byte[] cosign(final byte[] sign,
+    @Override
+	public byte[] cosign(final byte[] sign,
                          final String algorithm,
                          final PrivateKeyEntry keyEntry,
                          final Properties extraParams) throws AOException {
@@ -449,7 +453,8 @@ public final class AOCAdESSigner implements AOSigner {
      * </dl>
      * @return Contrafirma CAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-    public byte[] countersign(final byte[] sign,
+    @Override
+	public byte[] countersign(final byte[] sign,
                               final String algorithm,
                               final CounterSignTarget targetType,
                               final Object[] targets,
@@ -481,8 +486,10 @@ public final class AOCAdESSigner implements AOSigner {
      *        titulares de los certificados usados para cada firma.
      * @return &Aacute;rbol de nodos de firma o <code>null</code> en caso de
      *         error.
-     * @throws AOInvalidFormatException Cuando los datos introducidos no son una firma CAdES. */
-    public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) throws AOInvalidFormatException {
+     * @throws AOInvalidFormatException Cuando los datos introducidos no son una firma CAdES.
+     * @throws IOException Si ocurren problemas relacionados con la lectura de la firma */
+    @Override
+	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) throws AOInvalidFormatException, IOException {
     	new BCChecker().checkBouncyCastle();
     	if (!CAdESValidator.isCAdESValid(sign)) {
     		throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
@@ -498,8 +505,10 @@ public final class AOCAdESSigner implements AOSigner {
 
     /** Indica si un dato es una firma compatible con los m&eacute;todos de firma, cofirma y contrafirma de esta clase.
      * @param data Datos que deseamos comprobar.
-     * @return <code>true</code> si el dato es una firma reconocida por esta clase (&uacute;nicamente CAdES), <code>false</code> en caso contrario. */
-    public boolean isSign(final byte[] data) {
+     * @return <code>true</code> si el dato es una firma reconocida por esta clase (&uacute;nicamente CAdES), <code>false</code> en caso contrario.
+     * @throws IOException Si ocurren problemas relacionados con la lectura de los datos */
+    @Override
+	public boolean isSign(final byte[] data) throws IOException {
         if (data == null) {
             LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
             return false;
@@ -514,7 +523,8 @@ public final class AOCAdESSigner implements AOSigner {
      * @param data Datos que deseamos comprobar.
      * @return <code>true</code> si el dato es v&aacute;aacute;lido para
      *         firmar, <code>false</code> en caso contrario. */
-    public boolean isValidDataFile(final byte[] data) {
+    @Override
+	public boolean isValidDataFile(final byte[] data) {
         if (data == null) {
             LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
             return false;
@@ -529,8 +539,10 @@ public final class AOCAdESSigner implements AOSigner {
      * @throws AOInvalidFormatException
      *         Si no se ha introducido un fichero de firma v&aacute;lido o no
      *         ha podido leerse la firma.
+     * @throws IOException Si ocurren problemas relacionados con la lectura de la firma.
      * @throws IllegalArgumentException Si la firma introducida es nula. */
-    public byte[] getData(final byte[] signData) throws AOInvalidFormatException {
+    @Override
+	public byte[] getData(final byte[] signData) throws AOInvalidFormatException, IOException {
         if (signData == null) {
             throw new IllegalArgumentException("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
         }
@@ -548,7 +560,8 @@ public final class AOCAdESSigner implements AOSigner {
      * @param originalName Nombre del fichero original que se firma
      * @param inText Sufijo a agregar al nombre de fichero devuelto, inmediatamente anterior a la extensi&oacute;n <i>.csig</i>
      * @return Nombre apropiado para el fichero de firma. */
-    public String getSignedName(final String originalName, final String inText) {
+    @Override
+	public String getSignedName(final String originalName, final String inText) {
         return originalName + (inText != null ? inText : "") + ".csig"; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
@@ -562,8 +575,10 @@ public final class AOCAdESSigner implements AOSigner {
      *         Cuando la firma introducida no es un objeto de firma
      *         reconocido por este manejador.
      * @throws AOInvalidFormatException Si los datos proporcionados no se corresponden con una firma CAdES
+     * @throws IOException
      * @throws IllegalArgumentException Si La firma introducida es nula. */
-    public AOSignInfo getSignInfo(final byte[] signData) throws AOInvalidFormatException {
+    @Override
+	public AOSignInfo getSignInfo(final byte[] signData) throws AOInvalidFormatException, IOException {
         if (signData == null) {
             throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$
         }

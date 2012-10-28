@@ -78,7 +78,7 @@ public final class DigestedData implements ASN1Encodable {
         this.version = (DERInteger) e.nextElement();
         this.digestAlgorithm = new AlgorithmIdentifier((ASN1Sequence) e.nextElement());
         this.contentInfo = new ContentInfo((ASN1Sequence) e.nextElement());
-        this.digest = ((ASN1OctetString) (e.nextElement()));
+        this.digest = (ASN1OctetString) e.nextElement();
 
     }
 
@@ -122,7 +122,8 @@ public final class DigestedData implements ASN1Encodable {
      *
      * Digest ::= OCTET STRING
      * </pre> */
-    public ASN1Primitive toASN1Primitive() {
+    @Override
+	public ASN1Primitive toASN1Primitive() {
         final ASN1EncodableVector v = new ASN1EncodableVector();
 
         v.add(this.version);

@@ -111,7 +111,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
      * @return <code>true</code> si el <code>AOKeyStoreManager</code> est&aacute; listo para usarse, <code>false</code> en caso
      *         contrario */
     public boolean isKeyStoreReady() {
-        return (this.ksManager != null);
+        return this.ksManager != null;
     }
 
     synchronized void setKeyStoreManager(final AOKeyStoreManager ksm) {
@@ -405,13 +405,8 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
                 }
                 final FileOutputStream fos = new FileOutputStream(helpFile);
                 fos.write(helpDocument);
-                try {
-                    fos.flush();
-                    fos.close();
-                }
-                catch(final Exception e) {
-                    // Se ignora
-                }
+                fos.flush();
+                fos.close();
                 Desktop.getDesktop().open(helpFile);
                 return;
             }

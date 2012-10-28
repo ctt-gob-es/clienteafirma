@@ -126,12 +126,13 @@ public final class AOODFSigner implements AOSigner {
      * </dl>
      * @return Documento ODF con la nueva firma a&ntilde;adida
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-    public byte[] sign(final byte[] data,
+    @Override
+	public byte[] sign(final byte[] data,
                        final String algorithm,
                        final PrivateKeyEntry keyEntry,
                        final Properties xParams) throws AOException {
 
-        final Properties extraParams = (xParams != null) ? xParams : new Properties();
+        final Properties extraParams = xParams != null ? xParams : new Properties();
 
         final String digestMethodAlgorithm = extraParams.getProperty("referencesDigestMethod", DIGEST_METHOD); //$NON-NLS-1$
         final boolean useOpenOffice31Mode = "true".equalsIgnoreCase(extraParams.getProperty("useOpenOffice31Mode")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -149,18 +150,8 @@ public final class AOODFSigner implements AOSigner {
             final File zipFile = File.createTempFile("sign", ".zip"); //$NON-NLS-1$ //$NON-NLS-2$
             final FileOutputStream fos = new FileOutputStream(zipFile);
             fos.write(data);
-            try {
-                fos.flush();
-            }
-            catch (final Exception e) {
-             // Ignoramos los errores en el vaciado
-            }
-            try {
-                fos.close();
-            }
-            catch (final Exception e) {
-             // Ignoramos los errores en el cierre
-            }
+            fos.flush();
+            fos.close();
 
             // carga el fichero zip
             final ZipFile zf = new ZipFile(zipFile);
@@ -171,12 +162,7 @@ public final class AOODFSigner implements AOSigner {
             final byte[] manifestData = AOUtil.getDataFromInputStream(manifest);
 
             if (manifest != null) {
-                try {
-                    manifest.close();
-                }
-                catch (final Exception t) {
-                 // Ignoramos los errores en el cierre
-                }
+                manifest.close();
             }
 
             // obtiene el documento manifest.xml y su raiz
@@ -204,6 +190,7 @@ public final class AOODFSigner implements AOSigner {
                 dm = fac.newDigestMethod(digestMethodAlgorithm, null);
             }
             catch (final Exception e) {
+                zf.close();
                 throw new AOException(
                       "No se ha podido obtener un generador de huellas digitales con el algoritmo: " + digestMethodAlgorithm, e //$NON-NLS-1$
                 );
@@ -417,12 +404,9 @@ public final class AOODFSigner implements AOSigner {
             catch (final Exception t) {
                 // Ignoramos los errores en el cierre
             }
-
+            zf.close();
             return baos.toByteArray();
 
-        }
-        catch (final IOException ioex) {
-            throw new AOFormatFileException("No es posible abrir el fichero. " + fullPath + ": " + ioex); //$NON-NLS-1$ //$NON-NLS-2$
         }
         catch (final SAXException saxex) {
             throw new AOFormatFileException("Estructura de archivo no valida: " + fullPath + ": " + saxex); //$NON-NLS-1$ //$NON-NLS-2$
@@ -450,7 +434,8 @@ public final class AOODFSigner implements AOSigner {
      * </dl>
      * @return Documento ODF con la nueva firma a&ntilde;adida
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-    public byte[] cosign(final byte[] data,
+    @Override
+	public byte[] cosign(final byte[] data,
                          final byte[] sign,
                          final String algorithm,
                          final PrivateKeyEntry keyEntry,
@@ -474,7 +459,8 @@ public final class AOODFSigner implements AOSigner {
      * </dl>
      * @return Documento ODF con la nueva firma a&ntilde;adida
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-    public byte[] cosign(final byte[] sign,
+    @Override
+	public byte[] cosign(final byte[] sign,
                          final String algorithm,
                          final PrivateKeyEntry keyEntry,
                          final Properties extraParams) throws AOException {
@@ -483,7 +469,8 @@ public final class AOODFSigner implements AOSigner {
 
     /** M&eacute;todo no implementado. No es posible realizar contrafirmas de
      * documentos ODF. Lanza siempre una <code>UnsupportedOperationException</code>. */
-    public byte[] countersign(final byte[] sign,
+    @Override
+	public byte[] countersign(final byte[] sign,
                               final String algorithm,
                               final CounterSignTarget targetType,
                               final Object[] targets,
@@ -493,7 +480,8 @@ public final class AOODFSigner implements AOSigner {
     }
 
     /** {@inheritDoc} */
-    public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) throws AOInvalidFormatException {
+    @Override
+	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) throws AOInvalidFormatException, IOException {
 
     	if (!isSign(sign)) {
     		throw new AOInvalidFormatException("Los datos indicados no se corresponden con un ODF firmado"); //$NON-NLS-1$
@@ -505,18 +493,8 @@ public final class AOODFSigner implements AOSigner {
             final File zipFile = File.createTempFile("sign", ".zip"); //$NON-NLS-1$ //$NON-NLS-2$
             final FileOutputStream fos = new FileOutputStream(zipFile);
             fos.write(sign);
-            try {
-                fos.flush();
-            }
-            catch (final Exception e) {
-             // Ignoramos los errores en el vaciado
-            }
-            try {
-                fos.close();
-            }
-            catch (final Exception e) {
-             // Ignoramos los errores en el cierre
-            }
+            fos.flush();
+            fos.close();
 
             // carga el fichero zip
             final ZipFile zf = new ZipFile(zipFile);
@@ -582,6 +560,9 @@ public final class AOODFSigner implements AOSigner {
                 }
             }
 
+            signIs.close();
+            zf.close();
+
             try {
                 zipFile.delete();
             }
@@ -601,8 +582,10 @@ public final class AOODFSigner implements AOSigner {
      * electr&oacute;nica.
      * @param signData Datos que deseamos comprobar.
      * @return Devuelve <code>true</code> si los datos indicados son un documento ODF susceptible de contener una firma
-     * electr&oacute;nica, <code>false</code> en caso contrario. */
-    public boolean isSign(final byte[] signData) {
+     * electr&oacute;nica, <code>false</code> en caso contrario.
+     * @throws IOException Si ocurren problemas durante la lectura de la firma */
+    @Override
+	public boolean isSign(final byte[] signData) throws IOException {
         if(!isValidDataFile(signData)) {
         	return false;
         }
@@ -611,29 +594,35 @@ public final class AOODFSigner implements AOSigner {
     	try {
     		odfFile = createTempFile(signData);
     		odfFile.deleteOnExit();
-    	} catch (final Exception e) {
+    	}
+    	catch (final Exception e) {
     		LOGGER.warning("No se pudo crear una copia del fichero para su analisis, se devolvera false"); //$NON-NLS-1$
 			return false;
 		}
 
     	// carga el fichero zip
-    	final ZipFile zf;
+    	ZipFile zf = null;
     	try {
     		zf = new ZipFile(odfFile);
     	}
     	catch (final Exception e) {
-    		// Si detectamos que no es un fichero Zip, devolvemos null
+    		if (zf != null) {
+    			zf.close();
+    		}
     		return false;
     	}
 
     	// obtiene el archivo mimetype
-    	return zf.getEntry(AOODFSigner.SIGNATURES_PATH) != null;
+    	final boolean ret = zf.getEntry(AOODFSigner.SIGNATURES_PATH) != null;
+    	zf.close();
+    	return ret;
     }
 
     /** Indica si los datos son un documento ODF susceptible de ser firmado.
      * @param data Datos a comprobar
      * @return <cod>true</code> si los datos son un documento ODF susceptible de ser firmado, <code>false</code> en caso contrario */
-    public boolean isValidDataFile(final byte[] data) {
+    @Override
+	public boolean isValidDataFile(final byte[] data) {
 
     	final File odfFile;
     	try {
@@ -663,9 +652,10 @@ public final class AOODFSigner implements AOSigner {
     }
 
     /** {@inheritDoc} */
-    public String getSignedName(final String originalName, final String inText) {
+    @Override
+	public String getSignedName(final String originalName, final String inText) {
 
-        final String inTextInt = (inText != null ? inText : ""); //$NON-NLS-1$
+        final String inTextInt = inText != null ? inText : ""; //$NON-NLS-1$
 
         if (originalName == null) {
             return inTextInt + ".odf"; //$NON-NLS-1$
@@ -707,8 +697,10 @@ public final class AOODFSigner implements AOSigner {
 
     /** Si la entrada es un documento ODF, devuelve el mismo documento sin ninguna modificaci&oacute;n.
      * @param signData Documento ODF
-     * @return Documento de entrada si este es ODF, <code>null</code> en cualquier otro caso */
-    public byte[] getData(final byte[] signData) throws AOInvalidFormatException {
+     * @return Documento de entrada si este es ODF, <code>null</code> en cualquier otro caso
+     * @throws IOException Si ocurren problemas al leer la firma */
+    @Override
+	public byte[] getData(final byte[] signData) throws AOInvalidFormatException, IOException {
 
         // Si no es una firma ODF valida, lanzamos una excepcion
         if (!isSign(signData)) {
@@ -720,7 +712,8 @@ public final class AOODFSigner implements AOSigner {
     }
 
     /** {@inheritDoc} */
-    public AOSignInfo getSignInfo(final byte[] signData) throws AOException {
+    @Override
+	public AOSignInfo getSignInfo(final byte[] signData) throws AOException, IOException {
         if (signData == null) {
             throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$
         }
@@ -730,29 +723,26 @@ public final class AOODFSigner implements AOSigner {
         return new AOSignInfo(AOSignConstants.SIGN_FORMAT_ODF);
     }
 
-    private static String getODFMimeType(final File odfFile) {
+    private static String getODFMimeType(final File odfFile) throws IOException {
         String mimetype = null;
-        try {
-            // carga el fichero zip
-            final ZipFile zf;
-            try {
-                zf = new ZipFile(odfFile);
-            }
-            catch (final ZipException e) {
-                // Si detectamos que no es un fichero Zip, devolvemos null
-                return null;
-            }
 
-            // obtiene el archivo mimetype
-            final ZipEntry entry = zf.getEntry("mimetype"); //$NON-NLS-1$
-            if (entry != null) {
-                mimetype = new String(AOUtil.getDataFromInputStream(zf.getInputStream(entry)));
-            }
+        // carga el fichero zip
+        final ZipFile zf;
+        try {
+            zf = new ZipFile(odfFile);
         }
-        catch (final Exception e) {
-            LOGGER.severe("Error al analizar el fichero de firma: " + e); //$NON-NLS-1$
+        catch (final ZipException e) {
+            // Si detectamos que no es un fichero Zip, devolvemos null
             return null;
         }
+
+        // obtiene el archivo mimetype
+        final ZipEntry entry = zf.getEntry("mimetype"); //$NON-NLS-1$
+        if (entry != null) {
+            mimetype = new String(AOUtil.getDataFromInputStream(zf.getInputStream(entry)));
+        }
+        zf.close();
+
         return mimetype;
     }
 
@@ -769,19 +759,9 @@ public final class AOODFSigner implements AOSigner {
         final FileOutputStream fos = new FileOutputStream(zipFile);
 
         fos.write(data);
+        fos.flush();
+        fos.close();
 
-        try {
-            fos.flush();
-        }
-        catch (final Exception e) {
-         // Ignoramos los errores en el vaciado
-        }
-        try {
-            fos.close();
-        }
-        catch (final Exception e) {
-         // Ignoramos los errores en el cierre
-        }
         return zipFile;
     }
 

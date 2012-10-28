@@ -23,6 +23,7 @@ public class TestCadesValidator {
 	 * una firma CAdES ecpl&iacute;cita.
 	 * @throws Exception Cuando se produce cualquier error.
 	 */
+	@SuppressWarnings("static-method")
 	@Test
 	public void testComprobarFirmaCades() throws Exception {
 
@@ -30,15 +31,9 @@ public class TestCadesValidator {
 
 		final byte[] cades = AOUtil.getDataFromInputStream(is);
 
-		try {
-			Assert.assertTrue("La firma CAdES no es valida", //$NON-NLS-1$
+		Assert.assertTrue("La firma CAdES no es valida", //$NON-NLS-1$
 					CAdESValidator.isCAdESValid(cades, AOSignConstants.CMS_CONTENTTYPE_SIGNEDDATA));
-		} finally {
-			try {
-				is.close();
-			} catch (final Exception e) {
-				// Ignoramos el error
-			}
-		}
+		is.close();
+
 	}
 }

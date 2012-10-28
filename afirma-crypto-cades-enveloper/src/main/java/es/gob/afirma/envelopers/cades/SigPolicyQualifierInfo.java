@@ -57,7 +57,8 @@ final class SigPolicyQualifierInfo implements ASN1Encodable {
 
     /** Devuelve una representaci&oacute;n DER-encodable the esta estancia.
      * @return un valor <code>DERObject</code>. */
-    public ASN1Primitive toASN1Primitive() {
+    @Override
+	public ASN1Primitive toASN1Primitive() {
         final ASN1EncodableVector dev = new ASN1EncodableVector();
         dev.add(this.sigPolicyQualifierId);
         dev.add(this.sigQualifier);

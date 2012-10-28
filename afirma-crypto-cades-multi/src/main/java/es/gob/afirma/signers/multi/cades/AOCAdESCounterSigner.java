@@ -10,6 +10,7 @@
 
 package es.gob.afirma.signers.multi.cades;
 
+import java.io.IOException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.X509Certificate;
 import java.util.Properties;
@@ -29,33 +30,34 @@ import es.gob.afirma.signers.pkcs7.ReadNodesTree;
 public class AOCAdESCounterSigner implements AOCounterSigner {
 
 	/** {@inheritDoc} */
+	@Override
 	public byte[] countersign(final byte[] sign,
                               final String algorithm,
                               final CounterSignTarget targetType,
                               final Object[] targets,
                               final PrivateKeyEntry keyEntry,
-                              final Properties xParams) throws AOException {
+                              final Properties xParams) throws AOException, IOException {
 
-        final Properties extraParams = (xParams != null) ? xParams : new Properties();
+        final Properties extraParams = xParams != null ? xParams : new Properties();
 
         boolean signingCertificateV2;
         if (AOSignConstants.isSHA2SignatureAlgorithm(algorithm)) {
         	signingCertificateV2 = true;
-        } else if (extraParams.containsKey("signingCertificateV2")) { //$NON-NLS-1$
+        }
+        else if (extraParams.containsKey("signingCertificateV2")) { //$NON-NLS-1$
         	signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2")); //$NON-NLS-1$
-        } else {
+        }
+        else {
         	signingCertificateV2 = !"SHA1".equals(AOSignConstants.getDigestAlgorithmName(algorithm));	 //$NON-NLS-1$
         }
 
         final P7ContentSignerParameters csp = new P7ContentSignerParameters(
     		sign,
     		algorithm,
-    		(Boolean.parseBoolean(extraParams.getProperty("includeOnlySignningCertificate"))) ? //$NON-NLS-1$
+    		Boolean.parseBoolean(extraParams.getProperty("includeOnlySignningCertificate")) ? //$NON-NLS-1$
     			new X509Certificate[] { (X509Certificate) keyEntry.getCertificateChain()[0] } :
 				(X509Certificate[]) keyEntry.getCertificateChain()
-			);
-
-
+		);
 
         String contentTypeOid = MimeHelper.DEFAULT_CONTENT_OID_DATA;
         String contentDescription = MimeHelper.DEFAULT_CONTENT_DESCRIPTION;

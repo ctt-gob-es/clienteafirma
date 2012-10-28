@@ -62,8 +62,8 @@ public final class ValidateBinarySignature {
      * @param data Datos firmados o {@code null} si se desea comprobar contra los datos incrustados
      * en la firma.
      * @return <code>true</code> si la firma es v&aacute;lida, <code>false</code> en caso contrario
-     */
-    public static SignValidity validate(final byte[] sign, final byte[] data) {
+     * @throws IOException Si ocurren problemas relacionados con la lectura de la firma o los datos */
+    public static SignValidity validate(final byte[] sign, final byte[] data) throws IOException {
     	if (sign == null) {
     		throw new IllegalArgumentException("La firma a validar no puede ser nula"); //$NON-NLS-1$
     	}

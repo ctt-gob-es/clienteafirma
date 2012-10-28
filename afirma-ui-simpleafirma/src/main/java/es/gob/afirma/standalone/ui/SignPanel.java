@@ -235,15 +235,14 @@ public final class SignPanel extends JPanel {
             this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             return;
         }
+        finally {
+            fis.close();
+        }
         if (data == null || data.length < 1) {
             throw new IOException("No se ha podido leer el fichero"); //$NON-NLS-1$
         }
         this.dataToSign = data;
 
-        try {
-            fis.close();
-        }
-        catch (final Exception e) { /* Ignoramos los errores */ }
 
         String fileDescription;
         String iconPath;
@@ -526,18 +525,22 @@ public final class SignPanel extends JPanel {
                         loadFile(fileToLoad);
                     }
                     catch (final Exception e) {
+                    	e.printStackTrace();
+                    	LOGGER.severe("Error en la carga de fichero " + fileToLoad + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
                         UIUtils.showErrorMessage(
                                 UpperPanel.this,
                                 Messages.getString("SignPanel.36"), //$NON-NLS-1$
                                 Messages.getString("SimpleAfirma.7"), //$NON-NLS-1$
                                 JOptionPane.ERROR_MESSAGE
                         );
+                        // La carga habra dejado el cursor en reloj de arena
+                        SignPanel.this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                     }
 
                 }
             });
 
-            final JLabel welcomeLabel = new JLabel(((firstTime) ? (Messages.getString("SignPanel.14") + " ") : ("")) + Messages.getString("SignPanel.39")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+            final JLabel welcomeLabel = new JLabel((firstTime ? Messages.getString("SignPanel.14") + " " : "") + Messages.getString("SignPanel.39")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
             welcomeLabel.setFocusable(false);
             welcomeLabel.setFont(welcomeLabel.getFont().deriveFont(Font.PLAIN, 26));
             welcomeLabel.setLabelFor(SignPanel.this.getSelectButton());
@@ -968,7 +971,7 @@ public final class SignPanel extends JPanel {
     			);
             }
             // Esta propiedad se comparte con PAdES, hay que comprobar que signer tenemos
-            if (!"".equals(preferences.get(PreferencesNames.PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY, "")) && (SignPanel.this.getSigner() instanceof AOXAdESSigner)) {  //$NON-NLS-1$//$NON-NLS-2$
+            if (!"".equals(preferences.get(PreferencesNames.PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY, "")) && SignPanel.this.getSigner() instanceof AOXAdESSigner) {  //$NON-NLS-1$//$NON-NLS-2$
             	p.put(
         			"signatureProductionCity", //$NON-NLS-1$
         			preferences.get(PreferencesNames.PREFERENCE_XADES_SIGNATURE_PRODUCTION_CITY, "") //$NON-NLS-1$
@@ -1007,7 +1010,7 @@ public final class SignPanel extends JPanel {
     			);
             }
             // Esta propiedad se comparte con XAdES, hay que comprobar que signer tenemos
-            if (!"".equals(preferences.get(PreferencesNames.PREFERENCE_PADES_SIGN_PRODUCTION_CITY, "")) && (SignPanel.this.getSigner() instanceof AOPDFSigner)) {  //$NON-NLS-1$//$NON-NLS-2$
+            if (!"".equals(preferences.get(PreferencesNames.PREFERENCE_PADES_SIGN_PRODUCTION_CITY, "")) && SignPanel.this.getSigner() instanceof AOPDFSigner) {  //$NON-NLS-1$//$NON-NLS-2$
             	p.put(
         			"signatureProductionCity", //$NON-NLS-1$
         			preferences.get(PreferencesNames.PREFERENCE_PADES_SIGN_PRODUCTION_CITY, "") //$NON-NLS-1$

@@ -11,6 +11,7 @@
 package es.gob.afirma.signers.ooxml;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.Provider;
 import java.security.Security;
@@ -54,8 +55,10 @@ public final class AOOOXMLSigner implements AOSigner {
 
     /** Si la entrada es un documento OOXML, devuelve el mismo documento sin ninguna modificaci&oacute;n.
      * @param sign Documento OOXML
-     * @return Documento de entrada si este es OOXML, <code>null</code> en cualquier otro caso */
-    public byte[] getData(final byte[] sign) throws AOException {
+     * @return Documento de entrada si este es OOXML, <code>null</code> en cualquier otro caso
+     * @throws IOException Cuando ocurre alg&uacute;n error durante la lectura de la firma */
+    @Override
+	public byte[] getData(final byte[] sign) throws AOException, IOException {
 
         // Si no es una firma OOXML valida, lanzamos una excepcion
         if (!isSign(sign)) {
@@ -70,8 +73,9 @@ public final class AOOOXMLSigner implements AOSigner {
      * documento OOXML.
      * @param data Datos que deseamos analizar
      * @return {@code true} si el documento es un OOXML, {@code false} en caso
-     *         contrario */
-    private static boolean isOOXMLFile(final byte[] data) {
+     *         contrario
+     * @throws IOException Cuando ocurre alg&uacute;n error durante la lectura de los datos */
+    private static boolean isOOXMLFile(final byte[] data) throws IOException {
 
         final ZipFile zipFile;
         try {
@@ -81,20 +85,21 @@ public final class AOOOXMLSigner implements AOSigner {
             // El fichero no era un Zip ni, por tanto, OOXML
             return false;
         }
-        catch (final Exception e) {
-            LOGGER.severe("Error al cargar el fichero OOXML: " + e); //$NON-NLS-1$
-            return false;
-        }
 
         // Comprobamos si estan todos los ficheros principales del documento
 
-        return zipFile.getEntry("[Content_Types].xml") != null && (zipFile.getEntry("_rels/.rels") != null || zipFile.getEntry("_rels\\.rels") != null) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        final boolean ret = zipFile.getEntry("[Content_Types].xml") != null && (zipFile.getEntry("_rels/.rels") != null || zipFile.getEntry("_rels\\.rels") != null) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                && (zipFile.getEntry("docProps/app.xml") != null || zipFile.getEntry("docProps\\app.xml") != null) //$NON-NLS-1$ //$NON-NLS-2$
                && (zipFile.getEntry("docProps/core.xml") != null || zipFile.getEntry("docProps\\core.xml") != null); //$NON-NLS-1$ //$NON-NLS-2$
+
+        zipFile.close();
+
+        return ret;
     }
 
     /** { {@inheritDoc} */
-    public AOSignInfo getSignInfo(final byte[] sign) throws AOException {
+    @Override
+	public AOSignInfo getSignInfo(final byte[] sign) throws AOException, IOException {
         if (sign == null) {
             throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$
         }
@@ -111,8 +116,9 @@ public final class AOOOXMLSigner implements AOSigner {
     }
 
     /** { {@inheritDoc} */
-    public String getSignedName(final String originalName, final String inText) {
-        final String inTextInt = (inText != null ? inText : ""); //$NON-NLS-1$
+    @Override
+	public String getSignedName(final String originalName, final String inText) {
+        final String inTextInt = inText != null ? inText : ""; //$NON-NLS-1$
         if (originalName == null) {
             return inTextInt + ".ooxml"; //$NON-NLS-1$
         }
@@ -136,7 +142,8 @@ public final class AOOOXMLSigner implements AOSigner {
     }
 
     /** { {@inheritDoc} */
-    public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
+    @Override
+	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) throws IOException {
         if (sign == null) {
             throw new IllegalArgumentException("Los datos de firma introducidos son nulos"); //$NON-NLS-1$
         }
@@ -178,8 +185,10 @@ public final class AOOOXMLSigner implements AOSigner {
      * electr&oacute;nica.
      * @param sign Datos que deseamos comprobar.
      * @return Devuelve <code>true</code> si los datos indicados son un documento OOXML susceptible de contener una firma
-     * electr&oacute;nica, <code>false</code> en caso contrario. */
-    public boolean isSign(final byte[] sign) {
+     * electr&oacute;nica, <code>false</code> en caso contrario.
+     * @throws IOException Cuando ocurre alg&uacute;n error durante la lectura de la firma */
+    @Override
+	public boolean isSign(final byte[] sign) throws IOException {
         if (sign == null) {
             LOGGER.warning("Se ha introducido una firma nula para su comprobacion"); //$NON-NLS-1$
             return false;
@@ -189,8 +198,10 @@ public final class AOOOXMLSigner implements AOSigner {
 
     /** Indica si los datos son un documento OOXML susceptible de ser firmado.
      * @param data Datos a comprobar
-     * @return <cod>true</code> si los datos son un documento OOXML susceptible de ser firmado, <code>false</code> en caso contrario */
-    public boolean isValidDataFile(final byte[] data) {
+     * @return <cod>true</code> si los datos son un documento OOXML susceptible de ser firmado, <code>false</code> en caso contrario
+     * @throws IOException Cuando ocurre alg&uacute;n error durante la lectura de los datos */
+    @Override
+	public boolean isValidDataFile(final byte[] data) throws IOException {
         if (data == null) {
             LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
             return false;
@@ -211,11 +222,13 @@ public final class AOOOXMLSigner implements AOSigner {
      * @param keyEntry Entrada que apunta a la clave privada del firmante
      * @param extraParams No usado, se ignora el valor de este par&aacute;metro
      * @return Documento OOXML firmado
-     * @throws AOException Cuando ocurre alg&uacute;n error durante el proceso de firma */
-    public byte[] sign(final byte[] data,
+     * @throws AOException Cuando ocurre alg&uacute;n error durante el proceso de firma
+     * @throws IOException Cuando ocurre alg&uacute;n error durante la lectura de los datos */
+    @Override
+	public byte[] sign(final byte[] data,
                        final String algorithm,
                        final PrivateKeyEntry keyEntry,
-                       final Properties extraParams) throws AOException {
+                       final Properties extraParams) throws AOException, IOException {
 
         // Comprobamos si es un documento OOXML valido.
         if (!OfficeAnalizer.isOOXMLDocument(data)) {
@@ -239,11 +252,13 @@ public final class AOOOXMLSigner implements AOSigner {
      * @param keyEntry Entrada que apunta a la clave privada del firmante
      * @param extraParams No usado, se ignora el valor de este par&aacute;metro
      * @return Documento OOXML firmado
-     * @throws AOException Cuando ocurre alg&uacute;n error durante el proceso de firma */
-    public byte[] cosign(final byte[] sign,
+     * @throws AOException Cuando ocurre alg&uacute;n error durante el proceso de firma
+     * @throws IOException Cuando ocurre alg&uacute;n error durante la lectura de la firma */
+    @Override
+	public byte[] cosign(final byte[] sign,
                          final String algorithm,
                          final PrivateKeyEntry keyEntry,
-                         final Properties extraParams) throws AOException {
+                         final Properties extraParams) throws AOException, IOException {
     	return sign(sign, algorithm, keyEntry, extraParams);
     }
 
@@ -262,18 +277,21 @@ public final class AOOOXMLSigner implements AOSigner {
      * @param keyEntry Entrada que apunta a la clave privada del firmante
      * @param extraParams No usado, se ignora el valor de este par&aacute;metro
      * @return Documento OOXML firmado
-     * @throws AOException Cuando ocurre alg&uacute;n error durante el proceso de firma */
-    public byte[] cosign(final byte[] data,
+     * @throws AOException Cuando ocurre alg&uacute;n error durante el proceso de firma
+     * @throws IOException Cuando ocurre alg&uacute;n error durante la lectura de la firma o los datos */
+    @Override
+	public byte[] cosign(final byte[] data,
                          final byte[] sign,
                          final String algorithm,
                          final PrivateKeyEntry
-                         keyEntry, final Properties extraParams) throws AOException {
+                         keyEntry, final Properties extraParams) throws AOException, IOException {
     	return cosign(sign, algorithm, keyEntry, extraParams);
     }
 
     /** M&eacute;todo no implementado. No es posible realizar contrafirmas de
      * documentos OOXML. Lanza una <code>UnsupportedOperationException</code>. */
-    public byte[] countersign(final byte[] sign,
+    @Override
+	public byte[] countersign(final byte[] sign,
                               final String algorithm,
                               final CounterSignTarget targetType,
                               final Object[] targets,

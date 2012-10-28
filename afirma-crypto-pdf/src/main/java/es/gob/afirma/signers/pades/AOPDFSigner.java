@@ -261,9 +261,10 @@ public final class AOPDFSigner implements AOSigner {
      * </dl>
      * @return Documento PDF firmado en formato PAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-    public byte[] sign(final byte[] data, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException {
+    @Override
+	public byte[] sign(final byte[] data, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException {
 
-        final Properties extraParams = (xParams != null) ? xParams : new Properties();
+        final Properties extraParams = xParams != null ? xParams : new Properties();
 
         try {
             return signPDF(keyEntry, data, extraParams, algorithm);
@@ -464,7 +465,8 @@ public final class AOPDFSigner implements AOSigner {
      * </dl>
      * @return Documento PDF firmado en formato PAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-    public byte[] cosign(final byte[] data,
+    @Override
+	public byte[] cosign(final byte[] data,
                          final byte[] sign,
                          final String algorithm,
                          final PrivateKeyEntry keyEntry,
@@ -636,12 +638,14 @@ public final class AOPDFSigner implements AOSigner {
      * </dl>
      * @return Documento PDF firmado en formato PAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-    public byte[] cosign(final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties extraParams) throws AOException {
+    @Override
+	public byte[] cosign(final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties extraParams) throws AOException {
         return sign(sign, algorithm, keyEntry, extraParams);
     }
 
     /** Operaci&oacute;n no soportada para firmas PAdES. */
-    public byte[] countersign(final byte[] sign,
+    @Override
+	public byte[] countersign(final byte[] sign,
                               final String algorithm,
                               final CounterSignTarget targetType,
                               final Object[] targets,
@@ -658,8 +662,9 @@ public final class AOPDFSigner implements AOSigner {
      * @param originalName Nombre del fichero original que se firma.
      * @param inText Sufijo a agregar al nombre de fichero devuelto, inmediatamente anterior a la extensi&oacute;n.
      * @return Nombre apropiado para el fichero de firma. */
-    public String getSignedName(final String originalName, final String inText) {
-        final String inTextInt = (inText != null ? inText : ""); //$NON-NLS-1$
+    @Override
+	public String getSignedName(final String originalName, final String inText) {
+        final String inTextInt = inText != null ? inText : ""; //$NON-NLS-1$
         if (originalName == null) {
             return "signed.pdf"; //$NON-NLS-1$
         }
@@ -685,7 +690,8 @@ public final class AOPDFSigner implements AOSigner {
      *        mediante objetos <code>AOSimpleSignInfo</code>, si es <code>false</code> un &aacute;rbol con los nombres (CN X.500) de los
      *        titulares certificados.
      * @return &Aacute;rbol de nodos de firma o <code>null</code> en caso de error. */
-    public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
+    @Override
+	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
 
     	isPdfFile(sign);
 
@@ -760,7 +766,7 @@ public final class AOPDFSigner implements AOSigner {
                 root.add(new AOTreeNode(ssi));
             }
             else {
-                root.add(new AOTreeNode((AOUtil.getCN(pcks7.getSigningCertificate()))));
+                root.add(new AOTreeNode(AOUtil.getCN(pcks7.getSigningCertificate())));
             }
         }
 
@@ -771,7 +777,8 @@ public final class AOPDFSigner implements AOSigner {
      * @param data Datos a comprobar
      * @return <code>true</code> si los datos proporcionados son un documento PDF, <code>false</code> en caso contrario
      */
-    public boolean isSign(final byte[] data) {
+    @Override
+	public boolean isSign(final byte[] data) {
         if (data == null) {
             LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
             return false;
@@ -819,7 +826,8 @@ public final class AOPDFSigner implements AOSigner {
      * @param data Datos a comprobar
      * @return <code>true</code> si los datos proporcionados son un documento PDF, <code>false</code> en caso contrario
      */
-    public boolean isValidDataFile(final byte[] data) {
+    @Override
+	public boolean isValidDataFile(final byte[] data) {
         if (data == null) {
             LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
             return false;
@@ -901,7 +909,7 @@ public final class AOPDFSigner implements AOSigner {
             // proporcionaron ninguna
             ownerPassword = new String(
         		AOUIFactory.getPassword(
-    				(ownerPassword == null) ? PDFMessages.getString("AOPDFSigner.0") : PDFMessages.getString("AOPDFSigner.1"), //$NON-NLS-1$ //$NON-NLS-2$
+    				ownerPassword == null ? PDFMessages.getString("AOPDFSigner.0") : PDFMessages.getString("AOPDFSigner.1"), //$NON-NLS-1$ //$NON-NLS-2$
     				null
 				)
     		);
@@ -916,7 +924,7 @@ public final class AOPDFSigner implements AOSigner {
         	throw new InvalidPdfException(e);
 		}
 
-        if (pdfReader.getCertificationLevel() != PdfSignatureAppearance.NOT_CERTIFIED && (!Boolean.parseBoolean(extraParams.getProperty("allowSigningCertifiedPdfs")))) { //$NON-NLS-1$
+        if (pdfReader.getCertificationLevel() != PdfSignatureAppearance.NOT_CERTIFIED && !Boolean.parseBoolean(extraParams.getProperty("allowSigningCertifiedPdfs"))) { //$NON-NLS-1$
         	// Si no permitimos dialogos graficos o directamente hemos indicado que no permitimos firmar PDF certificados lanzamos
         	// una excepcion
             if (Boolean.parseBoolean(extraParams.getProperty("headLess")) || "false".equalsIgnoreCase(extraParams.getProperty("allowSigningCertifiedPdfs"))) {  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -1052,8 +1060,8 @@ public final class AOPDFSigner implements AOSigner {
                 );
                 try {
                     stp.setEncryption(
-                		(ownerPassword != null) ? ownerPassword.getBytes() : null,
-        				(userPassword != null) ? userPassword.getBytes() : null,
+                		ownerPassword != null ? ownerPassword.getBytes() : null,
+        				userPassword != null ? userPassword.getBytes() : null,
                 		pdfReader.getPermissions(),
                 		pdfReader.getCryptoMode()
             		);
@@ -1169,12 +1177,12 @@ public final class AOPDFSigner implements AOSigner {
                 else {
                     final String tsaHashAlgorithm = extraParams.getProperty("tsaHashAlgorithm"); //$NON-NLS-1$
                     completeCAdESSignature = new CMSTimestamper(
-                         !(Boolean.FALSE.toString()).equalsIgnoreCase(extraParams.getProperty("tsaRequireCert")),  //$NON-NLS-1$
+                         !Boolean.FALSE.toString().equalsIgnoreCase(extraParams.getProperty("tsaRequireCert")),  //$NON-NLS-1$
                          tsaPolicy,
                          tsaURL,
                          extraParams.getProperty("tsaUsr"),  //$NON-NLS-1$
                          extraParams.getProperty("tsaPwd"), //$NON-NLS-1$
-                         ((extraParams.getProperty("tsaExtensionOid") != null) && (extraParams.getProperty("tsaExtensionValueBase64") != null)) ? //$NON-NLS-1$ //$NON-NLS-2$
+                         extraParams.getProperty("tsaExtensionOid") != null && extraParams.getProperty("tsaExtensionValueBase64") != null ? //$NON-NLS-1$ //$NON-NLS-2$
                     		 new TsaRequestExtension[] {
                         		 new TsaRequestExtension(
                     				 extraParams.getProperty("tsaExtensionOid"), //$NON-NLS-1$
@@ -1183,7 +1191,7 @@ public final class AOPDFSigner implements AOSigner {
                 				 )
                              } :
                 			 null
-                     ).addTimestamp(completeCAdESSignature, AOAlgorithmID.getOID(AOSignConstants.getDigestAlgorithmName((tsaHashAlgorithm != null) ? tsaHashAlgorithm : "SHA1"))); //$NON-NLS-1$
+                     ).addTimestamp(completeCAdESSignature, AOAlgorithmID.getOID(AOSignConstants.getDigestAlgorithmName(tsaHashAlgorithm != null ? tsaHashAlgorithm : "SHA1"))); //$NON-NLS-1$
                 }
             }
 
@@ -1234,7 +1242,8 @@ public final class AOPDFSigner implements AOSigner {
      * @param sign Documento PDF
      * @return Mismo documento PDF de entrada, sin modificar en ning&uacute; aspecto.
      * @throws AOInvalidFormatException Si los datos de entrada no son un documento PDF. */
-    public byte[] getData(final byte[] sign) throws AOInvalidFormatException {
+    @Override
+	public byte[] getData(final byte[] sign) throws AOInvalidFormatException {
 
         // Si no es una firma PDF valida, lanzamos una excepcion
         if (!isSign(sign)) {
@@ -1250,7 +1259,8 @@ public final class AOPDFSigner implements AOSigner {
      * @param data Documento PDF.
      * @return Objeto <code>AOSignInfo</code> con el formato establecido a <code>AOSignConstants.SIGN_FORMAT_PDF</code>.
      * @throws AOException Si los datos de entrada no son un documento PDF. */
-    public AOSignInfo getSignInfo(final byte[] data) throws AOException {
+    @Override
+	public AOSignInfo getSignInfo(final byte[] data) throws AOException {
         if (data == null) {
             throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$
         }

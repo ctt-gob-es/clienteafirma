@@ -84,7 +84,7 @@ import es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.signer.Signature
 final class OOXMLSignatureFacet implements SignatureFacet {
 
     private final AbstractOOXMLSignatureService signatureService;
-    
+
     private static final String DIGITAL_SIGNATURE_SCHEMA = "http://schemas.openxmlformats.org/package/2006/digital-signature"; //$NON-NLS-1$
 
     /** Main constructor.
@@ -93,15 +93,16 @@ final class OOXMLSignatureFacet implements SignatureFacet {
         this.signatureService = signatureService;
     }
 
-    public void preSign(final XMLSignatureFactory signatureFactory,
+    @Override
+	public void preSign(final XMLSignatureFactory signatureFactory,
                         final Document document,
                         final String signatureId,
                         final List<X509Certificate> signingCertificateChain,
                         final List<Reference> references,
-                        final List<XMLObject> objects) throws NoSuchAlgorithmException, 
-                                                              InvalidAlgorithmParameterException, 
-                                                              IOException, 
-                                                              ParserConfigurationException, 
+                        final List<XMLObject> objects) throws NoSuchAlgorithmException,
+                                                              InvalidAlgorithmParameterException,
+                                                              IOException,
+                                                              ParserConfigurationException,
                                                               SAXException, TransformerException {
 
         addManifestObject(signatureFactory, document, signatureId, references, objects);
@@ -113,10 +114,10 @@ final class OOXMLSignatureFacet implements SignatureFacet {
                                    final Document document,
                                    final String signatureId,
                                    final List<Reference> references,
-                                   final List<XMLObject> objects) throws NoSuchAlgorithmException, 
-                                                                         InvalidAlgorithmParameterException, 
-                                                                         IOException, 
-                                                                         ParserConfigurationException, 
+                                   final List<XMLObject> objects) throws NoSuchAlgorithmException,
+                                                                         InvalidAlgorithmParameterException,
+                                                                         IOException,
+                                                                         ParserConfigurationException,
                                                                          SAXException, TransformerException {
         final Manifest manifest = constructManifest(signatureFactory);
         final String objectId = "idPackageObject"; // really has to be this value. //$NON-NLS-1$
@@ -133,9 +134,9 @@ final class OOXMLSignatureFacet implements SignatureFacet {
     }
 
     private Manifest constructManifest(final XMLSignatureFactory signatureFactory) throws NoSuchAlgorithmException,
-                                                                                          InvalidAlgorithmParameterException, 
-                                                                                          IOException, 
-                                                                                          ParserConfigurationException, 
+                                                                                          InvalidAlgorithmParameterException,
+                                                                                          IOException,
+                                                                                          ParserConfigurationException,
                                                                                           SAXException, TransformerException {
         final List<Reference> manifestReferences = new LinkedList<Reference>();
         addRelationshipsReferences(signatureFactory, manifestReferences);
@@ -167,14 +168,14 @@ final class OOXMLSignatureFacet implements SignatureFacet {
          * SignatureTime
          */
         final Element signatureTimeElement =
-                document.createElementNS(DIGITAL_SIGNATURE_SCHEMA, "mdssi:SignatureTime"); //$NON-NLS-1$ 
+                document.createElementNS(DIGITAL_SIGNATURE_SCHEMA, "mdssi:SignatureTime"); //$NON-NLS-1$
         signatureTimeElement.setAttributeNS(Constants.NamespaceSpecNS,
                                             "xmlns:mdssi", //$NON-NLS-1$
-                                            DIGITAL_SIGNATURE_SCHEMA); 
-        final Element formatElement = document.createElementNS(DIGITAL_SIGNATURE_SCHEMA, "mdssi:Format"); //$NON-NLS-1$ 
+                                            DIGITAL_SIGNATURE_SCHEMA);
+        final Element formatElement = document.createElementNS(DIGITAL_SIGNATURE_SCHEMA, "mdssi:Format"); //$NON-NLS-1$
         formatElement.setTextContent("YYYY-MM-DDThh:mm:ssTZD"); //$NON-NLS-1$
         signatureTimeElement.appendChild(formatElement);
-        final Element valueElement = document.createElementNS(DIGITAL_SIGNATURE_SCHEMA, "mdssi:Value"); //$NON-NLS-1$ 
+        final Element valueElement = document.createElementNS(DIGITAL_SIGNATURE_SCHEMA, "mdssi:Value"); //$NON-NLS-1$
         valueElement.setTextContent(new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss'Z'").format(new Date())); //$NON-NLS-1$
         signatureTimeElement.appendChild(valueElement);
 
@@ -346,7 +347,9 @@ final class OOXMLSignatureFacet implements SignatureFacet {
             if (!zipEntryName.equals(zipEntry.getName())) {
                 continue;
             }
-            return loadDocument(zipInputStream);
+            final Document ret = loadDocument(zipInputStream);
+            zipInputStream.close();
+            return ret;
         }
         return null;
     }
@@ -368,7 +371,8 @@ final class OOXMLSignatureFacet implements SignatureFacet {
         return documentBuilder.parse(inputSource);
     }
 
-    public void postSign(final Element signatureElement, final List<X509Certificate> signingCertificateChain) {
+    @Override
+	public void postSign(final Element signatureElement, final List<X509Certificate> signingCertificateChain) {
         // empty
     }
 }

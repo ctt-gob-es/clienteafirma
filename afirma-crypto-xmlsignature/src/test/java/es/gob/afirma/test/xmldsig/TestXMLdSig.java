@@ -144,20 +144,19 @@ public final class TestXMLdSig {
                     File f = File.createTempFile("Sign-XMLdSig-" + algo + "-" + extraParams.getProperty("mode") + "-" + filename.replace(".xml", "") + "-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
                     java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
                     fos.write(result);
-                    try { fos.flush(); fos.close(); } catch (final Exception e) {
-                        // Ignoramos los errores
-                    }
+                    fos.flush(); fos.close();
                     System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
 
                     Assert.assertNotNull(prueba, result);
                     Assert.assertTrue("El signer XMLdSig no reconoce como una firma los datos generados", signer.isSign(result)); //$NON-NLS-1$
 
-                    if ("implicit".equals(extraParams.getProperty("mode")) && (!filename.toLowerCase().endsWith(".xml"))) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                    if ("implicit".equals(extraParams.getProperty("mode")) && !filename.toLowerCase().endsWith(".xml")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
                     	boolean extractionProblem;
                     	if (filename.toLowerCase().endsWith(".b64")) { //$NON-NLS-1$
                     		extractionProblem = !Arrays.equals(signer.getData(result), Base64.decode(new String(data)));
-                    	} else {
+                    	}
+                    	else {
                     		extractionProblem = !Arrays.equals(signer.getData(result), data);
                     	}
 
@@ -165,7 +164,7 @@ public final class TestXMLdSig {
                     		f = File.createTempFile(algo + "-" + extraParams.getProperty("mode") + "-" + filename.replace(".xml", "") + "-", "-" + filename); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
                     		fos = new java.io.FileOutputStream(f);
                     		fos.write(signer.getData(result));
-                    		try { fos.flush(); fos.close(); } catch (final Exception e) { /* Ignoramos los errores */ }
+                    		fos.flush(); fos.close();
                     		System.out.println("Temporal de los datos extraidos para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
                     		Assert.fail("Los datos extraidos no coinciden con los originales: " + filename); //$NON-NLS-1$
                     	}
@@ -176,7 +175,7 @@ public final class TestXMLdSig {
                     Assert.assertEquals("El firmante encontrado en la firma no es el esperado", "ANF Usuario Activo", ((AOTreeNode) tree.getRoot()).getChildAt(0).getUserObject()); //$NON-NLS-1$ //$NON-NLS-2$
 
                     tree = signer.getSignersStructure(result, true);
-                    Assert.assertEquals("Los datos del nodo raiz no son los esperados", "Datos", ((AOTreeNode) tree.getRoot()).getUserObject()); //$NON-NLS-1$
+                    Assert.assertEquals("Los datos del nodo raiz no son los esperados", "Datos", ((AOTreeNode) tree.getRoot()).getUserObject()); //$NON-NLS-1$ //$NON-NLS-2$
                     final AOSimpleSignInfo simpleSignInfo = (AOSimpleSignInfo) ((AOTreeNode) tree.getRoot()).getChildAt(0).getUserObject();
 
                     Assert.assertEquals("El certificado del firmante encontrado en la firma no es el esperado", cert, simpleSignInfo.getCerts()[0]); //$NON-NLS-1$
@@ -229,9 +228,7 @@ public final class TestXMLdSig {
         			final File f = File.createTempFile("Cosign-XMLdSig-" + algo + "-" + filename.replace(".xml", "") + "-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
         			final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
         			fos.write(result);
-        			try { fos.flush(); fos.close(); } catch (final Exception e) {
-        				// Ignoramos los errores
-        			}
+        			fos.flush(); fos.close();
         			System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
 
         			Assert.assertNotNull(prueba, result);
@@ -287,9 +284,7 @@ public final class TestXMLdSig {
         			final File f = File.createTempFile("Countersign-XMLdSig-" + algo + "-" + filename.replace(".xml", "") + "-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
         			final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
         			fos.write(result);
-        			try { fos.flush(); fos.close(); } catch (final Exception e) {
-        				// Ignoramos los errores
-        			}
+        			fos.flush(); fos.close();
         			System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
 
         			Assert.assertNotNull(prueba, result);

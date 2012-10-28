@@ -11,6 +11,7 @@
 package es.gob.afirma.signers.xades;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.HashSet;
 import java.util.Properties;
@@ -59,7 +60,8 @@ public final class AOFacturaESigner implements AOSigner {
     }
 
     /** Operaci&oacute;n no soportada. */
-    public byte[] cosign(final byte[] data,
+    @Override
+	public byte[] cosign(final byte[] data,
                          final byte[] sign,
                          final String algorithm,
                          final PrivateKeyEntry keyEntry,
@@ -68,7 +70,8 @@ public final class AOFacturaESigner implements AOSigner {
     }
 
     /** Operaci&oacute;n no soportada. */
-    public byte[] cosign(final byte[] sign,
+    @Override
+	public byte[] cosign(final byte[] sign,
                          final String algorithm,
                          final PrivateKeyEntry keyEntry,
                          final Properties extraParams) throws AOException {
@@ -76,7 +79,8 @@ public final class AOFacturaESigner implements AOSigner {
     }
 
     /** Operaci&oacute;n no soportada, se lanza una <code>UnsupportedOperationException</code>. */
-    public byte[] countersign(final byte[] sign,
+    @Override
+	public byte[] countersign(final byte[] sign,
                               final String algorithm,
                               final CounterSignTarget targetType,
                               final Object[] targets,
@@ -112,10 +116,12 @@ public final class AOFacturaESigner implements AOSigner {
      * @return Cofirma en formato XAdES
      * @throws InvalidEFacturaDataException Cuando se proporcionan datos que no son una factura electr&oacute;nica
      * @throws EFacturaAlreadySignedException Cuando se proporciona un factura ya firmada
-     * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-    public byte[] sign(final byte[] data,
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso
+     * @throws IOException Cuando ocurren problemas relacionados con la lectura de los datos */
+    @Override
+	public byte[] sign(final byte[] data,
                        final String algorithm, final PrivateKeyEntry keyEntry,
-                       final Properties extraParams) throws AOException {
+                       final Properties extraParams) throws AOException, IOException {
         if (!isValidDataFile(data)) {
             throw new InvalidEFacturaDataException();
         }
@@ -134,12 +140,14 @@ public final class AOFacturaESigner implements AOSigner {
     }
 
     /** {@inheritDoc} */
-    public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) throws AOInvalidFormatException {
+    @Override
+	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) throws AOInvalidFormatException, IOException {
         return XADES_SIGNER.getSignersStructure(sign, asSimpleSignInfo);
     }
 
     /** {@inheritDoc} */
-    public boolean isSign(final byte[] is) {
+    @Override
+	public boolean isSign(final byte[] is) throws IOException {
         return XADES_SIGNER.isSign(is) && isValidDataFile(is);
     }
 
@@ -149,7 +157,8 @@ public final class AOFacturaESigner implements AOSigner {
      * @param is Datos a comprobar
      * @return <code>true</code> si los datos son una <a href="http://www.facturae.es/">factura electr&oacute;nica</a>,
      *         <code>false</code> en caso contrario */
-    public boolean isValidDataFile(final byte[] is) {
+    @Override
+	public boolean isValidDataFile(final byte[] is) {
         if (is == null || is.length == 0) {
             return false;
         }
@@ -161,7 +170,7 @@ public final class AOFacturaESigner implements AOSigner {
             final Element rootNode = doc.getDocumentElement();
             final String rootNodePrefix = rootNode.getPrefix();
 
-            if (!(((rootNodePrefix != null) ? (rootNodePrefix + ":") : "") + "Facturae").equals(rootNode.getNodeName())) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            if (!((rootNodePrefix != null ? rootNodePrefix + ":" : "") + "Facturae").equals(rootNode.getNodeName())) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 return false;
             }
 
@@ -189,17 +198,20 @@ public final class AOFacturaESigner implements AOSigner {
     }
 
     /** {@inheritDoc} */
-    public String getSignedName(final String originalName, final String inText) {
+    @Override
+	public String getSignedName(final String originalName, final String inText) {
         return XADES_SIGNER.getSignedName(originalName, inText);
     }
 
     /** {@inheritDoc} */
-    public byte[] getData(final byte[] signData) throws AOException {
+    @Override
+	public byte[] getData(final byte[] signData) throws AOException, IOException {
         return XADES_SIGNER.getData(signData);
     }
 
     /** {@inheritDoc} */
-    public AOSignInfo getSignInfo(final byte[] signData) throws AOException {
+    @Override
+	public AOSignInfo getSignInfo(final byte[] signData) throws AOException, IOException {
         return XADES_SIGNER.getSignInfo(signData);
     }
 

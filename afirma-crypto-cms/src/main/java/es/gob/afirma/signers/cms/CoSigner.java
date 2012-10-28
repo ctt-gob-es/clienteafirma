@@ -114,10 +114,10 @@ final class CoSigner {
                            final Map<String, byte[]> uatrib,
                            final byte[] messageDigest) throws IOException, NoSuchAlgorithmException, CertificateException {
 
-        final ASN1InputStream is = new ASN1InputStream(sign);
-
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
+    	final ASN1InputStream is = new ASN1InputStream(sign);
         final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+        is.close();
         final Enumeration<?> e = dsq.getObjects();
         // Elementos que contienen los elementos OID SignedData
         e.nextElement();
@@ -200,7 +200,7 @@ final class CoSigner {
             signedAttr =
             	generateSignerInfo(
             			digestAlgorithm,
-            			(content2 != null ? content2 : parameters.getContent()),
+            			content2 != null ? content2 : parameters.getContent(),
             			dataType,
             			atrib);
         }
@@ -291,12 +291,12 @@ final class CoSigner {
                            final Map<String, byte[]> uatrib,
                            final byte[] digest) throws IOException, NoSuchAlgorithmException, CertificateException {
 
-        byte[] messageDigest = (digest != null ? digest.clone() : null);
-
-        final ASN1InputStream is = new ASN1InputStream(sign);
+        byte[] messageDigest = digest != null ? digest.clone() : null;
 
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
+        final ASN1InputStream is = new ASN1InputStream(sign);
         final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+        is.close();
         final Enumeration<?> e = dsq.getObjects();
         // Elementos que contienen los elementos OID SignedData
         e.nextElement();
@@ -485,7 +485,7 @@ final class CoSigner {
                 final Map.Entry<String, byte[]> e = it.next();
                 contexExpecific.add(new Attribute(
             		// el oid
-                    new ASN1ObjectIdentifier((e.getKey()).toString()),
+                    new ASN1ObjectIdentifier(e.getKey().toString()),
                     // el array de bytes en formato string
                     new DERSet(new DERPrintableString(new String(e.getValue()))))
                 );
@@ -539,7 +539,7 @@ final class CoSigner {
                 final Map.Entry<String, byte[]> e = it.next();
                 contexExpecific.add(new Attribute(
             		// el oid
-                    new ASN1ObjectIdentifier((e.getKey()).toString()),
+                    new ASN1ObjectIdentifier(e.getKey().toString()),
                     // el array de bytes en formato string
                     new DERSet(DERPrintableString.getInstance(e.getValue())))
         		);
@@ -572,7 +572,7 @@ final class CoSigner {
                 final Map.Entry<String, byte[]> e = it.next();
                 contexExpecific.add(new Attribute(
             		// el oid
-                    new ASN1ObjectIdentifier((e.getKey()).toString()),
+                    new ASN1ObjectIdentifier(e.getKey().toString()),
                     // el array de bytes en formato string
                     new DERSet(new DERPrintableString(new String(e.getValue()))))
                 );

@@ -317,7 +317,7 @@ final class MozillaKeyStoreUtilities {
 
 	private static String getSystemNSSLibDirUnix() throws FileNotFoundException {
 
-		if (nssLibDir != null && (!"".equals(nssLibDir))) { //$NON-NLS-1$
+		if (nssLibDir != null && !"".equals(nssLibDir)) { //$NON-NLS-1$
 			return nssLibDir;
 		}
 
@@ -448,6 +448,7 @@ final class MozillaKeyStoreUtilities {
 			}
 			Collections.sort(firefoxDirectories, new Comparator<String>() {
 				/** {@inheritDoc} */
+				@Override
 				public int compare(final String o1, final String o2) {
 					return o1.compareTo(o2);
 				}
@@ -521,7 +522,7 @@ final class MozillaKeyStoreUtilities {
 				tmpLib = tmpLib.toLowerCase();
 			}
 
-			if (!revisedLibs.contains(tmpLib) && (!tmpLib.toLowerCase().contains("nssckbi"))) { //$NON-NLS-1$
+			if (!revisedLibs.contains(tmpLib) && !tmpLib.toLowerCase().contains("nssckbi")) { //$NON-NLS-1$
 				purgedTable.put(key, table.get(key));
 				revisedLibs.add(tmpLib);
 			}
@@ -602,7 +603,7 @@ final class MozillaKeyStoreUtilities {
 			return new String[0];
 		}
 
-		final String nssPath = (!path.endsWith(File.separator) ? path + File.separator : path);
+		final String nssPath = !path.endsWith(File.separator) ? path + File.separator : path;
 
 		if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
 			return new String[] {
@@ -827,7 +828,7 @@ final class MozillaKeyStoreUtilities {
 			return;
 		}
 
-		final String nssBinDir = (binDir.endsWith("/")) ? binDir : binDir + "/"; //$NON-NLS-1$ //$NON-NLS-2$
+		final String nssBinDir = binDir.endsWith("/") ? binDir : binDir + "/"; //$NON-NLS-1$ //$NON-NLS-2$
 
 		// Intentamos la carga, para ver si es necesaria la reconfiguracion
 		try {

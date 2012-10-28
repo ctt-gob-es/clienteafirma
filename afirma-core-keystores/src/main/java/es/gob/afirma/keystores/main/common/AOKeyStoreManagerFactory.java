@@ -155,7 +155,7 @@ public final class AOKeyStoreManagerFactory {
             }
         }
 
-        final InputStream is;
+        InputStream is = null;
         try {
             is = new FileInputStream(storeFilename);
             ksm.init(null, is, pssCallback, null);
@@ -166,6 +166,11 @@ public final class AOKeyStoreManagerFactory {
                "No se ha podido abrir el almacen de tipo PKCS#12 para el fichero " + lib, //$NON-NLS-1$
                e
             );
+        }
+        finally {
+        	if (is != null) {
+                is.close();
+        	}
         }
         return ksm;
 	}
@@ -232,7 +237,7 @@ public final class AOKeyStoreManagerFactory {
             }
         }
 
-        final InputStream is;
+        InputStream is = null;
         try {
             is = new FileInputStream(storeFilename);
             ksm.init(store, is, pssCallback, null);
@@ -243,6 +248,11 @@ public final class AOKeyStoreManagerFactory {
                "No se ha podido abrir el almacen de tipo " + store.getName(), //$NON-NLS-1$
                e
             );
+        }
+        finally {
+        	if (is != null) {
+        		is.close();
+        	}
         }
         return ksm;
     }
@@ -322,7 +332,7 @@ public final class AOKeyStoreManagerFactory {
             ksm.init(
         		store,
         		null,
-        		(!(pssCallback instanceof NullPasswordCallback)) ? pssCallback : null,
+        		!(pssCallback instanceof NullPasswordCallback) ? pssCallback : null,
         		null
     		);
         }
@@ -370,7 +380,7 @@ public final class AOKeyStoreManagerFactory {
         try {
             ksm.init(
                  store,
-                 (lib == null || "".equals(lib)) ? null : new FileInputStream(lib),  //$NON-NLS-1$
+                 lib == null || "".equals(lib) ? null : new FileInputStream(lib),  //$NON-NLS-1$
                  new NullPasswordCallback(),
                  null
             );
@@ -386,10 +396,10 @@ public final class AOKeyStoreManagerFactory {
         if (AOKeyStore.PKCS12.equals(currentStore)) {
             return null;
         }
-        if (Platform.OS.WINDOWS.equals(Platform.getOS()) && (!AOKeyStore.WINDOWS.equals(currentStore))) {
+        if (Platform.OS.WINDOWS.equals(Platform.getOS()) && !AOKeyStore.WINDOWS.equals(currentStore)) {
             return AOKeyStore.WINDOWS;
         }
-        if (Platform.OS.MACOSX.equals(Platform.getOS()) && (!AOKeyStore.APPLE.equals(currentStore))) {
+        if (Platform.OS.MACOSX.equals(Platform.getOS()) && !AOKeyStore.APPLE.equals(currentStore)) {
             return AOKeyStore.APPLE;
         }
         return AOKeyStore.PKCS12;

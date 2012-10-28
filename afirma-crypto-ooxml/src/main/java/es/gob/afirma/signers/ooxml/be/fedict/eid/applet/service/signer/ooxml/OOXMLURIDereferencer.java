@@ -68,7 +68,8 @@ final class OOXMLURIDereferencer implements URIDereferencer {
         this.ooxml = ooxml.clone();
     }
 
-    public Data dereference(final URIReference uriReference, final XMLCryptoContext context) throws URIReferenceException {
+    @Override
+	public Data dereference(final URIReference uriReference, final XMLCryptoContext context) throws URIReferenceException {
 
         if (null == uriReference) {
             throw new IllegalArgumentException("La URIReference no puede ser nula"); //$NON-NLS-1$

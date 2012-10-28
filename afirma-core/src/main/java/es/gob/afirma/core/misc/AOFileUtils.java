@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -17,7 +17,7 @@ import java.util.zip.ZipFile;
 
 /** Clase con m&eacute;todos para el trabajo con ficheros. */
 public final class AOFileUtils {
-    
+
     private AOFileUtils() {
         // No permitimos la instanciacion
     }
@@ -39,14 +39,7 @@ public final class AOFileUtils {
         fos.write(zipFileData);
         fos.flush();
         fos.close();
-
-        try {
-            tempFile.deleteOnExit();
-        }
-        catch (final Exception e) {
-            // Ignoramos los errores, el usuario debe limpiar los temporales regularmente
-        }
-
+        tempFile.deleteOnExit();
         return new ZipFile(tempFile);
     }
 }

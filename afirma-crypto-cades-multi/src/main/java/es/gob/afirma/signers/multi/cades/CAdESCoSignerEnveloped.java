@@ -153,10 +153,10 @@ final class CAdESCoSignerEnveloped {
                            final String contentType,
                            final String contentDescription) throws IOException, NoSuchAlgorithmException, CertificateException {
 
-        final ASN1InputStream is = new ASN1InputStream(sign);
-
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
+    	final ASN1InputStream is = new ASN1InputStream(sign);
         final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+        is.close();
         final Enumeration<?> e = dsq.getObjects();
         // Elementos que contienen los elementos OID SignedAndEnvelopedData
         e.nextElement();
@@ -321,10 +321,10 @@ final class CAdESCoSignerEnveloped {
                            final String contentType,
                            final String contentDescription) throws IOException, NoSuchAlgorithmException, CertificateException {
 
-        final ASN1InputStream is = new ASN1InputStream(data);
-
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
+    	final ASN1InputStream is = new ASN1InputStream(data);
         final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+        is.close();
         final Enumeration<?> e = dsq.getObjects();
         // Elementos que contienen los elementos OID SignedAndEnvelopedData
         e.nextElement();
@@ -377,7 +377,7 @@ final class CAdESCoSignerEnveloped {
         final ASN1EncodableVector signerInfos = new ASN1EncodableVector();
         // introducimos el nuevo SignerInfo del firmante actual.
 
-        byte[] messageDigest = (md != null ? md.clone() : null);
+        byte[] messageDigest = md != null ? md.clone() : null;
 
         for (int i = 0; i < signerInfosSd.size(); i++) {
             final SignerInfo si = new SignerInfo((ASN1Sequence) signerInfosSd.getObjectAt(i));

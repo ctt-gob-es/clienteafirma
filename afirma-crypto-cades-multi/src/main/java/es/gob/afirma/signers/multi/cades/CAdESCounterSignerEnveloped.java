@@ -145,10 +145,10 @@ final class CAdESCounterSignerEnveloped {
         this.setGlobalPolicy(policy);
         this.setGlobalsigningCertificateV2(signingCertificateV2);
 
-        final ASN1InputStream is = new ASN1InputStream(data);
-
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
+        final ASN1InputStream is = new ASN1InputStream(data);
         final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+        is.close();
         final Enumeration<?> e = dsq.getObjects();
         // Elementos que contienen los elementos OID SignedAndEnvelopedData
         e.nextElement();
@@ -224,6 +224,7 @@ final class CAdESCounterSignerEnveloped {
                 // Esto se realiza as&iacute; por problemas con los casting.
                 final ASN1InputStream sd2 = new ASN1InputStream(sigDat.toASN1Primitive().getEncoded(ASN1Encoding.DER));
                 final ASN1Sequence contentSignedData2 = (ASN1Sequence) sd2.readObject();// contenido del SignedAndEnvelopedData
+                sd2.close();
                 aux = new SignedAndEnvelopedData(contentSignedData2);
             }
 
@@ -252,6 +253,7 @@ final class CAdESCounterSignerEnveloped {
                 // Esto se realiza as&iacute; por problemas con los casting.
                 final ASN1InputStream sd2 = new ASN1InputStream(sigDat.getEncoded(ASN1Encoding.DER));
                 final ASN1Sequence contentSignedData2 = (ASN1Sequence) sd2.readObject();// contenido del SignedAndEnvelopedData
+                sd2.close();
 
                 aux = new SignedAndEnvelopedData(contentSignedData2);
             }

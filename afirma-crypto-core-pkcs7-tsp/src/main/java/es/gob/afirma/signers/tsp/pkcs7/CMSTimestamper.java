@@ -170,7 +170,9 @@ public final class CMSTimestamper {
              final SignerInformation si = (SignerInformation) name;
              final byte[] tsToken = getTimeStampToken(si.getSignature(), hashAlgorithm);
 
-             final ASN1Primitive derObj = new ASN1InputStream(new ByteArrayInputStream(tsToken)).readObject();
+             final ASN1InputStream is = new ASN1InputStream(new ByteArrayInputStream(tsToken));
+             final ASN1Primitive derObj = is.readObject();
+             is.close();
              final DERSet derSet = new DERSet(derObj);
 
              final Attribute unsignAtt = new Attribute(new ASN1ObjectIdentifier(SIGNATURE_TIMESTAMP_TOKEN_OID), derSet);
@@ -204,7 +206,9 @@ public final class CMSTimestamper {
     private byte[] getTSAResponseSocket(final byte[] request) throws IOException {
     	final Socket socket = new Socket(this.tsaURL.getHost(), this.tsaURL.getPort());
     	socket.setSoTimeout(500000);
-    	return getTSAResponseExternalSocket(request, socket);
+    	final byte[] ret = getTSAResponseExternalSocket(request, socket);
+    	socket.close();
+    	return ret;
     }
 
     private static byte[] getTSAResponseExternalSocket(final byte[] request, final Socket socket) throws IOException {
@@ -243,7 +247,7 @@ public final class CMSTimestamper {
          tsaConnection.setRequestProperty("Content-Type", "application/timestamp-query"); //$NON-NLS-1$ //$NON-NLS-2$
          tsaConnection.setRequestProperty("Content-Transfer-Encoding", "binary"); //$NON-NLS-1$ //$NON-NLS-2$
 
-         if ((this.tsaUsername != null) && !"".equals(this.tsaUsername) ) { //$NON-NLS-1$
+         if (this.tsaUsername != null && !"".equals(this.tsaUsername) ) { //$NON-NLS-1$
              final String userPassword = this.tsaUsername + ":" + this.tsaPassword; //$NON-NLS-1$
              tsaConnection.setRequestProperty("Authorization", "Basic " + new String(Base64.encode(userPassword.getBytes()))); //$NON-NLS-1$ //$NON-NLS-2$
          }
@@ -267,7 +271,7 @@ public final class CMSTimestamper {
      private byte[] getTimeStampToken(final byte[] imprint, final String hashAlgorithm) throws AOException, IOException {
 
          final TimeStampRequest request = this.tsqGenerator.generate(
-               new ASN1ObjectIdentifier((hashAlgorithm != null) ? AOAlgorithmID.getOID(hashAlgorithm) : X509ObjectIdentifiers.id_SHA1.getId()),
+               new ASN1ObjectIdentifier(hashAlgorithm != null ? AOAlgorithmID.getOID(hashAlgorithm) : X509ObjectIdentifiers.id_SHA1.getId()),
                imprint,
                BigInteger.valueOf(System.currentTimeMillis())
           );
@@ -291,7 +295,7 @@ public final class CMSTimestamper {
             throw new AOException("Error validando la respuesta de la TSA", e); //$NON-NLS-1$
         }
          final PKIFailureInfo failure = response.getFailInfo();
-         final int value = (failure == null) ? 0 : failure.intValue();
+         final int value = failure == null ? 0 : failure.intValue();
          if (value != 0) {
              throw new AOException("Respuesta invalida de la TSA ('" + this.tsaURL + "') con el codigo " + value); //$NON-NLS-1$ //$NON-NLS-2$
          }
