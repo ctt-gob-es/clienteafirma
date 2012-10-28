@@ -220,7 +220,7 @@ public final class AOUIFactory {
      *        Filtro de fichero.
      * @param parent
      *        Componente padre (para la modalidad)
-     * @return Fichero en el qeu se almacenan los datos.
+     * @return Fichero en el que se almacenan los datos.
      */
     public static File getSaveDataToFile(final byte[] data, final File selectedFile, final Object fileFilter, final Object parent) {
         return uiManager.saveDataToFile(data, selectedFile, fileFilter, parent);
