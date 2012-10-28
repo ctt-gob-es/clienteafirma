@@ -34,6 +34,7 @@ import com.lowagie.text.exceptions.BadPasswordException;
 import com.lowagie.text.pdf.AcroFields;
 import com.lowagie.text.pdf.PdfArray;
 import com.lowagie.text.pdf.PdfDate;
+import com.lowagie.text.pdf.PdfDeveloperExtension;
 import com.lowagie.text.pdf.PdfDictionary;
 import com.lowagie.text.pdf.PdfName;
 import com.lowagie.text.pdf.PdfPKCS7;
@@ -42,6 +43,7 @@ import com.lowagie.text.pdf.PdfSignature;
 import com.lowagie.text.pdf.PdfSignatureAppearance;
 import com.lowagie.text.pdf.PdfStamper;
 import com.lowagie.text.pdf.PdfString;
+import com.lowagie.text.pdf.PdfWriter;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
@@ -262,7 +264,7 @@ public final class AOPDFSigner implements AOSigner {
      * @return Documento PDF firmado en formato PAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     @Override
-	public byte[] sign(final byte[] data, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException {
+	public byte[] sign(final byte[] data, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException, IOException {
 
         final Properties extraParams = xParams != null ? xParams : new Properties();
 
@@ -277,9 +279,6 @@ public final class AOPDFSigner implements AOSigner {
         }
         catch (final NoSuchAlgorithmException e) {
         	throw new AOException("Error el en algoritmo de firma: " + e, e); //$NON-NLS-1$
-		}
-        catch (final IOException e) {
-        	throw new AOException("Error firmando el PDF: " + e, e); //$NON-NLS-1$
 		}
         catch (final DocumentException e) {
         	throw new AOException("Error en el tratamiento del PDF: " + e, e); //$NON-NLS-1$
@@ -464,13 +463,14 @@ public final class AOPDFSigner implements AOSigner {
      *   Si no se indica nada, se utilizar&aacute; V1 para las firmas SHA1 y V2 para el resto.</dd>
      * </dl>
      * @return Documento PDF firmado en formato PAdES
-     * @throws AOException Cuando ocurre cualquier problema durante el proceso */
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso
+     * @throws IOException */
     @Override
 	public byte[] cosign(final byte[] data,
                          final byte[] sign,
                          final String algorithm,
                          final PrivateKeyEntry keyEntry,
-                         final Properties extraParams) throws AOException {
+                         final Properties extraParams) throws AOException, IOException {
         return sign(sign, algorithm, keyEntry, extraParams);
     }
 
@@ -637,9 +637,10 @@ public final class AOPDFSigner implements AOSigner {
      *   Si no se indica nada, se utilizar&aacute; V1 para las firmas SHA1 y V2 para el resto.</dd>
      * </dl>
      * @return Documento PDF firmado en formato PAdES
-     * @throws AOException Cuando ocurre cualquier problema durante el proceso */
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso
+     * @throws IOException */
     @Override
-	public byte[] cosign(final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties extraParams) throws AOException {
+	public byte[] cosign(final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties extraParams) throws AOException, IOException {
         return sign(sign, algorithm, keyEntry, extraParams);
     }
 
@@ -775,8 +776,7 @@ public final class AOPDFSigner implements AOSigner {
 
     /** Comprueba que los datos proporcionados sean un documento PDF.
      * @param data Datos a comprobar
-     * @return <code>true</code> si los datos proporcionados son un documento PDF, <code>false</code> en caso contrario
-     */
+     * @return <code>true</code> si los datos proporcionados son un documento PDF, <code>false</code> en caso contrario */
     @Override
 	public boolean isSign(final byte[] data) {
         if (data == null) {
@@ -824,8 +824,7 @@ public final class AOPDFSigner implements AOSigner {
 
     /** Comprueba que los datos proporcionados sean un documento PDF.
      * @param data Datos a comprobar
-     * @return <code>true</code> si los datos proporcionados son un documento PDF, <code>false</code> en caso contrario
-     */
+     * @return <code>true</code> si los datos proporcionados son un documento PDF, <code>false</code> en caso contrario */
     @Override
 	public boolean isValidDataFile(final byte[] data) {
         if (data == null) {
@@ -966,7 +965,7 @@ public final class AOPDFSigner implements AOSigner {
                                 if (name instanceof PdfName) {
                                     LOGGER.warning(
                                        "Se ha encontrado un adjunto (" + fs.getAsString((PdfName) name) //$NON-NLS-1$
-                                          + ") en el PDF, pero no se firmara de forma independiente"); //$NON-NLS-1$
+                                          + ") en el PDF"); //$NON-NLS-1$
                                 }
                                 // System.out.println(new String(PdfReader.getStreamBytes((PRStream)refs.getAsStream(name))));
                             }
@@ -991,7 +990,7 @@ public final class AOPDFSigner implements AOSigner {
                         for (final Object key : refs.getKeys()) {
                             if (key instanceof PdfName) {
                                 LOGGER.warning("Se ha encontrado un fichero empotrado (" + filespec.getAsString((PdfName) key) //$NON-NLS-1$
-                                               + ") en el PDF, pero no se firmara de forma independiente"); //$NON-NLS-1$
+                                               + ") en el PDF"); //$NON-NLS-1$
 
 //                                final byte[] embeddedData = PdfReader.getStreamBytes((PRStream) PdfReader.getPdfObject(refs.getAsIndirectObject((PdfName) key)));
 //                                System.out.println(new String(embeddedData));
@@ -1037,6 +1036,13 @@ public final class AOPDFSigner implements AOSigner {
         final PdfSignatureAppearance sap = stp.getSignatureAppearance();
         stp.setFullCompression();
         sap.setAcro6Layers(true);
+
+        // PAdES parte 3 seccion 4.7 - Habilitacion para LTV
+        stp.getWriter().addDeveloperExtension(new PdfDeveloperExtension(
+    		new PdfName("ESIC"), //$NON-NLS-1$
+    		PdfWriter.PDF_VERSION_1_7,
+    		1
+		));
 
         // iText antiguo
         sap.setRender(PdfSignatureAppearance.SignatureRenderDescription);
@@ -1142,7 +1148,8 @@ public final class AOPDFSigner implements AOSigner {
         boolean signingCertificateV2;
         if (extraParams.containsKey("signingCertificateV2")) { //$NON-NLS-1$
         	signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2")); //$NON-NLS-1$
-        } else {
+        }
+        else {
         	signingCertificateV2 = !"SHA1".equals(AOSignConstants.getDigestAlgorithmName(algorithm));	 //$NON-NLS-1$
         }
 
