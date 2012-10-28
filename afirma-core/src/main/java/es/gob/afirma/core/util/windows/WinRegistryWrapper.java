@@ -178,8 +178,5 @@ public final class WinRegistryWrapper {
 				"No se ha podido anadir la URL al classloader( " + u + "): " + e, e //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
-		finally {
-			sysloader.close();
-		}
 	}
 }
