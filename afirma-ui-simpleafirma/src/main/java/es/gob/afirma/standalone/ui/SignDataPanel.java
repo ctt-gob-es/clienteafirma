@@ -290,11 +290,12 @@ final class SignDataPanel extends JPanel {
             signInfo = SignDataPanel.getSignInfo(sign);
         }
         catch (final Exception e) {
+        	LOGGER.severe("Error obteniendo los datos de la firma: " + e); //$NON-NLS-1$
             signInfo = null;
         }
         final JScrollPane detailPanel = new JScrollPane(signInfo == null ? null : this.getSignDataTree(signInfo, extKeyListener));
 
-        // En Apple siempre hay barras, y es el SO el que las pinta o no si hacen o no falta
+        // En Apple siempre hay barras, y es el SO el que las pinta o no depende de si hacen falta
         if (Platform.OS.MACOSX.equals(Platform.getOS())) {
             detailPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
             detailPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);

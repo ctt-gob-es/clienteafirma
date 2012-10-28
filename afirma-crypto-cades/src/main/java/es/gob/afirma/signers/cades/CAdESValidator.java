@@ -96,38 +96,39 @@ public final class CAdESValidator {
      * @throws IOException Si ocurren problemas leyendo los datos */
     public static boolean isCAdESSignedData(final byte[] data) throws IOException {
         boolean isValid = false;
+        ASN1InputStream is = null;
+        try {
+            is = new ASN1InputStream(data);
+            // LEEMOS EL FICHERO QUE NOS INTRODUCEN
+            final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+            final Enumeration<?> e = dsq.getObjects();
+            // Elementos que contienen los elementos OID Data
+            final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+            if (doi.equals(PKCSObjectIdentifiers.signedData)) {
+                isValid = true;
+            }
+            // Contenido de SignedData
+            final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+            final ASN1Sequence datos = (ASN1Sequence) doj.getObject();
+            final SignedData sd = SignedData.getInstance(datos);
 
-        // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-    	final ASN1InputStream is = new ASN1InputStream(data);
-    	final ASN1Sequence dsq;
-    	try {
-    		dsq = (ASN1Sequence) is.readObject();
-    	}
-    	catch(final ClassCastException e) {
-    		// No es una secuencia
-    		return false;
-    	}
-    	finally {
-    		is.close();
-    	}
-        final Enumeration<?> e = dsq.getObjects();
-        // Elementos que contienen los elementos OID Data
-        final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
-        if (doi.equals(PKCSObjectIdentifiers.signedData)) {
-            isValid = true;
+            final ASN1Set signerInfosSd = sd.getSignerInfos();
+
+            for (int i = 0; i < signerInfosSd.size(); i++) {
+                final SignerInfo si = new SignerInfo((ASN1Sequence) signerInfosSd.getObjectAt(i));
+                isValid = verifySignerInfo(si);
+            }
+
         }
-        // Contenido de SignedData
-        final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-        final ASN1Sequence datos = (ASN1Sequence) doj.getObject();
-        final SignedData sd = SignedData.getInstance(datos);
-
-        final ASN1Set signerInfosSd = sd.getSignerInfos();
-
-        for (int i = 0; i < signerInfosSd.size(); i++) {
-            final SignerInfo si = new SignerInfo((ASN1Sequence) signerInfosSd.getObjectAt(i));
-            isValid = verifySignerInfo(si);
+        catch (final Exception ex) {
+        	LOGGER.info("Los datos proporcionados no son un SignedData de CAdES: " + ex); //$NON-NLS-1$
+            return false;
         }
-
+        finally {
+        	if (is != null) {
+        		is.close();
+        	}
+        }
         return isValid;
     }
 
@@ -171,8 +172,8 @@ public final class CAdESValidator {
         try {
         	dsq = (ASN1Sequence) is.readObject();
         }
-        catch(final ClassCastException e) {
-        	// No es una secuencia
+        catch(final Exception e) {
+        	// No es una secuencia valida
         	return false;
         }
         finally {
@@ -216,8 +217,8 @@ public final class CAdESValidator {
         try {
         	dsq = (ASN1Sequence) is.readObject();
         }
-        catch(final ClassCastException e) {
-        	// No es una secuencia
+        catch(final Exception e) {
+        	// No es una secuencia valida
         	return false;
         }
         finally {
@@ -272,8 +273,8 @@ public final class CAdESValidator {
         try {
         	dsq = (ASN1Sequence) is.readObject();
         }
-        catch(final ClassCastException e) {
-        	// No es una secuencia
+        catch(final Exception e) {
+        	// No es una secuencia valida
         	return false;
         }
         finally {
@@ -316,8 +317,8 @@ public final class CAdESValidator {
         try {
         	dsq = (ASN1Sequence) is.readObject();
         }
-        catch(final ClassCastException e) {
-        	// No es una secuencia
+        catch(final Exception e) {
+        	// No es una secuencia valida
         	return false;
         }
         finally {

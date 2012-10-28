@@ -41,38 +41,37 @@ final class ValidateCMSSignedData {
     public static boolean isCMSSignedData(final byte[] data) throws IOException {
     	new BCChecker().checkBouncyCastle();
         boolean isValid = true;
-
-        final ASN1InputStream is = new ASN1InputStream(data);
-        final ASN1Sequence dsq;
+        ASN1InputStream is = null;
         try {
-        	dsq = (ASN1Sequence) is.readObject();
-        }
-        catch(final ClassCastException e) {
-        	// No es una secuencia
-        	return false;
-        }
-        finally {
-        	is.close();
-        }
-        final Enumeration<?> e = dsq.getObjects();
-        // Elementos que contienen los elementos OID Data
-        final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
-        if (!doi.equals(PKCSObjectIdentifiers.signedData)) {
-            isValid = false;
-        }
-        else {
-            // Contenido de SignedData
-            final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-            final ASN1Sequence datos = (ASN1Sequence) doj.getObject();
-            final SignedData sd = SignedData.getInstance(datos);
-            final ASN1Set signerInfosSd = sd.getSignerInfos();
+            is = new ASN1InputStream(data);
+            final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+            final Enumeration<?> e = dsq.getObjects();
+            // Elementos que contienen los elementos OID Data
+            final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+            if (!doi.equals(PKCSObjectIdentifiers.signedData)) {
+                isValid = false;
+            }
+            else {
+                // Contenido de SignedData
+                final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+                final ASN1Sequence datos = (ASN1Sequence) doj.getObject();
+                final SignedData sd = SignedData.getInstance(datos);
+                final ASN1Set signerInfosSd = sd.getSignerInfos();
 
-            for (int i = 0; isValid && i < signerInfosSd.size(); i++) {
-                final SignerInfo si = new SignerInfo((ASN1Sequence) signerInfosSd.getObjectAt(i));
-                isValid = verifySignerInfo(si);
+                for (int i = 0; isValid && i < signerInfosSd.size(); i++) {
+                    final SignerInfo si = new SignerInfo((ASN1Sequence) signerInfosSd.getObjectAt(i));
+                    isValid = verifySignerInfo(si);
+                }
             }
         }
-
+        catch (final Exception ex) {
+            isValid = false;
+        }
+        finally {
+        	if (is != null) {
+        		is.close();
+        	}
+        }
         return isValid;
     }
 
