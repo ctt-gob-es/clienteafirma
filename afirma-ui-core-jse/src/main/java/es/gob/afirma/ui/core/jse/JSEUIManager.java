@@ -53,7 +53,8 @@ public final class JSEUIManager implements AOUIManager {
      * @throws AOCancelledOperationException
      *         Cuando el usuario cancela el proceso de solicitud de
      *         contrase&ntilde;a */
-    public char[] getPassword(final String text, final Object c) {
+    @Override
+	public char[] getPassword(final String text, final Object c) {
         return getPassword(text, null, false, c);
     }
 
@@ -72,12 +73,13 @@ public final class JSEUIManager implements AOUIManager {
      * @return Array de caracteres del texto introducido como contrase&ntilde;a
      * @throws AOCancelledOperationException
      *         Cuando el usuario cancela o cierra el di&aacute;logo */
-    public char[] getPassword(final String text, final String charSet, final boolean beep, final Object c) {
+    @Override
+	public char[] getPassword(final String text, final String charSet, final boolean beep, final Object c) {
         final JPasswordField pwd = new JPasswordField(10);
         if (charSet != null) {
             pwd.setDocument(new JTextFieldFilter(charSet, beep));
         }
-        final JLabel lbText = new JLabel((text != null) ? text : JSEUIMessages.getString("JSEUIManager.24")); //$NON-NLS-1$
+        final JLabel lbText = new JLabel(text != null ? text : JSEUIMessages.getString("JSEUIManager.24")); //$NON-NLS-1$
         lbText.setMinimumSize(new Dimension(lbText.getFontMetrics(lbText.getFont()).stringWidth(text), lbText.getSize().height));
         lbText.setLabelFor(pwd);
         final JPanel panel = new JPanel();
@@ -116,7 +118,8 @@ public final class JSEUIManager implements AOUIManager {
     }
 
     /** {@inheritDoc} */
-    public Object showInputDialog(final Object parentComponent,
+    @Override
+	public Object showInputDialog(final Object parentComponent,
                                   final Object message,
                                   final String title,
                                   final int messageType,
@@ -135,7 +138,8 @@ public final class JSEUIManager implements AOUIManager {
     }
 
     /** {@inheritDoc} */
-    public Object showCertificateSelectionDialog(	final Object parentComponent,
+    @Override
+	public Object showCertificateSelectionDialog(	final Object parentComponent,
     												final NameCertificateBean[] selectionValues) {
     	Component parent = null;
     	if (parentComponent instanceof Component) {
@@ -226,7 +230,8 @@ public final class JSEUIManager implements AOUIManager {
     }
 
     /** {@inheritDoc} */
-    public int showConfirmDialog(final Object parentComponent, final Object message, final String title, final int optionType, final int messageType) {
+    @Override
+	public int showConfirmDialog(final Object parentComponent, final Object message, final String title, final int optionType, final int messageType) {
         Component parent = null;
         if (parentComponent instanceof Component) {
             parent = (Component) parentComponent;
@@ -235,42 +240,50 @@ public final class JSEUIManager implements AOUIManager {
     }
 
     /** {@inheritDoc} */
-    public int getPlainMessageCode() {
+    @Override
+	public int getPlainMessageCode() {
         return JOptionPane.PLAIN_MESSAGE;
     }
 
     /** {@inheritDoc} */
-    public int getYesNoOptionCode() {
+    @Override
+	public int getYesNoOptionCode() {
         return JOptionPane.YES_NO_OPTION;
     }
 
     /** {@inheritDoc} */
-    public int getWarningMessageCode() {
+    @Override
+	public int getWarningMessageCode() {
         return JOptionPane.WARNING_MESSAGE;
     }
 
     /** {@inheritDoc} */
-    public int getYesOptionCode() {
+    @Override
+	public int getYesOptionCode() {
         return JOptionPane.YES_OPTION;
     }
 
     /** {@inheritDoc} */
-    public int getNoOptionCode() {
+    @Override
+	public int getNoOptionCode() {
         return JOptionPane.NO_OPTION;
     }
 
     /** {@inheritDoc} */
-    public int getOkCancelOptionCode() {
+    @Override
+	public int getOkCancelOptionCode() {
         return JOptionPane.OK_CANCEL_OPTION;
     }
 
     /** {@inheritDoc} */
-    public int getOkOptionCode() {
+    @Override
+	public int getOkOptionCode() {
         return JOptionPane.OK_OPTION;
     }
 
     /** {@inheritDoc} */
-    public int getInformationMessageCode() {
+    @Override
+	public int getInformationMessageCode() {
         return JOptionPane.INFORMATION_MESSAGE;
     }
 
@@ -283,7 +296,8 @@ public final class JSEUIManager implements AOUIManager {
      * @param parentComponent
      *        Componente padre (para la modalidad)
      * @return Nombre de fichero (con ruta) seleccionado por el usuario */
-    public String getLoadFileName(final String[] extensions, final String description, final Object parentComponent) {
+    @Override
+	public String getLoadFileName(final String[] extensions, final String description, final Object parentComponent) {
         return getLoadFileName(null, extensions, description, parentComponent);
     }
 
@@ -298,7 +312,8 @@ public final class JSEUIManager implements AOUIManager {
      * @param parent
      *        Componente padre (para la modalidad)
      * @return Nombre de fichero (con ruta) seleccionado por el usuario */
-    public String getLoadFileName(final String dialogTitle,
+    @Override
+	public String getLoadFileName(final String dialogTitle,
                                                final String[] extensions,
                                                final String description,
                                                final Object parent) {
@@ -339,7 +354,8 @@ public final class JSEUIManager implements AOUIManager {
      * @return Fichero guardado.
      * @throws NullPointerException
      *         No se introdujeron los datos que se desean almacenar. */
-    public File saveDataToFile(final byte[] data, final File selectedFile, final Object fileFilter, final Object parent) {
+    @Override
+	public File saveDataToFile(final byte[] data, final File selectedFile, final Object fileFilter, final Object parent) {
 
         if (data == null) {
             throw new IllegalArgumentException("No se introdujeron datos que almacenar"); //$NON-NLS-1$
@@ -370,7 +386,7 @@ public final class JSEUIManager implements AOUIManager {
 
             // Solo aplicamos el filtro cuando este definido para evitar que el
             // desplegable de la ventana de guardado nos aparecezca vacio
-            if (fileFilter != null && (fileFilter instanceof FileFilter)) {
+            if (fileFilter != null && fileFilter instanceof FileFilter) {
                 fileChooser.setFileFilter((FileFilter)fileFilter);
             }
 
@@ -401,21 +417,26 @@ public final class JSEUIManager implements AOUIManager {
                     }
                     catch (final Exception ex) {
                         LOGGER.warning("No se pudo guardar la informacion en el fichero indicado: " + ex); //$NON-NLS-1$
-                        JOptionPane.showMessageDialog(parentComponent,
-                                JSEUIMessages.getString("JSEUIManager.88"), JSEUIMessages.getString("JSEUIManager.89"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
-                        fos = null;
+                        JOptionPane.showMessageDialog(
+                    		parentComponent,
+                            JSEUIMessages.getString("JSEUIManager.88"), //$NON-NLS-1$
+                            JSEUIMessages.getString("JSEUIManager.89"), //$NON-NLS-1$
+                            JOptionPane.ERROR_MESSAGE
+                        );
                         // Volvemos a intentar guardar
                         tryAgain = true;
                     }
-                    if (fos != null) {
-                        try {
-                            fos.flush();
-                        }
-                        catch (final Exception e) { /** No hacemos nada. */ }
-                        try {
-                            fos.close();
-                        }
-                        catch (final Exception e) { /** No hacemos nada. */ }
+                    finally {
+	                    if (fos != null) {
+	                        try {
+	                            fos.flush();
+	                        }
+	                        catch (final Exception e) { /** No hacemos nada. */ }
+	                        try {
+	                            fos.close();
+	                        }
+	                        catch (final Exception e) { /** No hacemos nada. */ }
+	                    }
                     }
                     resultFile = file;
                 }
@@ -448,7 +469,7 @@ public final class JSEUIManager implements AOUIManager {
                 throw new IllegalArgumentException("No se puede crear un filtro vacio"); //$NON-NLS-1$
             }
             this.extensions = exts.clone();
-            this.description = (desc != null) ? desc : JSEUIMessages.getString("JSEUIManager.0"); //$NON-NLS-1$
+            this.description = desc != null ? desc : JSEUIMessages.getString("JSEUIManager.0"); //$NON-NLS-1$
         }
 
         /** {@inheritDoc} */
@@ -501,7 +522,8 @@ public final class JSEUIManager implements AOUIManager {
      * @param parent
      *        Componente padre (para la modalidad, debe ser de tipo <code>java.awt.Component</code>)
      * @return Fichero seleccionado por el usuario */
-    public File getLoadFile(final String dialogTitle,
+    @Override
+	public File getLoadFile(final String dialogTitle,
                             final String fileName,
                             final String description,
                             final Object parent) {

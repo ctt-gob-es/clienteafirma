@@ -179,12 +179,7 @@ final class CertificateUtils {
     private static boolean saveFile(final File file, final byte[] dataToSave) throws IOException {
     	final FileOutputStream fos = new FileOutputStream(file);
     	fos.write(dataToSave);
-    	try {
-    		fos.close();
-    	}
-    	catch (final Exception e) {
-    		/* No hacemos nada */
-		}
+    	fos.close();
     	return true;
     }
 

@@ -71,7 +71,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 	private final NameCertificateBean[] certificateBeans;
 
 	CertificateSelectionPanel(final NameCertificateBean[] el) {
-		this.certificateBeans = (el == null) ? new NameCertificateBean[0] : el.clone();
+		this.certificateBeans = el == null ? new NameCertificateBean[0] : el.clone();
 		this.createUI();
 	}
 
@@ -242,10 +242,10 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 			c.gridy = 1;
 			c.gridheight = 4;
 
-			final URL urlIcon = (isDNIeCert(this.cert) ?
+			final URL urlIcon = isDNIeCert(this.cert) ?
 					AOUtil.getCleanClassLoader().getResource("resources/dnieicon.png") : //$NON-NLS-1$
-						AOUtil.getCleanClassLoader().getResource("resources/certicon.png")); //$NON-NLS-1$
-			final JLabel icon = (urlIcon != null) ?
+						AOUtil.getCleanClassLoader().getResource("resources/certicon.png"); //$NON-NLS-1$
+			final JLabel icon = urlIcon != null ?
 					new JLabel(new ImageIcon(urlIcon)) :
 						new JLabel();
 
@@ -316,6 +316,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		}
 
 		/** {@inheritDoc} */
+		@Override
 		public Component getListCellRendererComponent(final JList/*<? extends CertificateLine>*/ list, /*CertificateLine*/final Object value,
 				final int index, final boolean isSelected, final boolean cellHasFocus) {
 
@@ -338,6 +339,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 	}
 
 	/** {@inheritDoc} */
+	@Override
 	public void valueChanged(final ListSelectionEvent e) {
 		this.selectedIndex = this.certList.getSelectedIndex();
 	}
@@ -354,6 +356,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		}
 
 		/** {@inheritDoc} */
+		@Override
 		public void mouseClicked(final MouseEvent me) {
 			if (me.getClickCount() == 1 &&
 					((CertificateLine)((JList/*<?>*/) me.getSource()).getSelectedValue()).getCertificateLinkBounds().contains(me.getX(), me.getY() % CERT_LIST_ELEMENT_HEIGHT)) {
@@ -369,6 +372,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		}
 
 		/** {@inheritDoc} */
+		@Override
 		public void mouseMoved(final MouseEvent me) {
 			if (((CertificateLine)((JList/*<?>*/) me.getSource()).getSelectedValue()).getCertificateLinkBounds().contains(me.getX(), me.getY() % CERT_LIST_ELEMENT_HEIGHT)) {
 				if (!this.entered) {
@@ -383,26 +387,31 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		}
 
 		/** {@inheritDoc} */
+		@Override
 		public void mouseDragged(final MouseEvent e) {
 			/* No hacemos nada */
 		}
 
 		/** {@inheritDoc} */
+		@Override
 		public void mouseReleased(final MouseEvent me) {
 			/* No hacemos nada */
 		}
 
 		/** {@inheritDoc} */
+		@Override
 		public void mousePressed(final MouseEvent me) {
 			/* No hacemos nada */
 		}
 
 		/** {@inheritDoc} */
+		@Override
 		public void mouseExited(final MouseEvent me) {
 			/* No hacemos nada */
 		}
 
 		/** {@inheritDoc} */
+		@Override
 		public void mouseEntered(final MouseEvent me) {
 			/* No hacemos nada */
 		}

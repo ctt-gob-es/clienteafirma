@@ -33,7 +33,7 @@ final class CertificateSelectionDialog implements MouseListener {
 
 		this.csd = new CertificateSelectionPanel(el.clone());
 		this.parent = parent;
-		this.optionPane = (el.length > 1) ?
+		this.optionPane = el.length > 1 ?
 				new CertOptionPane(this.csd) : new JOptionPane();
 
 		this.csd.addCertificateListMouseListener(this);
@@ -66,6 +66,7 @@ final class CertificateSelectionDialog implements MouseListener {
 	}
 
 	/** {@inheritDoc} */
+	@Override
 	public void mouseClicked(final MouseEvent me) {
 		if (me.getClickCount() == 2 && this.optionPane != null) {
 			this.optionPane.setValue(Integer.valueOf(JOptionPane.OK_OPTION));
@@ -73,21 +74,25 @@ final class CertificateSelectionDialog implements MouseListener {
 	}
 
 	/** {@inheritDoc} */
+	@Override
 	public void mouseReleased(final MouseEvent me) {
 		/* No hacemos nada */
 	}
 
 	/** {@inheritDoc} */
+	@Override
 	public void mousePressed(final MouseEvent me) {
 		/* No hacemos nada */
 	}
 
 	/** {@inheritDoc} */
+	@Override
 	public void mouseExited(final MouseEvent me) {
 		/* No hacemos nada */
 	}
 
 	/** {@inheritDoc} */
+	@Override
 	public void mouseEntered(final MouseEvent me) {
 		/* No hacemos nada */
 	}
