@@ -128,13 +128,17 @@ public final class AOSignerFactory {
         return SIGNERS.get(signFormat);
     }
 
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder("Factoria de manejadores de firma. Formatos soportados:"); //$NON-NLS-1$
+    /**
+     * Recupera el listado de formatos de firma soportados por el Cliente (no los actualmente cargados).
+     * @return Listado de formatos.
+     */
+    public static String[] getSupportedFormats() {
+    	int i = 0;
+    	final String[] formats = new String[SIGNERS_CLASSES.length];
         for (final String[] format : SIGNERS_CLASSES) {
-            sb.append(" ").append(format[0]); //$NON-NLS-1$
+            formats[i++] = format[0];
         }
-        return sb.toString();
+        return formats;
     }
 
 }

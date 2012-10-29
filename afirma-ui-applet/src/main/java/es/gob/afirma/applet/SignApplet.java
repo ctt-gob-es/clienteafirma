@@ -1135,11 +1135,14 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 				// Tomamos el manejador del formato de firma
 				final AOSigner signer = AOSignerFactory.getSigner(format);
 				if (signer == null) {
+					final StringBuffer sb = new StringBuffer();
+					sb.append("El formato de firma '").append(format).append( //$NON-NLS-1$
+							"' no esta soportado. Lo formatos soportados son:\n");  //$NON-NLS-1$
+					for (final String supportedformat : AOSignerFactory.getSupportedFormats()) {
+						sb.append(supportedformat).append("\n"); //$NON-NLS-1$
+					}
+					getLogger().severe(sb.toString());
 					SignApplet.this.setError(AppletMessages.getString("SignApplet.95") + format); //$NON-NLS-1$
-					getLogger().severe("El formato de firma '" + format + //$NON-NLS-1$
-							"' no esta soportado. Lo formatos soportados son:\n"  //$NON-NLS-1$
-							+
-							AOSignerFactory.getInstance().toString());
 					return Boolean.FALSE;
 				}
 
@@ -1494,10 +1497,13 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 				// Tomamos el Signer adecuado
 				final AOSigner signer = AOSignerFactory.getSigner(format);
 				if (signer == null) {
-					getLogger().severe("El formato de firma '" + format + //$NON-NLS-1$
-							"' no esta soportado. Lo formatos soportados son:\n" //$NON-NLS-1$
-							+
-							AOSignerFactory.getInstance().toString());
+					final StringBuffer sb = new StringBuffer();
+					sb.append("El formato de firma '").append(format).append( //$NON-NLS-1$
+							"' no esta soportado. Lo formatos soportados son:\n");  //$NON-NLS-1$
+					for (final String supportedformat : AOSignerFactory.getSupportedFormats()) {
+						sb.append(supportedformat).append("\n"); //$NON-NLS-1$
+					}
+					getLogger().severe(sb.toString());
 					SignApplet.this.setError(AppletMessages.getString("SignApplet.95") + format); //$NON-NLS-1$
 					return Boolean.FALSE;
 				}
@@ -1859,10 +1865,13 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 				// Tomamos el manejador de firma asociado al formato
 				final AOSigner signer = AOSignerFactory.getSigner(format);
 				if (signer == null) {
-					getLogger().severe("El formato de firma '" + format + //$NON-NLS-1$
-							"' no esta soportado. Lo formatos soportados son:\n" //$NON-NLS-1$
-							+
-							AOSignerFactory.getInstance().toString());
+					final StringBuffer sb = new StringBuffer();
+					sb.append("El formato de firma '").append(format).append( //$NON-NLS-1$
+							"' no esta soportado. Lo formatos soportados son:\n");  //$NON-NLS-1$
+					for (final String supportedformat : AOSignerFactory.getSupportedFormats()) {
+						sb.append(supportedformat).append("\n"); //$NON-NLS-1$
+					}
+					getLogger().severe(sb.toString());
 					SignApplet.this.setError(AppletMessages.getString("SignApplet.95") + format); //$NON-NLS-1$
 					return Boolean.FALSE;
 				}
