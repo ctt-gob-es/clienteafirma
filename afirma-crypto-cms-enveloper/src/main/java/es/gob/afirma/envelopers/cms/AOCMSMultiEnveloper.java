@@ -422,8 +422,9 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
      * @return Envoltorio con el nuevo remitente.
      * @throws AOException
      *         Cuando se produce un error al agregar el nuevo remitente.
+     * @throws IOException Cuando ocurre alg&uacute;n error en la lectura de los datos.
      * @throws AOInvalidFormatException Si el tipo de envoltorio no est&aacute; soportado. */
-    static byte[] addOriginator(final byte[] envelop, final PrivateKeyEntry ke) throws AOException {
+    static byte[] addOriginator(final byte[] envelop, final PrivateKeyEntry ke) throws AOException, IOException {
         final String contentInfo;
         if (ValidateCMS.isCMSEnvelopedData(envelop)) {
             contentInfo = AOSignConstants.CMS_CONTENTTYPE_ENVELOPEDDATA;
@@ -457,12 +458,13 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
      * @throws AOException
      *         Cuando ocurrio un error al agregar el remitente a la
      *         estructura.
+     * @throws IOException Cuando ocurre alg&uacute;n error en la lectura de los datos.
      * @throws IllegalArgumentException
      *         Cuando se indica un contentInfo no compatible con
      *         m&uacute;tiples remitentes. */
     private static byte[] addOriginator(final byte[] envelop,
     		                            final String contentInfo,
-    		                            final PrivateKeyEntry ke) throws AOException {
+    		                            final PrivateKeyEntry ke) throws AOException, IOException {
 
         final byte[] newEnvelop;
 
