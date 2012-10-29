@@ -11,6 +11,7 @@
 package es.gob.afirma.massive;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.security.KeyStore.PrivateKeyEntry;
@@ -373,8 +374,10 @@ public final class MassiveSignatureHelper {
      * @return Firma electr&oacute;nica con el formato dado por el manejador de
      *         firma.
      * @throws AOException
-     *         Cuando ocurre un error durante la operaci&oacute;n de firma. */
-    private byte[] signDataFromData(final AOSigner signer, final byte[] data, final URI uri, final Properties config) throws AOException {
+     *         Cuando ocurre un error durante la operaci&oacute;n de firma.
+     * throws IOException Cuando ocurre un error durante la lectura o escritura de los datos.
+     */
+    private byte[] signDataFromData(final AOSigner signer, final byte[] data, final URI uri, final Properties config) throws AOException, IOException {
 
         // Configuramos y ejecutamos la operacion
     	if (!config.containsKey("mode")) { //$NON-NLS-1$
@@ -424,8 +427,10 @@ public final class MassiveSignatureHelper {
      *        Configuraci&oacute;n general para la operaci&oacute;n.
      * @return Firma electr&oacute;nica con el formato configurado.
      * @throws AOException
-     *         Cuando ocurre un error durante la operaci&oacute;n de firma. */
-    private byte[] signDataFromHash(final AOSigner signer, final byte[] data, final Properties config) throws AOException {
+     *         Cuando ocurre un error durante la operaci&oacute;n de firma.
+     * @throws IOException Cuando ocurre alg&uacute;n error en la lectura de los datos.
+     */
+    private byte[] signDataFromHash(final AOSigner signer, final byte[] data, final Properties config) throws AOException, IOException {
 
         // Configuramos y ejecutamos la operacion
     	if (!config.containsKey("mode")) { //$NON-NLS-1$
@@ -462,8 +467,10 @@ public final class MassiveSignatureHelper {
      * @return Firma electr&oacute;nica con el formato dado por el manejador de
      *         firma.
      * @throws AOException
-     *         Cuando ocurre un error durante la operaci&oacute;n de firma. */
-    private byte[] cosign(final AOSigner signer, final byte[] sign, final Properties config) throws AOException {
+     *         Cuando ocurre un error durante la operaci&oacute;n de firma.
+     * throws IOException Cuando ocurre un error durante la lectura o escritura de los datos.
+     */
+    private byte[] cosign(final AOSigner signer, final byte[] sign, final Properties config) throws AOException, IOException {
 
         // Configuramos y ejecutamos la operacion
     	if (!config.containsKey("mode")) { //$NON-NLS-1$
@@ -496,8 +503,10 @@ public final class MassiveSignatureHelper {
      *         firma.
      * @throws AOException
      *         Cuando ocurre un error durante la operaci&oacute;n de
-     *         contrafirma. */
-    private byte[] countersignTree(final AOSigner signer, final byte[] sign, final Properties config) throws AOException {
+     *         contrafirma.
+     * @throws IOException Cuando ocurre alg&uacute;n error en la lectura de los datos.
+     */
+    private byte[] countersignTree(final AOSigner signer, final byte[] sign, final Properties config) throws AOException, IOException {
         return countersignOperation(signer, sign, CounterSignTarget.TREE, config);
     }
 
@@ -514,8 +523,10 @@ public final class MassiveSignatureHelper {
      *         firma.
      * @throws AOException
      *         Cuando ocurre un error durante la operaci&oacute;n de
-     *         contrafirma. */
-    private byte[] countersignLeafs(final AOSigner signer, final byte[] sign, final Properties config) throws AOException {
+     *         contrafirma.
+     * @throws IOException Cuando ocurre alg&uacute;n error en la lectura de los datos.
+     */
+    private byte[] countersignLeafs(final AOSigner signer, final byte[] sign, final Properties config) throws AOException, IOException {
         return countersignOperation(signer, sign, CounterSignTarget.LEAFS, config);
     }
 
@@ -534,8 +545,10 @@ public final class MassiveSignatureHelper {
      *         firma.
      * @throws AOException
      *         Cuando ocurre un error durante la operaci&oacute;n de
-     *         contrafirma. */
-    private byte[] countersignOperation(final AOSigner signer, final byte[] sign, final CounterSignTarget target, final Properties config) throws AOException {
+     *         contrafirma.
+     * @throws IOException
+     * 		   C*/
+    private byte[] countersignOperation(final AOSigner signer, final byte[] sign, final CounterSignTarget target, final Properties config) throws AOException, IOException {
 
         // Tomamos el signer adecuado para la operacion o el obligatorio si se
         // especifico
@@ -560,8 +573,10 @@ public final class MassiveSignatureHelper {
      * @throws AOException
      *         Si la firma introducida no se corresponde con ning&uacute;n
      *         formato soportado o se obliga a usar el manejador por defecto
-     *         y este no la soporta. */
-    private AOSigner getValidSigner(final AOSigner signer, final byte[] signData) throws AOException {
+     *         y este no la soporta.
+     * @throws IOException Cuando ocurre alg&uacute;n error en la lectura de los datos.
+     */
+    private AOSigner getValidSigner(final AOSigner signer, final byte[] signData) throws AOException, IOException {
         // Tomamos el signer adecuado para la operacion o el obligatorio si se
         // especifico
         AOSigner validSigner = signer;
@@ -589,8 +604,9 @@ public final class MassiveSignatureHelper {
      * @param data Datos que se desean revisar.
      * @return Manejador de firma compatible con los datos indicados o {@code null} si
      * no se encontr&oacute; ninguno.
+     * @throws IOException Cuando ocurre alg&uacute;n error en la lectura de los datos.
      */
-    private static AOSigner getSpecificSigner(final byte[] data) {
+    private static AOSigner getSpecificSigner(final byte[] data) throws IOException {
     	final String[] specificFormats = new String[] {
     			AOSignConstants.SIGN_FORMAT_PDF,
     			AOSignConstants.SIGN_FORMAT_ODF,

@@ -212,7 +212,9 @@ public class DirectorySignatureHelper {
      * @return Devuelve <code>true</code> si todas las firmas se realizaron
      *         correctamente, <code>false</code> en caso contrario.
      * @throws AOException
-     *         Error grave durante el proceso de firma masiva. */
+     *         Error grave durante el proceso de firma masiva.
+     * @throws IOException Cuando ocurre un error durante la lectura o escritura de los datos.
+     */
     public boolean massiveSign(final MassiveType type,
                                final String startDir,
                                final boolean recurse,
@@ -220,7 +222,7 @@ public class DirectorySignatureHelper {
                                final boolean createOutDir,
                                final boolean originalFormat,
                                final PrivateKeyEntry keyEntry,
-                               final Properties config) throws AOException {
+                               final Properties config) throws AOException, IOException {
 
         if (config == null || !config.containsKey(FORMAT_KEY) || !config.containsKey(MODE_KEY)) {
             throw new IllegalArgumentException("No se ha establecido el formato y modo de firma"); //$NON-NLS-1$
@@ -343,14 +345,16 @@ public class DirectorySignatureHelper {
      * @return Devuelve <code>true</code> si todas las firmas se realizaron
      *         correctamente, <code>false</code> en caso contrario.
      * @throws AOException
-     *         Error grave durante el proceso de firma masiva. */
+     *         Error grave durante el proceso de firma masiva.
+     * @throws IOException Cuando ocurre un error durante la lectura o escritura de los datos.
+     */
     public boolean massiveSign(final MassiveType type,
                                final String[] filenames,
                                final String outDir,
                                final boolean createOutDir,
                                final boolean originalFormat,
                                final PrivateKeyEntry keyEntry,
-                               final Properties config) throws AOException {
+                               final Properties config) throws AOException, IOException {
 
         if (config == null || !config.containsKey(FORMAT_KEY) || !config.containsKey(MODE_KEY)) {
             throw new IllegalArgumentException("No se ha establecido el formato y modo de firma"); //$NON-NLS-1$
@@ -391,10 +395,10 @@ public class DirectorySignatureHelper {
             od.mkdirs();
         }
         if (!od.exists() || !od.isDirectory()) {
-            throw new AOException("El directorio de salida no existe o existe un fichero con el mismo nombre"); //$NON-NLS-1$
+            throw new IOException("El directorio de salida no existe o existe un fichero con el mismo nombre"); //$NON-NLS-1$
         }
         if (!od.canWrite()) {
-            throw new AOException("No se tienen permisos de escritura en el directorio de salida"); //$NON-NLS-1$
+            throw new IOException("No se tienen permisos de escritura en el directorio de salida"); //$NON-NLS-1$
         }
 
         // Inicializamos el log de operacion
@@ -534,7 +538,7 @@ public class DirectorySignatureHelper {
     private boolean massiveSignOperation(final File[] files,
                                          final File outDir,
                                          final PrivateKeyEntry keyEntry,
-                                         final Properties signConfig) {
+                                         final Properties signConfig) throws IOException {
 
         boolean allOK = true;
         InputStream fis = null;
@@ -666,12 +670,15 @@ public class DirectorySignatureHelper {
      *        Clave de firma.
      * @return Devuelve <code>true</code> si toda la operaci&oacute;n
      *         finaliz&oacute; correctamente, <code>false</code> en caso
-     *         contrario. */
+     *         contrario.
+     * @throws IOException Cuando ocurre alg&uacute;n error durante la lectura de
+     * 		   los datos.
+     */
     private boolean massiveCosignOperation(final File[] files,
                                            final File outDir,
                                            final boolean originalFormat,
                                            final PrivateKeyEntry keyEntry,
-                                           final Properties signConfig) {
+                                           final Properties signConfig) throws IOException {
 
         boolean allOK = true;
 
@@ -800,12 +807,13 @@ public class DirectorySignatureHelper {
      *        Clave para firmar.
      * @param signConfig
      *        Configurac&oacute;n de firma.
-     * @return Firma electr&oacute;nica. */
+     * @return Firma electr&oacute;nica.
+     * @throws IOException Cuando ocurre un error durante el an&aacute;lisis del tipo de dato. */
     private byte[] sign(final AOSigner signer,
                         final byte[] data,
                         final String algo,
                         final PrivateKeyEntry keyEntry,
-                        final Properties signConfig) {
+                        final Properties signConfig) throws IOException {
 
     	// Deteccion del MIMEType y Oid de los datos, solo para CAdES, XAdES y XMLDSig
         final String signerClassName = signer.getClass().getName();
@@ -849,13 +857,16 @@ public class DirectorySignatureHelper {
      *        Clave de firma.
      * @param signConfig
      *        Configuraci&oacute;n de firma.
-     * @return Indica si la operaci&oacute;n finaliz&oacute; correctamente. */
+     * @return Indica si la operaci&oacute;n finaliz&oacute; correctamente.
+     * @throws IOException Cuando ocurre alg&uacute;n error durante la lectura de
+     * 		   los datos.
+     */
     private boolean massiveCounterSignOperation(final MassiveType type,
                                                 final File[] files,
                                                 final File outDir,
                                                 final boolean originalFormat,
                                                 final PrivateKeyEntry keyEntry,
-                                                final Properties signConfig) {
+                                                final Properties signConfig) throws IOException {
         boolean allOK = true;
         InputStream fis = null;
         final CounterSignTarget target = (type == MassiveType.COUNTERSIGN_ALL ? CounterSignTarget.TREE : CounterSignTarget.LEAFS);
@@ -875,19 +886,7 @@ public class DirectorySignatureHelper {
             // Solo podemos contrafirmar un fichero de firma en el mismo formato
             // en el que este
             byte[] signData;
-            boolean isSignFile = false;
-            try {
-                isSignFile = this.isSign(signer, file);
-            }
-            catch (final Exception e) {
-                this.addLogRegistry(
-                    Level.SEVERE,
-                    MassiveSignMessages.getString("DirectorySignatureHelper.16") + REG_FIELD_SEPARATOR + file + REG_FIELD_SEPARATOR + signConfig.getProperty(FORMAT_KEY)  //$NON-NLS-1$
-                );
-                allOK = false;
-                continue;
-            }
-            if (isSignFile) {
+            if (this.isSign(signer, file)) {
                 try {
 
                     // Si se nos pide que respetemos el formato original el
@@ -1312,8 +1311,9 @@ public class DirectorySignatureHelper {
      * @param data Datos que se desean revisar.
      * @return Manejador de firma compatible con los datos indicados o {@code null} si
      * no se encontr&oacute; ninguno.
+     * @throws IOException Cuando ocurre alg&uacute;n error durante la lectura de los datos.
      */
-    private static AOSigner getSpecificSigner(final byte[] data) {
+    private static AOSigner getSpecificSigner(final byte[] data) throws IOException {
     	final String[] specificFormats = new String[] {
     			AOSignConstants.SIGN_FORMAT_PDF,
     			AOSignConstants.SIGN_FORMAT_ODF,
