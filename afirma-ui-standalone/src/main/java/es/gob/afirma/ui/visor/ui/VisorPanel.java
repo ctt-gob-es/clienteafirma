@@ -28,6 +28,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
@@ -416,9 +417,10 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
      * Comprueba la validez de la firma.
      * @param sign Firma que se desea comprobar.
      * @return {@code true} si la firma es v&acute;lida, {@code false} en caso contrario.
+     * @throws IOException Cuando ocurre algun error durante la lectura de los datos.
      * @throws Exception Cuando los datos introducidos no se corresponden con una firma.
      */
-    private static SignValidity validateSign(final byte[] sign, final byte[] data) {
+    private static SignValidity validateSign(final byte[] sign, final byte[] data) throws IOException {
         if (DataAnalizerUtil.isSignedPDF(sign)) {
             return new SignValidity(SIGN_DETAIL_TYPE.OK, null);
         }

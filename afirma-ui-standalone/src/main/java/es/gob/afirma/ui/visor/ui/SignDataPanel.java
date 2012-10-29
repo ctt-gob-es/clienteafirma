@@ -18,6 +18,7 @@ import java.awt.event.MouseEvent;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.security.cert.X509Certificate;
 import java.util.logging.Logger;
@@ -379,8 +380,10 @@ final class SignDataPanel extends JPanel {
 
     /** Recupera la informaci&oacute;n de la firma indicada.
      * @param signData Firma.
-     * @return Informaci&oacute;n de la firma. */
-    private static CompleteSignInfo getSignInfo(final byte[] signData) {
+     * @return Informaci&oacute;n de la firma.
+     * @throws IOException Cuando ocurre alg&uacute;n error durante la lectura de los datos.
+     */
+    private static CompleteSignInfo getSignInfo(final byte[] signData) throws IOException {
         final CompleteSignInfo signInfo = new CompleteSignInfo();
         signInfo.setSignData(signData);
         final AOSigner signer = AOSignerFactory.getSigner(signData);

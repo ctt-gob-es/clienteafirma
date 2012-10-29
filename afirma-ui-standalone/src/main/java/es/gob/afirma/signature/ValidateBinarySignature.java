@@ -65,8 +65,9 @@ public final class ValidateBinarySignature {
      * @param data Datos firmados o {@code null} si se desea comprobar contra los datos incrustados
      * en la firma.
      * @return <code>true</code> si la firma es v&aacute;lida, <code>false</code> en caso contrario
+     * @throws IOException Cuando ocurre algun error durante la lectura de los datos.
      */
-    public static SignValidity validate(final byte[] sign, final byte[] data) {
+    public static SignValidity validate(final byte[] sign, final byte[] data) throws IOException {
         if (sign == null) {
             throw new IllegalArgumentException("La firma a validar no puede ser nula"); //$NON-NLS-1$
         }
@@ -106,6 +107,9 @@ public final class ValidateBinarySignature {
             // Problema en la validacion de las CRLs de la firma
             return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CRL_PROBLEM);
         }
+        catch (final IOException e) {
+        	throw e;
+		}
         catch (final Exception e) {
             Logger.getLogger("es.gob.afirma").info("Los datos no son una firma binaria valida: " + e); //$NON-NLS-1$ //$NON-NLS-2$
             return new SignValidity(SIGN_DETAIL_TYPE.KO, null);

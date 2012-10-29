@@ -21,7 +21,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.List;
@@ -93,7 +93,7 @@ final class PanelCofirma extends JAccessibilityDialogWizard {
 	}
 	/**
 	 * Constructor.
-	 * @param kssc
+	 * @param kssc Configuraci&oacute;n del almac&eacute;n de certificados.
 	 */
 	public PanelCofirma(final KeyStoreConfiguration kssc) {
 		this.kssc = kssc;
@@ -318,7 +318,12 @@ final class PanelCofirma extends JAccessibilityDialogWizard {
 				final JButton siguiente, final JButton finalizar) {
 
 			boolean continuar = true;
-			continuar = cofirmaFichero();
+			try {
+				continuar = cofirmaFichero();
+			} catch (final IOException e) {
+				logger.warning("Ocurrio un error durante la lectura de los datos: " + e); //$NON-NLS-1$
+				return;
+			}
 
 			if (continuar) {
 				super.siguienteActionPerformed(anterior, siguiente, finalizar);
@@ -329,8 +334,9 @@ final class PanelCofirma extends JAccessibilityDialogWizard {
 	/**
 	 * Cofirma un fichero dado
 	 * @return	true o false indicando si se ha cofirmado correctamente
+	 * @throws IOException Cuando ocurre alg&uacute;n error durante la lectura de los datos.
 	 */
-	public boolean cofirmaFichero() {
+	public boolean cofirmaFichero() throws IOException {
 		//comprobacion de la ruta de fichero de entrada.
 		final String ficheroDatos = this.campoDatos.getText();
 		final String ficheroFirma = this.campoFirma.getText();
@@ -476,10 +482,10 @@ final class PanelCofirma extends JAccessibilityDialogWizard {
 	 * @param keyEntry Clave de firma.
 	 * @param filepath Ruta del fichero firmado.
 	 * @return Contenido de la firma.
-	 * @throws FileNotFoundException No se encuentra el fichero de datos.
 	 * @throws AOException Ocurrio un error durante el proceso de firma.
+	 * @throws IOException Cuando ocurre alg&uacute;n error durante la lectura de los datos.
 	 */
-	private static byte[] cosignOperation(final AOSigner signer, final byte[] data, final byte[] sign, final PrivateKeyEntry keyEntry, final String filepath) throws FileNotFoundException, AOException {
+	private static byte[] cosignOperation(final AOSigner signer, final byte[] data, final byte[] sign, final PrivateKeyEntry keyEntry, final String filepath) throws AOException, IOException {
 
 		final Properties prop = GeneralConfig.getSignConfig();
 		prop.setProperty("uri", filepath); //$NON-NLS-1$
