@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -26,14 +26,14 @@ import es.gob.afirma.core.AOCancelledOperationException;
  * @author Carlos Gamuci Mill&aacute;n
  */
 final class SaveFileAction implements PrivilegedExceptionAction<Boolean> {
-    
+
 	private final String title;
     private final byte[] data;
     private final String[] exts;
     private final String desc;
     private final File fileHint;
     private final Component parent;
-        
+
     /**
      * Crea la acci&oacute;n para la carga de ficheros.
      * @param title T&iacute;tulo del di&aacute;logo de guardado.
@@ -52,7 +52,7 @@ final class SaveFileAction implements PrivilegedExceptionAction<Boolean> {
         this.fileHint = fileHint;
         this.parent = parent;
     }
-    
+
     /**
      * Muestra un di&aacute;logo modal para el guardado de un fichero y lo salva en el directorio
      * y con el nombre indicado por el usuario.
@@ -60,10 +60,11 @@ final class SaveFileAction implements PrivilegedExceptionAction<Boolean> {
      * @throws AOCancelledOperationException Cuando se cancela la operaci&oacute;n.
      * @throws IOException Cuando se produce un error al almacenar el fichero.
      */
+	@Override
 	public Boolean run() throws IOException {
     	return Boolean.valueOf(SaveFileAction.saveFile(this.selectFileToSave(), this.data));
 	}
-	
+
     /**
      * Pregunta al usuario por un nombre de fichero para salvar datos en disco.
      * @return Nombre de fichero (con ruta) seleccionado por el usuario
@@ -82,7 +83,7 @@ final class SaveFileAction implements PrivilegedExceptionAction<Boolean> {
     	if (this.fileHint != null) {
     		fc.setSelectedFile(this.fileHint);
     	}
-		
+
     	boolean selectedFile = false;
         File finalFile = null;
         do {
@@ -127,17 +128,17 @@ final class SaveFileAction implements PrivilegedExceptionAction<Boolean> {
 
         return finalFile;
     }
-    
+
     private static boolean saveFile(final File file, final byte[] dataToSave) throws IOException {
-    	
-    	FileOutputStream fos = new FileOutputStream(file);
+
+    	final FileOutputStream fos = new FileOutputStream(file);
     	fos.write(dataToSave);
     	try {
     		fos.close();
-    	} catch (Exception e) {
+    	} catch (final Exception e) {
     		/* No hacemos nada */
 		}
-    	
+
     	return true;
     }
 }

@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -10,6 +10,7 @@
 
 package es.gob.afirma.miniapplet;
 
+import java.io.IOException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.PrivilegedExceptionAction;
 import java.util.Properties;
@@ -29,7 +30,7 @@ final class CoSignAction implements PrivilegedExceptionAction<byte[]> {
 	private final String algorithm;
 	private final PrivateKeyEntry keyEntry;
 	private final Properties extraParams;
-	
+
 	/**
 	 * Crea la acci&oacute;n para cofirmar de una firma electr&oacute;nica.
 	 * @param signer Manejador de firma.
@@ -39,11 +40,11 @@ final class CoSignAction implements PrivilegedExceptionAction<byte[]> {
 	 * @param keyEntry Clave privada de firma.
 	 * @param extraParams Datos adicionales para la configuraci&oacute;n de la contrafirma.
 	 */
-	CoSignAction(final AOSigner signer, 
-	                    final byte[] sign, 
-	                    final byte[] data, 
-	                    final String algorithm, 
-	                    final PrivateKeyEntry keyEntry, 
+	CoSignAction(final AOSigner signer,
+	                    final byte[] sign,
+	                    final byte[] data,
+	                    final String algorithm,
+	                    final PrivateKeyEntry keyEntry,
 	                    final Properties extraParams) {
 		this.signer = signer;
 		this.sign = (sign != null ? sign.clone() : null);
@@ -52,9 +53,11 @@ final class CoSignAction implements PrivilegedExceptionAction<byte[]> {
 		this.keyEntry = keyEntry;
 		this.extraParams = extraParams;
 	}
-	
-	/** {@inheritDoc} */
-	public byte[] run() throws AOException {
+
+	/** {@inheritDoc}
+	 * @throws IOException Cuando se produce un error durante la lectura de los datos. */
+	@Override
+	public byte[] run() throws AOException, IOException {
 		if (this.data == null) {
 			return this.signer.cosign(this.sign, this.algorithm, this.keyEntry, this.extraParams);
 		}

@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -19,12 +19,12 @@ import java.security.PrivilegedExceptionAction;
  * @author Carlos Gamuci Mill&aacute;n
  */
 final class GetFilePathAction implements PrivilegedExceptionAction<String> {
-    
+
     private final String title;
     private final String[] exts;
     private final String desc;
     private final Component parent;
-    
+
     /**
      * Crea la acci&oacute;n para la recuperaci&oacute;n de la ruta de un fichero.
      * @param title T&iacute;tulo del di&aacute;logo.
@@ -39,7 +39,7 @@ final class GetFilePathAction implements PrivilegedExceptionAction<String> {
         this.desc = description;
         this.parent = parent;
     }
-    
+
     /**
      * Muestra un di&aacute;logo modal para la carga de un fichero y recuperar la ruta absoluta
      * del mismo.
@@ -47,6 +47,7 @@ final class GetFilePathAction implements PrivilegedExceptionAction<String> {
      * @throws es.gob.afirma.core.AOCancelledOperationException Cuando se cancela la operaci&oacute;n de selecci&oacute;n.
      * @throws IOException Cuando se produce un error al leer el fichero.
      */
+	@Override
 	public String run() throws IOException {
         return new FileSelectionDialog(this.title, this.exts, this.desc, false, this.parent).getPath();
 	}

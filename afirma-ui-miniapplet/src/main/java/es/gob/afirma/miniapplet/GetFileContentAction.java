@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -28,7 +28,7 @@ final class GetFileContentAction implements PrivilegedExceptionAction<byte[]>{
     private final String[] exts;
     private final String desc;
     private final Component parent;
-    
+
     /**
      * Crea la acci&oacute;n para la carga de ficheros.
      * @param title T&iacute;tulo del di&aacute;logo.
@@ -43,7 +43,7 @@ final class GetFileContentAction implements PrivilegedExceptionAction<byte[]>{
         this.desc = description;
         this.parent = parent;
     }
-    
+
     /**
      * Muestra al usuario un di&aacute;logo modal para la selecci&oacute;n de un fichero y devuelve
      * su contenido.
@@ -51,17 +51,18 @@ final class GetFileContentAction implements PrivilegedExceptionAction<byte[]>{
      * @throws es.gob.afirma.core.AOCancelledOperationException Cuando se cancela la operacion de selecci&oacute;n.
      * @throws IOException Cuando se produce un error al leer el fichero.
      */
+	@Override
 	public byte[] run() throws IOException {
         final FileSelectionDialog dialog = new FileSelectionDialog(this.title, this.exts, this.desc, false, this.parent);
         final InputStream is = dialog.getFileContent();
         try {
         	return AOUtil.getDataFromInputStream(is);
-        } 
+        }
         finally {
         	if (is != null) {
         		try {
         			is.close();
-        		} 
+        		}
         		catch (final Exception e) {
         			/* Ignoramos este error */
         		}

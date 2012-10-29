@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -10,6 +10,7 @@
 
 package es.gob.afirma.miniapplet;
 
+import java.io.IOException;
 import java.security.PrivilegedExceptionAction;
 
 import es.gob.afirma.core.signers.AOSigner;
@@ -20,10 +21,10 @@ import es.gob.afirma.core.signers.AOSignerFactory;
  * @author Carlos Gamuci Mill&aacute;n
  */
 final class SelectSignerAction implements PrivilegedExceptionAction<AOSigner> {
-    
+
     private final String format;
     private final byte[] data;
-    
+
     /**
      * Crea la acci&oacute;n para la obtenci&oacute;n de un manejador de firma compatible
      * con el formato de firma indicado.
@@ -33,7 +34,7 @@ final class SelectSignerAction implements PrivilegedExceptionAction<AOSigner> {
         this.format = format;
         this.data = null;
     }
-    
+
     /**
      * Crea la acci&oacute;n para la obtenci&oacute;n de un manejador de firma compatible
      * con la firma indicada.
@@ -43,16 +44,18 @@ final class SelectSignerAction implements PrivilegedExceptionAction<AOSigner> {
         this.data = (data != null ? data.clone() : null);
         this.format = null;
     }
-    
+
     /**
      * Selecciona el manejador de firma adecuado para el formato o los datos indicados.
      * Si no se encuentra un manejador compatible, se devuelve {@code null}.
      * @return Manejador de firma.
+     * @throws IOException Cuando se produce un error durante la lectura de los datos.
      */
-	public AOSigner run() {
+	@Override
+	public AOSigner run() throws IOException {
 		if (this.format != null) {
-			return AOSignerFactory.getSigner(this.format);	
-		} 
+			return AOSignerFactory.getSigner(this.format);
+		}
 		else if (this.data != null) {
 			return AOSignerFactory.getSigner(this.data);
 		}

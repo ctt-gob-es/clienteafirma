@@ -21,6 +21,7 @@ public class GetPropertyAction implements PrivilegedAction<String> {
 	/**
 	 * Recupera la propiedad del sistema indicada.
 	 */
+	@Override
 	public String run() {
 		return System.getProperty(this.property);
 	}

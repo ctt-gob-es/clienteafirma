@@ -92,6 +92,7 @@ final class SelectPrivateKeyAction implements PrivilegedExceptionAction<PrivateK
 	}
 
 	/** {@inheritDoc} */
+	@Override
 	public PrivateKeyEntry run() throws KeyException,
 	                                    AOKeystoreAlternativeException,
 	                                    AOException,

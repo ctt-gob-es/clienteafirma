@@ -70,6 +70,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	private String errorType = null;
 
 	/** {@inheritDoc} */
+	@Override
 	public void setStickySignatory(final boolean sticky) {
 		this.stickySignatory = sticky;
 		if (!sticky) {
@@ -78,6 +79,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	}
 
 	/** {@inheritDoc} */
+	@Override
 	public String sign(final String dataB64,
 					   final String algorithm,
 					   final String format,
@@ -122,6 +124,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	}
 
 	/** {@inheritDoc} */
+	@Override
 	public String coSign(final String signB64,
 			             final String dataB64,
 			             final String algorithm,
@@ -169,6 +172,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	}
 
 	/** {@inheritDoc} */
+	@Override
 	public String counterSign(final String signB64,
 			                  final String algorithm,
 			                  final String format,
@@ -212,6 +216,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	}
 
 	/** {@inheritDoc} */
+	@Override
 	public String getSignersStructure(final String signB64) throws IOException,
 	                                                               PrivilegedActionException,
 	                                                               AOFormatFileException {
@@ -261,6 +266,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	}
 
 	/** {@inheritDoc} */
+	@Override
 	public boolean saveDataToFile(final String data,
 			                      final String title,
 			                      final String fileName,
@@ -313,6 +319,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	}
 
 	/** {@inheritDoc} */
+	@Override
 	public String getFileNameContentBase64(final String title,
 			                               final String extensions,
 			                               final String description) throws PrivilegedActionException {
@@ -351,6 +358,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	}
 
 	/** {@inheritDoc} */
+	@Override
 	public String[] getMultiFileNameContentBase64(final String title,
 			                                      final String extensions,
 			                                      final String description) throws IOException,
@@ -398,6 +406,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	}
 
 	/** {@inheritDoc} */
+	@Override
 	public String getTextFromBase64(final String base64Data, final String charset) throws IOException {
 		this.clearError();
 		if (base64Data == null) {
@@ -414,6 +423,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	}
 
 	/** {@inheritDoc} */
+	@Override
 	public String getBase64FromText(final String plainText, final String charset) throws UnsupportedEncodingException {
 		this.clearError();
 		if (plainText == null) {
@@ -466,11 +476,13 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	}
 
 	/** {@inheritDoc} */
+	@Override
 	public String getErrorMessage() {
 		return this.errorMessage;
 	}
 
 	/** {@inheritDoc} */
+	@Override
 	public String getErrorType() {
 		return this.errorType;
 	}
@@ -542,11 +554,12 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	 * @return Manejador de firma.
 	 * @throws AOFormatFileException Cuando el formato o la firma no estan soportados.
 	 * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
+	 * @throws IOException Cuando se produce un error durante la lectura de los datos.
 	 * @throws NullPointerException Cuando no se indica ni formato ni firma como par&aacute;nmetro.
 	 */
 	private static AOSigner selectSigner(final String format,
 			                             final byte[] sign) throws AOFormatFileException,
-			                                                       PrivilegedActionException {
+			                                                       PrivilegedActionException, IOException {
 		final AOSigner signer;
 		if (format != null) {
 			signer = MiniAfirmaApplet.getSigner(format);
@@ -679,6 +692,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	 * Imprime en el logger el texto "MiniApplet cargado y en ejecuci&oacute;n". El uso de
 	 * este m&eacute;todo permite determinar si el applet se encuentra inicializado.
 	 */
+	@Override
 	public void echo() {
 		LOGGER.info("MiniApplet cargado y en ejecuci\u00F3n"); //$NON-NLS-1$
 	}

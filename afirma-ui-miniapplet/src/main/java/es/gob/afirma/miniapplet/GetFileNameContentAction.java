@@ -60,6 +60,7 @@ final class GetFileNameContentAction implements PrivilegedExceptionAction<String
      * @throws es.gob.afirma.core.AOCancelledOperationException Cuando se cancela la operaci&oacute;n de selecci&oacute;n.
      * @throws IOException Cuando se produce un error al leer el fichero.
      */
+	@Override
 	public String[] run() throws IOException {
 
 		final FileSelectionDialog fsDialog = new FileSelectionDialog(this.title, this.exts, this.desc, this.multiSel, this.parent);
