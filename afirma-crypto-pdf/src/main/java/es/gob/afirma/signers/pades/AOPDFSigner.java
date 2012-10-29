@@ -79,14 +79,16 @@ import es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper.TsaRequestExtension;
  *  Cuando se encuentran documentos PDF con ficheros adjuntos o empotrados se imprime informaci&oacute;n relativa en consola.
  * </p>
  * <p>
+ *   Por compatibilidad con Adobe Reader, la firmas se generan con el subfiltro "adbe.pkcs7.detached" en vez de con
+ *   "ETSI.CAdES.detached".
+ * </p>
+ * <p>
  *  La clase necesita espec&iacute;ficamente iText 2.1.7 (no se usan versiones m&aacute;s actuales por cuestiones de licencia) y
  *  BouncyCastle 1.46 o superior (Proveedor + TSP + <i>Mail</i>).
  * </p> */
 public final class AOPDFSigner implements AOSigner {
 
     private static final int CSIZE = 8000;
-
-    private static final String PADES_BES_SUBFILTER = "ETSI.CAdES.detached"; //$NON-NLS-1$
 
     private static final String PDF_FILE_SUFFIX = ".pdf"; //$NON-NLS-1$
     private static final String PDF_FILE_HEADER = "%PDF-"; //$NON-NLS-1$
@@ -1116,7 +1118,7 @@ public final class AOPDFSigner implements AOSigner {
 
         sap.setCrypto(null, chain, null, null);
 
-        final PdfSignature dic = new PdfSignature(PdfName.ADOBE_PPKLITE, new PdfName(PADES_BES_SUBFILTER));
+        final PdfSignature dic = new PdfSignature(PdfName.ADOBE_PPKLITE, PdfName.ADBE_PKCS7_DETACHED);
         if (sap.getSignDate() != null) {
             dic.setDate(new PdfDate(sap.getSignDate()));
         }
