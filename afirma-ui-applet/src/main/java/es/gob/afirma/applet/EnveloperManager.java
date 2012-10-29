@@ -602,6 +602,7 @@ final class EnveloperManager {
      * @return Sobre electr&oacute;nico con el remitente agregado.
      * @throws AOException
      *         Cuando se produce un error durante el proceso de ensobrado.
+     * @throws IOException Cuando ocurre alg&uacute;n error en la lectura de los datos.
      * @throws es.gob.afirma.core.AOCancelledOperationException
      *         Cuando el usuario cancela la operaci&oacute;n.
      * @throws es.gob.afirma.keystores.main.common.AOCertificatesNotFoundException
@@ -610,7 +611,7 @@ final class EnveloperManager {
      *         Cuando no se puede acceder al almac&eacute;n de certificados.
      * @throws es.gob.afirma.core.AOInvalidFormatException
      *         Tipo de envoltorio no soportado. */
-    byte[] coEnvelop(final byte[] envelop) throws AOException {
+    byte[] coEnvelop(final byte[] envelop) throws AOException, IOException {
         if (!this.ksConfigManager.isSelectedCertificate()) {
             try {
                 this.ksConfigManager.selectCertificate();

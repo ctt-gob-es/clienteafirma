@@ -14,6 +14,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Frame;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
@@ -1047,8 +1048,14 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 				// establecido y si no es asi
 				// la analizamos y tomamos el manejador correspondiente
 				AOSigner signer = AOSignerFactory.getSigner(SignApplet.this.getSigFormat());
-				if (signer == null || !signer.isSign(originalSign)) {
-					signer = AOSignerFactory.getSigner(originalSign);
+				try {
+					if (signer == null || !signer.isSign(originalSign)) {
+						signer = AOSignerFactory.getSigner(originalSign);
+					}
+				} catch (final IOException e) {
+					getLogger().severe("Error al leer la firma: " + e); //$NON-NLS-1$
+					SignApplet.this.setError(AppletMessages.getString("SignApplet.63")); //$NON-NLS-1$
+					return null;
 				}
 
 				// Si la firma no esta en un formato soportado,
@@ -1167,6 +1174,11 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 						catch (final AOCancelledOperationException e) {
 							getLogger().info("Operacion cancelada por el usuario"); //$NON-NLS-1$
 							SignApplet.this.setError(AppletMessages.getString("SignApplet.68")); //$NON-NLS-1$
+							return Boolean.FALSE;
+						}
+						catch (final IOException e) {
+							getLogger().severe("Error al leer la firma"); //$NON-NLS-1$
+							SignApplet.this.setError(AppletMessages.getString("SignApplet.64")); //$NON-NLS-1$
 							return Boolean.FALSE;
 						}
 						catch (final AOException e) {
@@ -1736,7 +1748,13 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 		final String mimeType = SignApplet.this.extMimeType != null ? SignApplet.this.extMimeType : SignApplet.this.dataMimeType;
 		if (mimeType != null) {
 			extraParams.setProperty("mimeType", mimeType); //$NON-NLS-1$
-			final String oid = MimeHelper.transformMimeTypeToOid(mimeType);
+			final String oid;
+			try {
+				oid = MimeHelper.transformMimeTypeToOid(mimeType);
+			} catch (final IOException e) {
+				getLogger().warning("No se ha podido identificar el OID asociado el MimeType de los datos: " + e); //$NON-NLS-1$
+				return;
+			}
 			if (oid != null) {
 				extraParams.setProperty("oid", oid); //$NON-NLS-1$
 			}
@@ -1914,7 +1932,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 					return Boolean.FALSE;
 				}
 
-				// Establecemos el formato de los datos
+				// Configuramos el mimetype de los datos
 				configureDataTypeExtraParams(SignApplet.this.getGenericConfig());
 
 				// Configuramos el certificado
@@ -2201,6 +2219,10 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 		if (this.data != null || this.fileUri != null) {
 			try {
 				analizeMimeType(tempData);
+			} catch (final IOException e) {
+					LOGGER.severe("Error al leer los datos: " + e); //$NON-NLS-1$
+					this.setError(AppletMessages.getString("SignApplet.407")); //$NON-NLS-1$
+					throw new AOException(e.getMessage(), e);
 			}
 			catch (final OutOfMemoryError e) {
 				LOGGER.severe("Error de falta de memoria al analizar los datos de entrada: " + e); //$NON-NLS-1$
@@ -2215,8 +2237,10 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 	/** Analiza datos para establecer su MimeType y la descripci&oacute;n textual
 	 * de su tipo.
 	 * @param dataContent
-	 *        Contenidos que se desean analizar. */
-	private void analizeMimeType(final byte[] dataContent) {
+	 *        Contenidos que se desean analizar.
+	 * @throws IOException Cuando ocurre alg&uacute;n error al leer los datos.
+	 */
+	private void analizeMimeType(final byte[] dataContent) throws IOException {
 		// Intentamos extraer el mimetype y su descripcion
 		if (dataContent != null) {
 			final MimeHelper mtHelper = new MimeHelper(dataContent);
