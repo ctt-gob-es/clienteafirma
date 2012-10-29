@@ -321,7 +321,7 @@ final class PanelCofirma extends JAccessibilityDialogWizard {
 			try {
 				continuar = cofirmaFichero();
 			} catch (final IOException e) {
-				logger.warning("Ocurrio un error durante la lectura de los datos: " + e); //$NON-NLS-1$
+				Logger.getLogger("es.gob.afirma").warning("Ocurrio un error durante la lectura de los datos: " + e); //$NON-NLS-1$ //$NON-NLS-2$
 				return;
 			}
 
