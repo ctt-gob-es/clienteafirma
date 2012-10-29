@@ -36,7 +36,7 @@ public class SSLFilterTest {
     private static final String CERT_ALIAS = "anf usuario activo"; //$NON-NLS-1$
 
 	/** Comprobaci&oacute;n del filtrado.
-	 * @throws Exception */
+	 * @throws Exception Cuando ocurre alg&uacute;n error. */
 	@SuppressWarnings("static-method")
 	@Test
 	public void match() throws Exception {

@@ -120,10 +120,10 @@ public class GenerateAllSigns {
 
     /**
      * Genera todos los tipos de firmas posibles.
-     * @throws AOException
-     * @throws NoSuchAlgorithmException
-     * @throws GeneralSecurityException
-     * @throws IOException
+     * @throws AOException Cuando ocurre alg&uacute;n error al generar las firmas.
+     * @throws NoSuchAlgorithmException Cuando el algoritmo de firma no est&aacute; soportado.
+     * @throws GeneralSecurityException Cuando se produce un problema de seguridad.
+     * @throws IOException Cuando ocurre un error en la lectura de los datos.
      */
     @SuppressWarnings("static-method")
 	@Test
@@ -168,10 +168,10 @@ public class GenerateAllSigns {
 
     /**
      * Genera todos los tipos de firmas posibles.
-     * @throws AOException
-     * @throws NoSuchAlgorithmException
-     * @throws GeneralSecurityException
-     * @throws IOException
+     * @throws AOException Cuando ocurre alg&uacute;n error al generar las firmas.
+     * @throws NoSuchAlgorithmException Cuando el algoritmo de firma no est&aacute; soportado.
+     * @throws GeneralSecurityException Cuando se produce un problema de seguridad.
+     * @throws IOException Cuando ocurre un error en la lectura de los datos.
      */
     @SuppressWarnings("static-method")
 	@Test
@@ -215,10 +215,10 @@ public class GenerateAllSigns {
 
     /**
      * Genera todos los tipos de firmas posibles.
-     * @throws AOException
-     * @throws NoSuchAlgorithmException
-     * @throws GeneralSecurityException
-     * @throws IOException
+     * @throws AOException Cuando ocurre alg&uacute;n error al generar las firmas.
+     * @throws NoSuchAlgorithmException Cuando el algoritmo de firma no est&aacute; soportado.
+     * @throws GeneralSecurityException Cuando se produce un problema de seguridad.
+     * @throws IOException Cuando ocurre un error en la lectura de los datos.
      */
     @SuppressWarnings("static-method")
 	@Test

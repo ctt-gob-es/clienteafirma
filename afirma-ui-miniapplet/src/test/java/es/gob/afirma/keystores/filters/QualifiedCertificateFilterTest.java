@@ -42,7 +42,7 @@ public class QualifiedCertificateFilterTest {
     private static final String CERT_ALIAS = "{7f50af22-691e-4d84-b466-a5c33cab2683}"; //$NON-NLS-1$
 
 	/** Comprobaci&oacute;n del filtrado.
-	 * @throws Exception */
+	 * @throws Exception Cuando ocurre alg&uacute;n error. */
 	@SuppressWarnings("static-method")
 	@Test
 	@Ignore

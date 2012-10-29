@@ -68,7 +68,7 @@ public final class MiniAfirmaAppletTest {
 	}
 
 	/** Realiza una firma con el almac&eacute;n por defecto.
-	 * @throws Exception */
+	 * @throws Exception Cuando ocurre alg&uacute;n error. */
 	@SuppressWarnings("static-method")
 	@Test
 	@Ignore
