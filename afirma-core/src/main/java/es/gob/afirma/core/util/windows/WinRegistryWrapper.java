@@ -32,10 +32,16 @@ public final class WinRegistryWrapper {
         if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
 
         	try {
-        		WinRegistryWrapper.addURL(new File(Platform.getJavaHome() + "\\lib\\deploy.jar").toURI().toURL()); //$NON-NLS-1$
+        		final File deploy = new File(Platform.getJavaHome() + "\\lib\\deploy.jar"); //$NON-NLS-1$
+        		if (deploy.exists()) {
+        			WinRegistryWrapper.addURL(deploy.toURI().toURL());
+        		}
+        		else {
+        			LOGGER.warning("No se ha podido localizar la biblioteca java de despliegue '" + deploy.getAbsolutePath() + "'");  //$NON-NLS-1$ //$NON-NLS-2$
+        		}
             }
             catch (final Exception e) {
-                LOGGER.warning("No se ha localizar y agregar al path la biblioteca java de despliegue 'deploy.jar': " + e);  //$NON-NLS-1$
+                LOGGER.warning("No se ha podido agregar al path la biblioteca java de despliegue 'deploy.jar': " + e);  //$NON-NLS-1$
             }
 
             // Cargamos la libreria nativa 'deploy.dll'
