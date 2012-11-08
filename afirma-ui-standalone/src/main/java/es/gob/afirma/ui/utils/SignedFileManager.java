@@ -54,6 +54,10 @@ public final class SignedFileManager {
             return new ExtFilter(new String[] {
             "xsig"}, Messages.getString("SignedFileManager.17")); //$NON-NLS-1$ //$NON-NLS-2$
         }
+        else if (signFormat.equals(AOSignConstants.SIGN_FORMAT_FACTURAE)) {
+            return new ExtFilter(new String[] {
+            "xml"}, Messages.getString("SignedFileManager.18")); //$NON-NLS-1$ //$NON-NLS-2$
+        }
         return new ExtFilter(new String[] {
         "sig"}, Messages.getString("SignedFileManager.52")); //$NON-NLS-1$ //$NON-NLS-2$
     }
@@ -90,7 +94,7 @@ public final class SignedFileManager {
             return inName + ".xsig"; //$NON-NLS-1$
         }
         if (signFormat.equals(AOSignConstants.SIGN_FORMAT_PDF) || signFormat.equals(AOSignConstants.SIGN_FORMAT_ODF)
-                || signFormat.equals(AOSignConstants.SIGN_FORMAT_OOXML)) {
+                || signFormat.equals(AOSignConstants.SIGN_FORMAT_OOXML) || signFormat.equals(AOSignConstants.SIGN_FORMAT_FACTURAE)) {
             final int i = inName.lastIndexOf('.');
             if (i > 0 && i < inName.length() - 1) {
                 return inName.substring(0, i) + ".signed" + inName.substring(i).toLowerCase(); //$NON-NLS-1$
