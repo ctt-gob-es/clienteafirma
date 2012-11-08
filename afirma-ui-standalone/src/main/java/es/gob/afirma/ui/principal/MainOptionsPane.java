@@ -430,9 +430,11 @@ public class MainOptionsPane {
             config.setProperty("referencesDigestMethod", this.comboAlgoritmo.getSelectedItem().toString()); //$NON-NLS-1$
         }
         if (this.checkAddPolicy.isSelected()) {
-            config.setProperty("policyIdentifier", this.textPolicyIdentifier.getText()); //$NON-NLS-1$
-            config.setProperty("policyQualifier", this.textPolicyQualifier.getText()); //$NON-NLS-1$
-            config.setProperty("policyIdentifierHash", this.textPolicyHash.getText()); //$NON-NLS-1$
+            config.setProperty("policyIdentifier", this.textPolicyIdentifier.getText().trim()); //$NON-NLS-1$
+            if (this.textPolicyQualifier.getText().trim().length() > 0) {
+            	config.setProperty("policyQualifier", this.textPolicyQualifier.getText()); //$NON-NLS-1$
+            }
+            config.setProperty("policyIdentifierHash", this.textPolicyHash.getText().trim()); //$NON-NLS-1$
             config.setProperty("policyIdentifierHashAlgorithm", DEFAULT_POLICY_HASH_ALGORITHM); //$NON-NLS-1$
         }
         return config;
@@ -492,20 +494,25 @@ public class MainOptionsPane {
 	public boolean checkAboutBadPolicyId() {
     	if (this.checkAddPolicy.isSelected()) {
 			try {
-				new Oid(this.textPolicyIdentifier.getText().replace("urn:oid:", "")); //$NON-NLS-1$ //$NON-NLS-2$
+				new Oid(this.textPolicyIdentifier.getText().trim().replace("urn:oid:", "")); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			catch(final Exception e) {
-				CustomDialog.showMessageDialog(
-					this.textPolicyIdentifier,
-					true,
-					"El identificador de la pol\u00EDtica de firma debe ser un OID o un URN de tipo OID",
-					"Identificador incorrecto para la pol\u00EDtica de firma",
-					JOptionPane.ERROR_MESSAGE
-				);
-				this.textPolicyIdentifier.requestFocus();
-				this.textPolicyIdentifier.setSelectionStart(0);
-				this.textPolicyIdentifier.setSelectionEnd(this.textPolicyIdentifier.getText().length());
-				return false;
+				try {
+					new URL(this.textPolicyIdentifier.getText().trim());
+				}
+				catch (final Exception e2) {
+					CustomDialog.showMessageDialog(
+							this.textPolicyIdentifier,
+							true,
+							"El identificador de la pol\u00EDtica de firma debe ser un OID, una URN de tipo OID o una URL",
+							"Identificador incorrecto para la pol\u00EDtica de firma",
+							JOptionPane.ERROR_MESSAGE
+						);
+						this.textPolicyIdentifier.requestFocus();
+						this.textPolicyIdentifier.setSelectionStart(0);
+						this.textPolicyIdentifier.setSelectionEnd(this.textPolicyIdentifier.getText().length());
+						return false;
+				}
 			}
     	}
     	return true;
@@ -519,6 +526,12 @@ public class MainOptionsPane {
      */
 	@SuppressWarnings("unused")
 	public boolean checkSignaturePolicyQualifier() {
+
+		// Se permiten calificadores nulos
+		if (this.textPolicyQualifier.getText().trim().length() == 0) {
+			return true;
+		}
+
     	try {
     		new URL(this.textPolicyQualifier.getText());
     	}
