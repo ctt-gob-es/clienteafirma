@@ -212,7 +212,9 @@ public final class AOFacturaESigner implements AOSigner {
     /** {@inheritDoc} */
     @Override
 	public AOSignInfo getSignInfo(final byte[] signData) throws AOException, IOException {
-        return XADES_SIGNER.getSignInfo(signData);
+    	final AOSignInfo facturaeSignInfo = new AOSignInfo(AOSignConstants.SIGN_FORMAT_FACTURAE);
+    	facturaeSignInfo.setVariant(null);
+    	return facturaeSignInfo;
     }
 
 }
