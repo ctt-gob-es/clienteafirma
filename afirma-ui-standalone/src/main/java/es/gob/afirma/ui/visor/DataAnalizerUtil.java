@@ -5,6 +5,7 @@ import es.gob.afirma.signers.cms.AOCMSSigner;
 import es.gob.afirma.signers.odf.AOODFSigner;
 import es.gob.afirma.signers.ooxml.AOOOXMLSigner;
 import es.gob.afirma.signers.pades.AOPDFSigner;
+import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signers.xmldsig.AOXMLDSigSigner;
 
 /**
@@ -16,6 +17,23 @@ public final class DataAnalizerUtil {
 	private DataAnalizerUtil() {
 		// No permitimos la instanciacion
 	}
+
+	/**
+     * Comprueba si los datos introducidos se corresponden con una factura
+     * electr&oacute;nica firmada.
+     * @param data Datos a analizar.
+     * @return Devuelve {@code true} si los datos son una firma XML soportada.
+     */
+    public static boolean isSignedInvoice(final byte[] data) {
+
+        try {
+            return new AOFacturaESigner().isSign(data);
+        }
+        catch(final Exception e) {
+            return false;
+        }
+    }
+
 
     /**
      * Comprueba si los datos introducidos se corresponden a una firma XML soportada.
