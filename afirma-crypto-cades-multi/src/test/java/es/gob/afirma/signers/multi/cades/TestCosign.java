@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.security.MessageDigest;
 import java.util.Properties;
 
 import junit.framework.Assert;
@@ -183,6 +184,44 @@ public class TestCosign {
 	}
 
 	/**
+	 * Prueba de cofirma explicita de una firma explicita indicando el hash de los datos firmados.
+	 * @throws Exception Cuando se produce un error.
+	 */
+	@SuppressWarnings("static-method")
+	@Test
+	public void prueba_cofirma_explicita_de_firma_explicita_indicando_hash() throws Exception {
+
+		final InputStream is = AOUtil.getCleanClassLoader().getResourceAsStream(EXPLICIT_SHA1_SIGN_FILE);
+		final byte[] sign = AOUtil.getDataFromInputStream(is);
+		is.close();
+
+		final MessageDigest md = MessageDigest.getInstance("SHA1"); //$NON-NLS-1$
+		md.update(data);
+		final byte[] messageDigest = md.digest();
+
+		final Properties config = new Properties();
+		config.setProperty("mode", AOSignConstants.SIGN_MODE_EXPLICIT); //$NON-NLS-1$
+		config.setProperty("precalculatedHashAlgorithm", "SHA1"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		final AOCAdESSigner signer = new AOCAdESSigner();
+		final byte[] cosign = signer.cosign(
+				messageDigest,
+				sign,
+				AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
+				(PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray())),
+				config);
+
+		final File tempFile = File.createTempFile("CosignCades", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		System.out.println("Prueba de cofirma implicita sobre firma explicita indicando datos."); //$NON-NLS-1$
+		System.out.println("El resultado de almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
+
+		final FileOutputStream fos = new FileOutputStream(tempFile);
+		fos.write(cosign);
+		fos.close();
+	}
+
+	/**
 	 * Prueba de cofirma explicita de una firma explicita ambas generadas con el mismo algoritmo.
 	 * @throws Exception Cuando se produce un error.
 	 */
@@ -251,6 +290,8 @@ public class TestCosign {
 
 		Assert.fail("La firma tuvo que haber lanzado una excepcion de tipo AOException"); //$NON-NLS-1$
 	}
+
+
 
 	/** Cierra el flujo de lectura del almac&eacute;n de certificados.
 	 * @throws IOException */

@@ -261,7 +261,7 @@ final class CAdESCoSigner {
                      null,
                      policy,
                      signingCertificateV2,
-                     null,
+                     messageDigest,
                      new Date(),
                      false,
                      contentType,
