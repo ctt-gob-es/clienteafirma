@@ -43,7 +43,7 @@ public class TestCosign {
 	private static byte[] data;
 
 	/** Carga el almac&eacute;n de certificados.
-	 * @throws Exception */
+	 * @throws Exception Cuando ocurre algun problema al cargar el almac&eacute;n o los datos. */
 	@SuppressWarnings("static-method")
 	@Before
 	public void cargaAlmacen() throws Exception {
@@ -294,7 +294,7 @@ public class TestCosign {
 
 
 	/** Cierra el flujo de lectura del almac&eacute;n de certificados.
-	 * @throws IOException */
+	 * @throws IOException Cuando ocurre alg&uacute;n problema al cerrar el flujo de datos. */
 	@SuppressWarnings("static-method")
 	@After
 	public void cerrar() throws IOException {
