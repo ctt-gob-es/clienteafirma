@@ -11,7 +11,6 @@
                 <mapref location="map_file-es.jhm"/>
           </maps>
 
-
 		  <view>
 		    <name>Indice</name>
 		    <label>El indice</label>

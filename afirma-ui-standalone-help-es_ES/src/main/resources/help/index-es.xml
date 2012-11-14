@@ -22,6 +22,7 @@
 			<indexitem text="Firmas XML" target="firma.xml">
 				<indexitem text="XMLdSig" target="xmldsig"/>
 				<indexitem text="XAdES" target="xades"/>
+				<indexitem text="Facturas electrónicas" target="facturas.electronicas" />
 				<indexitem text="ODF" target="odf"/>
 				<indexitem text="OOXML" target="ooxml"/>
 			</indexitem>	

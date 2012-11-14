@@ -22,6 +22,7 @@
 				<mapID target="firma.xml" url="html/es_ES/firma_xml.html" />
 					<mapID target="xmldsig" url="html/es_ES/xmldsig.html" />
 					<mapID target="xades" url="html/es_ES/xades.html" />
+					<mapID target="facturas.electronicas" url="html/es_ES/facturas_electronicas.html" />
 					<mapID target="odf" url="html/es_ES/odf.html" />
 					<mapID target="ooxml" url="html/es_ES/ooxml.html" />
 				<mapID target="firma.binaria" url="html/es_ES/firma_binaria.html" />

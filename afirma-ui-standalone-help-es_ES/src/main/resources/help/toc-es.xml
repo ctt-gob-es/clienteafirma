@@ -26,6 +26,7 @@
 			<tocitem text="Firmas XML" target="firma.xml">
 				<tocitem text="XMLdSig" target="xmldsig"/>
 				<tocitem text="XAdES" target="xades"/>
+				<tocitem text="Facturas electrónicas" target="facturas.electronicas" />
 				<tocitem text="ODF" target="odf"/>
 				<tocitem text="OOXML" target="ooxml"/>
 			</tocitem>	
