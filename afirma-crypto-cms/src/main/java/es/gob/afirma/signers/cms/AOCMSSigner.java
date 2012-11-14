@@ -12,6 +12,8 @@ package es.gob.afirma.signers.cms;
 
 import java.io.IOException;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Map;
@@ -54,7 +56,7 @@ public final class AOCMSSigner implements AOSigner {
 
     /** {@inheritDoc} */
     @Override
-	public byte[] sign(final byte[] data, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException {
+	public byte[] sign(final byte[] data, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException, IOException {
 
     	new BCChecker().checkBouncyCastle();
 
@@ -76,20 +78,24 @@ public final class AOCMSSigner implements AOSigner {
 
         final String mode = extraParams.getProperty("mode", AOSignConstants.DEFAULT_SIGN_MODE); //$NON-NLS-1$
 
+        final boolean omitContent = mode.equals(AOSignConstants.SIGN_MODE_EXPLICIT) || precalculatedDigest != null;
         try {
-            final boolean omitContent = mode.equals(AOSignConstants.SIGN_MODE_EXPLICIT) || precalculatedDigest != null;
-            return new GenSignedData().generateSignedData(csp,
-                                                          omitContent,
-                                                          Boolean.parseBoolean(extraParams.getProperty("applySystemDate", "true")), //$NON-NLS-1$ //$NON-NLS-2$
-                                                          this.dataType,
-                                                          keyEntry,
-                                                          this.atrib,
-                                                          this.uatrib,
-                                                          messageDigest);
-        }
-        catch (final Exception e) {
-            throw new AOException("Error generando la firma PKCS#7", e); //$NON-NLS-1$
-        }
+			return new GenSignedData().generateSignedData(csp,
+			                                              omitContent,
+			                                              Boolean.parseBoolean(extraParams.getProperty("applySystemDate", "true")), //$NON-NLS-1$ //$NON-NLS-2$
+			                                              this.dataType,
+			                                              keyEntry,
+			                                              this.atrib,
+			                                              this.uatrib,
+			                                              messageDigest);
+		}
+        catch (final NoSuchAlgorithmException e) {
+			throw new AOException("Error en el algoritmo de firma: " + e, e); //$NON-NLS-1$
+		}
+        catch (final CertificateException e) {
+        	throw new AOException("Error en el certificado de firma: " + e, e); //$NON-NLS-1$
+		}
+
     }
 
     /** {@inheritDoc} */
