@@ -32,7 +32,6 @@ import com.lowagie.text.Jpeg;
 import com.lowagie.text.Rectangle;
 import com.lowagie.text.exceptions.BadPasswordException;
 import com.lowagie.text.pdf.AcroFields;
-import com.lowagie.text.pdf.PdfArray;
 import com.lowagie.text.pdf.PdfDate;
 import com.lowagie.text.pdf.PdfDeveloperExtension;
 import com.lowagie.text.pdf.PdfDictionary;
@@ -883,6 +882,18 @@ public final class AOPDFSigner implements AOSigner {
         catch (final Exception e) {
             /* Se deja la pagina tal y como esta */
         }
+        final String b64Attachment = extraParams.getProperty("attach"); //$NON-NLS-1$
+        final String attachmentFileName = extraParams.getProperty("attachFileName"); //$NON-NLS-1$
+        final String attachmentDescription = extraParams.getProperty("attachDescription"); //$NON-NLS-1$
+        byte[] attachment = null;
+        if (b64Attachment != null && attachmentFileName != null) {
+        	try {
+        		attachment = Base64.decode(b64Attachment);
+        	}
+        	catch(final IOException e) {
+        		LOGGER.warning("Se ha indicado un adjunto, pero no estaba en formato Base64, se ignorara : " + e); //$NON-NLS-1$
+        	}
+        }
 
         PdfReader pdfReader;
         String ownerPassword = extraParams.getProperty("ownerPassword"); //$NON-NLS-1$
@@ -943,70 +954,6 @@ public final class AOPDFSigner implements AOSigner {
             }
         }
 
-        // ******************************************************************************
-        // ********* Comprobaciones de adjuntos y empotrados PDF ************************
-        // ******************************************************************************
-
-        PdfArray array;
-        PdfDictionary annot;
-        PdfDictionary fs;
-        PdfDictionary refs;
-        for (int i = 1; i <= pdfReader.getNumberOfPages(); i++) {
-            array = pdfReader.getPageN(i).getAsArray(PdfName.ANNOTS);
-            if (array == null) {
-                continue;
-            }
-            for (int j = 0; j < array.size(); j++) {
-                annot = array.getAsDict(j);
-                if (annot != null && PdfName.FILEATTACHMENT.equals(annot.getAsName(PdfName.SUBTYPE))) {
-                    fs = annot.getAsDict(PdfName.FS);
-                    if (fs != null) {
-                        refs = fs.getAsDict(PdfName.EF);
-                        if (refs != null) {
-                            for (final Object name : refs.getKeys()) {
-                                if (name instanceof PdfName) {
-                                    LOGGER.warning(
-                                       "Se ha encontrado un adjunto (" + fs.getAsString((PdfName) name) //$NON-NLS-1$
-                                          + ") en el PDF"); //$NON-NLS-1$
-                                }
-                                // System.out.println(new String(PdfReader.getStreamBytes((PRStream)refs.getAsStream(name))));
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        final PdfDictionary catalog = pdfReader.getCatalog();
-        if (catalog != null) {
-            final PdfDictionary namesCatalog = catalog.getAsDict(PdfName.NAMES);
-            if (namesCatalog != null) {
-                final PdfDictionary filesCatalog = namesCatalog.getAsDict(PdfName.EMBEDDEDFILES);
-                if (filesCatalog != null) {
-                    final PdfArray filespecs = filesCatalog.getAsArray(PdfName.NAMES);
-                    PdfDictionary filespec;
-                    for (int i = 0; i < filespecs.size();) {
-                        filespecs.getAsString(i++);
-                        filespec = filespecs.getAsDict(i++);
-                        refs = filespec.getAsDict(PdfName.EF);
-                        for (final Object key : refs.getKeys()) {
-                            if (key instanceof PdfName) {
-                                LOGGER.warning("Se ha encontrado un fichero empotrado (" + filespec.getAsString((PdfName) key) //$NON-NLS-1$
-                                               + ") en el PDF"); //$NON-NLS-1$
-
-//                                final byte[] embeddedData = PdfReader.getStreamBytes((PRStream) PdfReader.getPdfObject(refs.getAsIndirectObject((PdfName) key)));
-//                                System.out.println(new String(embeddedData));
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        // ******************************************************************************
-        // ********* Fin comprobaciones de adjuntos y empotrados PDF ********************
-        // ******************************************************************************
-
         // Los derechos van firmados por Adobe, y como desde iText se invalidan
         // es mejor quitarlos
         pdfReader.removeUsageRights();
@@ -1045,6 +992,11 @@ public final class AOPDFSigner implements AOSigner {
     		PdfWriter.PDF_VERSION_1_7,
     		1
 		));
+
+        // Adjuntos
+        if (attachment != null) {
+        	stp.getWriter().addFileAttachment(attachmentDescription, attachment, null, attachmentFileName);
+        }
 
         // iText antiguo
         sap.setRender(PdfSignatureAppearance.SignatureRenderDescription);

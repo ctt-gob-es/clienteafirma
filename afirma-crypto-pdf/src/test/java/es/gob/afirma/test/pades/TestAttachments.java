@@ -8,7 +8,6 @@ import java.util.logging.Logger;
 
 import junit.framework.Assert;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -27,23 +26,33 @@ public class TestAttachments {
     private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
     private static final String CERT_ALIAS = "anf usuario activo"; //$NON-NLS-1$
 
+    private static final Properties P1 = new Properties();
+
     static {
-        final Properties p1 = new Properties();
-        p1.setProperty("format", AOSignConstants.SIGN_FORMAT_PDF); //$NON-NLS-1$
-        p1.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
-        p1.setProperty("signReason", "test"); //$NON-NLS-1$ //$NON-NLS-2$
-        p1.setProperty("signatureProductionCity", "madrid"); //$NON-NLS-1$ //$NON-NLS-2$
-        p1.setProperty("signerContact", "sink@usa.net"); //$NON-NLS-1$ //$NON-NLS-2$
-        p1.setProperty("policyQualifier", "http://google.com/"); //$NON-NLS-1$ //$NON-NLS-2$
-        p1.setProperty("policyIdentifier", "2.16.724.1.3.1.1.2"); //$NON-NLS-1$ //$NON-NLS-2$
-        p1.setProperty("policyIdentifierHash", "0"); //$NON-NLS-1$ //$NON-NLS-2$
+
+        P1.setProperty("format", AOSignConstants.SIGN_FORMAT_PDF); //$NON-NLS-1$
+        P1.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
+        P1.setProperty("signReason", "test"); //$NON-NLS-1$ //$NON-NLS-2$
+        P1.setProperty("signatureProductionCity", "madrid"); //$NON-NLS-1$ //$NON-NLS-2$
+        P1.setProperty("signerContact", "sink@usa.net"); //$NON-NLS-1$ //$NON-NLS-2$
+        P1.setProperty("policyQualifier", "http://google.com/"); //$NON-NLS-1$ //$NON-NLS-2$
+        P1.setProperty("policyIdentifier", "2.16.724.1.3.1.1.2"); //$NON-NLS-1$ //$NON-NLS-2$
+        P1.setProperty("policyIdentifierHash", "0"); //$NON-NLS-1$ //$NON-NLS-2$
+
+        P1.put("tsaURL", CMSTimestamper.CATCERT_TSP); //$NON-NLS-1$
+        P1.put("tsaPolicy", CMSTimestamper.CATCERT_POLICY); //$NON-NLS-1$
+        P1.put("tsaRequireCert", CMSTimestamper.CATCERT_REQUIRECERT); //$NON-NLS-1$
+        P1.put("tsaHashAlgorithm", "SHA1"); //$NON-NLS-1$ //$NON-NLS-2$
+
+        P1.setProperty("attach", "RXN0YXMgc29uIGxhcyBtYfFhbml0YXMgcXVlIGNhbnRhYmEgZWwgUmV5IERhdmlkLi4u"); //$NON-NLS-1$ //$NON-NLS-2$
+        P1.setProperty("attachFileName", "metadatos.txt"); //$NON-NLS-1$ //$NON-NLS-2$
+        P1.setProperty("attachDescription", "Metadatos del documento PDF acordes al ENI"); //$NON-NLS-1$ //$NON-NLS-2$
 
     }
 
-    /** Prueba de la firma de adjuntos (incompleta).
+    /** Prueba de la firma con adjuntos (incompleta).
      * @throws Exception */
     @SuppressWarnings("static-method")
-	@Ignore
 	@Test
 	public void testAttachmentSignature() throws Exception {
 
@@ -62,14 +71,15 @@ public class TestAttachments {
 
         System.out.println(prueba);
 
-        final Properties extraParams = new Properties();
-        extraParams.put("tsaURL", CMSTimestamper.CATCERT_TSP); //$NON-NLS-1$
-        extraParams.put("tsaPolicy", CMSTimestamper.CATCERT_POLICY); //$NON-NLS-1$
-        extraParams.put("tsaRequireCert", CMSTimestamper.CATCERT_REQUIRECERT); //$NON-NLS-1$
-        extraParams.put("tsaHashAlgorithm", "SHA1"); //$NON-NLS-1$ //$NON-NLS-2$
-
-        final byte[] result = signer.sign(testPdf, "SHA512withRSA", pke, extraParams); //$NON-NLS-1$
+        final byte[] result = signer.sign(testPdf, "SHA512withRSA", pke, P1); //$NON-NLS-1$
 
         Assert.assertNotNull(result);
+
+//        final File tmpFile = File.createTempFile("AFIRMA", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
+//        final OutputStream fos = new FileOutputStream(tmpFile);
+//        fos.write(result);
+//        fos.flush();
+//        fos.close();
+//        System.out.println("Resultado guardado en " + tmpFile.getAbsolutePath()); //$NON-NLS-1$
 	}
 }
