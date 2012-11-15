@@ -264,8 +264,7 @@ public final class Platform {
         return systemRoot;
     }
 
-    /** Devuelve el directorio principal de bibliotecas del sistema. Importante:
-     * No funciona correctamente en Windows de 64 bits //FIXME
+    /** Devuelve el directorio principal de bibliotecas del sistema.
      * @return Directorio principal de bibliotecas
      */
     public static String getSystemLibDir() {
