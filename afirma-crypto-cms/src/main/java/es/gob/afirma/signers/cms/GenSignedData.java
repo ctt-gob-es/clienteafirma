@@ -8,7 +8,7 @@
  * You may contact the copyright holder at: soporte.afirma5@mpt.es
  */
 
-package es.gob.afirma.signers.pkcs7;
+package es.gob.afirma.signers.cms;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -55,6 +55,9 @@ import org.bouncycastle.cms.CMSProcessableByteArray;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
+import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
+import es.gob.afirma.signers.pkcs7.SigUtils;
 
 /** Clase que implementa firma digital PKCS#7/CMS SignedData. La Estructura del
  * mensaje es la siguiente:<br>
@@ -87,7 +90,7 @@ import es.gob.afirma.core.signers.AOSignConstants;
  * La implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios
  * para crear un mensaje SignedData de BouncyCastle: <a
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
-public final class GenSignedData {
+final class GenSignedData {
 
     private ASN1Set signedAttr2;
 
@@ -125,7 +128,7 @@ public final class GenSignedData {
      * @throws AOException
      *         Cuando ocurre un error durante el proceso de descifrado
      *         (formato o clave incorrecto,...) */
-    public byte[] generateSignedData(final P7ContentSignerParameters parameters,
+    byte[] generateSignedData(final P7ContentSignerParameters parameters,
                                      final boolean omitContent,
                                      final boolean applyTimestamp,
                                      final String dataType,
@@ -293,7 +296,7 @@ public final class GenSignedData {
             while (it.hasNext()) {
                 final Map.Entry<String, byte[]> e = it.next();
                 contexExpecific.add(new Attribute(
-                  new ASN1ObjectIdentifier((e.getKey()).toString()), // el oid
+                  new ASN1ObjectIdentifier(e.getKey().toString()), // el oid
                   new DERSet(DERPrintableString.getInstance(e.getValue())) // el array de bytes en formato string
                 ));
             }
@@ -326,7 +329,7 @@ public final class GenSignedData {
                 final Map.Entry<String, byte[]> e = it.next();
                 contexExpecific.add(new Attribute(
                 		// el oid
-                        new ASN1ObjectIdentifier((e.getKey()).toString()),
+                        new ASN1ObjectIdentifier(e.getKey().toString()),
                         // el array de bytes en formato string
                         new DERSet(DERPrintableString.getInstance(e.getValue())))
         		);
