@@ -17,8 +17,6 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.crypto.SecretKey;
 
@@ -46,7 +44,6 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ciphers.AOCipherConfig;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
-import es.gob.afirma.signers.pkcs7.GenSignedData;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.SignedAndEnvelopedData;
 
@@ -108,12 +105,15 @@ final class CMSSignedAndEnvelopedData {
      *         Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
      */
     byte[] genSignedAndEnvelopedData(final P7ContentSignerParameters parameters,
-                                            final AOCipherConfig config,
-                                            final X509Certificate[] certDest,
-                                            final String dataType,
-                                            final PrivateKeyEntry keyEntry,
-                                            final Map<String, byte[]> atrib,
-                                            final Map<String, byte[]> uatrib) throws IOException, CertificateEncodingException, NoSuchAlgorithmException, AOException {
+                                     final AOCipherConfig config,
+                                     final X509Certificate[] certDest,
+                                     final String dataType,
+                                     final PrivateKeyEntry keyEntry,
+                                     final Map<String, byte[]> atrib,
+                                     final Map<String, byte[]> uatrib) throws IOException,
+                                                                              CertificateEncodingException,
+                                                                              NoSuchAlgorithmException,
+                                                                              AOException {
 
     	final SecretKey cipherKey = Utils.initEnvelopedData(config, certDest);
 
@@ -160,25 +160,24 @@ final class CMSSignedAndEnvelopedData {
         // digEncryptionAlgorithm
         final AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID("RSA")); //$NON-NLS-1$
 
-        ASN1OctetString sign2 = null;
-        try {
-            sign2 = Utils.firma(signatureAlgorithm, keyEntry, this.signedAttr2);
-        }
-        catch (final AOException ex) {
-            Logger.getLogger(GenSignedData.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        final ASN1OctetString sign2 = Utils.firma(signatureAlgorithm, keyEntry, this.signedAttr2);
 
         signerInfos.add(new SignerInfo(identifier, digAlgId, signedAttr, encAlgId, sign2, unSignedAttr));
 
         final ASN1Set certrevlist = null;
 
         // construimos el Signed And Enveloped Data y lo devolvemos
-        return new ContentInfo(PKCSObjectIdentifiers.signedAndEnvelopedData, new SignedAndEnvelopedData(new DERSet(infos.getRecipientInfos()),
-                                                                                                        new DERSet(digestAlgs),
-                                                                                                        infos.getEncInfo(),
-                                                                                                        certificates,
-                                                                                                        certrevlist,
-                                                                                                        new DERSet(signerInfos))).getEncoded(ASN1Encoding.DER);
+        return new ContentInfo(
+    		PKCSObjectIdentifiers.signedAndEnvelopedData,
+    		new SignedAndEnvelopedData(
+				new DERSet(infos.getRecipientInfos()),
+				new DERSet(digestAlgs),
+				infos.getEncInfo(),
+				certificates,
+				certrevlist,
+				new DERSet(signerInfos)
+    		)
+		).getEncoded(ASN1Encoding.DER);
     }
 
     /** M&eacute;todo que genera la parte que contiene la informaci&oacute;n del
@@ -218,7 +217,7 @@ final class CMSSignedAndEnvelopedData {
                 final Map.Entry<String, byte[]> e = it.next();
                 contexExpecific.add(new Attribute(
                         // el oid
-                        new ASN1ObjectIdentifier((e.getKey()).toString()),
+                        new ASN1ObjectIdentifier(e.getKey().toString()),
                         // el array de bytes en formato string
                         new DERSet(new DERPrintableString(new String(e.getValue()))))
                 );
@@ -250,7 +249,7 @@ final class CMSSignedAndEnvelopedData {
                 final Map.Entry<String, byte[]> e = it.next();
                 contexExpecific.add(new Attribute(
                 		// el oid
-                        new ASN1ObjectIdentifier((e.getKey()).toString()),
+                        new ASN1ObjectIdentifier(e.getKey().toString()),
                         // el array de bytes en formato string
                         new DERSet(new DERPrintableString(new String(e.getValue())))
                 ));
