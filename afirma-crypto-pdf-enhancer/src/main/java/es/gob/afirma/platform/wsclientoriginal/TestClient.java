@@ -19,9 +19,6 @@ import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.apache.log4j.Logger;
 
-import com.telventi.afirma.Excepcion;
-import com.telventi.afirma.IExcepcion;
-
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 
@@ -120,7 +117,7 @@ public class TestClient {
          }
          catch (final IOException e) {
             final String msgError = "No se han podido cargar las propiedades de WebServices: " + e.getMessage();
-            throw new Excepcion(IExcepcion.COD_001, "ERROR: " + msgError, e);
+            throw new Exception("ERR-01: " + msgError, e);
          }
          init(prop);
          setSystemParameters();
