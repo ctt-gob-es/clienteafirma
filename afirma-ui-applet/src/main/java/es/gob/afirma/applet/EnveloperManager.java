@@ -167,7 +167,7 @@ final class EnveloperManager {
      * @param signAlgorithm
      *        Algoritmo de firma. */
     void setSignAlgorithm(final String signAlgorithm) {
-        this.signAlgorithm = (signAlgorithm == null ? AOSignConstants.DEFAULT_SIGN_ALGO : signAlgorithm);
+        this.signAlgorithm = signAlgorithm == null ? AOSignConstants.DEFAULT_SIGN_ALGO : signAlgorithm;
     }
 
     /** Recupera el algoritmo de firma configurado.
@@ -304,7 +304,7 @@ final class EnveloperManager {
             throw new IllegalArgumentException("No se ha indicado el tipo de sobre electronico"); //$NON-NLS-1$
         }
 
-        if ((this.recipients == null || this.recipients.isEmpty())) {
+        if (this.recipients == null || this.recipients.isEmpty()) {
             LOGGER.severe("No se han indicado los destinatarios del sobre electronico"); //$NON-NLS-1$
             throw new IllegalArgumentException("No se han indicado los destinatarios del sobre electronico"); //$NON-NLS-1$
         }
@@ -603,6 +603,7 @@ final class EnveloperManager {
      * @throws AOException
      *         Cuando se produce un error durante el proceso de ensobrado.
      * @throws IOException Cuando ocurre alg&uacute;n error en la lectura de los datos.
+     * @throws CertificateEncodingException Si hay alg&uacute;n certificado inv&aacute;lido
      * @throws es.gob.afirma.core.AOCancelledOperationException
      *         Cuando el usuario cancela la operaci&oacute;n.
      * @throws es.gob.afirma.keystores.main.common.AOCertificatesNotFoundException
@@ -611,7 +612,7 @@ final class EnveloperManager {
      *         Cuando no se puede acceder al almac&eacute;n de certificados.
      * @throws es.gob.afirma.core.AOInvalidFormatException
      *         Tipo de envoltorio no soportado. */
-    byte[] coEnvelop(final byte[] envelop) throws AOException, IOException {
+    byte[] coEnvelop(final byte[] envelop) throws AOException, IOException, CertificateEncodingException {
         if (!this.ksConfigManager.isSelectedCertificate()) {
             try {
                 this.ksConfigManager.selectCertificate();

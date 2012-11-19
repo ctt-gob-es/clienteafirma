@@ -12,6 +12,7 @@ package es.gob.afirma.applet;
 
 import java.io.IOException;
 import java.security.PrivilegedExceptionAction;
+import java.security.cert.CertificateEncodingException;
 
 import es.gob.afirma.core.AOException;
 
@@ -40,8 +41,10 @@ final class CoEnvelopAction implements PrivilegedExceptionAction<byte[]> {
     }
 
     /** {@inheritDoc}
-     * @throws IOException Cuando ocurre alg&uacute;n error en la lectura de los datos. */
-    public byte[] run() throws AOException, IOException {
+     * @throws IOException Cuando ocurre alg&uacute;n error en la lectura de los datos.
+     * @throws CertificateEncodingException Si hay alg&uacute;n certificado inv&aacute;lido */
+    @Override
+	public byte[] run() throws AOException, IOException, CertificateEncodingException {
         this.enveloperManager.coEnvelop(this.envelop);
         return this.enveloperManager.getEnvelopedData();
     }
