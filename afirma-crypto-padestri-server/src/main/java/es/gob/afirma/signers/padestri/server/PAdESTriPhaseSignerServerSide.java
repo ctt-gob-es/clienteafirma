@@ -745,10 +745,32 @@ public final class PAdESTriPhaseSignerServerSide {
         	throw new AOException("Error creando el campo de firma: " + e, e); //$NON-NLS-1$
         }
 
+        // Adjuntos
+        final String b64Attachment = extraParams.getProperty("attach"); //$NON-NLS-1$
+        final String attachmentFileName = extraParams.getProperty("attachFileName"); //$NON-NLS-1$
+        final String attachmentDescription = extraParams.getProperty("attachDescription"); //$NON-NLS-1$
+        byte[] attachment = null;
+        if (b64Attachment != null && attachmentFileName != null) {
+        	try {
+        		attachment = Base64.decode(b64Attachment);
+        	}
+        	catch(final IOException e) {
+        		LOGGER.warning("Se ha indicado un adjunto, pero no estaba en formato Base64, se ignorara : " + e); //$NON-NLS-1$
+        	}
+        }
+
         // Aplicamos todos los atributos de firma
         final PdfSignatureAppearance sap = stp.getSignatureAppearance();
         stp.setFullCompression();
         sap.setAcro6Layers(true);
+
+        if (attachment != null) {
+        	try {
+        		stp.getWriter().addFileAttachment(attachmentDescription, attachment, null, attachmentFileName);
+        	} catch (final IOException e) {
+        		throw new AOException("Error al adjuntar los documentos proporcionados", e);
+        	}
+        }
 
         // iText antiguo
         sap.setRender(PdfSignatureAppearance.SignatureRenderDescription);
