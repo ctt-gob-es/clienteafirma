@@ -22,7 +22,9 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
@@ -224,6 +226,7 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
                     getPrivateKeyEntry(this.keyStoreManager, this.listaCertificadosRe.get(this.listaCertificadosRe.size() - 1).getAlias(), this.kconf);
             final String contentType = comprobarTipo(envelopedData);
             if (contentType == null) {
+            	dataFis.close();
                 return false;
             }
 
@@ -237,15 +240,11 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
                                                                   this);
             // Si el usuario cancela el guardado de los datos, no nos desplazamos a la ultima pantalla
             if (savedFile == null) {
+            	dataFis.close();
                 return false;
             }
 
-            try {
-                dataFis.close();
-            }
-            catch (final Exception e) {
-                logger.warning("No se pudo cerrar el fichero de datos"); //$NON-NLS-1$
-            }
+            dataFis.close();
         }
         catch (final AOCancelledOperationException e) {
             logger.info("La operacion ha sido cancelada por el usuario: " + e); //$NON-NLS-1$
@@ -304,8 +303,12 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
      * @param data Sobre electr&oacute;nico.
      * @param contentType Tipo del contenido
      * @param privateKey Clave privada
-     * @return */
-    private byte[] doCoEnvelopOperation(final byte[] data, final String contentType, final PrivateKeyEntry privateKey) {
+     * @return
+     * @throws IOException
+     * @throws CertificateEncodingException */
+    private byte[] doCoEnvelopOperation(final byte[] data,
+    		                            final String contentType,
+    		                            final PrivateKeyEntry privateKey) {
         byte[] envelop;
         final X509Certificate[] originatorCertChain = (X509Certificate[]) privateKey.getCertificateChain();
 
@@ -313,7 +316,7 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
             try {
                 envelop = CMSEnvelopedData.addOriginatorInfo(data, originatorCertChain);
             }
-            catch (final AOException e) {
+            catch (final Exception e) {
                 logger.warning("Ocurrio al agregar el nuevo remitente al sobre electronico: " + e); //$NON-NLS-1$
                 CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.sobres.almacen.anadir.remitentes"), //$NON-NLS-1$
                                                Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
@@ -333,7 +336,20 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
             }
         }
         else if (contentType.equals(AOSignConstants.CMS_CONTENTTYPE_AUTHENVELOPEDDATA)) {
-            envelop = CMSAuthenticatedEnvelopedData.addOriginatorInfo(data, originatorCertChain);
+        	try {
+        		envelop = CMSAuthenticatedEnvelopedData.addOriginatorInfo(data, originatorCertChain);
+        	}
+        	catch(final Exception e) {
+        		logger.warning("Error durante la creacion del sobre: " + e); //$NON-NLS-1$
+                CustomDialog.showMessageDialog(
+            		this,
+            		true,
+            		Messages.getString("Wizard.sobres.almacen.anadir.remitentes"), //$NON-NLS-1$
+                    Messages.getString("error"), //$NON-NLS-1$
+                    JOptionPane.ERROR_MESSAGE
+                );
+                return null;
+        	}
         }
         else {
             CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.sobres.almacen.certificado.soportado"), //$NON-NLS-1$

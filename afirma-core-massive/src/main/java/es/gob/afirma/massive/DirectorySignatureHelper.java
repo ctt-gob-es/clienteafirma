@@ -232,7 +232,7 @@ public class DirectorySignatureHelper {
             LOGGER.warning("No se ha indicado un directorio de inicio, se usara el actual"); //$NON-NLS-1$
         }
 
-        final File id = new File((startDir != null && startDir.trim().length() > 0) ? startDir.trim() : "."); //$NON-NLS-1$
+        final File id = new File(startDir != null && startDir.trim().length() > 0 ? startDir.trim() : "."); //$NON-NLS-1$
         this.inDir = id.getAbsolutePath();
         if (!id.exists() || !id.isDirectory()) {
             throw new AOException("El directorio de entrada no existe"); //$NON-NLS-1$
@@ -403,7 +403,7 @@ public class DirectorySignatureHelper {
 
         // Inicializamos el log de operacion
         if (this.activeLog) {
-            this.logHandler = DirectorySignatureHelper.initLogRegistry((this.logPath != null) ? this.logPath : (outDir + File.separator + DEFAULT_LOG_FILE));
+            this.logHandler = DirectorySignatureHelper.initLogRegistry(this.logPath != null ? this.logPath : outDir + File.separator + DEFAULT_LOG_FILE);
         }
 
         // Realizamos la operacion masiva correspondiente
@@ -460,7 +460,7 @@ public class DirectorySignatureHelper {
         final Properties signConfig = (Properties) config.clone();
         signConfig.setProperty("headLess", "true"); //$NON-NLS-1$ //$NON-NLS-2$
 
-        final AOSigner signer = (configuredSigner != null ? configuredSigner : this.defaultSigner);
+        final AOSigner signer = configuredSigner != null ? configuredSigner : this.defaultSigner;
 
         // Configuramos y ejecutamos la operacion
         if (!signConfig.containsKey(MODE_KEY)) {
@@ -472,7 +472,7 @@ public class DirectorySignatureHelper {
         signConfig.setProperty("precalculatedHashAlgorithm", AOSignConstants.getDigestAlgorithmName(this.algorithm)); //$NON-NLS-1$
 
         // Introduccion MIMEType "hash/algo", solo para XAdES y XMLDSig
-        if ((signer.getClass().getName().equals(XADES_SIGNER)) || (signer.getClass().getName().equals(XMLDSIG_SIGNER))) {
+        if (signer.getClass().getName().equals(XADES_SIGNER) || signer.getClass().getName().equals(XMLDSIG_SIGNER)) {
         	final String mimeType = "hash/" + AOSignConstants.getDigestAlgorithmName(this.algorithm).toLowerCase(); //$NON-NLS-1$
         	signConfig.setProperty("mimeType", mimeType); //$NON-NLS-1$
         }
@@ -869,7 +869,7 @@ public class DirectorySignatureHelper {
                                                 final Properties signConfig) throws IOException {
         boolean allOK = true;
         InputStream fis = null;
-        final CounterSignTarget target = (type == MassiveType.COUNTERSIGN_ALL ? CounterSignTarget.TREE : CounterSignTarget.LEAFS);
+        final CounterSignTarget target = type == MassiveType.COUNTERSIGN_ALL ? CounterSignTarget.TREE : CounterSignTarget.LEAFS;
         AOSigner signer = this.defaultSigner;
         for (final File file : files) {
             if (originalFormat) {
@@ -999,9 +999,9 @@ public class DirectorySignatureHelper {
         // otro a base de agregar e incrementar las cifras entre
         // par&eacute;ntesis.
         int ind = 0;
-        File finalFile = new File(parentFile, signer.getSignedName(signFilename, (inText != null ? inText : ""))); //$NON-NLS-1$
+        File finalFile = new File(parentFile, signer.getSignedName(signFilename, inText != null ? inText : "")); //$NON-NLS-1$
         while (finalFile.exists() && !this.overwriteFiles) {
-            finalFile = new File(parentFile, signer.getSignedName(signFilename, (inText != null ? inText : "") + "(" + (++ind) + ")"));  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+            finalFile = new File(parentFile, signer.getSignedName(signFilename, (inText != null ? inText : "") + "(" + ++ind + ")"));  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
         }
 
         // Almacenamos el fichero
@@ -1080,7 +1080,9 @@ public class DirectorySignatureHelper {
         catch(final OutOfMemoryError e) {
         	throw new IOException("El fichero es demasiado grande: " + e); //$NON-NLS-1$
         }
-        DirectorySignatureHelper.closeStream(is);
+        finally {
+        	is.close();
+        }
         return isValidDataFile;
     }
 
@@ -1098,7 +1100,7 @@ public class DirectorySignatureHelper {
      * @param path
      *        Ruta del fichero de log. */
     public void setLogPath(final String path) {
-        this.logPath = ((path == null || path.trim().length() == 0) ? null : path);
+        this.logPath = path == null || path.trim().length() == 0 ? null : path;
     }
 
     /** Recupera la ruta del fichero con el log de la operaci&oacute;n. Si no se
@@ -1287,14 +1289,12 @@ public class DirectorySignatureHelper {
         final FileInputStream fis = new FileInputStream(file);
         try {
             return AOSignerFactory.getSigner(AOUtil.getDataFromInputStream(fis));
-        } catch (final Exception e) {
-            throw new IOException("Ocurrio un error al leer el fichero: " + e); //$NON-NLS-1$
-        } finally {
-            try {
-                fis.close();
-            } catch (final Exception e) {
-                /* No hacemos nada. */
-            }
+        }
+        catch (final Exception e) {
+            throw new IOException("Error al leer el fichero: " + e, e); //$NON-NLS-1$
+        }
+        finally {
+            fis.close();
         }
     }
 
