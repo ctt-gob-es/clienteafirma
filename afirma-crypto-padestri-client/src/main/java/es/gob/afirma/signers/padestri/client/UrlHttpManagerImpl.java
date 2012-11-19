@@ -35,7 +35,7 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
         int nBytes = 0;
         final byte[] buffer = new byte[BUFFER_SIZE];
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        while ((nBytes = input.read(buffer)) != -1) {
+        while ((nBytes = input.read(buffer)) > 0) {
             baos.write(buffer, 0, nBytes);
         }
         return baos.toByteArray();
