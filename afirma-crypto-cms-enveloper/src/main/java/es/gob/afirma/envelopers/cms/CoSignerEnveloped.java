@@ -108,6 +108,7 @@ final class CoSignerEnveloped {
 
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
         final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+        is.close();
         final Enumeration<?> e = dsq.getObjects();
         // Elementos que contienen los elementos OID signedAndEnvelopedData
         e.nextElement();
@@ -263,6 +264,7 @@ final class CoSignerEnveloped {
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
         ASN1Sequence dsq = null;
         dsq = (ASN1Sequence) is.readObject();
+        is.close();
         final Enumeration<?> e = dsq.getObjects();
         // Elementos que contienen los elementos OID signedAndEnvelopedData
         e.nextElement();
@@ -442,7 +444,7 @@ final class CoSignerEnveloped {
                 final Map.Entry<String, byte[]> e = it.next();
                 contexExpecific.add(new Attribute(
             		// el oid
-                    new ASN1ObjectIdentifier((e.getKey()).toString()),
+                    new ASN1ObjectIdentifier(e.getKey().toString()),
                     // el array de bytes en formato string
                     new DERSet(new DERPrintableString(new String(e.getValue()))))
                 );
@@ -496,7 +498,7 @@ final class CoSignerEnveloped {
                 final Map.Entry<String, byte[]> e = it.next();
                 contexExpecific.add(new Attribute(
             		// el oid
-                    new ASN1ObjectIdentifier((e.getKey()).toString()),
+                    new ASN1ObjectIdentifier(e.getKey().toString()),
                     // el array de bytes en formato string
                     new DERSet(new DERPrintableString(new String(e.getValue()))))
                 );
@@ -529,7 +531,7 @@ final class CoSignerEnveloped {
                 final Map.Entry<String, byte[]> e = it.next();
                 contexExpecific.add(new Attribute(
             		// el oid
-                    new ASN1ObjectIdentifier((e.getKey()).toString()),
+                    new ASN1ObjectIdentifier(e.getKey().toString()),
                     // el array de bytes en formato string
                     new DERSet(new DERPrintableString(new String(e.getValue()))))
                 );

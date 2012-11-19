@@ -128,6 +128,7 @@ final class CounterSignerEnveloped {
 
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
         final Enumeration<?> e = ((ASN1Sequence) is.readObject()).getObjects();
+        is.close();
         // Elementos que contienen los elementos OID signedAndEnvelopedData
         e.nextElement();
         // Contenido de signedAndEnvelopedData
@@ -189,7 +190,9 @@ final class CounterSignerEnveloped {
                                                    new DERSet(signerInfos));
 
                 // Esto se realiza asi por problemas con los casting.
-                final ASN1Sequence contentSignedData2 = (ASN1Sequence) new ASN1InputStream(sigDat.getEncoded(ASN1Encoding.DER)).readObject(); // contenido del signedAndEnvelopedData
+                final ASN1InputStream asnIs = new ASN1InputStream(sigDat.getEncoded(ASN1Encoding.DER));
+                final ASN1Sequence contentSignedData2 = (ASN1Sequence) is.readObject(); // contenido del signedAndEnvelopedData
+                asnIs.close();
                 aux = new SignedAndEnvelopedData(contentSignedData2);
             }
 
@@ -216,6 +219,7 @@ final class CounterSignerEnveloped {
                 // Esto se realiza as&iacute; por problemas con los casting.
                 final ASN1InputStream sd2 = new ASN1InputStream(sigDat.getEncoded(ASN1Encoding.DER));
                 final ASN1Sequence contentSignedData2 = (ASN1Sequence) sd2.readObject();// contenido del signedAndEnvelopedData
+                sd2.close();
 
                 aux = new SignedAndEnvelopedData(contentSignedData2);
             }
@@ -932,7 +936,7 @@ final class CounterSignerEnveloped {
                 final Map.Entry<String, byte[]> e = it.next();
                 contexExpecific.add(new Attribute(
                         // el oid
-                        new ASN1ObjectIdentifier((e.getKey()).toString()),
+                        new ASN1ObjectIdentifier(e.getKey().toString()),
                         // el array de bytes en formato string
                         new DERSet(new DERPrintableString(new String(e.getValue()))))
                 );
@@ -962,7 +966,7 @@ final class CounterSignerEnveloped {
                 final Map.Entry<String, byte[]> e = it.next();
                 contexExpecific.add(new Attribute(
             		// el oid
-                    new ASN1ObjectIdentifier((e.getKey()).toString()),
+                    new ASN1ObjectIdentifier(e.getKey().toString()),
                     // el array de bytes en formato string
                     new DERSet(new DERPrintableString(new String(e.getValue()))))
                 );
@@ -996,7 +1000,7 @@ final class CounterSignerEnveloped {
                 final Map.Entry<String, byte[]> e = it.next();
                 contexExpecific.add(new Attribute(
             		// el oid
-                    new ASN1ObjectIdentifier((e.getKey()).toString()),
+                    new ASN1ObjectIdentifier(e.getKey().toString()),
                     // el array de bytes en formato string
                     new DERSet(new DERPrintableString(new String(e.getValue()))))
                 );

@@ -19,7 +19,6 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import javax.crypto.SecretKey;
 
@@ -214,7 +213,7 @@ public final class CMSAuthenticatedEnvelopedData {
                 final Map.Entry<String, byte[]> e = it.next();
                 contexExpecific.add(new Attribute(
                 	  // el oid
-	                  new ASN1ObjectIdentifier((e.getKey()).toString()),
+	                  new ASN1ObjectIdentifier(e.getKey().toString()),
 	                  // el array de bytes en formato string
 	                  new DERSet(new DERPrintableString(new String(e.getValue())))
                 ));
@@ -237,51 +236,50 @@ public final class CMSAuthenticatedEnvelopedData {
      *        Cadena de certificados a agregar.
      * @return La nueva firma AuthenticatedEnvelopedData con los remitentes que
      *         ten&iacute;a (si los tuviera) con la cadena de certificados
-     *         nueva. */
-    public static byte[] addOriginatorInfo(final byte[] data, final X509Certificate[] signerCertificateChain) {
+     *         nueva.
+     * @throws IOException Cuando hay errores de lectura o escritura de datos
+     * @throws CertificateEncodingException Si hay alg&uacute;n certificado inv&aacute;lido en la cadena */
+    public static byte[] addOriginatorInfo(final byte[] data, final X509Certificate[] signerCertificateChain) throws IOException, CertificateEncodingException {
 
-        try {
-            final ASN1InputStream is = new ASN1InputStream(data);
-            // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-            final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+        final ASN1InputStream is = new ASN1InputStream(data);
+        // LEEMOS EL FICHERO QUE NOS INTRODUCEN
+        final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+        is.close();
 
-            final Enumeration<?> e = dsq.getObjects();
-            // Elementos que contienen los elementos OID Data
-            final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+        final Enumeration<?> e = dsq.getObjects();
+        // Elementos que contienen los elementos OID Data
+        final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
 
-            if (doi.equals(PKCSObjectIdentifiers.id_ct_authEnvelopedData)) {
-                // Contenido de Data
-                final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+        if (doi.equals(PKCSObjectIdentifiers.id_ct_authEnvelopedData)) {
+            // Contenido de Data
+            final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
 
-                final AuthEnvelopedData authEnv = new AuthEnvelopedData((ASN1Sequence) doj.getObject());
+            final AuthEnvelopedData authEnv = new AuthEnvelopedData((ASN1Sequence) doj.getObject());
 
-                // Obtenemos los originatorInfo
-                OriginatorInfo origInfo = authEnv.getOriginatorInfo();
-                ASN1Set certs = null;
-                if (origInfo != null) {
-                    certs = origInfo.getCertificates();
-                }
-
-                final OriginatorInfo origInfoChecked = Utils.checkCertificates(signerCertificateChain, certs);
-                if (origInfoChecked != null) {
-                    origInfo = origInfoChecked;
-                }
-
-
-                // Se crea un nuevo AuthenticatedEnvelopedData a partir de los
-                // datos anteriores con los nuevos originantes.
-                return new ContentInfo(PKCSObjectIdentifiers.id_ct_authEnvelopedData, new AuthEnvelopedData(origInfo, // OriginatorInfo
-                                                                                                             authEnv.getRecipientInfos(), // ASN1Set
-                                                                                                             authEnv.getAuthEncryptedContentInfo(),
-                                                                                                             authEnv.getAuthAttrs(),
-                                                                                                             authEnv.getMac(),
-                                                                                                             authEnv.getUnauthAttrs())).getEncoded(ASN1Encoding.DER);
+            // Obtenemos los originatorInfo
+            OriginatorInfo origInfo = authEnv.getOriginatorInfo();
+            ASN1Set certs = null;
+            if (origInfo != null) {
+                certs = origInfo.getCertificates();
             }
 
+            final OriginatorInfo origInfoChecked = Utils.checkCertificates(signerCertificateChain, certs);
+            if (origInfoChecked != null) {
+                origInfo = origInfoChecked;
+            }
+
+
+            // Se crea un nuevo AuthenticatedEnvelopedData a partir de los
+            // datos anteriores con los nuevos originantes.
+            return new ContentInfo(
+        		PKCSObjectIdentifiers.id_ct_authEnvelopedData, new AuthEnvelopedData(origInfo, // OriginatorInfo
+                                                                                                         authEnv.getRecipientInfos(), // ASN1Set
+                                                                                                         authEnv.getAuthEncryptedContentInfo(),
+                                                                                                         authEnv.getAuthAttrs(),
+                                                                                                         authEnv.getMac(),
+                                                                                                         authEnv.getUnauthAttrs())).getEncoded(ASN1Encoding.DER);
         }
-        catch (final Exception ex) {
-            Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de insercion: " + ex); //$NON-NLS-1$ //$NON-NLS-2$
-        }
+
         return null;
     }
 }

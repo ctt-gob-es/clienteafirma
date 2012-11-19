@@ -65,6 +65,7 @@ final class ValidateCMS {
         try {
             final ASN1InputStream is = new ASN1InputStream(data);
             final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+            is.close();
             final Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID Data
             final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
@@ -98,6 +99,7 @@ final class ValidateCMS {
         try {
             final ASN1InputStream is = new ASN1InputStream(data);
             final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+            is.close();
             final Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID Data
             final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
@@ -156,6 +158,7 @@ final class ValidateCMS {
         try {
             final ASN1InputStream is = new ASN1InputStream(data);
             final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+            is.close();
             final Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID Data
             final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
@@ -190,6 +193,7 @@ final class ValidateCMS {
         try {
             final ASN1InputStream is = new ASN1InputStream(data);
             final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+            is.close();
             final Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID Data
             final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
@@ -227,6 +231,7 @@ final class ValidateCMS {
         try {
             final ASN1InputStream is = new ASN1InputStream(data);
             final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+            is.close();
             final Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID Data
             final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
@@ -261,6 +266,7 @@ final class ValidateCMS {
         try {
             final ASN1InputStream is = new ASN1InputStream(data);
             final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+            is.close();
             final Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID Data
             final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
@@ -293,12 +299,14 @@ final class ValidateCMS {
      * @return si es de este tipo. */
     static boolean isCMSAuthenticatedData(final byte[] data) {
         boolean isValid = true;
-        // Leemos el fichero que contiene la firma.
-        final ASN1InputStream is = new ASN1InputStream(data);
+
 
         try {
+            // Leemos el fichero que contiene la firma.
+            final ASN1InputStream is = new ASN1InputStream(data);
             // Comenzamos a obtener los datos.
             final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+            is.close();
             final Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID AuthenticatedData.
             final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
@@ -325,12 +333,13 @@ final class ValidateCMS {
      * @return si es de este tipo. */
     static boolean isCMSAuthenticatedEnvelopedData(final byte[] data) {
         boolean isValid = true;
-        // Leemos el fichero que contiene la firma.
-        final ASN1InputStream is = new ASN1InputStream(data);
 
         try {
+            // Leemos el fichero que contiene la firma.
+            final ASN1InputStream is = new ASN1InputStream(data);
             // Comenzamos a obtener los datos.
             final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+            is.close();
             final Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID
             // AuthenticatedEnvelopedData.
@@ -357,11 +366,12 @@ final class ValidateCMS {
      * @return si es de este tipo. */
     static boolean isCMSCompressedData(final byte[] data) {
         boolean isValid = true;
-        // Leemos el fichero que contiene la firma.
-        final ASN1InputStream is = new ASN1InputStream(data);
         try {
+            // Leemos el fichero que contiene la firma.
+            final ASN1InputStream is = new ASN1InputStream(data);
             // Comenzamos a obtener los datos.
             final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+            is.close();
             final Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID CompressedData.
             final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();

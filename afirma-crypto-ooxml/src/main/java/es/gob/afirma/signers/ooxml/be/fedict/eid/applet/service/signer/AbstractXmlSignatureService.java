@@ -414,7 +414,9 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
         return documentBuilderFactory.newDocumentBuilder().parse(new InputSource(documentInputStream));
     }
 
-    protected static Document loadDocumentNoClose(final InputStream documentInputStream) throws ParserConfigurationException, SAXException, IOException {
+    protected static Document loadDocumentNoClose(final InputStream documentInputStream) throws ParserConfigurationException,
+                                                                                                SAXException,
+                                                                                                IOException {
         final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         documentBuilderFactory.setNamespaceAware(true);
         final DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();

@@ -348,12 +348,18 @@ final class Utils {
      * @param config Configuracion de cifrado
      * @param params Parametros
      * @param cipher Encriptador */
-    private static EncryptedContentInfo getEncryptedContentInfo(final byte[] file, final AOCipherConfig config, final AlgorithmParameterSpec params, final Cipher cipher) throws IOException, IllegalBlockSizeException, BadPaddingException {
+    private static EncryptedContentInfo getEncryptedContentInfo(final byte[] file,
+    		                                                    final AOCipherConfig config,
+    		                                                    final AlgorithmParameterSpec params,
+    		                                                    final Cipher cipher) throws IOException,
+    		                                                                                IllegalBlockSizeException,
+    		                                                                                BadPaddingException {
 
     	ASN1Encodable asn1Params;
         if (params != null) {
             final ASN1InputStream aIn = new ASN1InputStream(cipher.getParameters().getEncoded("ASN.1")); //$NON-NLS-1$
             asn1Params = aIn.readObject();
+            aIn.close();
         }
         else {
             asn1Params = new DERNull();
@@ -479,7 +485,7 @@ final class Utils {
                 final Map.Entry<String, byte[]> e = it.next();
                 contexExpecific.add(new Attribute(
             		// el oid
-                    new ASN1ObjectIdentifier((e.getKey()).toString()),
+                    new ASN1ObjectIdentifier(e.getKey().toString()),
                     // el array de bytes en formato string
                     new DERSet(new DERPrintableString(new String(e.getValue()))))
                 );
@@ -609,7 +615,7 @@ final class Utils {
         }
 
         // si no se encuentran coincidencias es tonteria continuar.
-        if ((encryptedKey == null) || (algEncryptedKey == null)) {
+        if (encryptedKey == null || algEncryptedKey == null) {
             throw new AOInvalidRecipientException("El usuario indicado no es uno de los destinatarios del sobre digital."); //$NON-NLS-1$
         }
 
@@ -630,6 +636,7 @@ final class Utils {
 
         // Comenzamos a obtener los datos.
         final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+        is.close();
         final Enumeration<?> e = dsq.getObjects();
 
         // Elementos que contienen los elementos OID EnvelopedData.
@@ -770,7 +777,7 @@ final class Utils {
                 final Map.Entry<String, byte[]> e = it.next();
                 contexExpecific.add(new Attribute(
             		// el oid
-                    new ASN1ObjectIdentifier((e.getKey()).toString()),
+                    new ASN1ObjectIdentifier(e.getKey().toString()),
                     // el array de bytes en formato string
                     new DERSet(new DERPrintableString(new String(e.getValue()))))
                 );

@@ -108,7 +108,7 @@ public class AOCMSMultiEnveloper {
  */
 public byte[] cosign(final byte[] data, final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException {
 
-        final String precalculatedDigest = (xParams != null) ? xParams.getProperty("precalculatedHashAlgorithm") : null; //$NON-NLS-1$
+        final String precalculatedDigest = xParams != null ? xParams.getProperty("precalculatedHashAlgorithm") : null; //$NON-NLS-1$
 
         byte[] messageDigest = null;
         if (precalculatedDigest != null) {
@@ -423,8 +423,9 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
      * @throws AOException
      *         Cuando se produce un error al agregar el nuevo remitente.
      * @throws IOException Cuando ocurre alg&uacute;n error en la lectura de los datos.
+     * @throws CertificateEncodingException Cuando el certificado del remitente es inv&aacute;lido
      * @throws AOInvalidFormatException Si el tipo de envoltorio no est&aacute; soportado. */
-    static byte[] addOriginator(final byte[] envelop, final PrivateKeyEntry ke) throws AOException, IOException {
+    static byte[] addOriginator(final byte[] envelop, final PrivateKeyEntry ke) throws AOException, IOException, CertificateEncodingException {
         final String contentInfo;
         if (ValidateCMS.isCMSEnvelopedData(envelop)) {
             contentInfo = AOSignConstants.CMS_CONTENTTYPE_ENVELOPEDDATA;
@@ -459,12 +460,13 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
      *         Cuando ocurrio un error al agregar el remitente a la
      *         estructura.
      * @throws IOException Cuando ocurre alg&uacute;n error en la lectura de los datos.
+     * @throws CertificateEncodingException Cuando el certificado del remitente es inv&aacute;lido
      * @throws IllegalArgumentException
      *         Cuando se indica un contentInfo no compatible con
      *         m&uacute;tiples remitentes. */
     private static byte[] addOriginator(final byte[] envelop,
     		                            final String contentInfo,
-    		                            final PrivateKeyEntry ke) throws AOException, IOException {
+    		                            final PrivateKeyEntry ke) throws AOException, IOException, CertificateEncodingException {
 
         final byte[] newEnvelop;
 
@@ -494,7 +496,7 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
      * @param algorithm
      *        Algoritmo de firma. */
     public void setSignatureAlgorithm(final String algorithm) {
-        this.signatureAlgorithm = (algorithm == null ? AOSignConstants.DEFAULT_SIGN_ALGO : algorithm);
+        this.signatureAlgorithm = algorithm == null ? AOSignConstants.DEFAULT_SIGN_ALGO : algorithm;
     }
 
     /** Establece la clave privada del remitente del envoltorio.
@@ -567,18 +569,8 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
         final org.bouncycastle.asn1.ASN1InputStream is = new org.bouncycastle.asn1.ASN1InputStream(cmsEnvelop);
 
         // Leemos los datos
-        final org.bouncycastle.asn1.ASN1Sequence dsq;
-        try {
-            dsq = (org.bouncycastle.asn1.ASN1Sequence) is.readObject();
-        }
-        finally {
-            try {
-                is.close();
-            }
-            catch (final Exception e) {
-             // Ignoramos los errores en el cierre
-            }
-        }
+        final org.bouncycastle.asn1.ASN1Sequence dsq = (org.bouncycastle.asn1.ASN1Sequence) is.readObject();
+        is.close();
 
         final Enumeration<?> objects = dsq.getObjects();
 

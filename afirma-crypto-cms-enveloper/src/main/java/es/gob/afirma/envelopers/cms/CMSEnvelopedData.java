@@ -188,51 +188,50 @@ public final class CMSEnvelopedData {
      *        Cadena de certificados a agregar.
      * @return La nueva firma enveloped con los remitentes que ten&iacute;a (si
      *         los tuviera) con la cadena de certificados nueva.
-     * @throws AOException
-     *         Cuando ocurra un error al insertar el nuevo destinatario en el envoltorio.
-     */
-    public static byte[] addOriginatorInfo(final byte[] data, final X509Certificate[] signerCertificateChain) throws AOException {
-        byte[] retorno = null;
+     * @throws IOException Si hay errores de lectura de datos
+     * @throws AOException Cuando ocurra un error al insertar el nuevo destinatario en el envoltorio.
+     * @throws CertificateEncodingException Cuando el certificado proporcionado es inv&aacute;lido */
+    public static byte[] addOriginatorInfo(final byte[] data, final X509Certificate[] signerCertificateChain) throws IOException, AOException, CertificateEncodingException {
 
-        try {
-            final ASN1InputStream is = new ASN1InputStream(data);
-            // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-            final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
-            final Enumeration<?> e = dsq.getObjects();
-            // Elementos que contienen los elementos OID Data
-            final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
-            if (doi.equals(PKCSObjectIdentifiers.envelopedData)) {
-                // Contenido de Data
-                final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+        final ASN1InputStream is = new ASN1InputStream(data);
+        // LEEMOS EL FICHERO QUE NOS INTRODUCEN
+        final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+        is.close();
+        final Enumeration<?> e = dsq.getObjects();
+        // Elementos que contienen los elementos OID Data
+        final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+        if (doi.equals(PKCSObjectIdentifiers.envelopedData)) {
+            // Contenido de Data
+            final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
 
-                final EnvelopedData ed = new EnvelopedData((ASN1Sequence) doj.getObject());
+            final EnvelopedData ed = new EnvelopedData((ASN1Sequence) doj.getObject());
 
-                // Obtenemos los originatorInfo
-                OriginatorInfo origInfo = ed.getOriginatorInfo();
-                ASN1Set certs = null;
-                if (origInfo != null) {
-                    certs = origInfo.getCertificates();
-                }
-
-                // Si no hay certificados, se deja como esta.
-                final OriginatorInfo origInfoChecked = Utils.checkCertificates(signerCertificateChain, certs);
-                if (origInfoChecked != null) {
-                    origInfo = origInfoChecked;
-                }
-
-                // Se crea un nuevo EnvelopedData a partir de los datos
-                // anteriores con los nuevos originantes.
-                retorno =
-                        new ContentInfo(PKCSObjectIdentifiers.envelopedData, new EnvelopedData(origInfo,
-                                                                                               ed.getRecipientInfos(),
-                                                                                               ed.getEncryptedContentInfo(),
-                                                                                               ed.getUnprotectedAttrs())).getEncoded(ASN1Encoding.DER);
+            // Obtenemos los originatorInfo
+            OriginatorInfo origInfo = ed.getOriginatorInfo();
+            ASN1Set certs = null;
+            if (origInfo != null) {
+                certs = origInfo.getCertificates();
             }
-        }
-        catch (final Exception ex) {
-            throw new AOException("Error durante el proceso de insercion", ex); //$NON-NLS-1$
+
+            // Si no hay certificados, se deja como esta.
+            final OriginatorInfo origInfoChecked = Utils.checkCertificates(signerCertificateChain, certs);
+            if (origInfoChecked != null) {
+                origInfo = origInfoChecked;
+            }
+
+            // Se crea un nuevo EnvelopedData a partir de los datos
+            // anteriores con los nuevos originantes.
+            return new ContentInfo(
+        		PKCSObjectIdentifiers.envelopedData,
+        		new EnvelopedData(
+    				origInfo,
+                    ed.getRecipientInfos(),
+                    ed.getEncryptedContentInfo(),
+                    ed.getUnprotectedAttrs()
+                )
+    		).getEncoded(ASN1Encoding.DER);
         }
 
-        return retorno;
+        return null;
     }
 }

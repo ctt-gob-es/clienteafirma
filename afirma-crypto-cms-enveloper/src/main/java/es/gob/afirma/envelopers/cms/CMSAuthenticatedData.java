@@ -23,7 +23,6 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import javax.crypto.SecretKey;
 
@@ -269,7 +268,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
                 final Map.Entry<String, byte[]> e = it.next();
                 contexExpecific.add(new Attribute(
                 		// el oid
-                        new ASN1ObjectIdentifier((e.getKey()).toString()),
+                        new ASN1ObjectIdentifier(e.getKey().toString()),
                         // el array de bytes en formato string
                         new DERSet(new DERPrintableString(new String(e.getValue())))
                 ));
@@ -299,59 +298,55 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
      *        Cadena de certificados a agregar.
      * @return La nueva firma AuthenticatedData con los remitentes que
      *         ten&iacute;a (si los tuviera) con la cadena de certificados
-     *         nueva. */
-    static byte[] addOriginatorInfo(final InputStream data, final X509Certificate[] signerCertificateChain) {
-        // boolean isValid = false;
-        byte[] retorno = null;
+     *         nueva.
+     * @throws IOException Si hay errores de lectura o escritura de datos
+     * @throws CertificateEncodingException Si el certificado del remitente es invalido */
+    static byte[] addOriginatorInfo(final InputStream data, final X509Certificate[] signerCertificateChain) throws IOException, CertificateEncodingException {
 
-        final ASN1InputStream is = new ASN1InputStream(data);
+    	final ASN1InputStream is = new ASN1InputStream(data);
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-        ASN1Sequence dsq = null;
-        try {
-            dsq = (ASN1Sequence) is.readObject();
-            final Enumeration<?> e = dsq.getObjects();
-            // Elementos que contienen los elementos OID Data
-            final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
-            if (doi.equals(PKCSObjectIdentifiers.id_ct_authData)) {
-                // Contenido de Data
-                final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+        final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+        is.close();
+        final Enumeration<?> e = dsq.getObjects();
+        // Elementos que contienen los elementos OID Data
+        final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+        if (doi.equals(PKCSObjectIdentifiers.id_ct_authData)) {
+            // Contenido de Data
+            final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
 
-                final AuthenticatedData auth = new AuthenticatedData((ASN1Sequence) doj.getObject());
+            final AuthenticatedData auth = new AuthenticatedData((ASN1Sequence) doj.getObject());
 
-                final AlgorithmIdentifier digAlg = extractAOIfromAuth((ASN1Sequence) doj.getObject());
+            final AlgorithmIdentifier digAlg = extractAOIfromAuth((ASN1Sequence) doj.getObject());
 
-                // Obtenemos los originatorInfo
-                OriginatorInfo origInfo = auth.getOriginatorInfo();
-                ASN1Set certs = null;
-                if (origInfo != null) {
-                    certs = origInfo.getCertificates();
-                }
-
-                final OriginatorInfo origInfoChecked = Utils.checkCertificates(signerCertificateChain, certs);
-                if (origInfoChecked != null) {
-                    origInfo = origInfoChecked;
-                }
-
-                // Se crea un nuevo AuthenticatedData a partir de los datos
-                // anteriores con los nuevos originantes.
-                retorno = new ContentInfo(PKCSObjectIdentifiers.id_ct_authData, new AuthenticatedData(origInfo, // OriginatorInfo
-                                                                                                      auth.getRecipientInfos(), // ASN1Set
-                                                                                                      auth.getMacAlgorithm(), // macAlgorithm
-                                                                                                      digAlg, // AlgorithmIdentifier se les ha
-                                                                                                              // olvidado a BC implementar el
-                                                                                                              // getDigestAlgorithm
-                                                                                                      auth.getEncapsulatedContentInfo(), // ContentInfo
-                                                                                                      auth.getAuthAttrs(), // ASN1Set
-                                                                                                      auth.getMac(), // ASN1OctetString
-                                                                                                      auth.getUnauthAttrs() // ASN1Set
-                                          )).getEncoded(ASN1Encoding.DER);
+            // Obtenemos los originatorInfo
+            OriginatorInfo origInfo = auth.getOriginatorInfo();
+            ASN1Set certs = null;
+            if (origInfo != null) {
+                certs = origInfo.getCertificates();
             }
-        }
-        catch (final Exception ex) {
-            Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de insercion: " + ex); //$NON-NLS-1$ //$NON-NLS-2$
-        }
 
-        return retorno;
+            final OriginatorInfo origInfoChecked = Utils.checkCertificates(signerCertificateChain, certs);
+            if (origInfoChecked != null) {
+                origInfo = origInfoChecked;
+            }
+
+            // Se crea un nuevo AuthenticatedData a partir de los datos
+            // anteriores con los nuevos originantes.
+            return new ContentInfo(
+        		PKCSObjectIdentifiers.id_ct_authData,
+        		new AuthenticatedData(
+    				origInfo, // OriginatorInfo
+                    auth.getRecipientInfos(), // ASN1Set
+                    auth.getMacAlgorithm(), // macAlgorithm
+                    digAlg, // AlgorithmIdentifier se les ha olvidado a BC implementar el getDigestAlgorithm
+                    auth.getEncapsulatedContentInfo(), // ContentInfo
+                    auth.getAuthAttrs(), // ASN1Set
+                    auth.getMac(), // ASN1OctetString
+                    auth.getUnauthAttrs() // ASN1Set
+                )
+    		).getEncoded(ASN1Encoding.DER);
+        }
+        return null;
     }
 
     private static AlgorithmIdentifier extractAOIfromAuth(final ASN1Sequence auth) {

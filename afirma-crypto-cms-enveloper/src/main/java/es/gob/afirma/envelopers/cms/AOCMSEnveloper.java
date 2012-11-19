@@ -112,7 +112,8 @@ public class AOCMSEnveloper implements AOEnveloper {
      * @return Envoltorio CADES.
      * @throws AOException
      *         Cuando ocurre cualquier problema en el proceso. */
-    public byte[] envelop(final byte[] data,
+    @Override
+	public byte[] envelop(final byte[] data,
                           final String digestAlgorithm,
                           final String type,
                           final PrivateKeyEntry keyEntry,
@@ -150,7 +151,8 @@ public class AOCMSEnveloper implements AOEnveloper {
      * @return Contenido firmado
      * @throws AOException
      *         Cuando ocurre cualquier problema durante el proceso */
-    public byte[] encrypt(final byte[] data, final String digestAlgorithm, final String key, final AOCipherAlgorithm cipherAlgorithm, final String dataType) throws AOException {
+    @Override
+	public byte[] encrypt(final byte[] data, final String digestAlgorithm, final String key, final AOCipherAlgorithm cipherAlgorithm, final String dataType) throws AOException {
 
         // Comprobamos que el archivo a cifrar no sea nulo.
         if (data == null) {
@@ -425,9 +427,10 @@ public class AOCMSEnveloper implements AOEnveloper {
      * @throws AOException
      *         Cuando se produce un error al agregar el nuevo remitente.
      * @throws IOException Cuando ocurre alg&uacute;n error en la lectura de los datos.
+     * @throws CertificateEncodingException Cuando el certificado del remitente es inv&aacute;lido
      * @throws AOInvalidFormatException
      *         Tipo de envoltorio no soportado. */
-    public static byte[] addOriginator(final byte[] envelop, final PrivateKeyEntry ke) throws AOException, IOException {
+    public static byte[] addOriginator(final byte[] envelop, final PrivateKeyEntry ke) throws AOException, IOException, CertificateEncodingException {
         final String contentInfo;
         if (ValidateCMS.isCMSEnvelopedData(envelop)) {
             contentInfo = CMS_CONTENTTYPE_ENVELOPEDDATA;
@@ -462,10 +465,11 @@ public class AOCMSEnveloper implements AOEnveloper {
      *         Cuando ocurrio un error al agregar el remitente a la
      *         estructura.
      * @throws IOException Cuando ocurre alg&uacute;n error en la lectura de los datos.
+     * @throws CertificateEncodingException Si el certificado del remitente es inv&aacute;lido
      * @throws IllegalArgumentException
      *         Cuando se indica un contentInfo no compatible con
      *         m&uacute;tiples remitentes. */
-    private static byte[] addOriginator(final byte[] envelop, final String contentInfo, final PrivateKeyEntry ke) throws AOException, IOException {
+    private static byte[] addOriginator(final byte[] envelop, final String contentInfo, final PrivateKeyEntry ke) throws AOException, IOException, CertificateEncodingException {
 
         byte[] newEnvelop;
 
@@ -495,7 +499,7 @@ public class AOCMSEnveloper implements AOEnveloper {
      * @param algorithm
      *        Algoritmo de firma. */
     public void setSignatureAlgorithm(final String algorithm) {
-        this.signatureAlgorithm = (algorithm == null ? AOSignConstants.DEFAULT_SIGN_ALGO : algorithm);
+        this.signatureAlgorithm = algorithm == null ? AOSignConstants.DEFAULT_SIGN_ALGO : algorithm;
     }
 
     /** Establece la contrase&ntilde;a o clave para la encriptaci&oacute;n de los
@@ -530,26 +534,14 @@ public class AOCMSEnveloper implements AOEnveloper {
      *         Cuando la clave de descifrado configurada no sea v&aacute;lida o pertenezca a un destinatario.
      * @throws AOException
      *         Cuando se produce un error durante al desenvolver los datos. */
-    public byte[] recoverData(final byte[] cmsEnvelop, final PrivateKeyEntry addresseePke) throws InvalidKeyException, AOException {
+    @Override
+	public byte[] recoverData(final byte[] cmsEnvelop, final PrivateKeyEntry addresseePke) throws InvalidKeyException, AOException, IOException {
 
     	final org.bouncycastle.asn1.ASN1InputStream is = new org.bouncycastle.asn1.ASN1InputStream(cmsEnvelop);
 
     	// Leemos los datos
-    	final org.bouncycastle.asn1.ASN1Sequence dsq;
-    	try {
-    		dsq = (org.bouncycastle.asn1.ASN1Sequence) is.readObject();
-    	}
-    	catch (final IOException e) {
-    		throw new AOException("Ocurrio un error al leer la informacion del envoltorio", e); //$NON-NLS-1$
-    	}
-    	finally {
-    		try {
-    			is.close();
-    		}
-    		catch (final Exception e) {
-    			// Ignoramos los errores en el cierre
-    		}
-    	}
+    	final org.bouncycastle.asn1.ASN1Sequence dsq = (org.bouncycastle.asn1.ASN1Sequence) is.readObject();
+		is.close();
 
     	final Enumeration<?> objects = dsq.getObjects();
 
@@ -561,12 +553,10 @@ public class AOCMSEnveloper implements AOEnveloper {
     		if (doi.equals(org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.data)) {
     			Logger.getLogger("es.gob.afirma").warning("La extraccion de datos de los envoltorios CMS Data no esta implementada"); //$NON-NLS-1$ //$NON-NLS-2$
     			datos = null;
-    			// datos = this.recoverCMSEncryptedData(cmsEnvelop, cipherKey);
     		}
     		else if (doi.equals(org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.digestedData)) {
     			Logger.getLogger("es.gob.afirma").warning("La extraccion de datos de los envoltorios CMS DigestedData no esta implementada"); //$NON-NLS-1$ //$NON-NLS-2$
     			datos = null;
-    			// datos = this.recoverCMSEncryptedData(cmsEnvelop, cipherKey);
     		}
     		else if (doi.equals(org.bouncycastle.asn1.cms.CMSObjectIdentifiers.compressedData)) {
     			datos = AOCMSEnveloper.recoverCMSCompressedData(cmsEnvelop);
@@ -589,19 +579,28 @@ public class AOCMSEnveloper implements AOEnveloper {
     		else {
     			throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un tipo de objeto CMS soportado"); //$NON-NLS-1$
     		}
-    	} catch (final InvalidKeyException e) {
-    		throw e;
-    	} catch (final AOInvalidRecipientException e) {
-    		throw new InvalidKeyException("La clave indicada no pertenece a ninguno de los destinatarios del envoltorio", e); //$NON-NLS-1$
-    	} catch (final CertificateEncodingException e) {
-    		throw new AOException("Error al descodificar los certificados del envoltorio", e); //$NON-NLS-1$
-    	} catch (final IOException e) {
-    		throw new AOException("Error durante la lectura del envoltorio", e); //$NON-NLS-1$
-    	} catch (final NoSuchAlgorithmException e) {
-    		throw new AOException("No se reconoce el algoritmo indicado", e); //$NON-NLS-1$
-    	} catch (final Exception e) {
-    		throw new AOException("Error en el desencriptado de los datos", e); //$NON-NLS-1$
     	}
+    	catch (final AOInvalidRecipientException e) {
+    		throw new InvalidKeyException("La clave indicada no pertenece a ninguno de los destinatarios del envoltorio", e); //$NON-NLS-1$
+    	}
+    	catch (final CertificateEncodingException e) {
+    		throw new AOException("Error al descodificar los certificados del envoltorio", e); //$NON-NLS-1$
+    	}
+    	catch (final NoSuchAlgorithmException e) {
+    		throw new AOException("No se reconoce el algoritmo indicado", e); //$NON-NLS-1$
+    	}
+    	catch (final NoSuchPaddingException e) {
+    		throw new AOException("No se reconoce el tipo de relleno indicado", e); //$NON-NLS-1$
+		}
+    	catch (final InvalidAlgorithmParameterException e) {
+    		throw new AOException("No se reconoce la configuracion del algoritmo indicado", e); //$NON-NLS-1$
+		}
+    	catch (final IllegalBlockSizeException e) {
+    		throw new AOException("Tamano de bloque invalido: " + e, e); //$NON-NLS-1$
+		}
+    	catch (final BadPaddingException e) {
+    		throw new AOException("relleno invalido: " + e, e); //$NON-NLS-1$
+		}
 
     	return datos;
     }
