@@ -117,7 +117,7 @@ public final class MassiveSignatureHelper {
      * @see MassiveType */
     public void setMassiveOperation(final MassiveType massiveOperation) {
     	this.massiveConfiguration.setMassiveOperation(
-            (massiveOperation != null ? massiveOperation : MassiveType.SIGN)
+            massiveOperation != null ? massiveOperation : MassiveType.SIGN
         );
     }
 
@@ -442,7 +442,7 @@ public final class MassiveSignatureHelper {
         config.setProperty("precalculatedHashAlgorithm", AOSignConstants.getDigestAlgorithmName(this.massiveConfiguration.getAlgorithm())); //$NON-NLS-1$
 
         // Introduccion MIMEType "hash/algo", solo para XAdES y XMLDSig
-        if ((signer.getClass().getName().equals(XADES_SIGNER)) || (signer.getClass().getName().equals(XMLDSIG_SIGNER))) {
+        if (signer.getClass().getName().equals(XADES_SIGNER) || signer.getClass().getName().equals(XMLDSIG_SIGNER)) {
             final String mimeType = "hash/" + AOSignConstants.getDigestAlgorithmName(this.massiveConfiguration.getAlgorithm()).toLowerCase(); //$NON-NLS-1$
             config.setProperty("mimeType", mimeType); //$NON-NLS-1$
         }
@@ -703,8 +703,8 @@ public final class MassiveSignatureHelper {
          * @param massiveOperation
          *        Tipo de operaci&oacute;n masiva. */
         public void setMassiveOperation(final MassiveType massiveOperation) {
-            this.massiveOperation = (massiveOperation != null ?
-            		massiveOperation : MassiveType.SIGN);
+            this.massiveOperation = massiveOperation != null ?
+            		massiveOperation : MassiveType.SIGN;
         }
 
         /** Recupera el algoritmo de firma configurado.
@@ -718,8 +718,8 @@ public final class MassiveSignatureHelper {
          * @param algorithm
          *        Algoritmo de firma. */
         public void setAlgorithm(final String algorithm) {
-            this.algorithm = (algorithm != null ?
-            		algorithm : AOSignConstants.DEFAULT_SIGN_ALGO);
+            this.algorithm = algorithm != null ?
+            		algorithm : AOSignConstants.DEFAULT_SIGN_ALGO;
         }
 
         /** Recupera el modo de firma configurado.
@@ -733,7 +733,7 @@ public final class MassiveSignatureHelper {
          * @param mode
          *        Modo de firma. */
         public void setMode(final String mode) {
-            this.mode = (mode != null ? mode : AOSignConstants.DEFAULT_SIGN_MODE);
+            this.mode = mode != null ? mode : AOSignConstants.DEFAULT_SIGN_MODE;
         }
 
         /** Recupera el formato de firma configurado por defecto.
@@ -749,8 +749,8 @@ public final class MassiveSignatureHelper {
          * @param defaultFormat
          *        Formato de firma. */
         public void setDefaultFormat(final String defaultFormat) {
-            this.defaultFormat = (defaultFormat != null ?
-            		defaultFormat : AOSignConstants.DEFAULT_SIGN_FORMAT);
+            this.defaultFormat = defaultFormat != null ?
+            		defaultFormat : AOSignConstants.DEFAULT_SIGN_FORMAT;
             this.signatureFormat = this.defaultFormat;
         }
 
@@ -771,8 +771,8 @@ public final class MassiveSignatureHelper {
          * @param signatureFormat Formato de firma.
          */
         public void setSignatureFormat(final String signatureFormat) {
-			this.signatureFormat = (signatureFormat != null ?
-					signatureFormat : this.defaultFormat);
+			this.signatureFormat = signatureFormat != null ?
+					signatureFormat : this.defaultFormat;
 		}
 
         /** Indica si se ha configurado que las multifirmas respeten el formato

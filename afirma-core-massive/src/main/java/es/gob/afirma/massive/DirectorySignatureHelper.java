@@ -1005,17 +1005,15 @@ public class DirectorySignatureHelper {
         }
 
         // Almacenamos el fichero
-        OutputStream fos = null;
         try {
-            fos = new FileOutputStream(finalFile);
+        	final OutputStream fos = new FileOutputStream(finalFile);
             fos.write(signData);
+            fos.flush();
+            fos.close();
         }
         catch (final Exception e) {
             LOGGER.severe("No se pudo crear la estructura de directorios del fichero '" + filename + "': " + e);  //$NON-NLS-1$//$NON-NLS-2$
             this.addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.22") + REG_FIELD_SEPARATOR + finalFile); //$NON-NLS-1$
-        }
-        finally {
-            DirectorySignatureHelper.closeStream(fos);
         }
 
         // Almacenamos el nombre de fichero con la firma
@@ -1055,7 +1053,7 @@ public class DirectorySignatureHelper {
     private boolean isSign(final AOSigner signer, final File file) throws IOException {
         final InputStream is = this.getFileInputStream(file);
         final boolean isSignFile = signer.isSign(AOUtil.getDataFromInputStream(is));
-        DirectorySignatureHelper.closeStream(is);
+        is.close();
         return isSignFile;
     }
 
