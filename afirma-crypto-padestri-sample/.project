@@ -33,4 +33,46 @@
 		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>org.eclipse.wst.jsdt.core.jsNature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>afirma-core-java</name>
+			<type>2</type>
+			<location>C:/Users/A122466/workspace_sin_maven/afirma-core/src/main/java</location>
+		</link>
+		<link>
+			<name>afirma-core-resources</name>
+			<type>2</type>
+			<location>C:/Users/A122466/workspace_sin_maven/afirma-core/src/main/resources</location>
+		</link>
+		<link>
+			<name>afirma-crypto-cades-java</name>
+			<type>2</type>
+			<location>C:/Users/A122466/workspace_sin_maven/afirma-crypto-cades/src/main/java</location>
+		</link>
+		<link>
+			<name>afirma-crypto-core-pkcs7-java</name>
+			<type>2</type>
+			<location>C:/Users/A122466/workspace_sin_maven/afirma-crypto-core-pkcs7/src/main/java</location>
+		</link>
+		<link>
+			<name>afirma-crypto-core-pkcs7-tsp-java</name>
+			<type>2</type>
+			<location>C:/Users/A122466/workspace_sin_maven/afirma-crypto-core-pkcs7-tsp/src/main/java</location>
+		</link>
+		<link>
+			<name>afirma-crypto-pades-enhancer-java</name>
+			<type>2</type>
+			<location>C:/Users/A122466/workspace_sin_maven/afirma-crypto-pdf-enhancer/src/main/java</location>
+		</link>
+		<link>
+			<name>afirma-crypto-padestri-server-java</name>
+			<type>2</type>
+			<location>C:/Users/A122466/workspace_sin_maven/afirma-crypto-padestri-server/src/main/java</location>
+		</link>
+		<link>
+			<name>afirma-crypto-pdf-java</name>
+			<type>2</type>
+			<location>C:/Users/A122466/workspace_sin_maven/afirma-crypto-pdf-itext/src/main/java</location>
+		</link>
+	</linkedResources>
 </projectDescription>
