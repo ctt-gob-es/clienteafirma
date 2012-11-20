@@ -13,6 +13,7 @@ import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.massive.MassiveSignatureHelper.MassiveSignConfiguration;
 
 /**
@@ -21,11 +22,9 @@ import es.gob.afirma.massive.MassiveSignatureHelper.MassiveSignConfiguration;
  */
 public class MassiveSignatureTest {
 
-	private static final String		CERT_ALIAS		= "anf usuario activo";			//$NON-NLS-1$
-
-	private static final String		CERT_PASS		= "12341234";						//$NON-NLS-1$
-
-	private static final String		CERT_PATH		= "ANF_PF_Activo.pfx";				//$NON-NLS-1$
+	private static final String CERT_ALIAS = "anf usuario activo"; //$NON-NLS-1$
+	private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
+	private static final String CERT_PATH = "ANF_PF_Activo.pfx"; //$NON-NLS-1$
 
 	/**
 	 * Formatos de los cuales ejecutarse el test.
@@ -34,27 +33,19 @@ public class MassiveSignatureTest {
 	 * Campo 3: Extension de firma
 	 * Campo 4: Soporta contrafirma
 	 */
-	private static final String[][]	FORMATS			= {
+	private static final String[][]	FORMATS = {
 			{ AOSignConstants.SIGN_FORMAT_CMS, "CMS", "csig", "true", "true" }, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			{ AOSignConstants.SIGN_FORMAT_CADES,
-			"CADES", "csig", "true", "true" }, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			{ AOSignConstants.SIGN_FORMAT_XADES_DETACHED,
-			"XADES_DETACHED", "xsig", "true", "true" }, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			{ AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING,
-			"XADES_ENVELOPING", "xsig", "true", "true" }, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			{ AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED,
-			"XADES_ENVELOPED", "xsig", "true", "false" }, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			{ AOSignConstants.SIGN_FORMAT_XMLDSIG_DETACHED,
-			"XMLDSIG_DETACHED", "xsig", "true", "true" }, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			{ AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPING,
-			"XMLDSIG_ENVELOPING", "xsig", "true", "true" }, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			{ AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED,
-			"XMLDSIG_ENVELOPED", "xsig", "true", "false" }, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			{ AOSignConstants.SIGN_FORMAT_CADES, "CADES", "csig", "true", "true" }, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			{ AOSignConstants.SIGN_FORMAT_XADES_DETACHED, "XADES_DETACHED", "xsig", "true", "true" }, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			{ AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING, "XADES_ENVELOPING", "xsig", "true", "true" }, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			{ AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED, "XADES_ENVELOPED", "xsig", "true", "false" }, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			{ AOSignConstants.SIGN_FORMAT_XMLDSIG_DETACHED, "XMLDSIG_DETACHED", "xsig", "true", "true" }, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			{ AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPING, "XMLDSIG_ENVELOPING", "xsig", "true", "true" }, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			{ AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED, "XMLDSIG_ENVELOPED", "xsig", "true", "false" }, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			{ AOSignConstants.SIGN_FORMAT_ODF, "ODF", "odt", "false", "false" }, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			{ AOSignConstants.SIGN_FORMAT_OOXML,
-			"OOXML", "docx", "false", "false" }, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			{ AOSignConstants.SIGN_FORMAT_OOXML, "OOXML", "docx", "false", "false" }, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			{ AOSignConstants.SIGN_FORMAT_PDF, "PDF", "pdf", "false", "false" } //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-													};
+	};
 
 	private static final String[][]	FORMATS_FILES	= {
 			{ AOSignConstants.SIGN_FORMAT_CMS, "bin" }, //$NON-NLS-1$
@@ -78,42 +69,27 @@ public class MassiveSignatureTest {
 	// false};
 
 	private static final String[][]	FORMATS_MODES	= {
-			{ AOSignConstants.SIGN_FORMAT_CMS,
-			AOSignConstants.SIGN_MODE_EXPLICIT },
-			{ AOSignConstants.SIGN_FORMAT_CMS,
-			AOSignConstants.SIGN_MODE_IMPLICIT },
-			{ AOSignConstants.SIGN_FORMAT_CADES,
-			AOSignConstants.SIGN_MODE_EXPLICIT },
-			{ AOSignConstants.SIGN_FORMAT_CADES,
-			AOSignConstants.SIGN_MODE_IMPLICIT },
-			{ AOSignConstants.SIGN_FORMAT_XADES_DETACHED,
-			AOSignConstants.SIGN_MODE_EXPLICIT },
-			{ AOSignConstants.SIGN_FORMAT_XADES_DETACHED,
-			AOSignConstants.SIGN_MODE_IMPLICIT },
-			{ AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING,
-			AOSignConstants.SIGN_MODE_EXPLICIT },
-			{ AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING,
-			AOSignConstants.SIGN_MODE_IMPLICIT },
-			{ AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED,
-			AOSignConstants.SIGN_MODE_IMPLICIT },
-			{ AOSignConstants.SIGN_FORMAT_XMLDSIG_DETACHED,
-			AOSignConstants.SIGN_MODE_EXPLICIT },
-			{ AOSignConstants.SIGN_FORMAT_XMLDSIG_DETACHED,
-			AOSignConstants.SIGN_MODE_IMPLICIT },
-			{ AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPING,
-			AOSignConstants.SIGN_MODE_EXPLICIT },
-			{ AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPING,
-			AOSignConstants.SIGN_MODE_IMPLICIT },
-			{ AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED,
-			AOSignConstants.SIGN_MODE_IMPLICIT },
-			{ AOSignConstants.SIGN_FORMAT_PDF,
-			AOSignConstants.SIGN_MODE_IMPLICIT },
-			{ AOSignConstants.SIGN_FORMAT_ODF,
-			AOSignConstants.SIGN_MODE_IMPLICIT },
-			{ AOSignConstants.SIGN_FORMAT_OOXML,
-			AOSignConstants.SIGN_MODE_IMPLICIT }	};
-	private static final boolean	MANUAL_DEBUG	= false;
-	private final static String		path			= new File("").getAbsolutePath();	//$NON-NLS-1$
+			{ AOSignConstants.SIGN_FORMAT_CMS, AOSignConstants.SIGN_MODE_EXPLICIT },
+			{ AOSignConstants.SIGN_FORMAT_CMS, AOSignConstants.SIGN_MODE_IMPLICIT },
+			{ AOSignConstants.SIGN_FORMAT_CADES, AOSignConstants.SIGN_MODE_EXPLICIT },
+			{ AOSignConstants.SIGN_FORMAT_CADES, AOSignConstants.SIGN_MODE_IMPLICIT },
+			{ AOSignConstants.SIGN_FORMAT_XADES_DETACHED, AOSignConstants.SIGN_MODE_EXPLICIT },
+			{ AOSignConstants.SIGN_FORMAT_XADES_DETACHED, AOSignConstants.SIGN_MODE_IMPLICIT },
+			{ AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING, AOSignConstants.SIGN_MODE_EXPLICIT },
+			{ AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING, AOSignConstants.SIGN_MODE_IMPLICIT },
+			{ AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED, AOSignConstants.SIGN_MODE_IMPLICIT },
+			{ AOSignConstants.SIGN_FORMAT_XMLDSIG_DETACHED, AOSignConstants.SIGN_MODE_EXPLICIT },
+			{ AOSignConstants.SIGN_FORMAT_XMLDSIG_DETACHED, AOSignConstants.SIGN_MODE_IMPLICIT },
+			{ AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPING, AOSignConstants.SIGN_MODE_EXPLICIT },
+			{ AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPING, AOSignConstants.SIGN_MODE_IMPLICIT },
+			{ AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED, AOSignConstants.SIGN_MODE_IMPLICIT },
+			{ AOSignConstants.SIGN_FORMAT_PDF, AOSignConstants.SIGN_MODE_IMPLICIT },
+			{ AOSignConstants.SIGN_FORMAT_ODF, AOSignConstants.SIGN_MODE_IMPLICIT },
+			{ AOSignConstants.SIGN_FORMAT_OOXML, AOSignConstants.SIGN_MODE_IMPLICIT }
+	};
+
+	private static final boolean MANUAL_DEBUG = false;
+	private final static String path = new File("").getAbsolutePath();	//$NON-NLS-1$
 
 	//    private static final String CERT_PATH2 = "ANF_PJ_Activo.pfx"; //$NON-NLS-1$
 	//    private static final String CERT_PASS2 = "12341234"; //$NON-NLS-1$
@@ -173,8 +149,7 @@ public class MassiveSignatureTest {
 				new KeyStore.PasswordProtection(MassiveSignatureTest.CERT_PASS
 						.toCharArray()));
 
-		final MassiveSignConfiguration config = new MassiveSignConfiguration(
-				pke);
+		final MassiveSignConfiguration config = new MassiveSignConfiguration(pke);
 		for (final String[] format : MassiveSignatureTest.FORMATS) {
 			config.setDefaultFormat(format[0]);
 			// for (final boolean originalFormat : ORIGINAL_FORMAT) {
@@ -194,25 +169,19 @@ public class MassiveSignatureTest {
 							byte[] signature = massive.signFile(fullpath);
 							Assert.assertNotNull(signature);
 							MassiveSignatureTest.saveData(
-											signature,
-											"Firma_file_" + file[1] + "_" + format[1] + "_" + /*originalFormat + "_" +*/mode[1] + "." + format[2]); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+									signature,
+									"Firma_file_" + file[1] + "_" + format[1] + "_" + /*originalFormat + "_" +*/mode[1] + "." + format[2]); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 							signature = massive.signData(data);
 							Assert.assertNotNull(signature);
-							MassiveSignatureTest
-									.saveData(
-											signature,
-											"Firma_data_" + file[1] + "_" + format[1] + "_" + /*originalFormat + "_" +*/mode[1] + "." + format[2]); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-							if (Boolean.parseBoolean(format[4])
-									&& AOSignConstants.SIGN_MODE_IMPLICIT
-											.equals(mode[1])) {
-								signature = massive
-										.signHash(MassiveSignatureTest
-												.getDigestData(data));
+							MassiveSignatureTest.saveData(
+									signature,
+									"Firma_data_" + file[1] + "_" + format[1] + "_" + /*originalFormat + "_" +*/mode[1] + "." + format[2]); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+							if (Boolean.parseBoolean(format[4]) && AOSignConstants.SIGN_MODE_IMPLICIT .equals(mode[1])) {
+								signature = massive.signHash(MassiveSignatureTest.getDigestData(data));
 								Assert.assertNotNull(signature);
-								MassiveSignatureTest
-										.saveData(
-												signature,
-												"Firma_hash_" + file[1] + "_" + format[1] + "_" + /*originalFormat + "_" +*/mode[1] + "." + format[2]); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+								MassiveSignatureTest.saveData(
+										signature,
+										"Firma_hash_" + file[1] + "_" + format[1] + "_" + /*originalFormat + "_" +*/mode[1] + "." + format[2]); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 							}
 						}
 					}
@@ -220,5 +189,72 @@ public class MassiveSignatureTest {
 			}
 			// }
 		}
+	}
+
+	/**
+	 * Configura un formato de firma al inicio y lo cambia a lo largo de la ejecucion para firmas en otros formatos.
+	 * @throws Exception Cuando se produce cualquier error durante la ejecuci&oacute;n.
+	 */
+	@SuppressWarnings("static-method")
+	@Test
+	public void pruebaCambioDeFormatoEnCaliente() throws Exception {
+
+		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+		ks.load(ClassLoader.getSystemResourceAsStream(MassiveSignatureTest.CERT_PATH),
+				MassiveSignatureTest.CERT_PASS.toCharArray());
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(
+				MassiveSignatureTest.CERT_ALIAS,
+				new KeyStore.PasswordProtection(MassiveSignatureTest.CERT_PASS.toCharArray()));
+
+		final String fullpath = MassiveSignatureTest.getResourcePath("pdf"); //$NON-NLS-1$
+
+		final MassiveSignConfiguration config = new MassiveSignConfiguration(pke);
+		config.setAlgorithm(AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA);
+		config.setDefaultFormat(AOSignConstants.SIGN_FORMAT_PDF);
+		config.setMode(AOSignConstants.SIGN_MODE_IMPLICIT);
+		config.setOriginalFormat(true);
+
+		byte[] result = null;
+
+		final MassiveSignatureHelper massive = new MassiveSignatureHelper(config);
+		result = massive.signFile(fullpath);
+		Assert.assertNotNull("La firma con el formato por defecto da problemas, siendo el formato: " + config.getDefaultFormat(), result); //$NON-NLS-1$
+		Assert.assertTrue("No se genero una firma en formato " + config.getDefaultFormat(), AOSignerFactory.getSigner(config.getDefaultFormat()).isSign(result)); //$NON-NLS-1$
+
+
+		massive.setSignatureFormat(AOSignConstants.SIGN_FORMAT_CADES);
+		result = massive.signFile(fullpath);
+		Assert.assertNotNull("Error en la firma con el formato modificado en caliente: " + config.getSignatureFormat(), result); //$NON-NLS-1$
+		Assert.assertTrue("No se genero una firma en formato " + config.getSignatureFormat(), AOSignerFactory.getSigner(config.getSignatureFormat()).isSign(result)); //$NON-NLS-1$
+
+		massive.setSignatureFormat(AOSignConstants.SIGN_FORMAT_CMS);
+		result = massive.signFile(fullpath);
+		Assert.assertNotNull("Error en la firma con el formato modificado en caliente: " + config.getSignatureFormat(), result); //$NON-NLS-1$
+		Assert.assertTrue("No se genero una firma en formato " + config.getSignatureFormat(), AOSignerFactory.getSigner(config.getSignatureFormat()).isSign(result)); //$NON-NLS-1$
+
+		massive.setSignatureFormat(AOSignConstants.SIGN_FORMAT_XADES_DETACHED);
+		result = massive.signFile(fullpath);
+		Assert.assertNotNull("Error en la firma con el formato modificado en caliente: " + config.getSignatureFormat(), result); //$NON-NLS-1$
+		Assert.assertTrue("No se genero una firma en formato " + config.getSignatureFormat(), AOSignerFactory.getSigner(config.getSignatureFormat()).isSign(result)); //$NON-NLS-1$
+
+		massive.setSignatureFormat(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING);
+		result = massive.signFile(fullpath);
+		Assert.assertNotNull("Error en la firma con el formato modificado en caliente: " + config.getSignatureFormat(), result); //$NON-NLS-1$
+		Assert.assertTrue("No se genero una firma en formato " + config.getSignatureFormat(), AOSignerFactory.getSigner(config.getSignatureFormat()).isSign(result)); //$NON-NLS-1$
+
+		massive.setSignatureFormat(AOSignConstants.SIGN_FORMAT_XMLDSIG_DETACHED);
+		result = massive.signFile(fullpath);
+		Assert.assertNotNull("Error en la firma con el formato modificado en caliente: " + config.getSignatureFormat(), result); //$NON-NLS-1$
+		Assert.assertTrue("No se genero una firma en formato " + config.getSignatureFormat(), AOSignerFactory.getSigner(config.getSignatureFormat()).isSign(result)); //$NON-NLS-1$
+
+		massive.setSignatureFormat(AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPING);
+		result = massive.signFile(fullpath);
+		Assert.assertNotNull("Error en la firma con el formato modificado en caliente: " + config.getSignatureFormat(), result); //$NON-NLS-1$
+		Assert.assertTrue("No se genero una firma en formato " + config.getSignatureFormat(), AOSignerFactory.getSigner(config.getSignatureFormat()).isSign(result)); //$NON-NLS-1$
+
+		massive.setSignatureFormat(AOSignConstants.SIGN_FORMAT_PDF);
+		result = massive.signFile(fullpath);
+		Assert.assertNotNull("Error en la firma con el formato modificado en caliente: " + config.getSignatureFormat(), result); //$NON-NLS-1$
+		Assert.assertTrue("No se genero una firma en formato " + config.getSignatureFormat(), AOSignerFactory.getSigner(config.getSignatureFormat()).isSign(result)); //$NON-NLS-1$
 	}
 }
