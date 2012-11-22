@@ -393,13 +393,6 @@ public class AOKeyStoreManager {
     	if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
     		throw new InvalidOSException("Apple Mac OS X"); //$NON-NLS-1$
     	}
-        // Anadimos el proveedor de Apple
-        try {
-            Security.insertProviderAt((Provider) AOUtil.classForName("com.apple.crypto.provider.Apple").newInstance(), 0); //$NON-NLS-1$
-        }
-        catch (final Exception e) {
-            throw new MissingLibraryException("No se ha podido instanciar el proveedor 'com.apple.crypto.provider.Apple'", e); //$NON-NLS-1$
-        }
 
         // Inicializamos
         try {

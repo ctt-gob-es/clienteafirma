@@ -18,9 +18,10 @@ import java.security.cert.X509Certificate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import junit.framework.Assert;
+
 import org.junit.Test;
 
-import junit.framework.Assert;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.main.common.AOKeyStore;
@@ -40,6 +41,10 @@ public class TestMacKeyChain {
             return;
         }
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
+        System.out.println(System.getProperty("java.version")); //$NON-NLS-1$
+        System.out.println(System.getProperty("java.vm.vendor")); //$NON-NLS-1$
+        System.out.println(System.getProperty("java.home")); //$NON-NLS-1$
+        System.out.println(Platform.getJavaExtDir());
         
         // Copiamos el KeyChain a un fichero temporal
         final File kc = File.createTempFile("test", ".keychain"); //$NON-NLS-1$ //$NON-NLS-2$
