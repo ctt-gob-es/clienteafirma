@@ -410,10 +410,11 @@ public final class JSEUIManager implements AOUIManager {
                     tryAgain = true;
                 }
                 else { // Hemos seleccionado la opcion de sobreescribir
-                    FileOutputStream fos = null;
                     try {
-                        fos = new FileOutputStream(file);
+                    	final FileOutputStream fos = new FileOutputStream(file);
                         fos.write(data);
+                        fos.flush();
+                        fos.close();
                     }
                     catch (final Exception ex) {
                         LOGGER.warning("No se pudo guardar la informacion en el fichero indicado: " + ex); //$NON-NLS-1$
@@ -425,18 +426,6 @@ public final class JSEUIManager implements AOUIManager {
                         );
                         // Volvemos a intentar guardar
                         tryAgain = true;
-                    }
-                    finally {
-	                    if (fos != null) {
-	                        try {
-	                            fos.flush();
-	                        }
-	                        catch (final Exception e) { /** No hacemos nada. */ }
-	                        try {
-	                            fos.close();
-	                        }
-	                        catch (final Exception e) { /** No hacemos nada. */ }
-	                    }
                     }
                     resultFile = file;
                 }
