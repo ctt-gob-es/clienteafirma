@@ -18,6 +18,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Logger;
 
@@ -29,6 +30,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.text.Caret;
 
+import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
@@ -172,12 +174,13 @@ final class Validacion extends JPanel {
 
 			private void checkSignFile(final String path, final JLabel label,
 					final JTextField field, final JButton button1,
-					final JButton button2) throws Exception {
+					final JButton button2) throws AOException, IOException {
 
 		        // Si el fichero es una firma explicita activamos el campo de seleccion
 		        // de datos, si es una firma implicita activamos el boton de validacion
 		        final InputStream is = AOUtil.loadFile(AOUtil.createURI(path));
 		        final byte[] signData = AOUtil.getDataFromInputStream(is);
+		        is.close();
 		        final AOSigner signer = AOSignerFactory.getSigner(signData);
 		        if (signer == null) {
 		        	label.setEnabled(false);
@@ -185,12 +188,14 @@ final class Validacion extends JPanel {
 		        	field.setText(""); //$NON-NLS-1$
 		        	button1.setEnabled(false);
 		        	button2.setEnabled(false);
-		        } else if (signer.getData(signData) == null) {
+		        }
+		        else if (signer.getData(signData) == null) {
 		        	label.setEnabled(true);
 		        	field.setEnabled(true);
 		        	button1.setEnabled(true);
 		        	chechDataFile();
-		        } else {
+		        }
+		        else {
 		        	label.setEnabled(false);
 		        	field.setEnabled(false);
 		        	field.setText(""); //$NON-NLS-1$
