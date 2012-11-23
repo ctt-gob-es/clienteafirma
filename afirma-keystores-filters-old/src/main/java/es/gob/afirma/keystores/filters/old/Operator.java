@@ -22,7 +22,8 @@ interface Operator
     	 * @param o1 Primer operando
     	 * @param o2 Segundo operando
     	 * @return Resultado de la evaluaci&oacute;n */
-        public boolean eval(final Object o1, final Object o2)
+        @Override
+		public boolean eval(final Object o1, final Object o2)
         {
             return o1.equals(o2);
         }
@@ -34,7 +35,8 @@ interface Operator
     	 * @param str Cadena
     	 * @param pattern Patr&oacute;n
     	 * @return Resultado de la evaluaci&oacute;n */
-        public boolean eval(final Object str, final Object pattern)
+        @Override
+		public boolean eval(final Object str, final Object pattern)
         {
             boolean matches;
             matches = Pattern.matches((String) pattern, (String) str);
@@ -48,7 +50,8 @@ interface Operator
     	 * @param str Cadena
     	 * @param pattern Patr&oacute;n
     	 * @return Resultado de la evaluaci&oacute;n */
-        public boolean eval(final Object str, final Object pattern)
+        @Override
+		public boolean eval(final Object str, final Object pattern)
         {
             boolean matches;
             matches = Pattern.matches((String) pattern, (String) str);

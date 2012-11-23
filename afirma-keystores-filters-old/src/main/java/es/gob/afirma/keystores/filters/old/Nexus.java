@@ -14,13 +14,15 @@ package es.gob.afirma.keystores.filters.old;
 @Deprecated
 interface Nexus {
     Nexus AND = new Nexus() {
-        public boolean eval(boolean b1, boolean b2) {
+        @Override
+		public boolean eval(final boolean b1, final boolean b2) {
             return b1 && b2;
         }
     };
 
     Nexus OR = new Nexus() {
-        public boolean eval(boolean b1, boolean b2) {
+        @Override
+		public boolean eval(final boolean b1, final boolean b2) {
             return b1 || b2;
         }
     };
