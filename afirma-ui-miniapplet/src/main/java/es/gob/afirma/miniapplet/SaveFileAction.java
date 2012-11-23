@@ -46,8 +46,8 @@ final class SaveFileAction implements PrivilegedExceptionAction<Boolean> {
     SaveFileAction(final String title, final byte[] data, final String[] exts,
     		final String description, final File fileHint, final Component parent) {
         this.title = title;
-        this.data = (data != null ? data.clone() : null);
-        this.exts = (exts != null ? exts.clone() : null);
+        this.data = data != null ? data.clone() : null;
+        this.exts = exts != null ? exts.clone() : null;
         this.desc = description;
         this.fileHint = fileHint;
         this.parent = parent;
@@ -130,15 +130,10 @@ final class SaveFileAction implements PrivilegedExceptionAction<Boolean> {
     }
 
     private static boolean saveFile(final File file, final byte[] dataToSave) throws IOException {
-
     	final FileOutputStream fos = new FileOutputStream(file);
     	fos.write(dataToSave);
-    	try {
-    		fos.close();
-    	} catch (final Exception e) {
-    		/* No hacemos nada */
-		}
-
+    	fos.flush();
+		fos.close();
     	return true;
     }
 }
