@@ -36,6 +36,7 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.core.ui.NameCertificateBean;
+import es.gob.afirma.keystores.main.callbacks.CachePasswordCallback;
 import es.gob.afirma.keystores.main.callbacks.NullPasswordCallback;
 import es.gob.afirma.keystores.main.callbacks.UIPasswordCallback;
 import es.gob.afirma.keystores.main.filters.CertificateFilter;
@@ -521,17 +522,20 @@ public final class KeyStoreUtilities {
     public static PasswordCallback getPreferredPCB(final AOKeyStore kStore, final Object parent) {
 
         if (kStore == null) {
-            throw new IllegalArgumentException("No se ha indicado el KeyStore del que desea " + //$NON-NLS-1$
-                                                               "obtener la PasswordCallBack"); //$NON-NLS-1$
+            throw new IllegalArgumentException(
+               "No se ha indicado el KeyStore del que desea obtener la PasswordCallBack" //$NON-NLS-1$
+            );
         }
 
-        if (kStore == AOKeyStore.WINDOWS ||
-            kStore == AOKeyStore.WINROOT ||
-            kStore == AOKeyStore.APPLE) {
+        if (AOKeyStore.APPLE.equals(kStore)) {
+            return new CachePasswordCallback("dummy".toCharArray()); //$NON-NLS-1$
+        }
+        if (AOKeyStore.WINDOWS.equals(kStore) ||
+            AOKeyStore.WINROOT.equals(kStore)) {
                 return new NullPasswordCallback();
         }
-        else if (kStore == AOKeyStore.DNIEJAVA) {
-                    return null;
+        else if (AOKeyStore.DNIEJAVA.equals(kStore)) {
+            return null;
         }
         return new UIPasswordCallback(KeyStoreMessages.getString("KeyStoreUtilities.6", kStore.getName()), parent); //$NON-NLS-1$
     }
@@ -564,10 +568,10 @@ public final class KeyStoreUtilities {
             if (new File(lib + "\\UsrPkcs11.dll").exists()) { //$NON-NLS-1$
                 return lib + "\\UsrPkcs11.dll";  //$NON-NLS-1$
             }
-            // if (new File(lib + "\\AutBioPkcs11.dll").exists()) lib = lib + "\\AutBioPkcs11.dll";
             if (new File(lib + "\\opensc-pkcs11.dll").exists()) { //$NON-NLS-1$
                 return lib + "\\opensc-pkcs11.dll";  //$NON-NLS-1$
             }
+            // No soportamos AutBioPkcs11.dll
             throw new AOKeyStoreManagerException("No hay controlador PKCS#11 de DNIe instalado en este sistema Windows"); //$NON-NLS-1$
         }
         if (Platform.OS.MACOSX.equals(Platform.getOS())) {

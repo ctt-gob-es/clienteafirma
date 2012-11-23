@@ -24,6 +24,7 @@ import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.keystores.main.callbacks.CachePasswordCallback;
 import es.gob.afirma.keystores.main.common.AOKeyStore;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManagerFactory;
@@ -59,7 +60,7 @@ public class TestMacKeyChain {
         final String[] aliases = ksm.getAliases();
         Assert.assertNotNull(aliases);
         
-        final PrivateKeyEntry pke = ksm.getKeyEntry("anf usuario activo", null); //$NON-NLS-1$
+        final PrivateKeyEntry pke = ksm.getKeyEntry("anf usuario activo", new CachePasswordCallback("dummy".toCharArray())); //$NON-NLS-1$ //$NON-NLS-2$
         Assert.assertNotNull(pke);
         
         X509Certificate cert = (X509Certificate) pke.getCertificate();
@@ -71,6 +72,7 @@ public class TestMacKeyChain {
         );
         
         Assert.assertNotNull(pke.getPrivateKey());
+        System.out.println(pke.getPrivateKey());
         
     }
     
@@ -90,7 +92,7 @@ public class TestMacKeyChain {
         final String[] aliases = ksm.getAliases();
         Assert.assertNotNull(aliases);
         
-        final PrivateKeyEntry pke = ksm.getKeyEntry("anf usuario activo", null); //$NON-NLS-1$
+        final PrivateKeyEntry pke = ksm.getKeyEntry("anf usuario activo", new CachePasswordCallback("dummy".toCharArray())); //$NON-NLS-1$ //$NON-NLS-2$
         Assert.assertNotNull(pke);
         
         X509Certificate cert = (X509Certificate) pke.getCertificate();
@@ -99,8 +101,10 @@ public class TestMacKeyChain {
         Assert.assertNotNull(
             cert.getSubjectX500Principal().toString()
         );
+        System.out.println(cert.getSubjectX500Principal().toString());
         
         Assert.assertNotNull(pke.getPrivateKey());
+        System.out.println(pke.getPrivateKey());
         
     }
 

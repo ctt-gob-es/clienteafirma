@@ -20,7 +20,6 @@ import java.lang.reflect.Method;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.Security;
 import java.security.UnrecoverableEntryException;
@@ -559,32 +558,8 @@ public class AOKeyStoreManager {
     		                                    final PasswordCallback pssCallback) throws KeyStoreException,
     		                                                                               NoSuchAlgorithmException,
     		                                                                               UnrecoverableEntryException {
-
         if (this.ks == null) {
             throw new IllegalStateException("Se han pedido claves a un almacen no inicializado"); //$NON-NLS-1$
-        }
-
-        // El llavero de Mac OS X no responde al getKeyEntry(), solo al getKey(), pero
-        // obligartoriamente hay que proporcionarle una cadena de texto no vacia y no nula
-        // como contrasena. Esta cadena puede contener cualquier texto, no se comprueba.
-        // Esta cadena de texto debe contener unicamente caracteres ASCII.
-        if ("KeychainStore".equals(this.ks.getType())) { //$NON-NLS-1$
-            LOGGER.info("Detectado almacen Llavero de Mac OS X, se trataran directamente las claves privadas"); //$NON-NLS-1$
-            Certificate[] certChain = this.ks.getCertificateChain(alias);
-            if (certChain == null) {
-                LOGGER.warning(
-                   "El certificado " + alias + " no tiene su cadena de confianza instalada en el Llavero de Mac OS X, se insertara solo este certificado" //$NON-NLS-1$ //$NON-NLS-2$
-                );
-                certChain = new Certificate[] {
-                    this.ks.getCertificate(alias)
-                };
-            }
-            try {
-                return new KeyStore.PrivateKeyEntry((PrivateKey) this.ks.getKey(alias, "dummy".toCharArray()), certChain); //$NON-NLS-1$
-            }
-            catch(final UnrecoverableKeyException e) {
-                throw new UnrecoverableEntryException(e.toString());
-            }
         }
         return (KeyStore.PrivateKeyEntry) this.ks.getEntry(alias, (pssCallback != null) ? new KeyStore.PasswordProtection(pssCallback.getPassword()) : null);
     }
