@@ -346,7 +346,6 @@ public final class MassiveSignatureHelper {
                     + fileUri
                     + "': " //$NON-NLS-1$
                     + e.getMessage());
-            e.printStackTrace();
             this.addLog(MassiveSignMessages.getString("MassiveSignatureHelper.14") + REG_FIELD_SEPARATOR + e.getMessage()); //$NON-NLS-1$
             return null;
         }

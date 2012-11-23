@@ -525,7 +525,6 @@ public final class SignPanel extends JPanel {
                         loadFile(fileToLoad);
                     }
                     catch (final Exception e) {
-                    	e.printStackTrace();
                     	LOGGER.severe("Error en la carga de fichero " + fileToLoad + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
                         UIUtils.showErrorMessage(
                                 UpperPanel.this,
