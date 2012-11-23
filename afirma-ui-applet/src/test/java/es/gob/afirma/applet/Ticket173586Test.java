@@ -75,9 +75,8 @@ public class Ticket173586Test {
 		final File outFile = File.createTempFile("AfirmaTest173586", null); //$NON-NLS-1$
 		final FileOutputStream fos = new FileOutputStream(outFile);
 		fos.write(Base64.decode(signatureB64));
-		try { fos.close();} catch (final Exception e) {
-			/* No hacemos nada */
-		}
+		fos.flush();
+		fos.close();
 
 		System.out.println("Fichero de salida: " + outFile.getAbsolutePath()); //$NON-NLS-1$
 	}

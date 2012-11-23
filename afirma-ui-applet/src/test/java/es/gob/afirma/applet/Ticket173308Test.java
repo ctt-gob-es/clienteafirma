@@ -129,12 +129,9 @@ public class Ticket173308Test {
 			try {
 				final FileOutputStream fos = new FileOutputStream(path + "/173308_GetSignatureText.xsig"); //$NON-NLS-1$
 				fos.write(applet.getSignatureText().getBytes());
-				try {
-					fos.close();
-				} catch (final Exception e) {
-					// Se ignora el error
-				}
-			} catch (final Exception e) {
+				fos.close();
+			}
+			catch (final Exception e) {
 				Assert.fail("No se pudo generar la firma de prueba"); //$NON-NLS-1$
 			}
 		}

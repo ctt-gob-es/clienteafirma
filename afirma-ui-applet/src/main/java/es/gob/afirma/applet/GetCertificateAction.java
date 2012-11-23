@@ -38,6 +38,7 @@ class GetCertificateAction implements PrivilegedExceptionAction<X509Certificate>
 	}
 
 	/** {@inheritDoc} */
+	@Override
 	public X509Certificate run() throws AOKeyStoreManagerException, AOKeystoreAlternativeException {
 		return (X509Certificate) this.ksConfigManager.getCertificate(this.alias);
 	}

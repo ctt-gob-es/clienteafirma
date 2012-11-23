@@ -99,9 +99,11 @@ final class AsynchronousSaveData implements Runnable {
         this.showDialogIfError = errorDialog;
     }
 
-    public void run() {
+    @Override
+	public void run() {
         AccessController.doPrivileged(new java.security.PrivilegedAction<Void>() {
-            public Void run() {
+            @Override
+			public Void run() {
                 if (AsynchronousSaveData.this.getSavingTarget() == null || "".equals(AsynchronousSaveData.this.getSavingTarget())) { //$NON-NLS-1$
                     try {
                     	final String[] exts = AsynchronousSaveData.this.getExtensions();
@@ -110,7 +112,7 @@ final class AsynchronousSaveData implements Runnable {
                     			AsynchronousSaveData.this.getDescription());
                     	final File outputFile = AOUIFactory.getSaveDataToFile(
                     			AsynchronousSaveData.this.getDataToSave(),
-                    			new File("*" + ((exts == null || exts.length == 0) ? "" : ("." + exts[0]))), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                    			new File("*" + (exts == null || exts.length == 0 ? "" : "." + exts[0])), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                     			fileFilter,
                     			AsynchronousSaveData.this.getParent());
                     	if (outputFile == null) {

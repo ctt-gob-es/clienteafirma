@@ -45,7 +45,7 @@ final class GetFileAction implements PrivilegedExceptionAction<FileBean[]> {
      */
     GetFileAction(final String title, final String[] exts, final String desc, final boolean multiSel, final Component parent) {
     	this.title = title;
-        this.exts = (exts != null ? exts.clone() : null);
+        this.exts = exts != null ? exts.clone() : null;
         this.desc = desc;
         this.multiSel = multiSel;
         this.parent = parent;
@@ -67,6 +67,7 @@ final class GetFileAction implements PrivilegedExceptionAction<FileBean[]> {
      * @throws es.gob.afirma.core.AOCancelledOperationException Cuando se cancela la operaci&oacute;n de selecci&oacute;n.
      * @throws IOException Cuando se produce un error al leer el fichero.
      */
+	@Override
 	public FileBean[] run() throws IOException {
 
 		if (this.paths == null) {
@@ -81,18 +82,8 @@ final class GetFileAction implements PrivilegedExceptionAction<FileBean[]> {
 		for (int i = 0; i < this.paths.length; i++) {
 			file = new File(this.paths[i]);
 			is = new FileInputStream(file);
-			try {
-				contentFic = AOUtil.getDataFromInputStream(is);
-			}
-			finally {
-				try {
-					is.close();
-				}
-				catch (final Exception e) {
-					/* Ignoramos este error */
-				}
-			}
-
+			contentFic = AOUtil.getDataFromInputStream(is);
+			is.close();
 			fileContents[i] = new FileBean(this.paths[i], contentFic);
 		}
 

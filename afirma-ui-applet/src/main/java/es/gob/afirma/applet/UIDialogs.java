@@ -158,10 +158,12 @@ final class UIDialogs {
             arbolNodos.expandRow(i);
         }
         arbolNodos.addTreeExpansionListener(new TreeExpansionListener() {
-            public void treeCollapsed(final TreeExpansionEvent event) {
+            @Override
+			public void treeCollapsed(final TreeExpansionEvent event) {
                 ((JTree) event.getSource()).expandPath(event.getPath());
             }
-            public void treeExpanded(final TreeExpansionEvent event) { /* No se implementa */ }
+            @Override
+			public void treeExpanded(final TreeExpansionEvent event) { /* No se implementa */ }
         });
 
         // Seleccionamos el primer elemento para que siempre haya

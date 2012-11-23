@@ -123,6 +123,7 @@ final class CMSInformation {
 
 		// LEEMOS EL FICHERO QUE NOS INTRODUCEN
 		final ASN1Sequence dsq = (ASN1Sequence)is.readObject();
+		is.close();
 
 		final Enumeration<?> e = dsq.getObjects();
 
@@ -385,7 +386,7 @@ final class CMSInformation {
 				detalle = detalle + atributos;
 			}
 		}
-		else if ((envelopeType == TYPE_SIGNED_ENVELOPED_DATA || envelopeType == TYPE_SIGNED_DATA) &&  (signerInfosSd != null)) {
+		else if ((envelopeType == TYPE_SIGNED_ENVELOPED_DATA || envelopeType == TYPE_SIGNED_DATA) &&  signerInfosSd != null) {
 			//obtenemos el(los) firmate(s)
 			if (signerInfosSd.size()>0){
 				detalle = detalle + AppletMessages.getString("CMSInformation.30") + CR; //$NON-NLS-1$

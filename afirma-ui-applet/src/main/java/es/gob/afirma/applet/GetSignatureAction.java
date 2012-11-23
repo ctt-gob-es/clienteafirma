@@ -60,6 +60,7 @@ class GetSignatureAction implements PrivilegedExceptionAction<byte[]> {
 	}
 
 	/** {@inheritDoc} */
+	@Override
 	public byte[] run() throws AOException  {
 		final byte[] originalSign;
         if (this.signData != null) {
@@ -88,12 +89,7 @@ class GetSignatureAction implements PrivilegedExceptionAction<byte[]> {
             try {
                 final InputStream is = AOUtil.loadFile(this.electronicSignatureFile);
                 originalSign = AOUtil.getDataFromInputStream(is);
-                try {
-                    is.close();
-                }
-                catch (final Exception e) {
-                	// Se ignora
-                }
+                is.close();
             }
             catch (final FileNotFoundException e) {
             	LOGGER.severe("No se encuentra el fichero de firma '" + this.electronicSignatureFile.getPath() + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$

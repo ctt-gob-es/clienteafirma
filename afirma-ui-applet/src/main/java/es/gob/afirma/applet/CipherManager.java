@@ -249,7 +249,7 @@ final class CipherManager {
      * @param keyMode
      *        Modo de clave. */
     void setKeyMode(final String keyMode) {
-        this.keyMode = (keyMode == null ? AOCipherConstants.DEFAULT_KEY_MODE : keyMode);
+        this.keyMode = keyMode == null ? AOCipherConstants.DEFAULT_KEY_MODE : keyMode;
     }
 
     /** Recupera la clave de cifrado.
@@ -358,12 +358,7 @@ final class CipherManager {
             // En este punto, tenemos la URI de los datos de entrada
             final InputStream is = AOUtil.loadFile(this.fileUri);
             dataToCipher = AOUtil.getDataFromInputStream(is);
-            try {
-                is.close();
-            }
-            catch (final Exception e) {
-                // Ignoramos los errores en el cierre
-            }
+            is.close();
         }
 
         cipherData(dataToCipher);
@@ -561,12 +556,7 @@ final class CipherManager {
                 dataToDecipher = AOUtil.getDataFromInputStream(is);
             }
 
-            try {
-                is.close();
-            }
-            catch (final Exception e) {
-                // Ignoramos los errores en el cierre
-            }
+            is.close();
         }
 
         decipherData(dataToDecipher);

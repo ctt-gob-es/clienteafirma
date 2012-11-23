@@ -50,7 +50,8 @@ final class WrapAction implements PrivilegedExceptionAction<byte[]> {
     }
 
     /** {@inheritDoc} */
-    public byte[] run() throws NoSuchAlgorithmException,
+    @Override
+	public byte[] run() throws NoSuchAlgorithmException,
                                IOException,
                                AOException,
                                CertificateEncodingException,

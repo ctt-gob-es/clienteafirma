@@ -49,7 +49,8 @@ final class UnwrapAction implements PrivilegedExceptionAction<byte[]> {
     }
 
     /** {@inheritDoc} */
-    public byte[] run() throws IOException, AOException, CertificateEncodingException {
+    @Override
+	public byte[] run() throws IOException, AOException, CertificateEncodingException {
 
         try {
             this.enveloperManager.unwrap(this.envelop);

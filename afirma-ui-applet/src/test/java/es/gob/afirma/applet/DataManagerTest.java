@@ -49,6 +49,7 @@ public class DataManagerTest {
 		byte[] data;
 		try {
 			data = AOUtil.getDataFromInputStream(isData);
+			isData.close();
 		} catch (final IOException e) {
 			data = null;
 		}

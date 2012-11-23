@@ -120,7 +120,7 @@ final class SignText {
             return;
         }
 
-        if (!("ask".equals(caOption)) && !("auto".equals(caOption))) { //$NON-NLS-1$ //$NON-NLS-2$
+        if (!"ask".equals(caOption) && !"auto".equals(caOption)) { //$NON-NLS-1$ //$NON-NLS-2$
             Logger.getLogger("es.gob.afirma").severe("Valor incorrecto para caOption, debe ser 'ask' u 'auto': " + caOption); //$NON-NLS-1$ //$NON-NLS-2$
             this.result = INTERNAL_ERROR;
             return;
@@ -288,7 +288,8 @@ final class SignText {
         // mayusculas y minusculas
         final Object[] finalOrderedAliases = aliasesByFriendlyName.values().toArray();
         Arrays.sort(finalOrderedAliases, new Comparator<Object>() {
-            public int compare(final Object o1, final Object o2) {
+            @Override
+			public int compare(final Object o1, final Object o2) {
                 if (o1 == null && o2 == null) {
                     return 0;
                 }
@@ -348,7 +349,7 @@ final class SignText {
                 final String certName = comboBox.getSelectedItem().toString();
 
                 for (final String al : aliasesByFriendlyName.keySet().toArray(new String[aliasesByFriendlyName.size()])) {
-                    if (aliasesByFriendlyName.get(al).equals(certName) && (this.kss != null)) {
+                    if (aliasesByFriendlyName.get(al).equals(certName) && this.kss != null) {
                         final AOCertVerifier cv = new AOCertVerifier();
                         for (final KeyStore ks : this.kss.getKeyStores()) {
                             String errorMessage = null;

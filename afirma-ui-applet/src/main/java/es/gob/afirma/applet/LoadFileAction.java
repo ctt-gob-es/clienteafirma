@@ -51,7 +51,8 @@ final class LoadFileAction implements PrivilegedExceptionAction<byte[]> {
     }
 
     /** {@inheritDoc} */
-    public byte[] run() throws IOException {
+    @Override
+	public byte[] run() throws IOException {
 
         InputStream is = null;
         try {
