@@ -207,7 +207,7 @@ public final class AOCipherKeyStoreHelper {
      * consulta de verificaci&oacute;n de la orden.
      * @return Devuelve <code>true</code> si el keystore exist&iacute;a y se
      *         borr&oacute; correctamente. */
-    public boolean removeStore() {
+    public static boolean removeStore() {
         final File storeFile = new File(getCipherKeystore());
         return storeFile.exists() && storeFile.delete();
     }
