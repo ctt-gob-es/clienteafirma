@@ -47,6 +47,10 @@ import es.gob.afirma.signers.pkcs7.SigUtils;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s Capote. */
 public final class CAdESTriPhaseCoSigner {
 
+	private CAdESTriPhaseCoSigner() {
+		// No permitimos la instanciacion
+	}
+
     /** Realiza una pre-cofirma CAdES.
      * @param content Contenido a cofirmar
      * @param signatureAlgorithm Algoritmo de firma
