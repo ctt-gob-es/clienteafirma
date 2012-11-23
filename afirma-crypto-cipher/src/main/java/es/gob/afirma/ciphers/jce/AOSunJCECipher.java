@@ -131,12 +131,14 @@ public final class AOSunJCECipher implements AOCipher {
     };
 
     /** {@inheritDoc} */
-    public AOCipherConfig[] getSupportedConfigs() {
+    @Override
+	public AOCipherConfig[] getSupportedConfigs() {
         return SUPPORTED_CONFIGS.clone();
     }
 
     /** {@inheritDoc} */
-    public byte[] cipher(final byte[] data, final AOCipherConfig algorithmConfig, final Key cipherKey) throws AOException, KeyException {
+    @Override
+	public byte[] cipher(final byte[] data, final AOCipherConfig algorithmConfig, final Key cipherKey) throws AOException, KeyException {
 
         if (data == null || algorithmConfig == null || cipherKey == null || data.length == 0) {
             throw new AOException("Los parametros de la funcion de cifrado no pueden ser nulos o vacios"); //$NON-NLS-1$
@@ -173,7 +175,8 @@ public final class AOSunJCECipher implements AOCipher {
     }
 
     /** {@inheritDoc} */
-    public byte[] decipher(final byte[] data, final AOCipherConfig algorithmConfig, final Key decipherKey) throws AOException, InvalidKeyException {
+    @Override
+	public byte[] decipher(final byte[] data, final AOCipherConfig algorithmConfig, final Key decipherKey) throws AOException, InvalidKeyException {
 
         if (data == null || algorithmConfig == null || decipherKey == null) {
             throw new AOException("Los parametros de la funcion de descifrado no pueden ser nulos"); //$NON-NLS-1$
@@ -214,6 +217,7 @@ public final class AOSunJCECipher implements AOCipher {
     }
 
     /** {@inheritDoc} */
+	@Override
 	public Key decodeKey(final byte[] keyEncoded, final AOCipherConfig algorithmConfig, final Object[] params) throws KeyException {
         if (keyEncoded == null || keyEncoded.length < 1) {
             throw new IllegalArgumentException("La clave a descodificar no puede ser nula ni vacia"); //$NON-NLS-1$
@@ -231,7 +235,8 @@ public final class AOSunJCECipher implements AOCipher {
     }
 
     /** {@inheritDoc} */
-    public Key decodePassphrase(final char[] passphrase, final AOCipherConfig algorithmConfig, final Object[] params) throws AOException {
+    @Override
+	public Key decodePassphrase(final char[] passphrase, final AOCipherConfig algorithmConfig, final Object[] params) throws AOException {
 
         if (passphrase == null || passphrase.length < 1) {
             throw new IllegalArgumentException("La contrasena para la generacion de la clave no puede ser nula ni vacia"); //$NON-NLS-1$
@@ -251,7 +256,8 @@ public final class AOSunJCECipher implements AOCipher {
     }
 
     /** {@inheritDoc} */
-    public Key generateKey(final AOCipherConfig algorithmConfig) throws NoSuchAlgorithmException, AOException {
+    @Override
+	public Key generateKey(final AOCipherConfig algorithmConfig) throws NoSuchAlgorithmException, AOException {
         try {
             return KeyGenerator.getInstance(algorithmConfig.getAlgorithm().getName(), PROVIDER).generateKey();
         }
