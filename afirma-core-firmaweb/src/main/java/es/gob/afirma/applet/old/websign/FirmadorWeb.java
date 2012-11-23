@@ -54,77 +54,63 @@ public final class FirmadorWeb {
         tmpWebDataFile.deleteOnExit();
 
         final OutputStream os = new FileOutputStream(tmpWebDataFile);
-        try {
-            // Usamos el DigestOutputStream para calcular el hash a la vez que
-            // lo escribimos
-            final DigestOutputStream dos = new DigestOutputStream(os, MessageDigest.getInstance(hashAlgorithm.toUpperCase()));
 
-            // Lo usaremos para escribir los ficheros en b64
-            final BufferedOutputStream bos = new BufferedOutputStream(dos);
+        // Usamos el DigestOutputStream para calcular el hash a la vez que
+        // lo escribimos
+        final DigestOutputStream dos = new DigestOutputStream(os, MessageDigest.getInstance(hashAlgorithm.toUpperCase()));
 
-            // Escribimos el HTML
-            dos.write(html.getBytes());
-            dos.flush();
+        // Lo usaremos para escribir los ficheros en b64
+        final BufferedOutputStream bos = new BufferedOutputStream(dos);
 
-            // Anadimos los ficheros
-            for (final Attachment attach : attachments) {
-                if (attach.getURL().trim().length() > 0) {
-                    // Escribimos el tag de apertura
-                    final String openTag = "<afirma type='filecontent' path='" + URLEncoder.encode(attach.getURL(), "UTF-8") + "'><!--\n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                    dos.write(openTag.getBytes());
-                    dos.flush();
+        // Escribimos el HTML
+        dos.write(html.getBytes());
+        dos.flush();
 
-                    // Leemos el fichero con ventana grafica
-                    final FileInputStream attachIS = attach.getContentInputStream();
-                    try {
-                        // Volcamos el fichero en b64
-                        int nBytes;
-                        final byte[] buffer = new byte[BUFFER_SIZE];
-                        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                        while ((nBytes = attachIS.read(buffer)) != -1) {
-                            baos.write(buffer, 0, nBytes);
-                        }
-                        try {
-                            attachIS.close();
-                        }
-                        catch (final Exception e) {
-                            // Ignoramos los errores en el cierre
-                        }
+        // Anadimos los ficheros
+        for (final Attachment attach : attachments) {
+            if (attach.getURL().trim().length() > 0) {
+                // Escribimos el tag de apertura
+                final String openTag = "<afirma type='filecontent' path='" + URLEncoder.encode(attach.getURL(), "UTF-8") + "'><!--\n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                dos.write(openTag.getBytes());
+                dos.flush();
 
-                        bos.write(Base64.encode(baos.toByteArray()).getBytes());
-                        bos.flush();
+                // Leemos el fichero con ventana grafica
+                final FileInputStream attachIS = attach.getContentInputStream();
+                try {
+                    // Volcamos el fichero en b64
+                    int nBytes;
+                    final byte[] buffer = new byte[BUFFER_SIZE];
+                    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    while ((nBytes = attachIS.read(buffer)) != -1) {
+                        baos.write(buffer, 0, nBytes);
                     }
-                    finally {
-                        // Cerramos el fichero que estamos leyendo
+                    try {
                         attachIS.close();
                     }
+                    catch (final Exception e) {
+                        // Ignoramos los errores en el cierre
+                    }
 
-                    // Escribimos el tag de cierre
-                    final String closeTag = "\n--></afirma>"; //$NON-NLS-1$
-                    dos.write(closeTag.getBytes());
-                    dos.flush();
+                    bos.write(Base64.encode(baos.toByteArray()).getBytes());
+                    bos.flush();
+                    bos.close();
                 }
+                finally {
+                    // Cerramos el fichero que estamos leyendo
+                    attachIS.close();
+                }
+
+                // Escribimos el tag de cierre
+                final String closeTag = "\n--></afirma>"; //$NON-NLS-1$
+                dos.write(closeTag.getBytes());
+                dos.flush();
+                dos.close();
             }
-
-            tryClose(bos);
-            tryClose(dos);
-
         }
-        finally {
-            tryClose(os);
-        }
+
+        os.close();
 
         return new FirmaWeb(tmpWebDataFile);
     }
 
-    private static void tryClose(final OutputStream os) {
-        try {
-            if (os != null) {
-                os.close();
-            }
-        }
-        catch (final IOException e) {
-            // Ignoramos los errores en el ciere
-        }
-    }
 }

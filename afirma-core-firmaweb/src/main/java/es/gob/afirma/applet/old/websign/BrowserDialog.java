@@ -39,13 +39,13 @@ import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
 final class BrowserDialog extends JDialog {
-    
+
     private static final long serialVersionUID = 1554097041346695276L;
 
     static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     private boolean firmar = false;
-    
+
     void setFirmar(final boolean f) {
         this.firmar = f;
     }
@@ -57,7 +57,8 @@ final class BrowserDialog extends JDialog {
             putValue(Action.NAME, WebSignMessages.getString("BrowserDialog.0")); //$NON-NLS-1$
         }
 
-        public void actionPerformed(final ActionEvent e) {
+        @Override
+		public void actionPerformed(final ActionEvent e) {
             BrowserDialog.this.setFirmar(true);
             dispose();
         }
@@ -70,7 +71,8 @@ final class BrowserDialog extends JDialog {
             putValue(Action.NAME, WebSignMessages.getString("BrowserDialog.1")); //$NON-NLS-1$
         }
 
-        public void actionPerformed(final ActionEvent e) {
+        @Override
+		public void actionPerformed(final ActionEvent e) {
             BrowserDialog.this.setFirmar(false);
             dispose();
         }
@@ -89,7 +91,8 @@ final class BrowserDialog extends JDialog {
     };
 
     private final HyperlinkListener linkListener = new HyperlinkListener() {
-        public void hyperlinkUpdate(final HyperlinkEvent hl) {
+        @Override
+		public void hyperlinkUpdate(final HyperlinkEvent hl) {
             if (hl.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED) && hl.getDescription().startsWith("afirma:saveFile(")) { //$NON-NLS-1$
                 final String strId = hl.getDescription().substring(hl.getDescription().indexOf('(') + 1, hl.getDescription().indexOf(')'));
                 final int id = Integer.parseInt(strId);
@@ -114,6 +117,9 @@ final class BrowserDialog extends JDialog {
                             while ((nBytes = is.read(buffer)) != -1) {
                                 fos.write(buffer, 0, nBytes);
                             }
+                            fos.flush();
+                            fos.close();
+                            is.close();
                         }
                         else {
                             JOptionPane.showMessageDialog(BrowserDialog.this,
