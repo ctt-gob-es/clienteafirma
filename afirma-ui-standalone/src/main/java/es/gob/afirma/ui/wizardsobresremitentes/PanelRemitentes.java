@@ -22,9 +22,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.security.KeyStore.PrivateKeyEntry;
-import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
@@ -299,13 +297,10 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
         return tipo;
     }
 
-    /** Anade un nuevo remitente al sobre
+    /** A&ntilde;ade un nuevo remitente al sobre
      * @param data Sobre electr&oacute;nico.
      * @param contentType Tipo del contenido
-     * @param privateKey Clave privada
-     * @return
-     * @throws IOException
-     * @throws CertificateEncodingException */
+     * @param privateKey Clave privada */
     private byte[] doCoEnvelopOperation(final byte[] data,
     		                            final String contentType,
     		                            final PrivateKeyEntry privateKey) {
