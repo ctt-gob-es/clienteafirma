@@ -19,10 +19,8 @@ import java.security.PrivilegedExceptionAction;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 
-/**
- * Acci&oacute;n para la recuperaci&oacute;n del nombre y contenido de uno o m&aacute;s ficheros.
- * @author Carlos Gamuci Mill&aacute;n
- */
+/** Acci&oacute;n para la recuperaci&oacute;n del nombre y contenido de uno o m&aacute;s ficheros.
+ * @author Carlos Gamuci Mill&aacute;n */
 final class GetFileNameContentAction implements PrivilegedExceptionAction<String[]> {
 
 	private static final String SEPARATOR = "|"; //$NON-NLS-1$
@@ -34,38 +32,34 @@ final class GetFileNameContentAction implements PrivilegedExceptionAction<String
     private final boolean asBase64;
     private final Component parent;
 
-    /**
-     * Crea la acci&oacute;n para la recuperaci&oacute;n del nombre y el contenido de un fichero.
+    /** Crea la acci&oacute;n para la recuperaci&oacute;n del nombre y el contenido de un fichero.
      * @param title T&iacute;tulo del di&aacute;logo.
      * @param exts Extensiones de fichero aceptadas por defecto.
      * @param desc Descripci&opacute;n del tipo de fichero aceptado por defecto.
      * @param multiSel Habilita la selecci&oacute;n m&uacute;ltiple de ficheros.
      * @param asBase64 {@code true}= Base64, {@code false}=Texto.
-     * @param parent Componente padre sobre el que se mostrar&aacute; el di&aacute;logo.
-     */
+     * @param parent Componente padre sobre el que se mostrar&aacute; el di&aacute;logo. */
     GetFileNameContentAction(final String title, final String[] exts, final String desc, final boolean multiSel, final boolean asBase64, final Component parent) {
     	this.title = title;
-        this.exts = (exts != null ? exts.clone() : null);
+        this.exts = exts != null ? exts.clone() : null;
         this.desc = desc;
         this.multiSel = multiSel;
         this.asBase64 = asBase64;
         this.parent = parent;
     }
 
-    /**
-     * Muestra un di&aacute;logo modal para la carga de un fichero y recuperar el nombre
+    /** Muestra un di&aacute;logo modal para la carga de un fichero y recuperar el nombre
      * del mismo y su contenido.
      * @return Nombre del fichero, el car&aacute;cter "|" y el contenido del fichero (Texto o
      * BinarioB64 seg&uacute;n el indicador {@code asBase64}).
      * @throws es.gob.afirma.core.AOCancelledOperationException Cuando se cancela la operaci&oacute;n de selecci&oacute;n.
-     * @throws IOException Cuando se produce un error al leer el fichero.
-     */
+     * @throws IOException Cuando se produce un error al leer el fichero. */
 	@Override
 	public String[] run() throws IOException {
 
 		final FileSelectionDialog fsDialog = new FileSelectionDialog(this.title, this.exts, this.desc, this.multiSel, this.parent);
-		final String[] paths = (this.multiSel ?
-				fsDialog.getPaths() : new String[] { fsDialog.getPath() });
+		final String[] paths = this.multiSel ?
+				fsDialog.getPaths() : new String[] { fsDialog.getPath() };
 
 		File file;
 		byte[] contentFic;
@@ -74,18 +68,8 @@ final class GetFileNameContentAction implements PrivilegedExceptionAction<String
 		for (int i = 0; i < paths.length; i++) {
 			file = new File(paths[i]);
 			is = new FileInputStream(file);
-			try {
-				contentFic = AOUtil.getDataFromInputStream(is);
-			}
-			finally {
-				try {
-					is.close();
-				}
-				catch (final Exception e) {
-					/* Ignoramos este error */
-				}
-			}
-
+			contentFic = AOUtil.getDataFromInputStream(is);
+			is.close();
 			filenameContents[i] = file.getName() + SEPARATOR + (this.asBase64 ?
 					Base64.encode(contentFic) : new String(contentFic));
 		}

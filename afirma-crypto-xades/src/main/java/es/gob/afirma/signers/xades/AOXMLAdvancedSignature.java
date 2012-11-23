@@ -105,7 +105,7 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
         return keyInfoFactory.newKeyInfo(newList, keyInfoId);
     }
 
-    public void sign(final List<X509Certificate> certificates,
+    void sign(final List<X509Certificate> certificates,
                      final PrivateKey privateKey,
                      final String signatureMethod,
                      final List<?> refsIdList,
@@ -158,6 +158,10 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
         this.signature.sign(this.signContext);
     }
 
+    /** Obtiene una instancia de la clase.
+     * @param xades Datos de la firma XAdES-BES
+     * @return Instancia de la clase
+     * @throws GeneralSecurityException */
     public static AOXMLAdvancedSignature newInstance(final XAdES_BES xades) throws GeneralSecurityException {
         final AOXMLAdvancedSignature result = new AOXMLAdvancedSignature(xades);
         result.setDigestMethod(xades.getDigestMethod());

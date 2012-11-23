@@ -473,23 +473,15 @@ final class EnveloperManager {
         InputStream is = null;
         try {
             is = AOUtil.loadFile(this.fileUri);
+            final byte[] data = AOUtil.getDataFromInputStream(is);
+            is.close();
             if (this.fileBase64) {
-            	return Base64.decode(new String(AOUtil.getDataFromInputStream(is)));
+            	return Base64.decode(new String(data));
             }
-            return AOUtil.getDataFromInputStream(is);
+            return data;
         }
         catch (final AOException e) {
-            throw new IOException("No se pudieron leer los datos del fichero seleccionado: " + e); //$NON-NLS-1$
-        }
-        finally {
-            try {
-                if (is != null) {
-                    is.close();
-                }
-            }
-            catch (final Exception e) {
-                // Ignoramos los errores en el cierre
-            }
+            throw new IOException("No se pudieron leer los datos del fichero seleccionado: " + e, e); //$NON-NLS-1$
         }
     }
 

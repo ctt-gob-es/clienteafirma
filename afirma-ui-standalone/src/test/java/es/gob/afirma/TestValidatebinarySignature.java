@@ -30,12 +30,7 @@ public class TestValidatebinarySignature {
 
 		final InputStream is = AOUtil.getCleanClassLoader().getResourceAsStream(signatureFile);
 		final byte[] signature = AOUtil.getDataFromInputStream(is);
-
-		try {
-			is.close();
-		} catch (final Exception e) {
-			// No hacemos nada
-		}
+		is.close();
 
 		SignValidity validity = null;
 		try {
@@ -58,17 +53,13 @@ public class TestValidatebinarySignature {
 
 		final InputStream is = AOUtil.getCleanClassLoader().getResourceAsStream(signatureFile);
 		final byte[] signature = AOUtil.getDataFromInputStream(is);
-
-		try {
-			is.close();
-		} catch (final Exception e) {
-			// No hacemos nada
-		}
+		is.close();
 
 		SignValidity validity = null;
 		try {
 			validity = ValidateBinarySignature.validate(signature, null);
-		} catch (final Exception e) {
+		}
+		catch (final Exception e) {
 			Assert.fail("Ocurrio el siguiente error durante la validacion de la firma " + signatureFile + ": " + e.toString()); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
@@ -85,35 +76,25 @@ public class TestValidatebinarySignature {
 
 		final InputStream signIs = AOUtil.getCleanClassLoader().getResourceAsStream(signatureFile);
 		final byte[] signature = AOUtil.getDataFromInputStream(signIs);
-
+		signIs.close();
 		if (signature == null || signature.length == 0) {
 			Assert.fail("No se ha cargado correctamente la firma a validar"); //$NON-NLS-1$
-		}
-
-		try {
-			signIs.close();
-		} catch (final Exception e) {
-			// No hacemos nada
 		}
 
 		final String dataFile = DATA_FILENAME;
 
 		final InputStream dataIs = AOUtil.getCleanClassLoader().getResourceAsStream(dataFile);
 		final byte[] data = AOUtil.getDataFromInputStream(dataIs);
+		dataIs.close();
 		if (data == null || data.length == 0) {
 			Assert.fail("No se han cargado correctamente los datos de la firma a validar"); //$NON-NLS-1$
-		}
-
-		try {
-			dataIs.close();
-		} catch (final Exception e) {
-			// No hacemos nada
 		}
 
 		SignValidity validity = null;
 		try {
 			validity = ValidateBinarySignature.validate(signature, data);
-		} catch (final Exception e) {
+		}
+		catch (final Exception e) {
 			Assert.fail("Ocurrio el siguiente error durante la validacion de la firma " + signatureFile + ": " + e.toString()); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
@@ -130,23 +111,13 @@ public class TestValidatebinarySignature {
 
 		final InputStream signIs = AOUtil.getCleanClassLoader().getResourceAsStream(signatureFile);
 		final byte[] signature = AOUtil.getDataFromInputStream(signIs);
-
-		try {
-			signIs.close();
-		} catch (final Exception e) {
-			// No hacemos nada
-		}
+		signIs.close();
 
 		final String dataFile = DATA_FILENAME;
 
 		final InputStream dataIs = AOUtil.getCleanClassLoader().getResourceAsStream(dataFile);
 		final byte[] data = AOUtil.getDataFromInputStream(dataIs);
-
-		try {
-			dataIs.close();
-		} catch (final Exception e) {
-			// No hacemos nada
-		}
+		dataIs.close();
 
 		SignValidity validity = null;
 		try {

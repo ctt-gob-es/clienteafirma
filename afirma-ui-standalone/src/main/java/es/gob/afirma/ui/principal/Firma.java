@@ -313,10 +313,10 @@ final class Firma extends JPanel {
             }
 
             final byte[] fileData;
-            InputStream fileIn = null;
             try {
-                fileIn = AOUtil.loadFile(uri);
+            	final InputStream fileIn = AOUtil.loadFile(uri);
                 fileData = AOUtil.getDataFromInputStream(fileIn);
+                fileIn.close();
             }
             catch(final FileNotFoundException e) {
                 CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Firma.msg.error.fichero.noencontrado"), //$NON-NLS-1$
@@ -340,19 +340,11 @@ final class Firma extends JPanel {
             }
             finally {
                 setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-                if (fileIn != null) {
-                    try {
-                        fileIn.close();
-                    }
-                    catch (final Exception e) {
-                        /* Ignorada */
-                    }
-                }
             }
 
             // Se introduce la logica necesaria para que no se pueda firmar en formato XAdES o XMLdSign
             // una factura electronica ya firmada
-            if ((signer instanceof AOXAdESSigner || signer instanceof AOXMLDSigSigner) && (new AOFacturaESigner().isSign(fileData))) {
+            if ((signer instanceof AOXAdESSigner || signer instanceof AOXMLDSigSigner) && new AOFacturaESigner().isSign(fileData)) {
         		CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
         				true, Messages.getString("Firma.dialog.msg"), //$NON-NLS-1$
         				Messages.getString("Firma.dialog.title"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$
@@ -368,7 +360,7 @@ final class Firma extends JPanel {
             			Messages.getString("Firma.dialog.title"), //$NON-NLS-1$
             			JOptionPane.YES_NO_OPTION,
             			JOptionPane.INFORMATION_MESSAGE);
-                modoFirma = (incluir == JOptionPane.NO_OPTION ? AOSignConstants.SIGN_MODE_EXPLICIT : AOSignConstants.SIGN_MODE_IMPLICIT);
+                modoFirma = incluir == JOptionPane.NO_OPTION ? AOSignConstants.SIGN_MODE_EXPLICIT : AOSignConstants.SIGN_MODE_IMPLICIT;
             }
 
             final Properties prop = GeneralConfig.getSignConfig();

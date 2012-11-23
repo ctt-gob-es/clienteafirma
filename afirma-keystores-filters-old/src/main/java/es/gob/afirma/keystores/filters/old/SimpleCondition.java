@@ -21,15 +21,16 @@ import javax.naming.ldap.LdapName;
 import javax.naming.ldap.Rdn;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.misc.AOUtil;
 
-/** 
+/**
  * @deprecated Usar filtros compatibles RFC2254
  */
 @Deprecated
 final class SimpleCondition extends AClause implements ConditionConstants {
-    
+
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
-	
+
     private String field;
     private Operator operator;
     private String value;
@@ -37,9 +38,9 @@ final class SimpleCondition extends AClause implements ConditionConstants {
     private String hashAlg;
 
     SimpleCondition(final String str) throws AOException {
-        Matcher fieldMatcher = COMPILED_FIELD_CONDITION_PATTERN.matcher(str);
-        Matcher valueMatcher = COMPILED_VALUE_CONDITION_PATTERN.matcher(str);
-        Matcher operatorMatcher = COMPILED_OPERATOR_PATTERN.matcher(str);
+        final Matcher fieldMatcher = COMPILED_FIELD_CONDITION_PATTERN.matcher(str);
+        final Matcher valueMatcher = COMPILED_VALUE_CONDITION_PATTERN.matcher(str);
+        final Matcher operatorMatcher = COMPILED_OPERATOR_PATTERN.matcher(str);
 
         int ini, fin;
         if (fieldMatcher.find()) {
@@ -54,16 +55,16 @@ final class SimpleCondition extends AClause implements ConditionConstants {
         if (operatorMatcher.find()) {
             ini = operatorMatcher.start();
             fin = operatorMatcher.end();
-            String strOperator = str.substring(ini, fin);
-            
+            final String strOperator = str.substring(ini, fin);
+
             if (strOperator.equals("=")) { //$NON-NLS-1$
-                this.operator = Operator.EQ; 
+                this.operator = Operator.EQ;
             }
 	        else if (strOperator.equals("#MATCHES#")) { //$NON-NLS-1$
-	            this.operator = Operator.MATCHES; 
+	            this.operator = Operator.MATCHES;
 	        }
             else if (strOperator.equals("#NOT_MATCHES#")) { //$NON-NLS-1$
-                this.operator = Operator.NOT_MATCHES; 
+                this.operator = Operator.NOT_MATCHES;
             }
             else {
                 throw new AOException("Operador desconocido: " + str); //$NON-NLS-1$
@@ -84,14 +85,14 @@ final class SimpleCondition extends AClause implements ConditionConstants {
     }
 
     @Override
-	public boolean eval(X509Certificate cert) throws AOException {
+	public boolean eval(final X509Certificate cert) throws AOException {
     	if (cert==null) {
     	    return false;
     	}
         try {
             Object o1=null, o2;
             // Ver java.util.Pattern para lo de "?i"
-            //if (aux == null && (operator == Operator.MATCHES || operator == Operator.NOT_MATCHES)) aux = "(?i)" + value; 
+            //if (aux == null && (operator == Operator.MATCHES || operator == Operator.NOT_MATCHES)) aux = "(?i)" + value;
 
             if (this.field.equalsIgnoreCase("ISSUER.DN")) { //$NON-NLS-1$
                 this.aux = this.value;
@@ -103,7 +104,7 @@ final class SimpleCondition extends AClause implements ConditionConstants {
             	}
             	final String principal = cert.getSubjectX500Principal().getName();
             	final List<Rdn> rdns = new LdapName(principal).getRdns();
-        		if (rdns != null && (!rdns.isEmpty())) {
+        		if (rdns != null && !rdns.isEmpty()) {
         			for (int j=0; j<rdns.size(); j++) {
         				if (rdns.get(j).toString().startsWith("serialnumber=") || rdns.get(j).toString().startsWith("SERIALNUMBER=")) { //$NON-NLS-1$ //$NON-NLS-2$
         					o1 = asciiHexToString(rdns.get(j).toString().substring("serialnumber=".length())); //$NON-NLS-1$
@@ -115,7 +116,7 @@ final class SimpleCondition extends AClause implements ConditionConstants {
         			if (o1==null) {
         			    return false;
         			}
-        		} 
+        		}
         		else {
         		    return false;
         		}
@@ -132,42 +133,42 @@ final class SimpleCondition extends AClause implements ConditionConstants {
             }
             else if (this.field.toUpperCase().startsWith("SUBJECT.FP(")) { //$NON-NLS-1$
                 if (this.hashAlg == null) {
-                    Matcher matcher = COMPILED_HASH_ALG_PATTERN.matcher(this.field);
+                    final Matcher matcher = COMPILED_HASH_ALG_PATTERN.matcher(this.field);
                     matcher.find();
                     this.hashAlg = this.field.substring(matcher.start(), matcher.end());
                 }
                 if (this.aux == null) {
                     this.aux = this.value;
                 }
-                o1 = HexHelper.toString(MessageDigest.getInstance(this.hashAlg).digest(cert.getEncoded()));
+                o1 = AOUtil.hexify(MessageDigest.getInstance(this.hashAlg).digest(cert.getEncoded()), false);
             }
             else {
                 throw new AOException("Campo desconocido:" + this.field); //$NON-NLS-1$
             }
             o2 = this.aux;
-            
+
             LOGGER.info("\nValor extraido del certificado: " + o1+"\nValor patron del filtro: " + o2); //$NON-NLS-1$ //$NON-NLS-2$
-            
+
             return this.operator.eval(o1, o2);
         }
         catch (final Exception e) {
         	throw new AOException("Error evaluando la expresion", e); //$NON-NLS-1$
         }
-    } 			
+    }
 
     private static String asciiHexToString(final String ahex) {
-        
+
         if(!ahex.startsWith("#")) { //$NON-NLS-1$
             return ahex;
         }
-        
+
         final String ah = ahex.replaceAll("#", ""); //$NON-NLS-1$ //$NON-NLS-2$
         String tmpStr;
         final StringBuilder outStr = new StringBuilder();
         for (int i=0;i<ah.length()/2;i++) {
             tmpStr = ah.substring(i*2, i*2+2);
             tmpStr = tmpStr.trim();
-            
+
             if      (tmpStr.equalsIgnoreCase("30")) { outStr.append("0"); } //$NON-NLS-1$ //$NON-NLS-2$
             else if (tmpStr.equalsIgnoreCase("31")) { outStr.append("1"); } //$NON-NLS-1$ //$NON-NLS-2$
             else if (tmpStr.equalsIgnoreCase("32")) { outStr.append("2"); } //$NON-NLS-1$ //$NON-NLS-2$
@@ -234,24 +235,24 @@ final class SimpleCondition extends AClause implements ConditionConstants {
             else if (tmpStr.equalsIgnoreCase("5f")) { outStr.append("_"); } //$NON-NLS-1$ //$NON-NLS-2$
             else if (tmpStr.equalsIgnoreCase("20")) { outStr.append(" "); } //$NON-NLS-1$ //$NON-NLS-2$
         }
-        
+
         return outStr.toString();
     }
-    
+
     private static String rewriteLdapName(final String ln) {
         try {
             final List<Rdn> rdns = new LdapName(ln).getRdns();
             final StringBuilder out = new StringBuilder();
-            if (rdns != null && (!rdns.isEmpty())) {
+            if (rdns != null && !rdns.isEmpty()) {
                 for (int j=rdns.size()-1; j>=0; j--) {
-                    String keyValue = rdns.get(j).toString();
+                    final String keyValue = rdns.get(j).toString();
                     if(keyValue.startsWith("2.5.4.5=") || keyValue.startsWith("serialnumber=") || keyValue.startsWith("SERIALNUMBER=")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                         out.append("SERIALNUMBER="); //$NON-NLS-1$
                         out.append(asciiHexToString(keyValue.substring(keyValue.indexOf('=')+1)));
                         out.append(","); //$NON-NLS-1$
-                    } 
+                    }
                     else {
-                        out.append(keyValue);     
+                        out.append(keyValue);
                         out.append(","); //$NON-NLS-1$
                     }
                 }
@@ -268,7 +269,7 @@ final class SimpleCondition extends AClause implements ConditionConstants {
             LOGGER.warning("Excepcion: "+e); //$NON-NLS-1$
             return ln;
         }
-        
+
     }
-    
+
 }

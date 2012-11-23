@@ -90,7 +90,7 @@ public final class Main {
 		return isOSHighContrast;
 	}
 
-	public static void setOSHighContrast(final boolean isOSHighContrast) {
+	static void setOSHighContrast(final boolean isOSHighContrast) {
 		Main.isOSHighContrast = isOSHighContrast;
 	}
 

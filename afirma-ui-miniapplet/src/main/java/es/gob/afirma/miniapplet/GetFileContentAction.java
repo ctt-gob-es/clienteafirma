@@ -39,7 +39,7 @@ final class GetFileContentAction implements PrivilegedExceptionAction<byte[]>{
     GetFileContentAction(final String title, final String[] exts, final String description,
     		 final Component parent) {
         this.title = title;
-        this.exts = (exts != null ? exts.clone() : null);
+        this.exts = exts != null ? exts.clone() : null;
         this.desc = description;
         this.parent = parent;
     }
@@ -55,18 +55,8 @@ final class GetFileContentAction implements PrivilegedExceptionAction<byte[]>{
 	public byte[] run() throws IOException {
         final FileSelectionDialog dialog = new FileSelectionDialog(this.title, this.exts, this.desc, false, this.parent);
         final InputStream is = dialog.getFileContent();
-        try {
-        	return AOUtil.getDataFromInputStream(is);
-        }
-        finally {
-        	if (is != null) {
-        		try {
-        			is.close();
-        		}
-        		catch (final Exception e) {
-        			/* Ignoramos este error */
-        		}
-        	}
-        }
+    	final byte[] data = AOUtil.getDataFromInputStream(is);
+    	is.close();
+    	return data;
 	}
 }

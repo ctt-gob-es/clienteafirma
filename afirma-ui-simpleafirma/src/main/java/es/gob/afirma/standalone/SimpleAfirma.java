@@ -522,7 +522,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
                             file.delete();
                         }
                         catch (final Exception e) {
-                            LOGGER.warning("No se ha podido eliminar el bloqueo de instancia"); //$NON-NLS-1$
+                            LOGGER.warning("No se ha podido eliminar el bloqueo de instancia: " + e); //$NON-NLS-1$
                         }
                     }
                 });

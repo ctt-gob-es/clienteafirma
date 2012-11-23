@@ -14,6 +14,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
@@ -135,7 +137,7 @@ public class GenerateAllSigns {
 
     	final Map<String, byte[]> files = loadFiles();
 
-    	final String[] algos = (applyAlgos ? ALGOS : new String[] {DEFAULT_ALGO});
+    	final String[] algos = applyAlgos ? ALGOS : new String[] {DEFAULT_ALGO};
     	final Properties extraParams = new Properties();
 
 		AOSigner signer;
@@ -181,7 +183,7 @@ public class GenerateAllSigns {
         ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH2), CERT_PASS2.toCharArray());
         final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS2, new KeyStore.PasswordProtection(CERT_PASS2.toCharArray()));
 
-    	final String[] algos = (applyAlgos ? ALGOS : new String[] {DEFAULT_ALGO});
+    	final String[] algos = applyAlgos ? ALGOS : new String[] {DEFAULT_ALGO};
     	final Properties extraParams = new Properties();
 
 		AOSigner signer;
@@ -202,7 +204,8 @@ public class GenerateAllSigns {
 										loadFile(SIGNS_PATH + filename),
 										algo,
 										pke,
-										extraParams);
+										extraParams
+								);
 								saveSign(signature, "Cofirma_" + format[1] + "_" + mode[1] + "_" + file[1] + "_" + algo + "." + format[2]); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 
 							}
@@ -228,7 +231,7 @@ public class GenerateAllSigns {
         ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH3), CERT_PASS3.toCharArray());
         final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS3, new KeyStore.PasswordProtection(CERT_PASS3.toCharArray()));
 
-    	final String[] algos = (applyAlgos ? ALGOS : new String[] {DEFAULT_ALGO});
+    	final String[] algos = applyAlgos ? ALGOS : new String[] {DEFAULT_ALGO};
     	final Properties extraParams = new Properties();
 
 		AOSigner signer;
@@ -266,41 +269,31 @@ public class GenerateAllSigns {
 	}
 
     private static Map<String, byte[]> loadFiles() throws IOException {
-    	byte[] data;
     	final Hashtable<String, byte[]> files = new Hashtable<String, byte[]>();
     	for (final String[] formatsFiles : FORMATS_FILES) {
     		if (!files.contains(formatsFiles[1])) {
-				data = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(formatsFiles[1]));
-    			files.put(formatsFiles[1], data);
+    			AOUtil.getCleanClassLoader();
+				files.put(
+					formatsFiles[1],
+					AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(formatsFiles[1]))
+				);
     		}
     	}
     	return files;
 	}
 
-    private static byte[] loadFile(final String path) {
-    	FileInputStream fis = null;
-    	try {
-    		fis = new FileInputStream(path);
-    		return AOUtil.getDataFromInputStream(fis);
-    	} catch (final Exception e) {
-    		System.err.println("No se pudo cargar: " + path); //$NON-NLS-1$
-    		return null;
-    	} finally {
-    		if (fis != null) {
-    			try {
-    				fis.close();
-    			} catch (final Exception e) {
-    				/** no hacemos nada */
-    			}
-    		}
-    	}
+    private static byte[] loadFile(final String path) throws IOException {
+		final InputStream fis = new FileInputStream(path);
+		final byte[] data = AOUtil.getDataFromInputStream(fis);
+		fis.close();
+		return data;
     }
 
     private static void saveSign(final byte[] signData, final String filename) throws IOException {
-
     	final File signFile = new File(SIGNS_PATH + filename);
-    	final FileOutputStream fos = new FileOutputStream(signFile);
+    	final OutputStream fos = new FileOutputStream(signFile);
     	fos.write(signData);
+    	fos.flush();
     	fos.close();
     }
 }

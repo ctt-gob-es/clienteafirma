@@ -45,12 +45,13 @@ public class DataManagerTest {
 
 		DATA_FILE_URI = DataManagerTest.class.getResource("/" + DATA_FILE).toString(); //$NON-NLS-1$
 
-		final InputStream isData = DataManagerTest.class.getResourceAsStream("/" + DATA_FILE); //$NON-NLS-1$
 		byte[] data;
 		try {
+			final InputStream isData = DataManagerTest.class.getResourceAsStream("/" + DATA_FILE); //$NON-NLS-1$
 			data = AOUtil.getDataFromInputStream(isData);
 			isData.close();
-		} catch (final IOException e) {
+		}
+		catch (final IOException e) {
 			data = null;
 		}
 		Assert.assertNotNull("No se han cargado los datos", data); //$NON-NLS-1$

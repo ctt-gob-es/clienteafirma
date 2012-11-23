@@ -95,12 +95,9 @@ public class Ticket173308Test {
 				System.out.println(path + "/173308_GetTextFromBase64.xsig"); //$NON-NLS-1$
 				final FileOutputStream fos = new FileOutputStream(new File(path, "173308_GetTextFromBase64.xsig")); //$NON-NLS-1$
 				fos.write(applet.getTextFromBase64(applet.getSignatureBase64Encoded()).getBytes());
-				try {
-					fos.close();
-				} catch (final Exception e) {
-					// Se ignora el error
-				}
-			} catch (final Exception e) {
+				fos.close();
+			}
+			catch (final Exception e) {
 				Assert.fail("No se pudo generar la firma de prueba"); //$NON-NLS-1$
 			}
 		}
