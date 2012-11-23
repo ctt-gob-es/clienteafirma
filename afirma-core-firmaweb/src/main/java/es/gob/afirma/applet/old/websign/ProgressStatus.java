@@ -19,7 +19,7 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 
-class ProgressStatus extends JComponent {
+final class ProgressStatus extends JComponent {
     private JProgressBar barra = null;
 
     private JTextField text = null;
@@ -30,7 +30,7 @@ class ProgressStatus extends JComponent {
 
     static final long serialVersionUID = 1;
 
-    public ProgressStatus(final String info, final String message) {
+    ProgressStatus(final String info, final String message) {
         this.message = message;
 
         setLayout(new BorderLayout());
@@ -48,19 +48,19 @@ class ProgressStatus extends JComponent {
         add(panelInferior, BorderLayout.SOUTH);
     }
 
-    public void setMaxValue(final int value) {
+    void setMaxValue(final int value) {
         this.maxValue = value;
 
         this.barra.setMaximum(value);
     }
 
-    public void updateValue(final int value) {
+    void updateValue(final int value) {
         double percentage = 0.0;
 
         this.barra.setValue(value);
 
         if (this.maxValue > 0) {
-            percentage = ((double) value / this.maxValue) * 100;
+            percentage = (double) value / this.maxValue * 100;
         }
         else {
             percentage = 0.0;

@@ -171,10 +171,11 @@ public final class RelationshipTransformService extends TransformService {
 
         final OctetStreamData octetStreamData = (OctetStreamData) data;
 
-        final InputStream octetStream = octetStreamData.getOctetStream();
-        Document relationshipsDocument;
+        final Document relationshipsDocument;
         try {
+        	final InputStream octetStream = octetStreamData.getOctetStream();
             relationshipsDocument = loadDocument(octetStream);
+            octetStream.close();
         }
         catch (final Exception e) {
             throw new TransformException(e.getMessage(), e);

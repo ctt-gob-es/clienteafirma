@@ -12,7 +12,7 @@ package es.gob.afirma.applet.old.websign;
 
 import javax.swing.text.html.HTML;
 
-class AFirmaTag extends HTML.Tag {
+final class AFirmaTag extends HTML.Tag {
     static final AFirmaTag INSTANCE = new AFirmaTag();
 
     AFirmaTag() {
