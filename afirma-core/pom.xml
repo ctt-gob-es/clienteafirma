@@ -16,7 +16,7 @@
     <dependency>
       <groupId>es.gob.afirma</groupId>
       <artifactId>afirma-lib-jmimemagic</artifactId>
-      <version>0.0.2-SNAPSHOT</version>
+      <version>0.0.1</version>
     </dependency>
   </dependencies>
 </project>
