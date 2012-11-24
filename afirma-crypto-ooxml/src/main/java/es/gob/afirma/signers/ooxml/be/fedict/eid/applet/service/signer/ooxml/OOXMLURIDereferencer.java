@@ -91,9 +91,7 @@ final class OOXMLURIDereferencer implements URIDereferencer {
             if (null == dataInputStream) {
                 return this.baseUriDereferencer.dereference(uriReference, context);
             }
-            final Data ret = new OctetStreamData(dataInputStream, uri, null);
-            dataInputStream.close();
-            return ret;
+            return new OctetStreamData(dataInputStream, uri, null);
         }
         catch (final IOException e) {
             throw new URIReferenceException("Error de I/O: " + e.getMessage(), e); //$NON-NLS-1$
