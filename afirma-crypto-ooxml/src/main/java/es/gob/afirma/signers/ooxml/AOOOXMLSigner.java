@@ -55,9 +55,10 @@ public final class AOOOXMLSigner implements AOSigner {
 
     /** Si la entrada es un documento OOXML, devuelve el mismo documento sin ninguna modificaci&oacute;n.
      * @param sign Documento OOXML
-     * @return Documento de entrada si este es OOXML, <code>null</code> en cualquier otro caso */
+     * @return Documento de entrada si este es OOXML, <code>null</code> en cualquier otro caso
+     * @throws IOException Cuando hay errores en la lectura de la firma */
     @Override
-	public byte[] getData(final byte[] sign) throws AOException {
+	public byte[] getData(final byte[] sign) throws AOException, IOException {
 
         // Si no es una firma OOXML valida, lanzamos una excepcion
         if (!isSign(sign)) {
@@ -97,7 +98,7 @@ public final class AOOOXMLSigner implements AOSigner {
 
     /** { {@inheritDoc} */
     @Override
-	public AOSignInfo getSignInfo(final byte[] sign) throws AOException {
+	public AOSignInfo getSignInfo(final byte[] sign) throws AOException, IOException {
         if (sign == null) {
             throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$
         }
@@ -141,7 +142,7 @@ public final class AOOOXMLSigner implements AOSigner {
 
     /** { {@inheritDoc} */
     @Override
-	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
+	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) throws IOException {
         if (sign == null) {
             throw new IllegalArgumentException("Los datos de firma introducidos son nulos"); //$NON-NLS-1$
         }
@@ -183,9 +184,10 @@ public final class AOOOXMLSigner implements AOSigner {
      * electr&oacute;nica.
      * @param sign Datos que deseamos comprobar.
      * @return Devuelve <code>true</code> si los datos indicados son un documento OOXML susceptible de contener una firma
-     * electr&oacute;nica, <code>false</code> en caso contrario. */
+     * electr&oacute;nica, <code>false</code> en caso contrario.
+     * @throws IOException Cuando hay errores en la lectura de la firma */
     @Override
-	public boolean isSign(final byte[] sign) {
+	public boolean isSign(final byte[] sign) throws IOException {
         if (sign == null) {
             LOGGER.warning("Se ha introducido una firma nula para su comprobacion"); //$NON-NLS-1$
             return false;
