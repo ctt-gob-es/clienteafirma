@@ -167,12 +167,12 @@ public class AOKeyStoreManager {
         }
 
         try {
-            this.ks.load(null, (pssCallBack != null) ? pssCallBack.getPassword() : null);
+            this.ks.load(null, pssCallBack != null ? pssCallBack.getPassword() : null);
         }
         catch (final IOException e) {
             if (e.getCause() instanceof UnrecoverableKeyException ||
                     e.getCause() instanceof BadPaddingException) {
-                throw new IOException("Contrasena invalida: " + e); //$NON-NLS-1$
+                throw new IOException("Contrasena invalida: " + e, e); //$NON-NLS-1$
             }
             throw new AOKeyStoreManagerException("No se ha podido obtener el almacen PKCS#11 solicitado", e); //$NON-NLS-1$
         }
@@ -215,12 +215,12 @@ public class AOKeyStoreManager {
         }
 
         try {
-            this.ks.load(store, (pssCallBack != null) ? pssCallBack.getPassword() : null);
+            this.ks.load(store, pssCallBack != null ? pssCallBack.getPassword() : null);
         }
         catch (final IOException e) {
             if (e.getCause() instanceof UnrecoverableKeyException ||
                     e.getCause() instanceof BadPaddingException) {
-                throw new IOException("Contrasena invalida: " + e); //$NON-NLS-1$
+                throw new IOException("Contrasena invalida: " + e, e); //$NON-NLS-1$
             }
             throw new AOKeyStoreManagerException("No se ha podido abrir el almacen PKCS#7 / X.509 solicitado", e); //$NON-NLS-1$
         }
@@ -262,12 +262,12 @@ public class AOKeyStoreManager {
 
         // TODO: Revisar si el KeyStore de Java requiere contrasena
         try {
-            this.ks.load(store, (pssCallBack != null) ? pssCallBack.getPassword() : null);
+            this.ks.load(store, pssCallBack != null ? pssCallBack.getPassword() : null);
         }
         catch (final IOException e) {
             if (e.getCause() instanceof UnrecoverableKeyException ||
                     e.getCause() instanceof BadPaddingException) {
-                throw new IOException("Contrasena invalida: " + e); //$NON-NLS-1$
+                throw new IOException("Contrasena invalida: " + e, e); //$NON-NLS-1$
             }
         }
         catch (final CertificateException e) {
@@ -504,7 +504,7 @@ public class AOKeyStoreManager {
         }
 
         if (this.ksType.equals(AOKeyStore.DNIEJAVA)) {
-        	return initDnieJava(pssCallBack, (params != null && params.length > 0) ? params[0] : null);
+        	return initDnieJava(pssCallBack, params != null && params.length > 0 ? params[0] : null);
         }
 
         else if (this.ksType.equals(AOKeyStore.JAVA) || this.ksType.equals(AOKeyStore.JAVACE) || this.ksType.equals(AOKeyStore.JCEKS)) {
@@ -532,7 +532,7 @@ public class AOKeyStoreManager {
         }
 
         else if (this.ksType.equals(AOKeyStore.DNIE)) {
-            return initPKCS11((pssCallBack != null) ? pssCallBack : new UIPasswordCallback(KeyStoreMessages.getString("AOKeyStoreManager.0"), null), new String[] { KeyStoreUtilities.getPKCS11DNIeLib(), "DNIe-Afirma" });  //$NON-NLS-1$//$NON-NLS-2$
+            return initPKCS11(pssCallBack != null ? pssCallBack : new UIPasswordCallback(KeyStoreMessages.getString("AOKeyStoreManager.0"), null), new String[] { KeyStoreUtilities.getPKCS11DNIeLib(), "DNIe-Afirma" });  //$NON-NLS-1$//$NON-NLS-2$
         }
 
         throw new UnsupportedOperationException("Tipo de almacen no soportado"); //$NON-NLS-1$
@@ -561,7 +561,7 @@ public class AOKeyStoreManager {
         if (this.ks == null) {
             throw new IllegalStateException("Se han pedido claves a un almacen no inicializado"); //$NON-NLS-1$
         }
-        return (KeyStore.PrivateKeyEntry) this.ks.getEntry(alias, (pssCallback != null) ? new KeyStore.PasswordProtection(pssCallback.getPassword()) : null);
+        return (KeyStore.PrivateKeyEntry) this.ks.getEntry(alias, pssCallback != null ? new KeyStore.PasswordProtection(pssCallback.getPassword()) : null);
     }
 
     /** Obtiene el certificado correspondiente a una clave privada.
