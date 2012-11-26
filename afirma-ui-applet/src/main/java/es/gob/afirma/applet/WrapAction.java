@@ -16,7 +16,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivilegedExceptionAction;
 import java.security.cert.CertificateEncodingException;
 
-import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOSignConstants;
 
@@ -56,46 +55,23 @@ final class WrapAction implements PrivilegedExceptionAction<byte[]> {
                                AOException,
                                CertificateEncodingException,
                                KeyException {
-    	try {
-    		if (this.enveloperManager.getCmsContentType().equals(AOSignConstants.CMS_CONTENTTYPE_ENCRYPTEDDATA)) {
-    			if (this.data == null) {
-    				this.enveloperManager.encrypt();
-    			}
-    			else {
-    				this.enveloperManager.encrypt(this.data);
-    			}
-    		}
-    		else {
-    			if (this.data == null) {
-    				this.enveloperManager.envelop();
-    			}
-    			else {
-    				this.enveloperManager.envelop(this.data);
-    			}
-    		}
-    		return this.enveloperManager.getEnvelopedData();
-    	}
-    	catch (final AOCancelledOperationException e) {
-    		throw e;
-    	}
-    	catch (final IllegalArgumentException e) {
-    		throw new IllegalArgumentException("Modo de clave no soportado", e); //$NON-NLS-1$
-    	}
-    	catch (final NullPointerException e) {
-    		throw new IllegalArgumentException("No se ha indicado el tipo de envoltorio o los destinatarios del mismo", e); //$NON-NLS-1$
-    	}
-    	catch (final NoSuchAlgorithmException e) {
-    		throw new NoSuchAlgorithmException("Algoritmo de ensobrado no soportado", e); //$NON-NLS-1$
-    	}
-    	catch (final IOException e) {
-    		throw new IOException("No se han podido leer los datos a ensobrar"); //$NON-NLS-1$
-    	}
-    	catch (final CertificateEncodingException e) {
-    		throw new CertificateEncodingException("El certificado del remitente no es valido", e); //$NON-NLS-1$
-    	}
-    	catch (final KeyException e) {
-    		throw new KeyException("La clave de envoltura generada no es valida", e); //$NON-NLS-1$
-    	}
+		if (this.enveloperManager.getCmsContentType().equals(AOSignConstants.CMS_CONTENTTYPE_ENCRYPTEDDATA)) {
+			if (this.data == null) {
+				this.enveloperManager.encrypt();
+			}
+			else {
+				this.enveloperManager.encrypt(this.data);
+			}
+		}
+		else {
+			if (this.data == null) {
+				this.enveloperManager.envelop();
+			}
+			else {
+				this.enveloperManager.envelop(this.data);
+			}
+		}
+		return this.enveloperManager.getEnvelopedData();
     }
 
 }

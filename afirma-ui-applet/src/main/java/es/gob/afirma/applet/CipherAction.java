@@ -15,7 +15,6 @@ import java.security.KeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivilegedExceptionAction;
 
-import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 
 /** Acci&oacute;n privilegiada para el cifrado de datos. */
@@ -55,9 +54,6 @@ final class CipherAction implements PrivilegedExceptionAction<Void> {
                 this.cipherManager.cipherData(this.data);
             }
         }
-        catch (final AOCancelledOperationException e) {
-            throw e;
-        }
         catch (final IllegalArgumentException e) {
             throw new IllegalArgumentException("Modo de clave no soportado", e); //$NON-NLS-1$
         }
@@ -66,9 +62,6 @@ final class CipherAction implements PrivilegedExceptionAction<Void> {
         }
         catch (final KeyException e) {
             throw new KeyException("Clave de cifrado no valida", e); //$NON-NLS-1$
-        }
-        catch (final IOException e) {
-            throw new IOException("No se han podido leer los datos a cifrar"); //$NON-NLS-1$
         }
         catch (final AOException e) {
            throw e;

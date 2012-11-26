@@ -14,10 +14,7 @@ import java.io.IOException;
 import java.security.PrivilegedExceptionAction;
 import java.security.cert.CertificateEncodingException;
 
-import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.AOInvalidFormatException;
-import es.gob.afirma.envelopers.cms.AOInvalidRecipientException;
 
 /** Acci&oacute;n privilegiada para el desensobrado de datos. La ejecuci&oacute;n
  * de la acci&oacute;n devuelve {@code true} o {@code false} y el resultado
@@ -51,32 +48,8 @@ final class UnwrapAction implements PrivilegedExceptionAction<byte[]> {
     /** {@inheritDoc} */
     @Override
 	public byte[] run() throws IOException, AOException, CertificateEncodingException {
-
-        try {
-            this.enveloperManager.unwrap(this.envelop);
-        }
-        catch (final AOCancelledOperationException e) {
-            throw e;
-        }
-        catch (final AOInvalidRecipientException e) {
-            throw e;
-        }
-        catch (final AOInvalidFormatException e) {
-            throw new AOInvalidFormatException("No se ha proporcionado un envoltorio soportado", e); //$NON-NLS-1$
-        }
-        catch (final IllegalArgumentException e) {
-            throw new IllegalArgumentException("Modo de clave no soportado", e); //$NON-NLS-1$
-        }
-        catch (final IOException e) {
-            throw new IOException("El envoltorio esta corrupto o no ha podido leerse"); //$NON-NLS-1$
-        }
-        catch (final AOException e) {
-            throw e;
-        }
-        catch (final CertificateEncodingException e) {
-            throw new CertificateEncodingException("El certificado del destinatario no es valido", e); //$NON-NLS-1$
-        }
-       return this.enveloperManager.getContentData();
+        this.enveloperManager.unwrap(this.envelop);
+        return this.enveloperManager.getContentData();
     }
 
 }

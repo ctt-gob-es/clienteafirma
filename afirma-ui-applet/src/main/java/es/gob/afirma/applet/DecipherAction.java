@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.security.KeyException;
 import java.security.PrivilegedExceptionAction;
 
-import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 
 /** Acci&oacute;n privilegiada para el descifrado de datos. */
@@ -47,26 +46,11 @@ final class DecipherAction implements PrivilegedExceptionAction<Void> {
     /** {@inheritDoc} */
     @Override
 	public Void run() throws IOException, KeyException, AOException {
-
-        try {
-            if (this.data == null) {
-                this.cipherManager.decipherData();
-            }
-            else {
-                this.cipherManager.decipherData(this.data);
-            }
+        if (this.data == null) {
+            this.cipherManager.decipherData();
         }
-        catch (final AOCancelledOperationException e) {
-            throw e;
-        }
-        catch (final IOException e) {
-        	throw new IOException("No se han podido leer los datos a descifrar"); //$NON-NLS-1$
-        }
-        catch (final KeyException e) {
-            throw new KeyException("Se ha proporcionado una clave incorrecta", e); //$NON-NLS-1$
-        }
-        catch (final AOException e) {
-            throw e;
+        else {
+            this.cipherManager.decipherData(this.data);
         }
         return null;
     }

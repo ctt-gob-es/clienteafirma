@@ -1062,7 +1062,7 @@ final class CounterSigner {
             sign2 = firma(signatureAlgorithm, keyEntry);
         }
         catch (final Exception ex) {
-            throw new IOException("Error realizando la firma: " + ex); //$NON-NLS-1$
+            throw new IOException("Error realizando la firma: " + ex, ex); //$NON-NLS-1$
         }
 
         return new SignerInfo(identifier, digAlgId, signedAttr, encAlgId, sign2, unsignedAttr);

@@ -81,6 +81,7 @@ public final class MimeHelper {
             LOGGER.warning("No se encontro la biblioteca JMimeMagic para la deteccion del tipo de dato"); //$NON-NLS-1$
         }
         catch (final Exception e) {
+        	e.printStackTrace();
             try {
                 final Class<?> magicMatchNotFoundException = AOUtil.classForName("net.sf.jmimemagic.MagicMatchNotFoundException"); //$NON-NLS-1$
                 if (e.getCause() != null && magicMatchNotFoundException.isInstance(e.getCause())) {

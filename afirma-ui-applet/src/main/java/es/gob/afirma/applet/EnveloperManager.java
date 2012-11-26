@@ -465,7 +465,7 @@ final class EnveloperManager {
                 this.fileUri = AOUtil.createURI(AOUIFactory.getLoadFileName(null, null, this.parent));
             }
             catch (final Exception e) {
-                throw new IOException("Se ha proporcionado un nombre de fichero no valido '" + this.fileUri + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+                throw new IOException("Se ha proporcionado un nombre de fichero no valido '" + this.fileUri + "': " + e, e); //$NON-NLS-1$ //$NON-NLS-2$
             }
         }
 

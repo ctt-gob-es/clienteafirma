@@ -76,7 +76,7 @@ final class CAdESDigestedData {
             digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
         }
         catch (final Exception e) {
-            throw new IOException((new StringBuilder()).append("Error de codificacion: ").append(e).toString()); //$NON-NLS-1$
+            throw new IOException(new StringBuilder().append("Error de codificacion: ").append(e).toString(), e); //$NON-NLS-1$
         }
 
         // indicamos el tipo de contenido
@@ -86,7 +86,7 @@ final class CAdESDigestedData {
         final DEROctetString digest = new DEROctetString(MessageDigest.getInstance(digestAlgorithm).digest(parameters.getContent()));
 
         // construimos el digestedData.
-        return (new ContentInfo(PKCSObjectIdentifiers.digestedData, new DigestedData(digAlgId, encInfo, digest))).getEncoded(ASN1Encoding.DER);
+        return new ContentInfo(PKCSObjectIdentifiers.digestedData, new DigestedData(digAlgId, encInfo, digest)).getEncoded(ASN1Encoding.DER);
     }
 
 }

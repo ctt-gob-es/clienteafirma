@@ -171,7 +171,7 @@ final class GenSignedData {
                 msg.write(bOut);
             }
             catch (final Exception ex) {
-                throw new IOException("Error en la escritura del procesable CMS: " + ex); //$NON-NLS-1$
+                throw new IOException("Error en la escritura del procesable CMS: " + ex, ex); //$NON-NLS-1$
             }
             encInfo = new ContentInfo(contentTypeOID, new BEROctetString(bOut.toByteArray()));
         }
@@ -227,7 +227,7 @@ final class GenSignedData {
             encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID("RSA")); //$NON-NLS-1$
         }
         catch (final Exception e) {
-            throw new IOException("Error de codificacion: " + e); //$NON-NLS-1$
+            throw new IOException("Error de codificacion: " + e, e); //$NON-NLS-1$
         }
 
         final ASN1OctetString sign2 = firma(signatureAlgorithm, keyEntry);

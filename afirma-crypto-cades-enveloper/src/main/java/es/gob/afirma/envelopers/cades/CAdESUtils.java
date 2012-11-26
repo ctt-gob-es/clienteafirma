@@ -687,7 +687,7 @@ final class CAdESUtils {
             sign2 = firma(signatureAlgorithm, keyEntry, signedAttr2);
         }
         catch (final AOException ex) {
-            throw new IOException("Error durante la firma: " + ex); //$NON-NLS-1$
+            throw new IOException("Error durante la firma: " + ex, ex); //$NON-NLS-1$
         }
 
         // EN ESTE PUNTO YA TENEMOS EL NUEVO SIGNER

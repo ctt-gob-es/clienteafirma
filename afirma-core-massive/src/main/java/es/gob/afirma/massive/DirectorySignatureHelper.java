@@ -1076,7 +1076,7 @@ public class DirectorySignatureHelper {
         	isValidDataFile = signer.isValidDataFile(AOUtil.getDataFromInputStream(is));
         }
         catch(final OutOfMemoryError e) {
-        	throw new IOException("El fichero es demasiado grande: " + e); //$NON-NLS-1$
+        	throw new IOException("El fichero es demasiado grande: " + e, e); //$NON-NLS-1$
         }
         finally {
         	is.close();

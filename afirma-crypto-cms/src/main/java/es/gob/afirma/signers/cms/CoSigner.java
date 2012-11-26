@@ -145,7 +145,7 @@ final class CoSigner {
                 msg.write(bOut);
             }
             catch (final Exception ex) {
-                throw new IOException("Error en la escritura del procesable CMS: " + ex); //$NON-NLS-1$
+                throw new IOException("Error en la escritura del procesable CMS: " + ex, ex); //$NON-NLS-1$
             }
             encInfo = new ContentInfo(contentTypeOID, new BEROctetString(bOut.toByteArray()));
         }
@@ -235,7 +235,7 @@ final class CoSigner {
             sign2 = firma(signatureAlgorithm, keyEntry);
         }
         catch (final Exception ex) {
-            throw new IOException("Error al generar la firma: " + ex); //$NON-NLS-1$
+            throw new IOException("Error al generar la firma: " + ex, ex); //$NON-NLS-1$
         }
 
         // Creamos los signerInfos del SignedData
@@ -427,7 +427,7 @@ final class CoSigner {
             sign2 = firma(signatureAlgorithm, keyEntry);
         }
         catch (final Exception ex) {
-            throw new IOException("Error al generar la firma: " + ex); //$NON-NLS-1$
+            throw new IOException("Error al generar la firma: " + ex, ex); //$NON-NLS-1$
         }
 
         // Creamos los signerInfos del SignedData

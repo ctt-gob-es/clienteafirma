@@ -1064,7 +1064,7 @@ final class CounterSignerEnveloped {
             sign2 = firma(signatureAlgorithm, keyEntry);
         }
         catch (final AOException ex) {
-            throw new IOException("Error en la firma electronica: " + ex); //$NON-NLS-1$
+            throw new IOException("Error en la firma electronica: " + ex, ex); //$NON-NLS-1$
         }
 
         return new SignerInfo(identifier, digAlgId, signedAttr, encAlgId, sign2, unsignedAttr);

@@ -197,7 +197,7 @@ final class CoSignerEnveloped {
             sign2 = firma(signatureAlgorithm, keyEntry);
         }
         catch (final Exception ex) {
-            throw new IOException("Error al generar la firma: " + ex); //$NON-NLS-1$
+            throw new IOException("Error al generar la firma: " + ex, ex); //$NON-NLS-1$
         }
 
         // Creamos los signerInfos del signedAndEnvelopedData
@@ -384,7 +384,7 @@ final class CoSignerEnveloped {
             sign2 = firma(signatureAlgorithm, keyEntry);
         }
         catch (final Exception ex) {
-            throw new IOException("Error al generar la firma: " + ex); //$NON-NLS-1$
+            throw new IOException("Error al generar la firma: " + ex, ex); //$NON-NLS-1$
         }
 
         // Creamos los signerInfos del signedAndEnvelopedData

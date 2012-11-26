@@ -351,7 +351,7 @@ final class CipherManager {
                     this.fileUri = AOUtil.createURI(fileName);
                 }
                 catch (final Exception e) {
-                    throw new IOException("Se ha proporcionado un nombre de fichero no valido: " + e); //$NON-NLS-1$
+                    throw new IOException("Se ha proporcionado un nombre de fichero no valido: " + e, e); //$NON-NLS-1$
                 }
             }
 
@@ -542,7 +542,7 @@ final class CipherManager {
                     this.fileUri = AOUtil.createURI(fileName);
                 }
                 catch (final Exception e) {
-                    throw new IOException("Se ha proporcionado un nombre de fichero no valido: " + e); //$NON-NLS-1$
+                    throw new IOException("Se ha proporcionado un nombre de fichero no valido: " + e, e); //$NON-NLS-1$
                 }
             }
 

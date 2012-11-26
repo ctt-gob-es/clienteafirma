@@ -183,7 +183,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
             msg.write(bOut);
         }
         catch (final Exception ex) {
-            throw new IOException("Error en la escritura del procesable CMS: " + ex); //$NON-NLS-1$
+            throw new IOException("Error en la escritura del procesable CMS: " + ex, ex); //$NON-NLS-1$
         }
         encInfo = new ContentInfo(contentTypeOID, new BEROctetString(bOut.toByteArray()));
 

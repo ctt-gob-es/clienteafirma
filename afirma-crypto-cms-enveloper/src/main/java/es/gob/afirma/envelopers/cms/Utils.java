@@ -511,7 +511,7 @@ final class Utils {
             return mac.doFinal(content);
         }
         catch (final Exception e) {
-            throw new IOException("Error al generar el codigo de autenticacion Mac: " + e); //$NON-NLS-1$
+            throw new IOException("Error al generar el codigo de autenticacion Mac: " + e, e); //$NON-NLS-1$
         }
     }
 

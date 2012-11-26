@@ -158,7 +158,7 @@ final class CAdESEPESSignedAndEnvelopedData {
             digestAlgs.add(digAlgId);
         }
         catch (final Exception e) {
-            throw new IOException("Error de codificacion: " + e); //$NON-NLS-1$
+            throw new IOException("Error de codificacion: " + e, e); //$NON-NLS-1$
         }
 
         // LISTA DE CERTIFICADOS: obtenemos la lista de certificados
@@ -199,7 +199,7 @@ final class CAdESEPESSignedAndEnvelopedData {
             encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID("RSA")); //$NON-NLS-1$
         }
         catch (final Exception e) {
-            throw new IOException("Error de codificacion: " + e); //$NON-NLS-1$
+            throw new IOException("Error de codificacion: " + e, e); //$NON-NLS-1$
         }
 
         final ASN1OctetString sign2;
@@ -207,7 +207,7 @@ final class CAdESEPESSignedAndEnvelopedData {
             sign2 = firma(signatureAlgorithm, keyEntry);
         }
         catch (final AOException ex) {
-            throw new IOException("Error en la firma electronica: " + ex); //$NON-NLS-1$
+            throw new IOException("Error en la firma electronica: " + ex, ex); //$NON-NLS-1$
         }
 
         signerInfos.add(new SignerInfo(identifier, digAlgId, signedAttr, encAlgId, sign2, null // unsignedAttr
