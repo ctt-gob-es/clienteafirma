@@ -70,7 +70,7 @@ public final class Pkcs12KeyStoreManager extends AOKeyStoreManager {
             throw new AOKeyStoreManagerException("No se ha podido obtener el almacen PKCS#12 / PFX", e); //$NON-NLS-1$
         }
 
-        this.cachePasswordCallback = (pssCallBack != null) ? new CachePasswordCallback(pssCallBack.getPassword()) : new NullPasswordCallback();
+        this.cachePasswordCallback = pssCallBack != null ? new CachePasswordCallback(pssCallBack.getPassword()) : new NullPasswordCallback();
         try {
             this.getKeyStore().load(store, this.cachePasswordCallback.getPassword());
         }
@@ -78,7 +78,7 @@ public final class Pkcs12KeyStoreManager extends AOKeyStoreManager {
             if (e.getCause() instanceof UnrecoverableKeyException ||
                 e.getCause() instanceof BadPaddingException ||
                 e.getCause() instanceof ArithmeticException) { // Caso probable de contrasena nula
-                	throw new IOException("Contrasena invalida: " + e); //$NON-NLS-1$
+                	throw new IOException("Contrasena invalida: " + e, e); //$NON-NLS-1$
             }
         }
         catch (final CertificateException e) {
@@ -138,7 +138,7 @@ public final class Pkcs12KeyStoreManager extends AOKeyStoreManager {
         	// Se ignora
         }
         // Fnalmente pedimos la contrasena
-        return (KeyStore.PrivateKeyEntry) this.getKeyStore().getEntry(alias, (pssCallback != null) ? new KeyStore.PasswordProtection(pssCallback.getPassword()) : null);
+        return (KeyStore.PrivateKeyEntry) this.getKeyStore().getEntry(alias, pssCallback != null ? new KeyStore.PasswordProtection(pssCallback.getPassword()) : null);
     }
 
 }
