@@ -164,7 +164,7 @@ public final class OfficeAnalizer {
      * @param zipData
      *        Fichero ODF u OOXML
      * @return Extensi&oacute;n.
-     * @throws IOException */
+     * @throws IOException Cuando ocurre alg&uacute;n error en la lectura de los datos. */
     static String getExtension(final byte[] zipData) throws IOException {
         final String mimetype = getMimeType(zipData);
         if (mimetype == null) {

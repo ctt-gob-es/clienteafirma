@@ -356,8 +356,6 @@ public final class Base64 {
      * @param source The data to convert
      * @param options Specified options
      * @return The Base64-encoded data as a String
-     * @see SimpleBase64#GZIP
-     * @throws java.io.IOException if there is an error
      * @since 2.0
      */
     public static String encodeBytes(final byte[] source, final int options) {
