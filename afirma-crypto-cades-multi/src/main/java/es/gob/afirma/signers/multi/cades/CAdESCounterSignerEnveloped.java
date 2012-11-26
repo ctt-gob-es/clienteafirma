@@ -1002,7 +1002,7 @@ final class CAdESCounterSignerEnveloped {
             sign2 = firma(signatureAlgorithm, keyEntry);
         }
         catch (final AOException ex) {
-            throw new IOException("Error al realizar la firma electronica: " + ex); //$NON-NLS-1$
+            throw new IOException("Error al realizar la firma electronica: " + ex, ex); //$NON-NLS-1$
         }
 
         return  new SignerInfo(identifier, digAlgId, unsignedAttr, encAlgId, sign2, null);

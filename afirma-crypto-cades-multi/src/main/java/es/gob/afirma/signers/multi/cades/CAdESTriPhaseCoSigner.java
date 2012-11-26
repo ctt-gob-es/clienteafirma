@@ -241,7 +241,7 @@ public final class CAdESTriPhaseCoSigner {
                 msg.write(bOut);
             }
             catch (final CMSException ex) {
-                throw new IOException("Error en la escritura del procesable CMS: " + ex); //$NON-NLS-1$
+                throw new IOException("Error en la escritura del procesable CMS: " + ex, ex); //$NON-NLS-1$
             }
             return new ContentInfo(contentTypeOID, new BEROctetString(bOut.toByteArray()));
         }

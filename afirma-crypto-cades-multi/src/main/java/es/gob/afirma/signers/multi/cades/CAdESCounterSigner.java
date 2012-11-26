@@ -1160,7 +1160,7 @@ final class CAdESCounterSigner {
     		);
         }
         catch (final AOException ex) {
-            throw new IOException("Error al realizar la firma: " + ex); //$NON-NLS-1$
+            throw new IOException("Error al realizar la firma: " + ex, ex); //$NON-NLS-1$
         }
 
         // AlgorithmIdentifier
