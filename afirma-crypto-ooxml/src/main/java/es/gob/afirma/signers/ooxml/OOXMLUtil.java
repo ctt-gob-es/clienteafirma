@@ -117,8 +117,6 @@ final class OOXMLUtil {
         }
 
         // Comprobamos si existe la relacion de firmas del documento
-        // ZipEntry relsEntry = zipFile.getEntry("_xmlsignatures/_rels/origin.sigs.rels");
-        // if (relsEntry == null) relsEntry = zipFile.getEntry("_xmlsignatures\\_rels\\origin.sigs.rels");
         final ZipEntry relsEntry = getSignaturesRelsEntry(zipFile);
 
         // Si no existe el fichero, el documento no contiene firmas
@@ -194,9 +192,6 @@ final class OOXMLUtil {
 
         ZipEntry signsEntry = null;
         for (final RelationShip rel : parser.getRelationships()) {
-            //String c = OOXML_SIGNATURE_ORIGIN_RELATIONSHIP_TYPE;
-            //String r = rel.getType();
-
             if (OOXML_SIGNATURE_ORIGIN_RELATIONSHIP_TYPE.equals(rel.getType())) {
                 final String middleTarget = rel.getTarget().substring(0, "_xmlsignatures".length() + 1); //$NON-NLS-1$
                 final String target = rel.getTarget().substring("_xmlsignatures".length() + 1); //$NON-NLS-1$
