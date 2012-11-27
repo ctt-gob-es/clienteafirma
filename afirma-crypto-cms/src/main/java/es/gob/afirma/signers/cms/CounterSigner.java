@@ -109,9 +109,7 @@ final class CounterSigner {
      * @throws AOException
      *         Cuando ocurre cualquier error no contemplado por el resto de
      *         las excepciones declaradas
-     * @throws es.gob.afirma.exceptions.AOException
-     *         Cuando ocurre un error durante el proceso de contrafirma
-     *         (formato o clave incorrecto,...) */
+     */
     byte[] counterSigner(final P7ContentSignerParameters parameters,
                                 final byte[] data,
                                 final CounterSignTarget targetType,
