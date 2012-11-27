@@ -296,8 +296,8 @@ final class GenSignedData {
             while (it.hasNext()) {
                 final Map.Entry<String, byte[]> e = it.next();
                 contexExpecific.add(new Attribute(
-                  new ASN1ObjectIdentifier(e.getKey().toString()), // el oid
-                  new DERSet(DERPrintableString.getInstance(e.getValue())) // el array de bytes en formato string
+                  new ASN1ObjectIdentifier(e.getKey()), // el oid
+                  new DERSet(new DERPrintableString(new String(e.getValue()))) // el array de bytes en formato string
                 ));
             }
 
