@@ -34,9 +34,9 @@ final class PdfDocumentSecurityStore {
 
     private static final String DEFAULT_DIGEST_ALGORITHM = "SHA1"; //$NON-NLS-1$
 
-    public static class ValidationInformation {
+    static class ValidationInformation {
 
-        public static String getKey(final byte digest[]) {
+        static String getKey(final byte digest[]) {
             final StringBuilder buf = new StringBuilder();
             for (final byte element : digest) {
                 final int b = element & 0xff;
@@ -48,27 +48,27 @@ final class PdfDocumentSecurityStore {
             return buf.toString();
         }
 
-        public String getKey() {
+        String getKey() {
             return getKey(this.digest);
         }
 
-        public byte[] getDigest() {
+        byte[] getDigest() {
             return this.digest;
         }
 
-        public int[] getOcspId() {
-            return this.ocspId;
+        int[] getOcspId() {
+            return this.ocspId.clone();
         }
 
-        public int[] getCrlId() {
-            return this.crlId;
+        int[] getCrlId() {
+            return this.crlId.clone();
         }
 
-        public int[] getCertId() {
-            return this.certId;
+        int[] getCertId() {
+            return this.certId.clone();
         }
 
-        public Calendar getDate() {
+        Calendar getDate() {
             return this.date;
         }
 
@@ -78,7 +78,7 @@ final class PdfDocumentSecurityStore {
         private final int certId[];
         private final Calendar date;
 
-        public ValidationInformation(final byte val[], final int certId[], final int ocspId[], final int crlId[], final Calendar date) {
+        ValidationInformation(final byte val[], final int certId[], final int ocspId[], final int crlId[], final Calendar date) {
         	byte[] digestBytes = null;
         	try {
         		digestBytes = MessageDigest.getInstance(DEFAULT_DIGEST_ALGORITHM).digest(val);
@@ -87,17 +87,17 @@ final class PdfDocumentSecurityStore {
         		Logger.getLogger("es.gob.afirma").severe("No se ha posido calcular la huella digital: " + e);  //$NON-NLS-1$//$NON-NLS-2$
         	}
         	this.digest = digestBytes;
-            this.ocspId = ocspId;
-            this.crlId = crlId;
-            this.certId = certId;
+            this.ocspId = ocspId.clone();
+            this.crlId = crlId.clone();
+            this.certId = certId.clone();
             this.date = date;
         }
 
-        public ValidationInformation(final PdfName key, final int certId[], final int ocspId[], final int crlId[], final Calendar date) {
+        ValidationInformation(final PdfName key, final int certId[], final int ocspId[], final int crlId[], final Calendar date) {
             this.digest = key.getBytes();
-            this.ocspId = ocspId;
-            this.crlId = crlId;
-            this.certId = certId;
+            this.ocspId = ocspId.clone();
+            this.crlId = crlId.clone();
+            this.certId = certId.clone();
             this.date = date;
         }
     }
@@ -115,9 +115,9 @@ final class PdfDocumentSecurityStore {
     private static final String PDF_NAME_OCSP = "OCSP"; //$NON-NLS-1$
     private static final String PDF_NAME_CRL = "CRL"; //$NON-NLS-1$
 
-    public PdfDocumentSecurityStore() {}
+    PdfDocumentSecurityStore() {}
 
-    public PdfDocumentSecurityStore(final PdfDictionary dss) throws IOException {
+    PdfDocumentSecurityStore(final PdfDictionary dss) throws IOException {
         int i = 0;
         PdfArray arrayCerts = dss.getAsArray(new PdfName(PDF_NAME_CERTS));
         if(arrayCerts != null) {
@@ -242,48 +242,48 @@ final class PdfDocumentSecurityStore {
         }
     }
 
-    public Map<String, ValidationInformation> getSignatures() {
+    Map<String, ValidationInformation> getSignatures() {
         return this.signatures;
     }
 
-    public Map<Integer, byte[]> getCertificates() {
+    Map<Integer, byte[]> getCertificates() {
         return this.certificates;
     }
 
-    public Map<Integer, byte[]> getOcsps() {
+    Map<Integer, byte[]> getOcsps() {
         return this.ocsps;
     }
 
-    public Map<Integer, byte[]> getCrls() {
+    Map<Integer, byte[]> getCrls() {
         return this.crls;
     }
 
-    public void registerSignature(final byte pkcs7[], final int certId[], final int ocspId[], final int crlId[], final Calendar date) {
+    void registerSignature(final byte pkcs7[], final int certId[], final int ocspId[], final int crlId[], final Calendar date) {
         final ValidationInformation val = new ValidationInformation(pkcs7, certId, ocspId, crlId, date);
         this.signatures.put(val.getKey(), val);
     }
 
-    public void registerSignature(final byte pkcs7[], final int certId[], final int ocspId[], final int crlId[]) {
+    void registerSignature(final byte pkcs7[], final int certId[], final int ocspId[], final int crlId[]) {
         registerSignature(pkcs7, certId, ocspId, crlId, new GregorianCalendar());
     }
 
-    public void registerSignature(final byte pkcs7[]) {
+    void registerSignature(final byte pkcs7[]) {
         registerSignature(pkcs7, null, null, null, new GregorianCalendar());
     }
 
-    public synchronized int registerCertificate(final byte cert[]) {
+    synchronized int registerCertificate(final byte cert[]) {
         final int nextId = this.certificates.size() + 1;
         this.certificates.put(new Integer(nextId), cert);
         return nextId;
     }
 
-    public synchronized int registerOcspResp(final byte ocsp[]) {
+    synchronized int registerOcspResp(final byte ocsp[]) {
         final int nextId = this.ocsps.size() + 1;
         this.ocsps.put(new Integer(nextId), ocsp);
         return nextId;
     }
 
-    public synchronized int registerOcspBasicResp(final byte basicResp[]) throws IOException {
+    synchronized int registerOcspBasicResp(final byte basicResp[]) throws IOException {
         final DEROctetString doctet = new DEROctetString(basicResp);
         final ASN1EncodableVector v2 = new ASN1EncodableVector();
         v2.add(OCSPObjectIdentifiers.id_pkix_ocsp_basic);
@@ -297,13 +297,13 @@ final class PdfDocumentSecurityStore {
         return ocspId;
     }
 
-    public synchronized int registerCrl(final byte crl[]) {
+    synchronized int registerCrl(final byte crl[]) {
         final int nextId = this.crls.size() + 1;
         this.crls.put(new Integer(nextId), crl);
         return nextId;
     }
 
-    public ValidationInformation getValidationInformation(final byte pkcs7[]) throws NoSuchAlgorithmException {
+    ValidationInformation getValidationInformation(final byte pkcs7[]) throws NoSuchAlgorithmException {
         final MessageDigest dg = MessageDigest.getInstance(DEFAULT_DIGEST_ALGORITHM);
         return this.signatures.get(ValidationInformation.getKey(dg.digest(pkcs7)));
     }
@@ -318,8 +318,7 @@ final class PdfDocumentSecurityStore {
                 final ByteArrayOutputStream allBytes = new ByteArrayOutputStream();
                 final ListIterator<PdfObject> iter = ((PdfArray) contentObject).listIterator();
                 while (iter.hasNext()) {
-                    final PdfObject element = iter.next();
-                    allBytes.write(getContentBytesFromContentObject(element));
+                    allBytes.write(getContentBytesFromContentObject(iter.next()));
                     allBytes.write((byte)' ');
                 }
                 return allBytes.toByteArray();
