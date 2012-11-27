@@ -85,7 +85,8 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 					   final String format,
 					   final String extraParams) throws AOFormatFileException,
 			                                            PrivilegedActionException,
-			                                            IOException {
+			                                            IOException,
+			                                            Exception {
 		this.clearError();
 
 		if (dataB64 == null) {
@@ -121,6 +122,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			setError(e);
 			throw e;
 		}
+		catch (final Throwable e) {
+			setError(e);
+			throw new Exception(e);
+		}
 	}
 
 	/** {@inheritDoc} */
@@ -131,7 +136,8 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			             final String format,
 			             final String extraParams) throws AOFormatFileException,
 			             							      PrivilegedActionException,
-			             							      IOException {
+			             							      IOException,
+				                                          Exception {
 		this.clearError();
 
 		if (signB64 == null) {
@@ -168,7 +174,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			setError(e);
 			throw e;
 		}
-
+		catch (final Throwable e) {
+			setError(e);
+			throw new Exception(e);
+		}
 	}
 
 	/** {@inheritDoc} */
@@ -178,7 +187,8 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			                  final String format,
 			                  final String extraParams) throws AOFormatFileException,
 			                  								   PrivilegedActionException,
-			                  								   IOException {
+			                  								   IOException,
+					                                           Exception {
 		this.clearError();
 
 		if (signB64 == null) {
@@ -212,6 +222,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		catch (final RuntimeException e) {
 			setError(e);
 			throw e;
+		}
+		catch (final Throwable e) {
+			setError(e);
+			throw new Exception(e);
 		}
 	}
 
@@ -489,7 +503,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 	/** Establece el error en base a la excepci&oacute;n recibida.
 	 * @param e Excepci&oacute;n que produjo el error. */
-	private void setError(final Exception e) {
+	private void setError(final Throwable e) {
 		Throwable ex = e;
 		if (e instanceof PrivilegedActionException && e.getCause() != null) {
 			ex = e.getCause();
