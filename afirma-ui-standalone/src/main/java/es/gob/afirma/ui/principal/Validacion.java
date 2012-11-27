@@ -54,16 +54,28 @@ final class Validacion extends JPanel {
     private static final long serialVersionUID = 1L;
 
     /** Etiqueta del campo con la ruta del fichero de datos firmado. */
-    JLabel browseDataLabel = null;
+    private final JLabel browseDataLabel = new JLabel();
+    JLabel getBrowseDataLabel() {
+    	return this.browseDataLabel;
+    }
 
     /** Campo de texto con el fichero de datos firmado. */
-    JTextField dataFileField = null;
+    private final JTextField dataFileField = new JTextField();
+    JTextField getDataFileField() {
+    	return this.dataFileField;
+    }
 
     /** Bot&oacute;n para la b&uacute;squeda del fichero de datos firmado. */
-    JButton browseDataButton = null;
+    private final JButton browseDataButton = new JButton();
+    JButton getBrowseDataButton() {
+    	return this.browseDataButton;
+    }
 
     /** Bot&oacute;n para la validaci&oacute;n de la firma. */
-    JButton checkSignButton = null;
+    private final JButton checkSignButton = new JButton();
+    JButton getCheckSignButton() {
+    	return this.checkSignButton;
+    }
 
     /** Construye el panel y todos sus componentes visuales. */
     public Validacion() {
@@ -160,10 +172,10 @@ final class Validacion extends JPanel {
                 	try {
                 	checkSignFile(
                 			signFileField.getText(),
-                			Validacion.this.browseDataLabel,
-                			Validacion.this.dataFileField,
-                			Validacion.this.browseDataButton,
-                			Validacion.this.checkSignButton);
+                			Validacion.this.getBrowseDataLabel(),
+                			Validacion.this.getDataFileField(),
+                			Validacion.this.getBrowseDataButton(),
+                			Validacion.this.getCheckSignButton());
                 	} catch (final Exception e) {
                 		Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
                 				"Ocurrio un error al comprobar el fichero cargado: " + e); //$NON-NLS-1$
@@ -216,7 +228,6 @@ final class Validacion extends JPanel {
         c.gridy = 2;
 
         // Componentes para la seleccion del fichero de datos
-        this.browseDataLabel = new JLabel();
         this.browseDataLabel.setText(Messages.getString("Validacion.datos.buscar")); //$NON-NLS-1$
         this.browseDataLabel.getAccessibleContext().setAccessibleDescription(Messages.getString("Validacion.datos.buscar.description")); //$NON-NLS-1$
         Utils.setContrastColor(this.browseDataLabel);
@@ -230,7 +241,6 @@ final class Validacion extends JPanel {
         c.gridy = 3;
 
         // Campo donde se guarda el nombre del fichero de datos
-        this.dataFileField = new JTextField();
         this.dataFileField.setToolTipText(Messages.getString("Validacion.datos.buscar.caja.description")); //$NON-NLS-1$
         this.dataFileField.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(),
                                                                            Messages.getString("Validacion.datos.buscar.caja.description.status"))); //$NON-NLS-1$
@@ -262,7 +272,6 @@ final class Validacion extends JPanel {
 
         final JPanel panelExaminar2 = new JPanel(new GridLayout(1, 1));
         // Boton examinar
-        this.browseDataButton = new JButton();
         this.browseDataButton.setMnemonic(KeyEvent.VK_X);
         this.browseDataButton.setText(Messages.getString("PrincipalGUI.Examinar")); //$NON-NLS-1$
         this.browseDataButton.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description")); //$NON-NLS-1$
@@ -276,7 +285,7 @@ final class Validacion extends JPanel {
                 browseActionPerformed(
                 		Messages.getString("Validacion.chooser.title"), //$NON-NLS-1$
                 		null,
-                		Validacion.this.dataFileField);
+                		Validacion.this.getDataFileField());
 
                 chechDataFile();
             }
@@ -316,7 +325,6 @@ final class Validacion extends JPanel {
         final JPanel panelFirmar = new JPanel(new GridLayout(1, 1));
 
         // Boton Validar
-        this.checkSignButton = new JButton();
         this.checkSignButton.setMnemonic(KeyEvent.VK_V);
         this.checkSignButton.setText(Messages.getString("Validacion.btnValidar")); //$NON-NLS-1$
         this.checkSignButton.setToolTipText(Messages.getString("Validacion.btnValidar.description")); //$NON-NLS-1$
@@ -327,7 +335,7 @@ final class Validacion extends JPanel {
         this.checkSignButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent evt) {
-                validateActionPerformance(signFileField.getText(), Validacion.this.dataFileField.getText());
+                validateActionPerformance(signFileField.getText(), Validacion.this.getDataFileField().getText());
             }
         });
         this.checkSignButton.getAccessibleContext().setAccessibleDescription(Messages.getString("Validacion.btnValidar.description")); // NOI18N //$NON-NLS-1$
