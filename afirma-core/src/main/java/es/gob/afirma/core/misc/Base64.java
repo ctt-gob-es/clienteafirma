@@ -14,7 +14,7 @@ package es.gob.afirma.core.misc;
  * <p>The <tt>options</tt> parameter, which appears in a few places, is used to pass
  * several pieces of information to the encoder. In the "higher level" methods such as
  * encodeBytes( bytes, options ) the options parameter can be used to indicate such
- * things as first gzipping the bytes before encoding them, not inserting linefeeds,
+ * things as not inserting linefeeds,
  * and encoding using the URL-safe and Ordered dialects.</p>
  *
  * <p>Note, according to <a href="http://www.faqs.org/rfcs/rfc3548.html">RFC3548</a>,
@@ -64,12 +64,6 @@ public final class Base64 {
      public static final int URL_SAFE = 16;
 
 
-     /**
-      * Encode using the special "ordered" dialect of Base64 described here:
-      * <a href="http://www.faqs.org/qa/rfcc-1940.html">http://www.faqs.org/qa/rfcc-1940.html</a>.
-      */
-     public static final int ORDERED = 32;
-
 
 /* ********  P R I V A T E   F I E L D S  ******** */
 
@@ -81,14 +75,11 @@ public final class Base64 {
     /** The equals sign (=) as a byte. */
     private static final byte EQUALS_SIGN = (byte)'=';
 
-
     /** The new line character (\n) as a byte. */
     private static final byte NEW_LINE = (byte)'\n';
 
-
     /** Preferred encoding. */
     private static final String PREFERRED_ENCODING = "US-ASCII"; //$NON-NLS-1$
-
 
     private static final byte WHITE_SPACE_ENC = -5; // Indicates white space in encoding
     private static final byte EQUALS_SIGN_ENC = -1; // Indicates equals sign in encoding
@@ -110,7 +101,6 @@ public final class Base64 {
         (byte)'0', (byte)'1', (byte)'2', (byte)'3', (byte)'4', (byte)'5',
         (byte)'6', (byte)'7', (byte)'8', (byte)'9', (byte)'+', (byte)'/'
     };
-
 
     /**
      * Translates a Base64 value to either its 6-bit reconstruction value
@@ -212,22 +202,29 @@ public final class Base64 {
       -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9         // Decimal 244 - 255
     };
 
-
 /* ********  D E T E R M I N E   W H I C H   A L H A B E T  ******** */
 
-
-    /** Returns one of the _SOMETHING_ALPHABET byte arrays depending on
-     * the options specified. */
-    private static byte[] getAlphabet(final int options) {
+    /**
+     * Returns one of the _SOMETHING_ALPHABET byte arrays depending on
+     * the options specified.
+     * It's possible, though silly, to specify ORDERED <b>and</b> URLSAFE
+     * in which case one of them will be picked, though there is
+     * no guarantee as to which one will be picked.
+     */
+    private static byte[] getAlphabet(final int options ) {
         if ((options & URL_SAFE) == URL_SAFE) {
             return URL_SAFE_ALPHABET;
         }
         return STANDARD_ALPHABET;
     }	// end getAlphabet
 
-
-    /** Returns one of the _SOMETHING_DECODABET byte arrays depending on
-     * the options specified. */
+    /**
+     * Returns one of the _SOMETHING_DECODABET byte arrays depending on
+     * the options specified.
+     * It's possible, though silly, to specify ORDERED and URL_SAFE
+     * in which case one of them will be picked, though there is
+     * no guarantee as to which one will be picked.
+     */
     static byte[] getDecodabet(final int options) {
         if( (options & URL_SAFE) == URL_SAFE) {
             return URL_SAFE_DECODABET;
@@ -243,6 +240,25 @@ public final class Base64 {
 
 /* ********  E N C O D I N G   M E T H O D S  ******** */
 
+    /**
+     * Encodes up to the first three bytes of array <var>threeBytes</var>
+     * and returns a four-byte array in Base64 notation.
+     * The actual number of significant bytes in your array is
+     * given by <var>numSigBytes</var>.
+     * The array <var>threeBytes</var> needs only be as big as
+     * <var>numSigBytes</var>.
+     * Code can reuse a byte array by passing a four-byte array as <var>b4</var>.
+     *
+     * @param b4 A reusable byte array to reduce array instantiation
+     * @param threeBytes the array to convert
+     * @param numSigBytes the number of significant bytes in your array
+     * @return four byte array in Base64 notation.
+     * @since 1.5.1
+     */
+    static byte[] encode3to4(final byte[] b4, final byte[] threeBytes, final int numSigBytes, final int options) {
+        encode3to4( threeBytes, 0, numSigBytes, b4, 0, options );
+        return b4;
+    }   // end encode3to4
 
     /**
      * <p>Encodes up to three bytes of the array <var>source</var>
@@ -274,7 +290,7 @@ public final class Base64 {
     		                         final int destOffset,
     		                         final int options ) {
 
-    	final byte[] alphabet = getAlphabet( options );
+	final byte[] alphabet = getAlphabet( options );
 
         //           1         2         3
         // 01234567890123456789012345678901 Bit position
@@ -321,14 +337,24 @@ public final class Base64 {
 
     /**
      * Encodes a byte array into Base64 notation.
-     * Does not GZip-compress data.
      *
      * @param source The data to convert
      * @return The data in Base64-encoded form
      * @since 1.4
      */
-    public static String encode(final byte[] source) {
-        return encodeBytes(source, 0, source.length, NO_OPTIONS);
+    public static String encode( final byte[] source ) {
+        // Since we're not going to have the GZIP encoding turned on,
+        // we're not going to have an java.io.IOException thrown, so
+        // we should not force the user to have to catch it.
+        String encoded = null;
+        try {
+            encoded = encodeBytes(source, 0, source.length, NO_OPTIONS);
+        }
+        catch (final java.io.IOException ex) {
+            assert false : ex.getMessage();
+        }   // end catch
+        assert encoded != null;
+        return encoded;
     }   // end encodeBytes
 
 
@@ -336,64 +362,59 @@ public final class Base64 {
     /**
      * Encodes a byte array into Base64 notation.
      * <p>
-     * Example options:<pre>
-     *   GZIP: gzip-compresses object before encoding it.
-     *   DO_BREAK_LINES: break lines at 76 characters
-     *     <i>Note: Technically, this makes your encoding non-compliant.</i>
-     * </pre>
-     * <p>
      * Example: <code>encodeBytes( myData, Base64.GZIP )</code> or
      * <p>
      * Example: <code>encodeBytes( myData, Base64.GZIP | Base64.DO_BREAK_LINES )</code>
-     *
      *
      * <p>As of v 2.3, if there is an error with the GZIP stream,
      * the method will throw an java.io.IOException. <b>This is new to v2.3!</b>
      * In earlier versions, it just returned a null value, but
      * in retrospect that's a pretty poor way to handle it.</p>
      *
-     *
      * @param source The data to convert
      * @param options Specified options
      * @return The Base64-encoded data as a String
+     * @see Base64#GZIP
+     * @throws java.io.IOException if there is an error
      * @since 2.0
      */
-    public static String encodeBytes(final byte[] source, final int options) {
+    public static String encodeBytes( final byte[] source, final int options ) throws java.io.IOException {
         return encodeBytes( source, 0, source.length, options );
     }   // end encodeBytes
 
     /**
      * Encodes a byte array into Base64 notation.
      * <p>
-     * Example options:<pre>
-     *   GZIP: gzip-compresses object before encoding it.
-     *   DO_BREAK_LINES: break lines at 76 characters
-     *     <i>Note: Technically, this makes your encoding non-compliant.</i>
-     * </pre>
-     * <p>
      * Example: <code>encodeBytes( myData, Base64.GZIP )</code> or
      * <p>
      * Example: <code>encodeBytes( myData, Base64.GZIP | Base64.DO_BREAK_LINES )</code>
-     *
      *
      * <p>As of v 2.3, if there is an error with the GZIP stream,
      * the method will throw an java.io.IOException. <b>This is new to v2.3!</b>
      * In earlier versions, it just returned a null value, but
      * in retrospect that's a pretty poor way to handle it.</p>
      *
-     *
      * @param source The data to convert
      * @param off Offset in array where conversion should begin
      * @param len Length of data to convert
      * @param options Specified options
      * @return The Base64-encoded data as a String
-     * @see SimpleBase64#GZIP
+     * @see Base64#GZIP
      * @throws java.io.IOException if there is an error
      * @throws IllegalArgumentException if source array, offset, or length are invalid
      * @since 2.0
      */
-    private static String encodeBytes( final byte[] source, final int off, final int len, final int options ) {
-    	return new String(encodeBytesToBytes( source, off, len, options));
+    private static String encodeBytes( final byte[] source, final int off, final int len, final int options ) throws java.io.IOException {
+        final byte[] encoded = encodeBytesToBytes( source, off, len, options );
+
+        // Return value according to relevant encoding.
+        try {
+            return new String( encoded, PREFERRED_ENCODING );
+        }   // end try
+        catch (final java.io.UnsupportedEncodingException uue) {
+            return new String( encoded );
+        }   // end catch
+
     }   // end encodeBytes
 
     /**
@@ -407,12 +428,12 @@ public final class Base64 {
      * @param len Length of data to convert
      * @param options Specified options
      * @return The Base64-encoded data as a String
-     * @see SimpleBase64#GZIP
+     * @see Base64#GZIP
      * @throws java.io.IOException if there is an error
      * @throws IllegalArgumentException if source array, offset, or length are invalid
      * @since 2.3.1
      */
-    private static byte[] encodeBytesToBytes(final byte[] source, final int off, final int len, final int options) {
+    private static byte[] encodeBytesToBytes(final byte[] source, final int off, final int len, final int options) throws java.io.IOException {
 
         if( source == null ){
             throw new IllegalArgumentException("Cannot serialize a null array"); //$NON-NLS-1$
@@ -436,7 +457,6 @@ public final class Base64 {
 				)
 			);
         }   // end if: off < 0
-
 
         final boolean breakLines = (options & DO_BREAK_LINES) != 0;
 
@@ -521,7 +541,7 @@ public final class Base64 {
      *         or there is not enough room in the array.
      * @since 1.3
      */
-    private static int decode4to3(final byte[] source,
+    static int decode4to3(final byte[] source,
     							  final int srcOffset,
     		                      final byte[] destination,
     		                      final int destOffset,
@@ -596,8 +616,7 @@ public final class Base64 {
      * it's set.</strong> This is not generally a recommended method,
      * although it is used internally as part of the decoding process.
      * Special case: if len = 0, an empty array is returned. Still,
-     * if you need more speed and reduced memory footprint (and aren't
-     * gzipping), consider this method.
+     * if you need more speed and reduced memory footprint, consider this method.
      *
      * @param source The Base64 encoded data
      * @param off    The offset of where to begin decoding
@@ -607,7 +626,8 @@ public final class Base64 {
      * @throws java.io.IOException If bogus characters exist in source data
      * @since 1.3
      */
-    public static byte[] decode( final byte[] source, final int off, final int len, final int options) throws java.io.IOException {
+    public static byte[] decode( final byte[] source, final int off, final int len, final int options)
+    throws java.io.IOException {
 
         // Lots of error checking and exception throwing
         if( source == null ){
@@ -681,33 +701,28 @@ public final class Base64 {
         return out;
     }   // end decode
 
-
-
-
     /**
-     * Decodes data from Base64 notation, automatically
-     * detecting gzip-compressed data and decompressing it.
+     * Decodes data from Base64 notation.
      *
      * @param s the string to decode
      * @return the decoded data
      * @throws java.io.IOException If there is a problem
      * @since 1.4
      */
-    public static byte[] decode(final String s) throws java.io.IOException {
+    public static byte[] decode( final String s ) throws java.io.IOException {
         return decode( s, NO_OPTIONS );
     }
 
-
-
     /**
      * Decodes data from Base64 notation.
+     *
      * @param s the string to decode
      * @param options encode options such as URL_SAFE
      * @return the decoded data
      * @throws java.io.IOException if there is an error
      * @since 1.4
      */
-    public static byte[] decode(final String s, final int options) throws java.io.IOException {
+    public static byte[] decode( final String s, final int options ) throws java.io.IOException {
 
         if( s == null ){
             throw new IllegalArgumentException("Input string was null"); //$NON-NLS-1$
@@ -723,7 +738,7 @@ public final class Base64 {
 		//</change>
 
         // Decode
-        return decode( bytes, 0, bytes.length, options);
+        return decode( bytes, 0, bytes.length, options );
 
     }   // end decode
 
