@@ -26,6 +26,20 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 	private static final HostnameVerifier DEFAULT_HOSTNAME_VERIFIER = HttpsURLConnection.getDefaultHostnameVerifier();
 	private static final SSLSocketFactory DEFAULT_SSL_SOCKET_FACTORY = HttpsURLConnection.getDefaultSSLSocketFactory();
 
+	private static final TrustManager[] DUMMY_TRUST_MANAGER = new TrustManager[] {
+       new X509TrustManager() {
+           @Override
+           public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+             return null;
+           }
+           @Override
+           public void checkClientTrusted(final X509Certificate[] certs, final String authType) { /* No hacemos nada */ }
+           @Override
+           public void checkServerTrusted(final X509Certificate[] certs, final String authType) {  /* No hacemos nada */  }
+
+        }
+    };
+
 	@Override
 	public byte[] readUrl(final String url) throws IOException {
 		final URL uri = new URL(url);
@@ -75,23 +89,8 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
     }
 
     private static void disableSslChecks() throws KeyManagementException, NoSuchAlgorithmException {
-    	final TrustManager[] trustAllCerts = new TrustManager[] {
-	       new X509TrustManager() {
-	           @Override
-	           public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-	             return null;
-	           }
-
-	           @Override
-	           public void checkClientTrusted(final X509Certificate[] certs, final String authType) { /* No hacemos nada */ }
-
-	           @Override
-	           public void checkServerTrusted(final X509Certificate[] certs, final String authType) {  /* No hacemos nada */  }
-
-	        }
-	    };
     	final SSLContext sc = SSLContext.getInstance("SSL"); //$NON-NLS-1$
-        sc.init(null, trustAllCerts, new java.security.SecureRandom());
+        sc.init(null, DUMMY_TRUST_MANAGER, new java.security.SecureRandom());
         HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
         HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
 	        @Override

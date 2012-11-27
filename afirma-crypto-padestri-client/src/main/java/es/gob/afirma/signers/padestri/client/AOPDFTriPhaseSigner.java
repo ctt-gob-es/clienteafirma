@@ -3,16 +3,13 @@ package es.gob.afirma.signers.padestri.client;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -95,7 +92,7 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 	/** Crea un firmador PAdES en tres fases.
 	 * @param urlManager Gestor de comunicaciones con el servidor de firma  */
 	public AOPDFTriPhaseSigner(final UrlHttpManager urlManager) {
-		this.urlMgr = (urlManager != null) ? urlManager : new UrlHttpManagerImpl();
+		this.urlMgr = urlManager != null ? urlManager : new UrlHttpManagerImpl();
 	}
 
 	/** Crea un firmador PAdES en tres fases con el gestor por defecto de comunicaciones con el servidor de firma. */
@@ -358,7 +355,7 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
                 root.add(new AOTreeNode(ssi));
             }
             else {
-                root.add(new AOTreeNode((AOUtil.getCN(pcks7.getSigningCertificate()))));
+                root.add(new AOTreeNode(AOUtil.getCN(pcks7.getSigningCertificate())));
             }
         }
         return new AOTreeModel(root, root.getChildCount());
@@ -387,7 +384,7 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 
 	@Override
 	public String getSignedName(final String originalName, final String inText) {
-        final String inTextInt = (inText != null ? inText : ""); //$NON-NLS-1$
+        final String inTextInt = inText != null ? inText : ""; //$NON-NLS-1$
         if (originalName == null) {
             return "signed.pdf"; //$NON-NLS-1$
         }
@@ -453,23 +450,5 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
         return true;
     }
 
-    private byte[] sendRequest(final URL address, final HashMap<String, String> params) throws IOException {
-
-        final URLConnection conn = address.openConnection();
-        conn.setDoOutput(true);
-        final OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
-
-        //write parameters
-        if (params.size() > 0) {
-        	final String[] keys = params.keySet().toArray(new String[params.size()]);
-        	writer.write(keys[0] + "=" + params.get(keys[0])); //$NON-NLS-1$
-        	for (final String key : keys) {
-        		writer.write("&" + key + "=" + params.get(key)); //$NON-NLS-1$ //$NON-NLS-2$
-        	}
-        }
-    	writer.flush();
-
-    	return AOUtil.getDataFromInputStream(conn.getInputStream());
-    }
 
 }
