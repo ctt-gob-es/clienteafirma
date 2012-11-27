@@ -22,10 +22,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -75,6 +75,10 @@ public final class HelpUtils {
     private static Hashtable<String, Component> components = new Hashtable<String, Component>();
     /** Controlador de ayuda. */
     private static HelpBroker helpBroker = null;
+    static HelpBroker getHelpBroker() {
+    	return helpBroker;
+    }
+
     /** Conjunto de informacion de ayuda. */
     private static HelpSet helpset = null;
     /** Variable que almacena el icono original del boton de ayuda. */
@@ -139,7 +143,6 @@ public final class HelpUtils {
                                                                         if (component8 instanceof JViewport) {
                                                                             for (final Component component9 : ((JViewport) component8).getComponents()) {
                                                                                 if (component9 instanceof JEditorPane) {
-                                                                                    // component9.setBackground(Color.BLACK);
                                                                                     // Se activa el alto contraste para el editor pane
                                                                                     setHighContrastComponentTabbedPane(
                                                                                            jtp,
@@ -304,28 +307,26 @@ public final class HelpUtils {
                 getHelp().setDisplayed(true);
                 getHelp().setCurrentID(pagina);
                 if (GeneralConfig.isBigFontSize() && GeneralConfig.isFontBold()) {
-                    helpBroker.setFont(new Font(helpBroker.getFont().getName(), helpBroker.getFont().getStyle(), 16));
-                    helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.BOLD, helpBroker.getFont().getSize()));
+                	getHelpBroker().setFont(new Font(getHelpBroker().getFont().getName(), getHelpBroker().getFont().getStyle(), 16));
+                	getHelpBroker().setFont(new Font(getHelpBroker().getFont().getName(), Font.BOLD, getHelpBroker().getFont().getSize()));
                 }
                 else if (GeneralConfig.isBigFontSize()) {
-                    helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.PLAIN, 16));
+                	getHelpBroker().setFont(new Font(getHelpBroker().getFont().getName(), Font.PLAIN, 16));
                 }
                 else if (GeneralConfig.isFontBold()) {
-                    helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.BOLD, 11));
+                	getHelpBroker().setFont(new Font(getHelpBroker().getFont().getName(), Font.BOLD, 11));
                 }
                 else {
-                    helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.PLAIN, 11));
+                	getHelpBroker().setFont(new Font(getHelpBroker().getFont().getName(), Font.PLAIN, 11));
                 }
 
                 // Alto contraste
                 final WindowPresentation wp = ((DefaultHelpBroker) getHelp()).getWindowPresentation();
                 final Window helpwindow = wp.getHelpWindow();
                 if (Main.isOSHighContrast() || GeneralConfig.isHighContrast()) {
-                    // helpwindow.setBackground(Color.BLACK);
                     checkHelpAccessibility(helpwindow, true);
                 }
                 else {
-                    // helpwindow.setBackground(Color.WHITE);
                     checkHelpAccessibility(helpwindow, false);
                 }
             }
@@ -367,7 +368,6 @@ public final class HelpUtils {
                                                                                                   final boolean pIsLeaf,
                                                                                                   final int pRow,
                                                                                                   final boolean pHasFocus) {
-                                                        // DefaultMutableTreeNode node = (DefaultMutableTreeNode) pValue;
                                                         super.getTreeCellRendererComponent(pTree,
                                                                                            pValue,
                                                                                            pIsSelected,
@@ -383,7 +383,7 @@ public final class HelpUtils {
                                                             setForeground(Color.BLACK);
                                                             setBackgroundNonSelectionColor(Color.WHITE);
                                                         }
-                                                        return (this);
+                                                        return this;
                                                     }
                                                 });
                                             }
@@ -401,7 +401,6 @@ public final class HelpUtils {
                                                                                                   final boolean pIsLeaf,
                                                                                                   final int pRow,
                                                                                                   final boolean pHasFocus) {
-                                                        // DefaultMutableTreeNode node = (DefaultMutableTreeNode) pValue;
                                                         super.getTreeCellRendererComponent(pTree,
                                                                                            pValue,
                                                                                            pIsSelected,
@@ -417,7 +416,7 @@ public final class HelpUtils {
                                                             setForeground(Color.BLACK);
                                                             setBackgroundNonSelectionColor(Color.WHITE);
                                                         }
-                                                        return (this);
+                                                        return this;
                                                     }
                                                 });
                                             }
@@ -428,64 +427,18 @@ public final class HelpUtils {
                                             else {
                                                 ((JTree) component9).setBackground(Color.WHITE);
                                             }
-                                            ((JTree) component9).addMouseListener(new MouseListener() {
-
-                                                /** Captura de evento de raton. Hacer click. */
-                                                @Override
-                                                public void mouseClicked(final MouseEvent e) {
-                                                    // TODO Auto-generated method stub
-
-                                                }
-
-                                                /** Captura de evento de raton. Puntero del raton dentro del componente. */
-                                                @Override
-                                                public void mouseEntered(final MouseEvent e) {
-                                                    // TODO Auto-generated method stub
-
-                                                }
-
-                                                /** Captura de evento de raton. Puntero del raton fuera del componente. */
-                                                @Override
-                                                public void mouseExited(final MouseEvent e) {
-                                                    // TODO Auto-generated method stub
-
-                                                }
-
-                                                /** Captura de evento de raton. Presionar boton. */
-                                                @Override
-                                                public void mousePressed(final MouseEvent e) {
-                                                    // TODO Auto-generated method stub
-
-                                                }
-
+                                            ((JTree) component9).addMouseListener(new MouseAdapter() {
                                                 /** Captura de evento de raton. Liberar boton. */
                                                 @Override
                                                 public void mouseReleased(final MouseEvent e) {
-                                                    // TODO Auto-generated method stub
                                                     HelpUtils.setHighContrastEditorPane(editorPane, activate);
                                                 }
                                             });
-                                            ((JTree) component9).addKeyListener(new KeyListener() {
-
-                                                /** Se ha pulsado una tecla. */
-                                                @Override
-                                                public void keyPressed(final KeyEvent e) {
-                                                    // TODO Auto-generated method stub
-
-                                                }
-
+                                            ((JTree) component9).addKeyListener(new KeyAdapter() {
                                                 /** Tecla liberada. */
                                                 @Override
                                                 public void keyReleased(final KeyEvent e) {
-                                                    // TODO Auto-generated method stub
                                                     HelpUtils.setHighContrastEditorPane(editorPane, activate);
-                                                }
-
-                                                /** Tecla presionada. */
-                                                @Override
-                                                public void keyTyped(final KeyEvent e) {
-                                                    // TODO Auto-generated method stub
-
                                                 }
                                             });
                                         }
@@ -497,29 +450,13 @@ public final class HelpUtils {
                             for (final Component component : ((JPanel) panel).getComponents()) {
                                 if (component instanceof JTextField) {
                                     final JTextField campo = (JTextField) component;
-                                    campo.addKeyListener(new KeyListener() {
-
-                                        /** Se ha pulsado una tecla. */
-                                        @Override
-                                        public void keyPressed(final KeyEvent e) {
-                                            // TODO Auto-generated method stub
-
-                                        }
-
+                                    campo.addKeyListener(new KeyAdapter() {
                                         /** Tecla liberada. */
                                         @Override
                                         public void keyReleased(final KeyEvent e) {
-                                            // TODO Auto-generated method stub
                                             if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                                                 HelpUtils.setHighContrastEditorPane(editorPane, activate);
                                             }
-                                        }
-
-                                        /** Tecla presionada. */
-                                        @Override
-                                        public void keyTyped(final KeyEvent e) {
-                                            // TODO Auto-generated method stub
-
                                         }
                                     });
                                 }
@@ -534,7 +471,7 @@ public final class HelpUtils {
     /** Establece el modo alto contraste para el editorPane que recibe como parametro.
      * @param editorPane panel de edicion. */
     static void setHighContrastEditorPane(final JEditorPane editorPane, final boolean activate) {
-        if (editorPane != null && (editorPane.getDocument() instanceof HTMLDocument)) {
+        if (editorPane != null && editorPane.getDocument() instanceof HTMLDocument) {
             final HTMLDocument h = (HTMLDocument) editorPane.getDocument();
             // Se establece el color de la la letra a blanco
             editorPane.setContentType("text/html"); //$NON-NLS-1$
