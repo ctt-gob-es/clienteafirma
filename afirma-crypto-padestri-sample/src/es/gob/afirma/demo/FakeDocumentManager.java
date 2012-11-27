@@ -11,7 +11,8 @@ import es.gob.afirma.signers.padestri.server.DocumentManager;
  * @author Tom&aacute;s Garc&iacute;a-;er&aacute;s */
 final class FakeDocumentManager implements DocumentManager {
 
-	private static final String PDF_DOC = "TEST_PDF.pdf"; //$NON-NLS-1$
+	private static final String PDF_DOC = "TEST_PDF_SIN_FIRMA.pdf"; //$NON-NLS-1$
+	//private static final String SIGNED_PDF_DOC = "TEST_PDF.pdf"; //$NON-NLS-1$
 
 	/** {@inheritDoc} */
 	@Override
