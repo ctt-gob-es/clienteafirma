@@ -3,10 +3,13 @@ package es.gob.afirma.signers.padestri.client;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.net.URL;
+import java.net.URLConnection;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.net.ssl.HostnameVerifier;
@@ -99,6 +102,40 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 	        }
         });
     }
+
+	@Override
+	public byte[] readUrl(final String url, final Map<String, String> params) throws IOException {
+		final URL uri = new URL(url);
+		if (uri.getProtocol().equals("https")) { //$NON-NLS-1$
+			try {
+				disableSslChecks();
+			}
+			catch(final Exception e) {
+				Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+					"No se ha podido ajustar la confianza SSL, es posible que no se pueda completar la conexion: " + e //$NON-NLS-1$
+				);
+			}
+		}
+		final URLConnection conn = uri.openConnection();
+        conn.setDoOutput(true);
+        final OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
+
+        //write parameters
+        if (params.size() > 0) {
+        	final String[] keys = params.keySet().toArray(new String[params.size()]);
+        	writer.write(keys[0] + "=" + params.get(keys[0])); //$NON-NLS-1$
+        	for (final String key : keys) {
+        		writer.write("&" + key + "=" + params.get(key)); //$NON-NLS-1$ //$NON-NLS-2$
+        	}
+        }
+    	writer.flush();
+    	//writer.close();
+
+		if (uri.getProtocol().equals("https")) { //$NON-NLS-1$
+			enableSslChecks();
+		}
+		return getDataFromInputStream(conn.getInputStream());
+	}
 
 
 }

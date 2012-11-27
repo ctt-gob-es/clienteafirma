@@ -10,6 +10,7 @@ import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -56,10 +57,6 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 	/** Nombre del par&aacute;metro de c&oacute;digo de operaci&oacute;n en la URL de llamada al servidor de firma. */
 	private static final String PARAMETER_NAME_OPERATION = "op"; //$NON-NLS-1$
 
-	private static final String HTTP_CGI = "?"; //$NON-NLS-1$
-	private static final String HTTP_EQUALS = "="; //$NON-NLS-1$
-	private static final String HTTP_AND = "&"; //$NON-NLS-1$
-
 	// Parametros que necesitamos para la URL de las llamadas al servidor de firma
 	private static final String PARAMETER_NAME_DOCID = "doc"; //$NON-NLS-1$
 	private static final String PARAMETER_NAME_ALGORITHM = "algo"; //$NON-NLS-1$
@@ -92,7 +89,7 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 	/** Crea un firmador PAdES en tres fases.
 	 * @param urlManager Gestor de comunicaciones con el servidor de firma  */
 	public AOPDFTriPhaseSigner(final UrlHttpManager urlManager) {
-		this.urlMgr = urlManager != null ? urlManager : new UrlHttpManagerImpl();
+		this.urlMgr = (urlManager != null) ? urlManager : new UrlHttpManagerImpl();
 	}
 
 	/** Crea un firmador PAdES en tres fases con el gestor por defecto de comunicaciones con el servidor de firma. */
@@ -126,7 +123,7 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 			signServerUrl = new URL(configParams.getProperty(PROPERTY_NAME_SIGN_SERVER_URL));
 		}
 		catch (final MalformedURLException e) {
-			throw new IllegalArgumentException("No se ha proporcionado la URL del servidor de firma: " + configParams.getProperty(PROPERTY_NAME_SIGN_SERVER_URL), e); //$NON-NLS-1$
+			throw new IllegalArgumentException("No se ha proporcionado una URL valida para el servidor de firma: " + configParams.getProperty(PROPERTY_NAME_SIGN_SERVER_URL), e); //$NON-NLS-1$
 		}
 		configParams.remove(PROPERTY_NAME_SIGN_SERVER_URL);
 
@@ -143,39 +140,22 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 		// Empezamos la prefirma
 		final byte[] preSignResult;
 		try {
-			// Llamamos a una URL pasando como parametros los datos necesarios para
-			// configurar la operacion:
-			//  - Operacion trifasica (Prefirma o postfirma)
+			// Realizamos la prefirma llamando a la URL del servidor trifasico enviando los parametros
+			// mediante POST:
+			//  - Operacion trifasica: Prefirma
 			//  - Identificador del documento a firmar
 			//  - Algoritmo de firma a utilizar
 			//  - Certificado de firma
 			//  - Parametros extra de configuracion
-			preSignResult = this.urlMgr.readUrl(
-				signServerUrl + HTTP_CGI +
-				PARAMETER_NAME_OPERATION +
-				HTTP_EQUALS +
-				OPERATION_PRESIGN +
-				HTTP_AND +
-				PARAMETER_NAME_DOCID +
-				HTTP_EQUALS +
-				documentId +
-				HTTP_AND +
-				PARAMETER_NAME_FORMAT +
-				HTTP_EQUALS +
-				PADES_FORMAT +
-				HTTP_AND +
-				PARAMETER_NAME_ALGORITHM +
-				HTTP_EQUALS +
-				algorithm +
-				HTTP_AND +
-				PARAMETER_NAME_CERT +
-				HTTP_EQUALS +
-				Base64.encodeBytes(keyEntry.getCertificate().getEncoded(), Base64.URL_SAFE) +
-				HTTP_AND +
-				PARAMETER_NAME_EXTRA_PARAM +
-				HTTP_EQUALS +
-				properties2Base64(configParams)
-			);
+			final HashMap<String, String> params = new HashMap<String, String>();
+			params.put(PARAMETER_NAME_OPERATION, OPERATION_PRESIGN);
+			params.put(PARAMETER_NAME_DOCID, documentId);
+			params.put(PARAMETER_NAME_FORMAT, PADES_FORMAT);
+			params.put(PARAMETER_NAME_ALGORITHM, algorithm);
+			params.put(PARAMETER_NAME_CERT, Base64.encodeBytes(keyEntry.getCertificate().getEncoded(), Base64.URL_SAFE));
+			params.put(PARAMETER_NAME_EXTRA_PARAM, properties2Base64(configParams));
+
+			preSignResult = this.urlMgr.readUrl(signServerUrl.toString(), params);
 		}
 		catch (final CertificateEncodingException e) {
 			throw new AOException("Error decodificando el certificado del firmante: " + e, e); //$NON-NLS-1$
@@ -222,32 +202,22 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 
 		final byte[] triSignFinalResult;
 		try {
-			triSignFinalResult = this.urlMgr.readUrl(
-				signServerUrl + HTTP_CGI +
-				PARAMETER_NAME_OPERATION +
-				HTTP_EQUALS +
-				OPERATION_POSTSIGN +
-				HTTP_AND +
-				PARAMETER_NAME_DOCID +
-				HTTP_EQUALS +
-				documentId +
-				HTTP_AND +
-				PARAMETER_NAME_FORMAT +
-				HTTP_EQUALS +
-				PADES_FORMAT +
-				HTTP_AND +
-				PARAMETER_NAME_ALGORITHM +
-				HTTP_EQUALS +
-				algorithm +
-				HTTP_AND +
-				PARAMETER_NAME_CERT +
-				HTTP_EQUALS +
-				Base64.encodeBytes(keyEntry.getCertificate().getEncoded(), Base64.URL_SAFE) +
-				HTTP_AND +
-				PARAMETER_NAME_EXTRA_PARAM +
-				HTTP_EQUALS +
-				properties2Base64(configParams)
-			);
+			// Realizamos la postfirma llamando a la URL del servidor trifasico enviando los parametros
+			// mediante POST:
+			//  - Operacion trifasica: Postfirma
+			//  - Identificador del documento a firmar
+			//  - Algoritmo de firma a utilizar
+			//  - Certificado de firma
+			//  - Parametros extra de configuracion
+			final HashMap<String, String> params = new HashMap<String, String>();
+			params.put(PARAMETER_NAME_OPERATION, OPERATION_POSTSIGN);
+			params.put(PARAMETER_NAME_DOCID, documentId);
+			params.put(PARAMETER_NAME_FORMAT, PADES_FORMAT);
+			params.put(PARAMETER_NAME_ALGORITHM, algorithm);
+			params.put(PARAMETER_NAME_CERT, Base64.encodeBytes(keyEntry.getCertificate().getEncoded(), Base64.URL_SAFE));
+			params.put(PARAMETER_NAME_EXTRA_PARAM, properties2Base64(configParams));
+
+			triSignFinalResult = this.urlMgr.readUrl(signServerUrl.toString(), params);
 		}
 		catch (final CertificateEncodingException e) {
 			throw new AOException("Error decodificando el certificado del firmante: " + e, e); //$NON-NLS-1$
@@ -449,6 +419,4 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 
         return true;
     }
-
-
 }
