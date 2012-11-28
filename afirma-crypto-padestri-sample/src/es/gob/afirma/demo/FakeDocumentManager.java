@@ -24,8 +24,12 @@ final class FakeDocumentManager implements DocumentManager {
 	@Override
 	public String storeDocument(final String id, final byte[] data) throws IOException {
 		final File tempFile = File.createTempFile("fakeDocumentRetriever-" + id, ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
-		try (final FileOutputStream fos = new FileOutputStream(tempFile);) {
+		try {
+			final FileOutputStream fos = new FileOutputStream(tempFile);
 			fos.write(data);
+			fos.close();
+		} catch (final Exception e) {
+			System.err.println("Error al generar la firma temporal: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 		}
 		System.out.println("Guardamos la firma generada en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 		return "id-fake-" + id; //$NON-NLS-1$

@@ -10,6 +10,8 @@ import java.security.cert.X509Certificate;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -108,7 +110,7 @@ public final class SignatureService extends HttpServlet {
 		try {
 		if (request.getParameter(PARAMETER_NAME_EXTRA_PARAM) != null) {
 
-			System.out.println("ExtraParams: " + new String(Base64.decode(request.getParameter(PARAMETER_NAME_EXTRA_PARAM), Base64.URL_SAFE)));
+			Logger.getLogger("es.gob.afirma").log(Level.FINER, "ExtraParams: " + new String(Base64.decode(request.getParameter(PARAMETER_NAME_EXTRA_PARAM), Base64.URL_SAFE))); //$NON-NLS-1$ //$NON-NLS-2$
 
 			extraParams.load(
 					new ByteArrayInputStream(
@@ -121,7 +123,8 @@ public final class SignatureService extends HttpServlet {
 			return;
 		}
 
-		try (final PrintWriter out = response.getWriter()) {
+		try {
+			final PrintWriter out = response.getWriter();
 			if (OPERATION_PRESIGN.equals(operation)) {
 
 				final X509Certificate signerCert;
@@ -131,8 +134,10 @@ public final class SignatureService extends HttpServlet {
 					);
 				}
 				catch (final CertificateException e) {
-					out.println(e);
 					e.printStackTrace();
+					out.println(e);
+					out.flush();
+					out.close();
 					return;
 				}
 
@@ -154,6 +159,8 @@ public final class SignatureService extends HttpServlet {
 				}
 		        catch (final AOException e) {
 					out.println(e);
+					out.flush();
+					out.close();
 					return;
 				}
 
@@ -181,17 +188,23 @@ public final class SignatureService extends HttpServlet {
 					);
 				}
 				catch (final CertificateException e) {
-					out.println(e);
 					e.printStackTrace();
+					out.println(e);
+					out.flush();
+					out.close();
 					return;
 				}
 
 				// Obtenemos el PDF del gestor documental a partir del ID que nos llega por URL
 				final byte[] pdfBytes = DOC_MANAGER.getDocument(docId);
 
-				// Preparo la feca de firma
+				// Preparo la fecha de firma
 				final Calendar cal = Calendar.getInstance();
-				cal.setTimeInMillis(Long.parseLong(extraParams.getProperty(PROPERTY_NAME_SIGN_TIME)));
+				try {
+					cal.setTimeInMillis(Long.parseLong(extraParams.getProperty(PROPERTY_NAME_SIGN_TIME)));
+				} catch (final NumberFormatException e) {
+					Logger.getLogger("es.gob.afirma").warning("La hora de firma indicada no es valida: " + e.toString()); //$NON-NLS-1$ //$NON-NLS-2$
+				}
 
 				//TODO: Descomentar para el embellecimiento de las firmas PAdES
 				//final SignEnhancer enhancer = new PDFEnhancer();
@@ -220,8 +233,10 @@ public final class SignatureService extends HttpServlet {
 					);
 				}
 				catch (final Exception e) {
-					out.println(e);
 					e.printStackTrace();
+					out.println(e);
+					out.flush();
+					out.close();
 					return;
 				}
 
@@ -231,8 +246,13 @@ public final class SignatureService extends HttpServlet {
 				out.println(SUCCESS);
 			}
 			else {
-				out.println("ERR-11: Operacion desconocida"); //$NON-NLS-1$
+				out.println("ERR-11: Operacion desconocida");
 			}
+			out.flush();
+			out.close();
+		} catch (final IOException e) {
+			response.getOutputStream().println("ERR-12: Error al guardar o recuperar los datos temporales");
+
 		}
 	}
 }
