@@ -330,11 +330,15 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
 
         return new Enumeration<String>() {
 
-            public boolean hasMoreElements() {
+        	/** {@inheritDoc} */
+            @Override
+			public boolean hasMoreElements() {
                 return iter.hasNext();
             }
 
-            public String nextElement() {
+            /** {@inheritDoc} */
+            @Override
+			public String nextElement() {
                 final Object o = iter.next();
                 for (final java.lang.reflect.Method m : o.getClass().getDeclaredMethods()) {
                     if (m.getName().equals("getAlias")) { //$NON-NLS-1$
