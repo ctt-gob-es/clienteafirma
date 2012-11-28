@@ -30,12 +30,19 @@ import com.lowagie.text.pdf.PdfObject;
 import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.PdfString;
 
+/** Clase que representa un diccionario DSS.
+ * @author <a href="mailto:jgutierrez@accv.es">Jos&eacute; Manuel Guti&eacute;rrez N&uacute;&ntilde;ez</a> */
 final class PdfDocumentSecurityStore {
 
     private static final String DEFAULT_DIGEST_ALGORITHM = "SHA1"; //$NON-NLS-1$
 
+    /** Clase que representa una estructura VRI (Validation Related Information). */
     static class ValidationInformation {
 
+    	/** Obtiene la clave como la codificaci&oacute;n Base16 en may&uacute;sculas
+    	 * del la huella digital SHA-1 de la firma
+    	 * @param digest Huella digital SHA-1 de la firma
+    	 * @return Codificaci&oacute;n Base16 en may&uacute;sculas de la huella digital */
         static String getKey(final byte digest[]) {
             final StringBuilder buf = new StringBuilder();
             for (final byte element : digest) {
@@ -115,8 +122,12 @@ final class PdfDocumentSecurityStore {
     private static final String PDF_NAME_OCSP = "OCSP"; //$NON-NLS-1$
     private static final String PDF_NAME_CRL = "CRL"; //$NON-NLS-1$
 
+    /** Constructor por defecto. */
     PdfDocumentSecurityStore() {}
 
+    /** Constructor para inicializar la clase con una estructura DSS ya creada.
+     * @param dss Diccionario DSS
+     * @throws IOException */
     PdfDocumentSecurityStore(final PdfDictionary dss) throws IOException {
         int i = 0;
         PdfArray arrayCerts = dss.getAsArray(new PdfName(PDF_NAME_CERTS));
@@ -258,6 +269,12 @@ final class PdfDocumentSecurityStore {
         return this.crls;
     }
 
+    /** Registra una firma (crear&aacute; una estructura VRI dentro del DSS).
+     * @param pkcs7 Firma
+     * @param certId Array de IDs de certificados ubicados en el DSS
+     * @param ocspId Array de IDs de respuestas OCSP ubicadas en el DSS
+     * @param crlId Array de IDs de CRLs ubicadas en el DSS
+     * @param date Fecha de la firma */
     void registerSignature(final byte pkcs7[], final int certId[], final int ocspId[], final int crlId[], final Calendar date) {
         final ValidationInformation val = new ValidationInformation(pkcs7, certId, ocspId, crlId, date);
         this.signatures.put(val.getKey(), val);
@@ -271,12 +288,20 @@ final class PdfDocumentSecurityStore {
         registerSignature(pkcs7, null, null, null, new GregorianCalendar());
     }
 
+    /** Registra un certificado en el DSS y devuelve el ID que se le ha asignado.
+     * @param cert Certificado
+     * @return ID asignado al certificado (luego servir&aacute; para registrar la firma completa
+     * 	en un VRI) */
     synchronized int registerCertificate(final byte cert[]) {
         final int nextId = this.certificates.size() + 1;
         this.certificates.put(new Integer(nextId), cert);
         return nextId;
     }
 
+    /** Registra una respuesta OCSP y devuelve el ID que se le ha asignado.
+     * @param ocsp Respuesta OCSP
+     * @return ID asignado a la respuesta OCSP  (luego servir&aacute; para registrar la firma completa
+     * 	en un VRI) */
     synchronized int registerOcspResp(final byte ocsp[]) {
         final int nextId = this.ocsps.size() + 1;
         this.ocsps.put(new Integer(nextId), ocsp);
@@ -297,12 +322,20 @@ final class PdfDocumentSecurityStore {
         return ocspId;
     }
 
+    /** Registra una CRL y devuelve el ID que se le ha asignado.
+     * @param crl CRL
+     * @return ID asignado a la CRL  (luego servir&aacute; para registrar la firma completa
+     * 	en un VRI) */
     synchronized int registerCrl(final byte crl[]) {
         final int nextId = this.crls.size() + 1;
         this.crls.put(new Integer(nextId), crl);
         return nextId;
     }
 
+    /** Devuelve el VRI pas&aacute;ndole como par&aacute;metro la firma que representa.
+     * @param pkcs7 Firma PKCS#7
+     * @return VRI que representa la firma
+     * @throws NoSuchAlgorithmException */
     ValidationInformation getValidationInformation(final byte pkcs7[]) throws NoSuchAlgorithmException {
         final MessageDigest dg = MessageDigest.getInstance(DEFAULT_DIGEST_ALGORITHM);
         return this.signatures.get(ValidationInformation.getKey(dg.digest(pkcs7)));
