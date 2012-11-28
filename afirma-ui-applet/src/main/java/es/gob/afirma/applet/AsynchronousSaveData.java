@@ -37,7 +37,7 @@ final class AsynchronousSaveData implements Runnable {
 		this.savingTarget = target;
 	}
 
-	public String getSavingTarget() {
+	String getSavingTarget() {
 		return this.savingTarget;
 	}
 
@@ -132,11 +132,11 @@ final class AsynchronousSaveData implements Runnable {
                 }
 
                 // Aqui ya tenemos un nombre de salida
-                OutputStream fos = null;
                 try {
-                    fos = new FileOutputStream(AsynchronousSaveData.this.getSavingTarget());
+                	final OutputStream fos = new FileOutputStream(AsynchronousSaveData.this.getSavingTarget());
                     fos.write(AsynchronousSaveData.this.getDataToSave());
                     fos.flush();
+                    fos.close();
                 }
                 catch (final Exception e) {
                     Logger.getLogger("es.gob.afirma").severe("No se pudieron almacenar los datos en disco: " + e);  //$NON-NLS-1$//$NON-NLS-2$
@@ -145,17 +145,6 @@ final class AsynchronousSaveData implements Runnable {
                                                       AppletMessages.getString("AsynchronousSaveData.1"), //$NON-NLS-1$
                                                       AppletMessages.getString("SignApplet.156"), //$NON-NLS-1$
                                                       JOptionPane.ERROR_MESSAGE);
-                    }
-                }
-                finally {
-                    if (fos != null) {
-                        try {
-                            fos.close();
-                        }
-                        catch (final Exception e) {
-                            Logger.getLogger("es.gob.afirma") //$NON-NLS-1$
-                                  .warning("No se ha podido cerrar el fichero de salida, es posible que se no se pueda abrir hasta cerrar la aplicacion"); //$NON-NLS-1$
-                        }
                     }
                 }
                 return null;
