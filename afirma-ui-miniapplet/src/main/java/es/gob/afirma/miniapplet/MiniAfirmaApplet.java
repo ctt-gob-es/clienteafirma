@@ -27,6 +27,7 @@ import javax.swing.UIManager;
 import org.mozilla.universalchardet.UniversalDetector;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.AOUtil;
@@ -86,7 +87,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 					   final String extraParams) throws AOFormatFileException,
 			                                            PrivilegedActionException,
 			                                            IOException,
-			                                            Exception {
+			                                            AOException {
 		this.clearError();
 
 		if (dataB64 == null) {
@@ -122,9 +123,9 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			setError(e);
 			throw e;
 		}
-		catch (final Throwable e) {
+		catch (final Error e) {
 			setError(e);
-			throw new Exception(e);
+			throw new AOException("Ocurrio un error grave durante la operacion de firma", e); //$NON-NLS-1$
 		}
 	}
 
@@ -137,7 +138,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			             final String extraParams) throws AOFormatFileException,
 			             							      PrivilegedActionException,
 			             							      IOException,
-				                                          Exception {
+				                                          AOException {
 		this.clearError();
 
 		if (signB64 == null) {
@@ -174,9 +175,9 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			setError(e);
 			throw e;
 		}
-		catch (final Throwable e) {
+		catch (final Error e) {
 			setError(e);
-			throw new Exception(e);
+			throw new AOException("Ocurrio un error grave durante la operacion de cofirma", e); //$NON-NLS-1$
 		}
 	}
 
@@ -188,7 +189,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			                  final String extraParams) throws AOFormatFileException,
 			                  								   PrivilegedActionException,
 			                  								   IOException,
-					                                           Exception {
+					                                           AOException {
 		this.clearError();
 
 		if (signB64 == null) {
@@ -223,9 +224,9 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			setError(e);
 			throw e;
 		}
-		catch (final Throwable e) {
+		catch (final Error e) {
 			setError(e);
-			throw new Exception(e);
+			throw new AOException("Ocurrio un error grave durante la operacion de contrafirma", e); //$NON-NLS-1$
 		}
 	}
 

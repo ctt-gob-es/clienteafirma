@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.PrivilegedActionException;
 
+import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
 
 /** Contiene los puntos de entrada de las funcionalidades criptogr&aacute;ficas
@@ -57,8 +58,8 @@ interface MiniAfirma {
      * @throws es.gob.afirma.core.InvalidLibraryException Cuando se detecta una versi&oacute;n no v&aacute;lida de una biblioteca.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      * @throws es.gob.afirma.core.MissingLibraryException Cuando no se encuentra una biblioteca necesaria para la operaci&oacute;n.
-     * @throws Exception Cuando se produce un error desconocido. */
-    String sign(String data, String algorithm, String format, String extraParams) throws AOFormatFileException, PrivilegedActionException, IOException, Exception;
+     * @throws AOException Cuando se produce un error desconocido. */
+    String sign(String data, String algorithm, String format, String extraParams) throws AOFormatFileException, PrivilegedActionException, IOException, AOException;
 
 	/** Fija el firmante que se establezca para ser reutilizado (sin intervenci&oacute;n del usuario) en todas
 	 * las operaciones posteriores hasta que se desactive esta opci&oacute;n.
@@ -100,8 +101,8 @@ interface MiniAfirma {
      * @throws es.gob.afirma.core.InvalidLibraryException Cuando se detecta una versi&oacute;n no v&aacute;lida de una biblioteca.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      * @throws es.gob.afirma.core.MissingLibraryException Cuando no se encuentra una biblioteca necesaria para la operaci&oacute;n.
-     * @throws Exception Cuando se produce un error desconocido. */
-    String coSign(String sign, String data, String algorithm, String format, String extraParams) throws AOFormatFileException, PrivilegedActionException, IOException, Exception;
+     * @throws AOException Cuando se produce un error desconocido. */
+    String coSign(String sign, String data, String algorithm, String format, String extraParams) throws AOFormatFileException, PrivilegedActionException, IOException, AOException;
 
     /** Realiza una firma en cascada (Contrafirma) sobre una firma. Se contrafirman todos los
      * nodos hoja salvo que mediante {@code extraParams} se indique el par&aacute;metro
@@ -125,8 +126,8 @@ interface MiniAfirma {
      * @throws es.gob.afirma.core.InvalidLibraryException Cuando se detecta una versi&oacute;n no v&aacute;lida de una biblioteca.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      * @throws es.gob.afirma.core.MissingLibraryException Cuando no se encuentra una biblioteca necesaria para la operaci&oacute;n.
-     * @throws Exception Cuando se produce un error desconocido. */
-    String counterSign(String sign, String algorithm, String format, String extraParams) throws AOFormatFileException, PrivilegedActionException, IOException, Exception;
+     * @throws AOException Cuando se produce un error desconocido. */
+    String counterSign(String sign, String algorithm, String format, String extraParams) throws AOFormatFileException, PrivilegedActionException, IOException, AOException;
 
     /** Devuelve la estructura de firmantes de una firma electr&oacute;nica. Los
      * firmantes se separan por '\n' y comienzan por tantos '\t' como el nivel
