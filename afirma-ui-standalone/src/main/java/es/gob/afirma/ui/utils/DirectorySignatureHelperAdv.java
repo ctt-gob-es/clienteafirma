@@ -20,8 +20,7 @@ public class DirectorySignatureHelperAdv extends DirectorySignatureHelper {
      * @param algorithm Algoritmo de firma electr&oacute;nica.
      * @param format Formato de firma por defecto.
      * @param mode Modo de firma.
-     * @param parent Componente padre.
-     * @throws AOUnsupportedSignFormatException */
+     * @throws AOUnsupportedSignFormatException Cuando el formato de firma no esta soportado. */
     public DirectorySignatureHelperAdv(final String algorithm, final String format, final String mode) throws AOUnsupportedSignFormatException {
         super(algorithm, format, mode);
     }
