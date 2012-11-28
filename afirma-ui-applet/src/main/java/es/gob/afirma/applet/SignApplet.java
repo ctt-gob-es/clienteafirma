@@ -1983,7 +1983,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 					return Boolean.FALSE;
 				}
 				catch (final Exception e) {
-					getLogger().severe("Error durante el proceso de firma: " + e); //$NON-NLS-1$
+					getLogger().severe("Error durante el proceso de cofirma: " + e); //$NON-NLS-1$
 					setError(AppletMessages.getString("SignApplet.101")); //$NON-NLS-1$
 					return Boolean.FALSE;
 				}
