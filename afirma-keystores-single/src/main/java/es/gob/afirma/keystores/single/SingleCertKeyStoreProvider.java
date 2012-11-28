@@ -28,7 +28,8 @@ public final class SingleCertKeyStoreProvider extends Provider {
         super("PKCS7", PROVIDER_VERSION, "KeyStore for a PKCS7 or X.509 certificate"); //$NON-NLS-1$ //$NON-NLS-2$
         AccessController.doPrivileged(new java.security.PrivilegedAction<Object>() {
         	/** {@inheritdoc} */
-            public Object run() {
+            @Override
+			public Object run() {
                 put("KeyStore.PKCS7", "es.gob.afirma.keystores.single.SingleCertKeyStore"); //$NON-NLS-1$ //$NON-NLS-2$
                 return null;
             }
