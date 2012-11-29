@@ -541,7 +541,7 @@ final class CoSigner {
             		// el oid
                     new ASN1ObjectIdentifier(e.getKey().toString()),
                     // el array de bytes en formato string
-                    new DERSet(DERPrintableString.getInstance(e.getValue())))
+                    new DERSet(new DERPrintableString(new String(e.getValue()))))
         		);
             }
         }
