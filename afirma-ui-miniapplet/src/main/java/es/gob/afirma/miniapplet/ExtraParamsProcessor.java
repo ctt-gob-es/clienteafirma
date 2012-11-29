@@ -106,6 +106,7 @@ final class ExtraParamsProcessor {
      *  </li>
      * </ul>
 	 * @param params Par&aacute;metros definidos para la operaci&oacute;n.
+	 * @param signedData Datos firmados.
 	 * @param format Formato de firma.
 	 * @return Propiedades expandidas.
 	 */
@@ -143,11 +144,19 @@ final class ExtraParamsProcessor {
 					p.setProperty("format", //$NON-NLS-1$
 						AOSignConstants.SIGN_FORMAT_XADES_DETACHED);
 				}
+
 				if (format != null && (format.equals(AOSignConstants.SIGN_FORMAT_CADES) ||
-						format.equals(AOSignConstants.SIGN_FORMAT_PADES))) {
+						format.equals(AOSignConstants.SIGN_FORMAT_PDF) ||
+						format.equals(AOSignConstants.SIGN_FORMAT_PADES) ||
+						format.equals(AOSignConstants.SIGN_FORMAT_PDF_TRI))) {
 					p.setProperty("policyIdentifierHash", //$NON-NLS-1$
 						"7SxX3erFuH31TvAw9LZ70N7p1vA=");  //$NON-NLS-1$
-					if (!p.containsKey("mode")) { //$NON-NLS-1$
+
+					// La politica indica que la firma debe ser implicita siempre que el tamano
+					// del documento sea razonable. Como no se especifica que tamano es razonable
+					// establecemos el limite en 1Mb. Esto solo aplicaria a CAdES ya que PAdES
+					// siempre es implicita e ignora este parametro.
+					if (!p.containsKey("mode") && signedData != null) { //$NON-NLS-1$
 						p.setProperty("mode", signedData.length < SIZE_1MB ? //$NON-NLS-1$
 								AOSignConstants.SIGN_MODE_IMPLICIT : AOSignConstants.SIGN_MODE_EXPLICIT);
 					}
