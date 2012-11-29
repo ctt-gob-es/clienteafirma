@@ -141,8 +141,13 @@ final class ExtraParamsProcessor {
 				if (format != null && format.startsWith(AOSignConstants.SIGN_FORMAT_XADES)) {
 					p.setProperty("policyIdentifierHash", //$NON-NLS-1$
 						"V8lVVNGDCPen6VELRD1Ja8HARFk=");  //$NON-NLS-1$
-					p.setProperty("format", //$NON-NLS-1$
-						AOSignConstants.SIGN_FORMAT_XADES_DETACHED);
+
+					// La firma XAdES conforme a la politica de firma debe ser Detached o Enveloped
+					if (!AOSignConstants.SIGN_FORMAT_XADES_DETACHED.equals(p.getProperty("format")) && //$NON-NLS-1$
+							!AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED.equals(p.getProperty("format"))) { //$NON-NLS-1$
+						p.setProperty("format", //$NON-NLS-1$
+								AOSignConstants.SIGN_FORMAT_XADES_DETACHED);
+					}
 				}
 
 				if (format != null && (format.equals(AOSignConstants.SIGN_FORMAT_CADES) ||
