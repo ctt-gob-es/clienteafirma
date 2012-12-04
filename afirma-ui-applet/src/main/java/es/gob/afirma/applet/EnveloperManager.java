@@ -462,7 +462,7 @@ final class EnveloperManager {
         // Fichero de entrada
         if (this.fileUri == null) {
             try {
-                this.fileUri = AOUtil.createURI(AOUIFactory.getLoadFileName(null, null, this.parent));
+                this.fileUri = AOUtil.createURI(AOUIFactory.getLoadFileName(null, null, false, this.parent).get(0));
             }
             catch (final Exception e) {
                 throw new IOException("Se ha proporcionado un nombre de fichero no valido '" + this.fileUri + "': " + e, e); //$NON-NLS-1$ //$NON-NLS-2$

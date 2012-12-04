@@ -15,6 +15,9 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.BoxLayout;
@@ -295,27 +298,35 @@ public final class JSEUIManager implements AOUIManager {
      *        extensiones
      * @param parentComponent
      *        Componente padre (para la modalidad)
-     * @return Nombre de fichero (con ruta) seleccionado por el usuario */
+     * @aram multiSelect <code>true</code> para permitir selecci&oacute;n m&uacute;ltiple, <code>false</code>
+     *                    para selecci&oacute;n de un &uacute;nico fichero
+     * @return Nombre de fichero (con ruta) seleccionado por el usuario
+     * @throws AOCancelledOperationException Si el usuario cancela la operaci&oacute;n. */
     @Override
-	public String getLoadFileName(final String[] extensions, final String description, final Object parentComponent) {
-        return getLoadFileName(null, extensions, description, parentComponent);
+	public List<String> getLoadFileName(final String[] extensions, final String description, final boolean multiSelect, final Object parentComponent) {
+        return getLoadFileName(
+    		null,
+    		extensions,
+    		description,
+    		false,
+    		parentComponent
+		);
     }
 
     /** Pregunta al usuario por un nombre de fichero para su carga.
-     * @param dialogTitle
-     *        T&iacute;tulo de la ventana de di&aacute;logo.
-     * @param extensions
-     *        Extensiones predeterminadas para el fichero
-     * @param description
-     *        Descripci&oacute;n del tipo de fichero correspondiente con las
-     *        extensiones
-     * @param parent
-     *        Componente padre (para la modalidad)
-     * @return Nombre de fichero (con ruta) seleccionado por el usuario */
+     * @param dialogTitle T&iacute;tulo de la ventana de di&aacute;logo.
+     * @param extensions Extensiones predeterminadas para el fichero
+     * @param description Descripci&oacute;n del tipo de fichero correspondiente con las extensiones
+     * @param parent Componente padre (para la modalidad)
+     * @param multiSelect <code>true</code> para permitir selecci&oacute;n m&uacute;ltiple, <code>false</code>
+     *                    para selecci&oacute;n de un &uacute;nico fichero
+     * @return Nombre de fichero (con ruta) seleccionado por el usuario
+     * @throws AOCancelledOperationException Si el usuario cancela la operaci&oacute;n. */
     @Override
-	public String getLoadFileName(final String dialogTitle,
+	public List<String> getLoadFileName(final String dialogTitle,
                                                final String[] extensions,
                                                final String description,
+                                               final boolean multiSelect,
                                                final Object parent) {
         Component parentComponent = null;
         if (parent instanceof Component) {
@@ -323,6 +334,7 @@ public final class JSEUIManager implements AOUIManager {
         }
 
         final JFileChooser jfc = new JFileChooser();
+        jfc.setMultiSelectionEnabled(multiSelect);
         if (dialogTitle != null && dialogTitle.length() > 0) {
             jfc.setDialogTitle(dialogTitle);
         }
@@ -331,31 +343,44 @@ public final class JSEUIManager implements AOUIManager {
         }
         final int ret = jfc.showOpenDialog(parentComponent);
         if (ret == JFileChooser.APPROVE_OPTION) {
-            return jfc.getSelectedFile().getAbsolutePath();
+        	final File[] files;
+        	if (multiSelect) {
+        		files = jfc.getSelectedFiles();
+        	}
+        	else {
+				files = new File[] { jfc.getSelectedFile() };
+			}
+        	if (files == null) {
+        		return null;
+        	}
+        	final List<String> sel = new ArrayList<String>(files.length);
+        	for (final File f : files) {
+        		sel.add(f.getAbsolutePath());
+        	}
+            return sel;
         }
-        return null;
+        throw new AOCancelledOperationException();
     }
 
     /** Muestra un di&aacute;logo de guardado para almacenar los datos indicados.
      * Los datos ser&aacute;n almacenados en el directorio y con el nombre que
      * indique el usuario. Si el fichero ya existe se le preguntar&aacute; al
-     * usuario si desea sobreescribirlo. En caso de cancelar la operaci&oacute;n
-     * se devolvera null, si la operaci&oacute;n finaliza correctamente se
+     * usuario si desea sobreescribirlo. Si la operaci&oacute;n finaliza correctamente se
      * devolver&aacute; el path completo del fichero.
-     * @param data
-     *        Datos que se desean almacenar.
-     * @param selectedFile
-     *        Nombre de fichero por defecto.
-     * @param fileFilter
-     *        Filtro de fichero para el di&aacute;logo de guardado.
-     * @param parent
-     *        Componente padre sobre el que se mostrar&aacute; el
+     * @param data Datos que se desean almacenar.
+     * @param selectedFile Nombre de fichero por defecto.
+     * @param fileFilter Filtro de fichero para el di&aacute;logo de guardado.
+     * @param parent Componente padre sobre el que se mostrar&aacute; el
      *        di&aacute;logo de guardado.
      * @return Fichero guardado.
-     * @throws NullPointerException
-     *         No se introdujeron los datos que se desean almacenar. */
+     * @throws IOException Si no se puede guardar el fichero
+     * @throws AOCancelledOperationException Si el usuario cancela la operaci&oacute;n. */
     @Override
-	public File saveDataToFile(final byte[] data, final File selectedFile, final Object fileFilter, final Object parent) {
+	public File saveDataToFile(final byte[] data,
+			                   final String dialogTitle,
+			                   final File selectedFile,
+			                   final Object fileFilter,
+			                   final Object parent) throws IOException {
 
         if (data == null) {
             throw new IllegalArgumentException("No se introdujeron datos que almacenar"); //$NON-NLS-1$
@@ -366,20 +391,24 @@ public final class JSEUIManager implements AOUIManager {
             parentComponent = (Component) parent;
         }
 
-        File resultFile = null;
+        final File resultFile = null;
         boolean tryAgain = true;
-        File file = null;
+        File file;
         while (tryAgain) {
 
             tryAgain = false;
             final JFileChooser fileChooser = new JFileChooser();
+
+            // Accesibilidad con textos fijos
             fileChooser.getAccessibleContext().setAccessibleName(JSEUIMessages.getString("JSEUIManager.81")); //$NON-NLS-1$
             fileChooser.getAccessibleContext().setAccessibleDescription(JSEUIMessages.getString("JSEUIManager.82")); //$NON-NLS-1$
             fileChooser.setToolTipText(JSEUIMessages.getString("JSEUIManager.81")); //$NON-NLS-1$
-            fileChooser.setSelectedFile(file);
 
-            // Si se nos ha indicado un nombre de fichero por defecto, lo
-            // establecemos
+            if (dialogTitle != null) {
+            	fileChooser.setDialogTitle(dialogTitle);
+            }
+
+            // Si se nos ha indicado un nombre de fichero por defecto, lo establecemos
             if (selectedFile != null) {
                 fileChooser.setSelectedFile(selectedFile);
             }
@@ -391,25 +420,33 @@ public final class JSEUIManager implements AOUIManager {
             }
 
             int selectedOption = JOptionPane.YES_OPTION;
-            if (JFileChooser.APPROVE_OPTION == fileChooser.showSaveDialog(parentComponent)) {
-                file = fileChooser.getSelectedFile();
-                if (file.exists()) {
-                    selectedOption =
-                        JOptionPane.showConfirmDialog(parentComponent,
-                                JSEUIMessages.getString("JSEUIManager.77", file.getAbsolutePath()), JSEUIMessages.getString("JSEUIManager.85"), JOptionPane.YES_NO_CANCEL_OPTION); //$NON-NLS-1$ //$NON-NLS-2$
-                    if (selectedOption == JOptionPane.CANCEL_OPTION) {
-                        LOGGER.info("Se ha cancelado la operacion de guardado."); //$NON-NLS-1$
-                        return null;
-                    }
-                    // Si se ha seleccionado la opcion YES (se desea
-                    // sobreescribir) continuamos
-                    // normalmente con el guardado del fichero
-                }
+            final int returnCode = fileChooser.showSaveDialog(parentComponent);
+            switch(returnCode) {
+            	case JFileChooser.CANCEL_OPTION:
+            		throw new AOCancelledOperationException();
+            	case JFileChooser.APPROVE_OPTION:
+	                file = fileChooser.getSelectedFile();
+	                if (file.exists()) {
+	                    selectedOption = JOptionPane.showConfirmDialog(
+                    		parentComponent,
+	                        JSEUIMessages.getString("JSEUIManager.77", file.getAbsolutePath()), //$NON-NLS-1$
+	                        JSEUIMessages.getString("JSEUIManager.85"), //$NON-NLS-1$
+	                        JOptionPane.YES_NO_CANCEL_OPTION
+                        );
+	                    if (selectedOption == JOptionPane.CANCEL_OPTION) {
+	                        LOGGER.info("Se ha cancelado la operacion de guardado."); //$NON-NLS-1$
+	                        return null;
+	                    }
+	                    // Si se ha seleccionado la opcion YES (se desea
+	                    // sobreescribir) continuamos
+	                    // normalmente con el guardado del fichero
+	                }
 
-                if (selectedOption == JOptionPane.NO_OPTION) {
-                    tryAgain = true;
-                }
-                else { // Hemos seleccionado la opcion de sobreescribir
+	                if (selectedOption == JOptionPane.NO_OPTION) {
+	                    tryAgain = true;
+	                    break;
+	                }
+	                // Hemos seleccionado la opcion de sobreescribir
                     try {
                     	final FileOutputStream fos = new FileOutputStream(file);
                         fos.write(data);
@@ -427,8 +464,12 @@ public final class JSEUIManager implements AOUIManager {
                         // Volvemos a intentar guardar
                         tryAgain = true;
                     }
-                    resultFile = file;
-                }
+                    return file;
+			default:
+				throw new IOException("Error al seleccionar el fichero: " + returnCode); //$NON-NLS-1$
+
+
+
             }
         }
 
@@ -501,16 +542,12 @@ public final class JSEUIManager implements AOUIManager {
     }
 
     /** Pregunta al usuario por la localizaci&oacute;n de un fichero espec&iacute;fico para su carga.
-     * @param dialogTitle
-     *        T&iacute;tulo de la ventana de di&aacute;logo.
-     * @param fileName
-     *        Nombre del fichero a localizar
-     * @param description
-     *        Descripci&oacute;n del tipo de fichero correspondiente con las
-     *        extensiones
-     * @param parent
-     *        Componente padre (para la modalidad, debe ser de tipo <code>java.awt.Component</code>)
-     * @return Fichero seleccionado por el usuario */
+     * @param dialogTitle T&iacute;tulo de la ventana de di&aacute;logo.
+     * @param fileName Nombre del fichero a localizar
+     * @param description Descripci&oacute;n del tipo de fichero correspondiente con las extensiones
+     * @param parent Componente padre (para la modalidad, debe ser de tipo <code>java.awt.Component</code>)
+     * @return Fichero seleccionado por el usuario
+     * @throws AOCancelledOperationException Si el usuario cancela la operaci&oacute;n. */
     @Override
 	public File getLoadFile(final String dialogTitle,
                             final String fileName,
@@ -544,7 +581,7 @@ public final class JSEUIManager implements AOUIManager {
             }
         });
         if (fc.showOpenDialog(parentComponent) != JFileChooser.APPROVE_OPTION) {
-            return null;
+            throw new AOCancelledOperationException();
         }
         return fc.getSelectedFile();
     }

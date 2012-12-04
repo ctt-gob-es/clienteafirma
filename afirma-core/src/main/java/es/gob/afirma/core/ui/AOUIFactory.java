@@ -11,8 +11,11 @@
 package es.gob.afirma.core.ui;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.List;
 import java.util.logging.Logger;
 
+import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 
@@ -166,44 +169,39 @@ public final class AOUIFactory {
     }
 
     /** Pregunta al usuario por un nombre de fichero para su carga.
-     * @param extensions
-     *        Extensiones predeterminadas para el fichero
-     * @param description
-     *        Descripci&oacute;n del tipo de fichero correspondiente con las
-     *        extensiones
-     * @param parentComponent
-     *        Componente padre (para la modalidad)
+     * @param extensions Extensiones predeterminadas para el fichero
+     * @param description Descripci&oacute;n del tipo de fichero correspondiente con las extensiones
+     * @param multiSelect <code>true</code> para permitir selecci&oacute;n m&uacute;ltiple, <code>false</code>
+     *                    para selecci&oacute;n de un &uacute;nico fichero
+     * @param parentComponent Componente padre (para la modalidad)
      * @return Nombre de fichero (con ruta) seleccionado por el usuario */
-    public static String getLoadFileName(final String[] extensions, final String description, final Object parentComponent) {
-        return uiManager.getLoadFileName(extensions, description, parentComponent);
+    public static List<String> getLoadFileName(final String[] extensions, final String description, final boolean multiSelect, final Object parentComponent) {
+        return uiManager.getLoadFileName(extensions, description, multiSelect, parentComponent);
     }
 
     /** Pregunta al usuario por un nombre de fichero para su carga.
-     * @param dialogTitle
-     *        T&iacute;tulo de la ventana de di&aacute;logo.
-     * @param extensions
-     *        Extensiones predeterminadas para el fichero
-     * @param description
-     *        Descripci&oacute;n del tipo de fichero correspondiente con las
-     *        extensiones
-     * @param parentComponent
-     *        Componente padre (para la modalidad)
+     * @param dialogTitle T&iacute;tulo de la ventana de di&aacute;logo.
+     * @param extensions Extensiones predeterminadas para el fichero
+     * @param description Descripci&oacute;n del tipo de fichero correspondiente con las extensiones
+     * @param multiSelect <code>true</code> para permitir selecci&oacute;n m&uacute;ltiple, <code>false</code>
+     *                    para selecci&oacute;n de un &uacute;nico fichero
+     * @param parentComponent Componente padre (para la modalidad)
      * @return Nombre de fichero (con ruta) seleccionado por el usuario */
-    public static String getLoadFileName(final String dialogTitle,final String[] extensions, final String description, final Object parentComponent) {
-        return uiManager.getLoadFileName(dialogTitle, extensions, description, parentComponent);
+    public static List<String> getLoadFileName(final String dialogTitle,
+    		                                   final String[] extensions,
+    		                                   final String description,
+    		                                   final boolean multiSelect,
+    		                                   final Object parentComponent) {
+        return uiManager.getLoadFileName(dialogTitle, extensions, description, multiSelect, parentComponent);
     }
 
     /** Pregunta al usuario por la localizaci&oacute;n de un fichero espec&iacute;fico para su carga.
-     * @param dialogTitle
-     *        T&iacute;tulo de la ventana de di&aacute;logo.
-     * @param fileName
-     *        Nombre del fichero a localizar
-     * @param description
-     *        Descripci&oacute;n del tipo de fichero correspondiente con las
-     *        extensiones
-     * @param parent
-     *        Componente padre (para la modalidad)
-     * @return Fichero seleccionado por el usuario */
+     * @param dialogTitle T&iacute;tulo de la ventana de di&aacute;logo.
+     * @param fileName Nombre del fichero a localizar
+     * @param description Descripci&oacute;n del tipo de fichero correspondiente con las extensiones
+     * @param parent Componente padre (para la modalidad)
+     * @return Fichero seleccionado por el usuario
+     * @throws AOCancelledOperationException Si el usuario cancela la operaci&oacute;n. */
     public static File getLoadFile(final String dialogTitle, final String fileName, final String description, final Object parent) {
         return uiManager.getLoadFile(dialogTitle, fileName, description, parent);
     }
@@ -212,17 +210,18 @@ public final class AOUIFactory {
      * los datos y los guarda en la misma. Si ocurre un error durante el guardado, se
      * vuelve a preguntar al usuario por una localizaci&oacute;n, Si el usuario
      * cancela el di&aacute;logo, se devolver&aacute; {@code null}.
-     * @param data
-     *        Datos que se desean almacenar.
-     * @param selectedFile
-     *        Localizaci&oacute;n y nombre por defecto del fichero.
-     * @param fileFilter
-     *        Filtro de fichero.
-     * @param parent
-     *        Componente padre (para la modalidad)
+     * @param data Datos que se desean almacenar.
+     * @param dialogTitle T&iacute;tulo del di&aacute;logo de guardado
+     * @param selectedFile Localizaci&oacute;n y nombre por defecto del fichero.
+     * @param fileFilter Filtro de fichero.
+     * @param parent Componente padre (para la modalidad)
      * @return Fichero en el que se almacenan los datos.
-     */
-    public static File getSaveDataToFile(final byte[] data, final File selectedFile, final Object fileFilter, final Object parent) {
-        return uiManager.saveDataToFile(data, selectedFile, fileFilter, parent);
+     * @throws IOException Si no se puede guardar el fichero*/
+    public static File getSaveDataToFile(final byte[] data,
+    									 final String dialogTitle,
+    		                             final File selectedFile,
+    		                             final Object fileFilter,
+    		                             final Object parent) throws IOException {
+        return uiManager.saveDataToFile(data, dialogTitle, selectedFile, fileFilter, parent);
     }
 }

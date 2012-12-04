@@ -11,6 +11,8 @@
 package es.gob.afirma.core.ui;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
 /** Gestor de componentes de interfaz gr&aacute;fico
  * @version 0.4 */
@@ -126,15 +128,13 @@ public interface AOUIManager {
     int getInformationMessageCode();
 
     /** Pregunta al usuario por un nombre de fichero para su carga.
-     * @param extensions
-     *        Extensiones predeterminadas para el fichero
-     * @param description
-     *        Descripci&oacute;n del tipo de fichero correspondiente con las
-     *        extensiones
-     * @param parentComponent
-     *        Componente padre (para la modalidad)
+     * @param extensions Extensiones predeterminadas para el fichero
+     * @param description Descripci&oacute;n del tipo de fichero correspondiente con las extensiones
+     * @param multiSelect <code>true</code> para permitir selecci&oacute;n m&uacute;ltiple, <code>false</code>
+     *                    para selecci&oacute;n de un &uacute;nico fichero
+     * @param parentComponent Componente padre (para la modalidad)
      * @return Nombre de fichero (con ruta) seleccionado por el usuario */
-    String getLoadFileName(String[] extensions, String description, Object parentComponent);
+    List<String> getLoadFileName(String[] extensions, String description, boolean multiSelect, Object parentComponent);
 
     /** Pregunta al usuario por un nombre de fichero para su carga.
      * @param dialogTitle
@@ -144,10 +144,12 @@ public interface AOUIManager {
      * @param description
      *        Descripci&oacute;n del tipo de fichero correspondiente con las
      *        extensiones
+     * @param multiSelect <code>true</code> para permitir selecci&oacute;n m&uacute;ltiple, <code>false</code>
+     *                    para selecci&oacute;n de un &uacute;nico fichero
      * @param parentComponent
      *        Componente padre (para la modalidad)
      * @return Nombre de fichero (con ruta) seleccionado por el usuario */
-    String getLoadFileName(String dialogTitle, String[] extensions, String description, Object parentComponent);
+    List<String> getLoadFileName(String dialogTitle, String[] extensions, String description, boolean multiSelect, Object parentComponent);
 
     /** Pregunta al usuario por la localizaci&oacute;n de un fichero espec&iacute;fico para su carga.
      * @param dialogTitle
@@ -168,15 +170,17 @@ public interface AOUIManager {
      * usuario si desea sobreescribirlo. En caso de cancelar la operaci&oacute;n
      * se devolvera null, si la operaci&oacute;n finaliza correctamente se
      * devolver&aacute; el path completo del fichero.
-     * @param data
-     *        Datos que se desean almacenar.
-     * @param selectedFile
-     *        Nombre de fichero por defecto.
-     * @param fileFilter
-     *        Filtro de fichero para el di&aacute;logo de guardado.
-     * @param parent
-     *        Componente padre sobre el que se mostrar&aacute; el
+     * @param data Datos que se desean almacenar.
+     * @param dialogTitle T&iacute;tulo del di&aacute;logo de guardado
+     * @param selectedFile Nombre de fichero por defecto.
+     * @param fileFilter Filtro de fichero para el di&aacute;logo de guardado.
+     * @param parent Componente padre sobre el que se mostrar&aacute; el
      *        di&aacute;logo de guardado.
-     * @return Fichero guardado. */
-    File saveDataToFile(final byte[] data, final File selectedFile, final Object fileFilter, final Object parent);
+     * @return Fichero guardado.
+     * @throws IOException Si no se puede guardar el fichero */
+    File saveDataToFile(final byte[] data,
+    					final String dialogTitle,
+    		            final File selectedFile,
+    		            final Object fileFilter,
+    		            final Object parent) throws IOException;
 }

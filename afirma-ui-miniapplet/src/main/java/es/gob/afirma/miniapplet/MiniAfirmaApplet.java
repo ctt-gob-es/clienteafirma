@@ -301,24 +301,26 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		final String titleDialog = MiniAfirmaApplet.cleanParam(title);
 
 		final String depuredExts = MiniAfirmaApplet.cleanParam(extension);
-		final String[] exts = (depuredExts == null ? null : new String[] { depuredExts });
+		final String[] exts = depuredExts == null ? null : new String[] { depuredExts };
 
 		final String descFiles = MiniAfirmaApplet.cleanParam(description);
 
 		final String depuredFileName = MiniAfirmaApplet.cleanParam(fileName);
-		final File fileHint = (depuredFileName == null ?
-				this.pathHint : new File(this.pathHint, fileName));
+		final File fileHint = depuredFileName == null ?
+				this.pathHint : new File(this.pathHint, fileName);
 
 		try {
-			return AccessController.doPrivileged(
-					new SaveFileAction(
-							titleDialog,
-							Base64.decode(data),
-							exts,
-							descFiles,
-							fileHint,
-							this
-					)).booleanValue();
+			AccessController.doPrivileged(
+				new SaveFileAction(
+						titleDialog,
+						Base64.decode(data),
+						exts,
+						descFiles,
+						fileHint,
+						this
+				)
+			);
+			return true;
 		}
 		catch (final AOCancelledOperationException e) {
 			return false;
@@ -352,7 +354,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 		final String titleDialog = MiniAfirmaApplet.cleanParam(title);
 		final String cleanExts = MiniAfirmaApplet.cleanParam(extensions);
-		final String[] exts = (cleanExts == null ? null : cleanExts.split(",")); //$NON-NLS-1$
+		final String[] exts = cleanExts == null ? null : cleanExts.split(","); //$NON-NLS-1$
 		final String descFiles = MiniAfirmaApplet.cleanParam(description);
 
 		try {
@@ -400,7 +402,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 		final String titleDialog = MiniAfirmaApplet.cleanParam(title);
 		final String cleanExts = MiniAfirmaApplet.cleanParam(extensions);
-		final String[] exts = (cleanExts == null ? null : cleanExts.split(",")); //$NON-NLS-1$
+		final String[] exts = cleanExts == null ? null : cleanExts.split(","); //$NON-NLS-1$
 		final String descFiles = MiniAfirmaApplet.cleanParam(description);
 
 		try {
@@ -510,8 +512,8 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			ex = e.getCause();
 		}
 
-		this.errorMessage = (ex.getLocalizedMessage() != null ? ex.getLocalizedMessage() :
-			(ex.getMessage() != null ? ex.getMessage() : ex.toString()));
+		this.errorMessage = ex.getLocalizedMessage() != null ? ex.getLocalizedMessage() :
+			ex.getMessage() != null ? ex.getMessage() : ex.toString();
 
 		this.errorType = ex.getClass().getCanonicalName();
 

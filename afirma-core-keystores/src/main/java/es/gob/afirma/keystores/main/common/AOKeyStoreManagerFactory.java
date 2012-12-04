@@ -149,7 +149,13 @@ public final class AOKeyStoreManagerFactory {
                         "pfx", "p12" //$NON-NLS-1$ //$NON-NLS-2$
             };
             desc = KeyStoreMessages.getString("AOKeyStoreManagerFactory.0"); //$NON-NLS-1$
-            storeFilename = AOUIFactory.getLoadFileName(KeyStoreMessages.getString("AOKeyStoreManagerFactory.4") + " " + "PKCS#12", exts, desc, parentComponent); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            storeFilename = AOUIFactory.getLoadFileName(
+        		KeyStoreMessages.getString("AOKeyStoreManagerFactory.4") + " " + "PKCS#12", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        		exts,
+        		desc,
+        		false,
+        		parentComponent
+    		).get(0);
             if (storeFilename == null) {
                 throw new AOCancelledOperationException("No se ha seleccionado el almacen de certificados"); //$NON-NLS-1$
             }
@@ -231,7 +237,13 @@ public final class AOKeyStoreManagerFactory {
                 };
                 desc = KeyStoreMessages.getString("AOKeyStoreManagerFactory.3"); //$NON-NLS-1$
             }
-            storeFilename = AOUIFactory.getLoadFileName(KeyStoreMessages.getString("AOKeyStoreManagerFactory.4") + " " + store.getName(), exts, desc, parentComponent); //$NON-NLS-1$ //$NON-NLS-2$
+            storeFilename = AOUIFactory.getLoadFileName(
+        		KeyStoreMessages.getString("AOKeyStoreManagerFactory.4") + " " + store.getName(), //$NON-NLS-1$ //$NON-NLS-2$
+        		exts,
+        		desc,
+        		false,
+        		parentComponent
+    		).get(0);
             if (storeFilename == null) {
                 throw new AOCancelledOperationException("No se ha seleccionado el almacen de certificados"); //$NON-NLS-1$
             }
@@ -284,11 +296,12 @@ public final class AOKeyStoreManagerFactory {
                 extsDesc = extsDesc + " (*.so)"; //$NON-NLS-1$
             }
             p11Lib = AOUIFactory.getLoadFileName(
-                 KeyStoreMessages.getString("AOKeyStoreManagerFactory.7"),  //$NON-NLS-1$
-                 exts,
-                 extsDesc,
-                 parentComponent
-            );
+	             KeyStoreMessages.getString("AOKeyStoreManagerFactory.7"),  //$NON-NLS-1$
+	             exts,
+	             extsDesc,
+	             false,
+	             parentComponent
+            ).get(0);
         }
         if (p11Lib == null) {
             throw new AOCancelledOperationException("No se ha seleccionado el controlador PKCS#11"); //$NON-NLS-1$

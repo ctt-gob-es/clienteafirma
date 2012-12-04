@@ -56,6 +56,7 @@ import org.w3c.dom.ls.LSSerializer;
 
 import com.sun.org.apache.xerces.internal.dom.DOMOutputImpl;
 
+import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -170,14 +171,17 @@ public final class Utils {
             			AOUIFactory.OK_CANCEL_OPTION,
             			AOUIFactory.INFORMATION_MESSAGE) == AOUIFactory.OK_OPTION) {
 
-            		final File xmlStyleFile = AOUIFactory.getLoadFile(
-            				XMLMessages.getString("Utils.7"), //$NON-NLS-1$
-            				fileName,
-            				XMLMessages.getString("Utils.8", fileName), //$NON-NLS-1$
-            				null
-            		);
-
-            		if (xmlStyleFile == null) {
+            		final File xmlStyleFile;
+            		try {
+	            		xmlStyleFile = AOUIFactory.getLoadFile(
+	            				XMLMessages.getString("Utils.7"), //$NON-NLS-1$
+	            				fileName,
+	            				XMLMessages.getString("Utils.8", fileName), //$NON-NLS-1$
+	            				null
+	            		);
+            		}
+            		catch(final AOCancelledOperationException ex) {
+            			LOGGER.warning("El usuario ha cancelado la seleccion de hoja de estilo: " + ex); //$NON-NLS-1$
             			throw new CannotDereferenceException("No se ha podido dereferenciar la hoja de estilo", e); //$NON-NLS-1$
             		}
             		try {

@@ -11,11 +11,13 @@
 package es.gob.afirma.miniapplet;
 
 import java.awt.Component;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.PrivilegedExceptionAction;
 
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.ui.AOUIFactory;
 
 /**
  * Acci&oacute;n para la recuperaci&oacute;n del contenido de un fichero seleccionado
@@ -53,8 +55,13 @@ final class GetFileContentAction implements PrivilegedExceptionAction<byte[]>{
      */
 	@Override
 	public byte[] run() throws IOException {
-        final FileSelectionDialog dialog = new FileSelectionDialog(this.title, this.exts, this.desc, false, this.parent);
-        final InputStream is = dialog.getFileContent();
+		final InputStream is = new FileInputStream(AOUIFactory.getLoadFileName(
+			this.title,
+			this.exts,
+			this.desc,
+			false,
+			this.parent
+		).get(0));
     	final byte[] data = AOUtil.getDataFromInputStream(is);
     	is.close();
     	return data;

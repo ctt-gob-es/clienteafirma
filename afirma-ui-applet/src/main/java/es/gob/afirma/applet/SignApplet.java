@@ -2192,7 +2192,13 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
 					// Si no, le pedimos al usuario que seleccione un fichero y
 					// lo configuramos
-					final String fileName = AOUIFactory.getLoadFileName(AppletMessages.getString("SignApplet.356"), null, null, this); //$NON-NLS-1$
+					final String fileName = AOUIFactory.getLoadFileName(
+						AppletMessages.getString("SignApplet.356"), //$NON-NLS-1$
+						null,
+						null,
+						false,
+						this
+					).get(0);
 					if (fileName == null) {
 						LOGGER.severe("Se ha cancelado la seleccion del fichero de entrada"); //$NON-NLS-1$
 						this.setError(AppletMessages.getString("SignApplet.212")); //$NON-NLS-1$
@@ -4257,12 +4263,15 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 				/** {@inheritDoc} */
 				@Override
 				public String run() {
-					return AOUIFactory.getLoadFileName(title,
-							exts == null || exts.trim().length() == 0
-									? null
-											: AOUtil.split(exts, SignApplet.STRING_SEPARATOR),
-											description,
-											SignApplet.this);
+					return AOUIFactory.getLoadFileName(
+						title,
+						exts == null || exts.trim().length() == 0
+							? null
+								: AOUtil.split(exts, SignApplet.STRING_SEPARATOR),
+						description,
+						false,
+						SignApplet.this
+					).get(0);
 				}
 			});
 		}

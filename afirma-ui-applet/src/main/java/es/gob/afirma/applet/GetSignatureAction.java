@@ -7,7 +7,6 @@ import java.net.URI;
 import java.security.PrivilegedExceptionAction;
 import java.util.logging.Logger;
 
-import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -72,9 +71,6 @@ class GetSignatureAction implements PrivilegedExceptionAction<byte[]> {
         else {
             if (this.electronicSignatureFile == null) {
                 final String fileName = selectSignFile(this.signFormat, this.parent);
-                if (fileName == null) {
-                    throw new AOCancelledOperationException("Operacion cancelada por el usuario"); //$NON-NLS-1$
-                }
                 try {
                 	this.electronicSignatureFile = AOUtil.createURI(fileName);
                 }
@@ -171,10 +167,11 @@ class GetSignatureAction implements PrivilegedExceptionAction<byte[]> {
         }
 
         return AOUIFactory.getLoadFileName(
-        		AppletMessages.getString("SignApplet.163"), //$NON-NLS-1$
-                exts,
-                desc,
-                parent
-        );
+    		AppletMessages.getString("SignApplet.163"), //$NON-NLS-1$
+            exts,
+            desc,
+            false,
+            parent
+        ).get(0);
     }
 }

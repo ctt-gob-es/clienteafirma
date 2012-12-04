@@ -18,6 +18,7 @@ import java.security.PrivilegedExceptionAction;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.ui.AOUIFactory;
 
 /** Acci&oacute;n para la recuperaci&oacute;n del nombre y contenido de uno o m&aacute;s ficheros.
  * @author Carlos Gamuci Mill&aacute;n */
@@ -57,9 +58,13 @@ final class GetFileNameContentAction implements PrivilegedExceptionAction<String
 	@Override
 	public String[] run() throws IOException {
 
-		final FileSelectionDialog fsDialog = new FileSelectionDialog(this.title, this.exts, this.desc, this.multiSel, this.parent);
-		final String[] paths = this.multiSel ?
-				fsDialog.getPaths() : new String[] { fsDialog.getPath() };
+		final String[] paths = AOUIFactory.getLoadFileName(
+			this.title,
+			this.exts,
+			this.desc,
+			this.multiSel,
+			this.parent
+		).toArray(new String[0]);
 
 		File file;
 		byte[] contentFic;

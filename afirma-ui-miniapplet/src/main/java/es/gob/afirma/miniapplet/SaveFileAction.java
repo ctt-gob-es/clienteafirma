@@ -12,20 +12,17 @@ package es.gob.afirma.miniapplet;
 
 import java.awt.Component;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.PrivilegedExceptionAction;
 
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.ui.AOUIFactory;
 
 /**
  * Acci&oacute;n para almacenar un fichero en disco.
  * @author Carlos Gamuci Mill&aacute;n
  */
-final class SaveFileAction implements PrivilegedExceptionAction<Boolean> {
+final class SaveFileAction implements PrivilegedExceptionAction<Void> {
 
 	private final String title;
     private final byte[] data;
@@ -61,79 +58,24 @@ final class SaveFileAction implements PrivilegedExceptionAction<Boolean> {
      * @throws IOException Cuando se produce un error al almacenar el fichero.
      */
 	@Override
-	public Boolean run() throws IOException {
-    	return Boolean.valueOf(SaveFileAction.saveFile(this.selectFileToSave(), this.data));
+	public Void run() throws IOException {
+    	selectFileToSave();
+    	return null;
 	}
 
-    /**
-     * Pregunta al usuario por un nombre de fichero para salvar datos en disco.
+    /** Pregunta al usuario por un nombre de fichero para salvar datos en disco.
      * @return Nombre de fichero (con ruta) seleccionado por el usuario
      * @throws IOException Cuando se produzca un error durante la selecci&oacute;n del fichero.
      * @throws AOCancelledOperationException Cuando el usuario cancele la operaci&oacute;n.
      */
     private File selectFileToSave() throws IOException {
-
-    	final JFileChooser fc = new JFileChooser();
-    	if (this.title != null) {
-    		fc.setDialogTitle(this.title);
-    	}
-    	if (this.exts != null) {
-    		fc.setFileFilter(new FileExtensionFilter(this.exts, this.desc));
-    	}
-    	if (this.fileHint != null) {
-    		fc.setSelectedFile(this.fileHint);
-    	}
-
-    	boolean selectedFile = false;
-        File finalFile = null;
-        do {
-            final int ret = fc.showSaveDialog(this.parent);
-            if (ret == JFileChooser.CANCEL_OPTION) {
-            	throw new AOCancelledOperationException();
-            }
-            if (ret == JFileChooser.ERROR_OPTION) {
-            	throw new IOException();
-            }
-            final File tempFile = fc.getSelectedFile();
-            if (tempFile.exists()) {
-            	if (tempFile.isDirectory() || !tempFile.canWrite()) {
-            		JOptionPane.showMessageDialog(this.parent,
-            				MiniAppletMessages.getString("SaveFileAction.0", tempFile.getAbsolutePath()), //$NON-NLS-1$
-            				MiniAppletMessages.getString("SaveFileAction.1"), //$NON-NLS-1$
-            				JOptionPane.WARNING_MESSAGE);
-            		continue;
-            	}
-            	final int resp =
-            		JOptionPane.showConfirmDialog(this.parent,
-            				MiniAppletMessages.getString("SaveFileAction.2", tempFile.getAbsolutePath()), //$NON-NLS-1$
-            				MiniAppletMessages.getString("SaveFileAction.1"), //$NON-NLS-1$
-            				JOptionPane.YES_NO_CANCEL_OPTION,
-            				JOptionPane.QUESTION_MESSAGE);
-            	if (resp == JOptionPane.YES_OPTION) { // Sobreescribir fichero
-            		finalFile = tempFile;
-            		selectedFile = true;
-            	}
-            	else if (resp == JOptionPane.NO_OPTION) { // Seleccionar fichero
-            		continue;
-            	}
-            	else { // Cancelar operacion de guardado
-            		throw new AOCancelledOperationException();
-            	}
-            }
-            else {
-            	finalFile = fc.getSelectedFile();
-            	selectedFile = true;
-            }
-        } while (!selectedFile);
-
-        return finalFile;
+    	return AOUIFactory.getSaveDataToFile(
+			this.data,
+			this.title,
+			this.fileHint,
+			this.exts != null ? new FileExtensionFilter(this.exts, this.desc) : null,
+			this.parent
+		);
     }
 
-    private static boolean saveFile(final File file, final byte[] dataToSave) throws IOException {
-    	final FileOutputStream fos = new FileOutputStream(file);
-    	fos.write(dataToSave);
-    	fos.flush();
-		fos.close();
-    	return true;
-    }
 }

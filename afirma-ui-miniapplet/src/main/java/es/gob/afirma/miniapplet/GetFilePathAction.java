@@ -14,6 +14,8 @@ import java.awt.Component;
 import java.io.IOException;
 import java.security.PrivilegedExceptionAction;
 
+import es.gob.afirma.core.ui.AOUIFactory;
+
 /**
  * Acci&oacute;n para la recuperaci&oacute;n del nombre de un fichero.
  * @author Carlos Gamuci Mill&aacute;n
@@ -35,7 +37,7 @@ final class GetFilePathAction implements PrivilegedExceptionAction<String> {
     GetFilePathAction(final String title, final String[] exts, final String description,
     		 final Component parent) {
         this.title = title;
-        this.exts = (exts != null ? exts.clone() : null);
+        this.exts = exts != null ? exts.clone() : null;
         this.desc = description;
         this.parent = parent;
     }
@@ -49,6 +51,6 @@ final class GetFilePathAction implements PrivilegedExceptionAction<String> {
      */
 	@Override
 	public String run() throws IOException {
-        return new FileSelectionDialog(this.title, this.exts, this.desc, false, this.parent).getPath();
+		return AOUIFactory.getLoadFileName(this.title, this.exts, this.desc, false, this.parent).get(0);
 	}
 }

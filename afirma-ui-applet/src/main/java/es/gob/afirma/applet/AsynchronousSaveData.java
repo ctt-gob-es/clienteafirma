@@ -112,6 +112,7 @@ final class AsynchronousSaveData implements Runnable {
                     			AsynchronousSaveData.this.getDescription());
                     	final File outputFile = AOUIFactory.getSaveDataToFile(
                     			AsynchronousSaveData.this.getDataToSave(),
+                    			null, // Titulo del dialogo por defecto
                     			new File("*" + (exts == null || exts.length == 0 ? "" : "." + exts[0])), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                     			fileFilter,
                     			AsynchronousSaveData.this.getParent());
