@@ -61,7 +61,7 @@ final class GetFileContentAction implements PrivilegedExceptionAction<byte[]>{
 			this.desc,
 			false,
 			this.parent
-		).get(0));
+		)[0]);
     	final byte[] data = AOUtil.getDataFromInputStream(is);
     	is.close();
     	return data;

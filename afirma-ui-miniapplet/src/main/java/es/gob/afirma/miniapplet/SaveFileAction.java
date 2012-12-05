@@ -72,7 +72,8 @@ final class SaveFileAction implements PrivilegedExceptionAction<Void> {
 			this.data,
 			this.title,
 			this.fileHint,
-			this.exts != null ? new FileExtensionFilter(this.exts, this.desc) : null,
+			this.exts,
+			this.desc,
 			this.parent
 		);
     }

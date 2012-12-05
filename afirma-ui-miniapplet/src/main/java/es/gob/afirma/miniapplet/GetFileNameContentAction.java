@@ -64,7 +64,7 @@ final class GetFileNameContentAction implements PrivilegedExceptionAction<String
 			this.desc,
 			this.multiSel,
 			this.parent
-		).toArray(new String[0]);
+		);
 
 		File file;
 		byte[] contentFic;

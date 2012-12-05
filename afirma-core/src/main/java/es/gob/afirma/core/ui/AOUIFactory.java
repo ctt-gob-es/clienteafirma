@@ -12,7 +12,6 @@ package es.gob.afirma.core.ui;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -178,7 +177,7 @@ public final class AOUIFactory {
      *                    para selecci&oacute;n de un &uacute;nico fichero
      * @param parentComponent Componente padre (para la modalidad)
      * @return Nombre de fichero (con ruta) seleccionado por el usuario */
-    public static List<String> getLoadFileName(final String[] extensions, final String description, final boolean multiSelect, final Object parentComponent) {
+    public static String[] getLoadFileName(final String[] extensions, final String description, final boolean multiSelect, final Object parentComponent) {
         return uiManager.getLoadFileName(extensions, description, multiSelect, parentComponent);
     }
 
@@ -190,7 +189,7 @@ public final class AOUIFactory {
      *                    para selecci&oacute;n de un &uacute;nico fichero
      * @param parentComponent Componente padre (para la modalidad)
      * @return Nombre de fichero (con ruta) seleccionado por el usuario */
-    public static List<String> getLoadFileName(final String dialogTitle,
+    public static String[] getLoadFileName(final String dialogTitle,
     		                                   final String[] extensions,
     		                                   final String description,
     		                                   final boolean multiSelect,
@@ -226,15 +225,17 @@ public final class AOUIFactory {
      * @param data Datos que se desean almacenar.
      * @param dialogTitle T&iacute;tulo del di&aacute;logo de guardado
      * @param selectedFile Localizaci&oacute;n y nombre por defecto del fichero.
-     * @param fileFilter Filtro de fichero.
+     * @param exts Extensiones de fichero aceptadas.
+     * @param description Descripci&oacute;n del tipo de fichero a guardar
      * @param parent Componente padre (para la modalidad)
      * @return Fichero en el que se almacenan los datos.
      * @throws IOException Si no se puede guardar el fichero*/
     public static File getSaveDataToFile(final byte[] data,
     									 final String dialogTitle,
     		                             final File selectedFile,
-    		                             final Object fileFilter,
+    		                             final String[] exts,
+    		                             final String description,
     		                             final Object parent) throws IOException {
-        return uiManager.saveDataToFile(data, dialogTitle, selectedFile, fileFilter, parent);
+        return uiManager.saveDataToFile(data, dialogTitle, selectedFile, exts, description, parent);
     }
 }

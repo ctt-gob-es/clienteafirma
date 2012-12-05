@@ -155,7 +155,7 @@ public final class AOKeyStoreManagerFactory {
         		desc,
         		false,
         		parentComponent
-    		).get(0);
+    		)[0];
             if (storeFilename == null) {
                 throw new AOCancelledOperationException("No se ha seleccionado el almacen de certificados"); //$NON-NLS-1$
             }
@@ -243,7 +243,7 @@ public final class AOKeyStoreManagerFactory {
         		desc,
         		false,
         		parentComponent
-    		).get(0);
+    		)[0];
             if (storeFilename == null) {
                 throw new AOCancelledOperationException("No se ha seleccionado el almacen de certificados"); //$NON-NLS-1$
             }
@@ -301,7 +301,7 @@ public final class AOKeyStoreManagerFactory {
 	             extsDesc,
 	             false,
 	             parentComponent
-            ).get(0);
+            )[0];
         }
         if (p11Lib == null) {
             throw new AOCancelledOperationException("No se ha seleccionado el controlador PKCS#11"); //$NON-NLS-1$

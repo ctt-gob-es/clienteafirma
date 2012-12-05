@@ -1,30 +1,26 @@
-package es.gob.afirma.miniapplet;
+package es.gob.afirma.ui.core.jse;
 
 import java.io.File;
 
 import javax.swing.filechooser.FileFilter;
 
-/**
- * Filtro de ficheros basado en extensiones de fichero para di&aacute;logos de selecci&opacute;n.
- * @author Carlos Gamuci
- */
+/** Filtro de ficheros basado en extensiones de fichero para di&aacute;logos de selecci&opacute;n.
+ * @author Carlos Gamuci */
 class FileExtensionFilter extends FileFilter {
 
-	private String[] exts;
-	
-	private String desc;
-	
-	/**
-	 * Construye el filtro para un listado de extensiones y con una descripci&oacute;n (opcional)
-	 * asignada. 
+	private final String[] exts;
+
+	private final String desc;
+
+	/** Construye el filtro para un listado de extensiones y con una descripci&oacute;n (opcional)
+	 * asignada.
 	 * @param extensions Extensiones que se desean visualizar en el panel de selecci&oacute;n.
-	 * @param description Descripci&oacute;n asignada al tipo de fichero que se busca.
-	 */
-	FileExtensionFilter(String[] extensions, final String description) {
+	 * @param description Descripci&oacute;n asignada al tipo de fichero que se busca. */
+	FileExtensionFilter(final String[] extensions, final String description) {
 		this.exts = extensions.clone();
 		this.desc = description;
 	}
-	
+
 	/** {@inheritDoc} */
 	@Override
 	public String getDescription() {

@@ -71,7 +71,7 @@ final class GetFileAction implements PrivilegedExceptionAction<FileBean[]> {
 	public FileBean[] run() throws IOException {
 
 		if (this.paths == null) {
-			this.paths = AOUIFactory.getLoadFileName(this.title, this.exts, this.desc, this.multiSel, this.parent).toArray(new String[0]);
+			this.paths = AOUIFactory.getLoadFileName(this.title, this.exts, this.desc, this.multiSel, this.parent);
 		}
 
 		File file;

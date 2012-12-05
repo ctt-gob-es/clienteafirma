@@ -174,34 +174,16 @@ public final class FileUIManager {
      */
     public static File openFile(final Frame parent, final File actualDir, final String[] exts, final String title) {
 
-        final File currentDir = (actualDir != null) ? actualDir : new File("."); //$NON-NLS-1$
-
-        FilenameFilter filter = null;
-        if (exts != null) {
-            filter = new FilenameFilter() {
-                @Override
-                public boolean accept(final File dir, final String name) {
-                    for (final String ext : exts) {
-                        if (name.endsWith(ext)) {
-                            return true;
-                        }
-                    }
-                    return false;
-                }
-            };
-        }
+        final File currentDir = actualDir != null ? actualDir : new File("."); //$NON-NLS-1$
 
         if (Platform.OS.MACOSX.equals(Platform.getOS()) || Platform.OS.WINDOWS.equals(Platform.getOS())) {
             final FileDialog fd = new FileDialog(parent, title);
             fd.setDirectory(currentDir.getAbsolutePath());
 
-            if (filter != null) {
+            if (exts != null) {
                 fd.setFilenameFilter(new FilenameFilter() {
                     @Override
                     public boolean accept(final File dir, final String name) {
-                    	if (exts == null) {
-                            return true;
-                        }
                         for (final String ext : exts) {
                             if (name.endsWith(ext)) {
                                 return true;
@@ -219,16 +201,13 @@ public final class FileUIManager {
         }
 
         final JFileChooser fc = new JFileChooser(currentDir);
-        if (filter != null) {
+        if (exts != null) {
             fc.setFileFilter(new FileFilter() {
                 @Override public String getDescription() {
                     return null;
                 }
 
                 @Override public boolean accept(final File f) {
-                	if (exts == null) {
-                        return true;
-                    }
                     for (final String ext : exts) {
                         if (f.getName().endsWith(ext)) {
                             return true;

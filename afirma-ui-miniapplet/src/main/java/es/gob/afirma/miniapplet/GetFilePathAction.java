@@ -51,6 +51,6 @@ final class GetFilePathAction implements PrivilegedExceptionAction<String> {
      */
 	@Override
 	public String run() throws IOException {
-		return AOUIFactory.getLoadFileName(this.title, this.exts, this.desc, false, this.parent).get(0);
+		return AOUIFactory.getLoadFileName(this.title, this.exts, this.desc, false, this.parent)[0];
 	}
 }

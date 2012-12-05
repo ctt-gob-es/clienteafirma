@@ -107,15 +107,14 @@ final class AsynchronousSaveData implements Runnable {
                 if (AsynchronousSaveData.this.getSavingTarget() == null || "".equals(AsynchronousSaveData.this.getSavingTarget())) { //$NON-NLS-1$
                     try {
                     	final String[] exts = AsynchronousSaveData.this.getExtensions();
-                    	final ExtFilter fileFilter = new ExtFilter(
-                    			exts,
-                    			AsynchronousSaveData.this.getDescription());
                     	final File outputFile = AOUIFactory.getSaveDataToFile(
                     			AsynchronousSaveData.this.getDataToSave(),
                     			null, // Titulo del dialogo por defecto
                     			new File("*" + (exts == null || exts.length == 0 ? "" : "." + exts[0])), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                    			fileFilter,
-                    			AsynchronousSaveData.this.getParent());
+                    			exts,
+                    			AsynchronousSaveData.this.getDescription(),
+                    			AsynchronousSaveData.this.getParent()
+            			);
                     	if (outputFile == null) {
                     		Logger.getLogger("es.gob.afirma").severe("Operacion cancelada por el usuario"); //$NON-NLS-1$ //$NON-NLS-2$
                             return null;

@@ -16,8 +16,6 @@ import java.awt.Toolkit;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.BoxLayout;
@@ -36,12 +34,12 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.ui.AOUIManager;
 import es.gob.afirma.core.ui.NameCertificateBean;
 
-/** Gestor de componentes de interfas gr&aacute;fico (tanto para Applet como para
+/** Gestor de componentes de interfaz gr&aacute;fico (tanto para Applet como para
  * aplicaci&oacute;n de escritorio) de la aplicaci&oacute;n.
  * @version 0.4 */
-public final class JSEUIManager implements AOUIManager {
+public class JSEUIManager implements AOUIManager {
 
-    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+    protected static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     private static final int ASCII_LOWER_INDEX = 32;
     private static final int ASCII_HIGHER_INDEX = 126;
@@ -53,7 +51,7 @@ public final class JSEUIManager implements AOUIManager {
      * @throws AOCancelledOperationException Cuando el usuario cancela el proceso de solicitud de
      *         contrase&ntilde;a */
     @Override
-	public char[] getPassword(final String text, final Object c) {
+	public final char[] getPassword(final String text, final Object c) {
         return getPassword(text, null, false, c);
     }
 
@@ -69,7 +67,7 @@ public final class JSEUIManager implements AOUIManager {
      * @throws AOCancelledOperationException
      *         Cuando el usuario cancela o cierra el di&aacute;logo */
     @Override
-	public char[] getPassword(final String text, final String charSet, final boolean beep, final Object c) {
+	public final char[] getPassword(final String text, final String charSet, final boolean beep, final Object c) {
         final JPasswordField pwd = new JPasswordField(10);
         if (charSet != null) {
             pwd.setDocument(new JTextFieldFilter(charSet, beep));
@@ -114,7 +112,7 @@ public final class JSEUIManager implements AOUIManager {
 
     /** {@inheritDoc} */
     @Override
-	public Object showInputDialog(final Object parentComponent,
+	public final Object showInputDialog(final Object parentComponent,
                                   final Object message,
                                   final String title,
                                   final int messageType,
@@ -137,7 +135,7 @@ public final class JSEUIManager implements AOUIManager {
 
     /** {@inheritDoc} */
     @Override
-	public Object showCertificateSelectionDialog(	final Object parentComponent,
+	public final Object showCertificateSelectionDialog(	final Object parentComponent,
     												final NameCertificateBean[] selectionValues) {
     	Component parent = null;
     	if (parentComponent instanceof Component) {
@@ -146,8 +144,7 @@ public final class JSEUIManager implements AOUIManager {
 		return new CertificateSelectionDialog(selectionValues, parent).showDialog();
     }
 
-    /** Original code: <a
-     * href="http://tactika.com/realhome/realhome.html">http://tactika.com/realhome/realhome.html</a>
+    /** Original code: <a href="http://tactika.com/realhome/realhome.html">http://tactika.com/realhome/realhome.html</a>
      * @author Real Gagnon */
     private static final class JTextFieldFilter extends PlainDocument {
 
@@ -228,7 +225,7 @@ public final class JSEUIManager implements AOUIManager {
 
     /** {@inheritDoc} */
     @Override
-	public int showConfirmDialog(final Object parentComponent, final Object message, final String title, final int optionType, final int messageType) {
+	public final int showConfirmDialog(final Object parentComponent, final Object message, final String title, final int optionType, final int messageType) {
         Component parent = null;
         if (parentComponent instanceof Component) {
             parent = (Component) parentComponent;
@@ -238,55 +235,55 @@ public final class JSEUIManager implements AOUIManager {
 
     /** {@inheritDoc} */
     @Override
-	public int getPlainMessageCode() {
+	public final int getPlainMessageCode() {
         return JOptionPane.PLAIN_MESSAGE;
     }
 
     /** {@inheritDoc} */
     @Override
-	public int getYesNoOptionCode() {
+	public final int getYesNoOptionCode() {
         return JOptionPane.YES_NO_OPTION;
     }
 
     /** {@inheritDoc} */
     @Override
-	public int getWarningMessageCode() {
+	public final int getWarningMessageCode() {
         return JOptionPane.WARNING_MESSAGE;
     }
 
     /** {@inheritDoc} */
     @Override
-	public int getYesOptionCode() {
+	public final int getYesOptionCode() {
         return JOptionPane.YES_OPTION;
     }
 
     /** {@inheritDoc} */
     @Override
-	public int getNoOptionCode() {
+	public final int getNoOptionCode() {
         return JOptionPane.NO_OPTION;
     }
 
     /** {@inheritDoc} */
     @Override
-	public int getOkCancelOptionCode() {
+	public final int getOkCancelOptionCode() {
         return JOptionPane.OK_CANCEL_OPTION;
     }
 
     /** {@inheritDoc} */
     @Override
-	public int getOkOptionCode() {
+	public final int getOkOptionCode() {
         return JOptionPane.OK_OPTION;
     }
 
     /** {@inheritDoc} */
     @Override
-	public int getInformationMessageCode() {
+	public final int getInformationMessageCode() {
         return JOptionPane.INFORMATION_MESSAGE;
     }
 
     /** {@inheritDoc} */
     @Override
-	public int getQuestionMessageCode() {
+	public final int getQuestionMessageCode() {
         return JOptionPane.QUESTION_MESSAGE;
     }
 
@@ -326,7 +323,7 @@ public final class JSEUIManager implements AOUIManager {
      * @return Nombre de fichero (con ruta) seleccionado por el usuario
      * @throws AOCancelledOperationException Si el usuario cancela la operaci&oacute;n. */
     @Override
-	public List<String> getLoadFileName(final String[] extensions, final String description, final boolean multiSelect, final Object parentComponent) {
+	public String[] getLoadFileName(final String[] extensions, final String description, final boolean multiSelect, final Object parentComponent) {
         return getLoadFileName(
     		null,
     		extensions,
@@ -346,7 +343,7 @@ public final class JSEUIManager implements AOUIManager {
      * @return Nombre de fichero (con ruta) seleccionado por el usuario
      * @throws AOCancelledOperationException Si el usuario cancela la operaci&oacute;n. */
     @Override
-	public List<String> getLoadFileName(final String dialogTitle,
+	public String[] getLoadFileName(final String dialogTitle,
                                                final String[] extensions,
                                                final String description,
                                                final boolean multiSelect,
@@ -376,9 +373,9 @@ public final class JSEUIManager implements AOUIManager {
         	if (files == null) {
         		return null;
         	}
-        	final List<String> sel = new ArrayList<String>(files.length);
-        	for (final File f : files) {
-        		sel.add(f.getAbsolutePath());
+        	final String[] sel = new String[files.length];
+        	for (int i=0;i<files.length;i++) {
+        		sel[i] = files[i].getAbsolutePath();
         	}
             return sel;
         }
@@ -392,7 +389,8 @@ public final class JSEUIManager implements AOUIManager {
      * devolver&aacute; el path completo del fichero.
      * @param data Datos que se desean almacenar.
      * @param selectedFile Nombre de fichero por defecto.
-     * @param fileFilter Filtro de fichero para el di&aacute;logo de guardado.
+     * @param exts Extensiones de fichero aceptadas.
+     * @param description Descripci&oacute;n del tipo de fichero a guardar.
      * @param parent Componente padre sobre el que se mostrar&aacute; el
      *        di&aacute;logo de guardado.
      * @return Fichero guardado.
@@ -402,7 +400,8 @@ public final class JSEUIManager implements AOUIManager {
 	public File saveDataToFile(final byte[] data,
 			                   final String dialogTitle,
 			                   final File selectedFile,
-			                   final Object fileFilter,
+			                   final String[] exts,
+			                   final String description,
 			                   final Object parent) throws IOException {
 
         if (data == null) {
@@ -438,8 +437,8 @@ public final class JSEUIManager implements AOUIManager {
 
             // Solo aplicamos el filtro cuando este definido para evitar que el
             // desplegable de la ventana de guardado nos aparecezca vacio
-            if (fileFilter != null && fileFilter instanceof FileFilter) {
-                fileChooser.setFileFilter((FileFilter)fileFilter);
+            if (exts != null && exts.length > 0) {
+                fileChooser.setFileFilter(new FileExtensionFilter(exts, description));
             }
 
             int selectedOption = JOptionPane.YES_OPTION;
@@ -608,4 +607,5 @@ public final class JSEUIManager implements AOUIManager {
         }
         return fc.getSelectedFile();
     }
+
 }

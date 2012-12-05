@@ -172,6 +172,6 @@ class GetSignatureAction implements PrivilegedExceptionAction<byte[]> {
             desc,
             false,
             parent
-        ).get(0);
+        )[0];
     }
 }

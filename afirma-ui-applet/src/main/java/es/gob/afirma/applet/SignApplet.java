@@ -2206,7 +2206,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 						null,
 						false,
 						this
-					).get(0);
+					)[0];
 					if (fileName == null) {
 						LOGGER.severe("Se ha cancelado la seleccion del fichero de entrada"); //$NON-NLS-1$
 						this.setError(AppletMessages.getString("SignApplet.212")); //$NON-NLS-1$
@@ -4278,7 +4278,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 						description,
 						false,
 						SignApplet.this
-					).get(0);
+					)[0];
 				}
 			});
 		}

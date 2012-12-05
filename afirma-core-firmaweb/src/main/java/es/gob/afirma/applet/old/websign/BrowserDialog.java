@@ -112,6 +112,7 @@ final class BrowserDialog extends JDialog {
                 			WebSignMessages.getString("BrowserDialog.4"), //$NON-NLS-1$
                 			fich.getFile(),
                 			null,
+                			null,
                 			BrowserDialog.this
             			);
                     }
