@@ -335,7 +335,7 @@ public final class PAdESTriPhaseSignerServerSide {
                                            final Calendar signTime,
                                            final Properties xParams) throws IOException, AOException {
 
-        final Properties extraParams = (xParams != null) ? xParams : new Properties();
+        final Properties extraParams = xParams != null ? xParams : new Properties();
 
         final PdfTriPhaseSession ptps = getSessionData(inPDF, signerCertificateChain, signTime, extraParams);
 
@@ -540,7 +540,7 @@ public final class PAdESTriPhaseSignerServerSide {
         	completeCAdESSignature = enhancer.enhance(completeCAdESSignature, enhancerConfig);
         }
 
-        final Properties extraParams = (xParams != null) ? xParams : new Properties();
+        final Properties extraParams = xParams != null ? xParams : new Properties();
 
         //***************** SELLO DE TIEMPO ****************
         final String tsa = extraParams.getProperty("tsaURL"); //$NON-NLS-1$
@@ -561,12 +561,12 @@ public final class PAdESTriPhaseSignerServerSide {
                 else {
                     final String tsaHashAlgorithm = extraParams.getProperty("tsaHashAlgorithm"); //$NON-NLS-1$
                     completeCAdESSignature = new CMSTimestamper(
-                         !(Boolean.FALSE.toString()).equalsIgnoreCase(extraParams.getProperty("tsaRequireCert")),  //$NON-NLS-1$
+                         !Boolean.FALSE.toString().equalsIgnoreCase(extraParams.getProperty("tsaRequireCert")),  //$NON-NLS-1$
                          tsaPolicy,
                          tsaURL,
                          extraParams.getProperty("tsaUsr"),  //$NON-NLS-1$
                          extraParams.getProperty("tsaPwd"), //$NON-NLS-1$
-                         ((extraParams.getProperty("tsaExtensionOid") != null) && (extraParams.getProperty("tsaExtensionValueBase64") != null)) ? //$NON-NLS-1$ //$NON-NLS-2$
+                         extraParams.getProperty("tsaExtensionOid") != null && extraParams.getProperty("tsaExtensionValueBase64") != null ? //$NON-NLS-1$ //$NON-NLS-2$
                     		 new TsaRequestExtension[] {
                         		 new TsaRequestExtension(
                     				 extraParams.getProperty("tsaExtensionOid"), //$NON-NLS-1$
@@ -575,7 +575,7 @@ public final class PAdESTriPhaseSignerServerSide {
                 				 )
                              } :
                 			 null
-                     ).addTimestamp(completeCAdESSignature, AOAlgorithmID.getOID(AOSignConstants.getDigestAlgorithmName((tsaHashAlgorithm != null) ? tsaHashAlgorithm : "SHA1"))); //$NON-NLS-1$
+                     ).addTimestamp(completeCAdESSignature, AOAlgorithmID.getOID(AOSignConstants.getDigestAlgorithmName(tsaHashAlgorithm != null ? tsaHashAlgorithm : "SHA1"))); //$NON-NLS-1$
                 }
             }
 
@@ -710,7 +710,7 @@ public final class PAdESTriPhaseSignerServerSide {
 			throw new AOException("Error firmando el PDF", e); //$NON-NLS-1$
 		}
 
-        if ((pdfReader.getCertificationLevel() != PdfSignatureAppearance.NOT_CERTIFIED) && (!Boolean.parseBoolean(extraParams.getProperty("allowSigningCertifiedPdfs")))) { //$NON-NLS-1$
+        if (pdfReader.getCertificationLevel() != PdfSignatureAppearance.NOT_CERTIFIED && !Boolean.parseBoolean(extraParams.getProperty("allowSigningCertifiedPdfs"))) { //$NON-NLS-1$
             throw new PdfIsCertifiedException();
         }
 
@@ -767,14 +767,14 @@ public final class PAdESTriPhaseSignerServerSide {
         if (attachment != null) {
         	try {
         		stp.getWriter().addFileAttachment(attachmentDescription, attachment, null, attachmentFileName);
-        	} catch (final IOException e) {
-        		throw new AOException("Error al adjuntar los documentos proporcionados", e);
+        	}
+        	catch (final IOException e) {
+        		throw new AOException("Error al adjuntar los documentos proporcionados", e); //$NON-NLS-1$
         	}
         }
 
         // iText antiguo
         sap.setRender(PdfSignatureAppearance.SignatureRenderDescription);
-        // En iText nuevo seria "sap.setRenderingMode(PdfSignatureAppearance.RenderingMode.NAME_AND_DESCRIPTION);"
 
         if (reason != null) {
             sap.setReason(reason);
@@ -794,8 +794,8 @@ public final class PAdESTriPhaseSignerServerSide {
                 );
                 try {
                 	stp.setEncryption(
-                		(ownerPassword != null) ? ownerPassword.getBytes() : null,
-        				(userPassword != null) ? userPassword.getBytes() : null,
+                		ownerPassword != null ? ownerPassword.getBytes() : null,
+        				userPassword != null ? userPassword.getBytes() : null,
                 		pdfReader.getPermissions(),
                 		pdfReader.getCryptoMode()
             		);
