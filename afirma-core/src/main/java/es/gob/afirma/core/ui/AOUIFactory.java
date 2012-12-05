@@ -46,11 +46,14 @@ public final class AOUIFactory {
     /** JOptionPane.OK_CANCEL_OPTION. */
     public static final int OK_CANCEL_OPTION;
 
-    /** JOptionPane.PK_OPTION. */
+    /** JOptionPane.OK_OPTION. */
     public static final int OK_OPTION;
 
     /** JOptionPane.INFORMATION_MESSAGE. */
     public static final int INFORMATION_MESSAGE;
+
+    /** JOptionPane.QUESTION_MESSAGE. */
+    public static final int QUESTION_MESSAGE;
 
     private static AOUIManager uiManager;
 
@@ -75,6 +78,7 @@ public final class AOUIFactory {
             OK_CANCEL_OPTION = uiManager.getOkCancelOptionCode();
             OK_OPTION = uiManager.getOkOptionCode();
             INFORMATION_MESSAGE = uiManager.getInformationMessageCode();
+            QUESTION_MESSAGE = uiManager.getQuestionMessageCode();
         }
         catch(final Exception e) {
             throw new UnsupportedOperationException("No se ha podido instanciar el gestor de interfaces graficas: " + e, e); //$NON-NLS-1$

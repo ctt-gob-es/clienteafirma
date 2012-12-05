@@ -531,10 +531,13 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 						SignApplet.this.setError(AppletMessages.getString("SignApplet.6")); //$NON-NLS-1$
 						return new String[0];
 					}
-					if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(SignApplet.this,
-							AppletMessages.getString("SignApplet.4", kst.getName()), //$NON-NLS-1$
-							AppletMessages.getString("SignApplet.658"), //$NON-NLS-1$
-							JOptionPane.WARNING_MESSAGE)) {
+					if (AOUIFactory.YES_OPTION == AOUIFactory.showConfirmDialog(
+						SignApplet.this,
+						AppletMessages.getString("SignApplet.4", kst.getName()), //$NON-NLS-1$
+						AppletMessages.getString("SignApplet.658"), //$NON-NLS-1$
+						AOUIFactory.YES_NO_OPTION,
+						AOUIFactory.WARNING_MESSAGE)
+					) {
 						setKeyStore(null, null, kst.toString());
 						return getArrayCertificatesAlias();
 					}
@@ -632,10 +635,13 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 					this.setError(AppletMessages.getString("SignApplet.6")); //$NON-NLS-1$
 					return null;
 				}
-				if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(this,
-						AppletMessages.getString("SignApplet.4", kst.getName()), //$NON-NLS-1$
-						AppletMessages.getString("SignApplet.658"), //$NON-NLS-1$
-						JOptionPane.WARNING_MESSAGE)) {
+				if (AOUIFactory.YES_OPTION == AOUIFactory.showConfirmDialog(
+					this,
+					AppletMessages.getString("SignApplet.4", kst.getName()), //$NON-NLS-1$
+					AppletMessages.getString("SignApplet.658"), //$NON-NLS-1$
+					AOUIFactory.YES_NO_OPTION,
+					AOUIFactory.WARNING_MESSAGE)
+				) {
 					setKeyStore(null, null, kst.toString());
 					return getCertificateBinary(alias);
 				}
@@ -4036,14 +4042,13 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 		// Mostramos el mensaje informando del hash de los datos o, en caso de
 		// no haber podido calcularlo,
 		// lo informamos.
-		final int result =
-			JOptionPane.showConfirmDialog(this,
-					hashData != null ? AppletMessages.getString("SignApplet.655") + CR + digestAlgo + ": " + hashData : //$NON-NLS-1$ //$NON-NLS-2$
-						AppletMessages.getString("SignApplet.657"), //$NON-NLS-1$
-						AppletMessages.getString("SignApplet.658"), //$NON-NLS-1$
-						JOptionPane.OK_CANCEL_OPTION,
-						JOptionPane.WARNING_MESSAGE);
-		return result == JOptionPane.OK_OPTION;
+		return AOUIFactory.OK_OPTION == AOUIFactory.showConfirmDialog(
+			this,
+			hashData != null ? AppletMessages.getString("SignApplet.655") + CR + digestAlgo + ": " + hashData : AppletMessages.getString("SignApplet.657"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			AppletMessages.getString("SignApplet.658"), //$NON-NLS-1$
+			AOUIFactory.OK_CANCEL_OPTION,
+			AOUIFactory.WARNING_MESSAGE
+		);
 	}
 
 	/** {@inheritDoc} */
@@ -4498,10 +4503,13 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 					LOGGER.severe("Error inicializando el almacen de claves: " + e); //$NON-NLS-1$
 					SignApplet.this.setError(AppletMessages.getString("SignApplet.6")); //$NON-NLS-1$
 				}
-				else if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(SignApplet.this,
-						AppletMessages.getString("SignApplet.80") + kst.getName() + "?", //$NON-NLS-1$ //$NON-NLS-2$
-						AppletMessages.getString("SignApplet.658"), //$NON-NLS-1$
-						JOptionPane.WARNING_MESSAGE)) {
+				else if (AOUIFactory.YES_OPTION == AOUIFactory.showConfirmDialog(
+					SignApplet.this,
+					AppletMessages.getString("SignApplet.80") + kst.getName() + "?", //$NON-NLS-1$ //$NON-NLS-2$
+					AppletMessages.getString("SignApplet.658"), //$NON-NLS-1$
+					AOUIFactory.YES_NO_OPTION,
+					AOUIFactory.WARNING_MESSAGE
+				)) {
 					setKeyStore(null, null, kst.toString());
 					configureCertificate();
 				}
@@ -4591,11 +4599,13 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 			return true;
 		}
 
-		return JOptionPane.showConfirmDialog(this,
-				message,
-				AppletMessages.getString("SignApplet.16"), //$NON-NLS-1$
-				JOptionPane.YES_NO_OPTION,
-				JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION;
+		return AOUIFactory.showConfirmDialog(
+			this,
+			message,
+			AppletMessages.getString("SignApplet.16"), //$NON-NLS-1$
+			AOUIFactory.YES_NO_OPTION,
+			AOUIFactory.WARNING_MESSAGE
+		) == AOUIFactory.YES_OPTION;
 	}
 
 	/** Firma una cadena de texto simulando el funcionamiento del m&eacute;todo {@code [window.]crypto
@@ -4655,10 +4665,13 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 						SignApplet.this.setError(AppletMessages.getString("SignApplet.6")); //$NON-NLS-1$
 						return "error:internalError"; //$NON-NLS-1$
 					}
-					if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(SignApplet.this,
-							AppletMessages.getString("SignApplet.80") + kst.getName() + "?", //$NON-NLS-1$ //$NON-NLS-2$
-							AppletMessages.getString("SignApplet.658"), //$NON-NLS-1$
-							JOptionPane.WARNING_MESSAGE)) {
+					if (AOUIFactory.YES_OPTION == AOUIFactory.showConfirmDialog(
+						SignApplet.this,
+						AppletMessages.getString("SignApplet.80") + kst.getName() + "?", //$NON-NLS-1$ //$NON-NLS-2$
+						AppletMessages.getString("SignApplet.658"), //$NON-NLS-1$
+						AOUIFactory.YES_NO_OPTION,
+						AOUIFactory.WARNING_MESSAGE
+					)) {
 						setKeyStore(null, null, kst.toString());
 						return signText(stringToSign, caOption, caNameN);
 					}

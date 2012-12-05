@@ -37,6 +37,7 @@ import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
+import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.filters.rfc.RFC2254CertificateFilter;
 import es.gob.afirma.keystores.main.callbacks.NullPasswordCallback;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
@@ -339,12 +340,17 @@ final class SignText {
         pane.setPreferredSize(new Dimension(520, 440 + offset));
 
         // Mostramos el dialogo
-        if (JOptionPane.showConfirmDialog(this.parent, pane, AppletMessages.getString("SignApplet.25"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE) == JOptionPane.OK_OPTION) { //$NON-NLS-1$
+        if (AOUIFactory.showConfirmDialog(
+	    		this.parent,
+	    		pane,
+	    		AppletMessages.getString("SignApplet.25"),  //$NON-NLS-1$
+	    		AOUIFactory.OK_CANCEL_OPTION,
+	    		AOUIFactory.PLAIN_MESSAGE
+		) == AOUIFactory.OK_OPTION) {
             try {
 
                 // ********************************************************************
-                // **** DAMOS VUELTA ALIAS Y NOMBRES DESCRIPTIVOS Y FILTRAMOS
-                // CADUCADOS
+                // **** DAMOS VUELTA ALIAS Y NOMBRES DESCRIPTIVOS Y FILTRAMOS CADUCADOS
                 // ********************************************************************
                 final String certName = comboBox.getSelectedItem().toString();
 
@@ -378,10 +384,12 @@ final class SignText {
 
                                     if (errorMessage != null) {
                                         Logger.getLogger("es.gob.afirma").warning(errorMessage); //$NON-NLS-1$
-                                        if (JOptionPane.showConfirmDialog(this.parent, cv.getErrorMessage() + "\r\n" + AppletMessages.getString("SignText.10"), //$NON-NLS-1$ //$NON-NLS-2$
-                                                                          AppletMessages.getString("SignApplet.658"), //$NON-NLS-1$
-                                                                          JOptionPane.YES_NO_OPTION,
-                                                                          JOptionPane.WARNING_MESSAGE) != JOptionPane.YES_OPTION) {
+                                        if (AOUIFactory.showConfirmDialog(
+                                        		this.parent, cv.getErrorMessage() + "\r\n" + AppletMessages.getString("SignText.10"), //$NON-NLS-1$ //$NON-NLS-2$
+                                                AppletMessages.getString("SignApplet.658"), //$NON-NLS-1$
+                                                AOUIFactory.YES_NO_OPTION,
+                                                AOUIFactory.WARNING_MESSAGE
+                                        ) != AOUIFactory.YES_OPTION) {
                                             return;
                                         }
                                     }

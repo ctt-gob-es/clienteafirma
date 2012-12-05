@@ -98,13 +98,14 @@ final class BrowserDialog extends JDialog {
                 final int id = Integer.parseInt(strId);
                 final Attachment fich = AFirmaWebSignHTMLDocument.getAttachedFiles().get(id);
 
-                final int r = JOptionPane.showConfirmDialog(
+                final int r = AOUIFactory.showConfirmDialog(
                 	BrowserDialog.this,
                     WebSignMessages.getString("BrowserDialog.2"), //$NON-NLS-1$
                     WebSignMessages.getString("BrowserDialog.3"), //$NON-NLS-1$
-                    JOptionPane.YES_NO_OPTION
+                    AOUIFactory.YES_NO_OPTION,
+                    AOUIFactory.QUESTION_MESSAGE
                 );
-                if (r == JOptionPane.YES_OPTION) {
+                if (r == AOUIFactory.YES_OPTION) {
                     try {
                     	AOUIFactory.getSaveDataToFile(
                     		AOUtil.getDataFromInputStream(fich.getContentInputStream()),

@@ -97,6 +97,10 @@ public interface AOUIManager {
      * @return C&oacute;digo equivalente a JOptionPane.INFORMATION_MESSAGE */
     int getInformationMessageCode();
 
+    /** Obtiene el c&oacute;digo equivalente a JOptionPane.QUESTION_MESSAGE en la implementaci&oacute;n del entorno operativo actual.
+     * @return C&oacute;digo equivalente a JOptionPane.QUESTION_MESSAGE */
+    int getQuestionMessageCode();
+
     /** Pregunta al usuario por la localizaci&oacute;n de un directorio espec&iacute;fico para su carga.
      * @param dialogTitle T&iacute;tulo de la ventana de di&aacute;logo.
      * @param fileName Nombre del directorio a localizar

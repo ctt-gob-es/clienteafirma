@@ -32,6 +32,7 @@ import javax.swing.tree.TreeSelectionModel;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.ui.core.jse.JSEUtils;
 
@@ -98,8 +99,13 @@ final class UIDialogs {
         panel.add(spArbolNodos, c);
 
         do {
-            final int action = JOptionPane.showConfirmDialog(parentComponent, panel, AppletMessages.getString("UIDialogs.2"), //$NON-NLS-1$
-                                                             JOptionPane.OK_CANCEL_OPTION);
+            final int action = AOUIFactory.showConfirmDialog(
+        		parentComponent,
+        		panel,
+        		AppletMessages.getString("UIDialogs.2"), //$NON-NLS-1$
+        		AOUIFactory.OK_CANCEL_OPTION,
+        		AOUIFactory.QUESTION_MESSAGE
+            );
             if (action != JOptionPane.OK_OPTION) {
                 throw new AOCancelledOperationException("La operacion de firma ha sido cancelada por el usuario"); //$NON-NLS-1$
             }
@@ -183,10 +189,14 @@ final class UIDialogs {
         panel.add(spArbolNodos, c);
 
         do {
-            final int action = JOptionPane.showConfirmDialog(parentComponent, panel, AppletMessages.getString("UIDialogs.5"), //$NON-NLS-1$
-                                                             JOptionPane.OK_CANCEL_OPTION,
-                                                             JOptionPane.PLAIN_MESSAGE);
-            if (action != JOptionPane.OK_OPTION) {
+            final int action = AOUIFactory.showConfirmDialog(
+        		parentComponent,
+        		panel,
+        		AppletMessages.getString("UIDialogs.5"), //$NON-NLS-1$
+        		AOUIFactory.OK_CANCEL_OPTION,
+        		AOUIFactory.PLAIN_MESSAGE
+            );
+            if (action != AOUIFactory.OK_OPTION) {
                 throw new AOCancelledOperationException("La operacion de firma ha sido cancelada por el usuario"); //$NON-NLS-1$
             }
 

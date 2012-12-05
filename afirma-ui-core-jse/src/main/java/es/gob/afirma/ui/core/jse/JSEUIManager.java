@@ -129,6 +129,9 @@ public final class JSEUIManager implements AOUIManager {
         if (icon instanceof Icon) {
             dialogIcon = (Icon) icon;
         }
+        if (selectionValues == null) {
+        	return JOptionPane.showInputDialog(parent, message, title, messageType);
+        }
         return JOptionPane.showInputDialog(parent, message, title, messageType, dialogIcon, selectionValues, initialSelectionValue);
     }
 
@@ -279,6 +282,12 @@ public final class JSEUIManager implements AOUIManager {
     @Override
 	public int getInformationMessageCode() {
         return JOptionPane.INFORMATION_MESSAGE;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+	public int getQuestionMessageCode() {
+        return JOptionPane.QUESTION_MESSAGE;
     }
 
     /** Pregunta al usuario por la localizaci&oacute;n de un directorio espec&iacute;fico para su carga.

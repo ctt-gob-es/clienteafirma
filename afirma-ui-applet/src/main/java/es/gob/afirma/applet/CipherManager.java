@@ -690,16 +690,15 @@ final class CipherManager {
     private void saveCipherKey(final AOCipherConfig config, final Key cipherKey) throws AOException {
         // Preguntamos si se desea almacenar en el almacen de claves de cifrado
         // y si se acepta y no existe este almacen, lo creamos
-        final int selectedOption = JOptionPane.showConfirmDialog(this.parent, AppletMessages.getString("SignApplet.40"), //$NON-NLS-1$
-                                                           AppletMessages.getString("SignApplet.41"), //$NON-NLS-1$
-                                                           JOptionPane.YES_NO_CANCEL_OPTION);
+    	final int selectedOption = AOUIFactory.showConfirmDialog(
+			this.parent,
+			AppletMessages.getString("SignApplet.40"), //$NON-NLS-1$
+			AppletMessages.getString("SignApplet.41"), //$NON-NLS-1$
+			AOUIFactory.OK_CANCEL_OPTION,
+			AOUIFactory.QUESTION_MESSAGE
+		);
 
-        // Si se pulsa Cancelar o se cierra el dialogo, se cancela toda la
-        // operacion de cifrado
-        if (selectedOption == JOptionPane.CANCEL_OPTION || selectedOption == JOptionPane.CLOSED_OPTION) {
-            throw new AOCancelledOperationException("Se ha cancelado el guardado de la clave de cifrado"); //$NON-NLS-1$
-        }
-        else if (selectedOption == JOptionPane.YES_OPTION) {
+        if (selectedOption == AOUIFactory.OK_OPTION) {
 
             // Controlamos un maximo de 3 intentos para abrir el almacen cuando
             // no se establecio la contrasena
@@ -708,7 +707,6 @@ final class CipherManager {
             	if (this.cipherKeystorePass != null) {
             		try {
             			cKs = new AOCipherKeyStoreHelper(this.cipherKeystorePass);
-
             		}
             		catch (final IOException e) {
             			throw new AOException("La contrasena del almacen de claves de cifrado no es valida", e); //$NON-NLS-1$
@@ -737,17 +735,26 @@ final class CipherManager {
             String alias = this.cipherKeyAlias;
             if (alias == null) {
                 try {
-                    alias = JOptionPane.showInputDialog(this.parent, AppletMessages.getString("SignApplet.46"), //$NON-NLS-1$
-                                                        AppletMessages.getString("SignApplet.47"), //$NON-NLS-1$
-                                                        JOptionPane.QUESTION_MESSAGE);
+                	alias = AOUIFactory.showInputDialog(
+            			this.parent,
+            			AppletMessages.getString("SignApplet.46"), //$NON-NLS-1$
+            			AppletMessages.getString("SignApplet.47"), //$NON-NLS-1$
+            			AOUIFactory.QUESTION_MESSAGE,
+            			null,
+            			null,
+            			null
+        			).toString();
                 }
                 catch (final Exception e) {
-                    throw new AOException("Error al almacenar la clave de cifrado, la clave quedara sin almacenar", e); //$NON-NLS-1$
+                    throw new AOException("Error al almacenar la clave de cifrado, la clave quedara sin almacenar: " + e, e); //$NON-NLS-1$
                 }
                 alias += " (" + config.toString() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
             }
 
             cKs.storeKey(alias, cipherKey);
+        }
+        else {
+        	throw new AOCancelledOperationException("Se ha cancelado el guardado de la clave de cifrado"); //$NON-NLS-1$
         }
     }
 }
