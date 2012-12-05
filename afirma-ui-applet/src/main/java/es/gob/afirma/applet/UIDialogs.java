@@ -17,7 +17,6 @@ import java.awt.GridBagLayout;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -201,21 +200,4 @@ final class UIDialogs {
         return arbolNodos.getSelectionRows();
     }
 
-    /** Permite al usuario seleccionar un directorio y devuelve su ruta absoluta.
-     * Si no se selecciona ninguno se devuelve <code>null</code>.
-     * @param parentComponent
-     *        Componente padre (para la modalidad)
-     * @param title
-     *        T&iacute;tulo del di&aacute;logo de selecci&oacute;n
-     * @return Ruta absoluta del directorio seleccionado. */
-    static String selectDirectory(final Component parentComponent, final String title) {
-        final JFileChooser jfc = new JFileChooser();
-        jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        jfc.setDialogTitle(title);
-        final int ret = jfc.showOpenDialog(parentComponent);
-        if (ret == JFileChooser.APPROVE_OPTION) {
-            return jfc.getSelectedFile().getAbsolutePath();
-        }
-        return null;
-    }
 }

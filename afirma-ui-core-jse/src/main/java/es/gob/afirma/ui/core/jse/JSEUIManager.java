@@ -47,14 +47,10 @@ public final class JSEUIManager implements AOUIManager {
     private static final int ASCII_HIGHER_INDEX = 126;
 
     /** Pregunta al usuario por una contrase&ntilde;a.
-     * @param text
-     *        Texto que se muestra en el di&aacute;logo para pedir la
-     *        contrase&ntilde;a
-     * @param c
-     *        Componente padre (para la modalidad)
+     * @param text Texto que se muestra en el di&aacute;logo para pedir la contrase&ntilde;a
+     * @param c Componente padre (para la modalidad)
      * @return Contrase&ntilde;a introducida por el usuario
-     * @throws AOCancelledOperationException
-     *         Cuando el usuario cancela el proceso de solicitud de
+     * @throws AOCancelledOperationException Cuando el usuario cancela el proceso de solicitud de
      *         contrase&ntilde;a */
     @Override
 	public char[] getPassword(final String text, final Object c) {
@@ -62,17 +58,13 @@ public final class JSEUIManager implements AOUIManager {
     }
 
     /** Muestra un di&aacute;logo para pedir una contrase&ntilde;a al usuario.
-     * @param text
-     *        Texto con el que se solicitar&aacute; la entrada de texto al
-     *        usuario (<i>prompt</i>)
-     * @param charSet
-     *        Juego de caracteres aceptados para la contrase&ntilde;a
-     * @param beep
-     *        <code>true</code> si se desea un sonido de advertencia al
-     *        introducir un caracter no v&aacute;lido, <code>false</code> en
-     *        caso contrario
-     * @param c
-     *        Componente padre (para la modalidad)
+     * @param text Texto con el que se solicitar&aacute; la entrada de texto al
+     *             usuario (<i>prompt</i>)
+     * @param charSet Juego de caracteres aceptados para la contrase&ntilde;a
+     * @param beep <code>true</code> si se desea un sonido de advertencia al
+     *             introducir un caracter no v&aacute;lido, <code>false</code> en
+     *             caso contrario
+     * @param c Componente padre (para la modalidad)
      * @return Array de caracteres del texto introducido como contrase&ntilde;a
      * @throws AOCancelledOperationException
      *         Cuando el usuario cancela o cierra el di&aacute;logo */
@@ -152,8 +144,7 @@ public final class JSEUIManager implements AOUIManager {
     }
 
     /** Original code: <a
-     * href="http://tactika.com/realhome/realhome.html">http://
-     * tactika.com/realhome/realhome.html</a>
+     * href="http://tactika.com/realhome/realhome.html">http://tactika.com/realhome/realhome.html</a>
      * @author Real Gagnon */
     private static final class JTextFieldFilter extends PlainDocument {
 
@@ -288,6 +279,29 @@ public final class JSEUIManager implements AOUIManager {
     @Override
 	public int getInformationMessageCode() {
         return JOptionPane.INFORMATION_MESSAGE;
+    }
+
+    /** Pregunta al usuario por la localizaci&oacute;n de un directorio espec&iacute;fico para su carga.
+     * @param dialogTitle T&iacute;tulo de la ventana de di&aacute;logo.
+     * @param fileName Nombre del directorio a localizar
+     * @param parent Componente padre (para la modalidad)
+     * @return Ruta absoluta del directorio seleccionado por el usuario
+     * @throws es.gob.afirma.core.AOCancelledOperationException Si el usuario cancela la operaci&oacute;n. */
+    @Override
+	public String getLoadDirectory(final String dialogTitle, final String fileName, final Object parent) {
+        final JFileChooser jfc = new JFileChooser();
+        jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        if (dialogTitle != null) {
+        	jfc.setDialogTitle(dialogTitle);
+        }
+        if (fileName != null) {
+        	jfc.setSelectedFile(new File(fileName));
+        }
+        final int ret = jfc.showOpenDialog(parent instanceof Component ? (Component) parent : null);
+        if (ret == JFileChooser.APPROVE_OPTION) {
+            return jfc.getSelectedFile().getAbsolutePath();
+        }
+        throw new AOCancelledOperationException();
     }
 
     /** Pregunta al usuario por un nombre de fichero para su carga.

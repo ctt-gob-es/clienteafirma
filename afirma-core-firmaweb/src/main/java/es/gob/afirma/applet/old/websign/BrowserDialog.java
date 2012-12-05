@@ -15,11 +15,8 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringReader;
 import java.util.logging.Logger;
 
@@ -28,7 +25,6 @@ import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
-import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -37,6 +33,10 @@ import javax.swing.event.HyperlinkListener;
 import javax.swing.text.Document;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
+
+import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.ui.AOUIFactory;
 
 final class BrowserDialog extends JDialog {
 
@@ -98,35 +98,29 @@ final class BrowserDialog extends JDialog {
                 final int id = Integer.parseInt(strId);
                 final Attachment fich = AFirmaWebSignHTMLDocument.getAttachedFiles().get(id);
 
-                final int r =
-                        JOptionPane.showConfirmDialog(BrowserDialog.this,
-                                                      WebSignMessages.getString("BrowserDialog.2"), //$NON-NLS-1$
-                                                      WebSignMessages.getString("BrowserDialog.3"), //$NON-NLS-1$
-                                                      JOptionPane.YES_NO_OPTION);
+                final int r = JOptionPane.showConfirmDialog(
+                	BrowserDialog.this,
+                    WebSignMessages.getString("BrowserDialog.2"), //$NON-NLS-1$
+                    WebSignMessages.getString("BrowserDialog.3"), //$NON-NLS-1$
+                    JOptionPane.YES_NO_OPTION
+                );
                 if (r == JOptionPane.YES_OPTION) {
-                    final JFileChooser fc = new JFileChooser(fich.getName());
-                    fc.setDialogTitle(WebSignMessages.getString("BrowserDialog.4")); //$NON-NLS-1$
-                    fc.setDialogType(JFileChooser.SAVE_DIALOG);
                     try {
-                        if (fc.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
-                            final File outFile = fc.getSelectedFile();
-                            final FileOutputStream fos = new FileOutputStream(outFile);
-                            int nBytes;
-                            final byte[] buffer = new byte[1024];
-                            final InputStream is = fich.getContentInputStream();
-                            while ((nBytes = is.read(buffer)) != -1) {
-                                fos.write(buffer, 0, nBytes);
-                            }
-                            fos.flush();
-                            fos.close();
-                            is.close();
-                        }
-                        else {
-                            JOptionPane.showMessageDialog(BrowserDialog.this,
-                                                          WebSignMessages.getString("BrowserDialog.5"), //$NON-NLS-1$
-                                                          WebSignMessages.getString("BrowserDialog.6"), //$NON-NLS-1$
-                                                          JOptionPane.WARNING_MESSAGE);
-                        }
+                    	AOUIFactory.getSaveDataToFile(
+                    		AOUtil.getDataFromInputStream(fich.getContentInputStream()),
+                			WebSignMessages.getString("BrowserDialog.4"), //$NON-NLS-1$
+                			fich.getFile(),
+                			null,
+                			BrowserDialog.this
+            			);
+                    }
+                    catch(final AOCancelledOperationException e) {
+                        JOptionPane.showMessageDialog(
+                    		BrowserDialog.this,
+                            WebSignMessages.getString("BrowserDialog.5"), //$NON-NLS-1$
+                            WebSignMessages.getString("BrowserDialog.6"), //$NON-NLS-1$
+                            JOptionPane.WARNING_MESSAGE
+                        );
                     }
                     catch (final FileNotFoundException exc) {
                         LOGGER.severe("No se encontro el adjunto: " + exc); //$NON-NLS-1$
@@ -189,10 +183,12 @@ final class BrowserDialog extends JDialog {
 
     @Override
     public void setVisible(final boolean b) {
-        JOptionPane.showMessageDialog(this,
-                                      WebSignMessages.getString("BrowserDialog.15"), //$NON-NLS-1$
-                                      WebSignMessages.getString("BrowserDialog.6"), //$NON-NLS-1$
-                                      JOptionPane.WARNING_MESSAGE);
+        JOptionPane.showMessageDialog(
+    		this,
+            WebSignMessages.getString("BrowserDialog.15"), //$NON-NLS-1$
+            WebSignMessages.getString("BrowserDialog.6"), //$NON-NLS-1$
+            JOptionPane.WARNING_MESSAGE
+        );
         super.setVisible(b);
     }
 

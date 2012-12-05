@@ -2041,8 +2041,10 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 					inputDir = SignApplet.this.getMassiveInputDirectory();
 				}
 				else {
-					inputDir = UIDialogs.selectDirectory(SignApplet.this, AppletMessages.getString("SignApplet.187")); //$NON-NLS-1$
-					if (inputDir.equals("")) { //$NON-NLS-1$
+					try {
+						inputDir = AOUIFactory.getLoadDirectory(AppletMessages.getString("SignApplet.187"), null, SignApplet.this); //$NON-NLS-1$
+					}
+					catch(final AOCancelledOperationException e) {
 						getLogger().info("Operacion cancelada por el usuario"); //$NON-NLS-1$
 						return Boolean.FALSE;
 					}
@@ -3061,10 +3063,10 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 				try {
 					if (SignApplet.this.isFileBase64()) {
 						binaryData = Base64.decode(new String(AOUtil.getDataFromInputStream(is)));
-					} else {
+					}
+					else {
 						binaryData = AOUtil.getDataFromInputStream(is);
 					}
-
 				}
 				catch (final Exception e) {
 					getLogger().severe("Error durante la lectura del fichero " + SignApplet.this.getInternalFileUri() + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
@@ -4296,7 +4298,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 				/** {@inheritDoc} */
 				@Override
 				public String run() {
-					return UIDialogs.selectDirectory(SignApplet.this, AppletMessages.getString("SignApplet.104")); //$NON-NLS-1$
+					return AOUIFactory.getLoadDirectory(AppletMessages.getString("SignApplet.104"), null, SignApplet.this); //$NON-NLS-1$
 				}
 			});
 		}

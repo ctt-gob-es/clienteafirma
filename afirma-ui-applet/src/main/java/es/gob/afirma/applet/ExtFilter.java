@@ -25,18 +25,15 @@ final class ExtFilter extends FileFilter implements java.io.FileFilter {
     private final String[] extensions;
     private final String description;
 
-    /** Construye un filtro para la selecci&oacute;n de ficheros en un <code>JFileChooser</code>.
-     * @param exts
-     *        Extensiones de fichero permitidas
-     * @param desc
-     *        Descripci&oacute;n del tipo de fichero correspondiente a
-     *        las extensiones */
+    /** Construye un filtro para la selecci&oacute;n de ficheros en un di&aacute;logo de selecci6oacute;n de ficheros.
+     * @param exts Extensiones de fichero permitidas
+     * @param desc Descripci&oacute;n del tipo de fichero correspondiente a las extensiones */
     ExtFilter(final String[] exts, final String desc) {
         if (exts == null || exts.length < 1) {
             throw new IllegalArgumentException("No se puede crear un filtro vacio"); //$NON-NLS-1$
         }
         this.extensions = exts.clone();
-        this.description = (desc != null) ? desc : AppletMessages.getString("ExtFilter.1"); //$NON-NLS-1$
+        this.description = desc != null ? desc : AppletMessages.getString("ExtFilter.1"); //$NON-NLS-1$
     }
 
     /** {@inheritDoc} */

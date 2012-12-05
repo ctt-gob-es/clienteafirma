@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
 
-import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 
@@ -195,13 +194,23 @@ public final class AOUIFactory {
         return uiManager.getLoadFileName(dialogTitle, extensions, description, multiSelect, parentComponent);
     }
 
+    /** Pregunta al usuario por la localizaci&oacute;n de un directorio espec&iacute;fico para su carga.
+     * @param dialogTitle T&iacute;tulo de la ventana de di&aacute;logo.
+     * @param fileName Nombre del directorio a localizar
+     * @param parent Componente padre (para la modalidad)
+     * @return Ruta absoluta del directorio seleccionado por el usuario
+     * @throws es.gob.afirma.core.AOCancelledOperationException Si el usuario cancela la operaci&oacute;n. */
+    public static String getLoadDirectory(final String dialogTitle, final String fileName, final Object parent) {
+    	return uiManager.getLoadDirectory(dialogTitle, fileName, parent);
+    }
+
     /** Pregunta al usuario por la localizaci&oacute;n de un fichero espec&iacute;fico para su carga.
      * @param dialogTitle T&iacute;tulo de la ventana de di&aacute;logo.
      * @param fileName Nombre del fichero a localizar
      * @param description Descripci&oacute;n del tipo de fichero correspondiente con las extensiones
      * @param parent Componente padre (para la modalidad)
      * @return Fichero seleccionado por el usuario
-     * @throws AOCancelledOperationException Si el usuario cancela la operaci&oacute;n. */
+     * @throws es.gob.afirma.core.AOCancelledOperationException Si el usuario cancela la operaci&oacute;n. */
     public static File getLoadFile(final String dialogTitle, final String fileName, final String description, final Object parent) {
         return uiManager.getLoadFile(dialogTitle, fileName, description, parent);
     }

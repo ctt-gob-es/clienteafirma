@@ -19,36 +19,26 @@ import java.util.List;
 public interface AOUIManager {
 
     /** Pregunta al usuario por una contrase&ntilde;a.
-     * @param text
-     *        Texto que se muestra en el di&aacute;logo para pedir la
-     *        contrase&ntilde;a
-     * @param c
-     *        Componente padre (para la modalidad)
+     * @param text Texto que se muestra en el di&aacute;logo para pedir la contrase&ntilde;a
+     * @param c Componente padre (para la modalidad)
      * @return Contrase&ntilde;a introducida por el usuario
-     * @throws es.gob.afirma.core.AOCancelledOperationException
-     *         Cuando el usuario cancela el proceso de solicitud de
-     *         contrase&ntilde;a */
+     * @throws es.gob.afirma.core.AOCancelledOperationException Cuando el usuario cancela el
+     *         proceso de solicitud de contrase&ntilde;a */
     char[] getPassword(String text, Object c);
 
     /** Muestra un di&aacute;logo para pedir una contrase&ntilde;a al usuario.
-     * @param text
-     *        Texto con el que se solicitar&aacute; la entrada de texto al
+     * @param text Texto con el que se solicitar&aacute; la entrada de texto al
      *        usuario (<i>prompt</i>)
-     * @param charSet
-     *        Juego de caracteres aceptados para la contrase&ntilde;a
-     * @param beep
-     *        <code>true</code> si se desea un sonido de advertencia al
-     *        introducir un caracter no v&aacute;lido, <code>false</code> en
-     *        caso contrario
-     * @param c
-     *        Componente padre (para la modalidad)
+     * @param charSet Juego de caracteres aceptados para la contrase&ntilde;a
+     * @param beep <code>true</code> si se desea un sonido de advertencia al
+     *             introducir un caracter no v&aacute;lido, <code>false</code> en caso contrario
+     * @param c Componente padre (para la modalidad)
      * @return Array de caracteres del texto introducido como contrase&ntilde;a
      * @throws es.gob.afirma.core.AOCancelledOperationException
      *         Cuando el usuario cancela o cierra el di&aacute;logo */
     char[] getPassword(String text, final String charSet, final boolean beep, final Object c);
 
-    /**
-     * JOptionPane.showInputDialog().
+    /** JOptionPane.showInputDialog().
      * @param parentComponent Componente padre (se descarta si no es del tipo <code>java.awt.Component</code> en la implementaci&oacute;n Swing
      * @param message Mensaje
      * @param title Titulo del cuadro de di&aacute;logo
@@ -60,72 +50,60 @@ public interface AOUIManager {
      */
     Object showInputDialog(Object parentComponent, Object message, String title, int messageType, Object icon, Object[] selectionValues, Object initialSelectionValue);
 
-    /**
-     * Di&aacute;logo de selecci&oacute;n de certificados.
+    /** Di&aacute;logo de selecci&oacute;n de certificados.
      * @param parentComponent Componente padre (se descarta si no es del tipo <code>java.awt.Component</code> en la implementaci&oacute;n Swing
      * @param selectionValues Listado de valores seleccionables de tipo Nombre-Certificado.
-     * @return Valor seleccionado
-     */
+     * @return Valor seleccionado */
     Object showCertificateSelectionDialog(Object parentComponent, NameCertificateBean[] selectionValues);
 
-    /**
-     * JOptionPane.showConfirmDialog().
+    /** JOptionPane.showConfirmDialog().
      * @param parentComponent Componente padre (se descarta si no es del tipo <code>java.awt.Component</code> en la implementaci&oacute;n Swing
      * @param message Mensaje
      * @param title Titulo del cuadro de di&aacute;logo
      * @param optionType Tipo de opciones a confirmar
      * @param messageType Tipo de mensaje
-     * @return Opci&oacute;n seleccionada
-     */
+     * @return Opci&oacute;n seleccionada */
     int showConfirmDialog(Object parentComponent, Object message, String title, int optionType, int messageType);
 
-    /**
-     * Obtiene el c&oacute;digo equivalente a JOptionPane.PLAIN_MESSAGE en la implementaci&oacute;n del entorno operativo actual.
-     * @return C&oacute;digo equivalente a JOptionPane.PLAIN_MESSAGE
-     */
+    /** Obtiene el c&oacute;digo equivalente a JOptionPane.PLAIN_MESSAGE en la implementaci&oacute;n del entorno operativo actual.
+     * @return C&oacute;digo equivalente a JOptionPane.PLAIN_MESSAGE */
     int getPlainMessageCode();
 
-    /**
-     * Obtiene el c&oacute;digo equivalente a JOptionPane.YES_NO_OPTION en la implementaci&oacute;n del entorno operativo actual.
-     * @return C&oacute;digo equivalente a JOptionPane.YES_NO_OPTION
-     */
+    /** Obtiene el c&oacute;digo equivalente a JOptionPane.YES_NO_OPTION en la implementaci&oacute;n del entorno operativo actual.
+     * @return C&oacute;digo equivalente a JOptionPane.YES_NO_OPTION */
     int getYesNoOptionCode();
 
-    /**
-     * Obtiene el c&oacute;digo equivalente a JOptionPane.WARNING_MESSAGE en la implementaci&oacute;n del entorno operativo actual.
-     * @return C&oacute;digo equivalente a JOptionPane.WARNING_MESSAGE
-     */
+    /** Obtiene el c&oacute;digo equivalente a JOptionPane.WARNING_MESSAGE en la implementaci&oacute;n del entorno operativo actual.
+     * @return C&oacute;digo equivalente a JOptionPane.WARNING_MESSAGE */
     int getWarningMessageCode();
 
-    /**
-     * Obtiene el c&oacute;digo equivalente a JOptionPane.YES_OPTION en la implementaci&oacute;n del entorno operativo actual.
-     * @return C&oacute;digo equivalente a JOptionPane.YES_OPTION
-     */
+    /** Obtiene el c&oacute;digo equivalente a JOptionPane.YES_OPTION en la implementaci&oacute;n del entorno operativo actual.
+     * @return C&oacute;digo equivalente a JOptionPane.YES_OPTION */
     int getYesOptionCode();
 
-    /**
-     * Obtiene el c&oacute;digo equivalente a JOptionPane.NO_OPTION en la implementaci&oacute;n del entorno operativo actual.
-     * @return C&oacute;digo equivalente a JOptionPane.NO_OPTION
-     */
+    /** Obtiene el c&oacute;digo equivalente a JOptionPane.NO_OPTION en la implementaci&oacute;n del entorno operativo actual.
+     * @return C&oacute;digo equivalente a JOptionPane.NO_OPTION */
     int getNoOptionCode();
 
-    /**
-     * Obtiene el c&oacute;digo equivalente a JOptionPane.OK_CANCEL_OPTION en la implementaci&oacute;n del entorno operativo actual.
-     * @return C&oacute;digo equivalente a JOptionPane.OK_CANCEL_OPTION
-     */
+    /** Obtiene el c&oacute;digo equivalente a JOptionPane.OK_CANCEL_OPTION en la implementaci&oacute;n del entorno operativo actual.
+     * @return C&oacute;digo equivalente a JOptionPane.OK_CANCEL_OPTION */
     int getOkCancelOptionCode();
 
-    /**
-     * Obtiene el c&oacute;digo equivalente a JOptionPane.OK_OPTION en la implementaci&oacute;n del entorno operativo actual.
-     * @return C&oacute;digo equivalente a JOptionPane.OK_OPTION
-     */
+    /** Obtiene el c&oacute;digo equivalente a JOptionPane.OK_OPTION en la implementaci&oacute;n del entorno operativo actual.
+     * @return C&oacute;digo equivalente a JOptionPane.OK_OPTION */
     int getOkOptionCode();
 
-    /**
-     * Obtiene el c&oacute;digo equivalente a JOptionPane.INFORMATION_MESSAGE en la implementaci&oacute;n del entorno operativo actual.
-     * @return C&oacute;digo equivalente a JOptionPane.INFORMATION_MESSAGE
-     */
+    /** Obtiene el c&oacute;digo equivalente a JOptionPane.INFORMATION_MESSAGE en la implementaci&oacute;n del entorno operativo actual.
+     * @return C&oacute;digo equivalente a JOptionPane.INFORMATION_MESSAGE */
     int getInformationMessageCode();
+
+    /** Pregunta al usuario por la localizaci&oacute;n de un directorio espec&iacute;fico para su carga.
+     * @param dialogTitle T&iacute;tulo de la ventana de di&aacute;logo.
+     * @param fileName Nombre del directorio a localizar
+     * @param parent Componente padre (para la modalidad)
+     * @return Ruta absoluta del directorio seleccionado por el usuario
+     * @throws es.gob.afirma.core.AOCancelledOperationException Si el usuario cancela la operaci&oacute;n. */
+    String getLoadDirectory(final String dialogTitle, final String fileName, final Object parent);
 
     /** Pregunta al usuario por un nombre de fichero para su carga.
      * @param extensions Extensiones predeterminadas para el fichero

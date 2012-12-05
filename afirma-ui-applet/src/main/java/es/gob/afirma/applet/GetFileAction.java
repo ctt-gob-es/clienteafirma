@@ -17,8 +17,8 @@ import java.io.IOException;
 import java.security.PrivilegedExceptionAction;
 
 import es.gob.afirma.applet.io.FileBean;
-import es.gob.afirma.applet.io.FileSelectionDialog;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.ui.AOUIFactory;
 
 /**
  * Acci&oacute;n para la recuperaci&oacute;n del nombre y contenido de uno o m&aacute;s ficheros.
@@ -71,8 +71,7 @@ final class GetFileAction implements PrivilegedExceptionAction<FileBean[]> {
 	public FileBean[] run() throws IOException {
 
 		if (this.paths == null) {
-			final FileSelectionDialog fsDialog = new FileSelectionDialog(this.title, this.exts, this.desc, this.multiSel, this.parent);
-			this.paths = fsDialog.getPaths();
+			this.paths = AOUIFactory.getLoadFileName(this.title, this.exts, this.desc, this.multiSel, this.parent).toArray(new String[0]);
 		}
 
 		File file;

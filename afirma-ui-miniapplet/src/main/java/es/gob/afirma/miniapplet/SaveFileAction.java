@@ -15,7 +15,6 @@ import java.io.File;
 import java.io.IOException;
 import java.security.PrivilegedExceptionAction;
 
-import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.ui.AOUIFactory;
 
 /**
@@ -54,7 +53,7 @@ final class SaveFileAction implements PrivilegedExceptionAction<Void> {
      * Muestra un di&aacute;logo modal para el guardado de un fichero y lo salva en el directorio
      * y con el nombre indicado por el usuario.
      * @return {@code true} si el fichero se almacen&oacute; correctamente.
-     * @throws AOCancelledOperationException Cuando se cancela la operaci&oacute;n.
+     * @throws es.gob.afirma.core.AOCancelledOperationException Cuando se cancela la operaci&oacute;n.
      * @throws IOException Cuando se produce un error al almacenar el fichero.
      */
 	@Override
@@ -66,7 +65,7 @@ final class SaveFileAction implements PrivilegedExceptionAction<Void> {
     /** Pregunta al usuario por un nombre de fichero para salvar datos en disco.
      * @return Nombre de fichero (con ruta) seleccionado por el usuario
      * @throws IOException Cuando se produzca un error durante la selecci&oacute;n del fichero.
-     * @throws AOCancelledOperationException Cuando el usuario cancele la operaci&oacute;n.
+     * @throws es.gob.afirma.core.AOCancelledOperationException Cuando el usuario cancele la operaci&oacute;n.
      */
     private File selectFileToSave() throws IOException {
     	return AOUIFactory.getSaveDataToFile(
