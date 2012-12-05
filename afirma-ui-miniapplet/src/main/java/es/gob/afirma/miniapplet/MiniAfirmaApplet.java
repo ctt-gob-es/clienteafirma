@@ -84,8 +84,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	public String sign(final String dataB64,
 					   final String algorithm,
 					   final String format,
-					   final String extraParams) throws AOFormatFileException,
-			                                            PrivilegedActionException,
+					   final String extraParams) throws PrivilegedActionException,
 			                                            IOException,
 			                                            AOException {
 		this.clearError();
@@ -135,8 +134,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			             final String dataB64,
 			             final String algorithm,
 			             final String format,
-			             final String extraParams) throws AOFormatFileException,
-			             							      PrivilegedActionException,
+			             final String extraParams) throws PrivilegedActionException,
 			             							      IOException,
 				                                          AOException {
 		this.clearError();
@@ -186,8 +184,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	public String counterSign(final String signB64,
 			                  final String algorithm,
 			                  final String format,
-			                  final String extraParams) throws AOFormatFileException,
-			                  								   PrivilegedActionException,
+			                  final String extraParams) throws PrivilegedActionException,
 			                  								   IOException,
 					                                           AOException {
 		this.clearError();
