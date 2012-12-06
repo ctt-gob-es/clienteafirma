@@ -2533,24 +2533,27 @@ interface EntryPointsCrypto {
 
     /** Establece la pol&iacute;tica que debe aplicarse a las firmas que se
      * realicen. Se usa para la generaci&oacute;n de firmas avanzadas EPES. <br>
+     * Para el correcto establecimiento de estos par&aacute;metros consulte detenidamente
+     * la documentaci&oacute;n de la pol&iacute;tica de firma que desee establecer.</br>
      * <br>
      * Sets the policy for signatures. Used for the generation of EPES advanced
      * signatures.
      * @param identifier
-     *        URL identificadora de la pol&iacute;tica de firma (normalmente
-     *        una URL hacia el documento que describe la pol&iacute;tica). <br>
-     *        URL identifying the signature policy (normally, a URL pointing
-     *        to the document describing this policy)
+     *        Identificador de la pol&iacute;tica de firma. Normalmente una para
+     *        firmas XAdES es una URL hacia la descripci&oacute;n
+     *        formal de la pol&iacute;tica en formato XML o ASN.1 y para firmas
+     *        CAdES y PAdES es un OID o una URN de tipo OID (por
+     *        ejemplo "urn:oid:2.16.724.1.3.2.2.3.1").<br>
+     *        Signature policy identifier
      * @param description
-     *        Descripci&oacute;n de la pol&iacute;tica. <br>
+     *        Descripci&oacute;n de la pol&iacute;tica.<br>
      *        Policy description.
      * @param qualifier
-     *        URL calificadora de la pol&iacute;tica de firma, en caso de
-     *        indicar el calificador como OID debe usarse una URN (por
-     *        ejemplo "urn:oid:2.16.724.1.3.2.2.3.1" <br>
-     *        Signature policy's qualifying oid.
+     *        URL calificadora de la pol&iacute;tica de firma (normalmente
+     *        una URL hacia el documento que describe la pol&iacute;tica)<br>
+     *        Policy qualifier.
      * @param hashB64
-     * 		  Huella digital SHA-1 en base64 de la pol&iacute;tica de firma.
+     * 		  Huella digital SHA-1 en Base64 de la pol&iacute;tica de firma.
      * 		  Signature policy's hash.*/
     void setPolicy(String identifier, String description, String qualifier, String hashB64);
 
