@@ -1,44 +1,40 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
 package es.gob.afirma.signers.padestri.client;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import com.lowagie.text.exceptions.BadPasswordException;
-import com.lowagie.text.pdf.AcroFields;
-import com.lowagie.text.pdf.PdfPKCS7;
-import com.lowagie.text.pdf.PdfReader;
-
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
-import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
-import es.gob.afirma.core.misc.SHA2AltNamesProvider;
+import es.gob.afirma.core.misc.UrlHttpManagerImpl;
 import es.gob.afirma.core.signers.AOPkcs1Signer;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
-import es.gob.afirma.core.signers.AOSimpleSignInfo;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.util.tree.AOTreeModel;
-import es.gob.afirma.core.util.tree.AOTreeNode;
 
 /** Firmador PAdES en tres fases.
  * Las firmas que genera no se etiquetan como ETSI, sino como "Adobe PKCS#7 Detached".
  * @author Tom&acute;s Garc&iacute;a-Mer&aacute;s */
 public final class AOPDFTriPhaseSigner implements AOSigner {
-
-	private final UrlHttpManager urlMgr;
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -56,6 +52,10 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 
 	/** Nombre del par&aacute;metro de c&oacute;digo de operaci&oacute;n en la URL de llamada al servidor de firma. */
 	private static final String PARAMETER_NAME_OPERATION = "op"; //$NON-NLS-1$
+
+	private static final String HTTP_CGI = "?"; //$NON-NLS-1$
+	private static final String HTTP_EQUALS = "="; //$NON-NLS-1$
+	private static final String HTTP_AND = "&"; //$NON-NLS-1$
 
 	// Parametros que necesitamos para la URL de las llamadas al servidor de firma
 	private static final String PARAMETER_NAME_DOCID = "doc"; //$NON-NLS-1$
@@ -86,17 +86,6 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
     /** Indicador de finalizaci&oacute;n correcta de proceso. */
     private static final String SUCCESS = "OK"; //$NON-NLS-1$
 
-	/** Crea un firmador PAdES en tres fases.
-	 * @param urlManager Gestor de comunicaciones con el servidor de firma  */
-	public AOPDFTriPhaseSigner(final UrlHttpManager urlManager) {
-		this.urlMgr = (urlManager != null) ? urlManager : new UrlHttpManagerImpl();
-	}
-
-	/** Crea un firmador PAdES en tres fases con el gestor por defecto de comunicaciones con el servidor de firma. */
-	public AOPDFTriPhaseSigner() {
-		this.urlMgr = new UrlHttpManagerImpl();
-	}
-
 	@Override
 	public byte[] sign(final byte[] data,
 			           final String algorithm,
@@ -123,7 +112,7 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 			signServerUrl = new URL(configParams.getProperty(PROPERTY_NAME_SIGN_SERVER_URL));
 		}
 		catch (final MalformedURLException e) {
-			throw new IllegalArgumentException("No se ha proporcionado una URL valida para el servidor de firma: " + configParams.getProperty(PROPERTY_NAME_SIGN_SERVER_URL), e); //$NON-NLS-1$
+			throw new IllegalArgumentException("No se ha proporcionado la URL del servidor de firma: " + configParams.getProperty(PROPERTY_NAME_SIGN_SERVER_URL), e); //$NON-NLS-1$
 		}
 		configParams.remove(PROPERTY_NAME_SIGN_SERVER_URL);
 
@@ -140,22 +129,39 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 		// Empezamos la prefirma
 		final byte[] preSignResult;
 		try {
-			// Realizamos la prefirma llamando a la URL del servidor trifasico enviando los parametros
-			// mediante POST:
-			//  - Operacion trifasica: Prefirma
+			// Llamamos a una URL pasando como parametros los datos necesarios para
+			// configurar la operacion:
+			//  - Operacion trifasica (Prefirma o postfirma)
 			//  - Identificador del documento a firmar
 			//  - Algoritmo de firma a utilizar
 			//  - Certificado de firma
 			//  - Parametros extra de configuracion
-			final HashMap<String, String> params = new HashMap<String, String>();
-			params.put(PARAMETER_NAME_OPERATION, OPERATION_PRESIGN);
-			params.put(PARAMETER_NAME_DOCID, documentId);
-			params.put(PARAMETER_NAME_FORMAT, PADES_FORMAT);
-			params.put(PARAMETER_NAME_ALGORITHM, algorithm);
-			params.put(PARAMETER_NAME_CERT, Base64.encodeBytes(keyEntry.getCertificate().getEncoded(), Base64.URL_SAFE));
-			params.put(PARAMETER_NAME_EXTRA_PARAM, properties2Base64(configParams));
-
-			preSignResult = this.urlMgr.readUrl(signServerUrl.toString(), params);
+			preSignResult = UrlHttpManagerImpl.readUrlByPost(
+				signServerUrl + HTTP_CGI +
+				PARAMETER_NAME_OPERATION +
+				HTTP_EQUALS +
+				OPERATION_PRESIGN +
+				HTTP_AND +
+				PARAMETER_NAME_DOCID +
+				HTTP_EQUALS +
+				documentId +
+				HTTP_AND +
+				PARAMETER_NAME_FORMAT +
+				HTTP_EQUALS +
+				PADES_FORMAT +
+				HTTP_AND +
+				PARAMETER_NAME_ALGORITHM +
+				HTTP_EQUALS +
+				algorithm +
+				HTTP_AND +
+				PARAMETER_NAME_CERT +
+				HTTP_EQUALS +
+				Base64.encodeBytes(keyEntry.getCertificate().getEncoded(), Base64.URL_SAFE) +
+				HTTP_AND +
+				PARAMETER_NAME_EXTRA_PARAM +
+				HTTP_EQUALS +
+				properties2Base64(configParams)
+			);
 		}
 		catch (final CertificateEncodingException e) {
 			throw new AOException("Error decodificando el certificado del firmante: " + e, e); //$NON-NLS-1$
@@ -202,22 +208,32 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 
 		final byte[] triSignFinalResult;
 		try {
-			// Realizamos la postfirma llamando a la URL del servidor trifasico enviando los parametros
-			// mediante POST:
-			//  - Operacion trifasica: Postfirma
-			//  - Identificador del documento a firmar
-			//  - Algoritmo de firma a utilizar
-			//  - Certificado de firma
-			//  - Parametros extra de configuracion
-			final HashMap<String, String> params = new HashMap<String, String>();
-			params.put(PARAMETER_NAME_OPERATION, OPERATION_POSTSIGN);
-			params.put(PARAMETER_NAME_DOCID, documentId);
-			params.put(PARAMETER_NAME_FORMAT, PADES_FORMAT);
-			params.put(PARAMETER_NAME_ALGORITHM, algorithm);
-			params.put(PARAMETER_NAME_CERT, Base64.encodeBytes(keyEntry.getCertificate().getEncoded(), Base64.URL_SAFE));
-			params.put(PARAMETER_NAME_EXTRA_PARAM, properties2Base64(configParams));
-
-			triSignFinalResult = this.urlMgr.readUrl(signServerUrl.toString(), params);
+			triSignFinalResult = UrlHttpManagerImpl.readUrlByPost(
+				signServerUrl + HTTP_CGI +
+				PARAMETER_NAME_OPERATION +
+				HTTP_EQUALS +
+				OPERATION_POSTSIGN +
+				HTTP_AND +
+				PARAMETER_NAME_DOCID +
+				HTTP_EQUALS +
+				documentId +
+				HTTP_AND +
+				PARAMETER_NAME_FORMAT +
+				HTTP_EQUALS +
+				PADES_FORMAT +
+				HTTP_AND +
+				PARAMETER_NAME_ALGORITHM +
+				HTTP_EQUALS +
+				algorithm +
+				HTTP_AND +
+				PARAMETER_NAME_CERT +
+				HTTP_EQUALS +
+				Base64.encodeBytes(keyEntry.getCertificate().getEncoded(), Base64.URL_SAFE) +
+				HTTP_AND +
+				PARAMETER_NAME_EXTRA_PARAM +
+				HTTP_EQUALS +
+				properties2Base64(configParams)
+			);
 		}
 		catch (final CertificateEncodingException e) {
 			throw new AOException("Error decodificando el certificado del firmante: " + e, e); //$NON-NLS-1$
@@ -226,12 +242,19 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 			throw new AOException("Error en la llamada de postfirma al servidor: " + e, e); //$NON-NLS-1$
 		}
 
-		if (!SUCCESS.equals(new String(triSignFinalResult).trim())) {
+		final String stringTrimmedResult = new String(triSignFinalResult).trim();
+		if (!stringTrimmedResult.startsWith(SUCCESS)) {
 			throw new AOException("La firma trifasica no ha finalizado correctamente: " + new String(triSignFinalResult)); //$NON-NLS-1$
 		}
 
 		// Los datos no se devuelven, se quedan en el servidor
-		return SUCCESS.getBytes();
+		try {
+			return Base64.decode(stringTrimmedResult.replace("OK NEWID=", "")); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		catch (final IOException e) {
+			LOGGER.warning("El resultado de NEWID del servidor no estaba en Base64: " + e); //$NON-NLS-1$
+			return stringTrimmedResult.getBytes();
+		}
 	}
 
 	private static String properties2Base64(final Properties p) throws IOException {
@@ -276,59 +299,7 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 	@Override
 	public AOTreeModel getSignersStructure(final byte[] sign,
 										   final boolean asSimpleSignInfo) {
-    	isPdfFile(sign);
-        SHA2AltNamesProvider.install();
-        final AOTreeNode root = new AOTreeNode("Datos"); //$NON-NLS-1$
-        final AcroFields af;
-
-        PdfReader pdfReader;
-        try {
-            pdfReader = new PdfReader(sign);
-        }
-        catch (final Exception e) {
-            LOGGER.severe("No se ha podido leer el PDF, se devolvera un arbol vacio: " + e); //$NON-NLS-1$
-            return new AOTreeModel(root, root.getChildCount());
-        }
-        try {
-            af = pdfReader.getAcroFields();
-        }
-        catch (final Exception e) {
-            LOGGER.severe("No se ha podido obtener la informacion de los firmantes del PDF, se devolvera un arbol vacio: " + e); //$NON-NLS-1$
-            return new AOTreeModel(root, root.getChildCount());
-        }
-        final ArrayList<?> names = af.getSignatureNames();
-        Object pkcs1Object = null;
-        for (int i = 0; i < names.size(); ++i) {
-            final PdfPKCS7 pcks7 = af.verifySignature(names.get(i).toString());
-            if (asSimpleSignInfo) {
-                final AOSimpleSignInfo ssi = new AOSimpleSignInfo(new X509Certificate[] {
-                    pcks7.getSigningCertificate()
-                }, pcks7.getSignDate().getTime());
-
-                // Extraemos el PKCS1 de la firma
-                try {
-                    // iText antiguo
-                    final Field digestField = AOUtil.classForName("com.lowagie.text.pdf.PdfPKCS7").getDeclaredField("digest"); //$NON-NLS-1$ //$NON-NLS-2$
-                    // En iText nuevo seria "final Field digestField = AOUtil.classForName("com.itextpdf.text.pdf.PdfPKCS7").getDeclaredField("digest");"
-                    digestField.setAccessible(true);
-                    pkcs1Object = digestField.get(pcks7);
-                }
-                catch (final Exception e) {
-                    LOGGER.severe(
-                      "No se ha podido obtener informacion de una de las firmas del PDF, se continuara con la siguiente: " + e //$NON-NLS-1$
-                    );
-                    continue;
-                }
-                if (pkcs1Object instanceof byte[]) {
-                    ssi.setPkcs1((byte[]) pkcs1Object);
-                }
-                root.add(new AOTreeNode(ssi));
-            }
-            else {
-                root.add(new AOTreeNode(AOUtil.getCN(pcks7.getSigningCertificate())));
-            }
-        }
-        return new AOTreeModel(root, root.getChildCount());
+		throw new UnsupportedOperationException("No soportado para firmas trifasicas"); //$NON-NLS-1$
 	}
 
 	@Override
@@ -389,9 +360,7 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
         // otros datos de relevancia que se almacenan en el objeto AOSignInfo
 	}
 
-    @SuppressWarnings("unused")
     private static boolean isPdfFile(final byte[] data) {
-
         byte[] buffer = new byte[PDF_FILE_HEADER.length()];
         try {
             new ByteArrayInputStream(data).read(buffer);
@@ -399,24 +368,11 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
         catch (final Exception e) {
             buffer = null;
         }
-
         // Comprobamos que cuente con una cabecera PDF
         if (buffer != null && !PDF_FILE_HEADER.equals(new String(buffer))) {
             return false;
         }
-
-        try {
-            // Si lanza una excepcion al crear la instancia, no es un fichero PDF
-            new PdfReader(data);
-        }
-        catch (final BadPasswordException e) {
-            LOGGER.warning("El PDF esta protegido con contrasena, se toma como PDF valido"); //$NON-NLS-1$
-            return true;
-        }
-        catch (final Exception e) {
-            return false;
-        }
-
         return true;
     }
+
 }
