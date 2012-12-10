@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.concurrent.CancellationException;
 
 import javax.swing.JOptionPane;
@@ -107,8 +108,17 @@ public final class AWTUIManager extends JSEUIManager {
 									 	    final Object parent) {
         final FileDialog fd = new FileDialog(parent instanceof Frame ? (Frame) parent : null, dialogTitle);
         fd.setMode(FileDialog.LOAD);
-        fd.setMultipleMode(multiSelect);
 
+        // Habilitamos si corresponde el modo de seleccion multiple. Ya que solo esta disponible
+        // en Java 7, lo hacemos por reflexion para evitar problemas de compilacion. Esto equivale
+        // a la sentencia: fd.setMultipleMode(multiSelect);
+        try {
+        	final Method setMultipleModeMethod = FileDialog.class.getDeclaredMethod("setMultipleMode", Boolean.TYPE); //$NON-NLS-1$
+        	setMultipleModeMethod.invoke(fd, Boolean.valueOf(multiSelect));
+        } catch (final Exception e) {
+        	LOGGER.warning("Error de reflexion al establecer el dialogo de carga con seleccion multiple, se devolvera null: " + e); //$NON-NLS-1$
+        	return null;
+        }
         if (proposedFilename != null) {
         	fd.setDirectory(new File(proposedFilename).getAbsolutePath());
         }
@@ -146,7 +156,19 @@ public final class AWTUIManager extends JSEUIManager {
             throw new CancellationException();
         }
         if (multiSelect) {
-        	final File[] files = fd.getFiles();
+
+
+        	final File[] files;
+        	// Habilitamos si corresponde el modo de seleccion multiple. Ya que solo esta disponible
+            // en Java 7, lo hacemos por reflexion para evitar problemas de compilacion. Esto equivale
+            // a la sentencia: fd.getFiles();
+        	try {
+        		final Method getFilesMethod = FileDialog.class.getDeclaredMethod("getFiles", (Class<?>) null); //$NON-NLS-1$
+        		files = (File[]) getFilesMethod.invoke(fd, (Object) null);
+        	} catch (final Exception e) {
+        		LOGGER.warning("Error de reflexion al recuperar la seleccion multiple del dialogo de carga, se devolvera null: " + e); //$NON-NLS-1$
+            	return null;
+        	}
         	final String[] ret = new String[files.length];
         	for(int i=0;i<files.length;i++) {
         		ret[i] = files[i].getAbsolutePath();
