@@ -1779,7 +1779,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 				return;
 			}
 			if (oid != null) {
-				extraParams.setProperty("oid", oid); //$NON-NLS-1$
+				extraParams.setProperty("contentTypeOid", oid); //$NON-NLS-1$
 			}
 		}
 	}
@@ -2390,8 +2390,6 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 			return null;
 		}
 
-		// Establecemos el formato de firma para las operaciones de firma masiva
-		this.massiveSignatureHelper.setSignatureFormat(this.sigFormat);
 
 		// Ejecutamos la operacion
 		try {
@@ -2399,6 +2397,10 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 				/** {@inheritDoc} */
 				@Override
 				public String run() {
+
+					// Establecemos el formato de firma para las operaciones de firma masiva
+					SignApplet.this.getMassiveSignatureHelper().setSignatureFormat(SignApplet.this.getSigFormat());
+
 					final byte[] result = SignApplet.this.getMassiveSignatureHelper().signData(dataToSign);
 					if (result == null) {
 						SignApplet.this.setError(SignApplet.this.getMassiveSignatureHelper().getCurrentLogEntry());
@@ -2433,14 +2435,15 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 			return null;
 		}
 
-		// Establecemos el formato de firma para las operaciones de firma masiva
-		this.massiveSignatureHelper.setSignatureFormat(this.sigFormat);
-
 		try {
 			return AccessController.doPrivileged(new java.security.PrivilegedAction<String>() {
 				/** {@inheritDoc} */
 				@Override
 				public String run() {
+
+					// Establecemos el formato de firma para las operaciones de firma masiva
+					SignApplet.this.getMassiveSignatureHelper().setSignatureFormat(SignApplet.this.getSigFormat());
+
 					final byte[] result = SignApplet.this.getMassiveSignatureHelper().signHash(dataHash);
 					if (result == null) {
 						SignApplet.this.setError(SignApplet.this.getMassiveSignatureHelper().getCurrentLogEntry());
@@ -2470,14 +2473,15 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 			return null;
 		}
 
-		// Establecemos el formato de firma para las operaciones de firma masiva
-		this.massiveSignatureHelper.setSignatureFormat(this.sigFormat);
-
 		try {
 			return AccessController.doPrivileged(new java.security.PrivilegedAction<String>() {
 				/** {@inheritDoc} */
 				@Override
 				public String run() {
+
+					// Establecemos el formato de firma para las operaciones de firma masiva
+					SignApplet.this.getMassiveSignatureHelper().setSignatureFormat(SignApplet.this.getSigFormat());
+
 					final byte[] result = SignApplet.this.getMassiveSignatureHelper().signFile(filename);
 					if (result == null){
 						SignApplet.this.setError(SignApplet.this.getMassiveSignatureHelper().getCurrentLogEntry());
