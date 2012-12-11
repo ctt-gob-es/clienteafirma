@@ -18,9 +18,9 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Rectangle;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.net.URL;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
@@ -347,13 +347,9 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 	/**
 	 * Manejador de eventos de raton para la lista de certificados.
 	 */
-	private final class CertLinkMouseListener implements MouseListener, MouseMotionListener {
+	private final class CertLinkMouseListener extends MouseAdapter {
 
 		private boolean entered = false;
-
-		CertLinkMouseListener() {
-			/* Contructor por defecto */
-		}
 
 		/** {@inheritDoc} */
 		@Override
@@ -386,34 +382,5 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 			}
 		}
 
-		/** {@inheritDoc} */
-		@Override
-		public void mouseDragged(final MouseEvent e) {
-			/* No hacemos nada */
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public void mouseReleased(final MouseEvent me) {
-			/* No hacemos nada */
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public void mousePressed(final MouseEvent me) {
-			/* No hacemos nada */
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public void mouseExited(final MouseEvent me) {
-			/* No hacemos nada */
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public void mouseEntered(final MouseEvent me) {
-			/* No hacemos nada */
-		}
 	}
 }

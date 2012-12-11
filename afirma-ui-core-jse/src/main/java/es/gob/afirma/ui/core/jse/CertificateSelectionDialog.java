@@ -2,8 +2,8 @@ package es.gob.afirma.ui.core.jse;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
@@ -13,7 +13,7 @@ import es.gob.afirma.core.ui.NameCertificateBean;
 /** Di&aacute;logo de selecci&oacute;n de certificados con est&eacute;tica similar al de
  * Windows 7.
  * @author Carlos Gamuci */
-final class CertificateSelectionDialog implements MouseListener {
+final class CertificateSelectionDialog extends MouseAdapter {
 
 	private final CertificateSelectionPanel csd;
 
@@ -71,30 +71,6 @@ final class CertificateSelectionDialog implements MouseListener {
 		if (me.getClickCount() == 2 && this.optionPane != null) {
 			this.optionPane.setValue(Integer.valueOf(JOptionPane.OK_OPTION));
 		}
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public void mouseReleased(final MouseEvent me) {
-		/* No hacemos nada */
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public void mousePressed(final MouseEvent me) {
-		/* No hacemos nada */
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public void mouseExited(final MouseEvent me) {
-		/* No hacemos nada */
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public void mouseEntered(final MouseEvent me) {
-		/* No hacemos nada */
 	}
 
 	private static final class CertOptionPane extends JOptionPane {
