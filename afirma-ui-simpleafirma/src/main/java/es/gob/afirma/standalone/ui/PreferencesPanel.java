@@ -89,14 +89,14 @@ final class PreferencesPanel extends JPanel implements KeyListener {
 
 	private static final AdESPolicy POLICY_XADES_AGE = new AdESPolicy(
 		"urn:oid:2.16.724.1.3.1.1.2.1.8", //$NON-NLS-1$
-		"7SxX3erFuH31TvAw9LZ70N7p1vA=", //$NON-NLS-1$
+		"V8lVVNGDCPen6VELRD1Ja8HARFk=", //$NON-NLS-1$
 		"SHA1", //$NON-NLS-1$
 		"http://administracionelectronica.gob.es/es/ctt/politicafirma/politica_firma_AGE_v1_8.pdf" //$NON-NLS-1$
 	);
 
 	private static final AdESPolicy POLICY_CADES_AGE = new AdESPolicy(
 		"2.16.724.1.3.1.1.2.1.8", //$NON-NLS-1$
-		"V8lVVNGDCPen6VELRD1Ja8HARFk=", //$NON-NLS-1$
+		"7SxX3erFuH31TvAw9LZ70N7p1vA=", //$NON-NLS-1$
 		"SHA1", //$NON-NLS-1$
 		"http://administracionelectronica.gob.es/es/ctt/politicafirma/politica_firma_AGE_v1_8.pdf" //$NON-NLS-1$
 	);
