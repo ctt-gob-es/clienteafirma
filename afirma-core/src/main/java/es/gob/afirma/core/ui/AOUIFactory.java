@@ -62,7 +62,7 @@ public final class AOUIFactory {
                 throw new UnsupportedOperationException("No se soporta GUI en Android"); //$NON-NLS-1$
             }
             try {
-            	uiManager = (AOUIManager) AOUtil.classForName("es.gob.afirma.ui.core.jse.JSEUIManager").newInstance(); //$NON-NLS-1$
+            	uiManager = (AOUIManager) AOUtil.classForName("es.gob.afirma.ui.core.jse.AWTUIManager").newInstance(); //$NON-NLS-1$
             }
             catch(final Exception e) {
             	Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
