@@ -31,6 +31,12 @@ final class AsynchronousSaveData implements Runnable {
 		return this.dataToSave;
 	}
 
+	private String dialogTitle = AppletMessages.getString("AsynchronousSaveData.2"); //$NON-NLS-1$
+
+	String getDialogTitle() {
+		return this.dialogTitle;
+	}
+
 	private String savingTarget;
 
 	void setSavingTarget(final String target) {
@@ -81,6 +87,7 @@ final class AsynchronousSaveData implements Runnable {
      *        gr&aacute;fico en caso de error, <code>false</code> en caso
      *        contrario */
     AsynchronousSaveData(final byte[] data,
+    							final String dialogTitle,
                                 final String fileName,
                                 final String desc,
                                 final String[] exts,
@@ -90,6 +97,7 @@ final class AsynchronousSaveData implements Runnable {
             throw new IllegalArgumentException("Los datos a guardar no pueden ser nulos"); //$NON-NLS-1$
         }
         this.dataToSave = data.clone();
+        this.dialogTitle = dialogTitle;
         this.savingTarget = fileName;
         if (desc != null && !"".equals(desc)) { //$NON-NLS-1$
             this.description = desc;
@@ -109,7 +117,7 @@ final class AsynchronousSaveData implements Runnable {
                     	final String[] exts = AsynchronousSaveData.this.getExtensions();
                     	final File outputFile = AOUIFactory.getSaveDataToFile(
                     			AsynchronousSaveData.this.getDataToSave(),
-                    			null, // Titulo del dialogo por defecto
+                    			AsynchronousSaveData.this.getDialogTitle(),
                     			new File("*" + (exts == null || exts.length == 0 ? "" : "." + exts[0])), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                     			exts,
                     			AsynchronousSaveData.this.getDescription(),

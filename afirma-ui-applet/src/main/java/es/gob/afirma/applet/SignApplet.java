@@ -738,7 +738,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 			/** {@inheritDoc} */
 			@Override
 			public Boolean run() {
-				saveFileAsinchronously(SignApplet.this.getInternalData(), SignApplet.this.getOutputFile(), null, null);
+				saveFileAsinchronously(SignApplet.this.getInternalData(), AppletMessages.getString("SignApplet.499"), SignApplet.this.getOutputFile(), null, null); //$NON-NLS-1$
 				SignApplet.this.setError(null);
 				return Boolean.TRUE;
 			}
@@ -822,7 +822,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 				}
 
 				// Almacenamos en disco
-				saveFileAsinchronously(SignApplet.this.getSignData(), SignApplet.this.getOutputFile(), extensions, description);
+				saveFileAsinchronously(SignApplet.this.getSignData(), AppletMessages.getString("SignApplet.500") , SignApplet.this.getOutputFile(), extensions, description); //$NON-NLS-1$
 
 				SignApplet.this.setError(null);
 
@@ -847,9 +847,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 	 * @param description
 	 *        Descripci&oacute;n de los datos para el di&aacute;logo de
 	 *        guardado. */
-	void saveFileAsinchronously(final byte[] dat, final String outputPath, final String[] extensions, final String description) {
+	void saveFileAsinchronously(final byte[] dat, final String dialogTitle, final String outputPath, final String[] extensions, final String description) {
 		final AsynchronousSaveData saveDataDialog =
-			new AsynchronousSaveData(dat, outputPath, description, extensions, getParentFrame(SignApplet.this), true);
+			new AsynchronousSaveData(dat, dialogTitle, outputPath, description, extensions, getParentFrame(SignApplet.this), true);
 		// En firefox iniciamos un proceso asincrono para que no molesten los
 		// dialogos
 		// de script ocupado. En el resto de navegadores dejamos que aparezcan
@@ -1161,6 +1161,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 				// Configuramos el certificado
 				final PrivateKeyEntry ke = SignApplet.this.configureCertificate();
 				if (ke == null) {
+					getLogger().severe("No se ha podido acceder a la clave privada del certificado"); //$NON-NLS-1$
 					return Boolean.FALSE;
 				}
 
@@ -1612,6 +1613,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 				// Configuramos el certificado
 				final PrivateKeyEntry ke = SignApplet.this.configureCertificate();
 				if (ke == null) {
+					getLogger().severe("No se ha podido acceder a la clave privada del certificado"); //$NON-NLS-1$
 					return Boolean.FALSE;
 				}
 
@@ -2213,15 +2215,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 						throw new AOException("Se ha cancelado la seleccion del fichero de entrada, se cancelara toda la operacion" //$NON-NLS-1$
 						);
 					}
-
-					try {
-						this.fileUri = fileName;
-					}
-					catch (final Exception e) {
-						LOGGER.severe("Se ha proporcionado un nombre de fichero no valido '" + fileName + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
-						this.setError(AppletMessages.getString("SignApplet.214") + fileName); //$NON-NLS-1$
-						throw new AOException("Se ha proporcionado un nombre de fichero no valido: " + fileName, e); //$NON-NLS-1$
-					}
+					this.fileUri = fileName;
 					this.fileBase64 = false;
 				}
 
@@ -2536,6 +2530,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 			public Void run() {
 				SignApplet.this.saveFileAsinchronously(
 						SignApplet.this.getMassiveSignatureLog().getBytes(),
+						AppletMessages.getString("SignApplet.501"), //$NON-NLS-1$
 						SignApplet.this.getOutputFile(), new String[] {"txt"}, //$NON-NLS-1$
 						AppletMessages.getString("SignApplet.383") //$NON-NLS-1$
 				);
@@ -3500,6 +3495,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 				// Configuramos el certificado
 				final PrivateKeyEntry ke = SignApplet.this.configureCertificate();
 				if (ke == null) {
+					getLogger().severe("No se ha podido acceder a la clave privada del certificado"); //$NON-NLS-1$
 					return null;
 				}
 				return SignApplet.this.getKsConfigManager().getSelectedAlias();
