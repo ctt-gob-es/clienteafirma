@@ -116,8 +116,7 @@ public final class AWTUIManager extends JSEUIManager {
         	final Method setMultipleModeMethod = FileDialog.class.getDeclaredMethod("setMultipleMode", Boolean.TYPE); //$NON-NLS-1$
         	setMultipleModeMethod.invoke(fd, Boolean.valueOf(multiSelect));
         } catch (final Exception e) {
-        	LOGGER.warning("Error de reflexion al establecer el dialogo de carga con seleccion multiple, se devolvera null: " + e); //$NON-NLS-1$
-        	return null;
+        	LOGGER.warning("Error de reflexion al establecer el dialogo de carga con seleccion multiple, se realizara una seleccion simple: " + e); //$NON-NLS-1$
         }
         if (proposedFilename != null) {
         	fd.setDirectory(new File(proposedFilename).getAbsolutePath());
@@ -157,8 +156,7 @@ public final class AWTUIManager extends JSEUIManager {
         }
         if (multiSelect) {
 
-
-        	final File[] files;
+        	File[] files;
         	// Habilitamos si corresponde el modo de seleccion multiple. Ya que solo esta disponible
             // en Java 7, lo hacemos por reflexion para evitar problemas de compilacion. Esto equivale
             // a la sentencia: fd.getFiles();
@@ -166,8 +164,8 @@ public final class AWTUIManager extends JSEUIManager {
         		final Method getFilesMethod = FileDialog.class.getDeclaredMethod("getFiles", (Class<?>) null); //$NON-NLS-1$
         		files = (File[]) getFilesMethod.invoke(fd, (Object) null);
         	} catch (final Exception e) {
-        		LOGGER.warning("Error de reflexion al recuperar la seleccion multiple del dialogo de carga, se devolvera null: " + e); //$NON-NLS-1$
-            	return null;
+        		LOGGER.warning("Error de reflexion al recuperar la seleccion multiple del dialogo de carga, se devolvera un unico fichero: " + e); //$NON-NLS-1$
+        		files = new File[] { new File(fd.getFile()) };
         	}
         	final String[] ret = new String[files.length];
         	for(int i=0;i<files.length;i++) {
