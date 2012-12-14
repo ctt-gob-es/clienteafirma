@@ -528,6 +528,7 @@ public final class KeyStoreUtilities {
         }
 
         if (AOKeyStore.APPLE.equals(kStore)) {
+        	// El almacen KeyChain de Apple exige que se le pase una cadena como contrasena (vale cualquiera)
             return new CachePasswordCallback("dummy".toCharArray()); //$NON-NLS-1$
         }
         if (AOKeyStore.WINDOWS.equals(kStore) ||
@@ -553,11 +554,13 @@ public final class KeyStoreUtilities {
             store == AOKeyStore.WINCA ||
             store == AOKeyStore.SINGLE ||
             store == AOKeyStore.MOZ_UNI ||
-            store == AOKeyStore.PKCS11 ||
-            store == AOKeyStore.APPLE) {
+            store == AOKeyStore.PKCS11) {
                 return new NullPasswordCallback();
         } else if (store == AOKeyStore.DNIEJAVA) {
         	return null;
+        } else if (store == AOKeyStore.APPLE) {
+        	// El almacen KeyChain de Apple exige que se le pase una cadena como contrasena (vale cualquiera)
+        	return new CachePasswordCallback("dummy".toCharArray()); //$NON-NLS-1$
         }
         return new UIPasswordCallback(KeyStoreMessages.getString("KeyStoreUtilities.7"), parent); //$NON-NLS-1$
     }
@@ -609,5 +612,4 @@ public final class KeyStoreUtilities {
         }
         throw new AOKeyStoreManagerException("No hay controlador PKCS#11 de DNIe instalado en este sistema"); //$NON-NLS-1$
     }
-    
 }
