@@ -112,11 +112,13 @@ public final class AWTUIManager extends JSEUIManager {
         // Habilitamos si corresponde el modo de seleccion multiple. Ya que solo esta disponible
         // en Java 7, lo hacemos por reflexion para evitar problemas de compilacion. Esto equivale
         // a la sentencia: fd.setMultipleMode(multiSelect);
-        try {
-        	final Method setMultipleModeMethod = FileDialog.class.getDeclaredMethod("setMultipleMode", Boolean.TYPE); //$NON-NLS-1$
-        	setMultipleModeMethod.invoke(fd, Boolean.valueOf(multiSelect));
-        } catch (final Exception e) {
-        	LOGGER.warning("Error de reflexion al establecer el dialogo de carga con seleccion multiple, se realizara una seleccion simple: " + e); //$NON-NLS-1$
+        if (multiSelect) {
+        	try {
+        		final Method setMultipleModeMethod = FileDialog.class.getDeclaredMethod("setMultipleMode", Boolean.TYPE); //$NON-NLS-1$
+        		setMultipleModeMethod.invoke(fd, Boolean.valueOf(multiSelect));
+        	} catch (final Exception e) {
+        		LOGGER.warning("Error de reflexion al establecer el dialogo de carga con seleccion multiple, se realizara una seleccion simple: " + e); //$NON-NLS-1$
+        	}
         }
         if (proposedFilename != null) {
         	fd.setDirectory(new File(proposedFilename).getAbsolutePath());
