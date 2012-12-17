@@ -266,6 +266,12 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 		return this.massiveOperation;
 	}
 
+	/**
+	 * Marca si el proximo es el primer fichero a firmar dentro de una operaci&oacute;n masiva
+	 * program&aacute;tica.
+	 */
+	private boolean firstMassiveFile = true;
+
 	/** Indica si se deben firmar los ficheros de las subcarpetas del directorio
 	 * seleccionado durante la operacion de firma masiva. */
 	private boolean recursiveSignDir = false;
@@ -477,6 +483,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 		this.signersToCounterSign = new String[0];
 		this.hashesToSign = null;
 		this.massiveOperation = MassiveType.SIGN;
+		this.firstMassiveFile = true;
 		this.recursiveSignDir = false;
 		this.originalFormat = true;
 		this.massiveInputDirectory = null;
@@ -2305,11 +2312,8 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 		// Desactivamos la configuracion de error actual
 		this.setError(null);
 
-		if (!checkUserPermision(AppletMessages.getString("SignApplet.1") + //$NON-NLS-1$
-				CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
-			setError(AppletMessages.getString("SignApplet.497")); //$NON-NLS-1$
-			return false;
-		}
+		// Anotamos que la proxima firma masiva de fichero sera la primera
+		this.firstMassiveFile = true;
 
 		return AccessController.doPrivileged(new java.security.PrivilegedAction<Boolean>() {
 			/** {@inheritDoc} */
@@ -2462,6 +2466,14 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 			this.setError(AppletMessages.getString("SignApplet.375")); //$NON-NLS-1$
 			return null;
 		}
+
+		if (this.firstMassiveFile && !checkUserPermision(AppletMessages.getString("SignApplet.1") + //$NON-NLS-1$
+				CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
+			setError(AppletMessages.getString("SignApplet.497")); //$NON-NLS-1$
+			return null;
+		}
+		this.firstMassiveFile = false;
+
 		if (filename == null || "".equals(filename)) { //$NON-NLS-1$
 			setError(AppletMessages.getString("SignApplet.48")); //$NON-NLS-1$
 			return null;
