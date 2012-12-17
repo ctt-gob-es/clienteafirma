@@ -288,35 +288,25 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 	/** {@inheritDoc} */
 	@Override
+	@Deprecated
 	public String getSignersStructure(final String signB64) throws IOException,
 	                                                               PrivilegedActionException,
 	                                                               AOFormatFileException {
 		this.clearError();
 
 		final byte[] sign;
-		if (signB64 != null) {
-			try {
-				sign = Base64.decode(signB64);
-			}
-			catch (final IOException e) {
-				setError(e, "La firma proporcionada est\u00E1 mal codificada en base 64"); //$NON-NLS-1$
-				throw e;
-			}
+		if (signB64 == null) {
+			final IllegalArgumentException e = new IllegalArgumentException(
+					"Se ha introducido un firma nula para la extraccion de firmantes"); //$NON-NLS-1$
+			setError(e);
+			throw e;
 		}
-		else {
-			try {
-				sign = AccessController.doPrivileged(new GetFileContentAction(
-						MiniAppletMessages.getString("MiniAfirmaApplet.2"), null, //$NON-NLS-1$
-						MiniAppletMessages.getString("MiniAfirmaApplet.1"), this)); //$NON-NLS-1$
-			}
-			catch (final AOCancelledOperationException e) {
-				setError(e);
-				throw e;
-			}
-			catch (final PrivilegedActionException e) {
-				setError(e);
-				throw e;
-			}
+		try {
+			sign = Base64.decode(signB64);
+		}
+		catch (final IOException e) {
+			setError(e, "La firma proporcionada est\u00E1 mal codificada en base 64"); //$NON-NLS-1$
+			throw e;
 		}
 
 		final AOSigner signer;

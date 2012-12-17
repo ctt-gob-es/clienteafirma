@@ -146,8 +146,10 @@ interface MiniAfirma {
      * @throws es.gob.afirma.core.AOFormatFileException Cuando se indica un formato de firma no soportado.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      * @throws NullPointerException Cuando se introduce un par&aacute;metro nulo.
-     * @throws es.gob.afirma.core.InvalidLibraryException Cuando se detecta una versi&oacute;n no v&aacute;lida de una biblioteca. */
-    String getSignersStructure(String signB64) throws IOException, PrivilegedActionException, AOFormatFileException;
+     * @throws es.gob.afirma.core.InvalidLibraryException Cuando se detecta una versi&oacute;n no v&aacute;lida de una biblioteca.
+     * @deprecated Deprecado por ser meramente informativo. */
+    @Deprecated
+	String getSignersStructure(String signB64) throws IOException, PrivilegedActionException, AOFormatFileException;
 
     /** Muestra un di&aacute;logo modal que permite al usuario seleccionar
      * el directorio y el nombre de fichero para el guardado de datos.
