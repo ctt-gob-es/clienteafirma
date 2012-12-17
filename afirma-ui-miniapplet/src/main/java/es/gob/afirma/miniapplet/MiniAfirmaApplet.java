@@ -52,6 +52,8 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 	private static final String APPLET_PARAM_USER_KEYSTORE = "keystore"; //$NON-NLS-1$
 
+	private static final String SIGNATURE_FORMAT_AUTO = "AUTO"; //$NON-NLS-1$
+
 	/** Identificador del navegador Web que carga el applet. */
 	private String userAgent = null;
 
@@ -659,7 +661,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			                             final byte[] sign) throws AOFormatFileException,
 			                                                       PrivilegedActionException, IOException {
 		final AOSigner signer;
-		if (format != null) {
+		if (format != null && !SIGNATURE_FORMAT_AUTO.equalsIgnoreCase(format)) {
 			signer = MiniAfirmaApplet.getSigner(format);
 			if (signer == null) {
 				throw new AOFormatFileException("El formato de firma indicado no esta soportado"); //$NON-NLS-1$
