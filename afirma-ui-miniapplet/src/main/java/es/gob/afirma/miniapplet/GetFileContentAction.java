@@ -35,7 +35,7 @@ final class GetFileContentAction implements PrivilegedExceptionAction<byte[]>{
      * Crea la acci&oacute;n para la carga de ficheros.
      * @param title T&iacute;tulo del di&aacute;logo.
      * @param exts Extensiones de fichero aceptadas por defecto.
-     * @param description Descripci&opacute;n del tipo de fichero aceptado por defecto.
+     * @param description Descripci&oacute;n del tipo de fichero aceptado por defecto.
      * @param parent Componente padre sobre el que se mostrar&aacute; el di&aacute;logo.
      */
     GetFileContentAction(final String title, final String[] exts, final String description,

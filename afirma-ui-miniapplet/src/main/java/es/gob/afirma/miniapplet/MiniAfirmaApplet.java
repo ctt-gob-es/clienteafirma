@@ -89,17 +89,33 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			                                            AOException {
 		this.clearError();
 
-		if (dataB64 == null) {
-			final IllegalArgumentException e = new IllegalArgumentException(
-				"Se han introducido datos nulos para firmar" //$NON-NLS-1$
-			);
-			setError(e);
-			throw e;
+		final byte[] dataBinary;
+		if (dataB64 != null) {
+			try {
+				dataBinary = Base64.decode(dataB64);
+			}
+			catch (final IOException e) {
+				setError(e, "Los datos proporcionados est\u00E1n mal codificados en base 64"); //$NON-NLS-1$
+				throw e;
+			}
+		}
+		else {
+			try {
+				dataBinary = AccessController.doPrivileged(new GetFileContentAction(
+						MiniAppletMessages.getString("MiniAfirmaApplet.0"), null, //$NON-NLS-1$
+						MiniAppletMessages.getString("MiniAfirmaApplet.1"), this)); //$NON-NLS-1$
+			}
+			catch (final AOCancelledOperationException e) {
+				setError(e);
+				throw e;
+			}
+			catch (final PrivilegedActionException e) {
+				setError(e);
+				throw e;
+			}
 		}
 
 		final Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
-		final byte[] dataBinary;
-		dataBinary = Base64.decode(dataB64);
 
 		try {
 			return Base64.encode(AccessController.doPrivileged(new SignAction(
@@ -139,19 +155,43 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 				                                          AOException {
 		this.clearError();
 
-		if (signB64 == null) {
-			final IllegalArgumentException e = new IllegalArgumentException(
-				"Se ha introducido una firma nula para contrafirmar" //$NON-NLS-1$
-			);
-			setError(e);
-			throw e;
+		byte[] sign;
+		if (signB64 != null) {
+			try {
+				sign = Base64.decode(signB64);
+			}
+			catch (final IOException e) {
+				setError(e, "La firma proporcionada est\u00E1 mal codificada en base 64"); //$NON-NLS-1$
+				throw e;
+			}
+		}
+		else {
+			try {
+				sign = AccessController.doPrivileged(new GetFileContentAction(
+						MiniAppletMessages.getString("MiniAfirmaApplet.2"), null, //$NON-NLS-1$
+						MiniAppletMessages.getString("MiniAfirmaApplet.1"), this)); //$NON-NLS-1$
+			}
+			catch (final AOCancelledOperationException e) {
+				setError(e);
+				throw e;
+			}
+			catch (final PrivilegedActionException e) {
+				setError(e);
+				throw e;
+			}
 		}
 
 		final Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
-		final byte[] dataBinary = dataB64 == null ? null : Base64.decode(dataB64);
+		final byte[] dataBinary;
+		try {
+			dataBinary = dataB64 == null ? null : Base64.decode(dataB64);
+		}
+		catch (final IOException e) {
+			setError(e, "Los datos proporcionados est\u00E1n mal codificados en base 64"); //$NON-NLS-1$
+			throw e;
+		}
 
 		try {
-			final byte[] sign = Base64.decode(signB64);
 			return Base64.encode(AccessController.doPrivileged(new CoSignAction(
 					MiniAfirmaApplet.selectSigner(MiniAfirmaApplet.cleanParam(format), sign),
 					sign,
@@ -189,18 +229,35 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 					                                           AOException {
 		this.clearError();
 
-		if (signB64 == null) {
-			final IllegalArgumentException e = new IllegalArgumentException(
-				"Se ha introducido una firma nula para contrafirmar" //$NON-NLS-1$
-			);
-			setError(e);
-			throw e;
+		byte[] sign;
+		if (signB64 != null) {
+			try {
+				sign = Base64.decode(signB64);
+			}
+			catch (final IOException e) {
+				setError(e, "La firma proporcionada est\u00E1 mal codificada en base 64"); //$NON-NLS-1$
+				throw e;
+			}
+		}
+		else {
+			try {
+				sign = AccessController.doPrivileged(new GetFileContentAction(
+						MiniAppletMessages.getString("MiniAfirmaApplet.2"), null, //$NON-NLS-1$
+						MiniAppletMessages.getString("MiniAfirmaApplet.1"), this)); //$NON-NLS-1$
+			}
+			catch (final AOCancelledOperationException e) {
+				setError(e);
+				throw e;
+			}
+			catch (final PrivilegedActionException e) {
+				setError(e);
+				throw e;
+			}
 		}
 
 		final Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
 
 		try {
-			final byte[] sign = Base64.decode(signB64);
 			return Base64.encode(AccessController.doPrivileged(new CounterSignAction(
 					MiniAfirmaApplet.selectSigner(MiniAfirmaApplet.cleanParam(format), sign),
 					sign,
@@ -232,21 +289,36 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	public String getSignersStructure(final String signB64) throws IOException,
 	                                                               PrivilegedActionException,
 	                                                               AOFormatFileException {
-
 		this.clearError();
 
-		if (signB64 == null) {
-			final IllegalArgumentException e = new IllegalArgumentException(
-				"Se ha introducido un firma nula para la extraccion de firmantes" //$NON-NLS-1$
-			);
-			setError(e);
-			throw e;
+		final byte[] sign;
+		if (signB64 != null) {
+			try {
+				sign = Base64.decode(signB64);
+			}
+			catch (final IOException e) {
+				setError(e, "La firma proporcionada est\u00E1 mal codificada en base 64"); //$NON-NLS-1$
+				throw e;
+			}
+		}
+		else {
+			try {
+				sign = AccessController.doPrivileged(new GetFileContentAction(
+						MiniAppletMessages.getString("MiniAfirmaApplet.2"), null, //$NON-NLS-1$
+						MiniAppletMessages.getString("MiniAfirmaApplet.1"), this)); //$NON-NLS-1$
+			}
+			catch (final AOCancelledOperationException e) {
+				setError(e);
+				throw e;
+			}
+			catch (final PrivilegedActionException e) {
+				setError(e);
+				throw e;
+			}
 		}
 
-		final byte[] sign;
 		final AOSigner signer;
 		try {
-			sign = Base64.decode(signB64);
 			signer = MiniAfirmaApplet.getSigner(sign);
 		}
 		catch (final PrivilegedActionException e) {
@@ -322,6 +394,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		catch (final AOCancelledOperationException e) {
 			return false;
 		}
+		catch (final IOException e) {
+			setError(e, "Los datos proporcionados est\u00E1n mal codificados en base 64"); //$NON-NLS-1$
+			throw e;
+		}
 		catch (final PrivilegedActionException e) {
 			setError(e);
 			throw e;
@@ -394,7 +470,6 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			                                 final String extensions,
 			                                 final String description,
 			                                 final boolean asBase64) throws PrivilegedActionException {
-
 		this.clearError();
 
 		final String titleDialog = MiniAfirmaApplet.cleanParam(title);
@@ -504,13 +579,22 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	/** Establece el error en base a la excepci&oacute;n recibida.
 	 * @param e Excepci&oacute;n que produjo el error. */
 	private void setError(final Throwable e) {
+		setError(e, null);
+	}
+
+	/** Establece el mensaje de error recibido y el tipo de error en base a la excepci&oacute;n.
+	 * Si no se indica un mensaje este tambi&eacute;n se toma de la excepci&oacute;n.
+	 * @param e Excepci&oacute;n que produjo el error. */
+	private void setError(final Throwable e, final String message) {
 		Throwable ex = e;
 		if (e instanceof PrivilegedActionException && e.getCause() != null) {
 			ex = e.getCause();
 		}
 
-		this.errorMessage = ex.getLocalizedMessage() != null ? ex.getLocalizedMessage() :
-			ex.getMessage() != null ? ex.getMessage() : ex.toString();
+		this.errorMessage = message != null ? message :
+			ex.getLocalizedMessage() != null ? ex.getLocalizedMessage() :
+			ex.getMessage() != null ? ex.getMessage() :
+				ex.toString();
 
 		this.errorType = ex.getClass().getCanonicalName();
 
@@ -676,9 +760,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 				text = Base64.decode(textBase64);
 			}
 			catch (final IOException e) {
-				LOGGER.warning(
-					"No se ha podido autodetectar el juego de caracteres, se devolvera el por defecto del sistema" //$NON-NLS-1$
-				);
+				LOGGER.warning("Los datos proporcionados est\u00E1n mal codificados en base 64"); //$NON-NLS-1$
 				return getCharset("default", null); //$NON-NLS-1$
 			}
 			final UniversalDetector detector = new UniversalDetector();
