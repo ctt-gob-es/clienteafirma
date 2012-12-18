@@ -125,14 +125,16 @@ public final class MainMenu extends JMenuBar {
             public void actionPerformed(final ActionEvent ae) {
             	final String fileToLoad;
             	try {
-            		fileToLoad = AOUIFactory.getLoadFileName(
+            		fileToLoad = AOUIFactory.getLoadFiles(
             			Messages.getString("MainMenu.4"), //$NON-NLS-1$
             			MainMenu.this.getSimpleAfirma().getCurrentDir() != null ? MainMenu.this.getSimpleAfirma().getCurrentDir().getAbsolutePath() : null,
             			null,
             			null,
+            			null,
+            			false,
             			false,
             			MainMenu.this
-        			)[0];
+        			)[0].getAbsolutePath();
             	}
             	catch(final AOCancelledOperationException e) {
             		return;

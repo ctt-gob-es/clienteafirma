@@ -58,25 +58,25 @@ final class GetFileNameContentAction implements PrivilegedExceptionAction<String
 	@Override
 	public String[] run() throws IOException {
 
-		final String[] paths = AOUIFactory.getLoadFileName(
+		final File[] files = AOUIFactory.getLoadFiles(
 			this.title,
+			null,
 			null,
 			this.exts,
 			this.desc,
+			false,	//Seleccionar directorios
 			this.multiSel,
 			this.parent
 		);
 
-		File file;
 		byte[] contentFic;
 		FileInputStream is;
-		final String[] filenameContents = new String[paths.length];
-		for (int i = 0; i < paths.length; i++) {
-			file = new File(paths[i]);
-			is = new FileInputStream(file);
+		final String[] filenameContents = new String[files.length];
+		for (int i = 0; i < files.length; i++) {
+			is = new FileInputStream(files[i]);
 			contentFic = AOUtil.getDataFromInputStream(is);
 			is.close();
-			filenameContents[i] = file.getName() + SEPARATOR + (this.asBase64 ?
+			filenameContents[i] = files[i].getName() + SEPARATOR + (this.asBase64 ?
 					Base64.encode(contentFic) : new String(contentFic));
 		}
 

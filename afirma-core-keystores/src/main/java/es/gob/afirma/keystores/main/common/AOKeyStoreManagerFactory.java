@@ -149,14 +149,16 @@ public final class AOKeyStoreManagerFactory {
                         "pfx", "p12" //$NON-NLS-1$ //$NON-NLS-2$
             };
             desc = KeyStoreMessages.getString("AOKeyStoreManagerFactory.0"); //$NON-NLS-1$
-            storeFilename = AOUIFactory.getLoadFileName(
+            storeFilename = AOUIFactory.getLoadFiles(
         		KeyStoreMessages.getString("AOKeyStoreManagerFactory.4") + " " + "PKCS#12", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        		null,
         		null,
         		exts,
         		desc,
         		false,
+        		false,
         		parentComponent
-    		)[0];
+    		)[0].getAbsolutePath();
             if (storeFilename == null) {
                 throw new AOCancelledOperationException("No se ha seleccionado el almacen de certificados"); //$NON-NLS-1$
             }
@@ -238,14 +240,16 @@ public final class AOKeyStoreManagerFactory {
                 };
                 desc = KeyStoreMessages.getString("AOKeyStoreManagerFactory.3"); //$NON-NLS-1$
             }
-            storeFilename = AOUIFactory.getLoadFileName(
+            storeFilename = AOUIFactory.getLoadFiles(
         		KeyStoreMessages.getString("AOKeyStoreManagerFactory.4") + " " + store.getName(), //$NON-NLS-1$ //$NON-NLS-2$
+        		null,
         		null,
         		exts,
         		desc,
         		false,
+        		false,
         		parentComponent
-    		)[0];
+    		)[0].getAbsolutePath();
             if (storeFilename == null) {
                 throw new AOCancelledOperationException("No se ha seleccionado el almacen de certificados"); //$NON-NLS-1$
             }
@@ -297,14 +301,16 @@ public final class AOKeyStoreManagerFactory {
                 exts = new String[] { "so" }; //$NON-NLS-1$
                 extsDesc = extsDesc + " (*.so)"; //$NON-NLS-1$
             }
-            p11Lib = AOUIFactory.getLoadFileName(
+            p11Lib = AOUIFactory.getLoadFiles(
 	             KeyStoreMessages.getString("AOKeyStoreManagerFactory.7"),  //$NON-NLS-1$
+	             null,
 	             null,
 	             exts,
 	             extsDesc,
 	             false,
+	             false,
 	             parentComponent
-            )[0];
+            )[0].getAbsolutePath();
         }
         if (p11Lib == null) {
             throw new AOCancelledOperationException("No se ha seleccionado el controlador PKCS#11"); //$NON-NLS-1$

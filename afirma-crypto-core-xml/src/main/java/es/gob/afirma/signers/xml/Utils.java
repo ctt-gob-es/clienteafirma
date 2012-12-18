@@ -173,12 +173,16 @@ public final class Utils {
 
             		final File xmlStyleFile;
             		try {
-	            		xmlStyleFile = AOUIFactory.getLoadFile(
+	            		xmlStyleFile = AOUIFactory.getLoadFiles(
 	            				XMLMessages.getString("Utils.7"), //$NON-NLS-1$
+	            				null,
 	            				fileName,
+	            				null,
 	            				XMLMessages.getString("Utils.8", fileName), //$NON-NLS-1$
+	            				false,
+	            				false,
 	            				null
-	            		);
+	            		)[0];
             		}
             		catch(final AOCancelledOperationException ex) {
             			LOGGER.warning("El usuario ha cancelado la seleccion de hoja de estilo: " + ex); //$NON-NLS-1$

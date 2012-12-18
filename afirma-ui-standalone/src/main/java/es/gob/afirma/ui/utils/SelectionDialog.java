@@ -38,7 +38,7 @@ public final class SelectionDialog {
 	public static File showFileOpenDialog(final Component parent, final String title) {
 		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 			try {
-				return AOUIFactory.getLoadFile(title, null, null, parent);
+				return AOUIFactory.getLoadFiles(title, null, null, null, null, false, false, parent)[0];
 			}
 			catch(final AOCancelledOperationException e) {
 				return null;
@@ -56,14 +56,16 @@ public final class SelectionDialog {
 	public static File showFileOpenDialog(final Component parent, final String title, final ExtFilter filter) {
 		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 			try {
-				return new File(AOUIFactory.getLoadFileName(
+				return AOUIFactory.getLoadFiles(
 					title,
+					null,
 					null,
 					filter != null ? filter.getExtensions() : null,
 					filter != null ? filter.getDescription() : null,
 					false,
+					false,
 					parent
-				)[0]);
+				)[0];
 			}
 			catch(final AOCancelledOperationException e) {
 				return null;
@@ -79,7 +81,7 @@ public final class SelectionDialog {
 	public static File showDirOpenDialog(final Component parent, final String title) {
 		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 			try {
-				return new File(AOUIFactory.getLoadDirectory(title, null, parent));
+				return AOUIFactory.getLoadFiles(title, null, null, null, null, true, false, parent)[0];
 			}
 			catch(final AOCancelledOperationException e) {
 				return null;
@@ -103,16 +105,16 @@ public final class SelectionDialog {
 
         if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 			try {
-				return new File(
-					AOUIFactory.getLoadFileName(
+				return AOUIFactory.getLoadFiles(
 						title,
 						currentDir,
+						null,
 						filter != null ? filter.getExtensions() : null,
 						filter != null ? filter.getDescription() : null,
 						false,
+						false,
 						parent
-					)[0]
-				);
+					)[0];
 			}
 			catch(final AOCancelledOperationException e) {
 				return null;

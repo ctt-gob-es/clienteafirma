@@ -83,38 +83,14 @@ public final class AWTUIManager extends JSEUIManager {
 
     /** {@inheritDoc} */
     @Override
-	public String[] getLoadFileName(final String[] extensions, final String description, final boolean multiSelect, final Object parentComponent) {
-    	if (multiSelect && isJava6()) {
-    		return super.getLoadFileName(extensions, description, multiSelect, parentComponent);
-    	}
-    	return internalGetLoadFileName(null, null, null, extensions, multiSelect, parentComponent);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String[] getLoadFileName(final String dialogTitle,
-    								final String currentDir,
-    		                        final String[] extensions,
-    		                        final String description,
-    		                        final boolean multiSelect,
-    		                        final Object parent) {
-    	if (multiSelect && isJava6()) {
-    		return super.getLoadFileName(dialogTitle, currentDir, extensions, description, multiSelect, parent);
-    	}
-    	return internalGetLoadFileName(dialogTitle, currentDir, null, extensions, multiSelect, parent);
-    }
-
-    @Override
-	public File getLoadFile(final String dialogTitle, final String fileName, final String description, final Object parent) {
-    	return new File(internalGetLoadFileName(dialogTitle, null, fileName, null, false, parent)[0]);
-    }
-
-	private static String[] internalGetLoadFileName(final String dialogTitle,
-			                                        final String currentDir,
-			                                        final String proposedFilename,
-			                                        final String[] extensions,
-			                                        final boolean multiSelect,
-			                                        final Object parent) {
+	public File[] getLoadFiles(final String dialogTitle,
+			                  final String currentDir,
+			                  final String filename,
+			                  final String[] extensions,
+			                  final String description,
+			                  final boolean directory,
+			                  final boolean multiSelect,
+			                  final Object parent) {
         final FileDialog fd = new FileDialog(parent instanceof Frame ? (Frame) parent : null, dialogTitle);
         fd.setMode(FileDialog.LOAD);
         if (currentDir != null) {
@@ -132,8 +108,8 @@ public final class AWTUIManager extends JSEUIManager {
         		LOGGER.warning("Error de reflexion al establecer el dialogo de carga con seleccion multiple, se realizara una seleccion simple: " + e); //$NON-NLS-1$
         	}
         }
-        if (proposedFilename != null) {
-        	fd.setDirectory(new File(proposedFilename).getAbsolutePath());
+        if (filename != null) {
+        	fd.setDirectory(new File(filename).getAbsolutePath());
         }
 
         if (extensions != null && extensions.length > 0) {
@@ -168,12 +144,11 @@ public final class AWTUIManager extends JSEUIManager {
         if (fd.getFile() == null) {
             throw new AOCancelledOperationException();
         }
-        if (multiSelect) {
 
+
+        if (isJava7()) {
+        	// getFiles() solo esta disponible en Java 7
         	File[] files;
-        	// Habilitamos si corresponde el modo de seleccion multiple. Ya que solo esta disponible
-            // en Java 7, lo hacemos por reflexion para evitar problemas de compilacion. Esto equivale
-            // a la sentencia: fd.getFiles();
         	try {
         		final Method getFilesMethod = FileDialog.class.getDeclaredMethod("getFiles", (Class<?>) null); //$NON-NLS-1$
         		files = (File[]) getFilesMethod.invoke(fd, (Object) null);
@@ -181,17 +156,13 @@ public final class AWTUIManager extends JSEUIManager {
         		LOGGER.warning("Error de reflexion al recuperar la seleccion multiple del dialogo de carga, se devolvera un unico fichero: " + e); //$NON-NLS-1$
         		files = new File[] { new File(fd.getFile()) };
         	}
-        	final String[] ret = new String[files.length];
-        	for(int i=0;i<files.length;i++) {
-        		ret[i] = files[i].getAbsolutePath();
-        	}
-        	return ret;
+        	return files;
         }
-        return new String[] { fd.getDirectory() + fd.getFile() };
+        return new File[] { new File(fd.getFile()) };
     }
 
-	private static boolean isJava6() {
-		return System.getProperty("java.version").startsWith("1.6"); //$NON-NLS-1$ //$NON-NLS-2$
+	private static boolean isJava7() {
+		return System.getProperty("java.version").startsWith("1.7"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 }

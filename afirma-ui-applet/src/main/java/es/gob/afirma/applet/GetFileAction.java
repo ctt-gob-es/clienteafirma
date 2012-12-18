@@ -26,7 +26,7 @@ import es.gob.afirma.core.ui.AOUIFactory;
  */
 final class GetFileAction implements PrivilegedExceptionAction<FileBean[]> {
 
-	private String[] paths;
+	private File[] files;
 
     private String title;
     private String[] exts;
@@ -56,7 +56,7 @@ final class GetFileAction implements PrivilegedExceptionAction<FileBean[]> {
      * @param path Ruta de fichero.
      */
     GetFileAction(final String path) {
-    	this.paths = new String[] { path };
+    	this.files = new File[] { new File(path) };
     }
 
     /**
@@ -70,20 +70,18 @@ final class GetFileAction implements PrivilegedExceptionAction<FileBean[]> {
 	@Override
 	public FileBean[] run() throws IOException {
 
-		if (this.paths == null) {
-			this.paths = AOUIFactory.getLoadFileName(this.title, null, this.exts, this.desc, this.multiSel, this.parent);
+		if (this.files == null) {
+			this.files = AOUIFactory.getLoadFiles(this.title, null, null, this.exts, this.desc, false, this.multiSel, this.parent);
 		}
 
-		File file;
 		byte[] contentFic;
 		FileInputStream is;
-		final FileBean[] fileContents = new FileBean[this.paths.length];
-		for (int i = 0; i < this.paths.length; i++) {
-			file = new File(this.paths[i]);
-			is = new FileInputStream(file);
+		final FileBean[] fileContents = new FileBean[this.files.length];
+		for (int i = 0; i < this.files.length; i++) {
+			is = new FileInputStream(this.files[i]);
 			contentFic = AOUtil.getDataFromInputStream(is);
 			is.close();
-			fileContents[i] = new FileBean(this.paths[i], contentFic);
+			fileContents[i] = new FileBean(this.files[i], contentFic);
 		}
 
         return fileContents;

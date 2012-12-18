@@ -10,22 +10,24 @@
 
 package es.gob.afirma.applet.io;
 
+import java.io.File;
+
 /**
- * Clase que almacena el nombre y contenido de un fichero.
+ * Clase que almacena un fichero y su contenido.
  */
 public class FileBean {
 
-	private final String path;
+	private final File file;
 
 	private final byte[] content;
 
 	/**
-	 * Crea un objeto con ruta de fichero y contenido.
-	 * @param path Ruta al fichero.
+	 * Crea un objeto un fichero y su contenido.
+	 * @param file Fichero.
 	 * @param content Contenido del fichero.
 	 */
-	public FileBean(final String path, final byte[] content) {
-		this.path = path;
+	public FileBean(final File file, final byte[] content) {
+		this.file = file;
 		this.content = content == null ? null : content.clone();
 	}
 
@@ -34,7 +36,7 @@ public class FileBean {
 	 * @return Ruta del fichero.
 	 */
 	public String getPath() {
-		return this.path;
+		return this.file.getAbsolutePath();
 	}
 
 	/**

@@ -346,7 +346,7 @@ final class CipherManager {
 
             // Fichero de entrada
             if (this.fileUri == null) {
-                final String fileName = AOUIFactory.getLoadFileName(null, null, false, this.parent)[0];
+                final String fileName = AOUIFactory.getLoadFiles(null, null, null, null, null, false, false, this.parent)[0].getAbsolutePath();
                 try {
                     this.fileUri = AOUtil.createURI(fileName);
                 }
@@ -537,7 +537,7 @@ final class CipherManager {
             // Si no hay una informacion cofrada establecida, la tratamos de
             // leer desde fichero
             if (this.fileUri == null) {
-                final String fileName = AOUIFactory.getLoadFileName(null, null, false, this.parent)[0];
+                final String fileName = AOUIFactory.getLoadFiles(null, null, null, null, null, false, false, this.parent)[0].getAbsolutePath();
                 try {
                     this.fileUri = AOUtil.createURI(fileName);
                 }

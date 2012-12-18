@@ -40,7 +40,7 @@ public final class FileUIManager {
     	try {
 	    	AOUIFactory.getSaveDataToFile(
 				data,
-				null,
+				currentDir.getAbsolutePath(),
 				title,
 				null,
 				exts,
@@ -61,14 +61,16 @@ public final class FileUIManager {
      * @return Fichero seleccionado desde el di&aacute;logo o null si no se selecciona ninguno */
     public static File openFile(final Frame parent, final File actualDir, final String[] exts, final String title) {
     	try {
-	    	return new File(AOUIFactory.getLoadFileName(
+	    	return AOUIFactory.getLoadFiles(
 				title,
 				actualDir != null ? actualDir.getAbsolutePath() : null,
+				null,
 				exts,
 				null,
 				false,
+				false,
 				parent
-			)[0]);
+			)[0];
     	}
     	catch(final AOCancelledOperationException e) {
     		return null;

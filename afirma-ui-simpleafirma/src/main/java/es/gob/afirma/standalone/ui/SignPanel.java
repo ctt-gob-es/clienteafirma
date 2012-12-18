@@ -486,14 +486,16 @@ public final class SignPanel extends JPanel {
                 public void actionPerformed(final ActionEvent arg0) {
                 	final String fileToLoad;
                 	try {
-	                    fileToLoad = AOUIFactory.getLoadFileName(
+	                    fileToLoad = AOUIFactory.getLoadFiles(
 	                		Messages.getString("SignPanel.35"), //$NON-NLS-1$
 	                		SignPanel.this.getSimpleAfirma().getCurrentDir() != null ? SignPanel.this.getSimpleAfirma().getCurrentDir().getAbsolutePath() : null,
 	                		null,
 	                		null,
+	                		null,
+	                		false,
 	                		false,
 	                		UpperPanel.this
-	            		)[0];
+	            		)[0].getAbsolutePath();
                 	}
                 	catch(final AOCancelledOperationException e) {
                 		return;

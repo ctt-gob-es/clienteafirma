@@ -2057,7 +2057,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 				}
 				else {
 					try {
-						inputDir = AOUIFactory.getLoadDirectory(AppletMessages.getString("SignApplet.187"), null, SignApplet.this); //$NON-NLS-1$
+						inputDir = AOUIFactory.getLoadFiles(
+								AppletMessages.getString("SignApplet.187"), null, null, null, //$NON-NLS-1$
+								null, true, false, SignApplet.this)[0].getAbsolutePath();
 					}
 					catch(final AOCancelledOperationException e) {
 						getLogger().info("Operacion cancelada por el usuario"); //$NON-NLS-1$
@@ -2209,14 +2211,16 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
 					// Si no, le pedimos al usuario que seleccione un fichero y
 					// lo configuramos
-					final String fileName = AOUIFactory.getLoadFileName(
+					final String fileName = AOUIFactory.getLoadFiles(
 						AppletMessages.getString("SignApplet.356"), //$NON-NLS-1$
 						null,
 						null,
 						null,
+						null,
+						false,
 						false,
 						this
-					)[0];
+					)[0].getAbsolutePath();
 					if (fileName == null) {
 						LOGGER.severe("Se ha cancelado la seleccion del fichero de entrada"); //$NON-NLS-1$
 						this.setError(AppletMessages.getString("SignApplet.212")); //$NON-NLS-1$
@@ -4283,16 +4287,18 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 				/** {@inheritDoc} */
 				@Override
 				public String run() {
-					return AOUIFactory.getLoadFileName(
+					return AOUIFactory.getLoadFiles(
 						title,
+						null,
 						null,
 						exts == null || exts.trim().length() == 0
 							? null
 								: AOUtil.split(exts, SignApplet.STRING_SEPARATOR),
 						description,
 						false,
+						false,
 						SignApplet.this
-					)[0];
+					)[0].getAbsolutePath();
 				}
 			});
 		}
@@ -4317,7 +4323,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 				/** {@inheritDoc} */
 				@Override
 				public String run() {
-					return AOUIFactory.getLoadDirectory(AppletMessages.getString("SignApplet.104"), null, SignApplet.this); //$NON-NLS-1$
+					return AOUIFactory.getLoadFiles(
+							AppletMessages.getString("SignApplet.104"), null, null, null,  //$NON-NLS-1$
+							null, true, false, SignApplet.this)[8].getAbsolutePath();
 				}
 			});
 		}

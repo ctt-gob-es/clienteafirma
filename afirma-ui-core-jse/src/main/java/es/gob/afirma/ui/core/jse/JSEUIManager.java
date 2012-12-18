@@ -287,54 +287,7 @@ public class JSEUIManager implements AOUIManager {
         return JOptionPane.QUESTION_MESSAGE;
     }
 
-    /** Pregunta al usuario por la localizaci&oacute;n de un directorio espec&iacute;fico para su carga.
-     * @param dialogTitle T&iacute;tulo de la ventana de di&aacute;logo.
-     * @param fileName Nombre del directorio a localizar
-     * @param parent Componente padre (para la modalidad)
-     * @return Ruta absoluta del directorio seleccionado por el usuario
-     * @throws es.gob.afirma.core.AOCancelledOperationException Si el usuario cancela la operaci&oacute;n. */
-    @Override
-	public String getLoadDirectory(final String dialogTitle, final String fileName, final Object parent) {
-        final JFileChooser jfc = new JFileChooser();
-        jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        if (dialogTitle != null) {
-        	jfc.setDialogTitle(dialogTitle);
-        }
-        if (fileName != null) {
-        	jfc.setSelectedFile(new File(fileName));
-        }
-        final int ret = jfc.showOpenDialog(parent instanceof Component ? (Component) parent : null);
-        if (ret == JFileChooser.APPROVE_OPTION) {
-            return jfc.getSelectedFile().getAbsolutePath();
-        }
-        throw new AOCancelledOperationException();
-    }
-
-    /** Pregunta al usuario por un nombre de fichero para su carga.
-     * @param extensions
-     *        Extensiones predeterminadas para el fichero
-     * @param description
-     *        Descripci&oacute;n del tipo de fichero correspondiente con las
-     *        extensiones
-     * @param parentComponent
-     *        Componente padre (para la modalidad)
-     * @aram multiSelect <code>true</code> para permitir selecci&oacute;n m&uacute;ltiple, <code>false</code>
-     *                    para selecci&oacute;n de un &uacute;nico fichero
-     * @return Nombre de fichero (con ruta) seleccionado por el usuario
-     * @throws AOCancelledOperationException Si el usuario cancela la operaci&oacute;n. */
-    @Override
-	public String[] getLoadFileName(final String[] extensions, final String description, final boolean multiSelect, final Object parentComponent) {
-        return getLoadFileName(
-    		null,
-    		null,
-    		extensions,
-    		description,
-    		false,
-    		parentComponent
-		);
-    }
-
-    /** Pregunta al usuario por un nombre de fichero para su carga.
+    /** Permite al usuario seleccionar ficheros o directorios.
      * @param dialogTitle T&iacute;tulo de la ventana de di&aacute;logo.
      * @param extensions Extensiones predeterminadas para el fichero
      * @param description Descripci&oacute;n del tipo de fichero correspondiente con las extensiones
@@ -344,10 +297,12 @@ public class JSEUIManager implements AOUIManager {
      * @return Nombre de fichero (con ruta) seleccionado por el usuario
      * @throws AOCancelledOperationException Si el usuario cancela la operaci&oacute;n. */
     @Override
-	public String[] getLoadFileName(final String dialogTitle,
+	public File[] getLoadFiles(final String dialogTitle,
 								    final String currentDir,
+								    final String filename,
                                     final String[] extensions,
                                     final String description,
+                                    final boolean selectDirectory,
                                     final boolean multiSelect,
                                     final Object parent) {
         Component parentComponent = null;
@@ -356,9 +311,20 @@ public class JSEUIManager implements AOUIManager {
         }
 
         final JFileChooser jfc = new JFileChooser();
+        if (selectDirectory) {
+        	jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        }
         if (currentDir != null) {
         	jfc.setCurrentDirectory(new File(currentDir));
         }
+        if (filename != null) {
+        	if (currentDir != null) {
+        		jfc.setSelectedFile(new File(currentDir, filename));
+        	} else {
+        		jfc.setSelectedFile(new File(filename));
+        	}
+        }
+
         jfc.setMultiSelectionEnabled(multiSelect);
         if (dialogTitle != null && dialogTitle.length() > 0) {
             jfc.setDialogTitle(dialogTitle);
@@ -375,14 +341,7 @@ public class JSEUIManager implements AOUIManager {
         	else {
 				files = new File[] { jfc.getSelectedFile() };
 			}
-        	if (files == null) {
-        		return null;
-        	}
-        	final String[] sel = new String[files.length];
-        	for (int i=0;i<files.length;i++) {
-        		sel[i] = files[i].getAbsolutePath();
-        	}
-            return sel;
+            return files;
         }
         throw new AOCancelledOperationException();
     }
@@ -572,50 +531,4 @@ public class JSEUIManager implements AOUIManager {
         }
 
     }
-
-    /** Pregunta al usuario por la localizaci&oacute;n de un fichero espec&iacute;fico para su carga.
-     * @param dialogTitle T&iacute;tulo de la ventana de di&aacute;logo.
-     * @param fileName Nombre del fichero a localizar
-     * @param description Descripci&oacute;n del tipo de fichero correspondiente con las extensiones
-     * @param parent Componente padre (para la modalidad, debe ser de tipo <code>java.awt.Component</code>)
-     * @return Fichero seleccionado por el usuario
-     * @throws AOCancelledOperationException Si el usuario cancela la operaci&oacute;n. */
-    @Override
-	public File getLoadFile(final String dialogTitle,
-                            final String fileName,
-                            final String description,
-                            final Object parent) {
-
-        Component parentComponent = null;
-        if (parent instanceof Component) {
-            parentComponent = (Component) parent;
-        }
-
-        final JFileChooser fc = new JFileChooser();
-        fc.setDialogTitle(dialogTitle);
-        fc.setFileFilter(new FileFilter() {
-            /** {@inheritDoc} */
-            @Override
-            public boolean accept(final File f) {
-                if (f == null) {
-                    return false;
-                }
-                if (f.isDirectory() || f.getName().equalsIgnoreCase(fileName)) {
-                    return true;
-                }
-                return false;
-            }
-
-            /** {@inheritDoc} */
-            @Override
-            public String getDescription() {
-                return description;
-            }
-        });
-        if (fc.showOpenDialog(parentComponent) != JFileChooser.APPROVE_OPTION) {
-            throw new AOCancelledOperationException();
-        }
-        return fc.getSelectedFile();
-    }
-
 }

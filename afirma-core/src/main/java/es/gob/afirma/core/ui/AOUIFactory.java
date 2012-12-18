@@ -170,54 +170,28 @@ public final class AOUIFactory {
         return uiManager.showCertificateSelectionDialog(parentComponent, selectionValues);
     }
 
-    /** Pregunta al usuario por un nombre de fichero para su carga.
-     * @param extensions Extensiones predeterminadas para el fichero
-     * @param description Descripci&oacute;n del tipo de fichero correspondiente con las extensiones
-     * @param multiSelect <code>true</code> para permitir selecci&oacute;n m&uacute;ltiple, <code>false</code>
-     *                    para selecci&oacute;n de un &uacute;nico fichero
-     * @param parentComponent Componente padre (para la modalidad)
-     * @return Nombre de fichero (con ruta) seleccionado por el usuario */
-    public static String[] getLoadFileName(final String[] extensions, final String description, final boolean multiSelect, final Object parentComponent) {
-        return uiManager.getLoadFileName(extensions, description, multiSelect, parentComponent);
-    }
-
-    /** Pregunta al usuario por un nombre de fichero para su carga.
-     * @param dialogTitle T&iacute;tulo de la ventana de di&aacute;logo.
+    /** Pide al usuario que seleccione un fichero.
+     * @param dialogTitle T&iacute;tulo de la ventana de di&aacute;logo
      * @param currentDir Directorio inicial del di&aacute;logo
+     * @param filename Nombre del fichero a localizar
      * @param extensions Extensiones predeterminadas para el fichero
      * @param description Descripci&oacute;n del tipo de fichero correspondiente con las extensiones
-     * @param multiSelect <code>true</code> para permitir selecci&oacute;n m&uacute;ltiple, <code>false</code>
+     * @param selectDirectory {@code true} para permitir la selecci&oacute;n de directorios, {@code true}
+     * 					  para selecci&oacute;n de ficheros. En caso de directorios el par&aacute;metro
+     * 					  {@code multiselect} se ignorar&aacute;.
+     * @param multiSelect {@code true} para permitir selecci&oacute;n m&uacute;ltiple, {@code false}
      *                    para selecci&oacute;n de un &uacute;nico fichero
      * @param parentComponent Componente padre (para la modalidad)
      * @return Nombre de fichero (con ruta) seleccionado por el usuario */
-    public static String[] getLoadFileName(final String dialogTitle,
+    public static File[] getLoadFiles(final String dialogTitle,
     									   final String currentDir,
+    									   final String filename,
     		                               final String[] extensions,
     		                               final String description,
+    		                               final boolean selectDirectory,
     		                               final boolean multiSelect,
     		                               final Object parentComponent) {
-        return uiManager.getLoadFileName(dialogTitle, currentDir, extensions, description, multiSelect, parentComponent);
-    }
-
-    /** Pregunta al usuario por la localizaci&oacute;n de un directorio espec&iacute;fico para su carga.
-     * @param dialogTitle T&iacute;tulo de la ventana de di&aacute;logo.
-     * @param fileName Nombre del directorio a localizar
-     * @param parent Componente padre (para la modalidad)
-     * @return Ruta absoluta del directorio seleccionado por el usuario
-     * @throws es.gob.afirma.core.AOCancelledOperationException Si el usuario cancela la operaci&oacute;n. */
-    public static String getLoadDirectory(final String dialogTitle, final String fileName, final Object parent) {
-    	return uiManager.getLoadDirectory(dialogTitle, fileName, parent);
-    }
-
-    /** Pregunta al usuario por la localizaci&oacute;n de un fichero espec&iacute;fico para su carga.
-     * @param dialogTitle T&iacute;tulo de la ventana de di&aacute;logo.
-     * @param fileName Nombre del fichero a localizar
-     * @param description Descripci&oacute;n del tipo de fichero correspondiente con las extensiones
-     * @param parent Componente padre (para la modalidad)
-     * @return Fichero seleccionado por el usuario
-     * @throws es.gob.afirma.core.AOCancelledOperationException Si el usuario cancela la operaci&oacute;n. */
-    public static File getLoadFile(final String dialogTitle, final String fileName, final String description, final Object parent) {
-        return uiManager.getLoadFile(dialogTitle, fileName, description, parent);
+        return uiManager.getLoadFiles(dialogTitle, currentDir, filename, extensions, description, selectDirectory, multiSelect, parentComponent);
     }
 
     /** Pregunta al usuario por la localizaci&oacute;n en la que se desean guardar
