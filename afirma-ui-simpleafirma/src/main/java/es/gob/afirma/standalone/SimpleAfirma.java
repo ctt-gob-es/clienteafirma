@@ -415,12 +415,11 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 
     /** Carga el fichero a firmar. Este m&eacute;todo se situa aqu&iacute; para
      * permitir su acceso desde la barra de men&uacute;
-     * @param filePath
-     *        Fichero a firmar, incluyendo su ruta completa */
-    public void loadFileToSign(final String filePath) {
+     * @param file Fichero a firmar, incluyendo su ruta completa */
+    public void loadFileToSign(final File file) {
         if (this.currentPanel instanceof SignPanel) {
             try {
-                ((SignPanel) this.currentPanel).loadFile(filePath);
+                ((SignPanel) this.currentPanel).loadFile(file);
             }
             catch (final Exception e) {
                 UIUtils.showErrorMessage(
