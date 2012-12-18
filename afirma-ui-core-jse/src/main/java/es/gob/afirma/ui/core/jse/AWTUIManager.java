@@ -93,6 +93,7 @@ public final class AWTUIManager extends JSEUIManager {
 			                  final Object parent) {
         final FileDialog fd = new FileDialog(parent instanceof Frame ? (Frame) parent : null, dialogTitle);
         fd.setMode(FileDialog.LOAD);
+
         if (currentDir != null) {
         	fd.setDirectory(currentDir);
         }
@@ -109,7 +110,7 @@ public final class AWTUIManager extends JSEUIManager {
         	}
         }
         if (filename != null) {
-        	fd.setDirectory(new File(filename).getAbsolutePath());
+        	fd.setFile(filename);
         }
 
         if (extensions != null && extensions.length > 0) {
@@ -145,7 +146,6 @@ public final class AWTUIManager extends JSEUIManager {
             throw new AOCancelledOperationException();
         }
 
-
         if (isJava7()) {
         	// getFiles() solo esta disponible en Java 7
         	File[] files;
@@ -158,7 +158,7 @@ public final class AWTUIManager extends JSEUIManager {
         	}
         	return files;
         }
-        return new File[] { new File(fd.getFile()) };
+        return new File[] { new File(fd.getDirectory(), fd.getFile()) };
     }
 
 	private static boolean isJava7() {
