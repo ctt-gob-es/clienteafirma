@@ -292,6 +292,7 @@ public class JSEUIManager implements AOUIManager {
      * @param extensions Extensiones predeterminadas para el fichero
      * @param description Descripci&oacute;n del tipo de fichero correspondiente con las extensiones
      * @param parent Componente padre (para la modalidad)
+     * @param selectDirectory Selecci&oacute;n de directorios.
      * @param multiSelect <code>true</code> para permitir selecci&oacute;n m&uacute;ltiple, <code>false</code>
      *                    para selecci&oacute;n de un &uacute;nico fichero
      * @return Nombre de fichero (con ruta) seleccionado por el usuario

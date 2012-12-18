@@ -88,7 +88,7 @@ public final class AWTUIManager extends JSEUIManager {
 			                  final String filename,
 			                  final String[] extensions,
 			                  final String description,
-			                  final boolean directory,
+			                  final boolean selectDirectory,
 			                  final boolean multiSelect,
 			                  final Object parent) {
         final FileDialog fd = new FileDialog(parent instanceof Frame ? (Frame) parent : null, dialogTitle);
@@ -103,10 +103,11 @@ public final class AWTUIManager extends JSEUIManager {
         // a la sentencia: fd.setMultipleMode(multiSelect);
         if (multiSelect) {
         	try {
-        		final Method setMultipleModeMethod = FileDialog.class.getDeclaredMethod("setMultipleMode", Boolean.TYPE); //$NON-NLS-1$
+        		final Method setMultipleModeMethod = FileDialog.class.getMethod("setMultipleMode", Boolean.TYPE); //$NON-NLS-1$
         		setMultipleModeMethod.invoke(fd, Boolean.valueOf(multiSelect));
         	} catch (final Exception e) {
-        		LOGGER.warning("Error de reflexion al establecer el dialogo de carga con seleccion multiple, se realizara una seleccion simple: " + e); //$NON-NLS-1$
+        		LOGGER.warning("No es posible utilizar la seleccion multiples con los dialogos del sistema con versiones anteriores de Java 7, se utilizara Swing"); //$NON-NLS-1$
+        		return super.getLoadFiles(dialogTitle, currentDir, filename, extensions, description, selectDirectory, multiSelect, parent);
         	}
         }
         if (filename != null) {
@@ -150,8 +151,8 @@ public final class AWTUIManager extends JSEUIManager {
         	// getFiles() solo esta disponible en Java 7
         	File[] files;
         	try {
-        		final Method getFilesMethod = FileDialog.class.getDeclaredMethod("getFiles", (Class<?>) null); //$NON-NLS-1$
-        		files = (File[]) getFilesMethod.invoke(fd, (Object) null);
+        		final Method getFilesMethod = FileDialog.class.getMethod("getFiles"); //$NON-NLS-1$
+        		files = (File[]) getFilesMethod.invoke(fd);
         	} catch (final Exception e) {
         		LOGGER.warning("Error de reflexion al recuperar la seleccion multiple del dialogo de carga, se devolvera un unico fichero: " + e); //$NON-NLS-1$
         		files = new File[] { new File(fd.getFile()) };
