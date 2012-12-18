@@ -146,7 +146,7 @@ public final class AWTUIManager extends JSEUIManager {
             throw new AOCancelledOperationException();
         }
 
-        if (isJava7()) {
+        if (multiSelect && isJava7()) {
         	// getFiles() solo esta disponible en Java 7
         	File[] files;
         	try {
