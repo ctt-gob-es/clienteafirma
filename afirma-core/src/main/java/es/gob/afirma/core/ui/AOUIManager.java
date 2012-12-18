@@ -120,17 +120,15 @@ public interface AOUIManager {
     /** Pregunta al usuario por un nombre de fichero para su carga.
      * @param dialogTitle
      *        T&iacute;tulo de la ventana de di&aacute;logo.
-     * @param extensions
-     *        Extensiones predeterminadas para el fichero
-     * @param description
-     *        Descripci&oacute;n del tipo de fichero correspondiente con las
-     *        extensiones
+     * @param currentDir Directorio inicial del di&aacute;logo
+     * @param extensions Extensiones predeterminadas para el fichero
+     * @param description Descripci&oacute;n del tipo de fichero correspondiente con las extensiones
      * @param multiSelect <code>true</code> para permitir selecci&oacute;n m&uacute;ltiple, <code>false</code>
      *                    para selecci&oacute;n de un &uacute;nico fichero
      * @param parentComponent
      *        Componente padre (para la modalidad)
      * @return Nombre de fichero (con ruta) seleccionado por el usuario */
-    String[] getLoadFileName(String dialogTitle, String[] extensions, String description, boolean multiSelect, Object parentComponent);
+    String[] getLoadFileName(String dialogTitle, String currentDir, String[] extensions, String description, boolean multiSelect, Object parentComponent);
 
     /** Pregunta al usuario por la localizaci&oacute;n de un fichero espec&iacute;fico para su carga.
      * @param dialogTitle
@@ -152,6 +150,7 @@ public interface AOUIManager {
      * se devolvera null, si la operaci&oacute;n finaliza correctamente se
      * devolver&aacute; el path completo del fichero.
      * @param data Datos que se desean almacenar.
+     * @param currentDir Directorio inicial del di&aacute;logo
      * @param dialogTitle T&iacute;tulo del di&aacute;logo de guardado
      * @param selectedFile Nombre de fichero por defecto.
      * @param exts Extensiones de fichero aceptadas.
@@ -161,6 +160,7 @@ public interface AOUIManager {
      * @return Fichero guardado.
      * @throws IOException Si no se puede guardar el fichero */
     File saveDataToFile(final byte[] data,
+    					final String currentDir,
     					final String dialogTitle,
     		            final File selectedFile,
     		            final String[] exts,

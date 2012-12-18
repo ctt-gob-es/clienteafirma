@@ -183,6 +183,7 @@ public final class AOUIFactory {
 
     /** Pregunta al usuario por un nombre de fichero para su carga.
      * @param dialogTitle T&iacute;tulo de la ventana de di&aacute;logo.
+     * @param currentDir Directorio inicial del di&aacute;logo
      * @param extensions Extensiones predeterminadas para el fichero
      * @param description Descripci&oacute;n del tipo de fichero correspondiente con las extensiones
      * @param multiSelect <code>true</code> para permitir selecci&oacute;n m&uacute;ltiple, <code>false</code>
@@ -190,11 +191,12 @@ public final class AOUIFactory {
      * @param parentComponent Componente padre (para la modalidad)
      * @return Nombre de fichero (con ruta) seleccionado por el usuario */
     public static String[] getLoadFileName(final String dialogTitle,
-    		                                   final String[] extensions,
-    		                                   final String description,
-    		                                   final boolean multiSelect,
-    		                                   final Object parentComponent) {
-        return uiManager.getLoadFileName(dialogTitle, extensions, description, multiSelect, parentComponent);
+    									   final String currentDir,
+    		                               final String[] extensions,
+    		                               final String description,
+    		                               final boolean multiSelect,
+    		                               final Object parentComponent) {
+        return uiManager.getLoadFileName(dialogTitle, currentDir, extensions, description, multiSelect, parentComponent);
     }
 
     /** Pregunta al usuario por la localizaci&oacute;n de un directorio espec&iacute;fico para su carga.
@@ -223,6 +225,7 @@ public final class AOUIFactory {
      * vuelve a preguntar al usuario por una localizaci&oacute;n, Si el usuario
      * cancela el di&aacute;logo, se devolver&aacute; {@code null}.
      * @param data Datos que se desean almacenar.
+     * @param currentDir Directorio inicial del di&aacute;logo
      * @param dialogTitle T&iacute;tulo del di&aacute;logo de guardado
      * @param selectedFile Localizaci&oacute;n y nombre por defecto del fichero.
      * @param exts Extensiones de fichero aceptadas.
@@ -231,11 +234,12 @@ public final class AOUIFactory {
      * @return Fichero en el que se almacenan los datos.
      * @throws IOException Si no se puede guardar el fichero*/
     public static File getSaveDataToFile(final byte[] data,
+    									 final String currentDir,
     									 final String dialogTitle,
     		                             final File selectedFile,
     		                             final String[] exts,
     		                             final String description,
     		                             final Object parent) throws IOException {
-        return uiManager.saveDataToFile(data, dialogTitle, selectedFile, exts, description, parent);
+        return uiManager.saveDataToFile(data, null, dialogTitle, selectedFile, exts, description, parent);
     }
 }
