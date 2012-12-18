@@ -25,6 +25,13 @@ public final class ExtFilter extends FileFilter implements java.io.FileFilter {
         }
         return ""; //$NON-NLS-1$
     }
+
+    /** Devuleve las extensiones de fichero aceptadas.
+     * @return Extensiones de fichero aceptadas */
+    public String[] getExtensions() {
+    	return this.extensions;
+    }
+
     private final String description;
 
     private final String[] extensions;
@@ -40,7 +47,7 @@ public final class ExtFilter extends FileFilter implements java.io.FileFilter {
             throw new IllegalArgumentException("No se puede crear un filtro vacio"); //$NON-NLS-1$
         }
         this.extensions = exts.clone();
-        this.description = (desc != null) ? desc : Messages.getString("ExtFiler.fileTypes.all"); //$NON-NLS-1$
+        this.description = desc != null ? desc : Messages.getString("ExtFiler.fileTypes.all"); //$NON-NLS-1$
     }
 
     /** {@inheritDoc}  */

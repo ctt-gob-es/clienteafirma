@@ -12,70 +12,112 @@ package es.gob.afirma.ui.utils;
 import java.awt.Component;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.filechooser.FileFilter;
 
+import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.ui.principal.Main;
 
-/**
- * Clase para seleccionar un tipo de ventana de dialogo.
- */
+/** Clase para seleccionar un tipo de ventana de di&aacute;logo. */
 public final class SelectionDialog {
 
 	private SelectionDialog() {
 		// No permitimos la instanciacion
 	}
 
-	/**
-	 * Muestra un di&aacute;logo para la selecci&oacute;n de un fichero en disco.
+	/** Muestra un di&aacute;logo para la selecci&oacute;n de un fichero en disco.
 	 * @param parent Component padre sobre el que se mostrar&aacute; el di&aacute;logo.
 	 * @param title T&iacute;tulo del di&aacute;logo de selecci&oacute;n.
-	 * @return Fichero seleccionado o {@code null} si no se seleccion&oacute;o ninguno.
-	 */
+	 * @return Fichero seleccionado o {@code null} si no se seleccion&oacute;o ninguno. */
 	public static File showFileOpenDialog(final Component parent, final String title) {
+		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+			try {
+				return AOUIFactory.getLoadFile(title, null, null, parent);
+			}
+			catch(final AOCancelledOperationException e) {
+				return null;
+			}
+		}
 		return showOpenDialog(parent, title, JFileChooser.FILES_ONLY, null);
 	}
 
-	/**
-	 * Muestra un di&aacute;logo para la selecci&oacute;n de un fichero en disco
+	/** Muestra un di&aacute;logo para la selecci&oacute;n de un fichero en disco
 	 * mostrando s&oacute;lo aquellos que pasen el filtro indicado.
 	 * @param parent Component padre sobre el que se mostrar&aacute; el di&aacute;logo.
 	 * @param title T&iacute;tulo del di&aacute;logo de selecci&oacute;n.
 	 * @param filter Filtro de ficheros.
-	 * @return Fichero seleccionado o {@code null} si no se seleccion&oacute;o ninguno.
-	 */
+	 * @return Fichero seleccionado o {@code null} si no se seleccion&oacute;o ninguno. */
 	public static File showFileOpenDialog(final Component parent, final String title, final ExtFilter filter) {
+		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+			try {
+				return new File(AOUIFactory.getLoadFileName(
+					title,
+					null,
+					filter != null ? filter.getExtensions() : null,
+					filter != null ? filter.getDescription() : null,
+					false,
+					parent
+				)[0]);
+			}
+			catch(final AOCancelledOperationException e) {
+				return null;
+			}
+		}
 		return showOpenDialog(parent, title, JFileChooser.FILES_ONLY, filter);
 	}
 
-	/**
-	 * Muestra un di&aacute;logo para la selecci&oacute;n de un directorio en disco.
+	/** Muestra un di&aacute;logo para la selecci&oacute;n de un directorio en disco.
 	 * @param parent Component padre sobre el que se mostrar&aacute; el di&aacute;logo.
 	 * @param title T&iacute;tulo del di&aacute;logo de selecci&oacute;n.
-	 * @return Directorio seleccionado o {@code null} si no se seleccion&oacute;o ninguno.
-	 */
+	 * @return Directorio seleccionado o {@code null} si no se seleccion&oacute;o ninguno. */
 	public static File showDirOpenDialog(final Component parent, final String title) {
+		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+			try {
+				return new File(AOUIFactory.getLoadDirectory(title, null, parent));
+			}
+			catch(final AOCancelledOperationException e) {
+				return null;
+			}
+		}
 		return showOpenDialog(parent, title, JFileChooser.DIRECTORIES_ONLY, null);
 	}
 
-	/**
-	 * Muestra un di&aacute;logo para la selecci&oacute;n de un archivo en disco.
+	/** Muestra un di&aacute;logo para la selecci&oacute;n de un archivo en disco.
 	 * @param parent Component padre sobre el que se mostrar&aacute; el di&aacute;logo.
 	 * @param title T&iacute;tulo del di&aacute;logo de selecci&oacute;n.
 	 * @param selectionMode Modo de selecci&oacute;n de {@link JFileChooser}.
 	 * @param filter Filtro de ficheros.
-	 * @return Archivo seleccionado o {@code null} si no se seleccion&oacute;o ninguno.
-	 */
+	 * @return Archivo seleccionado o {@code null} si no se seleccion&oacute;o ninguno. */
 	private static File showOpenDialog(final Component parent, final String title, final int selectionMode, final ExtFilter filter) {
 
         String currentDir = Main.getPreferences().get("dialog.load.dir", null); //$NON-NLS-1$
         if (currentDir == null) {
             currentDir = "."; //$NON-NLS-1$
         }
+
+        if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+			try {
+				return new File(
+					AOUIFactory.getLoadFileName(
+						title,
+						currentDir,
+						filter != null ? filter.getExtensions() : null,
+						filter != null ? filter.getDescription() : null,
+						false,
+						parent
+					)[0]
+				);
+			}
+			catch(final AOCancelledOperationException e) {
+				return null;
+			}
+		}
 
 		//Instancia del componente FileChooser accesible
         final JAccessibilityFileChooser fc = new JAccessibilityFileChooser(new File(currentDir));
@@ -127,7 +169,7 @@ public final class SelectionDialog {
      * @return Fichero guardado.
      * @throws NullPointerException
      *         No se introdujeron los datos que se desean almacenar. */
-    public static File saveDataToFile(final String dialogTitle, final byte[] data, final String defaultName, final FileFilter fileFilter, final Object parent) {
+    public static File saveDataToFile(final String dialogTitle, final byte[] data, final String defaultName, final ExtFilter fileFilter, final Object parent) {
 
         if (data == null) {
             Logger.getLogger("es.gob.afirma").warning("No se han introducido los datos que se desean guardar. Se cancelara la operacion"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -138,6 +180,33 @@ public final class SelectionDialog {
         if (parent instanceof Component) {
             parentComponent = (Component) parent;
         }
+
+        try {
+        	return AOUIFactory.getSaveDataToFile(
+    			data,
+    			null,
+    			dialogTitle,
+    			null,
+    			fileFilter != null ? fileFilter.getExtensions() : null,
+    			fileFilter != null ? fileFilter.getDescription() : null,
+    			parentComponent
+			);
+        }
+        catch(final AOCancelledOperationException e) {
+        	return null;
+        }
+        catch(final IOException e) {
+            Logger.getLogger("es.gob.afirma").warning("No se pudo guardar la informacion en el fichero indicado: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+            CustomDialog.showMessageDialog(
+    		   parentComponent,
+    		   true,
+               Messages.getString("SelectionDialog.saveDialog.error.msg"), //$NON-NLS-1$
+               Messages.getString("SelectionDialog.saveDialog.error.title"), //$NON-NLS-1$
+               JOptionPane.ERROR_MESSAGE
+            );
+        }
+
+
         File resultFile = null;
         boolean tryAgain = true;
         File file = null;
@@ -205,28 +274,23 @@ public final class SelectionDialog {
                     tryAgain = true;
                 }
                 else { // Hemos seleccionado la opcion de sobrescribir
-                    FileOutputStream fos = null;
                     try {
-                        fos = new FileOutputStream(file);
+                    	final FileOutputStream fos = new FileOutputStream(file);
                         fos.write(data);
+                        fos.flush();
+                        fos.close();
                     }
                     catch (final Exception ex) {
                         Logger.getLogger("es.gob.afirma").warning("No se pudo guardar la informacion en el fichero indicado: " + ex); //$NON-NLS-1$ //$NON-NLS-2$
-                       CustomDialog.showMessageDialog(parentComponent, true,
-                                Messages.getString("SelectionDialog.saveDialog.error.msg"), Messages.getString("SelectionDialog.saveDialog.error.title"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
-                        fos = null;
+                        CustomDialog.showMessageDialog(
+                		   parentComponent,
+                		   true,
+                           Messages.getString("SelectionDialog.saveDialog.error.msg"), //$NON-NLS-1$
+                           Messages.getString("SelectionDialog.saveDialog.error.title"), //$NON-NLS-1$
+                           JOptionPane.ERROR_MESSAGE
+                        );
                         // Volvemos a intentar guardar
                         tryAgain = true;
-                    }
-                    if (fos != null) {
-                        try {
-                            fos.flush();
-                        }
-                        catch (final Exception e) { /** No hacemos nada. */ }
-                        try {
-                            fos.close();
-                        }
-                        catch (final Exception e) { /** No hacemos nada. */ }
                     }
                     resultFile = file;
                 }
@@ -245,7 +309,8 @@ public final class SelectionDialog {
 					);
 				}
             }
-        } catch (final Exception e) {
+        }
+        catch (final Exception e) {
             /* No hacemos nada */
         }
 

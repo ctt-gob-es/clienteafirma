@@ -1,7 +1,5 @@
 package es.gob.afirma.ui.utils;
 
-import javax.swing.filechooser.FileFilter;
-
 import es.gob.afirma.core.signers.AOSignConstants;
 
 /** Utilidades para la gesti&oacute;n de ficheros de firma. */
@@ -17,7 +15,7 @@ public final class SignFileUtils {
      *        Formato de firma.
      * @return Filtro con las extensiones de fichero v&aacute;lidas para el
      *         formato de firma especificado. */
-    public static FileFilter getOutFileFilter(final String signFormat) {
+    public static ExtFilter getOutFileFilter(final String signFormat) {
         if (signFormat.equals(AOSignConstants.SIGN_FORMAT_CMS)) {
             return new ExtFilter(new String[] {
             "csig"}, Messages.getString("AOUIManager.43")); //$NON-NLS-1$ //$NON-NLS-2$
