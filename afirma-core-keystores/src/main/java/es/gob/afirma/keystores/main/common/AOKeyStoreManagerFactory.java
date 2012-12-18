@@ -151,6 +151,7 @@ public final class AOKeyStoreManagerFactory {
             desc = KeyStoreMessages.getString("AOKeyStoreManagerFactory.0"); //$NON-NLS-1$
             storeFilename = AOUIFactory.getLoadFileName(
         		KeyStoreMessages.getString("AOKeyStoreManagerFactory.4") + " " + "PKCS#12", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        		null,
         		exts,
         		desc,
         		false,
@@ -239,6 +240,7 @@ public final class AOKeyStoreManagerFactory {
             }
             storeFilename = AOUIFactory.getLoadFileName(
         		KeyStoreMessages.getString("AOKeyStoreManagerFactory.4") + " " + store.getName(), //$NON-NLS-1$ //$NON-NLS-2$
+        		null,
         		exts,
         		desc,
         		false,
@@ -297,6 +299,7 @@ public final class AOKeyStoreManagerFactory {
             }
             p11Lib = AOUIFactory.getLoadFileName(
 	             KeyStoreMessages.getString("AOKeyStoreManagerFactory.7"),  //$NON-NLS-1$
+	             null,
 	             exts,
 	             extsDesc,
 	             false,
