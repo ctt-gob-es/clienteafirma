@@ -111,6 +111,11 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 				setError(e);
 				throw e;
 			}
+			catch (final java.util.concurrent.CancellationException e) {
+				final AOCancelledOperationException ce = new AOCancelledOperationException("Operacion cancelada por el usuario", e); //$NON-NLS-1$
+				setError(ce);
+				throw ce;
+			}
 			catch (final PrivilegedActionException e) {
 				setError(e);
 				throw e;
@@ -157,10 +162,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 				                                          AOException {
 		this.clearError();
 
-		byte[] sign;
+		byte[] signature;
 		if (signB64 != null) {
 			try {
-				sign = Base64.decode(signB64);
+				signature = Base64.decode(signB64);
 			}
 			catch (final IOException e) {
 				setError(e, "La firma proporcionada est\u00E1 mal codificada en base 64"); //$NON-NLS-1$
@@ -169,13 +174,18 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		}
 		else {
 			try {
-				sign = AccessController.doPrivileged(new GetFileContentAction(
+				signature = AccessController.doPrivileged(new GetFileContentAction(
 						MiniAppletMessages.getString("MiniAfirmaApplet.2"), null, //$NON-NLS-1$
 						MiniAppletMessages.getString("MiniAfirmaApplet.1"), this)); //$NON-NLS-1$
 			}
 			catch (final AOCancelledOperationException e) {
 				setError(e);
 				throw e;
+			}
+			catch (final java.util.concurrent.CancellationException e) {
+				final AOCancelledOperationException ce = new AOCancelledOperationException("Operacion cancelada por el usuario", e); //$NON-NLS-1$
+				setError(ce);
+				throw ce;
 			}
 			catch (final PrivilegedActionException e) {
 				setError(e);
@@ -195,8 +205,8 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 		try {
 			return Base64.encode(AccessController.doPrivileged(new CoSignAction(
-					MiniAfirmaApplet.selectSigner(MiniAfirmaApplet.cleanParam(format), sign),
-					sign,
+					MiniAfirmaApplet.selectSigner(MiniAfirmaApplet.cleanParam(format), signature),
+					signature,
 					dataBinary,
 					MiniAfirmaApplet.cleanParam(algorithm),
 					this.selectPrivateKey(params),
@@ -231,10 +241,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 					                                           AOException {
 		this.clearError();
 
-		byte[] sign;
+		byte[] signature;
 		if (signB64 != null) {
 			try {
-				sign = Base64.decode(signB64);
+				signature = Base64.decode(signB64);
 			}
 			catch (final IOException e) {
 				setError(e, "La firma proporcionada est\u00E1 mal codificada en base 64"); //$NON-NLS-1$
@@ -243,13 +253,18 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		}
 		else {
 			try {
-				sign = AccessController.doPrivileged(new GetFileContentAction(
+				signature = AccessController.doPrivileged(new GetFileContentAction(
 						MiniAppletMessages.getString("MiniAfirmaApplet.2"), null, //$NON-NLS-1$
 						MiniAppletMessages.getString("MiniAfirmaApplet.1"), this)); //$NON-NLS-1$
 			}
 			catch (final AOCancelledOperationException e) {
 				setError(e);
 				throw e;
+			}
+			catch (final java.util.concurrent.CancellationException e) {
+				final AOCancelledOperationException ce = new AOCancelledOperationException("Operacion cancelada por el usuario", e); //$NON-NLS-1$
+				setError(ce);
+				throw ce;
 			}
 			catch (final PrivilegedActionException e) {
 				setError(e);
@@ -261,8 +276,8 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 		try {
 			return Base64.encode(AccessController.doPrivileged(new CounterSignAction(
-					MiniAfirmaApplet.selectSigner(MiniAfirmaApplet.cleanParam(format), sign),
-					sign,
+					MiniAfirmaApplet.selectSigner(MiniAfirmaApplet.cleanParam(format), signature),
+					signature,
 					MiniAfirmaApplet.cleanParam(algorithm),
 					this.selectPrivateKey(params),
 					ExtraParamsProcessor.expandProperties(params, null, format)
@@ -386,6 +401,9 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		catch (final AOCancelledOperationException e) {
 			return false;
 		}
+		catch (final java.util.concurrent.CancellationException e) {
+			return false;
+		}
 		catch (final IOException e) {
 			setError(e, "Los datos proporcionados est\u00E1n mal codificados en base 64"); //$NON-NLS-1$
 			throw e;
@@ -427,7 +445,13 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 					titleDialog, exts, descFiles, false, asBase64, this))[0];
 		}
 		catch (final AOCancelledOperationException e) {
-			return null;
+			setError(e);
+			throw e;
+		}
+		catch (final java.util.concurrent.CancellationException e) {
+			final AOCancelledOperationException ce = new AOCancelledOperationException("Operacion cancelada por el usuario", e); //$NON-NLS-1$
+			setError(ce);
+			throw ce;
 		}
 		catch (final PrivilegedActionException e) {
 			setError(e);
@@ -474,7 +498,13 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 					titleDialog, exts, descFiles, true, asBase64, this));
 		}
 		catch (final AOCancelledOperationException e) {
-			return null;
+			setError(e);
+			throw e;
+		}
+		catch (final java.util.concurrent.CancellationException e) {
+			final AOCancelledOperationException ce = new AOCancelledOperationException("Operacion cancelada por el usuario", e); //$NON-NLS-1$
+			setError(ce);
+			throw ce;
 		}
 		catch (final PrivilegedActionException e) {
 			setError(e);
@@ -671,8 +701,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			}
 		}
 		else {
+			// Si llegamos aqui es por no haberse indicado el formato de firma y que no disponemos de
+			// una firma del que tomarlo (por lo que no puede ser una multifirma)
 			throw new IllegalArgumentException(
-				"No se ha indicado el formato ni la firma que se desea tratar" //$NON-NLS-1$
+				"No se ha indicado el formato para la operacion de firma" //$NON-NLS-1$
 			);
 		}
 		return signer;
