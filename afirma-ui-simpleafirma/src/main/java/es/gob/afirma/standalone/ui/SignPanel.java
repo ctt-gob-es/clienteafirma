@@ -388,10 +388,11 @@ public final class SignPanel extends JPanel {
                                     JOptionPane.WARNING_MESSAGE
                             );
                         }
-                        String fileName = fileList.get(0).toString();
-                        if (fileName.startsWith("http://") || //$NON-NLS-1$
-                            fileName.startsWith("https://") || //$NON-NLS-1$
-                            fileName.startsWith("ftp://") //$NON-NLS-1$
+                        File file = null;
+                        final String filename = fileList.get(0).toString();
+                        if (filename.startsWith("http://") || //$NON-NLS-1$
+                        	filename.startsWith("https://") || //$NON-NLS-1$
+                        	filename.startsWith("ftp://") //$NON-NLS-1$
                         ) {
                             UIUtils.showErrorMessage(
                                     SignPanel.this,
@@ -402,9 +403,9 @@ public final class SignPanel extends JPanel {
                             dtde.dropComplete(false);
                             return;
                         }
-                        else if (fileName.startsWith("file://")) { //$NON-NLS-1$
+                        else if (filename.startsWith("file://")) { //$NON-NLS-1$
                             try {
-                                fileName = new File(new URI(fileName)).getPath();
+                            	file = new File(new URI(filename));
                             }
                             catch (final Exception e) {
                                 LOGGER.warning(
@@ -415,7 +416,7 @@ public final class SignPanel extends JPanel {
                             }
                         }
                         try {
-                            loadFile(new File(fileName));
+                            loadFile(file != null ? file : new File(filename));
                         }
                         catch (final IOException e) {
                             LOGGER.warning(
