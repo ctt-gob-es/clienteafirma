@@ -59,6 +59,7 @@ import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.signers.cades.CAdESUtils;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
+import es.gob.afirma.signers.pkcs7.NoContainsDataException;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.SigUtils;
 
@@ -338,7 +339,9 @@ final class CAdESCoSigner {
      *         digital
      * @throws java.security.cert.CertificateException
      *         Si se produce alguna excepci&oacute;n con los certificados de
-     *         firma.*/
+     *         firma.
+     * @throws NoContainsDataException Cuando la firma no contiene los datos
+     * 		   ni fue generada con el mismo algoritmo de firma. */
     byte[] coSigner(final String signatureAlgorithm,
                            final X509Certificate[] signerCertificateChain,
                            final InputStream data,
@@ -347,7 +350,7 @@ final class CAdESCoSigner {
                            final PrivateKeyEntry keyEntry,
                            final byte[] md,
                            final String contentType,
-                           final String contentDescription) throws IOException, NoSuchAlgorithmException, CertificateException {
+                           final String contentDescription) throws IOException, NoSuchAlgorithmException, CertificateException, NoContainsDataException {
 
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
     	final ASN1InputStream is = new ASN1InputStream(data);
@@ -474,7 +477,7 @@ final class CAdESCoSigner {
             signedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
         }
         else {
-            throw new IllegalStateException("No se puede crear la cofirma ya que no se han encontrado ni los datos firmados ni una huella digital valida en la firma"); //$NON-NLS-1$
+            throw new NoContainsDataException("No se puede crear la cofirma ya que no se han encontrado ni los datos firmados ni una huella digital compatible con el algoritmo de firma"); //$NON-NLS-1$
         }
 
         final ASN1OctetString sign2;

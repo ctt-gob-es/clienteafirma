@@ -63,6 +63,7 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
+import es.gob.afirma.signers.pkcs7.NoContainsDataException;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.SigUtils;
 
@@ -281,7 +282,9 @@ final class CoSigner {
      *         digital
      * @throws java.security.cert.CertificateException
      *         Si se produce alguna excepci&oacute;n con los certificados de
-     *         firma. */
+     *         firma.
+     * @throws NoContainsDataException Cuando la firma no contiene los datos
+     * 		   ni fue generada con el mismo algoritmo de firma. */
     byte[] coSigner(final String signatureAlgorithm,
                            final X509Certificate[] signerCertificateChain,
                            final byte[] sign,
@@ -289,7 +292,7 @@ final class CoSigner {
                            final PrivateKeyEntry keyEntry,
                            final Map<String, byte[]> atrib,
                            final Map<String, byte[]> uatrib,
-                           final byte[] digest) throws IOException, NoSuchAlgorithmException, CertificateException {
+                           final byte[] digest) throws IOException, NoSuchAlgorithmException, CertificateException, NoContainsDataException {
 
         byte[] messageDigest = digest != null ? digest.clone() : null;
 
@@ -419,7 +422,7 @@ final class CoSigner {
             // En este caso no puedo usar un hash de fuera, ya que no me han
             // pasado datos ni
             // huellas digitales, solo un fichero de firma
-            throw new IllegalStateException("No se puede crear la firma ya que no se ha encontrado un hash valido"); //$NON-NLS-1$
+            throw new NoContainsDataException("No se puede crear la cofirma ya que no se han encontrado ni los datos firmados ni una huella digital compatible con el algoritmo de firma"); //$NON-NLS-1$
         }
 
         final ASN1OctetString sign2;

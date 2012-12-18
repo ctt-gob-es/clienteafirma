@@ -165,6 +165,9 @@ public class AOCAdESCoSigner implements AOCoSigner {
                     contentDescription
                 );
             }
+            catch (final AOException e) {
+                throw e;
+            }
             catch (final Exception e) {
                 throw new AOException("Error generando la Cofirma CADES", e); //$NON-NLS-1$
             }

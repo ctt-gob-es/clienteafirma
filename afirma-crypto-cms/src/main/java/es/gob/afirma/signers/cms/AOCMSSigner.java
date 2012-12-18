@@ -154,6 +154,9 @@ public final class AOCMSSigner implements AOSigner {
                 // en este metodo, tendria que ser en el que incluye datos
                 return new CoSigner().coSigner(algorithm, (X509Certificate[])keyEntry.getCertificateChain(), sign, this.dataType, keyEntry, this.atrib, this.uatrib, null);
             }
+            catch (final AOException e) {
+                throw e;
+            }
             catch (final Exception e) {
                 throw new AOException("Error generando la Cofirma PKCS#7", e); //$NON-NLS-1$
             }
@@ -307,7 +310,7 @@ public final class AOCMSSigner implements AOSigner {
     }
 
     /** {@inheritDoc}
-     * @throws IOException */
+     * @throws IOException Si no es posible leer la firma. */
     @Override
 	public AOSignInfo getSignInfo(final byte[] signData) throws AOException, IOException {
 
