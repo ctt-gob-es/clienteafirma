@@ -60,6 +60,7 @@ final class GetFileNameContentAction implements PrivilegedExceptionAction<String
 
 		final String[] paths = AOUIFactory.getLoadFileName(
 			this.title,
+			null,
 			this.exts,
 			this.desc,
 			this.multiSel,

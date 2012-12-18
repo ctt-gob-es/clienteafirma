@@ -9,14 +9,13 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.logging.Logger;
 
-import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.filechooser.FileFilter;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.Platform.OS;
+import es.gob.afirma.core.ui.AOUIFactory;
 
 /**
  * Funciones de utilidad del di&aacute;logo de selecci&oacute;n de certificados.
@@ -47,7 +46,7 @@ final class CertificateUtils {
 		if (desktopClass != null) {
 			try {
 				final File certFile = saveTemp(certificate.getEncoded(), CERTIFICATE_DEFAULT_EXTENSION);
-				final Method getDesktopMethod = desktopClass.getDeclaredMethod("getDesktop()", (Class[]) null); //$NON-NLS-1$
+				final Method getDesktopMethod = desktopClass.getDeclaredMethod("getDesktop", (Class[]) null); //$NON-NLS-1$
 				final Object desktopObject = getDesktopMethod.invoke(null, (Object[]) null);
 				final Method openMethod = desktopClass.getDeclaredMethod("open", File.class); //$NON-NLS-1$
 				openMethod.invoke(desktopObject, certFile);
@@ -77,8 +76,15 @@ final class CertificateUtils {
 
 		// Si no podemos abrirlo, lo guardamos en disco
 		try {
-			final File savedfile = selectFileToSave(parent, JSEUIMessages.getString("CertificateUtils.1")); //$NON-NLS-1$
-			saveFile(savedfile, certificate.getEncoded());
+	    	AOUIFactory.getSaveDataToFile(
+    			certificate.getEncoded(),
+    			null,
+    			JSEUIMessages.getString("CertificateUtils.1"),  //$NON-NLS-1$
+    			new File(JSEUIMessages.getString("CertificateUtils.5") + CERTIFICATE_DEFAULT_EXTENSION), //$NON-NLS-1$
+    			new String[] { CERTIFICATE_DEFAULT_EXTENSION },
+    			JSEUIMessages.getString("CertificateUtils.3"), //$NON-NLS-1$
+    			parent
+			);
 		}
 		catch (final IOException e) {
 			new JSEUIManager().showConfirmDialog(
@@ -98,83 +104,10 @@ final class CertificateUtils {
 					JOptionPane.ERROR_MESSAGE
 				);
 		}
+		catch(final AOCancelledOperationException e) {
+			// El usuario ha cancelado la operacion, no hacemos nada
+		}
 	}
-
-	/** Pregunta al usuario por un nombre de fichero para salvar datos en disco.
-     * @param parent Componente padre sobre el que se muestran los di&aacute;logos.
-     * @param title T&iacute;tulo del di&aacute;logo de guardado.
-     * @return Nombre de fichero (con ruta) seleccionado por el usuario
-     * @throws IOException Cuando se produzca un error durante la selecci&oacute;n del fichero.
-     * @throws AOCancelledOperationException Cuando el usuario cancele la operaci&oacute;n. */
-    private static File selectFileToSave(final Component parent, final String title) throws IOException {
-
-    	final JFileChooser fc = new JFileChooser();
-    	fc.setDialogTitle(title);
-    	fc.setFileFilter(new FileFilter() {
-    	    /** {@inheritDoc} */
-			@Override
-			public String getDescription() {
-				return JSEUIMessages.getString("CertificateUtils.3"); //$NON-NLS-1$
-			}
-
-			/** {@inheritDoc} */
-			@Override
-			public boolean accept(final File f) {
-				if (f.isDirectory()) {
-					return true;
-				}
-				if (f.getName().toLowerCase().endsWith(CERTIFICATE_DEFAULT_EXTENSION)) {
-					return true;
-				}
-				return false;
-			}
-		});
-   		fc.setSelectedFile(new File(JSEUIMessages.getString("CertificateUtils.5") + CERTIFICATE_DEFAULT_EXTENSION));  //$NON-NLS-1$
-
-    	boolean selectedFile = false;
-        File finalFile = null;
-        do {
-            final int ret = fc.showSaveDialog(parent);
-            if (ret == JFileChooser.CANCEL_OPTION) {
-            	throw new AOCancelledOperationException();
-            }
-            if (ret == JFileChooser.ERROR_OPTION) {
-            	throw new IOException();
-            }
-            final File tempFile = fc.getSelectedFile();
-            if (tempFile.exists()) {
-            	if (tempFile.isDirectory() || !tempFile.canWrite()) {
-            		JOptionPane.showMessageDialog(parent,
-            				JSEUIMessages.getString("CertificateUtils.6")  + tempFile.getAbsolutePath(), //$NON-NLS-1$
-            				JSEUIMessages.getString("CertificateUtils.7"), //$NON-NLS-1$
-            				JOptionPane.WARNING_MESSAGE);
-            		continue;
-            	}
-            	final int resp =
-            		JOptionPane.showConfirmDialog(parent,
-            				JSEUIMessages.getString("CertificateUtils.8"), //tempFile.getAbsolutePath()) //$NON-NLS-1$
-            				JSEUIMessages.getString("CertificateUtils.7"), //$NON-NLS-1$
-            				JOptionPane.YES_NO_CANCEL_OPTION,
-            				JOptionPane.QUESTION_MESSAGE);
-            	if (resp == JOptionPane.YES_OPTION) { // Sobreescribir fichero
-            		finalFile = tempFile;
-            		selectedFile = true;
-            	}
-            	else if (resp == JOptionPane.NO_OPTION) { // Seleccionar fichero
-            		continue;
-            	}
-            	else { // Cancelar operacion de guardado
-            		throw new AOCancelledOperationException();
-            	}
-            }
-            else {
-            	finalFile = fc.getSelectedFile();
-            	selectedFile = true;
-            }
-        } while (!selectedFile);
-
-        return finalFile;
-    }
 
     private static boolean saveFile(final File file, final byte[] dataToSave) throws IOException {
     	final FileOutputStream fos = new FileOutputStream(file);

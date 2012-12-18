@@ -16,10 +16,8 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Desktop;
 import java.awt.Dimension;
-import java.awt.FileDialog;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -34,14 +32,10 @@ import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -59,7 +53,6 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -69,7 +62,6 @@ import javax.swing.ProgressMonitor;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.WindowConstants;
-import javax.swing.filechooser.FileFilter;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.batik.swing.JSVGCanvas;
@@ -80,6 +72,7 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
+import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.main.common.AOCertificatesNotFoundException;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
@@ -491,35 +484,20 @@ public final class SignPanel extends JPanel {
             SignPanel.this.getSelectButton().addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent arg0) {
-
-                    String fileToLoad;
-
-                    if (Platform.OS.MACOSX.equals(Platform.getOS()) || Platform.OS.WINDOWS.equals(Platform.getOS())) {
-                        if (SignPanel.this.getSimpleAfirma().getCurrentDir() == null) {
-                            SignPanel.this.getSimpleAfirma().setCurrentDir(new File(Platform.getUserHome()));
-                        }
-                        final FileDialog fd = new FileDialog((Frame) null, Messages.getString("SignPanel.35")); //$NON-NLS-1$
-                        fd.setDirectory(SignPanel.this.getSimpleAfirma().getCurrentDir().getAbsolutePath());
-                        fd.setVisible(true);
-                        if (fd.getFile() == null) {
-                            return;
-                        }
-                        SignPanel.this.getSimpleAfirma().setCurrentDir(new File(fd.getDirectory()));
-                        fileToLoad = fd.getDirectory() + fd.getFile();
-                    }
-                    else {
-                        final JFileChooser fc = new JFileChooser();
-                        if (SignPanel.this.getSimpleAfirma().getCurrentDir() != null) {
-                            fc.setCurrentDirectory(SignPanel.this.getSimpleAfirma().getCurrentDir());
-                        }
-                        if (JFileChooser.APPROVE_OPTION == fc.showOpenDialog(UpperPanel.this)) {
-                            SignPanel.this.getSimpleAfirma().setCurrentDir(fc.getCurrentDirectory());
-                            fileToLoad = fc.getSelectedFile().getAbsolutePath();
-                        }
-                        else {
-                            return;
-                        }
-                    }
+                	final String fileToLoad;
+                	try {
+	                    fileToLoad = AOUIFactory.getLoadFileName(
+	                		Messages.getString("SignPanel.35"), //$NON-NLS-1$
+	                		SignPanel.this.getSimpleAfirma().getCurrentDir() != null ? SignPanel.this.getSimpleAfirma().getCurrentDir().getAbsolutePath() : null,
+	                		null,
+	                		null,
+	                		false,
+	                		UpperPanel.this
+	            		)[0];
+                	}
+                	catch(final AOCancelledOperationException e) {
+                		return;
+                	}
 
                     try {
                         loadFile(fileToLoad);
@@ -1133,127 +1111,46 @@ public final class SignPanel extends JPanel {
             final String fDescription = filterDescription;
             final String[] fExtensions = filterExtensions;
 
-            // Para las comprobaciones de si el usuario ha teclado la extension o espera que
-            // la aplicacion la anada sola
-            boolean nameMissingExtension = true;
-
-            if (Platform.OS.MACOSX.equals(Platform.getOS()) || Platform.OS.WINDOWS.equals(Platform.getOS())) {
-                if (SignPanel.this.getSimpleAfirma().getCurrentDir() == null) {
-                    SignPanel.this.getSimpleAfirma().setCurrentDir(new File(Platform.getUserHome()));
-                }
-                final FileDialog fd = new FileDialog(SignPanel.this.getWindow(), Messages.getString("SignPanel.81"), FileDialog.SAVE); //$NON-NLS-1$
-                fd.setDirectory(SignPanel.this.getSimpleAfirma().getCurrentDir().getAbsolutePath());
-                fd.setFile(newFileName);
-                fd.setFilenameFilter(new FilenameFilter() {
-                    @Override
-                    public boolean accept(final File dir, final String name) {
-                        for (final String ext : fExtensions) {
-                            if (name.endsWith(ext)) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    }
-                });
-                fd.setVisible(true);
-                if (fd.getFile() == null) {
-                    setSignCommandEnabled(true);
-                    return null;
-                }
-                SignPanel.this.getSimpleAfirma().setCurrentDir(new File(fd.getDirectory()));
-                newFileName = fd.getDirectory() + fd.getFile();
-            }
-            else {
-                final JFileChooser fc = new JFileChooser();
-                if (SignPanel.this.getSimpleAfirma().getCurrentDir() != null) {
-                    fc.setCurrentDirectory(SignPanel.this.getSimpleAfirma().getCurrentDir());
-                }
-                fc.setSelectedFile(new File(newFileName));
-                fc.setFileFilter(new FileFilter() {
-                    @Override
-                    public boolean accept(final File file) {
-                        for (final String ext : fExtensions) {
-                            if (file.getName().endsWith(ext)) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    }
-
-                    @Override
-                    public String getDescription() {
-                        return fDescription;
-                    }
-                });
-                if (JFileChooser.APPROVE_OPTION == fc.showSaveDialog(SignPanel.this.getWindow())) {
-                    SignPanel.this.getSimpleAfirma().setCurrentDir(fc.getCurrentDirectory());
-                    newFileName = fc.getSelectedFile().getAbsolutePath();
-                }
-                else {
-                    setSignCommandEnabled(true);
-                    return null;
-                }
+            if (SignPanel.this.getSimpleAfirma().getCurrentDir() == null) {
+                SignPanel.this.getSimpleAfirma().setCurrentDir(new File(Platform.getUserHome()));
             }
 
-            // Anadimos la extension si es necesario
-            for (final String ext : fExtensions) {
-                if (newFileName.toLowerCase().endsWith(ext)) {
-                    nameMissingExtension = false;
-                }
-            }
-            newFileName = newFileName + (nameMissingExtension ? fExtensions[0] : ""); //$NON-NLS-1$
-
-            // Cuando se usa un FileDialog la confirmacion de sobreescritura la gestiona
-            // el sistema operativo, pero en Mac hay comportamiento extrano con la extension
-
-            final File outputFile = new File(newFileName);
-
-            OutputStream fos = null;
-            OutputStream bos = null;
+            final File fd;
             try {
-                fos = new FileOutputStream(outputFile);
-                bos = new BufferedOutputStream(fos);
-                bos.write(signResult);
+	            fd = AOUIFactory.getSaveDataToFile(
+	        		signResult,
+	        		SignPanel.this.getSimpleAfirma().getCurrentDir().getAbsolutePath(),
+	        		Messages.getString("SignPanel.81"), //$NON-NLS-1$
+	        		new File(newFileName),
+	        		fExtensions,
+	        		fDescription,
+	        		SignPanel.this.getWindow()
+	    		);
             }
-            catch (final Exception e) {
+            catch(final IOException e) {
                 LOGGER.severe(
-                  "No se ha podido guardar el resultado de la firma: " + e //$NON-NLS-1$
-                );
-                UIUtils.showErrorMessage(
-                        SignPanel.this,
-                        Messages.getString("SignPanel.88"), //$NON-NLS-1$
-                        Messages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-                        JOptionPane.ERROR_MESSAGE
-                );
-                setSignCommandEnabled(true);
+                    "No se ha podido guardar el resultado de la firma: " + e //$NON-NLS-1$
+                  );
+                  UIUtils.showErrorMessage(
+                          SignPanel.this,
+                          Messages.getString("SignPanel.88"), //$NON-NLS-1$
+                          Messages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+                          JOptionPane.ERROR_MESSAGE
+                  );
+                  setSignCommandEnabled(true);
+                  return null;
+            }
+            catch(final AOCancelledOperationException e) {
+            	setSignCommandEnabled(true);
+            	return null;
             }
             finally {
-                try {
-                    if (bos != null) {
-                        bos.flush();
-                    }
-                }
-                catch (final Exception e) { /* Ignoramos los errores */ }
-                try {
-                    if (fos != null) {
-                        fos.flush();
-                    }
-                }
-                catch (final Exception e) { /* Ignoramos los errores */ }
-                try {
-                    if (bos != null) {
-                        bos.close();
-                    }
-                }
-                catch (final Exception e) { /* Ignoramos los errores */ }
-                try {
-                    if (fos != null) {
-                        fos.close();
-                    }
-                }
-                catch (final Exception e) { /* Ignoramos los errores */ }
+            	SignPanel.this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             }
-            SignPanel.this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+
+            SignPanel.this.getSimpleAfirma().setCurrentDir(fd);
+            newFileName = fd.getAbsolutePath();
+
             SignPanel.this.getSimpleAfirma().loadResultsPanel(signResult, newFileName, ksm.getCertificate(alias));
 
             return null;

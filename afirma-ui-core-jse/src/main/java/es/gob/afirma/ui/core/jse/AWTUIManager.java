@@ -8,7 +8,6 @@ import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.concurrent.CancellationException;
 
 import javax.swing.JOptionPane;
 
@@ -24,6 +23,7 @@ public final class AWTUIManager extends JSEUIManager {
 	/** {@inheritDoc} */
     @Override
 	public File saveDataToFile(final byte[] data,
+							   final String currentDir,
 			                   final String dialogTitle,
 			                   final File selectedFile,
 			                   final String[] exts,
@@ -31,8 +31,11 @@ public final class AWTUIManager extends JSEUIManager {
 			                   final Object parent) throws IOException {
     	final FileDialog fd = new FileDialog(parent instanceof Frame ? (Frame) parent : null, dialogTitle, FileDialog.SAVE);
     	if (selectedFile != null) {
-            fd.setDirectory(selectedFile.getAbsolutePath());
+    		fd.setFile(selectedFile.getAbsolutePath());
         }
+    	if (currentDir != null) {
+    		fd.setDirectory(currentDir);
+    	}
 
     	if (exts != null) {
             fd.setFilenameFilter(new FilenameFilter() {
@@ -84,30 +87,39 @@ public final class AWTUIManager extends JSEUIManager {
     	if (multiSelect && isJava6()) {
     		return super.getLoadFileName(extensions, description, multiSelect, parentComponent);
     	}
-    	return internalGetLoadFileName(null, null, extensions, multiSelect, parentComponent);
+    	return internalGetLoadFileName(null, null, null, extensions, multiSelect, parentComponent);
     }
 
     /** {@inheritDoc} */
     @Override
-    public String[] getLoadFileName(final String dialogTitle, final String[] extensions, final String description, final boolean multiSelect, final Object parent) {
+    public String[] getLoadFileName(final String dialogTitle,
+    								final String currentDir,
+    		                        final String[] extensions,
+    		                        final String description,
+    		                        final boolean multiSelect,
+    		                        final Object parent) {
     	if (multiSelect && isJava6()) {
-    		return super.getLoadFileName(dialogTitle, extensions, description, multiSelect, parent);
+    		return super.getLoadFileName(dialogTitle, currentDir, extensions, description, multiSelect, parent);
     	}
-    	return internalGetLoadFileName(dialogTitle, null, extensions, multiSelect, parent);
+    	return internalGetLoadFileName(dialogTitle, currentDir, null, extensions, multiSelect, parent);
     }
 
     @Override
 	public File getLoadFile(final String dialogTitle, final String fileName, final String description, final Object parent) {
-    	return new File(internalGetLoadFileName(dialogTitle, fileName, null, false, parent)[0]);
+    	return new File(internalGetLoadFileName(dialogTitle, null, fileName, null, false, parent)[0]);
     }
 
 	private static String[] internalGetLoadFileName(final String dialogTitle,
-									 	    final String proposedFilename,
-									 	    final String[] extensions,
-									 	    final boolean multiSelect,
-									 	    final Object parent) {
+			                                        final String currentDir,
+			                                        final String proposedFilename,
+			                                        final String[] extensions,
+			                                        final boolean multiSelect,
+			                                        final Object parent) {
         final FileDialog fd = new FileDialog(parent instanceof Frame ? (Frame) parent : null, dialogTitle);
         fd.setMode(FileDialog.LOAD);
+        if (currentDir != null) {
+        	fd.setDirectory(currentDir);
+        }
 
         // Habilitamos si corresponde el modo de seleccion multiple. Ya que solo esta disponible
         // en Java 7, lo hacemos por reflexion para evitar problemas de compilacion. Esto equivale
@@ -154,7 +166,7 @@ public final class AWTUIManager extends JSEUIManager {
         }
         fd.setVisible(true);
         if (fd.getFile() == null) {
-            throw new CancellationException();
+            throw new AOCancelledOperationException();
         }
         if (multiSelect) {
 

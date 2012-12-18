@@ -326,6 +326,7 @@ public class JSEUIManager implements AOUIManager {
 	public String[] getLoadFileName(final String[] extensions, final String description, final boolean multiSelect, final Object parentComponent) {
         return getLoadFileName(
     		null,
+    		null,
     		extensions,
     		description,
     		false,
@@ -344,16 +345,20 @@ public class JSEUIManager implements AOUIManager {
      * @throws AOCancelledOperationException Si el usuario cancela la operaci&oacute;n. */
     @Override
 	public String[] getLoadFileName(final String dialogTitle,
-                                               final String[] extensions,
-                                               final String description,
-                                               final boolean multiSelect,
-                                               final Object parent) {
+								    final String currentDir,
+                                    final String[] extensions,
+                                    final String description,
+                                    final boolean multiSelect,
+                                    final Object parent) {
         Component parentComponent = null;
         if (parent instanceof Component) {
             parentComponent = (Component) parent;
         }
 
         final JFileChooser jfc = new JFileChooser();
+        if (currentDir != null) {
+        	jfc.setCurrentDirectory(new File(currentDir));
+        }
         jfc.setMultiSelectionEnabled(multiSelect);
         if (dialogTitle != null && dialogTitle.length() > 0) {
             jfc.setDialogTitle(dialogTitle);
@@ -398,6 +403,7 @@ public class JSEUIManager implements AOUIManager {
      * @throws AOCancelledOperationException Si el usuario cancela la operaci&oacute;n. */
     @Override
 	public File saveDataToFile(final byte[] data,
+							   final String currentDir,
 			                   final String dialogTitle,
 			                   final File selectedFile,
 			                   final String[] exts,
@@ -428,6 +434,10 @@ public class JSEUIManager implements AOUIManager {
 
             if (dialogTitle != null) {
             	fileChooser.setDialogTitle(dialogTitle);
+            }
+
+            if (currentDir != null) {
+            	fileChooser.setCurrentDirectory(new File(currentDir));
             }
 
             // Si se nos ha indicado un nombre de fichero por defecto, lo establecemos

@@ -10,20 +10,16 @@
 
 package es.gob.afirma.standalone.ui;
 
-import java.awt.FileDialog;
-import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.io.File;
 import java.util.Locale;
 
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.JDialog;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -42,7 +38,9 @@ import com.apple.eawt.PreferencesHandler;
 import com.apple.eawt.QuitHandler;
 import com.apple.eawt.QuitResponse;
 
+import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.Messages;
 import es.gob.afirma.standalone.SimpleAfirma;
 
@@ -74,7 +72,7 @@ public final class MainMenu extends JMenuBar {
      * @return <code>true</code> si hay alg&uacute; men&uacute; de primer nivel seleccionado,
      *         <code>false</code> en caso contrario */
     public boolean isAnyMenuSelected() {
-    	return (this.menuArchivo.isSelected() || this.menuAyuda.isSelected());
+    	return this.menuArchivo.isSelected() || this.menuAyuda.isSelected();
     }
 
     /** Construye la barra de men&uacute; de la aplicaci&oacute;n.
@@ -125,34 +123,21 @@ public final class MainMenu extends JMenuBar {
         	/** {@inheritDoc} */
             @Override
             public void actionPerformed(final ActionEvent ae) {
-                String fileToLoad;
-                if (isMac || Platform.OS.WINDOWS.equals(Platform.getOS())) {
-                    if (MainMenu.this.getSimpleAfirma().getCurrentDir() == null) {
-                        MainMenu.this.getSimpleAfirma().setCurrentDir(new File(Platform.getUserHome()));
-                    }
-                    final FileDialog fd = new FileDialog((Frame) null, Messages.getString("MainMenu.4")); //$NON-NLS-1$
-                    fd.setDirectory(MainMenu.this.getSimpleAfirma().getCurrentDir().getAbsolutePath());
-                    fd.setVisible(true);
-                    if (fd.getFile() == null) {
-                        return;
-                    }
-                    MainMenu.this.getSimpleAfirma().setCurrentDir(new File(fd.getDirectory()));
-                    fileToLoad = fd.getDirectory() + fd.getFile();
-                }
-                else {
-                    final JFileChooser fc = new JFileChooser();
-                    if (MainMenu.this.getSimpleAfirma().getCurrentDir() != null) {
-                        fc.setCurrentDirectory(MainMenu.this.getSimpleAfirma().getCurrentDir());
-                    }
-                    if (JFileChooser.APPROVE_OPTION == fc.showOpenDialog(MainMenu.this)) {
-                        MainMenu.this.getSimpleAfirma().setCurrentDir(fc.getCurrentDirectory());
-                        fileToLoad = fc.getSelectedFile().getAbsolutePath();
-                    }
-                    else {
-                        return;
-                    }
-                }
-                MainMenu.this.getSimpleAfirma().loadFileToSign(fileToLoad);
+            	final String fileToLoad;
+            	try {
+            		fileToLoad = AOUIFactory.getLoadFileName(
+            			Messages.getString("MainMenu.4"), //$NON-NLS-1$
+            			MainMenu.this.getSimpleAfirma().getCurrentDir() != null ? MainMenu.this.getSimpleAfirma().getCurrentDir().getAbsolutePath() : null,
+            			null,
+            			null,
+            			false,
+            			MainMenu.this
+        			)[0];
+            	}
+            	catch(final AOCancelledOperationException e) {
+            		return;
+            	}
+            	MainMenu.this.getSimpleAfirma().loadFileToSign(fileToLoad);
             }
         });
         this.menuArchivo.add(this.abrirMenuItem);
@@ -381,7 +366,7 @@ public final class MainMenu extends JMenuBar {
     }
 
     void showAbout() {
-        JOptionPane.showMessageDialog((this.parent == null) ? MainMenu.this : this.parent,
+        JOptionPane.showMessageDialog(this.parent == null ? MainMenu.this : this.parent,
         							  Messages.getString("MainMenu.14"), //$NON-NLS-1$,
                                       Messages.getString("MainMenu.15"), //$NON-NLS-1$
                                       JOptionPane.INFORMATION_MESSAGE);

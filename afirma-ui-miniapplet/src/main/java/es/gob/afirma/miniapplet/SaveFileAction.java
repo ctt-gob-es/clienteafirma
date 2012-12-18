@@ -70,6 +70,7 @@ final class SaveFileAction implements PrivilegedExceptionAction<Void> {
     private File selectFileToSave() throws IOException {
     	return AOUIFactory.getSaveDataToFile(
 			this.data,
+			null,
 			this.title,
 			this.fileHint,
 			this.exts,

@@ -12,14 +12,15 @@ public final class FileDialogsTest {
 	 * @param args
 	 * @throws IOException */
 	public static void main(final String[] args) throws IOException {
-		for (final String s : AOUIFactory.getLoadFileName("Selecciona", new String[] {"txt"}, "Ficheros de texto", true, null)) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		for (final String s : AOUIFactory.getLoadFileName("Selecciona", null, new String[] {"txt"}, "Ficheros de texto", true, null)) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			System.out.println(s);
 		}
-		for (final String s : AOUIFactory.getLoadFileName("Selecciona", new String[] {"txt"}, "Ficheros de texto", false, null)) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		for (final String s : AOUIFactory.getLoadFileName("Selecciona", null, new String[] {"txt"}, "Ficheros de texto", false, null)) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			System.out.println(s);
 		}
 		System.out.println(AOUIFactory.getSaveDataToFile(
 			"Hola".getBytes(), //$NON-NLS-1$
+			null,
 			"Titulo del dialogo", //$NON-NLS-1$
 			null,
 			new String[] { "txt" }, //$NON-NLS-1$

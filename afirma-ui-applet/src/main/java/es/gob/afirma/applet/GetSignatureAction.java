@@ -168,6 +168,7 @@ class GetSignatureAction implements PrivilegedExceptionAction<byte[]> {
 
         return AOUIFactory.getLoadFileName(
     		AppletMessages.getString("SignApplet.163"), //$NON-NLS-1$
+    		null,
             exts,
             desc,
             false,

@@ -57,6 +57,7 @@ final class GetFileContentAction implements PrivilegedExceptionAction<byte[]>{
 	public byte[] run() throws IOException {
 		final InputStream is = new FileInputStream(AOUIFactory.getLoadFileName(
 			this.title,
+			null,
 			this.exts,
 			this.desc,
 			false,

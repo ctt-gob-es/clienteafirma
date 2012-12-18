@@ -2213,6 +2213,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 						AppletMessages.getString("SignApplet.356"), //$NON-NLS-1$
 						null,
 						null,
+						null,
 						false,
 						this
 					)[0];
@@ -4284,6 +4285,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 				public String run() {
 					return AOUIFactory.getLoadFileName(
 						title,
+						null,
 						exts == null || exts.trim().length() == 0
 							? null
 								: AOUtil.split(exts, SignApplet.STRING_SEPARATOR),
