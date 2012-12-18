@@ -180,13 +180,11 @@ public final class SignPanel extends JPanel {
     }
 
     /** Carga el fichero a firmar.
-     * @param filename Nombre (ruta completa incuida) del fichero a firmar
+     * @param file Fichero a firmar
      * @throws IOException Si ocurre alg&uacute;n problema durante la apertura o lectura del fichero */
-    public void loadFile(final String filename) throws IOException {
+    public void loadFile(final File file) throws IOException {
 
         this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
-
-        final File file = new File(filename);
 
         String errorMessage = null;
         if (!file.exists()) {
@@ -312,7 +310,7 @@ public final class SignPanel extends JPanel {
         this.lowerPanel.remove(this.filePanel);
         this.filePanel = new FilePanel(this.fileTypeVectorIcon,
               NumberFormat.getInstance().format(fileSize),
-              filename,
+              file,
               fileDescription,
               new Date(fileLastModified)
         );
@@ -320,8 +318,8 @@ public final class SignPanel extends JPanel {
         this.lowerPanel.revalidate();
 
         if (this.window != null) {
-            this.window.getRootPane().putClientProperty("Window.documentFile", new File(filename)); //$NON-NLS-1$
-            this.window.setTitle(Messages.getString("SimpleAfirma.10") + " - " + new File(filename).getName()); //$NON-NLS-1$ //$NON-NLS-2$
+            this.window.getRootPane().putClientProperty("Window.documentFile", file); //$NON-NLS-1$
+            this.window.setTitle(Messages.getString("SimpleAfirma.10") + " - " + file.getName()); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         this.currentFile = file;
@@ -417,7 +415,7 @@ public final class SignPanel extends JPanel {
                             }
                         }
                         try {
-                            loadFile(fileName);
+                            loadFile(new File(fileName));
                         }
                         catch (final IOException e) {
                             LOGGER.warning(
@@ -484,9 +482,9 @@ public final class SignPanel extends JPanel {
             SignPanel.this.getSelectButton().addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent arg0) {
-                	final String fileToLoad;
+                	final File file;
                 	try {
-	                    fileToLoad = AOUIFactory.getLoadFiles(
+	                    file = AOUIFactory.getLoadFiles(
 	                		Messages.getString("SignPanel.35"), //$NON-NLS-1$
 	                		SignPanel.this.getSimpleAfirma().getCurrentDir() != null ? SignPanel.this.getSimpleAfirma().getCurrentDir().getAbsolutePath() : null,
 	                		null,
@@ -495,17 +493,17 @@ public final class SignPanel extends JPanel {
 	                		false,
 	                		false,
 	                		UpperPanel.this
-	            		)[0].getAbsolutePath();
+	            		)[0];
                 	}
                 	catch(final AOCancelledOperationException e) {
                 		return;
                 	}
 
                     try {
-                        loadFile(fileToLoad);
+                        loadFile(file);
                     }
                     catch (final Exception e) {
-                    	LOGGER.severe("Error en la carga de fichero " + fileToLoad + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+                    	LOGGER.severe("Error en la carga de fichero " + file.getAbsolutePath() + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
                         UIUtils.showErrorMessage(
                                 UpperPanel.this,
                                 Messages.getString("SignPanel.36"), //$NON-NLS-1$
@@ -628,28 +626,28 @@ public final class SignPanel extends JPanel {
 
         FilePanel(final Component icon,
                           final String fileSize,
-                          final String filePath,
+                          final File file,
                           final String fileDescription,
                           final Date fileLastModified) {
             super(true);
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    createUI(icon, fileSize, filePath, fileDescription, fileLastModified);
+                    createUI(icon, fileSize, file, fileDescription, fileLastModified);
                 }
             });
         }
 
         void createUI(final Component icon,
                               final String fileSize,
-                              final String filePath,
+                              final File file,
                               final String fileDescription,
                               final Date fileLastModified) {
 
             this.setBorder(BorderFactory.createLineBorder(Color.black));
             this.setLayout(new GridBagLayout());
 
-            final JLabel pathLabel = new JLabel(filePath);
+            final JLabel pathLabel = new JLabel(file.getAbsolutePath());
             pathLabel.setFont(pathLabel.getFont().deriveFont(Font.BOLD, pathLabel.getFont().getSize() + 3f));
 
             final JLabel descLabel = new JLabel(Messages.getString("SignPanel.46") + fileDescription); //$NON-NLS-1$
@@ -700,20 +698,20 @@ public final class SignPanel extends JPanel {
             c.anchor = GridBagConstraints.NORTHEAST;
 
             // Si es una firma la abriremos desde el mismo aplicativo
-            final boolean isSign = filePath.endsWith(".csig") || filePath.endsWith(".xsig"); //$NON-NLS-1$ //$NON-NLS-2$
+            final boolean isSign = file.getName().endsWith(".csig") || file.getName().endsWith(".xsig"); //$NON-NLS-1$ //$NON-NLS-2$
 
-            if (isSign || UIUtils.hasAssociatedApplication(filePath.substring(filePath.lastIndexOf('.')))) {
+            if (isSign || UIUtils.hasAssociatedApplication(file.getName().substring(file.getName().lastIndexOf('.')))) {
                 final JButton openFileButton = new JButton(Messages.getString("SignPanel.51")); //$NON-NLS-1$
                 openFileButton.setMnemonic('v');
                 openFileButton.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(final ActionEvent ae) {
                         if (isSign) {
-                            new VisorFirma(new File(filePath), false).initialize(false, null);
+                            new VisorFirma(file, false).initialize(false, null);
                         }
                         else {
                             try {
-                                Desktop.getDesktop().open(new File(filePath));
+                                Desktop.getDesktop().open(file);
                             }
                             catch (final IOException e) {
                                 UIUtils.showErrorMessage(

@@ -15,6 +15,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.util.Locale;
 
 import javax.swing.Box;
@@ -123,7 +124,7 @@ public final class MainMenu extends JMenuBar {
         	/** {@inheritDoc} */
             @Override
             public void actionPerformed(final ActionEvent ae) {
-            	final String fileToLoad;
+            	final File fileToLoad;
             	try {
             		fileToLoad = AOUIFactory.getLoadFiles(
             			Messages.getString("MainMenu.4"), //$NON-NLS-1$
@@ -134,7 +135,7 @@ public final class MainMenu extends JMenuBar {
             			false,
             			false,
             			MainMenu.this
-        			)[0].getAbsolutePath();
+        			)[0];
             	}
             	catch(final AOCancelledOperationException e) {
             		return;
