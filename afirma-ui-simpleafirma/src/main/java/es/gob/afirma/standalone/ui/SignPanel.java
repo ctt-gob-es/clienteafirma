@@ -304,6 +304,7 @@ public final class SignPanel extends JPanel {
         }
         this.fileTypeVectorIcon.setFocusable(false);
         this.fileTypeVectorIcon.setToolTipText(iconTooltip);
+        this.fileTypeVectorIcon .setBackground(new Color(255, 255, 255, 0));
 
         final double fileSize = file.length() / 1024;
         final long fileLastModified = file.lastModified();
