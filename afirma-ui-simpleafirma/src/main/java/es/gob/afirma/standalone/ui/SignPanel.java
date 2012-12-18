@@ -309,13 +309,12 @@ public final class SignPanel extends JPanel {
         final long fileLastModified = file.lastModified();
 
         this.lowerPanel.remove(this.filePanel);
-        this.filePanel =
-                new FilePanel(this.fileTypeVectorIcon,
-                      NumberFormat.getInstance().format(fileSize),
-                      filename,
-                      fileDescription,
-                      new Date(fileLastModified)
-                );
+        this.filePanel = new FilePanel(this.fileTypeVectorIcon,
+              NumberFormat.getInstance().format(fileSize),
+              filename,
+              fileDescription,
+              new Date(fileLastModified)
+        );
         this.lowerPanel.add(this.filePanel);
         this.lowerPanel.revalidate();
 

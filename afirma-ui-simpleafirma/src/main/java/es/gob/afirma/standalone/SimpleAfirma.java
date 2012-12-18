@@ -87,16 +87,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
      * <i>Look&Field</i>. */
     public SimpleAfirma() {
        LookAndFeelManager. applyLookAndFeel();
-        this.mainMenu = new MainMenu(this.window, this);
-        if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-            try {
-                com.apple.eawt.Application.getApplication().setDefaultMenuBar(this.mainMenu);
-            }
-            catch (final Exception e) {
-                LOGGER.warning("No se ha podido establecer el menu de Mac OS X, se usara una barra de menu convencional: " + e); //$NON-NLS-1$
-                this.window.setJMenuBar(this.mainMenu);
-            }
-        }
+       this.mainMenu = new MainMenu(this.window, this);
     }
 
     private AOKeyStoreManager ksManager;
@@ -217,18 +208,16 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
             if (Platform.OS.MACOSX.equals(Platform.getOS())) {
             	this.window.getRootPane().putClientProperty("Window.documentFile", null); //$NON-NLS-1$
             }
-            else {
-                this.window.setJMenuBar(this.mainMenu);
-                this.mainMenu.setEnabledOpenCommand(true);
-                if (firstTime) {
-                	MainMenuManager.setMenuManagement(
-            			this.window.getRootPane().getActionMap(),
-            			this.window.getRootPane().getInputMap(
-                			JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
-            			),
-            			SimpleAfirma.this.getMainMenu()
-        			);
-                }
+            this.window.setJMenuBar(this.mainMenu);
+            this.mainMenu.setEnabledOpenCommand(true);
+            if (firstTime) {
+            	MainMenuManager.setMenuManagement(
+        			this.window.getRootPane().getActionMap(),
+        			this.window.getRootPane().getInputMap(
+            			JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
+        			),
+        			SimpleAfirma.this.getMainMenu()
+    			);
             }
         }
         final JPanel newPanel = new SignPanel(this.window, this, firstTime);
