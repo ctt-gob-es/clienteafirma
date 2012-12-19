@@ -214,6 +214,6 @@ public final class AOUIFactory {
     		                             final String[] exts,
     		                             final String description,
     		                             final Object parent) throws IOException {
-        return uiManager.saveDataToFile(data, null, dialogTitle, selectedFile, exts, description, parent);
+        return uiManager.saveDataToFile(data, currentDir, dialogTitle, selectedFile, exts, description, parent);
     }
 }
