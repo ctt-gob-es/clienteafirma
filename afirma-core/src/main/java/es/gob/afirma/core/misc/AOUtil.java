@@ -22,6 +22,8 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
@@ -559,17 +561,22 @@ public final class AOUtil {
      * @return ClassLoader sin URL adicionales a directorios sueltos Web
      */
     public static ClassLoader getCleanClassLoader() {
-        ClassLoader classLoader = AOUtil.class.getClassLoader();
-        if (classLoader instanceof URLClassLoader && !classLoader.getClass().toString().contains("sun.plugin2.applet.JNLP2ClassLoader")) { //$NON-NLS-1$
-        	final List<URL> urls = new ArrayList<URL>();
-        	for (final URL url : ((URLClassLoader) classLoader).getURLs()) {
-        		if (url.toString().endsWith(".jar")) { //$NON-NLS-1$
-        			urls.add(url);
-        		}
-        	}
-        	classLoader = new URLClassLoader(urls.toArray(new URL[0]));
-        }
-        return classLoader;
+        return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+			@Override
+			public ClassLoader run() {
+		        ClassLoader classLoader = AOUtil.class.getClassLoader();
+		        if (classLoader instanceof URLClassLoader && !classLoader.getClass().toString().contains("sun.plugin2.applet.JNLP2ClassLoader")) { //$NON-NLS-1$
+		        	final List<URL> urls = new ArrayList<URL>();
+		        	for (final URL url : ((URLClassLoader) classLoader).getURLs()) {
+		        		if (url.toString().endsWith(".jar")) { //$NON-NLS-1$
+		        			urls.add(url);
+		        		}
+		        	}
+		        	classLoader = new URLClassLoader(urls.toArray(new URL[0]));
+		        }
+		        return classLoader;
+			}
+		});
     }
 }
 
