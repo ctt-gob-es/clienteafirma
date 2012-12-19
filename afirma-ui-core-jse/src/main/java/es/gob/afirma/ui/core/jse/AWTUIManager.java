@@ -157,6 +157,10 @@ public final class AWTUIManager extends JSEUIManager {
         		LOGGER.warning("Error de reflexion al recuperar la seleccion multiple del dialogo de carga, se devolvera un unico fichero: " + e); //$NON-NLS-1$
         		files = new File[] { new File(fd.getFile()) };
         	}
+        	if (files == null) {
+        		files = new File[0];
+        	}
+
         	return files;
         }
         return new File[] { new File(fd.getDirectory(), fd.getFile()) };
