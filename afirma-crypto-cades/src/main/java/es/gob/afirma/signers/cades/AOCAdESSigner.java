@@ -575,7 +575,7 @@ public final class AOCAdESSigner implements AOSigner {
      *         Cuando la firma introducida no es un objeto de firma
      *         reconocido por este manejador.
      * @throws AOInvalidFormatException Si los datos proporcionados no se corresponden con una firma CAdES
-     * @throws IOException
+     * @throws IOException Cuando se produce alg&uacute;n error en la lectura de la datos.
      * @throws IllegalArgumentException Si La firma introducida es nula. */
     @Override
 	public AOSignInfo getSignInfo(final byte[] signData) throws AOInvalidFormatException, IOException {
