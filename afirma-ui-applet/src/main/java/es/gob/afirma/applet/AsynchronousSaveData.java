@@ -117,9 +117,9 @@ final class AsynchronousSaveData implements Runnable {
                     	final String[] exts = AsynchronousSaveData.this.getExtensions();
                     	final File outputFile = AOUIFactory.getSaveDataToFile(
                     			AsynchronousSaveData.this.getDataToSave(),
-                    			null,
                     			AsynchronousSaveData.this.getDialogTitle(),
-                    			new File("*" + (exts == null || exts.length == 0 ? "" : "." + exts[0])), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                    			null,
+                    			"*" + (exts == null || exts.length == 0 ? "" : "." + exts[0]), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                     			exts,
                     			AsynchronousSaveData.this.getDescription(),
                     			AsynchronousSaveData.this.getParent()

@@ -1118,15 +1118,14 @@ public final class SignPanel extends JPanel {
 
             final File fd;
             try {
-	            fd = AOUIFactory.getSaveDataToFile(
-	        		signResult,
-	        		SignPanel.this.getSimpleAfirma().getCurrentDir().getAbsolutePath(),
-	        		Messages.getString("SignPanel.81"), //$NON-NLS-1$
-	        		new File(newFileName),
-	        		fExtensions,
-	        		fDescription,
-	        		SignPanel.this.getWindow()
-	    		);
+            	fd = FileUIManager.saveFile(
+            			SignPanel.this.getWindow(),
+            			signResult,
+            			SignPanel.this.getSimpleAfirma().getCurrentDir(),
+            			newFileName,
+            			fExtensions,
+            			fDescription,
+            			Messages.getString("SignPanel.81")); //$NON-NLS-1$
             }
             catch(final IOException e) {
                 LOGGER.severe(

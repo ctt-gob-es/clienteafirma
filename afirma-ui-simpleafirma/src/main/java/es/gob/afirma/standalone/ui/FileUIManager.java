@@ -31,26 +31,22 @@ public final class FileUIManager {
      * @param data Datos que se desean guardar.
      * @param exts Posibles extensiones que asignar al fichero.
      * @param currentDir Directorio actual. */
-    static void saveFile(final Frame parent,
+    static File saveFile(final Frame parent,
     		             final byte[] data,
     		             final File currentDir,
+    		             final String filename,
     		             final String[] exts,
     		             final String description,
     		             final String title) throws IOException {
-    	try {
-	    	AOUIFactory.getSaveDataToFile(
+	    	return AOUIFactory.getSaveDataToFile(
 				data,
-				currentDir.getAbsolutePath(),
 				title,
-				null,
+				currentDir.getAbsolutePath(),
+				filename,
 				exts,
 				description,
 				parent
 			);
-    	}
-    	catch(final AOCancelledOperationException e) {
-    		// Operacion cancelada por el usuario, no hacemos nada
-    	}
     }
 
     /** Muestra un di&aacute;logo para la apertura de un fichero.

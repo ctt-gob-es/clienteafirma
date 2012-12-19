@@ -136,7 +136,7 @@ public interface AOUIManager {
     File saveDataToFile(final byte[] data,
     					final String currentDir,
     					final String dialogTitle,
-    		            final File selectedFile,
+    		            final String selectedFile,
     		            final String[] exts,
     		            final String description,
     		            final Object parent) throws IOException;

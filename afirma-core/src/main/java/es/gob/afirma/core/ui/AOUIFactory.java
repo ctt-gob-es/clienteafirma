@@ -199,21 +199,21 @@ public final class AOUIFactory {
      * vuelve a preguntar al usuario por una localizaci&oacute;n, Si el usuario
      * cancela el di&aacute;logo, se devolver&aacute; {@code null}.
      * @param data Datos que se desean almacenar.
-     * @param currentDir Directorio inicial del di&aacute;logo
      * @param dialogTitle T&iacute;tulo del di&aacute;logo de guardado
-     * @param selectedFile Localizaci&oacute;n y nombre por defecto del fichero.
+     * @param currentDir Directorio inicial del di&aacute;logo
+     * @param selectedFile Nombre por defecto del fichero.
      * @param exts Extensiones de fichero aceptadas.
      * @param description Descripci&oacute;n del tipo de fichero a guardar
      * @param parent Componente padre (para la modalidad)
      * @return Fichero en el que se almacenan los datos.
      * @throws IOException Si no se puede guardar el fichero*/
     public static File getSaveDataToFile(final byte[] data,
-    									 final String currentDir,
     									 final String dialogTitle,
-    		                             final File selectedFile,
+    									 final String currentDir,
+    		                             final String selectedFile,
     		                             final String[] exts,
     		                             final String description,
     		                             final Object parent) throws IOException {
-        return uiManager.saveDataToFile(data, currentDir, dialogTitle, selectedFile, exts, description, parent);
+        return uiManager.saveDataToFile(data, dialogTitle, currentDir, selectedFile, exts, description, parent);
     }
 }

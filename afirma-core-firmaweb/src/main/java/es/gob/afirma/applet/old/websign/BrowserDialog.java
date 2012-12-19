@@ -109,9 +109,9 @@ final class BrowserDialog extends JDialog {
                     try {
                     	AOUIFactory.getSaveDataToFile(
                     		AOUtil.getDataFromInputStream(fich.getContentInputStream()),
-                    		null,
                 			WebSignMessages.getString("BrowserDialog.4"), //$NON-NLS-1$
-                			fich.getFile(),
+                			fich.getFile().getParentFile().getAbsolutePath(),
+                			fich.getFile().getName(),
                 			null,
                 			null,
                 			BrowserDialog.this

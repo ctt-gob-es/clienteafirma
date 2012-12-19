@@ -23,19 +23,23 @@ public final class AWTUIManager extends JSEUIManager {
 	/** {@inheritDoc} */
     @Override
 	public File saveDataToFile(final byte[] data,
+							   final String dialogTitle,
 							   final String currentDir,
-			                   final String dialogTitle,
-			                   final File selectedFile,
+							   final String selectedFile,
 			                   final String[] exts,
 			                   final String description,
 			                   final Object parent) throws IOException {
     	final FileDialog fd = new FileDialog(parent instanceof Frame ? (Frame) parent : null, dialogTitle, FileDialog.SAVE);
-    	if (selectedFile != null) {
-    		fd.setFile(selectedFile.getAbsolutePath());
+
+        // El metodo setSelectedFile determina tambien el directorio actual, asi que lo usamos cuando
+        // se indica el nombre de fichero
+        if (selectedFile != null && currentDir != null) {
+        	fd.setFile(new File(currentDir, selectedFile).getAbsolutePath());
+        } else if (selectedFile != null) {
+        	fd.setFile(selectedFile);
+        } else if (currentDir != null) {
+        	fd.setDirectory(currentDir);
         }
-    	if (currentDir != null) {
-    		fd.setDirectory(currentDir);
-    	}
 
     	if (exts != null) {
             fd.setFilenameFilter(new FilenameFilter() {

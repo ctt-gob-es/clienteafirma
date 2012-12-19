@@ -186,8 +186,8 @@ public final class SelectionDialog {
         try {
         	return AOUIFactory.getSaveDataToFile(
     			data,
-    			null,
     			dialogTitle,
+    			null,
     			null,
     			fileFilter != null ? fileFilter.getExtensions() : null,
     			fileFilter != null ? fileFilter.getDescription() : null,

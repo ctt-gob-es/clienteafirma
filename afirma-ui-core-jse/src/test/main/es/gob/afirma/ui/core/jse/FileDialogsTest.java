@@ -21,8 +21,8 @@ public final class FileDialogsTest {
 		}
 		System.out.println(AOUIFactory.getSaveDataToFile(
 			"Hola".getBytes(), //$NON-NLS-1$
-			null,
 			"Ejemplo de guardar", //$NON-NLS-1$
+			null,
 			null,
 			new String[] { "txt" }, //$NON-NLS-1$
 			"Ficheros de texto", //$NON-NLS-1$

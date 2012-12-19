@@ -120,17 +120,26 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 				setError(e);
 				throw e;
 			}
+			catch (final Error e) {
+				setError(e);
+				throw e;
+			}
 		}
 
 		final Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
 
 		try {
+			String signatureFormat = format;
+			final AOSigner signer = MiniAfirmaApplet.selectSigner(MiniAfirmaApplet.cleanParam(signatureFormat), null);
+			if (SIGNATURE_FORMAT_AUTO.equalsIgnoreCase(signatureFormat)) {
+				signatureFormat = ExtraParamsProcessor.updateFormat(signer);
+			}
 			return Base64.encode(AccessController.doPrivileged(new SignAction(
-				MiniAfirmaApplet.selectSigner(MiniAfirmaApplet.cleanParam(format), null),
+				signer,
 				dataBinary,
 				MiniAfirmaApplet.cleanParam(algorithm),
 				this.selectPrivateKey(params),
-				ExtraParamsProcessor.expandProperties(params, dataBinary, format)
+				ExtraParamsProcessor.expandProperties(params, dataBinary, signatureFormat)
 			)));
 		}
 		catch (final AOFormatFileException e) {
@@ -204,13 +213,19 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		}
 
 		try {
+			String signatureFormat = format;
+			final AOSigner signer = MiniAfirmaApplet.selectSigner(MiniAfirmaApplet.cleanParam(signatureFormat), signature);
+			if (SIGNATURE_FORMAT_AUTO.equalsIgnoreCase(signatureFormat)) {
+				signatureFormat = ExtraParamsProcessor.updateFormat(signer);
+			}
+
 			return Base64.encode(AccessController.doPrivileged(new CoSignAction(
-					MiniAfirmaApplet.selectSigner(MiniAfirmaApplet.cleanParam(format), signature),
+					signer,
 					signature,
 					dataBinary,
 					MiniAfirmaApplet.cleanParam(algorithm),
 					this.selectPrivateKey(params),
-					ExtraParamsProcessor.expandProperties(params, dataBinary, format)
+					ExtraParamsProcessor.expandProperties(params, dataBinary, signatureFormat)
 			)));
 		}
 		catch (final AOFormatFileException e) {
@@ -275,12 +290,17 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		final Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
 
 		try {
+			String signatureFormat = format;
+			final AOSigner signer = MiniAfirmaApplet.selectSigner(MiniAfirmaApplet.cleanParam(signatureFormat), signature);
+			if (SIGNATURE_FORMAT_AUTO.equalsIgnoreCase(signatureFormat)) {
+				signatureFormat = ExtraParamsProcessor.updateFormat(signer);
+			}
 			return Base64.encode(AccessController.doPrivileged(new CounterSignAction(
-					MiniAfirmaApplet.selectSigner(MiniAfirmaApplet.cleanParam(format), signature),
+					signer,
 					signature,
 					MiniAfirmaApplet.cleanParam(algorithm),
 					this.selectPrivateKey(params),
-					ExtraParamsProcessor.expandProperties(params, null, format)
+					ExtraParamsProcessor.expandProperties(params, null, signatureFormat)
 			)));
 		}
 		catch (final AOFormatFileException e) {
@@ -354,6 +374,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 				setError(e);
 				throw e;
 		}
+		catch (final IOException e) {
+			setError(e);
+			throw e;
+		}
 	}
 
 	/** {@inheritDoc} */
@@ -364,7 +388,6 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			                      final String extension,
 			                      final String description) throws PrivilegedActionException,
 			                                                       IOException {
-
 		this.clearError();
 
 		if (data == null) {
@@ -381,10 +404,6 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 		final String descFiles = MiniAfirmaApplet.cleanParam(description);
 
-		final String depuredFileName = MiniAfirmaApplet.cleanParam(fileName);
-		final File fileHint = depuredFileName == null ?
-				this.pathHint : new File(this.pathHint, fileName);
-
 		try {
 			AccessController.doPrivileged(
 				new SaveFileAction(
@@ -392,7 +411,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 						Base64.decode(data),
 						exts,
 						descFiles,
-						fileHint,
+						MiniAfirmaApplet.cleanParam(fileName),
 						this
 				)
 			);
@@ -685,11 +704,6 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			signer = MiniAfirmaApplet.getSigner(format);
 			if (signer == null) {
 				throw new AOFormatFileException("El formato de firma indicado no esta soportado"); //$NON-NLS-1$
-			}
-			if (sign != null &&  !signer.isSign(sign)) {
-				throw new AOFormatFileException(
-					"La firma electronica no es compatible con el formato de firma indicado" //$NON-NLS-1$
-				);
 			}
 		}
 		else if (sign != null) {

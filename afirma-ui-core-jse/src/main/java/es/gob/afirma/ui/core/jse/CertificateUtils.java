@@ -78,9 +78,9 @@ final class CertificateUtils {
 		try {
 	    	AOUIFactory.getSaveDataToFile(
     			certificate.getEncoded(),
-    			null,
     			JSEUIMessages.getString("CertificateUtils.1"),  //$NON-NLS-1$
-    			new File(JSEUIMessages.getString("CertificateUtils.5") + CERTIFICATE_DEFAULT_EXTENSION), //$NON-NLS-1$
+    			null,
+    			JSEUIMessages.getString("CertificateUtils.5") + CERTIFICATE_DEFAULT_EXTENSION, //$NON-NLS-1$
     			new String[] { CERTIFICATE_DEFAULT_EXTENSION },
     			JSEUIMessages.getString("CertificateUtils.3"), //$NON-NLS-1$
     			parent

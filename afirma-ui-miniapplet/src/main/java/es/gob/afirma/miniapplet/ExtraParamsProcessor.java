@@ -15,6 +15,7 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.core.signers.AOSigner;
 
 /** Clase de utilidad para el proceso de propiedades enviadas desde JavaScript
  * y recogidas desde java en formato <code>Properties<code>. */
@@ -120,6 +121,28 @@ final class ExtraParamsProcessor {
 		expandPolicyKeys(p, signedData, format);
 
 		return p;
+	}
+
+	/**
+	 * Funci&oacute;n para obtener el nombre del formato de firma en base al manejador de firma.
+	 * @param signer Manejador de firma.
+	 * @return Nombre del formato de firma preferente del que se encarga el manejador o {@code null} si no
+	 * se reconoce.
+	 */
+	static String updateFormat(final AOSigner signer) {
+
+		//XXX: Utilizamos los nombres de las clases para evitar cargarlas pero habria que buscar un modo mejor
+		final String signerClassname = signer.getClass().getName();
+		if (signerClassname.equals("es.gob.afirma.signers.xades.AOXAdESSigner")) { //$NON-NLS-1$
+			return AOSignConstants.SIGN_FORMAT_XADES;
+		} else if (signerClassname.equals("es.gob.afirma.signers.cades.AOCAdESSigner")) { //$NON-NLS-1$
+			return AOSignConstants.SIGN_FORMAT_CADES;
+		} else if (signerClassname.equals("es.gob.afirma.signers.pades.AOPDFSigner")) { //$NON-NLS-1$
+			return AOSignConstants.SIGN_FORMAT_PADES;
+		} else if (signerClassname.equals("es.gob.afirma.signers.xades.AOFacturaESigner")) { //$NON-NLS-1$
+			return AOSignConstants.SIGN_FORMAT_FACTURAE;
+		}
+		return null;
 	}
 
 	/**

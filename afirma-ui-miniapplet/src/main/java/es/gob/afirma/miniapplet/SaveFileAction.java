@@ -21,13 +21,13 @@ import es.gob.afirma.core.ui.AOUIFactory;
  * Acci&oacute;n para almacenar un fichero en disco.
  * @author Carlos Gamuci Mill&aacute;n
  */
-final class SaveFileAction implements PrivilegedExceptionAction<Void> {
+final class SaveFileAction implements PrivilegedExceptionAction<File> {
 
 	private final String title;
     private final byte[] data;
     private final String[] exts;
     private final String desc;
-    private final File fileHint;
+    private final String filename;
     private final Component parent;
 
     /**
@@ -36,16 +36,16 @@ final class SaveFileAction implements PrivilegedExceptionAction<Void> {
      * @param data Datos que se desean guardar.
      * @param exts Extensiones permitidas para los datos.
      * @param description Descripci&oacute;n del tipo de fichero.
-     * @param fileHint Fichero de salida propuesto.
+     * @param filename Fichero de salida propuesto.
      * @param parent Componente padre sobre el que se mostrar&aacute; el di&aacute;logo.
      */
     SaveFileAction(final String title, final byte[] data, final String[] exts,
-    		final String description, final File fileHint, final Component parent) {
+    		final String description, final String filename, final Component parent) {
         this.title = title;
         this.data = data != null ? data.clone() : null;
         this.exts = exts != null ? exts.clone() : null;
         this.desc = description;
-        this.fileHint = fileHint;
+        this.filename = filename;
         this.parent = parent;
     }
 
@@ -57,26 +57,15 @@ final class SaveFileAction implements PrivilegedExceptionAction<Void> {
      * @throws IOException Cuando se produce un error al almacenar el fichero.
      */
 	@Override
-	public Void run() throws IOException {
-    	selectFileToSave();
-    	return null;
-	}
-
-    /** Pregunta al usuario por un nombre de fichero para salvar datos en disco.
-     * @return Nombre de fichero (con ruta) seleccionado por el usuario
-     * @throws IOException Cuando se produzca un error durante la selecci&oacute;n del fichero.
-     * @throws es.gob.afirma.core.AOCancelledOperationException Cuando el usuario cancele la operaci&oacute;n.
-     */
-    private File selectFileToSave() throws IOException {
+	public File run() throws IOException {
     	return AOUIFactory.getSaveDataToFile(
 			this.data,
-			null,
 			this.title,
-			this.fileHint,
+			null,
+			this.filename,
 			this.exts,
 			this.desc,
 			this.parent
 		);
-    }
-
+	}
 }

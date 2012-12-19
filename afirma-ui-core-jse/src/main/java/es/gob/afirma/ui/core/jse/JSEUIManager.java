@@ -363,9 +363,9 @@ public class JSEUIManager implements AOUIManager {
      * @throws AOCancelledOperationException Si el usuario cancela la operaci&oacute;n. */
     @Override
 	public File saveDataToFile(final byte[] data,
+							   final String dialogTitle,
 							   final String currentDir,
-			                   final String dialogTitle,
-			                   final File selectedFile,
+			                   final String selectedFile,
 			                   final String[] exts,
 			                   final String description,
 			                   final Object parent) throws IOException {
@@ -396,13 +396,14 @@ public class JSEUIManager implements AOUIManager {
             	fileChooser.setDialogTitle(dialogTitle);
             }
 
-            if (currentDir != null) {
+            // El metodo setSelectedFile determina tambien el directorio actual, asi que lo usamos cuando
+            // se indica el nombre de fichero
+            if (selectedFile != null && currentDir != null) {
+            	fileChooser.setSelectedFile(new File(currentDir, selectedFile));
+            } else if (selectedFile != null) {
+            	fileChooser.setSelectedFile(new File(selectedFile));
+            } else if (currentDir != null) {
             	fileChooser.setCurrentDirectory(new File(currentDir));
-            }
-
-            // Si se nos ha indicado un nombre de fichero por defecto, lo establecemos
-            if (selectedFile != null) {
-                fileChooser.setSelectedFile(selectedFile);
             }
 
             // Solo aplicamos el filtro cuando este definido para evitar que el

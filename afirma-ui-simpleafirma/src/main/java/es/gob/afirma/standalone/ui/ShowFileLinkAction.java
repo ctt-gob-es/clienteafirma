@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 
+import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.standalone.Messages;
 
@@ -76,12 +77,16 @@ final class ShowFileLinkAction {
 				        null,
 				        null,
 				        null,
+				        null,
 				        Messages.getString("ShowFileLinkAction.1") //$NON-NLS-1$
 				);
 			}
             catch (final IOException e) {
 				Logger.getLogger("es.gob.afirma").severe("No se ha podido guardar el fichero: " + e); //$NON-NLS-1$ //$NON-NLS-2$
 				JOptionPane.showMessageDialog(null, "No se ha podido guardar el fichero", "Error", JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+            catch (final AOCancelledOperationException e) {
+				Logger.getLogger("es.gob.afirma").warning("Operacion cancelada por el usuario"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
         }
     }
