@@ -309,17 +309,13 @@ final class PdfDocumentSecurityStore {
     }
 
     synchronized int registerOcspBasicResp(final byte basicResp[]) throws IOException {
-        final DEROctetString doctet = new DEROctetString(basicResp);
         final ASN1EncodableVector v2 = new ASN1EncodableVector();
         v2.add(OCSPObjectIdentifiers.id_pkix_ocsp_basic);
-        v2.add(doctet);
-        final DEREnumerated den = new DEREnumerated(0);
+        v2.add(new DEROctetString(basicResp));
         final ASN1EncodableVector v3 = new ASN1EncodableVector();
-        v3.add(den);
+        v3.add(new DEREnumerated(0));
         v3.add(new DERTaggedObject(true, 0, new DERSequence(v2)));
-        final byte ocspResponse[] = new DERSequence(v3).getEncoded();
-        final int ocspId = registerOcspResp(ocspResponse);
-        return ocspId;
+        return registerOcspResp(new DERSequence(v3).getEncoded());
     }
 
     /** Registra una CRL y devuelve el ID que se le ha asignado.
