@@ -24,7 +24,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.Key;
 import java.security.KeyException;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.util.List;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -303,40 +305,28 @@ final class PanelClaveCifrado extends JAccessibilityDialogWizard {
      * y seleccione la clave que desea recuperar del mismo. Devuelve {@code null} si
      * ocurre un error durante la transformaci&oacute;n a base 64.
      * @return Clave en base 64 o {@code}
-     * @throws AOException Ocurri&oacute; un error durate el proceso de configuraci&oacute;n. */
-    private String getKeyFromCipherKeyStore() throws AOException, IOException {
+     * @throws AOException Ocurri&oacute; un error durate el proceso de configuraci&oacute;n.
+     * @throws KeyStoreException
+     * @throws CertificateException
+     * @throws NoSuchAlgorithmException */
+    private String getKeyFromCipherKeyStore() throws AOException, IOException, NoSuchAlgorithmException, CertificateException, KeyStoreException {
         // Abrimos el Almacen de claves de cifrado preguntandole al usuario la clave si no
         // la indico
-        AOCipherKeyStoreHelper cKs = null;
-        try {
-            cKs =
-                    new AOCipherKeyStoreHelper(CustomDialog.showInputPasswordDialog(this,
-                                                                                    true,
-                                                                                    null,
-                                                                                    false,
-                                                                                    Messages.getString("WizardCifrado.almacen.claves.contrasenia"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title"), JOptionPane.QUESTION_MESSAGE)); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-        catch (final AOCancelledOperationException e) {
-            throw e;
-        }
-        catch (final IOException e) {
-            throw e; // Se lanza el tipo de excepcion IO
-        }
-        catch (final Exception e) {
-            throw new AOException(Messages.getString("WizardCifrado.almacen.error.abrir"), e); //$NON-NLS-1$
-        }
+        final AOCipherKeyStoreHelper cKs = new AOCipherKeyStoreHelper(
+    		CustomDialog.showInputPasswordDialog(
+				this,
+				true,
+                null,
+                false,
+                Messages.getString("WizardCifrado.almacen.claves.contrasenia"), //$NON-NLS-1$
+                KeyEvent.VK_O,
+                Messages.getString("CustomDialog.showInputPasswordDialog.title"), //$NON-NLS-1$
+                JOptionPane.QUESTION_MESSAGE
+            )
+        );
 
         // Si no se establecio el alias de la clave de cifrado, se la pedimos al usuario
-        String alias = null;
-        try {
-            alias = Utils.showCertSelectionDialog(cKs.getAliases(), null, this, true, true, true, new Vector<CertificateFilter>(0), false);
-        }
-        catch (final AOCancelledOperationException e) {
-            throw e;
-        }
-        catch (final Exception e) {
-            throw new AOException(Messages.getString("WizardCifrado.almacen.error.seleccionar"), e); //$NON-NLS-1$
-        }
+        final String alias = Utils.showCertSelectionDialog(cKs.getAliases(), null, this, true, true, true, new Vector<CertificateFilter>(0), false);
 
         return Base64.encode(cKs.getKey(alias).getEncoded());
     }

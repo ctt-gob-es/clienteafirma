@@ -45,28 +45,12 @@ final class CipherAction implements PrivilegedExceptionAction<Void> {
     /** {@inheritDoc} */
     @Override
 	public Void run() throws NoSuchAlgorithmException, KeyException, IOException, AOException {
-
-        try {
-            if (this.data == null) {
-                this.cipherManager.cipherData();
-            }
-            else {
-                this.cipherManager.cipherData(this.data);
-            }
+        if (this.data == null) {
+            this.cipherManager.cipherData();
         }
-        catch (final IllegalArgumentException e) {
-            throw new IllegalArgumentException("Modo de clave no soportado", e); //$NON-NLS-1$
+        else {
+            this.cipherManager.cipherData(this.data);
         }
-        catch (final NoSuchAlgorithmException e) {
-        	throw new NoSuchAlgorithmException("Algoritmo de cifrado no soportado", e); //$NON-NLS-1$
-        }
-        catch (final KeyException e) {
-            throw new KeyException("Clave de cifrado no valida", e); //$NON-NLS-1$
-        }
-        catch (final AOException e) {
-           throw e;
-        }
-
         return null;
     }
 }

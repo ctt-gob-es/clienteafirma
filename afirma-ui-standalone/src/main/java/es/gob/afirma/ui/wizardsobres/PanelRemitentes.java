@@ -24,6 +24,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableEntryException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -419,7 +422,8 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
      * @param kStore Almac&eacuten de claves */
     private PasswordCallback getPreferredPCB(final AOKeyStore kStore) {
         if (kStore == null) {
-            throw new IllegalArgumentException("No se ha indicado el KeyStore del que desea obtener el PasswordCallBack" //$NON-NLS-1$
+            throw new IllegalArgumentException(
+        		"No se ha indicado el KeyStore del que desea obtener el PasswordCallBack" //$NON-NLS-1$
             );
         }
 
@@ -431,10 +435,13 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
             pssCallback = null;
         }
         else {
-            // pssCallback = new UIPasswordCallback(Messages.getString("Wizard.sobres.almacen.pass")+" "+kStore.getDescription(), this);
-            pssCallback =
-                    new UIPasswordCallbackAccessibility(Messages.getString("Wizard.sobres.almacen.pass") + " " + kStore.getName(), this, //$NON-NLS-1$ //$NON-NLS-2$
-                                                        Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title")); //$NON-NLS-1$ //$NON-NLS-2$
+            pssCallback = new UIPasswordCallbackAccessibility(
+        		Messages.getString("Wizard.sobres.almacen.pass") + " " + kStore.getName(), //$NON-NLS-1$ //$NON-NLS-2$
+        		this,
+                Messages.getString("CustomDialog.showInputPasswordDialog.title"), //$NON-NLS-1$
+                KeyEvent.VK_O,
+                Messages.getString("CustomDialog.showInputPasswordDialog.title") //$NON-NLS-1$
+            );
         }
 
         return pssCallback;
@@ -447,7 +454,9 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
      * @return
      * @throws AOException
      * @throws UnrecoverableKeyException */
-    private PrivateKeyEntry getPrivateKeyEntry(final AOKeyStoreManager keyStoreManager, final String seleccionado, final KeyStoreConfiguration kconf1) throws AOException,
+    private PrivateKeyEntry getPrivateKeyEntry(final AOKeyStoreManager keyStoreManager,
+    		                                   final String seleccionado,
+    		                                   final KeyStoreConfiguration kconf1) throws AOException,
                                                                                                                                                       UnrecoverableKeyException {
 
         // Comprobamos si se ha cancelado la seleccion
@@ -456,25 +465,22 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
         }
 
         // Recuperamos la clave del certificado
-        final PrivateKeyEntry privateKeyEntry1;
         try {
-            privateKeyEntry1 = keyStoreManager.getKeyEntry(seleccionado, KeyStoreUtilities.getCertificatePC(kconf1.getType(), this));
+            return keyStoreManager.getKeyEntry(seleccionado, KeyStoreUtilities.getCertificatePC(kconf1.getType(), this));
         }
-        catch (final AOCancelledOperationException e) {
-            // Si se ha cancelado la operacion lo informamos en el nivel superior para que se trate.
-            // Este relanzamiento se realiza para evitar la siguiente captura generica de excepciones
-            // que las relanza en forma de AOException
-            throw e;
-        }
-        catch (final UnrecoverableKeyException e) {
-            throw e;
-        }
-        catch (final Exception e) {
+        catch (final KeyStoreException e) {
+        	LOGGER.severe("No se ha podido obtener el certicado con el alias '" + seleccionado + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+        	throw new AOException(e.getMessage(), e.getCause());
+		}
+        catch (final NoSuchAlgorithmException e) {
             LOGGER.severe("No se ha podido obtener el certicado con el alias '" + seleccionado + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
             throw new AOException(e.getMessage(), e.getCause());
-        }
+		}
+        catch (final UnrecoverableEntryException e) {
+	          LOGGER.severe("No se ha podido obtener el certicado con el alias '" + seleccionado + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+	          throw new AOException(e.getMessage(), e.getCause());
+		}
 
-        return privateKeyEntry1;
     }
 
     /** Inicializacion de componentes */

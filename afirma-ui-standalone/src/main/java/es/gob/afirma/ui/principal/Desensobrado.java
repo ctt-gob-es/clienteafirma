@@ -20,6 +20,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -117,8 +118,7 @@ final class Desensobrado extends JPanel {
 
             final byte[] envelopData;
             try {
-                final FileInputStream envelopFis = new FileInputStream(new File(envelopPath));
-                envelopData = AOUtil.getDataFromInputStream(envelopFis);
+                envelopData = AOUtil.getDataFromInputStream(new FileInputStream(new File(envelopPath)));
             }
             catch(final Exception e) {
                 LOGGER.severe("No se ha encontrado o no se ha podido leer el fichero: " + envelopPath); //$NON-NLS-1$
@@ -225,8 +225,7 @@ final class Desensobrado extends JPanel {
         }
     }
 
-    private AOKeyStoreManager getKeyStoreManager(final KeyStoreConfiguration ksConfiguration) throws AOException,
-    																							     AOKeystoreAlternativeException {
+    private AOKeyStoreManager getKeyStoreManager(final KeyStoreConfiguration ksConfiguration) throws AOKeystoreAlternativeException, IOException {
         PasswordCallback pssCallback;
         final AOKeyStore store = ksConfiguration.getType();
         String lib = ksConfiguration.getLib();
@@ -234,11 +233,18 @@ final class Desensobrado extends JPanel {
             pssCallback = new NullPasswordCallback();
         }
         else if (store == AOKeyStore.PKCS12) {
-            pssCallback =
-                new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getName(), SwingUtilities.getRoot(this), //$NON-NLS-1$ //$NON-NLS-2$
-                                                    Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title")); //$NON-NLS-1$ //$NON-NLS-2$
-            final File selectedFile =
-                SelectionDialog.showFileOpenDialog(this, Messages.getString("Open.repository"), (ExtFilter) Utils.getRepositoryFileFilter()); //$NON-NLS-1$
+            pssCallback =new UIPasswordCallbackAccessibility(
+        		Messages.getString("Msg.pedir.contraenia") + " " + store.getName(), //$NON-NLS-1$ //$NON-NLS-2$
+        		SwingUtilities.getRoot(this),
+                Messages.getString("CustomDialog.showInputPasswordDialog.title"), //$NON-NLS-1$
+                KeyEvent.VK_O,
+                Messages.getString("CustomDialog.showInputPasswordDialog.title") //$NON-NLS-1$
+            );
+            final File selectedFile = SelectionDialog.showFileOpenDialog(
+        		this,
+        		Messages.getString("Open.repository"), //$NON-NLS-1$
+        		(ExtFilter) Utils.getRepositoryFileFilter()
+    		);
             if (selectedFile != null) {
                 lib = selectedFile.getAbsolutePath();
             }
@@ -253,18 +259,8 @@ final class Desensobrado extends JPanel {
                                                     Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title")); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
-        try {
-            return AOKeyStoreManagerFactory.getAOKeyStoreManager(store, lib, ksConfiguration.toString(), pssCallback, this);
-        }
-        catch (final AOCancelledOperationException e) {
-            throw e;
-        }
-        catch (final AOKeystoreAlternativeException e) {
-            throw e;
-        }
-        catch (final Exception e) {
-            throw new AOException("Error al inicializar el almacen", e); //$NON-NLS-1$
-        }
+        return AOKeyStoreManagerFactory.getAOKeyStoreManager(store, lib, ksConfiguration.toString(), pssCallback, this);
+
     }
 
     private PrivateKeyEntry getPrivateKeyEntry(final AOKeyStoreManager keyStoreManager,
