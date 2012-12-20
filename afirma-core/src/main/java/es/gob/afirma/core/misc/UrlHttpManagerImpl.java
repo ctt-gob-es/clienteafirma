@@ -20,7 +20,7 @@ import javax.net.ssl.X509TrustManager;
 
 /** Implementacion de ua clase para la lectura del contenido de una URL.
  * @author Carlos Gamuci */
-public class UrlHttpManagerImpl {
+public final class UrlHttpManagerImpl {
 
 	private UrlHttpManagerImpl() {
 		// No permitimos la instanciacion
