@@ -11,7 +11,6 @@
 package es.gob.afirma.miniapplet;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -62,9 +61,6 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 	/** Ruta de la biblioteca o almac&eacute;n del que extraer los certificados. */
 	private String keystoreLib = null;
-
-	/** Ruta recomendada para la apertura de di&aacute;logos se seleccion y guardado de ficheros. */
-	private final File pathHint = new File(Platform.getUserHome());
 
 	/** Mensaje del &uacute;ltimo error producido. */
 	private String errorMessage = null;
@@ -603,6 +599,12 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 		MiniAfirmaApplet.configureLookAndFeel();
 		LOGGER.info("Miniapplet Afirma"); //$NON-NLS-1$
+
+		LOGGER.info("Sistema operativo: " + System.getProperty("os.name")); //$NON-NLS-1$ //$NON-NLS-2$
+		LOGGER.info("Version del SO: " + System.getProperty("os.version")); //$NON-NLS-1$ //$NON-NLS-2$
+		LOGGER.info("Version de Java: " + System.getProperty("java.version")); //$NON-NLS-1$ //$NON-NLS-2$
+		LOGGER.info("Arquitectura del JRE: " + Platform.getJavaArch()); //$NON-NLS-1$
+		LOGGER.info("Java Vendor: " + System.getProperty("java.vm.vendor")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/** {@inheritDoc} */
