@@ -421,8 +421,11 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 		LOGGER.info("Cliente @firma"); //$NON-NLS-1$
 		LOGGER.info("Versi\u00F3n: " + getVersion()); //$NON-NLS-1$
 
-		LOGGER.info("Sistema operativo: " + Platform.getOS().toString()); //$NON-NLS-1$
+		LOGGER.info("Sistema operativo: " + System.getProperty("os.name")); //$NON-NLS-1$ //$NON-NLS-2$
+		LOGGER.info("Version del SO: " + System.getProperty("os.version")); //$NON-NLS-1$ //$NON-NLS-2$
+		LOGGER.info("Version de Java: " + System.getProperty("java.version")); //$NON-NLS-1$ //$NON-NLS-2$
 		LOGGER.info("Arquitectura del JRE: " + Platform.getJavaArch()); //$NON-NLS-1$
+		LOGGER.info("Java Vendor: " + System.getProperty("java.vm.vendor")); //$NON-NLS-1$ //$NON-NLS-2$
 
 		SignApplet.setLookAndFeel();
 
