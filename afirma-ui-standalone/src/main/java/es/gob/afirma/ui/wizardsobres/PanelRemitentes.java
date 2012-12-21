@@ -470,15 +470,15 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
         }
         catch (final KeyStoreException e) {
         	LOGGER.severe("No se ha podido obtener el certicado con el alias '" + seleccionado + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
-        	throw new AOException(e.getMessage(), e.getCause());
+        	throw new AOException(e.getMessage(), e);
 		}
         catch (final NoSuchAlgorithmException e) {
             LOGGER.severe("No se ha podido obtener el certicado con el alias '" + seleccionado + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
-            throw new AOException(e.getMessage(), e.getCause());
+            throw new AOException(e.getMessage(), e);
 		}
         catch (final UnrecoverableEntryException e) {
 	          LOGGER.severe("No se ha podido obtener el certicado con el alias '" + seleccionado + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
-	          throw new AOException(e.getMessage(), e.getCause());
+	          throw new AOException(e.getMessage(), e);
 		}
 
     }
