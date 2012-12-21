@@ -13,6 +13,7 @@ package es.gob.afirma.applet;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.PrivilegedExceptionAction;
 
 import es.gob.afirma.core.AOException;
@@ -27,15 +28,12 @@ final class LoadFileAction implements PrivilegedExceptionAction<byte[]> {
 
     /** Construye una acci&oacute;n privilegiada para la carga del contenido de
      * un fichero.
-     * @param strUri
-     *        Ruta del fichero.
-     */
+     * @param strUri Ruta del fichero. */
     LoadFileAction(final String strUri) {
-
         try {
             this.uri = AOUtil.createURI(strUri);
         }
-        catch (final AOException e) {
+        catch (final URISyntaxException e) {
             throw new IllegalArgumentException("La URI '" + strUri + "' no es valida", e); //$NON-NLS-1$ //$NON-NLS-2$
         }
     }

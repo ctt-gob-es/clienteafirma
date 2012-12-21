@@ -22,6 +22,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.security.Key;
 import java.security.KeyException;
 import java.security.KeyStoreException;
@@ -292,8 +293,9 @@ final class PanelClaveCifrado extends JAccessibilityDialogWizard {
      * @return Contenido del fichero.
      * @throws FileNotFoundException Cuando no se encuentra o no puede leerse el fichero seleccionado.
      * @throws IOException Cuando ocurre un error durante la lectura de un fichero local.
-     * @throws AOException Cuando ocurre un error al formar una ruta remota o al leer un fichero remoto. */
-    private byte[] getFileContent() throws IOException, AOException {
+     * @throws AOException Cuando ocurre un error al formar una ruta remota o al leer un fichero remoto.
+     * @throws URISyntaxException Si la ruta del fichero no es v&aacute;lida */
+    private byte[] getFileContent() throws IOException, AOException, URISyntaxException {
         if (this.rutaFichero == null) {
             throw new IllegalArgumentException("No se ha indicado un fichero de entrada"); //$NON-NLS-1$
         }

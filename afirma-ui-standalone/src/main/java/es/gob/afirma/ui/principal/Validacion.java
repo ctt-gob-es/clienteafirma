@@ -20,6 +20,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
@@ -184,9 +185,13 @@ final class Validacion extends JPanel {
                 }
             }
 
-			private void checkSignFile(final String path, final JLabel label,
-					final JTextField field, final JButton button1,
-					final JButton button2) throws AOException, IOException {
+			private void checkSignFile(final String path,
+					                   final JLabel label,
+					                   final JTextField field,
+					                   final JButton button1,
+					                   final JButton button2) throws AOException,
+					                                                 IOException,
+					                                                 URISyntaxException {
 
 		        // Si el fichero es una firma explicita activamos el campo de seleccion
 		        // de datos, si es una firma implicita activamos el boton de validacion

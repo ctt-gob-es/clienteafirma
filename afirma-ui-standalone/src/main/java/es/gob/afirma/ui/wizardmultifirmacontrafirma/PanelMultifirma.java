@@ -20,7 +20,6 @@ import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.Arrays;
@@ -598,37 +597,33 @@ final class PanelMultifirma extends JAccessibilityDialogWizard {
     }
 
     private byte[] readFile(final String filepath) {
-        byte[] data = null;
-        InputStream fileIn = null;
         try {
-            fileIn = AOUtil.loadFile(AOUtil.createURI(filepath));
-            data = AOUtil.getDataFromInputStream(fileIn);
+        	final InputStream fileIn = AOUtil.loadFile(AOUtil.createURI(filepath));
+            final byte[] data = AOUtil.getDataFromInputStream(fileIn);
+            fileIn.close();
+            return data;
         }
         catch (final FileNotFoundException e) {
-            setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-            CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.simple.error.fichero.encontrar"), //$NON-NLS-1$
-                                           Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
-            return null;
+            CustomDialog.showMessageDialog(
+        		this,
+        		true,
+        		Messages.getString("Wizard.multifirma.simple.error.fichero.encontrar"), //$NON-NLS-1$
+                Messages.getString("error"), //$NON-NLS-1$
+                JOptionPane.ERROR_MESSAGE
+            );
         }
-        catch (final IOException e) {
-            setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-            CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.simple.error.fichero.leer"), //$NON-NLS-1$
-                                           Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
-            return null;
+        catch (final Exception e) {
+        	Logger.getLogger("es.gob.afirma").severe("Error al leer el fichero " + filepath + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            CustomDialog.showMessageDialog(
+        		this,
+        		true,
+        		Messages.getString("Wizard.multifirma.simple.error.fichero.leer"), //$NON-NLS-1$
+                Messages.getString("error"), //$NON-NLS-1$
+                JOptionPane.ERROR_MESSAGE
+            );
         }
-        catch (final AOException e) {
-            setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-        }
-        finally {
-            if (fileIn != null) {
-                try {
-                    fileIn.close();
-                }
-                catch (final Exception e) { /* se ignora */ }
-            }
-        }
-
-        return data;
+        setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        return null;
     }
 
     /** Guarda todas las ventanas del asistente para poder controlar la botonera

@@ -18,6 +18,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.MappedByteBuffer;
@@ -52,18 +53,17 @@ public final class AOUtil {
     /** Crea una URI a partir de un nombre de fichero local o una URL.
      * @param file Nombre del fichero local o URL
      * @return URI (<code>file://</code>) del fichero local o URL
-     * @throws AOException
-     *         cuando ocurre cualquier problema creando la URI */
-    public static URI createURI(final String file) throws AOException {
+     * @throws URISyntaxException Si no se puede crear una URI soportada a partir de la cadena de entrada */
+    public static URI createURI(final String file) throws URISyntaxException {
 
         if (file == null || "".equals(file)) { //$NON-NLS-1$
-            throw new AOException("No se puede crear una URI a partir de un nulo"); //$NON-NLS-1$
+            throw new IllegalArgumentException("No se puede crear una URI a partir de un nulo"); //$NON-NLS-1$
         }
 
         String filename = file.trim();
 
         if ("".equals(filename)) { //$NON-NLS-1$
-            throw new AOException("La URI no puede ser una cadena vacia"); //$NON-NLS-1$
+            throw new IllegalArgumentException("La URI no puede ser una cadena vacia"); //$NON-NLS-1$
         }
 
         // Cambiamos los caracteres Windows
@@ -85,13 +85,7 @@ public final class AOUtil {
                         .replace("]", "%5D") //$NON-NLS-1$ //$NON-NLS-2$
                         .replace("`", "%60"); //$NON-NLS-1$ //$NON-NLS-2$
 
-        final URI uri;
-        try {
-            uri = new URI(filename);
-        }
-        catch (final Exception e) {
-            throw new AOException("Formato de URI (" + filename + ") incorrecto", e); //$NON-NLS-1$ //$NON-NLS-2$
-        }
+        final URI uri = new URI(filename);
 
         // Comprobamos si es un esquema soportado
         final String scheme = uri.getScheme();
@@ -116,7 +110,7 @@ public final class AOUtil {
             return createURI("file://" + filename); //$NON-NLS-1$
         }
 
-        throw new AOException("Formato de URI valido pero no soportado '" + filename + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+        throw new URISyntaxException(filename, "Tipo de URI no soportado"); //$NON-NLS-1$
 
     }
 

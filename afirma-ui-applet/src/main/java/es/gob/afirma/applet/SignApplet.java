@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.security.AccessController;
@@ -3394,7 +3395,8 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 		if (getInternalFileUri() != null) {
 			try {
 				this.cipherManager.setFileUri(AOUtil.createURI(getInternalFileUri()), false);
-			} catch (final AOException e) {
+			}
+			catch (final URISyntaxException e) {
 				setError(AppletMessages.getString("SignApplet.15") + getInternalFileUri()); //$NON-NLS-1$
 				LOGGER.severe("Error: " + e.toString()); //$NON-NLS-1$
 				return false;
@@ -3475,7 +3477,8 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 		if (getInternalFileUri() != null) {
 			try {
 				this.cipherManager.setFileUri(AOUtil.createURI(getInternalFileUri()), false);
-			} catch (final AOException e) {
+			}
+			catch (final URISyntaxException e) {
 				setError(AppletMessages.getString("SignApplet.15") + getInternalFileUri()); //$NON-NLS-1$
 				LOGGER.severe("Error: " + e.toString()); //$NON-NLS-1$
 				return false;

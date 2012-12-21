@@ -22,7 +22,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.List;
@@ -106,6 +105,9 @@ final class PanelEntrada extends JAccessibilityDialogWizard {
 
     // Campo donde se guarda el nombre del fichero de firma
     private final JTextField campoFirma = new JTextField();
+    JTextField getCampoFirma() {
+    	return this.campoFirma;
+    }
 
     /**
      * Inicializacion de componentes
@@ -237,9 +239,10 @@ final class PanelEntrada extends JAccessibilityDialogWizard {
 
 		@Override
 		protected void siguienteActionPerformed(final JButton anterior,
-				final JButton siguiente, final JButton finalizar) {
+				                                final JButton siguiente,
+				                                final JButton finalizar) {
 
-			final String ficheroFirma = PanelEntrada.this.campoFirma.getText();
+			final String ficheroFirma = PanelEntrada.this.getCampoFirma().getText();
 
 			if (checkFicheroEntrada(ficheroFirma)) {
 				final byte[] dataFile = readFile(ficheroFirma);
@@ -337,31 +340,33 @@ final class PanelEntrada extends JAccessibilityDialogWizard {
 	}
 
 	byte[] readFile(final String filepath) {
-		byte[] data = null;
-		InputStream fileIn = null;
 		try {
-			fileIn = AOUtil.loadFile(AOUtil.createURI(filepath));
-			data = AOUtil.getDataFromInputStream(fileIn);
-		} catch (final FileNotFoundException e) {
-			setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-			CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.simple.error.fichero.encontrar"),  //$NON-NLS-1$
-					Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
-			return null;
-		} catch (final IOException e) {
-			setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-			CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.simple.error.fichero.leer"),  //$NON-NLS-1$
-					Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
-			return null;
+			final InputStream fileIn = AOUtil.loadFile(AOUtil.createURI(filepath));
+			final byte[] data = AOUtil.getDataFromInputStream(fileIn);
+			fileIn.close();
+			return data;
 		}
-		catch (final AOException e) {
-			setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-		} finally {
-			if (fileIn != null) {
-				try { fileIn.close(); } catch (final Exception e) { /* se ignora */ }
-			}
+		catch (final FileNotFoundException e) {
+			CustomDialog.showMessageDialog(
+				this,
+				true,
+				Messages.getString("Wizard.multifirma.simple.error.fichero.encontrar"),  //$NON-NLS-1$
+				Messages.getString("error"), //$NON-NLS-1$
+				JOptionPane.ERROR_MESSAGE
+			);
 		}
-
-		return data;
+		catch (final Exception e) {
+			Logger.getLogger("es.gob.afirma").severe("No se ha podido leer el fichero " + filepath + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			CustomDialog.showMessageDialog(
+				this,
+				true,
+				Messages.getString("Wizard.multifirma.simple.error.fichero.leer"),  //$NON-NLS-1$
+				Messages.getString("error"), //$NON-NLS-1$
+				JOptionPane.ERROR_MESSAGE
+			);
+		}
+		setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+		return null;
 	}
 
 	/**

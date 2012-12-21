@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -667,29 +668,21 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
      * @throws java.io.FileNotFoundException
      * @throws IOException */
     private static byte[] readFile(final String filepath) throws IOException {
-        byte[] data = null;
-        InputStream fileIn = null;
         try {
-            fileIn = AOUtil.loadFile(AOUtil.createURI(filepath));
-            data = AOUtil.getDataFromInputStream(fileIn);
-
+        	final InputStream fileIn = AOUtil.loadFile(AOUtil.createURI(filepath));
+            final byte[] data = AOUtil.getDataFromInputStream(fileIn);
+            fileIn.close();
+            return data;
         }
         catch (final AOException e) {
             throw new IOException("Error al cargar el fichero de datos", e); //$NON-NLS-1$
         }
-        finally {
-            if (fileIn != null) {
-                try {
-                    fileIn.close();
-                }
-                catch (final Exception e) { /* Ignorada */}
-            }
-        }
-
-        return data;
+        catch (final URISyntaxException e) {
+        	throw new IOException("Ruta hacia el fichero de datos invalida: " + filepath, e); //$NON-NLS-1$
+		}
     }
 
-    /** Asignacion de la lista de certificados.
+    /** Asignaci&oacute;n de la lista de certificados.
      * @param listaCertificados */
     public void setListaCertificados(final List<CertificateDestiny> listaCertificados) {
         this.listaCertificados = listaCertificados;
