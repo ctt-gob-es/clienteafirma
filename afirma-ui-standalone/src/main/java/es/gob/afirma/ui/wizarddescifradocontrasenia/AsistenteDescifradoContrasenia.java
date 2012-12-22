@@ -23,14 +23,14 @@ import es.gob.afirma.ui.wizardutils.JDialogWizard;
  */
 public final class AsistenteDescifradoContrasenia {
 
-    private String algoritmo;
+    private final String algoritmo;
 
-    private String rutaFichero;
+    private final String rutaFichero;
 
     /** Construye un nuevo asistente de cifrado por contrase&ntilde;a.
      * @param algoritmo ALgoritmo de cifrado
      * @param rutaFichero Fichero a cifrar */
-    public AsistenteDescifradoContrasenia(String algoritmo, String rutaFichero) {
+    public AsistenteDescifradoContrasenia(final String algoritmo, final String rutaFichero) {
         this.algoritmo = algoritmo;
         this.rutaFichero  =rutaFichero;
         initComponents();
@@ -41,27 +41,27 @@ public final class AsistenteDescifradoContrasenia {
      */
     private void initComponents() {
     	// Generamos la lista para el control de la botonera
-    	List<JDialogWizard> ventanas = new ArrayList<JDialogWizard>();
-    	
+    	final List<JDialogWizard> ventanas = new ArrayList<JDialogWizard>();
+
     	// Obtenemos todas las paginas
     	// Pagina 1: Panel presentacion
-    	PanelPresentacion panelPresentacion = new PanelPresentacion();
+    	final PanelPresentacion panelPresentacion = new PanelPresentacion();
     	ventanas.add(panelPresentacion);
-    	
+
     	// Pagina 2: Panel descifrar por contrasena
-    	PanelContrasenia panelContrasenia = new PanelContrasenia(this.algoritmo, this.rutaFichero);
+    	final PanelContrasenia panelContrasenia = new PanelContrasenia(this.algoritmo, this.rutaFichero);
     	ventanas.add(panelContrasenia);
-    	
+
     	// Pagina 3: Dialogo finalizar
-    	PanelFinalizar panelFinalizar = new PanelFinalizar();
+    	final PanelFinalizar panelFinalizar = new PanelFinalizar();
     	ventanas.add(panelFinalizar);
-        
+
         // Cargamos el listado de ventanas en todas las paginas con controles
     	// para inicializar sus botoneras
         panelPresentacion.setVentanas(ventanas);
         panelContrasenia.setVentanas(ventanas);
         panelFinalizar.setVentanas(ventanas);
-        
+
         // Mostramos la primera ventana
         panelPresentacion.setVisible(true);
     }

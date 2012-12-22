@@ -120,10 +120,25 @@ final class PanelContrasenia extends JAccessibilityDialogWizard implements KeyLi
     /** Cifra un fichero dado
      * @return true o false indicando si se ha cifrado correctamente */
     boolean cifrarFichero() {
-
+    	// Comprobamos si se ha indicado un fichero de datos
+    	if (this.rutaFichero == null) {
+            LOGGER.warning("No se ha indicado un fichero de datos"); //$NON-NLS-1$
+            CustomDialog.showMessageDialog(
+        		this,
+                true,
+                Messages.getString("Cifrado.msg.error.fichero"), //$NON-NLS-1$
+                Messages.getString("Cifrado.msg.titulo"), //$NON-NLS-1$
+                JOptionPane.WARNING_MESSAGE
+            );
+            return false;
+    	}
         // Generamos la clave necesaria para el cifrado
         try {
-            this.cipherKey = this.cipherConfig.getCipher().decodePassphrase(this.campoContrasenia.getPassword(), this.cipherConfig.getConfig(), null);
+            this.cipherKey = this.cipherConfig.getCipher().decodePassphrase(
+        		this.campoContrasenia.getPassword(),
+        		this.cipherConfig.getConfig(),
+        		null
+    		);
         }
         catch (final Exception ex) {
             LOGGER.severe("Error durante el proceso de generacion de claves: " + ex); //$NON-NLS-1$
@@ -136,13 +151,6 @@ final class PanelContrasenia extends JAccessibilityDialogWizard implements KeyLi
         final byte[] fileContent;
         try {
             fileContent = this.getFileContent();
-        }
-        catch (final NullPointerException ex) {
-            LOGGER.warning("No se ha indicado un fichero de datos: " + ex); //$NON-NLS-1$
-            CustomDialog.showMessageDialog(this,
-                                           true,
-                                           Messages.getString("Cifrado.msg.error.fichero"), Messages.getString("Cifrado.msg.titulo"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
-            return false;
         }
         catch (final FileNotFoundException ex) {
             LOGGER.warning("No se encuentra el fichero: " + ex); //$NON-NLS-1$

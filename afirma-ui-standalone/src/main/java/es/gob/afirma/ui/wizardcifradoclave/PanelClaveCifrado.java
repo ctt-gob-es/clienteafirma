@@ -182,12 +182,28 @@ final class PanelClaveCifrado extends JAccessibilityDialogWizard {
     /** Cifra un fichero dado
      * @return true o false indicando si se ha cifrado correctamente */
     boolean cifrarFichero() {
+    	// Comprobamos si se ha indicado un fichero de datos
+    	if (this.rutaFichero == null) {
+            LOGGER.warning("No se ha indicado un fichero de datos"); //$NON-NLS-1$
+            CustomDialog.showMessageDialog(
+        		this,
+                true,
+                Messages.getString("Cifrado.msg.error.fichero"), //$NON-NLS-1$
+                Messages.getString("Cifrado.msg.titulo"), //$NON-NLS-1$
+                JOptionPane.WARNING_MESSAGE
+            );
+            return false;
+    	}
 
         // Comprobamos si se ha generado alguna clave
         if (this.campoClave.getText() == null || this.campoClave.getText().equals("")) { //$NON-NLS-1$
-            CustomDialog.showMessageDialog(this,
-                                           true,
-                                           Messages.getString("Cifrado.msg.clave"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+            CustomDialog.showMessageDialog(
+        		this,
+                true,
+                Messages.getString("Cifrado.msg.clave"), //$NON-NLS-1$
+                Messages.getString("error"), //$NON-NLS-1$
+                JOptionPane.ERROR_MESSAGE
+            );
             return false;
         }
         // Generamos la clave necesaria para el cifrado
@@ -196,9 +212,13 @@ final class PanelClaveCifrado extends JAccessibilityDialogWizard {
         }
         catch (final Exception ex) {
             LOGGER.severe("Error durante el proceso de generacion de claves: " + ex); //$NON-NLS-1$
-            CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.error.cifrado"), //$NON-NLS-1$
-                                           Messages.getString("error"), //$NON-NLS-1$
-                                           JOptionPane.ERROR_MESSAGE);
+            CustomDialog.showMessageDialog(
+        		this,
+        		true,
+        		Messages.getString("Cifrado.msg.error.cifrado"), //$NON-NLS-1$
+                Messages.getString("error"), //$NON-NLS-1$
+                JOptionPane.ERROR_MESSAGE
+            );
             return false;
         }
 
@@ -207,18 +227,15 @@ final class PanelClaveCifrado extends JAccessibilityDialogWizard {
         try {
             fileContent = getFileContent();
         }
-        catch (final NullPointerException ex) {
-            LOGGER.warning("No se ha indicado un fichero de datos: " + ex); //$NON-NLS-1$
-            CustomDialog.showMessageDialog(this,
-                                           true,
-                                           Messages.getString("Cifrado.msg.error.fichero"), Messages.getString("Cifrado.msg.titulo"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
-            return false;
-        }
         catch (final FileNotFoundException ex) {
             LOGGER.warning("No se encuentra el fichero: " + ex); //$NON-NLS-1$
-            CustomDialog.showMessageDialog(this,
-                                           true,
-                                           Messages.getString("Cifrado.msg.error.lectura"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+            CustomDialog.showMessageDialog(
+        		this,
+                true,
+                Messages.getString("Cifrado.msg.error.lectura"), //$NON-NLS-1$
+                Messages.getString("error"), //$NON-NLS-1$
+                JOptionPane.ERROR_MESSAGE
+            );
             return false;
         }
         catch (final Exception ex) {

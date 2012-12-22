@@ -161,7 +161,7 @@ final class PanelContrasenia extends JAccessibilityDialogWizard {
 
         // Caja de texto donde se guarda la contrasenia
 		 this.campoContrasenia.setToolTipText(Messages.getString("WizardDescifrado.contrasenia.contrasenia.description")); // NOI18N //$NON-NLS-1$
-		 this.campoContrasenia.getAccessibleContext().setAccessibleName(passwordLabel.getText() + " " + this.campoContrasenia.getToolTipText() + "ALT + O.");
+		 this.campoContrasenia.getAccessibleContext().setAccessibleName(passwordLabel.getText() + " " + this.campoContrasenia.getToolTipText() + "ALT + O.");  //$NON-NLS-1$//$NON-NLS-2$
 	     this.campoContrasenia.getAccessibleContext().setAccessibleDescription(this.campoContrasenia.getToolTipText());
 	     this.campoContrasenia.setDocument(new JSEUIManager.JTextFieldASCIIFilter(true));
 	     if (GeneralConfig.isBigCaret()) {
@@ -282,35 +282,35 @@ final class PanelContrasenia extends JAccessibilityDialogWizard {
 	 * @return	true o false indicando si se ha descifrado correctamente
 	 */
 	public boolean descifrarFichero() {
+		if (this.rutaFichero == null) {
+			LOGGER.warning("No se ha indicado un fichero de datos"); //$NON-NLS-1$
+			CustomDialog.showMessageDialog(this, true, Messages.getString("Descifrado.msg.fichero"), //$NON-NLS-1$
+					Messages.getString("Descifrado.btndescifrar"),JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$
+			return false;
+		}
 		final char[] contrasenia = this.campoContrasenia.getPassword();
-
 		if (contrasenia == null || new String(contrasenia).trim().equals("")){ //$NON-NLS-1$
 			CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);  //$NON-NLS-1$//$NON-NLS-2$
 			return false;
 		}
-
-		byte[] fileContent = null;
+		final byte[] fileContent;
 		try {
 			fileContent = getFileContent();
 		}
-		catch (final NullPointerException ex) {
-			LOGGER.warning("No se ha indicado un fichero de datos: " + ex); //$NON-NLS-1$
-			CustomDialog.showMessageDialog(this, true, Messages.getString("Descifrado.msg.fichero"), //$NON-NLS-1$
-					Messages.getString("Descifrado.btndescifrar"),JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$
-			return false;
-		} catch (final FileNotFoundException ex) {
+		catch (final FileNotFoundException ex) {
 			LOGGER.warning("Error al leer el fichero: " + ex); //$NON-NLS-1$
 			CustomDialog.showMessageDialog(this, true, Messages.getString("Descifrado.msg.fichero2"),  //$NON-NLS-1$
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
 			return false;
-		} catch (final Exception ex) {
+		}
+		catch (final Exception ex) {
 			LOGGER.warning("Error durante la lectura del fichero de datos: " + ex); //$NON-NLS-1$
 			CustomDialog.showMessageDialog(this, true, Messages.getString("Descifrado.msg.fichero2"),  //$NON-NLS-1$
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
 			return false;
 		}
 
-		byte[] result = null;
+		final byte[] result;
 		try {
 			final Key tmpKey = this.cipherConfig.getCipher().decodePassphrase(contrasenia, this.cipherConfig.getConfig(), null);
 			result = this.cipherConfig.getCipher().decipher(fileContent, this.cipherConfig.getConfig(), tmpKey);

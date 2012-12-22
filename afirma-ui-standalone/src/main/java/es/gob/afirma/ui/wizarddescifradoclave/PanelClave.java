@@ -92,7 +92,7 @@ final class PanelClave extends JAccessibilityDialogWizard {
     }
 
     /** Log. */
-    private static Logger logger = Logger.getLogger(PanelClave.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(PanelClave.class.getName());
 
     /** UID. */
     private static final long serialVersionUID = 1L;
@@ -104,7 +104,7 @@ final class PanelClave extends JAccessibilityDialogWizard {
     private final CipherConfig cipherConfig;
 
     /** Ruta donde se encuentra el archivo a cifrar */
-    private String rutaFichero = ""; //$NON-NLS-1$
+    private final String rutaFichero;
 
     /** Constructor.
      * @param algoritmo
@@ -118,6 +118,18 @@ final class PanelClave extends JAccessibilityDialogWizard {
     /** Descifra un fichero dado
      * @return true o false indicando si se ha descifrado correctamente */
     public boolean descifrarFichero() {
+    	// Comprobamos si se ha indicado un fichero de datos
+    	if (this.rutaFichero == null) {
+            LOGGER.warning("No se ha indicado un fichero de datos"); //$NON-NLS-1$
+            CustomDialog.showMessageDialog(
+        		this,
+                true,
+                Messages.getString("Descifrado.msg.fichero"), //$NON-NLS-1$
+                Messages.getString("Descifrado.btndescifrar"), //$NON-NLS-1$
+                JOptionPane.WARNING_MESSAGE
+            );
+            return false;
+    	}
         // Recuperamos la clave
         final String clave = this.campoClave.getText();
 
@@ -127,26 +139,19 @@ final class PanelClave extends JAccessibilityDialogWizard {
                                            JOptionPane.ERROR_MESSAGE);
             return false;
         }
-        byte[] fileContent = null;
+        final byte[] fileContent;
         try {
             fileContent = this.getFileContent();
         }
-        catch (final NullPointerException ex) {
-            logger.warning("No se ha indicado un fichero de datos: " + ex); //$NON-NLS-1$
-            CustomDialog.showMessageDialog(this, true, Messages.getString("Descifrado.msg.fichero"), //$NON-NLS-1$
-                                           Messages.getString("Descifrado.btndescifrar"), //$NON-NLS-1$
-                                           JOptionPane.WARNING_MESSAGE);
-            return false;
-        }
         catch (final FileNotFoundException ex) {
-            logger.warning("Error al leer el fichero: " + ex); //$NON-NLS-1$
+            LOGGER.warning("Error al leer el fichero: " + ex); //$NON-NLS-1$
             CustomDialog.showMessageDialog(this, true, Messages.getString("Descifrado.msg.fichero2"), //$NON-NLS-1$
                                            Messages.getString("error"), //$NON-NLS-1$
                                            JOptionPane.ERROR_MESSAGE);
             return false;
         }
         catch (final Exception ex) {
-            logger.warning("Ocurri\u00F3 un error durante la lectura del fichero de datos: " + ex); //$NON-NLS-1$
+            LOGGER.warning("Ocurri\u00F3 un error durante la lectura del fichero de datos: " + ex); //$NON-NLS-1$
             CustomDialog.showMessageDialog(this, true, Messages.getString("Descifrado.msg.fichero2"), //$NON-NLS-1$
                                            Messages.getString("error"), //$NON-NLS-1$
                                            JOptionPane.ERROR_MESSAGE);
@@ -159,19 +164,19 @@ final class PanelClave extends JAccessibilityDialogWizard {
             result = this.cipherConfig.getCipher().decipher(fileContent, this.cipherConfig.getConfig(), tmpKey);
         }
         catch (final InvalidKeyException e) {
-            logger.severe("Clave no valida: " + e); //$NON-NLS-1$
+            LOGGER.severe("Clave no valida: " + e); //$NON-NLS-1$
             CustomDialog.showMessageDialog(this, true, Messages.getString("Descifrado.msg.error.clave"), //$NON-NLS-1$
                                            Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
             return false;
         }
         catch (final KeyException ex) {
-            logger.severe("Error al descifrar, compruebe que el fichero esta cifrado con el algoritmo seleccionado: " + ex); //$NON-NLS-1$
+            LOGGER.severe("Error al descifrar, compruebe que el fichero esta cifrado con el algoritmo seleccionado: " + ex); //$NON-NLS-1$
             CustomDialog.showMessageDialog(this, true, Messages.getString("Descifrado.msg.error.malcifrado"), //$NON-NLS-1$
                                            Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
             return false;
         }
         catch (final Exception ex) {
-            logger.severe("Error al descifrar: " + ex); //$NON-NLS-1$
+            LOGGER.severe("Error al descifrar: " + ex); //$NON-NLS-1$
             CustomDialog.showMessageDialog(this, true, Messages.getString("Descifrado.msg.error.operacion"), //$NON-NLS-1$
                                            Messages.getString("error"), //$NON-NLS-1$
                                            JOptionPane.ERROR_MESSAGE);
@@ -203,7 +208,7 @@ final class PanelClave extends JAccessibilityDialogWizard {
             this.campoClave.setText(getKeyFromCipherKeyStore());
         }
         catch (final AOCancelledOperationException e) {
-            logger.info("El usuario ha cancelado la recuperacion de claves de cifrado del almacen"); //$NON-NLS-1$
+            LOGGER.info("El usuario ha cancelado la recuperacion de claves de cifrado del almacen"); //$NON-NLS-1$
         }
         catch (final IOException e) {
             CustomDialog.showMessageDialog(this, true, Messages.getString("Descifrado.msg.error.contrasenia"), //$NON-NLS-1$
