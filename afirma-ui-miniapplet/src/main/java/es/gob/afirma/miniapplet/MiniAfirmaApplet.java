@@ -96,6 +96,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 				setError(e, "Los datos proporcionados est\u00E1n mal codificados en base 64"); //$NON-NLS-1$
 				throw e;
 			}
+			catch (final OutOfMemoryError e) {
+				setError(e, "Error de falta de memoria durante la carga de los datos"); //$NON-NLS-1$
+				throw e;
+			}
 		}
 		else {
 			try {
@@ -114,6 +118,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			}
 			catch (final PrivilegedActionException e) {
 				setError(e);
+				throw e;
+			}
+			catch (final OutOfMemoryError e) {
+				setError(e, "Error de falta de memoria durante la carga del fichero de datos"); //$NON-NLS-1$
 				throw e;
 			}
 			catch (final Error e) {
@@ -150,9 +158,13 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			setError(e);
 			throw e;
 		}
+		catch (final OutOfMemoryError e) {
+			setError(e, "Error de falta de memoria durante la operaci\u00F3n de firma"); //$NON-NLS-1$
+			throw e;
+		}
 		catch (final Error e) {
 			setError(e);
-			throw new AOException("Ocurrio un error grave durante la operacion de firma", e); //$NON-NLS-1$
+			throw new AOException("Ocurrio un error grave durante la operaci\u00F3n de firma", e); //$NON-NLS-1$
 		}
 	}
 
@@ -176,6 +188,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 				setError(e, "La firma proporcionada est\u00E1 mal codificada en base 64"); //$NON-NLS-1$
 				throw e;
 			}
+			catch (final OutOfMemoryError e) {
+				setError(e, "Error de falta de memoria durante la carga de la firma"); //$NON-NLS-1$
+				throw e;
+			}
 		}
 		else {
 			try {
@@ -192,9 +208,17 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 				setError(ce);
 				throw ce;
 			}
+			catch (final OutOfMemoryError e) {
+				setError(e, "Error de falta de memoria durante la carga del fichero de firma"); //$NON-NLS-1$
+				throw e;
+			}
 			catch (final PrivilegedActionException e) {
 				setError(e);
 				throw e;
+			}
+			catch (final Error e) {
+				setError(e);
+				throw new AOException("Ocurrio un error grave durante la operaci\u00F3n de firma", e); //$NON-NLS-1$
 			}
 		}
 
@@ -206,6 +230,14 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		catch (final IOException e) {
 			setError(e, "Los datos proporcionados est\u00E1n mal codificados en base 64"); //$NON-NLS-1$
 			throw e;
+		}
+		catch (final OutOfMemoryError e) {
+			setError(e, "Error de falta de memoria durante la carga de los datos"); //$NON-NLS-1$
+			throw e;
+		}
+		catch (final Error e) {
+			setError(e);
+			throw new AOException("Ocurrio un error grave durante la operaci\u00F3n de firma", e); //$NON-NLS-1$
 		}
 
 		try {
@@ -236,9 +268,13 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			setError(e);
 			throw e;
 		}
+		catch (final OutOfMemoryError e) {
+			setError(e, "Error de falta de memoria durante la operaci\u00F3n de cofirma"); //$NON-NLS-1$
+			throw e;
+		}
 		catch (final Error e) {
 			setError(e);
-			throw new AOException("Ocurrio un error grave durante la operacion de cofirma", e); //$NON-NLS-1$
+			throw new AOException("Ocurrio un error grave durante la operaci\u00F3n de cofirma", e); //$NON-NLS-1$
 		}
 	}
 
@@ -261,6 +297,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 				setError(e, "La firma proporcionada est\u00E1 mal codificada en base 64"); //$NON-NLS-1$
 				throw e;
 			}
+			catch (final OutOfMemoryError e) {
+				setError(e, "Error de falta de memoria durante la carga de la firma"); //$NON-NLS-1$
+				throw e;
+			}
 		}
 		else {
 			try {
@@ -279,6 +319,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			}
 			catch (final PrivilegedActionException e) {
 				setError(e);
+				throw e;
+			}
+			catch (final OutOfMemoryError e) {
+				setError(e, "Error de falta de memoria durante la carga del fichero de firma"); //$NON-NLS-1$
 				throw e;
 			}
 		}
@@ -311,9 +355,13 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			setError(e);
 			throw e;
 		}
+		catch (final OutOfMemoryError e) {
+			setError(e, "Error de falta de memoria durante la operaci\u00F3n de contrafirma"); //$NON-NLS-1$
+			throw e;
+		}
 		catch (final Error e) {
 			setError(e);
-			throw new AOException("Ocurrio un error grave durante la operacion de contrafirma", e); //$NON-NLS-1$
+			throw new AOException("Ocurrio un error grave durante la operaci\u00F3n de contrafirma", e); //$NON-NLS-1$
 		}
 	}
 
@@ -476,6 +524,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			setError(e);
 			throw e;
 		}
+		catch (final OutOfMemoryError e) {
+			setError(e, "Error de falta de memoria durante la carga del fichero"); //$NON-NLS-1$
+			throw e;
+		}
 	}
 
 	/** {@inheritDoc} */
@@ -527,6 +579,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		}
 		catch (final RuntimeException e) {
 			setError(e);
+			throw e;
+		}
+		catch (final OutOfMemoryError e) {
+			setError(e, "Error de falta de memoria durante la carga de los ficheros"); //$NON-NLS-1$
 			throw e;
 		}
 	}
