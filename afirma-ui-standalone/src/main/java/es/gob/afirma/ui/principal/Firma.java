@@ -277,7 +277,7 @@ final class Firma extends JPanel {
                 throw e;
             }
             catch (final Exception e) {
-                throw new AOException("No se ha podido recuperar el certificado seleccionado", e.getCause()); //$NON-NLS-1$
+                throw new AOException("No se ha podido recuperar el certificado seleccionado", e); //$NON-NLS-1$
             }
 
             if (privateKeyEntry == null) {

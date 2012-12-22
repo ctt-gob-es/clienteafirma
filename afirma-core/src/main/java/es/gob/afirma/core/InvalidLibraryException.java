@@ -21,4 +21,11 @@ public class InvalidLibraryException extends RuntimeException {
 	public InvalidLibraryException(final String msg) {
 		super(msg);
 	}
+
+	/** Crea una nueva instancia de la excepci&oacute;n.
+	 * @param msg Mensaje de la excepci&oacute;n
+	 * @param e Excepci&oacute;n original */
+	public InvalidLibraryException(final String msg, final Throwable e) {
+		super(msg, e);
+	}
 }

@@ -19,7 +19,7 @@ public final class BCChecker {
 			AOUtil.classForName("org.bouncycastle.asn1.ASN1Primitive"); //$NON-NLS-1$
 		}
 		catch(final ClassNotFoundException e) {
-			throw new InvalidBouncyCastleException(BC_VERSION, "1.46 o anterior"); //$NON-NLS-1$
+			throw new InvalidBouncyCastleException(BC_VERSION, "1.46 o anterior", e); //$NON-NLS-1$
 		}
 	}
 

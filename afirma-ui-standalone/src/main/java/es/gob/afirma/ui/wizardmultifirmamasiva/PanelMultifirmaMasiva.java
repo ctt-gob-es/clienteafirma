@@ -236,19 +236,16 @@ final class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
      * @param hojas si se han de firmar las hojas
      * @return tipo de firma a realizar. */
     private static MassiveType getMassiveOperationType(final int tipo, final boolean hojas) {
-        MassiveType operation = null;
         switch (tipo) {
             case 0:
-                operation = MassiveType.SIGN;
-                break;
+                return MassiveType.SIGN;
             case 1:
-                operation = MassiveType.COSIGN;
-                break;
+                return MassiveType.COSIGN;
             case 2:
-                operation = hojas ? MassiveType.COUNTERSIGN_LEAFS : MassiveType.COUNTERSIGN_ALL;
-                break;
+                return hojas ? MassiveType.COUNTERSIGN_LEAFS : MassiveType.COUNTERSIGN_ALL;
+            default:
+            	return null;
         }
-        return operation;
     }
 
     /** Relacion minima para el redimensionado de componentes. */
@@ -533,7 +530,7 @@ final class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
                 throw e;
             }
             catch (final Exception e) {
-                throw new AOException("No se ha podido extraer el certificado seleccionado.", e.getCause()); //$NON-NLS-1$
+                throw new AOException("No se ha podido extraer el certificado seleccionado.", e); //$NON-NLS-1$
             }
 
             if (privateKeyEntry == null) {

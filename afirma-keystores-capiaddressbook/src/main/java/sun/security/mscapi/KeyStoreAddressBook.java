@@ -477,7 +477,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
         }
         catch (final KeyStoreException kse) {
             // Wrap the JNI exception in an IOException
-            throw new IOException(kse.toString(), kse.getCause());
+            throw new IOException(kse.toString(), kse);
         }
     }
 

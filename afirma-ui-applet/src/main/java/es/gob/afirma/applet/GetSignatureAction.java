@@ -89,7 +89,7 @@ class GetSignatureAction implements PrivilegedExceptionAction<byte[]> {
             }
             catch (final FileNotFoundException e) {
             	LOGGER.severe("No se encuentra el fichero de firma '" + this.electronicSignatureFile.getPath() + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
-                throw new AOException("No se encuentra el fichero de firma '" + this.electronicSignatureFile.getPath() + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+                throw new AOException("No se encuentra el fichero de firma '" + this.electronicSignatureFile.getPath() + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
             }
             catch (final Exception e) {
             	LOGGER.severe("Error tratando de leer el fichero de firma original (" + this.electronicSignatureFile.getPath() + "): " + e); //$NON-NLS-1$ //$NON-NLS-2$

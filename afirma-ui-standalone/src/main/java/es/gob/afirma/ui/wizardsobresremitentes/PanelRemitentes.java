@@ -23,6 +23,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableEntryException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
@@ -415,32 +418,20 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
      * @param keyStoreManager1 Manager del KeyStore
      * @param seleccionado Certificado seleccionado
      * @param kconf1 Configuracion del KeyStore
-     * @return
-     * @throws AOException */
-    private PrivateKeyEntry getPrivateKeyEntry(final AOKeyStoreManager keyStoreManager1, final String seleccionado, final KeyStoreConfiguration kconf1) throws AOException {
-
+     * @throws UnrecoverableEntryException
+     * @throws NoSuchAlgorithmException
+     * @throws KeyStoreException */
+    private PrivateKeyEntry getPrivateKeyEntry(final AOKeyStoreManager keyStoreManager1,
+    		                                   final String seleccionado,
+    		                                   final KeyStoreConfiguration kconf1) throws KeyStoreException,
+    		                                                                              NoSuchAlgorithmException,
+    		                                                                              UnrecoverableEntryException {
         // Comprobamos si se ha cancelado la seleccion
         if (seleccionado == null) {
             throw new AOCancelledOperationException("Operacion de firma cancelada por el usuario"); //$NON-NLS-1$
         }
-
         // Recuperamos la clave del certificado
-        PrivateKeyEntry privateKeyEntry = null;
-        try {
-            privateKeyEntry = keyStoreManager1.getKeyEntry(seleccionado, KeyStoreUtilities.getCertificatePC(kconf1.getType(), this));
-        }
-        catch (final AOCancelledOperationException e) {
-            // Si se ha cancelado la operacion lo informamos en el nivel superior para que se trate.
-            // Este relanzamiento se realiza para evitar la siguiente captura generica de excepciones
-            // que las relanza en forma de AOException
-            throw e;
-        }
-        catch (final Exception e) {
-            logger.severe("No se ha podido obtener el certificado con el alias '" + seleccionado + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
-            throw new AOException(e.getMessage(), e.getCause());
-        }
-
-        return privateKeyEntry;
+        return keyStoreManager1.getKeyEntry(seleccionado, KeyStoreUtilities.getCertificatePC(kconf1.getType(), this));
     }
 
     /** Inicializacion de componentes */
