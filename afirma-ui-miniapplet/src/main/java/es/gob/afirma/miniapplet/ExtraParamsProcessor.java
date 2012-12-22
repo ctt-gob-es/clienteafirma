@@ -11,6 +11,7 @@
 package es.gob.afirma.miniapplet;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -26,9 +27,6 @@ final class ExtraParamsProcessor {
 
 	/** Clave expansible para pol&iacute;ticas de firma. */
 	private static final String EXPANDIBLE_POLICY_KEY = "expPolicy"; //$NON-NLS-1$
-
-	/** Valor de la pol&iacute;tica de firma de la AGE. */
-	private static final String EXPANDIBLE_POLICY_VALUE_AGE = "FirmaAGE"; //$NON-NLS-1$
 
 	private ExtraParamsProcessor() {
 		/* Constructor no publico */
@@ -153,41 +151,41 @@ final class ExtraParamsProcessor {
 	 */
 	static void expandPolicyKeys(final Properties p, final byte[] signedData, final String format) {
 		if (p.containsKey(EXPANDIBLE_POLICY_KEY)) {
-			if (EXPANDIBLE_POLICY_VALUE_AGE.equals(p.getProperty(EXPANDIBLE_POLICY_KEY))) {
-				p.setProperty("policyIdentifier", //$NON-NLS-1$
-					"urn:oid:2.16.724.1.3.1.1.2.1.8");  //$NON-NLS-1$
-				p.setProperty("policyIdentifierHashAlgorithm", //$NON-NLS-1$
-					"http://www.w3.org/2000/09/xmldsig#sha1"); //$NON-NLS-1$
-				p.setProperty("policyQualifier", //$NON-NLS-1$
-					"http://administracionelectronica.gob.es/es/ctt/politicafirma/politica_firma_AGE_v1_8.pdf"); //$NON-NLS-1$
 
-				if (format != null && format.startsWith(AOSignConstants.SIGN_FORMAT_XADES)) {
-					p.setProperty("policyIdentifierHash", //$NON-NLS-1$
-						"V8lVVNGDCPen6VELRD1Ja8HARFk=");  //$NON-NLS-1$
+			if (PolicyPropertiesManager.POLICY_ID_AGE.equals(p.getProperty(EXPANDIBLE_POLICY_KEY))) {
 
-					// La firma XAdES conforme a la politica de firma debe ser Detached o Enveloped
-					if (!AOSignConstants.SIGN_FORMAT_XADES_DETACHED.equals(p.getProperty("format")) && //$NON-NLS-1$
-							!AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED.equals(p.getProperty("format"))) { //$NON-NLS-1$
-						p.setProperty("format", //$NON-NLS-1$
-								AOSignConstants.SIGN_FORMAT_XADES_DETACHED);
+				String normalizedFormat = null;
+				if (format != null) {
+					if (format.startsWith(AOSignConstants.SIGN_FORMAT_XADES)) {
+						normalizedFormat = PolicyPropertiesManager.FORMAT_XADES;
+
+						// La firma XAdES conforme a la politica de firma de la AGE debe ser Detached o Enveloped
+						if (!AOSignConstants.SIGN_FORMAT_XADES_DETACHED.equals(p.getProperty("format")) && //$NON-NLS-1$
+								!AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED.equals(p.getProperty("format"))) { //$NON-NLS-1$
+							p.setProperty("format", AOSignConstants.SIGN_FORMAT_XADES_DETACHED); //$NON-NLS-1$
+						}
+					} else if (format.equals(AOSignConstants.SIGN_FORMAT_CADES)) {
+						normalizedFormat = PolicyPropertiesManager.FORMAT_CADES;
+
+						// La politica indica que la firma debe ser implicita siempre que el tamano
+						// del documento sea razonable. Como no se especifica que tamano es razonable
+						// respetaremos el modo indicado por el integrador. En caso de no haberlo
+						// indicado, establecemos el limite en 1Mb. Esto solo aplicaria a CAdES ya que
+						// PAdES siempre es implicita e ignora este parametro.
+						if (!p.containsKey("mode") && signedData != null) { //$NON-NLS-1$
+							p.setProperty("mode", signedData.length < SIZE_1MB ? //$NON-NLS-1$
+									AOSignConstants.SIGN_MODE_IMPLICIT : AOSignConstants.SIGN_MODE_EXPLICIT);
+						}
+					} else if (format.equals(AOSignConstants.SIGN_FORMAT_PDF) ||
+							format.equals(AOSignConstants.SIGN_FORMAT_PADES) ||
+							format.equals(AOSignConstants.SIGN_FORMAT_PDF_TRI)) {
+						normalizedFormat = PolicyPropertiesManager.FORMAT_PADES;
 					}
 				}
-
-				if (format != null && (format.equals(AOSignConstants.SIGN_FORMAT_CADES) ||
-						format.equals(AOSignConstants.SIGN_FORMAT_PDF) ||
-						format.equals(AOSignConstants.SIGN_FORMAT_PADES) ||
-						format.equals(AOSignConstants.SIGN_FORMAT_PDF_TRI))) {
-					p.setProperty("policyIdentifierHash", //$NON-NLS-1$
-						"7SxX3erFuH31TvAw9LZ70N7p1vA=");  //$NON-NLS-1$
-
-					// La politica indica que la firma debe ser implicita siempre que el tamano
-					// del documento sea razonable. Como no se especifica que tamano es razonable
-					// establecemos el limite en 1Mb. Esto solo aplicaria a CAdES ya que PAdES
-					// siempre es implicita e ignora este parametro.
-					if (!p.containsKey("mode") && signedData != null) { //$NON-NLS-1$
-						p.setProperty("mode", signedData.length < SIZE_1MB ? //$NON-NLS-1$
-								AOSignConstants.SIGN_MODE_IMPLICIT : AOSignConstants.SIGN_MODE_EXPLICIT);
-					}
+				try {
+					PolicyPropertiesManager.setProperties(p, PolicyPropertiesManager.POLICY_ID_AGE, normalizedFormat);
+				} catch (final IOException e) {
+					Logger.getLogger("es.gob.afirma").warning("No se han encontrado podido cargar el fichero de propiedades: " + e); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}
 			p.remove(EXPANDIBLE_POLICY_KEY);
