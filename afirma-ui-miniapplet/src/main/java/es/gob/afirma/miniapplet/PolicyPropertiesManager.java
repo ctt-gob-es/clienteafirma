@@ -22,7 +22,11 @@ import es.gob.afirma.core.misc.AOUtil;
  * (para una pol&iacute;tica de firma si se indic&oacute;n, o para cualquiera si no).
  * @author Carlos Gamuci
  */
-public class PolicyPropertiesManager {
+final class PolicyPropertiesManager {
+    
+    private PolicyPropertiesManager() {
+        // No permitimos la instanciacion
+    }
 
 	private static final String POLICIES_FILE = "policy.properties"; //$NON-NLS-1$
 
@@ -58,7 +62,7 @@ public class PolicyPropertiesManager {
 	 * 			usar&aacute;n los gen&eacute;ricos de la pol&iacute;tica.
 	 * @throws IOException Cuando no se encuentra o no puede leerse el fichero de propiedades.
 	 */
-	public static void setProperties(final Properties prop, final String policyId, final String format) throws IOException {
+	static void setProperties(final Properties prop, final String policyId, final String format) throws IOException {
 
 		if (config == null) {
 			loadConfig();
@@ -140,12 +144,4 @@ public class PolicyPropertiesManager {
 		is.close();
 	}
 
-	public static void main(final String[] args) throws IOException {
-		final Properties p = new Properties();
-		setProperties(p, "FirmaAGE", "XAdES");
-
-		for (final String key : p.keySet().toArray(new String[p.size()])) {
-			System.out.println(key + " = " + p.getProperty(key)); //$NON-NLS-1$
-		}
-	}
 }
