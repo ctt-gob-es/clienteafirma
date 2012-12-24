@@ -89,7 +89,7 @@ public final class AOSignerFactory {
                     SIGNERS.put(format[0], (AOSigner) AOUtil.classForName(format[1]).newInstance());
                 }
                 catch(final Exception e) {
-                    LOGGER.severe("No se ha podido instanciar un manejador para el formato de firma '" + format[0] + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+                    LOGGER.warning("No se ha podido instanciar un manejador para el formato de firma '" + format[0] + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
                     continue;
                 }
             }
