@@ -1,6 +1,5 @@
 package es.gob.afirma.ui.core.jse;
 
-import java.awt.Component;
 import java.awt.FileDialog;
 import java.awt.Frame;
 import java.io.File;
@@ -8,8 +7,6 @@ import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.lang.reflect.Method;
-
-import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Platform;
@@ -29,16 +26,25 @@ public final class AWTUIManager extends JSEUIManager {
 			                   final String[] exts,
 			                   final String description,
 			                   final Object parent) throws IOException {
-    	final FileDialog fd = new FileDialog(parent instanceof Frame ? (Frame) parent : null, dialogTitle, FileDialog.SAVE);
 
-        // El metodo setSelectedFile determina tambien el directorio actual, asi que lo usamos cuando
+        final FileDialog fd = new FileDialog(
+             parent instanceof Frame ? (Frame) parent : null, // Padre 
+             dialogTitle, // Titulo
+             FileDialog.SAVE // Tipo
+        );
+
+        // En Windows, el metodo setSelectedFile determina tambien el directorio actual, asi que lo usamos cuando
         // se indica el nombre de fichero
-        if (selectedFile != null && currentDir != null) {
+        if (selectedFile != null && currentDir != null && Platform.OS.WINDOWS.equals(Platform.getOS())) {
         	fd.setFile(new File(currentDir, selectedFile).getAbsolutePath());
-        } else if (selectedFile != null) {
-        	fd.setFile(selectedFile);
-        } else if (currentDir != null) {
-        	fd.setDirectory(currentDir);
+        } 
+        else {
+            if (selectedFile != null) {
+                fd.setFile(selectedFile);
+            } 
+            if (currentDir != null) {
+                fd.setDirectory(currentDir);
+            }
         }
 
     	if (exts != null) {
@@ -65,22 +71,11 @@ public final class AWTUIManager extends JSEUIManager {
         else {
         	throw new AOCancelledOperationException();
         }
-
-        try {
-        	final FileOutputStream fos = new FileOutputStream(file);
-            fos.write(data);
-            fos.flush();
-            fos.close();
-        }
-        catch (final Exception ex) {
-            LOGGER.warning("No se pudo guardar la informacion en el fichero indicado: " + ex); //$NON-NLS-1$
-            JOptionPane.showMessageDialog(
-        		parent instanceof Component ? (Component) parent : null,
-                JSEUIMessages.getString("JSEUIManager.88"), //$NON-NLS-1$
-                JSEUIMessages.getString("JSEUIManager.89"), //$NON-NLS-1$
-                JOptionPane.ERROR_MESSAGE
-            );
-        }
+        
+    	final FileOutputStream fos = new FileOutputStream(file);
+        fos.write(data);
+        fos.flush();
+        fos.close();
 
         return file;
     }

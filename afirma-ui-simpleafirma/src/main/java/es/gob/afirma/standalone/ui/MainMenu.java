@@ -340,6 +340,7 @@ public final class MainMenu extends JMenuBar {
         if (this.abrirMenuItem != null) {
             this.abrirMenuItem.setEnabled(en);
         }
+        setEnabledFileMenu(en);
     }
 
     /** Habilita o deshabilita el elemento de men&uacute; de firma de fichero.

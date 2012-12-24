@@ -41,7 +41,7 @@ public final class FileUIManager {
 	    	return AOUIFactory.getSaveDataToFile(
 				data,
 				title,
-				currentDir.getAbsolutePath(),
+				currentDir != null ? currentDir.getAbsolutePath() : null,
 				filename,
 				exts,
 				description,
