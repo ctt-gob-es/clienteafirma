@@ -410,10 +410,10 @@ public final class AOXAdESSigner implements AOSigner {
      *    </ul>
      *   </dd>
      *  <dt><b><i>policyIdentifier</i></b></dt>
-     *   <dd>Identificador de la pol&iacute;tica de firma (normalmente una URL hacia la pol&iacute;tica en formato XML procesable)</dd>
+     *   <dd>Identificador de la pol&iacute;tica de firma (normalmente una URL hacia la pol&iacute;tica en formato XML procesable o una URN de tipo OID)</dd>
      *  <dt><b><i>policyIdentifierHash</i></b></dt>
      *   <dd>
-     *    Huella digital del documento de pol&iacute;tica de firma (normlamente del mismo fichero en formato XML procesable).
+     *    Huella digital del documento de pol&iacute;tica de firma (normalmente del mismo fichero en formato XML procesable).
      *    Si no se indica, es obligatorio que el par&aacute;metro <code>policyIdentifier</code> sea una URL accesible universalmente
      *   </dd>
      *  <dt><b><i>policyIdentifierHashAlgorithm</i></b></dt>
