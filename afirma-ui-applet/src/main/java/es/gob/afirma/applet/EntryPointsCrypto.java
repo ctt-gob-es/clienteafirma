@@ -2532,17 +2532,32 @@ interface EntryPointsCrypto {
     // *******************************************************************/
 
     /** Establece la pol&iacute;tica que debe aplicarse a las firmas que se
-     * realicen. Se usa para la generaci&oacute;n de firmas avanzadas EPES. <br>
-     * Para el correcto establecimiento de estos par&aacute;metros consulte detenidamente
-     * la documentaci&oacute;n de la pol&iacute;tica de firma que desee establecer.</br>
-     * <br>
+     * realicen. Se usa para la generaci&oacute;n de firmas avanzadas EPES.
+     * <p>
+     *  Para el correcto establecimiento de estos par&aacute;metros consulte detenidamente
+     *  la documentaci&oacute;n de la pol&iacute;tica de firma que desee establecer.
+     * </p>
+     * <p>
+     *  Un ejemplo de esteblecimiento de la pol&iacute;tica de firma de la AGE en su versi&oacute;n
+     *  1.8 podr&iacute;a ser:
+     * </p>
+     * <p>
+     *  <pre>
+     *   setPolicy(
+     *     "urn:oid:2.16.724.1.3.1.1.2.1.8", // Identificador (URN de tipo OID)
+     *     "Politica de firma electronica para las Administraciones Publicas en Espana", // Descripcion
+     *     "http://administracionelectronica.gob.es/es/ctt/politicafirma/politica_firma_AGE_v1_8.pdf", // Calificador
+     *     "V8lVVNGDCPen6VELRD1Ja8HARFk=", // Huella digital en Base64
+     *   );
+     *  </pre>
+     * </p>
      * Sets the policy for signatures. Used for the generation of EPES advanced
      * signatures.
      * @param identifier
-     *        Identificador de la pol&iacute;tica de firma. Normalmente una para
-     *        firmas XAdES es una URL hacia la descripci&oacute;n
-     *        formal de la pol&iacute;tica en formato XML o ASN.1 y para firmas
-     *        CAdES y PAdES es un OID o una URN de tipo OID (por
+     *        Identificador de la pol&iacute;tica de firma.<br>
+     *        Normalmente una para firmas XAdES es una URL hacia la descripci&oacute;n
+     *        formal de la pol&iacute;tica en formato XML o ASN.1 o una URN de tipo OID.<br>
+     *        Para firmas CAdES y PAdES debe ser un OID o una URN de tipo OID (por
      *        ejemplo "urn:oid:2.16.724.1.3.2.2.3.1").<br>
      *        Signature policy identifier
      * @param description
@@ -2550,7 +2565,7 @@ interface EntryPointsCrypto {
      *        Policy description.
      * @param qualifier
      *        URL calificadora de la pol&iacute;tica de firma (normalmente
-     *        una URL hacia el documento que describe la pol&iacute;tica)<br>
+     *        una URL hacia el documento que describe la pol&iacute;tica).<br>
      *        Policy qualifier.
      * @param hashB64
      * 		  Huella digital SHA-1 en Base64 de la pol&iacute;tica de firma.
