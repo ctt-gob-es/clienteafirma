@@ -57,8 +57,8 @@ final class AOSecMod {
         final String libName = new String(secmoddb, namesRunningOffset + 2, len);
 
         if (
-        		(Platform.OS.WINDOWS.equals(Platform.getOS()) && (libName.endsWith(".DLL") || libName.endsWith(".dll"))) || //$NON-NLS-1$ //$NON-NLS-2$
-        		(!Platform.OS.WINDOWS.equals(Platform.getOS()) && (libName.endsWith(".so") || libName.contains(".so.") || libName.endsWith(".dylib"))) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        		Platform.OS.WINDOWS.equals(Platform.getOS()) && (libName.endsWith(".DLL") || libName.endsWith(".dll")) || //$NON-NLS-1$ //$NON-NLS-2$
+        		!Platform.OS.WINDOWS.equals(Platform.getOS()) && (libName.endsWith(".so") || libName.contains(".so.") || libName.endsWith(".dylib")) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		) {
 
             // namesRunningOffset += len + 2;
@@ -121,8 +121,6 @@ final class AOSecMod {
                     if (!libs.contains(module.getLib())) {
                         libs.add(module.getLib());
                         modules.add(module);
-                        // Logger.getLogger("es.gob.afirma").info("La busqueda manual sobre Mozilla secmod.db ha encontrado el siguiente modulo: "
-                        // + module);
                     }
                 }
                 catch (final Exception e) {
@@ -176,7 +174,7 @@ final class AOSecMod {
      *        octetos
      * @return N&ueacute;mero entero de 16 bits (sin signo) */
     private static int getShort(final byte[] src, final int offset) {
-        return (((src)[offset + 0] << 8) | (src)[offset + 1]);
+        return src[offset + 0] << 8 | src[offset + 1];
     }
 
     /** Busca un fichero (o una serie de ficheros) en el PATH del sistema. Deja
@@ -204,7 +202,7 @@ final class AOSecMod {
             File tmpFile;
             for (final String f : files) {
                 tmpFile = new File(libPath + f);
-                if (tmpFile.exists() && (!tmpFile.isDirectory())) {
+                if (tmpFile.exists() && !tmpFile.isDirectory()) {
                     return libPath + f;
                 }
             }
