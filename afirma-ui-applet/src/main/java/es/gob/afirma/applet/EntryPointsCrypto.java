@@ -2547,7 +2547,7 @@ interface EntryPointsCrypto {
      *     "urn:oid:2.16.724.1.3.1.1.2.1.8", // Identificador (URN de tipo OID)
      *     "Politica de firma electronica para las Administraciones Publicas en Espana", // Descripcion
      *     "http://administracionelectronica.gob.es/es/ctt/politicafirma/politica_firma_AGE_v1_8.pdf", // Calificador
-     *     "V8lVVNGDCPen6VELRD1Ja8HARFk=", // Huella digital en Base64
+     *     "V8lVVNGDCPen6VELRD1Ja8HARFk=" // Huella digital en Base64
      *   );
      *  </pre>
      * </p>
