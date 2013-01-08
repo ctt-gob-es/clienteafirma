@@ -105,7 +105,7 @@ import es.gob.afirma.signers.cms.AOCMSSigner;
 public final class SignApplet extends JApplet implements EntryPointsCrypto, EntryPointsUtil {
 
 	/** Estado del  modo DEBUG. Mantener a {@code false} en la compilaci&oacute;n final. */
-	private static final boolean DEBUG = true;
+	private static final boolean DEBUG = false;
 
 	private static final String CR = "\n"; //$NON-NLS-1$
 
@@ -934,10 +934,20 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 			return;
 		}
 
-		if (!checkUserPermision(AppletMessages.getString("SignApplet.19") + CR + uri + //$NON-NLS-1$
-				CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
-			setError(AppletMessages.getString("SignApplet.494", uri)); //$NON-NLS-1$
-			return;
+		// En caso de que se intente acceder a un host distinto del que se ha descargado el applet,
+		// incluso si es el equipo local, se pide confirmacion al usuario.
+		try {
+			if (!getCodeBase().getHost().equals(AOUtil.createURI(uri).getHost()) &&
+					!checkUserPermision(AppletMessages.getString("SignApplet.19") + CR + uri + //$NON-NLS-1$
+							CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
+				setError(AppletMessages.getString("SignApplet.494", uri)); //$NON-NLS-1$
+				return;
+			}
+		} catch (final URISyntaxException e) {
+			// Si la URI es erronea lo obviamos para evitar que el integrador tenga que hacer la comprobacion
+			// de error despues de este set (rompiendo compatibilidad con despliegues previos). El problema
+			// se detectara durante la operacion con el recurso.
+			LOGGER.warning("La URI proporcionada no es valida (" + uri + "): " + e); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		this.fileUri = uri;
@@ -959,10 +969,20 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 		}
 
 
-		if (!checkUserPermision(AppletMessages.getString("SignApplet.19") + CR + uri + //$NON-NLS-1$
-				CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
-			setError(AppletMessages.getString("SignApplet.494", uri)); //$NON-NLS-1$
-			return;
+		// En caso de que se intente acceder a un host distinto del que se ha descargado el applet,
+		// incluso si es el equipo local, se pide confirmacion al usuario.
+		try {
+			if (!getCodeBase().getHost().equals(AOUtil.createURI(uri).getHost()) &&
+					!checkUserPermision(AppletMessages.getString("SignApplet.19") + CR + uri + //$NON-NLS-1$
+							CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
+				setError(AppletMessages.getString("SignApplet.494", uri)); //$NON-NLS-1$
+				return;
+			}
+		} catch (final URISyntaxException e) {
+			// Si la URI es erronea lo obviamos para evitar que el integrador tenga que hacer la comprobacion
+			// de error despues de este set (rompiendo compatibilidad con despliegues previos). El problema
+			// se detectara durante la operacion con el recurso.
+			LOGGER.warning("La URI proporcionada no es valida (" + uri + "): " + e); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		this.fileUri = uri;
@@ -1022,10 +1042,20 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 			return;
 		}
 
-		if (!checkUserPermision(AppletMessages.getString("SignApplet.33") + CR + filename + //$NON-NLS-1$
-				CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
+		// En caso de que se intente acceder a un host distinto del que se ha descargado el applet,
+		// incluso si es el equipo local, se pide confirmacion al usuario.
+		try {
+			if (!getCodeBase().getHost().equals(AOUtil.createURI(filename).getHost()) &&
+					!checkUserPermision(AppletMessages.getString("SignApplet.33") + CR + filename + //$NON-NLS-1$
+							CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
 				setError(AppletMessages.getString("SignApplet.494", filename)); //$NON-NLS-1$
-			return;
+				return;
+			}
+		} catch (final URISyntaxException e) {
+			// Si la URI es erronea lo obviamos para evitar que el integrador tenga que hacer la comprobacion
+			// de error despues de este set (rompiendo compatibilidad con despliegues previos). El problema
+			// se detectara durante la operacion con el recurso.
+			LOGGER.warning("La URI proporcionada no es valida (" + filename + "): " + e); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		try {
@@ -3081,8 +3111,8 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 					is = AOUtil.loadFile(AOUtil.createURI(SignApplet.this.getInternalFileUri()));
 				}
 				catch (final Exception e) {
+					getLogger().severe("Error al leer el fichero '" + SignApplet.this.getInternalFileUri() + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
 					setError(AppletMessages.getString("SignApplet.85")); //$NON-NLS-1$
-					getLogger().severe(e.toString());
 					return null;
 				}
 				final byte[] binaryData;
