@@ -10,6 +10,7 @@
 
 package es.gob.afirma.standalone.ui;
 
+import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -92,6 +93,7 @@ public final class DNIeWaitPanel extends JPanel implements KeyListener {
 
         // Imagen central
         final JSVGCanvas vectorDNIeHelpPicture = new JSVGCanvas();
+        vectorDNIeHelpPicture.setBackground(new Color(255, 255, 255, 0));
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         try {

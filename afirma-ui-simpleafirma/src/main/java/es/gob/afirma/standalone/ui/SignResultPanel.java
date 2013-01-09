@@ -58,6 +58,7 @@ final class SignResultPanel extends JPanel {
         this.descTextLabel.setContentType("text/html"); //$NON-NLS-1$
 
         final JSVGCanvas resultOperationIcon = new JSVGCanvas();
+        resultOperationIcon.setBackground(new Color(255, 255, 255, 0));
         resultOperationIcon.setFocusable(false);
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
