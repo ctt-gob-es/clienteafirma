@@ -105,7 +105,7 @@ import es.gob.afirma.signers.cms.AOCMSSigner;
 public final class SignApplet extends JApplet implements EntryPointsCrypto, EntryPointsUtil {
 
 	/** Estado del  modo DEBUG. Mantener a {@code false} en la compilaci&oacute;n final. */
-	private static final boolean DEBUG = false;
+	private static final boolean DEBUG = true;
 
 	private static final String CR = "\n"; //$NON-NLS-1$
 
