@@ -18,19 +18,13 @@ public class StorageConfig {
 	private static final String TMP_DIR_KEY =  "tmpDir"; //$NON-NLS-1$
 
 	/** Directorio temporal por defecto. */
-	private static final String DEFAULT_TMP_DIR = System.getProperty("java.io.tmpdir"); //$NON-NLS-1$
+	private static final String DEFAULT_TMP_DIR = System.getProperty("java.io.tmpdir") + File.separator + "afirma"; //$NON-NLS-1$ //$NON-NLS-2$
 
 	/** Clave para la configuraci&oacute;n del tiempo de caducidad de los ficheros temporales. */
 	private static final String EXPIRATION_TIME_KEY =  "expTime"; //$NON-NLS-1$
 
 	/** Milisegundos que, por defecto, tardan los mensajes en caducar. */
 	private static final long DEFAULT_EXPIRATION_TIME = 5000; // 5 segundos
-
-	/** Clave para la configuraci&oacute;n del tiempo m&iacute;nimo entre proceso de limpieza del directorio temporal. */
-	private static final String REMOVE_PROCESS_INTERVAL_KEY = "remInt"; //$NON-NLS-1$
-
-	/** Milisegundos que, por defecto, deben trascurrir entre cada proceso de limpieza del directorio temporal. */
-	private static final long DEFAULT_REMOVE_PROCESS_INTERVAL = 60000; // 1 minuto
 
 	private final ServletContext context;
 
@@ -84,21 +78,6 @@ public class StorageConfig {
 		} catch (final Exception e) {
 			Logger.getLogger("es.gob.afirma").warning("Tiempo de expiracion invalido en el fichero de configuracion, se usara" + DEFAULT_EXPIRATION_TIME); //$NON-NLS-1$ //$NON-NLS-2$
 			return DEFAULT_EXPIRATION_TIME;
-		}
-	}
-
-	/**
-	 * Recupera el tiempo que debe transcurrir como m&iacute;nimo entre cada proceso de limpieza del
-	 * directorio temporal.
-	 * @return Tiempo m&iacute;nimo en milisegundos que debe transcurrir entre cada proceso de limpieza.
-	 */
-	public long getRemoveProcessInterval() {
-		try {
-			return this.config.containsKey(REMOVE_PROCESS_INTERVAL_KEY) ?
-					Long.parseLong(this.config.getProperty(REMOVE_PROCESS_INTERVAL_KEY)) : DEFAULT_REMOVE_PROCESS_INTERVAL;
-		} catch (final Exception e) {
-			Logger.getLogger("es.gob.afirma").warning("Intervalor de proceso invalido en el fichero de configuracion, se usara" + DEFAULT_REMOVE_PROCESS_INTERVAL); //$NON-NLS-1$ //$NON-NLS-2$
-			return DEFAULT_REMOVE_PROCESS_INTERVAL;
 		}
 	}
 }

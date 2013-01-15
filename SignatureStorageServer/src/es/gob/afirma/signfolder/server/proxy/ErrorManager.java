@@ -29,7 +29,9 @@ final class ErrorManager {
 	static final String ERROR_INVALID_CIPHER_KEY         = "ERR-15"; //$NON-NLS-1$
 	static final String ERROR_CIPHERING			         = "ERR-16"; //$NON-NLS-1$
 	static final String ERROR_NO_CERT_SELECTED			 = "ERR-17"; //$NON-NLS-1$
-
+	static final String ERROR_COMMUNICATING_WITH_WEB	 = "ERR-18"; //$NON-NLS-1$
+	static final String ERROR_CONFIGURATION_FILE_PROBLEM = "ERR-19"; //$NON-NLS-1$
+	static final String ERROR_MISSING_SYNTAX_VERSION	 = "ERR-20"; //$NON-NLS-1$
 
 	private static final Dictionary<String, String> ERRORS = new Hashtable<String, String>();
 	static {
@@ -51,6 +53,9 @@ final class ErrorManager {
 		ERRORS.put(ERROR_INVALID_CIPHER_KEY, "La clave de cifrado proporcionada no es valida"); //$NON-NLS-1$
 		ERRORS.put(ERROR_CIPHERING, "Error durante el proceso de cifrado de los datos"); //$NON-NLS-1$
 		ERRORS.put(ERROR_NO_CERT_SELECTED, "El usuario no seleccion\u00F3 ning\u00FAn certificado "); //$NON-NLS-1$
+		ERRORS.put(ERROR_COMMUNICATING_WITH_WEB, "No se ha podido enviar la firma generada a la web de origen"); //$NON-NLS-1$
+		ERRORS.put(ERROR_CONFIGURATION_FILE_PROBLEM, "Error de configuraci\u00F3n de la aplicaci\u00F3n"); //$NON-NLS-1$
+		ERRORS.put(ERROR_MISSING_SYNTAX_VERSION, "No se ha indicado la versi\u00F3n de la sintaxis de la operaci\u00F3n"); //$NON-NLS-1$
 	}
 
 	private ErrorManager() {
