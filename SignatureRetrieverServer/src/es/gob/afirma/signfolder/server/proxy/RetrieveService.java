@@ -25,33 +25,21 @@ public final class RetrieveService extends HttpServlet {
 	/** Fichero de configuraci&oacute;n. */
 	private static final String CONFIG_FILE = "/configuration.properties"; //$NON-NLS-1$
 
-	/** Juego de carateres UTF-8. */
-	private static final String UTF8 = "utf-8"; //$NON-NLS-1$
-
-	private static final String TMP_DIR = System.getProperty("java.io.tmpdir") + File.separator + "afirma"; //$NON-NLS-1$ //$NON-NLS-2$
-
-	private static final String ERROR_PREFIX = "err-"; //$NON-NLS-1$
-
+	/** Nombre del par&aacute;metro con la operaci&oacute;n realizada. */
 	private static final String PARAMETER_NAME_OPERATION = "op"; //$NON-NLS-1$
-	private static final String PARAMETER_NAME_DATA = "dat"; //$NON-NLS-1$
-	private static final String PARAMETER_NAME_ID = "id"; //$NON-NLS-1$
-	private static final String PARAMETER_NAME_CIPHER_KEY = "key"; //$NON-NLS-1$
 
-	/** Parametro para indicar la versiond el protocolo utilizado */
-	private static final String PARAMETER_NAME_VERSION = "v"; //$NON-NLS-1$
+	/** Nombre del par&aacute;metro con el identificador del fichero temporal. */
+	private static final String PARAMETER_NAME_ID = "id"; //$NON-NLS-1$
+
+	/** Nombre del par&aacute;metro con la versi&oacute;n de la sintaxis de petici&oacute; utilizada. */
+	private static final String PARAMETER_NAME_SYNTAX_VERSION = "v"; //$NON-NLS-1$
 
 	private static final String OPERATION_RETRIEVE = "get"; //$NON-NLS-1$
-
-	private static final String SUCCESS = "OK"; //$NON-NLS-1$
-
-	/** Sem&aacute;foro para evitar procesos de limpieza demasiado asiduos. */
-	private static final Object removeProcessBlocker = new Integer(0);
-
-	private static long lastRemoveDate = System.currentTimeMillis();
 
 	@Override
 	protected void service(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
 		final String operation = request.getParameter(PARAMETER_NAME_OPERATION);
+		final String syntaxVersion = request.getParameter(PARAMETER_NAME_SYNTAX_VERSION);
 		response.setContentType("text/plain"); //$NON-NLS-1$
 		response.setCharacterEncoding("iso-8859-15"); //$NON-NLS-1$
 
@@ -60,15 +48,18 @@ public final class RetrieveService extends HttpServlet {
 				out.println(ErrorManager.genError(ErrorManager.ERROR_MISSING_OPERATION_NAME, null));
 				return;
 			}
-
-			System.out.println("Cargamos el fichero de propiedades");
-
-			final RetrieveConfig config = new RetrieveConfig(this.getServletContext());
-			config.load(CONFIG_FILE);
-
-			System.out.println("Hemos cargado el fichero de propiedades");
-
-			System.out.println("Directorio temporal: " + config.getTempDir());
+			if (syntaxVersion == null) {
+				out.println(ErrorManager.genError(ErrorManager.ERROR_MISSING_SYNTAX_VERSION, null));
+				return;
+			}
+			final RetrieveConfig config;
+			try {
+				config = new RetrieveConfig(this.getServletContext());
+				config.load(CONFIG_FILE);
+			} catch (final IOException e) {
+				out.println(ErrorManager.genError(ErrorManager.ERROR_CONFIGURATION_FILE_PROBLEM, null));
+				return;
+			}
 
 			switch(operation) {
 			case OPERATION_RETRIEVE:
@@ -88,13 +79,6 @@ public final class RetrieveService extends HttpServlet {
 	 */
 	private static void retrieveSign(final PrintWriter out, final HttpServletRequest request, final RetrieveConfig config) throws IOException {
 
-		Logger.getLogger("es.gob.afirma").info("Se va a recuperar la respuesta.");
-		final StringBuilder sb = new StringBuilder("Parametros:\n");
-		for (final String key : request.getParameterMap().keySet().toArray(new String[request.getParameterMap().size()])) {
-			sb.append(key).append(": ").append(request.getParameter(key)).append("\n");
-		}
-		Logger.getLogger("es.gob.afirma").info(sb.toString());
-
 		final String id = request.getParameter(PARAMETER_NAME_ID);
 		if (id == null) {
 			out.println(ErrorManager.genError(ErrorManager.ERROR_MISSING_DATA_ID, null));
@@ -102,75 +86,49 @@ public final class RetrieveService extends HttpServlet {
 		}
 		final File inFile = new File(config.getTempDir(), request.getRemoteAddr().replace(":", "_") + "-" + id); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-		Logger.getLogger("es.gob.afirma").info("Recuperamos de: " + inFile.getAbsolutePath());
-
-//		try(final InputStream fis = new FileInputStream(inFile);) {
-//			byte[] data = AOUtil.getDataFromInputStream(fis);
-//
-//			Logger.getLogger("es.gob.afirma").info("Datos cifrados recogidos (mostrados en Base64): " + Base64.encode(data));
-//			Logger.getLogger("es.gob.afirma").info("Devolvemos en hexadecimal el Base64 del mensaje cifrado: " + AOUtil.hexify(data, false));
-//			out.println(AOUtil.hexify(data, false));
-//
-//			fis.close();
-//			data = null;
-//		}
-//		catch (final FileNotFoundException e) {
-//			out.println(ErrorManager.genError(ErrorManager.ERROR_INVALID_DATA_ID, null));
-//			return;
-//		}
-//		catch (final IOException e) {
-//			out.println(ErrorManager.genError(ErrorManager.ERROR_INVALID_DATA, null));
-//		}
-//
-//		inFile.delete();
-
-
-
-//		// Cuando se sobrepase el tiempo minimo de espera entre procesos de limpieza, se realizara un
-//		// proceso de limpieza. Se tendra en cuenta que durante este tiempo es posible que se soliciten
-//		// nuevos procesos. Se registran los tiempos de inicio y fin del proceso de limpieza
-//		//TODO: Revisar
-//		if ((System.currentTimeMillis() - lastRemoveDate) > config.getRemoveProcessInterval()) {
-//			synchronized (removeProcessBlocker) {
-//				if (System.currentTimeMillis() - lastRemoveDate > config.getRemoveProcessInterval()) {
-//					lastRemoveDate = System.currentTimeMillis();
-//					removeExpiredFiles(config);
-//					lastRemoveDate = System.currentTimeMillis();
-//				}
-//			}
-//		}
-
 		// No hacemos distincion si el archivo no existe, no es un fichero, no puede leerse o ha caducado
 		// para evitar que un atacante conozca su situacion. Lo borramos despuest de usarlo
-		if (!inFile.exists() || !inFile.isFile() || !inFile.canRead()) {
+		if (!inFile.exists() || !inFile.isFile() || !inFile.canRead() || isExpired(inFile, config.getExpirationTime())) {
 			out.println(ErrorManager.genError(ErrorManager.ERROR_INVALID_DATA_ID, null));
 			if (inFile.exists() && inFile.isFile()) {
 				inFile.delete();
 			}
-			return;
+		}
+		else {
+			try (final InputStream fis = new FileInputStream(inFile)) {
+				out.println(new String(getDataFromInputStream(fis)));
+			}
+			catch (final IOException e) {
+				out.println(ErrorManager.genError(ErrorManager.ERROR_INVALID_DATA, null));
+				return;
+			}
+			inFile.delete();
 		}
 
-		try (final InputStream fis = new FileInputStream(inFile)) {
-			out.println(new String(getDataFromInputStream(fis)));
-		}
-		catch (final IOException e) {
-			out.println(ErrorManager.genError(ErrorManager.ERROR_INVALID_DATA, null));
-			return;
-		}
-		inFile.delete();
+		// Antes de salir revisamos todos los ficheros y eliminamos los caducados.
+		removeExpiredFiles(config);
 	}
 
 	/**
 	 * Elimina del directorio temporal todos los ficheros que hayan sobrepasado el tiempo m&aacute;ximo
-	 * de vida para los ficheros.
+	 * de vida configurado.
 	 * @param config Opciones de configuraci&oacute;n de la operaci&oacute;n.
 	 */
 	private static void removeExpiredFiles(final RetrieveConfig config) {
 		for (final File file : config.getTempDir().listFiles()) {
-			if (System.currentTimeMillis() - file.lastModified() > config.getExpirationTime()) {
-				file.delete();
+			try {
+				if (file.exists() && file.isFile() && isExpired(file, config.getExpirationTime())) {
+					Logger.getLogger("es.gob.afirma").info("Eliminamos el fichero caducado: " + file.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
+					file.delete();
+				}
+			} catch(final Exception e) {
+				// Ignoramos cualquier error suponiendo que el fichero ha sido eliminado por otro hilo
 			}
 		}
+	}
+
+	private static boolean isExpired(final File file, final long expirationTimeLimit) {
+		return System.currentTimeMillis() - file.lastModified() > expirationTimeLimit;
 	}
 
 	private static final int BUFFER_SIZE = 4096;
