@@ -1,3 +1,13 @@
+/*
+ * Este fichero forma parte del Cliente @firma.
+ * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
+ * y descargado desde www.ctt.map.es.
+ * Copyright 2009,2010,2011 Gobierno de Espana
+ * Este fichero se distribuye bajo  bajo licencia GPL version 2  segun las
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
+ * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
+ */
+
 package es.gob.afirma.ui.core.jse;
 
 import java.awt.FileDialog;
@@ -28,7 +38,7 @@ public final class AWTUIManager extends JSEUIManager {
 			                   final Object parent) throws IOException {
 
         final FileDialog fd = new FileDialog(
-             parent instanceof Frame ? (Frame) parent : null, // Padre 
+             parent instanceof Frame ? (Frame) parent : null, // Padre
              dialogTitle, // Titulo
              FileDialog.SAVE // Tipo
         );
@@ -37,11 +47,11 @@ public final class AWTUIManager extends JSEUIManager {
         // se indica el nombre de fichero
         if (selectedFile != null && currentDir != null && Platform.OS.WINDOWS.equals(Platform.getOS())) {
         	fd.setFile(new File(currentDir, selectedFile).getAbsolutePath());
-        } 
+        }
         else {
             if (selectedFile != null) {
                 fd.setFile(selectedFile);
-            } 
+            }
             if (currentDir != null) {
                 fd.setDirectory(currentDir);
             }
@@ -71,7 +81,7 @@ public final class AWTUIManager extends JSEUIManager {
         else {
         	throw new AOCancelledOperationException();
         }
-        
+
     	final FileOutputStream fos = new FileOutputStream(file);
         fos.write(data);
         fos.flush();
