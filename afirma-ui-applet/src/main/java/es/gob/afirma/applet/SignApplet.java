@@ -116,6 +116,8 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 	/** N&uacute;meto de puerto por defecto para la conexi&oacute;n LDAP. */
 	private static final int DEFAULT_LDAP_PORT = 389;
 
+	private static final String EXTRAPARAM_KEY_MIMETYPE = "mimeType"; //$NON-NLS-1$
+
 	/** Logger para la visualizaci&oacute;n de los mensajes por consola. */
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -363,12 +365,6 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 		this.electronicSignatureFile = uri;
 	}
 
-	/** MimeType obtenido de los datos proporcionados. */
-	private String dataMimeType = MimeHelper.DEFAULT_MIMETYPE;
-
-	/** MimeType establecido externamente para incorporar a la firma. */
-	private String extMimeType = null;
-
 	/** Listado de atributos firmados que se deben agregar a una firma. */
 	private Map<String, String> signedAttributes = null;
 
@@ -482,8 +478,6 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 		this.ldapServerUrl = null;
 		this.ldapServerPort = DEFAULT_LDAP_PORT;
 		this.ldapCertificatePrincipal = null;
-		this.dataMimeType = MimeHelper.DEFAULT_MIMETYPE;
-		this.extMimeType = null;
 		this.signersToCounterSign = new String[0];
 		this.hashesToSign = null;
 		this.massiveOperation = MassiveType.SIGN;
@@ -1014,7 +1008,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 			LOGGER.warning("El hash insertado no esta en Base64: " + e); //$NON-NLS-1$
 			SignApplet.this.hash = null;
 		}
-		SignApplet.this.dataMimeType = MimeHelper.DEFAULT_MIMETYPE;
+		SignApplet.this.genericConfig.setProperty(EXTRAPARAM_KEY_MIMETYPE, MimeHelper.DEFAULT_MIMETYPE);
 		SignApplet.this.fileUri = null;
 		SignApplet.this.fileBase64 = false;
 		SignApplet.this.data = null;
@@ -1819,12 +1813,10 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 	}
 
 	void configureDataTypeExtraParams(final Properties extraParams) {
-		final String mimeType = SignApplet.this.extMimeType != null ? SignApplet.this.extMimeType : SignApplet.this.dataMimeType;
-		if (mimeType != null) {
-			extraParams.setProperty("mimeType", mimeType); //$NON-NLS-1$
+		if (extraParams.containsKey(EXTRAPARAM_KEY_MIMETYPE)) {
 			final String oid;
 			try {
-				oid = MimeHelper.transformMimeTypeToOid(mimeType);
+				oid = MimeHelper.transformMimeTypeToOid(extraParams.getProperty(EXTRAPARAM_KEY_MIMETYPE));
 			} catch (final IOException e) {
 				getLogger().warning("No se ha podido identificar el OID asociado el MimeType de los datos: " + e); //$NON-NLS-1$
 				return;
@@ -2295,8 +2287,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 			tempData = this.data;
 		}
 
-		// Si la entrada son datos o un fichero lo analizamos
-		if (this.data != null || this.fileUri != null) {
+		// Si no se nos ha establecido el MimeType y la entrada son datos o un fichero lo analizamos
+		// para identificarlo
+		if (!this.genericConfig.containsKey(EXTRAPARAM_KEY_MIMETYPE) & (this.data != null || this.fileUri != null)) {
 			try {
 				analizeMimeType(tempData);
 			} catch (final IOException e) {
@@ -2324,7 +2317,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 		// Intentamos extraer el mimetype y su descripcion
 		if (dataContent != null) {
 			final MimeHelper mtHelper = new MimeHelper(dataContent);
-			this.dataMimeType = mtHelper.getMimeType();
+			this.genericConfig.setProperty(EXTRAPARAM_KEY_MIMETYPE, mtHelper.getMimeType());
 		}
 	}
 
@@ -3964,12 +3957,15 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
 	/** {@inheritDoc} */
 	@Override
-	public void setDataMimeType(final String mimetype) {
-		LOGGER.info("Invocando setDataMimeType: " + mimetype); //$NON-NLS-1$
-		if (mimetype == null || mimetype.length() == 0) {
-			this.extMimeType = MimeHelper.DEFAULT_MIMETYPE;
+	public void setDataMimeType(final String mimeType) {
+		LOGGER.info("Invocando setDataMimeType: " + mimeType); //$NON-NLS-1$
+
+		if (mimeType != null && mimeType.length() > 0) {
+			this.genericConfig.setProperty(EXTRAPARAM_KEY_MIMETYPE, mimeType);
 		}
-		this.extMimeType = mimetype;
+		else {
+			this.genericConfig.remove(EXTRAPARAM_KEY_MIMETYPE);
+		}
 	}
 
 	/** {@inheritDoc} */
