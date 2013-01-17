@@ -160,6 +160,7 @@ public final class MassiveSignatureHelper {
         }
 
         final Properties config = (Properties) this.massiveConfiguration.getExtraParams().clone(); // Configuracion
+
         config.setProperty("headLess", Boolean.toString(true));  //$NON-NLS-1$
         byte[] signData = null; // Firma resultante
 
@@ -394,10 +395,17 @@ public final class MassiveSignatureHelper {
         if (CADES_SIGNER.equals(signerClassName) ||
         		XADES_SIGNER.equals(signerClassName) ||
         		XMLDSIG_SIGNER.equals(signerClassName)) {
-            final MimeHelper mimeHelper = new MimeHelper(data);
-            final String mimeType = mimeHelper.getMimeType();
-            if (mimeType != null) {
-            	config.setProperty("mimeType", mimeType); //$NON-NLS-1$
+
+        	final String mimeType;
+        	if (config.containsKey("mimeType")) { //$NON-NLS-1$
+        		mimeType = config.getProperty("mimeType"); //$NON-NLS-1$
+        	} else {
+        		final MimeHelper mimeHelper = new MimeHelper(data);
+        		mimeType = mimeHelper.getMimeType();
+        		config.setProperty("mimeType", mimeType); //$NON-NLS-1$
+        	}
+
+        	if (!config.containsKey("contentTypeOid")) { //$NON-NLS-1$
             	final String dataOid = MimeHelper.transformMimeTypeToOid(mimeType);
             	if (dataOid != null) {
             		config.setProperty("contentTypeOid", dataOid); //$NON-NLS-1$
