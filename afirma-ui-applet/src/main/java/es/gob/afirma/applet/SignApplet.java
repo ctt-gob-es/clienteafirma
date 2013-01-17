@@ -943,6 +943,14 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 				setError(AppletMessages.getString("SignApplet.494", uri)); //$NON-NLS-1$
 				return;
 			}
+		} catch (final NullPointerException e) {
+			LOGGER.warning("No se ha podido obtener informacion de la ruta indicada, se preguntara si debe permitirse el acceso"); //$NON-NLS-1$
+			// En caso de error obteniendo informacion de la ruta, se pregunta siempre
+			if (!checkUserPermision(AppletMessages.getString("SignApplet.19") + CR + uri + //$NON-NLS-1$
+					CR + AppletMessages.getString("SignApplet.12"))) { //$NON-NLS-1$
+				setError(AppletMessages.getString("SignApplet.494", uri)); //$NON-NLS-1$
+				return;
+			}
 		} catch (final URISyntaxException e) {
 			// Si la URI es erronea lo obviamos para evitar que el integrador tenga que hacer la comprobacion
 			// de error despues de este set (rompiendo compatibilidad con despliegues previos). El problema
