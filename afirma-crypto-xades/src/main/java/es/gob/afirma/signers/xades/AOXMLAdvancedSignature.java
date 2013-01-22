@@ -161,7 +161,7 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
     /** Obtiene una instancia de la clase.
      * @param xades Datos de la firma XAdES-BES
      * @return Instancia de la clase
-     * @throws GeneralSecurityException */
+     * @throws GeneralSecurityException Cuando se especifica una XAdES con un algoritmo de huella digital no soportado. */
     public static AOXMLAdvancedSignature newInstance(final XAdES_BES xades) throws GeneralSecurityException {
         final AOXMLAdvancedSignature result = new AOXMLAdvancedSignature(xades);
         result.setDigestMethod(xades.getDigestMethod());
