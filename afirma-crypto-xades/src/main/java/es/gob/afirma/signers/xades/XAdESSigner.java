@@ -11,6 +11,7 @@
 package es.gob.afirma.signers.xades;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.net.URI;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.MessageDigest;
@@ -417,9 +418,6 @@ final class XAdESSigner {
 		if ("base64".equalsIgnoreCase(encoding)) { //$NON-NLS-1$
 			encoding = XMLConstants.BASE64_ENCODING;
 		}
-		final String oid = extraParams.getProperty("contentTypeOid"); //$NON-NLS-1$
-		final ObjectIdentifierImpl objectIdentifier = (oid != null) ? new ObjectIdentifierImpl(
-				"OIDAsURN", (oid.startsWith("urn:oid:") ? "" : "urn:oid:") + oid, null, new ArrayList<String>(0)) : null; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
 		URI uri = null;
 		try {
@@ -1215,6 +1213,22 @@ final class XAdESSigner {
 		}
 
 		// DataObjectFormat
+		String oid = extraParams.getProperty("contentTypeOid"); //$NON-NLS-1$
+		if (oid == null && mimeType != null) {
+        	try {
+				oid = MimeHelper.transformMimeTypeToOid(mimeType);
+			} catch (final IOException e) {
+				LOGGER.warning("Error en la obtencion del OID del tipo de datos a partir del MimeType: " + e); //$NON-NLS-1$
+			}
+        	// Si no se reconoce el MimeType se habra establecido el por defecto. Evitamos este comportamiento
+        	if (!MimeHelper.DEFAULT_MIMETYPE.equals(mimeType) && MimeHelper.DEFAULT_CONTENT_OID_DATA.equals(oid)) {
+        		oid = null;
+        	}
+		}
+		final ObjectIdentifierImpl objectIdentifier = (oid != null) ? new ObjectIdentifierImpl(
+				"OIDAsURN", (oid.startsWith("urn:oid:") ? "" : "urn:oid:") + oid, null, new ArrayList<String>(0)) : null; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+
+
 		final ArrayList<DataObjectFormat> objectFormats = new ArrayList<DataObjectFormat>();
 		final DataObjectFormat objectFormat = new DataObjectFormatImpl(null,
 				objectIdentifier, mimeType, encoding, "#" + referenceId //$NON-NLS-1$
