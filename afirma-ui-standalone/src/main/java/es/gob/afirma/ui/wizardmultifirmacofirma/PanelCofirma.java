@@ -460,7 +460,7 @@ final class PanelCofirma extends JAccessibilityDialogWizard {
         }
 		catch (final Exception e) {
 		    logger.severe(e.toString());
-		    CustomDialog.showMessageDialog(this, true, e.getMessage(), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
+		    CustomDialog.showMessageDialog(this, true, e.getMessage() != null ? e.getMessage() : e.toString(), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
 		    return false;
 		} finally {
 		    if (dataIs != null) {
