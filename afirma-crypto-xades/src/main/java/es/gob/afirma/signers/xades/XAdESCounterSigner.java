@@ -34,6 +34,10 @@ import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
 
+import net.java.xades.security.xml.XAdES.DataObjectFormat;
+import net.java.xades.security.xml.XAdES.DataObjectFormatImpl;
+import net.java.xades.security.xml.XAdES.ObjectIdentifier;
+import net.java.xades.security.xml.XAdES.ObjectIdentifierImpl;
 import net.java.xades.security.xml.XAdES.SignaturePolicyIdentifier;
 import net.java.xades.security.xml.XAdES.SignatureProductionPlace;
 import net.java.xades.security.xml.XAdES.SignerRole;
@@ -629,6 +633,14 @@ final class XAdESCounterSigner {
 				"applySystemDate", Boolean.TRUE.toString()))) { //$NON-NLS-1$
 			xades.setSigningTime(new Date());
 		}
+
+		// DataObjectFormats
+		final ObjectIdentifier objectIdentifier = new ObjectIdentifierImpl("OIDAsURN", "urn:oid:1.2.840.10003.5.109.10", null, new ArrayList<String>(0)); //$NON-NLS-1$ //$NON-NLS-2$
+		final DataObjectFormat dataObjectFormat = new DataObjectFormatImpl(null, objectIdentifier, "text/xml", doc.getInputEncoding(), "#" + referenceId); //$NON-NLS-1$ //$NON-NLS-2$
+		final List<DataObjectFormat> dataObjectFormats = new ArrayList<DataObjectFormat>();
+		dataObjectFormats.add(dataObjectFormat);
+
+		xades.setDataObjectFormats(dataObjectFormats);
 
 		// crea la firma
 		final AOXMLAdvancedSignature xmlSignature;
