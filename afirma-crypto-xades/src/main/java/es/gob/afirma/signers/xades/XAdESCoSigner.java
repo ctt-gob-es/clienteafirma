@@ -12,6 +12,7 @@ package es.gob.afirma.signers.xades;
 
 import static es.gob.afirma.signers.xades.AOXAdESSigner.DIGEST_METHOD;
 import static es.gob.afirma.signers.xades.AOXAdESSigner.LOGGER;
+import static es.gob.afirma.signers.xades.AOXAdESSigner.OBJURI;
 import static es.gob.afirma.signers.xades.AOXAdESSigner.SIGNATURE_NODE_NAME;
 import static es.gob.afirma.signers.xades.AOXAdESSigner.SIGNATURE_TAG;
 import static es.gob.afirma.signers.xades.AOXAdESSigner.STYLE_REFERENCE_PREFIX;
@@ -21,6 +22,7 @@ import static es.gob.afirma.signers.xades.AOXAdESSigner.XADES_SIGNED_PROPERTIES_
 import static es.gob.afirma.signers.xades.AOXAdESSigner.XML_SIGNATURE_PREFIX;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.NoSuchAlgorithmException;
@@ -41,6 +43,9 @@ import javax.xml.crypto.dsig.Transform;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import net.java.xades.security.xml.XAdES.DataObjectFormat;
+import net.java.xades.security.xml.XAdES.DataObjectFormatImpl;
+import net.java.xades.security.xml.XAdES.ObjectIdentifierImpl;
 import net.java.xades.security.xml.XAdES.SignaturePolicyIdentifier;
 import net.java.xades.security.xml.XAdES.SignatureProductionPlace;
 import net.java.xades.security.xml.XAdES.SignerRole;
@@ -55,6 +60,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.XMLConstants;
 
@@ -166,7 +172,16 @@ final class XAdESCoSigner {
         final String xadesNamespace = extraParams.getProperty("xadesNamespace", XADESNS); //$NON-NLS-1$
         final String signedPropertiesTypeUrl = extraParams.getProperty("signedPropertiesTypeUrl", XADES_SIGNED_PROPERTIES_TYPE); //$NON-NLS-1$
 
-        // nueva instancia de DocumentBuilderFactory que permita espacio de
+        String mimeType = extraParams.getProperty("mimeType"); //$NON-NLS-1$
+		String encoding = extraParams.getProperty("encoding"); //$NON-NLS-1$
+		if ("base64".equalsIgnoreCase(encoding)) { //$NON-NLS-1$
+			encoding = XMLConstants.BASE64_ENCODING;
+		}
+		String oid = extraParams.getProperty("contentTypeOid"); //$NON-NLS-1$
+
+		ObjectIdentifierImpl objectIdentifier = null;
+
+		// nueva instancia de DocumentBuilderFactory que permita espacio de
         // nombres (necesario para XML)
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
@@ -217,6 +232,7 @@ final class XAdESCoSigner {
         // Se considera que la primera referencia de la firma son los datos que
         // debemos firmar, ademas
         // de varias referencias especiales
+        String referenceId = null;
         for (int i = 0; i < nl.getLength(); i++) {
             currentElement = nl.item(i);
 
@@ -249,7 +265,6 @@ final class XAdESCoSigner {
                 // para mantener un listado con todas. En el caso de las hojas
                 // de estilo lo creamos con un
                 // identificador descriptivo
-                String referenceId = null;
                 if ((currentNodeAttributes.getNamedItem("Id") != null && currentNodeAttributes.getNamedItem("Id")  //$NON-NLS-1$//$NON-NLS-2$
                                                                                               .getNodeValue()
                                                                                               .startsWith(STYLE_REFERENCE_PREFIX))) {
@@ -263,8 +278,78 @@ final class XAdESCoSigner {
                 // Creamos la propia referencia con las transformaciones de la
                 // original
                 referenceList.add(fac.newReference(((Element) currentElement).getAttribute("URI"), digestMethod, currentTransformList, //$NON-NLS-1$
-                                                   null,
-                                                   referenceId));
+                									OBJURI,
+                									referenceId));
+
+                // Buscamos y analizamos el nodo de datos para obtener su tipo
+                final String dataXmlUri = ((Element) currentElement).getAttribute("URI"); //$NON-NLS-1$
+                // Firmas enveloped
+                if ("".equals(dataXmlUri)) { //$NON-NLS-1$
+                	 if (mimeType == null) {
+                     	mimeType = "text/xml"; //$NON-NLS-1$
+                     }
+                	 if (encoding == null) {
+                     	encoding = docSig.getInputEncoding();
+                     }
+                }
+                // Firmas enveloping y detached
+                else {
+                	final String dataNodeId = dataXmlUri.substring(dataXmlUri.startsWith("#") ? 1 : 0); //$NON-NLS-1$
+                	Element dataObjectElement = null;
+                	final Element docElement = docSig.getDocumentElement();
+
+                	// Comprobamos si el nodo raiz o sus hijos inmediatos son el nodo de datos
+                	Node nodeAttributeId = docElement.getAttributes() != null ? docElement.getAttributes().getNamedItem("Id") : null; //$NON-NLS-1$
+                	if (nodeAttributeId != null && dataNodeId.equals(nodeAttributeId.getNodeValue())) {
+                		dataObjectElement = docElement;
+                	}
+                	else {
+                		// Recorremos los hijos al reves para acceder antes a los datos y las firmas
+                		final NodeList rootChildNodes = docElement.getChildNodes();
+                		for (int j = rootChildNodes.getLength() - 1; j >= 0; j--) {
+
+                			nodeAttributeId = rootChildNodes.item(j).getAttributes() != null ? rootChildNodes.item(j).getAttributes().getNamedItem("Id") : null; //$NON-NLS-1$
+                			if (nodeAttributeId != null && dataNodeId.equals(nodeAttributeId.getNodeValue())) {
+                				dataObjectElement = (Element) rootChildNodes.item(j);
+                				break;
+                			}
+
+                			// Si es un nodo de firma tambien miramos en sus nodos hijos
+                			if (SIGNATURE_TAG.equals(rootChildNodes.item(j).getLocalName())) {
+                				final NodeList subChildsNodes = rootChildNodes.item(j).getChildNodes();
+                				for (int k = subChildsNodes.getLength() - 1; k >= 0; k--) {
+                        			nodeAttributeId = subChildsNodes.item(k).getAttributes() != null ? subChildsNodes.item(k).getAttributes().getNamedItem("Id") : null; //$NON-NLS-1$
+                        			if (nodeAttributeId != null && dataNodeId.equals(nodeAttributeId.getNodeValue())) {
+                        				dataObjectElement = (Element) subChildsNodes.item(k);
+                        				break;
+                        			}
+                				}
+                				if (dataObjectElement != null) {
+                					break;
+                				}
+                			}
+                		}
+                	}
+                	if (dataObjectElement != null) {
+                		if (mimeType == null) {
+                			mimeType = dataObjectElement.getAttribute("MimeType"); //$NON-NLS-1$
+                		}
+                		if (encoding == null) {
+                			encoding = dataObjectElement.getAttribute("Encoding"); //$NON-NLS-1$
+                		}
+                	}
+                }
+                if (oid == null && mimeType != null) {
+                	try {
+						oid = MimeHelper.transformMimeTypeToOid(mimeType);
+					} catch (final IOException e) {
+						LOGGER.warning("Error en la obtencion del OID del tipo de datos a partir del MimeType: " + e); //$NON-NLS-1$
+					}
+                }
+                if (oid != null) {
+                	objectIdentifier = new ObjectIdentifierImpl(
+    						"OIDAsURN", (oid.startsWith("urn:oid:") ? "" : "urn:oid:") + oid, null, new ArrayList<String>(0)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+                }
             }
         }
 
@@ -326,6 +411,16 @@ final class XAdESCoSigner {
         // SigningTime
         if (Boolean.parseBoolean(extraParams.getProperty("applySystemDate", Boolean.TRUE.toString()))) { //$NON-NLS-1$
             xades.setSigningTime(new Date());
+        }
+
+		// DataObjectFormat
+        if (objectIdentifier != null || mimeType != null || encoding != null) {
+        	final ArrayList<DataObjectFormat> objectFormats = new ArrayList<DataObjectFormat>();
+        	final DataObjectFormat objectFormat = new DataObjectFormatImpl(null,
+        			objectIdentifier, mimeType, encoding, "#" + referenceId //$NON-NLS-1$
+        			);
+        	objectFormats.add(objectFormat);
+        	xades.setDataObjectFormats(objectFormats);
         }
 
         // crea la firma
