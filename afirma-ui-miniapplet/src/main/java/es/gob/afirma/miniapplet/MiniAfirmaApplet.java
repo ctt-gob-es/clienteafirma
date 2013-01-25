@@ -38,6 +38,8 @@ import es.gob.afirma.keystores.main.common.AOKeyStore;
 /** MiniApplet de firma del proyecto Afirma. */
 public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
+	private static final String VERSION = "v1.1 (Beta 1)"; //$NON-NLS-1$
+
 	/** Clave privada fijada para reutilizarse en operaciones sucesivas. */
 	private PrivateKeyEntry stickyKeyEntry = null;
 
@@ -654,7 +656,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		}
 
 		MiniAfirmaApplet.configureLookAndFeel();
-		LOGGER.info("Miniapplet Afirma"); //$NON-NLS-1$
+		LOGGER.info("Miniapplet Afirma " + VERSION); //$NON-NLS-1$
 
 		LOGGER.info("Sistema operativo: " + System.getProperty("os.name")); //$NON-NLS-1$ //$NON-NLS-2$
 		LOGGER.info("Version del SO: " + System.getProperty("os.version")); //$NON-NLS-1$ //$NON-NLS-2$
