@@ -73,13 +73,10 @@ final class PanelDestinatarios extends JAccessibilityDialogWizard {
         @Override
         protected void siguienteActionPerformed(final JButton anterior, final JButton siguiente, final JButton finalizar) {
 
-            boolean continuar = true;
-            continuar = verificarCertificados();
-
             // Cargamos el listado de certificados
-            ((PanelRemitentes) getVentanas().get(2)).setListaCertificados(PanelDestinatarios.this.listaCertificados);
+            ((PanelRemitentes) getVentanas().get(2)).setListaCertificados(PanelDestinatarios.this.getListaCertificados());
 
-            if (continuar) {
+            if (verificarCertificados()) {
                 super.siguienteActionPerformed(anterior, siguiente, finalizar);
             }
         }
@@ -91,9 +88,15 @@ final class PanelDestinatarios extends JAccessibilityDialogWizard {
 
     /** Lista de certificados. */
     private final List<CertificateDestiny> listaCertificados = new ArrayList<CertificateDestiny>();
+    List<CertificateDestiny> getListaCertificados() {
+    	return this.listaCertificados;
+    }
 
     /** Lista con los destinatarios. */
     private final JList listaDestinatarios = new JList();
+    JList getListaDestinatarios() {
+    	return this.listaDestinatarios;
+    }
 
     /** Constructor. */
     public PanelDestinatarios() {
@@ -111,9 +114,12 @@ final class PanelDestinatarios extends JAccessibilityDialogWizard {
             if (ao == AOKeyStore.PKCS12 || ao == AOKeyStore.SINGLE) {
                 ExtFilter filter;
                 if (ao == AOKeyStore.PKCS12) {
-                    filter = new ExtFilter(new String[] {
-                                                         "p12", "pfx"}, //$NON-NLS-1$ //$NON-NLS-2$
-                                                         Messages.getString("Filtro.fichero.pkcs12.descripcion")); //$NON-NLS-1$
+                    filter = new ExtFilter(
+                		new String[] {
+                        	"p12", "pfx"  //$NON-NLS-1$//$NON-NLS-2$
+                    	},
+                        Messages.getString("Filtro.fichero.pkcs12.descripcion") //$NON-NLS-1$
+                    );
                 }
                 else {
                     filter = new ExtFilter(new String[] {
@@ -169,11 +175,13 @@ final class PanelDestinatarios extends JAccessibilityDialogWizard {
                 eliminar.setMnemonic(KeyEvent.VK_E); // Se asigna un atajo al boton ya que ha sido habilitado
             }
             else {
-                CustomDialog.showMessageDialog(this,
-                                               true,
-                                               Messages.getString("Wizard.sobres.error.usuario.existe"), //$NON-NLS-1$
-                                               Messages.getString("error"), //$NON-NLS-1$
-                                               JOptionPane.WARNING_MESSAGE);
+                CustomDialog.showMessageDialog(
+            		this,
+                    true,
+                    Messages.getString("Wizard.sobres.error.usuario.existe"), //$NON-NLS-1$
+                    Messages.getString("error"), //$NON-NLS-1$
+                    JOptionPane.WARNING_MESSAGE
+                );
             }
         }
     }
@@ -228,11 +236,13 @@ final class PanelDestinatarios extends JAccessibilityDialogWizard {
         }
         else {
             pssCallback =
-                new UIPasswordCallbackAccessibility(Messages.getString("Wizard.sobres.almacen.pass") + " " + kStore.getName(), //$NON-NLS-1$
-                                                    this,
-                                                    Messages.getString("CustomDialog.showInputPasswordDialog.title"), //$NON-NLS-1$
-                                                    KeyEvent.VK_O,
-                                                    Messages.getString("CustomDialog.showInputPasswordDialog.title")); //$NON-NLS-1$
+                new UIPasswordCallbackAccessibility(
+            		Messages.getString("Wizard.sobres.almacen.pass") + " " + kStore.getName(), //$NON-NLS-1$ //$NON-NLS-2$
+                    this,
+                    Messages.getString("CustomDialog.showInputPasswordDialog.title"), //$NON-NLS-1$
+                    KeyEvent.VK_O,
+                    Messages.getString("CustomDialog.showInputPasswordDialog.title") //$NON-NLS-1$
+        		);
         }
 
         return pssCallback;
@@ -245,10 +255,12 @@ final class PanelDestinatarios extends JAccessibilityDialogWizard {
 
         // Panel con la cabecera
         final CabeceraAsistente panelSuperior =
-            new CabeceraAsistente("Wizard.sobres.pagina1.titulo", //$NON-NLS-1$
-                                  "Wizard.sobres.pagina1.titulo.explicacion1", //$NON-NLS-1$
-                                  "Wizard.sobres.pagina1.titulo.explicacion2", //$NON-NLS-1$
-                                  null);
+            new CabeceraAsistente(
+        		"Wizard.sobres.pagina1.titulo", //$NON-NLS-1$
+                "Wizard.sobres.pagina1.titulo.explicacion1", //$NON-NLS-1$
+                "Wizard.sobres.pagina1.titulo.explicacion2", //$NON-NLS-1$
+                null
+            );
         Utils.setContrastColor(panelSuperior);
         Utils.setFontBold(panelSuperior);
         getContentPane().add(panelSuperior, BorderLayout.NORTH);
@@ -290,7 +302,7 @@ final class PanelDestinatarios extends JAccessibilityDialogWizard {
         final JComboBox comboDestinatarios = new JComboBox();
         comboDestinatarios.setToolTipText(Messages.getString("Wizard.sobres.pagina1.comboDestinatarios.description")); //$NON-NLS-1$
         comboDestinatarios.getAccessibleContext()
-        .setAccessibleName(etiquetaAnadir.getText() + " " + comboDestinatarios.getToolTipText() + "ALT + D.");
+        .setAccessibleName(etiquetaAnadir.getText() + " " + comboDestinatarios.getToolTipText() + "ALT + D."); //$NON-NLS-1$ //$NON-NLS-2$
         comboDestinatarios.getAccessibleContext().setAccessibleDescription(comboDestinatarios.getToolTipText());
         cargarCombo(comboDestinatarios);
         Utils.remarcar(comboDestinatarios);
@@ -317,13 +329,13 @@ final class PanelDestinatarios extends JAccessibilityDialogWizard {
         anadir.setText(Messages.getString("wizard.aniadir")); //$NON-NLS-1$
         anadir.setAutoscrolls(true);
         anadir.setMnemonic(KeyEvent.VK_I); // Se asigna un atajo al boton
-        anadir.getAccessibleContext().setAccessibleName(anadir.getText() + " " + anadir.getToolTipText());
+        anadir.getAccessibleContext().setAccessibleName(anadir.getText() + " " + anadir.getToolTipText()); //$NON-NLS-1$
         anadir.getAccessibleContext().setAccessibleDescription(anadir.getToolTipText());
         anadir.addActionListener(new ActionListener() {
             /** Accion del boton anadir. */
             @Override
             public void actionPerformed(final ActionEvent evt) {
-                anadirActionPerformed(comboDestinatarios, (DefaultListModel) PanelDestinatarios.this.listaDestinatarios.getModel(), eliminar);
+                anadirActionPerformed(comboDestinatarios, (DefaultListModel) PanelDestinatarios.this.getListaDestinatarios().getModel(), eliminar);
             }
         });
         Utils.remarcar(anadir);
@@ -392,7 +404,7 @@ final class PanelDestinatarios extends JAccessibilityDialogWizard {
         eliminar.setToolTipText(Messages.getString("wizard.eliminar.description")); //$NON-NLS-1$
         eliminar.setEnabled(false);
         eliminar.setText(Messages.getString("wizard.sobres.eliminar.destinatario")); //$NON-NLS-1$
-        eliminar.getAccessibleContext().setAccessibleName(eliminar.getText() + " " + eliminar.getToolTipText());
+        eliminar.getAccessibleContext().setAccessibleName(eliminar.getText() + " " + eliminar.getToolTipText()); //$NON-NLS-1$
         eliminar.getAccessibleContext().setAccessibleDescription(eliminar.getToolTipText());
         eliminar.addActionListener(new ActionListener() {
             /** Accion del boton eliminar. */
@@ -424,11 +436,15 @@ final class PanelDestinatarios extends JAccessibilityDialogWizard {
     /** Comprueba que se ha seleccionado algun certificado
      * @return True o false segun la verificacion */
     public boolean verificarCertificados() {
-        final DefaultListModel listModel = (DefaultListModel) this.listaDestinatarios.getModel();
+        final DefaultListModel listModel = (DefaultListModel) this.getListaDestinatarios().getModel();
         if (listModel.isEmpty()) {
-            CustomDialog.showMessageDialog(this,
-                                           true,
-                                           Messages.getString("WizardCifrado.error.destinatario"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+            CustomDialog.showMessageDialog(
+        		this,
+                true,
+                Messages.getString("WizardCifrado.error.destinatario"), //$NON-NLS-1$
+                Messages.getString("error"), //$NON-NLS-1$
+                JOptionPane.ERROR_MESSAGE
+            );
             return false;
         }
         return true;
