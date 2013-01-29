@@ -25,6 +25,9 @@ public final class RetrieveService extends HttpServlet {
 	/** Fichero de configuraci&oacute;n. */
 	private static final String CONFIG_FILE = "/configuration.properties"; //$NON-NLS-1$
 
+	/** Log para registrar las acciones del servicio. */
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");  //$NON-NLS-1$
+
 	/** Nombre del par&aacute;metro con la operaci&oacute;n realizada. */
 	private static final String PARAMETER_NAME_OPERATION = "op"; //$NON-NLS-1$
 
@@ -38,6 +41,9 @@ public final class RetrieveService extends HttpServlet {
 
 	@Override
 	protected void service(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
+
+		LOGGER.info("Peticion realizada desde: " + request.getLocalAddr()); //$NON-NLS-1$
+
 		final String operation = request.getParameter(PARAMETER_NAME_OPERATION);
 		final String syntaxVersion = request.getParameter(PARAMETER_NAME_SYNTAX_VERSION);
 		response.setContentType("text/plain"); //$NON-NLS-1$
@@ -45,10 +51,12 @@ public final class RetrieveService extends HttpServlet {
 
 		try (final PrintWriter out = response.getWriter()) {
 			if (operation == null) {
+				LOGGER.warning(ErrorManager.genError(ErrorManager.ERROR_MISSING_OPERATION_NAME, null));
 				out.println(ErrorManager.genError(ErrorManager.ERROR_MISSING_OPERATION_NAME, null));
 				return;
 			}
 			if (syntaxVersion == null) {
+				LOGGER.warning(ErrorManager.genError(ErrorManager.ERROR_MISSING_SYNTAX_VERSION, null));
 				out.println(ErrorManager.genError(ErrorManager.ERROR_MISSING_SYNTAX_VERSION, null));
 				return;
 			}
@@ -57,6 +65,7 @@ public final class RetrieveService extends HttpServlet {
 				config = new RetrieveConfig(this.getServletContext());
 				config.load(CONFIG_FILE);
 			} catch (final IOException e) {
+				LOGGER.severe(ErrorManager.genError(ErrorManager.ERROR_CONFIGURATION_FILE_PROBLEM, null));
 				out.println(ErrorManager.genError(ErrorManager.ERROR_CONFIGURATION_FILE_PROBLEM, null));
 				return;
 			}
@@ -66,6 +75,7 @@ public final class RetrieveService extends HttpServlet {
 				retrieveSign(out, request, config);
 				return;
 			default:
+				LOGGER.warning(ErrorManager.genError(ErrorManager.ERROR_UNSUPPORTED_OPERATION_NAME, null));
 				out.println(ErrorManager.genError(ErrorManager.ERROR_UNSUPPORTED_OPERATION_NAME, null));
 			}
 		}
@@ -81,6 +91,7 @@ public final class RetrieveService extends HttpServlet {
 
 		final String id = request.getParameter(PARAMETER_NAME_ID);
 		if (id == null) {
+			LOGGER.warning(ErrorManager.genError(ErrorManager.ERROR_MISSING_DATA_ID, null));
 			out.println(ErrorManager.genError(ErrorManager.ERROR_MISSING_DATA_ID, null));
 			return;
 		}
@@ -89,6 +100,7 @@ public final class RetrieveService extends HttpServlet {
 		// No hacemos distincion si el archivo no existe, no es un fichero, no puede leerse o ha caducado
 		// para evitar que un atacante conozca su situacion. Lo borramos despuest de usarlo
 		if (!inFile.exists() || !inFile.isFile() || !inFile.canRead() || isExpired(inFile, config.getExpirationTime())) {
+			LOGGER.warning(ErrorManager.genError(ErrorManager.ERROR_INVALID_DATA_ID, null));
 			out.println(ErrorManager.genError(ErrorManager.ERROR_INVALID_DATA_ID, null));
 			if (inFile.exists() && inFile.isFile()) {
 				inFile.delete();
@@ -97,8 +109,10 @@ public final class RetrieveService extends HttpServlet {
 		else {
 			try (final InputStream fis = new FileInputStream(inFile)) {
 				out.println(new String(getDataFromInputStream(fis)));
+				LOGGER.info("Se recupera el fichero: " + inFile.getName()); //$NON-NLS-1$
 			}
 			catch (final IOException e) {
+				LOGGER.severe(ErrorManager.genError(ErrorManager.ERROR_INVALID_DATA, null));
 				out.println(ErrorManager.genError(ErrorManager.ERROR_INVALID_DATA, null));
 				return;
 			}
@@ -118,7 +132,7 @@ public final class RetrieveService extends HttpServlet {
 		for (final File file : config.getTempDir().listFiles()) {
 			try {
 				if (file.exists() && file.isFile() && isExpired(file, config.getExpirationTime())) {
-					Logger.getLogger("es.gob.afirma").info("Eliminamos el fichero caducado: " + file.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
+					LOGGER.fine("Eliminamos el fichero caducado: " + file.getAbsolutePath()); //$NON-NLS-1$
 					file.delete();
 				}
 			} catch(final Exception e) {
