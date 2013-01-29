@@ -6,5 +6,6 @@
 	<mapID target="PantallaEspera" url="../Spanish.lproj/pgs/PantallaEspera.html" />
 	<mapID target="PantallaFirma" url="../Spanish.lproj/pgs/PantallaFirma.html" />
 	<mapID target="PantallaDetalle" url="../Spanish.lproj/pgs/PantallaDetalle.html" />
+	<mapID target="MenuPreferencias" url="../Spanish.lproj/pgs/MenuPreferencias.html" />
 	<mapID target="Licencia" url="../Spanish.lproj/pgs/Licencia.html" />
 </map>

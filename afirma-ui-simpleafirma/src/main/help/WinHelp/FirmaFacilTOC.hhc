@@ -27,6 +27,10 @@
 			<param name="Local" value="Spanish.lproj\pgs\PantallaDetalle.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Men&uacute; para la configuraci&oacute;n de las firmas generadas">
+			<param name="Local" value="Spanish.lproj\pgs\MenuPreferencias.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Licencia de uso y distribuci&oacute;n">
 			<param name="Local" value="Spanish.lproj\pgs\Licencia.html">
 			</OBJECT>

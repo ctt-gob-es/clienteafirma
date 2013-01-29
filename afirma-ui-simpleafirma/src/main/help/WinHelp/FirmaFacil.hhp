@@ -15,11 +15,16 @@ shrd\icon_xml.png
 shrd\logo_cliente.png
 shrd\mhap.png
 Spanish.lproj\SimpleAfirma.html
+Spanish.lproj\gfx\menufirmascades_mini.png
+Spanish.lproj\gfx\menufirmaspades_mini.png
+Spanish.lproj\gfx\menufirmasxades_mini.png
+Spanish.lproj\gfx\menugeneral_mini.png
 Spanish.lproj\gfx\pantalladetalle_mini.png
 Spanish.lproj\gfx\pantallaespera_mini.png
 Spanish.lproj\gfx\pantallafirma1_mini.png
 Spanish.lproj\gfx\pantallafirma2_mini.png
 Spanish.lproj\pgs\Licencia.html
+Spanish.lproj\pgs\MenuPreferencias.html
 Spanish.lproj\pgs\PantallaDetalle.html
 Spanish.lproj\pgs\PantallaEspera.html
 Spanish.lproj\pgs\PantallaFirma.html
