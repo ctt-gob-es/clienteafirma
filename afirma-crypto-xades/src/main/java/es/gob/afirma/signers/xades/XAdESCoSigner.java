@@ -36,10 +36,13 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 
+import javax.xml.crypto.XMLStructure;
+import javax.xml.crypto.dom.DOMStructure;
 import javax.xml.crypto.dsig.CanonicalizationMethod;
 import javax.xml.crypto.dsig.DigestMethod;
 import javax.xml.crypto.dsig.Reference;
 import javax.xml.crypto.dsig.Transform;
+import javax.xml.crypto.dsig.XMLObject;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -207,7 +210,6 @@ final class XAdESCoSigner {
             throw new AOException("No se ha podido leer el documento XML de firmas", e); //$NON-NLS-1$
         }
 
-        final List<Reference> referenceList = new ArrayList<Reference>();
         final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
         final DigestMethod digestMethod;
         try {
@@ -217,6 +219,11 @@ final class XAdESCoSigner {
             throw new AOException("No se ha podido obtener un generador de huellas digitales para el algoritmo '" + digestMethodAlgorithm + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
+        // Objeto en donde se almacenaran los datos firmados en caso de tratarse de
+        // una firma enveloping
+        XMLObject envelopingObject = null;
+    	boolean isEnveloping = false;
+
         // Localizamos la primera firma (primer nodo "Signature") en profundidad
         // en el arbol de firma.
         // Se considera que todos los objetos "Signature" del documento firman
@@ -225,7 +232,7 @@ final class XAdESCoSigner {
         // actuales.
         // Buscamos dentro de ese Signature todas las referencias que apunten a
         // datos para firmarlas
-        final List<String> referencesIds = new ArrayList<String>();
+    	final List<Reference> referenceList = new ArrayList<Reference>();
         Node currentElement;
         final NodeList nl = ((Element) docSig.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_TAG).item(0)).getElementsByTagNameNS(XMLConstants.DSIGNNS, "Reference"); //$NON-NLS-1$
 
@@ -273,13 +280,7 @@ final class XAdESCoSigner {
                 else {
                     referenceId = "Reference-" + UUID.randomUUID().toString(); //$NON-NLS-1$
                 }
-                referencesIds.add(referenceId);
 
-                // Creamos la propia referencia con las transformaciones de la
-                // original
-                referenceList.add(fac.newReference(((Element) currentElement).getAttribute("URI"), digestMethod, currentTransformList, //$NON-NLS-1$
-                									OBJURI,
-                									referenceId));
 
                 // Buscamos y analizamos el nodo de datos para obtener su tipo
                 final String dataXmlUri = ((Element) currentElement).getAttribute("URI"); //$NON-NLS-1$
@@ -291,9 +292,15 @@ final class XAdESCoSigner {
                 	 if (encoding == null) {
                      	encoding = docSig.getInputEncoding();
                      }
+
+                	// Creamos la referencia a los datos con las transformaciones de la original
+                     referenceList.add(fac.newReference(
+                    		 ((Element) currentElement).getAttribute("URI"), digestMethod, currentTransformList, OBJURI, referenceId)); //$NON-NLS-1$
+
                 }
                 // Firmas enveloping y detached
                 else {
+
                 	final String dataNodeId = dataXmlUri.substring(dataXmlUri.startsWith("#") ? 1 : 0); //$NON-NLS-1$
                 	Element dataObjectElement = null;
                 	final Element docElement = docSig.getDocumentElement();
@@ -338,6 +345,50 @@ final class XAdESCoSigner {
                 			encoding = dataObjectElement.getAttribute("Encoding"); //$NON-NLS-1$
                 		}
                 	}
+
+                	final NodeList signatureChildNodes = docSig.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_TAG).item(0).getChildNodes();
+                	for (int j = 0; j < signatureChildNodes.getLength(); j++) {
+                		final Node subNode = signatureChildNodes.item(j);
+                		final NamedNodeMap nnm = subNode.getAttributes();
+                		if (nnm != null) {
+                			final Node idAttrNode = nnm.getNamedItem("Id"); //$NON-NLS-1$
+                			if (idAttrNode != null) {
+                				if (dataNodeId.equals(idAttrNode.getNodeValue())) {
+                					isEnveloping = true;
+                				}
+                			}
+                		}
+                	}
+
+                	//TODO: En el caso de firmas enveloped (no detached), agregar nodo de datos
+                	if (isEnveloping && dataObjectElement != null) {
+                		// crea el nuevo elemento Object que con el documento afirmar
+        				final List<XMLStructure> structures = new ArrayList<XMLStructure>(1);
+
+        				// Si los datos se han convertido a base64, bien por ser
+        				// binarios o explicitos
+        				if ("text/xml".equals(mimeType)) { //$NON-NLS-1$
+        					structures.add(new DOMStructure(dataObjectElement.getFirstChild().cloneNode(true)));
+        				} else {
+        					structures.add(new DOMStructure(dataObjectElement.cloneNode(true)));
+        				}
+
+        				final String objectId = "Object-" + UUID.randomUUID().toString(); //$NON-NLS-1$
+        				envelopingObject = fac.newXMLObject(structures, objectId, mimeType, encoding);
+
+        				// Agregamos la referencia al nuevo objeto de datos
+                        referenceList.add(fac.newReference(
+                        		"#" + objectId, digestMethod, currentTransformList, OBJURI, referenceId)); //$NON-NLS-1$
+
+                	}
+                	// Firma detached
+                	else {
+                		// Agregamos la referencia a los datos ya existentes
+                        referenceList.add(fac.newReference(
+                       		 ((Element) currentElement).getAttribute("URI"), digestMethod, currentTransformList, OBJURI, referenceId)); //$NON-NLS-1$
+
+                	}
+
                 }
                 if (oid == null && mimeType != null) {
                 	try {
@@ -444,6 +495,12 @@ final class XAdESCoSigner {
                                                      + "), es posible que el usado en la firma difiera del indicado: " //$NON-NLS-1$
                                                      + e);
         }
+
+		// en el caso de formato enveloping se inserta el elemento Object con el
+		// documento a firmar
+		if (isEnveloping) {
+			xmlSignature.addXMLObject(envelopingObject);
+		}
 
         try {
         	final boolean onlySignningCert = Boolean.parseBoolean(extraParams
