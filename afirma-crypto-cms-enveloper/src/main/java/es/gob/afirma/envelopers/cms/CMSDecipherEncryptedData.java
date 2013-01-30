@@ -10,9 +10,11 @@
 
 package es.gob.afirma.envelopers.cms;
 
+import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Enumeration;
 
 import javax.crypto.BadPaddingException;
@@ -58,7 +60,9 @@ final class CMSDecipherEncryptedData {
      * @throws IllegalBlockSizeException
      * @throws InvalidAlgorithmParameterException
      * @throws NoSuchPaddingException
-     * @throws NoSuchAlgorithmException */
+     * @throws NoSuchAlgorithmException
+     * @throws IOException
+     * @throws InvalidKeySpecException */
     @SuppressWarnings("unused")
     byte[] dechiperEncryptedData(final byte[] encryptedData, final String pass) throws AOException,
                                                                                        InvalidKeyException,
@@ -66,7 +70,9 @@ final class CMSDecipherEncryptedData {
                                                                                        NoSuchPaddingException,
                                                                                        InvalidAlgorithmParameterException,
                                                                                        IllegalBlockSizeException,
-                                                                                       BadPaddingException {
+                                                                                       BadPaddingException,
+                                                                                       InvalidKeySpecException,
+                                                                                       IOException {
 
         AlgorithmIdentifier alg = null;
         EncryptedContentInfo eci = null;
@@ -115,9 +121,10 @@ final class CMSDecipherEncryptedData {
      *        Algoritmo necesario para crear la clave.
      * @param key
      *        Contrase&ntilde;a que se va a usar para cifrar.
-     * @throws AOException
-     *         Cuando la clave o password no son v&aacute;lidas. */
-    private void assignKey(final AlgorithmIdentifier alg, final String key) throws AOException {
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeySpecException
+     * @throws IOException */
+    private void assignKey(final AlgorithmIdentifier alg, final String key) throws InvalidKeySpecException, NoSuchAlgorithmException, IOException {
 
         // obtenemos el oid del algoritmo.
         final String algoritmoOid = alg.getAlgorithm().toString();
@@ -138,22 +145,13 @@ final class CMSDecipherEncryptedData {
         this.config = new AOCipherConfig(algorithm, null, null);
 
         // Generamos la clave necesaria para el cifrado
-        if ((this.config.getAlgorithm().equals(AOCipherAlgorithm.PBEWITHMD5ANDDES)) || (this.config.getAlgorithm().equals(AOCipherAlgorithm.PBEWITHSHA1ANDDESEDE))
-            || (this.config.getAlgorithm().equals(AOCipherAlgorithm.PBEWITHSHA1ANDRC2_40))) {
-            try {
-                this.cipherKey = Utils.loadCipherKey(this.config, key);
-            }
-            catch (final Exception ex) {
-                throw new AOException("Error durante el proceso de asignacion de la clave (a partir de password)", ex); //$NON-NLS-1$
-            }
+        if (this.config.getAlgorithm().equals(AOCipherAlgorithm.PBEWITHMD5ANDDES) ||
+            this.config.getAlgorithm().equals(AOCipherAlgorithm.PBEWITHSHA1ANDDESEDE) ||
+            this.config.getAlgorithm().equals(AOCipherAlgorithm.PBEWITHSHA1ANDRC2_40)) {
+                    this.cipherKey = Utils.loadCipherKey(this.config, key);
         }
         else {
-            try {
-                this.cipherKey = new SecretKeySpec(Base64.decode(key), this.config.getAlgorithm().getName());
-            }
-            catch (final Exception ex) {
-                throw new AOException("Error durante el proceso de asignacion de la clave (a partir de key)", ex); //$NON-NLS-1$
-            }
+           this.cipherKey = new SecretKeySpec(Base64.decode(key), this.config.getAlgorithm().getName());
         }
     }
 

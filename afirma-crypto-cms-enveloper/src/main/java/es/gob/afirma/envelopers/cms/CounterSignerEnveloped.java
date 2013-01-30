@@ -11,6 +11,7 @@
 package es.gob.afirma.envelopers.cms;
 
 import java.io.IOException;
+import java.security.InvalidKeyException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -55,7 +56,6 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.TBSCertificateStructure;
 
-import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
@@ -105,12 +105,8 @@ final class CounterSignerEnveloped {
      * @throws java.security.cert.CertificateException
      *         Si se produce alguna excepci&oacute;n con los certificados de
      *         firma.
-     * @throws AOException
-     *         Cuando ocurre cualquier error no contemplado por el resto de
-     *         las excepciones declaradas
-     * @throws es.gob.afirma.exceptions.AOException
-     *         Cuando ocurre un error durante el proceso de contrafirma
-     *         (formato o clave incorrecto,...) */
+     * @throws SignatureException
+     * @throws InvalidKeyException */
     byte[] counterSignerEnveloped(final P7ContentSignerParameters parameters,
                                          final byte[] data,
                                          final CounterSignTarget targetType,
@@ -118,7 +114,11 @@ final class CounterSignerEnveloped {
                                          final PrivateKeyEntry keyEntry,
                                          final String dataType,
                                          final Map<String, byte[]> atri,
-                                         final Map<String, byte[]> uatri) throws IOException, NoSuchAlgorithmException, CertificateException, AOException {
+                                         final Map<String, byte[]> uatri) throws IOException,
+                                                                                 NoSuchAlgorithmException,
+                                                                                 CertificateException,
+                                                                                 InvalidKeyException,
+                                                                                 SignatureException {
 
         // Inicializamos el Oid
         this.atrib2 = atri;
@@ -266,13 +266,16 @@ final class CounterSignerEnveloped {
      * @throws java.security.cert.CertificateException
      *         Si se produce alguna excepci&oacute;n con los certificados de
      *         firma.
-     * @throws es.gob.afirma.exceptions.AOException
-     *         Cuando ocurre un error durante el proceso de contrafirma
-     *         (formato o clave incorrecto,...) */
+     * @throws SignatureException
+     * @throws InvalidKeyException */
     private ASN1EncodableVector counterTree(final ASN1Set signerInfosRaiz,
                                             final P7ContentSignerParameters parameters,
                                             final X509Certificate cert,
-                                            final PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException, IOException, CertificateException, AOException {
+                                            final PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException,
+                                                                                   IOException,
+                                                                                   CertificateException,
+                                                                                   InvalidKeyException,
+                                                                                   SignatureException {
         final ASN1EncodableVector counterSigners = new ASN1EncodableVector();
         for (int i = 0; i < signerInfosRaiz.size(); i++) {
             counterSigners.add(getCounterUnsignedAtributes(new SignerInfo((ASN1Sequence) signerInfosRaiz.getObjectAt(i)), parameters, cert, keyEntry));
@@ -296,15 +299,29 @@ final class CounterSignerEnveloped {
      * @throws java.security.NoSuchAlgorithmException
      * @throws java.io.IOException
      * @throws java.security.cert.CertificateException
-     * @throws es.map.es.map.afirma.exceptions.AOException */
+     * @throws SignatureException
+     * @throws InvalidKeyException */
     private ASN1EncodableVector counterLeaf(final ASN1Set signerInfosRaiz,
                                             final P7ContentSignerParameters parameters,
                                             final X509Certificate cert,
-                                            final PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException, IOException, CertificateException, AOException {
+                                            final PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException,
+                                                                                   IOException,
+                                                                                   CertificateException,
+                                                                                   InvalidKeyException,
+                                                                                   SignatureException {
 
         final ASN1EncodableVector counterSigners = new ASN1EncodableVector();
         for (int i = 0; i < signerInfosRaiz.size(); i++) {
-            counterSigners.add(getCounterLeafUnsignedAtributes(new SignerInfo((ASN1Sequence) signerInfosRaiz.getObjectAt(i)), parameters, cert, keyEntry));
+            counterSigners.add(
+        		getCounterLeafUnsignedAtributes(
+    				new SignerInfo(
+						(ASN1Sequence) signerInfosRaiz.getObjectAt(i)
+					),
+    				parameters,
+    				cert,
+    				keyEntry
+				)
+    		);
         }
 
         return counterSigners;
@@ -327,12 +344,17 @@ final class CounterSignerEnveloped {
      * @throws java.security.NoSuchAlgorithmException
      * @throws java.io.IOException
      * @throws java.security.cert.CertificateException
-     * @throws es.map.es.map.afirma.exceptions.AOException */
+     * @throws SignatureException
+     * @throws InvalidKeyException */
     private ASN1EncodableVector counterNode(final SignedAndEnvelopedData sd,
                                             final P7ContentSignerParameters parameters,
                                             final X509Certificate cert,
                                             final PrivateKeyEntry keyEntry,
-                                            final int nodo) throws NoSuchAlgorithmException, IOException, CertificateException, AOException {
+                                            final int nodo) throws NoSuchAlgorithmException,
+                                                                   IOException,
+                                                                   CertificateException,
+                                                                   InvalidKeyException,
+                                                                   SignatureException {
 
         final ASN1Set signerInfosRaiz = sd.getSignerInfos();
 
@@ -376,14 +398,16 @@ final class CounterSignerEnveloped {
      * @throws java.security.NoSuchAlgorithmException
      * @throws java.io.IOException
      * @throws java.security.cert.CertificateException
-     * @throws es.map.es.map.afirma.exceptions.AOException */
+     * @throws SignatureException
+     * @throws InvalidKeyException */
     private SignerInfo getCounterUnsignedAtributes(final SignerInfo signerInfo,
                                                    final P7ContentSignerParameters parameters,
                                                    final X509Certificate cert,
                                                    final PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException,
-                                                                            IOException,
-                                                                            CertificateException,
-                                                                            AOException {
+                                                                                          IOException,
+                                                                                          CertificateException,
+                                                                                          InvalidKeyException,
+                                                                                          SignatureException {
 
         final List<Object> attributes = new ArrayList<Object>();
         final ASN1EncodableVector signerInfosU = new ASN1EncodableVector();
@@ -517,14 +541,16 @@ final class CounterSignerEnveloped {
      * @throws java.security.NoSuchAlgorithmException
      * @throws java.io.IOException
      * @throws java.security.cert.CertificateException
-     * @throws es.map.es.map.afirma.exceptions.AOException */
+     * @throws SignatureException
+     * @throws InvalidKeyException */
     private SignerInfo getCounterLeafUnsignedAtributes(final SignerInfo signerInfo,
                                                        final P7ContentSignerParameters parameters,
                                                        final X509Certificate cert,
                                                        final PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException,
-                                                                                IOException,
-                                                                                CertificateException,
-                                                                                AOException {
+                                                                                              IOException,
+                                                                                              CertificateException,
+                                                                                              InvalidKeyException,
+                                                                                              SignatureException {
 
         final List<Object> attributes = new ArrayList<Object>();
         final ASN1EncodableVector signerInfosU = new ASN1EncodableVector();
@@ -652,11 +678,17 @@ final class CounterSignerEnveloped {
      *         Contrafirmados.
      * @throws java.security.NoSuchAlgorithmException
      * @throws java.io.IOException
-     * @throws java.security.cert.CertificateException */
+     * @throws java.security.cert.CertificateException
+     * @throws SignatureException
+     * @throws InvalidKeyException */
     private SignerInfo getCounterNodeUnsignedAtributes(final SignerInfo signerInfo,
                                                        final P7ContentSignerParameters parameters,
                                                        final X509Certificate cert,
-                                                       final PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException, IOException, CertificateException {
+                                                       final PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException,
+                                                                                              IOException,
+                                                                                              CertificateException,
+                                                                                              InvalidKeyException,
+                                                                                              SignatureException {
 
         final List<Object> attributes = new ArrayList<Object>();
         final ASN1EncodableVector signerInfosU = new ASN1EncodableVector();
@@ -785,12 +817,17 @@ final class CounterSignerEnveloped {
      * @throws java.security.NoSuchAlgorithmException
      * @throws java.io.IOException
      * @throws java.security.cert.CertificateException
-     * @throws es.map.es.map.afirma.exceptions.AOException */
+     * @throws SignatureException
+     * @throws InvalidKeyException */
     private SignerInfo getCounterNodeUnsignedAtributes(final SignerInfo signerInfo,
                                                        final P7ContentSignerParameters parameters,
                                                        final X509Certificate cert,
                                                        final PrivateKeyEntry keyEntry,
-                                                       final int node) throws NoSuchAlgorithmException, IOException, CertificateException, AOException {
+                                                       final int node) throws NoSuchAlgorithmException,
+                                                                              IOException,
+                                                                              CertificateException,
+                                                                              InvalidKeyException,
+                                                                              SignatureException {
 
         final List<Object> attributes = new ArrayList<Object>();
         final ASN1EncodableVector signerInfosU = new ASN1EncodableVector();
@@ -1028,10 +1065,15 @@ final class CounterSignerEnveloped {
      * @return El signerInfo contrafirmado.
      * @throws java.security.NoSuchAlgorithmException
      * @throws java.io.IOException
-     * @throws java.security.cert.CertificateException */
-    private SignerInfo unsignedAtributte(final P7ContentSignerParameters parameters, final X509Certificate cert, final SignerInfo si, final PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException,
+     * @throws java.security.cert.CertificateException
+     * @throws SignatureException
+     * @throws InvalidKeyException */
+    private SignerInfo unsignedAtributte(final P7ContentSignerParameters parameters,
+    		                             final X509Certificate cert,
+    		                             final SignerInfo si,
+    		                             final PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException,
                                                                                                                                              IOException,
-                                                                                                                                             CertificateException {
+                                                                                                                                             CertificateException, InvalidKeyException, SignatureException {
         // // UNAUTHENTICATEDATTRIBUTES
         ASN1Set unsignedAttr = null;
         ASN1Set signedAttr = null;
@@ -1059,13 +1101,7 @@ final class CounterSignerEnveloped {
         final AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID("RSA")); //$NON-NLS-1$
 
         // Firma del SignerInfo
-        final ASN1OctetString sign2;
-        try {
-            sign2 = firma(signatureAlgorithm, keyEntry);
-        }
-        catch (final AOException ex) {
-            throw new IOException("Error en la firma electronica: " + ex, ex); //$NON-NLS-1$
-        }
+        final ASN1OctetString sign2 = firma(signatureAlgorithm, keyEntry);
 
         return new SignerInfo(identifier, digAlgId, signedAttr, encAlgId, sign2, unsignedAttr);
 
@@ -1077,51 +1113,26 @@ final class CounterSignerEnveloped {
      * @param keyEntry
      *        Clave para firmar.
      * @return Firma de los atributos.
-     * @throws es.map.es.map.afirma.exceptions.AOException */
-    private ASN1OctetString firma(final String signatureAlgorithm, final PrivateKeyEntry keyEntry) throws AOException {
+     * @throws NoSuchAlgorithmException
+     * @throws IOException
+     * @throws InvalidKeyException
+     * @throws SignatureException */
+    private ASN1OctetString firma(final String signatureAlgorithm,
+    		                      final PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException,
+    		                                                             IOException,
+    		                                                             InvalidKeyException,
+    		                                                             SignatureException {
 
-        final Signature sig;
-        try {
-            sig = Signature.getInstance(signatureAlgorithm);
-        }
-        catch (final Exception e) {
-            throw new AOException("Error obteniendo la clase de firma para el algoritmo " + signatureAlgorithm, e); //$NON-NLS-1$
-        }
-
-        byte[] tmp;
-        try {
-            tmp = this.signedAttr2.getEncoded(ASN1Encoding.DER);
-        }
-        catch (final IOException ex) {
-            throw new AOException("Error obteniendo los atributos firmados", ex); //$NON-NLS-1$
-        }
+        final Signature sig = Signature.getInstance(signatureAlgorithm);
 
         // Indicar clave privada para la firma
-        try {
-            sig.initSign(keyEntry.getPrivateKey());
-        }
-        catch (final Exception e) {
-            throw new AOException("Error al inicializar la firma con la clave privada", e); //$NON-NLS-1$
-        }
+        sig.initSign(keyEntry.getPrivateKey());
 
         // Actualizamos la configuracion de firma
-        try {
-            sig.update(tmp);
-        }
-        catch (final SignatureException e) {
-            throw new AOException("Error al configurar la informacion de firma", e); //$NON-NLS-1$
-        }
+        sig.update(this.signedAttr2.getEncoded(ASN1Encoding.DER));
 
-        // firmamos.
-        final byte[] realSig;
-        try {
-            realSig = sig.sign();
-        }
-        catch (final Exception e) {
-            throw new AOException("Error durante el proceso de firma", e); //$NON-NLS-1$
-        }
-
-        return new DEROctetString(realSig);
+        // firmamos y devolvemos
+        return new DEROctetString(sig.sign());
 
     }
 

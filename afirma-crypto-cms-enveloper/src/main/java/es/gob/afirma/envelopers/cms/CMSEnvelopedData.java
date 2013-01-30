@@ -11,12 +11,17 @@
 package es.gob.afirma.envelopers.cms;
 
 import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 import java.util.Map;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 
 import org.bouncycastle.asn1.ASN1Encoding;
@@ -31,7 +36,6 @@ import org.bouncycastle.asn1.cms.EnvelopedData;
 import org.bouncycastle.asn1.cms.OriginatorInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 
-import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ciphers.AOCipherConfig;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
@@ -85,14 +89,24 @@ public final class CMSEnvelopedData {
      * @throws java.security.NoSuchAlgorithmException
      *         Si no se soporta alguno de los algoritmos de firma o huella
      *         digital
-     * @throws AOException
-     *         Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
+     * @throws InvalidAlgorithmParameterException
+     * @throws NoSuchPaddingException
+     * @throws InvalidKeyException
      */
     byte[] genEnvelopedData(final P7ContentSignerParameters parameters,
                                    final AOCipherConfig config,
                                    final X509Certificate[] certDest,
                                    final String dataType,
-                                   final Map<String, byte[]> uatrib) throws IOException, CertificateEncodingException, NoSuchAlgorithmException, AOException {
+                                   final Map<String, byte[]> uatrib) throws IOException,
+                                                                            CertificateEncodingException,
+                                                                            NoSuchAlgorithmException,
+                                                                            InvalidKeyException,
+                                                                            NoSuchPaddingException,
+                                                                            InvalidAlgorithmParameterException,
+                                                                            IllegalBlockSizeException,
+                                                                            BadPaddingException {
         this.cipherKey = Utils.initEnvelopedData(config, certDest);
 
         // Ya que el contenido puede ser grande, lo recuperamos solo una vez
@@ -142,15 +156,25 @@ public final class CMSEnvelopedData {
      * @throws java.io.IOException
      * @throws java.security.cert.CertificateEncodingException
      * @throws java.security.NoSuchAlgorithmException
-     * @throws AOException
-     *         Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
+     * @throws InvalidAlgorithmParameterException
+     * @throws NoSuchPaddingException
+     * @throws InvalidKeyException
      */
     byte[] genEnvelopedData(final byte[] data,
                                    final String digestAlg,
                                    final AOCipherConfig config,
                                    final X509Certificate[] certDest,
                                    final String dataType,
-                                   final Map<String, byte[]> uatrib) throws IOException, CertificateEncodingException, NoSuchAlgorithmException, AOException {
+                                   final Map<String, byte[]> uatrib) throws IOException,
+                                                                            CertificateEncodingException,
+                                                                            NoSuchAlgorithmException,
+                                                                            InvalidKeyException,
+                                                                            NoSuchPaddingException,
+                                                                            InvalidAlgorithmParameterException,
+                                                                            IllegalBlockSizeException,
+                                                                            BadPaddingException {
 
         // Comprobamos que el archivo a tratar no sea nulo.
         this.cipherKey = Utils.initEnvelopedData(config, certDest);
@@ -189,9 +213,8 @@ public final class CMSEnvelopedData {
      * @return La nueva firma enveloped con los remitentes que ten&iacute;a (si
      *         los tuviera) con la cadena de certificados nueva.
      * @throws IOException Si hay errores de lectura de datos
-     * @throws AOException Cuando ocurra un error al insertar el nuevo destinatario en el envoltorio.
      * @throws CertificateEncodingException Cuando el certificado proporcionado es inv&aacute;lido */
-    public static byte[] addOriginatorInfo(final byte[] data, final X509Certificate[] signerCertificateChain) throws IOException, AOException, CertificateEncodingException {
+    public static byte[] addOriginatorInfo(final byte[] data, final X509Certificate[] signerCertificateChain) throws IOException, CertificateEncodingException {
 
         final ASN1InputStream is = new ASN1InputStream(data);
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN

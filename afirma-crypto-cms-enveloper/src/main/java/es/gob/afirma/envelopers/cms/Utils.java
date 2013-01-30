@@ -11,7 +11,6 @@
 package es.gob.afirma.envelopers.cms;
 
 import java.io.IOException;
-import java.security.AlgorithmParameters;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
@@ -81,7 +80,6 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.TBSCertificateStructure;
 
-import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ciphers.AOCipherConfig;
 import es.gob.afirma.core.ciphers.CipherConstants.AOCipherAlgorithm;
 import es.gob.afirma.core.ciphers.CipherConstants.AOCipherBlockMode;
@@ -174,17 +172,14 @@ final class Utils {
      * @throws IOException
      * @throws CertificateEncodingException */
     static ASN1Set fetchCertificatesList(final X509Certificate[] signerCertificateChain) throws IOException, CertificateEncodingException {
-        ASN1Set certificates = null;
-
         if (signerCertificateChain.length != 0) {
             final List<ASN1Encodable> ce = new ArrayList<ASN1Encodable>();
             for (final X509Certificate element : signerCertificateChain) {
                 ce.add(Certificate.getInstance(ASN1Primitive.fromByteArray(element.getEncoded())));
             }
-            certificates = SigUtils.createBerSetFromList(ce);
+            return SigUtils.createBerSetFromList(ce);
         }
-
-        return certificates;
+        return null;
     }
 
     /**
@@ -198,10 +193,24 @@ final class Utils {
      *         datos.
      * @throws CertificateEncodingException Si se produce alguna excepci&oacute;n
      *         con los certificados de los usuarios.
-     * @throws AOException Cuando ocurre un error durante la generaci&oacute;n del
-     *         n&uacute;cleo del sobre.
+     * @throws IllegalBlockSizeException
+     * @throws InvalidAlgorithmParameterException
+     * @throws NoSuchPaddingException
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeyException
+     * @throws BadPaddingException
      */
-    static Info initVariables(final byte[] data, final AOCipherConfig config, final X509Certificate[] certDest, final SecretKey cipherKey) throws AOException, CertificateEncodingException, IOException {
+    static Info initVariables(final byte[] data,
+    		                  final AOCipherConfig config,
+    		                  final X509Certificate[] certDest,
+    		                  final SecretKey cipherKey) throws CertificateEncodingException,
+    		                                                    IOException,
+    		                                                    InvalidKeyException,
+    		                                                    NoSuchAlgorithmException,
+    		                                                    NoSuchPaddingException,
+    		                                                    InvalidAlgorithmParameterException,
+    		                                                    IllegalBlockSizeException,
+    		                                                    BadPaddingException {
 
         // Reiniciamos las dos variables
         final Info infos = new Info();
@@ -234,13 +243,9 @@ final class Utils {
             // obtenemos el algoritmo de cifrado.
             keyEncAlg = info.getAlgorithm();
 
-            try {
-                // ciframos la clave
-                encryptedKey = cipherKey(pubKey, cipherKey);
-            }
-            catch (final Exception e) {
-                throw new AOException("Error durante el proceso cifrado de la clave: " + e); //$NON-NLS-1$
-            }
+            // ciframos la clave
+            encryptedKey = cipherKey(pubKey, cipherKey);
+
             // creamos el recipiente con los datos del destinatario.
             final KeyTransRecipientInfo keyTransRecipientInfo = new KeyTransRecipientInfo(rid, keyEncAlg, new DEROctetString(encryptedKey));
 
@@ -250,12 +255,7 @@ final class Utils {
         }
 
         // 3. ENCRIPTEDCONTENTINFO
-        try {
-            infos.setEncInfo(getEncryptedContentInfo(data, config, cipherKey));
-        }
-        catch (final Exception e) {
-            throw new AOException("Error durante el proceso cifrado de la clave: " + e); //$NON-NLS-1$
-        }
+        infos.setEncInfo(getEncryptedContentInfo(data, config, cipherKey));
 
         infos.setRecipientInfos(recipientInfos);
 
@@ -287,15 +287,16 @@ final class Utils {
      * @throws java.security.InvalidKeyException
      * @throws java.io.IOException
      * @throws BadPaddingException
-     * @throws IllegalBlockSizeException
-     * @throws org.bouncycastle.cms.CMSException */
-    static EncryptedContentInfo getEncryptedContentInfo(final byte[] file, final AOCipherConfig config, final SecretKey cipherKey) throws NoSuchAlgorithmException,
-                                                                                                                       NoSuchPaddingException,
-                                                                                                                       InvalidAlgorithmParameterException,
-                                                                                                                       InvalidKeyException,
-                                                                                                                       IOException,
-                                                                                                                       IllegalBlockSizeException,
-                                                                                                                       BadPaddingException {
+     * @throws IllegalBlockSizeException */
+    static EncryptedContentInfo getEncryptedContentInfo(final byte[] file,
+    		                                            final AOCipherConfig config,
+    		                                            final SecretKey cipherKey) throws NoSuchAlgorithmException,
+                                                                                          NoSuchPaddingException,
+                                                                                          InvalidAlgorithmParameterException,
+                                                                                          InvalidKeyException,
+                                                                                          IOException,
+                                                                                          IllegalBlockSizeException,
+                                                                                          BadPaddingException {
 
         final AlgorithmParameterSpec params = getParams(config);
         final Cipher cipher = createCipher(config.toString());
@@ -330,13 +331,15 @@ final class Utils {
      * @throws java.io.IOException
      * @throws javax.crypto.IllegalBlockSizeException
      * @throws javax.crypto.BadPaddingException */
-    static EncryptedContentInfo getEncryptedContentInfo(final byte[] file, final Key cipherKey, final AOCipherConfig config) throws NoSuchAlgorithmException,
-                                                                                                                                   NoSuchPaddingException,
-                                                                                                                                   InvalidAlgorithmParameterException,
-                                                                                                                                   InvalidKeyException,
-                                                                                                                                   IOException,
-                                                                                                                                   IllegalBlockSizeException,
-                                                                                                                                   BadPaddingException {
+    static EncryptedContentInfo getEncryptedContentInfo(final byte[] file,
+    		                                            final Key cipherKey,
+    		                                            final AOCipherConfig config) throws NoSuchAlgorithmException,
+                                                                                            NoSuchPaddingException,
+                                                                                            InvalidAlgorithmParameterException,
+                                                                                            InvalidKeyException,
+                                                                                            IOException,
+                                                                                            IllegalBlockSizeException,
+                                                                                            BadPaddingException {
         final AlgorithmParameterSpec params = Utils.getParams(config);
         final Cipher cipher = createCipher(config.toString());
         cipher.init(Cipher.ENCRYPT_MODE, cipherKey, params);
@@ -421,18 +424,15 @@ final class Utils {
      * @throws java.security.InvalidAlgorithmParameterException
      * @throws javax.crypto.IllegalBlockSizeException
      * @throws javax.crypto.BadPaddingException */
-    private static byte[] cipherKey(final PublicKey pKey, final SecretKey cipherKey) throws NoSuchAlgorithmException,
-                                                                        NoSuchPaddingException,
-                                                                        InvalidKeyException,
-                                                                        InvalidAlgorithmParameterException,
-                                                                        IllegalBlockSizeException {
-
+    private static byte[] cipherKey(final PublicKey pKey,
+    		                        final SecretKey cipherKey) throws NoSuchAlgorithmException,
+                                                                      NoSuchPaddingException,
+                                                                      InvalidKeyException,
+                                                                      InvalidAlgorithmParameterException,
+                                                                      IllegalBlockSizeException {
         final Cipher cipher = createCipher(pKey.getAlgorithm());
-        final AlgorithmParameters params = cipher.getParameters();
-        cipher.init(Cipher.WRAP_MODE, pKey, params);
-        final byte[] ciphered = cipher.wrap(cipherKey);
-
-        return ciphered;
+        cipher.init(Cipher.WRAP_MODE, pKey);
+        return cipher.wrap(cipherKey);
     }
 
     /** Inicializa el context
@@ -442,7 +442,10 @@ final class Utils {
      * @param messageDigest
      * @return ASN1EncodableVector
      * @throws NoSuchAlgorithmException */
-    static ASN1EncodableVector initContexExpecific(final String digestAlgorithm, final byte[] datos, final String dataType, final byte[] messageDigest) throws NoSuchAlgorithmException {
+    static ASN1EncodableVector initContexExpecific(final String digestAlgorithm,
+    		                                       final byte[] datos,
+    		                                       final String dataType,
+    		                                       final byte[] messageDigest) throws NoSuchAlgorithmException {
         // authenticatedAttributes
         final ASN1EncodableVector contexExpecific = new ASN1EncodableVector();
 
@@ -456,10 +459,13 @@ final class Utils {
 
         // MessageDigest
         contexExpecific.add(new Attribute(CMSAttributes.messageDigest,
-                new DERSet(new DEROctetString(
-                        messageDigest != null ?
-                                messageDigest :
-                                    MessageDigest.getInstance(digestAlgorithm).digest(datos))))
+            new DERSet(
+        		new DEROctetString(
+                    messageDigest != null ?
+                            messageDigest :
+                                MessageDigest.getInstance(digestAlgorithm).digest(datos))
+        		)
+			)
         );
 
         return contexExpecific;
@@ -498,21 +504,10 @@ final class Utils {
         return SigUtils.getAttributeSet(new AttributeTable(contexExpecific));
     }
 
-    static byte[] genMac(final String encryptionAlg, final byte[] content, final SecretKey ciphKey) throws NoSuchAlgorithmException, IOException {
-        Mac mac;
-        if (encryptionAlg == null || encryptionAlg.equals("")) { //$NON-NLS-1$
-            mac = Mac.getInstance(ENCRYPTION_ALG_DEFAULT);
-        }
-        else {
-            mac = Mac.getInstance(encryptionAlg);
-        }
-        try {
-            mac.init(ciphKey);
-            return mac.doFinal(content);
-        }
-        catch (final Exception e) {
-            throw new IOException("Error al generar el codigo de autenticacion Mac: " + e, e); //$NON-NLS-1$
-        }
+    static byte[] genMac(final String encryptionAlg, final byte[] content, final SecretKey ciphKey) throws NoSuchAlgorithmException, InvalidKeyException {
+        final Mac mac = encryptionAlg == null || encryptionAlg.equals("") ? Mac.getInstance(ENCRYPTION_ALG_DEFAULT) : Mac.getInstance(encryptionAlg); //$NON-NLS-1$
+        mac.init(ciphKey);
+        return mac.doFinal(content);
     }
 
     static OriginatorInfo checkCertificates(final X509Certificate[] signerCertificateChain, final ASN1Set certs) throws IOException,
@@ -581,9 +576,10 @@ final class Utils {
      * @throws AOInvalidRecipientException
      * @throws IOException
      * @throws CertificateEncodingException */
-    static EncryptedKeyDatas fetchEncryptedKeyDatas(final X509Certificate userCert, final Enumeration<?> elementRecipient) throws AOInvalidRecipientException,
-                                                                                                                     IOException,
-                                                                                                                     CertificateEncodingException {
+    static EncryptedKeyDatas fetchEncryptedKeyDatas(final X509Certificate userCert,
+    		                                        final Enumeration<?> elementRecipient) throws AOInvalidRecipientException,
+                                                                                                  IOException,
+                                                                                                  CertificateEncodingException {
 
         final EncryptedKeyDatas encryptedKeyDatas = new EncryptedKeyDatas();
         AlgorithmIdentifier algEncryptedKey = null;
@@ -616,7 +612,7 @@ final class Utils {
 
         // si no se encuentran coincidencias es tonteria continuar.
         if (encryptedKey == null || algEncryptedKey == null) {
-            throw new AOInvalidRecipientException("El usuario indicado no es uno de los destinatarios del sobre digital."); //$NON-NLS-1$
+            throw new AOInvalidRecipientException("El usuario indicado no es uno de los destinatarios del sobre digital"); //$NON-NLS-1$
         }
 
         encryptedKeyDatas.setAlgEncryptedKey(algEncryptedKey);
@@ -663,12 +659,14 @@ final class Utils {
      * @throws org.bouncycastle.cms.CMSException
      * @throws javax.crypto.IllegalBlockSizeException
      * @throws javax.crypto.BadPaddingException */
-    static byte[] deCipherContent(final byte[] file, final AOCipherConfig config, final SecretKey cipherKey) throws NoSuchAlgorithmException,
-                                                                                                 NoSuchPaddingException,
-                                                                                                 InvalidAlgorithmParameterException,
-                                                                                                 InvalidKeyException,
-                                                                                                 IllegalBlockSizeException,
-                                                                                                 BadPaddingException {
+    static byte[] deCipherContent(final byte[] file,
+    		                      final AOCipherConfig config,
+    		                      final SecretKey cipherKey) throws NoSuchAlgorithmException,
+                                                                    NoSuchPaddingException,
+                                                                    InvalidAlgorithmParameterException,
+                                                                    InvalidKeyException,
+                                                                    IllegalBlockSizeException,
+                                                                    BadPaddingException {
         // asignamos los par&aacute;metros
         final AlgorithmParameterSpec params = getParams(config);
         // Creamos el cipher
@@ -689,11 +687,11 @@ final class Utils {
      * @throws InvalidKeySpecException
      * @throws NoSuchAlgorithmException */
     static SecretKey loadCipherKey(final AOCipherConfig config, final String key) throws InvalidKeySpecException, NoSuchAlgorithmException {
-        final SecretKey cipherKey =
-                SecretKeyFactory.getInstance(config.getAlgorithm().getName())
-                                .generateSecret(new PBEKeySpec(key.toCharArray(), SALT, ITERATION_COUNT));
-
-        return cipherKey;
+        return SecretKeyFactory.getInstance(
+    		config.getAlgorithm().getName()
+		).generateSecret(
+			new PBEKeySpec(key.toCharArray(), SALT, ITERATION_COUNT)
+		);
     }
 
     /** Asigna la clave para firmar el contenido del fichero que queremos
@@ -706,10 +704,14 @@ final class Utils {
      * @param algClave
      *        Algoritmo necesario para crear la clave.
      * @return Objeto con la configuracion y la clave de cifrado
-     * @throws AOException
-     *         Cuando no se pudo descifrar la clave con el certificado de
-     *         usuario. */
-    static KeyAsigned assignKey(final byte[] passCiphered, final PrivateKeyEntry keyEntry, final AlgorithmIdentifier algClave) throws AOException {
+     * @throws NoSuchPaddingException
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeyException */
+    static KeyAsigned assignKey(final byte[] passCiphered,
+    		                    final PrivateKeyEntry keyEntry,
+    		                    final AlgorithmIdentifier algClave) throws NoSuchAlgorithmException,
+    		                                                               NoSuchPaddingException,
+    		                                                               InvalidKeyException {
 
         final KeyAsigned keyAsigned = new KeyAsigned();
 
@@ -724,7 +726,7 @@ final class Utils {
         }
 
         if (algorithm == null) {
-            throw new AOException("No se ha podido determinar el algoritmo de cifrado de la clave"); //$NON-NLS-1$
+            throw new NoSuchAlgorithmException("No se ha podido determinar el algoritmo de cifrado de la clave"); //$NON-NLS-1$
         }
 
         // establecemos como configuraci&oacute;n para descifrar el contenido
@@ -733,16 +735,10 @@ final class Utils {
 
         // Desembolvemos la clave usada para cifrar el contenido
         // a partir de la clave privada del certificado del usuario.
-        try {
-            final byte[] encrypted = passCiphered;
-            final Cipher cipher2 = Cipher.getInstance("RSA/ECB/PKCS1Padding"); //$NON-NLS-1$
-            cipher2.init(Cipher.UNWRAP_MODE, keyEntry.getPrivateKey());
-            keyAsigned.setCipherKey((SecretKey) cipher2.unwrap(encrypted, algorithm.getName(), Cipher.SECRET_KEY));
-            return keyAsigned;
-        }
-        catch (final Exception e) {
-            throw new AOException("Ocurri\u00F3 un error al recuperar la clave de cifrado del sobre digital", e); //$NON-NLS-1$
-        }
+        final Cipher cipher2 = Cipher.getInstance("RSA/ECB/PKCS1Padding"); //$NON-NLS-1$
+        cipher2.init(Cipher.UNWRAP_MODE, keyEntry.getPrivateKey());
+        keyAsigned.setCipherKey((SecretKey) cipher2.unwrap(passCiphered, algorithm.getName(), Cipher.SECRET_KEY));
+        return keyAsigned;
     }
 
     /** M&eacute;todo que genera la parte que contiene la informaci&oacute;n del
@@ -798,53 +794,31 @@ final class Utils {
      * @param signedAttr2
      *        Atributos firmados
      * @return Firma de los atributos.
-     * @throws AOException
-     *         si ocurre cualquier error durante la firma */
-    static ASN1OctetString firma(final String signatureAlgorithm, final PrivateKeyEntry keyEntry, final ASN1Set signedAttr2) throws AOException {
+     * @throws NoSuchAlgorithmException
+     * @throws IOException
+     * @throws InvalidKeyException
+     * @throws SignatureException */
+    static ASN1OctetString firma(final String signatureAlgorithm,
+    		                     final PrivateKeyEntry keyEntry,
+    		                     final ASN1Set signedAttr2) throws NoSuchAlgorithmException,
+                                                                   IOException,
+                                                                   InvalidKeyException,
+                                                                   SignatureException {
 
-        final Signature sig;
-        try {
-            sig = Signature.getInstance(signatureAlgorithm);
-        }
-        catch (final Exception e) {
-            throw new AOException("Error obteniendo la clase de firma para el algoritmo " + signatureAlgorithm, e); //$NON-NLS-1$
-        }
+        final Signature sig = Signature.getInstance(signatureAlgorithm);
 
-        final byte[] tmp;
-
-        try {
-            tmp = signedAttr2.getEncoded(ASN1Encoding.DER);
-        }
-        catch (final IOException ex) {
-            throw new AOException("No se han podido codificar en ASN.1 los atributos firmados", ex); //$NON-NLS-1$
-        }
+        final byte[] tmp = signedAttr2.getEncoded(ASN1Encoding.DER);
 
         // Indicar clave privada para la firma
-        try {
-            sig.initSign(keyEntry.getPrivateKey());
-        }
-        catch (final Exception e) {
-            throw new AOException("Error al inicializar la firma con la clave privada", e); //$NON-NLS-1$
-        }
+        sig.initSign(keyEntry.getPrivateKey());
 
         // Actualizamos la configuracion de firma
-        try {
-            if (tmp != null) {
-                sig.update(tmp);
-            }
-        }
-        catch (final SignatureException e) {
-            throw new AOException("Error al configurar la informacion de firma", e); //$NON-NLS-1$
+        if (tmp != null) {
+            sig.update(tmp);
         }
 
         // firmamos.
-        final byte[] realSig;
-        try {
-            realSig = sig.sign();
-        }
-        catch (final Exception e) {
-            throw new AOException("Error durante el proceso de firma", e); //$NON-NLS-1$
-        }
+        final byte[] realSig = sig.sign();
 
         return new DEROctetString(realSig);
 

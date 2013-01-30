@@ -11,6 +11,8 @@
 package es.gob.afirma.envelopers.cms;
 
 import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
@@ -20,6 +22,9 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 
 import org.bouncycastle.asn1.ASN1Encodable;
@@ -43,7 +48,6 @@ import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.cms.OriginatorInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 
-import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ciphers.AOCipherConfig;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 
@@ -115,20 +119,27 @@ public final class CMSAuthenticatedEnvelopedData {
      *         firma.
      * @throws NoSuchAlgorithmException
      *         Si no se encuentra un algoritmo v&aacute;lido.
-     * @throws AOException
-     *         Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
+     * @throws InvalidKeyException
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
+     * @throws InvalidAlgorithmParameterException
+     * @throws NoSuchPaddingException
      */
     public static byte[] genAuthenticatedEnvelopedData(final P7ContentSignerParameters parameters,
-                                                final String autenticationAlgorithm,
-                                                final AOCipherConfig config,
-                                                final X509Certificate[] certDest,
-                                                final String dataType,
-                                                final boolean applySigningTime,
-                                                final Map<String, byte[]> atrib,
-                                                final Map<String, byte[]> uatrib) throws IOException,
-                                                                                      CertificateEncodingException,
-                                                                                      NoSuchAlgorithmException,
-                                                                                      AOException {
+                                                	   final String autenticationAlgorithm,
+                                                	   final AOCipherConfig config,
+                                                	   final X509Certificate[] certDest,
+                                                	   final String dataType,
+                                                	   final boolean applySigningTime,
+                                                	   final Map<String, byte[]> atrib,
+                                                	   final Map<String, byte[]> uatrib) throws IOException,
+                                                                                                CertificateEncodingException,
+                                                                                                NoSuchAlgorithmException,
+                                                                                                InvalidKeyException,
+                                                                                                NoSuchPaddingException,
+                                                                                                InvalidAlgorithmParameterException,
+                                                                                                IllegalBlockSizeException,
+                                                                                                BadPaddingException {
         final SecretKey cipherKey = Utils.initEnvelopedData(config, certDest);
 
         // Ya que el contenido puede ser grande, lo recuperamos solo una vez

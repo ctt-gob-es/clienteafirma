@@ -11,6 +11,7 @@
 package es.gob.afirma.envelopers.cms;
 
 import java.io.IOException;
+import java.security.InvalidKeyException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -54,7 +55,6 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.TBSCertificateStructure;
 
-import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
@@ -551,51 +551,28 @@ final class CoSignerEnveloped {
      * @param keyEntry
      *        Clave para firmar.
      * @return Firma de los atributos.
-     * @throws es.map.es.map.afirma.exceptions.AOException */
-    private ASN1OctetString firma(final String signatureAlgorithm, final PrivateKeyEntry keyEntry) throws AOException {
+     * @throws InvalidKeyException
+     * @throws NoSuchAlgorithmException
+     * @throws IOException
+     * @throws SignatureException */
+    private ASN1OctetString firma(final String signatureAlgorithm,
+    		                      final PrivateKeyEntry keyEntry) throws InvalidKeyException,
+    		                                                             NoSuchAlgorithmException,
+    		                                                             IOException,
+    		                                                             SignatureException {
 
-        final Signature sig;
-        try {
-            sig = Signature.getInstance(signatureAlgorithm);
-        }
-        catch (final Exception e) {
-            throw new AOException("Error obteniendo la clase de firma para el algoritmo " + signatureAlgorithm, e); //$NON-NLS-1$
-        }
+        final Signature sig = Signature.getInstance(signatureAlgorithm);
 
-        final byte[] tmp;
-        try {
-            tmp = this.signedAttr2.getEncoded(ASN1Encoding.DER);
-        }
-        catch (final IOException ex) {
-            throw new AOException("Error obteniendo los atributos firmados", ex); //$NON-NLS-1$
-        }
+        final byte[] tmp = this.signedAttr2.getEncoded(ASN1Encoding.DER);
 
         // Indicar clave privada para la firma
-        try {
-            sig.initSign(keyEntry.getPrivateKey());
-        }
-        catch (final Exception e) {
-            throw new AOException("Error al inicializar la firma con la clave privada", e); //$NON-NLS-1$
-        }
+        sig.initSign(keyEntry.getPrivateKey());
 
         // Actualizamos la configuracion de firma
-        try {
-            sig.update(tmp);
-        }
-        catch (final SignatureException e) {
-            throw new AOException("Error al configurar la informacion de firma", e); //$NON-NLS-1$
-        }
+        sig.update(tmp);
 
-        // firmamos.
-        final byte[] realSig;
-        try {
-            realSig = sig.sign();
-        }
-        catch (final Exception e) {
-            throw new AOException("Error durante el proceso de firma", e); //$NON-NLS-1$
-        }
-
-        return new DEROctetString(realSig);
+        // firmamos y devolvemos.
+        return new DEROctetString(sig.sign());
 
     }
 

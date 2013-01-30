@@ -65,11 +65,14 @@ final class CMSDecipherAuthenticatedData {
      * @throws NoSuchAlgorithmException
      *         Cuando no se reconozca el algoritmo utilizado para generar el
      *         c&oacute;digo de autenticaci&oacute;n.
+     * @throws NoSuchPaddingException
      */
     byte[] decipherAuthenticatedData(final byte[] cmsData, final PrivateKeyEntry keyEntry) throws IOException,
                                                                                      CertificateEncodingException,
                                                                                      AOException,
-                                                                                     InvalidKeyException, NoSuchAlgorithmException {
+                                                                                     InvalidKeyException,
+                                                                                     NoSuchAlgorithmException,
+                                                                                     NoSuchPaddingException {
         byte[] contenido = new byte[0];
 
         AuthenticatedData authenticated = null;
@@ -113,10 +116,14 @@ final class CMSDecipherAuthenticatedData {
      *        Contrase&ntilde;a que se va a usar para descifrar.
      * @param algClave
      *        Algoritmo necesario para crear la clave.
-     * @throws AOException
-     *         Cuando no se pudo descifrar la clave con el certificado de
-     *         usuario. */
-    private void assignKey(final byte[] passCiphered, final PrivateKeyEntry keyEntry, final AlgorithmIdentifier algClave) throws AOException {
+     * @throws InvalidKeyException
+     * @throws NoSuchAlgorithmException
+     * @throws NoSuchPaddingException */
+    private void assignKey(final byte[] passCiphered,
+    		               final PrivateKeyEntry keyEntry,
+    		               final AlgorithmIdentifier algClave) throws InvalidKeyException,
+    		                                                          NoSuchAlgorithmException,
+    		                                                          NoSuchPaddingException {
 
         AOCipherAlgorithm algorithmConfig = null;
 
@@ -129,21 +136,16 @@ final class CMSDecipherAuthenticatedData {
         }
 
         if (algorithmConfig == null) {
-            throw new AOException("No se ha podido obtener el algoritmo para cifrar la contrasena"); //$NON-NLS-1$
+            throw new NoSuchAlgorithmException("No se ha podido obtener el algoritmo para cifrar la contrasena"); //$NON-NLS-1$
         }
 
         this.macAlgorithmConfig = algorithmConfig;
 
         // Desembolvemos la clave usada para cifrar el contenido
         // a partir de la clave privada del certificado del usuario.
-        try {
-            final Cipher cipher = createCipher(keyEntry.getPrivateKey().getAlgorithm());
-            cipher.init(Cipher.UNWRAP_MODE, keyEntry.getPrivateKey());
-            this.cipherKey = (SecretKey) cipher.unwrap(passCiphered, algorithmConfig.getName(), Cipher.SECRET_KEY);
-        }
-        catch (final Exception e) {
-            throw new AOException("Error al recuperar la clave de cifrado del sobre autenticado", e); //$NON-NLS-1$
-        }
+        final Cipher cipher = createCipher(keyEntry.getPrivateKey().getAlgorithm());
+        cipher.init(Cipher.UNWRAP_MODE, keyEntry.getPrivateKey());
+        this.cipherKey = (SecretKey) cipher.unwrap(passCiphered, algorithmConfig.getName(), Cipher.SECRET_KEY);
     }
 
     /** Crea el cifrador usado para cifrar tanto el fichero como la clave usada

@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -11,11 +11,17 @@
 package es.gob.afirma.envelopers.cms;
 
 import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.cms.EncryptedContentInfo;
@@ -28,7 +34,7 @@ import es.gob.afirma.core.AOException;
  * CMS.
  * Se usa para ello una clave del usuario. */
 public final class CMSDecipherEnvelopData {
-	
+
 	private CMSDecipherEnvelopData() {
 		// No permitimos la instanciacion
 	}
@@ -54,12 +60,22 @@ public final class CMSDecipherEnvelopData {
      *         Cuando se indica un certificado que no est&aacute; entre los
      *         destinatarios del sobre.
      * @throws InvalidKeyException
-     *         Cuando la clave almacenada en el sobre no es v&aacute;lida. */
-    public static byte[] dechiperEnvelopData(final byte[] cmsData, 
+     *         Cuando la clave almacenada en el sobre no es v&aacute;lida.
+     * @throws NoSuchPaddingException
+     * @throws NoSuchAlgorithmException
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
+     * @throws InvalidAlgorithmParameterException */
+    public static byte[] dechiperEnvelopData(final byte[] cmsData,
     		                                 final PrivateKeyEntry keyEntry) throws IOException,
-                                                                               CertificateEncodingException,
-                                                                               AOException,
-                                                                               InvalidKeyException {
+                                                                                    CertificateEncodingException,
+                                                                                    AOException,
+                                                                                    InvalidKeyException,
+                                                                                    NoSuchAlgorithmException,
+                                                                                    NoSuchPaddingException,
+                                                                                    InvalidAlgorithmParameterException,
+                                                                                    IllegalBlockSizeException,
+                                                                                    BadPaddingException {
 
         // Contendra el contenido a tratar.
         EnvelopedData enveloped = null;
@@ -88,15 +104,10 @@ public final class CMSDecipherEnvelopData {
         final KeyAsigned keyAsigned = Utils.assignKey(encryptedKeyDatas.getEncryptedKey(), keyEntry, algClave);
 
         // Desciframos el contenido.
-        try {
-            return Utils.deCipherContent(
-                     contenidoCifrado.getEncryptedContent().getOctets(), 
-                     keyAsigned.getConfig(), 
-                     keyAsigned.getCipherKey()
-            );
-        }
-        catch (final Exception ex) {
-            throw new AOException("Error al descifrar los contenidos del sobre digital", ex); //$NON-NLS-1$
-        }
+        return Utils.deCipherContent(
+                 contenidoCifrado.getEncryptedContent().getOctets(),
+                 keyAsigned.getConfig(),
+                 keyAsigned.getCipherKey()
+        );
     }
 }

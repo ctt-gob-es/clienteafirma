@@ -16,8 +16,10 @@ import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -152,13 +154,16 @@ public class AOCMSEnveloper implements AOEnveloper {
      * @throws AOException
      *         Cuando ocurre cualquier problema durante el proceso */
     @Override
-	public byte[] encrypt(final byte[] data, final String digestAlgorithm, final String key, final AOCipherAlgorithm cipherAlgorithm, final String dataType) throws AOException {
+	public byte[] encrypt(final byte[] data,
+			              final String digestAlgorithm,
+			              final String key,
+			              final AOCipherAlgorithm cipherAlgorithm,
+			              final String dataType) throws AOException {
 
         // Comprobamos que el archivo a cifrar no sea nulo.
         if (data == null) {
             throw new IllegalArgumentException("Los datos a cifrar no pueden ser nulo."); //$NON-NLS-1$
         }
-
         return null;
     }
 
@@ -269,13 +274,24 @@ public class AOCMSEnveloper implements AOEnveloper {
      *         Cuando el certificado del remitente no es v&aacute;lido.
      * @throws AOException
      *         Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
+     * @throws InvalidAlgorithmParameterException
+     * @throws NoSuchPaddingException
+     * @throws InvalidKeyException
      */
     public byte[] createCMSEnvelopedData(final byte[] content,
                                          final PrivateKeyEntry ke,
                                          final AOCipherConfig cipherConfig,
                                          final X509Certificate[] recipientsCerts) throws NoSuchAlgorithmException,
-                                                                                 CertificateEncodingException,
-                                                                                 IOException, AOException {
+                                                                                         CertificateEncodingException,
+                                                                                         IOException,
+                                                                                         AOException,
+                                                                                         InvalidKeyException,
+                                                                                         NoSuchPaddingException,
+                                                                                         InvalidAlgorithmParameterException,
+                                                                                         IllegalBlockSizeException,
+                                                                                         BadPaddingException {
 
         // Si se establecion un remitente
         if (ke != null) {
@@ -311,13 +327,26 @@ public class AOCMSEnveloper implements AOEnveloper {
      *         Cuando el certificado del remitente no es v&aacute;lido.
      * @throws AOException
      *         Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
+     * @throws SignatureException
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
+     * @throws InvalidAlgorithmParameterException
+     * @throws NoSuchPaddingException
+     * @throws InvalidKeyException
      */
     public byte[] createCMSSignedAndEnvelopedData(final byte[] content,
                                                   final PrivateKeyEntry ke,
                                                   final AOCipherConfig cipherConfig,
                                                   final X509Certificate[] recipientsCerts) throws CertificateEncodingException,
-                                                                                          NoSuchAlgorithmException,
-                                                                                          IOException, AOException {
+                                                                                                  NoSuchAlgorithmException,
+                                                                                                  IOException,
+                                                                                                  AOException,
+                                                                                                  InvalidKeyException,
+                                                                                                  NoSuchPaddingException,
+                                                                                                  InvalidAlgorithmParameterException,
+                                                                                                  IllegalBlockSizeException,
+                                                                                                  BadPaddingException,
+                                                                                                  SignatureException {
         return new CMSSignedAndEnvelopedData().genSignedAndEnvelopedData(
         	 AOCMSEnveloper.createContentSignerParementers(content, ke, this.signatureAlgorithm),
              cipherConfig,
@@ -348,13 +377,24 @@ public class AOCMSEnveloper implements AOEnveloper {
      *         Cuando el certificado del remitente no es v&aacute;lido.
      * @throws AOException
      *         Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
+     * @throws InvalidKeyException
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
+     * @throws InvalidAlgorithmParameterException
+     * @throws NoSuchPaddingException
      */
     byte[] createCMSAuthenticatedData(final byte[] content,
     		                          final PrivateKeyEntry ke,
     		                          final AOCipherConfig cipherConfig,
     		                          final X509Certificate[] recipientsCerts) throws CertificateEncodingException,
                                                                                       NoSuchAlgorithmException,
-                                                                                      IOException, AOException {
+                                                                                      IOException,
+                                                                                      AOException,
+                                                                                      InvalidKeyException,
+                                                                                      NoSuchPaddingException,
+                                                                                      InvalidAlgorithmParameterException,
+                                                                                      IllegalBlockSizeException,
+                                                                                      BadPaddingException {
 		return CMSAuthenticatedData.genAuthenticatedData(
         		AOCMSEnveloper.createContentSignerParementers(content, ke, this.signatureAlgorithm), // ContentSignerParameters
                 null, // Algoritmo de autenticacion (usamos el por defecto)
@@ -386,22 +426,33 @@ public class AOCMSEnveloper implements AOEnveloper {
      *         Cuando el certificado del remitente no es v&aacute;lido.
      * @throws AOException
      *         Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
+     * @throws InvalidKeyException
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
+     * @throws InvalidAlgorithmParameterException
+     * @throws NoSuchPaddingException
      */
     public byte[] createCMSAuthenticatedEnvelopedData(final byte[] content,
                                                       final PrivateKeyEntry ke,
                                                       final AOCipherConfig cipherConfig,
                                                       final X509Certificate[] recipientsCerts) throws CertificateEncodingException,
-                                                                                        NoSuchAlgorithmException,
-                                                                                        IOException, AOException {
-		return CMSAuthenticatedEnvelopedData.genAuthenticatedEnvelopedData(AOCMSEnveloper.createContentSignerParementers(content, ke, this.signatureAlgorithm), // ContentSignerParameters
-                                                                                 null, // Algoritmo de autenticacion (usamos el por
-                                                                                       // defecto)
-                                                                                 cipherConfig, // Configuracion del cipher
-                                                                                 recipientsCerts, // certificados destino
-                                                                                 DATA_TYPE_OID, // dataType
-                                                                                 true, // applySigningTime,
-                                                                                 this.attrib, // atributos firmados
-                                                                                 this.uattrib // atributos no firmados
+                                                                                                      NoSuchAlgorithmException,
+                                                                                                      IOException,
+                                                                                                      AOException,
+                                                                                                      InvalidKeyException,
+                                                                                                      NoSuchPaddingException,
+                                                                                                      InvalidAlgorithmParameterException,
+                                                                                                      IllegalBlockSizeException,
+                                                                                                      BadPaddingException {
+		return CMSAuthenticatedEnvelopedData.genAuthenticatedEnvelopedData(
+				AOCMSEnveloper.createContentSignerParementers(content, ke, this.signatureAlgorithm), // ContentSignerParameters
+                null, // Algoritmo de autenticacion (usamos el por defecto)
+                cipherConfig, // Configuracion del cipher
+                recipientsCerts, // certificados destino
+                DATA_TYPE_OID, // dataType
+                true, // applySigningTime,
+                this.attrib, // atributos firmados
+                this.uattrib // atributos no firmados
         );
     }
 
@@ -533,9 +584,14 @@ public class AOCMSEnveloper implements AOEnveloper {
      * @throws InvalidKeyException
      *         Cuando la clave de descifrado configurada no sea v&aacute;lida o pertenezca a un destinatario.
      * @throws AOException
-     *         Cuando se produce un error durante al desenvolver los datos. */
+     *         Cuando se produce un error durante al desenvolver los datos.
+     * @throws InvalidKeySpecException */
     @Override
-	public byte[] recoverData(final byte[] cmsEnvelop, final PrivateKeyEntry addresseePke) throws InvalidKeyException, AOException, IOException {
+	public byte[] recoverData(final byte[] cmsEnvelop,
+			                  final PrivateKeyEntry addresseePke) throws InvalidKeyException,
+			                                                             AOException,
+			                                                             IOException,
+			                                                             InvalidKeySpecException {
 
     	final org.bouncycastle.asn1.ASN1InputStream is = new org.bouncycastle.asn1.ASN1InputStream(cmsEnvelop);
 
@@ -630,7 +686,9 @@ public class AOCMSEnveloper implements AOEnveloper {
      * @throws IllegalBlockSizeException
      * @throws InvalidAlgorithmParameterException
      * @throws NoSuchPaddingException
-     * @throws NoSuchAlgorithmException */
+     * @throws NoSuchAlgorithmException
+     * @throws IOException
+     * @throws InvalidKeySpecException */
     static byte[] recoverCMSEncryptedData(final byte[] encryptedData,
     		                              final String passkey) throws InvalidKeyException,
                                                                        AOException,
@@ -638,7 +696,9 @@ public class AOCMSEnveloper implements AOEnveloper {
                                                                        NoSuchPaddingException,
                                                                        InvalidAlgorithmParameterException,
                                                                        IllegalBlockSizeException,
-                                                                       BadPaddingException {
+                                                                       BadPaddingException,
+                                                                       InvalidKeySpecException,
+                                                                       IOException {
         return new CMSDecipherEncryptedData().dechiperEncryptedData(encryptedData, passkey);
     }
 
@@ -661,12 +721,19 @@ public class AOCMSEnveloper implements AOEnveloper {
      *         Cuando se indica un certificado que no est&aacute; entre los
      *         destinatarios del sobre.
      * @throws InvalidKeyException
-     *         Cuando la clave almacenada en el sobre no es v&aacute;lida. */
+     *         Cuando la clave almacenada en el sobre no es v&aacute;lida.
+     * @throws NoSuchPaddingException
+     * @throws NoSuchAlgorithmException
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
+     * @throws InvalidAlgorithmParameterException */
     static byte[] recoverCMSEnvelopedData(final byte[] envelopedData,
     		                              final PrivateKeyEntry ke) throws IOException,
                                                                            CertificateEncodingException,
                                                                            AOException,
-                                                                           InvalidKeyException {
+                                                                           InvalidKeyException,
+                                                                           NoSuchAlgorithmException,
+                                                                           NoSuchPaddingException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
 		return CMSDecipherEnvelopData.dechiperEnvelopData(envelopedData, ke);
     }
 
@@ -689,12 +756,22 @@ public class AOCMSEnveloper implements AOEnveloper {
      *         Cuando se indica un certificado que no est&aacute; entre los
      *         destinatarios del sobre.
      * @throws InvalidKeyException
-     *         Cuando la clave almacenada en el sobre no es v&aacute;lida. */
+     *         Cuando la clave almacenada en el sobre no es v&aacute;lida.
+     * @throws NoSuchPaddingException
+     * @throws NoSuchAlgorithmException
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
+     * @throws InvalidAlgorithmParameterException */
     static byte[] recoverCMSSignedEnvelopedData(final byte[] signedEnvelopedData,
     		                                    final PrivateKeyEntry ke) throws IOException,
                                                                                  CertificateEncodingException,
                                                                                  AOException,
-                                                                                 InvalidKeyException {
+                                                                                 InvalidKeyException,
+                                                                                 NoSuchAlgorithmException,
+                                                                                 NoSuchPaddingException,
+                                                                                 InvalidAlgorithmParameterException,
+                                                                                 IllegalBlockSizeException,
+                                                                                 BadPaddingException {
 		return CMSDecipherSignedAndEnvelopedData.dechiperSignedAndEnvelopData(signedEnvelopedData, ke);
     }
 
@@ -711,20 +788,19 @@ public class AOCMSEnveloper implements AOEnveloper {
      * @throws CertificateEncodingException
      *         Si el certificado proporcionado no se adec&uacute;a a la
      *         norma X.509v3
-     * @throws AOException
-     *         Cuando ocurre un error durante el proceso de
-     *         extracci&oacute;n.
      * @throws InvalidKeyException
      *         Cuando la clave almacenada en el sobre no es v&aacute;lida.
      * @throws NoSuchAlgorithmException Cuando no se reconoce el algoritmo
-     * utilizado para generar el c&oacute;digo de autenticaci&oacute;n.
+     *                                  utilizado para generar el c&oacute;digo de autenticaci&oacute;n.
+     * @throws NoSuchPaddingException
      */
     static byte[] recoverCMSAuthenticatedData(final byte[] authenticatedData,
     		                                  final PrivateKeyEntry ke) throws IOException,
                                                                                CertificateEncodingException,
                                                                                AOException,
                                                                                InvalidKeyException,
-                                                                               NoSuchAlgorithmException {
+                                                                               NoSuchAlgorithmException,
+                                                                               NoSuchPaddingException {
         return new CMSDecipherAuthenticatedData().decipherAuthenticatedData(authenticatedData, ke);
     }
 
@@ -749,12 +825,22 @@ public class AOCMSEnveloper implements AOEnveloper {
      *         Cuando se indica un certificado que no est&aacute; entre los
      *         destinatarios del sobre.
      * @throws InvalidKeyException
-     *         Cuando la clave almacenada en el sobre no es v&aacute;lida. */
+     *         Cuando la clave almacenada en el sobre no es v&aacute;lida.
+     * @throws NoSuchPaddingException
+     * @throws NoSuchAlgorithmException
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
+     * @throws InvalidAlgorithmParameterException */
     static byte[] recoverCMSAuthenticatedEnvelopedData(final byte[] authenticatedEnvelopedData,
     												   final PrivateKeyEntry ke) throws IOException,
                                                                                         CertificateEncodingException,
                                                                                         AOException,
-                                                                                        InvalidKeyException {
+                                                                                        InvalidKeyException,
+                                                                                        NoSuchAlgorithmException,
+                                                                                        NoSuchPaddingException,
+                                                                                        InvalidAlgorithmParameterException,
+                                                                                        IllegalBlockSizeException,
+                                                                                        BadPaddingException {
 		return CMSDecipherAuthenticatedEnvelopedData.dechiperAuthenticatedEnvelopedData(authenticatedEnvelopedData, ke);
     }
 

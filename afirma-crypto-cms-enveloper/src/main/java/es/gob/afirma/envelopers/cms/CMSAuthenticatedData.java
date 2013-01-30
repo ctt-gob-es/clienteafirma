@@ -13,6 +13,8 @@ package es.gob.afirma.envelopers.cms;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
@@ -24,6 +26,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 
 import org.bouncycastle.asn1.ASN1Encodable;
@@ -50,10 +55,10 @@ import org.bouncycastle.asn1.cms.OriginatorInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.style.RFC4519Style;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSProcessable;
 import org.bouncycastle.cms.CMSProcessableByteArray;
 
-import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ciphers.AOCipherConfig;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
@@ -128,8 +133,11 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
      *         firma.
      * @throws NoSuchAlgorithmException
      *         Si no se encuentra un algoritmo v&aacute;lido.
-     * @throws AOException
-     *         Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
+     * @throws InvalidKeyException
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
+     * @throws InvalidAlgorithmParameterException
+     * @throws NoSuchPaddingException
      */
     static byte[] genAuthenticatedData(final P7ContentSignerParameters parameters,
                                        final String autenticationAlgorithm,
@@ -138,7 +146,14 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
                                        final String dataType,
                                        final boolean applyTimestamp,
                                        final Map<String, byte[]> atrib,
-                                       final Map<String, byte[]> uatrib) throws IOException, CertificateEncodingException, NoSuchAlgorithmException, AOException {
+                                       final Map<String, byte[]> uatrib) throws IOException,
+                                                                                CertificateEncodingException,
+                                                                                NoSuchAlgorithmException,
+                                                                                InvalidKeyException,
+                                                                                NoSuchPaddingException,
+                                                                                InvalidAlgorithmParameterException,
+                                                                                IllegalBlockSizeException,
+                                                                                BadPaddingException {
 
     	final SecretKey cipherKey = Utils.initEnvelopedData(config, certDest);
 
@@ -182,7 +197,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
         try {
             msg.write(bOut);
         }
-        catch (final Exception ex) {
+        catch (final CMSException ex) {
             throw new IOException("Error en la escritura del procesable CMS: " + ex, ex); //$NON-NLS-1$
         }
         encInfo = new ContentInfo(contentTypeOID, new BEROctetString(bOut.toByteArray()));

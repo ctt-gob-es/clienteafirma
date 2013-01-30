@@ -11,13 +11,19 @@
 package es.gob.afirma.envelopers.cms;
 
 import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
@@ -40,7 +46,6 @@ import org.bouncycastle.asn1.x500.style.RFC4519Style;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.TBSCertificateStructure;
 
-import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ciphers.AOCipherConfig;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
@@ -101,8 +106,12 @@ final class CMSSignedAndEnvelopedData {
      * @throws java.security.NoSuchAlgorithmException
      *         Si no se soporta alguno de los algoritmos de firma o huella
      *         digital
-     * @throws AOException
-     *         Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
+     * @throws InvalidAlgorithmParameterException
+     * @throws NoSuchPaddingException
+     * @throws InvalidKeyException
+     * @throws SignatureException
      */
     byte[] genSignedAndEnvelopedData(final P7ContentSignerParameters parameters,
                                      final AOCipherConfig config,
@@ -113,7 +122,12 @@ final class CMSSignedAndEnvelopedData {
                                      final Map<String, byte[]> uatrib) throws IOException,
                                                                               CertificateEncodingException,
                                                                               NoSuchAlgorithmException,
-                                                                              AOException {
+                                                                              InvalidKeyException,
+                                                                              NoSuchPaddingException,
+                                                                              InvalidAlgorithmParameterException,
+                                                                              IllegalBlockSizeException,
+                                                                              BadPaddingException,
+                                                                              SignatureException {
 
     	final SecretKey cipherKey = Utils.initEnvelopedData(config, certDest);
 
