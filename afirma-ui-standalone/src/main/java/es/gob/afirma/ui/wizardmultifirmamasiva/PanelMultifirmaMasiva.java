@@ -51,6 +51,7 @@ import es.gob.afirma.keystores.main.common.KeyStoreConfiguration;
 import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
 import es.gob.afirma.keystores.main.filters.CertificateFilter;
 import es.gob.afirma.massive.MassiveType;
+import es.gob.afirma.ui.principal.Main;
 import es.gob.afirma.ui.utils.ConfigureCaret;
 import es.gob.afirma.ui.utils.CustomDialog;
 import es.gob.afirma.ui.utils.DirectorySignatureHelperAdv;
@@ -204,9 +205,10 @@ final class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
     /** Comprueba que el archivo seleccionado es correcto y guarda su nombre en el campo de texto.
      * Tambien genera el nombre del fichero log y lo guarda en su respectivo campo. */
     void examinarDirectorioActionPerformed() {
-        final File selectedFile = SelectionDialog.showDirOpenDialog(this, Messages.getString("PrincipalGUI.chooser.dir.outtitle")); //$NON-NLS-1$
+        final File selectedFile = SelectionDialog.showDirOpenDialog(this, Messages.getString("PrincipalGUI.chooser.dir.outtitle"), Main.getPreferences().get("dialog.load.dir.massiveout", null)); //$NON-NLS-1$ //$NON-NLS-2$
         if (selectedFile != null) {
             this.campoDirectorio.setText(selectedFile.getAbsolutePath());
+            Main.getPreferences().put("dialog.load.dir.massiveout", selectedFile.getAbsolutePath()); //$NON-NLS-1$
             if ("".equals(this.campoFicheroLog.getText().trim())) { //$NON-NLS-1$
             	this.campoFicheroLog.setText(new File(selectedFile.getAbsoluteFile().getParent(), "result.txt").getAbsolutePath()); //$NON-NLS-1$
             }
@@ -215,7 +217,7 @@ final class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
 
     /** Comprueba que el archivo log seleccionado es correcto y guarda su nombre en el campo de texto */
     void examinarFicheroLogActionPerformed() {
-        final File selectedFile = SelectionDialog.showFileOpenDialog(this, Messages.getString("Wizard.multifirma.chooserLog.tittle")); //$NON-NLS-1$
+        final File selectedFile = SelectionDialog.showFileOpenDialog(this, Messages.getString("Wizard.multifirma.chooserLog.tittle"), null); //$NON-NLS-1$
         if (selectedFile != null) {
             this.campoFicheroLog.setText(selectedFile.getAbsolutePath());
         }
@@ -442,8 +444,8 @@ final class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         HelpUtils.enableHelpKey(this.campoFicheroLog, "multifirma.masiva.wizard.firma.ficheroLog"); //$NON-NLS-1$
     }
 
-    /** Comprueba si los archivos son correctos
-     * @return */
+    /** Multifirma los ficheros del directorio seleccionado.
+     * @return {@code true} si la operaci&oacute;n finaliz&oacute; correctamente, {@code false} en caso contrario. */
     boolean multifirmarFicheros() {
         // Comprobamos rutas de los ficheros
         final String directorio = this.campoDirectorio.getText();
@@ -485,9 +487,10 @@ final class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
                         new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getName() + ". \r\nSi no ha establecido ninguna, deje el campo en blanco.", null, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                                                             Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title")); //$NON-NLS-1$ //$NON-NLS-2$
                 final File selectedFile =
-                        SelectionDialog.showFileOpenDialog(this, Messages.getString("Open.repository"), (ExtFilter) Utils.getRepositoryFileFilter()); //$NON-NLS-1$
+                        SelectionDialog.showFileOpenDialog(this, Messages.getString("Open.repository.pkcs12"), Main.getPreferences().get("dialog.load.repository.pkcs12", null), (ExtFilter) Utils.getRepositoryFileFilterPkcs12()); //$NON-NLS-1$ //$NON-NLS-2$
                 if (selectedFile != null) {
                     lib = selectedFile.getAbsolutePath();
+                    Main.getPreferences().put("dialog.load.repository.pkcs12", lib); //$NON-NLS-1$
                 }
                 else {
                     throw new AOCancelledOperationException("No se ha seleccionado el almac\u00E9n de certificados"); //$NON-NLS-1$

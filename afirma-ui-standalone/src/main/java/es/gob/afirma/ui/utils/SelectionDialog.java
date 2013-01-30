@@ -34,8 +34,9 @@ public final class SelectionDialog {
 	/** Muestra un di&aacute;logo para la selecci&oacute;n de un fichero en disco.
 	 * @param parent Component padre sobre el que se mostrar&aacute; el di&aacute;logo.
 	 * @param title T&iacute;tulo del di&aacute;logo de selecci&oacute;n.
+	 * @param defaultDir Directorio por defecto que se establecer&aacute; en el di&aacute;logo.
 	 * @return Fichero seleccionado o {@code null} si no se seleccion&oacute;o ninguno. */
-	public static File showFileOpenDialog(final Component parent, final String title) {
+	public static File showFileOpenDialog(final Component parent, final String title, final String defaultDir) {
 		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 			try {
 				return AOUIFactory.getLoadFiles(title, null, null, null, null, false, false, parent)[0];
@@ -44,21 +45,22 @@ public final class SelectionDialog {
 				return null;
 			}
 		}
-		return showOpenDialog(parent, title, JFileChooser.FILES_ONLY, null);
+		return showOpenDialog(parent, title, defaultDir, JFileChooser.FILES_ONLY, null);
 	}
 
 	/** Muestra un di&aacute;logo para la selecci&oacute;n de un fichero en disco
 	 * mostrando s&oacute;lo aquellos que pasen el filtro indicado.
 	 * @param parent Component padre sobre el que se mostrar&aacute; el di&aacute;logo.
 	 * @param title T&iacute;tulo del di&aacute;logo de selecci&oacute;n.
+	 * @param defaultDir Directorio por defecto que se establecer&aacute; en el di&aacute;logo.
 	 * @param filter Filtro de ficheros.
 	 * @return Fichero seleccionado o {@code null} si no se seleccion&oacute;o ninguno. */
-	public static File showFileOpenDialog(final Component parent, final String title, final ExtFilter filter) {
+	public static File showFileOpenDialog(final Component parent, final String title, final String defaultDir, final ExtFilter filter) {
 		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 			try {
 				return AOUIFactory.getLoadFiles(
 					title,
-					null,
+					defaultDir,
 					null,
 					filter != null ? filter.getExtensions() : null,
 					filter != null ? filter.getDescription() : null,
@@ -71,23 +73,24 @@ public final class SelectionDialog {
 				return null;
 			}
 		}
-		return showOpenDialog(parent, title, JFileChooser.FILES_ONLY, filter);
+		return showOpenDialog(parent, title, defaultDir, JFileChooser.FILES_ONLY, filter);
 	}
 
 	/** Muestra un di&aacute;logo para la selecci&oacute;n de un directorio en disco.
 	 * @param parent Component padre sobre el que se mostrar&aacute; el di&aacute;logo.
 	 * @param title T&iacute;tulo del di&aacute;logo de selecci&oacute;n.
+	 * @param defaultDir Directorio por defecto que se establecer&aacute; en el di&aacute;logo.
 	 * @return Directorio seleccionado o {@code null} si no se seleccion&oacute;o ninguno. */
-	public static File showDirOpenDialog(final Component parent, final String title) {
+	public static File showDirOpenDialog(final Component parent, final String title, final String defaultDir) {
 		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 			try {
-				return AOUIFactory.getLoadFiles(title, null, null, null, null, true, false, parent)[0];
+				return AOUIFactory.getLoadFiles(title, defaultDir, null, null, null, true, false, parent)[0];
 			}
 			catch(final AOCancelledOperationException e) {
 				return null;
 			}
 		}
-		return showOpenDialog(parent, title, JFileChooser.DIRECTORIES_ONLY, null);
+		return showOpenDialog(parent, title, defaultDir, JFileChooser.DIRECTORIES_ONLY, null);
 	}
 
 	/** Muestra un di&aacute;logo para la selecci&oacute;n de un archivo en disco.
@@ -96,9 +99,9 @@ public final class SelectionDialog {
 	 * @param selectionMode Modo de selecci&oacute;n de {@link JFileChooser}.
 	 * @param filter Filtro de ficheros.
 	 * @return Archivo seleccionado o {@code null} si no se seleccion&oacute;o ninguno. */
-	private static File showOpenDialog(final Component parent, final String title, final int selectionMode, final ExtFilter filter) {
+	private static File showOpenDialog(final Component parent, final String title, final String defaultDir, final int selectionMode, final ExtFilter filter) {
 
-        String currentDir = Main.getPreferences().get("dialog.load.dir", null); //$NON-NLS-1$
+        String currentDir = (defaultDir != null) ? defaultDir : Main.getPreferences().get("dialog.load.dir", null); //$NON-NLS-1$
         if (currentDir == null) {
             currentDir = "."; //$NON-NLS-1$
         }

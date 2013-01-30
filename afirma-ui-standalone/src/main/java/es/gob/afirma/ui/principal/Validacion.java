@@ -90,7 +90,7 @@ final class Validacion extends JPanel {
      * @param campoFichero Campo en el que se escribe la ruta del fichero seleccionado */
     void browseActionPerformed(final String titleDialog, final ExtFilter filter, final JTextField campoFichero) {
         final File selectedFile =
-            SelectionDialog.showFileOpenDialog(this, titleDialog, filter);
+            SelectionDialog.showFileOpenDialog(this, titleDialog, null, filter);
         if (selectedFile != null) {
         	campoFichero.setText(selectedFile.getAbsolutePath());
         }

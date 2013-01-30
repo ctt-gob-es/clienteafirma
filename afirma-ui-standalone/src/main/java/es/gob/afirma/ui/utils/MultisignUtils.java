@@ -32,6 +32,7 @@ import es.gob.afirma.keystores.main.common.AOKeystoreAlternativeException;
 import es.gob.afirma.keystores.main.common.KeyStoreConfiguration;
 import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
 import es.gob.afirma.keystores.main.filters.CertificateFilter;
+import es.gob.afirma.ui.principal.Main;
 
 /** Utilidades para las multifirmas */
 public final class MultisignUtils {
@@ -55,9 +56,6 @@ public final class MultisignUtils {
             pssCallback = new NullPasswordCallback();
         }
         else if (store == AOKeyStore.PKCS12) {
-            /*pssCallback = new UIPasswordCallback(
-            		Messages.getString("Msg.pedir.contraenia", store.getDescription()),  //$NON-NLS-1$
-            		null);*/
             pssCallback = new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getName(), //$NON-NLS-1$ //$NON-NLS-2$
                                                               null,
                                                               Messages.getString("CustomDialog.showInputPasswordDialog.title"), //$NON-NLS-1$
@@ -65,9 +63,27 @@ public final class MultisignUtils {
                                                               Messages.getString("CustomDialog.showInputPasswordDialog.title")); //$NON-NLS-1$
 
             final File selectedFile =
-                    SelectionDialog.showFileOpenDialog(null, Messages.getString("Open.repository"), (ExtFilter) Utils.getRepositoryFileFilter()); //$NON-NLS-1$
+                    SelectionDialog.showFileOpenDialog(null, Messages.getString("Open.repository.pkcs12"), Main.getPreferences().get("dialog.load.repository.pkcs12", null), (ExtFilter) Utils.getRepositoryFileFilterPkcs12()); //$NON-NLS-1$ //$NON-NLS-2$
             if (selectedFile != null) {
                 lib = selectedFile.getAbsolutePath();
+                Main.getPreferences().put("dialog.load.repository.pkcs12", lib); //$NON-NLS-1$
+            }
+            else {
+                throw new AOCancelledOperationException();
+            }
+        }
+        else if (store == AOKeyStore.PKCS11) {
+            pssCallback = new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getName(), //$NON-NLS-1$ //$NON-NLS-2$
+                                                              null,
+                                                              Messages.getString("CustomDialog.showInputPasswordDialog.title"), //$NON-NLS-1$
+                                                              KeyEvent.VK_O,
+                                                              Messages.getString("CustomDialog.showInputPasswordDialog.title")); //$NON-NLS-1$
+
+            final File selectedFile =
+                    SelectionDialog.showFileOpenDialog(null, Messages.getString("Open.repository.pkcs11"), Main.getPreferences().get("dialog.load.repository.pkcs11", null), (ExtFilter) Utils.getRepositoryFileFilterPkcs11()); //$NON-NLS-1$ //$NON-NLS-2$
+            if (selectedFile != null) {
+                lib = selectedFile.getAbsolutePath();
+                Main.getPreferences().put("dialog.load.repository.pkcs11", lib); //$NON-NLS-1$
             }
             else {
                 throw new AOCancelledOperationException();

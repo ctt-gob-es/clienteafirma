@@ -120,7 +120,7 @@ final class Firma extends JPanel {
      * Modifica el valor de la caja con el nombre del archivo seleccionado
      * @param campoFichero Campo en el que se escribe el nombre del fichero seleccionado */
     void examinarActionPerformed(final JTextField campoFichero) {
-        final File selectedFile = SelectionDialog.showFileOpenDialog(this, Messages.getString("PrincipalGUI.chooser.title")); //$NON-NLS-1$
+        final File selectedFile = SelectionDialog.showFileOpenDialog(this, Messages.getString("PrincipalGUI.chooser.title"), null); //$NON-NLS-1$
         if (selectedFile != null) {
             campoFichero.setText(selectedFile.getAbsolutePath());
         }
@@ -166,9 +166,10 @@ final class Firma extends JPanel {
                                                             Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title") //$NON-NLS-1$ //$NON-NLS-2$
                         );
                 final File selectedFile =
-                        SelectionDialog.showFileOpenDialog(this, Messages.getString("Open.repository"), (ExtFilter) Utils.getRepositoryFileFilter()); //$NON-NLS-1$
+                        SelectionDialog.showFileOpenDialog(this, Messages.getString("Open.repository.pkcs12"), Main.getPreferences().get("dialog.load.repository.pkcs12", null), (ExtFilter) Utils.getRepositoryFileFilterPkcs12()); //$NON-NLS-1$ //$NON-NLS-2$
                 if (selectedFile != null) {
                     lib = selectedFile.getAbsolutePath();
+                    Main.getPreferences().put("dialog.load.repository.pkcs12", lib); //$NON-NLS-1$
                 }
                 else {
                     return;

@@ -663,11 +663,19 @@ public final class Utils {
 	}
 
 	/**
-     * Obtiene un filtro de fichero correspondiente para almacenes de certificados del tipo PCKS#12 y .
+     * Obtiene un filtro de fichero correspondiente para almacenes de certificados del tipo PCKS#12.
      * @return filtro
      */
-    public static FileFilter getRepositoryFileFilter() {
-    	return new ExtFilter(new String[] {"p12", "pfx"}, Messages.getString("Repository.filefilter")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    public static FileFilter getRepositoryFileFilterPkcs12() {
+    	return new ExtFilter(new String[] {"p12", "pfx"}, Messages.getString("Repository.filefilter.pkcs12")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    }
+
+    /**
+     * Obtiene un filtro de fichero correspondiente para almacenes de certificados del tipo PCKS#11.
+     * @return filtro
+     */
+    public static FileFilter getRepositoryFileFilterPkcs11() {
+    	return new ExtFilter(new String[] {"dll", "so"}, Messages.getString("Repository.filefilter.pkcs11")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
 
     /**

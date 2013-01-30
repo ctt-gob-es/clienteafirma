@@ -59,6 +59,7 @@ import es.gob.afirma.keystores.main.common.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.main.common.AOKeystoreAlternativeException;
 import es.gob.afirma.keystores.main.common.KeyStoreConfiguration;
 import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
+import es.gob.afirma.ui.principal.Main;
 import es.gob.afirma.ui.utils.CustomDialog;
 import es.gob.afirma.ui.utils.ExtFilter;
 import es.gob.afirma.ui.utils.GeneralConfig;
@@ -135,8 +136,8 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
     private final int tipo;
 
     /** Constructor.
-     * @param rutafichero
-     * @param tipo */
+     * @param rutafichero Ruta del fichero a ensobrar.
+     * @param tipo Tipo de sobre a generar. */
     public PanelRemitentes(final String rutafichero, final int tipo) {
         this.rutafichero = rutafichero;
         this.tipo = tipo;
@@ -145,7 +146,6 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
 
     /** A&ntilde;ade un nuevo remitente desde el repositorio indicado
      * @param comboRepositorios combo con el listado de repositorios / almacenes
-     * @param listModel Modelo de la lista de remitentes
      * @param eliminar Boton para eliminar un remitente del listado de repositorios
      * @param anadir Boton para anadir un remitente al listado de repositorios */
     void anadirActionPerformed(final JComboBox comboRepositorios, final JButton eliminar, final JButton anadir) {
@@ -168,11 +168,12 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
                             "cer", "p7b", "p7s"}, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                                            Messages.getString("Filtro.fichero.certificado.descripcion")); //$NON-NLS-1$
                 }
-                final File keystorePath = SelectionDialog.showFileOpenDialog(this, Messages.getString("Ensobrado.dialogo.almacen.titulo"), filter); //$NON-NLS-1$
+                final File keystorePath = SelectionDialog.showFileOpenDialog(this, Messages.getString("Ensobrado.dialogo.almacen.titulo"), Main.getPreferences().get("dialog.load.repository.pkcs12", null), filter); //$NON-NLS-1$ //$NON-NLS-2$
                 if (keystorePath == null) {
                     throw new AOCancelledOperationException();
                 }
                 lib = keystorePath.getAbsolutePath();
+                Main.getPreferences().put("dialog.load.repository.pkcs12", lib); //$NON-NLS-1$
             }
             keyStoreManager = AOKeyStoreManagerFactory.getAOKeyStoreManager(ao, lib, null, getPreferredPCB(ao), this);
         }
@@ -683,7 +684,7 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
     }
 
     /** Asignaci&oacute;n de la lista de certificados.
-     * @param listaCertificados */
+     * @param listaCertificados Lista de certificados de los remitentes.*/
     public void setListaCertificados(final List<CertificateDestiny> listaCertificados) {
         this.listaCertificados = listaCertificados;
     }

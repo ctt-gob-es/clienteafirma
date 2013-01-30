@@ -3,6 +3,7 @@ package es.gob.afirma.ui.visor.ui;
 import java.awt.Component;
 import java.io.File;
 
+import es.gob.afirma.ui.principal.Main;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.SelectionDialog;
 
@@ -25,7 +26,8 @@ final class LoadFileLinkAction {
 
     void action() {
     	this.selectedFile = SelectionDialog.showFileOpenDialog(
-    			this.parent, Messages.getString("LoadFileLinkAction.0")); //$NON-NLS-1$
+    			this.parent, Messages.getString("LoadFileLinkAction.0"), //$NON-NLS-1$
+    			Main.getPreferences().get("dialog.load.dir", null)); //$NON-NLS-1$
     }
 
     @Override

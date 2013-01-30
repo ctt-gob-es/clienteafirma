@@ -208,7 +208,7 @@ final class Opciones extends JAccessibilityDialog {
     		//Se maximiza dependiendo del so
     		if (!Platform.getOS().equals(Platform.OS.LINUX)){
     			this.setBounds(0,0, maxWidth, maxHeight);
-    		} 
+    		}
     		else {
     			this.setBounds(0,0, maxWidth, maxHeight- Constants.MAXIMIZE_VERTICAL_MARGIN_LINUX);
     		}
@@ -228,9 +228,9 @@ final class Opciones extends JAccessibilityDialog {
     		if (PrincipalGUI.getOptionActualPositionX() != -1){
 	    		if (GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
 	    			setBounds(
-    			          PrincipalGUI.getOptionActualPositionX(), 
-    			          PrincipalGUI.getOptionActualPositionY(), 
-    			          PrincipalGUI.getOptionActualWidth(), 
+    			          PrincipalGUI.getOptionActualPositionX(),
+    			          PrincipalGUI.getOptionActualPositionY(),
+    			          PrincipalGUI.getOptionActualWidth(),
     			          PrincipalGUI.getOptionActualHeight()
 			        );
 	    			if (Platform.getOS().equals(Platform.OS.LINUX)){
@@ -271,9 +271,9 @@ final class Opciones extends JAccessibilityDialog {
 	    		if (GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
 	    			if (Platform.getOS().equals(Platform.OS.LINUX)){
 	    				setBounds(
-    				          Opciones.getInitialX(), 
-    				          Opciones.getInitialY(), 
-    				          Constants.OPTION_FONT_INITIAL_WIDTH_LINUX, 
+    				          Opciones.getInitialX(),
+    				          Opciones.getInitialY(),
+    				          Constants.OPTION_FONT_INITIAL_WIDTH_LINUX,
     				          Constants.OPTION_FONT_INITIAL_HEIGHT_LINUX
 				        );
 	    				setMinimumSize(new Dimension(getSize().width, getSize().height));
@@ -286,9 +286,9 @@ final class Opciones extends JAccessibilityDialog {
 	    		// Dimensiones normales
 	    		else {
 	    			setBounds(
-			           Opciones.getInitialX(), 
-			           Opciones.getInitialY() - (Platform.OS.MACOSX.equals(Platform.getOS()) ? 70 : 0), 
-			           Constants.OPTION_INITIAL_WIDTH, 
+			           Opciones.getInitialX(),
+			           Opciones.getInitialY() - (Platform.OS.MACOSX.equals(Platform.getOS()) ? 70 : 0),
+			           Constants.OPTION_INITIAL_WIDTH,
 			           Constants.OPTION_INITIAL_HEIGHT + (Platform.OS.MACOSX.equals(Platform.getOS()) ? 50 : 0)
 			        );
 	    			setMinimumSize(new Dimension(getSize().width, getSize().height));
@@ -637,6 +637,9 @@ final class Opciones extends JAccessibilityDialog {
     		this.mainGui.generarMenuAyuda();
     	}
 
+//    	// Guardamos la nueva configuracion
+//    	saveProfile();
+
     	// Cerramos la pantalla
     	dispose();
     	HelpUtils.visualize(Main.getHelpIndex());
@@ -918,4 +921,19 @@ final class Opciones extends JAccessibilityDialog {
     	}
 
 	}
+
+//	private void saveProfile() {
+//		try {
+//			ProfileManager.saveConfiguration(UserProfile.getCurrentProfileId(), ProfileManager.getProfileName(UserProfile.getCurrentProfileId()), this.getConfiguration());
+//		}
+//		catch (final IllegalArgumentException e) {
+//			CustomDialog.showMessageDialog(
+//					this,
+//					true,
+//					"Se ha insertado un nombre de fichero no v\u00E1lido. No se guardar\u00E1 el perfil.",
+//					"Perfiles",
+//					JOptionPane.ERROR_MESSAGE);
+//		}
+//	}
+
 }

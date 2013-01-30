@@ -92,9 +92,10 @@ final class Desensobrado extends JPanel {
      * Modifica el valor de la caja con el nombre del archivo seleccionado
      * @param campoFichero Campo en el que se escribe el nombre del fichero seleccionado */
     void examinarActionPerformed(final JTextField campoFichero) {
-        final File selectedFile = SelectionDialog.showFileOpenDialog(this, Messages.getString("Seleccione.fichero.desensobrar")); //$NON-NLS-1$
+        final File selectedFile = SelectionDialog.showFileOpenDialog(this, Messages.getString("Seleccione.fichero.desensobrar"), Main.getPreferences().get("dialog.load.dir.unwrap", null)); //$NON-NLS-1$ //$NON-NLS-2$
         if (selectedFile != null) {
             campoFichero.setText(selectedFile.getAbsolutePath());
+            Main.getPreferences().put("dialog.load.dir.unwrap", selectedFile.getAbsolutePath()); //$NON-NLS-1$
         }
     }
 
@@ -252,11 +253,36 @@ final class Desensobrado extends JPanel {
             );
             final File selectedFile = SelectionDialog.showFileOpenDialog(
         		this,
-        		Messages.getString("Open.repository"), //$NON-NLS-1$
-        		(ExtFilter) Utils.getRepositoryFileFilter()
+        		Messages.getString("Open.repository.pkcs12"), //$NON-NLS-1$
+        		Main.getPreferences().get("dialog.load.repository.pkcs12", null), //$NON-NLS-1$
+        		(ExtFilter) Utils.getRepositoryFileFilterPkcs12()
     		);
             if (selectedFile != null) {
                 lib = selectedFile.getAbsolutePath();
+                Main.getPreferences().put("dialog.load.repository.pkcs12", lib); //$NON-NLS-1$
+            }
+            else {
+                throw new AOCancelledOperationException();
+            }
+
+        }
+        else if (store == AOKeyStore.PKCS11) {
+            pssCallback =new UIPasswordCallbackAccessibility(
+        		Messages.getString("Msg.pedir.contraenia") + " " + store.getName(), //$NON-NLS-1$ //$NON-NLS-2$
+        		SwingUtilities.getRoot(this),
+                Messages.getString("CustomDialog.showInputPasswordDialog.title"), //$NON-NLS-1$
+                KeyEvent.VK_O,
+                Messages.getString("CustomDialog.showInputPasswordDialog.title") //$NON-NLS-1$
+            );
+            final File selectedFile = SelectionDialog.showFileOpenDialog(
+        		this,
+        		Messages.getString("Open.repository.pkcs11"), //$NON-NLS-1$
+        		Main.getPreferences().get("dialog.load.repository.pkcs11", null), //$NON-NLS-1$
+        		(ExtFilter) Utils.getRepositoryFileFilterPkcs11()
+    		);
+            if (selectedFile != null) {
+                lib = selectedFile.getAbsolutePath();
+                Main.getPreferences().put("dialog.load.repository.pkcs11", lib); //$NON-NLS-1$
             }
             else {
                 throw new AOCancelledOperationException();
@@ -420,6 +446,7 @@ final class Desensobrado extends JPanel {
 
         comboAlmacen.getAccessibleContext().setAccessibleDescription(Messages.getString("Desensobrado.almacen.combo.description")); // NOI18N //$NON-NLS-1$
         cargarComboAlmacen(comboAlmacen);
+
         Utils.remarcar(comboAlmacen);
         Utils.setContrastColor(comboAlmacen);
         Utils.setFontBold(comboAlmacen);
@@ -511,6 +538,9 @@ final class Desensobrado extends JPanel {
         extraer.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent evt) {
+
+            	Main.getPreferences().put("unenvelop.combo.repository", ((KeyStoreConfiguration) comboAlmacen.getSelectedItem()).getType().getName()); //$NON-NLS-1$
+
                 extraerActionPerformed(comboAlmacen, campoFichero, checkIniciar);
             }
         });

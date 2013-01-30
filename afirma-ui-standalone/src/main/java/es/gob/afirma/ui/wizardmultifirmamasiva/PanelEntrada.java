@@ -30,6 +30,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.text.Caret;
 
+import es.gob.afirma.ui.principal.Main;
 import es.gob.afirma.ui.utils.ConfigureCaret;
 import es.gob.afirma.ui.utils.CustomDialog;
 import es.gob.afirma.ui.utils.GeneralConfig;
@@ -131,9 +132,10 @@ final class PanelEntrada extends JAccessibilityDialogWizard {
 
     /** Comprueba que el fichero seleccionado es valido y guarda su nombre en el campo de texto */
     void examinarActionPerformed() {
-        final File selectedFile = SelectionDialog.showDirOpenDialog(this, Messages.getString("PrincipalGUI.chooser.dir.title")); //$NON-NLS-1$
+        final File selectedFile = SelectionDialog.showDirOpenDialog(this, Messages.getString("PrincipalGUI.chooser.dir.title"), Main.getPreferences().get("dialog.load.dir.massivein", null)); //$NON-NLS-1$ //$NON-NLS-2$
         if (selectedFile != null) {
             this.campoDirectorio.setText(selectedFile.getAbsolutePath());
+            Main.getPreferences().put("dialog.load.dir.massivein", selectedFile.getAbsolutePath()); //$NON-NLS-1$
         }
     }
 

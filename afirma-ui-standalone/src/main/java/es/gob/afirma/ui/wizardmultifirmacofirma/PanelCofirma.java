@@ -45,6 +45,7 @@ import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.main.common.KeyStoreConfiguration;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
+import es.gob.afirma.ui.principal.Main;
 import es.gob.afirma.ui.utils.ConfigureCaret;
 import es.gob.afirma.ui.utils.CustomDialog;
 import es.gob.afirma.ui.utils.GeneralConfig;
@@ -278,7 +279,7 @@ final class PanelCofirma extends JAccessibilityDialogWizard {
      * Examina si el archivo seleccionado es un archivo de firma y guarda el nombre en su caja
      */
     void examinarFirmaActionPerformed() {
-        final File selectedFile = SelectionDialog.showFileOpenDialog(this, Messages.getString("Wizard.multifirma.simple.chooserFirm.tittle")); //$NON-NLS-1$
+        final File selectedFile = SelectionDialog.showFileOpenDialog(this, Messages.getString("Wizard.multifirma.simple.chooserFirm.tittle"), Main.getPreferences().get("dialog.load.dir", null)); //$NON-NLS-1$ //$NON-NLS-2$
         if (selectedFile != null) {
             this.campoFirma.setText(selectedFile.getAbsolutePath());
         }
@@ -288,7 +289,7 @@ final class PanelCofirma extends JAccessibilityDialogWizard {
 	 * Examina si se ha seleccionado un archivo correcto y guarda el nombre en su caja
 	 */
 	void examinarDatosActionPerformed() {
-		final File selectedFile = SelectionDialog.showFileOpenDialog(this, Messages.getString("PrincipalGUI.chooser.title")); //$NON-NLS-1$
+		final File selectedFile = SelectionDialog.showFileOpenDialog(this, Messages.getString("PrincipalGUI.chooser.title"), Main.getPreferences().get("dialog.load.dir", null)); //$NON-NLS-1$ //$NON-NLS-2$
 		if (selectedFile != null) {
 			this.campoDatos.setText(selectedFile.getAbsolutePath());
 		}

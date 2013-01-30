@@ -93,6 +93,7 @@ final class UserProfile extends JAccessibilityFrameAdvisor {
 
             currentProfileId = ProfileManager.getProfileIdByName(profileName);
 
+            //TODO: Revisar si esta linea sirve para algo
             ProfileManager.getConfiguration(currentProfileId);
 
             GeneralConfig.loadConfig(ProfileManager.getConfiguration(profileName));

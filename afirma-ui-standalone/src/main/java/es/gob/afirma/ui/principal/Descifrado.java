@@ -134,7 +134,7 @@ final class Descifrado extends JPanel {
      * El nombre del fichero seleccionado se guardara en el campo.
      * @param campoFichero Campo donde se guarda el nombre del fichero seleccionado */
     void examinarActionPerformed(final JTextField campoFichero) {
-        final File selectedFile = SelectionDialog.showFileOpenDialog(this, Messages.getString("Seleccione.fichero.descifrar")); //$NON-NLS-1$
+        final File selectedFile = SelectionDialog.showFileOpenDialog(this, Messages.getString("Seleccione.fichero.descifrar"), Main.getPreferences().get("dialog.load.dir", null)); //$NON-NLS-1$ //$NON-NLS-2$
         if (selectedFile != null) {
             campoFichero.setText(selectedFile.getAbsolutePath());
         }
@@ -317,21 +317,13 @@ final class Descifrado extends JPanel {
         c.fill = GridBagConstraints.BOTH;
 
         // Combo con los algoritmos de descifrado
-        comboAlgoritmo.setModel(
-    		new DefaultComboBoxModel(new String[] {
-    				"Triple Data Encryption Standard (3DES)",
-    				"Item 2",
-    				"Item 3",
-    				"Item 4"
-			})
-		);
+        comboAlgoritmo.setModel(new DefaultComboBoxModel(ALGORITMO_LC.toArray()));
         comboAlgoritmo.setToolTipText(Messages.getString("Descifrado.formato.combo.description")); // NOI18N //$NON-NLS-1$
         comboAlgoritmo.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.getBar(),
                                                                             Messages.getString("Descifrado.formato.combo.description"))); //$NON-NLS-1$
         comboAlgoritmo.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.getBar(),
                                                                             Messages.getString("Descifrado.formato.combo.description"))); //$NON-NLS-1$
         comboAlgoritmo.getAccessibleContext().setAccessibleDescription(Messages.getString("Descifrado.formato.combo.description")); // NOI18N //$NON-NLS-1$
-        comboAlgoritmo.setModel(new DefaultComboBoxModel(ALGORITMO_LC.toArray()));
 
         Utils.remarcar(comboAlgoritmo);
         Utils.setContrastColor(comboAlgoritmo);

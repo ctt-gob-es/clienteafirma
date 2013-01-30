@@ -42,6 +42,7 @@ import es.gob.afirma.keystores.main.common.AOKeyStore;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.main.common.KeyStoreConfiguration;
+import es.gob.afirma.ui.principal.Main;
 import es.gob.afirma.ui.utils.CustomDialog;
 import es.gob.afirma.ui.utils.ExtFilter;
 import es.gob.afirma.ui.utils.HelpUtils;
@@ -126,11 +127,25 @@ final class PanelDestinatarios extends JAccessibilityDialogWizard {
                                                          "cer", "p7b", "p7s"}, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                                                          Messages.getString("Filtro.fichero.certificado.descripcion")); //$NON-NLS-1$
                 }
-                final File keystorePath = SelectionDialog.showFileOpenDialog(this, Messages.getString("Ensobrado.dialogo.almacen.titulo"), filter); //$NON-NLS-1$
+                final File keystorePath = SelectionDialog.showFileOpenDialog(this, Messages.getString("Ensobrado.dialogo.almacen.titulo"), Main.getPreferences().get("dialog.load.dir", null), filter); //$NON-NLS-1$ //$NON-NLS-2$
                 if (keystorePath == null) {
                     throw new AOCancelledOperationException();
                 }
                 lib = keystorePath.getAbsolutePath();
+            }
+            else if (ao == AOKeyStore.PKCS11) {
+                final ExtFilter filter = new ExtFilter(
+                		new String[] {
+                        	"dll", "so"  //$NON-NLS-1$//$NON-NLS-2$
+                    	},
+                        Messages.getString("Filtro.fichero.pkcs11.descripcion") //$NON-NLS-1$
+                    );
+                final File keystorePath = SelectionDialog.showFileOpenDialog(this, Messages.getString("Ensobrado.dialogo.almacen.titulo"), Main.getPreferences().get("dialog.load.repository.pkcs11", null), filter); //$NON-NLS-1$ //$NON-NLS-2$
+                if (keystorePath == null) {
+                    throw new AOCancelledOperationException();
+                }
+                lib = keystorePath.getAbsolutePath();
+                Main.getPreferences().put("dialog.load.repository.pkcs11", lib); //$NON-NLS-1$
             }
 
             keyStoreManager = AOKeyStoreManagerFactory.getAOKeyStoreManager(ao, lib, null, getPreferredPCB(ao), this);

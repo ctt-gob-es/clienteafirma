@@ -75,9 +75,10 @@ final class Ensobrado extends JPanel {
      * Modifica el valor de la caja con el nombre del archivo seleccionado
      * @param campoFichero Campo en el que se escribe el nombre del fichero seleccionado */
     void examinarActionPerformed(final JTextField campoFichero) {
-        final File selectedFile = SelectionDialog.showFileOpenDialog(this, Messages.getString("Seleccione.fichero.ensobrar")); //$NON-NLS-1$
+        final File selectedFile = SelectionDialog.showFileOpenDialog(this, Messages.getString("Seleccione.fichero.ensobrar"), Main.getPreferences().get("dialog.load.dir.wrap", null)); //$NON-NLS-1$ //$NON-NLS-2$
         if (selectedFile != null) {
             campoFichero.setText(selectedFile.getAbsolutePath());
+            Main.getPreferences().put("dialog.load.dir.wrap", selectedFile.getAbsolutePath()); //$NON-NLS-1$
         }
     }
 
@@ -102,6 +103,7 @@ final class Ensobrado extends JPanel {
             }
             else {
                 // Se muestra el asistente
+            	Main.getPreferences().put("envelop.combo.contenttype", this.comboTipos.getSelectedItem().toString());
                 new AsistenteEnsobrar(campoFichero.getText(), this.comboTipos.getSelectedIndex());
             }
         }
@@ -246,6 +248,10 @@ final class Ensobrado extends JPanel {
 
         this.comboTipos.getAccessibleContext().setAccessibleDescription(Messages.getString("Ensobrado.opciones.combo.description")); // NOI18N //$NON-NLS-1$
         cargarComboTipos();
+        if (Main.getPreferences().get("envelop.combo.contenttype", null) != null) { //$NON-NLS-1$
+        	this.comboTipos.setSelectedItem(Main.getPreferences().get("envelop.combo.contenttype", null)); //$NON-NLS-1$
+        }
+
         Utils.remarcar(this.comboTipos);
         Utils.setContrastColor(this.comboTipos);
         Utils.setFontBold(this.comboTipos);

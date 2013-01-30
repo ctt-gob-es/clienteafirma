@@ -84,7 +84,8 @@ public final class AccessibilityOptionsPane {
     /** Componente padre. */
     private JDialog parent = null;
 
-    /** Obtiene el valor de la variable continueBigStyle */
+    /** Obtiene el valor de la variable continueBigStyle.
+     * @return Indica si esta activado el estilo de letra grande. */
     public static boolean isContinueBigStyle() {
 		return continueBigStyle;
 	}

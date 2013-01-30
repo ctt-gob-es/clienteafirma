@@ -43,6 +43,7 @@ import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.main.common.KeyStoreConfiguration;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
+import es.gob.afirma.ui.principal.Main;
 import es.gob.afirma.ui.utils.ConfigureCaret;
 import es.gob.afirma.ui.utils.CustomDialog;
 import es.gob.afirma.ui.utils.GeneralConfig;
@@ -212,7 +213,7 @@ final class PanelEntrada extends JAccessibilityDialogWizard {
      * Comprueba si el archivo introducido es correcto y guarda su nombre en el campo de texto
      */
     void examinarFirmaActionPerformed() {
-        final File selectedFile = SelectionDialog.showFileOpenDialog(this, Messages.getString("PrincipalGUI.chooser.title")); //$NON-NLS-1$
+        final File selectedFile = SelectionDialog.showFileOpenDialog(this, Messages.getString("PrincipalGUI.chooser.title"), Main.getPreferences().get("dialog.load.dir", null)); //$NON-NLS-1$ //$NON-NLS-2$
       	if (selectedFile != null) {
       		this.campoFirma.setText(selectedFile.getAbsolutePath());
       	}
