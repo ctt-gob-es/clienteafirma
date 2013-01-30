@@ -188,7 +188,7 @@ public final class SelectionDialog {
     			data,
     			dialogTitle,
     			null,
-    			null,
+    			defaultName,
     			fileFilter != null ? fileFilter.getExtensions() : null,
     			fileFilter != null ? fileFilter.getDescription() : null,
     			parentComponent
@@ -225,9 +225,7 @@ public final class SelectionDialog {
             fileChooser.getAccessibleContext().setAccessibleName(Messages.getString("SelectionDialog.saveDialog.accesible.name")); //$NON-NLS-1$
             fileChooser.getAccessibleContext().setAccessibleDescription(Messages.getString("SelectionDialog.saveDialog.accesible.desc")); //$NON-NLS-1$
             fileChooser.setToolTipText(Messages.getString("SelectionDialog.saveDialog.accesible.name")); //$NON-NLS-1$
-            if (file != null) {
-                fileChooser.setSelectedFile(file);
-            } else if (defaultName != null) {
+            if (defaultName != null) {
                 fileChooser.setSelectedFile(new File(defaultName));
             }
 
