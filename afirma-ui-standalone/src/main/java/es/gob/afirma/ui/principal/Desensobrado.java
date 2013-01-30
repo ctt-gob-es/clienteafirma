@@ -42,6 +42,7 @@ import javax.swing.text.Caret;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.envelopers.cms.AOCMSEnveloper;
 import es.gob.afirma.envelopers.cms.CMSDecipherAuthenticatedEnvelopedData;
@@ -217,8 +218,17 @@ final class Desensobrado extends JPanel {
                 name = name.substring(0, name.lastIndexOf('.'));
             }
 
+            // Analizamos los datos para intentar determinar una extension por defecto
+            final MimeHelper mh = new MimeHelper(recoveredData);
+            final String ext = mh.getExtension();
+            ExtFilter fileFilter = null;
+            if (ext != null) {
+            	name = name + "." + ext; //$NON-NLS-1$
+            	fileFilter = new ExtFilter(new String[] { ext }, mh.getDescription());
+            }
+
             // Salvamos los datos
-            final File file = SelectionDialog.saveDataToFile(Messages.getString("Desensobrado.filechooser.save.title"), recoveredData, name, null, this); //$NON-NLS-1$
+            final File file = SelectionDialog.saveDataToFile(Messages.getString("Desensobrado.filechooser.save.title"), recoveredData, name, fileFilter, this); //$NON-NLS-1$
             if (file != null && checkIniciar.isSelected()) {
                 Utils.openFile(file);
             }
@@ -522,8 +532,8 @@ final class Desensobrado extends JPanel {
 
         final JPanel panelAyuda = new JPanel();
         // Boton de ayuda
-        final JButton botonAyuda = HelpUtils.helpButton("desensobrado");
-        botonAyuda.setName("helpButton");
+        final JButton botonAyuda = HelpUtils.helpButton("desensobrado"); //$NON-NLS-1$
+        botonAyuda.setName("helpButton"); //$NON-NLS-1$
 
         cons.ipadx = 15;
         cons.weightx = 0.0;
