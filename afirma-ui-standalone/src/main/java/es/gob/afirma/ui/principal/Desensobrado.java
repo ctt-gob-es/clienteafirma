@@ -84,7 +84,7 @@ final class Desensobrado extends JPanel {
      * la aplicaci&oacute;
      * @param comboAlmacen Combo donde se cargan los tipos de almacen */
     private static void cargarComboAlmacen(final JComboBox comboAlmacen) {
-        comboAlmacen.setModel(new DefaultComboBoxModel(KeyStoreLoader.getKeyStoresToSign()));
+        comboAlmacen.setModel(new DefaultComboBoxModel(KeyStoreLoader.getKeyStoresToUnWrap()));
     }
 
     /** Pulsar boton examinar: Muestra una ventana para seleccinar un archivo.
