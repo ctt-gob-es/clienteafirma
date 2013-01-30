@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.X509Certificate;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Properties;
 
 import es.gob.afirma.core.AOException;
@@ -63,8 +64,7 @@ public interface AOEnveloper {
     byte[] encrypt(byte[] data, String digestAlgorithm, String key, AOCipherAlgorithm cipherAlgorithm, String dataType) throws AOException;
 
 
-    /**
-     * Recupera los datos contenidos en un envoltorio.
+    /** Recupera los datos contenidos en un envoltorio.
      * @param envelop
      * 			Envoltorio de datos.
      * @param addresseePke
@@ -75,6 +75,7 @@ public interface AOEnveloper {
      * @throws AOException
      * 			Cuando ocurre algun problema en la apetura del envoltorio.
      * @throws IOException Si hay problema de lectura / escritura de datos
+     * @throws InvalidKeySpecException Cuando la clave es inv&aacute;lida
      */
-    byte[] recoverData(byte[] envelop, PrivateKeyEntry addresseePke) throws InvalidKeyException, AOException, IOException;
+    byte[] recoverData(byte[] envelop, PrivateKeyEntry addresseePke) throws InvalidKeyException, AOException, IOException, InvalidKeySpecException;
 }
