@@ -47,7 +47,7 @@ public final class RetrieveService extends HttpServlet {
 		final String operation = request.getParameter(PARAMETER_NAME_OPERATION);
 		final String syntaxVersion = request.getParameter(PARAMETER_NAME_SYNTAX_VERSION);
 		response.setContentType("text/plain"); //$NON-NLS-1$
-		response.setCharacterEncoding("iso-8859-15"); //$NON-NLS-1$
+		response.setCharacterEncoding("utf-8"); //$NON-NLS-1$
 
 		try (final PrintWriter out = response.getWriter()) {
 			if (operation == null) {

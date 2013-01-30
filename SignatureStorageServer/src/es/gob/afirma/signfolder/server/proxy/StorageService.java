@@ -43,7 +43,7 @@ public final class StorageService extends HttpServlet {
 		final String operation = request.getParameter(PARAMETER_NAME_OPERATION);
 		final String syntaxVersion = request.getParameter(PARAMETER_NAME_SYNTAX_VERSION);
 		response.setContentType("text/plain"); //$NON-NLS-1$
-		response.setCharacterEncoding("iso-8859-15"); //$NON-NLS-1$
+		response.setCharacterEncoding("utf-8"); //$NON-NLS-1$
 
 		try (final PrintWriter out = response.getWriter()) {
 			if (operation == null) {
@@ -89,12 +89,12 @@ public final class StorageService extends HttpServlet {
 		}
 
 		// Si no se indican los datos, se transmite el error en texto plano a traves del fichero generado
-		String b64Data = request.getParameter(PARAMETER_NAME_DATA);
-		if (b64Data == null) {
-			b64Data = ErrorManager.genError(ErrorManager.ERROR_MISSING_DATA, null);
+		String dataText = request.getParameter(PARAMETER_NAME_DATA);
+		if (dataText == null) {
+			dataText = ErrorManager.genError(ErrorManager.ERROR_MISSING_DATA, null);
 		}
 
-		final byte[] b64DataEncoded = b64Data.getBytes();
+		final byte[] data = dataText.getBytes();
 
 		if (!config.getTempDir().exists()) {
 			config.getTempDir().mkdirs();
@@ -102,7 +102,7 @@ public final class StorageService extends HttpServlet {
 
 		final File outFile = new File(config.getTempDir(), request.getRemoteAddr().replace(":", "_") + "-" + id); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		try (final OutputStream fos = new FileOutputStream(outFile);) {
-			fos.write(b64DataEncoded);
+			fos.write(data);
 			fos.flush();
 		} catch (final IOException e) {
 			out.println(ErrorManager.genError(ErrorManager.ERROR_COMMUNICATING_WITH_WEB, null));
