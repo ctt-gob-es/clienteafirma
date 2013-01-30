@@ -16,9 +16,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.net.URI;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
 import java.security.KeyException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -28,6 +31,8 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
@@ -265,12 +270,22 @@ final class EnveloperManager {
      *         Cuando el certificado del remitente no es v&aacute;lido.
      * @throws AOException
      *         Cuando ocurre algun error al envolver los datos.
+     * @throws InvalidKeyException
+     * @throws SignatureException
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
+     * @throws InvalidAlgorithmParameterException
+     * @throws NoSuchPaddingException
      * @throws IllegalArgumentException
      *         Cuando no se ha indicado un par&aacute;metro o se
      *         configur&oacute; uno err&oacute;neo.
      * @throws es.gob.afirma.core.AOCancelledOperationException
      *         Cuando el usuario cancela la operaci&oacute;n. */
-    void envelop() throws IOException, NoSuchAlgorithmException, AOException, CertificateEncodingException {
+    void envelop() throws IOException,
+                          NoSuchAlgorithmException,
+                          AOException,
+                          CertificateEncodingException,
+                          InvalidKeyException, NoSuchPaddingException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, SignatureException {
         this.envelop(getConfigureContent());
     }
 
@@ -286,6 +301,12 @@ final class EnveloperManager {
      *         Cuando el certificado del remitente no es v&aacute;lido.
      * @throws AOException
      *         Cuando ocurre algun error al envolver los datos.
+     * @throws InvalidKeyException
+     * @throws SignatureException
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
+     * @throws InvalidAlgorithmParameterException
+     * @throws NoSuchPaddingException
      * @throws NullPointerException
      *         Cuando se ha indicado el tipo de contenido o los
      *         destinatarios del mismo.
@@ -295,9 +316,10 @@ final class EnveloperManager {
      * @throws es.gob.afirma.core.AOCancelledOperationException
      *         Cuando el usuario cancela la operaci&oacute;n. */
     void envelop(final byte[] content) throws CertificateEncodingException,
-                                             NoSuchAlgorithmException,
-                                             IOException,
-                                             AOException {
+                                              NoSuchAlgorithmException,
+                                              IOException,
+                                              AOException,
+                                              InvalidKeyException, NoSuchPaddingException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, SignatureException {
 
         if (this.contentType == null) {
             LOGGER.severe("No se ha indicado el tipo de sobre electronico"); //$NON-NLS-1$
@@ -514,8 +536,21 @@ final class EnveloperManager {
      *         El certificado de firma no es v&aacute;lido.
      * @throws NoSuchAlgorithmException
      *         Algoritmo no soportado.
-     * @throws AOException */
-    private byte[] createCMSEnvelopData(final byte[] content) throws IOException, CertificateEncodingException, NoSuchAlgorithmException, AOException {
+     * @throws AOException
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
+     * @throws InvalidAlgorithmParameterException
+     * @throws NoSuchPaddingException
+     * @throws InvalidKeyException */
+    private byte[] createCMSEnvelopData(final byte[] content) throws IOException,
+                                                                     CertificateEncodingException,
+                                                                     NoSuchAlgorithmException,
+                                                                     AOException,
+                                                                     InvalidKeyException,
+                                                                     NoSuchPaddingException,
+                                                                     InvalidAlgorithmParameterException,
+                                                                     IllegalBlockSizeException,
+                                                                     BadPaddingException {
         return this.enveloper.createCMSEnvelopedData(content, this.ksConfigManager.getCertificateKeyEntry(), // Si hay uno
                                                                                                    // seleccionado, se
                                                                                                    // utiliza
@@ -535,13 +570,25 @@ final class EnveloperManager {
      *         Cuanto hay algun problema en la lectura de datos.
      * @throws NoSuchAlgorithmException
      * @throws CertificateEncodingException
+     * @throws SignatureException
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
+     * @throws InvalidAlgorithmParameterException
+     * @throws NoSuchPaddingException
+     * @throws InvalidKeyException
      * @throws IllegalArgumentException
      *         Cuando no se ha introducido alg&uacute;n par&aacute;metro
      *         requerido por el tipo de sobre */
     private byte[] createCMSSignedEnvelopData(final byte[] content) throws AOException,
-                                                                   CertificateEncodingException,
-                                                                   NoSuchAlgorithmException,
-                                                                   IOException {
+                                                                           CertificateEncodingException,
+                                                                           NoSuchAlgorithmException,
+                                                                           IOException,
+                                                                           InvalidKeyException,
+                                                                           NoSuchPaddingException,
+                                                                           InvalidAlgorithmParameterException,
+                                                                           IllegalBlockSizeException,
+                                                                           BadPaddingException,
+                                                                           SignatureException {
         if (!this.ksConfigManager.isSelectedCertificate()) {
             try {
                 this.ksConfigManager.selectCertificate();
@@ -565,13 +612,23 @@ final class EnveloperManager {
      * @throws IOException
      * @throws NoSuchAlgorithmException
      * @throws CertificateEncodingException
+     * @throws InvalidKeyException
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
+     * @throws InvalidAlgorithmParameterException
+     * @throws NoSuchPaddingException
      * @throws IllegalArgumentException
      *         Cuando no se ha introducido alg&uacute;n par&aacute;metro
      *         requerido por el tipo de sobre */
     private byte[] createCMSAuthenticatedEnvelopData(final byte[] content) throws AOException,
-                                                                          CertificateEncodingException,
-                                                                          NoSuchAlgorithmException,
-                                                                          IOException {
+                                                                                  CertificateEncodingException,
+                                                                                  NoSuchAlgorithmException,
+                                                                                  IOException,
+                                                                                  InvalidKeyException,
+                                                                                  NoSuchPaddingException,
+                                                                                  InvalidAlgorithmParameterException,
+                                                                                  IllegalBlockSizeException,
+                                                                                  BadPaddingException {
         if (!this.ksConfigManager.isSelectedCertificate()) {
             try {
                 this.ksConfigManager.selectCertificate();

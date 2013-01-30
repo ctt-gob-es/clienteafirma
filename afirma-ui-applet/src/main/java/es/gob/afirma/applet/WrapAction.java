@@ -11,10 +11,16 @@
 package es.gob.afirma.applet;
 
 import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivilegedExceptionAction;
+import java.security.SignatureException;
 import java.security.cert.CertificateEncodingException;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -54,7 +60,12 @@ final class WrapAction implements PrivilegedExceptionAction<byte[]> {
                                IOException,
                                AOException,
                                CertificateEncodingException,
-                               KeyException {
+                               KeyException,
+                               NoSuchPaddingException,
+                               InvalidAlgorithmParameterException,
+                               IllegalBlockSizeException,
+                               BadPaddingException,
+                               SignatureException {
 		if (this.enveloperManager.getCmsContentType().equals(AOSignConstants.CMS_CONTENTTYPE_ENCRYPTEDDATA)) {
 			if (this.data == null) {
 				this.enveloperManager.encrypt();
