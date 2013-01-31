@@ -95,7 +95,8 @@ public final class RetrieveService extends HttpServlet {
 			out.println(ErrorManager.genError(ErrorManager.ERROR_MISSING_DATA_ID, null));
 			return;
 		}
-		final File inFile = new File(config.getTempDir(), request.getRemoteAddr().replace(":", "_") + "-" + id); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		//final File inFile = new File(config.getTempDir(), request.getRemoteAddr().replace(":", "_") + "-" + id); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		final File inFile = new File(config.getTempDir(), id);
 
 		// No hacemos distincion si el archivo no existe, no es un fichero, no puede leerse o ha caducado
 		// para evitar que un atacante conozca su situacion. Lo borramos despuest de usarlo

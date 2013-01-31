@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -22,6 +23,9 @@ public final class StorageService extends HttpServlet {
 
 	/** Fichero de configuraci&oacute;n. */
 	private static final String CONFIG_FILE = "/configuration.properties"; //$NON-NLS-1$
+
+	/** Log para registrar las acciones del servicio. */
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");  //$NON-NLS-1$
 
 	/** Nombre del par&aacute;metro con la operaci&oacute;n realizada. */
 	private static final String PARAMETER_NAME_OPERATION = "op"; //$NON-NLS-1$
@@ -60,6 +64,7 @@ public final class StorageService extends HttpServlet {
 				config = new StorageConfig(this.getServletContext());
 				config.load(CONFIG_FILE);
 			} catch (final IOException e) {
+				LOGGER.severe(ErrorManager.genError(ErrorManager.ERROR_CONFIGURATION_FILE_PROBLEM, null));
 				out.println(ErrorManager.genError(ErrorManager.ERROR_CONFIGURATION_FILE_PROBLEM, null));
 				return;
 			}
@@ -100,15 +105,16 @@ public final class StorageService extends HttpServlet {
 			config.getTempDir().mkdirs();
 		}
 
-		final File outFile = new File(config.getTempDir(), request.getRemoteAddr().replace(":", "_") + "-" + id); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		final File outFile = new File(config.getTempDir(), id);
 		try (final OutputStream fos = new FileOutputStream(outFile);) {
 			fos.write(data);
 			fos.flush();
 		} catch (final IOException e) {
+			LOGGER.severe(ErrorManager.genError(ErrorManager.ERROR_COMMUNICATING_WITH_WEB, null));
 			out.println(ErrorManager.genError(ErrorManager.ERROR_COMMUNICATING_WITH_WEB, null));
 			return;
 		}
 
-		out.println(SUCCESS);
+		out.print(SUCCESS);
 	}
 }
