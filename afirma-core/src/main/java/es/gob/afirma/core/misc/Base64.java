@@ -25,7 +25,7 @@ package es.gob.afirma.core.misc;
  * <p>The constants defined in Base64 can be OR-ed together to combine options, so you
  * might make a call like this:</p>
  *
- * <code>String encoded = Base64.encodeBytes( mybytes, Base64.GZIP | Base64.DO_BREAK_LINES );</code>
+ * <code>String encoded = Base64.encodeBytes( mybytes, Base64.DO_BREAK_LINES );</code>
  * <p>to compress the data before encoding it and then making the output have newline characters.</p>
  * <p>Also...</p>
  * <code>String encoded = Base64.encodeBytes( crazyString.getBytes() );</code>
@@ -343,9 +343,6 @@ public final class Base64 {
      * @since 1.4
      */
     public static String encode( final byte[] source ) {
-        // Since we're not going to have the GZIP encoding turned on,
-        // we're not going to have an java.io.IOException thrown, so
-        // we should not force the user to have to catch it.
         String encoded = null;
         try {
             encoded = encodeBytes(source, 0, source.length, NO_OPTIONS);
@@ -362,19 +359,13 @@ public final class Base64 {
     /**
      * Encodes a byte array into Base64 notation.
      * <p>
-     * Example: <code>encodeBytes( myData, Base64.GZIP )</code> or
+     * Example: <code>encodeBytes( myData )</code> or
      * <p>
-     * Example: <code>encodeBytes( myData, Base64.GZIP | Base64.DO_BREAK_LINES )</code>
-     *
-     * <p>As of v 2.3, if there is an error with the GZIP stream,
-     * the method will throw an java.io.IOException. <b>This is new to v2.3!</b>
-     * In earlier versions, it just returned a null value, but
-     * in retrospect that's a pretty poor way to handle it.</p>
+     * Example: <code>encodeBytes( myData, Base64.DO_BREAK_LINES )</code>
      *
      * @param source The data to convert
      * @param options Specified options
      * @return The Base64-encoded data as a String
-     * @see Base64#GZIP
      * @throws java.io.IOException if there is an error
      * @since 2.0
      */
@@ -385,21 +376,15 @@ public final class Base64 {
     /**
      * Encodes a byte array into Base64 notation.
      * <p>
-     * Example: <code>encodeBytes( myData, Base64.GZIP )</code> or
+     * Example: <code>encode( myData )</code> or
      * <p>
-     * Example: <code>encodeBytes( myData, Base64.GZIP | Base64.DO_BREAK_LINES )</code>
-     *
-     * <p>As of v 2.3, if there is an error with the GZIP stream,
-     * the method will throw an java.io.IOException. <b>This is new to v2.3!</b>
-     * In earlier versions, it just returned a null value, but
-     * in retrospect that's a pretty poor way to handle it.</p>
+     * Example: <code>encodeBytes( myData, Base64.DO_BREAK_LINES )</code>
      *
      * @param source The data to convert
      * @param off Offset in array where conversion should begin
      * @param len Length of data to convert
      * @param options Specified options
      * @return The Base64-encoded data as a String
-     * @see Base64#GZIP
      * @throws java.io.IOException if there is an error
      * @throws IllegalArgumentException if source array, offset, or length are invalid
      * @since 2.0
@@ -428,7 +413,6 @@ public final class Base64 {
      * @param len Length of data to convert
      * @param options Specified options
      * @return The Base64-encoded data as a String
-     * @see Base64#GZIP
      * @throws java.io.IOException if there is an error
      * @throws IllegalArgumentException if source array, offset, or length are invalid
      * @since 2.3.1
