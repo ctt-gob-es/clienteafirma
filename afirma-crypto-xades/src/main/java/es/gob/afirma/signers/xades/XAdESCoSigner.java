@@ -168,7 +168,7 @@ final class XAdESCoSigner {
             throw new UnsupportedOperationException("Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'"); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
-        final Properties extraParams = (xParams != null) ? xParams: new Properties();
+        final Properties extraParams = xParams != null ? xParams: new Properties();
 
         final String digestMethodAlgorithm = extraParams.getProperty("referencesDigestMethod", DIGEST_METHOD); //$NON-NLS-1$
         final String canonicalizationAlgorithm = extraParams.getProperty("canonicalizationAlgorithm", CanonicalizationMethod.INCLUSIVE); //$NON-NLS-1$
@@ -249,9 +249,9 @@ final class XAdESCoSigner {
             // comience por STYLE_REFERENCE_PREFIX.
             // TODO: Identificar las hojas de estilo de un modo generico.
             final NamedNodeMap currentNodeAttributes = currentElement.getAttributes();
-            if (i == 0 || (currentNodeAttributes.getNamedItem("Id") != null && currentNodeAttributes.getNamedItem("Id")  //$NON-NLS-1$//$NON-NLS-2$
+            if (i == 0 || currentNodeAttributes.getNamedItem("Id") != null && currentNodeAttributes.getNamedItem("Id")  //$NON-NLS-1$//$NON-NLS-2$
                                                                                                     .getNodeValue()
-                                                                                                    .startsWith(STYLE_REFERENCE_PREFIX))) {
+                                                                                                    .startsWith(STYLE_REFERENCE_PREFIX)) {
 
                 // Buscamos las transformaciones declaradas en la Referencia,
                 // para anadirlas
@@ -272,9 +272,9 @@ final class XAdESCoSigner {
                 // para mantener un listado con todas. En el caso de las hojas
                 // de estilo lo creamos con un
                 // identificador descriptivo
-                if ((currentNodeAttributes.getNamedItem("Id") != null && currentNodeAttributes.getNamedItem("Id")  //$NON-NLS-1$//$NON-NLS-2$
+                if (currentNodeAttributes.getNamedItem("Id") != null && currentNodeAttributes.getNamedItem("Id")  //$NON-NLS-1$//$NON-NLS-2$
                                                                                               .getNodeValue()
-                                                                                              .startsWith(STYLE_REFERENCE_PREFIX))) {
+                                                                                              .startsWith(STYLE_REFERENCE_PREFIX)) {
                     referenceId = STYLE_REFERENCE_PREFIX + UUID.randomUUID().toString();
                 }
                 else {
@@ -352,10 +352,8 @@ final class XAdESCoSigner {
                 		final NamedNodeMap nnm = subNode.getAttributes();
                 		if (nnm != null) {
                 			final Node idAttrNode = nnm.getNamedItem("Id"); //$NON-NLS-1$
-                			if (idAttrNode != null) {
-                				if (dataNodeId.equals(idAttrNode.getNodeValue())) {
-                					isEnveloping = true;
-                				}
+                			if (idAttrNode != null && dataNodeId.equals(idAttrNode.getNodeValue())) {
+            					isEnveloping = true;
                 			}
                 		}
                 	}
