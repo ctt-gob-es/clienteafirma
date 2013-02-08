@@ -13,19 +13,17 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
+import es.gob.afirma.android.Messages;
 import es.gob.afirma.android.crypto.Android4KeyStoreManager;
 import es.gob.afirma.android.gui.FileArrayAdapter;
 import es.gob.afirma.android.gui.Option;
 
 /** @author Alberto Mart&iacute;nez */
 public class CertChooserActivity extends ListActivity {
-    private static final String FILETYPE_INCORRECT_MSG = "Debe seleccionar un fichero PKCS#12/PXF";
+    private static final String FILETYPE_INCORRECT_MSG = Messages.getString("CertChooserActivity.0"); //$NON-NLS-1$
     private static final String P12 = ".p12"; //$NON-NLS-1$
     private static final String PFX = ".pfx"; //$NON-NLS-1$
     private static final String ES_GOB_AFIRMA = "es.gob.afirma"; //$NON-NLS-1$
-
-    private static final String PARENT_DIRECTORY_NAME = "Directorio padre";
-    private static final String DIRECTORY_NAME = "Directorio";
 
     private FileArrayAdapter adapter;
     private File currentDir;
@@ -39,18 +37,18 @@ public class CertChooserActivity extends ListActivity {
 
     private void fill(final File f) {
         final File[] dirs = f.listFiles();
-        this.setTitle("Directorio actual: " + f.getName()); //$NON-NLS-1$
+        this.setTitle(Messages.getString("CertChooserActivity.1") + " " + f.getName()); //$NON-NLS-1$ //$NON-NLS-2$
         final List<Option> dir = new ArrayList<Option>();
         final List<Option> fls = new ArrayList<Option>();
 
         try {
             for (final File ff : dirs) {
                 if (ff.isDirectory()) {
-                    dir.add(new Option(ff.getName(), DIRECTORY_NAME, ff.getAbsolutePath()));
+                    dir.add(new Option(ff.getName(), Messages.getString("CertChooserActivity.3"), ff.getAbsolutePath())); //$NON-NLS-1$
                 }
                 else {
-                	if (ff.getName().toLowerCase().endsWith(".pfx") || ff.getName().toLowerCase().endsWith(".p12")) { //$NON-NLS-1$ //$NON-NLS-2$
-                		fls.add(new Option(ff.getName(), "Tama\u00F1o del fichero: " + ff.length(), ff.getAbsolutePath())); //$NON-NLS-1$
+                	if (ff.getName().toLowerCase().endsWith(PFX) || ff.getName().toLowerCase().endsWith(P12)) {
+                		fls.add(new Option(ff.getName(), Messages.getString("CertChooserActivity.4") + ff.length(), ff.getAbsolutePath())); //$NON-NLS-1$
                 	}
                 }
             }
@@ -63,7 +61,7 @@ public class CertChooserActivity extends ListActivity {
         Collections.sort(fls);
         dir.addAll(fls);
         if (!f.getName().equalsIgnoreCase("sdcard")) { //$NON-NLS-1$
-            dir.add(0, new Option("..", PARENT_DIRECTORY_NAME, f.getParent())); //$NON-NLS-1$
+            dir.add(0, new Option("..", Messages.getString("CertChooserActivity.5"), f.getParent())); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         this.adapter = new FileArrayAdapter(CertChooserActivity.this, R.layout.activity_cert_chooser, dir);
@@ -74,7 +72,7 @@ public class CertChooserActivity extends ListActivity {
     protected void onListItemClick(final ListView l, final View v, final int position, final long id) {
         super.onListItemClick(l, v, position, id);
         final Option o = this.adapter.getItem(position);
-        if (o.getData().equalsIgnoreCase(PARENT_DIRECTORY_NAME) || o.getData().equalsIgnoreCase(DIRECTORY_NAME)) {
+        if (o.getData().equalsIgnoreCase(Messages.getString("CertChooserActivity.5")) || o.getData().equalsIgnoreCase(Messages.getString("CertChooserActivity.3"))) { //$NON-NLS-1$ //$NON-NLS-2$
             this.currentDir = new File(o.getPath());
             fill(this.currentDir);
         }
@@ -91,6 +89,7 @@ public class CertChooserActivity extends ListActivity {
                 fis.read(data);
                 fis.close();
                 new Android4KeyStoreManager(this).importCertificateFromPkcs12(data, null);
+                finish();
             }
             else {
                 Toast.makeText(this, CertChooserActivity.FILETYPE_INCORRECT_MSG, Toast.LENGTH_LONG).show();
