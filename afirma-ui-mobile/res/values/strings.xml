@@ -1,0 +1,22 @@
+<resources>
+
+    <string name="app_name">Afirma m\u00F3vil</string>
+    <string name="title_activity_main">Afirma m\u00F3vil</string>
+    <string name="title_activity_cert_chooser">Importar certificado</string>
+    <string name="presentation_text">Bienvenido a "@firma m\u00F3vil" la aplicaci\u00F3n cliente de firma electr\u00F3nica en dispositivos m\u00F3viles. Esta aplicaci\u00F3n, permite utilizar los certificados de su dispositivos para firmar los tramites online en los que se haga uso del Cliente @firma.\nImporte sus certificados de usuario al dispositivo y accesa a trav\u00E9s de su navegador al trámite online que desee gestionar.</string>
+    <string name="import_cert">Importar certificado</string>
+    <string name="disclaimer">© 2012 Ministerio de Hacienda y Administraciones Públicas</string>
+    <string name="content_desc">Logotipo Afirma móvil</string>
+    <string name="ok">Aceptar</string>
+    <string name="title_activity_sign_data">Firma de datos</string>
+    <string name="error_no_params">Error: La aplicaci\u00F3n web no ha indicado los par\u00E1metros necesarios para la firma</string>
+    <string name="error_bad_params">Error: La aplicaci\u00F3n web no ha indicado par\u00E1metros v\u00E1lidos para la firma</string>
+    <string name="error_pke">No se obtuvo ning\u00FAn certificado de firma</string>
+    <string name="error_not_supported_format">Error: Formato de firma no soportado</string>
+    <string name="error_signing">Error durante el proceso de firma</string>
+    <string name="error_coding_base64">Error en la codificación base64 de la firma</string>
+    <string name="error_server_connect">Ocurri\u00F3 un error en la conexi\u00F3n entre la app y la pagina web.</string>
+    <string name="error_server_error">No se ha podido devolver el resultado de firma a la p\u00E1gina web</string>
+    <string name="title_activity_load_file">LoadFile</string>
+
+</resources>
