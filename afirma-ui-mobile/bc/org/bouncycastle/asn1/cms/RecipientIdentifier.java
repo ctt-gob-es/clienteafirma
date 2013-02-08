@@ -91,8 +91,7 @@ public class RecipientIdentifier
      * SubjectKeyIdentifier ::= OCTET STRING
      * </pre>
      */
-    @Override
-	public ASN1Primitive toASN1Primitive()
+    public ASN1Primitive toASN1Primitive()
     {
         return id.toASN1Primitive();
     }

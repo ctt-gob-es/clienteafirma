@@ -8,7 +8,6 @@ import java.util.Vector;
 /**
  * @deprecated use BEROctetString
  */
-@Deprecated
 public class BERConstructedOctetString
     extends BEROctetString
 {
@@ -86,8 +85,7 @@ public class BERConstructedOctetString
         this(obj.toASN1Primitive());
     }
 
-    @Override
-	public byte[] getOctets()
+    public byte[] getOctets()
     {
         return string;
     }
@@ -95,8 +93,7 @@ public class BERConstructedOctetString
     /**
      * return the DER octets that make up this string.
      */
-    @Override
-	public Enumeration getObjects()
+    public Enumeration getObjects()
     {
         if (octs == null)
         {

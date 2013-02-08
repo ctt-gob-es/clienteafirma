@@ -109,8 +109,7 @@ public class OriginatorInfo
      * }
      * </pre>
      */
-    @Override
-	public ASN1Primitive toASN1Primitive()
+    public ASN1Primitive toASN1Primitive()
     {
         ASN1EncodableVector  v = new ASN1EncodableVector();
 

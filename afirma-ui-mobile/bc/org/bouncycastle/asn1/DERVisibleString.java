@@ -73,14 +73,12 @@ public class DERVisibleString
         this.string = Strings.toByteArray(string);
     }
 
-    @Override
-	public String getString()
+    public String getString()
     {
         return Strings.fromByteArray(string);
     }
 
-    @Override
-	public String toString()
+    public String toString()
     {
         return getString();
     }
@@ -90,28 +88,24 @@ public class DERVisibleString
         return Arrays.clone(string);
     }
 
-    @Override
-	boolean isConstructed()
+    boolean isConstructed()
     {
         return false;
     }
 
-    @Override
-	int encodedLength()
+    int encodedLength()
     {
         return 1 + StreamUtil.calculateBodyLength(string.length) + string.length;
     }
 
-    @Override
-	void encode(
+    void encode(
         ASN1OutputStream out)
         throws IOException
     {
         out.writeEncoded(BERTags.VISIBLE_STRING, this.string);
     }
     
-    @Override
-	boolean asn1Equals(
+    boolean asn1Equals(
         ASN1Primitive o)
     {
         if (!(o instanceof DERVisibleString))
@@ -122,8 +116,7 @@ public class DERVisibleString
         return Arrays.areEqual(string, ((DERVisibleString)o).string);
     }
     
-    @Override
-	public int hashCode()
+    public int hashCode()
     {
         return Arrays.hashCode(string);
     }

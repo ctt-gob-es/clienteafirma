@@ -62,8 +62,7 @@ public class AlgorithmIdentifier
      * @deprecated use ASN1ObjectIdentifier
      * @param objectId
      */
-    @Deprecated
-	public AlgorithmIdentifier(
+    public AlgorithmIdentifier(
         String     objectId)
     {
         this.objectId = new ASN1ObjectIdentifier(objectId);
@@ -73,8 +72,7 @@ public class AlgorithmIdentifier
      * @deprecated use ASN1ObjectIdentifier
      * @param objectId
      */
-    @Deprecated
-	public AlgorithmIdentifier(
+    public AlgorithmIdentifier(
         DERObjectIdentifier    objectId)
     {
         this.objectId = new ASN1ObjectIdentifier(objectId.getId());
@@ -85,8 +83,7 @@ public class AlgorithmIdentifier
      * @param objectId
      * @param parameters
      */
-    @Deprecated
-	public AlgorithmIdentifier(
+    public AlgorithmIdentifier(
         DERObjectIdentifier objectId,
         ASN1Encodable           parameters)
     {
@@ -113,7 +110,7 @@ public class AlgorithmIdentifier
                     + seq.size());
         }
         
-        objectId = DERObjectIdentifier.getInstance(seq.getObjectAt(0));
+        objectId = ASN1ObjectIdentifier.getInstance(seq.getObjectAt(0));
 
         if (seq.size() == 2)
         {
@@ -135,8 +132,7 @@ public class AlgorithmIdentifier
      * @deprecated use getAlgorithm
      * @return
      */
-    @Deprecated
-	public ASN1ObjectIdentifier getObjectId()
+    public ASN1ObjectIdentifier getObjectId()
     {
         return objectId;
     }
@@ -154,8 +150,7 @@ public class AlgorithmIdentifier
      *                            parameters ANY DEFINED BY algorithm OPTIONAL }
      * </pre>
      */
-    @Override
-	public ASN1Primitive toASN1Primitive()
+    public ASN1Primitive toASN1Primitive()
     {
         ASN1EncodableVector  v = new ASN1EncodableVector();
 

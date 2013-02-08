@@ -176,8 +176,7 @@ public abstract class ASN1Sequence
 
             private int index;
 
-            @Override
-			public ASN1Encodable readObject() throws IOException
+            public ASN1Encodable readObject() throws IOException
             {
                 if (index == max)
                 {
@@ -197,14 +196,12 @@ public abstract class ASN1Sequence
                 return obj;
             }
 
-            @Override
-			public ASN1Primitive getLoadedObject()
+            public ASN1Primitive getLoadedObject()
             {
                 return outer;
             }
             
-            @Override
-			public ASN1Primitive toASN1Primitive()
+            public ASN1Primitive toASN1Primitive()
             {
                 return outer;
             }
@@ -233,8 +230,7 @@ public abstract class ASN1Sequence
         return seq.size();
     }
 
-    @Override
-	public int hashCode()
+    public int hashCode()
     {
         Enumeration             e = this.getObjects();
         int                     hashCode = size();
@@ -250,8 +246,7 @@ public abstract class ASN1Sequence
         return hashCode;
     }
 
-    @Override
-	boolean asn1Equals(
+    boolean asn1Equals(
         ASN1Primitive o)
     {
         if (!(o instanceof ASN1Sequence))
@@ -295,8 +290,7 @@ public abstract class ASN1Sequence
         return encObj;
     }
 
-    @Override
-	ASN1Primitive toDERObject()
+    ASN1Primitive toDERObject()
     {
         ASN1Sequence derSeq = new DERSequence();
 
@@ -305,8 +299,7 @@ public abstract class ASN1Sequence
         return derSeq;
     }
 
-    @Override
-	ASN1Primitive toDLObject()
+    ASN1Primitive toDLObject()
     {
         ASN1Sequence dlSeq = new DLSequence();
 
@@ -315,18 +308,15 @@ public abstract class ASN1Sequence
         return dlSeq;
     }
 
-    @Override
-	boolean isConstructed()
+    boolean isConstructed()
     {
         return true;
     }
 
-    @Override
-	abstract void encode(ASN1OutputStream out)
+    abstract void encode(ASN1OutputStream out)
         throws IOException;
 
-    @Override
-	public String toString() 
+    public String toString() 
     {
         return seq.toString();
     }

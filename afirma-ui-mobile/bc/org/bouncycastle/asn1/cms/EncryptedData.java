@@ -8,7 +8,6 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.BERSequence;
 import org.bouncycastle.asn1.BERTaggedObject;
-import org.bouncycastle.asn1.DERInteger;
 
 public class EncryptedData
     extends ASN1Object
@@ -46,7 +45,7 @@ public class EncryptedData
 
     private EncryptedData(ASN1Sequence seq)
     {
-        this.version = DERInteger.getInstance(seq.getObjectAt(0));
+        this.version = ASN1Integer.getInstance(seq.getObjectAt(0));
         this.encryptedContentInfo = EncryptedContentInfo.getInstance(seq.getObjectAt(1));
 
         if (seq.size() == 3)
@@ -79,8 +78,7 @@ public class EncryptedData
      * </pre>
      * @return a basic ASN.1 object representation.
      */
-    @Override
-	public ASN1Primitive toASN1Primitive()
+    public ASN1Primitive toASN1Primitive()
     {
         ASN1EncodableVector v = new ASN1EncodableVector();
 

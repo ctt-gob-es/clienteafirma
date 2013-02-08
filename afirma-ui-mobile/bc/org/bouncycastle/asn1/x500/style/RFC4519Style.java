@@ -171,8 +171,7 @@ public class RFC4519Style
 
     }
 
-    @Override
-	public ASN1Encodable stringToValue(ASN1ObjectIdentifier oid, String value)
+    public ASN1Encodable stringToValue(ASN1ObjectIdentifier oid, String value)
     {
         if (value.length() != 0 && value.charAt(0) == '#')
         {
@@ -205,14 +204,12 @@ public class RFC4519Style
         return new DERUTF8String(value);
     }
 
-    @Override
-	public ASN1ObjectIdentifier attrNameToOID(String attrName)
+    public ASN1ObjectIdentifier attrNameToOID(String attrName)
     {
         return IETFUtils.decodeAttrName(attrName, DefaultLookUp);
     }
 
-    @Override
-	public boolean areEqual(X500Name name1, X500Name name2)
+    public boolean areEqual(X500Name name1, X500Name name2)
     {
         RDN[] rdns1 = name1.getRDNs();
         RDN[] rdns2 = name2.getRDNs();
@@ -347,8 +344,7 @@ public class RFC4519Style
     }
 
     // parse backwards
-    @Override
-	public RDN[] fromString(String dirName)
+    public RDN[] fromString(String dirName)
     {
         RDN[] tmp = IETFUtils.rDNsFromString(dirName, this);
         RDN[] res = new RDN[tmp.length];
@@ -361,8 +357,7 @@ public class RFC4519Style
         return res;
     }
 
-    @Override
-	public int calculateHashCode(X500Name name)
+    public int calculateHashCode(X500Name name)
     {
         int hashCodeValue = 0;
         RDN[] rdns = name.getRDNs();
@@ -400,8 +395,7 @@ public class RFC4519Style
     }
 
     // convert in reverse
-    @Override
-	public String toString(X500Name name)
+    public String toString(X500Name name)
     {
         StringBuffer buf = new StringBuffer();
         boolean first = true;

@@ -32,8 +32,7 @@ public abstract class ASN1Primitive
         }
     }
 
-    @Override
-	public final boolean equals(Object o)
+    public final boolean equals(Object o)
     {
         if (this == o)
         {
@@ -43,8 +42,7 @@ public abstract class ASN1Primitive
         return (o instanceof ASN1Encodable) && asn1Equals(((ASN1Encodable)o).toASN1Primitive());
     }
 
-    @Override
-	public ASN1Primitive toASN1Primitive()
+    public ASN1Primitive toASN1Primitive()
     {
         return this;
     }
@@ -59,8 +57,7 @@ public abstract class ASN1Primitive
         return this;
     }
 
-    @Override
-	public abstract int hashCode();
+    public abstract int hashCode();
 
     abstract boolean isConstructed();
 

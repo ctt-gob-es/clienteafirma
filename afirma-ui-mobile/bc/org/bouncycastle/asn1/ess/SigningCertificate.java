@@ -93,8 +93,7 @@ public class SigningCertificate
      *  member-body(2) us(840) rsadsi(113549) pkcs(1) pkcs9(9)
      *  smime(16) id-aa(2) 12 }
      */
-    @Override
-	public ASN1Primitive toASN1Primitive()
+    public ASN1Primitive toASN1Primitive()
     {
         ASN1EncodableVector v = new ASN1EncodableVector();
 

@@ -141,8 +141,7 @@ public class DERApplicationSpecific
         return 2;
     }
 
-    @Override
-	public boolean isConstructed()
+    public boolean isConstructed()
     {
         return isConstructed;
     }
@@ -195,8 +194,7 @@ public class DERApplicationSpecific
         return new ASN1InputStream(tmp).readObject();
     }
 
-    @Override
-	int encodedLength()
+    int encodedLength()
         throws IOException
     {
         return StreamUtil.calculateTagLength(tag) + StreamUtil.calculateBodyLength(octets.length) + octets.length;
@@ -205,8 +203,7 @@ public class DERApplicationSpecific
     /* (non-Javadoc)
      * @see org.bouncycastle.asn1.ASN1Primitive#encode(org.bouncycastle.asn1.DEROutputStream)
      */
-    @Override
-	void encode(ASN1OutputStream out) throws IOException
+    void encode(ASN1OutputStream out) throws IOException
     {
         int classBits = BERTags.APPLICATION;
         if (isConstructed)
@@ -217,8 +214,7 @@ public class DERApplicationSpecific
         out.writeEncoded(classBits, tag, octets);
     }
     
-    @Override
-	boolean asn1Equals(
+    boolean asn1Equals(
         ASN1Primitive o)
     {
         if (!(o instanceof DERApplicationSpecific))
@@ -233,8 +229,7 @@ public class DERApplicationSpecific
             && Arrays.areEqual(octets, other.octets);
     }
 
-    @Override
-	public int hashCode()
+    public int hashCode()
     {
         return (isConstructed ? 1 : 0) ^ tag ^ Arrays.hashCode(octets);
     }

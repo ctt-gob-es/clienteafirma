@@ -87,28 +87,24 @@ public class DERInteger
         return new BigInteger(1, bytes);
     }
 
-    @Override
-	boolean isConstructed()
+    boolean isConstructed()
     {
         return false;
     }
 
-    @Override
-	int encodedLength()
+    int encodedLength()
     {
         return 1 + StreamUtil.calculateBodyLength(bytes.length) + bytes.length;
     }
 
-    @Override
-	void encode(
+    void encode(
         ASN1OutputStream out)
         throws IOException
     {
         out.writeEncoded(BERTags.INTEGER, bytes);
     }
     
-    @Override
-	public int hashCode()
+    public int hashCode()
     {
          int     value = 0;
  
@@ -120,8 +116,7 @@ public class DERInteger
          return value;
     }
 
-    @Override
-	boolean asn1Equals(
+    boolean asn1Equals(
         ASN1Primitive  o)
     {
         if (!(o instanceof DERInteger))
@@ -134,8 +129,7 @@ public class DERInteger
         return Arrays.areEqual(bytes, other.bytes);
     }
 
-    @Override
-	public String toString()
+    public String toString()
     {
       return getValue().toString();
     }

@@ -30,8 +30,7 @@ class LazyEncodedSequence
         encoded = null;
     }
 
-    @Override
-	public synchronized ASN1Encodable getObjectAt(int index)
+    public synchronized ASN1Encodable getObjectAt(int index)
     {
         if (encoded != null)
         {
@@ -41,8 +40,7 @@ class LazyEncodedSequence
         return super.getObjectAt(index);
     }
 
-    @Override
-	public synchronized Enumeration getObjects()
+    public synchronized Enumeration getObjects()
     {
         if (encoded == null)
         {
@@ -52,8 +50,7 @@ class LazyEncodedSequence
         return new LazyConstructionEnumeration(encoded);
     }
 
-    @Override
-	public synchronized int size()
+    public synchronized int size()
     {
         if (encoded != null)
         {
@@ -63,8 +60,7 @@ class LazyEncodedSequence
         return super.size();
     }
 
-    @Override
-	ASN1Primitive toDERObject()
+    ASN1Primitive toDERObject()
     {
         if (encoded != null)
         {
@@ -74,8 +70,7 @@ class LazyEncodedSequence
         return super.toDERObject();
     }
 
-    @Override
-	ASN1Primitive toDLObject()
+    ASN1Primitive toDLObject()
     {
         if (encoded != null)
         {
@@ -85,8 +80,7 @@ class LazyEncodedSequence
         return super.toDLObject();
     }
 
-    @Override
-	int encodedLength()
+    int encodedLength()
         throws IOException
     {
         if (encoded != null)
@@ -99,8 +93,7 @@ class LazyEncodedSequence
         }
     }
 
-    @Override
-	void encode(
+    void encode(
         ASN1OutputStream out)
         throws IOException
     {

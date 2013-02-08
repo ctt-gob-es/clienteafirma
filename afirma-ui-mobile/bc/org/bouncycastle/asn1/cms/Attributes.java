@@ -42,8 +42,7 @@ public class Attributes
      * </pre>
      * @return
      */
-    @Override
-	public ASN1Primitive toASN1Primitive()
+    public ASN1Primitive toASN1Primitive()
     {
         return attributes;
     }

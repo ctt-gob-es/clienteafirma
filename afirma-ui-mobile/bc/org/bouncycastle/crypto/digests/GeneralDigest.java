@@ -38,8 +38,7 @@ public abstract class GeneralDigest
         byteCount = t.byteCount;
     }
 
-    @Override
-	public void update(
+    public void update(
         byte in)
     {
         xBuf[xBufOff++] = in;
@@ -53,8 +52,7 @@ public abstract class GeneralDigest
         byteCount++;
     }
 
-    @Override
-	public void update(
+    public void update(
         byte[]  in,
         int     inOff,
         int     len)
@@ -113,8 +111,7 @@ public abstract class GeneralDigest
         processBlock();
     }
 
-    @Override
-	public void reset()
+    public void reset()
     {
         byteCount = 0;
 
@@ -125,8 +122,7 @@ public abstract class GeneralDigest
         }
     }
 
-    @Override
-	public int getByteLength()
+    public int getByteLength()
     {
         return BYTE_LENGTH;
     }

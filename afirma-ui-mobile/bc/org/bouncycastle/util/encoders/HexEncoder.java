@@ -42,8 +42,7 @@ public class HexEncoder
      *
      * @return the number of bytes produced.
      */
-    @Override
-	public int encode(
+    public int encode(
         byte[]                data,
         int                    off,
         int                    length,
@@ -73,8 +72,7 @@ public class HexEncoder
      *
      * @return the number of bytes produced.
      */
-    @Override
-	public int decode(
+    public int decode(
         byte[]          data,
         int             off,
         int             length,
@@ -127,8 +125,7 @@ public class HexEncoder
      *
      * @return the number of bytes produced.
      */
-    @Override
-	public int decode(
+    public int decode(
         String          data,
         OutputStream    out)
         throws IOException

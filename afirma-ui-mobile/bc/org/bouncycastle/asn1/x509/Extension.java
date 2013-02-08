@@ -220,8 +220,7 @@ public class Extension
         return convertValueToObject(this);
     }
 
-    @Override
-	public int hashCode()
+    public int hashCode()
     {
         if (this.isCritical())
         {
@@ -231,8 +230,7 @@ public class Extension
         return ~this.getExtnValue().hashCode();
     }
 
-    @Override
-	public boolean equals(
+    public boolean equals(
         Object  o)
     {
         if (!(o instanceof Extension))

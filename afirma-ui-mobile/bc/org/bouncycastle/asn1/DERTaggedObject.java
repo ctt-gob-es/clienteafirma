@@ -30,8 +30,7 @@ public class DERTaggedObject
         super(true, tagNo, encodable);
     }
 
-    @Override
-	boolean isConstructed()
+    boolean isConstructed()
     {
         if (!empty)
         {
@@ -52,8 +51,7 @@ public class DERTaggedObject
         }
     }
 
-    @Override
-	int encodedLength()
+    int encodedLength()
         throws IOException
     {
         if (!empty)
@@ -79,8 +77,7 @@ public class DERTaggedObject
         }
     }
 
-    @Override
-	void encode(
+    void encode(
         ASN1OutputStream out)
         throws IOException
     {

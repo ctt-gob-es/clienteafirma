@@ -35,14 +35,12 @@ class DefiniteLengthInputStream
         }
     }
 
-    @Override
-	int getRemaining()
+    int getRemaining()
     {
         return _remaining;
     }
 
-    @Override
-	public int read()
+    public int read()
         throws IOException
     {
         if (_remaining == 0)
@@ -65,8 +63,7 @@ class DefiniteLengthInputStream
         return b;
     }
 
-    @Override
-	public int read(byte[] buf, int off, int len)
+    public int read(byte[] buf, int off, int len)
         throws IOException
     {
         if (_remaining == 0)

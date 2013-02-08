@@ -14,22 +14,19 @@ public class BERApplicationSpecificParser
         this.parser = parser;
     }
 
-    @Override
-	public ASN1Encodable readObject()
+    public ASN1Encodable readObject()
         throws IOException
     {
         return parser.readObject();
     }
 
-    @Override
-	public ASN1Primitive getLoadedObject()
+    public ASN1Primitive getLoadedObject()
         throws IOException
     {
          return new BERApplicationSpecific(tag, parser.readVector());
     }
 
-    @Override
-	public ASN1Primitive toASN1Primitive()
+    public ASN1Primitive toASN1Primitive()
     {
         try
         {

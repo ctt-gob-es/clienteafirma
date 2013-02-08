@@ -81,8 +81,7 @@ public class ContentInfo
      *          [0] EXPLICIT ANY DEFINED BY contentType OPTIONAL }
      * </pre>
      */
-    @Override
-	public ASN1Primitive toASN1Primitive()
+    public ASN1Primitive toASN1Primitive()
     {
         ASN1EncodableVector  v = new ASN1EncodableVector();
 

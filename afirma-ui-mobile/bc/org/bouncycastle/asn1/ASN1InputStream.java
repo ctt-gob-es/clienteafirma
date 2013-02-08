@@ -428,9 +428,9 @@ public class ASN1InputStream
             case BMP_STRING:
                 return new DERBMPString(getBMPCharBuffer(defIn));
             case BOOLEAN:
-                return DERBoolean.fromOctetString(getBuffer(defIn, tmpBuffers));
+                return ASN1Boolean.fromOctetString(getBuffer(defIn, tmpBuffers));
             case ENUMERATED:
-                return DEREnumerated.fromOctetString(getBuffer(defIn, tmpBuffers));
+                return ASN1Enumerated.fromOctetString(getBuffer(defIn, tmpBuffers));
             case GENERALIZED_TIME:
                 return new ASN1GeneralizedTime(defIn.toByteArray());
             case GENERAL_STRING:
@@ -444,7 +444,7 @@ public class ASN1InputStream
             case NUMERIC_STRING:
                 return new DERNumericString(defIn.toByteArray());
             case OBJECT_IDENTIFIER:
-                return DERObjectIdentifier.fromOctetString(getBuffer(defIn, tmpBuffers));
+                return ASN1ObjectIdentifier.fromOctetString(getBuffer(defIn, tmpBuffers));
             case OCTET_STRING:
                 return new DEROctetString(defIn.toByteArray());
             case PRINTABLE_STRING:

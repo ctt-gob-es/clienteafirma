@@ -48,8 +48,7 @@ public class Attribute
     /**
      * @deprecated use ASN1ObjectIdentifier
      */
-    @Deprecated
-	public Attribute(
+    public Attribute(
         DERObjectIdentifier attrType,
         ASN1Set             attrValues)
     {
@@ -89,8 +88,7 @@ public class Attribute
      * }
      * </pre>
      */
-    @Override
-	public ASN1Primitive toASN1Primitive()
+    public ASN1Primitive toASN1Primitive()
     {
         ASN1EncodableVector v = new ASN1EncodableVector();
 

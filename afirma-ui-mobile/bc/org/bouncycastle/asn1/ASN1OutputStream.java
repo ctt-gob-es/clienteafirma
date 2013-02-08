@@ -178,8 +178,7 @@ public class ASN1OutputStream
             super(os);
         }
 
-        @Override
-		public void write(int b)
+        public void write(int b)
             throws IOException
         {
             if (first)

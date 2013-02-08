@@ -18,8 +18,7 @@ public class ASN1Exception
         this.cause = cause;
     }
 
-    @Override
-	public Throwable getCause()
+    public Throwable getCause()
     {
         return cause;
     }

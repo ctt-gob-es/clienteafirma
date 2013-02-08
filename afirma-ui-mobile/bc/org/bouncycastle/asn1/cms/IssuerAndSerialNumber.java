@@ -66,8 +66,7 @@ public class IssuerAndSerialNumber
     /**
      * @deprecated use X500Name constructor
      */
-    @Deprecated
-	public IssuerAndSerialNumber(
+    public IssuerAndSerialNumber(
         X509Name    name,
         BigInteger  serialNumber)
     {
@@ -78,8 +77,7 @@ public class IssuerAndSerialNumber
     /**
      * @deprecated use X500Name constructor
      */
-    @Deprecated
-	public IssuerAndSerialNumber(
+    public IssuerAndSerialNumber(
         X509Name    name,
         ASN1Integer  serialNumber)
     {
@@ -97,8 +95,7 @@ public class IssuerAndSerialNumber
         return serialNumber;
     }
 
-    @Override
-	public ASN1Primitive toASN1Primitive()
+    public ASN1Primitive toASN1Primitive()
     {
         ASN1EncodableVector    v = new ASN1EncodableVector();
 

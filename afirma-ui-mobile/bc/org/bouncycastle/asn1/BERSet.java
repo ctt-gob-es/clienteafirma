@@ -40,8 +40,7 @@ public class BERSet
         super(a, false);
     }
 
-    @Override
-	int encodedLength()
+    int encodedLength()
         throws IOException
     {
         int length = 0;
@@ -55,8 +54,7 @@ public class BERSet
 
     /*
      */
-    @Override
-	void encode(
+    void encode(
         ASN1OutputStream out)
         throws IOException
     {

@@ -25,8 +25,7 @@ public class CMSException
         return e;
     }
     
-    @Override
-	public Throwable getCause()
+    public Throwable getCause()
     {
         return e;
     }

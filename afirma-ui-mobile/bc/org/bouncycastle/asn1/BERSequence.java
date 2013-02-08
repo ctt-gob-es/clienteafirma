@@ -40,8 +40,7 @@ public class BERSequence
         super(array);
     }
 
-    @Override
-	int encodedLength()
+    int encodedLength()
         throws IOException
     {
         int length = 0;
@@ -55,8 +54,7 @@ public class BERSequence
 
     /*
      */
-    @Override
-	void encode(
+    void encode(
         ASN1OutputStream out)
         throws IOException
     {

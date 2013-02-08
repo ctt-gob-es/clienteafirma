@@ -55,7 +55,7 @@ public class DERObjectIdentifier
         }
         else
         {
-            return DERObjectIdentifier.fromOctetString(ASN1OctetString.getInstance(obj.getObject()).getOctets());
+            return ASN1ObjectIdentifier.fromOctetString(ASN1OctetString.getInstance(obj.getObject()).getOctets());
         }
     }
 
@@ -210,14 +210,12 @@ public class DERObjectIdentifier
         return body;
     }
 
-    @Override
-	boolean isConstructed()
+    boolean isConstructed()
     {
         return false;
     }
 
-    @Override
-	int encodedLength()
+    int encodedLength()
         throws IOException
     {
         int length = getBody().length;
@@ -225,8 +223,7 @@ public class DERObjectIdentifier
         return 1 + StreamUtil.calculateBodyLength(length) + length;
     }
 
-    @Override
-	void encode(
+    void encode(
         ASN1OutputStream out)
         throws IOException
     {
@@ -237,14 +234,12 @@ public class DERObjectIdentifier
         out.write(enc);
     }
 
-    @Override
-	public int hashCode()
+    public int hashCode()
     {
         return identifier.hashCode();
     }
 
-    @Override
-	boolean asn1Equals(
+    boolean asn1Equals(
         ASN1Primitive  o)
     {
         if (!(o instanceof DERObjectIdentifier))
@@ -255,8 +250,7 @@ public class DERObjectIdentifier
         return identifier.equals(((DERObjectIdentifier)o).identifier);
     }
 
-    @Override
-	public String toString()
+    public String toString()
     {
         return getId();
     }

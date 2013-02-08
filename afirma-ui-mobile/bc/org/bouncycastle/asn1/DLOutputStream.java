@@ -15,8 +15,7 @@ public class DLOutputStream
         super(os);
     }
 
-    @Override
-	public void writeObject(
+    public void writeObject(
         ASN1Encodable obj)
         throws IOException
     {

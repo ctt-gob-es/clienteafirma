@@ -58,8 +58,7 @@ public class BEROctetString
         this.octs = octs;
     }
 
-    @Override
-	public byte[] getOctets()
+    public byte[] getOctets()
     {
         return string;
     }
@@ -78,14 +77,12 @@ public class BEROctetString
         {
             int counter = 0;
 
-            @Override
-			public boolean hasMoreElements()
+            public boolean hasMoreElements()
             {
                 return counter < octs.length;
             }
 
-            @Override
-			public Object nextElement()
+            public Object nextElement()
             {
                 return octs[counter++];
             }
@@ -118,14 +115,12 @@ public class BEROctetString
          return vec; 
     }
 
-    @Override
-	boolean isConstructed()
+    boolean isConstructed()
     {
         return true;
     }
 
-    @Override
-	int encodedLength()
+    int encodedLength()
         throws IOException
     {
         int length = 0;
@@ -137,8 +132,7 @@ public class BEROctetString
         return 2 + length + 2;
     }
 
-    @Override
-	public void encode(
+    public void encode(
         ASN1OutputStream out)
         throws IOException
     {

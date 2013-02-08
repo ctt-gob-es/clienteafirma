@@ -79,28 +79,24 @@ public class DEREnumerated
         return new BigInteger(bytes);
     }
 
-    @Override
-	boolean isConstructed()
+    boolean isConstructed()
     {
         return false;
     }
 
-    @Override
-	int encodedLength()
+    int encodedLength()
     {
         return 1 + StreamUtil.calculateBodyLength(bytes.length) + bytes.length;
     }
 
-    @Override
-	void encode(
+    void encode(
         ASN1OutputStream out)
         throws IOException
     {
         out.writeEncoded(BERTags.ENUMERATED, bytes);
     }
     
-    @Override
-	boolean asn1Equals(
+    boolean asn1Equals(
         ASN1Primitive  o)
     {
         if (!(o instanceof DEREnumerated))
@@ -113,8 +109,7 @@ public class DEREnumerated
         return Arrays.areEqual(this.bytes, other.bytes);
     }
 
-    @Override
-	public int hashCode()
+    public int hashCode()
     {
         return Arrays.hashCode(bytes);
     }

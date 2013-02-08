@@ -44,20 +44,17 @@ public class SHA1Digest
         xOff = t.xOff;
     }
 
-    @Override
-	public String getAlgorithmName()
+    public String getAlgorithmName()
     {
         return "SHA-1";
     }
 
-    @Override
-	public int getDigestSize()
+    public int getDigestSize()
     {
         return DIGEST_LENGTH;
     }
 
-    @Override
-	protected void processWord(
+    protected void processWord(
         byte[]  in,
         int     inOff)
     {
@@ -75,8 +72,7 @@ public class SHA1Digest
         }        
     }
 
-    @Override
-	protected void processLength(
+    protected void processLength(
         long    bitLength)
     {
         if (xOff > 14)
@@ -88,8 +84,7 @@ public class SHA1Digest
         X[15] = (int)(bitLength & 0xffffffff);
     }
 
-    @Override
-	public int doFinal(
+    public int doFinal(
         byte[]  out,
         int     outOff)
     {
@@ -109,8 +104,7 @@ public class SHA1Digest
     /**
      * reset the chaining variables
      */
-    @Override
-	public void reset()
+    public void reset()
     {
         super.reset();
 
@@ -159,8 +153,7 @@ public class SHA1Digest
         return ((u & v) | (u & w) | (v & w));
     }
 
-    @Override
-	protected void processBlock()
+    protected void processBlock()
     {
         //
         // expand 16 word block into 80 word block.

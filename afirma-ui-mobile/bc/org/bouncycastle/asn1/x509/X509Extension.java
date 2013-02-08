@@ -202,8 +202,7 @@ public class X509Extension
         return convertValueToObject(this);
     }
 
-    @Override
-	public int hashCode()
+    public int hashCode()
     {
         if (this.isCritical())
         {
@@ -213,8 +212,7 @@ public class X509Extension
         return ~this.getValue().hashCode();
     }
 
-    @Override
-	public boolean equals(
+    public boolean equals(
         Object  o)
     {
         if (!(o instanceof X509Extension))

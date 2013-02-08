@@ -65,8 +65,7 @@ public class DERUniversalString
         this.string = string;
     }
 
-    @Override
-	public String getString()
+    public String getString()
     {
         StringBuffer    buf = new StringBuffer("#");
         ByteArrayOutputStream    bOut = new ByteArrayOutputStream();
@@ -92,8 +91,7 @@ public class DERUniversalString
         return buf.toString();
     }
 
-    @Override
-	public String toString()
+    public String toString()
     {
         return getString();
     }
@@ -103,28 +101,24 @@ public class DERUniversalString
         return string;
     }
 
-    @Override
-	boolean isConstructed()
+    boolean isConstructed()
     {
         return false;
     }
 
-    @Override
-	int encodedLength()
+    int encodedLength()
     {
         return 1 + StreamUtil.calculateBodyLength(string.length) + string.length;
     }
 
-    @Override
-	void encode(
+    void encode(
         ASN1OutputStream out)
         throws IOException
     {
         out.writeEncoded(BERTags.UNIVERSAL_STRING, this.getOctets());
     }
     
-    @Override
-	boolean asn1Equals(
+    boolean asn1Equals(
         ASN1Primitive o)
     {
         if (!(o instanceof DERUniversalString))
@@ -135,8 +129,7 @@ public class DERUniversalString
         return Arrays.areEqual(string, ((DERUniversalString)o).string);
     }
     
-    @Override
-	public int hashCode()
+    public int hashCode()
     {
         return Arrays.hashCode(string);
     }

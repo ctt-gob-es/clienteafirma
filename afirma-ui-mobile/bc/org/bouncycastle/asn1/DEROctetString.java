@@ -21,20 +21,17 @@ public class DEROctetString
         super(obj.toASN1Primitive().getEncoded(ASN1Encoding.DER));
     }
 
-    @Override
-	boolean isConstructed()
+    boolean isConstructed()
     {
         return false;
     }
 
-    @Override
-	int encodedLength()
+    int encodedLength()
     {
         return 1 + StreamUtil.calculateBodyLength(string.length) + string.length;
     }
 
-    @Override
-	void encode(
+    void encode(
         ASN1OutputStream out)
         throws IOException
     {

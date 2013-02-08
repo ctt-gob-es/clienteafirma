@@ -58,8 +58,7 @@ public class SubjectKeyIdentifier
         return keyidentifier;
     }
 
-    @Override
-	public ASN1Primitive toASN1Primitive()
+    public ASN1Primitive toASN1Primitive()
     {
         return new DEROctetString(keyidentifier);
     }
@@ -72,8 +71,7 @@ public class SubjectKeyIdentifier
      * @param spki the subject public key info.
      * @deprecated
      */
-    @Deprecated
-	public SubjectKeyIdentifier(
+    public SubjectKeyIdentifier(
         SubjectPublicKeyInfo    spki)
     {
         this.keyidentifier = getDigest(spki);
@@ -90,8 +88,7 @@ public class SubjectKeyIdentifier
      * @return the key identifier.
      * @deprecated use org.bouncycastle.cert.X509ExtensionUtils.createSubjectKeyIdentifier
      */
-    @Deprecated
-	public static SubjectKeyIdentifier createSHA1KeyIdentifier(SubjectPublicKeyInfo keyInfo)
+    public static SubjectKeyIdentifier createSHA1KeyIdentifier(SubjectPublicKeyInfo keyInfo)
     {
         return new SubjectKeyIdentifier(keyInfo);
     }
@@ -107,8 +104,7 @@ public class SubjectKeyIdentifier
      * @return the key identifier.
      * @deprecated use org.bouncycastle.cert.X509ExtensionUtils.createTruncatedSubjectKeyIdentifier
      */
-    @Deprecated
-	public static SubjectKeyIdentifier createTruncatedSHA1KeyIdentifier(SubjectPublicKeyInfo keyInfo)
+    public static SubjectKeyIdentifier createTruncatedSHA1KeyIdentifier(SubjectPublicKeyInfo keyInfo)
     {
         byte[] dig = getDigest(keyInfo);
         byte[] id = new byte[8];

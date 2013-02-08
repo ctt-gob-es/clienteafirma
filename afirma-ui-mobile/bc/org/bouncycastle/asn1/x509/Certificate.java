@@ -124,8 +124,7 @@ public class Certificate
         return sig;
     }
 
-    @Override
-	public ASN1Primitive toASN1Primitive()
+    public ASN1Primitive toASN1Primitive()
     {
         return seq;
     }

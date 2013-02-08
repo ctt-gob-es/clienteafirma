@@ -67,7 +67,7 @@ public class DERBoolean
         }
         else
         {
-            return DERBoolean.fromOctetString(((ASN1OctetString)o).getOctets());
+            return ASN1Boolean.fromOctetString(((ASN1OctetString)o).getOctets());
         }
     }
     
@@ -104,28 +104,24 @@ public class DERBoolean
         return (value[0] != 0);
     }
 
-    @Override
-	boolean isConstructed()
+    boolean isConstructed()
     {
         return false;
     }
 
-    @Override
-	int encodedLength()
+    int encodedLength()
     {
         return 3;
     }
 
-    @Override
-	void encode(
+    void encode(
         ASN1OutputStream out)
         throws IOException
     {
         out.writeEncoded(BERTags.BOOLEAN, value);
     }
     
-    @Override
-	protected boolean asn1Equals(
+    protected boolean asn1Equals(
         ASN1Primitive  o)
     {
         if ((o == null) || !(o instanceof DERBoolean))
@@ -136,15 +132,13 @@ public class DERBoolean
         return (value[0] == ((DERBoolean)o).value[0]);
     }
     
-    @Override
-	public int hashCode()
+    public int hashCode()
     {
         return value[0];
     }
 
 
-    @Override
-	public String toString()
+    public String toString()
     {
       return (value[0] != 0) ? "TRUE" : "FALSE";
     }

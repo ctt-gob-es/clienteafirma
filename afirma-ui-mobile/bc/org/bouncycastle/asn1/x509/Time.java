@@ -121,14 +121,12 @@ public class Time
      *             generalTime    GeneralizedTime }
      * </pre>
      */
-    @Override
-	public ASN1Primitive toASN1Primitive()
+    public ASN1Primitive toASN1Primitive()
     {
         return time;
     }
 
-    @Override
-	public String toString()
+    public String toString()
     {
         return getTime();
     }

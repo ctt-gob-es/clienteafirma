@@ -25,8 +25,7 @@ public class DLTaggedObject
         super(explicit, tagNo, obj);
     }
 
-    @Override
-	boolean isConstructed()
+    boolean isConstructed()
     {
         if (!empty)
         {
@@ -47,8 +46,7 @@ public class DLTaggedObject
         }
     }
 
-    @Override
-	int encodedLength()
+    int encodedLength()
         throws IOException
     {
         if (!empty)
@@ -73,8 +71,7 @@ public class DLTaggedObject
         }
     }
 
-    @Override
-	void encode(
+    void encode(
         ASN1OutputStream out)
         throws IOException
     {

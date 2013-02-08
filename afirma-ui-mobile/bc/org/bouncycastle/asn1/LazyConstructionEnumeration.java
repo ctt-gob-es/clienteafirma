@@ -15,14 +15,12 @@ class LazyConstructionEnumeration
         nextObj = readObject();
     }
 
-    @Override
-	public boolean hasMoreElements()
+    public boolean hasMoreElements()
     {
         return nextObj != null;
     }
 
-    @Override
-	public Object nextElement()
+    public Object nextElement()
     {
         Object o = nextObj;
 

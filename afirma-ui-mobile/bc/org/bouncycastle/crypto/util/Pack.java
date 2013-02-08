@@ -41,7 +41,7 @@ public abstract class Pack
     {
         int hi = bigEndianToInt(bs, off);
         int lo = bigEndianToInt(bs, off + 4);
-        return ((hi & 0xffffffffL) << 32) | lo & 0xffffffffL;
+        return ((long)(hi & 0xffffffffL) << 32) | (long)(lo & 0xffffffffL);
     }
 
     public static void longToBigEndian(long n, byte[] bs, int off)
@@ -89,7 +89,7 @@ public abstract class Pack
     {
         int lo = littleEndianToInt(bs, off);
         int hi = littleEndianToInt(bs, off + 4);
-        return ((hi & 0xffffffffL) << 32) | lo & 0xffffffffL;
+        return ((long)(hi & 0xffffffffL) << 32) | (long)(lo & 0xffffffffL);
     }
 
     public static void longToLittleEndian(long n, byte[] bs, int off)

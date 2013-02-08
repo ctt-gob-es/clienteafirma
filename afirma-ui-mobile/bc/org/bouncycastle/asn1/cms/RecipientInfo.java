@@ -147,8 +147,7 @@ public class RecipientInfo
      *     ori [4] OtherRecipientInfo }
      * </pre>
      */
-    @Override
-	public ASN1Primitive toASN1Primitive()
+    public ASN1Primitive toASN1Primitive()
     {
         return info.toASN1Primitive();
     }

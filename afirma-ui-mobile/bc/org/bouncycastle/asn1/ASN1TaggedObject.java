@@ -93,8 +93,7 @@ public abstract class ASN1TaggedObject
         }
     }
     
-    @Override
-	boolean asn1Equals(
+    boolean asn1Equals(
         ASN1Primitive o)
     {
         if (!(o instanceof ASN1TaggedObject))
@@ -127,8 +126,7 @@ public abstract class ASN1TaggedObject
         return true;
     }
     
-    @Override
-	public int hashCode()
+    public int hashCode()
     {
         int code = tagNo;
 
@@ -145,8 +143,7 @@ public abstract class ASN1TaggedObject
         return code;
     }
 
-    @Override
-	public int getTagNo()
+    public int getTagNo()
     {
         return tagNo;
     }
@@ -192,8 +189,7 @@ public abstract class ASN1TaggedObject
      * the type of the passed in tag. If the object doesn't have a parser
      * associated with it, the base object is returned.
      */
-    @Override
-	public ASN1Encodable getObjectParser(
+    public ASN1Encodable getObjectParser(
         int     tag,
         boolean isExplicit)
     {
@@ -215,30 +211,25 @@ public abstract class ASN1TaggedObject
         throw new RuntimeException("implicit tagging not implemented for tag: " + tag);
     }
 
-    @Override
-	public ASN1Primitive getLoadedObject()
+    public ASN1Primitive getLoadedObject()
     {
         return this.toASN1Primitive();
     }
 
-    @Override
-	ASN1Primitive toDERObject()
+    ASN1Primitive toDERObject()
     {
         return new DERTaggedObject(explicit, tagNo, obj);
     }
 
-    @Override
-	ASN1Primitive toDLObject()
+    ASN1Primitive toDLObject()
     {
         return new DLTaggedObject(explicit, tagNo, obj);
     }
 
-    @Override
-	abstract void encode(ASN1OutputStream out)
+    abstract void encode(ASN1OutputStream out)
         throws IOException;
 
-    @Override
-	public String toString()
+    public String toString()
     {
         return "[" + tagNo + "]" + obj;
     }

@@ -84,8 +84,7 @@ public class AttributeTable
     /**
      * @deprecated use ASN1ObjectIdentifier
      */
-    @Deprecated
-	public Attribute get(DERObjectIdentifier oid)
+    public Attribute get(DERObjectIdentifier oid)
     {
         return get(new ASN1ObjectIdentifier(oid.getId()));
     }
@@ -112,8 +111,7 @@ public class AttributeTable
      /**
      * @deprecated use ASN1ObjectIdentifier
      */
-    @Deprecated
-	public ASN1EncodableVector getAll(DERObjectIdentifier oid)
+    public ASN1EncodableVector getAll(DERObjectIdentifier oid)
     {
         return getAll(new ASN1ObjectIdentifier(oid.getId()));
     }

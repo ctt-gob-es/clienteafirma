@@ -121,8 +121,7 @@ public interface PKCSObjectIdentifiers
     static final ASN1ObjectIdentifier    pkcs_9_at_localKeyId    = pkcs_9.branch("21");
 
     /** @deprecated use x509Certificate instead */
-    @Deprecated
-	static final ASN1ObjectIdentifier    x509certType            = pkcs_9.branch("22.1");
+    static final ASN1ObjectIdentifier    x509certType            = pkcs_9.branch("22.1");
 
     static final ASN1ObjectIdentifier    certTypes               = pkcs_9.branch("22");
     static final ASN1ObjectIdentifier    x509Certificate         = certTypes.branch("1");
@@ -207,17 +206,13 @@ public interface PKCSObjectIdentifiers
     static final ASN1ObjectIdentifier id_aa_ets_archiveTimestamp = id_aa.branch("27");
 
     /** @deprecated use id_aa_ets_sigPolicyId instead */
-    @Deprecated
-	static final ASN1ObjectIdentifier id_aa_sigPolicyId = id_aa_ets_sigPolicyId;
+    static final ASN1ObjectIdentifier id_aa_sigPolicyId = id_aa_ets_sigPolicyId;
     /** @deprecated use id_aa_ets_commitmentType instead */
-    @Deprecated
-	static final ASN1ObjectIdentifier id_aa_commitmentType = id_aa_ets_commitmentType;
+    static final ASN1ObjectIdentifier id_aa_commitmentType = id_aa_ets_commitmentType;
     /** @deprecated use id_aa_ets_signerLocation instead */
-    @Deprecated
-	static final ASN1ObjectIdentifier id_aa_signerLocation = id_aa_ets_signerLocation;
+    static final ASN1ObjectIdentifier id_aa_signerLocation = id_aa_ets_signerLocation;
     /** @deprecated use id_aa_ets_otherSigCert instead */
-    @Deprecated
-	static final ASN1ObjectIdentifier id_aa_otherSigCert = id_aa_ets_otherSigCert;
+    static final ASN1ObjectIdentifier id_aa_otherSigCert = id_aa_ets_otherSigCert;
     
     //
     // id-spq OBJECT IDENTIFIER ::= {iso(1) member-body(2) usa(840)
@@ -254,8 +249,7 @@ public interface PKCSObjectIdentifiers
     /**
      * @deprecated use pbeWithSHAAnd40BitRC2_CBC
      */
-    @Deprecated
-	static final ASN1ObjectIdentifier    pbewithSHAAnd40BitRC2_CBC = pkcs_12PbeIds.branch("6");
+    static final ASN1ObjectIdentifier    pbewithSHAAnd40BitRC2_CBC = pkcs_12PbeIds.branch("6");
 
     static final ASN1ObjectIdentifier    id_alg_CMS3DESwrap = new ASN1ObjectIdentifier("1.2.840.113549.1.9.16.3.6");
     static final ASN1ObjectIdentifier    id_alg_CMSRC2wrap = new ASN1ObjectIdentifier("1.2.840.113549.1.9.16.3.7");

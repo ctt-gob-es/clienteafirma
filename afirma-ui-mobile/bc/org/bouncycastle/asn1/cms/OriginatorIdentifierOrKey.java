@@ -24,8 +24,7 @@ public class OriginatorIdentifierOrKey
     /**
      * @deprecated use version taking a SubjectKeyIdentifier
      */
-    @Deprecated
-	public OriginatorIdentifierOrKey(
+    public OriginatorIdentifierOrKey(
         ASN1OctetString id)
     {
         this(new SubjectKeyIdentifier(id.getOctets()));
@@ -46,8 +45,7 @@ public class OriginatorIdentifierOrKey
     /**
      * @deprecated use more specific version
      */
-    @Deprecated
-	public OriginatorIdentifierOrKey(
+    public OriginatorIdentifierOrKey(
         ASN1Primitive id)
     {
         this.id = id;
@@ -160,8 +158,7 @@ public class OriginatorIdentifierOrKey
      * SubjectKeyIdentifier ::= OCTET STRING
      * </pre>
      */
-    @Override
-	public ASN1Primitive toASN1Primitive()
+    public ASN1Primitive toASN1Primitive()
     {
         return id.toASN1Primitive();
     }

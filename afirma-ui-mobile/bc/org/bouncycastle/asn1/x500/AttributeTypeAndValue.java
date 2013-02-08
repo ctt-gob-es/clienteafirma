@@ -17,7 +17,7 @@ public class AttributeTypeAndValue
     private AttributeTypeAndValue(ASN1Sequence seq)
     {
         type = (ASN1ObjectIdentifier)seq.getObjectAt(0);
-        value = seq.getObjectAt(1);
+        value = (ASN1Encodable)seq.getObjectAt(1);
     }
 
     public static AttributeTypeAndValue getInstance(Object o)
@@ -60,8 +60,7 @@ public class AttributeTypeAndValue
      * </pre>
      * @return a basic ASN.1 object representation.
      */
-    @Override
-	public ASN1Primitive toASN1Primitive()
+    public ASN1Primitive toASN1Primitive()
     {
         ASN1EncodableVector v = new ASN1EncodableVector();
 

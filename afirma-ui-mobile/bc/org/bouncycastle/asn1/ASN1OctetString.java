@@ -88,8 +88,7 @@ public abstract class ASN1OctetString
         this.string = string;
     }
 
-    @Override
-	public InputStream getOctetStream()
+    public InputStream getOctetStream()
     {
         return new ByteArrayInputStream(string);
     }
@@ -104,14 +103,12 @@ public abstract class ASN1OctetString
         return string;
     }
 
-    @Override
-	public int hashCode()
+    public int hashCode()
     {
         return Arrays.hashCode(this.getOctets());
     }
 
-    @Override
-	boolean asn1Equals(
+    boolean asn1Equals(
         ASN1Primitive o)
     {
         if (!(o instanceof ASN1OctetString))
@@ -124,30 +121,25 @@ public abstract class ASN1OctetString
         return Arrays.areEqual(string, other.string);
     }
 
-    @Override
-	public ASN1Primitive getLoadedObject()
+    public ASN1Primitive getLoadedObject()
     {
         return this.toASN1Primitive();
     }
 
-    @Override
-	ASN1Primitive toDERObject()
+    ASN1Primitive toDERObject()
     {
         return new DEROctetString(string);
     }
 
-    @Override
-	ASN1Primitive toDLObject()
+    ASN1Primitive toDLObject()
     {
         return new DEROctetString(string);
     }
 
-    @Override
-	abstract void encode(ASN1OutputStream out)
+    abstract void encode(ASN1OutputStream out)
         throws IOException;
 
-    @Override
-	public String toString()
+    public String toString()
     {
       return "#"+new String(Hex.encode(string));
     }

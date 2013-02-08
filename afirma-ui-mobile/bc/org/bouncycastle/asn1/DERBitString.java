@@ -198,20 +198,17 @@ public class DERBitString
         return value;
     }
 
-    @Override
-	boolean isConstructed()
+    boolean isConstructed()
     {
         return false;
     }
 
-    @Override
-	int encodedLength()
+    int encodedLength()
     {
         return 1 + StreamUtil.calculateBodyLength(data.length + 1) + data.length + 1;
     }
 
-    @Override
-	void encode(
+    void encode(
         ASN1OutputStream  out)
         throws IOException
     {
@@ -223,14 +220,12 @@ public class DERBitString
         out.writeEncoded(BERTags.BIT_STRING, bytes);
     }
 
-    @Override
-	public int hashCode()
+    public int hashCode()
     {
         return padBits ^ Arrays.hashCode(data);
     }
 
-    @Override
-	protected boolean asn1Equals(
+    protected boolean asn1Equals(
         ASN1Primitive  o)
     {
         if (!(o instanceof DERBitString))
@@ -244,8 +239,7 @@ public class DERBitString
             && Arrays.areEqual(this.data, other.data);
     }
 
-    @Override
-	public String getString()
+    public String getString()
     {
         StringBuffer          buf = new StringBuffer("#");
         ByteArrayOutputStream bOut = new ByteArrayOutputStream();
@@ -271,8 +265,7 @@ public class DERBitString
         return buf.toString();
     }
 
-    @Override
-	public String toString()
+    public String toString()
     {
         return getString();
     }

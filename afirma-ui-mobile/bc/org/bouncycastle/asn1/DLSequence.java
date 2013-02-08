@@ -62,8 +62,7 @@ public class DLSequence
         return bodyLength;
     }
 
-    @Override
-	int encodedLength()
+    int encodedLength()
         throws IOException
     {
         int    length = getBodyLength();
@@ -79,8 +78,7 @@ public class DLSequence
      * ASN.1 descriptions given. Rather than just outputting SEQUENCE,
      * we also have to specify CONSTRUCTED, and the objects length.
      */
-    @Override
-	void encode(
+    void encode(
         ASN1OutputStream out)
         throws IOException
     {

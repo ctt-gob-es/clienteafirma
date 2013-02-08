@@ -243,14 +243,12 @@ public class X500Name
         return tmp;
     }
 
-    @Override
-	public ASN1Primitive toASN1Primitive()
+    public ASN1Primitive toASN1Primitive()
     {
         return new DERSequence(rdns);
     }
 
-    @Override
-	public int hashCode()
+    public int hashCode()
     {
         if (isHashCodeCalculated)
         {
@@ -267,8 +265,7 @@ public class X500Name
     /**
      * test for equality - note: case is ignored.
      */
-    @Override
-	public boolean equals(Object obj)
+    public boolean equals(Object obj)
     {
         if (obj == this)
         {
@@ -297,8 +294,7 @@ public class X500Name
         }
     }
     
-    @Override
-	public String toString()
+    public String toString()
     {
         return style.toString(this);
     }

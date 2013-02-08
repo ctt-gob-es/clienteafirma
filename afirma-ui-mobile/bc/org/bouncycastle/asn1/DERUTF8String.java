@@ -74,26 +74,22 @@ public class DERUTF8String
         this.string = Strings.toUTF8ByteArray(string);
     }
 
-    @Override
-	public String getString()
+    public String getString()
     {
         return Strings.fromUTF8ByteArray(string);
     }
 
-    @Override
-	public String toString()
+    public String toString()
     {
         return getString();
     }
 
-    @Override
-	public int hashCode()
+    public int hashCode()
     {
         return Arrays.hashCode(string);
     }
 
-    @Override
-	boolean asn1Equals(ASN1Primitive o)
+    boolean asn1Equals(ASN1Primitive o)
     {
         if (!(o instanceof DERUTF8String))
         {
@@ -105,21 +101,18 @@ public class DERUTF8String
         return Arrays.areEqual(string, s.string);
     }
 
-    @Override
-	boolean isConstructed()
+    boolean isConstructed()
     {
         return false;
     }
 
-    @Override
-	int encodedLength()
+    int encodedLength()
         throws IOException
     {
         return 1 + StreamUtil.calculateBodyLength(string.length) + string.length;
     }
 
-    @Override
-	void encode(ASN1OutputStream out)
+    void encode(ASN1OutputStream out)
         throws IOException
     {
         out.writeEncoded(BERTags.UTF8_STRING, string);

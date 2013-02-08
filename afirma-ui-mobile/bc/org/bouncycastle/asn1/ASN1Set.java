@@ -231,8 +231,7 @@ abstract public class ASN1Set
 
             private int index;
 
-            @Override
-			public ASN1Encodable readObject() throws IOException
+            public ASN1Encodable readObject() throws IOException
             {
                 if (index == max)
                 {
@@ -252,22 +251,19 @@ abstract public class ASN1Set
                 return obj;
             }
 
-            @Override
-			public ASN1Primitive getLoadedObject()
+            public ASN1Primitive getLoadedObject()
             {
                 return outer;
             }
 
-            @Override
-			public ASN1Primitive toASN1Primitive()
+            public ASN1Primitive toASN1Primitive()
             {
                 return outer;
             }
         };
     }
 
-    @Override
-	public int hashCode()
+    public int hashCode()
     {
         Enumeration             e = this.getObjects();
         int                     hashCode = size();
@@ -283,8 +279,7 @@ abstract public class ASN1Set
         return hashCode;
     }
 
-    @Override
-	ASN1Primitive toDERObject()
+    ASN1Primitive toDERObject()
     {
         if (isSorted)
         {
@@ -313,8 +308,7 @@ abstract public class ASN1Set
         }
     }
 
-    @Override
-	ASN1Primitive toDLObject()
+    ASN1Primitive toDLObject()
     {
         ASN1Set derSet = new DLSet();
 
@@ -323,8 +317,7 @@ abstract public class ASN1Set
         return derSet;
     }
 
-    @Override
-	boolean asn1Equals(
+    boolean asn1Equals(
         ASN1Primitive o)
     {
         if (!(o instanceof ASN1Set))
@@ -456,18 +449,15 @@ abstract public class ASN1Set
         }
     }
 
-    @Override
-	boolean isConstructed()
+    boolean isConstructed()
     {
         return true;
     }
 
-    @Override
-	abstract void encode(ASN1OutputStream out)
+    abstract void encode(ASN1OutputStream out)
             throws IOException;
 
-    @Override
-	public String toString() 
+    public String toString() 
     {
         return set.toString();
     }

@@ -87,8 +87,7 @@ public class SubjectPublicKeyInfo
      * @deprecated use getAlgorithm()
      * @return    alg ID.
      */
-    @Deprecated
-	public AlgorithmIdentifier getAlgorithmId()
+    public AlgorithmIdentifier getAlgorithmId()
     {
         return algId;
     }
@@ -118,8 +117,7 @@ public class SubjectPublicKeyInfo
      * @deprecated use parsePublicKey
      * @return the public key as an ASN.1 primitive.
      */
-    @Deprecated
-	public ASN1Primitive getPublicKey()
+    public ASN1Primitive getPublicKey()
         throws IOException
     {
         ASN1InputStream         aIn = new ASN1InputStream(keyData.getBytes());
@@ -145,8 +143,7 @@ public class SubjectPublicKeyInfo
      *                          publicKey BIT STRING }
      * </pre>
      */
-    @Override
-	public ASN1Primitive toASN1Primitive()
+    public ASN1Primitive toASN1Primitive()
     {
         ASN1EncodableVector  v = new ASN1EncodableVector();
 

@@ -13,7 +13,6 @@ import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.BERSequence;
 import org.bouncycastle.asn1.BERSet;
 import org.bouncycastle.asn1.BERTaggedObject;
-import org.bouncycastle.asn1.DERInteger;
 import org.bouncycastle.asn1.DERTaggedObject;
 
 /**
@@ -183,7 +182,7 @@ public class SignedData
     {
         Enumeration     e = seq.getObjects();
 
-        version = DERInteger.getInstance(e.nextElement());
+        version = ASN1Integer.getInstance(e.nextElement());
         digestAlgorithms = ((ASN1Set)e.nextElement());
         contentInfo = ContentInfo.getInstance(e.nextElement());
 
@@ -264,8 +263,7 @@ public class SignedData
      *   }
      * </pre>
      */
-    @Override
-	public ASN1Primitive toASN1Primitive()
+    public ASN1Primitive toASN1Primitive()
     {
         ASN1EncodableVector  v = new ASN1EncodableVector();
 

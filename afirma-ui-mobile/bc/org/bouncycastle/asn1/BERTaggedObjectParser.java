@@ -24,14 +24,12 @@ public class BERTaggedObjectParser
         return _constructed;
     }
 
-    @Override
-	public int getTagNo()
+    public int getTagNo()
     {
         return _tagNumber;
     }
 
-    @Override
-	public ASN1Encodable getObjectParser(
+    public ASN1Encodable getObjectParser(
         int     tag,
         boolean isExplicit)
         throws IOException
@@ -48,15 +46,13 @@ public class BERTaggedObjectParser
         return _parser.readImplicit(_constructed, tag);
     }
 
-    @Override
-	public ASN1Primitive getLoadedObject()
+    public ASN1Primitive getLoadedObject()
         throws IOException
     {
         return _parser.readTaggedObject(_constructed, _tagNumber);
     }
 
-    @Override
-	public ASN1Primitive toASN1Primitive()
+    public ASN1Primitive toASN1Primitive()
     {
         try
         {

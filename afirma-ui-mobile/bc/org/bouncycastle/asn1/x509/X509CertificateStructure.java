@@ -20,7 +20,6 @@ import org.bouncycastle.asn1.x500.X500Name;
  * </pre>
  * @deprecated use org.bouncycastle.asn1.x509.Certificate
  */
-@Deprecated
 public class X509CertificateStructure
     extends ASN1Object
     implements X509ObjectIdentifiers, PKCSObjectIdentifiers
@@ -123,8 +122,7 @@ public class X509CertificateStructure
         return sig;
     }
 
-    @Override
-	public ASN1Primitive toASN1Primitive()
+    public ASN1Primitive toASN1Primitive()
     {
         return seq;
     }

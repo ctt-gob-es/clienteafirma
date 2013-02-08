@@ -97,14 +97,12 @@ public class DERIA5String
         this.string = Strings.toByteArray(string);
     }
 
-    @Override
-	public String getString()
+    public String getString()
     {
         return Strings.fromByteArray(string);
     }
 
-    @Override
-	public String toString()
+    public String toString()
     {
         return getString();
     }
@@ -114,34 +112,29 @@ public class DERIA5String
         return Arrays.clone(string);
     }
 
-    @Override
-	boolean isConstructed()
+    boolean isConstructed()
     {
         return false;
     }
 
-    @Override
-	int encodedLength()
+    int encodedLength()
     {
         return 1 + StreamUtil.calculateBodyLength(string.length) + string.length;
     }
 
-    @Override
-	void encode(
+    void encode(
         ASN1OutputStream out)
         throws IOException
     {
         out.writeEncoded(BERTags.IA5_STRING, string);
     }
 
-    @Override
-	public int hashCode()
+    public int hashCode()
     {
         return Arrays.hashCode(string);
     }
 
-    @Override
-	boolean asn1Equals(
+    boolean asn1Equals(
         ASN1Primitive o)
     {
         if (!(o instanceof DERIA5String))

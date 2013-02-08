@@ -73,32 +73,27 @@ public class DERT61String
         this.string = Strings.toByteArray(string);
     }
 
-    @Override
-	public String getString()
+    public String getString()
     {
         return Strings.fromByteArray(string);
     }
 
-    @Override
-	public String toString()
+    public String toString()
     {
         return getString();
     }
 
-    @Override
-	boolean isConstructed()
+    boolean isConstructed()
     {
         return false;
     }
 
-    @Override
-	int encodedLength()
+    int encodedLength()
     {
         return 1 + StreamUtil.calculateBodyLength(string.length) + string.length;
     }
 
-    @Override
-	void encode(
+    void encode(
         ASN1OutputStream out)
         throws IOException
     {
@@ -110,8 +105,7 @@ public class DERT61String
         return Arrays.clone(string);
     }
 
-    @Override
-	boolean asn1Equals(
+    boolean asn1Equals(
         ASN1Primitive o)
     {
         if (!(o instanceof DERT61String))
@@ -122,8 +116,7 @@ public class DERT61String
         return Arrays.areEqual(string, ((DERT61String)o).string);
     }
     
-    @Override
-	public int hashCode()
+    public int hashCode()
     {
         return Arrays.hashCode(string);
     }

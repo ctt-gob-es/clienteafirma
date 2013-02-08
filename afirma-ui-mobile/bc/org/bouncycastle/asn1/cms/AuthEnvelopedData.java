@@ -183,8 +183,7 @@ public class AuthEnvelopedData
      *   unauthAttrs [2] IMPLICIT UnauthAttributes OPTIONAL }
      * </pre>
      */
-    @Override
-	public ASN1Primitive toASN1Primitive()
+    public ASN1Primitive toASN1Primitive()
     {
         ASN1EncodableVector v = new ASN1EncodableVector();
 

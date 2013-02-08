@@ -12,22 +12,19 @@ public class DERSetParser
         this._parser = parser;
     }
 
-    @Override
-	public ASN1Encodable readObject()
+    public ASN1Encodable readObject()
         throws IOException
     {
         return _parser.readObject();
     }
 
-    @Override
-	public ASN1Primitive getLoadedObject()
+    public ASN1Primitive getLoadedObject()
         throws IOException
     {
         return new DERSet(_parser.readVector(), false);
     }
 
-    @Override
-	public ASN1Primitive toASN1Primitive()
+    public ASN1Primitive toASN1Primitive()
     {
         try
         {

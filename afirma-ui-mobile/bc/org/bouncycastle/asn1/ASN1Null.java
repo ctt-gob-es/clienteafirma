@@ -38,14 +38,12 @@ public abstract class ASN1Null
         return null;
     }
 
-    @Override
-	public int hashCode()
+    public int hashCode()
     {
         return -1;
     }
 
-    @Override
-	boolean asn1Equals(
+    boolean asn1Equals(
         ASN1Primitive o)
     {
         if (!(o instanceof ASN1Null))
@@ -56,12 +54,10 @@ public abstract class ASN1Null
         return true;
     }
 
-    @Override
-	abstract void encode(ASN1OutputStream out)
+    abstract void encode(ASN1OutputStream out)
         throws IOException;
 
-    @Override
-	public String toString()
+    public String toString()
     {
          return "NULL";
     }

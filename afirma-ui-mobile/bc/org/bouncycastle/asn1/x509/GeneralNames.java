@@ -78,14 +78,12 @@ public class GeneralNames
      * GeneralNames ::= SEQUENCE SIZE {1..MAX} OF GeneralName
      * </pre>
      */
-    @Override
-	public ASN1Primitive toASN1Primitive()
+    public ASN1Primitive toASN1Primitive()
     {
         return new DERSequence(names);
     }
 
-    @Override
-	public String toString()
+    public String toString()
     {
         StringBuffer  buf = new StringBuffer();
         String        sep = System.getProperty("line.separator");

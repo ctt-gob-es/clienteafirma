@@ -48,8 +48,7 @@ class IndefiniteLengthInputStream
         return _eofReached;
     }
 
-    @Override
-	public int read(byte[] b, int off, int len)
+    public int read(byte[] b, int off, int len)
         throws IOException
     {
         // Only use this optimisation if we aren't checking for 00
@@ -86,8 +85,7 @@ class IndefiniteLengthInputStream
         return numRead + 2;
     }
 
-    @Override
-	public int read()
+    public int read()
         throws IOException
     {
         if (checkForEof())

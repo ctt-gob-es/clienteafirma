@@ -45,8 +45,7 @@ public class BERTaggedObject
         super(false, tagNo, new BERSequence());
     }
 
-    @Override
-	boolean isConstructed()
+    boolean isConstructed()
     {
         if (!empty)
         {
@@ -67,8 +66,7 @@ public class BERTaggedObject
         }
     }
 
-    @Override
-	int encodedLength()
+    int encodedLength()
         throws IOException
     {
         if (!empty)
@@ -94,8 +92,7 @@ public class BERTaggedObject
         }
     }
 
-    @Override
-	void encode(
+    void encode(
         ASN1OutputStream out)
         throws IOException
     {

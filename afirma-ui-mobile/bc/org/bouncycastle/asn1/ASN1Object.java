@@ -56,14 +56,12 @@ public abstract class ASN1Object
         return this.getEncoded();
     }
 
-    @Override
-	public int hashCode()
+    public int hashCode()
     {
         return this.toASN1Primitive().hashCode();
     }
 
-    @Override
-	public boolean equals(
+    public boolean equals(
         Object  o)
     {
         if (this == o)
@@ -85,8 +83,7 @@ public abstract class ASN1Object
      * @deprecated use toASN1Primitive()
      * @return the underlying primitive type.
      */
-    @Deprecated
-	public ASN1Primitive toASN1Object()
+    public ASN1Primitive toASN1Object()
     {
         return this.toASN1Primitive();
     }
@@ -96,6 +93,5 @@ public abstract class ASN1Object
         return (obj instanceof byte[]) && ((byte[])obj)[0] == tagValue;
     }
 
-    @Override
-	public abstract ASN1Primitive toASN1Primitive();
+    public abstract ASN1Primitive toASN1Primitive();
 }

@@ -34,7 +34,7 @@ public class DERExternal
         }
         if (!(enc instanceof DERTaggedObject))
         {
-            dataValueDescriptor = enc;
+            dataValueDescriptor = (ASN1Primitive) enc;
             offset++;
             enc = getObjFromVector(vector, offset);
         }
@@ -96,8 +96,7 @@ public class DERExternal
     /* (non-Javadoc)
      * @see java.lang.Object#hashCode()
      */
-    @Override
-	public int hashCode()
+    public int hashCode()
     {
         int ret = 0;
         if (directReference != null)
@@ -116,14 +115,12 @@ public class DERExternal
         return ret;
     }
 
-    @Override
-	boolean isConstructed()
+    boolean isConstructed()
     {
         return true;
     }
 
-    @Override
-	int encodedLength()
+    int encodedLength()
         throws IOException
     {
         return this.getEncoded().length;
@@ -132,8 +129,7 @@ public class DERExternal
     /* (non-Javadoc)
      * @see org.bouncycastle.asn1.ASN1Primitive#encode(org.bouncycastle.asn1.DEROutputStream)
      */
-    @Override
-	void encode(ASN1OutputStream out)
+    void encode(ASN1OutputStream out)
         throws IOException
     {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -157,8 +153,7 @@ public class DERExternal
     /* (non-Javadoc)
      * @see org.bouncycastle.asn1.ASN1Primitive#asn1Equals(org.bouncycastle.asn1.ASN1Primitive)
      */
-    @Override
-	boolean asn1Equals(ASN1Primitive o)
+    boolean asn1Equals(ASN1Primitive o)
     {
         if (!(o instanceof DERExternal))
         {

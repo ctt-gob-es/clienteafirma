@@ -14,21 +14,18 @@ public class DEROctetStringParser
         this.stream = stream;
     }
 
-    @Override
-	public InputStream getOctetStream()
+    public InputStream getOctetStream()
     {
         return stream;
     }
 
-    @Override
-	public ASN1Primitive getLoadedObject()
+    public ASN1Primitive getLoadedObject()
         throws IOException
     {
         return new DEROctetString(stream.toByteArray());
     }
     
-    @Override
-	public ASN1Primitive toASN1Primitive()
+    public ASN1Primitive toASN1Primitive()
     {
         try
         {

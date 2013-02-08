@@ -16,21 +16,18 @@ public class BEROctetStringParser
         _parser = parser;
     }
 
-    @Override
-	public InputStream getOctetStream()
+    public InputStream getOctetStream()
     {
         return new ConstructedOctetStream(_parser);
     }
 
-    @Override
-	public ASN1Primitive getLoadedObject()
+    public ASN1Primitive getLoadedObject()
         throws IOException
     {
         return new BEROctetString(Streams.readAll(getOctetStream()));
     }
 
-    @Override
-	public ASN1Primitive toASN1Primitive()
+    public ASN1Primitive toASN1Primitive()
     {
         try
         {

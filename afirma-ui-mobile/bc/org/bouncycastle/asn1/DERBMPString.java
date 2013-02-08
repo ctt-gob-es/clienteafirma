@@ -85,26 +85,22 @@ public class DERBMPString
         this.string = string.toCharArray();
     }
 
-    @Override
-	public String getString()
+    public String getString()
     {
         return new String(string);
     }
 
-    @Override
-	public String toString()
+    public String toString()
     {
         return getString();
     }
 
-    @Override
-	public int hashCode()
+    public int hashCode()
     {
         return Arrays.hashCode(string);
     }
 
-    @Override
-	protected boolean asn1Equals(
+    protected boolean asn1Equals(
         ASN1Primitive o)
     {
         if (!(o instanceof DERBMPString))
@@ -117,20 +113,17 @@ public class DERBMPString
         return Arrays.areEqual(string, s.string);
     }
 
-    @Override
-	boolean isConstructed()
+    boolean isConstructed()
     {
         return false;
     }
 
-    @Override
-	int encodedLength()
+    int encodedLength()
     {
         return 1 + StreamUtil.calculateBodyLength(string.length * 2) + (string.length * 2);
     }
 
-    @Override
-	void encode(
+    void encode(
         ASN1OutputStream out)
         throws IOException
     {

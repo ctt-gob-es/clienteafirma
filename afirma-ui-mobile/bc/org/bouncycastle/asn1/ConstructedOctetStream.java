@@ -17,8 +17,7 @@ class ConstructedOctetStream
         _parser = parser;
     }
 
-    @Override
-	public int read(byte[] b, int off, int len) throws IOException
+    public int read(byte[] b, int off, int len) throws IOException
     {
         if (_currentStream == null)
         {
@@ -68,8 +67,7 @@ class ConstructedOctetStream
         }
     }
 
-    @Override
-	public int read()
+    public int read()
         throws IOException
     {
         if (_currentStream == null)

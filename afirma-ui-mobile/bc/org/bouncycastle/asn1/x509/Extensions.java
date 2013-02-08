@@ -4,6 +4,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import org.bouncycastle.asn1.ASN1Boolean;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -11,8 +12,6 @@ import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.asn1.DERBoolean;
-import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DERSequence;
 
 public class Extensions
@@ -59,11 +58,11 @@ public class Extensions
 
             if (s.size() == 3)
             {
-                extensions.put(s.getObjectAt(0), new Extension(DERObjectIdentifier.getInstance(s.getObjectAt(0)), DERBoolean.getInstance(s.getObjectAt(1)), ASN1OctetString.getInstance(s.getObjectAt(2))));
+                extensions.put(s.getObjectAt(0), new Extension(ASN1ObjectIdentifier.getInstance(s.getObjectAt(0)), ASN1Boolean.getInstance(s.getObjectAt(1)), ASN1OctetString.getInstance(s.getObjectAt(2))));
             }
             else if (s.size() == 2)
             {
-                extensions.put(s.getObjectAt(0), new Extension(DERObjectIdentifier.getInstance(s.getObjectAt(0)), false, ASN1OctetString.getInstance(s.getObjectAt(1))));
+                extensions.put(s.getObjectAt(0), new Extension(ASN1ObjectIdentifier.getInstance(s.getObjectAt(0)), false, ASN1OctetString.getInstance(s.getObjectAt(1))));
             }
             else
             {
@@ -121,8 +120,7 @@ public class Extensions
      *        extnValue         OCTET STRING }
      * </pre>
      */
-    @Override
-	public ASN1Primitive toASN1Primitive()
+    public ASN1Primitive toASN1Primitive()
     {
         ASN1EncodableVector vec = new ASN1EncodableVector();
         Enumeration             e = ordering.elements();
@@ -137,7 +135,7 @@ public class Extensions
 
             if (ext.isCritical())
             {
-                v.add(DERBoolean.getInstance(true));
+                v.add(ASN1Boolean.getInstance(true));
             }
 
             v.add(ext.getExtnValue());

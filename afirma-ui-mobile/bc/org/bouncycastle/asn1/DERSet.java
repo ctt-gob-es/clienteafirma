@@ -72,8 +72,7 @@ public class DERSet
         return bodyLength;
     }
 
-    @Override
-	int encodedLength()
+    int encodedLength()
         throws IOException
     {
         int length = getBodyLength();
@@ -89,8 +88,7 @@ public class DERSet
      * ASN.1 descriptions given. Rather than just outputting SET,
      * we also have to specify CONSTRUCTED, and the objects length.
      */
-    @Override
-	void encode(
+    void encode(
         ASN1OutputStream out)
         throws IOException
     {

@@ -15,8 +15,7 @@ public class DEROutputStream
         super(os);
     }
 
-    @Override
-	public void writeObject(
+    public void writeObject(
         ASN1Encodable obj)
         throws IOException
     {
@@ -30,14 +29,12 @@ public class DEROutputStream
         }
     }
 
-    @Override
-	ASN1OutputStream getDERSubStream()
+    ASN1OutputStream getDERSubStream()
     {
         return this;
     }
 
-    @Override
-	ASN1OutputStream getDLSubStream()
+    ASN1OutputStream getDLSubStream()
     {
         return this;
     }

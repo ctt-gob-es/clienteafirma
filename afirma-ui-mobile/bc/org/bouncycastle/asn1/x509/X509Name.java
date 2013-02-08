@@ -15,7 +15,6 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.ASN1String;
 import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.DERUniversalString;
@@ -36,7 +35,6 @@ import org.bouncycastle.util.encoders.Hex;
  * </pre>
  * @deprecated use org.bouncycastle.asn1.x500.X500Name.
  */
-@Deprecated
 public class X509Name
     extends ASN1Object
 {
@@ -44,36 +42,31 @@ public class X509Name
      * country code - StringType(SIZE(2))
      * @deprecated use a X500NameStyle
      */
-    @Deprecated
-	public static final ASN1ObjectIdentifier C = new ASN1ObjectIdentifier("2.5.4.6");
+    public static final ASN1ObjectIdentifier C = new ASN1ObjectIdentifier("2.5.4.6");
 
     /**
      * organization - StringType(SIZE(1..64))
      * @deprecated use a X500NameStyle
      */
-    @Deprecated
-	public static final ASN1ObjectIdentifier O = new ASN1ObjectIdentifier("2.5.4.10");
+    public static final ASN1ObjectIdentifier O = new ASN1ObjectIdentifier("2.5.4.10");
 
     /**
      * organizational unit name - StringType(SIZE(1..64))
      * @deprecated use a X500NameStyle
      */
-    @Deprecated
-	public static final ASN1ObjectIdentifier OU = new ASN1ObjectIdentifier("2.5.4.11");
+    public static final ASN1ObjectIdentifier OU = new ASN1ObjectIdentifier("2.5.4.11");
 
     /**
      * Title
      * @deprecated use a X500NameStyle
      */
-    @Deprecated
-	public static final ASN1ObjectIdentifier T = new ASN1ObjectIdentifier("2.5.4.12");
+    public static final ASN1ObjectIdentifier T = new ASN1ObjectIdentifier("2.5.4.12");
 
     /**
      * common name - StringType(SIZE(1..64))
      * @deprecated use a X500NameStyle
      */
-    @Deprecated
-	public static final ASN1ObjectIdentifier CN = new ASN1ObjectIdentifier("2.5.4.3");
+    public static final ASN1ObjectIdentifier CN = new ASN1ObjectIdentifier("2.5.4.3");
 
     /**
      * device serial number name - StringType(SIZE(1..64))
@@ -198,8 +191,7 @@ public class X509Name
      * <p>Note: if you're trying to be ultra orthodox, don't use this! It shouldn't be in here.
      * @deprecated use a X500NameStyle
      */
-    @Deprecated
-	public static final ASN1ObjectIdentifier EmailAddress = PKCSObjectIdentifiers.pkcs_9_at_emailAddress;
+    public static final ASN1ObjectIdentifier EmailAddress = PKCSObjectIdentifiers.pkcs_9_at_emailAddress;
     
     /**
      * more from PKCS#9
@@ -255,15 +247,13 @@ public class X509Name
      * look up table translating OID values into their common symbols
      * @deprecated use DefaultSymbols
      */
-    @Deprecated
-	public static final Hashtable OIDLookUp = DefaultSymbols;
+    public static final Hashtable OIDLookUp = DefaultSymbols;
 
     /**
      * look up table translating string values into their OIDS -
      * @deprecated use DefaultLookUp
      */
-    @Deprecated
-	public static final Hashtable SymbolLookUp = DefaultLookUp;
+    public static final Hashtable SymbolLookUp = DefaultLookUp;
 
     private static final Boolean TRUE = new Boolean(true); // for J2ME compatibility
     private static final Boolean FALSE = new Boolean(false);
@@ -429,7 +419,7 @@ public class X509Name
                        throw new IllegalArgumentException("badly sized pair");
                    }
 
-                   ordering.addElement(DERObjectIdentifier.getInstance(s.getObjectAt(0)));
+                   ordering.addElement(ASN1ObjectIdentifier.getInstance(s.getObjectAt(0)));
                    
                    ASN1Encodable value = s.getObjectAt(1);
                    if (value instanceof ASN1String && !(value instanceof DERUniversalString))
@@ -472,8 +462,7 @@ public class X509Name
      * with the ordering specified below.
      * @deprecated use an ordered constructor! The hashtable ordering is rarely correct
      */
-    @Deprecated
-	public X509Name(
+    public X509Name(
         Hashtable  attributes)
     {
         this(null, attributes);
@@ -841,8 +830,7 @@ public class X509Name
         return v;
     }
 
-    @Override
-	public ASN1Primitive toASN1Primitive()
+    public ASN1Primitive toASN1Primitive()
     {
         if (seq == null)
         {
@@ -955,8 +943,7 @@ public class X509Name
         return true;
     }
 
-    @Override
-	public int hashCode()
+    public int hashCode()
     {
         if (isHashCodeCalculated)
         {
@@ -983,8 +970,7 @@ public class X509Name
     /**
      * test for equality - note: case is ignored.
      */
-    @Override
-	public boolean equals(Object obj)
+    public boolean equals(Object obj)
     {
         if (obj == this)
         {
@@ -1287,8 +1273,7 @@ public class X509Name
         return new String(cs);
     }
     
-    @Override
-	public String toString()
+    public String toString()
     {
         return toString(DefaultReverse, DefaultSymbols);
     }

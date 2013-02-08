@@ -21,8 +21,7 @@ public class DERExternalParser
         return _parser.readObject();
     }
 
-    @Override
-	public ASN1Primitive getLoadedObject()
+    public ASN1Primitive getLoadedObject()
         throws IOException
     {
         try
@@ -35,8 +34,7 @@ public class DERExternalParser
         }
     }
     
-    @Override
-	public ASN1Primitive toASN1Primitive()
+    public ASN1Primitive toASN1Primitive()
     {
         try 
         {

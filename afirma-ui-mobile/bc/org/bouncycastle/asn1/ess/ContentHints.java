@@ -39,19 +39,18 @@ public class ContentHints
         if (field.toASN1Primitive() instanceof DERUTF8String)
         {
             contentDescription = DERUTF8String.getInstance(field);
-            contentType = DERObjectIdentifier.getInstance(seq.getObjectAt(1));
+            contentType = ASN1ObjectIdentifier.getInstance(seq.getObjectAt(1));
         }
         else
         {
-            contentType = DERObjectIdentifier.getInstance(seq.getObjectAt(0));
+            contentType = ASN1ObjectIdentifier.getInstance(seq.getObjectAt(0));
         }
     }
 
     /**
      * @deprecated use ASN1ObjectIdentifier
      */
-    @Deprecated
-	public ContentHints(
+    public ContentHints(
         DERObjectIdentifier contentType)
     {
         this(new ASN1ObjectIdentifier(contentType.getId()));
@@ -60,8 +59,7 @@ public class ContentHints
         /**
      * @deprecated use ASN1ObjectIdentifier
      */
-    @Deprecated
-	public ContentHints(
+    public ContentHints(
         DERObjectIdentifier contentType,
         DERUTF8String contentDescription)
     {
@@ -100,8 +98,7 @@ public class ContentHints
      *   contentType ContentType }
      * </pre>
      */
-    @Override
-	public ASN1Primitive toASN1Primitive()
+    public ASN1Primitive toASN1Primitive()
     {
         ASN1EncodableVector v = new ASN1EncodableVector();
 

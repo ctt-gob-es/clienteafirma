@@ -7,7 +7,6 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DERSequence;
 
 public class OtherRecipientInfo
@@ -27,7 +26,7 @@ public class OtherRecipientInfo
     public OtherRecipientInfo(
         ASN1Sequence seq)
     {
-        oriType = DERObjectIdentifier.getInstance(seq.getObjectAt(0));
+        oriType = ASN1ObjectIdentifier.getInstance(seq.getObjectAt(0));
         oriValue = seq.getObjectAt(1);
     }
 
@@ -87,8 +86,7 @@ public class OtherRecipientInfo
      *    oriValue ANY DEFINED BY oriType }
      * </pre>
      */
-    @Override
-	public ASN1Primitive toASN1Primitive()
+    public ASN1Primitive toASN1Primitive()
     {
         ASN1EncodableVector  v = new ASN1EncodableVector();
 
