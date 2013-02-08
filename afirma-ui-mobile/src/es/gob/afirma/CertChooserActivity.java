@@ -2,8 +2,6 @@ package es.gob.afirma;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -15,13 +13,13 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
-import es.gob.afirma.android4.signfolder.Android4KeyStoreManager;
-import es.gob.afirma.utils.FileArrayAdapter;
-import es.gob.afirma.utils.Option;
+import es.gob.afirma.android.crypto.Android4KeyStoreManager;
+import es.gob.afirma.android.gui.FileArrayAdapter;
+import es.gob.afirma.android.gui.Option;
 
 /** @author Alberto Mart&iacute;nez */
 public class CertChooserActivity extends ListActivity {
-    private static final String FILETYPE_INCORRECT_MSG = "Debe seleccionar un certificado PKCS#12"; //$NON-NLS-1$
+    private static final String FILETYPE_INCORRECT_MSG = "Debe seleccionar un fichero PKCS#12/PXF";
     private static final String P12 = ".p12"; //$NON-NLS-1$
     private static final String PFX = ".pfx"; //$NON-NLS-1$
     private static final String ES_GOB_AFIRMA = "es.gob.afirma"; //$NON-NLS-1$
@@ -76,7 +74,6 @@ public class CertChooserActivity extends ListActivity {
     protected void onListItemClick(final ListView l, final View v, final int position, final long id) {
         super.onListItemClick(l, v, position, id);
         final Option o = this.adapter.getItem(position);
-
         if (o.getData().equalsIgnoreCase(PARENT_DIRECTORY_NAME) || o.getData().equalsIgnoreCase(DIRECTORY_NAME)) {
             this.currentDir = new File(o.getPath());
             fill(this.currentDir);
@@ -84,27 +81,22 @@ public class CertChooserActivity extends ListActivity {
         else {
             onFileClick(o);
         }
-
     }
 
     private void onFileClick(final Option o) {
         try {
             if (o.getPath().endsWith(CertChooserActivity.PFX) || o.getPath().endsWith(CertChooserActivity.P12)) {
-                final Android4KeyStoreManager a4ksm = new Android4KeyStoreManager(this);
                 final FileInputStream fis = new FileInputStream(o.getPath());
                 final byte[] data = new byte[(int) fis.getChannel().size()];
                 fis.read(data);
                 fis.close();
-                a4ksm.importCertificateFromPkcs12(data, null);
+                new Android4KeyStoreManager(this).importCertificateFromPkcs12(data, null);
             }
             else {
                 Toast.makeText(this, CertChooserActivity.FILETYPE_INCORRECT_MSG, Toast.LENGTH_LONG).show();
             }
         }
-        catch (final FileNotFoundException e) {
-            Log.e(CertChooserActivity.ES_GOB_AFIRMA, e.getMessage());
-        }
-        catch (final IOException e) {
+        catch (final Exception e) {
             Log.e(CertChooserActivity.ES_GOB_AFIRMA, e.getMessage());
         }
     }

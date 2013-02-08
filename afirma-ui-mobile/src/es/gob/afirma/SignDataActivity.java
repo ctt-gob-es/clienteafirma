@@ -26,14 +26,13 @@ import android.security.KeyChainAliasCallback;
 import android.security.KeyChainException;
 import android.util.Log;
 import android.widget.Toast;
+import es.gob.afirma.android.crypto.DesCipher;
+import es.gob.afirma.android.network.UriParser;
+import es.gob.afirma.android.network.UrlHttpManager;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
-import es.gob.afirma.jse.signfolder.UrlHttpManagerImpl;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
-import es.gob.afirma.signfolder.UrlHttpManager;
-import es.gob.afirma.utils.DesCipher;
-import es.gob.afirma.utils.UriParser;
 
 /**
  * Actividad dedicada a la firma de los datos recibidos en la entrada mediante un certificado
@@ -345,7 +344,7 @@ public class SignDataActivity extends Activity implements KeyChainAliasCallback 
 
     	Log.i(ES_GOB_AFIRMA, "Invocando sendData");
 
-    	final UrlHttpManager urlManager = new UrlHttpManagerImpl();
+    	final UrlHttpManager urlManager = new UrlHttpManager();
         try {
 
         	final StringBuilder url = new StringBuilder(getParameter(STORAGE_SERVLET_PARAM));
