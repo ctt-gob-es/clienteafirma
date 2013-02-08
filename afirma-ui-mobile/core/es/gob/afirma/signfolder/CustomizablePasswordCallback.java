@@ -15,7 +15,8 @@ public abstract class CustomizablePasswordCallback extends PasswordCallback {
         super(prompt, echoOn);
     }
 
-    /** @param prompt
-     * @return */
+    /** Solicita al usuario una conrtrase&ntilde;a.
+     * @param prompt Texto de solicitud
+     * @return Contrase&ntilde;a introducida por el usuario o <code>null</code> si cancel&oacute; la introducci&oacute;n */
     public abstract char[] getPassword(final String prompt);
 }
