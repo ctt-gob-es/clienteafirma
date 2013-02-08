@@ -381,7 +381,7 @@ public class SignDataActivity extends Activity implements KeyChainAliasCallback 
      */
     private void showMessage(final String message) {
     	final ErrorDialog dialog = new ErrorDialog(message);
-    	dialog.show(getFragmentManager(), "");
+    	dialog.show(getFragmentManager(), ""); //$NON-NLS-1$
     	this.toast.setText(message);
     	this.toast.show();
     }
