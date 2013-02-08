@@ -10,6 +10,7 @@
 
 package es.gob.afirma.core.signers;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -24,7 +25,7 @@ public final class AOSignerFactory {
 
 	private static AOSignerFactory signerFactory = null;
 
-	private static final Map<String, AOSigner> SIGNERS = new HashMap<String, AOSigner>(7);
+	private static final Map<String, AOSigner> SIGNERS = new HashMap<String, AOSigner>(20);
 
 	/* Listado de los manejador de firma soportados y los identificadores de formato de firma asociados. */
 	private static final String SIGNER_CLASS_CADES = "es.gob.afirma.signers.cades.AOCAdESSigner"; //$NON-NLS-1$
@@ -33,6 +34,7 @@ public final class AOSignerFactory {
 	private static final String SIGNER_CLASS_XADES = "es.gob.afirma.signers.xades.AOXAdESSigner"; //$NON-NLS-1$
 	private static final String SIGNER_CLASS_XMLDSIG = "es.gob.afirma.signers.xmldsig.AOXMLDSigSigner"; //$NON-NLS-1$
 	private static final String SIGNER_CLASS_PADES = "es.gob.afirma.signers.pades.AOPDFSigner"; //$NON-NLS-1$
+	private static final String SIGNER_CLASS_PADES_TRI = "es.gob.afirma.signers.padestri.client.AOPDFTriPhaseSigner"; //$NON-NLS-1$
 	private static final String SIGNER_CLASS_ODF = "es.gob.afirma.signers.odf.AOODFSigner"; //$NON-NLS-1$
 	private static final String SIGNER_CLASS_OOXML = "es.gob.afirma.signers.ooxml.AOOOXMLSigner"; //$NON-NLS-1$
 
@@ -50,6 +52,7 @@ public final class AOSignerFactory {
 		{AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED, SIGNER_CLASS_XMLDSIG},
 		{AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPING, SIGNER_CLASS_XMLDSIG},
 		{AOSignConstants.SIGN_FORMAT_PDF, SIGNER_CLASS_PADES},
+		{AOSignConstants.SIGN_FORMAT_PDF_TRI, SIGNER_CLASS_PADES_TRI},
 		{AOSignConstants.SIGN_FORMAT_PADES, SIGNER_CLASS_PADES},
 		{AOSignConstants.SIGN_FORMAT_ODF, SIGNER_CLASS_ODF},
 		{AOSignConstants.SIGN_FORMAT_ODF_ALT1, SIGNER_CLASS_ODF},
@@ -74,8 +77,9 @@ public final class AOSignerFactory {
     /** Recupera un manejador de firma capaz de tratar la firma indicada. En caso
      * de no tener ning&uacute;n manejador compatible se devolver&aacute; <code>null</code>.
      * @param signData Firma electr&oacute;nica
-     * @return Manejador de firma */
-    public static AOSigner getSigner(final byte[] signData) {
+     * @return Manejador de firma
+     * @throws IOException Si ocurren problemas relacionados con la lectura de la firma */
+    public static AOSigner getSigner(final byte[] signData) throws IOException {
         if (signData == null) {
             throw new IllegalArgumentException("No se han indicado datos de firma"); //$NON-NLS-1$
         }
@@ -85,7 +89,7 @@ public final class AOSignerFactory {
                     SIGNERS.put(format[0], (AOSigner) AOUtil.classForName(format[1]).newInstance());
                 }
                 catch(final Exception e) {
-                    LOGGER.severe("No se ha podido instanciar un manejador para el formato de firma '" + format[0] + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+                    LOGGER.warning("No se ha podido instanciar un manejador para el formato de firma '" + format[0] + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
                     continue;
                 }
             }
@@ -124,13 +128,17 @@ public final class AOSignerFactory {
         return SIGNERS.get(signFormat);
     }
 
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder("Factoria de manejadores de firma. Formatos soportados:"); //$NON-NLS-1$
+    /**
+     * Recupera el listado de formatos de firma soportados por el Cliente (no los actualmente cargados).
+     * @return Listado de formatos.
+     */
+    public static String[] getSupportedFormats() {
+    	int i = 0;
+    	final String[] formats = new String[SIGNERS_CLASSES.length];
         for (final String[] format : SIGNERS_CLASSES) {
-            sb.append(" ").append(format[0]); //$NON-NLS-1$
+            formats[i++] = format[0];
         }
-        return sb.toString();
+        return formats;
     }
 
 }

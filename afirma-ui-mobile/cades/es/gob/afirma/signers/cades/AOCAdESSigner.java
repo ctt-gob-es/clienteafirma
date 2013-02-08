@@ -10,6 +10,7 @@
 
 package es.gob.afirma.signers.cades;
 
+import java.io.IOException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.X509Certificate;
 import java.util.Properties;
@@ -138,7 +139,7 @@ public final class AOCAdESSigner implements AOSigner {
 
     	new BCChecker().checkBouncyCastle();
 
-        final Properties extraParams = (xParams != null) ? xParams : new Properties();
+        final Properties extraParams = xParams != null ? xParams : new Properties();
 
         final String precalculatedDigest = extraParams.getProperty("precalculatedHashAlgorithm"); //$NON-NLS-1$
         byte[] messageDigest = null;
@@ -163,7 +164,7 @@ public final class AOCAdESSigner implements AOSigner {
         final P7ContentSignerParameters csp = new P7ContentSignerParameters(
     		data,
     		algorithm,
-    		(Boolean.parseBoolean(extraParams.getProperty("includeOnlySignningCertificate"))) ? //$NON-NLS-1$
+    		Boolean.parseBoolean(extraParams.getProperty("includeOnlySignningCertificate")) ? //$NON-NLS-1$
     			new X509Certificate[] { (X509Certificate) keyEntry.getCertificateChain()[0] } :
 				(X509Certificate[]) keyEntry.getCertificateChain()
 		);
@@ -485,9 +486,10 @@ public final class AOCAdESSigner implements AOSigner {
      *        titulares de los certificados usados para cada firma.
      * @return &Aacute;rbol de nodos de firma o <code>null</code> en caso de
      *         error.
-     * @throws AOInvalidFormatException Cuando los datos introducidos no son una firma CAdES. */
+     * @throws AOInvalidFormatException Cuando los datos introducidos no son una firma CAdES.
+     * @throws IOException Si ocurren problemas relacionados con la lectura de la firma */
     @Override
-	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) throws AOInvalidFormatException {
+	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) throws AOInvalidFormatException, IOException {
     	new BCChecker().checkBouncyCastle();
     	if (!CAdESValidator.isCAdESValid(sign)) {
     		throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
@@ -503,9 +505,10 @@ public final class AOCAdESSigner implements AOSigner {
 
     /** Indica si un dato es una firma compatible con los m&eacute;todos de firma, cofirma y contrafirma de esta clase.
      * @param data Datos que deseamos comprobar.
-     * @return <code>true</code> si el dato es una firma reconocida por esta clase (&uacute;nicamente CAdES), <code>false</code> en caso contrario. */
+     * @return <code>true</code> si el dato es una firma reconocida por esta clase (&uacute;nicamente CAdES), <code>false</code> en caso contrario.
+     * @throws IOException Si ocurren problemas relacionados con la lectura de los datos */
     @Override
-	public boolean isSign(final byte[] data) {
+	public boolean isSign(final byte[] data) throws IOException {
         if (data == null) {
             LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
             return false;
@@ -536,9 +539,10 @@ public final class AOCAdESSigner implements AOSigner {
      * @throws AOInvalidFormatException
      *         Si no se ha introducido un fichero de firma v&aacute;lido o no
      *         ha podido leerse la firma.
+     * @throws IOException Si ocurren problemas relacionados con la lectura de la firma.
      * @throws IllegalArgumentException Si la firma introducida es nula. */
     @Override
-	public byte[] getData(final byte[] signData) throws AOInvalidFormatException {
+	public byte[] getData(final byte[] signData) throws AOInvalidFormatException, IOException {
         if (signData == null) {
             throw new IllegalArgumentException("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
         }
@@ -571,9 +575,10 @@ public final class AOCAdESSigner implements AOSigner {
      *         Cuando la firma introducida no es un objeto de firma
      *         reconocido por este manejador.
      * @throws AOInvalidFormatException Si los datos proporcionados no se corresponden con una firma CAdES
+     * @throws IOException Cuando se produce alg&uacute;n error en la lectura de la datos.
      * @throws IllegalArgumentException Si La firma introducida es nula. */
     @Override
-	public AOSignInfo getSignInfo(final byte[] signData) throws AOInvalidFormatException {
+	public AOSignInfo getSignInfo(final byte[] signData) throws AOInvalidFormatException, IOException {
         if (signData == null) {
             throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$
         }

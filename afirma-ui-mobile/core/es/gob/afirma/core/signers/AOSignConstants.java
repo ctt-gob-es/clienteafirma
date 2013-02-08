@@ -72,6 +72,9 @@ public final class AOSignConstants {
     /** Identificador de la firma Adobe PDF. */
     public static final String SIGN_FORMAT_PDF = "Adobe PDF"; //$NON-NLS-1$
 
+    /** Identificador de la firma Adobe PDF trif&aacute;sica. */
+    public static final String SIGN_FORMAT_PDF_TRI = "Adobe PDF TriPhase"; //$NON-NLS-1$
+
     /** Identificador de la firma PAdES. */
     public static final String SIGN_FORMAT_PADES = "PAdES"; //$NON-NLS-1$
 
