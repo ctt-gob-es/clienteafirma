@@ -63,15 +63,13 @@ final class ErrorManager {
 		return
 			ERROR_TEMPLATE.replace(ERROR_NUMBER, number).replace(
 				ERROR_MESSAGE,
-				(msg != null) ? msg : ((ERRORS.get(number) != null) ? ERRORS.get(number) : GENERIC_ERROR)
+				msg != null ? msg : ERRORS.get(number) != null ? ERRORS.get(number) : GENERIC_ERROR
 			);
 	}
 
-	/**
-	 * Recupera el mensaje asociado a un codigo de error.
+	/** Recupera el mensaje asociado a un c&oacute;digo de error.
 	 * @param code C&oacute;digo de error.
-	 * @return Mensaje.
-	 */
+	 * @return Mensaje. */
 	static String getErrorMessage(final String code) {
 		return ERRORS.get(code);
 	}
