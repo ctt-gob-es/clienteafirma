@@ -42,6 +42,8 @@ public class SignDataActivity extends Activity implements KeyChainAliasCallback 
 
 	private static final String ES_GOB_AFIRMA = "es.gob.afirma"; //$NON-NLS-1$
 
+	private static final String DEFAULT_URL_ENCODING = "UTF-8"; //$NON-NLS-1$
+
 	/** Juego de carateres UTF-8. */
 	private static final String UTF8 = "utf-8"; //$NON-NLS-1$
 
@@ -201,8 +203,9 @@ public class SignDataActivity extends Activity implements KeyChainAliasCallback 
 
     	// Comprobamos que los datos se pueden tratar como base 64
     	try {
-    		Base64.decode(URLDecoder.decode(params.get(DATA_PARAM)));
-    	} catch (final Exception e) {
+    		Base64.decode(URLDecoder.decode(params.get(DATA_PARAM), DEFAULT_URL_ENCODING));
+    	}
+    	catch (final Exception e) {
     		Log.e(ES_GOB_AFIRMA, "Los datos introducidos no se pueden tratar como base 64: " + e); //$NON-NLS-1$
     		showMessage(getString(R.string.error_bad_params));
             return false;
@@ -228,7 +231,7 @@ public class SignDataActivity extends Activity implements KeyChainAliasCallback 
     @Override
     public void alias(final String alias) {
 
-    	Log.i(ES_GOB_AFIRMA, "Se ha seleccionado el certificado: " + alias);
+    	Log.i(ES_GOB_AFIRMA, "Se ha seleccionado el certificado: " + alias); //$NON-NLS-1$
 
     	// Si no se selecciono ningun certificado, se envia el error
     	if (alias == null) {
@@ -284,10 +287,12 @@ public class SignDataActivity extends Activity implements KeyChainAliasCallback 
         // Generacion de la firma
         final byte[] sign;
         try {
-            sign = signer.sign( Base64.decode(URLDecoder.decode(getParameter(DATA_PARAM))),
-            					getParameter(ALGORITHM_PARAM, DEFAULT_SIGNATURE_ALGORITHM),
-                                pke,
-                                SignDataActivity.parseB64Properties(getParameter(PROPERTIES_PARAM)));
+            sign = signer.sign(
+        		Base64.decode(URLDecoder.decode(getParameter(DATA_PARAM), DEFAULT_URL_ENCODING)),
+            	getParameter(ALGORITHM_PARAM, DEFAULT_SIGNATURE_ALGORITHM),
+                pke,
+                SignDataActivity.parseB64Properties(getParameter(PROPERTIES_PARAM))
+            );
         }
         catch (final Exception e) {
             Log.e(ES_GOB_AFIRMA, e.getMessage());
@@ -342,7 +347,7 @@ public class SignDataActivity extends Activity implements KeyChainAliasCallback 
      */
     private void sendData(final String data) {
 
-    	Log.i(ES_GOB_AFIRMA, "Invocando sendData");
+    	Log.i(ES_GOB_AFIRMA, "Invocando sendData"); //$NON-NLS-1$
 
     	final UrlHttpManager urlManager = new UrlHttpManager();
         try {
@@ -356,7 +361,7 @@ public class SignDataActivity extends Activity implements KeyChainAliasCallback 
         	// Llamamos al servicio para guardar los datos
             final byte[] result = urlManager.readUrl(url.toString());
 
-            Log.i(ES_GOB_AFIRMA, "Resultado del deposito de la firma: " + new String(result));
+            Log.i(ES_GOB_AFIRMA, "Resultado del deposito de la firma: " + new String(result)); //$NON-NLS-1$
 
 
             if (!new String(result).trim().equals("OK")) { //$NON-NLS-1$
@@ -378,7 +383,16 @@ public class SignDataActivity extends Activity implements KeyChainAliasCallback 
      * @param errorId Identificador del error.
      */
     private void launchError(final String errorId) {
-		sendData(URLEncoder.encode(ErrorManager.genError(errorId, null)));
+		try {
+			sendData(URLEncoder.encode(ErrorManager.genError(errorId, null), DEFAULT_URL_ENCODING));
+		}
+		catch (final UnsupportedEncodingException e) {
+			// No puede darse el soporte de UTF-8 es obligatorio
+			Log.e(
+				ES_GOB_AFIRMA,
+				"No se ha posido enviar la respuesta al servidor por error en la codificacion " + DEFAULT_URL_ENCODING + ": " + e //$NON-NLS-1$ //$NON-NLS-2$
+			);
+		}
     }
 
     /**
