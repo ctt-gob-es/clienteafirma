@@ -10,6 +10,7 @@
 
 package es.gob.afirma.core.signers;
 
+import java.io.IOException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.Properties;
 
@@ -26,7 +27,8 @@ public interface AOSimpleSigner {
      * @param keyEntry Entrada que apunta a la clave privada a usar para firmar
      * @param extraParams Par&aacute;metros adicionales para la firma (dependientes de cada implementaci&oacute;n)
      * @return Contenido firmado
-     * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-    byte[] sign(byte[] data, String algorithm, PrivateKeyEntry keyEntry, Properties extraParams) throws AOException;
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso
+     * @throws IOException Cuando ocurren problemas relacionados con la lectura de los datos */
+    byte[] sign(byte[] data, String algorithm, PrivateKeyEntry keyEntry, Properties extraParams) throws AOException, IOException;
 
 }
