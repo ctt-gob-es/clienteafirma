@@ -178,7 +178,7 @@ public class SignDataActivity extends Activity implements KeyChainAliasCallback 
 
 		// Comprobamos que el protocolo este soportado
 		final String servletAdd = params.get(STORAGE_SERVLET_PARAM);
-		if (servletAdd == null || (!servletAdd.startsWith("http:") && !servletAdd.startsWith("https:"))) {  //$NON-NLS-1$//$NON-NLS-2$
+		if (servletAdd == null || !servletAdd.startsWith("http:") && !servletAdd.startsWith("https:")) {  //$NON-NLS-1$//$NON-NLS-2$
 			Log.e(ES_GOB_AFIRMA, "URL proporcionada no utiliza un protocolo soportado: " + servletAdd); //$NON-NLS-1$
 			showToast(getString(R.string.error_bad_params));
 			return false;
@@ -287,12 +287,14 @@ public class SignDataActivity extends Activity implements KeyChainAliasCallback 
         final String data;
         try {
         	data = generateCipherDataString(sign, getParameter(KEY_PARAM));
-        } catch (final IOException e) {
+        }
+        catch (final IOException e) {
         	Log.e(ES_GOB_AFIRMA, e.getMessage());
         	launchError(ErrorManager.ERROR_CODING_BASE64);
         	finish();
         	return;
-        } catch (final GeneralSecurityException e) {
+        }
+        catch (final GeneralSecurityException e) {
         	Log.e(ES_GOB_AFIRMA, e.getMessage());
         	launchError(ErrorManager.ERROR_CIPHERING);
         	finish();
@@ -317,7 +319,7 @@ public class SignDataActivity extends Activity implements KeyChainAliasCallback 
      * @throws IOException
      */
     private static String generateCipherDataString(final byte[] data, final String cipherKey) throws InvalidKeyException, GeneralSecurityException, IOException {
-    	return Integer.toString(DesCipher.getPaddingLength() - (data.length % DesCipher.getPaddingLength())) +
+    	return Integer.toString(DesCipher.getPaddingLength() - data.length % DesCipher.getPaddingLength()) +
     			PADDING_CHAR_SEPARATOR + Base64.encodeBytes(DesCipher.cipher(data, cipherKey), Base64.URL_SAFE);
     }
 
@@ -344,7 +346,7 @@ public class SignDataActivity extends Activity implements KeyChainAliasCallback 
             Log.i(ES_GOB_AFIRMA, "Resultado del deposito de la firma: " + new String(result));
 
 
-            if (!(new String(result)).trim().equals("OK")) { //$NON-NLS-1$
+            if (!new String(result).trim().equals("OK")) { //$NON-NLS-1$
             	Log.e(ES_GOB_AFIRMA, "No se pudo entregar la firma al servlet: " + new String(result)); //$NON-NLS-1$
             	showToast(getString(R.string.error_server_error));
             	finish();
