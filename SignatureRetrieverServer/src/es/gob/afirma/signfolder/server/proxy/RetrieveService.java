@@ -42,7 +42,7 @@ public final class RetrieveService extends HttpServlet {
 	@Override
 	protected void service(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
 
-		LOGGER.info("Peticion realizada desde: " + request.getLocalAddr()); //$NON-NLS-1$
+		LOGGER.info("Peticion recogida"); //$NON-NLS-1$
 
 		final String operation = request.getParameter(PARAMETER_NAME_OPERATION);
 		final String syntaxVersion = request.getParameter(PARAMETER_NAME_SYNTAX_VERSION);
@@ -95,13 +95,26 @@ public final class RetrieveService extends HttpServlet {
 			out.println(ErrorManager.genError(ErrorManager.ERROR_MISSING_DATA_ID, null));
 			return;
 		}
+
+		LOGGER.info("Se solicita el fichero con el identificador: " + id); //$NON-NLS-1$
+
 		//final File inFile = new File(config.getTempDir(), request.getRemoteAddr().replace(":", "_") + "-" + id); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		final File inFile = new File(config.getTempDir(), id);
 
 		// No hacemos distincion si el archivo no existe, no es un fichero, no puede leerse o ha caducado
 		// para evitar que un atacante conozca su situacion. Lo borramos despuest de usarlo
 		if (!inFile.exists() || !inFile.isFile() || !inFile.canRead() || isExpired(inFile, config.getExpirationTime())) {
-			LOGGER.warning(ErrorManager.genError(ErrorManager.ERROR_INVALID_DATA_ID, null));
+
+			if (!inFile.exists()) {
+				LOGGER.warning("El fichero con el identificador '" + id + "' no existe"); //$NON-NLS-1$ //$NON-NLS-2$
+			} else if (!inFile.isFile()) {
+				LOGGER.warning("El archivo con el identificador '" + id + "' no es un fichero"); //$NON-NLS-1$ //$NON-NLS-2$
+			} else if (!inFile.canRead()) {
+				LOGGER.warning("El fichero con el identificador '" + id + "' no tiene permisos de lectura"); //$NON-NLS-1$ //$NON-NLS-2$
+			} else {
+				LOGGER.warning("El fichero con el identificador '" + id + "' esta caducado"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+
 			out.println(ErrorManager.genError(ErrorManager.ERROR_INVALID_DATA_ID, null));
 			if (inFile.exists() && inFile.isFile()) {
 				inFile.delete();
