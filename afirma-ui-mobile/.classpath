@@ -7,6 +7,9 @@
 	<classpathentry kind="src" path="core"/>
 	<classpathentry kind="src" path="pkcs7"/>
 	<classpathentry kind="src" path="core-resources"/>
+	<classpathentry kind="src" path="pades"/>
+	<classpathentry kind="src" path="pkcs7-tsp"/>
+	<classpathentry kind="src" path="itext-droid"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry kind="output" path="bin/classes"/>
