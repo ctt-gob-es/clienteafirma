@@ -93,6 +93,8 @@ public final class StorageService extends HttpServlet {
 			return;
 		}
 
+		LOGGER.info("Se solicita guardar un fichero con el identificador: " + id); //$NON-NLS-1$
+
 		// Si no se indican los datos, se transmite el error en texto plano a traves del fichero generado
 		String dataText = request.getParameter(PARAMETER_NAME_DATA);
 		if (dataText == null) {
@@ -114,6 +116,8 @@ public final class StorageService extends HttpServlet {
 			out.println(ErrorManager.genError(ErrorManager.ERROR_COMMUNICATING_WITH_WEB, null));
 			return;
 		}
+
+		LOGGER.info("Se guardo correctamente el fichero: " + id); //$NON-NLS-1$
 
 		out.print(SUCCESS);
 	}
