@@ -123,13 +123,10 @@ public class SignDataActivity extends Activity implements KeyChainAliasCallback 
         }
     }
 
-    /**
-     * Comprueba que est&eacute;n disponibles todos los parametros disponibles en la entrada de datos.
+    /** Comprueba que est&eacute;n disponibles todos los parametros disponibles en la entrada de datos.
      * @param params Par&aacute;metros de entrada.
      * @return {@code true} si existen todos los par&oacute;metros necesarios, {@code false} en caso
-     * contrario.
-     */
-    @SuppressWarnings("unused")
+     *         contrario. */
 	private boolean checkParameters(final Map<String, String> params) {
 
 		// Comprobamos que se ha especificado el identificador para al firma
@@ -177,22 +174,22 @@ public class SignDataActivity extends Activity implements KeyChainAliasCallback 
             return false;
     	}
 
-		// Comprobamos que el protocolo este soportado
-		final String servletAdd = params.get(STORAGE_SERVLET_PARAM);
-		if (servletAdd == null || !servletAdd.startsWith("http:") && !servletAdd.startsWith("https:")) {  //$NON-NLS-1$//$NON-NLS-2$
-			Log.e(ES_GOB_AFIRMA, "URL proporcionada no utiliza un protocolo soportado: " + servletAdd); //$NON-NLS-1$
-			showMessage(getString(R.string.error_bad_params));
-			return false;
-		}
-
 		// Comprobamos que la URL sea valida
+		final URL servletUrl;
     	try {
-			new URL(servletAdd);
-		} catch (final MalformedURLException e) {
+    		servletUrl = new URL(params.get(STORAGE_SERVLET_PARAM));
+		}
+    	catch (final MalformedURLException e) {
 			Log.e(ES_GOB_AFIRMA, "La URL proporcionada del servlet no es valida: " + e); //$NON-NLS-1$
 			showMessage(getString(R.string.error_bad_params));
 			return false;
 		}
+    	// Comprobamos que el protocolo este soportado
+    	if (servletUrl.getProtocol() != "http" &&  servletUrl.getProtocol() != "https") { //$NON-NLS-1$ //$NON-NLS-2$
+			Log.e(ES_GOB_AFIRMA, "EL protocolo de la URL proporcionada para el servlet no esta soportado"); //$NON-NLS-1$
+			showMessage(getString(R.string.error_bad_params));
+			return false;
+    	}
 
 		// Comprobamos que se nos hayan indicado los datos
     	if (!params.containsKey(DATA_PARAM)) {
@@ -211,14 +208,14 @@ public class SignDataActivity extends Activity implements KeyChainAliasCallback 
             return false;
     	}
 
-    	// Comprobamos que se ha especificado el servlet
+    	// Comprobamos que se ha especificado el formato
     	if (!params.containsKey(FORMAT_PARAM)) {
     		Log.e(ES_GOB_AFIRMA, "No se ha recibido el parametro con el formato de firma: " + FORMAT_PARAM); //$NON-NLS-1$
     		showMessage(getString(R.string.error_bad_params));
             return false;
     	}
 
-    	// Comprobamos que se ha especificado el servlet
+    	// Comprobamos que se ha especificado el algoritmo
     	if (!params.containsKey(ALGORITHM_PARAM)) {
     		Log.e(ES_GOB_AFIRMA, "No se ha recibido el parametro con el algoritmo de firma: " + ALGORITHM_PARAM); //$NON-NLS-1$
     		showMessage(getString(R.string.error_bad_params));
