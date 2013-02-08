@@ -134,7 +134,7 @@ public class SignDataActivity extends Activity implements KeyChainAliasCallback 
 		// Comprobamos que se ha especificado el identificador para al firma
     	if (!params.containsKey(ID_PARAM)) {
     		Log.e(ES_GOB_AFIRMA, "No se ha recibido el parametro con el identificador del documento: " + ID_PARAM); //$NON-NLS-1$
-    		showToast(getString(R.string.error_no_params));
+    		showMessage(getString(R.string.error_bad_params));
             return false;
     	}
 
@@ -142,7 +142,7 @@ public class SignDataActivity extends Activity implements KeyChainAliasCallback 
 		final String signatureSessionId = params.get(ID_PARAM);
 		if (signatureSessionId.length() > MAX_ID_LENGTH) {
 			Log.e(ES_GOB_AFIRMA, "La longitud del identificador para la firma es mayor de " + MAX_ID_LENGTH + " caracteres."); //$NON-NLS-1$ //$NON-NLS-2$
-    		showToast(getString(R.string.error_bad_params));
+    		showMessage(getString(R.string.error_bad_params));
             return false;
 		}
 
@@ -150,7 +150,7 @@ public class SignDataActivity extends Activity implements KeyChainAliasCallback 
 		for (final char c : signatureSessionId.toLowerCase(Locale.ENGLISH).toCharArray()) {
 			if ((c < 'a' || c > 'z') && (c < '0' || c > '9')) {
 				Log.e(ES_GOB_AFIRMA, "El identificador de la firma debe ser alfanumerico."); //$NON-NLS-1$
-	    		showToast(getString(R.string.error_bad_params));
+	    		showMessage(getString(R.string.error_bad_params));
 	            return false;
 			}
 		}
@@ -158,21 +158,21 @@ public class SignDataActivity extends Activity implements KeyChainAliasCallback 
 		// Comprobamos que se ha especificado la clave de cifrado
     	if (!params.containsKey(KEY_PARAM)) {
     		Log.e(ES_GOB_AFIRMA, "No se ha recibido el parametro con la clave para el cifrado de la firma: " + KEY_PARAM); //$NON-NLS-1$
-    		showToast(getString(R.string.error_no_params));
+    		showMessage(getString(R.string.error_bad_params));
             return false;
     	}
 
 		// Comprobamos que la clave de cifrado tenga la longitud correcta
 		if (params.get(KEY_PARAM) == null || params.get(KEY_PARAM).length() != CIPHER_KEY_LENGTH) {
 			Log.e(ES_GOB_AFIRMA, "La longitud de la clave de cifrado no es correcta."); //$NON-NLS-1$
-    		showToast(getString(R.string.error_bad_params));
+    		showMessage(getString(R.string.error_bad_params));
             return false;
 		}
 
 		// Comprobamos que se ha especificado el servlet
     	if (!params.containsKey(STORAGE_SERVLET_PARAM)) {
     		Log.e(ES_GOB_AFIRMA, "No se ha recibido el parametro con la direccion del servlet para el envio de la firma: " + STORAGE_SERVLET_PARAM); //$NON-NLS-1$
-    		showToast(getString(R.string.error_no_params));
+    		showMessage(getString(R.string.error_bad_params));
             return false;
     	}
 
@@ -180,7 +180,7 @@ public class SignDataActivity extends Activity implements KeyChainAliasCallback 
 		final String servletAdd = params.get(STORAGE_SERVLET_PARAM);
 		if (servletAdd == null || !servletAdd.startsWith("http:") && !servletAdd.startsWith("https:")) {  //$NON-NLS-1$//$NON-NLS-2$
 			Log.e(ES_GOB_AFIRMA, "URL proporcionada no utiliza un protocolo soportado: " + servletAdd); //$NON-NLS-1$
-			showToast(getString(R.string.error_bad_params));
+			showMessage(getString(R.string.error_bad_params));
 			return false;
 		}
 
@@ -189,14 +189,14 @@ public class SignDataActivity extends Activity implements KeyChainAliasCallback 
 			new URL(servletAdd);
 		} catch (final MalformedURLException e) {
 			Log.e(ES_GOB_AFIRMA, "La URL proporcionada del servlet no es valida: " + e); //$NON-NLS-1$
-			showToast(getString(R.string.error_bad_params));
+			showMessage(getString(R.string.error_bad_params));
 			return false;
 		}
 
 		// Comprobamos que se nos hayan indicado los datos
     	if (!params.containsKey(DATA_PARAM)) {
     		Log.e(ES_GOB_AFIRMA, "No se ha recibido el parametro con los datos para firmar: " + DATA_PARAM); //$NON-NLS-1$
-    		launchError(ErrorManager.ERROR_MISSING_DATA);
+    		showMessage(getString(R.string.error_bad_params));
             return false;
     	}
 
@@ -205,7 +205,21 @@ public class SignDataActivity extends Activity implements KeyChainAliasCallback 
     		Base64.decode(URLDecoder.decode(params.get(DATA_PARAM)));
     	} catch (final Exception e) {
     		Log.e(ES_GOB_AFIRMA, "Los datos introducidos no se pueden tratar como base 64: " + e); //$NON-NLS-1$
-    		launchError(ErrorManager.ERROR_INVALID_DATA);
+    		showMessage(getString(R.string.error_bad_params));
+            return false;
+    	}
+
+    	// Comprobamos que se ha especificado el servlet
+    	if (!params.containsKey(FORMAT_PARAM)) {
+    		Log.e(ES_GOB_AFIRMA, "No se ha recibido el parametro con el formato de firma: " + FORMAT_PARAM); //$NON-NLS-1$
+    		showMessage(getString(R.string.error_bad_params));
+            return false;
+    	}
+
+    	// Comprobamos que se ha especificado el servlet
+    	if (!params.containsKey(ALGORITHM_PARAM)) {
+    		Log.e(ES_GOB_AFIRMA, "No se ha recibido el parametro con el algoritmo de firma: " + ALGORITHM_PARAM); //$NON-NLS-1$
+    		showMessage(getString(R.string.error_bad_params));
             return false;
     	}
 

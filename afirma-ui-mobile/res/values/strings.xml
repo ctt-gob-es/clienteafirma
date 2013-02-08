@@ -9,8 +9,7 @@
     <string name="content_desc">Logotipo Afirma móvil</string>
     <string name="ok">Aceptar</string>
     <string name="title_activity_sign_data">Firma de datos</string>
-    <string name="error_no_params">Error: La aplicaci\u00F3n web no ha indicado los par\u00E1metros necesarios para la firma</string>
-    <string name="error_bad_params">Error: La aplicaci\u00F3n web no ha indicado par\u00E1metros v\u00E1lidos para la firma</string>
+    <string name="error_bad_params">No se ha realizado correctamente la invocaci\u00F3n de la aplicaci\u00F3n. Consulte a su proveedor de servicios.</string>
     <string name="error_pke">No se obtuvo ning\u00FAn certificado de firma</string>
     <string name="error_not_supported_format">Error: Formato de firma no soportado</string>
     <string name="error_signing">Error durante el proceso de firma</string>
