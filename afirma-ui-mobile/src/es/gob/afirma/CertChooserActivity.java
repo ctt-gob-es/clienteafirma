@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 
 import android.app.ListActivity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -20,6 +21,7 @@ import es.gob.afirma.android.gui.Option;
 
 /** @author Alberto Mart&iacute;nez */
 public class CertChooserActivity extends ListActivity {
+
     private static final String FILETYPE_INCORRECT_MSG = Messages.getString("CertChooserActivity.0"); //$NON-NLS-1$
     private static final String P12 = ".p12"; //$NON-NLS-1$
     private static final String PFX = ".pfx"; //$NON-NLS-1$
@@ -27,6 +29,14 @@ public class CertChooserActivity extends ListActivity {
 
     private FileArrayAdapter adapter;
     private File currentDir;
+
+    @Override
+    public void onBackPressed() {
+        final Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setClass(this, MainActivity.class);
+        startActivity(intent);
+        finish();
+    }
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
