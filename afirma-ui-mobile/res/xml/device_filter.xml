@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <!-- CCID 1.0 - Class:00, SubClass:00, Protocol:00 -->
+    <usb-device class="000" subclass="000" protocol="000" />
+    <!-- CCID 1.1 - Class:0B, SubClass:00, Protocol:00 -->
+    <usb-device class="011" subclass="000" protocol="000" />
+</resources>
