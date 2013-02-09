@@ -45,18 +45,22 @@ public class CertChooserActivity extends ListActivity {
 
     private void fill(final File f) {
         final File[] dirs = f.listFiles();
-        this.setTitle("Directorio actual:" + " " + f.getName()); //$NON-NLS-2$
+        this.setTitle(getString(R.string.cert_chooser_directorio_actual) + " " + f.getName()); //$NON-NLS-1$
         final List<Option> dir = new ArrayList<Option>();
         final List<Option> fls = new ArrayList<Option>();
 
         try {
             for (final File ff : dirs) {
+            	// No mostramos ficheros ni directorios ocultos
+            	if (ff.getName().startsWith(".")) { //$NON-NLS-1$
+            		continue;
+            	}
                 if (ff.isDirectory()) {
-                    dir.add(new Option(ff.getName(), "Directorio", ff.getAbsolutePath()));
+                    dir.add(new Option(ff.getName(), getString(R.string.cert_chooser_directorio), ff.getAbsolutePath()));
                 }
                 else {
                 	if (ff.getName().toLowerCase().endsWith(PFX) || ff.getName().toLowerCase().endsWith(P12)) {
-                		fls.add(new Option(ff.getName(), "Tamaño del fichero:" + " " + ff.length(), ff.getAbsolutePath())); //$NON-NLS-2$
+                		fls.add(new Option(ff.getName(), getString(R.string.cert_chooser_tamano_del_fichero) + " " + ff.length(), ff.getAbsolutePath())); //$NON-NLS-1$
                 	}
                 }
             }
@@ -69,7 +73,7 @@ public class CertChooserActivity extends ListActivity {
         Collections.sort(fls);
         dir.addAll(fls);
         if (!f.getName().equalsIgnoreCase("sdcard")) { //$NON-NLS-1$
-            dir.add(0, new Option("..", "Directorio padre", f.getParent())); //$NON-NLS-1$
+            dir.add(0, new Option("..", getString(R.string.cert_chooser_directorio_padre), f.getParent())); //$NON-NLS-1$
         }
 
         this.adapter = new FileArrayAdapter(CertChooserActivity.this, R.layout.activity_cert_chooser, dir);
@@ -80,7 +84,7 @@ public class CertChooserActivity extends ListActivity {
     protected void onListItemClick(final ListView l, final View v, final int position, final long id) {
         super.onListItemClick(l, v, position, id);
         final Option o = this.adapter.getItem(position);
-        if (o.getData().equalsIgnoreCase("Directorio padre") || o.getData().equalsIgnoreCase("Directorio")) {
+        if (o.getData().equalsIgnoreCase(getString(R.string.cert_chooser_directorio_padre)) || o.getData().equalsIgnoreCase(getString(R.string.cert_chooser_directorio))) {
             this.currentDir = new File(o.getPath());
             fill(this.currentDir);
         }
@@ -100,7 +104,7 @@ public class CertChooserActivity extends ListActivity {
                 finish();
             }
             else {
-                Toast.makeText(this, "Debe seleccionar un fichero PKCS#12 o PXF", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getString(R.string.cert_chooser_seleccionar_p12_pxf), Toast.LENGTH_LONG).show();
             }
         }
         catch (final Exception e) {
