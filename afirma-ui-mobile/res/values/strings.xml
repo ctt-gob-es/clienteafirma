@@ -17,5 +17,10 @@
     <string name="error_server_connect">Ocurri\u00F3 un error en la conexi\u00F3n entre la app y la pagina web.</string>
     <string name="error_server_error">No se ha podido devolver el resultado de firma a la p\u00E1gina web</string>
     <string name="title_activity_load_file">LoadFile</string>
+    <string name="cert_chooser_directorio_actual">Directorio actual:</string>
+    <string name="cert_chooser_directorio">Directorio</string>
+    <string name="cert_chooser_directorio_padre">Directorio padre</string>
+    <string name="cert_chooser_tamano_del_fichero">Tamaño del fichero:</string>
+    <string name="cert_chooser_seleccionar_p12_pxf">Debe seleccionar un fichero PKCS#12 o PXF</string>
 
 </resources>
