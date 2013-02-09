@@ -5,8 +5,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
-/** @author Alberto Mart&iacute;nez */
-public class MainActivity extends Activity {
+/** Actividad que se muestra cuando se arranca la aplicaci&oaute;n pulsando su icono.
+ * @author Alberto Mart&iacute;nez */
+public final class MainActivity extends Activity {
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
