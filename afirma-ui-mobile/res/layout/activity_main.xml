@@ -10,12 +10,14 @@
 
         <ImageView
             android:id="@+id/imageView1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
             android:layout_gravity="center"
             android:layout_margin="5dp"
+            android:adjustViewBounds="true"
             android:contentDescription="@string/content_desc"
-            android:src="@drawable/ic_launcher" />
+            android:scaleType="fitXY"
+            android:src="@drawable/logo_cliente_completo" />
 
     </LinearLayout>
 
@@ -27,6 +29,28 @@
         android:layout_weight="0.91"
         android:padding="10dp"
         android:text="@string/presentation_text" />
+
+    <CheckBox
+        android:id="@+id/checkBox1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp"
+        android:enabled="false"
+        android:text="Buscar un DNIe si hay lectores de tarjetas en el sistema"
+        android:textSize="10dp" />
+
+    <CheckBox
+        android:id="@+id/checkBox2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:enabled="false"
+        android:text="Usar SSCD hardware si se encuentran en el sistema"
+        android:textSize="10dp" />
 
     <LinearLayout
         android:layout_width="fill_parent"

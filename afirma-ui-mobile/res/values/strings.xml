@@ -3,9 +3,9 @@
     <string name="app_name">Afirma m\u00F3vil</string>
     <string name="title_activity_main">Afirma m\u00F3vil</string>
     <string name="title_activity_cert_chooser">Importar certificado</string>
-    <string name="presentation_text">Bienvenido a "@firma m\u00F3vil" la aplicaci\u00F3n cliente de firma electr\u00F3nica en dispositivos m\u00F3viles. Esta aplicaci\u00F3n, permite utilizar los certificados de su dispositivos para firmar los tramites online en los que se haga uso del Cliente @firma.\nImporte sus certificados de usuario al dispositivo y accesa a trav\u00E9s de su navegador al trámite online que desee gestionar.</string>
+    <string name="presentation_text">Bienvenido a "Cliente @firma Android" 0.1 Beta.\nEsta aplicación permite realizar firmas electrónicas en las páginas de los proveedores de servicios que lo soporten.\nPara funcionar correctamente debe tener un certificado electrónico y su clave privada instalados en su dispositivo, consulte la documentación de su sistema Android y con su proveedor de servicios de certificación.</string>
     <string name="import_cert">Importar certificado</string>
-    <string name="disclaimer">© 2012 Ministerio de Hacienda y Administraciones Públicas</string>
+    <string name="disclaimer">© 2013 Gobierno de España</string>
     <string name="content_desc">Logotipo Afirma móvil</string>
     <string name="ok">Aceptar</string>
     <string name="title_activity_sign_data">Firma de datos</string>
