@@ -13,14 +13,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:layout_margin="5dp"
             android:contentDescription="@string/content_desc"
             android:src="@drawable/ic_launcher" />
+
     </LinearLayout>
 
     <TextView
         android:id="@+id/textView1"
         android:layout_width="fill_parent"
         android:layout_height="0dp"
+        android:layout_margin="5dp"
         android:layout_weight="0.91"
         android:padding="10dp"
         android:text="@string/presentation_text" />
@@ -36,7 +39,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_margin="0dp"
+            android:layout_margin="5dp"
             android:onClick="onClick"
             android:text="@string/import_cert" />
     </LinearLayout>
@@ -46,6 +49,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:layout_margin="5dp"
         android:gravity="center"
         android:text="@string/disclaimer" />
 
