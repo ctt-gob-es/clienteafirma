@@ -34,10 +34,8 @@ import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
 
-/**
- * Actividad dedicada a la firma de los datos recibidos en la entrada mediante un certificado
- * del almac&eacute;n central seleccionado por el usuario.
- */
+/** Actividad dedicada a la firma de los datos recibidos en la entrada mediante un certificado
+ * del almac&eacute;n central seleccionado por el usuario. */
 public final class SignDataActivity extends Activity implements KeyChainAliasCallback {
 
 	private static final String ES_GOB_AFIRMA = "es.gob.afirma"; //$NON-NLS-1$

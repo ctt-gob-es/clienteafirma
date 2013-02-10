@@ -12,7 +12,7 @@ import es.gob.afirma.R;
 
 /** Asocia una lista de objetos de la clase <code>Option</code> a un layout donde mostrarlos de forma iterativa
  * @author Alberto Mart&iacute;nez */
-public class FileArrayAdapter extends ArrayAdapter<Option> {
+public final class FileArrayAdapter extends ArrayAdapter<Option> {
     private final Context c;
     private final int id;
     private final List<Option> items;

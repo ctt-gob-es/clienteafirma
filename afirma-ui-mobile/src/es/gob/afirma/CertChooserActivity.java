@@ -2,6 +2,7 @@ package es.gob.afirma;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -10,7 +11,6 @@ import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -18,12 +18,12 @@ import es.gob.afirma.android.crypto.Android4KeyStoreManager;
 import es.gob.afirma.android.gui.FileArrayAdapter;
 import es.gob.afirma.android.gui.Option;
 
-/** @author Alberto Mart&iacute;nez */
-public class CertChooserActivity extends ListActivity {
+/** Actividad Android para la elecci&oacue;n de un fichero PFX/P12 en el almacenamiento del dispositivo.
+ * @author Alberto Mart&iacute;nez */
+public final class CertChooserActivity extends ListActivity {
 
     private static final String P12 = ".p12"; //$NON-NLS-1$
     private static final String PFX = ".pfx"; //$NON-NLS-1$
-    private static final String ES_GOB_AFIRMA = "es.gob.afirma"; //$NON-NLS-1$
 
     private FileArrayAdapter adapter;
     private File currentDir;
@@ -44,29 +44,24 @@ public class CertChooserActivity extends ListActivity {
     }
 
     private void fill(final File f) {
-        final File[] dirs = f.listFiles();
         this.setTitle(getString(R.string.cert_chooser_directorio_actual) + " " + f.getName()); //$NON-NLS-1$
         final List<Option> dir = new ArrayList<Option>();
         final List<Option> fls = new ArrayList<Option>();
 
-        try {
-            for (final File ff : dirs) {
-            	// No mostramos ficheros ni directorios ocultos
-            	if (ff.getName().startsWith(".")) { //$NON-NLS-1$
-            		continue;
-            	}
-                if (ff.isDirectory()) {
-                    dir.add(new Option(ff.getName(), getString(R.string.cert_chooser_directorio), ff.getAbsolutePath()));
-                }
-                else {
-                	if (ff.getName().toLowerCase().endsWith(PFX) || ff.getName().toLowerCase().endsWith(P12)) {
-                		fls.add(new Option(ff.getName(), getString(R.string.cert_chooser_tamano_del_fichero) + " " + ff.length(), ff.getAbsolutePath())); //$NON-NLS-1$
-                	}
-                }
+        for (final File ff : f.listFiles()) {
+        	// No mostramos ficheros ni directorios ocultos
+        	if (ff.getName().startsWith(".")) { //$NON-NLS-1$
+        		continue;
+        	}
+            if (ff.isDirectory()) {
+                dir.add(new Option(ff.getName(), getString(R.string.cert_chooser_directorio), ff.getAbsolutePath()));
             }
-        }
-        catch (final Exception e) {
-            Log.e(ES_GOB_AFIRMA, e.getMessage() != null ? e.getMessage() : e.getClass().toString());
+            else {
+            	// Solo mostramos P12 o PFX
+            	if (ff.getName().toLowerCase().endsWith(PFX) || ff.getName().toLowerCase().endsWith(P12)) {
+            		fls.add(new Option(ff.getName(), getString(R.string.cert_chooser_tamano_del_fichero) + " " + ff.length(), ff.getAbsolutePath())); //$NON-NLS-1$
+            	}
+            }
         }
 
         Collections.sort(dir);
@@ -94,21 +89,18 @@ public class CertChooserActivity extends ListActivity {
     }
 
     private void onFileClick(final Option o) {
-        try {
-            if (o.getPath().endsWith(CertChooserActivity.PFX) || o.getPath().endsWith(CertChooserActivity.P12)) {
-                final FileInputStream fis = new FileInputStream(o.getPath());
-                final byte[] data = new byte[(int) fis.getChannel().size()];
-                fis.read(data);
-                fis.close();
-                new Android4KeyStoreManager(this).importCertificateFromPkcs12(data, null);
-                finish();
-            }
-            else {
-                Toast.makeText(this, getString(R.string.cert_chooser_seleccionar_p12_pxf), Toast.LENGTH_LONG).show();
-            }
-        }
-        catch (final Exception e) {
-            Log.e(CertChooserActivity.ES_GOB_AFIRMA, e.getMessage());
-        }
+    	final byte[] data;
+    	try {
+            final FileInputStream fis = new FileInputStream(o.getPath());
+            data = new byte[(int) fis.getChannel().size()];
+            fis.read(data);
+            fis.close();
+    	}
+    	catch(final IOException e) {
+    		Toast.makeText(this, getString(R.string.cert_chooser_read_error), Toast.LENGTH_LONG).show();
+    		return;
+    	}
+        new Android4KeyStoreManager(this).importCertificateFromPkcs12(data, null);
+        finish();
     }
 }

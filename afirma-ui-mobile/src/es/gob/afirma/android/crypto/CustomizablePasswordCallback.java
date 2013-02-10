@@ -2,7 +2,9 @@ package es.gob.afirma.android.crypto;
 
 import javax.security.auth.callback.PasswordCallback;
 
-/** @author Alberto Mart&iacute;nez */
+/** <i>PasswordCallBack</i> que permite establecer al vuelo un mensaje de solicitud en el momento de
+ * pedir la contrase&ntilde;a al usuario.
+ * @author Alberto Mart&iacute;nez */
 public abstract class CustomizablePasswordCallback extends PasswordCallback {
 
     /** Serial version UID */

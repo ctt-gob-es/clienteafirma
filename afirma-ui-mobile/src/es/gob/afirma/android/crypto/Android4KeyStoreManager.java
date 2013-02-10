@@ -11,7 +11,7 @@ import android.security.KeyChainAliasCallback;
 /** Gestor simple de claves y certificados para dispositivos Android 4.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 @TargetApi(14)
-public class Android4KeyStoreManager implements MobileKeyStoreManager {
+public final class Android4KeyStoreManager implements MobileKeyStoreManager {
 
     private final Activity activity;
 
@@ -35,26 +35,37 @@ public class Android4KeyStoreManager implements MobileKeyStoreManager {
         if (pksl == null) {
             throw new IllegalArgumentException("La clase a notificar la seleccion de clave no puede ser nula"); //$NON-NLS-1$
         }
-        KeyChain.choosePrivateKeyAlias(this.activity, new KeyChainAliasCallback() {
-            /** {@inheritDoc} */
-            @Override
-            public void alias(final String alias) {
-                try {
-                    pksl.keySelected(new KeySelectedEvent(new PrivateKeyEntry(KeyChain.getPrivateKey(Android4KeyStoreManager.this.getActivity(),
-                                                                                                     alias),
-                                                                              KeyChain.getCertificateChain(Android4KeyStoreManager.this.getActivity(),
-                                                                                                           alias))));
-                }
-                catch (final Exception e) {
-                    pksl.keySelected(new KeySelectedEvent(e));
-                }
-            }
-        },
-                                       new String[] { "RSA" }, // KeyTypes //$NON-NLS-1$
-                                       null, // Issuers
-                                       null, // Host
-                                       -1, // Port
-                                       null // Alias
+        KeyChain.choosePrivateKeyAlias(
+    		this.activity, new KeyChainAliasCallback() {
+		        /** {@inheritDoc} */
+		        @Override
+		        public void alias(final String alias) {
+		            try {
+		                pksl.keySelected(
+	                		new KeySelectedEvent(
+                				new PrivateKeyEntry(
+            						KeyChain.getPrivateKey(
+        								Android4KeyStoreManager.this.getActivity(),
+		                                alias
+	                                ),
+		                            KeyChain.getCertificateChain(
+	                            		Android4KeyStoreManager.this.getActivity(),
+		                                alias
+	                                )
+                                )
+            				)
+                		);
+		            }
+		            catch (final Exception e) {
+		                pksl.keySelected(new KeySelectedEvent(e));
+		            }
+		        }
+    		},
+            new String[] { "RSA" }, // KeyTypes //$NON-NLS-1$
+            null, // Issuers
+            null, // Host
+            -1, // Port
+            null // Alias
         );
     }
 
