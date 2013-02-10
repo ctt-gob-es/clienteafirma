@@ -3,7 +3,7 @@ package es.gob.afirma.android.network;
 import java.util.HashMap;
 import java.util.Map;
 
-/** Clase de utilidad para el an&aacute;lisis sint&aacute;ctico de Urls
+/** Clase de utilidad para el an&aacute;lisis sint&aacute;ctico de URL.
  * @author Alberto Mart&iacute;nez */
 public final class UriParser {
 

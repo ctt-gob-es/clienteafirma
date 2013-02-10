@@ -23,7 +23,7 @@ import es.gob.afirma.core.misc.AOUtil;
 /** Implementacion de ua clase para la lectura del contenido de una URL.
  * @author Carlos Gamuci
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-public class UrlHttpManager {
+public final class UrlHttpManager {
 
 	private static final HostnameVerifier DEFAULT_HOSTNAME_VERIFIER = HttpsURLConnection.getDefaultHostnameVerifier();
 	private static final SSLSocketFactory DEFAULT_SSL_SOCKET_FACTORY = HttpsURLConnection.getDefaultSSLSocketFactory();
@@ -43,7 +43,16 @@ public class UrlHttpManager {
         }
     };
 
-	public byte[] readUrl(final String url) throws IOException {
+	private UrlHttpManager() {
+		// NO permitimos la instanciacion
+	}
+
+	/** Lee una URL HTTP o HTTPS por POST si contiene par&aacute;metros o por GET si no los tiene.
+	 * En HTTPS no se hacen comprobaciones del certificado servidor.
+	 * @param url URL a leer
+	 * @return Contenido de la URL
+	 * @throws IOException Si no se puede leer la URL */
+	public static byte[] readUrl(final String url) throws IOException {
 		if (url == null) {
 			throw new IllegalArgumentException("La URL a leer no puede ser nula"); //$NON-NLS-1$
 		}

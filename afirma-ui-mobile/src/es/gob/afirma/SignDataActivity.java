@@ -38,11 +38,14 @@ import es.gob.afirma.signers.cades.AOCAdESSigner;
  * Actividad dedicada a la firma de los datos recibidos en la entrada mediante un certificado
  * del almac&eacute;n central seleccionado por el usuario.
  */
-public class SignDataActivity extends Activity implements KeyChainAliasCallback {
+public final class SignDataActivity extends Activity implements KeyChainAliasCallback {
 
 	private static final String ES_GOB_AFIRMA = "es.gob.afirma"; //$NON-NLS-1$
 
 	private static final String DEFAULT_URL_ENCODING = "UTF-8"; //$NON-NLS-1$
+
+	private static final String SERVLET_NAME_STORAGE = "/SignatureStorageServer/storage"; //$NON-NLS-1$
+	private static final String SERVLET_NAME_RETRIEVE = "/SignatureRetrieverServer/retrieve"; //$NON-NLS-1$
 
 	/** Juego de carateres UTF-8. */
 	private static final String UTF8 = "utf-8"; //$NON-NLS-1$
@@ -97,7 +100,6 @@ public class SignDataActivity extends Activity implements KeyChainAliasCallback 
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_data);
-
         this.toast = Toast.makeText(getApplicationContext(), "", Toast.LENGTH_LONG); //$NON-NLS-1$
     }
 
@@ -186,7 +188,18 @@ public class SignDataActivity extends Activity implements KeyChainAliasCallback 
 		}
     	// Comprobamos que el protocolo este soportado
     	if (servletUrl.getProtocol() != "http" &&  servletUrl.getProtocol() != "https") { //$NON-NLS-1$ //$NON-NLS-2$
-			Log.e(ES_GOB_AFIRMA, "EL protocolo de la URL proporcionada para el servlet no esta soportado"); //$NON-NLS-1$
+			Log.e(ES_GOB_AFIRMA, "El protocolo de la URL proporcionada para el servlet no esta soportado"); //$NON-NLS-1$
+			showMessage(getString(R.string.error_bad_params));
+			return false;
+    	}
+    	// Comprobamos que la URL sea una llamada al servlet y que no sea local
+    	if ("localhost".equals(servletUrl.getHost()) || "127.0.0.1".equals(servletUrl.getHost())) { //$NON-NLS-1$ //$NON-NLS-2$
+			Log.e(ES_GOB_AFIRMA, "El host de la URL proporcionada para el servlet es local"); //$NON-NLS-1$
+			showMessage(getString(R.string.error_bad_params));
+			return false;
+    	}
+    	if (!(servletUrl.toString().endsWith(SERVLET_NAME_STORAGE) || servletUrl.toString().endsWith(SERVLET_NAME_RETRIEVE))) {
+			Log.e(ES_GOB_AFIRMA, "El protocolo de la URL proporcionada para el servlet no apunta a un servlet declarado"); //$NON-NLS-1$
 			showMessage(getString(R.string.error_bad_params));
 			return false;
     	}
@@ -346,7 +359,6 @@ public class SignDataActivity extends Activity implements KeyChainAliasCallback 
 
     	Log.i(ES_GOB_AFIRMA, "Invocando sendData"); //$NON-NLS-1$
 
-    	final UrlHttpManager urlManager = new UrlHttpManager();
         try {
 
         	final StringBuilder url = new StringBuilder(getParameter(STORAGE_SERVLET_PARAM));
@@ -356,7 +368,7 @@ public class SignDataActivity extends Activity implements KeyChainAliasCallback 
         	url.append("&dat=").append(data); //$NON-NLS-1$
 
         	// Llamamos al servicio para guardar los datos
-            final byte[] result = urlManager.readUrl(url.toString());
+            final byte[] result = UrlHttpManager.readUrl(url.toString());
 
             Log.i(ES_GOB_AFIRMA, "Resultado del deposito de la firma: " + new String(result)); //$NON-NLS-1$
 
