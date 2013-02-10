@@ -21,6 +21,6 @@
     <string name="cert_chooser_directorio">Directorio</string>
     <string name="cert_chooser_directorio_padre">Directorio padre</string>
     <string name="cert_chooser_tamano_del_fichero">Tamaño del fichero:</string>
-    <string name="cert_chooser_seleccionar_p12_pxf">Debe seleccionar un fichero PKCS#12 o PXF</string>
+    <string name="cert_chooser_read_error">Error: No ha sido posible leer el fichero</string>
 
 </resources>
