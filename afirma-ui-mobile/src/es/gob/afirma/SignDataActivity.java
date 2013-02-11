@@ -185,8 +185,8 @@ public final class SignDataActivity extends Activity implements KeyChainAliasCal
 			return false;
 		}
     	// Comprobamos que el protocolo este soportado
-    	if (servletUrl.getProtocol() != "http" &&  servletUrl.getProtocol() != "https") { //$NON-NLS-1$ //$NON-NLS-2$
-			Log.e(ES_GOB_AFIRMA, "El protocolo de la URL proporcionada para el servlet no esta soportado"); //$NON-NLS-1$
+    	if (!"http".equals(servletUrl.getProtocol()) &&  !"https".equals(servletUrl.getProtocol())) { //$NON-NLS-1$ //$NON-NLS-2$
+			Log.e(ES_GOB_AFIRMA, "El protocolo de la URL proporcionada para el servlet no esta soportado: " + servletUrl.getProtocol()); //$NON-NLS-1$
 			showMessage(getString(R.string.error_bad_params));
 			return false;
     	}
@@ -397,7 +397,7 @@ public final class SignDataActivity extends Activity implements KeyChainAliasCal
 			// No puede darse el soporte de UTF-8 es obligatorio
 			Log.e(
 				ES_GOB_AFIRMA,
-				"No se ha posido enviar la respuesta al servidor por error en la codificacion " + DEFAULT_URL_ENCODING + ": " + e //$NON-NLS-1$ //$NON-NLS-2$
+				"No se ha podido enviar la respuesta al servidor por error en la codificacion " + DEFAULT_URL_ENCODING + ": " + e //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
     }
@@ -417,9 +417,7 @@ public final class SignDataActivity extends Activity implements KeyChainAliasCal
      */
     private void showMessage(final String message) {
     	final ErrorDialog dialog = new ErrorDialog(message);
-    	dialog.show(getFragmentManager(), ""); //$NON-NLS-1$
-    	this.toast.setText(message);
-    	this.toast.show();
+    	dialog.show(getFragmentManager(), "ErrorDialog"); //$NON-NLS-1$
     }
 
     /**
