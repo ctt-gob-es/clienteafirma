@@ -66,9 +66,8 @@ public final class SignDataActivity extends FragmentActivity implements KeyChain
 				this.parameters = UriParser.getParameters(getIntent().getData().toString());
 			}
             catch (final ParameterException e) {
-            	showMessage(getString(R.string.error_bad_params));
+            	showErrorMessage(getString(R.string.error_bad_params));
             	Log.e(ES_GOB_AFIRMA, "La longitud de la clave de cifrado no es correcta."); //$NON-NLS-1$
-            	finish();
             	return;
 			}
 
@@ -253,7 +252,7 @@ public final class SignDataActivity extends FragmentActivity implements KeyChain
      * Muestra un mensaje de advertencia al usuario.
      * @param message Mensaje que se desea mostrar.
      */
-    private void showMessage(final String message) {
+    private void showErrorMessage(final String message) {
     	final ErrorDialog dialog = new ErrorDialog(message);
     	dialog.show(getSupportFragmentManager(), "ErrorDialog"); //$NON-NLS-1$
     }
