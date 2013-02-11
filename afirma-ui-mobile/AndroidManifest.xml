@@ -10,6 +10,11 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+    
+    <!--  Permisos para el uso de SSCD en MSC -->
+    <uses-permission android:name="org.simalliance.openmobileapiAET.SMARTCARD"/>
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+	<!--  Fin permisos para el uso de SSCD en MSC -->
 
     <application
         android:icon="@drawable/ic_launcher"
@@ -38,11 +43,12 @@
                 <action android:name="android.intent.action.VIEW" />
 				<category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                
-                <!-- <data android:scheme="http" android:host="194.140.22.80" android:port="-1" android:path="/FirmaMovil/firmamovil.html" />  -->
                 <data android:scheme="afirma" />
             </intent-filter>
         </activity>
+        <!--  Para uso SSCD en MSC -->
+        <uses-library android:name="org.simalliance.openmobileapiAET" android:required="false"/>
+        <!--  Fin para uso SSCD en MSC -->
     </application>
 
 </manifest>
