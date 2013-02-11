@@ -8,15 +8,16 @@ import java.security.InvalidKeyException;
 import java.security.KeyStore.PrivateKeyEntry;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.DialogFragment;
+import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
 import android.security.KeyChain;
 import android.security.KeyChainAliasCallback;
 import android.security.KeyChainException;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.widget.Toast;
 import es.gob.afirma.android.crypto.DesCipher;
@@ -30,7 +31,7 @@ import es.gob.afirma.signers.cades.AOCAdESSigner;
 
 /** Actividad dedicada a la firma de los datos recibidos en la entrada mediante un certificado
  * del almac&eacute;n central seleccionado por el usuario. */
-public final class SignDataActivity extends Activity implements KeyChainAliasCallback {
+public final class SignDataActivity extends FragmentActivity implements KeyChainAliasCallback {
 
 	private static final String ES_GOB_AFIRMA = "es.gob.afirma"; //$NON-NLS-1$
 
@@ -254,27 +255,37 @@ public final class SignDataActivity extends Activity implements KeyChainAliasCal
      */
     private void showMessage(final String message) {
     	final ErrorDialog dialog = new ErrorDialog(message);
-    	dialog.show(getFragmentManager(), ""); //$NON-NLS-1$
-    	this.toast.setText(message);
-    	this.toast.show();
+    	dialog.show(getSupportFragmentManager(), "ErrorDialog"); //$NON-NLS-1$
     }
 
-    /** Di&aacute;logo modal con el que mostrar al usuario los errores que deberer&iacute;a gestionar con
-     * el integrador del servicio. */
-    private final class ErrorDialog extends DialogFragment {
+    /**
+     * Di&aacute;logo modal con el que mostrar al usuario los errores que deberer&iacute;a gestionar con
+     * el integrador del servicio.
+     */
+    private class ErrorDialog extends DialogFragment {
 
-    	private final String message;
+    	private String message = null;
 
-    	/** Construye un di&aacute;logo de error.
-    	 * @param message Mensaje que mostrar al usuario. */
-    	public ErrorDialog(final String message) {
+    	/**
+    	 * Construye un di&aacute;logo de error.
+    	 * @param message Mensaje que mostrar al usuario.
+    	 */
+    	ErrorDialog(final String message) {
 			this.message = message;
 		}
 
     	@Override
     	public Dialog onCreateDialog(final Bundle savedInstanceState) {
+
     		final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
-    		dialogBuilder.setMessage(this.message).setPositiveButton(R.string.ok, null);
+    		dialogBuilder.setMessage(this.message)
+    			.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(final DialogInterface dialog, final int which) {
+						finish();
+					}
+				});
+
     		return dialogBuilder.create();
     	}
     }

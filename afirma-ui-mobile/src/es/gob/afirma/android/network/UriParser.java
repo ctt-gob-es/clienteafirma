@@ -144,7 +144,7 @@ public final class UriParser {
     		throw new ParameterException("La URL proporcionada para el Servlet no es valida: " + e); //$NON-NLS-1$
 		}
     	// Comprobamos que el protocolo este soportado
-    	if (servletUrl.getProtocol() != "http" &&  servletUrl.getProtocol() != "https") { //$NON-NLS-1$ //$NON-NLS-2$
+    	if (!"http".equals(servletUrl.getProtocol()) && !"https".equals(servletUrl.getProtocol())) { //$NON-NLS-1$ //$NON-NLS-2$
     		throw new ParameterException("El protocolo de la URL proporcionada para el servlet no esta soportado: " + servletUrl.getProtocol()); //$NON-NLS-1$
     	}
     	// Comprobamos que la URL sea una llamada al servlet y que no sea local
@@ -153,6 +153,9 @@ public final class UriParser {
     	}
     	if (!(servletUrl.toString().endsWith(SERVLET_NAME_STORAGE) || servletUrl.toString().endsWith(SERVLET_NAME_RETRIEVE))) {
     		throw new ParameterException("El protocolo de la URL proporcionada para el servlet no apunta a un servlet declarado"); //$NON-NLS-1$
+    	}
+    	if (servletUrl.toString().indexOf('?') != -1 || servletUrl.toString().indexOf('=') != -1) {
+    		throw new ParameterException("Se han encontrado parametros en la URL del servlet"); //$NON-NLS-1$
     	}
 
     	ret.setStorageServletUrl(servletUrl);
@@ -303,8 +306,6 @@ public final class UriParser {
 		void setExtraParams(final Properties properties) {
 			this.extraParams = properties != null ? properties : new Properties();
 		}
-
-
 	}
 
     /** Convierte una cadena en Base 64 de propiedades en un Properties.
