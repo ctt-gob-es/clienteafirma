@@ -1,0 +1,48 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="es.gob.afirma"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk
+        android:minSdkVersion="15"
+        android:targetSdkVersion="15" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+
+    <application
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".CertChooserActivity"
+            android:label="@string/title_activity_cert_chooser" >
+        </activity>
+        <activity
+            android:name=".SignDataActivity"
+            android:finishOnCloseSystemDialogs="true"
+            android:finishOnTaskLaunch="true"
+            android:label="@string/title_activity_sign_data"
+            android:theme="@style/Theme.Transparent" >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+				<category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                
+                <!-- <data android:scheme="http" android:host="194.140.22.80" android:port="-1" android:path="/FirmaMovil/firmamovil.html" />  -->
+                <data android:scheme="afirma" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
