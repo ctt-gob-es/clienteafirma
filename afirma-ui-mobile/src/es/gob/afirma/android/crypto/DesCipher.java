@@ -25,7 +25,7 @@ public final class DesCipher {
 	 * @return Resultado del proceso de cifrado.
 	 * @throws InvalidKeyException Cuando La clave no es valida para el algoritmo DES.
 	 * @throws GeneralSecurityException Cuando los datos introducidos no son validos o se produce un error en la operaci&oacute;n. */
-	public static byte[] cipher(final byte[] data, final String sk) throws InvalidKeyException, GeneralSecurityException {
+	public static byte[] cipher(final byte[] data, final byte[] sk) throws InvalidKeyException, GeneralSecurityException {
 		final Cipher desCipher;
 		try {
 			desCipher = Cipher.getInstance("DES/ECB/NoPadding"); //$NON-NLS-1$
@@ -34,7 +34,7 @@ public final class DesCipher {
 			// Este caso no deberia ocurrir nunca
 			throw new GeneralSecurityException("Algoritmo o formato no soportado por la maquina virtual: " + e); //$NON-NLS-1$
 		}
-		desCipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(sk.getBytes(), "DES")); //$NON-NLS-1$
+		desCipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(sk, "DES")); //$NON-NLS-1$
 		return desCipher.doFinal(padding(data, 8));
 	}
 

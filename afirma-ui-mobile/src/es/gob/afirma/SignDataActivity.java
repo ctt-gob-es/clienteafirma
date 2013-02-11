@@ -1,81 +1,41 @@
 package es.gob.afirma;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.security.KeyStore.PrivateKeyEntry;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Properties;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
+import android.app.DialogFragment;
 import android.os.Build;
 import android.os.Bundle;
 import android.security.KeyChain;
 import android.security.KeyChainAliasCallback;
 import android.security.KeyChainException;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.widget.Toast;
 import es.gob.afirma.android.crypto.DesCipher;
 import es.gob.afirma.android.network.UriParser;
+import es.gob.afirma.android.network.UriParser.ParameterException;
+import es.gob.afirma.android.network.UriParser.UrlParameters;
 import es.gob.afirma.android.network.UrlHttpManager;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSigner;
-import es.gob.afirma.core.signers.AOSignerFactory;
+import es.gob.afirma.signers.cades.AOCAdESSigner;
 
 /** Actividad dedicada a la firma de los datos recibidos en la entrada mediante un certificado
  * del almac&eacute;n central seleccionado por el usuario. */
-public final class SignDataActivity extends FragmentActivity implements KeyChainAliasCallback {
+public final class SignDataActivity extends Activity implements KeyChainAliasCallback {
 
 	private static final String ES_GOB_AFIRMA = "es.gob.afirma"; //$NON-NLS-1$
 
-	private static final String DEFAULT_URL_ENCODING = "UTF-8"; //$NON-NLS-1$
-
-	private static final String SERVLET_NAME_STORAGE = "/SignatureStorageServer/storage"; //$NON-NLS-1$
-	private static final String SERVLET_NAME_RETRIEVE = "/SignatureRetrieverServer/retrieve"; //$NON-NLS-1$
-
 	/** Juego de carateres UTF-8. */
-	private static final String UTF8 = "utf-8"; //$NON-NLS-1$
-
-	/** Par&aacute;metro de entrada con el formato de firma. */
-	private static final String FORMAT_PARAM = "format"; //$NON-NLS-1$
-
-	/** Par&aacute;metro de entrada con el algoritmo de firma. */
-	private static final String ALGORITHM_PARAM = "algorithm"; //$NON-NLS-1$
-
-	/** Par&aacute;metro de entrada con los datos a firmar. */
-	private static final String DATA_PARAM = "dat"; //$NON-NLS-1$
-
-	/** Par&aacute;metro de entrada con el algoritmo de firma. */
-	private static final String STORAGE_SERVLET_PARAM = "stservlet"; //$NON-NLS-1$
-
-	/** Par&aacute;metro de entrada con el identificador del documento. */
-	private static final String ID_PARAM = "id"; //$NON-NLS-1$
-
-	/** Par&aacute;metro de entrada con la clave para el cifrado del documento. */
-	private static final String KEY_PARAM = "key"; //$NON-NLS-1$
-
-	/** Par&aacute;metro de entrada con las opciones de configuraci&oacute;n de la firma. */
-	private static final String PROPERTIES_PARAM = "properties"; //$NON-NLS-1$
-
-	/** N&uacute;mero m&aacute;ximo de caracteres permitidos para el identificador de sesi&oacute;n de la firma. */
-	private static final int MAX_ID_LENGTH = 20;
-
-	/** Longitud permitida para la clave de cifrado. */
-	private static final int CIPHER_KEY_LENGTH = 8;
-
-	private Map<String, String> parameters = null;
+	private static final String DEFAULT_URL_ENCODING = "UTF-8"; //$NON-NLS-1$
 
     private static final String METHOD_OP = "put"; //$NON-NLS-1$
 
@@ -86,6 +46,8 @@ public final class SignDataActivity extends FragmentActivity implements KeyChain
     private static final char PADDING_CHAR_SEPARATOR = '.';
 
     private Toast toast;
+
+    private UrlParameters parameters;
 
     @SuppressLint("ShowToast")
 	@Override
@@ -98,142 +60,27 @@ public final class SignDataActivity extends FragmentActivity implements KeyChain
     @Override
     public void onStart() {
         super.onStart();
-
         if (getIntent() != null && getIntent().getData() != null) {
-
-            this.parameters = UriParser.parser(getIntent().getData().toString());
-
-            // Si no se cumplen los requisitos de entrada, suspendemos la ejecucion
-            if (!checkParameters(this.parameters)) {
-            	return;
-            }
-
-            KeyChain.choosePrivateKeyAlias(this, this, new String[] { "RSA" }, //$NON-NLS-1$ // KeyTypes
-            		null, // Issuers
-            		null, // Host
-            		-1, // Port
-            		null // Alias
-            		);
-        }
-    }
-
-    /** Comprueba que est&eacute;n disponibles todos los parametros disponibles en la entrada de datos.
-     * @param params Par&aacute;metros de entrada.
-     * @return {@code true} si existen todos los par&oacute;metros necesarios, {@code false} en caso
-     *         contrario. */
-	private boolean checkParameters(final Map<String, String> params) {
-
-		// Comprobamos que se ha especificado el identificador para al firma
-    	if (!params.containsKey(ID_PARAM)) {
-    		Log.e(ES_GOB_AFIRMA, "No se ha recibido el parametro con el identificador del documento: " + ID_PARAM); //$NON-NLS-1$
-    		showMessage(getString(R.string.error_bad_params));
-            return false;
-    	}
-
-		// Comprobamos que el identificador de sesion de la firma no sea mayor de un cierto numero de caracteres
-		final String signatureSessionId = params.get(ID_PARAM);
-		if (signatureSessionId.length() > MAX_ID_LENGTH) {
-			Log.e(ES_GOB_AFIRMA, "La longitud del identificador para la firma es mayor de " + MAX_ID_LENGTH + " caracteres."); //$NON-NLS-1$ //$NON-NLS-2$
-    		showMessage(getString(R.string.error_bad_params));
-            return false;
-		}
-
-		// Comprobamos que el identificador de sesion de la firma sea alfanumerico (se usara como nombre de fichero)
-		for (final char c : signatureSessionId.toLowerCase(Locale.ENGLISH).toCharArray()) {
-			if ((c < 'a' || c > 'z') && (c < '0' || c > '9')) {
-				Log.e(ES_GOB_AFIRMA, "El identificador de la firma debe ser alfanumerico."); //$NON-NLS-1$
-	    		showMessage(getString(R.string.error_bad_params));
-	            return false;
+            try {
+				this.parameters = UriParser.getParameters(getIntent().getData().toString());
 			}
-		}
+            catch (final ParameterException e) {
+            	showMessage(getString(R.string.error_bad_params));
+            	Log.e(ES_GOB_AFIRMA, "La longitud de la clave de cifrado no es correcta."); //$NON-NLS-1$
+            	finish();
+            	return;
+			}
 
-		// Comprobamos que se ha especificado la clave de cifrado
-    	if (!params.containsKey(KEY_PARAM)) {
-    		Log.e(ES_GOB_AFIRMA, "No se ha recibido el parametro con la clave para el cifrado de la firma: " + KEY_PARAM); //$NON-NLS-1$
-    		showMessage(getString(R.string.error_bad_params));
-            return false;
-    	}
-
-		// Comprobamos que la clave de cifrado tenga la longitud correcta
-		if (params.get(KEY_PARAM) == null || params.get(KEY_PARAM).length() != CIPHER_KEY_LENGTH) {
-			Log.e(ES_GOB_AFIRMA, "La longitud de la clave de cifrado no es correcta."); //$NON-NLS-1$
-    		showMessage(getString(R.string.error_bad_params));
-            return false;
-		}
-
-		// Comprobamos que se ha especificado el servlet
-    	if (!params.containsKey(STORAGE_SERVLET_PARAM)) {
-    		Log.e(ES_GOB_AFIRMA, "No se ha recibido el parametro con la direccion del servlet para el envio de la firma: " + STORAGE_SERVLET_PARAM); //$NON-NLS-1$
-    		showMessage(getString(R.string.error_bad_params));
-            return false;
-    	}
-
-		// Comprobamos que la URL sea valida
-		final URL servletUrl;
-    	try {
-    		servletUrl = new URL(params.get(STORAGE_SERVLET_PARAM));
-		}
-    	catch (final MalformedURLException e) {
-			Log.e(ES_GOB_AFIRMA, "La URL proporcionada del servlet no es valida: " + e); //$NON-NLS-1$
-			showMessage(getString(R.string.error_bad_params));
-			return false;
-		}
-    	// Comprobamos que el protocolo este soportado
-    	if (!"http".equals(servletUrl.getProtocol()) &&  !"https".equals(servletUrl.getProtocol())) { //$NON-NLS-1$ //$NON-NLS-2$
-			Log.e(ES_GOB_AFIRMA, "El protocolo de la URL proporcionada para el servlet no esta soportado: " + servletUrl.getProtocol()); //$NON-NLS-1$
-			showMessage(getString(R.string.error_bad_params));
-			return false;
-    	}
-    	// Comprobamos que la URL sea una llamada al servlet y que no sea local
-    	if ("localhost".equals(servletUrl.getHost()) || "127.0.0.1".equals(servletUrl.getHost())) { //$NON-NLS-1$ //$NON-NLS-2$
-			Log.e(ES_GOB_AFIRMA, "El host de la URL proporcionada para el servlet es local"); //$NON-NLS-1$
-			showMessage(getString(R.string.error_bad_params));
-			return false;
-    	}
-    	if (!(servletUrl.toString().endsWith(SERVLET_NAME_STORAGE) || servletUrl.toString().endsWith(SERVLET_NAME_RETRIEVE))) {
-			Log.e(ES_GOB_AFIRMA, "El protocolo de la URL proporcionada para el servlet no apunta a un servlet declarado"); //$NON-NLS-1$
-			showMessage(getString(R.string.error_bad_params));
-			return false;
-    	}
-    	if (servletUrl.toString().indexOf('?') != -1 || servletUrl.toString().indexOf('=') != -1) {
-			Log.e(ES_GOB_AFIRMA, "Se han encontrado parametros en la URL del servlet"); //$NON-NLS-1$
-			showMessage(getString(R.string.error_bad_params));
-			return false;
-    	}
-
-
-		// Comprobamos que se nos hayan indicado los datos
-    	if (!params.containsKey(DATA_PARAM)) {
-    		Log.e(ES_GOB_AFIRMA, "No se ha recibido el parametro con los datos para firmar: " + DATA_PARAM); //$NON-NLS-1$
-    		showMessage(getString(R.string.error_bad_params));
-            return false;
-    	}
-
-    	// Comprobamos que los datos se pueden tratar como base 64
-    	try {
-    		Base64.decode(URLDecoder.decode(params.get(DATA_PARAM), DEFAULT_URL_ENCODING));
-    	}
-    	catch (final Exception e) {
-    		Log.e(ES_GOB_AFIRMA, "Los datos introducidos no se pueden tratar como base 64: " + e); //$NON-NLS-1$
-    		showMessage(getString(R.string.error_bad_params));
-            return false;
-    	}
-
-    	// Comprobamos que se ha especificado el formato
-    	if (!params.containsKey(FORMAT_PARAM)) {
-    		Log.e(ES_GOB_AFIRMA, "No se ha recibido el parametro con el formato de firma: " + FORMAT_PARAM); //$NON-NLS-1$
-    		showMessage(getString(R.string.error_bad_params));
-            return false;
-    	}
-
-    	// Comprobamos que se ha especificado el algoritmo
-    	if (!params.containsKey(ALGORITHM_PARAM)) {
-    		Log.e(ES_GOB_AFIRMA, "No se ha recibido el parametro con el algoritmo de firma: " + ALGORITHM_PARAM); //$NON-NLS-1$
-    		showMessage(getString(R.string.error_bad_params));
-            return false;
-    	}
-
-    	return true;
+            KeyChain.choosePrivateKeyAlias(
+        		this,
+        		this,
+        		new String[] { "RSA" }, //$NON-NLS-1$ // KeyTypes
+        		null, // Issuers
+        		null, // Host
+        		-1, // Port
+        		null // Alias
+    		);
+        }
     }
 
     @Override
@@ -245,7 +92,7 @@ public final class SignDataActivity extends FragmentActivity implements KeyChain
     	if (alias == null) {
             Log.e(ES_GOB_AFIRMA, "No se selecciono ningun certificado de firma"); //$NON-NLS-1$
             launchError(ErrorManager.ERROR_NO_CERT_SELECTED);
-            close();
+            finish();
             return;
     	}
 
@@ -262,71 +109,66 @@ public final class SignDataActivity extends FragmentActivity implements KeyChain
 			} else {
         		launchError(ErrorManager.ERROR_PKE);
         	}
-            close();
+            finish();
             return;
         }
         catch (final Exception e) {
             Log.e(ES_GOB_AFIRMA, e.toString());
             launchError(ErrorManager.ERROR_PKE);
-            close();
+            finish();
             return;
         }
         // Cuando se instala el certificado desde el dialogo de seleccion, Android da a elegir certificado
         // en 2 ocasiones y en la segunda se produce un "java.lang.AssertionError". Se ignorara este error.
         catch (final Error e) {
         	Log.e(ES_GOB_AFIRMA, e.toString());
-            close();
+            finish();
             return;
 		}
 
         // Creacion del firmador
-        final AOSigner signer = AOSignerFactory.getSigner(getParameter(FORMAT_PARAM));
-        if (signer == null) {
-            Log.e(ES_GOB_AFIRMA, "No existe el formato: " + getParameter(FORMAT_PARAM)); //$NON-NLS-1$
-            launchError(ErrorManager.ERROR_NOT_SUPPORTED_FORMAT);
-            close();
-            return;
-        }
+        // Por ahora instanciamos directamente el CAdES
+        final AOSigner signer = new AOCAdESSigner();
 
         // Generacion de la firma
         final byte[] sign;
         try {
             sign = signer.sign(
-        		Base64.decode(URLDecoder.decode(getParameter(DATA_PARAM), DEFAULT_URL_ENCODING)),
-            	getParameter(ALGORITHM_PARAM),
+        		this.parameters.getData(),
+        		this.parameters.getSignatureAlgorithm(),
                 pke,
-                SignDataActivity.parseB64Properties(getParameter(PROPERTIES_PARAM))
+                this.parameters.getExtraParams()
             );
         }
         catch (final Exception e) {
-            Log.e(ES_GOB_AFIRMA, e.getMessage());
+            Log.e(ES_GOB_AFIRMA, "Error en la firma: " + e); //$NON-NLS-1$
             launchError(ErrorManager.ERROR_SIGNING);
-            close();
+            finish();
             return;
         }
 
     	// Ciframos si nos dieron clave privada, si no subimos los datos sin cifrar
         final String data;
         try {
-        	data = generateCipherDataString(sign, getParameter(KEY_PARAM));
+        	data = generateCipherDataString(sign, this.parameters.getDesKey());
         }
         catch (final IOException e) {
-        	Log.e(ES_GOB_AFIRMA, e.getMessage());
+        	Log.e(ES_GOB_AFIRMA, "Error en el cifrado de la firma: " + e); //$NON-NLS-1$
         	launchError(ErrorManager.ERROR_CODING_BASE64);
-        	close();
+        	finish();
         	return;
         }
         catch (final GeneralSecurityException e) {
-        	Log.e(ES_GOB_AFIRMA, e.getMessage());
+        	Log.e(ES_GOB_AFIRMA, "Error en el cifrado de la firma: " + e); //$NON-NLS-1$
         	launchError(ErrorManager.ERROR_CIPHERING);
-        	close();
+        	finish();
         	return;
         }
 
         sendData(data);
 
         Log.i(ES_GOB_AFIRMA, "Firma entregada satisfactoriamente."); //$NON-NLS-1$
-        close();
+        finish();
     }
 
     /**
@@ -338,9 +180,8 @@ public final class SignDataActivity extends FragmentActivity implements KeyChain
      * el caracter separador y los datos cifrados y en base 64.
      * @throws InvalidKeyException Cuando la clave no es v&aacute;lida.
      * @throws GeneralSecurityException Cuando falla el proceso de cifrado.
-     * @throws IOException
-     */
-    private static String generateCipherDataString(final byte[] data, final String cipherKey) throws InvalidKeyException, GeneralSecurityException, IOException {
+     * @throws IOException */
+    private static String generateCipherDataString(final byte[] data, final byte[] cipherKey) throws InvalidKeyException, GeneralSecurityException, IOException {
     	return Integer.toString(DesCipher.getPaddingLength() - data.length % DesCipher.getPaddingLength()) +
     			PADDING_CHAR_SEPARATOR + Base64.encodeBytes(DesCipher.cipher(data, cipherKey), Base64.URL_SAFE);
     }
@@ -355,10 +196,10 @@ public final class SignDataActivity extends FragmentActivity implements KeyChain
 
         try {
 
-        	final StringBuilder url = new StringBuilder(getParameter(STORAGE_SERVLET_PARAM));
+        	final StringBuilder url = new StringBuilder(this.parameters.getStorageServletUrl().toExternalForm());
         	url.append("?op=").append(METHOD_OP); //$NON-NLS-1$
         	url.append("&v=").append(SYNTAX_VERSION); //$NON-NLS-1$
-        	url.append("&id=").append(getParameter(ID_PARAM)); //$NON-NLS-1$
+        	url.append("&id=").append(this.parameters.getId()); //$NON-NLS-1$
         	url.append("&dat=").append(data); //$NON-NLS-1$
 
         	// Llamamos al servicio para guardar los datos
@@ -370,13 +211,13 @@ public final class SignDataActivity extends FragmentActivity implements KeyChain
             if (!new String(result).trim().equals("OK")) { //$NON-NLS-1$
             	Log.e(ES_GOB_AFIRMA, "No se pudo entregar la firma al servlet: " + new String(result)); //$NON-NLS-1$
             	showToast(getString(R.string.error_server_error));
-            	close();
+            	finish();
             }
         }
         catch (final IOException e) {
         	Log.e(ES_GOB_AFIRMA, "No se pudo conectar con el servidor intermedio: " + e); //$NON-NLS-1$
         	showToast(getString(R.string.error_server_connect));
-        	close();
+        	finish();
         }
     }
 
@@ -393,7 +234,7 @@ public final class SignDataActivity extends FragmentActivity implements KeyChain
 			// No puede darse el soporte de UTF-8 es obligatorio
 			Log.e(
 				ES_GOB_AFIRMA,
-				"No se ha podido enviar la respuesta al servidor por error en la codificacion " + DEFAULT_URL_ENCODING + ": " + e //$NON-NLS-1$ //$NON-NLS-2$
+				"No se ha posido enviar la respuesta al servidor por error en la codificacion " + DEFAULT_URL_ENCODING + ": " + e //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
     }
@@ -413,90 +254,27 @@ public final class SignDataActivity extends FragmentActivity implements KeyChain
      */
     private void showMessage(final String message) {
     	final ErrorDialog dialog = new ErrorDialog(message);
-    	dialog.show(getSupportFragmentManager(), "ErrorDialog"); //$NON-NLS-1$
+    	dialog.show(getFragmentManager(), ""); //$NON-NLS-1$
+    	this.toast.setText(message);
+    	this.toast.show();
     }
 
-    /**
-     * Recupera un p&aacute;rametro de la URL descodificado. Si no se encuentra el par&aacute;metro se devuelve {@code null}.
-     * @param param Clave del par&aacute;metro.
-     * @return Valor del par&aacute;metro.
-     */
-    private String getParameter(final String param) {
-    	return getParameter(param, null);
-    }
+    /** Di&aacute;logo modal con el que mostrar al usuario los errores que deberer&iacute;a gestionar con
+     * el integrador del servicio. */
+    private final class ErrorDialog extends DialogFragment {
 
-    /**
-     * Recupera un p&aacute;rametro de la URL descodificado. Si no se encuentra el par&aacute;metro se devuelve {@code null}.
-     * @param param Clave del par&aacute;metro.
-     * @return Valor del par&aacute;metro.
-     */
-    private String getParameter(final String param, final String defaultValue) {
-    	try {
-    		return this.parameters.containsKey(param) ?
-    				URLDecoder.decode(this.parameters.get(param), UTF8) :
-    					defaultValue;
-		} catch (final UnsupportedEncodingException e) {
-			Log.w(ES_GOB_AFIRMA, "La codificacion utilizada para la URL no es valida: " + e.toString()); //$NON-NLS-1$
-			return this.parameters.get(param);
-		}
-    }
+    	private final String message;
 
-
-    /**
-     * Convierte una cadena en Base 64 de propiedades en un Properties.
-     * @param prop Listado de propiedades en base 64.
-     * @return Objeto de propiedades.
-     * @throws IOException Cuando ocurre alg&uacute;n error en la lectura de la cadena.
-     */
-    private static Properties parseB64Properties(final String prop) throws IOException {
-        final Properties properties = new Properties();
-
-        if (prop != null) {
-        	properties.load(new ByteArrayInputStream(Base64.decode(prop)));
-        }
-
-        return properties;
-    }
-
-    /**
-     * Cierra la aplicaci&oacute;n liberando los recursos reservados.
-     */
-    private void close() {
-    	if (this.parameters != null) {
-    		this.parameters.clear();
-    		this.parameters = null;
-    	}
-    	finish();
-    }
-
-    /**
-     * Di&aacute;logo modal con el que mostrar al usuario los errores que deberer&iacute;a gestionar con
-     * el integrador del servicio.
-     */
-    private class ErrorDialog extends DialogFragment {
-
-    	private String message = null;
-
-    	/**
-    	 * Construye un di&aacute;logo de error.
-    	 * @param message Mensaje que mostrar al usuario.
-    	 */
-    	ErrorDialog(final String message) {
+    	/** Construye un di&aacute;logo de error.
+    	 * @param message Mensaje que mostrar al usuario. */
+    	public ErrorDialog(final String message) {
 			this.message = message;
 		}
 
     	@Override
     	public Dialog onCreateDialog(final Bundle savedInstanceState) {
-
     		final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
-    		dialogBuilder.setMessage(this.message)
-    			.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(final DialogInterface dialog, final int which) {
-						close();
-					}
-				});
-
+    		dialogBuilder.setMessage(this.message).setPositiveButton(R.string.ok, null);
     		return dialogBuilder.create();
     	}
     }
