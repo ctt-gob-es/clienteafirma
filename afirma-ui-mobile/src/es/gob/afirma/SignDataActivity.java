@@ -15,28 +15,28 @@ import java.util.Map;
 import java.util.Properties;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.DialogFragment;
+import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
 import android.security.KeyChain;
 import android.security.KeyChainAliasCallback;
 import android.security.KeyChainException;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.widget.Toast;
 import es.gob.afirma.android.crypto.DesCipher;
 import es.gob.afirma.android.network.UriParser;
 import es.gob.afirma.android.network.UrlHttpManager;
 import es.gob.afirma.core.misc.Base64;
-import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
-import es.gob.afirma.signers.cades.AOCAdESSigner;
+import es.gob.afirma.core.signers.AOSignerFactory;
 
 /** Actividad dedicada a la firma de los datos recibidos en la entrada mediante un certificado
  * del almac&eacute;n central seleccionado por el usuario. */
-public final class SignDataActivity extends Activity implements KeyChainAliasCallback {
+public final class SignDataActivity extends FragmentActivity implements KeyChainAliasCallback {
 
 	private static final String ES_GOB_AFIRMA = "es.gob.afirma"; //$NON-NLS-1$
 
@@ -68,12 +68,6 @@ public final class SignDataActivity extends Activity implements KeyChainAliasCal
 
 	/** Par&aacute;metro de entrada con las opciones de configuraci&oacute;n de la firma. */
 	private static final String PROPERTIES_PARAM = "properties"; //$NON-NLS-1$
-
-	/** Formato de firma por defecto. */
-	private static final String DEFAULT_SIGNATURE_FORMAT = AOSignConstants.SIGN_FORMAT_CADES;
-
-	/** Algoritmo de firma por defecto. */
-	private static final String DEFAULT_SIGNATURE_ALGORITHM = AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA;
 
 	/** N&uacute;mero m&aacute;ximo de caracteres permitidos para el identificador de sesi&oacute;n de la firma. */
 	private static final int MAX_ID_LENGTH = 20;
@@ -109,8 +103,8 @@ public final class SignDataActivity extends Activity implements KeyChainAliasCal
 
             this.parameters = UriParser.parser(getIntent().getData().toString());
 
+            // Si no se cumplen los requisitos de entrada, suspendemos la ejecucion
             if (!checkParameters(this.parameters)) {
-            	finish();
             	return;
             }
 
@@ -201,6 +195,12 @@ public final class SignDataActivity extends Activity implements KeyChainAliasCal
 			showMessage(getString(R.string.error_bad_params));
 			return false;
     	}
+    	if (servletUrl.toString().indexOf('?') != -1 || servletUrl.toString().indexOf('=') != -1) {
+			Log.e(ES_GOB_AFIRMA, "Se han encontrado parametros en la URL del servlet"); //$NON-NLS-1$
+			showMessage(getString(R.string.error_bad_params));
+			return false;
+    	}
+
 
 		// Comprobamos que se nos hayan indicado los datos
     	if (!params.containsKey(DATA_PARAM)) {
@@ -245,7 +245,7 @@ public final class SignDataActivity extends Activity implements KeyChainAliasCal
     	if (alias == null) {
             Log.e(ES_GOB_AFIRMA, "No se selecciono ningun certificado de firma"); //$NON-NLS-1$
             launchError(ErrorManager.ERROR_NO_CERT_SELECTED);
-            finish();
+            close();
             return;
     	}
 
@@ -262,33 +262,29 @@ public final class SignDataActivity extends Activity implements KeyChainAliasCal
 			} else {
         		launchError(ErrorManager.ERROR_PKE);
         	}
-            finish();
+            close();
             return;
         }
         catch (final Exception e) {
             Log.e(ES_GOB_AFIRMA, e.toString());
             launchError(ErrorManager.ERROR_PKE);
-            finish();
+            close();
             return;
         }
         // Cuando se instala el certificado desde el dialogo de seleccion, Android da a elegir certificado
         // en 2 ocasiones y en la segunda se produce un "java.lang.AssertionError". Se ignorara este error.
         catch (final Error e) {
         	Log.e(ES_GOB_AFIRMA, e.toString());
-            finish();
+            close();
             return;
 		}
 
         // Creacion del firmador
-        final AOSigner signer;
-        final String format = getParameter(FORMAT_PARAM, DEFAULT_SIGNATURE_FORMAT);
-        if (AOSignConstants.SIGN_FORMAT_CADES.equals(format)) {
-            signer = new AOCAdESSigner();
-        }
-        else {
-            Log.e(ES_GOB_AFIRMA, "No existe el formato: " + format); //$NON-NLS-1$
+        final AOSigner signer = AOSignerFactory.getSigner(getParameter(FORMAT_PARAM));
+        if (signer == null) {
+            Log.e(ES_GOB_AFIRMA, "No existe el formato: " + getParameter(FORMAT_PARAM)); //$NON-NLS-1$
             launchError(ErrorManager.ERROR_NOT_SUPPORTED_FORMAT);
-            finish();
+            close();
             return;
         }
 
@@ -297,7 +293,7 @@ public final class SignDataActivity extends Activity implements KeyChainAliasCal
         try {
             sign = signer.sign(
         		Base64.decode(URLDecoder.decode(getParameter(DATA_PARAM), DEFAULT_URL_ENCODING)),
-            	getParameter(ALGORITHM_PARAM, DEFAULT_SIGNATURE_ALGORITHM),
+            	getParameter(ALGORITHM_PARAM),
                 pke,
                 SignDataActivity.parseB64Properties(getParameter(PROPERTIES_PARAM))
             );
@@ -305,7 +301,7 @@ public final class SignDataActivity extends Activity implements KeyChainAliasCal
         catch (final Exception e) {
             Log.e(ES_GOB_AFIRMA, e.getMessage());
             launchError(ErrorManager.ERROR_SIGNING);
-            finish();
+            close();
             return;
         }
 
@@ -317,20 +313,20 @@ public final class SignDataActivity extends Activity implements KeyChainAliasCal
         catch (final IOException e) {
         	Log.e(ES_GOB_AFIRMA, e.getMessage());
         	launchError(ErrorManager.ERROR_CODING_BASE64);
-        	finish();
+        	close();
         	return;
         }
         catch (final GeneralSecurityException e) {
         	Log.e(ES_GOB_AFIRMA, e.getMessage());
         	launchError(ErrorManager.ERROR_CIPHERING);
-        	finish();
+        	close();
         	return;
         }
 
         sendData(data);
 
         Log.i(ES_GOB_AFIRMA, "Firma entregada satisfactoriamente."); //$NON-NLS-1$
-        finish();
+        close();
     }
 
     /**
@@ -374,13 +370,13 @@ public final class SignDataActivity extends Activity implements KeyChainAliasCal
             if (!new String(result).trim().equals("OK")) { //$NON-NLS-1$
             	Log.e(ES_GOB_AFIRMA, "No se pudo entregar la firma al servlet: " + new String(result)); //$NON-NLS-1$
             	showToast(getString(R.string.error_server_error));
-            	finish();
+            	close();
             }
         }
         catch (final IOException e) {
         	Log.e(ES_GOB_AFIRMA, "No se pudo conectar con el servidor intermedio: " + e); //$NON-NLS-1$
         	showToast(getString(R.string.error_server_connect));
-        	finish();
+        	close();
         }
     }
 
@@ -417,7 +413,7 @@ public final class SignDataActivity extends Activity implements KeyChainAliasCal
      */
     private void showMessage(final String message) {
     	final ErrorDialog dialog = new ErrorDialog(message);
-    	dialog.show(getFragmentManager(), "ErrorDialog"); //$NON-NLS-1$
+    	dialog.show(getSupportFragmentManager(), "ErrorDialog"); //$NON-NLS-1$
     }
 
     /**
@@ -463,6 +459,17 @@ public final class SignDataActivity extends Activity implements KeyChainAliasCal
     }
 
     /**
+     * Cierra la aplicaci&oacute;n liberando los recursos reservados.
+     */
+    private void close() {
+    	if (this.parameters != null) {
+    		this.parameters.clear();
+    		this.parameters = null;
+    	}
+    	finish();
+    }
+
+    /**
      * Di&aacute;logo modal con el que mostrar al usuario los errores que deberer&iacute;a gestionar con
      * el integrador del servicio.
      */
@@ -474,7 +481,7 @@ public final class SignDataActivity extends Activity implements KeyChainAliasCal
     	 * Construye un di&aacute;logo de error.
     	 * @param message Mensaje que mostrar al usuario.
     	 */
-    	public ErrorDialog(final String message) {
+    	ErrorDialog(final String message) {
 			this.message = message;
 		}
 
@@ -483,7 +490,12 @@ public final class SignDataActivity extends Activity implements KeyChainAliasCal
 
     		final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
     		dialogBuilder.setMessage(this.message)
-    			.setPositiveButton(R.string.ok, null);
+    			.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(final DialogInterface dialog, final int which) {
+						close();
+					}
+				});
 
     		return dialogBuilder.create();
     	}
