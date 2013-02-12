@@ -11,7 +11,7 @@
         <ImageView
             android:id="@+id/imageView1"
 			android:layout_width="wrap_content"
-            android:layout_height="80dp"
+            android:layout_height="40dp"
             android:layout_gravity="center"
             android:layout_margin="5dp"
             android:adjustViewBounds="true"
@@ -28,7 +28,8 @@
         android:layout_margin="5dp"
         android:layout_weight="0.91"
         android:padding="10dp"
-        android:text="@string/presentation_text" />
+        android:text="@string/presentation_text"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
 <!--
     <CheckBox
         android:id="@+id/checkBox1"
@@ -73,7 +74,6 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_margin="5dp"
         android:gravity="center"
         android:text="@string/disclaimer" />
 
