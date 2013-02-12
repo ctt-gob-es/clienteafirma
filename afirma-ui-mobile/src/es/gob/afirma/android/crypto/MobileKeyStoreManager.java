@@ -31,7 +31,7 @@ public interface MobileKeyStoreManager {
     public static class KeySelectedEvent {
 
         private final PrivateKeyEntry pke;
-        private final Exception e;
+        private final Throwable e;
 
         /** Construye un evento de selecci&oacute;n de una entrada que apunta a una clave privada.
          * @param p Entrada que apunta a una clave privada seleccionada */
@@ -42,15 +42,15 @@ public interface MobileKeyStoreManager {
 
         /** Construye un evento de selecci&oacute;n falida de una entrada que apunta a una clave privada.
          * @param t Causa del fallo en la selecci&oacute;n */
-        public KeySelectedEvent(final Exception t) {
+        public KeySelectedEvent(final Throwable t) {
             this.pke = null;
             this.e = t;
         }
 
         /** Obtiene la entrada que apunta a una clave privada asociada al evento.
          * @return Entrada que apunta a una clave privada asiciada al evento
-         * @throws Exception Si la obtenci&oacute;n de la clave privada produjo algun error */
-        public PrivateKeyEntry getPrivateKeyEntry() throws Exception {
+         * @throws Throwable Si la obtenci&oacute;n de la clave privada produjo algun error */
+        public PrivateKeyEntry getPrivateKeyEntry() throws Throwable {
             if (this.e != null) {
                 throw this.e;
             }

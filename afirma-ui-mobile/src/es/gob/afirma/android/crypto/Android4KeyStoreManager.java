@@ -1,6 +1,7 @@
 package es.gob.afirma.android.crypto;
 
 import java.security.KeyStore.PrivateKeyEntry;
+import java.security.KeyStoreException;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -23,7 +24,8 @@ public final class Android4KeyStoreManager implements MobileKeyStoreManager {
      * @param act Actividad padre de la aplicaci&oacute;n padre */
     public Android4KeyStoreManager(final Activity act) {
         if (act == null) {
-            throw new IllegalArgumentException("Es encesaria una actividad padre para mostrar los dialogos de seleccion de certificado" //$NON-NLS-1$
+            throw new IllegalArgumentException(
+        		"Es necesaria una actividad padre para mostrar los dialogos de seleccion de certificado" //$NON-NLS-1$
             );
         }
         this.activity = act;
@@ -40,25 +42,30 @@ public final class Android4KeyStoreManager implements MobileKeyStoreManager {
 		        /** {@inheritDoc} */
 		        @Override
 		        public void alias(final String alias) {
-		            try {
-		                pksl.keySelected(
-	                		new KeySelectedEvent(
-                				new PrivateKeyEntry(
-            						KeyChain.getPrivateKey(
-        								Android4KeyStoreManager.this.getActivity(),
-		                                alias
-	                                ),
-		                            KeyChain.getCertificateChain(
-	                            		Android4KeyStoreManager.this.getActivity(),
-		                                alias
+		        	if (alias != null) {
+			            try {
+			                pksl.keySelected(
+		                		new KeySelectedEvent(
+	                				new PrivateKeyEntry(
+	            						KeyChain.getPrivateKey(
+	        								Android4KeyStoreManager.this.getActivity(),
+			                                alias
+		                                ),
+			                            KeyChain.getCertificateChain(
+		                            		Android4KeyStoreManager.this.getActivity(),
+			                                alias
+		                                )
 	                                )
-                                )
-            				)
-                		);
-		            }
-		            catch (final Exception e) {
-		                pksl.keySelected(new KeySelectedEvent(e));
-		            }
+	            				)
+	                		);
+			            }
+			            catch (final Throwable e) {
+			                pksl.keySelected(new KeySelectedEvent(e));
+			            }
+		        	}
+		        	else {
+		        		pksl.keySelected(new KeySelectedEvent(new KeyStoreException("El usuario no selecciono un certificado")));
+		        	}
 		        }
     		},
             new String[] { "RSA" }, // KeyTypes //$NON-NLS-1$

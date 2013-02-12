@@ -13,14 +13,17 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
-import android.security.KeyChain;
-import android.security.KeyChainAliasCallback;
 import android.security.KeyChainException;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.widget.Toast;
 import es.gob.afirma.android.crypto.DesCipher;
+import es.gob.afirma.android.crypto.LoadKeyStoreManagerTask;
+import es.gob.afirma.android.crypto.MobileKeyStoreManager;
+import es.gob.afirma.android.crypto.LoadKeyStoreManagerTask.KeystoreManagerListener;
+import es.gob.afirma.android.crypto.MobileKeyStoreManager.KeySelectedEvent;
+import es.gob.afirma.android.crypto.MobileKeyStoreManager.PrivateKeySelectionListener;
 import es.gob.afirma.android.network.UriParser;
 import es.gob.afirma.android.network.UriParser.ParameterException;
 import es.gob.afirma.android.network.UriParser.UrlParameters;
@@ -31,7 +34,8 @@ import es.gob.afirma.signers.cades.AOCAdESSigner;
 
 /** Actividad dedicada a la firma de los datos recibidos en la entrada mediante un certificado
  * del almac&eacute;n central seleccionado por el usuario. */
-public final class SignDataActivity extends FragmentActivity implements KeyChainAliasCallback {
+public final class SignDataActivity extends FragmentActivity implements
+	KeystoreManagerListener, PrivateKeySelectionListener {
 
 	private static final String ES_GOB_AFIRMA = "es.gob.afirma"; //$NON-NLS-1$
 
@@ -71,60 +75,11 @@ public final class SignDataActivity extends FragmentActivity implements KeyChain
             	return;
 			}
 
-            KeyChain.choosePrivateKeyAlias(
-        		this,
-        		this,
-        		new String[] { "RSA" }, //$NON-NLS-1$ // KeyTypes
-        		null, // Issuers
-        		null, // Host
-        		-1, // Port
-        		null // Alias
-    		);
+            new LoadKeyStoreManagerTask(this, this).execute();
         }
     }
 
-    @Override
-    public void alias(final String alias) {
-
-    	Log.i(ES_GOB_AFIRMA, "Se ha seleccionado el certificado: " + alias); //$NON-NLS-1$
-
-    	// Si no se selecciono ningun certificado, se envia el error
-    	if (alias == null) {
-            Log.e(ES_GOB_AFIRMA, "No se selecciono ningun certificado de firma"); //$NON-NLS-1$
-            launchError(ErrorManager.ERROR_NO_CERT_SELECTED);
-            finish();
-            return;
-    	}
-
-        // Reanudamos aqui la operacion de firma
-        // Recuperacion de la clave privada de firma
-    	final PrivateKeyEntry pke;
-        try {
-            pke = new PrivateKeyEntry(KeyChain.getPrivateKey(this, alias), KeyChain.getCertificateChain(this, alias));
-        }
-        catch (final KeyChainException e) {
-            Log.e(ES_GOB_AFIRMA, e.toString());
-            if ("4.1.1".equals(Build.VERSION.RELEASE) || "4.1.0".equals(Build.VERSION.RELEASE) || "4.1".equals(Build.VERSION.RELEASE)) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				launchError(ErrorManager.ERROR_PKE_ANDROID_4_1);
-			} else {
-        		launchError(ErrorManager.ERROR_PKE);
-        	}
-            finish();
-            return;
-        }
-        catch (final Exception e) {
-            Log.e(ES_GOB_AFIRMA, e.toString());
-            launchError(ErrorManager.ERROR_PKE);
-            finish();
-            return;
-        }
-        // Cuando se instala el certificado desde el dialogo de seleccion, Android da a elegir certificado
-        // en 2 ocasiones y en la segunda se produce un "java.lang.AssertionError". Se ignorara este error.
-        catch (final Error e) {
-        	Log.e(ES_GOB_AFIRMA, e.toString());
-            finish();
-            return;
-		}
+    private void doSign(final PrivateKeyEntry pke) {
 
         // Creacion del firmador
         // Por ahora instanciamos directamente el CAdES
@@ -288,4 +243,43 @@ public final class SignDataActivity extends FragmentActivity implements KeyChain
     		return dialogBuilder.create();
     	}
     }
+
+	@Override
+	public void setKeyStoreManager(final MobileKeyStoreManager msm) {
+		msm.getPrivateKeyEntryAsynchronously(this);
+	}
+
+	@Override
+	public void keySelected(final KeySelectedEvent kse) {
+
+		final PrivateKeyEntry pke;
+		try {
+			pke = kse.getPrivateKeyEntry();
+		}
+		catch (final KeyChainException e) {
+			Log.e(ES_GOB_AFIRMA, e.toString());
+			if ("4.1.1".equals(Build.VERSION.RELEASE) || "4.1.0".equals(Build.VERSION.RELEASE) || "4.1".equals(Build.VERSION.RELEASE)) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				launchError(ErrorManager.ERROR_PKE_ANDROID_4_1);
+			} else {
+				launchError(ErrorManager.ERROR_PKE);
+			}
+			finish();
+			return;
+		}
+		catch (final Exception e) {
+			Log.e(ES_GOB_AFIRMA, "Error al recuperar la clave: " + e); //$NON-NLS-1$
+			launchError(ErrorManager.ERROR_PKE);
+			finish();
+			return;
+		}
+		// Cuando se instala el certificado desde el dialogo de seleccion, Android da a elegir certificado
+		// en 2 ocasiones y en la segunda se produce un "java.lang.AssertionError". Se ignorara este error.
+		catch (final Throwable e) {
+			Log.e(ES_GOB_AFIRMA, e.toString());
+			finish();
+			return;
+		}
+
+		doSign(pke);
+	}
 }
