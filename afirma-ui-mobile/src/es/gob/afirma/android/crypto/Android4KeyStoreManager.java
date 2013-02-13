@@ -64,7 +64,7 @@ public final class Android4KeyStoreManager implements MobileKeyStoreManager {
 			            }
 		        	}
 		        	else {
-		        		pksl.keySelected(new KeySelectedEvent(new KeyStoreException("El usuario no selecciono un certificado")));
+		        		pksl.keySelected(new KeySelectedEvent(new KeyStoreException("El usuario no selecciono un certificado"))); //$NON-NLS-1$
 		        	}
 		        }
     		},
