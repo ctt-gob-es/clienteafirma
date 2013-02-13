@@ -182,7 +182,9 @@ public final class KeyStoreUtilities {
 
                     	// Comprobaciones especifica para la compatibilidad con el proveedor de DNIe
                     	if ("es.gob.jmulticard.ui.passwordcallback.CancelledOperationException".equals(e.getClass().getName()) || //$NON-NLS-1$
-                    		"es.gob.jmulticard.card.AuthenticationModeLockedException".equals(e.getClass().getName())) { //$NON-NLS-1$
+                    		"es.gob.jmulticard.card.AuthenticationModeLockedException".equals(e.getClass().getName()) || //$NON-NLS-1$
+                    		"es.gob.jmulticard.jse.provider.BadPasswordProviderException".equals(e.getClass().getName()) || //$NON-NLS-1$
+                    		"es.gob.jmulticard.jse.provider.SignatureAuthException".equals(e.getClass().getName())) { //$NON-NLS-1$
                     			throw e;
                     	}
                         LOGGER.warning("No se ha inicializado el KeyStore indicado: " + e); //$NON-NLS-1$
