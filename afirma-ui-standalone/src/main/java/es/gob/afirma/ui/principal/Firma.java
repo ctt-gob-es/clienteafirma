@@ -452,11 +452,27 @@ final class Firma extends JPanel {
             }
             catch (final Exception e) {
                 LOGGER.severe("Error al generar la firma electronica: " + e); //$NON-NLS-1$
-                CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
-                                               true,
-                                               Messages.getString("Firma.msg.error.generar.firma"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+                CustomDialog.showMessageDialog(
+            		SwingUtilities.getRoot(this),
+                    true,
+                    Messages.getString("Firma.msg.error.generar.firma"), //$NON-NLS-1$
+                    Messages.getString("error"), //$NON-NLS-1$
+                    JOptionPane.ERROR_MESSAGE
+                );
                 return;
             }
+            catch(final OutOfMemoryError e) {
+                LOGGER.severe("El fichero es demasiado grande: " + e); //$NON-NLS-1$
+                CustomDialog.showMessageDialog(
+            		SwingUtilities.getRoot(this),
+                    true,
+                    Messages.getString("Firma.msg.error.memory"), //$NON-NLS-1$
+                    Messages.getString("error"), //$NON-NLS-1$
+                    JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+
 
             // Si el proceso de firma devuelve una firma nula o vacia, lanzamos una excepcion
             if (signedData == null || signedData.length == 0) {
