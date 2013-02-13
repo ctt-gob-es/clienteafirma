@@ -1,8 +1,9 @@
 package es.gob.afirma.miniapplet;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.util.Locale;
 import java.util.Properties;
+import java.util.ResourceBundle;
 
 import es.gob.afirma.core.misc.AOUtil;
 
@@ -23,12 +24,6 @@ import es.gob.afirma.core.misc.AOUtil;
  * @author Carlos Gamuci
  */
 final class PolicyPropertiesManager {
-    
-    private PolicyPropertiesManager() {
-        // No permitimos la instanciacion
-    }
-
-	private static final String POLICIES_FILE = "policy.properties"; //$NON-NLS-1$
 
 	/** Identificador de la pol&iacute;tica de firma de la AGE. */
 	static final String POLICY_ID_AGE = "FirmaAGE"; //$NON-NLS-1$
@@ -49,7 +44,15 @@ final class PolicyPropertiesManager {
 
 	static final String FORMAT_PADES = "PAdES"; //$NON-NLS-1$
 
-	private static Properties config = null;
+	private static final String BUNDLE_NAME = "policy"; //$NON-NLS-1$
+
+	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle
+			.getBundle(BUNDLE_NAME, Locale.getDefault(), AOUtil.getCleanClassLoader());
+
+    private PolicyPropertiesManager() {
+        // No permitimos la instanciacion
+    }
+
 
 	/**
 	 * Establece las propiedades asociadas a una pol&iacute;tica de firma determinada por un identificador
@@ -64,9 +67,6 @@ final class PolicyPropertiesManager {
 	 */
 	static void setProperties(final Properties prop, final String policyId, final String format) throws IOException {
 
-		if (config == null) {
-			loadConfig();
-		}
 		String value = getProperty(policyId, PROPERTY_POLICY_IDENTIFIER, format);
 		if (value != null) {
 			prop.setProperty(PROPERTY_POLICY_IDENTIFIER, value);
@@ -107,41 +107,25 @@ final class PolicyPropertiesManager {
 
 			if (format != null) {
 				key = id + "." + property + "." + format; //$NON-NLS-1$ //$NON-NLS-2$
-				if (config.containsKey(key)) {
-					return config.getProperty(key);
+				if (RESOURCE_BUNDLE.containsKey(key)) {
+					return RESOURCE_BUNDLE.getString(key);
 				}
 			}
 			key = id + "." + property; //$NON-NLS-1$
-			if (config.containsKey(key)) {
-				return config.getProperty(key);
+			if (RESOURCE_BUNDLE.containsKey(key)) {
+				return RESOURCE_BUNDLE.getString(key);
 			}
 		}
 		if (format != null) {
 			key = property + "." + format; //$NON-NLS-1$
-			if (config.containsKey(key)) {
-				return config.getProperty(key);
+			if (RESOURCE_BUNDLE.containsKey(key)) {
+				return RESOURCE_BUNDLE.getString(key);
 			}
 		}
 		key = property;
-		if (config.containsKey(key)) {
-			return config.getProperty(key);
+		if (RESOURCE_BUNDLE.containsKey(key)) {
+			return RESOURCE_BUNDLE.getString(key);
 		}
 		return null;
 	}
-
-	/**
-	 * Carga las propiedades de las pol&iacute;ticas de firma configuradas.
-	 * @throws IOException Cuando no se encuentra o no puede leerse el fichero de propiedades.
-	 */
-	private static void loadConfig() throws IOException {
-		config = new Properties();
-
-		final InputStream is = AOUtil.getCleanClassLoader().getResourceAsStream(POLICIES_FILE);
-		if (is == null) {
-			throw new IOException("No se encontra el fichero con las propiedades de las politicas de firma: " + POLICIES_FILE); //$NON-NLS-1$
-		}
-		config.load(is);
-		is.close();
-	}
-
 }
