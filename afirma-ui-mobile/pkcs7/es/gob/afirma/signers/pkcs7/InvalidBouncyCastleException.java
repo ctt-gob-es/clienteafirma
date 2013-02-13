@@ -14,9 +14,10 @@ public class InvalidBouncyCastleException extends InvalidLibraryException {
 
 	/** Crea una instancia de la excepci&oacute;n.
 	 * @param expected Versi&oacute;n esperada de BouncyCastle
-	 * @param found Versi&oacute;n encontrada (actual) de BouncyCastle */
-	public InvalidBouncyCastleException(final String expected, final String found) {
-		super("Se necesitaba BouncyCastle version " + expected + ", pero se encontro la version " + found); //$NON-NLS-1$ //$NON-NLS-2$
+	 * @param found Versi&oacute;n encontrada (actual) de BouncyCastle
+	 * @param e Excepci&oacute;n original */
+	public InvalidBouncyCastleException(final String expected, final String found, final Throwable e) {
+		super("Se necesitaba BouncyCastle version " + expected + ", pero se encontro la version " + found, e); //$NON-NLS-1$ //$NON-NLS-2$
 		this.exp = expected;
 		this.fnd = found;
 	}
