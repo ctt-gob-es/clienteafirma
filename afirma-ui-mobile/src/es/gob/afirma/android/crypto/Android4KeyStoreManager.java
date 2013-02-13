@@ -5,7 +5,6 @@ import java.security.KeyStoreException;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.Intent;
 import android.security.KeyChain;
 import android.security.KeyChainAliasCallback;
 
@@ -76,14 +75,4 @@ public final class Android4KeyStoreManager implements MobileKeyStoreManager {
         );
     }
 
-    /** Importa un certificado al sistema (o al almac&eacute;n particular de Afirma si el sistema carece de un
-     * almac&eacute;n central accesible) desde un fichero PCKS#12.
-     * @param pfx Fichero PKCS#12 / Personal File Exchange
-     * @param pwc Se ignora, el gestor central de Android se encarga de solicitar las contrase&ntilde;as si es necesario */
-    @Override
-    public void importCertificateFromPkcs12(final byte[] pfx, final CustomizablePasswordCallback pwc) {
-        final Intent intent = KeyChain.createInstallIntent();
-        intent.putExtra(KeyChain.EXTRA_PKCS12, pfx);
-        this.activity.startActivity(intent);
-    }
 }

@@ -1,7 +1,6 @@
 package es.gob.afirma.android.crypto;
 
 import java.security.KeyStore.PrivateKeyEntry;
-import java.security.KeyStoreException;
 
 
 /** Gestor simple de claves y certificados para dispositivos m&oacute;viles.
@@ -11,13 +10,6 @@ public interface MobileKeyStoreManager {
     /** Inicia un proceso as&iacute;ncrono de selecci&oacute;n de una entrada que apunta a una clave privada.
      * @param e Clase a la que hay que notificar cuando se complete la selecci&oacute;n */
     void getPrivateKeyEntryAsynchronously(final PrivateKeySelectionListener e);
-
-    /** Importa un certificado al sistema (o al almac&eacute;n particular de Afirma si el sistema carece de un
-     * almac&eacute;n central accesible) desde un fichero PCKS#12.
-     * @param pfx Fichero PKCS#12 / Personal File Exchange
-     * @param pwc Callback para solicitar las contrase&ntilde;as
-     * @throws KeyStoreException Cuando ocurre algun error durante la importaci&oacute;n */
-    void importCertificateFromPkcs12(final byte[] pfx, CustomizablePasswordCallback pwc) throws KeyStoreException;
 
     /** Interfaz para clases que esperen una selecci&oacute;n as&iacute;ncrona de una clave privada. */
     public interface PrivateKeySelectionListener {

@@ -11,10 +11,10 @@ import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
+import android.security.KeyChain;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
-import es.gob.afirma.android.crypto.Android4KeyStoreManager;
 import es.gob.afirma.android.gui.FileArrayAdapter;
 import es.gob.afirma.android.gui.Option;
 
@@ -100,7 +100,9 @@ public final class CertChooserActivity extends ListActivity {
     		Toast.makeText(this, getString(R.string.cert_chooser_read_error), Toast.LENGTH_LONG).show();
     		return;
     	}
-        new Android4KeyStoreManager(this).importCertificateFromPkcs12(data, null);
+        final Intent intent = KeyChain.createInstallIntent();
+        intent.putExtra(KeyChain.EXTRA_PKCS12, data);
+        startActivity(intent);
         finish();
     }
 }
