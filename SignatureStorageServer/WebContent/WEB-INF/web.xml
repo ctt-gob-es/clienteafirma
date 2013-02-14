@@ -16,6 +16,6 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>StorageService</servlet-name>
-    <url-pattern>/storage</url-pattern>
+    <url-pattern>/StorageService</url-pattern>
   </servlet-mapping>
 </web-app>
