@@ -16,6 +16,6 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>RetrieveService</servlet-name>
-    <url-pattern>/retrieve</url-pattern>
+    <url-pattern>/RetrieveService</url-pattern>
   </servlet-mapping>
 </web-app>
