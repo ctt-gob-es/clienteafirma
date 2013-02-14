@@ -25,7 +25,7 @@ public final class KeyStoreManagerFactory {
 //			final Provider provider = AETProvider.getInstance(providerConfiguration, activity.getApplicationContext());
 //			Security.addProvider(provider);
 //			final KeyStore ks = KeyStore.getInstance(AET_PKCS11_STORE, provider);
-//			ks.load(null, "rock2048".toCharArray());
+//			ks.load(null, "pin".toCharArray());
 //			final Enumeration<String> aliases = ks.aliases();
 //			while (aliases.hasMoreElements()) {
 //				Log.i(ES_GOB_AFIRMA, aliases.nextElement());
