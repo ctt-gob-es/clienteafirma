@@ -338,7 +338,7 @@ public class PdfPKCS7 {
         this.basicResp = null;
         boolean ret = false;
         while (true) {
-            if ((seq.getObjectAt(0) instanceof DERObjectIdentifier)
+            if (seq.getObjectAt(0) instanceof DERObjectIdentifier
                 && ((DERObjectIdentifier)seq.getObjectAt(0)).getId().equals(OCSPObjectIdentifiers.id_pkix_ocsp_basic.getId())) {
                 break;
             }
@@ -500,7 +500,7 @@ public class PdfPKCS7 {
             }
             this.digestEncryptionAlgorithm = ((DERObjectIdentifier)((ASN1Sequence)signerInfo.getObjectAt(next++)).getObjectAt(0)).getId();
             this.digest = ((DEROctetString)signerInfo.getObjectAt(next++)).getOctets();
-            if (next < signerInfo.size() && (signerInfo.getObjectAt(next) instanceof DERTaggedObject)) {
+            if (next < signerInfo.size() && signerInfo.getObjectAt(next) instanceof DERTaggedObject) {
                 final DERTaggedObject taggedObject = (DERTaggedObject) signerInfo.getObjectAt(next);
                 final ASN1Set unat = ASN1Set.getInstance(taggedObject, false);
                 final AttributeTable attble = new AttributeTable(unat);
@@ -643,7 +643,7 @@ public class PdfPKCS7 {
                 final byte msd[] = this.messageDigest.digest();
                 this.messageDigest.update(msd);
             }
-            this.verifyResult = (Arrays.equals(this.messageDigest.digest(), this.digestAttr) && this.sig.verify(this.digest));
+            this.verifyResult = Arrays.equals(this.messageDigest.digest(), this.digestAttr) && this.sig.verify(this.digest);
         }
         else {
             if (this.RSAdata != null) {
@@ -998,7 +998,7 @@ public class PdfPKCS7 {
                 if ( AccessDescription.size() != 2 ) {
                     continue;
                 } else {
-                    if ((AccessDescription.getObjectAt(0) instanceof DERObjectIdentifier) && ((DERObjectIdentifier)AccessDescription.getObjectAt(0)).getId().equals("1.3.6.1.5.5.7.48.1")) {
+                    if (AccessDescription.getObjectAt(0) instanceof DERObjectIdentifier && ((DERObjectIdentifier)AccessDescription.getObjectAt(0)).getId().equals("1.3.6.1.5.5.7.48.1")) {
                         final String AccessLocation =  getStringFromGeneralName((ASN1Primitive)AccessDescription.getObjectAt(1));
                         if ( AccessLocation == null ) {
                             return "" ;
@@ -1701,7 +1701,7 @@ public class PdfPKCS7 {
         }
 
         public boolean hasMoreTokens() {
-            return (this.index != this.oid.length());
+            return this.index != this.oid.length();
         }
 
         public String nextToken() {
