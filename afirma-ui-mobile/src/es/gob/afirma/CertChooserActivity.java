@@ -67,7 +67,7 @@ public final class CertChooserActivity extends ListActivity {
         Collections.sort(dir);
         Collections.sort(fls);
         dir.addAll(fls);
-        if (!f.getName().equalsIgnoreCase("sdcard")) { //$NON-NLS-1$
+        if (!f.getName().equalsIgnoreCase(Environment.getExternalStorageDirectory().getName())) {
             dir.add(0, new Option("..", getString(R.string.cert_chooser_directorio_padre), f.getParent())); //$NON-NLS-1$
         }
 
