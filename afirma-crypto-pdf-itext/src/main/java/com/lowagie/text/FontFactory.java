@@ -179,12 +179,6 @@ public final class FontFactory {
         return getFont(fontname, defaultEncoding, defaultEmbedding, size, style, color);
     }
 
-    /**
-     * Gets the font factory implementation.
-     * @return the font factory implementation
-     */
-    public static FontFactoryImp getFontImp() {
-        return fontImp;
-    }
+
 
 }

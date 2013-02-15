@@ -51,7 +51,8 @@ package com.lowagie.text.pdf;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <CODE>PdfName</CODE> is an object that can be used as a name in a PDF-file.
@@ -73,180 +74,125 @@ import java.util.*;
 
 public class PdfName extends PdfObject implements Comparable{
 
-    // CLASS CONSTANTS (a variety of standard names used in PDF))
-    /**
-     * A name.
-     * @since 2.1.6
-     */
-    public static final PdfName _3D = new PdfName("3D");
+
     /** A name */
     public static final PdfName A = new PdfName("A");
     /** A name */
-    public static final PdfName AA = new PdfName("AA");
+    static final PdfName AA = new PdfName("AA");
     /**
      * A name
      * @since 2.1.5 renamed from ABSOLUTECALORIMETRIC
      */
     public static final PdfName ABSOLUTECOLORIMETRIC = new PdfName("AbsoluteColorimetric");
     /** A name */
-    public static final PdfName AC = new PdfName("AC");
+    static final PdfName AC = new PdfName("AC");
     /** A name */
-    public static final PdfName ACROFORM = new PdfName("AcroForm");
-    /** A name */
-    public static final PdfName ACTION = new PdfName("Action");
+    static final PdfName ACROFORM = new PdfName("AcroForm");
+
+
     /**
      * A name.
      * @since 2.1.6
      */
-    public static final PdfName ACTIVATION = new PdfName("Activation");
-    /**
-     * A name.
-     * @since 2.1.6
-     */
-    public static final PdfName ADBE = new PdfName("ADBE");
-    /**
-     * a name used in PDF structure
-     * @since 2.1.6
-     */
-    public static final PdfName ACTUALTEXT = new PdfName("ActualText");
+    static final PdfName ADBE = new PdfName("ADBE");
+
     /** A name */
     public static final PdfName ADBE_PKCS7_DETACHED = new PdfName("adbe.pkcs7.detached");
     /** A name */
-    public static final PdfName ADBE_PKCS7_S4 =new PdfName("adbe.pkcs7.s4");
+    static final PdfName ADBE_PKCS7_S4 =new PdfName("adbe.pkcs7.s4");
     /** A name */
-    public static final PdfName ADBE_PKCS7_S5 =new PdfName("adbe.pkcs7.s5");
+    static final PdfName ADBE_PKCS7_S5 =new PdfName("adbe.pkcs7.s5");
     /** A name */
-    public static final PdfName ADBE_PKCS7_SHA1 = new PdfName("adbe.pkcs7.sha1");
+    static final PdfName ADBE_PKCS7_SHA1 = new PdfName("adbe.pkcs7.sha1");
     /** A name */
-    public static final PdfName ADBE_X509_RSA_SHA1 = new PdfName("adbe.x509.rsa_sha1");
+    static final PdfName ADBE_X509_RSA_SHA1 = new PdfName("adbe.x509.rsa_sha1");
     /** A name */
     public static final PdfName ADOBE_PPKLITE = new PdfName("Adobe.PPKLite");
     /** A name */
-    public static final PdfName ADOBE_PPKMS = new PdfName("Adobe.PPKMS");
+    static final PdfName ADOBE_PPKMS = new PdfName("Adobe.PPKMS");
     /** A name */
-    public static final PdfName AESV2 = new PdfName("AESV2");
+    static final PdfName AESV2 = new PdfName("AESV2");
     /** A name */
-    public static final PdfName AIS = new PdfName("AIS");
+    static final PdfName AIS = new PdfName("AIS");
+
+
     /** A name */
-    public static final PdfName ALLPAGES = new PdfName("AllPages");
+    static final PdfName ALTERNATE = new PdfName("Alternate");
+
     /** A name */
-    public static final PdfName ALT = new PdfName("Alt");
+    static final PdfName ANNOT = new PdfName("Annot");
     /** A name */
-    public static final PdfName ALTERNATE = new PdfName("Alternate");
-    /**
-     * A name.
-     * @since 2.1.6
-     */
-    public static final PdfName ANIMATION = new PdfName("Animation");
+    static final PdfName ANNOTS = new PdfName("Annots");
     /** A name */
-    public static final PdfName ANNOT = new PdfName("Annot");
+    static final PdfName ANTIALIAS = new PdfName("AntiAlias");
     /** A name */
-    public static final PdfName ANNOTS = new PdfName("Annots");
-    /** A name */
-    public static final PdfName ANTIALIAS = new PdfName("AntiAlias");
-    /** A name */
-    public static final PdfName AP = new PdfName("AP");
+    static final PdfName AP = new PdfName("AP");
     /** A name */
     public static final PdfName APPDEFAULT = new PdfName("AppDefault");
-    /**
-     * A name
-     * @since 2.1.6
-     */
-    public static final PdfName ART = new PdfName("Art");
+
     /** A name */
     public static final PdfName ARTBOX = new PdfName("ArtBox");
     /** A name */
-    public static final PdfName ASCENT = new PdfName("Ascent");
+    static final PdfName ASCENT = new PdfName("Ascent");
     /** A name */
-    public static final PdfName AS = new PdfName("AS");
+    static final PdfName AS = new PdfName("AS");
+
+
+
+
     /** A name */
-    public static final PdfName ASCII85DECODE = new PdfName("ASCII85Decode");
-    /** A name */
-    public static final PdfName ASCIIHEXDECODE = new PdfName("ASCIIHexDecode");
-    /**
-     * A name.
-     * @since 2.1.6
-     */
-    public static final PdfName ASSET = new PdfName("Asset");
-    /**
-     * A name.
-     * @since 2.1.6
-     */
-    public static final PdfName ASSETS = new PdfName("Assets");
-    /** A name */
-    public static final PdfName AUTHEVENT = new PdfName("AuthEvent");
+    static final PdfName AUTHEVENT = new PdfName("AuthEvent");
     /** A name */
     public static final PdfName AUTHOR = new PdfName("Author");
     /** A name */
-    public static final PdfName B = new PdfName("B");
-    /**
-     * A name
-     * @since	2.1.6
-     */
-    public static final PdfName BACKGROUND = new PdfName("Background");
+    static final PdfName B = new PdfName("B");
+
     /** A name */
-    public static final PdfName BASEENCODING = new PdfName("BaseEncoding");
+    static final PdfName BASEENCODING = new PdfName("BaseEncoding");
     /** A name */
-    public static final PdfName BASEFONT = new PdfName("BaseFont");
+    static final PdfName BASEFONT = new PdfName("BaseFont");
     /**
      * A name
      * @since	2.1.6
      */
     public static final PdfName BASEVERSION = new PdfName("BaseVersion");
     /** A name */
-    public static final PdfName BBOX = new PdfName("BBox");
+    static final PdfName BBOX = new PdfName("BBox");
     /** A name */
-    public static final PdfName BC = new PdfName("BC");
+    static final PdfName BC = new PdfName("BC");
     /** A name */
-    public static final PdfName BG = new PdfName("BG");
-    /**
-     * A name
-     * @since 2.1.6
-     */
-    public static final PdfName BIBENTRY = new PdfName("BibEntry");
+    static final PdfName BG = new PdfName("BG");
+
     /** A name */
-    public static final PdfName BIGFIVE = new PdfName("BigFive");
-    /**
-     * A name.
-     * @since 2.1.6
-     */
-    public static final PdfName BINDING = new PdfName("Binding");
-    /**
-     * A name.
-     * @since 2.1.6
-     */
-    public static final PdfName BINDINGMATERIALNAME = new PdfName("BindingMaterialName");
+    static final PdfName BIGFIVE = new PdfName("BigFive");
+
+
     /** A name */
     public static final PdfName BITSPERCOMPONENT = new PdfName("BitsPerComponent");
     /** A name */
-    public static final PdfName BITSPERSAMPLE = new PdfName("BitsPerSample");
+    static final PdfName BITSPERSAMPLE = new PdfName("BitsPerSample");
     /** A name */
-    public static final PdfName BL = new PdfName("Bl");
+    static final PdfName BL = new PdfName("Bl");
     /** A name */
-    public static final PdfName BLACKIS1 = new PdfName("BlackIs1");
-    /** A name */
-    public static final PdfName BLACKPOINT = new PdfName("BlackPoint");
-    /**
-     * A name
-     * @since 2.1.6
-     */
-    public static final PdfName BLOCKQUOTE = new PdfName("BlockQuote");
+    static final PdfName BLACKIS1 = new PdfName("BlackIs1");
+
+
     /** A name */
     public static final PdfName BLEEDBOX = new PdfName("BleedBox");
     /** A name */
-    public static final PdfName BLINDS = new PdfName("Blinds");
+    static final PdfName BLINDS = new PdfName("Blinds");
     /** A name */
     public static final PdfName BM = new PdfName("BM");
     /** A name */
-    public static final PdfName BORDER = new PdfName("Border");
+    static final PdfName BORDER = new PdfName("Border");
     /** A name */
-    public static final PdfName BOUNDS = new PdfName("Bounds");
+    static final PdfName BOUNDS = new PdfName("Bounds");
     /** A name */
-    public static final PdfName BOX = new PdfName("Box");
+    static final PdfName BOX = new PdfName("Box");
     /** A name */
-    public static final PdfName BS = new PdfName("BS");
+    static final PdfName BS = new PdfName("BS");
     /** A name */
-    public static final PdfName BTN = new PdfName("Btn");
+    static final PdfName BTN = new PdfName("Btn");
     /** A name */
     public static final PdfName BYTERANGE = new PdfName("ByteRange");
     /** A name */
@@ -1055,7 +1001,7 @@ public class PdfName extends PdfObject implements Comparable{
      * @since 2.1.6
      */
     public static final PdfName OSCILLATING = new PdfName("Oscillating");
-    
+
     /** A name */
     public static final PdfName OUTLINES = new PdfName("Outlines");
     /** A name */
@@ -1503,7 +1449,7 @@ public class PdfName extends PdfObject implements Comparable{
     /** A name */
     public static final PdfName TK = new PdfName("TK");
     /** A name */
-    public static final PdfName TM = new PdfName("TM"); 
+    public static final PdfName TM = new PdfName("TM");
     /**
      * A name
      * @since 2.1.6
@@ -1732,19 +1678,18 @@ public class PdfName extends PdfObject implements Comparable{
      */
 
     static {
-        Field fields[] = PdfName.class.getDeclaredFields();
+        final Field fields[] = PdfName.class.getDeclaredFields();
         staticNames = new HashMap( fields.length );
         final int flags = Modifier.STATIC | Modifier.PUBLIC | Modifier.FINAL;
         try {
-            for (int fldIdx = 0; fldIdx < fields.length; ++fldIdx) {
-                Field curFld = fields[fldIdx];
+            for (final Field curFld : fields) {
                 if ((curFld.getModifiers() & flags) == flags &&
                     curFld.getType().equals( PdfName.class )) {
-                    PdfName name = (PdfName)curFld.get( null );
+                    final PdfName name = (PdfName)curFld.get( null );
                     staticNames.put( decodeName( name.toString() ), name );
                 }
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
         }
     }
@@ -1759,7 +1704,7 @@ public class PdfName extends PdfObject implements Comparable{
      *
      * @param name the new name
      */
-    public PdfName(String name) {
+    public PdfName(final String name) {
         this(name, true);
     }
 
@@ -1769,13 +1714,14 @@ public class PdfName extends PdfObject implements Comparable{
      * @param lengthCheck if <CODE>true</CODE> check the length validity,
      * if <CODE>false</CODE> the name can have any length
      */
-    public PdfName(String name, boolean lengthCheck) {
+    PdfName(final String name, final boolean lengthCheck) {
         super(PdfObject.NAME);
         // The minimum number of characters in a name is 0, the maximum is 127 (the '/' not included)
-        int length = name.length();
-        if (lengthCheck && length > 127)
-            throw new IllegalArgumentException("The name '" + name + "' is too long (" + length + " characters).");
-        bytes = encodeName(name);
+        final int length = name.length();
+        if (lengthCheck && length > 127) {
+			throw new IllegalArgumentException("The name '" + name + "' is too long (" + length + " characters).");
+		}
+        this.bytes = encodeName(name);
     }
 
     /**
@@ -1783,7 +1729,7 @@ public class PdfName extends PdfObject implements Comparable{
      *
      * @param bytes the byte representation of the name
      */
-    public PdfName(byte bytes[]) {
+    PdfName(final byte bytes[]) {
         super(PdfObject.NAME, bytes);
     }
 
@@ -1800,21 +1746,26 @@ public class PdfName extends PdfObject implements Comparable{
      * @throws ClassCastException if the specified object's type prevents it
      * from being compared to this Object.
      */
-    public int compareTo(Object object) {
-        PdfName name = (PdfName) object;
-        byte myBytes[] = bytes;
-        byte objBytes[] = name.bytes;
-        int len = Math.min(myBytes.length, objBytes.length);
+    @Override
+	public int compareTo(final Object object) {
+        final PdfName name = (PdfName) object;
+        final byte myBytes[] = this.bytes;
+        final byte objBytes[] = name.bytes;
+        final int len = Math.min(myBytes.length, objBytes.length);
         for(int i = 0; i < len; i++) {
-            if (myBytes[i] > objBytes[i])
-                return 1;
-            if (myBytes[i] < objBytes[i])
-                return -1;
+            if (myBytes[i] > objBytes[i]) {
+				return 1;
+			}
+            if (myBytes[i] < objBytes[i]) {
+				return -1;
+			}
         }
-        if (myBytes.length < objBytes.length)
-            return -1;
-        if (myBytes.length > objBytes.length)
-            return 1;
+        if (myBytes.length < objBytes.length) {
+			return -1;
+		}
+        if (myBytes.length > objBytes.length) {
+			return 1;
+		}
         return 0;
     }
 
@@ -1825,11 +1776,14 @@ public class PdfName extends PdfObject implements Comparable{
      * @return  <code>true</code> if this object is the same as the obj
      * argument; <code>false</code> otherwise.
      */
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj instanceof PdfName)
-            return compareTo(obj) == 0;
+    @Override
+	public boolean equals(final Object obj) {
+        if (this == obj) {
+			return true;
+		}
+        if (obj instanceof PdfName) {
+			return compareTo(obj) == 0;
+		}
         return false;
     }
 
@@ -1840,14 +1794,16 @@ public class PdfName extends PdfObject implements Comparable{
      *
      * @return  a hash code value for this object.
      */
-    public int hashCode() {
-        int h = hash;
+    @Override
+	public int hashCode() {
+        int h = this.hash;
         if (h == 0) {
             int ptr = 0;
-            int len = bytes.length;
-            for (int i = 0; i < len; i++)
-                h = 31*h + (bytes[ptr++] & 0xff);
-            hash = h;
+            final int len = this.bytes.length;
+            for (int i = 0; i < len; i++) {
+				h = 31*h + (this.bytes[ptr++] & 0xff);
+			}
+            this.hash = h;
         }
         return h;
     }
@@ -1859,12 +1815,12 @@ public class PdfName extends PdfObject implements Comparable{
      * @return the encoded name
      * @since	2.1.5
      */
-    public static byte[] encodeName(String name) {
-    	int length = name.length();
-    	ByteBuffer buf = new ByteBuffer(length + 20);
+    private static byte[] encodeName(final String name) {
+    	final int length = name.length();
+    	final ByteBuffer buf = new ByteBuffer(length + 20);
     	buf.append('/');
     	char c;
-    	char chars[] = name.toCharArray();
+    	final char chars[] = name.toCharArray();
     	for (int k = 0; k < length; k++) {
     		c = (char)(chars[k] & 0xff);
     		// Escape special characters
@@ -1885,12 +1841,13 @@ public class PdfName extends PdfObject implements Comparable{
     				buf.append(Integer.toString(c, 16));
     				break;
     			default:
-    				if (c >= 32 && c <= 126)
-    					buf.append(c);
-    				else {
+    				if (c >= 32 && c <= 126) {
+						buf.append(c);
+					} else {
     					buf.append('#');
-    					if (c < 16)
-    						buf.append('0');
+    					if (c < 16) {
+							buf.append('0');
+						}
     					buf.append(Integer.toString(c, 16));
     				}
     				break;
@@ -1905,22 +1862,22 @@ public class PdfName extends PdfObject implements Comparable{
      * @param name the name to decode
      * @return the decoded name
      */
-    public static String decodeName(String name) {
-        StringBuffer buf = new StringBuffer();
+    static String decodeName(final String name) {
+        final StringBuffer buf = new StringBuffer();
         try {
-            int len = name.length();
+            final int len = name.length();
             for (int k = 1; k < len; ++k) {
                 char c = name.charAt(k);
                 if (c == '#') {
-                	char c1 = name.charAt(k + 1);
-                	char c2 = name.charAt(k + 2);
+                	final char c1 = name.charAt(k + 1);
+                	final char c2 = name.charAt(k + 2);
                     c = (char)((PRTokeniser.getHex(c1) << 4) + PRTokeniser.getHex(c2));
                     k += 2;
                 }
                 buf.append(c);
             }
         }
-        catch (IndexOutOfBoundsException e) {
+        catch (final IndexOutOfBoundsException e) {
             // empty on purpose
         }
         return buf.toString();

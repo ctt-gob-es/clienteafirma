@@ -411,11 +411,7 @@ public class ElementTags {
 
 	/** a possible list attribute */
 	public static final String LOWERCASE = "lowercase";
-   /**
-    * a possible list attribute
-    * @since 2.1.3
-    */
-   public static final String FACE = "face";
+
 
    /** attribute of the image or iframe tag
     * @since 2.1.3

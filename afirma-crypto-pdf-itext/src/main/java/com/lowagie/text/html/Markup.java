@@ -65,7 +65,7 @@ public class Markup {
 	// HTML tags
 
 	/** The SPAN tag. */
-	public static final String HTML_TAG_SPAN = "span";
+	static final String HTML_TAG_SPAN = "span";
 
 	// HTML attributes
 
@@ -73,18 +73,16 @@ public class Markup {
 	public static final String HTML_ATTR_STYLE = "style";
 
 	/** attribute for specifying externally defined CSS class */
-	public static final String HTML_ATTR_CSS_CLASS = "class";
+	static final String HTML_ATTR_CSS_CLASS = "class";
 
-	/** The ID attribute. */
-	public static final String HTML_ATTR_CSS_ID = "id";
+
 
 	// HTML values
 
 	/** This is a possible value for the language attribute (SCRIPT tag). */
-	public static final String HTML_VALUE_JAVASCRIPT = "text/javascript";
+	static final String HTML_VALUE_JAVASCRIPT = "text/javascript";
 
-	/** This is a possible HTML attribute for the LINK tag. */
-	public static final String HTML_VALUE_CSS = "text/css";
+
 
 	// CSS keys
 
@@ -106,35 +104,12 @@ public class Markup {
 	/** the CSS tag for text decorations */
 	public static final String CSS_KEY_LINEHEIGHT = "line-height";
 
-	/** the CSS tag for the margin of an object */
-	public static final String CSS_KEY_MARGIN = "margin";
-
-	/** the CSS tag for the margin of an object */
-	public static final String CSS_KEY_MARGINLEFT = "margin-left";
-
-	/** the CSS tag for the margin of an object */
-	public static final String CSS_KEY_MARGINRIGHT = "margin-right";
-
-	/** the CSS tag for the margin of an object */
-	public static final String CSS_KEY_MARGINTOP = "margin-top";
-
-	/** the CSS tag for the margin of an object */
-	public static final String CSS_KEY_MARGINBOTTOM = "margin-bottom";
-
-	/** the CSS tag for the margin of an object */
-	public static final String CSS_KEY_PADDING = "padding";
-
-	/** the CSS tag for the margin of an object */
-	public static final String CSS_KEY_PADDINGLEFT = "padding-left";
 
 	/** the CSS tag for adding a page break when the document is printed */
-	public static final String CSS_KEY_PAGE_BREAK_BEFORE = "page-break-before";
-
-	/** the CSS tag for the horizontal alignment of an object */
-	public static final String CSS_KEY_TEXTALIGN = "text-align";
+	static final String CSS_KEY_PAGE_BREAK_BEFORE = "page-break-before";
 
 	/** the CSS tag for text decorations */
-	public static final String CSS_KEY_TEXTDECORATION = "text-decoration";
+	static final String CSS_KEY_TEXTDECORATION = "text-decoration";
 
 	/** the CSS tag for text decorations */
 	public static final String CSS_KEY_VERTICALALIGN = "vertical-align";
@@ -145,7 +120,7 @@ public class Markup {
 	 * value for the CSS tag for adding a page break when the document is
 	 * printed
 	 */
-	public static final String CSS_VALUE_ALWAYS = "always";
+	static final String CSS_VALUE_ALWAYS = "always";
 
 	/** a CSS value for text font weight */
 	public static final String CSS_VALUE_BOLD = "bold";

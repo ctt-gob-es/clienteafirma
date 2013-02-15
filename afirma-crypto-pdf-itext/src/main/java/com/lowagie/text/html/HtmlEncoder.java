@@ -81,26 +81,26 @@ import com.lowagie.text.Element;
  * @author  mario.maccarini@ugent.be
  */
 
-public final class HtmlEncoder {
-    
+final class HtmlEncoder {
+
     // membervariables
-    
+
 /** List with the HTML translation of all the characters. */
     private static final String[] htmlCode = new String[256];
-    
+
     static {
         for (int i = 0; i < 10; i++) {
             htmlCode[i] = "&#00" + i + ";";
         }
-        
+
         for (int i = 10; i < 32; i++) {
             htmlCode[i] = "&#0" + i + ";";
         }
-        
+
         for (int i = 32; i < 128; i++) {
             htmlCode[i] = String.valueOf((char)i);
         }
-        
+
         // Special characters
         htmlCode['\t'] = "\t";
         htmlCode['\n'] = "<" + HtmlTags.NEWLINE + " />\n";
@@ -108,36 +108,36 @@ public final class HtmlEncoder {
         htmlCode['&'] = "&amp;"; // ampersand
         htmlCode['<'] = "&lt;"; // lower than
         htmlCode['>'] = "&gt;"; // greater than
-        
+
         for (int i = 128; i < 256; i++) {
             htmlCode[i] = "&#" + i + ";";
         }
     }
-    
-    
+
+
     // constructors
-    
+
 /**
  * This class will never be constructed.
  * <P>
  * HtmlEncoder only contains static methods.
  */
-    
+
     private HtmlEncoder () { }
-    
+
     // methods
-    
+
 /**
  * Converts a <CODE>String</CODE> to the HTML-format of this <CODE>String</CODE>.
  *
  * @param	string	The <CODE>String</CODE> to convert
  * @return	a <CODE>String</CODE>
  */
-    
-    public static String encode(String string) {
-        int n = string.length();
+
+    static String encode(final String string) {
+        final int n = string.length();
         char character;
-        StringBuffer buffer = new StringBuffer();
+        final StringBuffer buffer = new StringBuffer();
         // loop over all the characters of the String.
         for (int i = 0; i < n; i++) {
             character = string.charAt(i);
@@ -152,16 +152,16 @@ public final class HtmlEncoder {
         }
         return buffer.toString();
     }
-    
+
 /**
  * Converts a <CODE>Color</CODE> into a HTML representation of this <CODE>Color</CODE>.
  *
  * @param	color	the <CODE>Color</CODE> that has to be converted.
  * @return	the HTML representation of this <COLOR>Color</COLOR>
  */
-    
-    public static String encode(Color color) {
-        StringBuffer buffer = new StringBuffer("#");
+
+    static String encode(final Color color) {
+        final StringBuffer buffer = new StringBuffer("#");
         if (color.getRed() < 16) {
             buffer.append('0');
         }
@@ -176,15 +176,15 @@ public final class HtmlEncoder {
         buffer.append(Integer.toString(color.getBlue(), 16));
         return buffer.toString();
     }
-    
+
 /**
  * Translates the alignment value.
  *
  * @param   alignment   the alignment value
  * @return  the translated value
  */
-    
-    public static String getAlignment(int alignment) {
+
+    static String getAlignment(final int alignment) {
         switch(alignment) {
             case Element.ALIGN_LEFT:
                 return HtmlTags.ALIGN_LEFT;

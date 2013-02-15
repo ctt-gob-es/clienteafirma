@@ -345,23 +345,11 @@ public abstract class DocWriter implements DocListener {
  * @throws IOException
  */
 
-    protected void write(final String string) throws IOException {
+    private void write(final String string) throws IOException {
         this.os.write(getISOBytes(string));
     }
 
-/**
- * Writes a number of tabs.
- *
- * @param   indent  the number of tabs to add
- * @throws IOException
- */
 
-    protected void addTabs(final int indent) throws IOException {
-        this.os.write(NEWLINE);
-        for (int i = 0; i < indent; i++) {
-            this.os.write(TAB);
-        }
-    }
 
 /**
  * Writes a key-value pair to the outputstream.
@@ -371,7 +359,7 @@ public abstract class DocWriter implements DocListener {
  * @throws IOException
  */
 
-    protected void write(final String key, final String value)
+    private void write(final String key, final String value)
     throws IOException {
         this.os.write(SPACE);
         write(key);
@@ -381,33 +369,9 @@ public abstract class DocWriter implements DocListener {
         this.os.write(QUOTE);
     }
 
-/**
- * Writes a starttag to the outputstream.
- *
- * @param   tag     the name of the tag
- * @throws IOException
- */
 
-    protected void writeStart(final String tag)
-    throws IOException {
-        this.os.write(LT);
-        write(tag);
-    }
 
-/**
- * Writes an endtag to the outputstream.
- *
- * @param   tag     the name of the tag
- * @throws IOException
- */
 
-    protected void writeEnd(final String tag)
-    throws IOException {
-        this.os.write(LT);
-        this.os.write(FORWARD);
-        write(tag);
-        this.os.write(GT);
-    }
 
 /**
  * Writes an endtag to the outputstream.

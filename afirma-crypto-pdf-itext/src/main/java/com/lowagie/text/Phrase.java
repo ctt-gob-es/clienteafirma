@@ -442,7 +442,7 @@ public class Phrase extends ArrayList implements TextElementArray {
      *
      * @return	true if the leading is defined
      */
-    public boolean hasLeading() {
+    boolean hasLeading() {
         if (Float.isNaN(this.leading)) {
             return false;
         }

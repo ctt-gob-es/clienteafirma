@@ -76,23 +76,23 @@ class SequenceList {
     private static final int DIGIT2 = 3;
     private static final String NOT_OTHER = "-,!0123456789";
 
-    protected char text[];
-    protected int ptr;
-    protected int number;
-    protected String other;
+    private final char text[];
+    private int ptr;
+    private int number;
+    private String other;
 
-    protected int low;
-    protected int high;
-    protected boolean odd;
-    protected boolean even;
-    protected boolean inverse;
+    private int low;
+    private int high;
+    private boolean odd;
+    private boolean even;
+    private boolean inverse;
 
     private SequenceList(final String range) {
         this.ptr = 0;
         this.text = range.toCharArray();
     }
 
-    protected char nextChar() {
+    private char nextChar() {
         while (true) {
             if (this.ptr >= this.text.length) {
 				return EOT;
@@ -104,14 +104,14 @@ class SequenceList {
         }
     }
 
-    protected void putBack() {
+    private void putBack() {
         --this.ptr;
         if (this.ptr < 0) {
 			this.ptr = 0;
 		}
     }
 
-    protected int getType() {
+    private int getType() {
         final StringBuffer buf = new StringBuffer();
         int state = FIRST;
         while (true) {
@@ -177,7 +177,7 @@ class SequenceList {
         }
     }
 
-    protected boolean getAttributes() {
+    private boolean getAttributes() {
         this.low = -1;
         this.high = -1;
         this.odd = this.even = this.inverse = false;

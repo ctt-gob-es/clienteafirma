@@ -71,7 +71,7 @@ public class HtmlTags {
 	static final String META = "meta";
 
 	/** attribute of the root tag */
-	public static final String SUBJECT = "subject";
+	static final String SUBJECT = "subject";
 
 	/** attribute of the root tag */
 	static final String KEYWORDS = "keywords";
@@ -80,10 +80,10 @@ public class HtmlTags {
 	static final String AUTHOR = "author";
 
 	/** the title tag. */
-	public static final String TITLE = "title";
+	static final String TITLE = "title";
 
 	/** the script tag. */
-	public static final String SCRIPT = "script";
+	static final String SCRIPT = "script";
 
 	/** This is a possible HTML attribute for the SCRIPT tag. */
 	static final String LANGUAGE = "language";
@@ -101,7 +101,7 @@ public class HtmlTags {
 	static final String JAVASCRIPT_ONUNLOAD = "onUnLoad";
 
 	/** This is a possible HTML attribute for the BODY tag. */
-	public static final String TOPMARGIN = "topmargin";
+	static final String TOPMARGIN = "topmargin";
 
 	/** This is a possible HTML attribute for the BODY tag. */
 	static final String BOTTOMMARGIN = "bottommargin";
@@ -121,7 +121,7 @@ public class HtmlTags {
 	static final String CODE = "code";
 
 	/** the phrase tag */
-	public static final String VAR = "var";
+	static final String VAR = "var";
 
 	/** the anchor tag */
 	static final String ANCHOR = "a";
@@ -130,7 +130,7 @@ public class HtmlTags {
 	static final String ORDEREDLIST = "ol";
 
 	/** the list tag */
-	public static final String UNORDEREDLIST = "ul";
+	static final String UNORDEREDLIST = "ul";
 
 	/** the listitem tag */
 	static final String LISTITEM = "li";
@@ -161,7 +161,7 @@ public class HtmlTags {
 	static final String FONT = "face";
 
 	/** attribute of the chunk tag */
-	public static final String SIZE = "point-size";
+	static final String SIZE = "point-size";
 
 	/** attribute of the chunk/table/cell tag */
 	static final String COLOR = "color";
@@ -170,25 +170,25 @@ public class HtmlTags {
 	static final String EM = "em";
 
 	/** some phrase tag */
-	public static final String I = "i";
+	static final String I = "i";
 
 	/** some phrase tag */
-	public static final String STRONG = "strong";
+	static final String STRONG = "strong";
 
 	/** some phrase tag */
-	public static final String B = "b";
+	static final String B = "b";
 
 	/** some phrase tag */
-	public static final String S = "s";
+	static final String S = "s";
 
 	/** some phrase tag */
-	public static final String U = "u";
+	static final String U = "u";
 
 	/** some phrase tag */
-	public static final String SUB = "sub";
+	static final String SUB = "sub";
 
 	/** some phrase tag */
-	public static final String SUP = "sup";
+	static final String SUP = "sup";
 
 	/** the possible value of a tag */
 	static final String HORIZONTALRULE = "hr";
@@ -196,7 +196,7 @@ public class HtmlTags {
 	// tables/cells
 
 	/** the table tag */
-	public static final String TABLE = "table";
+	static final String TABLE = "table";
 
 	/** the cell tag */
 	static final String ROW = "tr";
@@ -214,109 +214,109 @@ public class HtmlTags {
 	static final String CELLPADDING = "cellpadding";
 
 	/** attribute of the table tag */
-	public static final String CELLSPACING = "cellspacing";
+	static final String CELLSPACING = "cellspacing";
 
 	/** attribute of the cell tag */
-	public static final String COLSPAN = "colspan";
+	static final String COLSPAN = "colspan";
 
 	/** attribute of the cell tag */
-	public static final String ROWSPAN = "rowspan";
+	static final String ROWSPAN = "rowspan";
 
 	/** attribute of the cell tag */
-	public static final String NOWRAP = "nowrap";
+	static final String NOWRAP = "nowrap";
 
 	/** attribute of the table/cell tag */
-	public static final String BORDERWIDTH = "border";
+	static final String BORDERWIDTH = "border";
 
 	/** attribute of the table/cell tag */
-	public static final String WIDTH = "width";
+	static final String WIDTH = "width";
 
 	/** attribute of the table/cell tag */
-	public static final String BACKGROUNDCOLOR = "bgcolor";
+	static final String BACKGROUNDCOLOR = "bgcolor";
 
 	/** attribute of the table/cell tag */
-	public static final String BORDERCOLOR = "bordercolor";
+	static final String BORDERCOLOR = "bordercolor";
 
 	/** attribute of paragraph/image/table tag */
-	public static final String ALIGN = "align";
+	static final String ALIGN = "align";
 
 	/** attribute of the cell tag */
-	public static final String HORIZONTALALIGN = "align";
+	static final String HORIZONTALALIGN = "align";
 
 	/** attribute of the cell tag */
-	public static final String VERTICALALIGN = "valign";
+	static final String VERTICALALIGN = "valign";
 
 	// Misc
 
 	/** the image tag */
-	public static final String IMAGE = "img";
+	static final String IMAGE = "img";
 
 	/** attribute of the image tag
 	 * @see com.lowagie.text.ElementTags#SRC
 	 */
-	public static final String URL = "src";
+	static final String URL = "src";
 
 	/** attribute of the image tag */
-	public static final String ALT = "alt";
+	static final String ALT = "alt";
 
 	/** attribute of the image tag */
-	public static final String PLAINWIDTH = "width";
+	static final String PLAINWIDTH = "width";
 
 	/** attribute of the image tag */
-	public static final String PLAINHEIGHT = "height";
+	static final String PLAINHEIGHT = "height";
 
 	/** the newpage tag */
-	public static final String NEWLINE = "br";
+	static final String NEWLINE = "br";
 
 	// alignment attribute values
 
 	/** the possible value of an alignment attribute */
-	public static final String ALIGN_LEFT = "Left";
+	static final String ALIGN_LEFT = "Left";
 
 	/** the possible value of an alignment attribute */
-	public static final String ALIGN_CENTER = "Center";
+	static final String ALIGN_CENTER = "Center";
 
 	/** the possible value of an alignment attribute */
-	public static final String ALIGN_RIGHT = "Right";
+	static final String ALIGN_RIGHT = "Right";
 
 	/** the possible value of an alignment attribute */
-	public static final String ALIGN_JUSTIFIED = "Justify";
+	static final String ALIGN_JUSTIFIED = "Justify";
 
 	/** the possible value of an alignment attribute */
-	public static final String ALIGN_TOP = "Top";
+	static final String ALIGN_TOP = "Top";
 
 	/** the possible value of an alignment attribute */
-	public static final String ALIGN_MIDDLE = "Middle";
+	static final String ALIGN_MIDDLE = "Middle";
 
 	/** the possible value of an alignment attribute */
-	public static final String ALIGN_BOTTOM = "Bottom";
+	static final String ALIGN_BOTTOM = "Bottom";
 
 	/** the possible value of an alignment attribute */
-	public static final String ALIGN_BASELINE = "Baseline";
+	static final String ALIGN_BASELINE = "Baseline";
 
 	/** The DIV tag. */
-	public static final String DIV = "div";
+	static final String DIV = "div";
 
 	/** The SPAN tag. */
-	public static final String SPAN = "span";
+	static final String SPAN = "span";
 
 	/** The LINK tag. */
-	public static final String LINK = "link";
+	static final String LINK = "link";
 
 	/** This is a possible HTML attribute for the LINK tag. */
-	public static final String TEXT_CSS = "text/css";
+	static final String TEXT_CSS = "text/css";
 
 	/** This is a possible HTML attribute for the LINK tag. */
-	public static final String REL = "rel";
+	static final String REL = "rel";
 
 	/** This is used for inline css style information */
-	public static final String STYLE = "style";
+	static final String STYLE = "style";
 
 	/** This is a possible HTML attribute for the LINK tag. */
-	public static final String TYPE = "type";
+	static final String TYPE = "type";
 
 	/** This is a possible HTML attribute. */
-	public static final String STYLESHEET = "stylesheet";
+	static final String STYLESHEET = "stylesheet";
 
 	/** This is a possible HTML attribute for auto-formated
      * @since 2.1.3

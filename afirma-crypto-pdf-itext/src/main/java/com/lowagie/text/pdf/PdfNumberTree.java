@@ -54,10 +54,10 @@ import java.util.HashMap;
  * Creates a number tree.
  * @author Paulo Soares (psoares@consiste.pt)
  */
-public class PdfNumberTree {
-    
+class PdfNumberTree {
+
     private static final int leafSize = 64;
-    
+
     /**
      * Creates a number tree.
      * @param items the item of the number tree. The key is an <CODE>Integer</CODE>
@@ -65,29 +65,30 @@ public class PdfNumberTree {
      * @param writer the writer
      * @throws IOException on error
      * @return the dictionary with the number tree.
-     */    
-    public static PdfDictionary writeTree(HashMap items, PdfWriter writer) throws IOException {
-        if (items.isEmpty())
-            return null;
+     */
+    static PdfDictionary writeTree(final HashMap items, final PdfWriter writer) throws IOException {
+        if (items.isEmpty()) {
+			return null;
+		}
         Integer numbers[] = new Integer[items.size()];
         numbers = (Integer[])items.keySet().toArray(numbers);
         Arrays.sort(numbers);
         if (numbers.length <= leafSize) {
-            PdfDictionary dic = new PdfDictionary();
-            PdfArray ar = new PdfArray();
-            for (int k = 0; k < numbers.length; ++k) {
-                ar.add(new PdfNumber(numbers[k].intValue()));
-                ar.add((PdfObject)items.get(numbers[k]));
+            final PdfDictionary dic = new PdfDictionary();
+            final PdfArray ar = new PdfArray();
+            for (final Integer number : numbers) {
+                ar.add(new PdfNumber(number.intValue()));
+                ar.add((PdfObject)items.get(number));
             }
             dic.put(PdfName.NUMS, ar);
             return dic;
         }
         int skip = leafSize;
-        PdfIndirectReference kids[] = new PdfIndirectReference[(numbers.length + leafSize - 1) / leafSize];
+        final PdfIndirectReference kids[] = new PdfIndirectReference[(numbers.length + leafSize - 1) / leafSize];
         for (int k = 0; k < kids.length; ++k) {
             int offset = k * leafSize;
-            int end = Math.min(offset + leafSize, numbers.length);
-            PdfDictionary dic = new PdfDictionary();
+            final int end = Math.min(offset + leafSize, numbers.length);
+            final PdfDictionary dic = new PdfDictionary();
             PdfArray arr = new PdfArray();
             arr.add(new PdfNumber(numbers[offset].intValue()));
             arr.add(new PdfNumber(numbers[end - 1].intValue()));
@@ -103,19 +104,20 @@ public class PdfNumberTree {
         int top = kids.length;
         while (true) {
             if (top <= leafSize) {
-                PdfArray arr = new PdfArray();
-                for (int k = 0; k < top; ++k)
-                    arr.add(kids[k]);
-                PdfDictionary dic = new PdfDictionary();
+                final PdfArray arr = new PdfArray();
+                for (int k = 0; k < top; ++k) {
+					arr.add(kids[k]);
+				}
+                final PdfDictionary dic = new PdfDictionary();
                 dic.put(PdfName.KIDS, arr);
                 return dic;
             }
             skip *= leafSize;
-            int tt = (numbers.length + skip - 1 )/ skip;
+            final int tt = (numbers.length + skip - 1 )/ skip;
             for (int k = 0; k < tt; ++k) {
                 int offset = k * leafSize;
-                int end = Math.min(offset + leafSize, top);
-                PdfDictionary dic = new PdfDictionary();
+                final int end = Math.min(offset + leafSize, top);
+                final PdfDictionary dic = new PdfDictionary();
                 PdfArray arr = new PdfArray();
                 arr.add(new PdfNumber(numbers[k * skip].intValue()));
                 arr.add(new PdfNumber(numbers[Math.min((k + 1) * skip, numbers.length) - 1].intValue()));
@@ -130,27 +132,28 @@ public class PdfNumberTree {
             top = tt;
         }
     }
-    
-    private static void iterateItems(PdfDictionary dic, HashMap items) {
+
+    private static void iterateItems(final PdfDictionary dic, final HashMap items) {
         PdfArray nn = (PdfArray)PdfReader.getPdfObjectRelease(dic.get(PdfName.NUMS));
         if (nn != null) {
             for (int k = 0; k < nn.size(); ++k) {
-                PdfNumber s = (PdfNumber)PdfReader.getPdfObjectRelease(nn.getPdfObject(k++));
+                final PdfNumber s = (PdfNumber)PdfReader.getPdfObjectRelease(nn.getPdfObject(k++));
                 items.put(new Integer(s.intValue()), nn.getPdfObject(k));
             }
         }
         else if ((nn = (PdfArray)PdfReader.getPdfObjectRelease(dic.get(PdfName.KIDS))) != null) {
             for (int k = 0; k < nn.size(); ++k) {
-                PdfDictionary kid = (PdfDictionary)PdfReader.getPdfObjectRelease(nn.getPdfObject(k));
+                final PdfDictionary kid = (PdfDictionary)PdfReader.getPdfObjectRelease(nn.getPdfObject(k));
                 iterateItems(kid, items);
             }
         }
     }
-    
-    public static HashMap readTree(PdfDictionary dic) {
-        HashMap items = new HashMap();
-        if (dic != null)
-            iterateItems(dic, items);
+
+    static HashMap readTree(final PdfDictionary dic) {
+        final HashMap items = new HashMap();
+        if (dic != null) {
+			iterateItems(dic, items);
+		}
         return items;
     }
 }

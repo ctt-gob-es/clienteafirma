@@ -65,7 +65,7 @@ import com.lowagie.text.xml.XmlPeer;
  * The <CODE>Tags</CODE>-class maps several XHTML-tags to iText-objects.
  */
 
-public class SAXmyHtmlHandler extends SAXiTextHandler // SAXmyHandler
+class SAXmyHtmlHandler extends SAXiTextHandler // SAXmyHandler
 {
 
     /** These are the properties of the body section. */
@@ -82,7 +82,7 @@ public class SAXmyHtmlHandler extends SAXiTextHandler // SAXmyHandler
      *            this is the document on which events must be triggered
      */
 
-    public SAXmyHtmlHandler(final DocListener document) {
+    SAXmyHtmlHandler(final DocListener document) {
         super(document, new HtmlTagMap());
     }
 

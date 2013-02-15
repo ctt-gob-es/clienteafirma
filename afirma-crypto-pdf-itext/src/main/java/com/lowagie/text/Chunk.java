@@ -547,7 +547,7 @@ public class Chunk implements Element {
 	 *            the hyphenation engine
 	 * @return this <CODE>Chunk</CODE>
 	 */
-	public Chunk setHyphenation(final HyphenationEvent hyphenation) {
+	Chunk setHyphenation(final HyphenationEvent hyphenation) {
 		return setAttribute(HYPHENATION, hyphenation);
 	}
 

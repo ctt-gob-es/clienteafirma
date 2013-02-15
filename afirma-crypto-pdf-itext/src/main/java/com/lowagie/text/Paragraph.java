@@ -281,7 +281,7 @@ public class Paragraph extends Phrase {
      * @param fixedLeading the fixed leading
      * @param multipliedLeading the variable leading
      */
-    public void setLeading(final float fixedLeading, final float multipliedLeading) {
+    private void setLeading(final float fixedLeading, final float multipliedLeading) {
         this.leading = fixedLeading;
         this.multipliedLeading = multipliedLeading;
     }

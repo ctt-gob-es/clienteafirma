@@ -236,7 +236,7 @@ public class HtmlTagMap extends HashMap {
 	 * @return true if tag is HTML or html
 	 */
 
-	public static boolean isHtml(final String tag) {
+	static boolean isHtml(final String tag) {
 		return HtmlTags.HTML.equalsIgnoreCase(tag);
 	}
 
@@ -246,7 +246,7 @@ public class HtmlTagMap extends HashMap {
 	 * @return true if tag is HEAD or head
 	 */
 
-	public static boolean isHead(final String tag) {
+	static boolean isHead(final String tag) {
 		return HtmlTags.HEAD.equalsIgnoreCase(tag);
 	}
 
@@ -256,7 +256,7 @@ public class HtmlTagMap extends HashMap {
 	 * @return true if tag is META or meta
 	 */
 
-	public static boolean isMeta(final String tag) {
+	static boolean isMeta(final String tag) {
 		return HtmlTags.META.equalsIgnoreCase(tag);
 	}
 
@@ -266,7 +266,7 @@ public class HtmlTagMap extends HashMap {
 	 * @return true if tag is LINK or link
 	 */
 
-	public static boolean isLink(final String tag) {
+	static boolean isLink(final String tag) {
 		return HtmlTags.LINK.equalsIgnoreCase(tag);
 	}
 
@@ -276,7 +276,7 @@ public class HtmlTagMap extends HashMap {
 	 * @return true if tag is TITLE or title
 	 */
 
-	public static boolean isTitle(final String tag) {
+	static boolean isTitle(final String tag) {
 		return HtmlTags.TITLE.equalsIgnoreCase(tag);
 	}
 
@@ -286,7 +286,7 @@ public class HtmlTagMap extends HashMap {
 	 * @return true if tag is BODY or body
 	 */
 
-	public static boolean isBody(final String tag) {
+	static boolean isBody(final String tag) {
 		return HtmlTags.BODY.equalsIgnoreCase(tag);
 	}
 

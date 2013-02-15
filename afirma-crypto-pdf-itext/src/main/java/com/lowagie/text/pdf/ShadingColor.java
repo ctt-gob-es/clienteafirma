@@ -54,13 +54,13 @@ package com.lowagie.text.pdf;
 public class ShadingColor extends ExtendedColor {
 
     private static final long serialVersionUID = 4817929454941328671L;
-	PdfShadingPattern shadingPattern;
+	private final PdfShadingPattern shadingPattern;
 
     /**
      * Creates a shading color.
      * @param shadingPattern
      */
-    public ShadingColor(PdfShadingPattern shadingPattern) {
+    public ShadingColor(final PdfShadingPattern shadingPattern) {
         super(TYPE_SHADING, .5f, .5f, .5f);
         this.shadingPattern = shadingPattern;
     }
@@ -70,15 +70,17 @@ public class ShadingColor extends ExtendedColor {
      * @return a shading pattern.
      */
     public PdfShadingPattern getPdfShadingPattern() {
-        return shadingPattern;
+        return this.shadingPattern;
     }
-    
-    public boolean equals(Object obj) {
+
+    @Override
+	public boolean equals(final Object obj) {
         return this == obj;
     }
-    
-    public int hashCode() {
-        return shadingPattern.hashCode();
+
+    @Override
+	public int hashCode() {
+        return this.shadingPattern.hashCode();
     }
-    
+
 }

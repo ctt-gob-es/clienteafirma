@@ -70,7 +70,7 @@ import com.lowagie.text.pdf.BaseFont;
  * @author  Bruno Lowagie
  */
 
-public class FontFactoryImp {
+class FontFactoryImp {
 
 /** This is a map of postscriptfontnames of True Type fonts and the path of their ttf- or ttc-file. */
     private final Properties trueTypeFonts = new Properties();
@@ -147,7 +147,7 @@ public class FontFactoryImp {
      * @param	color	    the <CODE>Color</CODE> of this font.
      * @return the Font constructed based on the parameters
      */
-    public Font getFont(final String fontname, final String encoding, final boolean embedded, final float size, final int style, final Color color) {
+    Font getFont(final String fontname, final String encoding, final boolean embedded, final float size, final int style, final Color color) {
         return getFont(fontname, encoding, embedded, size, style, color, true);
     }
 
@@ -526,7 +526,7 @@ public class FontFactoryImp {
  * @param   fontname    the name of the font that has to be checked.
  * @return  true if the font is found
  */
-    public boolean isRegistered(final String fontname) {
+    private boolean isRegistered(final String fontname) {
         return this.trueTypeFonts.containsKey(fontname.toLowerCase());
     }
 }
