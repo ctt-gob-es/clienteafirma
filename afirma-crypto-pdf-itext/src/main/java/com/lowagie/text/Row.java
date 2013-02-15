@@ -82,19 +82,19 @@ public class Row implements Element {
     // member variables
 
     /** This is the number of columns in the <CODE>Row</CODE>. */
-    protected int columns;
+    private int columns;
 
     /** This is a valid position the <CODE>Row</CODE>. */
-    protected int currentColumn;
+    private int currentColumn;
 
     /** This is the array that keeps track of reserved cells. */
-    protected boolean[] reserved;
+    private boolean[] reserved;
 
     /** This is the array of Objects (<CODE>Cell</CODE> or <CODE>Table</CODE>). */
-    protected Object[] cells;
+    private Object[] cells;
 
     /** This is the vertical alignment. */
-    protected int horizontalAlignment;
+    private int horizontalAlignment;
 
     // constructors
 
@@ -205,17 +205,6 @@ public class Row implements Element {
     // methods
 
     /**
-     * Adds a <CODE>Cell</CODE> to the <CODE>Row</CODE>.
-     *
-     * @param       element the element to add (currently only Cells and Tables supported)
-     * @return      the column position the <CODE>Cell</CODE> was added,
-     *                      or <CODE>-1</CODE> if the <CODE>element</CODE> couldn't be added.
-     */
-    int addElement(final Object element) {
-        return addElement(element, this.currentColumn);
-    }
-
-    /**
      * Adds an element to the <CODE>Row</CODE> at the position given.
      *
      * @param       element the element to add. (currently only Cells and Tables supported
@@ -267,17 +256,6 @@ public class Row implements Element {
      * Reserves a <CODE>Cell</CODE> in the <CODE>Row</CODE>.
      *
      * @param   column  the column that has to be reserved.
-     * @return  <CODE>true</CODE> if the column was reserved, <CODE>false</CODE> if not.
-     */
-    boolean reserve(final int column) {
-        return reserve(column, 1);
-    }
-
-
-    /**
-     * Reserves a <CODE>Cell</CODE> in the <CODE>Row</CODE>.
-     *
-     * @param   column  the column that has to be reserved.
      * @param   size    the number of columns
      * @return  <CODE>true</CODE> if the column was reserved, <CODE>false</CODE> if not.
      */
@@ -313,30 +291,12 @@ public class Row implements Element {
     }
 
     /**
-     * Returns the type-id of the element in a Row.
-     *
-     * @param       column  the column of which you'd like to know the type
-     * @return the type-id of the element in the row
-     */
-    int getElementID(final int column) {
-        if (this.cells[column] == null) {
-			return NULL;
-		} else if (Cell.class.isInstance(this.cells[column])) {
-			return CELL;
-		} else if (Table.class.isInstance(this.cells[column])) {
-			return TABLE;
-		}
-
-        return -1;
-    }
-
-    /**
      * Returns the type-id of an Object.
      *
      * @param       element the object of which you'd like to know the type-id, -1 if invalid
      * @return the type-id of an object
      */
-    int getObjectID(final Object element) {
+    private int getObjectID(final Object element) {
         if (element == null) {
 			return NULL;
 		} else if (Cell.class.isInstance(element)) {

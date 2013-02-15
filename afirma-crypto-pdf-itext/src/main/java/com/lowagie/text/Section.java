@@ -101,7 +101,7 @@ public class Section extends ArrayList implements TextElementArray, LargeElement
     protected Paragraph title;
 
     /** The bookmark title if different from the content title */
-    protected String bookmarkTitle;
+    private String bookmarkTitle;
 
     /** The number of sectionnumbers that has to be shown before the section title. */
     protected int numberDepth;
@@ -113,22 +113,22 @@ public class Section extends ArrayList implements TextElementArray, LargeElement
     protected int numberStyle = NUMBERSTYLE_DOTTED;
 
     /** The indentation of this section on the left side. */
-    protected float indentationLeft;
+    private float indentationLeft;
 
     /** The indentation of this section on the right side. */
-    protected float indentationRight;
+    private float indentationRight;
 
     /** The additional indentation of the content of this section. */
-    protected float indentation;
+    private float indentation;
 
     /** false if the bookmark children are not visible */
-    protected boolean bookmarkOpen = true;
+    private boolean bookmarkOpen = true;
 
     /** true if the section has to trigger a new page */
     protected boolean triggerNewPage = false;
 
     /** This is the number of subsections. */
-    protected int subsections = 0;
+    private int subsections = 0;
 
     /** This is the complete list of sectionnumbers of this section and the parents of this section. */
     protected ArrayList numbers = null;
@@ -137,19 +137,19 @@ public class Section extends ArrayList implements TextElementArray, LargeElement
      * Indicates if the Section will be complete once added to the document.
      * @since	iText 2.0.8
      */
-    protected boolean complete = true;
+    private boolean complete = true;
 
     /**
      * Indicates if the Section was added completely to the document.
      * @since	iText 2.0.8
      */
-    protected boolean addedCompletely = false;
+    private boolean addedCompletely = false;
 
     /**
      * Indicates if this is the first time the section was added.
      * @since	iText 2.0.8
      */
-    protected boolean notAddedYet = true;
+    private boolean notAddedYet = true;
 
     // constructors
 
@@ -386,7 +386,7 @@ public class Section extends ArrayList implements TextElementArray, LargeElement
     /**
      * Adds a marked section. For use in class MarkedSection only!
      */
-    public MarkedSection addMarkedSection() {
+    MarkedSection addMarkedSection() {
     	final MarkedSection section = new MarkedSection(new Section(null, this.numberDepth + 1));
     	add(section);
     	return section;
@@ -405,35 +405,12 @@ public class Section extends ArrayList implements TextElementArray, LargeElement
     /**
      * Adds a <CODE>Section</CODE> to this <CODE>Section</CODE> and returns it.
      *
-     * @param	indentation	the indentation of the new section
-     * @param	title		the title of the new section
-     * @param	numberDepth	the numberDepth of the section
-     * @return  a new Section object
-     */
-    public Section addSection(final float indentation, final String title, final int numberDepth) {
-        return addSection(indentation, new Paragraph(title), numberDepth);
-    }
-
-    /**
-     * Adds a <CODE>Section</CODE> to this <CODE>Section</CODE> and returns it.
-     *
      * @param	title		the title of the new section
      * @param	numberDepth	the numberDepth of the section
      * @return  a new Section object
      */
     public Section addSection(final String title, final int numberDepth) {
         return addSection(new Paragraph(title), numberDepth);
-    }
-
-    /**
-     * Adds a <CODE>Section</CODE> to this <CODE>Section</CODE> and returns it.
-     *
-     * @param	indentation	the indentation of the new section
-     * @param	title		the title of the new section
-     * @return  a new Section object
-     */
-    public Section addSection(final float indentation, final String title) {
-        return addSection(indentation, new Paragraph(title));
     }
 
     /**
@@ -762,7 +739,7 @@ public class Section extends ArrayList implements TextElementArray, LargeElement
 	 * Adds a new page to the section.
 	 * @since	2.1.1
 	 */
-	public void newPage() {
+	void newPage() {
 		this.add(Chunk.NEXTPAGE);
 	}
 }

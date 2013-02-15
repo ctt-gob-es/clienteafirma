@@ -50,14 +50,11 @@
 package com.lowagie.text;
 
 import java.awt.Color;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.lowagie.text.pdf.HyphenationEvent;
 import com.lowagie.text.pdf.PdfAction;
-import com.lowagie.text.pdf.PdfAnnotation;
-import com.lowagie.text.pdf.PdfContentByte;
 import com.lowagie.text.pdf.draw.DrawInterface;
 
 /**
@@ -119,22 +116,6 @@ public class Chunk implements Element {
 		this.font = new Font();
 	}
 
-    /**
-     * A <CODE>Chunk</CODE> copy constructor.
-     * @param ck the <CODE>Chunk</CODE> to be copied
-     */
-    public Chunk(final Chunk ck) {
-        if (ck.content != null) {
-            this.content = new StringBuffer(ck.content.toString());
-        }
-        if (ck.font != null) {
-            this.font = new Font(ck.font);
-        }
-        if (ck.attributes != null) {
-            this.attributes = new HashMap(ck.attributes);
-        }
-    }
-
 	/**
 	 * Constructs a chunk of text with a certain content and a certain <CODE>
 	 * Font</CODE>.
@@ -175,17 +156,6 @@ public class Chunk implements Element {
 	}
 
 	/**
-	 * Constructs a chunk of text with a char, without specifying a <CODE>Font
-	 * </CODE>.
-	 *
-	 * @param c
-	 *            the content
-	 */
-	public Chunk(final char c) {
-		this(c, new Font());
-	}
-
-	/**
 	 * Constructs a chunk containing an <CODE>Image</CODE>.
 	 *
 	 * @param image
@@ -213,16 +183,6 @@ public class Chunk implements Element {
 	 * Creates a separator Chunk.
      * Note that separator chunks can't be used in combination with tab chunks!
 	 * @param	separator	the drawInterface to use to draw the separator.
-	 * @since	2.1.2
-	 */
-	public Chunk(final DrawInterface separator) {
-		this(separator, false);
-	}
-
-	/**
-	 * Creates a separator Chunk.
-     * Note that separator chunks can't be used in combination with tab chunks!
-	 * @param	separator	the drawInterface to use to draw the separator.
 	 * @param	vertical	true if this is a vertical separator
 	 * @since	2.1.2
 	 */
@@ -236,17 +196,6 @@ public class Chunk implements Element {
 	 * @since	2.1.2
 	 */
 	public static final String TAB = "TAB";
-
-	/**
-	 * Creates a tab Chunk.
-     * Note that separator chunks can't be used in combination with tab chunks!
-	 * @param	separator	the drawInterface to use to draw the tab.
-	 * @param	tabPosition	an X coordinate that will be used as start position for the next Chunk.
-	 * @since	2.1.2
-	 */
-	public Chunk(final DrawInterface separator, final float tabPosition) {
-		this(separator, tabPosition, false);
-	}
 
 	/**
 	 * Creates a tab Chunk.
@@ -411,7 +360,7 @@ public class Chunk implements Element {
 	 * @return false if there aren't any.
 	 */
 
-	public boolean hasAttributes() {
+	boolean hasAttributes() {
 		return this.attributes != null;
 	}
 
@@ -459,18 +408,6 @@ public class Chunk implements Element {
 	public static final String HSCALE = "HSCALE";
 
 	/**
-	 * Sets the text horizontal scaling. A value of 1 is normal and a value of
-	 * 0.5f shrinks the text to half it's width.
-	 *
-	 * @param scale
-	 *            the horizontal scaling factor
-	 * @return this <CODE>Chunk</CODE>
-	 */
-	public Chunk setHorizontalScaling(final float scale) {
-		return setAttribute(HSCALE, new Float(scale));
-	}
-
-	/**
 	 * Gets the horizontal scaling.
 	 *
 	 * @return a percentage in float
@@ -495,23 +432,6 @@ public class Chunk implements Element {
 	 * Chunk</CODE> width. Multiple call to this method will produce multiple
 	 * lines.
 	 *
-	 * @param thickness
-	 *            the absolute thickness of the line
-	 * @param yPosition
-	 *            the absolute y position relative to the baseline
-	 * @return this <CODE>Chunk</CODE>
-	 */
-	public Chunk setUnderline(final float thickness, final float yPosition) {
-		return setUnderline(null, thickness, 0f, yPosition, 0f,
-				PdfContentByte.LINE_CAP_BUTT);
-	}
-
-	/**
-	 * Sets an horizontal line that can be an underline or a strikethrough.
-	 * Actually, the line can be anywhere vertically and has always the <CODE>
-	 * Chunk</CODE> width. Multiple call to this method will produce multiple
-	 * lines.
-	 *
 	 * @param color
 	 *            the color of the line or <CODE>null</CODE> to follow the
 	 *            text color
@@ -529,7 +449,7 @@ public class Chunk implements Element {
 	 *            and PdfContentByte.LINE_CAP_PROJECTING_SQUARE
 	 * @return this <CODE>Chunk</CODE>
 	 */
-	public Chunk setUnderline(final Color color, final float thickness, final float thicknessMul,
+	private Chunk setUnderline(final Color color, final float thickness, final float thicknessMul,
 			final float yPosition, final float yPositionMul, final int cap) {
 		if (this.attributes == null) {
 			this.attributes = new HashMap();
@@ -576,22 +496,6 @@ public class Chunk implements Element {
 	/** Key for text skewing. */
 	public static final String SKEW = "SKEW";
 
-	/**
-	 * Skews the text to simulate italic and other effects. Try <CODE>alpha=0
-	 * </CODE> and <CODE>beta=12</CODE>.
-	 *
-	 * @param alpha
-	 *            the first angle in degrees
-	 * @param beta
-	 *            the second angle in degrees
-	 * @return this <CODE>Chunk</CODE>
-	 */
-	public Chunk setSkew(float alpha, float beta) {
-		alpha = (float) Math.tan(alpha * Math.PI / 180);
-		beta = (float) Math.tan(beta * Math.PI / 180);
-		return setAttribute(SKEW, new float[] { alpha, beta });
-	}
-
 	/** Key for background. */
 	public static final String BACKGROUND = "BACKGROUND";
 
@@ -621,7 +525,7 @@ public class Chunk implements Element {
 	 *            increase the size of the rectangle in the top
 	 * @return this <CODE>Chunk</CODE>
 	 */
-	public Chunk setBackground(final Color color, final float extraLeft, final float extraBottom,
+	private Chunk setBackground(final Color color, final float extraLeft, final float extraBottom,
 			final float extraRight, final float extraTop) {
 		return setAttribute(BACKGROUND, new Object[] { color,
 				new float[] { extraLeft, extraBottom, extraRight, extraTop } });
@@ -630,45 +534,8 @@ public class Chunk implements Element {
 	/** Key for text rendering mode. */
 	public static final String TEXTRENDERMODE = "TEXTRENDERMODE";
 
-	/**
-	 * Sets the text rendering mode. It can outline text, simulate bold and make
-	 * text invisible.
-	 *
-	 * @param mode
-	 *            the text rendering mode. It can be <CODE>
-	 *            PdfContentByte.TEXT_RENDER_MODE_FILL</CODE>,<CODE>
-	 *            PdfContentByte.TEXT_RENDER_MODE_STROKE</CODE>,<CODE>
-	 *            PdfContentByte.TEXT_RENDER_MODE_FILL_STROKE</CODE> and <CODE>
-	 *            PdfContentByte.TEXT_RENDER_MODE_INVISIBLE</CODE>.
-	 * @param strokeWidth
-	 *            the stroke line width for the modes <CODE>
-	 *            PdfContentByte.TEXT_RENDER_MODE_STROKE</CODE> and <CODE>
-	 *            PdfContentByte.TEXT_RENDER_MODE_FILL_STROKE</CODE>.
-	 * @param strokeColor
-	 *            the stroke color or <CODE>null</CODE> to follow the text
-	 *            color
-	 * @return this <CODE>Chunk</CODE>
-	 */
-	public Chunk setTextRenderMode(final int mode, final float strokeWidth,
-			final Color strokeColor) {
-		return setAttribute(TEXTRENDERMODE, new Object[] { new Integer(mode),
-				new Float(strokeWidth), strokeColor });
-	}
-
 	/** Key for split character. */
 	public static final String SPLITCHARACTER = "SPLITCHARACTER";
-
-	/**
-	 * Sets the split characters.
-	 *
-	 * @param splitCharacter
-	 *            the <CODE>SplitCharacter</CODE> interface
-	 * @return this <CODE>Chunk</CODE>
-	 */
-
-	public Chunk setSplitCharacter(final SplitCharacter splitCharacter) {
-		return setAttribute(SPLITCHARACTER, splitCharacter);
-	}
 
 	/** Key for hyphenation. */
 	public static final String HYPHENATION = "HYPHENATION";
@@ -789,30 +656,6 @@ public class Chunk implements Element {
 	public static final String ACTION = "ACTION";
 
 	/**
-	 * Sets an action for this <CODE>Chunk</CODE>.
-	 *
-	 * @param action
-	 *            the action
-	 * @return this <CODE>Chunk</CODE>
-	 */
-
-	public Chunk setAction(final PdfAction action) {
-		return setAttribute(ACTION, action);
-	}
-
-	/**
-	 * Sets an anchor for this <CODE>Chunk</CODE>.
-	 *
-	 * @param url
-	 *            the <CODE>URL</CODE> to link to
-	 * @return this <CODE>Chunk</CODE>
-	 */
-
-	public Chunk setAnchor(final URL url) {
-		return setAttribute(ACTION, new PdfAction(url.toExternalForm()));
-	}
-
-	/**
 	 * Sets an anchor for this <CODE>Chunk</CODE>.
 	 *
 	 * @param url
@@ -820,7 +663,7 @@ public class Chunk implements Element {
 	 * @return this <CODE>Chunk</CODE>
 	 */
 
-	public Chunk setAnchor(final String url) {
+	Chunk setAnchor(final String url) {
 		return setAttribute(ACTION, new PdfAction(url));
 	}
 
@@ -839,17 +682,6 @@ public class Chunk implements Element {
 
 	/** Key for annotation. */
 	public static final String PDFANNOTATION = "PDFANNOTATION";
-
-	/**
-	 * Sets a generic annotation to this <CODE>Chunk</CODE>.
-	 *
-	 * @param annotation
-	 *            the annotation
-	 * @return this <CODE>Chunk</CODE>
-	 */
-	public Chunk setAnnotation(final PdfAnnotation annotation) {
-		return setAttribute(PDFANNOTATION, annotation);
-	}
 
 	/**
 	 * @see com.lowagie.text.Element#isContent()

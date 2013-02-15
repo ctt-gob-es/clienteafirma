@@ -49,7 +49,6 @@
 
 package com.lowagie.text;
 
-import java.util.Collection;
 import java.util.Iterator;
 
 /**
@@ -78,30 +77,6 @@ public class MarkedSection extends MarkedObject {
 		this.element = section;
 	}
 
-	/**
-	 * Adds a <CODE>Paragraph</CODE>, <CODE>List</CODE> or <CODE>Table</CODE>
-	 * to this <CODE>Section</CODE>.
-	 *
-	 * @param	index	index at which the specified element is to be inserted
-	 * @param	o   	an object of type <CODE>Paragraph</CODE>, <CODE>List</CODE> or <CODE>Table</CODE>=
-	 * @throws	ClassCastException if the object is not a <CODE>Paragraph</CODE>, <CODE>List</CODE> or <CODE>Table</CODE>
-	 */
-	public void add(final int index, final Object o) {
-		((Section)this.element).add(index, o);
-	}
-
-	/**
-	 * Adds a <CODE>Paragraph</CODE>, <CODE>List</CODE>, <CODE>Table</CODE> or another <CODE>Section</CODE>
-	 * to this <CODE>Section</CODE>.
-	 *
-	 * @param	o   	an object of type <CODE>Paragraph</CODE>, <CODE>List</CODE>, <CODE>Table</CODE> or another <CODE>Section</CODE>
-	 * @return	a boolean
-	 * @throws	ClassCastException if the object is not a <CODE>Paragraph</CODE>, <CODE>List</CODE>, <CODE>Table</CODE> or <CODE>Section</CODE>
-	 */
-	public boolean add(final Object o) {
-		return ((Section)this.element).add(o);
-	}
-
     /**
      * Processes the element by adding it (or the different parts) to an
      * <CODE>ElementListener</CODE>.
@@ -123,65 +98,6 @@ public class MarkedSection extends MarkedObject {
             return false;
         }
     }
-
-	/**
-	 * Adds a collection of <CODE>Element</CODE>s
-	 * to this <CODE>Section</CODE>.
-	 *
-	 * @param	collection	a collection of <CODE>Paragraph</CODE>s, <CODE>List</CODE>s and/or <CODE>Table</CODE>s
-	 * @return	<CODE>true</CODE> if the action succeeded, <CODE>false</CODE> if not.
-	 * @throws	ClassCastException if one of the objects isn't a <CODE>Paragraph</CODE>, <CODE>List</CODE>, <CODE>Table</CODE>
-	 */
-	public boolean addAll(final Collection collection) {
-		return ((Section)this.element).addAll(collection);
-	}
-
-	/**
-	 * Creates a <CODE>Section</CODE>, adds it to this <CODE>Section</CODE> and returns it.
-	 *
-	 * @param	indentation	the indentation of the new section
-	 * @param	numberDepth	the numberDepth of the section
-	 * @return  a new Section object
-	 */
-	public MarkedSection addSection(final float indentation, final int numberDepth) {
-		final MarkedSection section = ((Section)this.element).addMarkedSection();
-		section.setIndentation(indentation);
-		section.setNumberDepth(numberDepth);
-		return section;
-	}
-
-	/**
-	 * Creates a <CODE>Section</CODE>, adds it to this <CODE>Section</CODE> and returns it.
-	 *
-	 * @param	indentation	the indentation of the new section
-	 * @return  a new Section object
-	 */
-	public MarkedSection addSection(final float indentation) {
-		final MarkedSection section = ((Section)this.element).addMarkedSection();
-		section.setIndentation(indentation);
-		return section;
-	}
-
-	/**
-	 * Creates a <CODE>Section</CODE>, add it to this <CODE>Section</CODE> and returns it.
-	 *
-	 * @param	numberDepth	the numberDepth of the section
-	 * @return  a new Section object
-	 */
-	public MarkedSection addSection(final int numberDepth) {
-		final MarkedSection section = ((Section)this.element).addMarkedSection();
-		section.setNumberDepth(numberDepth);
-		return section;
-	}
-
-	/**
-	 * Creates a <CODE>Section</CODE>, adds it to this <CODE>Section</CODE> and returns it.
-	 *
-	 * @return  a new Section object
-	 */
-	public MarkedSection addSection() {
-		return ((Section)this.element).addMarkedSection();
-	}
 
 	// public methods
 
@@ -273,11 +189,4 @@ public class MarkedSection extends MarkedObject {
 	  	((Section)this.element).setBookmarkTitle(bookmarkTitle);
 	}
 
-	/**
-	 * Adds a new page to the section.
-	 * @since	2.1.1
-	 */
-	public void newPage() {
-		((Section)this.element).newPage();
-	}
 }

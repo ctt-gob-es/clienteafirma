@@ -389,7 +389,7 @@ public class Phrase extends ArrayList implements TextElementArray {
      * @param chunk a Chunk to add to the Phrase
      * @return true if adding the Chunk succeeded
      */
-    protected boolean addChunk(final Chunk chunk) {
+    private boolean addChunk(final Chunk chunk) {
     	Font f = chunk.getFont();
     	final String c = chunk.getContent();
         if (this.font != null && !this.font.isStandardFont()) {
@@ -546,31 +546,12 @@ public class Phrase extends ArrayList implements TextElementArray {
 
     /**
      * Gets a special kind of Phrase that changes some characters into corresponding symbols.
-     * @param string
-     * @return a newly constructed Phrase
-     */
-    public static final Phrase getInstance(final String string) {
-    	return getInstance(16, string, new Font());
-    }
-
-    /**
-     * Gets a special kind of Phrase that changes some characters into corresponding symbols.
-     * @param leading
-     * @param string
-     * @return a newly constructed Phrase
-     */
-    public static final Phrase getInstance(final int leading, final String string) {
-    	return getInstance(leading, string, new Font());
-    }
-
-    /**
-     * Gets a special kind of Phrase that changes some characters into corresponding symbols.
      * @param leading
      * @param string
      * @param font
      * @return a newly constructed Phrase
      */
-    public static final Phrase getInstance(final int leading, String string, final Font font) {
+    private static final Phrase getInstance(final int leading, String string, final Font font) {
     	final Phrase p = new Phrase(true);
     	p.setLeading(leading);
     	p.font = font;
