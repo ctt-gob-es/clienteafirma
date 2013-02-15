@@ -105,7 +105,7 @@ public class ChapterAutoNumber extends Chapter {
      * @param	number	the new chapter number
      * @since 2.1.4
      */
-    public int setAutomaticNumber(int number) {
+    int setAutomaticNumber(int number) {
     	if (!this.numberSet) {
         	number++;
         	super.setChapterNumber(number);

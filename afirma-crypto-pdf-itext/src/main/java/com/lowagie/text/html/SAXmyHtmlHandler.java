@@ -49,7 +49,6 @@
 
 package com.lowagie.text.html;
 
-import java.util.HashMap;
 import java.util.Properties;
 
 import org.xml.sax.Attributes;
@@ -59,7 +58,6 @@ import com.lowagie.text.DocumentException;
 import com.lowagie.text.Element;
 import com.lowagie.text.ElementTags;
 import com.lowagie.text.ExceptionConverter;
-import com.lowagie.text.pdf.BaseFont;
 import com.lowagie.text.xml.SAXiTextHandler;
 import com.lowagie.text.xml.XmlPeer;
 
@@ -71,7 +69,7 @@ public class SAXmyHtmlHandler extends SAXiTextHandler // SAXmyHandler
 {
 
     /** These are the properties of the body section. */
-    private Properties bodyAttributes = new Properties();
+    private final Properties bodyAttributes = new Properties();
 
     /** This is the status of the table border. */
     private boolean tableBorder = false;
@@ -79,44 +77,18 @@ public class SAXmyHtmlHandler extends SAXiTextHandler // SAXmyHandler
     /**
      * Constructs a new SAXiTextHandler that will translate all the events
      * triggered by the parser to actions on the <CODE>Document</CODE>-object.
-     * 
+     *
      * @param document
      *            this is the document on which events must be triggered
      */
 
-    public SAXmyHtmlHandler(DocListener document) {
+    public SAXmyHtmlHandler(final DocListener document) {
         super(document, new HtmlTagMap());
-    }
-    /**
-     * Constructs a new SAXiTextHandler that will translate all the events
-     * triggered by the parser to actions on the <CODE>Document</CODE>-object.
-     * 
-     * @param document
-     *            this is the document on which events must be triggered
-     * @param bf
-     */
-
-    public SAXmyHtmlHandler(DocListener document, BaseFont bf) {
-        super(document, new HtmlTagMap(), bf);
-    }
-
-    /**
-     * Constructs a new SAXiTextHandler that will translate all the events
-     * triggered by the parser to actions on the <CODE>Document</CODE>-object.
-     * 
-     * @param document
-     *            this is the document on which events must be triggered
-     * @param htmlTags
-     *            a tagmap translating HTML tags to iText tags
-     */
-
-    public SAXmyHtmlHandler(DocListener document, HashMap htmlTags) {
-        super(document, htmlTags);
     }
 
     /**
      * This method gets called when a start tag is encountered.
-     * 
+     *
      * @param uri
      *            the Uniform Resource Identifier
      * @param lname
@@ -128,8 +100,9 @@ public class SAXmyHtmlHandler extends SAXiTextHandler // SAXmyHandler
      *            the list of attributes
      */
 
-    public void startElement(String uri, String lname, String name,
-            Attributes attrs) {
+    @Override
+	public void startElement(final String uri, final String lname, String name,
+            final Attributes attrs) {
         // System.err.println("Start: " + name);
 
         // super.handleStartingTags is replaced with handleStartingTags
@@ -153,15 +126,16 @@ public class SAXmyHtmlHandler extends SAXiTextHandler // SAXmyHandler
             String content = null;
             if (attrs != null) {
                 for (int i = 0; i < attrs.getLength(); i++) {
-                    String attribute = attrs.getQName(i);
-                    if (attribute.equalsIgnoreCase(HtmlTags.CONTENT))
-                        content = attrs.getValue(i);
-                    else if (attribute.equalsIgnoreCase(HtmlTags.NAME))
-                        meta = attrs.getValue(i);
+                    final String attribute = attrs.getQName(i);
+                    if (attribute.equalsIgnoreCase(HtmlTags.CONTENT)) {
+						content = attrs.getValue(i);
+					} else if (attribute.equalsIgnoreCase(HtmlTags.NAME)) {
+						meta = attrs.getValue(i);
+					}
                 }
             }
             if (meta != null && content != null) {
-                bodyAttributes.put(meta, content);
+                this.bodyAttributes.put(meta, content);
             }
             return;
         }
@@ -174,27 +148,27 @@ public class SAXmyHtmlHandler extends SAXiTextHandler // SAXmyHandler
             // maybe we could extract some info about the document: color,
             // margins,...
             // but that's for a later version...
-            XmlPeer peer = new XmlPeer(ElementTags.ITEXT, name);
+            final XmlPeer peer = new XmlPeer(ElementTags.ITEXT, name);
             peer.addAlias(ElementTags.TOP, HtmlTags.TOPMARGIN);
             peer.addAlias(ElementTags.BOTTOM, HtmlTags.BOTTOMMARGIN);
             peer.addAlias(ElementTags.RIGHT, HtmlTags.RIGHTMARGIN);
             peer.addAlias(ElementTags.LEFT, HtmlTags.LEFTMARGIN);
-            bodyAttributes.putAll(peer.getAttributes(attrs));
-            handleStartingTags(peer.getTag(), bodyAttributes);
+            this.bodyAttributes.putAll(peer.getAttributes(attrs));
+            handleStartingTags(peer.getTag(), this.bodyAttributes);
             return;
         }
-        if (myTags.containsKey(name)) {
-            XmlPeer peer = (XmlPeer) myTags.get(name);
+        if (this.myTags.containsKey(name)) {
+            final XmlPeer peer = (XmlPeer) this.myTags.get(name);
             if (ElementTags.TABLE.equals(peer.getTag()) || ElementTags.CELL.equals(peer.getTag())) {
-                Properties p = peer.getAttributes(attrs);
+                final Properties p = peer.getAttributes(attrs);
                 String value;
                 if (ElementTags.TABLE.equals(peer.getTag())
                         && (value = p.getProperty(ElementTags.BORDERWIDTH)) != null) {
                     if (Float.parseFloat(value + "f") > 0) {
-                        tableBorder = true;
+                        this.tableBorder = true;
                     }
                 }
-                if (tableBorder) {
+                if (this.tableBorder) {
                     p.put(ElementTags.LEFT, String.valueOf(true));
                     p.put(ElementTags.RIGHT, String.valueOf(true));
                     p.put(ElementTags.TOP, String.valueOf(true));
@@ -206,10 +180,10 @@ public class SAXmyHtmlHandler extends SAXiTextHandler // SAXmyHandler
             handleStartingTags(peer.getTag(), peer.getAttributes(attrs));
             return;
         }
-        Properties attributes = new Properties();
+        final Properties attributes = new Properties();
         if (attrs != null) {
             for (int i = 0; i < attrs.getLength(); i++) {
-                String attribute = attrs.getQName(i).toLowerCase();
+                final String attribute = attrs.getQName(i).toLowerCase();
                 attributes.setProperty(attribute, attrs.getValue(i).toLowerCase());
             }
         }
@@ -218,7 +192,7 @@ public class SAXmyHtmlHandler extends SAXiTextHandler // SAXmyHandler
 
     /**
      * This method gets called when an end tag is encountered.
-     * 
+     *
      * @param uri
      *            the Uniform Resource Identifier
      * @param lname
@@ -228,14 +202,15 @@ public class SAXmyHtmlHandler extends SAXiTextHandler // SAXmyHandler
      *            the name of the tag that ends
      */
 
-    public void endElement(String uri, String lname, String name) {
+    @Override
+	public void endElement(final String uri, final String lname, String name) {
         // System.err.println("End: " + name);
     	name = name.toLowerCase();
         if (ElementTags.PARAGRAPH.equals(name)) {
             try {
-                document.add((Element) stack.pop());
+                this.document.add((Element) this.stack.pop());
                 return;
-            } catch (DocumentException e) {
+            } catch (final DocumentException e) {
                 throw new ExceptionConverter(e);
             }
         }
@@ -244,8 +219,8 @@ public class SAXmyHtmlHandler extends SAXiTextHandler // SAXmyHandler
             return;
         }
         if (HtmlTagMap.isTitle(name)) {
-            if (currentChunk != null) {
-                bodyAttributes.put(ElementTags.TITLE, currentChunk.getContent());
+            if (this.currentChunk != null) {
+                this.bodyAttributes.put(ElementTags.TITLE, this.currentChunk.getContent());
             }
             return;
         }
@@ -261,10 +236,10 @@ public class SAXmyHtmlHandler extends SAXiTextHandler // SAXmyHandler
             // we do nothing
             return;
         }
-        if (myTags.containsKey(name)) {
-            XmlPeer peer = (XmlPeer) myTags.get(name);
+        if (this.myTags.containsKey(name)) {
+            final XmlPeer peer = (XmlPeer) this.myTags.get(name);
             if (ElementTags.TABLE.equals(peer.getTag())) {
-                tableBorder = false;
+                this.tableBorder = false;
             }
             super.handleEndingTags(peer.getTag());
             return;

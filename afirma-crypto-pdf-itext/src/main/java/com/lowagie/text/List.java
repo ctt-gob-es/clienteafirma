@@ -104,54 +104,46 @@ public class List implements TextElementArray {
     // member variables
 
 	/** This is the <CODE>ArrayList</CODE> containing the different <CODE>ListItem</CODE>s. */
-    protected ArrayList list = new ArrayList();
+	private final ArrayList list = new ArrayList();
 
     /** Indicates if the list has to be numbered. */
     private boolean numbered = false;
     /** Indicates if the listsymbols are numerical or alphabetical. */
     private boolean lettered = false;
     /** Indicates if the listsymbols are lowercase or uppercase. */
-    protected boolean lowercase = false;
+    private boolean lowercase = false;
     /** Indicates if the indentation has to be set automatically. */
-    protected boolean autoindent = false;
+    private boolean autoindent = false;
     /** Indicates if the indentation of all the items has to be aligned. */
-    protected boolean alignindent = false;
+    private boolean alignindent = false;
 
     /** This variable indicates the first number of a numbered list. */
-    protected int first = 1;
+    private int first = 1;
     /** This is the listsymbol of a list that is not numbered. */
-    protected Chunk symbol = new Chunk("- ");
+    private Chunk symbol = new Chunk("- ");
     /**
      * In case you are using numbered/lettered lists, this String is added before the number/letter.
      * @since	iText 2.1.1
      */
-    protected String preSymbol = "";
+    private String preSymbol = "";
     /**
      * In case you are using numbered/lettered lists, this String is added after the number/letter.
      * @since	iText 2.1.1
      */
-    protected String postSymbol = ". ";
+    private String postSymbol = ". ";
 
     /** The indentation of this list on the left side. */
-    protected float indentationLeft = 0;
+    private float indentationLeft = 0;
     /** The indentation of this list on the right side. */
     private float indentationRight = 0;
     /** The indentation of the listitems. */
-    protected float symbolIndent = 0;
+    private float symbolIndent = 0;
 
     // constructors
 
     /** Constructs a <CODE>List</CODE>. */
     public List() {
         this(false, false);
-    }
-
-    /**
-     * Constructs a <CODE>List</CODE>.
-     * @param	numbered		a boolean
-     */
-    public List(final boolean numbered) {
-      	this(numbered, false);
     }
 
     /**
@@ -164,20 +156,6 @@ public class List implements TextElementArray {
         this.lettered = lettered;
         this.autoindent = true;
         this.alignindent = true;
-    }
-
-    /**
-     * Constructs a <CODE>List</CODE>.
-     * <P>
-     * Remark: the parameter <VAR>symbolIndent</VAR> is important for instance when
-     * generating PDF-documents; it indicates the indentation of the listsymbol.
-     * It is not important for HTML-documents.
-     *
-     * @param	numbered		a boolean
-     * @param	symbolIndent	the indentation that has to be used for the listsymbol
-     */
-    List(final boolean numbered, final float symbolIndent) {
-        this(numbered, false, symbolIndent);
     }
 
     /**

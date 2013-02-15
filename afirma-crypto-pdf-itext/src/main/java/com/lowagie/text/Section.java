@@ -98,7 +98,7 @@ public class Section extends ArrayList implements TextElementArray, LargeElement
 	// member variables
 
 	/** The title of this section. */
-    protected Paragraph title;
+	private Paragraph title;
 
     /** The bookmark title if different from the content title */
     private String bookmarkTitle;

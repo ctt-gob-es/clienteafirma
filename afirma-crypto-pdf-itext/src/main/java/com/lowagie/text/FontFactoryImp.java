@@ -166,7 +166,7 @@ public class FontFactoryImp {
      * 				the cache if new, false if the font is always created new
      * @return the Font constructed based on the parameters
      */
-    Font getFont(String fontname, final String encoding, final boolean embedded, final float size, int style, final Color color, final boolean cached) {
+    private Font getFont(String fontname, final String encoding, final boolean embedded, final float size, int style, final Color color, final boolean cached) {
     	if (fontname == null) {
 			return new Font(Font.UNDEFINED, size, style, color);
 		}
@@ -336,7 +336,7 @@ public class FontFactoryImp {
      * @param fullName the font name
      * @param path the font path
      */
-    void registerFamily(final String familyName, final String fullName, final String path) {
+    private void registerFamily(final String familyName, final String fullName, final String path) {
         if (path != null) {
 			this.trueTypeFonts.setProperty(fullName, path);
 		}
@@ -379,7 +379,7 @@ public class FontFactoryImp {
  * @param   alias   the alias you want to use for the font
  */
 
-    void register(final String path, final String alias) {
+    private void register(final String path, final String alias) {
         try {
             if (path.toLowerCase().endsWith(".ttf") || path.toLowerCase().endsWith(".otf") || path.toLowerCase().indexOf(".ttc,") > 0) {
                 final Object allNames[] = BaseFont.getAllFontNames(path, BaseFont.WINANSI, null);
@@ -450,14 +450,6 @@ public class FontFactoryImp {
         }
     }
 
-    /** Register all the fonts in a directory.
-     * @param dir the directory
-     * @return the number of fonts registered
-     */
-    int registerDirectory(final String dir) {
-        return registerDirectory(dir, false);
-    }
-
     /**
      * Register all the fonts in a directory and possibly its subdirectories.
      * @param dir the directory
@@ -465,7 +457,7 @@ public class FontFactoryImp {
      * @return the number of fonts registered
      * @since 2.1.2
      */
-    int registerDirectory(final String dir, final boolean scanSubdirectories) {
+    private int registerDirectory(final String dir, final boolean scanSubdirectories) {
         int count = 0;
         try {
             File file = new File(dir);

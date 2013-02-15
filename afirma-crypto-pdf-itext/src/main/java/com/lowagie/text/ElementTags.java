@@ -431,7 +431,7 @@ public class ElementTags {
      * @param	alignment a String (one of the ALIGN_ constants of this class)
      * @return	an alignment value (one of the ALIGN_ constants of the Element interface)
      */
-    public static int alignmentValue(final String alignment) {
+    static int alignmentValue(final String alignment) {
     	if (alignment == null) {
 			return Element.ALIGN_UNDEFINED;
 		}

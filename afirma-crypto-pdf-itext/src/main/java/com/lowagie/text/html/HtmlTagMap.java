@@ -44,7 +44,7 @@
  *
  * Contributions by:
  * Lubos Strapko
- * 
+ *
  * If you didn't download this code from the following link, you should check if
  * you aren't using an obsolete version:
  * http://www.lowagie.com/iText/
@@ -236,7 +236,7 @@ public class HtmlTagMap extends HashMap {
 	 * @return true if tag is HTML or html
 	 */
 
-	public static boolean isHtml(String tag) {
+	public static boolean isHtml(final String tag) {
 		return HtmlTags.HTML.equalsIgnoreCase(tag);
 	}
 
@@ -246,7 +246,7 @@ public class HtmlTagMap extends HashMap {
 	 * @return true if tag is HEAD or head
 	 */
 
-	public static boolean isHead(String tag) {
+	public static boolean isHead(final String tag) {
 		return HtmlTags.HEAD.equalsIgnoreCase(tag);
 	}
 
@@ -256,7 +256,7 @@ public class HtmlTagMap extends HashMap {
 	 * @return true if tag is META or meta
 	 */
 
-	public static boolean isMeta(String tag) {
+	public static boolean isMeta(final String tag) {
 		return HtmlTags.META.equalsIgnoreCase(tag);
 	}
 
@@ -266,7 +266,7 @@ public class HtmlTagMap extends HashMap {
 	 * @return true if tag is LINK or link
 	 */
 
-	public static boolean isLink(String tag) {
+	public static boolean isLink(final String tag) {
 		return HtmlTags.LINK.equalsIgnoreCase(tag);
 	}
 
@@ -276,7 +276,7 @@ public class HtmlTagMap extends HashMap {
 	 * @return true if tag is TITLE or title
 	 */
 
-	public static boolean isTitle(String tag) {
+	public static boolean isTitle(final String tag) {
 		return HtmlTags.TITLE.equalsIgnoreCase(tag);
 	}
 
@@ -286,17 +286,8 @@ public class HtmlTagMap extends HashMap {
 	 * @return true if tag is BODY or body
 	 */
 
-	public static boolean isBody(String tag) {
+	public static boolean isBody(final String tag) {
 		return HtmlTags.BODY.equalsIgnoreCase(tag);
 	}
 
-	/**
-	 * Checks if this is a special tag.
-	 * @param tag a tagvalue
-	 * @return true if tag is a HTML, HEAD, META, LINK or BODY tag (case insensitive)
-	 */
-	public static boolean isSpecialTag(String tag) {
-		return isHtml(tag) || isHead(tag) || isMeta(tag) || isLink(tag)
-				|| isBody(tag);
-	}
 }

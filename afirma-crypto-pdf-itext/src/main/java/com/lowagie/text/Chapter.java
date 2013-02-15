@@ -86,7 +86,7 @@ public class Chapter extends Section {
 	 * @param	number		the Chapter number
      */
 
-    Chapter(final Paragraph title, final int number) {
+	private Chapter(final Paragraph title, final int number) {
         super(title, 1);
         this.numbers = new ArrayList();
         this.numbers.add(new Integer(number));

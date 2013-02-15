@@ -321,7 +321,7 @@ public class Font implements Comparable {
 	 *            A <CODE>String</CODE> representing a certain font-family
 	 * @return the corresponding index
 	 */
-	public static int getFamilyIndex(final String family) {
+	private static int getFamilyIndex(final String family) {
 		if (family.equalsIgnoreCase(FontFactory.COURIER)) {
 			return COURIER;
 		}
@@ -373,7 +373,7 @@ public class Font implements Comparable {
 	 *            a certain linespacing
 	 * @return the height of a line
 	 */
-	public float getCalculatedLeading(final float linespacing) {
+	float getCalculatedLeading(final float linespacing) {
 		return linespacing * getCalculatedSize();
 	}
 
@@ -500,7 +500,7 @@ public class Font implements Comparable {
 	 *            A <CODE>String</CODE>
 	 * @return the corresponding value
 	 */
-	public static int getStyleValue(final String style) {
+	static int getStyleValue(final String style) {
 		int s = 0;
 		if (style.indexOf(Markup.CSS_VALUE_NORMAL) != -1) {
 			s |= NORMAL;
@@ -674,7 +674,7 @@ public class Font implements Comparable {
 	 *            the font of a bigger element class
 	 * @return a <CODE>Font</CODE>
 	 */
-	public Font difference(final Font font) {
+	Font difference(final Font font) {
 		if (font == null) {
 			return this;
 		}

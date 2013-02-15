@@ -71,13 +71,13 @@ public class RomanNumberFactory {
 		 * @param value the value
 		 * @param pre can it be used as a prefix
 		 */
-		RomanDigit(char digit, int value, boolean pre) {
+		RomanDigit(final char digit, final int value, final boolean pre) {
 			this.digit = digit;
 			this.value = value;
 			this.pre = pre;
 		}
 	}
-	
+
 	/**
 	 * Array with Roman digits.
 	 */
@@ -90,14 +90,14 @@ public class RomanNumberFactory {
 		new RomanDigit('v', 5, false),
 		new RomanDigit('i', 1, true)
 	};
-	
-	/** 
+
+	/**
 	 * Changes an int into a lower case roman number.
 	 * @param index the original number
 	 * @return the roman number (lower case)
 	 */
-	public static final String getString(int index) {
-		StringBuffer buf = new StringBuffer();
+	private static final String getString(int index) {
+		final StringBuffer buf = new StringBuffer();
 
 		// lower than 0 ? Add minus
 		if (index < 0) {
@@ -111,14 +111,14 @@ public class RomanNumberFactory {
 			buf.append(getString(index / 1000));
 			buf.append('|');
 			// remainder
-			index = index - (index / 1000) * 1000;
+			index = index - index / 1000 * 1000;
 		}
 
 		// number between 1 and 3000
 		int pos = 0;
 		while (true) {
 			// loop over the array with values for m-d-c-l-x-v-i
-			RomanDigit dig = roman[pos];
+			final RomanDigit dig = roman[pos];
 			// adding as many digits as we can
 			while (index >= dig.value) {
 				buf.append(dig.digit);
@@ -130,7 +130,9 @@ public class RomanNumberFactory {
 			}
 			// look for the next digit that can be used in a special way
 			int j = pos;
-			while (!roman[++j].pre);
+			while (!roman[++j].pre) {
+				;
+			}
 
 			// does the special notation apply?
 			if (index + roman[j].value >= dig.value) {
@@ -141,43 +143,30 @@ public class RomanNumberFactory {
 		}
 		return buf.toString();
 	}
-	
-	/** 
+
+	/**
 	 * Changes an int into a lower case roman number.
 	 * @param index the original number
 	 * @return the roman number (lower case)
 	 */
-	public static final String getLowerCaseString(int index) {
-		return getString(index);		
+	public static final String getLowerCaseString(final int index) {
+		return getString(index);
 	}
-	
-	/** 
+
+	/**
 	 * Changes an int into an upper case roman number.
 	 * @param index the original number
 	 * @return the roman number (lower case)
 	 */
-	public static final String getUpperCaseString(int index) {
-		return getString(index).toUpperCase();		
+	public static final String getUpperCaseString(final int index) {
+		return getString(index).toUpperCase();
 	}
 
-	/** 
-	 * Changes an int into a roman number.
-	 * @param index the original number
-	 * @return the roman number (lower case)
-	 */
-	public static final String getString(int index, boolean lowercase) {
-		if (lowercase) {
-			return getLowerCaseString(index);
-		}
-		else {
-			return getUpperCaseString(index);
-		}
-	}
-	
+
 	/**
 	 * Test this class using this main method.
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		for (int i = 1; i < 2000; i++) {
 			System.out.println(getString(i));
 		}

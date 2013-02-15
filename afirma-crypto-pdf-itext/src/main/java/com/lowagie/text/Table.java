@@ -194,31 +194,31 @@ public class Table extends Rectangle implements LargeElement {
      * Boolean to automatically fill empty cells before a table is rendered
      *  (takes CPU so may be set to false in case of certainty)
      */
-    protected boolean autoFillEmptyCells = false;
+    private boolean autoFillEmptyCells = false;
 
     /** If true this table may not be split over two pages. */
-    boolean tableFitsPage = false;
+    private boolean tableFitsPage = false;
 
     /** If true cells may not be split over two pages. */
-    boolean cellsFitPage = false;
+    private boolean cellsFitPage = false;
 
     /** This is the offset of the table. */
-    float offset = Float.NaN;
+    private float offset = Float.NaN;
 
     /** if you want to generate tables the old way, set this value to false. */
-    protected boolean convert2pdfptable = false;
+    private boolean convert2pdfptable = false;
 
     /**
      * Indicates if this is the first time the section was added.
      * @since	iText 2.0.8
      */
-    protected boolean notAddedYet = true;
+    private boolean notAddedYet = true;
 
     /**
      * Indicates if the PdfPTable is complete once added to the document.
      * @since	iText 2.0.8
      */
-    protected boolean complete = true;
+    private boolean complete = true;
 
     // constructors
 

@@ -49,7 +49,6 @@
 
 package com.lowagie.text;
 
-import java.awt.Graphics2D;
 import java.awt.color.ICC_Profile;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -59,7 +58,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import com.lowagie.text.pdf.PdfArray;
-import com.lowagie.text.pdf.PdfContentByte;
 import com.lowagie.text.pdf.PdfDictionary;
 import com.lowagie.text.pdf.PdfIndirectReference;
 import com.lowagie.text.pdf.PdfName;
@@ -174,7 +172,7 @@ public abstract class Image extends Rectangle {
 	protected int bpc = 1;
 
 	/** The template to be treated as an image. */
-	protected PdfTemplate template[] = new PdfTemplate[1];
+	private PdfTemplate template[] = new PdfTemplate[1];
 
 	/** The alignment of the Image. */
 	private int alignment;
@@ -207,7 +205,7 @@ public abstract class Image extends Rectangle {
 	private int compressionLevel = PdfStream.DEFAULT_COMPRESSION;
 
 	/** an iText attributed unique id for this image. */
-	protected Long mySerialId = getSerialId();
+	private Long mySerialId = getSerialId();
 
 	// image from file or URL
 
@@ -234,7 +232,7 @@ public abstract class Image extends Rectangle {
 	 * @throws MalformedURLException
 	 * @throws IOException
 	 */
-	public static Image getInstance(final URL url) throws BadElementException,
+	private static Image getInstance(final URL url) throws BadElementException,
 			MalformedURLException, IOException {
 		InputStream is = null;
 		try {
@@ -524,7 +522,7 @@ public abstract class Image extends Rectangle {
 	 * @throws BadElementException
 	 *             on error
 	 */
-	public static Image getInstance(final int width, final int height, final boolean reverseBits,
+	private static Image getInstance(final int width, final int height, final boolean reverseBits,
 			final int typeCCITT, final int parameters, final byte[] data, final int transparency[])
 			throws BadElementException {
 		if (transparency != null && transparency.length != 2) {
@@ -557,7 +555,7 @@ public abstract class Image extends Rectangle {
 	 * @throws BadElementException
 	 *             on error
 	 */
-	public static Image getInstance(final int width, final int height, final int components,
+	private static Image getInstance(final int width, final int height, final int components,
 			final int bpc, final byte data[], final int transparency[])
 			throws BadElementException {
 		if (transparency != null && transparency.length != components * 2) {
@@ -584,7 +582,7 @@ public abstract class Image extends Rectangle {
 	 * @return an Image object
 	 * @throws BadElementException
 	 */
-	public static Image getInstance(final PdfTemplate template)
+	private static Image getInstance(final PdfTemplate template)
 			throws BadElementException {
 		return new ImgTemplate(template);
 	}
@@ -787,42 +785,6 @@ public abstract class Image extends Rectangle {
 			throws BadElementException, IOException {
 		return Image.getInstance(image, color, false);
 	}
-
-    /**
-     * Gets an instance of a Image from a java.awt.Image.
-     * The image is added as a JPEG with a user defined quality.
-     *
-     * @param cb
-     *            the <CODE>PdfContentByte</CODE> object to which the image will be added
-     * @param awtImage
-     *            the <CODE>java.awt.Image</CODE> to convert
-     * @param quality
-     *            a float value between 0 and 1
-     * @return an object of type <CODE>PdfTemplate</CODE>
-     * @throws BadElementException
-     *             on error
-     * @throws IOException
-     */
-    public static Image getInstance(final PdfContentByte cb, final java.awt.Image awtImage, final float quality) throws BadElementException, IOException {
-        final java.awt.image.PixelGrabber pg = new java.awt.image.PixelGrabber(awtImage,
-                0, 0, -1, -1, true);
-        try {
-            pg.grabPixels();
-        } catch (final InterruptedException e) {
-            throw new IOException(
-                    "java.awt.Image Interrupted waiting for pixels!");
-        }
-        if ((pg.getStatus() & java.awt.image.ImageObserver.ABORT) != 0) {
-            throw new IOException("java.awt.Image fetch aborted or errored");
-        }
-        final int w = pg.getWidth();
-        final int h = pg.getHeight();
-        final PdfTemplate tp = cb.createTemplate(w, h);
-        final Graphics2D g2d = tp.createGraphics(w, h, true, quality);
-        g2d.drawImage(awtImage, 0, 0, null);
-        g2d.dispose();
-        return getInstance(tp);
-    }
 
     // image from indirect reference
 
@@ -1308,7 +1270,7 @@ public abstract class Image extends Rectangle {
 	// serial stamping
 
 	/** a static that is used for attributing a unique id to each image. */
-	static long serialId = 0;
+	private static long serialId = 0;
 
 	/** Creates a new serial id. */
 	static protected synchronized Long getSerialId() {
@@ -1328,7 +1290,7 @@ public abstract class Image extends Rectangle {
     // rotation, note that the superclass also has a rotation value.
 
 	/** This is the rotation of the image in radians. */
-	protected float rotationRadians;
+	private float rotationRadians;
 
     /** Holds value of property initialRotation. */
     private float initialRotation;
@@ -1396,16 +1358,16 @@ public abstract class Image extends Rectangle {
     // indentations
 
 	/** the indentation to the left. */
-	protected float indentationLeft = 0;
+    private float indentationLeft = 0;
 
 	/** the indentation to the right. */
-	protected float indentationRight = 0;
+    private float indentationRight = 0;
 
 	/** The spacing before the image. */
-	protected float spacingBefore;
+    private float spacingBefore;
 
 	/** The spacing after the image. */
-	protected float spacingAfter;
+	private float spacingAfter;
 
 	/**
 	 * Gets the left indentation.
@@ -1536,7 +1498,7 @@ public abstract class Image extends Rectangle {
     // Optional Content
 
     /** Optional Content layer to which we want this Image to belong. */
-	protected PdfOCG layer;
+	private PdfOCG layer;
 
 	/**
 	 * Gets the layer this image belongs to.
@@ -1561,7 +1523,7 @@ public abstract class Image extends Rectangle {
 	// interpolation
 
 	/** Holds value of property interpolation. */
-	protected boolean interpolation;
+	private boolean interpolation;
 
 	/**
 	 * Getter for property interpolation.
@@ -1760,7 +1722,7 @@ public abstract class Image extends Rectangle {
 	}
 
 	/** ICC Profile attached */
-	protected ICC_Profile profile = null;
+	private ICC_Profile profile = null;
 
 	/**
 	 * Tags this image with an ICC profile.
@@ -1830,7 +1792,7 @@ public abstract class Image extends Rectangle {
     }
 
 	/** Is this image a mask? */
-	protected boolean mask = false;
+    private boolean mask = false;
 
 	/** The image that serves as a mask for this image. */
 	private Image imageMask;
@@ -1926,7 +1888,7 @@ public abstract class Image extends Rectangle {
 	}
 
 	/** this is the transparency information of the raw image */
-	protected int transparency[];
+	private int transparency[];
 
 	/**
 	 * Returns the transparency.

@@ -63,7 +63,7 @@ package com.lowagie.text;
  * @author  Evelyne De Cordier
  */
 
-public class SpecialSymbol {
+class SpecialSymbol {
 
 	/**
 	 * Returns the first occurrence of a special symbol in a <CODE>String</CODE>.
@@ -87,7 +87,7 @@ public class SpecialSymbol {
      * @param	c	the original ASCII-char
      * @return	the corresponding symbol in font Symbol
      */
-    public static char getCorrespondingSymbol(final char c) {
+    static char getCorrespondingSymbol(final char c) {
         switch(c) {
             case 913:
                 return 'A'; // ALFA

@@ -522,7 +522,7 @@ public class Cell extends Rectangle implements TextElementArray {
 	 *
 	 * @return	a <CODE>size</CODE>.
 	 */
-	public int size() {
+	private int size() {
 		return this.arrayList.size();
 	}
 
@@ -538,7 +538,7 @@ public class Cell extends Rectangle implements TextElementArray {
 	/**
 	 * Clears all the <CODE>Element</CODE>s of this <CODE>Cell</CODE>.
 	 */
-	public void clear() {
+	private void clear() {
 		this.arrayList.clear();
 	}
 
@@ -599,7 +599,7 @@ public class Cell extends Rectangle implements TextElementArray {
 	 * @param element The <CODE>Element</CODE> to add
 	 * @throws BadElementException if the method was called with a <CODE>ListItem</CODE>, <CODE>Row</CODE> or <CODE>Cell</CODE>
 	 */
-	public void addElement(final Element element) throws BadElementException {
+	void addElement(final Element element) throws BadElementException {
 		if (isTable()) {
 			final Table table = (Table) this.arrayList.get(0);
 			final Cell tmp = new Cell(element);
@@ -726,7 +726,7 @@ public class Cell extends Rectangle implements TextElementArray {
 	 * @return a PdfPCell
 	 * @throws BadElementException
 	 */
-	public PdfPCell createPdfPCell() throws BadElementException {
+	PdfPCell createPdfPCell() throws BadElementException {
 		if (this.rowspan > 1) {
 			throw new BadElementException("PdfPCells can't have a rowspan > 1");
 		}

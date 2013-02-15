@@ -133,7 +133,7 @@ public final class FontFactory {
  * @return the Font constructed based on the parameters
  */
 
-    public static Font getFont(final String fontname, final String encoding, final boolean embedded, final float size, final int style, final Color color) {
+    private static Font getFont(final String fontname, final String encoding, final boolean embedded, final float size, final int style, final Color color) {
         return fontImp.getFont(fontname, encoding, embedded, size, style, color);
     }
 
@@ -175,21 +175,8 @@ public final class FontFactory {
  * @return the Font constructed based on the parameters
  */
 
-    public static Font getFont(final String fontname, final float size, final int style, final Color color) {
+    static Font getFont(final String fontname, final float size, final int style, final Color color) {
         return getFont(fontname, defaultEncoding, defaultEmbedding, size, style, color);
-    }
-
-/**
- * Constructs a <CODE>Font</CODE>-object.
- *
- * @param	fontname    the name of the font
- * @param	size	    the size of this font
- * @param	style	    the style of this font
- * @return the Font constructed based on the parameters
- */
-
-    public static Font getFont(final String fontname, final float size, final int style) {
-        return getFont(fontname, defaultEncoding, defaultEmbedding, size, style, null);
     }
 
     /**

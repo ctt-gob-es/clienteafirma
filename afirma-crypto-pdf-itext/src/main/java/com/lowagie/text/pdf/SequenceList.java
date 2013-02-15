@@ -61,14 +61,14 @@ import java.util.ListIterator;
  * range from what is already selected. The range changes are incremental, that is,
  * numbers are added or deleted as the range appears. The start or the end, but not both, can be omitted.
  */
-public class SequenceList {
-    protected static final int COMMA = 1;
-    protected static final int MINUS = 2;
-    protected static final int NOT = 3;
-    protected static final int TEXT = 4;
-    protected static final int NUMBER = 5;
-    protected static final int END = 6;
-    protected static final char EOT = '\uffff';
+class SequenceList {
+	private static final int COMMA = 1;
+    private static final int MINUS = 2;
+    private static final int NOT = 3;
+    private static final int TEXT = 4;
+    private static final int NUMBER = 5;
+    private static final int END = 6;
+    private static final char EOT = '\uffff';
 
     private static final int FIRST = 0;
     private static final int DIGIT = 1;
@@ -87,39 +87,42 @@ public class SequenceList {
     protected boolean even;
     protected boolean inverse;
 
-    protected SequenceList(String range) {
-        ptr = 0;
-        text = range.toCharArray();
+    private SequenceList(final String range) {
+        this.ptr = 0;
+        this.text = range.toCharArray();
     }
-    
+
     protected char nextChar() {
         while (true) {
-            if (ptr >= text.length)
-                return EOT;
-            char c = text[ptr++];
-            if (c > ' ')
-                return c;
+            if (this.ptr >= this.text.length) {
+				return EOT;
+			}
+            final char c = this.text[this.ptr++];
+            if (c > ' ') {
+				return c;
+			}
         }
     }
-    
+
     protected void putBack() {
-        --ptr;
-        if (ptr < 0)
-            ptr = 0;
+        --this.ptr;
+        if (this.ptr < 0) {
+			this.ptr = 0;
+		}
     }
-    
+
     protected int getType() {
-        StringBuffer buf = new StringBuffer();
+        final StringBuffer buf = new StringBuffer();
         int state = FIRST;
         while (true) {
-            char c = nextChar();
+            final char c = nextChar();
             if (c == EOT) {
                 if (state == DIGIT) {
-                    number = Integer.parseInt(other = buf.toString());
+                    this.number = Integer.parseInt(this.other = buf.toString());
                     return NUMBER;
                 }
                 else if (state == OTHER) {
-                    other = buf.toString().toLowerCase();
+                    this.other = buf.toString().toLowerCase();
                     return TEXT;
                 }
                 return END;
@@ -135,87 +138,89 @@ public class SequenceList {
                             return COMMA;
                     }
                     buf.append(c);
-                    if (c >= '0' && c <= '9')
-                        state = DIGIT;
-                    else
-                        state = OTHER;
+                    if (c >= '0' && c <= '9') {
+						state = DIGIT;
+					} else {
+						state = OTHER;
+					}
                     break;
                 case DIGIT:
-                    if (c >= '0' && c <= '9')
-                        buf.append(c);
-                    else {
+                    if (c >= '0' && c <= '9') {
+						buf.append(c);
+					} else {
                         putBack();
-                        number = Integer.parseInt(other = buf.toString());
+                        this.number = Integer.parseInt(this.other = buf.toString());
                         return NUMBER;
                     }
                     break;
                 case OTHER:
-                    if (NOT_OTHER.indexOf(c) < 0)
-                        buf.append(c);
-                    else {
+                    if (NOT_OTHER.indexOf(c) < 0) {
+						buf.append(c);
+					} else {
                         putBack();
-                        other = buf.toString().toLowerCase();
+                        this.other = buf.toString().toLowerCase();
                         return TEXT;
                     }
                     break;
             }
         }
     }
-    
+
     private void otherProc() {
-        if (other.equals("odd") || other.equals("o")) {
-            odd = true;
-            even = false;
+        if (this.other.equals("odd") || this.other.equals("o")) {
+            this.odd = true;
+            this.even = false;
         }
-        else if (other.equals("even") || other.equals("e")) {
-            odd = false;
-            even = true;
+        else if (this.other.equals("even") || this.other.equals("e")) {
+            this.odd = false;
+            this.even = true;
         }
     }
-    
+
     protected boolean getAttributes() {
-        low = -1;
-        high = -1;
-        odd = even = inverse = false;
+        this.low = -1;
+        this.high = -1;
+        this.odd = this.even = this.inverse = false;
         int state = OTHER;
         while (true) {
-            int type = getType();
+            final int type = getType();
             if (type == END || type == COMMA) {
-                if (state == DIGIT)
-                    high = low;
-                return (type == END);
+                if (state == DIGIT) {
+					this.high = this.low;
+				}
+                return type == END;
             }
             switch (state) {
                 case OTHER:
                     switch (type) {
                         case NOT:
-                            inverse = true;
+                            this.inverse = true;
                             break;
                         case MINUS:
                             state = DIGIT2;
                             break;
                         default:
                             if (type == NUMBER) {
-                                low = number;
+                                this.low = this.number;
                                 state = DIGIT;
-                            }
-                            else
-                                otherProc();
+                            } else {
+								otherProc();
+							}
                             break;
                     }
                     break;
                 case DIGIT:
                     switch (type) {
                         case NOT:
-                            inverse = true;
+                            this.inverse = true;
                             state = OTHER;
-                            high = low;
+                            this.high = this.low;
                             break;
                         case MINUS:
                             state = DIGIT2;
                             break;
                         default:
-                            high = low;
+                            this.high = this.low;
                             state = OTHER;
                             otherProc();
                             break;
@@ -224,13 +229,13 @@ public class SequenceList {
                 case DIGIT2:
                     switch (type) {
                         case NOT:
-                            inverse = true;
+                            this.inverse = true;
                             state = OTHER;
                             break;
                         case MINUS:
                             break;
                         case NUMBER:
-                            high = number;
+                            this.high = this.number;
                             state = OTHER;
                             break;
                         default:
@@ -242,44 +247,51 @@ public class SequenceList {
             }
         }
     }
-    
+
     /**
      * Generates a list of numbers from a string.
      * @param ranges the comma separated ranges
      * @param maxNumber the maximum number in the range
      * @return a list with the numbers as <CODE>Integer</CODE>
-     */    
-    public static List expand(String ranges, int maxNumber) {
-        SequenceList parse = new SequenceList(ranges);
-        LinkedList list = new LinkedList();
+     */
+    public static List expand(final String ranges, final int maxNumber) {
+        final SequenceList parse = new SequenceList(ranges);
+        final LinkedList list = new LinkedList();
         boolean sair = false;
         while (!sair) {
             sair = parse.getAttributes();
-            if (parse.low == -1 && parse.high == -1 && !parse.even && !parse.odd)
-                continue;
-            if (parse.low < 1)
-                parse.low = 1;
-            if (parse.high < 1 || parse.high > maxNumber)
-                parse.high = maxNumber;
-            if (parse.low > maxNumber)
-                parse.low = maxNumber;
-            
+            if (parse.low == -1 && parse.high == -1 && !parse.even && !parse.odd) {
+				continue;
+			}
+            if (parse.low < 1) {
+				parse.low = 1;
+			}
+            if (parse.high < 1 || parse.high > maxNumber) {
+				parse.high = maxNumber;
+			}
+            if (parse.low > maxNumber) {
+				parse.low = maxNumber;
+			}
+
             //System.out.println("low="+parse.low+",high="+parse.high+",odd="+parse.odd+",even="+parse.even+",inverse="+parse.inverse);
             int inc = 1;
             if (parse.inverse) {
                 if (parse.low > parse.high) {
-                    int t = parse.low;
+                    final int t = parse.low;
                     parse.low = parse.high;
                     parse.high = t;
                 }
-                for (ListIterator it = list.listIterator(); it.hasNext();) {
-                    int n = ((Integer)it.next()).intValue();
-                    if (parse.even && (n & 1) == 1)
-                        continue;
-                    if (parse.odd && (n & 1) == 0)
-                        continue;
-                    if (n >= parse.low && n <= parse.high)
-                        it.remove();
+                for (final ListIterator it = list.listIterator(); it.hasNext();) {
+                    final int n = ((Integer)it.next()).intValue();
+                    if (parse.even && (n & 1) == 1) {
+						continue;
+					}
+                    if (parse.odd && (n & 1) == 0) {
+						continue;
+					}
+                    if (n >= parse.low && n <= parse.high) {
+						it.remove();
+					}
                 }
             }
             else {
@@ -287,21 +299,24 @@ public class SequenceList {
                     inc = -1;
                     if (parse.odd || parse.even) {
                         --inc;
-                        if (parse.even)
-                            parse.low &= ~1;
-                        else
-                            parse.low -= ((parse.low & 1) == 1 ? 0 : 1);
+                        if (parse.even) {
+							parse.low &= ~1;
+						} else {
+							parse.low -= (parse.low & 1) == 1 ? 0 : 1;
+						}
                     }
-                    for (int k = parse.low; k >= parse.high; k += inc)
-                        list.add(new Integer(k));
+                    for (int k = parse.low; k >= parse.high; k += inc) {
+						list.add(new Integer(k));
+					}
                 }
                 else {
                     if (parse.odd || parse.even) {
                         ++inc;
-                        if (parse.odd)
-                            parse.low |= 1;
-                        else
-                            parse.low += ((parse.low & 1) == 1 ? 1 : 0);
+                        if (parse.odd) {
+							parse.low |= 1;
+						} else {
+							parse.low += (parse.low & 1) == 1 ? 1 : 0;
+						}
                     }
                     for (int k = parse.low; k <= parse.high; k += inc) {
                         list.add(new Integer(k));

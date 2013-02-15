@@ -140,20 +140,6 @@ public class Phrase extends ArrayList implements TextElementArray {
         setHyphenation(chunk.getHyphenation());
     }
 
-	/**
-     * Constructs a <CODE>Phrase</CODE> with a certain <CODE>Chunk</CODE>
-     * and a certain leading.
-     *
-     * @param	leading	the leading
-     * @param	chunk		a <CODE>Chunk</CODE>
-     */
-    Phrase(final float leading, final Chunk chunk) {
-        this.leading = leading;
-        super.add(chunk);
-        this.font = chunk.getFont();
-        setHyphenation(chunk.getHyphenation());
-    }
-
     /**
      * Constructs a <CODE>Phrase</CODE> with a certain <CODE>String</CODE>.
      *
@@ -174,16 +160,6 @@ public class Phrase extends ArrayList implements TextElementArray {
     }
 
     /**
-     * Constructs a <CODE>Phrase</CODE> with a certain leading and a certain <CODE>String</CODE>.
-     *
-     * @param	leading	the leading
-     * @param	string		a <CODE>String</CODE>
-     */
-    Phrase(final float leading, final String string) {
-        this(leading, string, new Font());
-    }
-
-    /**
      * Constructs a <CODE>Phrase</CODE> with a certain leading, a certain <CODE>String</CODE>
      * and a certain <CODE>Font</CODE>.
      *
@@ -191,7 +167,7 @@ public class Phrase extends ArrayList implements TextElementArray {
      * @param	string		a <CODE>String</CODE>
      * @param	font		a <CODE>Font</CODE>
      */
-    Phrase(final float leading, final String string, final Font font) {
+    private Phrase(final float leading, final String string, final Font font) {
         this.leading = leading;
         this.font = font;
     	/* bugfix by August Detlefsen */
