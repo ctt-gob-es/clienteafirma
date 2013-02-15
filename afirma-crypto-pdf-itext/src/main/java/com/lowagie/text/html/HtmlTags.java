@@ -61,33 +61,6 @@ public class HtmlTags {
 	/** the root tag. */
 	static final String HTML = "html";
 
-	/** the head tag */
-	static final String HEAD = "head";
-
-	/** This is a possible HTML attribute for the HEAD tag. */
-	static final String CONTENT = "content";
-
-	/** the meta tag */
-	static final String META = "meta";
-
-	/** the title tag. */
-	static final String TITLE = "title";
-
-	/** the body tag. */
-	static final String BODY = "body";
-
-	/** This is a possible HTML attribute for the BODY tag. */
-	static final String TOPMARGIN = "topmargin";
-
-	/** This is a possible HTML attribute for the BODY tag. */
-	static final String BOTTOMMARGIN = "bottommargin";
-
-	/** This is a possible HTML attribute for the BODY tag. */
-	static final String LEFTMARGIN = "leftmargin";
-
-	/** This is a possible HTML attribute for the BODY tag. */
-	static final String RIGHTMARGIN = "rightmargin";
-
 	// Phrases, Anchors, Lists and Paragraphs
 
 	/** the chunk tag */
@@ -241,40 +214,11 @@ public class HtmlTags {
 	/** the newpage tag */
 	static final String NEWLINE = "br";
 
-	// alignment attribute values
-
-	/** the possible value of an alignment attribute */
-	static final String ALIGN_LEFT = "Left";
-
-	/** the possible value of an alignment attribute */
-	static final String ALIGN_CENTER = "Center";
-
-	/** the possible value of an alignment attribute */
-	static final String ALIGN_RIGHT = "Right";
-
-	/** the possible value of an alignment attribute */
-	static final String ALIGN_JUSTIFIED = "Justify";
-
-	/** the possible value of an alignment attribute */
-	static final String ALIGN_TOP = "Top";
-
-	/** the possible value of an alignment attribute */
-	static final String ALIGN_MIDDLE = "Middle";
-
-	/** the possible value of an alignment attribute */
-	static final String ALIGN_BOTTOM = "Bottom";
-
-	/** the possible value of an alignment attribute */
-	static final String ALIGN_BASELINE = "Baseline";
-
 	/** The DIV tag. */
 	static final String DIV = "div";
 
 	/** The SPAN tag. */
 	static final String SPAN = "span";
-
-	/** The LINK tag. */
-	static final String LINK = "link";
 
 	/** This is a possible HTML attribute for auto-formated
      * @since 2.1.3

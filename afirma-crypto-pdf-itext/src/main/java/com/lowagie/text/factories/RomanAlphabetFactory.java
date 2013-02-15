@@ -92,7 +92,7 @@ public class RomanAlphabetFactory {
 	 * into a String using the letters 'a' to 'z';
 	 * 1 = a, 2 = b, ..., 26 = z, 27 = aa, 28 = ab,...
 	 */
-	public static final String getLowerCaseString(final int index) {
+	private static final String getLowerCaseString(final int index) {
 		return getString(index);
 	}
 
@@ -101,7 +101,7 @@ public class RomanAlphabetFactory {
 	 * into a String using the letters 'A' to 'Z';
 	 * 1 = A, 2 = B, ..., 26 = Z, 27 = AA, 28 = AB,...
 	 */
-	public static final String getUpperCaseString(final int index) {
+	private static final String getUpperCaseString(final int index) {
 		return getString(index).toUpperCase();
 	}
 

@@ -230,64 +230,7 @@ public class HtmlTagMap extends HashMap {
 		put(peer.getAlias(), peer);
 	}
 
-	/**
-	 * Checks if this is the root tag.
-	 * @param tag a tagvalue
-	 * @return true if tag is HTML or html
-	 */
 
-	static boolean isHtml(final String tag) {
-		return HtmlTags.HTML.equalsIgnoreCase(tag);
-	}
 
-	/**
-	 * Checks if this is the head tag.
-	 * @param tag a tagvalue
-	 * @return true if tag is HEAD or head
-	 */
-
-	static boolean isHead(final String tag) {
-		return HtmlTags.HEAD.equalsIgnoreCase(tag);
-	}
-
-	/**
-	 * Checks if this is the meta tag.
-	 * @param tag a tagvalue
-	 * @return true if tag is META or meta
-	 */
-
-	static boolean isMeta(final String tag) {
-		return HtmlTags.META.equalsIgnoreCase(tag);
-	}
-
-	/**
-	 * Checks if this is the link tag.
-	 * @param tag a tagvalue
-	 * @return true if tag is LINK or link
-	 */
-
-	static boolean isLink(final String tag) {
-		return HtmlTags.LINK.equalsIgnoreCase(tag);
-	}
-
-	/**
-	 * Checks if this is the title tag.
-	 * @param tag a tagvalue
-	 * @return true if tag is TITLE or title
-	 */
-
-	static boolean isTitle(final String tag) {
-		return HtmlTags.TITLE.equalsIgnoreCase(tag);
-	}
-
-	/**
-	 * Checks if this is the root tag.
-	 * @param tag a tagvalue
-	 * @return true if tag is BODY or body
-	 */
-
-	static boolean isBody(final String tag) {
-		return HtmlTags.BODY.equalsIgnoreCase(tag);
-	}
 
 }
