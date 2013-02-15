@@ -63,26 +63,26 @@ package com.lowagie.text;
  */
 
 public class Header extends Meta {
-    
+
     // membervariables
-    
+
 	/** This is the content of this chunk of text. */
-    private StringBuffer name;
-    
+    private final StringBuffer name;
+
     // constructors
-    
+
     /**
      * Constructs a <CODE>Meta</CODE>.
      *
      * @param	name		the name of the meta-information
      * @param	content		the content
      */
-    
-    public Header(String name, String content) {
+
+    Header(final String name, final String content) {
         super(Element.HEADER, content);
         this.name = new StringBuffer(name);
     }
-    
+
     // methods to retrieve information
 
 	/**
@@ -90,8 +90,9 @@ public class Header extends Meta {
      *
      * @return	a <CODE>String</CODE>
      */
-    public String getName() {
-        return name.toString();
+    @Override
+	public String getName() {
+        return this.name.toString();
     }
 
 }

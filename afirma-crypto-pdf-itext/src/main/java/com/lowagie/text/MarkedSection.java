@@ -63,21 +63,21 @@ import java.util.Iterator;
 public class MarkedSection extends MarkedObject {
 
 	/** This is the title of this section. */
-	protected MarkedObject title = null;
-	    
+	private MarkedObject title = null;
+
 	/**
 	 * Creates a MarkedObject with a Section or Chapter object.
 	 * @param section	the marked section
 	 */
-	public MarkedSection(Section section) {
+	MarkedSection(final Section section) {
 		super();
 		if (section.title != null) {
-			title = new MarkedObject(section.title);
+			this.title = new MarkedObject(section.title);
 			section.setTitle(null);
 		}
 		this.element = section;
 	}
-	
+
 	/**
 	 * Adds a <CODE>Paragraph</CODE>, <CODE>List</CODE> or <CODE>Table</CODE>
 	 * to this <CODE>Section</CODE>.
@@ -86,10 +86,10 @@ public class MarkedSection extends MarkedObject {
 	 * @param	o   	an object of type <CODE>Paragraph</CODE>, <CODE>List</CODE> or <CODE>Table</CODE>=
 	 * @throws	ClassCastException if the object is not a <CODE>Paragraph</CODE>, <CODE>List</CODE> or <CODE>Table</CODE>
 	 */
-	public void add(int index, Object o) {
-		((Section)element).add(index, o);
+	public void add(final int index, final Object o) {
+		((Section)this.element).add(index, o);
 	}
-	    
+
 	/**
 	 * Adds a <CODE>Paragraph</CODE>, <CODE>List</CODE>, <CODE>Table</CODE> or another <CODE>Section</CODE>
 	 * to this <CODE>Section</CODE>.
@@ -97,9 +97,9 @@ public class MarkedSection extends MarkedObject {
 	 * @param	o   	an object of type <CODE>Paragraph</CODE>, <CODE>List</CODE>, <CODE>Table</CODE> or another <CODE>Section</CODE>
 	 * @return	a boolean
 	 * @throws	ClassCastException if the object is not a <CODE>Paragraph</CODE>, <CODE>List</CODE>, <CODE>Table</CODE> or <CODE>Section</CODE>
-	 */ 
-	public boolean add(Object o) {
-		return ((Section)element).add(o);
+	 */
+	public boolean add(final Object o) {
+		return ((Section)this.element).add(o);
 	}
 
     /**
@@ -109,20 +109,21 @@ public class MarkedSection extends MarkedObject {
      * @param       listener        an <CODE>ElementListener</CODE>
      * @return <CODE>true</CODE> if the element was processed successfully
      */
-    public boolean process(ElementListener listener) {
+    @Override
+	public boolean process(final ElementListener listener) {
         try {
         	Element element;
-            for (Iterator i = ((Section)this.element).iterator(); i.hasNext(); ) {
+            for (final Iterator i = ((Section)this.element).iterator(); i.hasNext(); ) {
             	element = (Element)i.next();
                 listener.add(element);
             }
             return true;
         }
-        catch(DocumentException de) {
+        catch(final DocumentException de) {
             return false;
         }
     }
-	
+
 	/**
 	 * Adds a collection of <CODE>Element</CODE>s
 	 * to this <CODE>Section</CODE>.
@@ -130,68 +131,69 @@ public class MarkedSection extends MarkedObject {
 	 * @param	collection	a collection of <CODE>Paragraph</CODE>s, <CODE>List</CODE>s and/or <CODE>Table</CODE>s
 	 * @return	<CODE>true</CODE> if the action succeeded, <CODE>false</CODE> if not.
 	 * @throws	ClassCastException if one of the objects isn't a <CODE>Paragraph</CODE>, <CODE>List</CODE>, <CODE>Table</CODE>
-	 */ 
-	public boolean addAll(Collection collection) {
-		return ((Section)element).addAll(collection);
+	 */
+	public boolean addAll(final Collection collection) {
+		return ((Section)this.element).addAll(collection);
 	}
-	  
+
 	/**
 	 * Creates a <CODE>Section</CODE>, adds it to this <CODE>Section</CODE> and returns it.
 	 *
 	 * @param	indentation	the indentation of the new section
 	 * @param	numberDepth	the numberDepth of the section
 	 * @return  a new Section object
-	 */   
-	public MarkedSection addSection(float indentation, int numberDepth) {
-		MarkedSection section = ((Section)element).addMarkedSection();
+	 */
+	public MarkedSection addSection(final float indentation, final int numberDepth) {
+		final MarkedSection section = ((Section)this.element).addMarkedSection();
 		section.setIndentation(indentation);
 		section.setNumberDepth(numberDepth);
 		return section;
 	}
-	    
+
 	/**
 	 * Creates a <CODE>Section</CODE>, adds it to this <CODE>Section</CODE> and returns it.
 	 *
 	 * @param	indentation	the indentation of the new section
 	 * @return  a new Section object
 	 */
-	public MarkedSection addSection(float indentation) {
-		MarkedSection section = ((Section)element).addMarkedSection();
+	public MarkedSection addSection(final float indentation) {
+		final MarkedSection section = ((Section)this.element).addMarkedSection();
 		section.setIndentation(indentation);
 		return section;
 	}
-	    
+
 	/**
 	 * Creates a <CODE>Section</CODE>, add it to this <CODE>Section</CODE> and returns it.
 	 *
 	 * @param	numberDepth	the numberDepth of the section
 	 * @return  a new Section object
 	 */
-	public MarkedSection addSection(int numberDepth) {
-		MarkedSection section = ((Section)element).addMarkedSection();
+	public MarkedSection addSection(final int numberDepth) {
+		final MarkedSection section = ((Section)this.element).addMarkedSection();
 		section.setNumberDepth(numberDepth);
 		return section;
 	}
-	    
+
 	/**
 	 * Creates a <CODE>Section</CODE>, adds it to this <CODE>Section</CODE> and returns it.
 	 *
 	 * @return  a new Section object
 	 */
 	public MarkedSection addSection() {
-		return ((Section)element).addMarkedSection();
+		return ((Section)this.element).addMarkedSection();
 	}
-	    
+
 	// public methods
-	    
+
 	/**
 	 * Sets the title of this section.
 	 *
 	 * @param	title	the new title
 	 */
-	public void setTitle(MarkedObject title) {
-		if (title.element instanceof Paragraph)
+	public void setTitle(final MarkedObject title) {
+		if (title.element instanceof Paragraph) {
 			this.title = title;
+		}
 	}
 
 	/**
@@ -200,12 +202,12 @@ public class MarkedSection extends MarkedObject {
 	 * @since	iText 2.0.8
 	 */
     public MarkedObject getTitle() {
-    	Paragraph result = Section.constructTitle((Paragraph)title.element, ((Section)element).numbers, ((Section)element).numberDepth, ((Section)element).numberStyle);
-        MarkedObject mo = new MarkedObject(result);
-        mo.markupAttributes = title.markupAttributes;
+    	final Paragraph result = Section.constructTitle((Paragraph)this.title.element, ((Section)this.element).numbers, ((Section)this.element).numberDepth, ((Section)this.element).numberStyle);
+        final MarkedObject mo = new MarkedObject(result);
+        mo.markupAttributes = this.title.markupAttributes;
         return mo;
     }
-	
+
 	/**
 	 * Sets the depth of the sectionnumbers that will be shown preceding the title.
 	 * <P>
@@ -215,60 +217,60 @@ public class MarkedSection extends MarkedObject {
 	 *
 	 * @param	numberDepth		the new numberDepth
 	 */
-	public void setNumberDepth(int numberDepth) {
-		((Section)element).setNumberDepth(numberDepth);
+	public void setNumberDepth(final int numberDepth) {
+		((Section)this.element).setNumberDepth(numberDepth);
 	}
-	    
+
 	/**
 	 * Sets the indentation of this <CODE>Section</CODE> on the left side.
 	 *
 	 * @param	indentation		the indentation
 	 */
-	public void setIndentationLeft(float indentation) {
-		((Section)element).setIndentationLeft(indentation);
+	public void setIndentationLeft(final float indentation) {
+		((Section)this.element).setIndentationLeft(indentation);
 	}
-	    
+
 	/**
 	 * Sets the indentation of this <CODE>Section</CODE> on the right side.
 	 *
 	 * @param	indentation		the indentation
-	 */   
-	public void setIndentationRight(float indentation) {
-		((Section)element).setIndentationRight(indentation);
+	 */
+	public void setIndentationRight(final float indentation) {
+		((Section)this.element).setIndentationRight(indentation);
 	}
-	    
+
 	/**
 	 * Sets the indentation of the content of this <CODE>Section</CODE>.
 	 *
 	 * @param	indentation		the indentation
 	 */
-	public void setIndentation(float indentation) {
-		((Section)element).setIndentation(indentation);
+	public void setIndentation(final float indentation) {
+		((Section)this.element).setIndentation(indentation);
 	}
-	    
+
 	/** Setter for property bookmarkOpen.
 	 * @param bookmarkOpen false if the bookmark children are not
 	 * visible.
 	 */
-	public void setBookmarkOpen(boolean bookmarkOpen) {
-	 	((Section)element).setBookmarkOpen(bookmarkOpen);
+	public void setBookmarkOpen(final boolean bookmarkOpen) {
+	 	((Section)this.element).setBookmarkOpen(bookmarkOpen);
 	}
-	    
+
 	/**
 	 * Setter for property triggerNewPage.
 	 * @param triggerNewPage true if a new page has to be triggered.
 	 */
-	public void setTriggerNewPage(boolean triggerNewPage) {
-	  	((Section)element).setTriggerNewPage(triggerNewPage);
+	public void setTriggerNewPage(final boolean triggerNewPage) {
+	  	((Section)this.element).setTriggerNewPage(triggerNewPage);
 	}
-	    
+
 	/**
 	 * Sets the bookmark title. The bookmark title is the same as the section title but
 	 * can be changed with this method.
 	 * @param bookmarkTitle the bookmark title
-	 */    
-	public void setBookmarkTitle(String bookmarkTitle) {
-	  	((Section)element).setBookmarkTitle(bookmarkTitle);
+	 */
+	public void setBookmarkTitle(final String bookmarkTitle) {
+	  	((Section)this.element).setBookmarkTitle(bookmarkTitle);
 	}
 
 	/**
@@ -276,6 +278,6 @@ public class MarkedSection extends MarkedObject {
 	 * @since	2.1.1
 	 */
 	public void newPage() {
-		((Section)element).newPage();
+		((Section)this.element).newPage();
 	}
 }

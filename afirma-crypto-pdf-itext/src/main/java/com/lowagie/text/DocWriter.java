@@ -115,12 +115,12 @@ public abstract class DocWriter implements DocListener {
 
 /** Do we have to pause all writing actions? */
     protected boolean pause = false;
-    
+
 /** Closes the stream on document close */
-    protected boolean closeStream = true;
+    private boolean closeStream = true;
 
     // constructor
-    
+
     protected DocWriter()  {
     }
 
@@ -131,7 +131,7 @@ public abstract class DocWriter implements DocListener {
  * @param os  The <CODE>OutputStream</CODE> the writer has to write to.
  */
 
-    protected DocWriter(Document document, OutputStream os)  {
+    protected DocWriter(final Document document, final OutputStream os)  {
         this.document = document;
         this.os = new OutputStreamCounter(new BufferedOutputStream(os));
     }
@@ -143,13 +143,14 @@ public abstract class DocWriter implements DocListener {
  * <P>
  * This method should be overridden in the specific <CODE>DocWriter<CODE> classes
  * derived from this abstract class.
- * 
+ *
  * @param element A high level object to add
  * @return  <CODE>false</CODE>
  * @throws  DocumentException when a document isn't open yet, or has been closed
  */
 
-    public boolean add(Element element) throws DocumentException {
+    @Override
+	public boolean add(final Element element) throws DocumentException {
         return false;
     }
 
@@ -157,8 +158,9 @@ public abstract class DocWriter implements DocListener {
  * Signals that the <CODE>Document</CODE> was opened.
  */
 
-    public void open() {
-        open = true;
+    @Override
+	public void open() {
+        this.open = true;
     }
 
 /**
@@ -168,7 +170,8 @@ public abstract class DocWriter implements DocListener {
  * @return  a <CODE>boolean</CODE>
  */
 
-    public boolean setPageSize(Rectangle pageSize) {
+    @Override
+	public boolean setPageSize(final Rectangle pageSize) {
         this.pageSize = pageSize;
         return true;
     }
@@ -185,7 +188,8 @@ public abstract class DocWriter implements DocListener {
  * @return  <CODE>false</CODE>
  */
 
-    public boolean setMargins(float marginLeft, float marginRight, float marginTop, float marginBottom) {
+    @Override
+	public boolean setMargins(final float marginLeft, final float marginRight, final float marginTop, final float marginBottom) {
         return false;
     }
 
@@ -197,8 +201,9 @@ public abstract class DocWriter implements DocListener {
  * @return  <CODE>true</CODE> if the page was added, <CODE>false</CODE> if not.
  */
 
-    public boolean newPage() {
-        if (!open) {
+    @Override
+	public boolean newPage() {
+        if (!this.open) {
             return false;
         }
         return true;
@@ -214,7 +219,8 @@ public abstract class DocWriter implements DocListener {
  * @param header    the new header
  */
 
-    public void setHeader(HeaderFooter header) {
+    @Override
+	public void setHeader(final HeaderFooter header) {
     }
 
 /**
@@ -225,7 +231,8 @@ public abstract class DocWriter implements DocListener {
  * headers.
  */
 
-    public void resetHeader() {
+    @Override
+	public void resetHeader() {
     }
 
 /**
@@ -238,7 +245,8 @@ public abstract class DocWriter implements DocListener {
  * @param footer    the new footer
  */
 
-    public void setFooter(HeaderFooter footer) {
+    @Override
+	public void setFooter(final HeaderFooter footer) {
     }
 
 /**
@@ -249,7 +257,8 @@ public abstract class DocWriter implements DocListener {
  * footers.
  */
 
-    public void resetFooter() {
+    @Override
+	public void resetFooter() {
     }
 
 /**
@@ -260,7 +269,8 @@ public abstract class DocWriter implements DocListener {
  * pagenumbers.
  */
 
-    public void resetPageCount() {
+    @Override
+	public void resetPageCount() {
     }
 
 /**
@@ -273,7 +283,8 @@ public abstract class DocWriter implements DocListener {
  * @param pageN   the new page number
  */
 
-    public void setPageCount(int pageN) {
+    @Override
+	public void setPageCount(final int pageN) {
     }
 
 /**
@@ -281,14 +292,16 @@ public abstract class DocWriter implements DocListener {
  * <CODE>Elements</CODE> will be added.
  */
 
-    public void close() {
-        open = false;
+    @Override
+	public void close() {
+        this.open = false;
         try {
-            os.flush();
-            if (closeStream)
-                os.close();
+            this.os.flush();
+            if (this.closeStream) {
+				this.os.close();
+			}
         }
-        catch(IOException ioe) {
+        catch(final IOException ioe) {
             throw new ExceptionConverter(ioe);
         }
     }
@@ -301,14 +314,16 @@ public abstract class DocWriter implements DocListener {
  * @return the conversion result
  */
 
-    public static final byte[] getISOBytes(String text)
+    public static final byte[] getISOBytes(final String text)
     {
-        if (text == null)
-            return null;
-        int len = text.length();
-        byte b[] = new byte[len];
-        for (int k = 0; k < len; ++k)
-            b[k] = (byte)text.charAt(k);
+        if (text == null) {
+			return null;
+		}
+        final int len = text.length();
+        final byte b[] = new byte[len];
+        for (int k = 0; k < len; ++k) {
+			b[k] = (byte)text.charAt(k);
+		}
         return b;
     }
 
@@ -317,17 +332,17 @@ public abstract class DocWriter implements DocListener {
  */
 
     public void pause() {
-        pause = true;
+        this.pause = true;
     }
-    
+
     /**
      * Checks if writing is paused.
      *
      * @return		<CODE>true</CODE> if writing temporarily has to be paused, <CODE>false</CODE> otherwise.
      */
-    
+
     public boolean isPaused() {
-        return pause;
+        return this.pause;
     }
 
 /**
@@ -335,7 +350,7 @@ public abstract class DocWriter implements DocListener {
  */
 
     public void resume() {
-        pause = false;
+        this.pause = false;
     }
 
 /**
@@ -344,9 +359,9 @@ public abstract class DocWriter implements DocListener {
 
     public void flush() {
         try {
-            os.flush();
+            this.os.flush();
         }
-        catch(IOException ioe) {
+        catch(final IOException ioe) {
             throw new ExceptionConverter(ioe);
         }
     }
@@ -358,8 +373,8 @@ public abstract class DocWriter implements DocListener {
  * @throws IOException
  */
 
-    protected void write(String string) throws IOException {
-        os.write(getISOBytes(string));
+    protected void write(final String string) throws IOException {
+        this.os.write(getISOBytes(string));
     }
 
 /**
@@ -369,10 +384,10 @@ public abstract class DocWriter implements DocListener {
  * @throws IOException
  */
 
-    protected void addTabs(int indent) throws IOException {
-        os.write(NEWLINE);
+    protected void addTabs(final int indent) throws IOException {
+        this.os.write(NEWLINE);
         for (int i = 0; i < indent; i++) {
-            os.write(TAB);
+            this.os.write(TAB);
         }
     }
 
@@ -384,14 +399,14 @@ public abstract class DocWriter implements DocListener {
  * @throws IOException
  */
 
-    protected void write(String key, String value)
+    protected void write(final String key, final String value)
     throws IOException {
-        os.write(SPACE);
+        this.os.write(SPACE);
         write(key);
-        os.write(EQUALS);
-        os.write(QUOTE);
+        this.os.write(EQUALS);
+        this.os.write(QUOTE);
         write(value);
-        os.write(QUOTE);
+        this.os.write(QUOTE);
     }
 
 /**
@@ -401,9 +416,9 @@ public abstract class DocWriter implements DocListener {
  * @throws IOException
  */
 
-    protected void writeStart(String tag)
+    protected void writeStart(final String tag)
     throws IOException {
-        os.write(LT);
+        this.os.write(LT);
         write(tag);
     }
 
@@ -414,12 +429,12 @@ public abstract class DocWriter implements DocListener {
  * @throws IOException
  */
 
-    protected void writeEnd(String tag)
+    protected void writeEnd(final String tag)
     throws IOException {
-        os.write(LT);
-        os.write(FORWARD);
+        this.os.write(LT);
+        this.os.write(FORWARD);
         write(tag);
-        os.write(GT);
+        this.os.write(GT);
     }
 
 /**
@@ -429,9 +444,9 @@ public abstract class DocWriter implements DocListener {
 
     protected void writeEnd()
     throws IOException {
-        os.write(SPACE);
-        os.write(FORWARD);
-        os.write(GT);
+        this.os.write(SPACE);
+        this.os.write(FORWARD);
+        this.os.write(GT);
     }
 
 /**
@@ -441,10 +456,12 @@ public abstract class DocWriter implements DocListener {
  * @return true, if writing the markup attributes succeeded
  * @throws IOException
  */
-    protected boolean writeMarkupAttributes(Properties markup)
+    protected boolean writeMarkupAttributes(final Properties markup)
     throws IOException {
-    	if (markup == null) return false;
-    	Iterator attributeIterator = markup.keySet().iterator();
+    	if (markup == null) {
+			return false;
+		}
+    	final Iterator attributeIterator = markup.keySet().iterator();
     	String name;
     	while (attributeIterator.hasNext()) {
     		name = String.valueOf(attributeIterator.next());
@@ -459,30 +476,32 @@ public abstract class DocWriter implements DocListener {
      *
      */
     public boolean isCloseStream() {
-        return closeStream;
+        return this.closeStream;
     }
-    
+
     /** Sets the close state of the stream after document close
      * @param closeStream true if the stream is closed on document close
      *
      */
-    public void setCloseStream(boolean closeStream) {
+    public void setCloseStream(final boolean closeStream) {
         this.closeStream = closeStream;
     }
-    
+
     /**
      * @see com.lowagie.text.DocListener#setMarginMirroring(boolean)
      */
-    public boolean setMarginMirroring(boolean MarginMirroring) {
+    @Override
+	public boolean setMarginMirroring(final boolean MarginMirroring) {
         return false;
     }
-    
+
     /**
      * @see com.lowagie.text.DocListener#setMarginMirroring(boolean)
      * @since	2.1.6
      */
-    public boolean setMarginMirroringTopBottom(boolean MarginMirroring) {
+    @Override
+	public boolean setMarginMirroringTopBottom(final boolean MarginMirroring) {
         return false;
     }
-    
+
 }

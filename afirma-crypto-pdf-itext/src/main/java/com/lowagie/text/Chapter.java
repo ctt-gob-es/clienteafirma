@@ -75,53 +75,54 @@ import java.util.ArrayList;
  */
 
 public class Chapter extends Section {
-    
+
     // constant
 	private static final long serialVersionUID = 1791000695779357361L;
-	
+
 	/**
 	 * Constructs a new <CODE>Chapter</CODE>.
 	 * @param	number		the Chapter number
      */
-    public Chapter(int number) {
+    public Chapter(final int number) {
         super(null, 1);
-        numbers = new ArrayList();
-        numbers.add(new Integer(number));
-        triggerNewPage = true;
+        this.numbers = new ArrayList();
+        this.numbers.add(new Integer(number));
+        this.triggerNewPage = true;
     }
-	
+
 	/**
 	 * Constructs a new <CODE>Chapter</CODE>.
 	 *
 	 * @param	title		the Chapter title (as a <CODE>Paragraph</CODE>)
 	 * @param	number		the Chapter number
      */
-    
-    public Chapter(Paragraph title, int number) {
+
+    Chapter(final Paragraph title, final int number) {
         super(title, 1);
-        numbers = new ArrayList();
-        numbers.add(new Integer(number));
-        triggerNewPage = true;
+        this.numbers = new ArrayList();
+        this.numbers.add(new Integer(number));
+        this.triggerNewPage = true;
     }
-    
+
     /**
      * Constructs a new <CODE>Chapter</CODE>.
      *
      * @param	title		the Chapter title (as a <CODE>String</CODE>)
      * @param	number		the Chapter number
      */
-    public Chapter(String title, int number) {
+    Chapter(final String title, final int number) {
         this(new Paragraph(title), number);
     }
-    
+
     // implementation of the Element-methods
-    
+
     /**
      * Gets the type of the text element.
      *
      * @return	a type
      */
-    public int type() {
+    @Override
+	public int type() {
         return Element.CHAPTER;
     }
 
@@ -129,6 +130,7 @@ public class Chapter extends Section {
 	 * @see com.lowagie.text.Element#isNestable()
 	 * @since	iText 2.0.8
 	 */
+	@Override
 	public boolean isNestable() {
 		return false;
 	}

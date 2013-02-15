@@ -67,51 +67,51 @@ import java.util.ArrayList;
  * @see   Table
  */
 public class Row implements Element {
-    
+
     // constants
-    
+
 	/** id of a null element in a Row*/
-    public static final int NULL = 0;
-    
+	private static final int NULL = 0;
+
     /** id of the Cell element in a Row*/
-    public static final int CELL = 1;
-    
+    private static final int CELL = 1;
+
     /** id of the Table element in a Row*/
-    public static final int TABLE = 2;
-    
+    private static final int TABLE = 2;
+
     // member variables
-    
+
     /** This is the number of columns in the <CODE>Row</CODE>. */
     protected int columns;
-    
+
     /** This is a valid position the <CODE>Row</CODE>. */
     protected int currentColumn;
-    
+
     /** This is the array that keeps track of reserved cells. */
     protected boolean[] reserved;
-    
+
     /** This is the array of Objects (<CODE>Cell</CODE> or <CODE>Table</CODE>). */
     protected Object[] cells;
-    
+
     /** This is the vertical alignment. */
     protected int horizontalAlignment;
-    
+
     // constructors
-    
+
     /**
      * Constructs a <CODE>Row</CODE> with a certain number of <VAR>columns</VAR>.
      *
      * @param columns   a number of columns
      */
-    protected Row(int columns) {
+    protected Row(final int columns) {
         this.columns = columns;
-        reserved = new boolean[columns];
-        cells = new Object[columns];
-        currentColumn = 0;
+        this.reserved = new boolean[columns];
+        this.cells = new Object[columns];
+        this.currentColumn = 0;
     }
-    
+
     // implementation of the Element-methods
-    
+
     /**
      * Processes the element by adding it (or the different parts) to a
      * <CODE>ElementListener</CODE>.
@@ -119,37 +119,41 @@ public class Row implements Element {
      * @param listener  an <CODE>ElementListener</CODE>
      * @return  <CODE>true</CODE> if the element was processed successfully
      */
-    public boolean process(ElementListener listener) {
+    @Override
+	public boolean process(final ElementListener listener) {
         try {
             return listener.add(this);
         }
-        catch(DocumentException de) {
+        catch(final DocumentException de) {
             return false;
         }
     }
-    
+
     /**
      * Gets the type of the text element.
      *
      * @return  a type
      */
-    public int type() {
+    @Override
+	public int type() {
         return Element.ROW;
     }
-    
+
     /**
      * Gets all the chunks in this element.
      *
      * @return  an <CODE>ArrayList</CODE>
      */
-    public ArrayList getChunks() {
+    @Override
+	public ArrayList getChunks() {
         return new ArrayList();
     }
-    
+
 	/**
 	 * @see com.lowagie.text.Element#isContent()
 	 * @since	iText 2.0.8
 	 */
+	@Override
 	public boolean isContent() {
 		return true;
 	}
@@ -158,47 +162,48 @@ public class Row implements Element {
 	 * @see com.lowagie.text.Element#isNestable()
 	 * @since	iText 2.0.8
 	 */
+	@Override
 	public boolean isNestable() {
 		return false;
 	}
-    
+
     // method to delete a column
-    
+
     /**
      * Returns a <CODE>Row</CODE> that is a copy of this <CODE>Row</CODE>
      * in which a certain column has been deleted.
      *
      * @param column  the number of the column to delete
-     */    
-    void deleteColumn(int column) {
-        if ((column >= columns) || (column < 0)) {
+     */
+    void deleteColumn(final int column) {
+        if (column >= this.columns || column < 0) {
             throw new IndexOutOfBoundsException("getCell at illegal index : " + column);
         }
-        columns--;
-        boolean newReserved[] = new boolean[columns];
-        Object newCells[] = new Cell[columns];
-        
+        this.columns--;
+        final boolean newReserved[] = new boolean[this.columns];
+        final Object newCells[] = new Cell[this.columns];
+
         for (int i = 0; i < column; i++) {
-            newReserved[i] = reserved[i];
-            newCells[i] = cells[i];
-            if (newCells[i] != null && (i + ((Cell) newCells[i]).getColspan() > column)) {
-                ((Cell) newCells[i]).setColspan(((Cell) cells[i]).getColspan() - 1);
+            newReserved[i] = this.reserved[i];
+            newCells[i] = this.cells[i];
+            if (newCells[i] != null && i + ((Cell) newCells[i]).getColspan() > column) {
+                ((Cell) newCells[i]).setColspan(((Cell) this.cells[i]).getColspan() - 1);
             }
         }
-        for (int i = column; i < columns; i++) {
-            newReserved[i] = reserved[i + 1];
-            newCells[i] = cells[i + 1];
+        for (int i = column; i < this.columns; i++) {
+            newReserved[i] = this.reserved[i + 1];
+            newCells[i] = this.cells[i + 1];
         }
-        if (cells[column] != null && ((Cell) cells[column]).getColspan() > 1) {
-            newCells[column] = cells[column];
+        if (this.cells[column] != null && ((Cell) this.cells[column]).getColspan() > 1) {
+            newCells[column] = this.cells[column];
             ((Cell) newCells[column]).setColspan(((Cell) newCells[column]).getColspan() - 1);
         }
-        reserved = newReserved;
-        cells = newCells;
+        this.reserved = newReserved;
+        this.cells = newCells;
     }
-    
+
     // methods
-    
+
     /**
      * Adds a <CODE>Cell</CODE> to the <CODE>Row</CODE>.
      *
@@ -206,10 +211,10 @@ public class Row implements Element {
      * @return      the column position the <CODE>Cell</CODE> was added,
      *                      or <CODE>-1</CODE> if the <CODE>element</CODE> couldn't be added.
      */
-    int addElement(Object element) {
-        return addElement(element, currentColumn);
+    int addElement(final Object element) {
+        return addElement(element, this.currentColumn);
     }
-    
+
     /**
      * Adds an element to the <CODE>Row</CODE> at the position given.
      *
@@ -218,49 +223,57 @@ public class Row implements Element {
      * @return      the column position the <CODE>Cell</CODE> was added,
      *                      or <CODE>-1</CODE> if the <CODE>Cell</CODE> couldn't be added.
      */
-    int addElement(Object element, int column) {
-        if (element == null) throw new NullPointerException("addCell - null argument");
-        if ((column < 0) || (column > columns)) throw new IndexOutOfBoundsException("addCell - illegal column argument");
-        if ( !((getObjectID(element) == CELL) || (getObjectID(element) == TABLE)) ) throw new IllegalArgumentException("addCell - only Cells or Tables allowed");
-        
-        int lColspan = ( (Cell.class.isInstance(element)) ? ((Cell) element).getColspan() : 1);
-        
+    int addElement(final Object element, final int column) {
+        if (element == null) {
+			throw new NullPointerException("addCell - null argument");
+		}
+        if (column < 0 || column > this.columns) {
+			throw new IndexOutOfBoundsException("addCell - illegal column argument");
+		}
+        if ( !(getObjectID(element) == CELL || getObjectID(element) == TABLE) ) {
+			throw new IllegalArgumentException("addCell - only Cells or Tables allowed");
+		}
+
+        final int lColspan = Cell.class.isInstance(element) ? ((Cell) element).getColspan() : 1;
+
         if (!reserve(column, lColspan)) {
             return -1;
         }
-        
-        cells[column] = element;
-        currentColumn += lColspan - 1;
-        
+
+        this.cells[column] = element;
+        this.currentColumn += lColspan - 1;
+
         return column;
     }
-    
+
     /**
      * Puts <CODE>Cell</CODE> to the <CODE>Row</CODE> at the position given, doesn't reserve colspan.
      *
      * @param   aElement    the cell to add.
      * @param   column  the position where to add the cell.
      */
-    void setElement(Object aElement, int column) {
-        if (reserved[column]) throw new IllegalArgumentException("setElement - position already taken");
-        
-        cells[column] = aElement;
+    void setElement(final Object aElement, final int column) {
+        if (this.reserved[column]) {
+			throw new IllegalArgumentException("setElement - position already taken");
+		}
+
+        this.cells[column] = aElement;
         if (aElement != null) {
-            reserved[column] = true;
+            this.reserved[column] = true;
         }
     }
-    
+
     /**
      * Reserves a <CODE>Cell</CODE> in the <CODE>Row</CODE>.
      *
      * @param   column  the column that has to be reserved.
      * @return  <CODE>true</CODE> if the column was reserved, <CODE>false</CODE> if not.
      */
-    boolean reserve(int column) {
+    boolean reserve(final int column) {
         return reserve(column, 1);
     }
-    
-    
+
+
     /**
      * Reserves a <CODE>Cell</CODE> in the <CODE>Row</CODE>.
      *
@@ -268,62 +281,72 @@ public class Row implements Element {
      * @param   size    the number of columns
      * @return  <CODE>true</CODE> if the column was reserved, <CODE>false</CODE> if not.
      */
-    boolean reserve(int column, int size) {
-        if ((column < 0) || ((column + size) > columns)) throw new IndexOutOfBoundsException("reserve - incorrect column/size");
-        
+    boolean reserve(final int column, final int size) {
+        if (column < 0 || column + size > this.columns) {
+			throw new IndexOutOfBoundsException("reserve - incorrect column/size");
+		}
+
         for(int i=column; i < column + size; i++)
         {
-            if (reserved[i]) {
+            if (this.reserved[i]) {
                 // undo reserve
                 for(int j=i; j >= column; j--) {
-                    reserved[j] = false;
+                    this.reserved[j] = false;
                 }
                 return false;
             }
-            reserved[i] = true;
+            this.reserved[i] = true;
         }
         return true;
     }
-    
+
     // methods to retrieve information
-    
+
     /**
      * Returns true/false when this position in the <CODE>Row</CODE> has been reserved, either filled or through a colspan of an Element.
      *
      * @param       column  the column.
      * @return      <CODE>true</CODE> if the column was reserved, <CODE>false</CODE> if not.
      */
-    boolean isReserved(int column) {
-        return reserved[column];
+    boolean isReserved(final int column) {
+        return this.reserved[column];
     }
-    
+
     /**
      * Returns the type-id of the element in a Row.
      *
      * @param       column  the column of which you'd like to know the type
      * @return the type-id of the element in the row
      */
-    int getElementID(int column) {
-        if (cells[column] == null) return NULL;
-        else if (Cell.class.isInstance(cells[column])) return CELL;
-        else if (Table.class.isInstance(cells[column])) return TABLE;
-        
+    int getElementID(final int column) {
+        if (this.cells[column] == null) {
+			return NULL;
+		} else if (Cell.class.isInstance(this.cells[column])) {
+			return CELL;
+		} else if (Table.class.isInstance(this.cells[column])) {
+			return TABLE;
+		}
+
         return -1;
     }
-    
+
     /**
      * Returns the type-id of an Object.
      *
      * @param       element the object of which you'd like to know the type-id, -1 if invalid
      * @return the type-id of an object
      */
-    int getObjectID(Object element) {
-        if (element == null) return NULL;
-        else if (Cell.class.isInstance(element)) return CELL;
-        else if (Table.class.isInstance(element)) return TABLE; 
+    int getObjectID(final Object element) {
+        if (element == null) {
+			return NULL;
+		} else if (Cell.class.isInstance(element)) {
+			return CELL;
+		} else if (Table.class.isInstance(element)) {
+			return TABLE;
+		}
         return -1;
     }
-    
+
     /**
      * Gets a <CODE>Cell</CODE> or <CODE>Table</CODE> from a certain column.
      *
@@ -331,51 +354,51 @@ public class Row implements Element {
      * @return  the <CODE>Cell</CODE>,<CODE>Table</CODE> or <VAR>Object</VAR> if the column was
      *                  reserved or null if empty.
      */
-    public Object getCell(int column) {
-        if ((column < 0) || (column > columns)) {
-            throw new IndexOutOfBoundsException("getCell at illegal index :" + column + " max is " + columns);
+    public Object getCell(final int column) {
+        if (column < 0 || column > this.columns) {
+            throw new IndexOutOfBoundsException("getCell at illegal index :" + column + " max is " + this.columns);
         }
-        return cells[column];
+        return this.cells[column];
     }
-    
+
     /**
      * Checks if the row is empty.
      *
      * @return  <CODE>true</CODE> if none of the columns is reserved.
      */
     public boolean isEmpty() {
-        for (int i = 0; i < columns; i++) {
-            if (cells[i] != null) {
+        for (int i = 0; i < this.columns; i++) {
+            if (this.cells[i] != null) {
                 return false;
             }
         }
         return true;
     }
-    
+
     /**
      * Gets the number of columns.
      *
      * @return  a value
      */
     public int getColumns() {
-        return columns;
+        return this.columns;
     }
-    
+
     /**
      * Sets the horizontal alignment.
      *
      * @param value the new value
      */
-    public void setHorizontalAlignment(int value) {
-        horizontalAlignment = value;
+    public void setHorizontalAlignment(final int value) {
+        this.horizontalAlignment = value;
     }
-    
+
     /**
      * Gets the horizontal alignment.
      *
      * @return  a value
      */
     public int getHorizontalAlignment() {
-        return horizontalAlignment;
+        return this.horizontalAlignment;
     }
 }

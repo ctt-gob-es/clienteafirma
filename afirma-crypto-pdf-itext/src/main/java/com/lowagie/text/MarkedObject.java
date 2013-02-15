@@ -67,28 +67,29 @@ public class MarkedObject implements Element {
 
 	/** Contains extra markupAttributes */
 	protected Properties markupAttributes = new Properties();
-	    
+
 	/**
 	 * This constructor is for internal use only.
 	 */
 	protected MarkedObject() {
-		element = null;
+		this.element = null;
 	}
-	
+
 	/**
 	 * Creates a MarkedObject.
 	 */
-	public MarkedObject(Element element) {
+	MarkedObject(final Element element) {
 		this.element = element;
 	}
-	
+
     /**
      * Gets all the chunks in this element.
      *
      * @return  an <CODE>ArrayList</CODE>
      */
+	@Override
 	public ArrayList getChunks() {
-		return element.getChunks();
+		return this.element.getChunks();
 	}
 
     /**
@@ -98,28 +99,31 @@ public class MarkedObject implements Element {
      * @param       listener        an <CODE>ElementListener</CODE>
      * @return <CODE>true</CODE> if the element was processed successfully
      */
-	public boolean process(ElementListener listener) {
+	@Override
+	public boolean process(final ElementListener listener) {
         try {
-            return listener.add(element);
+            return listener.add(this.element);
         }
-        catch(DocumentException de) {
+        catch(final DocumentException de) {
             return false;
         }
 	}
-	
+
     /**
      * Gets the type of the text element.
      *
      * @return  a type
      */
+	@Override
 	public int type() {
 		return MARKED;
 	}
-	
+
 	/**
 	 * @see com.lowagie.text.Element#isContent()
 	 * @since	iText 2.0.8
 	 */
+	@Override
 	public boolean isContent() {
 		return true;
 	}
@@ -128,6 +132,7 @@ public class MarkedObject implements Element {
 	 * @see com.lowagie.text.Element#isNestable()
 	 * @since	iText 2.0.8
 	 */
+	@Override
 	public boolean isNestable() {
 		return true;
 	}
@@ -137,14 +142,14 @@ public class MarkedObject implements Element {
 	 * @return the markupAttributes
 	 */
 	public Properties getMarkupAttributes() {
-		return markupAttributes;
+		return this.markupAttributes;
 	}
-	
+
 	/**
 	 * Adds one markup attribute.
 	 */
-	public void setMarkupAttribute(String key, String value) {
-		markupAttributes.setProperty(key, value);
+	public void setMarkupAttribute(final String key, final String value) {
+		this.markupAttributes.setProperty(key, value);
 	}
 
 }

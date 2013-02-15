@@ -62,31 +62,33 @@ import com.lowagie.text.pdf.PdfTemplate;
  * @author  Paulo Soares
  */
 
-public class ImgTemplate extends Image {
-    
-    ImgTemplate(Image image) {
+class ImgTemplate extends Image {
+
+    ImgTemplate(final Image image) {
         super(image);
     }
-    
+
     /** Creates an Image from a PdfTemplate.
      *
      * @param template the PdfTemplate
      * @throws BadElementException on error
      */
-    public ImgTemplate(PdfTemplate template) throws BadElementException{
+    ImgTemplate(final PdfTemplate template) throws BadElementException{
         super((URL)null);
-        if (template == null)
-            throw new BadElementException("The template can not be null.");
-        if (template.getType() == PdfTemplate.TYPE_PATTERN)
-            throw new BadElementException("A pattern can not be used as a template to create an image.");
-        type = IMGTEMPLATE;
-        scaledHeight = template.getHeight();
-        setTop(scaledHeight);
-        scaledWidth = template.getWidth();
-        setRight(scaledWidth);
+        if (template == null) {
+			throw new BadElementException("The template can not be null.");
+		}
+        if (template.getType() == PdfTemplate.TYPE_PATTERN) {
+			throw new BadElementException("A pattern can not be used as a template to create an image.");
+		}
+        this.type = IMGTEMPLATE;
+        this.scaledHeight = template.getHeight();
+        setTop(this.scaledHeight);
+        this.scaledWidth = template.getWidth();
+        setRight(this.scaledWidth);
         setTemplateData(template);
-        plainWidth = getWidth();
-        plainHeight = getHeight();
+        this.plainWidth = getWidth();
+        this.plainHeight = getHeight();
     }
-	
+
 }

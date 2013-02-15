@@ -56,7 +56,7 @@ import java.util.HashMap;
 /**
  * An <CODE>Annotation</CODE> is a little note that can be added to a page on
  * a document.
- * 
+ *
  * @see Element
  * @see Anchor
  */
@@ -66,7 +66,7 @@ public class Annotation implements Element {
 	// membervariables
 
 	/** This is a possible annotation type. */
-	public static final int TEXT = 0;
+	private static final int TEXT = 0;
 
 	/** This is a possible annotation type. */
 	public static final int URL_NET = 1;
@@ -90,10 +90,10 @@ public class Annotation implements Element {
 	public static final int SCREEN = 7;
 
 	/** This is a possible attribute. */
-	public static final String TITLE = "title";
+	private static final String TITLE = "title";
 
 	/** This is a possible attribute. */
-	public static final String CONTENT = "content";
+	private static final String CONTENT = "content";
 
 	/** This is a possible attribute. */
 	public static final String URL = "url";
@@ -138,29 +138,29 @@ public class Annotation implements Element {
 	public static final String MIMETYPE = "mime";
 
 	/** This is the type of annotation. */
-	protected int annotationtype;
+	private int annotationtype;
 
 	/** This is the title of the <CODE>Annotation</CODE>. */
-	protected HashMap annotationAttributes = new HashMap();
+	private HashMap annotationAttributes = new HashMap();
 
 	/** This is the lower left x-value */
-	protected float llx = Float.NaN;
+	private float llx = Float.NaN;
 
 	/** This is the lower left y-value */
-	protected float lly = Float.NaN;
+	private float lly = Float.NaN;
 
 	/** This is the upper right x-value */
-	protected float urx = Float.NaN;
+	private float urx = Float.NaN;
 
 	/** This is the upper right y-value */
-	protected float ury = Float.NaN;
+	private float ury = Float.NaN;
 
 	// constructors
 
 	/**
 	 * Constructs an <CODE>Annotation</CODE> with a certain title and some
 	 * text.
-	 * 
+	 *
 	 * @param llx
 	 *            lower left x coordinate
 	 * @param lly
@@ -170,7 +170,7 @@ public class Annotation implements Element {
 	 * @param ury
 	 *            upper right y coordinate
 	 */
-	private Annotation(float llx, float lly, float urx, float ury) {
+	private Annotation(final float llx, final float lly, final float urx, final float ury) {
 		this.llx = llx;
 		this.lly = lly;
 		this.urx = urx;
@@ -180,34 +180,34 @@ public class Annotation implements Element {
 	/**
 	 * Copy constructor.
 	 */
-    public Annotation(Annotation an) {
-        annotationtype = an.annotationtype;
-        annotationAttributes = an.annotationAttributes;
-        llx = an.llx;
-        lly = an.lly;
-        urx = an.urx;
-        ury = an.ury;
+    public Annotation(final Annotation an) {
+        this.annotationtype = an.annotationtype;
+        this.annotationAttributes = an.annotationAttributes;
+        this.llx = an.llx;
+        this.lly = an.lly;
+        this.urx = an.urx;
+        this.ury = an.ury;
     }
-    
+
 	/**
 	 * Constructs an <CODE>Annotation</CODE> with a certain title and some
 	 * text.
-	 * 
+	 *
 	 * @param title
 	 *            the title of the annotation
 	 * @param text
 	 *            the content of the annotation
 	 */
-	public Annotation(String title, String text) {
-		annotationtype = TEXT;
-		annotationAttributes.put(TITLE, title);
-		annotationAttributes.put(CONTENT, text);
+	public Annotation(final String title, final String text) {
+		this.annotationtype = TEXT;
+		this.annotationAttributes.put(TITLE, title);
+		this.annotationAttributes.put(CONTENT, text);
 	}
 
 	/**
 	 * Constructs an <CODE>Annotation</CODE> with a certain title and some
 	 * text.
-	 * 
+	 *
 	 * @param title
 	 *            the title of the annotation
 	 * @param text
@@ -221,17 +221,17 @@ public class Annotation implements Element {
 	 * @param ury
 	 *            the upper right y-value
 	 */
-	public Annotation(String title, String text, float llx, float lly,
-			float urx, float ury) {
+	public Annotation(final String title, final String text, final float llx, final float lly,
+			final float urx, final float ury) {
 		this(llx, lly, urx, ury);
-		annotationtype = TEXT;
-		annotationAttributes.put(TITLE, title);
-		annotationAttributes.put(CONTENT, text);
+		this.annotationtype = TEXT;
+		this.annotationAttributes.put(TITLE, title);
+		this.annotationAttributes.put(CONTENT, text);
 	}
 
 	/**
 	 * Constructs an <CODE>Annotation</CODE>.
-	 * 
+	 *
 	 * @param llx
 	 *            the lower left x-value
 	 * @param lly
@@ -243,15 +243,15 @@ public class Annotation implements Element {
 	 * @param url
 	 *            the external reference
 	 */
-	public Annotation(float llx, float lly, float urx, float ury, URL url) {
+	public Annotation(final float llx, final float lly, final float urx, final float ury, final URL url) {
 		this(llx, lly, urx, ury);
-		annotationtype = URL_NET;
-		annotationAttributes.put(URL, url);
+		this.annotationtype = URL_NET;
+		this.annotationAttributes.put(URL, url);
 	}
 
 	/**
 	 * Constructs an <CODE>Annotation</CODE>.
-	 * 
+	 *
 	 * @param llx
 	 *            the lower left x-value
 	 * @param lly
@@ -263,15 +263,15 @@ public class Annotation implements Element {
 	 * @param url
 	 *            the external reference
 	 */
-	public Annotation(float llx, float lly, float urx, float ury, String url) {
+	public Annotation(final float llx, final float lly, final float urx, final float ury, final String url) {
 		this(llx, lly, urx, ury);
-		annotationtype = URL_AS_STRING;
-		annotationAttributes.put(FILE, url);
+		this.annotationtype = URL_AS_STRING;
+		this.annotationAttributes.put(FILE, url);
 	}
 
 	/**
 	 * Constructs an <CODE>Annotation</CODE>.
-	 * 
+	 *
 	 * @param llx
 	 *            the lower left x-value
 	 * @param lly
@@ -285,17 +285,17 @@ public class Annotation implements Element {
 	 * @param dest
 	 *            the destination in this file
 	 */
-	public Annotation(float llx, float lly, float urx, float ury, String file,
-			String dest) {
+	public Annotation(final float llx, final float lly, final float urx, final float ury, final String file,
+			final String dest) {
 		this(llx, lly, urx, ury);
-		annotationtype = FILE_DEST;
-		annotationAttributes.put(FILE, file);
-		annotationAttributes.put(DESTINATION, dest);
+		this.annotationtype = FILE_DEST;
+		this.annotationAttributes.put(FILE, file);
+		this.annotationAttributes.put(DESTINATION, dest);
 	}
 
 	/**
 	 * Creates a Screen annotation to embed media clips
-	 * 
+	 *
 	 * @param llx
 	 * @param lly
 	 * @param urx
@@ -307,19 +307,19 @@ public class Annotation implements Element {
 	 * @param showOnDisplay
 	 *            if true play on display of the page
 	 */
-	public Annotation(float llx, float lly, float urx, float ury,
-			String moviePath, String mimeType, boolean showOnDisplay) {
+	public Annotation(final float llx, final float lly, final float urx, final float ury,
+			final String moviePath, final String mimeType, final boolean showOnDisplay) {
 		this(llx, lly, urx, ury);
-		annotationtype = SCREEN;
-		annotationAttributes.put(FILE, moviePath);
-		annotationAttributes.put(MIMETYPE, mimeType);
-		annotationAttributes.put(PARAMETERS, new boolean[] {
+		this.annotationtype = SCREEN;
+		this.annotationAttributes.put(FILE, moviePath);
+		this.annotationAttributes.put(MIMETYPE, mimeType);
+		this.annotationAttributes.put(PARAMETERS, new boolean[] {
 				false /* embedded */, showOnDisplay });
 	}
 
 	/**
 	 * Constructs an <CODE>Annotation</CODE>.
-	 * 
+	 *
 	 * @param llx
 	 *            the lower left x-value
 	 * @param lly
@@ -333,17 +333,17 @@ public class Annotation implements Element {
 	 * @param page
 	 *            a page number in this file
 	 */
-	public Annotation(float llx, float lly, float urx, float ury, String file,
-			int page) {
+	public Annotation(final float llx, final float lly, final float urx, final float ury, final String file,
+			final int page) {
 		this(llx, lly, urx, ury);
-		annotationtype = FILE_PAGE;
-		annotationAttributes.put(FILE, file);
-		annotationAttributes.put(PAGE, new Integer(page));
+		this.annotationtype = FILE_PAGE;
+		this.annotationAttributes.put(FILE, file);
+		this.annotationAttributes.put(PAGE, new Integer(page));
 	}
 
 	/**
 	 * Constructs an <CODE>Annotation</CODE>.
-	 * 
+	 *
 	 * @param llx
 	 *            the lower left x-value
 	 * @param lly
@@ -355,15 +355,15 @@ public class Annotation implements Element {
 	 * @param named
 	 *            a named destination in this file
 	 */
-	public Annotation(float llx, float lly, float urx, float ury, int named) {
+	public Annotation(final float llx, final float lly, final float urx, final float ury, final int named) {
 		this(llx, lly, urx, ury);
-		annotationtype = NAMED_DEST;
-		annotationAttributes.put(NAMED, new Integer(named));
+		this.annotationtype = NAMED_DEST;
+		this.annotationAttributes.put(NAMED, new Integer(named));
 	}
 
 	/**
 	 * Constructs an <CODE>Annotation</CODE>.
-	 * 
+	 *
 	 * @param llx
 	 *            the lower left x-value
 	 * @param lly
@@ -381,24 +381,25 @@ public class Annotation implements Element {
 	 * @param defaultdir
 	 *            the default directory to run this application in
 	 */
-	public Annotation(float llx, float lly, float urx, float ury,
-			String application, String parameters, String operation,
-			String defaultdir) {
+	public Annotation(final float llx, final float lly, final float urx, final float ury,
+			final String application, final String parameters, final String operation,
+			final String defaultdir) {
 		this(llx, lly, urx, ury);
-		annotationtype = LAUNCH;
-		annotationAttributes.put(APPLICATION, application);
-		annotationAttributes.put(PARAMETERS, parameters);
-		annotationAttributes.put(OPERATION, operation);
-		annotationAttributes.put(DEFAULTDIR, defaultdir);
+		this.annotationtype = LAUNCH;
+		this.annotationAttributes.put(APPLICATION, application);
+		this.annotationAttributes.put(PARAMETERS, parameters);
+		this.annotationAttributes.put(OPERATION, operation);
+		this.annotationAttributes.put(DEFAULTDIR, defaultdir);
 	}
 
 	// implementation of the Element-methods
 
 	/**
 	 * Gets the type of the text element.
-	 * 
+	 *
 	 * @return a type
 	 */
+	@Override
 	public int type() {
 		return Element.ANNOTATION;
 	}
@@ -406,25 +407,27 @@ public class Annotation implements Element {
 	/**
 	 * Processes the element by adding it (or the different parts) to an <CODE>
 	 * ElementListener</CODE>.
-	 * 
+	 *
 	 * @param listener
 	 *            an <CODE>ElementListener</CODE>
 	 * @return <CODE>true</CODE> if the element was processed successfully
 	 */
-	public boolean process(ElementListener listener) {
+	@Override
+	public boolean process(final ElementListener listener) {
 		try {
 			return listener.add(this);
-		} catch (DocumentException de) {
+		} catch (final DocumentException de) {
 			return false;
 		}
 	}
 
 	/**
 	 * Gets all the chunks in this element.
-	 * 
+	 *
 	 * @return an <CODE>ArrayList</CODE>
 	 */
 
+	@Override
 	public ArrayList getChunks() {
 		return new ArrayList();
 	}
@@ -433,7 +436,7 @@ public class Annotation implements Element {
 
 	/**
 	 * Sets the dimensions of this annotation.
-	 * 
+	 *
 	 * @param llx
 	 *            the lower left x-value
 	 * @param lly
@@ -443,7 +446,7 @@ public class Annotation implements Element {
 	 * @param ury
 	 *            the upper right y-value
 	 */
-	public void setDimensions(float llx, float lly, float urx, float ury) {
+	public void setDimensions(final float llx, final float lly, final float urx, final float ury) {
 		this.llx = llx;
 		this.lly = lly;
 		this.urx = urx;
@@ -454,138 +457,145 @@ public class Annotation implements Element {
 
 	/**
 	 * Returns the lower left x-value.
-	 * 
+	 *
 	 * @return a value
 	 */
 	public float llx() {
-		return llx;
+		return this.llx;
 	}
 
 	/**
 	 * Returns the lower left y-value.
-	 * 
+	 *
 	 * @return a value
 	 */
 	public float lly() {
-		return lly;
+		return this.lly;
 	}
 
 	/**
 	 * Returns the upper right x-value.
-	 * 
+	 *
 	 * @return a value
 	 */
 	public float urx() {
-		return urx;
+		return this.urx;
 	}
 
 	/**
 	 * Returns the upper right y-value.
-	 * 
+	 *
 	 * @return a value
 	 */
 	public float ury() {
-		return ury;
+		return this.ury;
 	}
 
 	/**
 	 * Returns the lower left x-value.
-	 * 
+	 *
 	 * @param def
 	 *            the default value
 	 * @return a value
 	 */
-	public float llx(float def) {
-		if (Float.isNaN(llx))
+	public float llx(final float def) {
+		if (Float.isNaN(this.llx)) {
 			return def;
-		return llx;
+		}
+		return this.llx;
 	}
 
 	/**
 	 * Returns the lower left y-value.
-	 * 
+	 *
 	 * @param def
 	 *            the default value
 	 * @return a value
 	 */
-	public float lly(float def) {
-		if (Float.isNaN(lly))
+	public float lly(final float def) {
+		if (Float.isNaN(this.lly)) {
 			return def;
-		return lly;
+		}
+		return this.lly;
 	}
 
 	/**
 	 * Returns the upper right x-value.
-	 * 
+	 *
 	 * @param def
 	 *            the default value
 	 * @return a value
 	 */
-	public float urx(float def) {
-		if (Float.isNaN(urx))
+	public float urx(final float def) {
+		if (Float.isNaN(this.urx)) {
 			return def;
-		return urx;
+		}
+		return this.urx;
 	}
 
 	/**
 	 * Returns the upper right y-value.
-	 * 
+	 *
 	 * @param def
 	 *            the default value
 	 * @return a value
 	 */
-	public float ury(float def) {
-		if (Float.isNaN(ury))
+	public float ury(final float def) {
+		if (Float.isNaN(this.ury)) {
 			return def;
-		return ury;
+		}
+		return this.ury;
 	}
 
 	/**
 	 * Returns the type of this <CODE>Annotation</CODE>.
-	 * 
+	 *
 	 * @return a type
 	 */
 	public int annotationType() {
-		return annotationtype;
+		return this.annotationtype;
 	}
 
 	/**
 	 * Returns the title of this <CODE>Annotation</CODE>.
-	 * 
+	 *
 	 * @return a name
 	 */
 	public String title() {
-		String s = (String) annotationAttributes.get(TITLE);
-		if (s == null)
+		String s = (String) this.annotationAttributes.get(TITLE);
+		if (s == null) {
 			s = "";
+		}
 		return s;
 	}
 
 	/**
 	 * Gets the content of this <CODE>Annotation</CODE>.
-	 * 
+	 *
 	 * @return a reference
 	 */
 	public String content() {
-		String s = (String) annotationAttributes.get(CONTENT);
-		if (s == null)
+		String s = (String) this.annotationAttributes.get(CONTENT);
+		if (s == null) {
 			s = "";
+		}
 		return s;
 	}
 
 	/**
 	 * Gets the content of this <CODE>Annotation</CODE>.
-	 * 
+	 *
 	 * @return a reference
 	 */
 	public HashMap attributes() {
-		return annotationAttributes;
+		return this.annotationAttributes;
 	}
-	
+
 	/**
 	 * @see com.lowagie.text.Element#isContent()
 	 * @since	iText 2.0.8
 	 */
+	@Override
 	public boolean isContent() {
 		return true;
 	}
@@ -594,6 +604,7 @@ public class Annotation implements Element {
 	 * @see com.lowagie.text.Element#isNestable()
 	 * @since	iText 2.0.8
 	 */
+	@Override
 	public boolean isNestable() {
 		return true;
 	}

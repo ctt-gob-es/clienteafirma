@@ -67,13 +67,13 @@ import com.lowagie.text.pdf.codec.wmf.MetaDo;
  */
 
 public class ImgWMF extends Image {
-    
+
     // Constructors
-    
-    ImgWMF(Image image) {
+
+    ImgWMF(final Image image) {
         super(image);
     }
-    
+
     /**
      * Constructs an <CODE>ImgWMF</CODE>-object, using an <VAR>url</VAR>.
      *
@@ -81,12 +81,12 @@ public class ImgWMF extends Image {
      * @throws BadElementException on error
      * @throws IOException on error
      */
-    
-    public ImgWMF(URL url) throws BadElementException, IOException {
+
+    ImgWMF(final URL url) throws BadElementException, IOException {
         super(url);
         processParameters();
     }
-    
+
     /**
      * Constructs an <CODE>ImgWMF</CODE>-object, using a <VAR>filename</VAR>.
      *
@@ -95,11 +95,11 @@ public class ImgWMF extends Image {
      * @throws MalformedURLException on error
      * @throws IOException on error
      */
-    
-    public ImgWMF(String filename) throws BadElementException, MalformedURLException, IOException {
+
+    public ImgWMF(final String filename) throws BadElementException, MalformedURLException, IOException {
         this(Utilities.toURL(filename));
     }
-    
+
     /**
      * Constructs an <CODE>ImgWMF</CODE>-object from memory.
      *
@@ -107,78 +107,78 @@ public class ImgWMF extends Image {
      * @throws BadElementException on error
      * @throws IOException on error
      */
-    
-    public ImgWMF(byte[] img) throws BadElementException, IOException {
+
+    ImgWMF(final byte[] img) throws BadElementException, IOException {
         super((URL)null);
-        rawData = img;
-        originalData = img;
+        this.rawData = img;
+        this.originalData = img;
         processParameters();
     }
-    
+
 /**
  * This method checks if the image is a valid WMF and processes some parameters.
  * @throws BadElementException
  * @throws IOException
  */
-    
+
     private void processParameters() throws BadElementException, IOException {
-        type = IMGTEMPLATE;
-        originalType = ORIGINAL_WMF;
+        this.type = IMGTEMPLATE;
+        this.originalType = ORIGINAL_WMF;
         InputStream is = null;
         try {
             String errorID;
-            if (rawData == null){
-                is = url.openStream();
-                errorID = url.toString();
+            if (this.rawData == null){
+                is = this.url.openStream();
+                errorID = this.url.toString();
             }
             else{
-                is = new java.io.ByteArrayInputStream(rawData);
+                is = new java.io.ByteArrayInputStream(this.rawData);
                 errorID = "Byte array";
             }
-            InputMeta in = new InputMeta(is);
+            final InputMeta in = new InputMeta(is);
             if (in.readInt() != 0x9AC6CDD7)	{
                 throw new BadElementException(errorID + " is not a valid placeable windows metafile.");
             }
             in.readWord();
-            int left = in.readShort();
-            int top = in.readShort();
-            int right = in.readShort();
-            int bottom = in.readShort();
-            int inch = in.readWord();
-            dpiX = 72;
-            dpiY = 72;
-            scaledHeight = (float)(bottom - top) / inch * 72f;
-            setTop(scaledHeight);
-            scaledWidth = (float)(right - left) / inch * 72f;
-            setRight(scaledWidth);
+            final int left = in.readShort();
+            final int top = in.readShort();
+            final int right = in.readShort();
+            final int bottom = in.readShort();
+            final int inch = in.readWord();
+            this.dpiX = 72;
+            this.dpiY = 72;
+            this.scaledHeight = (float)(bottom - top) / inch * 72f;
+            setTop(this.scaledHeight);
+            this.scaledWidth = (float)(right - left) / inch * 72f;
+            setRight(this.scaledWidth);
         }
         finally {
             if (is != null) {
                 is.close();
             }
-            plainWidth = getWidth();
-            plainHeight = getHeight();
+            this.plainWidth = getWidth();
+            this.plainHeight = getHeight();
         }
     }
-    
+
     /** Reads the WMF into a template.
      * @param template the template to read to
      * @throws IOException on error
      * @throws DocumentException on error
-     */    
-    public void readWMF(PdfTemplate template) throws IOException, DocumentException {
+     */
+    public void readWMF(final PdfTemplate template) throws IOException, DocumentException {
         setTemplateData(template);
         template.setWidth(getWidth());
         template.setHeight(getHeight());
         InputStream is = null;
         try {
-            if (rawData == null){
-                is = url.openStream();
+            if (this.rawData == null){
+                is = this.url.openStream();
             }
             else{
-                is = new java.io.ByteArrayInputStream(rawData);
+                is = new java.io.ByteArrayInputStream(this.rawData);
             }
-            MetaDo meta = new MetaDo(is, template);
+            final MetaDo meta = new MetaDo(is, template);
             meta.readAll();
         }
         finally {

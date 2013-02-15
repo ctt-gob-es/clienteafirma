@@ -61,8 +61,8 @@ public class ChapterAutoNumber extends Chapter {
      * Is the chapter number already set?
      * @since	2.1.4
      */
-    protected boolean numberSet = false;
-    
+    private boolean numberSet = false;
+
     /**
      * Create a new object.
      *
@@ -74,7 +74,7 @@ public class ChapterAutoNumber extends Chapter {
 
     /**
      * Create a new object.
-     * 
+     *
      * @param title	    the Chapter title (as a <CODE>String</CODE>)
      */
     public ChapterAutoNumber(final String title) {
@@ -87,7 +87,8 @@ public class ChapterAutoNumber extends Chapter {
      * @param title  the Section title (as a <CODE>String</CODE>)
      * @return Returns the new section.
      */
-    public Section addSection(final String title) {
+    @Override
+	public Section addSection(final String title) {
     	if (isAddedCompletely()) {
     		throw new IllegalStateException("This LargeElement has already been added to the Document.");
     	}
@@ -100,23 +101,24 @@ public class ChapterAutoNumber extends Chapter {
      * @param title  the Section title (as a <CODE>Paragraph</CODE>)
      * @return Returns the new section.
      */
-    public Section addSection(final Paragraph title) {
+    @Override
+	public Section addSection(final Paragraph title) {
     	if (isAddedCompletely()) {
     		throw new IllegalStateException("This LargeElement has already been added to the Document.");
     	}
         return addSection(title, 2);
     }
-    
+
     /**
      * Changes the Chapter number.
      * @param	number	the new chapter number
      * @since 2.1.4
      */
     public int setAutomaticNumber(int number) {
-    	if (!numberSet) {
+    	if (!this.numberSet) {
         	number++;
         	super.setChapterNumber(number);
-        	numberSet = true;
+        	this.numberSet = true;
     	}
 		return number;
     }
