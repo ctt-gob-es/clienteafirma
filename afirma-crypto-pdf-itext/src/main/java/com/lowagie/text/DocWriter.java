@@ -52,8 +52,6 @@ package com.lowagie.text;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Iterator;
-import java.util.Properties;
 
 import com.lowagie.text.pdf.OutputStreamCounter;
 
@@ -76,28 +74,19 @@ import com.lowagie.text.pdf.OutputStreamCounter;
 public abstract class DocWriter implements DocListener {
 
 /** This is some byte that is often used. */
-    public static final byte NEWLINE = (byte)'\n';
+    private static final byte SPACE = (byte)' ';
 
 /** This is some byte that is often used. */
-    public static final byte TAB = (byte)'\t';
+    private static final byte EQUALS = (byte)'=';
 
 /** This is some byte that is often used. */
-    public static final byte LT = (byte)'<';
+    private static final byte QUOTE = (byte)'\"';
 
 /** This is some byte that is often used. */
-    public static final byte SPACE = (byte)' ';
+    private static final byte GT = (byte)'>';
 
 /** This is some byte that is often used. */
-    public static final byte EQUALS = (byte)'=';
-
-/** This is some byte that is often used. */
-    public static final byte QUOTE = (byte)'\"';
-
-/** This is some byte that is often used. */
-    public static final byte GT = (byte)'>';
-
-/** This is some byte that is often used. */
-    public static final byte FORWARD = (byte)'/';
+    private static final byte FORWARD = (byte)'/';
 
     // membervariables
 
@@ -114,7 +103,7 @@ public abstract class DocWriter implements DocListener {
     protected boolean open = false;
 
 /** Do we have to pause all writing actions? */
-    protected boolean pause = false;
+    private final boolean pause = false;
 
 /** Closes the stream on document close */
     private boolean closeStream = true;
@@ -367,44 +356,6 @@ public abstract class DocWriter implements DocListener {
         this.os.write(QUOTE);
         write(value);
         this.os.write(QUOTE);
-    }
-
-
-
-
-
-/**
- * Writes an endtag to the outputstream.
- * @throws IOException
- */
-
-    protected void writeEnd()
-    throws IOException {
-        this.os.write(SPACE);
-        this.os.write(FORWARD);
-        this.os.write(GT);
-    }
-
-/**
- * Writes the markup attributes of the specified <CODE>MarkupAttributes</CODE>
- * object to the <CODE>OutputStream</CODE>.
- * @param markup   a <CODE>Properties</CODE> collection to write.
- * @return true, if writing the markup attributes succeeded
- * @throws IOException
- */
-    protected boolean writeMarkupAttributes(final Properties markup)
-    throws IOException {
-    	if (markup == null) {
-			return false;
-		}
-    	final Iterator attributeIterator = markup.keySet().iterator();
-    	String name;
-    	while (attributeIterator.hasNext()) {
-    		name = String.valueOf(attributeIterator.next());
-    		write(name, markup.getProperty(name));
-    	}
-    	markup.clear();
-    	return true;
     }
 
     /** Checks if the stream is to be closed on document close

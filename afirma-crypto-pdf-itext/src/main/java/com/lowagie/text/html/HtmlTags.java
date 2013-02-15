@@ -70,35 +70,11 @@ public class HtmlTags {
 	/** the meta tag */
 	static final String META = "meta";
 
-	/** attribute of the root tag */
-	static final String SUBJECT = "subject";
-
-	/** attribute of the root tag */
-	static final String KEYWORDS = "keywords";
-
-	/** attribute of the root tag */
-	static final String AUTHOR = "author";
-
 	/** the title tag. */
 	static final String TITLE = "title";
 
-	/** the script tag. */
-	static final String SCRIPT = "script";
-
-	/** This is a possible HTML attribute for the SCRIPT tag. */
-	static final String LANGUAGE = "language";
-
-	/** This is a possible value for the LANGUAGE attribute. */
-	static final String JAVASCRIPT = "JavaScript";
-
 	/** the body tag. */
 	static final String BODY = "body";
-
-	/** This is a possible HTML attribute for the BODY tag */
-	static final String JAVASCRIPT_ONLOAD = "onLoad";
-
-	/** This is a possible HTML attribute for the BODY tag */
-	static final String JAVASCRIPT_ONUNLOAD = "onUnLoad";
 
 	/** This is a possible HTML attribute for the BODY tag. */
 	static final String TOPMARGIN = "topmargin";
@@ -251,10 +227,7 @@ public class HtmlTags {
 	/** the image tag */
 	static final String IMAGE = "img";
 
-	/** attribute of the image tag
-	 * @see com.lowagie.text.ElementTags#SRC
-	 */
-	static final String URL = "src";
+
 
 	/** attribute of the image tag */
 	static final String ALT = "alt";
@@ -302,21 +275,6 @@ public class HtmlTags {
 
 	/** The LINK tag. */
 	static final String LINK = "link";
-
-	/** This is a possible HTML attribute for the LINK tag. */
-	static final String TEXT_CSS = "text/css";
-
-	/** This is a possible HTML attribute for the LINK tag. */
-	static final String REL = "rel";
-
-	/** This is used for inline css style information */
-	static final String STYLE = "style";
-
-	/** This is a possible HTML attribute for the LINK tag. */
-	static final String TYPE = "type";
-
-	/** This is a possible HTML attribute. */
-	static final String STYLESHEET = "stylesheet";
 
 	/** This is a possible HTML attribute for auto-formated
      * @since 2.1.3

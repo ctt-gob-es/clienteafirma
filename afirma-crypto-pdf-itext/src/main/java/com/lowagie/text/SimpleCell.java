@@ -158,29 +158,7 @@ class SimpleCell extends Rectangle implements PdfPCellEvent, TextElementArray {
 		}
 	}
 
-	/**
-	 * Creates a Cell with these attributes.
-	 * @param rowAttributes
-	 * @return a cell based on these attributes.
-	 * @throws BadElementException
-	 */
-	public Cell createCell(final SimpleCell rowAttributes) throws BadElementException {
-		final Cell cell = new Cell();
-		cell.cloneNonPositionParameters(rowAttributes);
-		cell.softCloneNonPositionParameters(this);
-		cell.setColspan(this.colspan);
-		cell.setHorizontalAlignment(this.horizontalAlignment);
-		cell.setVerticalAlignment(this.verticalAlignment);
-		cell.setUseAscender(this.useAscender);
-		cell.setUseBorderPadding(this.useBorderPadding);
-		cell.setUseDescender(this.useDescender);
-		Element element;
-		for (final Iterator i = this.content.iterator(); i.hasNext(); ) {
-			element = (Element)i.next();
-			cell.addElement(element);
-		}
-		return cell;
-	}
+
 
 	/**
 	 * Creates a PdfPCell with these attributes.

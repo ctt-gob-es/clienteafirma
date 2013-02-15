@@ -106,7 +106,7 @@ public class Font implements Comparable {
 	public static final int STRIKETHRU = 8;
 
 	/** this is a possible style. */
-	public static final int BOLDITALIC = BOLD | ITALIC;
+	static final int BOLDITALIC = BOLD | ITALIC;
 
 	// static membervariables
 

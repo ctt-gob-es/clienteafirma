@@ -62,25 +62,10 @@ import java.util.StringTokenizer;
 
 public class Markup {
 
-	// HTML tags
-
-	/** The SPAN tag. */
-	static final String HTML_TAG_SPAN = "span";
-
 	// HTML attributes
 
 	/** This is used for inline css style information */
 	public static final String HTML_ATTR_STYLE = "style";
-
-	/** attribute for specifying externally defined CSS class */
-	static final String HTML_ATTR_CSS_CLASS = "class";
-
-
-
-	// HTML values
-
-	/** This is a possible value for the language attribute (SCRIPT tag). */
-	static final String HTML_VALUE_JAVASCRIPT = "text/javascript";
 
 
 
@@ -104,23 +89,10 @@ public class Markup {
 	/** the CSS tag for text decorations */
 	public static final String CSS_KEY_LINEHEIGHT = "line-height";
 
-
-	/** the CSS tag for adding a page break when the document is printed */
-	static final String CSS_KEY_PAGE_BREAK_BEFORE = "page-break-before";
-
-	/** the CSS tag for text decorations */
-	static final String CSS_KEY_TEXTDECORATION = "text-decoration";
-
 	/** the CSS tag for text decorations */
 	public static final String CSS_KEY_VERTICALALIGN = "vertical-align";
 
 	// CSS values
-
-	/**
-	 * value for the CSS tag for adding a page break when the document is
-	 * printed
-	 */
-	static final String CSS_VALUE_ALWAYS = "always";
 
 	/** a CSS value for text font weight */
 	public static final String CSS_VALUE_BOLD = "bold";

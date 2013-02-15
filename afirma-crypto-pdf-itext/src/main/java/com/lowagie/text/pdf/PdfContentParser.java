@@ -56,24 +56,24 @@ import java.util.ArrayList;
  * @author Paulo Soares (psoares@consiste.pt)
  */
 public class PdfContentParser {
-    
+
     /**
      * Commands have this type.
-     */    
-    public static final int COMMAND_TYPE = 200;
+     */
+    static final int COMMAND_TYPE = 200;
     /**
      * Holds value of property tokeniser.
      */
-    private PRTokeniser tokeniser;    
-    
+    private PRTokeniser tokeniser;
+
     /**
      * Creates a new instance of PdfContentParser
      * @param tokeniser the tokeniser with the content
      */
-    public PdfContentParser(PRTokeniser tokeniser) {
+    public PdfContentParser(final PRTokeniser tokeniser) {
         this.tokeniser = tokeniser;
     }
-    
+
     /**
      * Parses a single command from the content. Each command is output as an array of arguments
      * having the command itself as the last element. The returned array will be empty if the
@@ -82,21 +82,23 @@ public class PdfContentParser {
      * <CODE>null</CODE> will create a new <CODE>ArrayList</CODE>
      * @return the same <CODE>ArrayList</CODE> given as argument or a new one
      * @throws IOException on error
-     */    
+     */
     public ArrayList parse(ArrayList ls) throws IOException {
-        if (ls == null)
-            ls = new ArrayList();
-        else
-            ls.clear();
+        if (ls == null) {
+			ls = new ArrayList();
+		} else {
+			ls.clear();
+		}
         PdfObject ob = null;
         while ((ob = readPRObject()) != null) {
             ls.add(ob);
-            if (ob.type() == COMMAND_TYPE)
-                break;
+            if (ob.type() == COMMAND_TYPE) {
+				break;
+			}
         }
         return ls;
     }
-    
+
     /**
      * Gets the tokeniser.
      * @return the tokeniser.
@@ -104,99 +106,108 @@ public class PdfContentParser {
     public PRTokeniser getTokeniser() {
         return this.tokeniser;
     }
-    
+
     /**
      * Sets the tokeniser.
      * @param tokeniser the tokeniser
      */
-    public void setTokeniser(PRTokeniser tokeniser) {
+    public void setTokeniser(final PRTokeniser tokeniser) {
         this.tokeniser = tokeniser;
     }
-    
+
     /**
      * Reads a dictionary. The tokeniser must be positioned past the "&lt;&lt;" token.
      * @return the dictionary
      * @throws IOException on error
-     */    
-    public PdfDictionary readDictionary() throws IOException {
-        PdfDictionary dic = new PdfDictionary();
+     */
+    private PdfDictionary readDictionary() throws IOException {
+        final PdfDictionary dic = new PdfDictionary();
         while (true) {
-            if (!nextValidToken())
-                throw new IOException("Unexpected end of file.");
-                if (tokeniser.getTokenType() == PRTokeniser.TK_END_DIC)
-                    break;
-                if (tokeniser.getTokenType() != PRTokeniser.TK_NAME)
-                    throw new IOException("Dictionary key is not a name.");
-                PdfName name = new PdfName(tokeniser.getStringValue(), false);
-                PdfObject obj = readPRObject();
-                int type = obj.type();
-                if (-type == PRTokeniser.TK_END_DIC)
-                    throw new IOException("Unexpected '>>'");
-                if (-type == PRTokeniser.TK_END_ARRAY)
-                    throw new IOException("Unexpected ']'");
+            if (!nextValidToken()) {
+				throw new IOException("Unexpected end of file.");
+			}
+                if (this.tokeniser.getTokenType() == PRTokeniser.TK_END_DIC) {
+					break;
+				}
+                if (this.tokeniser.getTokenType() != PRTokeniser.TK_NAME) {
+					throw new IOException("Dictionary key is not a name.");
+				}
+                final PdfName name = new PdfName(this.tokeniser.getStringValue(), false);
+                final PdfObject obj = readPRObject();
+                final int type = obj.type();
+                if (-type == PRTokeniser.TK_END_DIC) {
+					throw new IOException("Unexpected '>>'");
+				}
+                if (-type == PRTokeniser.TK_END_ARRAY) {
+					throw new IOException("Unexpected ']'");
+				}
                 dic.put(name, obj);
         }
         return dic;
     }
-    
+
     /**
      * Reads an array. The tokeniser must be positioned past the "[" token.
      * @return an array
      * @throws IOException on error
-     */    
-    public PdfArray readArray() throws IOException {
-        PdfArray array = new PdfArray();
+     */
+    private PdfArray readArray() throws IOException {
+        final PdfArray array = new PdfArray();
         while (true) {
-            PdfObject obj = readPRObject();
-            int type = obj.type();
-            if (-type == PRTokeniser.TK_END_ARRAY)
-                break;
-            if (-type == PRTokeniser.TK_END_DIC)
-                throw new IOException("Unexpected '>>'");
+            final PdfObject obj = readPRObject();
+            final int type = obj.type();
+            if (-type == PRTokeniser.TK_END_ARRAY) {
+				break;
+			}
+            if (-type == PRTokeniser.TK_END_DIC) {
+				throw new IOException("Unexpected '>>'");
+			}
             array.add(obj);
         }
         return array;
     }
-    
+
     /**
      * Reads a pdf object.
      * @return the pdf object
      * @throws IOException on error
-     */    
-    public PdfObject readPRObject() throws IOException {
-        if (!nextValidToken())
-            return null;
-        int type = tokeniser.getTokenType();
+     */
+    PdfObject readPRObject() throws IOException {
+        if (!nextValidToken()) {
+			return null;
+		}
+        final int type = this.tokeniser.getTokenType();
         switch (type) {
             case PRTokeniser.TK_START_DIC: {
-                PdfDictionary dic = readDictionary();
+                final PdfDictionary dic = readDictionary();
                 return dic;
             }
             case PRTokeniser.TK_START_ARRAY:
                 return readArray();
             case PRTokeniser.TK_STRING:
-                PdfString str = new PdfString(tokeniser.getStringValue(), null).setHexWriting(tokeniser.isHexString());
+                final PdfString str = new PdfString(this.tokeniser.getStringValue(), null).setHexWriting(this.tokeniser.isHexString());
                 return str;
             case PRTokeniser.TK_NAME:
-                return new PdfName(tokeniser.getStringValue(), false);
+                return new PdfName(this.tokeniser.getStringValue(), false);
             case PRTokeniser.TK_NUMBER:
-                return new PdfNumber(tokeniser.getStringValue());
+                return new PdfNumber(this.tokeniser.getStringValue());
             case PRTokeniser.TK_OTHER:
-                return new PdfLiteral(COMMAND_TYPE, tokeniser.getStringValue());
+                return new PdfLiteral(COMMAND_TYPE, this.tokeniser.getStringValue());
             default:
-                return new PdfLiteral(-type, tokeniser.getStringValue());
+                return new PdfLiteral(-type, this.tokeniser.getStringValue());
         }
     }
-    
+
     /**
      * Reads the next token skipping over the comments.
      * @return <CODE>true</CODE> if a token was read, <CODE>false</CODE> if the end of content was reached
      * @throws IOException on error
-     */    
-    public boolean nextValidToken() throws IOException {
-        while (tokeniser.nextToken()) {
-            if (tokeniser.getTokenType() == PRTokeniser.TK_COMMENT)
-                continue;
+     */
+    private boolean nextValidToken() throws IOException {
+        while (this.tokeniser.nextToken()) {
+            if (this.tokeniser.getTokenType() == PRTokeniser.TK_COMMENT) {
+				continue;
+			}
             return true;
         }
         return false;

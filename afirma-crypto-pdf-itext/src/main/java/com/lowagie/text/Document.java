@@ -615,15 +615,7 @@ public class Document implements DocListener {
 
     // methods to get the layout of the document.
 
-	/**
- * Returns the left margin.
- *
- * @return	the left margin
- */
 
-    public float leftMargin() {
-        return this.marginLeft;
-    }
 
 	/**
  * Return the right margin.
@@ -635,25 +627,6 @@ public class Document implements DocListener {
         return this.marginRight;
     }
 
-	/**
- * Returns the top margin.
- *
- * @return	the top margin
- */
-
-    public float topMargin() {
-        return this.marginTop;
-    }
-
-	/**
- * Returns the bottom margin.
- *
- * @return	the bottom margin
- */
-
-    public float bottomMargin() {
-        return this.marginBottom;
-    }
 
 	/**
  * Returns the lower left x-coordinate.

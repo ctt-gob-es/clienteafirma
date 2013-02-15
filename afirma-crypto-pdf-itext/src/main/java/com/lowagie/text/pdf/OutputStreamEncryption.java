@@ -47,48 +47,47 @@
  * http://www.lowagie.com/iText/
  */
 package com.lowagie.text.pdf;
-import com.lowagie.text.ExceptionConverter;
-import com.lowagie.text.pdf.crypto.AESCipher;
-import com.lowagie.text.pdf.crypto.IVGenerator;
-import com.lowagie.text.pdf.crypto.ARCFOUREncryption;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class OutputStreamEncryption extends OutputStream {
-    
-    protected OutputStream out;
-    protected ARCFOUREncryption arcfour;
-    protected AESCipher cipher;
-    private byte[] sb = new byte[1];
+import com.lowagie.text.ExceptionConverter;
+import com.lowagie.text.pdf.crypto.AESCipher;
+import com.lowagie.text.pdf.crypto.ARCFOUREncryption;
+import com.lowagie.text.pdf.crypto.IVGenerator;
+
+class OutputStreamEncryption extends OutputStream {
+
+    private OutputStream out;
+    private ARCFOUREncryption arcfour;
+    private AESCipher cipher;
+    private final byte[] sb = new byte[1];
     private static final int AES_128 = 4;
     private boolean aes;
     private boolean finished;
-    
+
     /** Creates a new instance of OutputStreamCounter */
-    public OutputStreamEncryption(OutputStream out, byte key[], int off, int len, int revision) {
+    OutputStreamEncryption(final OutputStream out, final byte key[], final int off, final int len, final int revision) {
         try {
             this.out = out;
-            aes = revision == AES_128;
-            if (aes) {
-                byte[] iv = IVGenerator.getIV();
-                byte[] nkey = new byte[len];
+            this.aes = revision == AES_128;
+            if (this.aes) {
+                final byte[] iv = IVGenerator.getIV();
+                final byte[] nkey = new byte[len];
                 System.arraycopy(key, off, nkey, 0, len);
-                cipher = new AESCipher(true, nkey, iv);
+                this.cipher = new AESCipher(true, nkey, iv);
                 write(iv);
             }
             else {
-                arcfour = new ARCFOUREncryption();
-                arcfour.prepareARCFOURKey(key, off, len);
+                this.arcfour = new ARCFOUREncryption();
+                this.arcfour.prepareARCFOURKey(key, off, len);
             }
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             throw new ExceptionConverter(ex);
         }
     }
-    
-    public OutputStreamEncryption(OutputStream out, byte key[], int revision) {
-        this(out, key, 0, key.length, revision);
-    }
-    
+
+
+
     /** Closes this output stream and releases any system resources
      * associated with this stream. The general contract of <code>close</code>
      * is that it closes the output stream. A closed stream cannot perform
@@ -99,11 +98,12 @@ public class OutputStreamEncryption extends OutputStream {
      * @exception  IOException  if an I/O error occurs.
      *
      */
-    public void close() throws IOException {
+    @Override
+	public void close() throws IOException {
         finish();
-        out.close();
+        this.out.close();
     }
-    
+
     /** Flushes this output stream and forces any buffered output bytes
      * to be written out. The general contract of <code>flush</code> is
      * that calling it is an indication that, if any bytes previously
@@ -116,10 +116,11 @@ public class OutputStreamEncryption extends OutputStream {
      * @exception  IOException  if an I/O error occurs.
      *
      */
-    public void flush() throws IOException {
-        out.flush();
+    @Override
+	public void flush() throws IOException {
+        this.out.flush();
     }
-    
+
     /** Writes <code>b.length</code> bytes from the specified byte array
      * to this output stream. The general contract for <code>write(b)</code>
      * is that it should have exactly the same effect as the call
@@ -130,10 +131,11 @@ public class OutputStreamEncryption extends OutputStream {
      * @see        java.io.OutputStream#write(byte[], int, int)
      *
      */
-    public void write(byte[] b) throws IOException {
+    @Override
+	public void write(final byte[] b) throws IOException {
         write(b, 0, b.length);
     }
-    
+
     /** Writes the specified byte to this output stream. The general
      * contract for <code>write</code> is that one byte is written
      * to the output stream. The byte to be written is the eight
@@ -149,11 +151,12 @@ public class OutputStreamEncryption extends OutputStream {
      *             output stream has been closed.
      *
      */
-    public void write(int b) throws IOException {
-        sb[0] = (byte)b;
-        write(sb, 0, 1);
+    @Override
+	public void write(final int b) throws IOException {
+        this.sb[0] = (byte)b;
+        write(this.sb, 0, 1);
     }
-    
+
     /** Writes <code>len</code> bytes from the specified byte array
      * starting at offset <code>off</code> to this output stream.
      * The general contract for <code>write(b, off, len)</code> is that
@@ -182,36 +185,38 @@ public class OutputStreamEncryption extends OutputStream {
      *             stream is closed.
      *
      */
-    public void write(byte[] b, int off, int len) throws IOException {
-        if (aes) {
-            byte[] b2 = cipher.update(b, off, len);
-            if (b2 == null || b2.length == 0)
-                return;
-            out.write(b2, 0, b2.length);
+    @Override
+	public void write(final byte[] b, int off, int len) throws IOException {
+        if (this.aes) {
+            final byte[] b2 = this.cipher.update(b, off, len);
+            if (b2 == null || b2.length == 0) {
+				return;
+			}
+            this.out.write(b2, 0, b2.length);
         }
         else {
-            byte[] b2 = new byte[Math.min(len, 4192)];
+            final byte[] b2 = new byte[Math.min(len, 4192)];
             while (len > 0) {
-                int sz = Math.min(len, b2.length);
-                arcfour.encryptARCFOUR(b, off, sz, b2, 0);
-                out.write(b2, 0, sz);
+                final int sz = Math.min(len, b2.length);
+                this.arcfour.encryptARCFOUR(b, off, sz, b2, 0);
+                this.out.write(b2, 0, sz);
                 len -= sz;
                 off += sz;
             }
         }
     }
-    
-    public void finish() throws IOException {
-        if (!finished) {
-            finished = true;
-            if (aes) {
+
+    void finish() throws IOException {
+        if (!this.finished) {
+            this.finished = true;
+            if (this.aes) {
                 byte[] b;
                 try {
-                    b = cipher.doFinal();
-                } catch (Exception ex) {
+                    b = this.cipher.doFinal();
+                } catch (final Exception ex) {
                     throw new ExceptionConverter(ex);
                 }
-                out.write(b, 0, b.length);
+                this.out.write(b, 0, b.length);
             }
         }
     }

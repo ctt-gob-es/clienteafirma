@@ -63,98 +63,89 @@ package com.lowagie.text.pdf;
 public class PdfNumber extends PdfObject {
 
     // CLASS VARIABLES
-    
+
     /**
      * actual value of this <CODE>PdfNumber</CODE>, represented as a
      * <CODE>double</CODE>
      */
     private double value;
-    
+
     // CONSTRUCTORS
-    
+
     /**
      * Constructs a <CODE>PdfNumber</CODE>-object.
      *
      * @param content    value of the new <CODE>PdfNumber</CODE>-object
      */
-    public PdfNumber(String content) {
+    public PdfNumber(final String content) {
         super(NUMBER);
         try {
-            value = Double.parseDouble(content.trim());
+            this.value = Double.parseDouble(content.trim());
             setContent(content);
         }
-        catch (NumberFormatException nfe){
+        catch (final NumberFormatException nfe){
             throw new RuntimeException(content + " is not a valid number - " + nfe.toString());
         }
     }
-    
+
     /**
      * Constructs a new <CODE>PdfNumber</CODE>-object of type integer.
      *
      * @param value    value of the new <CODE>PdfNumber</CODE>-object
      */
-    public PdfNumber(int value) {
+    public PdfNumber(final int value) {
         super(NUMBER);
         this.value = value;
         setContent(String.valueOf(value));
     }
-    
+
     /**
      * Constructs a new <CODE>PdfNumber</CODE>-object of type real.
      *
      * @param value    value of the new <CODE>PdfNumber</CODE>-object
      */
-    public PdfNumber(double value) {
+    public PdfNumber(final double value) {
         super(NUMBER);
         this.value = value;
         setContent(ByteBuffer.formatDouble(value));
     }
-    
+
     /**
      * Constructs a new <CODE>PdfNumber</CODE>-object of type real.
      *
      * @param value    value of the new <CODE>PdfNumber</CODE>-object
      */
-    public PdfNumber(float value) {
+    public PdfNumber(final float value) {
         this((double)value);
     }
-    
+
     // methods returning the value of this object
-    
+
     /**
      * Returns the primitive <CODE>int</CODE> value of this object.
      *
      * @return The value as <CODE>int</CODE>
      */
     public int intValue() {
-        return (int) value;
+        return (int) this.value;
     }
-    
+
     /**
      * Returns the primitive <CODE>double</CODE> value of this object.
      *
      * @return The value as <CODE>double</CODE>
      */
     public double doubleValue() {
-        return value;
+        return this.value;
     }
-    
+
     /**
      * Returns the primitive <CODE>float</CODE> value of this object.
      *
      * @return The value as <CODE>float</CODE>
      */
     public float floatValue() {
-        return (float)value;
+        return (float)this.value;
     }
-    
-    // other methods
-    
-    /**
-     * Increments the value of the <CODE>PdfNumber</CODE>-object by 1.
-     */
-    public void increment() {
-        value += 1.0;
-        setContent(ByteBuffer.formatDouble(value));
-    }
+
 }

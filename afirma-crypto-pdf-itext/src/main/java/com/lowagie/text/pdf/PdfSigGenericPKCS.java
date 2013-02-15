@@ -56,23 +56,23 @@ import com.lowagie.text.ExceptionConverter;
 /**
  * A signature dictionary representation for the standard filters.
  */
-public abstract class PdfSigGenericPKCS extends PdfSignature {
+abstract class PdfSigGenericPKCS extends PdfSignature {
     /**
      * The hash algorithm, for example "SHA1"
-     */    
+     */
     protected String hashAlgorithm;
     /**
      * The crypto provider
-     */    
+     */
     protected String provider = null;
     /**
      * The class instance that calculates the PKCS#1 and PKCS#7
-     */    
+     */
     protected PdfPKCS7 pkcs;
     /**
      * The subject name in the signing certificate (the element "CN")
-     */    
-    protected String   name;
+     */
+    private String   name;
 
     private byte externalDigest[];
     private byte externalRSAdata[];
@@ -82,8 +82,8 @@ public abstract class PdfSigGenericPKCS extends PdfSignature {
      * Creates a generic standard filter.
      * @param filter the filter name
      * @param subFilter the sub-filter name
-     */    
-    public PdfSigGenericPKCS(PdfName filter, PdfName subFilter) {
+     */
+    private PdfSigGenericPKCS(final PdfName filter, final PdfName subFilter) {
         super(filter, subFilter);
     }
 
@@ -92,29 +92,30 @@ public abstract class PdfSigGenericPKCS extends PdfSignature {
      * @param privKey the private key
      * @param certChain the certificate chain
      * @param crlList the certificate revocation list. It can be <CODE>null</CODE>
-     */    
-    public void setSignInfo(PrivateKey privKey, Certificate[] certChain, CRL[] crlList) {
+     */
+    void setSignInfo(final PrivateKey privKey, final Certificate[] certChain, final CRL[] crlList) {
         try {
-            pkcs = new PdfPKCS7(privKey, certChain, crlList, hashAlgorithm, provider, PdfName.ADBE_PKCS7_SHA1.equals(get(PdfName.SUBFILTER)));
-            pkcs.setExternalDigest(externalDigest, externalRSAdata, digestEncryptionAlgorithm);
+            this.pkcs = new PdfPKCS7(privKey, certChain, crlList, this.hashAlgorithm, this.provider, PdfName.ADBE_PKCS7_SHA1.equals(get(PdfName.SUBFILTER)));
+            this.pkcs.setExternalDigest(this.externalDigest, this.externalRSAdata, this.digestEncryptionAlgorithm);
             if (PdfName.ADBE_X509_RSA_SHA1.equals(get(PdfName.SUBFILTER))) {
-                ByteArrayOutputStream bout = new ByteArrayOutputStream();
-                for (int k = 0; k < certChain.length; ++k) {
-                    bout.write(certChain[k].getEncoded());
+                final ByteArrayOutputStream bout = new ByteArrayOutputStream();
+                for (final Certificate element : certChain) {
+                    bout.write(element.getEncoded());
                 }
                 bout.close();
                 setCert(bout.toByteArray());
-                setContents(pkcs.getEncodedPKCS1());
-            }
-            else
-                setContents(pkcs.getEncodedPKCS7());
-            name = PdfPKCS7.getSubjectFields(pkcs.getSigningCertificate()).getField("CN");
-            if (name != null)
-                put(PdfName.NAME, new PdfString(name, PdfObject.TEXT_UNICODE));
-            pkcs = new PdfPKCS7(privKey, certChain, crlList, hashAlgorithm, provider, PdfName.ADBE_PKCS7_SHA1.equals(get(PdfName.SUBFILTER)));
-            pkcs.setExternalDigest(externalDigest, externalRSAdata, digestEncryptionAlgorithm);
+                setContents(this.pkcs.getEncodedPKCS1());
+            } else {
+				setContents(this.pkcs.getEncodedPKCS7());
+			}
+            this.name = PdfPKCS7.getSubjectFields(this.pkcs.getSigningCertificate()).getField("CN");
+            if (this.name != null) {
+				put(PdfName.NAME, new PdfString(this.name, PdfObject.TEXT_UNICODE));
+			}
+            this.pkcs = new PdfPKCS7(privKey, certChain, crlList, this.hashAlgorithm, this.provider, PdfName.ADBE_PKCS7_SHA1.equals(get(PdfName.SUBFILTER)));
+            this.pkcs.setExternalDigest(this.externalDigest, this.externalRSAdata, this.digestEncryptionAlgorithm);
         }
-        catch (Exception e) {
+        catch (final Exception e) {
             throw new ExceptionConverter(e);
         }
     }
@@ -126,59 +127,60 @@ public abstract class PdfSigGenericPKCS extends PdfSignature {
      * @param digestEncryptionAlgorithm the encryption algorithm. It may must be <CODE>null</CODE> if the <CODE>digest</CODE>
      * is also <CODE>null</CODE>. If the <CODE>digest</CODE> is not <CODE>null</CODE>
      * then it may be "RSA" or "DSA"
-     */    
-    public void setExternalDigest(byte digest[], byte RSAdata[], String digestEncryptionAlgorithm) {
-        externalDigest = digest;
-        externalRSAdata = RSAdata;
+     */
+    void setExternalDigest(final byte digest[], final byte RSAdata[], final String digestEncryptionAlgorithm) {
+        this.externalDigest = digest;
+        this.externalRSAdata = RSAdata;
         this.digestEncryptionAlgorithm = digestEncryptionAlgorithm;
     }
 
     /**
      * Gets the subject name in the signing certificate (the element "CN")
      * @return the subject name in the signing certificate (the element "CN")
-     */    
+     */
     public String getName() {
-        return name;
+        return this.name;
     }
 
     /**
      * Gets the class instance that does the actual signing.
      * @return the class instance that does the actual signing
-     */    
+     */
     public PdfPKCS7 getSigner() {
-        return pkcs;
+        return this.pkcs;
     }
 
     /**
      * Gets the signature content. This can be a PKCS#1 or a PKCS#7. It corresponds to
      * the /Contents key.
      * @return the signature content
-     */    
+     */
     public byte[] getSignerContents() {
-        if (PdfName.ADBE_X509_RSA_SHA1.equals(get(PdfName.SUBFILTER)))
-            return pkcs.getEncodedPKCS1();
-        else
-            return pkcs.getEncodedPKCS7();
+        if (PdfName.ADBE_X509_RSA_SHA1.equals(get(PdfName.SUBFILTER))) {
+			return this.pkcs.getEncodedPKCS1();
+		} else {
+			return this.pkcs.getEncodedPKCS7();
+		}
     }
 
     /**
      * Creates a standard filter of the type VeriSign.
-     */    
-    public static class VeriSign extends PdfSigGenericPKCS {
+     */
+    static class VeriSign extends PdfSigGenericPKCS {
         /**
          * The constructor for the default provider.
-         */        
+         */
         public VeriSign() {
             super(PdfName.VERISIGN_PPKVS, PdfName.ADBE_PKCS7_DETACHED);
-            hashAlgorithm = "MD5";
+            this.hashAlgorithm = "MD5";
             put(PdfName.R, new PdfNumber(65537));
         }
 
         /**
          * The constructor for an explicit provider.
          * @param provider the crypto provider
-         */        
-        public VeriSign(String provider) {
+         */
+        VeriSign(final String provider) {
             this();
             this.provider = provider;
         }
@@ -186,22 +188,22 @@ public abstract class PdfSigGenericPKCS extends PdfSignature {
 
     /**
      * Creates a standard filter of the type self signed.
-     */    
-    public static class PPKLite extends PdfSigGenericPKCS {
+     */
+    static class PPKLite extends PdfSigGenericPKCS {
         /**
          * The constructor for the default provider.
-         */        
+         */
         public PPKLite() {
             super(PdfName.ADOBE_PPKLITE, PdfName.ADBE_X509_RSA_SHA1);
-            hashAlgorithm = "SHA1";
+            this.hashAlgorithm = "SHA1";
             put(PdfName.R, new PdfNumber(65541));
         }
 
         /**
          * The constructor for an explicit provider.
          * @param provider the crypto provider
-         */        
-        public PPKLite(String provider) {
+         */
+        PPKLite(final String provider) {
             this();
             this.provider = provider;
         }
@@ -209,21 +211,21 @@ public abstract class PdfSigGenericPKCS extends PdfSignature {
 
     /**
      * Creates a standard filter of the type Windows Certificate.
-     */    
-    public static class PPKMS extends PdfSigGenericPKCS {
+     */
+    static class PPKMS extends PdfSigGenericPKCS {
         /**
          * The constructor for the default provider.
-         */        
+         */
         public PPKMS() {
             super(PdfName.ADOBE_PPKMS, PdfName.ADBE_PKCS7_SHA1);
-            hashAlgorithm = "SHA1";
+            this.hashAlgorithm = "SHA1";
         }
 
         /**
          * The constructor for an explicit provider.
          * @param provider the crypto provider
-         */        
-        public PPKMS(String provider) {
+         */
+        PPKMS(final String provider) {
             this();
             this.provider = provider;
         }
