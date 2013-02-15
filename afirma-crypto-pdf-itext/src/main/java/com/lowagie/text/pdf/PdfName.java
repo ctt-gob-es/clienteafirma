@@ -222,8 +222,7 @@ public class PdfName extends PdfObject implements Comparable{
     static final PdfName CFM = new PdfName("CFM");
     /** A name */
     static final PdfName CH = new PdfName("Ch");
-    /** A name */
-    static final PdfName CHARPROCS = new PdfName("CharProcs");
+
 
     /** A name */
     static final PdfName CIDFONTTYPE0 = new PdfName("CIDFontType0");
@@ -250,8 +249,7 @@ public class PdfName extends PdfObject implements Comparable{
     /** A name */
     static final PdfName COLLECTION = new PdfName("Collection");
 
-    /** A name */
-    public static final PdfName COLLECTIONITEM = new PdfName("CollectionItem");
+
     /** A name */
     public static final PdfName COLLECTIONSCHEMA = new PdfName("CollectionSchema");
 
@@ -478,8 +476,7 @@ public class PdfName extends PdfObject implements Comparable{
     static final PdfName FONTFILE2 = new PdfName("FontFile2");
     /** A name */
     static final PdfName FONTFILE3 = new PdfName("FontFile3");
-    /** A name */
-    static final PdfName FONTMATRIX = new PdfName("FontMatrix");
+
     /** A name */
     static final PdfName FONTNAME = new PdfName("FontName");
 
@@ -524,7 +521,7 @@ public class PdfName extends PdfObject implements Comparable{
     /** A name of an attribute. */
     public static final PdfName GTS_PDFXVERSION = new PdfName("GTS_PDFXVersion");
     /** A name of an attribute. */
-    public static final PdfName H = new PdfName("H");
+    static final PdfName H = new PdfName("H");
 
     /** A name of an attribute. */
     static final PdfName HEIGHT = new PdfName("Height");
@@ -841,8 +838,7 @@ public class PdfName extends PdfObject implements Comparable{
     public static final PdfName PRODUCER = new PdfName("Producer");
     /** A name */
     static final PdfName PROPERTIES = new PdfName("Properties");
-    /** A name */
-    static final PdfName PS = new PdfName("PS");
+
     /** A name */
     static final PdfName PUBSEC = new PdfName("Adobe.PubSec");
 
@@ -1057,8 +1053,7 @@ public class PdfName extends PdfObject implements Comparable{
     static final PdfName TYPE0 = new PdfName("Type0");
     /** A name */
     static final PdfName TYPE1 = new PdfName("Type1");
-    /** A name of an attribute. */
-    static final PdfName TYPE3 = new PdfName("Type3");
+
     /** A name of an attribute. */
     static final PdfName U = new PdfName("U");
     /** A name of an attribute. */
@@ -1101,7 +1096,7 @@ public class PdfName extends PdfObject implements Comparable{
 	public static final PdfName VERSION = new PdfName("Version");
 
     /** A name */
-    public static final PdfName VIEW = new PdfName("View");
+    static final PdfName VIEW = new PdfName("View");
 
     /** A name */
     public static final PdfName VIEWAREA = new PdfName("ViewArea");

@@ -63,7 +63,7 @@ import com.lowagie.text.Rectangle;
  * All the option in the Acrobat GUI are supported in an easy to use API.
  * @author Paulo Soares (psoares@consiste.pt)
  */
-public class TextField extends BaseField {
+class TextField extends BaseField {
 
     /** Holds value of property defaultText. */
     private String defaultText;
@@ -89,7 +89,7 @@ public class TextField extends BaseField {
      * @param fieldName the field name. If <CODE>null</CODE> only the widget keys
      * will be included in the field allowing it to be used as a kid field.
      */
-    public TextField(final PdfWriter writer, final Rectangle box, final String fieldName) {
+    TextField(final PdfWriter writer, final Rectangle box, final String fieldName) {
         super(writer, box, fieldName);
     }
 

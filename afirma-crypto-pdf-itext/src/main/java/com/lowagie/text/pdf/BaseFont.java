@@ -861,18 +861,7 @@ public abstract class BaseFont {
 
 
 
-/**
- * Gets the ascent of a <CODE>String</CODE> in points. The ascent will always be
- * greater than or equal to zero even if all the characters have a lower ascent.
- * @param text the <CODE>String</CODE> to get the ascent of
- * @param fontSize the size of the font
- * @return the ascent in points
- */
-    float getAscentPoint(final String text, final float fontSize)
-    {
-        return getAscent(text) * 0.001f * fontSize;
-    }
-// ia>
+
 
     /**
      * Gets the width of a <CODE>String</CODE> in points taking kerning

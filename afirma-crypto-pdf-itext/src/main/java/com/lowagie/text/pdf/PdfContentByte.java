@@ -130,8 +130,7 @@ public class PdfContentByte {
 
     /** A possible line cap value */
     private static final int LINE_CAP_BUTT = 0;
-    /** A possible line cap value */
-    public static final int LINE_CAP_ROUND = 1;
+
 
 
     /** A possible line join value */
@@ -722,20 +721,7 @@ public class PdfContentByte {
 
 
 
-    /** Draws a circle. The endpoint will (x+r, y).
-     *
-     * @param x x center of circle
-     * @param y y center of circle
-     * @param r radius of circle
-     */
-    void circle(final float x, final float y, final float r) {
-        final float b = 0.5523f;
-        moveTo(x + r, y);
-        curveTo(x + r, y + r * b, x + r * b, y + r, x, y + r);
-        curveTo(x - r * b, y + r, x - r, y + r * b, x - r, y);
-        curveTo(x - r, y - r * b, x - r * b, y - r, x, y - r);
-        curveTo(x + r * b, y - r, x + r, y - r * b, x + r, y);
-    }
+
 
 
 
