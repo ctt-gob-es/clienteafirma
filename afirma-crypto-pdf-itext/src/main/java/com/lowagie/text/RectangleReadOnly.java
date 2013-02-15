@@ -72,18 +72,6 @@ class RectangleReadOnly extends Rectangle {
 	// CONSTRUCTORS
 
 	/**
-	 * Constructs a <CODE>RectangleReadOnly</CODE> -object.
-	 *
-	 * @param llx	lower left x
-	 * @param lly	lower left y
-	 * @param urx	upper right x
-	 * @param ury	upper right y
-	 */
-	public RectangleReadOnly(final float llx, final float lly, final float urx, final float ury) {
-        super(llx, lly, urx, ury);
-	}
-
-	/**
 	 * Constructs a <CODE>RectangleReadOnly</CODE> -object starting from the origin
 	 * (0, 0).
 	 *
@@ -92,16 +80,6 @@ class RectangleReadOnly extends Rectangle {
 	 */
 	public RectangleReadOnly(final float urx, final float ury) {
 		super(0, 0, urx, ury);
-	}
-
-	/**
-	 * Constructs a <CODE>RectangleReadOnly</CODE> -object.
-	 *
-	 * @param rect	another <CODE>Rectangle</CODE>
-	 */
-	public RectangleReadOnly(final Rectangle rect) {
-		super(rect.llx, rect.lly, rect.urx, rect.ury);
-		super.cloneNonPositionParameters(rect);
 	}
 
 	/**

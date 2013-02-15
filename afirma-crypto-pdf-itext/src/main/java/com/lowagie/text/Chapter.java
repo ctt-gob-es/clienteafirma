@@ -81,17 +81,6 @@ public class Chapter extends Section {
 
 	/**
 	 * Constructs a new <CODE>Chapter</CODE>.
-	 * @param	number		the Chapter number
-     */
-    public Chapter(final int number) {
-        super(null, 1);
-        this.numbers = new ArrayList();
-        this.numbers.add(new Integer(number));
-        this.triggerNewPage = true;
-    }
-
-	/**
-	 * Constructs a new <CODE>Chapter</CODE>.
 	 *
 	 * @param	title		the Chapter title (as a <CODE>Paragraph</CODE>)
 	 * @param	number		the Chapter number

@@ -64,10 +64,6 @@ import com.lowagie.text.pdf.codec.TIFFFaxDecoder;
 
 class ImgCCITT extends Image {
 
-    ImgCCITT(final Image image) {
-        super(image);
-    }
-
     /** Creates an Image with CCITT compression.
      *
      * @param width the exact width of the image

@@ -66,15 +66,6 @@ public class ChapterAutoNumber extends Chapter {
     /**
      * Create a new object.
      *
-     * @param para     the Chapter title (as a <CODE>Paragraph</CODE>)
-     */
-    public ChapterAutoNumber(final Paragraph para) {
-        super(para, 0);
-    }
-
-    /**
-     * Create a new object.
-     *
      * @param title	    the Chapter title (as a <CODE>String</CODE>)
      */
     public ChapterAutoNumber(final String title) {

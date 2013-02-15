@@ -82,16 +82,16 @@ public class Row implements Element {
     // member variables
 
     /** This is the number of columns in the <CODE>Row</CODE>. */
-    private int columns;
+    private final int columns;
 
     /** This is a valid position the <CODE>Row</CODE>. */
     private int currentColumn;
 
     /** This is the array that keeps track of reserved cells. */
-    private boolean[] reserved;
+    private final boolean[] reserved;
 
     /** This is the array of Objects (<CODE>Cell</CODE> or <CODE>Table</CODE>). */
-    private Object[] cells;
+    private final Object[] cells;
 
     /** This is the vertical alignment. */
     private int horizontalAlignment;
@@ -166,41 +166,6 @@ public class Row implements Element {
 	public boolean isNestable() {
 		return false;
 	}
-
-    // method to delete a column
-
-    /**
-     * Returns a <CODE>Row</CODE> that is a copy of this <CODE>Row</CODE>
-     * in which a certain column has been deleted.
-     *
-     * @param column  the number of the column to delete
-     */
-    void deleteColumn(final int column) {
-        if (column >= this.columns || column < 0) {
-            throw new IndexOutOfBoundsException("getCell at illegal index : " + column);
-        }
-        this.columns--;
-        final boolean newReserved[] = new boolean[this.columns];
-        final Object newCells[] = new Cell[this.columns];
-
-        for (int i = 0; i < column; i++) {
-            newReserved[i] = this.reserved[i];
-            newCells[i] = this.cells[i];
-            if (newCells[i] != null && i + ((Cell) newCells[i]).getColspan() > column) {
-                ((Cell) newCells[i]).setColspan(((Cell) this.cells[i]).getColspan() - 1);
-            }
-        }
-        for (int i = column; i < this.columns; i++) {
-            newReserved[i] = this.reserved[i + 1];
-            newCells[i] = this.cells[i + 1];
-        }
-        if (this.cells[column] != null && ((Cell) this.cells[column]).getColspan() > 1) {
-            newCells[column] = this.cells[column];
-            ((Cell) newCells[column]).setColspan(((Cell) newCells[column]).getColspan() - 1);
-        }
-        this.reserved = newReserved;
-        this.cells = newCells;
-    }
 
     // methods
 

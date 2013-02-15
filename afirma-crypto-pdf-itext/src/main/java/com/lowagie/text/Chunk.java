@@ -90,7 +90,7 @@ public class Chunk implements Element {
 	public static final Chunk NEWLINE = new Chunk("\n");
 
 	/** This is a Chunk containing a newpage. */
-	static final Chunk NEXTPAGE = new Chunk("");
+	private static final Chunk NEXTPAGE = new Chunk("");
 	static {
 		NEXTPAGE.setNewPage();
 	}

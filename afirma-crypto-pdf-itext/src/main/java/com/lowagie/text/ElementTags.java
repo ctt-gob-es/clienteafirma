@@ -91,12 +91,6 @@ public class ElementTags {
     public static final String NUMBERDEPTH = "numberdepth";
 
     /** attribute of section/chapter tag */
-    public static final String DEPTH = "depth";
-
-    /** attribute of section/chapter tag */
-    public static final String NUMBER = "number";
-
-    /** attribute of section/chapter tag */
     public static final String INDENT = "indent";
 
     /** attribute of chapter/section/paragraph/table/cell tag */
@@ -127,9 +121,6 @@ public class ElementTags {
 
     /** attribute of paragraph/image/table tag */
     public static final String ALIGN = "align";
-
-    /** attribute of paragraph */
-    public static final String KEEPTOGETHER = "keeptogether";
 
     /** attribute of anchor tag */
     public static final String NAME = "name";
@@ -321,12 +312,6 @@ public class ElementTags {
     public static final String PLAINHEIGHT = "plainheight";
 
     /** attribute of the image tag */
-    public static final String SCALEDWIDTH = "scaledwidth";
-
-    /** attribute of the image tag */
-    public static final String SCALEDHEIGHT = "scaledheight";
-
-    /** attribute of the image tag */
     public static final String  ROTATION = "rotation";
 
     /** the newpage tag */
@@ -349,18 +334,6 @@ public class ElementTags {
 
     /** attribute of the annotation tag */
     public static final String NAMED = "named";
-
-    /** attribute of the annotation tag */
-    public static final String APPLICATION = "application";
-
-    /** attribute of the annotation tag */
-    public static final String PARAMETERS = "parameters";
-
-    /** attribute of the annotation tag */
-    public static final String OPERATION = "operation";
-
-    /** attribute of the annotation tag */
-    public static final String DEFAULTDIR = "defaultdir";
 
     /** attribute of the annotation tag */
     public static final String LLX = "llx";
@@ -451,36 +424,6 @@ public class ElementTags {
 
 
     // methods
-
-	/**
-	 * Translates the alignment value to a String value.
-	 *
-	 * @param   alignment   the alignment value
-	 * @return  the translated value
-	 */
-    public static String getAlignment(final int alignment) {
-        switch(alignment) {
-            case Element.ALIGN_LEFT:
-                return ALIGN_LEFT;
-            case Element.ALIGN_CENTER:
-                return ALIGN_CENTER;
-            case Element.ALIGN_RIGHT:
-                return ALIGN_RIGHT;
-            case Element.ALIGN_JUSTIFIED:
-            case Element.ALIGN_JUSTIFIED_ALL:
-                return ALIGN_JUSTIFIED;
-            case Element.ALIGN_TOP:
-                return ALIGN_TOP;
-            case Element.ALIGN_MIDDLE:
-                return ALIGN_MIDDLE;
-            case Element.ALIGN_BOTTOM:
-                return ALIGN_BOTTOM;
-            case Element.ALIGN_BASELINE:
-                return ALIGN_BASELINE;
-                default:
-                    return DEFAULT;
-        }
-    }
 
     /**
      * Translates a String value to an alignment value.

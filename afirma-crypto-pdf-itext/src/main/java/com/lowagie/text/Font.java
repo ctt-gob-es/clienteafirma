@@ -194,74 +194,9 @@ public class Font implements Comparable {
 	 *
 	 * @param bf
 	 *            the external font
-	 * @param size
-	 *            the size of this font
-	 * @param style
-	 *            the style of this font
-	 */
-	public Font(final BaseFont bf, final float size, final int style) {
-		this(bf, size, style, null);
-	}
-
-	/**
-	 * Constructs a Font.
-	 *
-	 * @param bf
-	 *            the external font
-	 * @param size
-	 *            the size of this font
-	 */
-	public Font(final BaseFont bf, final float size) {
-		this(bf, size, UNDEFINED, null);
-	}
-
-	/**
-	 * Constructs a Font.
-	 *
-	 * @param bf
-	 *            the external font
 	 */
 	public Font(final BaseFont bf) {
 		this(bf, UNDEFINED, UNDEFINED, null);
-	}
-
-	/**
-	 * Constructs a Font.
-	 *
-	 * @param family
-	 *            the family to which this font belongs
-	 * @param size
-	 *            the size of this font
-	 * @param style
-	 *            the style of this font
-	 */
-
-	public Font(final int family, final float size, final int style) {
-		this(family, size, style, null);
-	}
-
-	/**
-	 * Constructs a Font.
-	 *
-	 * @param family
-	 *            the family to which this font belongs
-	 * @param size
-	 *            the size of this font
-	 */
-
-	public Font(final int family, final float size) {
-		this(family, size, UNDEFINED, null);
-	}
-
-	/**
-	 * Constructs a Font.
-	 *
-	 * @param family
-	 *            the family to which this font belongs
-	 */
-
-	public Font(final int family) {
-		this(family, UNDEFINED, UNDEFINED, null);
 	}
 
 	/**
@@ -608,20 +543,6 @@ public class Font implements Comparable {
 
 	public void setColor(final Color color) {
 		this.color = color;
-	}
-
-	/**
-	 * Sets the color.
-	 *
-	 * @param red
-	 *            the red-value of the new color
-	 * @param green
-	 *            the green-value of the new color
-	 * @param blue
-	 *            the blue-value of the new color
-	 */
-	public void setColor(final int red, final int green, final int blue) {
-		this.color = new Color(red, green, blue);
 	}
 
 	// BASEFONT

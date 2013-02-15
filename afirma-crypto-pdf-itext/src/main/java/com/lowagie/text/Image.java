@@ -58,19 +58,15 @@ import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import com.lowagie.text.pdf.PRIndirectReference;
 import com.lowagie.text.pdf.PdfArray;
 import com.lowagie.text.pdf.PdfContentByte;
 import com.lowagie.text.pdf.PdfDictionary;
 import com.lowagie.text.pdf.PdfIndirectReference;
 import com.lowagie.text.pdf.PdfName;
-import com.lowagie.text.pdf.PdfNumber;
 import com.lowagie.text.pdf.PdfOCG;
 import com.lowagie.text.pdf.PdfObject;
-import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.PdfStream;
 import com.lowagie.text.pdf.PdfTemplate;
-import com.lowagie.text.pdf.PdfWriter;
 import com.lowagie.text.pdf.RandomAccessFileOrArray;
 import com.lowagie.text.pdf.codec.BmpImage;
 import com.lowagie.text.pdf.codec.CCITTG4Encoder;
@@ -153,9 +149,6 @@ public abstract class Image extends Rectangle {
 
 	/** type of image */
 	static final int ORIGINAL_WMF = 6;
-
-	/** type of image */
-    public static final int ORIGINAL_PS = 7;
 
 	/** type of image */
 	static final int ORIGINAL_JPEG2000 = 8;
@@ -471,19 +464,6 @@ public abstract class Image extends Rectangle {
 	public static Image getInstance(final int width, final int height, final int components,
 			final int bpc, final byte data[]) throws BadElementException {
 		return Image.getInstance(width, height, components, bpc, data, null);
-	}
-
-	/**
-	 * Creates a JBIG2 Image.
-	 * @param	width	the width of the image
-	 * @param	height	the height of the image
-	 * @param	data	the raw image data
-	 * @param	globals	JBIG2 globals
-	 * @since	2.1.5
-	 */
-	public static Image getInstance(final int width, final int height, final byte[] data, final byte[] globals) {
-		final Image img = new ImgJBIG2(width, height, data, globals);
-		return img;
 	}
 
 	/**
@@ -808,25 +788,6 @@ public abstract class Image extends Rectangle {
 		return Image.getInstance(image, color, false);
 	}
 
-	/**
-	 * Gets an instance of a Image from a java.awt.Image.
-	 * The image is added as a JPEG with a user defined quality.
-	 *
-	 * @param writer
-	 *            the <CODE>PdfWriter</CODE> object to which the image will be added
-	 * @param awtImage
-	 *            the <CODE>java.awt.Image</CODE> to convert
-	 * @param quality
-	 *            a float value between 0 and 1
-	 * @return an object of type <CODE>PdfTemplate</CODE>
-	 * @throws BadElementException
-	 *             on error
-	 * @throws IOException
-	 */
-	public static Image getInstance(final PdfWriter writer, final java.awt.Image awtImage, final float quality) throws BadElementException, IOException {
-		return getInstance(new PdfContentByte(writer), awtImage, quality);
-	}
-
     /**
      * Gets an instance of a Image from a java.awt.Image.
      * The image is added as a JPEG with a user defined quality.
@@ -886,36 +847,6 @@ public abstract class Image extends Rectangle {
      */
     public void setDirectReference(final PdfIndirectReference directReference) {
         this.directReference = directReference;
-    }
-
-    /**
-     * Reuses an existing image.
-     * @param ref the reference to the image dictionary
-     * @throws BadElementException on error
-     * @return the image
-     */
-    public static Image getInstance(final PRIndirectReference ref) throws BadElementException {
-        final PdfDictionary dic = (PdfDictionary)PdfReader.getPdfObjectRelease(ref);
-        final int width = ((PdfNumber)PdfReader.getPdfObjectRelease(dic.get(PdfName.WIDTH))).intValue();
-        final int height = ((PdfNumber)PdfReader.getPdfObjectRelease(dic.get(PdfName.HEIGHT))).intValue();
-        Image imask = null;
-        PdfObject obj = dic.get(PdfName.SMASK);
-        if (obj != null && obj.isIndirect()) {
-            imask = getInstance((PRIndirectReference)obj);
-        }
-        else {
-            obj = dic.get(PdfName.MASK);
-            if (obj != null && obj.isIndirect()) {
-                final PdfObject obj2 = PdfReader.getPdfObjectRelease(obj);
-                if (obj2 instanceof PdfDictionary) {
-					imask = getInstance((PRIndirectReference)obj);
-				}
-            }
-        }
-        final Image img = new ImgRaw(width, height, 1, 1, null);
-        img.imageMask = imask;
-        img.directReference = ref;
-        return img;
     }
 
     // copy constructor
@@ -1312,7 +1243,7 @@ public abstract class Image extends Rectangle {
 	 * @param percentY
 	 *            the scaling percentage of the height
 	 */
-	public void scalePercent(final float percentX, final float percentY) {
+	private void scalePercent(final float percentX, final float percentY) {
 		this.plainWidth = getWidth() * percentX / 100f;
 		this.plainHeight = getHeight() * percentY / 100f;
 		final float[] matrix = matrix();
@@ -1880,36 +1811,6 @@ public abstract class Image extends Rectangle {
 	public void setAdditional(final PdfDictionary additional) {
 		this.additional = additional;
 	}
-
-    /**
-     * Replaces CalRGB and CalGray colorspaces with DeviceRGB and DeviceGray.
-     */
-    public void simplifyColorspace() {
-        if (this.additional == null) {
-			return;
-		}
-        final PdfArray value = this.additional.getAsArray(PdfName.COLORSPACE);
-        if (value == null) {
-			return;
-		}
-        final PdfObject cs = simplifyColorspace(value);
-        PdfObject newValue;
-        if (cs.isName()) {
-			newValue = cs;
-		} else {
-            newValue = value;
-            final PdfName first = value.getAsName(0);
-            if (PdfName.INDEXED.equals(first)) {
-                if (value.size() >= 2) {
-                    final PdfArray second = value.getAsArray(1);
-                    if (second != null) {
-                        value.set(1, simplifyColorspace(second));
-                    }
-                }
-            }
-        }
-        this.additional.put(PdfName.COLORSPACE, newValue);
-    }
 
 	/**
 	 * Gets a PDF Name from an array or returns the object that was passed.

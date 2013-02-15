@@ -64,19 +64,6 @@ public class MarkedSection extends MarkedObject {
 	/** This is the title of this section. */
 	private MarkedObject title = null;
 
-	/**
-	 * Creates a MarkedObject with a Section or Chapter object.
-	 * @param section	the marked section
-	 */
-	MarkedSection(final Section section) {
-		super();
-		if (section.title != null) {
-			this.title = new MarkedObject(section.title);
-			section.setTitle(null);
-		}
-		this.element = section;
-	}
-
     /**
      * Processes the element by adding it (or the different parts) to an
      * <CODE>ElementListener</CODE>.

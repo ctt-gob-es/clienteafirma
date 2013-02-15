@@ -63,8 +63,6 @@ import com.lowagie.text.pdf.PdfPTable;
 class SimpleCell extends Rectangle implements PdfPCellEvent, TextElementArray {
 
 	// constants
-	/** the CellAttributes object represents a row. */
-	public static final boolean ROW = true;
 	/** the CellAttributes object represents a cell. */
 	static final boolean CELL = false;
 
@@ -102,16 +100,16 @@ class SimpleCell extends Rectangle implements PdfPCellEvent, TextElementArray {
     /** Indicates that the largest ascender height should be used to determine the
      * height of the first line.  Note that this only has an effect when rendered
      * to PDF.  Setting this to true can help with vertical alignment problems. */
-    protected boolean useAscender = false;
+	private boolean useAscender = false;
     /** Indicates that the largest descender height should be added to the height of
      * the last line (so characters like y don't dip into the border).   Note that
      * this only has an effect when rendered to PDF. */
-    protected boolean useDescender = false;
+	private boolean useDescender = false;
     /**
      * Adjusts the cell contents to compensate for border widths.  Note that
      * this only has an effect when rendered to PDF.
      */
-    protected boolean useBorderPadding;
+    private boolean useBorderPadding;
 
 	/**
 	 * A CellAttributes object is always constructed without any dimensions.
@@ -129,7 +127,7 @@ class SimpleCell extends Rectangle implements PdfPCellEvent, TextElementArray {
 	 * @param element
 	 * @throws BadElementException
 	 */
-	public void addElement(final Element element) throws BadElementException {
+	private void addElement(final Element element) throws BadElementException {
 		if (this.cellgroup) {
 			if (element instanceof SimpleCell) {
 				if(((SimpleCell)element).isCellgroup()) {

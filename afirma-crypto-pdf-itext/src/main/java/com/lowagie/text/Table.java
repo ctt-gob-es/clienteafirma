@@ -723,40 +723,12 @@ public class Table extends Rectangle implements LargeElement {
     }
 
     /**
-     * Adds a <CODE>Cell</CODE> to the <CODE>Table</CODE>.
-     * <P>
-     * This is a shortcut for <CODE>addCell(Cell cell)</CODE>.
-     * The <CODE>String</CODE> will be converted to a <CODE>Cell</CODE>.
-     *
-     * @param       content         a <CODE>String</CODE>
-     * @throws      BadElementException this should never happen
-     */
-
-    public void addCell(final String content) throws BadElementException {
-        addCell(new Phrase(content), this.curPosition);
-    }
-
-    /**
-     * Adds a <CODE>Cell</CODE> to the <CODE>Table</CODE>.
-     * <P>
-     * This is a shortcut for <CODE>addCell(Cell cell, Point location)</CODE>.
-     * The <CODE>String</CODE> will be converted to a <CODE>Cell</CODE>.
-     *
-     * @param       content         a <CODE>String</CODE>
-     * @param       location        a <CODE>Point</CODE>
-     * @throws      BadElementException this should never happen
-     */
-    public void addCell(final String content, final Point location) throws BadElementException {
-        addCell(new Phrase(content), location);
-    }
-
-    /**
      * To put a table within the existing table at the current position
      * generateTable will of course re-arrange the widths of the columns.
      *
      * @param   aTable      the table you want to insert
      */
-    public void insertTable(final Table aTable) {
+    void insertTable(final Table aTable) {
         if (aTable == null) {
 			throw new NullPointerException("insertTable - table has null-value");
 		}
@@ -767,25 +739,10 @@ public class Table extends Rectangle implements LargeElement {
      * To put a table within the existing table at the given position
      * generateTable will of course re-arrange the widths of the columns.
      *
-     * @param       aTable  The <CODE>Table</CODE> to add
-     * @param       row     The row where the <CODE>Cell</CODE> will be added
-     * @param       column  The column where the <CODE>Cell</CODE> will be added
-     */
-    public void insertTable(final Table aTable, final int row, final int column) {
-        if (aTable == null) {
-			throw new NullPointerException("insertTable - table has null-value");
-		}
-        insertTable(aTable, new Point(row, column));
-    }
-
-    /**
-     * To put a table within the existing table at the given position
-     * generateTable will of course re-arrange the widths of the columns.
-     *
      * @param   aTable      the table you want to insert
      * @param   aLocation   a <CODE>Point</CODE>
      */
-    public void insertTable(final Table aTable, final Point aLocation) {
+    private void insertTable(final Table aTable, final Point aLocation) {
 
         if (aTable == null) {
 			throw new NullPointerException("insertTable - table has null-value");
@@ -845,46 +802,6 @@ public class Table extends Rectangle implements LargeElement {
     }
 
     /**
-     * Deletes a column in this table.
-     *
-     * @param       column  the number of the column that has to be deleted
-     * @throws BadElementException
-     */
-    public void deleteColumn(final int column) throws BadElementException {
-        final float newWidths[] = new float[--this.columns];
-        System.arraycopy(this.widths, 0, newWidths, 0, column);
-        System.arraycopy(this.widths, column + 1, newWidths, column, this.columns - column);
-        setWidths(newWidths);
-        System.arraycopy(this.widths, 0, newWidths, 0, this.columns);
-        this.widths = newWidths;
-        Row row;
-        final int size = this.rows.size();
-        for (int i = 0; i < size; i++) {
-            row = (Row) this.rows.get(i);
-            row.deleteColumn(column);
-            this.rows.set(i, row);
-        }
-        if (column == this.columns) {
-            this.curPosition.setLocation(this.curPosition.x+1, 0);
-        }
-    }
-
-	/**
-     * Deletes a row.
-     *
-     * @param       row             the number of the row to delete
-     * @return      boolean <CODE>true</CODE> if the row was deleted; <CODE>false</CODE> if not
-     */
-    public boolean deleteRow(final int row) {
-        if (row < 0 || row >= this.rows.size()) {
-            return false;
-        }
-        this.rows.remove(row);
-        this.curPosition.setLocation(this.curPosition.x-1, this.curPosition.y);
-        return true;
-    }
-
-    /**
      * Deletes all rows in this table.
 	 * (contributed by dperezcar@fcc.es)
      */
@@ -894,15 +811,6 @@ public class Table extends Rectangle implements LargeElement {
         this.curPosition.setLocation(0, 0);
         this.lastHeaderRow = -1;
     }
-
-    /**
-     * Deletes the last row in this table.
-     *
-     * @return      boolean <CODE>true</CODE> if the row was deleted; <CODE>false</CODE> if not
-     */
-    public boolean deleteLastRow() {
-        return deleteRow(this.rows.size() - 1);
-	}
 
     /**
      * Will fill empty cells with valid blank <CODE>Cell</CODE>s
@@ -928,7 +836,7 @@ public class Table extends Rectangle implements LargeElement {
      * @return  dimension
      * @since  2.1.0 (was made private in 2.0.3)
      */
-    public Object getElement(final int row, final int column) {
+    private Object getElement(final int row, final int column) {
         return ((Row) this.rows.get(row)).getCell(column);
     }
 

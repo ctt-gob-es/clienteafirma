@@ -62,13 +62,6 @@ public class BadElementException extends DocumentException {
     private static final long serialVersionUID = -799006030723822254L;
 
 	// constructors
-    /**
-     * Constructs a BadElementException
-     * @param ex an Exception object that has to be turned into a BadElementException
-     */
-    public BadElementException(final Exception ex) {
-        super(ex);
-    }
 
     /**
      * Constructs a <CODE>BadElementException</CODE> without a message.

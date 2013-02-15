@@ -186,20 +186,6 @@ public class Cell extends Rectangle implements TextElementArray {
 	}
 
 	/**
-	 * Constructs a <CODE>Cell</CODE> with a certain content.<p>
-	 * The <CODE>String</CODE> will be converted into a <CODE>Paragraph</CODE>.
-	 * @param	content		a <CODE>String</CODE>
-	 */
-	public Cell(final String content) {
-		this();
-		try {
-			addElement(new Paragraph(content));
-		}
-		catch(final BadElementException bee) {
-		}
-	}
-
-	/**
 	 * Constructs a <CODE>Cell</CODE> with a certain <CODE>Element</CODE>.<p>
 	 * if the element is a <CODE>ListItem</CODE>, <CODE>Row</CODE> or
 	 * <CODE>Cell</CODE>, an exception will be thrown.
@@ -803,42 +789,6 @@ public class Cell extends Rectangle implements TextElementArray {
 	 */
 	@Override
 	public float getRight() {
-		throw new UnsupportedOperationException("Dimensions of a Cell can't be calculated. See the FAQ.");
-	}
-
-	/**
-	 * This method throws an <CODE>UnsupportedOperationException</CODE>.
-	 * @param margin
-	 * @return NA
-	 */
-	public float top(final int margin) {
-		throw new UnsupportedOperationException("Dimensions of a Cell can't be calculated. See the FAQ.");
-	}
-
-	/**
-	 * This method throws an <CODE>UnsupportedOperationException</CODE>.
-	 * @param margin
-	 * @return NA
-	 */
-	public float bottom(final int margin) {
-		throw new UnsupportedOperationException("Dimensions of a Cell can't be calculated. See the FAQ.");
-	}
-
-	/**
-	 * This method throws an <CODE>UnsupportedOperationException</CODE>.
-	 * @param margin
-	 * @return NA
-	 */
-	public float left(final int margin) {
-		throw new UnsupportedOperationException("Dimensions of a Cell can't be calculated. See the FAQ.");
-	}
-
-	/**
-	 * This method throws an <CODE>UnsupportedOperationException</CODE>.
-	 * @param margin NA
-	 * @return NA
-	 */
-	public float right(final int margin) {
 		throw new UnsupportedOperationException("Dimensions of a Cell can't be calculated. See the FAQ.");
 	}
 

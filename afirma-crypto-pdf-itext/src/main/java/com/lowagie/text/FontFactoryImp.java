@@ -510,26 +510,6 @@ public class FontFactoryImp {
         return count;
     }
 
-    /** Register fonts in some probable directories. It usually works in Windows,
-     * Linux and Solaris.
-     * @return the number of fonts registered
-     */
-    int registerDirectories() {
-        int count = 0;
-        count += registerDirectory("c:/windows/fonts");
-        count += registerDirectory("c:/winnt/fonts");
-        count += registerDirectory("d:/windows/fonts");
-        count += registerDirectory("d:/winnt/fonts");
-        count += registerDirectory("/usr/share/X11/fonts", true);
-        count += registerDirectory("/usr/X/lib/X11/fonts", true);
-        count += registerDirectory("/usr/openwin/lib/X11/fonts", true);
-        count += registerDirectory("/usr/share/fonts", true);
-        count += registerDirectory("/usr/X11R6/lib/X11/fonts", true);
-        count += registerDirectory("/Library/Fonts");
-        count += registerDirectory("/System/Library/Fonts");
-        return count;
-    }
-
 /**
  * Gets a set of registered fontnames.
  * @return a set of registered fonts

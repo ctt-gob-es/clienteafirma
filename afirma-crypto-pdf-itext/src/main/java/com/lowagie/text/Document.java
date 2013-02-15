@@ -243,17 +243,6 @@ public class Document implements DocListener {
         this.listeners.add(listener);
     }
 
-	/**
- * Removes a <CODE>DocListener</CODE> from the <CODE>Document</CODE>.
- *
-	 * @param listener
-	 *            the DocListener that has to be removed.
- */
-
-    public void removeDocListener(final DocListener listener) {
-        this.listeners.remove(listener);
-    }
-
     // methods implementing the DocListener interface
 
 	/**
@@ -511,24 +500,6 @@ public class Document implements DocListener {
     }
 
     // methods concerning the header or some meta information
-
-	/**
- * Adds a user defined header to the document.
- *
-	 * @param name
-	 *            the name of the header
-	 * @param content
-	 *            the content of the header
- * @return	<CODE>true</CODE> if successful, <CODE>false</CODE> otherwise
- */
-
-    public boolean addHeader(final String name, final String content) {
-        try {
-            return add(new Header(name, content));
-		} catch (final DocumentException de) {
-            throw new ExceptionConverter(de);
-        }
-    }
 
 	/**
  * Adds the title to a Document.

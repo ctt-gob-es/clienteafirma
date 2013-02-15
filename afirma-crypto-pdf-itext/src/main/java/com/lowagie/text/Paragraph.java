@@ -118,7 +118,7 @@ public class Paragraph extends Phrase {
      *
      * @param	leading		the leading
      */
-    public Paragraph(final float leading) {
+    Paragraph(final float leading) {
         super(leading);
     }
 
@@ -129,17 +129,6 @@ public class Paragraph extends Phrase {
      */
     public Paragraph(final Chunk chunk) {
         super(chunk);
-    }
-
-    /**
-     * Constructs a <CODE>Paragraph</CODE> with a certain <CODE>Chunk</CODE>
-     * and a certain leading.
-     *
-     * @param	leading		the leading
-     * @param	chunk		a <CODE>Chunk</CODE>
-     */
-    public Paragraph(final float leading, final Chunk chunk) {
-        super(leading, chunk);
     }
 
     /**
@@ -160,29 +149,6 @@ public class Paragraph extends Phrase {
      */
     public Paragraph(final String string, final Font font) {
         super(string, font);
-    }
-
-    /**
-     * Constructs a <CODE>Paragraph</CODE> with a certain <CODE>String</CODE>
-     * and a certain leading.
-     *
-     * @param	leading		the leading
-     * @param	string		a <CODE>String</CODE>
-     */
-    public Paragraph(final float leading, final String string) {
-        super(leading, string);
-    }
-
-    /**
-     * Constructs a <CODE>Paragraph</CODE> with a certain leading, <CODE>String</CODE>
-     * and <CODE>Font</CODE>.
-     *
-     * @param	leading		the leading
-     * @param	string		a <CODE>String</CODE>
-     * @param	font		a <CODE>Font</CODE>
-     */
-    public Paragraph(final float leading, final String string, final Font font) {
-        super(leading, string, font);
     }
 
     /**
@@ -488,7 +454,7 @@ public class Paragraph extends Phrase {
      * scheduled for removal at 2.3.0
      */
     @Deprecated
-	public float spacingBefore() {
+    private float spacingBefore() {
         return getSpacingBefore();
     }
 
@@ -500,7 +466,7 @@ public class Paragraph extends Phrase {
      * scheduled for removal at 2.3.0
      */
     @Deprecated
-	public float spacingAfter() {
+    private float spacingAfter() {
         return this.spacingAfter;
     }
 

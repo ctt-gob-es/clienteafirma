@@ -101,21 +101,6 @@ import com.lowagie.text.factories.RomanAlphabetFactory;
 
 public class List implements TextElementArray {
 
-    // constants
-
-	/** a possible value for the numbered parameter */
-	public static final boolean ORDERED = true;
-	/** a possible value for the numbered parameter */
-	public static final boolean UNORDERED = false;
-	/** a possible value for the lettered parameter */
-	public static final boolean NUMERICAL = false;
-	/** a possible value for the lettered parameter */
-	public static final boolean ALPHABETICAL = true;
-	/** a possible value for the lettered parameter */
-	public static final boolean UPPERCASE = false;
-	/** a possible value for the lettered parameter */
-	public static final boolean LOWERCASE = true;
-
     // member variables
 
 	/** This is the <CODE>ArrayList</CODE> containing the different <CODE>ListItem</CODE>s. */
@@ -159,15 +144,6 @@ public class List implements TextElementArray {
     /** Constructs a <CODE>List</CODE>. */
     public List() {
         this(false, false);
-    }
-
-    /**
-     * Constructs a <CODE>List</CODE> with a specific symbol indentation.
-     * @param	symbolIndent	the symbol indentation
-     * @since	iText 2.0.8
-     */
-    public List(final float symbolIndent) {
-    	this.symbolIndent = symbolIndent;
     }
 
     /**
@@ -423,15 +399,6 @@ public class List implements TextElementArray {
      */
     public ArrayList getItems() {
         return this.list;
-    }
-
-    /**
-     * Gets the size of the list.
-     *
-     * @return	a <CODE>size</CODE>
-     */
-    public int size() {
-        return this.list.size();
     }
 
     /**

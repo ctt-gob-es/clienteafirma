@@ -71,10 +71,6 @@ class Jpeg2000 extends Image {
     private static final int JP2_FTYP = 0x66747970;
     private static final int JP2_JP2H = 0x6a703268;
     private static final int JP2_JP2C = 0x6a703263;
-    public static final int JP2_URL = 0x75726c20;
-    public static final int JP2_DBTL = 0x6474626c;
-    public static final int JP2_BPCC = 0x62706363;
-    public static final int JP2_JP2 = 0x6a703220;
 
     private InputStream inp;
     private int boxLength;
