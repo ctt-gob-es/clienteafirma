@@ -801,16 +801,7 @@ public class Table extends Rectangle implements LargeElement {
         this.rows = newRows;
     }
 
-    /**
-     * Deletes all rows in this table.
-	 * (contributed by dperezcar@fcc.es)
-     */
-    public void deleteAllRows() {
-        this.rows.clear();
-        this.rows.add(new Row(this.columns));
-        this.curPosition.setLocation(0, 0);
-        this.lastHeaderRow = -1;
-    }
+
 
     /**
      * Will fill empty cells with valid blank <CODE>Cell</CODE>s
@@ -1249,7 +1240,7 @@ public class Table extends Rectangle implements LargeElement {
      * @return a PdfPTable object
      * @throws BadElementException
      */
-    public PdfPTable createPdfPTable() throws BadElementException {
+    PdfPTable createPdfPTable() throws BadElementException {
     	if (!this.convert2pdfptable) {
     		throw new BadElementException("No error, just an old style table");
     	}

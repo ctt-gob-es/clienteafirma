@@ -174,27 +174,7 @@ public class Section extends ArrayList implements TextElementArray, LargeElement
 
     // implementation of the Element-methods
 
-    /**
-     * Processes the element by adding it (or the different parts) to an
-     * <CODE>ElementListener</CODE>.
-     *
-     * @param	listener		the <CODE>ElementListener</CODE>
-     * @return	<CODE>true</CODE> if the element was processed successfully
-     */
-    @Override
-	public boolean process(final ElementListener listener) {
-        try {
-        	Element element;
-            for (final Iterator i = iterator(); i.hasNext(); ) {
-            	element = (Element)i.next();
-                listener.add(element);
-            }
-            return true;
-        }
-        catch(final DocumentException de) {
-            return false;
-        }
-    }
+
 
     /**
      * Gets the type of the text element.

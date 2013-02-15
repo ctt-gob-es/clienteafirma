@@ -88,7 +88,7 @@ public class Rectangle implements Element {
 	public static final int RIGHT = 8;
 
 	/** This represents a rectangle without borders. */
-	public static final int NO_BORDER = 0;
+	static final int NO_BORDER = 0;
 
 	/** This represents a type of border. */
 	public static final int BOX = TOP + BOTTOM + LEFT + RIGHT;
@@ -196,7 +196,6 @@ public class Rectangle implements Element {
 	 * @param listener	an <CODE>ElementListener</CODE>
 	 * @return <CODE>true</CODE> if the element was processed successfully
 	 */
-	@Override
 	public boolean process(final ElementListener listener) {
 		try {
 			return listener.add(this);

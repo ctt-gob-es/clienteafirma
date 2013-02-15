@@ -30,7 +30,7 @@
  * the MPL, indicate your decision by deleting the provisions above and
  * replace them with the notice and other provisions required by the LGPL.
  * If you do not delete the provisions above, a recipient may use your version
- * of this file under either the MPL or the GNU LIBRARY GENERAL PUBLIC LICENSE 
+ * of this file under either the MPL or the GNU LIBRARY GENERAL PUBLIC LICENSE
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the MPL as stated above or under the terms of the GNU
@@ -60,7 +60,7 @@ public class DublinCoreSchema extends XmpSchema {
 	public static final String DEFAULT_XPATH_ID = "dc";
 	/** default namespace uri*/
 	public static final String DEFAULT_XPATH_URI = "http://purl.org/dc/elements/1.1/";
-	
+
 	/** External Contributors to the resource (other than the authors). */
 	public static final String CONTRIBUTOR = "dc:contributor";
 	/** The extent or scope of the resource. */
@@ -92,18 +92,18 @@ public class DublinCoreSchema extends XmpSchema {
 	/** A document type; for example, novel, poem, or working paper. */
 	public static final String TYPE = "dc:type";
 
-	
+
 	public DublinCoreSchema() {
 		super("xmlns:" + DEFAULT_XPATH_ID + "=\"" + DEFAULT_XPATH_URI + "\"");
 		setProperty(FORMAT, "application/pdf");
 	}
-	
+
 	/**
 	 * Adds a title.
 	 * @param title
 	 */
-	public void addTitle(String title) {
-		XmpArray array = new XmpArray(XmpArray.ALTERNATIVE);
+	public void addTitle(final String title) {
+		final XmpArray array = new XmpArray(XmpArray.ALTERNATIVE);
 		array.add(title);
 		setProperty(TITLE, array);
 	}
@@ -112,8 +112,8 @@ public class DublinCoreSchema extends XmpSchema {
 	 * Adds a description.
 	 * @param desc
 	 */
-	public void addDescription(String desc) {
-		XmpArray array = new XmpArray(XmpArray.ALTERNATIVE);
+	public void addDescription(final String desc) {
+		final XmpArray array = new XmpArray(XmpArray.ALTERNATIVE);
 		array.add(desc);
 		setProperty(DESCRIPTION, array);
 	}
@@ -122,66 +122,28 @@ public class DublinCoreSchema extends XmpSchema {
 	 * Adds a subject.
 	 * @param subject
 	 */
-	public void addSubject(String subject) {
-		XmpArray array = new XmpArray(XmpArray.UNORDERED);
+	void addSubject(final String subject) {
+		final XmpArray array = new XmpArray(XmpArray.UNORDERED);
 		array.add(subject);
 		setProperty(SUBJECT, array);
 	}
 
-	
-	/**
-	 * Adds a subject.
-	 * @param subject array of subjects
-	 */
-	public void addSubject(String[] subject) {
-		XmpArray array = new XmpArray(XmpArray.UNORDERED);
-		for (int i = 0; i < subject.length; i++) {
-			array.add(subject[i]);
-		}
-		setProperty(SUBJECT, array);
-	}
-	
+
+
+
 	/**
 	 * Adds a single author.
 	 * @param author
 	 */
-	public void addAuthor(String author) {
-		XmpArray array = new XmpArray(XmpArray.ORDERED);
+	void addAuthor(final String author) {
+		final XmpArray array = new XmpArray(XmpArray.ORDERED);
 		array.add(author);
 		setProperty(CREATOR, array);
 	}
 
-	/**
-	 * Adds an array of authors.
-	 * @param author
-	 */
-	public void addAuthor(String[] author) {
-		XmpArray array = new XmpArray(XmpArray.ORDERED);
-		for (int i = 0; i < author.length; i++) {
-			array.add(author[i]);
-		}
-		setProperty(CREATOR, array);
-	}
 
-	/**
-	 * Adds a single publisher.
-	 * @param publisher
-	 */
-	public void addPublisher(String publisher) {
-		XmpArray array = new XmpArray(XmpArray.ORDERED);
-		array.add(publisher);
-		setProperty(PUBLISHER, array);
-	}
 
-	/**
-	 * Adds an array of publishers.
-	 * @param publisher
-	 */
-	public void addPublisher(String[] publisher) {
-		XmpArray array = new XmpArray(XmpArray.ORDERED);
-		for (int i = 0; i < publisher.length; i++) {
-			array.add(publisher[i]);
-		}
-		setProperty(PUBLISHER, array);
-	}
+
+
+
 }

@@ -30,7 +30,7 @@
  * the MPL, indicate your decision by deleting the provisions above and
  * replace them with the notice and other provisions required by the LGPL.
  * If you do not delete the provisions above, a recipient may use your version
- * of this file under either the MPL or the GNU LIBRARY GENERAL PUBLIC LICENSE 
+ * of this file under either the MPL or the GNU LIBRARY GENERAL PUBLIC LICENSE
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the MPL as stated above or under the terms of the GNU
@@ -53,85 +53,58 @@ package com.lowagie.text.xml.xmp;
 /**
  * An implementation of an XmpSchema.
  */
-public class XmpBasicSchema extends XmpSchema {
+class XmpBasicSchema extends XmpSchema {
 
 	private static final long serialVersionUID = -2416613941622479298L;
 	/** default namespace identifier*/
-	public static final String DEFAULT_XPATH_ID = "xmp";
+	private static final String DEFAULT_XPATH_ID = "xmp";
 	/** default namespace uri*/
-	public static final String DEFAULT_XPATH_URI = "http://ns.adobe.com/xap/1.0/";
-	
-	/** An unordered array specifying properties that were edited outside the authoring application. Each item should contain a single namespace and XPath separated by one ASCII space (U+0020). */
-	public static final String ADVISORY = "xmp:Advisory";
-	/** The base URL for relative URLs in the document content. If this document contains Internet links, and those links are relative, they are relative to this base URL. This property provides a standard way for embedded relative URLs to be interpreted by tools. Web authoring tools should set the value based on their notion of where URLs will be interpreted. */
-	public static final String BASEURL = "xmp:BaseURL";
-	/** The date and time the resource was originally created. */
-	public static final String CREATEDATE = "xmp:CreateDate";
-	/** The name of the first known tool used to create the resource. If history is present in the metadata, this value should be equivalent to that of xmpMM:History's softwareAgent property. */
-	public static final String CREATORTOOL = "xmp:CreatorTool";
-	/** An unordered array of text strings that unambiguously identify the resource within a given context. */
-	public static final String IDENTIFIER = "xmp:Identifier";
-	/** The date and time that any metadata for this resource was last changed. */
-	public static final String METADATADATE = "xmp:MetadataDate";
-	/** The date and time the resource was last modified. */
-	public static final String MODIFYDATE = "xmp:ModifyDate";
-	/** A short informal name for the resource. */
-	public static final String NICKNAME = "xmp:Nickname";
-	/** An alternative array of thumbnail images for a file, which can differ in characteristics such as size or image encoding. */
-	public static final String THUMBNAILS = "xmp:Thumbnails";
+	private static final String DEFAULT_XPATH_URI = "http://ns.adobe.com/xap/1.0/";
 
-	
+
+
+	/** The date and time the resource was originally created. */
+	private static final String CREATEDATE = "xmp:CreateDate";
+	/** The name of the first known tool used to create the resource. If history is present in the metadata, this value should be equivalent to that of xmpMM:History's softwareAgent property. */
+	private static final String CREATORTOOL = "xmp:CreatorTool";
+	/** An unordered array of text strings that unambiguously identify the resource within a given context. */
+	private static final String IDENTIFIER = "xmp:Identifier";
+	/** The date and time that any metadata for this resource was last changed. */
+	private static final String METADATADATE = "xmp:MetadataDate";
+	/** The date and time the resource was last modified. */
+	private static final String MODIFYDATE = "xmp:ModifyDate";
+	/** A short informal name for the resource. */
+	private static final String NICKNAME = "xmp:Nickname";
+
+
+
 	public XmpBasicSchema() {
 		super("xmlns:" + DEFAULT_XPATH_ID + "=\"" + DEFAULT_XPATH_URI + "\"");
 	}
-	
+
 	/**
 	 * Adds the creatortool.
 	 * @param creator
 	 */
-	public void addCreatorTool(String creator) {
+	void addCreatorTool(final String creator) {
 		setProperty(CREATORTOOL, creator);
 	}
-	
+
 	/**
 	 * Adds the creation date.
 	 * @param date
 	 */
-	public void addCreateDate(String date) {
+	void addCreateDate(final String date) {
 		setProperty(CREATEDATE, date);
 	}
-	
+
 	/**
 	 * Adds the modification date.
 	 * @param date
 	 */
-	public void addModDate(String date) {
+	void addModDate(final String date) {
 		setProperty(MODIFYDATE, date);
 	}
 
-	/**
-	 * Adds the meta data date.
-	 * @param date
-	 */
-	public void addMetaDataDate(String date) {
-		setProperty(METADATADATE, date);
-	}
 
-	/** Adds the identifier.
-	 * @param id
-	 */
-	public void addIdentifiers(String[] id) {
-		XmpArray array = new XmpArray(XmpArray.UNORDERED);
-		for (int i = 0; i < id.length; i++) {
-			array.add(id[i]);
-		}
-		setProperty(IDENTIFIER, array);
-	}
-
-	/** Adds the nickname.
-	 * @param name
-	 */
-	public void addNickname(String name) {
-		setProperty(NICKNAME, name);
-	}
 }

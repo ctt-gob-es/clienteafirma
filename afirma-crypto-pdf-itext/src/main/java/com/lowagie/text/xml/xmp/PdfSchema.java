@@ -30,7 +30,7 @@
  * the MPL, indicate your decision by deleting the provisions above and
  * replace them with the notice and other provisions required by the LGPL.
  * If you do not delete the provisions above, a recipient may use your version
- * of this file under either the MPL or the GNU LIBRARY GENERAL PUBLIC LICENSE 
+ * of this file under either the MPL or the GNU LIBRARY GENERAL PUBLIC LICENSE
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the MPL as stated above or under the terms of the GNU
@@ -61,7 +61,7 @@ public class PdfSchema extends XmpSchema {
 	public static final String DEFAULT_XPATH_ID = "pdf";
 	/** default namespace uri*/
 	public static final String DEFAULT_XPATH_URI = "http://ns.adobe.com/pdf/1.3/";
-	
+
 	/** Keywords. */
 	public static final String KEYWORDS = "pdf:keywords";
 	/** The PDF file version (for example: 1.0, 1.3, and so on). */
@@ -74,28 +74,22 @@ public class PdfSchema extends XmpSchema {
 		super("xmlns:" + DEFAULT_XPATH_ID + "=\"" + DEFAULT_XPATH_URI + "\"");
 		addProducer(Document.getVersion());
 	}
-	
+
 	/**
 	 * Adds keywords.
 	 * @param keywords
 	 */
-	public void addKeywords(String keywords) {
+	public void addKeywords(final String keywords) {
 		setProperty(KEYWORDS, keywords);
 	}
-	
+
 	/**
 	 * Adds the producer.
 	 * @param producer
 	 */
-	public void addProducer(String producer) {
+	public void addProducer(final String producer) {
 		setProperty(PRODUCER, producer);
 	}
 
-	/**
-	 * Adds the version.
-	 * @param version
-	 */
-	public void addVersion(String version) {
-		setProperty(VERSION, version);
-	}
+
 }

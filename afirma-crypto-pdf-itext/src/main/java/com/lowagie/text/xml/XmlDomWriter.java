@@ -1,12 +1,12 @@
 /*
  * Copyright 1999-2005 The Apache Software Foundation.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,126 +32,123 @@ import org.w3c.dom.Node;
  * @author psoares
  */
 public class XmlDomWriter {
-    
+
     /** Print writer. */
-    protected PrintWriter fOut;
-    
+    private PrintWriter fOut;
+
     /** Canonical output. */
-    protected boolean fCanonical;
-    
+    private boolean fCanonical;
+
     /** Processing XML 1.1 document. */
-    protected boolean fXML11;
-    
+    private boolean fXML11;
+
     //
     // Constructors
     //
-    
+
     /** Default constructor. */
     public XmlDomWriter() {
     } // <init>()
-    
-    public XmlDomWriter(boolean canonical) {
-        fCanonical = canonical;
-    } // <init>(boolean)
-    
+
+
+
     //
     // Public methods
     //
-    
+
     /** Sets whether output is canonical. */
-    public void setCanonical(boolean canonical) {
-        fCanonical = canonical;
+    public void setCanonical(final boolean canonical) {
+        this.fCanonical = canonical;
     } // setCanonical(boolean)
-    
+
     /** Sets the output stream for printing. */
-    public void setOutput(OutputStream stream, String encoding)
+    public void setOutput(final OutputStream stream, String encoding)
     throws UnsupportedEncodingException {
-        
+
         if (encoding == null) {
             encoding = "UTF8";
         }
-        
-        java.io.Writer writer = new OutputStreamWriter(stream, encoding);
-        fOut = new PrintWriter(writer);
-        
+
+        final java.io.Writer writer = new OutputStreamWriter(stream, encoding);
+        this.fOut = new PrintWriter(writer);
+
     } // setOutput(OutputStream,String)
-    
+
     /** Sets the output writer. */
-    public void setOutput(java.io.Writer writer) {
-        
-        fOut = writer instanceof PrintWriter
+    public void setOutput(final java.io.Writer writer) {
+
+        this.fOut = writer instanceof PrintWriter
                 ? (PrintWriter)writer : new PrintWriter(writer);
-        
+
     } // setOutput(java.io.Writer)
-    
+
     /** Writes the specified node, recursively. */
-    public void write(Node node) {
-        
+    public void write(final Node node) {
+
         // is there anything to do?
         if (node == null) {
             return;
         }
-        
-        short type = node.getNodeType();
+
+        final short type = node.getNodeType();
         switch (type) {
             case Node.DOCUMENT_NODE: {
-                Document document = (Document)node;
-                fXML11 = false; //"1.1".equals(getVersion(document));
-                if (!fCanonical) {
-                    if (fXML11) {
-                        fOut.println("<?xml version=\"1.1\" encoding=\"UTF-8\"?>");
+                final Document document = (Document)node;
+                this.fXML11 = false; //"1.1".equals(getVersion(document));
+                if (!this.fCanonical) {
+                    if (this.fXML11) {
+                        this.fOut.println("<?xml version=\"1.1\" encoding=\"UTF-8\"?>");
                     } else {
-                        fOut.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+                        this.fOut.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
                     }
-                    fOut.flush();
+                    this.fOut.flush();
                     write(document.getDoctype());
                 }
                 write(document.getDocumentElement());
                 break;
             }
-            
+
             case Node.DOCUMENT_TYPE_NODE: {
-                DocumentType doctype = (DocumentType)node;
-                fOut.print("<!DOCTYPE ");
-                fOut.print(doctype.getName());
-                String publicId = doctype.getPublicId();
-                String systemId = doctype.getSystemId();
+                final DocumentType doctype = (DocumentType)node;
+                this.fOut.print("<!DOCTYPE ");
+                this.fOut.print(doctype.getName());
+                final String publicId = doctype.getPublicId();
+                final String systemId = doctype.getSystemId();
                 if (publicId != null) {
-                    fOut.print(" PUBLIC '");
-                    fOut.print(publicId);
-                    fOut.print("' '");
-                    fOut.print(systemId);
-                    fOut.print('\'');
+                    this.fOut.print(" PUBLIC '");
+                    this.fOut.print(publicId);
+                    this.fOut.print("' '");
+                    this.fOut.print(systemId);
+                    this.fOut.print('\'');
                 } else if (systemId != null) {
-                    fOut.print(" SYSTEM '");
-                    fOut.print(systemId);
-                    fOut.print('\'');
+                    this.fOut.print(" SYSTEM '");
+                    this.fOut.print(systemId);
+                    this.fOut.print('\'');
                 }
-                String internalSubset = doctype.getInternalSubset();
+                final String internalSubset = doctype.getInternalSubset();
                 if (internalSubset != null) {
-                    fOut.println(" [");
-                    fOut.print(internalSubset);
-                    fOut.print(']');
+                    this.fOut.println(" [");
+                    this.fOut.print(internalSubset);
+                    this.fOut.print(']');
                 }
-                fOut.println('>');
+                this.fOut.println('>');
                 break;
             }
-            
+
             case Node.ELEMENT_NODE: {
-                fOut.print('<');
-                fOut.print(node.getNodeName());
-                Attr attrs[] = sortAttributes(node.getAttributes());
-                for (int i = 0; i < attrs.length; i++) {
-                    Attr attr = attrs[i];
-                    fOut.print(' ');
-                    fOut.print(attr.getNodeName());
-                    fOut.print("=\"");
+                this.fOut.print('<');
+                this.fOut.print(node.getNodeName());
+                final Attr attrs[] = sortAttributes(node.getAttributes());
+                for (final Attr attr : attrs) {
+                    this.fOut.print(' ');
+                    this.fOut.print(attr.getNodeName());
+                    this.fOut.print("=\"");
                     normalizeAndPrint(attr.getNodeValue(), true);
-                    fOut.print('"');
+                    this.fOut.print('"');
                 }
-                fOut.print('>');
-                fOut.flush();
-                
+                this.fOut.print('>');
+                this.fOut.flush();
+
                 Node child = node.getFirstChild();
                 while (child != null) {
                     write(child);
@@ -159,81 +156,81 @@ public class XmlDomWriter {
                 }
                 break;
             }
-            
+
             case Node.ENTITY_REFERENCE_NODE: {
-                if (fCanonical) {
+                if (this.fCanonical) {
                     Node child = node.getFirstChild();
                     while (child != null) {
                         write(child);
                         child = child.getNextSibling();
                     }
                 } else {
-                    fOut.print('&');
-                    fOut.print(node.getNodeName());
-                    fOut.print(';');
-                    fOut.flush();
+                    this.fOut.print('&');
+                    this.fOut.print(node.getNodeName());
+                    this.fOut.print(';');
+                    this.fOut.flush();
                 }
                 break;
             }
-            
+
             case Node.CDATA_SECTION_NODE: {
-                if (fCanonical) {
+                if (this.fCanonical) {
                     normalizeAndPrint(node.getNodeValue(), false);
                 } else {
-                    fOut.print("<![CDATA[");
-                    fOut.print(node.getNodeValue());
-                    fOut.print("]]>");
+                    this.fOut.print("<![CDATA[");
+                    this.fOut.print(node.getNodeValue());
+                    this.fOut.print("]]>");
                 }
-                fOut.flush();
+                this.fOut.flush();
                 break;
             }
-            
+
             case Node.TEXT_NODE: {
                 normalizeAndPrint(node.getNodeValue(), false);
-                fOut.flush();
+                this.fOut.flush();
                 break;
             }
-            
+
             case Node.PROCESSING_INSTRUCTION_NODE: {
-                fOut.print("<?");
-                fOut.print(node.getNodeName());
-                String data = node.getNodeValue();
+                this.fOut.print("<?");
+                this.fOut.print(node.getNodeName());
+                final String data = node.getNodeValue();
                 if (data != null && data.length() > 0) {
-                    fOut.print(' ');
-                    fOut.print(data);
+                    this.fOut.print(' ');
+                    this.fOut.print(data);
                 }
-                fOut.print("?>");
-                fOut.flush();
+                this.fOut.print("?>");
+                this.fOut.flush();
                 break;
             }
-            
+
             case Node.COMMENT_NODE: {
-                if (!fCanonical) {
-                    fOut.print("<!--");
-                    String comment = node.getNodeValue();
+                if (!this.fCanonical) {
+                    this.fOut.print("<!--");
+                    final String comment = node.getNodeValue();
                     if (comment != null && comment.length() > 0) {
-                        fOut.print(comment);
+                        this.fOut.print(comment);
                     }
-                    fOut.print("-->");
-                    fOut.flush();
+                    this.fOut.print("-->");
+                    this.fOut.flush();
                 }
             }
         }
-        
+
         if (type == Node.ELEMENT_NODE) {
-            fOut.print("</");
-            fOut.print(node.getNodeName());
-            fOut.print('>');
-            fOut.flush();
+            this.fOut.print("</");
+            this.fOut.print(node.getNodeName());
+            this.fOut.print('>');
+            this.fOut.flush();
         }
-        
+
     } // write(Node)
-    
+
     /** Returns a sorted list of attributes. */
-    protected Attr[] sortAttributes(NamedNodeMap attrs) {
-        
-        int len = (attrs != null) ? attrs.getLength() : 0;
-        Attr array[] = new Attr[len];
+    private Attr[] sortAttributes(final NamedNodeMap attrs) {
+
+        final int len = attrs != null ? attrs.getLength() : 0;
+        final Attr array[] = new Attr[len];
         for (int i = 0; i < len; i++) {
             array[i] = (Attr)attrs.item(i);
         }
@@ -241,61 +238,61 @@ public class XmlDomWriter {
             String name = array[i].getNodeName();
             int index = i;
             for (int j = i + 1; j < len; j++) {
-                String curName = array[j].getNodeName();
+                final String curName = array[j].getNodeName();
                 if (curName.compareTo(name) < 0) {
                     name = curName;
                     index = j;
                 }
             }
             if (index != i) {
-                Attr temp = array[i];
+                final Attr temp = array[i];
                 array[i] = array[index];
                 array[index] = temp;
             }
         }
-        
+
         return array;
-        
+
     } // sortAttributes(NamedNodeMap):Attr[]
-    
+
     //
     // Protected methods
     //
-    
+
     /** Normalizes and prints the given string. */
-    protected void normalizeAndPrint(String s, boolean isAttValue) {
-        
-        int len = (s != null) ? s.length() : 0;
+    private void normalizeAndPrint(final String s, final boolean isAttValue) {
+
+        final int len = s != null ? s.length() : 0;
         for (int i = 0; i < len; i++) {
-            char c = s.charAt(i);
+            final char c = s.charAt(i);
             normalizeAndPrint(c, isAttValue);
         }
-        
+
     } // normalizeAndPrint(String,boolean)
-    
+
     /** Normalizes and print the given character. */
-    protected void normalizeAndPrint(char c, boolean isAttValue) {
-        
+    private void normalizeAndPrint(final char c, final boolean isAttValue) {
+
         switch (c) {
             case '<': {
-                fOut.print("&lt;");
+                this.fOut.print("&lt;");
                 break;
             }
             case '>': {
-                fOut.print("&gt;");
+                this.fOut.print("&gt;");
                 break;
             }
             case '&': {
-                fOut.print("&amp;");
+                this.fOut.print("&amp;");
                 break;
             }
             case '"': {
                 // A '"' that appears in character data
                 // does not need to be escaped.
                 if (isAttValue) {
-                    fOut.print("&quot;");
+                    this.fOut.print("&quot;");
                 } else {
-                    fOut.print("\"");
+                    this.fOut.print("\"");
                 }
                 break;
             }
@@ -304,12 +301,12 @@ public class XmlDomWriter {
                 // must not be printed as a literal otherwise
                 // it would be normalized to LF when the document
                 // is reparsed.
-                fOut.print("&#xD;");
+                this.fOut.print("&#xD;");
                 break;
             }
             case '\n': {
-                if (fCanonical) {
-                    fOut.print("&#xA;");
+                if (this.fCanonical) {
+                    this.fOut.print("&#xA;");
                     break;
                 }
                 // else, default print char
@@ -323,19 +320,19 @@ public class XmlDomWriter {
                 // Escape NEL (0x85) and LSEP (0x2028) that appear in content
                 // if the document is XML 1.1, since they would be normalized to LF
                 // when the document is reparsed.
-                if (fXML11 && ((c >= 0x01 && c <= 0x1F && c != 0x09 && c != 0x0A)
-                || (c >= 0x7F && c <= 0x9F) || c == 0x2028)
+                if (this.fXML11 && (c >= 0x01 && c <= 0x1F && c != 0x09 && c != 0x0A
+                || c >= 0x7F && c <= 0x9F || c == 0x2028)
                 || isAttValue && (c == 0x09 || c == 0x0A)) {
-                    fOut.print("&#x");
-                    fOut.print(Integer.toHexString(c).toUpperCase());
-                    fOut.print(";");
+                    this.fOut.print("&#x");
+                    this.fOut.print(Integer.toHexString(c).toUpperCase());
+                    this.fOut.print(";");
                 } else {
-                    fOut.print(c);
+                    this.fOut.print(c);
                 }
             }
         }
     } // normalizeAndPrint(char,boolean)
-    
+
     /** Extracts the XML version from the Document. */
 //    protected String getVersion(Document document) {
 //        if (document == null) {

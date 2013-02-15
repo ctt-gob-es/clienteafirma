@@ -30,7 +30,7 @@
  * the MPL, indicate your decision by deleting the provisions above and
  * replace them with the notice and other provisions required by the LGPL.
  * If you do not delete the provisions above, a recipient may use your version
- * of this file under either the MPL or the GNU LIBRARY GENERAL PUBLIC LICENSE 
+ * of this file under either the MPL or the GNU LIBRARY GENERAL PUBLIC LICENSE
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the MPL as stated above or under the terms of the GNU
@@ -55,17 +55,17 @@ import java.util.Properties;
 /**
  * Abstract superclass of the XmpSchemas supported by iText.
  */
-public abstract class XmpSchema extends Properties {
+abstract class XmpSchema extends Properties {
 
 	private static final long serialVersionUID = -176374295948945272L;
 
 	/** the namesspace */
-	protected String xmlns;
-	
-	/** Constructs an XMP schema. 
+	private final String xmlns;
+
+	/** Constructs an XMP schema.
 	 * @param xmlns
 	 */
-	public XmpSchema(String xmlns) {
+	XmpSchema(final String xmlns) {
 		super();
 		this.xmlns = xmlns;
 	}
@@ -73,9 +73,10 @@ public abstract class XmpSchema extends Properties {
 	 * The String representation of the contents.
 	 * @return a String representation.
 	 */
+	@Override
 	public String toString() {
-		StringBuffer buf = new StringBuffer();
-		for (Enumeration e = this.propertyNames(); e.hasMoreElements(); ) {
+		final StringBuffer buf = new StringBuffer();
+		for (final Enumeration e = this.propertyNames(); e.hasMoreElements(); ) {
 			process(buf, e.nextElement());
 		}
 		return buf.toString();
@@ -85,7 +86,7 @@ public abstract class XmpSchema extends Properties {
 	 * @param buf
 	 * @param p
 	 */
-	protected void process(StringBuffer buf, Object p) {
+	private void process(final StringBuffer buf, final Object p) {
 		buf.append('<');
 		buf.append(p);
 		buf.append('>');
@@ -98,53 +99,38 @@ public abstract class XmpSchema extends Properties {
 	 * @return Returns the xmlns.
 	 */
 	public String getXmlns() {
-		return xmlns;
-	}	
-	
-	/**
-	 * @param key
-	 * @param value
-	 * @return the previous property (null if there wasn't one)
-	 */
-	public Object addProperty(String key, String value) {
-		return this.setProperty(key, value);
+		return this.xmlns;
 	}
-	
+
+
+
 	/**
 	 * @see java.util.Properties#setProperty(java.lang.String, java.lang.String)
 	 */
-	public Object setProperty(String key, String value) {
+	@Override
+	public Object setProperty(final String key, final String value) {
 		return super.setProperty(key, escape(value));
 	}
-	
+
 	/**
 	 * @see java.util.Properties#setProperty(java.lang.String, java.lang.String)
-	 * 
+	 *
 	 * @param key
 	 * @param value
 	 * @return the previous property (null if there wasn't one)
 	 */
-	public Object setProperty(String key, XmpArray value) {
+	Object setProperty(final String key, final XmpArray value) {
 		return super.setProperty(key, value.toString());
 	}
-	
-	/**
-	 * @see java.util.Properties#setProperty(java.lang.String, java.lang.String)
-	 * 
-	 * @param key
-	 * @param value
-	 * @return the previous property (null if there wasn't one)
-	 */
-	public Object setProperty(String key, LangAlt value) {
-		return super.setProperty(key, value.toString());
-	 }
-	
+
+
+
 	/**
 	 * @param content
 	 * @return an escaped string
 	 */
-	public static String escape(String content) {
-		StringBuffer buf = new StringBuffer();
+	static String escape(final String content) {
+		final StringBuffer buf = new StringBuffer();
 		for (int i = 0; i < content.length(); i++) {
 			switch(content.charAt(i)) {
 			case '<':

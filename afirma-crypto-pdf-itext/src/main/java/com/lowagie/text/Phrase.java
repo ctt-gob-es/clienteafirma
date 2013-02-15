@@ -145,7 +145,7 @@ public class Phrase extends ArrayList implements TextElementArray {
      *
      * @param	string		a <CODE>String</CODE>
      */
-    public Phrase(final String string) {
+    Phrase(final String string) {
         this(Float.NaN, string, new Font());
     }
 
@@ -185,7 +185,6 @@ public class Phrase extends ArrayList implements TextElementArray {
      * @param	listener	an <CODE>ElementListener</CODE>
      * @return	<CODE>true</CODE> if the element was processed successfully
      */
-    @Override
 	public boolean process(final ElementListener listener) {
         try {
             for (final Iterator i = iterator(); i.hasNext(); ) {

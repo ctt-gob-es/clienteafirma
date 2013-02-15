@@ -599,7 +599,7 @@ public class Cell extends Rectangle implements TextElementArray {
 	 * @param element The <CODE>Element</CODE> to add
 	 * @throws BadElementException if the method was called with a <CODE>ListItem</CODE>, <CODE>Row</CODE> or <CODE>Cell</CODE>
 	 */
-	void addElement(final Element element) throws BadElementException {
+	private void addElement(final Element element) throws BadElementException {
 		if (isTable()) {
 			final Table table = (Table) this.arrayList.get(0);
 			final Cell tmp = new Cell(element);

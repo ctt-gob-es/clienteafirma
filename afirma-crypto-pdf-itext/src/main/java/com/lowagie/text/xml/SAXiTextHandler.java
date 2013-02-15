@@ -94,51 +94,50 @@ import com.lowagie.text.xml.simpleparser.EntitiesToSymbol;
  * Subclass it, if you want to change the way iText translates XML to PDF.
  */
 
-public class SAXiTextHandler extends DefaultHandler {
+class SAXiTextHandler extends DefaultHandler {
 
     /** This is the resulting document. */
-    protected DocListener document;
+    private final DocListener document;
 
     /**
      * This is a <CODE>Stack</CODE> of objects, waiting to be added to the
      * document.
      */
-    protected Stack stack;
+    private final Stack stack;
 
-    /** Counts the number of chapters in this document. */
-    protected int chapters = 0;
 
-    /** This is the current chunk to which characters can be added. */
-    protected Chunk currentChunk = null;
 
     /** This is the current chunk to which characters can be added. */
-    protected boolean ignore = false;
+    private Chunk currentChunk = null;
+
+    /** This is the current chunk to which characters can be added. */
+    private boolean ignore = false;
 
     /**
      * This is a flag that can be set, if you want to open and close the
      * Document-object yourself.
      */
-    protected boolean controlOpenClose = true;
+    private boolean controlOpenClose = true;
 
     /** current margin of a page. */
-    float topMargin = 36;
+    private float topMargin = 36;
 
     /** current margin of a page. */
-    float rightMargin = 36;
+    private float rightMargin = 36;
 
     /** current margin of a page. */
-    float leftMargin = 36;
+    private float leftMargin = 36;
 
     /** current margin of a page. */
-    float bottomMargin = 36;
+    private float bottomMargin = 36;
 
     /**
      * @param document
      */
-    public SAXiTextHandler(DocListener document) {
+    SAXiTextHandler(final DocListener document) {
         super();
         this.document = document;
-        stack = new Stack();
+        this.stack = new Stack();
     }
 
     /** This hashmap contains all the custom keys and peers. */
@@ -148,27 +147,18 @@ public class SAXiTextHandler extends DefaultHandler {
      * @param document
      * @param myTags
      */
-    public SAXiTextHandler(DocListener document, HtmlTagMap myTags) {
+    private SAXiTextHandler(final DocListener document, final HtmlTagMap myTags) {
         this(document);
         this.myTags = myTags;
     }
 
-    /**
-     * @param document
-     * @param myTags
-     * @param bf
-     */
-    public SAXiTextHandler(DocListener document, HtmlTagMap myTags,
-            BaseFont bf){
-        this(document, myTags);
-        this.bf = bf;
-    }
+
 
     /**
      * @param document
      * @param myTags
      */
-    public SAXiTextHandler(DocListener document, HashMap myTags) {
+    SAXiTextHandler(final DocListener document, final HashMap myTags) {
         this(document);
         this.myTags = myTags;
     }
@@ -181,19 +171,19 @@ public class SAXiTextHandler extends DefaultHandler {
      * Document object when the start-root-tag is encountered and close it when
      * the end-root-tag is met. If you set it to false, you have to open and
      * close the Document object yourself.
-     * 
+     *
      * @param controlOpenClose
      *            set this to false if you plan to open/close the Document
      *            yourself
      */
 
-    public void setControlOpenClose(boolean controlOpenClose) {
+    public void setControlOpenClose(final boolean controlOpenClose) {
         this.controlOpenClose = controlOpenClose;
     }
 
     /**
      * This method gets called when a start tag is encountered.
-     * 
+     *
      * @param uri
      *            the Uniform Resource Identifier
      * @param lname
@@ -205,13 +195,14 @@ public class SAXiTextHandler extends DefaultHandler {
      *            the list of attributes
      */
 
-    public void startElement(String uri, String lname, String name,
-            Attributes attrs) {
+    @Override
+	public void startElement(final String uri, final String lname, final String name,
+            final Attributes attrs) {
 
-        Properties attributes = new Properties();
+        final Properties attributes = new Properties();
         if (attrs != null) {
             for (int i = 0; i < attrs.getLength(); i++) {
-                String attribute = attrs.getQName(i);
+                final String attribute = attrs.getQName(i);
                 attributes.setProperty(attribute, attrs.getValue(i));
             }
         }
@@ -220,43 +211,43 @@ public class SAXiTextHandler extends DefaultHandler {
 
     /**
      * This method deals with the starting tags.
-     * 
+     *
      * @param name
      *            the name of the tag
      * @param attributes
      *            the list of attributes
      */
 
-    public void handleStartingTags(String name, Properties attributes) {
+    void handleStartingTags(final String name, final Properties attributes) {
         // System.err.println("Start: " + name);
-        if (ignore || ElementTags.IGNORE.equals(name)) {
-            ignore = true;
+        if (this.ignore || ElementTags.IGNORE.equals(name)) {
+            this.ignore = true;
             return;
         }
 
         // maybe there is some meaningful data that wasn't between tags
-        if (currentChunk != null) {
+        if (this.currentChunk != null) {
             TextElementArray current;
             try {
-                current = (TextElementArray) stack.pop();
-            } catch (EmptyStackException ese) {
-            	if (bf == null) {
+                current = (TextElementArray) this.stack.pop();
+            } catch (final EmptyStackException ese) {
+            	if (this.bf == null) {
             		current = new Paragraph("", new Font());
             	}
             	else {
             		current = new Paragraph("", new Font(this.bf));
             	}
             }
-            current.add(currentChunk);
-            stack.push(current);
-            currentChunk = null;
+            current.add(this.currentChunk);
+            this.stack.push(current);
+            this.currentChunk = null;
         }
 
         // chunks
         if (ElementTags.CHUNK.equals(name)) {
-            currentChunk = ElementFactory.getChunk(attributes);
-            if (bf != null) {
-            	currentChunk.setFont(new Font(this.bf));
+            this.currentChunk = ElementFactory.getChunk(attributes);
+            if (this.bf != null) {
+            	this.currentChunk.setFont(new Font(this.bf));
             }
             return;
         }
@@ -264,55 +255,55 @@ public class SAXiTextHandler extends DefaultHandler {
         // symbols
         if (ElementTags.ENTITY.equals(name)) {
             Font f = new Font();
-            if (currentChunk != null) {
+            if (this.currentChunk != null) {
                 handleEndingTags(ElementTags.CHUNK);
-                f = currentChunk.getFont();
+                f = this.currentChunk.getFont();
             }
-            currentChunk = EntitiesToSymbol.get(attributes.getProperty(ElementTags.ID),
+            this.currentChunk = EntitiesToSymbol.get(attributes.getProperty(ElementTags.ID),
                     f);
             return;
         }
 
         // phrases
         if (ElementTags.PHRASE.equals(name)) {
-            stack.push(ElementFactory.getPhrase(attributes));
+            this.stack.push(ElementFactory.getPhrase(attributes));
             return;
         }
 
         // anchors
         if (ElementTags.ANCHOR.equals(name)) {
-            stack.push(ElementFactory.getAnchor(attributes));
+            this.stack.push(ElementFactory.getAnchor(attributes));
             return;
         }
 
         // paragraphs and titles
         if (ElementTags.PARAGRAPH.equals(name) || ElementTags.TITLE.equals(name)) {
-            stack.push(ElementFactory.getParagraph(attributes));
+            this.stack.push(ElementFactory.getParagraph(attributes));
             return;
         }
 
         // lists
         if (ElementTags.LIST.equals(name)) {
-            stack.push(ElementFactory.getList(attributes));
+            this.stack.push(ElementFactory.getList(attributes));
             return;
         }
-        
+
         // listitems
         if (ElementTags.LISTITEM.equals(name)) {
-            stack.push(ElementFactory.getListItem(attributes));
+            this.stack.push(ElementFactory.getListItem(attributes));
             return;
         }
 
         // cells
         if (ElementTags.CELL.equals(name)) {
-            stack.push(ElementFactory.getCell(attributes));
+            this.stack.push(ElementFactory.getCell(attributes));
             return;
         }
 
         // tables
         if (ElementTags.TABLE.equals(name)) {
-            Table table = ElementFactory.getTable(attributes);
-            float widths[] = table.getProportionalWidths();
+            final Table table = ElementFactory.getTable(attributes);
+            final float widths[] = table.getProportionalWidths();
             for (int i = 0; i < widths.length; i++) {
                 if (widths[i] == 0) {
                     widths[i] = 100.0f / widths.length;
@@ -320,74 +311,74 @@ public class SAXiTextHandler extends DefaultHandler {
             }
             try {
                 table.setWidths(widths);
-            } catch (BadElementException bee) {
+            } catch (final BadElementException bee) {
                 // this shouldn't happen
                 throw new ExceptionConverter(bee);
             }
-            stack.push(table);
+            this.stack.push(table);
             return;
         }
 
         // sections
         if (ElementTags.SECTION.equals(name)) {
-            Element previous = (Element) stack.pop();
+            final Element previous = (Element) this.stack.pop();
             Section section;
             try {
                 section = ElementFactory.getSection((Section) previous, attributes);
-            } catch (ClassCastException cce) {
+            } catch (final ClassCastException cce) {
                 throw new ExceptionConverter(cce);
             }
-            stack.push(previous);
-            stack.push(section);
+            this.stack.push(previous);
+            this.stack.push(section);
             return;
         }
 
         // chapters
         if (ElementTags.CHAPTER.equals(name)) {
-            stack.push(ElementFactory.getChapter(attributes));
+            this.stack.push(ElementFactory.getChapter(attributes));
             return;
         }
 
         // images
         if (ElementTags.IMAGE.equals(name)) {
             try {
-                Image img = ElementFactory.getImage(attributes);
+                final Image img = ElementFactory.getImage(attributes);
                 try {
                 	addImage(img);
                     return;
-                } catch (EmptyStackException ese) {
+                } catch (final EmptyStackException ese) {
                     // if there is no element on the stack, the Image is added
                     // to the document
                     try {
-                        document.add(img);
-                    } catch (DocumentException de) {
+                        this.document.add(img);
+                    } catch (final DocumentException de) {
                         throw new ExceptionConverter(de);
                     }
                     return;
                 }
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 throw new ExceptionConverter(e);
             }
         }
 
         // annotations
         if (ElementTags.ANNOTATION.equals(name)) {
-            Annotation annotation = ElementFactory.getAnnotation(attributes);
+            final Annotation annotation = ElementFactory.getAnnotation(attributes);
             TextElementArray current;
             try {
                 try {
-                    current = (TextElementArray) stack.pop();
+                    current = (TextElementArray) this.stack.pop();
                     try {
                         current.add(annotation);
-                    } catch (Exception e) {
-                        document.add(annotation);
+                    } catch (final Exception e) {
+                        this.document.add(annotation);
                     }
-                    stack.push(current);
-                } catch (EmptyStackException ese) {
-                    document.add(annotation);
+                    this.stack.push(current);
+                } catch (final EmptyStackException ese) {
+                    this.document.add(annotation);
                 }
                 return;
-            } catch (DocumentException de) {
+            } catch (final DocumentException de) {
                 throw new ExceptionConverter(de);
             }
         }
@@ -396,18 +387,18 @@ public class SAXiTextHandler extends DefaultHandler {
         if (isNewline(name)) {
             TextElementArray current;
             try {
-                current = (TextElementArray) stack.pop();
+                current = (TextElementArray) this.stack.pop();
                 current.add(Chunk.NEWLINE);
-                stack.push(current);
-            } catch (EmptyStackException ese) {
-                if (currentChunk == null) {
+                this.stack.push(current);
+            } catch (final EmptyStackException ese) {
+                if (this.currentChunk == null) {
                     try {
-                        document.add(Chunk.NEWLINE);
-                    } catch (DocumentException de) {
+                        this.document.add(Chunk.NEWLINE);
+                    } catch (final DocumentException de) {
                         throw new ExceptionConverter(de);
                     }
                 } else {
-                    currentChunk.append("\n");
+                    this.currentChunk.append("\n");
                 }
             }
             return;
@@ -417,37 +408,37 @@ public class SAXiTextHandler extends DefaultHandler {
         if (isNewpage(name)) {
             TextElementArray current;
             try {
-                current = (TextElementArray) stack.pop();
-                Chunk newPage = new Chunk("");
+                current = (TextElementArray) this.stack.pop();
+                final Chunk newPage = new Chunk("");
                 newPage.setNewPage();
-                if (bf != null) {
+                if (this.bf != null) {
                 	newPage.setFont(new Font(this.bf));
                 }
                 current.add(newPage);
-                stack.push(current);
-            } catch (EmptyStackException ese) {
-                document.newPage();
+                this.stack.push(current);
+            } catch (final EmptyStackException ese) {
+                this.document.newPage();
             }
             return;
         }
 
         if (ElementTags.HORIZONTALRULE.equals(name)) {
             TextElementArray current;
-            LineSeparator hr = new LineSeparator(1.0f, 100.0f, null, Element.ALIGN_CENTER, 0);
+            final LineSeparator hr = new LineSeparator(1.0f, 100.0f, null, Element.ALIGN_CENTER, 0);
             try {
-                current = (TextElementArray) stack.pop();
+                current = (TextElementArray) this.stack.pop();
                 current.add(hr);
-                stack.push(current);
-            } catch (EmptyStackException ese) {
+                this.stack.push(current);
+            } catch (final EmptyStackException ese) {
                 try {
-                    document.add(hr);
-                } catch (DocumentException de) {
+                    this.document.add(hr);
+                } catch (final DocumentException de) {
                     throw new ExceptionConverter(de);
                 }
             }
             return;
         }
-        
+
         // documentroot
         if (isDocumentRoot(name)) {
             String key;
@@ -456,29 +447,33 @@ public class SAXiTextHandler extends DefaultHandler {
             // Updated by Ricardo Coutinho. Only use if set in html!
 			Rectangle pageSize = null;
 			String orientation = null;
-            for (Iterator i = attributes.keySet().iterator(); i.hasNext();) {
-                key = (String) i.next();
+            for (final Object element : attributes.keySet()) {
+                key = (String) element;
                 value = attributes.getProperty(key);
                 try {
                     // margin specific code suggested by Reza Nasiri
-                    if (ElementTags.LEFT.equalsIgnoreCase(key))
-                        leftMargin = Float.parseFloat(value + "f");
-                    if (ElementTags.RIGHT.equalsIgnoreCase(key))
-                        rightMargin = Float.parseFloat(value + "f");
-                    if (ElementTags.TOP.equalsIgnoreCase(key))
-                        topMargin = Float.parseFloat(value + "f");
-                    if (ElementTags.BOTTOM.equalsIgnoreCase(key))
-                        bottomMargin = Float.parseFloat(value + "f");
-                } catch (Exception ex) {
+                    if (ElementTags.LEFT.equalsIgnoreCase(key)) {
+						this.leftMargin = Float.parseFloat(value + "f");
+					}
+                    if (ElementTags.RIGHT.equalsIgnoreCase(key)) {
+						this.rightMargin = Float.parseFloat(value + "f");
+					}
+                    if (ElementTags.TOP.equalsIgnoreCase(key)) {
+						this.topMargin = Float.parseFloat(value + "f");
+					}
+                    if (ElementTags.BOTTOM.equalsIgnoreCase(key)) {
+						this.bottomMargin = Float.parseFloat(value + "f");
+					}
+                } catch (final Exception ex) {
                     throw new ExceptionConverter(ex);
                 }
                 if (ElementTags.PAGE_SIZE.equals(key)) {
                     try {
-                        String pageSizeName = value;
-                        Field pageSizeField = PageSize.class
+                        final String pageSizeName = value;
+                        final Field pageSizeField = PageSize.class
                                 .getField(pageSizeName);
                         pageSize = (Rectangle) pageSizeField.get(null);
-                    } catch (Exception ex) {
+                    } catch (final Exception ex) {
                         throw new ExceptionConverter(ex);
                     }
                 } else if (ElementTags.ORIENTATION.equals(key)) {
@@ -486,13 +481,13 @@ public class SAXiTextHandler extends DefaultHandler {
                         if ("landscape".equals(value)) {
                             orientation = "landscape";
                         }
-                    } catch (Exception ex) {
+                    } catch (final Exception ex) {
                         throw new ExceptionConverter(ex);
                     }
                 } else {
                     try {
-                        document.add(new Meta(key, value));
-                    } catch (DocumentException de) {
+                        this.document.add(new Meta(key, value));
+                    } catch (final DocumentException de) {
                         throw new ExceptionConverter(de);
                     }
                 }
@@ -501,32 +496,33 @@ public class SAXiTextHandler extends DefaultHandler {
             	if ("landscape".equals(orientation)) {
             		pageSize = pageSize.rotate();
             	}
-            	document.setPageSize(pageSize);
+            	this.document.setPageSize(pageSize);
             }
-            document.setMargins(leftMargin, rightMargin, topMargin,
-                    bottomMargin);
+            this.document.setMargins(this.leftMargin, this.rightMargin, this.topMargin,
+                    this.bottomMargin);
 
-            if (controlOpenClose)
-                document.open();
+            if (this.controlOpenClose) {
+				this.document.open();
+			}
         }
 
     }
 
-    protected void addImage(Image img) throws EmptyStackException {
+    private void addImage(final Image img) throws EmptyStackException {
         // if there is an element on the stack...
-        Object current = stack.pop();
+        Object current = this.stack.pop();
         // ...and it's a Chapter or a Section, the Image can be
         // added directly
         if (current instanceof Chapter
                 || current instanceof Section
                 || current instanceof Cell) {
             ((TextElementArray) current).add(img);
-            stack.push(current);
+            this.stack.push(current);
             return;
         }
         // ...if not, we need to to a lot of stuff
         else {
-            Stack newStack = new Stack();
+            final Stack newStack = new Stack();
             while (!(current instanceof Chapter
                     || current instanceof Section || current instanceof Cell)) {
                 newStack.push(current);
@@ -534,20 +530,20 @@ public class SAXiTextHandler extends DefaultHandler {
                     img.setAnnotation(new Annotation(0, 0, 0,
                             0, ((Anchor) current).getReference()));
                 }
-                current = stack.pop();
+                current = this.stack.pop();
             }
             ((TextElementArray) current).add(img);
-            stack.push(current);
+            this.stack.push(current);
             while (!newStack.empty()) {
-                stack.push(newStack.pop());
+                this.stack.push(newStack.pop());
             }
             return;
         }
     }
-    
+
     /**
      * This method gets called when ignorable white space encountered.
-     * 
+     *
      * @param ch
      *            an array of characters
      * @param start
@@ -556,13 +552,14 @@ public class SAXiTextHandler extends DefaultHandler {
      *            the number of characters to read from the array
      */
 
-    public void ignorableWhitespace(char[] ch, int start, int length) {
+    @Override
+	public void ignorableWhitespace(final char[] ch, final int start, final int length) {
         characters(ch, start, length);
     }
 
     /**
      * This method gets called when characters are encountered.
-     * 
+     *
      * @param ch
      *            an array of characters
      * @param start
@@ -571,20 +568,22 @@ public class SAXiTextHandler extends DefaultHandler {
      *            the number of characters to read from the array
      */
 
-    public void characters(char[] ch, int start, int length) {
+    @Override
+	public void characters(final char[] ch, final int start, final int length) {
 
-        if (ignore)
-            return;
+        if (this.ignore) {
+			return;
+		}
 
-        String content = new String(ch, start, length);
+        final String content = new String(ch, start, length);
         // System.err.println("'" + content + "'");
 
         if (content.trim().length() == 0 && content.indexOf(' ') < 0) {
             return;
         }
 
-        StringBuffer buf = new StringBuffer();
-        int len = content.length();
+        final StringBuffer buf = new StringBuffer();
+        final int len = content.length();
         char character;
         boolean newline = false;
         for (int i = 0; i < len; i++) {
@@ -609,31 +608,31 @@ public class SAXiTextHandler extends DefaultHandler {
                 buf.append(character);
             }
         }
-        if (currentChunk == null) {
-        	if (bf == null) {
-        		currentChunk = new Chunk(buf.toString());
+        if (this.currentChunk == null) {
+        	if (this.bf == null) {
+        		this.currentChunk = new Chunk(buf.toString());
         	}
         	else {
-        		currentChunk = new Chunk(buf.toString(), new Font(this.bf));
+        		this.currentChunk = new Chunk(buf.toString(), new Font(this.bf));
         	}
         } else {
-            currentChunk.append(buf.toString());
+            this.currentChunk.append(buf.toString());
         }
     }
 
     private BaseFont bf = null;
-    
+
     /**
      * Sets the font that has to be used.
      * @param bf
      */
-    public void setBaseFont(BaseFont bf) {
+    public void setBaseFont(final BaseFont bf) {
     	this.bf = bf;
     }
 
     /**
      * This method gets called when an end tag is encountered.
-     * 
+     *
      * @param uri
      *            the Uniform Resource Identifier
      * @param lname
@@ -643,27 +642,29 @@ public class SAXiTextHandler extends DefaultHandler {
      *            the name of the tag that ends
      */
 
-    public void endElement(String uri, String lname, String name) {
+    @Override
+	public void endElement(final String uri, final String lname, final String name) {
         handleEndingTags(name);
     }
 
     /**
      * This method deals with the starting tags.
-     * 
+     *
      * @param name
      *            the name of the tag
      */
 
-    public void handleEndingTags(String name) {
+    void handleEndingTags(final String name) {
 
         // System.err.println("Stop: " + name);
 
         if (ElementTags.IGNORE.equals(name)) {
-            ignore = false;
+            this.ignore = false;
             return;
         }
-        if (ignore)
-            return;
+        if (this.ignore) {
+			return;
+		}
         // tags that don't have any content
         if (isNewpage(name) || ElementTags.ANNOTATION.equals(name) || ElementTags.IMAGE.equals(name)
                 || isNewline(name)) {
@@ -673,28 +674,28 @@ public class SAXiTextHandler extends DefaultHandler {
         try {
             // titles of sections and chapters
             if (ElementTags.TITLE.equals(name)) {
-                Paragraph current = (Paragraph) stack.pop();
-                if (currentChunk != null) {
-                    current.add(currentChunk);
-                    currentChunk = null;
+                final Paragraph current = (Paragraph) this.stack.pop();
+                if (this.currentChunk != null) {
+                    current.add(this.currentChunk);
+                    this.currentChunk = null;
                 }
-                Section previous = (Section) stack.pop();
+                final Section previous = (Section) this.stack.pop();
                 previous.setTitle(current);
-                stack.push(previous);
+                this.stack.push(previous);
                 return;
             }
 
             // all other endtags
-            if (currentChunk != null) {
+            if (this.currentChunk != null) {
                 TextElementArray current;
                 try {
-                    current = (TextElementArray) stack.pop();
-                } catch (EmptyStackException ese) {
+                    current = (TextElementArray) this.stack.pop();
+                } catch (final EmptyStackException ese) {
                     current = new Paragraph();
                 }
-                current.add(currentChunk);
-                stack.push(current);
-                currentChunk = null;
+                current.add(this.currentChunk);
+                this.stack.push(current);
+                this.currentChunk = null;
             }
 
             // chunks
@@ -705,46 +706,46 @@ public class SAXiTextHandler extends DefaultHandler {
             // phrases, anchors, lists, tables
             if (ElementTags.PHRASE.equals(name) || ElementTags.ANCHOR.equals(name) || ElementTags.LIST.equals(name)
                     || ElementTags.PARAGRAPH.equals(name)) {
-                Element current = (Element) stack.pop();
+                final Element current = (Element) this.stack.pop();
                 try {
-                    TextElementArray previous = (TextElementArray) stack.pop();
+                    final TextElementArray previous = (TextElementArray) this.stack.pop();
                     previous.add(current);
-                    stack.push(previous);
-                } catch (EmptyStackException ese) {
-                    document.add(current);
+                    this.stack.push(previous);
+                } catch (final EmptyStackException ese) {
+                    this.document.add(current);
                 }
                 return;
             }
 
             // listitems
             if (ElementTags.LISTITEM.equals(name)) {
-                ListItem listItem = (ListItem) stack.pop();
-                List list = (List) stack.pop();
+                final ListItem listItem = (ListItem) this.stack.pop();
+                final List list = (List) this.stack.pop();
                 list.add(listItem);
-                stack.push(list);
+                this.stack.push(list);
             }
 
             // tables
             if (ElementTags.TABLE.equals(name)) {
-                Table table = (Table) stack.pop();
+                final Table table = (Table) this.stack.pop();
                 try {
-                    TextElementArray previous = (TextElementArray) stack.pop();
+                    final TextElementArray previous = (TextElementArray) this.stack.pop();
                     previous.add(table);
-                    stack.push(previous);
-                } catch (EmptyStackException ese) {
-                    document.add(table);
+                    this.stack.push(previous);
+                } catch (final EmptyStackException ese) {
+                    this.document.add(table);
                 }
                 return;
             }
 
             // rows
             if (ElementTags.ROW.equals(name)) {
-                ArrayList cells = new ArrayList();
+                final ArrayList cells = new ArrayList();
                 int columns = 0;
                 Table table;
                 Cell cell;
                 while (true) {
-                    Element element = (Element) stack.pop();
+                    final Element element = (Element) this.stack.pop();
                     if (element.type() == Element.CELL) {
                         cell = (Cell) element;
                         columns += cell.getColspan();
@@ -759,15 +760,15 @@ public class SAXiTextHandler extends DefaultHandler {
                 }
                 Collections.reverse(cells);
                 String width;
-                float[] cellWidths = new float[columns];
-                boolean[] cellNulls = new boolean[columns];
+                final float[] cellWidths = new float[columns];
+                final boolean[] cellNulls = new boolean[columns];
                 for (int i = 0; i < columns; i++) {
                     cellWidths[i] = 0;
                     cellNulls[i] = true;
                 }
                 float total = 0;
                 int j = 0;
-                for (Iterator i = cells.iterator(); i.hasNext();) {
+                for (final Iterator i = cells.iterator(); i.hasNext();) {
                     cell = (Cell) i.next();
                     width = cell.getWidthAsString();
                     if (cell.getWidth() == 0) {
@@ -775,7 +776,7 @@ public class SAXiTextHandler extends DefaultHandler {
                             try {
                                 cellWidths[j] = 100f / columns;
                                 total += cellWidths[j];
-                            } catch (Exception e) {
+                            } catch (final Exception e) {
                                 // empty on purpose
                             }
                         } else if (cell.getColspan() == 1) {
@@ -787,14 +788,14 @@ public class SAXiTextHandler extends DefaultHandler {
                                     width.substring(0, width.length() - 1)
                                             + "f");
                             total += cellWidths[j];
-                        } catch (Exception e) {
+                        } catch (final Exception e) {
                             // empty on purpose
                         }
                     }
                     j += cell.getColspan();
                     table.addCell(cell);
                 }
-                float widths[] = table.getProportionalWidths();
+                final float widths[] = table.getProportionalWidths();
                 if (widths.length == columns) {
                     float left = 0.0f;
                     for (int i = 0; i < columns; i++) {
@@ -806,14 +807,14 @@ public class SAXiTextHandler extends DefaultHandler {
                     if (100.0 >= total) {
                         for (int i = 0; i < widths.length; i++) {
                             if (cellWidths[i] == 0 && widths[i] != 0) {
-                                cellWidths[i] = (widths[i] / left)
+                                cellWidths[i] = widths[i] / left
                                         * (100.0f - total);
                             }
                         }
                     }
                     table.setWidths(cellWidths);
                 }
-                stack.push(table);
+                this.stack.push(table);
             }
 
             // cells
@@ -823,13 +824,13 @@ public class SAXiTextHandler extends DefaultHandler {
 
             // sections
             if (ElementTags.SECTION.equals(name)) {
-                stack.pop();
+                this.stack.pop();
                 return;
             }
 
             // chapters
             if (ElementTags.CHAPTER.equals(name)) {
-                document.add((Element) stack.pop());
+                this.document.add((Element) this.stack.pop());
                 return;
             }
 
@@ -837,62 +838,63 @@ public class SAXiTextHandler extends DefaultHandler {
             if (isDocumentRoot(name)) {
                 try {
                     while (true) {
-                        Element element = (Element) stack.pop();
+                        final Element element = (Element) this.stack.pop();
                         try {
-                            TextElementArray previous = (TextElementArray) stack
+                            final TextElementArray previous = (TextElementArray) this.stack
                                     .pop();
                             previous.add(element);
-                            stack.push(previous);
-                        } catch (EmptyStackException es) {
-                            document.add(element);
+                            this.stack.push(previous);
+                        } catch (final EmptyStackException es) {
+                            this.document.add(element);
                         }
                     }
-                } catch (EmptyStackException ese) {
+                } catch (final EmptyStackException ese) {
                     // empty on purpose
                 }
-                if (controlOpenClose)
-                    document.close();
+                if (this.controlOpenClose) {
+					this.document.close();
+				}
                 return;
             }
-        } catch (DocumentException de) {
+        } catch (final DocumentException de) {
             throw new ExceptionConverter(de);
         }
     }
 
     /**
      * Checks if a certain tag corresponds with the newpage-tag.
-     * 
+     *
      * @param tag
      *            a presumed tagname
      * @return <CODE>true</CODE> or <CODE>false</CODE>
      */
 
-    private boolean isNewpage(String tag) {
+    private boolean isNewpage(final String tag) {
         return ElementTags.NEWPAGE.equals(tag);
     }
 
     /**
      * Checks if a certain tag corresponds with the newpage-tag.
-     * 
+     *
      * @param tag
      *            a presumed tagname
      * @return <CODE>true</CODE> or <CODE>false</CODE>
      */
 
-    private boolean isNewline(String tag) {
+    private boolean isNewline(final String tag) {
         return ElementTags.NEWLINE.equals(tag);
     }
 
     /**
      * Checks if a certain tag corresponds with the roottag.
-     * 
+     *
      * @param tag
      *            a presumed tagname
      * @return <CODE>true</CODE> if <VAR>tag </VAR> equals <CODE>itext
      *         </CODE>,<CODE>false</CODE> otherwise.
      */
 
-    protected boolean isDocumentRoot(String tag) {
+    private boolean isDocumentRoot(final String tag) {
         return ElementTags.ITEXT.equals(tag);
     }
 }

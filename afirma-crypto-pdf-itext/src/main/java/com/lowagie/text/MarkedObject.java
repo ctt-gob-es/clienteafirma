@@ -60,7 +60,7 @@ import java.util.Properties;
  * the MarkedObject functionality.
  */
 
-public class MarkedObject implements Element {
+class MarkedObject implements Element {
 
 	/** The element that is wrapped in a MarkedObject. */
 	protected Element element;
@@ -99,7 +99,6 @@ public class MarkedObject implements Element {
      * @param       listener        an <CODE>ElementListener</CODE>
      * @return <CODE>true</CODE> if the element was processed successfully
      */
-	@Override
 	public boolean process(final ElementListener listener) {
         try {
             return listener.add(this.element);

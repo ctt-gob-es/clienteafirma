@@ -59,7 +59,7 @@ import java.util.Iterator;
  * the MarkedObject functionality.
  */
 
-public class MarkedSection extends MarkedObject {
+class MarkedSection extends MarkedObject {
 
 	/** This is the title of this section. */
 	private MarkedObject title = null;

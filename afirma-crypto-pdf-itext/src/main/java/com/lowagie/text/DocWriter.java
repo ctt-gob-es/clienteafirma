@@ -90,11 +90,9 @@ public abstract class DocWriter implements DocListener {
 
     // membervariables
 
-/** The pageSize. */
-    protected Rectangle pageSize;
 
-/** This is the document that has to be written. */
-    protected Document document;
+
+
 
 /** The outputstream of this writer. */
     protected OutputStreamCounter os;
@@ -121,7 +119,6 @@ public abstract class DocWriter implements DocListener {
  */
 
     protected DocWriter(final Document document, final OutputStream os)  {
-        this.document = document;
         this.os = new OutputStreamCounter(new BufferedOutputStream(os));
     }
 
@@ -161,7 +158,6 @@ public abstract class DocWriter implements DocListener {
 
     @Override
 	public boolean setPageSize(final Rectangle pageSize) {
-        this.pageSize = pageSize;
         return true;
     }
 

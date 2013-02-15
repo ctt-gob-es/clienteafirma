@@ -234,22 +234,7 @@ public class Chunk implements Element {
 
 	// implementation of the Element-methods
 
-	/**
-	 * Processes the element by adding it (or the different parts) to an <CODE>
-	 * ElementListener</CODE>.
-	 *
-	 * @param listener
-	 *            an <CODE>ElementListener</CODE>
-	 * @return <CODE>true</CODE> if the element was processed successfully
-	 */
-	@Override
-	public boolean process(final ElementListener listener) {
-		try {
-			return listener.add(this);
-		} catch (final DocumentException de) {
-			return false;
-		}
-	}
+
 
 	/**
 	 * Gets the type of the text element.

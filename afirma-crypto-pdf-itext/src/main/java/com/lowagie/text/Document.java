@@ -517,69 +517,7 @@ public class Document implements DocListener {
         }
     }
 
-	/**
- * Adds the subject to a Document.
- *
-	 * @param subject
-	 *            the subject
- * @return	<CODE>true</CODE> if successful, <CODE>false</CODE> otherwise
- */
 
-    public boolean addSubject(final String subject) {
-        try {
-            return add(new Meta(Element.SUBJECT, subject));
-		} catch (final DocumentException de) {
-            throw new ExceptionConverter(de);
-        }
-    }
-
-	/**
- * Adds the keywords to a Document.
- *
-	 * @param keywords
-	 *            adds the keywords to the document
- * @return <CODE>true</CODE> if successful, <CODE>false</CODE> otherwise
- */
-
-    public boolean addKeywords(final String keywords) {
-        try {
-            return add(new Meta(Element.KEYWORDS, keywords));
-		} catch (final DocumentException de) {
-            throw new ExceptionConverter(de);
-        }
-    }
-
-	/**
- * Adds the author to a Document.
- *
-	 * @param author
-	 *            the name of the author
- * @return	<CODE>true</CODE> if successful, <CODE>false</CODE> otherwise
- */
-
-    public boolean addAuthor(final String author) {
-        try {
-            return add(new Meta(Element.AUTHOR, author));
-		} catch (final DocumentException de) {
-            throw new ExceptionConverter(de);
-        }
-    }
-
-	/**
- * Adds the creator to a Document.
- *
-	 * @param creator
-	 *            the name of the creator
- * @return	<CODE>true</CODE> if successful, <CODE>false</CODE> otherwise
- */
-
-    public boolean addCreator(final String creator) {
-        try {
-            return add(new Meta(Element.CREATOR, creator));
-		} catch (final DocumentException de) {
-            throw new ExceptionConverter(de);
-        }
-    }
 
 	/**
  * Adds the producer to a Document.
@@ -617,15 +555,7 @@ public class Document implements DocListener {
 
 
 
-	/**
- * Return the right margin.
- *
- * @return	the right margin
- */
 
-    public float rightMargin() {
-        return this.marginRight;
-    }
 
 
 	/**

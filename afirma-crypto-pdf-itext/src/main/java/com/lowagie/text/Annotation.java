@@ -301,22 +301,7 @@ public class Annotation implements Element {
 		return Element.ANNOTATION;
 	}
 
-	/**
-	 * Processes the element by adding it (or the different parts) to an <CODE>
-	 * ElementListener</CODE>.
-	 *
-	 * @param listener
-	 *            an <CODE>ElementListener</CODE>
-	 * @return <CODE>true</CODE> if the element was processed successfully
-	 */
-	@Override
-	public boolean process(final ElementListener listener) {
-		try {
-			return listener.add(this);
-		} catch (final DocumentException de) {
-			return false;
-		}
-	}
+
 
 	/**
 	 * Gets all the chunks in this element.
@@ -388,61 +373,13 @@ public class Annotation implements Element {
 		return this.ury;
 	}
 
-	/**
-	 * Returns the lower left x-value.
-	 *
-	 * @param def
-	 *            the default value
-	 * @return a value
-	 */
-	public float llx(final float def) {
-		if (Float.isNaN(this.llx)) {
-			return def;
-		}
-		return this.llx;
-	}
 
-	/**
-	 * Returns the lower left y-value.
-	 *
-	 * @param def
-	 *            the default value
-	 * @return a value
-	 */
-	public float lly(final float def) {
-		if (Float.isNaN(this.lly)) {
-			return def;
-		}
-		return this.lly;
-	}
 
-	/**
-	 * Returns the upper right x-value.
-	 *
-	 * @param def
-	 *            the default value
-	 * @return a value
-	 */
-	public float urx(final float def) {
-		if (Float.isNaN(this.urx)) {
-			return def;
-		}
-		return this.urx;
-	}
 
-	/**
-	 * Returns the upper right y-value.
-	 *
-	 * @param def
-	 *            the default value
-	 * @return a value
-	 */
-	public float ury(final float def) {
-		if (Float.isNaN(this.ury)) {
-			return def;
-		}
-		return this.ury;
-	}
+
+
+
+
 
 	/**
 	 * Returns the type of this <CODE>Annotation</CODE>.

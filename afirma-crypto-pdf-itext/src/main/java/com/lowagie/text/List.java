@@ -172,25 +172,7 @@ public class List implements TextElementArray {
 
     // implementation of the Element-methods
 
-    /**
-     * Processes the element by adding it (or the different parts) to an
-     * <CODE>ElementListener</CODE>.
-     *
-     * @param	listener	an <CODE>ElementListener</CODE>
-     * @return	<CODE>true</CODE> if the element was processed successfully
-     */
-    @Override
-	public boolean process(final ElementListener listener) {
-        try {
-            for (final Iterator i = this.list.iterator(); i.hasNext(); ) {
-                listener.add((Element) i.next());
-            }
-            return true;
-        }
-        catch(final DocumentException de) {
-            return false;
-        }
-    }
+
 
     /**
      * Gets the type of the text element.
@@ -260,23 +242,7 @@ public class List implements TextElementArray {
 
     // extra methods
 
-	/** Makes sure all the items in the list have the same indentation. */
-    public void normalizeIndentation() {
-        float max = 0;
-    	Element o;
-        for (final Iterator i = this.list.iterator(); i.hasNext(); ) {
-        	o = (Element)i.next();
-            if (o instanceof ListItem) {
-            	max = Math.max(max, ((ListItem)o).getIndentationLeft());
-            }
-        }
-        for (final Iterator i = this.list.iterator(); i.hasNext(); ) {
-        	o = (Element)i.next();
-            if (o instanceof ListItem) {
-            	((ListItem)o).setIndentationLeft(max);
-            }
-        }
-    }
+
 
     // setters
 
