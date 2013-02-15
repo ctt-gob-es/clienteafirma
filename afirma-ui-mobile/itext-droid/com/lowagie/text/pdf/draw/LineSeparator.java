@@ -49,10 +49,10 @@
 
 package com.lowagie.text.pdf.draw;
 
+import harmony.java.awt.Color;
+
 import com.lowagie.text.Element;
 import com.lowagie.text.pdf.PdfContentByte;
-
-import harmony.java.awt.Color;
 
 /**
  * Element that draws a solid line from left to right.
@@ -62,16 +62,16 @@ import harmony.java.awt.Color;
  * @since	2.1.2
  */
 public class LineSeparator extends VerticalPositionMark {
-	
+
     /** The thickness of the line. */
     protected float lineWidth = 1;
     /** The width of the line as a percentage of the available page width. */
-    protected float percentage = 100;
+    private float percentage = 100;
     /** The color of the line. */
-    protected Color lineColor;
+    private Color lineColor;
     /** The alignment of the line. */
-    protected int alignment = Element.ALIGN_CENTER;
-    
+    private int alignment = Element.ALIGN_CENTER;
+
     /**
      * Creates a new instance of the LineSeparator class.
      * @param lineWidth		the thickness of the line
@@ -80,7 +80,7 @@ public class LineSeparator extends VerticalPositionMark {
      * @param align			the alignment
      * @param offset		the offset of the line relative to the current baseline (negative = under the baseline)
      */
-    public LineSeparator(float lineWidth, float percentage, Color lineColor, int align, float offset) {
+    public LineSeparator(final float lineWidth, final float percentage, final Color lineColor, final int align, final float offset) {
         this.lineWidth = lineWidth;
         this.percentage = percentage;
         this.lineColor = lineColor;
@@ -98,7 +98,8 @@ public class LineSeparator extends VerticalPositionMark {
     /**
      * @see com.lowagie.text.pdf.draw.DrawInterface#draw(com.lowagie.text.pdf.PdfContentByte, float, float, float, float, float)
      */
-    public void draw(PdfContentByte canvas, float llx, float lly, float urx, float ury, float y) {
+    @Override
+	public void draw(final PdfContentByte canvas, final float llx, final float lly, final float urx, final float ury, final float y) {
         canvas.saveState();
         drawLine(canvas, llx, urx, y);
         canvas.restoreState();
@@ -111,12 +112,13 @@ public class LineSeparator extends VerticalPositionMark {
      * @param rightX	the right x coordindate
      * @param y			the y coordinate
      */
-    public void drawLine(PdfContentByte canvas, float leftX, float rightX, float y) {
+    void drawLine(final PdfContentByte canvas, final float leftX, final float rightX, final float y) {
     	float w;
-        if (getPercentage() < 0)
-            w = -getPercentage();
-        else
-            w = (rightX - leftX) * getPercentage() / 100.0f;
+        if (getPercentage() < 0) {
+			w = -getPercentage();
+		} else {
+			w = (rightX - leftX) * getPercentage() / 100.0f;
+		}
         float s;
         switch (getAlignment()) {
             case Element.ALIGN_LEFT:
@@ -130,26 +132,27 @@ public class LineSeparator extends VerticalPositionMark {
                 break;
         }
         canvas.setLineWidth(getLineWidth());
-        if (getLineColor() != null)
-            canvas.setColorStroke(getLineColor());
-        canvas.moveTo(s + leftX, y + offset);
-        canvas.lineTo(s + w + leftX, y + offset);
+        if (getLineColor() != null) {
+			canvas.setColorStroke(getLineColor());
+		}
+        canvas.moveTo(s + leftX, y + this.offset);
+        canvas.lineTo(s + w + leftX, y + this.offset);
         canvas.stroke();
     }
-    
+
     /**
      * Getter for the line width.
      * @return	the thickness of the line that will be drawn.
      */
     public float getLineWidth() {
-        return lineWidth;
+        return this.lineWidth;
     }
 
     /**
      * Setter for the line width.
      * @param lineWidth	the thickness of the line that will be drawn.
      */
-    public void setLineWidth(float lineWidth) {
+    public void setLineWidth(final float lineWidth) {
         this.lineWidth = lineWidth;
     }
 
@@ -158,14 +161,14 @@ public class LineSeparator extends VerticalPositionMark {
      * @return	a width percentage
      */
     public float getPercentage() {
-        return percentage;
+        return this.percentage;
     }
 
     /**
      * Setter for the width as a percentage of the available width.
      * @param percentage	a width percentage
      */
-    public void setPercentage(float percentage) {
+    public void setPercentage(final float percentage) {
         this.percentage = percentage;
     }
 
@@ -174,14 +177,14 @@ public class LineSeparator extends VerticalPositionMark {
      * @return	a color
      */
     public Color getLineColor() {
-        return lineColor;
+        return this.lineColor;
     }
 
     /**
      * Setter for the color of the line that will be drawn.
      * @param color	a color
      */
-    public void setLineColor(Color color) {
+    public void setLineColor(final Color color) {
         this.lineColor = color;
     }
 
@@ -190,14 +193,14 @@ public class LineSeparator extends VerticalPositionMark {
      * @return	an alignment value
      */
     public int getAlignment() {
-        return alignment;
+        return this.alignment;
     }
 
     /**
      * Setter for the alignment of the line.
      * @param align	an alignment value
      */
-    public void setAlignment(int align) {
+    public void setAlignment(final int align) {
         this.alignment = align;
     }
 }

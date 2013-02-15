@@ -54,77 +54,65 @@ package com.lowagie.text.pdf;
  * other nodes.
  * @author Paulo Soares (psoares@consiste.pt)
  */
-public class PdfStructureElement extends PdfDictionary {
-    
+class PdfStructureElement extends PdfDictionary {
+
     /**
      * Holds value of property kids.
      */
-    private PdfStructureElement parent;
-    private PdfStructureTreeRoot top;
-    
+    private final PdfStructureElement parent;
+    private final PdfStructureTreeRoot top;
+
     /**
      * Holds value of property reference.
      */
     private PdfIndirectReference reference;
-    
+
     /**
      * Creates a new instance of PdfStructureElement.
      * @param parent the parent of this node
      * @param structureType the type of structure. It may be a standard type or a user type mapped by the role map
      */
-    public PdfStructureElement(PdfStructureElement parent, PdfName structureType) {
-        top = parent.top;
+    public PdfStructureElement(final PdfStructureElement parent, final PdfName structureType) {
+        this.top = parent.top;
         init(parent, structureType);
         this.parent = parent;
         put(PdfName.P, parent.reference);
     }
-    
-    /**
-     * Creates a new instance of PdfStructureElement.
-     * @param parent the parent of this node
-     * @param structureType the type of structure. It may be a standard type or a user type mapped by the role map
-     */    
-    public PdfStructureElement(PdfStructureTreeRoot parent, PdfName structureType) {
-        top = parent;
-        init(parent, structureType);
-        put(PdfName.P, parent.getReference());
-    }
-    
-    private void init(PdfDictionary parent, PdfName structureType) {
-        PdfObject kido = parent.get(PdfName.K);
+
+
+
+    private void init(final PdfDictionary parent, final PdfName structureType) {
+        final PdfObject kido = parent.get(PdfName.K);
         PdfArray kids = null;
-        if (kido != null && !kido.isArray())
-            throw new IllegalArgumentException("The parent has already another function.");
+        if (kido != null && !kido.isArray()) {
+			throw new IllegalArgumentException("The parent has already another function.");
+		}
         if (kido == null) {
             kids = new PdfArray();
             parent.put(PdfName.K, kids);
-        }
-        else
-            kids = (PdfArray)kido;
+        } else {
+			kids = (PdfArray)kido;
+		}
         kids.add(this);
         put(PdfName.S, structureType);
-        reference = top.getWriter().getPdfIndirectReference();
+        this.reference = this.top.getWriter().getPdfIndirectReference();
     }
-    
+
     /**
      * Gets the parent of this node.
      * @return the parent of this node
-     */    
+     */
     public PdfDictionary getParent() {
-        return parent;
+        return this.parent;
     }
-    
-    void setPageMark(int page, int mark) {
-        if (mark >= 0)
-            put(PdfName.K, new PdfNumber(mark));
-        top.setPageMark(page, reference);
-    }
-    
+
+
+
     /**
      * Gets the reference this object will be written to.
      * @return the reference this object will be written to
      * @since	2.1.6 method removed in 2.1.5, but restored in 2.1.6
-     */    
+     */
     public PdfIndirectReference getReference() {
         return this.reference;
     }

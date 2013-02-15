@@ -52,7 +52,6 @@ package com.lowagie.text.pdf;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -78,162 +77,151 @@ import java.util.Set;
  * @see		BadPdfFormatException
  */
 public class PdfDictionary extends PdfObject {
-    
+
     // CONSTANTS
-    
+
     /** This is a possible type of dictionary */
-    public static final PdfName FONT = PdfName.FONT;
-    
+    private static final PdfName FONT = PdfName.FONT;
+
     /** This is a possible type of dictionary */
-    public static final PdfName OUTLINES = PdfName.OUTLINES;
-    
+    static final PdfName OUTLINES = PdfName.OUTLINES;
+
     /** This is a possible type of dictionary */
-    public static final PdfName PAGE = PdfName.PAGE;
-    
+    static final PdfName PAGE = PdfName.PAGE;
+
     /** This is a possible type of dictionary */
-    public static final PdfName PAGES = PdfName.PAGES;
-    
+    private static final PdfName PAGES = PdfName.PAGES;
+
     /** This is a possible type of dictionary */
-    public static final PdfName CATALOG = PdfName.CATALOG;
-    
+    static final PdfName CATALOG = PdfName.CATALOG;
+
     // CLASS VARIABLES
-    
+
     /** This is the type of this dictionary */
     private PdfName dictionaryType = null;
-    
+
     /** This is the hashmap that contains all the values and keys of the dictionary */
-    protected HashMap hashMap;
-    
+    protected HashMap<PdfName, PdfObject> hashMap;
+
     // CONSTRUCTORS
-    
+
     /**
      * Constructs an empty <CODE>PdfDictionary</CODE>-object.
      */
     public PdfDictionary() {
         super(DICTIONARY);
-        hashMap = new HashMap();
+        this.hashMap = new HashMap();
     }
-    
+
     /**
      * Constructs a <CODE>PdfDictionary</CODE>-object of a certain type.
      *
      * @param type a <CODE>PdfName</CODE>
      */
-    public PdfDictionary(PdfName type) {
+    public PdfDictionary(final PdfName type) {
         this();
-        dictionaryType = type;
-        put(PdfName.TYPE, dictionaryType);
+        this.dictionaryType = type;
+        put(PdfName.TYPE, this.dictionaryType);
     }
-    
+
     // METHODS OVERRIDING SOME PDFOBJECT METHODS
-    
+
     /**
      * Writes the PDF representation of this <CODE>PdfDictionary</CODE> as an
      * array of <CODE>byte</CODE> to the given <CODE>OutputStream</CODE>.
-     * 
+     *
      * @param writer for backwards compatibility
      * @param os the <CODE>OutputStream</CODE> to write the bytes to.
      * @throws IOException
      */
-    public void toPdf(PdfWriter writer, OutputStream os) throws IOException {
+    @Override
+	public void toPdf(final PdfWriter writer, final OutputStream os) throws IOException {
         os.write('<');
         os.write('<');
         // loop over all the object-pairs in the HashMap
         PdfName key;
         PdfObject value;
         int type = 0;
-        for (Iterator i = hashMap.keySet().iterator(); i.hasNext(); ) {
-            key = (PdfName) i.next();
-            value = (PdfObject) hashMap.get(key);
+        for (final Object element : this.hashMap.keySet()) {
+            key = (PdfName) element;
+            value = this.hashMap.get(key);
             key.toPdf(writer, os);
             type = value.type();
-            if (type != PdfObject.ARRAY && type != PdfObject.DICTIONARY && type != PdfObject.NAME && type != PdfObject.STRING)
-                os.write(' ');
+            if (type != PdfObject.ARRAY && type != PdfObject.DICTIONARY && type != PdfObject.NAME && type != PdfObject.STRING) {
+				os.write(' ');
+			}
             value.toPdf(writer, os);
         }
         os.write('>');
         os.write('>');
     }
-    
+
     /**
      * Returns a string representation of this <CODE>PdfDictionary</CODE>.
-     * 
+     *
      * The string doesn't contain any of the content of this dictionary.
      * Rather the string "dictionary" is returned, possibly followed by the
      * type of this <CODE>PdfDictionary</CODE>, if set.
-     * 
+     *
      * @return the string representation of this <CODE>PdfDictionary</CODE>
      * @see com.lowagie.text.pdf.PdfObject#toString()
      */
-    public String toString() {
-        if (get(PdfName.TYPE) == null)
-            return "Dictionary";
+    @Override
+	public String toString() {
+        if (get(PdfName.TYPE) == null) {
+			return "Dictionary";
+		}
         return "Dictionary of type: " + get(PdfName.TYPE);
     }
-    
+
     // DICTIONARY CONTENT METHODS
-    
+
     /**
      * Associates the specified <CODE>PdfObject</CODE> as <VAR>value</VAR> with
      * the specified <CODE>PdfName</CODE> as <VAR>key</VAR> in this map.
-     * 
+     *
      * If the map previously contained a mapping for this <VAR>key</VAR>, the
      * old <VAR>value</VAR> is replaced. If the <VAR>value</VAR> is
      * <CODE>null</CODE> or <CODE>PdfNull</CODE> the key is deleted.
      *
      * @param key a <CODE>PdfName</CODE>
      * @param object the <CODE>PdfObject</CODE> to be associated with the
-     *   <VAR>key</VAR> 
+     *   <VAR>key</VAR>
      */
-    public void put(PdfName key, PdfObject object) {
-        if (object == null || object.isNull())
-            hashMap.remove(key);
-        else
-            hashMap.put(key, object);
+    public void put(final PdfName key, final PdfObject object) {
+        if (object == null || object.isNull()) {
+			this.hashMap.remove(key);
+		} else {
+			this.hashMap.put(key, object);
+		}
     }
-    
-    /**
-     * Associates the specified <CODE>PdfObject</CODE> as value to the
-     * specified <CODE>PdfName</CODE> as key in this map.
-     * 
-     * If the <VAR>value</VAR> is a <CODE>PdfNull</CODE>, it is treated just as
-     * any other <CODE>PdfObject</CODE>. If the <VAR>value</VAR> is
-     * <CODE>null</CODE> however nothing is done.  
-     *
-     * @param key a <CODE>PdfName</CODE>
-     * @param value the <CODE>PdfObject</CODE> to be associated to the
-     * <VAR>key</VAR>
-     */
-    public void putEx(PdfName key, PdfObject value) {
-        if (value == null)
-            return;
-        put(key, value);
-    }
-    
+
+
+
     /**
      * Copies all of the mappings from the specified <CODE>PdfDictionary</CODE>
      * to this <CODE>PdfDictionary</CODE>.
-     * 
+     *
      * These mappings will replace any mappings previously contained in this
      * <CODE>PdfDictionary</CODE>.
-     * 
+     *
      * @param dic The <CODE>PdfDictionary</CODE> with the mappings to be
      *   copied over
      */
-    public void putAll(PdfDictionary dic) {
-        hashMap.putAll(dic.hashMap);
+    void putAll(final PdfDictionary dic) {
+        this.hashMap.putAll(dic.hashMap);
     }
-    
+
     /**
      * Removes a <CODE>PdfObject</CODE> and its <VAR>key</VAR> from the
      * <CODE>PdfDictionary</CODE>.
      *
      * @param key a <CODE>PdfName</CODE>
      */
-    public void remove(PdfName key) {
-        hashMap.remove(key);
+    public void remove(final PdfName key) {
+        this.hashMap.remove(key);
     }
-    
+
     /**
      * Returns the <CODE>PdfObject</CODE> associated to the specified
      * <VAR>key</VAR>.
@@ -242,32 +230,32 @@ public class PdfDictionary extends PdfObject {
      * @return the </CODE>PdfObject</CODE> previously associated to the
      *   <VAR>key</VAR>
      */
-    public PdfObject get(PdfName key) {
-        return (PdfObject) hashMap.get(key);
+    public PdfObject get(final PdfName key) {
+        return this.hashMap.get(key);
     }
-    
+
     /**
      * Returns the <CODE>PdfObject</CODE> associated to the specified
      * <VAR>key</VAR>, resolving a possible indirect reference to a direct
      * object.
-     * 
+     *
      * This method will never return a <CODE>PdfIndirectReference</CODE>
-     * object.  
-     * 
+     * object.
+     *
      * @param key A key for the <CODE>PdfObject</CODE> to be returned
-     * @return A direct <CODE>PdfObject</CODE> or <CODE>null</CODE> 
+     * @return A direct <CODE>PdfObject</CODE> or <CODE>null</CODE>
      */
-    public PdfObject getDirectObject(PdfName key) {
+    public PdfObject getDirectObject(final PdfName key) {
         return PdfReader.getPdfObject(get(key));
     }
-    
+
     /**
      * Get all keys that are set.
      *
      * @return <CODE>true</CODE> if it is, otherwise <CODE>false</CODE>.
      */
-    public Set getKeys() {
-        return hashMap.keySet();
+    public Set<PdfName> getKeys() {
+        return this.hashMap.keySet();
     }
 
     /**
@@ -278,246 +266,234 @@ public class PdfDictionary extends PdfObject {
      *   <CODE>PdfDictionary</CODE>.
      */
     public int size() {
-        return hashMap.size();
+        return this.hashMap.size();
     }
-    
+
     /**
      * Returns <CODE>true</CODE> if this <CODE>PdfDictionary</CODE> contains a
      * mapping for the specified <VAR>key</VAR>.
      *
      * @return <CODE>true</CODE> if the key is set, otherwise <CODE>false</CODE>.
      */
-    public boolean contains(PdfName key) {
-        return hashMap.containsKey(key);
+    boolean contains(final PdfName key) {
+        return this.hashMap.containsKey(key);
     }
-    
+
     // DICTIONARY TYPE METHODS
-    
+
     /**
      * Checks if a <CODE>Dictionary</CODE> is of the type FONT.
      *
      * @return <CODE>true</CODE> if it is, otherwise <CODE>false</CODE>.
      */
     public boolean isFont() {
-        return FONT.equals(dictionaryType);
+        return FONT.equals(this.dictionaryType);
     }
-    
+
     /**
      * Checks if a <CODE>Dictionary</CODE> is of the type PAGE.
      *
      * @return <CODE>true</CODE> if it is, otherwise <CODE>false</CODE>.
      */
     public boolean isPage() {
-        return PAGE.equals(dictionaryType);
+        return PAGE.equals(this.dictionaryType);
     }
-    
+
     /**
      * Checks if a <CODE>Dictionary</CODE> is of the type PAGES.
      *
      * @return <CODE>true</CODE> if it is, otherwise <CODE>false</CODE>.
      */
     public boolean isPages() {
-        return PAGES.equals(dictionaryType);
+        return PAGES.equals(this.dictionaryType);
     }
-    
+
     /**
      * Checks if a <CODE>Dictionary</CODE> is of the type CATALOG.
      *
      * @return <CODE>true</CODE> if it is, otherwise <CODE>false</CODE>.
      */
     public boolean isCatalog() {
-        return CATALOG.equals(dictionaryType);
+        return CATALOG.equals(this.dictionaryType);
     }
-    
+
     /**
      * Checks if a <CODE>Dictionary</CODE> is of the type OUTLINES.
      *
      * @return <CODE>true</CODE> if it is, otherwise <CODE>false</CODE>.
      */
     public boolean isOutlineTree() {
-        return OUTLINES.equals(dictionaryType);
+        return OUTLINES.equals(this.dictionaryType);
     }
-    
+
     // OTHER METHODS
 
-    public void merge(PdfDictionary other) {
-        hashMap.putAll(other.hashMap);
+    void merge(final PdfDictionary other) {
+        this.hashMap.putAll(other.hashMap);
     }
-    
-    public void mergeDifferent(PdfDictionary other) {
-        for (Iterator i = other.hashMap.keySet().iterator(); i.hasNext();) {
-            Object key = i.next();
-            if (!hashMap.containsKey(key))
-                hashMap.put(key, other.hashMap.get(key));
+
+    void mergeDifferent(final PdfDictionary other) {
+        for (final PdfName key : other.hashMap.keySet()) {
+            if (!this.hashMap.containsKey(key)) {
+				this.hashMap.put(key, other.hashMap.get(key));
+			}
         }
     }
-    
+
      // DOWNCASTING GETTERS
      // @author Mark A Storer (2/17/06)
-    
+
     /**
      * Returns a <CODE>PdfObject</CODE> as a <CODE>PdfDictionary</CODE>,
      * resolving indirect references.
-     * 
+     *
      * The object associated with the <CODE>PdfName</CODE> given is retrieved
      * and resolved to a direct object.
      * If it is a <CODE>PdfDictionary</CODE>, it is cast down and returned as
      * such. Otherwise <CODE>null</CODE> is returned.
-     *     
+     *
      * @param key A <CODE>PdfName</CODE>
      * @return the associated <CODE>PdfDictionary</CODE> object,
      *   or <CODE>null</CODE>
      */
-    public PdfDictionary getAsDict(PdfName key) {
+    public PdfDictionary getAsDict(final PdfName key) {
         PdfDictionary dict = null;
-        PdfObject orig = getDirectObject(key);
-        if (orig != null && orig.isDictionary())
-            dict = (PdfDictionary) orig;
+        final PdfObject orig = getDirectObject(key);
+        if (orig != null && orig.isDictionary()) {
+			dict = (PdfDictionary) orig;
+		}
         return dict;
     }
-    
+
     /**
      * Returns a <CODE>PdfObject</CODE> as a <CODE>PdfArray</CODE>,
      * resolving indirect references.
-     * 
+     *
      * The object associated with the <CODE>PdfName</CODE> given is retrieved
      * and resolved to a direct object.
      * If it is a <CODE>PdfArray</CODE>, it is cast down and returned as such.
      * Otherwise <CODE>null</CODE> is returned.
-     *     
+     *
      * @param key A <CODE>PdfName</CODE>
      * @return the associated <CODE>PdfArray</CODE> object,
      *   or <CODE>null</CODE>
      */
-    public PdfArray getAsArray(PdfName key) {
+    public PdfArray getAsArray(final PdfName key) {
         PdfArray array = null;
-        PdfObject orig = getDirectObject(key);
-        if (orig != null && orig.isArray())
-            array = (PdfArray) orig;
+        final PdfObject orig = getDirectObject(key);
+        if (orig != null && orig.isArray()) {
+			array = (PdfArray) orig;
+		}
         return array;
     }
-    
-    /**
-     * Returns a <CODE>PdfObject</CODE> as a <CODE>PdfStream</CODE>,
-     * resolving indirect references.
-     * 
-     * The object associated with the <CODE>PdfName</CODE> given is retrieved
-     * and resolved to a direct object.
-     * If it is a <CODE>PdfStream</CODE>, it is cast down and returned as such.
-     * Otherwise <CODE>null</CODE> is returned.
-     *     
-     * @param key A <CODE>PdfName</CODE>
-     * @return the associated <CODE>PdfStream</CODE> object,
-     *   or <CODE>null</CODE>
-     */
-    public PdfStream getAsStream(PdfName key) {
-        PdfStream stream = null;
-        PdfObject orig = getDirectObject(key);
-        if (orig != null && orig.isStream())
-            stream = (PdfStream) orig;
-        return stream;
-    }
-    
+
+
+
     /**
      * Returns a <CODE>PdfObject</CODE> as a <CODE>PdfString</CODE>,
      * resolving indirect references.
-     * 
+     *
      * The object associated with the <CODE>PdfName</CODE> given is retrieved
      * and resolved to a direct object.
      * If it is a <CODE>PdfString</CODE>, it is cast down and returned as such.
      * Otherwise <CODE>null</CODE> is returned.
-     *     
+     *
      * @param key A <CODE>PdfName</CODE>
      * @return the associated <CODE>PdfString</CODE> object,
      *   or <CODE>null</CODE>
      */
-    public PdfString getAsString(PdfName key) {
+    public PdfString getAsString(final PdfName key) {
         PdfString string = null;
-        PdfObject orig = getDirectObject(key);
-        if (orig != null && orig.isString())
-            string = (PdfString) orig;
+        final PdfObject orig = getDirectObject(key);
+        if (orig != null && orig.isString()) {
+			string = (PdfString) orig;
+		}
         return string;
     }
-    
+
     /**
      * Returns a <CODE>PdfObject</CODE> as a <CODE>PdfNumber</CODE>,
      * resolving indirect references.
-     * 
+     *
      * The object associated with the <CODE>PdfName</CODE> given is retrieved
      * and resolved to a direct object.
      * If it is a <CODE>PdfNumber</CODE>, it is cast down and returned as such.
      * Otherwise <CODE>null</CODE> is returned.
-     *     
+     *
      * @param key A <CODE>PdfName</CODE>
      * @return the associated <CODE>PdfNumber</CODE> object,
      *   or <CODE>null</CODE>
      */
-    public PdfNumber getAsNumber(PdfName key) {
+    public PdfNumber getAsNumber(final PdfName key) {
         PdfNumber number = null;
-        PdfObject orig = getDirectObject(key);
-        if (orig != null && orig.isNumber())
-            number = (PdfNumber) orig;
+        final PdfObject orig = getDirectObject(key);
+        if (orig != null && orig.isNumber()) {
+			number = (PdfNumber) orig;
+		}
         return number;
     }
-    
+
     /**
      * Returns a <CODE>PdfObject</CODE> as a <CODE>PdfName</CODE>,
      * resolving indirect references.
-     * 
+     *
      * The object associated with the <CODE>PdfName</CODE> given is retrieved
      * and resolved to a direct object.
      * If it is a <CODE>PdfName</CODE>, it is cast down and returned as such.
      * Otherwise <CODE>null</CODE> is returned.
-     *     
+     *
      * @param key A <CODE>PdfName</CODE>
      * @return the associated <CODE>PdfName</CODE> object,
      *   or <CODE>null</CODE>
      */
-    public PdfName getAsName(PdfName key) {
+    public PdfName getAsName(final PdfName key) {
         PdfName name = null;
-        PdfObject orig = getDirectObject(key);
-        if (orig != null && orig.isName())
-            name = (PdfName) orig;
+        final PdfObject orig = getDirectObject(key);
+        if (orig != null && orig.isName()) {
+			name = (PdfName) orig;
+		}
         return name;
     }
-    
+
     /**
      * Returns a <CODE>PdfObject</CODE> as a <CODE>PdfBoolean</CODE>,
      * resolving indirect references.
-     * 
+     *
      * The object associated with the <CODE>PdfName</CODE> given is retrieved
      * and resolved to a direct object.
      * If it is a <CODE>PdfBoolean</CODE>, it is cast down and returned as such.
      * Otherwise <CODE>null</CODE> is returned.
-     *     
+     *
      * @param key A <CODE>PdfName</CODE>
      * @return the associated <CODE>PdfBoolean</CODE> object,
      *   or <CODE>null</CODE>
      */
-    public PdfBoolean getAsBoolean(PdfName key) {
+    PdfBoolean getAsBoolean(final PdfName key) {
         PdfBoolean bool = null;
-        PdfObject orig = getDirectObject(key);
-        if (orig != null && orig.isBoolean())
-            bool = (PdfBoolean)orig;
+        final PdfObject orig = getDirectObject(key);
+        if (orig != null && orig.isBoolean()) {
+			bool = (PdfBoolean)orig;
+		}
         return bool;
     }
-    
+
     /**
      * Returns a <CODE>PdfObject</CODE> as a <CODE>PdfIndirectReference</CODE>.
-     * 
+     *
      * The object associated with the <CODE>PdfName</CODE> given is retrieved
      * If it is a <CODE>PdfIndirectReference</CODE>, it is cast down and returned
      * as such. Otherwise <CODE>null</CODE> is returned.
-     *     
+     *
      * @param key A <CODE>PdfName</CODE>
      * @return the associated <CODE>PdfIndirectReference</CODE> object,
      *   or <CODE>null</CODE>
      */
-    public PdfIndirectReference getAsIndirectObject(PdfName key) {
+    PdfIndirectReference getAsIndirectObject(final PdfName key) {
         PdfIndirectReference ref = null;
-        PdfObject orig = get(key); // not getDirect this time.
-        if (orig != null && orig.isIndirect())
-            ref = (PdfIndirectReference) orig;
+        final PdfObject orig = get(key); // not getDirect this time.
+        if (orig != null && orig.isIndirect()) {
+			ref = (PdfIndirectReference) orig;
+		}
         return ref;
     }
 }

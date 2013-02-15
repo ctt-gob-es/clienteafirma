@@ -69,31 +69,31 @@ public class Utilities {
 
 	/**
 	 * Gets the keys of a Hashtable
-	 * 
+	 *
 	 * @param table
 	 *            a Hashtable
 	 * @return the keyset of a Hashtable (or an empty set if table is null)
 	 */
-	public static Set getKeySet(Hashtable table) {
-		return (table == null) ? Collections.EMPTY_SET : table.keySet();
+	static Set getKeySet(final Hashtable table) {
+		return table == null ? Collections.EMPTY_SET : table.keySet();
 	}
 
 	/**
 	 * Utility method to extend an array.
-	 * 
+	 *
 	 * @param original
 	 *            the original array or <CODE>null</CODE>
 	 * @param item
 	 *            the item to be added to the array
 	 * @return a new array with the item appended
 	 */
-	public static Object[][] addToArray(Object original[][], Object item[]) {
+	public static Object[][] addToArray(Object original[][], final Object item[]) {
 		if (original == null) {
 			original = new Object[1][];
 			original[0] = item;
 			return original;
 		} else {
-			Object original2[][] = new Object[original.length + 1][];
+			final Object original2[][] = new Object[original.length + 1][];
 			System.arraycopy(original, 0, original2, 0, original.length);
 			original2[original.length] = item;
 			return original2;
@@ -106,7 +106,7 @@ public class Utilities {
 	 * @param key
 	 * @return a true/false value of a key in a Properties object
 	 */
-	public static boolean checkTrueOrFalse(Properties attributes, String key) {
+	public static boolean checkTrueOrFalse(final Properties attributes, final String key) {
 		return "true".equalsIgnoreCase(attributes.getProperty(key));
 	}
 
@@ -114,28 +114,28 @@ public class Utilities {
 	 * Unescapes an URL. All the "%xx" are replaced by the 'xx' hex char value.
 	 * @param src the url to unescape
 	 * @return the unescaped value
-	 */    
-	public static String unEscapeURL(String src) {
-	    StringBuffer bf = new StringBuffer();
-	    char[] s = src.toCharArray();
+	 */
+	static String unEscapeURL(final String src) {
+	    final StringBuffer bf = new StringBuffer();
+	    final char[] s = src.toCharArray();
 	    for (int k = 0; k < s.length; ++k) {
-	        char c = s[k];
+	        final char c = s[k];
 	        if (c == '%') {
 	            if (k + 2 >= s.length) {
 	                bf.append(c);
 	                continue;
 	            }
-	            int a0 = PRTokeniser.getHex(s[k + 1]);
-	            int a1 = PRTokeniser.getHex(s[k + 2]);
+	            final int a0 = PRTokeniser.getHex(s[k + 1]);
+	            final int a1 = PRTokeniser.getHex(s[k + 2]);
 	            if (a0 < 0 || a1 < 0) {
 	                bf.append(c);
 	                continue;
 	            }
 	            bf.append((char)(a0 * 16 + a1));
 	            k += 2;
-	        }
-	        else
-	            bf.append(c);
+	        } else {
+				bf.append(c);
+			}
 	    }
 	    return bf.toString();
 	}
@@ -145,17 +145,17 @@ public class Utilities {
 	 * <P>
 	 * This method makes the conversion of this library from the JAVA 2 platform
 	 * to a JDK1.1.x-version easier.
-	 * 
+	 *
 	 * @param filename
 	 *            a given filename
 	 * @return a valid URL
 	 * @throws MalformedURLException
 	 */
-	public static URL toURL(String filename) throws MalformedURLException {
+	static URL toURL(final String filename) throws MalformedURLException {
         try {
             return new URL(filename);
         }
-        catch (Exception e) {
+        catch (final Exception e) {
             return new File(filename).toURI().toURL();
         }
 	}
@@ -164,31 +164,22 @@ public class Utilities {
 	 * This method is an alternative for the <CODE>InputStream.skip()</CODE>
 	 * -method that doesn't seem to work properly for big values of <CODE>size
 	 * </CODE>.
-	 * 
+	 *
 	 * @param is
 	 *            the <CODE>InputStream</CODE>
 	 * @param size
 	 *            the number of bytes to skip
 	 * @throws IOException
 	 */
-	static public void skip(InputStream is, int size) throws IOException {
+	static public void skip(final InputStream is, int size) throws IOException {
 	    long n;
 		while (size > 0) {
 	        n = is.skip(size);
-	        if (n <= 0)
-	            break;
+	        if (n <= 0) {
+				break;
+			}
 			size -= n;
 		}
-	}
-	
-	/**
-	 * Measurement conversion from millimeters to points.
-	 * @param	value	a value in millimeters
-	 * @return	a value in points
-	 * @since	2.1.2
-	 */
-	public static final float millimetersToPoints(float value) {
-	    return inchesToPoints(millimetersToInches(value));
 	}
 
 	/**
@@ -197,18 +188,8 @@ public class Utilities {
 	 * @return	a value in inches
 	 * @since	2.1.2
 	 */
-	public static final float millimetersToInches(float value) {
+	private static final float millimetersToInches(final float value) {
 	    return value / 25.4f;
-	}
-
-	/**
-	 * Measurement conversion from points to millimeters.
-	 * @param	value	a value in points
-	 * @return	a value in millimeters
-	 * @since	2.1.2
-	 */
-	public static final float pointsToMillimeters(float value) {
-	    return inchesToMillimeters(pointsToInches(value));
 	}
 
 	/**
@@ -217,7 +198,7 @@ public class Utilities {
 	 * @return	a value in inches
 	 * @since	2.1.2
 	 */
-	public static final float pointsToInches(float value) {
+	private static final float pointsToInches(final float value) {
 	    return value / 72f;
 	}
 
@@ -227,7 +208,7 @@ public class Utilities {
 	 * @return	a value in millimeters
 	 * @since	2.1.2
 	 */
-	public static final float inchesToMillimeters(float value) {
+	private static final float inchesToMillimeters(final float value) {
 	    return value * 25.4f;
 	}
 
@@ -237,10 +218,10 @@ public class Utilities {
 	 * @return	a value in points
 	 * @since	2.1.2
 	 */
-	public static final float inchesToPoints(float value) {
+	private static final float inchesToPoints(final float value) {
 	    return value * 72f;
 	}
-    
+
     /**
      * Check if the value of a character belongs to a certain interval
      * that indicates it's the higher part of a surrogate pair.
@@ -248,7 +229,7 @@ public class Utilities {
      * @return	true if the character belongs to the interval
      * @since	2.1.2
      */
-    public static boolean isSurrogateHigh(char c) {
+    public static boolean isSurrogateHigh(final char c) {
         return c >= '\ud800' && c <= '\udbff';
     }
 
@@ -259,7 +240,7 @@ public class Utilities {
      * @return	true if the character belongs to the interval
      * @since	2.1.2
      */
-    public static boolean isSurrogateLow(char c) {
+    private static boolean isSurrogateLow(final char c) {
         return c >= '\udc00' && c <= '\udfff';
     }
 
@@ -272,9 +253,10 @@ public class Utilities {
      * @return	true if the characters are surrogate pairs
      * @since	2.1.2
      */
-    public static boolean isSurrogatePair(String text, int idx) {
-        if (idx < 0 || idx > text.length() - 2)
-            return false;
+    public static boolean isSurrogatePair(final String text, final int idx) {
+        if (idx < 0 || idx > text.length() - 2) {
+			return false;
+		}
         return isSurrogateHigh(text.charAt(idx)) && isSurrogateLow(text.charAt(idx + 1));
     }
 
@@ -287,9 +269,10 @@ public class Utilities {
      * @return	true if the characters are surrogate pairs
      * @since	2.1.2
      */
-    public static boolean isSurrogatePair(char[] text, int idx) {
-        if (idx < 0 || idx > text.length - 2)
-            return false;
+    public static boolean isSurrogatePair(final char[] text, final int idx) {
+        if (idx < 0 || idx > text.length - 2) {
+			return false;
+		}
         return isSurrogateHigh(text[idx]) && isSurrogateLow(text[idx + 1]);
     }
 
@@ -301,8 +284,8 @@ public class Utilities {
      * @return	a code point value
      * @since	2.1.2
      */
-    public static int convertToUtf32(char highSurrogate, char lowSurrogate) {
-         return (((highSurrogate - 0xd800) * 0x400) + (lowSurrogate - 0xdc00)) + 0x10000;
+    public static int convertToUtf32(final char highSurrogate, final char lowSurrogate) {
+         return (highSurrogate - 0xd800) * 0x400 + lowSurrogate - 0xdc00 + 0x10000;
     }
 
     /**
@@ -312,8 +295,8 @@ public class Utilities {
      * @return	the code point value
      * @since	2.1.2
      */
-    public static int convertToUtf32(char[] text, int idx) {
-         return (((text[idx] - 0xd800) * 0x400) + (text[idx + 1] - 0xdc00)) + 0x10000;
+    public static int convertToUtf32(final char[] text, final int idx) {
+         return (text[idx] - 0xd800) * 0x400 + text[idx + 1] - 0xdc00 + 0x10000;
     }
 
     /**
@@ -323,20 +306,8 @@ public class Utilities {
      * @return	the codepoint value
      * @since	2.1.2
      */
-    public static int convertToUtf32(String text, int idx) {
-         return (((text.charAt(idx) - 0xd800) * 0x400) + (text.charAt(idx + 1) - 0xdc00)) + 0x10000;
+    public static int convertToUtf32(final String text, final int idx) {
+         return (text.charAt(idx) - 0xd800) * 0x400 + text.charAt(idx + 1) - 0xdc00 + 0x10000;
     }
 
-    /**
-     * Converts a UTF32 code point value to a String with the corresponding character(s).
-     * @param codePoint	a Unicode value
-     * @return	the corresponding characters in a String
-     * @since	2.1.2
-     */
-    public static String convertFromUtf32(int codePoint) {
-        if (codePoint < 0x10000)
-            return Character.toString((char)codePoint);
-        codePoint -= 0x10000;
-        return new String(new char[]{(char)((codePoint / 0x400) + 0xd800), (char)((codePoint % 0x400) + 0xdc00)});
-    }
 }

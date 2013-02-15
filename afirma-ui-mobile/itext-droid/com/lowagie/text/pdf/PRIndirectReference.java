@@ -52,12 +52,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class PRIndirectReference extends PdfIndirectReference {
-    
-    protected PdfReader reader;
+
+    private final PdfReader reader;
     // membervariables
-    
+
     // constructors
-    
+
 /**
  * Constructs a <CODE>PdfIndirectReference</CODE>.
  *
@@ -65,37 +65,38 @@ public class PRIndirectReference extends PdfIndirectReference {
  * @param		number			the object number.
  * @param		generation		the generation number.
  */
-    
-    PRIndirectReference(PdfReader reader, int number, int generation) {
-        type = INDIRECT;
+
+    PRIndirectReference(final PdfReader reader, final int number, final int generation) {
+        this.type = INDIRECT;
         this.number = number;
         this.generation = generation;
         this.reader = reader;
     }
-    
+
 /**
  * Constructs a <CODE>PdfIndirectReference</CODE>.
  *
  * @param		reader			a <CODE>PdfReader</CODE>
  * @param		number			the object number.
  */
-    
-    PRIndirectReference(PdfReader reader, int number) {
+
+    PRIndirectReference(final PdfReader reader, final int number) {
         this(reader, number, 0);
     }
-    
+
     // methods
-    
-    public void toPdf(PdfWriter writer, OutputStream os) throws IOException {
-        int n = writer.getNewObjectNumber(reader, number, generation);
+
+    @Override
+	public void toPdf(final PdfWriter writer, final OutputStream os) throws IOException {
+        final int n = writer.getNewObjectNumber(this.reader, this.number, this.generation);
         os.write(PdfEncodings.convertToBytes(new StringBuffer().append(n).append(" 0 R").toString(), null));
     }
 
     public PdfReader getReader() {
-        return reader;
+        return this.reader;
     }
-    
-    public void setNumber(int number, int generation) {
+
+    void setNumber(final int number, final int generation) {
         this.number = number;
         this.generation = generation;
     }

@@ -125,9 +125,9 @@ import org.bouncycastle.asn1.x509.TBSCertificateStructure;
 /**
  * @author Aiken Sam (aikensam@ieee.org)
  */
-public class PdfPublicKeySecurityHandler {
+class PdfPublicKeySecurityHandler {
 
-    static final int SEED_LENGTH = 20;
+    private static final int SEED_LENGTH = 20;
 
     private ArrayList recipients = null;
 
@@ -153,53 +153,9 @@ public class PdfPublicKeySecurityHandler {
      * It should be moved to PdfContentByte.
      */
 
-    static public byte[] unescapedString(final byte[] bytes) throws BadPdfFormatException {
-        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        int index = 0;
 
-        if (bytes[0] != '(' && bytes[bytes.length-1] != ')') {
-			throw new BadPdfFormatException("Expect '(' and ')' at begin and end of the string.");
-		}
-
-        while (index < bytes.length) {
-            if (bytes[index] == '\\') {
-                index++;
-                switch (bytes[index]) {
-                case 'b':
-                    baos.write('\b');
-                    break;
-                case 'f':
-                    baos.write('\f');
-                    break;
-                case 't':
-                    baos.write('\t');
-                    break;
-                case 'n':
-                    baos.write('\n');
-                    break;
-                case 'r':
-                    baos.write('\r');
-                    break;
-                case '(':
-                        baos.write('(');
-                        break;
-                case ')':
-                        baos.write(')');
-                        break;
-                case '\\':
-                    baos.write('\\');
-                    break;
-                }
-            } else {
-				baos.write(bytes[index]);
-			}
-            index++;
-        }
-        return baos.toByteArray();
-    }
-
-    public void addRecipient(final PdfPublicKeyRecipient recipient) {
+    void addRecipient(final PdfPublicKeyRecipient recipient) {
         this.recipients.add(recipient);
     }
 
@@ -310,7 +266,7 @@ public class PdfPublicKeySecurityHandler {
         return contentinfo.toASN1Primitive();
     }
 
-    private static KeyTransRecipientInfo computeRecipientInfo(final X509Certificate x509certificate, final byte[] abyte0)
+    private KeyTransRecipientInfo computeRecipientInfo(final X509Certificate x509certificate, final byte[] abyte0)
         throws GeneralSecurityException, IOException
     {
         final ASN1InputStream asn1inputstream =

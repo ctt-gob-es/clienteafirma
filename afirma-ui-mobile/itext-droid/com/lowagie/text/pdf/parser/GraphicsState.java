@@ -52,7 +52,7 @@ import com.lowagie.text.pdf.CMapAwareDocumentFont;
  * Keeps all the parameters of the graphics state.
  * @since	2.1.4
  */
-public class GraphicsState {
+class GraphicsState {
     /** The current transformation matrix. */
     Matrix ctm;
     /** The current character spacing. */
@@ -72,40 +72,40 @@ public class GraphicsState {
     /** The current text rise */
     float rise;
     /** The current knockout value. */
-    boolean knockout;
-    
+    private final boolean knockout;
+
     /**
      * Constructs a new Graphics State object with the default values.
      */
     public GraphicsState(){
-        ctm = new Matrix();
-        characterSpacing = 0;
-        wordSpacing = 0;
-        horizontalScaling = 1.0f;
-        leading = 0;
-        font = null;
-        fontSize = 0;
-        renderMode = 0;
-        rise = 0;
-        knockout = true;
+        this.ctm = new Matrix();
+        this.characterSpacing = 0;
+        this.wordSpacing = 0;
+        this.horizontalScaling = 1.0f;
+        this.leading = 0;
+        this.font = null;
+        this.fontSize = 0;
+        this.renderMode = 0;
+        this.rise = 0;
+        this.knockout = true;
     }
-    
+
     /**
      * Copy constructor.
      * @param source	another GraphicsState object
      */
-    public GraphicsState(GraphicsState source){
+    public GraphicsState(final GraphicsState source){
         // note: all of the following are immutable, with the possible exception of font
         // so it is safe to copy them as-is
-        ctm = source.ctm;
-        characterSpacing = source.characterSpacing;
-        wordSpacing = source.wordSpacing;
-        horizontalScaling = source.horizontalScaling;
-        leading = source.leading;
-        font = source.font;
-        fontSize = source.fontSize;
-        renderMode = source.renderMode;
-        rise = source.rise;
-        knockout = source.knockout;
+        this.ctm = source.ctm;
+        this.characterSpacing = source.characterSpacing;
+        this.wordSpacing = source.wordSpacing;
+        this.horizontalScaling = source.horizontalScaling;
+        this.leading = source.leading;
+        this.font = source.font;
+        this.fontSize = source.fontSize;
+        this.renderMode = source.renderMode;
+        this.rise = source.rise;
+        this.knockout = source.knockout;
     }
 }

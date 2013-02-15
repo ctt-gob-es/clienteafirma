@@ -49,42 +49,43 @@
 
 package com.lowagie.text.pdf.codec.wmf;
 import harmony.java.awt.Color;
+
 import java.io.IOException;
 
-public class MetaPen extends MetaObject {
+class MetaPen extends MetaObject {
 
-    public static final int PS_SOLID = 0;
-    public static final int PS_DASH = 1;
+    private static final int PS_SOLID = 0;
+    static final int PS_DASH = 1;
     public static final int PS_DOT = 2;
-    public static final int PS_DASHDOT = 3;
-    public static final int PS_DASHDOTDOT = 4;
-    public static final int PS_NULL = 5;
-    public static final int PS_INSIDEFRAME = 6;
+    static final int PS_DASHDOT = 3;
+    static final int PS_DASHDOTDOT = 4;
+    static final int PS_NULL = 5;
 
-    int style = PS_SOLID;
-    int penWidth = 1;
-    Color color = Color.black;
+
+    private int style = PS_SOLID;
+    private int penWidth = 1;
+    private Color color = Color.black;
 
     public MetaPen() {
-        type = META_PEN;
+        this.type = META_PEN;
     }
 
-    public void init(InputMeta in) throws IOException {
-        style = in.readWord();
-        penWidth = in.readShort();
+    public void init(final InputMeta in) throws IOException {
+        this.style = in.readWord();
+        this.penWidth = in.readShort();
         in.readWord();
-        color = in.readColor();
+        this.color = in.readColor();
     }
-    
+
     public int getStyle() {
-        return style;
+        return this.style;
     }
-    
+
     public int getPenWidth() {
-        return penWidth;
+        return this.penWidth;
     }
-    
+
     public Color getColor() {
-        return color;
+        return this.color;
     }
 }

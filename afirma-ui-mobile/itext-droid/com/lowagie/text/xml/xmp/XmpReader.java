@@ -72,26 +72,26 @@ import com.lowagie.text.xml.XmlDomWriter;
 public class XmpReader {
 
     private Document domDocument;
-    
+
     /**
      * Constructs an XMP reader
      * @param	bytes	the XMP content
-     * @throws ExceptionConverter 
-     * @throws IOException 
-     * @throws SAXException 
+     * @throws ExceptionConverter
+     * @throws IOException
+     * @throws SAXException
      */
-	public XmpReader(byte[] bytes) throws SAXException, IOException {
+	public XmpReader(final byte[] bytes) throws SAXException, IOException {
 		try {
-	        DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
+	        final DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
 	        fact.setNamespaceAware(true);
-			DocumentBuilder db = fact.newDocumentBuilder();
-	        ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-	        domDocument = db.parse(bais);
-		} catch (ParserConfigurationException e) {
+			final DocumentBuilder db = fact.newDocumentBuilder();
+	        final ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+	        this.domDocument = db.parse(bais);
+		} catch (final ParserConfigurationException e) {
 			throw new ExceptionConverter(e);
 		}
 	}
-	
+
 	/**
 	 * Replaces the content of a tag.
 	 * @param	namespaceURI	the URI of the namespace
@@ -100,18 +100,19 @@ public class XmpReader {
 	 * @return	true if the content was successfully replaced
 	 * @since	2.1.6 the return type has changed from void to boolean
 	 */
-	public boolean replace(String namespaceURI, String localName, String value) {
-		NodeList nodes = domDocument.getElementsByTagNameNS(namespaceURI, localName);
+	public boolean replace(final String namespaceURI, final String localName, final String value) {
+		final NodeList nodes = this.domDocument.getElementsByTagNameNS(namespaceURI, localName);
 		Node node;
-		if (nodes.getLength() == 0)
+		if (nodes.getLength() == 0) {
 			return false;
+		}
 		for (int i = 0; i < nodes.getLength(); i++) {
 			node = nodes.item(i);
-			setNodeText(domDocument, node, value);
+			setNodeText(this.domDocument, node, value);
 		}
 		return true;
-	}    
-	
+	}
+
 	/**
 	 * Adds a tag.
 	 * @param	namespaceURI	the URI of the namespace
@@ -121,20 +122,21 @@ public class XmpReader {
 	 * @return	true if the content was successfully added
 	 * @since	2.1.6
 	 */
-	public boolean add(String parent, String namespaceURI, String localName, String value) {
-		NodeList nodes = domDocument.getElementsByTagName(parent);
-		if (nodes.getLength() == 0)
+	public boolean add(final String parent, final String namespaceURI, final String localName, final String value) {
+		final NodeList nodes = this.domDocument.getElementsByTagName(parent);
+		if (nodes.getLength() == 0) {
 			return false;
+		}
 		Node pNode;
 		Node node;
 		for (int i = 0; i < nodes.getLength(); i++) {
 			pNode = nodes.item(i);
-			NamedNodeMap attrs = pNode.getAttributes();
+			final NamedNodeMap attrs = pNode.getAttributes();
 			for (int j = 0; j < attrs.getLength(); j++) {
 				node = attrs.item(j);
 				if (namespaceURI.equals(node.getNodeValue())) {
-					node = domDocument.createElement(localName);
-					node.appendChild(domDocument.createTextNode(value));
+					node = this.domDocument.createElement(localName);
+					node.appendChild(this.domDocument.createTextNode(value));
 					pNode.appendChild(node);
 					return true;
 				}
@@ -142,7 +144,7 @@ public class XmpReader {
 		}
 		return false;
 	}
-	
+
     /**
      * Sets the text of this node. All the child's node are deleted and a new
      * child text node is created.
@@ -150,9 +152,10 @@ public class XmpReader {
      * @param n the <CODE>Node</CODE> to add the text to
      * @param value the text to add
      */
-    public boolean setNodeText(Document domDocument, Node n, String value) {
-        if (n == null)
-            return false;
+    private boolean setNodeText(final Document domDocument, final Node n, final String value) {
+        if (n == null) {
+			return false;
+		}
         Node nc = null;
         while ((nc = n.getFirstChild()) != null) {
             n.removeChild(nc);
@@ -160,17 +163,17 @@ public class XmpReader {
         n.appendChild(domDocument.createTextNode(value));
         return true;
     }
-	
+
     /**
      * Writes the document to a byte array.
      */
 	public byte[] serializeDoc() throws IOException {
-		XmlDomWriter xw = new XmlDomWriter();
-        ByteArrayOutputStream fout = new ByteArrayOutputStream();
+		final XmlDomWriter xw = new XmlDomWriter();
+        final ByteArrayOutputStream fout = new ByteArrayOutputStream();
         xw.setOutput(fout, null);
         fout.write(XmpWriter.XPACKET_PI_BEGIN.getBytes("UTF-8"));
         fout.flush();
-        NodeList xmpmeta = domDocument.getElementsByTagName("x:xmpmeta");
+        final NodeList xmpmeta = this.domDocument.getElementsByTagName("x:xmpmeta");
         xw.write(xmpmeta.item(0));
         fout.flush();
 		for (int i = 0; i < 20; i++) {

@@ -58,18 +58,18 @@ package com.lowagie.text.pdf;
  * @see		PdfObject
  */
 
-public class PdfNull extends PdfObject {
-    
+class PdfNull extends PdfObject {
+
     // CLASS CONSTANTS
-    
+
     /** An instance of the <CODE>PdfNull</CODE>-object. */
-    public static final PdfNull	PDFNULL = new PdfNull();
-    
+    static final PdfNull	PDFNULL = new PdfNull();
+
     /** The content of the <CODE>PdfNull</CODE>-object. */
     private static final String CONTENT = "null";
-    
+
     // CONSTRUCTOR
-    
+
     /**
      * Constructs a <CODE>PdfNull</CODE>-object.
      * <P>
@@ -78,10 +78,11 @@ public class PdfNull extends PdfObject {
     public PdfNull() {
         super(NULL, CONTENT);
     }
-    
+
     // CLASS METHOD
-    
-    public String toString() {
+
+    @Override
+	public String toString() {
     	return "null";
     }
 }

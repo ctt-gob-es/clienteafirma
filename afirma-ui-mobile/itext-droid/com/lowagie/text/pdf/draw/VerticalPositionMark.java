@@ -52,9 +52,7 @@ package com.lowagie.text.pdf.draw;
 import java.util.ArrayList;
 
 import com.lowagie.text.Chunk;
-import com.lowagie.text.DocumentException;
 import com.lowagie.text.Element;
-import com.lowagie.text.ElementListener;
 import com.lowagie.text.pdf.PdfContentByte;
 
 /**
@@ -64,78 +62,65 @@ import com.lowagie.text.pdf.PdfContentByte;
  * @since	2.1.2
  */
 
-public class VerticalPositionMark implements DrawInterface, Element {
+class VerticalPositionMark implements DrawInterface, Element {
 
     /** Another implementation of the DrawInterface; its draw method will overrule LineSeparator.draw(). */
-    protected DrawInterface drawInterface = null;
+    private DrawInterface drawInterface = null;
 
     /** The offset for the line. */
     protected float offset = 0;
-	
-	/**
-	 * Creates a vertical position mark that won't draw anything unless
-	 * you define a DrawInterface.
-	 */
-	public VerticalPositionMark() {	
-	}
 
 	/**
 	 * Creates a vertical position mark that won't draw anything unless
 	 * you define a DrawInterface.
-	 * @param	drawInterface	the drawInterface for this vertical position mark.
-	 * @param	offset			the offset for this vertical position mark.
 	 */
-	public VerticalPositionMark(DrawInterface drawInterface, float offset) {
-		this.drawInterface = drawInterface;
-		this.offset = offset;
+	public VerticalPositionMark() {
 	}
-	
+
+
+
 	/**
 	 * @see com.lowagie.text.pdf.draw.DrawInterface#draw(com.lowagie.text.pdf.PdfContentByte, float, float, float, float, float)
 	 */
-	public void draw(PdfContentByte canvas, float llx, float lly, float urx, float ury, float y) {
-		if (drawInterface != null) {
-			drawInterface.draw(canvas, llx, lly, urx, ury, y + offset);
+	@Override
+	public void draw(final PdfContentByte canvas, final float llx, final float lly, final float urx, final float ury, final float y) {
+		if (this.drawInterface != null) {
+			this.drawInterface.draw(canvas, llx, lly, urx, ury, y + this.offset);
 		}
 	}
-	
-    /**
-     * @see com.lowagie.text.Element#process(com.lowagie.text.ElementListener)
-     */
-    public boolean process(ElementListener listener) {
-		try {
-			return listener.add(this);
-		} catch (DocumentException e) {
-			return false;
-		}
-    }
+
+
 
     /**
      * @see com.lowagie.text.Element#type()
      */
-    public int type() {
+    @Override
+	public int type() {
         return Element.YMARK;
     }
 
     /**
      * @see com.lowagie.text.Element#isContent()
      */
-    public boolean isContent() {
+    @Override
+	public boolean isContent() {
         return true;
     }
 
     /**
      * @see com.lowagie.text.Element#isNestable()
      */
-    public boolean isNestable() {
+    @Override
+	public boolean isNestable() {
         return false;
     }
 
     /**
      * @see com.lowagie.text.Element#getChunks()
      */
-    public ArrayList getChunks() {
-    	ArrayList list = new ArrayList();
+    @Override
+	public ArrayList getChunks() {
+    	final ArrayList list = new ArrayList();
     	list.add(new Chunk(this, true));
         return list;
     }
@@ -145,14 +130,14 @@ public class VerticalPositionMark implements DrawInterface, Element {
      * @return	a DrawInterface implementation
      */
     public DrawInterface getDrawInterface() {
-        return drawInterface;
+        return this.drawInterface;
     }
 
     /**
      * Setter for the interface with the overruling draw() method.
      * @param drawInterface a DrawInterface implementation
      */
-    public void setDrawInterface(DrawInterface drawInterface) {
+    public void setDrawInterface(final DrawInterface drawInterface) {
         this.drawInterface = drawInterface;
     }
 
@@ -161,7 +146,7 @@ public class VerticalPositionMark implements DrawInterface, Element {
      * @return	an offset
      */
     public float getOffset() {
-        return offset;
+        return this.offset;
     }
 
     /**
@@ -170,7 +155,7 @@ public class VerticalPositionMark implements DrawInterface, Element {
      * choose a negative offset.
      * @param offset	an offset
      */
-    public void setOffset(float offset) {
+    public void setOffset(final float offset) {
         this.offset = offset;
     }
 }

@@ -1,6 +1,6 @@
 /*
  * Copyright 2002 by Phillip Pan
- * 
+ *
  * The contents of this file are subject to the Mozilla Public License Version 1.1
  * (the "License"); you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at http://www.mozilla.org/MPL/
@@ -54,15 +54,9 @@ import com.lowagie.text.ExceptionConverter;
  * @see		PdfStream
  */
 
-public class PdfPattern extends PdfStream {
-    
-	/**
-	 * Creates a PdfPattern object.
-	 * @param	painter	a pattern painter instance
-	 */
-	PdfPattern(PdfPatternPainter painter) {
-		this(painter, DEFAULT_COMPRESSION);
-	}
+class PdfPattern extends PdfStream {
+
+
 
 	/**
 	 * Creates a PdfPattern object.
@@ -70,10 +64,10 @@ public class PdfPattern extends PdfStream {
 	 * @param	compressionLevel the compressionLevel for the stream
 	 * @since	2.1.3
 	 */
-    PdfPattern(PdfPatternPainter painter, int compressionLevel) {
+    PdfPattern(final PdfPatternPainter painter, final int compressionLevel) {
         super();
-        PdfNumber one = new PdfNumber(1);
-        PdfArray matrix = painter.getMatrix();
+        final PdfNumber one = new PdfNumber(1);
+        final PdfArray matrix = painter.getMatrix();
         if ( matrix != null ) {
             put(PdfName.MATRIX, matrix);
         }
@@ -82,17 +76,18 @@ public class PdfPattern extends PdfStream {
         put(PdfName.RESOURCES, painter.getResources());
         put(PdfName.TILINGTYPE, one);
         put(PdfName.PATTERNTYPE, one);
-        if (painter.isStencil())
-            put(PdfName.PAINTTYPE, new PdfNumber(2));
-        else
-            put(PdfName.PAINTTYPE, one);
+        if (painter.isStencil()) {
+			put(PdfName.PAINTTYPE, new PdfNumber(2));
+		} else {
+			put(PdfName.PAINTTYPE, one);
+		}
         put(PdfName.XSTEP, new PdfNumber(painter.getXStep()));
         put(PdfName.YSTEP, new PdfNumber(painter.getYStep()));
-        bytes = painter.toPdf(null);
-        put(PdfName.LENGTH, new PdfNumber(bytes.length));
+        this.bytes = painter.toPdf(null);
+        put(PdfName.LENGTH, new PdfNumber(this.bytes.length));
         try {
             flateCompress(compressionLevel);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new ExceptionConverter(e);
         }
     }

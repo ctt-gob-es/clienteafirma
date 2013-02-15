@@ -62,11 +62,9 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.CRL;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateParsingException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -102,8 +100,6 @@ import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.ocsp.BasicOCSPResponse;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.asn1.tsp.MessageImprint;
-import org.bouncycastle.asn1.x509.X509Extensions;
 import org.bouncycastle.jce.provider.X509CRLParser;
 import org.bouncycastle.jce.provider.X509CertParser;
 import org.bouncycastle.ocsp.BasicOCSPResp;
@@ -246,7 +242,7 @@ public class PdfPKCS7 {
      * @return	a digest name (for instance "MD5")
      * @since	2.1.6
      */
-    public static String getDigest(final String oid) {
+    private static String getDigest(final String oid) {
         final String ret = (String)digestNames.get(oid);
         if (ret == null) {
 			return oid;
@@ -261,7 +257,7 @@ public class PdfPKCS7 {
      * @return	an algorithm name (for instance "RSA")
      * @since	2.1.6
      */
-    public static String getAlgorithm(final String oid) {
+    private static String getAlgorithm(final String oid) {
         final String ret = (String)algorithmNames.get(oid);
         if (ret == null) {
 			return oid;
@@ -300,7 +296,7 @@ public class PdfPKCS7 {
      * @param certsKey the /Cert key
      * @param provider the provider or <code>null</code> for the default provider
      */
-    public PdfPKCS7(final byte[] contentsKey, final byte[] certsKey, final String provider) {
+    PdfPKCS7(final byte[] contentsKey, final byte[] certsKey, final String provider) {
         try {
             this.provider = provider;
             final X509CertParser cr = new X509CertParser();
@@ -376,7 +372,7 @@ public class PdfPKCS7 {
      * @param contentsKey the /Contents key
      * @param provider the provider or <code>null</code> for the default provider
      */
-    public PdfPKCS7(final byte[] contentsKey, final String provider) {
+    PdfPKCS7(final byte[] contentsKey, final String provider) {
         try {
             this.provider = provider;
             final ASN1InputStream din = new ASN1InputStream(new ByteArrayInputStream(contentsKey));
@@ -545,7 +541,7 @@ public class PdfPKCS7 {
      * @throws NoSuchProviderException on error
      * @throws NoSuchAlgorithmException on error
      */
-    public PdfPKCS7(final PrivateKey privKey, final Certificate[] certChain, final CRL[] crlList,
+    PdfPKCS7(final PrivateKey privKey, final Certificate[] certChain, final CRL[] crlList,
                     final String hashAlgorithm, final String provider, final boolean hasRSAdata)
       throws InvalidKeyException, NoSuchProviderException,
       NoSuchAlgorithmException
@@ -620,7 +616,7 @@ public class PdfPKCS7 {
      * @param len the data length
      * @throws SignatureException on error
      */
-    public void update(final byte[] buf, final int off, final int len) throws SignatureException {
+    void update(final byte[] buf, final int off, final int len) throws SignatureException {
         if (this.RSAdata != null || this.digestAttr != null) {
 			this.messageDigest.update(buf, off, len);
 		} else {
@@ -628,49 +624,9 @@ public class PdfPKCS7 {
 		}
     }
 
-    /**
-     * Verify the digest.
-     * @throws SignatureException on error
-     * @return <CODE>true</CODE> if the signature checks out, <CODE>false</CODE> otherwise
-     */
-    public boolean verify() throws SignatureException {
-        if (this.verified) {
-			return this.verifyResult;
-		}
-        if (this.sigAttr != null) {
-            this.sig.update(this.sigAttr);
-            if (this.RSAdata != null) {
-                final byte msd[] = this.messageDigest.digest();
-                this.messageDigest.update(msd);
-            }
-            this.verifyResult = Arrays.equals(this.messageDigest.digest(), this.digestAttr) && this.sig.verify(this.digest);
-        }
-        else {
-            if (this.RSAdata != null) {
-				this.sig.update(this.messageDigest.digest());
-			}
-            this.verifyResult = this.sig.verify(this.digest);
-        }
-        this.verified = true;
-        return this.verifyResult;
-    }
 
-    /**
-     * Checks if the timestamp refers to this document.
-     * @throws java.security.NoSuchAlgorithmException on error
-     * @return true if it checks false otherwise
-     * @since	2.1.6
-     */
-    public boolean verifyTimestampImprint() throws NoSuchAlgorithmException {
-        if (this.timeStampToken == null) {
-			return false;
-		}
-        final MessageImprint imprint = this.timeStampToken.getTimeStampInfo().toTSTInfo().getMessageImprint();
-        final byte[] md = MessageDigest.getInstance("SHA-1").digest(this.digest);
-        final byte[] imphashed = imprint.getHashedMessage();
-        final boolean res = Arrays.equals(md, imphashed);
-        return res;
-    }
+
+
 
     /**
      * Get all the X.509 certificates associated with this PKCS#7 object in no particular order.
@@ -779,21 +735,14 @@ public class PdfPKCS7 {
         return getDigest(this.digestAlgorithm);
     }
 
-    /**
-     * Loads the default root certificates at &lt;java.home&gt;/lib/security/cacerts
-     * with the default provider.
-     * @return a <CODE>KeyStore</CODE>
-     */
-    public static KeyStore loadCacertsKeyStore() {
-        return loadCacertsKeyStore(null);
-    }
+
 
     /**
      * Loads the default root certificates at &lt;java.home&gt;/lib/security/cacerts.
      * @param provider the provider or <code>null</code> for the default provider
      * @return a <CODE>KeyStore</CODE>
      */
-    public static KeyStore loadCacertsKeyStore(final String provider) {
+    private static KeyStore loadCacertsKeyStore(final String provider) {
         File file = new File(System.getProperty("java.home"), "lib");
         file = new File(file, "security");
         file = new File(file, "cacerts");
@@ -817,201 +766,8 @@ public class PdfPKCS7 {
         }
     }
 
-    /**
-     * Verifies a single certificate.
-     * @param cert the certificate to verify
-     * @param crls the certificate revocation list or <CODE>null</CODE>
-     * @param calendar the date or <CODE>null</CODE> for the current date
-     * @return a <CODE>String</CODE> with the error description or <CODE>null</CODE>
-     * if no error
-     */
-    public static String verifyCertificate(final X509Certificate cert, final Collection crls, Calendar calendar) {
-        if (calendar == null) {
-			calendar = new GregorianCalendar();
-		}
-        if (cert.hasUnsupportedCriticalExtension()) {
-			return "Has unsupported critical extension";
-		}
-        try {
-            cert.checkValidity(calendar.getTime());
-        }
-        catch (final Exception e) {
-            return e.getMessage();
-        }
-        if (crls != null) {
-            for (final Iterator it = crls.iterator(); it.hasNext();) {
-                if (((CRL)it.next()).isRevoked(cert)) {
-					return "Certificate revoked";
-				}
-            }
-        }
-        return null;
-    }
 
-    /**
-     * Verifies a certificate chain against a KeyStore.
-     * @param certs the certificate chain
-     * @param keystore the <CODE>KeyStore</CODE>
-     * @param crls the certificate revocation list or <CODE>null</CODE>
-     * @param calendar the date or <CODE>null</CODE> for the current date
-     * @return <CODE>null</CODE> if the certificate chain could be validated or a
-     * <CODE>Object[]{cert,error}</CODE> where <CODE>cert</CODE> is the
-     * failed certificate and <CODE>error</CODE> is the error message
-     */
-    public static Object[] verifyCertificates(final Certificate certs[], final KeyStore keystore, final Collection crls, Calendar calendar) {
-        if (calendar == null) {
-			calendar = new GregorianCalendar();
-		}
-        for (int k = 0; k < certs.length; ++k) {
-            final X509Certificate cert = (X509Certificate)certs[k];
-            final String err = verifyCertificate(cert, crls, calendar);
-            if (err != null) {
-				return new Object[]{cert, err};
-			}
-            try {
-                for (final Enumeration aliases = keystore.aliases(); aliases.hasMoreElements();) {
-                    try {
-                        final String alias = (String)aliases.nextElement();
-                        if (!keystore.isCertificateEntry(alias)) {
-							continue;
-						}
-                        final X509Certificate certStoreX509 = (X509Certificate)keystore.getCertificate(alias);
-                        if (verifyCertificate(certStoreX509, crls, calendar) != null) {
-							continue;
-						}
-                        try {
-                            cert.verify(certStoreX509.getPublicKey());
-                            return null;
-                        }
-                        catch (final Exception e) {
-                            continue;
-                        }
-                    }
-                    catch (final Exception ex) {
-                    }
-                }
-            }
-            catch (final Exception e) {
-            }
-            int j;
-            for (j = 0; j < certs.length; ++j) {
-                if (j == k) {
-					continue;
-				}
-                final X509Certificate certNext = (X509Certificate)certs[j];
-                try {
-                    cert.verify(certNext.getPublicKey());
-                    break;
-                }
-                catch (final Exception e) {
-                }
-            }
-            if (j == certs.length) {
-				return new Object[]{cert, "Cannot be verified against the KeyStore or the certificate chain"};
-			}
-        }
-        return new Object[]{null, "Invalid state. Possible circular certificate chain"};
-    }
 
-    /**
-     * Verifies an OCSP response against a KeyStore.
-     * @param ocsp the OCSP response
-     * @param keystore the <CODE>KeyStore</CODE>
-     * @param provider the provider or <CODE>null</CODE> to use the BouncyCastle provider
-     * @return <CODE>true</CODE> is a certificate was found
-     * @since	2.1.6
-     */
-    public static boolean verifyOcspCertificates(final BasicOCSPResp ocsp, final KeyStore keystore, String provider) {
-        if (provider == null) {
-			provider = "BC";
-		}
-        try {
-            for (final Enumeration aliases = keystore.aliases(); aliases.hasMoreElements();) {
-                try {
-                    final String alias = (String)aliases.nextElement();
-                    if (!keystore.isCertificateEntry(alias)) {
-						continue;
-					}
-                    final X509Certificate certStoreX509 = (X509Certificate)keystore.getCertificate(alias);
-                    if (ocsp.verify(certStoreX509.getPublicKey(), provider)) {
-						return true;
-					}
-                }
-                catch (final Exception ex) {
-                }
-            }
-        }
-        catch (final Exception e) {
-        }
-        return false;
-    }
-
-    /**
-     * Verifies a timestamp against a KeyStore.
-     * @param ts the timestamp
-     * @param keystore the <CODE>KeyStore</CODE>
-     * @param provider the provider or <CODE>null</CODE> to use the BouncyCastle provider
-     * @return <CODE>true</CODE> is a certificate was found
-     * @since	2.1.6
-     */
-    public static boolean verifyTimestampCertificates(final TimeStampToken ts, final KeyStore keystore, String provider) {
-        if (provider == null) {
-			provider = "BC";
-		}
-        try {
-            for (final Enumeration aliases = keystore.aliases(); aliases.hasMoreElements();) {
-                try {
-                    final String alias = (String)aliases.nextElement();
-                    if (!keystore.isCertificateEntry(alias)) {
-						continue;
-					}
-                    final X509Certificate certStoreX509 = (X509Certificate)keystore.getCertificate(alias);
-                    ts.validate(certStoreX509, provider);
-                    return true;
-                }
-                catch (final Exception ex) {
-                }
-            }
-        }
-        catch (final Exception e) {
-        }
-        return false;
-    }
-
-    /**
-     * Retrieves the OCSP URL from the given certificate.
-     * @param certificate the certificate
-     * @return the URL or null
-     * @throws CertificateParsingException on error
-     * @since	2.1.6
-     */
-    public static String getOCSPURL(final X509Certificate certificate) throws CertificateParsingException {
-        try {
-            final ASN1Primitive obj = getExtensionValue(certificate, X509Extensions.AuthorityInfoAccess.getId());
-            if (obj == null) {
-                return null;
-            }
-
-            final ASN1Sequence AccessDescriptions = (ASN1Sequence) obj;
-            for (int i = 0; i < AccessDescriptions.size(); i++) {
-                final ASN1Sequence AccessDescription = (ASN1Sequence) AccessDescriptions.getObjectAt(i);
-                if ( AccessDescription.size() != 2 ) {
-                    continue;
-                } else {
-                    if (AccessDescription.getObjectAt(0) instanceof DERObjectIdentifier && ((DERObjectIdentifier)AccessDescription.getObjectAt(0)).getId().equals("1.3.6.1.5.5.7.48.1")) {
-                        final String AccessLocation =  getStringFromGeneralName((ASN1Primitive)AccessDescription.getObjectAt(1));
-                        if ( AccessLocation == null ) {
-                            return "" ;
-                        } else {
-                            return AccessLocation ;
-                        }
-                    }
-                }
-            }
-        } catch (final Exception e)  {
-        }
-        return null;
-    }
 
     /**
      * Checks if OCSP revocation refers to the document signing certificate.
@@ -1087,19 +843,7 @@ public class PdfPKCS7 {
         }
     }
 
-    /**
-     * Get the issuer fields from an X509 Certificate
-     * @param cert an X509Certificate
-     * @return an X509Name
-     */
-    public static X509Name getIssuerFields(final X509Certificate cert) {
-        try {
-            return new X509Name((ASN1Sequence)getIssuer(cert.getTBSCertificate()));
-        }
-        catch (final Exception e) {
-            throw new ExceptionConverter(e);
-        }
-    }
+
 
     /**
      * Get the subject fields from an X509 Certificate
@@ -1147,7 +891,7 @@ public class PdfPKCS7 {
      * is also <CODE>null</CODE>. If the <CODE>digest</CODE> is not <CODE>null</CODE>
      * then it may be "RSA" or "DSA"
      */
-    public void setExternalDigest(final byte digest[], final byte RSAdata[], final String digestEncryptionAlgorithm) {
+    void setExternalDigest(final byte digest[], final byte RSAdata[], final String digestEncryptionAlgorithm) {
         this.externalDigest = digest;
         this.externalRSAdata = RSAdata;
         if (digestEncryptionAlgorithm != null) {
@@ -1170,16 +914,7 @@ public class PdfPKCS7 {
         return getEncodedPKCS7(null, null, null, null);
     }
 
-    /**
-     * Gets the bytes for the PKCS7SignedData object. Optionally the authenticatedAttributes
-     * in the signerInfo can also be set. If either of the parameters is <CODE>null</CODE>, none will be used.
-     * @param secondDigest the digest in the authenticatedAttributes
-     * @param signingTime the signing time in the authenticatedAttributes
-     * @return the bytes for the PKCS7SignedData object
-     */
-    public byte[] getEncodedPKCS7(final byte secondDigest[], final Calendar signingTime) {
-        return getEncodedPKCS7(secondDigest, signingTime, null, null);
-    }
+
 
     /**
      * Gets the bytes for the PKCS7SignedData object. Optionally the authenticatedAttributes
@@ -1191,7 +926,7 @@ public class PdfPKCS7 {
      * @return byte[] the bytes for the PKCS7SignedData object
      * @since	2.1.6
      */
-    public byte[] getEncodedPKCS7(final byte secondDigest[], final Calendar signingTime, final TSAClient tsaClient, final byte[] ocsp) {
+    private byte[] getEncodedPKCS7(final byte secondDigest[], final Calendar signingTime, final TSAClient tsaClient, final byte[] ocsp) {
         try {
             if (this.externalDigest != null) {
                 this.digest = this.externalDigest;
@@ -1355,41 +1090,7 @@ public class PdfPKCS7 {
      }
 
 
-    /**
-     * When using authenticatedAttributes the authentication process is different.
-     * The document digest is generated and put inside the attribute. The signing is done over the DER encoded
-     * authenticatedAttributes. This method provides that encoding and the parameters must be
-     * exactly the same as in {@link #getEncodedPKCS7(byte[],Calendar)}.
-     * <p>
-     * A simple example:
-     * <p>
-     * <pre>
-     * Calendar cal = Calendar.getInstance();
-     * PdfPKCS7 pk7 = new PdfPKCS7(key, chain, null, "SHA1", null, false);
-     * MessageDigest messageDigest = MessageDigest.getInstance("SHA1");
-     * byte buf[] = new byte[8192];
-     * int n;
-     * InputStream inp = sap.getRangeStream();
-     * while ((n = inp.read(buf)) &gt; 0) {
-     *    messageDigest.update(buf, 0, n);
-     * }
-     * byte hash[] = messageDigest.digest();
-     * byte sh[] = pk7.getAuthenticatedAttributeBytes(hash, cal);
-     * pk7.update(sh, 0, sh.length);
-     * byte sg[] = pk7.getEncodedPKCS7(hash, cal);
-     * </pre>
-     * @param secondDigest the content digest
-     * @param signingTime the signing time
-     * @return the byte array representation of the authenticatedAttributes ready to be signed
-     */
-    public byte[] getAuthenticatedAttributeBytes(final byte secondDigest[], final Calendar signingTime, final byte[] ocsp) {
-        try {
-            return getAuthenticatedAttributeSet(secondDigest, signingTime, ocsp).getEncoded(ASN1Encoding.DER);
-        }
-        catch (final Exception e) {
-            throw new ExceptionConverter(e);
-        }
-    }
+
 
     private DERSet getAuthenticatedAttributeSet(final byte secondDigest[], final Calendar signingTime, final byte[] ocsp) {
         try {
@@ -1511,73 +1212,69 @@ public class PdfPKCS7 {
         /**
          * country code - StringType(SIZE(2))
          */
-        public static final DERObjectIdentifier C = new DERObjectIdentifier("2.5.4.6");
+        private static final DERObjectIdentifier C = new DERObjectIdentifier("2.5.4.6");
 
         /**
          * organization - StringType(SIZE(1..64))
          */
-        public static final DERObjectIdentifier O = new DERObjectIdentifier("2.5.4.10");
+        private static final DERObjectIdentifier O = new DERObjectIdentifier("2.5.4.10");
 
         /**
          * organizational unit name - StringType(SIZE(1..64))
          */
-        public static final DERObjectIdentifier OU = new DERObjectIdentifier("2.5.4.11");
+        private static final DERObjectIdentifier OU = new DERObjectIdentifier("2.5.4.11");
 
         /**
          * Title
          */
-        public static final DERObjectIdentifier T = new DERObjectIdentifier("2.5.4.12");
+        private static final DERObjectIdentifier T = new DERObjectIdentifier("2.5.4.12");
 
         /**
          * common name - StringType(SIZE(1..64))
          */
-        public static final DERObjectIdentifier CN = new DERObjectIdentifier("2.5.4.3");
+        private static final DERObjectIdentifier CN = new DERObjectIdentifier("2.5.4.3");
 
         /**
          * device serial number name - StringType(SIZE(1..64))
          */
-        public static final DERObjectIdentifier SN = new DERObjectIdentifier("2.5.4.5");
+        private static final DERObjectIdentifier SN = new DERObjectIdentifier("2.5.4.5");
 
         /**
          * locality name - StringType(SIZE(1..64))
          */
-        public static final DERObjectIdentifier L = new DERObjectIdentifier("2.5.4.7");
+        private static final DERObjectIdentifier L = new DERObjectIdentifier("2.5.4.7");
 
         /**
          * state, or province name - StringType(SIZE(1..64))
          */
-        public static final DERObjectIdentifier ST = new DERObjectIdentifier("2.5.4.8");
+        private static final DERObjectIdentifier ST = new DERObjectIdentifier("2.5.4.8");
 
         /** Naming attribute of type X520name */
-        public static final DERObjectIdentifier SURNAME = new DERObjectIdentifier("2.5.4.4");
+        private static final DERObjectIdentifier SURNAME = new DERObjectIdentifier("2.5.4.4");
         /** Naming attribute of type X520name */
-        public static final DERObjectIdentifier GIVENNAME = new DERObjectIdentifier("2.5.4.42");
+        private static final DERObjectIdentifier GIVENNAME = new DERObjectIdentifier("2.5.4.42");
         /** Naming attribute of type X520name */
-        public static final DERObjectIdentifier INITIALS = new DERObjectIdentifier("2.5.4.43");
+        private static final DERObjectIdentifier INITIALS = new DERObjectIdentifier("2.5.4.43");
         /** Naming attribute of type X520name */
-        public static final DERObjectIdentifier GENERATION = new DERObjectIdentifier("2.5.4.44");
-        /** Naming attribute of type X520name */
-        public static final DERObjectIdentifier UNIQUE_IDENTIFIER = new DERObjectIdentifier("2.5.4.45");
+        private static final DERObjectIdentifier GENERATION = new DERObjectIdentifier("2.5.4.44");
+
 
         /**
          * Email address (RSA PKCS#9 extension) - IA5String.
          * <p>Note: if you're trying to be ultra orthodox, don't use this! It shouldn't be in here.
          */
-        public static final DERObjectIdentifier EmailAddress = new DERObjectIdentifier("1.2.840.113549.1.9.1");
+        private static final DERObjectIdentifier EmailAddress = new DERObjectIdentifier("1.2.840.113549.1.9.1");
 
-        /**
-         * email address in Verisign certificates
-         */
-        public static final DERObjectIdentifier E = EmailAddress;
+
 
         /** object identifier */
-        public static final DERObjectIdentifier DC = new DERObjectIdentifier("0.9.2342.19200300.100.1.25");
+        private static final DERObjectIdentifier DC = new DERObjectIdentifier("0.9.2342.19200300.100.1.25");
 
         /** LDAP User id. */
-        public static final DERObjectIdentifier UID = new DERObjectIdentifier("0.9.2342.19200300.100.1.1");
+        private static final DERObjectIdentifier UID = new DERObjectIdentifier("0.9.2342.19200300.100.1.1");
 
         /** A HashMap with default symbols */
-        public static HashMap DefaultSymbols = new HashMap();
+        private static HashMap DefaultSymbols = new HashMap();
 
         static {
             DefaultSymbols.put(C, "C");
@@ -1597,13 +1294,13 @@ public class PdfPKCS7 {
             DefaultSymbols.put(GENERATION, "GENERATION");
         }
         /** A HashMap with values */
-        public HashMap values = new HashMap();
+        private final HashMap values = new HashMap();
 
         /**
          * Constructs an X509 name
          * @param seq an ASN1 Sequence
          */
-        public X509Name(final ASN1Sequence seq) {
+        private X509Name(final ASN1Sequence seq) {
             final Enumeration e = seq.getObjects();
 
             while (e.hasMoreElements()) {
@@ -1624,47 +1321,14 @@ public class PdfPKCS7 {
                 }
             }
         }
-        /**
-         * Constructs an X509 name
-         * @param dirName a directory name
-         */
-        public X509Name(final String dirName) {
-            final X509NameTokenizer   nTok = new X509NameTokenizer(dirName);
 
-            while (nTok.hasMoreTokens()) {
-                final String  token = nTok.nextToken();
-                final int index = token.indexOf('=');
-
-                if (index == -1) {
-                    throw new IllegalArgumentException("badly formated directory string");
-                }
-
-                final String id = token.substring(0, index).toUpperCase();
-                final String value = token.substring(index + 1);
-                ArrayList vs = (ArrayList)this.values.get(id);
-                if (vs == null) {
-                    vs = new ArrayList();
-                    this.values.put(id, vs);
-                }
-                vs.add(value);
-            }
-
-        }
 
         public String getField(final String name) {
             final ArrayList vs = (ArrayList)this.values.get(name);
             return vs == null ? null : (String)vs.get(0);
         }
 
-        /**
-         * gets a field array from the values Hashmap
-         * @param name
-         * @return an ArrayList
-         */
-        public ArrayList getFieldArray(final String name) {
-            final ArrayList vs = (ArrayList)this.values.get(name);
-            return vs == null ? null : vs;
-        }
+
 
         /**
          * getter for values
@@ -1689,22 +1353,22 @@ public class PdfPKCS7 {
      * lightweight Java environment don't support classes like
      * StringTokenizer.
      */
-    public static class X509NameTokenizer {
+    private static class X509NameTokenizer {
         private final String          oid;
         private int             index;
         private final StringBuffer    buf = new StringBuffer();
 
-        public X509NameTokenizer(
+        private X509NameTokenizer(
         final String oid) {
             this.oid = oid;
             this.index = -1;
         }
 
-        public boolean hasMoreTokens() {
+        private boolean hasMoreTokens() {
             return this.index != this.oid.length();
         }
 
-        public String nextToken() {
+        private String nextToken() {
             if (this.index == this.oid.length()) {
                 return null;
             }

@@ -63,52 +63,52 @@ import com.lowagie.text.ExceptionConverter;
  * @author  Paulo Soares (psoares@consiste.pt)
  */
 class TrueTypeFontSubSet {
-    static final String tableNamesSimple[] = {"cvt ", "fpgm", "glyf", "head",
+    private static final String tableNamesSimple[] = {"cvt ", "fpgm", "glyf", "head",
         "hhea", "hmtx", "loca", "maxp", "prep"};
-    static final String tableNamesCmap[] = {"cmap", "cvt ", "fpgm", "glyf", "head",
+    private static final String tableNamesCmap[] = {"cmap", "cvt ", "fpgm", "glyf", "head",
         "hhea", "hmtx", "loca", "maxp", "prep"};
-    static final String tableNamesExtra[] = {"OS/2", "cmap", "cvt ", "fpgm", "glyf", "head",
+    private static final String tableNamesExtra[] = {"OS/2", "cmap", "cvt ", "fpgm", "glyf", "head",
         "hhea", "hmtx", "loca", "maxp", "name, prep"};
-    static final int entrySelectors[] = {0,0,1,1,2,2,2,2,3,3,3,3,3,3,3,3,4,4,4,4,4};
-    static final int TABLE_CHECKSUM = 0;
-    static final int TABLE_OFFSET = 1;
-    static final int TABLE_LENGTH = 2;
+    private static final int entrySelectors[] = {0,0,1,1,2,2,2,2,3,3,3,3,3,3,3,3,4,4,4,4,4};
+    private static final int TABLE_CHECKSUM = 0;
+    private static final int TABLE_OFFSET = 1;
+    private static final int TABLE_LENGTH = 2;
     static final int HEAD_LOCA_FORMAT_OFFSET = 51;
 
-    static final int ARG_1_AND_2_ARE_WORDS = 1;
-    static final int WE_HAVE_A_SCALE = 8;
-    static final int MORE_COMPONENTS = 32;
-    static final int WE_HAVE_AN_X_AND_Y_SCALE = 64;
-    static final int WE_HAVE_A_TWO_BY_TWO = 128;
-    
-    
+    private static final int ARG_1_AND_2_ARE_WORDS = 1;
+    private static final int WE_HAVE_A_SCALE = 8;
+    private static final int MORE_COMPONENTS = 32;
+    private static final int WE_HAVE_AN_X_AND_Y_SCALE = 64;
+    private static final int WE_HAVE_A_TWO_BY_TWO = 128;
+
+
     /** Contains the location of the several tables. The key is the name of
      * the table and the value is an <CODE>int[3]</CODE> where position 0
      * is the checksum, position 1 is the offset from the start of the file
      * and position 2 is the length of the table.
      */
-    protected HashMap tableDirectory;
+    private HashMap tableDirectory;
     /** The file in use.
      */
-    protected RandomAccessFileOrArray rf;
+    private final RandomAccessFileOrArray rf;
     /** The file name.
      */
-    protected String fileName;
-    protected boolean includeCmap;
-    protected boolean includeExtras;
-    protected boolean locaShortTable;
-    protected int locaTable[];
-    protected HashMap glyphsUsed;
-    protected ArrayList glyphsInList;
-    protected int tableGlyphOffset;
-    protected int newLocaTable[];
-    protected byte newLocaTableOut[];
-    protected byte newGlyfTable[];
-    protected int glyfTableRealSize;
-    protected int locaTableRealSize;
-    protected byte outFont[];
-    protected int fontPtr;
-    protected int directoryOffset;
+    private final String fileName;
+    private final boolean includeCmap;
+    private final boolean includeExtras;
+    private boolean locaShortTable;
+    private int locaTable[];
+    private final HashMap glyphsUsed;
+    private final ArrayList glyphsInList;
+    private int tableGlyphOffset;
+    private int newLocaTable[];
+    private byte newLocaTableOut[];
+    private byte newGlyfTable[];
+    private int glyfTableRealSize;
+    private int locaTableRealSize;
+    private byte outFont[];
+    private int fontPtr;
+    private final int directoryOffset;
 
     /** Creates a new TrueTypeFontSubSet
      * @param directoryOffset The offset from the start of the file to the table directory
@@ -116,91 +116,93 @@ class TrueTypeFontSubSet {
      * @param glyphsUsed the glyphs used
      * @param includeCmap <CODE>true</CODE> if the table cmap is to be included in the generated font
      */
-    TrueTypeFontSubSet(String fileName, RandomAccessFileOrArray rf, HashMap glyphsUsed, int directoryOffset, boolean includeCmap, boolean includeExtras) {
+    TrueTypeFontSubSet(final String fileName, final RandomAccessFileOrArray rf, final HashMap glyphsUsed, final int directoryOffset, final boolean includeCmap, final boolean includeExtras) {
         this.fileName = fileName;
         this.rf = rf;
         this.glyphsUsed = glyphsUsed;
         this.includeCmap = includeCmap;
         this.includeExtras = includeExtras;
         this.directoryOffset = directoryOffset;
-        glyphsInList = new ArrayList(glyphsUsed.keySet());
+        this.glyphsInList = new ArrayList(glyphsUsed.keySet());
     }
-    
+
     /** Does the actual work of subsetting the font.
      * @throws IOException on error
      * @throws DocumentException on error
      * @return the subset font
-     */    
+     */
     byte[] process() throws IOException, DocumentException {
         try {
-            rf.reOpen();
+            this.rf.reOpen();
             createTableDirectory();
             readLoca();
             flatGlyphs();
             createNewGlyphTables();
             locaTobytes();
             assembleFont();
-            return outFont;
+            return this.outFont;
         }
         finally {
             try {
-                rf.close();
+                this.rf.close();
             }
-            catch (Exception e) {
+            catch (final Exception e) {
                 // empty on purpose
             }
         }
     }
-    
-    protected void assembleFont() throws IOException {
+
+    private void assembleFont() throws IOException {
         int tableLocation[];
         int fullFontSize = 0;
         String tableNames[];
-        if (includeExtras)
-            tableNames = tableNamesExtra;
-        else {
-            if (includeCmap)
-                tableNames = tableNamesCmap;
-            else
-                tableNames = tableNamesSimple;
+        if (this.includeExtras) {
+			tableNames = tableNamesExtra;
+		} else {
+            if (this.includeCmap) {
+				tableNames = tableNamesCmap;
+			} else {
+				tableNames = tableNamesSimple;
+			}
         }
         int tablesUsed = 2;
         int len = 0;
-        for (int k = 0; k < tableNames.length; ++k) {
-            String name = tableNames[k];
-            if (name.equals("glyf") || name.equals("loca"))
-                continue;
-            tableLocation = (int[])tableDirectory.get(name);
-            if (tableLocation == null)
-                continue;
+        for (final String name : tableNames) {
+            if (name.equals("glyf") || name.equals("loca")) {
+				continue;
+			}
+            tableLocation = (int[])this.tableDirectory.get(name);
+            if (tableLocation == null) {
+				continue;
+			}
             ++tablesUsed;
-            fullFontSize += (tableLocation[TABLE_LENGTH] + 3) & (~3);
+            fullFontSize += tableLocation[TABLE_LENGTH] + 3 & ~3;
         }
-        fullFontSize += newLocaTableOut.length;
-        fullFontSize += newGlyfTable.length;
+        fullFontSize += this.newLocaTableOut.length;
+        fullFontSize += this.newGlyfTable.length;
         int ref = 16 * tablesUsed + 12;
         fullFontSize += ref;
-        outFont = new byte[fullFontSize];
-        fontPtr = 0;
+        this.outFont = new byte[fullFontSize];
+        this.fontPtr = 0;
         writeFontInt(0x00010000);
         writeFontShort(tablesUsed);
-        int selector = entrySelectors[tablesUsed];
+        final int selector = entrySelectors[tablesUsed];
         writeFontShort((1 << selector) * 16);
         writeFontShort(selector);
         writeFontShort((tablesUsed - (1 << selector)) * 16);
-        for (int k = 0; k < tableNames.length; ++k) {
-            String name = tableNames[k];
-            tableLocation = (int[])tableDirectory.get(name);
-            if (tableLocation == null)
-                continue;
+        for (final String name : tableNames) {
+            tableLocation = (int[])this.tableDirectory.get(name);
+            if (tableLocation == null) {
+				continue;
+			}
             writeFontString(name);
             if (name.equals("glyf")) {
-                writeFontInt(calculateChecksum(newGlyfTable));
-                len = glyfTableRealSize;
+                writeFontInt(calculateChecksum(this.newGlyfTable));
+                len = this.glyfTableRealSize;
             }
             else if (name.equals("loca")) {
-                writeFontInt(calculateChecksum(newLocaTableOut));
-                len = locaTableRealSize;
+                writeFontInt(calculateChecksum(this.newLocaTableOut));
+                len = this.locaTableRealSize;
             }
             else {
                 writeFontInt(tableLocation[TABLE_CHECKSUM]);
@@ -208,210 +210,224 @@ class TrueTypeFontSubSet {
             }
             writeFontInt(ref);
             writeFontInt(len);
-            ref += (len + 3) & (~3);
+            ref += len + 3 & ~3;
         }
-        for (int k = 0; k < tableNames.length; ++k) {
-            String name = tableNames[k];
-            tableLocation = (int[])tableDirectory.get(name);
-            if (tableLocation == null)
-                continue;
+        for (final String name : tableNames) {
+            tableLocation = (int[])this.tableDirectory.get(name);
+            if (tableLocation == null) {
+				continue;
+			}
             if (name.equals("glyf")) {
-                System.arraycopy(newGlyfTable, 0, outFont, fontPtr, newGlyfTable.length);
-                fontPtr += newGlyfTable.length;
-                newGlyfTable = null;
+                System.arraycopy(this.newGlyfTable, 0, this.outFont, this.fontPtr, this.newGlyfTable.length);
+                this.fontPtr += this.newGlyfTable.length;
+                this.newGlyfTable = null;
             }
             else if (name.equals("loca")) {
-                System.arraycopy(newLocaTableOut, 0, outFont, fontPtr, newLocaTableOut.length);
-                fontPtr += newLocaTableOut.length;
-                newLocaTableOut = null;
+                System.arraycopy(this.newLocaTableOut, 0, this.outFont, this.fontPtr, this.newLocaTableOut.length);
+                this.fontPtr += this.newLocaTableOut.length;
+                this.newLocaTableOut = null;
             }
             else {
-                rf.seek(tableLocation[TABLE_OFFSET]);
-                rf.readFully(outFont, fontPtr, tableLocation[TABLE_LENGTH]);
-                fontPtr += (tableLocation[TABLE_LENGTH] + 3) & (~3);
+                this.rf.seek(tableLocation[TABLE_OFFSET]);
+                this.rf.readFully(this.outFont, this.fontPtr, tableLocation[TABLE_LENGTH]);
+                this.fontPtr += tableLocation[TABLE_LENGTH] + 3 & ~3;
             }
         }
     }
-    
-    protected void createTableDirectory() throws IOException, DocumentException {
-        tableDirectory = new HashMap();
-        rf.seek(directoryOffset);
-        int id = rf.readInt();
-        if (id != 0x00010000)
-            throw new DocumentException(fileName + " is not a true type file.");
-        int num_tables = rf.readUnsignedShort();
-        rf.skipBytes(6);
+
+    private void createTableDirectory() throws IOException, DocumentException {
+        this.tableDirectory = new HashMap();
+        this.rf.seek(this.directoryOffset);
+        final int id = this.rf.readInt();
+        if (id != 0x00010000) {
+			throw new DocumentException(this.fileName + " is not a true type file.");
+		}
+        final int num_tables = this.rf.readUnsignedShort();
+        this.rf.skipBytes(6);
         for (int k = 0; k < num_tables; ++k) {
-            String tag = readStandardString(4);
-            int tableLocation[] = new int[3];
-            tableLocation[TABLE_CHECKSUM] = rf.readInt();
-            tableLocation[TABLE_OFFSET] = rf.readInt();
-            tableLocation[TABLE_LENGTH] = rf.readInt();
-            tableDirectory.put(tag, tableLocation);
+            final String tag = readStandardString(4);
+            final int tableLocation[] = new int[3];
+            tableLocation[TABLE_CHECKSUM] = this.rf.readInt();
+            tableLocation[TABLE_OFFSET] = this.rf.readInt();
+            tableLocation[TABLE_LENGTH] = this.rf.readInt();
+            this.tableDirectory.put(tag, tableLocation);
         }
     }
-    
-    protected void readLoca() throws IOException, DocumentException {
+
+    private void readLoca() throws IOException, DocumentException {
         int tableLocation[];
-        tableLocation = (int[])tableDirectory.get("head");
-        if (tableLocation == null)
-            throw new DocumentException("Table 'head' does not exist in " + fileName);
-        rf.seek(tableLocation[TABLE_OFFSET] + HEAD_LOCA_FORMAT_OFFSET);
-        locaShortTable = (rf.readUnsignedShort() == 0);
-        tableLocation = (int[])tableDirectory.get("loca");
-        if (tableLocation == null)
-            throw new DocumentException("Table 'loca' does not exist in " + fileName);
-        rf.seek(tableLocation[TABLE_OFFSET]);
-        if (locaShortTable) {
-            int entries = tableLocation[TABLE_LENGTH] / 2;
-            locaTable = new int[entries];
-            for (int k = 0; k < entries; ++k)
-                locaTable[k] = rf.readUnsignedShort() * 2;
+        tableLocation = (int[])this.tableDirectory.get("head");
+        if (tableLocation == null) {
+			throw new DocumentException("Table 'head' does not exist in " + this.fileName);
+		}
+        this.rf.seek(tableLocation[TABLE_OFFSET] + HEAD_LOCA_FORMAT_OFFSET);
+        this.locaShortTable = this.rf.readUnsignedShort() == 0;
+        tableLocation = (int[])this.tableDirectory.get("loca");
+        if (tableLocation == null) {
+			throw new DocumentException("Table 'loca' does not exist in " + this.fileName);
+		}
+        this.rf.seek(tableLocation[TABLE_OFFSET]);
+        if (this.locaShortTable) {
+            final int entries = tableLocation[TABLE_LENGTH] / 2;
+            this.locaTable = new int[entries];
+            for (int k = 0; k < entries; ++k) {
+				this.locaTable[k] = this.rf.readUnsignedShort() * 2;
+			}
         }
         else {
-            int entries = tableLocation[TABLE_LENGTH] / 4;
-            locaTable = new int[entries];
-            for (int k = 0; k < entries; ++k)
-                locaTable[k] = rf.readInt();
+            final int entries = tableLocation[TABLE_LENGTH] / 4;
+            this.locaTable = new int[entries];
+            for (int k = 0; k < entries; ++k) {
+				this.locaTable[k] = this.rf.readInt();
+			}
         }
     }
-    
-    protected void createNewGlyphTables() throws IOException {
-        newLocaTable = new int[locaTable.length];
-        int activeGlyphs[] = new int[glyphsInList.size()];
-        for (int k = 0; k < activeGlyphs.length; ++k)
-            activeGlyphs[k] = ((Integer)glyphsInList.get(k)).intValue();
+
+    private void createNewGlyphTables() throws IOException {
+        this.newLocaTable = new int[this.locaTable.length];
+        final int activeGlyphs[] = new int[this.glyphsInList.size()];
+        for (int k = 0; k < activeGlyphs.length; ++k) {
+			activeGlyphs[k] = ((Integer)this.glyphsInList.get(k)).intValue();
+		}
         Arrays.sort(activeGlyphs);
         int glyfSize = 0;
-        for (int k = 0; k < activeGlyphs.length; ++k) {
-            int glyph = activeGlyphs[k];
-            glyfSize += locaTable[glyph + 1] - locaTable[glyph];
+        for (final int glyph : activeGlyphs) {
+            glyfSize += this.locaTable[glyph + 1] - this.locaTable[glyph];
         }
-        glyfTableRealSize = glyfSize;
-        glyfSize = (glyfSize + 3) & (~3);
-        newGlyfTable = new byte[glyfSize];
+        this.glyfTableRealSize = glyfSize;
+        glyfSize = glyfSize + 3 & ~3;
+        this.newGlyfTable = new byte[glyfSize];
         int glyfPtr = 0;
         int listGlyf = 0;
-        for (int k = 0; k < newLocaTable.length; ++k) {
-            newLocaTable[k] = glyfPtr;
+        for (int k = 0; k < this.newLocaTable.length; ++k) {
+            this.newLocaTable[k] = glyfPtr;
             if (listGlyf < activeGlyphs.length && activeGlyphs[listGlyf] == k) {
                 ++listGlyf;
-                newLocaTable[k] = glyfPtr;
-                int start = locaTable[k];
-                int len = locaTable[k + 1] - start;
+                this.newLocaTable[k] = glyfPtr;
+                final int start = this.locaTable[k];
+                final int len = this.locaTable[k + 1] - start;
                 if (len > 0) {
-                    rf.seek(tableGlyphOffset + start);
-                    rf.readFully(newGlyfTable, glyfPtr, len);
+                    this.rf.seek(this.tableGlyphOffset + start);
+                    this.rf.readFully(this.newGlyfTable, glyfPtr, len);
                     glyfPtr += len;
                 }
             }
         }
     }
-    
-    protected void locaTobytes() {
-        if (locaShortTable)
-            locaTableRealSize = newLocaTable.length * 2;
-        else
-            locaTableRealSize = newLocaTable.length * 4;
-        newLocaTableOut = new byte[(locaTableRealSize + 3) & (~3)];
-        outFont = newLocaTableOut;
-        fontPtr = 0;
-        for (int k = 0; k < newLocaTable.length; ++k) {
-            if (locaShortTable)
-                writeFontShort(newLocaTable[k] / 2);
-            else
-                writeFontInt(newLocaTable[k]);
+
+    private void locaTobytes() {
+        if (this.locaShortTable) {
+			this.locaTableRealSize = this.newLocaTable.length * 2;
+		} else {
+			this.locaTableRealSize = this.newLocaTable.length * 4;
+		}
+        this.newLocaTableOut = new byte[this.locaTableRealSize + 3 & ~3];
+        this.outFont = this.newLocaTableOut;
+        this.fontPtr = 0;
+        for (final int element : this.newLocaTable) {
+            if (this.locaShortTable) {
+				writeFontShort(element / 2);
+			} else {
+				writeFontInt(element);
+			}
         }
-        
+
     }
-    
-    protected void flatGlyphs() throws IOException, DocumentException {
+
+    private void flatGlyphs() throws IOException, DocumentException {
         int tableLocation[];
-        tableLocation = (int[])tableDirectory.get("glyf");
-        if (tableLocation == null)
-            throw new DocumentException("Table 'glyf' does not exist in " + fileName);
-        Integer glyph0 = new Integer(0);
-        if (!glyphsUsed.containsKey(glyph0)) {
-            glyphsUsed.put(glyph0, null);
-            glyphsInList.add(glyph0);
+        tableLocation = (int[])this.tableDirectory.get("glyf");
+        if (tableLocation == null) {
+			throw new DocumentException("Table 'glyf' does not exist in " + this.fileName);
+		}
+        final Integer glyph0 = new Integer(0);
+        if (!this.glyphsUsed.containsKey(glyph0)) {
+            this.glyphsUsed.put(glyph0, null);
+            this.glyphsInList.add(glyph0);
         }
-        tableGlyphOffset = tableLocation[TABLE_OFFSET];
-        for (int k = 0; k < glyphsInList.size(); ++k) {
-            int glyph = ((Integer)glyphsInList.get(k)).intValue();
+        this.tableGlyphOffset = tableLocation[TABLE_OFFSET];
+        for (int k = 0; k < this.glyphsInList.size(); ++k) {
+            final int glyph = ((Integer)this.glyphsInList.get(k)).intValue();
             checkGlyphComposite(glyph);
         }
     }
 
-    protected void checkGlyphComposite(int glyph) throws IOException {
-        int start = locaTable[glyph];
-        if (start == locaTable[glyph + 1]) // no contour
-            return;
-        rf.seek(tableGlyphOffset + start);
-        int numContours = rf.readShort();
-        if (numContours >= 0)
-            return;
-        rf.skipBytes(8);
+    private void checkGlyphComposite(final int glyph) throws IOException {
+        final int start = this.locaTable[glyph];
+        if (start == this.locaTable[glyph + 1]) {
+			return;
+		}
+        this.rf.seek(this.tableGlyphOffset + start);
+        final int numContours = this.rf.readShort();
+        if (numContours >= 0) {
+			return;
+		}
+        this.rf.skipBytes(8);
         for(;;) {
-            int flags = rf.readUnsignedShort();
-            Integer cGlyph = new Integer(rf.readUnsignedShort());
-            if (!glyphsUsed.containsKey(cGlyph)) {
-                glyphsUsed.put(cGlyph, null);
-                glyphsInList.add(cGlyph);
+            final int flags = this.rf.readUnsignedShort();
+            final Integer cGlyph = new Integer(this.rf.readUnsignedShort());
+            if (!this.glyphsUsed.containsKey(cGlyph)) {
+                this.glyphsUsed.put(cGlyph, null);
+                this.glyphsInList.add(cGlyph);
             }
-            if ((flags & MORE_COMPONENTS) == 0)
-                return;
+            if ((flags & MORE_COMPONENTS) == 0) {
+				return;
+			}
             int skip;
-            if ((flags & ARG_1_AND_2_ARE_WORDS) != 0)
-                skip = 4;
-            else
-                skip = 2;
-            if ((flags & WE_HAVE_A_SCALE) != 0)
-                skip += 2;
-            else if ((flags & WE_HAVE_AN_X_AND_Y_SCALE) != 0)
-                skip += 4;
-            if ((flags & WE_HAVE_A_TWO_BY_TWO) != 0)
-                skip += 8;
-            rf.skipBytes(skip);
+            if ((flags & ARG_1_AND_2_ARE_WORDS) != 0) {
+				skip = 4;
+			} else {
+				skip = 2;
+			}
+            if ((flags & WE_HAVE_A_SCALE) != 0) {
+				skip += 2;
+			} else if ((flags & WE_HAVE_AN_X_AND_Y_SCALE) != 0) {
+				skip += 4;
+			}
+            if ((flags & WE_HAVE_A_TWO_BY_TWO) != 0) {
+				skip += 8;
+			}
+            this.rf.skipBytes(skip);
         }
     }
-    
+
     /** Reads a <CODE>String</CODE> from the font file as bytes using the Cp1252
      *  encoding.
      * @param length the length of bytes to read
      * @return the <CODE>String</CODE> read
      * @throws IOException the font file could not be read
      */
-    protected String readStandardString(int length) throws IOException {
-        byte buf[] = new byte[length];
-        rf.readFully(buf);
+    private String readStandardString(final int length) throws IOException {
+        final byte buf[] = new byte[length];
+        this.rf.readFully(buf);
         try {
             return new String(buf, BaseFont.WINANSI);
         }
-        catch (Exception e) {
+        catch (final Exception e) {
             throw new ExceptionConverter(e);
         }
     }
-    
-    protected void writeFontShort(int n) {
-        outFont[fontPtr++] = (byte)(n >> 8);
-        outFont[fontPtr++] = (byte)(n);
+
+    private void writeFontShort(final int n) {
+        this.outFont[this.fontPtr++] = (byte)(n >> 8);
+        this.outFont[this.fontPtr++] = (byte)n;
     }
 
-    protected void writeFontInt(int n) {
-        outFont[fontPtr++] = (byte)(n >> 24);
-        outFont[fontPtr++] = (byte)(n >> 16);
-        outFont[fontPtr++] = (byte)(n >> 8);
-        outFont[fontPtr++] = (byte)(n);
+    private void writeFontInt(final int n) {
+        this.outFont[this.fontPtr++] = (byte)(n >> 24);
+        this.outFont[this.fontPtr++] = (byte)(n >> 16);
+        this.outFont[this.fontPtr++] = (byte)(n >> 8);
+        this.outFont[this.fontPtr++] = (byte)n;
     }
 
-    protected void writeFontString(String s) {
-        byte b[] = PdfEncodings.convertToBytes(s, BaseFont.WINANSI);
-        System.arraycopy(b, 0, outFont, fontPtr, b.length);
-        fontPtr += b.length;
+    private void writeFontString(final String s) {
+        final byte b[] = PdfEncodings.convertToBytes(s, BaseFont.WINANSI);
+        System.arraycopy(b, 0, this.outFont, this.fontPtr, b.length);
+        this.fontPtr += b.length;
     }
-    
-    protected int calculateChecksum(byte b[]) {
-        int len = b.length / 4;
+
+    private int calculateChecksum(final byte b[]) {
+        final int len = b.length / 4;
         int v0 = 0;
         int v1 = 0;
         int v2 = 0;

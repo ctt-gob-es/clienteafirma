@@ -60,17 +60,15 @@ import com.lowagie.text.pdf.PdfPTable;
  * Rectangle that can be used for Cells.
  * This Rectangle is padded and knows how to draw itself in a PdfPTable or PdfPcellEvent.
  */
-public class SimpleCell extends Rectangle implements PdfPCellEvent, TextElementArray {
+class SimpleCell extends Rectangle implements PdfPCellEvent, TextElementArray {
 
 	// constants
-	/** the CellAttributes object represents a row. */
-	public static final boolean ROW = true;
 	/** the CellAttributes object represents a cell. */
-	public static final boolean CELL = false;
-	
+	static final boolean CELL = false;
+
 	// member variables
 	/** the content of the Cell. */
-	private ArrayList content = new ArrayList();
+	private final ArrayList content = new ArrayList();
 	/** the width of the Cell. */
 	private float width = 0f;
 	/** the widthpercentage of the Cell. */
@@ -102,40 +100,40 @@ public class SimpleCell extends Rectangle implements PdfPCellEvent, TextElementA
     /** Indicates that the largest ascender height should be used to determine the
      * height of the first line.  Note that this only has an effect when rendered
      * to PDF.  Setting this to true can help with vertical alignment problems. */
-    protected boolean useAscender = false;
+	private boolean useAscender = false;
     /** Indicates that the largest descender height should be added to the height of
      * the last line (so characters like y don't dip into the border).   Note that
      * this only has an effect when rendered to PDF. */
-    protected boolean useDescender = false;
+	private boolean useDescender = false;
     /**
      * Adjusts the cell contents to compensate for border widths.  Note that
      * this only has an effect when rendered to PDF.
      */
-    protected boolean useBorderPadding;
-	
+    private boolean useBorderPadding;
+
 	/**
 	 * A CellAttributes object is always constructed without any dimensions.
 	 * Dimensions are defined after creation.
 	 * @param row only true if the CellAttributes object represents a row.
 	 */
-	public SimpleCell(boolean row) {
+	public SimpleCell(final boolean row) {
 		super(0f, 0f, 0f, 0f);
-		cellgroup = row;
+		this.cellgroup = row;
 		setBorder(BOX);
 	}
-	
+
 	/**
 	 * Adds content to this object.
 	 * @param element
 	 * @throws BadElementException
 	 */
-	public void addElement(Element element) throws BadElementException {
-		if (cellgroup) {
+	private void addElement(final Element element) throws BadElementException {
+		if (this.cellgroup) {
 			if (element instanceof SimpleCell) {
 				if(((SimpleCell)element).isCellgroup()) {
 					throw new BadElementException("You can't add one row to another row.");
 				}
-				content.add(element);
+				this.content.add(element);
 				return;
 			}
 			else {
@@ -153,50 +151,28 @@ public class SimpleCell extends Rectangle implements PdfPCellEvent, TextElementA
 				|| element.type() == Element.JBIG2
 				|| element.type() == Element.IMGRAW
 				|| element.type() == Element.IMGTEMPLATE) {
-			content.add(element);
+			this.content.add(element);
 		}
 		else {
 			throw new BadElementException("You can't add an element of type " + element.getClass().getName() + " to a SimpleCell.");
 		}
 	}
-	
-	/**
-	 * Creates a Cell with these attributes.
-	 * @param rowAttributes
-	 * @return a cell based on these attributes.
-	 * @throws BadElementException
-	 */
-	public Cell createCell(SimpleCell rowAttributes) throws BadElementException {
-		Cell cell = new Cell();
-		cell.cloneNonPositionParameters(rowAttributes);
-		cell.softCloneNonPositionParameters(this);
-		cell.setColspan(colspan);
-		cell.setHorizontalAlignment(horizontalAlignment);
-		cell.setVerticalAlignment(verticalAlignment);
-		cell.setUseAscender(useAscender);
-		cell.setUseBorderPadding(useBorderPadding);
-		cell.setUseDescender(useDescender);
-		Element element;
-		for (Iterator i = content.iterator(); i.hasNext(); ) {
-			element = (Element)i.next();
-			cell.addElement(element);
-		}
-		return cell;
-	}
-	
+
+
+
 	/**
 	 * Creates a PdfPCell with these attributes.
 	 * @param rowAttributes
 	 * @return a PdfPCell based on these attributes.
 	 */
-	public PdfPCell createPdfPCell(SimpleCell rowAttributes) {
-		PdfPCell cell = new PdfPCell();
+	public PdfPCell createPdfPCell(final SimpleCell rowAttributes) {
+		final PdfPCell cell = new PdfPCell();
 		cell.setBorder(NO_BORDER);
-		SimpleCell tmp = new SimpleCell(CELL);
-		tmp.setSpacing_left(spacing_left);
-		tmp.setSpacing_right(spacing_right);
-		tmp.setSpacing_top(spacing_top);
-		tmp.setSpacing_bottom(spacing_bottom);
+		final SimpleCell tmp = new SimpleCell(CELL);
+		tmp.setSpacing_left(this.spacing_left);
+		tmp.setSpacing_right(this.spacing_right);
+		tmp.setSpacing_top(this.spacing_top);
+		tmp.setSpacing_bottom(this.spacing_bottom);
 		tmp.cloneNonPositionParameters(rowAttributes);
 		tmp.softCloneNonPositionParameters(this);
 		cell.setCellEvent(tmp);
@@ -205,40 +181,61 @@ public class SimpleCell extends Rectangle implements PdfPCellEvent, TextElementA
 		cell.setUseAscender(rowAttributes.useAscender);
 		cell.setUseBorderPadding(rowAttributes.useBorderPadding);
 		cell.setUseDescender(rowAttributes.useDescender);
-		cell.setColspan(colspan);
-		if (horizontalAlignment != Element.ALIGN_UNDEFINED)
-			cell.setHorizontalAlignment(horizontalAlignment);
-		if (verticalAlignment != Element.ALIGN_UNDEFINED)
-			cell.setVerticalAlignment(verticalAlignment);
-		if (useAscender)
-			cell.setUseAscender(useAscender);
-		if (useBorderPadding)
-			cell.setUseBorderPadding(useBorderPadding);
-		if (useDescender)
-			cell.setUseDescender(useDescender);
+		cell.setColspan(this.colspan);
+		if (this.horizontalAlignment != Element.ALIGN_UNDEFINED) {
+			cell.setHorizontalAlignment(this.horizontalAlignment);
+		}
+		if (this.verticalAlignment != Element.ALIGN_UNDEFINED) {
+			cell.setVerticalAlignment(this.verticalAlignment);
+		}
+		if (this.useAscender) {
+			cell.setUseAscender(this.useAscender);
+		}
+		if (this.useBorderPadding) {
+			cell.setUseBorderPadding(this.useBorderPadding);
+		}
+		if (this.useDescender) {
+			cell.setUseDescender(this.useDescender);
+		}
 		float p;
-		float sp_left = spacing_left;
-		if (Float.isNaN(sp_left)) sp_left = 0f;
-		float sp_right = spacing_right;
-		if (Float.isNaN(sp_right)) sp_right = 0f;
-		float sp_top = spacing_top;
-		if (Float.isNaN(sp_top)) sp_top = 0f;
-		float sp_bottom = spacing_bottom;
-		if (Float.isNaN(sp_bottom)) sp_bottom = 0f;
-		p = padding_left;
-		if (Float.isNaN(p)) p = 0f; 
+		float sp_left = this.spacing_left;
+		if (Float.isNaN(sp_left)) {
+			sp_left = 0f;
+		}
+		float sp_right = this.spacing_right;
+		if (Float.isNaN(sp_right)) {
+			sp_right = 0f;
+		}
+		float sp_top = this.spacing_top;
+		if (Float.isNaN(sp_top)) {
+			sp_top = 0f;
+		}
+		float sp_bottom = this.spacing_bottom;
+		if (Float.isNaN(sp_bottom)) {
+			sp_bottom = 0f;
+		}
+		p = this.padding_left;
+		if (Float.isNaN(p)) {
+			p = 0f;
+		}
 		cell.setPaddingLeft(p + sp_left);
-		p = padding_right;
-		if (Float.isNaN(p)) p = 0f; 
+		p = this.padding_right;
+		if (Float.isNaN(p)) {
+			p = 0f;
+		}
 		cell.setPaddingRight(p + sp_right);
-		p = padding_top;
-		if (Float.isNaN(p)) p = 0f; 
+		p = this.padding_top;
+		if (Float.isNaN(p)) {
+			p = 0f;
+		}
 		cell.setPaddingTop(p + sp_top);
-		p = padding_bottom;
-		if (Float.isNaN(p)) p = 0f; 
+		p = this.padding_bottom;
+		if (Float.isNaN(p)) {
+			p = 0f;
+		}
 		cell.setPaddingBottom(p + sp_bottom);
 		Element element;
-		for (Iterator i = content.iterator(); i.hasNext(); ) {
+		for (final Iterator i = this.content.iterator(); i.hasNext(); ) {
 			element = (Element)i.next();
 			cell.addElement(element);
 		}
@@ -248,285 +245,299 @@ public class SimpleCell extends Rectangle implements PdfPCellEvent, TextElementA
 	/**
 	 * @see com.lowagie.text.pdf.PdfPCellEvent#cellLayout(com.lowagie.text.pdf.PdfPCell, com.lowagie.text.Rectangle, com.lowagie.text.pdf.PdfContentByte[])
 	 */
-	public void cellLayout(PdfPCell cell, Rectangle position, PdfContentByte[] canvases) {
-		float sp_left = spacing_left;
-		if (Float.isNaN(sp_left)) sp_left = 0f;
-		float sp_right = spacing_right;
-		if (Float.isNaN(sp_right)) sp_right = 0f;
-		float sp_top = spacing_top;
-		if (Float.isNaN(sp_top)) sp_top = 0f;
-		float sp_bottom = spacing_bottom;
-		if (Float.isNaN(sp_bottom)) sp_bottom = 0f;
-		Rectangle rect = new Rectangle(position.getLeft(sp_left), position.getBottom(sp_bottom), position.getRight(sp_right), position.getTop(sp_top));
+	@Override
+	public void cellLayout(final PdfPCell cell, final Rectangle position, final PdfContentByte[] canvases) {
+		float sp_left = this.spacing_left;
+		if (Float.isNaN(sp_left)) {
+			sp_left = 0f;
+		}
+		float sp_right = this.spacing_right;
+		if (Float.isNaN(sp_right)) {
+			sp_right = 0f;
+		}
+		float sp_top = this.spacing_top;
+		if (Float.isNaN(sp_top)) {
+			sp_top = 0f;
+		}
+		float sp_bottom = this.spacing_bottom;
+		if (Float.isNaN(sp_bottom)) {
+			sp_bottom = 0f;
+		}
+		final Rectangle rect = new Rectangle(position.getLeft(sp_left), position.getBottom(sp_bottom), position.getRight(sp_right), position.getTop(sp_top));
 		rect.cloneNonPositionParameters(this);
 		canvases[PdfPTable.BACKGROUNDCANVAS].rectangle(rect);
 		rect.setBackgroundColor(null);
 		canvases[PdfPTable.LINECANVAS].rectangle(rect);
 	}
-	
-	/** Sets the padding parameters if they are undefined. 
+
+	/** Sets the padding parameters if they are undefined.
 	 * @param padding
 	 */
-	public void setPadding(float padding) {
-		if (Float.isNaN(padding_right)) {
+	public void setPadding(final float padding) {
+		if (Float.isNaN(this.padding_right)) {
 			setPadding_right(padding);
 		}
-		if (Float.isNaN(padding_left)) {
+		if (Float.isNaN(this.padding_left)) {
 			setPadding_left(padding);
 		}
-		if (Float.isNaN(padding_top)) {
+		if (Float.isNaN(this.padding_top)) {
 			setPadding_top(padding);
 		}
-		if (Float.isNaN(padding_bottom)) {
+		if (Float.isNaN(this.padding_bottom)) {
 			setPadding_bottom(padding);
 		}
 	}
-	
+
 	/**
 	 * @return Returns the colspan.
 	 */
 	public int getColspan() {
-		return colspan;
+		return this.colspan;
 	}
 	/**
 	 * @param colspan The colspan to set.
 	 */
-	public void setColspan(int colspan) {
-		if (colspan > 0) this.colspan = colspan;
+	public void setColspan(final int colspan) {
+		if (colspan > 0) {
+			this.colspan = colspan;
+		}
 	}
 	/**
 	 * @return Returns the padding_bottom.
 	 */
 	public float getPadding_bottom() {
-		return padding_bottom;
+		return this.padding_bottom;
 	}
 	/**
 	 * @param padding_bottom The padding_bottom to set.
 	 */
-	public void setPadding_bottom(float padding_bottom) {
+	public void setPadding_bottom(final float padding_bottom) {
 		this.padding_bottom = padding_bottom;
 	}
 	/**
 	 * @return Returns the padding_left.
 	 */
 	public float getPadding_left() {
-		return padding_left;
+		return this.padding_left;
 	}
 	/**
 	 * @param padding_left The padding_left to set.
 	 */
-	public void setPadding_left(float padding_left) {
+	public void setPadding_left(final float padding_left) {
 		this.padding_left = padding_left;
 	}
 	/**
 	 * @return Returns the padding_right.
 	 */
 	public float getPadding_right() {
-		return padding_right;
+		return this.padding_right;
 	}
 	/**
 	 * @param padding_right The padding_right to set.
 	 */
-	public void setPadding_right(float padding_right) {
+	public void setPadding_right(final float padding_right) {
 		this.padding_right = padding_right;
 	}
 	/**
 	 * @return Returns the padding_top.
 	 */
 	public float getPadding_top() {
-		return padding_top;
+		return this.padding_top;
 	}
 	/**
 	 * @param padding_top The padding_top to set.
 	 */
-	public void setPadding_top(float padding_top) {
+	public void setPadding_top(final float padding_top) {
 		this.padding_top = padding_top;
 	}
 	/**
 	 * @return Returns the spacing.
 	 */
 	public float getSpacing_left() {
-		return spacing_left;
+		return this.spacing_left;
 	}
 	/**
 	 * @return Returns the spacing.
 	 */
 	public float getSpacing_right() {
-		return spacing_right;
+		return this.spacing_right;
 	}
 	/**
 	 * @return Returns the spacing.
 	 */
 	public float getSpacing_top() {
-		return spacing_top;
+		return this.spacing_top;
 	}
 	/**
 	 * @return Returns the spacing.
 	 */
 	public float getSpacing_bottom() {
-		return spacing_bottom;
+		return this.spacing_bottom;
 	}
-	
+
 	/**
 	 * @param spacing The spacing to set.
 	 */
-	public void setSpacing(float spacing) {
+	public void setSpacing(final float spacing) {
 		this.spacing_left = spacing;
 		this.spacing_right = spacing;
 		this.spacing_top = spacing;
 		this.spacing_bottom = spacing;
 	}
-	
+
 	/**
 	 * @param spacing The spacing to set.
 	 */
-	public void setSpacing_left(float spacing) {
+	public void setSpacing_left(final float spacing) {
 		this.spacing_left = spacing;
 	}
-	
+
 	/**
 	 * @param spacing The spacing to set.
 	 */
-	public void setSpacing_right(float spacing) {
+	public void setSpacing_right(final float spacing) {
 		this.spacing_right = spacing;
 	}
-	
+
 	/**
 	 * @param spacing The spacing to set.
 	 */
-	public void setSpacing_top(float spacing) {
+	public void setSpacing_top(final float spacing) {
 		this.spacing_top = spacing;
 	}
-	
+
 	/**
 	 * @param spacing The spacing to set.
 	 */
-	public void setSpacing_bottom(float spacing) {
+	public void setSpacing_bottom(final float spacing) {
 		this.spacing_bottom = spacing;
 	}
-	
+
 	/**
 	 * @return Returns the cellgroup.
 	 */
 	public boolean isCellgroup() {
-		return cellgroup;
+		return this.cellgroup;
 	}
 	/**
 	 * @param cellgroup The cellgroup to set.
 	 */
-	public void setCellgroup(boolean cellgroup) {
+	public void setCellgroup(final boolean cellgroup) {
 		this.cellgroup = cellgroup;
 	}
 	/**
 	 * @return Returns the horizontal alignment.
 	 */
 	public int getHorizontalAlignment() {
-		return horizontalAlignment;
+		return this.horizontalAlignment;
 	}
 	/**
 	 * @param horizontalAlignment The horizontalAlignment to set.
 	 */
-	public void setHorizontalAlignment(int horizontalAlignment) {
+	public void setHorizontalAlignment(final int horizontalAlignment) {
 		this.horizontalAlignment = horizontalAlignment;
 	}
 	/**
 	 * @return Returns the vertical alignment.
 	 */
 	public int getVerticalAlignment() {
-		return verticalAlignment;
+		return this.verticalAlignment;
 	}
 	/**
 	 * @param verticalAlignment The verticalAligment to set.
 	 */
-	public void setVerticalAlignment(int verticalAlignment) {
+	public void setVerticalAlignment(final int verticalAlignment) {
 		this.verticalAlignment = verticalAlignment;
 	}
 	/**
 	 * @return Returns the width.
 	 */
+	@Override
 	public float getWidth() {
-		return width;
+		return this.width;
 	}
 	/**
 	 * @param width The width to set.
 	 */
-	public void setWidth(float width) {
+	public void setWidth(final float width) {
 		this.width = width;
 	}
 	/**
 	 * @return Returns the widthpercentage.
 	 */
 	public float getWidthpercentage() {
-		return widthpercentage;
+		return this.widthpercentage;
 	}
 	/**
 	 * @param widthpercentage The widthpercentage to set.
 	 */
-	public void setWidthpercentage(float widthpercentage) {
+	public void setWidthpercentage(final float widthpercentage) {
 		this.widthpercentage = widthpercentage;
 	}
 	/**
 	 * @return Returns the useAscender.
 	 */
 	public boolean isUseAscender() {
-		return useAscender;
+		return this.useAscender;
 	}
 	/**
 	 * @param useAscender The useAscender to set.
 	 */
-	public void setUseAscender(boolean useAscender) {
+	public void setUseAscender(final boolean useAscender) {
 		this.useAscender = useAscender;
 	}
 	/**
 	 * @return Returns the useBorderPadding.
 	 */
 	public boolean isUseBorderPadding() {
-		return useBorderPadding;
+		return this.useBorderPadding;
 	}
 	/**
 	 * @param useBorderPadding The useBorderPadding to set.
 	 */
-	public void setUseBorderPadding(boolean useBorderPadding) {
+	public void setUseBorderPadding(final boolean useBorderPadding) {
 		this.useBorderPadding = useBorderPadding;
 	}
 	/**
 	 * @return Returns the useDescender.
 	 */
 	public boolean isUseDescender() {
-		return useDescender;
+		return this.useDescender;
 	}
 	/**
 	 * @param useDescender The useDescender to set.
 	 */
-	public void setUseDescender(boolean useDescender) {
+	public void setUseDescender(final boolean useDescender) {
 		this.useDescender = useDescender;
 	}
-	
+
 	/**
 	 * @return Returns the content.
 	 */
 	ArrayList getContent() {
-		return content;
+		return this.content;
 	}
 
 	/**
 	 * @see com.lowagie.text.TextElementArray#add(java.lang.Object)
 	 */
-	public boolean add(Object o) {
+	@Override
+	public boolean add(final Object o) {
 		try {
 			addElement((Element)o);
 			return true;
 		}
-		catch(ClassCastException e) {
+		catch(final ClassCastException e) {
 			return false;
 		}
-		catch(BadElementException e) {
+		catch(final BadElementException e) {
 			throw new ExceptionConverter(e);
 		}
 	}
 	/**
 	 * @see com.lowagie.text.Element#type()
 	 */
+	@Override
 	public int type() {
 		return Element.CELL;
 	}

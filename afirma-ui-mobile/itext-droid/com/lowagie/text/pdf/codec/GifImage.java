@@ -57,7 +57,6 @@ import java.util.ArrayList;
 import com.lowagie.text.ExceptionConverter;
 import com.lowagie.text.Image;
 import com.lowagie.text.ImgRaw;
-import com.lowagie.text.Utilities;
 import com.lowagie.text.pdf.PdfArray;
 import com.lowagie.text.pdf.PdfDictionary;
 import com.lowagie.text.pdf.PdfName;
@@ -69,58 +68,58 @@ import com.lowagie.text.pdf.PdfString;
  * @author Paulo Soares (psoares@consiste.pt)
  */
 public class GifImage {
-    
-    protected DataInputStream in;
-    protected int width;            // full image width
-    protected int height;           // full image height
-    protected boolean gctFlag;      // global color table used
 
-    protected int bgIndex;          // background color index
-    protected int bgColor;          // background color
-    protected int pixelAspect;      // pixel aspect ratio
+    private DataInputStream in;
+    private int width;            // full image width
+    private int height;           // full image height
+    private boolean gctFlag;      // global color table used
 
-    protected boolean lctFlag;      // local color table flag
-    protected boolean interlace;    // interlace flag
-    protected int lctSize;          // local color table size
 
-    protected int ix, iy, iw, ih;   // current image rectangle
 
-    protected byte[] block = new byte[256];  // current data block
-    protected int blockSize = 0;    // block size
+
+
+    private boolean lctFlag;      // local color table flag
+    private boolean interlace;    // interlace flag
+
+
+    private int ix, iy, iw, ih;   // current image rectangle
+
+    private final byte[] block = new byte[256];  // current data block
+    private int blockSize = 0;    // block size
 
     // last graphic control extension info
-    protected int dispose = 0;   // 0=no action; 1=leave in place; 2=restore to bg; 3=restore to prev
-    protected boolean transparency = false;   // use transparent color
-    protected int delay = 0;        // delay in milliseconds
-    protected int transIndex;       // transparent color index
+    private int dispose = 0;   // 0=no action; 1=leave in place; 2=restore to bg; 3=restore to prev
+    private boolean transparency = false;   // use transparent color
 
-    protected static final int MaxStackSize = 4096;   // max decoder pixel stack size
+    private int transIndex;       // transparent color index
+
+    private static final int MaxStackSize = 4096;   // max decoder pixel stack size
 
     // LZW decoder working arrays
-    protected short[] prefix;
-    protected byte[] suffix;
-    protected byte[] pixelStack;
-    protected byte[] pixels;
-
-    protected byte m_out[];
-    protected int m_bpc;
-    protected int m_gbpc;
-    protected byte m_global_table[];
-    protected byte m_local_table[];
-    protected byte m_curr_table[];
-    protected int m_line_stride;
-    protected byte fromData[];
-    protected URL fromUrl;
+    private short[] prefix;
+    private byte[] suffix;
+    private byte[] pixelStack;
 
 
-    protected ArrayList frames = new ArrayList();     // frames read from current file
+    private byte m_out[];
+    private int m_bpc;
+    private int m_gbpc;
+    private byte m_global_table[];
+
+    private byte m_curr_table[];
+    private int m_line_stride;
+    private byte fromData[];
+    private URL fromUrl;
+
+
+    private final ArrayList frames = new ArrayList();     // frames read from current file
 
     /** Reads gif images from an URL.
      * @param url the URL
      * @throws IOException on error
-     */    
-    public GifImage(URL url) throws IOException {
-        fromUrl = url;
+     */
+    public GifImage(final URL url) throws IOException {
+        this.fromUrl = url;
         InputStream is = null;
         try {
             is = url.openStream();
@@ -132,21 +131,15 @@ public class GifImage {
             }
         }
     }
-    
-    /** Reads gif images from a file.
-     * @param file the file
-     * @throws IOException on error
-     */    
-    public GifImage(String file) throws IOException {
-        this(Utilities.toURL(file));
-    }
-    
+
+
+
     /** Reads gif images from a byte array.
      * @param data the byte array
      * @throws IOException on error
-     */    
-    public GifImage(byte data[]) throws IOException {
-        fromData = data;
+     */
+    public GifImage(final byte data[]) throws IOException {
+        this.fromData = data;
         InputStream is = null;
         try {
             is = new ByteArrayInputStream(data);
@@ -158,99 +151,85 @@ public class GifImage {
             }
         }
     }
-    
-    /** Reads gif images from a stream. The stream is not closed.
-     * @param is the stream
-     * @throws IOException on error
-     */    
-    public GifImage(InputStream is) throws IOException {
-        process(is);
-    }
-    
+
+
+
     /** Gets the number of frames the gif has.
      * @return the number of frames the gif has
-     */    
+     */
     public int getFrameCount() {
-        return frames.size();
+        return this.frames.size();
     }
-    
+
     /** Gets the image from a frame. The first frame is 1.
      * @param frame the frame to get the image from
      * @return the image
-     */    
-    public Image getImage(int frame) {
-        GifFrame gf = (GifFrame)frames.get(frame - 1);
+     */
+    public Image getImage(final int frame) {
+        final GifFrame gf = (GifFrame)this.frames.get(frame - 1);
         return gf.image;
     }
-    
-    /** Gets the [x,y] position of the frame in reference to the
-     * logical screen.
-     * @param frame the frame
-     * @return the [x,y] position of the frame
-     */    
-    public int[] getFramePosition(int frame) {
-        GifFrame gf = (GifFrame)frames.get(frame - 1);
-        return new int[]{gf.ix, gf.iy};
-        
-    }
-    
+
+
+
     /** Gets the logical screen. The images may be smaller and placed
      * in some position in this screen to playback some animation.
      * No image will be be bigger that this.
      * @return the logical screen dimensions as [x,y]
-     */    
+     */
     public int[] getLogicalScreen() {
-        return new int[]{width, height};
+        return new int[]{this.width, this.height};
     }
-    
-    void process(InputStream is) throws IOException {
-        in = new DataInputStream(new BufferedInputStream(is));
+
+    private void process(final InputStream is) throws IOException {
+        this.in = new DataInputStream(new BufferedInputStream(is));
         readHeader();
         readContents();
-        if (frames.isEmpty())
-            throw new IOException("The file does not contain any valid image.");
+        if (this.frames.isEmpty()) {
+			throw new IOException("The file does not contain any valid image.");
+		}
     }
-    
+
     /**
      * Reads GIF file header information.
      */
-    protected void readHeader() throws IOException {
+    private void readHeader() throws IOException {
         String id = "";
-        for (int i = 0; i < 6; i++)
-            id += (char)in.read();
+        for (int i = 0; i < 6; i++) {
+			id += (char)this.in.read();
+		}
         if (!id.startsWith("GIF8")) {
             throw new IOException("Gif signature nor found.");
         }
-        
+
         readLSD();
-        if (gctFlag) {
-            m_global_table = readColorTable(m_gbpc);
+        if (this.gctFlag) {
+            this.m_global_table = readColorTable(this.m_gbpc);
         }
     }
 
     /**
      * Reads Logical Screen Descriptor
      */
-    protected void readLSD() throws IOException {
-        
+    private void readLSD() throws IOException {
+
         // logical screen size
-        width = readShort();
-        height = readShort();
-        
+        this.width = readShort();
+        this.height = readShort();
+
         // packed fields
-        int packed = in.read();
-        gctFlag = (packed & 0x80) != 0;      // 1   : global color table flag
-        m_gbpc = (packed & 7) + 1;
-        bgIndex = in.read();        // background color index
-        pixelAspect = in.read();    // pixel aspect ratio
+        final int packed = this.in.read();
+        this.gctFlag = (packed & 0x80) != 0;      // 1   : global color table flag
+        this.m_gbpc = (packed & 7) + 1;
+
     }
 
     /**
      * Reads next 16-bit value, LSB first
      */
-    protected int readShort() throws IOException {
+    private int readShort() throws IOException {
         // read 16-bit value, LSB first
-        return in.read() | (in.read() << 8);
+        return this.in.read() | this.in.read() << 8;
     }
 
     /**
@@ -258,31 +237,32 @@ public class GifImage {
      *
      * @return number of bytes stored in "buffer"
      */
-    protected int readBlock() throws IOException {
-        blockSize = in.read();
-        if (blockSize <= 0)
-            return blockSize = 0;
-        for (int k = 0; k < blockSize; ++k) {
-            int v = in.read();
+    private int readBlock() throws IOException {
+        this.blockSize = this.in.read();
+        if (this.blockSize <= 0) {
+			return this.blockSize = 0;
+		}
+        for (int k = 0; k < this.blockSize; ++k) {
+            final int v = this.in.read();
             if (v < 0) {
-                return blockSize = k;
+                return this.blockSize = k;
             }
-            block[k] = (byte)v;
+            this.block[k] = (byte)v;
         }
-        return blockSize;
+        return this.blockSize;
     }
 
-    protected byte[] readColorTable(int bpc) throws IOException {
-        int ncolors = 1 << bpc;
-        int nbytes = 3*ncolors;
+    private byte[] readColorTable(int bpc) throws IOException {
+        final int ncolors = 1 << bpc;
+        final int nbytes = 3*ncolors;
         bpc = newBpc(bpc);
-        byte table[] = new byte[(1 << bpc) * 3];
-        in.readFully(table, 0, nbytes);
+        final byte table[] = new byte[(1 << bpc) * 3];
+        this.in.readFully(table, 0, nbytes);
         return table;
     }
- 
-    
-    static protected int newBpc(int bpc) {
+
+
+    static private int newBpc(final int bpc) {
         switch (bpc) {
             case 1:
             case 2:
@@ -295,36 +275,36 @@ public class GifImage {
         }
         return bpc;
     }
-    
-    protected void readContents() throws IOException {
+
+    private void readContents() throws IOException {
         // read GIF file content blocks
         boolean done = false;
         while (!done) {
-            int code = in.read();
+            int code = this.in.read();
             switch (code) {
-                
+
                 case 0x2C:    // image separator
                     readImage();
                     break;
-                    
+
                 case 0x21:    // extension
-                    code = in.read();
+                    code = this.in.read();
                     switch (code) {
-                        
+
                         case 0xf9:    // graphics control extension
                             readGraphicControlExt();
                             break;
-                            
+
                         case 0xff:    // application extension
                             readBlock();
                             skip();        // don't care
                             break;
-                            
+
                         default:    // uninteresting extension
                             skip();
                     }
                     break;
-                    
+
                 default:
                     done = true;
                     break;
@@ -335,94 +315,97 @@ public class GifImage {
     /**
      * Reads next frame image
      */
-    protected void readImage() throws IOException {
-        ix = readShort();    // (sub)image position & size
-        iy = readShort();
-        iw = readShort();
-        ih = readShort();
-        
-        int packed = in.read();
-        lctFlag = (packed & 0x80) != 0;     // 1 - local color table flag
-        interlace = (packed & 0x40) != 0;   // 2 - interlace flag
+    private void readImage() throws IOException {
+        this.ix = readShort();    // (sub)image position & size
+        this.iy = readShort();
+        this.iw = readShort();
+        this.ih = readShort();
+
+        final int packed = this.in.read();
+        this.lctFlag = (packed & 0x80) != 0;     // 1 - local color table flag
+        this.interlace = (packed & 0x40) != 0;   // 2 - interlace flag
         // 3 - sort flag
         // 4-5 - reserved
-        lctSize = 2 << (packed & 7);        // 6-8 - local color table size
-        m_bpc = newBpc(m_gbpc);
-        if (lctFlag) {
-            m_curr_table = readColorTable((packed & 7) + 1);   // read table
-            m_bpc = newBpc((packed & 7) + 1);
+
+        this.m_bpc = newBpc(this.m_gbpc);
+        if (this.lctFlag) {
+            this.m_curr_table = readColorTable((packed & 7) + 1);   // read table
+            this.m_bpc = newBpc((packed & 7) + 1);
         }
         else {
-            m_curr_table = m_global_table;
+            this.m_curr_table = this.m_global_table;
         }
-        if (transparency && transIndex >= m_curr_table.length / 3)
-            transparency = false;
-        if (transparency && m_bpc == 1) { // Acrobat 5.05 doesn't like this combination
-            byte tp[] = new byte[12];
-            System.arraycopy(m_curr_table, 0, tp, 0, 6);
-            m_curr_table = tp;
-            m_bpc = 2;
+        if (this.transparency && this.transIndex >= this.m_curr_table.length / 3) {
+			this.transparency = false;
+		}
+        if (this.transparency && this.m_bpc == 1) { // Acrobat 5.05 doesn't like this combination
+            final byte tp[] = new byte[12];
+            System.arraycopy(this.m_curr_table, 0, tp, 0, 6);
+            this.m_curr_table = tp;
+            this.m_bpc = 2;
         }
-        boolean skipZero = decodeImageData();   // decode pixel data
-        if (!skipZero)
-            skip();
-        
+        final boolean skipZero = decodeImageData();   // decode pixel data
+        if (!skipZero) {
+			skip();
+		}
+
         Image img = null;
         try {
-            img = new ImgRaw(iw, ih, 1, m_bpc, m_out);
-            PdfArray colorspace = new PdfArray();
+            img = new ImgRaw(this.iw, this.ih, 1, this.m_bpc, this.m_out);
+            final PdfArray colorspace = new PdfArray();
             colorspace.add(PdfName.INDEXED);
             colorspace.add(PdfName.DEVICERGB);
-            int len = m_curr_table.length;
+            final int len = this.m_curr_table.length;
             colorspace.add(new PdfNumber(len / 3 - 1));
-            colorspace.add(new PdfString(m_curr_table));
-            PdfDictionary ad = new PdfDictionary();
+            colorspace.add(new PdfString(this.m_curr_table));
+            final PdfDictionary ad = new PdfDictionary();
             ad.put(PdfName.COLORSPACE, colorspace);
             img.setAdditional(ad);
-            if (transparency) {
-                img.setTransparency(new int[]{transIndex, transIndex});
+            if (this.transparency) {
+                img.setTransparency(new int[]{this.transIndex, this.transIndex});
             }
         }
-        catch (Exception e) {
+        catch (final Exception e) {
             throw new ExceptionConverter(e);
         }
         img.setOriginalType(Image.ORIGINAL_GIF);
-        img.setOriginalData(fromData);
-        img.setUrl(fromUrl);
-        GifFrame gf = new GifFrame();
+        img.setOriginalData(this.fromData);
+        img.setUrl(this.fromUrl);
+        final GifFrame gf = new GifFrame();
         gf.image = img;
-        gf.ix = ix;
-        gf.iy = iy;
-        frames.add(gf);   // add image to frame list
-        
+        this.frames.add(gf);   // add image to frame list
+
         //resetFrame();
-        
+
     }
-    
-    protected boolean decodeImageData() throws IOException {
-        int NullCode = -1;
-        int npix = iw * ih;
+
+    private boolean decodeImageData() throws IOException {
+        final int NullCode = -1;
+        final int npix = this.iw * this.ih;
         int available, clear, code_mask, code_size, end_of_information, in_code, old_code,
         bits, code, count, i, datum, data_size, first, top, bi;
         boolean skipZero = false;
-        
-        if (prefix == null)
-            prefix = new short[MaxStackSize];
-        if (suffix == null)
-            suffix = new byte[MaxStackSize];
-        if (pixelStack == null)
-            pixelStack = new byte[MaxStackSize+1];
-        
-        m_line_stride = (iw * m_bpc + 7) / 8;
-        m_out = new byte[m_line_stride * ih];
+
+        if (this.prefix == null) {
+			this.prefix = new short[MaxStackSize];
+		}
+        if (this.suffix == null) {
+			this.suffix = new byte[MaxStackSize];
+		}
+        if (this.pixelStack == null) {
+			this.pixelStack = new byte[MaxStackSize+1];
+		}
+
+        this.m_line_stride = (this.iw * this.m_bpc + 7) / 8;
+        this.m_out = new byte[this.m_line_stride * this.ih];
         int pass = 1;
-        int inc = interlace ? 8 : 1;
+        int inc = this.interlace ? 8 : 1;
         int line = 0;
         int xpos = 0;
-        
+
         //  Initialize GIF data stream decoder.
-        
-        data_size = in.read();
+
+        data_size = this.in.read();
         clear = 1 << data_size;
         end_of_information = clear + 1;
         available = clear + 2;
@@ -430,14 +413,14 @@ public class GifImage {
         code_size = data_size + 1;
         code_mask = (1 << code_size) - 1;
         for (code = 0; code < clear; code++) {
-            prefix[code] = 0;
-            suffix[code] = (byte) code;
+            this.prefix[code] = 0;
+            this.suffix[code] = (byte) code;
         }
-        
+
         //  Decode GIF pixel stream.
-        
+
         datum = bits = count = first = top = bi = 0;
-        
+
         for (i = 0; i < npix; ) {
             if (top == 0) {
                 if (bits < code_size) {
@@ -451,23 +434,24 @@ public class GifImage {
                         }
                         bi = 0;
                     }
-                    datum += (block[bi] & 0xff) << bits;
+                    datum += (this.block[bi] & 0xff) << bits;
                     bits += 8;
                     bi++;
                     count--;
                     continue;
                 }
-                
+
                 //  Get the next code.
-                
+
                 code = datum & code_mask;
                 datum >>= code_size;
                 bits -= code_size;
-                
+
                 //  Interpret the code
-                
-                if ((code > available) || (code == end_of_information))
-                    break;
+
+                if (code > available || code == end_of_information) {
+					break;
+				}
                 if (code == clear) {
                     //  Reset decoder.
                     code_size = data_size + 1;
@@ -477,49 +461,50 @@ public class GifImage {
                     continue;
                 }
                 if (old_code == NullCode) {
-                    pixelStack[top++] = suffix[code];
+                    this.pixelStack[top++] = this.suffix[code];
                     old_code = code;
                     first = code;
                     continue;
                 }
                 in_code = code;
                 if (code == available) {
-                    pixelStack[top++] = (byte) first;
+                    this.pixelStack[top++] = (byte) first;
                     code = old_code;
                 }
                 while (code > clear) {
-                    pixelStack[top++] = suffix[code];
-                    code = prefix[code];
+                    this.pixelStack[top++] = this.suffix[code];
+                    code = this.prefix[code];
                 }
-                first = suffix[code] & 0xff;
-                
+                first = this.suffix[code] & 0xff;
+
                 //  Add a new string to the string table,
-                
-                if (available >= MaxStackSize)
-                    break;
-                pixelStack[top++] = (byte) first;
-                prefix[available] = (short) old_code;
-                suffix[available] = (byte) first;
+
+                if (available >= MaxStackSize) {
+					break;
+				}
+                this.pixelStack[top++] = (byte) first;
+                this.prefix[available] = (short) old_code;
+                this.suffix[available] = (byte) first;
                 available++;
-                if (((available & code_mask) == 0) && (available < MaxStackSize)) {
+                if ((available & code_mask) == 0 && available < MaxStackSize) {
                     code_size++;
                     code_mask += available;
                 }
                 old_code = in_code;
             }
-            
+
             //  Pop a pixel off the pixel stack.
-            
+
             top--;
             i++;
-            
-            setPixel(xpos, line, pixelStack[top]);
+
+            setPixel(xpos, line, this.pixelStack[top]);
             ++xpos;
-            if (xpos >= iw) {
+            if (xpos >= this.iw) {
                 xpos = 0;
                 line += inc;
-                if (line >= ih) {
-                    if (interlace) {
+                if (line >= this.ih) {
+                    if (this.interlace) {
                         do {
                             pass++;
                             switch (pass) {
@@ -535,13 +520,13 @@ public class GifImage {
                                     inc = 2;
                                     break;
                                 default: // this shouldn't happen
-                                    line = ih - 1;
+                                    line = this.ih - 1;
                                     inc = 0;
                             }
-                        } while (line >= ih);
+                        } while (line >= this.ih);
                     }
                     else {
-                        line = ih - 1; // this shouldn't happen
+                        line = this.ih - 1; // this shouldn't happen
                         inc = 0;
                     }
                 }
@@ -549,57 +534,51 @@ public class GifImage {
         }
         return skipZero;
     }
-    
-    
-    protected void setPixel(int x, int y, int v) {
-        if (m_bpc == 8) {
-            int pos = x + iw * y;
-            m_out[pos] = (byte)v;
+
+
+    private void setPixel(final int x, final int y, final int v) {
+        if (this.m_bpc == 8) {
+            final int pos = x + this.iw * y;
+            this.m_out[pos] = (byte)v;
         }
         else {
-            int pos = m_line_stride * y + x / (8 / m_bpc);
-            int vout = v << (8 - m_bpc * (x % (8 / m_bpc))- m_bpc);
-            m_out[pos] |= vout;
+            final int pos = this.m_line_stride * y + x / (8 / this.m_bpc);
+            final int vout = v << 8 - this.m_bpc * (x % (8 / this.m_bpc))- this.m_bpc;
+            this.m_out[pos] |= vout;
         }
     }
-    
-    /**
-     * Resets frame state for reading next image.
-     */
-    protected void resetFrame() {
-        // it does nothing in the pdf context
-        //boolean transparency = false;
-        //int delay = 0;
-    }
+
+
 
     /**
      * Reads Graphics Control Extension values
      */
-    protected void readGraphicControlExt() throws IOException {
-        in.read();    // block size
-        int packed = in.read();   // packed fields
-        dispose = (packed & 0x1c) >> 2;   // disposal method
-        if (dispose == 0)
-            dispose = 1;   // elect to keep old image if discretionary
-        transparency = (packed & 1) != 0;
-        delay = readShort() * 10;   // delay in milliseconds
-        transIndex = in.read();        // transparent color index
-        in.read();                     // block terminator
+    private void readGraphicControlExt() throws IOException {
+        this.in.read();    // block size
+        final int packed = this.in.read();   // packed fields
+        this.dispose = (packed & 0x1c) >> 2;   // disposal method
+        if (this.dispose == 0)
+		 {
+			this.dispose = 1;   // elect to keep old image if discretionary
+		}
+        this.transparency = (packed & 1) != 0;
+        this.transIndex = this.in.read();        // transparent color index
+        this.in.read();                     // block terminator
     }
-    
+
     /**
      * Skips variable length blocks up to and including
      * next zero length block.
      */
-    protected void skip() throws IOException {
+    private void skip() throws IOException {
         do {
             readBlock();
-        } while (blockSize > 0);
+        } while (this.blockSize > 0);
     }
 
-    static class GifFrame {
-        Image image;
-        int ix;
-        int iy;
+    private static class GifFrame {
+        private Image image;
+
+
     }
 }

@@ -65,24 +65,22 @@ package com.lowagie.text.pdf;
  */
 public class PdfDeveloperExtension {
 
-	/** An instance of this class for Adobe 1.7 Extension level 3. */
-	public static final PdfDeveloperExtension ADOBE_1_7_EXTENSIONLEVEL3 =
-		new PdfDeveloperExtension(PdfName.ADBE, PdfWriter.PDF_VERSION_1_7, 3);
-	
+
+
 	/** The prefix used in the Extensions dictionary added to the Catalog. */
-	protected PdfName prefix;
+	private final PdfName prefix;
 	/** The base version. */
-	protected PdfName baseversion;
+	private final PdfName baseversion;
 	/** The extension level within the baseversion. */
-	protected int extensionLevel;
-	
+	private final int extensionLevel;
+
 	/**
 	 * Creates a PdfDeveloperExtension object.
 	 * @param prefix	the prefix referring to the developer
 	 * @param baseversion	the number of the base version
 	 * @param extensionLevel	the extension level within the baseverion.
 	 */
-	public PdfDeveloperExtension(PdfName prefix, PdfName baseversion, int extensionLevel) {
+	public PdfDeveloperExtension(final PdfName prefix, final PdfName baseversion, final int extensionLevel) {
 		this.prefix = prefix;
 		this.baseversion = baseversion;
 		this.extensionLevel = extensionLevel;
@@ -93,7 +91,7 @@ public class PdfDeveloperExtension {
 	 * @return	a PdfName
 	 */
 	public PdfName getPrefix() {
-		return prefix;
+		return this.prefix;
 	}
 
 	/**
@@ -101,7 +99,7 @@ public class PdfDeveloperExtension {
 	 * @return	a PdfName
 	 */
 	public PdfName getBaseversion() {
-		return baseversion;
+		return this.baseversion;
 	}
 
 	/**
@@ -109,18 +107,18 @@ public class PdfDeveloperExtension {
 	 * @return	an integer
 	 */
 	public int getExtensionLevel() {
-		return extensionLevel;
+		return this.extensionLevel;
 	}
-	
+
 	/**
 	 * Generations the developer extension dictionary corresponding
 	 * with the prefix.
 	 * @return	a PdfDictionary
 	 */
 	public PdfDictionary getDeveloperExtensions() {
-		PdfDictionary developerextensions = new PdfDictionary();
-		developerextensions.put(PdfName.BASEVERSION, baseversion);
-		developerextensions.put(PdfName.EXTENSIONLEVEL, new PdfNumber(extensionLevel));
+		final PdfDictionary developerextensions = new PdfDictionary();
+		developerextensions.put(PdfName.BASEVERSION, this.baseversion);
+		developerextensions.put(PdfName.EXTENSIONLEVEL, new PdfNumber(this.extensionLevel));
 		return developerextensions;
 	}
 }

@@ -50,10 +50,10 @@ package com.lowagie.text.xml.simpleparser;
  * The handler for the events fired by <CODE>SimpleXMLParser</CODE>.
  * @author Paulo Soares (psoares@consiste.pt)
  */
-public interface SimpleXMLDocHandlerComment {
+interface SimpleXMLDocHandlerComment {
     /**
      * Called when a comment is found.
      * @param text the comment text
-     */    
+     */
     public void comment(String text);
 }

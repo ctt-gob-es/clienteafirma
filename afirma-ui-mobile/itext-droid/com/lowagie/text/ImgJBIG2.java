@@ -57,19 +57,11 @@ import java.security.MessageDigest;
  * @since 2.1.5
  */
 public class ImgJBIG2 extends Image {
-	
+
 	/** JBIG2 globals */
 	private  byte[] global;
 	/** A unique hash */
 	private  byte[] globalHash;
-	
-	/**
-	 * Copy contstructor.
-	 * @param	image another Image
-	 */
-	ImgJBIG2(Image image) {
-		super(image);
-	}
 
 	/**
 	 * Empty constructor.
@@ -85,19 +77,19 @@ public class ImgJBIG2 extends Image {
 	 * @param	data	the raw image data
 	 * @param	globals	JBIG2 globals
 	 */
-	public ImgJBIG2(int width, int height, byte[] data, byte[] globals) {
+	public ImgJBIG2(final int width, final int height, final byte[] data, final byte[] globals) {
 		super((URL) null);
-        type = JBIG2;
-        originalType = ORIGINAL_JBIG2;
-		scaledHeight = height;
-		setTop(scaledHeight);
-		scaledWidth = width;
-		setRight(scaledWidth);
-		bpc = 1;
-		colorspace = 1;
-		rawData = data;
-		plainWidth = getWidth();
-		plainHeight = getHeight();
+        this.type = JBIG2;
+        this.originalType = ORIGINAL_JBIG2;
+		this.scaledHeight = height;
+		setTop(this.scaledHeight);
+		this.scaledWidth = width;
+		setRight(this.scaledWidth);
+		this.bpc = 1;
+		this.colorspace = 1;
+		this.rawData = data;
+		this.plainWidth = getWidth();
+		this.plainHeight = getHeight();
 		if ( globals != null ) {
 			this.global = globals;
 			MessageDigest md;
@@ -105,13 +97,13 @@ public class ImgJBIG2 extends Image {
 				md = MessageDigest.getInstance("MD5");
 				md.update(this.global);
 				this.globalHash = md.digest();
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				//ignore
 			}
-			
+
 		}
 	}
-	
+
 	/**
 	 * Getter for the JBIG2 global data.
 	 * @return 	an array of bytes
@@ -119,7 +111,7 @@ public class ImgJBIG2 extends Image {
 	public byte[] getGlobalBytes() {
 		return this.global;
 	}
-	
+
 	/**
 	 * Getter for the unique hash.
 	 * @return	an array of bytes

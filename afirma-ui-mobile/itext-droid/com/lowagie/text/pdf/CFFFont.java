@@ -68,14 +68,11 @@
 
 package com.lowagie.text.pdf;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-
 import com.lowagie.text.ExceptionConverter;
 
-public class CFFFont {
-    
-    static final String operatorNames[] = {
+class CFFFont {
+
+    private static final String operatorNames[] = {
         "version", "Notice", "FullName", "FamilyName",
         "Weight", "FontBBox", "BlueValues", "OtherBlues",
         "FamilyBlues", "FamilyOtherBlues", "StdHW", "StdVW",
@@ -95,7 +92,7 @@ public class CFFFont {
         "CIDFontRevision", "CIDFontType", "CIDCount", "UIDBase",
         "FDArray", "FDSelect", "FontName"
     };
-    
+
     static final String standardStrings[] = {
         // Automatically generated from Appendix A of the CFF specification; do
         // not edit. Size should be 391.
@@ -167,43 +164,47 @@ public class CFFFont {
         "Ydieresissmall", "001.000", "001.001", "001.002", "001.003", "Black",
         "Bold", "Book", "Light", "Medium", "Regular", "Roman", "Semibold"
     };
-    
+
     //private String[] strings;
-    public String getString(char sid) {
-        if (sid < standardStrings.length) return standardStrings[sid];
-        if (sid >= standardStrings.length+(stringOffsets.length-1)) return null;
-        int j = sid - standardStrings.length;
+    private String getString(final char sid) {
+        if (sid < standardStrings.length) {
+			return standardStrings[sid];
+		}
+        if (sid >= standardStrings.length+this.stringOffsets.length-1) {
+			return null;
+		}
+        final int j = sid - standardStrings.length;
         //java.lang.System.err.println("going for "+j);
-        int p = getPosition();
-        seek(stringOffsets[j]);
-        StringBuffer s = new StringBuffer();
-        for (int k=stringOffsets[j]; k<stringOffsets[j+1]; k++) {
+        final int p = getPosition();
+        seek(this.stringOffsets[j]);
+        final StringBuffer s = new StringBuffer();
+        for (int k=this.stringOffsets[j]; k<this.stringOffsets[j+1]; k++) {
             s.append(getCard8());
         }
         seek(p);
         return s.toString();
     }
-    
+
     char getCard8() {
         try {
-            byte i = buf.readByte();
+            final byte i = this.buf.readByte();
             return (char)(i & 0xff);
         }
-        catch (Exception e) {
+        catch (final Exception e) {
             throw new ExceptionConverter(e);
         }
     }
-    
+
     char getCard16() {
         try {
-            return buf.readChar();
+            return this.buf.readChar();
         }
-        catch (Exception e) {
+        catch (final Exception e) {
             throw new ExceptionConverter(e);
         }
     }
-    
-    int getOffset(int offSize) {
+
+    private int getOffset(final int offSize) {
         int offset = 0;
         for (int i=0; i<offSize; i++) {
             offset *= 256;
@@ -211,124 +212,126 @@ public class CFFFont {
         }
         return offset;
     }
-    
-    void seek(int offset) {
+
+    void seek(final int offset) {
         try {
-            buf.seek(offset);
+            this.buf.seek(offset);
         }
-        catch (Exception e) {
+        catch (final Exception e) {
             throw new ExceptionConverter(e);
         }
     }
-    
-    short getShort() {
+
+    private short getShort() {
         try {
-            return buf.readShort();
+            return this.buf.readShort();
         }
-        catch (Exception e) {
+        catch (final Exception e) {
             throw new ExceptionConverter(e);
         }
     }
-    
-    int getInt() {
+
+    private int getInt() {
         try {
-            return buf.readInt();
+            return this.buf.readInt();
         }
-        catch (Exception e) {
+        catch (final Exception e) {
             throw new ExceptionConverter(e);
         }
     }
-    
+
     int getPosition() {
         try {
-            return buf.getFilePointer();
+            return this.buf.getFilePointer();
         }
-        catch (Exception e) {
+        catch (final Exception e) {
             throw new ExceptionConverter(e);
         }
     }
-    int nextIndexOffset;
+
     // read the offsets in the next index
     // data structure, convert to global
     // offsets, and return them.
     // Sets the nextIndexOffset.
     int[] getIndex(int nextIndexOffset) {
         int count, indexOffSize;
-        
+
         seek(nextIndexOffset);
         count = getCard16();
-        int[] offsets = new int[count+1];
-        
+        final int[] offsets = new int[count+1];
+
         if (count==0) {
             offsets[0] = -1;
             nextIndexOffset += 2;
             return offsets;
         }
-        
+
         indexOffSize = getCard8();
-        
+
         for (int j=0; j<=count; j++) {
         	//nextIndexOffset = ofset to relative segment
             offsets[j] = nextIndexOffset
 			//2-> count in the index header. 1->offset size in index header
             + 2+1
-			//offset array size * offset size 
+			//offset array size * offset size
             + (count+1)*indexOffSize
 			//???zero <-> one base
             - 1
-			// read object offset relative to object array base 
+			// read object offset relative to object array base
             + getOffset(indexOffSize);
         }
         //nextIndexOffset = offsets[count];
         return offsets;
     }
-    
+
     protected String   key;
     protected Object[] args      = new Object[48];
     protected int      arg_count = 0;
-    
+
     protected void getDictItem() {
-        for (int i=0; i<arg_count; i++) args[i]=null;
-        arg_count = 0;
-        key = null;
+        for (int i=0; i<this.arg_count; i++) {
+			this.args[i]=null;
+		}
+        this.arg_count = 0;
+        this.key = null;
         boolean gotKey = false;
-        
+
         while (!gotKey) {
-            char b0 = getCard8();
+            final char b0 = getCard8();
             if (b0 == 29) {
-                int item = getInt();
-                args[arg_count] = new Integer(item);
-                arg_count++;
+                final int item = getInt();
+                this.args[this.arg_count] = new Integer(item);
+                this.arg_count++;
                 //System.err.println(item+" ");
                 continue;
             }
             if (b0 == 28) {
-                short item = getShort();
-                args[arg_count] = new Integer(item);
-                arg_count++;
+                final short item = getShort();
+                this.args[this.arg_count] = new Integer(item);
+                this.arg_count++;
                 //System.err.println(item+" ");
                 continue;
             }
             if (b0 >= 32 && b0 <= 246) {
-                byte item = (byte) (b0-139);
-                args[arg_count] = new Integer(item);
-                arg_count++;
+                final byte item = (byte) (b0-139);
+                this.args[this.arg_count] = new Integer(item);
+                this.arg_count++;
                 //System.err.println(item+" ");
                 continue;
             }
             if (b0 >= 247 && b0 <= 250) {
-                char b1 = getCard8();
-                short item = (short) ((b0-247)*256+b1+108);
-                args[arg_count] = new Integer(item);
-                arg_count++;
+                final char b1 = getCard8();
+                final short item = (short) ((b0-247)*256+b1+108);
+                this.args[this.arg_count] = new Integer(item);
+                this.arg_count++;
                 //System.err.println(item+" ");
                 continue;
             }
             if (b0 >= 251 && b0 <= 254) {
-                char b1 = getCard8();
-                short item = (short) (-(b0-251)*256-b1-108);
-                args[arg_count] = new Integer(item);
-                arg_count++;
+                final char b1 = getCard8();
+                final short item = (short) (-(b0-251)*256-b1-108);
+                this.args[this.arg_count] = new Integer(item);
+                this.arg_count++;
                 //System.err.println(item+" ");
                 continue;
             }
@@ -341,8 +344,8 @@ public class CFFFont {
                 while (!done) {
                     // get a nibble
                     if (avail==0) { buffer = getCard8(); avail=2; }
-                    if (avail==1) { nibble = (buffer / 16); avail--; }
-                    if (avail==2) { nibble = (buffer % 16); avail--; }
+                    if (avail==1) { nibble = buffer / 16; avail--; }
+                    if (avail==2) { nibble = buffer % 16; avail--; }
                     switch (nibble) {
                         case 0xa: item += "." ; break;
                         case 0xb: item += "E" ; break;
@@ -350,24 +353,27 @@ public class CFFFont {
                         case 0xe: item += "-" ; break;
                         case 0xf: done=true   ; break;
                         default:
-                            if (nibble >= 0 && nibble <= 9)
-                                item += String.valueOf(nibble);
-                            else {
+                            if (nibble >= 0 && nibble <= 9) {
+								item += String.valueOf(nibble);
+							} else {
                                 item += "<NIBBLE ERROR: " + nibble + '>';
                                 done = true;
                             }
                             break;
                     }
                 }
-                args[arg_count] = item;
-                arg_count++;
+                this.args[this.arg_count] = item;
+                this.arg_count++;
                 //System.err.println(" real=["+item+"]");
                 continue;
             }
             if (b0 <= 21) {
                 gotKey=true;
-                if (b0 != 12) key = operatorNames[b0];
-                else key = operatorNames[32 + getCard8()];
+                if (b0 != 12) {
+					this.key = operatorNames[b0];
+				} else {
+					this.key = operatorNames[32 + getCard8()];
+				}
                 //for (int i=0; i<arg_count; i++)
                 //  System.err.print(args[i].toString()+" ");
                 //System.err.println(key+" ;");
@@ -375,60 +381,63 @@ public class CFFFont {
             }
         }
     }
-    
+
     /** List items for the linked list that builds the new CID font.
      */
-    
+
     protected static abstract class Item {
-        protected int myOffset = -1;
+        int myOffset = -1;
         /** remember the current offset and increment by item's size in bytes. */
-        public void increment(int[] currentOffset) {
-            myOffset = currentOffset[0];
+        public void increment(final int[] currentOffset) {
+            this.myOffset = currentOffset[0];
         }
         /** Emit the byte stream for this item. */
-        public void emit(byte[] buffer) {}
+        public void emit(final byte[] buffer) {}
         /** Fix up cross references to this item (applies only to markers). */
         public void xref() {}
     }
-    
+
     protected static abstract class OffsetItem extends Item {
-        public int value;
+        int value;
         /** set the value of an offset item that was initially unknown.
          * It will be fixed up latex by a call to xref on some marker.
          */
-        public void set(int offset) { this.value = offset; }
+        private void set(final int offset) { this.value = offset; }
     }
-    
-    
+
+
     /** A range item.
      */
-    
+
     protected static final class RangeItem extends Item {
-        public int offset, length;
-        private RandomAccessFileOrArray buf;
-        public RangeItem(RandomAccessFileOrArray buf, int offset, int length) {
+        private final int offset, length;
+        private final RandomAccessFileOrArray buf;
+        RangeItem(final RandomAccessFileOrArray buf, final int offset, final int length) {
             this.offset = offset;
             this.length = length;
             this.buf = buf;
         }
-        public void increment(int[] currentOffset) {
+        @Override
+		public void increment(final int[] currentOffset) {
             super.increment(currentOffset);
-            currentOffset[0] += length;
+            currentOffset[0] += this.length;
         }
-        public void emit(byte[] buffer) {
+        @Override
+		public void emit(final byte[] buffer) {
             //System.err.println("range emit offset "+offset+" size="+length);
             try {
-                buf.seek(offset);
-                for (int i=myOffset; i<myOffset+length; i++)
-                    buffer[i] = buf.readByte();
+                this.buf.seek(this.offset);
+                for (int i=this.myOffset; i<this.myOffset+this.length; i++) {
+					buffer[i] = this.buf.readByte();
+				}
             }
-            catch (Exception e) {
+            catch (final Exception e) {
                 throw new ExceptionConverter(e);
             }
             //System.err.println("finished range emit");
         }
     }
-    
+
     /** An index-offset item for the list.
      * The size denotes the required size in the CFF. A positive
      * value means that we need a specific size in bytes (for offset arrays)
@@ -436,28 +445,30 @@ public class CFFFont {
      * variable-size representation.
      */
     static protected final class IndexOffsetItem extends OffsetItem {
-        public final int size;
-        public IndexOffsetItem(int size, int value) {this.size=size; this.value=value;}
-        public IndexOffsetItem(int size) {this.size=size; }
-        
-        public void increment(int[] currentOffset) {
+        private final int size;
+        IndexOffsetItem(final int size, final int value) {this.size=size; this.value=value;}
+        IndexOffsetItem(final int size) {this.size=size; }
+
+        @Override
+		public void increment(final int[] currentOffset) {
             super.increment(currentOffset);
-            currentOffset[0] += size;
+            currentOffset[0] += this.size;
         }
-        public void emit(byte[] buffer) {
+        @Override
+		public void emit(final byte[] buffer) {
             int i=0;
-            switch (size) {
+            switch (this.size) {
                 case 4:
-                    buffer[myOffset+i] = (byte) ((value >>> 24) & 0xff);
+                    buffer[this.myOffset+i] = (byte) (this.value >>> 24 & 0xff);
                     i++;
                 case 3:
-                    buffer[myOffset+i] = (byte) ((value >>> 16) & 0xff);
+                    buffer[this.myOffset+i] = (byte) (this.value >>> 16 & 0xff);
                     i++;
                 case 2:
-                    buffer[myOffset+i] = (byte) ((value >>>  8) & 0xff);
+                    buffer[this.myOffset+i] = (byte) (this.value >>>  8 & 0xff);
                     i++;
                 case 1:
-                    buffer[myOffset+i] = (byte) ((value >>>  0) & 0xff);
+                    buffer[this.myOffset+i] = (byte) (this.value >>>  0 & 0xff);
                     i++;
             }
             /*
@@ -469,21 +480,22 @@ public class CFFFont {
              */
         }
     }
-    
+
     static protected final class IndexBaseItem extends Item {
         public IndexBaseItem() {}
     }
-    
+
     static protected final class IndexMarkerItem extends Item {
-        private OffsetItem offItem;
-        private IndexBaseItem indexBase;
-        public IndexMarkerItem(OffsetItem offItem, IndexBaseItem indexBase) {
+        private final OffsetItem offItem;
+        private final IndexBaseItem indexBase;
+        IndexMarkerItem(final OffsetItem offItem, final IndexBaseItem indexBase) {
             this.offItem   = offItem;
             this.indexBase = indexBase;
         }
-        public void xref() {
+        @Override
+		public void xref() {
             //System.err.println("index marker item, base="+indexBase.myOffset+" my="+this.myOffset);
-            offItem.set(this.myOffset-indexBase.myOffset+1);
+            this.offItem.set(this.myOffset-this.indexBase.myOffset+1);
         }
     }
     /**
@@ -491,568 +503,308 @@ public class CFFFont {
      * Window - Preferences - Java - Code Generation - Code and Comments
      */
     static protected final class SubrMarkerItem extends Item {
-        private OffsetItem offItem;
-        private IndexBaseItem indexBase;
-        public SubrMarkerItem(OffsetItem offItem, IndexBaseItem indexBase) {
+        private final OffsetItem offItem;
+        private final IndexBaseItem indexBase;
+        SubrMarkerItem(final OffsetItem offItem, final IndexBaseItem indexBase) {
             this.offItem   = offItem;
             this.indexBase = indexBase;
         }
-        public void xref() {
+        @Override
+		public void xref() {
             //System.err.println("index marker item, base="+indexBase.myOffset+" my="+this.myOffset);
-            offItem.set(this.myOffset-indexBase.myOffset);
+            this.offItem.set(this.myOffset-this.indexBase.myOffset);
         }
     }
-    
-    
+
+
     /** an unknown offset in a dictionary for the list.
      * We will fix up the offset later; for now, assume it's large.
      */
     static protected final class DictOffsetItem extends OffsetItem {
-        public final int size;
+        private final int size;
         public DictOffsetItem() {this.size=5; }
-        
-        public void increment(int[] currentOffset) {
+
+        @Override
+		public void increment(final int[] currentOffset) {
             super.increment(currentOffset);
-            currentOffset[0] += size;
+            currentOffset[0] += this.size;
         }
         // this is incomplete!
-        public void emit(byte[] buffer) {
-            if (size==5) {
-                buffer[myOffset]   = 29;
-                buffer[myOffset+1] = (byte) ((value >>> 24) & 0xff);
-                buffer[myOffset+2] = (byte) ((value >>> 16) & 0xff);
-                buffer[myOffset+3] = (byte) ((value >>>  8) & 0xff);
-                buffer[myOffset+4] = (byte) ((value >>>  0) & 0xff);
+        @Override
+		public void emit(final byte[] buffer) {
+            if (this.size==5) {
+                buffer[this.myOffset]   = 29;
+                buffer[this.myOffset+1] = (byte) (this.value >>> 24 & 0xff);
+                buffer[this.myOffset+2] = (byte) (this.value >>> 16 & 0xff);
+                buffer[this.myOffset+3] = (byte) (this.value >>>  8 & 0xff);
+                buffer[this.myOffset+4] = (byte) (this.value >>>  0 & 0xff);
             }
         }
     }
-    
+
 	/** Card24 item.
      */
-    
+
     static protected final class UInt24Item extends Item {
-        public int value;
-        public UInt24Item(int value) {this.value=value;}
-        
-        public void increment(int[] currentOffset) {
+        private final int value;
+        UInt24Item(final int value) {this.value=value;}
+
+        @Override
+		public void increment(final int[] currentOffset) {
             super.increment(currentOffset);
             currentOffset[0] += 3;
         }
         // this is incomplete!
-        public void emit(byte[] buffer) {
-        	buffer[myOffset+0] = (byte) ((value >>> 16) & 0xff);
-            buffer[myOffset+1] = (byte) ((value >>> 8) & 0xff);
-            buffer[myOffset+2] = (byte) ((value >>> 0) & 0xff);
+        @Override
+		public void emit(final byte[] buffer) {
+        	buffer[this.myOffset+0] = (byte) (this.value >>> 16 & 0xff);
+            buffer[this.myOffset+1] = (byte) (this.value >>> 8 & 0xff);
+            buffer[this.myOffset+2] = (byte) (this.value >>> 0 & 0xff);
         }
     }
-    
+
     /** Card32 item.
      */
-    
+
     static protected final class UInt32Item extends Item {
-        public int value;
-        public UInt32Item(int value) {this.value=value;}
-        
-        public void increment(int[] currentOffset) {
+        private final int value;
+        UInt32Item(final int value) {this.value=value;}
+
+        @Override
+		public void increment(final int[] currentOffset) {
             super.increment(currentOffset);
             currentOffset[0] += 4;
         }
         // this is incomplete!
-        public void emit(byte[] buffer) {
-        	buffer[myOffset+0] = (byte) ((value >>> 24) & 0xff);
-        	buffer[myOffset+1] = (byte) ((value >>> 16) & 0xff);
-            buffer[myOffset+2] = (byte) ((value >>> 8) & 0xff);
-            buffer[myOffset+3] = (byte) ((value >>> 0) & 0xff);
+        @Override
+		public void emit(final byte[] buffer) {
+        	buffer[this.myOffset+0] = (byte) (this.value >>> 24 & 0xff);
+        	buffer[this.myOffset+1] = (byte) (this.value >>> 16 & 0xff);
+            buffer[this.myOffset+2] = (byte) (this.value >>> 8 & 0xff);
+            buffer[this.myOffset+3] = (byte) (this.value >>> 0 & 0xff);
         }
     }
 
     /** A SID or Card16 item.
      */
-    
+
     static protected final class UInt16Item extends Item {
-        public char value;
-        public UInt16Item(char value) {this.value=value;}
-        
-        public void increment(int[] currentOffset) {
+        private final char value;
+        UInt16Item(final char value) {this.value=value;}
+
+        @Override
+		public void increment(final int[] currentOffset) {
             super.increment(currentOffset);
             currentOffset[0] += 2;
         }
         // this is incomplete!
-        public void emit(byte[] buffer) {
-            buffer[myOffset+0] = (byte) ((value >>> 8) & 0xff);
-            buffer[myOffset+1] = (byte) ((value >>> 0) & 0xff);
+        @Override
+		public void emit(final byte[] buffer) {
+            buffer[this.myOffset+0] = (byte) (this.value >>> 8 & 0xff);
+            buffer[this.myOffset+1] = (byte) (this.value >>> 0 & 0xff);
         }
     }
-    
+
     /** A Card8 item.
      */
-    
+
     static protected final class UInt8Item extends Item {
-        public char value;
-        public UInt8Item(char value) {this.value=value;}
-        
-        public void increment(int[] currentOffset) {
+        private final char value;
+        UInt8Item(final char value) {this.value=value;}
+
+        @Override
+		public void increment(final int[] currentOffset) {
             super.increment(currentOffset);
             currentOffset[0] += 1;
         }
         // this is incomplete!
-        public void emit(byte[] buffer) {
-            buffer[myOffset+0] = (byte) ((value >>> 0) & 0xff);
+        @Override
+		public void emit(final byte[] buffer) {
+            buffer[this.myOffset+0] = (byte) (this.value >>> 0 & 0xff);
         }
     }
-    
+
     static protected final class StringItem extends Item {
-        public String s;
-        public StringItem(String s) {this.s=s;}
-        
-        public void increment(int[] currentOffset) {
+        private final String s;
+        StringItem(final String s) {this.s=s;}
+
+        @Override
+		public void increment(final int[] currentOffset) {
             super.increment(currentOffset);
-            currentOffset[0] += s.length();
+            currentOffset[0] += this.s.length();
         }
-        public void emit(byte[] buffer) {
-            for (int i=0; i<s.length(); i++)
-                buffer[myOffset+i] = (byte) (s.charAt(i) & 0xff);
+        @Override
+		public void emit(final byte[] buffer) {
+            for (int i=0; i<this.s.length(); i++) {
+				buffer[this.myOffset+i] = (byte) (this.s.charAt(i) & 0xff);
+			}
         }
     }
-    
-    
+
+
     /** A dictionary number on the list.
      * This implementation is inefficient: it doesn't use the variable-length
      * representation.
      */
-    
+
     static protected final class DictNumberItem extends Item {
-        public final int value;
-        public int size = 5;
-        public DictNumberItem(int value) {this.value=value;}
-        public void increment(int[] currentOffset) {
+        private final int value;
+        private final int size = 5;
+        DictNumberItem(final int value) {this.value=value;}
+        @Override
+		public void increment(final int[] currentOffset) {
             super.increment(currentOffset);
-            currentOffset[0] += size;
+            currentOffset[0] += this.size;
         }
         // this is incomplete!
-        public void emit(byte[] buffer) {
-            if (size==5) {
-                buffer[myOffset]   = 29;
-                buffer[myOffset+1] = (byte) ((value >>> 24) & 0xff);
-                buffer[myOffset+2] = (byte) ((value >>> 16) & 0xff);
-                buffer[myOffset+3] = (byte) ((value >>>  8) & 0xff);
-                buffer[myOffset+4] = (byte) ((value >>>  0) & 0xff);
+        @Override
+		public void emit(final byte[] buffer) {
+            if (this.size==5) {
+                buffer[this.myOffset]   = 29;
+                buffer[this.myOffset+1] = (byte) (this.value >>> 24 & 0xff);
+                buffer[this.myOffset+2] = (byte) (this.value >>> 16 & 0xff);
+                buffer[this.myOffset+3] = (byte) (this.value >>>  8 & 0xff);
+                buffer[this.myOffset+4] = (byte) (this.value >>>  0 & 0xff);
             }
         }
     }
-    
+
     /** An offset-marker item for the list.
      * It is used to mark an offset and to set the offset list item.
      */
-    
+
     static protected final class MarkerItem extends Item {
-        OffsetItem p;
-        public MarkerItem(OffsetItem pointerToMarker) {p=pointerToMarker;}
-        public void xref() {
-            p.set(this.myOffset);
+        private final OffsetItem p;
+        MarkerItem(final OffsetItem pointerToMarker) {this.p=pointerToMarker;}
+        @Override
+		public void xref() {
+            this.p.set(this.myOffset);
         }
     }
-    
+
     /** a utility that creates a range item for an entire index
      *
      * @param indexOffset where the index is
      * @return a range item representing the entire index
      */
-    
-    protected RangeItem getEntireIndexRange(int indexOffset) {
+
+    protected RangeItem getEntireIndexRange(final int indexOffset) {
         seek(indexOffset);
-        int count = getCard16();
+        final int count = getCard16();
         if (count==0) {
-            return new RangeItem(buf,indexOffset,2);
+            return new RangeItem(this.buf,indexOffset,2);
         } else {
-            int indexOffSize = getCard8();
+            final int indexOffSize = getCard8();
             seek(indexOffset+2+1+count*indexOffSize);
-            int size = getOffset(indexOffSize)-1;
-            return new RangeItem(buf,indexOffset,
+            final int size = getOffset(indexOffSize)-1;
+            return new RangeItem(this.buf,indexOffset,
             2+1+(count+1)*indexOffSize+size);
         }
     }
-    
-    
-    /** get a single CID font. The PDF architecture (1.4)
-     * supports 16-bit strings only with CID CFF fonts, not
-     * in Type-1 CFF fonts, so we convert the font to CID if
-     * it is in the Type-1 format.
-     * Two other tasks that we need to do are to select
-     * only a single font from the CFF package (this again is
-     * a PDF restriction) and to subset the CharStrings glyph
-     * description.
-     */
-    
-    
-    public byte[] getCID(String fontName)
-    //throws java.io.FileNotFoundException
-    {
-        int j;
-        for (j=0; j<fonts.length; j++)
-            if (fontName.equals(fonts[j].name)) break;
-        if (j==fonts.length) return null;
-        
-        LinkedList l = new LinkedList();
-        
-        // copy the header
-        
-        seek(0);
-        
-        int major = getCard8();
-        int minor = getCard8();
-        int hdrSize = getCard8();
-        int offSize = getCard8();
-        nextIndexOffset = hdrSize;
-        
-        l.addLast(new RangeItem(buf,0,hdrSize));
-        
-        int nglyphs=-1, nstrings=-1;
-        if ( ! fonts[j].isCID ) {
-            // count the glyphs
-            seek(fonts[j].charstringsOffset);
-            nglyphs = getCard16();
-            seek(stringIndexOffset);
-            nstrings = getCard16()+standardStrings.length;
-            //System.err.println("number of glyphs = "+nglyphs);
-        }
-        
-        // create a name index
-        
-        l.addLast(new UInt16Item((char)1)); // count
-        l.addLast(new UInt8Item((char)1)); // offSize
-        l.addLast(new UInt8Item((char)1)); // first offset
-        l.addLast(new UInt8Item((char)( 1+fonts[j].name.length() )));
-        l.addLast(new StringItem(fonts[j].name));
-        
-        // create the topdict Index
-        
-        
-        l.addLast(new UInt16Item((char)1)); // count
-        l.addLast(new UInt8Item((char)2)); // offSize
-        l.addLast(new UInt16Item((char)1)); // first offset
-        OffsetItem topdictIndex1Ref = new IndexOffsetItem(2);
-        l.addLast(topdictIndex1Ref);
-        IndexBaseItem topdictBase = new IndexBaseItem();
-        l.addLast(topdictBase);
-        
-        /*
-        int maxTopdictLen = (topdictOffsets[j+1]-topdictOffsets[j])
-                            + 9*2 // at most 9 new keys
-                            + 8*5 // 8 new integer arguments
-                            + 3*2;// 3 new SID arguments
-         */
-        
-        //int    topdictNext = 0;
-        //byte[] topdict = new byte[maxTopdictLen];
-        
-        OffsetItem charsetRef     = new DictOffsetItem();
-        OffsetItem charstringsRef = new DictOffsetItem();
-        OffsetItem fdarrayRef     = new DictOffsetItem();
-        OffsetItem fdselectRef    = new DictOffsetItem();
-        
-        if ( !fonts[j].isCID ) {
-            // create a ROS key
-            l.addLast(new DictNumberItem(nstrings));
-            l.addLast(new DictNumberItem(nstrings+1));
-            l.addLast(new DictNumberItem(0));
-            l.addLast(new UInt8Item((char)12));
-            l.addLast(new UInt8Item((char)30));
-            // create a CIDCount key
-            l.addLast(new DictNumberItem(nglyphs));
-            l.addLast(new UInt8Item((char)12));
-            l.addLast(new UInt8Item((char)34));
-            // What about UIDBase (12,35)? Don't know what is it.
-            // I don't think we need FontName; the font I looked at didn't have it.
-        }
-        
-        // create an FDArray key
-        l.addLast(fdarrayRef);
-        l.addLast(new UInt8Item((char)12));
-        l.addLast(new UInt8Item((char)36));
-        // create an FDSelect key
-        l.addLast(fdselectRef);
-        l.addLast(new UInt8Item((char)12));
-        l.addLast(new UInt8Item((char)37));
-        // create an charset key
-        l.addLast(charsetRef);
-        l.addLast(new UInt8Item((char)15));
-        // create a CharStrings key
-        l.addLast(charstringsRef);
-        l.addLast(new UInt8Item((char)17));
-        
-        seek(topdictOffsets[j]);
-        while (getPosition() < topdictOffsets[j+1]) {
-            int p1 = getPosition();
-            getDictItem();
-            int p2 = getPosition();
-            if (key=="Encoding"
-            || key=="Private"
-            || key=="FDSelect"
-            || key=="FDArray"
-            || key=="charset"
-            || key=="CharStrings"
-            ) {
-                // just drop them
-            } else {
-                l.add(new RangeItem(buf,p1,p2-p1));
-            }
-        }
-        
-        l.addLast(new IndexMarkerItem(topdictIndex1Ref,topdictBase));
-        
-        // Copy the string index and append new strings.
-        // We need 3 more strings: Registry, Ordering, and a FontName for one FD.
-        // The total length is at most "Adobe"+"Identity"+63 = 76
-        
-        if (fonts[j].isCID) {
-            l.addLast(getEntireIndexRange(stringIndexOffset));
-        } else {
-            String fdFontName = fonts[j].name+"-OneRange";
-            if (fdFontName.length() > 127)
-                fdFontName = fdFontName.substring(0,127);
-            String extraStrings = "Adobe"+"Identity"+fdFontName;
-            
-            int origStringsLen = stringOffsets[stringOffsets.length-1]
-            - stringOffsets[0];
-            int stringsBaseOffset = stringOffsets[0]-1;
-            
-            byte stringsIndexOffSize;
-            if (origStringsLen+extraStrings.length() <= 0xff) stringsIndexOffSize = 1;
-            else if (origStringsLen+extraStrings.length() <= 0xffff) stringsIndexOffSize = 2;
-            else if (origStringsLen+extraStrings.length() <= 0xffffff) stringsIndexOffSize = 3;
-            else stringsIndexOffSize = 4;
-            
-            l.addLast(new UInt16Item((char)((stringOffsets.length-1)+3))); // count
-            l.addLast(new UInt8Item((char)stringsIndexOffSize)); // offSize
-            for (int i=0; i<stringOffsets.length; i++)
-                l.addLast(new IndexOffsetItem(stringsIndexOffSize,
-                stringOffsets[i]-stringsBaseOffset));
-            int currentStringsOffset = stringOffsets[stringOffsets.length-1]
-            - stringsBaseOffset;
-            //l.addLast(new IndexOffsetItem(stringsIndexOffSize,currentStringsOffset));
-            currentStringsOffset += "Adobe".length();
-            l.addLast(new IndexOffsetItem(stringsIndexOffSize,currentStringsOffset));
-            currentStringsOffset += "Identity".length();
-            l.addLast(new IndexOffsetItem(stringsIndexOffSize,currentStringsOffset));
-            currentStringsOffset += fdFontName.length();
-            l.addLast(new IndexOffsetItem(stringsIndexOffSize,currentStringsOffset));
-            
-            l.addLast(new RangeItem(buf,stringOffsets[0],origStringsLen));
-            l.addLast(new StringItem(extraStrings));
-        }
-        
-        // copy the global subroutine index
-        
-        l.addLast(getEntireIndexRange(gsubrIndexOffset));
-        
-        // deal with fdarray, fdselect, and the font descriptors
-        
-        if (fonts[j].isCID) {
-            // copy the FDArray, FDSelect, charset
-        } else {
-            // create FDSelect
-            l.addLast(new MarkerItem(fdselectRef));
-            l.addLast(new UInt8Item((char)3)); // format identifier
-            l.addLast(new UInt16Item((char)1)); // nRanges
-            
-            l.addLast(new UInt16Item((char)0)); // Range[0].firstGlyph
-            l.addLast(new UInt8Item((char)0)); // Range[0].fd
-            
-            l.addLast(new UInt16Item((char)nglyphs)); // sentinel
-            
-            // recreate a new charset
-            // This format is suitable only for fonts without subsetting
-            
-            l.addLast(new MarkerItem(charsetRef));
-            l.addLast(new UInt8Item((char)2)); // format identifier
-            
-            l.addLast(new UInt16Item((char)1)); // first glyph in range (ignore .notdef)
-            l.addLast(new UInt16Item((char)(nglyphs-1))); // nLeft
-            // now all are covered, the data structure is complete.
-            
-            // create a font dict index (fdarray)
-            
-            l.addLast(new MarkerItem(fdarrayRef));
-            l.addLast(new UInt16Item((char)1));
-            l.addLast(new UInt8Item((char)1)); // offSize
-            l.addLast(new UInt8Item((char)1)); // first offset
-            
-            OffsetItem privateIndex1Ref = new IndexOffsetItem(1);
-            l.addLast(privateIndex1Ref);
-            IndexBaseItem privateBase = new IndexBaseItem();
-            l.addLast(privateBase);
-            
-            // looking at the PS that acrobat generates from a PDF with
-            // a CFF opentype font embedded with an identity-H encoding,
-            // it seems that it does not need a FontName.
-            //l.addLast(new DictNumberItem((standardStrings.length+(stringOffsets.length-1)+2)));
-            //l.addLast(new UInt8Item((char)12));
-            //l.addLast(new UInt8Item((char)38)); // FontName
-            
-            l.addLast(new DictNumberItem(fonts[j].privateLength));
-            OffsetItem privateRef = new DictOffsetItem();
-            l.addLast(privateRef);
-            l.addLast(new UInt8Item((char)18)); // Private
-            
-            l.addLast(new IndexMarkerItem(privateIndex1Ref,privateBase));
-            
-            // copy the private index & local subroutines
-            
-            l.addLast(new MarkerItem(privateRef));
-            // copy the private dict and the local subroutines.
-            // the length of the private dict seems to NOT include
-            // the local subroutines.
-            l.addLast(new RangeItem(buf,fonts[j].privateOffset,fonts[j].privateLength));
-            if (fonts[j].privateSubrs >= 0) {
-                //System.err.println("has subrs="+fonts[j].privateSubrs+" ,len="+fonts[j].privateLength);
-                l.addLast(getEntireIndexRange(fonts[j].privateSubrs));
-            }
-        }
-        
-        // copy the charstring index
-        
-        l.addLast(new MarkerItem(charstringsRef));
-        l.addLast(getEntireIndexRange(fonts[j].charstringsOffset));
-        
-        // now create the new CFF font
-        
-        int[] currentOffset = new int[1];
-        currentOffset[0] = 0;
-        
-        Iterator listIter = l.iterator();
-        while ( listIter.hasNext() ) {
-            Item item = (Item) listIter.next();
-            item.increment(currentOffset);
-        }
-        
-        listIter = l.iterator();
-        while ( listIter.hasNext() ) {
-            Item item = (Item) listIter.next();
-            item.xref();
-        }
-        
-        int size = currentOffset[0];
-        byte[] b = new byte[size];
-        
-        listIter = l.iterator();
-        while ( listIter.hasNext() ) {
-            Item item = (Item) listIter.next();
-            item.emit(b);
-        }
-        
-        return b;
-    }
-    
-    
-    public boolean isCID(String fontName) {
-        int j;
-        for (j=0; j<fonts.length; j++)
-            if (fontName.equals(fonts[j].name)) return fonts[j].isCID;
-        return false;
-    }
-    
-    public boolean exists(String fontName) {
-        int j;
-        for (j=0; j<fonts.length; j++)
-            if (fontName.equals(fonts[j].name)) return true;
-        return false;
-    }
-    
-    
+
+
+
+
+
+
+
+
+
+
     public String[] getNames() {
-        String[] names = new String[ fonts.length ];
-        for (int i=0; i<fonts.length; i++)
-            names[i] = fonts[i].name;
+        final String[] names = new String[ this.fonts.length ];
+        for (int i=0; i<this.fonts.length; i++) {
+			names[i] = this.fonts[i].name;
+		}
         return names;
     }
     /**
      * A random Access File or an array
      */
     protected RandomAccessFileOrArray buf;
-    private int offSize;
-    
-    protected int nameIndexOffset;
-    protected int topdictIndexOffset;
+    private final int offSize;
+
+    private final int nameIndexOffset;
+    private final int topdictIndexOffset;
     protected int stringIndexOffset;
     protected int gsubrIndexOffset;
-    protected int[] nameOffsets;
+    private final int[] nameOffsets;
     protected int[] topdictOffsets;
     protected int[] stringOffsets;
     protected int[] gsubrOffsets;
-    
+
     /**
      * TODO Changed from private to protected by Ygal&Oren
      */
-    protected final class Font {
-        public String    name;
-        public String    fullName;
-        public boolean   isCID = false;
-        public int       privateOffset     = -1; // only if not CID
-        public int       privateLength     = -1; // only if not CID
-        public int       privateSubrs      = -1;
-        public int       charstringsOffset = -1;
-        public int       encodingOffset    = -1;
-        public int       charsetOffset     = -1;
-        public int       fdarrayOffset     = -1; // only if CID
-        public int       fdselectOffset    = -1; // only if CID
-        public int[]     fdprivateOffsets;
-        public int[]     fdprivateLengths;
-        public int[]     fdprivateSubrs;
-        
+    final class Font {
+        String    name;
+
+        boolean   isCID = false;
+        int       privateOffset     = -1; // only if not CID
+        int       privateLength     = -1; // only if not CID
+        int       privateSubrs      = -1;
+        int       charstringsOffset = -1;
+        private int       encodingOffset    = -1;
+        int       charsetOffset     = -1;
+        int       fdarrayOffset     = -1; // only if CID
+        int       fdselectOffset    = -1; // only if CID
+        int[]     fdprivateOffsets;
+        int[]     fdprivateLengths;
+
+
         // Added by Oren & Ygal
-        public int nglyphs;
-        public int nstrings;
-        public int CharsetLength;
-        public int[]    charstringsOffsets;
-        public int[]    charset;
-        public int[] 	FDSelect;
-        public int FDSelectLength;
-        public int FDSelectFormat;
-        public int 		CharstringType = 2;
-        public int FDArrayCount;
-        public int FDArrayOffsize;
-        public int[] FDArrayOffsets;
-        public int[] PrivateSubrsOffset;
-        public int[][] PrivateSubrsOffsetsArray;
-        public int[]       SubrsOffsets;
+        int nglyphs;
+        int nstrings;
+        int CharsetLength;
+        int[]    charstringsOffsets;
+
+        int[] 	FDSelect;
+        int FDSelectLength;
+        int FDSelectFormat;
+        int 		CharstringType = 2;
+        int FDArrayCount;
+        int FDArrayOffsize;
+        int[] FDArrayOffsets;
+        int[] PrivateSubrsOffset;
+        int[][] PrivateSubrsOffsetsArray;
+        int[]       SubrsOffsets;
     }
     // Changed from private to protected by Ygal&Oren
     protected Font[] fonts;
-    
-    public CFFFont(RandomAccessFileOrArray inputbuffer) {
-        
+
+    public CFFFont(final RandomAccessFileOrArray inputbuffer) {
+
         //System.err.println("CFF: nStdString = "+standardStrings.length);
-        buf = inputbuffer;
+        this.buf = inputbuffer;
         seek(0);
-        
+
         int major, minor;
         major = getCard8();
         minor = getCard8();
-        
+
         //System.err.println("CFF Major-Minor = "+major+"-"+minor);
-        
-        int hdrSize = getCard8();
-        
-        offSize = getCard8();
-        
+
+        final int hdrSize = getCard8();
+
+        this.offSize = getCard8();
+
         //System.err.println("offSize = "+offSize);
-        
+
         //int count, indexOffSize, indexOffset, nextOffset;
-        
-        nameIndexOffset    = hdrSize;
-        nameOffsets        = getIndex(nameIndexOffset);
-        topdictIndexOffset = nameOffsets[nameOffsets.length-1];
-        topdictOffsets     = getIndex(topdictIndexOffset);
-        stringIndexOffset  = topdictOffsets[topdictOffsets.length-1];
-        stringOffsets      = getIndex(stringIndexOffset);
-        gsubrIndexOffset   = stringOffsets[stringOffsets.length-1];
-        gsubrOffsets       = getIndex(gsubrIndexOffset);
-        
-        fonts = new Font[nameOffsets.length-1];
-        
+
+        this.nameIndexOffset    = hdrSize;
+        this.nameOffsets        = getIndex(this.nameIndexOffset);
+        this.topdictIndexOffset = this.nameOffsets[this.nameOffsets.length-1];
+        this.topdictOffsets     = getIndex(this.topdictIndexOffset);
+        this.stringIndexOffset  = this.topdictOffsets[this.topdictOffsets.length-1];
+        this.stringOffsets      = getIndex(this.stringIndexOffset);
+        this.gsubrIndexOffset   = this.stringOffsets[this.stringOffsets.length-1];
+        this.gsubrOffsets       = getIndex(this.gsubrIndexOffset);
+
+        this.fonts = new Font[this.nameOffsets.length-1];
+
         // now get the name index
-        
+
         /*
         names             = new String[nfonts];
         privateOffset     = new int[nfonts];
@@ -1062,19 +814,19 @@ public class CFFFont {
         fdarrayOffset     = new int[nfonts];
         fdselectOffset    = new int[nfonts];
          */
-        
-        for (int j=0; j<nameOffsets.length-1; j++) {
-            fonts[j] = new Font();
-            seek(nameOffsets[j]);
-            fonts[j].name = "";
-            for (int k=nameOffsets[j]; k<nameOffsets[j+1]; k++) {
-                fonts[j].name += getCard8();
+
+        for (int j=0; j<this.nameOffsets.length-1; j++) {
+            this.fonts[j] = new Font();
+            seek(this.nameOffsets[j]);
+            this.fonts[j].name = "";
+            for (int k=this.nameOffsets[j]; k<this.nameOffsets[j+1]; k++) {
+                this.fonts[j].name += getCard8();
             }
             //System.err.println("name["+j+"]=<"+fonts[j].name+">");
         }
-        
+
         // string index
-        
+
         //strings = new String[stringOffsets.length-1];
         /*
         System.err.println("std strings = "+standardStrings.length);
@@ -1089,88 +841,87 @@ public class CFFFont {
             System.err.println("strings["+(int)j+"]=<"+getString(j)+">");
         }
          */
-        
+
         // top dict
-        
-        for (int j=0; j<topdictOffsets.length-1; j++) {
-            seek(topdictOffsets[j]);
-            while (getPosition() < topdictOffsets[j+1]) {            	
+
+        for (int j=0; j<this.topdictOffsets.length-1; j++) {
+            seek(this.topdictOffsets[j]);
+            while (getPosition() < this.topdictOffsets[j+1]) {
                 getDictItem();
-                if (key=="FullName") {
-                    //System.err.println("getting fullname sid = "+((Integer)args[0]).intValue());
-                    fonts[j].fullName = getString((char)((Integer)args[0]).intValue());
-                    //System.err.println("got it");
-                } else if (key=="ROS")
-                    fonts[j].isCID = true;
-                else if (key=="Private") {
-                    fonts[j].privateLength  = ((Integer)args[0]).intValue();
-                    fonts[j].privateOffset  = ((Integer)args[1]).intValue();
+                if (this.key=="ROS") {
+					this.fonts[j].isCID = true;
+				} else if (this.key=="Private") {
+                    this.fonts[j].privateLength  = ((Integer)this.args[0]).intValue();
+                    this.fonts[j].privateOffset  = ((Integer)this.args[1]).intValue();
                 }
-                else if (key=="charset"){
-                    fonts[j].charsetOffset = ((Integer)args[0]).intValue();
-                    
+                else if (this.key=="charset"){
+                    this.fonts[j].charsetOffset = ((Integer)this.args[0]).intValue();
+
                 }
-                else if (key=="Encoding"){
-                    fonts[j].encodingOffset = ((Integer)args[0]).intValue();
-                    ReadEncoding(fonts[j].encodingOffset);
+                else if (this.key=="Encoding"){
+                    this.fonts[j].encodingOffset = ((Integer)this.args[0]).intValue();
+                    ReadEncoding(this.fonts[j].encodingOffset);
                 }
-                else if (key=="CharStrings") {
-                    fonts[j].charstringsOffset = ((Integer)args[0]).intValue();
+                else if (this.key=="CharStrings") {
+                    this.fonts[j].charstringsOffset = ((Integer)this.args[0]).intValue();
                     //System.err.println("charstrings "+fonts[j].charstringsOffset);
                     // Added by Oren & Ygal
-                    int p = getPosition();
-                    fonts[j].charstringsOffsets = getIndex(fonts[j].charstringsOffset);
+                    final int p = getPosition();
+                    this.fonts[j].charstringsOffsets = getIndex(this.fonts[j].charstringsOffset);
                     seek(p);
-                } else if (key=="FDArray")
-                    fonts[j].fdarrayOffset = ((Integer)args[0]).intValue();
-                else if (key=="FDSelect")
-                    fonts[j].fdselectOffset = ((Integer)args[0]).intValue();
-                else if (key=="CharstringType")
-                	fonts[j].CharstringType = ((Integer)args[0]).intValue();
+                } else if (this.key=="FDArray") {
+					this.fonts[j].fdarrayOffset = ((Integer)this.args[0]).intValue();
+				} else if (this.key=="FDSelect") {
+					this.fonts[j].fdselectOffset = ((Integer)this.args[0]).intValue();
+				} else if (this.key=="CharstringType") {
+					this.fonts[j].CharstringType = ((Integer)this.args[0]).intValue();
+				}
             }
-            
+
             // private dict
-            if (fonts[j].privateOffset >= 0) {
+            if (this.fonts[j].privateOffset >= 0) {
                 //System.err.println("PRIVATE::");
-                seek(fonts[j].privateOffset);
-                while (getPosition() < fonts[j].privateOffset+fonts[j].privateLength) {
+                seek(this.fonts[j].privateOffset);
+                while (getPosition() < this.fonts[j].privateOffset+this.fonts[j].privateLength) {
                     getDictItem();
-                    if (key=="Subrs")
-                    	//Add the private offset to the lsubrs since the offset is 
+                    if (this.key=="Subrs") {
+						//Add the private offset to the lsubrs since the offset is
                     	// relative to the beginning of the PrivateDict
-                        fonts[j].privateSubrs = ((Integer)args[0]).intValue()+fonts[j].privateOffset;
+                        this.fonts[j].privateSubrs = ((Integer)this.args[0]).intValue()+this.fonts[j].privateOffset;
+					}
                 }
             }
-            
+
             // fdarray index
-            if (fonts[j].fdarrayOffset >= 0) {
-                int[] fdarrayOffsets = getIndex(fonts[j].fdarrayOffset);
-                
-                fonts[j].fdprivateOffsets = new int[fdarrayOffsets.length-1];
-                fonts[j].fdprivateLengths = new int[fdarrayOffsets.length-1];
-                
+            if (this.fonts[j].fdarrayOffset >= 0) {
+                final int[] fdarrayOffsets = getIndex(this.fonts[j].fdarrayOffset);
+
+                this.fonts[j].fdprivateOffsets = new int[fdarrayOffsets.length-1];
+                this.fonts[j].fdprivateLengths = new int[fdarrayOffsets.length-1];
+
                 //System.err.println("FD Font::");
-                
+
                 for (int k=0; k<fdarrayOffsets.length-1; k++) {
                     seek(fdarrayOffsets[k]);
-                    while (getPosition() < fdarrayOffsets[k+1])
-                        getDictItem();
-                    if (key=="Private") {
-                        fonts[j].fdprivateLengths[k]  = ((Integer)args[0]).intValue();
-                        fonts[j].fdprivateOffsets[k]  = ((Integer)args[1]).intValue();
+                    while (getPosition() < fdarrayOffsets[k+1]) {
+						getDictItem();
+					}
+                    if (this.key=="Private") {
+                        this.fonts[j].fdprivateLengths[k]  = ((Integer)this.args[0]).intValue();
+                        this.fonts[j].fdprivateOffsets[k]  = ((Integer)this.args[1]).intValue();
                     }
-                    
+
                 }
             }
         }
         //System.err.println("CFF: done");
     }
-    
+
     // ADDED BY Oren & Ygal
-    
-    void ReadEncoding(int nextIndexOffset){
+
+    private void ReadEncoding(final int nextIndexOffset){
     	int format;
     	seek(nextIndexOffset);
     	format = getCard8();
-    }    
+    }
 }

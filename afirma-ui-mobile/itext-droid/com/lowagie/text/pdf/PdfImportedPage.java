@@ -57,18 +57,18 @@ import com.lowagie.text.Image;
  *
  * @author Paulo Soares (psoares@consiste.pt)
  */
-public class PdfImportedPage extends com.lowagie.text.pdf.PdfTemplate {
+class PdfImportedPage extends com.lowagie.text.pdf.PdfTemplate {
 
-    PdfReaderInstance readerInstance;
-    int pageNumber;
-    
-    PdfImportedPage(PdfReaderInstance readerInstance, PdfWriter writer, int pageNumber) {
+    private final PdfReaderInstance readerInstance;
+    private final int pageNumber;
+
+    PdfImportedPage(final PdfReaderInstance readerInstance, final PdfWriter writer, final int pageNumber) {
         this.readerInstance = readerInstance;
         this.pageNumber = pageNumber;
         this.writer = writer;
-        bBox = readerInstance.getReader().getPageSize(pageNumber);
-        setMatrix(1, 0, 0, 1, -bBox.getLeft(), -bBox.getBottom());
-        type = TYPE_IMPORTED;
+        this.bBox = readerInstance.getReader().getPageSize(pageNumber);
+        setMatrix(1, 0, 0, 1, -this.bBox.getLeft(), -this.bBox.getBottom());
+        this.type = TYPE_IMPORTED;
     }
 
     /** Reads the content from this <CODE>PdfImportedPage</CODE>-object from a reader.
@@ -81,7 +81,7 @@ public class PdfImportedPage extends com.lowagie.text.pdf.PdfTemplate {
     }
 
     public int getPageNumber() {
-        return pageNumber;
+        return this.pageNumber;
     }
 
 
@@ -93,11 +93,12 @@ public class PdfImportedPage extends com.lowagie.text.pdf.PdfTemplate {
      * @param d dummy
      * @param e dummy
      * @param f dummy
-     * @throws DocumentException  dummy */    
-    public void addImage(Image image, float a, float b, float c, float d, float e, float f) throws DocumentException {
+     * @throws DocumentException  dummy */
+    @Override
+	public void addImage(final Image image, final float a, final float b, final float c, final float d, final float e, final float f) throws DocumentException {
         throwError();
     }
-    
+
     /** Always throws an error. This operation is not allowed.
      * @param template dummy
      * @param a dummy
@@ -105,14 +106,16 @@ public class PdfImportedPage extends com.lowagie.text.pdf.PdfTemplate {
      * @param c dummy
      * @param d dummy
      * @param e dummy
-     * @param f  dummy */    
-    public void addTemplate(PdfTemplate template, float a, float b, float c, float d, float e, float f) {
+     * @param f  dummy */
+    @Override
+	public void addTemplate(final PdfTemplate template, final float a, final float b, final float c, final float d, final float e, final float f) {
         throwError();
     }
-    
+
     /** Always throws an error. This operation is not allowed.
-     * @return  dummy */    
-    public PdfContentByte getDuplicate() {
+     * @return  dummy */
+    @Override
+	public PdfContentByte getDuplicate() {
         throwError();
         return null;
     }
@@ -124,43 +127,49 @@ public class PdfImportedPage extends com.lowagie.text.pdf.PdfTemplate {
      * @return the stream representing this page
      * @since	2.1.3	(replacing the method without param compressionLevel)
      */
-    PdfStream getFormXObject(int compressionLevel) throws IOException {
-         return readerInstance.getFormXObject(pageNumber, compressionLevel);
+    @Override
+	PdfStream getFormXObject(final int compressionLevel) throws IOException {
+         return this.readerInstance.getFormXObject(this.pageNumber, compressionLevel);
     }
-    
-    public void setColorFill(PdfSpotColor sp, float tint) {
+
+    @Override
+	public void setColorFill(final PdfSpotColor sp, final float tint) {
         throwError();
     }
-    
-    public void setColorStroke(PdfSpotColor sp, float tint) {
+
+    @Override
+	public void setColorStroke(final PdfSpotColor sp, final float tint) {
         throwError();
     }
-    
-    PdfObject getResources() {
-        return readerInstance.getResources(pageNumber);
+
+    @Override
+	PdfObject getResources() {
+        return this.readerInstance.getResources(this.pageNumber);
     }
-    
+
     /** Always throws an error. This operation is not allowed.
      * @param bf dummy
-     * @param size dummy */    
-    public void setFontAndSize(BaseFont bf, float size) {
+     * @param size dummy */
+    @Override
+	public void setFontAndSize(final BaseFont bf, final float size) {
         throwError();
     }
-    
+
     /**
      * Always throws an error. This operation is not allowed.
      * @param group New value of property group.
      * @since	2.1.6
-     */ 
-    public void setGroup(PdfTransparencyGroup group) {
+     */
+    @Override
+	public void setGroup(final PdfTransparencyGroup group) {
         throwError();
 	}
 
-	void throwError() {
+	private void throwError() {
         throw new RuntimeException("Content can not be added to a PdfImportedPage.");
     }
-    
+
     PdfReaderInstance getPdfReaderInstance() {
-        return readerInstance;
+        return this.readerInstance;
     }
 }

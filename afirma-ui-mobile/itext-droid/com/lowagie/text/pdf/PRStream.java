@@ -59,44 +59,43 @@ import com.lowagie.text.Document;
 import com.lowagie.text.ExceptionConverter;
 
 public class PRStream extends PdfStream {
-    
-    protected PdfReader reader;
-    protected int offset;
-    protected int length;
-    
+
+    private PdfReader reader;
+    private int offset;
+    private int length;
+
     //added by ujihara for decryption
-    protected int objNum = 0;
-    protected int objGen = 0;
-    
-    public PRStream(PRStream stream, PdfDictionary newDic) {
-        reader = stream.reader;
-        offset = stream.offset;
-        length = stream.length;
-        compressed = stream.compressed;
-        compressionLevel = stream.compressionLevel;
-        streamBytes = stream.streamBytes;
-        bytes = stream.bytes;
-        objNum = stream.objNum;
-        objGen = stream.objGen;
-        if (newDic != null)
-            putAll(newDic);
-        else
-            hashMap.putAll(stream.hashMap);
+    private int objNum = 0;
+    private int objGen = 0;
+
+    PRStream(final PRStream stream, final PdfDictionary newDic) {
+        this.reader = stream.reader;
+        this.offset = stream.offset;
+        this.length = stream.length;
+        this.compressed = stream.compressed;
+        this.compressionLevel = stream.compressionLevel;
+        this.streamBytes = stream.streamBytes;
+        this.bytes = stream.bytes;
+        this.objNum = stream.objNum;
+        this.objGen = stream.objGen;
+        if (newDic != null) {
+			putAll(newDic);
+		} else {
+			this.hashMap.putAll(stream.hashMap);
+		}
     }
 
-    public PRStream(PRStream stream, PdfDictionary newDic, PdfReader reader) {
+    PRStream(final PRStream stream, final PdfDictionary newDic, final PdfReader reader) {
         this(stream, newDic);
         this.reader = reader;
     }
 
-    public PRStream(PdfReader reader, int offset) {
+    PRStream(final PdfReader reader, final int offset) {
         this.reader = reader;
         this.offset = offset;
     }
 
-    public PRStream(PdfReader reader, byte conts[]) {
-    	this(reader, conts, DEFAULT_COMPRESSION);
-    }
+
 
     /**
      * Creates a new PDF stream object that will replace a stream
@@ -106,133 +105,138 @@ public class PRStream extends PdfStream {
      * @param	compressionLevel	the compression level for the content
      * @since	2.1.3 (replacing the existing constructor without param compressionLevel)
      */
-    public PRStream(PdfReader reader, byte[] conts, int compressionLevel) {
+    PRStream(final PdfReader reader, final byte[] conts, final int compressionLevel) {
         this.reader = reader;
         this.offset = -1;
         if (Document.compress) {
             try {
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                Deflater deflater = new Deflater(compressionLevel);
-                DeflaterOutputStream zip = new DeflaterOutputStream(stream, deflater);
+                final ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                final Deflater deflater = new Deflater(compressionLevel);
+                final DeflaterOutputStream zip = new DeflaterOutputStream(stream, deflater);
                 zip.write(conts);
                 zip.close();
                 deflater.end();
-                bytes = stream.toByteArray();
+                this.bytes = stream.toByteArray();
             }
-            catch (IOException ioe) {
+            catch (final IOException ioe) {
                 throw new ExceptionConverter(ioe);
             }
             put(PdfName.FILTER, PdfName.FLATEDECODE);
-        }
-        else
-            bytes = conts;
-        setLength(bytes.length);
+        } else {
+			this.bytes = conts;
+		}
+        setLength(this.bytes.length);
     }
-    
+
     /**
      * Sets the data associated with the stream, either compressed or
      * uncompressed. Note that the data will never be compressed if
      * Document.compress is set to false.
-     * 
+     *
      * @param data raw data, decrypted and uncompressed.
      * @param compress true if you want the stream to be compressed.
      * @since	iText 2.1.1
      */
-    public void setData(byte[] data, boolean compress) {
+    private void setData(final byte[] data, final boolean compress) {
     	setData(data, compress, DEFAULT_COMPRESSION);
     }
-    
+
     /**
      * Sets the data associated with the stream, either compressed or
      * uncompressed. Note that the data will never be compressed if
      * Document.compress is set to false.
-     * 
+     *
      * @param data raw data, decrypted and uncompressed.
      * @param compress true if you want the stream to be compressed.
      * @param compressionLevel	a value between -1 and 9 (ignored if compress == false)
      * @since	iText 2.1.3
      */
-    public void setData(byte[] data, boolean compress, int compressionLevel) {
+    private void setData(final byte[] data, final boolean compress, final int compressionLevel) {
         remove(PdfName.FILTER);
         this.offset = -1;
         if (Document.compress && compress) {
             try {
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                Deflater deflater = new Deflater(compressionLevel);
-                DeflaterOutputStream zip = new DeflaterOutputStream(stream, deflater);
+                final ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                final Deflater deflater = new Deflater(compressionLevel);
+                final DeflaterOutputStream zip = new DeflaterOutputStream(stream, deflater);
                 zip.write(data);
                 zip.close();
                 deflater.end();
-                bytes = stream.toByteArray();
+                this.bytes = stream.toByteArray();
                 this.compressionLevel = compressionLevel;
             }
-            catch (IOException ioe) {
+            catch (final IOException ioe) {
                 throw new ExceptionConverter(ioe);
             }
             put(PdfName.FILTER, PdfName.FLATEDECODE);
-        }
-        else
-            bytes = data;
-        setLength(bytes.length);
+        } else {
+			this.bytes = data;
+		}
+        setLength(this.bytes.length);
     }
-    
+
     /**Sets the data associated with the stream
      * @param data raw data, decrypted and uncompressed.
      */
-    public void setData(byte[] data) {
+    public void setData(final byte[] data) {
         setData(data, true);
     }
 
-    public void setLength(int length) {
+    public void setLength(final int length) {
         this.length = length;
         put(PdfName.LENGTH, new PdfNumber(length));
     }
-    
+
     public int getOffset() {
-        return offset;
+        return this.offset;
     }
-    
+
     public int getLength() {
-        return length;
+        return this.length;
     }
-    
+
     public PdfReader getReader() {
-        return reader;
+        return this.reader;
     }
-    
-    public byte[] getBytes() {
-        return bytes;
+
+    @Override
+	public byte[] getBytes() {
+        return this.bytes;
     }
-    
-    public void setObjNum(int objNum, int objGen) {
+
+    void setObjNum(final int objNum, final int objGen) {
         this.objNum = objNum;
         this.objGen = objGen;
     }
-    
+
     int getObjNum() {
-        return objNum;
+        return this.objNum;
     }
-    
+
     int getObjGen() {
-        return objGen;
+        return this.objGen;
     }
-    
-    public void toPdf(PdfWriter writer, OutputStream os) throws IOException {
+
+    @Override
+	public void toPdf(final PdfWriter writer, final OutputStream os) throws IOException {
         byte[] b = PdfReader.getStreamBytesRaw(this);
         PdfEncryption crypto = null;
-        if (writer != null)
-            crypto = writer.getEncryption();
-        PdfObject objLen = get(PdfName.LENGTH);
+        if (writer != null) {
+			crypto = writer.getEncryption();
+		}
+        final PdfObject objLen = get(PdfName.LENGTH);
         int nn = b.length;
-        if (crypto != null)
-            nn = crypto.calculateStreamSize(nn);
+        if (crypto != null) {
+			nn = crypto.calculateStreamSize(nn);
+		}
         put(PdfName.LENGTH, new PdfNumber(nn));
         superToPdf(writer, os);
         put(PdfName.LENGTH, objLen);
         os.write(STARTSTREAM);
-        if (length > 0) {
-            if (crypto != null && !crypto.isEmbeddedFilesOnly())
-                b = crypto.encryptByteArray(b);
+        if (this.length > 0) {
+            if (crypto != null && !crypto.isEmbeddedFilesOnly()) {
+				b = crypto.encryptByteArray(b);
+			}
             os.write(b);
         }
         os.write(ENDSTREAM);

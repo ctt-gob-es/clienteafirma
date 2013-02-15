@@ -1,6 +1,6 @@
 /*
  * Copyright 2002 by Phillip Pan
- * 
+ *
  * The contents of this file are subject to the Mozilla Public License Version 1.1
  * (the "License"); you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at http://www.mozilla.org/MPL/
@@ -57,60 +57,61 @@ import com.lowagie.text.Rectangle;
  */
 
 public final class PdfPatternPainter extends PdfTemplate {
-    
-    float xstep, ystep;
-    boolean stencil = false;
-    Color defaultColor;
-    
+
+    private float xstep, ystep;
+    private boolean stencil = false;
+    private Color defaultColor;
+
     /**
      *Creates a <CODE>PdfPattern</CODE>.
      */
-    
+
     private PdfPatternPainter() {
         super();
-        type = TYPE_PATTERN;
+        this.type = TYPE_PATTERN;
     }
-    
+
     /**
      * Creates new PdfPattern
      *
      * @param wr the <CODE>PdfWriter</CODE>
      */
-    
-    PdfPatternPainter(PdfWriter wr) {
+
+    PdfPatternPainter(final PdfWriter wr) {
         super(wr);
-        type = TYPE_PATTERN;
+        this.type = TYPE_PATTERN;
     }
-    
-    PdfPatternPainter(PdfWriter wr, Color defaultColor) {
+
+    PdfPatternPainter(final PdfWriter wr, final Color defaultColor) {
         this(wr);
-        stencil = true;
-        if (defaultColor == null)
-            this.defaultColor = Color.gray;
-        else
-            this.defaultColor = defaultColor;
+        this.stencil = true;
+        if (defaultColor == null) {
+			this.defaultColor = Color.gray;
+		} else {
+			this.defaultColor = defaultColor;
+		}
     }
-    
+
     /**
      * Sets the horizontal interval of this pattern.
      *
      * @param xstep the xstep in horizontal painting
      */
-    
-    public void setXStep(float xstep) {
+
+    public void setXStep(final float xstep) {
         this.xstep = xstep;
     }
-    
+
     /**
      * Sets the vertical interval of this pattern.
      *
      * @param ystep in vertical painting
      */
-    
-    public void setYStep(float ystep) {
+
+    public void setYStep(final float ystep) {
         this.ystep = ystep;
     }
-    
+
     /**
      * Returns the horizontal interval when repeating the pattern.
      * @return a value
@@ -118,7 +119,7 @@ public final class PdfPatternPainter extends PdfTemplate {
     public float getXStep() {
         return this.xstep;
     }
-    
+
     /**
      * Returns the vertical interval when repeating the pattern.
      * @return a value
@@ -126,15 +127,15 @@ public final class PdfPatternPainter extends PdfTemplate {
     public float getYStep() {
         return this.ystep;
     }
-    
+
     /**
      * Tells you if this pattern is colored/uncolored (stencil = uncolored, you need to set a default color).
      * @return true if the pattern is an uncolored tiling pattern (stencil).
      */
     public boolean isStencil() {
-        return stencil;
+        return this.stencil;
     }
-    
+
     /**
      * Sets the transformation matrix for the pattern.
      * @param a
@@ -144,259 +145,281 @@ public final class PdfPatternPainter extends PdfTemplate {
      * @param e
      * @param f
      */
-    public void setPatternMatrix(float a, float b, float c, float d, float e, float f) {
+    void setPatternMatrix(final float a, final float b, final float c, final float d, final float e, final float f) {
         setMatrix(a, b, c, d, e, f);
     }
-    /**
-     * Gets the stream representing this pattern
-     * @return the stream representing this pattern
-     */
-    PdfPattern getPattern() {
-        return new PdfPattern(this);
-    }
-    
+
+
     /**
      * Gets the stream representing this pattern
      * @param	compressionLevel	the compression level of the stream
      * @return the stream representing this pattern
      * @since	2.1.3
      */
-    PdfPattern getPattern(int compressionLevel) {
+    PdfPattern getPattern(final int compressionLevel) {
         return new PdfPattern(this, compressionLevel);
     }
-    
+
     /**
      * Gets a duplicate of this <CODE>PdfPatternPainter</CODE>. All
      * the members are copied by reference but the buffer stays different.
      * @return a copy of this <CODE>PdfPatternPainter</CODE>
      */
-    
-    public PdfContentByte getDuplicate() {
-        PdfPatternPainter tpl = new PdfPatternPainter();
-        tpl.writer = writer;
-        tpl.pdf = pdf;
-        tpl.thisReference = thisReference;
-        tpl.pageResources = pageResources;
-        tpl.bBox = new Rectangle(bBox);
-        tpl.xstep = xstep;
-        tpl.ystep = ystep;
-        tpl.matrix = matrix;
-        tpl.stencil = stencil;
-        tpl.defaultColor = defaultColor;
+
+    @Override
+	public PdfContentByte getDuplicate() {
+        final PdfPatternPainter tpl = new PdfPatternPainter();
+        tpl.writer = this.writer;
+        tpl.pdf = this.pdf;
+        tpl.thisReference = this.thisReference;
+        tpl.pageResources = this.pageResources;
+        tpl.bBox = new Rectangle(this.bBox);
+        tpl.xstep = this.xstep;
+        tpl.ystep = this.ystep;
+        tpl.matrix = this.matrix;
+        tpl.stencil = this.stencil;
+        tpl.defaultColor = this.defaultColor;
         return tpl;
     }
-    
+
     /**
      * Returns the default color of the pattern.
      * @return a Color
      */
     public Color getDefaultColor() {
-        return defaultColor;
+        return this.defaultColor;
     }
-    
+
     /**
      * @see com.lowagie.text.pdf.PdfContentByte#setGrayFill(float)
      */
-    public void setGrayFill(float gray) {
+    @Override
+	public void setGrayFill(final float gray) {
         checkNoColor();
         super.setGrayFill(gray);
     }
-    
+
     /**
      * @see com.lowagie.text.pdf.PdfContentByte#resetGrayFill()
      */
-    public void resetGrayFill() {
+    @Override
+	public void resetGrayFill() {
         checkNoColor();
         super.resetGrayFill();
     }
-    
+
     /**
      * @see com.lowagie.text.pdf.PdfContentByte#setGrayStroke(float)
      */
-    public void setGrayStroke(float gray) {
+    @Override
+	public void setGrayStroke(final float gray) {
         checkNoColor();
         super.setGrayStroke(gray);
     }
-    
+
     /**
      * @see com.lowagie.text.pdf.PdfContentByte#resetGrayStroke()
      */
-    public void resetGrayStroke() {
+    @Override
+	public void resetGrayStroke() {
         checkNoColor();
         super.resetGrayStroke();
     }
-    
+
     /**
      * @see com.lowagie.text.pdf.PdfContentByte#setRGBColorFillF(float, float, float)
      */
-    public void setRGBColorFillF(float red, float green, float blue) {
+    @Override
+	public void setRGBColorFillF(final float red, final float green, final float blue) {
         checkNoColor();
         super.setRGBColorFillF(red, green, blue);
     }
-    
+
     /**
      * @see com.lowagie.text.pdf.PdfContentByte#resetRGBColorFill()
      */
-    public void resetRGBColorFill() {
+    @Override
+	public void resetRGBColorFill() {
         checkNoColor();
         super.resetRGBColorFill();
     }
-    
+
     /**
      * @see com.lowagie.text.pdf.PdfContentByte#setRGBColorStrokeF(float, float, float)
      */
-    public void setRGBColorStrokeF(float red, float green, float blue) {
+    @Override
+	public void setRGBColorStrokeF(final float red, final float green, final float blue) {
         checkNoColor();
         super.setRGBColorStrokeF(red, green, blue);
     }
-    
+
     /**
      * @see com.lowagie.text.pdf.PdfContentByte#resetRGBColorStroke()
      */
-    public void resetRGBColorStroke() {
+    @Override
+	public void resetRGBColorStroke() {
         checkNoColor();
         super.resetRGBColorStroke();
     }
-    
+
     /**
      * @see com.lowagie.text.pdf.PdfContentByte#setCMYKColorFillF(float, float, float, float)
      */
-    public void setCMYKColorFillF(float cyan, float magenta, float yellow, float black) {
+    @Override
+	public void setCMYKColorFillF(final float cyan, final float magenta, final float yellow, final float black) {
         checkNoColor();
         super.setCMYKColorFillF(cyan, magenta, yellow, black);
     }
-    
+
     /**
      * @see com.lowagie.text.pdf.PdfContentByte#resetCMYKColorFill()
      */
-    public void resetCMYKColorFill() {
+    @Override
+	public void resetCMYKColorFill() {
         checkNoColor();
         super.resetCMYKColorFill();
     }
-    
+
     /**
      * @see com.lowagie.text.pdf.PdfContentByte#setCMYKColorStrokeF(float, float, float, float)
      */
-    public void setCMYKColorStrokeF(float cyan, float magenta, float yellow, float black) {
+    @Override
+	public void setCMYKColorStrokeF(final float cyan, final float magenta, final float yellow, final float black) {
         checkNoColor();
         super.setCMYKColorStrokeF(cyan, magenta, yellow, black);
     }
-    
+
     /**
      * @see com.lowagie.text.pdf.PdfContentByte#resetCMYKColorStroke()
      */
-    public void resetCMYKColorStroke() {
+    @Override
+	public void resetCMYKColorStroke() {
         checkNoColor();
         super.resetCMYKColorStroke();
     }
-    
+
     /**
      * @see com.lowagie.text.pdf.PdfContentByte#addImage(com.lowagie.text.Image, float, float, float, float, float, float)
      */
-    public void addImage(Image image, float a, float b, float c, float d, float e, float f) throws DocumentException {
-        if (stencil && !image.isMask())
-            checkNoColor();
+    @Override
+	public void addImage(final Image image, final float a, final float b, final float c, final float d, final float e, final float f) throws DocumentException {
+        if (this.stencil && !image.isMask()) {
+			checkNoColor();
+		}
         super.addImage(image, a, b, c, d, e, f);
     }
-    
+
     /**
      * @see com.lowagie.text.pdf.PdfContentByte#setCMYKColorFill(int, int, int, int)
      */
-    public void setCMYKColorFill(int cyan, int magenta, int yellow, int black) {
+    @Override
+	public void setCMYKColorFill(final int cyan, final int magenta, final int yellow, final int black) {
         checkNoColor();
         super.setCMYKColorFill(cyan, magenta, yellow, black);
     }
-    
+
     /**
      * @see com.lowagie.text.pdf.PdfContentByte#setCMYKColorStroke(int, int, int, int)
      */
-    public void setCMYKColorStroke(int cyan, int magenta, int yellow, int black) {
+    @Override
+	public void setCMYKColorStroke(final int cyan, final int magenta, final int yellow, final int black) {
         checkNoColor();
         super.setCMYKColorStroke(cyan, magenta, yellow, black);
     }
-    
+
     /**
      * @see com.lowagie.text.pdf.PdfContentByte#setRGBColorFill(int, int, int)
      */
-    public void setRGBColorFill(int red, int green, int blue) {
+    @Override
+	public void setRGBColorFill(final int red, final int green, final int blue) {
         checkNoColor();
         super.setRGBColorFill(red, green, blue);
     }
-    
+
     /**
      * @see com.lowagie.text.pdf.PdfContentByte#setRGBColorStroke(int, int, int)
      */
-    public void setRGBColorStroke(int red, int green, int blue) {
+    @Override
+	public void setRGBColorStroke(final int red, final int green, final int blue) {
         checkNoColor();
         super.setRGBColorStroke(red, green, blue);
     }
-    
+
     /**
      * @see com.lowagie.text.pdf.PdfContentByte#setColorStroke(java.awt.Color)
      */
-    public void setColorStroke(Color color) {
+    @Override
+	public void setColorStroke(final Color color) {
         checkNoColor();
         super.setColorStroke(color);
     }
-    
+
     /**
      * @see com.lowagie.text.pdf.PdfContentByte#setColorFill(java.awt.Color)
      */
-    public void setColorFill(Color color) {
+    @Override
+	public void setColorFill(final Color color) {
         checkNoColor();
         super.setColorFill(color);
     }
-    
+
     /**
      * @see com.lowagie.text.pdf.PdfContentByte#setColorFill(com.lowagie.text.pdf.PdfSpotColor, float)
      */
-    public void setColorFill(PdfSpotColor sp, float tint) {
+    @Override
+	public void setColorFill(final PdfSpotColor sp, final float tint) {
         checkNoColor();
         super.setColorFill(sp, tint);
     }
-    
+
     /**
      * @see com.lowagie.text.pdf.PdfContentByte#setColorStroke(com.lowagie.text.pdf.PdfSpotColor, float)
      */
-    public void setColorStroke(PdfSpotColor sp, float tint) {
+    @Override
+	public void setColorStroke(final PdfSpotColor sp, final float tint) {
         checkNoColor();
         super.setColorStroke(sp, tint);
     }
-    
+
     /**
      * @see com.lowagie.text.pdf.PdfContentByte#setPatternFill(com.lowagie.text.pdf.PdfPatternPainter)
      */
-    public void setPatternFill(PdfPatternPainter p) {
+    @Override
+	public void setPatternFill(final PdfPatternPainter p) {
         checkNoColor();
         super.setPatternFill(p);
     }
-    
+
     /**
      * @see com.lowagie.text.pdf.PdfContentByte#setPatternFill(com.lowagie.text.pdf.PdfPatternPainter, java.awt.Color, float)
      */
-    public void setPatternFill(PdfPatternPainter p, Color color, float tint) {
+    @Override
+	public void setPatternFill(final PdfPatternPainter p, final Color color, final float tint) {
         checkNoColor();
         super.setPatternFill(p, color, tint);
     }
-    
+
     /**
      * @see com.lowagie.text.pdf.PdfContentByte#setPatternStroke(com.lowagie.text.pdf.PdfPatternPainter, java.awt.Color, float)
      */
-    public void setPatternStroke(PdfPatternPainter p, Color color, float tint) {
+    @Override
+	public void setPatternStroke(final PdfPatternPainter p, final Color color, final float tint) {
         checkNoColor();
         super.setPatternStroke(p, color, tint);
     }
-    
+
     /**
      * @see com.lowagie.text.pdf.PdfContentByte#setPatternStroke(com.lowagie.text.pdf.PdfPatternPainter)
      */
-    public void setPatternStroke(PdfPatternPainter p) {
+    @Override
+	public void setPatternStroke(final PdfPatternPainter p) {
         checkNoColor();
         super.setPatternStroke(p);
     }
-    
-    void checkNoColor() {
-        if (stencil)
-            throw new RuntimeException("Colors are not allowed in uncolored tile patterns.");
+
+    private void checkNoColor() {
+        if (this.stencil) {
+			throw new RuntimeException("Colors are not allowed in uncolored tile patterns.");
+		}
     }
 }

@@ -57,19 +57,19 @@ import com.lowagie.text.SplitCharacter;
  * split characters.
  * @since	2.1.2
  */
-public class DefaultSplitCharacter implements SplitCharacter {
-	
+class DefaultSplitCharacter implements SplitCharacter {
+
 	/**
 	 * An instance of the default SplitCharacter.
 	 */
-	public static final SplitCharacter DEFAULT = new DefaultSplitCharacter();
-	
+	static final SplitCharacter DEFAULT = new DefaultSplitCharacter();
+
 	/**
 	 * Checks if a character can be used to split a <CODE>PdfString</CODE>.
 	 * <P>
 	 * for the moment every character less than or equal to SPACE, the character '-'
 	 * and some specific unicode ranges are 'splitCharacters'.
-	 * 
+	 *
 	 * @param start start position in the array
 	 * @param current current position in the array
 	 * @param end end position in the array
@@ -77,18 +77,20 @@ public class DefaultSplitCharacter implements SplitCharacter {
 	 * @param ck chunk array
 	 * @return	<CODE>true</CODE> if the character can be used to split a string, <CODE>false</CODE> otherwise
 	 */
-    public boolean isSplitCharacter(int start, int current, int end, char[] cc, PdfChunk[] ck) {
-        char c = getCurrentCharacter(current, cc, ck);
+    @Override
+	public boolean isSplitCharacter(final int start, final int current, final int end, final char[] cc, final PdfChunk[] ck) {
+        final char c = getCurrentCharacter(current, cc, ck);
         if (c <= ' ' || c == '-' || c == '\u2010') {
             return true;
         }
-        if (c < 0x2002)
-            return false;
-        return ((c >= 0x2002 && c <= 0x200b)
-        || (c >= 0x2e80 && c < 0xd7a0)
-        || (c >= 0xf900 && c < 0xfb00)
-        || (c >= 0xfe30 && c < 0xfe50)
-        || (c >= 0xff61 && c < 0xffa0));
+        if (c < 0x2002) {
+			return false;
+		}
+        return c >= 0x2002 && c <= 0x200b
+        || c >= 0x2e80 && c < 0xd7a0
+        || c >= 0xf900 && c < 0xfb00
+        || c >= 0xfe30 && c < 0xfe50
+        || c >= 0xff61 && c < 0xffa0;
     }
 
     /**
@@ -98,7 +100,7 @@ public class DefaultSplitCharacter implements SplitCharacter {
 	 * @param ck chunk array
      * @return	the current character
      */
-    protected char getCurrentCharacter(int current, char[] cc, PdfChunk[] ck) {
+    private char getCurrentCharacter(final int current, final char[] cc, final PdfChunk[] ck) {
     	if (ck == null) {
     		return cc[current];
     	}

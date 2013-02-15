@@ -46,6 +46,7 @@
  */
 package com.lowagie.text.pdf.codec;
 import harmony.java.awt.color.ICC_Profile;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.zip.DataFormatException;
@@ -66,25 +67,15 @@ import com.lowagie.text.pdf.RandomAccessFileOrArray;
  * @author Paulo Soares (psoares@consiste.pt)
  */
 public class TiffImage {
-    
-    /** Gets the number of pages the TIFF document has.
-     * @param s the file source
-     * @return the number of pages
-     */    
-    public static int getNumberOfPages(RandomAccessFileOrArray s) {
-        try {
-            return TIFFDirectory.getNumDirectories(s);
-        }
-        catch (Exception e) {
-            throw new ExceptionConverter(e);
-        }
-    }
 
-    static int getDpi(TIFFField fd, int resolutionUnit) {
-        if (fd == null)
-            return 0;
-        long res[] = fd.getAsRational(0);
-        float frac = (float)res[0] / (float)res[1];
+
+
+    private static int getDpi(final TIFFField fd, final int resolutionUnit) {
+        if (fd == null) {
+			return 0;
+		}
+        final long res[] = fd.getAsRational(0);
+        final float frac = (float)res[0] / (float)res[1];
         int dpi = 0;
         switch (resolutionUnit) {
             case TIFFConstants.RESUNIT_INCH:
@@ -97,16 +88,16 @@ public class TiffImage {
         }
         return dpi;
     }
-    
+
     /** Reads a page from a TIFF image. Direct mode is not used.
      * @param s the file source
      * @param page the page to get. The first page is 1
      * @return the <CODE>Image</CODE>
-     */    
-    public static Image getTiffImage(RandomAccessFileOrArray s, int page) {
+     */
+    public static Image getTiffImage(final RandomAccessFileOrArray s, final int page) {
         return getTiffImage(s, page, false);
     }
-    
+
     /** Reads a page from a TIFF image.
      * @param s the file source
      * @param page the page to get. The first page is 1
@@ -114,15 +105,17 @@ public class TiffImage {
      * by direct byte copying. It's faster but may not work
      * every time
      * @return the <CODE>Image</CODE>
-     */    
-    public static Image getTiffImage(RandomAccessFileOrArray s, int page, boolean direct) {
-        if (page < 1)
-            throw new IllegalArgumentException("The page number must be >= 1.");
+     */
+    private static Image getTiffImage(final RandomAccessFileOrArray s, final int page, final boolean direct) {
+        if (page < 1) {
+			throw new IllegalArgumentException("The page number must be >= 1.");
+		}
         try {
-            TIFFDirectory dir = new TIFFDirectory(s, page - 1);
-            if (dir.isTagPresent(TIFFConstants.TIFFTAG_TILEWIDTH))
-                throw new IllegalArgumentException("Tiles are not supported.");
-            int compression = (int)dir.getFieldAsLong(TIFFConstants.TIFFTAG_COMPRESSION);
+            final TIFFDirectory dir = new TIFFDirectory(s, page - 1);
+            if (dir.isTagPresent(TIFFConstants.TIFFTAG_TILEWIDTH)) {
+				throw new IllegalArgumentException("Tiles are not supported.");
+			}
+            final int compression = (int)dir.getFieldAsLong(TIFFConstants.TIFFTAG_COMPRESSION);
             switch (compression) {
                 case TIFFConstants.COMPRESSION_CCITTRLEW:
                 case TIFFConstants.COMPRESSION_CCITTRLE:
@@ -134,55 +127,62 @@ public class TiffImage {
             }
             float rotation = 0;
             if (dir.isTagPresent(TIFFConstants.TIFFTAG_ORIENTATION)) {
-                int rot = (int)dir.getFieldAsLong(TIFFConstants.TIFFTAG_ORIENTATION);
-                if (rot == TIFFConstants.ORIENTATION_BOTRIGHT || rot == TIFFConstants.ORIENTATION_BOTLEFT)
-                    rotation = (float)Math.PI;
-                else if (rot == TIFFConstants.ORIENTATION_LEFTTOP || rot == TIFFConstants.ORIENTATION_LEFTBOT)
-                    rotation = (float)(Math.PI / 2.0);
-                else if (rot == TIFFConstants.ORIENTATION_RIGHTTOP || rot == TIFFConstants.ORIENTATION_RIGHTBOT)
-                    rotation = -(float)(Math.PI / 2.0);
+                final int rot = (int)dir.getFieldAsLong(TIFFConstants.TIFFTAG_ORIENTATION);
+                if (rot == TIFFConstants.ORIENTATION_BOTRIGHT || rot == TIFFConstants.ORIENTATION_BOTLEFT) {
+					rotation = (float)Math.PI;
+				} else if (rot == TIFFConstants.ORIENTATION_LEFTTOP || rot == TIFFConstants.ORIENTATION_LEFTBOT) {
+					rotation = (float)(Math.PI / 2.0);
+				} else if (rot == TIFFConstants.ORIENTATION_RIGHTTOP || rot == TIFFConstants.ORIENTATION_RIGHTBOT) {
+					rotation = -(float)(Math.PI / 2.0);
+				}
             }
 
             Image img = null;
             long tiffT4Options = 0;
             long tiffT6Options = 0;
             int fillOrder = 1;
-            int h = (int)dir.getFieldAsLong(TIFFConstants.TIFFTAG_IMAGELENGTH);
-            int w = (int)dir.getFieldAsLong(TIFFConstants.TIFFTAG_IMAGEWIDTH);
+            final int h = (int)dir.getFieldAsLong(TIFFConstants.TIFFTAG_IMAGELENGTH);
+            final int w = (int)dir.getFieldAsLong(TIFFConstants.TIFFTAG_IMAGEWIDTH);
             int dpiX = 0;
             int dpiY = 0;
             float XYRatio = 0;
             int resolutionUnit = TIFFConstants.RESUNIT_INCH;
-            if (dir.isTagPresent(TIFFConstants.TIFFTAG_RESOLUTIONUNIT))
-                resolutionUnit = (int)dir.getFieldAsLong(TIFFConstants.TIFFTAG_RESOLUTIONUNIT);
+            if (dir.isTagPresent(TIFFConstants.TIFFTAG_RESOLUTIONUNIT)) {
+				resolutionUnit = (int)dir.getFieldAsLong(TIFFConstants.TIFFTAG_RESOLUTIONUNIT);
+			}
             dpiX = getDpi(dir.getField(TIFFConstants.TIFFTAG_XRESOLUTION), resolutionUnit);
             dpiY = getDpi(dir.getField(TIFFConstants.TIFFTAG_YRESOLUTION), resolutionUnit);
             if (resolutionUnit == TIFFConstants.RESUNIT_NONE) {
-                if (dpiY != 0)
-                    XYRatio = (float)dpiX / (float)dpiY;
+                if (dpiY != 0) {
+					XYRatio = (float)dpiX / (float)dpiY;
+				}
                 dpiX = 0;
                 dpiY = 0;
             }
             int rowsStrip = h;
-            if (dir.isTagPresent(TIFFConstants.TIFFTAG_ROWSPERSTRIP))
-                rowsStrip = (int)dir.getFieldAsLong(TIFFConstants.TIFFTAG_ROWSPERSTRIP);
-            if (rowsStrip <= 0 || rowsStrip > h)
-                rowsStrip = h;
-            long offset[] = getArrayLongShort(dir, TIFFConstants.TIFFTAG_STRIPOFFSETS);
+            if (dir.isTagPresent(TIFFConstants.TIFFTAG_ROWSPERSTRIP)) {
+				rowsStrip = (int)dir.getFieldAsLong(TIFFConstants.TIFFTAG_ROWSPERSTRIP);
+			}
+            if (rowsStrip <= 0 || rowsStrip > h) {
+				rowsStrip = h;
+			}
+            final long offset[] = getArrayLongShort(dir, TIFFConstants.TIFFTAG_STRIPOFFSETS);
             long size[] = getArrayLongShort(dir, TIFFConstants.TIFFTAG_STRIPBYTECOUNTS);
-            if ((size == null || (size.length == 1 && (size[0] == 0 || size[0] + offset[0] > s.length()))) && h == rowsStrip) { // some TIFF producers are really lousy, so...
+            if ((size == null || size.length == 1 && (size[0] == 0 || size[0] + offset[0] > s.length())) && h == rowsStrip) { // some TIFF producers are really lousy, so...
                 size = new long[]{s.length() - (int)offset[0]};
             }
             boolean reverse = false;
-            TIFFField fillOrderField =  dir.getField(TIFFConstants.TIFFTAG_FILLORDER);
-            if (fillOrderField != null)
-                fillOrder = fillOrderField.getAsInt(0);
-            reverse = (fillOrder == TIFFConstants.FILLORDER_LSB2MSB);
+            final TIFFField fillOrderField =  dir.getField(TIFFConstants.TIFFTAG_FILLORDER);
+            if (fillOrderField != null) {
+				fillOrder = fillOrderField.getAsInt(0);
+			}
+            reverse = fillOrder == TIFFConstants.FILLORDER_LSB2MSB;
             int params = 0;
             if (dir.isTagPresent(TIFFConstants.TIFFTAG_PHOTOMETRIC)) {
-                long photo = dir.getFieldAsLong(TIFFConstants.TIFFTAG_PHOTOMETRIC);
-                if (photo == TIFFConstants.PHOTOMETRIC_MINISBLACK)
-                    params |= Image.CCITT_BLACKIS1;
+                final long photo = dir.getFieldAsLong(TIFFConstants.TIFFTAG_PHOTOMETRIC);
+                if (photo == TIFFConstants.PHOTOMETRIC_MINISBLACK) {
+					params |= Image.CCITT_BLACKIS1;
+				}
             }
             int imagecomp = 0;
             switch (compression) {
@@ -194,24 +194,27 @@ public class TiffImage {
                 case TIFFConstants.COMPRESSION_CCITTFAX3:
                     imagecomp = Image.CCITTG3_1D;
                     params |= Image.CCITT_ENDOFLINE | Image.CCITT_ENDOFBLOCK;
-                    TIFFField t4OptionsField = dir.getField(TIFFConstants.TIFFTAG_GROUP3OPTIONS);
+                    final TIFFField t4OptionsField = dir.getField(TIFFConstants.TIFFTAG_GROUP3OPTIONS);
                     if (t4OptionsField != null) {
                         tiffT4Options = t4OptionsField.getAsLong(0);
-                    if ((tiffT4Options & TIFFConstants.GROUP3OPT_2DENCODING) != 0)
-                        imagecomp = Image.CCITTG3_2D;
-                    if ((tiffT4Options & TIFFConstants.GROUP3OPT_FILLBITS) != 0)
-                        params |= Image.CCITT_ENCODEDBYTEALIGN;
+                    if ((tiffT4Options & TIFFConstants.GROUP3OPT_2DENCODING) != 0) {
+						imagecomp = Image.CCITTG3_2D;
+					}
+                    if ((tiffT4Options & TIFFConstants.GROUP3OPT_FILLBITS) != 0) {
+						params |= Image.CCITT_ENCODEDBYTEALIGN;
+					}
                     }
                     break;
                 case TIFFConstants.COMPRESSION_CCITTFAX4:
                     imagecomp = Image.CCITTG4;
-                    TIFFField t6OptionsField = dir.getField(TIFFConstants.TIFFTAG_GROUP4OPTIONS);
-                    if (t6OptionsField != null)
-                        tiffT6Options = t6OptionsField.getAsLong(0);
+                    final TIFFField t6OptionsField = dir.getField(TIFFConstants.TIFFTAG_GROUP4OPTIONS);
+                    if (t6OptionsField != null) {
+						tiffT6Options = t6OptionsField.getAsLong(0);
+					}
                     break;
             }
             if (direct && rowsStrip == h) { //single strip, direct
-                byte im[] = new byte[(int)size[0]];
+                final byte im[] = new byte[(int)size[0]];
                 s.seek(offset[0]);
                 s.readFully(im);
                 img = Image.getInstance(w, h, false, imagecomp, params, im);
@@ -219,14 +222,14 @@ public class TiffImage {
             }
             else {
                 int rowsLeft = h;
-                CCITTG4Encoder g4 = new CCITTG4Encoder(w);
+                final CCITTG4Encoder g4 = new CCITTG4Encoder(w);
                 for (int k = 0; k < offset.length; ++k) {
-                    byte im[] = new byte[(int)size[k]];
+                    final byte im[] = new byte[(int)size[k]];
                     s.seek(offset[k]);
                     s.readFully(im);
-                    int height = Math.min(rowsStrip, rowsLeft);
-                    TIFFFaxDecoder decoder = new TIFFFaxDecoder(fillOrder, w, height);
-                    byte outBuf[] = new byte[(w + 7) / 8 * height];
+                    final int height = Math.min(rowsStrip, rowsLeft);
+                    final TIFFFaxDecoder decoder = new TIFFFaxDecoder(fillOrder, w, height);
+                    final byte outBuf[] = new byte[(w + 7) / 8 * height];
                     switch (compression) {
                         case TIFFConstants.COMPRESSION_CCITTRLEW:
                         case TIFFConstants.COMPRESSION_CCITTRLE:
@@ -237,13 +240,13 @@ public class TiffImage {
                             try {
                                 decoder.decode2D(outBuf, im, 0, height, tiffT4Options);
                             }
-                            catch (RuntimeException e) {
+                            catch (final RuntimeException e) {
                                 // let's flip the fill bits and try again...
                                 tiffT4Options ^= TIFFConstants.GROUP3OPT_FILLBITS;
                                 try {
                                     decoder.decode2D(outBuf, im, 0, height, tiffT4Options);
                                 }
-                                catch (RuntimeException e2) {
+                                catch (final RuntimeException e2) {
                                     throw e;
                                 }
                             }
@@ -256,35 +259,37 @@ public class TiffImage {
                     }
                     rowsLeft -= rowsStrip;
                 }
-                byte g4pic[] = g4.close();
+                final byte g4pic[] = g4.close();
                 img = Image.getInstance(w, h, false, Image.CCITTG4, params & Image.CCITT_BLACKIS1, g4pic);
             }
             img.setDpi(dpiX, dpiY);
             img.setXYRatio(XYRatio);
             if (dir.isTagPresent(TIFFConstants.TIFFTAG_ICCPROFILE)) {
                 try {
-                    TIFFField fd = dir.getField(TIFFConstants.TIFFTAG_ICCPROFILE);
-                    ICC_Profile icc_prof = ICC_Profile.getInstance(fd.getAsBytes());
-                    if (icc_prof.getNumComponents() == 1)
-                        img.tagICC(icc_prof);
+                    final TIFFField fd = dir.getField(TIFFConstants.TIFFTAG_ICCPROFILE);
+                    final ICC_Profile icc_prof = ICC_Profile.getInstance(fd.getAsBytes());
+                    if (icc_prof.getNumComponents() == 1) {
+						img.tagICC(icc_prof);
+					}
                 }
-                catch (RuntimeException e) {
+                catch (final RuntimeException e) {
                     //empty
                 }
             }
             img.setOriginalType(Image.ORIGINAL_TIFF);
-            if (rotation != 0)
-                img.setInitialRotation(rotation);
+            if (rotation != 0) {
+				img.setInitialRotation(rotation);
+			}
             return img;
         }
-        catch (Exception e) {
+        catch (final Exception e) {
             throw new ExceptionConverter(e);
         }
     }
-    
-    protected static Image getTiffImageColor(TIFFDirectory dir, RandomAccessFileOrArray s) {
+
+    private static Image getTiffImageColor(final TIFFDirectory dir, final RandomAccessFileOrArray s) {
         try {
-            int compression = (int)dir.getFieldAsLong(TIFFConstants.TIFFTAG_COMPRESSION);
+            final int compression = (int)dir.getFieldAsLong(TIFFConstants.TIFFTAG_COMPRESSION);
             int predictor = 1;
             TIFFLZWDecoder lzwDecoder = null;
             switch (compression) {
@@ -299,7 +304,7 @@ public class TiffImage {
                 default:
                     throw new IllegalArgumentException("The compression " + compression + " is not supported.");
             }
-            int photometric = (int)dir.getFieldAsLong(TIFFConstants.TIFFTAG_PHOTOMETRIC);
+            final int photometric = (int)dir.getFieldAsLong(TIFFConstants.TIFFTAG_PHOTOMETRIC);
             switch (photometric) {
                 case TIFFConstants.PHOTOMETRIC_MINISWHITE:
                 case TIFFConstants.PHOTOMETRIC_MINISBLACK:
@@ -308,30 +313,36 @@ public class TiffImage {
                 case TIFFConstants.PHOTOMETRIC_PALETTE:
                     break;
                 default:
-                    if (compression != TIFFConstants.COMPRESSION_OJPEG && compression != TIFFConstants.COMPRESSION_JPEG)
-                        throw new IllegalArgumentException("The photometric " + photometric + " is not supported.");
+                    if (compression != TIFFConstants.COMPRESSION_OJPEG && compression != TIFFConstants.COMPRESSION_JPEG) {
+						throw new IllegalArgumentException("The photometric " + photometric + " is not supported.");
+					}
             }
             float rotation = 0;
             if (dir.isTagPresent(TIFFConstants.TIFFTAG_ORIENTATION)) {
-                int rot = (int)dir.getFieldAsLong(TIFFConstants.TIFFTAG_ORIENTATION);
-                if (rot == TIFFConstants.ORIENTATION_BOTRIGHT || rot == TIFFConstants.ORIENTATION_BOTLEFT)
-                    rotation = (float)Math.PI;
-                else if (rot == TIFFConstants.ORIENTATION_LEFTTOP || rot == TIFFConstants.ORIENTATION_LEFTBOT)
-                    rotation = (float)(Math.PI / 2.0);
-                else if (rot == TIFFConstants.ORIENTATION_RIGHTTOP || rot == TIFFConstants.ORIENTATION_RIGHTBOT)
-                    rotation = -(float)(Math.PI / 2.0);
+                final int rot = (int)dir.getFieldAsLong(TIFFConstants.TIFFTAG_ORIENTATION);
+                if (rot == TIFFConstants.ORIENTATION_BOTRIGHT || rot == TIFFConstants.ORIENTATION_BOTLEFT) {
+					rotation = (float)Math.PI;
+				} else if (rot == TIFFConstants.ORIENTATION_LEFTTOP || rot == TIFFConstants.ORIENTATION_LEFTBOT) {
+					rotation = (float)(Math.PI / 2.0);
+				} else if (rot == TIFFConstants.ORIENTATION_RIGHTTOP || rot == TIFFConstants.ORIENTATION_RIGHTBOT) {
+					rotation = -(float)(Math.PI / 2.0);
+				}
             }
             if (dir.isTagPresent(TIFFConstants.TIFFTAG_PLANARCONFIG)
-                && dir.getFieldAsLong(TIFFConstants.TIFFTAG_PLANARCONFIG) == TIFFConstants.PLANARCONFIG_SEPARATE)
-                throw new IllegalArgumentException("Planar images are not supported.");
-            if (dir.isTagPresent(TIFFConstants.TIFFTAG_EXTRASAMPLES))
-                throw new IllegalArgumentException("Extra samples are not supported.");
+                && dir.getFieldAsLong(TIFFConstants.TIFFTAG_PLANARCONFIG) == TIFFConstants.PLANARCONFIG_SEPARATE) {
+				throw new IllegalArgumentException("Planar images are not supported.");
+			}
+            if (dir.isTagPresent(TIFFConstants.TIFFTAG_EXTRASAMPLES)) {
+				throw new IllegalArgumentException("Extra samples are not supported.");
+			}
             int samplePerPixel = 1;
-            if (dir.isTagPresent(TIFFConstants.TIFFTAG_SAMPLESPERPIXEL)) // 1,3,4
-                samplePerPixel = (int)dir.getFieldAsLong(TIFFConstants.TIFFTAG_SAMPLESPERPIXEL);
+            if (dir.isTagPresent(TIFFConstants.TIFFTAG_SAMPLESPERPIXEL)) {
+				samplePerPixel = (int)dir.getFieldAsLong(TIFFConstants.TIFFTAG_SAMPLESPERPIXEL);
+			}
             int bitsPerSample = 1;
-            if (dir.isTagPresent(TIFFConstants.TIFFTAG_BITSPERSAMPLE))
-                bitsPerSample = (int)dir.getFieldAsLong(TIFFConstants.TIFFTAG_BITSPERSAMPLE);
+            if (dir.isTagPresent(TIFFConstants.TIFFTAG_BITSPERSAMPLE)) {
+				bitsPerSample = (int)dir.getFieldAsLong(TIFFConstants.TIFFTAG_BITSPERSAMPLE);
+			}
             switch (bitsPerSample) {
                 case 1:
                 case 2:
@@ -343,44 +354,48 @@ public class TiffImage {
             }
             Image img = null;
 
-            int h = (int)dir.getFieldAsLong(TIFFConstants.TIFFTAG_IMAGELENGTH);
-            int w = (int)dir.getFieldAsLong(TIFFConstants.TIFFTAG_IMAGEWIDTH);
+            final int h = (int)dir.getFieldAsLong(TIFFConstants.TIFFTAG_IMAGELENGTH);
+            final int w = (int)dir.getFieldAsLong(TIFFConstants.TIFFTAG_IMAGEWIDTH);
             int dpiX = 0;
             int dpiY = 0;
             int resolutionUnit = TIFFConstants.RESUNIT_INCH;
-            if (dir.isTagPresent(TIFFConstants.TIFFTAG_RESOLUTIONUNIT))
-                resolutionUnit = (int)dir.getFieldAsLong(TIFFConstants.TIFFTAG_RESOLUTIONUNIT);
+            if (dir.isTagPresent(TIFFConstants.TIFFTAG_RESOLUTIONUNIT)) {
+				resolutionUnit = (int)dir.getFieldAsLong(TIFFConstants.TIFFTAG_RESOLUTIONUNIT);
+			}
             dpiX = getDpi(dir.getField(TIFFConstants.TIFFTAG_XRESOLUTION), resolutionUnit);
             dpiY = getDpi(dir.getField(TIFFConstants.TIFFTAG_YRESOLUTION), resolutionUnit);
             int fillOrder = 1;
             boolean reverse = false;
-            TIFFField fillOrderField =  dir.getField(TIFFConstants.TIFFTAG_FILLORDER);
-            if (fillOrderField != null)
-                fillOrder = fillOrderField.getAsInt(0);
-            reverse = (fillOrder == TIFFConstants.FILLORDER_LSB2MSB);
+            final TIFFField fillOrderField =  dir.getField(TIFFConstants.TIFFTAG_FILLORDER);
+            if (fillOrderField != null) {
+				fillOrder = fillOrderField.getAsInt(0);
+			}
+            reverse = fillOrder == TIFFConstants.FILLORDER_LSB2MSB;
             int rowsStrip = h;
-            if (dir.isTagPresent(TIFFConstants.TIFFTAG_ROWSPERSTRIP)) //another hack for broken tiffs
-                rowsStrip = (int)dir.getFieldAsLong(TIFFConstants.TIFFTAG_ROWSPERSTRIP);
-            if (rowsStrip <= 0 || rowsStrip > h)
-                rowsStrip = h;
-            long offset[] = getArrayLongShort(dir, TIFFConstants.TIFFTAG_STRIPOFFSETS);
+            if (dir.isTagPresent(TIFFConstants.TIFFTAG_ROWSPERSTRIP)) {
+				rowsStrip = (int)dir.getFieldAsLong(TIFFConstants.TIFFTAG_ROWSPERSTRIP);
+			}
+            if (rowsStrip <= 0 || rowsStrip > h) {
+				rowsStrip = h;
+			}
+            final long offset[] = getArrayLongShort(dir, TIFFConstants.TIFFTAG_STRIPOFFSETS);
             long size[] = getArrayLongShort(dir, TIFFConstants.TIFFTAG_STRIPBYTECOUNTS);
-            if ((size == null || (size.length == 1 && (size[0] == 0 || size[0] + offset[0] > s.length()))) && h == rowsStrip) { // some TIFF producers are really lousy, so...
+            if ((size == null || size.length == 1 && (size[0] == 0 || size[0] + offset[0] > s.length())) && h == rowsStrip) { // some TIFF producers are really lousy, so...
                 size = new long[]{s.length() - (int)offset[0]};
             }
             if (compression == TIFFConstants.COMPRESSION_LZW) {
-                TIFFField predictorField = dir.getField(TIFFConstants.TIFFTAG_PREDICTOR);
+                final TIFFField predictorField = dir.getField(TIFFConstants.TIFFTAG_PREDICTOR);
                 if (predictorField != null) {
                     predictor = predictorField.getAsInt(0);
                     if (predictor != 1 && predictor != 2) {
-                        throw new RuntimeException("Illegal value for Predictor in TIFF file."); 
+                        throw new RuntimeException("Illegal value for Predictor in TIFF file.");
                     }
                     if (predictor == 2 && bitsPerSample != 8) {
                         throw new RuntimeException(bitsPerSample + "-bit samples are not supported for Horizontal differencing Predictor.");
                     }
                 }
-                lzwDecoder = new TIFFLZWDecoder(w, predictor, 
-                                                samplePerPixel); 
+                lzwDecoder = new TIFFLZWDecoder(w, predictor,
+                                                samplePerPixel);
             }
             int rowsLeft = h;
             ByteArrayOutputStream stream = null;
@@ -391,52 +406,56 @@ public class TiffImage {
             }
             else {
                 stream = new ByteArrayOutputStream();
-                if (compression != TIFFConstants.COMPRESSION_OJPEG && compression != TIFFConstants.COMPRESSION_JPEG)
-                    zip = new DeflaterOutputStream(stream);
+                if (compression != TIFFConstants.COMPRESSION_OJPEG && compression != TIFFConstants.COMPRESSION_JPEG) {
+					zip = new DeflaterOutputStream(stream);
+				}
             }
             if (compression == TIFFConstants.COMPRESSION_OJPEG) {
-                
-                // Assume that the TIFFTAG_JPEGIFBYTECOUNT tag is optional, since it's obsolete and 
+
+                // Assume that the TIFFTAG_JPEGIFBYTECOUNT tag is optional, since it's obsolete and
                 // is often missing
 
-                if ((!dir.isTagPresent(TIFFConstants.TIFFTAG_JPEGIFOFFSET))) {
+                if (!dir.isTagPresent(TIFFConstants.TIFFTAG_JPEGIFOFFSET)) {
                     throw new IOException("Missing tag(s) for OJPEG compression.");
                 }
-                int jpegOffset = (int)dir.getFieldAsLong(TIFFConstants.TIFFTAG_JPEGIFOFFSET);
+                final int jpegOffset = (int)dir.getFieldAsLong(TIFFConstants.TIFFTAG_JPEGIFOFFSET);
                 int jpegLength = s.length() - jpegOffset;
 
                 if (dir.isTagPresent(TIFFConstants.TIFFTAG_JPEGIFBYTECOUNT)) {
                     jpegLength = (int)dir.getFieldAsLong(TIFFConstants.TIFFTAG_JPEGIFBYTECOUNT) +
                         (int)size[0];
                 }
-                
-                byte[] jpeg = new byte[Math.min(jpegLength, s.length() - jpegOffset)];
+
+                final byte[] jpeg = new byte[Math.min(jpegLength, s.length() - jpegOffset)];
 
                 int posFilePointer = s.getFilePointer();
                 posFilePointer += jpegOffset;
                 s.seek(posFilePointer);
                 s.readFully(jpeg);
                 img = new Jpeg(jpeg);
-            } 
+            }
             else if (compression == TIFFConstants.COMPRESSION_JPEG) {
-                if (size.length > 1)
-                    throw new IOException("Compression JPEG is only supported with a single strip. This image has " + size.length + " strips.");
-                byte[] jpeg = new byte[(int)size[0]];
+                if (size.length > 1) {
+					throw new IOException("Compression JPEG is only supported with a single strip. This image has " + size.length + " strips.");
+				}
+                final byte[] jpeg = new byte[(int)size[0]];
                 s.seek(offset[0]);
                 s.readFully(jpeg);
                 img = new Jpeg(jpeg);
-            } 
+            }
             else {
                 for (int k = 0; k < offset.length; ++k) {
-                    byte im[] = new byte[(int)size[k]];
+                    final byte im[] = new byte[(int)size[k]];
                     s.seek(offset[k]);
                     s.readFully(im);
-                    int height = Math.min(rowsStrip, rowsLeft);
+                    final int height = Math.min(rowsStrip, rowsLeft);
                     byte outBuf[] = null;
-                    if (compression != TIFFConstants.COMPRESSION_NONE)
-                        outBuf = new byte[(w * bitsPerSample * samplePerPixel + 7) / 8 * height];
-                    if (reverse)
-                        TIFFFaxDecoder.reverseBits(im);
+                    if (compression != TIFFConstants.COMPRESSION_NONE) {
+						outBuf = new byte[(w * bitsPerSample * samplePerPixel + 7) / 8 * height];
+					}
+                    if (reverse) {
+						TIFFFaxDecoder.reverseBits(im);
+					}
                     switch (compression) {
                         case TIFFConstants.COMPRESSION_DEFLATE:
                         case TIFFConstants.COMPRESSION_ADOBE_DEFLATE:
@@ -461,7 +480,7 @@ public class TiffImage {
                     rowsLeft -= rowsStrip;
                 }
                 if (bitsPerSample == 1 && samplePerPixel == 1) {
-                    img = Image.getInstance(w, h, false, Image.CCITTG4, 
+                    img = Image.getInstance(w, h, false, Image.CCITTG4,
                         photometric == TIFFConstants.PHOTOMETRIC_MINISBLACK ? Image.CCITT_BLACKIS1 : 0, g4.close());
                 }
                 else {
@@ -474,82 +493,87 @@ public class TiffImage {
             if (compression != TIFFConstants.COMPRESSION_OJPEG && compression != TIFFConstants.COMPRESSION_JPEG) {
                 if (dir.isTagPresent(TIFFConstants.TIFFTAG_ICCPROFILE)) {
                     try {
-                        TIFFField fd = dir.getField(TIFFConstants.TIFFTAG_ICCPROFILE);
-                        ICC_Profile icc_prof = ICC_Profile.getInstance(fd.getAsBytes());
-                        if (samplePerPixel == icc_prof.getNumComponents())
-                            img.tagICC(icc_prof);
+                        final TIFFField fd = dir.getField(TIFFConstants.TIFFTAG_ICCPROFILE);
+                        final ICC_Profile icc_prof = ICC_Profile.getInstance(fd.getAsBytes());
+                        if (samplePerPixel == icc_prof.getNumComponents()) {
+							img.tagICC(icc_prof);
+						}
                     }
-                    catch (RuntimeException e) {
+                    catch (final RuntimeException e) {
                         //empty
                     }
                 }
                 if (dir.isTagPresent(TIFFConstants.TIFFTAG_COLORMAP)) {
-                    TIFFField fd = dir.getField(TIFFConstants.TIFFTAG_COLORMAP);
-                    char rgb[] = fd.getAsChars();
-                    byte palette[] = new byte[rgb.length];
-                    int gColor = rgb.length / 3;
-                    int bColor = gColor * 2;
+                    final TIFFField fd = dir.getField(TIFFConstants.TIFFTAG_COLORMAP);
+                    final char rgb[] = fd.getAsChars();
+                    final byte palette[] = new byte[rgb.length];
+                    final int gColor = rgb.length / 3;
+                    final int bColor = gColor * 2;
                     for (int k = 0; k < gColor; ++k) {
                         palette[k * 3] = (byte)(rgb[k] >>> 8);
                         palette[k * 3 + 1] = (byte)(rgb[k + gColor] >>> 8);
                         palette[k * 3 + 2] = (byte)(rgb[k + bColor] >>> 8);
                     }
-                    PdfArray indexed = new PdfArray();
+                    final PdfArray indexed = new PdfArray();
                     indexed.add(PdfName.INDEXED);
                     indexed.add(PdfName.DEVICERGB);
                     indexed.add(new PdfNumber(gColor - 1));
                     indexed.add(new PdfString(palette));
-                    PdfDictionary additional = new PdfDictionary();
+                    final PdfDictionary additional = new PdfDictionary();
                     additional.put(PdfName.COLORSPACE, indexed);
                     img.setAdditional(additional);
                 }
                 img.setOriginalType(Image.ORIGINAL_TIFF);
             }
-            if (photometric == TIFFConstants.PHOTOMETRIC_MINISWHITE)
-                img.setInverted(true);
-            if (rotation != 0)
-                img.setInitialRotation(rotation);
+            if (photometric == TIFFConstants.PHOTOMETRIC_MINISWHITE) {
+				img.setInverted(true);
+			}
+            if (rotation != 0) {
+				img.setInitialRotation(rotation);
+			}
             return img;
         }
-        catch (Exception e) {
+        catch (final Exception e) {
             throw new ExceptionConverter(e);
         }
     }
-    
-    static long[] getArrayLongShort(TIFFDirectory dir, int tag) {
-        TIFFField field = dir.getField(tag);
-        if (field == null)
-            return null;
+
+    private static long[] getArrayLongShort(final TIFFDirectory dir, final int tag) {
+        final TIFFField field = dir.getField(tag);
+        if (field == null) {
+			return null;
+		}
         long offset[];
-        if (field.getType() == TIFFField.TIFF_LONG)
-            offset = field.getAsLongs();
-        else { // must be short
-            char temp[] = field.getAsChars();
+        if (field.getType() == TIFFField.TIFF_LONG) {
+			offset = field.getAsLongs();
+		} else { // must be short
+            final char temp[] = field.getAsChars();
             offset = new long[temp.length];
-            for (int k = 0; k < temp.length; ++k)
-                offset[k] = temp[k];
+            for (int k = 0; k < temp.length; ++k) {
+				offset[k] = temp[k];
+			}
         }
         return offset;
     }
-    
+
     // Uncompress packbits compressed image data.
-    public static void decodePackbits(byte data[], byte[] dst) {
+    private static void decodePackbits(final byte data[], final byte[] dst) {
         int srcCount = 0, dstCount = 0;
         byte repeat, b;
-        
+
         try {
             while (dstCount < dst.length) {
                 b = data[srcCount++];
                 if (b >= 0 && b <= 127) {
                     // literal run packet
-                    for (int i=0; i<(b + 1); i++) {
+                    for (int i=0; i<b + 1; i++) {
                         dst[dstCount++] = data[srcCount++];
                     }
 
                 } else if (b <= -1 && b >= -127) {
                     // 2 byte encoded run packet
                     repeat = data[srcCount++];
-                    for (int i=0; i<(-b + 1); i++) {
+                    for (int i=0; i<-b + 1; i++) {
                         dst[dstCount++] = repeat;
                     }
                 } else {
@@ -558,18 +582,18 @@ public class TiffImage {
                 }
             }
         }
-        catch (Exception e) {
+        catch (final Exception e) {
             // do nothing
         }
     }
 
-    public static void inflate(byte[] deflated, byte[] inflated) {
-        Inflater inflater = new Inflater();
+    private static void inflate(final byte[] deflated, final byte[] inflated) {
+        final Inflater inflater = new Inflater();
         inflater.setInput(deflated);
         try {
             inflater.inflate(inflated);
         }
-        catch(DataFormatException dfe) {
+        catch(final DataFormatException dfe) {
             throw new ExceptionConverter(dfe);
         }
     }

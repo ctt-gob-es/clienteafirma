@@ -44,7 +44,7 @@
  *
  * Contributions by:
  * Lubos Strapko
- * 
+ *
  * If you didn't download this code from the following link, you should check if
  * you aren't using an obsolete version:
  * http://www.lowagie.com/iText/
@@ -230,73 +230,7 @@ public class HtmlTagMap extends HashMap {
 		put(peer.getAlias(), peer);
 	}
 
-	/**
-	 * Checks if this is the root tag.
-	 * @param tag a tagvalue
-	 * @return true if tag is HTML or html
-	 */
 
-	public static boolean isHtml(String tag) {
-		return HtmlTags.HTML.equalsIgnoreCase(tag);
-	}
 
-	/**
-	 * Checks if this is the head tag.
-	 * @param tag a tagvalue
-	 * @return true if tag is HEAD or head
-	 */
 
-	public static boolean isHead(String tag) {
-		return HtmlTags.HEAD.equalsIgnoreCase(tag);
-	}
-
-	/**
-	 * Checks if this is the meta tag.
-	 * @param tag a tagvalue
-	 * @return true if tag is META or meta
-	 */
-
-	public static boolean isMeta(String tag) {
-		return HtmlTags.META.equalsIgnoreCase(tag);
-	}
-
-	/**
-	 * Checks if this is the link tag.
-	 * @param tag a tagvalue
-	 * @return true if tag is LINK or link
-	 */
-
-	public static boolean isLink(String tag) {
-		return HtmlTags.LINK.equalsIgnoreCase(tag);
-	}
-
-	/**
-	 * Checks if this is the title tag.
-	 * @param tag a tagvalue
-	 * @return true if tag is TITLE or title
-	 */
-
-	public static boolean isTitle(String tag) {
-		return HtmlTags.TITLE.equalsIgnoreCase(tag);
-	}
-
-	/**
-	 * Checks if this is the root tag.
-	 * @param tag a tagvalue
-	 * @return true if tag is BODY or body
-	 */
-
-	public static boolean isBody(String tag) {
-		return HtmlTags.BODY.equalsIgnoreCase(tag);
-	}
-
-	/**
-	 * Checks if this is a special tag.
-	 * @param tag a tagvalue
-	 * @return true if tag is a HTML, HEAD, META, LINK or BODY tag (case insensitive)
-	 */
-	public static boolean isSpecialTag(String tag) {
-		return isHtml(tag) || isHead(tag) || isMeta(tag) || isLink(tag)
-				|| isBody(tag);
-	}
 }

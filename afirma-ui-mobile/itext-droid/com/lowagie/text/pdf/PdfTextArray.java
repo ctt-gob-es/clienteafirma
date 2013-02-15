@@ -61,9 +61,9 @@ import java.util.ArrayList;
  * see reference manual version 1.6 section 5.3.2, pages 378-379.
  */
 
-public class PdfTextArray{
-    ArrayList arrayList = new ArrayList();
-    
+class PdfTextArray{
+    private final ArrayList arrayList = new ArrayList();
+
     // To emit a more efficient array, we consolidate
     // repeated numbers or strings into single array entries.
     // "add( 50 ); add( -50 );" will REMOVE the combined zero from the array.
@@ -71,63 +71,56 @@ public class PdfTextArray{
     // --Mark Storer, May 12, 2008
     private String lastStr;
     private Float lastNum;
-    
+
     // constructors
-    public PdfTextArray(String str) {
+    PdfTextArray(final String str) {
         add(str);
     }
-    
+
     public PdfTextArray() {
     }
-    
-    /**
-     * Adds a <CODE>PdfNumber</CODE> to the <CODE>PdfArray</CODE>.
-     *
-     * @param  number   displacement of the string
-     */
-    public void add(PdfNumber number) {
-        add((float) number.doubleValue());
-    }
-    
-    public void add(float number) {
+
+
+
+    void add(final float number) {
         if (number != 0) {
-            if (lastNum != null) {
-                lastNum = new Float(number + lastNum.floatValue());
-                if (lastNum.floatValue() != 0) {
-                    replaceLast(lastNum);
+            if (this.lastNum != null) {
+                this.lastNum = new Float(number + this.lastNum.floatValue());
+                if (this.lastNum.floatValue() != 0) {
+                    replaceLast(this.lastNum);
                 } else {
-                    arrayList.remove(arrayList.size() - 1);
+                    this.arrayList.remove(this.arrayList.size() - 1);
                 }
             } else {
-                lastNum = new Float(number);
-                arrayList.add(lastNum);
+                this.lastNum = new Float(number);
+                this.arrayList.add(this.lastNum);
             }
-            
-            lastStr = null;
+
+            this.lastStr = null;
         }
         // adding zero doesn't modify the TextArray at all
     }
-    
-    public void add(String str) {
+
+    void add(final String str) {
         if (str.length() > 0) {
-            if (lastStr != null) {
-                lastStr = lastStr + str;
-                replaceLast(lastStr);
+            if (this.lastStr != null) {
+                this.lastStr = this.lastStr + str;
+                replaceLast(this.lastStr);
             } else {
-                lastStr = str;
-                arrayList.add(lastStr);
+                this.lastStr = str;
+                this.arrayList.add(this.lastStr);
             }
-            lastNum = null;
+            this.lastNum = null;
         }
         // adding an empty string doesn't modify the TextArray at all
     }
-    
+
     ArrayList getArrayList() {
-        return arrayList;
+        return this.arrayList;
     }
-    
-    private void replaceLast(Object obj) {
+
+    private void replaceLast(final Object obj) {
         // deliberately throw the IndexOutOfBoundsException if we screw up.
-        arrayList.set(arrayList.size() - 1, obj);
+        this.arrayList.set(this.arrayList.size() - 1, obj);
     }
 }

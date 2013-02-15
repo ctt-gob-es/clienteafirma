@@ -73,34 +73,36 @@ class CJKFont extends BaseFont {
     private static final int BRACKET = 1;
     private static final int SERIAL = 2;
     private static final int V1Y = 880;
-        
-    static Properties cjkFonts = new Properties();
-    static Properties cjkEncodings = new Properties();
-    static Hashtable allCMaps = new Hashtable();
-    static Hashtable allFonts = new Hashtable();
+
+    private static Properties cjkFonts = new Properties();
+    private static Properties cjkEncodings = new Properties();
+    private static Hashtable allCMaps = new Hashtable();
+    private static Hashtable allFonts = new Hashtable();
     private static boolean propertiesLoaded = false;
-    
+
     /** The font name */
     private String fontName;
     /** The style modifier */
     private String style = "";
     /** The CMap name associated with this font */
-    private String CMap;
-    
+    private final String CMap;
+
     private boolean cidDirect = false;
-    
+
     private char[] translationMap;
-    private IntHashtable vMetrics;
-    private IntHashtable hMetrics;
+    private final IntHashtable vMetrics;
+    private final IntHashtable hMetrics;
     private HashMap fontDesc;
     private boolean vertical = false;
-    
+
     private static void loadProperties() {
-        if (propertiesLoaded)
-            return;
+        if (propertiesLoaded) {
+			return;
+		}
         synchronized (allFonts) {
-            if (propertiesLoaded)
-                return;
+            if (propertiesLoaded) {
+				return;
+			}
             try {
                 InputStream is = getResourceStream(RESOURCE_PATH + "cjkfonts.properties");
                 cjkFonts.load(is);
@@ -109,196 +111,214 @@ class CJKFont extends BaseFont {
                 cjkEncodings.load(is);
                 is.close();
             }
-            catch (Exception e) {
+            catch (final Exception e) {
                 cjkFonts = new Properties();
                 cjkEncodings = new Properties();
             }
             propertiesLoaded = true;
         }
     }
-    
+
     /** Creates a CJK font.
      * @param fontName the name of the font
      * @param enc the encoding of the font
      * @param emb always <CODE>false</CODE>. CJK font and not embedded
      * @throws DocumentException on error
      */
-    CJKFont(String fontName, String enc, boolean emb) throws DocumentException {
+    CJKFont(String fontName, final String enc, final boolean emb) throws DocumentException {
         loadProperties();
-        fontType = FONT_TYPE_CJK;
-        String nameBase = getBaseName(fontName);
-        if (!isCJKFont(nameBase, enc))
-            throw new DocumentException("Font '" + fontName + "' with '" + enc + "' encoding is not a CJK font.");
+        this.fontType = FONT_TYPE_CJK;
+        final String nameBase = getBaseName(fontName);
+        if (!isCJKFont(nameBase, enc)) {
+			throw new DocumentException("Font '" + fontName + "' with '" + enc + "' encoding is not a CJK font.");
+		}
         if (nameBase.length() < fontName.length()) {
-            style = fontName.substring(nameBase.length());
+            this.style = fontName.substring(nameBase.length());
             fontName = nameBase;
         }
         this.fontName = fontName;
-        encoding = CJK_ENCODING;
-        vertical = enc.endsWith("V");
-        CMap = enc;
+        this.encoding = CJK_ENCODING;
+        this.vertical = enc.endsWith("V");
+        this.CMap = enc;
         if (enc.startsWith("Identity-")) {
-            cidDirect = true;
+            this.cidDirect = true;
             String s = cjkFonts.getProperty(fontName);
             s = s.substring(0, s.indexOf('_'));
             char c[] = (char[])allCMaps.get(s);
             if (c == null) {
                 c = readCMap(s);
-                if (c == null)
-                    throw new DocumentException("The cmap " + s + " does not exist as a resource.");
+                if (c == null) {
+					throw new DocumentException("The cmap " + s + " does not exist as a resource.");
+				}
                 c[CID_NEWLINE] = '\n';
                 allCMaps.put(s, c);
             }
-            translationMap = c;
+            this.translationMap = c;
         }
         else {
             char c[] = (char[])allCMaps.get(enc);
             if (c == null) {
-                String s = cjkEncodings.getProperty(enc);
-                if (s == null)
-                    throw new DocumentException("The resource cjkencodings.properties does not contain the encoding " + enc);
-                StringTokenizer tk = new StringTokenizer(s);
-                String nt = tk.nextToken();
+                final String s = cjkEncodings.getProperty(enc);
+                if (s == null) {
+					throw new DocumentException("The resource cjkencodings.properties does not contain the encoding " + enc);
+				}
+                final StringTokenizer tk = new StringTokenizer(s);
+                final String nt = tk.nextToken();
                 c = (char[])allCMaps.get(nt);
                 if (c == null) {
                     c = readCMap(nt);
                     allCMaps.put(nt, c);
                 }
                 if (tk.hasMoreTokens()) {
-                    String nt2 = tk.nextToken();
-                    char m2[] = readCMap(nt2);
+                    final String nt2 = tk.nextToken();
+                    final char m2[] = readCMap(nt2);
                     for (int k = 0; k < 0x10000; ++k) {
-                        if (m2[k] == 0)
-                            m2[k] = c[k];
+                        if (m2[k] == 0) {
+							m2[k] = c[k];
+						}
                     }
                     allCMaps.put(enc, m2);
                     c = m2;
                 }
             }
-            translationMap = c;
+            this.translationMap = c;
         }
-        fontDesc = (HashMap)allFonts.get(fontName);
-        if (fontDesc == null) {
-            fontDesc = readFontProperties(fontName);
-            allFonts.put(fontName, fontDesc);
+        this.fontDesc = (HashMap)allFonts.get(fontName);
+        if (this.fontDesc == null) {
+            this.fontDesc = readFontProperties(fontName);
+            allFonts.put(fontName, this.fontDesc);
         }
-        hMetrics = (IntHashtable)fontDesc.get("W");
-        vMetrics = (IntHashtable)fontDesc.get("W2");
+        this.hMetrics = (IntHashtable)this.fontDesc.get("W");
+        this.vMetrics = (IntHashtable)this.fontDesc.get("W2");
     }
-    
+
     /** Checks if its a valid CJK font.
      * @param fontName the font name
      * @param enc the encoding
      * @return <CODE>true</CODE> if it is CJK font
      */
-    public static boolean isCJKFont(String fontName, String enc) {
+    public static boolean isCJKFont(final String fontName, final String enc) {
         loadProperties();
-        String encodings = cjkFonts.getProperty(fontName);
-        return (encodings != null && (enc.equals("Identity-H") || enc.equals("Identity-V") || encodings.indexOf("_" + enc + "_") >= 0));
+        final String encodings = cjkFonts.getProperty(fontName);
+        return encodings != null && (enc.equals("Identity-H") || enc.equals("Identity-V") || encodings.indexOf("_" + enc + "_") >= 0);
     }
-        
+
     /**
      * Gets the width of a <CODE>char</CODE> in normalized 1000 units.
      * @param char1 the unicode <CODE>char</CODE> to get the width of
      * @return the width in normalized 1000 units
      */
-    public int getWidth(int char1) {
+    @Override
+	public int getWidth(final int char1) {
         int c = char1;
-        if (!cidDirect)
-            c = translationMap[c];
+        if (!this.cidDirect) {
+			c = this.translationMap[c];
+		}
         int v;
-        if (vertical)
-            v = vMetrics.get(c);
-        else
-            v = hMetrics.get(c);
-        if (v > 0)
-            return v;
-        else
-            return 1000;
+        if (this.vertical) {
+			v = this.vMetrics.get(c);
+		} else {
+			v = this.hMetrics.get(c);
+		}
+        if (v > 0) {
+			return v;
+		} else {
+			return 1000;
+		}
     }
-    
-    public int getWidth(String text) {
+
+    @Override
+	public int getWidth(final String text) {
         int total = 0;
         for (int k = 0; k < text.length(); ++k) {
             int c = text.charAt(k);
-            if (!cidDirect)
-                c = translationMap[c];
+            if (!this.cidDirect) {
+				c = this.translationMap[c];
+			}
             int v;
-            if (vertical)
-                v = vMetrics.get(c);
-            else
-                v = hMetrics.get(c);
-            if (v > 0)
-                total += v;
-            else
-                total += 1000;
+            if (this.vertical) {
+				v = this.vMetrics.get(c);
+			} else {
+				v = this.hMetrics.get(c);
+			}
+            if (v > 0) {
+				total += v;
+			} else {
+				total += 1000;
+			}
         }
         return total;
     }
-    
-    int getRawWidth(int c, String name) {
+
+    @Override
+	int getRawWidth(final int c, final String name) {
         return 0;
     }
-  
-    public int getKerning(int char1, int char2) {
+
+    @Override
+	public int getKerning(final int char1, final int char2) {
         return 0;
     }
 
     private PdfDictionary getFontDescriptor() {
-        PdfDictionary dic = new PdfDictionary(PdfName.FONTDESCRIPTOR);
-        dic.put(PdfName.ASCENT, new PdfLiteral((String)fontDesc.get("Ascent")));
-        dic.put(PdfName.CAPHEIGHT, new PdfLiteral((String)fontDesc.get("CapHeight")));
-        dic.put(PdfName.DESCENT, new PdfLiteral((String)fontDesc.get("Descent")));
-        dic.put(PdfName.FLAGS, new PdfLiteral((String)fontDesc.get("Flags")));
-        dic.put(PdfName.FONTBBOX, new PdfLiteral((String)fontDesc.get("FontBBox")));
-        dic.put(PdfName.FONTNAME, new PdfName(fontName + style));
-        dic.put(PdfName.ITALICANGLE, new PdfLiteral((String)fontDesc.get("ItalicAngle")));
-        dic.put(PdfName.STEMV, new PdfLiteral((String)fontDesc.get("StemV")));
-        PdfDictionary pdic = new PdfDictionary();
-        pdic.put(PdfName.PANOSE, new PdfString((String)fontDesc.get("Panose"), null));
+        final PdfDictionary dic = new PdfDictionary(PdfName.FONTDESCRIPTOR);
+        dic.put(PdfName.ASCENT, new PdfLiteral((String)this.fontDesc.get("Ascent")));
+        dic.put(PdfName.CAPHEIGHT, new PdfLiteral((String)this.fontDesc.get("CapHeight")));
+        dic.put(PdfName.DESCENT, new PdfLiteral((String)this.fontDesc.get("Descent")));
+        dic.put(PdfName.FLAGS, new PdfLiteral((String)this.fontDesc.get("Flags")));
+        dic.put(PdfName.FONTBBOX, new PdfLiteral((String)this.fontDesc.get("FontBBox")));
+        dic.put(PdfName.FONTNAME, new PdfName(this.fontName + this.style));
+        dic.put(PdfName.ITALICANGLE, new PdfLiteral((String)this.fontDesc.get("ItalicAngle")));
+        dic.put(PdfName.STEMV, new PdfLiteral((String)this.fontDesc.get("StemV")));
+        final PdfDictionary pdic = new PdfDictionary();
+        pdic.put(PdfName.PANOSE, new PdfString((String)this.fontDesc.get("Panose"), null));
         dic.put(PdfName.STYLE, pdic);
         return dic;
     }
-    
-    private PdfDictionary getCIDFont(PdfIndirectReference fontDescriptor, IntHashtable cjkTag) {
-        PdfDictionary dic = new PdfDictionary(PdfName.FONT);
+
+    private PdfDictionary getCIDFont(final PdfIndirectReference fontDescriptor, final IntHashtable cjkTag) {
+        final PdfDictionary dic = new PdfDictionary(PdfName.FONT);
         dic.put(PdfName.SUBTYPE, PdfName.CIDFONTTYPE0);
-        dic.put(PdfName.BASEFONT, new PdfName(fontName + style));
+        dic.put(PdfName.BASEFONT, new PdfName(this.fontName + this.style));
         dic.put(PdfName.FONTDESCRIPTOR, fontDescriptor);
-        int keys[] = cjkTag.toOrderedKeys();
-        String w = convertToHCIDMetrics(keys, hMetrics);
-        if (w != null)
-            dic.put(PdfName.W, new PdfLiteral(w));
-        if (vertical) {
-            w = convertToVCIDMetrics(keys, vMetrics, hMetrics);
-            if (w != null)
-                dic.put(PdfName.W2, new PdfLiteral(w));
-        }
-        else
-            dic.put(PdfName.DW, new PdfNumber(1000));
-        PdfDictionary cdic = new PdfDictionary();
-        cdic.put(PdfName.REGISTRY, new PdfString((String)fontDesc.get("Registry"), null));
-        cdic.put(PdfName.ORDERING, new PdfString((String)fontDesc.get("Ordering"), null));
-        cdic.put(PdfName.SUPPLEMENT, new PdfLiteral((String)fontDesc.get("Supplement")));
+        final int keys[] = cjkTag.toOrderedKeys();
+        String w = convertToHCIDMetrics(keys, this.hMetrics);
+        if (w != null) {
+			dic.put(PdfName.W, new PdfLiteral(w));
+		}
+        if (this.vertical) {
+            w = convertToVCIDMetrics(keys, this.vMetrics, this.hMetrics);
+            if (w != null) {
+				dic.put(PdfName.W2, new PdfLiteral(w));
+			}
+        } else {
+			dic.put(PdfName.DW, new PdfNumber(1000));
+		}
+        final PdfDictionary cdic = new PdfDictionary();
+        cdic.put(PdfName.REGISTRY, new PdfString((String)this.fontDesc.get("Registry"), null));
+        cdic.put(PdfName.ORDERING, new PdfString((String)this.fontDesc.get("Ordering"), null));
+        cdic.put(PdfName.SUPPLEMENT, new PdfLiteral((String)this.fontDesc.get("Supplement")));
         dic.put(PdfName.CIDSYSTEMINFO, cdic);
         return dic;
     }
-    
-    private PdfDictionary getFontBaseType(PdfIndirectReference CIDFont) {
-        PdfDictionary dic = new PdfDictionary(PdfName.FONT);
+
+    private PdfDictionary getFontBaseType(final PdfIndirectReference CIDFont) {
+        final PdfDictionary dic = new PdfDictionary(PdfName.FONT);
         dic.put(PdfName.SUBTYPE, PdfName.TYPE0);
-        String name = fontName;
-        if (style.length() > 0)
-            name += "-" + style.substring(1);
-        name += "-" + CMap;
+        String name = this.fontName;
+        if (this.style.length() > 0) {
+			name += "-" + this.style.substring(1);
+		}
+        name += "-" + this.CMap;
         dic.put(PdfName.BASEFONT, new PdfName(name));
-        dic.put(PdfName.ENCODING, new PdfName(CMap));
+        dic.put(PdfName.ENCODING, new PdfName(this.CMap));
         dic.put(PdfName.DESCENDANTFONTS, new PdfArray(CIDFont));
         return dic;
     }
-    
-    void writeFont(PdfWriter writer, PdfIndirectReference ref, Object params[]) throws DocumentException, IOException {
-        IntHashtable cjkTag = (IntHashtable)params[0];
+
+    @Override
+	void writeFont(final PdfWriter writer, final PdfIndirectReference ref, final Object params[]) throws DocumentException, IOException {
+        final IntHashtable cjkTag = (IntHashtable)params[0];
         PdfIndirectReference ind_font = null;
         PdfObject pobj = null;
         PdfIndirectObject obj = null;
@@ -322,23 +342,25 @@ class CJKFont extends BaseFont {
    	 * @return	null
      * @since	2.1.3
      */
-    public PdfStream getFullFontStream() {
+    @Override
+	public PdfStream getFullFontStream() {
     	return null;
     }
-    
-    private float getDescNumber(String name) {
-        return Integer.parseInt((String)fontDesc.get(name));
+
+    private float getDescNumber(final String name) {
+        return Integer.parseInt((String)this.fontDesc.get(name));
     }
-    
-    private float getBBox(int idx) {
-        String s = (String)fontDesc.get("FontBBox");
-        StringTokenizer tk = new StringTokenizer(s, " []\r\n\t\f");
+
+    private float getBBox(final int idx) {
+        final String s = (String)this.fontDesc.get("FontBBox");
+        final StringTokenizer tk = new StringTokenizer(s, " []\r\n\t\f");
         String ret = tk.nextToken();
-        for (int k = 0; k < idx; ++k)
-            ret = tk.nextToken();
+        for (int k = 0; k < idx; ++k) {
+			ret = tk.nextToken();
+		}
         return Integer.parseInt(ret);
     }
-    
+
     /** Gets the font parameter identified by <CODE>key</CODE>. Valid values
      * for <CODE>key</CODE> are <CODE>ASCENT</CODE>, <CODE>CAPHEIGHT</CODE>, <CODE>DESCENT</CODE>
      * and <CODE>ITALICANGLE</CODE>.
@@ -346,7 +368,8 @@ class CJKFont extends BaseFont {
      * @param fontSize the font size in points
      * @return the parameter in points
      */
-    public float getFontDescriptor(int key, float fontSize) {
+    @Override
+	public float getFontDescriptor(final int key, final float fontSize) {
         switch (key) {
             case AWT_ASCENT:
             case ASCENT:
@@ -373,11 +396,12 @@ class CJKFont extends BaseFont {
         }
         return 0;
     }
-    
-    public String getPostscriptFontName() {
-        return fontName;
+
+    @Override
+	public String getPostscriptFontName() {
+        return this.fontName;
     }
-    
+
     /** Gets the full name of the font. If it is a True Type font
      * each array element will have {Platform ID, Platform Encoding ID,
      * Language ID, font name}. The interpretation of this values can be
@@ -386,10 +410,11 @@ class CJKFont extends BaseFont {
      * font name}.
      * @return the full name of the font
      */
-    public String[][] getFullFontName() {
-        return new String[][]{{"", "", "", fontName}};
+    @Override
+	public String[][] getFullFontName() {
+        return new String[][]{{"", "", "", this.fontName}};
     }
-    
+
     /** Gets all the entries of the names-table. If it is a True Type font
      * each array element will have {Name ID, Platform ID, Platform Encoding ID,
      * Language ID, font name}. The interpretation of this values can be
@@ -398,10 +423,11 @@ class CJKFont extends BaseFont {
      * font name}.
      * @return the full name of the font
      */
-    public String[][] getAllNameEntries() {
-        return new String[][]{{"4", "", "", "", fontName}};
+    @Override
+	public String[][] getAllNameEntries() {
+        return new String[][]{{"4", "", "", "", this.fontName}};
     }
-    
+
     /** Gets the family name of the font. If it is a True Type font
      * each array element will have {Platform ID, Platform Encoding ID,
      * Language ID, font name}. The interpretation of this values can be
@@ -410,39 +436,42 @@ class CJKFont extends BaseFont {
      * font name}.
      * @return the family name of the font
      */
-    public String[][] getFamilyFontName() {
+    @Override
+	public String[][] getFamilyFontName() {
         return getFullFontName();
     }
-    
-    static char[] readCMap(String name) {
+
+    private static char[] readCMap(String name) {
         try {
             name = name + ".cmap";
-            InputStream is = getResourceStream(RESOURCE_PATH + name);
-            char c[] = new char[0x10000];
-            for (int k = 0; k < 0x10000; ++k)
-                c[k] = (char)((is.read() << 8) + is.read());
+            final InputStream is = getResourceStream(RESOURCE_PATH + name);
+            final char c[] = new char[0x10000];
+            for (int k = 0; k < 0x10000; ++k) {
+				c[k] = (char)((is.read() << 8) + is.read());
+			}
             is.close();
             return c;
         }
-        catch (Exception e) {
+        catch (final Exception e) {
             // empty on purpose
         }
         return null;
     }
-    
-    static IntHashtable createMetric(String s) {
-        IntHashtable h = new IntHashtable();
-        StringTokenizer tk = new StringTokenizer(s);
+
+    private static IntHashtable createMetric(final String s) {
+        final IntHashtable h = new IntHashtable();
+        final StringTokenizer tk = new StringTokenizer(s);
         while (tk.hasMoreTokens()) {
-            int n1 = Integer.parseInt(tk.nextToken());
+            final int n1 = Integer.parseInt(tk.nextToken());
             h.put(n1, Integer.parseInt(tk.nextToken()));
         }
         return h;
     }
-    
-    static String convertToHCIDMetrics(int keys[], IntHashtable h) {
-        if (keys.length == 0)
-            return null;
+
+    private static String convertToHCIDMetrics(final int keys[], final IntHashtable h) {
+        if (keys.length == 0) {
+			return null;
+		}
         int lastCid = 0;
         int lastValue = 0;
         int start;
@@ -454,17 +483,19 @@ class CJKFont extends BaseFont {
                 break;
             }
         }
-        if (lastValue == 0)
-            return null;
-        StringBuffer buf = new StringBuffer();
+        if (lastValue == 0) {
+			return null;
+		}
+        final StringBuffer buf = new StringBuffer();
         buf.append('[');
         buf.append(lastCid);
         int state = FIRST;
         for (int k = start; k < keys.length; ++k) {
-            int cid = keys[k];
-            int value = h.get(cid);
-            if (value == 0)
-                continue;
+            final int cid = keys[k];
+            final int value = h.get(cid);
+            if (value == 0) {
+				continue;
+			}
             switch (state) {
                 case FIRST: {
                     if (cid == lastCid + 1 && value == lastValue) {
@@ -520,10 +551,11 @@ class CJKFont extends BaseFont {
         }
         return buf.toString();
     }
-    
-    static String convertToVCIDMetrics(int keys[], IntHashtable v, IntHashtable h) {
-        if (keys.length == 0)
-            return null;
+
+    private static String convertToVCIDMetrics(final int keys[], final IntHashtable v, final IntHashtable h) {
+        if (keys.length == 0) {
+			return null;
+		}
         int lastCid = 0;
         int lastValue = 0;
         int lastHValue = 0;
@@ -534,26 +566,30 @@ class CJKFont extends BaseFont {
             if (lastValue != 0) {
                 ++start;
                 break;
-            }
-            else
-                lastHValue = h.get(lastCid);
+            } else {
+				lastHValue = h.get(lastCid);
+			}
         }
-        if (lastValue == 0)
-            return null;
-        if (lastHValue == 0)
-            lastHValue = 1000;
-        StringBuffer buf = new StringBuffer();
+        if (lastValue == 0) {
+			return null;
+		}
+        if (lastHValue == 0) {
+			lastHValue = 1000;
+		}
+        final StringBuffer buf = new StringBuffer();
         buf.append('[');
         buf.append(lastCid);
         int state = FIRST;
         for (int k = start; k < keys.length; ++k) {
-            int cid = keys[k];
-            int value = v.get(cid);
-            if (value == 0)
-                continue;
+            final int cid = keys[k];
+            final int value = v.get(cid);
+            if (value == 0) {
+				continue;
+			}
             int hValue = h.get(lastCid);
-            if (hValue == 0)
-                hValue = 1000;
+            if (hValue == 0) {
+				hValue = 1000;
+			}
             switch (state) {
                 case FIRST: {
                     if (cid == lastCid + 1 && value == lastValue && hValue == lastHValue) {
@@ -579,62 +615,68 @@ class CJKFont extends BaseFont {
         buf.append(' ').append(lastCid).append(' ').append(-lastValue).append(' ').append(lastHValue / 2).append(' ').append(V1Y).append(" ]");
         return buf.toString();
     }
-    
-    static HashMap readFontProperties(String name) {
+
+    private static HashMap readFontProperties(String name) {
         try {
             name += ".properties";
-            InputStream is = getResourceStream(RESOURCE_PATH + name);
-            Properties p = new Properties();
+            final InputStream is = getResourceStream(RESOURCE_PATH + name);
+            final Properties p = new Properties();
             p.load(is);
             is.close();
-            IntHashtable W = createMetric(p.getProperty("W"));
+            final IntHashtable W = createMetric(p.getProperty("W"));
             p.remove("W");
-            IntHashtable W2 = createMetric(p.getProperty("W2"));
+            final IntHashtable W2 = createMetric(p.getProperty("W2"));
             p.remove("W2");
-            HashMap map = new HashMap();
-            for (Enumeration e = p.keys(); e.hasMoreElements();) {
-                Object obj = e.nextElement();
+            final HashMap map = new HashMap();
+            for (final Enumeration e = p.keys(); e.hasMoreElements();) {
+                final Object obj = e.nextElement();
                 map.put(obj, p.getProperty((String)obj));
             }
             map.put("W", W);
             map.put("W2", W2);
             return map;
         }
-        catch (Exception e) {
+        catch (final Exception e) {
             // empty on purpose
         }
         return null;
     }
 
-    public int getUnicodeEquivalent(int c) {
-        if (cidDirect)
-            return translationMap[c];
+    @Override
+	public int getUnicodeEquivalent(final int c) {
+        if (this.cidDirect) {
+			return this.translationMap[c];
+		}
         return c;
     }
-    
-    public int getCidCode(int c) {
-        if (cidDirect)
-            return c;
-        return translationMap[c];
+
+    @Override
+	public int getCidCode(final int c) {
+        if (this.cidDirect) {
+			return c;
+		}
+        return this.translationMap[c];
     }
-    
+
     /** Checks if the font has any kerning pairs.
      * @return always <CODE>false</CODE>
-     */    
-    public boolean hasKernPairs() {
+     */
+    @Override
+	public boolean hasKernPairs() {
         return false;
     }
-    
+
     /**
      * Checks if a character exists in this font.
      * @param c the character to check
      * @return <CODE>true</CODE> if the character has a glyph,
      * <CODE>false</CODE> otherwise
      */
-    public boolean charExists(int c) {
-        return translationMap[c] != 0;
+    @Override
+	public boolean charExists(final int c) {
+        return this.translationMap[c] != 0;
     }
-    
+
     /**
      * Sets the character advance.
      * @param c the character
@@ -642,28 +684,33 @@ class CJKFont extends BaseFont {
      * @return <CODE>true</CODE> if the advance was set,
      * <CODE>false</CODE> otherwise. Will always return <CODE>false</CODE>
      */
-    public boolean setCharAdvance(int c, int advance) {
+    @Override
+	public boolean setCharAdvance(final int c, final int advance) {
         return false;
     }
-    
+
     /**
      * Sets the font name that will appear in the pdf font dictionary.
      * Use with care as it can easily make a font unreadable if not embedded.
      * @param name the new font name
-     */    
-    public void setPostscriptFontName(String name) {
-        fontName = name;
-    }   
-    
-    public boolean setKerning(int char1, int char2, int kern) {
+     */
+    @Override
+	public void setPostscriptFontName(final String name) {
+        this.fontName = name;
+    }
+
+    @Override
+	public boolean setKerning(final int char1, final int char2, final int kern) {
         return false;
     }
-    
-    public int[] getCharBBox(int c) {
+
+    @Override
+	public int[] getCharBBox(final int c) {
         return null;
     }
-    
-    protected int[] getRawCharBBox(int c, String name) {
+
+    @Override
+	protected int[] getRawCharBBox(final int c, final String name) {
         return null;
     }
 }

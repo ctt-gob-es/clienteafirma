@@ -51,60 +51,61 @@ package com.lowagie.text.pdf;
 import com.lowagie.text.pdf.crypto.AESCipher;
 import com.lowagie.text.pdf.crypto.ARCFOUREncryption;
 
-public class StandardDecryption {
-    protected ARCFOUREncryption arcfour;
-    protected AESCipher cipher;
+class StandardDecryption {
+    private ARCFOUREncryption arcfour;
+    private AESCipher cipher;
     private byte[] key;
     private static final int AES_128 = 4;
-    private boolean aes;
+    private final boolean aes;
     private boolean initiated;
-    private byte[] iv = new byte[16];
+    private final byte[] iv = new byte[16];
     private int ivptr;
 
     /** Creates a new instance of StandardDecryption */
-    public StandardDecryption(byte key[], int off, int len, int revision) {
-        aes = revision == AES_128;
-        if (aes) {
+    StandardDecryption(final byte key[], final int off, final int len, final int revision) {
+        this.aes = revision == AES_128;
+        if (this.aes) {
             this.key = new byte[len];
             System.arraycopy(key, off, this.key, 0, len);
         }
         else {
-            arcfour = new ARCFOUREncryption();
-            arcfour.prepareARCFOURKey(key, off, len);
+            this.arcfour = new ARCFOUREncryption();
+            this.arcfour.prepareARCFOURKey(key, off, len);
         }
     }
-    
-    public byte[] update(byte[] b, int off, int len) {
-        if (aes) {
-            if (initiated)
-                return cipher.update(b, off, len);
-            else {
-                int left = Math.min(iv.length - ivptr, len);
-                System.arraycopy(b, off, iv, ivptr, left);
+
+    byte[] update(final byte[] b, int off, int len) {
+        if (this.aes) {
+            if (this.initiated) {
+				return this.cipher.update(b, off, len);
+			} else {
+                final int left = Math.min(this.iv.length - this.ivptr, len);
+                System.arraycopy(b, off, this.iv, this.ivptr, left);
                 off += left;
                 len -= left;
-                ivptr += left;
-                if (ivptr == iv.length) {
-                    cipher = new AESCipher(false, key, iv);
-                    initiated = true;
-                    if (len > 0)
-                        return cipher.update(b, off, len);
+                this.ivptr += left;
+                if (this.ivptr == this.iv.length) {
+                    this.cipher = new AESCipher(false, this.key, this.iv);
+                    this.initiated = true;
+                    if (len > 0) {
+						return this.cipher.update(b, off, len);
+					}
                 }
                 return null;
             }
         }
         else {
-            byte[] b2 = new byte[len];
-            arcfour.encryptARCFOUR(b, off, len, b2, 0);
+            final byte[] b2 = new byte[len];
+            this.arcfour.encryptARCFOUR(b, off, len, b2, 0);
             return b2;
         }
     }
-    
-    public byte[] finish() {
-        if (aes) {
-            return cipher.doFinal();
-        }
-        else
-            return null;
+
+    byte[] finish() {
+        if (this.aes) {
+            return this.cipher.doFinal();
+        } else {
+			return null;
+		}
     }
 }

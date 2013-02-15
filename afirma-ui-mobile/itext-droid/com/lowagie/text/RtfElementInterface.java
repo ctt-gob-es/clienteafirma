@@ -55,6 +55,6 @@ package com.lowagie.text;
  * until we find a more elegant way to solve this.
  * @since 2.1.0
  */
-public interface RtfElementInterface {
+interface RtfElementInterface {
 
 }

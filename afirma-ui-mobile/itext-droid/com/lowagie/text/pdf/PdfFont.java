@@ -68,45 +68,47 @@ import com.lowagie.text.Image;
  */
 
 class PdfFont implements Comparable {
-    
-    
+
+
     /** the font metrics. */
-    private BaseFont font;
-    
+    private final BaseFont font;
+
     /** the size. */
-    private float size;
-    
+    private final float size;
+
     /** an image. */
-    protected Image image;
-    
-    protected float hScale = 1;
-    
+    private Image image;
+
+    private float hScale = 1;
+
     // constructors
-    
-    PdfFont(BaseFont bf, float size) {
+
+    PdfFont(final BaseFont bf, final float size) {
         this.size = size;
-        font = bf;
+        this.font = bf;
     }
-    
+
     // methods
-    
+
     /**
      * Compares this <CODE>PdfFont</CODE> with another
      *
      * @param	object	the other <CODE>PdfFont</CODE>
      * @return	a value
      */
-    
-    public int compareTo(Object object) {
-        if (image != null)
-            return 0;
+
+    @Override
+	public int compareTo(final Object object) {
+        if (this.image != null) {
+			return 0;
+		}
         if (object == null) {
             return -1;
         }
         PdfFont pdfFont;
         try {
             pdfFont = (PdfFont) object;
-            if (font != pdfFont.font) {
+            if (this.font != pdfFont.font) {
                 return 1;
             }
             if (this.size() != pdfFont.size()) {
@@ -114,74 +116,76 @@ class PdfFont implements Comparable {
             }
             return 0;
         }
-        catch(ClassCastException cce) {
+        catch(final ClassCastException cce) {
             return -2;
         }
     }
-    
+
     /**
      * Returns the size of this font.
      *
      * @return		a size
      */
-    
+
     float size() {
-        if (image == null)
-            return size;
-        else {
-            return image.getScaledHeight();
+        if (this.image == null) {
+			return this.size;
+		} else {
+            return this.image.getScaledHeight();
         }
     }
-    
+
     /**
      * Returns the approximative width of 1 character of this font.
      *
      * @return		a width in Text Space
      */
-    
+
     float width() {
         return width(' ');
     }
-    
+
     /**
      * Returns the width of a certain character of this font.
      *
      * @param		character	a certain character
      * @return		a width in Text Space
      */
-    
-    float width(int character) {
-        if (image == null)
-            return font.getWidthPoint(character, size) * hScale;
-        else
-            return image.getScaledWidth();
+
+    float width(final int character) {
+        if (this.image == null) {
+			return this.font.getWidthPoint(character, this.size) * this.hScale;
+		} else {
+			return this.image.getScaledWidth();
+		}
     }
-    
-    float width(String s) {
-        if (image == null)
-            return font.getWidthPoint(s, size) * hScale;
-        else
-            return image.getScaledWidth();
+
+    float width(final String s) {
+        if (this.image == null) {
+			return this.font.getWidthPoint(s, this.size) * this.hScale;
+		} else {
+			return this.image.getScaledWidth();
+		}
     }
-    
+
     BaseFont getFont() {
-        return font;
+        return this.font;
     }
-    
-    void setImage(Image image) {
+
+    void setImage(final Image image) {
         this.image = image;
     }
-    
+
     static PdfFont getDefaultFont() {
         try {
-            BaseFont bf = BaseFont.createFont(BaseFont.HELVETICA, BaseFont.WINANSI, false);
+            final BaseFont bf = BaseFont.createFont(BaseFont.HELVETICA, BaseFont.WINANSI, false);
             return new PdfFont(bf, 12);
         }
-        catch (Exception ee) {
+        catch (final Exception ee) {
             throw new ExceptionConverter(ee);
         }
     }
-    void setHorizontalScaling(float hScale) {
+    void setHorizontalScaling(final float hScale) {
         this.hScale = hScale;
     }
 }

@@ -56,16 +56,10 @@ import com.lowagie.text.ExceptionConverter;
  * @see		PdfStream
  */
 
-public class PdfICCBased extends PdfStream {
+class PdfICCBased extends PdfStream {
 
-    /**
-     * Creates an ICC stream.
-     * @param	profile an ICC profile
-     */
-    public PdfICCBased(ICC_Profile profile) {
-    	this(profile, DEFAULT_COMPRESSION);
-    }
-    
+
+
     /**
      * Creates an ICC stream.
      *
@@ -74,10 +68,10 @@ public class PdfICCBased extends PdfStream {
      * @param	profile an ICC profile
      * @since	2.1.3	(replacing the constructor without param compressionLevel)
      */
-    public PdfICCBased(ICC_Profile profile, int compressionLevel) {
+    PdfICCBased(final ICC_Profile profile, final int compressionLevel) {
         super();
         try {
-            int numberOfComponents = profile.getNumComponents();
+            final int numberOfComponents = profile.getNumComponents();
             switch (numberOfComponents) {
                 case 1:
                     put(PdfName.ALTERNATE, PdfName.DEVICEGRAY);
@@ -92,9 +86,9 @@ public class PdfICCBased extends PdfStream {
                     throw new PdfException(numberOfComponents + " component(s) is not supported in PDF1.4");
             }
             put(PdfName.N, new PdfNumber(numberOfComponents));
-            bytes = profile.getData();
+            this.bytes = profile.getData();
             flateCompress(compressionLevel);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new ExceptionConverter(e);
         }
     }

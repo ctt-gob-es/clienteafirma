@@ -1,12 +1,12 @@
 /*
  * Copyright 1999-2004 The Apache Software Foundation.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,7 +15,7 @@
  */
 
 /* $Id: HyphenationTree.java 3117 2008-01-31 05:53:22Z xlv $ */
- 
+
 package com.lowagie.text.pdf.hyphenation;
 
 import java.io.InputStream;
@@ -29,7 +29,7 @@ import java.util.HashMap;
  *
  * @author Carlos Villegas <cav@uniscope.co.jp>
  */
-public class HyphenationTree extends TernaryTree 
+class HyphenationTree extends TernaryTree
             implements PatternConsumer {
 
     private static final long serialVersionUID = -7763254239309429432L;
@@ -37,17 +37,17 @@ public class HyphenationTree extends TernaryTree
 	/**
      * value space: stores the interletter values
      */
-    protected ByteVector vspace;
+    private final ByteVector vspace;
 
     /**
      * This map stores hyphenation exceptions
      */
-    protected HashMap stoplist;
+    private final HashMap stoplist;
 
     /**
      * This map stores the character classes
      */
-    protected TernaryTree classmap;
+    private final TernaryTree classmap;
 
     /**
      * Temporary map to store interletter values on pattern loading.
@@ -55,10 +55,10 @@ public class HyphenationTree extends TernaryTree
     private transient TernaryTree ivalues;
 
     public HyphenationTree() {
-        stoplist = new HashMap(23);    // usually a small table
-        classmap = new TernaryTree();
-        vspace = new ByteVector();
-        vspace.alloc(1);    // this reserves index 0, which we don't use
+        this.stoplist = new HashMap(23);    // usually a small table
+        this.classmap = new TernaryTree();
+        this.vspace = new ByteVector();
+        this.vspace.alloc(1);    // this reserves index 0, which we don't use
     }
 
     /**
@@ -70,14 +70,15 @@ public class HyphenationTree extends TernaryTree
      * @return the index into the vspace array where the packed values
      * are stored.
      */
-    protected int packValues(String values) {
-        int i, n = values.length();
-        int m = (n & 1) == 1 ? (n >> 1) + 2 : (n >> 1) + 1;
-        int offset = vspace.alloc(m);
-        byte[] va = vspace.getArray();
+    private int packValues(final String values) {
+        int i;
+		final int n = values.length();
+        final int m = (n & 1) == 1 ? (n >> 1) + 2 : (n >> 1) + 1;
+        final int offset = this.vspace.alloc(m);
+        final byte[] va = this.vspace.getArray();
         for (i = 0; i < n; i++) {
-            int j = i >> 1;
-            byte v = (byte)((values.charAt(i) - '0' + 1) & 0x0f);
+            final int j = i >> 1;
+            final byte v = (byte)(values.charAt(i) - '0' + 1 & 0x0f);
             if ((i & 1) == 1) {
                 va[j + offset] = (byte)(va[j + offset] | v);
             } else {
@@ -88,53 +89,32 @@ public class HyphenationTree extends TernaryTree
         return offset;
     }
 
-    protected String unpackValues(int k) {
-        StringBuffer buf = new StringBuffer();
-        byte v = vspace.get(k++);
-        while (v != 0) {
-            char c = (char)((v >>> 4) - 1 + '0');
-            buf.append(c);
-            c = (char)(v & 0x0f);
-            if (c == 0) {
-                break;
-            }
-            c = (char)(c - 1 + '0');
-            buf.append(c);
-            v = vspace.get(k++);
-        }
-        return buf.toString();
-    }
 
-    public void loadSimplePatterns(InputStream stream) {
-        SimplePatternParser pp = new SimplePatternParser();
-        ivalues = new TernaryTree();
+
+    void loadSimplePatterns(final InputStream stream) {
+        final SimplePatternParser pp = new SimplePatternParser();
+        this.ivalues = new TernaryTree();
 
         pp.parse(stream, this);
 
         // patterns/values should be now in the tree
         // let's optimize a bit
         trimToSize();
-        vspace.trimToSize();
-        classmap.trimToSize();
+        this.vspace.trimToSize();
+        this.classmap.trimToSize();
 
         // get rid of the auxiliary map
-        ivalues = null;
+        this.ivalues = null;
     }
 
 
-    public String findPattern(String pat) {
-        int k = super.find(pat);
-        if (k >= 0) {
-            return unpackValues(k);
-        }
-        return "";
-    }
+
 
     /**
      * String compare, returns 0 if equal or
      * t is a substring of s
      */
-    protected int hstrcmp(char[] s, int si, char[] t, int ti) {
+    private int hstrcmp(final char[] s, int si, final char[] t, int ti) {
         for (; s[si] == t[ti]; si++, ti++) {
             if (s[si] == 0) {
                 return 0;
@@ -146,9 +126,9 @@ public class HyphenationTree extends TernaryTree
         return s[si] - t[ti];
     }
 
-    protected byte[] getValues(int k) {
-        StringBuffer buf = new StringBuffer();
-        byte v = vspace.get(k++);
+    private byte[] getValues(int k) {
+        final StringBuffer buf = new StringBuffer();
+        byte v = this.vspace.get(k++);
         while (v != 0) {
             char c = (char)((v >>> 4) - 1);
             buf.append(c);
@@ -158,9 +138,9 @@ public class HyphenationTree extends TernaryTree
             }
             c = (char)(c - 1);
             buf.append(c);
-            v = vspace.get(k++);
+            v = this.vspace.get(k++);
         }
-        byte[] res = new byte[buf.length()];
+        final byte[] res = new byte[buf.length()];
         for (int i = 0; i < res.length; i++) {
             res[i] = (byte)buf.charAt(i);
         }
@@ -191,54 +171,54 @@ public class HyphenationTree extends TernaryTree
      * @param index start index from word
      * @param il interletter values array to update
      */
-    protected void searchPatterns(char[] word, int index, byte[] il) {
+    private void searchPatterns(final char[] word, final int index, final byte[] il) {
         byte[] values;
         int i = index;
         char p, q;
         char sp = word[i];
-        p = root;
+        p = this.root;
 
-        while (p > 0 && p < sc.length) {
-            if (sc[p] == 0xFFFF) {
-                if (hstrcmp(word, i, kv.getArray(), lo[p]) == 0) {
-                    values = getValues(eq[p]);    // data pointer is in eq[]
+        while (p > 0 && p < this.sc.length) {
+            if (this.sc[p] == 0xFFFF) {
+                if (hstrcmp(word, i, this.kv.getArray(), this.lo[p]) == 0) {
+                    values = getValues(this.eq[p]);    // data pointer is in eq[]
                     int j = index;
-                    for (int k = 0; k < values.length; k++) {
-                        if (j < il.length && values[k] > il[j]) {
-                            il[j] = values[k];
+                    for (final byte value : values) {
+                        if (j < il.length && value > il[j]) {
+                            il[j] = value;
                         }
                         j++;
                     }
                 }
                 return;
             }
-            int d = sp - sc[p];
+            final int d = sp - this.sc[p];
             if (d == 0) {
                 if (sp == 0) {
                     break;
                 }
                 sp = word[++i];
-                p = eq[p];
+                p = this.eq[p];
                 q = p;
 
                 // look for a pattern ending at this position by searching for
                 // the null char ( splitchar == 0 )
-                while (q > 0 && q < sc.length) {
-                    if (sc[q] == 0xFFFF) {        // stop at compressed branch
+                while (q > 0 && q < this.sc.length) {
+                    if (this.sc[q] == 0xFFFF) {        // stop at compressed branch
                         break;
                     }
-                    if (sc[q] == 0) {
-                        values = getValues(eq[q]);
+                    if (this.sc[q] == 0) {
+                        values = getValues(this.eq[q]);
                         int j = index;
-                        for (int k = 0; k < values.length; k++) {
-                            if (j < il.length && values[k] > il[j]) {
-                                il[j] = values[k];
+                        for (final byte value : values) {
+                            if (j < il.length && value > il[j]) {
+                                il[j] = value;
                             }
                             j++;
                         }
                         break;
                     } else {
-                        q = lo[q];
+                        q = this.lo[q];
 
                         /**
                          * actually the code should be:
@@ -248,7 +228,7 @@ public class HyphenationTree extends TernaryTree
                     }
                 }
             } else {
-                p = d < 0 ? lo[p] : hi[p];
+                p = d < 0 ? this.lo[p] : this.hi[p];
             }
         }
     }
@@ -263,9 +243,9 @@ public class HyphenationTree extends TernaryTree
      * @return a {@link Hyphenation Hyphenation} object representing
      * the hyphenated word or null if word is not hyphenated.
      */
-    public Hyphenation hyphenate(String word, int remainCharCount,
-                                 int pushCharCount) {
-        char[] w = word.toCharArray();
+    Hyphenation hyphenate(final String word, final int remainCharCount,
+                                 final int pushCharCount) {
+        final char[] w = word.toCharArray();
         return hyphenate(w, 0, w.length, remainCharCount, pushCharCount);
     }
 
@@ -304,21 +284,21 @@ public class HyphenationTree extends TernaryTree
      * @return a {@link Hyphenation Hyphenation} object representing
      * the hyphenated word or null if word is not hyphenated.
      */
-    public Hyphenation hyphenate(char[] w, int offset, int len,
-                                 int remainCharCount, int pushCharCount) {
+    private Hyphenation hyphenate(final char[] w, final int offset, int len,
+                                 final int remainCharCount, final int pushCharCount) {
         int i;
-        char[] word = new char[len + 3];
+        final char[] word = new char[len + 3];
 
         // normalize word
-        char[] c = new char[2];
+        final char[] c = new char[2];
         int iIgnoreAtBeginning = 0;
         int iLength = len;
         boolean bEndOfLetters = false;
         for (i = 1; i <= len; i++) {
             c[0] = w[offset + i - 1];
-            int nc = classmap.find(c, 0);
+            final int nc = this.classmap.find(c, 0);
             if (nc < 0) {    // found a non-letter character ...
-                if (i == (1 + iIgnoreAtBeginning)) {
+                if (i == 1 + iIgnoreAtBeginning) {
                     // ... before any letter character
                     iIgnoreAtBeginning ++;
                 } else {
@@ -335,26 +315,26 @@ public class HyphenationTree extends TernaryTree
             }
         }
         len = iLength;
-        if (len < (remainCharCount + pushCharCount)) {
+        if (len < remainCharCount + pushCharCount) {
             // word is too short to be hyphenated
             return null;
         }
-        int[] result = new int[len + 1];
+        final int[] result = new int[len + 1];
         int k = 0;
 
         // check exception list first
-        String sw = new String(word, 1, len);
-        if (stoplist.containsKey(sw)) {
+        final String sw = new String(word, 1, len);
+        if (this.stoplist.containsKey(sw)) {
             // assume only simple hyphens (Hyphen.pre="-", Hyphen.post = Hyphen.no = null)
-            ArrayList hw = (ArrayList)stoplist.get(sw);
+            final ArrayList hw = (ArrayList)this.stoplist.get(sw);
             int j = 0;
             for (i = 0; i < hw.size(); i++) {
-                Object o = hw.get(i);
+                final Object o = hw.get(i);
                 // j = index(sw) = letterindex(word)?
                 // result[k] = corresponding index(w)
                 if (o instanceof String) {
                     j += ((String)o).length();
-                    if (j >= remainCharCount && j < (len - pushCharCount)) {
+                    if (j >= remainCharCount && j < len - pushCharCount) {
                         result[k++] = j + iIgnoreAtBeginning;
                     }
                 }
@@ -364,7 +344,7 @@ public class HyphenationTree extends TernaryTree
             word[0] = '.';                    // word start marker
             word[len + 1] = '.';              // word end marker
             word[len + 2] = 0;                // null terminated
-            byte[] il = new byte[len + 3];    // initialized to zero
+            final byte[] il = new byte[len + 3];    // initialized to zero
             for (i = 0; i < len + 1; i++) {
                 searchPatterns(word, i, il);
             }
@@ -374,8 +354,8 @@ public class HyphenationTree extends TernaryTree
             // i + 1 is index(word),
             // result[k] = corresponding index(w)
             for (i = 0; i < len; i++) {
-                if (((il[i + 1] & 1) == 1) && i >= remainCharCount
-                        && i <= (len - pushCharCount)) {
+                if ((il[i + 1] & 1) == 1 && i >= remainCharCount
+                        && i <= len - pushCharCount) {
                     result[k++] = i + iIgnoreAtBeginning;
                 }
             }
@@ -384,7 +364,7 @@ public class HyphenationTree extends TernaryTree
 
         if (k > 0) {
             // trim result array
-            int[] res = new int[k];
+            final int[] res = new int[k];
             System.arraycopy(result, 0, res, 0, k);
             return new Hyphenation(new String(w, offset, len), res);
         } else {
@@ -404,14 +384,15 @@ public class HyphenationTree extends TernaryTree
      * for letter 'a', for example, should be defined as "aA", the first
      * character being the normalization char.
      */
-    public void addClass(String chargroup) {
+    @Override
+	public void addClass(final String chargroup) {
         if (chargroup.length() > 0) {
-            char equivChar = chargroup.charAt(0);
-            char[] key = new char[2];
+            final char equivChar = chargroup.charAt(0);
+            final char[] key = new char[2];
             key[1] = 0;
             for (int i = 0; i < chargroup.length(); i++) {
                 key[0] = chargroup.charAt(i);
-                classmap.insert(key, 0, equivChar);
+                this.classmap.insert(key, 0, equivChar);
             }
         }
     }
@@ -424,8 +405,9 @@ public class HyphenationTree extends TernaryTree
      * @param hyphenatedword a vector of alternating strings and
      * {@link Hyphen hyphen} objects.
      */
-    public void addException(String word, ArrayList hyphenatedword) {
-        stoplist.put(word, hyphenatedword);
+    @Override
+	public void addException(final String word, final ArrayList hyphenatedword) {
+        this.stoplist.put(word, hyphenatedword);
     }
 
     /**
@@ -438,18 +420,20 @@ public class HyphenationTree extends TernaryTree
      * within the pattern. It should contain only digit characters.
      * (i.e. '0' to '9').
      */
-    public void addPattern(String pattern, String ivalue) {
-        int k = ivalues.find(ivalue);
+    @Override
+	public void addPattern(final String pattern, final String ivalue) {
+        int k = this.ivalues.find(ivalue);
         if (k <= 0) {
             k = packValues(ivalue);
-            ivalues.insert(ivalue, (char)k);
+            this.ivalues.insert(ivalue, (char)k);
         }
         insert(pattern, (char)k);
     }
 
-    public void printStats() {
+    @Override
+	public void printStats() {
         System.out.println("Value space size = "
-                           + Integer.toString(vspace.length()));
+                           + Integer.toString(this.vspace.length()));
         super.printStats();
     }
 }

@@ -57,49 +57,49 @@ import com.lowagie.text.Rectangle;
  */
 
 public class PdfTemplate extends PdfContentByte {
-    public static final int TYPE_TEMPLATE = 1;
-    public static final int TYPE_IMPORTED = 2;
+    static final int TYPE_TEMPLATE = 1;
+    static final int TYPE_IMPORTED = 2;
     public static final int TYPE_PATTERN = 3;
     protected int type;
     /** The indirect reference to this template */
     protected PdfIndirectReference thisReference;
-    
+
     /** The resources used by this template */
     protected PageResources pageResources;
-    
-    
+
+
     /** The bounding box of this template */
     protected Rectangle bBox = new Rectangle(0, 0);
-    
+
     protected PdfArray matrix;
-    
+
     protected PdfTransparencyGroup group;
-    
+
     protected PdfOCG layer;
-    
+
     /**
      *Creates a <CODE>PdfTemplate</CODE>.
      */
-    
+
     protected PdfTemplate() {
         super(null);
-        type = TYPE_TEMPLATE;
+        this.type = TYPE_TEMPLATE;
     }
-    
+
     /**
      * Creates new PdfTemplate
      *
      * @param wr the <CODE>PdfWriter</CODE>
      */
-    
-    PdfTemplate(PdfWriter wr) {
+
+    PdfTemplate(final PdfWriter wr) {
         super(wr);
-        type = TYPE_TEMPLATE;
-        pageResources = new PageResources();
-        pageResources.addDefaultColor(wr.getDefaultColorspace());
-        thisReference = writer.getPdfIndirectReference();
+        this.type = TYPE_TEMPLATE;
+        this.pageResources = new PageResources();
+        this.pageResources.addDefaultColor(wr.getDefaultColorspace());
+        this.thisReference = this.writer.getPdfIndirectReference();
     }
-    
+
     /**
      * Creates a new template.
      * <P>
@@ -113,12 +113,12 @@ public class PdfTemplate extends PdfContentByte {
      * @param height the bounding box height
      * @return the created template
      */
-    public static PdfTemplate createTemplate(PdfWriter writer, float width, float height) {
+    static PdfTemplate createTemplate(final PdfWriter writer, final float width, final float height) {
         return createTemplate(writer, width, height, null);
     }
-    
-    static PdfTemplate createTemplate(PdfWriter writer, float width, float height, PdfName forcedName) {
-        PdfTemplate template = new PdfTemplate(writer);
+
+    private static PdfTemplate createTemplate(final PdfWriter writer, final float width, final float height, final PdfName forcedName) {
+        final PdfTemplate template = new PdfTemplate(writer);
         template.setWidth(width);
         template.setHeight(height);
         writer.addDirectTemplateSimple(template, forcedName);
@@ -130,112 +130,112 @@ public class PdfTemplate extends PdfContentByte {
      *
      * @param width the bounding width
      */
-    
-    public void setWidth(float width) {
-        bBox.setLeft(0);
-        bBox.setRight(width);
+
+    public void setWidth(final float width) {
+        this.bBox.setLeft(0);
+        this.bBox.setRight(width);
     }
-    
+
     /**
      * Sets the bounding height of this template.
      *
      * @param height the bounding height
      */
-    
-    public void setHeight(float height) {
-        bBox.setBottom(0);
-        bBox.setTop(height);
+
+    public void setHeight(final float height) {
+        this.bBox.setBottom(0);
+        this.bBox.setTop(height);
     }
-    
+
     /**
      * Gets the bounding width of this template.
      *
      * @return width the bounding width
      */
     public float getWidth() {
-        return bBox.getWidth();
+        return this.bBox.getWidth();
     }
-    
+
     /**
      * Gets the bounding height of this template.
      *
      * @return height the bounding height
      */
-    
+
     public float getHeight() {
-        return bBox.getHeight();
+        return this.bBox.getHeight();
     }
-    
+
     public Rectangle getBoundingBox() {
-        return bBox;
+        return this.bBox;
     }
-    
-    public void setBoundingBox(Rectangle bBox) {
+
+    public void setBoundingBox(final Rectangle bBox) {
         this.bBox = bBox;
     }
-    
+
     /**
      * Sets the layer this template belongs to.
      * @param layer the layer this template belongs to
-     */    
-    public void setLayer(PdfOCG layer) {
+     */
+    public void setLayer(final PdfOCG layer) {
         this.layer = layer;
     }
-    
+
     /**
      * Gets the layer this template belongs to.
      * @return the layer this template belongs to or <code>null</code> for no layer defined
      */
     public PdfOCG getLayer() {
-        return layer;
+        return this.layer;
     }
 
-    public void setMatrix(float a, float b, float c, float d, float e, float f) {
-		matrix = new PdfArray();
-		matrix.add(new PdfNumber(a));
-		matrix.add(new PdfNumber(b));
-		matrix.add(new PdfNumber(c));
-		matrix.add(new PdfNumber(d));
-		matrix.add(new PdfNumber(e));
-		matrix.add(new PdfNumber(f));
+    void setMatrix(final float a, final float b, final float c, final float d, final float e, final float f) {
+		this.matrix = new PdfArray();
+		this.matrix.add(new PdfNumber(a));
+		this.matrix.add(new PdfNumber(b));
+		this.matrix.add(new PdfNumber(c));
+		this.matrix.add(new PdfNumber(d));
+		this.matrix.add(new PdfNumber(e));
+		this.matrix.add(new PdfNumber(f));
 	}
 
 	PdfArray getMatrix() {
-		return matrix;
+		return this.matrix;
 	}
-    
+
     /**
      * Gets the indirect reference to this template.
      *
      * @return the indirect reference to this template
      */
-    
+
     public PdfIndirectReference getIndirectReference() {
     	// uncomment the null check as soon as we're sure all examples still work
-    	if (thisReference == null /* && writer != null */) {
-    		thisReference = writer.getPdfIndirectReference();
+    	if (this.thisReference == null /* && writer != null */) {
+    		this.thisReference = this.writer.getPdfIndirectReference();
     	}
-        return thisReference;
+        return this.thisReference;
     }
-        
-    public void beginVariableText() {
-        content.append("/Tx BMC ");
+
+    void beginVariableText() {
+        this.content.append("/Tx BMC ");
     }
-    
-    public void endVariableText() {
-        content.append("EMC ");
+
+    void endVariableText() {
+        this.content.append("EMC ");
     }
-    
+
     /**
      * Constructs the resources used by this template.
      *
      * @return the resources used by this template
      */
-    
+
     PdfObject getResources() {
         return getPageResources().getResources();
     }
-    
+
     /**
      * Gets the stream representing this template.
      *
@@ -243,40 +243,42 @@ public class PdfTemplate extends PdfContentByte {
      * @return the stream representing this template
      * @since	2.1.3	(replacing the method without param compressionLevel)
      */
-    PdfStream getFormXObject(int compressionLevel) throws IOException {
+    PdfStream getFormXObject(final int compressionLevel) throws IOException {
         return new PdfFormXObject(this, compressionLevel);
     }
-        
+
     /**
      * Gets a duplicate of this <CODE>PdfTemplate</CODE>. All
      * the members are copied by reference but the buffer stays different.
      * @return a copy of this <CODE>PdfTemplate</CODE>
      */
-    
-    public PdfContentByte getDuplicate() {
-        PdfTemplate tpl = new PdfTemplate();
-        tpl.writer = writer;
-        tpl.pdf = pdf;
-        tpl.thisReference = thisReference;
-        tpl.pageResources = pageResources;
-        tpl.bBox = new Rectangle(bBox);
-        tpl.group = group;
-        tpl.layer = layer;
-        if (matrix != null) {
-            tpl.matrix = new PdfArray(matrix);
+
+    @Override
+	public PdfContentByte getDuplicate() {
+        final PdfTemplate tpl = new PdfTemplate();
+        tpl.writer = this.writer;
+        tpl.pdf = this.pdf;
+        tpl.thisReference = this.thisReference;
+        tpl.pageResources = this.pageResources;
+        tpl.bBox = new Rectangle(this.bBox);
+        tpl.group = this.group;
+        tpl.layer = this.layer;
+        if (this.matrix != null) {
+            tpl.matrix = new PdfArray(this.matrix);
         }
-        tpl.separator = separator;
+        tpl.separator = this.separator;
         return tpl;
     }
-    
+
     public int getType() {
-        return type;
+        return this.type;
     }
-    
-    PageResources getPageResources() {
-        return pageResources;
+
+    @Override
+	PageResources getPageResources() {
+        return this.pageResources;
     }
-    
+
     /** Getter for property group.
      * @return Value of property group.
      *
@@ -284,13 +286,13 @@ public class PdfTemplate extends PdfContentByte {
     public PdfTransparencyGroup getGroup() {
         return this.group;
     }
-    
+
     /** Setter for property group.
      * @param group New value of property group.
      *
      */
-    public void setGroup(PdfTransparencyGroup group) {
+    public void setGroup(final PdfTransparencyGroup group) {
         this.group = group;
     }
-    
+
 }

@@ -59,13 +59,13 @@ import com.lowagie.text.Font;
  */
 
 public class EntitiesToSymbol {
-    
+
     /**
      * This is a map that contains all possible id values of the entity tag
      * that can be translated to a character in font Symbol.
      */
-    public static final HashMap map;
-    
+    private static final HashMap map;
+
     static {
         map = new HashMap();
         map.put("169", new Character((char)227));
@@ -343,35 +343,35 @@ public class EntitiesToSymbol {
         map.put("xi", new Character((char)120));
         map.put("zeta", new Character((char)122));
     }
-    
+
     /**
      * Gets a chunk with a symbol character.
      * @param e a symbol value (see Entities class: alfa is greek alfa,...)
      * @param font the font if the symbol isn't found (otherwise Font.SYMBOL)
      * @return a Chunk
      */
-    public static Chunk get(String e, Font font) {
-        char s = getCorrespondingSymbol(e);
+    public static Chunk get(final String e, final Font font) {
+        final char s = getCorrespondingSymbol(e);
         if (s == (char)0) {
             try {
                 return new Chunk(String.valueOf((char)Integer.parseInt(e)), font);
             }
-            catch(Exception exception) {
+            catch(final Exception exception) {
                 return new Chunk(e, font);
             }
         }
-        Font symbol = new Font(Font.SYMBOL, font.getSize(), font.getStyle(), font.getColor());
+        final Font symbol = new Font(Font.SYMBOL, font.getSize(), font.getStyle(), font.getColor());
         return new Chunk(String.valueOf(s), symbol);
     }
-    
+
     /**
      * Looks for the corresponding symbol in the font Symbol.
      *
      * @param	name	the name of the entity
      * @return	the corresponding character in font Symbol
      */
-    public static char getCorrespondingSymbol(String name) {
-        Character symbol = (Character) map.get(name);
+    private static char getCorrespondingSymbol(final String name) {
+        final Character symbol = (Character) map.get(name);
         if (symbol == null) {
             return (char)0;
         }

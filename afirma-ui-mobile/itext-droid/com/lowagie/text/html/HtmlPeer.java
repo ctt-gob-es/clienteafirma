@@ -60,42 +60,44 @@ import com.lowagie.text.xml.XmlPeer;
  * This interface is implemented by the peer of all the iText objects.
  */
 
-public class HtmlPeer extends XmlPeer {
+class HtmlPeer extends XmlPeer {
 
 	/**
 	 * Creates a XmlPeer.
-	 * 
+	 *
 	 * @param name
 	 *            the iText name of the tag
 	 * @param alias
 	 *            the Html name of the tag
 	 */
 
-	public HtmlPeer(String name, String alias) {
+	HtmlPeer(final String name, final String alias) {
 		super(name, alias.toLowerCase());
 	}
 
 	/**
 	 * Sets an alias for an attribute.
-	 * 
+	 *
 	 * @param name
 	 *            the iText tagname
 	 * @param alias
 	 *            the custom tagname
 	 */
 
-	public void addAlias(String name, String alias) {
-		attributeAliases.put(alias.toLowerCase(), name);
+	@Override
+	public void addAlias(final String name, final String alias) {
+		this.attributeAliases.put(alias.toLowerCase(), name);
 	}
 
 	/**
 	 * @see com.lowagie.text.xml.XmlPeer#getAttributes(org.xml.sax.Attributes)
 	 */
-	public Properties getAttributes(Attributes attrs) {
-		Properties attributes = new Properties();
-		attributes.putAll(attributeValues);
-		if (defaultContent != null) {
-			attributes.put(ElementTags.ITEXT, defaultContent);
+	@Override
+	public Properties getAttributes(final Attributes attrs) {
+		final Properties attributes = new Properties();
+		attributes.putAll(this.attributeValues);
+		if (this.defaultContent != null) {
+			attributes.put(ElementTags.ITEXT, this.defaultContent);
 		}
 		if (attrs != null) {
 			String attribute, value;

@@ -97,138 +97,76 @@ package com.lowagie.text;
  */
 
 public class ListItem extends Paragraph {
-    
+
     // constants
 	private static final long serialVersionUID = 1970670787169329006L;
-	
+
 	// member variables
-	
+
 	/** this is the symbol that will precede the listitem. */
     private Chunk symbol;
-    
+
     // constructors
-    
+
     /**
      * Constructs a <CODE>ListItem</CODE>.
      */
     public ListItem() {
         super();
     }
-    
-    /**
-     * Constructs a <CODE>ListItem</CODE> with a certain leading.
-     *
-     * @param	leading		the leading
-     */    
-    public ListItem(float leading) {
-        super(leading);
-    }
-    
-    /**
-     * Constructs a <CODE>ListItem</CODE> with a certain <CODE>Chunk</CODE>.
-     *
-     * @param	chunk		a <CODE>Chunk</CODE>
-     */
-    public ListItem(Chunk chunk) {
-        super(chunk);
-    }
-    
+
     /**
      * Constructs a <CODE>ListItem</CODE> with a certain <CODE>String</CODE>.
      *
      * @param	string		a <CODE>String</CODE>
      */
-    public ListItem(String string) {
+    ListItem(final String string) {
         super(string);
     }
-    
-    /**
-     * Constructs a <CODE>ListItem</CODE> with a certain <CODE>String</CODE>
-     * and a certain <CODE>Font</CODE>.
-     *
-     * @param	string		a <CODE>String</CODE>
-     * @param	font		a <CODE>String</CODE>
-     */
-    public ListItem(String string, Font font) {
-        super(string, font);
-    }
-    
-    /**
-     * Constructs a <CODE>ListItem</CODE> with a certain <CODE>Chunk</CODE>
-     * and a certain leading.
-     *
-     * @param	leading		the leading
-     * @param	chunk		a <CODE>Chunk</CODE>
-     */
-    public ListItem(float leading, Chunk chunk) {
-        super(leading, chunk);
-    }
-    
-    /**
-     * Constructs a <CODE>ListItem</CODE> with a certain <CODE>String</CODE>
-     * and a certain leading.
-     *
-     * @param	leading		the leading
-     * @param	string		a <CODE>String</CODE>
-     */
-    public ListItem(float leading, String string) {
-        super(leading, string);
-    }
-    
-    /**
-     * Constructs a <CODE>ListItem</CODE> with a certain leading, <CODE>String</CODE>
-     * and <CODE>Font</CODE>.
-     *
-     * @param	leading		the leading
-     * @param	string		a <CODE>String</CODE>
-     * @param	font		a <CODE>Font</CODE>
-     */
-    public ListItem(float leading, String string, Font font) {
-        super(leading, string, font);
-    }
-    
+
     /**
      * Constructs a <CODE>ListItem</CODE> with a certain <CODE>Phrase</CODE>.
      *
      * @param	phrase		a <CODE>Phrase</CODE>
      */
-    public ListItem(Phrase phrase) {
+    public ListItem(final Phrase phrase) {
         super(phrase);
     }
-    
+
     // implementation of the Element-methods
-    
+
     /**
      * Gets the type of the text element.
      *
      * @return	a type
      */
-    public int type() {
+    @Override
+	public int type() {
         return Element.LISTITEM;
     }
-    
+
     // methods
-    
+
     /**
      * Sets the listsymbol.
      *
      * @param	symbol	a <CODE>Chunk</CODE>
      */
-    public void setListSymbol(Chunk symbol) {
+    public void setListSymbol(final Chunk symbol) {
     	if (this.symbol == null) {
     		this.symbol = symbol;
     		if (this.symbol.getFont().isStandardFont()) {
-    			this.symbol.setFont(font);
+    			this.symbol.setFont(this.font);
     		}
     	}
     }
-    
+
     /**
      * Sets the indentation of this paragraph on the left side.
      *
      * @param	indentation		the new indentation
      */
-    public void setIndentationLeft(float indentation, boolean autoindent) {
+    void setIndentationLeft(final float indentation, final boolean autoindent) {
     	if (autoindent) {
     		setIndentationLeft(getListSymbol().getWidthPoint());
     	}
@@ -236,7 +174,7 @@ public class ListItem extends Paragraph {
     		setIndentationLeft(indentation);
     	}
     }
-    
+
     // methods to retrieve information
 
 	/**
@@ -245,7 +183,7 @@ public class ListItem extends Paragraph {
      * @return	a <CODE>Chunk</CODE>
      */
     public Chunk getListSymbol() {
-        return symbol;
+        return this.symbol;
     }
 
 }

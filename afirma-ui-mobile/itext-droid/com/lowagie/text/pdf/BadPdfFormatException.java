@@ -60,27 +60,27 @@ package com.lowagie.text.pdf;
  * @see		PdfDictionary
  */
 
-public class BadPdfFormatException extends PdfException {
-    
+class BadPdfFormatException extends PdfException {
+
     // constructors
-    
+
 private static final long serialVersionUID = 1802317735708833538L;
 
 /**
  * Constructs a <CODE>BadPdfFormatException</CODE> without a message.
  */
-    
+
     BadPdfFormatException() {
         super();
     }
-    
+
 /**
  * Constructs a <code>BadPdfFormatException</code> with a message.
  *
  * @param		message			a message describing the exception
  */
-    
-    BadPdfFormatException(String message) {
+
+    BadPdfFormatException(final String message) {
         super(message);
     }
 }

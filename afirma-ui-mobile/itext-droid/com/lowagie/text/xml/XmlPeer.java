@@ -60,123 +60,123 @@ import com.lowagie.text.ElementTags;
  */
 
 public class XmlPeer {
-    
+
 /** This is the name of the alias. */
-    protected String tagname;
-    
+    private final String tagname;
+
 /** This is the name of the alias. */
-    protected String customTagname;
-    
+    private final String customTagname;
+
 /** This is the Map that contains the aliases of the attributes. */
     protected Properties attributeAliases = new Properties();
-    
+
 /** This is the Map that contains the default values of the attributes. */
     protected Properties attributeValues = new Properties();
-    
+
 /** This is String that contains the default content of the attributes. */
     protected String defaultContent = null;
-    
+
 /**
  * Creates a XmlPeer.
  * @param name the iText name of a tag
  * @param alias the user defined name of a tag
  */
-    
-    public XmlPeer(String name, String alias) {
+
+    public XmlPeer(final String name, final String alias) {
         this.tagname = name;
         this.customTagname = alias;
     }
-    
+
 /**
  * Gets the tagname of the peer.
  * @return the iText name of a tag
  */
-    
+
     public String getTag() {
-        return tagname;
+        return this.tagname;
     }
-    
+
 /**
  * Gets the tagname of the peer.
  * @return the user defined tagname
  */
-    
+
     public String getAlias() {
-        return customTagname;
+        return this.customTagname;
     }
-    
-/** Gets the list of attributes of the peer. 
+
+/** Gets the list of attributes of the peer.
  * @param attrs the user defined set of attributes
  * @return the set of attributes translated to iText attributes
  */
-    public Properties getAttributes(Attributes attrs) {
-        Properties attributes = new Properties();
-        attributes.putAll(attributeValues);
-        if (defaultContent != null) {
-            attributes.put(ElementTags.ITEXT, defaultContent);
+    public Properties getAttributes(final Attributes attrs) {
+        final Properties attributes = new Properties();
+        attributes.putAll(this.attributeValues);
+        if (this.defaultContent != null) {
+            attributes.put(ElementTags.ITEXT, this.defaultContent);
         }
         if (attrs != null) {
             for (int i = 0; i < attrs.getLength(); i++) {
-                String attribute = getName(attrs.getQName(i));
+                final String attribute = getName(attrs.getQName(i));
                 attributes.setProperty(attribute, attrs.getValue(i));
             }
         }
         return attributes;
     }
-    
+
 /**
  * Sets an alias for an attribute.
  *
  * @param   name    the iText tagname
  * @param   alias   the custom tagname
  */
-    
-    public void addAlias(String name, String alias) {
-        attributeAliases.put(alias, name);
+
+    public void addAlias(final String name, final String alias) {
+        this.attributeAliases.put(alias, name);
     }
-    
+
 /**
  * Sets a value for an attribute.
  *
  * @param   name    the iText tagname
  * @param   value   the default value for this tag
  */
-    
-    public void addValue(String name, String value) {
-        attributeValues.put(name, value);
+
+    public void addValue(final String name, final String value) {
+        this.attributeValues.put(name, value);
     }
-    
+
 /**
  * Sets the default content.
  *
  * @param   content    the default content
  */
-    
-    public void setContent(String content) {
+
+    public void setContent(final String content) {
         this.defaultContent = content;
     }
-    
+
 /**
  * Returns the iText attribute name.
  *
  * @param   name   the custom attribute name
  * @return  iText translated attribute name
  */
-    
-    public String getName(String name) {
+
+    public String getName(final String name) {
         String value;
-        if ((value = attributeAliases.getProperty(name)) != null) {
+        if ((value = this.attributeAliases.getProperty(name)) != null) {
             return value;
         }
         return name;
     }
-    
+
 /**
  * Returns the default values.
  * @return A set of default (user defined) values
  */
-    
+
     public Properties getDefaultValues() {
-        return attributeValues;
+        return this.attributeValues;
     }
 }

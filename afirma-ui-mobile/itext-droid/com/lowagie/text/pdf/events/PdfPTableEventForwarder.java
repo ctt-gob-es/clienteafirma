@@ -66,22 +66,23 @@ import com.lowagie.text.pdf.PdfPTableEvent;
 public class PdfPTableEventForwarder implements PdfPTableEvent {
 
 	/** ArrayList containing all the PageEvents that have to be executed. */
-	protected ArrayList events = new ArrayList();
-	
-	/** 
+	private final ArrayList events = new ArrayList();
+
+	/**
 	 * Add a page event to the forwarder.
 	 * @param event an event that has to be added to the forwarder.
 	 */
-	public void addTableEvent(PdfPTableEvent event) {
-		events.add(event);
+	public void addTableEvent(final PdfPTableEvent event) {
+		this.events.add(event);
 	}
 
 	/**
 	 * @see com.lowagie.text.pdf.PdfPTableEvent#tableLayout(com.lowagie.text.pdf.PdfPTable, float[][], float[], int, int, com.lowagie.text.pdf.PdfContentByte[])
 	 */
-	public void tableLayout(PdfPTable table, float[][] widths, float[] heights, int headerRows, int rowStart, PdfContentByte[] canvases) {
+	@Override
+	public void tableLayout(final PdfPTable table, final float[][] widths, final float[] heights, final int headerRows, final int rowStart, final PdfContentByte[] canvases) {
 		PdfPTableEvent event;
-		for (Iterator i = events.iterator(); i.hasNext(); ) {
+		for (final Iterator i = this.events.iterator(); i.hasNext(); ) {
 			event = (PdfPTableEvent)i.next();
 			event.tableLayout(table, widths, heights, headerRows, rowStart, canvases);
 		}

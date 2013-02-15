@@ -61,14 +61,14 @@ import java.util.zip.DeflaterOutputStream;
  * @since	2.1.3
  */
 
-public class PdfEFStream extends PdfStream {
+class PdfEFStream extends PdfStream {
 
 	/**
 	 * Creates a Stream object using an InputStream and a PdfWriter object
 	 * @param	in	the InputStream that will be read to get the Stream object
 	 * @param	writer	the writer to which the stream will be added
 	 */
-	public PdfEFStream(InputStream in, PdfWriter writer) {
+	public PdfEFStream(final InputStream in, final PdfWriter writer) {
 		super(in, writer);
 	}
 
@@ -76,100 +76,108 @@ public class PdfEFStream extends PdfStream {
 	 * Creates a Stream object using a byte array
 	 * @param	fileStore	the bytes for the stream
 	 */
-	public PdfEFStream(byte[] fileStore) {
+	public PdfEFStream(final byte[] fileStore) {
 		super(fileStore);
 	}
 
     /**
      * @see com.lowagie.text.pdf.PdfDictionary#toPdf(com.lowagie.text.pdf.PdfWriter, java.io.OutputStream)
      */
-    public void toPdf(PdfWriter writer, OutputStream os) throws IOException {
-        if (inputStream != null && compressed)
-            put(PdfName.FILTER, PdfName.FLATEDECODE);
+    @Override
+	public void toPdf(final PdfWriter writer, final OutputStream os) throws IOException {
+        if (this.inputStream != null && this.compressed) {
+			put(PdfName.FILTER, PdfName.FLATEDECODE);
+		}
         PdfEncryption crypto = null;
-        if (writer != null)
-            crypto = writer.getEncryption();
+        if (writer != null) {
+			crypto = writer.getEncryption();
+		}
         if (crypto != null) {
-            PdfObject filter = get(PdfName.FILTER);
+            final PdfObject filter = get(PdfName.FILTER);
             if (filter != null) {
-                if (PdfName.CRYPT.equals(filter))
-                    crypto = null;
-                else if (filter.isArray()) {
-                    PdfArray a = (PdfArray)filter;
-                    if (!a.isEmpty() && PdfName.CRYPT.equals(a.getPdfObject(0)))
-                        crypto = null;
+                if (PdfName.CRYPT.equals(filter)) {
+					crypto = null;
+				} else if (filter.isArray()) {
+                    final PdfArray a = (PdfArray)filter;
+                    if (!a.isEmpty() && PdfName.CRYPT.equals(a.getPdfObject(0))) {
+						crypto = null;
+					}
                 }
             }
         }
     	if (crypto != null && crypto.isEmbeddedFilesOnly()) {
-    		PdfArray filter = new PdfArray();
-    		PdfArray decodeparms = new PdfArray();
-    		PdfDictionary crypt = new PdfDictionary();
+    		final PdfArray filter = new PdfArray();
+    		final PdfArray decodeparms = new PdfArray();
+    		final PdfDictionary crypt = new PdfDictionary();
     		crypt.put(PdfName.NAME, PdfName.STDCF);
     		filter.add(PdfName.CRYPT);
     		decodeparms.add(crypt);
-    		if (compressed) {
+    		if (this.compressed) {
     			filter.add(PdfName.FLATEDECODE);
     			decodeparms.add(new PdfNull());
     		}
     		put(PdfName.FILTER, filter);
     		put(PdfName.DECODEPARMS, decodeparms);
     	}
-        PdfObject nn = get(PdfName.LENGTH);
+        final PdfObject nn = get(PdfName.LENGTH);
         if (crypto != null && nn != null && nn.isNumber()) {
-            int sz = ((PdfNumber)nn).intValue();
+            final int sz = ((PdfNumber)nn).intValue();
             put(PdfName.LENGTH, new PdfNumber(crypto.calculateStreamSize(sz)));
             superToPdf(writer, os);
             put(PdfName.LENGTH, nn);
-        }
-        else
-            superToPdf(writer, os);
+        } else {
+			superToPdf(writer, os);
+		}
 
         os.write(STARTSTREAM);
-        if (inputStream != null) {
-            rawLength = 0;
+        if (this.inputStream != null) {
+            this.rawLength = 0;
             DeflaterOutputStream def = null;
-            OutputStreamCounter osc = new OutputStreamCounter(os);
+            final OutputStreamCounter osc = new OutputStreamCounter(os);
             OutputStreamEncryption ose = null;
             OutputStream fout = osc;
-            if (crypto != null)
-                fout = ose = crypto.getEncryptionStream(fout);
+            if (crypto != null) {
+				fout = ose = crypto.getEncryptionStream(fout);
+			}
             Deflater deflater = null;
-            if (compressed) {
-                deflater = new Deflater(compressionLevel);
+            if (this.compressed) {
+                deflater = new Deflater(this.compressionLevel);
                 fout = def = new DeflaterOutputStream(fout, deflater, 0x8000);
             }
-            
-            byte buf[] = new byte[4192];
+
+            final byte buf[] = new byte[4192];
             while (true) {
-                int n = inputStream.read(buf);
-                if (n <= 0)
-                    break;
+                final int n = this.inputStream.read(buf);
+                if (n <= 0) {
+					break;
+				}
                 fout.write(buf, 0, n);
-                rawLength += n;
+                this.rawLength += n;
             }
             if (def != null) {
                 def.finish();
                 deflater.end();
             }
-            if (ose != null)
-                ose.finish();
-            inputStreamLength = osc.getCounter();
+            if (ose != null) {
+				ose.finish();
+			}
+            this.inputStreamLength = osc.getCounter();
         }
         else {
             if (crypto == null) {
-                if (streamBytes != null)
-                    streamBytes.writeTo(os);
-                else
-                    os.write(bytes);
+                if (this.streamBytes != null) {
+					this.streamBytes.writeTo(os);
+				} else {
+					os.write(this.bytes);
+				}
             }
             else {
                 byte b[];
-                if (streamBytes != null) {
-                    b = crypto.encryptByteArray(streamBytes.toByteArray());
+                if (this.streamBytes != null) {
+                    b = crypto.encryptByteArray(this.streamBytes.toByteArray());
                 }
                 else {
-                    b = crypto.encryptByteArray(bytes);
+                    b = crypto.encryptByteArray(this.bytes);
                 }
                 os.write(b);
             }

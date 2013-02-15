@@ -66,86 +66,89 @@ import com.lowagie.text.pdf.interfaces.PdfVersion;
  */
 
 public class PdfVersionImp implements PdfVersion {
-    
+
     /** Contains different strings that are part of the header. */
-    public static final byte[][] HEADER = {
+    private static final byte[][] HEADER = {
     	DocWriter.getISOBytes("\n"),
     	DocWriter.getISOBytes("%PDF-"),
     	DocWriter.getISOBytes("\n%\u00e2\u00e3\u00cf\u00d3\n")
     };
-    
+
 	/** Indicates if the header was already written. */
-	protected boolean headerWasWritten = false;
+	private boolean headerWasWritten = false;
 	/** Indicates if we are working in append mode. */
-	protected boolean appendmode = false;
+	private boolean appendmode = false;
 	/** The version that was or will be written to the header. */
-	protected char header_version = PdfWriter.VERSION_1_4;
+	private char header_version = PdfWriter.VERSION_1_4;
 	/** The version that will be written to the catalog. */
-	protected PdfName catalog_version = null;
+	private PdfName catalog_version = null;
 	/**
 	 * The extensions dictionary.
 	 * @since	2.1.6
 	 */
-	protected PdfDictionary extensions = null;
-	
+	private PdfDictionary extensions = null;
+
 	/**
 	 * @see com.lowagie.text.pdf.interfaces.PdfVersion#setPdfVersion(char)
 	 */
-	public void setPdfVersion(char version) {
-		if (headerWasWritten || appendmode) {
+	@Override
+	public void setPdfVersion(final char version) {
+		if (this.headerWasWritten || this.appendmode) {
 			setPdfVersion(getVersionAsName(version));
 		}
 		else {
 			this.header_version = version;
 		}
 	}
-	
+
 	/**
 	 * @see com.lowagie.text.pdf.interfaces.PdfVersion#setAtLeastPdfVersion(char)
 	 */
-	public void setAtLeastPdfVersion(char version) {
-		if (version > header_version) {
+	@Override
+	public void setAtLeastPdfVersion(final char version) {
+		if (version > this.header_version) {
 			setPdfVersion(version);
 		}
 	}
-	
+
 	/**
 	 * @see com.lowagie.text.pdf.interfaces.PdfVersion#setPdfVersion(com.lowagie.text.pdf.PdfName)
 	 */
-	public void setPdfVersion(PdfName version) {
-		if (catalog_version == null || catalog_version.compareTo(version) < 0) {
+	@Override
+	public void setPdfVersion(final PdfName version) {
+		if (this.catalog_version == null || this.catalog_version.compareTo(version) < 0) {
 			this.catalog_version = version;
 		}
 	}
-	
+
 	/**
 	 * Sets the append mode.
 	 */
-	public void setAppendmode(boolean appendmode) {
+	public void setAppendmode(final boolean appendmode) {
 		this.appendmode = appendmode;
 	}
-	
+
 	/**
 	 * Writes the header to the OutputStreamCounter.
-	 * @throws IOException 
+	 * @throws IOException
 	 */
-	public void writeHeader(OutputStreamCounter os) throws IOException {
-		if (appendmode) {
+	public void writeHeader(final OutputStreamCounter os) throws IOException {
+		if (this.appendmode) {
 			os.write(HEADER[0]);
 		}
 		else {
 			os.write(HEADER[1]);
-			os.write(getVersionAsByteArray(header_version));
+			os.write(getVersionAsByteArray(this.header_version));
 			os.write(HEADER[2]);
-			headerWasWritten = true;
+			this.headerWasWritten = true;
 		}
 	}
-	
+
 	/**
 	 * Returns the PDF version as a name.
 	 * @param version	the version character.
 	 */
-	public PdfName getVersionAsName(char version) {
+	private PdfName getVersionAsName(final char version) {
 		switch(version) {
 		case PdfWriter.VERSION_1_2:
 			return PdfWriter.PDF_VERSION_1_2;
@@ -163,22 +166,22 @@ public class PdfVersionImp implements PdfVersion {
 			return PdfWriter.PDF_VERSION_1_4;
 		}
 	}
-	
+
 	/**
 	 * Returns the version as a byte[].
 	 * @param version the version character
 	 */
-	public byte[] getVersionAsByteArray(char version) {
+	private byte[] getVersionAsByteArray(final char version) {
 		return DocWriter.getISOBytes(getVersionAsName(version).toString().substring(1));
 	}
 
 	/** Adds the version to the Catalog dictionary. */
-	public void addToCatalog(PdfDictionary catalog) {
-		if(catalog_version != null) {
-			catalog.put(PdfName.VERSION, catalog_version);
+	public void addToCatalog(final PdfDictionary catalog) {
+		if(this.catalog_version != null) {
+			catalog.put(PdfName.VERSION, this.catalog_version);
 		}
-		if (extensions != null) {
-			catalog.put(PdfName.EXTENSIONS, extensions);
+		if (this.extensions != null) {
+			catalog.put(PdfName.EXTENSIONS, this.extensions);
 		}
 	}
 
@@ -186,21 +189,24 @@ public class PdfVersionImp implements PdfVersion {
 	 * @see com.lowagie.text.pdf.interfaces.PdfVersion#addDeveloperExtension(com.lowagie.text.pdf.PdfDeveloperExtension)
 	 * @since	2.1.6
 	 */
-	public void addDeveloperExtension(PdfDeveloperExtension de) {
-		if (extensions == null) {
-			extensions = new PdfDictionary();
+	@Override
+	public void addDeveloperExtension(final PdfDeveloperExtension de) {
+		if (this.extensions == null) {
+			this.extensions = new PdfDictionary();
 		}
 		else {
-			PdfDictionary extension = extensions.getAsDict(de.getPrefix());
+			final PdfDictionary extension = this.extensions.getAsDict(de.getPrefix());
 			if (extension != null) {
 				int diff = de.getBaseversion().compareTo(extension.getAsName(PdfName.BASEVERSION));
-				if (diff < 0)
+				if (diff < 0) {
 					return;
+				}
 				diff = de.getExtensionLevel() - extension.getAsNumber(PdfName.EXTENSIONLEVEL).intValue();
-				if (diff <= 0)
+				if (diff <= 0) {
 					return;
+				}
 			}
 		}
-		extensions.put(de.getPrefix(), de.getDeveloperExtensions());
+		this.extensions.put(de.getPrefix(), de.getDeveloperExtensions());
 	}
 }

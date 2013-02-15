@@ -37,7 +37,7 @@ package com.lowagie.text.pdf.fonts.cmaps;
  * @version $Revision: 3646 $
  * @since	2.1.4
  */
-public class CodespaceRange
+class CodespaceRange
 {
 
     private byte[] start;
@@ -63,9 +63,9 @@ public class CodespaceRange
      * @param endBytes New value of property end.
      *
      */
-    public void setEnd(byte[] endBytes)
+    public void setEnd(final byte[] endBytes)
     {
-        end = endBytes;
+        this.end = endBytes;
     }
 
     /** Getter for property start.
@@ -81,9 +81,9 @@ public class CodespaceRange
      * @param startBytes New value of property start.
      *
      */
-    public void setStart(byte[] startBytes)
+    public void setStart(final byte[] startBytes)
     {
-        start = startBytes;
+        this.start = startBytes;
     }
 
 }

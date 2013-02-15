@@ -75,113 +75,40 @@ public class Anchor extends Phrase {
 
 	// constant
 	private static final long serialVersionUID = -852278536049236911L;
-	
+
     // membervariables
-    
+
 	/** This is the name of the <CODE>Anchor</CODE>. */
-    protected String name = null;
-    
+    private String name = null;
+
     /** This is the reference of the <CODE>Anchor</CODE>. */
-    protected String reference = null;
-    
+    private String reference = null;
+
     // constructors
-    
+
     /**
      * Constructs an <CODE>Anchor</CODE> without specifying a leading.
      */
     public Anchor() {
         super(16);
     }
-    
-    /**
-     * Constructs an <CODE>Anchor</CODE> with a certain leading.
-     *
-     * @param	leading		the leading
-     */
-    
-    public Anchor(float leading) {
-        super(leading);
-    }
-    
-    /**
-     * Constructs an <CODE>Anchor</CODE> with a certain <CODE>Chunk</CODE>.
-     *
-     * @param	chunk		a <CODE>Chunk</CODE>
-     */
-    public Anchor(Chunk chunk) {
-        super(chunk);
-    }
-    
-    /**
-     * Constructs an <CODE>Anchor</CODE> with a certain <CODE>String</CODE>.
-     *
-     * @param	string		a <CODE>String</CODE>
-     */
-    public Anchor(String string) {
-        super(string);
-    }
-    
-    /**
-     * Constructs an <CODE>Anchor</CODE> with a certain <CODE>String</CODE>
-     * and a certain <CODE>Font</CODE>.
-     *
-     * @param	string		a <CODE>String</CODE>
-     * @param	font		a <CODE>Font</CODE>
-     */
-    public Anchor(String string, Font font) {
-        super(string, font);
-    }
-    
-    /**
-     * Constructs an <CODE>Anchor</CODE> with a certain <CODE>Chunk</CODE>
-     * and a certain leading.
-     *
-     * @param	leading		the leading
-     * @param	chunk		a <CODE>Chunk</CODE>
-     */
-    public Anchor(float leading, Chunk chunk) {
-        super(leading, chunk);
-    }
-    
-    /**
-     * Constructs an <CODE>Anchor</CODE> with a certain leading
-     * and a certain <CODE>String</CODE>.
-     *
-     * @param	leading		the leading
-     * @param	string		a <CODE>String</CODE>
-     */
-    public Anchor(float leading, String string) {
-        super(leading, string);
-    }
-    
-    /**
-     * Constructs an <CODE>Anchor</CODE> with a certain leading,
-     * a certain <CODE>String</CODE> and a certain <CODE>Font</CODE>.
-     *
-     * @param	leading		the leading
-     * @param	string		a <CODE>String</CODE>
-     * @param	font		a <CODE>Font</CODE>
-     */
-    public Anchor(float leading, String string, Font font) {
-        super(leading, string, font);
-    }
-    
+
     /**
      * Constructs an <CODE>Anchor</CODE> with a certain <CODE>Phrase</CODE>.
      *
      * @param	phrase		a <CODE>Phrase</CODE>
-     */    
-    public Anchor(Phrase phrase) {
+     */
+    public Anchor(final Phrase phrase) {
     	super(phrase);
     	if (phrase instanceof Anchor) {
-    		Anchor a = (Anchor) phrase;
+    		final Anchor a = (Anchor) phrase;
     		setName(a.name);
     		setReference(a.reference);
     	}
     }
-    
+
     // implementation of the Element-methods
-    
+
     /**
      * Processes the element by adding it (or the different parts) to an
      * <CODE>ElementListener</CODE>.
@@ -189,95 +116,99 @@ public class Anchor extends Phrase {
      * @param	listener	an <CODE>ElementListener</CODE>
      * @return	<CODE>true</CODE> if the element was processed successfully
      */
-    public boolean process(ElementListener listener) {
+    @Override
+	public boolean process(final ElementListener listener) {
         try {
             Chunk chunk;
-            Iterator i = getChunks().iterator();
-            boolean localDestination = (reference != null && reference.startsWith("#"));
+            final Iterator i = getChunks().iterator();
+            final boolean localDestination = this.reference != null && this.reference.startsWith("#");
             boolean notGotoOK = true;
             while (i.hasNext()) {
                 chunk = (Chunk) i.next();
-                if (name != null && notGotoOK && !chunk.isEmpty()) {
-                    chunk.setLocalDestination(name);
+                if (this.name != null && notGotoOK && !chunk.isEmpty()) {
+                    chunk.setLocalDestination(this.name);
                     notGotoOK = false;
                 }
                 if (localDestination) {
-                    chunk.setLocalGoto(reference.substring(1));
+                    chunk.setLocalGoto(this.reference.substring(1));
                 }
                 listener.add(chunk);
             }
             return true;
         }
-        catch(DocumentException de) {
+        catch(final DocumentException de) {
             return false;
         }
     }
-    
+
     /**
      * Gets all the chunks in this element.
      *
      * @return	an <CODE>ArrayList</CODE>
      */
-    public ArrayList getChunks() {
-        ArrayList tmp = new ArrayList();
+    @Override
+	public ArrayList getChunks() {
+        final ArrayList tmp = new ArrayList();
         Chunk chunk;
-        Iterator i = iterator();
-        boolean localDestination = (reference != null && reference.startsWith("#"));
+        final Iterator i = iterator();
+        final boolean localDestination = this.reference != null && this.reference.startsWith("#");
         boolean notGotoOK = true;
         while (i.hasNext()) {
             chunk = (Chunk) i.next();
-            if (name != null && notGotoOK && !chunk.isEmpty()) {
-                chunk.setLocalDestination(name);
+            if (this.name != null && notGotoOK && !chunk.isEmpty()) {
+                chunk.setLocalDestination(this.name);
                 notGotoOK = false;
             }
             if (localDestination) {
-                chunk.setLocalGoto(reference.substring(1));
+                chunk.setLocalGoto(this.reference.substring(1));
             }
-            else if (reference != null)
-                chunk.setAnchor(reference);
+            else if (this.reference != null) {
+				chunk.setAnchor(this.reference);
+			}
             tmp.add(chunk);
         }
         return tmp;
     }
-    
+
     /**
      * Gets the type of the text element.
      *
      * @return	a type
      */
-    public int type() {
+    @Override
+	public int type() {
         return Element.ANCHOR;
     }
-    
+
     // methods
-    
+
     /**
      * Sets the name of this <CODE>Anchor</CODE>.
      *
      * @param	name		a new name
      */
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
-    
+
     /**
      * Sets the reference of this <CODE>Anchor</CODE>.
      *
      * @param	reference		a new reference
      */
-    public void setReference(String reference) {
+    public void setReference(final String reference) {
         this.reference = reference;
     }
-    
+
     // methods to retrieve information
 
 	/**
      * Returns the name of this <CODE>Anchor</CODE>.
      *
      * @return	a name
-     */   
+     */
     public String getName() {
-        return name;
+        return this.name;
     }
 
 	/**
@@ -286,7 +217,7 @@ public class Anchor extends Phrase {
      * @return	a reference
      */
     public String getReference() {
-        return reference;
+        return this.reference;
     }
 
 	/**
@@ -296,9 +227,9 @@ public class Anchor extends Phrase {
      */
     public URL getUrl() {
         try {
-            return new URL(reference);
+            return new URL(this.reference);
         }
-        catch(MalformedURLException mue) {
+        catch(final MalformedURLException mue) {
             return null;
         }
     }

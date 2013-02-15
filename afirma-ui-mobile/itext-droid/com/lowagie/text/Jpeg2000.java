@@ -61,32 +61,22 @@ import java.net.URL;
  * @see		Image
  */
 
-public class Jpeg2000 extends Image {
-    
+class Jpeg2000 extends Image {
+
     // public static final membervariables
-    
-    public static final int JP2_JP = 0x6a502020;
-    public static final int JP2_IHDR = 0x69686472;
-    public static final int JPIP_JPIP = 0x6a706970;
 
-    public static final int JP2_FTYP = 0x66747970;
-    public static final int JP2_JP2H = 0x6a703268;
-    public static final int JP2_COLR = 0x636f6c72;
-    public static final int JP2_JP2C = 0x6a703263;
-    public static final int JP2_URL = 0x75726c20;
-    public static final int JP2_DBTL = 0x6474626c;
-    public static final int JP2_BPCC = 0x62706363;
-    public static final int JP2_JP2 = 0x6a703220;
+	private static final int JP2_JP = 0x6a502020;
+    private static final int JP2_IHDR = 0x69686472;
 
-    InputStream inp;
-    int boxLength;
-    int boxType;
-    
+    private static final int JP2_FTYP = 0x66747970;
+    private static final int JP2_JP2H = 0x6a703268;
+    private static final int JP2_JP2C = 0x6a703263;
+
+    private InputStream inp;
+    private int boxLength;
+    private int boxType;
+
     // Constructors
-    
-    Jpeg2000(Image image) {
-        super(image);
-    }
 
     /**
      * Constructs a <CODE>Jpeg2000</CODE>-object, using an <VAR>url</VAR>.
@@ -95,11 +85,11 @@ public class Jpeg2000 extends Image {
      * @throws BadElementException
      * @throws IOException
      */
-    public Jpeg2000(URL url) throws BadElementException, IOException {
+    Jpeg2000(final URL url) throws BadElementException, IOException {
         super(url);
         processParameters();
     }
-    
+
     /**
      * Constructs a <CODE>Jpeg2000</CODE>-object from memory.
      *
@@ -107,76 +97,61 @@ public class Jpeg2000 extends Image {
      * @throws BadElementException
      * @throws IOException
      */
-    
-    public Jpeg2000(byte[] img) throws BadElementException, IOException {
+
+    Jpeg2000(final byte[] img) throws BadElementException, IOException {
         super((URL)null);
-        rawData = img;
-        originalData = img;
+        this.rawData = img;
+        this.originalData = img;
         processParameters();
     }
-    
-    /**
-     * Constructs a <CODE>Jpeg2000</CODE>-object from memory.
-     *
-     * @param		img			the memory image.
-     * @param		width		the width you want the image to have
-     * @param		height		the height you want the image to have
-     * @throws BadElementException
-     * @throws IOException
-     */
-    
-    public Jpeg2000(byte[] img, float width, float height) throws BadElementException, IOException {
-        this(img);
-        scaledWidth = width;
-        scaledHeight = height;
-    }
-    
-    private int cio_read(int n) throws IOException {
+
+    private int cio_read(final int n) throws IOException {
         int v = 0;
         for (int i = n - 1; i >= 0; i--) {
-            v += inp.read() << (i << 3);
+            v += this.inp.read() << (i << 3);
         }
         return v;
     }
-    
-    public void jp2_read_boxhdr() throws IOException {
-        boxLength = cio_read(4);
-        boxType = cio_read(4);
-        if (boxLength == 1) {
+
+    private void jp2_read_boxhdr() throws IOException {
+        this.boxLength = cio_read(4);
+        this.boxType = cio_read(4);
+        if (this.boxLength == 1) {
             if (cio_read(4) != 0) {
                 throw new IOException("Cannot handle box sizes higher than 2^32");
             }
-            boxLength = cio_read(4);
-            if (boxLength == 0) 
-                throw new IOException("Unsupported box size == 0");
+            this.boxLength = cio_read(4);
+            if (this.boxLength == 0) {
+				throw new IOException("Unsupported box size == 0");
+			}
         }
-        else if (boxLength == 0) {
+        else if (this.boxLength == 0) {
             throw new IOException("Unsupported box size == 0");
         }
     }
-    
+
     /**
      * This method checks if the image is a valid JPEG and processes some parameters.
      * @throws IOException
      */
     private void processParameters() throws IOException {
-        type = JPEG2000;
-        originalType = ORIGINAL_JPEG2000;
-        inp = null;
+        this.type = JPEG2000;
+        this.originalType = ORIGINAL_JPEG2000;
+        this.inp = null;
         try {
             String errorID;
-            if (rawData == null){
-                inp = url.openStream();
-                errorID = url.toString();
+            if (this.rawData == null){
+                this.inp = this.url.openStream();
+                errorID = this.url.toString();
             }
             else{
-                inp = new java.io.ByteArrayInputStream(rawData);
+                this.inp = new java.io.ByteArrayInputStream(this.rawData);
                 errorID = "Byte array";
             }
-            boxLength = cio_read(4);
-            if (boxLength == 0x0000000c) {
-                boxType = cio_read(4);
-                if (JP2_JP != boxType) {
+            this.boxLength = cio_read(4);
+            if (this.boxLength == 0x0000000c) {
+                this.boxType = cio_read(4);
+                if (JP2_JP != this.boxType) {
                     throw new IOException("Expected JP Marker");
                 }
                 if (0x0d0a870a != cio_read(4)) {
@@ -184,55 +159,55 @@ public class Jpeg2000 extends Image {
                 }
 
                 jp2_read_boxhdr();
-                if (JP2_FTYP != boxType) {
+                if (JP2_FTYP != this.boxType) {
                     throw new IOException("Expected FTYP Marker");
                 }
-                Utilities.skip(inp, boxLength - 8);
+                Utilities.skip(this.inp, this.boxLength - 8);
                 jp2_read_boxhdr();
                 do {
-                    if (JP2_JP2H != boxType) {
-                        if (boxType == JP2_JP2C) {
+                    if (JP2_JP2H != this.boxType) {
+                        if (this.boxType == JP2_JP2C) {
                             throw new IOException("Expected JP2H Marker");
                         }
-                        Utilities.skip(inp, boxLength - 8);
+                        Utilities.skip(this.inp, this.boxLength - 8);
                         jp2_read_boxhdr();
                     }
-                } while(JP2_JP2H != boxType);
+                } while(JP2_JP2H != this.boxType);
                 jp2_read_boxhdr();
-                if (JP2_IHDR != boxType) {
+                if (JP2_IHDR != this.boxType) {
                     throw new IOException("Expected IHDR Marker");
                 }
-                scaledHeight = cio_read(4);
-                setTop(scaledHeight);
-                scaledWidth = cio_read(4);
-                setRight(scaledWidth);
-                bpc = -1;
+                this.scaledHeight = cio_read(4);
+                setTop(this.scaledHeight);
+                this.scaledWidth = cio_read(4);
+                setRight(this.scaledWidth);
+                this.bpc = -1;
             }
-            else if (boxLength == 0xff4fff51) {
-                Utilities.skip(inp, 4);
-                int x1 = cio_read(4);
-                int y1 = cio_read(4);
-                int x0 = cio_read(4);
-                int y0 = cio_read(4);
-                Utilities.skip(inp, 16);
-                colorspace = cio_read(2);
-                bpc = 8;
-                scaledHeight = y1 - y0;
-                setTop(scaledHeight);
-                scaledWidth = x1 - x0;
-                setRight(scaledWidth);
+            else if (this.boxLength == 0xff4fff51) {
+                Utilities.skip(this.inp, 4);
+                final int x1 = cio_read(4);
+                final int y1 = cio_read(4);
+                final int x0 = cio_read(4);
+                final int y0 = cio_read(4);
+                Utilities.skip(this.inp, 16);
+                this.colorspace = cio_read(2);
+                this.bpc = 8;
+                this.scaledHeight = y1 - y0;
+                setTop(this.scaledHeight);
+                this.scaledWidth = x1 - x0;
+                setRight(this.scaledWidth);
             }
             else {
                 throw new IOException("Not a valid Jpeg2000 file");
             }
         }
         finally {
-            if (inp != null) {
-                try{inp.close();}catch(Exception e){}
-                inp = null;
+            if (this.inp != null) {
+                try{this.inp.close();}catch(final Exception e){}
+                this.inp = null;
             }
         }
-        plainWidth = getWidth();
-        plainHeight = getHeight();
+        this.plainWidth = getWidth();
+        this.plainHeight = getHeight();
     }
 }

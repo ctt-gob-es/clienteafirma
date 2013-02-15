@@ -57,20 +57,20 @@ class ColorDetails {
 
     /** The indirect reference to this color
      */
-    PdfIndirectReference indirectReference;
+    private final PdfIndirectReference indirectReference;
     /** The color name that appears in the document body stream
      */
-    PdfName colorName;
+    private final PdfName colorName;
     /** The color
      */
-    PdfSpotColor spotcolor;
+    private final PdfSpotColor spotcolor;
 
     /** Each spot color used in a document has an instance of this class.
      * @param colorName the color name
      * @param indirectReference the indirect reference to the font
      * @param scolor the <CODE>PDfSpotColor</CODE>
      */
-    ColorDetails(PdfName colorName, PdfIndirectReference indirectReference, PdfSpotColor scolor) {
+    ColorDetails(final PdfName colorName, final PdfIndirectReference indirectReference, final PdfSpotColor scolor) {
         this.colorName = colorName;
         this.indirectReference = indirectReference;
         this.spotcolor = scolor;
@@ -80,20 +80,20 @@ class ColorDetails {
      * @return the indirect reference to this color
      */
     PdfIndirectReference getIndirectReference() {
-        return indirectReference;
+        return this.indirectReference;
     }
 
     /** Gets the color name as it appears in the document body.
      * @return the color name
      */
     PdfName getColorName() {
-        return colorName;
+        return this.colorName;
     }
 
     /** Gets the <CODE>SpotColor</CODE> object.
      * @return the <CODE>PdfSpotColor</CODE>
      */
-    PdfObject getSpotColor(PdfWriter writer) {
-        return spotcolor.getSpotObject(writer);
+    PdfObject getSpotColor(final PdfWriter writer) {
+        return this.spotcolor.getSpotObject(writer);
     }
 }
