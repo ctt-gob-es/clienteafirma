@@ -125,9 +125,9 @@ import org.bouncycastle.asn1.x509.TBSCertificateStructure;
 /**
  * @author Aiken Sam (aikensam@ieee.org)
  */
-public class PdfPublicKeySecurityHandler {
+class PdfPublicKeySecurityHandler {
 
-    static final int SEED_LENGTH = 20;
+    private static final int SEED_LENGTH = 20;
 
     private ArrayList recipients = null;
 

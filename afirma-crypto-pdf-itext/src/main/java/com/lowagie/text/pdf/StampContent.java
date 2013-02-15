@@ -46,19 +46,20 @@
  */
 package com.lowagie.text.pdf;
 
-public class StampContent extends PdfContentByte {
-    PdfStamperImp.PageStamp ps;
-    PageResources pageResources;
-    
+class StampContent extends PdfContentByte {
+    private final PdfStamperImp.PageStamp ps;
+    private final PageResources pageResources;
+
     /** Creates a new instance of StampContent */
-    StampContent(PdfStamperImp stamper, PdfStamperImp.PageStamp ps) {
+    StampContent(final PdfStamperImp stamper, final PdfStamperImp.PageStamp ps) {
         super(stamper);
         this.ps = ps;
-        pageResources = ps.pageResources;
+        this.pageResources = ps.pageResources;
     }
-    
-    public void setAction(PdfAction action, float llx, float lly, float urx, float ury) {
-        ((PdfStamperImp)writer).addAnnotation(new PdfAnnotation(writer, llx, lly, urx, ury, action), ps.pageN);
+
+    @Override
+	public void setAction(final PdfAction action, final float llx, final float lly, final float urx, final float ury) {
+        ((PdfStamperImp)this.writer).addAnnotation(new PdfAnnotation(this.writer, llx, lly, urx, ury, action), this.ps.pageN);
     }
 
     /**
@@ -67,15 +68,18 @@ public class StampContent extends PdfContentByte {
      *
      * @return a copy of this <CODE>PdfContentByte</CODE>
      */
-    public PdfContentByte getDuplicate() {
-        return new StampContent((PdfStamperImp)writer, ps);
+    @Override
+	public PdfContentByte getDuplicate() {
+        return new StampContent((PdfStamperImp)this.writer, this.ps);
     }
 
-    PageResources getPageResources() {
-        return pageResources;
+    @Override
+	PageResources getPageResources() {
+        return this.pageResources;
     }
-    
-    void addAnnotation(PdfAnnotation annot) {
-        ((PdfStamperImp)writer).addAnnotation(annot, ps.pageN);
+
+    @Override
+	void addAnnotation(final PdfAnnotation annot) {
+        ((PdfStamperImp)this.writer).addAnnotation(annot, this.ps.pageN);
     }
 }

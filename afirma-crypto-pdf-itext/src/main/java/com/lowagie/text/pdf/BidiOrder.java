@@ -154,7 +154,7 @@ package com.lowagie.text.pdf;
  * @author Doug Felt
  */
 
-public final class BidiOrder {
+final class BidiOrder {
     private final byte[] initialTypes;
     private byte[] embeddings; // generated from processing format codes
     private byte paragraphEmbeddingLevel = -1; // undefined
@@ -169,10 +169,10 @@ public final class BidiOrder {
     public static final byte L = 0;
 
     /** Left-to-Right Embedding */
-    public static final byte LRE = 1;
+    private static final byte LRE = 1;
 
     /** Left-to-Right Override */
-    public static final byte LRO = 2;
+    private static final byte LRO = 2;
 
     /** Right-to-Left */
     public static final byte R = 3;
@@ -181,52 +181,52 @@ public final class BidiOrder {
     public static final byte AL = 4;
 
     /** Right-to-Left Embedding */
-    public static final byte RLE = 5;
+    private static final byte RLE = 5;
 
     /** Right-to-Left Override */
-    public static final byte RLO = 6;
+    private static final byte RLO = 6;
 
     /** Pop Directional Format */
-    public static final byte PDF = 7;
+    private static final byte PDF = 7;
 
     /** European Number */
     public static final byte EN = 8;
 
     /** European Number Separator */
-    public static final byte ES = 9;
+    private static final byte ES = 9;
 
     /** European Number Terminator */
-    public static final byte ET = 10;
+    private static final byte ET = 10;
 
     /** Arabic Number */
-    public static final byte AN = 11;
+    private static final byte AN = 11;
 
     /** Common Number Separator */
-    public static final byte CS = 12;
+    private static final byte CS = 12;
 
     /** Non-Spacing Mark */
-    public static final byte NSM = 13;
+    private static final byte NSM = 13;
 
     /** Boundary Neutral */
-    public static final byte BN = 14;
+    private static final byte BN = 14;
 
     /** Paragraph Separator */
-    public static final byte B = 15;
+    private static final byte B = 15;
 
     /** Segment Separator */
-    public static final byte S = 16;
+    private static final byte S = 16;
 
     /** Whitespace */
-    public static final byte WS = 17;
+    private static final byte WS = 17;
 
     /** Other Neutrals */
-    public static final byte ON = 18;
+    private static final byte ON = 18;
 
     /** Minimum bidi type value. */
-    public static final byte TYPE_MIN = 0;
+    private static final byte TYPE_MIN = 0;
 
     /** Maximum bidi type value. */
-    public static final byte TYPE_MAX = 18;
+    private static final byte TYPE_MAX = 18;
 
     //
     // Input
@@ -806,7 +806,7 @@ public final class BidiOrder {
      * @param linebreaks the offsets at which to break the paragraph
      * @return the resolved levels of the text
      */
-    public byte[] getLevels(final int[] linebreaks) {
+    private byte[] getLevels(final int[] linebreaks) {
 
         // Note that since the previous processing has removed all
         // P, S, and WS values from resultTypes, the values referred to

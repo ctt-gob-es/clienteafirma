@@ -52,17 +52,17 @@ import java.util.HashMap;
 
 class PageResources {
 
-    protected PdfDictionary fontDictionary = new PdfDictionary();
-    protected PdfDictionary xObjectDictionary = new PdfDictionary();
-    protected PdfDictionary colorDictionary = new PdfDictionary();
-    protected PdfDictionary patternDictionary = new PdfDictionary();
-    protected PdfDictionary shadingDictionary = new PdfDictionary();
-    protected PdfDictionary extGStateDictionary = new PdfDictionary();
-    protected PdfDictionary propertyDictionary = new PdfDictionary();
-    protected HashMap forbiddenNames;
-    protected PdfDictionary originalResources;
-    protected int namePtr[] = {0};
-    protected HashMap usedNames;
+    private final PdfDictionary fontDictionary = new PdfDictionary();
+    private final PdfDictionary xObjectDictionary = new PdfDictionary();
+    private final PdfDictionary colorDictionary = new PdfDictionary();
+    private final PdfDictionary patternDictionary = new PdfDictionary();
+    private final PdfDictionary shadingDictionary = new PdfDictionary();
+    private final PdfDictionary extGStateDictionary = new PdfDictionary();
+    private final PdfDictionary propertyDictionary = new PdfDictionary();
+    private HashMap forbiddenNames;
+    private PdfDictionary originalResources;
+    private int namePtr[] = {0};
+    private HashMap usedNames;
 
     PageResources() {
     }
@@ -93,7 +93,7 @@ class PageResources {
         }
     }
 
-    PdfName translateName(final PdfName name) {
+    private PdfName translateName(final PdfName name) {
         PdfName translated = name;
         if (this.forbiddenNames != null) {
             translated = (PdfName)this.usedNames.get(name);

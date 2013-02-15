@@ -53,18 +53,18 @@ import java.io.IOException;
  */
 public class PdfShadingPattern extends PdfDictionary {
 
-    protected PdfShading shading;
+    private final PdfShading shading;
 
-    protected PdfWriter writer;
+    private final PdfWriter writer;
 
-    protected float matrix[] = {1, 0, 0, 1, 0, 0};
+    private float matrix[] = {1, 0, 0, 1, 0, 0};
 
-    protected PdfName patternName;
+    private PdfName patternName;
 
-    protected PdfIndirectReference patternReference;
+    private PdfIndirectReference patternReference;
 
     /** Creates new PdfShadingPattern */
-    public PdfShadingPattern(final PdfShading shading) {
+    PdfShadingPattern(final PdfShading shading) {
         this.writer = shading.getWriter();
         put(PdfName.PATTERNTYPE, new PdfNumber(2));
         this.shading = shading;

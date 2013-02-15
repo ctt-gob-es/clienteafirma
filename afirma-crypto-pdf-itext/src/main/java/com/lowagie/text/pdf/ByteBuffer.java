@@ -64,22 +64,22 @@ import com.lowagie.text.DocWriter;
 
 public class ByteBuffer extends OutputStream {
     /** The count of bytes in the buffer. */
-    protected int count;
+    private int count;
 
     /** The buffer where the bytes are stored. */
-    protected byte buf[];
+    private byte buf[];
 
     private static int byteCacheSize = 0;
 
     private static byte[][] byteCache = new byte[byteCacheSize][];
-    public static final byte ZERO = (byte)'0';
+    private static final byte ZERO = (byte)'0';
     private static final char[] chars = new char[] {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
     private static final byte[] bytes = new byte[] {48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 97, 98, 99, 100, 101, 102};
     /**
      * If <CODE>true</CODE> always output floating point numbers with 6 decimal digits.
      * If <CODE>false</CODE> uses the faster, although less precise, representation.
      */
-    public static boolean HIGH_PRECISION = false;
+    private static boolean HIGH_PRECISION = false;
     private static final DecimalFormatSymbols dfs = new DecimalFormatSymbols(Locale.US);
 
     /** Creates new ByteBuffer with capacity 128 */
@@ -170,7 +170,7 @@ public class ByteBuffer extends OutputStream {
      * @param len the length of bytes to append
      * @return a reference to this <CODE>ByteBuffer</CODE> object
      */
-    public ByteBuffer append(final byte b[], final int off, final int len) {
+    ByteBuffer append(final byte b[], final int off, final int len) {
         if (off < 0 || off > b.length || len < 0 ||
         off + len > b.length || off + len < 0 || len == 0) {
 			return this;
@@ -191,7 +191,7 @@ public class ByteBuffer extends OutputStream {
      * @param b the array to be appended
      * @return a reference to this <CODE>ByteBuffer</CODE> object
      */
-    public ByteBuffer append(final byte b[]) {
+    ByteBuffer append(final byte b[]) {
         return append(b, 0, b.length);
     }
 
@@ -201,7 +201,7 @@ public class ByteBuffer extends OutputStream {
      * @param str the <CODE>String</CODE> to be appended
      * @return a reference to this <CODE>ByteBuffer</CODE> object
      */
-    public ByteBuffer append(final String str) {
+    ByteBuffer append(final String str) {
         if (str != null) {
 			return append(DocWriter.getISOBytes(str));
 		}
@@ -214,7 +214,7 @@ public class ByteBuffer extends OutputStream {
      * @param c the <CODE>char</CODE> to be appended
      * @return a reference to this <CODE>ByteBuffer</CODE> object
      */
-    public ByteBuffer append(final char c) {
+    ByteBuffer append(final char c) {
         return append_i(c);
     }
 
@@ -223,7 +223,7 @@ public class ByteBuffer extends OutputStream {
      * @param buf the <CODE>ByteBuffer</CODE> to be appended
      * @return a reference to this <CODE>ByteBuffer</CODE> object
      */
-    public ByteBuffer append(final ByteBuffer buf) {
+    ByteBuffer append(final ByteBuffer buf) {
         return append(buf.buf, 0, buf.count);
     }
 
@@ -232,7 +232,7 @@ public class ByteBuffer extends OutputStream {
      * @param i the <CODE>int</CODE> to be appended
      * @return a reference to this <CODE>ByteBuffer</CODE> object
      */
-    public ByteBuffer append(final int i) {
+    ByteBuffer append(final int i) {
         return append((double)i);
     }
 
@@ -240,7 +240,7 @@ public class ByteBuffer extends OutputStream {
         return append_i(b);
     }
 
-    public ByteBuffer appendHex(final byte b) {
+    ByteBuffer appendHex(final byte b) {
         append(bytes[b >> 4 & 0x0f]);
         return append(bytes[b & 0x0f]);
     }
@@ -251,7 +251,7 @@ public class ByteBuffer extends OutputStream {
      * @param i the <CODE>float</CODE> to be appended
      * @return a reference to this <CODE>ByteBuffer</CODE> object
      */
-    public ByteBuffer append(final float i) {
+    ByteBuffer append(final float i) {
         return append((double)i);
     }
 
@@ -261,7 +261,7 @@ public class ByteBuffer extends OutputStream {
      * @param d the <CODE>double</CODE> to be appended
      * @return a reference to this <CODE>ByteBuffer</CODE> object
      */
-    public ByteBuffer append(final double d) {
+    private ByteBuffer append(final double d) {
         append(formatDouble(d, this));
         return this;
     }
@@ -271,7 +271,7 @@ public class ByteBuffer extends OutputStream {
      * @param d a double
      * @return the <CODE>String</CODE> representation of the <CODE>double</CODE>
      */
-    public static String formatDouble(final double d) {
+    static String formatDouble(final double d) {
         return formatDouble(d, null);
     }
 
@@ -283,7 +283,7 @@ public class ByteBuffer extends OutputStream {
      * <CODE>buf</CODE> is <CODE>null</CODE>. If <CODE>buf</CODE> is <B>not</B> <CODE>null</CODE>,
      * then the double is appended directly to the buffer and this methods returns <CODE>null</CODE>.
      */
-    public static String formatDouble(double d, final ByteBuffer buf) {
+    private static String formatDouble(double d, final ByteBuffer buf) {
         if (HIGH_PRECISION) {
             final DecimalFormat dn = new DecimalFormat("0.######", dfs);
             final String sform = dn.format(d);
@@ -520,7 +520,7 @@ public class ByteBuffer extends OutputStream {
     /**
      * Sets the size to zero.
      */
-    public void reset() {
+    void reset() {
         this.count = 0;
     }
 
@@ -542,7 +542,7 @@ public class ByteBuffer extends OutputStream {
      *
      * @return the value of the <code>count</code> field, which is the number of valid bytes in this byte buffer.
      */
-    public int size() {
+    int size() {
         return this.count;
     }
 

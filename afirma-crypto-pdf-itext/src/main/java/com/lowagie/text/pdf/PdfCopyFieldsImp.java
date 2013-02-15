@@ -70,19 +70,19 @@ class PdfCopyFieldsImp extends PdfWriter {
 
     private static final PdfName iTextTag = new PdfName("_iTextTag_");
     private static final Integer zero = new Integer(0);
-    ArrayList readers = new ArrayList();
+    private final ArrayList readers = new ArrayList();
     HashMap readers2intrefs = new HashMap();
-    HashMap pages2intrefs = new HashMap();
-    HashMap visited = new HashMap();
+    private final HashMap pages2intrefs = new HashMap();
+    private final HashMap visited = new HashMap();
     ArrayList fields = new ArrayList();
-    RandomAccessFileOrArray file;
-    HashMap fieldTree = new HashMap();
-    ArrayList pageRefs = new ArrayList();
-    ArrayList pageDics = new ArrayList();
-    PdfDictionary resources = new PdfDictionary();
-    PdfDictionary form;
-    boolean closing = false;
-    Document nd;
+    private RandomAccessFileOrArray file;
+    private final HashMap fieldTree = new HashMap();
+    private final ArrayList pageRefs = new ArrayList();
+    private final ArrayList pageDics = new ArrayList();
+    private final PdfDictionary resources = new PdfDictionary();
+    private PdfDictionary form;
+    private boolean closing = false;
+    private final Document nd;
     private HashMap tabOrder;
     private final ArrayList calculationOrder = new ArrayList();
     private ArrayList calculationOrderRefs;
@@ -92,7 +92,7 @@ class PdfCopyFieldsImp extends PdfWriter {
         this(os, '\0', globalDate);
     }
 
-    PdfCopyFieldsImp(final OutputStream os, final char pdfVersion, final Calendar globalDate) throws DocumentException {
+    private PdfCopyFieldsImp(final OutputStream os, final char pdfVersion, final Calendar globalDate) throws DocumentException {
         super(new PdfDocument(globalDate), os);
         this.pdf.addWriter(this);
         if (pdfVersion != 0) {
@@ -196,7 +196,7 @@ class PdfCopyFieldsImp extends PdfWriter {
         }
     }
 
-    void propagate(final PdfObject obj, final PdfIndirectReference refo, final boolean restricted) throws IOException {
+    private void propagate(final PdfObject obj, final PdfIndirectReference refo, final boolean restricted) throws IOException {
         if (obj == null) {
 			return;
 		}
@@ -279,7 +279,7 @@ class PdfCopyFieldsImp extends PdfWriter {
         }
     }
 
-    protected PdfArray branchForm(final HashMap level, final PdfIndirectReference parent, final String fname) throws IOException {
+    private PdfArray branchForm(final HashMap level, final PdfIndirectReference parent, final String fname) throws IOException {
         final PdfArray arr = new PdfArray();
         for (final Iterator it = level.entrySet().iterator(); it.hasNext();) {
             final Map.Entry entry = (Map.Entry) it.next();
@@ -347,7 +347,7 @@ class PdfCopyFieldsImp extends PdfWriter {
         return arr;
     }
 
-    protected void createAcroForms() throws IOException {
+    private void createAcroForms() throws IOException {
         if (this.fieldTree.isEmpty()) {
 			return;
 		}
@@ -391,7 +391,7 @@ class PdfCopyFieldsImp extends PdfWriter {
     /**
      * Creates the new PDF by merging the fields and forms.
      */
-    protected void closeIt() throws IOException {
+    private void closeIt() throws IOException {
         for (int k = 0; k < this.readers.size(); ++k) {
             ((PdfReader)this.readers.get(k)).removeFields();
         }
@@ -440,7 +440,7 @@ class PdfCopyFieldsImp extends PdfWriter {
         this.pdf.close();
     }
 
-    void addPageOffsetToField(final HashMap fd, final int pageOffset) {
+    private void addPageOffsetToField(final HashMap fd, final int pageOffset) {
         if (pageOffset == 0) {
 			return;
 		}
@@ -453,7 +453,7 @@ class PdfCopyFieldsImp extends PdfWriter {
         }
     }
 
-    void createWidgets(final ArrayList list, final AcroFields.Item item) {
+    private void createWidgets(final ArrayList list, final AcroFields.Item item) {
         for (int k = 0; k < item.size(); ++k) {
             list.add(item.getPage(k));
             final PdfDictionary merged = item.getMerged(k);
@@ -473,7 +473,7 @@ class PdfCopyFieldsImp extends PdfWriter {
         }
     }
 
-    void mergeField(final String name, final AcroFields.Item item) {
+    private void mergeField(final String name, final AcroFields.Item item) {
         HashMap map = this.fieldTree;
         final StringTokenizer tk = new StringTokenizer(name, ".");
         if (!tk.hasMoreTokens()) {
@@ -592,7 +592,7 @@ class PdfCopyFieldsImp extends PdfWriter {
         }
     }
 
-    protected PdfIndirectReference getNewReference(final PRIndirectReference ref) {
+    private PdfIndirectReference getNewReference(final PRIndirectReference ref) {
         return new PdfIndirectReference(0, getNewObjectNumber(ref.getReader(), ref.getNumber(), 0));
     }
 
@@ -627,7 +627,7 @@ class PdfCopyFieldsImp extends PdfWriter {
      * @param	ref	the reference that needs to be checked
      * @return	true if the reference was already visited
      */
-    protected boolean isVisited(final PRIndirectReference ref) {
+    private boolean isVisited(final PRIndirectReference ref) {
         final IntHashtable refs = (IntHashtable)this.visited.get(ref.getReader());
         if (refs != null) {
 			return refs.containsKey(ref.getNumber());
@@ -643,7 +643,7 @@ class PdfCopyFieldsImp extends PdfWriter {
      * @param	ref	the reference that needs to be checked
      * @return	true is the reference refers to a page object.
      */
-    protected boolean isPage(final PRIndirectReference ref) {
+    private boolean isPage(final PRIndirectReference ref) {
         final IntHashtable refs = (IntHashtable)this.pages2intrefs.get(ref.getReader());
         if (refs != null) {
 			return refs.containsKey(ref.getNumber());
@@ -663,7 +663,7 @@ class PdfCopyFieldsImp extends PdfWriter {
 		}
     }
 
-    protected static final HashMap widgetKeys = new HashMap();
+    private static final HashMap widgetKeys = new HashMap();
     protected static final HashMap fieldKeys = new HashMap();
     static {
         final Integer one = new Integer(1);

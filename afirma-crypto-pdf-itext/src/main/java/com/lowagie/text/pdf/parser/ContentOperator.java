@@ -54,7 +54,7 @@ import com.lowagie.text.pdf.PdfLiteral;
  * Interface implemented by a series of content operators
  * @since 2.1.4
  */
-public interface ContentOperator {
+interface ContentOperator {
     /**
      * Invokes a content operator.
      * @param processor	the processor that is dealing with the PDF content

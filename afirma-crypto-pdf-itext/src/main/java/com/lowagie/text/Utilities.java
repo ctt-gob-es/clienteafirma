@@ -151,7 +151,7 @@ public class Utilities {
 	 * @return a valid URL
 	 * @throws MalformedURLException
 	 */
-	public static URL toURL(final String filename) throws MalformedURLException {
+	static URL toURL(final String filename) throws MalformedURLException {
         try {
             return new URL(filename);
         }

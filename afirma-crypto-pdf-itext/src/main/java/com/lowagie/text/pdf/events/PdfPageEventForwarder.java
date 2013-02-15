@@ -68,27 +68,28 @@ import com.lowagie.text.pdf.PdfWriter;
 public class PdfPageEventForwarder implements PdfPageEvent {
 
 	/** ArrayList containing all the PageEvents that have to be executed. */
-	protected ArrayList events = new ArrayList();
-	
-	/** 
+	private final ArrayList events = new ArrayList();
+
+	/**
 	 * Add a page event to the forwarder.
 	 * @param event an event that has to be added to the forwarder.
 	 */
-	public void addPageEvent(PdfPageEvent event) {
-		events.add(event);
+	public void addPageEvent(final PdfPageEvent event) {
+		this.events.add(event);
 	}
-	
+
 	/**
 	 * Called when the document is opened.
-	 * 
+	 *
 	 * @param writer
 	 *            the <CODE>PdfWriter</CODE> for this document
 	 * @param document
 	 *            the document
 	 */
-	public void onOpenDocument(PdfWriter writer, Document document) {
+	@Override
+	public void onOpenDocument(final PdfWriter writer, final Document document) {
 		PdfPageEvent event;
-		for (Iterator i = events.iterator(); i.hasNext(); ) {
+		for (final Iterator i = this.events.iterator(); i.hasNext(); ) {
 			event = (PdfPageEvent)i.next();
 			event.onOpenDocument(writer, document);
 		}
@@ -99,15 +100,16 @@ public class PdfPageEventForwarder implements PdfPageEvent {
 	 * <P>
 	 * Note that if even if a page is not written this method is still called.
 	 * It is preferable to use <CODE>onEndPage</CODE> to avoid infinite loops.
-	 * 
+	 *
 	 * @param writer
 	 *            the <CODE>PdfWriter</CODE> for this document
 	 * @param document
 	 *            the document
 	 */
-	public void onStartPage(PdfWriter writer, Document document) {
+	@Override
+	public void onStartPage(final PdfWriter writer, final Document document) {
 		PdfPageEvent event;
-		for (Iterator i = events.iterator(); i.hasNext(); ) {
+		for (final Iterator i = this.events.iterator(); i.hasNext(); ) {
 			event = (PdfPageEvent)i.next();
 			event.onStartPage(writer, document);
 		}
@@ -116,15 +118,16 @@ public class PdfPageEventForwarder implements PdfPageEvent {
 	/**
 	 * Called when a page is finished, just before being written to the
 	 * document.
-	 * 
+	 *
 	 * @param writer
 	 *            the <CODE>PdfWriter</CODE> for this document
 	 * @param document
 	 *            the document
 	 */
-	public void onEndPage(PdfWriter writer, Document document) {
+	@Override
+	public void onEndPage(final PdfWriter writer, final Document document) {
 		PdfPageEvent event;
-		for (Iterator i = events.iterator(); i.hasNext(); ) {
+		for (final Iterator i = this.events.iterator(); i.hasNext(); ) {
 			event = (PdfPageEvent)i.next();
 			event.onEndPage(writer, document);
 		}
@@ -135,15 +138,16 @@ public class PdfPageEventForwarder implements PdfPageEvent {
 	 * <P>
 	 * Note that this method is called with the page number equal to the last
 	 * page plus one.
-	 * 
+	 *
 	 * @param writer
 	 *            the <CODE>PdfWriter</CODE> for this document
 	 * @param document
 	 *            the document
 	 */
-	public void onCloseDocument(PdfWriter writer, Document document) {
+	@Override
+	public void onCloseDocument(final PdfWriter writer, final Document document) {
 		PdfPageEvent event;
-		for (Iterator i = events.iterator(); i.hasNext(); ) {
+		for (final Iterator i = this.events.iterator(); i.hasNext(); ) {
 			event = (PdfPageEvent)i.next();
 			event.onCloseDocument(writer, document);
 		}
@@ -155,7 +159,7 @@ public class PdfPageEventForwarder implements PdfPageEvent {
 	 * <CODE>paragraphPosition</CODE> will hold the height at which the
 	 * paragraph will be written to. This is useful to insert bookmarks with
 	 * more control.
-	 * 
+	 *
 	 * @param writer
 	 *            the <CODE>PdfWriter</CODE> for this document
 	 * @param document
@@ -163,10 +167,11 @@ public class PdfPageEventForwarder implements PdfPageEvent {
 	 * @param paragraphPosition
 	 *            the position the paragraph will be written to
 	 */
-	public void onParagraph(PdfWriter writer, Document document,
-			float paragraphPosition) {
+	@Override
+	public void onParagraph(final PdfWriter writer, final Document document,
+			final float paragraphPosition) {
 		PdfPageEvent event;
-		for (Iterator i = events.iterator(); i.hasNext(); ) {
+		for (final Iterator i = this.events.iterator(); i.hasNext(); ) {
 			event = (PdfPageEvent)i.next();
 			event.onParagraph(writer, document, paragraphPosition);
 		}
@@ -177,7 +182,7 @@ public class PdfPageEventForwarder implements PdfPageEvent {
 	 * <P>
 	 * <CODE>paragraphPosition</CODE> will hold the height of the end of the
 	 * paragraph.
-	 * 
+	 *
 	 * @param writer
 	 *            the <CODE>PdfWriter</CODE> for this document
 	 * @param document
@@ -185,10 +190,11 @@ public class PdfPageEventForwarder implements PdfPageEvent {
 	 * @param paragraphPosition
 	 *            the position of the end of the paragraph
 	 */
-	public void onParagraphEnd(PdfWriter writer, Document document,
-			float paragraphPosition) {
+	@Override
+	public void onParagraphEnd(final PdfWriter writer, final Document document,
+			final float paragraphPosition) {
 		PdfPageEvent event;
-		for (Iterator i = events.iterator(); i.hasNext(); ) {
+		for (final Iterator i = this.events.iterator(); i.hasNext(); ) {
 			event = (PdfPageEvent)i.next();
 			event.onParagraphEnd(writer, document, paragraphPosition);
 		}
@@ -199,7 +205,7 @@ public class PdfPageEventForwarder implements PdfPageEvent {
 	 * <P>
 	 * <CODE>position</CODE> will hold the height at which the chapter will be
 	 * written to.
-	 * 
+	 *
 	 * @param writer
 	 *            the <CODE>PdfWriter</CODE> for this document
 	 * @param document
@@ -209,10 +215,11 @@ public class PdfPageEventForwarder implements PdfPageEvent {
 	 * @param title
 	 *            the title of the Chapter
 	 */
-	public void onChapter(PdfWriter writer, Document document,
-			float paragraphPosition, Paragraph title) {
+	@Override
+	public void onChapter(final PdfWriter writer, final Document document,
+			final float paragraphPosition, final Paragraph title) {
 		PdfPageEvent event;
-		for (Iterator i = events.iterator(); i.hasNext(); ) {
+		for (final Iterator i = this.events.iterator(); i.hasNext(); ) {
 			event = (PdfPageEvent)i.next();
 			event.onChapter(writer, document, paragraphPosition, title);
 		}
@@ -222,7 +229,7 @@ public class PdfPageEventForwarder implements PdfPageEvent {
 	 * Called when the end of a Chapter is reached.
 	 * <P>
 	 * <CODE>position</CODE> will hold the height of the end of the chapter.
-	 * 
+	 *
 	 * @param writer
 	 *            the <CODE>PdfWriter</CODE> for this document
 	 * @param document
@@ -230,9 +237,10 @@ public class PdfPageEventForwarder implements PdfPageEvent {
 	 * @param position
 	 *            the position of the end of the chapter.
 	 */
-	public void onChapterEnd(PdfWriter writer, Document document, float position) {
+	@Override
+	public void onChapterEnd(final PdfWriter writer, final Document document, final float position) {
 		PdfPageEvent event;
-		for (Iterator i = events.iterator(); i.hasNext(); ) {
+		for (final Iterator i = this.events.iterator(); i.hasNext(); ) {
 			event = (PdfPageEvent)i.next();
 			event.onChapterEnd(writer, document, position);
 		}
@@ -243,7 +251,7 @@ public class PdfPageEventForwarder implements PdfPageEvent {
 	 * <P>
 	 * <CODE>position</CODE> will hold the height at which the section will be
 	 * written to.
-	 * 
+	 *
 	 * @param writer
 	 *            the <CODE>PdfWriter</CODE> for this document
 	 * @param document
@@ -255,10 +263,11 @@ public class PdfPageEventForwarder implements PdfPageEvent {
 	 * @param title
 	 *            the title of the section
 	 */
-	public void onSection(PdfWriter writer, Document document,
-			float paragraphPosition, int depth, Paragraph title) {
+	@Override
+	public void onSection(final PdfWriter writer, final Document document,
+			final float paragraphPosition, final int depth, final Paragraph title) {
 		PdfPageEvent event;
-		for (Iterator i = events.iterator(); i.hasNext(); ) {
+		for (final Iterator i = this.events.iterator(); i.hasNext(); ) {
 			event = (PdfPageEvent)i.next();
 			event.onSection(writer, document, paragraphPosition, depth, title);
 		}
@@ -268,7 +277,7 @@ public class PdfPageEventForwarder implements PdfPageEvent {
 	 * Called when the end of a Section is reached.
 	 * <P>
 	 * <CODE>position</CODE> will hold the height of the section end.
-	 * 
+	 *
 	 * @param writer
 	 *            the <CODE>PdfWriter</CODE> for this document
 	 * @param document
@@ -276,9 +285,10 @@ public class PdfPageEventForwarder implements PdfPageEvent {
 	 * @param position
 	 *            the position of the end of the section
 	 */
-	public void onSectionEnd(PdfWriter writer, Document document, float position) {
+	@Override
+	public void onSectionEnd(final PdfWriter writer, final Document document, final float position) {
 		PdfPageEvent event;
-		for (Iterator i = events.iterator(); i.hasNext(); ) {
+		for (final Iterator i = this.events.iterator(); i.hasNext(); ) {
 			event = (PdfPageEvent)i.next();
 			event.onSectionEnd(writer, document, position);
 		}
@@ -289,7 +299,7 @@ public class PdfPageEventForwarder implements PdfPageEvent {
 	 * <P>
 	 * It is useful to pinpoint the <CODE>Chunk</CODE> location to generate
 	 * bookmarks, for example.
-	 * 
+	 *
 	 * @param writer
 	 *            the <CODE>PdfWriter</CODE> for this document
 	 * @param document
@@ -300,10 +310,11 @@ public class PdfPageEventForwarder implements PdfPageEvent {
 	 * @param text
 	 *            the text of the tag
 	 */
-	public void onGenericTag(PdfWriter writer, Document document,
-			Rectangle rect, String text) {
+	@Override
+	public void onGenericTag(final PdfWriter writer, final Document document,
+			final Rectangle rect, final String text) {
 		PdfPageEvent event;
-		for (Iterator i = events.iterator(); i.hasNext(); ) {
+		for (final Iterator i = this.events.iterator(); i.hasNext(); ) {
 			event = (PdfPageEvent)i.next();
 			event.onGenericTag(writer, document, rect, text);
 		}

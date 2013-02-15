@@ -58,32 +58,19 @@ import com.lowagie.text.ExceptionConverter;
  * page visually on the screen or in print.
  * @author  Paulo Soares (psoares@consiste.pt)
  */
-public class PdfPageLabels {
+class PdfPageLabels {
 
     /** Logical pages will have the form 1,2,3,...
      */
-    public static final int DECIMAL_ARABIC_NUMERALS = 0;
-    /** Logical pages will have the form I,II,III,IV,...
-     */
-    public static final int UPPERCASE_ROMAN_NUMERALS = 1;
-    /** Logical pages will have the form i,ii,iii,iv,...
-     */
-    public static final int LOWERCASE_ROMAN_NUMERALS = 2;
-    /** Logical pages will have the form of uppercase letters
-     * (A to Z for the first 26 pages, AA to ZZ for the next 26, and so on)
-     */
-    public static final int UPPERCASE_LETTERS = 3;
-    /** Logical pages will have the form of uppercase letters
-     * (a to z for the first 26 pages, aa to zz for the next 26, and so on)
-     */
-    public static final int LOWERCASE_LETTERS = 4;
-    /** No logical page numbers are generated but fixed text may
-     * still exist
-     */
-    public static final int EMPTY = 5;
+    private static final int DECIMAL_ARABIC_NUMERALS = 0;
+
+
+
+
+
     /** Dictionary values to set the logical page styles
      */
-    static PdfName numberingStyle[] = new PdfName[]{PdfName.D, PdfName.R,
+    private static PdfName numberingStyle[] = new PdfName[]{PdfName.D, PdfName.R,
                 new PdfName("r"), PdfName.A, new PdfName("a")};
     /** The sequence of logical pages. Will contain at least a value for page 1
      */
@@ -102,7 +89,7 @@ public class PdfPageLabels {
      * @param text the text to prefix the number. Can be <CODE>null</CODE> or empty
      * @param firstPage the first logical page number
      */
-    public void addPageLabel(final int page, final int numberStyle, final String text, final int firstPage) {
+    private void addPageLabel(final int page, final int numberStyle, final String text, final int firstPage) {
         if (page < 1 || firstPage < 1) {
 			throw new IllegalArgumentException("In a page label the page numbers must be greater or equal to 1.");
 		}

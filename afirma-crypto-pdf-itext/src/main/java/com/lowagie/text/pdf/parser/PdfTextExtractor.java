@@ -57,20 +57,20 @@ import com.lowagie.text.pdf.RandomAccessFileOrArray;
  * Extracts text from a PDF file.
  * @since	2.1.4
  */
-public class PdfTextExtractor {
+class PdfTextExtractor {
 
 	/** The PdfReader that holds the PDF file. */
     private final PdfReader reader;
     /** The processor that will extract the text. */
     private final SimpleTextExtractingPdfContentStreamProcessor extractionProcessor;
-    
+
     /**
      * Creates a new Text Extractor object.
      * @param reader	the reader with the PDF
      */
-    public PdfTextExtractor(PdfReader reader) {
+    public PdfTextExtractor(final PdfReader reader) {
         this.reader = reader;
-        extractionProcessor = new SimpleTextExtractingPdfContentStreamProcessor();
+        this.extractionProcessor = new SimpleTextExtractingPdfContentStreamProcessor();
     }
 
     /**
@@ -79,23 +79,23 @@ public class PdfTextExtractor {
      * @return	a byte array with the content stream of a page
      * @throws IOException
      */
-    private byte[] getContentBytesForPage(int pageNum) throws IOException {
-        RandomAccessFileOrArray f = reader.getSafeFile();
-        byte[] contentBytes = reader.getPageContent(pageNum, f);
+    private byte[] getContentBytesForPage(final int pageNum) throws IOException {
+        final RandomAccessFileOrArray f = this.reader.getSafeFile();
+        final byte[] contentBytes = this.reader.getPageContent(pageNum, f);
         f.close();
         return contentBytes;
     }
-    
+
     /**
      * Gets the text from a page.
      * @param page	the page number of the page
      * @return	a String with the content as plain text (without PDF syntax)
      * @throws IOException
      */
-    public String getTextFromPage(int page) throws IOException {
-        PdfDictionary pageDic = reader.getPageN(page);
-        PdfDictionary resourcesDic = pageDic.getAsDict(PdfName.RESOURCES);
-        extractionProcessor.processContent(getContentBytesForPage(page), resourcesDic);        
-        return extractionProcessor.getResultantText();
+    public String getTextFromPage(final int page) throws IOException {
+        final PdfDictionary pageDic = this.reader.getPageN(page);
+        final PdfDictionary resourcesDic = pageDic.getAsDict(PdfName.RESOURCES);
+        this.extractionProcessor.processContent(getContentBytesForPage(page), resourcesDic);
+        return this.extractionProcessor.getResultantText();
     }
 }

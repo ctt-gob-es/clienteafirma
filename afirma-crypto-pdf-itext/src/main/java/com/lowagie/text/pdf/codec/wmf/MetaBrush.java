@@ -51,43 +51,43 @@ package com.lowagie.text.pdf.codec.wmf;
 import java.awt.Color;
 import java.io.IOException;
 
-public class MetaBrush extends MetaObject {
+class MetaBrush extends MetaObject {
 
-    public static final int BS_SOLID = 0;
-    public static final int BS_NULL = 1;
-    public static final int BS_HATCHED = 2;
-    public static final int BS_PATTERN = 3;
-    public static final int BS_DIBPATTERN = 5;
-    public static final int HS_HORIZONTAL = 0;
-    public static final int HS_VERTICAL = 1;
-    public static final int HS_FDIAGONAL = 2;
-    public static final int HS_BDIAGONAL = 3;
-    public static final int HS_CROSS = 4;
-    public static final int HS_DIAGCROSS = 5;
+    static final int BS_SOLID = 0;
 
-    int style = BS_SOLID;
-    int hatch;
-    Color color = Color.white;
+    static final int BS_HATCHED = 2;
+
+
+
+
+
+
+
+
+
+    private int style = BS_SOLID;
+    private int hatch;
+    private Color color = Color.white;
 
     public MetaBrush() {
-        type = META_BRUSH;
+        this.type = META_BRUSH;
     }
 
-    public void init(InputMeta in) throws IOException {
-        style = in.readWord();
-        color = in.readColor();
-        hatch = in.readWord();
+    public void init(final InputMeta in) throws IOException {
+        this.style = in.readWord();
+        this.color = in.readColor();
+        this.hatch = in.readWord();
     }
-    
+
     public int getStyle() {
-        return style;
+        return this.style;
     }
-    
+
     public int getHatch() {
-        return hatch;
+        return this.hatch;
     }
-    
+
     public Color getColor() {
-        return color;
+        return this.color;
     }
 }

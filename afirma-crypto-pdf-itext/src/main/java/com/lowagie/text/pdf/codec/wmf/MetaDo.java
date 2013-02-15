@@ -65,74 +65,74 @@ import com.lowagie.text.pdf.codec.BmpImage;
 
 public class MetaDo {
 
-    public static final int META_SETBKCOLOR            = 0x0201;
-    public static final int META_SETBKMODE             = 0x0102;
-    public static final int META_SETMAPMODE            = 0x0103;
-    public static final int META_SETROP2               = 0x0104;
-    public static final int META_SETRELABS             = 0x0105;
-    public static final int META_SETPOLYFILLMODE       = 0x0106;
-    public static final int META_SETSTRETCHBLTMODE     = 0x0107;
-    public static final int META_SETTEXTCHAREXTRA      = 0x0108;
-    public static final int META_SETTEXTCOLOR          = 0x0209;
-    public static final int META_SETTEXTJUSTIFICATION  = 0x020A;
-    public static final int META_SETWINDOWORG          = 0x020B;
-    public static final int META_SETWINDOWEXT          = 0x020C;
-    public static final int META_SETVIEWPORTORG        = 0x020D;
-    public static final int META_SETVIEWPORTEXT        = 0x020E;
-    public static final int META_OFFSETWINDOWORG       = 0x020F;
-    public static final int META_SCALEWINDOWEXT        = 0x0410;
-    public static final int META_OFFSETVIEWPORTORG     = 0x0211;
-    public static final int META_SCALEVIEWPORTEXT      = 0x0412;
-    public static final int META_LINETO                = 0x0213;
-    public static final int META_MOVETO                = 0x0214;
-    public static final int META_EXCLUDECLIPRECT       = 0x0415;
-    public static final int META_INTERSECTCLIPRECT     = 0x0416;
-    public static final int META_ARC                   = 0x0817;
-    public static final int META_ELLIPSE               = 0x0418;
-    public static final int META_FLOODFILL             = 0x0419;
-    public static final int META_PIE                   = 0x081A;
-    public static final int META_RECTANGLE             = 0x041B;
-    public static final int META_ROUNDRECT             = 0x061C;
-    public static final int META_PATBLT                = 0x061D;
-    public static final int META_SAVEDC                = 0x001E;
-    public static final int META_SETPIXEL              = 0x041F;
-    public static final int META_OFFSETCLIPRGN         = 0x0220;
-    public static final int META_TEXTOUT               = 0x0521;
-    public static final int META_BITBLT                = 0x0922;
-    public static final int META_STRETCHBLT            = 0x0B23;
-    public static final int META_POLYGON               = 0x0324;
-    public static final int META_POLYLINE              = 0x0325;
-    public static final int META_ESCAPE                = 0x0626;
-    public static final int META_RESTOREDC             = 0x0127;
+    private static final int META_SETBKCOLOR            = 0x0201;
+    private static final int META_SETBKMODE             = 0x0102;
 
-    public static final int META_SELECTOBJECT          = 0x012D;
-    public static final int META_SETTEXTALIGN          = 0x012E;
-    public static final int META_CHORD                 = 0x0830;
-    public static final int META_SETMAPPERFLAGS        = 0x0231;
-    public static final int META_EXTTEXTOUT            = 0x0a32;
 
-    public static final int META_POLYPOLYGON           = 0x0538;
 
-    public static final int META_DIBSTRETCHBLT         = 0x0b41;
-    public static final int META_DIBCREATEPATTERNBRUSH = 0x0142;
-    public static final int META_STRETCHDIB            = 0x0f43;
+    private static final int META_SETPOLYFILLMODE       = 0x0106;
 
-    public static final int META_DELETEOBJECT          = 0x01f0;
-    public static final int META_CREATEPALETTE         = 0x00f7;
 
-    public static final int META_CREATEPENINDIRECT     = 0x02FA;
-    public static final int META_CREATEFONTINDIRECT    = 0x02FB;
-    public static final int META_CREATEBRUSHINDIRECT   = 0x02FC;
-    public static final int META_CREATEREGION          = 0x06FF;
+    private static final int META_SETTEXTCOLOR          = 0x0209;
 
-    public PdfContentByte cb;
-    public InputMeta in;
-    int left;
-    int top;
-    int right;
-    int bottom;
-    int inch;
-    MetaState state = new MetaState();
+    private static final int META_SETWINDOWORG          = 0x020B;
+    private static final int META_SETWINDOWEXT          = 0x020C;
+
+
+
+
+
+
+    private static final int META_LINETO                = 0x0213;
+    private static final int META_MOVETO                = 0x0214;
+
+    private static final int META_INTERSECTCLIPRECT     = 0x0416;
+    private static final int META_ARC                   = 0x0817;
+    private static final int META_ELLIPSE               = 0x0418;
+
+    private static final int META_PIE                   = 0x081A;
+    private static final int META_RECTANGLE             = 0x041B;
+    private static final int META_ROUNDRECT             = 0x061C;
+
+    private static final int META_SAVEDC                = 0x001E;
+    private static final int META_SETPIXEL              = 0x041F;
+
+    private static final int META_TEXTOUT               = 0x0521;
+
+
+    private static final int META_POLYGON               = 0x0324;
+    private static final int META_POLYLINE              = 0x0325;
+
+    private static final int META_RESTOREDC             = 0x0127;
+
+    private static final int META_SELECTOBJECT          = 0x012D;
+    private static final int META_SETTEXTALIGN          = 0x012E;
+    private static final int META_CHORD                 = 0x0830;
+
+    private static final int META_EXTTEXTOUT            = 0x0a32;
+
+    private static final int META_POLYPOLYGON           = 0x0538;
+
+    private static final int META_DIBSTRETCHBLT         = 0x0b41;
+    private static final int META_DIBCREATEPATTERNBRUSH = 0x0142;
+    private static final int META_STRETCHDIB            = 0x0f43;
+
+    private static final int META_DELETEOBJECT          = 0x01f0;
+    private static final int META_CREATEPALETTE         = 0x00f7;
+
+    private static final int META_CREATEPENINDIRECT     = 0x02FA;
+    private static final int META_CREATEFONTINDIRECT    = 0x02FB;
+    private static final int META_CREATEBRUSHINDIRECT   = 0x02FC;
+    private static final int META_CREATEREGION          = 0x06FF;
+
+    private final PdfContentByte cb;
+    private final InputMeta in;
+    private int left;
+    private int top;
+    private int right;
+    private int bottom;
+    private int inch;
+    private final MetaState state = new MetaState();
 
     public MetaDo(final InputStream in, final PdfContentByte cb) {
         this.cb = cb;

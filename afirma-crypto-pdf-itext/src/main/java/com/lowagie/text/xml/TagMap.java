@@ -67,48 +67,48 @@ import com.lowagie.text.ExceptionConverter;
  * The <CODE>Tags</CODE>-class maps several XHTML-tags to iText-objects.
  */
 
-public class TagMap extends HashMap {
+class TagMap extends HashMap {
 
     private static final long serialVersionUID = -6809383366554350820L;
 
-	class AttributeHandler extends DefaultHandler {
-        
+	private class AttributeHandler extends DefaultHandler {
+
 /** This is a tag */
-        public static final String TAG = "tag";
-        
+        private static final String TAG = "tag";
+
 /** This is a tag */
-        public static final String ATTRIBUTE = "attribute";
-        
+        private static final String ATTRIBUTE = "attribute";
+
 /** This is an attribute */
-        public static final String NAME = "name";
-        
+        private static final String NAME = "name";
+
 /** This is an attribute */
-        public static final String ALIAS = "alias";
-        
+        private static final String ALIAS = "alias";
+
 /** This is an attribute */
-        public static final String VALUE = "value";
-        
+        private static final String VALUE = "value";
+
 /** This is an attribute */
-        public static final String CONTENT = "content";
-        
+        private static final String CONTENT = "content";
+
 /** This is the tagmap using the AttributeHandler */
-        private HashMap tagMap;
-        
+        private final HashMap tagMap;
+
 /** This is the current peer. */
         private XmlPeer currentPeer;
-        
+
 /**
  * Constructs a new SAXiTextHandler that will translate all the events
  * triggered by the parser to actions on the <CODE>Document</CODE>-object.
  *
  * @param	tagMap  A Hashmap containing XmlPeer-objects
  */
-        
-        public AttributeHandler(HashMap tagMap) {
+
+        private AttributeHandler(final HashMap tagMap) {
             super();
             this.tagMap = tagMap;
         }
-        
+
 /**
  * This method gets called when a start tag is encountered.
  *
@@ -117,30 +117,31 @@ public class TagMap extends HashMap {
  * @param	tag 		the name of the tag that is encountered
  * @param	attrs		the list of attributes
  */
-        
-        public void startElement(String uri, String lname, String tag, Attributes attrs) {
-            String name = attrs.getValue(NAME);
-            String alias = attrs.getValue(ALIAS);
+
+        @Override
+		public void startElement(final String uri, final String lname, final String tag, final Attributes attrs) {
+            final String name = attrs.getValue(NAME);
+            final String alias = attrs.getValue(ALIAS);
             String value = attrs.getValue(VALUE);
             if (name != null) {
                 if(TAG.equals(tag)) {
-                    currentPeer = new XmlPeer(name, alias);
+                    this.currentPeer = new XmlPeer(name, alias);
                 }
                 else if (ATTRIBUTE.equals(tag)) {
                     if (alias != null) {
-                        currentPeer.addAlias(name, alias);
+                        this.currentPeer.addAlias(name, alias);
                     }
                     if (value != null) {
-                        currentPeer.addValue(name, value);
+                        this.currentPeer.addValue(name, value);
                     }
                 }
             }
             value = attrs.getValue(CONTENT);
             if (value != null) {
-                currentPeer.setContent(value);
+                this.currentPeer.setContent(value);
             }
         }
-        
+
 /**
  * This method gets called when ignorable white space encountered.
  *
@@ -148,11 +149,12 @@ public class TagMap extends HashMap {
  * @param	start	the start position in the array
  * @param	length	the number of characters to read from the array
  */
-        
-        public void ignorableWhitespace(char[] ch, int start, int length) {
+
+        @Override
+		public void ignorableWhitespace(final char[] ch, final int start, final int length) {
             // do nothing
         }
-        
+
 /**
  * This method gets called when characters are encountered.
  *
@@ -160,11 +162,12 @@ public class TagMap extends HashMap {
  * @param	start	the start position in the array
  * @param	length	the number of characters to read from the array
  */
-        
-        public void characters(char[] ch, int start, int length) {
+
+        @Override
+		public void characters(final char[] ch, final int start, final int length) {
             // do nothing
         }
-        
+
 /**
  * This method gets called when an end tag is encountered.
  *
@@ -172,25 +175,27 @@ public class TagMap extends HashMap {
  * @param   lname 		the local name (without prefix), or the empty string if Namespace processing is not being performed.
  * @param	tag		the name of the tag that ends
  */
-        
-        public void endElement(String uri, String lname, String tag) {
-            if (TAG.equals(tag))
-                tagMap.put(currentPeer.getAlias(), currentPeer);
+
+        @Override
+		public void endElement(final String uri, final String lname, final String tag) {
+            if (TAG.equals(tag)) {
+				this.tagMap.put(this.currentPeer.getAlias(), this.currentPeer);
+			}
         }
     }
-    
+
     /**
      * Constructs a TagMap
      * @param tagfile the path to an XML file with the tagmap
      */
-    public TagMap(String tagfile) {
+    public TagMap(final String tagfile) {
         super();
         try {
             init(TagMap.class.getClassLoader().getResourceAsStream(tagfile));
-        }catch(Exception e) {
+        }catch(final Exception e) {
         	try {
 				init(new FileInputStream(tagfile));
-			} catch (FileNotFoundException fnfe) {
+			} catch (final FileNotFoundException fnfe) {
 				throw new ExceptionConverter(fnfe);
 			}
         }
@@ -200,17 +205,17 @@ public class TagMap extends HashMap {
      * Constructs a TagMap.
      * @param in	An InputStream with the tagmap xml
      */
-    public TagMap(InputStream in) {
+    public TagMap(final InputStream in) {
         super();
         init(in);
     }
 
-    protected void init(InputStream in) {
+    private void init(final InputStream in) {
         try {
-            SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
+            final SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
             parser.parse(new InputSource(in), new AttributeHandler(this));
         }
-        catch(Exception e) {
+        catch(final Exception e) {
             throw new ExceptionConverter(e);
         }
     }

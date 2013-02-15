@@ -132,19 +132,19 @@ public class PdfChunk {
  * This attributes do not require the measurement of characters widths when rendering
  * such as Color.
  */
-    protected HashMap noStroke = new HashMap();
+    private HashMap noStroke = new HashMap();
 
 /** <CODE>true</CODE> if the chunk split was cause by a newline. */
-    protected boolean newlineSplit;
+    private boolean newlineSplit;
 
 /** The image in this <CODE>PdfChunk</CODE>, if it has one */
-    protected Image image;
+    private Image image;
 
 /** The offset in the x direction for the image */
-    protected float offsetX;
+    private float offsetX;
 
 /** The offset in the y direction for the image */
-    protected float offsetY;
+    private float offsetY;
 
 /** Indicates if the height and offset of the Image has to be taken into account */
     protected boolean changeLeading = false;
@@ -799,7 +799,7 @@ public class PdfChunk {
  * @param	string		the <CODE>String<CODE> that has to be trimmed.
  * @return	the trimmed <CODE>String</CODE>
  */
-    String trim(String string) {
+    private String trim(String string) {
         final BaseFont ft = this.font.getFont();
         if (ft.getFontType() == BaseFont.FONT_TYPE_CJK && ft.getUnicodeEquivalent(' ') != ' ') {
             while (string.endsWith("\u0001")) {
@@ -823,7 +823,7 @@ public class PdfChunk {
         return this.font.width(c);
     }
 
-    public static boolean noPrint(final int c) {
+    static boolean noPrint(final int c) {
         return c >= 0x200b && c <= 0x200f || c >= 0x202a && c <= 0x202e;
     }
 

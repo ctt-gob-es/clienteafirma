@@ -1803,9 +1803,7 @@ class PdfDocument extends Document {
         this.annotationsImp.setSigFlags(f);
     }
 
-    void addCalculationOrder(final PdfFormField formField) {
-        this.annotationsImp.addCalculationOrder(formField);
-    }
+
 
     void addAnnotation(final PdfAnnotation annot) {
         this.pageEmpty = false;

@@ -101,7 +101,7 @@ public class CMap
      *
      * @throws IOException if the src is invalid.
      */
-    public void addMapping( final byte[] src, final String dest ) throws IOException
+    void addMapping( final byte[] src, final String dest ) throws IOException
     {
         if( src.length == 1 )
         {
@@ -126,7 +126,7 @@ public class CMap
      *
      * @param range A single codespace range.
      */
-    public void addCodespaceRange( final CodespaceRange range )
+    void addCodespaceRange( final CodespaceRange range )
     {
         this.codeSpaceRanges.add( range );
     }

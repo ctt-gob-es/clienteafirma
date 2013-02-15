@@ -57,20 +57,20 @@ import java.util.NoSuchElementException;
  * This class was originally written by wil - amristar.com.au
  * and integrated into iText by Bruno.
  */
-public class PolylineShapeIterator implements PathIterator {
+class PolylineShapeIterator implements PathIterator {
 	/** The polyline over which we are going to iterate. */
-	protected PolylineShape poly;
+	private final PolylineShape poly;
 	/** an affine transformation to be performed on the polyline. */
-	protected AffineTransform affine;
+	private final AffineTransform affine;
 	/** the index of the current segment in the iterator. */
-	protected int index;
-	
+	private int index;
+
 	/** Creates a PolylineShapeIterator. */
-	PolylineShapeIterator(PolylineShape l, AffineTransform at) {
+	PolylineShapeIterator(final PolylineShape l, final AffineTransform at) {
 		this.poly = l;
 		this.affine = at;
 	}
-	
+
 	/**
 	 * Returns the coordinates and type of the current path segment in
 	 * the iteration. The return value is the path segment type:
@@ -89,19 +89,20 @@ public class PolylineShapeIterator implements PathIterator {
 	 * @see #SEG_CLOSE
 	 * @see java.awt.geom.PathIterator#currentSegment(double[])
 	 */
-	public int currentSegment(double[] coords) {
+	@Override
+	public int currentSegment(final double[] coords) {
 		if (isDone()) {
 			throw new NoSuchElementException("line iterator out of bounds");
 		}
-		int type = (index==0)?SEG_MOVETO:SEG_LINETO;
-		coords[0] = poly.x[index];
-		coords[1] = poly.y[index];
-		if (affine != null) {
-			affine.transform(coords, 0, coords, 0, 1);
+		final int type = this.index==0?SEG_MOVETO:SEG_LINETO;
+		coords[0] = this.poly.x[this.index];
+		coords[1] = this.poly.y[this.index];
+		if (this.affine != null) {
+			this.affine.transform(coords, 0, coords, 0, 1);
 		}
 		return type;
 	}
-	
+
 	/**
 	 * Returns the coordinates and type of the current path segment in
 	 * the iteration. The return value is the path segment type:
@@ -120,15 +121,16 @@ public class PolylineShapeIterator implements PathIterator {
 	 * @see #SEG_CLOSE
 	 * @see java.awt.geom.PathIterator#currentSegment(float[])
 	 */
-	public int currentSegment(float[] coords) {
+	@Override
+	public int currentSegment(final float[] coords) {
 		if (isDone()) {
 			throw new NoSuchElementException("line iterator out of bounds");
 		}
-		int type = (index==0)?SEG_MOVETO:SEG_LINETO;
-		coords[0] = poly.x[index];
-		coords[1] = poly.y[index];
-		if (affine != null) {
-			affine.transform(coords, 0, coords, 0, 1);
+		final int type = this.index==0?SEG_MOVETO:SEG_LINETO;
+		coords[0] = this.poly.x[this.index];
+		coords[1] = this.poly.y[this.index];
+		if (this.affine != null) {
+			this.affine.transform(coords, 0, coords, 0, 1);
 		}
 		return type;
 	}
@@ -140,6 +142,7 @@ public class PolylineShapeIterator implements PathIterator {
 	 * @see #WIND_NON_ZERO
 	 * @see java.awt.geom.PathIterator#getWindingRule()
 	 */
+	@Override
 	public int getWindingRule() {
 		return WIND_NON_ZERO;
 	}
@@ -149,8 +152,9 @@ public class PolylineShapeIterator implements PathIterator {
 	 * @return true if there are more points to read
 	 * @see java.awt.geom.PathIterator#isDone()
 	 */
+	@Override
 	public boolean isDone() {
-		return (index >= poly.np);
+		return this.index >= this.poly.np;
 	}
 
 	/**
@@ -159,8 +163,9 @@ public class PolylineShapeIterator implements PathIterator {
 	 * more points in that direction.
 	 * @see java.awt.geom.PathIterator#next()
 	 */
+	@Override
 	public void next() {
-		index++;
+		this.index++;
 	}
 
 }

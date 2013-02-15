@@ -54,8 +54,8 @@ import java.io.OutputStream;
  */
 public class OutputStreamCounter extends OutputStream {
 
-    protected OutputStream out;
-    protected int counter = 0;
+    private final OutputStream out;
+    private int counter = 0;
 
     /** Creates a new instance of OutputStreamCounter */
     public OutputStreamCounter(final OutputStream out) {

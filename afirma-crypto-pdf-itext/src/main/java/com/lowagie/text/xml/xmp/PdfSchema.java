@@ -54,20 +54,19 @@ import com.lowagie.text.Document;
 /**
  * An implementation of an XmpSchema.
  */
-public class PdfSchema extends XmpSchema {
+class PdfSchema extends XmpSchema {
 
 	private static final long serialVersionUID = -1541148669123992185L;
 	/** default namespace identifier*/
-	public static final String DEFAULT_XPATH_ID = "pdf";
+	private static final String DEFAULT_XPATH_ID = "pdf";
 	/** default namespace uri*/
-	public static final String DEFAULT_XPATH_URI = "http://ns.adobe.com/pdf/1.3/";
+	private static final String DEFAULT_XPATH_URI = "http://ns.adobe.com/pdf/1.3/";
 
 	/** Keywords. */
-	public static final String KEYWORDS = "pdf:keywords";
-	/** The PDF file version (for example: 1.0, 1.3, and so on). */
-	public static final String VERSION = "pdf:PDFVersion";
+	private static final String KEYWORDS = "pdf:keywords";
+
 	/** The Producer. */
-	public static final String PRODUCER = "pdf:Producer";
+	private static final String PRODUCER = "pdf:Producer";
 
 
 	public PdfSchema() {

@@ -12,23 +12,18 @@ import com.lowagie.text.pdf.PdfString;
  * @author blowagie
  *
  */
-public class PdfCollectionField extends PdfDictionary {
+class PdfCollectionField extends PdfDictionary {
 	/** A possible type of collection field. */
-	public static final int TEXT = 0;
+	private static final int TEXT = 0;
 	/** A possible type of collection field. */
 	public static final int DATE = 1;
 	/** A possible type of collection field. */
 	public static final int NUMBER = 2;
-	/** A possible type of collection field. */
-	public static final int FILENAME = 3;
-	/** A possible type of collection field. */
-	public static final int DESC = 4;
-	/** A possible type of collection field. */
-	public static final int MODDATE = 5;
-	/** A possible type of collection field. */
-	public static final int CREATIONDATE = 6;
-	/** A possible type of collection field. */
-	public static final int SIZE = 7;
+
+
+
+
+
 
 	/**
 	 * The type of the PDF collection field.

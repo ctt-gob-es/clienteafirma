@@ -53,44 +53,34 @@ package com.lowagie.text.xml.xmp;
 /**
  * An implementation of an XmpSchema.
  */
-public class DublinCoreSchema extends XmpSchema {
+class DublinCoreSchema extends XmpSchema {
 
 	private static final long serialVersionUID = -4551741356374797330L;
 	/** default namespace identifier*/
-	public static final String DEFAULT_XPATH_ID = "dc";
+	private static final String DEFAULT_XPATH_ID = "dc";
 	/** default namespace uri*/
-	public static final String DEFAULT_XPATH_URI = "http://purl.org/dc/elements/1.1/";
+	private static final String DEFAULT_XPATH_URI = "http://purl.org/dc/elements/1.1/";
 
-	/** External Contributors to the resource (other than the authors). */
-	public static final String CONTRIBUTOR = "dc:contributor";
-	/** The extent or scope of the resource. */
-	public static final String COVERAGE = "dc:coverage";
+
+
 	/** The authors of the resource (listed in order of precedence, if significant). */
-	public static final String CREATOR = "dc:creator";
-	/** Date(s) that something interesting happened to the resource. */
-	public static final String DATE = "dc:date";
+	private static final String CREATOR = "dc:creator";
+
 	/** A textual description of the content of the resource. Multiple values may be present for different languages. */
-	public static final String DESCRIPTION = "dc:description";
+	private static final String DESCRIPTION = "dc:description";
 	/** The file format used when saving the resource. Tools and applications should set this property to the save format of the data. It may include appropriate qualifiers. */
-	public static final String FORMAT = "dc:format";
-	/** Unique identifier of the resource. */
-	public static final String IDENTIFIER = "dc:identifier";
-	/** An unordered array specifying the languages used in the	resource. */
-	public static final String LANGUAGE = "dc:language";
-	/** Publishers. */
-	public static final String PUBLISHER = "dc:publisher";
-	/** Relationships to other documents. */
-	public static final String RELATION = "dc:relation";
-	/** Informal rights statement, selected by language. */
-	public static final String RIGHTS = "dc:rights";
-	/** Unique identifier of the work from which this resource was derived. */
-	public static final String SOURCE = "dc:source";
+	private static final String FORMAT = "dc:format";
+
+
+
+
+
+
 	/** An unordered array of descriptive phrases or keywords that specify the topic of the content of the resource. */
-	public static final String SUBJECT = "dc:subject";
+	private static final String SUBJECT = "dc:subject";
 	/** The title of the document, or the name given to the resource. Typically, it will be a name by which the resource is formally known. */
-	public static final String TITLE = "dc:title";
-	/** A document type; for example, novel, poem, or working paper. */
-	public static final String TYPE = "dc:type";
+	private static final String TITLE = "dc:title";
+
 
 
 	public DublinCoreSchema() {

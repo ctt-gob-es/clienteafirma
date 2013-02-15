@@ -58,51 +58,49 @@ import com.lowagie.text.Rectangle;
 /** Common field variables.
  * @author Paulo Soares (psoares@consiste.pt)
  */
-public abstract class BaseField {
+abstract class BaseField {
 
     /** A thin border with 1 point width. */
-    public static final float BORDER_WIDTH_THIN = 1;
-    /** A medium border with 2 point width. */
-    public static final float BORDER_WIDTH_MEDIUM = 2;
-    /** A thick border with 3 point width. */
-    public static final float BORDER_WIDTH_THICK = 3;
+    private static final float BORDER_WIDTH_THIN = 1;
+
+
     /** The field is visible. */
-    public static final int VISIBLE = 0;
+    static final int VISIBLE = 0;
     /** The field is hidden. */
     public static final int HIDDEN = 1;
     /** The field is visible but does not print. */
-    public static final int VISIBLE_BUT_DOES_NOT_PRINT = 2;
+    static final int VISIBLE_BUT_DOES_NOT_PRINT = 2;
     /** The field is hidden but is printable. */
-    public static final int HIDDEN_BUT_PRINTABLE = 3;
+    static final int HIDDEN_BUT_PRINTABLE = 3;
     /** The user may not change the value of the field. */
-    public static final int READ_ONLY = PdfFormField.FF_READ_ONLY;
+    static final int READ_ONLY = PdfFormField.FF_READ_ONLY;
     /** The field must have a value at the time it is exported by a submit-form
      * action.
      */
-    public static final int REQUIRED = PdfFormField.FF_REQUIRED;
+    static final int REQUIRED = PdfFormField.FF_REQUIRED;
     /** The field may contain multiple lines of text.
      * This flag is only meaningful with text fields.
      */
-    public static final int MULTILINE = PdfFormField.FF_MULTILINE;
+    static final int MULTILINE = PdfFormField.FF_MULTILINE;
     /** The field will not scroll (horizontally for single-line
      * fields, vertically for multiple-line fields) to accommodate more text
      * than will fit within its annotation rectangle. Once the field is full, no
      * further text will be accepted.
      */
-    public static final int DO_NOT_SCROLL = PdfFormField.FF_DONOTSCROLL;
+    static final int DO_NOT_SCROLL = PdfFormField.FF_DONOTSCROLL;
     /** The field is intended for entering a secure password that should
      * not be echoed visibly to the screen.
      */
-    public static final int PASSWORD = PdfFormField.FF_PASSWORD;
+    static final int PASSWORD = PdfFormField.FF_PASSWORD;
     /** The text entered in the field represents the pathname of
      * a file whose contents are to be submitted as the value of the field.
      */
-    public static final int FILE_SELECTION = PdfFormField.FF_FILESELECT;
+    static final int FILE_SELECTION = PdfFormField.FF_FILESELECT;
     /** The text entered in the field will not be spell-checked.
      * This flag is meaningful only in text fields and in combo
      * fields with the <CODE>EDIT</CODE> flag set.
      */
-    public static final int DO_NOT_SPELL_CHECK = PdfFormField.FF_DONOTSPELLCHECK;
+    static final int DO_NOT_SPELL_CHECK = PdfFormField.FF_DONOTSPELLCHECK;
     /** If set the combo box includes an editable text box as well as a drop list; if
      * clear, it includes only a drop list.
      * This flag is only meaningful with combo fields.
@@ -119,7 +117,7 @@ public abstract class BaseField {
     protected Color borderColor;
     protected Color backgroundColor;
     protected Color textColor;
-    protected BaseFont font;
+    private BaseFont font;
     protected float fontSize = 0;
     protected int alignment = Element.ALIGN_LEFT;
     protected PdfWriter writer;

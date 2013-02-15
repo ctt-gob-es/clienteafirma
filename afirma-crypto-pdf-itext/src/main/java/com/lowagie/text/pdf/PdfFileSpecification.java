@@ -120,7 +120,7 @@ public class PdfFileSpecification extends PdfDictionary {
      * @return the file specification
      * @since	2.1.3
      */
-    public static PdfFileSpecification fileEmbedded(final PdfWriter writer, final String filePath, final String fileDisplay, final byte fileStore[], final String mimeType, final PdfDictionary fileParameter, final int compressionLevel) throws IOException {
+    private static PdfFileSpecification fileEmbedded(final PdfWriter writer, final String filePath, final String fileDisplay, final byte fileStore[], final String mimeType, final PdfDictionary fileParameter, final int compressionLevel) throws IOException {
         final PdfFileSpecification fs = new PdfFileSpecification();
         fs.writer = writer;
         fs.put(PdfName.F, new PdfString(fileDisplay));
@@ -225,7 +225,7 @@ public class PdfFileSpecification extends PdfDictionary {
      * @param filename	the filename
      * @param unicode	if true, the filename is UTF-16BE encoded; otherwise PDFDocEncoding is used;
      */
-    public void setUnicodeFileName(final String filename, final boolean unicode) {
+    private void setUnicodeFileName(final String filename, final boolean unicode) {
         put(PdfName.UF, new PdfString(filename, unicode ? PdfObject.TEXT_UNICODE : PdfObject.TEXT_PDFDOCENCODING));
     }
 

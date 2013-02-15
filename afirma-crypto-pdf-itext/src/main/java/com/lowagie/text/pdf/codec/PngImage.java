@@ -124,7 +124,7 @@ public class PngImage {
     public static final int[] PNGID = {137, 80, 78, 71, 13, 10, 26, 10};
 
 /** A PNG marker. */
-    public static final String IHDR = "IHDR";
+    private static final String IHDR = "IHDR";
 
 /** A PNG marker. */
     private static final String PLTE = "PLTE";
@@ -148,10 +148,10 @@ public class PngImage {
     private static final String cHRM = "cHRM";
 
 /** A PNG marker. */
-    public static final String sRGB = "sRGB";
+    private static final String sRGB = "sRGB";
 
 /** A PNG marker. */
-    public static final String iCCP = "iCCP";
+    private static final String iCCP = "iCCP";
 
     private static final int TRANSFERSIZE = 4096;
     private static final int PNG_FILTER_NONE = 0;
@@ -162,41 +162,41 @@ public class PngImage {
     private static final PdfName intents[] = {PdfName.PERCEPTUAL,
         PdfName.RELATIVECOLORIMETRIC,PdfName.SATURATION,PdfName.ABSOLUTECOLORIMETRIC};
 
-    InputStream is;
-    DataInputStream dataStream;
-    int width;
-    int height;
-    int bitDepth;
-    int colorType;
-    int compressionMethod;
-    int filterMethod;
-    int interlaceMethod;
-    PdfDictionary additional = new PdfDictionary();
-    byte image[];
-    byte smask[];
-    byte trans[];
-    NewByteArrayOutputStream idat = new NewByteArrayOutputStream();
-    int dpiX;
-    int dpiY;
-    float XYRatio;
-    boolean genBWMask;
-    boolean palShades;
-    int transRedGray = -1;
-    int transGreen = -1;
-    int transBlue = -1;
-    int inputBands;
-    int bytesPerPixel; // number of bytes per input pixel
-    byte colorTable[];
-    float gamma = 1f;
-    boolean hasCHRM = false;
-    float xW, yW, xR, yR, xG, yG, xB, yB;
-    PdfName intent;
-    ICC_Profile icc_profile;
+    private final InputStream is;
+    private DataInputStream dataStream;
+    private int width;
+    private int height;
+    private int bitDepth;
+    private int colorType;
+    private int compressionMethod;
+    private int filterMethod;
+    private int interlaceMethod;
+    private final PdfDictionary additional = new PdfDictionary();
+    private byte image[];
+    private byte smask[];
+    private byte trans[];
+    private final NewByteArrayOutputStream idat = new NewByteArrayOutputStream();
+    private int dpiX;
+    private int dpiY;
+    private float XYRatio;
+    private boolean genBWMask;
+    private boolean palShades;
+    private int transRedGray = -1;
+    private int transGreen = -1;
+    private int transBlue = -1;
+    private int inputBands;
+    private int bytesPerPixel; // number of bytes per input pixel
+    private byte colorTable[];
+    private float gamma = 1f;
+    private boolean hasCHRM = false;
+    private float xW, yW, xR, yR, xG, yG, xB, yB;
+    private PdfName intent;
+    private ICC_Profile icc_profile;
 
 
 
     /** Creates a new instance of PngImage */
-    PngImage(final InputStream is) {
+    private PngImage(final InputStream is) {
         this.is = is;
     }
 
@@ -225,7 +225,7 @@ public class PngImage {
      * @throws IOException on error
      * @return the image
      */
-    public static Image getImage(final InputStream is) throws IOException {
+    private static Image getImage(final InputStream is) throws IOException {
         final PngImage png = new PngImage(is);
         return png.getImage();
     }
@@ -515,7 +515,7 @@ public class PngImage {
         }
     }
 
-    Image getImage() throws IOException {
+    private Image getImage() throws IOException {
         readPng();
         try {
             int pal0 = 0;
@@ -620,7 +620,7 @@ public class PngImage {
         }
     }
 
-    void decodeIdat() {
+    private void decodeIdat() {
         int nbitDepth = this.bitDepth;
         if (nbitDepth == 16) {
 			nbitDepth = 8;
@@ -831,7 +831,7 @@ public class PngImage {
 
 
 
-    static void setPixel(final byte image[], final int data[], final int offset, final int size, final int x, final int y, final int bitDepth, final int bytesPerRow) {
+    private static void setPixel(final byte image[], final int data[], final int offset, final int size, final int x, final int y, final int bitDepth, final int bytesPerRow) {
         if (bitDepth == 8) {
             final int pos = bytesPerRow * y + size * x;
             for (int k = 0; k < size; ++k) {
@@ -961,7 +961,7 @@ public class PngImage {
         }
     }
 
-    static class NewByteArrayOutputStream extends ByteArrayOutputStream {
+    private static class NewByteArrayOutputStream extends ByteArrayOutputStream {
         public byte[] getBuf() {
             return this.buf;
         }
@@ -974,7 +974,7 @@ public class PngImage {
  * @return		the value of an <CODE>int</CODE>
  */
 
-    public static final int getInt(final InputStream is) throws IOException {
+    private static final int getInt(final InputStream is) throws IOException {
         return (is.read() << 24) + (is.read() << 16) + (is.read() << 8) + is.read();
     }
 

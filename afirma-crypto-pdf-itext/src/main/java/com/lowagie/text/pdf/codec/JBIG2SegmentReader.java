@@ -72,31 +72,31 @@ import com.lowagie.text.pdf.RandomAccessFileOrArray;
  * @since 2.1.5
  */
 
-public class JBIG2SegmentReader {
+class JBIG2SegmentReader {
 
-	public static final int SYMBOL_DICTIONARY = 0; //see 7.4.2.
 
-	public static final int INTERMEDIATE_TEXT_REGION = 4; //see 7.4.3.
-	public static final int IMMEDIATE_TEXT_REGION = 6; //see 7.4.3.
-	public static final int IMMEDIATE_LOSSLESS_TEXT_REGION = 7; //see 7.4.3.
-	public static final int PATTERN_DICTIONARY = 16; //see 7.4.4.
-	public static final int INTERMEDIATE_HALFTONE_REGION = 20; //see 7.4.5.
-	public static final int IMMEDIATE_HALFTONE_REGION = 22; //see 7.4.5.
-	public static final int IMMEDIATE_LOSSLESS_HALFTONE_REGION = 23; //see 7.4.5.
-	public static final int INTERMEDIATE_GENERIC_REGION = 36; //see 7.4.6.
-	public static final int IMMEDIATE_GENERIC_REGION = 38; //see 7.4.6.
-	public static final int IMMEDIATE_LOSSLESS_GENERIC_REGION = 39; //see 7.4.6.
-	public static final int INTERMEDIATE_GENERIC_REFINEMENT_REGION = 40; //see 7.4.7.
-	public static final int IMMEDIATE_GENERIC_REFINEMENT_REGION = 42; //see 7.4.7.
-	public static final int IMMEDIATE_LOSSLESS_GENERIC_REFINEMENT_REGION = 43; //see 7.4.7.
 
-	public static final int PAGE_INFORMATION = 48; //see 7.4.8.
-	public static final int END_OF_PAGE = 49; //see 7.4.9.
-	public static final int END_OF_STRIPE = 50; //see 7.4.10.
-	public static final int END_OF_FILE = 51; //see 7.4.11.
-	public static final int PROFILES = 52; //see 7.4.12.
-	public static final int TABLES = 53; //see 7.4.13.
-	public static final int EXTENSION = 62; //see 7.4.14.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	private static final int PAGE_INFORMATION = 48; //see 7.4.8.
+	private static final int END_OF_PAGE = 49; //see 7.4.9.
+
+	private static final int END_OF_FILE = 51; //see 7.4.11.
+
+
+
 
 	private final SortedMap segments = new TreeMap();
 	private final SortedMap pages = new TreeMap();
@@ -111,22 +111,22 @@ public class JBIG2SegmentReader {
 	 * Inner class that holds information about a JBIG2 segment.
 	 * @since	2.1.5
 	 */
-	public static class JBIG2Segment implements Comparable {
+	private static class JBIG2Segment implements Comparable {
 
-		public final int segmentNumber;
-		public long dataLength = -1;
-		public int page = -1;
-		public int[] referredToSegmentNumbers = null;
-		public boolean[] segmentRetentionFlags = null;
-		public int type = -1;
-		public boolean deferredNonRetain = false;
-		public int countOfReferredToSegments = -1;
-		public byte[] data = null;
-		public byte[] headerData = null;
-		public boolean page_association_size = false;
-		public int page_association_offset = -1;
+		private final int segmentNumber;
+		private long dataLength = -1;
+		private int page = -1;
+		private int[] referredToSegmentNumbers = null;
+		private boolean[] segmentRetentionFlags = null;
+		private int type = -1;
+		private boolean deferredNonRetain = false;
+		private int countOfReferredToSegments = -1;
+		private byte[] data = null;
+		private byte[] headerData = null;
+		private boolean page_association_size = false;
+		private int page_association_offset = -1;
 
-		public JBIG2Segment(final int segment_number) {
+		private JBIG2Segment(final int segment_number) {
 			this.segmentNumber = segment_number;
 		}
 
@@ -135,7 +135,7 @@ public class JBIG2SegmentReader {
 		public int compareTo(final Object o) {
 			return this.compareTo((JBIG2Segment)o);
 		}
-		public int compareTo(final JBIG2Segment s) {
+		private int compareTo(final JBIG2Segment s) {
 			return this.segmentNumber - s.segmentNumber;
 		}
 
@@ -146,13 +146,12 @@ public class JBIG2SegmentReader {
 	 * @since	2.1.5
 	 */
 	public static class JBIG2Page {
-		public final int page;
+
 		private final JBIG2SegmentReader sr;
 		private final SortedMap segs = new TreeMap();
-		public int pageBitmapWidth = -1;
-		public int pageBitmapHeight = -1;
-		public JBIG2Page(final int page, final JBIG2SegmentReader sr) {
-			this.page = page;
+		int pageBitmapWidth = -1;
+		int pageBitmapHeight = -1;
+		private JBIG2Page(final int page, final JBIG2SegmentReader sr) {
 			this.sr = sr;
 		}
 		/**
@@ -196,7 +195,7 @@ public class JBIG2SegmentReader {
 			os.close();
 			return os.toByteArray();
 		}
-		public void addSegment(final JBIG2Segment s) {
+		private void addSegment(final JBIG2Segment s) {
 			this.segs.put(new Integer(s.segmentNumber), s);
 		}
 
@@ -206,7 +205,7 @@ public class JBIG2SegmentReader {
 		this.ra = ra;
 	}
 
-	public static byte[] copyByteArray(final byte[] b) {
+	private static byte[] copyByteArray(final byte[] b) {
 		final byte[] bc = new byte[b.length];
 		System.arraycopy(b, 0, bc, 0, b.length);
 		return bc;
@@ -241,7 +240,7 @@ public class JBIG2SegmentReader {
 		}
 	}
 
-	void readSegment(final JBIG2Segment s) throws IOException {
+	private void readSegment(final JBIG2Segment s) throws IOException {
 		final int ptr = this.ra.getFilePointer();
 
 		if ( s.dataLength == 0xffffffffl ) {
@@ -269,7 +268,7 @@ public class JBIG2SegmentReader {
 		}
 	}
 
-	JBIG2Segment readHeader() throws IOException {
+	private JBIG2Segment readHeader() throws IOException {
 		final int ptr = this.ra.getFilePointer();
 		// 7.2.1
 		final int segment_number = this.ra.readInt();
@@ -371,7 +370,7 @@ public class JBIG2SegmentReader {
 		return s;
 	}
 
-	void readFileHeader() throws IOException {
+	private void readFileHeader() throws IOException {
 		this.ra.seek(0);
 		final byte[] idstring = new byte[8];
 		this.ra.read(idstring);
@@ -398,7 +397,7 @@ public class JBIG2SegmentReader {
 		}
 	}
 
-	public int numberOfPages() {
+	private int numberOfPages() {
 		return this.pages.size();
 	}
 

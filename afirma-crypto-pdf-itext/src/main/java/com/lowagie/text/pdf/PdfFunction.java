@@ -53,16 +53,16 @@ import com.lowagie.text.ExceptionConverter;
  *
  * @author Paulo Soares (psoares@consiste.pt)
  */
-public class PdfFunction {
+class PdfFunction {
 
-    protected PdfWriter writer;
+    private final PdfWriter writer;
 
-    protected PdfIndirectReference reference;
+    private PdfIndirectReference reference;
 
-    protected PdfDictionary dictionary;
+    private PdfDictionary dictionary;
 
     /** Creates new PdfFunction */
-    protected PdfFunction(final PdfWriter writer) {
+    private PdfFunction(final PdfWriter writer) {
         this.writer = writer;
     }
 

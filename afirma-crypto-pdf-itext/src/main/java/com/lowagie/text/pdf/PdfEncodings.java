@@ -61,12 +61,12 @@ import com.lowagie.text.ExceptionConverter;
  * Supports custom encodings.
  * @author Paulo Soares (psoares@consiste.pt)
  */
-public class PdfEncodings {
-    protected static final int CIDNONE = 0;
-    protected static final int CIDRANGE = 1;
-    protected static final int CIDCHAR = 2;
+class PdfEncodings {
+    private static final int CIDNONE = 0;
+    private static final int CIDRANGE = 1;
+    private static final int CIDCHAR = 2;
 
-    static final char winansiByteToChar[] = {
+    private static final char winansiByteToChar[] = {
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
         16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
         32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
@@ -84,7 +84,7 @@ public class PdfEncodings {
         224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239,
         240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255};
 
-    static final char pdfEncodingByteToChar[] = {
+    private static final char pdfEncodingByteToChar[] = {
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
         16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
         32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
@@ -104,9 +104,9 @@ public class PdfEncodings {
 
     static final IntHashtable winansi = new IntHashtable();
 
-    static final IntHashtable pdfEncoding = new IntHashtable();
+    private static final IntHashtable pdfEncoding = new IntHashtable();
 
-    static HashMap extraEncodings = new HashMap();
+    private static HashMap extraEncodings = new HashMap();
 
     static {
         for (int k = 128; k < 161; ++k) {
@@ -361,7 +361,7 @@ public class PdfEncodings {
         }
     }
 
-    static String decodeSequence(final byte seq[], final int start, final int length, final char planes[][]) {
+    private static String decodeSequence(final byte seq[], final int start, final int length, final char planes[][]) {
         final StringBuffer buf = new StringBuffer();
         final int end = start + length;
         int currentPlane = 0;
@@ -379,7 +379,7 @@ public class PdfEncodings {
         return buf.toString();
     }
 
-    static char[][] readCmap(final String name, final byte newline[][]) throws IOException {
+    private static char[][] readCmap(final String name, final byte newline[][]) throws IOException {
         final ArrayList planes = new ArrayList();
         planes.add(new char[256]);
         readCmap(name, planes);
@@ -392,7 +392,7 @@ public class PdfEncodings {
         return (char[][])planes.toArray(ret);
     }
 
-    static void readCmap(final String name, final ArrayList planes) throws IOException {
+    private static void readCmap(final String name, final ArrayList planes) throws IOException {
         final String fullName = BaseFont.RESOURCE_PATH + "cmaps/" + name;
         final InputStream in = BaseFont.getResourceStream(fullName);
         if (in == null) {
@@ -402,7 +402,7 @@ public class PdfEncodings {
         in.close();
     }
 
-    static void encodeStream(final InputStream in, final ArrayList planes) throws IOException {
+    private static void encodeStream(final InputStream in, final ArrayList planes) throws IOException {
         final BufferedReader rd = new BufferedReader(new InputStreamReader(in, "iso-8859-1"));
         String line = null;
         int state = CIDNONE;
@@ -463,13 +463,13 @@ public class PdfEncodings {
         }
     }
 
-    static void breakLong(final long n, final int size, final byte seqs[]) {
+    private static void breakLong(final long n, final int size, final byte seqs[]) {
         for (int k = 0; k < size; ++k) {
             seqs[k] = (byte)(n >> (size - 1 - k) * 8);
         }
     }
 
-    static void encodeSequence(int size, final byte seqs[], final char cid, final ArrayList planes) {
+    private static void encodeSequence(int size, final byte seqs[], final char cid, final ArrayList planes) {
         --size;
         int nextPlane = 0;
         for (int idx = 0; idx < size; ++idx) {
@@ -499,7 +499,7 @@ public class PdfEncodings {
      * @param name the name of the encoding. The encoding recognition is case insensitive
      * @param enc the conversion class
      */
-    public static void addExtraEncoding(final String name, final ExtraEncoding enc) {
+    private static void addExtraEncoding(final String name, final ExtraEncoding enc) {
         synchronized (extraEncodings) { // This serializes concurrent updates
             final HashMap newEncodings = (HashMap)extraEncodings.clone();
             newEncodings.put(name.toLowerCase(), enc);

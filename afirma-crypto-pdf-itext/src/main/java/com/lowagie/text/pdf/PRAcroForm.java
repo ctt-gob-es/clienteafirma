@@ -81,7 +81,7 @@ class PRAcroForm extends PdfDictionary {
     private final ArrayList fields;
     private final ArrayList stack;
     private final HashMap fieldByName;
-    PdfReader reader;
+    private final PdfReader reader;
 
     /**
      * Constructor

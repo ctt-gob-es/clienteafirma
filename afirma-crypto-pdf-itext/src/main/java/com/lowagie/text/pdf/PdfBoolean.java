@@ -60,30 +60,30 @@ package com.lowagie.text.pdf;
  */
 
 public class PdfBoolean extends PdfObject {
-    
+
     // static membervariables (possible values of a boolean object)
     public static final PdfBoolean PDFTRUE = new PdfBoolean(true);
-    public static final PdfBoolean PDFFALSE = new PdfBoolean(false);
+    static final PdfBoolean PDFFALSE = new PdfBoolean(false);
 /** A possible value of <CODE>PdfBoolean</CODE> */
-    public static final String TRUE = "true";
-    
+    private static final String TRUE = "true";
+
 /** A possible value of <CODE>PdfBoolean</CODE> */
-    public static final String FALSE = "false";
-    
+    private static final String FALSE = "false";
+
     // membervariables
-    
+
 /** the boolean value of this object */
     private boolean value;
-    
+
     // constructors
-    
+
 /**
  * Constructs a <CODE>PdfBoolean</CODE>-object.
  *
  * @param		value			the value of the new <CODE>PdfObject</CODE>
  */
-    
-    public PdfBoolean(boolean value) {
+
+    public PdfBoolean(final boolean value) {
         super(BOOLEAN);
         if (value) {
             setContent(TRUE);
@@ -93,7 +93,7 @@ public class PdfBoolean extends PdfObject {
         }
         this.value = value;
     }
-    
+
 /**
  * Constructs a <CODE>PdfBoolean</CODE>-object.
  *
@@ -101,8 +101,8 @@ public class PdfBoolean extends PdfObject {
  *
  * @throws		BadPdfFormatException	thrown if the <VAR>value</VAR> isn't '<CODE>true</CODE>' or '<CODE>false</CODE>'
  */
-    
-    public PdfBoolean(String value) throws BadPdfFormatException {
+
+    PdfBoolean(final String value) throws BadPdfFormatException {
         super(BOOLEAN, value);
         if (value.equals(TRUE)) {
             this.value = true;
@@ -114,20 +114,21 @@ public class PdfBoolean extends PdfObject {
             throw new BadPdfFormatException("The value has to be 'true' of 'false', instead of '" + value + "'.");
         }
     }
-    
+
     // methods returning the value of this object
-    
+
 /**
  * Returns the primitive value of the <CODE>PdfBoolean</CODE>-object.
  *
  * @return		the actual value of the object.
  */
-    
-    public boolean booleanValue() {
-        return value;
+
+    boolean booleanValue() {
+        return this.value;
     }
-    
-    public String toString() {
-    	return value ? TRUE : FALSE;
+
+    @Override
+	public String toString() {
+    	return this.value ? TRUE : FALSE;
     }
 }

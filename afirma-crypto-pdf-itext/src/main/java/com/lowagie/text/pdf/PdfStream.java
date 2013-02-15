@@ -113,9 +113,9 @@ public class PdfStream extends PdfDictionary {
 
     protected ByteArrayOutputStream streamBytes = null;
     protected InputStream inputStream;
-    protected PdfIndirectReference ref;
+    private PdfIndirectReference ref;
     protected int inputStreamLength = -1;
-    protected PdfWriter writer;
+    private PdfWriter writer;
     protected int rawLength;
 
     static final byte STARTSTREAM[] = DocWriter.getISOBytes("stream\n");
@@ -153,7 +153,7 @@ public class PdfStream extends PdfDictionary {
      * @param inputStream the data to write to this stream
      * @param writer the <CODE>PdfWriter</CODE> for this stream
      */
-    public PdfStream(final InputStream inputStream, final PdfWriter writer) {
+    PdfStream(final InputStream inputStream, final PdfWriter writer) {
         super();
         this.type = STREAM;
         this.inputStream = inputStream;
@@ -179,7 +179,7 @@ public class PdfStream extends PdfDictionary {
      * @throws IOException on error
      * @see #PdfStream(InputStream,PdfWriter)
      */
-    public void writeLength() throws IOException {
+    void writeLength() throws IOException {
         if (this.inputStream == null) {
 			throw new UnsupportedOperationException("writeLength() can only be called in a contructed PdfStream(InputStream,PdfWriter).");
 		}
@@ -204,7 +204,7 @@ public class PdfStream extends PdfDictionary {
 	 * @param compressionLevel the compression level (0 = best speed, 9 = best compression, -1 is default)
 	 * @since	2.1.3
      */
-    public void flateCompress(final int compressionLevel) {
+    void flateCompress(final int compressionLevel) {
         if (!Document.compress) {
 			return;
 		}
@@ -373,7 +373,7 @@ public class PdfStream extends PdfDictionary {
      * @param os the destination to write to
      * @throws IOException on error
      */
-    public void writeContent(final OutputStream os) throws IOException {
+    void writeContent(final OutputStream os) throws IOException {
         if (this.streamBytes != null) {
 			this.streamBytes.writeTo(os);
 		} else if (this.bytes != null) {

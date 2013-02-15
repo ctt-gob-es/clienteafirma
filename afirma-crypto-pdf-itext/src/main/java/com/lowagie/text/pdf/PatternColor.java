@@ -52,29 +52,31 @@ public class PatternColor extends ExtendedColor {
     private static final long serialVersionUID = -1185448552860615964L;
 	/**
      * The actual pattern.
-     */    
-    PdfPatternPainter painter;
-    
+     */
+    private final PdfPatternPainter painter;
+
     /** Creates a color representing a pattern.
      * @param painter the actual pattern
-     */    
-    public PatternColor(PdfPatternPainter painter) {
+     */
+    public PatternColor(final PdfPatternPainter painter) {
         super(TYPE_PATTERN, .5f, .5f, .5f);
         this.painter = painter;
     }
-    
+
     /** Gets the pattern.
      * @return the pattern
-     */    
+     */
     public PdfPatternPainter getPainter() {
         return this.painter;
     }
-    
-    public boolean equals(Object obj) {
+
+    @Override
+	public boolean equals(final Object obj) {
         return this == obj;
     }
-    
-    public int hashCode() {
-        return painter.hashCode();
-    }    
+
+    @Override
+	public int hashCode() {
+        return this.painter.hashCode();
+    }
 }

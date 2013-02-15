@@ -81,17 +81,7 @@ class IntHashtable implements Cloneable {
         this(150, 0.75f);
     }
 
-    /***
-     * <p>Constructs a new, empty hashtable with the specified initial capacity
-     * and default load factor, which is <code>0.75</code>.</p>
-     *
-     * @param  initialCapacity the initial capacity of the hashtable.
-     * @throws IllegalArgumentException if the initial capacity is less
-     *   than zero.
-     */
-    IntHashtable(final int initialCapacity) {
-        this(initialCapacity, 0.75f);
-    }
+
 
     /***
      * <p>Constructs a new, empty hashtable with the specified initial
@@ -303,7 +293,7 @@ class IntHashtable implements Cloneable {
      * <p>Innerclass that acts as a datastructure to create a new entry in the
      * table.</p>
      */
-    static class Entry {
+    private static class Entry {
         private final int hash;
         private final int key;
         private int value;

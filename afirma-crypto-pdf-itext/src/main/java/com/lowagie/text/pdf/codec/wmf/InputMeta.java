@@ -56,57 +56,60 @@ import java.io.InputStream;
 import com.lowagie.text.Utilities;
 
 public class InputMeta {
-    
-    InputStream in;
-    int length;
-    
-    public InputMeta(InputStream in) {
+
+    private final InputStream in;
+    private int length;
+
+    public InputMeta(final InputStream in) {
         this.in = in;
     }
 
     public int readWord() throws IOException{
-        length += 2;
-        int k1 = in.read();
-        if (k1 < 0)
-            return 0;
-        return (k1 + (in.read() << 8)) & 0xffff;
+        this.length += 2;
+        final int k1 = this.in.read();
+        if (k1 < 0) {
+			return 0;
+		}
+        return k1 + (this.in.read() << 8) & 0xffff;
     }
 
     public int readShort() throws IOException{
         int k = readWord();
-        if (k > 0x7fff)
-            k -= 0x10000;
+        if (k > 0x7fff) {
+			k -= 0x10000;
+		}
         return k;
     }
 
     public int readInt() throws IOException{
-        length += 4;
-        int k1 = in.read();
-        if (k1 < 0)
-            return 0;
-        int k2 = in.read() << 8;
-        int k3 = in.read() << 16;
-        return k1 + k2 + k3 + (in.read() << 24);
+        this.length += 4;
+        final int k1 = this.in.read();
+        if (k1 < 0) {
+			return 0;
+		}
+        final int k2 = this.in.read() << 8;
+        final int k3 = this.in.read() << 16;
+        return k1 + k2 + k3 + (this.in.read() << 24);
     }
-    
-    public int readByte() throws IOException{
-        ++length;
-        return in.read() & 0xff;
+
+    int readByte() throws IOException{
+        ++this.length;
+        return this.in.read() & 0xff;
     }
-    
-    public void skip(int len) throws IOException{
-        length += len;
-        Utilities.skip(in, len);
+
+    void skip(final int len) throws IOException{
+        this.length += len;
+        Utilities.skip(this.in, len);
     }
-    
+
     public int getLength() {
-        return length;
+        return this.length;
     }
-    
-    public Color readColor() throws IOException{
-        int red = readByte();
-        int green = readByte();
-        int blue = readByte();
+
+    Color readColor() throws IOException{
+        final int red = readByte();
+        final int green = readByte();
+        final int blue = readByte();
         readByte();
         return new Color(red, green, blue);
     }

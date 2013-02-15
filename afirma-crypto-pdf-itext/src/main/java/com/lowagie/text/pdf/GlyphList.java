@@ -56,49 +56,53 @@ import java.util.StringTokenizer;
 
 import com.lowagie.text.pdf.fonts.FontsResourceAnchor;
 
-public class GlyphList {
+class GlyphList {
     private static HashMap unicode2names = new HashMap();
     private static HashMap names2unicode = new HashMap();
-        
+
     static {
         InputStream is = null;
         try {
             is = BaseFont.getResourceStream(BaseFont.RESOURCE_PATH + "glyphlist.txt", new FontsResourceAnchor().getClass().getClassLoader());
             if (is == null) {
-                String msg = "glyphlist.txt not found as resource. (It must exist as resource in the package com.lowagie.text.pdf.fonts)";
+                final String msg = "glyphlist.txt not found as resource. (It must exist as resource in the package com.lowagie.text.pdf.fonts)";
                 throw new Exception(msg);
             }
-            byte buf[] = new byte[1024];
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            final byte buf[] = new byte[1024];
+            final ByteArrayOutputStream out = new ByteArrayOutputStream();
             while (true) {
-                int size = is.read(buf);
-                if (size < 0)
-                    break;
+                final int size = is.read(buf);
+                if (size < 0) {
+					break;
+				}
                 out.write(buf, 0, size);
             }
             is.close();
             is = null;
-            String s = PdfEncodings.convertToString(out.toByteArray(), null);
-            StringTokenizer tk = new StringTokenizer(s, "\r\n");
+            final String s = PdfEncodings.convertToString(out.toByteArray(), null);
+            final StringTokenizer tk = new StringTokenizer(s, "\r\n");
             while (tk.hasMoreTokens()) {
-                String line = tk.nextToken();
-                if (line.startsWith("#"))
-                    continue;
-                StringTokenizer t2 = new StringTokenizer(line, " ;\r\n\t\f");
+                final String line = tk.nextToken();
+                if (line.startsWith("#")) {
+					continue;
+				}
+                final StringTokenizer t2 = new StringTokenizer(line, " ;\r\n\t\f");
                 String name = null;
                 String hex = null;
-                if (!t2.hasMoreTokens())
-                    continue;
+                if (!t2.hasMoreTokens()) {
+					continue;
+				}
                 name = t2.nextToken();
-                if (!t2.hasMoreTokens())
-                    continue;
+                if (!t2.hasMoreTokens()) {
+					continue;
+				}
                 hex = t2.nextToken();
-                Integer num = Integer.valueOf(hex, 16);
+                final Integer num = Integer.valueOf(hex, 16);
                 unicode2names.put(num, name);
                 names2unicode.put(name, new int[]{num.intValue()});
             }
         }
-        catch (Exception e) {
+        catch (final Exception e) {
             System.err.println("glyphlist.txt loading error: " + e.getMessage());
         }
         finally {
@@ -106,18 +110,18 @@ public class GlyphList {
                 try {
                     is.close();
                 }
-                catch (Exception e) {
+                catch (final Exception e) {
                     // empty on purpose
                 }
             }
         }
     }
-    
-    public static int[] nameToUnicode(String name) {
+
+    public static int[] nameToUnicode(final String name) {
         return (int[])names2unicode.get(name);
     }
-    
-    public static String unicodeToName(int num) {
+
+    public static String unicodeToName(final int num) {
         return (String)unicode2names.get(new Integer(num));
     }
 }

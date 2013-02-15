@@ -55,12 +55,12 @@ import java.util.HashMap;
  * This class contains entities that can be used in an entity tag.
  */
 
-public class EntitiesToUnicode {
+class EntitiesToUnicode {
 
     /**
      * This is a map that contains the names of entities and their unicode value.
      */
-    public static final HashMap map = new HashMap();
+    private static final HashMap map = new HashMap();
     static {
         map.put("nbsp", new Character('\u00a0')); // no-break space = non-breaking space, U+00A0 ISOnum
         map.put("iexcl", new Character('\u00a1')); // inverted exclamation mark, U+00A1 ISOnum

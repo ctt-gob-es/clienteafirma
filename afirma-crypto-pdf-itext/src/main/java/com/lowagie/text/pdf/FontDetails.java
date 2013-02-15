@@ -49,7 +49,6 @@
 
 package com.lowagie.text.pdf;
 
-import java.awt.font.GlyphVector;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 
@@ -63,54 +62,54 @@ import com.lowagie.text.Utilities;
  * @author  Paulo Soares (psoares@consiste.pt)
  */
 class FontDetails {
-    
+
     /**
      * The indirect reference to this font
-     */    
-    PdfIndirectReference indirectReference;
+     */
+    private final PdfIndirectReference indirectReference;
     /**
      * The font name that appears in the document body stream
-     */    
-    PdfName fontName;
+     */
+    private final PdfName fontName;
     /**
      * The font
-     */    
-    BaseFont baseFont;
+     */
+    private final BaseFont baseFont;
     /**
      * The font if it's an instance of <CODE>TrueTypeFontUnicode</CODE>
-     */    
-    TrueTypeFontUnicode ttu;
+     */
+    private TrueTypeFontUnicode ttu;
     /**
      * The font if it's an instance of <CODE>CJKFont</CODE>
      */
-    CJKFont cjkFont;
+    private CJKFont cjkFont;
     /**
      * The array used with single byte encodings
-     */    
-    byte shortTag[];
+     */
+    private byte shortTag[];
     /**
      * The map used with double byte encodings. The key is Integer(glyph) and
      * the value is int[]{glyph, width, Unicode code}
-     */    
-    HashMap longTag;
+     */
+    private HashMap longTag;
     /**
      * IntHashtable with CIDs of CJK glyphs that are used in the text.
      */
-    IntHashtable cjkTag;
+    private IntHashtable cjkTag;
     /**
      * The font type
-     */    
-    int fontType;
+     */
+    private final int fontType;
     /**
      * <CODE>true</CODE> if the font is symbolic
-     */    
-    boolean symbolic;
+     */
+    private boolean symbolic;
     /**
      * Indicates if only a subset of the glyphs and widths for that particular
      * encoding should be included in the document.
      */
-    protected boolean subset = true;
-    
+    private boolean subset = true;
+
     /**
      * Each font used in a document has an instance of this class.
      * This class stores the characters used in the document and other
@@ -119,97 +118,100 @@ class FontDetails {
      * @param indirectReference the indirect reference to the font
      * @param baseFont the <CODE>BaseFont</CODE>
      */
-    FontDetails(PdfName fontName, PdfIndirectReference indirectReference, BaseFont baseFont) {
+    FontDetails(final PdfName fontName, final PdfIndirectReference indirectReference, final BaseFont baseFont) {
         this.fontName = fontName;
         this.indirectReference = indirectReference;
         this.baseFont = baseFont;
-        fontType = baseFont.getFontType();
-        switch (fontType) {
+        this.fontType = baseFont.getFontType();
+        switch (this.fontType) {
             case BaseFont.FONT_TYPE_T1:
             case BaseFont.FONT_TYPE_TT:
-                shortTag = new byte[256];
+                this.shortTag = new byte[256];
                 break;
             case BaseFont.FONT_TYPE_CJK:
-                cjkTag = new IntHashtable();
-                cjkFont = (CJKFont)baseFont;
+                this.cjkTag = new IntHashtable();
+                this.cjkFont = (CJKFont)baseFont;
                 break;
             case BaseFont.FONT_TYPE_TTUNI:
-                longTag = new HashMap();
-                ttu = (TrueTypeFontUnicode)baseFont;
-                symbolic = baseFont.isFontSpecific();
+                this.longTag = new HashMap();
+                this.ttu = (TrueTypeFontUnicode)baseFont;
+                this.symbolic = baseFont.isFontSpecific();
                 break;
         }
     }
-    
+
     /**
      * Gets the indirect reference to this font.
      * @return the indirect reference to this font
-     */    
+     */
     PdfIndirectReference getIndirectReference() {
-        return indirectReference;
+        return this.indirectReference;
     }
-    
+
     /**
      * Gets the font name as it appears in the document body.
      * @return the font name
-     */    
+     */
     PdfName getFontName() {
-        return fontName;
+        return this.fontName;
     }
-    
+
     /**
      * Gets the <CODE>BaseFont</CODE> of this font.
      * @return the <CODE>BaseFont</CODE> of this font
-     */    
+     */
     BaseFont getBaseFont() {
-        return baseFont;
+        return this.baseFont;
     }
-    
+
     /**
      * Converts the text into bytes to be placed in the document.
      * The conversion is done according to the font and the encoding and the characters
      * used are stored.
      * @param text the text to convert
      * @return the conversion
-     */    
-    byte[] convertToBytes(String text) {
+     */
+    byte[] convertToBytes(final String text) {
         byte b[] = null;
-        switch (fontType) {
+        switch (this.fontType) {
             case BaseFont.FONT_TYPE_T3:
-                return baseFont.convertToBytes(text);
+                return this.baseFont.convertToBytes(text);
             case BaseFont.FONT_TYPE_T1:
             case BaseFont.FONT_TYPE_TT: {
-                b = baseFont.convertToBytes(text);
-                int len = b.length;
-                for (int k = 0; k < len; ++k)
-                    shortTag[b[k] & 0xff] = 1;
+                b = this.baseFont.convertToBytes(text);
+                final int len = b.length;
+                for (int k = 0; k < len; ++k) {
+					this.shortTag[b[k] & 0xff] = 1;
+				}
                 break;
             }
             case BaseFont.FONT_TYPE_CJK: {
-                int len = text.length();
-                for (int k = 0; k < len; ++k)
-                    cjkTag.put(cjkFont.getCidCode(text.charAt(k)), 0);
-                b = baseFont.convertToBytes(text);
+                final int len = text.length();
+                for (int k = 0; k < len; ++k) {
+					this.cjkTag.put(this.cjkFont.getCidCode(text.charAt(k)), 0);
+				}
+                b = this.baseFont.convertToBytes(text);
                 break;
             }
             case BaseFont.FONT_TYPE_DOCUMENT: {
-                b = baseFont.convertToBytes(text);
+                b = this.baseFont.convertToBytes(text);
                 break;
             }
             case BaseFont.FONT_TYPE_TTUNI: {
                 try {
                     int len = text.length();
                     int metrics[] = null;
-                    char glyph[] = new char[len];
+                    final char glyph[] = new char[len];
                     int i = 0;
-                    if (symbolic) {
+                    if (this.symbolic) {
                         b = PdfEncodings.convertToBytes(text, "symboltt");
                         len = b.length;
                         for (int k = 0; k < len; ++k) {
-                            metrics = ttu.getMetricsTT(b[k] & 0xff);
-                            if (metrics == null)
-                                continue;
-                            longTag.put(new Integer(metrics[0]), new int[]{metrics[0], metrics[1], ttu.getUnicodeDifferences(b[k] & 0xff)});
+                            metrics = this.ttu.getMetricsTT(b[k] & 0xff);
+                            if (metrics == null) {
+								continue;
+							}
+                            this.longTag.put(new Integer(metrics[0]), new int[]{metrics[0], metrics[1], this.ttu.getUnicodeDifferences(b[k] & 0xff)});
                             glyph[i++] = (char)metrics[0];
                         }
                     }
@@ -223,20 +225,22 @@ class FontDetails {
                     		else {
                     			val = text.charAt(k);
                     		}
-                    		metrics = ttu.getMetricsTT(val);
-                    		if (metrics == null)
-                    			continue;
-                    		int m0 = metrics[0];
-                    		Integer gl = new Integer(m0);
-                    		if (!longTag.containsKey(gl))
-                    			longTag.put(gl, new int[]{m0, metrics[1], val});
+                    		metrics = this.ttu.getMetricsTT(val);
+                    		if (metrics == null) {
+								continue;
+							}
+                    		final int m0 = metrics[0];
+                    		final Integer gl = new Integer(m0);
+                    		if (!this.longTag.containsKey(gl)) {
+								this.longTag.put(gl, new int[]{m0, metrics[1], val});
+							}
                     		glyph[i++] = (char)m0;
                     	}
                     }
-                    String s = new String(glyph, 0, i);
+                    final String s = new String(glyph, 0, i);
                     b = s.getBytes(CJKFont.CJK_ENCODING);
                 }
-                catch (UnsupportedEncodingException e) {
+                catch (final UnsupportedEncodingException e) {
                     throw new ExceptionConverter(e);
                 }
                 break;
@@ -244,65 +248,67 @@ class FontDetails {
         }
         return b;
     }
-    
+
     /**
      * Writes the font definition to the document.
      * @param writer the <CODE>PdfWriter</CODE> of this document
-     */    
-    void writeFont(PdfWriter writer) {
+     */
+    void writeFont(final PdfWriter writer) {
         try {
-            switch (fontType) {
+            switch (this.fontType) {
                 case BaseFont.FONT_TYPE_T3:
-                    baseFont.writeFont(writer, indirectReference, null);
+                    this.baseFont.writeFont(writer, this.indirectReference, null);
                     break;
                 case BaseFont.FONT_TYPE_T1:
                 case BaseFont.FONT_TYPE_TT: {
                     int firstChar;
                     int lastChar;
                     for (firstChar = 0; firstChar < 256; ++firstChar) {
-                        if (shortTag[firstChar] != 0)
-                            break;
+                        if (this.shortTag[firstChar] != 0) {
+							break;
+						}
                     }
                     for (lastChar = 255; lastChar >= firstChar; --lastChar) {
-                        if (shortTag[lastChar] != 0)
-                            break;
+                        if (this.shortTag[lastChar] != 0) {
+							break;
+						}
                     }
                     if (firstChar > 255) {
                         firstChar = 255;
                         lastChar = 255;
                     }
-                    baseFont.writeFont(writer, indirectReference, new Object[]{new Integer(firstChar), new Integer(lastChar), shortTag, Boolean.valueOf(subset)});
+                    this.baseFont.writeFont(writer, this.indirectReference, new Object[]{new Integer(firstChar), new Integer(lastChar), this.shortTag, Boolean.valueOf(this.subset)});
                     break;
                 }
                 case BaseFont.FONT_TYPE_CJK:
-                    baseFont.writeFont(writer, indirectReference, new Object[]{cjkTag});
+                    this.baseFont.writeFont(writer, this.indirectReference, new Object[]{this.cjkTag});
                     break;
                 case BaseFont.FONT_TYPE_TTUNI:
-                    baseFont.writeFont(writer, indirectReference, new Object[]{longTag, Boolean.valueOf(subset)});
+                    this.baseFont.writeFont(writer, this.indirectReference, new Object[]{this.longTag, Boolean.valueOf(this.subset)});
                     break;
             }
         }
-        catch(Exception e) {
+        catch(final Exception e) {
             throw new ExceptionConverter(e);
         }
     }
-    
+
     /**
      * Indicates if all the glyphs and widths for that particular
      * encoding should be included in the document.
      * @return <CODE>false</CODE> to include all the glyphs and widths.
      */
     public boolean isSubset() {
-        return subset;
+        return this.subset;
     }
-    
+
     /**
      * Indicates if all the glyphs and widths for that particular
      * encoding should be included in the document. Set to <CODE>false</CODE>
      * to include all.
      * @param subset new value of property subset
      */
-    public void setSubset(boolean subset) {
+    public void setSubset(final boolean subset) {
         this.subset = subset;
     }
 }

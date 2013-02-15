@@ -60,15 +60,15 @@ abstract class PdfSigGenericPKCS extends PdfSignature {
     /**
      * The hash algorithm, for example "SHA1"
      */
-    protected String hashAlgorithm;
+    String hashAlgorithm;
     /**
      * The crypto provider
      */
-    protected String provider = null;
+    String provider = null;
     /**
      * The class instance that calculates the PKCS#1 and PKCS#7
      */
-    protected PdfPKCS7 pkcs;
+    private PdfPKCS7 pkcs;
     /**
      * The subject name in the signing certificate (the element "CN")
      */

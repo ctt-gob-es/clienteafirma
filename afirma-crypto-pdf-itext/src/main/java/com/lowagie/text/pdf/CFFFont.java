@@ -386,7 +386,7 @@ class CFFFont {
      */
 
     protected static abstract class Item {
-        protected int myOffset = -1;
+        int myOffset = -1;
         /** remember the current offset and increment by item's size in bytes. */
         public void increment(final int[] currentOffset) {
             this.myOffset = currentOffset[0];
@@ -398,11 +398,11 @@ class CFFFont {
     }
 
     protected static abstract class OffsetItem extends Item {
-        public int value;
+        int value;
         /** set the value of an offset item that was initially unknown.
          * It will be fixed up latex by a call to xref on some marker.
          */
-        public void set(final int offset) { this.value = offset; }
+        private void set(final int offset) { this.value = offset; }
     }
 
 
@@ -736,7 +736,7 @@ class CFFFont {
     /**
      * TODO Changed from private to protected by Ygal&Oren
      */
-    protected final class Font {
+    final class Font {
         String    name;
 
         boolean   isCID = false;
@@ -757,7 +757,7 @@ class CFFFont {
         int nstrings;
         int CharsetLength;
         int[]    charstringsOffsets;
-        int[]    charset;
+
         int[] 	FDSelect;
         int FDSelectLength;
         int FDSelectFormat;

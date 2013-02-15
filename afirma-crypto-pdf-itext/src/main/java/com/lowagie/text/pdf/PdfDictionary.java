@@ -468,7 +468,7 @@ public class PdfDictionary extends PdfObject {
      * @return the associated <CODE>PdfBoolean</CODE> object,
      *   or <CODE>null</CODE>
      */
-    public PdfBoolean getAsBoolean(final PdfName key) {
+    PdfBoolean getAsBoolean(final PdfName key) {
         PdfBoolean bool = null;
         final PdfObject orig = getDirectObject(key);
         if (orig != null && orig.isBoolean()) {
@@ -488,7 +488,7 @@ public class PdfDictionary extends PdfObject {
      * @return the associated <CODE>PdfIndirectReference</CODE> object,
      *   or <CODE>null</CODE>
      */
-    public PdfIndirectReference getAsIndirectObject(final PdfName key) {
+    PdfIndirectReference getAsIndirectObject(final PdfName key) {
         PdfIndirectReference ref = null;
         final PdfObject orig = get(key); // not getDirect this time.
         if (orig != null && orig.isIndirect()) {

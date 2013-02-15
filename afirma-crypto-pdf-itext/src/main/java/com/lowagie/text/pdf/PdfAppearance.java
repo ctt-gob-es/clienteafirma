@@ -54,9 +54,9 @@ import com.lowagie.text.Rectangle;
  * Implements the appearance stream to be used with form fields..
  */
 
-public class PdfAppearance extends PdfTemplate {
-    
-    public static final HashMap stdFieldFontNames = new HashMap();
+class PdfAppearance extends PdfTemplate {
+
+    private static final HashMap stdFieldFontNames = new HashMap();
     static {
         stdFieldFontNames.put("Courier-BoldOblique", new PdfName("CoBO"));
         stdFieldFontNames.put("Courier-Bold", new PdfName("CoBo"));
@@ -84,31 +84,31 @@ public class PdfAppearance extends PdfTemplate {
         stdFieldFontNames.put("HYSMyeongJoStd-Medium", new PdfName("HySm"));
         stdFieldFontNames.put("KozMinPro-Regular", new PdfName("KaMi"));
     }
-    
+
     /**
      *Creates a <CODE>PdfAppearance</CODE>.
      */
-    
+
     PdfAppearance() {
         super();
-        separator = ' ';
+        this.separator = ' ';
     }
-    
-    PdfAppearance(PdfIndirectReference iref) {
-        thisReference = iref;
+
+    PdfAppearance(final PdfIndirectReference iref) {
+        this.thisReference = iref;
     }
-    
+
     /**
      * Creates new PdfTemplate
      *
      * @param wr the <CODE>PdfWriter</CODE>
      */
-    
-    PdfAppearance(PdfWriter wr) {
+
+    PdfAppearance(final PdfWriter wr) {
         super(wr);
-        separator = ' ';
+        this.separator = ' ';
     }
-    
+
     /**
      * Creates a new appearance to be used with form fields.
      *
@@ -117,12 +117,12 @@ public class PdfAppearance extends PdfTemplate {
      * @param height the bounding box height
      * @return the appearance created
      */
-    public static PdfAppearance createAppearance(PdfWriter writer, float width, float height) {
+    public static PdfAppearance createAppearance(final PdfWriter writer, final float width, final float height) {
         return createAppearance(writer, width, height, null);
     }
-    
-    static PdfAppearance createAppearance(PdfWriter writer, float width, float height, PdfName forcedName) {
-        PdfAppearance template = new PdfAppearance(writer);
+
+    private static PdfAppearance createAppearance(final PdfWriter writer, final float width, final float height, final PdfName forcedName) {
+        final PdfAppearance template = new PdfAppearance(writer);
         template.setWidth(width);
         template.setHeight(height);
         writer.addDirectTemplateSimple(template, forcedName);
@@ -135,42 +135,44 @@ public class PdfAppearance extends PdfTemplate {
      * @param bf the font
      * @param size the font size in points
      */
-    public void setFontAndSize(BaseFont bf, float size) {
+    @Override
+	public void setFontAndSize(final BaseFont bf, final float size) {
         checkWriter();
-        state.size = size;
+        this.state.size = size;
         if (bf.getFontType() == BaseFont.FONT_TYPE_DOCUMENT) {
-            state.fontDetails = new FontDetails(null, ((DocumentFont)bf).getIndirectReference(), bf);
-        }
-        else
-            state.fontDetails = writer.addSimple(bf);
+            this.state.fontDetails = new FontDetails(null, ((DocumentFont)bf).getIndirectReference(), bf);
+        } else {
+			this.state.fontDetails = this.writer.addSimple(bf);
+		}
         PdfName psn = (PdfName)stdFieldFontNames.get(bf.getPostscriptFontName());
         if (psn == null) {
-            if (bf.isSubset() && bf.getFontType() == BaseFont.FONT_TYPE_TTUNI)
-                psn = state.fontDetails.getFontName();
-            else {
+            if (bf.isSubset() && bf.getFontType() == BaseFont.FONT_TYPE_TTUNI) {
+				psn = this.state.fontDetails.getFontName();
+			} else {
                 psn = new PdfName(bf.getPostscriptFontName());
-                state.fontDetails.setSubset(false);
+                this.state.fontDetails.setSubset(false);
             }
         }
-        PageResources prs = getPageResources();
+        final PageResources prs = getPageResources();
 //        PdfName name = state.fontDetails.getFontName();
-        prs.addFont(psn, state.fontDetails.getIndirectReference());
-        content.append(psn.getBytes()).append(' ').append(size).append(" Tf").append_i(separator);
+        prs.addFont(psn, this.state.fontDetails.getIndirectReference());
+        this.content.append(psn.getBytes()).append(' ').append(size).append(" Tf").append_i(this.separator);
     }
 
-    public PdfContentByte getDuplicate() {
-        PdfAppearance tpl = new PdfAppearance();
-        tpl.writer = writer;
-        tpl.pdf = pdf;
-        tpl.thisReference = thisReference;
-        tpl.pageResources = pageResources;
-        tpl.bBox = new Rectangle(bBox);
-        tpl.group = group;
-        tpl.layer = layer;
-        if (matrix != null) {
-            tpl.matrix = new PdfArray(matrix);
+    @Override
+	public PdfContentByte getDuplicate() {
+        final PdfAppearance tpl = new PdfAppearance();
+        tpl.writer = this.writer;
+        tpl.pdf = this.pdf;
+        tpl.thisReference = this.thisReference;
+        tpl.pageResources = this.pageResources;
+        tpl.bBox = new Rectangle(this.bBox);
+        tpl.group = this.group;
+        tpl.layer = this.layer;
+        if (this.matrix != null) {
+            tpl.matrix = new PdfArray(this.matrix);
         }
-        tpl.separator = separator;
+        tpl.separator = this.separator;
         return tpl;
     }
 }

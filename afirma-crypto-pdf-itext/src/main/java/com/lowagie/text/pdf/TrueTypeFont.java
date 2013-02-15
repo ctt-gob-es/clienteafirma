@@ -279,7 +279,7 @@ class TrueTypeFont extends BaseFont {
 
     /** The components of table 'OS/2'.
      */
-    protected static class WindowsMetrics {
+    static class WindowsMetrics {
         /** A variable. */
         private short xAvgCharWidth;
 

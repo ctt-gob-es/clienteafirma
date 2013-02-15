@@ -55,27 +55,28 @@ package com.lowagie.text.pdf;
  * @see		PdfArray
  */
 
-public class PdfBorderArray extends PdfArray {
-    
+class PdfBorderArray extends PdfArray {
+
     // constructors
-    
+
 /**
  * Constructs a new <CODE>PdfBorderArray</CODE>.
  */
-    
-    public PdfBorderArray(float hRadius, float vRadius, float width) {
+
+    public PdfBorderArray(final float hRadius, final float vRadius, final float width) {
         this(hRadius, vRadius, width, null);
     }
-    
+
 /**
  * Constructs a new <CODE>PdfBorderArray</CODE>.
  */
-    
-    public PdfBorderArray(float hRadius, float vRadius, float width, PdfDashPattern dash) {
+
+    private PdfBorderArray(final float hRadius, final float vRadius, final float width, final PdfDashPattern dash) {
         super(new PdfNumber(hRadius));
         add(new PdfNumber(vRadius));
         add(new PdfNumber(width));
-        if (dash != null)
-            add(dash);
+        if (dash != null) {
+			add(dash);
+		}
     }
 }

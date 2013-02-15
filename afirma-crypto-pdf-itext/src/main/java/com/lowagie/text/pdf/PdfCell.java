@@ -81,7 +81,7 @@ import com.lowagie.text.Rectangle;
  * @see		PdfTable
  */
 
-public class PdfCell extends Rectangle {
+class PdfCell extends Rectangle {
 
     // membervariables
 
@@ -748,7 +748,7 @@ public class PdfCell extends Rectangle {
      * @return	a value
      */
 
-    public float cellspacing() {
+    private float cellspacing() {
         return this.cellspacing;
     }
 
@@ -758,7 +758,7 @@ public class PdfCell extends Rectangle {
      * @return	a value
      */
 
-    public float cellpadding() {
+    private float cellpadding() {
         return this.cellpadding;
     }
 
@@ -769,7 +769,7 @@ public class PdfCell extends Rectangle {
      * @param allActions
      */
 
-    protected void processActions(final Element element, PdfAction action, final ArrayList allActions) {
+    private void processActions(final Element element, PdfAction action, final ArrayList allActions) {
         if (element.type() == Element.ANCHOR) {
             final String url = ((Anchor) element).getReference();
             if (url != null) {

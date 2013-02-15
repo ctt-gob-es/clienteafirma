@@ -60,8 +60,8 @@ import com.lowagie.text.DocListener;
  * The <CODE>Tags</CODE>-class maps several XHTML-tags to iText-objects.
  */
 
-public class SAXmyHandler extends SAXiTextHandler {
-    
+class SAXmyHandler extends SAXiTextHandler {
+
 /**
  * Constructs a new SAXiTextHandler that will translate all the events
  * triggered by the parser to actions on the <CODE>Document</CODE>-object.
@@ -69,37 +69,38 @@ public class SAXmyHandler extends SAXiTextHandler {
  * @param	document	this is the document on which events must be triggered
  * @param myTags a user defined tagmap
  */
-    
-    public SAXmyHandler(DocListener document, HashMap myTags) {
+
+    public SAXmyHandler(final DocListener document, final HashMap myTags) {
         super(document, myTags);
     }
-    
+
 /**
  * This method gets called when a start tag is encountered.
- * 
+ *
 	 * @param   uri 		the Uniform Resource Identifier
 	 * @param   lname 		the local name (without prefix), or the empty string if Namespace processing is not being performed.
  * @param	name		the name of the tag that is encountered
  * @param	attrs		the list of attributes
  */
-    
-    public void startElement(String uri, String lname, String name, Attributes attrs) {
-        if (myTags.containsKey(name)) {
-            XmlPeer peer = (XmlPeer) myTags.get(name);
+
+    @Override
+	public void startElement(final String uri, final String lname, final String name, final Attributes attrs) {
+        if (this.myTags.containsKey(name)) {
+            final XmlPeer peer = (XmlPeer) this.myTags.get(name);
             handleStartingTags(peer.getTag(), peer.getAttributes(attrs));
         }
         else {
-            Properties attributes = new Properties();
+            final Properties attributes = new Properties();
             if (attrs != null) {
                 for (int i = 0; i < attrs.getLength(); i++) {
-                    String attribute = attrs.getQName(i);
+                    final String attribute = attrs.getQName(i);
                     attributes.setProperty(attribute, attrs.getValue(i));
                 }
             }
             handleStartingTags(name, attributes);
         }
     }
-    
+
     /**
  	 * This method gets called when an end tag is encountered.
  	 *
@@ -107,10 +108,11 @@ public class SAXmyHandler extends SAXiTextHandler {
 	 * @param   lname 		the local name (without prefix), or the empty string if Namespace processing is not being performed.
 	 * @param	name		the name of the tag that ends
 	 */
-    
-    public void endElement(String uri, String lname, String name) {
-        if (myTags.containsKey(name)) {
-            XmlPeer peer = (XmlPeer) myTags.get(name);
+
+    @Override
+	public void endElement(final String uri, final String lname, final String name) {
+        if (this.myTags.containsKey(name)) {
+            final XmlPeer peer = (XmlPeer) this.myTags.get(name);
             handleEndingTags(peer.getTag());
         }
         else {

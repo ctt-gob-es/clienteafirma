@@ -110,11 +110,11 @@ public abstract class BaseFont {
     /** The maximum height above the baseline reached by glyphs in this
      * font, excluding the height of glyphs for accented characters.
      */
-    public static final int ASCENT = 1;
+    static final int ASCENT = 1;
     /** The y coordinate of the top of flat capital letters, measured from
      * the baseline.
      */
-    public static final int CAPHEIGHT = 2;
+    static final int CAPHEIGHT = 2;
     /** The maximum depth below the baseline reached by glyphs in this
      * font. The value is a negative number.
      */
@@ -123,126 +123,123 @@ public abstract class BaseFont {
      * of the dominant vertical strokes of the font. The value is
      * negative for fonts that slope to the right, as almost all italic fonts do.
      */
-    public static final int ITALICANGLE = 4;
+    static final int ITALICANGLE = 4;
     /** The lower left x glyph coordinate.
      */
-    public static final int BBOXLLX = 5;
+    static final int BBOXLLX = 5;
     /** The lower left y glyph coordinate.
      */
-    public static final int BBOXLLY = 6;
+    static final int BBOXLLY = 6;
     /** The upper right x glyph coordinate.
      */
-    public static final int BBOXURX = 7;
+    static final int BBOXURX = 7;
     /** The upper right y glyph coordinate.
      */
     public static final int BBOXURY = 8;
 
     /** java.awt.Font property */
-    public static final int AWT_ASCENT = 9;
+    static final int AWT_ASCENT = 9;
     /** java.awt.Font property */
-    public static final int AWT_DESCENT = 10;
+    static final int AWT_DESCENT = 10;
     /** java.awt.Font property */
-    public static final int AWT_LEADING = 11;
+    static final int AWT_LEADING = 11;
     /** java.awt.Font property */
-    public static final int AWT_MAXADVANCE = 12;
+    static final int AWT_MAXADVANCE = 12;
     /**
      * The underline position. Usually a negative value.
      */
-    public static final int UNDERLINE_POSITION = 13;
+    static final int UNDERLINE_POSITION = 13;
     /**
      * The underline thickness.
      */
-    public static final int UNDERLINE_THICKNESS = 14;
+    static final int UNDERLINE_THICKNESS = 14;
     /**
      * The strikethrough position.
      */
-    public static final int STRIKETHROUGH_POSITION = 15;
+    static final int STRIKETHROUGH_POSITION = 15;
     /**
      * The strikethrough thickness.
      */
-    public static final int STRIKETHROUGH_THICKNESS = 16;
+    static final int STRIKETHROUGH_THICKNESS = 16;
     /**
      * The recommended vertical size for subscripts for this font.
      */
-    public static final int SUBSCRIPT_SIZE = 17;
+    static final int SUBSCRIPT_SIZE = 17;
     /**
      * The recommended vertical offset from the baseline for subscripts for this font. Usually a negative value.
      */
-    public static final int SUBSCRIPT_OFFSET = 18;
+    static final int SUBSCRIPT_OFFSET = 18;
     /**
      * The recommended vertical size for superscripts for this font.
      */
-    public static final int SUPERSCRIPT_SIZE = 19;
+    static final int SUPERSCRIPT_SIZE = 19;
     /**
      * The recommended vertical offset from the baseline for superscripts for this font.
      */
-    public static final int SUPERSCRIPT_OFFSET = 20;
+    static final int SUPERSCRIPT_OFFSET = 20;
     /** The font is Type 1.
      */
-    public static final int FONT_TYPE_T1 = 0;
+    static final int FONT_TYPE_T1 = 0;
     /** The font is True Type with a standard encoding.
      */
-    public static final int FONT_TYPE_TT = 1;
+    static final int FONT_TYPE_TT = 1;
     /** The font is CJK.
      */
-    public static final int FONT_TYPE_CJK = 2;
+    static final int FONT_TYPE_CJK = 2;
     /** The font is True Type with a Unicode encoding.
      */
-    public static final int FONT_TYPE_TTUNI = 3;
+    static final int FONT_TYPE_TTUNI = 3;
     /** A font already inside the document.
      */
-    public static final int FONT_TYPE_DOCUMENT = 4;
+    static final int FONT_TYPE_DOCUMENT = 4;
     /** A Type3 font.
      */
-    public static final int FONT_TYPE_T3 = 5;
+    static final int FONT_TYPE_T3 = 5;
     /** The Unicode encoding with horizontal writing.
      */
-    public static final String IDENTITY_H = "Identity-H";
+    static final String IDENTITY_H = "Identity-H";
     /** The Unicode encoding with vertical writing.
      */
-    public static final String IDENTITY_V = "Identity-V";
+    static final String IDENTITY_V = "Identity-V";
 
-    /** A possible encoding. */
-    public static final String CP1250 = "Cp1250";
+
 
     /** A possible encoding. */
     public static final String CP1252 = "Cp1252";
 
-    /** A possible encoding. */
-    public static final String CP1257 = "Cp1257";
+
 
     /** A possible encoding. */
     public static final String WINANSI = "Cp1252";
 
     /** A possible encoding. */
-    public static final String MACROMAN = "MacRoman";
+    static final String MACROMAN = "MacRoman";
 
-    public static final int[] CHAR_RANGE_LATIN = {0, 0x17f, 0x2000, 0x206f, 0x20a0, 0x20cf, 0xfb00, 0xfb06};
-    public static final int[] CHAR_RANGE_ARABIC = {0, 0x7f, 0x0600, 0x067f, 0x20a0, 0x20cf, 0xfb50, 0xfbff, 0xfe70, 0xfeff};
-    public static final int[] CHAR_RANGE_HEBREW = {0, 0x7f, 0x0590, 0x05ff, 0x20a0, 0x20cf, 0xfb1d, 0xfb4f};
-    public static final int[] CHAR_RANGE_CYRILLIC = {0, 0x7f, 0x0400, 0x052f, 0x2000, 0x206f, 0x20a0, 0x20cf};
+
+
+
+
 
 /** if the font has to be embedded */
-    public static final boolean EMBEDDED = true;
+    static final boolean EMBEDDED = true;
 
 /** if the font doesn't have to be embedded */
     public static final boolean NOT_EMBEDDED = false;
 /** if the font has to be cached */
-    public static final boolean CACHED = true;
-/** if the font doesn't have to be cached */
-    public static final boolean NOT_CACHED = false;
+    static final boolean CACHED = true;
+
 
     /** The path to the font resources. */
-    public static final String RESOURCE_PATH = "com/lowagie/text/pdf/fonts/";
+    static final String RESOURCE_PATH = "com/lowagie/text/pdf/fonts/";
     /** The fake CID code that represents a newline. */
-    public static final char CID_NEWLINE = '\u7fff';
+    static final char CID_NEWLINE = '\u7fff';
 
     protected ArrayList subsetRanges;
     /** The font type.
      */
     int fontType;
 /** a not defined character in a custom PDF encoding */
-    public static final String notdef = ".notdef";
+    static final String notdef = ".notdef";
 
 /** table of characters widths for this encoding */
     protected int widths[] = new int[256];
@@ -252,7 +249,7 @@ public abstract class BaseFont {
 /** same as differences but with the unicode codes */
     protected char unicodeDifferences[] = new char[256];
 
-    protected int charBBoxes[][] = new int[256][];
+    private final int charBBoxes[][] = new int[256][];
 /** encoding used with this font */
     protected String encoding;
 
@@ -273,7 +270,7 @@ public abstract class BaseFont {
     protected boolean fontSpecific = true;
 
 /** cache for the fonts already used. */
-    protected static HashMap fontCache = new HashMap();
+    private static HashMap fontCache = new HashMap();
 
 /** list of the 14 built in fonts. */
     protected static final HashMap BuiltinFonts14 = new HashMap();
@@ -293,7 +290,7 @@ public abstract class BaseFont {
      */
     protected boolean subset = true;
 
-    protected boolean fastWinansi = false;
+    private boolean fastWinansi = false;
 
     /**
      * Custom encodings use this map to key the Unicode character
@@ -331,7 +328,7 @@ public abstract class BaseFont {
          * @throws DocumentException error in the stream compression
          * @since	2.1.3 (replaces the constructor without param compressionLevel)
          */
-        public StreamFont(final byte contents[], final int lengths[], final int compressionLevel) throws DocumentException {
+        StreamFont(final byte contents[], final int lengths[], final int compressionLevel) throws DocumentException {
             try {
                 this.bytes = contents;
                 put(PdfName.LENGTH, new PdfNumber(this.bytes.length));
@@ -353,7 +350,7 @@ public abstract class BaseFont {
          * @throws DocumentException error in the stream compression
          * @since	2.1.3 (replaces the constructor without param compressionLevel)
          */
-        public StreamFont(final byte contents[], final String subType, final int compressionLevel) throws DocumentException {
+        StreamFont(final byte contents[], final String subType, final int compressionLevel) throws DocumentException {
             try {
                 this.bytes = contents;
                 put(PdfName.LENGTH, new PdfNumber(this.bytes.length));
@@ -595,7 +592,7 @@ public abstract class BaseFont {
      * @throws IOException the font file could not be read
      * @since	2.1.5
      */
-    public static BaseFont createFont(final String name, String encoding, boolean embedded, final boolean cached, final byte ttfAfm[], final byte pfb[], final boolean noThrow, final boolean forceRead) throws DocumentException, IOException {
+    private static BaseFont createFont(final String name, String encoding, boolean embedded, final boolean cached, final byte ttfAfm[], final byte pfb[], final boolean noThrow, final boolean forceRead) throws DocumentException, IOException {
     	final String nameBase = getBaseName(name);
         encoding = normalizeEncoding(encoding);
         final boolean isBuiltinFonts14 = BuiltinFonts14.containsKey(name);
@@ -672,7 +669,7 @@ public abstract class BaseFont {
      * @param enc the encoding to be normalized
      * @return the normalized encoding
      */
-    protected static String normalizeEncoding(final String enc) {
+    private static String normalizeEncoding(final String enc) {
         if (enc.equals("winansi") || enc.equals("")) {
 			return CP1252;
 		} else if (enc.equals("macroman")) {
@@ -884,7 +881,7 @@ public abstract class BaseFont {
      * @param fontSize the font size
      * @return the width in points
      */
-    public float getWidthPointKerned(final String text, final float fontSize) {
+    float getWidthPointKerned(final String text, final float fontSize) {
         final float size = getWidth(text) * 0.001f * fontSize;
         if (!hasKernPairs()) {
 			return size;
@@ -914,7 +911,7 @@ public abstract class BaseFont {
      * @param fontSize the font size
      * @return the width in points
      */
-    public float getWidthPoint(final int char1, final float fontSize) {
+    float getWidthPoint(final int char1, final float fontSize) {
         return getWidth(char1) * 0.001f * fontSize;
     }
 
@@ -1030,7 +1027,7 @@ public abstract class BaseFont {
     /** Creates a unique subset prefix to be added to the font name when the font is embedded and subset.
      * @return the subset prefix
      */
-    public static String createSubsetPrefix() {
+    static String createSubsetPrefix() {
         String s = "";
         for (int k = 0; k < 6; ++k) {
 			s += (char)(Math.random() * 26 + 'A');
@@ -1221,7 +1218,7 @@ public abstract class BaseFont {
      * @return the <CODE>InputStream</CODE> to get the resource or
      * <CODE>null</CODE> if not found
      */
-    public static InputStream getResourceStream(String key, final ClassLoader loader) {
+    static InputStream getResourceStream(String key, final ClassLoader loader) {
         if (key.startsWith("/")) {
 			key = key.substring(1);
 		}

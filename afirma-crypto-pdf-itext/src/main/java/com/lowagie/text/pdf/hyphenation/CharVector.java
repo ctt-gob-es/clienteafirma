@@ -24,7 +24,7 @@ import java.io.Serializable;
  *
  * @author Carlos Villegas <cav@uniscope.co.jp>
  */
-public class CharVector implements Cloneable, Serializable {
+class CharVector implements Cloneable, Serializable {
 
     private static final long serialVersionUID = -4875768298308363544L;
 	/**
@@ -47,7 +47,7 @@ public class CharVector implements Cloneable, Serializable {
         this(DEFAULT_BLOCK_SIZE);
     }
 
-    public CharVector(final int capacity) {
+    private CharVector(final int capacity) {
         if (capacity > 0) {
             this.blockSize = capacity;
         } else {
@@ -57,13 +57,9 @@ public class CharVector implements Cloneable, Serializable {
         this.n = 0;
     }
 
-    public CharVector(final char[] a) {
-        this.blockSize = DEFAULT_BLOCK_SIZE;
-        this.array = a;
-        this.n = a.length;
-    }
 
-    public CharVector(final char[] a, final int capacity) {
+
+    private CharVector(final char[] a, final int capacity) {
         if (capacity > 0) {
             this.blockSize = capacity;
         } else {
@@ -113,7 +109,7 @@ public class CharVector implements Cloneable, Serializable {
         return index;
     }
 
-    public void trimToSize() {
+    void trimToSize() {
         if (this.n < this.array.length) {
             final char[] aux = new char[this.n];
             System.arraycopy(this.array, 0, aux, 0, this.n);

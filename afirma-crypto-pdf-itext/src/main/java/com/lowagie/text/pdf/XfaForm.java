@@ -500,30 +500,30 @@ class XfaForm {
         /**
          * The order the names appear in the XML, depth first.
          */
-        protected ArrayList order;
+        ArrayList order;
         /**
          * The mapping of full names to nodes.
          */
-        protected HashMap name2Node;
+        HashMap name2Node;
         /**
          * The data to do a search from the bottom hierarchy.
          */
-        protected HashMap inverseSearch;
+        HashMap inverseSearch;
         /**
          * A stack to be used when parsing.
          */
-        protected Stack2 stack;
+        Stack2 stack;
         /**
          * A temporary store for the repetition count.
          */
-        protected int anform;
+        int anform;
 
         /**
          * Escapes a SOM string fragment replacing "." with "\.".
          * @param s the unescaped string
          * @return the escaped string
          */
-        public static String escapeSom(final String s) {
+        static String escapeSom(final String s) {
             int idx = s.indexOf('.');
             if (idx < 0) {
 				return s;
@@ -547,7 +547,7 @@ class XfaForm {
          * by '.'.
          * @return the stack as the sequence of elements separated by '.'
          */
-        protected String printStack() {
+        String printStack() {
             if (this.stack.empty()) {
 				return "";
 			}
@@ -587,7 +587,7 @@ class XfaForm {
          * Adds a SOM name to the search node chain.
          * @param unstack the SOM name
          */
-        public void inverseSearchAdd(final String unstack) {
+        void inverseSearchAdd(final String unstack) {
             inverseSearchAdd(this.inverseSearch, this.stack, unstack);
         }
 
@@ -597,7 +597,7 @@ class XfaForm {
          * @param stack the stack with the separated SOM parts
          * @param unstack the full name
          */
-        public static void inverseSearchAdd(final HashMap inverseSearch, final Stack2 stack, final String unstack) {
+        static void inverseSearchAdd(final HashMap inverseSearch, final Stack2 stack, final String unstack) {
             String last = (String)stack.peek();
             InverseStore store = (InverseStore)inverseSearch.get(last);
             if (store == null) {
@@ -626,7 +626,7 @@ class XfaForm {
          * @param parts the SOM parts
          * @return the full name or <CODE>null</CODE> if not found
          */
-        public String inverseSearchGlobal(final ArrayList parts) {
+        String inverseSearchGlobal(final ArrayList parts) {
             if (parts.isEmpty()) {
 				return null;
 			}
@@ -653,7 +653,7 @@ class XfaForm {
          * @param name the full SOM name
          * @return the split name
          */
-        public static Stack2 splitParts(String name) {
+        static Stack2 splitParts(String name) {
             while (name.startsWith(".")) {
 				name = name.substring(1);
 			}
@@ -744,13 +744,13 @@ class XfaForm {
     /**
      * Processes the datasets section in the XFA form.
      */
-    public static class Xml2SomDatasets extends Xml2Som {
+    static class Xml2SomDatasets extends Xml2Som {
         /**
          * Creates a new instance from the datasets node. This expects
          * not the datasets but the data node that comes below.
          * @param n the datasets node
          */
-        public Xml2SomDatasets(final Node n) {
+        private Xml2SomDatasets(final Node n) {
             this.order = new ArrayList();
             this.name2Node = new HashMap();
             this.stack = new Stack2();

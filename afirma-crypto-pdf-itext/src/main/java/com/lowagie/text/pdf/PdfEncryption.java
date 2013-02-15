@@ -63,13 +63,13 @@ import com.lowagie.text.pdf.crypto.ARCFOUREncryption;
  * @author Paulo Soares (psoares@consiste.pt)
  * @author Kazuya Ujihara
  */
-public class PdfEncryption {
+class PdfEncryption {
 
-	public static final int STANDARD_ENCRYPTION_40 = 2;
+	private static final int STANDARD_ENCRYPTION_40 = 2;
 
-	public static final int STANDARD_ENCRYPTION_128 = 3;
+	private static final int STANDARD_ENCRYPTION_128 = 3;
 
-	public static final int AES_128 = 4;
+	private static final int AES_128 = 4;
 
 	private static final byte[] pad = { (byte) 0x28, (byte) 0xBF, (byte) 0x4E,
 			(byte) 0x5E, (byte) 0x4E, (byte) 0x75, (byte) 0x8A, (byte) 0x41,
@@ -86,34 +86,34 @@ public class PdfEncryption {
 			(byte) 255, (byte) 255 };
 
 	/** The encryption key for a particular object/generation */
-	byte key[];
+	private byte key[];
 
 	/** The encryption key length for a particular object/generation */
-	int keySize;
+	private int keySize;
 
 	/** The global encryption key */
-	byte mkey[];
+	private byte mkey[];
 
 	/** Work area to prepare the object/generation bytes */
-	byte extra[] = new byte[5];
+	private final byte extra[] = new byte[5];
 
 	/** The message digest algorithm MD5 */
-	MessageDigest md5;
+	private MessageDigest md5;
 
 	/** The encryption key for the owner */
-	byte ownerKey[] = new byte[32];
+	private byte ownerKey[] = new byte[32];
 
 	/** The encryption key for the user */
 	byte userKey[] = new byte[32];
 
 	/** The public key security handler for certificate encryption */
-	protected PdfPublicKeySecurityHandler publicKeyHandler = null;
+	private PdfPublicKeySecurityHandler publicKeyHandler = null;
 
-	int permissions;
+	private int permissions;
 
-	byte documentID[];
+	private byte documentID[];
 
-	static long seq = System.currentTimeMillis();
+	private static long seq = System.currentTimeMillis();
 
 	private int revision;
 

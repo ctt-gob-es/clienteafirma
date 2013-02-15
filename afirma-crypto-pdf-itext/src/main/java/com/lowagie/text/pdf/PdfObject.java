@@ -75,40 +75,40 @@ public abstract class PdfObject {
     // CONSTANTS
 
     /** A possible type of <CODE>PdfObject</CODE> */
-    public static final int BOOLEAN = 1;
+    static final int BOOLEAN = 1;
 
     /** A possible type of <CODE>PdfObject</CODE> */
-    public static final int NUMBER = 2;
+    static final int NUMBER = 2;
 
     /** A possible type of <CODE>PdfObject</CODE> */
-    public static final int STRING = 3;
+    static final int STRING = 3;
 
     /** A possible type of <CODE>PdfObject</CODE> */
-    public static final int NAME = 4;
+    static final int NAME = 4;
 
     /** A possible type of <CODE>PdfObject</CODE> */
     public static final int ARRAY = 5;
 
     /** A possible type of <CODE>PdfObject</CODE> */
-    public static final int DICTIONARY = 6;
+    static final int DICTIONARY = 6;
 
     /** A possible type of <CODE>PdfObject</CODE> */
     public static final int STREAM = 7;
 
     /** A possible type of <CODE>PdfObject</CODE> */
-    public static final int NULL = 8;
+    static final int NULL = 8;
 
     /** A possible type of <CODE>PdfObject</CODE> */
     public static final int INDIRECT = 10;
 
     /** An empty string used for the <CODE>PdfNull</CODE>-object and for an empty <CODE>PdfString</CODE>-object. */
-    public static final String NOTHING = "";
+    static final String NOTHING = "";
 
     /**
      * This is the default encoding to be used for converting Strings into
      * bytes and vice versa. The default encoding is PdfDocEncoding.
      */
-    public static final String TEXT_PDFDOCENCODING = "PDF";
+    static final String TEXT_PDFDOCENCODING = "PDF";
 
     /** This is the encoding to be used to output text in Unicode. */
     public static final String TEXT_UNICODE = "UnicodeBig";
@@ -122,7 +122,7 @@ public abstract class PdfObject {
     protected int type;
 
     /** Holds the indirect reference. */
-    protected PRIndirectReference indRef;
+    private PRIndirectReference indRef;
 
     // CONSTRUCTORS
 
@@ -210,7 +210,7 @@ public abstract class PdfObject {
      * @return <CODE>true</CODE> if this object can be in an object stream.
      *   Otherwise <CODE>false</CODE>
      */
-    public boolean canBeInObjStm() {
+    boolean canBeInObjStm() {
         switch (this.type) {
             case NULL:
             case BOOLEAN:

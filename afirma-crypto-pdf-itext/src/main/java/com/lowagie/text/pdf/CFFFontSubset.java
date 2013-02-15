@@ -64,12 +64,12 @@ import java.util.LinkedList;
  * The CID synthetic creation was written by Sivan Toledo (sivan@math.tau.ac.il)
  * @author Oren Manor (manorore@post.tau.ac.il) and Ygal Blum (blumygal@post.tau.ac.il)
  */
-public class CFFFontSubset extends CFFFont {
+class CFFFontSubset extends CFFFont {
 
 	/**
 	 *  The Strings in this array represent Type1/Type2 operator names
 	 */
-	static final String SubrsFunctions[] = {
+	private static final String SubrsFunctions[] = {
 			"RESERVED_0","hstem","RESERVED_2","vstem","vmoveto","rlineto","hlineto","vlineto",
 			"rrcurveto","RESERVED_9","callsubr","return","escape","RESERVED_13",
 			"endchar","RESERVED_15","RESERVED_16","RESERVED_17","hstemhm","hintmask",
@@ -79,7 +79,7 @@ public class CFFFontSubset extends CFFFont {
 	/**
 	 * The Strings in this array represent Type1/Type2 escape operator names
 	 */
-	static final String SubrsEscapeFuncs[] = {
+	private static final String SubrsEscapeFuncs[] = {
 			"RESERVED_0","RESERVED_1","RESERVED_2","and","or","not","RESERVED_6",
 			"RESERVED_7","RESERVED_8","abs","add","sub","div","RESERVED_13","neg",
 			"eq","RESERVED_16","RESERVED_17","drop","RESERVED_19","put","get","ifelse",
@@ -90,77 +90,77 @@ public class CFFFontSubset extends CFFFont {
 	/**
 	*  Operator codes for unused  CharStrings and unused local and global Subrs
 	*/
-	static final byte ENDCHAR_OP = 14;
-	static final byte RETURN_OP = 11;
+	private static final byte ENDCHAR_OP = 14;
+	private static final byte RETURN_OP = 11;
 
 	/**
 	 * A HashMap containing the glyphs used in the text after being converted
 	 * to glyph number by the CMap
 	 */
-	HashMap GlyphsUsed;
+	private final HashMap GlyphsUsed;
 	/**
 	 * The GlyphsUsed keys as an ArrayList
 	 */
-	ArrayList glyphsInList;
+	private final ArrayList glyphsInList;
 	/**
 	 * A HashMap for keeping the FDArrays being used by the font
 	 */
-	HashMap FDArrayUsed = new HashMap();
+	private final HashMap FDArrayUsed = new HashMap();
 	/**
 	 * A HashMaps array for keeping the subroutines used in each FontDict
 	 */
-	HashMap[] hSubrsUsed;
+	private HashMap[] hSubrsUsed;
 	/**
 	 * The SubroutinesUsed HashMaps as ArrayLists
 	 */
-	ArrayList[] lSubrsUsed;
+	private ArrayList[] lSubrsUsed;
 	/**
 	 * A HashMap for keeping the Global subroutines used in the font
 	 */
-	HashMap hGSubrsUsed  = new HashMap();
+	private final HashMap hGSubrsUsed  = new HashMap();
 	/**
 	 * The Global SubroutinesUsed HashMaps as ArrayLists
 	 */
-	ArrayList lGSubrsUsed = new ArrayList();
+	private final ArrayList lGSubrsUsed = new ArrayList();
 	/**
 	 * A HashMap for keeping the subroutines used in a non-cid font
 	 */
-	HashMap hSubrsUsedNonCID  = new HashMap();
+	private final HashMap hSubrsUsedNonCID  = new HashMap();
 	/**
 	 * The SubroutinesUsed HashMap as ArrayList
 	 */
-	ArrayList lSubrsUsedNonCID = new ArrayList();
+	private final ArrayList lSubrsUsedNonCID = new ArrayList();
 	/**
 	 * An array of the new Indexes for the local Subr. One index for each FontDict
 	 */
-	byte[][] NewLSubrsIndex;
+	private byte[][] NewLSubrsIndex;
 	/**
 	 * The new subroutines index for a non-cid font
 	 */
-	byte[] NewSubrsIndexNonCID;
+	private byte[] NewSubrsIndexNonCID;
 	/**
 	 * The new global subroutines index of the font
 	 */
-	byte[] NewGSubrsIndex;
+	private byte[] NewGSubrsIndex;
 	/**
 	 * The new CharString of the font
 	 */
-	byte[] NewCharStringsIndex;
+	private byte[] NewCharStringsIndex;
 
 	/**
 	 * The bias for the global subroutines
 	 */
-	int GBias = 0;
+	private int GBias = 0;
 
 	/**
 	 * The linked list for generating the new font stream
 	 */
-	LinkedList OutputList;
+	private LinkedList OutputList;
 
 	/**
 	 * Number of arguments to the stem operators in a subroutine calculated recursively
 	 */
-	int NumOfHints=0;
+	private int NumOfHints=0;
 
 
 	/**
@@ -212,7 +212,7 @@ public class CFFFontSubset extends CFFFont {
      * @param NumofGlyphs Number of glyphs in the font
      * @return the length of the Charset
      */
-    int CountCharset(final int Offset,final int NumofGlyphs){
+    private int CountCharset(final int Offset,final int NumofGlyphs){
     	int format;
     	int Length=0;
     	seek(Offset);
@@ -241,7 +241,7 @@ public class CFFFontSubset extends CFFFont {
      * @param Type The format of the Charset
      * @return The number of ranges in the Charset data structure
      */
-    int CountRange(final int NumofGlyphs,final int Type){
+    private int CountRange(final int NumofGlyphs,final int Type){
     	int num=0;
     	char Sid;
     	int i=1,nLeft;
@@ -263,7 +263,7 @@ public class CFFFontSubset extends CFFFont {
 	 * Read the FDSelect of the font and compute the array and its length
 	 * @param Font The index of the font being processed
 	 */
-	protected void readFDSelect(final int Font)
+	private void readFDSelect(final int Font)
 	{
 		// Restore the number of glyphs
 		final int NumOfGlyphs = this.fonts[Font].nglyphs;
@@ -322,7 +322,7 @@ public class CFFFontSubset extends CFFFont {
 	 * Function reads the FDSelect and builds the FDArrayUsed HashMap According to the glyphs used
 	 * @param Font the Number of font being processed
 	 */
-	protected void BuildFDArrayUsed(final int Font)
+	private void BuildFDArrayUsed(final int Font)
 	{
 		final int[] FDSelect = this.fonts[Font].FDSelect;
 		// For each glyph used
@@ -341,7 +341,7 @@ public class CFFFontSubset extends CFFFont {
 	 * Read the FDArray count, offsize and Offset array
 	 * @param Font
 	 */
-	protected void ReadFDArray(final int Font)
+	private void ReadFDArray(final int Font)
 	{
 		seek(this.fonts[Font].fdarrayOffset);
 		this.fonts[Font].FDArrayCount = getCard16();
@@ -408,7 +408,7 @@ public class CFFFontSubset extends CFFFont {
 	 * @param Font the font
 	 * @return The calculated Bias
 	 */
-	protected int CalcBias(final int Offset,final int Font)
+	private int CalcBias(final int Offset,final int Font)
 	{
 		seek(Offset);
 		final int nSubrs = getCard16();
@@ -429,7 +429,7 @@ public class CFFFontSubset extends CFFFont {
 	 * @param FontIndex the font
 	 * @throws IOException
 	 */
-	protected void BuildNewCharString(final int FontIndex) throws IOException
+	private void BuildNewCharString(final int FontIndex) throws IOException
 	{
 		this.NewCharStringsIndex = BuildNewIndex(this.fonts[FontIndex].charstringsOffsets,this.GlyphsUsed,ENDCHAR_OP);
 	}
@@ -440,7 +440,7 @@ public class CFFFontSubset extends CFFFont {
 	 * @param Font the font
 	 * @throws IOException
 	 */
-	protected void BuildNewLGSubrs(final int Font)throws IOException
+	private void BuildNewLGSubrs(final int Font)throws IOException
 	{
 		// If the font is CID then the lsubrs are divided into FontDicts.
 		// for each FD array the lsubrs will be subsetted.
@@ -506,7 +506,7 @@ public class CFFFontSubset extends CFFFont {
 	 * @param Font the font
 	 * @param FD The FDARRAY processed
 	 */
-	protected void BuildFDSubrsOffsets(final int Font,final int FD)
+	private void BuildFDSubrsOffsets(final int Font,final int FD)
 	{
 		// Initiate to -1 to indicate lsubr operator present
 		this.fonts[Font].PrivateSubrsOffset[FD] = -1;
@@ -538,7 +538,7 @@ public class CFFFontSubset extends CFFFont {
 	 * @param hSubr HashMap of the subrs used
 	 * @param lSubr ArrayList of the subrs used
 	 */
-	protected void BuildSubrUsed(final int Font,final int FD,final int SubrOffset,final int[] SubrsOffsets,final HashMap hSubr,final ArrayList lSubr)
+	private void BuildSubrUsed(final int Font,final int FD,final int SubrOffset,final int[] SubrsOffsets,final HashMap hSubr,final ArrayList lSubr)
 	{
 
 		// Calc the Bias for the subr index
@@ -590,7 +590,7 @@ public class CFFFontSubset extends CFFFont {
 	 * to Gsubrs and adds to Hashmap & ArrayList
 	 * @param Font the font
 	 */
-	protected void BuildGSubrsUsed(final int Font)
+	private void BuildGSubrsUsed(final int Font)
 	{
 		int LBias = 0;
 		int SizeOfNonCIDSubrsUsed = 0;
@@ -648,7 +648,7 @@ public class CFFFontSubset extends CFFFont {
 	 * @param hSubr the HashMap for the lSubrs
 	 * @param lSubr the ArrayList for the lSubrs
 	 */
-	protected void ReadASubr(final int begin,final int end,final int GBias,final int LBias,final HashMap hSubr,final ArrayList lSubr,final int[] LSubrsOffsets)
+	private void ReadASubr(final int begin,final int end,final int GBias,final int LBias,final HashMap hSubr,final ArrayList lSubr,final int[] LSubrsOffsets)
 	{
 		// Clear the stack for the subrs
 		EmptyStack();
@@ -726,7 +726,7 @@ public class CFFFontSubset extends CFFFont {
 	 * Function Checks how the current operator effects the run time stack after being run
 	 * An operator may increase or decrease the stack size
 	 */
-	protected void HandelStack()
+	private void HandelStack()
 	{
     	// Find out what the operator does to the stack
     	int StackHandel = StackOpp();
@@ -756,7 +756,7 @@ public class CFFFontSubset extends CFFFont {
 	 * Function checks the key and return the change to the stack after the operator
 	 * @return The change in the stack. 2-> flush the stack
 	 */
-	protected int StackOpp()
+	private int StackOpp()
 	{
 		if (this.key == "ifelse") {
 			return -3;
@@ -783,7 +783,7 @@ public class CFFFontSubset extends CFFFont {
 	 * Empty the Type2 Stack
 	 *
 	 */
-	protected void EmptyStack()
+	private void EmptyStack()
 	{
 		// Null the arguments
     	for (int i=0; i<this.arg_count; i++) {
@@ -796,7 +796,7 @@ public class CFFFontSubset extends CFFFont {
 	 * Pop one element from the stack
 	 *
 	 */
-	protected void PopStack()
+	private void PopStack()
 	{
 		if (this.arg_count>0)
 		{
@@ -809,7 +809,7 @@ public class CFFFontSubset extends CFFFont {
 	 * Add an item to the stack
 	 *
 	 */
-	protected void PushStack()
+	private void PushStack()
 	{
 		this.arg_count++;
 	}
@@ -817,7 +817,7 @@ public class CFFFontSubset extends CFFFont {
 	/**
 	 * The function reads the next command after the file pointer is set
 	 */
-	protected void ReadCommand()
+	private void ReadCommand()
 	{
         this.key = null;
         boolean gotKey = false;
@@ -894,7 +894,7 @@ public class CFFFontSubset extends CFFFont {
 	 * @param LSubrsOffsets The Offsets array of the subroutines
 	 * @return The number of hints in the subroutine read.
 	 */
-	protected int CalcHints(final int begin,final int end,final int LBias,final int GBias,final int[] LSubrsOffsets)
+	private int CalcHints(final int begin,final int end,final int LBias,final int GBias,final int[] LSubrsOffsets)
 	{
 		// Goto beginning of the subr
         seek(begin);
@@ -960,7 +960,7 @@ public class CFFFontSubset extends CFFFont {
 	 * @return the new index subset version
 	 * @throws IOException
 	 */
-	protected byte[] BuildNewIndex(final int[] Offsets,final HashMap Used,final byte OperatorForUnusedEntries) throws IOException
+	private byte[] BuildNewIndex(final int[] Offsets,final HashMap Used,final byte OperatorForUnusedEntries) throws IOException
 	{
 		int unusedCount = 0;
 		int Offset=0;
@@ -1013,7 +1013,7 @@ public class CFFFontSubset extends CFFFont {
 	 * @param NewObjects the subsetted object array
 	 * @return the new index created
 	 */
-	protected byte[] AssembleIndex(final int[] NewOffsets,final byte[] NewObjects)
+	private byte[] AssembleIndex(final int[] NewOffsets,final byte[] NewObjects)
 	{
 		// Calc the index' count field
 		final char Count = (char)(NewOffsets.length-1);
@@ -1069,7 +1069,7 @@ public class CFFFontSubset extends CFFFont {
 	 * @param Font the font
 	 * @return the subsetted font stream
 	 */
-	protected byte[] BuildNewFile(final int Font)
+	private byte[] BuildNewFile(final int Font)
     {
 		// Prepare linked list for new font components
 		this.OutputList = new LinkedList();
@@ -1252,7 +1252,7 @@ public class CFFFontSubset extends CFFFont {
 	/**
 	 * Function Copies the header from the original fileto the output list
 	 */
-	protected void CopyHeader()
+	private void CopyHeader()
 	{
 		seek(0);
         final int major = getCard8();
@@ -1268,7 +1268,7 @@ public class CFFFontSubset extends CFFFont {
 	 * @param Offsize the offsize field of the index
 	 * @param First the first offset of the index
 	 */
-	protected void BuildIndexHeader(final int Count,final int Offsize,final int First)
+	private void BuildIndexHeader(final int Count,final int Offsize,final int First)
 	{
 		// Add the count field
 		this.OutputList.addLast(new UInt16Item((char)Count)); // count
@@ -1300,7 +1300,7 @@ public class CFFFontSubset extends CFFFont {
 	 * @param charsetRef OffsetItem for the CharSet
 	 * @param charstringsRef OffsetItem for the CharString
 	 */
-	protected void CreateKeys(final OffsetItem fdarrayRef,final OffsetItem fdselectRef,final OffsetItem charsetRef,final OffsetItem charstringsRef)
+	private void CreateKeys(final OffsetItem fdarrayRef,final OffsetItem fdselectRef,final OffsetItem charsetRef,final OffsetItem charstringsRef)
 	{
 	    // create an FDArray key
         this.OutputList.addLast(fdarrayRef);
@@ -1323,7 +1323,7 @@ public class CFFFontSubset extends CFFFont {
 	 * to accommodate the CID rules
 	 * @param Font the font
 	 */
-	protected void CreateNewStringIndex(final int Font)
+	private void CreateNewStringIndex(final int Font)
 	{
         String fdFontName = this.fonts[Font].name+"-OneRange";
         if (fdFontName.length() > 127) {
@@ -1372,7 +1372,7 @@ public class CFFFontSubset extends CFFFont {
 	 * @param fdselectRef OffsetItem for the FDSelect
 	 * @param nglyphs the number of glyphs in the font
 	 */
-	protected void CreateFDSelect(final OffsetItem fdselectRef,final int nglyphs)
+	private void CreateFDSelect(final OffsetItem fdselectRef,final int nglyphs)
 	{
 		this.OutputList.addLast(new MarkerItem(fdselectRef));
 	    this.OutputList.addLast(new UInt8Item((char)3)); // format identifier
@@ -1390,7 +1390,7 @@ public class CFFFontSubset extends CFFFont {
 	 * @param charsetRef OffsetItem for the CharSet
 	 * @param nglyphs the number of glyphs in the font
 	 */
-	protected void CreateCharset(final OffsetItem charsetRef,final int nglyphs)
+	private void CreateCharset(final OffsetItem charsetRef,final int nglyphs)
 	{
 		this.OutputList.addLast(new MarkerItem(charsetRef));
 	    this.OutputList.addLast(new UInt8Item((char)2)); // format identifier
@@ -1406,7 +1406,7 @@ public class CFFFontSubset extends CFFFont {
 	 * @param privateRef OffsetItem for the Private Dict
 	 * @param Font the font
 	 */
-	protected void CreateFDArray(final OffsetItem fdarrayRef,final OffsetItem privateRef,final int Font)
+	private void CreateFDArray(final OffsetItem fdarrayRef,final OffsetItem privateRef,final int Font)
 	{
 		this.OutputList.addLast(new MarkerItem(fdarrayRef));
 		// Build the header (count=offsize=first=1)
@@ -1438,7 +1438,7 @@ public class CFFFontSubset extends CFFFont {
 	 * Function reconstructs the FDArray, PrivateDict and LSubr for CID fonts
 	 * @param Font the font
 	 */
-	void Reconstruct(final int Font)
+	private void Reconstruct(final int Font)
 	{
 		// Init for later use
 		final OffsetItem[] fdPrivate = new DictOffsetItem[this.fonts[Font].FDArrayOffsets.length-1];
@@ -1455,7 +1455,7 @@ public class CFFFontSubset extends CFFFont {
 	 * @param Font The font
 	 * @param fdPrivate OffsetItem Array (one for each FDArray)
 	 */
-	void ReconstructFDArray(final int Font,final OffsetItem[] fdPrivate)
+	private void ReconstructFDArray(final int Font,final OffsetItem[] fdPrivate)
 	{
 		// Build the header of the index
 		BuildIndexHeader(this.fonts[Font].FDArrayCount,this.fonts[Font].FDArrayOffsize,1);
@@ -1522,7 +1522,7 @@ public class CFFFontSubset extends CFFFont {
 	 * @param fdPrivateBase IndexBaseItem array one element for each private
 	 * @param fdSubrs OffsetItem array one element for each private
 	 */
-	void ReconstructPrivateDict(final int Font,final OffsetItem[] fdPrivate,final IndexBaseItem[] fdPrivateBase,
+	private void ReconstructPrivateDict(final int Font,final OffsetItem[] fdPrivate,final IndexBaseItem[] fdPrivateBase,
 			final OffsetItem[] fdSubrs)
 	{
 
@@ -1567,7 +1567,7 @@ public class CFFFontSubset extends CFFFont {
 	 * @param fdSubrs OffsetItem array for the linked list
 	 */
 
-	void ReconstructPrivateSubrs(final int Font,final IndexBaseItem[] fdPrivateBase,
+	private void ReconstructPrivateSubrs(final int Font,final IndexBaseItem[] fdPrivateBase,
 			final OffsetItem[] fdSubrs)
 	{
 		// For each private dict
@@ -1590,7 +1590,7 @@ public class CFFFontSubset extends CFFFont {
 	 * @param Size The size of the private dict
 	 * @return The size of the offset of the subrs in the private dict
 	 */
-	int CalcSubrOffsetSize(final int Offset,final int Size)
+	private int CalcSubrOffsetSize(final int Offset,final int Size)
 	{
 		// Set the size to 0
 		int OffsetSize = 0;
@@ -1621,7 +1621,7 @@ public class CFFFontSubset extends CFFFont {
 	 * @param Font the font
 	 * @param Subr The OffsetItem for the subrs of the private
 	 */
-	void CreateNonCIDPrivate(final int Font,final OffsetItem Subr)
+	private void CreateNonCIDPrivate(final int Font,final OffsetItem Subr)
 	{
 		// Go to the beginning of the private dict and read until the end
 		seek(this.fonts[Font].privateOffset);
@@ -1650,7 +1650,7 @@ public class CFFFontSubset extends CFFFont {
 	 * @param PrivateBase IndexBaseItem for the private that's referencing to the subrs
 	 * @param Subrs OffsetItem for the subrs
 	 */
-	void CreateNonCIDSubrs(final int Font,final IndexBaseItem PrivateBase,final OffsetItem Subrs)
+	private void CreateNonCIDSubrs(final int Font,final IndexBaseItem PrivateBase,final OffsetItem Subrs)
 	{
 		// Mark the beginning of the Subrs index
 		this.OutputList.addLast(new SubrMarkerItem(Subrs,PrivateBase));

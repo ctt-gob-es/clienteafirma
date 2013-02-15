@@ -125,7 +125,7 @@ public class BmpImage {
     private boolean isBottomUp;
     private int bitsPerPixel;
     private int redMask, greenMask, blueMask, alphaMask;
-    public HashMap properties = new HashMap();
+    private final HashMap properties = new HashMap();
     private long xPelsPerMeter;
     private long yPelsPerMeter;
     // BMP Image types
@@ -160,10 +160,10 @@ public class BmpImage {
     private static final int BI_RLE4 = 2;
     private static final int BI_BITFIELDS = 3;
 
-    int width;
-    int height;
+    private int width;
+    private int height;
 
-    BmpImage(final InputStream is, final boolean noHeader, final int size) throws IOException {
+    private BmpImage(final InputStream is, final boolean noHeader, final int size) throws IOException {
         this.bitmapFileSize = size;
         this.bitmapOffset = 0;
         process(is, noHeader);
@@ -194,7 +194,7 @@ public class BmpImage {
      * @throws IOException on error
      * @return the image
      */
-    public static Image getImage(final InputStream is) throws IOException {
+    private static Image getImage(final InputStream is) throws IOException {
         return getImage(is, false, 0);
     }
 

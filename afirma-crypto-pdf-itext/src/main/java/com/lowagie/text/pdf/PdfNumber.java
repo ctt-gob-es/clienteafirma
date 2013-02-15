@@ -104,7 +104,7 @@ public class PdfNumber extends PdfObject {
      *
      * @param value    value of the new <CODE>PdfNumber</CODE>-object
      */
-    public PdfNumber(final double value) {
+    PdfNumber(final double value) {
         super(NUMBER);
         this.value = value;
         setContent(ByteBuffer.formatDouble(value));

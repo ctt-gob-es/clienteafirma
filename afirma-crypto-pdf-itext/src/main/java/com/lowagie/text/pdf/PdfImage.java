@@ -62,11 +62,11 @@ import com.lowagie.text.Image;
 
 public class PdfImage extends PdfStream {
 
-    static final int TRANSFERSIZE = 4096;
+    private static final int TRANSFERSIZE = 4096;
     // membervariables
 
     /** This is the <CODE>PdfName</CODE> of the image. */
-    protected PdfName name = null;
+    private PdfName name = null;
 
     // constructor
 
@@ -78,7 +78,7 @@ public class PdfImage extends PdfStream {
      * @throws BadPdfFormatException on error
      */
 
-    public PdfImage(final Image image, final String name, final PdfIndirectReference maskRef) throws BadPdfFormatException {
+    PdfImage(final Image image, final String name, final PdfIndirectReference maskRef) throws BadPdfFormatException {
         super();
         this.name = new PdfName(name);
         put(PdfName.TYPE, PdfName.XOBJECT);
@@ -282,7 +282,7 @@ public class PdfImage extends PdfStream {
      * @return		the name
      */
 
-    public PdfName name() {
+    PdfName name() {
         return this.name;
     }
 

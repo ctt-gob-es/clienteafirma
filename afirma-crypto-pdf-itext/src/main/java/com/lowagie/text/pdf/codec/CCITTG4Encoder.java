@@ -54,44 +54,44 @@ import com.lowagie.text.pdf.ByteBuffer;
  * Encodes data in the CCITT G4 FAX format.
  */
 public class CCITTG4Encoder {
-    private int rowbytes;
-    private int rowpixels;
+    private final int rowbytes;
+    private final int rowpixels;
     private int bit = 8;
     private int data;
-    private byte[] refline;
-    private ByteBuffer outBuf = new ByteBuffer(1024);
+    private final byte[] refline;
+    private final ByteBuffer outBuf = new ByteBuffer(1024);
     private byte[] dataBp;
     private int offsetData;
     private int sizeData;
-    
+
     /**
      * Creates a new encoder.
      * @param width the line width
-     */    
-    public CCITTG4Encoder(int width) {
-        rowpixels = width;
-        rowbytes = (rowpixels + 7) / 8;
-        refline = new byte[rowbytes];
+     */
+    CCITTG4Encoder(final int width) {
+        this.rowpixels = width;
+        this.rowbytes = (this.rowpixels + 7) / 8;
+        this.refline = new byte[this.rowbytes];
     }
-    
+
     /**
      * Encodes a number of lines.
      * @param data the data to be encoded
      * @param offset the offset into the data
      * @param size the size of the data to be encoded
-     */    
-    public void fax4Encode(byte[] data, int offset, int size) {
-        dataBp = data;
-        offsetData = offset;
-        sizeData = size;
-        while (sizeData > 0) {
+     */
+    private void fax4Encode(final byte[] data, final int offset, final int size) {
+        this.dataBp = data;
+        this.offsetData = offset;
+        this.sizeData = size;
+        while (this.sizeData > 0) {
             Fax3Encode2DRow();
-            System.arraycopy(dataBp, offsetData, refline, 0, rowbytes);
-            offsetData += rowbytes;
-            sizeData -= rowbytes;
+            System.arraycopy(this.dataBp, this.offsetData, this.refline, 0, this.rowbytes);
+            this.offsetData += this.rowbytes;
+            this.sizeData -= this.rowbytes;
         }
     }
-    
+
 
     /**
      * Encodes a full image.
@@ -99,38 +99,38 @@ public class CCITTG4Encoder {
      * @param width the image width
      * @param height the image height
      * @return the encoded image
-     */    
-    public static byte[] compress(byte[] data, int width, int height) {
-        CCITTG4Encoder g4 = new CCITTG4Encoder(width);
+     */
+    public static byte[] compress(final byte[] data, final int width, final int height) {
+        final CCITTG4Encoder g4 = new CCITTG4Encoder(width);
         g4.fax4Encode(data, 0, g4.rowbytes * height);
         return g4.close();
     }
-    
+
     /**
      * Encodes a number of lines.
      * @param data the data to be encoded
      * @param height the number of lines to encode
-     */    
-    public void fax4Encode(byte[] data, int height) {
-        fax4Encode(data, 0, rowbytes * height);
+     */
+    void fax4Encode(final byte[] data, final int height) {
+        fax4Encode(data, 0, this.rowbytes * height);
     }
 
-    private void putcode(int[] table) {
+    private void putcode(final int[] table) {
         putBits(table[CODE], table[LENGTH]);
     }
-    
-    private void putspan(int span, int[][] tab) {
+
+    private void putspan(int span, final int[][] tab) {
         int code, length;
-        
+
         while (span >= 2624) {
-            int[] te = tab[63 + (2560>>6)];
+            final int[] te = tab[63 + (2560>>6)];
             code = te[CODE];
             length = te[LENGTH];
             putBits(code, length);
             span -= te[RUNLEN];
         }
         if (span >= 64) {
-            int[] te = tab[63 + (span>>6)];
+            final int[] te = tab[63 + (span>>6)];
             code = te[CODE];
             length = te[LENGTH];
             putBits(code, length);
@@ -140,112 +140,119 @@ public class CCITTG4Encoder {
         length = tab[span][LENGTH];
         putBits(code, length);
     }
-    
-    private void putBits(int bits, int length) {
-        while (length > bit) {
-            data |= bits >> (length - bit);
-            length -= bit;
-            outBuf.append((byte)data);
-            data = 0;
-            bit = 8;
+
+    private void putBits(final int bits, int length) {
+        while (length > this.bit) {
+            this.data |= bits >> length - this.bit;
+            length -= this.bit;
+            this.outBuf.append((byte)this.data);
+            this.data = 0;
+            this.bit = 8;
         }
-        data |= (bits & msbmask[length]) << (bit - length);
-        bit -= length;
-        if (bit == 0) {
-            outBuf.append((byte)data);
-            data = 0;
-            bit = 8;
+        this.data |= (bits & this.msbmask[length]) << this.bit - length;
+        this.bit -= length;
+        if (this.bit == 0) {
+            this.outBuf.append((byte)this.data);
+            this.data = 0;
+            this.bit = 8;
         }
     }
-    
+
     private void Fax3Encode2DRow() {
         int a0 = 0;
-        int a1 = (pixel(dataBp, offsetData, 0) != 0 ? 0 : finddiff(dataBp, offsetData, 0, rowpixels, 0));
-        int b1 = (pixel(refline, 0, 0) != 0 ? 0 : finddiff(refline, 0, 0, rowpixels, 0));
+        int a1 = pixel(this.dataBp, this.offsetData, 0) != 0 ? 0 : finddiff(this.dataBp, this.offsetData, 0, this.rowpixels, 0);
+        int b1 = pixel(this.refline, 0, 0) != 0 ? 0 : finddiff(this.refline, 0, 0, this.rowpixels, 0);
         int a2, b2;
-        
+
         for (;;) {
-            b2 = finddiff2(refline, 0, b1, rowpixels, pixel(refline, 0,b1));
+            b2 = finddiff2(this.refline, 0, b1, this.rowpixels, pixel(this.refline, 0,b1));
             if (b2 >= a1) {
-                int d = b1 - a1;
+                final int d = b1 - a1;
                 if (!(-3 <= d && d <= 3)) {	/* horizontal mode */
-                    a2 = finddiff2(dataBp, offsetData, a1, rowpixels, pixel(dataBp, offsetData,a1));
-                    putcode(horizcode);
-                    if (a0+a1 == 0 || pixel(dataBp, offsetData, a0) == 0) {
-                        putspan(a1-a0, TIFFFaxWhiteCodes);
-                        putspan(a2-a1, TIFFFaxBlackCodes);
+                    a2 = finddiff2(this.dataBp, this.offsetData, a1, this.rowpixels, pixel(this.dataBp, this.offsetData,a1));
+                    putcode(this.horizcode);
+                    if (a0+a1 == 0 || pixel(this.dataBp, this.offsetData, a0) == 0) {
+                        putspan(a1-a0, this.TIFFFaxWhiteCodes);
+                        putspan(a2-a1, this.TIFFFaxBlackCodes);
                     } else {
-                        putspan(a1-a0, TIFFFaxBlackCodes);
-                        putspan(a2-a1, TIFFFaxWhiteCodes);
+                        putspan(a1-a0, this.TIFFFaxBlackCodes);
+                        putspan(a2-a1, this.TIFFFaxWhiteCodes);
                     }
                     a0 = a2;
                 } else {			/* vertical mode */
-                    putcode(vcodes[d+3]);
+                    putcode(this.vcodes[d+3]);
                     a0 = a1;
                 }
             } else {				/* pass mode */
-                putcode(passcode);
+                putcode(this.passcode);
                 a0 = b2;
             }
-            if (a0 >= rowpixels)
-                break;
-            a1 = finddiff(dataBp, offsetData, a0, rowpixels, pixel(dataBp, offsetData,a0));
-            b1 = finddiff(refline, 0, a0, rowpixels, pixel(dataBp, offsetData,a0) ^ 1);
-            b1 = finddiff(refline, 0, b1, rowpixels, pixel(dataBp, offsetData,a0));
+            if (a0 >= this.rowpixels) {
+				break;
+			}
+            a1 = finddiff(this.dataBp, this.offsetData, a0, this.rowpixels, pixel(this.dataBp, this.offsetData,a0));
+            b1 = finddiff(this.refline, 0, a0, this.rowpixels, pixel(this.dataBp, this.offsetData,a0) ^ 1);
+            b1 = finddiff(this.refline, 0, b1, this.rowpixels, pixel(this.dataBp, this.offsetData,a0));
         }
     }
-    
+
     private void Fax4PostEncode() {
         putBits(EOL, 12);
         putBits(EOL, 12);
-        if (bit != 8) {
-            outBuf.append((byte)data);
-            data = 0;
-            bit = 8;
+        if (this.bit != 8) {
+            this.outBuf.append((byte)this.data);
+            this.data = 0;
+            this.bit = 8;
         }
     }
-    
+
     /**
      * Closes the encoder and returns the encoded data.
      * @return the encoded data
-     */    
-    public byte[] close() {
+     */
+    byte[] close() {
         Fax4PostEncode();
-        return outBuf.toByteArray();
+        return this.outBuf.toByteArray();
     }
-    
-    private int pixel(byte[] data, int offset, int bit) {
-        if (bit >= rowpixels)
-            return 0;
-        return ((data[offset + (bit >> 3)] & 0xff) >> (7-((bit)&7))) & 1;
+
+    private int pixel(final byte[] data, final int offset, final int bit) {
+        if (bit >= this.rowpixels) {
+			return 0;
+		}
+        return (data[offset + (bit >> 3)] & 0xff) >> 7-(bit&7) & 1;
     }
-    
-    private static int find1span(byte[] bp, int offset, int bs, int be) {
+
+    private static int find1span(final byte[] bp, final int offset, final int bs, final int be) {
         int bits = be - bs;
         int n, span;
-        
+
         int pos = offset + (bs >> 3);
         /*
          * Check partial byte on lhs.
          */
-        if (bits > 0 && (n = (bs & 7)) != 0) {
-            span = oneruns[(bp[pos] << n) & 0xff];
-            if (span > 8-n)		/* table value too generous */
-                span = 8-n;
-            if (span > bits)	/* constrain span to bit range */
-                span = bits;
-            if (n+span < 8)		/* doesn't extend to edge of byte */
-                return span;
+        if (bits > 0 && (n = bs & 7) != 0) {
+            span = oneruns[bp[pos] << n & 0xff];
+            if (span > 8-n) {
+				span = 8-n;
+			}
+            if (span > bits) {
+				span = bits;
+			}
+            if (n+span < 8) {
+				return span;
+			}
             bits -= span;
             pos++;
-        } else
-            span = 0;
+        } else {
+			span = 0;
+		}
         /*
          * Scan full bytes for all 1's.
          */
         while (bits >= 8) {
-            if (bp[pos] != -1)	/* end of run */
-                return (span + oneruns[bp[pos] & 0xff]);
+            if (bp[pos] != -1) {
+				return span + oneruns[bp[pos] & 0xff];
+			}
             span += 8;
             bits -= 8;
             pos++;
@@ -255,37 +262,42 @@ public class CCITTG4Encoder {
          */
         if (bits > 0) {
             n = oneruns[bp[pos] & 0xff];
-            span += (n > bits ? bits : n);
+            span += n > bits ? bits : n;
         }
         return span;
     }
-    
-    private static int find0span(byte[] bp, int offset, int bs, int be) {
+
+    private static int find0span(final byte[] bp, final int offset, final int bs, final int be) {
         int bits = be - bs;
         int n, span;
-        
+
         int pos = offset + (bs >> 3);
         /*
          * Check partial byte on lhs.
          */
-        if (bits > 0 && (n = (bs & 7)) != 0) {
-            span = zeroruns[(bp[pos] << n) & 0xff];
-            if (span > 8-n)		/* table value too generous */
-                span = 8-n;
-            if (span > bits)	/* constrain span to bit range */
-                span = bits;
-            if (n+span < 8)		/* doesn't extend to edge of byte */
-                return span;
+        if (bits > 0 && (n = bs & 7) != 0) {
+            span = zeroruns[bp[pos] << n & 0xff];
+            if (span > 8-n) {
+				span = 8-n;
+			}
+            if (span > bits) {
+				span = bits;
+			}
+            if (n+span < 8) {
+				return span;
+			}
             bits -= span;
             pos++;
-        } else
-            span = 0;
+        } else {
+			span = 0;
+		}
         /*
          * Scan full bytes for all 1's.
          */
         while (bits >= 8) {
-            if (bp[pos] != 0)	/* end of run */
-                return (span + zeroruns[bp[pos] & 0xff]);
+            if (bp[pos] != 0) {
+				return span + zeroruns[bp[pos] & 0xff];
+			}
             span += 8;
             bits -= 8;
             pos++;
@@ -295,19 +307,19 @@ public class CCITTG4Encoder {
          */
         if (bits > 0) {
             n = zeroruns[bp[pos] & 0xff];
-            span += (n > bits ? bits : n);
+            span += n > bits ? bits : n;
         }
         return span;
     }
-    
-    private static int finddiff(byte[] bp, int offset, int bs, int be, int color) {
+
+    private static int finddiff(final byte[] bp, final int offset, final int bs, final int be, final int color) {
         return bs + (color != 0 ? find1span(bp, offset, bs, be) : find0span(bp, offset, bs, be));
     }
-    
-    private static int finddiff2(byte[] bp, int offset, int bs, int be, int color) {
+
+    private static int finddiff2(final byte[] bp, final int offset, final int bs, final int be, final int color) {
         return bs < be ? finddiff(bp, offset, bs, be, color) : be;
     }
-    
+
     private static byte zeroruns[] = {
         8, 7, 6, 6, 5, 5, 5, 5, 4, 4, 4, 4, 4, 4, 4, 4,	/* 0x00 - 0x0f */
         3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,	/* 0x10 - 0x1f */
@@ -326,7 +338,7 @@ public class CCITTG4Encoder {
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 0xe0 - 0xef */
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0	/* 0xf0 - 0xff */
     };
-    
+
     private static byte oneruns[] = {
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 0x00 - 0x0f */
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 0x10 - 0x1f */
@@ -358,7 +370,7 @@ public class CCITTG4Encoder {
     private static final int G3CODE_EOF = -3;     /* end of input data */
     private static final int G3CODE_INCOMP = -4;  /* incomplete run code */
 
-    private int[][] TIFFFaxWhiteCodes = {
+    private final int[][] TIFFFaxWhiteCodes = {
         { 8, 0x35, 0 },	/* 0011 0101 */
         { 6, 0x7, 1 },	/* 0001 11 */
         { 4, 0x7, 2 },	/* 0111 */
@@ -470,7 +482,7 @@ public class CCITTG4Encoder {
         { 12, 0x0, G3CODE_INVALID }	/* 0000 0000 0000 */
     };
 
-    private int[][] TIFFFaxBlackCodes = {
+    private final int[][] TIFFFaxBlackCodes = {
         { 10, 0x37, 0 },	/* 0000 1101 11 */
         { 3, 0x2, 1 },	/* 010 */
         { 2, 0x3, 2 },	/* 11 */
@@ -581,12 +593,12 @@ public class CCITTG4Encoder {
         { 11, 0x1, G3CODE_INVALID },	/* 0000 0000 001 */
         { 12, 0x0, G3CODE_INVALID }	/* 0000 0000 0000 */
     };
-    
-    private int[] horizcode =
+
+    private final int[] horizcode =
         { 3, 0x1, 0 };		/* 001 */
-    private int[] passcode =
+    private final int[] passcode =
         { 4, 0x1, 0 };		/* 0001 */
-    private int[][] vcodes = {
+    private final int[][] vcodes = {
         { 7, 0x03, 0 },	/* 0000 011 */
         { 6, 0x03, 0 },	/* 0000 11 */
         { 3, 0x03, 0 },	/* 011 */
@@ -595,6 +607,6 @@ public class CCITTG4Encoder {
         { 6, 0x02, 0 },	/* 0000 10 */
         { 7, 0x02, 0 }		/* 0000 010 */
     };
-    private int[] msbmask =
+    private final int[] msbmask =
     { 0x00, 0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f, 0xff };
 }
