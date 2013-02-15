@@ -49,9 +49,7 @@
 
 package com.lowagie.text.pdf.interfaces;
 
-import com.lowagie.text.DocumentException;
 import com.lowagie.text.pdf.PdfAction;
-import com.lowagie.text.pdf.PdfName;
 
 /**
  * A PDF document can have an open action and other additional actions.
@@ -65,25 +63,14 @@ public interface PdfDocumentActions {
      * @param name the name of the destination to jump to
      */
     public void setOpenAction(String name);
-    
+
     /**
      * When the document opens this <CODE>action</CODE> will be
      * invoked.
      * @param action the action to be invoked
      */
     public void setOpenAction(PdfAction action);
-    
-    /**
-     * Additional-actions defining the actions to be taken in
-     * response to various trigger events affecting the document
-     * as a whole. The actions types allowed are: <CODE>DOCUMENT_CLOSE</CODE>,
-     * <CODE>WILL_SAVE</CODE>, <CODE>DID_SAVE</CODE>, <CODE>WILL_PRINT</CODE>
-     * and <CODE>DID_PRINT</CODE>.
-     *
-     * @param actionType the action type
-     * @param action the action to execute in response to the trigger
-     * @throws DocumentException on invalid action type
-     */
-    public void setAdditionalAction(PdfName actionType, PdfAction action) throws DocumentException;
+
+
 
 }

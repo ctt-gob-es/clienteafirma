@@ -55,18 +55,18 @@ import java.io.IOException;
  * @author  Paulo Soares (psoares@consiste.pt)
  */
 public class PRTokeniser {
-    
-    public static final int TK_NUMBER = 1;
-    public static final int TK_STRING = 2;
-    public static final int TK_NAME = 3;
-    public static final int TK_COMMENT = 4;
-    public static final int TK_START_ARRAY = 5;
-    public static final int TK_END_ARRAY = 6;
-    public static final int TK_START_DIC = 7;
-    public static final int TK_END_DIC = 8;
-    public static final int TK_REF = 9;
-    public static final int TK_OTHER = 10;
-    public static final boolean delims[] = {
+
+    static final int TK_NUMBER = 1;
+    static final int TK_STRING = 2;
+    static final int TK_NAME = 3;
+    static final int TK_COMMENT = 4;
+    static final int TK_START_ARRAY = 5;
+    static final int TK_END_ARRAY = 6;
+    static final int TK_START_DIC = 7;
+    static final int TK_END_DIC = 8;
+    static final int TK_REF = 9;
+    static final int TK_OTHER = 10;
+    private static final boolean delims[] = {
         true,  true,  false, false, false, false, false, false, false, false,
         true,  true,  false, true,  true,  false, false, false, false, false,
         false, false, false, false, false, false, false, false, false, false,
@@ -93,187 +93,193 @@ public class PRTokeniser {
         false, false, false, false, false, false, false, false, false, false,
         false, false, false, false, false, false, false, false, false, false,
         false, false, false, false, false, false, false};
-    
-    static final String EMPTY = "";
 
-    
-    protected RandomAccessFileOrArray file;
-    protected int type;
-    protected String stringValue;
-    protected int reference;
-    protected int generation;
-    protected boolean hexString;
-       
-    public PRTokeniser(String filename) throws IOException {
-        file = new RandomAccessFileOrArray(filename);
+    private static final String EMPTY = "";
+
+
+    private final RandomAccessFileOrArray file;
+    private int type;
+    private String stringValue;
+    private int reference;
+    private int generation;
+    private boolean hexString;
+
+    PRTokeniser(final String filename) throws IOException {
+        this.file = new RandomAccessFileOrArray(filename);
     }
 
-    public PRTokeniser(byte pdfIn[]) {
-        file = new RandomAccessFileOrArray(pdfIn);
+    public PRTokeniser(final byte pdfIn[]) {
+        this.file = new RandomAccessFileOrArray(pdfIn);
     }
-    
-    public PRTokeniser(RandomAccessFileOrArray file) {
+
+    PRTokeniser(final RandomAccessFileOrArray file) {
         this.file = file;
     }
-    
-    public void seek(int pos) throws IOException {
-        file.seek(pos);
+
+    void seek(final int pos) throws IOException {
+        this.file.seek(pos);
     }
-    
+
     public int getFilePointer() throws IOException {
-        return file.getFilePointer();
+        return this.file.getFilePointer();
     }
 
-    public void close() throws IOException {
-        file.close();
-    }
-    
-    public int length() throws IOException {
-        return file.length();
+    void close() throws IOException {
+        this.file.close();
     }
 
-    public int read() throws IOException {
-        return file.read();
+    int length() throws IOException {
+        return this.file.length();
     }
-    
+
+    int read() throws IOException {
+        return this.file.read();
+    }
+
     public RandomAccessFileOrArray getSafeFile() {
-        return new RandomAccessFileOrArray(file);
+        return new RandomAccessFileOrArray(this.file);
     }
-    
+
     public RandomAccessFileOrArray getFile() {
-        return file;
+        return this.file;
     }
-    
-    public String readString(int size) throws IOException {
-        StringBuffer buf = new StringBuffer();
+
+    String readString(int size) throws IOException {
+        final StringBuffer buf = new StringBuffer();
         int ch;
-        while ((size--) > 0) {
-            ch = file.read();
-            if (ch == -1)
-                break;
+        while (size-- > 0) {
+            ch = this.file.read();
+            if (ch == -1) {
+				break;
+			}
             buf.append((char)ch);
         }
         return buf.toString();
     }
 
-    public static final boolean isWhitespace(int ch) {
-        return (ch == 0 || ch == 9 || ch == 10 || ch == 12 || ch == 13 || ch == 32);
-    }
-    
-    public static final boolean isDelimiter(int ch) {
-        return (ch == '(' || ch == ')' || ch == '<' || ch == '>' || ch == '[' || ch == ']' || ch == '/' || ch == '%');
+    static final boolean isWhitespace(final int ch) {
+        return ch == 0 || ch == 9 || ch == 10 || ch == 12 || ch == 13 || ch == 32;
     }
 
-    public static final boolean isDelimiterWhitespace(int ch) {
-        return delims[ch + 1];
-    }
+
+
+
 
     public int getTokenType() {
-        return type;
+        return this.type;
     }
-    
+
     public String getStringValue() {
-        return stringValue;
+        return this.stringValue;
     }
-    
+
     public int getReference() {
-        return reference;
+        return this.reference;
     }
-    
+
     public int getGeneration() {
-        return generation;
+        return this.generation;
     }
-    
-    public void backOnePosition(int ch) {
-        if (ch != -1)
-            file.pushBack((byte)ch);
+
+    void backOnePosition(final int ch) {
+        if (ch != -1) {
+			this.file.pushBack((byte)ch);
+		}
     }
-    
-    public void throwError(String error) throws IOException {
-        throw new IOException(error + " at file pointer " + file.getFilePointer());
+
+    void throwError(final String error) throws IOException {
+        throw new IOException(error + " at file pointer " + this.file.getFilePointer());
     }
-    
-    public char checkPdfHeader() throws IOException {
-        file.setStartOffset(0);
-        String str = readString(1024);
-        int idx = str.indexOf("%PDF-");
-        if (idx < 0)
-            throw new IOException("PDF header signature not found.");
-        file.setStartOffset(idx);
+
+    char checkPdfHeader() throws IOException {
+        this.file.setStartOffset(0);
+        final String str = readString(1024);
+        final int idx = str.indexOf("%PDF-");
+        if (idx < 0) {
+			throw new IOException("PDF header signature not found.");
+		}
+        this.file.setStartOffset(idx);
         return str.charAt(idx + 7);
     }
-    
-    public void checkFdfHeader() throws IOException {
-        file.setStartOffset(0);
-        String str = readString(1024);
-        int idx = str.indexOf("%FDF-1.2");
-        if (idx < 0)
-            throw new IOException("FDF header signature not found.");
-        file.setStartOffset(idx);
+
+    void checkFdfHeader() throws IOException {
+        this.file.setStartOffset(0);
+        final String str = readString(1024);
+        final int idx = str.indexOf("%FDF-1.2");
+        if (idx < 0) {
+			throw new IOException("FDF header signature not found.");
+		}
+        this.file.setStartOffset(idx);
     }
 
     public int getStartxref() throws IOException {
-        int size = Math.min(1024, file.length());
-        int pos = file.length() - size;
-        file.seek(pos);
-        String str = readString(1024);
-        int idx = str.lastIndexOf("startxref");
-        if (idx < 0)
-            throw new IOException("PDF startxref not found.");
+        final int size = Math.min(1024, this.file.length());
+        final int pos = this.file.length() - size;
+        this.file.seek(pos);
+        final String str = readString(1024);
+        final int idx = str.lastIndexOf("startxref");
+        if (idx < 0) {
+			throw new IOException("PDF startxref not found.");
+		}
         return pos + idx;
     }
 
-    public static int getHex(int v) {
-        if (v >= '0' && v <= '9')
-            return v - '0';
-        if (v >= 'A' && v <= 'F')
-            return v - 'A' + 10;
-        if (v >= 'a' && v <= 'f')
-            return v - 'a' + 10;
+    public static int getHex(final int v) {
+        if (v >= '0' && v <= '9') {
+			return v - '0';
+		}
+        if (v >= 'A' && v <= 'F') {
+			return v - 'A' + 10;
+		}
+        if (v >= 'a' && v <= 'f') {
+			return v - 'a' + 10;
+		}
         return -1;
     }
-    
-    public void nextValidToken() throws IOException {
+
+    void nextValidToken() throws IOException {
         int level = 0;
         String n1 = null;
         String n2 = null;
         int ptr = 0;
         while (nextToken()) {
-            if (type == TK_COMMENT)
-                continue;
+            if (this.type == TK_COMMENT) {
+				continue;
+			}
             switch (level) {
                 case 0:
                 {
-                    if (type != TK_NUMBER)
-                        return;
-                    ptr = file.getFilePointer();
-                    n1 = stringValue;
+                    if (this.type != TK_NUMBER) {
+						return;
+					}
+                    ptr = this.file.getFilePointer();
+                    n1 = this.stringValue;
                     ++level;
                     break;
                 }
                 case 1:
                 {
-                    if (type != TK_NUMBER) {
-                        file.seek(ptr);
-                        type = TK_NUMBER;
-                        stringValue = n1;
+                    if (this.type != TK_NUMBER) {
+                        this.file.seek(ptr);
+                        this.type = TK_NUMBER;
+                        this.stringValue = n1;
                         return;
                     }
-                    n2 = stringValue;
+                    n2 = this.stringValue;
                     ++level;
                     break;
                 }
                 default:
                 {
-                    if (type != TK_OTHER || !stringValue.equals("R")) {
-                        file.seek(ptr);
-                        type = TK_NUMBER;
-                        stringValue = n1;
+                    if (this.type != TK_OTHER || !this.stringValue.equals("R")) {
+                        this.file.seek(ptr);
+                        this.type = TK_NUMBER;
+                        this.stringValue = n1;
                         return;
                     }
-                    type = TK_REF;
-                    reference = Integer.parseInt(n1);
-                    generation = Integer.parseInt(n2);
+                    this.type = TK_REF;
+                    this.reference = Integer.parseInt(n1);
+                    this.generation = Integer.parseInt(n2);
                     return;
                 }
             }
@@ -282,38 +288,40 @@ public class PRTokeniser {
         // or the last token ended exactly at the end of a stream.  This last
         // case can occur inside an Object Stream.
     }
-    
-    public boolean nextToken() throws IOException {
+
+    boolean nextToken() throws IOException {
         int ch = 0;
         do {
-            ch = file.read();
+            ch = this.file.read();
         } while (ch != -1 && isWhitespace(ch));
-        if (ch == -1)
-            return false;
+        if (ch == -1) {
+			return false;
+		}
 
         // Note:  We have to initialize stringValue here, after we've looked for the end of the stream,
         // to ensure that we don't lose the value of a token that might end exactly at the end
         // of the stream
         StringBuffer outBuf = null;
-        stringValue = EMPTY;
+        this.stringValue = EMPTY;
 
         switch (ch) {
             case '[':
-                type = TK_START_ARRAY;
+                this.type = TK_START_ARRAY;
                 break;
             case ']':
-                type = TK_END_ARRAY;
+                this.type = TK_END_ARRAY;
                 break;
             case '/':
             {
                 outBuf = new StringBuffer();
-                type = TK_NAME;
+                this.type = TK_NAME;
                 while (true) {
-                    ch = file.read();
-                    if (delims[ch + 1])
-                        break;
+                    ch = this.file.read();
+                    if (delims[ch + 1]) {
+						break;
+					}
                     if (ch == '#') {
-                        ch = (getHex(file.read()) << 4) + getHex(file.read());
+                        ch = (getHex(this.file.read()) << 4) + getHex(this.file.read());
                     }
                     outBuf.append((char)ch);
                 }
@@ -321,65 +329,73 @@ public class PRTokeniser {
                 break;
             }
             case '>':
-                ch = file.read();
-                if (ch != '>')
-                    throwError("'>' not expected");
-                type = TK_END_DIC;
+                ch = this.file.read();
+                if (ch != '>') {
+					throwError("'>' not expected");
+				}
+                this.type = TK_END_DIC;
                 break;
             case '<':
             {
-                int v1 = file.read();
+                int v1 = this.file.read();
                 if (v1 == '<') {
-                    type = TK_START_DIC;
+                    this.type = TK_START_DIC;
                     break;
                 }
                 outBuf = new StringBuffer();
-                type = TK_STRING;
-                hexString = true;
+                this.type = TK_STRING;
+                this.hexString = true;
                 int v2 = 0;
                 while (true) {
-                    while (isWhitespace(v1))
-                        v1 = file.read();
-                    if (v1 == '>')
-                        break;
+                    while (isWhitespace(v1)) {
+						v1 = this.file.read();
+					}
+                    if (v1 == '>') {
+						break;
+					}
                     v1 = getHex(v1);
-                    if (v1 < 0)
-                        break;
-                    v2 = file.read();
-                    while (isWhitespace(v2))
-                        v2 = file.read();
+                    if (v1 < 0) {
+						break;
+					}
+                    v2 = this.file.read();
+                    while (isWhitespace(v2)) {
+						v2 = this.file.read();
+					}
                     if (v2 == '>') {
                         ch = v1 << 4;
                         outBuf.append((char)ch);
                         break;
                     }
                     v2 = getHex(v2);
-                    if (v2 < 0)
-                        break;
+                    if (v2 < 0) {
+						break;
+					}
                     ch = (v1 << 4) + v2;
                     outBuf.append((char)ch);
-                    v1 = file.read();
+                    v1 = this.file.read();
                 }
-                if (v1 < 0 || v2 < 0)
-                    throwError("Error reading string");
+                if (v1 < 0 || v2 < 0) {
+					throwError("Error reading string");
+				}
                 break;
             }
             case '%':
-                type = TK_COMMENT;
+                this.type = TK_COMMENT;
                 do {
-                    ch = file.read();
+                    ch = this.file.read();
                 } while (ch != -1 && ch != '\r' && ch != '\n');
                 break;
             case '(':
             {
                 outBuf = new StringBuffer();
-                type = TK_STRING;
-                hexString = false;
+                this.type = TK_STRING;
+                this.hexString = false;
                 int nesting = 0;
                 while (true) {
-                    ch = file.read();
-                    if (ch == -1)
-                        break;
+                    ch = this.file.read();
+                    if (ch == -1) {
+						break;
+					}
                     if (ch == '(') {
                         ++nesting;
                     }
@@ -388,7 +404,7 @@ public class PRTokeniser {
                     }
                     else if (ch == '\\') {
                         boolean lineBreak = false;
-                        ch = file.read();
+                        ch = this.file.read();
                         switch (ch) {
                             case 'n':
                                 ch = '\n';
@@ -411,9 +427,10 @@ public class PRTokeniser {
                                 break;
                             case '\r':
                                 lineBreak = true;
-                                ch = file.read();
-                                if (ch != '\n')
-                                    backOnePosition(ch);
+                                ch = this.file.read();
+                                if (ch != '\n') {
+									backOnePosition(ch);
+								}
                                 break;
                             case '\n':
                                 lineBreak = true;
@@ -424,14 +441,14 @@ public class PRTokeniser {
                                     break;
                                 }
                                 int octal = ch - '0';
-                                ch = file.read();
+                                ch = this.file.read();
                                 if (ch < '0' || ch > '7') {
                                     backOnePosition(ch);
                                     ch = octal;
                                     break;
                                 }
                                 octal = (octal << 3) + ch - '0';
-                                ch = file.read();
+                                ch = this.file.read();
                                 if (ch < '0' || ch > '7') {
                                     backOnePosition(ch);
                                     ch = octal;
@@ -442,68 +459,76 @@ public class PRTokeniser {
                                 break;
                             }
                         }
-                        if (lineBreak)
-                            continue;
-                        if (ch < 0)
-                            break;
+                        if (lineBreak) {
+							continue;
+						}
+                        if (ch < 0) {
+							break;
+						}
                     }
                     else if (ch == '\r') {
-                        ch = file.read();
-                        if (ch < 0)
-                            break;
+                        ch = this.file.read();
+                        if (ch < 0) {
+							break;
+						}
                         if (ch != '\n') {
                             backOnePosition(ch);
                             ch = '\n';
                         }
                     }
-                    if (nesting == -1)
-                        break;
+                    if (nesting == -1) {
+						break;
+					}
                     outBuf.append((char)ch);
                 }
-                if (ch == -1)
-                    throwError("Error reading string");
+                if (ch == -1) {
+					throwError("Error reading string");
+				}
                 break;
             }
             default:
             {
                 outBuf = new StringBuffer();
-                if (ch == '-' || ch == '+' || ch == '.' || (ch >= '0' && ch <= '9')) {
-                    type = TK_NUMBER;
+                if (ch == '-' || ch == '+' || ch == '.' || ch >= '0' && ch <= '9') {
+                    this.type = TK_NUMBER;
                     do {
                         outBuf.append((char)ch);
-                        ch = file.read();
-                    } while (ch != -1 && ((ch >= '0' && ch <= '9') || ch == '.'));
+                        ch = this.file.read();
+                    } while (ch != -1 && (ch >= '0' && ch <= '9' || ch == '.'));
                 }
                 else {
-                    type = TK_OTHER;
+                    this.type = TK_OTHER;
                     do {
                         outBuf.append((char)ch);
-                        ch = file.read();
+                        ch = this.file.read();
                     } while (!delims[ch + 1]);
                 }
                 backOnePosition(ch);
                 break;
             }
         }
-        if (outBuf != null)
-            stringValue = outBuf.toString();
+        if (outBuf != null) {
+			this.stringValue = outBuf.toString();
+		}
         return true;
     }
-    
-    public int intValue() {
-        return Integer.parseInt(stringValue);
+
+    int intValue() {
+        return Integer.parseInt(this.stringValue);
     }
-    
-    public boolean readLineSegment(byte input[]) throws IOException {
+
+    boolean readLineSegment(final byte input[]) throws IOException {
         int c = -1;
         boolean eol = false;
         int ptr = 0;
-        int len = input.length;
-	// ssteward, pdftk-1.10, 040922: 
+        final int len = input.length;
+	// ssteward, pdftk-1.10, 040922:
 	// skip initial whitespace; added this because PdfReader.rebuildXref()
 	// assumes that line provided by readLineSegment does not have init. whitespace;
 	if ( ptr < len ) {
-	    while ( isWhitespace( (c = read()) ) );
+	    while ( isWhitespace( c = read() ) ) {
+			;
+		}
 	}
 	while ( !eol && ptr < len ) {
 	    switch (c) {
@@ -513,8 +538,8 @@ public class PRTokeniser {
                     break;
                 case '\r':
                     eol = true;
-                    int cur = getFilePointer();
-                    if ((read()) != '\n') {
+                    final int cur = getFilePointer();
+                    if (read() != '\n') {
                         seek(cur);
                     }
                     break;
@@ -541,16 +566,16 @@ public class PRTokeniser {
                         break;
                     case '\r':
                         eol = true;
-                        int cur = getFilePointer();
-                        if ((read()) != '\n') {
+                        final int cur = getFilePointer();
+                        if (read() != '\n') {
                             seek(cur);
                         }
                         break;
                 }
             }
         }
-        
-        if ((c == -1) && (ptr == 0)) {
+
+        if (c == -1 && ptr == 0) {
             return false;
         }
         if (ptr + 2 <= len) {
@@ -559,32 +584,36 @@ public class PRTokeniser {
         }
         return true;
     }
-    
-    public static int[] checkObjectStart(byte line[]) {
+
+    static int[] checkObjectStart(final byte line[]) {
         try {
-            PRTokeniser tk = new PRTokeniser(line);
+            final PRTokeniser tk = new PRTokeniser(line);
             int num = 0;
             int gen = 0;
-            if (!tk.nextToken() || tk.getTokenType() != TK_NUMBER)
-                return null;
+            if (!tk.nextToken() || tk.getTokenType() != TK_NUMBER) {
+				return null;
+			}
             num = tk.intValue();
-            if (!tk.nextToken() || tk.getTokenType() != TK_NUMBER)
-                return null;
+            if (!tk.nextToken() || tk.getTokenType() != TK_NUMBER) {
+				return null;
+			}
             gen = tk.intValue();
-            if (!tk.nextToken())
-                return null;
-            if (!tk.getStringValue().equals("obj"))
-                return null;
+            if (!tk.nextToken()) {
+				return null;
+			}
+            if (!tk.getStringValue().equals("obj")) {
+				return null;
+			}
             return new int[]{num, gen};
         }
-        catch (Exception ioe) {
+        catch (final Exception ioe) {
             // empty on purpose
         }
         return null;
     }
-    
+
     public boolean isHexString() {
         return this.hexString;
     }
-    
+
 }

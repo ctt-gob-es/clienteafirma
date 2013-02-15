@@ -94,7 +94,7 @@ public class PdfRectangle extends PdfArray {
  * @since		rugPdf0.10
  */
 
-    public PdfRectangle(float llx, float lly, float urx, float ury, int rotation) {
+    private PdfRectangle(final float llx, final float lly, final float urx, final float ury, final int rotation) {
         super();
         if (rotation == 90 || rotation == 270) {
             this.llx = lly;
@@ -114,24 +114,13 @@ public class PdfRectangle extends PdfArray {
         super.add(new PdfNumber(this.ury));
     }
 
-    public PdfRectangle(float llx, float lly, float urx, float ury) {
+    public PdfRectangle(final float llx, final float lly, final float urx, final float ury) {
         this(llx, lly, urx, ury, 0);
     }
 
-/**
- * Constructs a <CODE>PdfRectangle</CODE>-object starting from the origin (0, 0).
- *
- * @param		urx			upper right x
- * @param		ury			upper right y
- */
 
-    public PdfRectangle(float urx, float ury, int rotation) {
-        this(0, 0, urx, ury, rotation);
-    }
 
-    public PdfRectangle(float urx, float ury) {
-        this(0, 0, urx, ury, 0);
-    }
+
 
 /**
  * Constructs a <CODE>PdfRectangle</CODE>-object with a <CODE>Rectangle</CODE>-object.
@@ -139,11 +128,11 @@ public class PdfRectangle extends PdfArray {
  * @param	rectangle	a <CODE>Rectangle</CODE>
  */
 
-    public PdfRectangle(Rectangle rectangle, int rotation) {
+    PdfRectangle(final Rectangle rectangle, final int rotation) {
         this(rectangle.getLeft(), rectangle.getBottom(), rectangle.getRight(), rectangle.getTop(), rotation);
     }
 
-    public PdfRectangle(Rectangle rectangle) {
+    PdfRectangle(final Rectangle rectangle) {
         this(rectangle.getLeft(), rectangle.getBottom(), rectangle.getRight(), rectangle.getTop(), 0);
     }
 
@@ -163,7 +152,8 @@ public class PdfRectangle extends PdfArray {
  * @return		<CODE>false</CODE>
  */
 
-    public boolean add(PdfObject object) {
+    @Override
+	public boolean add(final PdfObject object) {
         return false;
     }
 
@@ -174,7 +164,8 @@ public class PdfRectangle extends PdfArray {
      * @since 2.1.5
      */
 
-    public boolean add( float values[] ) {
+    @Override
+	public boolean add( final float values[] ) {
         return false;
     }
 
@@ -185,7 +176,8 @@ public class PdfRectangle extends PdfArray {
      * @since 2.1.5
      */
 
-    public boolean add( int values[] ) {
+    @Override
+	public boolean add( final int values[] ) {
         return false;
     }
 
@@ -195,7 +187,8 @@ public class PdfRectangle extends PdfArray {
      * @since 2.1.5
      */
 
-    public void addFirst( PdfObject object ) {
+    @Override
+	public void addFirst( final PdfObject object ) {
     }
 /**
  * Returns the lower left x-coordinate.
@@ -204,7 +197,7 @@ public class PdfRectangle extends PdfArray {
  */
 
     public float left() {
-        return llx;
+        return this.llx;
     }
 
 /**
@@ -214,7 +207,7 @@ public class PdfRectangle extends PdfArray {
  */
 
     public float right() {
-        return urx;
+        return this.urx;
     }
 
 /**
@@ -224,7 +217,7 @@ public class PdfRectangle extends PdfArray {
  */
 
     public float top() {
-        return ury;
+        return this.ury;
     }
 
 /**
@@ -234,80 +227,8 @@ public class PdfRectangle extends PdfArray {
  */
 
     public float bottom() {
-        return lly;
+        return this.lly;
     }
 
-/**
- * Returns the lower left x-coordinate, considering a given margin.
- *
- * @param		margin		a margin
- * @return		the lower left x-coordinate
- */
 
-    public float left(int margin) {
-        return llx + margin;
-    }
-
-/**
- * Returns the upper right x-coordinate, considering a given margin.
- *
- * @param		margin		a margin
- * @return		the upper right x-coordinate
- */
-
-    public float right(int margin) {
-        return urx - margin;
-    }
-
-/**
- * Returns the upper right y-coordinate, considering a given margin.
- *
- * @param		margin		a margin
- * @return		the upper right y-coordinate
- */
-
-    public float top(int margin) {
-        return ury - margin;
-    }
-
-/**
- * Returns the lower left y-coordinate, considering a given margin.
- *
- * @param		margin		a margin
- * @return		the lower left y-coordinate
- */
-
-    public float bottom(int margin) {
-        return lly + margin;
-    }
-
-/**
- * Returns the width of the rectangle.
- *
- * @return		a width
- */
-
-    public float width() {
-        return urx - llx;
-    }
-
-/**
- * Returns the height of the rectangle.
- *
- * @return		a height
- */
-
-    public float height() {
-        return ury - lly;
-    }
-
-/**
- * Swaps the values of urx and ury and of lly and llx in order to rotate the rectangle.
- *
- * @return		a <CODE>PdfRectangle</CODE>
- */
-
-    public PdfRectangle rotate() {
-        return new PdfRectangle(lly, llx, ury, urx, 0);
-    }
 }

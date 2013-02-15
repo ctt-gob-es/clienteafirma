@@ -1,12 +1,12 @@
 /*
  * Copyright 1999-2004 The Apache Software Foundation.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -47,88 +47,77 @@ public class CharVector implements Cloneable, Serializable {
         this(DEFAULT_BLOCK_SIZE);
     }
 
-    public CharVector(int capacity) {
+    public CharVector(final int capacity) {
         if (capacity > 0) {
-            blockSize = capacity;
+            this.blockSize = capacity;
         } else {
-            blockSize = DEFAULT_BLOCK_SIZE;
+            this.blockSize = DEFAULT_BLOCK_SIZE;
         }
-        array = new char[blockSize];
-        n = 0;
+        this.array = new char[this.blockSize];
+        this.n = 0;
     }
 
-    public CharVector(char[] a) {
-        blockSize = DEFAULT_BLOCK_SIZE;
-        array = a;
-        n = a.length;
+    public CharVector(final char[] a) {
+        this.blockSize = DEFAULT_BLOCK_SIZE;
+        this.array = a;
+        this.n = a.length;
     }
 
-    public CharVector(char[] a, int capacity) {
+    public CharVector(final char[] a, final int capacity) {
         if (capacity > 0) {
-            blockSize = capacity;
+            this.blockSize = capacity;
         } else {
-            blockSize = DEFAULT_BLOCK_SIZE;
+            this.blockSize = DEFAULT_BLOCK_SIZE;
         }
-        array = a;
-        n = a.length;
+        this.array = a;
+        this.n = a.length;
     }
 
-    /**
-     * Reset Vector but don't resize or clear elements
-     */
-    public void clear() {
-        n = 0;
-    }
 
-    public Object clone() {
-        CharVector cv = new CharVector((char[])array.clone(), blockSize);
+
+    @Override
+	public Object clone() {
+        final CharVector cv = new CharVector(this.array.clone(), this.blockSize);
         cv.n = this.n;
         return cv;
     }
 
     public char[] getArray() {
-        return array;
+        return this.array;
     }
 
     /**
      * return number of items in array
      */
-    public int length() {
-        return n;
+    int length() {
+        return this.n;
     }
 
-    /**
-     * returns current capacity of array
-     */
-    public int capacity() {
-        return array.length;
+
+
+
+
+    char get(final int index) {
+        return this.array[index];
     }
 
-    public void put(int index, char val) {
-        array[index] = val;
-    }
-
-    public char get(int index) {
-        return array[index];
-    }
-
-    public int alloc(int size) {
-        int index = n;
-        int len = array.length;
-        if (n + size >= len) {
-            char[] aux = new char[len + blockSize];
-            System.arraycopy(array, 0, aux, 0, len);
-            array = aux;
+    int alloc(final int size) {
+        final int index = this.n;
+        final int len = this.array.length;
+        if (this.n + size >= len) {
+            final char[] aux = new char[len + this.blockSize];
+            System.arraycopy(this.array, 0, aux, 0, len);
+            this.array = aux;
         }
-        n += size;
+        this.n += size;
         return index;
     }
 
     public void trimToSize() {
-        if (n < array.length) {
-            char[] aux = new char[n];
-            System.arraycopy(array, 0, aux, 0, n);
-            array = aux;
+        if (this.n < this.array.length) {
+            final char[] aux = new char[this.n];
+            System.arraycopy(this.array, 0, aux, 0, this.n);
+            this.array = aux;
         }
     }
 

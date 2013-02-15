@@ -698,10 +698,8 @@ public class PdfName extends PdfObject implements Comparable{
     static final PdfName MAXLEN = new PdfName("MaxLen");
     /** A name */
     public static final PdfName MEDIABOX = new PdfName("MediaBox");
-    /** A name */
-    static final PdfName MCID = new PdfName("MCID");
-    /** A name */
-    static final PdfName MCR = new PdfName("MCR");
+
+
     /** A name */
     static final PdfName METADATA = new PdfName("Metadata");
     /**
@@ -840,8 +838,7 @@ public class PdfName extends PdfObject implements Comparable{
     public static final PdfName PERCEPTUAL = new PdfName("Perceptual");
     /** A name */
     static final PdfName PERMS = new PdfName("Perms");
-    /** A name */
-    static final PdfName PG = new PdfName("Pg");
+
 
     /** A name */
     public static final PdfName PICKTRAYBYPDFSIZE = new PdfName("PickTrayByPDFSize");

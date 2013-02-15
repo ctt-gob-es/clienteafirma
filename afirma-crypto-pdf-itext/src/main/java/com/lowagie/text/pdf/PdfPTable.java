@@ -53,7 +53,6 @@ import java.util.ArrayList;
 
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.Element;
-import com.lowagie.text.ElementListener;
 import com.lowagie.text.LargeElement;
 import com.lowagie.text.Phrase;
 import com.lowagie.text.pdf.events.PdfPTableEventForwarder;
@@ -1049,22 +1048,7 @@ public class PdfPTable implements LargeElement{
 		return true;
 	}
 
-    /**
-     * Processes the element by adding it (or the different parts) to an
-     * <CODE>ElementListener</CODE>.
-     *
-     * @param	listener	an <CODE>ElementListener</CODE>
-     * @return	<CODE>true</CODE> if the element was processed successfully
-     */
-    @Override
-	public boolean process(final ElementListener listener) {
-        try {
-            return listener.add(this);
-        }
-        catch(final DocumentException de) {
-            return false;
-        }
-    }
+
 
     /**
      * Gets the width percentage that the table will occupy in the page.

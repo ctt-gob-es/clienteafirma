@@ -81,19 +81,19 @@ public class PdfDictionary extends PdfObject {
     // CONSTANTS
 
     /** This is a possible type of dictionary */
-    public static final PdfName FONT = PdfName.FONT;
+    private static final PdfName FONT = PdfName.FONT;
 
     /** This is a possible type of dictionary */
-    public static final PdfName OUTLINES = PdfName.OUTLINES;
+    static final PdfName OUTLINES = PdfName.OUTLINES;
 
     /** This is a possible type of dictionary */
-    public static final PdfName PAGE = PdfName.PAGE;
+    static final PdfName PAGE = PdfName.PAGE;
 
     /** This is a possible type of dictionary */
-    public static final PdfName PAGES = PdfName.PAGES;
+    private static final PdfName PAGES = PdfName.PAGES;
 
     /** This is a possible type of dictionary */
-    public static final PdfName CATALOG = PdfName.CATALOG;
+    static final PdfName CATALOG = PdfName.CATALOG;
 
     // CLASS VARIABLES
 
@@ -196,24 +196,7 @@ public class PdfDictionary extends PdfObject {
 		}
     }
 
-    /**
-     * Associates the specified <CODE>PdfObject</CODE> as value to the
-     * specified <CODE>PdfName</CODE> as key in this map.
-     *
-     * If the <VAR>value</VAR> is a <CODE>PdfNull</CODE>, it is treated just as
-     * any other <CODE>PdfObject</CODE>. If the <VAR>value</VAR> is
-     * <CODE>null</CODE> however nothing is done.
-     *
-     * @param key a <CODE>PdfName</CODE>
-     * @param value the <CODE>PdfObject</CODE> to be associated to the
-     * <VAR>key</VAR>
-     */
-    public void putEx(final PdfName key, final PdfObject value) {
-        if (value == null) {
-			return;
-		}
-        put(key, value);
-    }
+
 
     /**
      * Copies all of the mappings from the specified <CODE>PdfDictionary</CODE>
@@ -225,7 +208,7 @@ public class PdfDictionary extends PdfObject {
      * @param dic The <CODE>PdfDictionary</CODE> with the mappings to be
      *   copied over
      */
-    public void putAll(final PdfDictionary dic) {
+    void putAll(final PdfDictionary dic) {
         this.hashMap.putAll(dic.hashMap);
     }
 
@@ -292,7 +275,7 @@ public class PdfDictionary extends PdfObject {
      *
      * @return <CODE>true</CODE> if the key is set, otherwise <CODE>false</CODE>.
      */
-    public boolean contains(final PdfName key) {
+    boolean contains(final PdfName key) {
         return this.hashMap.containsKey(key);
     }
 
@@ -345,11 +328,11 @@ public class PdfDictionary extends PdfObject {
 
     // OTHER METHODS
 
-    public void merge(final PdfDictionary other) {
+    void merge(final PdfDictionary other) {
         this.hashMap.putAll(other.hashMap);
     }
 
-    public void mergeDifferent(final PdfDictionary other) {
+    void mergeDifferent(final PdfDictionary other) {
         for (final PdfName key : other.hashMap.keySet()) {
             if (!this.hashMap.containsKey(key)) {
 				this.hashMap.put(key, other.hashMap.get(key));
@@ -404,27 +387,7 @@ public class PdfDictionary extends PdfObject {
         return array;
     }
 
-    /**
-     * Returns a <CODE>PdfObject</CODE> as a <CODE>PdfStream</CODE>,
-     * resolving indirect references.
-     *
-     * The object associated with the <CODE>PdfName</CODE> given is retrieved
-     * and resolved to a direct object.
-     * If it is a <CODE>PdfStream</CODE>, it is cast down and returned as such.
-     * Otherwise <CODE>null</CODE> is returned.
-     *
-     * @param key A <CODE>PdfName</CODE>
-     * @return the associated <CODE>PdfStream</CODE> object,
-     *   or <CODE>null</CODE>
-     */
-    public PdfStream getAsStream(final PdfName key) {
-        PdfStream stream = null;
-        final PdfObject orig = getDirectObject(key);
-        if (orig != null && orig.isStream()) {
-			stream = (PdfStream) orig;
-		}
-        return stream;
-    }
+
 
     /**
      * Returns a <CODE>PdfObject</CODE> as a <CODE>PdfString</CODE>,

@@ -149,11 +149,5 @@ class PdfNumberTree {
         }
     }
 
-    static HashMap readTree(final PdfDictionary dic) {
-        final HashMap items = new HashMap();
-        if (dic != null) {
-			iterateItems(dic, items);
-		}
-        return items;
-    }
+
 }

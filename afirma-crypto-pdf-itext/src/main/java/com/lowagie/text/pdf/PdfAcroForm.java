@@ -419,46 +419,7 @@ public class PdfAcroForm extends PdfDictionary {
 
 
 
-    /**
-     * @param field
-     * @param name
-     * @param llx
-     * @param lly
-     * @param urx
-     * @param ury
-     */
-    void setSignatureParams(final PdfFormField field, final String name,
-                    final float llx, final float lly, final float urx, final float ury) {
-        field.setWidget(new Rectangle(llx, lly, urx, ury), PdfAnnotation.HIGHLIGHT_INVERT);
-        field.setFieldName(name);
-        field.setFlags(PdfAnnotation.FLAGS_PRINT);
-        field.setPage();
-        field.setMKBorderColor(java.awt.Color.black);
-        field.setMKBackgroundColor(java.awt.Color.white);
-    }
 
-    /**
-     * @param field
-     * @param llx
-     * @param lly
-     * @param urx
-     * @param ury
-     */
-    void drawSignatureAppearences(final PdfFormField field,
-                    final float llx, final float lly, final float urx, final float ury) {
-        final PdfAppearance tp = PdfAppearance.createAppearance(this.writer, urx - llx, ury - lly);
-        tp.setGrayFill(1.0f);
-        tp.rectangle(0, 0, urx - llx, ury - lly);
-        tp.fill();
-        tp.setGrayStroke(0);
-        tp.setLineWidth(1);
-        tp.rectangle(0.5f, 0.5f, urx - llx - 0.5f, ury - lly - 0.5f);
-        tp.closePathStroke();
-        tp.saveState();
-        tp.rectangle(1, 1, urx - llx - 2, ury - lly - 2);
-        tp.clip();
-        tp.newPath();
-        tp.restoreState();
-        field.setAppearance(PdfAnnotation.APPEARANCE_NORMAL, tp);
-    }
+
+
 }

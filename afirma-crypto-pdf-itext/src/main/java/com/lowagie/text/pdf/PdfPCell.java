@@ -630,16 +630,7 @@ public class PdfPCell extends Rectangle{
         return this.table;
     }
 
-    void setTable(final PdfPTable table) {
-        this.table = table;
-        this.column.setText(null);
-        this.image = null;
-        if (table != null) {
-            table.setExtendLastRow(this.verticalAlignment == Element.ALIGN_TOP);
-            this.column.addElement(table);
-            table.setWidthPercentage(100);
-        }
-    }
+
 
     /**
      * Getter for property colspan.

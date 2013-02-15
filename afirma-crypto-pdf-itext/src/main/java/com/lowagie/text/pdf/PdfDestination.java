@@ -55,93 +55,41 @@ package com.lowagie.text.pdf;
  * @see		PdfDictionary
  */
 
-public class PdfDestination extends PdfArray {
-    
+class PdfDestination extends PdfArray {
+
     // public static final member-variables
-    
+
 /** This is a possible destination type */
-    public static final int XYZ = 0;
-    
+    static final int XYZ = 0;
+
+
+
+
+
 /** This is a possible destination type */
-    public static final int FIT = 1;
-    
+    private static final int FITV = 3;
+
+
+
+
+
 /** This is a possible destination type */
-    public static final int FITH = 2;
-    
+    private static final int FITBH = 6;
+
 /** This is a possible destination type */
-    public static final int FITV = 3;
-    
-/** This is a possible destination type */
-    public static final int FITR = 4;
-    
-/** This is a possible destination type */
-    public static final int FITB = 5;
-    
-/** This is a possible destination type */
-    public static final int FITBH = 6;
-    
-/** This is a possible destination type */
-    public static final int FITBV = 7;
-    
+    private static final int FITBV = 7;
+
     // member variables
-    
+
 /** Is the indirect reference to a page already added? */
     private boolean status = false;
-    
+
     // constructors
-    
-/**
- * Constructs a new <CODE>PdfDestination</CODE>.
- * <P>
- * If <VAR>type</VAR> equals <VAR>FITB</VAR>, the bounding box of a page
- * will fit the window of the Reader. Otherwise the type will be set to
- * <VAR>FIT</VAR> so that the entire page will fit to the window.
- *
- * @param		type		The destination type
- */
-    
-    public PdfDestination(int type) {
-        super();
-        if (type == FITB) {
-            add(PdfName.FITB);
-        }
-        else {
-            add(PdfName.FIT);
-        }
-    }
-    
-/**
- * Constructs a new <CODE>PdfDestination</CODE>.
- * <P>
- * If <VAR>type</VAR> equals <VAR>FITBH</VAR> / <VAR>FITBV</VAR>,
- * the width / height of the bounding box of a page will fit the window
- * of the Reader. The parameter will specify the y / x coordinate of the
- * top / left edge of the window. If the <VAR>type</VAR> equals <VAR>FITH</VAR>
- * or <VAR>FITV</VAR> the width / height of the entire page will fit
- * the window and the parameter will specify the y / x coordinate of the
- * top / left edge. In all other cases the type will be set to <VAR>FITH</VAR>.
- *
- * @param		type		the destination type
- * @param		parameter	a parameter to combined with the destination type
- */
-    
-    public PdfDestination(int type, float parameter) {
-        super(new PdfNumber(parameter));
-        switch(type) {
-            default:
-                addFirst(PdfName.FITH);
-                break;
-            case FITV:
-                addFirst(PdfName.FITV);
-                break;
-            case FITBH:
-                addFirst(PdfName.FITBH);
-                break;
-            case FITBV:
-                addFirst(PdfName.FITBV);
-        }
-    }
-    
+
+
+
+
+
 /** Constructs a new <CODE>PdfDestination</CODE>.
  * <P>
  * Display the page, with the coordinates (left, top) positioned
@@ -153,66 +101,46 @@ public class PdfDestination extends PdfArray {
  * @param top the top value. Negative to place a null
  * @param zoom The zoom factor. A value of 0 keeps the current value
  */
-    
-    public PdfDestination(int type, float left, float top, float zoom) {
+
+    PdfDestination(final int type, final float left, final float top, final float zoom) {
         super(PdfName.XYZ);
-        if (left < 0)
-            add(PdfNull.PDFNULL);
-        else
-            add(new PdfNumber(left));
-        if (top < 0)
-            add(PdfNull.PDFNULL);
-        else
-            add(new PdfNumber(top));
+        if (left < 0) {
+			add(PdfNull.PDFNULL);
+		} else {
+			add(new PdfNumber(left));
+		}
+        if (top < 0) {
+			add(PdfNull.PDFNULL);
+		} else {
+			add(new PdfNumber(top));
+		}
         add(new PdfNumber(zoom));
     }
-    
-/** Constructs a new <CODE>PdfDestination</CODE>.
- * <P>
- * Display the page, with its contents magnified just enough
- * to fit the rectangle specified by the coordinates left, bottom, right, and top
- * entirely within the window both horizontally and vertically. If the required
- * horizontal and vertical magnification factors are different, use the smaller of
- * the two, centering the rectangle within the window in the other dimension.
- *
- * @param type must be PdfDestination.FITR
- * @param left a parameter
- * @param bottom a parameter
- * @param right a parameter
- * @param top a parameter
- * @since iText0.38
- */
-    
-    public PdfDestination(int type, float left, float bottom, float right, float top) {
-        super(PdfName.FITR);
-        add(new PdfNumber(left));
-        add(new PdfNumber(bottom));
-        add(new PdfNumber(right));
-        add(new PdfNumber(top));
-    }
-    
+
+
+
     // methods
-    
+
 /**
  * Checks if an indirect reference to a page has been added.
  *
  * @return	<CODE>true</CODE> or <CODE>false</CODE>
  */
-    
-    public boolean hasPage() {
-        return status;
+
+    boolean hasPage() {
+        return this.status;
     }
-    
+
 /** Adds the indirect reference of the destination page.
  *
  * @param page	an indirect reference
  * @return true if the page reference was added
  */
-    
-    public boolean addPage(PdfIndirectReference page) {
-        if (!status) {
+
+    boolean addPage(final PdfIndirectReference page) {
+        if (!this.status) {
             addFirst(page);
-            status = true;
+            this.status = true;
             return true;
         }
         return false;

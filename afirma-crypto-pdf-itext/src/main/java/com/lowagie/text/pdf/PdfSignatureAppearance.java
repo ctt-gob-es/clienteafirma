@@ -88,29 +88,20 @@ public class PdfSignatureAppearance {
     /**
      * The rendering mode is the name of the signer and the description
      */
-    public static final int SignatureRenderNameAndDescription = 1;
+    private static final int SignatureRenderNameAndDescription = 1;
     /**
      * The rendering mode is an image and the description
      */
-    public static final int SignatureRenderGraphicAndDescription = 2;
+    private static final int SignatureRenderGraphicAndDescription = 2;
 
-    /**
-     * The self signed filter.
-     */
-    public static final PdfName SELF_SIGNED = PdfName.ADOBE_PPKLITE;
-    /**
-     * The VeriSign filter.
-     */
-    public static final PdfName VERISIGN_SIGNED = PdfName.VERISIGN_PPKVS;
-    /**
-     * The Windows Certificate Security.
-     */
-    public static final PdfName WINCER_SIGNED = PdfName.ADOBE_PPKMS;
+
+
+
 
     public static final int NOT_CERTIFIED = 0;
-    public static final int CERTIFIED_NO_CHANGES_ALLOWED = 1;
-    public static final int CERTIFIED_FORM_FILLING = 2;
-    public static final int CERTIFIED_FORM_FILLING_AND_ANNOTATIONS = 3;
+
+
+
 
     private static final float TOP_SECTION = 0.3f;
     private static final float MARGIN = 2;
@@ -149,7 +140,7 @@ public class PdfSignatureAppearance {
 
     PdfSignatureAppearance(final PdfStamperImp writer, final Calendar globalDate) {
         this.writer = writer;
-        this.signDate = (globalDate!=null) ? globalDate : new GregorianCalendar();
+        this.signDate = globalDate!=null ? globalDate : new GregorianCalendar();
         this.fieldName = getNewSigName();
     }
 
@@ -241,7 +232,7 @@ public class PdfSignatureAppearance {
      * @return the visibility status of the signature
      */
     public boolean isInvisible() {
-        return (this.rect == null || this.rect.getWidth() == 0 || this.rect.getHeight() == 0);
+        return this.rect == null || this.rect.getWidth() == 0 || this.rect.getHeight() == 0;
     }
 
     /**
@@ -340,26 +331,7 @@ public class PdfSignatureAppearance {
         this.rect = new Rectangle(this.pageRect.getWidth(), this.pageRect.getHeight());
     }
 
-    /**
-     * Gets a template layer to create a signature appearance. The layers can go from 0 to 4.
-     * <p>
-     * Consult <A HREF="http://partners.adobe.com/asn/developer/pdfs/tn/PPKAppearances.pdf">PPKAppearances.pdf</A>
-     * for further details.
-     * @param layer the layer
-     * @return a template
-     */
-    public PdfTemplate getLayer(final int layer) {
-        if (layer < 0 || layer >= this.app.length) {
-			return null;
-		}
-        PdfTemplate t = this.app[layer];
-        if (t == null) {
-            t = this.app[layer] = new PdfTemplate(this.writer);
-            t.setBoundingBox(this.rect);
-            this.writer.addDirectTemplateSimple(t, new PdfName("n" + layer)); //$NON-NLS-1$
-        }
-        return t;
-    }
+
 
     /**
      * Gets the template that aggregates all appearance layers. This corresponds to the /FRM resource.
@@ -452,7 +424,7 @@ public class PdfSignatureAppearance {
             Rectangle signatureRect = null;
 
             if (this.render == SignatureRenderNameAndDescription ||
-                (this.render == SignatureRenderGraphicAndDescription && this.signatureGraphic != null)) {
+                this.render == SignatureRenderGraphicAndDescription && this.signatureGraphic != null) {
                 // origin is the bottom-left
                 signatureRect = new Rectangle(
                     MARGIN,
@@ -604,7 +576,7 @@ public class PdfSignatureAppearance {
      * @param runDirection the run direction
      * @return the calculated font size that makes the text fit
      */
-    public static float fitText(final Font font, final String text, final Rectangle rect, float maxFontSize, final int runDirection) {
+    private static float fitText(final Font font, final String text, final Rectangle rect, float maxFontSize, final int runDirection) {
         try {
             ColumnText ct = null;
             int status = 0;
@@ -612,10 +584,10 @@ public class PdfSignatureAppearance {
                 int cr = 0;
                 int lf = 0;
                 final char t[] = text.toCharArray();
-                for (int k = 0; k < t.length; ++k) {
-                    if (t[k] == '\n') {
+                for (final char element : t) {
+                    if (element == '\n') {
 						++lf;
-					} else if (t[k] == '\r') {
+					} else if (element == '\r') {
 						++cr;
 					}
                 }
@@ -658,19 +630,7 @@ public class PdfSignatureAppearance {
         }
     }
 
-    /**
-     * Sets the digest/signature to an external calculated value.
-     * @param digest the digest. This is the actual signature
-     * @param RSAdata the extra data that goes into the data tag in PKCS#7
-     * @param digestEncryptionAlgorithm the encryption algorithm. It may must be <CODE>null</CODE> if the <CODE>digest</CODE>
-     * is also <CODE>null</CODE>. If the <CODE>digest</CODE> is not <CODE>null</CODE>
-     * then it may be "RSA" or "DSA"
-     */
-    public void setExternalDigest(final byte digest[], final byte RSAdata[], final String digestEncryptionAlgorithm) {
-        this.externalDigest = digest;
-        this.externalRSAdata = RSAdata;
-        this.digestEncryptionAlgorithm = digestEncryptionAlgorithm;
-    }
+
 
     /**
      * Gets the signing reason.
@@ -804,17 +764,13 @@ public class PdfSignatureAppearance {
         this.signDate = signDate;
     }
 
-    com.lowagie.text.pdf.ByteBuffer getSigout() {
-        return this.sigout;
-    }
+
 
     void setSigout(final com.lowagie.text.pdf.ByteBuffer sigout) {
         this.sigout = sigout;
     }
 
-    java.io.OutputStream getOriginalout() {
-        return this.originalout;
-    }
+
 
     void setOriginalout(final java.io.OutputStream originalout) {
         this.originalout = originalout;
@@ -872,7 +828,7 @@ public class PdfSignatureAppearance {
      * @throws IOException on error
      * @throws DocumentException on error
      */
-    public void preClose(final Calendar globalDate) throws IOException, DocumentException {
+    void preClose(final Calendar globalDate) throws IOException, DocumentException {
         preClose(null, globalDate);
     }
 
@@ -1021,7 +977,7 @@ public class PdfSignatureAppearance {
              this.writer.reader.getCatalog().put(new PdfName("Perms"), docmdp); //$NON-NLS-1$
         }
 
-        this.writer.close(this.stamper.getMoreInfo(), (globalDate!=null) ? globalDate : new GregorianCalendar());
+        this.writer.close(this.stamper.getMoreInfo(), globalDate!=null ? globalDate : new GregorianCalendar());
 
         this.range = new int[this.exclusionLocations.size() * 2];
         final int byteRangePosition = ((PdfLiteral)this.exclusionLocations.get(PdfName.BYTERANGE)).getPosition();
@@ -1044,8 +1000,8 @@ public class PdfSignatureAppearance {
             this.range[this.range.length - 1] = this.boutLen - this.range[this.range.length - 2];
             final ByteBuffer bf = new ByteBuffer();
             bf.append('[');
-            for (int k = 0; k < this.range.length; ++k) {
-				bf.append(this.range[k]).append(' ');
+            for (final int element : this.range) {
+				bf.append(element).append(' ');
 			}
             bf.append(']');
             System.arraycopy(bf.getBuffer(), 0, this.bout, byteRangePosition, bf.size());
@@ -1057,8 +1013,8 @@ public class PdfSignatureAppearance {
                 this.range[this.range.length - 1] = boutLen - this.range[this.range.length - 2];
                 final ByteBuffer bf = new ByteBuffer();
                 bf.append('[');
-                for (int k = 0; k < this.range.length; ++k) {
-					bf.append(this.range[k]).append(' ');
+                for (final int element : this.range) {
+					bf.append(element).append(' ');
 				}
                 bf.append(']');
                 this.raf.seek(byteRangePosition);
@@ -1089,8 +1045,8 @@ public class PdfSignatureAppearance {
 				throw new DocumentException("preClose() must be called first."); //$NON-NLS-1$
 			}
             final ByteBuffer bf = new ByteBuffer();
-            for (final Iterator it = update.getKeys().iterator(); it.hasNext();) {
-                final PdfName key = (PdfName)it.next();
+            for (final Object element : update.getKeys()) {
+                final PdfName key = (PdfName)element;
                 final PdfObject obj = update.get(key);
                 final PdfLiteral lit = (PdfLiteral)this.exclusionLocations.get(key);
                 if (lit == null) {
@@ -1341,7 +1297,7 @@ public class PdfSignatureAppearance {
     /**
      * Commands to draw a yellow question mark in a stream content
      */
-    public static final String questionMark =
+    private static final String questionMark =
         "% DSUnknown\n" + //$NON-NLS-1$
         "q\n" + //$NON-NLS-1$
         "1 G\n" + //$NON-NLS-1$
@@ -1460,8 +1416,8 @@ public class PdfSignatureAppearance {
 		public int read(final byte[] b, final int off, final int len) throws IOException {
             if (b == null) {
                 throw new NullPointerException();
-            } else if ((off < 0) || (off > b.length) || (len < 0) ||
-            ((off + len) > b.length) || ((off + len) < 0)) {
+            } else if (off < 0 || off > b.length || len < 0 ||
+            off + len > b.length || off + len < 0) {
                 throw new IndexOutOfBoundsException();
             } else if (len == 0) {
                 return 0;
@@ -1494,7 +1450,7 @@ public class PdfSignatureAppearance {
     /**
      * An interface to retrieve the signature dictionary for modification.
      */
-    public interface SignatureEvent {
+    private interface SignatureEvent {
         /**
          * Allows modification of the signature dictionary.
          * @param sig the signature dictionary

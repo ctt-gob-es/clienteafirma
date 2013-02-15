@@ -31,7 +31,6 @@
 package com.lowagie.text.pdf.fonts.cmaps;
 
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,9 +44,9 @@ import java.util.Map;
  */
 public class CMap
 {
-    private List codeSpaceRanges = new ArrayList();
-    private Map singleByteMappings = new HashMap();
-    private Map doubleByteMappings = new HashMap();
+    private final List codeSpaceRanges = new ArrayList();
+    private final Map singleByteMappings = new HashMap();
+    private final Map doubleByteMappings = new HashMap();
 
     /**
      * Creates a new instance of CMap.
@@ -56,26 +55,10 @@ public class CMap
     {
         //default constructor
     }
-    
-    /**
-     * This will tell if this cmap has any one byte mappings.
-     * 
-     * @return true If there are any one byte mappings, false otherwise.
-     */
-    public boolean hasOneByteMappings()
-    {
-        return !singleByteMappings.isEmpty();
-    }
-    
-    /**
-     * This will tell if this cmap has any two byte mappings.
-     * 
-     * @return true If there are any two byte mappings, false otherwise.
-     */
-    public boolean hasTwoByteMappings()
-    {
-        return !doubleByteMappings.isEmpty();
-    }
+
+
+
+
 
     /**
      * This will perform a lookup into the map.
@@ -86,16 +69,16 @@ public class CMap
      *
      * @return The string that matches the lookup.
      */
-    public String lookup( byte[] code, int offset, int length )
+    public String lookup( final byte[] code, final int offset, final int length )
     {
 
         String result = null;
         Integer key = null;
         if( length == 1 )
         {
-            
+
             key = new Integer( (code[offset]+256)%256 );
-            result = (String)singleByteMappings.get( key );
+            result = (String)this.singleByteMappings.get( key );
         }
         else if( length == 2 )
         {
@@ -104,7 +87,7 @@ public class CMap
             intKey += (code[offset+1]+256)%256;
             key = new Integer( intKey );
 
-            result = (String)doubleByteMappings.get( key );
+            result = (String)this.doubleByteMappings.get( key );
         }
 
         return result;
@@ -118,18 +101,18 @@ public class CMap
      *
      * @throws IOException if the src is invalid.
      */
-    public void addMapping( byte[] src, String dest ) throws IOException
+    public void addMapping( final byte[] src, final String dest ) throws IOException
     {
         if( src.length == 1 )
         {
-            singleByteMappings.put( new Integer( src[0] ), dest );
+            this.singleByteMappings.put( new Integer( src[0] ), dest );
         }
         else if( src.length == 2 )
         {
             int intSrc = src[0]&0xFF;
             intSrc <<= 8;
-            intSrc |= (src[1]&0xFF);
-            doubleByteMappings.put( new Integer( intSrc ), dest );
+            intSrc |= src[1]&0xFF;
+            this.doubleByteMappings.put( new Integer( intSrc ), dest );
         }
         else
         {
@@ -143,9 +126,9 @@ public class CMap
      *
      * @param range A single codespace range.
      */
-    public void addCodespaceRange( CodespaceRange range )
+    public void addCodespaceRange( final CodespaceRange range )
     {
-        codeSpaceRanges.add( range );
+        this.codeSpaceRanges.add( range );
     }
 
     /**
@@ -155,7 +138,7 @@ public class CMap
      */
     public List getCodeSpaceRanges()
     {
-        return codeSpaceRanges;
+        return this.codeSpaceRanges;
     }
 
 }

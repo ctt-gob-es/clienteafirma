@@ -57,30 +57,30 @@ public class GrayColor extends ExtendedColor {
 
     private static final long serialVersionUID = -6571835680819282746L;
 
-	private float gray;
-    
-    public static final GrayColor GRAYBLACK = new GrayColor(0f);
-    public static final GrayColor GRAYWHITE = new GrayColor(1f);
+	private final float gray;
 
-    public GrayColor(int intGray) {
-        this(intGray / 255f);
-    }
+    static final GrayColor GRAYBLACK = new GrayColor(0f);
+    static final GrayColor GRAYWHITE = new GrayColor(1f);
 
-    public GrayColor(float floatGray) {
+
+
+    public GrayColor(final float floatGray) {
         super(TYPE_GRAY, floatGray, floatGray, floatGray);
-        gray = normalize(floatGray);
-    }
-    
-    public float getGray() {
-        return gray;
+        this.gray = normalize(floatGray);
     }
 
-    public boolean equals(Object obj) {
+    public float getGray() {
+        return this.gray;
+    }
+
+    @Override
+	public boolean equals(final Object obj) {
         return obj instanceof GrayColor && ((GrayColor)obj).gray == this.gray;
     }
-    
-    public int hashCode() {
-        return Float.floatToIntBits(gray);
+
+    @Override
+	public int hashCode() {
+        return Float.floatToIntBits(this.gray);
     }
-    
+
 }

@@ -5,25 +5,25 @@
  * reusing methods that were written by Paulo Soares.
  * Instead of being a hashtable that stores objects with an int as key,
  * it stores int values with an int as key.
- * 
+ *
  * This is the original license of the original class IntHashMap:
- * 
+ *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
- * Note: originally released under the GNU LGPL v2.1, 
+ *
+ * Note: originally released under the GNU LGPL v2.1,
  * but rereleased by the original author under the ASF license (above).
  */
 
@@ -46,7 +46,7 @@ import java.util.NoSuchElementException;
  * @author Bruno Lowagie (change Objects as keys into int values)
  * @author Paulo Soares (added extra methods)
  */
-public class IntHashtable implements Cloneable {
+class IntHashtable implements Cloneable {
 
     /***
      * The hash table data.
@@ -71,7 +71,7 @@ public class IntHashtable implements Cloneable {
      *
      * @serial
      */
-    private float loadFactor;
+    private final float loadFactor;
 
     /***
      * <p>Constructs a new, empty hashtable with a default capacity and load
@@ -89,7 +89,7 @@ public class IntHashtable implements Cloneable {
      * @throws IllegalArgumentException if the initial capacity is less
      *   than zero.
      */
-    public IntHashtable(int initialCapacity) {
+    IntHashtable(final int initialCapacity) {
         this(initialCapacity, 0.75f);
     }
 
@@ -102,7 +102,7 @@ public class IntHashtable implements Cloneable {
      * @throws IllegalArgumentException  if the initial capacity is less
      *             than zero, or if the load factor is nonpositive.
      */
-    public IntHashtable(int initialCapacity, float loadFactor) {
+    private IntHashtable(int initialCapacity, final float loadFactor) {
         super();
         if (initialCapacity < 0) {
             throw new IllegalArgumentException("Illegal Capacity: " + initialCapacity);
@@ -114,8 +114,8 @@ public class IntHashtable implements Cloneable {
             initialCapacity = 1;
         }
         this.loadFactor = loadFactor;
-        table = new Entry[initialCapacity];
-        threshold = (int) (initialCapacity * loadFactor);
+        this.table = new Entry[initialCapacity];
+        this.threshold = (int) (initialCapacity * loadFactor);
     }
 
     /***
@@ -123,8 +123,8 @@ public class IntHashtable implements Cloneable {
      *
      * @return  the number of keys in this hashtable.
      */
-    public int size() {
-        return count;
+    int size() {
+        return this.count;
     }
 
     /***
@@ -134,55 +134,12 @@ public class IntHashtable implements Cloneable {
      *          <code>false</code> otherwise.
      */
     public boolean isEmpty() {
-        return count == 0;
+        return this.count == 0;
     }
 
-    /***
-     * <p>Tests if some key maps into the specified value in this hashtable.
-     * This operation is more expensive than the <code>containsKey</code>
-     * method.</p>
-     *
-     * <p>Note that this method is identical in functionality to containsValue,
-     * (which is part of the Map interface in the collections framework).</p>
-     *
-     * @param      value   a value to search for.
-     * @return     <code>true</code> if and only if some key maps to the
-     *             <code>value</code> argument in this hashtable as
-     *             determined by the <tt>equals</tt> method;
-     *             <code>false</code> otherwise.
-     * @throws  NullPointerException  if the value is <code>null</code>.
-     * @see        #containsKey(int)
-     * @see        #containsValue(int)
-     * @see        java.util.Map
-     */
-    public boolean contains(int value) {
 
-        Entry tab[] = table;
-        for (int i = tab.length; i-- > 0;) {
-            for (Entry e = tab[i]; e != null; e = e.next) {
-                if (e.value == value) {
-                    return true;
-                }
-            }
-        }
-        return false;
-     }
 
-    /***
-     * <p>Returns <code>true</code> if this HashMap maps one or more keys
-     * to this value.</p>
-     *
-     * <p>Note that this method is identical in functionality to contains
-     * (which predates the Map interface).</p>
-     *
-     * @param value value whose presence in this HashMap is to be tested.
-     * @return boolean <code>true</code> if the value is contained
-     * @see    java.util.Map
-     * @since JDK1.2
-     */
-    public boolean containsValue(int value) {
-        return contains(value);
-    }
+
 
     /***
      * <p>Tests if the specified int is a key in this hashtable.</p>
@@ -193,10 +150,10 @@ public class IntHashtable implements Cloneable {
      *    method; <code>false</code> otherwise.
      * @see #contains(int)
      */
-    public boolean containsKey(int key) {
-        Entry tab[] = table;
-        int hash = key;
-        int index = (hash & 0x7FFFFFFF) % tab.length;
+    boolean containsKey(final int key) {
+        final Entry tab[] = this.table;
+        final int hash = key;
+        final int index = (hash & 0x7FFFFFFF) % tab.length;
         for (Entry e = tab[index]; e != null; e = e.next) {
             if (e.hash == hash && e.key == key) {
                 return true;
@@ -214,10 +171,10 @@ public class IntHashtable implements Cloneable {
      *          this hashtable.
      * @see     #put(int, int)
      */
-    public int get(int key) {
-        Entry tab[] = table;
-        int hash = key;
-        int index = (hash & 0x7FFFFFFF) % tab.length;
+    int get(final int key) {
+        final Entry tab[] = this.table;
+        final int hash = key;
+        final int index = (hash & 0x7FFFFFFF) % tab.length;
         for (Entry e = tab[index]; e != null; e = e.next) {
             if (e.hash == hash && e.key == key) {
                 return e.value;
@@ -235,22 +192,22 @@ public class IntHashtable implements Cloneable {
      * in the hashtable exceeds this hashtable's capacity and load
      * factor.</p>
      */
-    protected void rehash() {
-        int oldCapacity = table.length;
-        Entry oldMap[] = table;
+    private void rehash() {
+        final int oldCapacity = this.table.length;
+        final Entry oldMap[] = this.table;
 
-        int newCapacity = oldCapacity * 2 + 1;
-        Entry newMap[] = new Entry[newCapacity];
+        final int newCapacity = oldCapacity * 2 + 1;
+        final Entry newMap[] = new Entry[newCapacity];
 
-        threshold = (int) (newCapacity * loadFactor);
-        table = newMap;
+        this.threshold = (int) (newCapacity * this.loadFactor);
+        this.table = newMap;
 
         for (int i = oldCapacity; i-- > 0;) {
             for (Entry old = oldMap[i]; old != null;) {
-                Entry e = old;
+                final Entry e = old;
                 old = old.next;
 
-                int index = (e.hash & 0x7FFFFFFF) % newCapacity;
+                final int index = (e.hash & 0x7FFFFFFF) % newCapacity;
                 e.next = newMap[index];
                 newMap[index] = e;
             }
@@ -272,31 +229,31 @@ public class IntHashtable implements Cloneable {
      * @throws  NullPointerException  if the key is <code>null</code>.
      * @see     #get(int)
      */
-    public int put(int key, int value) {
+    int put(final int key, final int value) {
         // Makes sure the key is not already in the hashtable.
-        Entry tab[] = table;
-        int hash = key;
+        Entry tab[] = this.table;
+        final int hash = key;
         int index = (hash & 0x7FFFFFFF) % tab.length;
         for (Entry e = tab[index]; e != null; e = e.next) {
             if (e.hash == hash && e.key == key) {
-                int old = e.value;
+                final int old = e.value;
                 e.value = value;
                 return old;
             }
         }
 
-        if (count >= threshold) {
+        if (this.count >= this.threshold) {
             // Rehash the table if the threshold is exceeded
             rehash();
 
-            tab = table;
+            tab = this.table;
             index = (hash & 0x7FFFFFFF) % tab.length;
         }
- 
+
          // Creates the new entry.
-         Entry e = new Entry(hash, key, value, tab[index]);
+         final Entry e = new Entry(hash, key, value, tab[index]);
          tab[index] = e;
-         count++;
+         this.count++;
          return 0;
     }
 
@@ -311,10 +268,10 @@ public class IntHashtable implements Cloneable {
      * @return  the value to which the key had been mapped in this hashtable,
      *          or <code>null</code> if the key did not have a mapping.
      */
-    public int remove(int key) {
-        Entry tab[] = table;
-        int hash = key;
-        int index = (hash & 0x7FFFFFFF) % tab.length;
+    int remove(final int key) {
+        final Entry tab[] = this.table;
+        final int hash = key;
+        final int index = (hash & 0x7FFFFFFF) % tab.length;
         for (Entry e = tab[index], prev = null; e != null; prev = e, e = e.next) {
             if (e.hash == hash && e.key == key) {
                 if (prev != null) {
@@ -322,8 +279,8 @@ public class IntHashtable implements Cloneable {
                 } else {
                     tab[index] = e.next;
                 }
-                count--;
-                int oldValue = e.value;
+                this.count--;
+                final int oldValue = e.value;
                 e.value = 0;
                 return oldValue;
             }
@@ -334,23 +291,23 @@ public class IntHashtable implements Cloneable {
     /***
      * <p>Clears this hashtable so that it contains no keys.</p>
      */
-    public void clear() {
-    	Entry tab[] = table;
+    void clear() {
+    	final Entry tab[] = this.table;
         for (int index = tab.length; --index >= 0;) {
             tab[index] = null;
         }
-        count = 0;
+        this.count = 0;
 	}
-    
+
     /***
      * <p>Innerclass that acts as a datastructure to create a new entry in the
      * table.</p>
      */
     static class Entry {
-        int hash;
-        int key;
-        int value;
-        Entry next;
+        private final int hash;
+        private final int key;
+        private int value;
+        private Entry next;
 
         /***
          * <p>Create a new entry with the given values.</p>
@@ -360,114 +317,129 @@ public class IntHashtable implements Cloneable {
          * @param value The value for this key
          * @param next A reference to the next entry in the table
          */
-        protected Entry(int hash, int key, int value, Entry next) {
+        private Entry(final int hash, final int key, final int value, final Entry next) {
             this.hash = hash;
             this.key = key;
             this.value = value;
             this.next = next;
         }
-        
+
         // extra methods for inner class Entry by Paulo
         public int getKey() {
-        	return key;
+        	return this.key;
         }
         public int getValue() {
-        	return value;
+        	return this.value;
         }
-        protected Object clone() {
-        	Entry entry = new Entry(hash, key, value, (next != null) ? (Entry)next.clone() : null);
+        @Override
+		protected Object clone() {
+        	final Entry entry = new Entry(this.hash, this.key, this.value, this.next != null ? (Entry)this.next.clone() : null);
         	return entry;
         }
     }
-    
+
     // extra inner class by Paulo
-    static class IntHashtableIterator implements Iterator {
-        int index;
-        Entry table[];
-        Entry entry;
-        
-        IntHashtableIterator(Entry table[]) {
+    private static class IntHashtableIterator implements Iterator {
+        private int index;
+        private final Entry table[];
+        private Entry entry;
+
+        private IntHashtableIterator(final Entry table[]) {
         	this.table = table;
         	this.index = table.length;
         }
-        public boolean hasNext() {
-        	if (entry != null) {
+        @Override
+		public boolean hasNext() {
+        	if (this.entry != null) {
         		return true;
         	}
-        	while (index-- > 0) {
-        	    if ((entry = table[index]) != null) {
+        	while (this.index-- > 0) {
+        	    if ((this.entry = this.table[this.index]) != null) {
         	        return true;
         	    }
         	}
         	return false;
         }
-        
-        public Object next() {
-            if (entry == null) {
-                while ((index-- > 0) && ((entry = table[index]) == null));
+
+        @Override
+		public Object next() {
+            if (this.entry == null) {
+                while (this.index-- > 0 && (this.entry = this.table[this.index]) == null) {
+					;
+				}
             }
-            if (entry != null) {
-            	Entry e = entry;
-            	entry = e.next;
+            if (this.entry != null) {
+            	final Entry e = this.entry;
+            	this.entry = e.next;
             	return e;
             }
         	throw new NoSuchElementException("IntHashtableIterator");
         }
-        public void remove() {
+        @Override
+		public void remove() {
         	throw new UnsupportedOperationException("remove() not supported.");
         }
     }
-    
+
 // extra methods by Paulo Soares:
 
     public Iterator getEntryIterator() {
-        return new IntHashtableIterator(table);
+        return new IntHashtableIterator(this.table);
     }
-    
-    public int[] toOrderedKeys() {
-    	int res[] = getKeys();
+
+    int[] toOrderedKeys() {
+    	final int res[] = getKeys();
     	Arrays.sort(res);
     	return res;
     }
-    
+
     public int[] getKeys() {
-    	int res[] = new int[count];
+    	final int res[] = new int[this.count];
     	int ptr = 0;
-    	int index = table.length;
+    	int index = this.table.length;
     	Entry entry = null;
     	while (true) {
-    		if (entry == null)
-    			while ((index-- > 0) && ((entry = table[index]) == null));
-    		if (entry == null)
-    			break;
-    		Entry e = entry;
+    		if (entry == null) {
+				while (index-- > 0 && (entry = this.table[index]) == null) {
+					;
+				}
+			}
+    		if (entry == null) {
+				break;
+			}
+    		final Entry e = entry;
     		entry = e.next;
     		res[ptr++] = e.key;
     	}
     	return res;
     }
-    
+
     public int getOneKey() {
-    	if (count == 0)
-    		return 0;
-    	int index = table.length;
+    	if (this.count == 0) {
+			return 0;
+		}
+    	int index = this.table.length;
     	Entry entry = null;
-    	while ((index-- > 0) && ((entry = table[index]) == null));
-    	if (entry == null)
-    		return 0;
+    	while (index-- > 0 && (entry = this.table[index]) == null) {
+			;
+		}
+    	if (entry == null) {
+			return 0;
+		}
     	return entry.key;
     }
-    
-    public Object clone() {
+
+    @Override
+	public Object clone() {
     	try {
-    		IntHashtable t = (IntHashtable)super.clone();
-    		t.table = new Entry[table.length];
-    		for (int i = table.length ; i-- > 0 ; ) {
-    			t.table[i] = (table[i] != null)
-    			? (Entry)table[i].clone() : null;
+    		final IntHashtable t = (IntHashtable)super.clone();
+    		t.table = new Entry[this.table.length];
+    		for (int i = this.table.length ; i-- > 0 ; ) {
+    			t.table[i] = this.table[i] != null
+    			? (Entry)this.table[i].clone() : null;
     		}
     		return t;
-    	} catch (CloneNotSupportedException e) {
+    	} catch (final CloneNotSupportedException e) {
     		// this shouldn't happen, since we are Cloneable
     		throw new InternalError();
     	}

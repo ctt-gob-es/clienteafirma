@@ -78,10 +78,10 @@ public class PdfChunk {
     private static final float ITALIC_ANGLE = 0.21256f;
 /** The allowed attributes in variable <CODE>attributes</CODE>. */
     private static final HashMap keysAttributes = new HashMap();
-    
+
 /** The allowed attributes in variable <CODE>noStroke</CODE>. */
     private static final HashMap keysNoStroke = new HashMap();
-    
+
     static {
         keysAttributes.put(Chunk.ACTION, null);
         keysAttributes.put(Chunk.UNDERLINE, null);
@@ -102,30 +102,30 @@ public class PdfChunk {
         keysNoStroke.put(Chunk.HYPHENATION, null);
         keysNoStroke.put(Chunk.TEXTRENDERMODE, null);
     }
-    
+
     // membervariables
 
     /** The value of this object. */
-    protected String value = PdfObject.NOTHING;
-    
+    private String value = PdfObject.NOTHING;
+
     /** The encoding. */
-    protected String encoding = BaseFont.WINANSI;
-    
-    
+    private String encoding = BaseFont.WINANSI;
+
+
 /** The font for this <CODE>PdfChunk</CODE>. */
     protected PdfFont font;
-    
-    protected BaseFont baseFont;
-    
-    protected SplitCharacter splitCharacter;
+
+    private BaseFont baseFont;
+
+    private SplitCharacter splitCharacter;
 /**
  * Metric attributes.
  * <P>
  * This attributes require the measurement of characters widths when rendering
  * such as underline.
  */
-    protected HashMap attributes = new HashMap();
-    
+    private HashMap attributes = new HashMap();
+
 /**
  * Non metric attributes.
  * <P>
@@ -133,16 +133,16 @@ public class PdfChunk {
  * such as Color.
  */
     protected HashMap noStroke = new HashMap();
-    
+
 /** <CODE>true</CODE> if the chunk split was cause by a newline. */
     protected boolean newlineSplit;
-    
+
 /** The image in this <CODE>PdfChunk</CODE>, if it has one */
     protected Image image;
-    
+
 /** The offset in the x direction for the image */
     protected float offsetX;
-    
+
 /** The offset in the y direction for the image */
     protected float offsetY;
 
@@ -150,144 +150,152 @@ public class PdfChunk {
     protected boolean changeLeading = false;
 
     // constructors
-    
+
 /**
  * Constructs a <CODE>PdfChunk</CODE>-object.
  *
  * @param string the content of the <CODE>PdfChunk</CODE>-object
  * @param other Chunk with the same style you want for the new Chunk
  */
-    
-    PdfChunk(String string, PdfChunk other) {
+
+    PdfChunk(final String string, final PdfChunk other) {
         thisChunk[0] = this;
-        value = string;
+        this.value = string;
         this.font = other.font;
         this.attributes = other.attributes;
         this.noStroke = other.noStroke;
         this.baseFont = other.baseFont;
-        Object obj[] = (Object[])attributes.get(Chunk.IMAGE);
-        if (obj == null)
-            image = null;
-        else {
-            image = (Image)obj[0];
-            offsetX = ((Float)obj[1]).floatValue();
-            offsetY = ((Float)obj[2]).floatValue();
-            changeLeading = ((Boolean)obj[3]).booleanValue();
+        final Object obj[] = (Object[])this.attributes.get(Chunk.IMAGE);
+        if (obj == null) {
+			this.image = null;
+		} else {
+            this.image = (Image)obj[0];
+            this.offsetX = ((Float)obj[1]).floatValue();
+            this.offsetY = ((Float)obj[2]).floatValue();
+            this.changeLeading = ((Boolean)obj[3]).booleanValue();
         }
-        encoding = font.getFont().getEncoding();
-        splitCharacter = (SplitCharacter)noStroke.get(Chunk.SPLITCHARACTER);
-        if (splitCharacter == null)
-            splitCharacter = DefaultSplitCharacter.DEFAULT;
+        this.encoding = this.font.getFont().getEncoding();
+        this.splitCharacter = (SplitCharacter)this.noStroke.get(Chunk.SPLITCHARACTER);
+        if (this.splitCharacter == null) {
+			this.splitCharacter = DefaultSplitCharacter.DEFAULT;
+		}
     }
-    
+
 /**
  * Constructs a <CODE>PdfChunk</CODE>-object.
  *
  * @param chunk the original <CODE>Chunk</CODE>-object
  * @param action the <CODE>PdfAction</CODE> if the <CODE>Chunk</CODE> comes from an <CODE>Anchor</CODE>
  */
-    
-    PdfChunk(Chunk chunk, PdfAction action) {
+
+    PdfChunk(final Chunk chunk, final PdfAction action) {
         thisChunk[0] = this;
-        value = chunk.getContent();
-        
-        Font f = chunk.getFont();
+        this.value = chunk.getContent();
+
+        final Font f = chunk.getFont();
         float size = f.getSize();
-        if (size == Font.UNDEFINED)
-            size = 12;
-        baseFont = f.getBaseFont();
+        if (size == Font.UNDEFINED) {
+			size = 12;
+		}
+        this.baseFont = f.getBaseFont();
         int style = f.getStyle();
         if (style == Font.UNDEFINED) {
             style = Font.NORMAL;
         }
-        if (baseFont == null) {
+        if (this.baseFont == null) {
             // translation of the font-family to a PDF font-family
-            baseFont = f.getCalculatedBaseFont(false);
+            this.baseFont = f.getCalculatedBaseFont(false);
         }
         else {
             // bold simulation
-            if ((style & Font.BOLD) != 0)
-                attributes.put(Chunk.TEXTRENDERMODE, new Object[]{new Integer(PdfContentByte.TEXT_RENDER_MODE_FILL_STROKE), new Float(size / 30f), null});
+            if ((style & Font.BOLD) != 0) {
+				this.attributes.put(Chunk.TEXTRENDERMODE, new Object[]{new Integer(PdfContentByte.TEXT_RENDER_MODE_FILL_STROKE), new Float(size / 30f), null});
+			}
             // italic simulation
-            if ((style & Font.ITALIC) != 0)
-                attributes.put(Chunk.SKEW, new float[]{0, ITALIC_ANGLE});
+            if ((style & Font.ITALIC) != 0) {
+				this.attributes.put(Chunk.SKEW, new float[]{0, ITALIC_ANGLE});
+			}
         }
-        font = new PdfFont(baseFont, size);
+        this.font = new PdfFont(this.baseFont, size);
         // other style possibilities
-        HashMap attr = chunk.getAttributes();
+        final HashMap attr = chunk.getAttributes();
         if (attr != null) {
-            for (Iterator i = attr.entrySet().iterator(); i.hasNext();) {
-                Map.Entry entry = (Map.Entry) i.next();
-                Object name = entry.getKey();
+            for (final Iterator i = attr.entrySet().iterator(); i.hasNext();) {
+                final Map.Entry entry = (Map.Entry) i.next();
+                final Object name = entry.getKey();
                 if (keysAttributes.containsKey(name)) {
-                    attributes.put(name, entry.getValue());
+                    this.attributes.put(name, entry.getValue());
                 }
                 else if (keysNoStroke.containsKey(name)) {
-                    noStroke.put(name, entry.getValue());
+                    this.noStroke.put(name, entry.getValue());
                 }
             }
             if ("".equals(attr.get(Chunk.GENERICTAG))) {
-                attributes.put(Chunk.GENERICTAG, chunk.getContent());
+                this.attributes.put(Chunk.GENERICTAG, chunk.getContent());
             }
         }
         if (f.isUnderlined()) {
-            Object obj[] = {null, new float[]{0, 1f / 15, 0, -1f / 3, 0}};
-            Object unders[][] = Utilities.addToArray((Object[][])attributes.get(Chunk.UNDERLINE), obj);
-            attributes.put(Chunk.UNDERLINE, unders);
+            final Object obj[] = {null, new float[]{0, 1f / 15, 0, -1f / 3, 0}};
+            final Object unders[][] = Utilities.addToArray((Object[][])this.attributes.get(Chunk.UNDERLINE), obj);
+            this.attributes.put(Chunk.UNDERLINE, unders);
         }
         if (f.isStrikethru()) {
-            Object obj[] = {null, new float[]{0, 1f / 15, 0, 1f / 3, 0}};
-            Object unders[][] = Utilities.addToArray((Object[][])attributes.get(Chunk.UNDERLINE), obj);
-            attributes.put(Chunk.UNDERLINE, unders);
+            final Object obj[] = {null, new float[]{0, 1f / 15, 0, 1f / 3, 0}};
+            final Object unders[][] = Utilities.addToArray((Object[][])this.attributes.get(Chunk.UNDERLINE), obj);
+            this.attributes.put(Chunk.UNDERLINE, unders);
         }
-        if (action != null)
-            attributes.put(Chunk.ACTION, action);
+        if (action != null) {
+			this.attributes.put(Chunk.ACTION, action);
+		}
         // the color can't be stored in a PdfFont
-        noStroke.put(Chunk.COLOR, f.getColor());
-        noStroke.put(Chunk.ENCODING, font.getFont().getEncoding());
-        Object obj[] = (Object[])attributes.get(Chunk.IMAGE);
+        this.noStroke.put(Chunk.COLOR, f.getColor());
+        this.noStroke.put(Chunk.ENCODING, this.font.getFont().getEncoding());
+        final Object obj[] = (Object[])this.attributes.get(Chunk.IMAGE);
         if (obj == null) {
-            image = null;
+            this.image = null;
         }
         else {
-            attributes.remove(Chunk.HSCALE); // images are scaled in other ways
-            image = (Image)obj[0];
-            offsetX = ((Float)obj[1]).floatValue();
-            offsetY = ((Float)obj[2]).floatValue();
-            changeLeading = ((Boolean)obj[3]).booleanValue();
+            this.attributes.remove(Chunk.HSCALE); // images are scaled in other ways
+            this.image = (Image)obj[0];
+            this.offsetX = ((Float)obj[1]).floatValue();
+            this.offsetY = ((Float)obj[2]).floatValue();
+            this.changeLeading = ((Boolean)obj[3]).booleanValue();
         }
-        font.setImage(image);
-        Float hs = (Float)attributes.get(Chunk.HSCALE);
-        if (hs != null)
-            font.setHorizontalScaling(hs.floatValue());
-        encoding = font.getFont().getEncoding();
-        splitCharacter = (SplitCharacter)noStroke.get(Chunk.SPLITCHARACTER);
-        if (splitCharacter == null)
-            splitCharacter = DefaultSplitCharacter.DEFAULT;
+        this.font.setImage(this.image);
+        final Float hs = (Float)this.attributes.get(Chunk.HSCALE);
+        if (hs != null) {
+			this.font.setHorizontalScaling(hs.floatValue());
+		}
+        this.encoding = this.font.getFont().getEncoding();
+        this.splitCharacter = (SplitCharacter)this.noStroke.get(Chunk.SPLITCHARACTER);
+        if (this.splitCharacter == null) {
+			this.splitCharacter = DefaultSplitCharacter.DEFAULT;
+		}
     }
-    
+
     // methods
-    
+
     /** Gets the Unicode equivalent to a CID.
-     * The (inexistent) CID <FF00> is translated as '\n'. 
+     * The (inexistent) CID <FF00> is translated as '\n'.
      * It has only meaning with CJK fonts with Identity encoding.
      * @param c the CID code
      * @return the Unicode equivalent
-     */    
-    public int getUnicodeEquivalent(int c) {
-        return baseFont.getUnicodeEquivalent(c);
+     */
+    int getUnicodeEquivalent(final int c) {
+        return this.baseFont.getUnicodeEquivalent(c);
     }
 
-    protected int getWord(String text, int start) {
-        int len = text.length();
+    private int getWord(final String text, int start) {
+        final int len = text.length();
         while (start < len) {
-            if (!Character.isLetter(text.charAt(start)))
-                break;
+            if (!Character.isLetter(text.charAt(start))) {
+				break;
+			}
             ++start;
         }
         return start;
     }
-    
+
 /**
  * Splits this <CODE>PdfChunk</CODE> if it's too long for the given width.
  * <P>
@@ -296,61 +304,63 @@ public class PdfChunk {
  * @param		width		a given width
  * @return		the <CODE>PdfChunk</CODE> that doesn't fit into the width.
  */
-    
-    PdfChunk split(float width) {
-        newlineSplit = false;
-        if (image != null) {
-            if (image.getScaledWidth() > width) {
-                PdfChunk pc = new PdfChunk(Chunk.OBJECT_REPLACEMENT_CHARACTER, this);
-                value = "";
-                attributes = new HashMap();
-                image = null;
-                font = PdfFont.getDefaultFont();
+
+    PdfChunk split(final float width) {
+        this.newlineSplit = false;
+        if (this.image != null) {
+            if (this.image.getScaledWidth() > width) {
+                final PdfChunk pc = new PdfChunk(Chunk.OBJECT_REPLACEMENT_CHARACTER, this);
+                this.value = "";
+                this.attributes = new HashMap();
+                this.image = null;
+                this.font = PdfFont.getDefaultFont();
                 return pc;
-            }
-            else
-                return null;
+            } else {
+				return null;
+			}
         }
-        HyphenationEvent hyphenationEvent = (HyphenationEvent)noStroke.get(Chunk.HYPHENATION);
+        final HyphenationEvent hyphenationEvent = (HyphenationEvent)this.noStroke.get(Chunk.HYPHENATION);
         int currentPosition = 0;
         int splitPosition = -1;
         float currentWidth = 0;
-        
+
         // loop over all the characters of a string
         // or until the totalWidth is reached
         int lastSpace = -1;
         float lastSpaceWidth = 0;
-        int length = value.length();
-        char valueArray[] = value.toCharArray();
+        final int length = this.value.length();
+        final char valueArray[] = this.value.toCharArray();
         char character = 0;
-        BaseFont ft = font.getFont();
+        final BaseFont ft = this.font.getFont();
         boolean surrogate = false;
         if (ft.getFontType() == BaseFont.FONT_TYPE_CJK && ft.getUnicodeEquivalent(' ') != ' ') {
             while (currentPosition < length) {
                 // the width of every character is added to the currentWidth
-                char cidChar = valueArray[currentPosition];
+                final char cidChar = valueArray[currentPosition];
                 character = (char)ft.getUnicodeEquivalent(cidChar);
                 // if a newLine or carriageReturn is encountered
                 if (character == '\n') {
-                    newlineSplit = true;
-                    String returnValue = value.substring(currentPosition + 1);
-                    value = value.substring(0, currentPosition);
-                    if (value.length() < 1) {
-                        value = "\u0001";
+                    this.newlineSplit = true;
+                    final String returnValue = this.value.substring(currentPosition + 1);
+                    this.value = this.value.substring(0, currentPosition);
+                    if (this.value.length() < 1) {
+                        this.value = "\u0001";
                     }
-                    PdfChunk pc = new PdfChunk(returnValue, this);
+                    final PdfChunk pc = new PdfChunk(returnValue, this);
                     return pc;
                 }
-                currentWidth += font.width(cidChar);
+                currentWidth += this.font.width(cidChar);
                 if (character == ' ') {
                     lastSpace = currentPosition + 1;
                     lastSpaceWidth = currentWidth;
                 }
-                if (currentWidth > width)
-                    break;
+                if (currentWidth > width) {
+					break;
+				}
                 // if a split-character is encountered, the splitPosition is altered
-                if (splitCharacter.isSplitCharacter(0, currentPosition, length, valueArray, thisChunk))
-                    splitPosition = currentPosition + 1;
+                if (this.splitCharacter.isSplitCharacter(0, currentPosition, length, valueArray, thisChunk)) {
+					splitPosition = currentPosition + 1;
+				}
                 currentPosition++;
             }
         }
@@ -360,70 +370,76 @@ public class PdfChunk {
                 character = valueArray[currentPosition];
                 // if a newLine or carriageReturn is encountered
                 if (character == '\r' || character == '\n') {
-                    newlineSplit = true;
+                    this.newlineSplit = true;
                     int inc = 1;
-                    if (character == '\r' && currentPosition + 1 < length && valueArray[currentPosition + 1] == '\n')
-                        inc = 2;
-                    String returnValue = value.substring(currentPosition + inc);
-                    value = value.substring(0, currentPosition);
-                    if (value.length() < 1) {
-                        value = " ";
+                    if (character == '\r' && currentPosition + 1 < length && valueArray[currentPosition + 1] == '\n') {
+						inc = 2;
+					}
+                    final String returnValue = this.value.substring(currentPosition + inc);
+                    this.value = this.value.substring(0, currentPosition);
+                    if (this.value.length() < 1) {
+                        this.value = " ";
                     }
-                    PdfChunk pc = new PdfChunk(returnValue, this);
+                    final PdfChunk pc = new PdfChunk(returnValue, this);
                     return pc;
                 }
                 surrogate = Utilities.isSurrogatePair(valueArray, currentPosition);
-                if (surrogate)
-                    currentWidth += font.width(Utilities.convertToUtf32(valueArray[currentPosition], valueArray[currentPosition + 1]));
-                else
-                    currentWidth += font.width(character);
+                if (surrogate) {
+					currentWidth += this.font.width(Utilities.convertToUtf32(valueArray[currentPosition], valueArray[currentPosition + 1]));
+				} else {
+					currentWidth += this.font.width(character);
+				}
                 if (character == ' ') {
                     lastSpace = currentPosition + 1;
                     lastSpaceWidth = currentWidth;
                 }
-                if (surrogate)
-                    currentPosition++;
-                if (currentWidth > width)
-                    break;
+                if (surrogate) {
+					currentPosition++;
+				}
+                if (currentWidth > width) {
+					break;
+				}
                 // if a split-character is encountered, the splitPosition is altered
-                if (splitCharacter.isSplitCharacter(0, currentPosition, length, valueArray, null))
-                    splitPosition = currentPosition + 1;
+                if (this.splitCharacter.isSplitCharacter(0, currentPosition, length, valueArray, null)) {
+					splitPosition = currentPosition + 1;
+				}
                 currentPosition++;
             }
         }
-        
+
         // if all the characters fit in the total width, null is returned (there is no overflow)
         if (currentPosition == length) {
             return null;
         }
         // otherwise, the string has to be truncated
         if (splitPosition < 0) {
-            String returnValue = value;
-            value = "";
-            PdfChunk pc = new PdfChunk(returnValue, this);
+            final String returnValue = this.value;
+            this.value = "";
+            final PdfChunk pc = new PdfChunk(returnValue, this);
             return pc;
         }
-        if (lastSpace > splitPosition && splitCharacter.isSplitCharacter(0, 0, 1, singleSpace, null))
-            splitPosition = lastSpace;
+        if (lastSpace > splitPosition && this.splitCharacter.isSplitCharacter(0, 0, 1, singleSpace, null)) {
+			splitPosition = lastSpace;
+		}
         if (hyphenationEvent != null && lastSpace >= 0 && lastSpace < currentPosition) {
-            int wordIdx = getWord(value, lastSpace);
+            final int wordIdx = getWord(this.value, lastSpace);
             if (wordIdx > lastSpace) {
-                String pre = hyphenationEvent.getHyphenatedWordPre(value.substring(lastSpace, wordIdx), font.getFont(), font.size(), width - lastSpaceWidth);
-                String post = hyphenationEvent.getHyphenatedWordPost();
+                final String pre = hyphenationEvent.getHyphenatedWordPre(this.value.substring(lastSpace, wordIdx), this.font.getFont(), this.font.size(), width - lastSpaceWidth);
+                final String post = hyphenationEvent.getHyphenatedWordPost();
                 if (pre.length() > 0) {
-                    String returnValue = post + value.substring(wordIdx);
-                    value = trim(value.substring(0, lastSpace) + pre);
-                    PdfChunk pc = new PdfChunk(returnValue, this);
+                    final String returnValue = post + this.value.substring(wordIdx);
+                    this.value = trim(this.value.substring(0, lastSpace) + pre);
+                    final PdfChunk pc = new PdfChunk(returnValue, this);
                     return pc;
                 }
             }
         }
-        String returnValue = value.substring(splitPosition);
-        value = trim(value.substring(0, splitPosition));
-        PdfChunk pc = new PdfChunk(returnValue, this);
+        final String returnValue = this.value.substring(splitPosition);
+        this.value = trim(this.value.substring(0, splitPosition));
+        final PdfChunk pc = new PdfChunk(returnValue, this);
         return pc;
     }
-    
+
 /**
  * Truncates this <CODE>PdfChunk</CODE> if it's too long for the given width.
  * <P>
@@ -432,112 +448,116 @@ public class PdfChunk {
  * @param		width		a given width
  * @return		the <CODE>PdfChunk</CODE> that doesn't fit into the width.
  */
-    
-    PdfChunk truncate(float width) {
-        if (image != null) {
-            if (image.getScaledWidth() > width) {
-                PdfChunk pc = new PdfChunk("", this);
-                value = "";
-                attributes.remove(Chunk.IMAGE);
-                image = null;
-                font = PdfFont.getDefaultFont();
+
+    PdfChunk truncate(final float width) {
+        if (this.image != null) {
+            if (this.image.getScaledWidth() > width) {
+                final PdfChunk pc = new PdfChunk("", this);
+                this.value = "";
+                this.attributes.remove(Chunk.IMAGE);
+                this.image = null;
+                this.font = PdfFont.getDefaultFont();
                 return pc;
-            }
-            else
-                return null;
+            } else {
+				return null;
+			}
         }
-        
+
         int currentPosition = 0;
         float currentWidth = 0;
-        
+
         // it's no use trying to split if there isn't even enough place for a space
-        if (width < font.width()) {
-            String returnValue = value.substring(1);
-            value = value.substring(0, 1);
-            PdfChunk pc = new PdfChunk(returnValue, this);
+        if (width < this.font.width()) {
+            final String returnValue = this.value.substring(1);
+            this.value = this.value.substring(0, 1);
+            final PdfChunk pc = new PdfChunk(returnValue, this);
             return pc;
         }
-        
+
         // loop over all the characters of a string
         // or until the totalWidth is reached
-        int length = value.length();
+        final int length = this.value.length();
         boolean surrogate = false;
-        char character;
+        final char character;
         while (currentPosition < length) {
             // the width of every character is added to the currentWidth
-            surrogate = Utilities.isSurrogatePair(value, currentPosition);
-            if (surrogate)
-                currentWidth += font.width(Utilities.convertToUtf32(value, currentPosition));
-            else
-                currentWidth += font.width(value.charAt(currentPosition));
-            if (currentWidth > width)
-                break;
-            if (surrogate)
-                currentPosition++;
+            surrogate = Utilities.isSurrogatePair(this.value, currentPosition);
+            if (surrogate) {
+				currentWidth += this.font.width(Utilities.convertToUtf32(this.value, currentPosition));
+			} else {
+				currentWidth += this.font.width(this.value.charAt(currentPosition));
+			}
+            if (currentWidth > width) {
+				break;
+			}
+            if (surrogate) {
+				currentPosition++;
+			}
             currentPosition++;
         }
-        
+
         // if all the characters fit in the total width, null is returned (there is no overflow)
         if (currentPosition == length) {
             return null;
         }
-        
+
         // otherwise, the string has to be truncated
         //currentPosition -= 2;
         // we have to chop off minimum 1 character from the chunk
         if (currentPosition == 0) {
             currentPosition = 1;
-            if (surrogate)
-                ++currentPosition;
+            if (surrogate) {
+				++currentPosition;
+			}
         }
-        String returnValue = value.substring(currentPosition);
-        value = value.substring(0, currentPosition);
-        PdfChunk pc = new PdfChunk(returnValue, this);
+        final String returnValue = this.value.substring(currentPosition);
+        this.value = this.value.substring(0, currentPosition);
+        final PdfChunk pc = new PdfChunk(returnValue, this);
         return pc;
     }
-    
+
     // methods to retrieve the membervariables
-    
+
 /**
  * Returns the font of this <CODE>Chunk</CODE>.
  *
  * @return	a <CODE>PdfFont</CODE>
  */
-    
+
     PdfFont font() {
-        return font;
+        return this.font;
     }
-    
+
 /**
  * Returns the color of this <CODE>Chunk</CODE>.
  *
  * @return	a <CODE>Color</CODE>
  */
-    
+
     Color color() {
-        return (Color)noStroke.get(Chunk.COLOR);
+        return (Color)this.noStroke.get(Chunk.COLOR);
     }
-    
+
 /**
  * Returns the width of this <CODE>PdfChunk</CODE>.
  *
  * @return	a width
  */
-    
+
     float width() {
-        return font.width(value);
+        return this.font.width(this.value);
     }
-    
+
 /**
  * Checks if the <CODE>PdfChunk</CODE> split was caused by a newline.
  * @return <CODE>true</CODE> if the <CODE>PdfChunk</CODE> split was caused by a newline.
  */
-    
+
     public boolean isNewlineSplit()
     {
-        return newlineSplit;
+        return this.newlineSplit;
     }
-    
+
 /**
  * Gets the width of the <CODE>PdfChunk</CODE> taking into account the
  * extra character and word spacing.
@@ -545,108 +565,95 @@ public class PdfChunk {
  * @param wordSpacing the extra word spacing
  * @return the calculated width
  */
-    
-    public float getWidthCorrected(float charSpacing, float wordSpacing)
+
+    float getWidthCorrected(final float charSpacing, final float wordSpacing)
     {
-        if (image != null) {
-            return image.getScaledWidth() + charSpacing;
+        if (this.image != null) {
+            return this.image.getScaledWidth() + charSpacing;
         }
         int numberOfSpaces = 0;
         int idx = -1;
-        while ((idx = value.indexOf(' ', idx + 1)) >= 0)
-            ++numberOfSpaces;
-        return width() + (value.length() * charSpacing + numberOfSpaces * wordSpacing);
+        while ((idx = this.value.indexOf(' ', idx + 1)) >= 0) {
+			++numberOfSpaces;
+		}
+        return width() + (this.value.length() * charSpacing + numberOfSpaces * wordSpacing);
     }
-    
+
     /**
      * Gets the text displacement relative to the baseline.
      * @return a displacement in points
      */
     public float getTextRise() {
-    	Float f = (Float) getAttribute(Chunk.SUBSUPSCRIPT);
+    	final Float f = (Float) getAttribute(Chunk.SUBSUPSCRIPT);
     	if (f != null) {
     		return f.floatValue();
     	}
     	return 0.0f;
     }
-    
+
 /**
  * Trims the last space.
  * @return the width of the space trimmed, otherwise 0
  */
-    
-    public float trimLastSpace()
+
+    float trimLastSpace()
     {
-        BaseFont ft = font.getFont();
+        final BaseFont ft = this.font.getFont();
         if (ft.getFontType() == BaseFont.FONT_TYPE_CJK && ft.getUnicodeEquivalent(' ') != ' ') {
-            if (value.length() > 1 && value.endsWith("\u0001")) {
-                value = value.substring(0, value.length() - 1);
-                return font.width('\u0001');
+            if (this.value.length() > 1 && this.value.endsWith("\u0001")) {
+                this.value = this.value.substring(0, this.value.length() - 1);
+                return this.font.width('\u0001');
             }
         }
         else {
-            if (value.length() > 1 && value.endsWith(" ")) {
-                value = value.substring(0, value.length() - 1);
-                return font.width(' ');
-            }
-        }
-        return 0;
-    }    
-    public float trimFirstSpace()
-    {
-        BaseFont ft = font.getFont();
-        if (ft.getFontType() == BaseFont.FONT_TYPE_CJK && ft.getUnicodeEquivalent(' ') != ' ') {
-            if (value.length() > 1 && value.startsWith("\u0001")) {
-                value = value.substring(1);
-                return font.width('\u0001');
-            }
-        }
-        else {
-            if (value.length() > 1 && value.startsWith(" ")) {
-                value = value.substring(1);
-                return font.width(' ');
+            if (this.value.length() > 1 && this.value.endsWith(" ")) {
+                this.value = this.value.substring(0, this.value.length() - 1);
+                return this.font.width(' ');
             }
         }
         return 0;
     }
-    
+
+
 /**
  * Gets an attribute. The search is made in <CODE>attributes</CODE>
  * and <CODE>noStroke</CODE>.
  * @param name the attribute key
  * @return the attribute value or null if not found
  */
-    
-    Object getAttribute(String name)
+
+    Object getAttribute(final String name)
     {
-        if (attributes.containsKey(name))
-            return attributes.get(name);
-        return noStroke.get(name);
+        if (this.attributes.containsKey(name)) {
+			return this.attributes.get(name);
+		}
+        return this.noStroke.get(name);
     }
-    
+
 /**
  *Checks if the attribute exists.
  * @param name the attribute key
  * @return <CODE>true</CODE> if the attribute exists
  */
-    
-    boolean isAttribute(String name)
+
+    boolean isAttribute(final String name)
     {
-        if (attributes.containsKey(name))
-            return true;
-        return noStroke.containsKey(name);
+        if (this.attributes.containsKey(name)) {
+			return true;
+		}
+        return this.noStroke.containsKey(name);
     }
-    
+
 /**
  * Checks if this <CODE>PdfChunk</CODE> needs some special metrics handling.
  * @return <CODE>true</CODE> if this <CODE>PdfChunk</CODE> needs some special metrics handling.
  */
-    
+
     boolean isStroked()
     {
-        return (!attributes.isEmpty());
+        return !this.attributes.isEmpty();
     }
-    
+
     /**
      * Checks if this <CODE>PdfChunk</CODE> is a Separator Chunk.
      * @return	true if this chunk is a separator.
@@ -655,7 +662,7 @@ public class PdfChunk {
     boolean isSeparator() {
     	return isAttribute(Chunk.SEPARATOR);
     }
-    
+
     /**
      * Checks if this <CODE>PdfChunk</CODE> is a horizontal Separator Chunk.
      * @return	true if this chunk is a horizontal separator.
@@ -663,12 +670,12 @@ public class PdfChunk {
      */
     boolean isHorizontalSeparator() {
     	if (isAttribute(Chunk.SEPARATOR)) {
-    		Object[] o = (Object[])getAttribute(Chunk.SEPARATOR);
+    		final Object[] o = (Object[])getAttribute(Chunk.SEPARATOR);
     		return !((Boolean)o[1]).booleanValue();
     	}
     	return false;
     }
-    
+
     /**
      * Checks if this <CODE>PdfChunk</CODE> is a tab Chunk.
      * @return	true if this chunk is a separator.
@@ -677,85 +684,69 @@ public class PdfChunk {
     boolean isTab() {
     	return isAttribute(Chunk.TAB);
     }
-    
+
     /**
      * Correction for the tab position based on the left starting position.
      * @param	newValue	the new value for the left X.
      * @since	2.1.2
      */
-    void adjustLeft(float newValue) {
-    	Object[] o = (Object[])attributes.get(Chunk.TAB);
+    void adjustLeft(final float newValue) {
+    	final Object[] o = (Object[])this.attributes.get(Chunk.TAB);
     	if (o != null) {
-    		attributes.put(Chunk.TAB, new Object[]{o[0], o[1], o[2], new Float(newValue)});
+    		this.attributes.put(Chunk.TAB, new Object[]{o[0], o[1], o[2], new Float(newValue)});
     	}
     }
-    
+
 /**
  * Checks if there is an image in the <CODE>PdfChunk</CODE>.
  * @return <CODE>true</CODE> if an image is present
  */
-    
+
     boolean isImage()
     {
-        return image != null;
+        return this.image != null;
     }
-    
+
 /**
  * Gets the image in the <CODE>PdfChunk</CODE>.
  * @return the image or <CODE>null</CODE>
  */
-    
+
     Image getImage()
     {
-        return image;
+        return this.image;
     }
-    
-/**
- * Sets the image offset in the x direction
- * @param  offsetX the image offset in the x direction
- */
-    
-    void setImageOffsetX(float offsetX)
-    {
-        this.offsetX = offsetX;
-    }
-    
+
+
+
 /**
  * Gets the image offset in the x direction
  * @return the image offset in the x direction
  */
-    
+
     float getImageOffsetX()
     {
-        return offsetX;
+        return this.offsetX;
     }
-    
-/**
- * Sets the image offset in the y direction
- * @param  offsetY the image offset in the y direction
- */
-    
-    void setImageOffsetY(float offsetY)
-    {
-        this.offsetY = offsetY;
-    }
-    
+
+
+
 /**
  * Gets the image offset in the y direction
  * @return Gets the image offset in the y direction
  */
-    
+
     float getImageOffsetY()
     {
-        return offsetY;
+        return this.offsetY;
     }
-    
+
 /**
  * sets the value.
  * @param value content of the Chunk
  */
-    
-    void setValue(String value)
+
+    void setValue(final String value)
     {
         this.value = value;
     }
@@ -763,58 +754,53 @@ public class PdfChunk {
     /**
      * @see java.lang.Object#toString()
      */
-    public String toString() {
-        return value;
+    @Override
+	public String toString() {
+        return this.value;
     }
 
     /**
      * Tells you if this string is in Chinese, Japanese, Korean or Identity-H.
      * @return true if the Chunk has a special encoding
      */
-    
+
     boolean isSpecialEncoding() {
-        return encoding.equals(CJKFont.CJK_ENCODING) || encoding.equals(BaseFont.IDENTITY_H);
-    }
-    
-    /**
-     * Gets the encoding of this string.
-     *
-     * @return		a <CODE>String</CODE>
-     */
-    
-    String getEncoding() {
-        return encoding;
+        return this.encoding.equals(CJKFont.CJK_ENCODING) || this.encoding.equals(BaseFont.IDENTITY_H);
     }
 
+
+
     int length() {
-        return value.length();
+        return this.value.length();
     }
-    
+
     int lengthUtf32() {
-        if (!BaseFont.IDENTITY_H.equals(encoding))
-            return value.length();
+        if (!BaseFont.IDENTITY_H.equals(this.encoding)) {
+			return this.value.length();
+		}
         int total = 0;
-        int len = value.length();
+        final int len = this.value.length();
         for (int k = 0; k < len; ++k) {
-            if (Utilities.isSurrogateHigh(value.charAt(k)))
-                ++k;
+            if (Utilities.isSurrogateHigh(this.value.charAt(k))) {
+				++k;
+			}
             ++total;
         }
         return total;
     }
-    
-    boolean isExtSplitCharacter(int start, int current, int end, char[] cc, PdfChunk[] ck) {
-        return splitCharacter.isSplitCharacter(start, current, end, cc, ck);
+
+    boolean isExtSplitCharacter(final int start, final int current, final int end, final char[] cc, final PdfChunk[] ck) {
+        return this.splitCharacter.isSplitCharacter(start, current, end, cc, ck);
     }
-    
+
 /**
  * Removes all the <VAR>' '</VAR> and <VAR>'-'</VAR>-characters on the right of a <CODE>String</CODE>.
  * <P>
  * @param	string		the <CODE>String<CODE> that has to be trimmed.
  * @return	the trimmed <CODE>String</CODE>
- */    
+ */
     String trim(String string) {
-        BaseFont ft = font.getFont();
+        final BaseFont ft = this.font.getFont();
         if (ft.getFontType() == BaseFont.FONT_TYPE_CJK && ft.getUnicodeEquivalent(' ') != ' ') {
             while (string.endsWith("\u0001")) {
                 string = string.substring(0, string.length() - 1);
@@ -828,18 +814,17 @@ public class PdfChunk {
         return string;
     }
 
-    public boolean changeLeading() {
-        return changeLeading;
+
+
+    float getCharWidth(final int c) {
+        if (noPrint(c)) {
+			return 0;
+		}
+        return this.font.width(c);
     }
-    
-    float getCharWidth(int c) {
-        if (noPrint(c))
-            return 0;
-        return font.width(c);
+
+    public static boolean noPrint(final int c) {
+        return c >= 0x200b && c <= 0x200f || c >= 0x202a && c <= 0x202e;
     }
-    
-    public static boolean noPrint(int c) {
-        return ((c >= 0x200b && c <= 0x200f) || (c >= 0x202a && c <= 0x202e));
-    }
-    
+
 }

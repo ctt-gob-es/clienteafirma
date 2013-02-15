@@ -57,27 +57,27 @@ package com.lowagie.text.pdf;
  * As stated in the Javadoc comments below, materials from Unicode.org
  * are used in this class. The following license applies to these materials:
  * http://www.unicode.org/copyright.html#Exhibit1
- * 
+ *
  * EXHIBIT 1
  * UNICODE, INC. LICENSE AGREEMENT - DATA FILES AND SOFTWARE
- * 
+ *
  * Unicode Data Files include all data files under the directories
  * http://www.unicode.org/Public/, http://www.unicode.org/reports/,
  * and http://www.unicode.org/cldr/data/ .
  * Unicode Software includes any source code published in the Unicode Standard
  * or under the directories http://www.unicode.org/Public/, http://www.unicode.org/reports/,
  * and http://www.unicode.org/cldr/data/.
- * 
+ *
  * NOTICE TO USER: Carefully read the following legal agreement. BY DOWNLOADING,
  * INSTALLING, COPYING OR OTHERWISE USING UNICODE INC.'S DATA FILES ("DATA FILES"),
  * AND/OR SOFTWARE ("SOFTWARE"), YOU UNEQUIVOCALLY ACCEPT, AND AGREE TO BE BOUND BY,
  * ALL OF THE TERMS AND CONDITIONS OF THIS AGREEMENT. IF YOU DO NOT AGREE, DO NOT
  * DOWNLOAD, INSTALL, COPY, DISTRIBUTE OR USE THE DATA FILES OR SOFTWARE.
- * 
+ *
  * COPYRIGHT AND PERMISSION NOTICE
  * Copyright (C) 1991-2007 Unicode, Inc. All rights reserved. Distributed under
  * the Terms of Use in http://www.unicode.org/copyright.html.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of the Unicode data files and any associated documentation (the "Data Files")
  * or Unicode software and any associated documentation (the "Software") to deal
@@ -90,7 +90,7 @@ package com.lowagie.text.pdf;
  * appear in associated documentation, and (c) there is clear notice in each
  * modified Data File or in the Software as well as in the documentation associated
  * with the Data File(s) or Software that the data or software has been modified.
- * 
+ *
  * THE DATA FILES AND SOFTWARE ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF THIRD PARTY RIGHTS.
@@ -99,7 +99,7 @@ package com.lowagie.text.pdf;
  * DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
  * CONNECTION WITH THE USE OR PERFORMANCE OF THE DATA FILES OR SOFTWARE.
- * 
+ *
  * Except as contained in this notice, the name of a copyright holder shall not
  * be used in advertising or otherwise to promote the sale, use or other dealings
  * in these Data Files or Software without prior written authorization of the
@@ -155,203 +155,175 @@ package com.lowagie.text.pdf;
  */
 
 public final class BidiOrder {
-    private byte[] initialTypes;
+    private final byte[] initialTypes;
     private byte[] embeddings; // generated from processing format codes
     private byte paragraphEmbeddingLevel = -1; // undefined
-    
+
     private int textLength; // for convenience
     private byte[] resultTypes; // for paragraph, not lines
     private byte[] resultLevels; // for paragraph, not lines
-    
+
     // The bidi types
-    
+
     /** Left-to-right*/
     public static final byte L = 0;
-    
+
     /** Left-to-Right Embedding */
     public static final byte LRE = 1;
-    
+
     /** Left-to-Right Override */
     public static final byte LRO = 2;
-    
+
     /** Right-to-Left */
     public static final byte R = 3;
-    
+
     /** Right-to-Left Arabic */
     public static final byte AL = 4;
-    
+
     /** Right-to-Left Embedding */
     public static final byte RLE = 5;
-    
+
     /** Right-to-Left Override */
     public static final byte RLO = 6;
-    
+
     /** Pop Directional Format */
     public static final byte PDF = 7;
-    
+
     /** European Number */
     public static final byte EN = 8;
-    
+
     /** European Number Separator */
     public static final byte ES = 9;
-    
+
     /** European Number Terminator */
     public static final byte ET = 10;
-    
+
     /** Arabic Number */
     public static final byte AN = 11;
-    
+
     /** Common Number Separator */
     public static final byte CS = 12;
-    
+
     /** Non-Spacing Mark */
     public static final byte NSM = 13;
-    
+
     /** Boundary Neutral */
     public static final byte BN = 14;
-    
+
     /** Paragraph Separator */
     public static final byte B = 15;
-    
+
     /** Segment Separator */
     public static final byte S = 16;
-    
+
     /** Whitespace */
     public static final byte WS = 17;
-    
+
     /** Other Neutrals */
     public static final byte ON = 18;
-    
+
     /** Minimum bidi type value. */
     public static final byte TYPE_MIN = 0;
-    
+
     /** Maximum bidi type value. */
     public static final byte TYPE_MAX = 18;
-    
+
     //
     // Input
     //
-    
-    /**
-     * Initialize using an array of direction types.  Types range from TYPE_MIN to TYPE_MAX inclusive
-     * and represent the direction codes of the characters in the text.
-     *
-     * @param types the types array
-     */
-    public BidiOrder(byte[] types) {
-        validateTypes(types);
-        
-        this.initialTypes = (byte[])types.clone(); // client type array remains unchanged
-        
-        runAlgorithm();
-    }
-    
-    /**
-     * Initialize using an array of direction types and an externally supplied paragraph embedding level.
-     * The embedding level may be -1, 0, or 1.  -1 means to apply the default algorithm (rules P2 and P3),
-     * 0 is for LTR paragraphs, and 1 is for RTL paragraphs.
-     *
-     * @param types the types array
-     * @param paragraphEmbeddingLevel the externally supplied paragraph embedding level.
-     */
-    public BidiOrder(byte[] types, byte paragraphEmbeddingLevel) {
-        validateTypes(types);
-        validateParagraphEmbeddingLevel(paragraphEmbeddingLevel);
-        
-        this.initialTypes = (byte[])types.clone(); // client type array remains unchanged
-        this.paragraphEmbeddingLevel = paragraphEmbeddingLevel;
-        
-        runAlgorithm();
-    }
-    
-    public BidiOrder(char text[], int offset, int length, byte paragraphEmbeddingLevel) {
-        initialTypes = new byte[length];
+
+
+
+
+
+    BidiOrder(final char text[], final int offset, final int length, final byte paragraphEmbeddingLevel) {
+        this.initialTypes = new byte[length];
         for (int k = 0; k < length; ++k) {
-            initialTypes[k] = rtypes[text[offset + k]];
+            this.initialTypes[k] = rtypes[text[offset + k]];
         }
         validateParagraphEmbeddingLevel(paragraphEmbeddingLevel);
-        
+
         this.paragraphEmbeddingLevel = paragraphEmbeddingLevel;
-        
+
         runAlgorithm();
     }
-    
-    public final static byte getDirection(char c) {
+
+    final static byte getDirection(final char c) {
         return rtypes[c];
     }
-    
+
     /**
      * The algorithm.
      * Does not include line-based processing (Rules L1, L2).
      * These are applied later in the line-based phase of the algorithm.
      */
     private void runAlgorithm() {
-        textLength = initialTypes.length;
-        
+        this.textLength = this.initialTypes.length;
+
         // Initialize output types.
         // Result types initialized to input types.
-        resultTypes = (byte[])initialTypes.clone();
-        
-        
+        this.resultTypes = this.initialTypes.clone();
+
+
         // 1) determining the paragraph level
         // Rule P1 is the requirement for entering this algorithm.
         // Rules P2, P3.
         // If no externally supplied paragraph embedding level, use default.
-        if (paragraphEmbeddingLevel == -1) {
+        if (this.paragraphEmbeddingLevel == -1) {
             determineParagraphEmbeddingLevel();
         }
-        
+
         // Initialize result levels to paragraph embedding level.
-        resultLevels = new byte[textLength];
-        setLevels(0, textLength, paragraphEmbeddingLevel);
-        
+        this.resultLevels = new byte[this.textLength];
+        setLevels(0, this.textLength, this.paragraphEmbeddingLevel);
+
         // 2) Explicit levels and directions
         // Rules X1-X8.
         determineExplicitEmbeddingLevels();
-        
+
         // Rule X9.
-        textLength = removeExplicitCodes();
-        
+        this.textLength = removeExplicitCodes();
+
         // Rule X10.
         // Run remainder of algorithm one level run at a time
-        byte prevLevel = paragraphEmbeddingLevel;
+        byte prevLevel = this.paragraphEmbeddingLevel;
         int start = 0;
-        while (start < textLength) {
-            byte level = resultLevels[start];
-            byte prevType = typeForLevel(Math.max(prevLevel, level));
-            
+        while (start < this.textLength) {
+            final byte level = this.resultLevels[start];
+            final byte prevType = typeForLevel(Math.max(prevLevel, level));
+
             int limit = start + 1;
-            while (limit < textLength && resultLevels[limit] == level) {
+            while (limit < this.textLength && this.resultLevels[limit] == level) {
                 ++limit;
             }
-            
-            byte succLevel = limit < textLength ? resultLevels[limit] : paragraphEmbeddingLevel;
-            byte succType = typeForLevel(Math.max(succLevel, level));
-            
+
+            final byte succLevel = limit < this.textLength ? this.resultLevels[limit] : this.paragraphEmbeddingLevel;
+            final byte succType = typeForLevel(Math.max(succLevel, level));
+
             // 3) resolving weak types
             // Rules W1-W7.
             resolveWeakTypes(start, limit, level, prevType, succType);
-            
+
             // 4) resolving neutral types
             // Rules N1-N3.
             resolveNeutralTypes(start, limit, level, prevType, succType);
-            
+
             // 5) resolving implicit embedding levels
             // Rules I1, I2.
             resolveImplicitLevels(start, limit, level, prevType, succType);
-            
+
             prevLevel = level;
             start = limit;
         }
-        
+
         // Reinsert explicit codes and assign appropriate levels to 'hide' them.
         // This is for convenience, so the resulting level array maps 1-1
         // with the initial array.
         // See the implementation suggestions section of TR#9 for guidelines on
         // how to implement the algorithm without removing and reinserting the codes.
-        textLength = reinsertExplicitCodes(textLength);
+        this.textLength = reinsertExplicitCodes(this.textLength);
     }
-    
+
     /**
      * 1) determining the paragraph level.
      * <p>
@@ -361,27 +333,27 @@ public final class BidiOrder {
      */
     private void determineParagraphEmbeddingLevel() {
         byte strongType = -1; // unknown
-        
+
         // Rule P2.
-        for (int i = 0; i < textLength; ++i) {
-            byte t = resultTypes[i];
+        for (int i = 0; i < this.textLength; ++i) {
+            final byte t = this.resultTypes[i];
             if (t == L || t == AL || t == R) {
                 strongType = t;
                 break;
             }
         }
-        
+
         // Rule P3.
         if (strongType == -1) { // none found
             // default embedding level when no strong types found is 0.
-            paragraphEmbeddingLevel = 0;
+            this.paragraphEmbeddingLevel = 0;
         } else if (strongType == L) {
-            paragraphEmbeddingLevel = 0;
+            this.paragraphEmbeddingLevel = 0;
         } else { // AL, R
-            paragraphEmbeddingLevel = 1;
+            this.paragraphEmbeddingLevel = 1;
         }
     }
-    
+
     /**
      * Process embedding format codes.
      * <p>
@@ -391,18 +363,18 @@ public final class BidiOrder {
      * @see #processEmbeddings
      */
     private void determineExplicitEmbeddingLevels() {
-        embeddings = processEmbeddings(resultTypes, paragraphEmbeddingLevel);
-        
-        for (int i = 0; i < textLength; ++i) {
-            byte level = embeddings[i];
+        this.embeddings = processEmbeddings(this.resultTypes, this.paragraphEmbeddingLevel);
+
+        for (int i = 0; i < this.textLength; ++i) {
+            byte level = this.embeddings[i];
             if ((level & 0x80) != 0) {
                 level &= 0x7f;
-                resultTypes[i] = typeForLevel(level);
+                this.resultTypes[i] = typeForLevel(level);
             }
-            resultLevels[i] = level;
+            this.resultLevels[i] = level;
         }
     }
-    
+
     /**
      * Rules X9.
      * Remove explicit codes so that they may be ignored during the remainder
@@ -412,18 +384,18 @@ public final class BidiOrder {
      */
     private int removeExplicitCodes() {
         int w = 0;
-        for (int i = 0; i < textLength; ++i) {
-            byte t = initialTypes[i];
+        for (int i = 0; i < this.textLength; ++i) {
+            final byte t = this.initialTypes[i];
             if (!(t == LRE || t == RLE || t == LRO || t == RLO || t == PDF || t == BN)) {
-                embeddings[w] = embeddings[i];
-                resultTypes[w] = resultTypes[i];
-                resultLevels[w] = resultLevels[i];
+                this.embeddings[w] = this.embeddings[i];
+                this.resultTypes[w] = this.resultTypes[i];
+                this.resultLevels[w] = this.resultLevels[i];
                 w++;
             }
         }
         return w; // new textLength while explicit levels are removed
     }
-    
+
     /**
      * Reinsert levels information for explicit codes.
      * This is for ease of relating the level information
@@ -435,39 +407,39 @@ public final class BidiOrder {
      * types array supplied to constructor)
      */
     private int reinsertExplicitCodes(int textLength) {
-        for (int i = initialTypes.length; --i >= 0;) {
-            byte t = initialTypes[i];
+        for (int i = this.initialTypes.length; --i >= 0;) {
+            final byte t = this.initialTypes[i];
             if (t == LRE || t == RLE || t == LRO || t == RLO || t == PDF || t == BN) {
-                embeddings[i] = 0;
-                resultTypes[i] = t;
-                resultLevels[i] = -1;
+                this.embeddings[i] = 0;
+                this.resultTypes[i] = t;
+                this.resultLevels[i] = -1;
             } else {
                 --textLength;
-                embeddings[i] = embeddings[textLength];
-                resultTypes[i] = resultTypes[textLength];
-                resultLevels[i] = resultLevels[textLength];
+                this.embeddings[i] = this.embeddings[textLength];
+                this.resultTypes[i] = this.resultTypes[textLength];
+                this.resultLevels[i] = this.resultLevels[textLength];
             }
         }
-        
+
         // now propagate forward the levels information (could have
         // propagated backward, the main thing is not to introduce a level
         // break where one doesn't already exist).
-        
-        if (resultLevels[0] == -1) {
-            resultLevels[0] = paragraphEmbeddingLevel;
+
+        if (this.resultLevels[0] == -1) {
+            this.resultLevels[0] = this.paragraphEmbeddingLevel;
         }
-        for (int i = 1; i < initialTypes.length; ++i) {
-            if (resultLevels[i] == -1) {
-                resultLevels[i] = resultLevels[i-1];
+        for (int i = 1; i < this.initialTypes.length; ++i) {
+            if (this.resultLevels[i] == -1) {
+                this.resultLevels[i] = this.resultLevels[i-1];
             }
         }
-        
+
         // Embedding information is for informational purposes only
         // so need not be adjusted.
-        
-        return initialTypes.length;
+
+        return this.initialTypes.length;
     }
-    
+
     /**
      * 2) determining explicit levels
      * Rules X1 - X8
@@ -477,41 +449,41 @@ public final class BidiOrder {
      * override information in the result array.  The low 7 bits are the level, the high
      * bit is set if the level is an override, and clear if it is an embedding.
      */
-    private static byte[] processEmbeddings(byte[] resultTypes, byte paragraphEmbeddingLevel) {
+    private static byte[] processEmbeddings(final byte[] resultTypes, final byte paragraphEmbeddingLevel) {
         final int EXPLICIT_LEVEL_LIMIT = 62;
-        
-        int textLength = resultTypes.length;
-        byte[] embeddings = new byte[textLength];
-        
+
+        final int textLength = resultTypes.length;
+        final byte[] embeddings = new byte[textLength];
+
         // This stack will store the embedding levels and override status in a single byte
         // as described above.
-        byte[] embeddingValueStack = new byte[EXPLICIT_LEVEL_LIMIT];
+        final byte[] embeddingValueStack = new byte[EXPLICIT_LEVEL_LIMIT];
         int stackCounter = 0;
-        
+
         // An LRE or LRO at level 60 is invalid, since the new level 62 is invalid.  But
         // an RLE at level 60 is valid, since the new level 61 is valid.  The current wording
         // of the rules requires that the RLE remain valid even if a previous LRE is invalid.
         // This keeps track of ignored LRE or LRO codes at level 60, so that the matching PDFs
         // will not try to pop the stack.
         int overflowAlmostCounter = 0;
-        
+
         // This keeps track of ignored pushes at level 61 or higher, so that matching PDFs will
         // not try to pop the stack.
         int overflowCounter = 0;
-        
+
         // Rule X1.
-        
+
         // Keep the level separate from the value (level | override status flag) for ease of access.
         byte currentEmbeddingLevel = paragraphEmbeddingLevel;
         byte currentEmbeddingValue = paragraphEmbeddingLevel;
-        
+
         // Loop through types, handling all remaining rules
         for (int i = 0; i < textLength; ++i) {
-            
+
             embeddings[i] = currentEmbeddingValue;
-            
-            byte t = resultTypes[i];
-            
+
+            final byte t = resultTypes[i];
+
             // Rules X2, X3, X4, X5
             switch (t) {
                 case RLE:
@@ -522,30 +494,30 @@ public final class BidiOrder {
                     if (overflowCounter == 0) {
                         byte newLevel;
                         if (t == RLE || t == RLO) {
-                            newLevel = (byte)((currentEmbeddingLevel + 1) | 1); // least greater odd
+                            newLevel = (byte)(currentEmbeddingLevel + 1 | 1); // least greater odd
                         } else { // t == LRE || t == LRO
-                            newLevel = (byte)((currentEmbeddingLevel + 2) & ~1); // least greater even
+                            newLevel = (byte)(currentEmbeddingLevel + 2 & ~1); // least greater even
                         }
-                        
+
                         // If the new level is valid, push old embedding level and override status
                         // No check for valid stack counter, since the level check suffices.
                         if (newLevel < EXPLICIT_LEVEL_LIMIT) {
                             embeddingValueStack[stackCounter] = currentEmbeddingValue;
                             stackCounter++;
-                            
+
                             currentEmbeddingLevel = newLevel;
                             if (t == LRO || t == RLO) { // override
                                 currentEmbeddingValue = (byte)(newLevel | 0x80);
                             } else {
                                 currentEmbeddingValue = newLevel;
                             }
-                            
+
                             // Adjust level of format mark (for expositional purposes only, this gets
                             // removed later).
                             embeddings[i] = currentEmbeddingValue;
                             break;
                         }
-                        
+
                         // Otherwise new level is invalid, but a valid level can still be achieved if this
                         // level is 60 and we encounter an RLE or RLO further on.  So record that we
                         // 'almost' overflowed.
@@ -554,18 +526,18 @@ public final class BidiOrder {
                             break;
                         }
                     }
-                    
+
                     // Otherwise old or new level is invalid.
                     overflowCounter++;
                     break;
-                    
+
                 case PDF:
                     // The only case where this did not actually overflow but may have almost overflowed
                     // is when there was an RLE or RLO on level 60, which would result in level 61.  So we
                     // only test the almost overflow condition in that case.
                     //
                     // Also note that there may be a PDF without any pushes at all.
-                    
+
                     if (overflowCounter > 0) {
                         --overflowCounter;
                     } else if (overflowAlmostCounter > 0 && currentEmbeddingLevel != 61) {
@@ -576,10 +548,10 @@ public final class BidiOrder {
                         currentEmbeddingLevel = (byte)(currentEmbeddingValue & 0x7f);
                     }
                     break;
-                    
+
                 case B:
                     // Rule X8.
-                    
+
                     // These values are reset for clarity, in this implementation B can only
                     // occur as the last code in the array.
                     stackCounter = 0;
@@ -587,62 +559,62 @@ public final class BidiOrder {
                     overflowAlmostCounter = 0;
                     currentEmbeddingLevel = paragraphEmbeddingLevel;
                     currentEmbeddingValue = paragraphEmbeddingLevel;
-                    
+
                     embeddings[i] = paragraphEmbeddingLevel;
                     break;
-                    
+
                 default:
                     break;
             }
         }
-        
+
         return embeddings;
     }
-    
-    
+
+
     /**
      * 3) resolving weak types
      * Rules W1-W7.
      *
      * Note that some weak types (EN, AN) remain after this processing is complete.
      */
-    private void resolveWeakTypes(int start, int limit, byte level, byte sor, byte eor) {
-        
+    private void resolveWeakTypes(final int start, final int limit, final byte level, final byte sor, final byte eor) {
+
         // Rule W1.
         // Changes all NSMs.
         byte preceedingCharacterType = sor;
         for (int i = start; i < limit; ++i) {
-            byte t = resultTypes[i];
+            final byte t = this.resultTypes[i];
             if (t == NSM) {
-                resultTypes[i] = preceedingCharacterType;
+                this.resultTypes[i] = preceedingCharacterType;
             } else {
                 preceedingCharacterType = t;
             }
         }
-        
+
         // Rule W2.
         // EN does not change at the start of the run, because sor != AL.
         for (int i = start; i < limit; ++i) {
-            if (resultTypes[i] == EN) {
+            if (this.resultTypes[i] == EN) {
                 for (int j = i - 1; j >= start; --j) {
-                    byte t = resultTypes[j];
+                    final byte t = this.resultTypes[j];
                     if (t == L || t == R || t == AL) {
                         if (t == AL) {
-                            resultTypes[i] = AN;
+                            this.resultTypes[i] = AN;
                         }
                         break;
                     }
                 }
             }
         }
-        
+
         // Rule W3.
         for (int i = start; i < limit; ++i) {
-            if (resultTypes[i] == AL) {
-                resultTypes[i] = R;
+            if (this.resultTypes[i] == AL) {
+                this.resultTypes[i] = R;
             }
         }
-        
+
         // Rule W4.
         // Since there must be values on both sides for this rule to have an
         // effect, the scan skips the first and last value.
@@ -654,90 +626,90 @@ public final class BidiOrder {
         // ES or CS.  But the current value can only change if the value to its
         // right is not ES or CS.  Thus either the current value will not change,
         // or its change will have no effect on the remainder of the analysis.
-        
+
         for (int i = start + 1; i < limit - 1; ++i) {
-            if (resultTypes[i] == ES || resultTypes[i] == CS) {
-                byte prevSepType = resultTypes[i-1];
-                byte succSepType = resultTypes[i+1];
+            if (this.resultTypes[i] == ES || this.resultTypes[i] == CS) {
+                final byte prevSepType = this.resultTypes[i-1];
+                final byte succSepType = this.resultTypes[i+1];
                 if (prevSepType == EN && succSepType == EN) {
-                    resultTypes[i] = EN;
-                } else if (resultTypes[i] == CS && prevSepType == AN && succSepType == AN) {
-                    resultTypes[i] = AN;
+                    this.resultTypes[i] = EN;
+                } else if (this.resultTypes[i] == CS && prevSepType == AN && succSepType == AN) {
+                    this.resultTypes[i] = AN;
                 }
             }
         }
-        
+
         // Rule W5.
         for (int i = start; i < limit; ++i) {
-            if (resultTypes[i] == ET) {
+            if (this.resultTypes[i] == ET) {
                 // locate end of sequence
-                int runstart = i;
-                int runlimit = findRunLimit(runstart, limit, new byte[] { ET });
-                
+                final int runstart = i;
+                final int runlimit = findRunLimit(runstart, limit, new byte[] { ET });
+
                 // check values at ends of sequence
-                byte t = runstart == start ? sor : resultTypes[runstart - 1];
-                
+                byte t = runstart == start ? sor : this.resultTypes[runstart - 1];
+
                 if (t != EN) {
-                    t = runlimit == limit ? eor : resultTypes[runlimit];
+                    t = runlimit == limit ? eor : this.resultTypes[runlimit];
                 }
-                
+
                 if (t == EN) {
                     setTypes(runstart, runlimit, EN);
                 }
-                
+
                 // continue at end of sequence
                 i = runlimit;
             }
         }
-        
+
         // Rule W6.
         for (int i = start; i < limit; ++i) {
-            byte t = resultTypes[i];
+            final byte t = this.resultTypes[i];
             if (t == ES || t == ET || t == CS) {
-                resultTypes[i] = ON;
+                this.resultTypes[i] = ON;
             }
         }
-        
+
         // Rule W7.
         for (int i = start; i < limit; ++i) {
-            if (resultTypes[i] == EN) {
+            if (this.resultTypes[i] == EN) {
                 // set default if we reach start of run
                 byte prevStrongType = sor;
                 for (int j = i - 1; j >= start; --j) {
-                    byte t = resultTypes[j];
+                    final byte t = this.resultTypes[j];
                     if (t == L || t == R) { // AL's have been removed
                         prevStrongType = t;
                         break;
                     }
                 }
                 if (prevStrongType == L) {
-                    resultTypes[i] = L;
+                    this.resultTypes[i] = L;
                 }
             }
         }
     }
-    
+
     /**
      * 6) resolving neutral types
      * Rules N1-N2.
      */
-    private void resolveNeutralTypes(int start, int limit, byte level, byte sor, byte eor) {
-        
+    private void resolveNeutralTypes(final int start, final int limit, final byte level, final byte sor, final byte eor) {
+
         for (int i = start; i < limit; ++i) {
-            byte t = resultTypes[i];
+            final byte t = this.resultTypes[i];
             if (t == WS || t == ON || t == B || t == S) {
                 // find bounds of run of neutrals
-                int runstart = i;
-                int runlimit = findRunLimit(runstart, limit, new byte[] {B, S, WS, ON});
-                
+                final int runstart = i;
+                final int runlimit = findRunLimit(runstart, limit, new byte[] {B, S, WS, ON});
+
                 // determine effective types at ends of run
                 byte leadingType;
                 byte trailingType;
-                
+
                 if (runstart == start) {
                     leadingType = sor;
                 } else {
-                    leadingType = resultTypes[runstart - 1];
+                    leadingType = this.resultTypes[runstart - 1];
                     if (leadingType == L || leadingType == R) {
                         // found the strong type
                     } else if (leadingType == AN) {
@@ -748,11 +720,11 @@ public final class BidiOrder {
                         leadingType = R;
                     }
                 }
-                
+
                 if (runlimit == limit) {
                     trailingType = eor;
                 } else {
-                    trailingType = resultTypes[runlimit];
+                    trailingType = this.resultTypes[runlimit];
                     if (trailingType == L || trailingType == R) {
                         // found the strong type
                     } else if (trailingType == AN) {
@@ -761,7 +733,7 @@ public final class BidiOrder {
                         trailingType = R;
                     }
                 }
-                
+
                 byte resolvedType;
                 if (leadingType == trailingType) {
                     // Rule N1.
@@ -772,53 +744,53 @@ public final class BidiOrder {
                     // the paragraph embedding level.
                     resolvedType = typeForLevel(level);
                 }
-                
+
                 setTypes(runstart, runlimit, resolvedType);
-                
+
                 // skip over run of (former) neutrals
                 i = runlimit;
             }
         }
     }
-    
+
     /**
      * 7) resolving implicit embedding levels
      * Rules I1, I2.
      */
-    private void resolveImplicitLevels(int start, int limit, byte level, byte sor, byte eor) {
+    private void resolveImplicitLevels(final int start, final int limit, final byte level, final byte sor, final byte eor) {
         if ((level & 1) == 0) { // even level
             for (int i = start; i < limit; ++i) {
-                byte t = resultTypes[i];
+                final byte t = this.resultTypes[i];
                 // Rule I1.
                 if (t == L ) {
                     // no change
                 } else if (t == R) {
-                    resultLevels[i] += 1;
+                    this.resultLevels[i] += 1;
                 } else { // t == AN || t == EN
-                    resultLevels[i] += 2;
+                    this.resultLevels[i] += 2;
                 }
             }
         } else { // odd level
             for (int i = start; i < limit; ++i) {
-                byte t = resultTypes[i];
+                final byte t = this.resultTypes[i];
                 // Rule I2.
                 if (t == R) {
                     // no change
                 } else { // t == L || t == AN || t == EN
-                    resultLevels[i] += 1;
+                    this.resultLevels[i] += 1;
                 }
             }
         }
     }
-    
+
     //
     // Output
     //
-    
+
     public byte[] getLevels() {
-        return getLevels(new int[]{textLength});
+        return getLevels(new int[]{this.textLength});
     }
-    
+
     /**
      * Return levels array breaking lines at offsets in linebreaks. <br>
      * Rule L1.
@@ -834,8 +806,8 @@ public final class BidiOrder {
      * @param linebreaks the offsets at which to break the paragraph
      * @return the resolved levels of the text
      */
-    public byte[] getLevels(int[] linebreaks) {
-        
+    public byte[] getLevels(final int[] linebreaks) {
+
         // Note that since the previous processing has removed all
         // P, S, and WS values from resultTypes, the values referred to
         // in these rules are the initial types, before any processing
@@ -846,170 +818,143 @@ public final class BidiOrder {
         // initial text.  Their final placement is not normative.
         // These codes are treated like WS in this implementation,
         // so they don't interrupt sequences of WS.
-        
-        validateLineBreaks(linebreaks, textLength);
-        
-        byte[] result = (byte[])resultLevels.clone(); // will be returned to caller
-        
+
+        validateLineBreaks(linebreaks, this.textLength);
+
+        final byte[] result = this.resultLevels.clone(); // will be returned to caller
+
         // don't worry about linebreaks since if there is a break within
         // a series of WS values preceding S, the linebreak itself
         // causes the reset.
         for (int i = 0; i < result.length; ++i) {
-            byte t = initialTypes[i];
+            final byte t = this.initialTypes[i];
             if (t == B || t == S) {
                 // Rule L1, clauses one and two.
-                result[i] = paragraphEmbeddingLevel;
-                
+                result[i] = this.paragraphEmbeddingLevel;
+
                 // Rule L1, clause three.
                 for (int j = i - 1; j >= 0; --j) {
-                    if (isWhitespace(initialTypes[j])) { // including format codes
-                        result[j] = paragraphEmbeddingLevel;
+                    if (isWhitespace(this.initialTypes[j])) { // including format codes
+                        result[j] = this.paragraphEmbeddingLevel;
                     } else {
                         break;
                     }
                 }
             }
         }
-        
+
         // Rule L1, clause four.
         int start = 0;
-        for (int i = 0; i < linebreaks.length; ++i) {
-            int limit = linebreaks[i];
+        for (final int limit : linebreaks) {
             for (int j = limit - 1; j >= start; --j) {
-                if (isWhitespace(initialTypes[j])) { // including format codes
-                    result[j] = paragraphEmbeddingLevel;
+                if (isWhitespace(this.initialTypes[j])) { // including format codes
+                    result[j] = this.paragraphEmbeddingLevel;
                 } else {
                     break;
                 }
             }
-            
+
             start = limit;
         }
-        
+
         return result;
     }
-    
-    /**
-     * Return reordering array breaking lines at offsets in linebreaks.
-     * <p>
-     * The reordering array maps from a visual index to a logical index.
-     * Lines are concatenated from left to right.  So for example, the
-     * fifth character from the left on the third line is
-     * <pre> getReordering(linebreaks)[linebreaks[1] + 4]</pre>
-     * (linebreaks[1] is the position after the last character of the
-     * second line, which is also the index of the first character on the
-     * third line, and adding four gets the fifth character from the left).
-     * <p>
-     * The linebreaks array must include at least one value.
-     * The values must be in strictly increasing order (no duplicates)
-     * between 1 and the length of the text, inclusive.  The last value
-     * must be the length of the text.
-     *
-     * @param linebreaks the offsets at which to break the paragraph.
-     */
-    public int[] getReordering(int[] linebreaks) {
-        validateLineBreaks(linebreaks, textLength);
-        
-        byte[] levels = getLevels(linebreaks);
-        
-        return computeMultilineReordering(levels, linebreaks);
-    }
-    
+
+
+
     /**
      * Return multiline reordering array for a given level array.
      * Reordering does not occur across a line break.
      */
-    private static int[] computeMultilineReordering(byte[] levels, int[] linebreaks) {
-        int[] result = new int[levels.length];
-        
+    private static int[] computeMultilineReordering(final byte[] levels, final int[] linebreaks) {
+        final int[] result = new int[levels.length];
+
         int start = 0;
-        for (int i = 0; i < linebreaks.length; ++i) {
-            int limit = linebreaks[i];
-            
-            byte[] templevels = new byte[limit - start];
+        for (final int limit : linebreaks) {
+            final byte[] templevels = new byte[limit - start];
             System.arraycopy(levels, start, templevels, 0, templevels.length);
-            
-            int[] temporder = computeReordering(templevels);
+
+            final int[] temporder = computeReordering(templevels);
             for (int j = 0; j < temporder.length; ++j) {
                 result[start + j] = temporder[j] + start;
             }
-            
+
             start = limit;
         }
-        
+
         return result;
     }
-    
+
     /**
      * Return reordering array for a given level array.  This reorders a single line.
      * The reordering is a visual to logical map.  For example,
      * the leftmost char is string.charAt(order[0]).
      * Rule L2.
      */
-    private static int[] computeReordering(byte[] levels) {
-        int lineLength = levels.length;
-        
-        int[] result = new int[lineLength];
-        
+    private static int[] computeReordering(final byte[] levels) {
+        final int lineLength = levels.length;
+
+        final int[] result = new int[lineLength];
+
         // initialize order
         for (int i = 0; i < lineLength; ++i) {
             result[i] = i;
         }
-        
+
         // locate highest level found on line.
         // Note the rules say text, but no reordering across line bounds is performed,
         // so this is sufficient.
         byte highestLevel = 0;
         byte lowestOddLevel = 63;
         for (int i = 0; i < lineLength; ++i) {
-            byte level = levels[i];
+            final byte level = levels[i];
             if (level > highestLevel) {
                 highestLevel = level;
             }
-            if (((level & 1) != 0) && level < lowestOddLevel) {
+            if ((level & 1) != 0 && level < lowestOddLevel) {
                 lowestOddLevel = level;
             }
         }
-        
+
         for (int level = highestLevel; level >= lowestOddLevel; --level) {
             for (int i = 0; i < lineLength; ++i) {
                 if (levels[i] >= level) {
                     // find range of text at or above this level
-                    int start = i;
+                    final int start = i;
                     int limit = i + 1;
                     while (limit < lineLength && levels[limit] >= level) {
                         ++limit;
                     }
-                    
+
                     // reverse run
                     for (int j = start, k = limit - 1; j < k; ++j, --k) {
-                        int temp = result[j];
+                        final int temp = result[j];
                         result[j] = result[k];
                         result[k] = temp;
                     }
-                    
+
                     // skip to end of level run
                     i = limit;
                 }
             }
         }
-        
+
         return result;
     }
-    
+
     /**
      * Return the base level of the paragraph.
      */
     public byte getBaseLevel() {
-        return paragraphEmbeddingLevel;
+        return this.paragraphEmbeddingLevel;
     }
-    
+
     // --- internal utilities -------------------------------------------------
-    
+
     /**
      * Return true if the type is considered a whitespace type for the line break rules.
      */
-    private static boolean isWhitespace(byte biditype) {
+    private static boolean isWhitespace(final byte biditype) {
         switch (biditype) {
             case LRE:
             case RLE:
@@ -1023,23 +968,23 @@ public final class BidiOrder {
                 return false;
         }
     }
-    
+
     /**
      * Return the strong type (L or R) corresponding to the level.
      */
-    private static byte typeForLevel(int level) {
-        return ((level & 0x1) == 0) ? L : R;
+    private static byte typeForLevel(final int level) {
+        return (level & 0x1) == 0 ? L : R;
     }
-    
+
     /**
      * Return the limit of the run starting at index that includes only resultTypes in validSet.
      * This checks the value at index, and will return index if that value is not in validSet.
      */
-    private int findRunLimit(int index, int limit, byte[] validSet) {
+    private int findRunLimit(int index, final int limit, final byte[] validSet) {
         --index;
         loop:
             while (++index < limit) {
-                byte t = resultTypes[index];
+                final byte t = this.resultTypes[index];
                 for (int i = 0; i < validSet.length; ++i) {
                     if (t == validSet[i]) {
                         continue loop;
@@ -1050,15 +995,15 @@ public final class BidiOrder {
             }
             return limit;
     }
-    
+
     /**
      * Return the start of the run including index that includes only resultTypes in validSet.
      * This assumes the value at index is valid, and does not check it.
      */
-    private int findRunStart(int index, byte[] validSet) {
+    private int findRunStart(int index, final byte[] validSet) {
         loop:
             while (--index >= 0) {
-                byte t = resultTypes[index];
+                final byte t = this.resultTypes[index];
                 for (int i = 0; i < validSet.length; ++i) {
                     if (t == validSet[i]) {
                         continue loop;
@@ -1068,31 +1013,31 @@ public final class BidiOrder {
             }
             return 0;
     }
-    
+
     /**
      * Set resultTypes from start up to (but not including) limit to newType.
      */
-    private void setTypes(int start, int limit, byte newType) {
+    private void setTypes(final int start, final int limit, final byte newType) {
         for (int i = start; i < limit; ++i) {
-            resultTypes[i] = newType;
+            this.resultTypes[i] = newType;
         }
     }
-    
+
     /**
      * Set resultLevels from start up to (but not including) limit to newLevel.
      */
-    private void setLevels(int start, int limit, byte newLevel) {
+    private void setLevels(final int start, final int limit, final byte newLevel) {
         for (int i = start; i < limit; ++i) {
-            resultLevels[i] = newLevel;
+            this.resultLevels[i] = newLevel;
         }
     }
-    
+
     // --- input validation ---------------------------------------------------
-    
+
     /**
      * Throw exception if type array is invalid.
      */
-    private static void validateTypes(byte[] types) {
+    private static void validateTypes(final byte[] types) {
         if (types == null) {
             throw new IllegalArgumentException("types is null");
         }
@@ -1107,26 +1052,26 @@ public final class BidiOrder {
             }
         }
     }
-    
+
     /**
      * Throw exception if paragraph embedding level is invalid. Special allowance for -1 so that
      * default processing can still be performed when using this API.
      */
-    private static void validateParagraphEmbeddingLevel(byte paragraphEmbeddingLevel) {
+    private static void validateParagraphEmbeddingLevel(final byte paragraphEmbeddingLevel) {
         if (paragraphEmbeddingLevel != -1 &&
         paragraphEmbeddingLevel != 0 &&
         paragraphEmbeddingLevel != 1) {
             throw new IllegalArgumentException("illegal paragraph embedding level: " + paragraphEmbeddingLevel);
         }
     }
-    
+
     /**
      * Throw exception if line breaks array is invalid.
      */
-    private static void validateLineBreaks(int[] linebreaks, int textLength) {
+    private static void validateLineBreaks(final int[] linebreaks, final int textLength) {
         int prev = 0;
         for (int i = 0; i < linebreaks.length; ++i) {
-            int next = linebreaks[i];
+            final int next = linebreaks[i];
             if (next <= prev) {
                 throw new IllegalArgumentException("bad linebreak: " + next + " at index: " + i);
             }
@@ -1136,9 +1081,9 @@ public final class BidiOrder {
             throw new IllegalArgumentException("last linebreak must be at " + textLength);
         }
     }
-    
+
     private static final byte rtypes[] = new byte[0x10000];
-    
+
     private static char baseTypes[] = {
         0, 8, (char)BN, 9, 9, (char)S, 10, 10, (char)B, 11, 11, (char)S, 12, 12, (char)WS, 13, 13, (char)B,
         14, 27, (char)BN, 28, 30, (char)B, 31, 31, (char)S, 32, 32, (char)WS, 33, 34, (char)ON, 35, 37, (char)ET,
@@ -1280,14 +1225,15 @@ public final class BidiOrder {
         65382, 65503, (char)L, 65504, 65505, (char)ET, 65506, 65508, (char)ON, 65509, 65510, (char)ET,
         65511, 65511, (char)L, 65512, 65518, (char)ON, 65519, 65528, (char)L, 65529, 65531, (char)BN,
         65532, 65533, (char)ON, 65534, 65535, (char)L};
-        
+
     static {
         for (int k = 0; k < baseTypes.length; ++k) {
             int start = baseTypes[k];
-            int end = baseTypes[++k];
-            byte b = (byte)baseTypes[++k];
-            while (start <= end)
-                rtypes[start++] = b;
+            final int end = baseTypes[++k];
+            final byte b = (byte)baseTypes[++k];
+            while (start <= end) {
+				rtypes[start++] = b;
+			}
         }
-    }        
+    }
 }

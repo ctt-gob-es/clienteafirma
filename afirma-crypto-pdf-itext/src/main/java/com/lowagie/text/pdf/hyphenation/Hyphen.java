@@ -1,12 +1,12 @@
 /*
  * Copyright 1999-2004 The Apache Software Foundation.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,37 +31,34 @@ import java.io.Serializable;
  * @author Carlos Villegas <cav@uniscope.co.jp>
  */
 
-public class Hyphen implements Serializable {
+class Hyphen implements Serializable {
     private static final long serialVersionUID = -7666138517324763063L;
-	public String preBreak;
-    public String noBreak;
-    public String postBreak;
+	private final String preBreak;
+    String noBreak;
+    private final String postBreak;
 
-    Hyphen(String pre, String no, String post) {
-        preBreak = pre;
-        noBreak = no;
-        postBreak = post;
+    Hyphen(final String pre, final String no, final String post) {
+        this.preBreak = pre;
+        this.noBreak = no;
+        this.postBreak = post;
     }
 
-    Hyphen(String pre) {
-        preBreak = pre;
-        noBreak = null;
-        postBreak = null;
-    }
 
-    public String toString() {
-        if (noBreak == null 
-                && postBreak == null 
-                && preBreak != null
-                && preBreak.equals("-")) {
+
+    @Override
+	public String toString() {
+        if (this.noBreak == null
+                && this.postBreak == null
+                && this.preBreak != null
+                && this.preBreak.equals("-")) {
             return "-";
                 }
-        StringBuffer res = new StringBuffer("{");
-        res.append(preBreak);
+        final StringBuffer res = new StringBuffer("{");
+        res.append(this.preBreak);
         res.append("}{");
-        res.append(postBreak);
+        res.append(this.postBreak);
         res.append("}{");
-        res.append(noBreak);
+        res.append(this.noBreak);
         res.append('}');
         return res.toString();
     }

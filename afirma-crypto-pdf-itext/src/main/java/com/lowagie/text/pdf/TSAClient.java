@@ -57,7 +57,7 @@ package com.lowagie.text.pdf;
  * @author Martin Brunecky, 07/17/2007
  * @since	2.1.6
  */
-public interface TSAClient {
+interface TSAClient {
     /**
      * Get the time stamp token size estimate.
      * Implementation must return value large enough to accomodate the entire token
@@ -65,7 +65,7 @@ public interface TSAClient {
      * @return	an estimate of the token size
      */
     public int getTokenSizeEstimate();
-    
+
     /**
      * Get RFC 3161 timeStampToken.
      * Method may return null indicating that timestamp should be skipped.
@@ -75,5 +75,5 @@ public interface TSAClient {
      * @throws Exception - TSA request failed
      */
     public byte[] getTimeStampToken(PdfPKCS7 caller, byte[] imprint) throws Exception;
-    
+
 }

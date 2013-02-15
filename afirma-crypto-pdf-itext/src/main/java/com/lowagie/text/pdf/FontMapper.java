@@ -56,7 +56,7 @@ import java.awt.Font;
  * to define a mapping which is appropriate for it.
  */
 
-public interface FontMapper {
+interface FontMapper {
 
     /**
      * Returns a BaseFont which can be used to represent the given AWT Font
@@ -67,14 +67,6 @@ public interface FontMapper {
 
     public BaseFont awtToPdf(Font font);
 
-    /**
-     * Returns an AWT Font which can be used to represent the given BaseFont
-     *
-     * @param	font		the font to be converted
-     * @param	size		the desired point size of the resulting font
-     * @return	a Font which has similar properties to the provided BaseFont
-     */
 
-    public Font pdfToAwt(BaseFont font, int size);
 
 }

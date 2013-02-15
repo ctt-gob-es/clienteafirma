@@ -51,7 +51,6 @@ package com.lowagie.text.pdf.codec.wmf;
 import java.awt.Color;
 import java.awt.Point;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -65,7 +64,7 @@ import com.lowagie.text.pdf.PdfContentByte;
 import com.lowagie.text.pdf.codec.BmpImage;
 
 public class MetaDo {
-    
+
     public static final int META_SETBKCOLOR            = 0x0201;
     public static final int META_SETBKMODE             = 0x0102;
     public static final int META_SETMAPMODE            = 0x0103;
@@ -105,31 +104,22 @@ public class MetaDo {
     public static final int META_POLYLINE              = 0x0325;
     public static final int META_ESCAPE                = 0x0626;
     public static final int META_RESTOREDC             = 0x0127;
-    public static final int META_FILLREGION            = 0x0228;
-    public static final int META_FRAMEREGION           = 0x0429;
-    public static final int META_INVERTREGION          = 0x012A;
-    public static final int META_PAINTREGION           = 0x012B;
-    public static final int META_SELECTCLIPREGION      = 0x012C;
+
     public static final int META_SELECTOBJECT          = 0x012D;
     public static final int META_SETTEXTALIGN          = 0x012E;
     public static final int META_CHORD                 = 0x0830;
     public static final int META_SETMAPPERFLAGS        = 0x0231;
     public static final int META_EXTTEXTOUT            = 0x0a32;
-    public static final int META_SETDIBTODEV           = 0x0d33;
-    public static final int META_SELECTPALETTE         = 0x0234;
-    public static final int META_REALIZEPALETTE        = 0x0035;
-    public static final int META_ANIMATEPALETTE        = 0x0436;
-    public static final int META_SETPALENTRIES         = 0x0037;
+
     public static final int META_POLYPOLYGON           = 0x0538;
-    public static final int META_RESIZEPALETTE         = 0x0139;
-    public static final int META_DIBBITBLT             = 0x0940;
+
     public static final int META_DIBSTRETCHBLT         = 0x0b41;
     public static final int META_DIBCREATEPATTERNBRUSH = 0x0142;
     public static final int META_STRETCHDIB            = 0x0f43;
-    public static final int META_EXTFLOODFILL          = 0x0548;
+
     public static final int META_DELETEOBJECT          = 0x01f0;
     public static final int META_CREATEPALETTE         = 0x00f7;
-    public static final int META_CREATEPATTERNBRUSH    = 0x01F9;
+
     public static final int META_CREATEPENINDIRECT     = 0x02FA;
     public static final int META_CREATEFONTINDIRECT    = 0x02FB;
     public static final int META_CREATEBRUSHINDIRECT   = 0x02FC;
@@ -144,340 +134,355 @@ public class MetaDo {
     int inch;
     MetaState state = new MetaState();
 
-    public MetaDo(InputStream in, PdfContentByte cb) {
+    public MetaDo(final InputStream in, final PdfContentByte cb) {
         this.cb = cb;
         this.in = new InputMeta(in);
     }
-    
+
     public void readAll() throws IOException, DocumentException{
-        if (in.readInt() != 0x9AC6CDD7) {
+        if (this.in.readInt() != 0x9AC6CDD7) {
             throw new DocumentException("Not a placeable windows metafile");
         }
-        in.readWord();
-        left = in.readShort();
-        top = in.readShort();
-        right = in.readShort();
-        bottom = in.readShort();
-        inch = in.readWord();
-        state.setScalingX((float)(right - left) / (float)inch * 72f);
-        state.setScalingY((float)(bottom - top) / (float)inch * 72f);
-        state.setOffsetWx(left);
-        state.setOffsetWy(top);
-        state.setExtentWx(right - left);
-        state.setExtentWy(bottom - top);
-        in.readInt();
-        in.readWord();
-        in.skip(18);
-        
+        this.in.readWord();
+        this.left = this.in.readShort();
+        this.top = this.in.readShort();
+        this.right = this.in.readShort();
+        this.bottom = this.in.readShort();
+        this.inch = this.in.readWord();
+        this.state.setScalingX((float)(this.right - this.left) / (float)this.inch * 72f);
+        this.state.setScalingY((float)(this.bottom - this.top) / (float)this.inch * 72f);
+        this.state.setOffsetWx(this.left);
+        this.state.setOffsetWy(this.top);
+        this.state.setExtentWx(this.right - this.left);
+        this.state.setExtentWy(this.bottom - this.top);
+        this.in.readInt();
+        this.in.readWord();
+        this.in.skip(18);
+
         int tsize;
         int function;
-        cb.setLineCap(1);
-        cb.setLineJoin(1);
+        this.cb.setLineCap(1);
+        this.cb.setLineJoin(1);
         for (;;) {
-            int lenMarker = in.getLength();
-            tsize = in.readInt();
-            if (tsize < 3)
-                break;
-            function = in.readWord();
+            final int lenMarker = this.in.getLength();
+            tsize = this.in.readInt();
+            if (tsize < 3) {
+				break;
+			}
+            function = this.in.readWord();
             switch (function) {
                 case 0:
                     break;
                 case META_CREATEPALETTE:
                 case META_CREATEREGION:
                 case META_DIBCREATEPATTERNBRUSH:
-                    state.addMetaObject(new MetaObject());
+                    this.state.addMetaObject(new MetaObject());
                     break;
                 case META_CREATEPENINDIRECT:
                 {
-                    MetaPen pen = new MetaPen();
-                    pen.init(in);
-                    state.addMetaObject(pen);
+                    final MetaPen pen = new MetaPen();
+                    pen.init(this.in);
+                    this.state.addMetaObject(pen);
                     break;
                 }
                 case META_CREATEBRUSHINDIRECT:
                 {
-                    MetaBrush brush = new MetaBrush();
-                    brush.init(in);
-                    state.addMetaObject(brush);
+                    final MetaBrush brush = new MetaBrush();
+                    brush.init(this.in);
+                    this.state.addMetaObject(brush);
                     break;
                 }
                 case META_CREATEFONTINDIRECT:
                 {
-                    MetaFont font = new MetaFont();
-                    font.init(in);
-                    state.addMetaObject(font);
+                    final MetaFont font = new MetaFont();
+                    font.init(this.in);
+                    this.state.addMetaObject(font);
                     break;
                 }
                 case META_SELECTOBJECT:
                 {
-                    int idx = in.readWord();
-                    state.selectMetaObject(idx, cb);
+                    final int idx = this.in.readWord();
+                    this.state.selectMetaObject(idx, this.cb);
                     break;
                 }
                 case META_DELETEOBJECT:
                 {
-                    int idx = in.readWord();
-                    state.deleteMetaObject(idx);
+                    final int idx = this.in.readWord();
+                    this.state.deleteMetaObject(idx);
                     break;
                 }
                 case META_SAVEDC:
-                    state.saveState(cb);
+                    this.state.saveState(this.cb);
                     break;
                 case META_RESTOREDC:
                 {
-                    int idx = in.readShort();
-                    state.restoreState(idx, cb);
+                    final int idx = this.in.readShort();
+                    this.state.restoreState(idx, this.cb);
                     break;
                 }
                 case META_SETWINDOWORG:
-                    state.setOffsetWy(in.readShort());
-                    state.setOffsetWx(in.readShort());
+                    this.state.setOffsetWy(this.in.readShort());
+                    this.state.setOffsetWx(this.in.readShort());
                     break;
                 case META_SETWINDOWEXT:
-                    state.setExtentWy(in.readShort());
-                    state.setExtentWx(in.readShort());
+                    this.state.setExtentWy(this.in.readShort());
+                    this.state.setExtentWx(this.in.readShort());
                     break;
                 case META_MOVETO:
                 {
-                    int y = in.readShort();
-                    Point p = new Point(in.readShort(), y);
-                    state.setCurrentPoint(p);
+                    final int y = this.in.readShort();
+                    final Point p = new Point(this.in.readShort(), y);
+                    this.state.setCurrentPoint(p);
                     break;
                 }
                 case META_LINETO:
                 {
-                    int y = in.readShort();
-                    int x = in.readShort();
-                    Point p = state.getCurrentPoint();
-                    cb.moveTo(state.transformX(p.x), state.transformY(p.y));
-                    cb.lineTo(state.transformX(x), state.transformY(y));
-                    cb.stroke();
-                    state.setCurrentPoint(new Point(x, y));
+                    final int y = this.in.readShort();
+                    final int x = this.in.readShort();
+                    final Point p = this.state.getCurrentPoint();
+                    this.cb.moveTo(this.state.transformX(p.x), this.state.transformY(p.y));
+                    this.cb.lineTo(this.state.transformX(x), this.state.transformY(y));
+                    this.cb.stroke();
+                    this.state.setCurrentPoint(new Point(x, y));
                     break;
                 }
                 case META_POLYLINE:
                 {
-                    state.setLineJoinPolygon(cb);
-                    int len = in.readWord();
-                    int x = in.readShort();
-                    int y = in.readShort();
-                    cb.moveTo(state.transformX(x), state.transformY(y));
+                    this.state.setLineJoinPolygon(this.cb);
+                    final int len = this.in.readWord();
+                    int x = this.in.readShort();
+                    int y = this.in.readShort();
+                    this.cb.moveTo(this.state.transformX(x), this.state.transformY(y));
                     for (int k = 1; k < len; ++k) {
-                        x = in.readShort();
-                        y = in.readShort();
-                        cb.lineTo(state.transformX(x), state.transformY(y));
+                        x = this.in.readShort();
+                        y = this.in.readShort();
+                        this.cb.lineTo(this.state.transformX(x), this.state.transformY(y));
                     }
-                    cb.stroke();
+                    this.cb.stroke();
                     break;
                 }
                 case META_POLYGON:
                 {
-                    if (isNullStrokeFill(false))
-                        break;
-                    int len = in.readWord();
-                    int sx = in.readShort();
-                    int sy = in.readShort();
-                    cb.moveTo(state.transformX(sx), state.transformY(sy));
+                    if (isNullStrokeFill(false)) {
+						break;
+					}
+                    final int len = this.in.readWord();
+                    final int sx = this.in.readShort();
+                    final int sy = this.in.readShort();
+                    this.cb.moveTo(this.state.transformX(sx), this.state.transformY(sy));
                     for (int k = 1; k < len; ++k) {
-                        int x = in.readShort();
-                        int y = in.readShort();
-                        cb.lineTo(state.transformX(x), state.transformY(y));
+                        final int x = this.in.readShort();
+                        final int y = this.in.readShort();
+                        this.cb.lineTo(this.state.transformX(x), this.state.transformY(y));
                     }
-                    cb.lineTo(state.transformX(sx), state.transformY(sy));
+                    this.cb.lineTo(this.state.transformX(sx), this.state.transformY(sy));
                     strokeAndFill();
                     break;
                 }
                 case META_POLYPOLYGON:
                 {
-                    if (isNullStrokeFill(false))
-                        break;
-                    int numPoly = in.readWord();
-                    int lens[] = new int[numPoly];
-                    for (int k = 0; k < lens.length; ++k)
-                        lens[k] = in.readWord();
-                    for (int j = 0; j < lens.length; ++j) {
-                        int len = lens[j];
-                        int sx = in.readShort();
-                        int sy = in.readShort();
-                        cb.moveTo(state.transformX(sx), state.transformY(sy));
+                    if (isNullStrokeFill(false)) {
+						break;
+					}
+                    final int numPoly = this.in.readWord();
+                    final int lens[] = new int[numPoly];
+                    for (int k = 0; k < lens.length; ++k) {
+						lens[k] = this.in.readWord();
+					}
+                    for (final int len : lens) {
+                        final int sx = this.in.readShort();
+                        final int sy = this.in.readShort();
+                        this.cb.moveTo(this.state.transformX(sx), this.state.transformY(sy));
                         for (int k = 1; k < len; ++k) {
-                            int x = in.readShort();
-                            int y = in.readShort();
-                            cb.lineTo(state.transformX(x), state.transformY(y));
+                            final int x = this.in.readShort();
+                            final int y = this.in.readShort();
+                            this.cb.lineTo(this.state.transformX(x), this.state.transformY(y));
                         }
-                        cb.lineTo(state.transformX(sx), state.transformY(sy));
+                        this.cb.lineTo(this.state.transformX(sx), this.state.transformY(sy));
                     }
                     strokeAndFill();
                     break;
                 }
                 case META_ELLIPSE:
                 {
-                    if (isNullStrokeFill(state.getLineNeutral()))
-                        break;
-                    int b = in.readShort();
-                    int r = in.readShort();
-                    int t = in.readShort();
-                    int l = in.readShort();
-                    cb.arc(state.transformX(l), state.transformY(b), state.transformX(r), state.transformY(t), 0, 360);
+                    if (isNullStrokeFill(this.state.getLineNeutral())) {
+						break;
+					}
+                    final int b = this.in.readShort();
+                    final int r = this.in.readShort();
+                    final int t = this.in.readShort();
+                    final int l = this.in.readShort();
+                    this.cb.arc(this.state.transformX(l), this.state.transformY(b), this.state.transformX(r), this.state.transformY(t), 0, 360);
                     strokeAndFill();
                     break;
                 }
                 case META_ARC:
                 {
-                    if (isNullStrokeFill(state.getLineNeutral()))
-                        break;
-                    float yend = state.transformY(in.readShort());
-                    float xend = state.transformX(in.readShort());
-                    float ystart = state.transformY(in.readShort());
-                    float xstart = state.transformX(in.readShort());
-                    float b = state.transformY(in.readShort());
-                    float r = state.transformX(in.readShort());
-                    float t = state.transformY(in.readShort());
-                    float l = state.transformX(in.readShort());
-                    float cx = (r + l) / 2;
-                    float cy = (t + b) / 2;
-                    float arc1 = getArc(cx, cy, xstart, ystart);
+                    if (isNullStrokeFill(this.state.getLineNeutral())) {
+						break;
+					}
+                    final float yend = this.state.transformY(this.in.readShort());
+                    final float xend = this.state.transformX(this.in.readShort());
+                    final float ystart = this.state.transformY(this.in.readShort());
+                    final float xstart = this.state.transformX(this.in.readShort());
+                    final float b = this.state.transformY(this.in.readShort());
+                    final float r = this.state.transformX(this.in.readShort());
+                    final float t = this.state.transformY(this.in.readShort());
+                    final float l = this.state.transformX(this.in.readShort());
+                    final float cx = (r + l) / 2;
+                    final float cy = (t + b) / 2;
+                    final float arc1 = getArc(cx, cy, xstart, ystart);
                     float arc2 = getArc(cx, cy, xend, yend);
                     arc2 -= arc1;
-                    if (arc2 <= 0)
-                        arc2 += 360;
-                    cb.arc(l, b, r, t, arc1, arc2);
-                    cb.stroke();
+                    if (arc2 <= 0) {
+						arc2 += 360;
+					}
+                    this.cb.arc(l, b, r, t, arc1, arc2);
+                    this.cb.stroke();
                     break;
                 }
                 case META_PIE:
                 {
-                    if (isNullStrokeFill(state.getLineNeutral()))
-                        break;
-                    float yend = state.transformY(in.readShort());
-                    float xend = state.transformX(in.readShort());
-                    float ystart = state.transformY(in.readShort());
-                    float xstart = state.transformX(in.readShort());
-                    float b = state.transformY(in.readShort());
-                    float r = state.transformX(in.readShort());
-                    float t = state.transformY(in.readShort());
-                    float l = state.transformX(in.readShort());
-                    float cx = (r + l) / 2;
-                    float cy = (t + b) / 2;
-                    float arc1 = getArc(cx, cy, xstart, ystart);
+                    if (isNullStrokeFill(this.state.getLineNeutral())) {
+						break;
+					}
+                    final float yend = this.state.transformY(this.in.readShort());
+                    final float xend = this.state.transformX(this.in.readShort());
+                    final float ystart = this.state.transformY(this.in.readShort());
+                    final float xstart = this.state.transformX(this.in.readShort());
+                    final float b = this.state.transformY(this.in.readShort());
+                    final float r = this.state.transformX(this.in.readShort());
+                    final float t = this.state.transformY(this.in.readShort());
+                    final float l = this.state.transformX(this.in.readShort());
+                    final float cx = (r + l) / 2;
+                    final float cy = (t + b) / 2;
+                    final float arc1 = getArc(cx, cy, xstart, ystart);
                     float arc2 = getArc(cx, cy, xend, yend);
                     arc2 -= arc1;
-                    if (arc2 <= 0)
-                        arc2 += 360;
-                    ArrayList ar = PdfContentByte.bezierArc(l, b, r, t, arc1, arc2);
-                    if (ar.isEmpty())
-                        break;
+                    if (arc2 <= 0) {
+						arc2 += 360;
+					}
+                    final ArrayList ar = PdfContentByte.bezierArc(l, b, r, t, arc1, arc2);
+                    if (ar.isEmpty()) {
+						break;
+					}
                     float pt[] = (float [])ar.get(0);
-                    cb.moveTo(cx, cy);
-                    cb.lineTo(pt[0], pt[1]);
+                    this.cb.moveTo(cx, cy);
+                    this.cb.lineTo(pt[0], pt[1]);
                     for (int k = 0; k < ar.size(); ++k) {
                         pt = (float [])ar.get(k);
-                        cb.curveTo(pt[2], pt[3], pt[4], pt[5], pt[6], pt[7]);
+                        this.cb.curveTo(pt[2], pt[3], pt[4], pt[5], pt[6], pt[7]);
                     }
-                    cb.lineTo(cx, cy);
+                    this.cb.lineTo(cx, cy);
                     strokeAndFill();
                     break;
                 }
                 case META_CHORD:
                 {
-                    if (isNullStrokeFill(state.getLineNeutral()))
-                        break;
-                    float yend = state.transformY(in.readShort());
-                    float xend = state.transformX(in.readShort());
-                    float ystart = state.transformY(in.readShort());
-                    float xstart = state.transformX(in.readShort());
-                    float b = state.transformY(in.readShort());
-                    float r = state.transformX(in.readShort());
-                    float t = state.transformY(in.readShort());
-                    float l = state.transformX(in.readShort());
+                    if (isNullStrokeFill(this.state.getLineNeutral())) {
+						break;
+					}
+                    final float yend = this.state.transformY(this.in.readShort());
+                    final float xend = this.state.transformX(this.in.readShort());
+                    final float ystart = this.state.transformY(this.in.readShort());
+                    final float xstart = this.state.transformX(this.in.readShort());
+                    final float b = this.state.transformY(this.in.readShort());
+                    final float r = this.state.transformX(this.in.readShort());
+                    final float t = this.state.transformY(this.in.readShort());
+                    final float l = this.state.transformX(this.in.readShort());
                     float cx = (r + l) / 2;
                     float cy = (t + b) / 2;
-                    float arc1 = getArc(cx, cy, xstart, ystart);
+                    final float arc1 = getArc(cx, cy, xstart, ystart);
                     float arc2 = getArc(cx, cy, xend, yend);
                     arc2 -= arc1;
-                    if (arc2 <= 0)
-                        arc2 += 360;
-                    ArrayList ar = PdfContentByte.bezierArc(l, b, r, t, arc1, arc2);
-                    if (ar.isEmpty())
-                        break;
+                    if (arc2 <= 0) {
+						arc2 += 360;
+					}
+                    final ArrayList ar = PdfContentByte.bezierArc(l, b, r, t, arc1, arc2);
+                    if (ar.isEmpty()) {
+						break;
+					}
                     float pt[] = (float [])ar.get(0);
                     cx = pt[0];
                     cy = pt[1];
-                    cb.moveTo(cx, cy);
+                    this.cb.moveTo(cx, cy);
                     for (int k = 0; k < ar.size(); ++k) {
                         pt = (float [])ar.get(k);
-                        cb.curveTo(pt[2], pt[3], pt[4], pt[5], pt[6], pt[7]);
+                        this.cb.curveTo(pt[2], pt[3], pt[4], pt[5], pt[6], pt[7]);
                     }
-                    cb.lineTo(cx, cy);
+                    this.cb.lineTo(cx, cy);
                     strokeAndFill();
                     break;
                 }
                 case META_RECTANGLE:
                 {
-                    if (isNullStrokeFill(true))
-                        break;
-                    float b = state.transformY(in.readShort());
-                    float r = state.transformX(in.readShort());
-                    float t = state.transformY(in.readShort());
-                    float l = state.transformX(in.readShort());
-                    cb.rectangle(l, b, r - l, t - b);
+                    if (isNullStrokeFill(true)) {
+						break;
+					}
+                    final float b = this.state.transformY(this.in.readShort());
+                    final float r = this.state.transformX(this.in.readShort());
+                    final float t = this.state.transformY(this.in.readShort());
+                    final float l = this.state.transformX(this.in.readShort());
+                    this.cb.rectangle(l, b, r - l, t - b);
                     strokeAndFill();
                     break;
                 }
                 case META_ROUNDRECT:
                 {
-                    if (isNullStrokeFill(true))
-                        break;
-                    float h = state.transformY(0) - state.transformY(in.readShort());
-                    float w = state.transformX(in.readShort()) - state.transformX(0);
-                    float b = state.transformY(in.readShort());
-                    float r = state.transformX(in.readShort());
-                    float t = state.transformY(in.readShort());
-                    float l = state.transformX(in.readShort());
-                    cb.roundRectangle(l, b, r - l, t - b, (h + w) / 4);
+                    if (isNullStrokeFill(true)) {
+						break;
+					}
+                    final float h = this.state.transformY(0) - this.state.transformY(this.in.readShort());
+                    final float w = this.state.transformX(this.in.readShort()) - this.state.transformX(0);
+                    final float b = this.state.transformY(this.in.readShort());
+                    final float r = this.state.transformX(this.in.readShort());
+                    final float t = this.state.transformY(this.in.readShort());
+                    final float l = this.state.transformX(this.in.readShort());
+                    this.cb.roundRectangle(l, b, r - l, t - b, (h + w) / 4);
                     strokeAndFill();
                     break;
                 }
                 case META_INTERSECTCLIPRECT:
                 {
-                    float b = state.transformY(in.readShort());
-                    float r = state.transformX(in.readShort());
-                    float t = state.transformY(in.readShort());
-                    float l = state.transformX(in.readShort());
-                    cb.rectangle(l, b, r - l, t - b);
-                    cb.eoClip();
-                    cb.newPath();
+                    final float b = this.state.transformY(this.in.readShort());
+                    final float r = this.state.transformX(this.in.readShort());
+                    final float t = this.state.transformY(this.in.readShort());
+                    final float l = this.state.transformX(this.in.readShort());
+                    this.cb.rectangle(l, b, r - l, t - b);
+                    this.cb.eoClip();
+                    this.cb.newPath();
                     break;
                 }
                 case META_EXTTEXTOUT:
                 {
-                    int y = in.readShort();
-                    int x = in.readShort();
-                    int count = in.readWord();
-                    int flag = in.readWord();
+                    final int y = this.in.readShort();
+                    final int x = this.in.readShort();
+                    final int count = this.in.readWord();
+                    final int flag = this.in.readWord();
                     int x1 = 0;
                     int y1 = 0;
                     int x2 = 0;
                     int y2 = 0;
                     if ((flag & (MetaFont.ETO_CLIPPED | MetaFont.ETO_OPAQUE)) != 0) {
-                        x1 = in.readShort();
-                        y1 = in.readShort();
-                        x2 = in.readShort();
-                        y2 = in.readShort();
+                        x1 = this.in.readShort();
+                        y1 = this.in.readShort();
+                        x2 = this.in.readShort();
+                        y2 = this.in.readShort();
                     }
-                    byte text[] = new byte[count];
+                    final byte text[] = new byte[count];
                     int k;
                     for (k = 0; k < count; ++k) {
-                        byte c = (byte)in.readByte();
-                        if (c == 0)
-                            break;
+                        final byte c = (byte)this.in.readByte();
+                        if (c == 0) {
+							break;
+						}
                         text[k] = c;
                     }
                     String s;
                     try {
                         s = new String(text, 0, k, "Cp1252");
                     }
-                    catch (UnsupportedEncodingException e) {
+                    catch (final UnsupportedEncodingException e) {
                         s = new String(text, 0, k);
                     }
                     outputText(x, y, flag, x1, y1, x2, y2, s);
@@ -485,283 +490,215 @@ public class MetaDo {
                 }
                 case META_TEXTOUT:
                 {
-                    int count = in.readWord();
-                    byte text[] = new byte[count];
+                    int count = this.in.readWord();
+                    final byte text[] = new byte[count];
                     int k;
                     for (k = 0; k < count; ++k) {
-                        byte c = (byte)in.readByte();
-                        if (c == 0)
-                            break;
+                        final byte c = (byte)this.in.readByte();
+                        if (c == 0) {
+							break;
+						}
                         text[k] = c;
                     }
                     String s;
                     try {
                         s = new String(text, 0, k, "Cp1252");
                     }
-                    catch (UnsupportedEncodingException e) {
+                    catch (final UnsupportedEncodingException e) {
                         s = new String(text, 0, k);
                     }
-                    count = (count + 1) & 0xfffe;
-                    in.skip(count - k);
-                    int y = in.readShort();
-                    int x = in.readShort();
+                    count = count + 1 & 0xfffe;
+                    this.in.skip(count - k);
+                    final int y = this.in.readShort();
+                    final int x = this.in.readShort();
                     outputText(x, y, 0, 0, 0, 0, 0, s);
                     break;
                 }
                 case META_SETBKCOLOR:
-                    state.setCurrentBackgroundColor(in.readColor());
+                    this.state.setCurrentBackgroundColor(this.in.readColor());
                     break;
                 case META_SETTEXTCOLOR:
-                    state.setCurrentTextColor(in.readColor());
+                    this.state.setCurrentTextColor(this.in.readColor());
                     break;
                 case META_SETTEXTALIGN:
-                    state.setTextAlign(in.readWord());
+                    this.state.setTextAlign(this.in.readWord());
                     break;
                 case META_SETBKMODE:
-                    state.setBackgroundMode(in.readWord());
+                    this.state.setBackgroundMode(this.in.readWord());
                     break;
                 case META_SETPOLYFILLMODE:
-                    state.setPolyFillMode(in.readWord());
+                    this.state.setPolyFillMode(this.in.readWord());
                     break;
                 case META_SETPIXEL:
                 {
-                    Color color = in.readColor();
-                    int y = in.readShort();
-                    int x = in.readShort();
-                    cb.saveState();
-                    cb.setColorFill(color);
-                    cb.rectangle(state.transformX(x), state.transformY(y), .2f, .2f);
-                    cb.fill();
-                    cb.restoreState();
+                    final Color color = this.in.readColor();
+                    final int y = this.in.readShort();
+                    final int x = this.in.readShort();
+                    this.cb.saveState();
+                    this.cb.setColorFill(color);
+                    this.cb.rectangle(this.state.transformX(x), this.state.transformY(y), .2f, .2f);
+                    this.cb.fill();
+                    this.cb.restoreState();
                     break;
                 }
                 case META_DIBSTRETCHBLT:
                 case META_STRETCHDIB: {
-                    int rop = in.readInt();
+                    final int rop = this.in.readInt();
                     if (function == META_STRETCHDIB) {
-                        /*int usage = */ in.readWord();
+                        /*int usage = */ this.in.readWord();
                     }
-                    int srcHeight = in.readShort();
-                    int srcWidth = in.readShort();
-                    int ySrc = in.readShort();
-                    int xSrc = in.readShort();
-                    float destHeight = state.transformY(in.readShort()) - state.transformY(0);
-                    float destWidth = state.transformX(in.readShort()) - state.transformX(0);
-                    float yDest = state.transformY(in.readShort());
-                    float xDest = state.transformX(in.readShort());
-                    byte b[] = new byte[(tsize * 2) - (in.getLength() - lenMarker)];
-                    for (int k = 0; k < b.length; ++k)
-                        b[k] = (byte)in.readByte();
+                    final int srcHeight = this.in.readShort();
+                    final int srcWidth = this.in.readShort();
+                    final int ySrc = this.in.readShort();
+                    final int xSrc = this.in.readShort();
+                    final float destHeight = this.state.transformY(this.in.readShort()) - this.state.transformY(0);
+                    final float destWidth = this.state.transformX(this.in.readShort()) - this.state.transformX(0);
+                    final float yDest = this.state.transformY(this.in.readShort());
+                    final float xDest = this.state.transformX(this.in.readShort());
+                    final byte b[] = new byte[tsize * 2 - (this.in.getLength() - lenMarker)];
+                    for (int k = 0; k < b.length; ++k) {
+						b[k] = (byte)this.in.readByte();
+					}
                     try {
-                        ByteArrayInputStream inb = new ByteArrayInputStream(b);
-                        Image bmp = BmpImage.getImage(inb, true, b.length);
-                        cb.saveState();
-                        cb.rectangle(xDest, yDest, destWidth, destHeight);
-                        cb.clip();
-                        cb.newPath();
+                        final ByteArrayInputStream inb = new ByteArrayInputStream(b);
+                        final Image bmp = BmpImage.getImage(inb, true, b.length);
+                        this.cb.saveState();
+                        this.cb.rectangle(xDest, yDest, destWidth, destHeight);
+                        this.cb.clip();
+                        this.cb.newPath();
                         bmp.scaleAbsolute(destWidth * bmp.getWidth() / srcWidth, -destHeight * bmp.getHeight() / srcHeight);
                         bmp.setAbsolutePosition(xDest - destWidth * xSrc / srcWidth, yDest + destHeight * ySrc / srcHeight - bmp.getScaledHeight());
-                        cb.addImage(bmp);
-                        cb.restoreState();
+                        this.cb.addImage(bmp);
+                        this.cb.restoreState();
                     }
-                    catch (Exception e) {
+                    catch (final Exception e) {
                         // empty on purpose
                     }
                     break;
                 }
             }
-            in.skip((tsize * 2) - (in.getLength() - lenMarker));
+            this.in.skip(tsize * 2 - (this.in.getLength() - lenMarker));
         }
-        state.cleanup(cb);
+        this.state.cleanup(this.cb);
     }
-    
-    public void outputText(int x, int y, int flag, int x1, int y1, int x2, int y2, String text) {
-        MetaFont font = state.getCurrentFont();
-        float refX = state.transformX(x);
-        float refY = state.transformY(y);
-        float angle = state.transformAngle(font.getAngle());
-        float sin = (float)Math.sin(angle);
-        float cos = (float)Math.cos(angle);
-        float fontSize = font.getFontSize(state);
-        BaseFont bf = font.getFont();
-        int align = state.getTextAlign();
-        float textWidth = bf.getWidthPoint(text, fontSize);
+
+    private void outputText(final int x, final int y, final int flag, final int x1, final int y1, final int x2, final int y2, final String text) {
+        final MetaFont font = this.state.getCurrentFont();
+        final float refX = this.state.transformX(x);
+        final float refY = this.state.transformY(y);
+        final float angle = this.state.transformAngle(font.getAngle());
+        final float sin = (float)Math.sin(angle);
+        final float cos = (float)Math.cos(angle);
+        final float fontSize = font.getFontSize(this.state);
+        final BaseFont bf = font.getFont();
+        final int align = this.state.getTextAlign();
+        final float textWidth = bf.getWidthPoint(text, fontSize);
         float tx = 0;
         float ty = 0;
-        float descender = bf.getFontDescriptor(BaseFont.DESCENT, fontSize);
-        float ury = bf.getFontDescriptor(BaseFont.BBOXURY, fontSize);
-        cb.saveState();
-        cb.concatCTM(cos, sin, -sin, cos, refX, refY);
-        if ((align & MetaState.TA_CENTER) == MetaState.TA_CENTER)
-            tx = -textWidth / 2;
-        else if ((align & MetaState.TA_RIGHT) == MetaState.TA_RIGHT)
-            tx = -textWidth;
-        if ((align & MetaState.TA_BASELINE) == MetaState.TA_BASELINE)
-            ty = 0;
-        else if ((align & MetaState.TA_BOTTOM) == MetaState.TA_BOTTOM)
-            ty = -descender;
-        else
-            ty = -ury;
+        final float descender = bf.getFontDescriptor(BaseFont.DESCENT, fontSize);
+        final float ury = bf.getFontDescriptor(BaseFont.BBOXURY, fontSize);
+        this.cb.saveState();
+        this.cb.concatCTM(cos, sin, -sin, cos, refX, refY);
+        if ((align & MetaState.TA_CENTER) == MetaState.TA_CENTER) {
+			tx = -textWidth / 2;
+		} else if ((align & MetaState.TA_RIGHT) == MetaState.TA_RIGHT) {
+			tx = -textWidth;
+		}
+        if ((align & MetaState.TA_BASELINE) == MetaState.TA_BASELINE) {
+			ty = 0;
+		} else if ((align & MetaState.TA_BOTTOM) == MetaState.TA_BOTTOM) {
+			ty = -descender;
+		} else {
+			ty = -ury;
+		}
         Color textColor;
-        if (state.getBackgroundMode() == MetaState.OPAQUE) {
-            textColor = state.getCurrentBackgroundColor();
-            cb.setColorFill(textColor);
-            cb.rectangle(tx, ty + descender, textWidth, ury - descender);
-            cb.fill();
+        if (this.state.getBackgroundMode() == MetaState.OPAQUE) {
+            textColor = this.state.getCurrentBackgroundColor();
+            this.cb.setColorFill(textColor);
+            this.cb.rectangle(tx, ty + descender, textWidth, ury - descender);
+            this.cb.fill();
         }
-        textColor = state.getCurrentTextColor();
-        cb.setColorFill(textColor);
-        cb.beginText();
-        cb.setFontAndSize(bf, fontSize);
-        cb.setTextMatrix(tx, ty);
-        cb.showText(text);
-        cb.endText();
+        textColor = this.state.getCurrentTextColor();
+        this.cb.setColorFill(textColor);
+        this.cb.beginText();
+        this.cb.setFontAndSize(bf, fontSize);
+        this.cb.setTextMatrix(tx, ty);
+        this.cb.showText(text);
+        this.cb.endText();
         if (font.isUnderline()) {
-            cb.rectangle(tx, ty - fontSize / 4, textWidth, fontSize / 15);
-            cb.fill();
+            this.cb.rectangle(tx, ty - fontSize / 4, textWidth, fontSize / 15);
+            this.cb.fill();
         }
         if (font.isStrikeout()) {
-            cb.rectangle(tx, ty + fontSize / 3, textWidth, fontSize / 15);
-            cb.fill();
+            this.cb.rectangle(tx, ty + fontSize / 3, textWidth, fontSize / 15);
+            this.cb.fill();
         }
-        cb.restoreState();
+        this.cb.restoreState();
     }
-    
-    public boolean isNullStrokeFill(boolean isRectangle) {
-        MetaPen pen = state.getCurrentPen();
-        MetaBrush brush = state.getCurrentBrush();
-        boolean noPen = (pen.getStyle() == MetaPen.PS_NULL);
-        int style = brush.getStyle();
-        boolean isBrush = (style == MetaBrush.BS_SOLID || (style == MetaBrush.BS_HATCHED && state.getBackgroundMode() == MetaState.OPAQUE));
-        boolean result = noPen && !isBrush;
+
+    private boolean isNullStrokeFill(final boolean isRectangle) {
+        final MetaPen pen = this.state.getCurrentPen();
+        final MetaBrush brush = this.state.getCurrentBrush();
+        final boolean noPen = pen.getStyle() == MetaPen.PS_NULL;
+        final int style = brush.getStyle();
+        final boolean isBrush = style == MetaBrush.BS_SOLID || style == MetaBrush.BS_HATCHED && this.state.getBackgroundMode() == MetaState.OPAQUE;
+        final boolean result = noPen && !isBrush;
         if (!noPen) {
-            if (isRectangle)
-                state.setLineJoinRectangle(cb);
-            else
-                state.setLineJoinPolygon(cb);
+            if (isRectangle) {
+				this.state.setLineJoinRectangle(this.cb);
+			} else {
+				this.state.setLineJoinPolygon(this.cb);
+			}
         }
         return result;
     }
 
-    public void strokeAndFill(){
-        MetaPen pen = state.getCurrentPen();
-        MetaBrush brush = state.getCurrentBrush();
-        int penStyle = pen.getStyle();
-        int brushStyle = brush.getStyle();
+    private void strokeAndFill(){
+        final MetaPen pen = this.state.getCurrentPen();
+        final MetaBrush brush = this.state.getCurrentBrush();
+        final int penStyle = pen.getStyle();
+        final int brushStyle = brush.getStyle();
         if (penStyle == MetaPen.PS_NULL) {
-            cb.closePath();
-            if (state.getPolyFillMode() == MetaState.ALTERNATE) {
-                cb.eoFill();
+            this.cb.closePath();
+            if (this.state.getPolyFillMode() == MetaState.ALTERNATE) {
+                this.cb.eoFill();
             }
             else {
-                cb.fill();
+                this.cb.fill();
             }
         }
         else {
-            boolean isBrush = (brushStyle == MetaBrush.BS_SOLID || (brushStyle == MetaBrush.BS_HATCHED && state.getBackgroundMode() == MetaState.OPAQUE));
+            final boolean isBrush = brushStyle == MetaBrush.BS_SOLID || brushStyle == MetaBrush.BS_HATCHED && this.state.getBackgroundMode() == MetaState.OPAQUE;
             if (isBrush) {
-                if (state.getPolyFillMode() == MetaState.ALTERNATE)
-                    cb.closePathEoFillStroke();
-                else
-                    cb.closePathFillStroke();
+                if (this.state.getPolyFillMode() == MetaState.ALTERNATE) {
+					this.cb.closePathEoFillStroke();
+				} else {
+					this.cb.closePathFillStroke();
+				}
             }
             else {
-                cb.closePathStroke();
+                this.cb.closePathStroke();
             }
         }
     }
-    
-    static float getArc(float xCenter, float yCenter, float xDot, float yDot) {
+
+    private static float getArc(final float xCenter, final float yCenter, final float xDot, final float yDot) {
         double s = Math.atan2(yDot - yCenter, xDot - xCenter);
-        if (s < 0)
-            s += Math.PI * 2;
+        if (s < 0) {
+			s += Math.PI * 2;
+		}
         return (float)(s / Math.PI * 180);
     }
-    
-    public static byte[] wrapBMP(Image image) throws IOException {
-        if (image.getOriginalType() != Image.ORIGINAL_BMP)
-            throw new IOException("Only BMP can be wrapped in WMF.");
-        InputStream imgIn;
-        byte data[] = null;
-        if (image.getOriginalData() == null) {
-            imgIn = image.getUrl().openStream();
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            int b = 0;
-            while ((b = imgIn.read()) != -1)
-                out.write(b);
-            imgIn.close();
-            data = out.toByteArray();
-        }
-        else
-            data = image.getOriginalData();
-        int sizeBmpWords = (data.length - 14 + 1) >>> 1;
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        // write metafile header
-        writeWord(os, 1);
-        writeWord(os, 9);
-        writeWord(os, 0x0300);
-        writeDWord(os, 9 + 4 + 5 + 5 + (13 + sizeBmpWords) + 3); // total metafile size
-        writeWord(os, 1);
-        writeDWord(os, 14 + sizeBmpWords); // max record size
-        writeWord(os, 0);
-        // write records
-        writeDWord(os, 4);
-        writeWord(os, META_SETMAPMODE);
-        writeWord(os, 8);
 
-        writeDWord(os, 5);
-        writeWord(os, META_SETWINDOWORG);
-        writeWord(os, 0);
-        writeWord(os, 0);
 
-        writeDWord(os, 5);
-        writeWord(os, META_SETWINDOWEXT);
-        writeWord(os, (int)image.getHeight());
-        writeWord(os, (int)image.getWidth());
 
-        writeDWord(os, 13 + sizeBmpWords);
-        writeWord(os, META_DIBSTRETCHBLT);
-        writeDWord(os, 0x00cc0020);
-        writeWord(os, (int)image.getHeight());
-        writeWord(os, (int)image.getWidth());
-        writeWord(os, 0);
-        writeWord(os, 0);
-        writeWord(os, (int)image.getHeight());
-        writeWord(os, (int)image.getWidth());
-        writeWord(os, 0);
-        writeWord(os, 0);
-        os.write(data, 14, data.length - 14);
-        if ((data.length & 1) == 1)
-            os.write(0);
-//        writeDWord(os, 14 + sizeBmpWords);
-//        writeWord(os, META_STRETCHDIB);
-//        writeDWord(os, 0x00cc0020);
-//        writeWord(os, 0);
-//        writeWord(os, (int)image.height());
-//        writeWord(os, (int)image.width());
-//        writeWord(os, 0);
-//        writeWord(os, 0);
-//        writeWord(os, (int)image.height());
-//        writeWord(os, (int)image.width());
-//        writeWord(os, 0);
-//        writeWord(os, 0);
-//        os.write(data, 14, data.length - 14);
-//        if ((data.length & 1) == 1)
-//            os.write(0);
-
-        writeDWord(os, 3);
-        writeWord(os, 0);
-        os.close();
-        return os.toByteArray();
-    }
-
-    public static void writeWord(OutputStream os, int v) throws IOException {
+    private static void writeWord(final OutputStream os, final int v) throws IOException {
         os.write(v & 0xff);
-        os.write((v >>> 8) & 0xff);
+        os.write(v >>> 8 & 0xff);
     }
-    
-    public static void writeDWord(OutputStream os, int v) throws IOException {
+
+    private static void writeDWord(final OutputStream os, final int v) throws IOException {
         writeWord(os, v & 0xffff);
-        writeWord(os, (v >>> 16) & 0xffff);
+        writeWord(os, v >>> 16 & 0xffff);
     }
 }

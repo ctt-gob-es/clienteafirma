@@ -57,31 +57,29 @@ import com.lowagie.text.DocumentException;
  * @see		BadPdfFormatException
  */
 
-public class PdfException extends DocumentException {
-    
+class PdfException extends DocumentException {
+
     // constructors
-    
+
     private static final long serialVersionUID = 6767433960955483999L;
 
-	public PdfException(Exception ex) {
-        super(ex);
-    }
+
 
  /**
  * Constructs a <CODE>PdfException</CODE> without a message.
  */
-    
+
     PdfException() {
         super();
     }
-    
+
 /**
  * Constructs a <code>PdfException</code> with a message.
  *
  * @param		message			a message describing the exception
  */
-    
-    PdfException(String message) {
+
+    PdfException(final String message) {
         super(message);
     }
 }

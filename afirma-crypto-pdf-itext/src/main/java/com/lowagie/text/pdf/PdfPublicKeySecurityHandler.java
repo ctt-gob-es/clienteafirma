@@ -153,53 +153,9 @@ public class PdfPublicKeySecurityHandler {
      * It should be moved to PdfContentByte.
      */
 
-    static public byte[] unescapedString(final byte[] bytes) throws BadPdfFormatException {
-        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        int index = 0;
 
-        if (bytes[0] != '(' && bytes[bytes.length-1] != ')') {
-			throw new BadPdfFormatException("Expect '(' and ')' at begin and end of the string.");
-		}
-
-        while (index < bytes.length) {
-            if (bytes[index] == '\\') {
-                index++;
-                switch (bytes[index]) {
-                case 'b':
-                    baos.write('\b');
-                    break;
-                case 'f':
-                    baos.write('\f');
-                    break;
-                case 't':
-                    baos.write('\t');
-                    break;
-                case 'n':
-                    baos.write('\n');
-                    break;
-                case 'r':
-                    baos.write('\r');
-                    break;
-                case '(':
-                        baos.write('(');
-                        break;
-                case ')':
-                        baos.write(')');
-                        break;
-                case '\\':
-                    baos.write('\\');
-                    break;
-                }
-            } else {
-				baos.write(bytes[index]);
-			}
-            index++;
-        }
-        return baos.toByteArray();
-    }
-
-    public void addRecipient(final PdfPublicKeyRecipient recipient) {
+    void addRecipient(final PdfPublicKeyRecipient recipient) {
         this.recipients.add(recipient);
     }
 
@@ -235,7 +191,7 @@ public class PdfPublicKeySecurityHandler {
 
         final byte[] pkcs7input = new byte[24];
 
-        final byte one = (byte)(permission);
+        final byte one = (byte)permission;
         final byte two = (byte)(permission >> 8);
         final byte three = (byte)(permission >> 16);
         final byte four = (byte)(permission >> 24);

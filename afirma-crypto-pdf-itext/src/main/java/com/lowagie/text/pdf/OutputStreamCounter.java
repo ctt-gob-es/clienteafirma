@@ -53,15 +53,15 @@ import java.io.OutputStream;
  * @author  psoares
  */
 public class OutputStreamCounter extends OutputStream {
-    
+
     protected OutputStream out;
     protected int counter = 0;
-    
+
     /** Creates a new instance of OutputStreamCounter */
-    public OutputStreamCounter(OutputStream out) {
+    public OutputStreamCounter(final OutputStream out) {
         this.out = out;
     }
-    
+
     /** Closes this output stream and releases any system resources
      * associated with this stream. The general contract of <code>close</code>
      * is that it closes the output stream. A closed stream cannot perform
@@ -72,10 +72,11 @@ public class OutputStreamCounter extends OutputStream {
      * @exception  IOException  if an I/O error occurs.
      *
      */
-    public void close() throws IOException {
-        out.close();
+    @Override
+	public void close() throws IOException {
+        this.out.close();
     }
-    
+
     /** Flushes this output stream and forces any buffered output bytes
      * to be written out. The general contract of <code>flush</code> is
      * that calling it is an indication that, if any bytes previously
@@ -88,10 +89,11 @@ public class OutputStreamCounter extends OutputStream {
      * @exception  IOException  if an I/O error occurs.
      *
      */
-    public void flush() throws IOException {
-        out.flush();
+    @Override
+	public void flush() throws IOException {
+        this.out.flush();
     }
-    
+
     /** Writes <code>b.length</code> bytes from the specified byte array
      * to this output stream. The general contract for <code>write(b)</code>
      * is that it should have exactly the same effect as the call
@@ -102,11 +104,12 @@ public class OutputStreamCounter extends OutputStream {
      * @see        java.io.OutputStream#write(byte[], int, int)
      *
      */
-    public void write(byte[] b) throws IOException {
-        counter += b.length;
-        out.write(b);
+    @Override
+	public void write(final byte[] b) throws IOException {
+        this.counter += b.length;
+        this.out.write(b);
     }
-    
+
     /** Writes the specified byte to this output stream. The general
      * contract for <code>write</code> is that one byte is written
      * to the output stream. The byte to be written is the eight
@@ -122,11 +125,12 @@ public class OutputStreamCounter extends OutputStream {
      *             output stream has been closed.
      *
      */
-    public void write(int b) throws IOException {
-        ++counter;
-        out.write(b);
+    @Override
+	public void write(final int b) throws IOException {
+        ++this.counter;
+        this.out.write(b);
     }
-    
+
     /** Writes <code>len</code> bytes from the specified byte array
      * starting at offset <code>off</code> to this output stream.
      * The general contract for <code>write(b, off, len)</code> is that
@@ -155,16 +159,15 @@ public class OutputStreamCounter extends OutputStream {
      *             stream is closed.
      *
      */
-    public void write(byte[] b, int off, int len) throws IOException {
-        counter += len;
-        out.write(b, off, len);
+    @Override
+	public void write(final byte[] b, final int off, final int len) throws IOException {
+        this.counter += len;
+        this.out.write(b, off, len);
     }
-    
+
     public int getCounter() {
-        return counter;
+        return this.counter;
     }
-    
-    public void resetCounter() {
-        counter = 0;
-    }
+
+
 }

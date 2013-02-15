@@ -56,10 +56,10 @@ package com.lowagie.text.pdf;
 public class SpotColor extends ExtendedColor {
 
     private static final long serialVersionUID = -6257004582113248079L;
-	PdfSpotColor spot;
-    float tint;
+	private final PdfSpotColor spot;
+    private final float tint;
 
-    public SpotColor(PdfSpotColor spot, float tint) {
+    private SpotColor(final PdfSpotColor spot, final float tint) {
         super(TYPE_SEPARATION,
             (spot.getAlternativeCS().getRed() / 255f - 1f) * tint + 1,
             (spot.getAlternativeCS().getGreen() / 255f - 1f) * tint + 1,
@@ -67,24 +67,24 @@ public class SpotColor extends ExtendedColor {
         this.spot = spot;
         this.tint = tint;
     }
-    
-    public SpotColor(PdfSpotColor spot) {
-        this(spot, spot.getTint());
-    }
-    
+
+
+
     public PdfSpotColor getPdfSpotColor() {
-        return spot;
-    }
-    
-    public float getTint() {
-        return tint;
+        return this.spot;
     }
 
-    public boolean equals(Object obj) {
+    public float getTint() {
+        return this.tint;
+    }
+
+    @Override
+	public boolean equals(final Object obj) {
         return this == obj;
     }
-    
-    public int hashCode() {
-        return spot.hashCode() ^ Float.floatToIntBits(tint);
+
+    @Override
+	public int hashCode() {
+        return this.spot.hashCode() ^ Float.floatToIntBits(this.tint);
     }
 }

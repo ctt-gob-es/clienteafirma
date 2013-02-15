@@ -422,7 +422,7 @@ public class PdfAnnotation extends PdfDictionary {
         getMK().put(PdfName.R, new PdfNumber(rotation));
     }
 
-    static PdfArray getMKColor(final Color color) {
+    private static PdfArray getMKColor(final Color color) {
         final PdfArray array = new PdfArray();
         final int type = ExtendedColor.getType(color);
         switch (type) {
@@ -530,127 +530,5 @@ public class PdfAnnotation extends PdfDictionary {
     	put(PdfName.NM, new PdfString(name));
     }
 
-    /**
-     * This class processes links from imported pages so that they may be active. The following example code reads a group
-     * of files and places them all on the output PDF, four pages in a single page, keeping the links active.
-     * <pre>
-     * String[] files = new String[] {&quot;input1.pdf&quot;, &quot;input2.pdf&quot;};
-     * String outputFile = &quot;output.pdf&quot;;
-     * int firstPage=1;
-     * Document document = new Document();
-     * PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(outputFile));
-     * document.setPageSize(PageSize.A4);
-     * float W = PageSize.A4.getWidth() / 2;
-     * float H = PageSize.A4.getHeight() / 2;
-     * document.open();
-     * PdfContentByte cb = writer.getDirectContent();
-     * for (int i = 0; i &lt; files.length; i++) {
-     *    PdfReader currentReader = new PdfReader(files[i]);
-     *    currentReader.consolidateNamedDestinations();
-     *    for (int page = 1; page &lt;= currentReader.getNumberOfPages(); page++) {
-     *        PdfImportedPage importedPage = writer.getImportedPage(currentReader, page);
-     *        float a = 0.5f;
-     *        float e = (page % 2 == 0) ? W : 0;
-     *        float f = (page % 4 == 1 || page % 4 == 2) ? H : 0;
-     *        ArrayList links = currentReader.getLinks(page);
-     *        cb.addTemplate(importedPage, a, 0, 0, a, e, f);
-     *        for (int j = 0; j &lt; links.size(); j++) {
-     *            PdfAnnotation.PdfImportedLink link = (PdfAnnotation.PdfImportedLink)links.get(j);
-     *            if (link.isInternal()) {
-     *                int dPage = link.getDestinationPage();
-     *                int newDestPage = (dPage-1)/4 + firstPage;
-     *                float ee = (dPage % 2 == 0) ? W : 0;
-     *                float ff = (dPage % 4 == 1 || dPage % 4 == 2) ? H : 0;
-     *                link.setDestinationPage(newDestPage);
-     *                link.transformDestination(a, 0, 0, a, ee, ff);
-     *            }
-     *            link.transformRect(a, 0, 0, a, e, f);
-     *            writer.addAnnotation(link.createAnnotation(writer));
-     *        }
-     *        if (page % 4 == 0)
-     *        document.newPage();
-     *    }
-     *    if (i &lt; files.length - 1)
-     *    document.newPage();
-     *    firstPage += (currentReader.getNumberOfPages()+3)/4;
-     * }
-     * document.close();
-     * </pre>
-     */
-    static class PdfImportedLink {
-    	private final float llx, lly, urx, ury;
-    	private final HashMap parameters = new HashMap();
-    	private PdfArray destination = null;
-    	private int newPage=0;
 
-    	PdfImportedLink(final PdfDictionary annotation) {
-    		this.parameters.putAll(annotation.hashMap);
-    		try {
-    			this.destination = (PdfArray) this.parameters.remove(PdfName.DEST);
-    		} catch (final ClassCastException ex) {
-    			throw new IllegalArgumentException("You have to consolidate the named destinations of your reader.");
-    		}
-    		if (this.destination != null) {
-    			this.destination = new PdfArray(this.destination);
-    		}
-        	final PdfArray rc = (PdfArray) this.parameters.remove(PdfName.RECT);
-        	this.llx = rc.getAsNumber(0).floatValue();
-    		this.lly = rc.getAsNumber(1).floatValue();
-        	this.urx = rc.getAsNumber(2).floatValue();
-    		this.ury = rc.getAsNumber(3).floatValue();
-    	}
-
-    	public boolean isInternal() {
-    		return this.destination != null;
-    	}
-
-    	public int getDestinationPage() {
-    		if (!isInternal()) {
-				return 0;
-			}
-
-    		// here destination is something like
-    		// [132 0 R, /XYZ, 29.3898, 731.864502, null]
-    		final PdfIndirectReference ref = this.destination.getAsIndirectObject(0);
-
-    		final PRIndirectReference pr = (PRIndirectReference) ref;
-    		final PdfReader r = pr.getReader();
-    		for (int i = 1; i <= r.getNumberOfPages(); i++) {
-    			final PRIndirectReference pp = r.getPageOrigRef(i);
-    			if (pp.getGeneration() == pr.getGeneration() && pp.getNumber() == pr.getNumber()) {
-					return i;
-				}
-    		}
-    		throw new IllegalArgumentException("Page not found.");
-    	}
-
-    	public void setDestinationPage(final int newPage) {
-    		if (!isInternal()) {
-				throw new IllegalArgumentException("Cannot change destination of external link");
-			}
-    		this.newPage=newPage;
-    	}
-
-    	/**
-    	 * Returns a String representation of the link.
-    	 * @return	a String representation of the imported link
-    	 * @since	2.1.6
-    	 */
-    	@Override
-		public String toString() {
-    		final StringBuffer buf = new StringBuffer("Imported link: location [");
-    		buf.append(this.llx);
-    		buf.append(' ');
-    		buf.append(this.lly);
-    		buf.append(' ');
-    		buf.append(this.urx);
-    		buf.append(' ');
-    		buf.append(this.ury);
-    		buf.append("] destination ");
-    		buf.append(this.destination);
-    		buf.append(" parameters ");
-    		buf.append(this.parameters);
-    		return buf.toString();
-    	}
-    }
 }

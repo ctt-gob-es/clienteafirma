@@ -71,18 +71,18 @@ class PdfCopy extends PdfWriter {
      * This class holds information about indirect references, since they are
      * renumbered by iText.
      */
-    static class IndirectReferences {
+    private static class IndirectReferences {
         private final PdfIndirectReference theRef;
         private boolean hasCopied;
-        IndirectReferences(final PdfIndirectReference ref) {
+        private IndirectReferences(final PdfIndirectReference ref) {
             this.theRef = ref;
             this.hasCopied = false;
         }
-        void setCopied() { this.hasCopied = true; }
-        boolean getCopied() { return this.hasCopied; }
-        PdfIndirectReference getRef() { return this.theRef; }
+        private void setCopied() { this.hasCopied = true; }
+        private boolean getCopied() { return this.hasCopied; }
+        private PdfIndirectReference getRef() { return this.theRef; }
     };
-    protected HashMap indirects;
+    private HashMap indirects;
     private final HashMap indirectMap;
 
     private PdfReader reader;
@@ -96,12 +96,12 @@ class PdfCopy extends PdfWriter {
     /**
      * A key to allow us to hash indirect references
      */
-    protected static class RefKey {
+    private static class RefKey {
         private final int num;
         private final int gen;
 
 
-        RefKey(final PRIndirectReference ref) {
+        private RefKey(final PRIndirectReference ref) {
             this.num = ref.getNumber();
             this.gen = ref.getGeneration();
         }
@@ -188,7 +188,7 @@ class PdfCopy extends PdfWriter {
      * we do from their namespace to ours is *at best* heuristic, and guaranteed to
      * fail under some circumstances.
      */
-    protected PdfIndirectReference copyIndirect(final PRIndirectReference in) throws IOException, BadPdfFormatException {
+    private PdfIndirectReference copyIndirect(final PRIndirectReference in) throws IOException, BadPdfFormatException {
         PdfIndirectReference theRef;
         final RefKey key = new RefKey(in);
         IndirectReferences iRef = (IndirectReferences)this.indirects.get(key);
@@ -273,7 +273,7 @@ class PdfCopy extends PdfWriter {
     /**
      * Translate a PR-object to a Pdf-object
      */
-    protected PdfObject copyObject(final PdfObject in) throws IOException,BadPdfFormatException {
+    private PdfObject copyObject(final PdfObject in) throws IOException,BadPdfFormatException {
         if (in == null) {
 			return PdfNull.PDFNULL;
 		}

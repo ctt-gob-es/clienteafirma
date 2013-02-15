@@ -60,7 +60,7 @@ import com.lowagie.text.pdf.fonts.cmaps.CMapParser;
 public class CMapAwareDocumentFont extends DocumentFont {
 
 	/** The font dictionary. */
-    private PdfDictionary fontDic;
+    private final PdfDictionary fontDic;
     /** the width of a space for this font, in normalized 1000 point units */
     private int spaceWidth;
     /** The CMap constructed from the ToUnicode map from the font's dictionary, if present.
@@ -72,24 +72,25 @@ public class CMapAwareDocumentFont extends DocumentFont {
 	 *  as derived by the font's encoding.  Only needed if the ToUnicode CMap is not provided.
 	 */
     private char[] cidbyte2uni;
-    
+
     /**
      * Creates an instance of a CMapAwareFont based on an indirect reference to a font.
      * @param refFont	the indirect reference to a font
      */
-    public CMapAwareDocumentFont(PRIndirectReference refFont) {
+    public CMapAwareDocumentFont(final PRIndirectReference refFont) {
         super(refFont);
-        fontDic = (PdfDictionary)PdfReader.getPdfObjectRelease(refFont);
+        this.fontDic = (PdfDictionary)PdfReader.getPdfObjectRelease(refFont);
 
         processToUnicode();
-        if (toUnicodeCmap == null)
-            processUni2Byte();
-        
-        spaceWidth = super.getWidth(' ');
-        if (spaceWidth == 0){
-            spaceWidth = computeAverageWidth();
+        if (this.toUnicodeCmap == null) {
+			processUni2Byte();
+		}
+
+        this.spaceWidth = super.getWidth(' ');
+        if (this.spaceWidth == 0){
+            this.spaceWidth = computeAverageWidth();
         }
-        
+
     }
 
     /**
@@ -97,47 +98,48 @@ public class CMapAwareDocumentFont extends DocumentFont {
      * @since 2.1.7
      */
     private void processToUnicode(){
-        
-        PdfObject toUni = fontDic.get(PdfName.TOUNICODE);
+
+        final PdfObject toUni = this.fontDic.get(PdfName.TOUNICODE);
         if (toUni != null){
-            
+
             try {
-                byte[] touni = PdfReader.getStreamBytes((PRStream)PdfReader.getPdfObjectRelease(toUni));
-    
-                CMapParser cmapParser = new CMapParser();
-                toUnicodeCmap = cmapParser.parse(new ByteArrayInputStream(touni));
-            } catch (IOException e) {
+                final byte[] touni = PdfReader.getStreamBytes((PRStream)PdfReader.getPdfObjectRelease(toUni));
+
+                final CMapParser cmapParser = new CMapParser();
+                this.toUnicodeCmap = cmapParser.parse(new ByteArrayInputStream(touni));
+            } catch (final IOException e) {
                 throw new Error("Unable to process ToUnicode map - " + e.getMessage(), e);
             }
         }
     }
-    
+
     /**
      * Inverts DocumentFont's uni2byte mapping to obtain a cid-to-unicode mapping based
      * on the font's encoding
      * @since 2.1.7
      */
     private void processUni2Byte(){
-        IntHashtable uni2byte = getUni2Byte();
-        int e[] = uni2byte.toOrderedKeys();
-        
-        cidbyte2uni = new char[256];
-        for (int k = 0; k < e.length; ++k) {
-            int n = uni2byte.get(e[k]);
-            
+        final IntHashtable uni2byte = getUni2Byte();
+        final int e[] = uni2byte.toOrderedKeys();
+
+        this.cidbyte2uni = new char[256];
+        for (final int element : e) {
+            final int n = uni2byte.get(element);
+
             // this is messy, messy - an encoding can have multiple unicode values mapping to the same cid - we are going to arbitrarily choose the first one
             // what we really need to do is to parse the encoding, and handle the differences info ourselves.  This is a huge duplication of code of what is already
             // being done in DocumentFont, so I really hate to go down that path without seriously thinking about a change in the organization of the Font class hierarchy
-            if (cidbyte2uni[n] == 0)
-                cidbyte2uni[n] = (char)e[k];
+            if (this.cidbyte2uni[n] == 0) {
+				this.cidbyte2uni[n] = (char)element;
+			}
         }
     }
-    
 
-    
+
+
     /**
      * For all widths of all glyphs, compute the average width in normalized 1000 point units.
-     * This is used to give some meaningful width in cases where we need an average font width 
+     * This is used to give some meaningful width in cases where we need an average font width
      * (such as if the width of a space isn't specified by a given font)
      * @return the average width of all non-zero width glyphs in the font
      */
@@ -152,19 +154,21 @@ public class CMapAwareDocumentFont extends DocumentFont {
         }
         return count != 0 ? total/count : 0;
     }
-    
+
     /**
      * @since 2.1.5
      * Override to allow special handling for fonts that don't specify width of space character
      * @see com.lowagie.text.pdf.DocumentFont#getWidth(int)
      */
-    public int getWidth(int char1) {
-        if (char1 == ' ')
-            return spaceWidth;
-        
+    @Override
+	public int getWidth(final int char1) {
+        if (char1 == ' ') {
+			return this.spaceWidth;
+		}
+
         return super.getWidth(char1);
     }
-    
+
     /**
      * Decodes a single CID (represented by one or two bytes) to a unicode String.
      * @param bytes		the bytes making up the character code to convert
@@ -172,17 +176,18 @@ public class CMapAwareDocumentFont extends DocumentFont {
      * @param len		a length
      * @return	a String containing the encoded form of the input bytes using the font's encoding.
      */
-    private String decodeSingleCID(byte[] bytes, int offset, int len){
-        if (toUnicodeCmap != null){
-            if (offset + len > bytes.length)
-                throw new ArrayIndexOutOfBoundsException("Invalid index: " + offset + len);
-            return toUnicodeCmap.lookup(bytes, offset, len);
+    private String decodeSingleCID(final byte[] bytes, final int offset, final int len){
+        if (this.toUnicodeCmap != null){
+            if (offset + len > bytes.length) {
+				throw new ArrayIndexOutOfBoundsException("Invalid index: " + offset + len);
+			}
+            return this.toUnicodeCmap.lookup(bytes, offset, len);
         }
 
         if (len == 1){
-            return new String(cidbyte2uni, 0xff & bytes[offset], 1);
+            return new String(this.cidbyte2uni, 0xff & bytes[offset], 1);
         }
-        
+
         throw new Error("Multi-byte glyphs not implemented yet");
     }
 
@@ -194,8 +199,8 @@ public class CMapAwareDocumentFont extends DocumentFont {
      * @return  the unicode String that results from decoding
      * @since 2.1.7
      */
-    public String decode(byte[] cidbytes, final int offset, final int len){
-        StringBuffer sb = new StringBuffer(); // it's a shame we can't make this StringBuilder
+    public String decode(final byte[] cidbytes, final int offset, final int len){
+        final StringBuffer sb = new StringBuffer(); // it's a shame we can't make this StringBuilder
         for(int i = offset; i < offset + len; i++){
             String rslt = decodeSingleCID(cidbytes, i, 1);
             if (rslt == null){
@@ -208,15 +213,5 @@ public class CMapAwareDocumentFont extends DocumentFont {
         return sb.toString();
     }
 
-    /**
-     * Encodes bytes to a String.
-     * @param bytes		the bytes from a stream
-     * @param offset	an offset
-     * @param len		a length
-     * @return	a String encoded taking into account if the bytes are in unicode or not.
-     * @deprecated method name is not indicative of what it does.  Use <code>decode</code> instead.
-     */
-    public String encode(byte[] bytes, int offset, int len){
-        return decode(bytes, offset, len);    
-    }
+
 }

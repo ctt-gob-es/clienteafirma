@@ -1,12 +1,12 @@
 /*
  * Copyright 1999-2004 The Apache Software Foundation.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -62,7 +62,7 @@ import java.util.Stack;
  * @author cav@uniscope.co.jp
  */
 
-public class TernaryTree implements Cloneable, Serializable {
+class TernaryTree implements Cloneable, Serializable {
 
     /**
      * We use 4 arrays to represent a node. I guess I should have created
@@ -107,24 +107,24 @@ public class TernaryTree implements Cloneable, Serializable {
     protected CharVector kv;
 
     protected char root;
-    protected char freenode;
-    protected int length;    // number of items in tree
+    private char freenode;
+    private int length;    // number of items in tree
 
-    protected static final int BLOCK_SIZE = 2048;    // allocation size for arrays
+    private static final int BLOCK_SIZE = 2048;    // allocation size for arrays
 
     TernaryTree() {
         init();
     }
 
-    protected void init() {
-        root = 0;
-        freenode = 1;
-        length = 0;
-        lo = new char[BLOCK_SIZE];
-        hi = new char[BLOCK_SIZE];
-        eq = new char[BLOCK_SIZE];
-        sc = new char[BLOCK_SIZE];
-        kv = new CharVector();
+    private void init() {
+        this.root = 0;
+        this.freenode = 1;
+        this.length = 0;
+        this.lo = new char[BLOCK_SIZE];
+        this.hi = new char[BLOCK_SIZE];
+        this.eq = new char[BLOCK_SIZE];
+        this.sc = new char[BLOCK_SIZE];
+        this.kv = new CharVector();
     }
 
     /**
@@ -135,96 +135,96 @@ public class TernaryTree implements Cloneable, Serializable {
      * is inserted. This saves a lot of space,
      * specially for long keys.
      */
-    public void insert(String key, char val) {
+    void insert(final String key, final char val) {
         // make sure we have enough room in the arrays
         int len = key.length()
                   + 1;    // maximum number of nodes that may be generated
-        if (freenode + len > eq.length) {
-            redimNodeArrays(eq.length + BLOCK_SIZE);
+        if (this.freenode + len > this.eq.length) {
+            redimNodeArrays(this.eq.length + BLOCK_SIZE);
         }
-        char strkey[] = new char[len--];
+        final char strkey[] = new char[len--];
         key.getChars(0, len, strkey, 0);
         strkey[len] = 0;
-        root = insert(root, strkey, 0, val);
+        this.root = insert(this.root, strkey, 0, val);
     }
 
-    public void insert(char[] key, int start, char val) {
-        int len = strlen(key) + 1;
-        if (freenode + len > eq.length) {
-            redimNodeArrays(eq.length + BLOCK_SIZE);
+    void insert(final char[] key, final int start, final char val) {
+        final int len = strlen(key) + 1;
+        if (this.freenode + len > this.eq.length) {
+            redimNodeArrays(this.eq.length + BLOCK_SIZE);
         }
-        root = insert(root, key, start, val);
+        this.root = insert(this.root, key, start, val);
     }
 
     /**
      * The actual insertion function, recursive version.
      */
-    private char insert(char p, char[] key, int start, char val) {
-        int len = strlen(key, start);
+    private char insert(char p, final char[] key, final int start, final char val) {
+        final int len = strlen(key, start);
         if (p == 0) {
             // this means there is no branch, this node will start a new branch.
             // Instead of doing that, we store the key somewhere else and create
             // only one node with a pointer to the key
-            p = freenode++;
-            eq[p] = val;           // holds data
-            length++;
-            hi[p] = 0;
+            p = this.freenode++;
+            this.eq[p] = val;           // holds data
+            this.length++;
+            this.hi[p] = 0;
             if (len > 0) {
-                sc[p] = 0xFFFF;    // indicates branch is compressed
-                lo[p] = (char)kv.alloc(len
+                this.sc[p] = 0xFFFF;    // indicates branch is compressed
+                this.lo[p] = (char)this.kv.alloc(len
                                        + 1);    // use 'lo' to hold pointer to key
-                strcpy(kv.getArray(), lo[p], key, start);
+                strcpy(this.kv.getArray(), this.lo[p], key, start);
             } else {
-                sc[p] = 0;
-                lo[p] = 0;
+                this.sc[p] = 0;
+                this.lo[p] = 0;
             }
             return p;
         }
 
-        if (sc[p] == 0xFFFF) {
+        if (this.sc[p] == 0xFFFF) {
             // branch is compressed: need to decompress
             // this will generate garbage in the external key array
             // but we can do some garbage collection later
-            char pp = freenode++;
-            lo[pp] = lo[p];    // previous pointer to key
-            eq[pp] = eq[p];    // previous pointer to data
-            lo[p] = 0;
+            final char pp = this.freenode++;
+            this.lo[pp] = this.lo[p];    // previous pointer to key
+            this.eq[pp] = this.eq[p];    // previous pointer to data
+            this.lo[p] = 0;
             if (len > 0) {
-                sc[p] = kv.get(lo[pp]);
-                eq[p] = pp;
-                lo[pp]++;
-                if (kv.get(lo[pp]) == 0) {
+                this.sc[p] = this.kv.get(this.lo[pp]);
+                this.eq[p] = pp;
+                this.lo[pp]++;
+                if (this.kv.get(this.lo[pp]) == 0) {
                     // key completely decompressed leaving garbage in key array
-                    lo[pp] = 0;
-                    sc[pp] = 0;
-                    hi[pp] = 0;
+                    this.lo[pp] = 0;
+                    this.sc[pp] = 0;
+                    this.hi[pp] = 0;
                 } else {
                     // we only got first char of key, rest is still there
-                    sc[pp] = 0xFFFF;
+                    this.sc[pp] = 0xFFFF;
                 }
             } else {
                 // In this case we can save a node by swapping the new node
                 // with the compressed node
-                sc[pp] = 0xFFFF;
-                hi[p] = pp;
-                sc[p] = 0;
-                eq[p] = val;
-                length++;
+                this.sc[pp] = 0xFFFF;
+                this.hi[p] = pp;
+                this.sc[p] = 0;
+                this.eq[p] = val;
+                this.length++;
                 return p;
             }
         }
-        char s = key[start];
-        if (s < sc[p]) {
-            lo[p] = insert(lo[p], key, start, val);
-        } else if (s == sc[p]) {
+        final char s = key[start];
+        if (s < this.sc[p]) {
+            this.lo[p] = insert(this.lo[p], key, start, val);
+        } else if (s == this.sc[p]) {
             if (s != 0) {
-                eq[p] = insert(eq[p], key, start + 1, val);
+                this.eq[p] = insert(this.eq[p], key, start + 1, val);
             } else {
                 // key already in tree, overwrite data
-                eq[p] = val;
+                this.eq[p] = val;
             }
         } else {
-            hi[p] = insert(hi[p], key, start, val);
+            this.hi[p] = insert(this.hi[p], key, start, val);
         }
         return p;
     }
@@ -232,7 +232,7 @@ public class TernaryTree implements Cloneable, Serializable {
     /**
      * Compares 2 null terminated char arrays
      */
-    public static int strcmp(char[] a, int startA, char[] b, int startB) {
+    private static int strcmp(final char[] a, int startA, final char[] b, int startB) {
         for (; a[startA] == b[startB]; startA++, startB++) {
             if (a[startA] == 0) {
                 return 0;
@@ -241,35 +241,16 @@ public class TernaryTree implements Cloneable, Serializable {
         return a[startA] - b[startB];
     }
 
-    /**
-     * Compares a string with null terminated char array
-     */
-    public static int strcmp(String str, char[] a, int start) {
-        int i, d, len = str.length();
-        for (i = 0; i < len; i++) {
-            d = str.charAt(i) - a[start + i];
-            if (d != 0) {
-                return d;
-            }
-            if (a[start + i] == 0) {
-                return d;
-        }
-        }
-        if (a[start + i] != 0) {
-            return -a[start + i];
-        }
-        return 0;
 
-    }
 
-    public static void strcpy(char[] dst, int di, char[] src, int si) {
+    private static void strcpy(final char[] dst, int di, final char[] src, int si) {
         while (src[si] != 0) {
             dst[di++] = src[si++];
         }
         dst[di] = 0;
     }
 
-    public static int strlen(char[] a, int start) {
+    private static int strlen(final char[] a, final int start) {
         int len = 0;
         for (int i = start; i < a.length && a[i] != 0; i++) {
             len++;
@@ -277,81 +258,78 @@ public class TernaryTree implements Cloneable, Serializable {
         return len;
     }
 
-    public static int strlen(char[] a) {
+    private static int strlen(final char[] a) {
         return strlen(a, 0);
     }
 
-    public int find(String key) {
-        int len = key.length();
-        char strkey[] = new char[len + 1];
+    int find(final String key) {
+        final int len = key.length();
+        final char strkey[] = new char[len + 1];
         key.getChars(0, len, strkey, 0);
         strkey[len] = 0;
 
         return find(strkey, 0);
     }
 
-    public int find(char[] key, int start) {
+    int find(final char[] key, final int start) {
         int d;
-        char p = root;
+        char p = this.root;
         int i = start;
         char c;
 
         while (p != 0) {
-            if (sc[p] == 0xFFFF) {
-                if (strcmp(key, i, kv.getArray(), lo[p]) == 0) {
-                    return eq[p];
+            if (this.sc[p] == 0xFFFF) {
+                if (strcmp(key, i, this.kv.getArray(), this.lo[p]) == 0) {
+                    return this.eq[p];
                 } else {
                     return -1;
             }
             }
             c = key[i];
-            d = c - sc[p];
+            d = c - this.sc[p];
             if (d == 0) {
                 if (c == 0) {
-                    return eq[p];
+                    return this.eq[p];
                 }
                 i++;
-                p = eq[p];
+                p = this.eq[p];
             } else if (d < 0) {
-                p = lo[p];
+                p = this.lo[p];
             } else {
-                p = hi[p];
+                p = this.hi[p];
         }
         }
         return -1;
     }
 
-    public boolean knows(String key) {
-        return (find(key) >= 0);
-    }
+
 
     // redimension the arrays
-    private void redimNodeArrays(int newsize) {
-        int len = newsize < lo.length ? newsize : lo.length;
+    private void redimNodeArrays(final int newsize) {
+        final int len = newsize < this.lo.length ? newsize : this.lo.length;
         char[] na = new char[newsize];
-        System.arraycopy(lo, 0, na, 0, len);
-        lo = na;
+        System.arraycopy(this.lo, 0, na, 0, len);
+        this.lo = na;
         na = new char[newsize];
-        System.arraycopy(hi, 0, na, 0, len);
-        hi = na;
+        System.arraycopy(this.hi, 0, na, 0, len);
+        this.hi = na;
         na = new char[newsize];
-        System.arraycopy(eq, 0, na, 0, len);
-        eq = na;
+        System.arraycopy(this.eq, 0, na, 0, len);
+        this.eq = na;
         na = new char[newsize];
-        System.arraycopy(sc, 0, na, 0, len);
-        sc = na;
+        System.arraycopy(this.sc, 0, na, 0, len);
+        this.sc = na;
     }
 
-    public int size() {
-        return length;
-    }
 
-    public Object clone() {
-        TernaryTree t = new TernaryTree();
-        t.lo = (char[])this.lo.clone();
-        t.hi = (char[])this.hi.clone();
-        t.eq = (char[])this.eq.clone();
-        t.sc = (char[])this.sc.clone();
+
+    @Override
+	public Object clone() {
+        final TernaryTree t = new TernaryTree();
+        t.lo = this.lo.clone();
+        t.hi = this.hi.clone();
+        t.eq = this.eq.clone();
+        t.sc = this.sc.clone();
         t.kv = (CharVector)this.kv.clone();
         t.root = this.root;
         t.freenode = this.freenode;
@@ -366,7 +344,7 @@ public class TernaryTree implements Cloneable, Serializable {
      * tree. The array of keys is assumed to be sorted in ascending
      * order.
      */
-    protected void insertBalanced(String[] k, char[] v, int offset, int n) {
+    private void insertBalanced(final String[] k, final char[] v, final int offset, final int n) {
         int m;
         if (n < 1) {
             return;
@@ -383,13 +361,14 @@ public class TernaryTree implements Cloneable, Serializable {
     /**
      * Balance the tree for best search performance
      */
-    public void balance() {
+    private void balance() {
         // System.out.print("Before root splitchar = "); System.out.println(sc[root]);
 
-        int i = 0, n = length;
-        String[] k = new String[n];
-        char[] v = new char[n];
-        Iterator iter = new Iterator();
+        int i = 0;
+		final int n = this.length;
+        final String[] k = new String[n];
+        final char[] v = new char[n];
+        final Iterator iter = new Iterator();
         while (iter.hasMoreElements()) {
             v[i] = iter.getValue();
             k[i++] = (String)iter.nextElement();
@@ -414,77 +393,76 @@ public class TernaryTree implements Cloneable, Serializable {
      * a map (implemented with a TernaryTree!).
      *
      */
-    public void trimToSize() {
+    void trimToSize() {
         // first balance the tree for best performance
         balance();
 
         // redimension the node arrays
-        redimNodeArrays(freenode);
+        redimNodeArrays(this.freenode);
 
         // ok, compact kv array
-        CharVector kx = new CharVector();
+        final CharVector kx = new CharVector();
         kx.alloc(1);
-        TernaryTree map = new TernaryTree();
-        compact(kx, map, root);
-        kv = kx;
-        kv.trimToSize();
+        final TernaryTree map = new TernaryTree();
+        compact(kx, map, this.root);
+        this.kv = kx;
+        this.kv.trimToSize();
     }
 
-    private void compact(CharVector kx, TernaryTree map, char p) {
+    private void compact(final CharVector kx, final TernaryTree map, final char p) {
         int k;
         if (p == 0) {
             return;
         }
-        if (sc[p] == 0xFFFF) {
-            k = map.find(kv.getArray(), lo[p]);
+        if (this.sc[p] == 0xFFFF) {
+            k = map.find(this.kv.getArray(), this.lo[p]);
             if (k < 0) {
-                k = kx.alloc(strlen(kv.getArray(), lo[p]) + 1);
-                strcpy(kx.getArray(), k, kv.getArray(), lo[p]);
+                k = kx.alloc(strlen(this.kv.getArray(), this.lo[p]) + 1);
+                strcpy(kx.getArray(), k, this.kv.getArray(), this.lo[p]);
                 map.insert(kx.getArray(), k, (char)k);
             }
-            lo[p] = (char)k;
+            this.lo[p] = (char)k;
         } else {
-            compact(kx, map, lo[p]);
-            if (sc[p] != 0) {
-                compact(kx, map, eq[p]);
+            compact(kx, map, this.lo[p]);
+            if (this.sc[p] != 0) {
+                compact(kx, map, this.eq[p]);
             }
-            compact(kx, map, hi[p]);
+            compact(kx, map, this.hi[p]);
         }
     }
 
 
-    public Enumeration keys() {
-        return new Iterator();
-    }
 
-    public class Iterator implements Enumeration {
+
+    private class Iterator implements Enumeration {
 
         /**
          * current node index
          */
-        int cur;
+        private int cur;
 
         /**
          * current key
          */
-        String curkey;
+        private String curkey;
 
         private class Item implements Cloneable {
             char parent;
             char child;
 
             public Item() {
-                parent = 0;
-                child = 0;
+                this.parent = 0;
+                this.child = 0;
             }
 
-            public Item(char p, char c) {
-                parent = p;
-                child = c;
+            public Item(final char p, final char c) {
+                this.parent = p;
+                this.child = c;
             }
 
-            public Object clone() {
-                return new Item(parent, child);
+            @Override
+			public Object clone() {
+                return new Item(this.parent, this.child);
             }
 
         }
@@ -492,43 +470,45 @@ public class TernaryTree implements Cloneable, Serializable {
         /**
          * Node stack
          */
-        Stack ns;
+        private final Stack ns;
 
         /**
          * key stack implemented with a StringBuffer
          */
-        StringBuffer ks;
+        private final StringBuffer ks;
 
         public Iterator() {
-            cur = -1;
-            ns = new Stack();
-            ks = new StringBuffer();
+            this.cur = -1;
+            this.ns = new Stack();
+            this.ks = new StringBuffer();
             rewind();
         }
 
-        public void rewind() {
-            ns.removeAllElements();
-            ks.setLength(0);
-            cur = root;
+        private void rewind() {
+            this.ns.removeAllElements();
+            this.ks.setLength(0);
+            this.cur = TernaryTree.this.root;
             run();
         }
 
-        public Object nextElement() {
-            String res = curkey;
-            cur = up();
+        @Override
+		public Object nextElement() {
+            final String res = this.curkey;
+            this.cur = up();
             run();
             return res;
         }
 
         public char getValue() {
-            if (cur >= 0) {
-                return eq[cur];
+            if (this.cur >= 0) {
+                return TernaryTree.this.eq[this.cur];
             }
             return 0;
         }
 
-        public boolean hasMoreElements() {
-            return (cur != -1);
+        @Override
+		public boolean hasMoreElements() {
+            return this.cur != -1;
         }
 
         /**
@@ -538,44 +518,44 @@ public class TernaryTree implements Cloneable, Serializable {
             Item i = new Item();
             int res = 0;
 
-            if (ns.empty()) {
+            if (this.ns.empty()) {
                 return -1;
             }
 
-            if (cur != 0 && sc[cur] == 0) {
-                return lo[cur];
+            if (this.cur != 0 && TernaryTree.this.sc[this.cur] == 0) {
+                return TernaryTree.this.lo[this.cur];
             }
 
             boolean climb = true;
 
             while (climb) {
-                i = (Item)ns.pop();
+                i = (Item)this.ns.pop();
                 i.child++;
                 switch (i.child) {
                 case 1:
-                    if (sc[i.parent] != 0) {
-                        res = eq[i.parent];
-                        ns.push(i.clone());
-                        ks.append(sc[i.parent]);
+                    if (TernaryTree.this.sc[i.parent] != 0) {
+                        res = TernaryTree.this.eq[i.parent];
+                        this.ns.push(i.clone());
+                        this.ks.append(TernaryTree.this.sc[i.parent]);
                     } else {
                         i.child++;
-                        ns.push(i.clone());
-                        res = hi[i.parent];
+                        this.ns.push(i.clone());
+                        res = TernaryTree.this.hi[i.parent];
                     }
                     climb = false;
                     break;
 
                 case 2:
-                    res = hi[i.parent];
-                    ns.push(i.clone());
-                    if (ks.length() > 0) {
-                        ks.setLength(ks.length() - 1);    // pop
+                    res = TernaryTree.this.hi[i.parent];
+                    this.ns.push(i.clone());
+                    if (this.ks.length() > 0) {
+                        this.ks.setLength(this.ks.length() - 1);    // pop
                     }
                     climb = false;
                     break;
 
                 default:
-                    if (ns.empty()) {
+                    if (this.ns.empty()) {
                         return -1;
                     }
                     climb = true;
@@ -589,55 +569,55 @@ public class TernaryTree implements Cloneable, Serializable {
          * traverse the tree to find next key
          */
         private int run() {
-            if (cur == -1) {
+            if (this.cur == -1) {
                 return -1;
             }
 
             boolean leaf = false;
             while (true) {
                 // first go down on low branch until leaf or compressed branch
-                while (cur != 0) {
-                    if (sc[cur] == 0xFFFF) {
+                while (this.cur != 0) {
+                    if (TernaryTree.this.sc[this.cur] == 0xFFFF) {
                         leaf = true;
                         break;
                     }
-                    ns.push(new Item((char)cur, '\u0000'));
-                    if (sc[cur] == 0) {
+                    this.ns.push(new Item((char)this.cur, '\u0000'));
+                    if (TernaryTree.this.sc[this.cur] == 0) {
                         leaf = true;
                         break;
                     }
-                    cur = lo[cur];
+                    this.cur = TernaryTree.this.lo[this.cur];
                 }
                 if (leaf) {
                     break;
                 }
                     // nothing found, go up one node and try again
-                cur = up();
-                if (cur == -1) {
+                this.cur = up();
+                if (this.cur == -1) {
                     return -1;
                 }
             }
             // The current node should be a data node and
             // the key should be in the key stack (at least partially)
-            StringBuffer buf = new StringBuffer(ks.toString());
-            if (sc[cur] == 0xFFFF) {
-                int p = lo[cur];
-                while (kv.get(p) != 0) {
-                    buf.append(kv.get(p++));
+            final StringBuffer buf = new StringBuffer(this.ks.toString());
+            if (TernaryTree.this.sc[this.cur] == 0xFFFF) {
+                int p = TernaryTree.this.lo[this.cur];
+                while (TernaryTree.this.kv.get(p) != 0) {
+                    buf.append(TernaryTree.this.kv.get(p++));
             }
             }
-            curkey = buf.toString();
+            this.curkey = buf.toString();
             return 0;
         }
 
     }
 
     public void printStats() {
-        System.out.println("Number of keys = " + Integer.toString(length));
-        System.out.println("Node count = " + Integer.toString(freenode));
+        System.out.println("Number of keys = " + Integer.toString(this.length));
+        System.out.println("Node count = " + Integer.toString(this.freenode));
         // System.out.println("Array length = " + Integer.toString(eq.length));
         System.out.println("Key Array length = "
-                           + Integer.toString(kv.length()));
+                           + Integer.toString(this.kv.length()));
 
         /*
          * for(int i=0; i<kv.length(); i++)
