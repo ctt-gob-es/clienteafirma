@@ -51,7 +51,6 @@ package com.lowagie.text;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 import com.lowagie.text.pdf.PdfTemplate;
@@ -70,10 +69,6 @@ public class ImgWMF extends Image {
 
     // Constructors
 
-    ImgWMF(final Image image) {
-        super(image);
-    }
-
     /**
      * Constructs an <CODE>ImgWMF</CODE>-object, using an <VAR>url</VAR>.
      *
@@ -85,19 +80,6 @@ public class ImgWMF extends Image {
     ImgWMF(final URL url) throws BadElementException, IOException {
         super(url);
         processParameters();
-    }
-
-    /**
-     * Constructs an <CODE>ImgWMF</CODE>-object, using a <VAR>filename</VAR>.
-     *
-     * @param filename a <CODE>String</CODE>-representation of the file that contains the image.
-     * @throws BadElementException on error
-     * @throws MalformedURLException on error
-     * @throws IOException on error
-     */
-
-    public ImgWMF(final String filename) throws BadElementException, MalformedURLException, IOException {
-        this(Utilities.toURL(filename));
     }
 
     /**

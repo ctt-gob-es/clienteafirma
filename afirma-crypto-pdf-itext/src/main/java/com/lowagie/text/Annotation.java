@@ -49,7 +49,6 @@
 
 package com.lowagie.text;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -123,18 +122,6 @@ public class Annotation implements Element {
 	public static final String DEFAULTDIR = "defaultdir";
 
 	/** This is a possible attribute. */
-	public static final String LLX = "llx";
-
-	/** This is a possible attribute. */
-	public static final String LLY = "lly";
-
-	/** This is a possible attribute. */
-	public static final String URX = "urx";
-
-	/** This is a possible attribute. */
-	public static final String URY = "ury";
-
-	/** This is a possible attribute. */
 	public static final String MIMETYPE = "mime";
 
 	/** This is the type of annotation. */
@@ -197,21 +184,6 @@ public class Annotation implements Element {
 	 *            the title of the annotation
 	 * @param text
 	 *            the content of the annotation
-	 */
-	public Annotation(final String title, final String text) {
-		this.annotationtype = TEXT;
-		this.annotationAttributes.put(TITLE, title);
-		this.annotationAttributes.put(CONTENT, text);
-	}
-
-	/**
-	 * Constructs an <CODE>Annotation</CODE> with a certain title and some
-	 * text.
-	 *
-	 * @param title
-	 *            the title of the annotation
-	 * @param text
-	 *            the content of the annotation
 	 * @param llx
 	 *            the lower left x-value
 	 * @param lly
@@ -227,26 +199,6 @@ public class Annotation implements Element {
 		this.annotationtype = TEXT;
 		this.annotationAttributes.put(TITLE, title);
 		this.annotationAttributes.put(CONTENT, text);
-	}
-
-	/**
-	 * Constructs an <CODE>Annotation</CODE>.
-	 *
-	 * @param llx
-	 *            the lower left x-value
-	 * @param lly
-	 *            the lower left y-value
-	 * @param urx
-	 *            the upper right x-value
-	 * @param ury
-	 *            the upper right y-value
-	 * @param url
-	 *            the external reference
-	 */
-	public Annotation(final float llx, final float lly, final float urx, final float ury, final URL url) {
-		this(llx, lly, urx, ury);
-		this.annotationtype = URL_NET;
-		this.annotationAttributes.put(URL, url);
 	}
 
 	/**
@@ -294,30 +246,6 @@ public class Annotation implements Element {
 	}
 
 	/**
-	 * Creates a Screen annotation to embed media clips
-	 *
-	 * @param llx
-	 * @param lly
-	 * @param urx
-	 * @param ury
-	 * @param moviePath
-	 *            path to the media clip file
-	 * @param mimeType
-	 *            mime type of the media
-	 * @param showOnDisplay
-	 *            if true play on display of the page
-	 */
-	public Annotation(final float llx, final float lly, final float urx, final float ury,
-			final String moviePath, final String mimeType, final boolean showOnDisplay) {
-		this(llx, lly, urx, ury);
-		this.annotationtype = SCREEN;
-		this.annotationAttributes.put(FILE, moviePath);
-		this.annotationAttributes.put(MIMETYPE, mimeType);
-		this.annotationAttributes.put(PARAMETERS, new boolean[] {
-				false /* embedded */, showOnDisplay });
-	}
-
-	/**
 	 * Constructs an <CODE>Annotation</CODE>.
 	 *
 	 * @param llx
@@ -359,37 +287,6 @@ public class Annotation implements Element {
 		this(llx, lly, urx, ury);
 		this.annotationtype = NAMED_DEST;
 		this.annotationAttributes.put(NAMED, new Integer(named));
-	}
-
-	/**
-	 * Constructs an <CODE>Annotation</CODE>.
-	 *
-	 * @param llx
-	 *            the lower left x-value
-	 * @param lly
-	 *            the lower left y-value
-	 * @param urx
-	 *            the upper right x-value
-	 * @param ury
-	 *            the upper right y-value
-	 * @param application
-	 *            an external application
-	 * @param parameters
-	 *            parameters to pass to this application
-	 * @param operation
-	 *            the operation to pass to this application
-	 * @param defaultdir
-	 *            the default directory to run this application in
-	 */
-	public Annotation(final float llx, final float lly, final float urx, final float ury,
-			final String application, final String parameters, final String operation,
-			final String defaultdir) {
-		this(llx, lly, urx, ury);
-		this.annotationtype = LAUNCH;
-		this.annotationAttributes.put(APPLICATION, application);
-		this.annotationAttributes.put(PARAMETERS, parameters);
-		this.annotationAttributes.put(OPERATION, operation);
-		this.annotationAttributes.put(DEFAULTDIR, defaultdir);
 	}
 
 	// implementation of the Element-methods

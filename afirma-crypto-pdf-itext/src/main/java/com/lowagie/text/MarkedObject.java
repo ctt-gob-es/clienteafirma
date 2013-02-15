@@ -145,11 +145,4 @@ public class MarkedObject implements Element {
 		return this.markupAttributes;
 	}
 
-	/**
-	 * Adds one markup attribute.
-	 */
-	public void setMarkupAttribute(final String key, final String value) {
-		this.markupAttributes.setProperty(key, value);
-	}
-
 }

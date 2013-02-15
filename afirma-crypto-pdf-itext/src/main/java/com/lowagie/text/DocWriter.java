@@ -327,13 +327,6 @@ public abstract class DocWriter implements DocListener {
         return b;
     }
 
-/**
- * Let the writer know that all writing has to be paused.
- */
-
-    public void pause() {
-        this.pause = true;
-    }
 
     /**
      * Checks if writing is paused.
@@ -343,27 +336,6 @@ public abstract class DocWriter implements DocListener {
 
     public boolean isPaused() {
         return this.pause;
-    }
-
-/**
- * Let the writer know that writing may be resumed.
- */
-
-    public void resume() {
-        this.pause = false;
-    }
-
-/**
- * Flushes the <CODE>BufferedOutputStream</CODE>.
- */
-
-    public void flush() {
-        try {
-            this.os.flush();
-        }
-        catch(final IOException ioe) {
-            throw new ExceptionConverter(ioe);
-        }
     }
 
 /**

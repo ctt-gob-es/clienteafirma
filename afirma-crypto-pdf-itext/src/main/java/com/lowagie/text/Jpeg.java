@@ -100,10 +100,6 @@ public class Jpeg extends Image {
     private byte[][] icc;
     // Constructors
 
-    Jpeg(final Image image) {
-        super(image);
-    }
-
     /**
      * Constructs a <CODE>Jpeg</CODE>-object, using an <VAR>url</VAR>.
      *
@@ -129,22 +125,6 @@ public class Jpeg extends Image {
         this.rawData = img;
         this.originalData = img;
         processParameters();
-    }
-
-    /**
-     * Constructs a <CODE>Jpeg</CODE>-object from memory.
-     *
-     * @param		img			the memory image.
-     * @param		width		the width you want the image to have
-     * @param		height		the height you want the image to have
-     * @throws BadElementException
-     * @throws IOException
-     */
-
-    public Jpeg(final byte[] img, final float width, final float height) throws BadElementException, IOException {
-        this(img);
-        this.scaledWidth = width;
-        this.scaledHeight = height;
     }
 
     // private static methods

@@ -67,26 +67,20 @@ class Jpeg2000 extends Image {
 
 	private static final int JP2_JP = 0x6a502020;
     private static final int JP2_IHDR = 0x69686472;
-    public static final int JPIP_JPIP = 0x6a706970;
 
     private static final int JP2_FTYP = 0x66747970;
     private static final int JP2_JP2H = 0x6a703268;
-    public static final int JP2_COLR = 0x636f6c72;
     private static final int JP2_JP2C = 0x6a703263;
     public static final int JP2_URL = 0x75726c20;
     public static final int JP2_DBTL = 0x6474626c;
     public static final int JP2_BPCC = 0x62706363;
     public static final int JP2_JP2 = 0x6a703220;
 
-    InputStream inp;
-    int boxLength;
-    int boxType;
+    private InputStream inp;
+    private int boxLength;
+    private int boxType;
 
     // Constructors
-
-    Jpeg2000(final Image image) {
-        super(image);
-    }
 
     /**
      * Constructs a <CODE>Jpeg2000</CODE>-object, using an <VAR>url</VAR>.
@@ -115,22 +109,6 @@ class Jpeg2000 extends Image {
         processParameters();
     }
 
-    /**
-     * Constructs a <CODE>Jpeg2000</CODE>-object from memory.
-     *
-     * @param		img			the memory image.
-     * @param		width		the width you want the image to have
-     * @param		height		the height you want the image to have
-     * @throws BadElementException
-     * @throws IOException
-     */
-
-    public Jpeg2000(final byte[] img, final float width, final float height) throws BadElementException, IOException {
-        this(img);
-        this.scaledWidth = width;
-        this.scaledHeight = height;
-    }
-
     private int cio_read(final int n) throws IOException {
         int v = 0;
         for (int i = n - 1; i >= 0; i--) {
@@ -139,7 +117,7 @@ class Jpeg2000 extends Image {
         return v;
     }
 
-    public void jp2_read_boxhdr() throws IOException {
+    private void jp2_read_boxhdr() throws IOException {
         this.boxLength = cio_read(4);
         this.boxType = cio_read(4);
         if (this.boxLength == 1) {

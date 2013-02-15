@@ -267,29 +267,6 @@ public class Table extends Rectangle implements LargeElement {
         }
     }
 
-    /**
-     * Copy constructor (shallow copy).
-     */
-    public Table(final Table t) {
-    	super(0, 0, 0, 0);
-    	this.cloneNonPositionParameters(t);
-    	this.columns = t.columns;
-    	this.rows = t.rows;
-    	this.curPosition = t.curPosition;
-    	this.defaultCell = t.defaultCell;
-    	this.lastHeaderRow = t.lastHeaderRow;
-    	this.alignment = t.alignment;
-    	this.cellpadding = t.cellpadding;
-    	this.cellspacing = t.cellspacing;
-    	this.width = t.width;
-    	this.widths = t.widths;
-    	this.autoFillEmptyCells = t.autoFillEmptyCells;
-    	this.tableFitsPage = t.tableFitsPage;
-    	this.cellsFitPage = t.cellsFitPage;
-    	this.offset = t.offset;
-    	this.convert2pdfptable = t.convert2pdfptable;
-    }
-
     // implementation of the Element-methods
 
     /**
@@ -403,16 +380,6 @@ public class Table extends Rectangle implements LargeElement {
      */
     public void setLastHeaderRow(final int value) {
         this.lastHeaderRow = value;
-    }
-
-    /**
-     * Marks the last row of the table headers.
-     *
-     * @return      the number of the last row of the table headers
-     */
-    public int endHeaders() {
-        this.lastHeaderRow = this.curPosition.x - 1;
-        return this.lastHeaderRow;
     }
 
 	/**
@@ -683,25 +650,13 @@ public class Table extends Rectangle implements LargeElement {
     // methods to add content to the table
 
     /**
-     * Adds a <CODE>Cell</CODE> to the <CODE>Table</CODE> at a certain row and column.
-     *
-     * @param       aCell    The <CODE>Cell</CODE> to add
-     * @param       row     The row where the <CODE>Cell</CODE> will be added
-     * @param       column  The column where the <CODE>Cell</CODE> will be added
-     * @throws BadElementException
-     */
-    public void addCell(final Cell aCell, final int row, final int column) throws BadElementException {
-        addCell(aCell, new Point(row,column));
-    }
-
-    /**
      * Adds a <CODE>Cell</CODE> to the <CODE>Table</CODE> at a certain location.
      *
      * @param       aCell        The <CODE>Cell</CODE> to add
      * @param       aLocation    The location where the <CODE>Cell</CODE> will be added
      * @throws BadElementException
      */
-    public void addCell(final Cell aCell, final Point aLocation) throws BadElementException {
+	private void addCell(final Cell aCell, final Point aLocation) throws BadElementException {
         if (aCell == null) {
 			throw new NullPointerException("addCell - cell has null-value");
 		}
@@ -747,19 +702,6 @@ public class Table extends Rectangle implements LargeElement {
     /**
      * Adds a <CODE>Cell</CODE> to the <CODE>Table</CODE>.
      * <P>
-     * This is a shortcut for <CODE>addCell(Cell cell)</CODE>.
-     * The <CODE>Phrase</CODE> will be converted to a <CODE>Cell</CODE>.
-     *
-     * @param       content         a <CODE>Phrase</CODE>
-     * @throws      BadElementException this should never happen
-     */
-    public void addCell(final Phrase content) throws BadElementException {
-        addCell(content, this.curPosition);
-    }
-
-    /**
-     * Adds a <CODE>Cell</CODE> to the <CODE>Table</CODE>.
-     * <P>
      * This is a shortcut for <CODE>addCell(Cell cell, Point location)</CODE>.
      * The <CODE>Phrase</CODE> will be converted to a <CODE>Cell</CODE>.
      *
@@ -767,7 +709,7 @@ public class Table extends Rectangle implements LargeElement {
      * @param       location        a <CODE>Point</CODE>
      * @throws      BadElementException this should never happen
      */
-    public void addCell(final Phrase content, final Point location) throws BadElementException {
+    private void addCell(final Phrase content, final Point location) throws BadElementException {
         final Cell cell = new Cell(content);
         cell.setBorder(this.defaultCell.getBorder());
         cell.setBorderWidth(this.defaultCell.getBorderWidth());

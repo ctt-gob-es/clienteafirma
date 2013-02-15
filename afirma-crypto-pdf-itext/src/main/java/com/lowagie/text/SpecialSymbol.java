@@ -71,7 +71,7 @@ public class SpecialSymbol {
 	 * @param	string		a <CODE>String</CODE>
 	 * @return	an index of -1 if no special symbol was found
 	 */
-    public static int index(final String string) {
+    static int index(final String string) {
         final int length = string.length();
         for (int i = 0; i < length; i++) {
             if (getCorrespondingSymbol(string.charAt(i)) != ' ') {
