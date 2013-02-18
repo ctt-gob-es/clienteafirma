@@ -1,19 +1,25 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="es.gob.afirma"
     android:versionCode="1"
-    android:versionName="1.0" >
+    android:versionName="0.1" >
 
     <uses-sdk
-        android:minSdkVersion="15"
-        android:targetSdkVersion="15" />
+        android:minSdkVersion="14"
+        android:targetSdkVersion="17" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
     
+    <supports-screens android:smallScreens="true" />
+    <supports-screens android:normalScreens="true" />
+    <supports-screens android:largeScreens="true" />
+    <supports-screens android:xlargeScreens="true" />
+    <supports-screens android:anyDensity="true" />
+    
     <!--  Permisos para el uso de SSCD en MSC -->
-    <uses-permission android:name="org.simalliance.openmobileapiAET.SMARTCARD"/>
-	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <!-- <uses-permission android:name="org.simalliance.openmobileapiAET.SMARTCARD"/>  -->
+	<!-- <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/> -->
 	<!--  Fin permisos para el uso de SSCD en MSC -->
 
     <application
@@ -47,7 +53,7 @@
             </intent-filter>
         </activity>
         <!--  Para uso SSCD en MSC -->
-        <uses-library android:name="org.simalliance.openmobileapiAET" android:required="false"/>
+        <!-- <uses-library android:name="org.simalliance.openmobileapiAET" android:required="false"/> -->
         <!--  Fin para uso SSCD en MSC -->
     </application>
 
