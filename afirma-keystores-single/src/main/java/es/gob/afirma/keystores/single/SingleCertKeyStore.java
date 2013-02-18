@@ -149,7 +149,7 @@ public final class SingleCertKeyStore extends KeyStoreSpi {
             getCertificatesFromStream(certs);
             return;
         }
-        if (tmpColCerts != null) {
+        if (tmpColCerts != null && !tmpColCerts.isEmpty()) {
             for (final Certificate c : tmpColCerts) {
                 if (!(c instanceof X509Certificate)) {
                     LOGGER.warning("Se ha encontrado un certificado en un formato que no es X.509, se ignorara"); //$NON-NLS-1$
@@ -231,7 +231,7 @@ public final class SingleCertKeyStore extends KeyStoreSpi {
             return;
         }
 
-        // No es un Base64 directo sin cabeceras, probasmos con cabeceras ASCII
+        // No es un Base64 directo sin cabeceras, probamos con cabeceras ASCII
         final BufferedReader br = new BufferedReader(new InputStreamReader(new DataInputStream(new ByteArrayInputStream(certs))));
         String strLine;
         String currentAlias = null;
@@ -288,7 +288,7 @@ public final class SingleCertKeyStore extends KeyStoreSpi {
             return;
         }
 
-        this.certificates.put((alias != null) ? alias : AOUtil.getCN(tmpCert), tmpCert);
+        this.certificates.put(alias != null ? alias : AOUtil.getCN(tmpCert), tmpCert);
     }
 
 }

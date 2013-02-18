@@ -14,7 +14,8 @@ import es.gob.afirma.keystores.single.SingleCertKeyStoreProvider;
 public class TestSingeCert {
 
     private static String[] TEST_FILES = new String[] {
-           "b64cert1.txt" //$NON-NLS-1$
+       "b64cert1.txt", //$NON-NLS-1$
+       "Equifax_Secure_Certificate_Authority.pem" //$NON-NLS-1$
     };
 
     /** Pruebas de apertura de certificados sueltos.
