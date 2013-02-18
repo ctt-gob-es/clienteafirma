@@ -9,8 +9,8 @@ public final class KeyStoreManagerFactory {
 		// Se prohibe crear instancias
 	}
 
-	private static final String ES_GOB_AFIRMA = "es.gob.afirma"; //$NON-NLS-1$
-	private static final String AET_PKCS11_STORE = "PKCS11KeyStore"; //$NON-NLS-1$
+//	private static final String ES_GOB_AFIRMA = "es.gob.afirma"; //$NON-NLS-1$
+//	private static final String AET_PKCS11_STORE = "PKCS11KeyStore"; //$NON-NLS-1$
 
 	/** Obtiene el gestor de contrase&ntuilde;as y claves m&aacute;s apropiado seg&uacute;n el entorno
 	 * operativo y el hardware encontrado.

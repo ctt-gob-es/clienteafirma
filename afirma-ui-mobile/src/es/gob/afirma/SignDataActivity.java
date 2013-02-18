@@ -26,7 +26,6 @@ import es.gob.afirma.android.crypto.MobileKeyStoreManager;
 import es.gob.afirma.android.crypto.MobileKeyStoreManager.KeySelectedEvent;
 import es.gob.afirma.android.crypto.MobileKeyStoreManager.PrivateKeySelectionListener;
 import es.gob.afirma.android.network.UriParser;
-import es.gob.afirma.android.network.UriParser.ParameterException;
 import es.gob.afirma.android.network.UriParser.UrlParameters;
 import es.gob.afirma.android.network.UrlHttpManager;
 import es.gob.afirma.core.misc.Base64;
@@ -70,12 +69,11 @@ KeystoreManagerListener, PrivateKeySelectionListener {
 			try {
 				this.parameters = UriParser.getParameters(getIntent().getData().toString());
 			}
-			catch (final ParameterException e) {
+			catch (final Exception e) {
 				showErrorMessage(getString(R.string.error_bad_params));
 				Log.e(ES_GOB_AFIRMA, "Error en la comprobacion de parametros de firma: " + e.toString()); //$NON-NLS-1$
 				return;
 			}
-
 			new LoadKeyStoreManagerTask(this, this).execute();
 		}
 	}
@@ -85,8 +83,6 @@ KeystoreManagerListener, PrivateKeySelectionListener {
 		// Creacion del firmador
 		// Por ahora instanciamos directamente el CAdES
 		final AOSigner signer = AOSignerFactory.getSigner(this.parameters.getSignatureFormat());
-
-		Log.i(ES_GOB_AFIRMA, "Manejador de firma: " + signer.getClass().getName());
 
 		// Generacion de la firma
 		final byte[] sign;
@@ -103,13 +99,6 @@ KeystoreManagerListener, PrivateKeySelectionListener {
 			launchError(ErrorManager.ERROR_SIGNING);
 			finish();
 			return;
-		}
-
-		try {
-			Log.i(ES_GOB_AFIRMA, "El documento generado es un PDF valido: " + signer.isValidDataFile(sign));
-		} catch (final IOException e1) {
-			e1.printStackTrace();
-			Log.i(ES_GOB_AFIRMA, "Error en la validacion del PDF");
 		}
 
 		// Ciframos si nos dieron clave privada, si no subimos los datos sin cifrar

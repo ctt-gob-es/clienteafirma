@@ -2,6 +2,7 @@ package es.gob.afirma.android.network;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -91,8 +92,9 @@ public final class UriParser {
 	/** Comprueba que est&eacute;n disponibles todos los parametros disponibles en la entrada de datos.
 	 * @param uri Url de llamada
 	 * @return Par&aacute;metros
-	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto */
-	public static UrlParameters getParameters(final String uri) throws ParameterException {
+	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto
+	 * @throws UnsupportedEncodingException Si no se soporta UTF-8 en URL (no debe ocurrir nunca) */
+	public static UrlParameters getParameters(final String uri) throws ParameterException, UnsupportedEncodingException {
 
 		final Map<String, String> params = parser(uri);
 
@@ -182,7 +184,7 @@ public final class UriParser {
 			throw new ParameterException("No se ha recibido el formato de firma"); //$NON-NLS-1$
 		}
 
-		final String format = URLDecoder.decode(params.get(FORMAT_PARAM));
+		final String format = URLDecoder.decode(params.get(FORMAT_PARAM), DEFAULT_URL_ENCODING);
 		if (!SUPPORTED_SIGNATURE_FORMATS.contains(format.toLowerCase())) {
 			throw new ParameterException("Formato de firma no soportado"); //$NON-NLS-1$
 		}
@@ -193,7 +195,7 @@ public final class UriParser {
 		if (!params.containsKey(ALGORITHM_PARAM)) {
 			throw new ParameterException("No se ha recibido el algoritmo de firma"); //$NON-NLS-1$
 		}
-		final String algo = URLDecoder.decode(params.get(ALGORITHM_PARAM));
+		final String algo = URLDecoder.decode(params.get(ALGORITHM_PARAM), DEFAULT_URL_ENCODING);
 		if (!SUPPORTED_SIGNATURE_ALGORITHMS.contains(algo)) {
 			throw new ParameterException("Algoritmo de firma no soportado"); //$NON-NLS-1$
 		}
