@@ -43,6 +43,9 @@ public final class SingleCertKeyStore extends KeyStoreSpi {
 
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
+    private static final String PEM_FOOTER = "-----END CERTIFICATE-----"; //$NON-NLS-1$
+    private static final String PEM_HEADER = "-----BEGIN CERTIFICATE-----"; //$NON-NLS-1$
+
     private final Map<String, X509Certificate> certificates = new Hashtable<String, X509Certificate>();
 
     @Override
@@ -239,11 +242,11 @@ public final class SingleCertKeyStore extends KeyStoreSpi {
         try {
             while ((strLine = br.readLine()) != null) {
                 // Certificado nuevo
-                if (strLine.trim().equals("-----BEGIN CERTIFICATE-----")) { //$NON-NLS-1$
+                if (strLine.trim().equals(PEM_HEADER)) {
                     currentCertificate = new StringBuilder(strLine);
                     currentCertificate.append("\n"); //$NON-NLS-1$
                 }
-                else if (strLine.trim().equals("-----END CERTIFICATE-----")) { //$NON-NLS-1$
+                else if (strLine.trim().equals(PEM_FOOTER)) {
                     if (currentCertificate != null) {
                         currentCertificate.append(strLine);
                         addCertificate(currentCertificate.toString(), currentAlias);
