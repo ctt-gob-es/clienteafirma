@@ -1,5 +1,6 @@
 package es.gob.afirma;
 
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -71,7 +72,7 @@ KeystoreManagerListener, PrivateKeySelectionListener {
 			}
 			catch (final ParameterException e) {
 				showErrorMessage(getString(R.string.error_bad_params));
-				Log.e(ES_GOB_AFIRMA, "La longitud de la clave de cifrado no es correcta."); //$NON-NLS-1$
+				Log.e(ES_GOB_AFIRMA, "Error en la comprobacion de parametros de firma: " + e.toString()); //$NON-NLS-1$
 				return;
 			}
 
@@ -102,6 +103,13 @@ KeystoreManagerListener, PrivateKeySelectionListener {
 			launchError(ErrorManager.ERROR_SIGNING);
 			finish();
 			return;
+		}
+
+		try {
+			Log.i(ES_GOB_AFIRMA, "El documento generado es un PDF valido: " + signer.isValidDataFile(sign));
+		} catch (final IOException e1) {
+			e1.printStackTrace();
+			Log.i(ES_GOB_AFIRMA, "Error en la validacion del PDF");
 		}
 
 		// Ciframos si nos dieron clave privada, si no subimos los datos sin cifrar
@@ -226,7 +234,7 @@ KeystoreManagerListener, PrivateKeySelectionListener {
 		 * Construye un di&aacute;logo de error.
 		 * @param message Mensaje que mostrar al usuario.
 		 */
-		ErrorDialog(final String message) {
+		public ErrorDialog(final String message) {
 			this.message = message;
 		}
 
@@ -235,7 +243,7 @@ KeystoreManagerListener, PrivateKeySelectionListener {
 
 			final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
 			dialogBuilder.setMessage(this.message)
-			.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+			.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(final DialogInterface dialog, final int which) {
 					finish();
