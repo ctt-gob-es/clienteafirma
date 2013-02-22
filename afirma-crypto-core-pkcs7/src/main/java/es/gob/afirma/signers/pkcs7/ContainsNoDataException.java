@@ -7,7 +7,7 @@ import es.gob.afirma.core.AOInvalidFormatException;
  * no contiene los datos necesarios.
  * @author Carlos Gamuci Mill&aacute;n
  */
-public class NoContainsDataException extends AOInvalidFormatException {
+public class ContainsNoDataException extends AOInvalidFormatException {
 
 	/** Serial version id */
 	private static final long serialVersionUID = -114813694395801268L;
@@ -16,7 +16,7 @@ public class NoContainsDataException extends AOInvalidFormatException {
 	 * Crea la excepci&oacute;n asociando un mensaje de error.
 	 * @param message Mensaje asociado al error.
 	 */
-	public NoContainsDataException(final String message) {
+	public ContainsNoDataException(final String message) {
 		super(message);
 	}
 
@@ -25,7 +25,7 @@ public class NoContainsDataException extends AOInvalidFormatException {
 	 * @param message Mensaje asociado al error.
 	 * @param e Excepcion previa que caus&oacute; el problema.
 	 */
-	public NoContainsDataException(final String message, final Exception e) {
+	public ContainsNoDataException(final String message, final Exception e) {
 		super(message, e);
 	}
 }
