@@ -19,16 +19,51 @@ public final class KeyStoreManagerFactory {
 	public static MobileKeyStoreManager getKeyStoreManager(final Activity activity) {
 //		// Primero intentamos la instanciacion de un PKCS#11 MSC AET
 //		try {
+//
+//			// Todo el proceso se hace por reflexion, porque el entorno de ejecucion es completamente opcional
 //			final Properties providerConfiguration = new Properties();
-//			providerConfiguration.put(ContextManager.CONTEXT_MANAGER_TYPE, ContextManagerType.MICROSD.getType());
-//			providerConfiguration.put(AETProvider.PROVIDER_TYPE, AETProviderType.JAVA.getType());
-//			final Provider provider = AETProvider.getInstance(providerConfiguration, activity.getApplicationContext());
+//
+//			final Class<?> contextManagerClass = Class.forName("com.aet.android.javaprovider.context.ContextManager"); //$NON-NLS-1$
+//			final Field contextManagerTypeFiled = contextManagerClass.getDeclaredField("CONTEXT_MANAGER_TYPE"); //$NON-NLS-1$
+//
+//			final Class<?> contextManagerTypeClass = Class.forName("com.aet.android.javaprovider.context.ContextManagerType"); //$NON-NLS-1$
+//			final Field microsdField = contextManagerTypeClass.getDeclaredField("MICROSD"); //$NON-NLS-1$
+//			final Object microsdObject = microsdField.get(null);
+//			final Method getTypeMethod = contextManagerTypeClass.getDeclaredMethod("getType"); //$NON-NLS-1$
+//			final Object typeValue = getTypeMethod.invoke(microsdObject);
+//
+//			providerConfiguration.put(
+//					contextManagerTypeFiled.get(null),
+//					typeValue
+//			);
+//
+//
+//			final Class<?> aetProviderClass = Class.forName("com.aet.android.javaprovider.AETProvider"); //$NON-NLS-1$
+//			final Field aetProviderTypeField = aetProviderClass.getDeclaredField("PROVIDER_TYPE"); //$NON-NLS-1$
+//			final Object aetProviderTypeObject = aetProviderTypeField.get(null);
+//
+//			final Class<?> aetProviderTypeClass = Class.forName("com.aet.android.javaprovider.AETProviderType"); //$NON-NLS-1$
+//			final Field javaField = aetProviderTypeClass.getDeclaredField("JAVA"); //$NON-NLS-1$
+//			final Object javaObject = javaField.get(null);
+//			final Method aetProviderGetTypeMethod = aetProviderTypeClass.getDeclaredMethod("getType"); //$NON-NLS-1$
+//			final Object javaTypeValue = aetProviderGetTypeMethod.invoke(javaObject);
+//
+//			providerConfiguration.put(
+//				aetProviderTypeObject,
+//				javaTypeValue
+//			);
+//
+//			final Method aetProviderGetInstanceMethod = aetProviderClass.getDeclaredMethod("getInstance", Properties.class, Context.class); //$NON-NLS-1$
+//
+//			final Provider provider = (Provider) aetProviderGetInstanceMethod.invoke(
+//				null, providerConfiguration, activity.getApplicationContext()
+//			);
 //			Security.addProvider(provider);
 //			final KeyStore ks = KeyStore.getInstance(AET_PKCS11_STORE, provider);
 //			ks.load(null, "pin".toCharArray());
 //			final Enumeration<String> aliases = ks.aliases();
-//			while (aliases.hasMoreElements()) {
-//				Log.i(ES_GOB_AFIRMA, aliases.nextElement());
+//			if (aliases.hasMoreElements()) {
+//				return new AndroidJcaKeyStoreManager(ks, "".toCharArray()); //$NON-NLS-1$
 //			}
 //		}
 //		catch (final Exception e) {
