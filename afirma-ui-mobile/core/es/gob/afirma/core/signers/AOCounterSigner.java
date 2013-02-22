@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -10,6 +10,7 @@
 
 package es.gob.afirma.core.signers;
 
+import java.io.IOException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.Properties;
 
@@ -46,12 +47,13 @@ public interface AOCounterSigner {
      *        Par&aacute;metros adicionales para la contrafirma
      * @return Contenido firmado
      * @throws AOException
-     *         Cuando ocurre cualquier problema durante el proceso */
+     *         Cuando ocurre cualquier problema durante el proceso
+     * @throws IOException Si ocurren problemas relacionados con la lectura de la firma */
     byte[] countersign(byte[] sign,
                               String algorithm,
                               CounterSignTarget targetType,
                               Object[] targets,
                               PrivateKeyEntry keyEntry,
-                              Properties extraParams) throws AOException;
-    
+                              Properties extraParams) throws AOException, IOException;
+
 }
