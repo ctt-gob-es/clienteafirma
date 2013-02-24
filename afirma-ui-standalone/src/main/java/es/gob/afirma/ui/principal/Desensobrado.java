@@ -21,6 +21,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.security.InvalidKeyException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -184,32 +185,56 @@ final class Desensobrado extends JPanel {
                     // AuthenticatedAndEnvelopedData
                 }
                 else if (AOCMSEnveloper.isCMSValid(envelopData, AOSignConstants.CMS_CONTENTTYPE_AUTHENVELOPEDDATA)) {
-					recoveredData = CMSDecipherAuthenticatedEnvelopedData.dechiperAuthenticatedEnvelopedData(envelopData, privateKeyEntry);
-                    // Envoltorio no reconocido
+					recoveredData = CMSDecipherAuthenticatedEnvelopedData.dechiperAuthenticatedEnvelopedData(
+						envelopData,
+						privateKeyEntry
+					);
                 }
+                // Envoltorio no reconocido
                 else {
-                    CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
-                                                   true,
-                                                   Messages.getString("Desensobrado.msg.error.sobre"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+                    CustomDialog.showMessageDialog(
+                		SwingUtilities.getRoot(this),
+                        true,
+                        Messages.getString("Desensobrado.msg.error.sobre"), //$NON-NLS-1$
+                        Messages.getString("error"), //$NON-NLS-1$
+                        JOptionPane.ERROR_MESSAGE
+                    );
                     return;
                 }
             }
             catch (final AOException e) {
                 LOGGER.severe("Error al abrir el sobre digital: " + e); //$NON-NLS-1$
                 // El pop-up muestra el mensaje de la excepcion
-                CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
-                                               true,
-                                               e.getMessage(),
-                                               Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
+                CustomDialog.showMessageDialog(
+            		SwingUtilities.getRoot(this),
+                    true,
+                    e.getMessage(),
+                    Messages.getString("error"), //$NON-NLS-1$
+                    JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+            catch (final InvalidKeyException e) {
+                LOGGER.severe("No se soporta la clave AES del sobre digital: " + e); //$NON-NLS-1$
+                CustomDialog.showMessageDialog(
+            		SwingUtilities.getRoot(this),
+                    true,
+                    Messages.getString("Desensobrado.msg.error.clave.msg"), //$NON-NLS-1$
+                    Messages.getString("Desensobrado.msg.error.clave.title"), //$NON-NLS-1$
+                    JOptionPane.ERROR_MESSAGE
+                );
                 return;
             }
             catch (final Exception e) {
                 LOGGER.severe("Error al abrir el sobre digital: " + e); //$NON-NLS-1$
                 // El pop-up muestra el mensaje de la excepcion
-                CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
-                                               true,
-                                               e.getMessage(),
-                                               Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
+                CustomDialog.showMessageDialog(
+            		SwingUtilities.getRoot(this),
+                    true,
+                    e.getMessage(),
+                    Messages.getString("error"), //$NON-NLS-1$
+                    JOptionPane.ERROR_MESSAGE
+                );
                 return;
             }
 

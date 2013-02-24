@@ -81,7 +81,7 @@ import es.gob.afirma.ui.wizardutils.JDialogWizard;
  * a partir de una seleccion de certificados de remitentes. */
 final class PanelRemitentes extends JAccessibilityDialogWizard {
 
-	private static final int AES_DEFAULT_KEYT_SIZE = 128;
+	private static final Integer AES_MAX_KEY_SIZE = Integer.valueOf(256);
 
     /** Botonera con funciones para la pagina panel de multifirma - cofirma */
     private class Botonera extends BotoneraInferior {
@@ -369,17 +369,17 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
             }
             Integer keySize = null;
             final int aesMaxKeySize = Cipher.getMaxAllowedKeyLength(AOCipherAlgorithm.AES.getName());
-            if (aesMaxKeySize > AES_DEFAULT_KEYT_SIZE) {
+            if (aesMaxKeySize == Integer.MAX_VALUE) {
             	if (CustomDialog.showConfirmDialog(
         			SwingUtilities.getRoot(this),
         			true,
-        			Messages.getString("Wizard.sobres.unlimitedencryption", Integer.toString(aesMaxKeySize)), //$NON-NLS-1$
+        			Messages.getString("Wizard.sobres.unlimitedencryption"), //$NON-NLS-1$
         			Messages.getString("Wizard.sobres.unlimitedencryption.title"), //$NON-NLS-1$
         			JOptionPane.YES_NO_OPTION,
         			JOptionPane.WARNING_MESSAGE
     			) == 0) {
             		LOGGER.info("Se ha establecido la clave AES a " + Integer.toString(aesMaxKeySize) + " bits"); //$NON-NLS-1$ //$NON-NLS-2$
-            		keySize = Integer.valueOf(aesMaxKeySize);
+            		keySize = AES_MAX_KEY_SIZE;
             	}
             }
             try {
