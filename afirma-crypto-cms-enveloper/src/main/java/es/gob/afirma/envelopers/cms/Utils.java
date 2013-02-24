@@ -138,7 +138,7 @@ final class Utils {
      *        Certificado
      * @return Clave secreta
      * @throws NullPointerException */
-    static SecretKey initEnvelopedData(final AOCipherConfig config, final X509Certificate[] certDest) {
+    static SecretKey initEnvelopedData(final AOCipherConfig config, final X509Certificate[] certDest, final Integer keySize) {
         // Comprobamos que el archivo a tratar no sea nulo.
         if (certDest == null || certDest.length == 0) {
             throw new IllegalArgumentException("No se pueden envolver datos sin certificados destino"); //$NON-NLS-1$
@@ -146,7 +146,7 @@ final class Utils {
 
         // Asignamos la clave de cifrado
         try {
-            return assignKey(config);
+            return assignKey(config, keySize);
         }
         catch (final Exception ex) {
             LOGGER.severe("Error durante el proceso de asignado de clave, se devolvera null: " + ex); //$NON-NLS-1$
@@ -159,9 +159,14 @@ final class Utils {
      * envolver y qeu m&aacute;s tarde ser&aacute; cifrada con la clave
      * p&uacute;blica del usuario que hace la firma.
      * @param config configuraci&oacute;n necesaria para crear la clave */
-    private static SecretKey assignKey(final AOCipherConfig config) throws NoSuchAlgorithmException {
+    private static SecretKey assignKey(final AOCipherConfig config, final Integer keySize) throws NoSuchAlgorithmException {
         final KeyGenerator kg = KeyGenerator.getInstance(config.getAlgorithm().getName());
-        kg.init(new SecureRandom());
+        if (keySize != null) {
+        	kg.init(keySize.intValue(), new SecureRandom());
+        }
+        else {
+        	kg.init(new SecureRandom());
+        }
         return kg.generateKey();
     }
 

@@ -551,11 +551,12 @@ final class EnveloperManager {
                                                                      InvalidAlgorithmParameterException,
                                                                      IllegalBlockSizeException,
                                                                      BadPaddingException {
-        return this.enveloper.createCMSEnvelopedData(content, this.ksConfigManager.getCertificateKeyEntry(), // Si hay uno
-                                                                                                   // seleccionado, se
-                                                                                                   // utiliza
-                                                this.cipherManager.getCipherConfig(),
-                                                this.getRecipients());
+        return this.enveloper.createCMSEnvelopedData(
+    		content, this.ksConfigManager.getCertificateKeyEntry(), // Si hay uno seleccionado, se utiliza
+            this.cipherManager.getCipherConfig(),
+            this.getRecipients(),
+            null // Tamano de clave por defecto
+        );
     }
 
     /** Genera un sobre de tipo SignedAndEnvelopedData.
@@ -597,10 +598,13 @@ final class EnveloperManager {
                 throw new AOException("Error al seleccionar el certificado", e); //$NON-NLS-1$
             }
         }
-        return this.enveloper.createCMSSignedAndEnvelopedData(content,
-                                                         this.ksConfigManager.getCertificateKeyEntry(),
-                                                         this.cipherManager.getCipherConfig(),
-                                                         this.getRecipients());
+        return this.enveloper.createCMSSignedAndEnvelopedData(
+    		content,
+            this.ksConfigManager.getCertificateKeyEntry(),
+            this.cipherManager.getCipherConfig(),
+            this.getRecipients(),
+            null // Tamano de clave por defecto
+        );
     }
 
     /** Genera un sobre de tipo AuthenticatedEnvelopedData.
@@ -637,10 +641,13 @@ final class EnveloperManager {
                 throw new AOException("Error al seleccionar el certificado", e); //$NON-NLS-1$
             }
         }
-        return this.enveloper.createCMSAuthenticatedEnvelopedData(content,
-                                                             this.ksConfigManager.getCertificateKeyEntry(),
-                                                             this.cipherManager.getCipherConfig(),
-                                                             this.getRecipients());
+        return this.enveloper.createCMSAuthenticatedEnvelopedData(
+    		content,
+            this.ksConfigManager.getCertificateKeyEntry(),
+            this.cipherManager.getCipherConfig(),
+            this.getRecipients(),
+            null // Tamano de clave por defecto
+        );
     }
 
     /** Agrega un nuevo remitente a un sobre electr&oacute;nico. Los tipos de

@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.crypto.Cipher;
 import javax.security.auth.callback.PasswordCallback;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
@@ -79,6 +80,8 @@ import es.gob.afirma.ui.wizardutils.JDialogWizard;
 /** Clase que contiene los elementos necesarios para crear un grupo de Remitenres
  * a partir de una seleccion de certificados de remitentes. */
 final class PanelRemitentes extends JAccessibilityDialogWizard {
+
+	private static final int AES_DEFAULT_KEYT_SIZE = 128;
 
     /** Botonera con funciones para la pagina panel de multifirma - cofirma */
     private class Botonera extends BotoneraInferior {
@@ -223,7 +226,7 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
                 comboRepositorios.setEnabled(false);
                 this.etiquetaAnadir.setDisplayedMnemonic(0); // Se asigna un atajo vacio puesto que se ha deshabilitado el combo asociado
                 this.etiquetaAnadir.getAccessibleContext().setAccessibleName(this.etiquetaAnadir.getText() + " " //$NON-NLS-1$
-                                                                             + Messages.getString("wizard.sobres.etiquetaAnadir")); //$NON-NLS-1$
+                                                                             + Messages.getString("Wizard.sobres.etiquetaAnadir")); //$NON-NLS-1$
                 this.etiquetaAnadir.setFocusable(true);
                 eliminar.setEnabled(true);
                 eliminar.setMnemonic(KeyEvent.VK_E); // Se asigna un atajo al boton ya que ha sido habilitado
@@ -241,16 +244,24 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
             }
             catch (final UnrecoverableKeyException e) {
                 // Control de la excepcion generada al introducir mal la contrasena para el certificado
-                CustomDialog.showMessageDialog(this,
-                                               true,
-                                               Messages.getString("Wizard.sobres.error.certificados.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+                CustomDialog.showMessageDialog(
+            		this,
+                    true,
+                    Messages.getString("Wizard.sobres.error.certificados.contrasenia"),  //$NON-NLS-1$
+                    Messages.getString("error"),  //$NON-NLS-1$
+                    JOptionPane.ERROR_MESSAGE
+                );
                 return;
             }
             catch (final AOException e) {
                 LOGGER.warning("Error al obtener la clave del certificado: " + e); //$NON-NLS-1$
-                CustomDialog.showMessageDialog(this, true, Messages.getString("Ensobrado.msg.error.clave"), //$NON-NLS-1$
-                                               Messages.getString("error"), //$NON-NLS-1$
-                                               JOptionPane.ERROR_MESSAGE);
+                CustomDialog.showMessageDialog(
+            		this,
+            		true,
+            		Messages.getString("Ensobrado.msg.error.clave"), //$NON-NLS-1$
+                    Messages.getString("error"), //$NON-NLS-1$
+                    JOptionPane.ERROR_MESSAGE
+                );
 
                 clearWizard(comboRepositorios, eliminar, anadir);
 
@@ -348,33 +359,53 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
             }
             catch(final OutOfMemoryError e) {
             	CustomDialog.showMessageDialog(
-        			SwingUtilities.getRoot(this), true, Messages.getString("WizardCifrado.error.tamanodatos"), //$NON-NLS-1$
+        			SwingUtilities.getRoot(this),
+        			true,
+        			Messages.getString("WizardCifrado.error.tamanodatos"), //$NON-NLS-1$
                     Messages.getString("error"), //$NON-NLS-1$
                     JOptionPane.ERROR_MESSAGE
                 );
             	this.getBotonera().getCancelar().doClick();
             }
+            Integer keySize = null;
+            final int aesMaxKeySize = Cipher.getMaxAllowedKeyLength(AOCipherAlgorithm.AES.getName());
+            if (aesMaxKeySize > AES_DEFAULT_KEYT_SIZE) {
+            	if (CustomDialog.showConfirmDialog(
+        			SwingUtilities.getRoot(this),
+        			true,
+        			Messages.getString("Wizard.sobres.unlimitedencryption", Integer.toString(aesMaxKeySize)), //$NON-NLS-1$
+        			Messages.getString("Wizard.sobres.unlimitedencryption.title"), //$NON-NLS-1$
+        			JOptionPane.YES_NO_OPTION,
+        			JOptionPane.WARNING_MESSAGE
+    			) == 0) {
+            		LOGGER.info("Se ha establecido la clave AES a " + Integer.toString(aesMaxKeySize) + " bits"); //$NON-NLS-1$ //$NON-NLS-2$
+            		keySize = Integer.valueOf(aesMaxKeySize);
+            	}
+            }
             try {
                 if (this.tipo == SOBRE_AUTENTICADO) {
-                    envelopedData = enveloper.createCMSAuthenticatedEnvelopedData(contentData, this.privateKeyEntry, cipherConfig, certs);
+                    envelopedData = enveloper.createCMSAuthenticatedEnvelopedData(contentData, this.privateKeyEntry, cipherConfig, certs, keySize);
                 }
                 else if (this.tipo == SOBRE_FIRMADO) {
-                    envelopedData = enveloper.createCMSSignedAndEnvelopedData(contentData, this.privateKeyEntry, cipherConfig, certs);
+                    envelopedData = enveloper.createCMSSignedAndEnvelopedData(contentData, this.privateKeyEntry, cipherConfig, certs, keySize);
                 }
                 else if (this.tipo == SOBRE_SIMPLE) {
-                    envelopedData = enveloper.createCMSEnvelopedData(contentData, this.privateKeyEntry, cipherConfig, certs);
+                    envelopedData = enveloper.createCMSEnvelopedData(contentData, this.privateKeyEntry, cipherConfig, certs, keySize);
                 }
             }
             catch (final Exception e) {
+            	LOGGER.severe("No se ha posido crear el sobre: " + e); //$NON-NLS-1$
                 return false;
             }
 
             // Guardamos el sobre generado
-            final File savedFile = SelectionDialog.saveDataToFile(Messages.getString("wizard.sobres.filechooser.save.title"), //$NON-NLS-1$
-                                                                  envelopedData,
-                                                                  new File(this.rutafichero).getName(),
-                                                                  null,
-                                                                  this);
+            final File savedFile = SelectionDialog.saveDataToFile(
+        		Messages.getString("Wizard.sobres.filechooser.save.title"), //$NON-NLS-1$
+                envelopedData,
+                new File(this.rutafichero).getName() + ".enveloped", //$NON-NLS-1$
+                null,
+                this
+            );
             // Si el usuario cancela el guardado de los datos, no nos desplazamos a la ultima pantalla
             if (savedFile == null) {
                 return false;
@@ -535,7 +566,7 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
 
         // Combo con los repositorios / almacenes
         final JComboBox comboRepositorios = new JComboBox();
-        comboRepositorios.setToolTipText(Messages.getString("wizard.comboRepositorios.description")); //$NON-NLS-1$
+        comboRepositorios.setToolTipText(Messages.getString("Wizard.comboRepositorios.description")); //$NON-NLS-1$
         comboRepositorios.getAccessibleContext().setAccessibleName(this.etiquetaAnadir.getText() + " " //$NON-NLS-1$
                                                                    + comboRepositorios.getToolTipText()
                                                                    + " ALT + D."); //$NON-NLS-1$
@@ -588,7 +619,7 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
 
         // Etiqueta con el texto "Remitentes"
         final JLabel senderLabel = new JLabel();
-        senderLabel.setText(Messages.getString("wizard.sobres.listaRemitentes")); //$NON-NLS-1$
+        senderLabel.setText(Messages.getString("Wizard.sobres.listaRemitentes")); //$NON-NLS-1$
         Utils.setContrastColor(senderLabel);
         Utils.setFontBold(senderLabel);
         panelCentral.add(senderLabel, c);
@@ -639,7 +670,7 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
         // Boton eliminar
         eliminar.setEnabled(false);
         eliminar.setToolTipText(Messages.getString("Wizard.sobres.eliminar.remitente.description")); //$NON-NLS-1$
-        eliminar.setText(Messages.getString("wizard.sobres.eliminar.remitente")); //$NON-NLS-1$
+        eliminar.setText(Messages.getString("Wizard.sobres.eliminar.remitente")); //$NON-NLS-1$
         eliminar.getAccessibleContext().setAccessibleName(eliminar.getText() + " " + eliminar.getToolTipText()); //$NON-NLS-1$
         eliminar.getAccessibleContext().setAccessibleDescription(eliminar.getToolTipText());
         eliminar.addActionListener(new ActionListener() {

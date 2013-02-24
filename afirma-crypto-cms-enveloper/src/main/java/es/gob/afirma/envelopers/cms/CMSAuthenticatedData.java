@@ -146,7 +146,8 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
                                        final String dataType,
                                        final boolean applyTimestamp,
                                        final Map<String, byte[]> atrib,
-                                       final Map<String, byte[]> uatrib) throws IOException,
+                                       final Map<String, byte[]> uatrib,
+                                       final Integer keySize) throws IOException,
                                                                                 CertificateEncodingException,
                                                                                 NoSuchAlgorithmException,
                                                                                 InvalidKeyException,
@@ -155,7 +156,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
                                                                                 IllegalBlockSizeException,
                                                                                 BadPaddingException {
 
-    	final SecretKey cipherKey = Utils.initEnvelopedData(config, certDest);
+    	final SecretKey cipherKey = Utils.initEnvelopedData(config, certDest, keySize);
 
         // Ya que el contenido puede ser grande, lo recuperamos solo una vez
         final byte[] content2 = parameters.getContent();

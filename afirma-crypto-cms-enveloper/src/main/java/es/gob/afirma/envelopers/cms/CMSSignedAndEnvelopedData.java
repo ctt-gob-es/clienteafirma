@@ -119,17 +119,18 @@ final class CMSSignedAndEnvelopedData {
                                      final String dataType,
                                      final PrivateKeyEntry keyEntry,
                                      final Map<String, byte[]> atrib,
-                                     final Map<String, byte[]> uatrib) throws IOException,
-                                                                              CertificateEncodingException,
-                                                                              NoSuchAlgorithmException,
-                                                                              InvalidKeyException,
-                                                                              NoSuchPaddingException,
-                                                                              InvalidAlgorithmParameterException,
-                                                                              IllegalBlockSizeException,
-                                                                              BadPaddingException,
-                                                                              SignatureException {
+                                     final Map<String, byte[]> uatrib,
+                                     final Integer keySize) throws IOException,
+                                                                   CertificateEncodingException,
+                                                                   NoSuchAlgorithmException,
+                                                                   InvalidKeyException,
+                                                                   NoSuchPaddingException,
+                                                                   InvalidAlgorithmParameterException,
+                                                                   IllegalBlockSizeException,
+                                                                   BadPaddingException,
+                                                                   SignatureException {
 
-    	final SecretKey cipherKey = Utils.initEnvelopedData(config, certDest);
+    	final SecretKey cipherKey = Utils.initEnvelopedData(config, certDest, keySize);
 
         // 1. VERSION
         // la version se mete en el constructor del signedAndEnvelopedData y es

@@ -272,18 +272,19 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
      * @throws NoSuchPaddingException
      * @throws InvalidKeyException
      */
-    public byte[] createCMSEnvelopedData(final byte[] content,
+    byte[] createCMSEnvelopedData(final byte[] content,
                                          final PrivateKeyEntry ke,
                                          final AOCipherConfig cipherConfig,
-                                         final X509Certificate[] recipientsCerts) throws NoSuchAlgorithmException,
-                                                                                         CertificateEncodingException,
-                                                                                         IOException,
-                                                                                         AOException,
-                                                                                         InvalidKeyException,
-                                                                                         NoSuchPaddingException,
-                                                                                         InvalidAlgorithmParameterException,
-                                                                                         IllegalBlockSizeException,
-                                                                                         BadPaddingException {
+                                         final X509Certificate[] recipientsCerts,
+                                         final Integer keySize) throws NoSuchAlgorithmException,
+                                                                       CertificateEncodingException,
+                                                                       IOException,
+                                                                       AOException,
+                                                                       InvalidKeyException,
+                                                                       NoSuchPaddingException,
+                                                                       InvalidAlgorithmParameterException,
+                                                                       IllegalBlockSizeException,
+                                                                       BadPaddingException {
 
         // Si se establecion un remitente
         if (ke != null) {
@@ -292,12 +293,21 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
                 cipherConfig,
                 recipientsCerts,
                 DATA_TYPE_OID,
-                this.uattrib
+                this.uattrib,
+                keySize
             );
         }
 
         // Si no se establecio remitente
-        return new CMSEnvelopedData().genEnvelopedData(content, this.signatureAlgorithm, cipherConfig, recipientsCerts, DATA_TYPE_OID, this.uattrib);
+        return new CMSEnvelopedData().genEnvelopedData(
+    		content,
+    		this.signatureAlgorithm,
+    		cipherConfig,
+    		recipientsCerts,
+    		DATA_TYPE_OID,
+    		this.uattrib,
+    		keySize
+		);
     }
 
     /** Crea un envoltorio CMS de tipo SignedAndEnvelopedData.
@@ -326,26 +336,31 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
      * @throws NoSuchPaddingException
      * @throws InvalidKeyException
      */
-    public byte[] createCMSSignedAndEnvelopedData(final byte[] content,
+    byte[] createCMSSignedAndEnvelopedData(final byte[] content,
                                                   final PrivateKeyEntry ke,
                                                   final AOCipherConfig cipherConfig,
-                                                  final X509Certificate[] recipientsCerts) throws CertificateEncodingException,
-                                                                                                  NoSuchAlgorithmException,
-                                                                                                  IOException,
-                                                                                                  AOException,
-                                                                                                  InvalidKeyException,
-                                                                                                  NoSuchPaddingException,
-                                                                                                  InvalidAlgorithmParameterException,
-                                                                                                  IllegalBlockSizeException,
-                                                                                                  BadPaddingException,
-                                                                                                  SignatureException {
-        return new CMSSignedAndEnvelopedData().genSignedAndEnvelopedData(AOCMSMultiEnveloper.createContentSignerParementers(content, ke, this.signatureAlgorithm),
-                                                                         cipherConfig,
-                                                                         recipientsCerts,
-                                                                         DATA_TYPE_OID,
-                                                                         ke,
-                                                                         this.attrib,
-                                                                         this.uattrib);
+                                                  final X509Certificate[] recipientsCerts,
+                                                  final Integer keySize) throws CertificateEncodingException,
+                                                                                NoSuchAlgorithmException,
+                                                                                IOException,
+                                                                                AOException,
+                                                                                InvalidKeyException,
+                                                                                NoSuchPaddingException,
+                                                                                InvalidAlgorithmParameterException,
+                                                                                IllegalBlockSizeException,
+                                                                                BadPaddingException,
+                                                                                SignatureException {
+
+        return new CMSSignedAndEnvelopedData().genSignedAndEnvelopedData(
+    		AOCMSMultiEnveloper.createContentSignerParementers(content, ke, this.signatureAlgorithm),
+            cipherConfig,
+            recipientsCerts,
+            DATA_TYPE_OID,
+            ke,
+            this.attrib,
+            this.uattrib,
+            keySize
+        );
     }
 
     /** Crea un envoltorio CMS de tipo AuthenticatedData.
@@ -373,18 +388,19 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
      * @throws InvalidAlgorithmParameterException
      * @throws NoSuchPaddingException
      */
-    byte[] createCMSAuthenticatedData(	final byte[] content,
-    									final PrivateKeyEntry ke,
-    									final AOCipherConfig cipherConfig,
-    									final X509Certificate[] recipientsCerts) throws CertificateEncodingException,
-    																				    NoSuchAlgorithmException,
-    																				    IOException,
-    																				    AOException,
-    																				    InvalidKeyException,
-    																				    NoSuchPaddingException,
-    																				    InvalidAlgorithmParameterException,
-    																				    IllegalBlockSizeException,
-    																				    BadPaddingException {
+    byte[] createCMSAuthenticatedData(final byte[] content,
+    								  final PrivateKeyEntry ke,
+    								  final AOCipherConfig cipherConfig,
+    								  final X509Certificate[] recipientsCerts,
+    								  final Integer keySize) throws CertificateEncodingException,
+    																NoSuchAlgorithmException,
+    																IOException,
+    																AOException,
+    																InvalidKeyException,
+    																NoSuchPaddingException,
+    																InvalidAlgorithmParameterException,
+    																IllegalBlockSizeException,
+    																BadPaddingException {
     	return CMSAuthenticatedData.genAuthenticatedData(
     			AOCMSMultiEnveloper.createContentSignerParementers(content, ke, this.signatureAlgorithm), // ContentSignerParameters
     			null, // Algoritmo de autenticacion (usamos el por defecto)
@@ -393,7 +409,8 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
     			DATA_TYPE_OID, // dataType
     			true, // applySigningTime,
     			this.attrib, // atributos firmados
-    			this.uattrib // atributos no firmados
+    			this.uattrib, // atributos no firmados
+    			keySize
     	);
     }
 
@@ -422,18 +439,19 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
      * @throws InvalidAlgorithmParameterException
      * @throws NoSuchPaddingException
      */
-    public byte[] createCMSAuthenticatedEnvelopedData(final byte[] content,
+    byte[] createCMSAuthenticatedEnvelopedData(final byte[] content,
                                                       final PrivateKeyEntry ke,
                                                       final AOCipherConfig cipherConfig,
-                                                      final X509Certificate[] recipientsCerts) throws CertificateEncodingException,
-                                                                                                      NoSuchAlgorithmException,
-                                                                                                      IOException,
-                                                                                                      AOException,
-                                                                                                      InvalidKeyException,
-                                                                                                      NoSuchPaddingException,
-                                                                                                      InvalidAlgorithmParameterException,
-                                                                                                      IllegalBlockSizeException,
-                                                                                                      BadPaddingException {
+                                                      final X509Certificate[] recipientsCerts,
+                                                      final Integer keySize) throws CertificateEncodingException,
+                                                                                    NoSuchAlgorithmException,
+                                                                                    IOException,
+                                                                                    AOException,
+                                                                                    InvalidKeyException,
+                                                                                    NoSuchPaddingException,
+                                                                                    InvalidAlgorithmParameterException,
+                                                                                    IllegalBlockSizeException,
+                                                                                    BadPaddingException {
 		return CMSAuthenticatedEnvelopedData.genAuthenticatedEnvelopedData(
 			AOCMSMultiEnveloper.createContentSignerParementers(content, ke, this.signatureAlgorithm), // ContentSignerParameters
             null, // Algoritmo de autenticacion (usamos el por defecto)
@@ -442,7 +460,8 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
             DATA_TYPE_OID, // dataType
             true, // applySigningTime,
             this.attrib, // atributos firmados
-            this.uattrib // atributos no firmados
+            this.uattrib, // atributos no firmados
+            keySize
         );
     }
 

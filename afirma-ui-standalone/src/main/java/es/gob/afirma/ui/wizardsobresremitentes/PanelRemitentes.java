@@ -203,7 +203,7 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
                 comboRepositorios.setEnabled(false);
                 this.etiquetaAnadir.setDisplayedMnemonic(0); // Se asigna un atajo vacio puesto que se ha deshabilitado el combo asociado
                 this.etiquetaAnadir.getAccessibleContext().setAccessibleName(this.etiquetaAnadir.getText() + " " //$NON-NLS-1$
-                                                                             + Messages.getString("wizard.sobres.etiquetaAnadir")); //$NON-NLS-1$
+                                                                             + Messages.getString("Wizard.sobres.etiquetaAnadir")); //$NON-NLS-1$
                 this.etiquetaAnadir.setFocusable(true);
                 eliminar.setEnabled(true);
                 eliminar.setMnemonic(KeyEvent.VK_E); // Se asigna un atajo al boton ya que ha sido habilitado
@@ -482,7 +482,7 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
 
         // Combo con los repositorios / almacenes
         final JComboBox comboRepositorios = new JComboBox();
-        comboRepositorios.setToolTipText(Messages.getString("wizard.comboRepositorios.description")); //$NON-NLS-1$
+        comboRepositorios.setToolTipText(Messages.getString("Wizard.comboRepositorios.description")); //$NON-NLS-1$
         comboRepositorios.getAccessibleContext().setAccessibleName(this.etiquetaAnadir.getText() + " " //$NON-NLS-1$
                                                                    + comboRepositorios.getToolTipText()
                                                                    + " ALT + D."); //$NON-NLS-1$
@@ -542,7 +542,7 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
 
         // Etiqueta con el texto "Remitentes"
         final JLabel senderLabel = new JLabel();
-        senderLabel.setText(Messages.getString("wizard.sobres.listaRemitentes")); //$NON-NLS-1$
+        senderLabel.setText(Messages.getString("Wizard.sobres.listaRemitentes")); //$NON-NLS-1$
         Utils.setContrastColor(senderLabel);
         Utils.setFontBold(senderLabel);
         panelCentral.add(senderLabel, c);
@@ -592,7 +592,7 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
         // Boton eliminar
         eliminar.setEnabled(false);
         eliminar.setToolTipText(Messages.getString("Wizard.sobres.eliminar.remitente.description")); //$NON-NLS-1$
-        eliminar.setText(Messages.getString("wizard.sobres.eliminar.remitente")); //$NON-NLS-1$
+        eliminar.setText(Messages.getString("Wizard.sobres.eliminar.remitente")); //$NON-NLS-1$
         eliminar.getAccessibleContext().setAccessibleName(eliminar.getText() + " " + eliminar.getToolTipText()); //$NON-NLS-1$
         eliminar.getAccessibleContext().setAccessibleDescription(eliminar.getToolTipText());
         eliminar.addActionListener(new ActionListener() {
@@ -602,7 +602,7 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
                 eliminarActionPerformed(comboRepositorios, eliminar, anadir);
             }
         });
-        eliminar.getAccessibleContext().setAccessibleDescription(Messages.getString("wizard.sobres.eliminar.remitente")); //$NON-NLS-1$
+        eliminar.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.sobres.eliminar.remitente")); //$NON-NLS-1$
         Utils.remarcar(eliminar);
         Utils.setContrastColor(eliminar);
         Utils.setFontBold(eliminar);

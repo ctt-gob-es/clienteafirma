@@ -264,6 +264,7 @@ public class AOCMSEnveloper implements AOEnveloper {
      *        Configuraci&oacute;n para el cifrado de datos.
      * @param recipientsCerts
      *        Destinatarios del sobre electr&oacute;nico.
+     * @param keySize Tama&ntilde;o de la clave AES de cifrado
      * @return Envoltorio EnvelopedData.
      * @throws NoSuchAlgorithmException
      *         Cuando el algoritmo de cifrado indicado no est&aacute;
@@ -283,15 +284,16 @@ public class AOCMSEnveloper implements AOEnveloper {
     public byte[] createCMSEnvelopedData(final byte[] content,
                                          final PrivateKeyEntry ke,
                                          final AOCipherConfig cipherConfig,
-                                         final X509Certificate[] recipientsCerts) throws NoSuchAlgorithmException,
-                                                                                         CertificateEncodingException,
-                                                                                         IOException,
-                                                                                         AOException,
-                                                                                         InvalidKeyException,
-                                                                                         NoSuchPaddingException,
-                                                                                         InvalidAlgorithmParameterException,
-                                                                                         IllegalBlockSizeException,
-                                                                                         BadPaddingException {
+                                         final X509Certificate[] recipientsCerts,
+                                         final Integer keySize) throws NoSuchAlgorithmException,
+                                                                       CertificateEncodingException,
+                                                                       IOException,
+                                                                       AOException,
+                                                                       InvalidKeyException,
+                                                                       NoSuchPaddingException,
+                                                                       InvalidAlgorithmParameterException,
+                                                                       IllegalBlockSizeException,
+                                                                       BadPaddingException {
 
         // Si se establecion un remitente
         if (ke != null) {
@@ -300,12 +302,21 @@ public class AOCMSEnveloper implements AOEnveloper {
                     cipherConfig,
                     recipientsCerts,
                     DATA_TYPE_OID,
-                    this.uattrib
+                    this.uattrib,
+                    keySize
             );
         }
 
         // Si no se establecio remitente
-        return new CMSEnvelopedData().genEnvelopedData(content, this.signatureAlgorithm, cipherConfig, recipientsCerts, DATA_TYPE_OID, this.uattrib);
+        return new CMSEnvelopedData().genEnvelopedData(
+    		content,
+    		this.signatureAlgorithm,
+    		cipherConfig,
+    		recipientsCerts,
+    		DATA_TYPE_OID,
+    		this.uattrib,
+    		keySize
+		);
     }
 
     /** Crea un envoltorio CMS de tipo SignedAndEnvelopedData.
@@ -317,6 +328,7 @@ public class AOCMSEnveloper implements AOEnveloper {
      *        Configuraci&oacute;n para el cifrado de datos.
      * @param recipientsCerts
      *        Destinatarios del sobre electr&oacute;nico.
+     * @param keySize Tama&ntilde;o de la clave AES de cifrado
      * @return Envoltorio SignedAndEnvelopedData.
      * @throws NoSuchAlgorithmException
      *         Cuando el algoritmo de cifrado indicado no est&aacute;
@@ -337,16 +349,17 @@ public class AOCMSEnveloper implements AOEnveloper {
     public byte[] createCMSSignedAndEnvelopedData(final byte[] content,
                                                   final PrivateKeyEntry ke,
                                                   final AOCipherConfig cipherConfig,
-                                                  final X509Certificate[] recipientsCerts) throws CertificateEncodingException,
-                                                                                                  NoSuchAlgorithmException,
-                                                                                                  IOException,
-                                                                                                  AOException,
-                                                                                                  InvalidKeyException,
-                                                                                                  NoSuchPaddingException,
-                                                                                                  InvalidAlgorithmParameterException,
-                                                                                                  IllegalBlockSizeException,
-                                                                                                  BadPaddingException,
-                                                                                                  SignatureException {
+                                                  final X509Certificate[] recipientsCerts,
+                                                  final Integer keySize) throws CertificateEncodingException,
+                                                                                NoSuchAlgorithmException,
+                                                                                IOException,
+                                                                                AOException,
+                                                                                InvalidKeyException,
+                                                                                NoSuchPaddingException,
+                                                                                InvalidAlgorithmParameterException,
+                                                                                IllegalBlockSizeException,
+                                                                                BadPaddingException,
+                                                                                SignatureException {
         return new CMSSignedAndEnvelopedData().genSignedAndEnvelopedData(
         	 AOCMSEnveloper.createContentSignerParementers(content, ke, this.signatureAlgorithm),
              cipherConfig,
@@ -354,7 +367,8 @@ public class AOCMSEnveloper implements AOEnveloper {
              DATA_TYPE_OID,
              ke,
              this.attrib,
-             this.uattrib
+             this.uattrib,
+             keySize
         );
     }
 
@@ -386,15 +400,16 @@ public class AOCMSEnveloper implements AOEnveloper {
     byte[] createCMSAuthenticatedData(final byte[] content,
     		                          final PrivateKeyEntry ke,
     		                          final AOCipherConfig cipherConfig,
-    		                          final X509Certificate[] recipientsCerts) throws CertificateEncodingException,
-                                                                                      NoSuchAlgorithmException,
-                                                                                      IOException,
-                                                                                      AOException,
-                                                                                      InvalidKeyException,
-                                                                                      NoSuchPaddingException,
-                                                                                      InvalidAlgorithmParameterException,
-                                                                                      IllegalBlockSizeException,
-                                                                                      BadPaddingException {
+    		                          final X509Certificate[] recipientsCerts,
+    		                          final Integer keySize) throws CertificateEncodingException,
+                                                                    NoSuchAlgorithmException,
+                                                                    IOException,
+                                                                    AOException,
+                                                                    InvalidKeyException,
+                                                                    NoSuchPaddingException,
+                                                                    InvalidAlgorithmParameterException,
+                                                                    IllegalBlockSizeException,
+                                                                    BadPaddingException {
 		return CMSAuthenticatedData.genAuthenticatedData(
         		AOCMSEnveloper.createContentSignerParementers(content, ke, this.signatureAlgorithm), // ContentSignerParameters
                 null, // Algoritmo de autenticacion (usamos el por defecto)
@@ -403,7 +418,8 @@ public class AOCMSEnveloper implements AOEnveloper {
                 DATA_TYPE_OID, // dataType
                 true, // applySigningTime,
                 this.attrib, // atributos firmados
-                this.uattrib // atributos no firmados
+                this.uattrib, // atributos no firmados
+                keySize // Tamano de la clave AES
         );
     }
 
@@ -416,6 +432,7 @@ public class AOCMSEnveloper implements AOEnveloper {
      *        Configuraci&oacute;n para el cifrado de datos.
      * @param recipientsCerts
      *        Destinatarios del sobre electr&oacute;nico.
+     * @param keySize Tama&ntilde;o de la clave AES de cifrado
      * @return Envoltorio AuthenticatedEnvelopedData.
      * @throws NoSuchAlgorithmException
      *         Cuando el algoritmo de cifrado indicado no est&aacute;
@@ -435,24 +452,26 @@ public class AOCMSEnveloper implements AOEnveloper {
     public byte[] createCMSAuthenticatedEnvelopedData(final byte[] content,
                                                       final PrivateKeyEntry ke,
                                                       final AOCipherConfig cipherConfig,
-                                                      final X509Certificate[] recipientsCerts) throws CertificateEncodingException,
-                                                                                                      NoSuchAlgorithmException,
-                                                                                                      IOException,
-                                                                                                      AOException,
-                                                                                                      InvalidKeyException,
-                                                                                                      NoSuchPaddingException,
-                                                                                                      InvalidAlgorithmParameterException,
-                                                                                                      IllegalBlockSizeException,
-                                                                                                      BadPaddingException {
+                                                      final X509Certificate[] recipientsCerts,
+                                                      final Integer keySize) throws CertificateEncodingException,
+                                                                                    NoSuchAlgorithmException,
+                                                                                    IOException,
+                                                                                    AOException,
+                                                                                    InvalidKeyException,
+                                                                                    NoSuchPaddingException,
+                                                                                    InvalidAlgorithmParameterException,
+                                                                                    IllegalBlockSizeException,
+                                                                                    BadPaddingException {
 		return CMSAuthenticatedEnvelopedData.genAuthenticatedEnvelopedData(
 				AOCMSEnveloper.createContentSignerParementers(content, ke, this.signatureAlgorithm), // ContentSignerParameters
-                null, // Algoritmo de autenticacion (usamos el por defecto)
-                cipherConfig, // Configuracion del cipher
+                null,            // Algoritmo de autenticacion (usamos el por defecto)
+                cipherConfig,    // Configuracion del cipher
                 recipientsCerts, // certificados destino
-                DATA_TYPE_OID, // dataType
-                true, // applySigningTime,
-                this.attrib, // atributos firmados
-                this.uattrib // atributos no firmados
+                DATA_TYPE_OID,   // dataType
+                true,            // applySigningTime,
+                this.attrib,     // atributos firmados
+                this.uattrib,     // atributos no firmados
+                keySize
         );
     }
 

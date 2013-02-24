@@ -99,15 +99,16 @@ public final class CMSEnvelopedData {
                                    final AOCipherConfig config,
                                    final X509Certificate[] certDest,
                                    final String dataType,
-                                   final Map<String, byte[]> uatrib) throws IOException,
-                                                                            CertificateEncodingException,
-                                                                            NoSuchAlgorithmException,
-                                                                            InvalidKeyException,
-                                                                            NoSuchPaddingException,
-                                                                            InvalidAlgorithmParameterException,
-                                                                            IllegalBlockSizeException,
-                                                                            BadPaddingException {
-        this.cipherKey = Utils.initEnvelopedData(config, certDest);
+                                   final Map<String, byte[]> uatrib,
+                                   final Integer keySize) throws IOException,
+                                                                 CertificateEncodingException,
+                                                                 NoSuchAlgorithmException,
+                                                                 InvalidKeyException,
+                                                                 NoSuchPaddingException,
+                                                                 InvalidAlgorithmParameterException,
+                                                                 IllegalBlockSizeException,
+                                                                 BadPaddingException {
+        this.cipherKey = Utils.initEnvelopedData(config, certDest, keySize);
 
         // Ya que el contenido puede ser grande, lo recuperamos solo una vez
         final byte[] content2 = parameters.getContent();
@@ -167,17 +168,18 @@ public final class CMSEnvelopedData {
                                    final AOCipherConfig config,
                                    final X509Certificate[] certDest,
                                    final String dataType,
-                                   final Map<String, byte[]> uatrib) throws IOException,
-                                                                            CertificateEncodingException,
-                                                                            NoSuchAlgorithmException,
-                                                                            InvalidKeyException,
-                                                                            NoSuchPaddingException,
-                                                                            InvalidAlgorithmParameterException,
-                                                                            IllegalBlockSizeException,
-                                                                            BadPaddingException {
+                                   final Map<String, byte[]> uatrib,
+                                   final Integer keySize) throws IOException,
+                                                                 CertificateEncodingException,
+                                                                 NoSuchAlgorithmException,
+                                                                 InvalidKeyException,
+                                                                 NoSuchPaddingException,
+                                                                 InvalidAlgorithmParameterException,
+                                                                 IllegalBlockSizeException,
+                                                                 BadPaddingException {
 
         // Comprobamos que el archivo a tratar no sea nulo.
-        this.cipherKey = Utils.initEnvelopedData(config, certDest);
+        this.cipherKey = Utils.initEnvelopedData(config, certDest, keySize);
 
         // Datos previos utiles
         final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(digestAlg);

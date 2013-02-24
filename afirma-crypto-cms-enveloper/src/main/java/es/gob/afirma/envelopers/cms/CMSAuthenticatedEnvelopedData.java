@@ -125,22 +125,23 @@ public final class CMSAuthenticatedEnvelopedData {
      * @throws InvalidAlgorithmParameterException
      * @throws NoSuchPaddingException
      */
-    public static byte[] genAuthenticatedEnvelopedData(final P7ContentSignerParameters parameters,
-                                                	   final String autenticationAlgorithm,
-                                                	   final AOCipherConfig config,
-                                                	   final X509Certificate[] certDest,
-                                                	   final String dataType,
-                                                	   final boolean applySigningTime,
-                                                	   final Map<String, byte[]> atrib,
-                                                	   final Map<String, byte[]> uatrib) throws IOException,
-                                                                                                CertificateEncodingException,
-                                                                                                NoSuchAlgorithmException,
-                                                                                                InvalidKeyException,
-                                                                                                NoSuchPaddingException,
-                                                                                                InvalidAlgorithmParameterException,
-                                                                                                IllegalBlockSizeException,
-                                                                                                BadPaddingException {
-        final SecretKey cipherKey = Utils.initEnvelopedData(config, certDest);
+    static byte[] genAuthenticatedEnvelopedData(final P7ContentSignerParameters parameters,
+	                                        	   final String autenticationAlgorithm,
+	                                        	   final AOCipherConfig config,
+	                                        	   final X509Certificate[] certDest,
+	                                        	   final String dataType,
+	                                        	   final boolean applySigningTime,
+	                                        	   final Map<String, byte[]> atrib,
+	                                        	   final Map<String, byte[]> uatrib,
+	                                        	   final Integer keySize) throws IOException,
+	                                                                             CertificateEncodingException,
+	                                                                             NoSuchAlgorithmException,
+	                                                                             InvalidKeyException,
+	                                                                             NoSuchPaddingException,
+	                                                                             InvalidAlgorithmParameterException,
+	                                                                             IllegalBlockSizeException,
+	                                                                             BadPaddingException {
+        final SecretKey cipherKey = Utils.initEnvelopedData(config, certDest, keySize);
 
         // Ya que el contenido puede ser grande, lo recuperamos solo una vez
         final byte[] content2 = parameters.getContent();
@@ -172,13 +173,16 @@ public final class CMSAuthenticatedEnvelopedData {
         final ASN1Set unAuthAttr = Utils.generateUnsignedAtt(uatrib);
 
         // construimos el Authenticated data y lo devolvemos
-        return new ContentInfo(PKCSObjectIdentifiers.id_ct_authEnvelopedData, new AuthEnvelopedData(origInfo, // originatorInfo,
-                                                                                                    new DERSet(infos.getRecipientInfos()), // recipientInfos,
-                                                                                                    infos.getEncInfo(), // authEncryptedContentInfo,
-                                                                                                    authAttr, // authAttrs
-                                                                                                    new DEROctetString(mac), // mac
-                                                                                                    unAuthAttr // unauthAttrs
-                               )).getEncoded(ASN1Encoding.DER);
+        return new ContentInfo(
+    		PKCSObjectIdentifiers.id_ct_authEnvelopedData,
+    		new AuthEnvelopedData(origInfo, // originatorInfo,
+            new DERSet(infos.getRecipientInfos()), // recipientInfos,
+            infos.getEncInfo(), // authEncryptedContentInfo,
+            authAttr, // authAttrs
+            new DEROctetString(mac), // MAC
+            unAuthAttr // unauthAttrs
+            )
+		).getEncoded(ASN1Encoding.DER);
 
     }
 

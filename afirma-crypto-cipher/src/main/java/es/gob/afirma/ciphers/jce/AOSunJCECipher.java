@@ -32,6 +32,9 @@ import es.gob.afirma.core.ciphers.CipherConstants.AOCipherAlgorithm;
 import es.gob.afirma.core.ciphers.CipherConstants.AOCipherBlockMode;
 import es.gob.afirma.core.ciphers.CipherConstants.AOCipherPadding;
 
+
+
+
 /** Cifrador seg&uacute;n las capacidades del proveedor JCE (<i>Java Cryptography
  * Extension</i>). */
 public final class AOSunJCECipher implements AOCipher {
@@ -40,7 +43,7 @@ public final class AOSunJCECipher implements AOCipher {
     private static final String PROVIDER = "SunJCE"; //$NON-NLS-1$
 
     private static final byte[] SALT = {
-            (byte) 0xA2, (byte) 0x35, (byte) 0xDC, (byte) 0xA4, (byte) 0x11, (byte) 0x7C, (byte) 0x99, (byte) 0x4B
+        (byte) 0xA2, (byte) 0x35, (byte) 0xDC, (byte) 0xA4, (byte) 0x11, (byte) 0x7C, (byte) 0x99, (byte) 0x4B
     };
 
     private static final int ITERATION_COUNT = 9;
@@ -48,86 +51,72 @@ public final class AOSunJCECipher implements AOCipher {
     /** Vector de inicializacion de 8 bytes. Un vector de inicializaci&oacute;n
      * de 8 bytes es necesario para el uso de los algoritmos DES y DESede. */
     private static final byte[] IV_8 = {
-            (byte) 0xC6, (byte) 0xBA, (byte) 0xDE, (byte) 0xA4, (byte) 0x76, (byte) 0x43, (byte) 0x32, (byte) 0x6B
+        (byte) 0xC6, (byte) 0xBA, (byte) 0xDE, (byte) 0xA4, (byte) 0x76, (byte) 0x43, (byte) 0x32, (byte) 0x6B
     };
 
     /** Vector de inicializacion de 16 bytes. Un vector de inicializaci&oacute;n
      * de 16 bytes es necesario para el uso de los algoritmos DES y DESede. */
     private static final byte[] IV_16 = {
-            (byte) 0xB2,
-            (byte) 0xBA,
-            (byte) 0xDE,
-            (byte) 0xA4,
-            (byte) 0x41,
-            (byte) 0x7F,
-            (byte) 0x97,
-            (byte) 0x4B,
-            (byte) 0xAC,
-            (byte) 0x63,
-            (byte) 0xAC,
-            (byte) 0xAA,
-            (byte) 0x76,
-            (byte) 0x73,
-            (byte) 0x12,
-            (byte) 0x6B
+        (byte) 0xB2, (byte) 0xBA, (byte) 0xDE, (byte) 0xA4, (byte) 0x41, (byte) 0x7F, (byte) 0x97, (byte) 0x4B,
+        (byte) 0xAC, (byte) 0x63, (byte) 0xAC, (byte) 0xAA, (byte) 0x76, (byte) 0x73, (byte) 0x12, (byte) 0x6B
     };
 
     /** Configuraciones de cifrado soportadas. */
     private static final AOCipherConfig[] SUPPORTED_CONFIGS = new AOCipherConfig[] {
-            new AOCipherConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.ECB, AOCipherPadding.PKCS5PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.ECB, AOCipherPadding.ISO10126PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.CBC, AOCipherPadding.PKCS5PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.CBC, AOCipherPadding.ISO10126PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.PCBC, AOCipherPadding.PKCS5PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.PCBC, AOCipherPadding.ISO10126PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.CTR, AOCipherPadding.NOPADDING),
-            new AOCipherConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.CTR, AOCipherPadding.PKCS5PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.CFB, AOCipherPadding.PKCS5PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.CFB, AOCipherPadding.ISO10126PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.OFB, AOCipherPadding.PKCS5PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.OFB, AOCipherPadding.ISO10126PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.ARCFOUR, AOCipherBlockMode.ECB, AOCipherPadding.NOPADDING),
-            new AOCipherConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.ECB, AOCipherPadding.PKCS5PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.ECB, AOCipherPadding.ISO10126PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.CBC, AOCipherPadding.PKCS5PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.CBC, AOCipherPadding.ISO10126PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.PCBC, AOCipherPadding.PKCS5PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.PCBC, AOCipherPadding.ISO10126PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.CTR, AOCipherPadding.NOPADDING),
-            new AOCipherConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.CTR, AOCipherPadding.PKCS5PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.CFB, AOCipherPadding.PKCS5PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.CFB, AOCipherPadding.ISO10126PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.OFB, AOCipherPadding.PKCS5PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.OFB, AOCipherPadding.ISO10126PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.ECB, AOCipherPadding.PKCS5PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.ECB, AOCipherPadding.ISO10126PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.CBC, AOCipherPadding.PKCS5PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.CBC, AOCipherPadding.ISO10126PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.PCBC, AOCipherPadding.PKCS5PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.PCBC, AOCipherPadding.ISO10126PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.CTR, AOCipherPadding.NOPADDING),
-            new AOCipherConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.CTR, AOCipherPadding.PKCS5PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.CFB, AOCipherPadding.PKCS5PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.CFB, AOCipherPadding.ISO10126PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.OFB, AOCipherPadding.PKCS5PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.OFB, AOCipherPadding.ISO10126PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.ECB, AOCipherPadding.PKCS5PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.ECB, AOCipherPadding.ISO10126PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.CBC, AOCipherPadding.PKCS5PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.CBC, AOCipherPadding.ISO10126PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.PCBC, AOCipherPadding.PKCS5PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.PCBC, AOCipherPadding.ISO10126PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.CTR, AOCipherPadding.NOPADDING),
-            new AOCipherConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.CTR, AOCipherPadding.PKCS5PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.CFB, AOCipherPadding.PKCS5PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.CFB, AOCipherPadding.ISO10126PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.OFB, AOCipherPadding.PKCS5PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.OFB, AOCipherPadding.ISO10126PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.RC2, AOCipherBlockMode.ECB, AOCipherPadding.PKCS5PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.RC2, AOCipherBlockMode.ECB, AOCipherPadding.ISO10126PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.PBEWITHSHA1ANDDESEDE, AOCipherBlockMode.CBC, AOCipherPadding.PKCS5PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.PBEWITHSHA1ANDRC2_40, AOCipherBlockMode.CBC, AOCipherPadding.PKCS5PADDING),
-            new AOCipherConfig(AOCipherAlgorithm.PBEWITHMD5ANDDES, AOCipherBlockMode.CBC, AOCipherPadding.PKCS5PADDING)
+        new AOCipherConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.ECB, AOCipherPadding.PKCS5PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.ECB, AOCipherPadding.ISO10126PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.CBC, AOCipherPadding.PKCS5PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.CBC, AOCipherPadding.ISO10126PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.PCBC, AOCipherPadding.PKCS5PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.PCBC, AOCipherPadding.ISO10126PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.CTR, AOCipherPadding.NOPADDING),
+        new AOCipherConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.CTR, AOCipherPadding.PKCS5PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.CFB, AOCipherPadding.PKCS5PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.CFB, AOCipherPadding.ISO10126PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.OFB, AOCipherPadding.PKCS5PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.OFB, AOCipherPadding.ISO10126PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.ARCFOUR, AOCipherBlockMode.ECB, AOCipherPadding.NOPADDING),
+        new AOCipherConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.ECB, AOCipherPadding.PKCS5PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.ECB, AOCipherPadding.ISO10126PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.CBC, AOCipherPadding.PKCS5PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.CBC, AOCipherPadding.ISO10126PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.PCBC, AOCipherPadding.PKCS5PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.PCBC, AOCipherPadding.ISO10126PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.CTR, AOCipherPadding.NOPADDING),
+        new AOCipherConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.CTR, AOCipherPadding.PKCS5PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.CFB, AOCipherPadding.PKCS5PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.CFB, AOCipherPadding.ISO10126PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.OFB, AOCipherPadding.PKCS5PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.OFB, AOCipherPadding.ISO10126PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.ECB, AOCipherPadding.PKCS5PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.ECB, AOCipherPadding.ISO10126PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.CBC, AOCipherPadding.PKCS5PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.CBC, AOCipherPadding.ISO10126PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.PCBC, AOCipherPadding.PKCS5PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.PCBC, AOCipherPadding.ISO10126PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.CTR, AOCipherPadding.NOPADDING),
+        new AOCipherConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.CTR, AOCipherPadding.PKCS5PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.CFB, AOCipherPadding.PKCS5PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.CFB, AOCipherPadding.ISO10126PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.OFB, AOCipherPadding.PKCS5PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.OFB, AOCipherPadding.ISO10126PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.ECB, AOCipherPadding.PKCS5PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.ECB, AOCipherPadding.ISO10126PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.CBC, AOCipherPadding.PKCS5PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.CBC, AOCipherPadding.ISO10126PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.PCBC, AOCipherPadding.PKCS5PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.PCBC, AOCipherPadding.ISO10126PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.CTR, AOCipherPadding.NOPADDING),
+        new AOCipherConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.CTR, AOCipherPadding.PKCS5PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.CFB, AOCipherPadding.PKCS5PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.CFB, AOCipherPadding.ISO10126PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.OFB, AOCipherPadding.PKCS5PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.OFB, AOCipherPadding.ISO10126PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.RC2, AOCipherBlockMode.ECB, AOCipherPadding.PKCS5PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.RC2, AOCipherBlockMode.ECB, AOCipherPadding.ISO10126PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.PBEWITHSHA1ANDDESEDE, AOCipherBlockMode.CBC, AOCipherPadding.PKCS5PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.PBEWITHSHA1ANDRC2_40, AOCipherBlockMode.CBC, AOCipherPadding.PKCS5PADDING),
+        new AOCipherConfig(AOCipherAlgorithm.PBEWITHMD5ANDDES, AOCipherBlockMode.CBC, AOCipherPadding.PKCS5PADDING)
     };
 
     /** {@inheritDoc} */
