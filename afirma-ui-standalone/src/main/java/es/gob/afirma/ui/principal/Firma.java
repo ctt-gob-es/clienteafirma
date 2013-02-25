@@ -226,17 +226,20 @@ final class Firma extends JPanel {
                 CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, msg,
                 								Messages.getString("error"), //$NON-NLS-1$
                 								JOptionPane.ERROR_MESSAGE);
+
+                setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+
                 return;
             }
             catch (final Exception e) {
                 CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Firma.msg.error.almacen"), //$NON-NLS-1$
                                                Messages.getString("error"), //$NON-NLS-1$
                                                JOptionPane.ERROR_MESSAGE);
+
+                setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+
                 return;
             }
-            finally {
-            	setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-			}
 
 
             // Recuperamos la clave del certificado
@@ -257,7 +260,6 @@ final class Firma extends JPanel {
             	if (selectedcert == null) {
             		throw new AOCancelledOperationException("Operacion de firma cancelada por el usuario"); //$NON-NLS-1$
             	}
-
             	privateKeyEntry = keyStoreManager.getKeyEntry(selectedcert, KeyStoreUtilities.getCertificatePC(store, SwingUtilities.getRoot(this)));
             }
             catch (final java.security.ProviderException e) {
@@ -266,11 +268,14 @@ final class Firma extends JPanel {
             		CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
                             true,
                             Messages.getString("Firma.msg.error.dnie.AuthenticationModeLockedException"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+
+            		setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             		return;
             	}
                 CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
                                                true,
                                                Messages.getString("Firma.msg.error.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+                setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                 return;
             }
             catch (final java.security.UnrecoverableEntryException e) {
@@ -278,12 +283,14 @@ final class Firma extends JPanel {
                 CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
                                                true,
                                                Messages.getString("Firma.msg.error.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+                setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                 return;
             }
             catch (final AOCancelledOperationException e) {
                 // Si se ha cancelado la operacion lo informamos en el nivel superior para que se trate.
                 // Este relanzamiento se realiza para evitar la siguiente captura generica de excepciones
                 // que las relanza en forma de AOException
+            	setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                 throw e;
             }
             catch (final Exception e) {
@@ -332,12 +339,14 @@ final class Firma extends JPanel {
                 CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Firma.msg.error.fichero.noencontrado"), //$NON-NLS-1$
                                                Messages.getString("error"), //$NON-NLS-1$
                                                JOptionPane.ERROR_MESSAGE);
+                setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                 return;
             }
             catch(final IOException e) {
                 CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Firma.msg.error.fichero.leer"), //$NON-NLS-1$
                                                Messages.getString("error"), //$NON-NLS-1$
                                                JOptionPane.ERROR_MESSAGE);
+                setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                 return;
             }
             catch(final OutOfMemoryError e) {
@@ -346,10 +355,8 @@ final class Firma extends JPanel {
                     Messages.getString("error"), //$NON-NLS-1$
                     JOptionPane.ERROR_MESSAGE
                 );
+            	setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             	return;
-            }
-            finally {
-                setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             }
 
             // Se introduce la logica necesaria para que no se pueda firmar en formato XAdES o XMLdSign
@@ -358,6 +365,7 @@ final class Firma extends JPanel {
         		CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
         				true, Messages.getString("Firma.dialog.msg"), //$NON-NLS-1$
         				Messages.getString("Firma.dialog.title"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$
+        		setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         		return;
         	}
 
@@ -396,6 +404,7 @@ final class Firma extends JPanel {
     				Messages.getString("error"),  //$NON-NLS-1$
     				JOptionPane.ERROR_MESSAGE
     			);
+        		setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         		return;
             }
             catch(final EFacturaAlreadySignedException e) {
@@ -407,6 +416,7 @@ final class Firma extends JPanel {
                     Messages.getString("error"),  //$NON-NLS-1$
                     JOptionPane.ERROR_MESSAGE
                 );
+                setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                 return;
             }
             catch(final InvalidPdfException e) {
@@ -418,6 +428,7 @@ final class Firma extends JPanel {
     				Messages.getString("error"),  //$NON-NLS-1$
     				JOptionPane.ERROR_MESSAGE
     			);
+        		setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         		return;
             }
             catch(final InvalidXMLException e) {
@@ -429,6 +440,7 @@ final class Firma extends JPanel {
     				Messages.getString("error"),  //$NON-NLS-1$
     				JOptionPane.ERROR_MESSAGE
     			);
+        		setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         		return;
             }
             catch(final AOFormatFileException e) {
@@ -440,6 +452,7 @@ final class Firma extends JPanel {
                     Messages.getString("error"),  //$NON-NLS-1$
                     JOptionPane.ERROR_MESSAGE
                 );
+                setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                 return;
             }
             catch(final BadPdfPasswordException e) {
@@ -450,6 +463,7 @@ final class Firma extends JPanel {
                     Messages.getString("error"), //$NON-NLS-1$
                     JOptionPane.ERROR_MESSAGE
                 );
+            	setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             	return;
             }
             catch (final AOException e) {
@@ -457,6 +471,7 @@ final class Firma extends JPanel {
                 CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
                                                true,
                                                Messages.getString("Firma.msg.error.generar.firma"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+                setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                 return;
             }
             catch (final Exception e) {
@@ -468,6 +483,7 @@ final class Firma extends JPanel {
                     Messages.getString("error"), //$NON-NLS-1$
                     JOptionPane.ERROR_MESSAGE
                 );
+                setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                 return;
             }
             catch(final OutOfMemoryError e) {
@@ -479,14 +495,18 @@ final class Firma extends JPanel {
                     Messages.getString("error"), //$NON-NLS-1$
                     JOptionPane.ERROR_MESSAGE
                 );
+                setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                 return;
             }
 
 
             // Si el proceso de firma devuelve una firma nula o vacia, lanzamos una excepcion
             if (signedData == null || signedData.length == 0) {
+            	setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                 throw new AOException("La firma generada esta vacia"); //$NON-NLS-1$
             }
+
+            setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 
             // Guardamos la firma en fichero
             final File savedFile =
