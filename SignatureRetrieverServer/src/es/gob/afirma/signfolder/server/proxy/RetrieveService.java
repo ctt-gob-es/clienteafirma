@@ -49,36 +49,35 @@ public final class RetrieveService extends HttpServlet {
 		response.setContentType("text/plain"); //$NON-NLS-1$
 		response.setCharacterEncoding("utf-8"); //$NON-NLS-1$
 
-		try (final PrintWriter out = response.getWriter()) {
-			if (operation == null) {
-				LOGGER.warning(ErrorManager.genError(ErrorManager.ERROR_MISSING_OPERATION_NAME, null));
-				out.println(ErrorManager.genError(ErrorManager.ERROR_MISSING_OPERATION_NAME, null));
-				return;
-			}
-			if (syntaxVersion == null) {
-				LOGGER.warning(ErrorManager.genError(ErrorManager.ERROR_MISSING_SYNTAX_VERSION, null));
-				out.println(ErrorManager.genError(ErrorManager.ERROR_MISSING_SYNTAX_VERSION, null));
-				return;
-			}
-			final RetrieveConfig config;
-			try {
-				config = new RetrieveConfig(this.getServletContext());
-				config.load(CONFIG_FILE);
-			} catch (final IOException e) {
-				LOGGER.severe(ErrorManager.genError(ErrorManager.ERROR_CONFIGURATION_FILE_PROBLEM, null));
-				out.println(ErrorManager.genError(ErrorManager.ERROR_CONFIGURATION_FILE_PROBLEM, null));
-				return;
-			}
-
-			switch(operation) {
-			case OPERATION_RETRIEVE:
-				retrieveSign(out, request, config);
-				return;
-			default:
-				LOGGER.warning(ErrorManager.genError(ErrorManager.ERROR_UNSUPPORTED_OPERATION_NAME, null));
-				out.println(ErrorManager.genError(ErrorManager.ERROR_UNSUPPORTED_OPERATION_NAME, null));
-			}
+		final PrintWriter out = response.getWriter();
+		if (operation == null) {
+			LOGGER.warning(ErrorManager.genError(ErrorManager.ERROR_MISSING_OPERATION_NAME, null));
+			out.println(ErrorManager.genError(ErrorManager.ERROR_MISSING_OPERATION_NAME, null));
+			return;
 		}
+		if (syntaxVersion == null) {
+			LOGGER.warning(ErrorManager.genError(ErrorManager.ERROR_MISSING_SYNTAX_VERSION, null));
+			out.println(ErrorManager.genError(ErrorManager.ERROR_MISSING_SYNTAX_VERSION, null));
+			return;
+		}
+		final RetrieveConfig config;
+		try {
+			config = new RetrieveConfig(this.getServletContext());
+			config.load(CONFIG_FILE);
+		} catch (final IOException e) {
+			LOGGER.severe(ErrorManager.genError(ErrorManager.ERROR_CONFIGURATION_FILE_PROBLEM, null));
+			out.println(ErrorManager.genError(ErrorManager.ERROR_CONFIGURATION_FILE_PROBLEM, null));
+			return;
+		}
+
+		if (OPERATION_RETRIEVE.equalsIgnoreCase(operation)) {
+			retrieveSign(out, request, config);
+		} else {
+			LOGGER.warning(ErrorManager.genError(ErrorManager.ERROR_UNSUPPORTED_OPERATION_NAME, null));
+			out.println(ErrorManager.genError(ErrorManager.ERROR_UNSUPPORTED_OPERATION_NAME, null));
+		}
+
+		out.close();
 	}
 
 	/**
@@ -121,8 +120,10 @@ public final class RetrieveService extends HttpServlet {
 			}
 		}
 		else {
-			try (final InputStream fis = new FileInputStream(inFile)) {
+			try {
+				final InputStream fis = new FileInputStream(inFile);
 				out.println(new String(getDataFromInputStream(fis)));
+				fis.close();
 				LOGGER.info("Se recupera el fichero: " + inFile.getName()); //$NON-NLS-1$
 			}
 			catch (final IOException e) {
@@ -130,6 +131,7 @@ public final class RetrieveService extends HttpServlet {
 				out.println(ErrorManager.genError(ErrorManager.ERROR_INVALID_DATA, null));
 				return;
 			}
+
 			inFile.delete();
 		}
 
