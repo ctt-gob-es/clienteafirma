@@ -10,6 +10,7 @@
 package es.gob.afirma.ui.principal;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -105,6 +106,9 @@ final class Desensobrado extends JPanel {
      * @param campoFichero Campo con el nombre del fichero a extraer
      * @param checkIniciar Checkbox que indica si los datos se deben de iniciar */
     void extraerActionPerformed(final JComboBox comboAlmacen, final JTextField campoFichero, final JCheckBox checkIniciar) {
+
+    	setCursor(new Cursor(Cursor.WAIT_CURSOR));
+
         // Obtenemos la ruta del sobre
         final String envelopPath = campoFichero.getText();
         if (envelopPath == null || envelopPath.equals("") || !new File(envelopPath).exists() || !new File(envelopPath).isFile()) { //$NON-NLS-1$
@@ -128,7 +132,8 @@ final class Desensobrado extends JPanel {
                 CustomDialog.showMessageDialog(
                 		SwingUtilities.getRoot(this),
                         true,
-                        Messages.getString("Desensobrado.msg.error.fichero2"), "Error", JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
+                        Messages.getString("Desensobrado.msg.error.fichero2"), "Error", JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+                setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                 return;
             }
             catch(final OutOfMemoryError e) {
@@ -137,6 +142,7 @@ final class Desensobrado extends JPanel {
                     Messages.getString("error"), //$NON-NLS-1$
                     JOptionPane.ERROR_MESSAGE
                 );
+            	setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             	return;
             }
 
@@ -148,6 +154,7 @@ final class Desensobrado extends JPanel {
             }
             catch (final AOCancelledOperationException e) {
                 LOGGER.info("Operacion cancelada por el usuario"); //$NON-NLS-1$
+                setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                 return;
             }
             catch (final UnrecoverableEntryException e) {
@@ -155,6 +162,7 @@ final class Desensobrado extends JPanel {
                 CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
                                                true,
                                                Messages.getString("Desensobrado.msg.error.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+                setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                 return;
             }
             catch (final AOException e) {
@@ -162,6 +170,7 @@ final class Desensobrado extends JPanel {
                 CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
                                                true,
                                                Messages.getString("Desensobrado.msg.error.almacen"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+                setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                 return;
             }
             catch (final Exception e) {
@@ -169,6 +178,7 @@ final class Desensobrado extends JPanel {
                 CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
                                                true,
                                                Messages.getString("Desensobrado.msg.error.certificado"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+                setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                 return;
             }
 
@@ -199,6 +209,7 @@ final class Desensobrado extends JPanel {
                         Messages.getString("error"), //$NON-NLS-1$
                         JOptionPane.ERROR_MESSAGE
                     );
+                    setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                     return;
                 }
             }
@@ -212,6 +223,7 @@ final class Desensobrado extends JPanel {
                     Messages.getString("error"), //$NON-NLS-1$
                     JOptionPane.ERROR_MESSAGE
                 );
+                setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                 return;
             }
             catch (final InvalidKeyException e) {
@@ -223,6 +235,7 @@ final class Desensobrado extends JPanel {
                     Messages.getString("Desensobrado.msg.error.clave.title"), //$NON-NLS-1$
                     JOptionPane.ERROR_MESSAGE
                 );
+                setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                 return;
             }
             catch (final Exception e) {
@@ -235,6 +248,7 @@ final class Desensobrado extends JPanel {
                     Messages.getString("error"), //$NON-NLS-1$
                     JOptionPane.ERROR_MESSAGE
                 );
+                setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                 return;
             }
 
@@ -248,7 +262,7 @@ final class Desensobrado extends JPanel {
             final MimeHelper mh = new MimeHelper(recoveredData);
             final String ext = mh.getExtension();
             ExtFilter fileFilter = null;
-            if (ext != null) {
+            if (ext != null && (!name.toLowerCase().endsWith("." + ext) || (ext.equals("html") && name.toLowerCase().endsWith(".htm")) || (ext.equals("jpg") && name.toLowerCase().endsWith(".jpeg")))) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             	name = name + "." + ext; //$NON-NLS-1$
             	fileFilter = new ExtFilter(new String[] { ext }, mh.getDescription());
             }
@@ -259,6 +273,7 @@ final class Desensobrado extends JPanel {
                 Utils.openFile(file);
             }
         }
+        setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
     }
 
     private AOKeyStoreManager getKeyStoreManager(final KeyStoreConfiguration ksConfiguration) throws AOKeystoreAlternativeException, IOException {
