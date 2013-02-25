@@ -444,7 +444,7 @@ public class MainOptionsPane {
      * @param config Configuraci&oacute;n para cargar en el panel. */
     public void loadConfig(final Properties config) {
 
-        this.checkHabilitar.setSelected(Boolean.parseBoolean(config.getProperty(MainOptionsPane.MAIN_ADVANCED_VIEW, "false"))); //$NON-NLS-1$
+        this.checkHabilitar.setSelected(Boolean.parseBoolean(config.getProperty(MainOptionsPane.MAIN_ADVANCED_VIEW, "true"))); //$NON-NLS-1$
         this.checkXML.setSelected(Boolean.parseBoolean(config.getProperty(MainOptionsPane.MAIN_ALGORITHM_XML, "false"))); //$NON-NLS-1$
         this.checkAddPolicy.setSelected(Boolean.parseBoolean(config.getProperty(MainOptionsPane.MAIN_POLICY_ESTABLISHED, "false"))); //$NON-NLS-1$
         this.textPolicyIdentifier.setText(config.getProperty(MainOptionsPane.MAIN_POLICY_IDENTIFIER, "")); //$NON-NLS-1$

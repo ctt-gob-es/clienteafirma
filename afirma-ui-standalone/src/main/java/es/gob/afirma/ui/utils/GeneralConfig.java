@@ -64,7 +64,7 @@ public final class GeneralConfig {
      * @return <code>true</code> si est&aacute; activada ka vista avanzada de configuraci&oacute;n,
      *         <code>false</code> en caso contrario */
     public static boolean isAvanzados() {
-        return Boolean.parseBoolean(configOptions.getProperty(MainOptionsPane.MAIN_ADVANCED_VIEW, "false")); //$NON-NLS-1$
+        return Boolean.parseBoolean(configOptions.getProperty(MainOptionsPane.MAIN_ADVANCED_VIEW, "true")); //$NON-NLS-1$
     }
 
     /** Indica si el ususario ha activado o desactivado la opcion de cursor de texto grande
