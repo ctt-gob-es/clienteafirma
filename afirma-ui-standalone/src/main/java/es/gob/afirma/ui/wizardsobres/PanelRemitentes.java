@@ -369,19 +369,17 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
             }
             Integer keySize = null;
             final int aesMaxKeySize = Cipher.getMaxAllowedKeyLength(AOCipherAlgorithm.AES.getName());
-            if (aesMaxKeySize == Integer.MAX_VALUE) {
-            	if (CustomDialog.showConfirmDialog(
-        			SwingUtilities.getRoot(this),
-        			true,
-        			Messages.getString("Wizard.sobres.unlimitedencryption"), //$NON-NLS-1$
-        			Messages.getString("Wizard.sobres.unlimitedencryption.title"), //$NON-NLS-1$
-        			JOptionPane.YES_NO_OPTION,
-        			JOptionPane.WARNING_MESSAGE
-    			) == 0) {
-            		LOGGER.info("Se ha establecido la clave AES a " + Integer.toString(aesMaxKeySize) + " bits"); //$NON-NLS-1$ //$NON-NLS-2$
-            		keySize = AES_MAX_KEY_SIZE;
-            	}
-            }
+            if (aesMaxKeySize == Integer.MAX_VALUE && CustomDialog.showConfirmDialog(
+    			SwingUtilities.getRoot(this),
+    			true,
+    			Messages.getString("Wizard.sobres.unlimitedencryption"), //$NON-NLS-1$
+    			Messages.getString("Wizard.sobres.unlimitedencryption.title"), //$NON-NLS-1$
+    			JOptionPane.YES_NO_OPTION,
+    			JOptionPane.WARNING_MESSAGE
+			) == 0) {
+        		LOGGER.info("Se ha establecido la clave AES a " + Integer.toString(aesMaxKeySize) + " bits"); //$NON-NLS-1$ //$NON-NLS-2$
+        		keySize = AES_MAX_KEY_SIZE;
+        	}
             try {
                 if (this.tipo == SOBRE_AUTENTICADO) {
                     envelopedData = enveloper.createCMSAuthenticatedEnvelopedData(contentData, this.privateKeyEntry, cipherConfig, certs, keySize);
