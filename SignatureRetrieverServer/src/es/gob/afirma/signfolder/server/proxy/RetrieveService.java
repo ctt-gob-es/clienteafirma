@@ -44,7 +44,7 @@ public final class RetrieveService extends HttpServlet {
 	public void init() throws ServletException {
 		super.init();
 
-		final String WARNING_CONFIG_MSG = "Se utilizara el directorio temporal para el guardado de los ficheros de intercambio, lo cual puede constituir un problema de seguridad. Configure un directorio con permisos controlados para mayor seguridad."; //$NON-NLS-1$
+		final String WARNING_CONFIG_MSG = "Se recuperaran los ficheros de intercambio desde el directorio temporal, lo cual puede constituir un problema de seguridad. Configure un directorio con permisos controlados para mayor seguridad."; //$NON-NLS-1$
 		final Properties p = new Properties();
 		try {
 			final InputStream is = this.getServletContext().getResourceAsStream(CONFIG_FILE);
@@ -65,7 +65,7 @@ public final class RetrieveService extends HttpServlet {
 	@Override
 	protected void service(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
 
-		LOGGER.info("Peticion recogida"); //$NON-NLS-1$
+		LOGGER.info("Solicitud de fichero"); //$NON-NLS-1$
 
 		final String operation = request.getParameter(PARAMETER_NAME_OPERATION);
 		final String syntaxVersion = request.getParameter(PARAMETER_NAME_SYNTAX_VERSION);
