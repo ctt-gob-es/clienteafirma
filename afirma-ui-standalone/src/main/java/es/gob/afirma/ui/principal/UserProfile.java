@@ -50,7 +50,7 @@ import es.gob.afirma.ui.utils.ProfileManager;
 
 /** Ventana de seleccion de perfiles.
  * @author inteco */
-final class UserProfile extends JAccessibilityFrameAdvisor {
+public final class UserProfile extends JAccessibilityFrameAdvisor {
 
     /** Perfil actual. */
     private static String currentProfileId;

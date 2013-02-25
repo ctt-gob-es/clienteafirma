@@ -13,6 +13,7 @@ import es.gob.afirma.ui.principal.AccessibilityOptionsPane;
 import es.gob.afirma.ui.principal.ContextOptionsPane;
 import es.gob.afirma.ui.principal.Main;
 import es.gob.afirma.ui.principal.MainOptionsPane;
+import es.gob.afirma.ui.principal.UserProfile;
 
 /** Gestor de perfiles de usuario.
  * @author Carlos Gamuci */
@@ -225,6 +226,59 @@ public final class ProfileManager {
 				"No se han podido guardar las preferencias de configuracion de la aplicacion: " + e //$NON-NLS-1$
 			);
 		}
+    }
+
+    /** Guarda una preferencia. Si se indica un valor nulo para la preferencia la borra.
+     * @param key Clave de la preferencia a asignar.
+     * @param value Valor a asignar a la preferencia o nulo para borrarla.
+     * @throws IllegalArgumentException Cuando se indica una clave nula. */
+    public static void setDinamicPreference(final String key, final String value) {
+
+    	if (key == null) {
+            throw new IllegalArgumentException("No se ha indicado la clave de la preferencia"); //$NON-NLS-1$
+        }
+
+    	String completeKey = PREFIX_KEY;
+    	final String id = UserProfile.getCurrentProfileId();
+        if (id != null) {
+            completeKey += id + "."; //$NON-NLS-1$
+        }
+        completeKey += key;
+
+        if (value != null) {
+        	Main.getPreferences().put(completeKey, value);
+        } else {
+        	Main.getPreferences().remove(completeKey);
+		}
+
+	    try {
+			Main.getPreferences().flush();
+		}
+	    catch (final BackingStoreException e) {
+			LOGGER.warning(
+				"No se han podido guardar las preferencias de configuracion de la aplicacion: " + e //$NON-NLS-1$
+			);
+		}
+    }
+
+    /** Recupera una preferencia.
+     * @param key Clave de la preferencia a asignar.
+     * @return Valor de la preferencia o {@code null} si no est&aacute; definida.
+     * @throws IllegalArgumentException Cuando se indica una clave nula. */
+    public static String getDinamicPreference(final String key) {
+
+    	if (key == null) {
+            throw new IllegalArgumentException("No se ha indicado la clave de la preferencia"); //$NON-NLS-1$
+        }
+
+    	String completeKey = PREFIX_KEY;
+    	final String id = UserProfile.getCurrentProfileId();
+        if (id != null) {
+            completeKey += id + "."; //$NON-NLS-1$
+        }
+        completeKey += key;
+
+        return Main.getPreferences().get(completeKey, null);
     }
 
     private static void addNewId(final String id) {

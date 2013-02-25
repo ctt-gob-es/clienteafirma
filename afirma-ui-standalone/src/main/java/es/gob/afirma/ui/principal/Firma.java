@@ -73,6 +73,7 @@ import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.KeyStoreLoader;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.ProfileManager;
 import es.gob.afirma.ui.utils.RequestFocusListener;
 import es.gob.afirma.ui.utils.SelectionDialog;
 import es.gob.afirma.ui.utils.SignedFileManager;
@@ -131,6 +132,14 @@ final class Firma extends JPanel {
      * @param comboFormato Combo con los formatos de firmado
      * @param campoFichero Campo con el nombre del archivo a firmar */
     void firmarActionPerformed(final JComboBox comboAlmacen, final JComboBox comboFormato, final JTextField campoFichero) {// GEN-FIRST:event_firmarActionPerformed
+
+    	final String formatName = comboFormato.getSelectedItem().toString();
+    	if (GeneralConfig.isAvanzados()) {
+    		ProfileManager.setDinamicPreference("advanced.format", formatName); //$NON-NLS-1$
+    	} else {
+    		ProfileManager.setDinamicPreference("simple.format", formatName); //$NON-NLS-1$
+    	}
+
         // Obtenemos la constante del formato a utilizar
         final String formato = Firma.FORMATOS.get(comboFormato.getSelectedIndex());
 
@@ -701,6 +710,17 @@ final class Firma extends JPanel {
         Utils.setContrastColor(comboFormato);
         Utils.setFontBold(comboFormato);
         add(comboFormato, c);
+
+
+        String preSelectedFormat = null;
+        if (GeneralConfig.isAvanzados()) {
+        	preSelectedFormat = ProfileManager.getDinamicPreference("advanced.format"); //$NON-NLS-1$
+    	} else {
+    		preSelectedFormat = ProfileManager.getDinamicPreference("simple.format"); //$NON-NLS-1$
+    	}
+        if (preSelectedFormat != null) {
+        	comboFormato.setSelectedItem(preSelectedFormat);
+        }
 
         // Relacion entre etiqueta y combo
         etiquetaFormato.setLabelFor(comboFormato);

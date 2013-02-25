@@ -279,7 +279,7 @@ final class ProfilesOptionsPane {
         return config;
     }
 
-    private static String getCurrentProfileId() {
+    static String getCurrentProfileId() {
         return UserProfile.getCurrentProfileId();
     }
 
