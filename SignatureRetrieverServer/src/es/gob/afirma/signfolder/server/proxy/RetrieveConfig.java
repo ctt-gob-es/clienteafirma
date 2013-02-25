@@ -15,7 +15,7 @@ import javax.servlet.ServletContext;
 public class RetrieveConfig {
 
 	/** Clave para la configuraci&oacute;n del directorio para la creacion de ficheros temporales. */
-	private static final String TMP_DIR_KEY =  "tmpDir"; //$NON-NLS-1$
+	static final String TMP_DIR_KEY =  "tmpDir"; //$NON-NLS-1$
 
 	/** Directorio temporal por defecto. */
 	private static final String DEFAULT_TMP_DIR = System.getProperty("java.io.tmpdir") + File.separator + "afirma"; //$NON-NLS-1$ //$NON-NLS-2$
@@ -24,7 +24,7 @@ public class RetrieveConfig {
 	private static final String EXPIRATION_TIME_KEY =  "expTime"; //$NON-NLS-1$
 
 	/** Milisegundos que, por defecto, tardan los mensajes en caducar. */
-	private static final long DEFAULT_EXPIRATION_TIME = 5000; // 5 segundos
+	private static final long DEFAULT_EXPIRATION_TIME = 60000; // 1 minuto
 
 	private final ServletContext context;
 

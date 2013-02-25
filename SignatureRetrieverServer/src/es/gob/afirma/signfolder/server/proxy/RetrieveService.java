@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
@@ -38,6 +39,28 @@ public final class RetrieveService extends HttpServlet {
 	private static final String PARAMETER_NAME_SYNTAX_VERSION = "v"; //$NON-NLS-1$
 
 	private static final String OPERATION_RETRIEVE = "get"; //$NON-NLS-1$
+
+	@Override
+	public void init() throws ServletException {
+		super.init();
+
+		final String WARNING_CONFIG_MSG = "Se utilizara el directorio temporal para el guardado de los ficheros de intercambio, lo cual puede constituir un problema de seguridad. Configure un directorio con permisos controlados para mayor seguridad."; //$NON-NLS-1$
+		final Properties p = new Properties();
+		try {
+			final InputStream is = this.getServletContext().getResourceAsStream(CONFIG_FILE);
+			p.load(is);
+			is.close();
+		} catch (final IOException e) {
+			Logger.getLogger("es.gob.afirma").severe("No se ha podido cargar el fichero con la configuracion del servicio: " + e.toString()); //$NON-NLS-1$ //$NON-NLS-2$
+			Logger.getLogger("es.gob.afirma").warning(WARNING_CONFIG_MSG); //$NON-NLS-1$
+			return;
+		}
+
+		if (!p.containsKey(RetrieveConfig.TMP_DIR_KEY)) {
+			Logger.getLogger("es.gob.afirma").warning("No se ha encontrado un valor definido para el directorio de intercambio de ficheros."); //$NON-NLS-1$ //$NON-NLS-2$
+			Logger.getLogger("es.gob.afirma").warning(WARNING_CONFIG_MSG); //$NON-NLS-1$
+		}
+	}
 
 	@Override
 	protected void service(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
