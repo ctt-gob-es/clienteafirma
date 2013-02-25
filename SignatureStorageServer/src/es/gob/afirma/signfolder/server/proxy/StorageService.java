@@ -109,8 +109,11 @@ public final class StorageService extends HttpServlet {
 	 */
 	private static void storeSign(final PrintWriter out, final HttpServletRequest request, final StorageConfig config) throws IOException {
 
+		LOGGER.info("Solicitud de guardado"); //$NON-NLS-1$
+
 		final String id = request.getParameter(PARAMETER_NAME_ID);
 		if (id == null) {
+			LOGGER.severe(ErrorManager.genError(ErrorManager.ERROR_MISSING_DATA_ID, null));
 			out.println(ErrorManager.genError(ErrorManager.ERROR_MISSING_DATA_ID, null));
 			return;
 		}
@@ -120,6 +123,7 @@ public final class StorageService extends HttpServlet {
 		// Si no se indican los datos, se transmite el error en texto plano a traves del fichero generado
 		String dataText = request.getParameter(PARAMETER_NAME_DATA);
 		if (dataText == null) {
+			LOGGER.severe(ErrorManager.genError(ErrorManager.ERROR_MISSING_DATA, null));
 			dataText = ErrorManager.genError(ErrorManager.ERROR_MISSING_DATA, null);
 		}
 
