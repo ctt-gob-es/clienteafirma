@@ -15,7 +15,7 @@ import javax.servlet.ServletContext;
 public class StorageConfig {
 
 	/** Clave para la configuraci&oacute;n del directorio para la creacion de ficheros temporales. */
-	public static final String TMP_DIR_KEY =  "tmpDir"; //$NON-NLS-1$
+	static final String TMP_DIR_KEY =  "tmpDir"; //$NON-NLS-1$
 
 	/** Directorio temporal por defecto. */
 	private static final String DEFAULT_TMP_DIR = System.getProperty("java.io.tmpdir") + File.separator + "afirma"; //$NON-NLS-1$ //$NON-NLS-2$
