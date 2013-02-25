@@ -115,8 +115,7 @@ public final class CMSTimestamper {
      * @param tsaUsr Nombre de usuario si la TSA requiere autenticaci&oacute;n (puede ser <code>null</code> si no se necesita autenticaci&oacute;n)
      * @param tsaPwd Contrase&ntilde;a del usuario de la TSA (puede ser <code>null</code> si no se necesita autenticaci&oacute;n)
      * @param extensions Extensiones a a&ntilde;adir a la petici&oacute;n de sello de tiempo
-     * @param useSsl <code>true</code> si se debe establecer la conexi&oacute;n por SSL,
-     *               <code>false</code> en caso contrario */
+     */
     public CMSTimestamper(final boolean requireCert,
                      final String policy,
                      final URI tsa,
