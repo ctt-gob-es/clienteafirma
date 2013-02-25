@@ -131,7 +131,7 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
     /** Gives back the enveloping document. Return <code>null</code> in case
      * ds:Signature should be the top-level element. Implementations can
      * override this method to provide a custom enveloping document.
-     * @return */
+     * @return null */
     private static Document getEnvelopingDocument() {
         return null;
     }
