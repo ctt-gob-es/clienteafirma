@@ -47,8 +47,10 @@ public class StorageConfig {
 	 */
 	public void load(final String path) throws FileNotFoundException, IOException {
 		if (path != null) {
- 			try (final InputStream is = this.context.getResourceAsStream(path)) {
+ 			try {
+ 				final InputStream is = this.context.getResourceAsStream(path);
 				this.config.load(is);
+				is.close();
 			} catch (final IOException e) {
 				Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
 						"No se ha podido cargar el fichero con las propiedades: " + e.toString()); //$NON-NLS-1$

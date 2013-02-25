@@ -49,34 +49,32 @@ public final class StorageService extends HttpServlet {
 		response.setContentType("text/plain"); //$NON-NLS-1$
 		response.setCharacterEncoding("utf-8"); //$NON-NLS-1$
 
-		try (final PrintWriter out = response.getWriter()) {
-			if (operation == null) {
-				out.println(ErrorManager.genError(ErrorManager.ERROR_MISSING_OPERATION_NAME, null));
-				return;
-			}
-			if (syntaxVersion == null) {
-				out.println(ErrorManager.genError(ErrorManager.ERROR_MISSING_SYNTAX_VERSION, null));
-				return;
-			}
-
-			final StorageConfig config;
-			try {
-				config = new StorageConfig(this.getServletContext());
-				config.load(CONFIG_FILE);
-			} catch (final IOException e) {
-				LOGGER.severe(ErrorManager.genError(ErrorManager.ERROR_CONFIGURATION_FILE_PROBLEM, null));
-				out.println(ErrorManager.genError(ErrorManager.ERROR_CONFIGURATION_FILE_PROBLEM, null));
-				return;
-			}
-
-			switch(operation) {
-			case OPERATION_STORE:
-				storeSign(out, request, config);
-				return;
-			default:
-				out.println(ErrorManager.genError(ErrorManager.ERROR_UNSUPPORTED_OPERATION_NAME, null));
-			}
+		final PrintWriter out = response.getWriter();
+		if (operation == null) {
+			out.println(ErrorManager.genError(ErrorManager.ERROR_MISSING_OPERATION_NAME, null));
+			return;
 		}
+		if (syntaxVersion == null) {
+			out.println(ErrorManager.genError(ErrorManager.ERROR_MISSING_SYNTAX_VERSION, null));
+			return;
+		}
+
+		final StorageConfig config;
+		try {
+			config = new StorageConfig(this.getServletContext());
+			config.load(CONFIG_FILE);
+		} catch (final IOException e) {
+			LOGGER.severe(ErrorManager.genError(ErrorManager.ERROR_CONFIGURATION_FILE_PROBLEM, null));
+			out.println(ErrorManager.genError(ErrorManager.ERROR_CONFIGURATION_FILE_PROBLEM, null));
+			return;
+		}
+
+		if (OPERATION_STORE.equalsIgnoreCase(operation)) {
+			storeSign(out, request, config);
+		} else {
+			out.println(ErrorManager.genError(ErrorManager.ERROR_UNSUPPORTED_OPERATION_NAME, null));
+		}
+		out.close();
 	}
 
 	/**
@@ -108,16 +106,18 @@ public final class StorageService extends HttpServlet {
 		}
 
 		final File outFile = new File(config.getTempDir(), id);
-		try (final OutputStream fos = new FileOutputStream(outFile);) {
+		try {
+			final OutputStream fos = new FileOutputStream(outFile);
 			fos.write(data);
 			fos.flush();
+			fos.close();
 		} catch (final IOException e) {
 			LOGGER.severe(ErrorManager.genError(ErrorManager.ERROR_COMMUNICATING_WITH_WEB, null));
 			out.println(ErrorManager.genError(ErrorManager.ERROR_COMMUNICATING_WITH_WEB, null));
 			return;
 		}
 
-		LOGGER.info("Se guardo correctamente el fichero: " + id); //$NON-NLS-1$
+		LOGGER.info("Se guardo correctamente el fichero: " + outFile.getAbsolutePath()); //$NON-NLS-1$
 
 		out.print(SUCCESS);
 	}
