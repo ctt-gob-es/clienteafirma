@@ -264,7 +264,8 @@ public final class AOXAdESSigner implements AOSigner {
 
     static final Logger LOGGER = Logger.getLogger("es.agob.afirma"); //$NON-NLS-1$
 
-    static final String SIGNATURE_TAG = "Signature"; //$NON-NLS-1$
+    /** Etiqueta de los nodos firma de los XML firmados. */
+    public static final String SIGNATURE_TAG = "Signature"; //$NON-NLS-1$
 
     /** URI que define la versi&oacute;n por defecto de XAdES. */
     static final String XADESNS = "http://uri.etsi.org/01903/v1.3.2#"; //$NON-NLS-1$
