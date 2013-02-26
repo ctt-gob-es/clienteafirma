@@ -16,7 +16,9 @@ import java.net.URI;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.security.interfaces.RSAPrivateKey;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -26,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 import javax.xml.crypto.XMLStructure;
 import javax.xml.crypto.dom.DOMStructure;
@@ -69,10 +72,24 @@ import es.gob.afirma.signers.xml.Utils.IsInnerlException;
 import es.gob.afirma.signers.xml.Utils.ReferenceIsNotXMLException;
 import es.gob.afirma.signers.xml.XMLConstants;
 
-final class XAdESSigner {
+/** Firmador simple XAdES.
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
+public final class XAdESSigner {
 
-	private static final java.util.logging.Logger	LOGGER	= java.util.logging.Logger
-																	.getLogger("es.gob.afirma");	//$NON-NLS-1$
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");	//$NON-NLS-1$
+
+	static byte[] sign(final byte[] data,
+            final String algorithm,
+            final PrivateKeyEntry keyEntry,
+            final Properties xParams) throws AOException {
+		return sign(
+			data,
+			algorithm,
+			keyEntry.getCertificateChain(),
+			(RSAPrivateKey) keyEntry.getPrivateKey(),
+			xParams
+		);
+	}
 
 	/**
 	 * Firma datos en formato XAdES.
@@ -159,8 +176,8 @@ final class XAdESSigner {
 	 *            <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
 	 *            <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
 	 *            </ul>
-	 * @param keyEntry
-	 *            Entrada que apunta a la clave privada a usar para firmar.
+	 * @param certChain Cadena de certificados del firmante
+	 * @param pk Clave privada del firmante
 	 * @param xParams
 	 *            Par&aacute;metros adicionales para la firma.
 	 *            <p>
@@ -375,9 +392,11 @@ final class XAdESSigner {
 	 * @throws AOException
 	 *             Cuando ocurre cualquier problema durante el proceso
 	 */
-	static byte[] sign(final byte[] data, final String algorithm,
-			final PrivateKeyEntry keyEntry, final Properties xParams)
-			throws AOException {
+	public static byte[] sign(final byte[] data,
+			                  final String algorithm,
+			                  final Certificate[] certChain,
+			                  final RSAPrivateKey pk,
+			                  final Properties xParams) throws AOException {
 
 		final String algoUri = XMLConstants.SIGN_ALGOS_URI.get(algorithm);
 		if (algoUri == null) {
@@ -385,7 +404,7 @@ final class XAdESSigner {
 					"Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
-		final Properties extraParams = (xParams != null) ? xParams
+		final Properties extraParams = xParams != null ? xParams
 				: new Properties();
 
 		final String format = extraParams.getProperty(
@@ -565,7 +584,7 @@ final class XAdESSigner {
 					dataElement.setAttributeNS(null, "Id", contentId); //$NON-NLS-1$
 					dataElement.setAttributeNS(null,
 							AOXAdESSigner.MIMETYPE_STR, mimeType);
-					if (encoding != null && (!"".equals(encoding))) { //$NON-NLS-1$
+					if (encoding != null && !"".equals(encoding)) { //$NON-NLS-1$
 						dataElement.setAttributeNS(null,
 								AOXAdESSigner.ENCODING_STR, encoding);
 					}
@@ -1161,7 +1180,7 @@ final class XAdESSigner {
 				);
 
 		// SigningCertificate
-		xades.setSigningCertificate((X509Certificate) keyEntry.getCertificate());
+		xades.setSigningCertificate((X509Certificate) certChain[0]);
 
 		// SignaturePolicyIdentifier
 		final SignaturePolicyIdentifier spi = AOXAdESSigner.getPolicy(
@@ -1225,7 +1244,7 @@ final class XAdESSigner {
         		oid = null;
         	}
 		}
-		final ObjectIdentifierImpl objectIdentifier = (oid != null) ? new ObjectIdentifierImpl(
+		final ObjectIdentifierImpl objectIdentifier = oid != null ? new ObjectIdentifierImpl(
 				"OIDAsURN", (oid.startsWith("urn:oid:") ? "" : "urn:oid:") + oid, null, new ArrayList<String>(0)) : null; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
 
@@ -1291,8 +1310,8 @@ final class XAdESSigner {
 					.getProperty("includeOnlySignningCertificate", Boolean.FALSE.toString())); //$NON-NLS-1$
 			if (onlySignningCert) {
 				xmlSignature.sign(
-					(X509Certificate) keyEntry.getCertificate(),
-					keyEntry.getPrivateKey(),
+					(X509Certificate) certChain[0],
+					pk,
 					algoUri,
 					referenceList,
 					"Signature-" + UUID.randomUUID().toString() //$NON-NLS-1$
@@ -1300,8 +1319,8 @@ final class XAdESSigner {
 			}
 			else {
 				xmlSignature.sign(
-					Arrays.asList((X509Certificate[]) keyEntry.getCertificateChain()),
-					keyEntry.getPrivateKey(),
+					Arrays.asList((X509Certificate[]) certChain),
+					pk,
 					algoUri,
 					referenceList,
 					"Signature-" + UUID.randomUUID().toString() //$NON-NLS-1$
