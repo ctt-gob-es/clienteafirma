@@ -13,7 +13,6 @@ package es.gob.afirma.signature;
 import java.io.ByteArrayInputStream;
 import java.security.Key;
 import java.security.KeyException;
-import java.security.Provider;
 import java.security.PublicKey;
 import java.util.List;
 
@@ -55,37 +54,47 @@ public final class ValidateXMLSignature {
         // Instantiate the document to be validated
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
-        Document doc;
+        final Document doc;
         try {
             doc = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
-        } catch (final Exception e) {
+        }
+        catch (final Exception e) {
             return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CORRUPTED_SIGN);
         }
 
         // Find Signature element
-        final NodeList nl =
-            doc.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature"); //$NON-NLS-1$
+        final NodeList nl = doc.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature"); //$NON-NLS-1$
         if (nl.getLength() == 0) {
             return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_SIGN);
         }
 
         try {
-            // Create a DOM XMLSignatureFactory that will be used to unmarshal the
-            // document containing the XMLSignature
-            final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM", //$NON-NLS-1$
-                    (Provider) Class.forName(System.getProperty
-                            ("jsr105Provider", "org.jcp.xml.dsig.internal.dom.XMLDSigRI")).newInstance()); //$NON-NLS-1$ //$NON-NLS-2$
 
-            // Create a DOMValidateContext and specify a KeyValue KeySelector
-            // and document context
-            final DOMValidateContext valContext = new DOMValidateContext
-            (new KeyValueKeySelector(), nl.item(0));
+        	final DOMValidateContext valContext = new DOMValidateContext(new KeyValueKeySelector(), nl.item(0));
 
-            // Validate the XMLSignature (generated above)
-            return fac.unmarshalXMLSignature(valContext).validate(valContext) ?
+            // Primero validamos el PKCS#1 XMLSignature
+            return XMLSignatureFactory.getInstance("DOM").unmarshalXMLSignature(valContext).validate(valContext) ? //$NON-NLS-1$
                     new SignValidity(SIGN_DETAIL_TYPE.OK, null) :
                     new SignValidity(SIGN_DETAIL_TYPE.KO, null);
-        } catch (final Exception e) {
+
+            // Ahora miramos las referencias una a una
+            		// Check core validation status
+//            		if (coreValidity == false) {
+//            		    System.err.println("Signature failed core validation"); //$NON-NLS-1$
+//            		    final boolean sv = signature.getSignatureValue().validate(valContext);
+//            		    System.out.println("signature validation status: " + sv); //$NON-NLS-1$
+//            		    // check the validation status of each Reference
+//            		    final Iterator<?> i = signature.getSignedInfo().getReferences().iterator();
+//            		    for (int j=0; i.hasNext(); j++) {
+//            			final boolean refValid = ((Reference) i.next()).validate(valContext);
+//            			System.out.println("ref["+j+"] validity status: " + refValid); //$NON-NLS-1$ //$NON-NLS-2$
+//            		    }
+//            		}
+//            		else {
+//            		    System.out.println("Signature passed core validation"); //$NON-NLS-1$
+//            		}
+        }
+        catch (final Exception e) {
             return new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, null);
         }
     }
