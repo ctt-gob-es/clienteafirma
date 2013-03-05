@@ -68,6 +68,9 @@ public final class StorageService extends HttpServlet {
 
 	@Override
 	protected void service(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
+
+		LOGGER.info("Se recibe una peticion de almacenamiento"); //$NON-NLS-1$
+
 		final String operation = request.getParameter(PARAMETER_NAME_OPERATION);
 		final String syntaxVersion = request.getParameter(PARAMETER_NAME_SYNTAX_VERSION);
 		response.setContentType("text/plain"); //$NON-NLS-1$
