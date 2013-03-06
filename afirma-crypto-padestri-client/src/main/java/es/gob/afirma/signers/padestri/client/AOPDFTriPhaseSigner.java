@@ -186,9 +186,9 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 			throw new AOException("Error decodificando los atributos CAdES a firmar: " + e, e); //$NON-NLS-1$
 		}
 
-		// ---------
-		// FIRMA
-		// ---------
+		// -------------------------------------------------
+		// FIRMA (este bloque se ejecuta en el dispositivo)
+		// -------------------------------------------------
 
 		final byte[] pkcs1sign = new AOPkcs1Signer().sign(
 			cadesSignedAttributes,
@@ -196,15 +196,15 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 			keyEntry,
 			null // No hay parametros en PKCS#1
 		);
-
-		// ---------
-		// POSTFIRMA
-		// ---------
 		// Creamos la peticion de postfirma
 		configParams.put(PROPERTY_NAME_PKCS1_SIGN, Base64.encode(pkcs1sign));
 		configParams.put(PROPERTY_NAME_PRESIGN, preSign.getProperty(PROPERTY_NAME_PRESIGN));
 		configParams.put(PROPERTY_NAME_PDF_UNIQUE_ID, preSign.getProperty(PROPERTY_NAME_PDF_UNIQUE_ID));
 		configParams.put(PROPERTY_NAME_SIGN_TIME, preSign.getProperty(PROPERTY_NAME_SIGN_TIME));
+
+		// ---------
+		// POSTFIRMA
+		// ---------
 
 		final byte[] triSignFinalResult;
 		try {
