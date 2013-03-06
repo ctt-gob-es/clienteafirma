@@ -382,8 +382,7 @@ public final class TestXAdES {
 
         final Document document;
         try {
-            document = DocumentBuilderFactory.newInstance().
-            newDocumentBuilder().parse(sign);
+            document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(sign);
         }
         catch (final Exception e) {
             System.out.println("No es una firma valida"); //$NON-NLS-1$
