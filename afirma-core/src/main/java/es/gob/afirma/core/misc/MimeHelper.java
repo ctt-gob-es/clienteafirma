@@ -133,6 +133,9 @@ public final class MimeHelper {
     private static void loadOidMimetypeProperties() throws IOException {
         oidMimetypeProp = new Properties();
         final InputStream isProp = AOUtil.getCleanClassLoader().getResourceAsStream("resources/mimetypes_oids.properties"); //$NON-NLS-1$
+        if (isProp == null) {
+        	throw new IOException("No se ha encontrado el fichero de recursos para la relacion entre OIDs y MimeTypes"); //$NON-NLS-1$
+        }
         oidMimetypeProp.load(isProp);
         isProp.close();
     }
