@@ -16,9 +16,9 @@ import java.net.URI;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
-import java.security.interfaces.RSAPrivateKey;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -79,16 +79,16 @@ public final class XAdESSigner {
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");	//$NON-NLS-1$
 
 	static byte[] sign(final byte[] data,
-            final String algorithm,
-            final PrivateKeyEntry keyEntry,
-            final Properties xParams) throws AOException {
+			final String algorithm,
+			final PrivateKeyEntry keyEntry,
+			final Properties xParams) throws AOException {
 		return sign(
-			data,
-			algorithm,
-			keyEntry.getCertificateChain(),
-			(RSAPrivateKey) keyEntry.getPrivateKey(),
-			xParams
-		);
+				data,
+				algorithm,
+				keyEntry.getCertificateChain(),
+				keyEntry.getPrivateKey(),
+				xParams
+				);
 	}
 
 	/**
@@ -393,10 +393,10 @@ public final class XAdESSigner {
 	 *             Cuando ocurre cualquier problema durante el proceso
 	 */
 	public static byte[] sign(final byte[] data,
-			                  final String algorithm,
-			                  final Certificate[] certChain,
-			                  final RSAPrivateKey pk,
-			                  final Properties xParams) throws AOException {
+			final String algorithm,
+			final Certificate[] certChain,
+			final PrivateKey pk,
+			final Properties xParams) throws AOException {
 
 		final String algoUri = XMLConstants.SIGN_ALGOS_URI.get(algorithm);
 		if (algoUri == null) {
@@ -499,21 +499,21 @@ public final class XAdESSigner {
 					if (styleType != null && styleHref != null) {
 
 						XAdESSigner.LOGGER
-								.info("Se ha encontrado una hoja de estilo asociada al XML a firmar: tipo=" + styleType //$NON-NLS-1$
-										+ ", referencia=" //$NON-NLS-1$
-										+ styleHref);
+						.info("Se ha encontrado una hoja de estilo asociada al XML a firmar: tipo=" + styleType //$NON-NLS-1$
+								+ ", referencia=" //$NON-NLS-1$
+								+ styleHref);
 
 						try {
 							final Document tmpDoc = Utils
 									.dereferenceStyleSheet(
 											TransformerFactory
-													.newInstance()
-													.getAssociatedStylesheet(
-															new StreamSource(
-																	new ByteArrayInputStream(
-																			data)),
-															null, null, null)
-													.getSystemId(), headLess);
+											.newInstance()
+											.getAssociatedStylesheet(
+													new StreamSource(
+															new ByteArrayInputStream(
+																	data)),
+																	null, null, null)
+																	.getSystemId(), headLess);
 
 							// Cuidado!! Solo rellenamos el Elemento DOM si no
 							// es HTTP o HTTPS, porque si es accesible
@@ -522,28 +522,28 @@ public final class XAdESSigner {
 							if (!styleHref
 									.startsWith(AOXAdESSigner.HTTP_PROTOCOL_PREFIX)
 									&& !styleHref
-											.startsWith(AOXAdESSigner.HTTPS_PROTOCOL_PREFIX)) {
+									.startsWith(AOXAdESSigner.HTTPS_PROTOCOL_PREFIX)) {
 								styleElement = tmpDoc.getDocumentElement();
 							}
 
 							styleEncoding = tmpDoc.getXmlEncoding();
 						} catch (final IsInnerlException ex) {
 							XAdESSigner.LOGGER
-									.info("La hoja de estilo esta referenciada internamente, por lo que no se necesita dereferenciar"); //$NON-NLS-1$
+							.info("La hoja de estilo esta referenciada internamente, por lo que no se necesita dereferenciar"); //$NON-NLS-1$
 						} catch (final ReferenceIsNotXMLException ex) {
 							XAdESSigner.LOGGER
-									.warning("La hoja de estilo referenciada no es XML o no se ha dereferenciado apropiadamente"); //$NON-NLS-1$
+							.warning("La hoja de estilo referenciada no es XML o no se ha dereferenciado apropiadamente"); //$NON-NLS-1$
 						} catch (final CannotDereferenceException ex) {
 							XAdESSigner.LOGGER
-									.warning("La hoja de estilo no ha podido dereferenciar, probablemente sea un enlace relativo local"); //$NON-NLS-1$
+							.warning("La hoja de estilo no ha podido dereferenciar, probablemente sea un enlace relativo local"); //$NON-NLS-1$
 						} catch (final Exception ex) {
 							XAdESSigner.LOGGER
-									.severe("Error intentando dereferenciar la hoja de estilo: " + ex); //$NON-NLS-1$
+							.severe("Error intentando dereferenciar la hoja de estilo: " + ex); //$NON-NLS-1$
 						}
 					}
 				} catch (final Exception e) {
 					XAdESSigner.LOGGER
-							.info("No se ha encontrado ninguna hoja de estilo asociada al XML a firmar"); //$NON-NLS-1$
+					.info("No se ha encontrado ninguna hoja de estilo asociada al XML a firmar"); //$NON-NLS-1$
 				}
 
 				// Si no hay asignado un MimeType o es el por defecto
@@ -609,7 +609,7 @@ public final class XAdESSigner {
 							styleElement = tmpStyleElement;
 						} catch (final Exception e) {
 							XAdESSigner.LOGGER
-									.warning("No ha sido posible crear el elemento DOM para incluir la hoja de estilo del XML como Internally Detached: " + e); //$NON-NLS-1$
+							.warning("No ha sido posible crear el elemento DOM para incluir la hoja de estilo del XML como Internally Detached: " + e); //$NON-NLS-1$
 							styleElement = null;
 						}
 					}
@@ -626,7 +626,7 @@ public final class XAdESSigner {
 				// para los formatos de firma internally detached y enveloping
 				// se trata de convertir el documento a base64
 				XAdESSigner.LOGGER
-						.info("El documento no es un XML valido. Se convertira a Base64: " + e); //$NON-NLS-1$
+				.info("El documento no es un XML valido. Se convertira a Base64: " + e); //$NON-NLS-1$
 
 				try {
 					// crea un nuevo nodo xml para contener los datos en base 64
@@ -650,7 +650,7 @@ public final class XAdESSigner {
 					if (AOUtil.isBase64(data)
 							&& (XMLConstants.BASE64_ENCODING.equals(encoding) || "base64".equalsIgnoreCase(encoding))) { //$NON-NLS-1$
 						XAdESSigner.LOGGER
-								.info("El documento se ha indicado como Base64, se insertara como tal en el XML"); //$NON-NLS-1$
+						.info("El documento se ha indicado como Base64, se insertara como tal en el XML"); //$NON-NLS-1$
 
 						// Adicionalmente, si es un base 64 intentamos obtener
 						// el tipo del contenido
@@ -669,10 +669,10 @@ public final class XAdESSigner {
 					} else {
 						if (XMLConstants.BASE64_ENCODING.equals(encoding)) {
 							XAdESSigner.LOGGER
-									.info("El documento se ha indicado como Base64, pero no es un Base64 valido. Se convertira a Base64 antes de insertarlo en el XML y se declarara la transformacion"); //$NON-NLS-1$
+							.info("El documento se ha indicado como Base64, pero no es un Base64 valido. Se convertira a Base64 antes de insertarlo en el XML y se declarara la transformacion"); //$NON-NLS-1$
 						} else {
 							XAdESSigner.LOGGER
-									.info("El documento se considera binario, se convertira a Base64 antes de insertarlo en el XML y se declarara la transformacion"); //$NON-NLS-1$
+							.info("El documento se considera binario, se convertira a Base64 antes de insertarlo en el XML y se declarara la transformacion"); //$NON-NLS-1$
 						}
 
 						if (mimeType == XMLConstants.DEFAULT_MIMETYPE) {
@@ -846,7 +846,7 @@ public final class XAdESSigner {
 							(TransformParameterSpec) null));
 				} catch (final Exception e) {
 					XAdESSigner.LOGGER
-							.severe("No se puede encontrar el algoritmo de canonicalizacion, la referencia no se canonicalizara: " + e); //$NON-NLS-1$
+					.severe("No se puede encontrar el algoritmo de canonicalizacion, la referencia no se canonicalizara: " + e); //$NON-NLS-1$
 				}
 			}
 		}
@@ -858,7 +858,7 @@ public final class XAdESSigner {
 						(TransformParameterSpec) null));
 			} catch (final Exception e) {
 				XAdESSigner.LOGGER
-						.severe("No se puede encontrar el algoritmo transformacion Base64, esta no se declarara: " + e); //$NON-NLS-1$
+				.severe("No se puede encontrar el algoritmo transformacion Base64, esta no se declarara: " + e); //$NON-NLS-1$
 			}
 		}
 
@@ -878,7 +878,7 @@ public final class XAdESSigner {
 				// binarios o explicitos
 				if (isBase64) {
 					structures
-							.add(new DOMStructure(dataElement.getFirstChild()));
+					.add(new DOMStructure(dataElement.getFirstChild()));
 				} else {
 					structures.add(new DOMStructure(dataElement));
 				}
@@ -889,8 +889,8 @@ public final class XAdESSigner {
 
 				// crea la referencia al nuevo elemento Object
 				referenceList
-						.add(fac.newReference(
-								"#" + objectId, digestMethod, transformList, AOXAdESSigner.OBJURI, referenceId)); //$NON-NLS-1$
+				.add(fac.newReference(
+						"#" + objectId, digestMethod, transformList, AOXAdESSigner.OBJURI, referenceId)); //$NON-NLS-1$
 
 				// Vamos con la hoja de estilo
 				if (styleElement != null) {
@@ -903,7 +903,7 @@ public final class XAdESSigner {
 							digestMethod, Collections.singletonList(fac
 									.newTransform(canonicalizationAlgorithm,
 											(TransformParameterSpec) null)),
-							AOXAdESSigner.OBJURI, referenceStyleId));
+											AOXAdESSigner.OBJURI, referenceStyleId));
 
 				}
 			} catch (final Exception e) {
@@ -917,22 +917,22 @@ public final class XAdESSigner {
 					&& (styleHref
 							.startsWith(AOXAdESSigner.HTTP_PROTOCOL_PREFIX) || styleHref
 							.startsWith(AOXAdESSigner.HTTPS_PROTOCOL_PREFIX))) { // Comprobamos
-																					// si
-																					// la
-																					// referencia
-																					// al
-																					// estilo
-																					// es
-																					// externa
+				// si
+				// la
+				// referencia
+				// al
+				// estilo
+				// es
+				// externa
 				try {
 					referenceList.add(fac.newReference(styleHref, digestMethod,
 							Collections.singletonList(fac.newTransform(
 									canonicalizationAlgorithm,
 									(TransformParameterSpec) null)), null,
-							referenceStyleId));
+									referenceStyleId));
 				} catch (final Exception e) {
 					XAdESSigner.LOGGER
-							.severe("No ha sido posible anadir la referencia a la hoja de estilo del XML, esta no se firmara: " + e); //$NON-NLS-1$
+					.severe("No ha sido posible anadir la referencia a la hoja de estilo del XML, esta no se firmara: " + e); //$NON-NLS-1$
 				}
 			}
 
@@ -962,7 +962,7 @@ public final class XAdESSigner {
 							digestMethod, Collections.singletonList(fac
 									.newTransform(canonicalizationAlgorithm,
 											(TransformParameterSpec) null)),
-							null, referenceStyleId));
+											null, referenceStyleId));
 				}
 
 			} catch (final Exception e) {
@@ -976,22 +976,22 @@ public final class XAdESSigner {
 					&& (styleHref
 							.startsWith(AOXAdESSigner.HTTP_PROTOCOL_PREFIX) || styleHref
 							.startsWith(AOXAdESSigner.HTTPS_PROTOCOL_PREFIX))) { // Comprobamos
-																					// si
-																					// la
-																					// referencia
-																					// al
-																					// estilo
-																					// es
-																					// externa
+				// si
+				// la
+				// referencia
+				// al
+				// estilo
+				// es
+				// externa
 				try {
 					referenceList.add(fac.newReference(styleHref, digestMethod,
 							Collections.singletonList(fac.newTransform(
 									canonicalizationAlgorithm,
 									(TransformParameterSpec) null)), null,
-							referenceStyleId));
+									referenceStyleId));
 				} catch (final Exception e) {
 					XAdESSigner.LOGGER
-							.severe("No ha sido posible anadir la referencia a la hoja de estilo del XML, esta no se firmara: " + e); //$NON-NLS-1$
+					.severe("No ha sido posible anadir la referencia a la hoja de estilo del XML, esta no se firmara: " + e); //$NON-NLS-1$
 				}
 			}
 
@@ -1016,15 +1016,15 @@ public final class XAdESSigner {
 						dm = fac.newDigestMethod(DigestMethod.SHA1, null);
 					} else if (AOSignConstants.getDigestAlgorithmName(
 							precalculatedHashAlgorithm).equalsIgnoreCase(
-							"SHA-256")) { //$NON-NLS-1$
+									"SHA-256")) { //$NON-NLS-1$
 						dm = fac.newDigestMethod(DigestMethod.SHA256, null);
 					} else if (AOSignConstants.getDigestAlgorithmName(
 							precalculatedHashAlgorithm).equalsIgnoreCase(
-							"SHA-512")) { //$NON-NLS-1$
+									"SHA-512")) { //$NON-NLS-1$
 						dm = fac.newDigestMethod(DigestMethod.SHA512, null);
 					} else if (AOSignConstants.getDigestAlgorithmName(
 							precalculatedHashAlgorithm).equalsIgnoreCase(
-							"RIPEMD160")) { //$NON-NLS-1$
+									"RIPEMD160")) { //$NON-NLS-1$
 						dm = fac.newDigestMethod(DigestMethod.RIPEMD160, null);
 					}
 				} catch (final Exception e) {
@@ -1053,9 +1053,9 @@ public final class XAdESSigner {
 										null,
 										referenceId,
 										MessageDigest
-												.getInstance(
-														AOSignConstants
-																.getDigestAlgorithmName(digestMethodAlgorithm))
+										.getInstance(
+												AOSignConstants
+												.getDigestAlgorithmName(digestMethodAlgorithm))
 												.digest(AOUtil
 														.getDataFromInputStream(AOUtil
 																.loadFile(uri))));
@@ -1089,21 +1089,21 @@ public final class XAdESSigner {
 				// Comprobamos que la URL es valida
 				if (styleHref.startsWith(AOXAdESSigner.HTTP_PROTOCOL_PREFIX)
 						|| styleHref
-								.startsWith(AOXAdESSigner.HTTPS_PROTOCOL_PREFIX)) {
+						.startsWith(AOXAdESSigner.HTTPS_PROTOCOL_PREFIX)) {
 					try {
 						referenceList.add(fac.newReference(styleHref,
 								digestMethod,
 								Collections.singletonList(fac.newTransform(
 										canonicalizationAlgorithm,
 										(TransformParameterSpec) null)), null,
-								referenceStyleId));
+										referenceStyleId));
 					} catch (final Exception e) {
 						XAdESSigner.LOGGER
-								.severe("No ha sido posible anadir la referencia a la hoja de estilo del XML, esta no se firmara: " + e); //$NON-NLS-1$
+						.severe("No ha sido posible anadir la referencia a la hoja de estilo del XML, esta no se firmara: " + e); //$NON-NLS-1$
 					}
 				} else {
 					XAdESSigner.LOGGER
-							.warning("Se necesita una referencia externa HTTP o HTTPS a la hoja de estilo para referenciarla en firmas XML Externally Detached"); //$NON-NLS-1$
+					.warning("Se necesita una referencia externa HTTP o HTTPS a la hoja de estilo para referenciarla en firmas XML Externally Detached"); //$NON-NLS-1$
 				}
 			}
 
@@ -1125,14 +1125,14 @@ public final class XAdESSigner {
 				// para eliminar el resto de firmas del documento
 				if (!facturaeSign) {
 					transformList
-							.add(fac.newTransform(
-									Transform.XPATH,
-									new XPathFilterParameterSpec(
-											"not(ancestor-or-self::" + AOXAdESSigner.XML_SIGNATURE_PREFIX + ":Signature)", //$NON-NLS-1$ //$NON-NLS-2$
-											Collections
-													.singletonMap(
-															AOXAdESSigner.XML_SIGNATURE_PREFIX,
-															XMLSignature.XMLNS))));
+					.add(fac.newTransform(
+							Transform.XPATH,
+							new XPathFilterParameterSpec(
+									"not(ancestor-or-self::" + AOXAdESSigner.XML_SIGNATURE_PREFIX + ":Signature)", //$NON-NLS-1$ //$NON-NLS-2$
+									Collections
+									.singletonMap(
+											AOXAdESSigner.XML_SIGNATURE_PREFIX,
+											XMLSignature.XMLNS))));
 				}
 
 				// crea la referencia
@@ -1149,22 +1149,22 @@ public final class XAdESSigner {
 					&& (styleHref
 							.startsWith(AOXAdESSigner.HTTP_PROTOCOL_PREFIX) || styleHref
 							.startsWith(AOXAdESSigner.HTTPS_PROTOCOL_PREFIX))) { // Comprobamos
-																					// si
-																					// la
-																					// referencia
-																					// al
-																					// estilo
-																					// es
-																					// externa
+				// si
+				// la
+				// referencia
+				// al
+				// estilo
+				// es
+				// externa
 				try {
 					referenceList.add(fac.newReference(styleHref, digestMethod,
 							Collections.singletonList(fac.newTransform(
 									canonicalizationAlgorithm,
 									(TransformParameterSpec) null)), null,
-							referenceStyleId));
+									referenceStyleId));
 				} catch (final Exception e) {
 					XAdESSigner.LOGGER
-							.severe("No ha sido posible anadir la referencia a la hoja de estilo del XML, esta no se firmara: " + e); //$NON-NLS-1$
+					.severe("No ha sido posible anadir la referencia a la hoja de estilo del XML, esta no se firmara: " + e); //$NON-NLS-1$
 				}
 			}
 
@@ -1195,11 +1195,11 @@ public final class XAdESSigner {
 
 		// SignatureProductionPlace
 		final SignatureProductionPlace spp = AOXAdESSigner.getSignatureProductionPlace(
-			extraParams.getProperty("signatureProductionCity"), //$NON-NLS-1$
-			extraParams.getProperty("signatureProductionProvince"), //$NON-NLS-1$
-			extraParams.getProperty("signatureProductionPostalCode"), //$NON-NLS-1$
-			extraParams.getProperty("signatureProductionCountry") //$NON-NLS-1$
-		);
+				extraParams.getProperty("signatureProductionCity"), //$NON-NLS-1$
+				extraParams.getProperty("signatureProductionProvince"), //$NON-NLS-1$
+				extraParams.getProperty("signatureProductionPostalCode"), //$NON-NLS-1$
+				extraParams.getProperty("signatureProductionCountry") //$NON-NLS-1$
+				);
 		if (spp != null) {
 			xades.setSignatureProductionPlace(spp);
 		}
@@ -1234,134 +1234,134 @@ public final class XAdESSigner {
 		// DataObjectFormat
 		String oid = extraParams.getProperty("contentTypeOid"); //$NON-NLS-1$
 		if (oid == null && mimeType != null) {
-        	try {
+			try {
 				oid = MimeHelper.transformMimeTypeToOid(mimeType);
 			} catch (final IOException e) {
 				LOGGER.warning("Error en la obtencion del OID del tipo de datos a partir del MimeType: " + e); //$NON-NLS-1$
 			}
-        	// Si no se reconoce el MimeType se habra establecido el por defecto. Evitamos este comportamiento
-        	if (!MimeHelper.DEFAULT_MIMETYPE.equals(mimeType) && MimeHelper.DEFAULT_CONTENT_OID_DATA.equals(oid)) {
-        		oid = null;
-        	}
+			// Si no se reconoce el MimeType se habra establecido el por defecto. Evitamos este comportamiento
+			if (!MimeHelper.DEFAULT_MIMETYPE.equals(mimeType) && MimeHelper.DEFAULT_CONTENT_OID_DATA.equals(oid)) {
+				oid = null;
+			}
 		}
 		final ObjectIdentifierImpl objectIdentifier = oid != null ? new ObjectIdentifierImpl(
 				"OIDAsURN", (oid.startsWith("urn:oid:") ? "" : "urn:oid:") + oid, null, new ArrayList<String>(0)) : null; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
 
-		final ArrayList<DataObjectFormat> objectFormats = new ArrayList<DataObjectFormat>();
-		final DataObjectFormat objectFormat = new DataObjectFormatImpl(null,
-				objectIdentifier, mimeType, encoding, "#" + referenceId //$NON-NLS-1$
-		);
-		objectFormats.add(objectFormat);
-		xades.setDataObjectFormats(objectFormats);
+				final ArrayList<DataObjectFormat> objectFormats = new ArrayList<DataObjectFormat>();
+				final DataObjectFormat objectFormat = new DataObjectFormatImpl(null,
+						objectIdentifier, mimeType, encoding, "#" + referenceId //$NON-NLS-1$
+						);
+				objectFormats.add(objectFormat);
+				xades.setDataObjectFormats(objectFormats);
 
-		final AOXMLAdvancedSignature xmlSignature;
-		try {
-			xmlSignature = AOXMLAdvancedSignature.newInstance(xades);
-		} catch (final Exception e) {
-			throw new AOException(
-					"No se ha podido instanciar la firma XML Avanzada de JXAdES", e); //$NON-NLS-1$
-		}
+				final AOXMLAdvancedSignature xmlSignature;
+				try {
+					xmlSignature = AOXMLAdvancedSignature.newInstance(xades);
+				} catch (final Exception e) {
+					throw new AOException(
+							"No se ha podido instanciar la firma XML Avanzada de JXAdES", e); //$NON-NLS-1$
+				}
 
-		// Establecemos el tipo de propiedades firmadas
-		xmlSignature.setSignedPropertiesTypeUrl(signedPropertiesTypeUrl);
+				// Establecemos el tipo de propiedades firmadas
+				xmlSignature.setSignedPropertiesTypeUrl(signedPropertiesTypeUrl);
 
-		try {
-			xmlSignature.setDigestMethod(digestMethodAlgorithm);
-			xmlSignature.setCanonicalizationMethod(canonicalizationAlgorithm);
-		} catch (final Exception e) {
-			XAdESSigner.LOGGER
+				try {
+					xmlSignature.setDigestMethod(digestMethodAlgorithm);
+					xmlSignature.setCanonicalizationMethod(canonicalizationAlgorithm);
+				} catch (final Exception e) {
+					XAdESSigner.LOGGER
 					.severe("No se ha podido establecer el algoritmo de huella digital (" + algoUri //$NON-NLS-1$
 							+ "), es posible que el usado en la firma difiera del indicado: " //$NON-NLS-1$
 							+ e);
-		}
-
-		// en el caso de formato enveloping se inserta el elemento Object con el
-		// documento a firmar
-		if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING)) {
-			xmlSignature.addXMLObject(envelopingObject);
-			if (envelopingStyleObject != null) {
-				xmlSignature.addXMLObject(envelopingStyleObject);
-			}
-		}
-
-		// Si es enveloped hay que anadir la hoja de estilo dentro de la firma y
-		// referenciarla
-		if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED)
-				&& styleElement != null) {
-			xmlSignature.addStyleSheetEnvelopingOntoSignature(styleElement,
-					styleType, styleEncoding, styleId);
-
-			try {
-				referenceList.add(fac.newReference(tmpStyleUri, digestMethod,
-						Collections.singletonList(fac.newTransform(
-								canonicalizationAlgorithm,
-								(TransformParameterSpec) null)), null,
-						referenceStyleId));
-			} catch (final Exception e) {
-				XAdESSigner.LOGGER
-						.severe("No se ha podido anadir una referencia a la hoja de estilo, esta se incluira dentro de la firma, pero no estara firmada: " + e); //$NON-NLS-1$
-			}
-		}
-
-		// Genera la firma
-		try {
-			final boolean onlySignningCert = Boolean.parseBoolean(extraParams
-					.getProperty("includeOnlySignningCertificate", Boolean.FALSE.toString())); //$NON-NLS-1$
-			if (onlySignningCert) {
-				xmlSignature.sign(
-					(X509Certificate) certChain[0],
-					pk,
-					algoUri,
-					referenceList,
-					"Signature-" + UUID.randomUUID().toString() //$NON-NLS-1$
-				);
-			}
-			else {
-				xmlSignature.sign(
-					Arrays.asList((X509Certificate[]) certChain),
-					pk,
-					algoUri,
-					referenceList,
-					"Signature-" + UUID.randomUUID().toString() //$NON-NLS-1$
-				);
-			}
-		} catch (final NoSuchAlgorithmException e) {
-			throw new UnsupportedOperationException(
-					"Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
-		} catch (final Exception e) {
-			throw new AOException("Error al generar la firma XAdES: " + e, e); //$NON-NLS-1$
-		}
-
-		// Si se esta realizando una firma enveloping simple no tiene sentido el
-		// nodo raiz,
-		// asi que sacamos el nodo de firma a un documento aparte
-		if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING)) {
-			try {
-				if (docSignature.getElementsByTagNameNS(XMLConstants.DSIGNNS,
-						AOXAdESSigner.SIGNATURE_TAG).getLength() == 1) {
-					final Document newdoc = dbf.newDocumentBuilder()
-							.newDocument();
-					newdoc.appendChild(newdoc.adoptNode(docSignature
-							.getElementsByTagNameNS(XMLConstants.DSIGNNS,
-									AOXAdESSigner.SIGNATURE_TAG).item(0)));
-					docSignature = newdoc;
 				}
-			} catch (final Exception e) {
-				XAdESSigner.LOGGER
+
+				// en el caso de formato enveloping se inserta el elemento Object con el
+				// documento a firmar
+				if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING)) {
+					xmlSignature.addXMLObject(envelopingObject);
+					if (envelopingStyleObject != null) {
+						xmlSignature.addXMLObject(envelopingStyleObject);
+					}
+				}
+
+				// Si es enveloped hay que anadir la hoja de estilo dentro de la firma y
+				// referenciarla
+				if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED)
+						&& styleElement != null) {
+					xmlSignature.addStyleSheetEnvelopingOntoSignature(styleElement,
+							styleType, styleEncoding, styleId);
+
+					try {
+						referenceList.add(fac.newReference(tmpStyleUri, digestMethod,
+								Collections.singletonList(fac.newTransform(
+										canonicalizationAlgorithm,
+										(TransformParameterSpec) null)), null,
+										referenceStyleId));
+					} catch (final Exception e) {
+						XAdESSigner.LOGGER
+						.severe("No se ha podido anadir una referencia a la hoja de estilo, esta se incluira dentro de la firma, pero no estara firmada: " + e); //$NON-NLS-1$
+					}
+				}
+
+				// Genera la firma
+				try {
+					final boolean onlySignningCert = Boolean.parseBoolean(extraParams
+							.getProperty("includeOnlySignningCertificate", Boolean.FALSE.toString())); //$NON-NLS-1$
+					if (onlySignningCert) {
+						xmlSignature.sign(
+								(X509Certificate) certChain[0],
+								pk,
+								algoUri,
+								referenceList,
+								"Signature-" + UUID.randomUUID().toString() //$NON-NLS-1$
+								);
+					}
+					else {
+						xmlSignature.sign(
+								Arrays.asList((X509Certificate[]) certChain),
+								pk,
+								algoUri,
+								referenceList,
+								"Signature-" + UUID.randomUUID().toString() //$NON-NLS-1$
+								);
+					}
+				} catch (final NoSuchAlgorithmException e) {
+					throw new UnsupportedOperationException(
+							"Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
+				} catch (final Exception e) {
+					throw new AOException("Error al generar la firma XAdES: " + e, e); //$NON-NLS-1$
+				}
+
+				// Si se esta realizando una firma enveloping simple no tiene sentido el
+				// nodo raiz,
+				// asi que sacamos el nodo de firma a un documento aparte
+				if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING)) {
+					try {
+						if (docSignature.getElementsByTagNameNS(XMLConstants.DSIGNNS,
+								AOXAdESSigner.SIGNATURE_TAG).getLength() == 1) {
+							final Document newdoc = dbf.newDocumentBuilder()
+									.newDocument();
+							newdoc.appendChild(newdoc.adoptNode(docSignature
+									.getElementsByTagNameNS(XMLConstants.DSIGNNS,
+											AOXAdESSigner.SIGNATURE_TAG).item(0)));
+							docSignature = newdoc;
+						}
+					} catch (final Exception e) {
+						XAdESSigner.LOGGER
 						.info("No se ha eliminado el nodo padre '<AFIRMA>': " + e); //$NON-NLS-1$
-			}
-		}
+					}
+				}
 
-		// Si no es enveloped quito los valores para que no se inserte la
-		// cabecera de hoja de estilo
-		if (!format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED)) {
-			styleHref = null;
-			styleType = null;
-		}
+				// Si no es enveloped quito los valores para que no se inserte la
+				// cabecera de hoja de estilo
+				if (!format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED)) {
+					styleHref = null;
+					styleType = null;
+				}
 
-		return Utils.writeXML(docSignature.getDocumentElement(),
-				originalXMLProperties, styleHref, styleType);
+				return Utils.writeXML(docSignature.getDocumentElement(),
+						originalXMLProperties, styleHref, styleType);
 
 	}
 
