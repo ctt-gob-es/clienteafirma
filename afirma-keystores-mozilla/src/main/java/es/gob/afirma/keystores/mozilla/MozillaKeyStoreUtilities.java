@@ -153,6 +153,13 @@ final class MozillaKeyStoreUtilities {
 		if (dir == null) {
 			dir = WinRegistryWrapper.getString(WinRegistryWrapper.HKEY_LOCAL_MACHINE, "SOFTWARE\\Classes\\FirefoxURL\\shell\\open\\command", ""); //$NON-NLS-1$ //$NON-NLS-2$
 			if (dir == null) {
+				final String currentVersion = WinRegistryWrapper.getString(WinRegistryWrapper.HKEY_LOCAL_MACHINE, "SOFTWARE\\Mozilla\\Mozilla Firefox", "CurrentVersion"); //$NON-NLS-1$ //$NON-NLS-2$
+				if (currentVersion != null) {
+					final String installDir = WinRegistryWrapper.getString(WinRegistryWrapper.HKEY_LOCAL_MACHINE, "SOFTWARE\\Mozilla\\Mozilla Firefox\\" + currentVersion + "\\Main", "Install Directory"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					if (installDir != null) {
+						return installDir;
+					}
+				}
 				throw new FileNotFoundException("No se ha podido localizar el directorio de Firefox a traves del registro de Windows"); //$NON-NLS-1$
 			}
 		}
