@@ -11,7 +11,6 @@
 package es.gob.afirma.signers.xades;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.net.URI;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.MessageDigest;
@@ -1236,7 +1235,8 @@ public final class XAdESSigner {
 		if (oid == null && mimeType != null) {
 			try {
 				oid = MimeHelper.transformMimeTypeToOid(mimeType);
-			} catch (final IOException e) {
+			}
+        	catch (final Exception e) {
 				LOGGER.warning("Error en la obtencion del OID del tipo de datos a partir del MimeType: " + e); //$NON-NLS-1$
 			}
 			// Si no se reconoce el MimeType se habra establecido el por defecto. Evitamos este comportamiento
