@@ -39,11 +39,4 @@
 		<nature>org.eclipse.wst.common.project.facet.core.nature</nature>
 		<nature>org.eclipse.wst.jsdt.core.jsNature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>JXAdES</name>
-			<type>2</type>
-			<location>C:/Users/tomas/workspace/jxades/src/main/java</location>
-		</link>
-	</linkedResources>
 </projectDescription>
