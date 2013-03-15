@@ -1,4 +1,4 @@
-package es.gob.afirma.signfolder.server.proxy;
+package es.gob.afirma.triphase.server;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
