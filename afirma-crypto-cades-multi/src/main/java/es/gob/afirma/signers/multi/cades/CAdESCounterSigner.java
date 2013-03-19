@@ -61,12 +61,12 @@ import es.gob.afirma.signers.pkcs7.SigUtils;
  * crear un mensaje SignedData de BouncyCastle: <a
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> pero con la
  * peculiaridad de que es una Contrafirma. */
-final class CAdESCounterSigner {
+class CAdESCounterSigner {
 
     /* Propiedades de la clase */
     private int actualIndex = 0;
 
-    /** Constructor de la clase. Se crea una contrafirma a partir de los datos
+    /** Crea una contrafirma a partir de los datos
      * del firmante, el archivo que se firma y del archivo que contiene las
      * firmas.<br>
      * @param parameters
@@ -265,7 +265,7 @@ final class CAdESCounterSigner {
 
     }
 
-    /** M&eacute;todo que contrafirma el arbol completo de forma recursiva, todos
+    /** Contrafirma el &aacute;rbol completo de forma recursiva, todos
      * los nodos creando un nuevo contraSigner.<br>
      * @param signerInfosRaiz
      *        Nodo ra&iacute; que contiene todos los signerInfos que se
@@ -314,7 +314,7 @@ final class CAdESCounterSigner {
         return counterSigners;
     }
 
-    /** M&eacute;todo que contrafirma las hojas del arbol completo de forma
+    /** Contrafirma las hojas del &aacute;rbol completo de forma
      * recursiva, todos los dodos creando un nuevo contraSigner.<br>
      * @param signerInfosRaiz
      *        Nodo ra&iacute; que contiene todos los signerInfos que se
@@ -361,7 +361,7 @@ final class CAdESCounterSigner {
         return counterSigners;
     }
 
-    /** M&eacute;todo que contrafirma un nodo determinado del arbol buscandolo de
+    /** Contrafirma un nodo determinado del &aacute;rbol busc&aacute;ndolo de
      * forma recursiva.<br>
      * @param sd
      *        SignedData que contiene el Nodo ra&iacute;z.
@@ -437,8 +437,7 @@ final class CAdESCounterSigner {
 
     }
 
-    /** M&eacute;todo utilizado por la firma del &eacute;rbol para obtener la
-     * contrafirma de los signerInfo de forma recursiva.<br>
+    /** Obtiene la contrafirma de los signerInfo de forma recursiva.<br>
      * @param signerInfo
      *        Nodo ra&iacute; que contiene todos los signerInfos que se
      *        deben firmar.
@@ -614,8 +613,7 @@ final class CAdESCounterSigner {
         return counterSigner;
     }
 
-    /** M&eacute;todo utilizado por la firma de una hoja del &eacute;rbol para
-     * obtener la contrafirma de los signerInfo de una determinada hoja de forma
+    /** Obtiene la contrafirma de los signerInfo de una determinada hoja de forma
      * recursiva.</br>
      * @param signerInfo
      *        Nodo ra&iacute; que contiene todos los signerInfos que se
@@ -780,8 +778,7 @@ final class CAdESCounterSigner {
         return counterSigner;
     }
 
-    /** M&eacute;todo utilizado por la firma de un nodo del &eacute;rbol para
-     * obtener la contrafirma de los signerInfo Sin ser recursivo. Esto es por
+    /** Obtiene la contrafirma de los signerInfo sin ser recursivo. Esto es por
      * el caso especial de que puede ser el nodo raiz el nodo a firmar, por lo
      * que no ser&iacute;a necesario usar la recursividad.</br>
      * @param signerInfo
@@ -940,8 +937,7 @@ final class CAdESCounterSigner {
         return counterSigner;
     }
 
-    /** M&eacute;todo utilizado por la firma de un nodo del &eacute;rbol para
-     * obtener la contrafirma de los signerInfo buscando el nodo de forma
+    /** Obtiene la contrafirma de los signerInfo buscando el nodo de forma
      * recursiva.</br>
      * @param signerInfo
      *        Nodo ra&iacute; que contiene todos los signerInfos que se
@@ -1100,7 +1096,7 @@ final class CAdESCounterSigner {
         return counterSigner;
     }
 
-    /** M&eacute;todo que genera un signerInfo espec&iacute;fico utilizando los
+    /** Genera un signerInfo espec&iacute;fico utilizando los
      * datos necesarios para crearlo. Se utiliza siempre que no se sabe cual es
      * el signerInfo que se debe firmar.</br>
      * @param parameters
@@ -1190,7 +1186,7 @@ final class CAdESCounterSigner {
      *        Clave para firmar.
      * @return Firma de los atributos.
      * @throws es.map.es.map.afirma.exceptions.AOException */
-    private static byte[] firma(final byte[] data, final String signatureAlgorithm, final PrivateKeyEntry keyEntry) throws AOException {
+    protected static byte[] firma(final byte[] data, final String signatureAlgorithm, final PrivateKeyEntry keyEntry) throws AOException {
         return new AOPkcs1Signer().sign(data, signatureAlgorithm, keyEntry, null);
     }
 }
