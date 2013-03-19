@@ -1,6 +1,7 @@
 package es.gob.afirma.triphase.server;
 
 import java.io.IOException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
@@ -48,6 +49,11 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			signingCertificateV2 = !"SHA1".equals(AOSignConstants.getDigestAlgorithmName(algorithm));	 //$NON-NLS-1$
 		}
 
+		boolean omitContent = false;
+		if (extraParams.containsKey("mode")) { //$NON-NLS-1$
+			omitContent = "explicit".equalsIgnoreCase(extraParams.getProperty("mode")); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+
 		String contentTypeOid = MimeHelper.DEFAULT_CONTENT_OID_DATA;
 		String contentDescription = MimeHelper.DEFAULT_CONTENT_DESCRIPTION;
 
@@ -60,17 +66,27 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			Logger.getLogger("es.gob.afirma").warning("No se ha podido determinar el tipo de los datos: " + e); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
+		final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(algorithm);
+		byte[] messageDigest = null;
+		if (omitContent) {
+			try {
+				messageDigest = data != null ? MessageDigest.getInstance(digestAlgorithm).digest(data) : null;
+			} catch (final NoSuchAlgorithmException e) {
+				throw new IllegalArgumentException("Algoritmo de huella digital no soportado: " + digestAlgorithm, e); //$NON-NLS-1$
+			}
+		}
+
 		final byte[] presign = CAdESTriPhaseSigner.preSign(
-				AOSignConstants.getDigestAlgorithmName(algorithm),
-				data,
-				new X509Certificate[] { cert },
-				new AdESPolicy(extraParams),
-				signingCertificateV2,
-				null,                       // MessageDigest
-				new Date(),
-				false,                      // PAdES Mode
-				contentTypeOid,
-				contentDescription
+				digestAlgorithm,
+				omitContent ? null : data,
+						new X509Certificate[] { cert },
+						new AdESPolicy(extraParams),
+						signingCertificateV2,
+						messageDigest,
+						new Date(),
+						false,           // PAdES Mode
+						contentTypeOid,
+						contentDescription
 				);
 
 		// Ahora pasamos al cliente los datos de la prefirma
@@ -88,12 +104,17 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			final X509Certificate cert,
 			final Properties extraParams) throws NoSuchAlgorithmException, AOException, IOException {
 
+		boolean omitContent = false;
+		if (extraParams.containsKey("mode")) { //$NON-NLS-1$
+			omitContent = "explicit".equalsIgnoreCase(extraParams.getProperty("mode")); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+
 		return CAdESTriPhaseSigner.postSign(
 				AOSignConstants.getDigestAlgorithmName(algorithm),
-				data,
-				new X509Certificate[] { cert },
-				Base64.decode(extraParams.getProperty(PROPERTY_NAME_PKCS1_SIGN)),
-				Base64.decode(extraParams.getProperty(PROPERTY_NAME_SESSION_DATA))
+				omitContent ? null : data,
+						new X509Certificate[] { cert },
+						Base64.decode(extraParams.getProperty(PROPERTY_NAME_PKCS1_SIGN)),
+						Base64.decode(extraParams.getProperty(PROPERTY_NAME_SESSION_DATA))
 				);
 
 	}
