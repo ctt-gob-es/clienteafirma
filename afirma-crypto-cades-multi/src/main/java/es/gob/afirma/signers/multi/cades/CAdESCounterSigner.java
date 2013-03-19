@@ -61,7 +61,7 @@ import es.gob.afirma.signers.pkcs7.SigUtils;
  * crear un mensaje SignedData de BouncyCastle: <a
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> pero con la
  * peculiaridad de que es una Contrafirma. */
-class CAdESCounterSigner {
+final class CAdESCounterSigner {
 
     /* Propiedades de la clase */
     private int actualIndex = 0;
@@ -1186,7 +1186,7 @@ class CAdESCounterSigner {
      *        Clave para firmar.
      * @return Firma de los atributos.
      * @throws es.map.es.map.afirma.exceptions.AOException */
-    protected static byte[] firma(final byte[] data, final String signatureAlgorithm, final PrivateKeyEntry keyEntry) throws AOException {
+    private static byte[] firma(final byte[] data, final String signatureAlgorithm, final PrivateKeyEntry keyEntry) throws AOException {
         return new AOPkcs1Signer().sign(data, signatureAlgorithm, keyEntry, null);
     }
 }
