@@ -3,8 +3,11 @@ package es.gob.afirma.triphase.server;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URLDecoder;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -15,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.padestri.server.DocumentManager;
@@ -27,12 +31,16 @@ import es.gob.afirma.signers.padestri.server.DocumentManager;
 @WebServlet("/SignatureService")
 public final class SignatureService extends HttpServlet {
 
+	private static final long serialVersionUID = 1L;
+
 	private static Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	//TODO: Cambiar por una referencia al gestor documental de verdad
 	private static final DocumentManager DOC_MANAGER = new SelfishDocumentManager();
 
-	private static final long serialVersionUID = 1L;
+
+	private static final String URL_DEFAULT_CHARSET = "utf-8"; //$NON-NLS-1$
+
 
 	private static final String PARAMETER_NAME_OPERATION = "op"; //$NON-NLS-1$
 	private static final String PARAMETER_NAME_SUB_OPERATION = "cop"; //$NON-NLS-1$
@@ -62,25 +70,29 @@ public final class SignatureService extends HttpServlet {
 	@Override
 	protected void service(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
 
-		LOGGER.info("Se realiza una peticion de firma trifasica: " + request.getParameter(PARAMETER_NAME_OPERATION)); //$NON-NLS-1$
+		LOGGER.info("Se realiza una peticion de firma trifasica"); //$NON-NLS-1$
 
-		//		final Map<String, String> parameters = new HashMap<String, String>();
-		//		final String[] params = new String(AOUtil.getDataFromInputStream(request.getInputStream())).split("&");
-		//		for (final String param : params) {
-		//			LOGGER.info("Param: " + param);
-		//			parameters.put(param.substring(0, param.indexOf("=")), param.substring(param.indexOf("=") + 1));
-		//		}
+		final Map<String, String> parameters = new HashMap<String, String>();
+		final String[] params = new String(AOUtil.getDataFromInputStream(request.getInputStream())).split("&"); //$NON-NLS-1$
+		for (final String param : params) {
+			if (param.indexOf('=') != -1) {
+				parameters.put(param.substring(0, param.indexOf('=')), URLDecoder.decode(param.substring(param.indexOf('=') + 1), URL_DEFAULT_CHARSET));
+			}
+		}
+
+		LOGGER.info("Operacion: " + parameters.get(PARAMETER_NAME_OPERATION));
 
 		// Obtenemos el codigo de operacion
 		final PrintWriter out = response.getWriter();
-		final String operation = request.getParameter(PARAMETER_NAME_OPERATION);
+		final String operation = parameters.get(PARAMETER_NAME_OPERATION);
 		if (operation == null) {
 			out.print(ErrorManager.getErrorMessage(1));
 			return;
 		}
 
 		// Obtenemos el codigo de operacion
-		final String subOperation = request.getParameter(PARAMETER_NAME_SUB_OPERATION);
+		//final String subOperation = request.getParameter(PARAMETER_NAME_SUB_OPERATION);
+		final String subOperation = parameters.get(PARAMETER_NAME_SUB_OPERATION);
 		if (subOperation == null) {
 			out.print(ErrorManager.getErrorMessage(13));
 			return;
@@ -90,12 +102,12 @@ public final class SignatureService extends HttpServlet {
 
 		String docId = null;
 		final byte[] docBytes;
-		final String dataB64 = request.getParameter(PARAMETER_NAME_DATA_PARAM);
+		final String dataB64 = parameters.get(PARAMETER_NAME_DATA_PARAM);
 		if (dataB64 != null) {
 			docBytes = Base64.decode(dataB64, Base64.URL_SAFE);
 		}
 		else {
-			docId = request.getParameter(PARAMETER_NAME_DOCID);
+			docId = parameters.get(PARAMETER_NAME_DOCID);
 			if (docId == null) {
 				out.print(ErrorManager.getErrorMessage(2));
 				return;
@@ -104,14 +116,14 @@ public final class SignatureService extends HttpServlet {
 		}
 
 		// Obtenemos el algoritmo de firma
-		final String algorithm = request.getParameter(PARAMETER_NAME_ALGORITHM);
+		final String algorithm = parameters.get(PARAMETER_NAME_ALGORITHM);
 		if (algorithm == null) {
 			out.print(ErrorManager.getErrorMessage(3));
 			return;
 		}
 
 		// Obtenemos el formato de firma
-		final String format = request.getParameter(PARAMETER_NAME_FORMAT);
+		final String format = parameters.get(PARAMETER_NAME_FORMAT);
 		LOGGER.info("Formato de firma seleccionado: " + format); //$NON-NLS-1$
 		if (format == null) {
 			out.print(ErrorManager.getErrorMessage(4));
@@ -119,7 +131,7 @@ public final class SignatureService extends HttpServlet {
 		}
 
 		// Obtenemos el certificado
-		final String cert = request.getParameter(PARAMETER_NAME_CERT);
+		final String cert = parameters.get(PARAMETER_NAME_CERT);
 		if (cert == null) {
 			out.print(ErrorManager.getErrorMessage(5));
 			return;
@@ -139,16 +151,23 @@ public final class SignatureService extends HttpServlet {
 		// Obtenemos los parametros adicionales para la firma
 		final Properties extraParams = new Properties();
 		try {
-			if (request.getParameter(PARAMETER_NAME_EXTRA_PARAM) != null) {
-				LOGGER.info("ExtraParams: " + new String(Base64.decode(request.getParameter(PARAMETER_NAME_EXTRA_PARAM).trim(), Base64.URL_SAFE))); //$NON-NLS-1$
+			LOGGER.info("Parametros extra recibidos: " + parameters.get(PARAMETER_NAME_EXTRA_PARAM));
+			if (parameters.get(PARAMETER_NAME_EXTRA_PARAM) != null) {
 				extraParams.load(
 						new ByteArrayInputStream(
-								Base64.decode(request.getParameter(PARAMETER_NAME_EXTRA_PARAM).trim(), Base64.URL_SAFE)
+								Base64.decode(parameters.get(PARAMETER_NAME_EXTRA_PARAM).trim(), Base64.URL_SAFE)
 								)
 						);
+
+				LOGGER.info("ExtraParams:");
+				for ( final String key : extraParams.keySet().toArray(new String[extraParams.size()])) {
+					LOGGER.info(key);
+				}
+
 			}
 		}
 		catch (final Exception e) {
+			e.printStackTrace();
 			out.print(ErrorManager.getErrorMessage(6));
 			return;
 		}
@@ -171,7 +190,6 @@ public final class SignatureService extends HttpServlet {
 		}
 
 		if (OPERATION_PRESIGN.equals(operation)) {
-
 			try {
 				final byte[] preRes;
 				if (PARAMETER_VALUE_SUB_OPERATION_COSIGN.equals(subOperation)) {
@@ -228,6 +246,8 @@ public final class SignatureService extends HttpServlet {
 				out.print(ErrorManager.getErrorMessage(10));
 				return;
 			}
+
+			LOGGER.info("Firma OK"); //$NON-NLS-1$
 
 			out.println(SUCCESS + " " + NEW_DOCID_TAG + "=" + newDocId); //$NON-NLS-1$ //$NON-NLS-2$
 		}
