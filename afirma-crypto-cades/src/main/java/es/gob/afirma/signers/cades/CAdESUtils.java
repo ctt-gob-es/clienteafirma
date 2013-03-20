@@ -63,7 +63,7 @@ public final class CAdESUtils {
      * Usuario. Se generan los atributos que se necesitan para generar la firma.
      * @param cert Certificado del firmante
      * @param digestAlgorithmName Nombre del algoritmo de huella digital a usar
-     * @param datos Datos firmados
+     * @param data Datos firmados
      * @param policy Pol&iacute;tica de firma
      * @param signingCertificateV2 {@code true} para utilizar la versi&oacute;n 2 del campo
      * signingCertificate, {@code false} para utilizar la versi&oacute;n 1.
@@ -79,7 +79,7 @@ public final class CAdESUtils {
      */
     public static ASN1EncodableVector generateSignerInfo(final X509Certificate cert,
                                                   final String digestAlgorithmName,
-                                                  final byte[] datos,
+                                                  final byte[] data,
                                                   final AdESPolicy policy,
                                                   final boolean signingCertificateV2,
                                                   final byte[] messageDigest,
@@ -98,7 +98,7 @@ public final class CAdESUtils {
         // authenticatedAttributes
         final ASN1EncodableVector contexExpecific = initContexExpecific(
                 digestAlgorithmName,
-                datos,
+                data,
                 PKCSObjectIdentifiers.data.getId(),
                 messageDigest,
                 signDate,
@@ -405,7 +405,7 @@ public final class CAdESUtils {
 
     /** Inicializa el contexto. */
     static ASN1EncodableVector initContexExpecific(final String digestAlgorithm,
-                                                   final byte[] datos,
+                                                   final byte[] data,
                                                    final String dataType,
                                                    final byte[] messageDigest,
                                                    final Date signDate,
@@ -424,7 +424,7 @@ public final class CAdESUtils {
         }
 
         // MessageDigest
-        contexExpecific.add(new Attribute(CMSAttributes.messageDigest, new DERSet(new DEROctetString(messageDigest != null ? messageDigest : MessageDigest.getInstance(digestAlgorithm).digest(datos)))));
+        contexExpecific.add(new Attribute(CMSAttributes.messageDigest, new DERSet(new DEROctetString(messageDigest != null ? messageDigest : MessageDigest.getInstance(digestAlgorithm).digest(data)))));
 
         return contexExpecific;
     }
