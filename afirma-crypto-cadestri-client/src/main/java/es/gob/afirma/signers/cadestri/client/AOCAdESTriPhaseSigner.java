@@ -15,7 +15,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.KeyStore.PrivateKeyEntry;
+import java.security.PrivateKey;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -93,27 +94,30 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 	@Override
 	public byte[] sign(final byte[] data,
 			final String algorithm,
-			final PrivateKeyEntry keyEntry,
+			final PrivateKey key,
+			final Certificate[] certChain,
 			final Properties extraParams) throws AOException, IOException {
-		return triPhaseOperation(CRYPTO_OPERATION_SIGN, data, algorithm, keyEntry, extraParams);
+		return triPhaseOperation(CRYPTO_OPERATION_SIGN, data, algorithm, key, certChain, extraParams);
 	}
 
 	@Override
 	public byte[] cosign(final byte[] data,
 			final byte[] sign,
 			final String algorithm,
-			final PrivateKeyEntry keyEntry,
+			final PrivateKey key,
+			final Certificate[] certChain,
 			final Properties extraParams) throws AOException, IOException {
-		return cosign(sign, algorithm, keyEntry, extraParams);
+		return cosign(sign, algorithm, key, certChain, extraParams);
 	}
 
 	@Override
 	public byte[] cosign(final byte[] sign,
 			final String algorithm,
-			final PrivateKeyEntry keyEntry,
+			final PrivateKey key,
+			final Certificate[] certChain,
 			final Properties extraParams)
 					throws AOException, IOException {
-		return triPhaseOperation(CRYPTO_OPERATION_COSIGN, sign, algorithm, keyEntry, extraParams);
+		return triPhaseOperation(CRYPTO_OPERATION_COSIGN, sign, algorithm, key, certChain, extraParams);
 	}
 
 	@Override
@@ -121,7 +125,8 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 			final String algorithm,
 			final CounterSignTarget targetType,
 			final Object[] targets,
-			final PrivateKeyEntry keyEntry,
+			final PrivateKey key,
+			final Certificate[] certChain,
 			final Properties extraParams) throws AOException, IOException {
 		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
 	}
@@ -176,7 +181,8 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 	private static byte[] triPhaseOperation(final String cryptoOperation,
 			final byte[] data,
 			final String algorithm,
-			final PrivateKeyEntry keyEntry,
+			final PrivateKey key,
+			final Certificate[] certChain,
 			final Properties extraParams) throws AOException {
 
 		if (!CRYPTO_OPERATION_SIGN.equals(cryptoOperation) && !CRYPTO_OPERATION_COSIGN.equals(cryptoOperation)) {
@@ -186,8 +192,11 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 		if (extraParams == null) {
 			throw new IllegalArgumentException("Se necesitan parametros adicionales"); //$NON-NLS-1$
 		}
-		if (keyEntry == null) {
-			throw new IllegalArgumentException("Es necesario proporcionar una entrada a la clave privada de firma"); //$NON-NLS-1$
+		if (key == null) {
+			throw new IllegalArgumentException("Es necesario proporcionar una clave privada de firma"); //$NON-NLS-1$
+		}
+		if (certChain == null || certChain.length == 0) {
+			throw new IllegalArgumentException("Es necesario proporcionar un certificado de firma"); //$NON-NLS-1$
 		}
 		if (data == null && !extraParams.containsKey(PROPERTY_NAME_DOCUMENT_ID)) {
 			throw new IllegalArgumentException("No se han proporcionado datos de entrada ni el identificador de documento a firmar"); //$NON-NLS-1$
@@ -195,8 +204,8 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 
 		// Creamos una copia de los parametros
 		final Properties configParams = new Properties();
-		for (final String key : extraParams.keySet().toArray(new String[extraParams.size()])) {
-			configParams.setProperty(key, extraParams.getProperty(key));
+		for (final String keyParam : extraParams.keySet().toArray(new String[extraParams.size()])) {
+			configParams.setProperty(keyParam, extraParams.getProperty(keyParam));
 		}
 
 		// Comprobamos la direccion del servidor
@@ -240,7 +249,7 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 			append(PARAMETER_NAME_CRYPTO_OPERATION).append(HTTP_EQUALS).append(cryptoOperation).append(HTTP_AND).
 			append(PARAMETER_NAME_FORMAT).append(HTTP_EQUALS).append(CADES_FORMAT).append(HTTP_AND).
 			append(PARAMETER_NAME_ALGORITHM).append(HTTP_EQUALS).append(algorithm).append(HTTP_AND).
-			append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(Base64.encodeBytes(keyEntry.getCertificate().getEncoded(), Base64.URL_SAFE));
+			append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(Base64.encodeBytes(certChain[0].getEncoded(), Base64.URL_SAFE));
 
 			if (configParams.size() > 0) {
 				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_EXTRA_PARAM).append(HTTP_EQUALS).
@@ -296,7 +305,8 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 		final byte[] pkcs1sign = new AOPkcs1Signer().sign(
 				cadesSignedAttributes,
 				algorithm,
-				keyEntry,
+				key,
+				certChain,
 				null // No hay parametros en PKCS#1
 				);
 		// Creamos la peticion de postfirma
@@ -315,7 +325,7 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 			append(PARAMETER_NAME_CRYPTO_OPERATION).append(HTTP_EQUALS).append(cryptoOperation).append(HTTP_AND).
 			append(PARAMETER_NAME_FORMAT).append(HTTP_EQUALS).append(CADES_FORMAT).append(HTTP_AND).
 			append(PARAMETER_NAME_ALGORITHM).append(HTTP_EQUALS).append(algorithm).append(HTTP_AND).
-			append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(Base64.encodeBytes(keyEntry.getCertificate().getEncoded(), Base64.URL_SAFE)).
+			append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(Base64.encodeBytes(certChain[0].getEncoded(), Base64.URL_SAFE)).
 			append(HTTP_AND).append(PARAMETER_NAME_EXTRA_PARAM).append(HTTP_EQUALS).append(properties2Base64(configParams));
 
 			if (data != null) {
