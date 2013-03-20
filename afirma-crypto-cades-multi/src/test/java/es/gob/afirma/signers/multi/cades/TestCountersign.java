@@ -32,8 +32,6 @@ public class TestCountersign {
 
 	private static final String EXPLICIT_SHA1_COUNTERSIGN_FILE = "contrafirma_explicita.csig"; //$NON-NLS-1$
 
-	private static final String DATA_FILE = "data"; //$NON-NLS-1$
-
 	private static InputStream ksIs;
 	private static KeyStore ks;
 
@@ -96,12 +94,12 @@ public class TestCountersign {
 
 		final AOCAdESSigner signer = new AOCAdESSigner();
 		final byte[] countersign = signer.countersign(
-					sign,
-					AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
-					CounterSignTarget.LEAFS,
-					null,
-					(PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray())),
-					config);
+				sign,
+				AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
+				CounterSignTarget.LEAFS,
+				null,
+				(PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray())),
+				config);
 
 		final File tempFile = File.createTempFile("CountersignCades", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -162,12 +160,12 @@ public class TestCountersign {
 
 		final AOCAdESSigner signer = new AOCAdESSigner();
 		final byte[] countersign = signer.countersign(
-					sign,
-					AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
-					CounterSignTarget.LEAFS,
-					null,
-					(PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray())),
-					config);
+				sign,
+				AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
+				CounterSignTarget.LEAFS,
+				null,
+				(PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray())),
+				config);
 
 		final File tempFile = File.createTempFile("CountersignCades", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
 
