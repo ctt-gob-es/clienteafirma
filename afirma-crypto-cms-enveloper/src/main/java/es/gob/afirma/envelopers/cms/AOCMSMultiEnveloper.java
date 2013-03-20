@@ -117,7 +117,7 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
             messageDigest = data;
         }
 
-        final P7ContentSignerParameters csp = new P7ContentSignerParameters(data, algorithm, (X509Certificate[]) keyEntry.getCertificateChain());
+        final P7ContentSignerParameters csp = new P7ContentSignerParameters(data, algorithm);
 
         // tipos de datos a firmar.
         if (this.dataTypeOID == null) {
@@ -128,7 +128,16 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
         try {
             // El parametro omitContent no tiene sentido en un signed and
             // envelopedData.
-            return new CoSignerEnveloped().coSigner(csp, sign, this.dataTypeOID, keyEntry, this.atrib, this.uatrib, messageDigest);
+            return new CoSignerEnveloped().coSigner(
+        		csp,
+        		(X509Certificate[]) keyEntry.getCertificateChain(),
+        		sign,
+        		this.dataTypeOID,
+        		keyEntry,
+        		this.atrib,
+        		this.uatrib,
+        		messageDigest
+    		);
         }
         catch (final Exception e) {
             throw new AOException("Error generando la Cofirma del sobre", e); //$NON-NLS-1$
@@ -290,6 +299,7 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
         if (ke != null) {
             return new CMSEnvelopedData().genEnvelopedData(
         		AOCMSMultiEnveloper.createContentSignerParementers(content, ke, this.signatureAlgorithm),
+        		(X509Certificate[]) ke.getCertificateChain(),
                 cipherConfig,
                 recipientsCerts,
                 DATA_TYPE_OID,
@@ -353,6 +363,7 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
 
         return new CMSSignedAndEnvelopedData().genSignedAndEnvelopedData(
     		AOCMSMultiEnveloper.createContentSignerParementers(content, ke, this.signatureAlgorithm),
+    		(X509Certificate[]) ke.getCertificateChain(),
             cipherConfig,
             recipientsCerts,
             DATA_TYPE_OID,
@@ -403,6 +414,7 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
     																BadPaddingException {
     	return CMSAuthenticatedData.genAuthenticatedData(
     			AOCMSMultiEnveloper.createContentSignerParementers(content, ke, this.signatureAlgorithm), // ContentSignerParameters
+    			(X509Certificate[]) ke.getCertificateChain(), // Certificados del firmante (remitente)
     			null, // Algoritmo de autenticacion (usamos el por defecto)
     			cipherConfig, // Configuracion del cipher
     			recipientsCerts, // certificados destino
@@ -454,6 +466,7 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
                                                                                     BadPaddingException {
 		return CMSAuthenticatedEnvelopedData.genAuthenticatedEnvelopedData(
 			AOCMSMultiEnveloper.createContentSignerParementers(content, ke, this.signatureAlgorithm), // ContentSignerParameters
+			(X509Certificate[]) ke.getCertificateChain(), // Certificados del firmante (remitente)
             null, // Algoritmo de autenticacion (usamos el por defecto)
             cipherConfig, // Configuracion del cipher
             recipientsCerts, // certificados destino
@@ -477,7 +490,7 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
     private static P7ContentSignerParameters createContentSignerParementers(final byte[] content,
     		                                                                final PrivateKeyEntry ke,
     		                                                                final String digestAlgorithm) {
-        return new P7ContentSignerParameters(content, digestAlgorithm, (X509Certificate[]) ke.getCertificateChain());
+        return new P7ContentSignerParameters(content, digestAlgorithm);
     }
 
     /** Agrega un nuevo remitente a un envoltorio CMS compatible.
@@ -540,7 +553,13 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
             newEnvelop = CMSEnvelopedData.addOriginatorInfo(envelop, (X509Certificate[]) ke.getCertificateChain());
         }
         else if (contentInfo.equals(AOSignConstants.CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA)) {
-            newEnvelop = new AOCMSSigner().cosign(envelop, AOSignConstants.DEFAULT_SIGN_ALGO, ke, null);
+            newEnvelop = new AOCMSSigner().cosign(
+        		envelop,
+        		AOSignConstants.DEFAULT_SIGN_ALGO,
+        		ke.getPrivateKey(),
+        		ke.getCertificateChain(),
+        		null
+    		);
         }
         else if (contentInfo.equals(AOSignConstants.CMS_CONTENTTYPE_AUTHENVELOPEDDATA)) {
             newEnvelop = CMSAuthenticatedEnvelopedData.addOriginatorInfo(envelop, (X509Certificate[]) ke.getCertificateChain());

@@ -206,7 +206,6 @@ final class CAdESCoSigner {
 		// 4. CERTIFICADOS
 		// obtenemos la lista de certificados
 		ASN1Set certificates = null;
-		final X509Certificate[] signerCertificateChain = parameters.getSignerCertificateChain();
 
 		final ASN1Set certificatesSigned = sd.getCertificates();
 		final ASN1EncodableVector vCertsSig = new ASN1EncodableVector();
@@ -217,9 +216,9 @@ final class CAdESCoSigner {
 			vCertsSig.add((ASN1Encodable) certs.nextElement());
 		}
 
-		if (signerCertificateChain.length != 0) {
+		if (certChain.length != 0) {
 			final List<ASN1Encodable> ce = new ArrayList<ASN1Encodable>();
-			for (final X509Certificate element : signerCertificateChain) {
+			for (final java.security.cert.Certificate element : certChain) {
 				ce.add(Certificate.getInstance(ASN1Primitive.fromByteArray(element.getEncoded())));
 			}
 			certificates = SigUtils.fillRestCerts(ce, vCertsSig);
@@ -231,7 +230,9 @@ final class CAdESCoSigner {
 		final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(AOSignConstants.getDigestAlgorithmName(signatureAlgorithm)));
 
 		// Identificador del firmante ISSUER AND SERIAL-NUMBER
-		final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Primitive.fromByteArray(signerCertificateChain[0].getTBSCertificate()));
+		final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(
+			ASN1Primitive.fromByteArray(((X509Certificate)certChain[0]).getTBSCertificate())
+		);
 		final IssuerAndSerialNumber encSid = new IssuerAndSerialNumber(X500Name.getInstance(tbs.getIssuer()), tbs.getSerialNumber().getValue());
 		final SignerIdentifier identifier = new SignerIdentifier(encSid);
 
@@ -240,7 +241,8 @@ final class CAdESCoSigner {
 		ASN1Set signedAttr = null;
 		if (messageDigest == null) {
 			final ASN1EncodableVector contextExpecific =
-					CAdESUtils.generateSignerInfo(signerCertificateChain[0],
+					CAdESUtils.generateSignerInfo(
+							(X509Certificate) certChain[0],
 							digestAlgorithm,
 							content2 != null ? content2 : parameters.getContent(),
 									policy,
@@ -256,7 +258,8 @@ final class CAdESCoSigner {
 		}
 		else {
 			final ASN1EncodableVector contextExpecific =
-					CAdESUtils.generateSignerInfo(signerCertificateChain[0],
+					CAdESUtils.generateSignerInfo(
+							(X509Certificate) certChain[0],
 							digestAlgorithm,
 							null,
 							policy,

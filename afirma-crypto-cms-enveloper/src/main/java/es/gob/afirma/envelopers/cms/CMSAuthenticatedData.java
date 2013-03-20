@@ -140,6 +140,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
      * @throws NoSuchPaddingException
      */
     static byte[] genAuthenticatedData(final P7ContentSignerParameters parameters,
+    		                           final X509Certificate[] signerCertChain,
                                        final String autenticationAlgorithm,
                                        final AOCipherConfig config,
                                        final X509Certificate[] certDest,
@@ -163,12 +164,11 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 
         // 1. ORIGINATORINFO
         // obtenemos la lista de certificados
-        final X509Certificate[] signerCertificateChain = parameters.getSignerCertificateChain();
-        final ASN1Set certificates = Utils.fetchCertificatesList(signerCertificateChain);
+        final ASN1Set certificates = Utils.fetchCertificatesList(signerCertChain);
         ASN1Set certrevlist = null;
 
         OriginatorInfo origInfo = null;
-        if (signerCertificateChain.length != 0) {
+        if (signerCertChain.length != 0) {
             // introducimos una lista vacia en los CRL ya que no podemos
             // modificar el codigo de bc.
             final List<ASN1Encodable> crl = new ArrayList<ASN1Encodable>();
@@ -205,7 +205,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 
         // 6. ATRIBUTOS FIRMADOS
         ASN1Set authAttr = null;
-        authAttr = generateSignedAtt(signerCertificateChain[0], digestAlgorithm, content2, dataType, applyTimestamp, atrib);
+        authAttr = generateSignedAtt(signerCertChain[0], digestAlgorithm, content2, dataType, applyTimestamp, atrib);
 
         // 7. MAC
         final byte[] mac = Utils.genMac(autenticationAlgorithm, authAttr.getEncoded(ASN1Encoding.DER), cipherKey);
@@ -216,15 +216,19 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
         unAuthAttr = Utils.generateUnsignedAtt(uatrib);
 
         // construimos el Authenticated data y lo devolvemos
-        return new ContentInfo(PKCSObjectIdentifiers.id_ct_authData, new AuthenticatedData(origInfo, // OriginatorInfo
-                                                                                           new DERSet(infos.getRecipientInfos()), // ASN1Set
-                                                                                           macAlgorithm, // macAlgorithm
-                                                                                           digAlgId, // AlgorithmIdentifier
-                                                                                           encInfo, // ContentInfo
-                                                                                           authAttr, // ASN1Set
-                                                                                           new DEROctetString(mac), // ASN1OctetString
-                                                                                           unAuthAttr // ASN1Set
-                               )).getEncoded(ASN1Encoding.DER);
+        return new ContentInfo(
+    		PKCSObjectIdentifiers.id_ct_authData,
+    		new AuthenticatedData(
+				origInfo, // OriginatorInfo
+                new DERSet(infos.getRecipientInfos()), // ASN1Set
+                macAlgorithm, // macAlgorithm
+                digAlgId, // AlgorithmIdentifier
+                encInfo, // ContentInfo
+                authAttr, // ASN1Set
+                new DEROctetString(mac), // ASN1OctetString
+                unAuthAttr // ASN1Set
+			)
+		).getEncoded(ASN1Encoding.DER);
 
     }
 
@@ -294,13 +298,6 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 
         return SigUtils.getAttributeSet(new AttributeTable(contexExpecific));
     }
-
-    /** M&eacute;todo que genera la parte que contiene la informaci&oacute;n del
-     * Usuario. Se generan los atributos no firmados.
-     * @param uatrib
-     *        Lista de atributos no firmados que se insertar&aacute;n dentro
-     *        del archivo de firma.
-     * @return Los atributos no firmados de la firma. */
 
     /*************************************************************************/
     /**************** Metodos auxiliares de cifrado **************************/

@@ -12,7 +12,6 @@ package es.gob.afirma.envelopers.cades;
 
 import java.security.InvalidKeyException;
 import java.security.KeyStore.PrivateKeyEntry;
-import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Properties;
 
@@ -84,26 +83,7 @@ public class AOCAdESEnveloper implements AOEnveloper {
             throw new IllegalArgumentException("El archivo a tratar no puede ser nulo."); //$NON-NLS-1$
         }
 
-        P7ContentSignerParameters csp = null;
-        if (keyEntry != null) {
-
-            X509Certificate[] xCerts = new X509Certificate[0];
-            final Certificate[] certs = keyEntry.getCertificateChain();
-            if (certs != null && certs instanceof X509Certificate[]) {
-                xCerts = (X509Certificate[]) certs;
-            }
-            else {
-                final Certificate cert = keyEntry.getCertificate();
-                if (cert instanceof X509Certificate) {
-                    xCerts = new X509Certificate[] {
-                                                    (X509Certificate) cert
-                    };
-                }
-            }
-
-            csp = new P7ContentSignerParameters(data, digestAlgorithm, xCerts);
-
-        }
+        final P7ContentSignerParameters csp = new P7ContentSignerParameters(data, digestAlgorithm);
 
         // tipos de datos a firmar.
         final String dataType = datTyp != null ? datTyp : PKCSObjectIdentifiers.data.getId();
@@ -139,7 +119,13 @@ public class AOCAdESEnveloper implements AOEnveloper {
             // Es Enveloped Data. El null y el vacio se consideran Enveloped Data, el por defecto
             else if (AOSignConstants.CMS_CONTENTTYPE_ENVELOPEDDATA.equals(type)  || type == null || "".equals(type)) { //$NON-NLS-1$
                 if (keyEntry != null) {
-                    dataSigned = new CAdESEnvelopedData().genEnvelopedData(csp, config, certDest, dataType);
+                    dataSigned = new CAdESEnvelopedData().genEnvelopedData(
+                		csp,
+                		(X509Certificate[]) keyEntry.getCertificateChain(),
+                		config,
+                		certDest,
+                		dataType
+            		);
                 }
                 else {
                     dataSigned = new CAdESEnvelopedData().genEnvelopedData(data, digestAlgorithm, config, certDest, dataType);
@@ -147,13 +133,15 @@ public class AOCAdESEnveloper implements AOEnveloper {
             }
             // Es Signed and Enveloped Data.
             else {
-                dataSigned =
-                        new CAdESEPESSignedAndEnvelopedData().genCADESEPESSignedAndEnvelopedData(csp,
-                                                                                                 config,
-                                                                                                 new AdESPolicy(extraParams),
-                                                                                                 certDest,
-                                                                                                 PKCSObjectIdentifiers.signedData.getId(),
-                                                                                                 keyEntry);
+                dataSigned = new CAdESEPESSignedAndEnvelopedData().genCADESEPESSignedAndEnvelopedData(
+            		csp,
+            		(X509Certificate[]) keyEntry.getCertificateChain(),
+                    config,
+                    new AdESPolicy(extraParams),
+                    certDest,
+                    PKCSObjectIdentifiers.signedData.getId(),
+                    keyEntry
+                );
             }
         }
         catch (final Exception e) {

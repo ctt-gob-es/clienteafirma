@@ -108,13 +108,14 @@ final class CounterSignerEnveloped {
      * @throws SignatureException
      * @throws InvalidKeyException */
     byte[] counterSignerEnveloped(final P7ContentSignerParameters parameters,
-                                         final byte[] data,
-                                         final CounterSignTarget targetType,
-                                         final int[] targets,
-                                         final PrivateKeyEntry keyEntry,
-                                         final String dataType,
-                                         final Map<String, byte[]> atri,
-                                         final Map<String, byte[]> uatri) throws IOException,
+    		                      final X509Certificate[] signerCertificateChain,
+                                  final byte[] data,
+                                  final CounterSignTarget targetType,
+                                  final int[] targets,
+                                  final PrivateKeyEntry keyEntry,
+                                  final String dataType,
+                                  final Map<String, byte[]> atri,
+                                  final Map<String, byte[]> uatri) throws IOException,
                                                                                  NoSuchAlgorithmException,
                                                                                  CertificateException,
                                                                                  InvalidKeyException,
@@ -142,7 +143,6 @@ final class CounterSignerEnveloped {
         // 4. CERTIFICADOS
         // obtenemos la lista de certificados
         ASN1Set certificates = null;
-        final X509Certificate[] signerCertificateChain = parameters.getSignerCertificateChain();
 
         final ASN1Set certificatesSigned = sd.getCertificates();
         final ASN1EncodableVector vCertsSig = new ASN1EncodableVector();

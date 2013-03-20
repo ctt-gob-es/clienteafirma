@@ -58,10 +58,7 @@ public class AOCAdESCoSigner implements AOCoSigner {
 
         final P7ContentSignerParameters csp = new P7ContentSignerParameters(
     		data,
-    		algorithm,
-    		Boolean.parseBoolean(extraParams.getProperty("includeOnlySignningCertificate")) ? //$NON-NLS-1$
-    			new X509Certificate[] { (X509Certificate) certChain[0] } :
-				(X509Certificate[]) certChain
+    		algorithm
 		);
 
         String contentTypeOid = MimeHelper.DEFAULT_CONTENT_OID_DATA;

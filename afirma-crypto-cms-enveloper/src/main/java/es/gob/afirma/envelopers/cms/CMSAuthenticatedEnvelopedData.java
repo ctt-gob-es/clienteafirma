@@ -126,14 +126,15 @@ public final class CMSAuthenticatedEnvelopedData {
      * @throws NoSuchPaddingException
      */
     static byte[] genAuthenticatedEnvelopedData(final P7ContentSignerParameters parameters,
-	                                        	   final String autenticationAlgorithm,
-	                                        	   final AOCipherConfig config,
-	                                        	   final X509Certificate[] certDest,
-	                                        	   final String dataType,
-	                                        	   final boolean applySigningTime,
-	                                        	   final Map<String, byte[]> atrib,
-	                                        	   final Map<String, byte[]> uatrib,
-	                                        	   final Integer keySize) throws IOException,
+    		                                    final X509Certificate[] signerCertificateChain,
+	                                        	final String autenticationAlgorithm,
+	                                        	final AOCipherConfig config,
+	                                        	final X509Certificate[] certDest,
+	                                        	final String dataType,
+	                                        	final boolean applySigningTime,
+	                                        	final Map<String, byte[]> atrib,
+	                                        	final Map<String, byte[]> uatrib,
+	                                        	final Integer keySize) throws IOException,
 	                                                                             CertificateEncodingException,
 	                                                                             NoSuchAlgorithmException,
 	                                                                             InvalidKeyException,
@@ -148,7 +149,6 @@ public final class CMSAuthenticatedEnvelopedData {
 
         // 1. ORIGINATORINFO
         // obtenemos la lista de certificados
-        final X509Certificate[] signerCertificateChain = parameters.getSignerCertificateChain();
         final ASN1Set certificates = Utils.fetchCertificatesList(signerCertificateChain);
         ASN1Set certrevlist = null;
 

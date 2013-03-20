@@ -78,9 +78,13 @@ final class CAdESEnvelopedData {
      * @throws java.security.NoSuchAlgorithmException
      *         Si no se soporta alguno de los algoritmos de firma o huella
      *         digital */
-    byte[] genEnvelopedData(final P7ContentSignerParameters parameters, final AOCipherConfig config, final X509Certificate[] certDest, final String dataType) throws IOException,
-                                                                                                                                         CertificateEncodingException,
-                                                                                                                                         NoSuchAlgorithmException {
+    byte[] genEnvelopedData(final P7ContentSignerParameters parameters,
+    		                final X509Certificate[] signerCertificateChain,
+    		                final AOCipherConfig config,
+    		                final X509Certificate[] certDest,
+    		                final String dataType) throws IOException,
+                                                          CertificateEncodingException,
+                                                          NoSuchAlgorithmException {
 
         this.cipherKey = CAdESUtils.initEnvelopedData(config, certDest);
 
@@ -89,7 +93,6 @@ final class CAdESEnvelopedData {
 
         // 1. ORIGINATORINFO
         // obtenemos la lista de certificados
-        final X509Certificate[] signerCertificateChain = parameters.getSignerCertificateChain();
         final ASN1Set certificates = CAdESUtils.fetchCertificatesList(signerCertificateChain);
         final ASN1Set certrevlist = null;
 

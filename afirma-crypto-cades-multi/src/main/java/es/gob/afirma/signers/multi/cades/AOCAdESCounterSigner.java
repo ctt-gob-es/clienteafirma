@@ -12,7 +12,6 @@ package es.gob.afirma.signers.multi.cades;
 
 import java.io.IOException;
 import java.security.PrivateKey;
-import java.security.cert.X509Certificate;
 import java.util.Properties;
 
 import es.gob.afirma.core.AOException;
@@ -54,10 +53,7 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
 
         final P7ContentSignerParameters csp = new P7ContentSignerParameters(
     		sign,
-    		algorithm,
-    		Boolean.parseBoolean(extraParams.getProperty("includeOnlySignningCertificate")) ? //$NON-NLS-1$
-    			new X509Certificate[] { (X509Certificate) certChain[0] } :
-				(X509Certificate[]) certChain
+    		algorithm
 		);
 
         String contentTypeOid = MimeHelper.DEFAULT_CONTENT_OID_DATA;

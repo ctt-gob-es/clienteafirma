@@ -299,6 +299,7 @@ public class AOCMSEnveloper implements AOEnveloper {
         if (ke != null) {
             return new CMSEnvelopedData().genEnvelopedData(
             		AOCMSEnveloper.createContentSignerParementers(content, ke, this.signatureAlgorithm),
+            		(X509Certificate[]) ke.getCertificateChain(),
                     cipherConfig,
                     recipientsCerts,
                     DATA_TYPE_OID,
@@ -362,6 +363,7 @@ public class AOCMSEnveloper implements AOEnveloper {
                                                                                 SignatureException {
         return new CMSSignedAndEnvelopedData().genSignedAndEnvelopedData(
         	 AOCMSEnveloper.createContentSignerParementers(content, ke, this.signatureAlgorithm),
+        	 (X509Certificate[]) ke.getCertificateChain(),
              cipherConfig,
              recipientsCerts,
              DATA_TYPE_OID,
@@ -412,6 +414,7 @@ public class AOCMSEnveloper implements AOEnveloper {
                                                                     BadPaddingException {
 		return CMSAuthenticatedData.genAuthenticatedData(
         		AOCMSEnveloper.createContentSignerParementers(content, ke, this.signatureAlgorithm), // ContentSignerParameters
+        		(X509Certificate[]) ke.getCertificateChain(), // Certificados del firmante (remitente)
                 null, // Algoritmo de autenticacion (usamos el por defecto)
                 cipherConfig, // Configuracion del cipher
                 recipientsCerts, // certificados destino
@@ -464,6 +467,7 @@ public class AOCMSEnveloper implements AOEnveloper {
                                                                                     BadPaddingException {
 		return CMSAuthenticatedEnvelopedData.genAuthenticatedEnvelopedData(
 				AOCMSEnveloper.createContentSignerParementers(content, ke, this.signatureAlgorithm), // ContentSignerParameters
+				(X509Certificate[]) ke.getCertificateChain(), // Certificados del firmante (remitente)
                 null,            // Algoritmo de autenticacion (usamos el por defecto)
                 cipherConfig,    // Configuracion del cipher
                 recipientsCerts, // certificados destino
@@ -485,7 +489,7 @@ public class AOCMSEnveloper implements AOEnveloper {
      *        Algoritmo de huella digital.
      * @return Bloque de datos con la informaci&oacute;n del remitente. */
     private static P7ContentSignerParameters createContentSignerParementers(final byte[] content, final PrivateKeyEntry ke, final String digestAlgorithm) {
-        return new P7ContentSignerParameters(content, digestAlgorithm, (X509Certificate[]) ke.getCertificateChain());
+        return new P7ContentSignerParameters(content, digestAlgorithm);
     }
 
     /** Agrega un nuevo remitente a un envoltorio CMS compatible.
@@ -547,7 +551,13 @@ public class AOCMSEnveloper implements AOEnveloper {
             newEnvelop = CMSEnvelopedData.addOriginatorInfo(envelop, (X509Certificate[]) ke.getCertificateChain());
         }
         else if (contentInfo.equals(CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA)) {
-            newEnvelop = new AOCMSSigner().cosign(envelop, AOSignConstants.DEFAULT_SIGN_ALGO, ke, null);
+            newEnvelop = new AOCMSSigner().cosign(
+        		envelop,
+        		AOSignConstants.DEFAULT_SIGN_ALGO,
+        		ke.getPrivateKey(),
+        		ke.getCertificateChain(),
+        		null
+    		);
         }
         else if (contentInfo.equals(CMS_CONTENTTYPE_AUTHENVELOPEDDATA)) {
             newEnvelop = CMSAuthenticatedEnvelopedData.addOriginatorInfo(envelop, (X509Certificate[]) ke.getCertificateChain());

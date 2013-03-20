@@ -114,6 +114,7 @@ final class CMSSignedAndEnvelopedData {
      * @throws SignatureException
      */
     byte[] genSignedAndEnvelopedData(final P7ContentSignerParameters parameters,
+    		                         final X509Certificate[] signerCertificateChain,
                                      final AOCipherConfig config,
                                      final X509Certificate[] certDest,
                                      final String dataType,
@@ -147,7 +148,6 @@ final class CMSSignedAndEnvelopedData {
         digestAlgs.add(digAlgId);
 
         // LISTA DE CERTIFICADOS: obtenemos la lista de certificados
-        final X509Certificate[] signerCertificateChain = parameters.getSignerCertificateChain();
         final ASN1Set certificates = Utils.fetchCertificatesList(signerCertificateChain);
 
         // Ya que el contenido puede ser grande, lo recuperamos solo una vez

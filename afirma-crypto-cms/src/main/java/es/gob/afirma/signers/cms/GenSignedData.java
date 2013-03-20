@@ -12,9 +12,9 @@ package es.gob.afirma.signers.cms;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.security.KeyStore.PrivateKeyEntry;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.Signature;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -107,8 +107,7 @@ final class GenSignedData {
      *        Si se aplica el Timestamp o no.
      * @param dataType
      *        Identifica el tipo del contenido a firmar.
-     * @param keyEntry
-     *        Clave privada del firmante.
+     * @param key Clave privada del firmante.
      * @param atrib
      *        Atributos firmados opcionales.
      * @param uatrib
@@ -132,7 +131,8 @@ final class GenSignedData {
                                      final boolean omitContent,
                                      final boolean applyTimestamp,
                                      final String dataType,
-                                     final PrivateKeyEntry keyEntry,
+                                     final PrivateKey key,
+                                     final java.security.cert.Certificate[] certChain,
                                      final Map<String, byte[]> atrib,
                                      final Map<String, byte[]> uatrib,
                                      final byte[] messageDigest) throws NoSuchAlgorithmException, CertificateException, IOException, AOException {
@@ -183,11 +183,10 @@ final class GenSignedData {
         // obtenemos la lista de certificados
 
         ASN1Set certificates = null;
-        final X509Certificate[] signerCertificateChain = parameters.getSignerCertificateChain();
 
-        if (signerCertificateChain.length != 0) {
+        if (certChain.length != 0) {
             final List<ASN1Encodable> ce = new ArrayList<ASN1Encodable>();
-            for (final X509Certificate element : signerCertificateChain) {
+            for (final java.security.cert.Certificate element : certChain) {
                 ce.add(Certificate.getInstance(ASN1Primitive.fromByteArray(element.getEncoded())));
             }
             certificates = SigUtils.createBerSetFromList(ce);
@@ -199,7 +198,7 @@ final class GenSignedData {
         // raiz de la secuencia de SignerInfo
         final ASN1EncodableVector signerInfos = new ASN1EncodableVector();
 
-        final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Primitive.fromByteArray(signerCertificateChain[0].getTBSCertificate()));
+        final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Primitive.fromByteArray(((X509Certificate)certChain[0]).getTBSCertificate()));
         final IssuerAndSerialNumber encSid = new IssuerAndSerialNumber(X500Name.getInstance(tbs.getIssuer()), tbs.getSerialNumber().getValue());
 
         final SignerIdentifier identifier = new SignerIdentifier(encSid);
@@ -230,7 +229,7 @@ final class GenSignedData {
             throw new IOException("Error de codificacion: " + e, e); //$NON-NLS-1$
         }
 
-        final ASN1OctetString sign2 = firma(signatureAlgorithm, keyEntry);
+        final ASN1OctetString sign2 = firma(signatureAlgorithm, key);
         signerInfos.add(new SignerInfo(identifier, digAlgId, signedAttr, encAlgId, sign2, unSignedAttr// null //unsignedAttr
         ));
 
@@ -350,7 +349,7 @@ final class GenSignedData {
      *        Clave para firmar.
      * @return Firma de los atributos.
      * @throws es.map.es.map.afirma.exceptions.AOException */
-    private ASN1OctetString firma(final String signatureAlgorithm, final PrivateKeyEntry keyEntry) throws AOException {
+    private ASN1OctetString firma(final String signatureAlgorithm, final PrivateKey key) throws AOException {
 
         final Signature sig;
         try {
@@ -362,7 +361,7 @@ final class GenSignedData {
 
         // Indicar clave privada para la firma
         try {
-            sig.initSign(keyEntry.getPrivateKey());
+            sig.initSign(key);
         }
         catch (final Exception e) {
             throw new AOException("Error al inicializar la firma con la clave privada", e); //$NON-NLS-1$

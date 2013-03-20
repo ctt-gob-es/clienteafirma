@@ -11,9 +11,9 @@
 package es.gob.afirma.signers.cms;
 
 import java.io.IOException;
-import java.security.KeyStore.PrivateKeyEntry;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.CertificateException;
@@ -88,8 +88,7 @@ final class CounterSigner {
      *        las hojas, un nodo determinado o unos determinados firmantes.
      * @param targets
      *        Nodos objetivos a firmar.
-     * @param keyEntry
-     *        Clave privada a usar para firmar.
+     * @param key Clave privada a usar para firmar.
      * @param dataType
      *        Identifica el tipo del contenido a firmar.
      * @param atri
@@ -114,7 +113,8 @@ final class CounterSigner {
                                 final byte[] data,
                                 final CounterSignTarget targetType,
                                 final int[] targets,
-                                final PrivateKeyEntry keyEntry,
+                                final PrivateKey key,
+                                final java.security.cert.Certificate[] certChain,
                                 final String dataType,
                                 final Map<String, byte[]> atri,
                                 final Map<String, byte[]> uatri) throws IOException, NoSuchAlgorithmException, CertificateException, AOException {
@@ -143,7 +143,6 @@ final class CounterSigner {
         // 4. CERTIFICADOS
         // obtenemos la lista de certificados
         ASN1Set certificates = null;
-        final X509Certificate[] signerCertificateChain = parameters.getSignerCertificateChain();
 
         final ASN1Set certificatesSigned = sd.getCertificates();
         final ASN1EncodableVector vCertsSig = new ASN1EncodableVector();
@@ -154,11 +153,9 @@ final class CounterSigner {
             vCertsSig.add((ASN1Encodable) certs.nextElement());
         }
 
-        if (signerCertificateChain.length != 0) {
-
-            vCertsSig.add(Certificate.getInstance(ASN1Primitive.fromByteArray(signerCertificateChain[0].getEncoded())));
+        if (certChain.length != 0) {
+            vCertsSig.add(Certificate.getInstance(ASN1Primitive.fromByteArray(certChain[0].getEncoded())));
             certificates = new BERSet(vCertsSig);
-
         }
 
         // CRLS no usado
@@ -170,10 +167,10 @@ final class CounterSigner {
 
         // FIRMA EN ARBOL
         if (targetType.equals(CounterSignTarget.TREE)) {
-            signerInfos = counterTree(signerInfosSd, parameters, signerCertificateChain[0], keyEntry);
+            signerInfos = counterTree(signerInfosSd, parameters, key, certChain);
         } // FIRMA DE LAS HOJAS
         else if (targetType.equals(CounterSignTarget.LEAFS)) {
-            signerInfos = counterLeaf(signerInfosSd, parameters, signerCertificateChain[0], keyEntry);
+            signerInfos = counterLeaf(signerInfosSd, parameters, key, certChain);
         } // FIRMA DE NODOS
         else if (targetType.equals(CounterSignTarget.NODES)) {
             // Firma de Nodos
@@ -184,7 +181,7 @@ final class CounterSigner {
             int nodo = 0;
             for (int i = targets.length - 1; i >= 0; i--) {
                 nodo = targets[i];
-                signerInfos = counterNode(aux, parameters, signerCertificateChain[0], keyEntry, nodo);
+                signerInfos = counterNode(aux, parameters, key, certChain, nodo);
                 sigDat = new SignedData(sd.getDigestAlgorithms(), sd.getEncapContentInfo(), certificates, certrevlist, new DERSet(signerInfos));
 
                 // Esto se realiza as&iacute; por problemas con los casting.
@@ -206,7 +203,13 @@ final class CounterSigner {
             int nodo = 0;
             for (int i = targets.length - 1; i >= 0; i--) {
                 nodo = targets[i];
-                signerInfos = counterNode(aux, parameters, signerCertificateChain[0], keyEntry, nodo);
+                signerInfos = counterNode(
+            		aux,
+            		parameters,
+            		key,
+            		certChain,
+            		nodo
+        		);
                 sigDat = new SignedData(sd.getDigestAlgorithms(), sd.getEncapContentInfo(), certificates, certrevlist, new DERSet(signerInfos));
 
                 // Esto se realiza as&iacute; por problemas con los casting.
@@ -238,10 +241,7 @@ final class CounterSigner {
      * @param parameters
      *        Par&aacute;metros necesarios para firmar un determinado
      *        SignerInfo
-     * @param cert
-     *        Certificado de firma.
-     * @param keyEntry
-     *        Clave privada a usar para firmar
+     * @param key Clave privada a usar para firmar
      * @return El SignerInfo ra&iacute;z con todos sus nodos Contrafirmados.
      * @throws java.security.NoSuchAlgorithmException
      *         Si no se soporta alguno de los algoritmos de firma o huella
@@ -257,15 +257,15 @@ final class CounterSigner {
      *         (formato o clave incorrecto,...) */
     private ASN1EncodableVector counterTree(final ASN1Set signerInfosRaiz,
                                             final P7ContentSignerParameters parameters,
-                                            final X509Certificate cert,
-                                            final PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException, IOException, CertificateException, AOException {
+                                            final PrivateKey key,
+                                            final java.security.cert.Certificate[] certChain) throws NoSuchAlgorithmException, IOException, CertificateException, AOException {
 
         final ASN1EncodableVector counterSigners = new ASN1EncodableVector();
 
         for (int i = 0; i < signerInfosRaiz.size(); i++) {
             final ASN1Sequence atribute = (ASN1Sequence) signerInfosRaiz.getObjectAt(i);
             final SignerInfo si = new SignerInfo(atribute);
-            counterSigners.add(getCounterUnsignedAtributes(si, parameters, cert, keyEntry));
+            counterSigners.add(getCounterUnsignedAtributes(si, parameters, key, certChain));
         }
 
         return counterSigners;
@@ -279,10 +279,7 @@ final class CounterSigner {
      * @param parameters
      *        Par&aacute;metros necesarios para firmar un determinado
      *        SignerInfo hoja.
-     * @param cert
-     *        Certificado de firma.
-     * @param keyEntry
-     *        Clave privada a usar para firmar
+     * @param key Clave privada a usar para firmar
      * @return El SignerInfo ra&iacute;z con todos sus nodos Contrafirmados.
      * @throws java.security.NoSuchAlgorithmException
      * @throws java.io.IOException
@@ -290,15 +287,15 @@ final class CounterSigner {
      * @throws es.map.es.map.afirma.exceptions.AOException */
     private ASN1EncodableVector counterLeaf(final ASN1Set signerInfosRaiz,
                                             final P7ContentSignerParameters parameters,
-                                            final X509Certificate cert,
-                                            final PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException, IOException, CertificateException, AOException {
+                                            final PrivateKey key,
+                                            final java.security.cert.Certificate[] certChain) throws NoSuchAlgorithmException, IOException, CertificateException, AOException {
 
         final ASN1EncodableVector counterSigners = new ASN1EncodableVector();
 
         for (int i = 0; i < signerInfosRaiz.size(); i++) {
             final ASN1Sequence atribute = (ASN1Sequence) signerInfosRaiz.getObjectAt(i);
             final SignerInfo si = new SignerInfo(atribute);
-            counterSigners.add(getCounterLeafUnsignedAtributes(si, parameters, cert, keyEntry));
+            counterSigners.add(getCounterLeafUnsignedAtributes(si, parameters, key, certChain));
         }
 
         return counterSigners;
@@ -311,10 +308,7 @@ final class CounterSigner {
      * @param parameters
      *        Par&aacute;metros necesarios para firmar un determinado
      *        SignerInfo hoja.
-     * @param cert
-     *        Certificado de firma.
-     * @param keyEntry
-     *        Clave privada a usar para firmar
+     * @param key Clave privada a usar para firmar
      * @param nodo
      *        Nodo signerInfo a firmar.
      * @return El SignerInfo ra&iacute;z con todos sus nodos Contrafirmados.
@@ -324,8 +318,8 @@ final class CounterSigner {
      * @throws es.map.es.map.afirma.exceptions.AOException */
     private ASN1EncodableVector counterNode(final SignedData sd,
                                             final P7ContentSignerParameters parameters,
-                                            final X509Certificate cert,
-                                            final PrivateKeyEntry keyEntry,
+                                            final PrivateKey key,
+                                            final java.security.cert.Certificate[] certChain,
                                             final int nodo) throws NoSuchAlgorithmException, IOException, CertificateException, AOException {
 
         final ASN1Set signerInfosRaiz = sd.getSignerInfos();
@@ -341,11 +335,11 @@ final class CounterSigner {
             final SignerInfo si = new SignerInfo(atribute);
             SignerInfo counterSigner = null;
             if (this.actualIndex == nodo) {
-                counterSigner = getCounterNodeUnsignedAtributes(si, parameters, cert, keyEntry);
+                counterSigner = getCounterNodeUnsignedAtributes(si, parameters, key, certChain);
             }
             else {
                 if (this.actualIndex != nodo) {
-                    counterSigner = getCounterNodeUnsignedAtributes(si, parameters, cert, keyEntry, nodo);
+                    counterSigner = getCounterNodeUnsignedAtributes(si, parameters, key, certChain, nodo);
                 }
             }
             this.actualIndex++;
@@ -364,10 +358,7 @@ final class CounterSigner {
      * @param parameters
      *        Par&aacute;metros necesarios para firmar un determinado
      *        SignerInfo hoja.
-     * @param cert
-     *        Certificado de firma.
-     * @param keyEntry
-     *        Clave privada a usar para firmar.
+     * @param key Clave privada a usar para firmar.
      * @return El SignerInfo ra&iacute;z parcial con todos sus nodos
      *         Contrafirmados.
      * @throws java.security.NoSuchAlgorithmException
@@ -376,8 +367,8 @@ final class CounterSigner {
      * @throws es.map.es.map.afirma.exceptions.AOException */
     private SignerInfo getCounterUnsignedAtributes(final SignerInfo signerInfo,
                                                    final P7ContentSignerParameters parameters,
-                                                   final X509Certificate cert,
-                                                   final PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException,
+                                                   final PrivateKey key,
+                                                   final java.security.cert.Certificate[] certChain) throws NoSuchAlgorithmException,
                                                                             IOException,
                                                                             CertificateException,
                                                                             AOException {
@@ -400,7 +391,7 @@ final class CounterSigner {
                             final ASN1Sequence atrib = (ASN1Sequence) obj;
                             final SignerInfo si = new SignerInfo(atrib);
 
-                            final SignerInfo obtained = getCounterUnsignedAtributes(si, parameters, cert, keyEntry);
+                            final SignerInfo obtained = getCounterUnsignedAtributes(si, parameters, key, certChain);
                             signerInfosU.add(obtained);
                         }
                         else {
@@ -413,7 +404,7 @@ final class CounterSigner {
                 }
             }
             // FIRMA DEL NODO ACTUAL
-            counterSigner = unsignedAtributte(parameters, cert, signerInfo, keyEntry);
+            counterSigner = unsignedAtributte(parameters, signerInfo, key, certChain);
             signerInfosU.add(counterSigner);
 
             // FIRMA DE CADA UNO DE LOS HIJOS
@@ -447,7 +438,7 @@ final class CounterSigner {
                         // anadimos el que hay
                         contexExpecific.add(signerInfosU.get(0));
                         // creamos el de la contrafirma.
-                        signerInfosU2.add(unsignedAtributte(parameters, cert, signerInfo, keyEntry));
+                        signerInfosU2.add(unsignedAtributte(parameters, signerInfo, key, certChain));
                         final Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU2));
                         contexExpecific.add(uAtrib);
 
@@ -483,7 +474,7 @@ final class CounterSigner {
             }
         }
         else {
-            signerInfosU2.add(unsignedAtributte(parameters, cert, signerInfo, keyEntry));
+            signerInfosU2.add(unsignedAtributte(parameters, signerInfo, key, certChain));
             final Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU2));
             counterSigner =
                     new SignerInfo(signerInfo.getSID(),
@@ -507,10 +498,7 @@ final class CounterSigner {
      * @param parameters
      *        Par&aacute;metros necesarios para firmar un determinado
      *        SignerInfo hoja.
-     * @param cert
-     *        Certificado de firma.
-     * @param keyEntry
-     *        Clave privada a usar para firmar
+     * @param key Clave privada a usar para firmar
      * @return El SignerInfo ra&iacute;z parcial con todos sus nodos
      *         Contrafirmados.
      * @throws java.security.NoSuchAlgorithmException
@@ -519,11 +507,11 @@ final class CounterSigner {
      * @throws es.map.es.map.afirma.exceptions.AOException */
     private SignerInfo getCounterLeafUnsignedAtributes(final SignerInfo signerInfo,
                                                        final P7ContentSignerParameters parameters,
-                                                       final X509Certificate cert,
-                                                       final PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException,
-                                                                                IOException,
-                                                                                CertificateException,
-                                                                                AOException {
+                                                       final PrivateKey key,
+                                                       final java.security.cert.Certificate[] certChain) throws NoSuchAlgorithmException,
+                                                                                                                IOException,
+                                                                                                                CertificateException,
+                                                                                                                AOException {
 
         final List<Object> attributes = new ArrayList<Object>();
         final ASN1EncodableVector signerInfosU = new ASN1EncodableVector();
@@ -542,7 +530,7 @@ final class CounterSigner {
                         final Object obj = eAtributesData.nextElement();
                         if (obj instanceof ASN1Sequence) {
                             final SignerInfo si = new SignerInfo((ASN1Sequence) obj);
-                            final SignerInfo obtained = getCounterLeafUnsignedAtributes(si, parameters, cert, keyEntry);
+                            final SignerInfo obtained = getCounterLeafUnsignedAtributes(si, parameters, key, certChain);
                             signerInfosU.add(obtained);
                         }
                         else {
@@ -584,7 +572,7 @@ final class CounterSigner {
                         // anadimos el que hay
                         contexExpecific.add(signerInfosU.get(0));
                         // creamos el de la contrafirma.
-                        signerInfosU2.add(unsignedAtributte(parameters, cert, signerInfo, keyEntry));
+                        signerInfosU2.add(unsignedAtributte(parameters, signerInfo, key, certChain));
                         final Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU2));
                         contexExpecific.add(uAtrib);
 
@@ -621,7 +609,7 @@ final class CounterSigner {
             }
         }
         else {
-            signerInfosU2.add(unsignedAtributte(parameters, cert, signerInfo, keyEntry));
+            signerInfosU2.add(unsignedAtributte(parameters, signerInfo, key, certChain));
             final Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU2));
             counterSigner =
                     new SignerInfo(signerInfo.getSID(),
@@ -645,10 +633,7 @@ final class CounterSigner {
      * @param parameters
      *        Par&aacute;metros necesarios para firmar un determinado
      *        SignerInfo hoja.
-     * @param cert
-     *        Certificado de firma.
-     * @param keyEntry
-     *        Clave privada a usar para firmar
+     * @param key Clave privada a usar para firmar
      * @return El SignerInfo ra&iacute;z parcial con todos sus nodos
      *         Contrafirmados.
      * @throws java.security.NoSuchAlgorithmException
@@ -656,8 +641,10 @@ final class CounterSigner {
      * @throws java.security.cert.CertificateException */
     private SignerInfo getCounterNodeUnsignedAtributes(final SignerInfo signerInfo,
                                                        final P7ContentSignerParameters parameters,
-                                                       final X509Certificate cert,
-                                                       final PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException, IOException, CertificateException {
+                                                       final PrivateKey key,
+                                                       final java.security.cert.Certificate[] certChain) throws NoSuchAlgorithmException,
+                                                                                                                IOException,
+                                                                                                                CertificateException {
 
         final List<Object> attributes = new ArrayList<Object>();
         final ASN1EncodableVector signerInfosU = new ASN1EncodableVector();
@@ -685,7 +672,7 @@ final class CounterSigner {
                 }
             }
             // FIRMA DEL NODO ACTUAL
-            signerInfosU.add(unsignedAtributte(parameters, cert, signerInfo, keyEntry));
+            signerInfosU.add(unsignedAtributte(parameters, signerInfo, key, certChain));
 
             // FIRMA DE CADA UNO DE LOS HIJOS
             ASN1Set a1;
@@ -716,7 +703,7 @@ final class CounterSigner {
                         // anadimos el que hay
                         contexExpecific.add(signerInfosU.get(0));
                         // creamos el de la contrafirma.
-                        signerInfosU2.add(unsignedAtributte(parameters, cert, signerInfo, keyEntry));
+                        signerInfosU2.add(unsignedAtributte(parameters, signerInfo, key, certChain));
                         final Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU2));
                         contexExpecific.add(uAtrib);
 
@@ -753,7 +740,7 @@ final class CounterSigner {
             }
         }
         else {
-            signerInfosU2.add(unsignedAtributte(parameters, cert, signerInfo, keyEntry));
+            signerInfosU2.add(unsignedAtributte(parameters, signerInfo, key, certChain));
             final Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU2));
             counterSigner =
                     new SignerInfo(signerInfo.getSID(),
@@ -776,10 +763,7 @@ final class CounterSigner {
      * @param parameters
      *        Par&aacute;metros necesarios para firmar un determinado
      *        SignerInfo hoja.
-     * @param cert
-     *        Certificado de firma.
-     * @param keyEntry
-     *        Clave privada a usar para firmar
+     * @param key Clave privada a usar para firmar
      * @param node
      *        Nodo espec&iacute;fico a firmar.
      * @return El SignerInfo ra&iacute;z parcial con todos sus nodos
@@ -790,8 +774,8 @@ final class CounterSigner {
      * @throws es.map.es.map.afirma.exceptions.AOException */
     private SignerInfo getCounterNodeUnsignedAtributes(final SignerInfo signerInfo,
                                                        final P7ContentSignerParameters parameters,
-                                                       final X509Certificate cert,
-                                                       final PrivateKeyEntry keyEntry,
+                                                       final PrivateKey key,
+                                                       final java.security.cert.Certificate[] certChain,
                                                        final int node) throws NoSuchAlgorithmException, IOException, CertificateException, AOException {
 
         final List<Object> attributes = new ArrayList<Object>();
@@ -812,14 +796,14 @@ final class CounterSigner {
                             this.actualIndex++;
                             if (this.actualIndex != node) {
                                 if (this.actualIndex < node) {
-                                    signerInfosU.add(getCounterNodeUnsignedAtributes(si, parameters, cert, keyEntry, node));
+                                    signerInfosU.add(getCounterNodeUnsignedAtributes(si, parameters, key, certChain, node));
                                 }
                                 else {
                                     signerInfosU.add(si);
                                 }
                             }
                             else {
-                                signerInfosU.add(getCounterNodeUnsignedAtributes(si, parameters, cert, keyEntry));
+                                signerInfosU.add(getCounterNodeUnsignedAtributes(si, parameters, key, certChain));
                             }
                         }
                         else {
@@ -1013,23 +997,20 @@ final class CounterSigner {
      * @param parameters
      *        Par&aacute;metros necesarios para firmar un determinado
      *        SignerInfo hoja.
-     * @param cert
-     *        Certificado de firma.
      * @param si
      *        SignerInfo del que se debe recoger la informaci&oacute;n para
      *        realizar la contrafirma espec&iacute;fica.
-     * @param keyEntry
-     *        Clave privada a usar para firmar
+     * @param key Clave privada a usar para firmar
      * @return El signerInfo contrafirmado.
      * @throws java.security.NoSuchAlgorithmException
      * @throws java.io.IOException
      * @throws java.security.cert.CertificateException */
     private SignerInfo unsignedAtributte(final P7ContentSignerParameters parameters,
-                                         final X509Certificate cert,
                                          final SignerInfo si,
-                                         final PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException,
-                                                                                IOException,
-                                                                                CertificateException {
+                                         final PrivateKey key,
+                                         final java.security.cert.Certificate[] certChain) throws NoSuchAlgorithmException,
+                                                                                                  IOException,
+                                                                                                  CertificateException {
         // // UNAUTHENTICATEDATTRIBUTES
 
         // buscamos que timo de algoritmo es y lo codificamos con su OID
@@ -1038,12 +1019,12 @@ final class CounterSigner {
 
         // ATRIBUTOS FINALES
 
-        final ASN1Set signedAttr = generateSignerInfo(cert, digestAlgorithm, si.getEncryptedDigest().getOctets());
+        final ASN1Set signedAttr = generateSignerInfo((X509Certificate) certChain[0], digestAlgorithm, si.getEncryptedDigest().getOctets());
         final ASN1Set unsignedAttr = generateUnsignerInfo();
 
         // 5. SIGNERINFO
         // raiz de la secuencia de SignerInfo
-        final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Primitive.fromByteArray(cert.getTBSCertificate()));
+        final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Primitive.fromByteArray(((X509Certificate)certChain[0]).getTBSCertificate()));
         final IssuerAndSerialNumber encSid = new IssuerAndSerialNumber(X500Name.getInstance(tbs.getIssuer()), tbs.getSerialNumber().getValue());
         final SignerIdentifier identifier = new SignerIdentifier(encSid);
 
@@ -1057,7 +1038,7 @@ final class CounterSigner {
 
         final ASN1OctetString sign2;
         try {
-            sign2 = firma(signatureAlgorithm, keyEntry);
+            sign2 = firma(signatureAlgorithm, key);
         }
         catch (final Exception ex) {
             throw new IOException("Error realizando la firma: " + ex, ex); //$NON-NLS-1$
@@ -1070,11 +1051,10 @@ final class CounterSigner {
     /** Realiza la firma usando los atributos del firmante.
      * @param signatureAlgorithm
      *        Algoritmo para la firma
-     * @param keyEntry
-     *        Clave para firmar.
+     * @param key Clave para firmar.
      * @return Firma de los atributos.
      * @throws es.map.es.map.afirma.exceptions.AOException */
-    private ASN1OctetString firma(final String signatureAlgorithm, final PrivateKeyEntry keyEntry) throws AOException {
+    private ASN1OctetString firma(final String signatureAlgorithm, final PrivateKey key) throws AOException {
 
         final Signature sig;
         try {
@@ -1094,7 +1074,7 @@ final class CounterSigner {
 
         // Indicar clave privada para la firma
         try {
-            sig.initSign(keyEntry.getPrivateKey());
+            sig.initSign(key);
         }
         catch (final Exception e) {
             throw new AOException("Error al inicializar la firma con la clave privada", e); //$NON-NLS-1$

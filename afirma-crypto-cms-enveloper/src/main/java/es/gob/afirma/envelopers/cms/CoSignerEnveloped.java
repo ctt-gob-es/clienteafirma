@@ -97,12 +97,13 @@ final class CoSignerEnveloped {
      *         Si se produce alguna excepci&oacute;n con los certificados de
      *         firma. */
     byte[] coSigner(final P7ContentSignerParameters parameters,
-                           final byte[] sign,
-                           final String dataType,
-                           final PrivateKeyEntry keyEntry,
-                           final Map<String, byte[]> atrib,
-                           final Map<String, byte[]> uatrib,
-                           final byte[] messageDigest) throws IOException, NoSuchAlgorithmException, CertificateException {
+    		        final X509Certificate[] signerCertificateChain,
+                    final byte[] sign,
+                    final String dataType,
+                    final PrivateKeyEntry keyEntry,
+                    final Map<String, byte[]> atrib,
+                    final Map<String, byte[]> uatrib,
+                    final byte[] messageDigest) throws IOException, NoSuchAlgorithmException, CertificateException {
 
         final ASN1InputStream is = new ASN1InputStream(sign);
 
@@ -123,7 +124,6 @@ final class CoSignerEnveloped {
         // 4. CERTIFICADOS
         // obtenemos la lista de certificados
         ASN1Set certificates = null;
-        final X509Certificate[] signerCertificateChain = parameters.getSignerCertificateChain();
 
         final ASN1Set certificatesSigned = sd.getCertificates();
         final ASN1EncodableVector vCertsSig = new ASN1EncodableVector();

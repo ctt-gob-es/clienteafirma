@@ -11,8 +11,8 @@
 package es.gob.afirma.signers.cms;
 
 import java.io.IOException;
-import java.security.KeyStore.PrivateKeyEntry;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
@@ -55,7 +55,11 @@ public final class AOCMSSigner implements AOSigner {
 
     /** {@inheritDoc} */
     @Override
-	public byte[] sign(final byte[] data, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException, IOException {
+	public byte[] sign(final byte[] data,
+			           final String algorithm,
+			           final PrivateKey key,
+			           final java.security.cert.Certificate[] certChain,
+			           final Properties xParams) throws AOException, IOException {
 
     	new BCChecker().checkBouncyCastle();
 
@@ -68,7 +72,7 @@ public final class AOCMSSigner implements AOSigner {
             messageDigest = data;
         }
 
-        final P7ContentSignerParameters csp = new P7ContentSignerParameters(data, algorithm, (X509Certificate[]) keyEntry.getCertificateChain());
+        final P7ContentSignerParameters csp = new P7ContentSignerParameters(data, algorithm);
 
         // tipos de datos a firmar.
         if (this.dataType == null) {
@@ -79,14 +83,17 @@ public final class AOCMSSigner implements AOSigner {
 
         final boolean omitContent = mode.equals(AOSignConstants.SIGN_MODE_EXPLICIT) || precalculatedDigest != null;
         try {
-			return new GenSignedData().generateSignedData(csp,
-			                                              omitContent,
-			                                              Boolean.parseBoolean(extraParams.getProperty("applySystemDate", "true")), //$NON-NLS-1$ //$NON-NLS-2$
-			                                              this.dataType,
-			                                              keyEntry,
-			                                              this.atrib,
-			                                              this.uatrib,
-			                                              messageDigest);
+			return new GenSignedData().generateSignedData(
+				csp,
+			    omitContent,
+			    Boolean.parseBoolean(extraParams.getProperty("applySystemDate", "true")), //$NON-NLS-1$ //$NON-NLS-2$
+			    this.dataType,
+			    key,
+			    certChain,
+			    this.atrib,
+			    this.uatrib,
+			    messageDigest
+		    );
 		}
         catch (final NoSuchAlgorithmException e) {
 			throw new AOException("Error en el algoritmo de firma: " + e, e); //$NON-NLS-1$
@@ -99,7 +106,12 @@ public final class AOCMSSigner implements AOSigner {
 
     /** {@inheritDoc} */
     @Override
-	public byte[] cosign(final byte[] data, final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException, IOException {
+	public byte[] cosign(final byte[] data,
+			             final byte[] sign,
+			             final String algorithm,
+			             final PrivateKey key,
+			             final java.security.cert.Certificate[] certChain,
+			             final Properties xParams) throws AOException, IOException {
 
     	new BCChecker().checkBouncyCastle();
 
@@ -112,7 +124,7 @@ public final class AOCMSSigner implements AOSigner {
             messageDigest = data;
         }
 
-        final P7ContentSignerParameters csp = new P7ContentSignerParameters(data, algorithm, (X509Certificate[]) keyEntry.getCertificateChain());
+        final P7ContentSignerParameters csp = new P7ContentSignerParameters(data, algorithm);
 
         // tipos de datos a firmar.
         if (this.dataType == null) {
@@ -126,7 +138,7 @@ public final class AOCMSSigner implements AOSigner {
         // Si la firma que nos introducen es SignedData
         if (ValidateCMSSignedData.isCMSSignedData(sign)) {
             try {
-                return new CoSigner().coSigner(csp, sign, omitContent, this.dataType, keyEntry, this.atrib, this.uatrib, messageDigest);
+                return new CoSigner().coSigner(csp, sign, omitContent, this.dataType, key, certChain, this.atrib, this.uatrib, messageDigest);
             }
             catch (final Exception e) {
                 throw new AOException("Error generando la Cofirma PKCS#7", e); //$NON-NLS-1$
@@ -137,7 +149,11 @@ public final class AOCMSSigner implements AOSigner {
 
     /** {@inheritDoc} */
     @Override
-	public byte[] cosign(final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties extraParams) throws AOException, IOException {
+	public byte[] cosign(final byte[] sign,
+			             final String algorithm,
+			             final PrivateKey key,
+			             final java.security.cert.Certificate[] certChain,
+			             final Properties extraParams) throws AOException, IOException {
 
     	new BCChecker().checkBouncyCastle();
 
@@ -152,7 +168,7 @@ public final class AOCMSSigner implements AOSigner {
             try {
                 // No habra messageDigest porque no nos pueden dar un hash
                 // en este metodo, tendria que ser en el que incluye datos
-                return new CoSigner().coSigner(algorithm, (X509Certificate[])keyEntry.getCertificateChain(), sign, this.dataType, keyEntry, this.atrib, this.uatrib, null);
+                return new CoSigner().coSigner(algorithm, (X509Certificate[])certChain, sign, this.dataType, key, this.atrib, this.uatrib, null);
             }
             catch (final AOException e) {
                 throw e;
@@ -170,12 +186,13 @@ public final class AOCMSSigner implements AOSigner {
                               final String algorithm,
                               final CounterSignTarget targetType,
                               final Object[] targets,
-                              final PrivateKeyEntry keyEntry,
+                              final PrivateKey key,
+                              final java.security.cert.Certificate[] certChain,
                               final Properties extraParams) throws AOException, IOException {
 
     	new BCChecker().checkBouncyCastle();
 
-        final P7ContentSignerParameters csp = new P7ContentSignerParameters(sign, algorithm, (X509Certificate[]) keyEntry.getCertificateChain());
+        final P7ContentSignerParameters csp = new P7ContentSignerParameters(sign, algorithm);
 
         // tipos de datos a firmar.
         if (this.dataType == null) {
@@ -194,14 +211,34 @@ public final class AOCMSSigner implements AOSigner {
                     final int[] nodes = {
                         0
                     };
-                    dataSigned = new CounterSigner().counterSigner(csp, sign, CounterSignTarget.TREE, nodes, keyEntry, this.dataType, this.atrib, this.uatrib);
+                    dataSigned = new CounterSigner().counterSigner(
+                		csp,
+                		sign,
+                		CounterSignTarget.TREE,
+                		nodes,
+                		key,
+                		certChain,
+                		this.dataType,
+                		this.atrib,
+                		this.uatrib
+            		);
                 }
                 // CASO DE FIRMA DE HOJAS
                 else if (targetType == CounterSignTarget.LEAFS) {
                     final int[] nodes = {
                         0
                     };
-                    dataSigned = new CounterSigner().counterSigner(csp, sign, CounterSignTarget.LEAFS, nodes, keyEntry, this.dataType, this.atrib, this.uatrib);
+                    dataSigned = new CounterSigner().counterSigner(
+                		csp,
+                		sign,
+                		CounterSignTarget.LEAFS,
+                		nodes,
+                		key,
+                		certChain,
+                		this.dataType,
+                		this.atrib,
+                		this.uatrib
+            		);
                 }
                 // CASO DE FIRMA DE NODOS
                 else if (targetType == CounterSignTarget.NODES) {
@@ -210,7 +247,17 @@ public final class AOCMSSigner implements AOSigner {
                         nodesID[i] = ((Integer) targets[i]).intValue();
                     }
 					nodesID = ReadNodesTree.simplyArray(nodesID);
-                    dataSigned = new CounterSigner().counterSigner(csp, sign, CounterSignTarget.NODES, nodesID, keyEntry, this.dataType, this.atrib, this.uatrib);
+                    dataSigned = new CounterSigner().counterSigner(
+                		csp,
+                		sign,
+                		CounterSignTarget.NODES,
+                		nodesID,
+                		key,
+                		certChain,
+                		this.dataType,
+                		this.atrib,
+                		this.uatrib
+            		);
                 }
                 // CASO DE FIRMA DE NODOS DE UNO O VARIOS FIRMANTES
                 else if (targetType == CounterSignTarget.SIGNERS) {
@@ -222,7 +269,17 @@ public final class AOCMSSigner implements AOSigner {
                     }
                     final ReadNodesTree rn2 = new ReadNodesTree();
                     final int[] nodes2 = rn2.readNodesFromSigners(signers, sign);
-                    dataSigned = new CounterSigner().counterSigner(csp, sign, CounterSignTarget.SIGNERS, nodes2, keyEntry, this.dataType, this.atrib, this.uatrib);
+                    dataSigned = new CounterSigner().counterSigner(
+                		csp,
+                		sign,
+                		CounterSignTarget.SIGNERS,
+                		nodes2,
+                		key,
+                		certChain,
+                		this.dataType,
+                		this.atrib,
+                		this.uatrib
+            		);
 
                 }
             }

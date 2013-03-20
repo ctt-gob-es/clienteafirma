@@ -96,18 +96,19 @@ public final class CMSEnvelopedData {
      * @throws InvalidKeyException
      */
     byte[] genEnvelopedData(final P7ContentSignerParameters parameters,
-                                   final AOCipherConfig config,
-                                   final X509Certificate[] certDest,
-                                   final String dataType,
-                                   final Map<String, byte[]> uatrib,
-                                   final Integer keySize) throws IOException,
-                                                                 CertificateEncodingException,
-                                                                 NoSuchAlgorithmException,
-                                                                 InvalidKeyException,
-                                                                 NoSuchPaddingException,
-                                                                 InvalidAlgorithmParameterException,
-                                                                 IllegalBlockSizeException,
-                                                                 BadPaddingException {
+    		                final X509Certificate[] signerCertificateChain,
+                            final AOCipherConfig config,
+                            final X509Certificate[] certDest,
+                            final String dataType,
+                            final Map<String, byte[]> uatrib,
+                            final Integer keySize) throws IOException,
+                                                          CertificateEncodingException,
+                                                          NoSuchAlgorithmException,
+                                                          InvalidKeyException,
+                                                          NoSuchPaddingException,
+                                                          InvalidAlgorithmParameterException,
+                                                          IllegalBlockSizeException,
+                                                          BadPaddingException {
         this.cipherKey = Utils.initEnvelopedData(config, certDest, keySize);
 
         // Ya que el contenido puede ser grande, lo recuperamos solo una vez
@@ -118,7 +119,6 @@ public final class CMSEnvelopedData {
 
         // 1. ORIGINATORINFO
         // obtenemos la lista de certificados
-        final X509Certificate[] signerCertificateChain = parameters.getSignerCertificateChain();
         final ASN1Set certificates = Utils.fetchCertificatesList(signerCertificateChain);
         final ASN1Set certrevlist = null;
 

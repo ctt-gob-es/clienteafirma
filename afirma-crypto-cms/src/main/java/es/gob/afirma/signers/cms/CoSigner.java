@@ -12,9 +12,9 @@ package es.gob.afirma.signers.cms;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.security.KeyStore.PrivateKeyEntry;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.CertificateException;
@@ -88,8 +88,7 @@ final class CoSigner {
      *        Expl&iacute;cita o Impl&iacute;cita.
      * @param dataType
      *        Identifica el tipo del contenido a firmar.
-     * @param keyEntry
-     *        Clave privada del firmante.
+     * @param key Clave privada del firmante.
      * @param atrib
      *        Atributos firmados opcionales.
      * @param uatrib
@@ -110,7 +109,8 @@ final class CoSigner {
                            final byte[] sign,
                            final boolean omitContent,
                            final String dataType,
-                           final PrivateKeyEntry keyEntry,
+                           final PrivateKey key,
+                           final java.security.cert.Certificate[] certChain,
                            final Map<String, byte[]> atrib,
                            final Map<String, byte[]> uatrib,
                            final byte[] messageDigest) throws IOException, NoSuchAlgorithmException, CertificateException {
@@ -157,7 +157,6 @@ final class CoSigner {
         // 4. CERTIFICADOS
         // obtenemos la lista de certificados
         ASN1Set certificates = null;
-        final X509Certificate[] signerCertificateChain = parameters.getSignerCertificateChain();
 
         final ASN1Set certificatesSigned = sd.getCertificates();
         final ASN1EncodableVector vCertsSig = new ASN1EncodableVector();
@@ -168,10 +167,10 @@ final class CoSigner {
             vCertsSig.add((ASN1Encodable) certs.nextElement());
         }
 
-        if (signerCertificateChain.length != 0) {
+        if (certChain.length != 0) {
             // descomentar lo siguiente para version del rfc 3852
             final List<ASN1Encodable> ce = new ArrayList<ASN1Encodable>();
-            for (final X509Certificate element : signerCertificateChain) {
+            for (final java.security.cert.Certificate element : certChain) {
                 ce.add(Certificate.getInstance(ASN1Primitive.fromByteArray(element.getEncoded())));
             }
             certificates = SigUtils.fillRestCerts(ce, vCertsSig);
@@ -189,7 +188,9 @@ final class CoSigner {
         final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
 
         // Identificador del firmante ISSUER AND SERIAL-NUMBER
-        final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Primitive.fromByteArray(signerCertificateChain[0].getTBSCertificate()));
+        final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(
+    		ASN1Primitive.fromByteArray(((X509Certificate)certChain[0]).getTBSCertificate())
+		);
         final IssuerAndSerialNumber encSid = new IssuerAndSerialNumber(X500Name.getInstance(tbs.getIssuer()), tbs.getSerialNumber().getValue());
         final SignerIdentifier identifier = new SignerIdentifier(encSid);
 
@@ -206,7 +207,7 @@ final class CoSigner {
             			atrib);
         }
         else {
-            signedAttr = generateSignerInfoFromHash(signerCertificateChain[0], messageDigest, dataType, atrib);
+            signedAttr = generateSignerInfoFromHash((X509Certificate) certChain[0], messageDigest, dataType, atrib);
         }
 
         // atributos no firmados.
@@ -233,7 +234,7 @@ final class CoSigner {
 
         final ASN1OctetString sign2;
         try {
-            sign2 = firma(signatureAlgorithm, keyEntry);
+            sign2 = firma(signatureAlgorithm, key);
         }
         catch (final Exception ex) {
             throw new IOException("Error al generar la firma: " + ex, ex); //$NON-NLS-1$
@@ -265,8 +266,7 @@ final class CoSigner {
      *        Archivo que contiene las firmas.
      * @param dataType
      *        Identifica el tipo del contenido a firmar.
-     * @param keyEntry
-     *        Clave privada del firmante.
+     * @param key Clave privada del firmante.
      * @param atrib
      *        Atributos firmados adicionales.
      * @param uatrib
@@ -289,7 +289,7 @@ final class CoSigner {
                            final X509Certificate[] signerCertificateChain,
                            final byte[] sign,
                            final String dataType,
-                           final PrivateKeyEntry keyEntry,
+                           final PrivateKey key,
                            final Map<String, byte[]> atrib,
                            final Map<String, byte[]> uatrib,
                            final byte[] digest) throws IOException, NoSuchAlgorithmException, CertificateException, ContainsNoDataException {
@@ -427,7 +427,7 @@ final class CoSigner {
 
         final ASN1OctetString sign2;
         try {
-            sign2 = firma(signatureAlgorithm, keyEntry);
+            sign2 = firma(signatureAlgorithm, key);
         }
         catch (final Exception ex) {
             throw new IOException("Error al generar la firma: " + ex, ex); //$NON-NLS-1$
@@ -592,11 +592,10 @@ final class CoSigner {
     /** Realiza la firma usando los atributos del firmante.
      * @param signatureAlgorithm
      *        Algoritmo para la firma
-     * @param keyEntry
-     *        Clave para firmar.
+     * @param key Clave para firmar.
      * @return Firma de los atributos.
      * @throws es.map.es.map.afirma.exceptions.AOException */
-    private ASN1OctetString firma(final String signatureAlgorithm, final PrivateKeyEntry keyEntry) throws AOException {
+    private ASN1OctetString firma(final String signatureAlgorithm, final PrivateKey key) throws AOException {
 
         final Signature sig;
         try {
@@ -616,7 +615,7 @@ final class CoSigner {
 
         // Indicar clave privada para la firma
         try {
-            sig.initSign(keyEntry.getPrivateKey());
+            sig.initSign(key);
         }
         catch (final Exception e) {
             throw new AOException("Error al inicializar la firma con la clave privada", e); //$NON-NLS-1$

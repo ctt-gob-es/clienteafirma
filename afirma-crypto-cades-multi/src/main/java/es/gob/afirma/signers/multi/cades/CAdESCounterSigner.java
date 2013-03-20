@@ -132,7 +132,6 @@ final class CAdESCounterSigner {
         // 4. CERTIFICADOS
         // obtenemos la lista de certificados
         ASN1Set certificates = null;
-        final X509Certificate[] signerCertificateChain = parameters.getSignerCertificateChain();
 
         final ASN1Set certificatesSigned = sd.getCertificates();
         final ASN1EncodableVector vCertsSig = new ASN1EncodableVector();
@@ -143,9 +142,9 @@ final class CAdESCounterSigner {
             vCertsSig.add((ASN1Encodable) certs.nextElement());
         }
         // e introducimos los del firmante actual.
-        if (signerCertificateChain.length != 0) {
+        if (certChain.length != 0) {
             final List<ASN1Encodable> ce = new ArrayList<ASN1Encodable>();
-            for (final X509Certificate element : signerCertificateChain) {
+            for (final java.security.cert.Certificate element : certChain) {
                 ce.add(Certificate.getInstance(ASN1Primitive.fromByteArray(element.getEncoded())));
             }
             certificates = SigUtils.fillRestCerts(ce, vCertsSig);

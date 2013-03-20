@@ -10,7 +10,6 @@
 
 package es.gob.afirma.signers.pkcs7;
 
-import java.security.cert.X509Certificate;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -22,7 +21,6 @@ public final class P7ContentSignerParameters {
 
     private final byte[] data;
     private final String sigAlgo;
-    private final X509Certificate[] certChain;
     private final byte[] signature;
 
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
@@ -31,11 +29,8 @@ public final class P7ContentSignerParameters {
      * propiedades de la clase.
      * @param data2
      *        Archivo de firmas.
-     * @param signatureAlgorithm
-     *        Tipo de datos.
-     * @param cChain
-     *        Certificados del firmante */
-    public P7ContentSignerParameters(final byte[] data2, final String signatureAlgorithm, final X509Certificate[] cChain) {
+     * @param signatureAlgorithm Tipo de datos. */
+    public P7ContentSignerParameters(final byte[] data2, final String signatureAlgorithm) {
 
         this.data = data2.clone();
 
@@ -46,14 +41,6 @@ public final class P7ContentSignerParameters {
         else {
             this.sigAlgo = signatureAlgorithm;
         }
-        if (cChain == null) {
-            LOGGER.warning("No se ha proporcionado una cadena de certificados para la construccion de los parametros de firma CADES, se utilizara una cadena vacia"); //$NON-NLS-1$
-            this.certChain = new X509Certificate[0];
-        }
-        else {
-            this.certChain = cChain.clone();
-        }
-
         this.signature = new byte[0]; // la firma se realizara despues
 
     }
@@ -74,12 +61,6 @@ public final class P7ContentSignerParameters {
      * @return el tipo */
     public String getSignatureAlgorithm() {
         return this.sigAlgo;
-    }
-
-    /** M&eacute;todo que devuelve los certificados del firmante
-     * @return Array de certificados. */
-    public X509Certificate[] getSignerCertificateChain() {
-        return this.certChain.clone();
     }
 
 }

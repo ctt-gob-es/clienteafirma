@@ -129,6 +129,7 @@ final class CAdESEPESSignedAndEnvelopedData {
      * @throws java.security.NoSuchAlgorithmException
      *         Si no se encuentra un algoritmo v&aacute;lido. */
     byte[] genCADESEPESSignedAndEnvelopedData(final P7ContentSignerParameters parameters,
+    		                                  final X509Certificate[] signerCertificateChain,
                                                      final AOCipherConfig config,
                                                      final AdESPolicy policy,
                                                      final X509Certificate[] certDest,
@@ -163,7 +164,6 @@ final class CAdESEPESSignedAndEnvelopedData {
 
         // LISTA DE CERTIFICADOS: obtenemos la lista de certificados
         ASN1Set certificates = null;
-        final X509Certificate[] signerCertificateChain = parameters.getSignerCertificateChain();
 
         certificates = CAdESUtils.fetchCertificatesList(signerCertificateChain);
 
@@ -288,6 +288,7 @@ final class CAdESEPESSignedAndEnvelopedData {
      * @throws IOException */
     byte[] addOriginatorInfo(final InputStream data,
                                     final P7ContentSignerParameters parameters,
+                                    final X509Certificate[] signerCertificateChain,
                                     final PrivateKeyEntry keyEntry,
                                     final AdESPolicy policy) throws IOException {
         // boolean isValid = false;
@@ -312,9 +313,6 @@ final class CAdESEPESSignedAndEnvelopedData {
             while (signers.hasMoreElements()) {
                 signerInfos.add((ASN1Sequence) signers.nextElement());
             }
-
-            // certificado del remitente
-            final X509Certificate[] signerCertificateChain = parameters.getSignerCertificateChain();
 
             ASN1EncodableVector signCerts = new ASN1EncodableVector();
 
