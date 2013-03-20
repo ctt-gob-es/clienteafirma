@@ -421,7 +421,7 @@ final class CAdESCoSigner {
 				for (int s = 0; s < signedAttrib.size(); s++) {
 					final ASN1Sequence elemento = (ASN1Sequence) signedAttrib.getObjectAt(s);
 					final DERObjectIdentifier oids = (DERObjectIdentifier) elemento.getObjectAt(0);
-					if (CMSAttributes.messageDigest.getId().toString().equals(oids.toString())) {
+					if (CMSAttributes.messageDigest.getId().equals(oids.toString())) {
 						final DERSet derSetHash = (DERSet) elemento.getObjectAt(1);
 						final DEROctetString derHash = (DEROctetString) derSetHash.getObjectAt(0);
 						messageDigest = derHash.getOctets();
