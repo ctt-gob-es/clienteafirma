@@ -146,6 +146,7 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		final byte[] data = ObtainContentSignedData.obtainData(sign);
 		if (data == null) {
 			messageDigest = ObtainContentSignedData.obtainMessageDigest(sign, AOSignConstants.getDigestAlgorithmName(algorithm));
+			throw new AOException("No se han encontrado datos dentro de la firma ni una huella digital compatible con el algoritmo seleccionado"); //$NON-NLS-1$
 		}
 
 		String contentTypeOid = MimeHelper.DEFAULT_CONTENT_OID_DATA;
