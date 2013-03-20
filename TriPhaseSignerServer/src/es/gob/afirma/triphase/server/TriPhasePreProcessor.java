@@ -14,7 +14,7 @@ interface TriPhasePreProcessor {
 	byte[] preProcessPostSign(byte[] data, String algorithm, X509Certificate cert, Properties extraParams) throws NoSuchAlgorithmException, AOException, IOException;
 
 	// Cofirma
-	byte[] preProcessPreCoSign(byte[] data, String algorithm, X509Certificate cert, Properties extraParams) throws IOException, AOException;
-    byte[] preProcessPostCoSign(byte[] data, String algorithm, X509Certificate cert, Properties extraParams) throws NoSuchAlgorithmException, AOException, IOException;
+	byte[] preProcessPreCoSign(byte[] sign, String algorithm, X509Certificate cert, Properties extraParams) throws IOException, AOException;
+    byte[] preProcessPostCoSign(byte[] sign, String algorithm, X509Certificate cert, Properties extraParams) throws NoSuchAlgorithmException, AOException, IOException;
 
 }

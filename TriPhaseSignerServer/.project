@@ -52,7 +52,7 @@
 		<link>
 			<name>afirma-crypto-cades-java</name>
 			<type>2</type>
-			<location>C:/Users/A122466/workspace_sin_maven/afirma-crypto-cades/src/main/java</location>
+			<location>C:/Users/A122466/workspace_android/afirma-crypto-cades/src/main/java</location>
 		</link>
 		<link>
 			<name>afirma-crypto-cades-multi-java</name>
@@ -118,6 +118,21 @@
 			<name>afirma-crypto-xadestri-server-src</name>
 			<type>2</type>
 			<location>C:/Users/A122466/workspace_android/afirma-crypto-xadestri-server/src</location>
+		</link>
+		<link>
+			<name>afirma-lib-jmimemagic-java</name>
+			<type>2</type>
+			<location>C:/Users/A122466/workspace_android/afirma-lib-jmimemagic/src/main/java</location>
+		</link>
+		<link>
+			<name>afirma-lib-jmimemagic-resources</name>
+			<type>2</type>
+			<location>C:/Users/A122466/workspace_android/afirma-lib-jmimemagic/src/main/resources</location>
+		</link>
+		<link>
+			<name>afirma-lib-oro-java</name>
+			<type>2</type>
+			<location>C:/Users/A122466/workspace_android/afirma-lib-oro/src/main/java</location>
 		</link>
 		<link>
 			<name>jxades-src</name>

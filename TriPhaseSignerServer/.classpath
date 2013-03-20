@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="afirma-lib-oro-java"/>
+	<classpathentry kind="src" path="afirma-lib-jmimemagic-resources"/>
+	<classpathentry kind="src" path="afirma-lib-jmimemagic-java"/>
+	<classpathentry kind="src" path="afirma-crypto-cades-java"/>
 	<classpathentry kind="src" path="afirma-crypto-xades-resources"/>
 	<classpathentry kind="src" path="afirma-crypto-xades-java"/>
 	<classpathentry kind="src" path="afirma-crypto-cades-multi-java"/>
@@ -11,7 +15,6 @@
 	<classpathentry kind="src" path="afirma-crypto-padestri-server"/>
 	<classpathentry kind="src" path="afirma-crypto-pdf-itext-resources"/>
 	<classpathentry kind="src" path="afirma-crypto-cades-resources"/>
-	<classpathentry kind="src" path="afirma-crypto-cades-java"/>
 	<classpathentry kind="src" path="afirma-crypto-core-pkcs7-tsp-java"/>
 	<classpathentry kind="src" path="afirma-crypto-core-pkcs7-resources"/>
 	<classpathentry kind="src" path="afirma-crypto-core-pkcs7-java"/>

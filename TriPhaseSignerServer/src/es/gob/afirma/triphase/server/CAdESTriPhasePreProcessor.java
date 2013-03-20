@@ -16,6 +16,7 @@ import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.signers.cades.CAdESTriPhaseSigner;
 import es.gob.afirma.signers.multi.cades.CAdESTriPhaseCoSigner;
+import es.gob.afirma.signers.pkcs7.ObtainContentSignedData;
 
 final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
@@ -120,12 +121,12 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	}
 
 	@Override
-	public byte[] preProcessPreCoSign(final byte[] data,
+	public byte[] preProcessPreCoSign(final byte[] sign,
 			final String algorithm,
 			final X509Certificate cert,
 			final Properties extraParams) throws IOException, AOException {
-		if (data == null || data.length < 1) {
-			throw new IllegalArgumentException("Los datos no pueden ser nulos ni vacios"); //$NON-NLS-1$
+		if (sign == null || sign.length < 1) {
+			throw new IllegalArgumentException("Las firma no puede ser nula ni vacia"); //$NON-NLS-1$
 		}
 
 		boolean signingCertificateV2;
@@ -139,6 +140,10 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			signingCertificateV2 = !"SHA1".equals(AOSignConstants.getDigestAlgorithmName(algorithm));	 //$NON-NLS-1$
 		}
 
+		//TODO: Crear la alternativa para firmas explicitas (se obtienen datos nulos), en las que hay que extraer el MessageDigest
+		// de la firma original
+		final byte[] data = ObtainContentSignedData.obtainData(sign);
+
 		String contentTypeOid = MimeHelper.DEFAULT_CONTENT_OID_DATA;
 		String contentDescription = MimeHelper.DEFAULT_CONTENT_DESCRIPTION;
 
@@ -150,6 +155,7 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		catch(final Exception e) {
 			Logger.getLogger("es.gob.afirma").warning("No se ha podido determinar el tipo de los datos: " + e); //$NON-NLS-1$ //$NON-NLS-2$
 		}
+
 		final byte[] presign;
 		try {
 			presign = CAdESTriPhaseCoSigner.preCoSign(
@@ -180,18 +186,22 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 	}
 
 	@Override
-	public byte[] preProcessPostCoSign(final byte[] data,
+	public byte[] preProcessPostCoSign(final byte[] sign,
 			final String algorithm,
 			final X509Certificate cert,
 			final Properties extraParams) throws NoSuchAlgorithmException, AOException, IOException {
+
+		//TODO: Crear la alternativa para firmas explicitas (se obtienen datos nulos), en las que hay que extraer el Messa
+		final byte[] data = ObtainContentSignedData.obtainData(sign);
+
 		try {
 			return CAdESTriPhaseCoSigner.postCoSign(
 					Base64.decode(extraParams.getProperty(PROPERTY_NAME_PKCS1_SIGN)),
 					Base64.decode(extraParams.getProperty(PROPERTY_NAME_SESSION_DATA)),
-					null, // Contenido
+					data, // Contenido
 					algorithm,
 					new X509Certificate[] { cert },
-					data
+					sign
 					);
 		}
 		catch (final CertificateEncodingException e) {

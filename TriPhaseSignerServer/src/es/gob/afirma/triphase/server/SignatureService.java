@@ -80,6 +80,12 @@ public final class SignatureService extends HttpServlet {
 			}
 		}
 
+		LOGGER.info("-------------- CLAVES:");
+		for (final String key : parameters.keySet().toArray(new String[parameters.size()])) {
+			LOGGER.info(key);
+		}
+		LOGGER.info("--------------");
+
 		LOGGER.info("Operacion: " + parameters.get(PARAMETER_NAME_OPERATION));
 
 		// Obtenemos el codigo de operacion
@@ -112,7 +118,9 @@ public final class SignatureService extends HttpServlet {
 				out.print(ErrorManager.getErrorMessage(2));
 				return;
 			}
+			LOGGER.info("Recibimos el docId de longitud: " + docId.length());
 			docBytes = DOC_MANAGER.getDocument(docId);
+			LOGGER.info("Obtenemos los datos de longitud: " + (docBytes == null ? 0 : docBytes.length));
 		}
 
 		// Obtenemos el algoritmo de firma
@@ -152,7 +160,7 @@ public final class SignatureService extends HttpServlet {
 		final Properties extraParams = new Properties();
 		try {
 			LOGGER.info("Parametros extra recibidos: " + parameters.get(PARAMETER_NAME_EXTRA_PARAM));
-			if (parameters.get(PARAMETER_NAME_EXTRA_PARAM) != null) {
+			if (parameters.containsKey(PARAMETER_NAME_EXTRA_PARAM)) {
 				extraParams.load(
 						new ByteArrayInputStream(
 								Base64.decode(parameters.get(PARAMETER_NAME_EXTRA_PARAM).trim(), Base64.URL_SAFE)
