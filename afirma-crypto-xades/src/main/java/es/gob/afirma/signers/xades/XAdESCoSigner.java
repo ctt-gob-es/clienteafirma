@@ -167,7 +167,13 @@ public final class XAdESCoSigner {
 			final String algorithm,
 			final PrivateKeyEntry keyEntry,
 			final Properties xParams) throws AOException {
-		return cosign(sign, algorithm, keyEntry.getCertificateChain(), keyEntry.getPrivateKey(), xParams);
+		return cosign(
+			sign,
+			algorithm,
+			keyEntry.getPrivateKey(),
+			keyEntry.getCertificateChain(),
+			xParams
+		);
 	}
 
 	/** Cofirma datos en formato XAdES.
@@ -259,8 +265,8 @@ public final class XAdESCoSigner {
 	 * @throws AOException Cuando ocurre cualquier problema durante el proceso */
 	public static byte[] cosign(final byte[] sign,
 			final String algorithm,
-			final Certificate[] certChain,
 			final PrivateKey pk,
+			final Certificate[] certChain,
 			final Properties xParams) throws AOException {
 		final String algoUri = XMLConstants.SIGN_ALGOS_URI.get(algorithm);
 		if (algoUri == null) {

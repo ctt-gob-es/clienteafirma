@@ -139,7 +139,13 @@ public final class TestXMLdSig {
 
                     final byte[] data = AOUtil.getDataFromInputStream(TestXMLdSig.class.getResourceAsStream("/" + filename)); //$NON-NLS-1$
 
-                    final byte[] result = signer.sign(data, algo, pke, extraParams);
+                    final byte[] result = signer.sign(
+                		data,
+                		algo,
+                		pke.getPrivateKey(),
+                		pke.getCertificateChain(),
+                		extraParams
+            		);
 
                     File f = File.createTempFile("Sign-XMLdSig-" + algo + "-" + extraParams.getProperty("mode") + "-" + filename.replace(".xml", "") + "-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
                     java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
@@ -221,9 +227,22 @@ public final class TestXMLdSig {
 
         			final byte[] data = AOUtil.getDataFromInputStream(TestXMLdSig.class.getResourceAsStream("/" + filename)); //$NON-NLS-1$
 
-        			final byte[] signature = signer.sign(data, algo, pke, extraParams);
+        			final byte[] signature = signer.sign(
+    					data,
+    					algo,
+    					pke.getPrivateKey(),
+    					pke.getCertificateChain(),
+    					extraParams
+					);
 
-        			final byte[] result = signer.cosign(data, signature, algo, pke, extraParams);
+        			final byte[] result = signer.cosign(
+    					data,
+    					signature,
+    					algo,
+    					pke.getPrivateKey(),
+    					pke.getCertificateChain(),
+    					extraParams
+					);
 
         			final File f = File.createTempFile("Cosign-XMLdSig-" + algo + "-" + filename.replace(".xml", "") + "-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
         			final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
@@ -275,11 +294,32 @@ public final class TestXMLdSig {
 
         			final byte[] data = AOUtil.getDataFromInputStream(TestXMLdSig.class.getResourceAsStream("/" + filename)); //$NON-NLS-1$
 
-        			final byte[] signature = signer.sign(data, algo, pke, extraParams);
+        			final byte[] signature = signer.sign(
+    					data,
+    					algo,
+    					pke.getPrivateKey(),
+    					pke.getCertificateChain(),
+    					extraParams
+					);
 
-        			final byte[] cosignature = signer.cosign(data, signature, algo, pke, extraParams);
+        			final byte[] cosignature = signer.cosign(
+    					data,
+    					signature,
+    					algo,
+    					pke.getPrivateKey(),
+    					pke.getCertificateChain(),
+    					extraParams
+					);
 
-        			final byte[] result = signer.countersign(cosignature, algo, CounterSignTarget.LEAFS, null, pke, extraParams);
+        			final byte[] result = signer.countersign(
+    					cosignature,
+    					algo,
+    					CounterSignTarget.LEAFS,
+    					null,
+    					pke.getPrivateKey(),
+    					pke.getCertificateChain(),
+    					extraParams
+					);
 
         			final File f = File.createTempFile("Countersign-XMLdSig-" + algo + "-" + filename.replace(".xml", "") + "-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
         			final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);

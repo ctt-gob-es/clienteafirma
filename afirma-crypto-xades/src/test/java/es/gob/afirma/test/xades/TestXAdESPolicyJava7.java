@@ -74,8 +74,15 @@ public final class TestXAdESPolicyJava7 {
     	final byte[] data = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILE_DATA));
 
     	try {
-    		new AOXAdESSigner().sign(data, SIGN_ALGO, pke, XADES_CONFIG);
-    	} catch (final Exception e) {
+    		new AOXAdESSigner().sign(
+				data,
+				SIGN_ALGO,
+				pke.getPrivateKey(),
+				pke.getCertificateChain(),
+				XADES_CONFIG
+			);
+    	}
+    	catch (final Exception e) {
     		Assert.fail("Ocurrio un error durante la generacion de la firma: " + e); //$NON-NLS-1$
     	}
     }

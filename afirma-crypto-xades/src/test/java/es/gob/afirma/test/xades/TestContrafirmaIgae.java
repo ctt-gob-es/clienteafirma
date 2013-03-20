@@ -72,7 +72,13 @@ public class TestContrafirmaIgae {
     		final byte[] sign = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(signFile));
 
     		final byte[] result = signer.countersign(
-    				sign, algorithm, CounterSignTarget.TREE, null, pke, p);
+    				sign,
+    				algorithm,
+    				CounterSignTarget.TREE,
+    				null,
+    				pke.getPrivateKey(),
+    				pke.getCertificateChain(),
+    				p);
 
     		final File f = File.createTempFile("Contrafirma-" + signFile, ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
     		final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);

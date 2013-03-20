@@ -12,9 +12,10 @@ package es.gob.afirma.signers.xades;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.security.KeyStore.PrivateKeyEntry;
+import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.Security;
+import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -381,7 +382,8 @@ public final class AOXAdESSigner implements AOSigner {
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
      * </ul>
-     * @param keyEntry Entrada que apunta a la clave privada a usar para firmar.
+     * @param key Clave privada a usar para firmar.
+     * @param certChain Cadena de certificados del cliente
      * @param xParams Par&aacute;metros adicionales para la firma.
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
      * <dl>
@@ -554,9 +556,10 @@ public final class AOXAdESSigner implements AOSigner {
     @Override
 	public byte[] sign(final byte[] data,
                        final String algorithm,
-                       final PrivateKeyEntry keyEntry,
+                       final PrivateKey key,
+                       final Certificate[] certChain,
                        final Properties xParams) throws AOException {
-    	return XAdESSigner.sign(data, algorithm, keyEntry, xParams);
+    	return XAdESSigner.sign(data, algorithm, key, certChain, xParams);
     }
 
     /** Comprueba si la firma es detached. Previamente debe haberse comprabado que el XML se
@@ -726,13 +729,11 @@ public final class AOXAdESSigner implements AOSigner {
         }
 	}
 
-	/**
-     * Comprueba si unos datos firmados tienen declarados una transformaci&oacute;n de tipo Base64.
+	/** Comprueba si unos datos firmados tienen declarados una transformaci&oacute;n de tipo Base64.
      * @param rootSig Nodo raiz de la firma.
      * @param objectId Identificador de los datos.
      * @return Devuelve {@code true} si la transformaci&oacute;n est&aacute; definida, {@code false}
-     * en caso contrario.
-     */
+     * en caso contrario. */
     private static boolean isBase64TransformationDeclared(final Element rootSig, final String objectId) {
     	if (objectId == null || objectId.trim().equals("")) { //$NON-NLS-1$
     		return false;
@@ -845,7 +846,8 @@ public final class AOXAdESSigner implements AOSigner {
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
      * </ul>
-     * @param keyEntry Entrada que apunta a la clave privada a usar para firmar.
+     * @param key Clave privada a usar para firmar.
+     * @param certChain Cadena de certificados del cliente.
      * @param xParams Par&aacute;metros adicionales para la firma.
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
      * <dl>
@@ -917,9 +919,10 @@ public final class AOXAdESSigner implements AOSigner {
 	public byte[] cosign(final byte[] data,
                          final byte[] sign,
                          final String algorithm,
-                         final PrivateKeyEntry keyEntry,
+                         final PrivateKey key,
+                         final Certificate[] certChain,
                          final Properties xParams) throws AOException {
-    	return XAdESCoSigner.cosign(sign, algorithm, keyEntry, xParams);
+    	return XAdESCoSigner.cosign(sign, algorithm, key, certChain, xParams);
     }
 
     /** Cofirma datos en formato XAdES.
@@ -945,7 +948,8 @@ public final class AOXAdESSigner implements AOSigner {
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
      * </ul>
-     * @param keyEntry Entrada que apunta a la clave privada a usar para firmar.
+     * @param key Clave privada a usar para firmar.
+     * @param certChain Cadena de certificados del firmante.
      * @param extraParams Par&aacute;metros adicionales para la firma.
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
      * <dl>
@@ -1016,14 +1020,15 @@ public final class AOXAdESSigner implements AOSigner {
     @Override
 	public byte[] cosign(final byte[] sign,
                          final String algorithm,
-                         final PrivateKeyEntry keyEntry,
+                         final PrivateKey key,
+                         final Certificate[] certChain,
                          final Properties extraParams) throws AOException {
 
     	if (!isSign(sign)) {
     		throw new AOInvalidFormatException("No se ha indicado una firma XAdES para cofirmar"); //$NON-NLS-1$
     	}
 
-    	return XAdESCoSigner.cosign(sign, algorithm, keyEntry, extraParams);
+    	return XAdESCoSigner.cosign(sign, algorithm, key, certChain, extraParams);
     }
 
     /** Contrafirma firmas en formato XAdES.
@@ -1051,7 +1056,8 @@ public final class AOXAdESSigner implements AOSigner {
      * <p>Cada uno de estos tipos se define en {@link es.gob.afirma.core.signers.CounterSignTarget}.
      * @param targets Listado de nodos o firmantes que se deben contrafirmar seg&uacute;n el
      * {@code targetType} seleccionado.
-     * @param keyEntry Entrada que apunta a la clave privada a usar para firmar.
+     * @param key Clave privada a usar para firmar.
+     * @param certChain Cadena de certificados del firmante.
      * @param xParams Par&aacute;metros adicionales para la firma.
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
      * <dl>
@@ -1113,13 +1119,22 @@ public final class AOXAdESSigner implements AOSigner {
                               final String algorithm,
                               final CounterSignTarget targetType,
                               final Object[] targets,
-                              final PrivateKeyEntry keyEntry,
+                              final PrivateKey key,
+                              final Certificate[] certChain,
                               final Properties xParams) throws AOException {
     	if (!isSign(sign)) {
     		throw new AOInvalidFormatException("No se ha indicado una firma XAdES para contrafirmar"); //$NON-NLS-1$
     	}
 
-    	return XAdESCounterSigner.countersign(sign, algorithm, targetType, targets, keyEntry, xParams);
+    	return XAdESCounterSigner.countersign(
+			sign,
+			algorithm,
+			targetType,
+			targets,
+			key,
+			certChain,
+			xParams
+		);
     }
 
     /** {@inheritDoc} */

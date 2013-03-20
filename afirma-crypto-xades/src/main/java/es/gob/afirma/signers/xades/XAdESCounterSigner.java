@@ -11,8 +11,9 @@
 package es.gob.afirma.signers.xades;
 
 import java.io.ByteArrayInputStream;
-import java.security.KeyStore.PrivateKeyEntry;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -104,8 +105,7 @@ final class XAdESCounterSigner {
 	 * @param targets
 	 *            Listado de nodos o firmantes que se deben contrafirmar
 	 *            seg&uacute;n el {@code targetType} seleccionado.
-	 * @param keyEntry
-	 *            Entrada que apunta a la clave privada a usar para firmar.
+	 * @param key Clave privada a usar para firmar.
 	 * @param xParams
 	 *            Par&aacute;metros adicionales para la firma.
 	 *            <p>
@@ -180,12 +180,15 @@ final class XAdESCounterSigner {
 	 * @throws AOException
 	 *             Cuando ocurre cualquier problema durante el proceso
 	 */
-	static byte[] countersign(final byte[] sign, final String algorithm,
-			final CounterSignTarget targetType, final Object[] targets,
-			final PrivateKeyEntry keyEntry, final Properties xParams)
-			throws AOException {
+	static byte[] countersign(final byte[] sign,
+			                  final String algorithm,
+			                  final CounterSignTarget targetType,
+			                  final Object[] targets,
+			                  final PrivateKey key,
+			                  final Certificate[] certChain,
+			                  final Properties xParams) throws AOException {
 
-		final Properties extraParams = (xParams != null) ? xParams
+		final Properties extraParams = xParams != null ? xParams
 				: new Properties();
 
 		String encoding = extraParams.getProperty("encoding"); //$NON-NLS-1$
@@ -262,19 +265,49 @@ final class XAdESCounterSigner {
 
 		try {
 			if (targetType == CounterSignTarget.TREE) {
-				XAdESCounterSigner.countersignTree(root, keyEntry, extraParams,
-						algorithm, doc);
-			} else if (targetType == CounterSignTarget.LEAFS) {
-				XAdESCounterSigner.countersignLeafs(root, keyEntry,
-						extraParams, algorithm, doc);
-			} else if (targetType == CounterSignTarget.NODES) {
-				XAdESCounterSigner.countersignNodes(root, targets, keyEntry,
-						extraParams, algorithm, doc);
-			} else if (targetType == CounterSignTarget.SIGNERS) {
-				XAdESCounterSigner.countersignSigners(root, targets, keyEntry,
-						extraParams, algorithm, doc);
+				XAdESCounterSigner.countersignTree(
+					root,
+					key,
+					certChain,
+					extraParams,
+				    algorithm,
+				    doc
+			    );
 			}
-		} catch (final Exception e) {
+			else if (targetType == CounterSignTarget.LEAFS) {
+				XAdESCounterSigner.countersignLeafs(
+					root,
+					key,
+					certChain,
+					extraParams,
+					algorithm,
+					doc
+				);
+			}
+			else if (targetType == CounterSignTarget.NODES) {
+				XAdESCounterSigner.countersignNodes(
+					root,
+					targets,
+					key,
+					certChain,
+					extraParams,
+					algorithm,
+					doc
+				);
+			}
+			else if (targetType == CounterSignTarget.SIGNERS) {
+				XAdESCounterSigner.countersignSigners(
+					root,
+					targets,
+					key,
+					certChain,
+					extraParams,
+					algorithm,
+					doc
+				);
+			}
+		}
+		catch (final Exception e) {
 			throw new AOException("Error al generar la contrafirma", e); //$NON-NLS-1$
 		}
 
@@ -315,8 +348,11 @@ final class XAdESCounterSigner {
 	 *             Cuando ocurre cualquier problema durante el proceso
 	 */
 	private static void countersignLeafs(final Element root,
-			final PrivateKeyEntry keyEntry, final Properties extraParams,
-			final String algorithm, final Document doc) throws AOException {
+			                             final PrivateKey key,
+			                             final Certificate[] certChain,
+			                             final Properties extraParams,
+			                             final String algorithm,
+			                             final Document doc) throws AOException {
 
 		// obtiene todas las firmas
 		final NodeList signatures = root.getElementsByTagNameNS(
@@ -333,7 +369,7 @@ final class XAdESCounterSigner {
 
 				// y crea sus contrafirmas
 				if (children == 0) {
-					XAdESCounterSigner.cs(signature, keyEntry, extraParams, algorithm, doc);
+					XAdESCounterSigner.cs(signature, key, certChain, extraParams, algorithm, doc);
 					numSignatures++;
 					i++;
 				}
@@ -344,21 +380,18 @@ final class XAdESCounterSigner {
 		}
 	}
 
-	/**
-	 * Realiza la contrafirma de los nodos indicados en el par&aacute;metro
-	 * targets
-	 *
-	 * @param root
-	 *            Elemento raiz del documento xml que contiene las firmas
-	 * @param tgts
-	 *            Array con las posiciones de los nodos a contrafirmar
-	 * @throws AOException
-	 *             Cuando ocurre cualquier problema durante el proceso
-	 */
+	/** Realiza la contrafirma de los nodos indicados en el par&aacute;metro
+	 * <code>targets</code>.
+	 * @param root Elemento ra&iacute;z del documento xml que contiene las firmas
+	 * @param tgts Array con las posiciones de los nodos a contrafirmar
+	 * @throws AOException Cuando ocurre cualquier problema durante el proceso */
 	private static void countersignNodes(final Element root,
-			final Object[] tgts, final PrivateKeyEntry keyEntry,
-			final Properties extraParams, final String algorithm,
-			final Document doc) throws AOException {
+			                             final Object[] tgts,
+			                             final PrivateKey key,
+			                             final Certificate[] certChain,
+			                             final Properties extraParams,
+			                             final String algorithm,
+			                             final Document doc) throws AOException {
 
 		// descarta las posiciones que esten repetidas
 		final List<Integer> targetsList = new ArrayList<Integer>();
@@ -382,14 +415,15 @@ final class XAdESCounterSigner {
 					throw new AOException("Posicion de nodo no valida."); //$NON-NLS-1$
 				}
 			}
-		} catch (final ClassCastException e) {
+		}
+		catch (final ClassCastException e) {
 			throw new AOException("Valor de nodo no valido", e); //$NON-NLS-1$
 		}
 
 		// y crea sus contrafirmas
 		try {
 			for (final Element node : nodes) {
-				XAdESCounterSigner.cs(node, keyEntry, extraParams, algorithm, doc);
+				XAdESCounterSigner.cs(node, key, certChain, extraParams, algorithm, doc);
 			}
 		} catch (final Exception e) {
 			throw new AOException(
@@ -397,22 +431,18 @@ final class XAdESCounterSigner {
 		}
 	}
 
-	/**
-	 * Realiza la contrafirma de los firmantes indicados en el par&aacute;metro
-	 * targets
-	 *
-	 * @param root
-	 *            Elemento ra&iacute;z del documento xml que contiene las firmas
-	 * @param targets
-	 *            Array con el nombre de los firmantes de los nodos a
-	 *            contrafirmar
-	 * @throws AOException
-	 *             Cuando ocurre cualquier problema durante el proceso
-	 */
+	/** Realiza la contrafirma de los firmantes indicados en el par&aacute;metro
+	 * targets.
+	 * @param root Elemento ra&iacute;z del documento xml que contiene las firmas
+	 * @param targets Array con el nombre de los firmantes de los nodos a contrafirmar
+	 * @throws AOException Cuando ocurre cualquier problema durante el proceso */
 	private static void countersignSigners(final Element root,
-			final Object[] targets, final PrivateKeyEntry keyEntry,
-			final Properties extraParams, final String algorithm,
-			final Document doc) throws AOException {
+			                               final Object[] targets,
+			                               final PrivateKey key,
+			                               final Certificate[] certChain,
+			                               final Properties extraParams,
+			                               final String algorithm,
+			                               final Document doc) throws AOException {
 
 		// obtiene todas las firmas
 		final NodeList signatures = root.getElementsByTagNameNS(
@@ -434,23 +464,20 @@ final class XAdESCounterSigner {
 		// y crea sus contrafirmas
 		final Iterator<Element> i = nodes.iterator();
 		while (i.hasNext()) {
-			XAdESCounterSigner.cs(i.next(), keyEntry, extraParams, algorithm, doc);
+			XAdESCounterSigner.cs(i.next(), key, certChain, extraParams, algorithm, doc);
 		}
 	}
 
-	/**
-	 * Realiza la contrafirma de todos los nodos del arbol
-	 *
-	 * @param root
-	 *            Elemento ra&iacute;z del documento xml que contiene las firmas
-	 * @param algorithm
-	 *            Algoritmo de firma XML
-	 * @throws AOException
-	 *             Cuando ocurre cualquier problema durante el proceso
-	 */
+	/** Realiza la contrafirma de todos los nodos del &aacute;rbol.
+	 * @param root Elemento ra&iacute;z del documento xml que contiene las firmas
+	 * @param algorithm Algoritmo de firma XML
+	 * @throws AOException Cuando ocurre cualquier problema durante el proceso */
 	private static void countersignTree(final Element root,
-			final PrivateKeyEntry keyEntry, final Properties extraParams,
-			final String algorithm, final Document doc) throws AOException {
+			                            final PrivateKey key,
+			                            final Certificate[] certChain,
+			                            final Properties extraParams,
+			                            final String algorithm,
+			                            final Document doc) throws AOException {
 
 		// obtiene todas las firmas
 		final NodeList signatures = root.getElementsByTagNameNS(
@@ -465,7 +492,14 @@ final class XAdESCounterSigner {
 		// y crea sus contrafirmas
 		try {
 			for (int i = 0; i < numSignatures; i++) {
-				XAdESCounterSigner.cs(nodes[i], keyEntry, extraParams, algorithm, doc);
+				XAdESCounterSigner.cs(
+					nodes[i],
+					key,
+					certChain,
+					extraParams,
+					algorithm,
+					doc
+				);
 			}
 		} catch (final Exception e) {
 			throw new AOException(
@@ -478,7 +512,8 @@ final class XAdESCounterSigner {
 	 * @param algorithm Algoritmo de firma XML
 	 * @throws AOException Cuando ocurre cualquier problema durante el proceso */
 	private static void cs(final Element signature,
-			               final PrivateKeyEntry keyEntry,
+			               final PrivateKey key,
+			               final Certificate[] certChain,
 			               final Properties xParams,
 			               final String algorithm,
 			               final Document doc) throws AOException {
@@ -490,7 +525,7 @@ final class XAdESCounterSigner {
 				"El documento DOM no puede ser nulo"); //$NON-NLS-1$
 		}
 
-		final Properties extraParams = (xParams != null) ? xParams : new Properties();
+		final Properties extraParams = xParams != null ? xParams : new Properties();
 
 		final String digestMethodAlgorithm = extraParams.getProperty(
 				"referencesDigestMethod", AOXAdESSigner.DIGEST_METHOD); //$NON-NLS-1$
@@ -582,8 +617,7 @@ final class XAdESCounterSigner {
 		);
 
 		// establece el certificado
-		final X509Certificate cert = (X509Certificate) keyEntry
-				.getCertificate();
+		final X509Certificate cert = (X509Certificate) certChain[0];
 		xades.setSigningCertificate(cert);
 
 		// SignaturePolicyIdentifier
@@ -668,14 +702,22 @@ final class XAdESCounterSigner {
 			final boolean onlySignningCert = Boolean.parseBoolean(extraParams
 					.getProperty("includeOnlySignningCertificate", Boolean.FALSE.toString())); //$NON-NLS-1$
 			if (onlySignningCert) {
-				xmlSignature.sign((X509Certificate) keyEntry.getCertificate(),
-						keyEntry.getPrivateKey(), XMLConstants.SIGN_ALGOS_URI.get(algorithm), referenceList,
-						"Signature-" + UUID.randomUUID().toString()); //$NON-NLS-1$
+				xmlSignature.sign(
+					(X509Certificate) certChain[0],
+					key,
+					XMLConstants.SIGN_ALGOS_URI.get(algorithm),
+					referenceList,
+					"Signature-" + UUID.randomUUID().toString() //$NON-NLS-1$
+				);
 			}
 			else {
-				xmlSignature.sign(Arrays.asList((X509Certificate[]) keyEntry.getCertificateChain()),
-						keyEntry.getPrivateKey(), XMLConstants.SIGN_ALGOS_URI.get(algorithm), referenceList,
-						"Signature-" + UUID.randomUUID().toString()); //$NON-NLS-1$
+				xmlSignature.sign(
+					Arrays.asList((X509Certificate[]) certChain),
+					key,
+					XMLConstants.SIGN_ALGOS_URI.get(algorithm),
+					referenceList,
+					"Signature-" + UUID.randomUUID().toString() //$NON-NLS-1$
+				);
 			}
 		} catch (final NoSuchAlgorithmException e) {
 			throw new UnsupportedOperationException(

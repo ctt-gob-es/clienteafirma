@@ -12,7 +12,6 @@ package es.gob.afirma.signers.xades;
 
 import java.io.ByteArrayInputStream;
 import java.net.URI;
-import java.security.KeyStore.PrivateKeyEntry;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -79,13 +78,14 @@ public final class XAdESSigner {
 
 	static byte[] sign(final byte[] data,
 			final String algorithm,
-			final PrivateKeyEntry keyEntry,
+			final PrivateKey key,
+			final Certificate[] certChain,
 			final Properties xParams) throws AOException {
 		return sign(
 				data,
 				algorithm,
-				keyEntry.getCertificateChain(),
-				keyEntry.getPrivateKey(),
+				certChain,
+				key,
 				xParams
 				);
 	}

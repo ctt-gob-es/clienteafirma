@@ -168,7 +168,13 @@ public final class TestXAdES {
 
             final byte[] data = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(filename));
 
-            final byte[] result = signer.cosign(data, algo, pke, p);
+            final byte[] result = signer.cosign(
+        		data,
+        		algo,
+        		pke.getPrivateKey(),
+        		pke.getCertificateChain(),
+        		p
+    		);
 
             final File f = File.createTempFile(algo + "-" + filename.replace(".xml", "") + "-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
             final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
@@ -236,7 +242,13 @@ public final class TestXAdES {
 
             final byte[] data = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(filename));
 
-            final byte[] result = signer.sign(data, algo, pke, p1);
+            final byte[] result = signer.sign(
+        		data,
+        		algo,
+        		pke.getPrivateKey(),
+        		pke.getCertificateChain(),
+        		p1
+    		);
 
             final File f = File.createTempFile(algo + "-" + p1.getProperty("mode") + "-" + filename.replace(".xml", "") + "-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
             final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
@@ -323,7 +335,13 @@ public final class TestXAdES {
 
                     final byte[] data = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(filename));
 
-                    final byte[] result = signer.sign(data, algo, pke, extraParams);
+                    final byte[] result = signer.sign(
+                		data,
+                		algo,
+                		pke.getPrivateKey(),
+                		pke.getCertificateChain(),
+                		extraParams
+            		);
 
                     Assert.assertFalse("El XML contiene '&#13;'", new String(result).contains("&#13;")); //$NON-NLS-1$ //$NON-NLS-2$
 

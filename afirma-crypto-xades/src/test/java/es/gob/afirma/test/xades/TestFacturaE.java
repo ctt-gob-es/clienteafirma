@@ -115,7 +115,13 @@ public final class TestFacturaE {
 
                     final byte[] data = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(filename));
 
-                    final byte[] result = signer.sign(data, algo, pke, extraParams);
+                    final byte[] result = signer.sign(
+                		data,
+                		algo,
+                		pke.getPrivateKey(),
+                		pke.getCertificateChain(),
+                		extraParams
+            		);
 
                     final File f = File.createTempFile("Factura_firmada_" + filename.replace(".xml", "") + "-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
                     final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);

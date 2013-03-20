@@ -12,7 +12,8 @@ package es.gob.afirma.signers.xades;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.security.KeyStore.PrivateKeyEntry;
+import java.security.PrivateKey;
+import java.security.cert.Certificate;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
@@ -64,7 +65,8 @@ public final class AOFacturaESigner implements AOSigner {
 	public byte[] cosign(final byte[] data,
                          final byte[] sign,
                          final String algorithm,
-                         final PrivateKeyEntry keyEntry,
+                         final PrivateKey key,
+                         final Certificate[] certChain,
                          final Properties extraParams) throws AOException {
     	throw new UnsupportedOperationException("No se soporta la cofirma de facturas"); //$NON-NLS-1$
     }
@@ -73,7 +75,8 @@ public final class AOFacturaESigner implements AOSigner {
     @Override
 	public byte[] cosign(final byte[] sign,
                          final String algorithm,
-                         final PrivateKeyEntry keyEntry,
+                         final PrivateKey key,
+                         final Certificate[] certChain,
                          final Properties extraParams) throws AOException {
     	throw new UnsupportedOperationException("No se soporta la cofirma de facturas"); //$NON-NLS-1$
     }
@@ -84,7 +87,8 @@ public final class AOFacturaESigner implements AOSigner {
                               final String algorithm,
                               final CounterSignTarget targetType,
                               final Object[] targets,
-                              final PrivateKeyEntry keyEntry,
+                              final PrivateKey key,
+                              final Certificate[] certChain,
                               final Properties extraParams) throws AOException {
         throw new UnsupportedOperationException("No se soporta la contrafirma de facturas"); //$NON-NLS-1$
     }
@@ -99,7 +103,8 @@ public final class AOFacturaESigner implements AOSigner {
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
      * </ul>
-     * @param keyEntry Entrada que apunta a la clave privada a usar para firmar.
+     * @param key Clave privada a usar para firmar.
+     * @param certChain Cadena de certificados del firmante
      * @param extraParams Par&aacute;metros adicionales para la firma.
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
      * <dl>
@@ -120,7 +125,9 @@ public final class AOFacturaESigner implements AOSigner {
      * @throws IOException Cuando ocurren problemas relacionados con la lectura de los datos */
     @Override
 	public byte[] sign(final byte[] data,
-                       final String algorithm, final PrivateKeyEntry keyEntry,
+                       final String algorithm,
+                       final PrivateKey key,
+                       final Certificate[] certChain,
                        final Properties extraParams) throws AOException, IOException {
         if (!isValidDataFile(data)) {
             throw new InvalidEFacturaDataException();
@@ -130,13 +137,13 @@ public final class AOFacturaESigner implements AOSigner {
         }
         final Properties xParams = (Properties) EXTRA_PARAMS.clone();
         if (extraParams != null) {
-            for (final Object key : extraParams.keySet()) {
-                if (ALLOWED_PARAMS.contains(key)) {
-                    xParams.put(key, extraParams.get(key));
+            for (final Object k : extraParams.keySet()) {
+                if (ALLOWED_PARAMS.contains(k)) {
+                    xParams.put(k, extraParams.get(k));
                 }
             }
         }
-        return XADES_SIGNER.sign(data, algorithm, keyEntry, xParams);
+        return XADES_SIGNER.sign(data, algorithm, key, certChain, xParams);
     }
 
     /** {@inheritDoc} */

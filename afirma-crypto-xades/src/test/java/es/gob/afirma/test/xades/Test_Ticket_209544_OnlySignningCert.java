@@ -119,7 +119,13 @@ public final class Test_Ticket_209544_OnlySignningCert {
 
                     final byte[] data = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(filename));
 
-                    final byte[] result = signer.sign(data, algo, pke, extraParams);
+                    final byte[] result = signer.sign(
+                		data,
+                		algo,
+                		pke.getPrivateKey(),
+                		pke.getCertificateChain(),
+                		extraParams
+            		);
 
                     Assert.assertNotNull("Error al generar la firma: " + prueba, result); //$NON-NLS-1$
                     Assert.assertTrue(prueba + ", no se reconoce como una firma", signer.isSign(result)); //$NON-NLS-1$
@@ -192,12 +198,24 @@ public final class Test_Ticket_209544_OnlySignningCert {
 
                     final byte[] data = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(filename));
 
-                    final byte[] signResult = signer.sign(data, algo, pke, extraParams);
+                    final byte[] signResult = signer.sign(
+                		data,
+                		algo,
+                		pke.getPrivateKey(),
+                		pke.getCertificateChain(),
+                		extraParams
+            		);
 
                     Assert.assertNotNull(prueba, signResult);
                     Assert.assertTrue(signer.isSign(signResult));
 
-                    final byte[] cosignResult = signer.cosign(signResult, algo, pke, extraParams);
+                    final byte[] cosignResult = signer.cosign(
+                		signResult,
+                		algo,
+                		pke.getPrivateKey(),
+                		pke.getCertificateChain(),
+                		extraParams
+            		);
 
                     Assert.assertNotNull(prueba, cosignResult);
                     Assert.assertTrue(signer.isSign(cosignResult));
@@ -271,12 +289,26 @@ public final class Test_Ticket_209544_OnlySignningCert {
 
                     final byte[] data = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(filename));
 
-                    final byte[] signResult = signer.sign(data, algo, pke, extraParams);
+                    final byte[] signResult = signer.sign(
+                		data,
+                		algo,
+                		pke.getPrivateKey(),
+                		pke.getCertificateChain(),
+                		extraParams
+            		);
 
                     Assert.assertNotNull(prueba, signResult);
                     Assert.assertTrue(signer.isSign(signResult));
 
-                    final byte[] countersignResult = signer.countersign(signResult, algo, CounterSignTarget.TREE, null, pke, extraParams);
+                    final byte[] countersignResult = signer.countersign(
+                		signResult,
+                		algo,
+                		CounterSignTarget.TREE,
+                		null,
+                		pke.getPrivateKey(),
+                		pke.getCertificateChain(),
+                		extraParams
+            		);
 
                     Assert.assertNotNull(prueba, countersignResult);
                     Assert.assertTrue(signer.isSign(countersignResult));
