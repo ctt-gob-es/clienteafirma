@@ -44,7 +44,7 @@ public class AOXAdESTriSignerTest {
 
 		final AOXAdESTriSigner signer = new AOXAdESTriSigner();
 
-		final byte[] result = signer.sign(data, AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, pke, config);
+		final byte[] result = signer.sign(data, AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, pke.getPrivateKey(), pke.getCertificateChain(), config);
 
 		System.out.println("Resultado:\n" + new String(result));
 	}
@@ -63,7 +63,7 @@ public class AOXAdESTriSignerTest {
 
 		final AOXAdESTriSigner signer = new AOXAdESTriSigner();
 
-		final byte[] result = signer.cosign(sign, AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, pke, config);
+		final byte[] result = signer.cosign(sign, AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, pke.getPrivateKey(), pke.getCertificateChain(), config);
 
 		System.out.println("Resultado:\n" + new String(result));
 	}
