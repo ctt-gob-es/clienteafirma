@@ -97,7 +97,13 @@ public final class TestAOODFSignerTest {
 					final File tempFile = File.createTempFile("odfSign", "." + DATA_FILES[i]); //$NON-NLS-1$ //$NON-NLS-2$
 					final FileOutputStream fos = new FileOutputStream(tempFile);
 
-					final byte[] result = signer.sign(DATA.get(i), "SHA1withRSA", pke, extraParams); //$NON-NLS-1$
+					final byte[] result = signer.sign(
+						DATA.get(i),
+						"SHA1withRSA", //$NON-NLS-1$
+						pke.getPrivateKey(),
+						pke.getCertificateChain(),
+						extraParams
+					);
 					Assert.assertNotNull(result);
 
 					fos.write(result);
@@ -132,10 +138,22 @@ public final class TestAOODFSignerTest {
 					final File tempFile = File.createTempFile("odfCosign", "." + DATA_FILES[i]); //$NON-NLS-1$ //$NON-NLS-2$
 					final FileOutputStream fos = new FileOutputStream(tempFile);
 
-					final byte[] signature = signer.sign(DATA.get(i), "SHA1withRSA", pke, extraParams); //$NON-NLS-1$
+					final byte[] signature = signer.sign(
+						DATA.get(i),
+						"SHA1withRSA", //$NON-NLS-1$
+						pke.getPrivateKey(),
+						pke.getCertificateChain(),
+						extraParams
+					);
 					Assert.assertNotNull(signature);
 
-					final byte[] result = signer.cosign(signature, "SHA1withRSA", pke2, extraParams); //$NON-NLS-1$
+					final byte[] result = signer.cosign(
+						signature,
+						"SHA1withRSA", //$NON-NLS-1$
+						pke2.getPrivateKey(),
+						pke2.getCertificateChain(),
+						extraParams
+					);
 					Assert.assertNotNull(result);
 
 					fos.write(result);

@@ -596,21 +596,23 @@ public final class PAdESTriPhaseSignerServerSide {
 
         final PdfTriPhaseSession pts = getSessionData(inPDF, signerCertificateChain, signTime, extraParams);
         final PdfSignatureAppearance sap = pts.getSAP();
-        try (
-    		final ByteArrayOutputStream baos = pts.getBAOS();
-		) {
 
-		    final String badFileID = pts.getFileID();
+    	final ByteArrayOutputStream baos = pts.getBAOS();
+	    final String badFileID = pts.getFileID();
 
-		    try {
-		       sap.close(dic2);
-		    }
-		    catch (final Exception e) {
-		        throw new AOException("Error al cerrar el PDF para finalizar el proceso de firma", e); //$NON-NLS-1$
-		    }
+	    try {
+	       sap.close(dic2);
+	    }
+	    catch (final Exception e) {
+	    	baos.close();
+	        throw new AOException("Error al cerrar el PDF para finalizar el proceso de firma", e); //$NON-NLS-1$
+	    }
 
-		    return new String(baos.toByteArray(), "ISO-8859-1").replace(badFileID, fileID).getBytes("ISO-8859-1"); //$NON-NLS-1$ //$NON-NLS-2$
-        }
+	    final byte[] ret = new String(baos.toByteArray(), "ISO-8859-1").replace(badFileID, fileID).getBytes("ISO-8859-1"); //$NON-NLS-1$ //$NON-NLS-2$
+
+	    baos.close();
+
+	    return ret;
     }
 
     /** Resultado de una pre-firma (como primera parte de un firma trif&aacute;sica) PAdES. */
@@ -859,7 +861,7 @@ public final class PAdESTriPhaseSignerServerSide {
         sap.setCryptoDictionary(dic);
 
         // Reservamos el espacio necesario en el PDF para insertar la firma
-        final HashMap<PdfName, Integer> exc = new HashMap<>();
+        final HashMap<PdfName, Integer> exc = new HashMap<PdfName, Integer>();
         exc.put(PdfName.CONTENTS, Integer.valueOf(CSIZE * 2 + 2));
 
         try {

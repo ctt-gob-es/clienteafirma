@@ -122,7 +122,13 @@ public final class TestOOXML {
 
                 System.out.println(prueba);
 
-                final byte[] result = signer.sign(DATA, algo, pke, extraParams);
+                final byte[] result = signer.sign(
+            		DATA,
+            		algo,
+            		pke.getPrivateKey(),
+            		pke.getCertificateChain(),
+            		extraParams
+        		);
 
                 final File saveFile = File.createTempFile(algo + "-", ".docx"); //$NON-NLS-1$ //$NON-NLS-2$
                 final OutputStream os = new FileOutputStream(saveFile);
@@ -153,7 +159,13 @@ public final class TestOOXML {
             }
         }
 
-        signer.sign(DATA, "SHA1withRSA", pke, null); //$NON-NLS-1$
+        signer.sign(
+    		DATA,
+    		"SHA1withRSA", //$NON-NLS-1$
+    		pke.getPrivateKey(),
+    		pke.getCertificateChain(),
+    		null
+		);
 
     }
 
@@ -202,7 +214,13 @@ public final class TestOOXML {
             }
         }
 
-        signer.sign(DATA, "SHA1withRSA", pke1, null); //$NON-NLS-1$
+        signer.sign(
+    		DATA,
+    		"SHA1withRSA", //$NON-NLS-1$
+    		pke1.getPrivateKey(),
+    		pke1.getCertificateChain(),
+    		null
+		);
 
     }
 
@@ -224,17 +242,36 @@ public final class TestOOXML {
     }
 
     private static byte[] sign(final AOSigner signer, final byte[] data, final String algorithm, final PrivateKeyEntry pke, final Properties params) throws Exception {
-        return signer.sign(data, algorithm, pke, params);
+        return signer.sign(
+    		data,
+    		algorithm,
+    		pke.getPrivateKey(),
+    		pke.getCertificateChain(),
+    		params
+		);
     }
 
     /** Cofirma sin necesidad de los datos originales. */
     private static byte[] cosign(final AOSigner signer, final byte[] sign, final String algorithm, final PrivateKeyEntry pke, final Properties params) throws Exception {
-        return signer.cosign(sign, algorithm, pke, params);
+        return signer.cosign(
+    		sign,
+    		algorithm,
+    		pke.getPrivateKey(),
+    		pke.getCertificateChain(),
+    		params
+		);
     }
 
 
     private static byte[] cosign(final AOSigner signer, final byte[] data, final byte[] sign, final String algorithm, final PrivateKeyEntry pke, final Properties params) throws Exception {
-        return signer.cosign(data, sign, algorithm, pke, params);
+        return signer.cosign(
+    		data,
+    		sign,
+    		algorithm,
+    		pke.getPrivateKey(),
+    		pke.getCertificateChain(),
+    		params
+		);
     }
 
     /** Hace las comprobaciones b&aacute;sicas de una firma. */

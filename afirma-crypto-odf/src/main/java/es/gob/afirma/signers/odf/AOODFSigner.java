@@ -21,8 +21,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
-import java.security.KeyStore.PrivateKeyEntry;
 import java.security.MessageDigest;
+import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -114,7 +114,8 @@ public final class AOODFSigner implements AOSigner {
     /** A&ntilde;ade una firma electr&oacute;nica a un documento ODF.
      * @param data Documento ODF a firmar
      * @param algorithm Se ignora el valor de este par&aacute;metro, se utiliza siempre el algoritmo SHA1withRSA
-     * @param keyEntry Entrada que apunta a la clave privada a usar para firmar
+     * @param key Clave privada a usar para firmar
+     * @param certChain Cadena de certificados del firmante
      * @param xParams Par&aacute;metros adicionales para la firma.
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
      * <dl>
@@ -129,7 +130,8 @@ public final class AOODFSigner implements AOSigner {
     @Override
 	public byte[] sign(final byte[] data,
                        final String algorithm,
-                       final PrivateKeyEntry keyEntry,
+                       final PrivateKey key,
+                       final java.security.cert.Certificate[] certChain,
                        final Properties xParams) throws AOException {
 
         final Properties extraParams = xParams != null ? xParams : new Properties();
@@ -339,7 +341,7 @@ public final class AOODFSigner implements AOSigner {
             // Preparamos el KeyInfo
             final KeyInfoFactory kif = fac.getKeyInfoFactory();
             final List<Object> x509Content = new ArrayList<Object>();
-            final X509Certificate cert = (X509Certificate) keyEntry.getCertificate();
+            final X509Certificate cert = (X509Certificate) certChain[0];
             x509Content.add(cert.getSubjectX500Principal().getName());
             x509Content.add(cert);
 
@@ -363,7 +365,7 @@ public final class AOODFSigner implements AOSigner {
                  signatureId,
                  null
               ).sign(
-                 new DOMSignContext(keyEntry.getPrivateKey(), rootSignatures)
+                 new DOMSignContext(key, rootSignatures)
             );
 
             // crea un nuevo fichero zip
@@ -422,7 +424,8 @@ public final class AOODFSigner implements AOSigner {
      * @param data No usado, se ignora el valor de este par&aacute;metro
      * @param sign Documento ODF a firmar
      * @param algorithm Se ignora el valor de este par&aacute;metro, se utiliza siempre el algoritmo SHA1withRSA
-     * @param keyEntry Entrada que apunta a la clave privada a usar para firmar
+     * @param key Clave privada a usar para firmar
+     * @param certChain Cadena de certificados del firmante
      * @param extraParams Par&aacute;metros adicionales para la firma.
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
      * <dl>
@@ -433,21 +436,24 @@ public final class AOODFSigner implements AOSigner {
      *   </dd>
      * </dl>
      * @return Documento ODF con la nueva firma a&ntilde;adida
-     * @throws AOException Cuando ocurre cualquier problema durante el proceso */
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso
+     * @throws IOException */
     @Override
 	public byte[] cosign(final byte[] data,
                          final byte[] sign,
                          final String algorithm,
-                         final PrivateKeyEntry keyEntry,
-                         final Properties extraParams) throws AOException {
-        return sign(sign, algorithm, keyEntry, extraParams);
+                         final PrivateKey key,
+                         final java.security.cert.Certificate[] certChain,
+                         final Properties extraParams) throws AOException, IOException {
+        return sign(sign, algorithm, key, certChain, extraParams);
     }
 
     /** A&ntilde;ade una firma electr&oacute;nica a un documento ODF.
      * Este m&eacute;todo es completamente equivalente a <code>sign(byte[], String, PrivateKeyEntry, Properties)</code>.
      * @param sign Documento ODF a firmar
      * @param algorithm Se ignora el valor de este par&aacute;metro, se utiliza siempre el algoritmo SHA1withRSA
-     * @param keyEntry Entrada que apunta a la clave privada a usar para firmar
+     * @param key Clave privada a usar para firmar
+     * @param certChain Cadena de certificados del firmante
      * @param extraParams Par&aacute;metros adicionales para la firma.
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
      * <dl>
@@ -458,13 +464,15 @@ public final class AOODFSigner implements AOSigner {
      *   </dd>
      * </dl>
      * @return Documento ODF con la nueva firma a&ntilde;adida
-     * @throws AOException Cuando ocurre cualquier problema durante el proceso */
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso
+     * @throws IOException */
     @Override
 	public byte[] cosign(final byte[] sign,
                          final String algorithm,
-                         final PrivateKeyEntry keyEntry,
-                         final Properties extraParams) throws AOException {
-        return sign(sign, algorithm, keyEntry, extraParams);
+                         final PrivateKey key,
+                         final java.security.cert.Certificate[] certChain,
+                         final Properties extraParams) throws AOException, IOException {
+        return sign(sign, algorithm, key, certChain, extraParams);
     }
 
     /** M&eacute;todo no implementado. No es posible realizar contrafirmas de
@@ -474,7 +482,8 @@ public final class AOODFSigner implements AOSigner {
                               final String algorithm,
                               final CounterSignTarget targetType,
                               final Object[] targets,
-                              final PrivateKeyEntry keyEntry,
+                              final PrivateKey key,
+                              final java.security.cert.Certificate[] certChain,
                               final Properties extraParams) throws AOException {
         throw new UnsupportedOperationException("No es posible realizar contrafirmas de ficheros ODF"); //$NON-NLS-1$
     }

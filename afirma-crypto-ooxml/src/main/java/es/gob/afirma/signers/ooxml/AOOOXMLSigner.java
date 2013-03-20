@@ -12,7 +12,7 @@ package es.gob.afirma.signers.ooxml;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.security.KeyStore.PrivateKeyEntry;
+import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.Security;
 import java.security.cert.X509Certificate;
@@ -217,7 +217,8 @@ public final class AOOOXMLSigner implements AOSigner {
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
      * </ul>
-     * @param keyEntry Entrada que apunta a la clave privada del firmante
+     * @param key Clave privada del firmante
+     * @param certChain Cadena de certificados del firmante
      * @param extraParams No usado, se ignora el valor de este par&aacute;metro
      * @return Documento OOXML firmado
      * @throws AOException Cuando ocurre alg&uacute;n error durante el proceso de firma
@@ -225,7 +226,8 @@ public final class AOOOXMLSigner implements AOSigner {
     @Override
 	public byte[] sign(final byte[] data,
                        final String algorithm,
-                       final PrivateKeyEntry keyEntry,
+                       final PrivateKey key,
+                       final java.security.cert.Certificate[] certChain,
                        final Properties extraParams) throws AOException, IOException {
 
         // Comprobamos si es un documento OOXML valido.
@@ -233,7 +235,7 @@ public final class AOOOXMLSigner implements AOSigner {
             throw new AOFormatFileException("Los datos introducidos no se corresponden con un documento OOXML"); //$NON-NLS-1$
         }
 
-        return signOOXML(data, OOXMLUtil.countOOXMLSignatures(data) + 1, algorithm, keyEntry);
+        return signOOXML(data, OOXMLUtil.countOOXMLSignatures(data) + 1, algorithm, key, certChain);
     }
 
     /** Agrega una firma electr&oacute;nica a un documento OOXML.
@@ -247,7 +249,8 @@ public final class AOOOXMLSigner implements AOSigner {
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
      * </ul>
-     * @param keyEntry Entrada que apunta a la clave privada del firmante
+     * @param key Clave privada del firmante
+     * @param certChain Cadena de certificados del firmante
      * @param extraParams No usado, se ignora el valor de este par&aacute;metro
      * @return Documento OOXML firmado
      * @throws AOException Cuando ocurre alg&uacute;n error durante el proceso de firma
@@ -255,9 +258,10 @@ public final class AOOOXMLSigner implements AOSigner {
     @Override
 	public byte[] cosign(final byte[] sign,
                          final String algorithm,
-                         final PrivateKeyEntry keyEntry,
+                         final PrivateKey key,
+                         final java.security.cert.Certificate[] certChain,
                          final Properties extraParams) throws AOException, IOException {
-    	return sign(sign, algorithm, keyEntry, extraParams);
+    	return sign(sign, algorithm, key, certChain, extraParams);
     }
 
     /** Agrega una firma electr&oacute;nica a un documento OOXML.
@@ -272,7 +276,8 @@ public final class AOOOXMLSigner implements AOSigner {
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
      * </ul>
-     * @param keyEntry Entrada que apunta a la clave privada del firmante
+     * @param key Clave privada del firmante
+     * @param certChain Cadena de certificados del firmante
      * @param extraParams No usado, se ignora el valor de este par&aacute;metro
      * @return Documento OOXML firmado
      * @throws AOException Cuando ocurre alg&uacute;n error durante el proceso de firma
@@ -281,9 +286,10 @@ public final class AOOOXMLSigner implements AOSigner {
 	public byte[] cosign(final byte[] data,
                          final byte[] sign,
                          final String algorithm,
-                         final PrivateKeyEntry
-                         keyEntry, final Properties extraParams) throws AOException, IOException {
-    	return cosign(sign, algorithm, keyEntry, extraParams);
+                         final PrivateKey key,
+                         final java.security.cert.Certificate[] certChain,
+                         final Properties extraParams) throws AOException, IOException {
+    	return cosign(sign, algorithm, key, certChain, extraParams);
     }
 
     /** M&eacute;todo no implementado. No es posible realizar contrafirmas de
@@ -293,7 +299,8 @@ public final class AOOOXMLSigner implements AOSigner {
                               final String algorithm,
                               final CounterSignTarget targetType,
                               final Object[] targets,
-                              final PrivateKeyEntry keyEntry,
+                              final PrivateKey key,
+                              final java.security.cert.Certificate[] certChain,
                               final Properties extraParams) throws AOException {
         throw new UnsupportedOperationException("No es posible realizar contrafirmas de ficheros OOXML"); //$NON-NLS-1$
     }
@@ -309,25 +316,27 @@ public final class AOOOXMLSigner implements AOSigner {
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
      * </ul>
-     * @param keyEntry Entrada que apunta a la clave privada del firmante
+     * @param key Clave privada del firmante
+     * @param certChain Cadena de certificados del firmante
      * @return Documento OOXML firmado
      * @throws AOException Cuando ocurre alg&uacute;n error durante el proceso de firma */
     private static byte[] signOOXML(final byte[] ooxmlDocument,
                              final int signNum,
                              final String algorithm,
-                             final PrivateKeyEntry keyEntry) throws AOException {
+                             final PrivateKey key,
+                             final java.security.cert.Certificate[] certChain) throws AOException {
 
         // Pasamos la cadena de certificacion a una lista
-        if (keyEntry == null) {
+        if (key == null) {
             throw new AOException("No se ha proporcionado una clave valida"); //$NON-NLS-1$
         }
 
         try {
 			return AbstractOOXMLSignatureServiceContainer.sign(
                  new ByteArrayInputStream(ooxmlDocument),
-                 Arrays.asList((X509Certificate[])keyEntry.getCertificateChain()),
+                 Arrays.asList((X509Certificate[])certChain),
                  AOSignConstants.getDigestAlgorithmName(algorithm),
-                 keyEntry.getPrivateKey(),
+                 key,
                  signNum
             );
         }
