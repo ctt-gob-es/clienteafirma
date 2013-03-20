@@ -170,8 +170,8 @@ public final class XAdESTriPhaseSignerServerSide {
 			result = XAdESSigner.sign(
 					data,
 					algorithm,
-					certChain,
 					prk,
+					certChain,
 					xParams
 					);
 			break;
@@ -179,8 +179,8 @@ public final class XAdESTriPhaseSignerServerSide {
 			result = XAdESCoSigner.cosign(
 					data,
 					algorithm,
-					certChain,
 					prk,
+					certChain,
 					xParams
 					);
 			break;
