@@ -142,18 +142,24 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 		//TODO: Crear la alternativa para firmas explicitas (se obtienen datos nulos), en las que hay que extraer el MessageDigest
 		// de la firma original
+		byte[] messageDigest = null;
 		final byte[] data = ObtainContentSignedData.obtainData(sign);
+		if (data == null) {
+			messageDigest = ObtainContentSignedData.obtainMessageDigest(sign, AOSignConstants.getDigestAlgorithmName(algorithm));
+		}
 
 		String contentTypeOid = MimeHelper.DEFAULT_CONTENT_OID_DATA;
 		String contentDescription = MimeHelper.DEFAULT_CONTENT_DESCRIPTION;
 
-		try {
-			final MimeHelper mimeHelper = new MimeHelper(data);
-			contentTypeOid = MimeHelper.transformMimeTypeToOid(mimeHelper.getMimeType());
-			contentDescription = mimeHelper.getDescription();
-		}
-		catch(final Exception e) {
-			Logger.getLogger("es.gob.afirma").warning("No se ha podido determinar el tipo de los datos: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+		if (data != null) {
+			try {
+				final MimeHelper mimeHelper = new MimeHelper(data);
+				contentTypeOid = MimeHelper.transformMimeTypeToOid(mimeHelper.getMimeType());
+				contentDescription = mimeHelper.getDescription();
+			}
+			catch(final Exception e) {
+				Logger.getLogger("es.gob.afirma").warning("No se ha podido determinar el tipo de los datos: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			}
 		}
 
 		final byte[] presign;
@@ -164,7 +170,7 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 					new X509Certificate[] { cert },
 					new AdESPolicy(extraParams),
 					signingCertificateV2,
-					null,                        // MessageDigest
+					messageDigest,
 					contentTypeOid,
 					contentDescription,
 					new Date()
@@ -192,7 +198,11 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			final Properties extraParams) throws NoSuchAlgorithmException, AOException, IOException {
 
 		//TODO: Crear la alternativa para firmas explicitas (se obtienen datos nulos), en las que hay que extraer el Messa
+		byte[] messageDigest = null;
 		final byte[] data = ObtainContentSignedData.obtainData(sign);
+		if (data == null) {
+			messageDigest = ObtainContentSignedData.obtainMessageDigest(sign, AOSignConstants.getDigestAlgorithmName(algorithm));
+		}
 
 		try {
 			return CAdESTriPhaseCoSigner.postCoSign(
