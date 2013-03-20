@@ -76,20 +76,6 @@ public final class XAdESSigner {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");	//$NON-NLS-1$
 
-	static byte[] sign(final byte[] data,
-			final String algorithm,
-			final PrivateKey key,
-			final Certificate[] certChain,
-			final Properties xParams) throws AOException {
-		return sign(
-				data,
-				algorithm,
-				certChain,
-				key,
-				xParams
-				);
-	}
-
 	/**
 	 * Firma datos en formato XAdES.
 	 * <p>
@@ -393,8 +379,8 @@ public final class XAdESSigner {
 	 */
 	public static byte[] sign(final byte[] data,
 			final String algorithm,
-			final Certificate[] certChain,
 			final PrivateKey pk,
+			final Certificate[] certChain,
 			final Properties xParams) throws AOException {
 
 		final String algoUri = XMLConstants.SIGN_ALGOS_URI.get(algorithm);

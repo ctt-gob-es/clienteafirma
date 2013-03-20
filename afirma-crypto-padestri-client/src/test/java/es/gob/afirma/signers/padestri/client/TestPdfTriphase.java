@@ -80,7 +80,13 @@ public class TestPdfTriphase {
 		}
 		System.out.println(config.size());
 
-        final byte[] result = signer.sign(null, "SHA512withRSA", this.pke, config); //$NON-NLS-1$
+        final byte[] result = signer.sign(
+    		null,
+    		"SHA512withRSA",  //$NON-NLS-1$
+    		this.pke.getPrivateKey(),
+    		this.pke.getCertificateChain(),
+    		config
+		);
 
         Assert.assertNotNull("Error durante el proceso de firma, resultado nulo", result); //$NON-NLS-1$
         Assert.assertEquals("No se recibió un OK desde servidor", "OK", new String(result)); //$NON-NLS-1$ //$NON-NLS-2$
@@ -101,7 +107,13 @@ public class TestPdfTriphase {
 		config.setProperty(PROPERTY_NAME_ATTACH_FILENAME, "splash.png"); //$NON-NLS-1$
 		config.setProperty(PROPERTY_NAME_ATTACH_DESCRIPTION, "Imagen adjunta de prueba"); //$NON-NLS-1$
 
-        final byte[] result = signer.sign(null, "SHA512withRSA", this.pke, config); //$NON-NLS-1$
+        final byte[] result = signer.sign(
+    		null,
+    		"SHA512withRSA", //$NON-NLS-1$
+    		this.pke.getPrivateKey(),
+    		this.pke.getCertificateChain(),
+    		config
+		);
 
         Assert.assertNotNull("Error durante el proceso de firma, resultado nulo", result); //$NON-NLS-1$
         Assert.assertTrue("Se recibio un codigo de error desde el servidor", !new String(result).startsWith("ERR-")); //$NON-NLS-1$ //$NON-NLS-2$
