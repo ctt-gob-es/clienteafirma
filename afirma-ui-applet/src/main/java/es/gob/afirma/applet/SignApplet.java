@@ -1319,7 +1319,15 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 				// Contrafirmamos finalmente
 				final byte[] outputBuffer;
 				try {
-					outputBuffer = signer.countersign(originalSign, algorithm, target, params, ke, SignApplet.this.getGenericConfig());
+					outputBuffer = signer.countersign(
+						originalSign,
+						algorithm,
+						target,
+						params,
+						ke.getPrivateKey(),
+						ke.getCertificateChain(),
+						SignApplet.this.getGenericConfig()
+					);
 				}
 				catch (final UnsupportedOperationException e) {
 					getLogger().severe(e.getMessage());
@@ -1746,7 +1754,13 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
 					final byte[] outputBuffer;
 					try {
-						outputBuffer = signer.sign(dataToSign, algorithm, ke, SignApplet.this.getGenericConfig());
+						outputBuffer = signer.sign(
+							dataToSign,
+							algorithm,
+							ke.getPrivateKey(),
+							ke.getCertificateChain(),
+							SignApplet.this.getGenericConfig()
+						);
 					}
 					catch (final UnsupportedOperationException e) {
 						getLogger().severe(e.getMessage());
@@ -2024,7 +2038,14 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
 				byte[] outputBuffer;
 				try {
-					outputBuffer = signer.cosign(dataToSign, originalSign, algorithm, ke, SignApplet.this.getGenericConfig());
+					outputBuffer = signer.cosign(
+						dataToSign,
+						originalSign,
+						algorithm,
+						ke.getPrivateKey(),
+						ke.getCertificateChain(),
+						SignApplet.this.getGenericConfig()
+					);
 				}
 				catch (final UnsupportedOperationException e) {
 					getLogger().severe(AppletMessages.getString("SignApplet.682") + ": " + e.getMessage()); //$NON-NLS-1$  //$NON-NLS-2$

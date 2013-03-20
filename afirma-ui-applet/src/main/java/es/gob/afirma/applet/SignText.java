@@ -228,11 +228,14 @@ final class SignText {
                         this.useCAdES ? AOSignConstants.SIGN_FORMAT_CADES : AOSignConstants.SIGN_FORMAT_CMS);
 
                 return Base64.encode(
-                        signer.sign(
-                                stringToSign.getBytes(),
-                                AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
-                                keyEntry,
-                                null));
+                    signer.sign(
+                        stringToSign.getBytes(),
+                        AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
+                        keyEntry.getPrivateKey(),
+                        keyEntry.getCertificateChain(),
+                        null
+                    )
+                );
         }
         catch (final Exception e) {
             Logger.getLogger("es.gob.afirma").severe("Error creando la firma: " + e); //$NON-NLS-1$ //$NON-NLS-2$
