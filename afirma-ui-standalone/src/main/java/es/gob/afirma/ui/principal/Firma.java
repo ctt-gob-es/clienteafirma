@@ -393,7 +393,13 @@ final class Firma extends JPanel {
 
             final byte[] signedData;
             try {
-                signedData = signer.sign(fileData, GeneralConfig.getSignAlgorithm(), privateKeyEntry, prop);
+                signedData = signer.sign(
+            		fileData,
+            		GeneralConfig.getSignAlgorithm(),
+            		privateKeyEntry.getPrivateKey(),
+            		privateKeyEntry.getCertificateChain(),
+            		prop
+        		);
             }
             catch(final InvalidEFacturaDataException e) {
             	LOGGER.severe("Se ha enviado a firmar como E-Factura datos que no son una factura electronica: " + e); //$NON-NLS-1$

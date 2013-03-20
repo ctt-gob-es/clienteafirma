@@ -276,7 +276,15 @@ final class PanelMultifirma extends JAccessibilityDialogWizard {
                     for (final int value : nodosSeleccionados) {
                         nodos[i++] = Integer.valueOf(value);
                     }
-                    signedData = signer.countersign(signData1, GeneralConfig.getSignAlgorithm(), CounterSignTarget.NODES, nodos, keyEntry, prop);
+                    signedData = signer.countersign(
+                		signData1,
+                		GeneralConfig.getSignAlgorithm(),
+                		CounterSignTarget.NODES,
+                		nodos,
+                		keyEntry.getPrivateKey(),
+                		keyEntry.getCertificateChain(),
+                		prop
+            		);
                     break;
                 }
                 // FIRMANTES SELECCIONADOS
@@ -291,22 +299,41 @@ final class PanelMultifirma extends JAccessibilityDialogWizard {
                         return null;
                     }
                     signedData =
-                        signer.countersign(signData1,
-                                           GeneralConfig.getSignAlgorithm(),
-                                           CounterSignTarget.SIGNERS,
-                                           nodosSeleccionados,
-                                           keyEntry,
-                                           prop);
+                        signer.countersign(
+                    		signData1,
+                            GeneralConfig.getSignAlgorithm(),
+                            CounterSignTarget.SIGNERS,
+                            nodosSeleccionados,
+                            keyEntry.getPrivateKey(),
+                            keyEntry.getCertificateChain(),
+                            prop
+                        );
                     break;
                 }
                 // EL ARBOL DE FIRMAS
                 case 2: {
-                    signedData = signer.countersign(signData1, GeneralConfig.getSignAlgorithm(), CounterSignTarget.TREE, null, keyEntry, prop);
+                    signedData = signer.countersign(
+                		signData1,
+                		GeneralConfig.getSignAlgorithm(),
+                		CounterSignTarget.TREE,
+                		null,
+                		keyEntry.getPrivateKey(),
+                		keyEntry.getCertificateChain(),
+                		prop
+            		);
                     break;
                 }
                 // FIRMA DE HOJAS
                 case 3: {
-                    signedData = signer.countersign(signData1, GeneralConfig.getSignAlgorithm(), CounterSignTarget.LEAFS, null, keyEntry, prop);
+                    signedData = signer.countersign(
+                		signData1,
+                		GeneralConfig.getSignAlgorithm(),
+                		CounterSignTarget.LEAFS,
+                		null,
+                		keyEntry.getPrivateKey(),
+                		keyEntry.getCertificateChain(),
+                		prop
+            		);
                     break;
                 }
             }

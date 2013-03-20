@@ -463,7 +463,8 @@ final class PanelCofirma extends JAccessibilityDialogWizard {
 		    logger.severe(e.toString());
 		    CustomDialog.showMessageDialog(this, true, e.getMessage() != null ? e.getMessage() : e.toString(), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
 		    return false;
-		} finally {
+		}
+		finally {
 		    if (dataIs != null) {
 		        try { dataIs.close(); } catch (final Exception e) {
 		            // Se ignora
@@ -500,6 +501,13 @@ final class PanelCofirma extends JAccessibilityDialogWizard {
         }
 
 		// Realizamos la cofirma
-		return signer.cosign(data, sign, GeneralConfig.getSignAlgorithm(),	keyEntry, prop);
+		return signer.cosign(
+			data,
+			sign,
+			GeneralConfig.getSignAlgorithm(),
+			keyEntry.getPrivateKey(),
+			keyEntry.getCertificateChain(),
+			prop
+		);
 	}
 }

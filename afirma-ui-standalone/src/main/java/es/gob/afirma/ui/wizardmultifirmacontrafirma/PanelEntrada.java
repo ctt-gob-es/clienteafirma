@@ -310,7 +310,8 @@ final class PanelEntrada extends JAccessibilityDialogWizard {
 			signedData = aoSigner.sign(
 					data,
 					GeneralConfig.getSignAlgorithm(),
-					keyEntry,
+					keyEntry.getPrivateKey(),
+					keyEntry.getCertificateChain(),
 					prop
 			);
 		}

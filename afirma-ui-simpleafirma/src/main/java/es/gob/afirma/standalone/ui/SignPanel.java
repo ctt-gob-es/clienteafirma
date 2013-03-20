@@ -39,6 +39,7 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URI;
+import java.security.KeyStore.PrivateKeyEntry;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.Date;
@@ -1014,11 +1015,13 @@ public final class SignPanel extends JPanel {
             final String signatureAlgorithm = preferences.get(PreferencesNames.PREFERENCE_SIGNATURE_ALGORITHM, "SHA1withRSA"); //$NON-NLS-1$
             final byte[] signResult;
             try {
+            	final PrivateKeyEntry pke = ksm.getKeyEntry(alias, KeyStoreUtilities.getCertificatePC(ksm.getType(), SignPanel.this));
                 if (SignPanel.this.isCosign()) {
                     signResult = SignPanel.this.getSigner().cosign(
                 		SignPanel.this.getDataToSign(),
                 		signatureAlgorithm,
-                        ksm.getKeyEntry(alias, KeyStoreUtilities.getCertificatePC(ksm.getType(), SignPanel.this)),
+                        pke.getPrivateKey(),
+                        pke.getCertificateChain(),
                         p
                     );
                 }
@@ -1026,7 +1029,8 @@ public final class SignPanel extends JPanel {
                     signResult = SignPanel.this.getSigner().sign(
                 		SignPanel.this.getDataToSign(),
                 		signatureAlgorithm,
-                        ksm.getKeyEntry(alias, KeyStoreUtilities.getCertificatePC(ksm.getType(), SignPanel.this)),
+                		pke.getPrivateKey(),
+                        pke.getCertificateChain(),
                         p
                     );
                 }
