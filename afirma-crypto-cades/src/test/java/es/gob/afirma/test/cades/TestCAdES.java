@@ -152,7 +152,9 @@ public final class TestCAdES {
 
 					System.out.println(prueba);
 
-					final byte[] result = signer.sign(DATA.get(i), algo, pke, extraParams);
+					final byte[] result = signer.sign(
+						DATA.get(i), algo, pke.getPrivateKey(), pke.getCertificateChain(), extraParams
+					);
 
 					final File saveFile = File.createTempFile(algo + "-", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
 					final OutputStream os = new FileOutputStream(saveFile);
@@ -189,7 +191,9 @@ public final class TestCAdES {
 			}
 		}
 
-		signer.sign(DATA.get(0), "SHA1withRSA", pke, null); //$NON-NLS-1$
+		signer.sign(
+			DATA.get(0), "SHA1withRSA", pke.getPrivateKey(), pke.getCertificateChain(), null //$NON-NLS-1$
+		);
 
 	}
 
@@ -273,17 +277,23 @@ public final class TestCAdES {
 	}
 
 	private static byte[] sign(final AOSigner signer, final byte[] data, final String algorithm, final PrivateKeyEntry pke, final Properties params) throws Exception {
-		return signer.sign(data, algorithm, pke, params);
+		return signer.sign(
+			data, algorithm, pke.getPrivateKey(), pke.getCertificateChain(), params
+		);
 	}
 
 	/** Cofirma sin necesidad de los datos originales. */
 	private static byte[] cosign(final AOSigner signer, final byte[] sign, final String algorithm, final PrivateKeyEntry pke, final Properties params) throws Exception {
-		return signer.cosign(sign, algorithm, pke, params);
+		return signer.cosign(
+			sign, algorithm, pke.getPrivateKey(), pke.getCertificateChain(), params
+		);
 	}
 
 
 	private static byte[] cosign(final AOSigner signer, final byte[] data, final byte[] sign, final String algorithm, final PrivateKeyEntry pke, final Properties params) throws Exception {
-		return signer.cosign(data, sign, algorithm, pke, params);
+		return signer.cosign(
+			data, sign, algorithm, pke.getPrivateKey(), pke.getCertificateChain(), params
+		);
 	}
 
 	/** Hace las comprobaciones b&aacute;sicas de una firma. */

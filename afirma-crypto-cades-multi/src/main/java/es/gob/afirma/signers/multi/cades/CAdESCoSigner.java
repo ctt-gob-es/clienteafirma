@@ -13,8 +13,8 @@ package es.gob.afirma.signers.multi.cades;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.KeyStore.PrivateKeyEntry;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -139,8 +139,7 @@ final class CAdESCoSigner {
 	 *        <code>true</code> si se desea usar la versi&oacute;n 2 del
 	 *        atributo <i>Signing Certificate</i> <code>false</code> para
 	 *        usar la versi&oacute;n 1
-	 * @param keyEntry
-	 *        Clave privada usada para firmar.
+	 * @param key Clave privada usada para firmar.
 	 * @param messageDigest
 	 *        Hash espec&iacute;fico para una firma.
 	 * @param contentType Tipo de contenido definido por su OID.
@@ -160,7 +159,8 @@ final class CAdESCoSigner {
 			final boolean omitContent,
 			final AdESPolicy policy,
 			final boolean signingCertificateV2,
-			final PrivateKeyEntry keyEntry,
+			final PrivateKey key,
+			final java.security.cert.Certificate[] certChain,
 			final byte[] messageDigest,
 			final String contentType,
 			final String contentDescription) throws IOException, NoSuchAlgorithmException, CertificateException {
@@ -289,7 +289,7 @@ final class CAdESCoSigner {
 
 		final ASN1OctetString sign2;
 		try {
-			sign2 = firma(signatureAlgorithm, keyEntry);
+			sign2 = firma(signatureAlgorithm, key, certChain);
 		}
 		catch (final AOException ex) {
 			throw new IOException("Error al realizar la firma: " + ex, ex); //$NON-NLS-1$
@@ -318,7 +318,7 @@ final class CAdESCoSigner {
 	 *        <code>true</code> si se desea usar la versi&oacute;n 2 del
 	 *        atributo <i>Signing Certificate</i> <code>false</code> para
 	 *        usar la versi&oacute;n 1
-	 * @param keyEntry Clave privada usada para firmar.
+	 * @param key Clave privada usada para firmar.
 	 * @param md
 	 *        Huella digital espec&iacute;fica para una firma.
 	 * @param contentType Tipo de contenido definido por su OID.
@@ -340,7 +340,8 @@ final class CAdESCoSigner {
 			final InputStream signature,
 			final AdESPolicy policy,
 			final boolean signingCertificateV2,
-			final PrivateKeyEntry keyEntry,
+			final PrivateKey key,
+			final java.security.cert.Certificate[] certChain,
 			final byte[] md,
 			final String contentType,
 			final String contentDescription) throws IOException, NoSuchAlgorithmException, CertificateException, ContainsNoDataException {
@@ -475,7 +476,7 @@ final class CAdESCoSigner {
 
 		final ASN1OctetString sign2;
 		try {
-			sign2 = firma(signatureAlgorithm, keyEntry);
+			sign2 = firma(signatureAlgorithm, key, certChain);
 		}
 		catch (final AOException ex) {
 			throw new IOException("Error al realizar la firma: " + ex, ex); //$NON-NLS-1$
@@ -498,11 +499,12 @@ final class CAdESCoSigner {
 	/** Realiza la firma usando los atributos del firmante.
 	 * @param signatureAlgorithm
 	 *        Algoritmo para la firma
-	 * @param keyEntry
-	 *        Clave para firmar.
+	 * @param key Clave para firmar.
 	 * @return Firma de los atributos.
 	 * @throws es.map.es.map.afirma.exceptions.AOException */
-	private ASN1OctetString firma(final String signatureAlgorithm, final PrivateKeyEntry keyEntry) throws AOException {
+	private ASN1OctetString firma(final String signatureAlgorithm,
+			                      final PrivateKey key,
+			                      final java.security.cert.Certificate[] certChain) throws AOException {
 
 		final byte[] tmp;
 		try {
@@ -512,7 +514,7 @@ final class CAdESCoSigner {
 			throw new AOException("Error al obtener los datos a firmar", ex); //$NON-NLS-1$
 		}
 
-		return new DEROctetString(new AOPkcs1Signer().sign(tmp, signatureAlgorithm, keyEntry, null));
+		return new DEROctetString(new AOPkcs1Signer().sign(tmp, signatureAlgorithm, key, certChain, null));
 
 	}
 }

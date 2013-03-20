@@ -22,7 +22,7 @@ import es.gob.afirma.signers.cades.AOCAdESSigner;
  * Prueba de cofirmas CAdES.
  * @author Carlos Gamuci
  */
-public class TestCountersign {
+public class TestTriphaseCountersign {
 
 	private static final String PKCS12_KEYSTORE = "ANF_PF_Activo.pfx"; //$NON-NLS-1$
 
@@ -59,17 +59,29 @@ public class TestCountersign {
 
 		final Properties config = new Properties();
 
+//		final CAdESTriPhaseCounterSigner ctcs = new CAdESTriPhaseCounterSigner();
+//		ctcs.counterSigner(
+//			parameters,
+//			data,
+//			targetType,
+//			targets,
+//			keyEntry,
+//			policy,
+//			signingCertificateV2,
+//			contentType,
+//			contentDescription
+//		);
+
 		final AOCAdESSigner signer = new AOCAdESSigner();
 		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
 		final byte[] countersign = signer.countersign(
-			sign,
-			AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
-			CounterSignTarget.TREE,
-			null,
-			pke.getPrivateKey(),
-			pke.getCertificateChain(),
-			config
-		);
+				sign,
+				AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
+				CounterSignTarget.TREE,
+				null,
+				pke.getPrivateKey(),
+				pke.getCertificateChain(),
+				config);
 
 		final File tempFile = File.createTempFile("CountersignCades", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -134,13 +146,14 @@ public class TestCountersign {
 		final AOCAdESSigner signer = new AOCAdESSigner();
 		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
 		final byte[] countersign = signer.countersign(
-				sign,
-				AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
-				CounterSignTarget.TREE,
-				null,
-				pke.getPrivateKey(),
-				pke.getCertificateChain(),
-				config);
+			sign,
+			AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
+			CounterSignTarget.TREE,
+			null,
+			pke.getPrivateKey(),
+			pke.getCertificateChain(),
+			config
+		);
 
 		final File tempFile = File.createTempFile("CountersignCades", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -169,14 +182,13 @@ public class TestCountersign {
 		final AOCAdESSigner signer = new AOCAdESSigner();
 		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
 		final byte[] countersign = signer.countersign(
-			sign,
-			AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
-			CounterSignTarget.LEAFS,
-			null,
-			pke.getPrivateKey(),
-			pke.getCertificateChain(),
-			config
-		);
+				sign,
+				AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
+				CounterSignTarget.LEAFS,
+				null,
+				pke.getPrivateKey(),
+				pke.getCertificateChain(),
+				config);
 
 		final File tempFile = File.createTempFile("CountersignCades", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
 

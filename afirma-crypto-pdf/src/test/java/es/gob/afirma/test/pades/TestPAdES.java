@@ -148,7 +148,13 @@ public class TestPAdES {
 //        //******************************************************************************************
 //        //********** FIN TSA AFIRMA ****************************************************************
 
-        final byte[] result = signer.sign(testPdf, "SHA512withRSA", pke, extraParams); //$NON-NLS-1$
+        final byte[] result = signer.sign(
+    		testPdf,
+    		"SHA512withRSA", //$NON-NLS-1$
+    		pke.getPrivateKey(),
+    		pke.getCertificateChain(),
+    		extraParams
+		);
 
         final File saveFile = File.createTempFile("TSA-", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
         final OutputStream os = new FileOutputStream(saveFile);
@@ -191,7 +197,13 @@ public class TestPAdES {
         extraParams.put("headLess", "true"); //$NON-NLS-1$ //$NON-NLS-2$
         extraParams.put("ownerPassword", "password"); //$NON-NLS-1$ //$NON-NLS-2$
 
-        final byte[] result = signer.sign(testPdf, "SHA512withRSA", pke, extraParams); //$NON-NLS-1$
+        final byte[] result = signer.sign(
+    		testPdf,
+    		"SHA512withRSA",  //$NON-NLS-1$
+    		pke.getPrivateKey(),
+    		pke.getCertificateChain(),
+    		extraParams
+		);
 
         Assert.assertNotNull(prueba, result);
 
@@ -225,7 +237,13 @@ public class TestPAdES {
         extraParams.put("headLess", "true"); //$NON-NLS-1$ //$NON-NLS-2$
         extraParams.put("userPassword", "1111"); //$NON-NLS-1$ //$NON-NLS-2$
 
-        final byte[] result = signer.sign(testPdf, "SHA512withRSA", pke, extraParams); //$NON-NLS-1$
+        final byte[] result = signer.sign(
+    		testPdf,
+    		"SHA512withRSA",  //$NON-NLS-1$
+    		pke.getPrivateKey(),
+    		pke.getCertificateChain(),
+    		extraParams
+		);
 
         Assert.assertNotNull(prueba, result);
 
@@ -280,7 +298,13 @@ public class TestPAdES {
 
                     System.out.println(prueba);
 
-                    final byte[] result = signer.sign(testPdf, algo, pke, extraParams);
+                    final byte[] result = signer.sign(
+                		testPdf,
+                		algo,
+                		pke.getPrivateKey(),
+                		pke.getCertificateChain(),
+                		extraParams
+            		);
 
                     Assert.assertNotNull(prueba, result);
                     Assert.assertTrue(signer.isSign(result));
@@ -341,7 +365,13 @@ public class TestPAdES {
 
         Properties extraParams = new Properties();
         extraParams.put("allowSigningCertifiedPdfs", "true"); //$NON-NLS-1$ //$NON-NLS-2$
-        byte[] result = signer.sign(testPdf, "SHA512withRSA", pke, extraParams); //$NON-NLS-1$
+        byte[] result = signer.sign(
+    		testPdf,
+    		"SHA512withRSA",  //$NON-NLS-1$
+    		pke.getPrivateKey(),
+    		pke.getCertificateChain(),
+    		extraParams
+		);
 
         Assert.assertNotNull(prueba, result);
         Assert.assertTrue(signer.isSign(result));
@@ -354,7 +384,13 @@ public class TestPAdES {
 
         boolean failed = false;
         try {
-            result = signer.sign(testPdf, "SHA512withRSA", pke, extraParams); //$NON-NLS-1$
+            result = signer.sign(
+        		testPdf,
+        		"SHA512withRSA",  //$NON-NLS-1$
+        		pke.getPrivateKey(),
+        		pke.getCertificateChain(),
+        		extraParams
+    		);
         }
         catch(final Exception e) {
             failed = true;
@@ -369,7 +405,13 @@ public class TestPAdES {
 
         failed = false;
         try {
-            result = signer.sign(testPdf, "SHA512withRSA", pke, extraParams); //$NON-NLS-1$
+            result = signer.sign(
+        		testPdf,
+        		"SHA512withRSA", //$NON-NLS-1$
+        		pke.getPrivateKey(),
+        		pke.getCertificateChain(),
+        		extraParams
+    		);
         }
         catch(final Exception e) {
             failed = true;

@@ -11,7 +11,7 @@
 package es.gob.afirma.signers.multi.cades;
 
 import java.io.IOException;
-import java.security.KeyStore.PrivateKeyEntry;
+import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.Properties;
 
@@ -35,7 +35,8 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                               final String algorithm,
                               final CounterSignTarget targetType,
                               final Object[] targets,
-                              final PrivateKeyEntry keyEntry,
+                              final PrivateKey key,
+                              final java.security.cert.Certificate[] certChain,
                               final Properties xParams) throws AOException, IOException {
 
         final Properties extraParams = xParams != null ? xParams : new Properties();
@@ -55,8 +56,8 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
     		sign,
     		algorithm,
     		Boolean.parseBoolean(extraParams.getProperty("includeOnlySignningCertificate")) ? //$NON-NLS-1$
-    			new X509Certificate[] { (X509Certificate) keyEntry.getCertificateChain()[0] } :
-				(X509Certificate[]) keyEntry.getCertificateChain()
+    			new X509Certificate[] { (X509Certificate) certChain[0] } :
+				(X509Certificate[]) certChain
 		);
 
         String contentTypeOid = MimeHelper.DEFAULT_CONTENT_OID_DATA;
@@ -84,7 +85,8 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
 	                       sign,
 	                       CounterSignTarget.TREE,
 	                       nodes,
-	                       keyEntry,
+	                       key,
+	                       certChain,
 	                       new AdESPolicy(extraParams),
 	                       signingCertificateV2,
 	                       contentTypeOid,
@@ -102,7 +104,8 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                                 sign,
                                 CounterSignTarget.LEAFS,
                                 nodes,
-                                keyEntry,
+                                key,
+                                certChain,
                                 new AdESPolicy(extraParams),
 								signingCertificateV2,
                                 contentTypeOid,
@@ -122,7 +125,8 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                                 sign,
                                 CounterSignTarget.NODES,
                                 nodesID,
-                                keyEntry,
+                                key,
+                                certChain,
                                 new AdESPolicy(extraParams),
 								signingCertificateV2,
                                 contentTypeOid,
@@ -145,7 +149,8 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                                 sign,
                                 CounterSignTarget.SIGNERS,
                                 nodes2,
-                                keyEntry,
+                                key,
+                                certChain,
                                 new AdESPolicy(extraParams),
                                 signingCertificateV2,
                                 contentTypeOid,
@@ -176,7 +181,8 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                             sign,
                             CounterSignTarget.TREE,
                             nodes,
-                            keyEntry,
+                            key,
+                            certChain,
                             new AdESPolicy(extraParams),
                             signingCertificateV2,
                             contentTypeOid,
@@ -194,7 +200,8 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                             sign,
                             CounterSignTarget.LEAFS,
                             nodes,
-                            keyEntry,
+                            key,
+                            certChain,
                             new AdESPolicy(extraParams),
                             signingCertificateV2,
                             contentTypeOid,
@@ -213,7 +220,8 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                     sign,
                     CounterSignTarget.NODES,
                     nodesID,
-                    keyEntry,
+                    key,
+                    certChain,
                     new AdESPolicy(extraParams),
                     signingCertificateV2,
                     contentTypeOid,
@@ -235,7 +243,8 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                     sign,
                     CounterSignTarget.SIGNERS,
                     nodes2,
-                    keyEntry,
+                    key,
+                    certChain,
                     new AdESPolicy(extraParams),
                     signingCertificateV2,
                     contentTypeOid,

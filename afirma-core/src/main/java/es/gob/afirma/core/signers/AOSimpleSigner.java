@@ -11,7 +11,8 @@
 package es.gob.afirma.core.signers;
 
 import java.io.IOException;
-import java.security.KeyStore.PrivateKeyEntry;
+import java.security.PrivateKey;
+import java.security.cert.Certificate;
 import java.util.Properties;
 
 import es.gob.afirma.core.AOException;
@@ -24,11 +25,12 @@ public interface AOSimpleSigner {
     /** Firma electr&oacute;nicamente unos datos (t&iacute;picamente el contenido de un fichero).
      * @param data Datos que deseamos firmar.
      * @param algorithm Algoritmo a usar para la firma (cada implementaci&oacute;n puede aceptar unos valores diferentes)
-     * @param keyEntry Entrada que apunta a la clave privada a usar para firmar
+     * @param key Clave privada a usar para firmar
+     * @param certChain Cadena de certificados del firmante
      * @param extraParams Par&aacute;metros adicionales para la firma (dependientes de cada implementaci&oacute;n)
      * @return Contenido firmado
      * @throws AOException Cuando ocurre cualquier problema durante el proceso
      * @throws IOException Cuando ocurren problemas relacionados con la lectura de los datos */
-    byte[] sign(byte[] data, String algorithm, PrivateKeyEntry keyEntry, Properties extraParams) throws AOException, IOException;
+    byte[] sign(byte[] data, String algorithm, PrivateKey key, Certificate[] certChain, Properties extraParams) throws AOException, IOException;
 
 }

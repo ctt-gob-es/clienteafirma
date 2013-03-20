@@ -11,9 +11,10 @@
 package es.gob.afirma.signers.cades;
 
 import java.io.IOException;
-import java.security.KeyStore.PrivateKeyEntry;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
@@ -72,8 +73,8 @@ public final class GenCAdESEPESSignedData {
      *        <code>true</code> si se desea usar la versi&oacute;n 2 del
      *        atributo <i>SigningCertificate</i> <code>false</code> para
      *        usar la versi&oacute;n 1
-     * @param keyEntry
-     *        Entrada a la clave privada para firma.
+     * @param key Clave privada para firma.
+     * @param certChain Cadena de certificados del firmante
      * @param messageDigest
      *        Huella digital a aplicar en la firma.
      * @param padesMode <code>true</code> para generar una firma CAdES compatible PAdES, <code>false</code> para generar una firma CAdES normal
@@ -95,7 +96,8 @@ public final class GenCAdESEPESSignedData {
                                      final boolean omitContent,
                                      final AdESPolicy policy,
                                      final boolean signingCertificateV2,
-                                     final PrivateKeyEntry keyEntry,
+                                     final PrivateKey key,
+                                     final Certificate[] certChain,
                                      final byte[] messageDigest,
                                      final boolean padesMode,
                                      final String contentType,
@@ -115,11 +117,11 @@ public final class GenCAdESEPESSignedData {
 
         final byte[] preSignature = CAdESTriPhaseSigner.preSign(
             AOSignConstants.getDigestAlgorithmName(signatureAlgorithm),
-            (omitContent) ? null : content,
+            omitContent ? null : content,
             signerCertificateChain,
             policy,
             signingCertificateV2,
-            (messageDigest == null && content != null) ?
+            messageDigest == null && content != null ?
                 MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(signatureAlgorithm)).digest(content) :
                     messageDigest,
             signDate,
@@ -128,22 +130,22 @@ public final class GenCAdESEPESSignedData {
             contentDescription
         );
 
-        final byte[] signature = new AOPkcs1Signer().sign(preSignature, signatureAlgorithm, keyEntry, null);
+        final byte[] signature = new AOPkcs1Signer().sign(preSignature, signatureAlgorithm, key, certChain, null);
 
         return CAdESTriPhaseSigner.postSign(
             AOSignConstants.getDigestAlgorithmName(signatureAlgorithm),
-            (omitContent) ? null : content,
+            omitContent ? null : content,
             signerCertificateChain,
             signature,
             // Volvemos a crear la prefirma simulando una firma trifasica en la que la postfirma no cuenta con el
             // resultado de la prefirma
             CAdESTriPhaseSigner.preSign(
                 AOSignConstants.getDigestAlgorithmName(signatureAlgorithm),
-                (omitContent) ? null : content,
+                omitContent ? null : content,
                 signerCertificateChain,
                 policy,
                 signingCertificateV2,
-                (messageDigest == null && content != null) ?
+                messageDigest == null && content != null ?
                     MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(signatureAlgorithm)).digest(content) :
                         messageDigest,
                 signDate,

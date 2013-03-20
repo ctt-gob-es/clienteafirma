@@ -480,7 +480,13 @@ public class DirectorySignatureHelper {
         final byte[][] signs = new byte[hashes.length][];
         for (int i = 0; i < hashes.length; i++) {
         	try {
-        		signs[i] = signer.sign(Base64.decode(hashes[i]), this.algorithm, keyEntry, signConfig);
+        		signs[i] = signer.sign(
+    				Base64.decode(hashes[i]),
+    				this.algorithm,
+    				keyEntry.getPrivateKey(),
+    				keyEntry.getCertificateChain(),
+    				signConfig
+				);
         	}
         	catch (final IOException e) {
         		throw new AOException("El hash '" + hashes[i] + "' no es un Base64 valido", e);  //$NON-NLS-1$//$NON-NLS-2$
@@ -601,7 +607,13 @@ public class DirectorySignatureHelper {
 
             byte[] signData = null;
             try {
-                signData = signer.sign(dataToSign, this.algorithm, keyEntry, signConfig);
+                signData = signer.sign(
+            		dataToSign,
+            		this.algorithm,
+            		keyEntry.getPrivateKey(),
+            		keyEntry.getCertificateChain(),
+            		signConfig
+        		);
             }
             catch(final UnsupportedOperationException e) {
                 LOGGER.severe("No ha sido posible firmar el fichero '" + file + "': " + e.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
@@ -781,7 +793,13 @@ public class DirectorySignatureHelper {
         // Configuramos y ejecutamos la operacion
         byte[] signedData;
         try {
-            signedData = signer.cosign(signData, algo, keyEntry, signConfig);
+            signedData = signer.cosign(
+        		signData,
+        		algo,
+        		keyEntry.getPrivateKey(),
+        		keyEntry.getCertificateChain(),
+        		signConfig
+    		);
         }
         catch (final Exception e) {
             LOGGER.severe("No ha sido posible cofirmar el fichero '" + signConfig.getProperty(URI_STR) + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
@@ -833,7 +851,13 @@ public class DirectorySignatureHelper {
 
         // Configuramos y ejecutamos la operacion
         try {
-            return signer.sign(data, algo, keyEntry, signConfig);
+            return signer.sign(
+        		data,
+        		algo,
+        		keyEntry.getPrivateKey(),
+        		keyEntry.getCertificateChain(),
+        		signConfig
+    		);
         }
         catch (final Exception e) {
             LOGGER.severe("No ha sido posible firmar el fichero de datos '" + signConfig.getProperty(URI_STR) + "': " + e);  //$NON-NLS-1$//$NON-NLS-2$
@@ -897,7 +921,15 @@ public class DirectorySignatureHelper {
                         allOK = false;
                         continue;
                     }
-                    signData = signer.countersign(AOUtil.getDataFromInputStream(fis), this.algorithm, target, null, keyEntry, signConfig);
+                    signData = signer.countersign(
+                		AOUtil.getDataFromInputStream(fis),
+                		this.algorithm,
+                		target,
+                		null,
+                		keyEntry.getPrivateKey(),
+                		keyEntry.getCertificateChain(),
+                		signConfig
+            		);
                 }
                 catch (final Exception e) {
                     LOGGER.severe("No ha sido posible contrafirmar el fichero '" + file.getPath() + "': " + e);  //$NON-NLS-1$//$NON-NLS-2$

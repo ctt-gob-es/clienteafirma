@@ -1,8 +1,9 @@
 package es.gob.afirma.core.signers;
 
-import java.security.KeyStore.PrivateKeyEntry;
+import java.security.PrivateKey;
 import java.security.Signature;
 import java.security.SignatureException;
+import java.security.cert.Certificate;
 import java.util.Properties;
 
 import es.gob.afirma.core.AOException;
@@ -22,14 +23,15 @@ public final class AOPkcs1Signer implements AOSimpleSigner {
      *  <li><i>SHA384withRSA</i></li>
      *  <li><i>SHA512withRSA</i></li>
      * </ul>
-     * @param keyEntry Entrada hacia la clave privada a usar para la firma
+     * @param key Clave privada a usar para la firma
+     * @param certChain Cadena de certificados del firmante
      * @param data Datos a firmar
      * @param extraParams Se ignora, esta clase no acepta par&aacute;metros adicionales
      * @return Firma PKCS#1 en binario puro no tratado
      * @throws AOException en caso de cualquier problema durante la firma
      */
 	@Override
-	public byte[] sign(final byte[] data, final String algorithm, final PrivateKeyEntry keyEntry, final Properties extraParams) throws AOException {
+	public byte[] sign(final byte[] data, final String algorithm, final PrivateKey key, final Certificate[] certChain, final Properties extraParams) throws AOException {
         final Signature sig;
         try {
             sig = Signature.getInstance(algorithm);
@@ -39,7 +41,7 @@ public final class AOPkcs1Signer implements AOSimpleSigner {
         }
 
         try {
-            sig.initSign(keyEntry.getPrivateKey());
+            sig.initSign(key);
         }
         catch (final Exception e) {
             throw new AOException("Error al inicializar la firma con la clave privada: " + e, e); //$NON-NLS-1$

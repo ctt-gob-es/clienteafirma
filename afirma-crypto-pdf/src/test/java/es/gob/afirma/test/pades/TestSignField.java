@@ -56,7 +56,13 @@ public class TestSignField {
 		final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILE));
 
 		final AOPDFSigner signer = new AOPDFSigner();
-		final byte[] signedPdf = signer.sign(testPdf, DEFAULT_SIGNATURE_ALGORITHM, pke, extraParams);
+		final byte[] signedPdf = signer.sign(
+			testPdf,
+			DEFAULT_SIGNATURE_ALGORITHM,
+			pke.getPrivateKey(),
+			pke.getCertificateChain(),
+			extraParams
+		);
 
 		final File tempFile = File.createTempFile("afirmaPDF", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -99,7 +105,13 @@ public class TestSignField {
 		final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILE));
 
 		final AOPDFSigner signer = new AOPDFSigner();
-		final byte[] signedPdf = signer.sign(testPdf, DEFAULT_SIGNATURE_ALGORITHM, pke, extraParams);
+		final byte[] signedPdf = signer.sign(
+			testPdf,
+			DEFAULT_SIGNATURE_ALGORITHM,
+			pke.getPrivateKey(),
+			pke.getCertificateChain(),
+			extraParams
+		);
 
 		final File tempFile = File.createTempFile("afirmaPDF", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
 

@@ -15,9 +15,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.URI;
-import java.security.KeyStore.PrivateKeyEntry;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -133,7 +133,8 @@ public final class AOPDFSigner implements AOSigner {
      *  <li><i>SHA384withRSA</i></li>
      *  <li><i>SHA512withRSA</i></li>
      * </ul>
-     * @param keyEntry Entrada que apunta a la clave privada a usar para firmar
+     * @param key Clave privada a usar para firmar
+     * @param certChain Cadena de certificados del firmante
      * @param xParams Par&aacute;metros adicionales para la firma.
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
      * <dl>
@@ -265,12 +266,16 @@ public final class AOPDFSigner implements AOSigner {
      * @return Documento PDF firmado en formato PAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     @Override
-	public byte[] sign(final byte[] data, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException, IOException {
+	public byte[] sign(final byte[] data,
+			           final String algorithm,
+			           final PrivateKey key,
+			           final java.security.cert.Certificate[] certChain,
+			           final Properties xParams) throws AOException, IOException {
 
         final Properties extraParams = xParams != null ? xParams : new Properties();
 
         try {
-            return signPDF(keyEntry, data, extraParams, algorithm);
+            return signPDF(key, certChain, data, extraParams, algorithm);
         }
         catch (final  com.lowagie.text.exceptions.InvalidPdfException e) {
         	throw new InvalidPdfException(e);
@@ -296,7 +301,7 @@ public final class AOPDFSigner implements AOSigner {
                 throw new BadPdfPasswordException(e);
             }
         	extraParams.put("userPassword", new String(AOUIFactory.getPassword(PDFMessages.getString("AOPDFSigner.0"), null))); //$NON-NLS-1$ //$NON-NLS-2$)
-        	return sign(data, algorithm, keyEntry, extraParams);
+        	return sign(data, algorithm, key, certChain, extraParams);
         }
     }
 
@@ -334,7 +339,8 @@ public final class AOPDFSigner implements AOSigner {
      *  <li><i>SHA384withRSA</i></li>
      *  <li><i>SHA512withRSA</i></li>
      * </ul>
-     * @param keyEntry Entrada que apunta a la clave privada a usar para firmar
+     * @param key Clave privada a usar para firmar
+     * @param certChain Cadena de certificados del firmante
      * @param extraParams Par&aacute;metros adicionales para la firma.
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>extraParams</code>:</p>
      * <dl>
@@ -470,9 +476,10 @@ public final class AOPDFSigner implements AOSigner {
 	public byte[] cosign(final byte[] data,
                          final byte[] sign,
                          final String algorithm,
-                         final PrivateKeyEntry keyEntry,
+                         final PrivateKey key,
+                         final java.security.cert.Certificate[] certChain,
                          final Properties extraParams) throws AOException, IOException {
-        return sign(sign, algorithm, keyEntry, extraParams);
+        return sign(sign, algorithm, key, certChain, extraParams);
     }
 
     /** A&ntilde;ade una firma PAdES a un documento PDF. El comportamiento es exactamente el mismo que una llamada al m&eacute;todo <code>sign(...)</code>
@@ -508,7 +515,8 @@ public final class AOPDFSigner implements AOSigner {
      *  <li><i>SHA384withRSA</i></li>
      *  <li><i>SHA512withRSA</i></li>
      * </ul>
-     * @param keyEntry Entrada que apunta a la clave privada a usar para firmar
+     * @param key Clave privada a usar para firmar
+     * @param certChain Cadena de certificados del firmante
      * @param extraParams Par&aacute;metros adicionales para la firma.
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>extraParams</code>:</p>
      * <dl>
@@ -641,8 +649,12 @@ public final class AOPDFSigner implements AOSigner {
      * @throws AOException Cuando ocurre cualquier problema durante el proceso
      * @throws IOException */
     @Override
-	public byte[] cosign(final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties extraParams) throws AOException, IOException {
-        return sign(sign, algorithm, keyEntry, extraParams);
+	public byte[] cosign(final byte[] sign,
+			             final String algorithm,
+			             final PrivateKey key,
+			             final java.security.cert.Certificate[] certChain,
+			             final Properties extraParams) throws AOException, IOException {
+        return sign(sign, algorithm, key, certChain, extraParams);
     }
 
     /** Operaci&oacute;n no soportada para firmas PAdES. */
@@ -651,7 +663,8 @@ public final class AOPDFSigner implements AOSigner {
                               final String algorithm,
                               final CounterSignTarget targetType,
                               final Object[] targets,
-                              final PrivateKeyEntry keyEntry,
+                              final PrivateKey key,
+                              final java.security.cert.Certificate[] certChain,
                               final Properties extraParams) throws AOException {
         throw new UnsupportedOperationException("No es posible realizar contrafirmas de ficheros PDF"); //$NON-NLS-1$
     }
@@ -859,7 +872,8 @@ public final class AOPDFSigner implements AOSigner {
         	return null;
         }
 
-    private byte[] signPDF(final PrivateKeyEntry ke,
+    private byte[] signPDF(final PrivateKey key,
+    					   final java.security.cert.Certificate[] certChain,
                            final byte[] inPDF,
                            final Properties extraParams,
                            final String algorithm) throws IOException,
@@ -1066,7 +1080,7 @@ public final class AOPDFSigner implements AOSigner {
             sap.setLayer4Text(""); //$NON-NLS-1$
         }
 
-        final X509Certificate[] chain = (X509Certificate[]) ke.getCertificateChain();
+        final X509Certificate[] chain = (X509Certificate[]) certChain;
 
         sap.setCrypto(null, chain, null, null);
 
@@ -1112,7 +1126,8 @@ public final class AOPDFSigner implements AOSigner {
             true, // omitContent
             new AdESPolicy(extraParams),
             signingCertificateV2,
-            ke,
+            key,
+            certChain,
             MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(algorithm)).digest(AOUtil.getDataFromInputStream(sap.getRangeStream())),
             true, // Modo PAdES
             PDF_OID,

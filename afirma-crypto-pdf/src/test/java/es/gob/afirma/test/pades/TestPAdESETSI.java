@@ -133,14 +133,20 @@ public final class TestPAdESETSI {
                     extraParams;
                     System.out.println(prueba);
 
-                    final byte[] result = signer.sign(testPdf, algo, pke, extraParams);
+                    final byte[] result = signer.sign(
+                		testPdf,
+                		algo,
+                		pke.getPrivateKey(),
+                		pke.getCertificateChain(),
+                		extraParams
+            		);
 
                     Assert.assertNotNull(prueba, result);
                     Assert.assertTrue(signer.isSign(result));
                     Assert.assertEquals(result, signer.getData(result));
                     Assert.assertEquals(AOSignConstants.SIGN_FORMAT_PDF, signer.getSignInfo(result).getFormat());
 
-                    final File saveFile = File.createTempFile(file.replace(".pdf", "") + "_" + ((extraParams.getProperty("policyIdentifier") != null) ? "POL_" : "") + ((extraParams.getProperty("tsaURL") != null) ? "TSP_" : "") + algo + "_", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$
+                    final File saveFile = File.createTempFile(file.replace(".pdf", "") + "_" + (extraParams.getProperty("policyIdentifier") != null ? "POL_" : "") + (extraParams.getProperty("tsaURL") != null ? "TSP_" : "") + algo + "_", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$
                     final OutputStream os = new FileOutputStream(saveFile);
                     os.write(result);
                     os.flush();

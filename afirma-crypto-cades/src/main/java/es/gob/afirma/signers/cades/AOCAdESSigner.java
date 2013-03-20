@@ -11,7 +11,8 @@
 package es.gob.afirma.signers.cades;
 
 import java.io.IOException;
-import java.security.KeyStore.PrivateKeyEntry;
+import java.security.PrivateKey;
+import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -134,7 +135,8 @@ public final class AOCAdESSigner implements AOSigner {
     @Override
 	public byte[] sign(final byte[] data,
                        final String algorithm,
-                       final PrivateKeyEntry keyEntry,
+                       final PrivateKey key,
+                       final Certificate[] certChain,
                        final Properties xParams) throws AOException {
 
     	new BCChecker().checkBouncyCastle();
@@ -165,8 +167,8 @@ public final class AOCAdESSigner implements AOSigner {
     		data,
     		algorithm,
     		Boolean.parseBoolean(extraParams.getProperty("includeOnlySignningCertificate")) ? //$NON-NLS-1$
-    			new X509Certificate[] { (X509Certificate) keyEntry.getCertificateChain()[0] } :
-				(X509Certificate[]) keyEntry.getCertificateChain()
+    			new X509Certificate[] { (X509Certificate) certChain[0] } :
+				(X509Certificate[]) certChain
 		);
 
         try {
@@ -193,7 +195,8 @@ public final class AOCAdESSigner implements AOSigner {
                    omitContent,
                    new AdESPolicy(extraParams),
                    signingCertificateV2,
-                   keyEntry,
+                   key,
+                   certChain,
                    messageDigest,
                    Boolean.parseBoolean(extraParams.getProperty("padesMode", "false")), //$NON-NLS-1$ //$NON-NLS-2$
                    contentTypeOid,
@@ -237,7 +240,7 @@ public final class AOCAdESSigner implements AOSigner {
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
      * </ul>
-     * @param keyEntry Entrada que apunta a la clave privada a usar para firmar
+     * @param key Clave privada a usar para firmar
      * @param extraParams
      * Par&aacute;metros adicionales para la cofirma.
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>extraParams</code>:</p>
@@ -292,11 +295,14 @@ public final class AOCAdESSigner implements AOSigner {
 	public byte[] cosign(final byte[] data,
                          final byte[] sign,
                          final String algorithm,
-                         final PrivateKeyEntry keyEntry,
+                         final PrivateKey key,
+                         final java.security.cert.Certificate[] certChain,
                          final Properties extraParams) throws AOException {
     	new BCChecker().checkBouncyCastle();
         try {
-            return ((AOCoSigner)AOUtil.classForName("es.gob.afirma.signers.multi.cades.AOCAdESCoSigner").newInstance()).cosign(data, sign, algorithm, keyEntry, extraParams); //$NON-NLS-1$
+            return ((AOCoSigner)AOUtil.classForName("es.gob.afirma.signers.multi.cades.AOCAdESCoSigner").newInstance()).cosign( //$NON-NLS-1$
+        		data, sign, algorithm, key, certChain, extraParams
+    		);
         }
         catch(final Exception e) {
             throw new AOException("Error general en la cofirma: " + e, e); //$NON-NLS-1$
@@ -334,7 +340,7 @@ public final class AOCAdESSigner implements AOSigner {
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
      * </ul>
-     * @param keyEntry Entrada que apunta a la clave privada a usar para firmar
+     * @param key Clave privada a usar para firmar
      * @param extraParams
      * Par&aacute;metros adicionales para la cofirma.
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>extraParams</code>:</p>
@@ -378,11 +384,14 @@ public final class AOCAdESSigner implements AOSigner {
     @Override
 	public byte[] cosign(final byte[] sign,
                          final String algorithm,
-                         final PrivateKeyEntry keyEntry,
+                         final PrivateKey key,
+                         final java.security.cert.Certificate[] certChain,
                          final Properties extraParams) throws AOException {
     	new BCChecker().checkBouncyCastle();
         try {
-            return ((AOCoSigner)AOUtil.classForName("es.gob.afirma.signers.multi.cades.AOCAdESCoSigner").newInstance()).cosign(sign, algorithm, keyEntry, extraParams); //$NON-NLS-1$
+            return ((AOCoSigner)AOUtil.classForName("es.gob.afirma.signers.multi.cades.AOCAdESCoSigner").newInstance()).cosign( //$NON-NLS-1$
+        		sign, algorithm, key, certChain, extraParams
+    		);
         }
         catch(final Exception e) {
             throw new AOException("Error general en la cofirma: " + e, e); //$NON-NLS-1$
@@ -412,7 +421,7 @@ public final class AOCAdESSigner implements AOSigner {
      * </ul>
      * @param targetType Tipo de objetivo de la contrafirma
      * @param targets Informaci&oacute;n complementario seg&uacute;n el tipo de objetivo de la contrafirma
-     * @param keyEntry Entrada que apunta a la clave privada a usar para firmar
+     * @param key Clave privada a usar para firmar
      * @param extraParams
      * Par&aacute;metros adicionales para la contrafirma.
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>extraParams</code>:</p>
@@ -458,11 +467,14 @@ public final class AOCAdESSigner implements AOSigner {
                               final String algorithm,
                               final CounterSignTarget targetType,
                               final Object[] targets,
-                              final PrivateKeyEntry keyEntry,
+                              final PrivateKey key,
+                              final java.security.cert.Certificate[] certChain,
                               final Properties extraParams) throws AOException {
     	new BCChecker().checkBouncyCastle();
         try {
-            return ((AOCounterSigner)AOUtil.classForName("es.gob.afirma.signers.multi.cades.AOCAdESCounterSigner").newInstance()).countersign(sign, algorithm, targetType, targets, keyEntry, extraParams); //$NON-NLS-1$
+            return ((AOCounterSigner)AOUtil.classForName("es.gob.afirma.signers.multi.cades.AOCAdESCounterSigner").newInstance()).countersign( //$NON-NLS-1$
+        		sign, algorithm, targetType, targets, key, certChain, extraParams
+    		);
         }
         catch(final Exception e) {
             throw new AOException("Error general en la contrafirma: " + e, e); //$NON-NLS-1$

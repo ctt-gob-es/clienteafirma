@@ -11,7 +11,7 @@
 package es.gob.afirma.core.signers;
 
 import java.io.IOException;
-import java.security.KeyStore.PrivateKeyEntry;
+import java.security.PrivateKey;
 import java.util.Properties;
 
 import es.gob.afirma.core.AOException;
@@ -39,10 +39,10 @@ public interface AOCounterSigner {
      * @param targetType
      *        Tipo de objetivo de la contrafirma
      * @param targets
-     *        Informaci&oacute;n complementario seg&uacute;n el tipo de
+     *        Informaci&oacute;n complementaria seg&uacute;n el tipo de
      *        objetivo de la contrafirma
-     * @param keyEntry
-     *        Clave privada a usar para firmar
+     * @param key Clave privada a usar para firmar
+     * @param certChain Cadena de certificados del firmante
      * @param extraParams
      *        Par&aacute;metros adicionales para la contrafirma
      * @return Contenido firmado
@@ -53,7 +53,8 @@ public interface AOCounterSigner {
                               String algorithm,
                               CounterSignTarget targetType,
                               Object[] targets,
-                              PrivateKeyEntry keyEntry,
+                              PrivateKey key,
+                              final java.security.cert.Certificate[] certChain,
                               Properties extraParams) throws AOException, IOException;
 
 }

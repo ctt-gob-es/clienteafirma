@@ -71,7 +71,13 @@ public class TestAttachments {
 
         System.out.println(prueba);
 
-        final byte[] result = signer.sign(testPdf, "SHA512withRSA", pke, P1); //$NON-NLS-1$
+        final byte[] result = signer.sign(
+    		testPdf,
+    		"SHA512withRSA", //$NON-NLS-1$
+    		pke.getPrivateKey(),
+    		pke.getCertificateChain(),
+    		P1
+		);
 
         Assert.assertNotNull(result);
 

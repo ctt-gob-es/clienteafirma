@@ -70,10 +70,12 @@ public class TestCosign {
 		config.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
 
 		final AOCAdESSigner signer = new AOCAdESSigner();
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
 		final byte[] cosign = signer.cosign(
 				sign,
 				AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
-				(PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray())),
+				pke.getPrivateKey(),
+				pke.getCertificateChain(),
 				config);
 
 		final File tempFile = File.createTempFile("CosignCades", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -101,12 +103,15 @@ public class TestCosign {
 		config.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
 
 		final AOCAdESSigner signer = new AOCAdESSigner();
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
 		final byte[] cosign = signer.cosign(
-				signer.getData(sign),
-				sign,
-				AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
-				(PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray())),
-				config);
+			signer.getData(sign),
+			sign,
+			AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
+			pke.getPrivateKey(),
+			pke.getCertificateChain(),
+			config
+		);
 
 		final File tempFile = File.createTempFile("CosignCades", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -134,11 +139,14 @@ public class TestCosign {
 		config.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
 
 		final AOCAdESSigner signer = new AOCAdESSigner();
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
 		final byte[] cosign = signer.cosign(
-				sign,
-				AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
-				(PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray())),
-				config);
+			sign,
+			AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
+			pke.getPrivateKey(),
+			pke.getCertificateChain(),
+			config
+		);
 
 		final File tempFile = File.createTempFile("CosignCades", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -166,12 +174,15 @@ public class TestCosign {
 		config.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
 
 		final AOCAdESSigner signer = new AOCAdESSigner();
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
 		final byte[] cosign = signer.cosign(
-				data,
-				sign,
-				AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
-				(PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray())),
-				config);
+			data,
+			sign,
+			AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
+			pke.getPrivateKey(),
+			pke.getCertificateChain(),
+			config
+		);
 
 		final File tempFile = File.createTempFile("CosignCades", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -204,12 +215,15 @@ public class TestCosign {
 		config.setProperty("precalculatedHashAlgorithm", "SHA1"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		final AOCAdESSigner signer = new AOCAdESSigner();
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
 		final byte[] cosign = signer.cosign(
-				messageDigest,
-				sign,
-				AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
-				(PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray())),
-				config);
+			messageDigest,
+			sign,
+			AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
+			pke.getPrivateKey(),
+			pke.getCertificateChain(),
+			config
+		);
 
 		final File tempFile = File.createTempFile("CosignCades", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -237,11 +251,14 @@ public class TestCosign {
 		config.setProperty("mode", AOSignConstants.SIGN_MODE_EXPLICIT); //$NON-NLS-1$
 
 		final AOCAdESSigner signer = new AOCAdESSigner();
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
 		final byte[] cosign = signer.cosign(
-				sign,
-				AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
-				(PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray())),
-				config);
+			sign,
+			AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
+			pke.getPrivateKey(),
+			pke.getCertificateChain(),
+			config
+		);
 
 		try {
 			is.close();
@@ -277,10 +294,12 @@ public class TestCosign {
 		final AOCAdESSigner signer = new AOCAdESSigner();
 
 		try {
+			final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
 			signer.cosign(
 					sign,
 					AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
-					(PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray())),
+					pke.getPrivateKey(),
+					pke.getCertificateChain(),
 					config);
 		}
 		catch (final AOException e) {

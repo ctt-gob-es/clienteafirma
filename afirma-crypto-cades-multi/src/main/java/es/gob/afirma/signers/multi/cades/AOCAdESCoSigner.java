@@ -12,7 +12,7 @@ package es.gob.afirma.signers.multi.cades;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.security.KeyStore.PrivateKeyEntry;
+import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -35,7 +35,8 @@ public class AOCAdESCoSigner implements AOCoSigner {
 	public byte[] cosign(final byte[] data,
                          final byte[] sign,
                          final String algorithm,
-                         final PrivateKeyEntry keyEntry,
+                         final PrivateKey key,
+                         final java.security.cert.Certificate[] certChain,
                          final Properties xParams) throws AOException {
 
         final Properties extraParams = xParams != null ? xParams : new Properties();
@@ -59,8 +60,8 @@ public class AOCAdESCoSigner implements AOCoSigner {
     		data,
     		algorithm,
     		Boolean.parseBoolean(extraParams.getProperty("includeOnlySignningCertificate")) ? //$NON-NLS-1$
-    			new X509Certificate[] { (X509Certificate) keyEntry.getCertificateChain()[0] } :
-				(X509Certificate[]) keyEntry.getCertificateChain()
+    			new X509Certificate[] { (X509Certificate) certChain[0] } :
+				(X509Certificate[]) certChain
 		);
 
         String contentTypeOid = MimeHelper.DEFAULT_CONTENT_OID_DATA;
@@ -91,7 +92,8 @@ public class AOCAdESCoSigner implements AOCoSigner {
                     omitContent,
                     new AdESPolicy(extraParams),
                     signingCertificateV2,
-                    keyEntry,
+                    key,
+                    certChain,
                     messageDigest,
                     contentTypeOid,
                     contentDescription
@@ -103,7 +105,8 @@ public class AOCAdESCoSigner implements AOCoSigner {
                  sign,
                  new AdESPolicy(extraParams),
                  signingCertificateV2,
-                 keyEntry,
+                 key,
+                 certChain,
                  messageDigest,
                  contentTypeOid,
                  contentDescription
@@ -119,7 +122,8 @@ public class AOCAdESCoSigner implements AOCoSigner {
 	@Override
 	public byte[] cosign(final byte[] sign,
                          final String algorithm,
-                         final PrivateKeyEntry keyEntry,
+                         final PrivateKey key,
+                         final java.security.cert.Certificate[] certChain,
                          final Properties xParams) throws AOException, IOException {
 
         final Properties extraParams = xParams != null ? xParams : new Properties();
@@ -154,12 +158,13 @@ public class AOCAdESCoSigner implements AOCoSigner {
                 return new CAdESCoSigner().coSigner(
                     typeAlgorithm,
                     Boolean.parseBoolean(extraParams.getProperty("includeOnlySignningCertificate")) ? //$NON-NLS-1$
-            			new X509Certificate[] { (X509Certificate) keyEntry.getCertificateChain()[0] } :
-        				(X509Certificate[]) keyEntry.getCertificateChain(),
+            			new X509Certificate[] { (X509Certificate) certChain[0] } :
+        				(X509Certificate[]) certChain,
                     new ByteArrayInputStream(sign),
                     new AdESPolicy(extraParams),
                     signingCertificateV2,
-                    keyEntry,
+                    key,
+                    certChain,
                     null, // null porque no nos pueden dar un hash en este metodo, tendria que ser en el que incluye datos
                     contentTypeOid,
                     contentDescription
@@ -178,12 +183,13 @@ public class AOCAdESCoSigner implements AOCoSigner {
             return new CAdESCoSignerEnveloped().coSigner(
                  typeAlgorithm,
                  Boolean.parseBoolean(extraParams.getProperty("includeOnlySignningCertificate")) ? //$NON-NLS-1$
-         			new X509Certificate[] { (X509Certificate) keyEntry.getCertificateChain()[0] } :
-     				(X509Certificate[]) keyEntry.getCertificateChain(),
+         			new X509Certificate[] { (X509Certificate) certChain[0] } :
+     				(X509Certificate[]) certChain,
                  new ByteArrayInputStream(sign),
                  new AdESPolicy(extraParams),
                  signingCertificateV2,
-                 keyEntry,
+                 key,
+                 certChain,
                  null, // null porque no nos pueden dar un hash en este metodo, tendria que ser en el que incluye datos
                  contentTypeOid,
                  contentDescription
