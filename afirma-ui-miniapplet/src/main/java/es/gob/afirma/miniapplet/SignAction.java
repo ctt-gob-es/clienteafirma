@@ -44,7 +44,7 @@ final class SignAction implements PrivilegedExceptionAction<byte[]> {
 	                  final PrivateKeyEntry keyEntry,
 	                  final Properties extraParams) {
 		this.signer = signer;
-		this.data = (data != null ? data.clone() : null);
+		this.data = data != null ? data.clone() : null;
 		this.algorithm = algorithm;
 		this.keyEntry = keyEntry;
 		this.extraParams = extraParams;
@@ -53,7 +53,13 @@ final class SignAction implements PrivilegedExceptionAction<byte[]> {
 	/** {@inheritDoc} */
 	@Override
 	public byte[] run() throws AOException, IOException {
-		return this.signer.sign(this.data, this.algorithm, this.keyEntry, this.extraParams);
+		return this.signer.sign(
+			this.data,
+			this.algorithm,
+			this.keyEntry.getPrivateKey(),
+			this.keyEntry.getCertificateChain(),
+			this.extraParams
+		);
 	}
 
 }

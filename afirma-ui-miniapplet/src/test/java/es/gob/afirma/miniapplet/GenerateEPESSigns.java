@@ -147,7 +147,7 @@ public class GenerateEPESSigns {
 
     	final Map<String, byte[]> files = loadFiles();
 
-    	final String[] algos = (applyAlgos ? ALGOS : new String[] {DEFAULT_ALGO});
+    	final String[] algos = applyAlgos ? ALGOS : new String[] {DEFAULT_ALGO};
     	final Properties extraParams = new Properties();
 
 		AOSigner signer;
@@ -172,7 +172,8 @@ public class GenerateEPESSigns {
 				final byte[] signature = signer.sign(
 					files.get(config[3]),
 					algo,
-					pke,
+					pke.getPrivateKey(),
+					pke.getCertificateChain(),
 					extraParams);
 
 				if (DEBUG) {

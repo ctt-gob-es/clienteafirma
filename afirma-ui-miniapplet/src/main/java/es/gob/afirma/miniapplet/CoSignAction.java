@@ -47,8 +47,8 @@ final class CoSignAction implements PrivilegedExceptionAction<byte[]> {
 	                    final PrivateKeyEntry keyEntry,
 	                    final Properties extraParams) {
 		this.signer = signer;
-		this.sign = (sign != null ? sign.clone() : null);
-		this.data = (data != null ? data.clone() : null);
+		this.sign = sign != null ? sign.clone() : null;
+		this.data = data != null ? data.clone() : null;
 		this.algorithm = algorithm;
 		this.keyEntry = keyEntry;
 		this.extraParams = extraParams;
@@ -59,8 +59,21 @@ final class CoSignAction implements PrivilegedExceptionAction<byte[]> {
 	@Override
 	public byte[] run() throws AOException, IOException {
 		if (this.data == null) {
-			return this.signer.cosign(this.sign, this.algorithm, this.keyEntry, this.extraParams);
+			return this.signer.cosign(
+				this.sign,
+				this.algorithm,
+				this.keyEntry.getPrivateKey(),
+				this.keyEntry.getCertificateChain(),
+				this.extraParams
+			);
 		}
-		return this.signer.cosign(this.data, this.sign, this.algorithm, this.keyEntry, this.extraParams);
+		return this.signer.cosign(
+			this.data,
+			this.sign,
+			this.algorithm,
+			this.keyEntry.getPrivateKey(),
+			this.keyEntry.getCertificateChain(),
+			this.extraParams
+		);
 	}
 }

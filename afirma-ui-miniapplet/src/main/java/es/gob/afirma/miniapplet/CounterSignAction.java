@@ -51,7 +51,7 @@ final class CounterSignAction implements PrivilegedExceptionAction<byte[]> {
 	                         final PrivateKeyEntry keyEntry,
 	                         final Properties extraParams) {
 		this.signer = signer;
-		this.sign = (sign != null ? sign.clone() : null);
+		this.sign = sign != null ? sign.clone() : null;
 		this.algorithm = algorithm;
 		this.keyEntry = keyEntry;
 		this.extraParams = extraParams;
@@ -69,7 +69,14 @@ final class CounterSignAction implements PrivilegedExceptionAction<byte[]> {
 			}
 		}
 
-		return this.signer.countersign(this.sign, this.algorithm,
-				target, null, this.keyEntry, this.extraParams);
+		return this.signer.countersign(
+			this.sign,
+			this.algorithm,
+			target,
+			null,
+			this.keyEntry.getPrivateKey(),
+			this.keyEntry.getCertificateChain(),
+			this.extraParams
+		);
 	}
 }

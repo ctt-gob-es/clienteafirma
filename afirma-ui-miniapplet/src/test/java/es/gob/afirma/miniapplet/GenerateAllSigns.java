@@ -154,12 +154,15 @@ public class GenerateAllSigns {
 						if (format[0].equals(file[0])) {
 							for(final String algo : algos) {
 								final byte[] signature = signer.sign(
-										files.get(file[1]),
-										algo,
-										pke,
-										extraParams);
-
-								saveSign(signature, "Firma_" + format[1] + "_" + mode[1] + "_" + file[1] + "_" + algo + "." + format[2]); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+									files.get(file[1]),
+									algo,
+									pke.getPrivateKey(),
+									pke.getCertificateChain(),
+									extraParams
+								);
+								saveSign(
+									signature, "Firma_" + format[1] + "_" + mode[1] + "_" + file[1] + "_" + algo + "." + format[2] //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+								);
 							}
 						}
 					}
@@ -201,10 +204,11 @@ public class GenerateAllSigns {
 							for(final String algo : algos) {
 								final String filename = "Firma_" + format[1] + "_" + mode[1] + "_" + file[1] + "_" + algo + "." + format[2]; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 								final byte[] signature = signer.cosign(
-										loadFile(SIGNS_PATH + filename),
-										algo,
-										pke,
-										extraParams
+									loadFile(SIGNS_PATH + filename),
+									algo,
+									pke.getPrivateKey(),
+									pke.getCertificateChain(),
+									extraParams
 								);
 								saveSign(signature, "Cofirma_" + format[1] + "_" + mode[1] + "_" + file[1] + "_" + algo + "." + format[2]); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 
@@ -253,12 +257,14 @@ public class GenerateAllSigns {
 							for(final String algo : algos) {
 								final String filename = "Cofirma_" + format[1] + "_" + mode[1] + "_" + file[1] + "_" + algo + "." + format[2]; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 								final byte[] signature = signer.countersign(
-										loadFile(SIGNS_PATH + filename),
-										algo,
-										CounterSignTarget.LEAFS,
-										null,
-										pke,
-										extraParams);
+									loadFile(SIGNS_PATH + filename),
+									algo,
+									CounterSignTarget.LEAFS,
+									null,
+									pke.getPrivateKey(),
+									pke.getCertificateChain(),
+									extraParams
+								);
 								saveSign(signature, "Contrafirma_" + format[1] + "_" + mode[1] + "_" + file[1] + "_" + algo + "." + format[2]); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 							}
 						}
