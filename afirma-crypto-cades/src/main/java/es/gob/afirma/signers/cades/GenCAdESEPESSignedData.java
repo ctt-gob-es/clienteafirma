@@ -108,8 +108,6 @@ public final class GenCAdESEPESSignedData {
         }
         final String signatureAlgorithm = parameters.getSignatureAlgorithm();
 
-        final X509Certificate[] signerCertificateChain = parameters.getSignerCertificateChain();
-
         final Date signDate = new Date();
 
         // Ya que el contenido de la firma puede ser grande, lo obtenemos solo al principio
@@ -118,7 +116,7 @@ public final class GenCAdESEPESSignedData {
         final byte[] preSignature = CAdESTriPhaseSigner.preSign(
             AOSignConstants.getDigestAlgorithmName(signatureAlgorithm),
             omitContent ? null : content,
-            signerCertificateChain,
+            (X509Certificate[]) certChain,
             policy,
             signingCertificateV2,
             messageDigest == null && content != null ?
@@ -135,14 +133,14 @@ public final class GenCAdESEPESSignedData {
         return CAdESTriPhaseSigner.postSign(
             AOSignConstants.getDigestAlgorithmName(signatureAlgorithm),
             omitContent ? null : content,
-            signerCertificateChain,
+            (X509Certificate[]) certChain,
             signature,
             // Volvemos a crear la prefirma simulando una firma trifasica en la que la postfirma no cuenta con el
             // resultado de la prefirma
             CAdESTriPhaseSigner.preSign(
                 AOSignConstants.getDigestAlgorithmName(signatureAlgorithm),
                 omitContent ? null : content,
-                signerCertificateChain,
+                (X509Certificate[]) certChain,
                 policy,
                 signingCertificateV2,
                 messageDigest == null && content != null ?

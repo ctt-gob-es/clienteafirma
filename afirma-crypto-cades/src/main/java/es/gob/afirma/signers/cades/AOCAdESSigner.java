@@ -13,7 +13,6 @@ package es.gob.afirma.signers.cades;
 import java.io.IOException;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -165,10 +164,7 @@ public final class AOCAdESSigner implements AOSigner {
 
         final P7ContentSignerParameters csp = new P7ContentSignerParameters(
     		data,
-    		algorithm,
-    		Boolean.parseBoolean(extraParams.getProperty("includeOnlySignningCertificate")) ? //$NON-NLS-1$
-    			new X509Certificate[] { (X509Certificate) certChain[0] } :
-				(X509Certificate[]) certChain
+    		algorithm
 		);
 
         try {

@@ -414,10 +414,12 @@ public final class MassiveSignatureHelper {
         }
 
         final byte[] signData = signer.sign(
-                data,
-                this.massiveConfiguration.getAlgorithm(),
-                this.massiveConfiguration.getKeyEntry(),
-                config);
+            data,
+            this.massiveConfiguration.getAlgorithm(),
+            this.massiveConfiguration.getKeyEntry().getPrivateKey(),
+            this.massiveConfiguration.getKeyEntry().getCertificateChain(),
+            config
+        );
 
         if (signData == null) {
             throw new AOException("No se generaron datos de firma"); //$NON-NLS-1$
@@ -454,7 +456,13 @@ public final class MassiveSignatureHelper {
             config.setProperty("mimeType", mimeType); //$NON-NLS-1$
         }
 
-        final byte[] signData = signer.sign(data, this.massiveConfiguration.getAlgorithm(), this.massiveConfiguration.getKeyEntry(), config);
+        final byte[] signData = signer.sign(
+    		data,
+    		this.massiveConfiguration.getAlgorithm(),
+    		this.massiveConfiguration.getKeyEntry().getPrivateKey(),
+    		this.massiveConfiguration.getKeyEntry().getCertificateChain(),
+    		config
+		);
         if (signData == null) {
             throw new AOException("No se generaron datos de firma"); //$NON-NLS-1$
         }
@@ -489,7 +497,13 @@ public final class MassiveSignatureHelper {
         final AOSigner validSigner;
         byte[] signData;
         validSigner = this.getValidSigner(signer, sign);
-        signData = validSigner.cosign(sign, this.massiveConfiguration.getAlgorithm(), this.massiveConfiguration.getKeyEntry(), config);
+        signData = validSigner.cosign(
+    		sign,
+    		this.massiveConfiguration.getAlgorithm(),
+    		this.massiveConfiguration.getKeyEntry().getPrivateKey(),
+    		this.massiveConfiguration.getKeyEntry().getCertificateChain(),
+    		config
+		);
 
         if (signData == null) {
             throw new AOException("No se generaron datos de firma"); //$NON-NLS-1$
@@ -561,7 +575,15 @@ public final class MassiveSignatureHelper {
         // especifico
         final AOSigner validSigner = this.getValidSigner(signer, sign);
 
-        final byte[] signData = validSigner.countersign(sign, this.massiveConfiguration.getAlgorithm(), target, null, this.massiveConfiguration.getKeyEntry(), config);
+        final byte[] signData = validSigner.countersign(
+    		sign,
+    		this.massiveConfiguration.getAlgorithm(),
+    		target,
+    		null,
+    		this.massiveConfiguration.getKeyEntry().getPrivateKey(),
+    		this.massiveConfiguration.getKeyEntry().getCertificateChain(),
+    		config
+		);
         if (signData == null) {
             throw new AOException("No se generaron datos de firma"); //$NON-NLS-1$
         }

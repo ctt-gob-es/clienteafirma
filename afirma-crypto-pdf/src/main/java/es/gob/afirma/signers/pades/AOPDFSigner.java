@@ -1080,15 +1080,13 @@ public final class AOPDFSigner implements AOSigner {
             sap.setLayer4Text(""); //$NON-NLS-1$
         }
 
-        final X509Certificate[] chain = (X509Certificate[]) certChain;
-
-        sap.setCrypto(null, chain, null, null);
+        sap.setCrypto(null, certChain, null, null);
 
         final PdfSignature dic = new PdfSignature(PdfName.ADOBE_PPKLITE, PdfName.ADBE_PKCS7_DETACHED);
         if (sap.getSignDate() != null) {
             dic.setDate(new PdfDate(sap.getSignDate()));
         }
-        dic.setName(PdfPKCS7.getSubjectFields(chain[0]).getField("CN")); //$NON-NLS-1$
+        dic.setName(PdfPKCS7.getSubjectFields((X509Certificate) certChain[0]).getField("CN")); //$NON-NLS-1$
         if (sap.getReason() != null) {
             dic.setReason(sap.getReason());
         }
@@ -1122,7 +1120,7 @@ public final class AOPDFSigner implements AOSigner {
         }
 
 		byte[] completeCAdESSignature = GenCAdESEPESSignedData.generateSignedData(
-            new P7ContentSignerParameters(inPDF, algorithm, chain),
+            new P7ContentSignerParameters(inPDF, algorithm),
             true, // omitContent
             new AdESPolicy(extraParams),
             signingCertificateV2,
