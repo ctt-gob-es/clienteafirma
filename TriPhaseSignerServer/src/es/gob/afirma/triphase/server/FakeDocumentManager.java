@@ -2,6 +2,7 @@ package es.gob.afirma.triphase.server;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Properties;
 
 import es.gob.afirma.core.misc.AOUtil;
 
@@ -13,13 +14,13 @@ final class FakeDocumentManager implements DocumentManager {
 
 	/** {@inheritDoc} */
 	@Override
-	public byte[] getDocument(final String id) throws IOException {
+	public byte[] getDocument(final String id, final Properties config) throws IOException {
 		return AOUtil.getDataFromInputStream(this.getClass().getResourceAsStream(PDF_DOC));
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public String storeDocument(final String id, final byte[] data) throws IOException {
+	public String storeDocument(final String id, final byte[] data, final Properties config) throws IOException {
 		final File tempFile = File.createTempFile("fakeDocumentRetriever-" + id, ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
 		final FileOutputStream fos = new FileOutputStream(tempFile);
 		fos.write(data);

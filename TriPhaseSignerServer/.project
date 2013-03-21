@@ -42,12 +42,12 @@
 		<link>
 			<name>afirma-core-java</name>
 			<type>2</type>
-			<location>C:/Users/A122466/workspace_sin_maven/afirma-core/src/main/java</location>
+			<location>C:/Users/A122466/workspace_android/afirma-core/src/main/java</location>
 		</link>
 		<link>
 			<name>afirma-core-resources</name>
 			<type>2</type>
-			<location>C:/Users/A122466/workspace_sin_maven/afirma-core/src/main/resources</location>
+			<location>C:/Users/A122466/workspace_android/afirma-core/src/main/resources</location>
 		</link>
 		<link>
 			<name>afirma-crypto-cades-java</name>
@@ -62,47 +62,47 @@
 		<link>
 			<name>afirma-crypto-cades-resources</name>
 			<type>2</type>
-			<location>C:/Users/A122466/workspace_sin_maven/afirma-crypto-cades/src/main/resources</location>
-		</link>
-		<link>
-			<name>afirma-crypto-core-pkcs7-java</name>
-			<type>2</type>
-			<location>C:/Users/A122466/workspace_sin_maven/afirma-crypto-core-pkcs7/src/main/java</location>
-		</link>
-		<link>
-			<name>afirma-crypto-core-pkcs7-resources</name>
-			<type>2</type>
-			<location>C:/Users/A122466/workspace_sin_maven/afirma-crypto-core-pkcs7/src/main/resources</location>
+			<location>C:/Users/A122466/workspace_android/afirma-crypto-cades/src/main/resources</location>
 		</link>
 		<link>
 			<name>afirma-crypto-core-pkcs7-tsp-java</name>
 			<type>2</type>
-			<location>C:/Users/A122466/workspace_sin_maven/afirma-crypto-core-pkcs7-tsp/src/main/java</location>
+			<location>C:/Users/A122466/workspace_android/afirma-crypto-core-pkcs7-tsp/src/main/java</location>
 		</link>
 		<link>
 			<name>afirma-crypto-core-xml-java</name>
 			<type>2</type>
-			<location>C:/Users/A122466/workspace_sin_maven/afirma-crypto-core-xml/src/main/java</location>
+			<location>C:/Users/A122466/workspace_android/afirma-crypto-core-xml/src/main/java</location>
 		</link>
 		<link>
 			<name>afirma-crypto-core-xml-resources</name>
 			<type>2</type>
-			<location>C:/Users/A122466/workspace_sin_maven/afirma-crypto-core-xml/src/main/resources</location>
+			<location>C:/Users/A122466/workspace_android/afirma-crypto-core-xml/src/main/resources</location>
 		</link>
 		<link>
-			<name>afirma-crypto-padestri-server</name>
+			<name>afirma-crypto-padestri-server-java</name>
 			<type>2</type>
-			<location>C:/Users/A122466/workspace_sin_maven/afirma-crypto-padestri-server/src/main/java</location>
+			<location>C:/Users/A122466/workspace_android/afirma-crypto-padestri-server/src/main/java</location>
 		</link>
 		<link>
 			<name>afirma-crypto-pdf-itext-java</name>
 			<type>2</type>
-			<location>C:/Users/A122466/workspace_sin_maven/afirma-crypto-pdf-itext/src/main/java</location>
+			<location>C:/Users/A122466/workspace_android/afirma-crypto-pdf-itext/src/main/java</location>
 		</link>
 		<link>
 			<name>afirma-crypto-pdf-itext-resources</name>
 			<type>2</type>
-			<location>C:/Users/A122466/workspace_sin_maven/afirma-crypto-pdf-itext/src/main/resources</location>
+			<location>C:/Users/A122466/workspace_android/afirma-crypto-pdf-itext/src/main/resources</location>
+		</link>
+		<link>
+			<name>afirma-crypto-pkcs7-java</name>
+			<type>2</type>
+			<location>C:/Users/A122466/workspace_android/afirma-crypto-core-pkcs7/src/main/java</location>
+		</link>
+		<link>
+			<name>afirma-crypto-pkcs7-resources</name>
+			<type>2</type>
+			<location>C:/Users/A122466/workspace_android/afirma-crypto-core-pkcs7/src/main/resources</location>
 		</link>
 		<link>
 			<name>afirma-crypto-xades-java</name>

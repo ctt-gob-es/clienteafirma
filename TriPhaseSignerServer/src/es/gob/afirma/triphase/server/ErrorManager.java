@@ -20,6 +20,7 @@ final class ErrorManager {
 		errorMessages.put(Integer.valueOf(11), "Operacion desconocida"); //$NON-NLS-1$
 		errorMessages.put(Integer.valueOf(12), "Error realizando la postfirma"); //$NON-NLS-1$
 		errorMessages.put(Integer.valueOf(13), "No se ha indicado la sub-operacion a realizar"); //$NON-NLS-1$
+		errorMessages.put(Integer.valueOf(14), "Error al recuperar el documento"); //$NON-NLS-1$
 	}
 
 	static String getErrorMessage(final int errNo) {

@@ -2,7 +2,9 @@ package es.gob.afirma.triphase.server;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
+import java.lang.reflect.Constructor;
 import java.net.URLDecoder;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -21,7 +23,6 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.signers.padestri.server.DocumentManager;
 
 // http://localhost:8080/afirma-crypto-padestri-sample/SignatureService?doc=1&op=0&algo=SHA1withRSA&format=PAdES&cert=AAAA
 
@@ -36,8 +37,65 @@ public final class SignatureService extends HttpServlet {
 	private static Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	//TODO: Cambiar por una referencia al gestor documental de verdad
-	private static final DocumentManager DOC_MANAGER = new SelfishDocumentManager();
+	private static DocumentManager DOC_MANAGER;
 
+	private static final String CONFIG_FILE = "config.properties"; //$NON-NLS-1$
+
+	private static final String DOCUMENT_MANAGER_CLASS_PARAM = "document.manager"; //$NON-NLS-1$
+
+	static {
+
+		Logger.getLogger("es.gob.afirma").info("Cargamos la configuracion");
+
+		final InputStream configIs = SignatureService.class.getClassLoader().getResourceAsStream(CONFIG_FILE);
+		if (configIs == null) {
+			throw new RuntimeException("No se encuentra el fichero de configuracion del servicio: " + CONFIG_FILE); //$NON-NLS-1$
+		}
+
+		Logger.getLogger("es.gob.afirma").info("1");
+
+		final Properties prop = new Properties();
+		try {
+			prop.load(configIs);
+			configIs.close();
+		} catch (final Exception e) {
+			throw new RuntimeException("Error en la carga del fichero de propiedades", e); //$NON-NLS-1$
+		}
+
+		Logger.getLogger("es.gob.afirma").info("2");
+
+		if (!prop.containsKey(DOCUMENT_MANAGER_CLASS_PARAM)) {
+			throw new IllegalArgumentException(
+					"No se ha indicado el document manager (" + DOCUMENT_MANAGER_CLASS_PARAM + ") en el fichero de propiedades"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+
+		Logger.getLogger("es.gob.afirma").info("3");
+
+		Class docManagerClass;
+		try {
+			docManagerClass = Class.forName(prop.getProperty(DOCUMENT_MANAGER_CLASS_PARAM));
+		} catch (final ClassNotFoundException e) {
+			throw new RuntimeException("La clase DocumentManager indicada no existe: " + prop.getProperty(DOCUMENT_MANAGER_CLASS_PARAM), e); //$NON-NLS-1$
+		}
+
+		Logger.getLogger("es.gob.afirma").info("3");
+
+		try {
+			final Constructor<DocumentManager> docManagerConstructor = docManagerClass.getConstructor(Properties.class);
+			DOC_MANAGER = docManagerConstructor.newInstance(prop);
+		} catch (final ReflectiveOperationException e) {
+			try {
+				DOC_MANAGER = (DocumentManager) docManagerClass.newInstance();
+			} catch (final Exception e2) {
+				throw new RuntimeException("No se ha podido inicializar el DocumentManager. Debe tener un constructor vacio o que reciba un Properties", e); //$NON-NLS-1$
+			}
+		}
+
+		Logger.getLogger("es.gob.afirma").info("4");
+
+		Logger.getLogger("es.gob.afirma").info("DOC_MANAGER: " + DOC_MANAGER.getClass().getCanonicalName());
+
+	}
 
 	private static final String URL_DEFAULT_CHARSET = "utf-8"; //$NON-NLS-1$
 
@@ -119,7 +177,12 @@ public final class SignatureService extends HttpServlet {
 				return;
 			}
 			LOGGER.info("Recibimos el docId de longitud: " + docId.length());
-			docBytes = DOC_MANAGER.getDocument(docId);
+			try {
+				docBytes = DOC_MANAGER.getDocument(docId, null);
+			} catch (final IOException e) {
+				out.print(ErrorManager.getErrorMessage(14));
+				return;
+			}
 			LOGGER.info("Obtenemos los datos de longitud: " + (docBytes == null ? 0 : docBytes.length));
 		}
 
@@ -244,14 +307,19 @@ public final class SignatureService extends HttpServlet {
 				return;
 			}
 
+			// Establecemos parametros adicionales queutilizar para guardar el documento
+			final Properties config = new Properties();
+			config.setProperty(PARAMETER_NAME_FORMAT, parameters.get(PARAMETER_NAME_FORMAT));
+
 			// Devolvemos al servidor documental el documento firmado
 			final String newDocId;
 			try {
-				newDocId = DOC_MANAGER.storeDocument(docId, signedDoc);
+				newDocId = DOC_MANAGER.storeDocument(docId, signedDoc, config);
 			}
 			catch(final Exception e) {
 				LOGGER.severe("Error en el almacen del documento: " + e); //$NON-NLS-1$
 				out.print(ErrorManager.getErrorMessage(10));
+				e.printStackTrace();
 				return;
 			}
 

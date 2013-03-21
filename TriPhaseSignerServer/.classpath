@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="afirma-crypto-pdf-itext-resources"/>
+	<classpathentry kind="src" path="afirma-crypto-pdf-itext-java"/>
+	<classpathentry kind="src" path="afirma-crypto-padestri-server-java"/>
+	<classpathentry kind="src" path="afirma-crypto-core-pkcs7-tsp-java"/>
+	<classpathentry kind="src" path="afirma-crypto-core-xml-resources"/>
+	<classpathentry kind="src" path="afirma-crypto-core-xml-java"/>
+	<classpathentry kind="src" path="afirma-crypto-pkcs7-resources"/>
+	<classpathentry kind="src" path="afirma-crypto-pkcs7-java"/>
+	<classpathentry kind="src" path="afirma-crypto-cades-resources"/>
+	<classpathentry kind="src" path="afirma-core-resources"/>
+	<classpathentry kind="src" path="afirma-core-java"/>
 	<classpathentry kind="src" path="afirma-lib-oro-java"/>
 	<classpathentry kind="src" path="afirma-lib-jmimemagic-resources"/>
 	<classpathentry kind="src" path="afirma-lib-jmimemagic-java"/>
@@ -10,18 +21,8 @@
 	<classpathentry kind="src" path="afirma-crypto-cades-multi-java"/>
 	<classpathentry kind="src" path="afirma-crypto-xadestri-server-src"/>
 	<classpathentry kind="src" path="jxades-src"/>
-	<classpathentry kind="src" path="afirma-crypto-core-xml-resources"/>
-	<classpathentry kind="src" path="afirma-crypto-core-xml-java"/>
-	<classpathentry kind="src" path="afirma-crypto-padestri-server"/>
-	<classpathentry kind="src" path="afirma-crypto-pdf-itext-resources"/>
-	<classpathentry kind="src" path="afirma-crypto-cades-resources"/>
-	<classpathentry kind="src" path="afirma-crypto-core-pkcs7-tsp-java"/>
-	<classpathentry kind="src" path="afirma-crypto-core-pkcs7-resources"/>
-	<classpathentry kind="src" path="afirma-crypto-core-pkcs7-java"/>
-	<classpathentry kind="src" path="afirma-core-resources"/>
-	<classpathentry kind="src" path="afirma-core-java"/>
-	<classpathentry kind="src" path="afirma-crypto-pdf-itext-java"/>
 	<classpathentry kind="src" path="BouncyCastle"/>
+	<classpathentry kind="src" path="resources"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
