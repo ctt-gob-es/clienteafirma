@@ -14,9 +14,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.signers.AOCounterSigner;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.CounterSignTarget;
-import es.gob.afirma.signers.cades.AOCAdESSigner;
 
 /**
  * Prueba de cofirmas CAdES.
@@ -59,20 +59,7 @@ public class TestTriphaseCountersign {
 
 		final Properties config = new Properties();
 
-//		final CAdESTriPhaseCounterSigner ctcs = new CAdESTriPhaseCounterSigner();
-//		ctcs.counterSigner(
-//			parameters,
-//			data,
-//			targetType,
-//			targets,
-//			keyEntry,
-//			policy,
-//			signingCertificateV2,
-//			contentType,
-//			contentDescription
-//		);
-
-		final AOCAdESSigner signer = new AOCAdESSigner();
+		final AOCounterSigner signer = new AOCAdESTriPhaseCounterSigner();
 		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
 		final byte[] countersign = signer.countersign(
 				sign,
@@ -107,7 +94,7 @@ public class TestTriphaseCountersign {
 
 		final Properties config = new Properties();
 
-		final AOCAdESSigner signer = new AOCAdESSigner();
+		final AOCounterSigner signer = new AOCAdESTriPhaseCounterSigner();
 		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
 		final byte[] countersign = signer.countersign(
 			sign,
@@ -143,7 +130,7 @@ public class TestTriphaseCountersign {
 
 		final Properties config = new Properties();
 
-		final AOCAdESSigner signer = new AOCAdESSigner();
+		final AOCounterSigner signer = new AOCAdESTriPhaseCounterSigner();
 		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
 		final byte[] countersign = signer.countersign(
 			sign,
@@ -179,7 +166,7 @@ public class TestTriphaseCountersign {
 
 		final Properties config = new Properties();
 
-		final AOCAdESSigner signer = new AOCAdESSigner();
+		final AOCounterSigner signer = new AOCAdESTriPhaseCounterSigner();
 		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
 		final byte[] countersign = signer.countersign(
 				sign,

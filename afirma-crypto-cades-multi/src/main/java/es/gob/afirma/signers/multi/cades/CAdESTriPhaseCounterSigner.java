@@ -17,6 +17,7 @@ import java.security.PrivateKey;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
@@ -46,8 +47,9 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.TBSCertificateStructure;
 
+import com.sun.org.apache.xml.internal.security.utils.Base64;
+
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.signers.AOPkcs1Signer;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.signers.CounterSignTarget;
@@ -61,7 +63,70 @@ import es.gob.afirma.signers.pkcs7.SigUtils;
  * crear un mensaje SignedData de BouncyCastle: <a
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> pero con la
  * peculiaridad de que es una Contrafirma. */
-final class CAdESTriPhaseCounterSigner {
+public final class CAdESTriPhaseCounterSigner {
+
+	/** Clave de la propiedad de firma. */
+	public static final String KEY_SIGN = "sign"; //$NON-NLS-1$
+
+	/** Clave de la propiedad de n&uacute;mero de contrafirmas. */
+	public static final String KEY_COUNTERSIGN_COUNT = "csCount"; //$NON-NLS-1$
+
+	/** Clave de la propiedad de datos firmados (a firmar). */
+	public static final String KEY_SIGNED_DATA = "signedData"; //$NON-NLS-1$
+
+	/** Clave de la propiedad de n&uacute;mero de firmas PKCS#1. */
+	public static final String KEY_PKCS1_SIGN_COUNT = "p1Count"; //$NON-NLS-1$
+
+	/** Clave de la propiedad de firma PKCS#1. */
+	public static final String KEY_PKCS1_SIGN = "p1Sign"; //$NON-NLS-1$
+
+	/** Caracter '='. */
+	public static final char EQUALS_SIGN = '=';
+
+	/** Caracter '\n'. */
+	public static final char CR = '\n';
+
+	/** Resultado de un conjunto de PreContraFirmas CAdES. */
+	public static final class CAdESPreCounterSignResult {
+
+		private final ArrayList<byte[]> signedDatas;
+		private final byte[] sign;
+
+		CAdESPreCounterSignResult(final byte[] s, final ArrayList<byte[]> sDatas) {
+			this.signedDatas = sDatas;
+			this.sign = s.clone();
+		}
+
+		@Override
+		public String toString() {
+			final StringBuilder sb = new StringBuilder(KEY_SIGN);
+			sb.append(EQUALS_SIGN);
+			sb.append(Base64.encode(this.sign).replace("\n", "").replace("\r", "")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			sb.append(CR);
+			sb.append(KEY_COUNTERSIGN_COUNT);
+			sb.append(EQUALS_SIGN);
+			sb.append(this.signedDatas.size());
+			sb.append(CR);
+			for(int i=0;i<this.signedDatas.size();i++) {
+				sb.append(KEY_SIGNED_DATA);
+				sb.append("."); //$NON-NLS-1$
+				sb.append(i);
+				sb.append(EQUALS_SIGN);
+				sb.append(Base64.encode(this.signedDatas.get(i)).replace("\n", "").replace("\r", "")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				sb.append(CR);
+			}
+			return sb.toString();
+		}
+	}
+
+	/** Tama&ntilde;o de una firma PKCS#1. */
+	public static final int PKCS1_DEFAULT_SIZE = 128;
+
+    /** N&uacute;mero de contrafirma dentro de la firma actual. */
+	private int counterIndex = 0;
+
+	/** Lista de <i>SignedAttributes</i> de las contrafirmas de la firma ordenados por n&uacute;mero de contrafirma dentro de la firma. */
+	private ArrayList<byte[]> signedDatas = new ArrayList<byte[]>();
 
     /** Crea una contrafirma a partir de los datos
      * del firmante, el archivo que se firma y del archivo que contiene las
@@ -75,6 +140,7 @@ final class CAdESTriPhaseCounterSigner {
      *        Lo que se quiere firmar. Puede ser el &aacute;rbol completo,
      *        las hojas, un nodo determinado o unos determinados firmantes.
      * @param key Clave privada a usar para firmar.
+     * @param certChain Cadena de certificados del firmante
      * @param policy Pol&iacute;tica de firma
      * @param signingCertificateV2
      *        <code>true</code> si se desea usar la versi&oacute;n 2 del
@@ -97,7 +163,7 @@ final class CAdESTriPhaseCounterSigner {
      * @throws AOException
      *         Cuando ocurre alguno error con contemplado por las otras
      *         excepciones declaradas */
-    byte[] counterSign(final P7ContentSignerParameters parameters,
+    public CAdESPreCounterSignResult preCounterSign(final P7ContentSignerParameters parameters,
                                 final byte[] data,
                                 final CounterSignTarget targetType,
                                 final PrivateKey key,
@@ -105,7 +171,14 @@ final class CAdESTriPhaseCounterSigner {
                                 final AdESPolicy policy,
                                 final boolean signingCertificateV2,
                                 final String contentType,
-                                final String contentDescription) throws IOException, NoSuchAlgorithmException, CertificateException, AOException {
+                                final String contentDescription) throws IOException,
+                                                                        NoSuchAlgorithmException,
+                                                                        CertificateException,
+                                                                        AOException {
+
+    	// Inicializamos el contador global y la lista de SignedDatas
+    	this.counterIndex = 0;
+    	this.signedDatas = new ArrayList<byte[]>();
 
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
     	final ASN1InputStream is = new ASN1InputStream(data);
@@ -181,13 +254,18 @@ final class CAdESTriPhaseCounterSigner {
         	throw new IllegalArgumentException("Modo de contrafirma no soportado: " + targetType); //$NON-NLS-1$
         }
 
-        // construimos el Signed Data y lo devolvemos
-        return new ContentInfo(PKCSObjectIdentifiers.signedData, new SignedData(sd.getDigestAlgorithms(),
-                                                                                sd.getEncapContentInfo(),
-                                                                                certificates,
-                                                                                certrevlist,
-                                                                                new DERSet(signerInfos))).getEncoded(ASN1Encoding.DER);
-
+        // construimos el Signed Data y lo devolvemos dentro del resultado
+        return new CAdESPreCounterSignResult(
+    		new ContentInfo(
+				PKCSObjectIdentifiers.signedData,
+				new SignedData(sd.getDigestAlgorithms(),
+		        sd.getEncapContentInfo(),
+		        certificates,
+		        certrevlist,
+		        new DERSet(signerInfos))
+			).getEncoded(ASN1Encoding.DER),
+			this.signedDatas
+		);
     }
 
     /** Contrafirma el &aacute;rbol completo de forma recursiva, todos
@@ -455,22 +533,13 @@ final class CAdESTriPhaseCounterSigner {
 
     /** Obtiene la contrafirma de los signerInfo de una determinada hoja de forma
      * recursiva.</br>
-     * @param signerInfo
-     *        Nodo ra&iacute; que contiene todos los signerInfos que se
-     *        deben firmar.
-     * @param parameters
-     *        Par&aacute;metros necesarios para firmar un determinado
-     *        SignerInfo hoja.
-     * @param cert
-     *        Certificado de firma.
-     * @param keyEntry
-     *        Clave privada a usar para firmar
-     * @param contentType
-     * 		  Tipo de contenido definido por su OID.
-     * @param contentDescription
-     * 		  Descripci&oacute;n textual del tipo de contenido firmado.
-     * @return El SignerInfo ra&iacute;z parcial con todos sus nodos
-     *         Contrafirmados.
+     * @param signerInfo Nodo ra&iacute; que contiene todos los signerInfos que se deben firmar.
+     * @param parameters Par&aacute;metros necesarios para firmar un determinado <i>SignerInfo</i> hoja.
+     * @param cert Certificado de firma.
+     * @param keyEntry Clave privada a usar para firmar
+     * @param contentType Tipo de contenido definido por su OID.
+     * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
+     * @return SignerInfo ra&iacute;z parcial con todos sus nodos contrafirmados.
      * @throws java.security.NoSuchAlgorithmException
      * @throws java.io.IOException
      * @throws java.security.cert.CertificateException
@@ -483,9 +552,9 @@ final class CAdESTriPhaseCounterSigner {
                                                        final String contentDescription,
                                                        final AdESPolicy policy,
                                                        final boolean signingCertificateV2) throws NoSuchAlgorithmException,
-                                                                                IOException,
-                                                                                CertificateException,
-                                                                                AOException {
+                                                                                                  IOException,
+                                                                                                  CertificateException,
+                                                                                                  AOException {
 
         final ASN1EncodableVector signerInfosU = new ASN1EncodableVector();
         final ASN1EncodableVector signerInfosU2 = new ASN1EncodableVector();
@@ -533,12 +602,13 @@ final class CAdESTriPhaseCounterSigner {
                 }
                 a1 = SigUtils.getAttributeSet(new AttributeTable(contexExpecific));
                 counterSigner =
-                        new SignerInfo(signerInfo.getSID(),
-                                       signerInfo.getDigestAlgorithm(),
-                                       signerInfo.getAuthenticatedAttributes(),
-                                       signerInfo.getDigestEncryptionAlgorithm(),
-                                       signerInfo.getEncryptedDigest(),
-                                       a1 // unsignedAttr
+                        new SignerInfo(
+                    		signerInfo.getSID(),
+                            signerInfo.getDigestAlgorithm(),
+                            signerInfo.getAuthenticatedAttributes(),
+                            signerInfo.getDigestEncryptionAlgorithm(),
+                            signerInfo.getEncryptedDigest(),
+                            a1 // unsignedAttr
                         );
 
             }
@@ -575,18 +645,18 @@ final class CAdESTriPhaseCounterSigner {
                         signerInfo.getDigestEncryptionAlgorithm(),
                         signerInfo.getEncryptedDigest(),
                         a1 // unsignedAttr
-                        );
+                    );
                 }
                 else {
                     final Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU));
-                    counterSigner =
-                            new SignerInfo(signerInfo.getSID(),
-                                           signerInfo.getDigestAlgorithm(),
-                                           signerInfo.getAuthenticatedAttributes(),
-                                           signerInfo.getDigestEncryptionAlgorithm(),
-                                           signerInfo.getEncryptedDigest(),
-                                           new DERSet(uAtrib) // unsignedAttr
-                            );
+                    counterSigner = new SignerInfo(
+                		signerInfo.getSID(),
+                        signerInfo.getDigestAlgorithm(),
+                        signerInfo.getAuthenticatedAttributes(),
+                        signerInfo.getDigestEncryptionAlgorithm(),
+                        signerInfo.getEncryptedDigest(),
+                        new DERSet(uAtrib) // unsignedAttr
+                    );
                 }
 
             }
@@ -631,16 +701,16 @@ final class CAdESTriPhaseCounterSigner {
      * @throws java.security.NoSuchAlgorithmException
      * @throws java.io.IOException
      * @throws java.security.cert.CertificateException */
-    private static SignerInfo generateSignerInfo(final String signatureAlgorithm,
-                                          final SignerInfo si,
-                                          final PrivateKey key,
-                                          final java.security.cert.Certificate[] certChain,
-                                          final String contentType,
-                                          final String contentDescription,
-                                          final AdESPolicy policy,
-                                          final boolean signingCertificateV2) throws NoSuchAlgorithmException,
-                                                                                  IOException,
-                                                                                  CertificateException {
+    private SignerInfo generateSignerInfo(final String signatureAlgorithm,
+                                                 final SignerInfo si,
+                                                 final PrivateKey key,
+                                                 final java.security.cert.Certificate[] certChain,
+                                                 final String contentType,
+                                                 final String contentDescription,
+                                                 final AdESPolicy policy,
+                                                 final boolean signingCertificateV2) throws NoSuchAlgorithmException,
+                                                                                             IOException,
+                                                                                             CertificateException {
         // buscamos que timo de algoritmo es y lo codificamos con su OID
         final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
 
@@ -660,20 +730,16 @@ final class CAdESTriPhaseCounterSigner {
 
         final ASN1Set signedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExcepcific));
 
-        final ASN1OctetString sign2;
-        try {
-            sign2 = new DEROctetString(
-        		firma(
-    				signedAttr.getEncoded(ASN1Encoding.DER),
-    				signatureAlgorithm,
-    				key,
-    				certChain
-				)
-    		);
-        }
-        catch (final AOException ex) {
-            throw new IOException("Error al realizar la firma: " + ex, ex); //$NON-NLS-1$
-        }
+        // Anadimos los SignedAttributes a la lista en la posicion adecuada
+        this.signedDatas.add(this.counterIndex, signedAttr.getEncoded(ASN1Encoding.DER));
+        // Obtenemos el sustituto del PKCS#1, relleno con el numero de contrafirma
+        final ASN1OctetString sign2 = new DEROctetString(firma());
+        // Incrementamos el indice de contrafirmas
+    	this.counterIndex = this.counterIndex + 1;
+
+    	if (this.counterIndex > 9) {
+    		throw new UnsupportedOperationException("No se soportan mas de 10 contrafirmas en una misma firma"); //$NON-NLS-1$
+    	}
 
         // AlgorithmIdentifier
         final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
@@ -694,17 +760,13 @@ final class CAdESTriPhaseCounterSigner {
 
         return new SignerInfo(identifier, digAlgId, unsignedAttr, encAlgId, sign2, null);
 
-
     }
 
-    /** Realiza la firma usando los atributos del firmante.
-     * @param signatureAlgorithm
-     *        Algoritmo para la firma
-     * @param keyEntry
-     *        Clave para firmar.
-     * @return Firma de los atributos.
-     * @throws es.map.es.map.afirma.exceptions.AOException */
-    private static byte[] firma(final byte[] data, final String signatureAlgorithm, final PrivateKey key, final java.security.cert.Certificate[] certChain) throws AOException {
-        return new AOPkcs1Signer().sign(data, signatureAlgorithm, key, certChain, null);
+    /** Simula una firma PKCS#1.
+     * @return Array de octetos relleno con el ASCII del n&uacute;mero de contrafirma y de longitud igual a un PKCS#1 equivalente */
+    private byte[] firma() {
+    	final byte[] dummy = new byte[PKCS1_DEFAULT_SIZE];
+    	Arrays.fill(dummy, (byte) Integer.toString(this.counterIndex).toCharArray()[0]);
+        return dummy;
     }
 }

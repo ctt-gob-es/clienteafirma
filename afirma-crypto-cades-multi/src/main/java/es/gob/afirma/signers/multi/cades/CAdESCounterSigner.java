@@ -47,6 +47,7 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.TBSCertificateStructure;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOPkcs1Signer;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
@@ -1164,6 +1165,7 @@ final class CAdESCounterSigner {
      * @return Firma de los atributos.
      * @throws es.map.es.map.afirma.exceptions.AOException */
     private static byte[] firma(final byte[] data, final String signatureAlgorithm, final PrivateKey key, final java.security.cert.Certificate[] certChain) throws AOException {
-        return new AOPkcs1Signer().sign(data, signatureAlgorithm, key, certChain, null);
+    	System.out.println(AOUtil.hexify(new byte[] { (byte) Integer.toString(0).toCharArray()[0] }, false));
+    	return new AOPkcs1Signer().sign(data, signatureAlgorithm, key, certChain, null);
     }
 }
