@@ -46,10 +46,10 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 	private static final String PROPERTY_NAME_DOCUMENT_ID = "documentId"; //$NON-NLS-1$
 
 	/** Identificador de la operacion de prefirma en servidor. */
-	private static final String OPERATION_PRESIGN = "0"; //$NON-NLS-1$
+	private static final String OPERATION_PRESIGN = "pre"; //$NON-NLS-1$
 
 	/** Identificador de la operacion de postfirma en servidor. */
-	private static final String OPERATION_POSTSIGN = "1"; //$NON-NLS-1$
+	private static final String OPERATION_POSTSIGN = "post"; //$NON-NLS-1$
 
 	/** Nombre del par&aacute;metro de c&oacute;digo de operaci&oacute;n en la URL de llamada al servidor de firma. */
 	private static final String PARAMETER_NAME_OPERATION = "op"; //$NON-NLS-1$
@@ -72,41 +72,41 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 	/** Prefirma. */
 	private static final String PROPERTY_NAME_PRESIGN = "PRE"; //$NON-NLS-1$
 
+	/** Datos adicionales de la session de firma trifasica */
+	private static final String PROPERTY_NAME_SESSION_DATA = "SESSION"; //$NON-NLS-1$
+
 	/** Firma PKCS#1. */
 	private static final String PROPERTY_NAME_PKCS1_SIGN = "PK1"; //$NON-NLS-1$
 
-	/** Identificador interno del PDF. */
-	private static final String PROPERTY_NAME_PDF_UNIQUE_ID = "PID"; //$NON-NLS-1$
+	private static final String PDF_FILE_HEADER = "%PDF-"; //$NON-NLS-1$
+	private static final String PDF_FILE_SUFFIX = ".pdf"; //$NON-NLS-1$
 
-	/** Momento de la firma, establecido en el servidor. */
-	private static final String PROPERTY_NAME_SIGN_TIME = "TIME"; //$NON-NLS-1$
-
-    private static final String PDF_FILE_HEADER = "%PDF-"; //$NON-NLS-1$
-    private static final String PDF_FILE_SUFFIX = ".pdf"; //$NON-NLS-1$
-
-    /** Indicador de finalizaci&oacute;n correcta de proceso. */
-    private static final String SUCCESS = "OK"; //$NON-NLS-1$
+	/** Indicador de finalizaci&oacute;n correcta de proceso. */
+	private static final String SUCCESS = "OK"; //$NON-NLS-1$
 
 	@Override
 	public byte[] sign(final byte[] data,
-			           final String algorithm,
-			           final PrivateKey key,
-						final Certificate[] certChain,
-			           final Properties extraParams) throws AOException {
+			final String algorithm,
+			final PrivateKey key,
+			final Certificate[] certChain,
+			final Properties extraParams) throws AOException {
 
 		if (extraParams == null) {
 			throw new IllegalArgumentException("Se necesitan parametros adicionales"); //$NON-NLS-1$
 		}
 		if (key == null) {
-			throw new IllegalArgumentException("Es necesario proporcionar una clave privada de firma"); //$NON-NLS-1$
+			throw new IllegalArgumentException("Es necesario proporcionar la clave privada de firma"); //$NON-NLS-1$
+		}
+		if (certChain == null || certChain.length == 0) {
+			throw new IllegalArgumentException("Es necesario proporcionar el certificado de firma"); //$NON-NLS-1$
 		}
 		if (data != null) {
 			LOGGER.warning("Se han recibido datos, pero se ignoraran, ya que estos se obtienen directamente del servidor documental"); //$NON-NLS-1$
 		}
 
 		final Properties configParams = new Properties();
-		for (final String k : extraParams.keySet().toArray(new String[extraParams.size()])) {
-			configParams.setProperty(k, extraParams.getProperty(k));
+		for (final String keyParam : extraParams.keySet().toArray(new String[extraParams.size()])) {
+			configParams.setProperty(keyParam, extraParams.getProperty(keyParam));
 		}
 
 		final URL signServerUrl;
@@ -139,31 +139,31 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 			//  - Certificado de firma
 			//  - Parametros extra de configuracion
 			preSignResult = UrlHttpManagerImpl.readUrlByPost(
-				signServerUrl + HTTP_CGI +
-				PARAMETER_NAME_OPERATION +
-				HTTP_EQUALS +
-				OPERATION_PRESIGN +
-				HTTP_AND +
-				PARAMETER_NAME_DOCID +
-				HTTP_EQUALS +
-				documentId +
-				HTTP_AND +
-				PARAMETER_NAME_FORMAT +
-				HTTP_EQUALS +
-				PADES_FORMAT +
-				HTTP_AND +
-				PARAMETER_NAME_ALGORITHM +
-				HTTP_EQUALS +
-				algorithm +
-				HTTP_AND +
-				PARAMETER_NAME_CERT +
-				HTTP_EQUALS +
-				Base64.encodeBytes(certChain[0].getEncoded(), Base64.URL_SAFE) +
-				HTTP_AND +
-				PARAMETER_NAME_EXTRA_PARAM +
-				HTTP_EQUALS +
-				properties2Base64(configParams)
-			);
+					signServerUrl + HTTP_CGI +
+					PARAMETER_NAME_OPERATION +
+					HTTP_EQUALS +
+					OPERATION_PRESIGN +
+					HTTP_AND +
+					PARAMETER_NAME_DOCID +
+					HTTP_EQUALS +
+					documentId +
+					HTTP_AND +
+					PARAMETER_NAME_FORMAT +
+					HTTP_EQUALS +
+					PADES_FORMAT +
+					HTTP_AND +
+					PARAMETER_NAME_ALGORITHM +
+					HTTP_EQUALS +
+					algorithm +
+					HTTP_AND +
+					PARAMETER_NAME_CERT +
+					HTTP_EQUALS +
+					Base64.encodeBytes(certChain[0].getEncoded(), Base64.URL_SAFE) +
+					HTTP_AND +
+					PARAMETER_NAME_EXTRA_PARAM +
+					HTTP_EQUALS +
+					properties2Base64(configParams)
+					);
 		}
 		catch (final CertificateEncodingException e) {
 			throw new AOException("Error decodificando el certificado del firmante: " + e, e); //$NON-NLS-1$
@@ -193,17 +193,15 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 		// -------------------------------------------------
 
 		final byte[] pkcs1sign = new AOPkcs1Signer().sign(
-			cadesSignedAttributes,
-			algorithm,
-			key,
-			certChain,
-			null // No hay parametros en PKCS#1
-		);
+				cadesSignedAttributes,
+				algorithm,
+				key,
+				certChain,
+				null // No hay parametros en PKCS#1
+				);
 		// Creamos la peticion de postfirma
 		configParams.put(PROPERTY_NAME_PKCS1_SIGN, Base64.encode(pkcs1sign));
-		configParams.put(PROPERTY_NAME_PRESIGN, preSign.getProperty(PROPERTY_NAME_PRESIGN));
-		configParams.put(PROPERTY_NAME_PDF_UNIQUE_ID, preSign.getProperty(PROPERTY_NAME_PDF_UNIQUE_ID));
-		configParams.put(PROPERTY_NAME_SIGN_TIME, preSign.getProperty(PROPERTY_NAME_SIGN_TIME));
+		configParams.put(PROPERTY_NAME_SESSION_DATA, preSign.getProperty(PROPERTY_NAME_SESSION_DATA));
 
 		// ---------
 		// POSTFIRMA
@@ -212,31 +210,31 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 		final byte[] triSignFinalResult;
 		try {
 			triSignFinalResult = UrlHttpManagerImpl.readUrlByPost(
-				signServerUrl + HTTP_CGI +
-				PARAMETER_NAME_OPERATION +
-				HTTP_EQUALS +
-				OPERATION_POSTSIGN +
-				HTTP_AND +
-				PARAMETER_NAME_DOCID +
-				HTTP_EQUALS +
-				documentId +
-				HTTP_AND +
-				PARAMETER_NAME_FORMAT +
-				HTTP_EQUALS +
-				PADES_FORMAT +
-				HTTP_AND +
-				PARAMETER_NAME_ALGORITHM +
-				HTTP_EQUALS +
-				algorithm +
-				HTTP_AND +
-				PARAMETER_NAME_CERT +
-				HTTP_EQUALS +
-				Base64.encodeBytes(certChain[0].getEncoded(), Base64.URL_SAFE) +
-				HTTP_AND +
-				PARAMETER_NAME_EXTRA_PARAM +
-				HTTP_EQUALS +
-				properties2Base64(configParams)
-			);
+					signServerUrl + HTTP_CGI +
+					PARAMETER_NAME_OPERATION +
+					HTTP_EQUALS +
+					OPERATION_POSTSIGN +
+					HTTP_AND +
+					PARAMETER_NAME_DOCID +
+					HTTP_EQUALS +
+					documentId +
+					HTTP_AND +
+					PARAMETER_NAME_FORMAT +
+					HTTP_EQUALS +
+					PADES_FORMAT +
+					HTTP_AND +
+					PARAMETER_NAME_ALGORITHM +
+					HTTP_EQUALS +
+					algorithm +
+					HTTP_AND +
+					PARAMETER_NAME_CERT +
+					HTTP_EQUALS +
+					Base64.encodeBytes(certChain[0].getEncoded(), Base64.URL_SAFE) +
+					HTTP_AND +
+					PARAMETER_NAME_EXTRA_PARAM +
+					HTTP_EQUALS +
+					properties2Base64(configParams)
+					);
 		}
 		catch (final CertificateEncodingException e) {
 			throw new AOException("Error decodificando el certificado del firmante: " + e, e); //$NON-NLS-1$
@@ -274,111 +272,111 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 
 	@Override
 	public byte[] cosign(final byte[] data,
-			             final byte[] sign,
-			             final String algorithm,
-			             final PrivateKey key,
-			 			 final Certificate[] certChain,
-			             final Properties extraParams) throws AOException {
+			final byte[] sign,
+			final String algorithm,
+			final PrivateKey key,
+			final Certificate[] certChain,
+			final Properties extraParams) throws AOException {
 		return sign(null, null, key, certChain, extraParams);
 	}
 
 	@Override
 	public byte[] cosign(final byte[] sign,
-			             final String algorithm,
-			             final PrivateKey key,
-			 			 final Certificate[] certChain,
-			             final Properties extraParams) throws AOException {
+			final String algorithm,
+			final PrivateKey key,
+			final Certificate[] certChain,
+			final Properties extraParams) throws AOException {
 		return sign(null, null, key, certChain, extraParams);
 	}
 
 	@Override
 	public byte[] countersign(final byte[] sign,
-			                  final String algorithm,
-			                  final CounterSignTarget targetType,
-			                  final Object[] targets,
-			                  final PrivateKey key,
-			      			  final Certificate[] certChain,
-			                  final Properties extraParams) throws AOException {
+			final String algorithm,
+			final CounterSignTarget targetType,
+			final Object[] targets,
+			final PrivateKey key,
+			final Certificate[] certChain,
+			final Properties extraParams) throws AOException {
 		throw new UnsupportedOperationException("No se soportan contrafirmas en PAdES"); //$NON-NLS-1$
 	}
 
 	@Override
 	public AOTreeModel getSignersStructure(final byte[] sign,
-										   final boolean asSimpleSignInfo) {
+			final boolean asSimpleSignInfo) {
 		throw new UnsupportedOperationException("No soportado para firmas trifasicas"); //$NON-NLS-1$
 	}
 
 	@Override
 	public boolean isSign(final byte[] data) {
-        if (data == null) {
-            LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
-            return false;
-        }
-        if (!isPdfFile(data)) {
-        	return false;
-        }
-        return getSignersStructure(data, false).getCount().intValue() > 0;
+		if (data == null) {
+			LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
+			return false;
+		}
+		if (!isPdfFile(data)) {
+			return false;
+		}
+		return getSignersStructure(data, false).getCount().intValue() > 0;
 	}
 
 	@Override
 	public boolean isValidDataFile(final byte[] data) {
-        if (data == null) {
-            LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
-            return false;
-        }
-        return isPdfFile(data);
+		if (data == null) {
+			LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
+			return false;
+		}
+		return isPdfFile(data);
 	}
 
 	@Override
 	public String getSignedName(final String originalName, final String inText) {
-        final String inTextInt = inText != null ? inText : ""; //$NON-NLS-1$
-        if (originalName == null) {
-            return "signed.pdf"; //$NON-NLS-1$
-        }
-        if (originalName.toLowerCase().endsWith(PDF_FILE_SUFFIX)) {
-            return originalName.substring(0, originalName.length() - PDF_FILE_SUFFIX.length()) + inTextInt + PDF_FILE_SUFFIX;
-        }
-        return originalName + inTextInt + PDF_FILE_SUFFIX;
+		final String inTextInt = inText != null ? inText : ""; //$NON-NLS-1$
+		if (originalName == null) {
+			return "signed.pdf"; //$NON-NLS-1$
+		}
+		if (originalName.toLowerCase().endsWith(PDF_FILE_SUFFIX)) {
+			return originalName.substring(0, originalName.length() - PDF_FILE_SUFFIX.length()) + inTextInt + PDF_FILE_SUFFIX;
+		}
+		return originalName + inTextInt + PDF_FILE_SUFFIX;
 	}
 
 	@Override
 	public byte[] getData(final byte[] sign) throws AOException {
-        // Si no es una firma PDF valida, lanzamos una excepcion
-        if (!isSign(sign)) {
-            throw new AOInvalidFormatException("El documento introducido no contiene una firma valida"); //$NON-NLS-1$
-        }
-        // TODO: Devolver el PDF sin firmar
-        return sign;
+		// Si no es una firma PDF valida, lanzamos una excepcion
+		if (!isSign(sign)) {
+			throw new AOInvalidFormatException("El documento introducido no contiene una firma valida"); //$NON-NLS-1$
+		}
+		// TODO: Devolver el PDF sin firmar
+		return sign;
 	}
 
 	@Override
 	public AOSignInfo getSignInfo(final byte[] data) throws AOException {
-        if (data == null) {
-            throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$
-        }
+		if (data == null) {
+			throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$
+		}
 
-        if (!isSign(data)) {
-            throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
-        }
+		if (!isSign(data)) {
+			throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
+		}
 
-        return new AOSignInfo(AOSignConstants.SIGN_FORMAT_PDF);
-        // Aqui podria venir el analisis de la firma buscando alguno de los
-        // otros datos de relevancia que se almacenan en el objeto AOSignInfo
+		return new AOSignInfo(AOSignConstants.SIGN_FORMAT_PDF);
+		// Aqui podria venir el analisis de la firma buscando alguno de los
+		// otros datos de relevancia que se almacenan en el objeto AOSignInfo
 	}
 
-    private static boolean isPdfFile(final byte[] data) {
-        byte[] buffer = new byte[PDF_FILE_HEADER.length()];
-        try {
-            new ByteArrayInputStream(data).read(buffer);
-        }
-        catch (final Exception e) {
-            buffer = null;
-        }
-        // Comprobamos que cuente con una cabecera PDF
-        if (buffer != null && !PDF_FILE_HEADER.equals(new String(buffer))) {
-            return false;
-        }
-        return true;
-    }
+	private static boolean isPdfFile(final byte[] data) {
+		byte[] buffer = new byte[PDF_FILE_HEADER.length()];
+		try {
+			new ByteArrayInputStream(data).read(buffer);
+		}
+		catch (final Exception e) {
+			buffer = null;
+		}
+		// Comprobamos que cuente con una cabecera PDF
+		if (buffer != null && !PDF_FILE_HEADER.equals(new String(buffer))) {
+			return false;
+		}
+		return true;
+	}
 
 }
