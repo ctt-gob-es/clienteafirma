@@ -2,17 +2,26 @@ package es.gob.afirma.standalone;
 
 import java.io.Console;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
+import java.security.KeyStore.PrivateKeyEntry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.keystores.main.callbacks.CachePasswordCallback;
 import es.gob.afirma.keystores.main.common.AOKeyStore;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.main.common.AOKeystoreAlternativeException;
+import es.gob.afirma.signers.cades.AOCAdESSigner;
+import es.gob.afirma.signers.pades.AOPDFSigner;
+import es.gob.afirma.signers.xades.AOXAdESSigner;
 
 /** Clase para la gesti&oacute;n de los par&aacute;metros proporcionados desde l&iacute;nea de comandos.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -24,6 +33,7 @@ final class CommandLineLauncher {
 	private static final String PARAM_STORE  = "-store"; //$NON-NLS-1$
 	private static final String PARAM_FORMAT = "-format"; //$NON-NLS-1$
 	private static final String PARAM_PASSWD = "-password"; //$NON-NLS-1$
+	private static final String PARAM_XML    = "-xml"; //$NON-NLS-1$
 
 	private static final String STORE_AUTO = "auto"; //$NON-NLS-1$
 	private static final String STORE_MAC  = "mac"; //$NON-NLS-1$
@@ -39,6 +49,10 @@ final class CommandLineLauncher {
 	private static final String FORMAT_FACTURAE = "facturae"; //$NON-NLS-1$
 
 	private static final String COMMAND_LIST = "listaliases"; //$NON-NLS-1$
+	private static final String COMMAND_SIGN = "sign"; //$NON-NLS-1$
+	private static final String COMMAND_COSIGN = "cosign"; //$NON-NLS-1$
+	private static final String COMMAND_COUNTERSIGN = "countersign"; //$NON-NLS-1$
+
 
 	static void processCommandLine(final String[] args) {
 
@@ -56,10 +70,6 @@ final class CommandLineLauncher {
 			syntaxError(pw);
 		}
 
-		for (final String a : args) {
-			System.out.println(a);
-		}
-
 		final String command = args[0].toLowerCase();
 
 		String store = null;
@@ -68,101 +78,132 @@ final class CommandLineLauncher {
 		File outputFile = null;
 		String format = null;
 		String password = null;
+		boolean xml = false;
 		try {
 			for (int i=1; i<args.length; i++) {
-				if (PARAM_STORE.equals(args[i])) {
+				if (PARAM_XML.equals(args[i])) {
+					xml = true;
+				}
+				else if (PARAM_STORE.equals(args[i])) {
 					if (store != null) {
 						syntaxError(pw);
 					}
 					store = args[i+1];
 					i++;
 				}
-				if (PARAM_PASSWD.equals(args[i])) {
+				else if (PARAM_PASSWD.equals(args[i])) {
 					if (password != null) {
 						syntaxError(pw);
 					}
 					password = args[i+1];
 					i++;
 				}
-				if (PARAM_ALIAS.equals(args[i])) {
+				else if (PARAM_ALIAS.equals(args[i])) {
 					if (alias != null) {
 						syntaxError(pw);
 					}
 					alias = args[i+1];
 					i++;
 				}
-				if (PARAM_INPUT.equals(args[i])) {
+				else if (PARAM_INPUT.equals(args[i])) {
 					if (inputFile != null) {
 						syntaxError(pw);
 					}
 					inputFile = new File(args[i+1]);
 					if (!inputFile.exists()) {
-						pw.write(Messages.getString("CommandLineLauncher.0") + " " + args[i+1]);  //$NON-NLS-1$//$NON-NLS-2$
+						pw.write(CommandLineMessages.getString("CommandLineLauncher.0") + " " + args[i+1]);  //$NON-NLS-1$//$NON-NLS-2$
 						pw.flush();
 						pw.close();
 						System.exit(-1);
 					}
 					if (!inputFile.canRead()) {
-						pw.write(Messages.getString("CommandLineLauncher.1") + " " + args[i+1]);  //$NON-NLS-1$//$NON-NLS-2$
+						pw.write(CommandLineMessages.getString("CommandLineLauncher.1") + " " + args[i+1]);  //$NON-NLS-1$//$NON-NLS-2$
 						pw.flush();
 						pw.close();
 						System.exit(-1);
 					}
 					if (!inputFile.isFile()) {
-						pw.write(Messages.getString("CommandLineLauncher.2") + " " + args[i+1]);  //$NON-NLS-1$//$NON-NLS-2$
+						pw.write(CommandLineMessages.getString("CommandLineLauncher.2") + " " + args[i+1]);  //$NON-NLS-1$//$NON-NLS-2$
 						pw.flush();
 						pw.close();
 						System.exit(-1);
 					}
 					i++;
 				}
-				if (PARAM_OUTPUT.equals(args[i])) {
-					if (outputFile != null) {
-						syntaxError(pw);
-					}
-					outputFile = new File(args[i+1]);
-					final String parent = outputFile.getParent();
-					if (parent != null && !new File(parent).canWrite()) {
-						pw.write(Messages.getString("CommandLineLauncher.3") + " " + args[i+1]);  //$NON-NLS-1$//$NON-NLS-2$
-						pw.flush();
-						pw.close();
-						System.exit(-1);
-					}
-					i++;
-				}
-				if (PARAM_FORMAT.equals(args[i])) {
+				else if (PARAM_FORMAT.equals(args[i])) {
 					format = args[i+1].toLowerCase();
 					if (!format.equals(FORMAT_XADES) &&
 						!format.equals(FORMAT_CADES) &&
 						!format.equals(FORMAT_PADES) &&
 						!format.equals(FORMAT_FACTURAE) &&
 						!format.equals(FORMAT_AUTO)) {
-							pw.write(Messages.getString("CommandLineLauncher.4") + args[i+1]); //$NON-NLS-1$
+							pw.write(CommandLineMessages.getString("CommandLineLauncher.4") + args[i+1]); //$NON-NLS-1$
 							pw.flush();
 							pw.close();
 							System.exit(-1);
 					}
 					i++;
 				}
+				else if (PARAM_OUTPUT.equals(args[i])) {
+					if (outputFile != null) {
+						syntaxError(pw);
+					}
+					outputFile = new File(args[i+1]);
+					final String parent = outputFile.getParent();
+					if (parent != null && !new File(parent).canWrite()) {
+						pw.write(CommandLineMessages.getString("CommandLineLauncher.3") + " " + args[i+1]);  //$NON-NLS-1$//$NON-NLS-2$
+						pw.flush();
+						pw.close();
+						System.exit(-1);
+					}
+					i++;
+				}
+				else {
+					syntaxError(pw);
+				}
 			}
 			if (store == null) {
 				store = STORE_AUTO;
 			}
 			if (COMMAND_LIST.equals(command)) {
-				pw.write(listAliases(store, password));
+				pw.write(listAliases(store, password, xml));
 				pw.flush();
 				pw.close();
 				System.exit(0);
 			}
-			if (format == null) {
-				format = FORMAT_AUTO;
-			}
-			if (inputFile == null) {
-				pw.write(Messages.getString("CommandLineLauncher.5")); //$NON-NLS-1$
+			else if (!COMMAND_SIGN.equals(command) && !COMMAND_COSIGN.equals(command) && !COMMAND_COUNTERSIGN.equals(command)) {
+				pw.write(CommandLineMessages.getString("CommandLineLauncher.15") + " " + command); //$NON-NLS-1$ //$NON-NLS-2$
 				pw.flush();
 				pw.close();
 				System.exit(-1);
 			}
+
+			if (format == null) {
+				format = FORMAT_AUTO;
+			}
+			if (inputFile == null) {
+				pw.write(CommandLineMessages.getString("CommandLineLauncher.5")); //$NON-NLS-1$
+				pw.flush();
+				pw.close();
+				System.exit(-1);
+			}
+			if (alias == null) {
+				pw.write(CommandLineMessages.getString("CommandLineLauncher.17")); //$NON-NLS-1$
+				pw.flush();
+				pw.close();
+				System.exit(-1);
+			}
+			if (outputFile == null && !xml) {
+				pw.write(CommandLineMessages.getString("CommandLineLauncher.19")); //$NON-NLS-1$
+				pw.flush();
+				pw.close();
+				System.exit(-1);
+			}
+
+			final String res = sign(command, format, inputFile, alias, store, password, xml);
+
+			System.out.println(res);
+
 		}
 		catch(final ArrayIndexOutOfBoundsException e) {
 			syntaxError(pw);
@@ -172,18 +213,148 @@ final class CommandLineLauncher {
 		pw.close();
 	}
 
-	private static String listAliases(final String store, final String password) {
+	private static String sign(final String op,
+			                 final String fmt,
+			                 final File inputFile,
+			                 final String alias,
+			                 final String store,
+			                 final String storePassword,
+			                 final boolean xml) {
+		final StringBuilder sb = new StringBuilder();
+		final AOKeyStoreManager ksm;
+		try {
+			ksm = getKsm(store, storePassword);
+		}
+		catch (final Exception e) {
+			if (xml) {
+				sb.append("<afirma><result>ko</result><response><description>"); //$NON-NLS-1$
+			}
+			sb.append("No se ha podido inicializar el almacen de claves: "); //$NON-NLS-1$
+			sb.append(e.toString());
+			if (xml) {
+				sb.append("</description></response></afirma>"); //$NON-NLS-1$
+			}
+			else {
+				sb.append('\n');
+			}
+			return sb.toString();
+		}
+		final PrivateKeyEntry ke;
+		try {
+			ke = ksm.getKeyEntry(
+				alias,
+				new CachePasswordCallback(storePassword != null ? storePassword.toCharArray() : "".toCharArray()) //$NON-NLS-1$
+			);
+		}
+		catch (final Exception e) {
+			if (xml) {
+				sb.append("<afirma><result>ko</result><response><description>"); //$NON-NLS-1$
+			}
+			sb.append("No se ha podido obtener la referencia a la clave privada: "); //$NON-NLS-1$
+			sb.append(e.toString());
+			if (xml) {
+				sb.append("</description></response></afirma>"); //$NON-NLS-1$
+			}
+			else {
+				sb.append('\n');
+			}
+			return sb.toString();
+		}
+		if (ke == null) {
+			if (xml) {
+				sb.append("<afirma><result>ko</result><response><description>"); //$NON-NLS-1$
+			}
+			sb.append("No se hay ninguna entrada en el almacen con el alias indicado: "); //$NON-NLS-1$
+			sb.append(alias);
+			if (xml) {
+				sb.append("</description></response></afirma>"); //$NON-NLS-1$
+			}
+			else {
+				sb.append('\n');
+			}
+			return sb.toString();
+		}
+
+		// Leemos el fichero de entrada
+		final byte[] data;
+		try {
+			final InputStream input = new FileInputStream(inputFile);
+			data = AOUtil.getDataFromInputStream(input);
+			input.close();
+		}
+		catch(final Exception e) {
+			if (xml) {
+				sb.append("<afirma><result>ko</result><response><description>"); //$NON-NLS-1$
+			}
+			sb.append("No se ha podido leer el fichero de entrada: "); //$NON-NLS-1$
+			sb.append(alias);
+			if (xml) {
+				sb.append("</description></response></afirma>"); //$NON-NLS-1$
+			}
+			else {
+				sb.append('\n');
+			}
+			return sb.toString();
+		}
+		final String format;
+		// Si el formato es "auto", miramos si es XML o PDF para asignar XAdES o PAdES
+		if (FORMAT_AUTO.equals(fmt)) {
+			final String ext = new MimeHelper(data).getExtension();
+			if ("pdf".equals(ext)) { //$NON-NLS-1$
+				format = FORMAT_PADES;
+			}
+			else if ("xml".equals(ext)) { //$NON-NLS-1$
+				format = FORMAT_XADES;
+			}
+			else {
+				format = FORMAT_CADES;
+			}
+		}
+		else {
+			format = fmt;
+		}
+
+		// Instanciamos un firmador del tipo adecuado
+		final AOSigner signer;
+		if (FORMAT_CADES.equals(format)) {
+			signer = new AOCAdESSigner();
+		}
+		else if (FORMAT_XADES.equals(format)) {
+			signer = new AOXAdESSigner();
+		}
+		else /*if (FORMAT_PADES.equals(format))*/ {
+			signer = new AOPDFSigner();
+		}
+
+		return "OK";
+	}
+
+	private static String listAliases(final String store, final String password, final boolean xml) {
 		final String[] aliases;
 		try {
 			aliases = getKsm(store, password).getAliases();
 		}
 		catch (final Exception e) {
-			return Messages.getString("CommandLineLauncher.6") + e; //$NON-NLS-1$
+			return CommandLineMessages.getString("CommandLineLauncher.6") + e; //$NON-NLS-1$
 		}
 		final StringBuilder sb = new StringBuilder();
+		if (xml) {
+			sb.append("<afirma><result>ok</result><response>"); //$NON-NLS-1$
+		}
 		for (final String alias : aliases) {
+			if (xml) {
+				sb.append("<alias>"); //$NON-NLS-1$
+			}
 			sb.append(alias);
-			sb.append('\n');
+			if (xml) {
+				sb.append("</alias>"); //$NON-NLS-1$
+			}
+			else {
+				sb.append('\n');
+			}
+		}
+		if (xml) {
+			sb.append("</response></afirma>"); //$NON-NLS-1$
 		}
 		return sb.toString();
 	}
@@ -242,18 +413,20 @@ final class CommandLineLauncher {
 
 	private static void syntaxError(final PrintWriter pw) {
 		pw.write(
-			Messages.getString("CommandLineLauncher.7") + ": SimpleAfirma cmd [options...]\n" +  //$NON-NLS-1$//$NON-NLS-2$
+			CommandLineMessages.getString("CommandLineLauncher.7") + ": SimpleAfirma cmd [options...]\n" +  //$NON-NLS-1$//$NON-NLS-2$
 			"cmd\n" + //$NON-NLS-1$
-			"  sign        (" + Messages.getString("CommandLineLauncher.8") + ")\n" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			"  cosign      (" + Messages.getString("CommandLineLauncher.9") + ")\n" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			"  countersign (" + Messages.getString("CommandLineLauncher.10") + ")\n" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			"  " + COMMAND_LIST + " (" + Messages.getString("CommandLineLauncher.11") + ")\n" +  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			"  sign        (" + CommandLineMessages.getString("CommandLineLauncher.8") + ")\n" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			"  cosign      (" + CommandLineMessages.getString("CommandLineLauncher.9") + ")\n" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			"  countersign (" + CommandLineMessages.getString("CommandLineLauncher.10") + ")\n" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			"  " + COMMAND_LIST + " (" + CommandLineMessages.getString("CommandLineLauncher.11") + ")\n" +  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			"options\n" + //$NON-NLS-1$
 			"  " + PARAM_STORE  + " auto|windows|mac|mozilla|dni|pkcs12:p12file\n" + //$NON-NLS-1$ //$NON-NLS-2$
-			"  " + PARAM_PASSWD + " storepassword (" + Messages.getString("CommandLineLauncher.12") + ")\n" +  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			"  " + PARAM_PASSWD + " storepassword (" + CommandLineMessages.getString("CommandLineLauncher.12") + ")\n" +  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			"  " + PARAM_FORMAT + " auto|xades|cades|pades|facturae\n" +  //$NON-NLS-1$//$NON-NLS-2$
-			"  " + PARAM_INPUT  + " inputfile (" + Messages.getString("CommandLineLauncher.13") + ")\n" +  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			"  " + PARAM_OUTPUT + " outputfile (" + Messages.getString("CommandLineLauncher.14") + ")\n" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			"  " + PARAM_INPUT  + " inputfile (" + CommandLineMessages.getString("CommandLineLauncher.13") + ")\n" +  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			"  " + PARAM_OUTPUT + " outputfile (" + CommandLineMessages.getString("CommandLineLauncher.14") + ")\n" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			"  " + PARAM_ALIAS  + " alias (" + CommandLineMessages.getString("CommandLineLauncher.16") + ")\n" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			"  " + PARAM_XML    + " (" + CommandLineMessages.getString("CommandLineLauncher.18") + ")" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		);
 		pw.flush();
 		pw.close();
