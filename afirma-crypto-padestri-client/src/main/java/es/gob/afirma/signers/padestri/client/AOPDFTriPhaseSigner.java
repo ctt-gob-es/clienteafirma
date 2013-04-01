@@ -107,9 +107,6 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 		if (certChain == null || certChain.length == 0) {
 			throw new IllegalArgumentException("Es necesario proporcionar el certificado de firma"); //$NON-NLS-1$
 		}
-		if (data != null) {
-			LOGGER.warning("Se han recibido datos, pero se ignoraran, ya que estos se obtienen directamente del servidor documental"); //$NON-NLS-1$
-		}
 
 		final Properties configParams = new Properties();
 		for (final String keyParam : extraParams.keySet().toArray(new String[extraParams.size()])) {
@@ -125,9 +122,21 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 		}
 		configParams.remove(PROPERTY_NAME_SIGN_SERVER_URL);
 
-		final String documentId = configParams.getProperty(PROPERTY_NAME_DOCUMENT_ID);
+		LOGGER.info("DATOS: " + new String(data));
+
+		String documentId = configParams.getProperty(PROPERTY_NAME_DOCUMENT_ID);
 		if (documentId == null || "".equals(documentId)) { //$NON-NLS-1$
-			throw new IllegalArgumentException("No se ha proporcionado un identificador de documento"); //$NON-NLS-1$
+			if (data != null) {
+				try {
+					documentId = Base64.encodeBytes(data, Base64.URL_SAFE);
+				} catch (final IOException e) {
+					throw new IllegalArgumentException("Error al interpretar los datos como identificador del documento que desea firmar", e); //$NON-NLS-1$
+				}
+			} else {
+				throw new IllegalArgumentException("No se ha proporcionado un identificador de documento"); //$NON-NLS-1$
+			}
+		} else if (data != null) {
+			LOGGER.warning("Se ignoraran los datos indicados por haberse introducido un identificador para la descarga de datos del servidor"); //$NON-NLS-1$
 		}
 		configParams.remove(PROPERTY_NAME_DOCUMENT_ID);
 
