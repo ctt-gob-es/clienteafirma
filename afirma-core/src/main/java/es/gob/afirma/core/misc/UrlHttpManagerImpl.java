@@ -13,6 +13,7 @@ package es.gob.afirma.core.misc;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -40,18 +41,18 @@ public final class UrlHttpManagerImpl {
 	private static final SSLSocketFactory DEFAULT_SSL_SOCKET_FACTORY = HttpsURLConnection.getDefaultSSLSocketFactory();
 
 	private static final TrustManager[] DUMMY_TRUST_MANAGER = new TrustManager[] {
-       new X509TrustManager() {
-           @Override
-           public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-             return null;
-           }
-           @Override
-           public void checkClientTrusted(final X509Certificate[] certs, final String authType) { /* No hacemos nada */ }
-           @Override
-           public void checkServerTrusted(final X509Certificate[] certs, final String authType) {  /* No hacemos nada */  }
+		new X509TrustManager() {
+			@Override
+			public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+				return null;
+			}
+			@Override
+			public void checkClientTrusted(final X509Certificate[] certs, final String authType) { /* No hacemos nada */ }
+			@Override
+			public void checkServerTrusted(final X509Certificate[] certs, final String authType) {  /* No hacemos nada */  }
 
-        }
-    };
+		}
+	};
 
 	/** Lee una URL HTTP o HTTPS por POST si se indican par&aacute;metros en la URL y por GET en caso contrario.
 	 * En HTTPS no se hacen comprobaciones del certificado servidor.
@@ -80,14 +81,16 @@ public final class UrlHttpManagerImpl {
 			}
 			catch(final Exception e) {
 				Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-					"No se ha podido ajustar la confianza SSL, es posible que no se pueda completar la conexion: " + e //$NON-NLS-1$
-				);
+						"No se ha podido ajustar la confianza SSL, es posible que no se pueda completar la conexion: " + e //$NON-NLS-1$
+						);
 			}
 		}
 
-		final java.net.URLConnection conn = uri.openConnection();
+		final HttpURLConnection conn = (HttpURLConnection) uri.openConnection();
+		conn.setRequestMethod("POST"); //$NON-NLS-1$
 
 		conn.setDoOutput(true);
+
 		final OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
 
 		writer.write(urlParameters);
@@ -116,8 +119,8 @@ public final class UrlHttpManagerImpl {
 			}
 			catch(final Exception e) {
 				Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-					"No se ha podido ajustar la confianza SSL, es posible que no se pueda completar la conexion: " + e //$NON-NLS-1$
-				);
+						"No se ha podido ajustar la confianza SSL, es posible que no se pueda completar la conexion: " + e //$NON-NLS-1$
+						);
 			}
 		}
 		final InputStream is = uri.openStream();
@@ -129,22 +132,22 @@ public final class UrlHttpManagerImpl {
 		return data;
 	}
 
-    private static void enableSslChecks() {
-    	HttpsURLConnection.setDefaultSSLSocketFactory(DEFAULT_SSL_SOCKET_FACTORY);
-        HttpsURLConnection.setDefaultHostnameVerifier(DEFAULT_HOSTNAME_VERIFIER);
-    }
+	private static void enableSslChecks() {
+		HttpsURLConnection.setDefaultSSLSocketFactory(DEFAULT_SSL_SOCKET_FACTORY);
+		HttpsURLConnection.setDefaultHostnameVerifier(DEFAULT_HOSTNAME_VERIFIER);
+	}
 
-    private static void disableSslChecks() throws KeyManagementException, NoSuchAlgorithmException {
-    	final SSLContext sc = SSLContext.getInstance("SSL"); //$NON-NLS-1$
-        sc.init(null, DUMMY_TRUST_MANAGER, new java.security.SecureRandom());
-        HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-        HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
-	        @Override
+	private static void disableSslChecks() throws KeyManagementException, NoSuchAlgorithmException {
+		final SSLContext sc = SSLContext.getInstance("SSL"); //$NON-NLS-1$
+		sc.init(null, DUMMY_TRUST_MANAGER, new java.security.SecureRandom());
+		HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+		HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
+			@Override
 			public boolean verify(final String hostname, final SSLSession session) {
-	          return true;
-	        }
-        });
-    }
+				return true;
+			}
+		});
+	}
 
 
 }
