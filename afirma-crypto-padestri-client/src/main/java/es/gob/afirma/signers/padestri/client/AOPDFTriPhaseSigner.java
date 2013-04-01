@@ -54,6 +54,13 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 	/** Nombre del par&aacute;metro de c&oacute;digo de operaci&oacute;n en la URL de llamada al servidor de firma. */
 	private static final String PARAMETER_NAME_OPERATION = "op"; //$NON-NLS-1$
 
+	/** Identificador de la operaci&oacute;n criptogr&aacute;fica de firma. */
+	private static final String CRYPTO_OPERATION_SIGN = "sign"; //$NON-NLS-1$
+
+	/** Nombre del par&aacute;metro que identifica la operaci&oacute;n criptogr&aacute;fica en la URL del servidor de firma. */
+	private static final String PARAMETER_NAME_CRYPTO_OPERATION = "cop"; //$NON-NLS-1$
+
+
 	private static final String HTTP_CGI = "?"; //$NON-NLS-1$
 	private static final String HTTP_EQUALS = "="; //$NON-NLS-1$
 	private static final String HTTP_AND = "&"; //$NON-NLS-1$
@@ -143,6 +150,10 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 					PARAMETER_NAME_OPERATION +
 					HTTP_EQUALS +
 					OPERATION_PRESIGN +
+					HTTP_AND +
+					PARAMETER_NAME_CRYPTO_OPERATION +
+					HTTP_EQUALS +
+					CRYPTO_OPERATION_SIGN +
 					HTTP_AND +
 					PARAMETER_NAME_DOCID +
 					HTTP_EQUALS +
