@@ -3,14 +3,17 @@ package es.gob.afirma.standalone;
 import java.io.Console;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOSigner;
@@ -34,6 +37,7 @@ final class CommandLineLauncher {
 	private static final String PARAM_FORMAT = "-format"; //$NON-NLS-1$
 	private static final String PARAM_PASSWD = "-password"; //$NON-NLS-1$
 	private static final String PARAM_XML    = "-xml"; //$NON-NLS-1$
+	private static final String PARAM_ALGO   = "-algorithm"; //$NON-NLS-1$
 
 	private static final String STORE_AUTO = "auto"; //$NON-NLS-1$
 	private static final String STORE_MAC  = "mac"; //$NON-NLS-1$
@@ -52,6 +56,8 @@ final class CommandLineLauncher {
 	private static final String COMMAND_SIGN = "sign"; //$NON-NLS-1$
 	private static final String COMMAND_COSIGN = "cosign"; //$NON-NLS-1$
 	private static final String COMMAND_COUNTERSIGN = "countersign"; //$NON-NLS-1$
+
+	private static final String DEFAULT_SIGN_ALGORITHM = "SHA512withRSA"; //$NON-NLS-1$
 
 
 	static void processCommandLine(final String[] args) {
@@ -78,6 +84,7 @@ final class CommandLineLauncher {
 		File outputFile = null;
 		String format = null;
 		String password = null;
+		String algorithm = null;
 		boolean xml = false;
 		try {
 			for (int i=1; i<args.length; i++) {
@@ -89,6 +96,13 @@ final class CommandLineLauncher {
 						syntaxError(pw);
 					}
 					store = args[i+1];
+					i++;
+				}
+				else if (PARAM_ALGO.equals(args[i])) {
+					if (algorithm != null) {
+						syntaxError(pw);
+					}
+					algorithm = args[i+1];
 					i++;
 				}
 				else if (PARAM_PASSWD.equals(args[i])) {
@@ -181,18 +195,25 @@ final class CommandLineLauncher {
 			if (format == null) {
 				format = FORMAT_AUTO;
 			}
+
+			if (algorithm == null) {
+				algorithm = DEFAULT_SIGN_ALGORITHM;
+			}
+
 			if (inputFile == null) {
 				pw.write(CommandLineMessages.getString("CommandLineLauncher.5")); //$NON-NLS-1$
 				pw.flush();
 				pw.close();
 				System.exit(-1);
 			}
+
 			if (alias == null) {
 				pw.write(CommandLineMessages.getString("CommandLineLauncher.17")); //$NON-NLS-1$
 				pw.flush();
 				pw.close();
 				System.exit(-1);
 			}
+
 			if (outputFile == null && !xml) {
 				pw.write(CommandLineMessages.getString("CommandLineLauncher.19")); //$NON-NLS-1$
 				pw.flush();
@@ -200,10 +221,31 @@ final class CommandLineLauncher {
 				System.exit(-1);
 			}
 
-			final String res = sign(command, format, inputFile, alias, store, password, xml);
+			final byte[] res = sign(command, format, algorithm, inputFile, alias, store, password, xml);
 
-			System.out.println(res);
+			if (outputFile != null) {
+				try {
+					final OutputStream fos = new FileOutputStream(outputFile);
+					fos.write(res);
+					fos.flush();
+					fos.close();
+				}
+				catch(final Exception e) {
+					pw.write(CommandLineMessages.getString("CommandLineLauncher.21") + " '" + outputFile.getAbsolutePath() + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					pw.flush();
+					pw.close();
+					System.exit(-1);
+				}
+				pw.write(CommandLineMessages.getString("CommandLineLauncher.22")); //$NON-NLS-1$
+				pw.flush();
+				pw.close();
+				System.exit(0);
+			}
 
+			pw.write(new String(res));
+			pw.flush();
+			pw.close();
+			System.exit(0);
 		}
 		catch(final ArrayIndexOutOfBoundsException e) {
 			syntaxError(pw);
@@ -213,14 +255,18 @@ final class CommandLineLauncher {
 		pw.close();
 	}
 
-	private static String sign(final String op,
+	private static byte[] sign(final String op,
 			                 final String fmt,
+			                 final String algorithm,
 			                 final File inputFile,
 			                 final String alias,
 			                 final String store,
 			                 final String storePassword,
 			                 final boolean xml) {
+
 		final StringBuilder sb = new StringBuilder();
+
+		// Almacen
 		final AOKeyStoreManager ksm;
 		try {
 			ksm = getKsm(store, storePassword);
@@ -237,7 +283,7 @@ final class CommandLineLauncher {
 			else {
 				sb.append('\n');
 			}
-			return sb.toString();
+			return sb.toString().getBytes();
 		}
 		final PrivateKeyEntry ke;
 		try {
@@ -258,7 +304,7 @@ final class CommandLineLauncher {
 			else {
 				sb.append('\n');
 			}
-			return sb.toString();
+			return sb.toString().getBytes();
 		}
 		if (ke == null) {
 			if (xml) {
@@ -272,7 +318,7 @@ final class CommandLineLauncher {
 			else {
 				sb.append('\n');
 			}
-			return sb.toString();
+			return sb.toString().getBytes();
 		}
 
 		// Leemos el fichero de entrada
@@ -294,10 +340,11 @@ final class CommandLineLauncher {
 			else {
 				sb.append('\n');
 			}
-			return sb.toString();
+			return sb.toString().getBytes();
 		}
-		final String format;
+
 		// Si el formato es "auto", miramos si es XML o PDF para asignar XAdES o PAdES
+		final String format;
 		if (FORMAT_AUTO.equals(fmt)) {
 			final String ext = new MimeHelper(data).getExtension();
 			if ("pdf".equals(ext)) { //$NON-NLS-1$
@@ -326,7 +373,56 @@ final class CommandLineLauncher {
 			signer = new AOPDFSigner();
 		}
 
-		return "OK";
+		// Obtenemos el resultado de la operacion adecuada
+		final byte[] resBytes;
+		try {
+			if (COMMAND_SIGN.equals(op)) {
+				resBytes = signer.sign(
+					data,
+					algorithm,
+					ke.getPrivateKey(),
+					ke.getCertificateChain(),
+					null//extraParams
+				);
+			}
+			else {
+				if (xml) {
+					sb.append("<afirma><result>ko</result><response><description>"); //$NON-NLS-1$
+				}
+				sb.append("Operacion no soportada: "); //$NON-NLS-1$
+				sb.append(op);
+				if (xml) {
+					sb.append("</description></response></afirma>"); //$NON-NLS-1$
+				}
+				else {
+					sb.append('\n');
+				}
+				return sb.toString().getBytes();
+			}
+		}
+		catch(final Exception e) {
+			if (xml) {
+				sb.append("<afirma><result>ko</result><response><description>"); //$NON-NLS-1$
+			}
+			sb.append("Error en la operacion de firma: "); //$NON-NLS-1$
+			sb.append(e.toString());
+			if (xml) {
+				sb.append("</description></response></afirma>"); //$NON-NLS-1$
+			}
+			else {
+				sb.append('\n');
+			}
+			return sb.toString().getBytes();
+		}
+
+		if (xml) {
+			sb.append("<afirma><result>ok</result><response><sign>"); //$NON-NLS-1$");
+			sb.append(Base64.encode(resBytes));
+			sb.append("</sign></afirma>"); //$NON-NLS-1$
+			return sb.toString().getBytes();
+		}
+		return resBytes;
+
 	}
 
 	private static String listAliases(final String store, final String password, final boolean xml) {
@@ -426,6 +522,7 @@ final class CommandLineLauncher {
 			"  " + PARAM_INPUT  + " inputfile (" + CommandLineMessages.getString("CommandLineLauncher.13") + ")\n" +  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			"  " + PARAM_OUTPUT + " outputfile (" + CommandLineMessages.getString("CommandLineLauncher.14") + ")\n" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			"  " + PARAM_ALIAS  + " alias (" + CommandLineMessages.getString("CommandLineLauncher.16") + ")\n" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			"  " + PARAM_ALGO   + " algo (" + CommandLineMessages.getString("CommandLineLauncher.20") + ")\n" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			"  " + PARAM_XML    + " (" + CommandLineMessages.getString("CommandLineLauncher.18") + ")" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		);
 		pw.flush();
