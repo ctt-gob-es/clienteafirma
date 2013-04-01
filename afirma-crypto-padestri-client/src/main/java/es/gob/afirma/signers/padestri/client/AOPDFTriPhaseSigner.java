@@ -226,6 +226,10 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 					HTTP_EQUALS +
 					OPERATION_POSTSIGN +
 					HTTP_AND +
+					PARAMETER_NAME_CRYPTO_OPERATION +
+					HTTP_EQUALS +
+					CRYPTO_OPERATION_SIGN +
+					HTTP_AND +
 					PARAMETER_NAME_DOCID +
 					HTTP_EQUALS +
 					documentId +
