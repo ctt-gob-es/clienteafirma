@@ -83,7 +83,7 @@ public final class TestCAdES {
 		p2.setProperty("format", AOSignConstants.SIGN_FORMAT_CADES); //$NON-NLS-1$
 		p2.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
 		p2.setProperty("policyIdentifier", "urn:oid:2.16.724.1.3.1.1.2.1.8"); //$NON-NLS-1$ //$NON-NLS-2$
-		p2.setProperty("policyIdentifierHash", "V8lVVNGDCPen6VELRD1Ja8HARFk="); //$NON-NLS-1$ //$NON-NLS-2$
+		p2.setProperty("policyIdentifierHash", "7SxX3erFuH31TvAw9LZ70N7p1vA="); //$NON-NLS-1$ //$NON-NLS-2$
 		p2.setProperty("policyIdentifierHashAlgorithm", "http://www.w3.org/2000/09/xmldsig#sha1"); //$NON-NLS-1$ //$NON-NLS-2$
 		//p2.setProperty("policyQualifier", "http://www.google.com"); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -153,8 +153,8 @@ public final class TestCAdES {
 					System.out.println(prueba);
 
 					final byte[] result = signer.sign(
-						DATA.get(i), algo, pke.getPrivateKey(), pke.getCertificateChain(), extraParams
-					);
+							DATA.get(i), algo, pke.getPrivateKey(), pke.getCertificateChain(), extraParams
+							);
 
 					final File saveFile = File.createTempFile(algo + "-", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
 					final OutputStream os = new FileOutputStream(saveFile);
@@ -192,8 +192,8 @@ public final class TestCAdES {
 		}
 
 		signer.sign(
-			DATA.get(0), "SHA1withRSA", pke.getPrivateKey(), pke.getCertificateChain(), null //$NON-NLS-1$
-		);
+				DATA.get(0), "SHA1withRSA", pke.getPrivateKey(), pke.getCertificateChain(), null //$NON-NLS-1$
+				);
 
 	}
 
@@ -278,22 +278,22 @@ public final class TestCAdES {
 
 	private static byte[] sign(final AOSigner signer, final byte[] data, final String algorithm, final PrivateKeyEntry pke, final Properties params) throws Exception {
 		return signer.sign(
-			data, algorithm, pke.getPrivateKey(), pke.getCertificateChain(), params
-		);
+				data, algorithm, pke.getPrivateKey(), pke.getCertificateChain(), params
+				);
 	}
 
 	/** Cofirma sin necesidad de los datos originales. */
 	private static byte[] cosign(final AOSigner signer, final byte[] sign, final String algorithm, final PrivateKeyEntry pke, final Properties params) throws Exception {
 		return signer.cosign(
-			sign, algorithm, pke.getPrivateKey(), pke.getCertificateChain(), params
-		);
+				sign, algorithm, pke.getPrivateKey(), pke.getCertificateChain(), params
+				);
 	}
 
 
 	private static byte[] cosign(final AOSigner signer, final byte[] data, final byte[] sign, final String algorithm, final PrivateKeyEntry pke, final Properties params) throws Exception {
 		return signer.cosign(
-			data, sign, algorithm, pke.getPrivateKey(), pke.getCertificateChain(), params
-		);
+				data, sign, algorithm, pke.getPrivateKey(), pke.getCertificateChain(), params
+				);
 	}
 
 	/** Hace las comprobaciones b&aacute;sicas de una firma. */
