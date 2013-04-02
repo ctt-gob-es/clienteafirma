@@ -114,37 +114,19 @@ public final class CAdESTriPhaseCoSigner {
 			NoSuchAlgorithmException,
 			IOException {
 
-		if (messageDigest == null) {
-			final ASN1EncodableVector contextExpecific =
-					CAdESUtils.generateSignerInfo(signerCertificateChain[0],
-							digestAlgorithm,
-							content,
-							policy,
-							signingCertificateV2,
-							null,
-							signDate,
-							false,
-							contentType,
-							contentDescription
-							);
-			return SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
-		}
-
-		final ASN1EncodableVector contextExpecific = CAdESUtils.generateSignerInfo(
-				signerCertificateChain[0],
-				digestAlgorithm,
-				null,
-				policy,
-				signingCertificateV2,
-				messageDigest,
-				signDate,
-				false,
-				contentType,
-				contentDescription
-				);
-
+		final ASN1EncodableVector contextExpecific =
+				CAdESUtils.generateSignerInfo(signerCertificateChain[0],
+						digestAlgorithm,
+						content,
+						policy,
+						signingCertificateV2,
+						messageDigest,
+						signDate,
+						false,
+						contentType,
+						contentDescription
+						);
 		return SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
-
 	}
 
 
