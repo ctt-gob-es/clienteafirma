@@ -44,15 +44,10 @@ public final class SignatureService extends HttpServlet {
 	private static final String DOCUMENT_MANAGER_CLASS_PARAM = "document.manager"; //$NON-NLS-1$
 
 	static {
-
-		Logger.getLogger("es.gob.afirma").info("Cargamos la configuracion");
-
 		final InputStream configIs = SignatureService.class.getClassLoader().getResourceAsStream(CONFIG_FILE);
 		if (configIs == null) {
 			throw new RuntimeException("No se encuentra el fichero de configuracion del servicio: " + CONFIG_FILE); //$NON-NLS-1$
 		}
-
-		Logger.getLogger("es.gob.afirma").info("1");
 
 		final Properties prop = new Properties();
 		try {
@@ -62,14 +57,10 @@ public final class SignatureService extends HttpServlet {
 			throw new RuntimeException("Error en la carga del fichero de propiedades", e); //$NON-NLS-1$
 		}
 
-		Logger.getLogger("es.gob.afirma").info("2");
-
 		if (!prop.containsKey(DOCUMENT_MANAGER_CLASS_PARAM)) {
 			throw new IllegalArgumentException(
 					"No se ha indicado el document manager (" + DOCUMENT_MANAGER_CLASS_PARAM + ") en el fichero de propiedades"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-
-		Logger.getLogger("es.gob.afirma").info("3");
 
 		Class docManagerClass;
 		try {
@@ -77,8 +68,6 @@ public final class SignatureService extends HttpServlet {
 		} catch (final ClassNotFoundException e) {
 			throw new RuntimeException("La clase DocumentManager indicada no existe: " + prop.getProperty(DOCUMENT_MANAGER_CLASS_PARAM), e); //$NON-NLS-1$
 		}
-
-		Logger.getLogger("es.gob.afirma").info("3");
 
 		try {
 			final Constructor<DocumentManager> docManagerConstructor = docManagerClass.getConstructor(Properties.class);
@@ -90,10 +79,6 @@ public final class SignatureService extends HttpServlet {
 				throw new RuntimeException("No se ha podido inicializar el DocumentManager. Debe tener un constructor vacio o que reciba un Properties", e); //$NON-NLS-1$
 			}
 		}
-
-		Logger.getLogger("es.gob.afirma").info("4");
-
-		Logger.getLogger("es.gob.afirma").info("DOC_MANAGER: " + DOC_MANAGER.getClass().getCanonicalName());
 
 	}
 
@@ -156,14 +141,16 @@ public final class SignatureService extends HttpServlet {
 
 		// Obtenemos el codigo de operacion
 		//final String subOperation = request.getParameter(PARAMETER_NAME_SUB_OPERATION);
-		final String subOperation = parameters.get(PARAMETER_NAME_SUB_OPERATION);
+		String subOperation = parameters.get(PARAMETER_NAME_SUB_OPERATION);
 		if (subOperation == null) {
-			out.print(ErrorManager.getErrorMessage(13));
-			return;
+			//TODO: Descomentar cuando se publique la segunda version de la aplicacion Android para que sea
+			// obligatorio indicar la operacion criptografica
+			subOperation = "sign"; //$NON-NLS-1$
+			//			out.print(ErrorManager.getErrorMessage(13));
+			//			return;
 		}
 
 		// Comprobamos si nos pasan los datos en la peticion, si no es que debe haber un docId para sacarlos del gestor documental
-
 		String docId = null;
 		final byte[] docBytes;
 		final String dataB64 = parameters.get(PARAMETER_NAME_DATA_PARAM);
@@ -176,14 +163,12 @@ public final class SignatureService extends HttpServlet {
 				out.print(ErrorManager.getErrorMessage(2));
 				return;
 			}
-			LOGGER.info("Recibimos el docId de longitud: " + docId.length());
 			try {
 				docBytes = DOC_MANAGER.getDocument(docId, null);
 			} catch (final IOException e) {
 				out.print(ErrorManager.getErrorMessage(14));
 				return;
 			}
-			LOGGER.info("Obtenemos los datos de longitud: " + (docBytes == null ? 0 : docBytes.length));
 		}
 
 		// Obtenemos el algoritmo de firma
@@ -222,15 +207,12 @@ public final class SignatureService extends HttpServlet {
 		// Obtenemos los parametros adicionales para la firma
 		final Properties extraParams = new Properties();
 		try {
-			LOGGER.info("Parametros extra recibidos: " + parameters.get(PARAMETER_NAME_EXTRA_PARAM));
 			if (parameters.containsKey(PARAMETER_NAME_EXTRA_PARAM)) {
 				extraParams.load(
 						new ByteArrayInputStream(
 								Base64.decode(parameters.get(PARAMETER_NAME_EXTRA_PARAM).trim(), Base64.URL_SAFE)
 								)
 						);
-
-				LOGGER.info("ExtraParams:");
 				for ( final String key : extraParams.keySet().toArray(new String[extraParams.size()])) {
 					LOGGER.info(key);
 				}
