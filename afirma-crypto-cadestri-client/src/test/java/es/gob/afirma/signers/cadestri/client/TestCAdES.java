@@ -36,22 +36,18 @@ import es.gob.afirma.core.signers.AOSigner;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class TestCAdES {
 
-	private static final String SERVER_URL = "http://172.24.22.235:8080/SignFolderMobileProxy/SignatureService"; //$NON-NLS-1$
+	private static final String SERVER_URL = "http://localhost:8080/TriPhaseSignerServer/SignatureService"; //$NON-NLS-1$
 
-	private static final String CERT_PATH = "ANF_PF_Activo.pfx"; //$NON-NLS-1$
+	private static final String CERT_PATH = "ANF PFISICA ACTIVO.pfx"; //$NON-NLS-1$
 	private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
 	private static final String CERT_ALIAS = "anf usuario activo"; //$NON-NLS-1$
 
-	private static final String CERT_PATH2 = "CATCERT GENCAT SAFP PF Identidad y Firma Reconocida de Clase 1 Caducado.pfx"; //$NON-NLS-1$
-	private static final String CERT_PASS2 = "1234"; //$NON-NLS-1$
-	private static final String CERT_ALIAS2 = "{71e526c4-0f27-4f32-8be0-90df52dcbc53}"; //$NON-NLS-1$
-
-	private static final String CERT_PATH3 = "CAMERFIRMA_PF_SW_Clave_usuario_Activo.p12"; //$NON-NLS-1$
-	private static final String CERT_PASS3 = "1111"; //$NON-NLS-1$
-	private static final String CERT_ALIAS3 = "1"; //$NON-NLS-1$
+	private static final String CERT_PATH3 = "ANF PJURIDICA ACTIVO.pfx"; //$NON-NLS-1$
+	private static final String CERT_PASS3 = "12341234"; //$NON-NLS-1$
+	private static final String CERT_ALIAS3 = "anf usuario activo"; //$NON-NLS-1$
 
 	private static final String[] DATA_FILES = {
-		"ANF_PF_Activo.pfx" //$NON-NLS-1$
+		"ANF PFISICA ACTIVO.pfx" //$NON-NLS-1$
 	};
 
 	private static final List<byte[]> DATA = new ArrayList<byte[]>(2);
@@ -78,7 +74,7 @@ public final class TestCAdES {
 		p2.setProperty("format", AOSignConstants.SIGN_FORMAT_CADES); //$NON-NLS-1$
 		p2.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
 		p2.setProperty("policyIdentifier", "urn:oid:2.16.724.1.3.1.1.2.1.8"); //$NON-NLS-1$ //$NON-NLS-2$
-		p2.setProperty("policyIdentifierHash", "V8lVVNGDCPen6VELRD1Ja8HARFk="); //$NON-NLS-1$ //$NON-NLS-2$
+		p2.setProperty("policyIdentifierHash", "7SxX3erFuH31TvAw9LZ70N7p1vA="); //$NON-NLS-1$ //$NON-NLS-2$
 		p2.setProperty("policyIdentifierHashAlgorithm", "http://www.w3.org/2000/09/xmldsig#sha1"); //$NON-NLS-1$ //$NON-NLS-2$
 		//p2.setProperty("policyQualifier", "http://www.google.com"); //$NON-NLS-1$ //$NON-NLS-2$
 		p2.setProperty("serverUrl", SERVER_URL); //$NON-NLS-1$
@@ -96,7 +92,7 @@ public final class TestCAdES {
 	/** Algoritmos de firma a probar. */
 	private final static String[] ALGOS = new String[] {
 		AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
-		AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA
+		//		AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA
 	};
 
 	/**
@@ -124,7 +120,7 @@ public final class TestCAdES {
 						continue;
 					}
 
-					prueba = "Firma CAdES del fichero " + DATA_FILES[i] + " en modo '" +  //$NON-NLS-1$ //$NON-NLS-2$
+					prueba = "Firma CAdES trifasica del fichero " + DATA_FILES[i] + " en modo '" +  //$NON-NLS-1$ //$NON-NLS-2$
 							extraParams.getProperty("mode") +  //$NON-NLS-1$
 							"' con el algoritmo ': " + //$NON-NLS-1$
 							algo +
@@ -157,7 +153,6 @@ public final class TestCAdES {
 
 		Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
 		final PrivateKeyEntry pke1 = loadKeyEntry(CERT_PATH, CERT_ALIAS, CERT_PASS);
-		final PrivateKeyEntry pke2 = loadKeyEntry(CERT_PATH2, CERT_ALIAS2, CERT_PASS2);
 		final PrivateKeyEntry pke3 = loadKeyEntry(CERT_PATH3, CERT_ALIAS3, CERT_PASS3);
 
 		final AOSigner signer = new AOCAdESTriPhaseSigner();
@@ -171,7 +166,7 @@ public final class TestCAdES {
 						continue;
 					}
 
-					prueba = "Cofirma CAdES " + DATA_FILES[i] + " en modo '" +  //$NON-NLS-1$ //$NON-NLS-2$
+					prueba = "Cofirma CAdES trifasica del fichero " + DATA_FILES[i] + " en modo '" +  //$NON-NLS-1$ //$NON-NLS-2$
 							extraParams.getProperty("mode") +  //$NON-NLS-1$
 							"' con el algoritmo ': " + //$NON-NLS-1$
 							algo +
@@ -183,7 +178,7 @@ public final class TestCAdES {
 					final byte[] sign1 = sign(signer, DATA.get(i), algo, pke1, extraParams);
 
 					// Cofirma sin indicar los datos
-					final byte[] sign2 = cosign(signer, sign1, algo, pke2, extraParams);
+					final byte[] sign2 = cosign(signer, sign1, algo, pke3, extraParams);
 
 					// Cofirma indicando los datos
 					final byte[] sign3 = cosign(signer, DATA.get(i), sign2, algo, pke3, extraParams);
