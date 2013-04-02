@@ -47,9 +47,8 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.TBSCertificateStructure;
 
-import com.sun.org.apache.xml.internal.security.utils.Base64;
-
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.signers.CounterSignTarget;
@@ -423,7 +422,6 @@ public final class CAdESTriPhaseCounterSigner {
             counterSigner = generateSignerInfo(
         		parameters.getSignatureAlgorithm(),
         		signerInfo,
-        		key,
         		certChain,
                 contentType,
                 contentDescription,
@@ -465,7 +463,6 @@ public final class CAdESTriPhaseCounterSigner {
                     		generateSignerInfo(
                 				parameters.getSignatureAlgorithm(),
                 				signerInfo,
-                				key,
                 				certChain,
                 				contentType,
                 				contentDescription,
@@ -509,7 +506,6 @@ public final class CAdESTriPhaseCounterSigner {
         		generateSignerInfo(
             		parameters.getSignatureAlgorithm(),
             		signerInfo,
-            		key,
             		certChain,
             		contentType,
             		contentDescription,
@@ -622,7 +618,6 @@ public final class CAdESTriPhaseCounterSigner {
                     		generateSignerInfo(
                 				parameters.getSignatureAlgorithm(),
                 				signerInfo,
-                				key,
                 				certChain,
                                 contentType,
                                 contentDescription,
@@ -666,7 +661,6 @@ public final class CAdESTriPhaseCounterSigner {
         		generateSignerInfo(
             		parameters.getSignatureAlgorithm(),
             		signerInfo,
-            		key,
             		certChain,
             		contentType,
             		contentDescription,
@@ -703,7 +697,6 @@ public final class CAdESTriPhaseCounterSigner {
      * @throws java.security.cert.CertificateException */
     private SignerInfo generateSignerInfo(final String signatureAlgorithm,
                                                  final SignerInfo si,
-                                                 final PrivateKey key,
                                                  final java.security.cert.Certificate[] certChain,
                                                  final String contentType,
                                                  final String contentDescription,
