@@ -140,13 +140,13 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			signingCertificateV2 = !"SHA1".equals(AOSignConstants.getDigestAlgorithmName(algorithm));	 //$NON-NLS-1$
 		}
 
-		//TODO: Crear la alternativa para firmas explicitas (se obtienen datos nulos), en las que hay que extraer el MessageDigest
-		// de la firma original
 		byte[] messageDigest = null;
 		final byte[] data = ObtainContentSignedData.obtainData(sign);
 		if (data == null) {
 			messageDigest = ObtainContentSignedData.obtainMessageDigest(sign, AOSignConstants.getDigestAlgorithmName(algorithm));
-			throw new AOException("No se han encontrado datos dentro de la firma ni una huella digital compatible con el algoritmo seleccionado"); //$NON-NLS-1$
+			if (messageDigest == null) {
+				throw new AOException("No se han encontrado datos dentro de la firma ni una huella digital compatible con el algoritmo: " + algorithm); //$NON-NLS-1$
+			}
 		}
 
 		String contentTypeOid = MimeHelper.DEFAULT_CONTENT_OID_DATA;
@@ -198,11 +198,13 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			final X509Certificate cert,
 			final Properties extraParams) throws NoSuchAlgorithmException, AOException, IOException {
 
-		//TODO: Crear la alternativa para firmas explicitas (se obtienen datos nulos), en las que hay que extraer el Messa
 		byte[] messageDigest = null;
 		final byte[] data = ObtainContentSignedData.obtainData(sign);
 		if (data == null) {
 			messageDigest = ObtainContentSignedData.obtainMessageDigest(sign, AOSignConstants.getDigestAlgorithmName(algorithm));
+			if (messageDigest == null) {
+				throw new AOException("No se han encontrado datos dentro de la firma ni una huella digital compatible con el algoritmo: " + algorithm); //$NON-NLS-1$
+			}
 		}
 
 		try {
