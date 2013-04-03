@@ -123,12 +123,7 @@ public final class SignatureService extends HttpServlet {
 			}
 		}
 
-		LOGGER.info("-------------- CLAVES:");
-		for (final String key : parameters.keySet().toArray(new String[parameters.size()])) {
-			LOGGER.info(key);
-		}
-		LOGGER.info("--------------");
-
+		LOGGER.info("CLAVES: " + parameters.keySet());
 		LOGGER.info("Operacion: " + parameters.get(PARAMETER_NAME_OPERATION));
 
 		// Obtenemos el codigo de operacion
