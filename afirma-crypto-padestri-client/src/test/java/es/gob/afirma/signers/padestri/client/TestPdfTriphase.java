@@ -10,6 +10,9 @@
 
 package es.gob.afirma.signers.padestri.client;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
@@ -18,7 +21,6 @@ import java.util.Properties;
 import junit.framework.Assert;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -30,25 +32,32 @@ public class TestPdfTriphase {
 
 	/** Nombre de la propiedad de URL del servidor de firma trif&aacute;sica. */
 	private static final String PROPERTY_NAME_SIGN_SERVER_URL = "serverUrl"; //$NON-NLS-1$
-	private static final String PROPERTY_VALUE_SIGN_SERVER_URL = "http://localhost:8080/afirma-crypto-padestri-sample/SignatureService"; //$NON-NLS-1$
+	private static final String PROPERTY_VALUE_SIGN_SERVER_URL = "http://localhost:8080/TriPhaseSignerServer/SignatureService"; //$NON-NLS-1$
 
 	private static final String PROPERTY_NAME_DOC_ID = "documentId"; //$NON-NLS-1$
-	private static final String PROPERTY_VALUE_DOC_ID = "docIdPrueba"; //$NON-NLS-1$
+	//private static final String PROPERTY_VALUE_DOC_ID = "docIdPrueba"; //$NON-NLS-1$
+
+	private static final String PDF_FILENAME = "TEST_PDF.pdf"; //$NON-NLS-1$
 
 	private static final String PROPERTY_NAME_ATTACH = "attach"; //$NON-NLS-1$
 	private static final String PROPERTY_NAME_ATTACH_FILENAME = "attachFileName"; //$NON-NLS-1$
 	private static final String PROPERTY_NAME_ATTACH_DESCRIPTION = "attachDescription"; //$NON-NLS-1$
 
 
-    private static final String CERT_PATH = "ANF_PF_Activo.pfx"; //$NON-NLS-1$
-    private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
-    private static final String CERT_ALIAS = "anf usuario activo"; //$NON-NLS-1$
+	private static final String CERT_PATH = "ANF PFISICA ACTIVO.pfx"; //$NON-NLS-1$
+	private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
+	private static final String CERT_ALIAS = "anf usuario activo"; //$NON-NLS-1$
 
-    private static final String TEST_IMAGE_FILE = "splash.png"; //$NON-NLS-1$
+	private static final String CERT_PATH2 = "ANF PJURIDICA ACTIVO.pfx"; //$NON-NLS-1$
+	private static final String CERT_PASS2 = "12341234"; //$NON-NLS-1$
+	private static final String CERT_ALIAS2 = "anf usuario activo"; //$NON-NLS-1$
 
-    private PrivateKeyEntry pke;
+	private static final String TEST_IMAGE_FILE = "splash.png"; //$NON-NLS-1$
 
-    private Properties serverConfig;
+	private PrivateKeyEntry pke;
+	private PrivateKeyEntry pke2;
+
+	private Properties serverConfig;
 
 	/** Carga el almac&acute;n de pruebas.
 	 * @throws Exception */
@@ -56,40 +65,56 @@ public class TestPdfTriphase {
 	public void loadKeystore() throws Exception {
 
 		// Cargamos la referencia a la clave privada
-        final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
-        this.pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+		ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+		this.pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
 
-        // Establecemos la configuracion
-        this.serverConfig = new Properties();
-        this.serverConfig.setProperty(PROPERTY_NAME_SIGN_SERVER_URL, PROPERTY_VALUE_SIGN_SERVER_URL);
-        this.serverConfig.setProperty(PROPERTY_NAME_DOC_ID, PROPERTY_VALUE_DOC_ID);
+		final KeyStore ks2 = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+		ks2.load(ClassLoader.getSystemResourceAsStream(CERT_PATH2), CERT_PASS2.toCharArray());
+		this.pke2 = (PrivateKeyEntry) ks2.getEntry(CERT_ALIAS2, new KeyStore.PasswordProtection(CERT_PASS2.toCharArray()));
+
+
+		// Establecemos la configuracion
+		this.serverConfig = new Properties();
+		this.serverConfig.setProperty(PROPERTY_NAME_SIGN_SERVER_URL, PROPERTY_VALUE_SIGN_SERVER_URL);
+		//		this.serverConfig.setProperty(PROPERTY_NAME_DOC_ID, PROPERTY_VALUE_DOC_ID);
+
+		final String base64 = loadFileOnBase64(PDF_FILENAME);
+		//		final int dataLength = Base64.decode(base64, Base64.URL_SAFE).length;
+
+		this.serverConfig.setProperty(PROPERTY_NAME_DOC_ID, base64);
+
+		//		System.out.println("Base64 final: " + base64.substring(base64.length() - 100));
+		//
+		//		System.out.println("PDF length: " + dataLength);
+		//		System.out.println(new String(Arrays.copyOfRange(Base64.decode(this.serverConfig.getProperty(PROPERTY_NAME_DOC_ID)), dataLength - 100, dataLength)));
 	}
 
 	/** Prueba de firma trif&aacute;sica normal.
 	 * @throws Exception */
-	@Ignore
 	@Test
 	public void firma() throws Exception {
 		final AOSigner signer = new AOPDFTriPhaseSigner();
 
-		final Properties config = new Properties(this.serverConfig);
+		final Properties config = new Properties();
 
 		for (final String key : this.serverConfig.keySet().toArray(new String[this.serverConfig.size()])) {
 			config.setProperty(key, this.serverConfig.getProperty(key));
 		}
-		System.out.println(config.size());
 
-        final byte[] result = signer.sign(
-    		null,
-    		"SHA512withRSA",  //$NON-NLS-1$
-    		this.pke.getPrivateKey(),
-    		this.pke.getCertificateChain(),
-    		config
-		);
+		final byte[] result = signer.sign(
+				null,
+				"SHA512withRSA",  //$NON-NLS-1$
+				this.pke.getPrivateKey(),
+				this.pke.getCertificateChain(),
+				config
+				);
 
-        Assert.assertNotNull("Error durante el proceso de firma, resultado nulo", result); //$NON-NLS-1$
-        Assert.assertEquals("No se recibió un OK desde servidor", "OK", new String(result)); //$NON-NLS-1$ //$NON-NLS-2$
+		Assert.assertNotNull("Error durante el proceso de firma, resultado nulo", result); //$NON-NLS-1$
+		Assert.assertFalse("Se recibio un codigo de error desde el servidor", new String(result).startsWith("ERR-")); //$NON-NLS-1$ //$NON-NLS-2$
+
+		final File tempFile = savePdfTempFile(result);
+		System.out.println("La firma se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 	}
 
 	/** Prueba de firma trif&aacute;sica con adjunto en el PDF.
@@ -98,7 +123,7 @@ public class TestPdfTriphase {
 	public void firmaConAdjunto() throws Exception {
 		final AOSigner signer = new AOPDFTriPhaseSigner();
 
-		final Properties config = new Properties(this.serverConfig);
+		final Properties config = new Properties();
 		for (final String key : this.serverConfig.keySet().toArray(new String[this.serverConfig.size()])) {
 			config.setProperty(key, this.serverConfig.getProperty(key));
 		}
@@ -107,17 +132,19 @@ public class TestPdfTriphase {
 		config.setProperty(PROPERTY_NAME_ATTACH_FILENAME, "splash.png"); //$NON-NLS-1$
 		config.setProperty(PROPERTY_NAME_ATTACH_DESCRIPTION, "Imagen adjunta de prueba"); //$NON-NLS-1$
 
-        final byte[] result = signer.sign(
-    		null,
-    		"SHA512withRSA", //$NON-NLS-1$
-    		this.pke.getPrivateKey(),
-    		this.pke.getCertificateChain(),
-    		config
-		);
+		final byte[] result = signer.sign(
+				null,
+				"SHA512withRSA", //$NON-NLS-1$
+				this.pke.getPrivateKey(),
+				this.pke.getCertificateChain(),
+				config
+				);
 
-        Assert.assertNotNull("Error durante el proceso de firma, resultado nulo", result); //$NON-NLS-1$
-        Assert.assertTrue("Se recibio un codigo de error desde el servidor", !new String(result).startsWith("ERR-")); //$NON-NLS-1$ //$NON-NLS-2$
-        System.out.println(new String(result));
+		Assert.assertNotNull("Error durante el proceso de firma, resultado nulo", result); //$NON-NLS-1$
+		Assert.assertFalse("Se recibio un codigo de error desde el servidor", new String(result).startsWith("ERR-")); //$NON-NLS-1$ //$NON-NLS-2$
+
+		final File tempFile = savePdfTempFile(result);
+		System.out.println("La firma con adjunto se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 
 	}
 
@@ -126,6 +153,55 @@ public class TestPdfTriphase {
 		final byte[] encoded = AOUtil.getDataFromInputStream(is);
 		is.close();
 
-		return Base64.encode(encoded);
+		return Base64.encodeBytes(encoded, Base64.URL_SAFE);
+	}
+
+	/** Prueba de firma trif&aacute;sica normal.
+	 * @throws Exception */
+	@Test
+	public void cofirma() throws Exception {
+		final AOSigner signer = new AOPDFTriPhaseSigner();
+
+		final Properties config = new Properties(this.serverConfig);
+
+		for (final String key : this.serverConfig.keySet().toArray(new String[this.serverConfig.size()])) {
+			config.setProperty(key, this.serverConfig.getProperty(key));
+		}
+
+		final byte[] signature = signer.sign(
+				null,
+				"SHA512withRSA",  //$NON-NLS-1$
+				this.pke.getPrivateKey(),
+				this.pke.getCertificateChain(),
+				config
+				);
+
+		Assert.assertNotNull("Error durante el proceso de firma, resultado nulo", signature); //$NON-NLS-1$
+		Assert.assertFalse("Se recibio un codigo de error desde el servidor", new String(signature).startsWith("ERR-")); //$NON-NLS-1$ //$NON-NLS-2$
+
+		config.setProperty(PROPERTY_NAME_DOC_ID, Base64.encodeBytes(signature, Base64.URL_SAFE));
+
+		final byte[] coSignature = signer.cosign(
+				null,
+				"SHA512withRSA",  //$NON-NLS-1$
+				this.pke2.getPrivateKey(),
+				this.pke2.getCertificateChain(),
+				config
+				);
+
+		Assert.assertNotNull("Error durante el proceso de firma, resultado nulo", coSignature); //$NON-NLS-1$
+		Assert.assertFalse("Se recibio un codigo de error desde el servidor", new String(coSignature).startsWith("ERR-")); //$NON-NLS-1$ //$NON-NLS-2$
+
+		final File tempFile = savePdfTempFile(coSignature);
+		System.out.println("La cofirma se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
+	}
+
+	private File savePdfTempFile(final byte[] content) throws IOException {
+		final File tempFile = File.createTempFile("test", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
+		final FileOutputStream fos = new FileOutputStream(tempFile);
+		fos.write(content);
+		fos.close();
+
+		return tempFile;
 	}
 }
