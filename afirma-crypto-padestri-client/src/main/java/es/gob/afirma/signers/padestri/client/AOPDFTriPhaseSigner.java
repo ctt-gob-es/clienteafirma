@@ -122,8 +122,6 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 		}
 		configParams.remove(PROPERTY_NAME_SIGN_SERVER_URL);
 
-		LOGGER.info("DATOS: " + new String(data));
-
 		String documentId = configParams.getProperty(PROPERTY_NAME_DOCUMENT_ID);
 		if (documentId == null || "".equals(documentId)) { //$NON-NLS-1$
 			if (data != null) {
@@ -301,7 +299,7 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 			final PrivateKey key,
 			final Certificate[] certChain,
 			final Properties extraParams) throws AOException {
-		return sign(null, null, key, certChain, extraParams);
+		return sign(sign, algorithm, key, certChain, extraParams);
 	}
 
 	@Override
@@ -310,7 +308,7 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 			final PrivateKey key,
 			final Certificate[] certChain,
 			final Properties extraParams) throws AOException {
-		return sign(null, null, key, certChain, extraParams);
+		return sign(sign, algorithm, key, certChain, extraParams);
 	}
 
 	@Override
