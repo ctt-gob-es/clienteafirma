@@ -98,7 +98,7 @@ public class AOKeyStoreManager {
     		                          final Object[] params) throws AOKeyStoreManagerException,
     		                                                        IOException {
         // En el "params" debemos traer los parametros:
-        // [0] - p11lib: Biblioteca PKCS#11, debe estar en el Path (Windows) o en el LD_LIBRARY_PATH (UNIX, Linux, Mac OS X)
+        // [0] -p11lib: Biblioteca PKCS#11, debe estar en el Path (Windows) o en el LD_LIBRARY_PATH (UNIX, Linux, Mac OS X)
         // [1] -desc: Descripcion del token PKCS#11 (opcional)
         // [2] -slot: Numero de lector de tarjeta (Sistema Operativo) [OPCIONAL]
 
@@ -469,7 +469,7 @@ public class AOKeyStoreManager {
      * @param type
      *        Tipo del almac&eacute;n de claves
      * @param store
-     *        Flujo para la lectura directa del almac&acute;n de claves
+     *        Flujo para la lectura directa del almac&eacute;n de claves
      *        (solo para los almacenes en disco)
      * @param pssCallBack
      *        CallBack encargado de recuperar la contrasenya del
