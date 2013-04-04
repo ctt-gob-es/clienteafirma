@@ -224,11 +224,12 @@ public final class KeyStoreUtilities {
                     continue;
                 }
 
-                if (tmpCert == null) { //TODO: Revisar si debe pasarse a la siguiente iteracion
+                if (tmpCert == null) {
                     LOGGER.warning("El KeyStore no permite extraer el certificado publico para el siguiente alias: " + al); //$NON-NLS-1$
+                    continue;
                 }
 
-                if (!showExpiredCertificates && tmpCert != null) {
+                if (!showExpiredCertificates) {
                     try {
                         tmpCert.checkValidity();
                     }
@@ -241,7 +242,7 @@ public final class KeyStoreUtilities {
                     }
                 }
 
-                if (checkPrivateKeys && tmpCert != null) {
+                if (checkPrivateKeys) {
                     try {
                         if ("KeychainStore".equals(ks.getType())) { //$NON-NLS-1$
                             final KeyStore tmpKs = ks;
