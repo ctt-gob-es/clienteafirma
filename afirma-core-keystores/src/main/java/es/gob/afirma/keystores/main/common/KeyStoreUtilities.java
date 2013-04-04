@@ -52,6 +52,15 @@ public final class KeyStoreUtilities {
 
     private static final String OPENSC_USR_LIB_LINUX = "/usr/lib/opensc-pkcs11.so"; //$NON-NLS-1$
 
+    /** Nombre de los ficheros de biblioteca de los controladores de la FNMT para DNIe y CERES
+     * que no tienen implementados el algoritmo SHA1withRSA.
+     */
+    private static final String[] FNMT_PKCS11_LIBS_WITHOUT_SHA1 = {
+    	"DNIe_P11_priv.dll", //$NON-NLS-1$
+    	"DNIe_P11_pub.dll", //$NON-NLS-1$
+    	"FNMT_P11.dll" //$NON-NLS-1$
+    };
+
     /** Crea las l&iacute;neas de configuraci&oacute;n para el proveedor PKCS#11
      * de Sun.
      * @param lib Nombre (con o sin ruta) de la biblioteca PKCS#11
@@ -89,6 +98,15 @@ public final class KeyStoreUtilities {
 
         if (slot != null) {
             buffer.append("slot=").append(slot); //$NON-NLS-1$
+        }
+
+        // Por un problema con la version 10 del driver de la FNMT para el DNIe y tarjetas CERES
+        // debemos deshabilitar el mecanismo del algorimto de firma con SHA1 para que lo emule
+        for (final String problematicLib : FNMT_PKCS11_LIBS_WITHOUT_SHA1) {
+        	if (problematicLib.equalsIgnoreCase(new java.io.File(lib).getName())) {
+        		buffer.append("\r\ndisabledMechanisms={ CKM_SHA1_RSA_PKCS }"); //$NON-NLS-1$
+        		break;
+        	}
         }
 
         LOGGER.info("Creada configuracion PKCS#11:\r\n" + buffer.toString()); //$NON-NLS-1$
