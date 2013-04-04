@@ -58,7 +58,9 @@ public final class KeyStoreUtilities {
     private static final String[] FNMT_PKCS11_LIBS_WITHOUT_SHA1 = {
     	"DNIe_P11_priv.dll", //$NON-NLS-1$
     	"DNIe_P11_pub.dll", //$NON-NLS-1$
-    	"FNMT_P11.dll" //$NON-NLS-1$
+    	"FNMT_P11.dll", //$NON-NLS-1$
+    	"UsrPkcs11.dll", //$NON-NLS-1$
+    	"UsrPubPkcs11.dll" //$NON-NLS-1$
     };
 
     /** Crea las l&iacute;neas de configuraci&oacute;n para el proveedor PKCS#11
