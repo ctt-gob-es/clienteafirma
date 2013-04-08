@@ -15,6 +15,7 @@ import org.xml.sax.SAXException;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.signers.xadestri.server.XAdESTriPhaseSignerServerSide;
 import es.gob.afirma.signers.xadestri.server.XmlPreSignException;
 import es.gob.afirma.signers.xadestri.server.XmlPreSignResult;
@@ -140,6 +141,21 @@ final class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 		return new String(Base64.decode(extraParams.getProperty(PROPERTY_NAME_SESSION_DATA))).replace(
 				XAdESTriPhaseSignerServerSide.REPLACEMENT_STRING, pkcs1Base64Sign.trim()).getBytes();
+	}
+
+	@Override
+	public byte[] preProcessPreCounterSign(final byte[] sign, final String algorithm,
+			final X509Certificate cert, final Properties extraParams,
+			final CounterSignTarget targets) throws IOException, AOException {
+		throw new UnsupportedOperationException("La operacion de contrafirma trifasica no esta soportada."); //$NON-NLS-1$
+	}
+
+	@Override
+	public byte[] preProcessPostCounterSign(final byte[] sign, final String algorithm,
+			final X509Certificate cert, final Properties extraParams,
+			final CounterSignTarget targets) throws NoSuchAlgorithmException,
+			AOException, IOException {
+		throw new UnsupportedOperationException("La operacion de contrafirma trifasica no esta soportada."); //$NON-NLS-1$
 	}
 
 }

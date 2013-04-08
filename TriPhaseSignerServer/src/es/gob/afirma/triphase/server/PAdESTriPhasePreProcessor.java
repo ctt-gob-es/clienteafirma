@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.signers.padestri.server.PAdESTriPhaseSignerServerSide;
 import es.gob.afirma.signers.padestri.server.PAdESTriPhaseSignerServerSide.PdfPreSignResult;
 
@@ -34,45 +35,45 @@ final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 	@Override
 	public byte[] preProcessPreSign(final byte[] docBytes,
-			                        final String algorithm,
-			                        final X509Certificate signerCert,
-			                        final Properties extraParams) throws IOException, AOException {
+			final String algorithm,
+			final X509Certificate signerCert,
+			final Properties extraParams) throws IOException, AOException {
 
 
 		final GregorianCalendar signTime = new GregorianCalendar();
 
-        // Primera fase (servidor)
+		// Primera fase (servidor)
 		final PdfPreSignResult preSignature = PAdESTriPhaseSignerServerSide.preSign(
-		     AOSignConstants.getDigestAlgorithmName(algorithm),
-		     docBytes,
-		     new X509Certificate[] { signerCert },
-		     signTime,
-		     extraParams
-		);
+				AOSignConstants.getDigestAlgorithmName(algorithm),
+				docBytes,
+				new X509Certificate[] { signerCert },
+				signTime,
+				extraParams
+				);
 
-        // Ahora pasamos al cliente 2 cosas:
-        // 1.- La prefirma para que haga el PKCS#1
-        // 2.- Los datos de sesion necesarios para recomponer la firma con el PKCS#1 correcto. Estos son:
+		// Ahora pasamos al cliente 2 cosas:
+		// 1.- La prefirma para que haga el PKCS#1
+		// 2.- Los datos de sesion necesarios para recomponer la firma con el PKCS#1 correcto. Estos son:
 		//    - La fecha generada en el servidor para reutilizarla en la postfirma
-        //    - El ID de PDF para reutilizarlo en la postfirma
+		//    - El ID de PDF para reutilizarlo en la postfirma
 		//    - La propia prefirma
-        final StringBuilder builder = new StringBuilder();
-        builder.append(PROPERTY_NAME_SIGN_TIME).append("=").append(Long.toString(signTime.getTimeInMillis())).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		final StringBuilder builder = new StringBuilder();
+		builder.append(PROPERTY_NAME_SIGN_TIME).append("=").append(Long.toString(signTime.getTimeInMillis())).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		builder.append(PROPERTY_NAME_PDF_UNIQUE_ID).append("=").append(preSignature.getFileID()).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		builder.append(PROPERTY_NAME_PRESIGN).append("=").append(Base64.encode(preSignature.getPreSign())); //$NON-NLS-1$
 
-     	final StringBuilder builder2 = new StringBuilder();
-        builder2.append(PROPERTY_NAME_PRESIGN).append("=").append(Base64.encode(preSignature.getPreSign())).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		final StringBuilder builder2 = new StringBuilder();
+		builder2.append(PROPERTY_NAME_PRESIGN).append("=").append(Base64.encode(preSignature.getPreSign())).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		builder2.append(PROPERTY_NAME_SESSION_DATA).append("=").append(Base64.encode(builder.toString().getBytes())); //$NON-NLS-1$
 
-        return builder2.toString().getBytes();
+		return builder2.toString().getBytes();
 	}
 
 	@Override
 	public byte[] preProcessPostSign(final byte[] docBytes,
-			                         final String algorithm,
-			                         final X509Certificate signerCert,
-			                         final Properties extraParams) throws NoSuchAlgorithmException, AOException, IOException {
+			final String algorithm,
+			final X509Certificate signerCert,
+			final Properties extraParams) throws NoSuchAlgorithmException, AOException, IOException {
 
 		final Properties sessionData = new Properties();
 		sessionData.load(new ByteArrayInputStream(Base64.decode(extraParams.getProperty(PROPERTY_NAME_SESSION_DATA))));
@@ -92,34 +93,49 @@ final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 		// Datos firmados
 		return PAdESTriPhaseSignerServerSide.postSign(
-			AOSignConstants.getDigestAlgorithmName(algorithm),
-			docBytes,
-			new X509Certificate[] { signerCert },
-			extraParams,
-			Base64.decode(extraParams.getProperty(PROPERTY_NAME_PKCS1_SIGN)),
-			Base64.decode(sessionData.getProperty(PROPERTY_NAME_PRESIGN)),
-			sessionData.getProperty(PROPERTY_NAME_PDF_UNIQUE_ID),
-			cal,
-			null,
-			enhancerConfig
-		);
+				AOSignConstants.getDigestAlgorithmName(algorithm),
+				docBytes,
+				new X509Certificate[] { signerCert },
+				extraParams,
+				Base64.decode(extraParams.getProperty(PROPERTY_NAME_PKCS1_SIGN)),
+				Base64.decode(sessionData.getProperty(PROPERTY_NAME_PRESIGN)),
+				sessionData.getProperty(PROPERTY_NAME_PDF_UNIQUE_ID),
+				cal,
+				null,
+				enhancerConfig
+				);
 
 	}
 
 	@Override
 	public byte[] preProcessPreCoSign(final byte[] data,
-			                          final String algorithm,
-			                          final X509Certificate cert,
-			                          final Properties extraParams) throws IOException, AOException {
+			final String algorithm,
+			final X509Certificate cert,
+			final Properties extraParams) throws IOException, AOException {
 		return preProcessPreSign(data, algorithm, cert, extraParams);
 	}
 
 	@Override
 	public byte[] preProcessPostCoSign(final byte[] data,
-			                           final String algorithm,
-			                           final X509Certificate cert,
-			                           final Properties extraParams) throws NoSuchAlgorithmException, AOException, IOException {
+			final String algorithm,
+			final X509Certificate cert,
+			final Properties extraParams) throws NoSuchAlgorithmException, AOException, IOException {
 		return preProcessPostSign(data, algorithm, cert, extraParams);
+	}
+
+	@Override
+	public byte[] preProcessPreCounterSign(final byte[] sign, final String algorithm,
+			final X509Certificate cert, final Properties extraParams,
+			final CounterSignTarget targets) throws IOException, AOException {
+		throw new UnsupportedOperationException("La operacion de contrafirma no esta soportada en PAdES."); //$NON-NLS-1$
+	}
+
+	@Override
+	public byte[] preProcessPostCounterSign(final byte[] sign, final String algorithm,
+			final X509Certificate cert, final Properties extraParams,
+			final CounterSignTarget targets) throws NoSuchAlgorithmException,
+			AOException, IOException {
+		throw new UnsupportedOperationException("La operacion de contrafirma no esta soportada en PAdES."); //$NON-NLS-1$
 	}
 
 }

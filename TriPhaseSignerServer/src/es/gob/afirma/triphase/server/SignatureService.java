@@ -23,6 +23,7 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.core.signers.CounterSignTarget;
 
 // http://localhost:8080/afirma-crypto-padestri-sample/SignatureService?doc=1&op=0&algo=SHA1withRSA&format=PAdES&cert=AAAA
 
@@ -90,6 +91,7 @@ public final class SignatureService extends HttpServlet {
 
 	private static final String PARAMETER_VALUE_SUB_OPERATION_SIGN = "sign"; //$NON-NLS-1$
 	private static final String PARAMETER_VALUE_SUB_OPERATION_COSIGN = "cosign"; //$NON-NLS-1$
+	private static final String PARAMETER_VALUE_SUB_OPERATION_COUNTERSIGN = "countersign"; //$NON-NLS-1$
 
 	// Parametros que necesitamos para la prefirma
 	private static final String PARAMETER_NAME_DOCID = "doc"; //$NON-NLS-1$
@@ -97,6 +99,9 @@ public final class SignatureService extends HttpServlet {
 	private static final String PARAMETER_NAME_FORMAT = "format"; //$NON-NLS-1$
 	private static final String PARAMETER_NAME_CERT = "cert"; //$NON-NLS-1$
 	private static final String PARAMETER_NAME_EXTRA_PARAM = "params"; //$NON-NLS-1$
+
+	/** Nombre del par&aacute;metro que identifica los nodos que deben contrafirmarse. */
+	private static final String PARAMETER_NAME_TARGET_TYPE = "targets"; //$NON-NLS-1$
 
 	/** Par&aacute;metro con los datos. Si no aparece se recuperar&aacute;n a partir de {@link #PARAMETER_NAME_DOCID}. */
 	private static final String PARAMETER_NAME_DATA_PARAM = "dat"; //$NON-NLS-1$
@@ -240,11 +245,18 @@ public final class SignatureService extends HttpServlet {
 		if (OPERATION_PRESIGN.equals(operation)) {
 			try {
 				final byte[] preRes;
-				if (PARAMETER_VALUE_SUB_OPERATION_COSIGN.equals(subOperation)) {
+				if (PARAMETER_VALUE_SUB_OPERATION_SIGN.equals(subOperation)) {
+					preRes = prep.preProcessPreSign(docBytes, algorithm, signerCert, extraParams);
+				}
+				else if (PARAMETER_VALUE_SUB_OPERATION_COSIGN.equals(subOperation)) {
 					preRes = prep.preProcessPreCoSign(docBytes, algorithm, signerCert, extraParams);
 				}
-				else if (PARAMETER_VALUE_SUB_OPERATION_SIGN.equals(subOperation)) {
-					preRes = prep.preProcessPreSign(docBytes, algorithm, signerCert, extraParams);
+				else if (PARAMETER_VALUE_SUB_OPERATION_COUNTERSIGN.equals(subOperation)) {
+					CounterSignTarget target = CounterSignTarget.LEAFS;
+					if (parameters.containsKey(PARAMETER_NAME_TARGET_TYPE)) {
+						target = CounterSignTarget.valueOf(parameters.get(PARAMETER_NAME_TARGET_TYPE));
+					}
+					preRes = prep.preProcessPreCounterSign(docBytes, algorithm, signerCert, extraParams, target);
 				}
 				else {
 					throw new AOException("No se reconoce el codigo de sub-operacion: " + subOperation); //$NON-NLS-1$
@@ -267,11 +279,18 @@ public final class SignatureService extends HttpServlet {
 
 			final byte[] signedDoc;
 			try {
-				if (PARAMETER_VALUE_SUB_OPERATION_COSIGN.equals(subOperation)) {
+				if (PARAMETER_VALUE_SUB_OPERATION_SIGN.equals(subOperation)) {
+					signedDoc = prep.preProcessPostSign(docBytes, algorithm, signerCert, extraParams);
+				}
+				else if (PARAMETER_VALUE_SUB_OPERATION_COSIGN.equals(subOperation)) {
 					signedDoc = prep.preProcessPostCoSign(docBytes, algorithm, signerCert, extraParams);
 				}
-				else if (PARAMETER_VALUE_SUB_OPERATION_SIGN.equals(subOperation)) {
-					signedDoc = prep.preProcessPostSign(docBytes, algorithm, signerCert, extraParams);
+				else if (PARAMETER_VALUE_SUB_OPERATION_COUNTERSIGN.equals(subOperation)) {
+					CounterSignTarget target = CounterSignTarget.LEAFS;
+					if (parameters.containsKey(PARAMETER_NAME_TARGET_TYPE)) {
+						target = CounterSignTarget.valueOf(parameters.get(PARAMETER_NAME_TARGET_TYPE));
+					}
+					signedDoc = prep.preProcessPostCounterSign(docBytes, algorithm, signerCert, extraParams, target);
 				}
 				else {
 					throw new AOException("No se reconoce el codigo de sub-operacion: " + subOperation); //$NON-NLS-1$

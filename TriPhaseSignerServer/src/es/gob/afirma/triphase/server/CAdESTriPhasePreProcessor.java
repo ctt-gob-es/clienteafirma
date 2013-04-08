@@ -5,6 +5,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -14,9 +15,14 @@ import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
+import es.gob.afirma.core.signers.CounterSignTarget;
+import es.gob.afirma.signers.cades.AOCAdESSigner;
 import es.gob.afirma.signers.cades.CAdESTriPhaseSigner;
 import es.gob.afirma.signers.multi.cades.CAdESTriPhaseCoSigner;
+import es.gob.afirma.signers.multi.cades.CAdESTriPhaseCounterSigner;
+import es.gob.afirma.signers.multi.cades.CAdESTriPhaseCounterSigner.CAdESPreCounterSignResult;
 import es.gob.afirma.signers.pkcs7.ObtainContentSignedData;
+import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 
 final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
@@ -220,5 +226,113 @@ final class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		catch (final CertificateEncodingException e) {
 			throw new AOException("Error de la postcofirma CAdES", e); //$NON-NLS-1$
 		}
+	}
+
+	@Override
+	public byte[] preProcessPreCounterSign(final byte[] sign, final String algorithm,
+			final X509Certificate cert, final Properties extraParams, final CounterSignTarget targetType) throws IOException, AOException {
+
+		final Properties config = extraParams != null ? extraParams : new Properties();
+
+		boolean signingCertificateV2;
+		if (AOSignConstants.isSHA2SignatureAlgorithm(algorithm)) {
+			signingCertificateV2 = true;
+		}
+		else if (config.containsKey("signingCertificateV2")) { //$NON-NLS-1$
+			signingCertificateV2 = Boolean.parseBoolean(config.getProperty("signingCertificateV2")); //$NON-NLS-1$
+		}
+		else {
+			signingCertificateV2 = !"SHA1".equals(AOSignConstants.getDigestAlgorithmName(algorithm));	 //$NON-NLS-1$
+		}
+
+		String contentTypeOid = MimeHelper.DEFAULT_CONTENT_OID_DATA;
+		String contentDescription = MimeHelper.DEFAULT_CONTENT_DESCRIPTION;
+		final byte[] data = new AOCAdESSigner().getData(sign);
+		if (data != null) {
+			final MimeHelper mimeHelper = new MimeHelper(data);
+			contentDescription = mimeHelper.getDescription();
+			contentTypeOid = MimeHelper.transformMimeTypeToOid(mimeHelper.getMimeType());
+		}
+
+		final CAdESPreCounterSignResult preSign;
+		try {
+			preSign = new CAdESTriPhaseCounterSigner().preCounterSign(
+					new P7ContentSignerParameters(
+							sign,
+							algorithm
+							),
+							sign,
+							targetType,
+							null,	// La clave privada no es necesaria para la prefirma
+							new X509Certificate[] { cert },
+							new AdESPolicy(config),
+							signingCertificateV2,
+							contentTypeOid,
+							contentDescription
+					);
+		}
+		catch (final Exception e) {
+			throw new AOException("Error generando la PreContrafirma CAdES: " + e, e); //$NON-NLS-1$
+		}
+
+		// Ahora pasamos al cliente los datos de la prefirma
+		final StringBuilder builder = new StringBuilder();
+		builder.append(PROPERTY_NAME_SESSION_DATA).append("=").append(Base64.encode(preSign.toString().getBytes())); //$NON-NLS-1$
+
+		return builder.toString().getBytes();
+	}
+
+	@Override
+	public byte[] preProcessPostCounterSign(final byte[] sign, final String algorithm,
+			final X509Certificate cert, final Properties extraParams, final CounterSignTarget targets)
+					throws NoSuchAlgorithmException, AOException, IOException {
+
+		if (!extraParams.containsKey(CAdESTriPhaseCounterSigner.KEY_PKCS1_SIGN_COUNT) ||
+				!extraParams.containsKey(CAdESTriPhaseCounterSigner.KEY_SIGN)) {
+			throw new AOException("La firma no contiene las claves de propiedades obligatorias"); //$NON-NLS-1$
+		}
+
+		// Ahora vamos sustitutendo los PKCS#1 en la firma
+		byte[] signPlacement = Base64.decode(extraParams.getProperty(CAdESTriPhaseCounterSigner.KEY_SIGN));
+		final int p1Count = Integer.parseInt(extraParams.getProperty(CAdESTriPhaseCounterSigner.KEY_PKCS1_SIGN_COUNT));
+		for (int i=0;i<p1Count;i++) {
+			// El PKCS#1 de verdad
+			final byte[] realP1 = Base64.decode(extraParams.getProperty(CAdESTriPhaseCounterSigner.KEY_PKCS1_SIGN + '.' + Integer.toString(i)));
+			// El troncho a buscar y sustituir
+			final byte[] hop = new byte[CAdESTriPhaseCounterSigner.PKCS1_DEFAULT_SIZE];
+			Arrays.fill(hop, (byte) Integer.toString(i).toCharArray()[0]);
+			signPlacement = searchAndReplace(signPlacement, hop, realP1);
+		}
+
+		return signPlacement;
+	}
+
+	private static byte[] searchAndReplace(final byte[] array, final byte[] search, final byte[] replace) {
+		if (search.length != replace.length) {
+			return array;
+		}
+		int p = searchFor(array, search);
+		if (p == -1) {
+			throw new IllegalArgumentException("No se ha encontrado la cadena a sustituir"); //$NON-NLS-1$
+		}
+		final byte[] result = Arrays.copyOf(array, array.length);
+		for (final byte element : replace) {
+			result[p] = element;
+			p++;
+		}
+		return result;
+	}
+
+	private static int searchFor(final byte[] array, final byte[] subArray) {
+		if (subArray.length > array.length) {
+			return -1;
+		}
+		final int p = new String(array).indexOf(new String(subArray));
+		for (int i = 1; i < subArray.length; i++) {
+			if (array[p + i] != subArray[i]) {
+				return -1;
+			}
+		}
+		return p;
 	}
 }
