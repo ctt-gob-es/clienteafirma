@@ -203,7 +203,8 @@ public final class QualifiedCertificatesFilter extends CertificateFilter {
 	 * Comprueba que el KeyUsage del certificado coincide con el patr&oacute;n indicado.
 	 * @param certKeyUsages KeyUsages del certificado.
 	 * @param pattern Patr&oacute;n que debe cumplir el certificado.
-	 * @return
+	 * @return {@code true} si el KeyUsage se corresponde con el patr&oacute;n,
+	 * {@code false} en caso contrario.
 	 */
 	private static boolean checkKeyUsages(final boolean[] certKeyUsages, final Boolean[] pattern) {
 		for (int i = 0; i < pattern.length; i++) {
