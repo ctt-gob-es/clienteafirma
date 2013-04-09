@@ -18,7 +18,7 @@ public interface DocumentManager {
 	 * @param id Identificador del documento original no firmado.
 	 * @param data Datos firmados.
 	 * @param config Par&aacute;metros para la configuraci&oacute;n del guardado del documento.
-	 * @return Identificador del nuevo documento.
+	 * @return Identificador del nuevo documento codificado en base 64.
 	 * @throws IOException Cuando ocurre alg&uacute;n problema con la recuperaci&oacute;n */
 	String storeDocument(final String id, final byte[] data, final Properties config) throws IOException;
 }
