@@ -6,7 +6,7 @@ import java.security.PrivilegedAction;
  * Acci&oacute;n privilegiada para la recuperaci&oacute;n de una propiedad del sistema.
  * @author Carlos Gamuci Mill&aacute;n
  */
-public class GetPropertyAction implements PrivilegedAction<String> {
+final class GetPropertyAction implements PrivilegedAction<String> {
 
 	private final String property;
 
