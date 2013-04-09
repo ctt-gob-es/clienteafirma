@@ -135,6 +135,7 @@ public final class SignatureService extends HttpServlet {
 		final PrintWriter out = response.getWriter();
 		final String operation = parameters.get(PARAMETER_NAME_OPERATION);
 		if (operation == null) {
+			LOGGER.warning("No se ha indicado la operacion trifasica a realizar");
 			out.print(ErrorManager.getErrorMessage(1));
 			return;
 		}
@@ -160,12 +161,14 @@ public final class SignatureService extends HttpServlet {
 		else {
 			docId = parameters.get(PARAMETER_NAME_DOCID);
 			if (docId == null) {
+				LOGGER.warning("No se han indicado datos ni identificador para la obtencion del documento");
 				out.print(ErrorManager.getErrorMessage(2));
 				return;
 			}
 			try {
 				docBytes = DOC_MANAGER.getDocument(docId, null);
 			} catch (final IOException e) {
+				LOGGER.warning("Error al recuperar el documento: " + e.toString());
 				out.print(ErrorManager.getErrorMessage(14));
 				return;
 			}
@@ -174,6 +177,7 @@ public final class SignatureService extends HttpServlet {
 		// Obtenemos el algoritmo de firma
 		final String algorithm = parameters.get(PARAMETER_NAME_ALGORITHM);
 		if (algorithm == null) {
+		LOGGER.warning("No se ha indicado algoritmo de firma");
 			out.print(ErrorManager.getErrorMessage(3));
 			return;
 		}
@@ -182,6 +186,7 @@ public final class SignatureService extends HttpServlet {
 		final String format = parameters.get(PARAMETER_NAME_FORMAT);
 		LOGGER.info("Formato de firma seleccionado: " + format); //$NON-NLS-1$
 		if (format == null) {
+			LOGGER.warning("No se ha indicado formato de firma");
 			out.print(ErrorManager.getErrorMessage(4));
 			return;
 		}
@@ -189,6 +194,7 @@ public final class SignatureService extends HttpServlet {
 		// Obtenemos el certificado
 		final String cert = parameters.get(PARAMETER_NAME_CERT);
 		if (cert == null) {
+			LOGGER.warning("No se ha indicado certificado de firma");
 			out.print(ErrorManager.getErrorMessage(5));
 			return;
 		}
