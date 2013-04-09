@@ -83,8 +83,8 @@ public final class ObtainContentSignedData {
 	 * algoritmo es el que se utiliz&oacute; en alguna de las operaci&oacute;nes de firma con la
 	 * que se gener&oacute; esta firma. Si no se utiliz&oacute, este algoritmo, se devuelve
 	 * {@code null}.
-	 * @param data
-	 *        datos que contienen la firma.
+	 * @param signature Firma de la que obtener la huella digital.
+	 * @param digestAlgorithm Algoritmo con el que se gener&oacute; la huella digital que buscamos.
 	 * @return La huella digital de los datos firmados generada con el algoritmo indicado, o
 	 * {@code null} si esta no se encuentra en la firma.
 	 * @throws IOException Si no se pueden leer los datos */
