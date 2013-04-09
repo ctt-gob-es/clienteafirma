@@ -5,6 +5,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
+import java.util.logging.Logger;
+
+import com.sun.org.apache.xml.internal.security.utils.Base64;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -32,6 +35,10 @@ final public class FileSystemDocumentManager implements DocumentManager {
 	public byte[] getDocument(final String id, final Properties prop) throws IOException {
 
 		final File file = new File(this.inDir, id);
+		if (!file.exists() || !file.isFile() || !file.canRead()) {
+			throw new IOException("No se puede cargar el documento"); //$NON-NLS-1$
+		}
+
 		final FileInputStream fis = new FileInputStream(file);
 		final byte[] data = AOUtil.getDataFromInputStream(fis);
 		fis.close();
@@ -58,7 +65,7 @@ final public class FileSystemDocumentManager implements DocumentManager {
 		}
 
 		final File file = new File(this.outDir, newId);
-		if (file.exists()) {
+		if (file.exists() && !this.overwrite) {
 			throw new IOException("Se ha obtenido un nombre de documento existente en el sistema de ficheros."); //$NON-NLS-1$
 		}
 
@@ -66,7 +73,7 @@ final public class FileSystemDocumentManager implements DocumentManager {
 		fos.write(data);
 		fos.close();
 
-		return newId;
+		return Base64.encode(newId.getBytes());
 	}
 
 
