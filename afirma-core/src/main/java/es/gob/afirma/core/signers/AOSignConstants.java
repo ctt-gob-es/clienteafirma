@@ -24,6 +24,12 @@ public final class AOSignConstants {
     /** Identificador de la firma CAdES. */
     public static final String SIGN_FORMAT_CADES = "CAdES"; //$NON-NLS-1$
 
+    /** Identificador de la firma CAdES trif&aacute:sica. */
+    public static final String SIGN_FORMAT_CADES_TRI = "CAdEStri"; //$NON-NLS-1$
+
+    /** Identificador alternativo 1 de la firma CAdES trif&aacute:sica. */
+    public static final String SIGN_FORMAT_CADES_TRI_ALT1 = "CAdES TriPhase"; //$NON-NLS-1$
+
     /** Identificador de la firma PKCS1 (RAW). */
     public static final String SIGN_FORMAT_PKCS1 = "NONE"; //$NON-NLS-1$
 
