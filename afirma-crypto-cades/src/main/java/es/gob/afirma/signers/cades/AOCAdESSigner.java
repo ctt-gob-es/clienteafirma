@@ -74,7 +74,8 @@ public final class AOCAdESSigner implements AOSigner {
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
      * </ul>
-     * @param keyEntry Entrada que apunta a la clave privada a usar para firmar
+     * @param key Clave privada a usar para firmar.
+     * @param certChain Cadena de certificaci&oacute;n.
      * @param xParams Par&aacute;metros adicionales para la firma.
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
      * <dl>
