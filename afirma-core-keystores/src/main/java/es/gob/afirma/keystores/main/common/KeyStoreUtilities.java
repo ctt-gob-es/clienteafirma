@@ -99,14 +99,14 @@ public final class KeyStoreUtilities {
               .append("showInfo=true\r\n"); //$NON-NLS-1$
 
         if (slot != null) {
-            buffer.append("slot=").append(slot); //$NON-NLS-1$
+            buffer.append("slot=").append(slot).append("\r\n"); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         // Por un problema con la version 10 del driver de la FNMT para el DNIe y tarjetas CERES
         // debemos deshabilitar el mecanismo del algorimto de firma con SHA1 para que lo emule
         for (final String problematicLib : FNMT_PKCS11_LIBS_WITHOUT_SHA1) {
         	if (problematicLib.equalsIgnoreCase(new java.io.File(lib).getName())) {
-        		buffer.append("\r\ndisabledMechanisms={ CKM_SHA1_RSA_PKCS }"); //$NON-NLS-1$
+        		buffer.append("disabledMechanisms={ CKM_SHA1_RSA_PKCS }\r\n"); //$NON-NLS-1$
         		break;
         	}
         }
