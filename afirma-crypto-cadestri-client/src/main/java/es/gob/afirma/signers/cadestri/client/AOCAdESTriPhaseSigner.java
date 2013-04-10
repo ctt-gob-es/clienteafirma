@@ -63,7 +63,6 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 	private static final String HTTP_AND = "&"; //$NON-NLS-1$
 
 	// Parametros que necesitamos para la URL de las llamadas al servidor de firma
-	private static final String PARAMETER_NAME_DATA = "dat"; //$NON-NLS-1$
 	private static final String PARAMETER_NAME_DOCID = "doc"; //$NON-NLS-1$
 	private static final String PARAMETER_NAME_ALGORITHM = "algo"; //$NON-NLS-1$
 	private static final String PARAMETER_NAME_FORMAT = "format"; //$NON-NLS-1$
@@ -217,7 +216,6 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 
 		// Comprobamos el identificador del documento
 		final String documentId = new String(data);
-		System.out.println("documentId: " + documentId);
 
 		// ---------
 		// PREFIRMA
