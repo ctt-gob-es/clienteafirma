@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 import com.sun.org.apache.xml.internal.security.utils.Base64;
 
@@ -49,10 +48,11 @@ final public class FileSystemDocumentManager implements DocumentManager {
 	@Override
 	public String storeDocument(final String id, final byte[] data, final Properties prop) throws IOException {
 
-		String newId = id;
-		final int lastDotPos = id.lastIndexOf('.');
+		final String initialId = id != null ? id : "signature"; //$NON-NLS-1$
+		String newId = initialId;
+		final int lastDotPos = initialId.lastIndexOf('.');
 		if (lastDotPos != -1) {
-			newId = id.substring(0,  lastDotPos) + "_signed"; //$NON-NLS-1$
+			newId = initialId.substring(0,  lastDotPos) + "_signed"; //$NON-NLS-1$
 		}
 
 		final String format = prop.getProperty(FORMAT_PROPERTY);
@@ -60,8 +60,8 @@ final public class FileSystemDocumentManager implements DocumentManager {
 			newId += ".csig";  //$NON-NLS-1$
 		} else if (AOSignConstants.SIGN_FORMAT_XADES.equalsIgnoreCase(format)) {
 			newId += ".xsig"; //$NON-NLS-1$
-		} else if (lastDotPos < id.length() - 1) {
-			newId += id.substring(lastDotPos + 1);
+		} else if (lastDotPos < initialId.length() - 1) {
+			newId += initialId.substring(lastDotPos + 1);
 		}
 
 		final File file = new File(this.outDir, newId);
