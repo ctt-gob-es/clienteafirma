@@ -40,9 +40,6 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 	/** Nombre de la propiedad de URL del servidor de firma trif&aacute;sica. */
 	private static final String PROPERTY_NAME_SIGN_SERVER_URL = "serverUrl"; //$NON-NLS-1$
 
-	/** Identificador del documento a firmar, por el cual se obtiene desde el servidor documental. */
-	private static final String PROPERTY_NAME_DOCUMENT_ID = "documentId"; //$NON-NLS-1$
-
 	/** Identificador de la operacion de prefirma en servidor. */
 	private static final String OPERATION_PRESIGN = "pre"; //$NON-NLS-1$
 
@@ -198,8 +195,8 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 		if (certChain == null || certChain.length == 0) {
 			throw new IllegalArgumentException("Es necesario proporcionar un certificado de firma"); //$NON-NLS-1$
 		}
-		if (data == null && !extraParams.containsKey(PROPERTY_NAME_DOCUMENT_ID)) {
-			throw new IllegalArgumentException("No se han proporcionado datos de entrada ni el identificador de documento a firmar"); //$NON-NLS-1$
+		if (data == null) {
+			throw new IllegalArgumentException("No se ha proporcionado el identificador de documento a firmar"); //$NON-NLS-1$
 		}
 
 		// Creamos una copia de los parametros
@@ -219,14 +216,8 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 		configParams.remove(PROPERTY_NAME_SIGN_SERVER_URL);
 
 		// Comprobamos el identificador del documento
-		String documentId = null;
-		if (configParams.containsKey(PROPERTY_NAME_DOCUMENT_ID)) {
-			if (data == null) {
-				documentId = configParams.getProperty(PROPERTY_NAME_DOCUMENT_ID);
-			}
-			configParams.remove(PROPERTY_NAME_DOCUMENT_ID);
-		}
-
+		final String documentId = new String(data);
+		System.out.println("documentId: " + documentId);
 
 		// ---------
 		// PREFIRMA
@@ -256,13 +247,8 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 				append(properties2Base64(configParams));
 			}
 
-			if (data != null) {
-				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_DATA).append(HTTP_EQUALS).
-				append(Base64.encodeBytes(data, Base64.URL_SAFE));
-			} else {
-				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_DOCID).append(HTTP_EQUALS).
-				append(documentId);
-			}
+			urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_DOCID).append(HTTP_EQUALS).
+			append(documentId);
 
 			preSignResult = UrlHttpManagerImpl.readUrlByPost(urlBuffer.toString());
 			urlBuffer.setLength(0);
@@ -328,13 +314,8 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 			append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(Base64.encodeBytes(certChain[0].getEncoded(), Base64.URL_SAFE)).
 			append(HTTP_AND).append(PARAMETER_NAME_EXTRA_PARAM).append(HTTP_EQUALS).append(properties2Base64(configParams));
 
-			if (data != null) {
-				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_DATA).append(HTTP_EQUALS).
-				append(Base64.encodeBytes(data, Base64.URL_SAFE));
-			} else {
-				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_DOCID).append(HTTP_EQUALS).
-				append(documentId);
-			}
+			urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_DOCID).append(HTTP_EQUALS).
+			append(documentId);
 
 			triSignFinalResult = UrlHttpManagerImpl.readUrlByPost(urlBuffer.toString());
 			urlBuffer.setLength(0);
