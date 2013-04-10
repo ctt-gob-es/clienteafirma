@@ -79,7 +79,7 @@ import es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper.TsaRequestExtension;
  * </p>
  * <p>
  *   Por compatibilidad con Adobe Reader, la firmas se generan con el subfiltro "adbe.pkcs7.detached" en vez de con
- *   "ETSI.CAdES.detached".
+ *   "ETSI.CAdES.detached". Consulte la documentaci&oacute;n del par&aacute;metro <code>signatureSubFilter</code> para variar este comportamiento.
  * </p>
  * <p>
  *  La clase necesita espec&iacute;ficamente iText 2.1.7 (no se usan versiones m&aacute;s actuales por cuestiones de licencia) y
@@ -138,6 +138,13 @@ public final class AOPDFSigner implements AOSigner {
      * @param xParams Par&aacute;metros adicionales para la firma.
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
      * <dl>
+     *  <dt><b><i>signatureSubFilter</i></b></dt>
+     *   <dd>
+     *   </dd>
+     *    Nombre del sub-filtro en el diccionario PDF para indicar el tipo de la firma. Si no se indica este par&aacute;metro por defecto se
+     *    usa <code>adbe.pkcs7.detached</code> (firma PAdES b&aacute;sica).
+     *    Es posible indicar <code>ETSI.CAdES.detached</code> para generar una firma PAdES-BES, si bien el hacerlo puede causar que al a&ntilde;adir firmas adicionales
+     *    al PDF se invaliden las ya existentes.
      *  <dt><b><i>signatureField</i></b></dt>
      *   <dd>
      *    Nombre del campo en donde insertar la firma.
@@ -344,6 +351,13 @@ public final class AOPDFSigner implements AOSigner {
      * @param extraParams Par&aacute;metros adicionales para la firma.
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>extraParams</code>:</p>
      * <dl>
+     *  <dt><b><i>signatureSubFilter</i></b></dt>
+     *   <dd>
+     *   </dd>
+     *    Nombre del sub-filtro en el diccionario PDF para indicar el tipo de la firma. Si no se indica este par&aacute;metro por defecto se
+     *    usa <code>adbe.pkcs7.detached</code> (firma PAdES b&aacute;sica).
+     *    Es posible indicar <code>ETSI.CAdES.detached</code> para generar una firma PAdES-BES, si bien el hacerlo puede causar que al a&ntilde;adir firmas adicionales
+     *    al PDF se invaliden las ya existentes.
      *  <dt><b><i>signatureField</i></b></dt>
      *   <dd>
      *    Nombre del campo en donde insertar la firma.
@@ -520,6 +534,13 @@ public final class AOPDFSigner implements AOSigner {
      * @param extraParams Par&aacute;metros adicionales para la firma.
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>extraParams</code>:</p>
      * <dl>
+     *  <dt><b><i>signatureSubFilter</i></b></dt>
+     *   <dd>
+     *   </dd>
+     *    Nombre del sub-filtro en el diccionario PDF para indicar el tipo de la firma. Si no se indica este par&aacute;metro por defecto se
+     *    usa <code>adbe.pkcs7.detached</code> (firma PAdES b&aacute;sica).
+     *    Es posible indicar <code>ETSI.CAdES.detached</code> para generar una firma PAdES-BES, si bien el hacerlo puede causar que al a&ntilde;adir firmas adicionales
+     *    al PDF se invaliden las ya existentes.
      *  <dt><b><i>signatureField</i></b></dt>
      *   <dd>
      *    Nombre del campo en donde insertar la firma.
@@ -896,6 +917,7 @@ public final class AOPDFSigner implements AOSigner {
         catch (final Exception e) {
             /* Se deja la pagina tal y como esta */
         }
+        final String signatureSubFilter = extraParams.getProperty("signatureSubFilter"); //$NON-NLS-1$
         final String b64Attachment = extraParams.getProperty("attach"); //$NON-NLS-1$
         final String attachmentFileName = extraParams.getProperty("attachFileName"); //$NON-NLS-1$
         final String attachmentDescription = extraParams.getProperty("attachDescription"); //$NON-NLS-1$
@@ -1082,7 +1104,10 @@ public final class AOPDFSigner implements AOSigner {
 
         sap.setCrypto(null, certChain, null, null);
 
-        final PdfSignature dic = new PdfSignature(PdfName.ADOBE_PPKLITE, PdfName.ADBE_PKCS7_DETACHED);
+        final PdfSignature dic = new PdfSignature(
+    		PdfName.ADOBE_PPKLITE,
+    		signatureSubFilter != null && !"".equals(signatureSubFilter) ? new PdfName(signatureSubFilter) : PdfName.ADBE_PKCS7_DETACHED //$NON-NLS-1$
+		);
         if (sap.getSignDate() != null) {
             dic.setDate(new PdfDate(sap.getSignDate()));
         }

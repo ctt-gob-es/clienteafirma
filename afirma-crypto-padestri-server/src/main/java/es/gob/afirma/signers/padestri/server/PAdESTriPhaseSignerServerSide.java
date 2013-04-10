@@ -199,6 +199,13 @@ public final class PAdESTriPhaseSignerServerSide {
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
      * <dl>
+     *  <dt><b><i>signatureSubFilter</i></b></dt>
+     *   <dd>
+     *   </dd>
+     *    Nombre del sub-filtro en el diccionario PDF para indicar el tipo de la firma. Si no se indica este par&aacute;metro por defecto se
+     *    usa <code>adbe.pkcs7.detached</code> (firma PAdES b&aacute;sica).
+     *    Es posible indicar <code>ETSI.CAdES.detached</code> para generar una firma PAdES-BES, si bien el hacerlo puede causar que al a&ntilde;adir firmas adicionales
+     *    al PDF se invaliden las ya existentes.
      *  <dt><b><i>signatureField</i></b></dt>
      *   <dd>
      *    Nombre del campo en donde insertar la firma.
@@ -386,6 +393,13 @@ public final class PAdESTriPhaseSignerServerSide {
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>extraParams</code>:</p>
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
      * <dl>
+     *  <dt><b><i>signatureSubFilter</i></b></dt>
+     *   <dd>
+     *   </dd>
+     *    Nombre del sub-filtro en el diccionario PDF para indicar el tipo de la firma. Si no se indica este par&aacute;metro por defecto se
+     *    usa <code>adbe.pkcs7.detached</code> (firma PAdES b&aacute;sica).
+     *    Es posible indicar <code>ETSI.CAdES.detached</code> para generar una firma PAdES-BES, si bien el hacerlo puede causar que al a&ntilde;adir firmas adicionales
+     *    al PDF se invaliden las ya existentes.
      *  <dt><b><i>signatureField</i></b></dt>
      *   <dd>
      *    Nombre del campo en donde insertar la firma.
@@ -675,7 +689,8 @@ public final class PAdESTriPhaseSignerServerSide {
                                               final Calendar signTime,
                                               final Properties extraParams) throws AOException {
 
-        final String reason = extraParams.getProperty("signReason"); //$NON-NLS-1$
+    	final String signatureSubFilter = extraParams.getProperty("signatureSubFilter"); //$NON-NLS-1$
+    	final String reason = extraParams.getProperty("signReason"); //$NON-NLS-1$
         final String signatureField = extraParams.getProperty("signatureField"); //$NON-NLS-1$
         final String signatureProductionCity = extraParams.getProperty("signatureProductionCity"); //$NON-NLS-1$
         final String signerContact = extraParams.getProperty("signerContact"); //$NON-NLS-1$
@@ -843,7 +858,10 @@ public final class PAdESTriPhaseSignerServerSide {
 
         sap.setCrypto(null, chain, null, null);
 
-        final PdfSignature dic = new PdfSignature(PdfName.ADOBE_PPKLITE, PdfName.ADBE_PKCS7_DETACHED);
+        final PdfSignature dic = new PdfSignature(
+    		PdfName.ADOBE_PPKLITE,
+    		signatureSubFilter != null && !"".equals(signatureSubFilter) ? new PdfName(signatureSubFilter) : PdfName.ADBE_PKCS7_DETACHED //$NON-NLS-1$
+		);
         if (sap.getSignDate() != null) {
             dic.setDate(new PdfDate(signTime));
         }
