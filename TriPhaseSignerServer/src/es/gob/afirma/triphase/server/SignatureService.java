@@ -177,7 +177,7 @@ public final class SignatureService extends HttpServlet {
 		// Obtenemos el algoritmo de firma
 		final String algorithm = parameters.get(PARAMETER_NAME_ALGORITHM);
 		if (algorithm == null) {
-		LOGGER.warning("No se ha indicado algoritmo de firma");
+			LOGGER.warning("No se ha indicado algoritmo de firma");
 			out.print(ErrorManager.getErrorMessage(3));
 			return;
 		}
