@@ -1,12 +1,10 @@
 package es.gob.afirma.signers.cadestri.client;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import junit.framework.Assert;
 
@@ -22,15 +20,16 @@ public final class TestCadesTriphase {
 
 	/** Nombre de la propiedad de URL del servidor de firma trif&aacute;sica. */
 	private static final String PROPERTY_NAME_SIGN_SERVER_URL = "serverUrl"; //$NON-NLS-1$
-	private static final String PROPERTY_VALUE_SIGN_SERVER_URL = "http://localhost:8080/SignFolderMobileProxy/SignatureService"; //$NON-NLS-1$
+	private static final String PROPERTY_VALUE_SIGN_SERVER_URL = "http://localhost:8080/TriPhaseSignerServer/SignatureService"; //$NON-NLS-1$
 
 	// ID del documento, en este caso el documento en si
 	private static final String PROPERTY_NAME_DOC_ID = "documentId"; //$NON-NLS-1$
-	private static final String PROPERTY_VALUE_DOC_ID = "SG9sYSBNdW5kbw=="; //$NON-NLS-1$
+	//private static final String PROPERTY_VALUE_DOC_ID = "SG9sYSBNdW5kbw=="; //$NON-NLS-1$
+	private static final String PROPERTY_VALUE_DOC_ID = "Entrada.pdf"; //$NON-NLS-1$
 
 
 	// Almacen de pruebas
-	private static final String CERT_PATH = "ANF_PF_Activo.pfx"; //$NON-NLS-1$
+	private static final String CERT_PATH = "ANF PFISICA ACTIVO.pfx"; //$NON-NLS-1$
 	private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
 	private static final String CERT_ALIAS = "anf usuario activo"; //$NON-NLS-1$
 
@@ -53,12 +52,7 @@ public final class TestCadesTriphase {
 
 		Assert.assertNotNull("Error durante el proceso de firma, resultado nulo", result); //$NON-NLS-1$
 
-		final File tempFile = File.createTempFile("TEMP", ".p7s"); //$NON-NLS-1$ //$NON-NLS-2$
-		final OutputStream os = new FileOutputStream(tempFile);
-		os.write(result);
-		os.flush();
-		os.close();
-		System.out.println("Resultado almacenado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
+		Logger.getLogger("es.gob.afirma").info("El resultado de la firma es: " + new String(result)); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/** Carga el almac&acute;n de pruebas.
