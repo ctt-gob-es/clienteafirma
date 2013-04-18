@@ -38,7 +38,7 @@ import es.gob.afirma.keystores.main.common.AOKeyStore;
 /** MiniApplet de firma del proyecto Afirma. */
 public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
-	private static final String VERSION = "v1.1"; //$NON-NLS-1$
+	private static final String VERSION = "v1.2 Beta 2"; //$NON-NLS-1$
 
 	/** Clave privada fijada para reutilizarse en operaciones sucesivas. */
 	private PrivateKeyEntry stickyKeyEntry = null;
