@@ -283,7 +283,10 @@ public final class AOKeyStoreManagerFactory {
                                                                                                    AOKeystoreAlternativeException {
     	final AOKeyStoreManager ksm = new AOKeyStoreManager();
         String p11Lib = null;
-        if (lib != null && !"".equals(lib) && new File(lib).exists()) { //$NON-NLS-1$
+        if (!new File(lib).exists()) {
+        	throw new IOException("La biblioteca '" + lib + "' no existe"); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+        if (lib != null && !"".equals(lib)) { //$NON-NLS-1$
             p11Lib = lib;
         }
         if (p11Lib == null) {
