@@ -95,8 +95,8 @@ public final class KeyStoreUtilities {
         // falla si llegan espacios o caracteres raros
               .append("name=") //$NON-NLS-1$
               .append(name != null ? name : "AFIRMA-PKCS11") //$NON-NLS-1$
-              .append("\r\n") //$NON-NLS-1$
-              .append("showInfo=true\r\n"); //$NON-NLS-1$
+              // El showInfo debe ser false para mantener la compatibilidad con el PKCS#11 de los dispositivos Clauer
+              .append("\r\nshowInfo=false\r\n"); //$NON-NLS-1$
 
         if (slot != null) {
             buffer.append("slot=").append(slot).append("\r\n"); //$NON-NLS-1$ //$NON-NLS-2$
