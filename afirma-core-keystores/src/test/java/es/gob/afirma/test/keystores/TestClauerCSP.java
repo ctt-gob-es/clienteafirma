@@ -13,7 +13,7 @@ import es.gob.afirma.core.misc.Base64;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class TestClauerCSP {
 
-	private static final String ALIAS = "CLAUER_PERSONA FISICA DE LA PEÇA DE PROVES"; //$NON-NLS-1$
+	private static final String ALIAS = "CLAUER_PERSONA FISICA DE LA PE\u199A DE PROVES"; //$NON-NLS-1$
 
 	/** Prueba de firma con CSP.
 	 * @throws Exception */
