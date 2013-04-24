@@ -12,7 +12,7 @@
   <servlet>
     <description>Servicio de firma trifasica</description>
     <servlet-name>SignatureService</servlet-name>
-    <servlet-class>es.gob.afirma.signfolder.server.proxy.SignatureService</servlet-class>
+    <servlet-class>es.gob.afirma.triphase.server.SignatureService</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>SignatureService</servlet-name>
