@@ -8,7 +8,7 @@
  * You may contact the copyright holder at: soporte.afirma5@mpt.es
  */
 
-package es.gob.afirma.signers.xades;
+package es.gob.afirma.signers.xadestri.client;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -48,7 +48,7 @@ import es.gob.afirma.core.util.tree.AOTreeModel;
  * servidor. El resultado ser&aacute; an&aacute;logo al anterior, recuperandose &uacute;nicamente el identificador
  * remoto asignado al resultado.
  */
-public final class AOXAdESTriSigner implements AOSigner {
+public final class AOXAdESTriPhaseSigner implements AOSigner {
 
 	static final Logger LOGGER = Logger.getLogger("es.agob.afirma"); //$NON-NLS-1$
 

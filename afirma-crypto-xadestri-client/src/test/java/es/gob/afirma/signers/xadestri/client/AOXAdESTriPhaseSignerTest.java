@@ -8,7 +8,7 @@
  * You may contact the copyright holder at: soporte.afirma5@mpt.es
  */
 
-package es.gob.afirma.signers.xades;
+package es.gob.afirma.signers.xadestri.client;
 
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
@@ -18,8 +18,9 @@ import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.signers.xadestri.client.AOXAdESTriPhaseSigner;
 
-public class AOXAdESTriSignerTest {
+public class AOXAdESTriPhaseSignerTest {
 
 	private static final String CERT_PATH = "ANF_PF_Activo.pfx"; //$NON-NLS-1$
 	private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
@@ -42,7 +43,7 @@ public class AOXAdESTriSignerTest {
 		final Properties config = new Properties();
 		config.setProperty("serverUrl", SERVER_URL); //$NON-NLS-1$
 
-		final AOXAdESTriSigner signer = new AOXAdESTriSigner();
+		final AOXAdESTriPhaseSigner signer = new AOXAdESTriPhaseSigner();
 
 		final byte[] result = signer.sign(data, AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, pke.getPrivateKey(), pke.getCertificateChain(), config);
 
@@ -61,7 +62,7 @@ public class AOXAdESTriSignerTest {
 		final Properties config = new Properties();
 		config.setProperty("serverUrl", SERVER_URL); //$NON-NLS-1$
 
-		final AOXAdESTriSigner signer = new AOXAdESTriSigner();
+		final AOXAdESTriPhaseSigner signer = new AOXAdESTriPhaseSigner();
 
 		final byte[] result = signer.cosign(sign, AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, pke.getPrivateKey(), pke.getCertificateChain(), config);
 
