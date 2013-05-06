@@ -1,8 +1,0 @@
-es\gob\afirma\signers\padestri\server\PAdESTriPhaseSignerServerSide$PdfPreSignResult.class
-es\gob\afirma\signers\padestri\server\PdfIsPasswordProtectedException.class
-es\gob\afirma\signers\padestri\server\PAdESTriPhaseSignerServerSide$PdfTriPhaseSession.class
-es\gob\afirma\signers\padestri\server\SignEnhancer.class
-es\gob\afirma\signers\padestri\server\PdfIsCertifiedException.class
-es\gob\afirma\signers\padestri\server\BadPdfPasswordException.class
-es\gob\afirma\signers\padestri\server\PAdESTriPhaseSignerServerSide.class
-es\gob\afirma\signers\padestri\server\InvalidPdfException.class

@@ -1,5 +1,0 @@
-es\gob\afirma\signers\cms\AOCMSSigner.class
-es\gob\afirma\signers\cms\GenSignedData.class
-es\gob\afirma\signers\cms\CounterSigner.class
-es\gob\afirma\signers\cms\ValidateCMSSignedData.class
-es\gob\afirma\signers\cms\CoSigner.class
