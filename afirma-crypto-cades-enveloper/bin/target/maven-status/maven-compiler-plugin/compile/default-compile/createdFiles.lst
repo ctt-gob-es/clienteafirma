@@ -1,0 +1,9 @@
+es\gob\afirma\envelopers\cades\CAdESEncryptedData.class
+es\gob\afirma\envelopers\cades\CAdESData.class
+es\gob\afirma\envelopers\cades\Info.class
+es\gob\afirma\envelopers\cades\CAdESUtils.class
+es\gob\afirma\envelopers\cades\CAdESDigestedData.class
+es\gob\afirma\envelopers\cades\AOCAdESEnveloper.class
+es\gob\afirma\envelopers\cades\SigPolicyQualifierInfo.class
+es\gob\afirma\envelopers\cades\CAdESEnvelopedData.class
+es\gob\afirma\envelopers\cades\CAdESEPESSignedAndEnvelopedData.class

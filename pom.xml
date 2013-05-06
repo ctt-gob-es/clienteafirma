@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<packaging>pom</packaging>
+	<artifactId>afirma</artifactId>
+	<name>afirma</name>
+
+	<parent>
+		<groupId>es.gob.afirma</groupId>
+		<artifactId>afirma-client</artifactId>
+		<version>3.3.2-SNAPSHOT</version>
+	</parent>
+
+	<description>Librerías del núcleo de afirma</description>
+
+	<properties>
+        <afirma.keytool.keystore>${basedir}/../afirma.keystore</afirma.keytool.keystore>
+	</properties>
+	
+	<modules>
+		<module>afirma-core</module>
+		<module>afirma-core-keystores</module>
+		<module>afirma-crypto-cadestri-client</module>
+		<module>afirma-crypto-cipher</module>
+		<module>afirma-crypto-core-pkcs7</module>
+		<module>afirma-crypto-cades</module>
+		<module>afirma-crypto-cades-enveloper</module>
+		<module>afirma-crypto-cades-multi</module>
+		<module>afirma-crypto-cms</module>
+		<module>afirma-crypto-cms-enveloper</module>
+		<module>afirma-crypto-core-pkcs7-tsp</module>
+		<module>afirma-crypto-core-xml</module>
+		<module>afirma-crypto-odf</module>
+		<module>afirma-crypto-padestri-client</module>
+		<module>afirma-crypto-padestri-server</module>
+		<module>afirma-crypto-pdf-enhancer</module>
+		<module>afirma-crypto-xades</module>
+		<module>afirma-crypto-xadestri-client</module>
+		<module>afirma-crypto-xadestri-server</module>
+		<module>afirma-crypto-xmlsignature</module>
+		<module>afirma-crypto-ooxml</module>
+		<module>afirma-keystores-capiaddressbook</module>
+		<module>afirma-keystores-filters-rfc</module>
+		<module>afirma-keystores-mozilla</module>
+		<module>afirma-keystores-single</module>
+		<module>afirma-ui-core-jse</module>
+		<module>afirma-util</module>
+		
+		<module>afirma-crypto-pdf</module>
+		<module>afirma-core-massive</module>
+	</modules>
+</project>

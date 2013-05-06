@@ -1,0 +1,76 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation; 
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
+package es.gob.afirma.core.misc;
+
+import junit.framework.Assert;
+
+import org.junit.Test;
+
+/** M&eacute;todos generales de utilidad para toda la aplicaci&oacute;n.
+ * @version 0.3
+ */
+public final class TestAOUtil {
+
+    /** Prueba para el getCN(), reconstruido para prescindir de javax.naming.
+     * @throws Exception */
+    @SuppressWarnings("static-method")
+	@Test
+    public void testGetCN() throws Exception {
+        final String principals[][] = {
+                {"CN=\"fulanito Menganito\", C=ES", "fulanito Menganito"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {" CN=\"fulanito Menganito\", C=ES", "fulanito Menganito"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"CN=\"fulanito, Menganito\", C=ES", "fulanito, Menganito"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"CN=fulanito Menganito, C=ES", "fulanito Menganito"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"CN=fulanito Menganito , C=ES", "fulanito Menganito"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"CN = fulanito Menganito, C=ES", "fulanito Menganito"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"CN=fulanito Menganito, C=ES", "fulanito Menganito"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"C=ES, CN=fulanito Menganito", "fulanito Menganito"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"C=ES,CN=fulanito Menganito", "fulanito Menganito"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"C=ES,CN =fulanito Menganito", "fulanito Menganito"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"C=ES,CN = fulanito Menganito", "fulanito Menganito"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"C=ES,CN=fulanito Menganito", "fulanito Menganito"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"C=ES,CN =\"fulanito Menganito\"", "fulanito Menganito"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"C=ES,CN= \"fulanito Menganito\"", "fulanito Menganito"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"OU=\"mi organizacion\", C=ES", "mi organizacion"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {" OU=\"mi organizacion\", C=ES", "mi organizacion"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"OU=\"mi organizacion\", C=ES", "mi organizacion"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"OU=mi organizacion, C=ES", "mi organizacion"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"OU=mi organizacion , C=ES", "mi organizacion"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"OU = mi organizacion, C=ES", "mi organizacion"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"OU=mi organizacion, C=ES", "mi organizacion"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"C=ES, OU=mi organizacion", "mi organizacion"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"C=ES, OU = mi organizacion", "mi organizacion"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"C=ES,OU=mi organizacion", "mi organizacion"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"C=ES,OU = mi organizacion", "mi organizacion"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"C=ES,OU=\"mi organizacion\"", "mi organizacion"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"C=ES,OU= \"mi organizacion\"", "mi organizacion"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"PCN=mi organizacion, C=ES", "mi organizacion"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"CN=, C=ES", ""}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"C=ES, PCN=fulanito Menganito", "ES"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"C=ES, P CN=\"fulanito Menganito\"", "fulanito Menganito"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"C=ES, P ,CN=\"fulanito Menganito\"", "fulanito Menganito"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"C=ES, CN=\"\"", ""}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"C=ES, CN=", ""}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"C=ES, CN=\"", ""}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"C=ES, CN=\" ", " "}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"C=ES, CN", "ES"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"C=ES, CN a", "ES"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"Hola Mundo!!", "Hola Mundo!!"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {null, null}
+        };
+        
+        for (final String principal[] : principals) {
+            System.out.println(principal[0] + ": " + principal[1]); //$NON-NLS-1$
+            Assert.assertEquals("El metodo getCN() no devuelve el resultado correcto para " + principal[0], AOUtil.getCN(principal[0]), principal[1]); //$NON-NLS-1$
+        }
+    }
+}
+

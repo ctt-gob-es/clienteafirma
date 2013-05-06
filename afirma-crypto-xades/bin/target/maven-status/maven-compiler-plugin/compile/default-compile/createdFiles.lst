@@ -1,0 +1,8 @@
+es\gob\afirma\signers\xades\XAdESCounterSigner.class
+es\gob\afirma\signers\xades\AOFacturaESigner.class
+es\gob\afirma\signers\xades\XAdESCoSigner.class
+es\gob\afirma\signers\xades\AOXMLAdvancedSignature.class
+es\gob\afirma\signers\xades\EFacturaAlreadySignedException.class
+es\gob\afirma\signers\xades\AOXAdESSigner.class
+es\gob\afirma\signers\xades\XAdESSigner.class
+es\gob\afirma\signers\xades\InvalidEFacturaDataException.class

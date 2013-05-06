@@ -1,0 +1,10 @@
+es\gob\afirma\signers\pkcs7\SigUtils.class
+es\gob\afirma\signers\pkcs7\InvalidBouncyCastleException.class
+es\gob\afirma\signers\pkcs7\BCChecker.class
+es\gob\afirma\signers\pkcs7\ObtainContentSignedData.class
+es\gob\afirma\signers\pkcs7\AOAlgorithmID.class
+es\gob\afirma\signers\pkcs7\SignedAndEnvelopedData.class
+es\gob\afirma\signers\pkcs7\P7ContentSignerParameters.class
+es\gob\afirma\signers\pkcs7\ContainsNoDataException.class
+es\gob\afirma\signers\pkcs7\ReadNodesTree.class
+es\gob\afirma\signers\pkcs7\DigestedData.class

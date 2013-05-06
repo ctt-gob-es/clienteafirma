@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/xsl" href="C:\Users\Tomas\Eclipse Workspace\afirma-crypto-xades\src\test\resources\book_style.xsl"?>
+<books>
+<book>
+<author>Author Name 1</author>
+<title>Book Title 1</title>
+</book>
+</books>

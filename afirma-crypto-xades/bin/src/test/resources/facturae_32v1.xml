@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fe:Facturae xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:fe="http://www.facturae.es/Facturae/2009/v3.2/Facturae">
+<FileHeader>
+ <SchemaVersion>3.2</SchemaVersion>
+ <Modality>I</Modality>
+ <InvoiceIssuerType>EM</InvoiceIssuerType>
+ <Batch>
+  <BatchIdentifier>0000000000B18</BatchIdentifier>
+  <InvoicesCount>1</InvoicesCount>
+  <TotalInvoicesAmount>
+   <TotalAmount>63.13</TotalAmount>
+  </TotalInvoicesAmount>
+  <TotalOutstandingAmount>
+   <TotalAmount>63.13</TotalAmount>
+  </TotalOutstandingAmount>
+  <TotalExecutableAmount>
+   <TotalAmount>63.13</TotalAmount>
+  </TotalExecutableAmount>
+  <InvoiceCurrencyCode>EUR</InvoiceCurrencyCode>
+ </Batch>
+</FileHeader>
+<Parties>
+ <SellerParty>
+  <TaxIdentification>
+   <PersonTypeCode>J</PersonTypeCode>
+   <ResidenceTypeCode>R</ResidenceTypeCode>
+   <TaxIdentificationNumber>A82735122</TaxIdentificationNumber>
+  </TaxIdentification>
+  <LegalEntity>
+   <CorporateName>Company Comp SA</CorporateName>
+   <TradeName>Comp</TradeName>
+   <RegistrationData>
+    <Book>1</Book>
+    <RegisterOfCompaniesLocation>12AP22</RegisterOfCompaniesLocation>
+    <Sheet>3</Sheet>
+    <Folio>15</Folio>
+    <Section>2</Section>
+    <Volume>12</Volume>
+    <AdditionalRegistrationData>Sin datos</AdditionalRegistrationData>
+   </RegistrationData>
+   <AddressInSpain>
+    <Address>C/ Mayour 33 15 E</Address>
+    <PostCode>28001</PostCode>
+    <Town>Argamasilla de Alba</Town>
+    <Province>Ciudad Real</Province>
+    <CountryCode>ESP</CountryCode>
+   </AddressInSpain>
+   <ContactDetails>
+    <Telephone>917776665</Telephone>
+    <TeleFax>917776666</TeleFax>
+    <WebAddress>www.facturae.es</WebAddress>
+    <ElectronicMail>facturae@mityc.es</ElectronicMail>
+    <ContactPersons>Fernando</ContactPersons>
+    <CnoCnae>28000</CnoCnae>
+    <INETownCode>2134AAB</INETownCode>
+    <AdditionalContactDetails>Otros datos</AdditionalContactDetails>
+   </ContactDetails>
+  </LegalEntity>
+ </SellerParty>
+ <BuyerParty>
+  <TaxIdentification>
+   <PersonTypeCode>F</PersonTypeCode>
+   <ResidenceTypeCode>E</ResidenceTypeCode>
+   <TaxIdentificationNumber>0000000000B</TaxIdentificationNumber>
+  </TaxIdentification>
+  <AdministrativeCentres>
+   <AdministrativeCentre>
+    <CentreCode>1</CentreCode>
+    <RoleTypeCode>02</RoleTypeCode>
+    <Name>Ruth</Name>
+    <FirstSurname>Mauripo</FirstSurname>
+    <OverseasAddress>
+     <Address>Armenia 1922</Address>
+     <PostCodeAndTown>00000 Buenos Aires</PostCodeAndTown>
+     <Province>Capital Federal</Province>
+     <CountryCode>ARG</CountryCode>
+    </OverseasAddress>
+    <CentreDescription>Centro principal de recepcion</CentreDescription>
+   </AdministrativeCentre>
+  </AdministrativeCentres>
+  <Individual>
+   <Name>Juana</Name>
+   <FirstSurname>Mauripo</FirstSurname>
+   <OverseasAddress>
+    <Address>Juncal 1315</Address>
+    <PostCodeAndTown>00000 Buenos Aires</PostCodeAndTown>
+    <Province>Capital Federal</Province>
+    <CountryCode>ARG</CountryCode>
+   </OverseasAddress>
+   <ContactDetails>
+    <Telephone>00547775554</Telephone>
+    <TeleFax>00547775555</TeleFax>
+   </ContactDetails>
+  </Individual>
+ </BuyerParty>
+</Parties>
+<Invoices>
+ <Invoice>
+  <InvoiceHeader>
+   <InvoiceNumber>18</InvoiceNumber>
+   <InvoiceSeriesCode></InvoiceSeriesCode>
+   <InvoiceDocumentType>FC</InvoiceDocumentType>
+   <InvoiceClass>OO</InvoiceClass>
+  </InvoiceHeader>
+  <InvoiceIssueData>
+   <IssueDate>2010-03-10</IssueDate>
+   <OperationDate>2010-03-10</OperationDate>
+   <PlaceOfIssue>
+    <PostCode>00000</PostCode>
+    <PlaceOfIssueDescription>Regalos</PlaceOfIssueDescription>
+   </PlaceOfIssue>
+   <InvoicingPeriod>
+    <StartDate>2010-03-09</StartDate>
+    <EndDate>2010-03-10</EndDate>
+   </InvoicingPeriod>
+   <InvoiceCurrencyCode>EUR</InvoiceCurrencyCode>
+   <TaxCurrencyCode>EUR</TaxCurrencyCode>
+   <LanguageName>es</LanguageName>
+  </InvoiceIssueData>
+  <TaxesOutputs>
+   <Tax>
+    <TaxTypeCode>01</TaxTypeCode>
+    <TaxRate>16.00</TaxRate>
+    <TaxableBase>
+     <TotalAmount>26.00</TotalAmount>
+    </TaxableBase>
+    <TaxAmount>
+     <TotalAmount>4.16</TotalAmount>
+    </TaxAmount>
+    <EquivalenceSurcharge>1.00</EquivalenceSurcharge>
+    <EquivalenceSurchargeAmount>
+     <TotalAmount>0.26</TotalAmount>
+    </EquivalenceSurchargeAmount>
+   </Tax>
+   <Tax><TaxTypeCode>01</TaxTypeCode><TaxRate>0.00</TaxRate><TaxableBase><TotalAmount>0.00</TotalAmount></TaxableBase></Tax></TaxesOutputs><TaxesWithheld><Tax><TaxTypeCode>05</TaxTypeCode><TaxRate>4.00</TaxRate><TaxableBase><TotalAmount>26.00</TotalAmount></TaxableBase><TaxAmount><TotalAmount>1.04</TotalAmount></TaxAmount></Tax></TaxesWithheld><InvoiceTotals><TotalGrossAmount>59.75</TotalGrossAmount><TotalGeneralDiscounts>0.00</TotalGeneralDiscounts><TotalGeneralSurcharges>0.00</TotalGeneralSurcharges><TotalGrossAmountBeforeTaxes>59.75</TotalGrossAmountBeforeTaxes><TotalTaxOutputs>4.42</TotalTaxOutputs><TotalTaxesWithheld>1.04</TotalTaxesWithheld><InvoiceTotal>63.13</InvoiceTotal><TotalOutstandingAmount>63.13</TotalOutstandingAmount><TotalExecutableAmount>63.13</TotalExecutableAmount></InvoiceTotals><Items><InvoiceLine><IssuerContractReference>A9938281</IssuerContractReference><IssuerContractDate>2010-03-10</IssuerContractDate><IssuerTransactionReference>A9938282</IssuerTransactionReference><IssuerTransactionDate>2010-03-10</IssuerTransactionDate><ReceiverContractReference>BBBH-38271</ReceiverContractReference><ReceiverContractDate>2010-03-10</ReceiverContractDate><ReceiverTransactionReference>BBBH-38272</ReceiverTransactionReference><ReceiverTransactionDate>2010-03-10</ReceiverTransactionDate><FileReference>000298172</FileReference><FileDate>2010-03-10</FileDate><SequenceNumber>1.0</SequenceNumber><DeliveryNotesReferences><DeliveryNote><DeliveryNoteNumber>132413842</DeliveryNoteNumber><DeliveryNoteDate>2010-03-10</DeliveryNoteDate></DeliveryNote><DeliveryNote><DeliveryNoteNumber>987673211</DeliveryNoteNumber><DeliveryNoteDate>2010-03-09</DeliveryNoteDate></DeliveryNote></DeliveryNotesReferences><ItemDescription>Flores</ItemDescription><Quantity>1.0</Quantity><UnitOfMeasure>01</UnitOfMeasure><UnitPriceWithoutTax>25.000000</UnitPriceWithoutTax><TotalCost>25.000000</TotalCost><DiscountsAndRebates><Discount><DiscountReason>Descuento</DiscountReason><DiscountRate>5.0000</DiscountRate><DiscountAmount>1.250000</DiscountAmount></Discount></DiscountsAndRebates><Charges><Charge><ChargeReason>Cargo</ChargeReason><ChargeAmount>10.000000</ChargeAmount></Charge></Charges><GrossAmount>33.750000</GrossAmount><TaxesOutputs><Tax><TaxTypeCode>01</TaxTypeCode><TaxRate>0.00</TaxRate><TaxableBase><TotalAmount>0.00</TotalAmount></TaxableBase><TaxAmount><TotalAmount>0.00</TotalAmount></TaxAmount></Tax></TaxesOutputs><AdditionalLineItemInformation>Contacto en Neuquen: Paulita</AdditionalLineItemInformation><SpecialTaxableEvent><SpecialTaxableEventCode>01</SpecialTaxableEventCode><SpecialTaxableEventReason>Concepto exento por el motivo aqu� definido</SpecialTaxableEventReason></SpecialTaxableEvent><ArticleCode>142</ArticleCode></InvoiceLine><InvoiceLine><IssuerContractDate>2010-03-10</IssuerContractDate><IssuerTransactionDate>2010-03-10</IssuerTransactionDate><ReceiverContractDate>2010-03-10</ReceiverContractDate><ReceiverTransactionDate>2010-03-10</ReceiverTransactionDate><FileDate>2010-03-10</FileDate><SequenceNumber>2.0</SequenceNumber><ItemDescription>Mate</ItemDescription><Quantity>2.0</Quantity><UnitOfMeasure>01</UnitOfMeasure><UnitPriceWithoutTax>13.000000</UnitPriceWithoutTax><TotalCost>26.000000</TotalCost><GrossAmount>26.000000</GrossAmount><TaxesWithheld><Tax><TaxTypeCode>05</TaxTypeCode><TaxRate>4.00</TaxRate><TaxableBase><TotalAmount>26.00</TotalAmount></TaxableBase><TaxAmount><TotalAmount>1.04</TotalAmount></TaxAmount></Tax></TaxesWithheld><TaxesOutputs><Tax><TaxTypeCode>01</TaxTypeCode><TaxRate>16.00</TaxRate><TaxableBase><TotalAmount>26.00</TotalAmount></TaxableBase><TaxAmount><TotalAmount>4.16</TotalAmount></TaxAmount><EquivalenceSurcharge>1.00</EquivalenceSurcharge><EquivalenceSurchargeAmount><TotalAmount>0.26</TotalAmount></EquivalenceSurchargeAmount></Tax></TaxesOutputs><ArticleCode>122</ArticleCode></InvoiceLine></Items><PaymentDetails><Installment><InstallmentDueDate>2010-03-10</InstallmentDueDate><InstallmentAmount>25.00</InstallmentAmount><PaymentMeans>19</PaymentMeans><AccountToBeCredited><IBAN>4322 3432 22 1341234212</IBAN><BankCode>4322</BankCode><BranchCode>3432</BranchCode><OverseasBranchAddress><Address>Juncal 1423 8 Z</Address><PostCodeAndTown>01115 Capital Federal</PostCodeAndTown><Province>Buenos Aires</Province><CountryCode>ARG</CountryCode></OverseasBranchAddress></AccountToBeCredited><PaymentReconciliationReference>12223</PaymentReconciliationReference><AccountToBeDebited><IBAN>1234 4312 22 33212341212314</IBAN><BankCode>1234</BankCode><BranchCode>4312</BranchCode></AccountToBeDebited><DebitReconciliationReference>12223</DebitReconciliationReference></Installment></PaymentDetails></Invoice></Invoices></fe:Facturae>

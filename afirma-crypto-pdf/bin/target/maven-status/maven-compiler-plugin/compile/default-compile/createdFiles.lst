@@ -1,0 +1,9 @@
+es\gob\afirma\signers\pades\PdfIsPasswordProtectedException.class
+es\gob\afirma\signers\pades\InvalidITextException.class
+es\gob\afirma\signers\pades\PdfDocumentSecurityStore$ValidationInformation.class
+es\gob\afirma\signers\pades\BadPdfPasswordException.class
+es\gob\afirma\signers\pades\PdfDocumentSecurityStore.class
+es\gob\afirma\signers\pades\PDFMessages.class
+es\gob\afirma\signers\pades\AOPDFSigner.class
+es\gob\afirma\signers\pades\PdfIsCertifiedException.class
+es\gob\afirma\signers\pades\InvalidPdfException.class

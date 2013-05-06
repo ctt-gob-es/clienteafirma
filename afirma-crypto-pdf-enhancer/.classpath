@@ -1,0 +1,25 @@
+<classpath>
+  <classpathentry kind="src" path="src/main/java" including="**/*.java"/>
+  <classpathentry kind="output" path="target/classes"/>
+  <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+  <classpathentry kind="src" path="/afirma-core"/>
+  <classpathentry kind="src" path="/afirma-crypto-cades"/>
+  <classpathentry kind="src" path="/afirma-crypto-core-pkcs7"/>
+  <classpathentry kind="src" path="/afirma-crypto-core-pkcs7-tsp"/>
+  <classpathentry kind="src" path="/afirma-crypto-padestri-server"/>
+  <classpathentry kind="var" path="M2_REPO/es/gob/afirma/afirma-lib-bouncycastle/1.48/afirma-lib-bouncycastle-1.48.jar"/>
+  <classpathentry kind="var" path="M2_REPO/es/gob/afirma/afirma-lib-itext/3.3.2-SNAPSHOT/afirma-lib-itext-3.3.2-SNAPSHOT.jar"/>
+  <classpathentry kind="var" path="M2_REPO/es/gob/afirma/afirma-lib-jmimemagic/0.0.1/afirma-lib-jmimemagic-0.0.1.jar" sourcepath="M2_REPO/es/gob/afirma/afirma-lib-jmimemagic/0.0.1/afirma-lib-jmimemagic-0.0.1-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/es/gob/afirma/afirma-lib-oro/0.0.1/afirma-lib-oro-0.0.1.jar" sourcepath="M2_REPO/es/gob/afirma/afirma-lib-oro/0.0.1/afirma-lib-oro-0.0.1-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/axis/axis/1.3/axis-1.3.jar"/>
+  <classpathentry kind="var" path="M2_REPO/axis/axis-ant/1.3/axis-ant-1.3.jar"/>
+  <classpathentry kind="var" path="M2_REPO/axis/axis-jaxrpc/1.3/axis-jaxrpc-1.3.jar"/>
+  <classpathentry kind="var" path="M2_REPO/axis/axis-saaj/1.3/axis-saaj-1.3.jar"/>
+  <classpathentry kind="var" path="M2_REPO/axis/axis-schema/1.3/axis-schema-1.3.jar"/>
+  <classpathentry kind="var" path="M2_REPO/commons-discovery/commons-discovery/0.2/commons-discovery-0.2.jar"/>
+  <classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar"/>
+  <classpathentry kind="var" path="M2_REPO/junit/junit/4.8.2/junit-4.8.2.jar" sourcepath="M2_REPO/junit/junit/4.8.2/junit-4.8.2-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.17/log4j-1.2.17.jar"/>
+  <classpathentry kind="var" path="M2_REPO/wsdl4j/wsdl4j/1.5.1/wsdl4j-1.5.1.jar"/>
+  <classpathentry kind="var" path="M2_REPO/wss4j/wss4j/1.5.0/wss4j-1.5.0.jar"/>
+</classpath>
