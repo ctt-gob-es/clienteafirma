@@ -47,11 +47,11 @@ public class TestCosign {
 	@SuppressWarnings("static-method")
 	@Before
 	public void cargaAlmacen() throws Exception {
-		ksIs = TestCosign.class.getResourceAsStream(PKCS12_KEYSTORE);
+		ksIs = getClass().getClassLoader().getResourceAsStream(PKCS12_KEYSTORE);
 		ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
 		ks.load(ksIs, PASSWORD.toCharArray());
 
-		data = AOUtil.getDataFromInputStream(TestCosign.class.getResourceAsStream(DATA_FILE));
+		data = AOUtil.getDataFromInputStream(getClass().getClassLoader().getResourceAsStream(DATA_FILE));
 	}
 
 	/**
@@ -62,7 +62,7 @@ public class TestCosign {
 	@Test
 	public void prueba_cofirmar_firma_implicita_sin_indicar_datos() throws Exception {
 
-		final InputStream is = TestCosign.class.getResourceAsStream(IMPLICIT_SHA1_SIGN_FILE);
+		final InputStream is = getClass().getClassLoader().getResourceAsStream(IMPLICIT_SHA1_SIGN_FILE);
 		final byte[] sign = AOUtil.getDataFromInputStream(is);
 		is.close();
 
@@ -95,7 +95,7 @@ public class TestCosign {
 	@Test
 	public void prueba_cofirmar_firma_implicita_indicando_datos() throws Exception {
 
-		final InputStream is = TestCosign.class.getResourceAsStream(IMPLICIT_SHA1_SIGN_FILE);
+		final InputStream is = getClass().getClassLoader().getResourceAsStream(IMPLICIT_SHA1_SIGN_FILE);
 		final byte[] sign = AOUtil.getDataFromInputStream(is);
 		is.close();
 
@@ -131,7 +131,7 @@ public class TestCosign {
 	@Test
 	public void prueba_cofirma_implicita_de_firma_explicita_sin_indicar_datos() throws Exception {
 
-		final InputStream is = TestCosign.class.getResourceAsStream(EXPLICIT_SHA1_SIGN_FILE);
+		final InputStream is = getClass().getClassLoader().getResourceAsStream(EXPLICIT_SHA1_SIGN_FILE);
 		final byte[] sign = AOUtil.getDataFromInputStream(is);
 		is.close();
 
@@ -166,7 +166,7 @@ public class TestCosign {
 	@Test
 	public void prueba_cofirma_implicita_de_firma_explicita_indicando_datos() throws Exception {
 
-		final InputStream is = TestCosign.class.getResourceAsStream(EXPLICIT_SHA1_SIGN_FILE);
+		final InputStream is = getClass().getClassLoader().getResourceAsStream(EXPLICIT_SHA1_SIGN_FILE);
 		final byte[] sign = AOUtil.getDataFromInputStream(is);
 		is.close();
 
@@ -202,7 +202,7 @@ public class TestCosign {
 	@Test
 	public void prueba_cofirma_explicita_de_firma_explicita_indicando_hash() throws Exception {
 
-		final InputStream is = TestCosign.class.getResourceAsStream(EXPLICIT_SHA1_SIGN_FILE);
+		final InputStream is = getClass().getClassLoader().getResourceAsStream(EXPLICIT_SHA1_SIGN_FILE);
 		final byte[] sign = AOUtil.getDataFromInputStream(is);
 		is.close();
 
@@ -243,7 +243,7 @@ public class TestCosign {
 	@Test
 	public void prueba_cofirma_explicita_de_firma_explicita_mismo_algoritmo_sin_datos() throws Exception {
 
-		final InputStream is = TestCosign.class.getResourceAsStream(EXPLICIT_SHA1_SIGN_FILE);
+		final InputStream is = getClass().getClassLoader().getResourceAsStream(EXPLICIT_SHA1_SIGN_FILE);
 		final byte[] sign = AOUtil.getDataFromInputStream(is);
 		is.close();
 
@@ -284,7 +284,7 @@ public class TestCosign {
 	@Test
 	public void prueba_cofirma_explicita_de_firma_explicita_distinto_algoritmo_sin_datos() throws Exception {
 
-		final InputStream is = TestCosign.class.getResourceAsStream(EXPLICIT_SHA1_SIGN_FILE);
+		final InputStream is = getClass().getClassLoader().getResourceAsStream(EXPLICIT_SHA1_SIGN_FILE);
 		final byte[] sign = AOUtil.getDataFromInputStream(is);
 		is.close();
 

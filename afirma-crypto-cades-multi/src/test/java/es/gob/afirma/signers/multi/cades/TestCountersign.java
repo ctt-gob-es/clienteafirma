@@ -40,7 +40,7 @@ public class TestCountersign {
 	@SuppressWarnings("static-method")
 	@Before
 	public void cargaAlmacen() throws Exception {
-		ksIs = TestCountersign.class.getResourceAsStream(PKCS12_KEYSTORE);
+		ksIs = getClass().getClassLoader().getResourceAsStream(PKCS12_KEYSTORE);
 		ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
 		ks.load(ksIs, PASSWORD.toCharArray());
 	}
@@ -53,7 +53,7 @@ public class TestCountersign {
 	@Test
 	public void prueba_contrafirma_de_arbol_de_firma_explicita() throws Exception {
 
-		final InputStream is = TestCountersign.class.getResourceAsStream(EXPLICIT_SHA1_COUNTERSIGN_FILE);
+		final InputStream is = getClass().getClassLoader().getResourceAsStream(EXPLICIT_SHA1_COUNTERSIGN_FILE);
 		final byte[] sign = AOUtil.getDataFromInputStream(is);
 		is.close();
 
@@ -89,7 +89,7 @@ public class TestCountersign {
 	@Test
 	public void prueba_contrafirma_de_firma_explicita_nodos_hoja() throws Exception {
 
-		final InputStream is = TestCountersign.class.getResourceAsStream(EXPLICIT_SHA1_COUNTERSIGN_FILE);
+		final InputStream is = getClass().getClassLoader().getResourceAsStream(EXPLICIT_SHA1_COUNTERSIGN_FILE);
 		final byte[] sign = AOUtil.getDataFromInputStream(is);
 		is.close();
 
@@ -125,7 +125,7 @@ public class TestCountersign {
 	@Test
 	public void prueba_contrafirma_de_arbol_de_firma_implicita() throws Exception {
 
-		final InputStream is = TestCountersign.class.getResourceAsStream(IMPLICIT_SHA1_COUNTERSIGN_FILE);
+		final InputStream is = getClass().getClassLoader().getResourceAsStream(IMPLICIT_SHA1_COUNTERSIGN_FILE);
 		final byte[] sign = AOUtil.getDataFromInputStream(is);
 		is.close();
 
@@ -160,7 +160,7 @@ public class TestCountersign {
 	@Test
 	public void prueba_contrafirma_de_firma_implicita_nodos_hoja() throws Exception {
 
-		final InputStream is = TestCountersign.class.getResourceAsStream(IMPLICIT_SHA1_COUNTERSIGN_FILE);
+		final InputStream is = getClass().getClassLoader().getResourceAsStream(IMPLICIT_SHA1_COUNTERSIGN_FILE);
 		final byte[] sign = AOUtil.getDataFromInputStream(is);
 		is.close();
 
