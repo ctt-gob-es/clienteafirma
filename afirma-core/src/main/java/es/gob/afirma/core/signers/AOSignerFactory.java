@@ -31,6 +31,7 @@ public final class AOSignerFactory {
 	private static final String SIGNER_CLASS_CMS = "es.gob.afirma.signers.cms.AOCMSSigner"; //$NON-NLS-1$
 	private static final String SIGNER_CLASS_FACTURAE = "es.gob.afirma.signers.xades.AOFacturaESigner"; //$NON-NLS-1$
 	private static final String SIGNER_CLASS_XADES = "es.gob.afirma.signers.xades.AOXAdESSigner"; //$NON-NLS-1$
+	private static final String SIGNER_CLASS_XADES_TRI = "es.gob.afirma.signers.xadestri.client.AOXAdESTriPhaseSigner"; //$NON-NLS-1$
 	private static final String SIGNER_CLASS_XMLDSIG = "es.gob.afirma.signers.xmldsig.AOXMLDSigSigner"; //$NON-NLS-1$
 	private static final String SIGNER_CLASS_PADES = "es.gob.afirma.signers.pades.AOPDFSigner"; //$NON-NLS-1$
 	private static final String SIGNER_CLASS_PADES_TRI = "es.gob.afirma.signers.padestri.client.AOPDFTriPhaseSigner"; //$NON-NLS-1$
@@ -40,11 +41,11 @@ public final class AOSignerFactory {
 	private static final String[][] SIGNERS_CLASSES = new String[][] {
 		{AOSignConstants.SIGN_FORMAT_CADES, SIGNER_CLASS_CADES},
 		{AOSignConstants.SIGN_FORMAT_CADES_TRI, SIGNER_CLASS_CADES_TRI},
-		{AOSignConstants.SIGN_FORMAT_CADES_TRI_ALT1, SIGNER_CLASS_CADES_TRI},
 		{AOSignConstants.SIGN_FORMAT_CMS, SIGNER_CLASS_CMS},
 		{AOSignConstants.SIGN_FORMAT_FACTURAE, SIGNER_CLASS_FACTURAE},
 		{AOSignConstants.SIGN_FORMAT_FACTURAE_ALT1, SIGNER_CLASS_FACTURAE},
 		{AOSignConstants.SIGN_FORMAT_XADES, SIGNER_CLASS_XADES},
+		{AOSignConstants.SIGN_FORMAT_XADES_TRI, SIGNER_CLASS_XADES_TRI},
 		{AOSignConstants.SIGN_FORMAT_XADES_DETACHED, SIGNER_CLASS_XADES},
 		{AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED, SIGNER_CLASS_XADES},
 		{AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING, SIGNER_CLASS_XADES},
@@ -55,91 +56,92 @@ public final class AOSignerFactory {
 		{AOSignConstants.SIGN_FORMAT_PDF, SIGNER_CLASS_PADES},
 		{AOSignConstants.SIGN_FORMAT_PDF_TRI, SIGNER_CLASS_PADES_TRI},
 		{AOSignConstants.SIGN_FORMAT_PADES, SIGNER_CLASS_PADES},
+		{AOSignConstants.SIGN_FORMAT_PADES_TRI, SIGNER_CLASS_PADES_TRI},
 		{AOSignConstants.SIGN_FORMAT_ODF, SIGNER_CLASS_ODF},
 		{AOSignConstants.SIGN_FORMAT_ODF_ALT1, SIGNER_CLASS_ODF},
 		{AOSignConstants.SIGN_FORMAT_OOXML, SIGNER_CLASS_OOXML},
 		{AOSignConstants.SIGN_FORMAT_OOXML_ALT1, SIGNER_CLASS_OOXML}
 	};
 
-    private AOSignerFactory() {
-        // No permitimos la instanciacion externa
-    }
+	private AOSignerFactory() {
+		// No permitimos la instanciacion externa
+	}
 
-    /** Obtiene una instancia de la factor&iacute;a.
-     * @return Instancia de la factor&iacute;a */
-    public static AOSignerFactory getInstance() {
-        if (signerFactory != null) {
-            return signerFactory;
-        }
-        signerFactory = new AOSignerFactory();
-        return signerFactory;
-    }
+	/** Obtiene una instancia de la factor&iacute;a.
+	 * @return Instancia de la factor&iacute;a */
+	public static AOSignerFactory getInstance() {
+		if (signerFactory != null) {
+			return signerFactory;
+		}
+		signerFactory = new AOSignerFactory();
+		return signerFactory;
+	}
 
-    /** Recupera un manejador de firma capaz de tratar la firma indicada. En caso
-     * de no tener ning&uacute;n manejador compatible se devolver&aacute; <code>null</code>.
-     * @param signData Firma electr&oacute;nica
-     * @return Manejador de firma
-     * @throws IOException Si ocurren problemas relacionados con la lectura de la firma */
-    public static AOSigner getSigner(final byte[] signData) throws IOException {
-        if (signData == null) {
-            throw new IllegalArgumentException("No se han indicado datos de firma"); //$NON-NLS-1$
-        }
-        for (final String format[] : SIGNERS_CLASSES) {
-            if (SIGNERS.get(format[0]) == null) {
-                try {
-                    SIGNERS.put(format[0], (AOSigner) Class.forName(format[1]).newInstance());
-                }
-                catch(final Exception e) {
-                    LOGGER.warning("No se ha podido instanciar un manejador para el formato de firma '" + format[0] + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
-                    continue;
-                }
-            }
-            final AOSigner signer = SIGNERS.get(format[0]);
-            if (signer != null && signer.isSign(signData)) {
-                return signer;
-            }
-        }
-        return null;
-    }
+	/** Recupera un manejador de firma capaz de tratar la firma indicada. En caso
+	 * de no tener ning&uacute;n manejador compatible se devolver&aacute; <code>null</code>.
+	 * @param signData Firma electr&oacute;nica
+	 * @return Manejador de firma
+	 * @throws IOException Si ocurren problemas relacionados con la lectura de la firma */
+	public static AOSigner getSigner(final byte[] signData) throws IOException {
+		if (signData == null) {
+			throw new IllegalArgumentException("No se han indicado datos de firma"); //$NON-NLS-1$
+		}
+		for (final String format[] : SIGNERS_CLASSES) {
+			if (SIGNERS.get(format[0]) == null) {
+				try {
+					SIGNERS.put(format[0], (AOSigner) Class.forName(format[1]).newInstance());
+				}
+				catch(final Exception e) {
+					LOGGER.warning("No se ha podido instanciar un manejador para el formato de firma '" + format[0] + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+					continue;
+				}
+			}
+			final AOSigner signer = SIGNERS.get(format[0]);
+			if (signer != null && signer.isSign(signData)) {
+				return signer;
+			}
+		}
+		return null;
+	}
 
-    /** Obtiene un manejador para un formato de firma dado. En caso de no
-     * encontrar ninguno, se devuelve <code>null</code>.
-     * @param signFormat Formato de firma para el cual solicitamos el manejador.
-     * @return Manejador capaz de firmar en el formato indicado. */
-    public static AOSigner getSigner(final String signFormat) {
-    	String signerClass = null;
-    	for (final String[] format : SIGNERS_CLASSES) {
-    		if (format[0].equalsIgnoreCase(signFormat)) {
-    			signerClass = format[1];
-    			break;
-    		}
-    	}
-        if (signerClass == null) {
-            LOGGER.warning("El formato de firma '" + signFormat + "' no esta soportado, se devolvera null"); //$NON-NLS-1$ //$NON-NLS-2$
-            return null;
-        }
-        if (SIGNERS.get(signFormat) == null) {
-            try {
-                SIGNERS.put(signFormat, (AOSigner) Class.forName(signerClass).newInstance());
-            }
-            catch(final Exception e) {
-                LOGGER.severe("No se ha podido instanciar un manejador para el formato de firma '" + signFormat + "', se devolvera null: " + e); //$NON-NLS-1$ //$NON-NLS-2$
-            }
-        }
-        return SIGNERS.get(signFormat);
-    }
+	/** Obtiene un manejador para un formato de firma dado. En caso de no
+	 * encontrar ninguno, se devuelve <code>null</code>.
+	 * @param signFormat Formato de firma para el cual solicitamos el manejador.
+	 * @return Manejador capaz de firmar en el formato indicado. */
+	public static AOSigner getSigner(final String signFormat) {
+		String signerClass = null;
+		for (final String[] format : SIGNERS_CLASSES) {
+			if (format[0].equalsIgnoreCase(signFormat)) {
+				signerClass = format[1];
+				break;
+			}
+		}
+		if (signerClass == null) {
+			LOGGER.warning("El formato de firma '" + signFormat + "' no esta soportado, se devolvera null"); //$NON-NLS-1$ //$NON-NLS-2$
+			return null;
+		}
+		if (SIGNERS.get(signFormat) == null) {
+			try {
+				SIGNERS.put(signFormat, (AOSigner) Class.forName(signerClass).newInstance());
+			}
+			catch(final Exception e) {
+				LOGGER.severe("No se ha podido instanciar un manejador para el formato de firma '" + signFormat + "', se devolvera null: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+		}
+		return SIGNERS.get(signFormat);
+	}
 
-    /**
-     * Recupera el listado de formatos de firma soportados por el Cliente (no los actualmente cargados).
-     * @return Listado de formatos.
-     */
-    public static String[] getSupportedFormats() {
-    	int i = 0;
-    	final String[] formats = new String[SIGNERS_CLASSES.length];
-        for (final String[] format : SIGNERS_CLASSES) {
-            formats[i++] = format[0];
-        }
-        return formats;
-    }
+	/**
+	 * Recupera el listado de formatos de firma soportados por el Cliente (no los actualmente cargados).
+	 * @return Listado de formatos.
+	 */
+	public static String[] getSupportedFormats() {
+		int i = 0;
+		final String[] formats = new String[SIGNERS_CLASSES.length];
+		for (final String[] format : SIGNERS_CLASSES) {
+			formats[i++] = format[0];
+		}
+		return formats;
+	}
 
 }
