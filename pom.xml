@@ -51,20 +51,4 @@
 		<module>afirma-crypto-pdf</module>
 		<module>afirma-core-massive</module>
 	</modules>
-	
-	<scm>
-		<connection>scm:svn:http://svn-ctt.administracionelectronica.gob.es/svn/clienteafirma/project/afirma/trunk</connection>
-		<url>http://svn-ctt.administracionelectronica.gob.es/svn/clienteafirma/project/afirma/trunk</url>
-	</scm>
-	
-	<distributionManagement>
-		<repository>
-			<id>nexus</id>
-			<url>http://devel01.uji.es:8080/nexus/content/repositories/releases</url>
-		</repository>
-		<snapshotRepository>
-			<id>nexus</id>
-			<url>http://devel01.uji.es:8080/nexus/content/repositories/snapshots</url>
-		</snapshotRepository>
-	</distributionManagement>
 </project>
