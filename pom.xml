@@ -11,6 +11,7 @@
 		<groupId>es.gob.afirma</groupId>
 		<artifactId>afirma-client</artifactId>
 		<version>3.3.2-SNAPSHOT</version>
+		<relativePath>../../pom.xml</relativePath>
 	</parent>
 
 	<description>Librerías del núcleo de afirma</description>
