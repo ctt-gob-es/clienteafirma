@@ -33,7 +33,7 @@
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-lib-commons-io</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>2.2</version>
 		</dependency>
 	</dependencies>
 </project>
