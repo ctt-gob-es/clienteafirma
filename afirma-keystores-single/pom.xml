@@ -6,15 +6,16 @@
 	<artifactId>afirma-keystores-single</artifactId>
 	<name>afirma-keystores-single</name>
 
-	<properties>
-        <afirma.keytool.keystore>${basedir}/../../../afirma.keystore</afirma.keytool.keystore>
-	</properties>
-	
 	<parent>
 		<groupId>es.gob.afirma</groupId>
 		<artifactId>afirma-client</artifactId>
 		<version>3.3.2-SNAPSHOT</version>
+		<relativePath>../../../pom.xml</relativePath>
 	</parent>
+
+	<properties>
+        <afirma.keytool.keystore>${basedir}/../afirma.keystore</afirma.keytool.keystore>
+	</properties>
 
 	<dependencies>
 		<dependency>

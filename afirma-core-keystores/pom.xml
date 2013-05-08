@@ -10,10 +10,11 @@
 		<groupId>es.gob.afirma</groupId>
 		<artifactId>afirma-client</artifactId>
 		<version>3.3.2-SNAPSHOT</version>
+		<relativePath>../../../pom.xml</relativePath>
 	</parent>
 
 	<properties>
-        <afirma.keytool.keystore>${basedir}/../../../afirma.keystore</afirma.keytool.keystore>
+        <afirma.keytool.keystore>${basedir}/../afirma.keystore</afirma.keytool.keystore>
 	</properties>
 	
 	<dependencies>
