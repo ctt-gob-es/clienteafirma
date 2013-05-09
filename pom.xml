@@ -15,10 +15,6 @@
 	</parent>
 
 	<description>Librerías del núcleo de afirma</description>
-
-	<properties>
-        <afirma.keytool.keystore>${basedir}/afirma.keystore</afirma.keytool.keystore>
-	</properties>
 	
 	<modules>
 		<module>afirma-core</module>

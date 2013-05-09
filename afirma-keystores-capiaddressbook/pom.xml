@@ -13,10 +13,6 @@
 		<relativePath>../../../pom.xml</relativePath>
 	</parent>
 
-	<properties>
-        <afirma.keytool.keystore>${basedir}/../afirma.keystore</afirma.keytool.keystore>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>sunmscapi</groupId>
