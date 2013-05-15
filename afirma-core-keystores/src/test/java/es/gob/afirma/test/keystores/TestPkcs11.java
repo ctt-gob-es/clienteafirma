@@ -11,7 +11,6 @@ import java.util.Enumeration;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import sun.security.pkcs11.SunPKCS11;
 import es.gob.afirma.keystores.main.callbacks.CachePasswordCallback;
 import es.gob.afirma.keystores.main.common.AOKeyStore;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
@@ -48,7 +47,8 @@ public final class TestPkcs11 {
 	@Test
 	@Ignore
 	public void testRawPkcs11() throws Exception {
-		final Provider p = new SunPKCS11(
+		@SuppressWarnings("restriction")
+		final Provider p = new sun.security.pkcs11.SunPKCS11(
 			new ByteArrayInputStream(
 				(
 					"name=pkcs11-win_dll\n" + //$NON-NLS-1$
