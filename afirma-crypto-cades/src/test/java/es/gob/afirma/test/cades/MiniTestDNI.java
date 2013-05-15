@@ -19,9 +19,9 @@ import java.util.Properties;
 
 import junit.framework.Assert;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
-import sun.security.pkcs11.SunPKCS11;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.signers.cades.GenCAdESEPESSignedData;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
@@ -46,10 +46,12 @@ public class MiniTestDNI {
      * @throws Exception en caso de cualquier tipo de problema
      */
     @SuppressWarnings({ "static-method" })
+    @Ignore
 	@Test
     public void testCAdESDNIe() throws Exception {
 
-        final Provider p = new SunPKCS11(new ByteArrayInputStream(DNIE_DRIVER_PATH.getBytes()));
+        @SuppressWarnings("restriction")
+		final Provider p = new sun.security.pkcs11.SunPKCS11(new ByteArrayInputStream(DNIE_DRIVER_PATH.getBytes()));
         Security.addProvider(p);
         final KeyStore ks = KeyStore.getInstance("PKCS11", p); //$NON-NLS-1$
         ks.load(null, DNI_PIN);
