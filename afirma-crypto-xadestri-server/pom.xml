@@ -8,11 +8,10 @@
 
 	<parent>
 		<groupId>es.gob.afirma</groupId>
-		<artifactId>afirma-client</artifactId>
+		<artifactId>afirma</artifactId>
 		<version>3.3.2-SNAPSHOT</version>
-		<relativePath>../../../pom.xml</relativePath>
 	</parent>
-
+	
 	<dependencies>
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
