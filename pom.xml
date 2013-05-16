@@ -13,13 +13,6 @@
 		<project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
 	</properties>
 
-	<repositories>
-		<repository>
-			<id>uji</id>
-			<url>http://devel.uji.es/nexus/content/groups/public/</url>
-		</repository>
-	</repositories>
-
 	<description>Librerías del núcleo de afirma</description>
 	
 	<modules>
