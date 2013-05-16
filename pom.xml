@@ -5,9 +5,9 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>es.gob.afirma</groupId>
 	<version>3.3.2-SNAPSHOT</version>
-	<artifactId>afirma</artifactId>
+	<artifactId>afirma-client</artifactId>
 	<packaging>pom</packaging>
-	<name>afirma</name>
+	<name>afirma-client</name>
 
 	<properties>
 		<project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
