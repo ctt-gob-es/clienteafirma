@@ -14,8 +14,7 @@ public final class TestHttpConnection {
 	@SuppressWarnings("static-method")
 	@Test
 	public void testHttpsConnection() throws IOException {
-		Assert.assertNotNull(UrlHttpManagerImpl.readUrlByGet("https://www.google.es")); //$NON-NLS-1$
-		Assert.assertNotNull(UrlHttpManagerImpl.readUrlByPost("https://forja-ctt.administracionelectronica.gob.es/")); //$NON-NLS-1$
+		Assert.assertNotNull(es.gob.afirma.core.misc.UrlHttpManagerImpl.readUrlByPost("https://valide.redsara.es/valide/")); //$NON-NLS-1$
 	}
 
 }
