@@ -16,5 +16,4 @@ public final class TestHttpConnection {
 	public void testHttpsConnection() throws IOException {
 		Assert.assertNotNull(es.gob.afirma.core.misc.UrlHttpManagerImpl.readUrlByPost("https://valide.redsara.es/valide/")); //$NON-NLS-1$
 	}
-
 }
