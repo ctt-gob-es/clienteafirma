@@ -42,9 +42,6 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 	/** Nombre de la propiedad de URL del servidor de firma trif&aacute;sica. */
 	private static final String PROPERTY_NAME_SIGN_SERVER_URL = "serverUrl"; //$NON-NLS-1$
 
-	/** Identificador del documento a firmar, por el cual se obtiene desde el servidor documental. */
-	private static final String PROPERTY_NAME_DOCUMENT_ID = "documentId"; //$NON-NLS-1$
-
 	/** Identificador de la operacion de prefirma en servidor. */
 	private static final String OPERATION_PRESIGN = "pre"; //$NON-NLS-1$
 
@@ -107,7 +104,10 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 		if (certChain == null || certChain.length == 0) {
 			throw new IllegalArgumentException("Es necesario proporcionar el certificado de firma"); //$NON-NLS-1$
 		}
-
+		if (data == null) {
+			throw new IllegalArgumentException("No se ha proporcionado el identificador de documento a firmar"); //$NON-NLS-1$
+		}
+		
 		final Properties configParams = new Properties();
 		for (final String keyParam : extraParams.keySet().toArray(new String[extraParams.size()])) {
 			configParams.setProperty(keyParam, extraParams.getProperty(keyParam));
@@ -122,21 +122,13 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 		}
 		configParams.remove(PROPERTY_NAME_SIGN_SERVER_URL);
 
-		String documentId = configParams.getProperty(PROPERTY_NAME_DOCUMENT_ID);
-		if (documentId == null || "".equals(documentId)) { //$NON-NLS-1$
-			if (data != null) {
-				try {
-					documentId = Base64.encodeBytes(data, Base64.URL_SAFE);
-				} catch (final IOException e) {
-					throw new IllegalArgumentException("Error al interpretar los datos como identificador del documento que desea firmar", e); //$NON-NLS-1$
-				}
-			} else {
-				throw new IllegalArgumentException("No se ha proporcionado un identificador de documento"); //$NON-NLS-1$
-			}
-		} else if (data != null) {
-			LOGGER.warning("Se ignoraran los datos indicados por haberse introducido un identificador para la descarga de datos del servidor"); //$NON-NLS-1$
+		// Decodificamos el identificador del documento
+		final String documentId;
+		try {
+			documentId = Base64.encodeBytes(data, Base64.URL_SAFE);
+		} catch (final IOException e) {
+			throw new IllegalArgumentException("Error al interpretar los datos como identificador del documento que desea firmar", e); //$NON-NLS-1$
 		}
-		configParams.remove(PROPERTY_NAME_DOCUMENT_ID);
 
 		// ---------
 		// PREFIRMA
@@ -152,36 +144,17 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 			//  - Algoritmo de firma a utilizar
 			//  - Certificado de firma
 			//  - Parametros extra de configuracion
-			preSignResult = UrlHttpManagerImpl.readUrlByPost(
-					signServerUrl + HTTP_CGI +
-					PARAMETER_NAME_OPERATION +
-					HTTP_EQUALS +
-					OPERATION_PRESIGN +
-					HTTP_AND +
-					PARAMETER_NAME_CRYPTO_OPERATION +
-					HTTP_EQUALS +
-					CRYPTO_OPERATION_SIGN +
-					HTTP_AND +
-					PARAMETER_NAME_DOCID +
-					HTTP_EQUALS +
-					documentId +
-					HTTP_AND +
-					PARAMETER_NAME_FORMAT +
-					HTTP_EQUALS +
-					PADES_FORMAT +
-					HTTP_AND +
-					PARAMETER_NAME_ALGORITHM +
-					HTTP_EQUALS +
-					algorithm +
-					HTTP_AND +
-					PARAMETER_NAME_CERT +
-					HTTP_EQUALS +
-					Base64.encodeBytes(certChain[0].getEncoded(), Base64.URL_SAFE) +
-					HTTP_AND +
-					PARAMETER_NAME_EXTRA_PARAM +
-					HTTP_EQUALS +
-					properties2Base64(configParams)
-					);
+			final StringBuffer urlBuffer = new StringBuffer();
+			urlBuffer.append(signServerUrl).append(HTTP_CGI).
+			append(PARAMETER_NAME_OPERATION).append(HTTP_EQUALS).append(OPERATION_PRESIGN).append(HTTP_AND).
+			append(PARAMETER_NAME_CRYPTO_OPERATION).append(HTTP_EQUALS).append(CRYPTO_OPERATION_SIGN).append(HTTP_AND).
+			append(PARAMETER_NAME_FORMAT).append(HTTP_EQUALS).append(PADES_FORMAT).append(HTTP_AND).
+			append(PARAMETER_NAME_ALGORITHM).append(HTTP_EQUALS).append(algorithm).append(HTTP_AND).
+			append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(Base64.encodeBytes(certChain[0].getEncoded(), Base64.URL_SAFE)).append(HTTP_AND).
+			append(PARAMETER_NAME_EXTRA_PARAM).append(HTTP_EQUALS).append(properties2Base64(configParams)).append(HTTP_AND).
+			append(PARAMETER_NAME_DOCID).append(HTTP_EQUALS).append(documentId);
+			
+			preSignResult = UrlHttpManagerImpl.readUrlByPost(urlBuffer.toString());
 		}
 		catch (final CertificateEncodingException e) {
 			throw new AOException("Error decodificando el certificado del firmante: " + e, e); //$NON-NLS-1$
@@ -227,36 +200,17 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 
 		final byte[] triSignFinalResult;
 		try {
-			triSignFinalResult = UrlHttpManagerImpl.readUrlByPost(
-					signServerUrl + HTTP_CGI +
-					PARAMETER_NAME_OPERATION +
-					HTTP_EQUALS +
-					OPERATION_POSTSIGN +
-					HTTP_AND +
-					PARAMETER_NAME_CRYPTO_OPERATION +
-					HTTP_EQUALS +
-					CRYPTO_OPERATION_SIGN +
-					HTTP_AND +
-					PARAMETER_NAME_DOCID +
-					HTTP_EQUALS +
-					documentId +
-					HTTP_AND +
-					PARAMETER_NAME_FORMAT +
-					HTTP_EQUALS +
-					PADES_FORMAT +
-					HTTP_AND +
-					PARAMETER_NAME_ALGORITHM +
-					HTTP_EQUALS +
-					algorithm +
-					HTTP_AND +
-					PARAMETER_NAME_CERT +
-					HTTP_EQUALS +
-					Base64.encodeBytes(certChain[0].getEncoded(), Base64.URL_SAFE) +
-					HTTP_AND +
-					PARAMETER_NAME_EXTRA_PARAM +
-					HTTP_EQUALS +
-					properties2Base64(configParams)
-					);
+			StringBuffer urlBuffer = new StringBuffer();
+			urlBuffer.append(signServerUrl).append(HTTP_CGI).
+			append(PARAMETER_NAME_OPERATION).append(HTTP_EQUALS).append(OPERATION_POSTSIGN).append(HTTP_AND).
+			append(PARAMETER_NAME_CRYPTO_OPERATION).append(HTTP_EQUALS).append(CRYPTO_OPERATION_SIGN).append(HTTP_AND).
+			append(PARAMETER_NAME_FORMAT).append(HTTP_EQUALS).append(PADES_FORMAT).append(HTTP_AND).
+			append(PARAMETER_NAME_ALGORITHM).append(HTTP_EQUALS).append(algorithm).append(HTTP_AND).
+			append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(Base64.encodeBytes(certChain[0].getEncoded(), Base64.URL_SAFE)).append(HTTP_AND).
+			append(PARAMETER_NAME_EXTRA_PARAM).append(HTTP_EQUALS).append(properties2Base64(configParams)).append(HTTP_AND).
+			append(PARAMETER_NAME_DOCID).append(HTTP_EQUALS).append(documentId);
+			
+			triSignFinalResult = UrlHttpManagerImpl.readUrlByPost(urlBuffer.toString());
 		}
 		catch (final CertificateEncodingException e) {
 			throw new AOException("Error decodificando el certificado del firmante: " + e, e); //$NON-NLS-1$

@@ -55,9 +55,6 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 	/** Nombre de la propiedad de URL del servidor de firma trif&aacute;sica. */
 	private static final String PROPERTY_NAME_SIGN_SERVER_URL = "serverUrl"; //$NON-NLS-1$
 
-	/** Identificador del documento a firmar, por el cual se obtiene desde el servidor documental. */
-	private static final String PROPERTY_NAME_DOCUMENT_ID = "documentId"; //$NON-NLS-1$
-
 	/** Identificador de la operaci&oacute;n de prefirma en servidor. */
 	private static final String OPERATION_PRESIGN = "pre"; //$NON-NLS-1$
 
@@ -81,7 +78,6 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 	private static final String HTTP_AND = "&"; //$NON-NLS-1$
 
 	// Parametros que necesitamos para la URL de las llamadas al servidor de firma
-	private static final String PARAMETER_NAME_DATA = "dat"; //$NON-NLS-1$
 	private static final String PARAMETER_NAME_DOCID = "doc"; //$NON-NLS-1$
 	private static final String PARAMETER_NAME_ALGORITHM = "algo"; //$NON-NLS-1$
 	private static final String PARAMETER_NAME_FORMAT = "format"; //$NON-NLS-1$
@@ -218,8 +214,8 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 			throw new IllegalArgumentException("Es necesario proporcionar un certificado de firma"); //$NON-NLS-1$
 		}
 
-		if (data == null && !xParams.containsKey(PROPERTY_NAME_DOCUMENT_ID)) {
-			throw new IllegalArgumentException("No se han proporcionado datos de entrada ni el identificador de documento a firmar"); //$NON-NLS-1$
+		if (data == null) {
+			throw new IllegalArgumentException("No se ha proporcionado el identificador de documento a firmar"); //$NON-NLS-1$
 		}
 
 		// Creamos una copia de los parametros
@@ -238,12 +234,12 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 		}
 		configParams.remove(PROPERTY_NAME_SIGN_SERVER_URL);
 
-		String documentId = null;
-		if (configParams.containsKey(PROPERTY_NAME_DOCUMENT_ID)) {
-			if (data == null) {
-				documentId = configParams.getProperty(PROPERTY_NAME_DOCUMENT_ID);
-			}
-			configParams.remove(PROPERTY_NAME_DOCUMENT_ID);
+		// Decodificamos el identificador del documento
+		final String documentId;
+		try {
+			documentId = Base64.encodeBytes(data, Base64.URL_SAFE);
+		} catch (final IOException e) {
+			throw new IllegalArgumentException("Error al interpretar los datos como identificador del documento que desea firmar", e); //$NON-NLS-1$
 		}
 
 		final String algoUri = SIGN_ALGOS_URI.get(algorithm);
@@ -280,13 +276,8 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 				append(properties2Base64(configParams));
 			}
 
-			if (data != null) {
-				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_DATA).append(HTTP_EQUALS).
-				append(Base64.encodeBytes(data, Base64.URL_SAFE));
-			} else {
-				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_DOCID).append(HTTP_EQUALS).
-				append(documentId);
-			}
+			urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_DOCID).append(HTTP_EQUALS).
+			append(documentId);
 
 			preSignResult = UrlHttpManagerImpl.readUrlByPost(urlBuffer.toString());
 			urlBuffer.setLength(0);
@@ -350,16 +341,9 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 			append(PARAMETER_NAME_CRYPTO_OPERATION).append(HTTP_EQUALS).append(cryptoOperation).append(HTTP_AND).
 			append(PARAMETER_NAME_FORMAT).append(HTTP_EQUALS).append(XADES_FORMAT).append(HTTP_AND).
 			append(PARAMETER_NAME_ALGORITHM).append(HTTP_EQUALS).append(algorithm).append(HTTP_AND).
-			append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(Base64.encodeBytes(certChain[0].getEncoded(), Base64.URL_SAFE)).
-			append(HTTP_AND).append(PARAMETER_NAME_EXTRA_PARAM).append(HTTP_EQUALS).append(properties2Base64(configParams));
-
-			if (data != null) {
-				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_DATA).append(HTTP_EQUALS).
-				append(Base64.encodeBytes(data, Base64.URL_SAFE));
-			} else {
-				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_DOCID).append(HTTP_EQUALS).
-				append(documentId);
-			}
+			append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(Base64.encodeBytes(certChain[0].getEncoded(), Base64.URL_SAFE)).append(HTTP_AND).
+			append(PARAMETER_NAME_EXTRA_PARAM).append(HTTP_EQUALS).append(properties2Base64(configParams)).append(HTTP_AND).
+			append(PARAMETER_NAME_DOCID).append(HTTP_EQUALS).append(documentId);
 
 			triSignFinalResult = UrlHttpManagerImpl.readUrlByPost(urlBuffer.toString());
 			urlBuffer.setLength(0);

@@ -214,8 +214,13 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 		}
 		configParams.remove(PROPERTY_NAME_SIGN_SERVER_URL);
 
-		// Comprobamos el identificador del documento
-		final String documentId = new String(data);
+		// Decodificamos el identificador del documento
+		final String documentId;
+		try {
+			documentId = Base64.encodeBytes(data, Base64.URL_SAFE);
+		} catch (final IOException e) {
+			throw new IllegalArgumentException("Error al interpretar los datos como identificador del documento que desea firmar", e); //$NON-NLS-1$
+		}
 
 		// ---------
 		// PREFIRMA
