@@ -14,6 +14,7 @@ import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.Properties;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -32,6 +33,7 @@ public class AOXAdESTriPhaseSignerTest {
 	private static final String SERVER_URL = "http://172.24.22.235:8080/SignFolderMobileProxy/SignatureService"; //$NON-NLS-1$
 
 	@Test
+	@Ignore
 	public void pruebaFirmaXAdES() throws Exception {
 
 		final byte[] data = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(DATA_FILENAME));
@@ -51,6 +53,7 @@ public class AOXAdESTriPhaseSignerTest {
 	}
 
 	@Test
+	@Ignore
 	public void pruebaCofirmaXAdES() throws Exception {
 
 		final byte[] sign = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(SIGNATURE_FILENAME));
