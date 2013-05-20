@@ -38,29 +38,33 @@ public final class AOSignerFactory {
 	private static final String SIGNER_CLASS_ODF = "es.gob.afirma.signers.odf.AOODFSigner"; //$NON-NLS-1$
 	private static final String SIGNER_CLASS_OOXML = "es.gob.afirma.signers.ooxml.AOOOXMLSigner"; //$NON-NLS-1$
 
+	// Listado los formatos con la siguiente informacion:
+	// 0.- Nombre
+	// 1.- Clase manejadora
+	// 2.- Soporte de identificacion de firmas
 	private static final String[][] SIGNERS_CLASSES = new String[][] {
-		{AOSignConstants.SIGN_FORMAT_CADES, SIGNER_CLASS_CADES},
-		{AOSignConstants.SIGN_FORMAT_CADES_TRI, SIGNER_CLASS_CADES_TRI},
-		{AOSignConstants.SIGN_FORMAT_CMS, SIGNER_CLASS_CMS},
-		{AOSignConstants.SIGN_FORMAT_FACTURAE, SIGNER_CLASS_FACTURAE},
-		{AOSignConstants.SIGN_FORMAT_FACTURAE_ALT1, SIGNER_CLASS_FACTURAE},
-		{AOSignConstants.SIGN_FORMAT_XADES, SIGNER_CLASS_XADES},
-		{AOSignConstants.SIGN_FORMAT_XADES_TRI, SIGNER_CLASS_XADES_TRI},
-		{AOSignConstants.SIGN_FORMAT_XADES_DETACHED, SIGNER_CLASS_XADES},
-		{AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED, SIGNER_CLASS_XADES},
-		{AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING, SIGNER_CLASS_XADES},
-		{AOSignConstants.SIGN_FORMAT_XMLDSIG, SIGNER_CLASS_XMLDSIG},
-		{AOSignConstants.SIGN_FORMAT_XMLDSIG_DETACHED, SIGNER_CLASS_XMLDSIG},
-		{AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED, SIGNER_CLASS_XMLDSIG},
-		{AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPING, SIGNER_CLASS_XMLDSIG},
-		{AOSignConstants.SIGN_FORMAT_PDF, SIGNER_CLASS_PADES},
-		{AOSignConstants.SIGN_FORMAT_PDF_TRI, SIGNER_CLASS_PADES_TRI},
-		{AOSignConstants.SIGN_FORMAT_PADES, SIGNER_CLASS_PADES},
-		{AOSignConstants.SIGN_FORMAT_PADES_TRI, SIGNER_CLASS_PADES_TRI},
-		{AOSignConstants.SIGN_FORMAT_ODF, SIGNER_CLASS_ODF},
-		{AOSignConstants.SIGN_FORMAT_ODF_ALT1, SIGNER_CLASS_ODF},
-		{AOSignConstants.SIGN_FORMAT_OOXML, SIGNER_CLASS_OOXML},
-		{AOSignConstants.SIGN_FORMAT_OOXML_ALT1, SIGNER_CLASS_OOXML}
+		{AOSignConstants.SIGN_FORMAT_CADES, SIGNER_CLASS_CADES, Boolean.TRUE.toString()},
+		{AOSignConstants.SIGN_FORMAT_CADES_TRI, SIGNER_CLASS_CADES_TRI, Boolean.FALSE.toString()},
+		{AOSignConstants.SIGN_FORMAT_CMS, SIGNER_CLASS_CMS, Boolean.TRUE.toString()},
+		{AOSignConstants.SIGN_FORMAT_FACTURAE, SIGNER_CLASS_FACTURAE, Boolean.TRUE.toString()},
+		{AOSignConstants.SIGN_FORMAT_FACTURAE_ALT1, SIGNER_CLASS_FACTURAE, Boolean.FALSE.toString()},
+		{AOSignConstants.SIGN_FORMAT_XADES, SIGNER_CLASS_XADES, Boolean.TRUE.toString()},
+		{AOSignConstants.SIGN_FORMAT_XADES_TRI, SIGNER_CLASS_XADES_TRI, Boolean.FALSE.toString()},
+		{AOSignConstants.SIGN_FORMAT_XADES_DETACHED, SIGNER_CLASS_XADES, Boolean.FALSE.toString()},
+		{AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED, SIGNER_CLASS_XADES, Boolean.FALSE.toString()},
+		{AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING, SIGNER_CLASS_XADES, Boolean.FALSE.toString()},
+		{AOSignConstants.SIGN_FORMAT_XMLDSIG, SIGNER_CLASS_XMLDSIG, Boolean.TRUE.toString()},
+		{AOSignConstants.SIGN_FORMAT_XMLDSIG_DETACHED, SIGNER_CLASS_XMLDSIG, Boolean.FALSE.toString()},
+		{AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED, SIGNER_CLASS_XMLDSIG, Boolean.FALSE.toString()},
+		{AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPING, SIGNER_CLASS_XMLDSIG, Boolean.FALSE.toString()},
+		{AOSignConstants.SIGN_FORMAT_PDF, SIGNER_CLASS_PADES, Boolean.FALSE.toString()},
+		{AOSignConstants.SIGN_FORMAT_PDF_TRI, SIGNER_CLASS_PADES_TRI, Boolean.FALSE.toString()},
+		{AOSignConstants.SIGN_FORMAT_PADES, SIGNER_CLASS_PADES, Boolean.TRUE.toString()},
+		{AOSignConstants.SIGN_FORMAT_PADES_TRI, SIGNER_CLASS_PADES_TRI, Boolean.FALSE.toString()},
+		{AOSignConstants.SIGN_FORMAT_ODF, SIGNER_CLASS_ODF, Boolean.TRUE.toString()},
+		{AOSignConstants.SIGN_FORMAT_ODF_ALT1, SIGNER_CLASS_ODF, Boolean.FALSE.toString()},
+		{AOSignConstants.SIGN_FORMAT_OOXML, SIGNER_CLASS_OOXML, Boolean.TRUE.toString()},
+		{AOSignConstants.SIGN_FORMAT_OOXML_ALT1, SIGNER_CLASS_OOXML, Boolean.FALSE.toString()}
 	};
 
 	private AOSignerFactory() {
@@ -87,6 +91,12 @@ public final class AOSignerFactory {
 			throw new IllegalArgumentException("No se han indicado datos de firma"); //$NON-NLS-1$
 		}
 		for (final String format[] : SIGNERS_CLASSES) {
+			
+			// Solo buscaremos el signer compatible entre los que soportan la identificacion
+			if (!Boolean.parseBoolean(format[2])) {
+				continue;
+			}
+			
 			if (SIGNERS.get(format[0]) == null) {
 				try {
 					SIGNERS.put(format[0], (AOSigner) Class.forName(format[1]).newInstance());
