@@ -90,8 +90,8 @@
 					<target>1.6</target>
 					<fork>true</fork>
 					<compilerArgs>
-						<arg>-Xbootclasspath:${java.home}\lib\jsse.jar${path.separator}${java.home}\lib\rt.jar${path.separator}${java.home}\lib\jce.jar</arg>
-					</compilerArgs>
+-						<arg>-Xbootclasspath:${java.home}/lib/jsse.jar${path.separator}${java.home}/lib/rt.jar${path.separator}${java.home}/lib/jce.jar</arg>
+-					</compilerArgs>
 					<debug>false</debug>
 				</configuration>
 			</plugin>
