@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 
 import junit.framework.Assert;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -101,6 +102,7 @@ public final class TestCAdES {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void testSignature() throws Exception {
 
 		Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
@@ -149,6 +151,7 @@ public final class TestCAdES {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void testCoSignature() throws Exception {
 
 		Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$

@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import junit.framework.Assert;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.AOException;
@@ -40,6 +41,7 @@ public final class TestCadesTriphase {
 	 * @throws AOException
 	 * @throws IOException */
 	@Test
+	@Ignore
 	public void firma() throws AOException, IOException {
 		final AOSigner signer = new AOCAdESTriPhaseSigner();
 
