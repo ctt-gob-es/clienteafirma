@@ -21,6 +21,7 @@ import java.util.Properties;
 import junit.framework.Assert;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -93,6 +94,7 @@ public class TestPdfTriphase {
 	/** Prueba de firma trif&aacute;sica normal.
 	 * @throws Exception */
 	@Test
+	@Ignore
 	public void firma() throws Exception {
 		final AOSigner signer = new AOPDFTriPhaseSigner();
 
@@ -120,6 +122,7 @@ public class TestPdfTriphase {
 	/** Prueba de firma trif&aacute;sica con adjunto en el PDF.
 	 * @throws Exception */
 	@Test
+	@Ignore
 	public void firmaConAdjunto() throws Exception {
 		final AOSigner signer = new AOPDFTriPhaseSigner();
 
@@ -159,6 +162,7 @@ public class TestPdfTriphase {
 	/** Prueba de firma trif&aacute;sica normal.
 	 * @throws Exception */
 	@Test
+	@Ignore
 	public void cofirma() throws Exception {
 		final AOSigner signer = new AOPDFTriPhaseSigner();
 
