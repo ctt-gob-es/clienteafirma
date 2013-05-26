@@ -60,7 +60,7 @@ public interface AOSigner extends AOCoSigner, AOCounterSigner, AOSimpleSigner {
      * con el nombre proporcionado. Si se indica una part&iacute;cula intermedia, se a&ntilde;ade esta al
      * nombre resultante seg&uacute;n el criterio de la implementaci&oacute;n concreta.
      * @param originalName Nombre del fichero original que se firma
-     * @param inText Particula intermedia que agregar al nombre del fichero de
+     * @param inText Part&iacute;cula intermedia que agregar al nombre del fichero de
      *        firma.
      * @return Nombre apropiado para el fichero de firma o fichero firmado. */
     String getSignedName(String originalName, String inText);
