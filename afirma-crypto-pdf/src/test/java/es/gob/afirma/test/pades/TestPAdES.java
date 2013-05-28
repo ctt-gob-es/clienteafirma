@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 
 import junit.framework.Assert;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -106,6 +107,7 @@ public class TestPAdES {
      * @throws Exception */
     @SuppressWarnings("static-method")
 	@Test
+	@Ignore
     public void testTimestampedSignature() throws Exception {
 
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
