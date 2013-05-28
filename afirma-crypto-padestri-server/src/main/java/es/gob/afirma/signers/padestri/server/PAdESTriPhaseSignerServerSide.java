@@ -342,6 +342,8 @@ public final class PAdESTriPhaseSignerServerSide {
                                            final Calendar signTime,
                                            final Properties xParams) throws IOException, AOException {
 
+    	Logger.getLogger("es.gob.afirma").info("Iniciamos la prefirma PAdES");
+    	
         final Properties extraParams = xParams != null ? xParams : new Properties();
 
         final PdfTriPhaseSession ptps = getSessionData(inPDF, signerCertificateChain, signTime, extraParams);
@@ -548,6 +550,8 @@ public final class PAdESTriPhaseSignerServerSide {
                     final SignEnhancer enhancer,
                     final Properties enhancerConfig) throws AOException, IOException, NoSuchAlgorithmException {
 
+		Logger.getLogger("es.gob.afirma").info("Iniciamos la postfirma PAdES");
+
         byte[] completeCAdESSignature = CAdESTriPhaseSigner.postSign(digestAlgorithmName, null, signerCertificateChain, signature, signedAttributes);
 
         if (enhancer != null) {
@@ -723,7 +727,8 @@ public final class PAdESTriPhaseSignerServerSide {
         	throw new InvalidPdfException(e);
 		}
         catch (final IOException e) {
-			throw new AOException("Error firmando el PDF", e); //$NON-NLS-1$
+        	e.printStackTrace();
+			throw new AOException("Los datos introducidos no se reconocen como PDF", e); //$NON-NLS-1$
 		}
 
         if (pdfReader.getCertificationLevel() != PdfSignatureAppearance.NOT_CERTIFIED && !Boolean.parseBoolean(extraParams.getProperty("allowSigningCertifiedPdfs"))) { //$NON-NLS-1$
