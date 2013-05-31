@@ -86,10 +86,10 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
 			}
 			catch (final Exception e) {
 				try {
-					keyStore.load(null, (this.externallPasswordCallback != null
+					keyStore.load(null, this.externallPasswordCallback != null
 							? this.externallPasswordCallback.getPassword()
 									: new UIPasswordCallback(FirefoxKeyStoreMessages.getString("MozillaUnifiedKeyStoreManager.0"), //$NON-NLS-1$
-											this.parentComponent).getPassword()));
+											this.parentComponent).getPassword());
 				}
 				catch (final AOCancelledOperationException e1) {
 					keyStore = null;
@@ -221,7 +221,7 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
 	@Override
 	public X509Certificate[] getCertificateChain(final String alias) {
 		final PrivateKeyEntry key = this.getKeyEntry(alias, this.externallPasswordCallback);
-		return (key != null) ? (X509Certificate[]) key.getCertificateChain() : null;
+		return key != null ? (X509Certificate[]) key.getCertificateChain() : null;
 	}
 
 	/** {@inheritDoc} */
@@ -235,7 +235,7 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
 		}
 		final KeyStore.PrivateKeyEntry keyEntry;
 		try {
-			keyEntry = (KeyStore.PrivateKeyEntry) tmpStore.getEntry(alias, new KeyStore.PasswordProtection((pssCallback != null) ? pssCallback.getPassword() : null));
+			keyEntry = (KeyStore.PrivateKeyEntry) tmpStore.getEntry(alias, new KeyStore.PasswordProtection(pssCallback != null ? pssCallback.getPassword() : null));
 		}
 		catch (final KeyStoreException e) {
 			LOGGER.severe("Erro al acceder al almacen para obtener la clave privada del certicado '" + alias + "', se devolvera null: " + e); //$NON-NLS-1$ //$NON-NLS-2$
