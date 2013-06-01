@@ -55,30 +55,9 @@ final class MozillaKeyStoreUtilitiesWindows {
 	static String getMozillaUserProfileDirectoryWindows() {
 		File regFile;
 
-		String appDataDir = WinRegistryWrapper.getString(
-			WinRegistryWrapper.HKEY_CURRENT_USER,
-			"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders", //$NON-NLS-1$
-			"AppData" //$NON-NLS-1$
-		);
-		if (appDataDir == null) {
-			LOGGER.severe(
-				"No se ha podido determinar la situacion del directorio 'AppData' de Windows a traves del registro de Windows" //$NON-NLS-1$
-			);
-			final String probablyPath = "C:\\Users\\" + System.getProperty("user.name") + "\\AppData\\Roaming"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			final File f = new File(probablyPath);
-			if (f.exists() && f.isDirectory()) {
-				appDataDir = probablyPath;
-				LOGGER.info(
-					"Se ha comprobado la situacion del directorio 'AppData' de Windows manualmente" //$NON-NLS-1$
-				);
-			}
-			else {
-				return null;
-			}
-		}
 		String finalDir;
 		// En Firefox usamos el profiles.ini (el registro clasico esta ya obsoleto)
-		regFile = new File(appDataDir + "\\Mozilla\\Firefox\\profiles.ini"); //$NON-NLS-1$
+		regFile = new File(getWindowsAppDataDir() + "\\Mozilla\\Firefox\\profiles.ini"); //$NON-NLS-1$
 		try {
 			if (regFile.exists()) {
 				finalDir = NSPreferences.getFireFoxUserProfileDirectory(regFile);
@@ -385,6 +364,53 @@ final class MozillaKeyStoreUtilitiesWindows {
 
 	static String getSoftoknLibNameWindows() {
 		return SOFTOKN3_DLL;
+	}
+
+	private static String appData = null;
+
+	private static String getWindowsAppDataDir() {
+
+		// Miramos primero con la variable de entorno
+		if (appData == null) {
+			final String ret = System.getenv("AppData"); //$NON-NLS-1$
+			if (ret != null) {
+				LOGGER.info(
+					"Se ha comprobado la situacion del directorio 'AppData' de Windows a traves de la variable de entorno" //$NON-NLS-1$
+				);
+				appData = ret;
+			}
+		}
+		if (appData != null) {
+			return appData;
+		}
+
+		// Probamos despues con el registro
+		appData = WinRegistryWrapper.getString(
+			WinRegistryWrapper.HKEY_CURRENT_USER,
+			"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders", //$NON-NLS-1$
+			"AppData" //$NON-NLS-1$
+		);
+		if (appData != null) {
+			LOGGER.info(
+				"Se ha comprobado la situacion del directorio 'AppData' de Windows a traves del registro" //$NON-NLS-1$
+			);
+			return appData;
+		}
+
+		// Y por ultimo con el directorio por defecto de Windows 7 y Windows 8
+		final String probablyPath = "C:\\Users\\" + System.getProperty("user.name") + "\\AppData\\Roaming"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		final File f = new File(probablyPath);
+		if (f.exists() && f.isDirectory()) {
+			appData = probablyPath;
+			LOGGER.info(
+				"Se ha comprobado la situacion del directorio 'AppData' de Windows manualmente" //$NON-NLS-1$
+			);
+			return appData;
+		}
+
+		appData = null;
+		throw new IllegalStateException("No se ha podido determinar la situacion del directorio 'AppData' de Windows"); //$NON-NLS-1$
+
 	}
 
 }
