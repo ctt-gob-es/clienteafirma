@@ -3,8 +3,12 @@ package es.gob.afirma.keystores.mozilla;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
@@ -171,168 +175,79 @@ final class MozillaKeyStoreUtilitiesWindows {
 
 	static String getSystemNSSLibDirWindows() throws FileNotFoundException {
 
-		// Intentamos extraer la ruta de instalacion de Firefox del registro
-		String dir = WinRegistryWrapper.getString(WinRegistryWrapper.HKEY_CURRENT_USER, "Software\\Classes\\FirefoxURL\\shell\\open\\command", ""); //$NON-NLS-1$ //$NON-NLS-2$
-		if (dir == null) {
-			dir = WinRegistryWrapper.getString(WinRegistryWrapper.HKEY_LOCAL_MACHINE, "SOFTWARE\\Classes\\FirefoxURL\\shell\\open\\command", ""); //$NON-NLS-1$ //$NON-NLS-2$
-			if (dir == null) {
-				final String currentVersion = WinRegistryWrapper.getString(WinRegistryWrapper.HKEY_LOCAL_MACHINE, "SOFTWARE\\Mozilla\\Mozilla Firefox", "CurrentVersion"); //$NON-NLS-1$ //$NON-NLS-2$
-				if (currentVersion != null) {
-					final String installDir = WinRegistryWrapper.getString(WinRegistryWrapper.HKEY_LOCAL_MACHINE, "SOFTWARE\\Mozilla\\Mozilla Firefox\\" + currentVersion + "\\Main", "Install Directory"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-					if (installDir != null) {
-						return installDir;
-					}
-				}
-				throw new FileNotFoundException("No se ha podido localizar el directorio de Firefox a traves del registro de Windows"); //$NON-NLS-1$
+		String dir;
+		// Probamos primero el 'compatibility.ini' de Firefox
+		try {
+			dir = getNssPathFromCompatibilityFile();
+			LOGGER.info("Directorio de NSS en Windows determinado a partir de 'compatibility.ini' de Firefox"); //$NON-NLS-1$
+		}
+		catch(final Exception e) {
+			// Intentamos extraer la ruta de instalacion de Firefox del registro
+			dir = getNssPathFromRegistry();
+			LOGGER.info("Directorio de NSS en Windows determinado a partir del registro de Windows"); //$NON-NLS-1$
+		}
+
+		// Tenemos la ruta del NSS, comprobamos adecuacion por bugs de Java
+		boolean illegalChars = false;
+		for (final char c : dir.toCharArray()) {
+			if (P11_CONFIG_VALID_CHARS.indexOf(c) == -1) {
+				illegalChars = true;
+				break;
 			}
 		}
 
-		final String regKeyLowCase = dir.toLowerCase();
-		final int pos = regKeyLowCase.indexOf("firefox.exe"); //$NON-NLS-1$
-		if (pos != -1) {
-			dir = dir.substring(0, pos);
-			if (dir.startsWith("\"")) { //$NON-NLS-1$
-				dir = dir.substring(1);
-			}
-			if (dir.endsWith(File.separator)) {
-				dir = dir.substring(0, dir.length() - 1);
-			}
+		// Cuidado, el caracter "tilde" (unicode 007E) es valido para perfil de usuario pero no
+		// para bibliotecas en java inferior a 6u30
+		if (illegalChars) {
 
-			File tmpFile = new File(dir);
-			if (tmpFile.exists() && tmpFile.isDirectory()) {
-				tmpFile = new File(dir + File.separator + SOFTOKN3_DLL);
-				if (tmpFile.exists()) {
-					try {
-						dir = tmpFile.getParentFile().getCanonicalPath();
-					}
-					catch (final Exception e) {
-						if (dir.contains("\u007E")) { //$NON-NLS-1$
-							throw new FileNotFoundException("No se ha podido obtener el nombre del directorio del modulo PKCS#11, parece estar establecido como un nombre corto (8+3): " + e); //$NON-NLS-1$
-						}
-					}
+			// Tenemos una ruta con caracteres ilegales para la
+			// configuracion de SunPKCS#11 por el bug 6581254:
+			// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6581254
+			try {
 
-					// Tenemos la ruta del NSS, comprobamos adecuacion por bugs de Java
-					boolean illegalChars = false;
-					for (final char c : dir.toCharArray()) {
-						if (P11_CONFIG_VALID_CHARS.indexOf(c) == -1) {
-							illegalChars = true;
-							break;
-						}
-					}
-					// Cuidado, el caracter "tilde" (unicode 007E) es valido para perfil de usuario pero no
-					// para bibliotecas en java inferior a 6u30
-					if (illegalChars || dir.contains("\u007E")) { //$NON-NLS-1$
-						// Tenemos una ruta con caracteres ilegales para la
-						// configuracion de SunPKCS#11 por el bug 6581254:
-						// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6581254
-						try {
-
-							// Copiamos las DLL necesarias a un temporal y
-							// devolvemos el temporal
-							final File tmp;
-							// Intentamos usar antes el temporal del sistema, para evitar el del usuario, que puede tener caracteres especiales
-							final File tmpDir = new File(new File(Platform.getSystemLibDir()).getParent() + File.separator + "Temp"); //$NON-NLS-1$
-							if (tmpDir.isDirectory() && tmpDir.canWrite() && tmpDir.canRead()) {
-								tmp = File.createTempFile("nss", null, tmpDir); //$NON-NLS-1$
-							}
-							else {
-								tmp = File.createTempFile("nss", null); //$NON-NLS-1$
-							}
-							tmp.delete();
-							if (!tmp.mkdir()) {
-								throw new AOException("No se ha creado el directorio temporal"); //$NON-NLS-1$
-							}
-							final String dest = tmp.getCanonicalPath() + File.separator;
-
-							// "softokn3" es comun para todos los Firefox a partir del 2
-							AOUtil.copyFile(new File(dir + File.separator + SOFTOKN3_DLL), new File(dest + SOFTOKN3_DLL));
-
-							// A partir de aqui comprobamos exsitencia antes,
-							// porque no estan en Mozilla 2
-
-							// Cuidado, en Firefox 4 sqlite3.dll pasa a llamarse
-							// mozsqlite3.dll
-							File tmpFile2 = new File(dir + File.separator + MOZSQLITE3_DLL);
-							if (tmpFile2.exists()) {
-								AOUtil.copyFile(tmpFile2, new File(dest + MOZSQLITE3_DLL));
-							}
-							else {
-								tmpFile2 = new File(dir + File.separator + SQLITE3_DLL);
-								if (tmpFile2.exists()) {
-									AOUtil.copyFile(tmpFile2, new File(dest + SQLITE3_DLL));
-								}
-							}
-
-							tmpFile2 = new File(dir + File.separator + NSS3_DLL);
-							if (tmpFile2.exists()) {
-								AOUtil.copyFile(tmpFile2, new File(dest + NSS3_DLL));
-							}
-
-							tmpFile2 = new File(dir + File.separator + PLDS4_DLL);
-							if (tmpFile2.exists()) {
-								AOUtil.copyFile(tmpFile2, new File(dest + PLDS4_DLL));
-							}
-
-							tmpFile2 = new File(dir + File.separator + NSPR4_DLL);
-							if (tmpFile2.exists()) {
-								AOUtil.copyFile(tmpFile2, new File(dest + NSPR4_DLL));
-							}
-
-
-							tmpFile2 = new File(dir + File.separator + PLC4_DLL);
-							if (tmpFile2.exists()) {
-								AOUtil.copyFile(tmpFile2, new File(dest + PLC4_DLL));
-							}
-
-							tmpFile2 = new File(dir + File.separator + MOZCRT19_DLL);
-							if (tmpFile2.exists()) {
-								AOUtil.copyFile(tmpFile2, new File(dest + MOZCRT19_DLL));
-							}
-
-							tmpFile2 = new File(dir + File.separator + NSSUTIL3_DLL);
-							if (tmpFile2.exists()) {
-								AOUtil.copyFile(tmpFile2, new File(dest + NSSUTIL3_DLL));
-							}
-
-							tmpFile2 = new File(dir + File.separator + FREEBL3_DLL);
-							if (tmpFile2.exists()) {
-								AOUtil.copyFile(tmpFile2, new File(dest + FREEBL3_DLL));
-							}
-
-							tmpFile2 = new File(dir + File.separator + NSSDBM3_DLL);
-							if (tmpFile2.exists()) {
-								AOUtil.copyFile(tmpFile2, new File(dest + NSSDBM3_DLL));
-							}
-
-							tmpFile2 = new File(dir + File.separator + MOZUTILS_DLL);
-							if (tmpFile2.exists()) {
-								AOUtil.copyFile(tmpFile2, new File(dest + MOZUTILS_DLL));
-							}
-
-							// A partir de Firefox 11
-							tmpFile2 = new File(dir + File.separator + MOZGLUE_DLL);
-							if (tmpFile2.exists()) {
-								AOUtil.copyFile(tmpFile2, new File(dest + MOZGLUE_DLL));
-							}
-
-							dir = tmp.getCanonicalPath();
-
-						}
-						catch (final Exception e) {
-							LOGGER.warning("No se ha podido duplicar NSS en un directorio temporal, si esta version de JRE esta afectada por el error 6581254 de Java es posible que no pueda cargarse: " + e); //$NON-NLS-1$
-						}
-					}
-
-					for (final char c : dir.toCharArray()) {
-						if (P11_CONFIG_VALID_CHARS.indexOf(c) == -1) {
-							dir = dir.replace(Platform.getUserHome(), getShortPath(Platform.getUserHome()));
-							break;
-						}
-					}
-					return dir;
-
+				// Copiamos las DLL necesarias a un temporal y devolvemos el temporal
+				final File tmp;
+				// Intentamos usar antes el temporal del sistema, para evitar el del usuario, que puede tener caracteres especiales
+				final File tmpDir = new File(new File(Platform.getSystemLibDir()).getParent() + File.separator + "Temp"); //$NON-NLS-1$
+				if (tmpDir.isDirectory() && tmpDir.canWrite() && tmpDir.canRead()) {
+					tmp = File.createTempFile("nss", null, tmpDir); //$NON-NLS-1$
 				}
+				else {
+					tmp = File.createTempFile("nss", null); //$NON-NLS-1$
+				}
+				tmp.delete();
+				if (!tmp.mkdir()) {
+					throw new AOException("No se ha creado el directorio temporal"); //$NON-NLS-1$
+				}
+				final String dest = tmp.getCanonicalPath() + File.separator;
+
+				copyFile(new String[] {
+					SOFTOKN3_DLL,   // "softokn3" es comun para todos los Firefox a partir del 2
+					MOZSQLITE3_DLL, // En Firefox 4 sqlite3.dll pasa a llamarse mozsqlite3.dll
+					SQLITE3_DLL,
+					NSS3_DLL,
+					PLDS4_DLL,
+					NSPR4_DLL,
+					PLC4_DLL,
+					MOZCRT19_DLL,
+					NSSUTIL3_DLL,
+					FREEBL3_DLL,
+					NSSDBM3_DLL,
+					MOZUTILS_DLL,
+					MOZGLUE_DLL     // A partir de Firefox 11
+				}, dir, dest);
+
+				dir = tmp.getCanonicalPath();
+
 			}
+			catch (final Exception e) {
+				LOGGER.warning("No se ha podido duplicar NSS en un directorio temporal, si esta version de JRE esta afectada por el error 6581254 de Java es posible que no pueda cargarse: " + e); //$NON-NLS-1$
+			}
+
+		}
+
+		if (dir != null) {
+			return dir;
 		}
 
 		throw new FileNotFoundException("No se ha encontrado un NSS compatible en Windows"); //$NON-NLS-1$
@@ -413,4 +328,81 @@ final class MozillaKeyStoreUtilitiesWindows {
 
 	}
 
+	/** Copia ficheros de un directorio a otro, ignorando los ficheros que no existan.
+	 * @param fileNames Nombres de los ficheros a copiar
+	 * @param sourceDir Directorio de origen, no debe tener la barra al final
+	 * @param destDir Directorio de destino, debe tener la barra al final */
+	private static void copyFile(final String[] fileNames, final String sourceDir, final String destDir) {
+		if (fileNames !=null) {
+			File tmpFile;
+			for(final String f : fileNames) {
+				tmpFile = new File(sourceDir + File.separator + f);
+				if (tmpFile.exists()) {
+					try {
+						AOUtil.copyFile(tmpFile, new File(destDir + f));
+					}
+					catch (final IOException e) {
+						LOGGER.warning("No se ha podido copiar '" + f + "' a '" + destDir + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					}
+				}
+			}
+		}
+	}
+
+	private static String getNssPathFromCompatibilityFile() throws IOException {
+		final File compatibility = new File(getMozillaUserProfileDirectoryWindows() + "\\" + "compatibility.ini");  //$NON-NLS-1$//$NON-NLS-2$
+		if (compatibility.exists() && compatibility.canRead()) {
+			final InputStream fis = new FileInputStream(compatibility);
+			final BufferedReader br = new BufferedReader(new InputStreamReader(fis, Charset.forName("UTF-8"))); //$NON-NLS-1$
+			String line;
+			String dir = null;
+			while ((line = br.readLine()) != null) {
+			    if (line.startsWith("LastPlatformDir=")) { //$NON-NLS-1$
+			    	dir = line.replace("LastPlatformDir=", "").trim(); //$NON-NLS-1$ //$NON-NLS-2$
+					break;
+			    }
+			}
+			br.close();
+			if (dir != null) {
+				return dir;
+			}
+		}
+		throw new FileNotFoundException("No se ha podido deternimar el directorio de NSS en Windows a partir de 'compatibility.ini' de Firefox"); //$NON-NLS-1$
+	}
+
+	private static String getNssPathFromRegistry() throws FileNotFoundException {
+		String dir = WinRegistryWrapper.getString(WinRegistryWrapper.HKEY_CURRENT_USER, "Software\\Classes\\FirefoxURL\\shell\\open\\command", ""); //$NON-NLS-1$ //$NON-NLS-2$
+		if (dir == null) {
+			dir = WinRegistryWrapper.getString(WinRegistryWrapper.HKEY_LOCAL_MACHINE, "SOFTWARE\\Classes\\FirefoxURL\\shell\\open\\command", ""); //$NON-NLS-1$ //$NON-NLS-2$
+			if (dir == null) {
+				final String currentVersion = WinRegistryWrapper.getString(WinRegistryWrapper.HKEY_LOCAL_MACHINE, "SOFTWARE\\Mozilla\\Mozilla Firefox", "CurrentVersion"); //$NON-NLS-1$ //$NON-NLS-2$
+				if (currentVersion != null) {
+					final String installDir = WinRegistryWrapper.getString(WinRegistryWrapper.HKEY_LOCAL_MACHINE, "SOFTWARE\\Mozilla\\Mozilla Firefox\\" + currentVersion + "\\Main", "Install Directory"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					if (installDir != null) {
+						return installDir;
+					}
+				}
+				throw new FileNotFoundException("No se ha podido localizar el directorio de Firefox a traves del registro de Windows"); //$NON-NLS-1$
+			}
+		}
+		final String regKeyLowCase = dir.toLowerCase();
+		final int pos = regKeyLowCase.indexOf("firefox.exe"); //$NON-NLS-1$
+		if (pos != -1) {
+			dir = dir.substring(0, pos);
+			if (dir.startsWith("\"")) { //$NON-NLS-1$
+				dir = dir.substring(1);
+			}
+			if (dir.endsWith(File.separator)) {
+				dir = dir.substring(0, dir.length() - 1);
+			}
+		}
+
+		final File tmpFile = new File(dir);
+		if (tmpFile.exists() && tmpFile.isDirectory() && new File(dir + File.separator + SOFTOKN3_DLL).exists()) {
+			return dir;
+		}
+
+		throw new FileNotFoundException("No se ha podido localizar el directorio de Firefox a traves del registro de Windows"); //$NON-NLS-1$
+
+	}
 }
