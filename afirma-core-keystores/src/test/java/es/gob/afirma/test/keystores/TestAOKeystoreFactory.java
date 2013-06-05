@@ -22,6 +22,7 @@ import javax.security.auth.callback.PasswordCallback;
 
 import junit.framework.Assert;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -37,11 +38,19 @@ import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
  */
 public class TestAOKeystoreFactory {
 
+	/** Prueba directa.
+	 * @param args
+	 * @throws Exception */
+	public static void main(final String args[]) throws Exception {
+		new TestAOKeystoreFactory().testAOKeystoreFactoryCAPI();
+	}
+
     /** Pruebas de AOKeyStoreFactory de los tipos sin dependencias de otros m&oacute;dulos
      * @throws Exception
      */
     @SuppressWarnings("static-method")
 	@Test
+	@Ignore
     public void testAOKeystoreFactoryCAPI() throws Exception {
     	Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
     	final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
