@@ -13,6 +13,7 @@ package es.gob.afirma.test.keystores;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.X509Certificate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,12 +29,35 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.main.common.AOKeyStore;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManagerFactory;
+import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
 
 /**
  * Pruebas de AOKeyStoreFactory
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
  */
 public class TestAOKeystoreFactory {
+
+    /** Pruebas de AOKeyStoreFactory de los tipos sin dependencias de otros m&oacute;dulos
+     * @throws Exception
+     */
+    @SuppressWarnings("static-method")
+	@Test
+    public void testAOKeystoreFactoryCAPI() throws Exception {
+    	Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
+    	final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+			AOKeyStore.WINDOWS, // Store
+			null, 				// Lib
+			null, 				// Description
+			KeyStoreUtilities.getPreferredPCB(AOKeyStore.WINDOWS, null),
+			null				// Parent
+		);
+    	for (final String alias : ksm.getAliases()) {
+    		System.out.println(alias);
+    	}
+    	final PrivateKeyEntry pke = ksm.getKeyEntry(ksm.getAliases()[1], KeyStoreUtilities.getCertificatePC(AOKeyStore.WINDOWS, null));
+    	System.out.println(pke.toString());
+
+    }
 
     /** Pruebas de AOKeyStoreFactory de los tipos sin dependencias de otros m&oacute;dulos
      * @throws Exception

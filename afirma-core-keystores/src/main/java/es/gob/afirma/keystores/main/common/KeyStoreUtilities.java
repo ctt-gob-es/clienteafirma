@@ -554,11 +554,10 @@ public final class KeyStoreUtilities {
         	// El almacen KeyChain de Apple exige que se le pase una cadena como contrasena (vale cualquiera)
             return new CachePasswordCallback("dummy".toCharArray()); //$NON-NLS-1$
         }
-        if (AOKeyStore.WINDOWS.equals(kStore) ||
-            AOKeyStore.WINROOT.equals(kStore)) {
+        if (AOKeyStore.WINDOWS.equals(kStore) || AOKeyStore.WINROOT.equals(kStore)) {
                 return new NullPasswordCallback();
         }
-        else if (AOKeyStore.DNIEJAVA.equals(kStore)) {
+        if (AOKeyStore.DNIEJAVA.equals(kStore)) {
             return null;
         }
         return new UIPasswordCallback(KeyStoreMessages.getString("KeyStoreUtilities.6", kStore.getName()), parent); //$NON-NLS-1$
@@ -571,18 +570,21 @@ public final class KeyStoreUtilities {
      *               di&aacute;logos modales (normalmente un <code>java.awt.Comonent</code>)
      * @return Manejador para la solicitud de la clave. */
     public static PasswordCallback getCertificatePC(final AOKeyStore store, final Object parent) {
-        if (store == AOKeyStore.WINDOWS ||
-            store == AOKeyStore.WINROOT ||
-            store == AOKeyStore.WINADDRESSBOOK ||
-            store == AOKeyStore.WINCA ||
-            store == AOKeyStore.SINGLE ||
-            store == AOKeyStore.MOZ_UNI ||
-            store == AOKeyStore.PKCS11) {
+        if (AOKeyStore.WINROOT.equals(store)        ||
+    		AOKeyStore.WINADDRESSBOOK.equals(store) ||
+            AOKeyStore.WINCA.equals(store)          ||
+            AOKeyStore.SINGLE.equals(store)         ||
+            AOKeyStore.MOZ_UNI.equals(store)        ||
+            AOKeyStore.PKCS11.equals(store)) {
                 return new NullPasswordCallback();
-        } else if (store == AOKeyStore.DNIEJAVA) {
+        }
+        else if (store == AOKeyStore.DNIEJAVA) {
         	return null;
-        } else if (store == AOKeyStore.APPLE) {
+        }
+        else if (AOKeyStore.APPLE.equals(store) || AOKeyStore.WINDOWS.equals(store)) {
         	// El almacen KeyChain de Apple exige que se le pase una cadena como contrasena (vale cualquiera)
+        	// Windows cono MiniDriver igualmente exige una contrasena, aunque luego no se comprueba y se pide
+        	// con un UI del propio Windows
         	return new CachePasswordCallback("dummy".toCharArray()); //$NON-NLS-1$
         }
         return new UIPasswordCallback(KeyStoreMessages.getString("KeyStoreUtilities.7"), parent); //$NON-NLS-1$
