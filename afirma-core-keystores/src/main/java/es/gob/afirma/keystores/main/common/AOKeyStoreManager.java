@@ -48,10 +48,6 @@ public class AOKeyStoreManager {
 
     protected static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-    /** Instancia del provider CAPI de Sun. Aunque se permite m&aacute;s de una
-     * instancia de este provider, lo cacheamos para evitar problemas. */
-    private static Provider sunMSCAPIProvider = null;
-
     /** Almac&eacute;n de claves. */
     private KeyStore ks;
     protected void setKeyStore(final KeyStore k) {
@@ -275,60 +271,6 @@ public class AOKeyStoreManager {
 
     }
 
-    private List<KeyStore> initCAPI() throws AOKeyStoreManagerException,
-                                             IOException {
-        if (!Platform.getOS().equals(Platform.OS.WINDOWS)) {
-            throw new InvalidOSException("Microsoft Windows"); //$NON-NLS-1$
-        }
-
-        // Si no se ha agregado el proveedor CAPI de Sun, lo anadimos
-        // En java 6 viene instalado de serie, pero no pasa nada por
-        // reinstalarlo
-        if (sunMSCAPIProvider == null && Security.getProvider("SunMSCAPI") == null) { //$NON-NLS-1$
-            try {
-                sunMSCAPIProvider = (Provider) Class.forName("sun.security.mscapi.SunMSCAPI").newInstance(); //$NON-NLS-1$
-                Security.addProvider(sunMSCAPIProvider);
-            }
-            catch(final Exception e) {
-            	throw new MissingSunMSCAPIException(e);
-            }
-        }
-
-        // Inicializamos
-        try {
-            this.ks = KeyStore.getInstance(this.ksType.getProviderName());
-        }
-        catch (final Exception e) {
-            throw new AOKeyStoreManagerException("No se ha podido obtener el almacen SunMSCAPI.MY", e); //$NON-NLS-1$
-        }
-
-        LOGGER.info("Cargando KeyStore de Windows"); //$NON-NLS-1$
-        try {
-            this.ks.load(null, null);
-        }
-        catch (final CertificateException e) {
-            throw new AOKeyStoreManagerException("No se han podido cargar los certificados del almacen SunMSCAPI.MY", e); //$NON-NLS-1$
-        }
-        catch (final NoSuchAlgorithmException e) {
-        	throw new AOKeyStoreManagerException("No se ha podido verificar la integridad del almacen SunMSCAPI.MY", e); //$NON-NLS-1$
-		}
-
-        // Tratamos los alias repetidos, situacion problematica afectada por el bug
-        // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6483657
-        // Este solo se da con SunMSCAPI
-        try {
-            KeyStoreUtilities.cleanCAPIDuplicateAliases(this.ks);
-        }
-        catch (final Exception e) {
-            LOGGER.warning("No se han podido tratar los alias duplicados: " + e); //$NON-NLS-1$
-        }
-
-        final List<KeyStore> ret = new ArrayList<KeyStore>(1);
-        ret.add(this.ks);
-        return ret;
-
-    }
-
     private List<KeyStore> initCAPIAddressBook() throws AOKeyStoreManagerException {
         if (!Platform.getOS().equals(Platform.OS.WINDOWS)) {
             throw new InvalidOSException("Microsoft Windows"); //$NON-NLS-1$
@@ -498,10 +440,6 @@ public class AOKeyStoreManager {
         	return initJava(store, pssCallBack);
         }
 
-        else if (this.ksType.equals(AOKeyStore.WINDOWS) || this.ksType.equals(AOKeyStore.WINROOT)) {
-        	return initCAPI();
-        }
-
         else if (this.ksType.equals(AOKeyStore.WINCA) || this.ksType.equals(AOKeyStore.WINADDRESSBOOK)) {
         	return initCAPIAddressBook();
         }
@@ -650,8 +588,6 @@ public class AOKeyStoreManager {
         while (aliases.hasMoreElements()) {
             currAlias = aliases.nextElement().toString();
             v.add(currAlias);
-
-            LOGGER.info("Alias: " + currAlias);	//TODO: Traza para ayudar a localizar los problemas relacionados con CLAUER //$NON-NLS-1$
         }
 
         return v.toArray(new String[0]);

@@ -91,13 +91,14 @@ public final class AOKeyStoreManagerFactory {
         	return getPkcs11KeyStoreManager(store, lib, description, pssCallback, parentComponent);
         }
 
-        // Almacenes de certificados de Windows
-        else if (Platform.getOS().equals(Platform.OS.WINDOWS) &&
-        		(AOKeyStore.WINDOWS.equals(store) ||
-        				AOKeyStore.WINROOT.equals(store) ||
-        				AOKeyStore.WINADDRESSBOOK.equals(store) ||
-        				AOKeyStore.WINCA.equals(store))) {
-        	return getWindowsCapiKeyStoreManager(store);
+        // Almacen de certificados de Windows
+        else if (Platform.getOS().equals(Platform.OS.WINDOWS) && AOKeyStore.WINDOWS.equals(store)) {
+        	return getWindowsMyCapiKeyStoreManager();
+        }
+
+        // Libreta de direcciones de Windows
+        else if (Platform.getOS().equals(Platform.OS.WINDOWS) && (AOKeyStore.WINADDRESSBOOK.equals(store) || AOKeyStore.WINCA.equals(store))) {
+        	return getWindowsAddressBookKeyStoreManager(store);
         }
 
         else if (AOKeyStore.DNIE.equals(store)) {
@@ -332,7 +333,7 @@ public final class AOKeyStoreManagerFactory {
         return ksm;
     }
 
-    private static AOKeyStoreManager getWindowsCapiKeyStoreManager(final AOKeyStore store) throws IOException,
+    private static AOKeyStoreManager getWindowsAddressBookKeyStoreManager(final AOKeyStore store) throws IOException,
                                                                                                   AOKeystoreAlternativeException {
     	final AOKeyStoreManager ksm = new AOKeyStoreManager();
         try {
@@ -370,6 +371,21 @@ public final class AOKeyStoreManagerFactory {
         return ksm;
     }
 
+    private static AOKeyStoreManager getWindowsMyCapiKeyStoreManager() throws AOKeystoreAlternativeException, IOException {
+    	final AOKeyStoreManager ksmCapi = new CAPIKeyStoreManager();
+		try {
+			ksmCapi.init(AOKeyStore.WINDOWS, null, null, null);
+		}
+		catch (final AOKeyStoreManagerException e) {
+			throw new AOKeystoreAlternativeException(
+                 getAlternateKeyStoreType(AOKeyStore.WINDOWS),
+                 "Error al obtener almacen WINDOWS: " + e, //$NON-NLS-1$
+                 e
+             );
+		}
+		return ksmCapi;
+    }
+
     private static AOKeyStoreManager getMozillaUnifiedKeyStoreManager(final AOKeyStore store,
     		                                                          final PasswordCallback pssCallback) throws AOKeystoreAlternativeException,
     		                                                                                                     IOException {
@@ -380,7 +396,7 @@ public final class AOKeyStoreManagerFactory {
         catch(final Exception e) {
             throw new AOKeystoreAlternativeException(
                  getAlternateKeyStoreType(store),
-                 "Error al obtener dinamicamente el almacen NSS unificado de Mozilla Firefox", //$NON-NLS-1$
+                 "Error al obtener dinamicamente el almacen NSS unificado de Mozilla Firefox: " + e, //$NON-NLS-1$
                  e
              );
         }
@@ -390,7 +406,7 @@ public final class AOKeyStoreManagerFactory {
         catch (final AOException e) {
             throw new AOKeystoreAlternativeException(
                 getAlternateKeyStoreType(store),
-                "Error al inicializar el almacen NSS unificado de Mozilla Firefox", //$NON-NLS-1$
+                "Error al inicializar el almacen NSS unificado de Mozilla Firefox: " + e, //$NON-NLS-1$
                 e
             );
         }

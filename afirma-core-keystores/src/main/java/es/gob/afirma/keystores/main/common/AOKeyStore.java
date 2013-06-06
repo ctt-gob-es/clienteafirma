@@ -32,8 +32,6 @@ public enum AOKeyStore {
     /** Java KeyStore (JKS, distinguiendo entre may&uacute;sculas y
      * min&uacute;sculas). */
     JAVACE("Java KeyStore / JKS (Case Exact)", 9, "CaseExactJKS"), //$NON-NLS-1$ //$NON-NLS-2$
-    /** Windows / Internet Explorer (CAPI, certificados ra&iacute;z). */
-    WINROOT("Windows / Internet Explorer (raiz)", 10, "Windows-ROOT"),  //$NON-NLS-1$//$NON-NLS-2$
     /** Windows / Internet Explorer (CAPI, certificados de otras personas /
      * libreta de direcciones). */
     WINADDRESSBOOK("Windows / Internet Explorer (otras personas / libreta de direcciones)", 11, "Windows-ADDRESSBOOK"),  //$NON-NLS-1$//$NON-NLS-2$
@@ -43,8 +41,6 @@ public enum AOKeyStore {
     DNIE("DNI Electronico", 13, "PKCS11"), //$NON-NLS-1$ //$NON-NLS-2$
     /** DNIe con controlador nativo Java. */
     DNIEJAVA("DNIe 100% Java", 14, "DNI") //$NON-NLS-1$ //$NON-NLS-2$
-    // /** Windows (MY) con proveedor alternativo (JRE Deploy). */
-    // WINDEPLOY("Windows / Internet Explorer (despliegue)", 15, "WIExplorerMy")
     ;
 
     private String name;

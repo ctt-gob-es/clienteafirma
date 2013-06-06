@@ -11,18 +11,15 @@
 package es.gob.afirma.keystores.main.common;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.security.AccessController;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
-import java.security.KeyStoreSpi;
 import java.security.PrivateKey;
 import java.security.PrivilegedAction;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.List;
@@ -113,40 +110,6 @@ public final class KeyStoreUtilities {
 
         LOGGER.info("Creada configuracion PKCS#11:\r\n" + buffer.toString()); //$NON-NLS-1$
         return buffer.toString();
-    }
-
-    static void cleanCAPIDuplicateAliases(final KeyStore keyStore) throws NoSuchFieldException,
-                                                                          IllegalAccessException {
-
-        Field field = keyStore.getClass().getDeclaredField("keyStoreSpi"); //$NON-NLS-1$
-        field.setAccessible(true);
-        final KeyStoreSpi keyStoreVeritable = (KeyStoreSpi) field.get(keyStore);
-
-        if ("sun.security.mscapi.KeyStore$MY".equals(keyStoreVeritable.getClass().getName())) { //$NON-NLS-1$
-            String alias, hashCode;
-            X509Certificate[] certificates;
-
-            field = keyStoreVeritable.getClass().getEnclosingClass().getDeclaredField("entries"); //$NON-NLS-1$
-            field.setAccessible(true);
-            final Collection<?> entries = (Collection<?>) field.get(keyStoreVeritable);
-
-            for (final Object entry : entries) {
-                field = entry.getClass().getDeclaredField("certChain"); //$NON-NLS-1$
-                field.setAccessible(true);
-                certificates = (X509Certificate[]) field.get(entry);
-
-                hashCode = Integer.toString(certificates[0].hashCode());
-
-                field = entry.getClass().getDeclaredField("alias"); //$NON-NLS-1$
-                field.setAccessible(true);
-                alias = (String) field.get(entry);
-
-                if (!alias.equals(hashCode)) {
-                    field.set(entry, alias.concat(" - ").concat(hashCode)); //$NON-NLS-1$
-                }
-            } // for
-        } // if
-
     }
 
     private static final int ALIAS_MAX_LENGTH = 120;
@@ -554,7 +517,7 @@ public final class KeyStoreUtilities {
         	// El almacen KeyChain de Apple exige que se le pase una cadena como contrasena (vale cualquiera)
             return new CachePasswordCallback("dummy".toCharArray()); //$NON-NLS-1$
         }
-        if (AOKeyStore.WINDOWS.equals(kStore) || AOKeyStore.WINROOT.equals(kStore)) {
+        if (AOKeyStore.WINDOWS.equals(kStore)) {
                 return new NullPasswordCallback();
         }
         if (AOKeyStore.DNIEJAVA.equals(kStore)) {
@@ -570,8 +533,7 @@ public final class KeyStoreUtilities {
      *               di&aacute;logos modales (normalmente un <code>java.awt.Comonent</code>)
      * @return Manejador para la solicitud de la clave. */
     public static PasswordCallback getCertificatePC(final AOKeyStore store, final Object parent) {
-        if (AOKeyStore.WINROOT.equals(store)        ||
-    		AOKeyStore.WINADDRESSBOOK.equals(store) ||
+        if (AOKeyStore.WINADDRESSBOOK.equals(store) ||
             AOKeyStore.WINCA.equals(store)          ||
             AOKeyStore.SINGLE.equals(store)         ||
             AOKeyStore.MOZ_UNI.equals(store)        ||
