@@ -48,18 +48,6 @@ public class AOKeyStoreManager {
 
     protected static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-    /** Instancia del provider de NSS. S&oacute;lo se permite una instancia de
-     * esta clase, as&iacute; que la cacheamos. */
-    private Provider nssProvider = null;
-
-    protected Provider getNSSProvider() {
-        return this.nssProvider;
-    }
-
-    protected void setNSSProvider(final Provider p) {
-        this.nssProvider = p;
-    }
-
     /** Instancia del provider CAPI de Sun. Aunque se permite m&aacute;s de una
      * instancia de este provider, lo cacheamos para evitar problemas. */
     private static Provider sunMSCAPIProvider = null;
