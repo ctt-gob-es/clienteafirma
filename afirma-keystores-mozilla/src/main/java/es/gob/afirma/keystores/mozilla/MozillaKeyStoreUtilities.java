@@ -261,23 +261,23 @@ final class MozillaKeyStoreUtilities {
 			return nssLibDir;
 		}
 
-//		// Primero probamos con la variable de entorno, que es comun a todos los sistemas operativos
-//		try {
-//			nssLibDir = System.getenv("NSS_HOME"); //$NON-NLS-1$
-//		}
-//		catch(final Exception e) {
-//			LOGGER.warning("No se tiene acceso a la variable de entorno 'NSS_HOME': " + e); //$NON-NLS-1$
-//		}
-//		if (nssLibDir != null) {
-//			final File nssDir = new File(nssLibDir);
-//			if (nssDir.isDirectory() && nssDir.canRead()) {
-//				LOGGER.info("Directorio de NSS determinado a partir de la variable de entorno 'NSS_HOME'"); //$NON-NLS-1$
-//				return nssLibDir;
-//			}
-//			LOGGER.warning(
-//				"La variable de entorno 'NSS_HOME' apunta a un directorio que no existe o sobre el que no se tienen permisos de lectura, se ignorara" //$NON-NLS-1$
-//			);
-//		}
+		// Primero probamos con la variable de entorno, que es comun a todos los sistemas operativos
+		try {
+			nssLibDir = System.getenv("NSS_HOME"); //$NON-NLS-1$
+		}
+		catch(final Exception e) {
+			LOGGER.warning("No se tiene acceso a la variable de entorno 'NSS_HOME': " + e); //$NON-NLS-1$
+		}
+		if (nssLibDir != null) {
+			final File nssDir = new File(nssLibDir);
+			if (nssDir.isDirectory() && nssDir.canRead()) {
+				LOGGER.info("Directorio de NSS determinado a partir de la variable de entorno 'NSS_HOME'"); //$NON-NLS-1$
+				return nssLibDir;
+			}
+			LOGGER.warning(
+				"La variable de entorno 'NSS_HOME' apunta a un directorio que no existe o sobre el que no se tienen permisos de lectura, se ignorara" //$NON-NLS-1$
+			);
+		}
 
 		// Probamos ahora con "compatibility.ini" de Firefox, pero solo en Mac o Windows
 		if (Platform.OS.WINDOWS.equals(Platform.getOS()) || Platform.OS.MACOSX.equals(Platform.getOS())) {
