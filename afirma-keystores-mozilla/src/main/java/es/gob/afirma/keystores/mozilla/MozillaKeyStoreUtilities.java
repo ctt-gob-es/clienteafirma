@@ -10,11 +10,16 @@
 
 package es.gob.afirma.keystores.mozilla;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.Charset;
 import java.security.Provider;
 import java.security.Security;
 import java.util.ArrayList;
@@ -223,6 +228,28 @@ final class MozillaKeyStoreUtilities {
 		return nssLibDir;
 	}
 
+	private static String getNssPathFromCompatibilityFile() throws IOException {
+		final File compatibility = new File(getMozillaUserProfileDirectory() + File.separator + "compatibility.ini");  //$NON-NLS-1$
+		if (compatibility.exists() && compatibility.canRead()) {
+			final InputStream fis = new FileInputStream(compatibility);
+			final BufferedReader br = new BufferedReader(new InputStreamReader(fis, Charset.forName("UTF-8"))); //$NON-NLS-1$
+			String line;
+			String dir = null;
+			while ((line = br.readLine()) != null) {
+			    if (line.startsWith("LastPlatformDir=")) { //$NON-NLS-1$
+			    	dir = line.replace("LastPlatformDir=", "").trim(); //$NON-NLS-1$ //$NON-NLS-2$
+					break;
+			    }
+			}
+			br.close();
+			if (dir != null) {
+				return dir;
+			}
+		}
+		throw new FileNotFoundException("No se ha podido deternimar el directorio de NSS en Windows a partir de 'compatibility.ini' de Firefox"); //$NON-NLS-1$
+	}
+
+
 	/** Obtiene el directorio de las bibliotecas NSS (<i>Netscape Security
 	 * Services</i>) del sistema.
 	 * @return Directorio de las bibliotecas NSS del sistema
@@ -232,6 +259,45 @@ final class MozillaKeyStoreUtilities {
 
 		if (nssLibDir != null) {
 			return nssLibDir;
+		}
+
+//		// Primero probamos con la variable de entorno, que es comun a todos los sistemas operativos
+//		try {
+//			nssLibDir = System.getenv("NSS_HOME"); //$NON-NLS-1$
+//		}
+//		catch(final Exception e) {
+//			LOGGER.warning("No se tiene acceso a la variable de entorno 'NSS_HOME': " + e); //$NON-NLS-1$
+//		}
+//		if (nssLibDir != null) {
+//			final File nssDir = new File(nssLibDir);
+//			if (nssDir.isDirectory() && nssDir.canRead()) {
+//				LOGGER.info("Directorio de NSS determinado a partir de la variable de entorno 'NSS_HOME'"); //$NON-NLS-1$
+//				return nssLibDir;
+//			}
+//			LOGGER.warning(
+//				"La variable de entorno 'NSS_HOME' apunta a un directorio que no existe o sobre el que no se tienen permisos de lectura, se ignorara" //$NON-NLS-1$
+//			);
+//		}
+
+		// Probamos ahora con "compatibility.ini" de Firefox, pero solo en Mac o Windows
+		if (Platform.OS.WINDOWS.equals(Platform.getOS()) || Platform.OS.MACOSX.equals(Platform.getOS())) {
+			try {
+				nssLibDir = getNssPathFromCompatibilityFile();
+				LOGGER.info("Directorio de NSS determinado a partir de 'compatibility.ini' de Firefox"); //$NON-NLS-1$
+			}
+			catch(final Exception e) {
+				LOGGER.warning("No se ha podido acceder a 'compatibility.ini' de Mozilla: " + e); //$NON-NLS-1$
+			}
+			if (nssLibDir != null) {
+				final File nssDir = new File(nssLibDir);
+				if (nssDir.isDirectory() && nssDir.canRead()) {
+					LOGGER.info("Directorio de NSS determinado a partir de 'compatibility.ini' de Mozilla"); //$NON-NLS-1$
+					return nssLibDir;
+				}
+				LOGGER.warning(
+					"'compatibility.ini' de Mozilla apunta a un directorio que no existe o sobre el que no se tienen permisos de lectura, se ignorara" //$NON-NLS-1$
+				);
+			}
 		}
 
 		if (Platform.getOS().equals(Platform.OS.WINDOWS)) {

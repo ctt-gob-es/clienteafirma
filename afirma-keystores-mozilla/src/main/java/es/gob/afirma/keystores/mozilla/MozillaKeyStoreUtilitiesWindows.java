@@ -3,12 +3,9 @@ package es.gob.afirma.keystores.mozilla;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
@@ -175,16 +172,10 @@ final class MozillaKeyStoreUtilitiesWindows {
 
 	static String getSystemNSSLibDirWindows() throws FileNotFoundException {
 
-		String dir;
-		// Probamos primero el 'compatibility.ini' de Firefox
-		try {
-			dir = getNssPathFromCompatibilityFile();
-			LOGGER.info("Directorio de NSS en Windows determinado a partir de 'compatibility.ini' de Firefox"); //$NON-NLS-1$
-		}
-		catch(final Exception e) {
-			// Intentamos extraer la ruta de instalacion de Firefox del registro
-			dir = getNssPathFromRegistry();
-			LOGGER.info("Directorio de NSS en Windows determinado a partir del registro de Windows"); //$NON-NLS-1$
+		String dir = getNssPathFromRegistry();
+
+		if (dir == null) {
+			throw new FileNotFoundException("No se encuentra el dierctorio de NSS en Windows"); //$NON-NLS-1$
 		}
 
 		// Tenemos la ruta del NSS, comprobamos adecuacion por bugs de Java
@@ -347,27 +338,6 @@ final class MozillaKeyStoreUtilitiesWindows {
 				}
 			}
 		}
-	}
-
-	private static String getNssPathFromCompatibilityFile() throws IOException {
-		final File compatibility = new File(getMozillaUserProfileDirectoryWindows() + "\\" + "compatibility.ini");  //$NON-NLS-1$//$NON-NLS-2$
-		if (compatibility.exists() && compatibility.canRead()) {
-			final InputStream fis = new FileInputStream(compatibility);
-			final BufferedReader br = new BufferedReader(new InputStreamReader(fis, Charset.forName("UTF-8"))); //$NON-NLS-1$
-			String line;
-			String dir = null;
-			while ((line = br.readLine()) != null) {
-			    if (line.startsWith("LastPlatformDir=")) { //$NON-NLS-1$
-			    	dir = line.replace("LastPlatformDir=", "").trim(); //$NON-NLS-1$ //$NON-NLS-2$
-					break;
-			    }
-			}
-			br.close();
-			if (dir != null) {
-				return dir;
-			}
-		}
-		throw new FileNotFoundException("No se ha podido deternimar el directorio de NSS en Windows a partir de 'compatibility.ini' de Firefox"); //$NON-NLS-1$
 	}
 
 	private static String getNssPathFromRegistry() throws FileNotFoundException {
