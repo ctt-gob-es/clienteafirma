@@ -562,6 +562,26 @@ final class MozillaKeyStoreUtilities {
 	 * @return Ruta completa del directorio del perfil de usuario de Mozilla /
 	 *         Firefox */
 	static String getMozillaUserProfileDirectory() {
+
+		String profileDir = null;
+		// Miramos primero la variable de entorno 'PROFILE_HOME', que es comun a todos los sistemas operativos
+		try {
+			profileDir = System.getenv("PROFILE_HOME"); //$NON-NLS-1$
+		}
+		catch(final Exception e) {
+			LOGGER.warning("No se tiene acceso a la variable de entorno 'PROFILE_HOME': " + e); //$NON-NLS-1$
+		}
+		if (profileDir != null) {
+			final File nssDir = new File(profileDir);
+			if (nssDir.isDirectory() && nssDir.canRead()) {
+				LOGGER.info("Directorio de perfil de usuario Firefox determinado a partir de la variable de entorno 'PROFILE_HOME'"); //$NON-NLS-1$
+				return profileDir;
+			}
+			LOGGER.warning(
+				"La variable de entorno 'PROFILE_HOME' apunta a un directorio que no existe o sobre el que no se tienen permisos de lectura, se ignorara" //$NON-NLS-1$
+			);
+		}
+
 		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
 			return MozillaKeyStoreUtilitiesWindows.getMozillaUserProfileDirectoryWindows();
 		}
