@@ -21,8 +21,6 @@ public final class AOSignerFactory {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	private static AOSignerFactory signerFactory = null;
-
 	private static final Map<String, AOSigner> SIGNERS = new HashMap<String, AOSigner>(20);
 
 	/* Listado de los manejador de firma soportados y los identificadores de formato de firma asociados. */
@@ -69,16 +67,6 @@ public final class AOSignerFactory {
 
 	private AOSignerFactory() {
 		// No permitimos la instanciacion externa
-	}
-
-	/** Obtiene una instancia de la factor&iacute;a.
-	 * @return Instancia de la factor&iacute;a */
-	public static AOSignerFactory getInstance() {
-		if (signerFactory != null) {
-			return signerFactory;
-		}
-		signerFactory = new AOSignerFactory();
-		return signerFactory;
 	}
 
 	/** Recupera un manejador de firma capaz de tratar la firma indicada. En caso
