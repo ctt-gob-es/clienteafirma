@@ -363,11 +363,11 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 
 		// Los datos no se devuelven, se quedan en el servidor
 		try {
-			return Base64.decode(stringTrimmedResult.replace(SUCCESS + " NEWID=", "")); //$NON-NLS-1$ //$NON-NLS-2$
+			return Base64.decode(stringTrimmedResult.replace(SUCCESS + " NEWID=", ""), Base64.URL_SAFE); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		catch (final IOException e) {
 			LOGGER.warning("El resultado de NEWID del servidor no estaba en Base64: " + e); //$NON-NLS-1$
-			return stringTrimmedResult.getBytes();
+			throw new AOException("El resultado devuelto por el servidor no es correcto", e); //$NON-NLS-1$
 		}
 	}
 

@@ -48,7 +48,6 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.TBSCertificateStructure;
 
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.signers.CounterSignTarget;
@@ -64,57 +63,32 @@ import es.gob.afirma.signers.pkcs7.SigUtils;
  * peculiaridad de que es una Contrafirma. */
 public final class CAdESTriPhaseCounterSigner {
 
-	/** Clave de la propiedad de firma. */
-	public static final String KEY_SIGN = "sign"; //$NON-NLS-1$
-
-	/** Clave de la propiedad de n&uacute;mero de contrafirmas. */
-	public static final String KEY_COUNTERSIGN_COUNT = "csCount"; //$NON-NLS-1$
-
-	/** Clave de la propiedad de datos firmados (a firmar). */
-	public static final String KEY_SIGNED_DATA = "signedData"; //$NON-NLS-1$
-
-	/** Clave de la propiedad de n&uacute;mero de firmas PKCS#1. */
-	public static final String KEY_PKCS1_SIGN_COUNT = "p1Count"; //$NON-NLS-1$
-
-	/** Clave de la propiedad de firma PKCS#1. */
-	public static final String KEY_PKCS1_SIGN = "p1Sign"; //$NON-NLS-1$
-
-	/** Caracter '='. */
-	public static final char EQUALS_SIGN = '=';
-
-	/** Caracter '\n'. */
-	public static final char CR = '\n';
-
 	/** Resultado de un conjunto de PreContraFirmas CAdES. */
 	public static final class CAdESPreCounterSignResult {
 
-		private final ArrayList<byte[]> signedDatas;
+		private final ArrayList<byte[]> preSigns;
 		private final byte[] sign;
 
 		CAdESPreCounterSignResult(final byte[] s, final ArrayList<byte[]> sDatas) {
-			this.signedDatas = sDatas;
+			this.preSigns = sDatas;
 			this.sign = s.clone();
 		}
 
-		@Override
-		public String toString() {
-			final StringBuilder sb = new StringBuilder(KEY_SIGN);
-			sb.append(EQUALS_SIGN);
-			sb.append(Base64.encode(this.sign).replace("\n", "").replace("\r", "")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			sb.append(CR);
-			sb.append(KEY_COUNTERSIGN_COUNT);
-			sb.append(EQUALS_SIGN);
-			sb.append(this.signedDatas.size());
-			sb.append(CR);
-			for(int i=0;i<this.signedDatas.size();i++) {
-				sb.append(KEY_SIGNED_DATA);
-				sb.append("."); //$NON-NLS-1$
-				sb.append(i);
-				sb.append(EQUALS_SIGN);
-				sb.append(Base64.encode(this.signedDatas.get(i)).replace("\n", "").replace("\r", "")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-				sb.append(CR);
-			}
-			return sb.toString();
+		/**
+		 * Recupera la firma con las contrafirmas que deseamos generada con un certificado fake.
+		 * @return Firma CAdES con contrafirmas.
+		 */
+		public byte[] getSign() {
+			return this.sign;
+		}
+		
+		/**
+		 * Recupera las prefirmas (SignedData) de cada contrafirma realizada listas para
+		 * firmarse con el certificado correcto.
+		 * @return Listado de prefirmas. 
+		 */
+		public ArrayList<byte[]> getPreSigns() {
+			return this.preSigns;
 		}
 	}
 

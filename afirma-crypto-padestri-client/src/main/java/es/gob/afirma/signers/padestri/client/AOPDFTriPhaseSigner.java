@@ -18,6 +18,7 @@ import java.net.URL;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -226,11 +227,11 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 
 		// Los datos no se devuelven, se quedan en el servidor
 		try {
-			return Base64.decode(stringTrimmedResult.replace("OK NEWID=", "")); //$NON-NLS-1$ //$NON-NLS-2$
+			return Base64.decode(stringTrimmedResult.replace("OK NEWID=", ""), Base64.URL_SAFE); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		catch (final IOException e) {
 			LOGGER.warning("El resultado de NEWID del servidor no estaba en Base64: " + e); //$NON-NLS-1$
-			return stringTrimmedResult.getBytes();
+			throw new AOException("El resultado devuelto por el servidor no es correcto", e); //$NON-NLS-1$
 		}
 	}
 
@@ -309,7 +310,7 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 		if (originalName == null) {
 			return "signed.pdf"; //$NON-NLS-1$
 		}
-		if (originalName.toLowerCase().endsWith(PDF_FILE_SUFFIX)) {
+		if (originalName.toLowerCase(Locale.ENGLISH).endsWith(PDF_FILE_SUFFIX)) {
 			return originalName.substring(0, originalName.length() - PDF_FILE_SUFFIX.length()) + inTextInt + PDF_FILE_SUFFIX;
 		}
 		return originalName + inTextInt + PDF_FILE_SUFFIX;
@@ -321,7 +322,6 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 		if (!isSign(sign)) {
 			throw new AOInvalidFormatException("El documento introducido no contiene una firma valida"); //$NON-NLS-1$
 		}
-		// TODO: Devolver el PDF sin firmar
 		return sign;
 	}
 
