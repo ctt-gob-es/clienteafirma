@@ -74,7 +74,7 @@ public class TestCountersign {
 		final File tempFile = File.createTempFile("CountersignCades", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		System.out.println("Prueba de contrafirma de arbol sobre firma explicita."); //$NON-NLS-1$
-		System.out.println("El resultado de almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
+		System.out.println("El resultado se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 
 		final FileOutputStream fos = new FileOutputStream(tempFile);
 		fos.write(countersign);
@@ -110,7 +110,7 @@ public class TestCountersign {
 		final File tempFile = File.createTempFile("CountersignCades", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		System.out.println("Prueba de contrafirma de nodos hoja sobre firma explicita."); //$NON-NLS-1$
-		System.out.println("El resultado de almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
+		System.out.println("El resultado se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 
 		final FileOutputStream fos = new FileOutputStream(tempFile);
 		fos.write(countersign);
@@ -145,7 +145,7 @@ public class TestCountersign {
 		final File tempFile = File.createTempFile("CountersignCades", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		System.out.println("Prueba de contrafirma de arbol sobre firma implicita."); //$NON-NLS-1$
-		System.out.println("El resultado de almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
+		System.out.println("El resultado se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 
 		final FileOutputStream fos = new FileOutputStream(tempFile);
 		fos.write(countersign);
@@ -181,7 +181,7 @@ public class TestCountersign {
 		final File tempFile = File.createTempFile("CountersignCades", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		System.out.println("Prueba de contrafirma de nodos hoja sobre firma implicita."); //$NON-NLS-1$
-		System.out.println("El resultado de almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
+		System.out.println("El resultado se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 
 		final FileOutputStream fos = new FileOutputStream(tempFile);
 		fos.write(countersign);

@@ -81,7 +81,7 @@ public class TestCosign {
 		final File tempFile = File.createTempFile("CosignCades", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		System.out.println("Prueba de cofirma implicita sobre firma implicita sin indicar los datos."); //$NON-NLS-1$
-		System.out.println("El resultado de almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
+		System.out.println("El resultado se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 
 		final FileOutputStream fos = new FileOutputStream(tempFile);
 		fos.write(cosign);
@@ -116,7 +116,7 @@ public class TestCosign {
 		final File tempFile = File.createTempFile("CosignCades", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		System.out.println("Prueba de cofirma implicita sobre firma implicita indicando datos."); //$NON-NLS-1$
-		System.out.println("El resultado de almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
+		System.out.println("El resultado se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 
 		final FileOutputStream fos = new FileOutputStream(tempFile);
 		fos.write(cosign);
@@ -151,7 +151,7 @@ public class TestCosign {
 		final File tempFile = File.createTempFile("CosignCades", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		System.out.println("Prueba de cofirma implicita sobre firma explicita sin indicar los datos."); //$NON-NLS-1$
-		System.out.println("El resultado de almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
+		System.out.println("El resultado se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 
 		final FileOutputStream fos = new FileOutputStream(tempFile);
 		fos.write(cosign);
@@ -187,7 +187,7 @@ public class TestCosign {
 		final File tempFile = File.createTempFile("CosignCades", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		System.out.println("Prueba de cofirma implicita sobre firma explicita indicando datos."); //$NON-NLS-1$
-		System.out.println("El resultado de almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
+		System.out.println("El resultado se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 
 		final FileOutputStream fos = new FileOutputStream(tempFile);
 		fos.write(cosign);
@@ -228,7 +228,7 @@ public class TestCosign {
 		final File tempFile = File.createTempFile("CosignCades", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		System.out.println("Prueba de cofirma implicita sobre firma explicita indicando datos."); //$NON-NLS-1$
-		System.out.println("El resultado de almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
+		System.out.println("El resultado se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 
 		final FileOutputStream fos = new FileOutputStream(tempFile);
 		fos.write(cosign);
@@ -269,7 +269,7 @@ public class TestCosign {
 		final File tempFile = File.createTempFile("CosignCades", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		System.out.println("Prueba de cofirma explicita sobre firma explicita ambas generadas con el mismo algoritmo y sin indicar los datos."); //$NON-NLS-1$
-		System.out.println("El resultado de almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
+		System.out.println("El resultado se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 
 		final FileOutputStream fos = new FileOutputStream(tempFile);
 		fos.write(cosign);
