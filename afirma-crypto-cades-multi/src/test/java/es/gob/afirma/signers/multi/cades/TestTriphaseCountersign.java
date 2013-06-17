@@ -11,12 +11,14 @@ import java.util.Properties;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOCounterSigner;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.CounterSignTarget;
+import es.gob.afirma.signers.cadestri.client.AOCAdESTriPhaseSigner;
 
 /**
  * Prueba de cofirmas CAdES.
@@ -32,6 +34,10 @@ public class TestTriphaseCountersign {
 
 	private static final String EXPLICIT_SHA1_COUNTERSIGN_FILE = "contrafirma_explicita.csig"; //$NON-NLS-1$
 
+	private static final String SERVLET_URL = "http://localhost:8080/afirma-server-triphase-signer/SignatureService"; //$NON-NLS-1$
+
+	private static final String PARAM_NAME_SERVER_URL = "serverUrl"; //$NON-NLS-1$
+	
 	private static InputStream ksIs;
 	private static KeyStore ks;
 
@@ -51,6 +57,7 @@ public class TestTriphaseCountersign {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void prueba_contrafirma_de_arbol_de_firma_explicita() throws Exception {
 
 		final InputStream is = getClass().getClassLoader().getResourceAsStream(EXPLICIT_SHA1_COUNTERSIGN_FILE);
@@ -58,8 +65,9 @@ public class TestTriphaseCountersign {
 		is.close();
 
 		final Properties config = new Properties();
-
-		final AOCounterSigner signer = new AOCAdESTriPhaseCounterSigner();
+		config.setProperty(PARAM_NAME_SERVER_URL, SERVLET_URL);
+		
+		final AOCounterSigner signer = new AOCAdESTriPhaseSigner();
 		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
 		final byte[] countersign = signer.countersign(
 				sign,
@@ -73,7 +81,7 @@ public class TestTriphaseCountersign {
 		final File tempFile = File.createTempFile("CountersignCades", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		System.out.println("Prueba de contrafirma de arbol sobre firma explicita."); //$NON-NLS-1$
-		System.out.println("El resultado de almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
+		System.out.println("El resultado se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 
 		final FileOutputStream fos = new FileOutputStream(tempFile);
 		fos.write(countersign);
@@ -86,6 +94,7 @@ public class TestTriphaseCountersign {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void prueba_contrafirma_de_firma_explicita_nodos_hoja() throws Exception {
 
 		final InputStream is = getClass().getClassLoader().getResourceAsStream(EXPLICIT_SHA1_COUNTERSIGN_FILE);
@@ -93,8 +102,9 @@ public class TestTriphaseCountersign {
 		is.close();
 
 		final Properties config = new Properties();
-
-		final AOCounterSigner signer = new AOCAdESTriPhaseCounterSigner();
+		config.setProperty(PARAM_NAME_SERVER_URL, SERVLET_URL);
+		
+		final AOCounterSigner signer = new AOCAdESTriPhaseSigner();
 		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
 		final byte[] countersign = signer.countersign(
 			sign,
@@ -109,7 +119,7 @@ public class TestTriphaseCountersign {
 		final File tempFile = File.createTempFile("CountersignCades", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		System.out.println("Prueba de contrafirma de nodos hoja sobre firma explicita."); //$NON-NLS-1$
-		System.out.println("El resultado de almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
+		System.out.println("El resultado se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 
 		final FileOutputStream fos = new FileOutputStream(tempFile);
 		fos.write(countersign);
@@ -122,6 +132,7 @@ public class TestTriphaseCountersign {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void prueba_contrafirma_de_arbol_de_firma_implicita() throws Exception {
 
 		final InputStream is = getClass().getClassLoader().getResourceAsStream(IMPLICIT_SHA1_COUNTERSIGN_FILE);
@@ -129,8 +140,9 @@ public class TestTriphaseCountersign {
 		is.close();
 
 		final Properties config = new Properties();
-
-		final AOCounterSigner signer = new AOCAdESTriPhaseCounterSigner();
+		config.setProperty(PARAM_NAME_SERVER_URL, SERVLET_URL);
+		
+		final AOCounterSigner signer = new AOCAdESTriPhaseSigner();
 		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
 		final byte[] countersign = signer.countersign(
 			sign,
@@ -145,7 +157,7 @@ public class TestTriphaseCountersign {
 		final File tempFile = File.createTempFile("CountersignCades", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		System.out.println("Prueba de contrafirma de arbol sobre firma implicita."); //$NON-NLS-1$
-		System.out.println("El resultado de almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
+		System.out.println("El resultado se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 
 		final FileOutputStream fos = new FileOutputStream(tempFile);
 		fos.write(countersign);
@@ -158,6 +170,7 @@ public class TestTriphaseCountersign {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void prueba_contrafirma_de_firma_implicita_nodos_hoja() throws Exception {
 
 		final InputStream is = getClass().getClassLoader().getResourceAsStream(IMPLICIT_SHA1_COUNTERSIGN_FILE);
@@ -165,8 +178,9 @@ public class TestTriphaseCountersign {
 		is.close();
 
 		final Properties config = new Properties();
-
-		final AOCounterSigner signer = new AOCAdESTriPhaseCounterSigner();
+		config.setProperty(PARAM_NAME_SERVER_URL, SERVLET_URL);
+		
+		final AOCounterSigner signer = new AOCAdESTriPhaseSigner();
 		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(), new KeyStore.PasswordProtection(PASSWORD.toCharArray()));
 		final byte[] countersign = signer.countersign(
 				sign,
@@ -180,7 +194,7 @@ public class TestTriphaseCountersign {
 		final File tempFile = File.createTempFile("CountersignCades", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		System.out.println("Prueba de contrafirma de nodos hoja sobre firma implicita."); //$NON-NLS-1$
-		System.out.println("El resultado de almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
+		System.out.println("El resultado se almacena en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 
 		final FileOutputStream fos = new FileOutputStream(tempFile);
 		fos.write(countersign);
