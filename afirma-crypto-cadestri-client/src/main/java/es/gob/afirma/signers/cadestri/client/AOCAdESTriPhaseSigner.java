@@ -338,7 +338,7 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 		}
 		
 		// Agregamos la configuracion general
-		configParams.setProperty(PROPERTY_NAME_SIGN_COUNT, Integer.toString(signCount));
+		configParams.setProperty(PROPERTY_NAME_SIGN_COUNT, preSign.getProperty(PROPERTY_NAME_SIGN_COUNT));
 		if (preSign.containsKey(PROPERTY_NAME_SIGN)) {
 			configParams.setProperty(PROPERTY_NAME_SIGN, preSign.getProperty(PROPERTY_NAME_SIGN));
 		}
