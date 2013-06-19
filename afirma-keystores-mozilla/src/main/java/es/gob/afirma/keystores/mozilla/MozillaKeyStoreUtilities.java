@@ -228,7 +228,7 @@ final class MozillaKeyStoreUtilities {
 		return nssLibDir;
 	}
 
-	private static String getNssPathFromCompatibilityFile() throws IOException {
+	static String getNssPathFromCompatibilityFile() throws IOException {
 		final File compatibility = new File(getMozillaUserProfileDirectory() + File.separator + "compatibility.ini");  //$NON-NLS-1$
 		if (compatibility.exists() && compatibility.canRead()) {
 			final InputStream fis = new FileInputStream(compatibility);
@@ -254,8 +254,10 @@ final class MozillaKeyStoreUtilities {
 	 * Services</i>) del sistema.
 	 * @return Directorio de las bibliotecas NSS del sistema
 	 * @throws FileNotFoundException
-	 *         Si no se puede encontrar NSS en el sistema */
-	private static String getSystemNSSLibDir() throws FileNotFoundException {
+	 *         Si no se puede encontrar NSS en el sistema
+     * @throws IOException En caso de errores de lectura/escritura
+	 *         */
+	private static String getSystemNSSLibDir() throws IOException {
 
 		if (nssLibDir != null) {
 			return nssLibDir;
@@ -279,7 +281,12 @@ final class MozillaKeyStoreUtilities {
 			);
 		}
 
-		// Probamos ahora con "compatibility.ini" de Firefox, pero solo en Mac o Windows
+		if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
+			return MozillaKeyStoreUtilitiesWindows.getSystemNSSLibDirWindows();
+		}
+
+		// Probamos con "compatibility.ini" de Firefox solo en Mac, ya que la comprobacion anterior de Windows tambien lo hace
+		// pero comprueba caracteres extranos, cosa que no hay que hacer en Mac
 		if (Platform.OS.WINDOWS.equals(Platform.getOS()) || Platform.OS.MACOSX.equals(Platform.getOS())) {
 			try {
 				nssLibDir = getNssPathFromCompatibilityFile();
@@ -300,9 +307,6 @@ final class MozillaKeyStoreUtilities {
 			}
 		}
 
-		if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
-			return MozillaKeyStoreUtilitiesWindows.getSystemNSSLibDirWindows();
-		}
 		if (Platform.getOS().equals(Platform.OS.LINUX) || Platform.getOS().equals(Platform.OS.SOLARIS)) {
 			return getSystemNSSLibDirUnix();
 		}
@@ -517,9 +521,6 @@ final class MozillaKeyStoreUtilities {
 
 		LOGGER.warning(
 				"Plataforma no soportada para la precarga de las bibliotecas NSS: " + Platform.getOS() //$NON-NLS-1$
-				+ " + Java " //$NON-NLS-1$
-				+ Platform.getJavaArch()
-				+ " bits" //$NON-NLS-1$
 		);
 		return new String[0];
 	}
@@ -659,7 +660,7 @@ final class MozillaKeyStoreUtilities {
 		}
 	}
 
-	static Provider loadNSS() throws FileNotFoundException,
+	static Provider loadNSS() throws IOException,
 	                                 AOException,
 	                                 InstantiationException,
 	                                 IllegalAccessException,

@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -18,6 +18,13 @@ import org.junit.Test;
  * @version 0.3
  */
 public final class TestAOUtil {
+
+	/** Prueba los m&eacute;todos de <code>Platform</code> */
+	@SuppressWarnings("static-method")
+	@Test
+	public void testPlatform() {
+		System.out.println(Platform.getSystemLibDir());
+	}
 
     /** Prueba para el getCN(), reconstruido para prescindir de javax.naming.
      * @throws Exception */
@@ -66,7 +73,7 @@ public final class TestAOUtil {
                 {"Hola Mundo!!", "Hola Mundo!!"}, //$NON-NLS-1$ //$NON-NLS-2$
                 {null, null}
         };
-        
+
         for (final String principal[] : principals) {
             System.out.println(principal[0] + ": " + principal[1]); //$NON-NLS-1$
             Assert.assertEquals("El metodo getCN() no devuelve el resultado correcto para " + principal[0], AOUtil.getCN(principal[0]), principal[1]); //$NON-NLS-1$

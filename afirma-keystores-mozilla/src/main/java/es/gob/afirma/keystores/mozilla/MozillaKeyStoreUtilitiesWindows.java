@@ -11,7 +11,6 @@ import java.util.logging.Logger;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.core.util.windows.WinRegistryWrapper;
 
 final class MozillaKeyStoreUtilitiesWindows {
 
@@ -170,9 +169,9 @@ final class MozillaKeyStoreUtilitiesWindows {
 		return longPath;
 	}
 
-	static String getSystemNSSLibDirWindows() throws FileNotFoundException {
+	static String getSystemNSSLibDirWindows() throws IOException {
 
-		String dir = getNssPathFromRegistry();
+		String dir = MozillaKeyStoreUtilities.getNssPathFromCompatibilityFile();
 
 		if (dir == null) {
 			throw new FileNotFoundException("No se encuentra el dierctorio de NSS en Windows"); //$NON-NLS-1$
@@ -290,19 +289,6 @@ final class MozillaKeyStoreUtilitiesWindows {
 			return appData;
 		}
 
-		// Probamos despues con el registro
-		appData = WinRegistryWrapper.getString(
-			WinRegistryWrapper.HKEY_CURRENT_USER,
-			"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders", //$NON-NLS-1$
-			"AppData" //$NON-NLS-1$
-		);
-		if (appData != null) {
-			LOGGER.info(
-				"Se ha comprobado la situacion del directorio 'AppData' de Windows a traves del registro" //$NON-NLS-1$
-			);
-			return appData;
-		}
-
 		// Y por ultimo con el directorio por defecto de Windows 7 y Windows 8
 		final String probablyPath = "C:\\Users\\" + System.getProperty("user.name") + "\\AppData\\Roaming"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		final File f = new File(probablyPath);
@@ -340,39 +326,4 @@ final class MozillaKeyStoreUtilitiesWindows {
 		}
 	}
 
-	private static String getNssPathFromRegistry() throws FileNotFoundException {
-		String dir = WinRegistryWrapper.getString(WinRegistryWrapper.HKEY_CURRENT_USER, "Software\\Classes\\FirefoxURL\\shell\\open\\command", ""); //$NON-NLS-1$ //$NON-NLS-2$
-		if (dir == null) {
-			dir = WinRegistryWrapper.getString(WinRegistryWrapper.HKEY_LOCAL_MACHINE, "SOFTWARE\\Classes\\FirefoxURL\\shell\\open\\command", ""); //$NON-NLS-1$ //$NON-NLS-2$
-			if (dir == null) {
-				final String currentVersion = WinRegistryWrapper.getString(WinRegistryWrapper.HKEY_LOCAL_MACHINE, "SOFTWARE\\Mozilla\\Mozilla Firefox", "CurrentVersion"); //$NON-NLS-1$ //$NON-NLS-2$
-				if (currentVersion != null) {
-					final String installDir = WinRegistryWrapper.getString(WinRegistryWrapper.HKEY_LOCAL_MACHINE, "SOFTWARE\\Mozilla\\Mozilla Firefox\\" + currentVersion + "\\Main", "Install Directory"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-					if (installDir != null) {
-						return installDir;
-					}
-				}
-				throw new FileNotFoundException("No se ha podido localizar el directorio de Firefox a traves del registro de Windows"); //$NON-NLS-1$
-			}
-		}
-		final String regKeyLowCase = dir.toLowerCase();
-		final int pos = regKeyLowCase.indexOf("firefox.exe"); //$NON-NLS-1$
-		if (pos != -1) {
-			dir = dir.substring(0, pos);
-			if (dir.startsWith("\"")) { //$NON-NLS-1$
-				dir = dir.substring(1);
-			}
-			if (dir.endsWith(File.separator)) {
-				dir = dir.substring(0, dir.length() - 1);
-			}
-		}
-
-		final File tmpFile = new File(dir);
-		if (tmpFile.exists() && tmpFile.isDirectory() && new File(dir + File.separator + SOFTOKN3_DLL).exists()) {
-			return dir;
-		}
-
-		throw new FileNotFoundException("No se ha podido localizar el directorio de Firefox a traves del registro de Windows"); //$NON-NLS-1$
-
-	}
 }

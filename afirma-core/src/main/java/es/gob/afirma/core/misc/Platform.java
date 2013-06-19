@@ -11,11 +11,9 @@
 package es.gob.afirma.core.misc;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Locale;
 import java.util.logging.Logger;
-
-import es.gob.afirma.core.util.windows.WinRegistryWrapper;
 
 /** Clase para la identificaci&oacute;n de la plataforma Cliente y
  * extracci&oacute;n de datos relativos a la misma. */
@@ -120,21 +118,21 @@ public final class Platform {
         if (userAgent == null) {
             return BROWSER.OTHER;
         }
-        else if (userAgent.toLowerCase().contains("msie")) { //$NON-NLS-1$
+        else if (userAgent.toLowerCase(Locale.US).contains("msie")) { //$NON-NLS-1$
             return BROWSER.INTERNET_EXPLORER;
         }
-        else if (userAgent.toLowerCase().contains("firefox")) { //$NON-NLS-1$
+        else if (userAgent.toLowerCase(Locale.US).contains("firefox")) { //$NON-NLS-1$
             return BROWSER.FIREFOX;
         }
-        else if (userAgent.toLowerCase().contains("chrome")) { //$NON-NLS-1$
+        else if (userAgent.toLowerCase(Locale.US).contains("chrome")) { //$NON-NLS-1$
             return BROWSER.CHROME;
         }
-        else if (userAgent.toLowerCase().contains("safari")) { //$NON-NLS-1$
+        else if (userAgent.toLowerCase(Locale.US).contains("safari")) { //$NON-NLS-1$
             // CUIDADO: Chrome incluye la cadena "safari" como parte de su
             // UserAgent
             return BROWSER.SAFARI;
         }
-        else if (userAgent.toLowerCase().contains("opera")) { //$NON-NLS-1$
+        else if (userAgent.toLowerCase(Locale.US).contains("opera")) { //$NON-NLS-1$
             return BROWSER.OPERA;
         }
         else { // Cualquier otro navegador
@@ -226,7 +224,8 @@ public final class Platform {
             final Method getReleaseMethod = documentClass.getDeclaredMethod("getRelease"); //$NON-NLS-1$
 
             return (String) getReleaseMethod.invoke(null);
-        } catch (final Exception e) {
+        }
+        catch (final Exception e) {
             return null;
         }
     }
@@ -237,20 +236,9 @@ public final class Platform {
         if (!Platform.getOS().equals(Platform.OS.WINDOWS)) {
             return File.separator;
         }
-        String systemRoot = null;
-        final String defaultSystemRoot = "C:\\WINDOWS"; //$NON-NLS-1$
-        try {
-            systemRoot =
-                WinRegistryWrapper.getString(WinRegistryWrapper.HKEY_LOCAL_MACHINE,
-                        "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", //$NON-NLS-1$
-                "SystemRoot"); //$NON-NLS-1$
-        }
-        catch (final Exception e) {
-            LOGGER
-            .severe("No se ha podido obtener el directorio principal de Windows accediendo al registro, " + "se probara con 'C:\\WINDOWS': " //$NON-NLS-1$ //$NON-NLS-2$
-                    + e);
-        }
+        String systemRoot = System.getProperty("SystemRoot"); //$NON-NLS-1$
         if (systemRoot == null) {
+            final String defaultSystemRoot = "C:\\WINDOWS"; //$NON-NLS-1$
             final File winSys32 = new File(defaultSystemRoot + "\\SYSTEM32"); //$NON-NLS-1$
             if (winSys32.exists() && winSys32.isDirectory()) {
                 return defaultSystemRoot;
@@ -282,57 +270,4 @@ public final class Platform {
         return "/usr/lib"; //$NON-NLS-1$
     }
 
-    /** Obtiene la versi&oacute;n de BouncyCastle en uso.
-     * @return Versi&oacute;n del BouncyCastle encontrado primero en el BootClassPath
-     * o en el ClassPath. Si no se puede recuperar se devuelve {@code null} */
-    public static String getBouncyCastleVersion() {
-
-        try {
-            final Class<?> bouncyCastleProviderClass = Class.forName("org.bouncycastle.jce.provider.BouncyCastleProvider"); //$NON-NLS-1$
-            final Field info = bouncyCastleProviderClass.getDeclaredField("info"); //$NON-NLS-1$
-            info.setAccessible(true);
-            return info.get("").toString().replace("BouncyCastle Security Provider v", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-        }
-        catch (final Exception e) {
-        	return null;
-        }
-    }
-
-    /** Obtiene el directorio de extensiones del entorno de ejecuci&oacute;n de Java en uso.
-     * @return Directorio de extensiones del JRE o {@code null} si no se pudo identificar */
-    public static String getJavaExtDir() {
-        final File extDir = new File(getJavaHome() + (getJavaHome().endsWith(File.separator) ? "" : File.separator) + "lib" + File.separator + "ext"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-        if (extDir.exists() && extDir.isDirectory()) {
-            return extDir.getAbsolutePath();
-        }
-        return null;
-    }
-
-    /** Obtiene el directorio global de extensiones de Java.
-     * @return Directorio de extensiones Java del sistema o {@code null} si no se pudo identificar o no existe */
-    public static String getSystemJavaExtDir() {
-        final File systemExtDir;
-        switch (getOS()) {
-            case WINDOWS:
-                systemExtDir = new File(getSystemRoot() + (getSystemRoot().endsWith("\\") ? "" : "\\") + "Sun\\Java\\lib\\ext"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-                break;
-            case SOLARIS:
-                systemExtDir = new File("/usr/jdk/packages/lib/ext"); //$NON-NLS-1$
-                break;
-            case LINUX:
-                systemExtDir = new File("/usr/java/packages/lib/ext"); //$NON-NLS-1$
-                break;
-            case MACOSX:
-                systemExtDir = new File("/Library/Java/Extensions"); //$NON-NLS-1$
-                break;
-            default:
-                LOGGER.warning("No se soporta el sistema operativo '" + getOS() + "' para la obtencion del directorio global de extensiones Java, se devolvera null"); //$NON-NLS-1$ //$NON-NLS-2$
-                return null;
-        }
-        if (systemExtDir.exists() && systemExtDir.isDirectory()) {
-            return systemExtDir.getAbsolutePath();
-        }
-        LOGGER.info("El directorio global de extensiones Java no esta creado, se devolvera null"); //$NON-NLS-1$
-        return null;
-    }
 }
