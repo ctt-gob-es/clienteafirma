@@ -161,9 +161,6 @@ public final class PAdESTriPhaseSignerServerSide {
     /** Versi&oacute;n de iText necesaria para el uso de esta clase (2.1.7). */
     public static final String ITEXT_VERSION = "2.1.7"; //$NON-NLS-1$
 
-    /** Versi&oacute;n de BouncyCastle necesaria para el uso de esta clase (1.46 o superior). */
-    public static final String BC_VERSION = "1.46"; //$NON-NLS-1$
-
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");  //$NON-NLS-1$
 
     /** Construye un firmador PAdES trif&aacute;sico, comprobando que la versiones existentes de iText y Bouncycastle sean las adecuadas.
@@ -173,10 +170,6 @@ public final class PAdESTriPhaseSignerServerSide {
         final String itextVersion = Platform.getITextVersion();
         if (!ITEXT_VERSION.equals(itextVersion)) {
             throw new UnsupportedOperationException("Se necesita iText version " + ITEXT_VERSION + ", pero se ha encontrado la version: " + itextVersion); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-        final String bcVersion = Platform.getBouncyCastleVersion();
-        if (BC_VERSION.compareTo(bcVersion) > 0) {
-            throw new UnsupportedOperationException("Se necesita BouncyCastle version igual o superior a " + BC_VERSION + ", pero se ha encontrado la version: " + bcVersion); //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
 
@@ -342,8 +335,6 @@ public final class PAdESTriPhaseSignerServerSide {
                                            final Calendar signTime,
                                            final Properties xParams) throws IOException, AOException {
 
-    	Logger.getLogger("es.gob.afirma").info("Iniciamos la prefirma PAdES");
-    	
         final Properties extraParams = xParams != null ? xParams : new Properties();
 
         final PdfTriPhaseSession ptps = getSessionData(inPDF, signerCertificateChain, signTime, extraParams);
@@ -549,8 +540,6 @@ public final class PAdESTriPhaseSignerServerSide {
                     final Calendar signTime,
                     final SignEnhancer enhancer,
                     final Properties enhancerConfig) throws AOException, IOException, NoSuchAlgorithmException {
-
-		Logger.getLogger("es.gob.afirma").info("Iniciamos la postfirma PAdES");
 
         byte[] completeCAdESSignature = CAdESTriPhaseSigner.postSign(digestAlgorithmName, null, signerCertificateChain, signature, signedAttributes);
 
