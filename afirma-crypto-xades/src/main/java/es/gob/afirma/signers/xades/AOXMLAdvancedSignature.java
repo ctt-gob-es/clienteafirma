@@ -10,6 +10,7 @@
 
 package es.gob.afirma.signers.xades;
 
+import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyException;
 import java.security.PrivateKey;
@@ -23,6 +24,10 @@ import javax.xml.crypto.XMLStructure;
 import javax.xml.crypto.dom.DOMStructure;
 import javax.xml.crypto.dsig.CanonicalizationMethod;
 import javax.xml.crypto.dsig.Reference;
+import javax.xml.crypto.dsig.SignatureMethod;
+import javax.xml.crypto.dsig.SignedInfo;
+import javax.xml.crypto.dsig.TransformException;
+import javax.xml.crypto.dsig.XMLObject;
 import javax.xml.crypto.dsig.XMLSignature;
 import javax.xml.crypto.dsig.XMLSignatureException;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
@@ -30,6 +35,7 @@ import javax.xml.crypto.dsig.dom.DOMSignContext;
 import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
+import javax.xml.parsers.ParserConfigurationException;
 
 import net.java.xades.security.xml.WrappedKeyStorePlace;
 import net.java.xades.security.xml.XmlWrappedKeyInfo;
@@ -37,6 +43,7 @@ import net.java.xades.security.xml.XAdES.XAdES_BES;
 import net.java.xades.security.xml.XAdES.XMLAdvancedSignature;
 
 import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
 /** Derivado de <code>net.java.xades.security.xml.XAdES.XMLAdvancedSignature</code> con los
  * siguientes cambios:
@@ -109,7 +116,7 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
                      final PrivateKey privateKey,
                      final String signatureMethod,
                      final List<?> refsIdList,
-                     final String signatureIdPrefix) throws MarshalException, XMLSignatureException, GeneralSecurityException {
+                     final String signatureIdPrefix) throws MarshalException, GeneralSecurityException {
 
         final List<?> referencesIdList = new ArrayList<Object>(refsIdList);
 
@@ -155,9 +162,70 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
         this.signContext.putNamespacePrefix(XMLSignature.XMLNS, this.xades.getXmlSignaturePrefix());
         this.signContext.putNamespacePrefix(this.xadesNamespace, this.xades.getXadesPrefix());
 
-        this.signature.sign(this.signContext);
+        this.signContext.setURIDereferencer(new CustomDOMUriDereferencer());
+
+        try {
+        	this.signature.sign(this.signContext);
+        }
+        catch(final Throwable e) {
+        	e.printStackTrace();
+        	throw new RuntimeException(e);
+        }
     }
 
+    // Sobreescribimos este metodo de XMLAdvancedSignature unicamente para poder instalar el
+    // derreferenciador a medida
+    
+    @Override
+    public void sign(X509Certificate certificate, PrivateKey privateKey, String signatureMethod,
+            List refsIdList, String signatureIdPrefix) throws MarshalException,
+            XMLSignatureException, GeneralSecurityException, TransformException, IOException,
+            ParserConfigurationException, SAXException
+    {
+        List<?> referencesIdList = new ArrayList(refsIdList);
+
+        if (WrappedKeyStorePlace.SIGNING_CERTIFICATE_PROPERTY.equals(getWrappedKeyStorePlace()))
+        {
+            this.xades.setSigningCertificate(certificate);
+        }
+        else
+        {
+            /*
+             * @ToDo The ds:KeyInfo element also MAY contain other certificates forming a chain that
+             * MAY reach the point of trust;
+             */
+        }
+
+        XMLObject xadesObject = marshalXMLSignature(this.xadesNamespace,
+                this.signedPropertiesTypeUrl, signatureIdPrefix, referencesIdList);
+        addXMLObject(xadesObject);
+
+        String signatureId = getSignatureId(signatureIdPrefix);
+        String signatureValueId = getSignatureValueId(signatureIdPrefix);
+
+        XMLSignatureFactory fac = getXMLSignatureFactory();
+        CanonicalizationMethod cm = fac.newCanonicalizationMethod(CanonicalizationMethod.INCLUSIVE,
+                (C14NMethodParameterSpec) null);
+
+        List<Reference> documentReferences = getReferences(referencesIdList);
+        String keyInfoId = getKeyInfoId(signatureIdPrefix);
+        documentReferences.add(fac.newReference("#" + keyInfoId, getDigestMethod())); //$NON-NLS-1$
+
+        SignatureMethod sm = fac.newSignatureMethod(signatureMethod, null);
+        SignedInfo si = fac.newSignedInfo(cm, sm, documentReferences);
+
+        this.signature = fac.newXMLSignature(si, newKeyInfo(certificate, keyInfoId),
+                getXMLObjects(), signatureId, signatureValueId);
+
+        this.signContext = new DOMSignContext(privateKey, this.baseElement);
+        this.signContext.putNamespacePrefix(XMLSignature.XMLNS, this.xades.getXmlSignaturePrefix());
+        this.signContext.putNamespacePrefix(this.xadesNamespace, this.xades.getXadesPrefix());
+
+        this.signContext.setURIDereferencer(new CustomDOMUriDereferencer());
+        
+        this.signature.sign(this.signContext);
+    }
+    
     /** Obtiene una instancia de la clase.
      * @param xades Datos de la firma XAdES-BES
      * @return Instancia de la clase
