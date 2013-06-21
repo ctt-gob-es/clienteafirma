@@ -48,6 +48,7 @@ import org.w3c.dom.NodeList;
 import com.sun.org.apache.xml.internal.security.Init;
 import com.sun.org.apache.xml.internal.security.signature.XMLSignatureInput;
 import com.sun.org.apache.xml.internal.security.utils.IdResolver;
+import com.sun.org.apache.xml.internal.security.utils.resolver.ResourceResolver;
 
 /**
  * DOM-based implementation of URIDereferencer.
@@ -102,18 +103,29 @@ public class CustomDOMUriDereferencer implements URIDereferencer {
         }
 
         try {
-            
-            //------------------------------
-            
-            Document doc = uriAttr.getOwnerDocument();
-            String uriValue = uriAttr.getNodeValue();
-            
+            final String baseURI = context.getBaseURI();
+            final ResourceResolver apacheResolver = ResourceResolver.getInstance(uriAttr, baseURI);
+            final XMLSignatureInput in = apacheResolver.resolve(uriAttr, baseURI);
+            if (in.isOctetStream()) {
+                return new ApacheOctetStreamData(in);
+            }
+			return new ApacheNodeSetData(in);
+        }
+        catch (final Exception e) {
+        	
+        	// Si el derreferenciador de Apache no ha podido obtener la referencia, la buscamos
+        	// nosotros en el XML
+        	
+            final Document doc = uriAttr.getOwnerDocument();
+            final String uriValue = uriAttr.getNodeValue();
             Node targetNode = null;
+            
             // Derreferenciacion de todo el XML en firmas enveloped
             if ("".equals(uriValue)) { //$NON-NLS-1$
             	targetNode = doc;
             }
             
+            // Buscamos el nodo en todo el XML
             if (targetNode == null) {
             	String id = uriValue;
             	if (uriValue.length() > 0 && uriValue.charAt(0) == '#') {
@@ -123,22 +135,18 @@ public class CustomDOMUriDereferencer implements URIDereferencer {
             }
             
             if (targetNode == null) {
-            	throw new URIReferenceException("No se ha podido derreferenciar un nodo a partir de la uri: " + uri); //$NON-NLS-1$
+            	throw new URIReferenceException(e);
             }
             
             final XMLSignatureInput in = new XMLSignatureInput(targetNode);
-                        
-            //------------------------------
-            
-//            final ResourceResolver apacheResolver = ResourceResolver.getInstance(uriAttr, baseURI);
-//            final XMLSignatureInput in = apacheResolver.resolve(uriAttr, baseURI);
             if (in.isOctetStream()) {
-                return new ApacheOctetStreamData(in);
+            	try {
+            		return new ApacheOctetStreamData(in);
+            	} catch (Exception ioe) {
+            		throw new URIReferenceException(e);
+            	}
             }
 			return new ApacheNodeSetData(in);
-        }
-        catch (final Exception e) {
-            throw new URIReferenceException(e);
         }
     }
     
