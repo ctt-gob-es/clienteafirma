@@ -55,7 +55,7 @@ import com.sun.org.apache.xml.internal.security.utils.resolver.ResourceResolver;
  *
  * @author Sean Mullan
  */
-public class CustomDOMUriDereferencer implements URIDereferencer {
+final class CustomDOMUriDereferencer implements URIDereferencer {
 
     static final URIDereferencer INSTANCE = new CustomDOMUriDereferencer();
 
@@ -112,19 +112,19 @@ public class CustomDOMUriDereferencer implements URIDereferencer {
 			return new ApacheNodeSetData(in);
         }
         catch (final Exception e) {
-        	
+
         	// Si el derreferenciador de Apache no ha podido obtener la referencia, la buscamos
         	// nosotros en el XML
-        	
+
             final Document doc = uriAttr.getOwnerDocument();
             final String uriValue = uriAttr.getNodeValue();
             Node targetNode = null;
-            
+
             // Derreferenciacion de todo el XML en firmas enveloped
             if ("".equals(uriValue)) { //$NON-NLS-1$
             	targetNode = doc;
             }
-            
+
             // Buscamos el nodo en todo el XML
             if (targetNode == null) {
             	String id = uriValue;
@@ -133,38 +133,38 @@ public class CustomDOMUriDereferencer implements URIDereferencer {
             	}
             	targetNode = findNodeById(id, doc);
             }
-            
+
             if (targetNode == null) {
             	throw new URIReferenceException(e);
             }
-            
+
             final XMLSignatureInput in = new XMLSignatureInput(targetNode);
             if (in.isOctetStream()) {
             	try {
             		return new ApacheOctetStreamData(in);
-            	} catch (Exception ioe) {
+            	} catch (final Exception ioe) {
             		throw new URIReferenceException(e);
             	}
             }
 			return new ApacheNodeSetData(in);
         }
     }
-    
+
     /**
      * Comprueba si un nodo o alguno de sus nodos hijos tiene el identificador indicado.
      * @param id Identificador buscado.
      * @param xmlNode Nodo sobre el que se realiza la b&uacute;squeda.
      * @return Nodo con el identificador indicado o {@code null} si no se encuentra.
      */
-    private Node findNodeById(String id, Node xmlNode) {
-    	
-    	NamedNodeMap attrs = xmlNode.getAttributes();
+    private Node findNodeById(final String id, final Node xmlNode) {
+
+    	final NamedNodeMap attrs = xmlNode.getAttributes();
         if (attrs != null && attrs.getNamedItem("Id") != null && id.equals(attrs.getNamedItem("Id").getNodeValue())) { //$NON-NLS-1$ //$NON-NLS-2$
         	return xmlNode;
         }
-        
+
         Node targetNode = null;
-        NodeList childNodes = xmlNode.getChildNodes();
+        final NodeList childNodes = xmlNode.getChildNodes();
         for (int i = 0; i < childNodes.getLength(); i++) {
         	if (childNodes.item(i).getNodeType() == Node.ELEMENT_NODE) {
         		targetNode = findNodeById(id, childNodes.item(i));
