@@ -283,12 +283,13 @@ public final class AOKeyStoreManagerFactory {
                                                                                                    AOKeystoreAlternativeException {
     	final AOKeyStoreManager ksm = new AOKeyStoreManager();
         String p11Lib = null;
-        if (!new File(lib).exists()) {
-        	throw new IOException("La biblioteca '" + lib + "' no existe"); //$NON-NLS-1$ //$NON-NLS-2$
-        }
         if (lib != null && !"".equals(lib)) { //$NON-NLS-1$
             p11Lib = lib;
         }
+        if (p11Lib != null && !new File(p11Lib).exists()) {
+        	throw new IOException("La biblioteca '" + p11Lib + "' no existe"); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+        
         if (p11Lib == null) {
             final String[] exts;
             String extsDesc = KeyStoreMessages.getString("AOKeyStoreManagerFactory.6"); //$NON-NLS-1$
