@@ -116,7 +116,7 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
                      final PrivateKey privateKey,
                      final String signatureMethod,
                      final List<?> refsIdList,
-                     final String signatureIdPrefix) throws MarshalException, GeneralSecurityException {
+                     final String signatureIdPrefix) throws MarshalException, GeneralSecurityException, XMLSignatureException {
 
         final List<?> referencesIdList = new ArrayList<Object>(refsIdList);
 
@@ -164,55 +164,49 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
 
         this.signContext.setURIDereferencer(new CustomDOMUriDereferencer());
 
-        try {
-        	this.signature.sign(this.signContext);
-        }
-        catch(final Throwable e) {
-        	e.printStackTrace();
-        	throw new RuntimeException(e);
-        }
+        this.signature.sign(this.signContext);
+
     }
 
     // Sobreescribimos este metodo de XMLAdvancedSignature unicamente para poder instalar el
     // derreferenciador a medida
-    
-    @Override
-    public void sign(X509Certificate certificate, PrivateKey privateKey, String signatureMethod,
-            List refsIdList, String signatureIdPrefix) throws MarshalException,
-            XMLSignatureException, GeneralSecurityException, TransformException, IOException,
-            ParserConfigurationException, SAXException
-    {
-        List<?> referencesIdList = new ArrayList(refsIdList);
 
-        if (WrappedKeyStorePlace.SIGNING_CERTIFICATE_PROPERTY.equals(getWrappedKeyStorePlace()))
-        {
+    @Override
+    public void sign(final X509Certificate certificate,
+    		         final PrivateKey privateKey,
+    		         final String signatureMethod,
+    		         final List refsIdList,
+    		         final String signatureIdPrefix) throws MarshalException,
+                                                            XMLSignatureException,
+                                                            GeneralSecurityException,
+                                                            TransformException,
+                                                            IOException,
+                                                            ParserConfigurationException,
+                                                            SAXException {
+
+        final List<?> referencesIdList = new ArrayList(refsIdList);
+
+        if (WrappedKeyStorePlace.SIGNING_CERTIFICATE_PROPERTY.equals(getWrappedKeyStorePlace())) {
             this.xades.setSigningCertificate(certificate);
         }
-        else
-        {
-            /*
-             * @ToDo The ds:KeyInfo element also MAY contain other certificates forming a chain that
-             * MAY reach the point of trust;
-             */
-        }
 
-        XMLObject xadesObject = marshalXMLSignature(this.xadesNamespace,
+        final XMLObject xadesObject = marshalXMLSignature(this.xadesNamespace,
                 this.signedPropertiesTypeUrl, signatureIdPrefix, referencesIdList);
         addXMLObject(xadesObject);
 
-        String signatureId = getSignatureId(signatureIdPrefix);
-        String signatureValueId = getSignatureValueId(signatureIdPrefix);
+        final String signatureId = getSignatureId(signatureIdPrefix);
+        final String signatureValueId = getSignatureValueId(signatureIdPrefix);
 
-        XMLSignatureFactory fac = getXMLSignatureFactory();
-        CanonicalizationMethod cm = fac.newCanonicalizationMethod(CanonicalizationMethod.INCLUSIVE,
+        final XMLSignatureFactory fac = getXMLSignatureFactory();
+        final CanonicalizationMethod cm = fac.newCanonicalizationMethod(CanonicalizationMethod.INCLUSIVE,
                 (C14NMethodParameterSpec) null);
 
-        List<Reference> documentReferences = getReferences(referencesIdList);
-        String keyInfoId = getKeyInfoId(signatureIdPrefix);
+        final List<Reference> documentReferences = getReferences(referencesIdList);
+        final String keyInfoId = getKeyInfoId(signatureIdPrefix);
         documentReferences.add(fac.newReference("#" + keyInfoId, getDigestMethod())); //$NON-NLS-1$
 
-        SignatureMethod sm = fac.newSignatureMethod(signatureMethod, null);
-        SignedInfo si = fac.newSignedInfo(cm, sm, documentReferences);
+        final SignatureMethod sm = fac.newSignatureMethod(signatureMethod, null);
+        final SignedInfo si = fac.newSignedInfo(cm, sm, documentReferences);
 
         this.signature = fac.newXMLSignature(si, newKeyInfo(certificate, keyInfoId),
                 getXMLObjects(), signatureId, signatureValueId);
@@ -220,12 +214,11 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
         this.signContext = new DOMSignContext(privateKey, this.baseElement);
         this.signContext.putNamespacePrefix(XMLSignature.XMLNS, this.xades.getXmlSignaturePrefix());
         this.signContext.putNamespacePrefix(this.xadesNamespace, this.xades.getXadesPrefix());
-
         this.signContext.setURIDereferencer(new CustomDOMUriDereferencer());
-        
+
         this.signature.sign(this.signContext);
     }
-    
+
     /** Obtiene una instancia de la clase.
      * @param xades Datos de la firma XAdES-BES
      * @return Instancia de la clase
