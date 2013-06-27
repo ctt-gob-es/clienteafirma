@@ -81,6 +81,7 @@ import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
+import es.gob.afirma.signers.xml.CustomDOMUriDereferencer;
 import es.gob.afirma.signers.xml.InvalidXMLException;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.Utils.CannotDereferenceException;
@@ -624,7 +625,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             dataElement.setAttributeNS(null, MIMETYPE_STR, mimeType);
             dataElement.setAttributeNS(null, ENCODING_STR, encoding);
             if (hashAlgoUri != null) {
-                dataElement.setAttributeNS(null, "hashAlgorithm", hashAlgoUri); // TODO: Aqui se agrega el atributo a la Detached Explicita //$NON-NLS-1$
+                dataElement.setAttributeNS(null, "hashAlgorithm", hashAlgoUri); //$NON-NLS-1$ // TODO: Aqui se agrega el atributo a la Detached Explicita
             }
 
             dataElement.setTextContent(Base64.encode(digestValue));
@@ -1016,6 +1017,8 @@ public final class AOXMLDSigSigner implements AOSigner {
         		key, docSignature.getDocumentElement()
     		);
             signContext.putNamespacePrefix(XMLConstants.DSIGNNS, xmlSignaturePrefix);
+            signContext.setURIDereferencer(new CustomDOMUriDereferencer());
+            
             signature.sign(signContext);
         }
         catch (final NoSuchAlgorithmException e) {
@@ -1406,7 +1409,8 @@ public final class AOXMLDSigSigner implements AOSigner {
 
             final DOMSignContext signContext = new DOMSignContext(key, rootSig);
             signContext.putNamespacePrefix(XMLConstants.DSIGNNS, xmlSignaturePrefix);
-
+            signContext.setURIDereferencer(new CustomDOMUriDereferencer());
+            
             fac.newXMLSignature(fac.newSignedInfo(cm, sm, referenceList), // SignedInfo
                                 kif.newKeyInfo(content, keyInfoId), // KeyInfo
                                 new ArrayList<Object>(),
@@ -1965,7 +1969,8 @@ public final class AOXMLDSigSigner implements AOSigner {
         		signature.getOwnerDocument().getDocumentElement()
     		);
             signContext.putNamespacePrefix(XMLConstants.DSIGNNS, xmlSignaturePrefix);
-
+            signContext.setURIDereferencer(new CustomDOMUriDereferencer());
+            
             sign.sign(signContext);
         }
         catch (final NoSuchAlgorithmException e) {
