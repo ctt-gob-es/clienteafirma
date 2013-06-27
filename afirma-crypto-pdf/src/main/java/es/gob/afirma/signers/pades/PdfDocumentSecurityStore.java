@@ -10,6 +10,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.ListIterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -50,7 +51,7 @@ final class PdfDocumentSecurityStore {
                 if(b >= 0 && b <= 15) {
                     buf.append("0"); //$NON-NLS-1$
                 }
-                buf.append(Integer.toHexString(b).toUpperCase());
+                buf.append(Integer.toHexString(b).toUpperCase(Locale.ENGLISH));
             }
             return buf.toString();
         }
@@ -134,7 +135,7 @@ final class PdfDocumentSecurityStore {
         if(arrayCerts != null) {
             for(final Iterator<PdfObject> iterator = arrayCerts.listIterator(); iterator.hasNext();) {
                 final PdfIndirectReference reference = (PdfIndirectReference)iterator.next();
-                this.certificates.put(new Integer(i), getContentBytesFromContentObject(PdfReader.getPdfObject(reference)));
+                this.certificates.put(Integer.valueOf(i), getContentBytesFromContentObject(PdfReader.getPdfObject(reference)));
                 i++;
             }
 
@@ -144,7 +145,7 @@ final class PdfDocumentSecurityStore {
             i = 0;
             for(final Iterator<PdfObject> iterator = arrayOcsps.listIterator(); iterator.hasNext();) {
                 final PdfIndirectReference reference = (PdfIndirectReference)iterator.next();
-                this.ocsps.put(new Integer(i), getContentBytesFromContentObject(PdfReader.getPdfObject(reference)));
+                this.ocsps.put(Integer.valueOf(i), getContentBytesFromContentObject(PdfReader.getPdfObject(reference)));
                 i++;
             }
 
@@ -154,7 +155,7 @@ final class PdfDocumentSecurityStore {
             i = 0;
             for(final Iterator<PdfObject> iterator = arrayCrls.listIterator(); iterator.hasNext();) {
                 final PdfIndirectReference reference = (PdfIndirectReference)iterator.next();
-                this.crls.put(new Integer(i), getContentBytesFromContentObject(PdfReader.getPdfObject(reference)));
+                this.crls.put(Integer.valueOf(i), getContentBytesFromContentObject(PdfReader.getPdfObject(reference)));
                 i++;
             }
 
@@ -294,7 +295,7 @@ final class PdfDocumentSecurityStore {
      * 	en un VRI) */
     synchronized int registerCertificate(final byte cert[]) {
         final int nextId = this.certificates.size() + 1;
-        this.certificates.put(new Integer(nextId), cert);
+        this.certificates.put(Integer.valueOf(nextId), cert);
         return nextId;
     }
 
@@ -304,7 +305,7 @@ final class PdfDocumentSecurityStore {
      * 	en un VRI) */
     synchronized int registerOcspResp(final byte ocsp[]) {
         final int nextId = this.ocsps.size() + 1;
-        this.ocsps.put(new Integer(nextId), ocsp);
+        this.ocsps.put(Integer.valueOf(nextId), ocsp);
         return nextId;
     }
 
@@ -324,7 +325,7 @@ final class PdfDocumentSecurityStore {
      * 	en un VRI) */
     synchronized int registerCrl(final byte crl[]) {
         final int nextId = this.crls.size() + 1;
-        this.crls.put(new Integer(nextId), crl);
+        this.crls.put(Integer.valueOf(nextId), crl);
         return nextId;
     }
 

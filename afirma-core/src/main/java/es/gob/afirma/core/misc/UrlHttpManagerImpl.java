@@ -37,6 +37,8 @@ public final class UrlHttpManagerImpl {
 		// No permitimos la instanciacion
 	}
 
+	private static final String HTTPS = "https"; //$NON-NLS-1$
+
 	private static final HostnameVerifier DEFAULT_HOSTNAME_VERIFIER = HttpsURLConnection.getDefaultHostnameVerifier();
 	private static final SSLSocketFactory DEFAULT_SSL_SOCKET_FACTORY = HttpsURLConnection.getDefaultSSLSocketFactory();
 
@@ -75,7 +77,7 @@ public final class UrlHttpManagerImpl {
 
 		final URL uri = new URL(request);
 
-		if (uri.getProtocol().equals("https")) { //$NON-NLS-1$
+		if (uri.getProtocol().equals(HTTPS)) {
 			try {
 				disableSslChecks();
 			}
@@ -100,7 +102,7 @@ public final class UrlHttpManagerImpl {
 		final byte[] data = AOUtil.getDataFromInputStream(is);
 		is.close();
 
-		if (uri.getProtocol().equals("https")) { //$NON-NLS-1$
+		if (uri.getProtocol().equals(HTTPS)) {
 			enableSslChecks();
 		}
 

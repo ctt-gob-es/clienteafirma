@@ -168,14 +168,11 @@ public final class AOCMSSigner implements AOSigner {
             try {
                 // No habra messageDigest porque no nos pueden dar un hash
                 // en este metodo, tendria que ser en el que incluye datos
-                return new CoSigner().coSigner(algorithm, (X509Certificate[])certChain, sign, this.dataType, key, this.atrib, this.uatrib, null);
-            }
-            catch (final AOException e) {
-                throw e;
-            }
+				return new CoSigner().coSigner(algorithm, (X509Certificate[])certChain, sign, this.dataType, key, this.atrib, this.uatrib, null);
+			}
             catch (final Exception e) {
-                throw new AOException("Error generando la Cofirma PKCS#7", e); //$NON-NLS-1$
-            }
+            	throw new AOException("Error generando la Cofirma PKCS#7", e); //$NON-NLS-1$
+			}
         }
         throw new AOException("Los datos no se corresponden con una firma CMS valida"); //$NON-NLS-1$
     }
