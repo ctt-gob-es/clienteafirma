@@ -25,7 +25,7 @@
 /*
  * $Id: DOMURIDereferencer.java,v 1.19 2005/09/23 20:09:34 mullan Exp $
  */
-package es.gob.afirma.signers.xades;
+package es.gob.afirma.signers.xml;
 
 import javax.xml.crypto.Data;
 import javax.xml.crypto.URIDereferencer;
@@ -55,11 +55,11 @@ import com.sun.org.apache.xml.internal.security.utils.resolver.ResourceResolver;
  *
  * @author Sean Mullan
  */
-final class CustomDOMUriDereferencer implements URIDereferencer {
+public final class CustomDOMUriDereferencer implements URIDereferencer {
 
     static final URIDereferencer INSTANCE = new CustomDOMUriDereferencer();
 
-    CustomDOMUriDereferencer() {
+    public CustomDOMUriDereferencer() {
         // need to call com.sun.org.apache.xml.internal.security.Init.init()
         // before calling any apache security code
     	//com.sun.org.apache.xml.internal.security.Init.init();

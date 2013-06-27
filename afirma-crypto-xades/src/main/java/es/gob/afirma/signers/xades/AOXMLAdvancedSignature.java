@@ -45,6 +45,8 @@ import net.java.xades.security.xml.XAdES.XMLAdvancedSignature;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
+import es.gob.afirma.signers.xml.CustomDOMUriDereferencer;
+
 /** Derivado de <code>net.java.xades.security.xml.XAdES.XMLAdvancedSignature</code> con los
  * siguientes cambios:
  * <ul>
