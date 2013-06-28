@@ -114,11 +114,12 @@ public class ClientHandler extends BasicHandler {
 				secMsg = msgContext.getMessage();
 			}
 			/* SOLO PARA DEBUG */
-			String textRequest = "";
+/*			String textRequest = "";
 			final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			secMsg.writeTo(baos);
 			textRequest = new String(baos.toByteArray());
-			//logger.error(textRequest);
+			logger.error(textRequest);
+*/
 			/* FIN */
 			if (!this.securityOption.equals(NONEOPTION.toUpperCase())) {
 				//Modificacion de la peticion SOAP
@@ -141,7 +142,7 @@ public class ClientHandler extends BasicHandler {
 	 * @throws IOException
 	 * @throws SOAPException
 	 */
-	private SOAPMessage createUserNameToken(final Document soapEnvelopeRequest) throws TransformerConfigurationException, TransformerException, TransformerFactoryConfigurationError, IOException, SOAPException {
+	private SOAPMessage createUserNameToken(final Document soapEnvelopeRequest) throws TransformerException, TransformerFactoryConfigurationError, IOException, SOAPException {
 		ByteArrayOutputStream baos;
 		Document secSOAPReqDoc;
 		DOMSource source;

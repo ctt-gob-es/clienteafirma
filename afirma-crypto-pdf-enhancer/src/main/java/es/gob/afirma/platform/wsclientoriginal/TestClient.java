@@ -23,16 +23,14 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 
 public class TestClient {
-   private static final Logger logger = Logger.getLogger(TestClient.class);
+   private static final Logger LOGGER = Logger.getLogger(TestClient.class);
    private static final String CABECERA = "[TestClient]:";
    //Ruta donde se encuentran los ficheros de entrada a los servicios web
-   private static final String RUTA_XML_ENTRADA = "webservices.rutaXml";
-   private static final String XML_ENTRADA_PREFIX = "webservices.";
    private static String servicio;
-   private static String end_point;
-   private static String ruta_trusted_cacerts;
-   private static String password_trusted_cacerts;
-   private static String type_trusted_cacerts;
+   private static String endPoint;
+   private static String rutaTrustedCacerts;
+   private static String passwordTrustedCacerts;
+   private static String typeTrustedCacerts;
    private static String authorizationMethod = null;
    private static String authorizationKeyStorePath = null;
    private static String authorizationKeyStoreType = null;
@@ -46,10 +44,10 @@ public class TestClient {
    private static void init(final Properties p) {
 
 	  servicio = p.getProperty("webservices.servicio");
-	  end_point = p.getProperty("webservices.endpoint");
-      ruta_trusted_cacerts = p.getProperty("com.trustedstore.path");
-      password_trusted_cacerts = p.getProperty("com.trustedstore.password");
-      type_trusted_cacerts = p.getProperty("com.trustedstore.type");
+	  endPoint = p.getProperty("webservices.endpoint");
+      rutaTrustedCacerts = p.getProperty("com.trustedstore.path");
+      passwordTrustedCacerts = p.getProperty("com.trustedstore.password");
+      typeTrustedCacerts = p.getProperty("com.trustedstore.type");
       authorizationMethod = p.getProperty("webservices.authorization.method");
       authorizationKeyStorePath = p.getProperty("webservices.authorization.ks.path");
       authorizationKeyStoreType = p.getProperty("webservices.authorization.ks.type");
@@ -62,9 +60,9 @@ public class TestClient {
    }
 
    private static void setSystemParameters() {
-      System.setProperty("javax.net.ssl.trustStore", ruta_trusted_cacerts);
-      System.setProperty("javax.net.ssl.trustStorePassword", password_trusted_cacerts);
-      System.setProperty("javax.net.ssl.trustStoreType", type_trusted_cacerts);
+      System.setProperty("javax.net.ssl.trustStore", rutaTrustedCacerts);
+      System.setProperty("javax.net.ssl.trustStorePassword", passwordTrustedCacerts);
+      System.setProperty("javax.net.ssl.trustStoreType", typeTrustedCacerts);
    }
 
    private static Properties generateHandlerProperties() {
@@ -96,10 +94,10 @@ public class TestClient {
 		   throw new IOException("Error devuelto por el servidor");
 	   }
 
-	   final String SIGN_FIND_TAG_START = "<![CDATA[";
-	   final String SIGN_FIND_TAG_END = "]]>";
-	   final int indexStart = responseXml.indexOf(SIGN_FIND_TAG_START) + SIGN_FIND_TAG_START.length();
-	   final int indexEnd = responseXml.indexOf(SIGN_FIND_TAG_END);
+	   final String signFindTagStart = "<![CDATA[";
+	   final String signFindTagEnd = "]]>";
+	   final int indexStart = responseXml.indexOf(signFindTagStart) + signFindTagStart.length();
+	   final int indexEnd = responseXml.indexOf(signFindTagEnd);
 
 	   final String base64Sign = responseXml.substring(indexStart, indexEnd);
 
@@ -109,6 +107,7 @@ public class TestClient {
 
    public static String upgradeSign(final String dssXml) {
 
+	  String ret;
       try {
 
          final Properties prop = new Properties();
@@ -123,7 +122,7 @@ public class TestClient {
          setSystemParameters();
 
          //Se configura del endponit del servicio
-         final String endpoint = end_point + servicio;
+         final String endpoint = endPoint + servicio;
 
          final Properties clientHandlerInitProperties = generateHandlerProperties();
          final Handler reqHandler = new ClientHandler(clientHandlerInitProperties);
@@ -153,19 +152,18 @@ public class TestClient {
 		final Call call = (Call) service.createCall();
 		call.setTargetEndpointAddress( new java.net.URL(endpoint) );
 		call.setOperationName(new QName("http://soapinterop.org/", servicioDSS));
-		call.setTimeout(new Integer(prop.getProperty("webservices.timeout")));
+		call.setTimeout(Integer.valueOf((prop.getProperty("webservices.timeout"))));
         call.setClientHandlers(reqHandler, null);
 
-        //logger.info(TestClient.CABECERA + paramIn.toString());
-        final String ret = (String) call.invoke(new Object[] {dssXml});
-        return ret;
-
+        ret = (String) call.invoke(new Object[] {dssXml});
       }
       catch (final Exception e) {
-         logger.error(TestClient.CABECERA + e.toString());
+    	 LOGGER.error(TestClient.CABECERA + e.toString());
          e.printStackTrace();
-         return null;
+         ret = null;
       }
+      
+      return ret;
    }
 
 }
