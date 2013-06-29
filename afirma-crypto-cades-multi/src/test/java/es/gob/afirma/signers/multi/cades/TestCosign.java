@@ -44,7 +44,6 @@ public class TestCosign {
 
 	/** Carga el almac&eacute;n de certificados.
 	 * @throws Exception Cuando ocurre algun problema al cargar el almac&eacute;n o los datos. */
-	@SuppressWarnings("static-method")
 	@Before
 	public void cargaAlmacen() throws Exception {
 		ksIs = getClass().getClassLoader().getResourceAsStream(PKCS12_KEYSTORE);
@@ -58,7 +57,6 @@ public class TestCosign {
 	 * Prueba de cofirma implicita de una firma implicita sin indicar los datos de firma.
 	 * @throws Exception Cuando se produce un error.
 	 */
-	@SuppressWarnings("static-method")
 	@Test
 	public void prueba_cofirmar_firma_implicita_sin_indicar_datos() throws Exception {
 
@@ -91,7 +89,6 @@ public class TestCosign {
 	/** Prueba de cofirma implicita de una firma implicita indicando los datos firmados.
 	 * @throws Exception Cuando se produce un error.
 	 */
-	@SuppressWarnings("static-method")
 	@Test
 	public void prueba_cofirmar_firma_implicita_indicando_datos() throws Exception {
 
@@ -127,7 +124,6 @@ public class TestCosign {
 	 * Prueba de cofirma implicita de una firma explicita sin indicar los datos de firma.
 	 * @throws Exception Cuando se produce un error.
 	 */
-	@SuppressWarnings("static-method")
 	@Test
 	public void prueba_cofirma_implicita_de_firma_explicita_sin_indicar_datos() throws Exception {
 
@@ -162,7 +158,6 @@ public class TestCosign {
 	 * Prueba de cofirma implicita de una firma explicita indicando los datos firmados.
 	 * @throws Exception Cuando se produce un error.
 	 */
-	@SuppressWarnings("static-method")
 	@Test
 	public void prueba_cofirma_implicita_de_firma_explicita_indicando_datos() throws Exception {
 
@@ -198,7 +193,6 @@ public class TestCosign {
 	 * Prueba de cofirma explicita de una firma explicita indicando el hash de los datos firmados.
 	 * @throws Exception Cuando se produce un error.
 	 */
-	@SuppressWarnings("static-method")
 	@Test
 	public void prueba_cofirma_explicita_de_firma_explicita_indicando_hash() throws Exception {
 
@@ -239,7 +233,6 @@ public class TestCosign {
 	 * Prueba de cofirma explicita de una firma explicita ambas generadas con el mismo algoritmo.
 	 * @throws Exception Cuando se produce un error.
 	 */
-	@SuppressWarnings("static-method")
 	@Test
 	public void prueba_cofirma_explicita_de_firma_explicita_mismo_algoritmo_sin_datos() throws Exception {
 
@@ -280,7 +273,6 @@ public class TestCosign {
 	 * Prueba de cofirma explicita de una firma explicita ambas generadas con distinto algoritmo.
 	 * @throws Exception Cuando se produce un error.
 	 */
-	@SuppressWarnings("static-method")
 	@Test
 	public void prueba_cofirma_explicita_de_firma_explicita_distinto_algoritmo_sin_datos() throws Exception {
 

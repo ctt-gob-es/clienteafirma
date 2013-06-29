@@ -152,24 +152,21 @@ public class AOCAdESCoSigner implements AOCoSigner {
         // Si la firma que nos introducen es SignedData
         if (CAdESValidator.isCAdESSignedData(sign)) {
             try {
-                return new CAdESCoSigner().coSigner(
-                    typeAlgorithm,
-                    Boolean.parseBoolean(extraParams.getProperty("includeOnlySignningCertificate")) ? //$NON-NLS-1$
-            			new X509Certificate[] { (X509Certificate) certChain[0] } :
-        				(X509Certificate[]) certChain,
-                    new ByteArrayInputStream(sign),
-                    new AdESPolicy(extraParams),
-                    signingCertificateV2,
-                    key,
-                    certChain,
-                    null, // null porque no nos pueden dar un hash en este metodo, tendria que ser en el que incluye datos
-                    contentTypeOid,
-                    contentDescription
-                );
-            }
-            catch (final AOException e) {
-                throw e;
-            }
+				return new CAdESCoSigner().coSigner(
+				    typeAlgorithm,
+				    Boolean.parseBoolean(extraParams.getProperty("includeOnlySignningCertificate")) ? //$NON-NLS-1$
+						new X509Certificate[] { (X509Certificate) certChain[0] } :
+						(X509Certificate[]) certChain,
+				    new ByteArrayInputStream(sign),
+				    new AdESPolicy(extraParams),
+				    signingCertificateV2,
+				    key,
+				    certChain,
+				    null, // null porque no nos pueden dar un hash en este metodo, tendria que ser en el que incluye datos
+				    contentTypeOid,
+				    contentDescription
+				);
+			}
             catch (final Exception e) {
                 throw new AOException("Error generando la Cofirma CADES", e); //$NON-NLS-1$
             }

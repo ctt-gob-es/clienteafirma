@@ -37,7 +37,6 @@ public class TestCountersign {
 
 	/** Carga el almac&eacute;n de certificados.
 	 * @throws Exception Cuando ocurre algun problema al cargar el almac&eacute;n o los datos. */
-	@SuppressWarnings("static-method")
 	@Before
 	public void cargaAlmacen() throws Exception {
 		ksIs = getClass().getClassLoader().getResourceAsStream(PKCS12_KEYSTORE);
@@ -49,7 +48,6 @@ public class TestCountersign {
 	 * Prueba de contrafirma de todo el &aacute;rbol de firmas de una firma expl&iacute;cita.
 	 * @throws Exception Cuando se produce un error.
 	 */
-	@SuppressWarnings("static-method")
 	@Test
 	public void prueba_contrafirma_de_arbol_de_firma_explicita() throws Exception {
 
@@ -85,7 +83,6 @@ public class TestCountersign {
 	 * Prueba de contrafirma de los nodos hoja de una firma explicita.
 	 * @throws Exception Cuando se produce un error.
 	 */
-	@SuppressWarnings("static-method")
 	@Test
 	public void prueba_contrafirma_de_firma_explicita_nodos_hoja() throws Exception {
 
@@ -121,7 +118,6 @@ public class TestCountersign {
 	 * Prueba de contrafirma de todo el &aacute;rbol de firmas de una firma impl&iacute;cita.
 	 * @throws Exception Cuando se produce un error.
 	 */
-	@SuppressWarnings("static-method")
 	@Test
 	public void prueba_contrafirma_de_arbol_de_firma_implicita() throws Exception {
 
@@ -156,7 +152,6 @@ public class TestCountersign {
 	 * Prueba de contrafirma de los nodos hoja de una firma implicita.
 	 * @throws Exception Cuando se produce un error.
 	 */
-	@SuppressWarnings("static-method")
 	@Test
 	public void prueba_contrafirma_de_firma_implicita_nodos_hoja() throws Exception {
 
