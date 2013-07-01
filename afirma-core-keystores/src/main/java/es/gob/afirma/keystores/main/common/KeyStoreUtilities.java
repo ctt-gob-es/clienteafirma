@@ -72,21 +72,7 @@ public final class KeyStoreUtilities {
 
         final StringBuilder buffer = new StringBuilder("library="); //$NON-NLS-1$
 
-        // TODO: Ir uno a uno en el ApplicationPath de Java hasta que
-        // encontremos la biblioteca, en vez de mirar directamente en
-        // system32 y usr/lib
-
-        // Si la biblioteca no existe directamente es que viene sin Path
-        // Mozilla devuelve las bibliotecas sin Path
-        if (!new java.io.File(lib).exists()) {
-            String sysLibDir = Platform.getSystemLibDir();
-            if (!sysLibDir.endsWith(java.io.File.separator)) {
-                sysLibDir += java.io.File.separator;
-            }
-            buffer.append(sysLibDir);
-        }
-
-        buffer.append(lib).append("\r\n") //$NON-NLS-1$
+        buffer.append(getShort(lib)).append("\r\n") //$NON-NLS-1$
         // Ignoramos la descripcion que se nos proporciona, ya que el
         // proveedor PKCS#11 de Sun
         // falla si llegan espacios o caracteres raros
@@ -602,4 +588,28 @@ public final class KeyStoreUtilities {
         }
         throw new AOKeyStoreManagerException("No hay controlador PKCS#11 de DNIe instalado en este sistema"); //$NON-NLS-1$
     }
+
+	/** Obtiene el nombre corto (8+3) de un fichero o directorio indicado (con ruta).
+	 * @param originalPath Ruta completa hacia el fichero o directorio que queremos pasar a nombre corto.
+	 * @return Nombre corto del fichero o directorio con su ruta completa, o la cadena originalmente indicada si no puede
+	 *         obtenerse la versi&oacute;n corta */
+	public static String getShort(final String originalPath) {
+		if (originalPath == null || !Platform.OS.WINDOWS.equals(Platform.getOS())) {
+			return originalPath;
+		}
+		final File dir = new File(originalPath);
+		if (!dir.exists()) {
+			return originalPath;
+		}
+		try {
+			final Process p = new ProcessBuilder(
+					"cmd.exe", "/c", "for %f in (\"" + originalPath + "\") do @echo %~sf" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			).start();
+			return new String(AOUtil.getDataFromInputStream(p.getInputStream())).trim();
+		}
+		catch(final Exception e) {
+			LOGGER.warning("No se ha podido obtener el nombre corto de " + originalPath + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		return originalPath;
+	}
 }

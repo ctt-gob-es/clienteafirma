@@ -20,8 +20,8 @@ import es.gob.afirma.keystores.main.common.AOKeyStoreManagerFactory;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class TestPkcs11 {
 
-	private static final String LIB_NAME = "C:\\WINDOWS\\SysWOW64\\pkcs11-win.dll"; //$NON-NLS-1$
-	private static final char[] PIN = "12341234".toCharArray(); //$NON-NLS-1$
+	private static final String LIB_NAME = "C:\\temp\\FNMT_P11_x64.dll"; //$NON-NLS-1$
+	private static final char[] PIN = "rock2048".toCharArray(); //$NON-NLS-1$
 
 	/** Prueba de firma con PKCS#11.
 	 * @throws Exception */

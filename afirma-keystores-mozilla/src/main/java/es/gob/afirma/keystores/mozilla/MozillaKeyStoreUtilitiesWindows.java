@@ -1,26 +1,20 @@
 package es.gob.afirma.keystores.mozilla;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
 
 final class MozillaKeyStoreUtilitiesWindows {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static final String P11_CONFIG_VALID_CHARS = ":\\0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_.\u007E"; //$NON-NLS-1$
-
-	// Para el nombre corto en Windows
-	private static final String DIR_TAG = "<DIR>"; //$NON-NLS-1$
-	private static final String JUNCTION_TAG = "<JUNCTION>"; //$NON-NLS-1$
 
 	// Bibliotecas Windows de Firefox
 	private static final String SOFTOKN3_DLL = "softokn3.dll"; //$NON-NLS-1$
@@ -78,95 +72,12 @@ final class MozillaKeyStoreUtilitiesWindows {
 
 		for (final char c : finalDir.toCharArray()) {
 			if (P11_CONFIG_VALID_CHARS.indexOf(c) == -1) {
-				finalDir = finalDir.replace(Platform.getUserHome(), getShortPath(Platform.getUserHome()));
+				finalDir = finalDir.replace(Platform.getUserHome(), KeyStoreUtilities.getShort(Platform.getUserHome()));
 				break;
 			}
 		}
 		return finalDir.replace('\\', '/');
 
-	}
-
-	private static String getShortPath(final String originalPath) {
-		if (originalPath == null) {
-			return originalPath;
-		}
-		if (originalPath.endsWith(":\\")) { //$NON-NLS-1$
-			return originalPath;
-		}
-		String longPath = originalPath;
-		if (longPath.endsWith("\\")) { //$NON-NLS-1$
-			longPath = longPath.substring(0, longPath.length()-1);
-		}
-		final File dir = new File(longPath);
-		if (!dir.exists() || !dir.isDirectory()) {
-			return longPath;
-		}
-		String finalPath = getShort(dir.getAbsolutePath());
-		File parent = dir.getParentFile();
-		while(parent != null) {
-			finalPath = finalPath.replace(parent.getAbsolutePath(), getShort(parent.getAbsolutePath()));
-			parent = parent.getParentFile();
-		}
-		return finalPath;
-	}
-
-	/** Obtiene el nombre corto (8+3) del &uacute;ltimo directorio de una ruta sobre la misma ruta de directorios (es decir,
-	 * que solo se pasa a nombre corto al &uacute;timo directorio, el resto de elementos de la ruta se dejan largos).
-	 * Es necesario asegurarse de estar sobre MS-Windows antes de llamar a este m&eacute;todo. */
-	private static String getShort(final String originalPath) {
-		if (originalPath == null) {
-			return originalPath;
-		}
-		if (originalPath.endsWith(":\\")) { //$NON-NLS-1$
-			return originalPath;
-		}
-		String longPath = originalPath;
-		if (longPath.endsWith("\\")) { //$NON-NLS-1$
-			longPath = longPath.substring(0, longPath.length()-1);
-		}
-		final File dir = new File(longPath);
-		if (!dir.exists() || !dir.isDirectory()) {
-			return longPath;
-		}
-
-		try {
-			final Process p = new ProcessBuilder(
-					"cmd.exe", "/c", "dir /ad /x \"" + longPath + "\\..\\?" + longPath.substring(longPath.lastIndexOf('\\') + 2) + "\"" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-			).start();
-
-			final BufferedReader br = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(AOUtil.getDataFromInputStream(p.getInputStream()))));
-			String line = br.readLine();
-			String token;
-			while (line != null) {
-				if (line.contains(DIR_TAG)) {
-					token = DIR_TAG;
-				}
-				else if (line.contains(JUNCTION_TAG)) {
-					token = JUNCTION_TAG;
-				}
-				else {
-					line = br.readLine();
-					continue;
-				}
-				final String path = longPath.substring(0, longPath.lastIndexOf('\\') + 1);
-				final String filenames = line.substring(line.indexOf(token) + token.length()).trim();
-				final String shortName;
-				if (filenames.contains(" ")) { //$NON-NLS-1$
-					shortName = filenames.substring(0, filenames.indexOf(' '));
-				}
-				else {
-					shortName = filenames;
-				}
-				if (!"".equals(shortName)) { //$NON-NLS-1$
-					return path + shortName;
-				}
-				return longPath;
-			}
-		}
-		catch(final Exception e) {
-			LOGGER.warning("No se ha podido obtener el nombre corto de " + longPath + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		return longPath;
 	}
 
 	static String getSystemNSSLibDirWindows() throws IOException {
