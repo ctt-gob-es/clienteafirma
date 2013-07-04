@@ -42,9 +42,9 @@ public class ClientHandler extends BasicHandler {
 	/** Opcion de seguridad BinarySecurityToken */
 	public static final String CERTIFICATEOPTION = WSConstants.BINARY_TOKEN_LN;
 	/** Sin seguridad */
-	public static final String NONEOPTION = "none";
-	public static final String DIGESTPASSWORD = "DIGEST";
-	public static final String TEXTPASSWORD = "TEXT";
+	public static final String NONEOPTION = "none"; //$NON-NLS-1$
+	public static final String DIGESTPASSWORD = "DIGEST"; //$NON-NLS-1$
+	public static final String TEXTPASSWORD = "TEXT"; //$NON-NLS-1$
 	private static final long serialVersionUID = 1L;
 	// Opciones de seguridad
 	// Opcion de seguridad del objeto actual
@@ -74,29 +74,31 @@ public class ClientHandler extends BasicHandler {
 	 */
 	public ClientHandler(final Properties config) throws AxisFault {
 		if (config == null) {
-			System.err.println("Fichero de configuracion de propiedades nulo");
+			logger.error("Fichero de configuracion de propiedades nulo"); //$NON-NLS-1$
 			System.exit(-1);
+			return;
 		}
 		try {
-			this.securityOption = config.getProperty("security.mode").toUpperCase();
-			this.usernameTokenName = config.getProperty("security.usertoken.user");
-			this.usernameTokenPassword = config.getProperty("security.usertoken.password");
-			this.usernameTokenPasswordType = config.getProperty("security.usertoken.passwordType");
-			this.keystoreLocation = config.getProperty("security.keystore.location");
-			this.keystoreType = config.getProperty("security.keystore.type");
-			this.keystorePassword = config.getProperty("security.keystore.password");
-			this.keystoreCertAlias = config.getProperty("security.keystore.cert.alias");
-			this.keystoreCertPassword = config.getProperty("security.keystore.cert.password");
+			this.securityOption = config.getProperty("security.mode").toUpperCase(); //$NON-NLS-1$
+			this.usernameTokenName = config.getProperty("security.usertoken.user"); //$NON-NLS-1$
+			this.usernameTokenPassword = config.getProperty("security.usertoken.password"); //$NON-NLS-1$
+			this.usernameTokenPasswordType = config.getProperty("security.usertoken.passwordType"); //$NON-NLS-1$
+			this.keystoreLocation = config.getProperty("security.keystore.location"); //$NON-NLS-1$
+			this.keystoreType = config.getProperty("security.keystore.type"); //$NON-NLS-1$
+			this.keystorePassword = config.getProperty("security.keystore.password"); //$NON-NLS-1$
+			this.keystoreCertAlias = config.getProperty("security.keystore.cert.alias"); //$NON-NLS-1$
+			this.keystoreCertPassword = config.getProperty("security.keystore.cert.password"); //$NON-NLS-1$
 		} catch (final Exception e) {
-			logger.error("Error leyendo el fichero de configuracion de securizacion", e);
+			logger.error("Error leyendo el fichero de configuracion de securizacion", e); //$NON-NLS-1$
 			System.exit(-1);
 		}
 		if (!this.securityOption.equals(USERNAMEOPTION.toUpperCase()) && !this.securityOption.equals(CERTIFICATEOPTION.toUpperCase()) && !this.securityOption.equals(NONEOPTION.toUpperCase())) {
-			logger.error("Opcion de seguridad no valida: " + this.securityOption);
-			AxisFault.makeFault(new InvalidParameterException("Opcion de seguridad no valida: " + this.securityOption));
+			logger.error("Opcion de seguridad no valida: " + this.securityOption); //$NON-NLS-1$
+			AxisFault.makeFault(new InvalidParameterException("Opcion de seguridad no valida: " + this.securityOption)); //$NON-NLS-1$
 		}
 	}
 
+	@Override
 	public void invoke(final MessageContext msgContext) throws AxisFault {
 		SOAPMessage msg,secMsg;
 		Document doc = null;
@@ -126,8 +128,13 @@ public class ClientHandler extends BasicHandler {
 				((SOAPPart) msgContext.getRequestMessage().getSOAPPart()).setCurrentMessage(secMsg.getSOAPPart().getEnvelope(), SOAPPart.FORM_SOAPENVELOPE);
 			}
 		} catch (final Exception e) {
-			e.printStackTrace();
+			logger.error("Excepcion al invocar al servicio de mejora de la firma: " + e); //$NON-NLS-1$
 			AxisFault.makeFault(e);
+		}
+		catch (final Error e) {
+			logger.error("Error al invocar al servicio de mejora de la firma: " + e); //$NON-NLS-1$
+			// Encapsulamos para permitir su uso con makeFault(Exception)
+			AxisFault.makeFault(new RuntimeException(e));
 		}
 	}
 
@@ -160,8 +167,8 @@ public class ClientHandler extends BasicHandler {
 		} else if (DIGESTPASSWORD.equalsIgnoreCase(this.usernameTokenPasswordType)) {
 			wsSecUsernameToken.setPasswordType(WSConstants.PASSWORD_DIGEST);
 		} else {
-			System.err.println("Tipo de password no valido: " + this.usernameTokenPasswordType);
-			throw new SOAPException("No se ha especificado un tipo de password valido");
+			logger.error("Tipo de password no valido: " + this.usernameTokenPasswordType); //$NON-NLS-1$
+			throw new SOAPException("No se ha especificado un tipo de password valido"); //$NON-NLS-1$
 		}
 		wsSecUsernameToken.setUserInfo(this.usernameTokenName, this.usernameTokenPassword);
 		wsSecHeader.insertSecurityHeader(soapEnvelopeRequest);
@@ -199,7 +206,7 @@ public class ClientHandler extends BasicHandler {
 	 * @throws CertificateException
 	 * @throws NoSuchAlgorithmException
 	 */
-	private SOAPMessage createBinarySecurityToken(final Document soapEnvelopeRequest) throws TransformerConfigurationException, TransformerException, TransformerFactoryConfigurationError, IOException, SOAPException, KeyStoreException, CredentialException, NoSuchAlgorithmException, CertificateException {
+	private SOAPMessage createBinarySecurityToken(final Document soapEnvelopeRequest) throws TransformerException, TransformerFactoryConfigurationError, IOException, SOAPException, KeyStoreException, CredentialException, NoSuchAlgorithmException, CertificateException {
 		ByteArrayOutputStream baos;
 		Crypto crypto;
 		Document secSOAPReqDoc;
@@ -216,7 +223,7 @@ public class ClientHandler extends BasicHandler {
 		//Insercion del tag wsse:Security y BinarySecurityToken
 		wsSecHeader = new WSSecHeader(null, false);
 		wsSecSignature = new WSSecSignature();
-		crypto = CryptoFactory.getInstance("org.apache.ws.security.components.crypto.Merlin", this.initializateCryptoProperties());
+		crypto = CryptoFactory.getInstance("org.apache.ws.security.components.crypto.Merlin", this.initializateCryptoProperties()); //$NON-NLS-1$
 		//Indicacion para que inserte el tag BinarySecurityToken
 		wsSecSignature.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 		// wsSecSignature.setUserInfo(this.usernameTokenName, this.usernameTokenPassword);
@@ -232,7 +239,7 @@ public class ClientHandler extends BasicHandler {
 		streamResult = new StreamResult(baos);
 		TransformerFactory.newInstance().newTransformer().transform(source, streamResult);
 		secSOAPReq = new String(baos.toByteArray());
-		System.out.println(secSOAPReq);
+		logger.info("SOAP Request: " + secSOAPReq); //$NON-NLS-1$
 		//Creacion de un nuevo mensaje SOAP a partir del mensaje SOAP securizado formado
 		final MessageFactory mf = new org.apache.axis.soap.MessageFactoryImpl();
 		res = mf.createMessage(null, new ByteArrayInputStream(secSOAPReq.getBytes()));
@@ -245,12 +252,12 @@ public class ClientHandler extends BasicHandler {
 	 */
 	private Properties initializateCryptoProperties() {
 		final Properties res = new Properties();
-		res.setProperty("org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin");
-		res.setProperty("org.apache.ws.security.crypto.merlin.keystore.type", this.keystoreType);
-		res.setProperty("org.apache.ws.security.crypto.merlin.keystore.password", this.keystorePassword);
-		res.setProperty("org.apache.ws.security.crypto.merlin.keystore.alias", this.keystoreCertAlias);
-		res.setProperty("org.apache.ws.security.crypto.merlin.alias.password", this.keystoreCertPassword);
-		res.setProperty("org.apache.ws.security.crypto.merlin.file", this.keystoreLocation);
+		res.setProperty("org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin"); //$NON-NLS-1$ //$NON-NLS-2$
+		res.setProperty("org.apache.ws.security.crypto.merlin.keystore.type", this.keystoreType); //$NON-NLS-1$
+		res.setProperty("org.apache.ws.security.crypto.merlin.keystore.password", this.keystorePassword); //$NON-NLS-1$
+		res.setProperty("org.apache.ws.security.crypto.merlin.keystore.alias", this.keystoreCertAlias); //$NON-NLS-1$
+		res.setProperty("org.apache.ws.security.crypto.merlin.alias.password", this.keystoreCertPassword); //$NON-NLS-1$
+		res.setProperty("org.apache.ws.security.crypto.merlin.file", this.keystoreLocation); //$NON-NLS-1$
 		return res;
 	}
 }
