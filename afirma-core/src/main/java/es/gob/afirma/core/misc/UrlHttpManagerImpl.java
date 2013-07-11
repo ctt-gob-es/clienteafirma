@@ -33,6 +33,8 @@ import javax.net.ssl.X509TrustManager;
  * @author Carlos Gamuci */
 public final class UrlHttpManagerImpl {
 
+	private static final int DEFAULT_TIMEOUT = -1;
+	
 	private UrlHttpManagerImpl() {
 		// No permitimos la instanciacion
 	}
@@ -62,6 +64,17 @@ public final class UrlHttpManagerImpl {
 	 * @return Contenido de la URL
 	 * @throws IOException Si no se puede leer la URL */
 	public static byte[] readUrlByPost(final String url) throws IOException {
+		return readUrlByPost(url, DEFAULT_TIMEOUT);
+	}
+
+	/** Lee una URL HTTP o HTTPS por POST si se indican par&aacute;metros en la URL y por GET en caso contrario.
+	 * En HTTPS no se hacen comprobaciones del certificado servidor.
+	 * @param url URL a leer
+	 * @param timeout Tiempo m&aacute;ximo en milisegundos que se debe esperar por la respuesta. Un timeout de 0
+	 * se interpreta como un timeout infinito. Si se indica -1, se usar&aacute; el por defecto de Java.
+	 * @return Contenido de la URL
+	 * @throws IOException Si no se puede leer la URL */
+	public static byte[] readUrlByPost(final String url, final int timeout) throws IOException {
 		if (url == null) {
 			throw new IllegalArgumentException("La URL a leer no puede ser nula"); //$NON-NLS-1$
 		}
@@ -90,6 +103,10 @@ public final class UrlHttpManagerImpl {
 
 		final HttpURLConnection conn = (HttpURLConnection) uri.openConnection();
 		conn.setRequestMethod("POST"); //$NON-NLS-1$
+		if (timeout != DEFAULT_TIMEOUT) {
+			conn.setConnectTimeout(timeout);
+			conn.setReadTimeout(timeout);
+		}
 
 		conn.setDoOutput(true);
 
@@ -108,7 +125,7 @@ public final class UrlHttpManagerImpl {
 
 		return data;
 	}
-
+	
 	/** Lee una URL HTTP o HTTPS por GET. En HTTPS no se hacen comprobaciones del certificado servidor.
 	 * @param url URL a leer
 	 * @return Contenido de la URL
