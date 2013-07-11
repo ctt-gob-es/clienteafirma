@@ -277,7 +277,6 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 
 			preSignResult = UrlHttpManagerImpl.readUrlByPost(urlBuffer.toString());
 			urlBuffer.setLength(0);
-
 		}
 		catch (final CertificateEncodingException e) {
 			throw new AOException("Error decodificando el certificado del firmante: " + e, e); //$NON-NLS-1$
@@ -287,9 +286,9 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 		}
 
 		// Convertimos la respuesta del servidor en un Properties
-		final Properties preSign;
+		final Properties preSignProperties;
 		try {
-			preSign = base642Properties(new String(preSignResult));
+			preSignProperties = base642Properties(new String(preSignResult));
 		}
 		catch (final IOException e) {
 			throw new AOException("La respuesta del servidor no es valida: " + new String(preSignResult), e); //$NON-NLS-1$
@@ -302,27 +301,27 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 		// Es posible que se ejecute mas de una firma como resultado de haber proporcionado varios
 		// identificadores de datos o en una operacion de postfirma.
 		
-		if (!preSign.containsKey(PROPERTY_NAME_SIGN_COUNT)) {
+		if (!preSignProperties.containsKey(PROPERTY_NAME_SIGN_COUNT)) {
 			throw new AOException("El servidor no ha informado del numero de firmas que envia"); //$NON-NLS-1$
 		}
 		
-		final int signCount = Integer.parseInt(preSign.getProperty(PROPERTY_NAME_SIGN_COUNT));
+		final int signCount = Integer.parseInt(preSignProperties.getProperty(PROPERTY_NAME_SIGN_COUNT));
 		for (int i = 0; i < signCount; i++) {
-			final String base64PreSign = preSign.getProperty(PROPERTY_NAME_PRESIGN_PREFIX + i);
+			final String base64PreSign = preSignProperties.getProperty(PROPERTY_NAME_PRESIGN_PREFIX + i);
 			if (base64PreSign == null) {
 				throw new AOException("El servidor no ha devuelto la prefirma numero " + i + ": " + new String(preSignResult)); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		
-			final byte[] cadesSignedAttributes;
+			final byte[] preSign;
 			try {
-				cadesSignedAttributes = Base64.decode(base64PreSign);
+				preSign = Base64.decode(base64PreSign);
 			}
 			catch (final IOException e) {
 				throw new AOException("Error decodificando los atributos CAdES a firmar: " + e, e); //$NON-NLS-1$
 			}
 			
 			final byte[] pkcs1sign = new AOPkcs1Signer().sign(
-					cadesSignedAttributes,
+					preSign,
 					algorithm,
 					key,
 					certChain,
@@ -332,15 +331,15 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 			// Configuramos la peticion de postfirma indicando las firmas PKCS#1 generadas
 			configParams.setProperty(PROPERTY_NAME_PKCS1_SIGN_PREFIX + i, Base64.encode(pkcs1sign));
 			// Si hay datos de sesion, los indicamos tambien
-			if (preSign.containsKey(PROPERTY_NAME_SESSION_DATA_PREFIX + i)) {
-				configParams.setProperty(PROPERTY_NAME_SESSION_DATA_PREFIX + i, preSign.getProperty(PROPERTY_NAME_SESSION_DATA_PREFIX + i));
+			if (preSignProperties.containsKey(PROPERTY_NAME_SESSION_DATA_PREFIX + i)) {
+				configParams.setProperty(PROPERTY_NAME_SESSION_DATA_PREFIX + i, preSignProperties.getProperty(PROPERTY_NAME_SESSION_DATA_PREFIX + i));
 			}
 		}
 		
 		// Agregamos la configuracion general
-		configParams.setProperty(PROPERTY_NAME_SIGN_COUNT, preSign.getProperty(PROPERTY_NAME_SIGN_COUNT));
-		if (preSign.containsKey(PROPERTY_NAME_SIGN)) {
-			configParams.setProperty(PROPERTY_NAME_SIGN, preSign.getProperty(PROPERTY_NAME_SIGN));
+		configParams.setProperty(PROPERTY_NAME_SIGN_COUNT, preSignProperties.getProperty(PROPERTY_NAME_SIGN_COUNT));
+		if (preSignProperties.containsKey(PROPERTY_NAME_SIGN)) {
+			configParams.setProperty(PROPERTY_NAME_SIGN, preSignProperties.getProperty(PROPERTY_NAME_SIGN));
 		}
 		
 		// ---------
@@ -355,11 +354,9 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 			append(PARAMETER_NAME_CRYPTO_OPERATION).append(HTTP_EQUALS).append(cryptoOperation).append(HTTP_AND).
 			append(PARAMETER_NAME_FORMAT).append(HTTP_EQUALS).append(CADES_FORMAT).append(HTTP_AND).
 			append(PARAMETER_NAME_ALGORITHM).append(HTTP_EQUALS).append(algorithm).append(HTTP_AND).
-			append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(Base64.encodeBytes(certChain[0].getEncoded(), Base64.URL_SAFE)).
-			append(HTTP_AND).append(PARAMETER_NAME_EXTRA_PARAM).append(HTTP_EQUALS).append(properties2Base64(configParams));
-
-			urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_DOCID).append(HTTP_EQUALS).
-			append(documentId);
+			append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(Base64.encodeBytes(certChain[0].getEncoded(), Base64.URL_SAFE)).append(HTTP_AND).
+			append(PARAMETER_NAME_EXTRA_PARAM).append(HTTP_EQUALS).append(properties2Base64(configParams)).append(HTTP_AND).
+			append(PARAMETER_NAME_DOCID).append(HTTP_EQUALS).append(documentId);
 
 			triSignFinalResult = UrlHttpManagerImpl.readUrlByPost(urlBuffer.toString());
 			urlBuffer.setLength(0);

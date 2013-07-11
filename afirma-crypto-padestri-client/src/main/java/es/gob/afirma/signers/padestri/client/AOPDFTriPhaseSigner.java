@@ -164,28 +164,28 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 			throw new AOException("Error en la llamada de prefirma al servidor: " + e, e); //$NON-NLS-1$
 		}
 
-		final Properties preSign;
+		final Properties preSignProperties;
 		try {
-			preSign = base642Properties(new String(preSignResult));
+			preSignProperties = base642Properties(new String(preSignResult));
 		}
 		catch (final IOException e) {
 			throw new AOException("La respuesta del servidor no es valida: " + new String(preSignResult), e); //$NON-NLS-1$
-		}
-
-		final byte[] cadesSignedAttributes;
-		try {
-			cadesSignedAttributes = Base64.decode(preSign.getProperty(PROPERTY_NAME_PRESIGN));
-		}
-		catch (final IOException e) {
-			throw new AOException("Error decodificando los atributos CAdES a firmar: " + e, e); //$NON-NLS-1$
 		}
 
 		// -------------------------------------------------
 		// FIRMA (este bloque se ejecuta en el dispositivo)
 		// -------------------------------------------------
 
+		final byte[] preSign;
+		try {
+			preSign = Base64.decode(preSignProperties.getProperty(PROPERTY_NAME_PRESIGN));
+		}
+		catch (final IOException e) {
+			throw new AOException("Error decodificando los atributos CAdES a firmar: " + e, e); //$NON-NLS-1$
+		}
+
 		final byte[] pkcs1sign = new AOPkcs1Signer().sign(
-				cadesSignedAttributes,
+				preSign,
 				algorithm,
 				key,
 				certChain,
@@ -193,7 +193,7 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 				);
 		// Creamos la peticion de postfirma
 		configParams.put(PROPERTY_NAME_PKCS1_SIGN, Base64.encode(pkcs1sign));
-		configParams.put(PROPERTY_NAME_SESSION_DATA, preSign.getProperty(PROPERTY_NAME_SESSION_DATA));
+		configParams.put(PROPERTY_NAME_SESSION_DATA, preSignProperties.getProperty(PROPERTY_NAME_SESSION_DATA));
 
 		// ---------
 		// POSTFIRMA
@@ -201,7 +201,7 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 
 		final byte[] triSignFinalResult;
 		try {
-			StringBuffer urlBuffer = new StringBuffer();
+			final StringBuffer urlBuffer = new StringBuffer();
 			urlBuffer.append(signServerUrl).append(HTTP_CGI).
 			append(PARAMETER_NAME_OPERATION).append(HTTP_EQUALS).append(OPERATION_POSTSIGN).append(HTTP_AND).
 			append(PARAMETER_NAME_CRYPTO_OPERATION).append(HTTP_EQUALS).append(CRYPTO_OPERATION_SIGN).append(HTTP_AND).
@@ -212,6 +212,7 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 			append(PARAMETER_NAME_DOCID).append(HTTP_EQUALS).append(documentId);
 			
 			triSignFinalResult = UrlHttpManagerImpl.readUrlByPost(urlBuffer.toString());
+			urlBuffer.setLength(0);
 		}
 		catch (final CertificateEncodingException e) {
 			throw new AOException("Error decodificando el certificado del firmante: " + e, e); //$NON-NLS-1$
@@ -220,6 +221,7 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 			throw new AOException("Error en la llamada de postfirma al servidor: " + e, e); //$NON-NLS-1$
 		}
 
+		// Analizamos la respuesta del servidor
 		final String stringTrimmedResult = new String(triSignFinalResult).trim();
 		if (!stringTrimmedResult.startsWith(SUCCESS)) {
 			throw new AOException("La firma trifasica no ha finalizado correctamente: " + new String(triSignFinalResult)); //$NON-NLS-1$
@@ -227,7 +229,7 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 
 		// Los datos no se devuelven, se quedan en el servidor
 		try {
-			return Base64.decode(stringTrimmedResult.replace("OK NEWID=", ""), Base64.URL_SAFE); //$NON-NLS-1$ //$NON-NLS-2$
+			return Base64.decode(stringTrimmedResult.replace(SUCCESS + " NEWID=", ""), Base64.URL_SAFE); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		catch (final IOException e) {
 			LOGGER.warning("El resultado de NEWID del servidor no estaba en Base64: " + e); //$NON-NLS-1$

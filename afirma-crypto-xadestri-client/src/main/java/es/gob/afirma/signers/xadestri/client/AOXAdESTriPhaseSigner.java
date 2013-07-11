@@ -290,16 +290,20 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 		}
 
 		// Convertimos la respuesta del servidor en un Properties
-		final Properties preSign;
+		final Properties preSignProperties;
 		try {
-			preSign = base642Properties(new String(preSignResult));
+			preSignProperties = base642Properties(new String(preSignResult));
 		}
 		catch (final IOException e) {
 			throw new AOException("La respuesta del servidor no es valida: " + new String(preSignResult), e); //$NON-NLS-1$
 		}
 
-		// Sacamos los SignedAttributes de CAdES para firmarlos
-		final String base64PreSign = preSign.getProperty(PROPERTY_NAME_PRESIGN);
+		// -------------------------------------------
+		// FIRMA (Este bloque se hace en dispositivo)
+		// -------------------------------------------
+
+		// Sacamos los datos de la prefirma para firmarla
+		final String base64PreSign = preSignProperties.getProperty(PROPERTY_NAME_PRESIGN);
 		if (base64PreSign == null) {
 			throw new AOException("El servidor no ha devuelto una prefirma : " + new String(preSignResult)); //$NON-NLS-1$
 		}
@@ -312,10 +316,7 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 			throw new AOException("Error decodificando el core de datos a firmar: " + e, e); //$NON-NLS-1$
 		}
 
-		// -------------------------------------------
-		// FIRMA (Este bloque se hace en dispositivo)
-		// -------------------------------------------
-
+		
 		final byte[] pkcs1sign = new AOPkcs1Signer().sign(
 				coreData,
 				algorithm,
@@ -325,8 +326,8 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 				);
 		// Creamos la peticion de postfirma
 		configParams.put(PROPERTY_NAME_PKCS1_SIGN, Base64.encode(pkcs1sign));
-		if (preSign.containsKey(PROPERTY_NAME_SESSION_DATA)) {
-			configParams.put(PROPERTY_NAME_SESSION_DATA, preSign.getProperty(PROPERTY_NAME_SESSION_DATA));
+		if (preSignProperties.containsKey(PROPERTY_NAME_SESSION_DATA)) {
+			configParams.put(PROPERTY_NAME_SESSION_DATA, preSignProperties.getProperty(PROPERTY_NAME_SESSION_DATA));
 		}
 
 		// ---------
