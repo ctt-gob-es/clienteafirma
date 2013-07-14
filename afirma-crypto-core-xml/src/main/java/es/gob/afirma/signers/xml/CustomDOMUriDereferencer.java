@@ -50,15 +50,14 @@ import com.sun.org.apache.xml.internal.security.signature.XMLSignatureInput;
 import com.sun.org.apache.xml.internal.security.utils.IdResolver;
 import com.sun.org.apache.xml.internal.security.utils.resolver.ResourceResolver;
 
-/**
- * DOM-based implementation of URIDereferencer.
- *
- * @author Sean Mullan
- */
+/** DOM-based implementation of URIDereferencer.
+ * @author Sean Mullan */
+@SuppressWarnings("restriction")
 public final class CustomDOMUriDereferencer implements URIDereferencer {
 
     static final URIDereferencer INSTANCE = new CustomDOMUriDereferencer();
 
+    /** Constructor. */
     public CustomDOMUriDereferencer() {
         // need to call com.sun.org.apache.xml.internal.security.Init.init()
         // before calling any apache security code
@@ -66,11 +65,11 @@ public final class CustomDOMUriDereferencer implements URIDereferencer {
         Init.init();
     }
 
-    @Override
+	@Override
 	public Data dereference(final URIReference uriRef, final XMLCryptoContext context) throws URIReferenceException {
 
         if (uriRef == null) {
-            throw new NullPointerException("uriRef cannot be null"); //$NON-NLS-1$
+            throw new IllegalArgumentException("La referencia no puede ser nula"); //$NON-NLS-1$
         }
         if (context == null) {
             throw new NullPointerException("context cannot be null"); //$NON-NLS-1$
