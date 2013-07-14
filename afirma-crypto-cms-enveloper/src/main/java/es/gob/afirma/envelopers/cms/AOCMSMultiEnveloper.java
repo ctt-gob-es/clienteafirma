@@ -298,7 +298,7 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
         // Si se establecion un remitente
         if (ke != null) {
             return new CMSEnvelopedData().genEnvelopedData(
-        		AOCMSMultiEnveloper.createContentSignerParementers(content, ke, this.signatureAlgorithm),
+        		AOCMSMultiEnveloper.createContentSignerParementers(content, this.signatureAlgorithm),
         		(X509Certificate[]) ke.getCertificateChain(),
                 cipherConfig,
                 recipientsCerts,
@@ -362,7 +362,7 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
                                                                                 SignatureException {
 
         return new CMSSignedAndEnvelopedData().genSignedAndEnvelopedData(
-    		AOCMSMultiEnveloper.createContentSignerParementers(content, ke, this.signatureAlgorithm),
+    		AOCMSMultiEnveloper.createContentSignerParementers(content, this.signatureAlgorithm),
     		(X509Certificate[]) ke.getCertificateChain(),
             cipherConfig,
             recipientsCerts,
@@ -413,7 +413,7 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
     																IllegalBlockSizeException,
     																BadPaddingException {
     	return CMSAuthenticatedData.genAuthenticatedData(
-    			AOCMSMultiEnveloper.createContentSignerParementers(content, ke, this.signatureAlgorithm), // ContentSignerParameters
+    			AOCMSMultiEnveloper.createContentSignerParementers(content, this.signatureAlgorithm), // ContentSignerParameters
     			(X509Certificate[]) ke.getCertificateChain(), // Certificados del firmante (remitente)
     			null, // Algoritmo de autenticacion (usamos el por defecto)
     			cipherConfig, // Configuracion del cipher
@@ -465,7 +465,7 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
                                                                                     IllegalBlockSizeException,
                                                                                     BadPaddingException {
 		return CMSAuthenticatedEnvelopedData.genAuthenticatedEnvelopedData(
-			AOCMSMultiEnveloper.createContentSignerParementers(content, ke, this.signatureAlgorithm), // ContentSignerParameters
+			AOCMSMultiEnveloper.createContentSignerParementers(content, this.signatureAlgorithm), // ContentSignerParameters
 			(X509Certificate[]) ke.getCertificateChain(), // Certificados del firmante (remitente)
             null, // Algoritmo de autenticacion (usamos el por defecto)
             cipherConfig, // Configuracion del cipher
@@ -482,13 +482,10 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
      * mensaje.
      * @param content
      *        Mensaje.
-     * @param ke
-     *        Clave privada del remitente.
      * @param digestAlgorithm
      *        Algoritmo de huella digital.
      * @return Bloque de datos con la informaci&oacute;n del remitente. */
     private static P7ContentSignerParameters createContentSignerParementers(final byte[] content,
-    		                                                                final PrivateKeyEntry ke,
     		                                                                final String digestAlgorithm) {
         return new P7ContentSignerParameters(content, digestAlgorithm);
     }

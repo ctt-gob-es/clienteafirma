@@ -298,7 +298,7 @@ public class AOCMSEnveloper implements AOEnveloper {
         // Si se establecion un remitente
         if (ke != null) {
             return new CMSEnvelopedData().genEnvelopedData(
-            		AOCMSEnveloper.createContentSignerParementers(content, ke, this.signatureAlgorithm),
+            		AOCMSEnveloper.createContentSignerParementers(content, this.signatureAlgorithm),
             		(X509Certificate[]) ke.getCertificateChain(),
                     cipherConfig,
                     recipientsCerts,
@@ -362,7 +362,7 @@ public class AOCMSEnveloper implements AOEnveloper {
                                                                                 BadPaddingException,
                                                                                 SignatureException {
         return new CMSSignedAndEnvelopedData().genSignedAndEnvelopedData(
-        	 AOCMSEnveloper.createContentSignerParementers(content, ke, this.signatureAlgorithm),
+        	 AOCMSEnveloper.createContentSignerParementers(content, this.signatureAlgorithm),
         	 (X509Certificate[]) ke.getCertificateChain(),
              cipherConfig,
              recipientsCerts,
@@ -413,7 +413,7 @@ public class AOCMSEnveloper implements AOEnveloper {
                                                                     IllegalBlockSizeException,
                                                                     BadPaddingException {
 		return CMSAuthenticatedData.genAuthenticatedData(
-        		AOCMSEnveloper.createContentSignerParementers(content, ke, this.signatureAlgorithm), // ContentSignerParameters
+        		AOCMSEnveloper.createContentSignerParementers(content, this.signatureAlgorithm), // ContentSignerParameters
         		(X509Certificate[]) ke.getCertificateChain(), // Certificados del firmante (remitente)
                 null, // Algoritmo de autenticacion (usamos el por defecto)
                 cipherConfig, // Configuracion del cipher
@@ -466,7 +466,7 @@ public class AOCMSEnveloper implements AOEnveloper {
                                                                                     IllegalBlockSizeException,
                                                                                     BadPaddingException {
 		return CMSAuthenticatedEnvelopedData.genAuthenticatedEnvelopedData(
-				AOCMSEnveloper.createContentSignerParementers(content, ke, this.signatureAlgorithm), // ContentSignerParameters
+				AOCMSEnveloper.createContentSignerParementers(content, this.signatureAlgorithm), // ContentSignerParameters
 				(X509Certificate[]) ke.getCertificateChain(), // Certificados del firmante (remitente)
                 null,            // Algoritmo de autenticacion (usamos el por defecto)
                 cipherConfig,    // Configuracion del cipher
@@ -483,12 +483,10 @@ public class AOCMSEnveloper implements AOEnveloper {
      * mensaje.
      * @param content
      *        Mensaje.
-     * @param ke
-     *        Clave privada del remitente.
      * @param digestAlgorithm
      *        Algoritmo de huella digital.
      * @return Bloque de datos con la informaci&oacute;n del remitente. */
-    private static P7ContentSignerParameters createContentSignerParementers(final byte[] content, final PrivateKeyEntry ke, final String digestAlgorithm) {
+    private static P7ContentSignerParameters createContentSignerParementers(final byte[] content, final String digestAlgorithm) {
         return new P7ContentSignerParameters(content, digestAlgorithm);
     }
 
