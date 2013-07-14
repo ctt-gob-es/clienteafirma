@@ -154,7 +154,6 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
 				continue;
 			}
 			catch (final Exception ex) {
-				ex.printStackTrace();
 				LOGGER.severe("No se ha podido inicializar el PKCS#11 '" + descr + "': " + ex); //$NON-NLS-1$ //$NON-NLS-2$
 				continue;
 			}
