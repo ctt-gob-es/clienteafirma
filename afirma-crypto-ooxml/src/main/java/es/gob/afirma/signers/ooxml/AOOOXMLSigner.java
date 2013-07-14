@@ -26,7 +26,6 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.AOFileUtils;
-import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.OfficeAnalizer;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignInfo;
@@ -79,9 +78,14 @@ public final class AOOOXMLSigner implements AOSigner {
         final ZipFile zipFile;
         try {
             zipFile = AOFileUtils.createTempZipFile(data);
+            final boolean ret = zipFile.getEntry("[Content_Types].xml") != null && (zipFile.getEntry("_rels/.rels") != null || zipFile.getEntry("_rels\\.rels") != null) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                    && (zipFile.getEntry("docProps/app.xml") != null || zipFile.getEntry("docProps\\app.xml") != null) //$NON-NLS-1$ //$NON-NLS-2$
+                    && (zipFile.getEntry("docProps/core.xml") != null || zipFile.getEntry("docProps\\core.xml") != null); //$NON-NLS-1$ //$NON-NLS-2$
+            zipFile.close();
+            return ret;
         }
         catch (final ZipException e) {
-            // El fichero no era un Zip ni, por tanto, OOXML
+            // El fichero no era un ZIP, y por lo tanto, tampoco un OOXML
             return false;
         }
         catch (final Exception e) {
@@ -91,9 +95,8 @@ public final class AOOOXMLSigner implements AOSigner {
 
         // Comprobamos si estan todos los ficheros principales del documento
 
-        return zipFile.getEntry("[Content_Types].xml") != null && (zipFile.getEntry("_rels/.rels") != null || zipFile.getEntry("_rels\\.rels") != null) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-               && (zipFile.getEntry("docProps/app.xml") != null || zipFile.getEntry("docProps\\app.xml") != null) //$NON-NLS-1$ //$NON-NLS-2$
-               && (zipFile.getEntry("docProps/core.xml") != null || zipFile.getEntry("docProps\\core.xml") != null); //$NON-NLS-1$ //$NON-NLS-2$
+
+
     }
 
     /** { {@inheritDoc} */
@@ -341,7 +344,7 @@ public final class AOOOXMLSigner implements AOSigner {
             );
         }
         catch (final Exception e) {
-            throw new AOException("Error durante la firma OOXML", e); //$NON-NLS-1$
+            throw new AOException("Error durante la firma OOXML: " + e, e); //$NON-NLS-1$
         }
     }
 }

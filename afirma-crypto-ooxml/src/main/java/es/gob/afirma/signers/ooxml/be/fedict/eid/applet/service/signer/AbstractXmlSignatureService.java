@@ -104,7 +104,7 @@ import es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.spi.SignatureSer
 
 /** Abstract base class for an XML Signature Service implementation.
  * @author fcorneli */
-@SuppressWarnings("static-method")
+@SuppressWarnings({ "static-method", "restriction" })
 public abstract class AbstractXmlSignatureService implements SignatureService {
 
     private final List<SignatureFacet> signatureFacets;
@@ -311,8 +311,7 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
         final ByteArrayOutputStream dataStream = new ByteArrayOutputStream();
         domSignedInfo.canonicalize(xmlSignContext, dataStream);
         final byte[] octets = dataStream.toByteArray();
-
-        final Signature sig = Signature.getInstance(digestAlgo + "withRSA"); //$NON-NLS-1$
+        final Signature sig = Signature.getInstance(digestAlgo.replace("-",  "") + "withRSA"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         final byte[] sigBytes;
         try {
             sig.initSign(signingKey);

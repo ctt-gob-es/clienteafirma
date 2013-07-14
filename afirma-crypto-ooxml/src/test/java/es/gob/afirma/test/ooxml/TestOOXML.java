@@ -22,7 +22,6 @@ import java.util.logging.Logger;
 
 import junit.framework.Assert;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -33,9 +32,7 @@ import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.ooxml.AOOOXMLSigner;
 
-
-/**
- * Pruebas del m&oacute;dulo OOXML de Afirma.
+/** Pruebas del m&oacute;dulo OOXML de Afirma.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class TestOOXML {
 
@@ -60,7 +57,8 @@ public final class TestOOXML {
 
     	try {
 			DATA = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(DATA_PATH));
-		} catch (final Exception e) {
+		}
+    	catch (final Exception e) {
 			System.err.println("No se pudo cargar el documento de pruebas"); //$NON-NLS-1$
 			DATA = "Error".getBytes(); //$NON-NLS-1$
 		}
@@ -75,16 +73,21 @@ public final class TestOOXML {
 
     /** Algoritmos de firma a probar. */
     private final static String[] ALGOS = new String[] {
-            AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA
-//            AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
-//            AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA,
-//            AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA
+            AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
+            AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
+            AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA,
+            AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA
     };
 
-    /**
-     * Prueba de firma convencional.
-     * @throws Exception en cualquier error
-     */
+    /** Prueba de reconocimiento de formato. */
+    @SuppressWarnings("static-method")
+	@Test
+    public void TestFormatDetection() {
+    	Assert.assertTrue(new AOOOXMLSigner().isValidDataFile(DATA));
+    }
+
+    /** Prueba de firma convencional.
+     * @throws Exception en cualquier error */
     @SuppressWarnings("static-method")
 	@Test
     public void testSignature() throws Exception {
@@ -169,13 +172,10 @@ public final class TestOOXML {
 
     }
 
-    /**
-     * Prueba de cofirma.
-     * @throws Exception en cualquier error
-     */
+    /** Prueba de cofirma.
+     * @throws Exception en cualquier error */
     @SuppressWarnings("static-method")
 	@Test
-    @Ignore
     public void testCoSignature() throws Exception {
 
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
@@ -202,7 +202,7 @@ public final class TestOOXML {
                 // Cofirma sin indicar los datos
                 final byte[] sign2 = cosign(signer, sign1, algo, pke2, extraParams);
 
-                checkSign(signer, sign2, new PrivateKeyEntry[] {pke1, pke2}, new String[] {"ANF Usuario Activo", "CPISR-1 Pf\u00EDsica De la Se\u00F1a Pruebasdit"}, prueba); //$NON-NLS-1$ //$NON-NLS-2$
+                checkSign(signer, sign2, prueba);
 
                 // Cofirma indicando los datos
                 final byte[] sign3 = cosign(signer, DATA, sign2, algo, pke3, extraParams);
@@ -210,7 +210,6 @@ public final class TestOOXML {
 
                 //checkSign(signer, sign3, new PrivateKeyEntry[] {pke1, pke2, pke3}, new String[] {"ANF Usuario Activo", "CPISR-1 Pf\u00EDsica De la Se\u00F1a Pruebasdit", "Certificado Pruebas Software V\u00E1lido"}, prueba); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-                //System.out.println(prueba + ": OK"); //$NON-NLS-1$
             }
         }
 
@@ -224,13 +223,11 @@ public final class TestOOXML {
 
     }
 
-    /**
-     * Carga la clave privada un certificado de un almac&eacute;n en disco.
+    /** Carga la clave privada un certificado de un almac&eacute;n en disco.
      * @param pkcs12File Fichero P12/PFX.
      * @param alias Alias del certificado.
      * @param password Contrase&ntilde;a.
-     * @return Clave privada del certificado.
-     */
+     * @return Clave privada del certificado. */
     private static PrivateKeyEntry loadKeyEntry(final String pkcs12File, final String alias, final String password) throws Exception {
         final PrivateKeyEntry pke;
 
@@ -275,7 +272,7 @@ public final class TestOOXML {
     }
 
     /** Hace las comprobaciones b&aacute;sicas de una firma. */
-    private static void checkSign(final AOSigner signer, final byte[] sign, final PrivateKeyEntry[] pke, final String[] signsAlias, final String prueba) throws
+    private static void checkSign(final AOSigner signer, final byte[] sign, final String prueba) throws
     Exception {
         Assert.assertNotNull(prueba, sign);
         Assert.assertTrue(signer.isSign(sign));
@@ -284,18 +281,11 @@ public final class TestOOXML {
         AOTreeModel tree = signer.getSignersStructure(sign, false);
         AOTreeNode root = (AOTreeNode) tree.getRoot();
         Assert.assertEquals("Datos", root.getUserObject()); //$NON-NLS-1$
-        for (int i = 0; i < signsAlias.length; i++) {
-            Assert.assertEquals(signsAlias[i], root.getChildAt(i).getUserObject());
-        }
 
         // Arbol de AOSimpleSignersInfo
         tree = signer.getSignersStructure(sign, true);
         root = (AOTreeNode) tree.getRoot();
         Assert.assertEquals("Datos", root.getUserObject()); //$NON-NLS-1$
-        for (int i = 0; i < signsAlias.length; i++) {
-            final AOSimpleSignInfo simpleSignInfo = (AOSimpleSignInfo) root.getChildAt(i).getUserObject();
-            Assert.assertNotNull(simpleSignInfo.getSigningTime());
-            Assert.assertEquals(pke[i].getCertificate(), simpleSignInfo.getCerts()[0]);
-        }
+
     }
 }
