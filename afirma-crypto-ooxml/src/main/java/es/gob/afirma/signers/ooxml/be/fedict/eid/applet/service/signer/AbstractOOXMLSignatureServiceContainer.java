@@ -56,7 +56,7 @@ import es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.signer.ooxml.OOX
 
 /** Contenedor para la implementaci&oacute;n abstracta del servicio de firma OOXML. */
 public final class AbstractOOXMLSignatureServiceContainer {
-	
+
 	private AbstractOOXMLSignatureServiceContainer() {
 		// No permitimos la instanciacion
 	}
@@ -72,7 +72,7 @@ public final class AbstractOOXMLSignatureServiceContainer {
 
         private final String digestAlgorithm;
 
-        public OOXMLSignatureService(final InputStream ooxmlis, final String digestAlgo) {
+        OOXMLSignatureService(final InputStream ooxmlis, final String digestAlgo) {
             try {
                 this.ooxml = AOUtil.getDataFromInputStream(ooxmlis);
             }
@@ -101,25 +101,25 @@ public final class AbstractOOXMLSignatureServiceContainer {
      * @param pk Clave privada
      * @param signerCount N&uacute;mero de firma
      * @return Documento OOXML firmado
-     * @throws XMLSignatureException 
-     * @throws MarshalException 
-     * @throws TransformerException 
-     * @throws SAXException 
-     * @throws ParserConfigurationException 
-     * @throws IOException 
-     * @throws InvalidAlgorithmParameterException 
+     * @throws XMLSignatureException
+     * @throws MarshalException
+     * @throws TransformerException
+     * @throws SAXException
+     * @throws ParserConfigurationException
+     * @throws IOException
+     * @throws InvalidAlgorithmParameterException
      * @throws NoSuchAlgorithmException */
     public static byte[] sign(final InputStream ooxml,
                              final List<X509Certificate> certChain,
                              final String digestAlgorithm,
                              final PrivateKey pk,
-                             final int signerCount) throws NoSuchAlgorithmException, 
-                                                           InvalidAlgorithmParameterException, 
-                                                           IOException, 
-                                                           ParserConfigurationException, 
-                                                           SAXException, 
-                                                           TransformerException, 
-                                                           MarshalException, 
+                             final int signerCount) throws NoSuchAlgorithmException,
+                                                           InvalidAlgorithmParameterException,
+                                                           IOException,
+                                                           ParserConfigurationException,
+                                                           SAXException,
+                                                           TransformerException,
+                                                           MarshalException,
                                                            XMLSignatureException {
 
         OOXMLProvider.install();
