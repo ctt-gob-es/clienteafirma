@@ -23,6 +23,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -704,7 +705,7 @@ public final class AOPDFSigner implements AOSigner {
         if (originalName == null) {
             return "signed.pdf"; //$NON-NLS-1$
         }
-        if (originalName.toLowerCase().endsWith(PDF_FILE_SUFFIX)) {
+        if (originalName.toLowerCase(Locale.US).endsWith(PDF_FILE_SUFFIX)) {
             return originalName.substring(0, originalName.length() - PDF_FILE_SUFFIX.length()) + inTextInt + PDF_FILE_SUFFIX;
         }
         return originalName + inTextInt + PDF_FILE_SUFFIX;
@@ -1228,7 +1229,7 @@ public final class AOPDFSigner implements AOSigner {
         if (originalName == null) {
             return "signed.pdf"; //$NON-NLS-1$
         }
-        if (originalName.endsWith(PDF_FILE_SUFFIX)) { //{
+        if (originalName.endsWith(PDF_FILE_SUFFIX)) {
             return originalName.replace(PDF_FILE_SUFFIX, ".signed.pdf"); //$NON-NLS-1$
         }
         if (originalName.endsWith(".PDF")) { //$NON-NLS-1$
