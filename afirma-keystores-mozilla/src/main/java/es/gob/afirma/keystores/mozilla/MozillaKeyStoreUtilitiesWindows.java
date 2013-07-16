@@ -51,7 +51,7 @@ final class MozillaKeyStoreUtilitiesWindows {
 
 		String finalDir;
 		// En Firefox usamos el profiles.ini (el registro clasico esta ya obsoleto)
-		regFile = new File(getWindowsAppDataDir() + "\\Mozilla\\Firefox\\profiles.ini"); //$NON-NLS-1$
+		regFile = new File(getWindowsAppDataDir(), "Mozilla\\Firefox\\profiles.ini"); //$NON-NLS-1$
 		try {
 			if (regFile.exists()) {
 				finalDir = NSPreferences.getFireFoxUserProfileDirectory(regFile);
@@ -109,7 +109,7 @@ final class MozillaKeyStoreUtilitiesWindows {
 				// Copiamos las DLL necesarias a un temporal y devolvemos el temporal
 				final File tmp;
 				// Intentamos usar antes el temporal del sistema, para evitar el del usuario, que puede tener caracteres especiales
-				final File tmpDir = new File(new File(Platform.getSystemLibDir()).getParent() + File.separator + "Temp"); //$NON-NLS-1$
+				final File tmpDir = new File(new File(Platform.getSystemLibDir()).getParent(), "Temp"); //$NON-NLS-1$
 				if (tmpDir.isDirectory() && tmpDir.canWrite() && tmpDir.canRead()) {
 					tmp = File.createTempFile("nss", null, tmpDir); //$NON-NLS-1$
 				}
@@ -120,8 +120,7 @@ final class MozillaKeyStoreUtilitiesWindows {
 				if (!tmp.mkdir()) {
 					throw new AOException("No se ha creado el directorio temporal"); //$NON-NLS-1$
 				}
-				final String dest = tmp.getCanonicalPath() + File.separator;
-
+				
 				copyFile(new String[] {
 					SOFTOKN3_DLL,   // "softokn3" es comun para todos los Firefox a partir del 2
 					MOZSQLITE3_DLL, // En Firefox 4 sqlite3.dll pasa a llamarse mozsqlite3.dll
@@ -136,7 +135,7 @@ final class MozillaKeyStoreUtilitiesWindows {
 					NSSDBM3_DLL,
 					MOZUTILS_DLL,
 					MOZGLUE_DLL     // A partir de Firefox 11
-				}, dir, dest);
+				}, dir, tmp.getCanonicalPath());
 
 				dir = tmp.getCanonicalPath();
 
@@ -224,10 +223,10 @@ final class MozillaKeyStoreUtilitiesWindows {
 		if (fileNames !=null) {
 			File tmpFile;
 			for(final String f : fileNames) {
-				tmpFile = new File(sourceDir + File.separator + f);
+				tmpFile = new File(sourceDir, f);
 				if (tmpFile.exists()) {
 					try {
-						AOUtil.copyFile(tmpFile, new File(destDir + f));
+						AOUtil.copyFile(tmpFile, new File(destDir, f));
 					}
 					catch (final IOException e) {
 						LOGGER.warning("No se ha podido copiar '" + f + "' a '" + destDir + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

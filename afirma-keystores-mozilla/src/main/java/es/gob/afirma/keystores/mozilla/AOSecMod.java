@@ -99,7 +99,7 @@ final class AOSecMod {
             if (!profileDir.endsWith("/")) { //$NON-NLS-1$
                 profileDir = profileDir + "/"; //$NON-NLS-1$
             }
-            final File secmod = new File(profileDir + "secmod.db"); //$NON-NLS-1$
+            final File secmod = new File(profileDir, "secmod.db"); //$NON-NLS-1$
             if (!secmod.exists()) {
                 throw new AOException("El directorio del perfil de Mozilla proporcionado no contiene una base de datos de modulos (secmod.db)"); //$NON-NLS-1$
             }
@@ -201,7 +201,7 @@ final class AOSecMod {
             }
             File tmpFile;
             for (final String f : files) {
-                tmpFile = new File(libPath + f);
+                tmpFile = new File(libPath, f);
                 if (tmpFile.exists() && !tmpFile.isDirectory()) {
                     return libPath + f;
                 }

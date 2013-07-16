@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.charset.Charset;
 import java.security.Provider;
 import java.security.Security;
 import java.util.ArrayList;
@@ -229,10 +228,11 @@ final class MozillaKeyStoreUtilities {
 	}
 
 	static String getNssPathFromCompatibilityFile() throws IOException {
-		final File compatibility = new File(getMozillaUserProfileDirectory() + File.separator + "compatibility.ini");  //$NON-NLS-1$
+		final File compatibility = new File(getMozillaUserProfileDirectory(), "compatibility.ini");  //$NON-NLS-1$
 		if (compatibility.exists() && compatibility.canRead()) {
 			final InputStream fis = new FileInputStream(compatibility);
-			final BufferedReader br = new BufferedReader(new InputStreamReader(fis, Charset.forName("UTF-8"))); //$NON-NLS-1$
+			// Cargamos el fichero con la codificacion por defecto (que es la que con mas probabilidad tiene el fichero)
+			final BufferedReader br = new BufferedReader(new InputStreamReader(fis));
 			String line;
 			String dir = null;
 			while ((line = br.readLine()) != null) {
