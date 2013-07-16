@@ -12,10 +12,8 @@ import java.util.Properties;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
@@ -143,13 +141,12 @@ public class ClientHandler extends BasicHandler {
 	 * @param soapRequest Documento xml que representa la peticion SOAP sin securizar.
 	 * @return Un mensaje SOAP que contiene la peticion SOAP de entrada securizada
 	 * mediante el tag userNameToken.
-	 * @throws TransformerConfigurationException
 	 * @throws TransformerException
-	 * @throws TransformerFactoryConfigurationError
+	 * @throws javax.xml.transform.TransformerFactoryConfigurationError
 	 * @throws IOException
 	 * @throws SOAPException
 	 */
-	private SOAPMessage createUserNameToken(final Document soapEnvelopeRequest) throws TransformerException, TransformerFactoryConfigurationError, IOException, SOAPException {
+	private SOAPMessage createUserNameToken(final Document soapEnvelopeRequest) throws TransformerException, IOException, SOAPException {
 		ByteArrayOutputStream baos;
 		Document secSOAPReqDoc;
 		DOMSource source;
@@ -196,9 +193,9 @@ public class ClientHandler extends BasicHandler {
 	 * @param soapEnvelopeRequest Documento xml que representa la peticion SOAP sin securizar.
 	 * @return Un mensaje SOAP que contiene la peticion SOAP de entrada securizada
 	 * mediante el tag BinarySecurityToken.
-	 * @throws TransformerFactoryConfigurationError
+	 * @throws javax.xml.transform.TransformerFactoryConfigurationError
 	 * @throws TransformerException
-	 * @throws TransformerConfigurationException
+	 * @throws javax.xml.transform.TransformerConfigurationException
 	 * @throws SOAPException
 	 * @throws IOException
 	 * @throws KeyStoreException
@@ -206,7 +203,7 @@ public class ClientHandler extends BasicHandler {
 	 * @throws CertificateException
 	 * @throws NoSuchAlgorithmException
 	 */
-	private SOAPMessage createBinarySecurityToken(final Document soapEnvelopeRequest) throws TransformerException, TransformerFactoryConfigurationError, IOException, SOAPException, KeyStoreException, CredentialException, NoSuchAlgorithmException, CertificateException {
+	private SOAPMessage createBinarySecurityToken(final Document soapEnvelopeRequest) throws TransformerException, IOException, SOAPException, KeyStoreException, CredentialException, NoSuchAlgorithmException, CertificateException {
 		ByteArrayOutputStream baos;
 		Crypto crypto;
 		Document secSOAPReqDoc;

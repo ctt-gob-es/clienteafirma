@@ -22,7 +22,7 @@ import org.apache.log4j.Logger;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 
-public class TestClient {
+public final class TestClient {
    private static final Logger LOGGER = Logger.getLogger(TestClient.class);
    private static final String CABECERA = "[TestClient]:"; //$NON-NLS-1$
    //Ruta donde se encuentran los ficheros de entrada a los servicios web
@@ -164,7 +164,6 @@ public class TestClient {
       }
       catch (final Exception e) {
     	 LOGGER.error(TestClient.CABECERA + e.toString());
-         e.printStackTrace();
          return null;
       }
       
