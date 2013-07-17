@@ -311,9 +311,6 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
 		catch (final Exception e) {
 			LOGGER.severe("Error inicializando el proveedor NSS: " + e); //$NON-NLS-1$
 			nssProvider = null;
-			
-			//TODO: Borrar
-			e.printStackTrace();
 		}
 
 		return nssProvider;
