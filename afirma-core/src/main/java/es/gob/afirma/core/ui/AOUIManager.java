@@ -45,8 +45,7 @@ public interface AOUIManager {
      * @param icon Icono a mostrar en el di&aacute;logo
      * @param selectionValues Valores posibles para seleccionar
      * @param initialSelectionValue Valor seleccionado por defecto
-     * @return Valor seleccionado
-     */
+     * @return Valor seleccionado */
     Object showInputDialog(Object parentComponent, Object message, String title, int messageType, Object icon, Object[] selectionValues, Object initialSelectionValue);
 
     /** Di&aacute;logo de selecci&oacute;n de certificados.
@@ -64,6 +63,13 @@ public interface AOUIManager {
      * @return Opci&oacute;n seleccionada */
     int showConfirmDialog(Object parentComponent, Object message, String title, int optionType, int messageType);
 
+    /** JOptionPane.showMessageDialog().
+     * @param parentComponent Componente padre (se descarta si no es del tipo <code>java.awt.Component</code> en la implementaci&oacute;n Swing
+     * @param message Mensaje
+     * @param title Titulo del cuadro de di&aacute;logo
+     * @param messageType Tipo de mensaje */
+    void showMessageDialog(Object parentComponent, Object message, String title, int messageType);
+
     /** Obtiene el c&oacute;digo equivalente a JOptionPane.PLAIN_MESSAGE en la implementaci&oacute;n del entorno operativo actual.
      * @return C&oacute;digo equivalente a JOptionPane.PLAIN_MESSAGE */
     int getPlainMessageCode();
@@ -75,6 +81,10 @@ public interface AOUIManager {
     /** Obtiene el c&oacute;digo equivalente a JOptionPane.WARNING_MESSAGE en la implementaci&oacute;n del entorno operativo actual.
      * @return C&oacute;digo equivalente a JOptionPane.WARNING_MESSAGE */
     int getWarningMessageCode();
+
+    /** Obtiene el c&oacute;digo equivalente a JOptionPane.ERROR_MESSAGE en la implementaci&oacute;n del entorno operativo actual.
+     * @return C&oacute;digo equivalente a JOptionPane.ERROR_MESSAGE */
+    int getErrorMessageCode();
 
     /** Obtiene el c&oacute;digo equivalente a JOptionPane.YES_OPTION en la implementaci&oacute;n del entorno operativo actual.
      * @return C&oacute;digo equivalente a JOptionPane.YES_OPTION */

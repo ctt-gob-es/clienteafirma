@@ -53,6 +53,9 @@ public final class AOUIFactory {
     /** JOptionPane.QUESTION_MESSAGE. */
     public static final int QUESTION_MESSAGE;
 
+    /** JOptionPane.ERROR_MESSAGE. */
+    public static final int ERROR_MESSAGE;
+
     private static AOUIManager uiManager;
 
     static {
@@ -84,6 +87,7 @@ public final class AOUIFactory {
             OK_OPTION = uiManager.getOkOptionCode();
             INFORMATION_MESSAGE = uiManager.getInformationMessageCode();
             QUESTION_MESSAGE = uiManager.getQuestionMessageCode();
+            ERROR_MESSAGE = uiManager.getErrorMessageCode();
         }
         catch(final Exception e) {
             throw new UnsupportedOperationException("No se ha podido instanciar el gestor de interfaces graficas: " + e, e); //$NON-NLS-1$
@@ -138,17 +142,31 @@ public final class AOUIFactory {
         return uiManager.getPassword(text, charset, beep, c);
     }
 
-    /**
-     * JOptionPane.showConfirmDialog().
+    /** JOptionPane.showConfirmDialog().
      * @param parentComponent Componente padre (se descarta si no es del tipo <code>java.awt.Component</code> en la implementaci&oacute;n Swing
      * @param message Mensaje
      * @param title Titulo del cuadro de di&aacute;logo
      * @param optionType Tipo de opciones a confirmar
      * @param messageType Tipo de mensaje
-     * @return Opci&oacute;n seleccionada
-     */
-    public static int showConfirmDialog(final Object parentComponent, final Object message, final String title, final int optionType, final int messageType) {
+     * @return Opci&oacute;n seleccionada */
+    public static int showConfirmDialog(final Object parentComponent,
+    		                            final Object message,
+    		                            final String title,
+    		                            final int optionType,
+    		                            final int messageType) {
         return uiManager.showConfirmDialog(parentComponent, message, title, optionType, messageType);
+    }
+
+    /** JOptionPane.showMessageDialog().
+     * @param parentComponent Componente padre (se descarta si no es del tipo <code>java.awt.Component</code> en la implementaci&oacute;n Swing
+     * @param message Mensaje
+     * @param title Titulo del cuadro de di&aacute;logo
+     * @param messageType Tipo de mensaje */
+    public static void showMessageDialog(final Object parentComponent,
+    		                            final Object message,
+    		                            final String title,
+    		                            final int messageType) {
+        uiManager.showMessageDialog(parentComponent, message, title, messageType);
     }
 
     /**
@@ -172,7 +190,8 @@ public final class AOUIFactory {
      * @param selectionValues Listado de valores seleccionables Nombre-Certificado.
      * @return Alias del certificado seleccionado o {@code null} si no se seleccion&oacute; ninguno.
      */
-    public static Object showCertificateSelectionDialog(final Object parentComponent, final NameCertificateBean[] selectionValues) {
+    public static Object showCertificateSelectionDialog(final Object parentComponent,
+    		                                            final NameCertificateBean[] selectionValues) {
         return uiManager.showCertificateSelectionDialog(parentComponent, selectionValues);
     }
 

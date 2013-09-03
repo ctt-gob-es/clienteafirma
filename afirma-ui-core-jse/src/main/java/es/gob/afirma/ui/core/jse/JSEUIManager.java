@@ -135,8 +135,8 @@ public class JSEUIManager implements AOUIManager {
 
     /** {@inheritDoc} */
     @Override
-	public final Object showCertificateSelectionDialog(	final Object parentComponent,
-    												final NameCertificateBean[] selectionValues) {
+	public final Object showCertificateSelectionDialog(final Object parentComponent,
+    												   final NameCertificateBean[] selectionValues) {
     	Component parent = null;
     	if (parentComponent instanceof Component) {
     		parent = (Component) parentComponent;
@@ -225,12 +225,25 @@ public class JSEUIManager implements AOUIManager {
 
     /** {@inheritDoc} */
     @Override
-	public final int showConfirmDialog(final Object parentComponent, final Object message, final String title, final int optionType, final int messageType) {
+	public final int showConfirmDialog(final Object parentComponent,
+			                           final Object message,
+			                           final String title,
+			                           final int optionType,
+			                           final int messageType) {
         Component parent = null;
         if (parentComponent instanceof Component) {
             parent = (Component) parentComponent;
         }
-        return JOptionPane.showConfirmDialog(parent, message, title, optionType);
+        return JOptionPane.showConfirmDialog(parent, message, title, optionType, messageType);
+    }
+
+    @Override
+	public void showMessageDialog(final Object parentComponent, final Object message, final String title, final int messageType) {
+        Component parent = null;
+        if (parentComponent instanceof Component) {
+            parent = (Component) parentComponent;
+        }
+        JOptionPane.showMessageDialog(parent, message, title, messageType);
     }
 
     /** {@inheritDoc} */
@@ -283,6 +296,12 @@ public class JSEUIManager implements AOUIManager {
 
     /** {@inheritDoc} */
     @Override
+	public final int getErrorMessageCode() {
+        return JOptionPane.ERROR_MESSAGE;
+    }
+
+    /** {@inheritDoc} */
+    @Override
 	public final int getQuestionMessageCode() {
         return JOptionPane.QUESTION_MESSAGE;
     }
@@ -321,7 +340,8 @@ public class JSEUIManager implements AOUIManager {
         if (filename != null) {
         	if (currentDir != null) {
         		jfc.setSelectedFile(new File(currentDir, filename));
-        	} else {
+        	}
+        	else {
         		jfc.setSelectedFile(new File(filename));
         	}
         }
