@@ -80,8 +80,7 @@ public enum AOKeyStore {
 
     /** Recupera el repositorio con el nombre indicado. Si no existe un keystore con
      * ese nombre, se devuelve <code>null</code>.
-     * @param name
-     *        nombre del repositorio que se desea recuperar.
+     * @param name Nombre del repositorio que se desea recuperar.
      * @return KeyStore Repositorio de certificados. */
     public static AOKeyStore getKeyStore(final String name) {
         for (final AOKeyStore tempKs : AOKeyStore.values()) {

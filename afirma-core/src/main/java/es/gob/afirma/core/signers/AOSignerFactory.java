@@ -79,12 +79,12 @@ public final class AOSignerFactory {
 			throw new IllegalArgumentException("No se han indicado datos de firma"); //$NON-NLS-1$
 		}
 		for (final String format[] : SIGNERS_CLASSES) {
-			
+
 			// Solo buscaremos el signer compatible entre los que soportan la identificacion
 			if (!Boolean.parseBoolean(format[2])) {
 				continue;
 			}
-			
+
 			if (SIGNERS.get(format[0]) == null) {
 				try {
 					SIGNERS.put(format[0], (AOSigner) Class.forName(format[1]).newInstance());
@@ -102,8 +102,8 @@ public final class AOSignerFactory {
 		return null;
 	}
 
-	/** Obtiene un manejador para un formato de firma dado. En caso de no
-	 * encontrar ninguno, se devuelve <code>null</code>.
+	/** Obtiene un manejador para un formato de firma dado, o <code>null</code> en caso de no
+	 * encontrar ninguno.
 	 * @param signFormat Formato de firma para el cual solicitamos el manejador.
 	 * @return Manejador capaz de firmar en el formato indicado. */
 	public static AOSigner getSigner(final String signFormat) {

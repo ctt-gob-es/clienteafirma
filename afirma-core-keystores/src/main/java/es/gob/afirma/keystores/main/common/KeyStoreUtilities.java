@@ -379,12 +379,19 @@ public final class KeyStoreUtilities {
     		final boolean showExpiredCertificates,
     		final List<CertificateFilter> certFilters,
     		final boolean mandatoryCertificate) throws AOCertificatesNotFoundException {
-    	if (alias == null || alias.length == 0) {
-    		throw new AOCertificatesNotFoundException("El almac\u00E9n no conten\u00EDa entradas"); //$NON-NLS-1$
+
+    	if (alias == null && ksm == null || alias != null && alias.length == 0) {
+    		throw new AOCertificatesNotFoundException("El almacen no contenia entradas"); //$NON-NLS-1$
     	}
 
     	final Map<String, String> aliassesByFriendlyName =
-    		KeyStoreUtilities.getAliasesByFriendlyName(alias, ksm, checkPrivateKeys, showExpiredCertificates, certFilters);
+    		KeyStoreUtilities.getAliasesByFriendlyName(
+				alias != null ? alias : ksm.getAliases(),
+				ksm,
+				checkPrivateKeys,
+				showExpiredCertificates,
+				certFilters
+			);
 
     	// Miramos si despues de filtrar las entradas queda alguna o se ha
     	// quedado la lista vacia
