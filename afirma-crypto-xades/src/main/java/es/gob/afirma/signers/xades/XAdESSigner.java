@@ -391,6 +391,8 @@ public final class XAdESSigner {
 
 		final Properties extraParams = xParams != null ? xParams : new Properties();
 
+		final String nodeToSign = extraParams.getProperty(
+				"nodeToSign"); //$NON-NLS-1$
 		final String format = extraParams.getProperty(
 				"format", AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING); //$NON-NLS-1$
 		final String mode = extraParams.getProperty(
@@ -429,8 +431,7 @@ public final class XAdESSigner {
 			// Ignoramos errores, el parametro es opcional
 		}
 
-		Utils.checkIllegalParams(format, mode, uri, precalculatedHashAlgorithm,
-				true);
+		Utils.checkIllegalParams(format, mode, uri, precalculatedHashAlgorithm, true);
 
 		// Un externally detached con URL permite los datos nulos o vacios
 		if ((data == null || data.length == 0)
@@ -469,7 +470,9 @@ public final class XAdESSigner {
 					new ByteArrayInputStream(data)
 				);
 
-				// Obtenemos la hoja de estilo del XML
+				// ************************************************
+				// **** Obtencion de la hoja de estilo del XML ****
+				// ************************************************
 				try {
 					final Properties p;
 					if (!ignoreStyleSheets) {
@@ -483,10 +486,11 @@ public final class XAdESSigner {
 
 					if (styleType != null && styleHref != null) {
 
-						XAdESSigner.LOGGER
-						.info("Se ha encontrado una hoja de estilo asociada al XML a firmar: tipo=" + styleType //$NON-NLS-1$
+						XAdESSigner.LOGGER.info(
+							"Se ha encontrado una hoja de estilo asociada al XML a firmar: tipo=" + styleType //$NON-NLS-1$
 								+ ", referencia=" //$NON-NLS-1$
-								+ styleHref);
+								+ styleHref
+						);
 
 						try {
 							final Document tmpDoc = Utils.dereferenceStyleSheet(
@@ -501,9 +505,8 @@ public final class XAdESSigner {
 								headLess
 							);
 
-							// Cuidado!! Solo rellenamos el Elemento DOM si no
-							// es HTTP o HTTPS, porque si es accesible
-							// remotamente no necesito el elemento, ya que se
+							// Cuidado!! Solo rellenamos el Elemento DOM si no es HTTP o HTTPS,
+							// porque si es accesible remotamente no necesito el elemento, ya que se
 							// firma via referencia Externally Detached
 							if (!styleHref.startsWith(AOXAdESSigner.HTTP_PROTOCOL_PREFIX) &&
 								!styleHref.startsWith(AOXAdESSigner.HTTPS_PROTOCOL_PREFIX)) {
@@ -539,11 +542,13 @@ public final class XAdESSigner {
 						"No se ha encontrado ninguna hoja de estilo asociada al XML a firmar" //$NON-NLS-1$
 					);
 				}
+				// ************************************************
+				// ** Fin obtencion de la hoja de estilo del XML **
+				// ************************************************
 
 				// Si no hay asignado un MimeType o es el por defecto
 				// establecemos el de XML
-				if (mimeType == null
-						|| XMLConstants.DEFAULT_MIMETYPE.equals(mimeType)) {
+				if (mimeType == null || XMLConstants.DEFAULT_MIMETYPE.equals(mimeType)) {
 					mimeType = "text/xml"; //$NON-NLS-1$
 				}
 
@@ -569,6 +574,7 @@ public final class XAdESSigner {
 					}
 				}
 
+				// En Detached se crea un elemento nuevo que contiene los datos
 				if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_DETACHED)) {
 					dataElement = docum.createElement(AOXAdESSigner.DETACHED_CONTENT_ELEMENT_NAME);
 					dataElement.setAttributeNS(null, "Id", contentId); //$NON-NLS-1$
@@ -576,7 +582,22 @@ public final class XAdESSigner {
 					if (encoding != null && !"".equals(encoding)) { //$NON-NLS-1$
 						dataElement.setAttributeNS(null, AOXAdESSigner.ENCODING_STR, encoding);
 					}
-					dataElement.appendChild(docum.getDocumentElement());
+					// Si no se indica un nodo especifico se firma todo el XML
+					if (nodeToSign == null) {
+						dataElement.appendChild(docum.getDocumentElement());
+					}
+					// Si se especifica un nodo, se firma solo ese
+					else {
+						final Element nodeTbs = XAdESUtil.getElementById(docum, nodeToSign);
+						if (nodeTbs != null) {
+							dataElement.appendChild(nodeTbs);
+						}
+						else {
+							throw new InvalidXMLException(
+								"El nodo XML indicado para su firma detached (" + nodeToSign + ") no existe" //$NON-NLS-1$ //$NON-NLS-2$
+							);
+						}
+					}
 
 					// Tambien el estilo
 					if (styleElement != null) {
@@ -598,24 +619,44 @@ public final class XAdESSigner {
 						}
 					}
 				}
+				// En cualquier otro caso los datos a firmar son o el XML inicial o el
+				// nodo especifico indicado
 				else {
-					dataElement = docum.getDocumentElement();
+					// Si no se indica un nodo especifico se firma todo el XML
+					if (nodeToSign == null) {
+						dataElement = docum.getDocumentElement();
+					}
+					// Si se especifica un nodo, se firma solo ese
+					else {
+						dataElement = XAdESUtil.getElementById(docum, nodeToSign);
+						// Si el nodo indicado no existe, soltamos excepcion
+						if (dataElement == null) {
+							throw new InvalidXMLException(
+								"El nodo XML indicado para su firma (" + nodeToSign + ") no existe" //$NON-NLS-1$ //$NON-NLS-2$
+							);
+						}
+					}
 				}
 
 			}
-			// captura de error en caso de no ser un documento xml
+			// Captura de error en caso de no ser un documento XML
+			// **********************************************************
+			// ********* Contenido no XML *******************************
+			// **********************************************************
 			catch (final Exception e) {
-				if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED)) {
+				// Error cuando los datos no son XML y se pide firma enveloped o si se pide firmar
+				// un nodo XML especifico
+				if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED) || nodeToSign != null) {
 					throw new InvalidXMLException(e);
 				}
-				// para los formatos de firma internally detached y enveloping
+				// Para los formatos de firma internally detached y enveloping
 				// se trata de convertir el documento a base64
 				XAdESSigner.LOGGER.info(
 					"El documento no es un XML valido. Se convertira a Base64: " + e //$NON-NLS-1$
 				);
 
 				try {
-					// crea un nuevo nodo xml para contener los datos en base 64
+					// Crea un nuevo nodo XML para contener los datos en base 64
 					final Document docFile = dbf.newDocumentBuilder().newDocument();
 					dataElement = docFile.createElement(AOXAdESSigner.DETACHED_CONTENT_ELEMENT_NAME);
 					uri = null;
@@ -625,20 +666,16 @@ public final class XAdESSigner {
 
 					dataElement.setAttributeNS(null, "Id", contentId); //$NON-NLS-1$
 
-					// Si es base 64, lo firmamos indicando como contenido el
-					// dato pero, ya que puede
-					// poseer un formato particular o caracteres valido pero
-					// extranos para el XML,
-					// realizamos una decodificacion y recodificacion para asi
-					// homogenizar el formato.
+					// Si es base 64, lo firmamos indicando como contenido el dato pero, ya que puede
+					// poseer un formato particular o caracteres valido pero extranos para el XML,
+					// realizamos una decodificacion y recodificacion para asi homogenizar el formato.
 					if (AOUtil.isBase64(data)
 							&& (XMLConstants.BASE64_ENCODING.equals(encoding) || "base64".equalsIgnoreCase(encoding))) { //$NON-NLS-1$
 						XAdESSigner.LOGGER.info(
 							"El documento se ha indicado como Base64, se insertara como tal en el XML" //$NON-NLS-1$
 						);
 
-						// Adicionalmente, si es un base 64 intentamos obtener
-						// el tipo del contenido
+						// Adicionalmente, si es un base 64 intentamos obtener el tipo del contenido
 						// decodificado para asi reestablecer el MimeType.
 						final byte[] decodedData = Base64.decode(new String(data));
 						final MimeHelper mimeTypeHelper = new MimeHelper(decodedData);
@@ -678,9 +715,19 @@ public final class XAdESSigner {
 				}
 			}
 		}
+		// **********************************************************
+		// ********* Fin contenido no XML ***************************
+		// **********************************************************
 
 		// Firma Explicita
 		else {
+
+			// No se firman nodos sueltos en firmas explicitas
+			if (nodeToSign != null) {
+				throw new AOException(
+					"No se soporta la firma de nodos independientes en firmas XAdES explicitas" //$NON-NLS-1$
+				);
+			}
 
 			// ESTE BLOQUE CONTIENE EL PROCESO A SEGUIR EN EL MODO EXPLICITO,
 			// ESTO ES, NO FIRMAMOS LOS DATOS SINO SU HASH
@@ -690,12 +737,12 @@ public final class XAdESSigner {
 
 				final byte[] tmpData;
 				try {
-					tmpData = AOUtil.getDataFromInputStream(AOUtil
-							.loadFile(uri));
+					tmpData = AOUtil.getDataFromInputStream(AOUtil.loadFile(uri));
 				}
 				catch (final Exception e) {
 					throw new AOException(
-							"No se han podido obtener los datos de la URI externa '" + uri + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
+						"No se han podido obtener los datos de la URI externa '" + uri + "'", e //$NON-NLS-1$ //$NON-NLS-2$
+					);
 				}
 				// Vemos si hemos obtenido bien los datos de la URI
 				if (tmpData != null && tmpData.length > 0) {

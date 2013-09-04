@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<catalog xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+         xmlns:x="urn:book"> 
+<!-- START OF SCHEMA -->
+<xsd:schema targetNamespace="urn:book">
+ <xsd:element name="book">
+  <xsd:complexType>
+    <xsd:sequence>
+      <xsd:element name="author" type="xsd:string"/>
+      <xsd:element name="title" type="xsd:string"/>
+      <xsd:element name="genre" type="xsd:string"/>
+      <xsd:element name="price" type="xsd:float"/>
+      <xsd:element name="publish_date" type="xsd:date"/>
+      <xsd:element name="description" type="xsd:string"/>
+    </xsd:sequence>
+    <xsd:attribute name="id" type="xsd:ID"/>
+  </xsd:complexType>
+ </xsd:element>
+</xsd:schema>
+<!-- END OF SCHEMA -->
+   <x:book id="bk101">
+      <author>Gambardella, Matthew</author>
+      <title>XML Developer's Guide</title>
+      <genre>Computer</genre>
+      <price>44.95</price>
+      <publish_date>2000-10-01</publish_date>
+      <description>An in-depth look at creating applications with
+      XML.</description>
+   </x:book>
+</catalog>

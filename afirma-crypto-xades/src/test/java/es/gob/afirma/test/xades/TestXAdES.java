@@ -129,6 +129,44 @@ public final class TestXAdES {
             "sample-facturae-firmada.xsig.xml" //$NON-NLS-1$
     };
 
+    /** Prueba de firma de nodo indicado expl&iacute;citamente.
+     * @throws Exception */
+    @SuppressWarnings("static-method")
+	@Test
+    public void testNodeTbs() throws Exception {
+    	Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
+
+        final PrivateKeyEntry pke;
+
+        final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+        pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+
+        final AOSigner signer = new AOXAdESSigner();
+
+        final Properties p = new Properties();
+        p.put("nodeToSign", "bk101"); //$NON-NLS-1$ //$NON-NLS-2$
+
+        final byte[] data = AOUtil.getDataFromInputStream(
+    		ClassLoader.getSystemResourceAsStream("singlenodetbs.xml") //$NON-NLS-1$
+		);
+
+        final byte[] result = signer.sign(
+    		data,
+    		"SHA512withRSA", //$NON-NLS-1$
+    		pke.getPrivateKey(),
+    		pke.getCertificateChain(),
+    		p
+		);
+
+        final File f = File.createTempFile("SINGLENODE-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
+        final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
+        fos.write(result);
+        fos.flush(); fos.close();
+        System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
+
+    }
+
     /** Pruebas de cofirma.
      * @throws Exception Cuando ocurre un error */
     @SuppressWarnings("static-method")
