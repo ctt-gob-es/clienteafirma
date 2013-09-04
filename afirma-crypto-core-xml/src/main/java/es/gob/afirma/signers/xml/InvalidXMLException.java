@@ -18,10 +18,18 @@ public final class InvalidXMLException extends AOFormatFileException {
 
 	private static final long serialVersionUID = -8682543966969351726L;
 
-	/** Construye una excepci&oacute;n para notificar que se ha encontrado un objeto que no es un XML v&aacute;lido.
+	/** Construye una excepci&oacute;n para notificar que se ha encontrado un objeto
+	 * que no es un XML apto para ser firmado con los par&aacute;metros indicados.
 	 * @param e Origen de la excepci&oacute;n */
 	public InvalidXMLException(final Exception e) {
 		super("Los datos proporcionados no son un XML valido", e); //$NON-NLS-1$
+	}
+
+	/** Construye una excepci&oacute;n para notificar que se ha encontrado un objeto
+	 * que no es un XML apto para ser firmado con los par&aacute;metros indicados.
+	 * @param msg Mensaje de la excepci&oacute;n */
+	public InvalidXMLException(final String msg) {
+		super(msg);
 	}
 
 }
