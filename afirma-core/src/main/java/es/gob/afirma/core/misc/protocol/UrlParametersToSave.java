@@ -1,6 +1,7 @@
 package es.gob.afirma.core.misc.protocol;
 
 import java.net.URL;
+import java.util.Arrays;
 
 /** Par&aacute;metros para el guardado de datos. */
 public final class UrlParametersToSave {
@@ -40,9 +41,9 @@ public final class UrlParametersToSave {
 	}
 
 	/** Establece los datos a guardar.
-	 * @param data Datos a guardar */
-	void setData(final byte[] data) {
-		this.data = data;
+	 * @param dat Datos a guardar */
+	void setData(final byte[] dat) {
+		this.data = dat != null ? Arrays.copyOf(dat, dat.length) : null;
 	}
 
 	/** Establece el identificador de los datos en el servidor intermedio.
@@ -52,9 +53,9 @@ public final class UrlParametersToSave {
 	}
 
 	/** Establece la clave DES de cifrado de los datos a subir al servidor intermedio.
-	 * @param desKey Clave DES de cifrado de los datos a subir al servidor intermedio */
-	void setDesKey(final byte[] desKey) {
-		this.desKey = desKey;
+	 * @param key Clave DES de cifrado de los datos a subir al servidor intermedio */
+	void setDesKey(final byte[] key) {
+		this.desKey = key != null ? Arrays.copyOf(key, key.length) : null;
 	}
 
 	/** Establece la URL de subida al servidor intermedio.

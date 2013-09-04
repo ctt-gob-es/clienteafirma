@@ -131,7 +131,7 @@ public final class ProtocolInvocationUriParser {
 
 		// Agregamos como codigo de operacion el nombre de host de la URL
 		final String path = uri.substring(uri.indexOf("://") + "://".length(), uri.indexOf('?')); //$NON-NLS-1$ //$NON-NLS-2$
-		params.put(OPERATION_PARAM, path.substring(path.lastIndexOf("/") + 1)); //$NON-NLS-1$
+		params.put(OPERATION_PARAM, path.substring(path.lastIndexOf('/') + 1));
 
 		return params;
 	}
@@ -340,11 +340,9 @@ public final class ProtocolInvocationUriParser {
 	}
 
 	private static String verifyDefaultKeyStoreName(final Map<String, String> params) throws UnsupportedEncodingException {
-		if (params.containsKey(BROWSER_USER_AGENT)) {
-			// Analizamos el User Agent para determinar el almacen
-			if (URLDecoder.decode(params.get(BROWSER_USER_AGENT), DEFAULT_URL_ENCODING).contains("Firefox")) { //$NON-NLS-1$
-				return "Mozilla / Firefox (unificado)"; //$NON-NLS-1$
-			}
+		// Analizamos el User Agent para determinar el almacen
+		if (params.containsKey(BROWSER_USER_AGENT) && URLDecoder.decode(params.get(BROWSER_USER_AGENT), DEFAULT_URL_ENCODING).contains("Firefox")) { //$NON-NLS-1$
+			return "Mozilla / Firefox (unificado)"; //$NON-NLS-1$
 		}
 		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
 			return "Windows / Internet Explorer"; //$NON-NLS-1$

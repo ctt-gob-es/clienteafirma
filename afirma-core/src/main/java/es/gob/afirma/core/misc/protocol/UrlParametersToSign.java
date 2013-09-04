@@ -1,6 +1,7 @@
 package es.gob.afirma.core.misc.protocol;
 
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Properties;
 
 /** Par&aacute;metros de la URL de llamada a la aplicaci&oacute;n. */
@@ -108,7 +109,7 @@ public final class UrlParametersToSign {
 	}
 
 	void setDesKey(final byte[] key) {
-		this.desKey = key;
+		this.desKey = key != null ? Arrays.copyOf(key, key.length) : null;
 	}
 
 	void setSignFormat(final String format) {
@@ -122,7 +123,7 @@ public final class UrlParametersToSign {
 	/** Establece los datos a tratar (firmar, guardar, etc.).
 	 * @param dat Datos a tratar */
 	public void setData(final byte[] dat) {
-		this.data = dat;
+		this.data = dat != null ? Arrays.copyOf(dat, dat.length) : null;
 	}
 
 	void setFileId(final String fileId) {
