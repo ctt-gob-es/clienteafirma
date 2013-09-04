@@ -72,17 +72,16 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
     /** A&ntilde;ade una hoja de estilo en modo <i>enveloping</i> dentro de la
      * firma. La referencia para firmarla debe construirse de forma externa,
      * esta clase no la construye ni a&ntilde;ade
-     * @param s
-     *        XML de la hoja de estilo (si se proporciona un nulo no se
-     *        a&ntilde;ade la hoja de estilo)
-     * @param sType
-     *        Tipo (MimeType) de la hoja de estilo (puede ser nulo)
-     * @param sEncoding
-     *        Codificaci&oacute;n de la hoja de estilo (puede ser nula)
-     * @param sId
-     *        Identificador de la hoja de estilo (si se proporciona un nulo
-     *        no se a&ntilde;ade la hoja de estilo) */
-    void addStyleSheetEnvelopingOntoSignature(final Element s, final String sType, final String sEncoding, final String sId) {
+     * @param s XML de la hoja de estilo (si se proporciona un nulo no se
+     *          a&ntilde;ade la hoja de estilo)
+     * @param sType Tipo (MimeType) de la hoja de estilo (puede ser nulo)
+     * @param sEncoding Codificaci&oacute;n de la hoja de estilo (puede ser nula)
+     * @param sId Identificador de la hoja de estilo (si se proporciona un nulo
+     *            no se a&ntilde;ade la hoja de estilo) */
+    void addStyleSheetEnvelopingOntoSignature(final Element s,
+    		                                  final String sType,
+    		                                  final String sEncoding,
+    		                                  final String sId) {
         this.styleElement = s;
         if (sType != null) {
             this.styleType = sType;
@@ -101,7 +100,8 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
         }
     }
 
-    private KeyInfo newKeyInfo(final List<X509Certificate> certificates, final String keyInfoId) throws KeyException {
+    private KeyInfo newKeyInfo(final List<X509Certificate> certificates,
+    		                   final String keyInfoId) throws KeyException {
         final KeyInfoFactory keyInfoFactory = getXMLSignatureFactory().getKeyInfoFactory();
         final List<X509Certificate> x509DataList = new ArrayList<X509Certificate>();
         if (!XmlWrappedKeyInfo.PUBLIC_KEY.equals(getXmlWrappedKeyInfo())) {
@@ -116,10 +116,12 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
     }
 
     void sign(final List<X509Certificate> certificates,
-                     final PrivateKey privateKey,
-                     final String signatureMethod,
-                     final List<?> refsIdList,
-                     final String signatureIdPrefix) throws MarshalException, GeneralSecurityException, XMLSignatureException {
+              final PrivateKey privateKey,
+              final String signatureMethod,
+              final List<?> refsIdList,
+              final String signatureIdPrefix) throws MarshalException,
+                                                     GeneralSecurityException,
+                                                     XMLSignatureException {
 
         final List<?> referencesIdList = new ArrayList<Object>(refsIdList);
 
@@ -139,7 +141,14 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
         final XMLSignatureFactory fac = getXMLSignatureFactory();
 
         if (this.styleElement != null && this.styleId != null) {
-            addXMLObject(fac.newXMLObject(Collections.singletonList(new DOMStructure(this.styleElement)), this.styleId, this.styleType, this.styleEncoding));
+            addXMLObject(
+        		fac.newXMLObject(
+    				Collections.singletonList(new DOMStructure(this.styleElement)),
+    				this.styleId,
+    				this.styleType,
+    				this.styleEncoding
+				)
+    		);
         }
 
         final List<Reference> documentReferences = getReferences(referencesIdList);
@@ -194,16 +203,22 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
             this.xades.setSigningCertificate(certificate);
         }
 
-        final XMLObject xadesObject = marshalXMLSignature(this.xadesNamespace,
-                this.signedPropertiesTypeUrl, signatureIdPrefix, referencesIdList);
+        final XMLObject xadesObject = marshalXMLSignature(
+    		this.xadesNamespace,
+            this.signedPropertiesTypeUrl,
+            signatureIdPrefix,
+            referencesIdList
+        );
         addXMLObject(xadesObject);
 
         final String signatureId = getSignatureId(signatureIdPrefix);
         final String signatureValueId = getSignatureValueId(signatureIdPrefix);
 
         final XMLSignatureFactory fac = getXMLSignatureFactory();
-        final CanonicalizationMethod cm = fac.newCanonicalizationMethod(CanonicalizationMethod.INCLUSIVE,
-                (C14NMethodParameterSpec) null);
+        final CanonicalizationMethod cm = fac.newCanonicalizationMethod(
+    		CanonicalizationMethod.INCLUSIVE,
+            (C14NMethodParameterSpec) null
+        );
 
         final List<Reference> documentReferences = getReferences(referencesIdList);
         final String keyInfoId = getKeyInfoId(signatureIdPrefix);
@@ -236,11 +251,9 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
         return result;
     }
 
-    /**
-     * Indica si es necesario instalar el derreferenciador XML a medida.
-     * @return Devuelve {@code true} si se tiene que instalar el derreferenciador, {@code false}
-     * en caso contrario.
-     */
+    /** Indica si es necesario instalar el derreferenciador XML a medida.
+     * @return {@code true} si se tiene que instalar el derreferenciador, {@code false}
+     *         en caso contrario. */
     public static boolean needCustomUriDereferencer() {
     	try {
 	    	final Class<?> apacheNodeSetDataClass = Class.forName("org.jcp.xml.dsig.internal.dom.ApacheNodeSetData"); //$NON-NLS-1$

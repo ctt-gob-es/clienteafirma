@@ -300,7 +300,9 @@ public final class AOXAdESSigner implements AOSigner {
                 Security.addProvider((Provider) Class.forName("org.jcp.xml.dsig.internal.dom.XMLDSigRI").newInstance()); //$NON-NLS-1$
             }
             catch (final Exception e) {
-                LOGGER.warning("No se ha podido agregar el proveedor de firma XMLDSig necesario para firmas XML: " + e); //$NON-NLS-1$
+                LOGGER.warning(
+            		"No se ha podido agregar el proveedor de firma XMLDSig necesario para firmas XML: " + e //$NON-NLS-1$
+        		);
             }
         }
     }
@@ -660,7 +662,7 @@ public final class AOXAdESSigner implements AOSigner {
                 // afirma) asi que la firma no tiene datos
                 // else if
                 // (firstChild.getAttribute(MIMETYPE_STR).startsWith("hash/")) {
-                // elementRes = null;
+                //   elementRes = null;
                 // }
                 // si el documento es binario se deshace la codificacion en
                 // Base64 si y solo si esta declarada esta transformacion
@@ -672,7 +674,7 @@ public final class AOXAdESSigner implements AOSigner {
                 }
             }
 
-            // si es enveloped
+            // Si es enveloped
             else if (AOXAdESSigner.isEnveloped(rootSig)) {
 
             	removeEnvelopedSignatures(rootSig);
@@ -680,16 +682,16 @@ public final class AOXAdESSigner implements AOSigner {
                 elementRes = rootSig;
             }
 
-            // si es enveloping
+            // Si es enveloping
             else if (AOXAdESSigner.isEnveloping(rootSig)) {
 
-                // obtiene el nodo Object de la primera firma
+                // Obtiene el nodo Object de la primera firma
                 final Element object = (Element) rootSig.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Object").item(0); //$NON-NLS-1$
-                // si el documento es un xml se extrae como tal
+                // Si el documento es un xml se extrae como tal
                 if (object.getAttribute(MIMETYPE_STR).equals("text/xml")) { //$NON-NLS-1$
                     elementRes = (Element) object.getFirstChild();
                 }
-                // si el documento es binario se deshace la codificacion en
+                // Si el documento es binario se deshace la codificacion en
                 // Base64 si y solo si esta declarada esta transformacion
                 else {
                 	//TODO: Deshacer solo el Base64 si existe la transformacion Base64 (COMPROBAR)
@@ -731,8 +733,8 @@ public final class AOXAdESSigner implements AOSigner {
 	/** Comprueba si unos datos firmados tienen declarados una transformaci&oacute;n de tipo Base64.
      * @param rootSig Nodo raiz de la firma.
      * @param objectId Identificador de los datos.
-     * @return Devuelve {@code true} si la transformaci&oacute;n est&aacute; definida, {@code false}
-     * en caso contrario. */
+     * @return {@code true} si la transformaci&oacute;n est&aacute; definida, {@code false}
+     *         en caso contrario. */
     private static boolean isBase64TransformationDeclared(final Element rootSig, final String objectId) {
     	if (objectId == null || objectId.trim().equals("")) { //$NON-NLS-1$
     		return false;
@@ -760,9 +762,9 @@ public final class AOXAdESSigner implements AOSigner {
     }
 
     static SignatureProductionPlace getSignatureProductionPlace(final String city,
-                                                                 final String province,
-                                                                 final String postalCode,
-                                                                 final String country) {
+                                                                final String province,
+                                                                final String postalCode,
+                                                                final String country) {
         if (city == null && province == null && postalCode == null && country == null) {
             return null;
         }
@@ -770,10 +772,10 @@ public final class AOXAdESSigner implements AOSigner {
     }
 
     static SignaturePolicyIdentifier getPolicy(final String identifier,
-                                                final String identifierHash,
-                                                final String identifierHashAlgorithm,
-                                                final String description,
-                                                final String qualifier) {
+                                               final String identifierHash,
+                                               final String identifierHashAlgorithm,
+                                               final String description,
+                                               final String qualifier) {
         if (identifier == null) {
             return null;
         }
@@ -1205,17 +1207,12 @@ public final class AOXAdESSigner implements AOSigner {
 
     /** M&eacute;todo recursivo para la obtenci&oacute;n de la estructura de
      * &aacute;rbol
-     * @param i
-     *        Inicio de lectura del array de identificadores
-     * @param j
-     *        Inicio de lectura inversa del array de referencias
-     * @param arrayNodes
-     *        Array de objetos TreeNode
-     * @param arrayIds
-     *        Array de identificadores
-     * @param arrayRef
-     *        Array de referencias
-     * @return Array de objetos TreeNode */
+     * @param i Inicio de lectura del array de identificadores
+     * @param j Inicio de lectura inversa del array de referencias
+     * @param arrayNodes Array de objetos <code>TreeNode</code>
+     * @param arrayIds Array de identificadores
+     * @param arrayRef Array de referencias
+     * @return Array de objetos <code>TreeNode</code> */
     private AOTreeNode[] generateSignsTree(final int i,
                                          final int j,
                                          final List<AOTreeNode> arrayNodes,
