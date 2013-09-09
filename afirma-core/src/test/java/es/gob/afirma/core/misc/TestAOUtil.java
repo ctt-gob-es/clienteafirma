@@ -10,7 +10,7 @@
 
 package es.gob.afirma.core.misc;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.Test;
 

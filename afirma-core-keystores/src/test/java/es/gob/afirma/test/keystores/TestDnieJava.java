@@ -13,8 +13,7 @@ package es.gob.afirma.test.keystores;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
