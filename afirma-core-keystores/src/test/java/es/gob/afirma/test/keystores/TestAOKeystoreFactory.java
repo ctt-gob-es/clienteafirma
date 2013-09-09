@@ -20,7 +20,7 @@ import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -63,7 +63,7 @@ public class TestAOKeystoreFactory {
     	for (final String alias : ksm.getAliases()) {
     		System.out.println(alias);
     	}
-    	final PrivateKeyEntry pke = ksm.getKeyEntry(ksm.getAliases()[1], KeyStoreUtilities.getCertificatePC(AOKeyStore.WINDOWS, null));
+    	final PrivateKeyEntry pke = ksm.getKeyEntry(ksm.getAliases()[0], KeyStoreUtilities.getCertificatePC(AOKeyStore.WINDOWS, null));
     	System.out.println(pke.toString());
 
     }
