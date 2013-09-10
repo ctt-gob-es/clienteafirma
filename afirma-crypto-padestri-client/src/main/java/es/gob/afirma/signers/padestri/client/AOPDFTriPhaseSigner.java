@@ -13,7 +13,6 @@ package es.gob.afirma.signers.padestri.client;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
@@ -58,7 +57,6 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 	/** Nombre del par&aacute;metro que identifica la operaci&oacute;n criptogr&aacute;fica en la URL del servidor de firma. */
 	private static final String PARAMETER_NAME_CRYPTO_OPERATION = "cop"; //$NON-NLS-1$
 
-
 	private static final String HTTP_CGI = "?"; //$NON-NLS-1$
 	private static final String HTTP_EQUALS = "="; //$NON-NLS-1$
 	private static final String HTTP_AND = "&"; //$NON-NLS-1$
@@ -69,19 +67,26 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 	private static final String PARAMETER_NAME_FORMAT = "format"; //$NON-NLS-1$
 	private static final String PARAMETER_NAME_CERT = "cert"; //$NON-NLS-1$
 	private static final String PARAMETER_NAME_EXTRA_PARAM = "params"; //$NON-NLS-1$
+	private static final String PARAMETER_NAME_SESSION_DATA = "session"; //$NON-NLS-1$
 
 	private static final String PADES_FORMAT = "pades"; //$NON-NLS-1$
 
 	// Nombres de las propiedades intercambiadas con el servidor como Properties
+	
+	/** Nombre de la propiedad que contiene el n&uacute;mero de firmas proporcionadas. */
+	private static final String PROPERTY_NAME_SIGN_COUNT = "SIGN_COUNT"; //$NON-NLS-1$
 
-	/** Prefirma. */
-	private static final String PROPERTY_NAME_PRESIGN = "PRE"; //$NON-NLS-1$
-
-	/** Datos adicionales de la session de firma trifasica */
-	private static final String PROPERTY_NAME_SESSION_DATA = "SESSION"; //$NON-NLS-1$
-
+	/** Prefijo para las propiedades que almacenan prefirmas. */
+	private static final String PROPERTY_NAME_PRESIGN_PREFIX = "PRE."; //$NON-NLS-1$
+	
 	/** Firma PKCS#1. */
-	private static final String PROPERTY_NAME_PKCS1_SIGN = "PK1"; //$NON-NLS-1$
+	private static final String PROPERTY_NAME_PKCS1_SIGN_PREFIX = "PK1."; //$NON-NLS-1$
+	
+	/** Indica si la postfirma requiere la prefirma. */
+	private static final String PROPERTY_NAME_NEED_PRE = "NEED_PRE"; //$NON-NLS-1$
+	
+	/** Indica si la postfirma requiere el identificador o contenido del documento. */
+	private static final String PROPERTY_NAME_NEED_DATA = "NEED_DATA"; //$NON-NLS-1$
 
 	private static final String PDF_FILE_HEADER = "%PDF-"; //$NON-NLS-1$
 	private static final String PDF_FILE_SUFFIX = ".pdf"; //$NON-NLS-1$
@@ -108,20 +113,17 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 		if (data == null) {
 			throw new IllegalArgumentException("No se ha proporcionado el identificador de documento a firmar"); //$NON-NLS-1$
 		}
-		
-		final Properties configParams = new Properties();
-		for (final String keyParam : extraParams.keySet().toArray(new String[extraParams.size()])) {
-			configParams.setProperty(keyParam, extraParams.getProperty(keyParam));
-		}
 
+		// Comprobamos la direccion del servidor
 		final URL signServerUrl;
 		try {
-			signServerUrl = new URL(configParams.getProperty(PROPERTY_NAME_SIGN_SERVER_URL));
+			signServerUrl = new URL(extraParams.getProperty(PROPERTY_NAME_SIGN_SERVER_URL));
 		}
-		catch (final MalformedURLException e) {
-			throw new IllegalArgumentException("No se ha proporcionado la URL del servidor de firma: " + configParams.getProperty(PROPERTY_NAME_SIGN_SERVER_URL), e); //$NON-NLS-1$
+		catch (final Exception e) {
+			throw new IllegalArgumentException("No se ha proporcionado una URL valida para el servidor de firma: " + extraParams.getProperty(PROPERTY_NAME_SIGN_SERVER_URL), e); //$NON-NLS-1$
 		}
-		configParams.remove(PROPERTY_NAME_SIGN_SERVER_URL);
+
+		//TODO: Retirar del extraParams la URL del servidor de firma sin mutar el parametros de entrada
 
 		// Decodificamos el identificador del documento
 		final String documentId;
@@ -130,6 +132,7 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 		} catch (final IOException e) {
 			throw new IllegalArgumentException("Error al interpretar los datos como identificador del documento que desea firmar", e); //$NON-NLS-1$
 		}
+
 
 		// ---------
 		// PREFIRMA
@@ -140,11 +143,13 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 		try {
 			// Llamamos a una URL pasando como parametros los datos necesarios para
 			// configurar la operacion:
-			//  - Operacion trifasica (Prefirma o postfirma)
-			//  - Identificador del documento a firmar
+			//  - Operacion trifasica (prefirma o postfirma)
+			//  - Operacion criptográfica (firma, cofirma o contrafirma)
+			//  - Formato de firma
 			//  - Algoritmo de firma a utilizar
 			//  - Certificado de firma
 			//  - Parametros extra de configuracion
+			//  - Datos o identificador del documento a firmar
 			final StringBuffer urlBuffer = new StringBuffer();
 			urlBuffer.append(signServerUrl).append(HTTP_CGI).
 			append(PARAMETER_NAME_OPERATION).append(HTTP_EQUALS).append(OPERATION_PRESIGN).append(HTTP_AND).
@@ -152,10 +157,15 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 			append(PARAMETER_NAME_FORMAT).append(HTTP_EQUALS).append(PADES_FORMAT).append(HTTP_AND).
 			append(PARAMETER_NAME_ALGORITHM).append(HTTP_EQUALS).append(algorithm).append(HTTP_AND).
 			append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(Base64.encodeBytes(certChain[0].getEncoded(), Base64.URL_SAFE)).append(HTTP_AND).
-			append(PARAMETER_NAME_EXTRA_PARAM).append(HTTP_EQUALS).append(properties2Base64(configParams)).append(HTTP_AND).
 			append(PARAMETER_NAME_DOCID).append(HTTP_EQUALS).append(documentId);
-			
+
+			if (extraParams.size() > 0) {
+				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_EXTRA_PARAM).append(HTTP_EQUALS).
+				append(properties2Base64(extraParams));
+			}
+
 			preSignResult = UrlHttpManagerImpl.readUrlByPost(urlBuffer.toString());
+			urlBuffer.setLength(0);
 		}
 		catch (final CertificateEncodingException e) {
 			throw new AOException("Error decodificando el certificado del firmante: " + e, e); //$NON-NLS-1$
@@ -164,6 +174,7 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 			throw new AOException("Error en la llamada de prefirma al servidor: " + e, e); //$NON-NLS-1$
 		}
 
+		// Convertimos la respuesta del servidor en un Properties
 		final Properties preSignProperties;
 		try {
 			preSignProperties = base642Properties(new String(preSignResult));
@@ -172,28 +183,55 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 			throw new AOException("La respuesta del servidor no es valida: " + new String(preSignResult), e); //$NON-NLS-1$
 		}
 
-		// -------------------------------------------------
-		// FIRMA (este bloque se ejecuta en el dispositivo)
-		// -------------------------------------------------
+		final String needDataProperty = preSignProperties.getProperty(PROPERTY_NAME_NEED_DATA);
+		final boolean needData = needDataProperty != null && "true".equalsIgnoreCase(needDataProperty); //$NON-NLS-1$
 
-		final byte[] preSign;
-		try {
-			preSign = Base64.decode(preSignProperties.getProperty(PROPERTY_NAME_PRESIGN));
-		}
-		catch (final IOException e) {
-			throw new AOException("Error decodificando los atributos CAdES a firmar: " + e, e); //$NON-NLS-1$
+		final String needPreProperty = preSignProperties.getProperty(PROPERTY_NAME_NEED_PRE);
+		final boolean needPre = needPreProperty != null && "true".equalsIgnoreCase(needPreProperty); //$NON-NLS-1$
+
+
+		// ----------
+		// FIRMA
+		// ----------
+
+		// Es posible que se ejecute mas de una firma como resultado de haber proporcionado varios
+		// identificadores de datos o en una operacion de contrafirma.
+		int signCount = 1;
+		if (preSignProperties.containsKey(PROPERTY_NAME_SIGN_COUNT)) {
+			signCount = Integer.parseInt(preSignProperties.getProperty(PROPERTY_NAME_SIGN_COUNT));
 		}
 
-		final byte[] pkcs1sign = new AOPkcs1Signer().sign(
-				preSign,
-				algorithm,
-				key,
-				certChain,
-				null // No hay parametros en PKCS#1
-				);
-		// Creamos la peticion de postfirma
-		configParams.put(PROPERTY_NAME_PKCS1_SIGN, Base64.encode(pkcs1sign));
-		configParams.put(PROPERTY_NAME_SESSION_DATA, preSignProperties.getProperty(PROPERTY_NAME_SESSION_DATA));
+		for (int i = 0; i < signCount; i++) {
+			final String base64PreSign = preSignProperties.getProperty(PROPERTY_NAME_PRESIGN_PREFIX + i);
+			if (base64PreSign == null) {
+				throw new AOException("El servidor no ha devuelto la prefirma numero " + i + ": " + new String(preSignResult)); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+
+			final byte[] preSign;
+			try {
+				preSign = Base64.decode(base64PreSign);
+			}
+			catch (final IOException e) {
+				throw new AOException("Error decodificando la prefirma: " + e, e); //$NON-NLS-1$
+			}
+
+			final byte[] pkcs1sign = new AOPkcs1Signer().sign(
+					preSign,
+					algorithm,
+					key,
+					certChain,
+					null // No hay parametros en PKCS#1
+					);
+
+			// Configuramos la peticion de postfirma indicando las firmas PKCS#1 generadas
+			preSignProperties.setProperty(PROPERTY_NAME_PKCS1_SIGN_PREFIX + i, Base64.encode(pkcs1sign));
+			
+			// Si no es necesaria la prefirma para completar la postfirma, la eliminamos
+			if (!needPre) {
+				preSignProperties.remove(PROPERTY_NAME_PRESIGN_PREFIX + i);
+			}
+		}
+
 
 		// ---------
 		// POSTFIRMA
@@ -207,10 +245,22 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 			append(PARAMETER_NAME_CRYPTO_OPERATION).append(HTTP_EQUALS).append(CRYPTO_OPERATION_SIGN).append(HTTP_AND).
 			append(PARAMETER_NAME_FORMAT).append(HTTP_EQUALS).append(PADES_FORMAT).append(HTTP_AND).
 			append(PARAMETER_NAME_ALGORITHM).append(HTTP_EQUALS).append(algorithm).append(HTTP_AND).
-			append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(Base64.encodeBytes(certChain[0].getEncoded(), Base64.URL_SAFE)).append(HTTP_AND).
-			append(PARAMETER_NAME_EXTRA_PARAM).append(HTTP_EQUALS).append(properties2Base64(configParams)).append(HTTP_AND).
-			append(PARAMETER_NAME_DOCID).append(HTTP_EQUALS).append(documentId);
-			
+			append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(Base64.encodeBytes(certChain[0].getEncoded(), Base64.URL_SAFE));
+
+			if (extraParams.size() > 0) {
+				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_EXTRA_PARAM).append(HTTP_EQUALS).
+				append(properties2Base64(extraParams));
+			}
+
+			if (preSignProperties.size() > 0) {
+				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_SESSION_DATA).append(HTTP_EQUALS).
+				append(properties2Base64(preSignProperties));
+			}
+
+			if (needData) {
+				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_DOCID).append(HTTP_EQUALS).append(documentId);
+			}
+
 			triSignFinalResult = UrlHttpManagerImpl.readUrlByPost(urlBuffer.toString());
 			urlBuffer.setLength(0);
 		}
@@ -229,7 +279,7 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 
 		// Los datos no se devuelven, se quedan en el servidor
 		try {
-			return Base64.decode(stringTrimmedResult.replace(SUCCESS + " NEWID=", ""), Base64.URL_SAFE); //$NON-NLS-1$ //$NON-NLS-2$
+			return Base64.decode(stringTrimmedResult.substring((SUCCESS + " NEWID=").length()), Base64.URL_SAFE); //$NON-NLS-1$
 		}
 		catch (final IOException e) {
 			LOGGER.warning("El resultado de NEWID del servidor no estaba en Base64: " + e); //$NON-NLS-1$

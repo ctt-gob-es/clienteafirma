@@ -12,13 +12,10 @@ package es.gob.afirma.signers.xadestri.client;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -27,7 +24,6 @@ import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.UrlHttpManagerImpl;
 import es.gob.afirma.core.signers.AOPkcs1Signer;
-import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
@@ -37,7 +33,7 @@ import es.gob.afirma.core.util.tree.AOTreeModel;
 /**
  * Manejador de firma XAdES trif&aacute;sicas. Mediante este manejador un usuario puede firmar un documento remoto
  * indicando el identificador del documento. Este manejador requiere de un servicio remoto que genere la estructura
- * de firma en servidor. La operaci√≥n criptogr&aacute;fica de firma se realiza en el PC o dispositivo del usuario,
+ * de firma en servidor. La operaci&oacute;n criptogr&aacute;fica de firma se realiza en el PC o dispositivo del usuario,
  * por lo que la clave privada de su certificado nunca sale de este.<br/>
  * El resultado de las operaciones criptogr&aacute;ficas no es el resultado generado sino el identificador con el que
  * el resultado se ha guardado en el servidor remoto (gestor documental, sistema de ficheros,...).
@@ -83,19 +79,26 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 	private static final String PARAMETER_NAME_FORMAT = "format"; //$NON-NLS-1$
 	private static final String PARAMETER_NAME_CERT = "cert"; //$NON-NLS-1$
 	private static final String PARAMETER_NAME_EXTRA_PARAM = "params"; //$NON-NLS-1$
+	private static final String PARAMETER_NAME_SESSION_DATA = "session"; //$NON-NLS-1$
 
 	private static final String XADES_FORMAT = "XAdES"; //$NON-NLS-1$
 
 	// Nombres de las propiedades intercambiadas con el servidor como Properties
 
-	/** Prefirma. */
-	private static final String PROPERTY_NAME_PRESIGN = "PRE"; //$NON-NLS-1$
+	/** Prefijo para las propiedades que almacenan prefirmas. */
+	private static final String PROPERTY_NAME_PRESIGN_PREFIX = "PRE."; //$NON-NLS-1$
 
-	/** Nombre de la propiedad de los sesi&oacute;n necesarios para completar la firma. */
-	private static final String PROPERTY_NAME_SESSION_DATA = "SESSION"; //$NON-NLS-1$
+	/** Nombre de la propiedad que contiene el n&uacute;mero de firmas proporcionadas. */
+	private static final String PROPERTY_NAME_SIGN_COUNT = "SIGN_COUNT"; //$NON-NLS-1$
 
 	/** Firma PKCS#1. */
-	private static final String PROPERTY_NAME_PKCS1_SIGN = "PK1"; //$NON-NLS-1$
+	private static final String PROPERTY_NAME_PKCS1_SIGN_PREFIX = "PK1."; //$NON-NLS-1$
+	
+	/** Indica si la postfirma requiere la prefirma. */
+	private static final String PROPERTY_NAME_NEED_PRE = "NEED_PRE"; //$NON-NLS-1$
+
+	/** Indica si la postfirma requiere el identificador de documento. */
+	private static final String PROPERTY_NAME_NEED_DATA = "NEED_DATA"; //$NON-NLS-1$
 
 	/** Indicador de finalizaci&oacute;n correcta de proceso. */
 	private static final String SUCCESS = "OK"; //$NON-NLS-1$
@@ -182,57 +185,46 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 	}
 
 	/**
-	 * Ejecuta una operaci&oacute;n de firma/cofirma en 3 fases.
-	 * @param cryptoOperation Tipo de operaci&oacute: "sign" (firma) o "cosign" (cofirma)
+	 * Ejecuta una operaci&oacute;n de firma/multifirma en 3 fases.
+	 * @param cryptoOperation Tipo de operaci&oacute.
 	 * @param data Datos o firma sobre la que operar
 	 * @param algorithm Algoritmo de firma
 	 * @param key Clave privada del certificado de firma.
 	 * @param certChain Cadena de certificaci&oacute;n.
-	 * @param xParams Par&aacute;metros para la configuraci&oacute;n de la operaci&oacute;n.
-	 * @return
-	 * @throws AOException
+	 * @param extraParams Par&aacute;metros para la configuraci&oacute;n de la operaci&oacute;n.
+	 * @return Resultado de la operaci&oacute;n de firma.
+	 * @throws AOException Cuando se produce un error durante la operaci&oacute;n.
 	 */
 	private static byte[] triPhaseOperation(final String cryptoOperation,
 			final byte[] data,
 			final String algorithm,
 			final PrivateKey key,
 			final Certificate[] certChain,
-			final Properties xParams) throws AOException {
+			final Properties extraParams) throws AOException {
 
-		if (!CRYPTO_OPERATION_SIGN.equals(cryptoOperation) && !CRYPTO_OPERATION_COSIGN.equals(cryptoOperation)) {
-			throw new IllegalArgumentException("Operacion criptografica no soportada: " + cryptoOperation); //$NON-NLS-1$
-		}
-
-		if (xParams == null) {
+		if (extraParams == null) {
 			throw new IllegalArgumentException("Se necesitan parametros adicionales"); //$NON-NLS-1$
 		}
 		if (key == null) {
-			throw new IllegalArgumentException("Es necesario proporcionar una clave privada de firma"); //$NON-NLS-1$
+			throw new IllegalArgumentException("Es necesario proporcionar la clave privada de firma"); //$NON-NLS-1$
 		}
-
 		if (certChain == null || certChain.length == 0) {
-			throw new IllegalArgumentException("Es necesario proporcionar un certificado de firma"); //$NON-NLS-1$
+			throw new IllegalArgumentException("Es necesario proporcionar el certificado de firma"); //$NON-NLS-1$
 		}
-
 		if (data == null) {
 			throw new IllegalArgumentException("No se ha proporcionado el identificador de documento a firmar"); //$NON-NLS-1$
-		}
-
-		// Creamos una copia de los parametros
-		final Properties configParams = new Properties();
-		for (final String keyParam : xParams.keySet().toArray(new String[xParams.size()])) {
-			configParams.setProperty(keyParam, xParams.getProperty(keyParam));
 		}
 
 		// Comprobamos la direccion del servidor
 		final URL signServerUrl;
 		try {
-			signServerUrl = new URL(configParams.getProperty(PROPERTY_NAME_SIGN_SERVER_URL));
+			signServerUrl = new URL(extraParams.getProperty(PROPERTY_NAME_SIGN_SERVER_URL));
 		}
-		catch (final MalformedURLException e) {
-			throw new IllegalArgumentException("No se ha proporcionado la URL del servidor de firma: " + configParams.getProperty(PROPERTY_NAME_SIGN_SERVER_URL), e); //$NON-NLS-1$
+		catch (final Exception e) {
+			throw new IllegalArgumentException("No se ha proporcionado una URL valida para el servidor de firma: " + extraParams.getProperty(PROPERTY_NAME_SIGN_SERVER_URL), e); //$NON-NLS-1$
 		}
-		configParams.remove(PROPERTY_NAME_SIGN_SERVER_URL);
+
+		//TODO: Retirar del extraParams la URL del servidor de firma sin mutar el parametros de entrada
 
 		// Decodificamos el identificador del documento
 		final String documentId;
@@ -242,11 +234,6 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 			throw new IllegalArgumentException("Error al interpretar los datos como identificador del documento que desea firmar", e); //$NON-NLS-1$
 		}
 
-		final String algoUri = SIGN_ALGOS_URI.get(algorithm);
-		if (algoUri == null) {
-			throw new UnsupportedOperationException(
-					"Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'"); //$NON-NLS-1$ //$NON-NLS-2$
-		}
 
 		// ---------
 		// PREFIRMA
@@ -258,6 +245,7 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 			// Llamamos a una URL pasando como parametros los datos necesarios para
 			// configurar la operacion:
 			//  - Operacion trifasica (prefirma o postfirma)
+			//  - Operacion criptogr·fica (firma, cofirma o contrafirma)
 			//  - Formato de firma
 			//  - Algoritmo de firma a utilizar
 			//  - Certificado de firma
@@ -269,15 +257,13 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 			append(PARAMETER_NAME_CRYPTO_OPERATION).append(HTTP_EQUALS).append(cryptoOperation).append(HTTP_AND).
 			append(PARAMETER_NAME_FORMAT).append(HTTP_EQUALS).append(XADES_FORMAT).append(HTTP_AND).
 			append(PARAMETER_NAME_ALGORITHM).append(HTTP_EQUALS).append(algorithm).append(HTTP_AND).
-			append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(Base64.encodeBytes(certChain[0].getEncoded(), Base64.URL_SAFE));
+			append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(Base64.encodeBytes(certChain[0].getEncoded(), Base64.URL_SAFE)).append(HTTP_AND).
+			append(PARAMETER_NAME_DOCID).append(HTTP_EQUALS).append(documentId);
 
-			if (configParams.size() > 0) {
+			if (extraParams.size() > 0) {
 				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_EXTRA_PARAM).append(HTTP_EQUALS).
-				append(properties2Base64(configParams));
+				append(properties2Base64(extraParams));
 			}
-
-			urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_DOCID).append(HTTP_EQUALS).
-			append(documentId);
 
 			preSignResult = UrlHttpManagerImpl.readUrlByPost(urlBuffer.toString());
 			urlBuffer.setLength(0);
@@ -298,37 +284,55 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 			throw new AOException("La respuesta del servidor no es valida: " + new String(preSignResult), e); //$NON-NLS-1$
 		}
 
-		// -------------------------------------------
-		// FIRMA (Este bloque se hace en dispositivo)
-		// -------------------------------------------
+		final String needDataProperty = preSignProperties.getProperty(PROPERTY_NAME_NEED_DATA);
+		final boolean needData = needDataProperty != null && "true".equalsIgnoreCase(needDataProperty); //$NON-NLS-1$
 
-		// Sacamos los datos de la prefirma para firmarla
-		final String base64PreSign = preSignProperties.getProperty(PROPERTY_NAME_PRESIGN);
-		if (base64PreSign == null) {
-			throw new AOException("El servidor no ha devuelto una prefirma : " + new String(preSignResult)); //$NON-NLS-1$
+		final String needPreProperty = preSignProperties.getProperty(PROPERTY_NAME_NEED_PRE);
+		final boolean needPre = needPreProperty != null && "true".equalsIgnoreCase(needPreProperty); //$NON-NLS-1$
+
+
+		// ----------
+		// FIRMA
+		// ----------
+
+		// Es posible que se ejecute mas de una firma como resultado de haber proporcionado varios
+		// identificadores de datos o en una operacion de contrafirma.
+		int signCount = 1;
+		if (preSignProperties.containsKey(PROPERTY_NAME_SIGN_COUNT)) {
+			signCount = Integer.parseInt(preSignProperties.getProperty(PROPERTY_NAME_SIGN_COUNT));
 		}
 
-		final byte[] coreData;
-		try {
-			coreData = Base64.decode(base64PreSign);
-		}
-		catch (final IOException e) {
-			throw new AOException("Error decodificando el core de datos a firmar: " + e, e); //$NON-NLS-1$
+		for (int i = 0; i < signCount; i++) {
+			final String base64PreSign = preSignProperties.getProperty(PROPERTY_NAME_PRESIGN_PREFIX + i);
+			if (base64PreSign == null) {
+				throw new AOException("El servidor no ha devuelto la prefirma numero " + i + ": " + new String(preSignResult)); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+
+			final byte[] preSign;
+			try {
+				preSign = Base64.decode(base64PreSign);
+			}
+			catch (final IOException e) {
+				throw new AOException("Error decodificando la prefirma: " + e, e); //$NON-NLS-1$
+			}
+
+			final byte[] pkcs1sign = new AOPkcs1Signer().sign(
+					preSign,
+					algorithm,
+					key,
+					certChain,
+					null // No hay parametros en PKCS#1
+					);
+
+			// Configuramos la peticion de postfirma indicando las firmas PKCS#1 generadas
+			preSignProperties.setProperty(PROPERTY_NAME_PKCS1_SIGN_PREFIX + i, Base64.encode(pkcs1sign));
+			
+			// Si no es necesaria la prefirma para completar la postfirma, la eliminamos
+			if (!needPre) {
+				preSignProperties.remove(PROPERTY_NAME_PRESIGN_PREFIX + i);
+			}
 		}
 
-		
-		final byte[] pkcs1sign = new AOPkcs1Signer().sign(
-				coreData,
-				algorithm,
-				key,
-				certChain,
-				null // No hay parametros en PKCS#1
-				);
-		// Creamos la peticion de postfirma
-		configParams.put(PROPERTY_NAME_PKCS1_SIGN, Base64.encode(pkcs1sign));
-		if (preSignProperties.containsKey(PROPERTY_NAME_SESSION_DATA)) {
-			configParams.put(PROPERTY_NAME_SESSION_DATA, preSignProperties.getProperty(PROPERTY_NAME_SESSION_DATA));
-		}
 
 		// ---------
 		// POSTFIRMA
@@ -342,9 +346,21 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 			append(PARAMETER_NAME_CRYPTO_OPERATION).append(HTTP_EQUALS).append(cryptoOperation).append(HTTP_AND).
 			append(PARAMETER_NAME_FORMAT).append(HTTP_EQUALS).append(XADES_FORMAT).append(HTTP_AND).
 			append(PARAMETER_NAME_ALGORITHM).append(HTTP_EQUALS).append(algorithm).append(HTTP_AND).
-			append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(Base64.encodeBytes(certChain[0].getEncoded(), Base64.URL_SAFE)).append(HTTP_AND).
-			append(PARAMETER_NAME_EXTRA_PARAM).append(HTTP_EQUALS).append(properties2Base64(configParams)).append(HTTP_AND).
-			append(PARAMETER_NAME_DOCID).append(HTTP_EQUALS).append(documentId);
+			append(PARAMETER_NAME_CERT).append(HTTP_EQUALS).append(Base64.encodeBytes(certChain[0].getEncoded(), Base64.URL_SAFE));
+
+			if (extraParams.size() > 0) {
+				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_EXTRA_PARAM).append(HTTP_EQUALS).
+				append(properties2Base64(extraParams));
+			}
+
+			if (preSignProperties.size() > 0) {
+				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_SESSION_DATA).append(HTTP_EQUALS).
+				append(properties2Base64(preSignProperties));
+			}
+
+			if (needData) {
+				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_DOCID).append(HTTP_EQUALS).append(documentId);
+			}
 
 			triSignFinalResult = UrlHttpManagerImpl.readUrlByPost(urlBuffer.toString());
 			urlBuffer.setLength(0);
@@ -364,7 +380,7 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 
 		// Los datos no se devuelven, se quedan en el servidor
 		try {
-			return Base64.decode(stringTrimmedResult.replace(SUCCESS + " NEWID=", ""), Base64.URL_SAFE); //$NON-NLS-1$ //$NON-NLS-2$
+			return Base64.decode(stringTrimmedResult.substring((SUCCESS + " NEWID=").length()), Base64.URL_SAFE); //$NON-NLS-1$
 		}
 		catch (final IOException e) {
 			LOGGER.warning("El resultado de NEWID del servidor no estaba en Base64: " + e); //$NON-NLS-1$
@@ -385,46 +401,4 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 		p.load(new ByteArrayInputStream(Base64.decode(base64, Base64.URL_SAFE)));
 		return p;
 	}
-
-	private static final String URL_SHA1_RSA    = "http://www.w3.org/2000/09/xmldsig#rsa-sha1"; //$NON-NLS-1$
-	private static final String URL_MD5_RSA     = "http://www.w3.org/2001/04/xmldsig-more#rsa-md5"; //$NON-NLS-1$
-	private static final String URL_SHA256_RSA  = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"; //$NON-NLS-1$
-	private static final String URL_SHA384_RSA  = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha384"; //$NON-NLS-1$
-	private static final String URL_SHA512_RSA  = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512"; //$NON-NLS-1$
-
-	/** URIs de los algoritmos de firma */
-	public static final Map<String, String> SIGN_ALGOS_URI = new HashMap<String, String>() {
-		private static final long serialVersionUID = 1897588397257599853L;
-		{
-			put(AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, URL_SHA1_RSA);
-			// Introducimos variantes para hacerlo mas robusto
-			put("RSA", URL_SHA1_RSA); //$NON-NLS-1$
-			put("SHA-1withRSA", URL_SHA1_RSA); //$NON-NLS-1$
-			put("SHA1withRSAEncryption", URL_SHA1_RSA); //$NON-NLS-1$
-			put("SHA-1withRSAEncryption", URL_SHA1_RSA); //$NON-NLS-1$
-			put("SHAwithRSAEncryption", URL_SHA1_RSA); //$NON-NLS-1$
-			put("SHAwithRSA", URL_SHA1_RSA); //$NON-NLS-1$
-
-			put(AOSignConstants.SIGN_ALGORITHM_MD5WITHRSA, URL_MD5_RSA);
-
-			put(AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA, URL_SHA256_RSA);
-			// Introducimos variantes para hacerlo mas robusto
-			put("SHA-256withRSA", URL_SHA256_RSA); //$NON-NLS-1$
-			put("SHA256withRSAEncryption", URL_SHA256_RSA); //$NON-NLS-1$
-			put("SHA-256withRSAEncryption", URL_SHA256_RSA); //$NON-NLS-1$
-
-			put(AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA, URL_SHA384_RSA);
-			// Introducimos variantes para hacerlo mas robusto
-			put("SHA-384withRSA", URL_SHA384_RSA); //$NON-NLS-1$
-			put("SHA384withRSAEncryption", URL_SHA384_RSA); //$NON-NLS-1$
-			put("SHA-384withRSAEncryption", URL_SHA384_RSA); //$NON-NLS-1$
-
-			put(AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA, URL_SHA512_RSA);
-			// Introducimos variantes para hacerlo mas robusto
-			put("SHA-512withRSA", URL_SHA512_RSA); //$NON-NLS-1$
-			put("SHA512withRSAEncryption", URL_SHA512_RSA); //$NON-NLS-1$
-			put("SHA-512withRSAEncryption", URL_SHA512_RSA); //$NON-NLS-1$
-
-		}
-	};
 }

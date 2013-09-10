@@ -10,16 +10,19 @@
 
 package es.gob.afirma.signers.xadestri.client;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.Properties;
+
+import javax.xml.crypto.dsig.DigestMethod;
 
 import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.signers.xadestri.client.AOXAdESTriPhaseSigner;
 
 public class AOXAdESTriPhaseSignerTest {
 
@@ -30,8 +33,35 @@ public class AOXAdESTriPhaseSignerTest {
 	private static final String DATA_FILENAME = "ANF_PF_Activo.pfx"; //$NON-NLS-1$
 	private static final String SIGNATURE_FILENAME = "firma.xml"; //$NON-NLS-1$
 
-	private static final String SERVER_URL = "http://172.24.22.235:8080/SignFolderMobileProxy/SignatureService"; //$NON-NLS-1$
+	private static final String SERVER_URL = "http://10.1.46.4:8080/afirma-server-triphase-signer/SignatureService"; //$NON-NLS-1$
 
+	private static final Properties[] CONFIGS;
+	
+	static {
+		CONFIGS = new Properties[3];
+		
+		final Properties config0 = new Properties();
+		config0.setProperty("serverUrl", SERVER_URL); //$NON-NLS-1$
+		CONFIGS[0] = config0;
+		
+		final Properties config1 = new Properties();
+		config1.setProperty("serverUrl", SERVER_URL); //$NON-NLS-1$
+		config1.setProperty("format", AOSignConstants.SIGN_FORMAT_XADES_DETACHED); //$NON-NLS-1$
+		config1.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
+		config1.setProperty("policyIdentifier", "urn:oid:2.16.724.1.3.1.1.2.1.8"); //$NON-NLS-1$ //$NON-NLS-2$
+		config1.setProperty("policyIdentifierHash", "V8lVVNGDCPen6VELRD1Ja8HARFk=");  //$NON-NLS-1$//$NON-NLS-2$
+		config1.setProperty("policyIdentifierHashAlgorithm", DigestMethod.SHA1);         //$NON-NLS-1$
+		config1.setProperty("policyDescription", "Politica de firma electronica para las Administraciones Publicas en Espana"); //$NON-NLS-1$ //$NON-NLS-2$
+		config1.setProperty("policyQualifier", "http://administracionelectronica.gob.es/es/ctt/politicafirma/politica_firma_AGE_v1_8.pdf"); //$NON-NLS-1$ //$NON-NLS-2$
+		CONFIGS[1] = config1;
+		
+		final Properties config2 = new Properties();
+		config2.setProperty("serverUrl", SERVER_URL); //$NON-NLS-1$
+		config2.setProperty("format", AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING); //$NON-NLS-1$
+		config2.setProperty("mode", AOSignConstants.SIGN_MODE_EXPLICIT); //$NON-NLS-1$
+		CONFIGS[2] = config2;
+	}
+	
 	@Test
 	@Ignore
 	public void pruebaFirmaXAdES() throws Exception {
@@ -42,14 +72,21 @@ public class AOXAdESTriPhaseSignerTest {
 		ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
 		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
 
-		final Properties config = new Properties();
-		config.setProperty("serverUrl", SERVER_URL); //$NON-NLS-1$
-
 		final AOXAdESTriPhaseSigner signer = new AOXAdESTriPhaseSigner();
 
-		final byte[] result = signer.sign(data, AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, pke.getPrivateKey(), pke.getCertificateChain(), config);
+		for (Properties config : CONFIGS) {
 
-		System.out.println("Resultado:\n" + new String(result));
+			final byte[] result = signer.sign(data, AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, pke.getPrivateKey(), pke.getCertificateChain(), config);
+
+			//		System.out.println("Resultado:\n" + new String(result)); //$NON-NLS-1$
+
+			File tempFile = File.createTempFile("xades-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
+			FileOutputStream fos = new FileOutputStream(tempFile);
+			fos.write(result);
+			fos.close();
+
+			System.out.println("El resultado de la firma se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
+		}
 	}
 
 	@Test
@@ -69,6 +106,6 @@ public class AOXAdESTriPhaseSignerTest {
 
 		final byte[] result = signer.cosign(sign, AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, pke.getPrivateKey(), pke.getCertificateChain(), config);
 
-		System.out.println("Resultado:\n" + new String(result));
+		System.out.println("Resultado:\n" + new String(result)); //$NON-NLS-1$
 	}
 }

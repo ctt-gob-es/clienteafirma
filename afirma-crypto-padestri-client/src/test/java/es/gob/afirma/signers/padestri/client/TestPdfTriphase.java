@@ -33,10 +33,10 @@ public class TestPdfTriphase {
 
 	/** Nombre de la propiedad de URL del servidor de firma trif&aacute;sica. */
 	private static final String PROPERTY_NAME_SIGN_SERVER_URL = "serverUrl"; //$NON-NLS-1$
-	private static final String PROPERTY_VALUE_SIGN_SERVER_URL = "http://localhost:8080/TriPhaseSignerServer/SignatureService"; //$NON-NLS-1$
+	private static final String PROPERTY_VALUE_SIGN_SERVER_URL = "http://localhost:8080/afirma-server-triphase-signer/SignatureService"; //$NON-NLS-1$
 
 	private static final String PROPERTY_NAME_DOC_ID = "documentId"; //$NON-NLS-1$
-	//private static final String PROPERTY_VALUE_DOC_ID = "docIdPrueba"; //$NON-NLS-1$
+	private static final String PROPERTY_VALUE_DOC_ID = "docIdPrueba"; //$NON-NLS-1$
 
 	private static final String PDF_FILENAME = "TEST_PDF.pdf"; //$NON-NLS-1$
 
@@ -60,6 +60,8 @@ public class TestPdfTriphase {
 
 	private Properties serverConfig;
 
+	private byte[] data;
+	
 	/** Carga el almac&acute;n de pruebas.
 	 * @throws Exception */
 	@Before
@@ -78,12 +80,12 @@ public class TestPdfTriphase {
 		// Establecemos la configuracion
 		this.serverConfig = new Properties();
 		this.serverConfig.setProperty(PROPERTY_NAME_SIGN_SERVER_URL, PROPERTY_VALUE_SIGN_SERVER_URL);
-		//		this.serverConfig.setProperty(PROPERTY_NAME_DOC_ID, PROPERTY_VALUE_DOC_ID);
+//		this.serverConfig.setProperty(PROPERTY_NAME_DOC_ID, PROPERTY_VALUE_DOC_ID);
 
-		final String base64 = loadFileOnBase64(PDF_FILENAME);
+		this.data = loadFile(PDF_FILENAME);
 		//		final int dataLength = Base64.decode(base64, Base64.URL_SAFE).length;
 
-		this.serverConfig.setProperty(PROPERTY_NAME_DOC_ID, base64);
+//		this.serverConfig.setProperty(PROPERTY_NAME_DOC_ID, base64);
 
 		//		System.out.println("Base64 final: " + base64.substring(base64.length() - 100));
 		//
@@ -94,18 +96,16 @@ public class TestPdfTriphase {
 	/** Prueba de firma trif&aacute;sica normal.
 	 * @throws Exception */
 	@Test
-	@Ignore
 	public void firma() throws Exception {
 		final AOSigner signer = new AOPDFTriPhaseSigner();
 
 		final Properties config = new Properties();
-
 		for (final String key : this.serverConfig.keySet().toArray(new String[this.serverConfig.size()])) {
 			config.setProperty(key, this.serverConfig.getProperty(key));
 		}
 
 		final byte[] result = signer.sign(
-				null,
+				this.data,
 				"SHA512withRSA",  //$NON-NLS-1$
 				this.pke.getPrivateKey(),
 				this.pke.getCertificateChain(),
@@ -122,7 +122,6 @@ public class TestPdfTriphase {
 	/** Prueba de firma trif&aacute;sica con adjunto en el PDF.
 	 * @throws Exception */
 	@Test
-	@Ignore
 	public void firmaConAdjunto() throws Exception {
 		final AOSigner signer = new AOPDFTriPhaseSigner();
 
@@ -136,7 +135,7 @@ public class TestPdfTriphase {
 		config.setProperty(PROPERTY_NAME_ATTACH_DESCRIPTION, "Imagen adjunta de prueba"); //$NON-NLS-1$
 
 		final byte[] result = signer.sign(
-				null,
+				this.data,
 				"SHA512withRSA", //$NON-NLS-1$
 				this.pke.getPrivateKey(),
 				this.pke.getCertificateChain(),
@@ -159,6 +158,14 @@ public class TestPdfTriphase {
 		return Base64.encodeBytes(encoded, Base64.URL_SAFE);
 	}
 
+	private static byte[] loadFile(final String filename) throws Exception {
+		final InputStream is = ClassLoader.getSystemResourceAsStream(filename);
+		final byte[] encoded = AOUtil.getDataFromInputStream(is);
+		is.close();
+
+		return encoded;
+	}
+	
 	/** Prueba de firma trif&aacute;sica normal.
 	 * @throws Exception */
 	@Test
