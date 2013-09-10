@@ -476,4 +476,46 @@ public final class TestXAdES {
     	}
     }
 
+    @Test
+    @Ignore
+    public void testBasicXadesSigns() throws Exception {
+
+        final PrivateKeyEntry pke;
+        final X509Certificate cert;
+
+        final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+        pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+        cert = (X509Certificate) ks.getCertificate(CERT_ALIAS);
+    	
+    	final byte[] data = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream("xml_with_ids.xml")); //$NON-NLS-1$
+    	
+    	final String[] formats = new String[] {
+    			AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING,
+    			AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED,
+    			AOSignConstants.SIGN_FORMAT_XADES_DETACHED
+    	};
+    	
+    	Properties config = new Properties();
+    	config.setProperty("mode", "implicit"); //$NON-NLS-1$ //$NON-NLS-2$
+    	
+    	final AOXAdESSigner signer = new AOXAdESSigner();
+    	
+    	for (String format : formats) {
+    		config.setProperty("format", format); //$NON-NLS-1$
+
+    		byte[] signature = signer.sign(data,
+    				AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
+    				pke.getPrivateKey(),
+    				pke.getCertificateChain(),
+    				config
+    				);
+
+    		File f = File.createTempFile("xades-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
+    		java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
+    		fos.write(signature);
+    		fos.flush(); fos.close();
+    		System.out.println("Firma " + format + " para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
+    	}
+    }
 }
