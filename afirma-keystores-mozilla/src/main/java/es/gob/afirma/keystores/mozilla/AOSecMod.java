@@ -60,9 +60,6 @@ final class AOSecMod {
         		Platform.OS.WINDOWS.equals(Platform.getOS()) && (libName.endsWith(".DLL") || libName.endsWith(".dll")) || //$NON-NLS-1$ //$NON-NLS-2$
         		!Platform.OS.WINDOWS.equals(Platform.getOS()) && (libName.endsWith(".so") || libName.contains(".so.") || libName.endsWith(".dylib")) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		) {
-
-            // namesRunningOffset += len + 2;
-
             final String trueLibName = searchPathForFile(new String[] {
                 libName
             });
@@ -159,8 +156,6 @@ final class AOSecMod {
 
         @Override
         public String toString() {
-            // commonName + " (" + type + ", " + libraryName + ", slot " + slot
-            // + ")";
             return this.description + " (EXTERNAL, " + this.lib + ", slot 0)"; //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
