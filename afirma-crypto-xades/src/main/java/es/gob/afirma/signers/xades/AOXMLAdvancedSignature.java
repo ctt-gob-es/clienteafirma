@@ -174,6 +174,7 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
         this.signContext.putNamespacePrefix(XMLSignature.XMLNS, this.xades.getXmlSignaturePrefix());
         this.signContext.putNamespacePrefix(this.xadesNamespace, this.xades.getXadesPrefix());
         if (needCustomUriDereferencer()) {
+        	Logger.getLogger("es.gob.afirma").info("Se instala el derreferenciador a medida XML"); //$NON-NLS-1$ //$NON-NLS-2$
         	this.signContext.setURIDereferencer(new CustomDOMUriDereferencer());
         }
 
@@ -267,7 +268,6 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
     	catch (final Exception e) {
     		return false;
     	}
-    	Logger.getLogger("es.gob.afirma").info("Es necesario instalar el derreferenciador a medida XML"); //$NON-NLS-1$ //$NON-NLS-2$
     	return true;
     }
 }
