@@ -59,9 +59,6 @@ public final class CustomDOMUriDereferencer implements URIDereferencer {
 
     /** Constructor. */
     public CustomDOMUriDereferencer() {
-        // need to call com.sun.org.apache.xml.internal.security.Init.init()
-        // before calling any apache security code
-    	//com.sun.org.apache.xml.internal.security.Init.init();
         Init.init();
     }
 
@@ -72,7 +69,7 @@ public final class CustomDOMUriDereferencer implements URIDereferencer {
             throw new IllegalArgumentException("La referencia no puede ser nula"); //$NON-NLS-1$
         }
         if (context == null) {
-            throw new NullPointerException("context cannot be null"); //$NON-NLS-1$
+            throw new IllegalArgumentException("El contexto no puede ser nulo"); //$NON-NLS-1$
         }
 
         final DOMURIReference domRef = (DOMURIReference) uriRef;

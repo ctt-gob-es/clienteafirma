@@ -22,7 +22,7 @@ public final class InvalidXMLException extends AOFormatFileException {
 	 * que no es un XML apto para ser firmado con los par&aacute;metros indicados.
 	 * @param e Origen de la excepci&oacute;n */
 	public InvalidXMLException(final Exception e) {
-		super("Los datos proporcionados no son un XML valido", e); //$NON-NLS-1$
+		super("Los datos proporcionados no son un XML apto para su firma con los parametros indicados", e); //$NON-NLS-1$
 	}
 
 	/** Construye una excepci&oacute;n para notificar que se ha encontrado un objeto
