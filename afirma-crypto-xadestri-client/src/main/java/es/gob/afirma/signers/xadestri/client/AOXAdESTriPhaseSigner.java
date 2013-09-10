@@ -245,7 +245,7 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 			// Llamamos a una URL pasando como parametros los datos necesarios para
 			// configurar la operacion:
 			//  - Operacion trifasica (prefirma o postfirma)
-			//  - Operacion criptográfica (firma, cofirma o contrafirma)
+			//  - Operacion criptografica (firma, cofirma o contrafirma)
 			//  - Formato de firma
 			//  - Algoritmo de firma a utilizar
 			//  - Certificado de firma
