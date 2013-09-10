@@ -388,6 +388,25 @@ public final class AOXAdESSigner implements AOSigner {
      * @param xParams Par&aacute;metros adicionales para la firma.
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
      * <dl>
+	 *  <dt><b><i>avoidXpathExtraTransformsOnEveloped</i></b></dt>
+	 *   <dd>
+	 *    Indica si se debe evitar la inclusi&oacute;n de la transformaci&oacute;n
+	 *    XPATH2 que normalmente se a&ntilde;ade para posibilitar las cofirmas y
+	 *    que elimina todas las firmas del documento para dejar &uacute;nicamente
+	 *    el contenido. Por defecto, se encuentra a {@code false}.
+	 *   </dd>
+	 *  <dt><b><i>nodeToSign</i></b></dt>
+	 *   <dd>
+	 *    Indica un nombre de nodo a firmar, para el caso en el que quiera firmarse
+	 *    un nodo concreto en vez de todo el documento. Solo aplica a la firma de
+	 *    documentos XML.
+	 *    <br>
+	 *    El nombre nodo debe estar indicado con el valor de un atributo llamado <i>Id</i>,
+	 *    y se ignorar&aacute;n los atributos con nombre distinto, aunque se hayan declarado
+	 *    en el esquema como identificadores (con una l&iacute;nea del tipo
+	 *    <code>&lt;xs:attribute name="otronombre" type="xs:ID"/&gt;</code>), para evitar
+	 *    conflictos con el esquema de XAdES y XMLDSig.
+	 *   </dd>
      *  <dt><b><i>uri</i></b></dt>
      *   <dd>URL en la que se encuentra el documento a firmar, necesario en el caso del formato <i>XAdES Externally Detached</i></dd>
      *  <dt><b><i>format</i></b></dt>

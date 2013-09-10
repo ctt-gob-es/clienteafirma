@@ -169,10 +169,29 @@ public final class XAdESSigner {
 	 *            <code>xParams</code>:
 	 *            </p>
 	 *            <dl>
+	 *            <dt><b><i>avoidXpathExtraTransformsOnEveloped</i></b></dt>
+	 *            <dd>
+	 *             Indica si se debe evitar la inclusi&oacute;n de la transformaci&oacute;n
+	 *             XPATH2 que normalmente se a&ntilde;ade para posibilitar las cofirmas y
+	 *             que elimina todas las firmas del documento para dejar &uacute;nicamente
+	 *             el contenido. Por defecto, se encuentra a {@code false}.
+	 *            </dd>
+	 *            <dt><b><i>nodeToSign</i></b></dt>
+	 *            <dd>
+	 *             Indica un nombre de nodo a firmar, para el caso en el que quiera firmarse
+	 *             un nodo concreto en vez de todo el documento. Solo aplica a la firma de
+	 *             documentos XML.
+	 *             <br>
+	 *             El nombre nodo debe estar indicado con el valor de un atributo llamado <i>Id</i>,
+	 *             y se ignorar&aacute;n los atributos con nombre distinto, aunque se hayan declarado
+	 *             en el esquema como identificadores (con una l&iacute;nea del tipo
+	 *             <code>&lt;xs:attribute name="otronombre" type="xs:ID"/&gt;</code>), para evitar
+	 *             conflictos con el esquema de XAdES y XMLDSig.
+	 *            </dd>
 	 *            <dt><b><i>uri</i></b></dt>
 	 *            <dd>URL en la que se encuentra el documento a firmar,
 	 *            necesario en el caso del formato <i>XAdES Externally
-	 *            Detached</i></dd>
+	 *            Detached</i>.</dd>
 	 *            <dt><b><i>format</i></b></dt>
 	 *            <dd>
 	 *            Formato de firma. Se aceptan los siguientes valores:<br>
@@ -200,23 +219,23 @@ public final class XAdESSigner {
 	 *            </dd>
 	 *            <dt><b><i>policyIdentifier</i></b></dt>
 	 *            <dd>Identificador de la pol&iacute;tica de firma (normalmente
-	 *            una URL hacia la pol&iacute;tica en formato XML procesable)</dd>
+	 *            una URL hacia la pol&iacute;tica en formato XML procesable).</dd>
 	 *            <dt><b><i>policyIdentifierHash</i></b></dt>
 	 *            <dd>
 	 *            Huella digital del documento de pol&iacute;tica de firma
 	 *            (normlamente del mismo fichero en formato XML procesable). Si
 	 *            no se indica, es obligatorio que el par&aacute;metro
 	 *            <code>policyIdentifier</code> sea una URL accesible
-	 *            universalmente</dd>
+	 *            universalmente.</dd>
 	 *            <dt><b><i>policyIdentifierHashAlgorithm</i></b></dt>
 	 *            <dd>Algoritmo usado para el c&aacute;lculo de la huella
 	 *            digital indicada en el par&aacute;metro
 	 *            <code>policyIdentifierHash</code>
 	 *            <dt><b><i>policyDescription</i></b></dt>
-	 *            <dd>Descripci&oacute;n textual de la pol&iacute;tica</dd>
+	 *            <dd>Descripci&oacute;n textual de la pol&iacute;tica.</dd>
 	 *            <dt><b><i>policyQualifier</i></b></dt>
 	 *            <dd>URL hacia el documento (legible por personas, normalmente
-	 *            en formato PDF) descriptivo de la pol&iacute;tica de firma</dd>
+	 *            en formato PDF) descriptivo de la pol&iacute;tica de firma.</dd>
 	 *            <dt><b><i>includeOnlySignningCertificate</i></b></dt>
 	 *            <dd>Indica, mediante un {@code true} o {@code false}, que debe
 	 *            indicarse en la firma &uacute;nicamente el certificado utilizado
@@ -230,31 +249,31 @@ public final class XAdESSigner {
 	 *            transformaci&oacute;n de canonicalizaci&oacute;n de la firma,
 	 *            ni la transformaci&oacute;n XPATH en las firmas Enveloped.</dd>
 	 *            <dt><b><i>signerClaimedRole</i></b></dt>
-	 *            <dd>Cargo atribuido para el firmante</dd>
+	 *            <dd>Cargo atribuido para el firmante.</dd>
 	 *            <dt><b><i>signerCertifiedRole</i></b></dt>
-	 *            <dd>Cargo confirmado para el firmante</dd>
+	 *            <dd>Cargo confirmado para el firmante.</dd>
 	 *            <dt><b><i>precalculatedHashAlgorithm</i></b></dt>
 	 *            <dd>Algoritmo de huella digital cuando esta se proporciona
-	 *            precalculada</dd>
+	 *            precalculada.</dd>
 	 *            <dt><b><i>signatureProductionCity</i></b></dt>
-	 *            <dd>Ciudad en la que se realiza la firma</dd>
+	 *            <dd>Ciudad en la que se realiza la firma.</dd>
 	 *            <dt><b><i>signatureProductionProvince</i></b></dt>
-	 *            <dd>Provincia en la que se realiza la firma</dd>
+	 *            <dd>Provincia en la que se realiza la firma.</dd>
 	 *            <dt><b><i>signatureProductionPostalCode</i></b></dt>
-	 *            <dd>C&oacute;digo postal en el que se realiza la firma</dd>
+	 *            <dd>C&oacute;digo postal en el que se realiza la firma.</dd>
 	 *            <dt><b><i>signatureProductionCountry</i></b></dt>
-	 *            <dd>Pa&iacute;s en el que se realiza la firma</dd>
+	 *            <dd>Pa&iacute;s en el que se realiza la firma.</dd>
 	 *            <dt><b><i>xmlTransforms</i></b></dt>
 	 *            <dd>N&uacute;mero de transformaciones a aplicar al XML antes
-	 *            de firmarlo</dd>
+	 *            de firmarlo.</dd>
 	 *            <dt><b><i>xmlTransform</i>n<i>Type</i></b></dt>
 	 *            <dd>Tipo de la transformaci&oacute;n <i>n</i> (debe ser la URL
-	 *            del algoritmo segun define W3C)</dd>
+	 *            del algoritmo segun define W3C).</dd>
 	 *            <dt><b><i>xmlTransform</i>n<i>Subtype</i></b></dt>
 	 *            <dd>Subtipo de la transformaci&oacute;n <i>n</i> (por ejemplo,
-	 *            "intersect", "subtract" o "union" para XPATH2)</dd>
+	 *            "intersect", "subtract" o "union" para XPATH2).</dd>
 	 *            <dt><b><i>xmlTransform</i>n<i>Body</i></b></dt>
-	 *            <dd>Cuerpo de la transformaci&oacute;n <i>n</i></dd>
+	 *            <dd>Cuerpo de la transformaci&oacute;n <i>n</i>.</dd>
 	 *            <dt><b><i>referencesDigestMethod</i></b></dt>
 	 *            <dd>
 	 *            Algoritmo de huella digital a usar en las referencias XML
@@ -272,15 +291,15 @@ public final class XAdESSigner {
 	 *            <dt><b><i>mimeType</i></b></dt>
 	 *            <dd>
 	 *            MIME-Type de los datos a firmar. Si no se indica se realiza
-	 *            una auto-detecci&oacute;n cuyo resultado puede ser inexacto</dd>
+	 *            una auto-detecci&oacute;n cuyo resultado puede ser inexacto.</dd>
 	 *            <dt><b><i>encoding</i></b></dt>
 	 *            <dd>
-	 *            Codificaci&oacute;n de los datos a firmar</dd>
+	 *            Codificaci&oacute;n de los datos a firmar.</dd>
 	 *            <dt><b><i>contentTypeOid</i></b>
 	 *            <dt>
-	 *            <dd>OID que identifica el tipo de datos a firmar</dd>
+	 *            <dd>OID que identifica el tipo de datos a firmar.</dd>
 	 *            <dt><b><i>canonicalizationAlgorithm</i></b></dt>
-	 *            <dd>Algoritmo de canonicalizaci&oacute;n</dd>
+	 *            <dd>Algoritmo de canonicalizaci&oacute;n.</dd>
 	 *            <dt><b><i>xadesNamespace</i></b></dt>
 	 *            <dd>
 	 *            URL de definici&oacute;n del espacio de nombres de XAdES (y
@@ -304,13 +323,13 @@ public final class XAdESSigner {
 	 *            Ignora las hojas de estilo externas de los XML (no las firma)
 	 *            si se establece a <code>true</code>, si se establece a
 	 *            <code>false</code> act&uacute;a normalmente (s&iacute; las
-	 *            firma)</dd>
+	 *            firma).</dd>
 	 *            <dt><b><i>avoidBase64Transforms</i></b></dt>
 	 *            <dd>
 	 *            No declara transformaciones Base64 incluso si son necesarias
 	 *            si se establece a <code>true</code>, si se establece a
 	 *            <code>false</code> act&uacute;a normalmente (s&iacute; las
-	 *            declara)</dd>
+	 *            declara).</dd>
 	 *            <dt><b><i>headLess</i></b></dt>
 	 *            <dd>
 	 *            Evita cualquier interacci&oacute;n con el usuario si se
@@ -318,7 +337,7 @@ public final class XAdESSigner {
 	 *            <code>false</code> act&uacute;a normalmente (puede mostrar
 	 *            di&aacute;logos, por ejemplo, para la dereferenciaci&oacute;n
 	 *            de hojas de estilo enlazadas con rutas relativas). &Uacute;til
-	 *            para los procesos desatendidos y por lotes</dd>
+	 *            para los procesos desatendidos y por lotes.</dd>
 	 *            <dt><b><i>applySystemDate</i></b></dt>
 	 *            <dd>
 	 *            Indica si se debe introducir en la firma el atributo
@@ -391,6 +410,8 @@ public final class XAdESSigner {
 
 		final Properties extraParams = xParams != null ? xParams : new Properties();
 
+		final boolean avoidXpathExtraTransformsOnEveloped = Boolean.parseBoolean(extraParams.getProperty(
+				"avoidXpathExtraTransformsOnEveloped", Boolean.FALSE.toString())); //$NON-NLS-1$
 		final String nodeToSign = extraParams.getProperty(
 				"nodeToSign"); //$NON-NLS-1$
 		final String format = extraParams.getProperty(
@@ -475,7 +496,6 @@ public final class XAdESSigner {
 						"El nodo XML indicado para su firma (" + nodeToSign + ") no existe" //$NON-NLS-1$ //$NON-NLS-2$
 					);
 				}
-
 
 				// ************************************************
 				// **** Obtencion de la hoja de estilo del XML ****
@@ -564,7 +584,7 @@ public final class XAdESSigner {
 					encoding = docum.getXmlEncoding();
 				}
 
-				// Hacemos la comprobacion del base64 por si se establecido desde fuera
+				// Hacemos la comprobacion del Base64 por si se establecido desde fuera
 				if (encoding != null && !XMLConstants.BASE64_ENCODING.equals(encoding)) {
 					originalXMLProperties.put(OutputKeys.ENCODING, encoding);
 				}
@@ -801,7 +821,9 @@ public final class XAdESSigner {
 		// ***************************************************
 		// ***************************************************
 
-		final String tmpUri = "#" + contentId; //$NON-NLS-1$
+		// La URI de contenido a firmat puede ser el nodo especifico si asi se indico o el
+		// nodo de contenido completo
+		final String tmpUri = "#" + (nodeToSign != null ? nodeToSign : contentId); //$NON-NLS-1$
 		final String tmpStyleUri = "#" + styleId; //$NON-NLS-1$
 
 		// Crea el nuevo documento de firma
@@ -898,20 +920,20 @@ public final class XAdESSigner {
 
 				// Si los datos se han convertido a base64, bien por ser
 				// binarios o explicitos
-				if (isBase64) {
-					structures.add(new DOMStructure(dataElement.getFirstChild()));
-				}
-				else {
-					structures.add(new DOMStructure(dataElement));
-				}
+				structures.add(
+					new DOMStructure(
+						isBase64 ? dataElement.getFirstChild() : dataElement
+					)
+				);
 
 				final String objectId = "Object-" + UUID.randomUUID().toString(); //$NON-NLS-1$
 				envelopingObject = fac.newXMLObject(structures, objectId, mimeType, encoding);
 
-				// crea la referencia al nuevo elemento Object
+				// Crea la referencia al nuevo elemento Object o al nodo especifico a firmar
+				// si asi se hubiese indicado
 				referenceList.add(
 					fac.newReference(
-						"#" + objectId, //$NON-NLS-1$
+						"#" + (nodeToSign != null ? nodeToSign : objectId), //$NON-NLS-1$
 						digestMethod,
 						transformList,
 						AOXAdESSigner.OBJURI,
@@ -993,7 +1015,8 @@ public final class XAdESSigner {
 					docSignature.getDocumentElement().appendChild(
 						docSignature.adoptNode(dataElement)
 					);
-					// Crea la referencia a los datos firmados que se encontraran en el mismo documento
+					// Crea la referencia a los datos firmados que se encontraran en el mismo
+					// documento
 					referenceList.add(
 						fac.newReference(
 							tmpUri,
@@ -1151,7 +1174,9 @@ public final class XAdESSigner {
 			}
 			referenceList.add(ref);
 
-			// Hojas de estilo remotas en Externally Detached
+			// *******************************************************
+			// **** Hojas de estilo remotas en Externally Detached ***
+			// *******************************************************
 			if (styleHref != null && styleElement == null) {
 				// Comprobamos que la URL es valida
 				if (styleHref.startsWith(AOXAdESSigner.HTTP_PROTOCOL_PREFIX) ||
@@ -1179,6 +1204,9 @@ public final class XAdESSigner {
 					);
 				}
 			}
+			// *******************************************************
+			// ** Fin hojas de estilo remotas en Externally Detached *
+			// *******************************************************
 
 		}
 
@@ -1196,9 +1224,10 @@ public final class XAdESSigner {
 					)
 				);
 
-				// Salvo que sea una factura electronica, se agrega una transformacion XPATH
-				// para eliminar el resto de firmas del documento
-				if (!facturaeSign) {
+				// Salvo que sea una factura electronica o se haya indicado lo contrario,
+				// se agrega una transformacion XPATH para eliminar el resto de firmas del
+				// documento en las firmas Enveloped
+				if (!facturaeSign && !avoidXpathExtraTransformsOnEveloped) {
 					transformList.add(
 						fac.newTransform(
 							Transform.XPATH,
@@ -1216,7 +1245,7 @@ public final class XAdESSigner {
 				// Crea la referencia
 				referenceList.add(
 					fac.newReference(
-						"", //$NON-NLS-1$
+						nodeToSign != null ? "#" + nodeToSign : "", //$NON-NLS-1$ //$NON-NLS-2$
 						digestMethod,
 						transformList,
 						null,
@@ -1230,7 +1259,9 @@ public final class XAdESSigner {
 				);
 			}
 
-			// Hojas de estilo remotas para enveloped
+			// *******************************************************
+			// ******** Hojas de estilo remotas en Enveloped *********
+			// *******************************************************
 			if (styleHref != null
 					&& styleElement == null
 					&& (styleHref
@@ -1254,6 +1285,9 @@ public final class XAdESSigner {
 					);
 				}
 			}
+			// *******************************************************
+			// ****** Fin hojas de estilo remotas en Enveloped *******
+			// *******************************************************
 
 		}
 
@@ -1385,9 +1419,13 @@ public final class XAdESSigner {
 					}
 				}
 
-				// Si es enveloped hay que anadir la hoja de estilo dentro de la firma y
-				// referenciarla
+				// *******************************************************
+				// *********** Hojas de estilo en Enveloped **************
+				// *******************************************************
 				if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED) && styleElement != null) {
+
+					// Si es enveloped hay que anadir la hoja de estilo dentro de la firma y
+					// referenciarla
 
 					xmlSignature.addStyleSheetEnvelopingOntoSignature(
 						styleElement,
@@ -1413,6 +1451,9 @@ public final class XAdESSigner {
 						);
 					}
 				}
+				// *******************************************************
+				// ********* Fin hojas de estilo en Enveloped ************
+				// *******************************************************
 
 				// Genera la firma
 				try {
@@ -1422,6 +1463,7 @@ public final class XAdESSigner {
 							Boolean.FALSE.toString()
 						)
 					);
+
 					if (onlySignningCert) {
 						xmlSignature.sign(
 							(X509Certificate) certChain[0],
