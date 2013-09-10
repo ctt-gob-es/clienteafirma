@@ -470,6 +470,13 @@ public final class XAdESSigner {
 					new ByteArrayInputStream(data)
 				);
 
+				if (nodeToSign != null && XAdESUtil.getElementById(docum, nodeToSign) == null) {
+					throw new InvalidXMLException(
+						"El nodo XML indicado para su firma (" + nodeToSign + ") no existe" //$NON-NLS-1$ //$NON-NLS-2$
+					);
+				}
+
+
 				// ************************************************
 				// **** Obtencion de la hoja de estilo del XML ****
 				// ************************************************
@@ -582,22 +589,8 @@ public final class XAdESSigner {
 					if (encoding != null && !"".equals(encoding)) { //$NON-NLS-1$
 						dataElement.setAttributeNS(null, AOXAdESSigner.ENCODING_STR, encoding);
 					}
-					// Si no se indica un nodo especifico se firma todo el XML
-					if (nodeToSign == null) {
-						dataElement.appendChild(docum.getDocumentElement());
-					}
-					// Si se especifica un nodo, se firma solo ese
-					else {
-						final Element nodeTbs = XAdESUtil.getElementById(docum, nodeToSign);
-						if (nodeTbs != null) {
-							dataElement.appendChild(nodeTbs);
-						}
-						else {
-							throw new InvalidXMLException(
-								"El nodo XML indicado para su firma detached (" + nodeToSign + ") no existe" //$NON-NLS-1$ //$NON-NLS-2$
-							);
-						}
-					}
+
+					dataElement.appendChild(docum.getDocumentElement());
 
 					// Tambien el estilo
 					if (styleElement != null) {
@@ -622,20 +615,7 @@ public final class XAdESSigner {
 				// En cualquier otro caso los datos a firmar son o el XML inicial o el
 				// nodo especifico indicado
 				else {
-					// Si no se indica un nodo especifico se firma todo el XML
-					if (nodeToSign == null) {
-						dataElement = docum.getDocumentElement();
-					}
-					// Si se especifica un nodo, se firma solo ese
-					else {
-						dataElement = XAdESUtil.getElementById(docum, nodeToSign);
-						// Si el nodo indicado no existe, soltamos excepcion
-						if (dataElement == null) {
-							throw new InvalidXMLException(
-								"El nodo XML indicado para su firma (" + nodeToSign + ") no existe" //$NON-NLS-1$ //$NON-NLS-2$
-							);
-						}
-					}
+					dataElement = docum.getDocumentElement();
 				}
 
 			}
@@ -759,10 +739,8 @@ public final class XAdESSigner {
 			else if (precalculatedHashAlgorithm != null) {
 				digestValue = data;
 			}
-			// El hash de los datos, ni una URI a traves de la que calcularlos,
-			// entonces lo calculamos
-			// a traves de los datos introducidos (Siempre se calcula el SHA-1
-			// de los datos)
+			// El hash de los datos, ni una URI a traves de la que calcularlos,entonces lo calculamos
+			// a traves de los datos introducidos (Siempre se calcula el SHA-1 de los datos)
 			else {
 				try {
 					digestValue = MessageDigest.getInstance("SHA1").digest(data); //$NON-NLS-1$
@@ -792,14 +770,10 @@ public final class XAdESSigner {
 			dataElement = docFile.createElement(AOXAdESSigner.DETACHED_CONTENT_ELEMENT_NAME);
 
 			encoding = XMLConstants.BASE64_ENCODING;
-			// En el caso de la firma explicita, se firma el Hash de los datos
-			// en lugar de los propios datos.
-			// En este caso, los indicaremos a traves del MimeType en donde
-			// establecemos un tipo especial
-			// que designa al hash. Independientemente del algoritmo de firma
-			// utilizado, el Hash de las firmas
-			// explicitas de datos siempre sera SHA1, salvo que el hash se haya
-			// establecido desde fuera.
+			// En el caso de la firma explicita, se firma el Hash de los datos en lugar de los propios datos.
+			// En este caso, los indicaremos a traves del MimeType en donde establecemos un tipo especial
+			// que designa al hash. Independientemente del algoritmo de firma utilizado, el Hash de las firmas
+			// explicitas de datos siempre sera SHA1, salvo que el hash se haya establecido desde fuera.
 			String hashAlgoUri;
 			if (precalculatedHashAlgorithm != null) {
 				mimeType = "hash/" + precalculatedHashAlgorithm.toLowerCase(); //$NON-NLS-1$
@@ -866,18 +840,26 @@ public final class XAdESSigner {
 		// Primero anadimos las transformaciones a medida
 		Utils.addCustomTransforms(transformList, extraParams, AOXAdESSigner.XML_SIGNATURE_PREFIX);
 
+		final Transform canonicalizationTransform;
+		try {
+			canonicalizationTransform = fac.newTransform(
+				canonicalizationAlgorithm,
+				(TransformParameterSpec) null
+			);
+		}
+		catch (final Exception e1) {
+			throw new AOException(
+				"No se ha posido crear el canonizador para el algoritmo indicado (" + canonicalizationAlgorithm + "): " + e1, e1 //$NON-NLS-1$ //$NON-NLS-2$
+			);
+		}
+
 		// Solo canonicalizo si es XML
 		if (!isBase64) {
 			// Las facturas electronicas no se canonicalizan
 			if (!facturaeSign) {
 				try {
 					// Transformada para la canonicalizacion inclusiva
-					transformList.add(
-						fac.newTransform(
-							canonicalizationAlgorithm,
-							(TransformParameterSpec) null
-						)
-					);
+					transformList.add(canonicalizationTransform);
 				}
 				catch (final Exception e) {
 					XAdESSigner.LOGGER.severe(
@@ -890,8 +872,12 @@ public final class XAdESSigner {
 		// transformacion
 		else if (wasEncodedToBase64 && !avoidBase64Transforms) {
 			try {
-				transformList.add(fac.newTransform(Transform.BASE64,
-						(TransformParameterSpec) null));
+				transformList.add(
+					fac.newTransform(
+						Transform.BASE64,
+						(TransformParameterSpec) null
+					)
+				);
 			}
 			catch (final Exception e) {
 				XAdESSigner.LOGGER.severe(
@@ -933,7 +919,9 @@ public final class XAdESSigner {
 					)
 				);
 
-				// Vamos con la hoja de estilo
+				// ******************************************************************
+				// ************** Hojas de estilo ***********************************
+				// ******************************************************************
 				if (styleElement != null) {
 					final String objectStyleId = "StyleObject-" + UUID.randomUUID().toString(); //$NON-NLS-1$
 					envelopingStyleObject = fac.newXMLObject(
@@ -948,43 +936,51 @@ public final class XAdESSigner {
 						fac.newReference(
 							"#" + objectStyleId, //$NON-NLS-1$
 							digestMethod,
-							Collections.singletonList(
-								fac.newTransform(canonicalizationAlgorithm,
-								(TransformParameterSpec) null
-							)
-						),
-											AOXAdESSigner.OBJURI, referenceStyleId));
+							Collections.singletonList(canonicalizationTransform),
+							AOXAdESSigner.OBJURI,
+							referenceStyleId
+						)
+					);
 
 				}
-			} catch (final Exception e) {
+				// ******************************************************************
+				// ************** Fin hojas de estilo ***********************************
+				// ******************************************************************
+			}
+			catch (final Exception e) {
 				throw new AOException(
-						"Error al generar la firma en formato enveloping", e); //$NON-NLS-1$
+					"Error al generar la firma en formato enveloping", e //$NON-NLS-1$
+				);
 			}
 
-			// Hojas de estilo para enveloping en Externally Detached
+			// ******************************************************************
+			// ***** Hojas de estilo para enveloping en Externally Detached *****
+			// ******************************************************************
 			if (styleHref != null
 					&& styleElement == null
-					&& (styleHref
-							.startsWith(AOXAdESSigner.HTTP_PROTOCOL_PREFIX) || styleHref
-							.startsWith(AOXAdESSigner.HTTPS_PROTOCOL_PREFIX))) { // Comprobamos
-				// si
-				// la
-				// referencia
-				// al
-				// estilo
-				// es
-				// externa
+					&& (styleHref.startsWith(AOXAdESSigner.HTTP_PROTOCOL_PREFIX) ||
+						styleHref.startsWith(AOXAdESSigner.HTTPS_PROTOCOL_PREFIX))) {
+				// Comprobamos Si la referencia al estilo es externa
 				try {
-					referenceList.add(fac.newReference(styleHref, digestMethod,
-							Collections.singletonList(fac.newTransform(
-									canonicalizationAlgorithm,
-									(TransformParameterSpec) null)), null,
-									referenceStyleId));
-				} catch (final Exception e) {
-					XAdESSigner.LOGGER
-					.severe("No ha sido posible anadir la referencia a la hoja de estilo del XML, esta no se firmara: " + e); //$NON-NLS-1$
+					referenceList.add(
+						fac.newReference(
+							styleHref,
+							digestMethod,
+							Collections.singletonList(canonicalizationTransform),
+							null,
+							referenceStyleId
+						)
+					);
+				}
+				catch (final Exception e) {
+					XAdESSigner.LOGGER.severe(
+						"No ha sido posible anadir la referencia a la hoja de estilo del XML, esta no se firmara: " + e //$NON-NLS-1$
+					);
 				}
 			}
+			// ******************************************************************
+			// *** Fin hojas de estilo para enveloping en Externally Detached ***
+			// ******************************************************************
 
 		}
 
@@ -993,12 +989,11 @@ public final class XAdESSigner {
 		else if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_DETACHED)) {
 			try {
 				if (dataElement != null) {
-					// inserta en el nuevo documento de firma el documento a
-					// firmar
+					// Inserta en el nuevo documento de firma el documento a firmar
 					docSignature.getDocumentElement().appendChild(
-							docSignature.adoptNode(dataElement));
-					// crea la referencia a los datos firmados que se
-					// encontraran en el mismo documento
+						docSignature.adoptNode(dataElement)
+					);
+					// Crea la referencia a los datos firmados que se encontraran en el mismo documento
 					referenceList.add(
 						fac.newReference(
 							tmpUri,
@@ -1009,94 +1004,102 @@ public final class XAdESSigner {
 						)
 					);
 				}
+
+				// ******************************************************************
+				// ************** Hojas de estilo ***********************************
+				// ******************************************************************
 				if (styleElement != null) {
-					// inserta en el nuevo documento de firma la hoja de estilo
+					// Inserta en el nuevo documento de firma la hoja de estilo
 					docSignature.getDocumentElement().appendChild(
 						docSignature.adoptNode(styleElement)
 					);
-					// crea la referencia a los datos firmados que se
-					// encontraran en el mismo documento
+					// Crea la referencia a los datos firmados que se encontraran en el mismo documento
 					referenceList.add(
 						fac.newReference(
 							tmpStyleUri,
 							digestMethod,
-							Collections.singletonList(
-								fac.newTransform(
-									canonicalizationAlgorithm,
-									(TransformParameterSpec) null
-								)
-							),
+							Collections.singletonList(canonicalizationTransform),
 							null,
 							referenceStyleId
 						)
 					);
 				}
-
+				// ******************************************************************
+				// ************** Fin hojas de estilo *******************************
+				// ******************************************************************
 			}
 			catch (final Exception e) {
 				throw new AOException(
-						"Error al generar la firma en formato detached implicito", e); //$NON-NLS-1$
+					"Error al generar la firma en formato detached implicito", e //$NON-NLS-1$
+				);
 			}
 
-			// Hojas de estilo remotas para detached
+			// ******************************************************************
+			// ************* Hojas de estilo remotas para Detached **************
+			// ******************************************************************
 			if (styleHref != null
 					&& styleElement == null
-					&& (styleHref
-							.startsWith(AOXAdESSigner.HTTP_PROTOCOL_PREFIX) || styleHref
-							.startsWith(AOXAdESSigner.HTTPS_PROTOCOL_PREFIX))) {
+					&& (styleHref.startsWith(AOXAdESSigner.HTTP_PROTOCOL_PREFIX) ||
+						styleHref.startsWith(AOXAdESSigner.HTTPS_PROTOCOL_PREFIX))) {
 				// Comprobamos si la referencia al estilo es externa
 				try {
-					referenceList.add(fac.newReference(styleHref, digestMethod,
-							Collections.singletonList(fac.newTransform(
-									canonicalizationAlgorithm,
-									(TransformParameterSpec) null)), null,
-									referenceStyleId));
+					referenceList.add(
+						fac.newReference(
+							styleHref,
+							digestMethod,
+							Collections.singletonList(canonicalizationTransform),
+							null,
+							referenceStyleId
+						)
+					);
 				}
 				catch (final Exception e) {
-					XAdESSigner.LOGGER
-					.severe("No ha sido posible anadir la referencia a la hoja de estilo del XML, esta no se firmara: " + e); //$NON-NLS-1$
+					XAdESSigner.LOGGER.severe(
+						"No ha sido posible anadir la referencia a la hoja de estilo del XML, esta no se firmara: " + e //$NON-NLS-1$
+					);
 				}
 			}
+			// ******************************************************************
+			// *********** Fin hojas de estilo remotas para Detached ************
+			// ******************************************************************
 
 		}
 
 		// Crea una referencia al documento mediante la URI externa si la
 		// tenemos o usando un Message Digest
 		// precalculado si no tenemos otro remedio
-		else if (format
-				.equals(AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED)) {
+		else if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED)) {
 			Reference ref = null;
 			// No tenemos uri, suponemos que los datos son el message digest
-			if (precalculatedHashAlgorithm != null
-					&& (uri == null || uri.getScheme().equals("") || uri.getScheme().equals("file"))) { //$NON-NLS-1$ //$NON-NLS-2$
+			if (precalculatedHashAlgorithm != null &&
+					(uri == null ||
+			         uri.getScheme().equals("") || //$NON-NLS-1$
+			         uri.getScheme().equals("file"))) { //$NON-NLS-1$
 				DigestMethod dm = null;
 				try {
-					// Convertimos el algo del Message Digest externo a la
-					// nomenclatura XML
-					if (AOSignConstants.getDigestAlgorithmName(
-							precalculatedHashAlgorithm)
-							.equalsIgnoreCase("SHA1")) { //$NON-NLS-1$
+					// Convertimos el algo del Message Digest externo a la nomenclatura XML
+					if (AOSignConstants.getDigestAlgorithmName(precalculatedHashAlgorithm).equalsIgnoreCase("SHA1")) { //$NON-NLS-1$
 						dm = fac.newDigestMethod(DigestMethod.SHA1, null);
-					} else if (AOSignConstants.getDigestAlgorithmName(
-							precalculatedHashAlgorithm).equalsIgnoreCase(
-									"SHA-256")) { //$NON-NLS-1$
+					}
+					else if (AOSignConstants.getDigestAlgorithmName(precalculatedHashAlgorithm).equalsIgnoreCase("SHA-256")) { //$NON-NLS-1$
 						dm = fac.newDigestMethod(DigestMethod.SHA256, null);
-					} else if (AOSignConstants.getDigestAlgorithmName(
-							precalculatedHashAlgorithm).equalsIgnoreCase(
-									"SHA-512")) { //$NON-NLS-1$
+					}
+					else if (AOSignConstants.getDigestAlgorithmName(precalculatedHashAlgorithm).equalsIgnoreCase("SHA-512")) { //$NON-NLS-1$
 						dm = fac.newDigestMethod(DigestMethod.SHA512, null);
-					} else if (AOSignConstants.getDigestAlgorithmName(
-							precalculatedHashAlgorithm).equalsIgnoreCase(
-									"RIPEMD160")) { //$NON-NLS-1$
+					}
+					else if (AOSignConstants.getDigestAlgorithmName(precalculatedHashAlgorithm).equalsIgnoreCase("RIPEMD160")) { //$NON-NLS-1$
 						dm = fac.newDigestMethod(DigestMethod.RIPEMD160, null);
 					}
-				} catch (final Exception e) {
+				}
+				catch (final Exception e) {
 					throw new AOException(
-							"No se ha podido crear el metodo de huella digital para la referencia Externally Detached", e); //$NON-NLS-1$
+						"No se ha podido crear el metodo de huella digital para la referencia Externally Detached", e //$NON-NLS-1$
+					);
 				}
 				if (dm == null) {
 					throw new AOException(
-							"Metodo de Message Digest para la referencia Externally Detached no soportado: " + precalculatedHashAlgorithm); //$NON-NLS-1$
+						"Metodo de Message Digest para la referencia Externally Detached no soportado: " + precalculatedHashAlgorithm //$NON-NLS-1$
+					);
 				}
 				ref = fac.newReference("", dm, null, null, referenceId, data); //$NON-NLS-1$
 			}
@@ -1104,79 +1107,86 @@ public final class XAdESSigner {
 			// por lo que es una referencia externa accesible
 			else {
 				// Si es una referencia de tipo file:// obtenemos el fichero y
-				// creamos una referencia solo con
-				// el message digest
+				// creamos una referencia solo con el message digest
 				if (uri != null && uri.getScheme().equals("file")) { //$NON-NLS-1$
 					try {
-						ref = fac
-								.newReference(
-										"", //$NON-NLS-1$
-										digestMethod,
-										null,
-										null,
-										referenceId,
-										MessageDigest
-										.getInstance(
-												AOSignConstants
-												.getDigestAlgorithmName(digestMethodAlgorithm))
-												.digest(AOUtil
-														.getDataFromInputStream(AOUtil
-																.loadFile(uri))));
-					} catch (final Exception e) {
+						ref = fac.newReference(
+							"", //$NON-NLS-1$
+							digestMethod,
+							null,
+							null,
+							referenceId,
+							MessageDigest.getInstance(
+								AOSignConstants.getDigestAlgorithmName(digestMethodAlgorithm)
+							).digest(
+								AOUtil.getDataFromInputStream(
+									AOUtil.loadFile(uri)
+								)
+							)
+						);
+					}
+					catch (final Exception e) {
 						throw new AOException(
-								"No se ha podido crear la referencia XML a partir de la URI local (" + uri.toASCIIString() + ")", e); //$NON-NLS-1$ //$NON-NLS-2$
+							"No se ha podido crear la referencia XML a partir de la URI local (" + uri.toASCIIString() + ")", e //$NON-NLS-1$ //$NON-NLS-2$
+						);
 					}
 				}
-				// Si es una referencia distinta de file:// suponemos que es
-				// dereferenciable de forma universal
+				// Si es una referencia distinta de file:// suponemos que es dereferenciable de forma universal
 				// por lo que dejamos que Java lo haga todo
 				else if (uri != null) {
 					try {
-						ref = fac.newReference(uri.toASCIIString(),
-								digestMethod);
-					} catch (final Exception e) {
+						ref = fac.newReference(uri.toASCIIString(), digestMethod);
+					}
+					catch (final Exception e) {
 						throw new AOException(
-								"No se ha podido crear la referencia Externally Detached, probablemente por no obtenerse el metodo de digest", //$NON-NLS-1$
-								e);
+							"No se ha podido crear la referencia Externally Detached, probablemente por no obtenerse el metodo de digest", e //$NON-NLS-1$
+						);
 					}
 				}
 			}
 			if (ref == null) {
 				throw new AOException(
-						"Error al generar la firma Externally Detached, no se ha podido crear la referencia externa"); //$NON-NLS-1$
+					"Error al generar la firma Externally Detached, no se ha podido crear la referencia externa" //$NON-NLS-1$
+				);
 			}
 			referenceList.add(ref);
 
 			// Hojas de estilo remotas en Externally Detached
 			if (styleHref != null && styleElement == null) {
 				// Comprobamos que la URL es valida
-				if (styleHref.startsWith(AOXAdESSigner.HTTP_PROTOCOL_PREFIX)
-						|| styleHref
-						.startsWith(AOXAdESSigner.HTTPS_PROTOCOL_PREFIX)) {
+				if (styleHref.startsWith(AOXAdESSigner.HTTP_PROTOCOL_PREFIX) ||
+					styleHref.startsWith(AOXAdESSigner.HTTPS_PROTOCOL_PREFIX)) {
 					try {
-						referenceList.add(fac.newReference(styleHref,
+						referenceList.add(
+							fac.newReference(
+								styleHref,
 								digestMethod,
-								Collections.singletonList(fac.newTransform(
-										canonicalizationAlgorithm,
-										(TransformParameterSpec) null)), null,
-										referenceStyleId));
-					} catch (final Exception e) {
-						XAdESSigner.LOGGER
-						.severe("No ha sido posible anadir la referencia a la hoja de estilo del XML, esta no se firmara: " + e); //$NON-NLS-1$
+								Collections.singletonList(canonicalizationTransform),
+								null,
+								referenceStyleId
+							)
+						);
 					}
-				} else {
-					XAdESSigner.LOGGER
-					.warning("Se necesita una referencia externa HTTP o HTTPS a la hoja de estilo para referenciarla en firmas XML Externally Detached"); //$NON-NLS-1$
+					catch (final Exception e) {
+						XAdESSigner.LOGGER.severe(
+							"No ha sido posible anadir la referencia a la hoja de estilo del XML, esta no se firmara: " + e //$NON-NLS-1$
+						);
+					}
+				}
+				else {
+					XAdESSigner.LOGGER.warning(
+						"Se necesita una referencia externa HTTP o HTTPS a la hoja de estilo para referenciarla en firmas XML Externally Detached" //$NON-NLS-1$
+					);
 				}
 			}
 
 		}
 
-		// crea una referencia indicando que se trata de una firma enveloped
+		// Crea una referencia indicando que se trata de una firma enveloped
 		else if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED)) {
 			try {
 
-				// Transformacion enveloped
+				// Transformacion enveloped.
 				// La enveloped siempre la primera, para que no se quede sin
 				// nodos Signature por haber ejecutado antes otra transformacion
 				transformList.add(
@@ -1186,8 +1196,7 @@ public final class XAdESSigner {
 					)
 				);
 
-				// Salvo que sea una factura electronica, se agrega una
-				// transformacion XPATH
+				// Salvo que sea una factura electronica, se agrega una transformacion XPATH
 				// para eliminar el resto de firmas del documento
 				if (!facturaeSign) {
 					transformList.add(
@@ -1217,7 +1226,8 @@ public final class XAdESSigner {
 			}
 			catch (final Exception e) {
 				throw new AOException(
-						"Error al generar la firma en formato enveloped", e); //$NON-NLS-1$
+					"Error al generar la firma en formato enveloped", e //$NON-NLS-1$
+				);
 			}
 
 			// Hojas de estilo remotas para enveloped
@@ -1232,12 +1242,7 @@ public final class XAdESSigner {
 						fac.newReference(
 							styleHref,
 							digestMethod,
-							Collections.singletonList(
-								fac.newTransform(
-									canonicalizationAlgorithm,
-									(TransformParameterSpec) null
-								)
-							),
+							Collections.singletonList(canonicalizationTransform),
 							null,
 							referenceStyleId
 						)
@@ -1333,8 +1338,7 @@ public final class XAdESSigner {
 			}
 		}
 		final ObjectIdentifierImpl objectIdentifier = oid != null ? new ObjectIdentifierImpl(
-				"OIDAsURN", (oid.startsWith("urn:oid:") ? "" : "urn:oid:") + oid, null, new ArrayList<String>(0)) : null; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-
+			"OIDAsURN", (oid.startsWith("urn:oid:") ? "" : "urn:oid:") + oid, null, new ArrayList<String>(0)) : null; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
 				final ArrayList<DataObjectFormat> objectFormats = new ArrayList<DataObjectFormat>();
 				final DataObjectFormat objectFormat = new DataObjectFormatImpl(
@@ -1353,7 +1357,8 @@ public final class XAdESSigner {
 				}
 				catch (final Exception e) {
 					throw new AOException(
-							"No se ha podido instanciar la firma XML Avanzada de JXAdES", e); //$NON-NLS-1$
+						"No se ha podido instanciar la firma XML Avanzada de JXAdES", e //$NON-NLS-1$
+					);
 				}
 
 				// Establecemos el tipo de propiedades firmadas
@@ -1362,11 +1367,13 @@ public final class XAdESSigner {
 				try {
 					xmlSignature.setDigestMethod(digestMethodAlgorithm);
 					xmlSignature.setCanonicalizationMethod(canonicalizationAlgorithm);
-				} catch (final Exception e) {
-					XAdESSigner.LOGGER
-					.severe("No se ha podido establecer el algoritmo de huella digital (" + algoUri //$NON-NLS-1$
+				}
+				catch (final Exception e) {
+					XAdESSigner.LOGGER.severe(
+						"No se ha podido establecer el algoritmo de huella digital (" + algoUri //$NON-NLS-1$
 							+ "), es posible que el usado en la firma difiera del indicado: " //$NON-NLS-1$
-							+ e);
+							+ e
+					);
 				}
 
 				// en el caso de formato enveloping se inserta el elemento Object con el
@@ -1380,28 +1387,41 @@ public final class XAdESSigner {
 
 				// Si es enveloped hay que anadir la hoja de estilo dentro de la firma y
 				// referenciarla
-				if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED)
-						&& styleElement != null) {
-					xmlSignature.addStyleSheetEnvelopingOntoSignature(styleElement,
-							styleType, styleEncoding, styleId);
+				if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED) && styleElement != null) {
+
+					xmlSignature.addStyleSheetEnvelopingOntoSignature(
+						styleElement,
+						styleType,
+						styleEncoding,
+						styleId
+					);
 
 					try {
-						referenceList.add(fac.newReference(tmpStyleUri, digestMethod,
-								Collections.singletonList(fac.newTransform(
-										canonicalizationAlgorithm,
-										(TransformParameterSpec) null)), null,
-										referenceStyleId));
+						referenceList.add(
+							fac.newReference(
+								tmpStyleUri,
+								digestMethod,
+								Collections.singletonList(canonicalizationTransform),
+								null,
+								referenceStyleId
+							)
+						);
 					}
 					catch (final Exception e) {
-						XAdESSigner.LOGGER
-						.severe("No se ha podido anadir una referencia a la hoja de estilo, esta se incluira dentro de la firma, pero no estara firmada: " + e); //$NON-NLS-1$
+						XAdESSigner.LOGGER.severe(
+							"No se ha podido anadir una referencia a la hoja de estilo, esta se incluira dentro de la firma, pero no estara firmada: " + e //$NON-NLS-1$
+						);
 					}
 				}
 
 				// Genera la firma
 				try {
-					final boolean onlySignningCert = Boolean.parseBoolean(extraParams
-							.getProperty("includeOnlySignningCertificate", Boolean.FALSE.toString())); //$NON-NLS-1$
+					final boolean onlySignningCert = Boolean.parseBoolean(
+						extraParams.getProperty(
+							"includeOnlySignningCertificate", //$NON-NLS-1$
+							Boolean.FALSE.toString()
+						)
+					);
 					if (onlySignningCert) {
 						xmlSignature.sign(
 							(X509Certificate) certChain[0],
@@ -1423,7 +1443,8 @@ public final class XAdESSigner {
 				}
 				catch (final NoSuchAlgorithmException e) {
 					throw new UnsupportedOperationException(
-							"Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
+						"Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'", e //$NON-NLS-1$ //$NON-NLS-2$
+					);
 				}
 				catch (final Exception e) {
 					throw new AOException("Error al generar la firma XAdES: " + e, e); //$NON-NLS-1$
@@ -1448,8 +1469,9 @@ public final class XAdESSigner {
 						}
 					}
 					catch (final Exception e) {
-						XAdESSigner.LOGGER
-						.info("No se ha eliminado el nodo padre '<AFIRMA>': " + e); //$NON-NLS-1$
+						XAdESSigner.LOGGER.info(
+							"No se ha eliminado el nodo padre '<AFIRMA>': " + e //$NON-NLS-1$
+						);
 					}
 				}
 
