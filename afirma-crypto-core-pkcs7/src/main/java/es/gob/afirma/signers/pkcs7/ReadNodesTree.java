@@ -61,8 +61,6 @@ public final class ReadNodesTree {
         this.seleccionados = seleccionados.clone();
     }
 
-    // DefaultTreeModel modelo;
-
     String getStringRetorn() {
         return this.stringRetorn;
     }
