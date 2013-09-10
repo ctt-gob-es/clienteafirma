@@ -48,10 +48,10 @@ public final class Base64 {
 
 
     /** No options specified. Value is zero. */
-    private static final int NO_OPTIONS = 0;
+    public static final int NO_OPTIONS = 0;
 
     /** Do break lines when encoding. Value is 8. */
-    private static final int DO_BREAK_LINES = 8;
+    public static final int DO_BREAK_LINES = 8;
 
     /**
      * Encode using Base64-like encoding that is URL- and Filename-safe as described
