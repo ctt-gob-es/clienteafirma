@@ -1,0 +1,4678 @@
+Signature-Version: 1.0
+SHA1-Digest-Manifest-Main-Attributes: QD2NCbxQE/YHIsnyTJDhpcRlMZk=
+Created-By: 1.6.0_25 (Sun Microsystems Inc.)
+SHA1-Digest-Manifest: ExlSCJ8nOpgZuQmpL4Su2goXwJQ=
+
+Name: org/bouncycastle/asn1/ocsp/ResponderID.class
+SHA1-Digest: HLrMUV7ZGXrcV1hNFKJMzTD5P8E=
+
+Name: org/bouncycastle/operator/jcajce/JcaContentVerifierProviderBuild
+ er$SignatureOutputStream.class
+SHA1-Digest: +TiHg4AIMx73A9RCRJuWLnJXG2Q=
+
+Name: com/lowagie/text/pdf/PdfTable.class
+SHA1-Digest: 8Y/JIt9i9sVGpGfo7tOIeF/h0MA=
+
+Name: org/bouncycastle/asn1/x9/X962NamedCurves$5.class
+SHA1-Digest: CEXOsNCXXJOPwAU+hKwaBzX4Cy4=
+
+Name: com/lowagie/text/pdf/IntHashtable$Entry.class
+SHA1-Digest: 6be74D4bhUm+uwbXHOAQ+844508=
+
+Name: org/bouncycastle/cms/jcajce/EnvelopedDataHelper.class
+SHA1-Digest: XKwDiYNrhxyBLDqp1BEkTXWUWMU=
+
+Name: com/lowagie/text/pdf/crypto/IVGenerator.class
+SHA1-Digest: r+YN4iSRCZ32FQXoteTNJaNcLkU=
+
+Name: com/lowagie/text/exceptions/UnsupportedPdfException.class
+SHA1-Digest: +7L90aoNXUle8X46Imyapcrgfjw=
+
+Name: com/lowagie/text/pdf/PdfContentByte$GraphicState.class
+SHA1-Digest: nh0WqE0+5LBD/ZVqv+GqFArO5j0=
+
+Name: net/java/xades/util/ResourceHelper$JarResourceEntry.class
+SHA1-Digest: sgbSxKKfOk1LO+5gzXlPNqnPteM=
+
+Name: net/java/xades/util/ResourceHelper.class
+SHA1-Digest: pFD2IuaRg9nOn7mPSA2+R32OE5Q=
+
+Name: java/com/lowagie/text/pdf/fonts/Courier-Bold.afm
+SHA1-Digest: ASoGezCPWOhl9yp3CsydSUq46+k=
+
+Name: com/lowagie/text/xml/simpleparser/SimpleXMLDocHandlerComment.cla
+ ss
+SHA1-Digest: K0jOgZEGbzhGP+YrESoF6C5Y+VM=
+
+Name: org/bouncycastle/util/IPAddress.class
+SHA1-Digest: V+e61fCbpu4uQzcsIIqbHSdoYw8=
+
+Name: org/mozilla/universalchardet/prober/distributionanalysis/JISDist
+ ributionAnalysis.class
+SHA1-Digest: U13vpZeBFcvKeT/VBHuRiluj9PM=
+
+Name: com/lowagie/text/SimpleCell.class
+SHA1-Digest: CneEeLh9wkmBMTHCnoz+6727kCM=
+
+Name: com/lowagie/text/pdf/TrueTypeFont.class
+SHA1-Digest: e/BewaWVXAaEBHWSbz1COaADBJ0=
+
+Name: org/bouncycastle/crypto/Digest.class
+SHA1-Digest: FvJ1cuL9YRumioKEO0eOI6fth8o=
+
+Name: org/bouncycastle/asn1/x9/X962NamedCurves$7.class
+SHA1-Digest: n1V7uY2TCQwjNBX4BW6/e/XxDQ4=
+
+Name: es/gob/afirma/core/misc/Platform$JREVER.class
+SHA1-Digest: Q+AZRWnHMUAlnbrtFHZVpFKU3RY=
+
+Name: org/bouncycastle/asn1/BERSetParser.class
+SHA1-Digest: 4Mui8LaSbI/YwOzP3EOmjQj4lc0=
+
+Name: net/java/xades/security/xml/XAdES/SignatureProductionPlaceImpl.c
+ lass
+SHA1-Digest: NqJEIX7B1IYagCygjP0wMGq8d7g=
+
+Name: java/com/lowagie/text/MPL-1.1.txt
+SHA1-Digest: PiC7JBwjtSzOUWP6b1oDKJUfl7Q=
+
+Name: org/bouncycastle/cms/CMSUtils.class
+SHA1-Digest: zmJA8/6mIic5jOlLhift2E/x6qA=
+
+Name: org/bouncycastle/asn1/misc/VerisignCzagExtension.class
+SHA1-Digest: GmD1GCYLqrwmTjyObij061hBv5s=
+
+Name: com/lowagie/text/MarkedObject.class
+SHA1-Digest: 2QBqXRBVafgwCR1F1nw29yzvxKw=
+
+Name: org/bouncycastle/cert/AttributeCertificateIssuer.class
+SHA1-Digest: 6AsYPnaFnmR4R9Ut4Ls0T0JSoAs=
+
+Name: com/lowagie/text/pdf/ArabicLigaturizer$charstruct.class
+SHA1-Digest: zxcv+oXnlFDN1hw+v9CFwbNnXQY=
+
+Name: es/gob/afirma/core/signers/CounterSignTarget.class
+SHA1-Digest: /a7tAMeQqF/zkcVUger5ETpXdSc=
+
+Name: org/bouncycastle/crypto/generators/PKCS5S2ParametersGenerator.cl
+ ass
+SHA1-Digest: mR6mO0pMgx9T+hu7BFLwbKfSY1k=
+
+Name: org/bouncycastle/crypto/digests/SHA256Digest.class
+SHA1-Digest: b/7/ZvoqHxB6dIMq0AZ7t2UzskQ=
+
+Name: org/bouncycastle/crypto/engines/GOST28147Engine.class
+SHA1-Digest: EKvWbJgfcvAKvPh/aLXMxD7CRCE=
+
+Name: com/lowagie/text/Table.class
+SHA1-Digest: nUB3WgvNCh6jOiXiAh116zYso9c=
+
+Name: java/es/gob/afirma/signers/pades/doc-files/package-info-1.png
+SHA1-Digest: vcI3t0P9zbvyxQd2LO+78V2Dew8=
+
+Name: net/java/xades/security/xml/XAdES/CompleteCertificateRefs.class
+SHA1-Digest: lOI3N1Mm2pznJvk1J5uCLZOxeVA=
+
+Name: net/java/xades/security/xml/XAdES/ExtendedXAdESImpl.class
+SHA1-Digest: wa11ozQkxEVVXi9TWwdpyxwHFTc=
+
+Name: org/bouncycastle/asn1/x509/PolicyQualifierInfo.class
+SHA1-Digest: b8Ia7WgQODdta8ssQT/MpUFT3/g=
+
+Name: org/bouncycastle/asn1/sec/SECNamedCurves$31.class
+SHA1-Digest: Sw2ZGmY6IN3Kc93s90OgC2rVxnQ=
+
+Name: es/gob/afirma/core/ui/AOUIFactory.class
+SHA1-Digest: i/7FoyPkloJYmVbrVq3HvHpVQds=
+
+Name: org/bouncycastle/asn1/x509/Targets.class
+SHA1-Digest: YUiKIPvSPsUdW1dFmE5o/uvykO8=
+
+Name: com/lowagie/text/pdf/CFFFont$SubrMarkerItem.class
+SHA1-Digest: 7ECj+Hf77P7luTkzBqtLHVUOp4g=
+
+Name: org/bouncycastle/util/Arrays.class
+SHA1-Digest: lbg4DWbEfomIB+Wg6LGaCCWYEMo=
+
+Name: org/bouncycastle/util/encoders/Encoder.class
+SHA1-Digest: BXFMlc6+MTGYCp8VFRfXwe/F9Mw=
+
+Name: net/java/xades/security/xml/XAdES/CommitmentTypeId.class
+SHA1-Digest: R59XRzzmPejvrhXiXIi2OOotq1k=
+
+Name: org/bouncycastle/operator/OutputEncryptor.class
+SHA1-Digest: 4rMDxA3C6hiUM3zlTBkYcWadxLQ=
+
+Name: org/bouncycastle/asn1/ASN1SequenceParser.class
+SHA1-Digest: Rbnl/OZYcEs5XWY60aaeVKhh5Qw=
+
+Name: java/com/lowagie/text/pdf/fonts/Helvetica-BoldOblique.afm
+SHA1-Digest: CkHn+/MgIlmZHVwkl3nHZMARcMY=
+
+Name: org/bouncycastle/asn1/DERApplicationSpecific.class
+SHA1-Digest: zLmSHsGLV0lR1xNzwdgRLjyDTts=
+
+Name: com/lowagie/text/pdf/crypto/ARCFOUREncryption.class
+SHA1-Digest: FU/QEzQ2DPNoD8iIu9gM8QPjajM=
+
+Name: org/bouncycastle/asn1/sec/SECNamedCurves$22.class
+SHA1-Digest: 3k66ay0jzSm29I9BbdMvBh/jGGQ=
+
+Name: org/bouncycastle/asn1/ASN1StreamParser.class
+SHA1-Digest: sdlq67EQV/3KojgKeqiT6dTKTMQ=
+
+Name: org/bouncycastle/util/io/TeeOutputStream.class
+SHA1-Digest: mznAju9aqnqOwSREm2tG3TFD1/M=
+
+Name: com/lowagie/text/pdf/parser/PdfContentStreamProcessor$TextMoveNe
+ xtLine.class
+SHA1-Digest: j169LFIjEpkj+HRdzQw3DB3ulQA=
+
+Name: org/bouncycastle/cms/CMSProcessableByteArray.class
+SHA1-Digest: 0fKEQ1j0jsCRP70Wy43zpE8Ot+Y=
+
+Name: org/mozilla/universalchardet/prober/statemachine/SMModel.class
+SHA1-Digest: zJLIgLnQmLd0VgIjBAvFpyrTRwI=
+
+Name: com/lowagie/text/Element.class
+SHA1-Digest: 9gB/yzpEfFfUwqEGuYjvfrYnVts=
+
+Name: org/bouncycastle/asn1/DERFactory.class
+SHA1-Digest: I8P/QnUKBmVXl684UFP+KKNgWNQ=
+
+Name: com/lowagie/text/pdf/PdfStamperImp$PageStamp.class
+SHA1-Digest: qzo0/t954NZqyT1umhaMm2Gvm9w=
+
+Name: org/bouncycastle/asn1/x509/CRLReason.class
+SHA1-Digest: CkClGa3GYMBHvI+9CoB1raaXVFQ=
+
+Name: java/es/gob/afirma/signers/cades/doc-files/CAdESTriPhaseSigner-2
+ .png
+SHA1-Digest: Z5TsXEAphoVyhrJLZwmjFJEM/v8=
+
+Name: org/bouncycastle/tsp/TimeStampRequestGenerator.class
+SHA1-Digest: x1uDKPkei61FAi01nNedXRhNsrk=
+
+Name: org/bouncycastle/cms/SimpleAttributeTableGenerator.class
+SHA1-Digest: v0XFvt6GXjx7MsUXGuiYuEG2e9A=
+
+Name: org/bouncycastle/crypto/DataLengthException.class
+SHA1-Digest: 74ZK2o/DZUoh8aX980FHdCbbKas=
+
+Name: org/bouncycastle/asn1/x509/CRLNumber.class
+SHA1-Digest: UzMKjsg5n5JmYfCAUuhQEol1ylI=
+
+Name: org/bouncycastle/cms/CMSEnvelopedDataGenerator.class
+SHA1-Digest: boigU8iqjKmHaf43yBth3dVkgSU=
+
+Name: com/lowagie/text/pdf/PdfFormField.class
+SHA1-Digest: sYyy/aY94gs1ybTeBSwlVWOWsz8=
+
+Name: org/bouncycastle/asn1/x509/Time.class
+SHA1-Digest: UB6MbUiaR1Z1f1x5f6A0ITUC0Rw=
+
+Name: es/gob/afirma/miniapplet/SelectPrivateKeyAction.class
+SHA1-Digest: 8RKir1Uan8cAM+4NY2U2a9zfJ/s=
+
+Name: com/lowagie/text/pdf/CJKFont.class
+SHA1-Digest: FVBBypWdlqvfyzdtP6ieD7mip5I=
+
+Name: org/bouncycastle/asn1/cms/RecipientIdentifier.class
+SHA1-Digest: alixpRWd8xqV2SRZAEzo6z6gqhw=
+
+Name: es/gob/afirma/miniapplet/InvalidExternalLibraryException.class
+SHA1-Digest: UQ80fHrr7PRTn2Lsx5hSEz0V1mQ=
+
+Name: org/bouncycastle/asn1/cms/CMSObjectIdentifiers.class
+SHA1-Digest: 2eG9KDLAO7nsA366LSGbSua4LIo=
+
+Name: org/bouncycastle/crypto/modes/CBCBlockCipher.class
+SHA1-Digest: kgNH4M65/4+SfyihksBhB13VEqc=
+
+Name: com/lowagie/text/pdf/CFFFont$IndexOffsetItem.class
+SHA1-Digest: wiOwlSmz02/S0U03elUX6x1KZ4w=
+
+Name: com/lowagie/text/pdf/PdfStamper.class
+SHA1-Digest: fXukFJtVF8aRkOuH6NFqhqG3LTg=
+
+Name: org/bouncycastle/cms/KEKRecipientInformation.class
+SHA1-Digest: rztA/BeHKA9eVLfK2ZXqpKkrzBo=
+
+Name: com/lowagie/text/xml/xmp/XmpReader.class
+SHA1-Digest: 5HDtD3V01JOECS3ITOmDzhoSZ30=
+
+Name: com/lowagie/text/pdf/MappedRandomAccessFile$1.class
+SHA1-Digest: 0rn4mS/5/MHY/i67plwwiau9/jM=
+
+Name: com/lowagie/text/pdf/CFFFont$OffsetItem.class
+SHA1-Digest: 2BQw0IVyR2d5HZ+2qYgz+agKSFE=
+
+Name: com/lowagie/text/pdf/parser/PdfContentStreamProcessor$TextMoveSt
+ artNextLineWithLeading.class
+SHA1-Digest: OVI4uK2rFewzA6ynxHELbPxJMo4=
+
+Name: org/bouncycastle/cms/CMSAttributeTableGenerationException.class
+SHA1-Digest: R2j1WxpGs6GhlQy0MgpZsiA6P+4=
+
+Name: org/bouncycastle/asn1/DERT61String.class
+SHA1-Digest: 9uCAlV9vGVEbL12JoKg2VpA+pno=
+
+Name: com/lowagie/text/Jpeg.class
+SHA1-Digest: f+EFdLc8nSUernpj6FEqNDSHTvI=
+
+Name: es/gob/afirma/signers/xml/InvalidXMLException.class
+SHA1-Digest: UIQ45B2yVqpR2VxLf/pFxqYDtWk=
+
+Name: com/lowagie/text/pdf/PdfOCProperties.class
+SHA1-Digest: lCrNztnGLFAz1iyqwo0M7pqON1o=
+
+Name: org/bouncycastle/cert/CertIOException.class
+SHA1-Digest: hM75s8zuYdz1Sr0c32LXC/RlL/Q=
+
+Name: es/gob/afirma/core/misc/Platform$OS.class
+SHA1-Digest: 5PoKLkNgjpMXvAxCvShqtkICozg=
+
+Name: org/bouncycastle/cms/SignerInformationStore.class
+SHA1-Digest: eYA0L0c60Nkt28AVOW4+HQ0VUxA=
+
+Name: org/bouncycastle/asn1/cms/KeyAgreeRecipientIdentifier.class
+SHA1-Digest: SDHcY2zvcKspTCe7928GwFVvUBQ=
+
+Name: org/bouncycastle/jce/provider/X509CertificateObject.class
+SHA1-Digest: 44YbxQwXArQYxm874JqgfCBEgkw=
+
+Name: org/bouncycastle/jce/provider/X509CRLParser.class
+SHA1-Digest: yZ1AweXta0G0FjbSRdGlBTrI6Mo=
+
+Name: com/lowagie/text/pdf/PdfDestination.class
+SHA1-Digest: J6D/19Y+BvDo0KqxWYSTk46TjbE=
+
+Name: org/mozilla/universalchardet/prober/SBCSGroupProber.class
+SHA1-Digest: 8NYRM7XvmN/M3CqwjV/wJati8tY=
+
+Name: org/bouncycastle/asn1/x509/PolicyQualifierId.class
+SHA1-Digest: aZyez3JORP923EXhr+ivQykqCKk=
+
+Name: net/java/xades/security/xml/XAdES/CommitmentTypeIdDetails.class
+SHA1-Digest: uI9pQOdAv4ekeMc9HExiAIt1QpU=
+
+Name: es/gob/afirma/ui/core/jse/CertificateSelectionPanel$CertificateL
+ ine.class
+SHA1-Digest: kh3RbEaVLrD3OIfbagJA3wbqrlg=
+
+Name: org/bouncycastle/operator/DefaultSignatureAlgorithmIdentifierFin
+ der.class
+SHA1-Digest: 5K2K0H7rbEdpU+T3DBgaKwl8HzQ=
+
+Name: com/lowagie/text/pdf/codec/TIFFConstants.class
+SHA1-Digest: 56ivgk3OIU3O5GNTFWx64rzeSyw=
+
+Name: es/gob/afirma/core/misc/Platform$1.class
+SHA1-Digest: Zym2mIp3Hf6E/TLRsTRltJgM4a8=
+
+Name: com/lowagie/text/pdf/FontDetails.class
+SHA1-Digest: crRVgKN8aMd/KeOAheYjT9XNH28=
+
+Name: org/bouncycastle/asn1/x500/style/X500NameTokenizer.class
+SHA1-Digest: e5V/pqdZaWLlXrCeuit4Ca8IrJ4=
+
+Name: net/java/xades/security/xml/XmlWrappedKeyInfo.class
+SHA1-Digest: rl2PGUAohOX4sbkjjYYNLBNezV4=
+
+Name: org/bouncycastle/asn1/cms/AttributeTable.class
+SHA1-Digest: zAkt/GSC1GYkOUKYA0HJ+ouAWQI=
+
+Name: org/bouncycastle/operator/jcajce/OperatorUtils.class
+SHA1-Digest: OMQmF5AhaKEY/7NwkQsceARiGBI=
+
+Name: org/bouncycastle/asn1/tsp/Accuracy.class
+SHA1-Digest: hJ1K7EsX/Zi2t6xNmq1+U3eBQfI=
+
+Name: net/java/xades/security/xml/XAdES/CompleteCertificateRefsImpl.cl
+ ass
+SHA1-Digest: DkKDNohesj1JNe5GGSIDfCNLZ7Y=
+
+Name: org/bouncycastle/x509/X509StoreParameters.class
+SHA1-Digest: PZXFBPQKy6LO8j6STZbXpF0sdrQ=
+
+Name: org/bouncycastle/asn1/ocsp/OCSPResponse.class
+SHA1-Digest: 22AtENWXMykpjGpi2VijM3HfF60=
+
+Name: com/lowagie/text/pdf/Pfm2afm.class
+SHA1-Digest: YLRAzOMTZJ5jNKXXJYmRbEM59Os=
+
+Name: org/bouncycastle/asn1/DERNumericString.class
+SHA1-Digest: pidBC3vIe039Yei/+jEpMorxFp4=
+
+Name: org/bouncycastle/cms/PasswordRecipient.class
+SHA1-Digest: kamnPB4clVt7YRqRbRu9twctFfk=
+
+Name: org/bouncycastle/ocsp/CertificateStatus.class
+SHA1-Digest: oZVfEMLJ7OOXf9nb4g1EU1iUt64=
+
+Name: org/bouncycastle/cms/jcajce/JcePasswordEnvelopedRecipient$1.clas
+ s
+SHA1-Digest: pD9MwZLHwxcHZGABu5e6TWuEdVk=
+
+Name: org/bouncycastle/jce/provider/RFC3280CertPathUtilities.class
+SHA1-Digest: 35FXKcw6HIiQwDWpti5lqGTVNIU=
+
+Name: com/lowagie/text/pdf/collection/PdfCollectionField.class
+SHA1-Digest: 9Wb7j7myFkVWecWQYwnmo0wwyyY=
+
+Name: net/java/xades/security/xml/XAdES/XAdES_X_L.class
+SHA1-Digest: qOu4V+fnztVtLKqtXQvAdW0E5JA=
+
+Name: com/lowagie/text/Utilities.class
+SHA1-Digest: EcYcFX58AkAqQupzPYMdtroW0nY=
+
+Name: net/java/xades/security/xml/XAdES/CRLRef.class
+SHA1-Digest: Mqmlw+2Y2ElWjMEwWmyc7cJlooo=
+
+Name: com/lowagie/text/pdf/PdfTransparencyGroup.class
+SHA1-Digest: C4WwKQefdyXoHftxjjS9Ja2cfpU=
+
+Name: net/java/xades/security/xml/XAdES/ExtendedLongXAdESImpl.class
+SHA1-Digest: yRVcdlp8E/17oBVSuYDJhFp3fj4=
+
+Name: org/bouncycastle/asn1/teletrust/TeleTrusTNamedCurves.class
+SHA1-Digest: G+4xJWFAAdJHCz3nca4eI73euFM=
+
+Name: org/bouncycastle/cms/jcajce/JcaSignerInfoVerifierBuilder.class
+SHA1-Digest: xHANXyr/mXqoVBpP/aWKaJsTEJY=
+
+Name: org/bouncycastle/operator/jcajce/JcaContentSignerBuilder$Signatu
+ reOutputStream.class
+SHA1-Digest: uYl22mA+qPtZtyA9zsBACogj0iY=
+
+Name: org/bouncycastle/cms/jcajce/JceKeyTransRecipient.class
+SHA1-Digest: lV80SdooPIsVJmEqFsp+49Ft2ZQ=
+
+Name: org/bouncycastle/cms/SignerInfoGeneratorBuilder.class
+SHA1-Digest: 3CYgkCKKM3P0IoqcjC2znen10Ss=
+
+Name: org/bouncycastle/asn1/x509/X509Name.class
+SHA1-Digest: fgOa7jh8i77DkW9kL2xa8L8ABJY=
+
+Name: es/gob/afirma/signers/xml/Utils.class
+SHA1-Digest: 4fc2NYDzCB0p6RHVpHwc1vcyqlY=
+
+Name: com/lowagie/text/pdf/PdfImage.class
+SHA1-Digest: LUoXm198GXw27W5tD4KS7lytz0Y=
+
+Name: com/lowagie/text/pdf/PdfException.class
+SHA1-Digest: SOEQ4GKrfOaY3kZn2Ajbt3ZesA8=
+
+Name: com/lowagie/text/Section.class
+SHA1-Digest: EdKl6UBdNXv4q6NfoMCDjQFfUSE=
+
+Name: org/mozilla/universalchardet/prober/statemachine/Big5SMModel.cla
+ ss
+SHA1-Digest: DGC3lYBk9KfeUD4evCM9tOBVmpI=
+
+Name: org/bouncycastle/cms/jcajce/EnvelopedDataHelper$JCECallback.clas
+ s
+SHA1-Digest: QPZR09NgfT1FDD0Y4UfCCaq6hZ4=
+
+Name: org/bouncycastle/jce/provider/ExtCRLException.class
+SHA1-Digest: JmhHnIhuUJbf8+nDfJ8sIR84LXE=
+
+Name: com/lowagie/text/ExceptionConverter.class
+SHA1-Digest: WVIgSghndwSb3bKySss9UznV97k=
+
+Name: es/gob/afirma/miniapplet/keystores/filters/SignatureDNIeFilter.c
+ lass
+SHA1-Digest: 4dEgSLBZfnNA5xS9xMClh+JOxRY=
+
+Name: es/gob/afirma/keystores/dnie/DnieUnifiedKeyStoreManager.class
+SHA1-Digest: 0T4W21lps3YRAnKxfU85UjVHI88=
+
+Name: com/lowagie/text/pdf/AcroFields.class
+SHA1-Digest: khquIfW+mQxVfZc1KPHFIQ3yjb0=
+
+Name: org/bouncycastle/asn1/sec/SECNamedCurves$17.class
+SHA1-Digest: YhfDuLNibnPYPuMpGPJDSwPKy7E=
+
+Name: org/mozilla/universalchardet/prober/sequence/Latin7Model.class
+SHA1-Digest: V7q0n4ISkGnJGrGTRz7KTOtXF68=
+
+Name: org/apache/oro/util/Cache.class
+SHA1-Digest: qbwoF1lggSA5GJfynpa6pA4yEZk=
+
+Name: org/bouncycastle/cms/jcajce/JceKeyTransEnvelopedRecipient.class
+SHA1-Digest: KoLUfT/qfp9/XXJig1fPkpmbiQA=
+
+Name: com/lowagie/text/ElementTags.class
+SHA1-Digest: dzD32jIGxWlslIUI6lkBF3qR7aI=
+
+Name: com/lowagie/text/pdf/PdfPKCS7$X509NameTokenizer.class
+SHA1-Digest: gkx8gW+QgkyfYwR0DgTGVvT/qkM=
+
+Name: es/gob/afirma/core/signers/AOPkcs1Signer.class
+SHA1-Digest: IrTLGxkggudusDa+FPvX2BO+hN4=
+
+Name: com/lowagie/text/pdf/parser/PdfContentStreamProcessor$SetTextHor
+ izontalScaling.class
+SHA1-Digest: kHWwSLOsSpJk9xMxGcKrftJ7cII=
+
+Name: org/bouncycastle/util/Strings.class
+SHA1-Digest: rCPAGG81NgZVKN8sDIDNZzhEA2I=
+
+Name: org/bouncycastle/cms/KeyAgreeRecipientInformation.class
+SHA1-Digest: kpNgWEdDwYxmaHnM8+CYW8JOHi4=
+
+Name: org/bouncycastle/asn1/DERGeneralizedTime.class
+SHA1-Digest: f2TjcWCwHYncI/vDHa6IUOfII4Q=
+
+Name: com/lowagie/text/pdf/PdfIndirectReference.class
+SHA1-Digest: almw7D5WCJp5eQ1kNXXDFOrL/60=
+
+Name: net/java/xades/security/xml/XAdES/IssuerSerial.class
+SHA1-Digest: qqdsNC1f4L9eXePMrijzBX17+Tw=
+
+Name: com/lowagie/text/pdf/parser/PdfContentStreamProcessor$SetTextLea
+ ding.class
+SHA1-Digest: qb6tRo7XVf53zou8CNAfnqaMp0A=
+
+Name: net/java/xades/security/xml/XAdES/DigestAlgAndValue.class
+SHA1-Digest: gFHvU1SYB8qy1zokLsH+HJensBk=
+
+Name: org/bouncycastle/asn1/pkcs/RSASSAPSSparams.class
+SHA1-Digest: ihuNaIIXLgRAkYg956PD0wxItgA=
+
+Name: com/lowagie/text/pdf/DefaultFontMapper$BaseFontParameters.class
+SHA1-Digest: XjKTNaFDf0Ce86760YbCJx8D+/E=
+
+Name: org/bouncycastle/x509/PKIXAttrCertChecker.class
+SHA1-Digest: GNSvlEnDpMrbAgL2aRiQ2Fg5Chg=
+
+Name: es/gob/afirma/core/AOException.class
+SHA1-Digest: 69HEswthRfDYqRNn5g5XXel8jLk=
+
+Name: org/bouncycastle/ocsp/SingleResp.class
+SHA1-Digest: p0+e+BtsHAphQ3Q9oA4UhJ1SYsM=
+
+Name: org/bouncycastle/jcajce/provider/util/AsymmetricKeyInfoConverter
+ .class
+SHA1-Digest: p25PznoTBUzK++bDJmPW8SZ1Af4=
+
+Name: org/mozilla/universalchardet/prober/contextanalysis/JapaneseCont
+ extAnalysis.class
+SHA1-Digest: R+nEAoHqAskHAZQQDJThR7R3LPY=
+
+Name: com/lowagie/text/pdf/codec/TIFFFaxDecoder.class
+SHA1-Digest: wD6Cv0uSYjECcxcmNIp5wleYKhI=
+
+Name: org/bouncycastle/jcajce/provider/asymmetric/ec/BCECPublicKey.cla
+ ss
+SHA1-Digest: ZKPkws2i2eXMJ8T5hLwSnO6iRIo=
+
+Name: org/mozilla/universalchardet/prober/distributionanalysis/Big5Dis
+ tributionAnalysis.class
+SHA1-Digest: tHoQmb16f2tp6C2iFqt1wnj72wg=
+
+Name: org/bouncycastle/asn1/x509/TBSCertList.class
+SHA1-Digest: ChE/3vtcwD7Uvvtg3V1O5eH2je8=
+
+Name: com/lowagie/text/pdf/PdfCopy$StampContent.class
+SHA1-Digest: i6Asumkp6Y9u9WpAalSrAMfVqc8=
+
+Name: org/bouncycastle/crypto/digests/MD4Digest.class
+SHA1-Digest: eIXlYnqMWQOtTlMmh75vhRsSPiQ=
+
+Name: org/bouncycastle/asn1/DERPrintableString.class
+SHA1-Digest: wpCNJ56OeqWNZjsd7KOc7pClhhw=
+
+Name: net/java/xades/util/OccursRequirement.class
+SHA1-Digest: 915SD5Quy/iNn5lQ9HBOcm1BtzM=
+
+Name: es/gob/afirma/core/misc/Platform$BROWSER.class
+SHA1-Digest: JLei0WS7MsV4PMhtVyJ1rlLRkwo=
+
+Name: es/gob/afirma/signers/pades/PdfIsCertifiedException.class
+SHA1-Digest: lulTmXxUgTFFkaNYFuhiwgLmz/s=
+
+Name: es/gob/afirma/core/misc/AOFileUtils.class
+SHA1-Digest: 4exaj2kYP1nArMQgV2UQTemUrAI=
+
+Name: es/gob/afirma/miniapplet/keystores/filters/QualifiedCertificates
+ Filter.class
+SHA1-Digest: JUDqOlyuOF6mtLH335OAwBUv1Gc=
+
+Name: com/lowagie/text/pdf/codec/PngImage$NewByteArrayOutputStream.cla
+ ss
+SHA1-Digest: gjmYNj4+SJVxpVK6zDkQsoSL784=
+
+Name: com/lowagie/text/pdf/PdfReader$PageRefs.class
+SHA1-Digest: i8OCvLiBr8Gwp5ByvEvF/e6Gjyw=
+
+Name: com/lowagie/text/pdf/internal/PdfVersionImp.class
+SHA1-Digest: 5cAUOU1fsHar2mQFxt4dUtAZDwg=
+
+Name: org/bouncycastle/operator/RuntimeOperatorException.class
+SHA1-Digest: A2IUY9Z2t/q3GiZLSPOca/fcjug=
+
+Name: es/gob/afirma/signers/xades/XAdESSigner.class
+SHA1-Digest: VN/EB7lclpesbSQWAk03vvMlcuA=
+
+Name: org/bouncycastle/crypto/Mac.class
+SHA1-Digest: Qo6Dx9CbvRmGMLla4EOtVyFgMh8=
+
+Name: uimessages.properties
+SHA1-Digest: i/HC/02LKoodkqFBNwditR9VoIQ=
+
+Name: net/java/xades/security/xml/InvalidSignatureReason.class
+SHA1-Digest: JEO4YVFjpm94f7mR9BoWEduwI8Q=
+
+Name: com/lowagie/text/pdf/PdfShadingPattern.class
+SHA1-Digest: sLC7wzO0K7WB8zvKtiJSa1qsNR4=
+
+Name: org/bouncycastle/asn1/sec/SECNamedCurves$7.class
+SHA1-Digest: ACrXFzLXo1YN96rRuHQuF0y5Ywc=
+
+Name: com/lowagie/text/pdf/PdfRectangle.class
+SHA1-Digest: JUpc5HBNEOco+laiEUGulxwJBAI=
+
+Name: es/gob/afirma/keystores/mozilla/FirefoxKeyStoreMessages.class
+SHA1-Digest: u+hN+wFf2qjieuC99QZ/E+3G2k8=
+
+Name: net/java/xades/security/xml/XMLSignatureElement.class
+SHA1-Digest: UEE9o5eQyzm4owwYnNYfLyDK0sQ=
+
+Name: com/lowagie/text/pdf/draw/DrawInterface.class
+SHA1-Digest: 7bKJswmjXRwm64BPrWsx1Ggyad0=
+
+Name: com/lowagie/text/pdf/PdfBorderArray.class
+SHA1-Digest: Bib1Ts9ODEKPoF9IkK/o0Gpz0eI=
+
+Name: org/bouncycastle/asn1/ASN1Exception.class
+SHA1-Digest: iQqammdv/79I8nUZhYcrciiJlbM=
+
+Name: es/gob/afirma/ui/core/jse/CertificateSelectionPanel$CertLinkMous
+ eListener.class
+SHA1-Digest: qOmDJvQwhxR9OgGgln+6CXUlxoE=
+
+Name: org/bouncycastle/cms/CMSProcessable.class
+SHA1-Digest: /OSG2RTy190l7GOwCUGO+uW/btI=
+
+Name: com/lowagie/text/xml/xmp/PdfA1Schema.class
+SHA1-Digest: 3WjoYVnzVdZGgNrW/q9AVD7sVJo=
+
+Name: org/bouncycastle/asn1/cmp/PKIFailureInfo.class
+SHA1-Digest: pUGTpjm2fkgp7SW5LzJG68TcQO4=
+
+Name: org/bouncycastle/cms/CMSTypedData.class
+SHA1-Digest: wUUUA0xuGH1KUtyAAuirSn9vTGM=
+
+Name: es/gob/afirma/miniapplet/ExtraParamsProcessor.class
+SHA1-Digest: 4yQO7DcP1MJtTah99PCM1J9/OEU=
+
+Name: org/apache/oro/text/GenericPatternCache.class
+SHA1-Digest: 7PGY9hjAP9BMMGtE/Ub+G/CyBqs=
+
+Name: org/bouncycastle/cms/CMSSignedDataGenerator$1.class
+SHA1-Digest: xBcWRf7+uxtmgpoMvQPJoQVD3i4=
+
+Name: com/lowagie/text/pdf/AcroFields$RevisionStream.class
+SHA1-Digest: su9s1RzP45lZd0VccqY9PVD7hfw=
+
+Name: com/lowagie/text/pdf/hyphenation/Hyphenator.class
+SHA1-Digest: HHSRGuugorc1ItIfsETPLdSp750=
+
+Name: com/lowagie/text/pdf/PdfWriter.class
+SHA1-Digest: R6BDoY1ruD9jm4+0x/mebx8CsrM=
+
+Name: com/lowagie/text/pdf/PdfDictionary.class
+SHA1-Digest: kSvREYG5fcOEPaZrlzq0xmVhU7k=
+
+Name: org/bouncycastle/asn1/DERObjectIdentifier.class
+SHA1-Digest: BATCqn1ZzHEJFg3+eJiU7ewFyxs=
+
+Name: org/bouncycastle/asn1/teletrust/TeleTrusTNamedCurves$9.class
+SHA1-Digest: FgzGqYGmlbVVWeJVgYzjUeR7fhE=
+
+Name: com/lowagie/text/pdf/ShadingColor.class
+SHA1-Digest: WyDM/2dMKvgKvQORXvbCqZDIodk=
+
+Name: net/java/xades/security/xml/XAdES/ValidationResult.class
+SHA1-Digest: PDll58UroVdskvNNNk2swxPX9RU=
+
+Name: es/gob/afirma/miniapplet/MiniAppletMessages.class
+SHA1-Digest: /tLCOUN3/F7mTSBn3h+tWO2bD7w=
+
+Name: com/lowagie/text/pdf/PdfOutline.class
+SHA1-Digest: ftRqdRqSSQ5jXGTg5geYh0w7dSI=
+
+Name: com/lowagie/text/DocListener.class
+SHA1-Digest: glZxD0VoUY/yI91zP8/1p+F1uA8=
+
+Name: java/com/lowagie/text/apache_license.txt
+SHA1-Digest: Co0BIdCmevl0sQqVZlMG2y6Ez8E=
+
+Name: net/java/xades/security/xml/XAdES/UnsignedSignatureProperties.cl
+ ass
+SHA1-Digest: RzNCSFye1rVjrvef/es32cfE11w=
+
+Name: com/lowagie/text/pdf/parser/Matrix.class
+SHA1-Digest: H8dpmNZ9yRMyWmsxLP8hNHVPNEE=
+
+Name: net/java/xades/security/xml/XAdES/SigningCertificate.class
+SHA1-Digest: f6A/xV6amkcvvrxntXGUdQ5Mhl4=
+
+Name: org/bouncycastle/asn1/BERTaggedObject.class
+SHA1-Digest: 8dxBz6XH+DZLmI2Hc3MyngObbKk=
+
+Name: org/bouncycastle/jcajce/provider/asymmetric/util/KeyUtil.class
+SHA1-Digest: AuOCpHQcHWVvN7lirbZAecujRhk=
+
+Name: org/bouncycastle/crypto/params/KeyParameter.class
+SHA1-Digest: 99ueY/rZddXabr+qrst7Q7oIRyI=
+
+Name: es/gob/afirma/core/signers/AOCounterSigner.class
+SHA1-Digest: rdXX3cYhHZ6oMvz8YIdSk6rwntc=
+
+Name: org/bouncycastle/asn1/cms/AuthenticatedData.class
+SHA1-Digest: xH+YVKHyN/GeICGyGR7Yo9va0bI=
+
+Name: es/gob/afirma/core/misc/Platform.class
+SHA1-Digest: ePLfcnj6ppbTvFuE/gJfKCzBSKo=
+
+Name: org/bouncycastle/operator/jcajce/JcaDigestCalculatorProviderBuil
+ der$DigestOutputStream.class
+SHA1-Digest: fz3tq0Gz49yWenH+SYHKIYAqGQY=
+
+Name: magic_1_0.dtd
+SHA1-Digest: pxUUn3qPTkHi8XBqAoXv1uGsCjw=
+
+Name: net/sf/jmimemagic/detectors/TextFileDetector.class
+SHA1-Digest: cKyvpnlqR25HCmFqAO8x1suwxZU=
+
+Name: org/bouncycastle/ocsp/RespID.class
+SHA1-Digest: RYDrVSnX8569SfOxh1jz4vMDNn8=
+
+Name: com/lowagie/text/pdf/codec/wmf/InputMeta.class
+SHA1-Digest: hMXN0tfYeJJs82nI7kyOXzYUL6A=
+
+Name: net/java/xades/security/xml/XAdES/DataObjectFormatImpl.class
+SHA1-Digest: AEL2R6OmANLBdQYinHiIJjKg4Uk=
+
+Name: com/lowagie/text/pdf/XfdfReader.class
+SHA1-Digest: iPkbSmk5fZGzVWRjvaWoVNts2tE=
+
+Name: org/bouncycastle/asn1/BEROctetString$1.class
+SHA1-Digest: vzOtFHnZnaLd90MOcKtoe5Ad91E=
+
+Name: net/java/xades/security/xml/XAdES/OCSPRef.class
+SHA1-Digest: dcv/R6w5AQbXlN/z+Ll4ESTg53I=
+
+Name: org/bouncycastle/operator/jcajce/JcaContentVerifierProviderBuild
+ er$2.class
+SHA1-Digest: G69iYcJ1EN9dZnEHnch+PCzLH6g=
+
+Name: org/bouncycastle/asn1/x509/AttCertIssuer.class
+SHA1-Digest: h+zoeW6l+OoafADDRB6Z+yl2vEY=
+
+Name: org/bouncycastle/asn1/x9/X962NamedCurves$12.class
+SHA1-Digest: +OawxVC+0dzgd6bUNJgUgYiwnis=
+
+Name: com/lowagie/text/pdf/CMapAwareDocumentFont.class
+SHA1-Digest: Bkerz0yU3Lx908VUmaSVZLG5ILM=
+
+Name: es/gob/afirma/core/ui/NameCertificateBean.class
+SHA1-Digest: z/MTrf7t1RnTb+jUJdn/5LFDk5A=
+
+Name: org/bouncycastle/math/ec/ECMultiplier.class
+SHA1-Digest: pdJ2eny57JxnQ3UWTKTJOmonSxk=
+
+Name: org/bouncycastle/util/Store.class
+SHA1-Digest: QodKJeQjNxLBaudq2MphTvY/+PQ=
+
+Name: org/bouncycastle/asn1/DERBMPString.class
+SHA1-Digest: niHzS2QcnTmIZ3axBsbFPmJopRM=
+
+Name: org/bouncycastle/asn1/cmp/PKIStatus.class
+SHA1-Digest: V3NtFCGpy2VgfKBRLVPHuzgqcp8=
+
+Name: com/lowagie/text/pdf/PdfReaderInstance.class
+SHA1-Digest: iLQroWTrGyZYFU6zv/peY3qWikY=
+
+Name: net/java/xades/security/xml/XAdES/CommitmentTypeIndication.class
+SHA1-Digest: ZJykaGEPTHqNWpg2uZ7sppAyg7Y=
+
+Name: com/lowagie/text/pdf/BadPdfFormatException.class
+SHA1-Digest: B4xzdVL11Z2nnHIjc0d+EC91HdQ=
+
+Name: java/com/lowagie/text/pdf/fonts/Courier.afm
+SHA1-Digest: GvO2zITJDfwc6G01KMIRtpudcvI=
+
+Name: com/lowagie/text/pdf/EnumerateTTC.class
+SHA1-Digest: eNoRTDx+lDF08YTEycODHKuKJ3I=
+
+Name: net/java/xades/security/xml/X509DataKeySelectorResult.class
+SHA1-Digest: JOeGXcGSzgUOkZ3Pep6fMPEjQ4w=
+
+Name: org/bouncycastle/math/ec/ECPoint$Fp.class
+SHA1-Digest: 1PgXaXa+RlNgucuttzVzFk32A1U=
+
+Name: org/bouncycastle/cms/jcajce/JceKeyAgreeAuthenticatedRecipient.cl
+ ass
+SHA1-Digest: HY8TD5PRukBT5op/CQN1GclrnCc=
+
+Name: com/lowagie/text/MarkedSection.class
+SHA1-Digest: YaBwUc5AOJd3rdVdd/9U+mxK2TY=
+
+Name: net/java/xades/util/ISO8601DateFormat.class
+SHA1-Digest: 1Rrf369muswbI7JhrbrGJQ85Ces=
+
+Name: net/java/xades/security/xml/XAdES/SignerRoleDetails.class
+SHA1-Digest: ok0DL2AZ2Ry7oBV9ahDHf9DrC1o=
+
+Name: org/bouncycastle/operator/SignatureAlgorithmIdentifierFinder.cla
+ ss
+SHA1-Digest: cIEPPBI4LKeum+KKV/dHKc/AaCg=
+
+Name: org/bouncycastle/cms/KeyAgreeRecipientInfoGenerator.class
+SHA1-Digest: CzMbFpQCBfy2kPjLRyqaBg+n5Cs=
+
+Name: net/java/xades/security/xml/XAdES/SignedSignatureProperties.clas
+ s
+SHA1-Digest: 0AFe+MLFKYhvS0KgtHC45alhzV4=
+
+Name: com/lowagie/text/pdf/LZWDecoder.class
+SHA1-Digest: vyrY8ZrkS/YdbNzWPwREmNAch+0=
+
+Name: org/bouncycastle/operator/jcajce/JcaContentVerifierProviderBuild
+ er$1.class
+SHA1-Digest: vXwlMwSZYsv2FhQ9YQ+XilCNAYU=
+
+Name: com/lowagie/text/ImgWMF.class
+SHA1-Digest: EG+7KamzO9SyshnZsbiUYQ9od0c=
+
+Name: org/bouncycastle/operator/AsymmetricKeyWrapper.class
+SHA1-Digest: Ii64rH4QKOO4JPj5M8a00Z3G4V0=
+
+Name: org/bouncycastle/cms/RecipientOperator.class
+SHA1-Digest: qM/jIZMTYuvMi/wGDBycswBu6yk=
+
+Name: org/bouncycastle/operator/DigestAlgorithmIdentifierFinder.class
+SHA1-Digest: pcr2FTsDWPHGYkl5BLWA3SwY/zA=
+
+Name: es/gob/afirma/ui/core/jse/CertificateSelectionDialog.class
+SHA1-Digest: EjpbpYgIZewjmUBkXRf3gwscOPY=
+
+Name: org/bouncycastle/asn1/x9/X962NamedCurves$3.class
+SHA1-Digest: KGY4vNrEJ5qD2XJjHsUzl29ZHuA=
+
+Name: org/bouncycastle/jcajce/provider/asymmetric/ec/EC5Util.class
+SHA1-Digest: fatSAfRIFZXrcXVb/lzDGeT5PCk=
+
+Name: com/lowagie/text/pdf/PdfRendition.class
+SHA1-Digest: 8ru/zt7/s+ADz48xXgyz98Aim4A=
+
+Name: es/gob/afirma/core/util/tree/AOTreeNode.class
+SHA1-Digest: 6YsXTaBfiv5o4GrUe3LU5qKGNUo=
+
+Name: net/java/xades/security/xml/XAdES/XMLAdvancedSignature.class
+SHA1-Digest: d+BMXAIvED1pTpONfXe4dMZLstU=
+
+Name: org/bouncycastle/cms/DefaultCMSSignatureEncryptionAlgorithmFinde
+ r.class
+SHA1-Digest: 3GJDkycdMKs3q+oit6jyqJ2PyCo=
+
+Name: org/bouncycastle/cms/CMSAbsentContent.class
+SHA1-Digest: cgThm56UmA61luY5lLYNW9j9xBw=
+
+Name: com/lowagie/text/pdf/MultiColumnText.class
+SHA1-Digest: SShH0lrRkQYBWaP1ZlF+o7/tprk=
+
+Name: com/lowagie/text/pdf/PdfFileSpecification.class
+SHA1-Digest: vYcMejONGc8HOvyznsED9aSwN2U=
+
+Name: com/lowagie/text/pdf/PdfCopy$PageStamp.class
+SHA1-Digest: tHDn++qmZhcGJrzfNPu6nHQ68oI=
+
+Name: org/bouncycastle/cms/CMSSignatureEncryptionAlgorithmFinder.class
+SHA1-Digest: 6b1+smq2rhNFPBDVHCa777uCN1Y=
+
+Name: net/java/xades/security/xml/XAdES/SigningTime.class
+SHA1-Digest: DcGs1KtK3srC7zOM4jhGzKqBicI=
+
+Name: net/java/xades/security/xml/XAdES/AllDataObjectsTimeStampDetails
+ .class
+SHA1-Digest: 7aK953Z4PMs5xfOLxESpmfGqH+o=
+
+Name: org/bouncycastle/asn1/BEROctetString.class
+SHA1-Digest: q8KmY9EMGOPlwBJhGWWzkJzysbw=
+
+Name: org/bouncycastle/cms/jcajce/JceKEKAuthenticatedRecipient.class
+SHA1-Digest: IKJ2UywGe+9gq+IfkQyBfQTQPc8=
+
+Name: es/gob/afirma/signers/cades/CAdESTriPhaseSigner.class
+SHA1-Digest: XdOj27LlEKiw2Qf514rSvGNNuBA=
+
+Name: com/lowagie/text/pdf/CFFFont.class
+SHA1-Digest: 5+tq/7Ga85gqUfJZROsIBvSI7jA=
+
+Name: org/bouncycastle/x509/ExtendedPKIXParameters.class
+SHA1-Digest: 3EuMYh4D2YbzjfW6KvzgE0KmIMU=
+
+Name: net/java/xades/security/xml/XAdES/CompleteRevocationRefs.class
+SHA1-Digest: wxqV7FBYnPrJLtywZ5aaJIgHAb4=
+
+Name: org/bouncycastle/asn1/misc/NetscapeCertType.class
+SHA1-Digest: Wjhae6PKxROHYpjWV+QOIppGWzo=
+
+Name: org/bouncycastle/asn1/cms/RecipientEncryptedKey.class
+SHA1-Digest: OjmN6kQYBHMuue4U7jJufKkhgHE=
+
+Name: org/bouncycastle/asn1/sec/SECNamedCurves$30.class
+SHA1-Digest: pqbAF/wEZu2tWuQUSIz1zzgntAs=
+
+Name: org/bouncycastle/asn1/x500/style/BCStyle.class
+SHA1-Digest: pygHnD9eNv5RmTOnMwdsLNiWnTA=
+
+Name: com/lowagie/text/pdf/RandomAccessFileOrArray.class
+SHA1-Digest: mwZPo5qrx24d1RmKxLGwLvDmbBw=
+
+Name: org/bouncycastle/asn1/x509/ExtensionsGenerator.class
+SHA1-Digest: jtEN9fW+YULAuwDMxJGdcNxhrdI=
+
+Name: org/bouncycastle/x509/extension/X509ExtensionUtil.class
+SHA1-Digest: f0K6PohmmpOwrD63S31RLlx76aU=
+
+Name: es/gob/afirma/keystores/pkcs12/Pkcs12KeyStoreManager.class
+SHA1-Digest: hZDOBFoNnL9r662C83j9mkwSypE=
+
+Name: org/bouncycastle/cert/jcajce/JcaX509CertificateHolder.class
+SHA1-Digest: eJfFZCeLNXWC60bZIcuUturIXl8=
+
+Name: com/lowagie/text/FontFactoryImp.class
+SHA1-Digest: 8WzYatGkaR3I4Z2rHYfM6y6C+R8=
+
+Name: com/lowagie/text/pdf/PdfDashPattern.class
+SHA1-Digest: 9qmx70wucLoWYmeZsOIxARwW8IU=
+
+Name: org/bouncycastle/operator/jcajce/JcaContentSignerBuilder.class
+SHA1-Digest: SD+piundoq1YgYBx2LIjL/05/k4=
+
+Name: org/bouncycastle/cms/jcajce/JcaSimpleSignerInfoVerifierBuilder$P
+ roviderHelper.class
+SHA1-Digest: cYhkKD6vlyt+WpdPvokOS9SutNE=
+
+Name: org/bouncycastle/asn1/DERIA5String.class
+SHA1-Digest: Nfn1/ejU2ygwTIhaL6PI3FbbfGU=
+
+Name: com/lowagie/text/pdf/ExtendedColor.class
+SHA1-Digest: qhRpO5RkVUF/m1+umG6pJGWD+wA=
+
+Name: com/lowagie/text/factories/RomanAlphabetFactory.class
+SHA1-Digest: Q33dBaEd/A1n1piWxIWoxDtIQ4A=
+
+Name: org/bouncycastle/asn1/cms/OriginatorInfo.class
+SHA1-Digest: w+bZ1D9wfsaiSyLQNZSqD/UKW10=
+
+Name: es/gob/afirma/core/misc/OfficeAnalizer.class
+SHA1-Digest: F9DU6QMWvAl83p12SXo//sBsr1o=
+
+Name: net/java/xades/security/xml/WrappedKeyStorePlace.class
+SHA1-Digest: /5QM6/D1qtvdEmOqhXK+qZVfeNA=
+
+Name: com/lowagie/text/pdf/hyphenation/SimplePatternParser.class
+SHA1-Digest: 4Caau4GfyvRJgQDQy1QcHdbjiP8=
+
+Name: org/bouncycastle/jce/interfaces/GOST3410Params.class
+SHA1-Digest: FpUGUraVd9folckOwI6kGhG6OaE=
+
+Name: java/com/lowagie/text/pdf/fonts/ZapfDingbats.afm
+SHA1-Digest: Yx3bIqugR1b8TcpJXMEd6NLSGb8=
+
+Name: net/java/xades/security/xml/InvalidSignature.class
+SHA1-Digest: 1rwj8156ltPSLkNE5yMOXYwDVII=
+
+Name: com/lowagie/text/pdf/parser/PdfContentStreamProcessor$SetTextRen
+ derMode.class
+SHA1-Digest: nFntJiin4LfzyijoOzIfUyLnYdo=
+
+Name: es/gob/afirma/ui/core/jse/CertificateSelectionPanel$CertListCell
+ Rendered.class
+SHA1-Digest: M5t9tMwYEJ7Yl7nJyYPwqMAe254=
+
+Name: com/lowagie/text/pdf/FontMapper.class
+SHA1-Digest: bfIDZcewY59m+OmHw9NBw3D6+oY=
+
+Name: org/bouncycastle/asn1/x509/X509Extensions.class
+SHA1-Digest: mDAq3T2rA4R2etxmZX8Ipg0sIrU=
+
+Name: org/mozilla/universalchardet/prober/sequence/Koi8rModel.class
+SHA1-Digest: AoHzdyEPfboATYl4nKcV0mUYlR4=
+
+Name: org/bouncycastle/x509/X509StreamParserSpi.class
+SHA1-Digest: nBHA4NwM6CraO55SI6zgq//4ycQ=
+
+Name: magic.xml
+SHA1-Digest: Gd1QGY9lLcbSLhfDqEsHAjwFrbU=
+
+Name: com/lowagie/text/pdf/PatternColor.class
+SHA1-Digest: zh1DjREIHm9P6t65bPbxID+wM0c=
+
+Name: es/gob/afirma/signers/xades/AOXAdESSigner.class
+SHA1-Digest: HkO41j2duyomIcXFJRW/VaxeOnE=
+
+Name: org/bouncycastle/asn1/cms/KeyTransRecipientInfo.class
+SHA1-Digest: OJ/y0jbDWYmlwECtQS9xMnP3wA0=
+
+Name: org/bouncycastle/jcajce/provider/asymmetric/util/PKCS12BagAttrib
+ uteCarrierImpl.class
+SHA1-Digest: 4ZkhMzTRWbiJMzHwpqds61N5Bpo=
+
+Name: es/gob/afirma/signers/pkcs7/ReadNodesTree.class
+SHA1-Digest: YgmpuWJKAUed+G9GInhaY/EF5KY=
+
+Name: com/lowagie/text/pdf/codec/BmpImage.class
+SHA1-Digest: kzHwkdPb9K/gAavio3hgZkTSkX0=
+
+Name: es/gob/afirma/miniapplet/SignAction.class
+SHA1-Digest: Qzy5kZ1HiDiaUlBvanDyvCds/Iw=
+
+Name: org/mozilla/universalchardet/UniversalDetector$InputState.class
+SHA1-Digest: mQWhsW6gpEjEQh8jbpOGonQJKz8=
+
+Name: org/bouncycastle/asn1/x509/Certificate.class
+SHA1-Digest: VETeyMZN83Hw/HPzrDIIWGg4eHM=
+
+Name: org/bouncycastle/asn1/x9/X962NamedCurves$23.class
+SHA1-Digest: xq3tHIJYE8lfb5xeL8MGa+LvHho=
+
+Name: org/bouncycastle/crypto/CipherParameters.class
+SHA1-Digest: DWuBKoy403sxUmTzqLBH2QIh2G4=
+
+Name: org/bouncycastle/asn1/BERFactory.class
+SHA1-Digest: AjRv2VAa77W30w4HQJzhZa8NLIU=
+
+Name: org/bouncycastle/asn1/x509/DigestInfo.class
+SHA1-Digest: pmQufXHX1p49Lcckq4bXRZIjs8E=
+
+Name: org/bouncycastle/asn1/cms/Attributes.class
+SHA1-Digest: PMyNW+FRCq2F7oWkpMfK/3hqQps=
+
+Name: org/bouncycastle/cms/PKCS5Scheme2UTF8PBEKey.class
+SHA1-Digest: snUAmoq/eHpSlNPhPSL6KlTP7fc=
+
+Name: com/lowagie/text/pdf/PdfDocument$Indentation.class
+SHA1-Digest: iaajGAS17bIBO7So8f8gFlOYxz8=
+
+Name: org/bouncycastle/crypto/BlockCipher.class
+SHA1-Digest: jcRNetL81B7RZU1PVboirQyXerg=
+
+Name: org/bouncycastle/cms/CMSEnvelopedData.class
+SHA1-Digest: u2mdG+N4gm06TWXYfpGDRPTFwWU=
+
+Name: org/bouncycastle/asn1/bc/BCObjectIdentifiers.class
+SHA1-Digest: i3sRREblhEzSglMkpp40DZlB6Ns=
+
+Name: com/lowagie/text/pdf/BaseField.class
+SHA1-Digest: tm5wL0kUUdFsMQtfWryJEA0Y7vI=
+
+Name: org/bouncycastle/asn1/BERConstructedOctetString.class
+SHA1-Digest: V3SitpsbzozyMs9FTLGmFeKHEQY=
+
+Name: es/gob/afirma/keystores/main/common/AOCertificatesNotFoundExcept
+ ion.class
+SHA1-Digest: W9Vt9RkBYhIhhFY/dir0q6TAtvU=
+
+Name: org/bouncycastle/cms/RecipientInformation.class
+SHA1-Digest: SJLeLy41TONVn/unsoJ8baLvw7I=
+
+Name: org/bouncycastle/util/encoders/Hex.class
+SHA1-Digest: 5gW0ClrTCUK0T59Td2R0NO2KJBI=
+
+Name: com/lowagie/text/pdf/fonts/cmaps/CMapParser$LiteralName.class
+SHA1-Digest: Raqqwc5RlZ3ZEkvR955il9GIu0E=
+
+Name: org/bouncycastle/crypto/digests/LongDigest.class
+SHA1-Digest: nCHUVYE9YGPCtWJaiWRN1Rqva94=
+
+Name: net/java/xades/security/xml/XAdES/ExplicitPolicyXAdESImpl.class
+SHA1-Digest: xJVrgD07y//Caa7M2NFzuB/LjUY=
+
+Name: net/java/xades/security/xml/XAdES/OCSPRefs.class
+SHA1-Digest: CbhzLHgCyC/W8NGEkeKmdug4Ykg=
+
+Name: net/java/xades/security/xml/XAdES/XAdES$Element.class
+SHA1-Digest: lfxFPOShph3mhtxG7LIQm04jUWI=
+
+Name: org/bouncycastle/x509/X509Util.class
+SHA1-Digest: iSKb7kSm+SkxUd5aDhpSxYZP2Rk=
+
+Name: net/java/xades/security/xml/XAdES/CommitmentTypeIdImpl.class
+SHA1-Digest: 71qMpJz35xRSQDyDEnFbcw0BdQA=
+
+Name: org/bouncycastle/ocsp/RevokedStatus.class
+SHA1-Digest: Vjy6ww+5cIIkg/6+KYGiBoVcAbA=
+
+Name: es/gob/afirma/keystores/main/common/AOKeyStoreManagerException.c
+ lass
+SHA1-Digest: 6axEgiUieC+9fhQ+SVmbwp1+W7I=
+
+Name: net/java/xades/security/xml/XAdES/XAdES_T.class
+SHA1-Digest: rqfyi6PE0w+Ik6h+ze6HC+Wy0YU=
+
+Name: com/lowagie/text/pdf/interfaces/PdfAnnotations.class
+SHA1-Digest: hYzqouTnTeFzzOk/m86nlyGPlz4=
+
+Name: org/bouncycastle/asn1/x500/AttributeTypeAndValue.class
+SHA1-Digest: uHkLH50mwKpB2e/iviyvKIPyhQ0=
+
+Name: org/bouncycastle/asn1/LazyEncodedSequence.class
+SHA1-Digest: mxfT6l3Q4efO7+y1TNCOlxWRFHY=
+
+Name: org/bouncycastle/cert/X509AttributeCertificateHolder.class
+SHA1-Digest: Kyny409bZbvPLDeSBUsklnhEIE0=
+
+Name: org/bouncycastle/util/CollectionStore.class
+SHA1-Digest: thT161ykymh+PqJ6P/hDYXTenmI=
+
+Name: org/bouncycastle/asn1/DEROctetStringParser.class
+SHA1-Digest: Y7xvRF9wYumaNFvHoJ2FLoAxQfM=
+
+Name: net/java/xades/util/ResourceHelper$FileResourceEntries.class
+SHA1-Digest: w9W5Ta6tynVt1KuiVkve65nhyoM=
+
+Name: es/gob/afirma/keystores/mozilla/MozillaKeyStoreUtilities.class
+SHA1-Digest: MW/PZmc7lYMaYwVTtns+2naL2SM=
+
+Name: com/lowagie/text/ImgCCITT.class
+SHA1-Digest: ZJ4VfRvGYqRlG5S1LqZtEDAOJQ0=
+
+Name: com/lowagie/text/pdf/PdfXConformanceException.class
+SHA1-Digest: 8/444D6Bno2UQRFycnCmkbGz1vI=
+
+Name: org/bouncycastle/asn1/x509/X509CertificateStructure.class
+SHA1-Digest: okYERD8uRp3U/LC+XfYh8jXvxLs=
+
+Name: com/lowagie/text/pdf/codec/Base64.class
+SHA1-Digest: 41cED01x/hqwfjShyZfV6jybgEk=
+
+Name: es/gob/afirma/signers/tsp/pkcs7/CMSTimestamper$TsaRequestExtensi
+ on.class
+SHA1-Digest: mQFqMMQvaJzC8GcmZwNYqYg5Bfk=
+
+Name: com/lowagie/text/pdf/internal/PdfAnnotationsImp.class
+SHA1-Digest: VIcbkC7kxlBj9hM9DAK2cmrtfjc=
+
+Name: com/lowagie/text/ChapterAutoNumber.class
+SHA1-Digest: wkJy+nEltmCf4a0K3WhDL/iFlVk=
+
+Name: com/lowagie/text/pdf/AcroFields$Item.class
+SHA1-Digest: ZJtyCqxOb3BsL9tw05WCVQhF+ZA=
+
+Name: org/bouncycastle/asn1/cms/PasswordRecipientInfo.class
+SHA1-Digest: 22XGtb2948Gi2kqTkrgCOGYqEcA=
+
+Name: es/gob/afirma/core/misc/MimeHelper.class
+SHA1-Digest: TtOOdQ7t0Sfsta7N0oSyPfgY/0k=
+
+Name: com/lowagie/text/pdf/PdfAcroForm.class
+SHA1-Digest: S49x9OlhCOcO1dgPUErX2XJCpFw=
+
+Name: com/lowagie/text/pdf/CFFFont$UInt32Item.class
+SHA1-Digest: 4Qzz02ROS+ggm4n7/eq+yVuE4ss=
+
+Name: org/bouncycastle/asn1/sec/SECNamedCurves$20.class
+SHA1-Digest: f4dch4fAgmMJWu2Q4bUZb1tsfX4=
+
+Name: com/lowagie/text/xml/xmp/XmpWriter.class
+SHA1-Digest: 4/RU4cgTYXdtYv0fLJ2WPuroEaA=
+
+Name: org/bouncycastle/asn1/pkcs/PBKDF2Params.class
+SHA1-Digest: ws5W3L2rtb558jnSKXT6vXOdp6U=
+
+Name: org/bouncycastle/asn1/x500/X500NameStyle.class
+SHA1-Digest: cFb39u/wzDrlXtrrvkxTo4vn1Q8=
+
+Name: com/lowagie/text/FontFactory.class
+SHA1-Digest: H99fs0clMac++PGAsHJrAoldpas=
+
+Name: net/java/xades/security/xml/XAdES/SignerImpl.class
+SHA1-Digest: k+MXgTnC5AyowT0XsuB0Plt+Kgc=
+
+Name: org/mozilla/universalchardet/prober/sequence/GreekModel.class
+SHA1-Digest: dWiZrTlglQtpaWOvaRTEDIzFLWk=
+
+Name: es/gob/afirma/keystores/main/common/AOKeyStore.class
+SHA1-Digest: 3HlT/9L+t6h9LaXosX/0J3PD0mE=
+
+Name: org/apache/oro/text/MalformedCachePatternException.class
+SHA1-Digest: lamNO0O8VJ/OUrZc1HEuUXquI9Q=
+
+Name: com/lowagie/text/pdf/CFFFont$Font.class
+SHA1-Digest: B25x/QxsmKVbdRqopJeMVUiJ21g=
+
+Name: es/gob/afirma/signers/multi/cades/CAdESCoSigner.class
+SHA1-Digest: afrFXRdxkBT19GIVImzLf6cuXgo=
+
+Name: com/lowagie/text/pdf/PdfEncodings$WingdingsConversion.class
+SHA1-Digest: SxYXlrT1BA0r4ijFtEO0uepPu4k=
+
+Name: es/gob/afirma/keystores/main/common/KeyStoreUtilities.class
+SHA1-Digest: YF6wXyoKCbSsiDzuKZF6A4m3klw=
+
+Name: net/java/xades/util/ObjectId.class
+SHA1-Digest: f38H8Q1hjrzJSHWW388gwtKk9QA=
+
+Name: org/bouncycastle/asn1/util/ASN1Dump.class
+SHA1-Digest: 3tgSzUpmMifVGV6lJIn7GBMXYQ0=
+
+Name: net/java/xades/security/xml/XAdES/OCSPIdentifier.class
+SHA1-Digest: Uhet/MPK87cdIad7yM5+z2jKMZE=
+
+Name: org/bouncycastle/math/ec/WTauNafPreCompInfo.class
+SHA1-Digest: U9KdBqdb38qayUXpC3RSMdrdXeg=
+
+Name: org/bouncycastle/cms/RecipientInformationStore.class
+SHA1-Digest: pgG1Z7Zx+TTN6AhqiCcJwX1Ha7M=
+
+Name: es/gob/afirma/ui/core/jse/AWTUIManager$1.class
+SHA1-Digest: xwZ1T0mODQc0VCaggSYYfkDM2dE=
+
+Name: org/bouncycastle/asn1/ocsp/CertID.class
+SHA1-Digest: /3GUgF1VZxyXvbkHkJVGF5Y1MoA=
+
+Name: com/lowagie/text/pdf/parser/SimpleTextExtractingPdfContentStream
+ Processor.class
+SHA1-Digest: LR5Y56hmr0V5t/2IPRnXANBUjwI=
+
+Name: org/bouncycastle/cms/CMSRuntimeException.class
+SHA1-Digest: +PyjIl8AeL297h55teIiKyRY2l0=
+
+Name: java/com/lowagie/text/pdf/fonts/Helvetica-Bold.afm
+SHA1-Digest: WU5VQUnBIOGblV8sSp8A94ZyTC4=
+
+Name: org/bouncycastle/asn1/tsp/MessageImprint.class
+SHA1-Digest: 7Nrs1f7MNkUe7KP1LgODJBTUpA8=
+
+Name: org/bouncycastle/asn1/BERSet.class
+SHA1-Digest: 1d7YHmoZHJGvvSTiNQ8q3kUSJzw=
+
+Name: es/gob/afirma/keystores/main/common/AOKeyStoreManager.class
+SHA1-Digest: kuDPDZHloh9ViQgaCtI8Gbjbdok=
+
+Name: com/lowagie/text/pdf/parser/PdfContentStreamProcessor$SetTextCha
+ racterSpacing.class
+SHA1-Digest: ol2/7U5BwkZuBWo82ueSjU99pUY=
+
+Name: com/lowagie/text/pdf/PdfStamperImp.class
+SHA1-Digest: sSd/o1X/WHkH06f9nm9LiemgnSk=
+
+Name: com/lowagie/text/pdf/PdfContentParser.class
+SHA1-Digest: ufKoIWjzA3VfYEg1MffXeArgz5I=
+
+Name: org/bouncycastle/util/StoreException.class
+SHA1-Digest: J86+9qt4/NgfSoOjatf7ytuuSnE=
+
+Name: org/bouncycastle/asn1/cms/IssuerAndSerialNumber.class
+SHA1-Digest: OC6pmWcjLpaKMjEdmM6rVLMpIdI=
+
+Name: com/lowagie/text/pdf/PdfLiteral.class
+SHA1-Digest: zafO194PwP8Geg6IB8CgyabC9mo=
+
+Name: com/lowagie/text/pdf/SpotColor.class
+SHA1-Digest: zGhUeak3Qh8p7EBkXteV8yxn1TQ=
+
+Name: org/mozilla/universalchardet/prober/statemachine/CodingStateMach
+ ine.class
+SHA1-Digest: sjbwXH9/s/bMxMPdRJt5Q9WNudI=
+
+Name: net/java/xades/security/xml/XAdES/XAdES_X.class
+SHA1-Digest: M4SKEQLXY3cPqNyCI+gu9fW+RIM=
+
+Name: es/gob/afirma/keystores/main/common/KeyStoreUtilities$1.class
+SHA1-Digest: NPzmzfbG70RtiCUtxT2h+CnFYT0=
+
+Name: org/bouncycastle/crypto/params/ECPrivateKeyParameters.class
+SHA1-Digest: LVui80PYHh1Ah+29MqXolsrPFlU=
+
+Name: com/lowagie/text/xml/SAXmyHandler.class
+SHA1-Digest: IAH7WV+rhmtuo07TawSootGBPEk=
+
+Name: org/bouncycastle/asn1/x9/X9IntegerConverter.class
+SHA1-Digest: m7/6Tv+/J8Sr/MZdDJgu7+RVpWw=
+
+Name: org/bouncycastle/operator/jcajce/JcaDigestCalculatorProviderBuil
+ der$1.class
+SHA1-Digest: NZYPbPRgnGGdXIoipDfg9RYmpFk=
+
+Name: com/lowagie/text/pdf/fonts/cmaps/CMapParser$Operator.class
+SHA1-Digest: qQOTD/wlKOtheY9fxTU3URBP6XI=
+
+Name: org/bouncycastle/crypto/params/AsymmetricKeyParameter.class
+SHA1-Digest: +wzlixqKOpaOnDq/z/KPQCtDtKE=
+
+Name: es/gob/afirma/signers/xades/AOFacturaESigner.class
+SHA1-Digest: ph/zYuTKi8HtcymuZ9xb5KK3wgw=
+
+Name: org/bouncycastle/jcajce/provider/asymmetric/ec/ECUtil.class
+SHA1-Digest: uJeOQbMMId9TrNn6lkkiaCWgNtg=
+
+Name: org/bouncycastle/asn1/ASN1Generator.class
+SHA1-Digest: 73qQgsfq0EV7ggH1jfUpFFcN9Ho=
+
+Name: com/lowagie/text/pdf/PageResources.class
+SHA1-Digest: YhbRHJEsicfXjPkOcyMGRy+nBAc=
+
+Name: es/gob/afirma/miniapplet/GetFileContentAction.class
+SHA1-Digest: jk7JMA2Zi+lwHwusTDuWMM1gw9s=
+
+Name: com/lowagie/text/pdf/CFFFont$MarkerItem.class
+SHA1-Digest: Mgj/7sX1xylOfaihvX97F+7+zGA=
+
+Name: es/gob/afirma/ui/core/jse/JSEUIManager$JTextFieldASCIIFilter.cla
+ ss
+SHA1-Digest: lvTR+lWBXKJFC+LFFing0nzTv1I=
+
+Name: com/lowagie/text/pdf/codec/wmf/MetaFont.class
+SHA1-Digest: PdlIbwlix6TsPxirJPurD6fBwAo=
+
+Name: org/bouncycastle/asn1/teletrust/TeleTrusTNamedCurves$10.class
+SHA1-Digest: 9Watt2w40crkWFYSEPMQ4TYrH7s=
+
+Name: com/lowagie/text/pdf/PdfChunk.class
+SHA1-Digest: p3YzMlckvDSvRJR2TSgzECK/FUE=
+
+Name: org/bouncycastle/crypto/digests/SHA1Digest.class
+SHA1-Digest: lQ3r4Hb1+VkG7On8JbkleQ3ec+4=
+
+Name: org/bouncycastle/ocsp/OCSPUtil.class
+SHA1-Digest: dLkxfpHP3qLSTSIP6vd+xygkQD0=
+
+Name: org/bouncycastle/cms/CMSSignatureAlgorithmNameGenerator.class
+SHA1-Digest: 1HVEsJEId/PDgXu9TRkVNKZOrtM=
+
+Name: es/gob/afirma/miniapplet/CertFilterManager.class
+SHA1-Digest: 1AyXU7hLvGS69x1FD1RXL3RYZ50=
+
+Name: org/mozilla/universalchardet/prober/statemachine/UTF8SMModel.cla
+ ss
+SHA1-Digest: ZqpTufdxD6aFPXq5pMpx40wHy+4=
+
+Name: org/bouncycastle/jce/provider/PKIXNameConstraintValidator.class
+SHA1-Digest: N6ZmCn4DlkN0pAd5CLgELjtlVZU=
+
+Name: org/mozilla/universalchardet/prober/MBCSGroupProber.class
+SHA1-Digest: uYAKzk8PV67FvwEG8weRLePOS0E=
+
+Name: es/gob/afirma/ui/core/jse/CertificateUtils.class
+SHA1-Digest: 2A3JABmT3Pf1ibQ953zFJfyRfpg=
+
+Name: com/lowagie/text/ImgTemplate.class
+SHA1-Digest: zq71GdzB3bPkOKhDcLPPV9DGG1M=
+
+Name: com/lowagie/text/pdf/CMYKColor.class
+SHA1-Digest: YCpeom9u33rMMQvq/bnVo67QABA=
+
+Name: org/bouncycastle/asn1/teletrust/TeleTrusTNamedCurves$4.class
+SHA1-Digest: 4itn8NzXgK6zE4w1Emwnai8BMMQ=
+
+Name: org/bouncycastle/jcajce/NamedJcaJceHelper.class
+SHA1-Digest: 6igxQFVhcIgyygHW4xsGrU/zo30=
+
+Name: com/lowagie/text/pdf/CFFFont$UInt16Item.class
+SHA1-Digest: 6rIdLoIqBbkQlaHE2NvgcPg9hl0=
+
+Name: net/sf/jmimemagic/MagicMatchNotFoundException.class
+SHA1-Digest: 42Pl4zWWZs3+8uWzJrNa7u1KMPI=
+
+Name: com/lowagie/text/pdf/MultiColumnText$ColumnDef.class
+SHA1-Digest: iwC4Ufyu9eeLGiJKDI+ab4Tml88=
+
+Name: org/bouncycastle/asn1/nist/NISTNamedCurves.class
+SHA1-Digest: VoMHGxNpGpUEdo6+Dv9OQIKKvq4=
+
+Name: org/bouncycastle/x509/X509V2AttributeCertificate.class
+SHA1-Digest: AGB44/q9ocO1VFJttgJb5WemW8k=
+
+Name: com/lowagie/text/pdf/PdfFunction.class
+SHA1-Digest: epVQjU1ZiHkkrQX45/pRmsiUIiM=
+
+Name: org/bouncycastle/asn1/ASN1Set$1.class
+SHA1-Digest: 18KEvikrWkch6wzBKMls3uHe4CA=
+
+Name: org/bouncycastle/asn1/ess/ContentHints.class
+SHA1-Digest: SgH936+Xnwjgj3b0p7jp9I70P98=
+
+Name: org/mozilla/universalchardet/prober/CharsetProber$ProbingState.c
+ lass
+SHA1-Digest: YiK+9MnUTU9Pzs7tyZw4bRzBV3o=
+
+Name: org/mozilla/universalchardet/prober/sequence/Ibm855Model.class
+SHA1-Digest: vFWmimq6gjxP3CwBrY/YqGEkhr8=
+
+Name: org/bouncycastle/asn1/ASN1ApplicationSpecificParser.class
+SHA1-Digest: A1XXgEXXJWnHnH5XyDWQiplaNG8=
+
+Name: es/gob/afirma/core/InvalidOSException.class
+SHA1-Digest: h3NrAdCJdsrNh6K8c2RgWVp/mIk=
+
+Name: es/gob/afirma/signers/pades/PdfDocumentSecurityStore.class
+SHA1-Digest: zDJE9WWgNLRdDaKJKTrXpj3STKw=
+
+Name: com/lowagie/text/pdf/DefaultSplitCharacter.class
+SHA1-Digest: /f0lZVL3hY4xc6DipAx8IOk/md8=
+
+Name: org/bouncycastle/asn1/x509/X509NameTokenizer.class
+SHA1-Digest: NwNFGpEimJ+vbZaJHrtpT8Hm/dc=
+
+Name: org/bouncycastle/asn1/teletrust/TeleTrusTNamedCurves$11.class
+SHA1-Digest: dVWJSshYZP0n3vVh3riT4TTDiW8=
+
+Name: com/lowagie/text/Jpeg2000.class
+SHA1-Digest: 4XEUoUTEQwOY+TlgXcQbkKXini4=
+
+Name: com/lowagie/text/pdf/codec/JBIG2SegmentReader$JBIG2Page.class
+SHA1-Digest: IrXY8cLAfCfD6w6WTQ6YLt53WT8=
+
+Name: com/lowagie/text/pdf/CFFFont$StringItem.class
+SHA1-Digest: esCFvKkNENMqjXtZVmv3ZSkkFWE=
+
+Name: com/lowagie/text/pdf/hyphenation/TernaryTree$Iterator.class
+SHA1-Digest: pX1WbROg+YYk7XUL2Lsuj/axyb8=
+
+Name: org/mozilla/universalchardet/prober/contextanalysis/JapaneseCont
+ extAnalysis$Order.class
+SHA1-Digest: rEnzGS2PNF3SDZfvtqoBPF8/p78=
+
+Name: org/apache/oro/text/regex/PatternCompiler.class
+SHA1-Digest: DR5HZJHVrTw7WXUVwZPTraPRWaI=
+
+Name: org/bouncycastle/asn1/cms/OriginatorPublicKey.class
+SHA1-Digest: QQ1skNwsxKs/nRCrfCMmMbs6VSQ=
+
+Name: org/bouncycastle/crypto/PBEParametersGenerator.class
+SHA1-Digest: Usqr5Fj/YG8h5wrcVbOH2OVx8Es=
+
+Name: org/bouncycastle/asn1/sec/SECNamedCurves$18.class
+SHA1-Digest: 8yAxVrYupyL5+OO4WnmZQjKz3V4=
+
+Name: org/bouncycastle/cert/selector/MSOutlookKeyIdCalculator.class
+SHA1-Digest: CZBCpwPSU5InmbDvae74gEt+jeU=
+
+Name: org/bouncycastle/asn1/x509/Extensions.class
+SHA1-Digest: 9z7akhzgux5QqT5ka4rrQ2khviY=
+
+Name: com/lowagie/text/pdf/PdfName.class
+SHA1-Digest: F5z8sC35y2YEv4NKXFN3jYKRCfI=
+
+Name: com/lowagie/text/pdf/PdfEncodings$SymbolConversion.class
+SHA1-Digest: Vvv8FAKJADnzhcORwkD1CVP0hlM=
+
+Name: org/bouncycastle/crypto/params/ECKeyParameters.class
+SHA1-Digest: 8dS1d5ID8e2+13bBfBFSyydeCeE=
+
+Name: org/bouncycastle/asn1/teletrust/TeleTrusTNamedCurves$12.class
+SHA1-Digest: Hdv3tSTIV5uyfHAfnhkduHpLhBY=
+
+Name: org/bouncycastle/crypto/digests/RIPEMD256Digest.class
+SHA1-Digest: KsNZTH9V3hBtmpcdUgusMIXGo7M=
+
+Name: org/mozilla/universalchardet/prober/EscCharsetProber.class
+SHA1-Digest: oDf6OAUkupkRDy95LBvi8gqXZo8=
+
+Name: org/bouncycastle/cms/jcajce/JcaSimpleSignerInfoVerifierBuilder$H
+ elper.class
+SHA1-Digest: OPut3/qrMU7uNR2jt+Ym5gTTpkw=
+
+Name: com/lowagie/text/pdf/hyphenation/HyphenationTree.class
+SHA1-Digest: iuu8KUkezMtnaUAnh0tiMmC7O0c=
+
+Name: org/bouncycastle/cms/PasswordRecipientId.class
+SHA1-Digest: 7+SIgJfs4dbfKzc1h4wW0u9cLmg=
+
+Name: es/gob/afirma/signers/padestri/client/AOPDFTriPhaseSigner.class
+SHA1-Digest: tG7pP0hVQ93w+WAsAsWsm7qie+0=
+
+Name: org/bouncycastle/asn1/teletrust/TeleTrusTNamedCurves$7.class
+SHA1-Digest: QZM8NNOoPjh83alYoZtSKiuXGFc=
+
+Name: com/lowagie/text/pdf/PdfBoolean.class
+SHA1-Digest: XkasPIqrKyf+UBCA2/IQeBTfFQ8=
+
+Name: es/gob/afirma/keystores/mozilla/NSPreferences.class
+SHA1-Digest: dBwkjaetXZsQPXu3J7XXVpKDE50=
+
+Name: org/bouncycastle/asn1/ocsp/ResponseData.class
+SHA1-Digest: bzcRkxx5DNLBu2oMvG07Evre6sU=
+
+Name: es/gob/afirma/signers/pkcs7/BCChecker.class
+SHA1-Digest: 8RrTWu94Lv9Nm+4oQL3WDZX0xQ0=
+
+Name: org/bouncycastle/asn1/ASN1InputStream.class
+SHA1-Digest: xIpbwc4sN1BGfZy9LQsTal+5wV8=
+
+Name: com/lowagie/text/pdf/interfaces/PdfViewerPreferences.class
+SHA1-Digest: h+G4us9toXBGrIcAcLCGwOo5V/k=
+
+Name: com/lowagie/text/pdf/internal/PdfXConformanceImp.class
+SHA1-Digest: 2NPEju4vduC0aqrZtZ2JI9k5ndc=
+
+Name: org/bouncycastle/asn1/ocsp/Signature.class
+SHA1-Digest: zVcQzBo87/++nf3YpIraZjYA4fo=
+
+Name: org/bouncycastle/cms/SignerInfoGenerator.class
+SHA1-Digest: k78wsFDMbgPxab1UgLTzLQXkPPQ=
+
+Name: org/bouncycastle/cms/OriginatorId.class
+SHA1-Digest: 90J5WoY8+y7xvRRdExh5e9R/WZA=
+
+Name: net/java/xades/security/xml/XAdES/SignedDataObjectProperties.cla
+ ss
+SHA1-Digest: by4tq/9tJIPpOfYrQ9i0N+tmcl4=
+
+Name: org/bouncycastle/asn1/pkcs/RC2CBCParameter.class
+SHA1-Digest: MNMMG39Wdais8974BDTyv8grv6s=
+
+Name: es/gob/afirma/signers/xades/AOXMLAdvancedSignature.class
+SHA1-Digest: bgzZOmAVoe7Hjvy6Ugfde2Deg2g=
+
+Name: org/bouncycastle/cms/jcajce/JceCMSContentEncryptorBuilder.class
+SHA1-Digest: W8sAAm83i4AA0BcwEV68FzPATfg=
+
+Name: com/lowagie/text/ImgRaw.class
+SHA1-Digest: 0Weiq32UkrbxkDKJNhZH2RIwLsA=
+
+Name: es/gob/afirma/core/ciphers/AOCipher.class
+SHA1-Digest: 2CChs3QytIo0rgRUwk2p37EdanQ=
+
+Name: org/bouncycastle/cms/CMSTypedStream.class
+SHA1-Digest: ALaPWbEVeR2sD3kydET/qfgNjoc=
+
+Name: com/lowagie/text/pdf/codec/TIFFField.class
+SHA1-Digest: JwIBxOz8UAmlrIrQxVLyESTMmE4=
+
+Name: java/com/lowagie/text/pdf/fonts/Courier-Oblique.afm
+SHA1-Digest: AE2HNg1HeTbHxmH4fj11nB3q/iQ=
+
+Name: net/java/xades/security/xml/XAdES/CertDigest.class
+SHA1-Digest: kYklw5zybUYkzdD1onzBoxyfKkk=
+
+Name: org/bouncycastle/crypto/digests/MD2Digest.class
+SHA1-Digest: E3PM3fPlBaFAGGNxlsFZA0ye8H4=
+
+Name: java/com/lowagie/text/pdf/fonts/Symbol.afm
+SHA1-Digest: c3xMf2s1ZqmJCRdyoxnLXGT0Wnc=
+
+Name: com/lowagie/text/pdf/draw/VerticalPositionMark.class
+SHA1-Digest: XIKspq51vgU2o5I930+966+yaA8=
+
+Name: org/bouncycastle/asn1/ess/ESSCertIDv2.class
+SHA1-Digest: H9D7ozLvmvGGtiH5CI72Qtztdzk=
+
+Name: com/lowagie/text/pdf/hyphenation/Hyphen.class
+SHA1-Digest: coB4WQ2gOBgqT/BbNXOzqWrB6xI=
+
+Name: com/lowagie/text/pdf/PdfDeveloperExtension.class
+SHA1-Digest: 9d7wiL1kY2c86YGHufOt4pF0cWc=
+
+Name: org/bouncycastle/asn1/cms/EncryptedContentInfo.class
+SHA1-Digest: byXbJEGVEeDRkFNm49agbvteGIY=
+
+Name: org/bouncycastle/crypto/paddings/BlockCipherPadding.class
+SHA1-Digest: NInmaZFJb/aNhcVOZu7f+g/miSk=
+
+Name: org/bouncycastle/util/io/TeeInputStream.class
+SHA1-Digest: UOoppxC4ybhgQa32g+Al7c2YD3k=
+
+Name: es/gob/afirma/ui/core/jse/AWTUIManager.class
+SHA1-Digest: b+FpwQzGmVyCxSeeBahUXGnVkrg=
+
+Name: org/bouncycastle/asn1/BERApplicationSpecific.class
+SHA1-Digest: 0/rdH6Kwir0gsMvu/0q09CI8hIQ=
+
+Name: org/bouncycastle/asn1/BERTaggedObjectParser.class
+SHA1-Digest: IbpyAJZIvHaOfJQZrymf3AB5+Ao=
+
+Name: org/apache/oro/text/regex/MalformedPatternException.class
+SHA1-Digest: opKTSeX5IGCI7KNqGoTs1km4l1g=
+
+Name: org/apache/oro/text/regex/PatternMatcherInput.class
+SHA1-Digest: tUAWf2+U8es0NQPRDp3OSRMUfoA=
+
+Name: net/java/xades/security/xml/XMLSignatureElement$SimpleKeySelecto
+ rResult.class
+SHA1-Digest: c9xFWEnM5n0GNZjypt0+TfeH34g=
+
+Name: org/bouncycastle/jce/provider/BouncyCastleProvider$1.class
+SHA1-Digest: 4F3D+KevksDFkvIl6MjS+gt38A0=
+
+Name: org/mozilla/universalchardet/prober/EUCKRProber.class
+SHA1-Digest: GdASX6iYr8HQZvUBf4bFtgkGhyU=
+
+Name: java/es/gob/afirma/signers/cades/doc-files/package-info-1.png
+SHA1-Digest: 5AYJ3Nv82J4vhGfh97dBwHDY8Yc=
+
+Name: com/lowagie/text/pdf/PdfDocument$PdfInfo.class
+SHA1-Digest: pXwBmgmn2gHf9fm7XhwgM+Y/AP8=
+
+Name: org/mozilla/universalchardet/prober/statemachine/EUCTWSMModel.cl
+ ass
+SHA1-Digest: w26wAw+S5BeR2Z+B4SSVFSEsfgk=
+
+Name: net/java/xades/security/xml/XAdES/IndividualDataObjectsTimeStamp
+ Details.class
+SHA1-Digest: mw3t09yV2TlXbm46ohRuXQ2T4ro=
+
+Name: org/bouncycastle/cms/jcajce/JcaSimpleSignerInfoVerifierBuilder$N
+ amedHelper.class
+SHA1-Digest: FPlwldTk61OuMTNxqzmQWNZt4us=
+
+Name: org/bouncycastle/cms/CMSSignedGenerator.class
+SHA1-Digest: N1ZRtDKT0Abs15k3fvLKZQTPhe0=
+
+Name: com/lowagie/text/pdf/collection/PdfTargetDictionary.class
+SHA1-Digest: vPHV0QDCRX97nO1aWYGQkl2WxC8=
+
+Name: org/apache/oro/text/perl/Perl5Util.class
+SHA1-Digest: h5FLHZBikALoFu+U3wJfKryEkJA=
+
+Name: org/bouncycastle/x509/X509Util$Implementation.class
+SHA1-Digest: cxiFhqQRlO5MY1ZSuQ5tvwi3edc=
+
+Name: org/bouncycastle/asn1/sec/SECNamedCurves$14.class
+SHA1-Digest: BEnVHP3h0GY43Sbxwh2dy0QgaHY=
+
+Name: com/lowagie/text/pdf/PdfPublicKeySecurityHandler.class
+SHA1-Digest: AJ+10Td0/IAXVxGhxb4rOTcTLO0=
+
+Name: net/java/xades/security/xml/XAdES/XadesElementsEnumeration.class
+SHA1-Digest: LCq4+ougImvi+JbUCOPpxz3n360=
+
+Name: net/java/xades/util/DefaultFileExtension.class
+SHA1-Digest: G3IApd6AuMC575IXhjoWLiBJTGY=
+
+Name: org/bouncycastle/cms/jcajce/JceKEKRecipientInfoGenerator.class
+SHA1-Digest: jEcBXqVr4tdbinKGN6J8YPEBPD8=
+
+Name: org/bouncycastle/asn1/sec/SECNamedCurves$10.class
+SHA1-Digest: gt1JLpqCX/OKbIZNbVvdj9RPj5g=
+
+Name: com/lowagie/text/html/HtmlTagMap.class
+SHA1-Digest: K++Mozj2TD2gpIPysR78ptf75kE=
+
+Name: es/gob/afirma/core/AOInvalidFormatException.class
+SHA1-Digest: nO5Wp31zl5gAEhhJGXaGr7eMM9g=
+
+Name: es/gob/afirma/keystores/main/callbacks/UIPasswordCallback.class
+SHA1-Digest: NWwYcpFLfIc2mkwdrTTGLnlmirg=
+
+Name: org/bouncycastle/cms/jcajce/JceKeyAgreeEnvelopedRecipient.class
+SHA1-Digest: y1OG+nPP4QsAS1tsCrUUvkkGx8g=
+
+Name: com/lowagie/text/pdf/codec/wmf/MetaBrush.class
+SHA1-Digest: ke4D2867ZlnX8YH5FWrqca8E2po=
+
+Name: es/gob/afirma/signers/xades/XAdESCoSigner.class
+SHA1-Digest: pLEsLV2Gz0+c8yuoFZpqE0zYrPI=
+
+Name: java/com/lowagie/text/pdf/fonts/Times-Roman.afm
+SHA1-Digest: 4L7QL+n0QwFBK4aUaCv5BxGXXIs=
+
+Name: org/bouncycastle/x509/X509Store.class
+SHA1-Digest: GkswJgOca4aYGi1mOYyMGvc8bs8=
+
+Name: com/lowagie/text/pdf/PdfPageLabels.class
+SHA1-Digest: LVU7vsHHx9OZ6xR3kq1LUq2u1BE=
+
+Name: org/bouncycastle/asn1/x509/AttCertValidityPeriod.class
+SHA1-Digest: FMGgRjxo0jucJU25oiSKJ+NLGRA=
+
+Name: org/mozilla/universalchardet/prober/GB18030Prober.class
+SHA1-Digest: r9hdVMv8faYLqyOuyD9b6RBXJLY=
+
+Name: es/gob/afirma/signers/pkcs7/ObtainContentSignedData.class
+SHA1-Digest: oJuS28hkrSdWjXgiS2DisNqDtXs=
+
+Name: com/lowagie/text/pdf/parser/ContentOperator.class
+SHA1-Digest: iUz5rxyKyitp7LYAaEkP700hDno=
+
+Name: org/mozilla/universalchardet/prober/statemachine/ISO2022KRSMMode
+ l.class
+SHA1-Digest: YOIDThrXC1yWN1Iiql2iSr85PSA=
+
+Name: com/lowagie/text/pdf/GrayColor.class
+SHA1-Digest: M9k4QI0jpxbOYRl9CyGK3GGhl2U=
+
+Name: net/java/xades/security/xml/XAdES/XAdES_EPES.class
+SHA1-Digest: 2AsuGjQXD0iN1RJFBsnpaaZy0AY=
+
+Name: org/bouncycastle/asn1/DERUTCTime.class
+SHA1-Digest: 5hd9tjb8xxIR3K19ABKNvvV55ek=
+
+Name: com/lowagie/text/pdf/TrueTypeFontSubSet.class
+SHA1-Digest: LZNr3Pe05JmWDxV81MfdO+o2ST8=
+
+Name: org/mozilla/universalchardet/prober/UTF8Prober.class
+SHA1-Digest: x9x2brxLDFWDX39pPcLll+8Nynw=
+
+Name: org/bouncycastle/asn1/ocsp/Request.class
+SHA1-Digest: jackAZYbUxkt6KWr+ecLKEo/rps=
+
+Name: com/lowagie/text/pdf/PdfFont.class
+SHA1-Digest: DbWXKfApZm3kWzEogegohEI3E04=
+
+Name: org/bouncycastle/operator/jcajce/OperatorHelper$OpCertificateExc
+ eption.class
+SHA1-Digest: yprDAUkDYi7sJK9rnew+4K/n+M4=
+
+Name: org/bouncycastle/asn1/x509/PolicyInformation.class
+SHA1-Digest: ouH0QLfazioIWbUPLzs/k0ZiYr0=
+
+Name: net/java/xades/security/xml/XAdES/SignerDetails.class
+SHA1-Digest: k2q/FNcJHszq3gyTzp0mazLRbfY=
+
+Name: org/bouncycastle/jce/spec/MQVPrivateKeySpec.class
+SHA1-Digest: p4+ZnG/zXBfWAnN7MNBXxZ3QZMc=
+
+Name: es/gob/afirma/keystores/main/common/MissingSunMSCAPIException.cl
+ ass
+SHA1-Digest: b1UGJnQWXUBINw2yn41ujUy6JIs=
+
+Name: com/lowagie/text/Cell.class
+SHA1-Digest: jvJot/yQHUzYGrmgGT9C3itWy/g=
+
+Name: com/lowagie/text/pdf/codec/wmf/MetaObject.class
+SHA1-Digest: 2T0U+6y9EzVf3aaDEqoCsr+EVP0=
+
+Name: org/bouncycastle/asn1/sec/SECNamedCurves$29.class
+SHA1-Digest: zTmvshRzYNglMY1u6TFImSpujEE=
+
+Name: es/gob/afirma/miniapplet/MiniAfirma.class
+SHA1-Digest: EjUVat4eOQiG85ru7K37qqFdfgg=
+
+Name: org/bouncycastle/crypto/CryptoException.class
+SHA1-Digest: gsuuos3RKAvb+yHv4Y7OwuIiC6s=
+
+Name: org/bouncycastle/cms/OriginatorInformation.class
+SHA1-Digest: 2btZ8nZHnhIP9gTAv49HkRPQMuk=
+
+Name: es/gob/afirma/ui/core/jse/JSEUIManager$JTextFieldFilter.class
+SHA1-Digest: klDA7cBSEBmTZfr8GAb0f0wC3JI=
+
+Name: org/bouncycastle/operator/KeyUnwrapper.class
+SHA1-Digest: FrSIEa9EQphfU46BnbNW/Xrbvsg=
+
+Name: org/bouncycastle/cms/SignerInformationVerifier.class
+SHA1-Digest: 9sPWF+srwgb6h6lQcKC/2QAJlMY=
+
+Name: org/bouncycastle/asn1/x9/X962NamedCurves$10.class
+SHA1-Digest: P2cxBTOS9JAlaHUgMJ615sZY/XQ=
+
+Name: es/gob/afirma/signers/pkcs7/DigestedData.class
+SHA1-Digest: yg2bAcr2T70hCLooya7ZDmS1osA=
+
+Name: net/java/xades/security/xml/XAdES/XAdES_C.class
+SHA1-Digest: is40Q1nplyjtI0s0wQYd0DTwOC4=
+
+Name: org/bouncycastle/cms/jcajce/JcaSignerInfoGeneratorBuilder.class
+SHA1-Digest: +YDUNOQZlVS4ZqMdzsb9N6YovJk=
+
+Name: es/gob/afirma/signers/pkcs7/P7ContentSignerParameters.class
+SHA1-Digest: TsXSZCWrVFw6CnmpVA4LHmW5dvs=
+
+Name: org/bouncycastle/jce/interfaces/PKCS12BagAttributeCarrier.class
+SHA1-Digest: DK4GnuhpgCw/CdARUXvWV+iWhYk=
+
+Name: org/bouncycastle/asn1/x9/X9FieldID.class
+SHA1-Digest: r0pYet5Qde8MFLDL7jIaXAY+eg0=
+
+Name: org/bouncycastle/cms/jcajce/JceKeyAgreeRecipient.class
+SHA1-Digest: PCNMsJtZ2945f4YN18iWmR6NkQ0=
+
+Name: org/bouncycastle/cms/DefaultCMSSignatureAlgorithmNameGenerator.c
+ lass
+SHA1-Digest: w8S08VTgSAhBBjN6gp3zWsdDy9Y=
+
+Name: org/apache/oro/util/GenericCacheEntry.class
+SHA1-Digest: Y2HN8Oz5Zdj/9KZ5gJ2IPHJEAYs=
+
+Name: org/bouncycastle/operator/OperatorException.class
+SHA1-Digest: yocWGlm/JhI9NeS+nUx7Fo/3/4o=
+
+Name: com/lowagie/text/pdf/PdfDocument$PdfCatalog.class
+SHA1-Digest: Z2iqSVWsPPtB0GtnjKxTorIm8PA=
+
+Name: com/lowagie/text/pdf/PdfPKCS7.class
+SHA1-Digest: e1y26uOPcVGaSA1gmPHOXdEwLNk=
+
+Name: es/gob/afirma/keystores/main/filters/CertificateFilter.class
+SHA1-Digest: rzLrsaln1+fYt26rExH3+MwyiXg=
+
+Name: org/bouncycastle/ocsp/OCSPResp.class
+SHA1-Digest: O2nqLic6p6isHvjZqIvIZQ8c1Oo=
+
+Name: org/bouncycastle/asn1/cms/EnvelopedData.class
+SHA1-Digest: aK+sQHNLTnak9GfmjxB0LGQjOh8=
+
+Name: com/lowagie/text/pdf/PdfICCBased.class
+SHA1-Digest: tgPWWEPfY6Zd9IDlKa0K7GXYFbM=
+
+Name: com/lowagie/text/pdf/PdfStructureTreeRoot.class
+SHA1-Digest: ZTRMDRSthDrvHqDe9qnI/NhMRSo=
+
+Name: org/bouncycastle/asn1/x500/X500Name.class
+SHA1-Digest: 6c92NOfGM3ojFfEs9uUVwQIOKzM=
+
+Name: org/mozilla/universalchardet/prober/EUCJPProber.class
+SHA1-Digest: 1jHRR2m3vNa4cSx/LV+f1OV3MHM=
+
+Name: es/gob/afirma/miniapplet/MiniAfirmaApplet.class
+SHA1-Digest: d1DxwpkOi20PxThmLpTFHjnnh5o=
+
+Name: com/lowagie/text/DocumentException.class
+SHA1-Digest: oHaYf+3WcxAPFqJvsyg33OOGmwE=
+
+Name: es/gob/afirma/keystores/main/callbacks/CachePasswordCallback.cla
+ ss
+SHA1-Digest: jz3jLF/wfLviOjbSFheGBKRMdQ4=
+
+Name: org/bouncycastle/asn1/tsp/TSTInfo.class
+SHA1-Digest: MoM9qaCVyt4Paf9a+uyku8y6QNg=
+
+Name: org/bouncycastle/asn1/x9/X962NamedCurves$4.class
+SHA1-Digest: zTZkMespgySbb1z35zfq3+ZJyRE=
+
+Name: org/bouncycastle/asn1/x509/Holder.class
+SHA1-Digest: UrijAsPISL3aQrMhEPkonlMb+X0=
+
+Name: org/mozilla/universalchardet/prober/statemachine/ISO2022CNSMMode
+ l.class
+SHA1-Digest: 5jNXmBoDhdODl2c3zvHljMR5NXE=
+
+Name: org/bouncycastle/asn1/ASN1Encoding.class
+SHA1-Digest: ovtE0HCaTCINQRLGn/UeFghQDPU=
+
+Name: es/gob/afirma/miniapplet/CounterSignAction.class
+SHA1-Digest: kj+VNg6eMBU1Bg0WM/d9NSpGucc=
+
+Name: com/lowagie/text/pdf/StampContent.class
+SHA1-Digest: WjSIFyvBgjNN38zImPTLqETMqk4=
+
+Name: com/lowagie/text/pdf/parser/PdfContentStreamProcessor$EndText.cl
+ ass
+SHA1-Digest: LWMd1VRZJ7UweinjSbwsPd5aMyA=
+
+Name: java/es/gob/afirma/keystores/mozilla/doc-files/package-info-1.pn
+ g
+SHA1-Digest: pzhpnOy4FUTpF0wOmtFwR5P7SZY=
+
+Name: com/lowagie/text/pdf/parser/PdfTextExtractor.class
+SHA1-Digest: qfs8J0Q8bpZvJuWKgVEWSbxpeBs=
+
+Name: org/bouncycastle/math/ec/SimpleBigDecimal.class
+SHA1-Digest: oU4lPrFHDJpf6YA4DQ+khUG4bf8=
+
+Name: com/lowagie/text/pdf/PdfIndirectObject.class
+SHA1-Digest: dCRJqYBSXX0bpF4Ae7/rtIrCpUU=
+
+Name: org/bouncycastle/asn1/x9/X962NamedCurves$16.class
+SHA1-Digest: 5YRS2zr2rqflQ2MTQXSq10epQvM=
+
+Name: org/bouncycastle/jcajce/provider/util/AlgorithmProvider.class
+SHA1-Digest: G660+9Z6dOWV6yzk8ZvLcNxEfcc=
+
+Name: org/bouncycastle/asn1/ntt/NTTObjectIdentifiers.class
+SHA1-Digest: S7UhQ5WntmKyTSWOP5rqHoA0nS0=
+
+Name: com/lowagie/text/pdf/parser/PdfContentStreamProcessor$PushGraphi
+ csState.class
+SHA1-Digest: uO0kmS5FP5hYVnqPaBbuDMWkBhw=
+
+Name: es/gob/afirma/signers/xades/XAdESCounterSigner.class
+SHA1-Digest: OdTeYfLSqqC+l5wSA6EaxSXl9WY=
+
+Name: com/lowagie/text/pdf/PdfStream.class
+SHA1-Digest: NB4nhzsz7gGDUR+dGERRqdFkbaY=
+
+Name: org/bouncycastle/jce/provider/CertPathValidatorUtilities.class
+SHA1-Digest: 2Zzk/oo/FNeSRnTQTlTUvMXmbA0=
+
+Name: es/gob/afirma/core/util/tree/AOTreeNode$PreorderEnumeration.clas
+ s
+SHA1-Digest: SnoiE/54OM1+WdXRoNNweqaPdJs=
+
+Name: es/gob/afirma/miniapplet/GetFilePathAction.class
+SHA1-Digest: SDEyksO6sAbfjjS4EzkKYERMlhk=
+
+Name: org/bouncycastle/asn1/sec/SECNamedCurves$19.class
+SHA1-Digest: gzSctLJCowJ8hWrzn4Ryn9CMlOs=
+
+Name: org/bouncycastle/cms/SignerId.class
+SHA1-Digest: HH6RvYFdUYK4tGGLUXwJddn3Y/E=
+
+Name: org/bouncycastle/asn1/x9/X962NamedCurves$2.class
+SHA1-Digest: vGU57DejDmQETuEImihbeAa7p8Q=
+
+Name: java/es/gob/afirma/signers/cades/doc-files/CAdESTriPhaseSigner-1
+ .png
+SHA1-Digest: /ua27Zbda0DQP877ibQDRxXPwcc=
+
+Name: com/lowagie/text/pdf/parser/PdfContentStreamProcessor$SetTextWor
+ dSpacing.class
+SHA1-Digest: S+foEVaf75f3nWnadLBHRMTgbbQ=
+
+Name: com/lowagie/text/pdf/codec/wmf/MetaDo.class
+SHA1-Digest: Rx29Epm9Q/rO9DLzKgwmvaYwIrs=
+
+Name: org/bouncycastle/asn1/sec/SECNamedCurves$6.class
+SHA1-Digest: RTMPJjMOGKAc98QAxGAnnBHM2rQ=
+
+Name: com/lowagie/text/pdf/Type1Font.class
+SHA1-Digest: hOkicFk1rM43WI9lCwOJEg9d2kA=
+
+Name: com/lowagie/text/html/HtmlPeer.class
+SHA1-Digest: Q6GPtD0j5bIOy9+zbMIRAfmyzog=
+
+Name: net/java/xades/security/xml/XAdES/QualifyingPropertiesReference.
+ class
+SHA1-Digest: qny6bWSsVWRWoDx3y2JBaeiAAAE=
+
+Name: org/bouncycastle/cms/jcajce/JceKEKRecipient.class
+SHA1-Digest: 0OiTJ6djJPc4ur/PmsG3aQEsAJk=
+
+Name: org/bouncycastle/asn1/DEREnumerated.class
+SHA1-Digest: J4aimzOSFlAMacoiBe5lgiMnYWA=
+
+Name: com/lowagie/text/pdf/PdfContentByte.class
+SHA1-Digest: KzdlI9pk/dEOJDyxl6iDFLIR6JU=
+
+Name: org/bouncycastle/asn1/LazyConstructionEnumeration.class
+SHA1-Digest: +TOixTvwxh16VnvmYGZhC3iZwAs=
+
+Name: com/lowagie/text/xml/xmp/DublinCoreSchema.class
+SHA1-Digest: z+UNpk5Ucm3Cs8c1Uhg/M96/aS8=
+
+Name: org/bouncycastle/asn1/x509/TBSCertList$EmptyEnumeration.class
+SHA1-Digest: xI5UnfIdgBvSzHIpAloBb24pu18=
+
+Name: org/bouncycastle/x509/X509Attribute.class
+SHA1-Digest: a2yKelPtddBqAi8IdXphoqSlI3E=
+
+Name: net/java/xades/security/xml/XAdES/XAdESStructure.class
+SHA1-Digest: y/+DU8g1cP5TwbWPeBeyQ2ZX4rg=
+
+Name: org/bouncycastle/asn1/DERSetParser.class
+SHA1-Digest: hnAo5cg5Zh88E0WgpGCdxtuBU8w=
+
+Name: es/gob/afirma/signers/tsp/pkcs7/CMSTimestamper.class
+SHA1-Digest: kspB5KwAkfMRY9TCCJ+1/peAur0=
+
+Name: org/bouncycastle/cms/jcajce/JcePasswordEnvelopedRecipient.class
+SHA1-Digest: tLCQOyCVrsDMWPMzsJO4RsydP4k=
+
+Name: net/java/xades/util/Base64$OutputStream.class
+SHA1-Digest: 5dsbTg/YUBBje1Z5FE7OjkBJcSQ=
+
+Name: org/bouncycastle/cms/CMSEnvelopedHelper$CMSEnvelopedSecureReadab
+ le.class
+SHA1-Digest: rQy/vZNo/rXWNu2BzaSAQgzKMTY=
+
+Name: org/bouncycastle/asn1/DERBoolean.class
+SHA1-Digest: eLh5PJ84nQzZgG1AxL+NlJpmsV0=
+
+Name: com/lowagie/text/Meta.class
+SHA1-Digest: uDE9/yknq9D2TnHJ8GW8Uu/vY90=
+
+Name: org/bouncycastle/asn1/ASN1Object.class
+SHA1-Digest: 39m8z6Mra7JvVewbQxUZOnsJlIY=
+
+Name: net/java/xades/util/ResourceHelper$FileResourceEntry.class
+SHA1-Digest: vaHraocnP8blLVDbLkS+tL/bb+k=
+
+Name: org/bouncycastle/asn1/cms/SignerInfo.class
+SHA1-Digest: qHn16rUzSDnNoyD+AwcBVaTw+gc=
+
+Name: org/bouncycastle/ocsp/OCSPReq.class
+SHA1-Digest: 2pNpWkI3trkUy7QutktHFpYdjF4=
+
+Name: org/bouncycastle/asn1/x509/IssuingDistributionPoint.class
+SHA1-Digest: rhVmSNLdBqRkEru4LMYykNZJzp4=
+
+Name: com/lowagie/text/pdf/FontSelector.class
+SHA1-Digest: Tc1OWtL0d6sJ186ALOUzHhK5Ylc=
+
+Name: net/java/xades/security/xml/XAdES/AllDataObjectsTimeStamp.class
+SHA1-Digest: WfV8w1r6IRguA1I0rBXgtoCaU48=
+
+Name: template.xml
+SHA1-Digest: 5OnxyKe3kdaUoGoQO8MonAr/yIE=
+
+Name: net/java/xades/security/xml/XAdES/CommitmentTypeIndicationImpl.c
+ lass
+SHA1-Digest: UCGMUxa9jf2dOKxqBQZrEoLXheU=
+
+Name: org/bouncycastle/ocsp/OCSPReqGenerator.class
+SHA1-Digest: 2EHXkPmwuMZF6qfPJKnoeqXc7V8=
+
+Name: org/mozilla/universalchardet/prober/Latin1Prober.class
+SHA1-Digest: 4iL30mv5hs6+uZsp0v1j9TSg3pk=
+
+Name: org/bouncycastle/jce/spec/ECKeySpec.class
+SHA1-Digest: ip7vL5nXCeuBNGug51hnawnylf0=
+
+Name: org/bouncycastle/asn1/x9/X962NamedCurves$22.class
+SHA1-Digest: SLDuECErxLkuX/Uh77KrU9jsIQU=
+
+Name: net/java/xades/security/xml/XAdES/SigningCertificateImpl.class
+SHA1-Digest: P23E9nuTq+2Kvu/9OGwHleFD3jo=
+
+Name: org/bouncycastle/jce/interfaces/ECPointEncoder.class
+SHA1-Digest: 588VDxOm+Nl5kppsr2fyEXGX+p0=
+
+Name: es/gob/afirma/signers/cadestri/client/AOCAdESTriPhaseSigner.clas
+ s
+SHA1-Digest: BclZJ8fUSl+Au2LM5aCwDbZCyUk=
+
+Name: org/bouncycastle/asn1/DERUTF8String.class
+SHA1-Digest: 8qFiIucL1kL1kECTundmFrxmVFs=
+
+Name: com/lowagie/text/pdf/TextField.class
+SHA1-Digest: Iaasg1tkZXp51q587rMEFuxKZjM=
+
+Name: com/lowagie/text/xml/simpleparser/EntitiesToSymbol.class
+SHA1-Digest: B05n8wjF0YnJCFnejMqo5dZW4JQ=
+
+Name: net/java/xades/util/ResourceHelper$ResourceEntry.class
+SHA1-Digest: yusZ8/c5U8/H/EoMOj8y1mUR/uU=
+
+Name: com/lowagie/text/pdf/codec/CCITTG4Encoder.class
+SHA1-Digest: wCQ3IuwPCn/8YXLJDvFXCNiFIG4=
+
+Name: es/gob/afirma/signers/multi/cades/AOCAdESTriPhaseCounterSigner.c
+ lass
+SHA1-Digest: /f6u6/KNEz+aqDFneZ8XIpJyye0=
+
+Name: org/bouncycastle/util/encoders/HexEncoder.class
+SHA1-Digest: tWcA1oITE20QolcMP2f85wFN5sw=
+
+Name: org/bouncycastle/cms/CMSSecureReadable.class
+SHA1-Digest: pug4fOdNB9ZtuZvLVbNJ23pPb7I=
+
+Name: org/bouncycastle/jcajce/provider/config/ProviderConfiguration.cl
+ ass
+SHA1-Digest: /0/YQjL30ZOjUaNc+ynDodYHxIg=
+
+Name: org/mozilla/universalchardet/prober/contextanalysis/EUCJPContext
+ Analysis.class
+SHA1-Digest: 7t5AHZoCpvnF7FLDsgZ8IM1gxdE=
+
+Name: com/lowagie/text/xml/XmlPeer.class
+SHA1-Digest: tn0GBHdbfxJQwYGKQwtq3Pj/Cmo=
+
+Name: org/bouncycastle/cms/jcajce/ProviderJcaJceExtHelper.class
+SHA1-Digest: 74/RVJohFZfrD17BAc+RevbwAJY=
+
+Name: com/lowagie/text/pdf/PdfSignatureAppearance$SignatureEvent.class
+SHA1-Digest: 4nwAjGS+GruACHxI9v+eQb92lkI=
+
+Name: org/bouncycastle/ocsp/OCSPException.class
+SHA1-Digest: F3tbltvnoyazQlgjh+fNlkp8TC0=
+
+Name: org/bouncycastle/cert/X509CRLEntryHolder.class
+SHA1-Digest: eZ4Jpuvrnr/1ghJqcu1QKD3qRX4=
+
+Name: es/gob/afirma/keystores/mozilla/AOSecMod$ModuleName.class
+SHA1-Digest: 2jQYwlTNBXIcobDg/RNLEjORyFo=
+
+Name: org/bouncycastle/util/Selector.class
+SHA1-Digest: HAgIFuzixVn2TbtsGbRGq6h276Y=
+
+Name: org/bouncycastle/asn1/x509/X509Extension.class
+SHA1-Digest: Mt+nsw7WB5zhv6vcXeN7flrRkv0=
+
+Name: org/bouncycastle/asn1/OIDTokenizer.class
+SHA1-Digest: YKYU97XLmywFJKLDpQ6gUTlyeV0=
+
+Name: es/gob/afirma/signers/pades/PdfIsPasswordProtectedException.clas
+ s
+SHA1-Digest: H6Dt8jP1oVUe9l4GNhBf3+MSp5g=
+
+Name: net/java/xades/security/xml/XAdES/CompleteRevocationRefsImpl.cla
+ ss
+SHA1-Digest: 93r8tH0+5BXjZfIuJWZ3xfmei3M=
+
+Name: com/lowagie/text/pdf/ArabicLigaturizer.class
+SHA1-Digest: 6fBjVMitha8VRKEDzG7cEO2/jpo=
+
+Name: org/bouncycastle/cms/KeyTransRecipientInfoGenerator.class
+SHA1-Digest: Mdubg4zpeEfXXzYlImcELFERoXo=
+
+Name: org/bouncycastle/tsp/TimeStampToken$CertID.class
+SHA1-Digest: nURv6BqwYLONl4pnCdBkwOQOi9g=
+
+Name: com/lowagie/text/pdf/codec/JBIG2SegmentReader$JBIG2Segment.class
+SHA1-Digest: 6RnTPNKQDQh/YDVYU5Rqr32804s=
+
+Name: org/bouncycastle/asn1/BERApplicationSpecificParser.class
+SHA1-Digest: zrM9rj/33al0RcCmmf4dfwc4Akc=
+
+Name: org/bouncycastle/math/ec/Tnaf.class
+SHA1-Digest: Yy4ZVc0nvrBviMpjyP0hduHZfqY=
+
+Name: org/bouncycastle/asn1/cms/KeyAgreeRecipientInfo.class
+SHA1-Digest: U+XnCCqweNEoOqWGjEYgVn3hdX8=
+
+Name: com/lowagie/text/pdf/PdfCopy$IndirectReferences.class
+SHA1-Digest: 2Arlhakjgbtnb4bY2FZHF0BpE9Q=
+
+Name: org/bouncycastle/asn1/sec/SECNamedCurves$1.class
+SHA1-Digest: J2z5pnjzwlyIItDTRzGhGGXQCRM=
+
+Name: com/lowagie/text/pdf/interfaces/PdfRunDirection.class
+SHA1-Digest: noggkbtIMJewKxteEMATGXP5pcI=
+
+Name: es/gob/afirma/ui/core/jse/JSEUIManager$1.class
+SHA1-Digest: U4zggCGBxLW+/YEr2iwKCxrXcIo=
+
+Name: net/java/xades/security/xml/XAdES/SignerRoleImpl.class
+SHA1-Digest: gWUlc76hUxEZ7d6QdxYyOY/Mc8E=
+
+Name: net/java/xades/security/xml/XAdES/SignatureTimeStamp.class
+SHA1-Digest: WO56ZthcxXTeI/fEqerCPpOIJF4=
+
+Name: org/bouncycastle/asn1/LimitedInputStream.class
+SHA1-Digest: SbuL9BdWDimuj3SFBFVDqA//dRM=
+
+Name: es/gob/afirma/signers/xml/XMLConstants$2.class
+SHA1-Digest: xU2MqdR/0iH+iqYuMvqmEgLcMew=
+
+Name: org/bouncycastle/jce/interfaces/ECPrivateKey.class
+SHA1-Digest: PqfluqkrWuK+U3z9KMkHsN9jWOs=
+
+Name: net/java/xades/util/FileExtension.class
+SHA1-Digest: 3dXalI/8gAOgCxHtARkWHjqOtRw=
+
+Name: org/mozilla/universalchardet/prober/EUCTWProber.class
+SHA1-Digest: 9hw75ZX4Vg1A/JiuLPtLM6pg4qY=
+
+Name: org/apache/oro/text/regex/Perl5Compiler.class
+SHA1-Digest: vet0ogbRFtPdq4pBMF6lsV4Gakk=
+
+Name: org/mozilla/universalchardet/prober/statemachine/UCS2BESMModel.c
+ lass
+SHA1-Digest: j7ibRLFBSnuTrefnzSVxkcwVM0k=
+
+Name: com/lowagie/text/LargeElement.class
+SHA1-Digest: vZXSQYiXG0yabMWO1jKpAe64MXM=
+
+Name: com/lowagie/text/xml/xmp/XmpArray.class
+SHA1-Digest: wXiIelOWziolQtH14u+lbjI1G0o=
+
+Name: es/gob/afirma/keystores/mozilla/MozillaKeyStoreUtilities$1.class
+SHA1-Digest: wW2QJLwIFcd4K9mQJNYBRYJXPGY=
+
+Name: com/lowagie/text/pdf/codec/JBIG2SegmentReader.class
+SHA1-Digest: jcBtHHE8JW+53zjL6LfAfWxN90s=
+
+Name: org/bouncycastle/asn1/DERBitString.class
+SHA1-Digest: rVoI6aNEs0xn8GvWDVicJOxhUag=
+
+Name: com/lowagie/text/pdf/interfaces/PdfDocumentActions.class
+SHA1-Digest: dLYz7jUlTlST0MUD2ddzsgOCULg=
+
+Name: org/bouncycastle/ocsp/CertificateID.class
+SHA1-Digest: pvX6HW31eIvV9XxPHhWmT49doWY=
+
+Name: resources/mimetypes_oids.properties
+SHA1-Digest: Onpf4j3uMP9TurrsYIfMcqXG/Go=
+
+Name: org/bouncycastle/cms/KeyAgreeRecipientId.class
+SHA1-Digest: VSUXwn/vdsZWudIqbOrRyabzoDM=
+
+Name: org/bouncycastle/cms/jcajce/JcePasswordAuthenticatedRecipient$1.
+ class
+SHA1-Digest: jWzUnaIPpe9jZUOn001cvk8IgsA=
+
+Name: org/bouncycastle/asn1/teletrust/TeleTrusTNamedCurves$6.class
+SHA1-Digest: Wwo3b8Q35d47OlUu+0RYEMht2iY=
+
+Name: com/lowagie/text/pdf/PdfPageLabels$PdfPageLabelFormat.class
+SHA1-Digest: Z5r+Je1bkBGk/3IUSr2WqKwi6Fs=
+
+Name: com/lowagie/text/pdf/fonts/cmaps/CMap.class
+SHA1-Digest: yH9K3ICH3G4m+GAu16QACH5hGLU=
+
+Name: net/java/xades/security/xml/XAdES/QualifyingProperties.class
+SHA1-Digest: VmVFZ689v/RPcY+57yGIUrlMsBk=
+
+Name: org/bouncycastle/asn1/x9/X9ECParametersHolder.class
+SHA1-Digest: O11HccjP5LAB+Ux4Vw6NwIGz2uU=
+
+Name: es/gob/afirma/core/ciphers/CipherConstants.class
+SHA1-Digest: gAZhBXAh5GbOjKvYj4YTv9hP6bs=
+
+Name: org/bouncycastle/asn1/x509/X509NameEntryConverter.class
+SHA1-Digest: QRaYOZBMh2Lbtdn4Zty82lQO5us=
+
+Name: org/bouncycastle/tsp/TSPException.class
+SHA1-Digest: gYv2UbWL88OSk+pX4+MC+n8nLBQ=
+
+Name: org/bouncycastle/asn1/x509/TBSCertList$RevokedCertificatesEnumer
+ ation.class
+SHA1-Digest: c07Yny4E+YumOkqqAWbfhOxOPKU=
+
+Name: es/gob/afirma/signers/multi/cades/CAdESTriPhaseCounterSigner.cla
+ ss
+SHA1-Digest: nTKCHYJ4j1nXfQAB06aAQj6aE10=
+
+Name: com/lowagie/text/pdf/collection/PdfCollection.class
+SHA1-Digest: Os8IaH+fDPt1OlMUXcOoKuxDkTQ=
+
+Name: com/lowagie/text/pdf/draw/LineSeparator.class
+SHA1-Digest: cQaJLqZEWf6eQ29xZeoVnR84hS0=
+
+Name: org/bouncycastle/math/ec/IntArray.class
+SHA1-Digest: KDcwWXGCzthHfVZB1361RFIBoro=
+
+Name: com/lowagie/text/pdf/interfaces/PdfEncryptionSettings.class
+SHA1-Digest: kly5/MXgQc1Fnvd3CulfFo9EGnc=
+
+Name: org/bouncycastle/cms/jcajce/JcaSimpleSignerInfoVerifierBuilder.c
+ lass
+SHA1-Digest: 6ijE5ecJyevKwH9C6Ky4bQTOilM=
+
+Name: org/bouncycastle/asn1/x500/style/RFC4519Style.class
+SHA1-Digest: fFuHP5PLUgNtkQjDoN1HOezdtSc=
+
+Name: es/gob/afirma/keystores/main/common/AOKeystoreAlternativeExcepti
+ on.class
+SHA1-Digest: 1aU0gM1H4mU66NZcW0NotTz0oSI=
+
+Name: com/lowagie/text/pdf/codec/wmf/MetaPen.class
+SHA1-Digest: CzeXVbHGZq31Eg6mlj/61vuB9fk=
+
+Name: org/bouncycastle/asn1/DERTaggedObject.class
+SHA1-Digest: 8ViZNGYxK3qQ5uYmfKlIgAn59dA=
+
+Name: es/gob/afirma/miniapplet/keystores/filters/SSLFilter.class
+SHA1-Digest: I1TR2KEULxEcgceBVXme7q+ULqQ=
+
+Name: com/lowagie/text/pdf/hyphenation/Hyphenation.class
+SHA1-Digest: upvYAg2sKq8xt5B7v81qGebbB+c=
+
+Name: org/bouncycastle/crypto/paddings/PaddedBufferedBlockCipher.class
+SHA1-Digest: Y5/Ui9zIPeZw7hGM6dhGLPWmpMc=
+
+Name: org/bouncycastle/jce/interfaces/GOST3410PrivateKey.class
+SHA1-Digest: ZITyWNln2E+0FGSPFkbJGlcgiwg=
+
+Name: es/gob/afirma/ui/core/jse/CertificateSelectionPanel.class
+SHA1-Digest: YJ5B8om447ttthCcvcKo31opCgk=
+
+Name: com/lowagie/text/pdf/hyphenation/CharVector.class
+SHA1-Digest: FtHNltJ+r8TsOOahrTdfAL7m1hM=
+
+Name: org/bouncycastle/asn1/x9/X9ECPoint.class
+SHA1-Digest: FNgZhj2LgukJrdqWMowEIXeyTwI=
+
+Name: es/gob/afirma/signers/pkcs7/ContainsNoDataException.class
+SHA1-Digest: MNvBqde5owVQUB/nYMAcJb5BgGU=
+
+Name: es/gob/afirma/keystores/main/filters/MultipleCertificateFilter.c
+ lass
+SHA1-Digest: tWwu21KQNGJVdvSnbyvb4oGIsCo=
+
+Name: com/lowagie/text/pdf/parser/PdfContentStreamProcessor$PopGraphic
+ sState.class
+SHA1-Digest: OpCAphJtmRFA4Iz4uASNZznvPFU=
+
+Name: org/bouncycastle/jce/interfaces/ECPublicKey.class
+SHA1-Digest: f0nLnnXN5lDuiVhh7j1n2BmS5Z0=
+
+Name: org/bouncycastle/asn1/ASN1Enumerated.class
+SHA1-Digest: yCtLU414OBiWvgNNhCYBSrxsUUo=
+
+Name: org/bouncycastle/asn1/x500/style/IETFUtils.class
+SHA1-Digest: n8Ac7FbFZ+8agnRGUPtkWAzeeYk=
+
+Name: com/lowagie/text/pdf/CFFFont$DictOffsetItem.class
+SHA1-Digest: hCy2rQO3hPffXeNvhkuKz67HadY=
+
+Name: org/bouncycastle/asn1/ASN1OutputStream.class
+SHA1-Digest: zU7YmkTmpbF7u232uxhKCAeHnTU=
+
+Name: org/bouncycastle/crypto/params/ParametersWithRandom.class
+SHA1-Digest: JKiFolLQ3mSk2GrxiPb4qTq1XjI=
+
+Name: com/lowagie/text/pdf/codec/GifImage$GifFrame.class
+SHA1-Digest: nJkT2/u21MmKOrU9z1cipgjhrb8=
+
+Name: org/bouncycastle/math/ec/ZTauElement.class
+SHA1-Digest: vu+lZEEXVLScHsDZp0esd653/28=
+
+Name: org/bouncycastle/asn1/cms/SignerIdentifier.class
+SHA1-Digest: S0fmnZt+2Sjv90HLJpkfjSJ5KKc=
+
+Name: com/lowagie/text/pdf/PdfNumberTree.class
+SHA1-Digest: 4GM/OOiqqlRVRr1tnOeoucZR088=
+
+Name: com/lowagie/text/ElementListener.class
+SHA1-Digest: 4SsceT+g/QNLl8z0H8oCUkflLng=
+
+Name: com/lowagie/text/pdf/PdfWriter$PdfTrailer.class
+SHA1-Digest: R2i5PfW+8NHAkT2BnNhDLZ+hnzg=
+
+Name: com/lowagie/text/pdf/PRAcroForm.class
+SHA1-Digest: 947dVqNRd62IKkOUlavYW0PxgYc=
+
+Name: com/lowagie/text/html/HtmlTags.class
+SHA1-Digest: oqLpNh8brKhCSo2WH0Naw0ILzx8=
+
+Name: org/bouncycastle/asn1/sec/SECNamedCurves$2.class
+SHA1-Digest: q36FqG1utTF2ISXzAz/GVsx3YkM=
+
+Name: org/bouncycastle/asn1/cms/ecc/MQVuserKeyingMaterial.class
+SHA1-Digest: RPV7T8xo49QNhuQXqKeS2ZeV80A=
+
+Name: org/bouncycastle/asn1/DERInteger.class
+SHA1-Digest: 5HWX7NXSec5yAoNI/w1QFEXQ6S8=
+
+Name: com/lowagie/text/pdf/PdfPCell.class
+SHA1-Digest: o4pYi+cBlyQkE5cSFtqOueQ2XX4=
+
+Name: com/lowagie/text/pdf/PdfBorderDictionary.class
+SHA1-Digest: aATjoLWmvElftvpw9ejcqEyc9JE=
+
+Name: org/bouncycastle/asn1/x509/CRLDistPoint.class
+SHA1-Digest: DMhgvceHb0p/oyamaIs//E1xx5M=
+
+Name: net/java/xades/util/ResourceHelper$JarResourceEntries.class
+SHA1-Digest: qWqH6grG4bAI62TFEdpTkBU76O4=
+
+Name: org/bouncycastle/cms/CMSVerifierCertificateNotValidException.cla
+ ss
+SHA1-Digest: zxw7pmlklScx6XXu4RaphmmDB2I=
+
+Name: org/bouncycastle/asn1/x509/AlgorithmIdentifier.class
+SHA1-Digest: wNrIPds6xD+TD4CRvU2xrVS69xo=
+
+Name: es/gob/afirma/core/util/tree/AOTreeNode$1.class
+SHA1-Digest: 3wXQmUFjgfqLnA/+DZGMcWP/H7g=
+
+Name: com/lowagie/text/pdf/PdfPages.class
+SHA1-Digest: I5EFdEUBFHsT1xxjPLhBBxOh7bs=
+
+Name: org/bouncycastle/asn1/x509/ExtendedKeyUsage.class
+SHA1-Digest: TQXR45cXUxllzCbzLLiLCwVq/Gg=
+
+Name: com/lowagie/text/pdf/PdfSigGenericPKCS$PPKLite.class
+SHA1-Digest: 9laaObYIbuOZeQoax2wxO6MBgZA=
+
+Name: com/lowagie/text/Chapter.class
+SHA1-Digest: 4fV0GQmICMqNrWtqKGjasNlMLb8=
+
+Name: es/gob/afirma/core/util/windows/WinRegistryWrapper.class
+SHA1-Digest: z1/L1jx1zGP6pVWP00LFYYoyJI0=
+
+Name: org/bouncycastle/asn1/pkcs/PrivateKeyInfo.class
+SHA1-Digest: tZr9ZDlotpziA4o6BtO6Q+oYlhs=
+
+Name: com/lowagie/text/pdf/PdfSignatureAppearance.class
+SHA1-Digest: oFejFTZiBC7uplVh9f0F7GJkA7s=
+
+Name: net/java/xades/security/xml/XAdES/XAdES.class
+SHA1-Digest: lXjGP7Q9KEDoQ9IdW9hpqmQ2J3Q=
+
+Name: org/bouncycastle/asn1/teletrust/TeleTrusTNamedCurves$14.class
+SHA1-Digest: 6EVo8m8OQI7lBcO0qQb1Wb04YZs=
+
+Name: org/bouncycastle/asn1/sec/SECNamedCurves$25.class
+SHA1-Digest: bZ1a/eTKQUCPPJPgYCNiQEjSP44=
+
+Name: org/bouncycastle/cms/jcajce/JceKeyAgreeRecipientInfoGenerator.cl
+ ass
+SHA1-Digest: RNxRl1wwhSRgLr+eLZRbBiqgMjs=
+
+Name: com/lowagie/text/pdf/PdfPTable.class
+SHA1-Digest: 9d9CM41NKfwPsF6iJm2puGWFQ24=
+
+Name: org/bouncycastle/asn1/misc/MiscObjectIdentifiers.class
+SHA1-Digest: 18UuRPCJUHoUQEgXV1s9RAnXfPw=
+
+Name: org/bouncycastle/asn1/x9/X962NamedCurves$6.class
+SHA1-Digest: arIZBVvKBQLXFhLSublzcQNNd+E=
+
+Name: org/bouncycastle/asn1/cms/KEKIdentifier.class
+SHA1-Digest: dQ+sAs4omkpIegB+8n8hRq8J33o=
+
+Name: org/bouncycastle/asn1/ASN1Integer.class
+SHA1-Digest: +hLEUeyEOovffLG4Rs/iposvPsY=
+
+Name: es/gob/afirma/signers/multi/cades/CAdESTriPhaseCounterSigner$CAd
+ ESPreCounterSignResult.class
+SHA1-Digest: uUisrXYwZIPeE0W3Y5bPOJ4YugI=
+
+Name: org/bouncycastle/cms/jcajce/JceKeyAgreeEnvelopedRecipient$1.clas
+ s
+SHA1-Digest: JWRNrsSSsLL81FnJptycTElpNFY=
+
+Name: org/bouncycastle/asn1/kisa/KISAObjectIdentifiers.class
+SHA1-Digest: itJMo5Qb29OZWEujTl7EnOqwN8w=
+
+Name: com/lowagie/text/exceptions/BadPasswordException.class
+SHA1-Digest: aICTOAElE9hVAEvg1PbcJKd19ww=
+
+Name: org/bouncycastle/asn1/ASN1EncodableVector.class
+SHA1-Digest: /zt61hiKqB107SG3Wz0jCtqvDDU=
+
+Name: com/lowagie/text/pdf/PRStream.class
+SHA1-Digest: FXQsudTr43m6s5Eea9/JExH+LWM=
+
+Name: org/bouncycastle/asn1/ASN1GeneralizedTime.class
+SHA1-Digest: ng1AcD5jORoYdq5VPoKsOeVlRY4=
+
+Name: org/bouncycastle/x509/AttributeCertificateIssuer.class
+SHA1-Digest: 7322WTq3zBBmrC08r55L+rnt/Jo=
+
+Name: org/apache/oro/text/regex/MatchResult.class
+SHA1-Digest: asytiQhRFLjg9iF/qYxUNgLMoO8=
+
+Name: org/bouncycastle/math/ec/ECCurve$F2m.class
+SHA1-Digest: sRncTRrbzc+qybnTvvzj01gDIO0=
+
+Name: org/bouncycastle/cms/jcajce/JceAlgorithmIdentifierConverter.clas
+ s
+SHA1-Digest: MtaXCVUddNVZgM+UQPK8LDjx6KI=
+
+Name: org/bouncycastle/operator/jcajce/JcaContentSignerBuilder$1.class
+SHA1-Digest: 3Y7EZz5ayCv5mQIOH90aj+591Mc=
+
+Name: org/bouncycastle/math/ec/WTauNafMultiplier.class
+SHA1-Digest: h1WiV9CgOZioDc1bKpBon83LXbg=
+
+Name: es/gob/afirma/core/misc/Base64.class
+SHA1-Digest: M9AVuU63K4zI1H+D3IIjOseNRkA=
+
+Name: org/bouncycastle/jcajce/ProviderJcaJceHelper.class
+SHA1-Digest: mP9JDaX0M92sKXVd4GrGU5fFCbI=
+
+Name: com/lowagie/text/pdf/PdfNumber.class
+SHA1-Digest: 6HpKelWwuY03XZz73xwV4Tdz7rU=
+
+Name: com/lowagie/text/pdf/PdfEncodings$SymbolTTConversion.class
+SHA1-Digest: 8Gi8jeJ0PT54Vqn/HM4hIL+xjWg=
+
+Name: org/bouncycastle/jcajce/DefaultJcaJceHelper.class
+SHA1-Digest: gSEqPBhQL3r0SFXLTKE1idGIJYA=
+
+Name: com/lowagie/text/pdf/parser/PdfContentStreamProcessor$BeginText.
+ class
+SHA1-Digest: 2slo29EM2lG22XvwTeGExwgRI0g=
+
+Name: org/bouncycastle/crypto/engines/AESFastEngine.class
+SHA1-Digest: +gygL7C+SiHh4VurLwTLpF0EMrw=
+
+Name: es/gob/afirma/miniapplet/SelectSignerAction.class
+SHA1-Digest: GV84kZUi7uu5iv8tNw5oNnhPf8c=
+
+Name: org/apache/oro/text/regex/Pattern.class
+SHA1-Digest: hzDpmG9zvGo3gpN5cXDM/5amXkA=
+
+Name: org/bouncycastle/asn1/DERUniversalString.class
+SHA1-Digest: aFlnLNc0IFpcYcBujUrrqESNd34=
+
+Name: org/bouncycastle/asn1/ocsp/SingleResponse.class
+SHA1-Digest: cp4s8YPp8hT6srhy+jFja/XI7Tk=
+
+Name: net/java/xades/security/xml/XAdES/Cert.class
+SHA1-Digest: u8Zt9un/9j5PbokglsMfqB8OX4A=
+
+Name: com/lowagie/text/pdf/parser/PdfContentStreamProcessor$MoveNextLi
+ neAndShowTextWithSpacing.class
+SHA1-Digest: ptU/8VHw8+zkhc9+JFVTMSqIQpw=
+
+Name: net/java/xades/util/Base64$InputStream.class
+SHA1-Digest: SXIj/B8/jnD3r1ocbiJyKNqF6+8=
+
+Name: org/bouncycastle/asn1/sec/SECNamedCurves.class
+SHA1-Digest: mzmkFP6elv7PEvUKjvpFUO+bzkc=
+
+Name: org/bouncycastle/jce/provider/PKIXCRLUtil.class
+SHA1-Digest: p1NWtwnjync1i2mqhQJME9aZsmQ=
+
+Name: java/com/lowagie/text/pdf/fonts/glyphlist.txt
+SHA1-Digest: FeOZwf2x3O3PZJ/H5ZSiOomrZgg=
+
+Name: com/lowagie/text/pdf/IntHashtable$IntHashtableIterator.class
+SHA1-Digest: GiGtr7ymH390CQjUqfNXDA2mx2I=
+
+Name: org/bouncycastle/tsp/TSPValidationException.class
+SHA1-Digest: jVlddcwuUk7wGAlbZ0MPkHRvke4=
+
+Name: com/lowagie/text/pdf/PdfPRow.class
+SHA1-Digest: aD3D+sUWZ5b11sqljssLyQvBRCI=
+
+Name: org/bouncycastle/asn1/ess/SigningCertificate.class
+SHA1-Digest: d9Ij94ZIyyuiQeI/fVVQdq/07V0=
+
+Name: org/bouncycastle/cms/CMSSignedDataGenerator.class
+SHA1-Digest: kT680E1XrcCJ31IGlOfXSPmlNAQ=
+
+Name: org/bouncycastle/operator/GenericKey.class
+SHA1-Digest: PLFcZ98pBSgABkbzQG4r+j5e0rg=
+
+Name: net/java/xades/security/xml/XAdES/ArchivalXAdESImpl.class
+SHA1-Digest: IQ1qcFl3w88AxrJZ8nr1SikZyPo=
+
+Name: net/sf/jmimemagic/MagicParser.class
+SHA1-Digest: KQCsKsSlcX7OBZtabBoF16FCQCg=
+
+Name: com/lowagie/text/pdf/XfaForm$AcroFieldsSearch.class
+SHA1-Digest: LfX6D2xvuGxciywQZKTheooQFto=
+
+Name: org/mozilla/universalchardet/prober/sequence/MacCyrillicModel.cl
+ ass
+SHA1-Digest: GMYpCI3+ogRMAo0U/tfnx1Ifzc8=
+
+Name: es/gob/afirma/core/ciphers/CipherConstants$AOCipherBlockMode.cla
+ ss
+SHA1-Digest: FFzQvXS8zRj7dNTK/S0Jb+5c8bw=
+
+Name: org/bouncycastle/asn1/x509/NameConstraints.class
+SHA1-Digest: s58v6OHVVBOnqKKVgCkNxZooqa0=
+
+Name: net/java/xades/util/DOMOutputImpl.class
+SHA1-Digest: f+yw48jX9+JKX2UXokUvgHi84+0=
+
+Name: com/lowagie/text/pdf/IntHashtable.class
+SHA1-Digest: H0RBaB9QJ5V9lCePM7MBUqbNXGI=
+
+Name: org/apache/oro/text/regex/PatternMatcher.class
+SHA1-Digest: VuZ07zJzn6dkEF/XUpb6An6SLC8=
+
+Name: org/mozilla/universalchardet/prober/sequence/Win1253Model.class
+SHA1-Digest: fhTavYJh7Porv3+h6XlunqzKqQ0=
+
+Name: org/bouncycastle/asn1/ASN1Null.class
+SHA1-Digest: E8zAD6ceUDwFfBOW28YEpYUFz8s=
+
+Name: net/java/xades/security/xml/XAdES/RoleType.class
+SHA1-Digest: 8qfvCLt3q9lXT9UDubHyg/t+Foo=
+
+Name: com/lowagie/text/RectangleReadOnly.class
+SHA1-Digest: 224FMl4BCRpZ+Mdps5PTOQOCiHM=
+
+Name: com/lowagie/text/pdf/BaseFont.class
+SHA1-Digest: Gg+nxhO2J4CMru3dXZxrKuyT8H8=
+
+Name: org/bouncycastle/operator/InputDecryptor.class
+SHA1-Digest: 9MSsVoRthMCOdekomo/rV31a5QU=
+
+Name: net/java/xades/security/xml/XAdES/UnsignedProperties.class
+SHA1-Digest: UKtFTENeqOfOBmJ2mMdpTcC0YHQ=
+
+Name: com/lowagie/text/pdf/PdfShading.class
+SHA1-Digest: fmOUDvPdoRjZe0oihVO92g9cutM=
+
+Name: org/bouncycastle/asn1/teletrust/TeleTrusTNamedCurves$3.class
+SHA1-Digest: dbEMo2MTZGQ2RNiRkVTZzOV05BY=
+
+Name: org/bouncycastle/crypto/RuntimeCryptoException.class
+SHA1-Digest: hXJ3g6kw4mfWlJDScATuRZZY/B0=
+
+Name: es/gob/afirma/miniapplet/SaveFileAction.class
+SHA1-Digest: MHt1lvfvfXbGPpvmA8SDpo3cMfU=
+
+Name: net/sf/jmimemagic/MagicException.class
+SHA1-Digest: xYsISEzqiuH8NEb41iQDCOaEFV8=
+
+Name: es/gob/afirma/keystores/mozilla/NSPreferences$FirefoxProfile.cla
+ ss
+SHA1-Digest: eLf3BYJLzHHbamMQv7JSbfFpw6g=
+
+Name: com/lowagie/text/pdf/PdfEncryption.class
+SHA1-Digest: lcCwjVZmwMaWfjoGOLrXykbRVzw=
+
+Name: com/lowagie/text/SpecialSymbol.class
+SHA1-Digest: odfhj5HwaVTPzCrKpotmlXZsnIw=
+
+Name: org/bouncycastle/asn1/cms/KEKRecipientInfo.class
+SHA1-Digest: SKiWJSdR3PN8wUEgN25PdrJ0NGA=
+
+Name: org/bouncycastle/asn1/DLTaggedObject.class
+SHA1-Digest: ssQENQvtxV5kLaHMVmtzD7zId/s=
+
+Name: es/gob/afirma/core/util/tree/AOTreePath.class
+SHA1-Digest: TH+oe11ffNFUFRwz05GRPHDwd0A=
+
+Name: org/bouncycastle/math/ec/ECFieldElement.class
+SHA1-Digest: lYKUi0iiokUm8LnVXXQcuw6Ysew=
+
+Name: com/lowagie/text/pdf/parser/PdfContentStreamProcessor$MoveNextLi
+ neAndShowText.class
+SHA1-Digest: ZIHZHxPet2AeC2CG2Dbuv3g6tSs=
+
+Name: es/gob/afirma/core/signers/AOSigner.class
+SHA1-Digest: JvOmoeneS/Q/mLTXoCZ3lY/UVFU=
+
+Name: org/bouncycastle/asn1/DEROutputStream.class
+SHA1-Digest: jsoQ/ODEU2MuINdEOFlRrlonPuw=
+
+Name: org/bouncycastle/asn1/ASN1Choice.class
+SHA1-Digest: 4Ho2dRxVOHZbG2HvBYz4ZL8ZyhI=
+
+Name: java/com/lowagie/text/pdf/fonts/Times-Italic.afm
+SHA1-Digest: 1COKxiIyTmT/GvojeYek13ZXHmg=
+
+Name: net/java/xades/security/xml/XAdES/SignatureProductionPlace.class
+SHA1-Digest: OXOoSaIH6j7wSSUHW2hfJdwzJJ0=
+
+Name: org/apache/oro/text/regex/Perl5Matcher.class
+SHA1-Digest: NLJr+MbUaYstHc1K+nX264KZEGY=
+
+Name: org/mozilla/universalchardet/prober/statemachine/ISO2022JPSMMode
+ l.class
+SHA1-Digest: 89STFutHGjR4SoROAQ0D5J8cWXA=
+
+Name: org/bouncycastle/asn1/DERNull.class
+SHA1-Digest: L7iC028Q5aAhcg2fV5u5tsmA7fM=
+
+Name: es/gob/afirma/core/AOUnsupportedSignFormatException.class
+SHA1-Digest: Ibm5IORQfQGkcW3xaP+J2lweWGw=
+
+Name: org/bouncycastle/jcajce/provider/config/ProviderConfigurationPer
+ mission.class
+SHA1-Digest: apqgfajEo8IsrmslDUjysIh8YDU=
+
+Name: org/bouncycastle/jce/provider/PKIXPolicyNode.class
+SHA1-Digest: UAQUv14i4jhWMs1HtrxtRO8obmI=
+
+Name: com/lowagie/text/pdf/PdfAnnotation.class
+SHA1-Digest: X2JTHiXmcxiW14k5paWrkYE90PA=
+
+Name: org/bouncycastle/jce/interfaces/MQVPublicKey.class
+SHA1-Digest: Qjqmgf24aqVrb0onYbDOB2Y0xMU=
+
+Name: org/apache/oro/text/regex/Perl5Repetition.class
+SHA1-Digest: enRQLNnNlKbT6gBWaye62FTFccQ=
+
+Name: com/lowagie/text/pdf/ByteBuffer.class
+SHA1-Digest: X5So5fTTBoj/MfXkj2B1yCc55qc=
+
+Name: com/lowagie/text/Document.class
+SHA1-Digest: DMqTwtgVYYKqgmVIUB2eA/5Swjw=
+
+Name: org/bouncycastle/asn1/BERSequenceParser.class
+SHA1-Digest: xLvk7DToJ5QaTf9lTkdlGCPZu9Y=
+
+Name: org/bouncycastle/crypto/digests/GOST3411Digest.class
+SHA1-Digest: 3rdHAS/XCA1RdGPCI/33/HZnlWI=
+
+Name: es/gob/afirma/core/signers/AOSimpleSignInfo.class
+SHA1-Digest: wN4pfW8y6nUS5R0QPNY/rfXy1Bg=
+
+Name: org/bouncycastle/asn1/x509/V2Form.class
+SHA1-Digest: J98wrJ6VBG+13eeaiEPd0HQ+v2U=
+
+Name: org/bouncycastle/asn1/sec/SECNamedCurves$12.class
+SHA1-Digest: XXhvIlkIPWc5PFYaFB3iXlO+XQM=
+
+Name: org/bouncycastle/asn1/x9/X962NamedCurves$11.class
+SHA1-Digest: LtshCsgP8y386z98UC48YuFSOqA=
+
+Name: org/bouncycastle/crypto/digests/GeneralDigest.class
+SHA1-Digest: eJoY201Y7EkB25ZwW3Ea7bQ/8Is=
+
+Name: com/lowagie/text/pdf/internal/PdfViewerPreferencesImp.class
+SHA1-Digest: Bc+34EsPCBry3DI3H0H9TBn0svk=
+
+Name: es/gob/afirma/core/ciphers/CipherConstants$AOCipherPadding.class
+SHA1-Digest: BUAA8GEn/XhCJhNCiKMbMDUlmHY=
+
+Name: com/lowagie/text/RtfElementInterface.class
+SHA1-Digest: C2Di5dzfj7qmDevO3g2jARgoR+c=
+
+Name: es/gob/afirma/signers/multi/cades/CAdESCounterSigner.class
+SHA1-Digest: we6/Hrd8Iu1lN7uMGYxHk6Bk7So=
+
+Name: org/bouncycastle/asn1/cms/EncryptedData.class
+SHA1-Digest: QHEdoxaK74t057s0qxGxsQOiMRY=
+
+Name: org/bouncycastle/crypto/InvalidCipherTextException.class
+SHA1-Digest: JrZlFCdJpofS4o+4+oAUZpUUsyE=
+
+Name: org/bouncycastle/jce/spec/ECParameterSpec.class
+SHA1-Digest: cxjL+EPnsFaWcAu5U2M9J3sVUZo=
+
+Name: net/sf/jmimemagic/MagicMatch.class
+SHA1-Digest: 38UYk+qJEy7UtwHgMgR31YmJomY=
+
+Name: net/java/xades/security/xml/XAdES/SignedProperties.class
+SHA1-Digest: x7WsdWuYVpJc7M/8E5kmnQDHLY4=
+
+Name: com/lowagie/text/xml/simpleparser/SimpleXMLParser.class
+SHA1-Digest: eF6Cl7h9cbu21R7Zr4JadSZK5tI=
+
+Name: org/bouncycastle/cert/X509CertificateHolder.class
+SHA1-Digest: LB57QUE2G30b2KtLMXvD15S2KvQ=
+
+Name: net/java/xades/util/Base64.class
+SHA1-Digest: HnwP3+iqRNWik5DGSvCMADMFy0k=
+
+Name: org/bouncycastle/asn1/x509/SubjectPublicKeyInfo.class
+SHA1-Digest: 4kGQ6EZ2Gxl8JBpDyW9oFLoEA4w=
+
+Name: org/bouncycastle/asn1/x509/DistributionPoint.class
+SHA1-Digest: tTQ5AzUAeMidqyzPKbEn00U0RU4=
+
+Name: org/bouncycastle/cms/DefaultSignedAttributeTableGenerator.class
+SHA1-Digest: MuFRJsCPFv3n2TsGZy7Da2SffSo=
+
+Name: com/lowagie/text/pdf/hyphenation/PatternConsumer.class
+SHA1-Digest: V2akPuOOqvf8E2QSgsNgYoD1vq4=
+
+Name: com/lowagie/text/pdf/PdfOCG.class
+SHA1-Digest: /nuGJSeG1PS5bau7W0jNDgLUdmQ=
+
+Name: com/lowagie/text/pdf/parser/PdfContentStreamProcessor$ShowText.c
+ lass
+SHA1-Digest: GKFiNQ8wEtsVnKvcoKzEul87xsY=
+
+Name: com/lowagie/text/pdf/SimpleNamedDestination.class
+SHA1-Digest: YC+G4RqOEnootu4llckgLrdP6Zw=
+
+Name: org/bouncycastle/jce/provider/X509CertParser.class
+SHA1-Digest: x0fHBpjKo0SEbMl+TwbiFCwuf/M=
+
+Name: org/bouncycastle/asn1/x9/X962NamedCurves$18.class
+SHA1-Digest: WBA0XAiJLmO51+CLEVuBcCigvXs=
+
+Name: org/bouncycastle/asn1/cryptopro/CryptoProObjectIdentifiers.class
+SHA1-Digest: Lq4SZ9xLBuLf4cUH7yDCNL1fnFs=
+
+Name: org/bouncycastle/x509/AttributeCertificateHolder.class
+SHA1-Digest: ay0HWd6snABwJQfT4Bkd4OPhQ5Q=
+
+Name: es/gob/afirma/keystores/main/common/KeyStoreMessages.class
+SHA1-Digest: 07JccYGlWDklSaav8g95vGMVJ1w=
+
+Name: com/lowagie/text/pdf/PdfEFStream.class
+SHA1-Digest: a1rzHfffLHpZ77wdenKWfC6E/Jk=
+
+Name: com/lowagie/text/HeaderFooter.class
+SHA1-Digest: OLBh1+RDb3ESRK4MBjEgnixRKBU=
+
+Name: org/bouncycastle/cms/jcajce/JcaJceExtHelper.class
+SHA1-Digest: CbdMpvYCVZMIRC2x83T4XCCo6zg=
+
+Name: org/bouncycastle/asn1/x509/Attribute.class
+SHA1-Digest: 7vW2FniP7BcVERxJ1+Npm3/ALVs=
+
+Name: org/bouncycastle/cms/CMSSignerDigestMismatchException.class
+SHA1-Digest: 32nVp/wME5tzk/LSIVLusaUdxlw=
+
+Name: es/gob/afirma/core/AOFormatFileException.class
+SHA1-Digest: F8psmgDlqBLi43X0PGNegIvUdGE=
+
+Name: com/lowagie/text/pdf/parser/PdfContentStreamProcessor$ModifyCurr
+ entTransformationMatrix.class
+SHA1-Digest: Ufe6h64MLICQC1ouB103h+CyqjU=
+
+Name: com/lowagie/text/pdf/PdfObject.class
+SHA1-Digest: a+LK+YjB/F+AIlO21rAK4h+6yQY=
+
+Name: org/bouncycastle/asn1/x9/X962NamedCurves.class
+SHA1-Digest: G8EBNdkNb7F6ZsBdNrtX4A7I9yY=
+
+Name: org/bouncycastle/cms/CMSException.class
+SHA1-Digest: G+LZHI4Sb9BDO8DOHAlRTUY6O2Q=
+
+Name: org/bouncycastle/asn1/ocsp/ResponseBytes.class
+SHA1-Digest: B5PDpftoa9IurFfKLdWw45PR+ro=
+
+Name: org/bouncycastle/crypto/params/ECDomainParameters.class
+SHA1-Digest: OaW+KsVfcEirIBwIQO1o11ZwEG0=
+
+Name: org/bouncycastle/crypto/params/ECPublicKeyParameters.class
+SHA1-Digest: XC8CUxf5lxxJ7qJMUK2IoyFiUXQ=
+
+Name: net/java/xades/security/xml/SignatureStatus.class
+SHA1-Digest: g48qs5FXaphL65HAMs8U/xvEI9o=
+
+Name: es/gob/afirma/ui/core/jse/JSEUIMessages.class
+SHA1-Digest: Zldvi8uMxh+6m5044yGyLn7aNB4=
+
+Name: org/bouncycastle/asn1/BEROctetStringGenerator$BufferedBEROctetSt
+ ream.class
+SHA1-Digest: szHD7kH7rIyTwwJ/3AseLsnQZGI=
+
+Name: org/bouncycastle/asn1/cms/SignedData.class
+SHA1-Digest: V1L8nE7x+2qN/5UynQH9c63EZDg=
+
+Name: org/bouncycastle/cms/jcajce/JceKeyTransRecipientInfoGenerator.cl
+ ass
+SHA1-Digest: qK2lQY5+Is0HH5V4inc2xxa4404=
+
+Name: com/lowagie/text/pdf/collection/PdfCollectionSchema.class
+SHA1-Digest: Pb7hudM3lRen+Cu6Q2ddii1XV5A=
+
+Name: es/gob/afirma/signers/pades/AOPDFSigner.class
+SHA1-Digest: YLjivEPr9xX7QMeu7qZxc+NHBzw=
+
+Name: java/es/gob/afirma/signers/tsp/pkcs7/doc-files/package-info-1.pn
+ g
+SHA1-Digest: FJZrjf9kEsuCLmTyWllC/Sur6Ic=
+
+Name: com/lowagie/text/xml/simpleparser/IanaEncodings.class
+SHA1-Digest: kkz1GgcICN/M+DeVowQWKjcd0pk=
+
+Name: org/bouncycastle/cms/CMSEnvelopedGenerator.class
+SHA1-Digest: YqVwsoMQn1Z8kyDpFeyOIiQZV6c=
+
+Name: org/bouncycastle/jce/spec/MQVPublicKeySpec.class
+SHA1-Digest: ViATnQPHOiwJuhHXrIjMKpZwfUs=
+
+Name: com/lowagie/text/pdf/BaseFont$StreamFont.class
+SHA1-Digest: ru73Z2vNP3+f9InO0OYUHiA01X4=
+
+Name: org/bouncycastle/asn1/x500/RDN.class
+SHA1-Digest: KU5DpCY73WEHOBSo43U6CJGW1VE=
+
+Name: org/bouncycastle/ocsp/RespData.class
+SHA1-Digest: sSE5TdeMX5RHSqBq65XwF6v1lIU=
+
+Name: org/bouncycastle/x509/X509CertStoreSelector.class
+SHA1-Digest: JxYz96h93TWoa833Am9dgEPy3jY=
+
+Name: org/bouncycastle/asn1/pkcs/ContentInfo.class
+SHA1-Digest: Sd2mVzJcLu9G7JQrQGEoD8mz/gc=
+
+Name: com/lowagie/text/pdf/parser/PdfContentStreamProcessor$ProcessGra
+ phicsStateResource.class
+SHA1-Digest: NqObqoNOPNRV5/xVCh6SQ7RC1BE=
+
+Name: org/apache/oro/util/CacheLRU.class
+SHA1-Digest: bP+mMpGH60t3YucAuQy4jsR9Vjw=
+
+Name: org/bouncycastle/asn1/ASN1SetParser.class
+SHA1-Digest: ENVgbi5Nd6xXWHt5raujHekyrXg=
+
+Name: org/bouncycastle/ocsp/BasicOCSPResp.class
+SHA1-Digest: pR1neoil+wFR5VxAkEXM71dGEnE=
+
+Name: com/lowagie/text/pdf/parser/PdfContentStreamProcessor.class
+SHA1-Digest: McgbXDkisA8Z5YqzlUJ4Tkciba4=
+
+Name: com/lowagie/text/pdf/codec/TiffImage.class
+SHA1-Digest: 2d7KZKgthK0XclgSKE7U/4r9zb8=
+
+Name: com/lowagie/text/pdf/CFFFontSubset.class
+SHA1-Digest: TA4Mnc6rPDi4Qvxz0CWH4hROX2A=
+
+Name: org/bouncycastle/jcajce/io/MacOutputStream.class
+SHA1-Digest: OBI9Qv9IGz3yeXBXLVR9iN1XrIw=
+
+Name: net/sf/jmimemagic/MagicDetector.class
+SHA1-Digest: P+y6j8iqdutWNyTLjt8R39tnT6Q=
+
+Name: org/bouncycastle/operator/bc/BcDigestCalculatorProvider.class
+SHA1-Digest: j8iiESBu7bnbXdGn7EGEtQfoqag=
+
+Name: org/bouncycastle/math/ec/WNafPreCompInfo.class
+SHA1-Digest: vILKL+Cg0j9jCi73QCVpVun6Qpo=
+
+Name: org/bouncycastle/asn1/DERSequence.class
+SHA1-Digest: p3oAWZmofefB2QK7JD7PVajeaaA=
+
+Name: net/java/xades/security/xml/XAdES/CertRefs.class
+SHA1-Digest: teHBmJQ4cG7CRHZZp/cr1xxRJ1I=
+
+Name: org/bouncycastle/jce/interfaces/ECKey.class
+SHA1-Digest: 5sxhqkdZmt6OaoJ5Iq/RLZFzGkw=
+
+Name: org/bouncycastle/operator/jcajce/JcaDigestCalculatorProviderBuil
+ der.class
+SHA1-Digest: LpC8FmN0sim2EOW1XeAGvdhFwCk=
+
+Name: com/lowagie/text/Anchor.class
+SHA1-Digest: Tz91KQlrvscr8hQNH0mfwsGfXOA=
+
+Name: org/bouncycastle/asn1/ASN1OutputStream$ImplicitOutputStream.clas
+ s
+SHA1-Digest: UdKHggPA92SC0itlOe7fv2VAsQQ=
+
+Name: net/java/xades/security/xml/XAdES/SignatureTimeStampDetails.clas
+ s
+SHA1-Digest: NB8cGFV19PM/kVfMzyNaN1vQ1tY=
+
+Name: org/bouncycastle/asn1/x9/X962NamedCurves$1.class
+SHA1-Digest: tX5HzgpnKLzX4x+FvUava6Cm1+Q=
+
+Name: org/mozilla/universalchardet/prober/sequence/Latin5BulgarianMode
+ l.class
+SHA1-Digest: +yyl/bn2wT0M6MjBov4jo0pFzfU=
+
+Name: es/gob/afirma/core/InvalidLibraryException.class
+SHA1-Digest: yefWA3AKKN7xJw42zKohY2CUggs=
+
+Name: org/bouncycastle/asn1/sec/SECNamedCurves$9.class
+SHA1-Digest: SOFNymnUjIgtOl1E9lGTSy5M+R4=
+
+Name: org/bouncycastle/asn1/x509/Target.class
+SHA1-Digest: mDOLT+Vu6X0P4XOXpXGDjqq7r6w=
+
+Name: org/mozilla/universalchardet/prober/distributionanalysis/SJISDis
+ tributionAnalysis.class
+SHA1-Digest: 9og/CbNVJXZ28eOdP78iKOTrGko=
+
+Name: net/java/xades/util/ComparableBean.class
+SHA1-Digest: p3GaLAEXwdP9M5G7WC9SsL2aczo=
+
+Name: es/gob/afirma/keystores/filters/rfc/SerialNumberFilter.class
+SHA1-Digest: VhqRYgGFHmSX6zAvsTIf5N1wdL8=
+
+Name: org/bouncycastle/asn1/sec/SECNamedCurves$21.class
+SHA1-Digest: LWFmhpUXw7Zd8UVHBXPMjS8CFKQ=
+
+Name: org/bouncycastle/jce/provider/X509CRLEntryObject.class
+SHA1-Digest: LJ6Wg2pmC3YKK/ooBNykKiV9IQs=
+
+Name: es/gob/afirma/signers/cades/GenCAdESEPESSignedData.class
+SHA1-Digest: J1jjlebv7XBOftf924uarQ8rlVQ=
+
+Name: org/bouncycastle/asn1/x9/X962NamedCurves$15.class
+SHA1-Digest: 9kLTNU5yY/luGejTcPStcZk20gg=
+
+Name: net/sf/jmimemagic/UnsupportedTypeException.class
+SHA1-Digest: 7/9qqYxyA1vRQVPOHs+FyvMmiUU=
+
+Name: com/lowagie/text/Phrase.class
+SHA1-Digest: i0v0sppIFN36V/mqczAu2P8jEg8=
+
+Name: org/bouncycastle/operator/SymmetricKeyUnwrapper.class
+SHA1-Digest: Y41USb1VZ4V3r33q5FdNslkG+3M=
+
+Name: org/bouncycastle/util/encoders/Base64.class
+SHA1-Digest: RYB0RsG7T9tXKqUnNbrAZX/nP5E=
+
+Name: org/mozilla/universalchardet/prober/contextanalysis/SJISContextA
+ nalysis.class
+SHA1-Digest: chk1vjzk+kHsfqAc8vL/+kV1C+U=
+
+Name: org/bouncycastle/asn1/ocsp/RevokedInfo.class
+SHA1-Digest: YzTPWnZUOSknIY/ofezQ6tKbpu8=
+
+Name: es/gob/afirma/core/MissingLibraryException.class
+SHA1-Digest: Xbs7eP1/3Yz5WYEeKPQeL3Gmkls=
+
+Name: java/es/gob/afirma/signers/multi/cades/doc-files/package-info-1.
+ png
+SHA1-Digest: jviLBF6rL+KyUHl4ZA0C2PES+Sc=
+
+Name: com/lowagie/text/pdf/fonts/cmaps/CodespaceRange.class
+SHA1-Digest: Nifh6hYer1AF05bX0zOADVew6N8=
+
+Name: es/gob/afirma/signers/xml/Utils$ReferenceIsNotXMLException.class
+SHA1-Digest: Mzvc/zLGlFbVVZPle5EnXaKLOxo=
+
+Name: org/bouncycastle/asn1/x509/GeneralName.class
+SHA1-Digest: tYDd1JoKqLf3G03Rqqsq9gvp+Zo=
+
+Name: es/gob/afirma/signers/xadestri/client/AOXAdESTriPhaseSigner$1.cl
+ ass
+SHA1-Digest: FedRaXOIQaQRelPnPI3B/P72MkY=
+
+Name: com/lowagie/text/pdf/XfaForm$InverseStore.class
+SHA1-Digest: yPwR9Ss+JGiF/gjHxbKdGBHZvws=
+
+Name: es/gob/afirma/core/misc/MimeHelper$MimeInfo.class
+SHA1-Digest: mFakRMzOqdVK7Mr8vayuT4t+uds=
+
+Name: org/bouncycastle/cms/jcajce/JcaSignerInfoVerifierBuilder$NamedHe
+ lper.class
+SHA1-Digest: 1FyeyyjBQ0tlGUJDkSMvX5a8IJo=
+
+Name: org/bouncycastle/util/io/Streams.class
+SHA1-Digest: 30wyat5s/MG5Gy08Ijb/ZzeU+qs=
+
+Name: com/lowagie/text/pdf/PRAcroForm$FieldInformation.class
+SHA1-Digest: jwLxJqUTDhhgaRK/ILuBpJYln60=
+
+Name: org/bouncycastle/asn1/DLSequence.class
+SHA1-Digest: h7G06zFmR0bsASxoR4bmjmx4/ks=
+
+Name: org/bouncycastle/asn1/sec/SECNamedCurves$11.class
+SHA1-Digest: mbID8rUVsM5OYqxkymYnE8S1xhE=
+
+Name: com/lowagie/text/pdf/fonts/cmaps/CMapParser.class
+SHA1-Digest: RlVVUSVHvfDw4b25z16gf4tIXTI=
+
+Name: net/java/xades/security/xml/XAdES/BasicXAdESImpl.class
+SHA1-Digest: m5ybiLmHq/19OhcbWn/DsSP9QJU=
+
+Name: es/gob/afirma/signers/pades/PDFMessages.class
+SHA1-Digest: ub5F2KEuQnHNgeefjyXFPjdMo7o=
+
+Name: com/lowagie/text/pdf/PdfPage.class
+SHA1-Digest: jzcpbZ0g982UVOciAAKuaBNUFvE=
+
+Name: com/lowagie/text/pdf/FdfReader.class
+SHA1-Digest: IbOMujDSNL4HWEawQW9BD37qP4o=
+
+Name: org/bouncycastle/asn1/sec/SECNamedCurves$27.class
+SHA1-Digest: oUTZIESeEIIGOvHZVnquzBC+pmY=
+
+Name: com/lowagie/text/pdf/PdfImportedPage.class
+SHA1-Digest: c9NoEjVeIsrIZB9YAxfIp8sNeL0=
+
+Name: es/gob/afirma/miniapplet/PolicyPropertiesManager.class
+SHA1-Digest: QwjFiz7d7B2TcMuqbduhfWOMvkg=
+
+Name: es/gob/afirma/core/misc/UrlHttpManagerImpl.class
+SHA1-Digest: 7qekox1O/Ytfy0vqvG8pWYS071A=
+
+Name: com/lowagie/text/pdf/interfaces/PdfPageActions.class
+SHA1-Digest: kU9i2c8R47VgJOHhbZua2FqfmQk=
+
+Name: org/bouncycastle/cms/CMSEnvelopedDataGenerator$1.class
+SHA1-Digest: gIgwsBOqmyja4hCxSQjFDBC24N0=
+
+Name: org/mozilla/universalchardet/prober/sequence/Ibm866Model.class
+SHA1-Digest: qIsPil69xh1b6kfL8Sc1bnolA+Q=
+
+Name: org/bouncycastle/asn1/ocsp/TBSRequest.class
+SHA1-Digest: nnxqeBiCyr0jgMkEt12XhfrXxY0=
+
+Name: org/bouncycastle/cms/CMSAttributeTableGenerator.class
+SHA1-Digest: qwN388jH3uNePKiATvXB+gcUI+M=
+
+Name: org/bouncycastle/asn1/ASN1UTCTime.class
+SHA1-Digest: mkI1krudtOM2IiK/xVpAzUvLi5w=
+
+Name: org/bouncycastle/cert/X509CRLHolder.class
+SHA1-Digest: 3LNrM1BPBAGxp4/BOimJ9CcBbxE=
+
+Name: org/bouncycastle/tsp/TimeStampRequest.class
+SHA1-Digest: JFmkyNrdDy0Pu89AHIbyG2LxBB0=
+
+Name: com/lowagie/text/pdf/codec/GifImage.class
+SHA1-Digest: 7lvUlZGmbit3A6SgJiyEcpC6MQw=
+
+Name: org/bouncycastle/asn1/x509/TBSCertificateStructure.class
+SHA1-Digest: WdRQtZ/NsIPkhhwt5/Eg/R/x7z4=
+
+Name: es/gob/afirma/core/misc/UrlHttpManagerImpl$1.class
+SHA1-Digest: rl04Rb1oqod6rTMw64/Mul12DPg=
+
+Name: org/bouncycastle/cms/CMSPBEKey.class
+SHA1-Digest: HgHcatU4ZD9Rdp95LoDPjsFAG6A=
+
+Name: com/lowagie/text/xml/xmp/XmpSchema.class
+SHA1-Digest: NPBFHyHKnRqevJZYJoG/lEVU4Kc=
+
+Name: org/bouncycastle/asn1/x509/KeyUsage.class
+SHA1-Digest: ZvwY/mg2hNKdUq5kBvcT4ZA8Cds=
+
+Name: org/bouncycastle/cms/jcajce/JceCMSContentEncryptorBuilder$CMSOut
+ putEncryptor.class
+SHA1-Digest: F+rv6TFv+/7paLAngO88kzbO9QI=
+
+Name: org/bouncycastle/cms/jcajce/JcaSignerInfoVerifierBuilder$Helper.
+ class
+SHA1-Digest: ykGNzRpXVYg9Y3fLoVxXa+YEmhw=
+
+Name: com/lowagie/text/pdf/PdfDocument.class
+SHA1-Digest: btpNzYCeWejqkTHzPdOsvoe01ns=
+
+Name: com/lowagie/text/xml/simpleparser/EntitiesToUnicode.class
+SHA1-Digest: 2er744xHC1QvCx06RPNVVHmwxH4=
+
+Name: com/lowagie/text/pdf/PdfResources.class
+SHA1-Digest: GYA66WdT/mp6f1vEj47CGlkD4TM=
+
+Name: com/lowagie/text/TextElementArray.class
+SHA1-Digest: xpQpvO78ECsF70pYVi50cIKHc9E=
+
+Name: org/bouncycastle/cms/CMSSignedData.class
+SHA1-Digest: 8PUiaaBK/6bOb1W1r073VviZYQU=
+
+Name: org/bouncycastle/util/io/StreamOverflowException.class
+SHA1-Digest: SicJWLXVHj+oeBICLX2AGFgxHQM=
+
+Name: com/lowagie/text/exceptions/IllegalPdfSyntaxException.class
+SHA1-Digest: 8C+Go/3qbYS2hKvFxXjivRMXx7I=
+
+Name: es/gob/afirma/keystores/mozilla/MozillaUnifiedKeyStoreManager.cl
+ ass
+SHA1-Digest: Pp4CCF/D7OWIpWfuRMXO6nzHZi4=
+
+Name: com/lowagie/text/pdf/codec/TIFFLZWDecoder.class
+SHA1-Digest: gv1rkJFjvLWa7XyJs60LAdNMcss=
+
+Name: com/lowagie/text/pdf/CFFFont$IndexMarkerItem.class
+SHA1-Digest: xkGdK+v977Wz1tzpLs4twReUShU=
+
+Name: org/bouncycastle/operator/bc/BcDigestCalculatorProvider$DigestOu
+ tputStream.class
+SHA1-Digest: G4sNrk0QiGrfJBRaPuOdIb1xdiw=
+
+Name: es/gob/afirma/signers/cades/CAdESValidator.class
+SHA1-Digest: RvAPWrULbc18w6Gv2PwUycO4P1w=
+
+Name: org/bouncycastle/math/ec/ECPoint.class
+SHA1-Digest: DyB+HIm+LptkmZFq1/0kKd+ENtM=
+
+Name: org/bouncycastle/jcajce/JcaJceHelper.class
+SHA1-Digest: 3Jo9fTiWUTIPUUl3RbEjVWmORbQ=
+
+Name: org/bouncycastle/asn1/teletrust/TeleTrusTNamedCurves$8.class
+SHA1-Digest: gZ6he1a5VbIfFf6eB8EnhPbyjAw=
+
+Name: org/bouncycastle/operator/RawContentVerifier.class
+SHA1-Digest: i+ByMhBnh7MIHS9W3/GnzOrQ6fY=
+
+Name: es/gob/afirma/signers/pades/InvalidPdfException.class
+SHA1-Digest: KQlEDGvuFaN3VWlJ6VEBynwWtv4=
+
+Name: es/gob/afirma/signers/xml/Utils$IsInnerlException.class
+SHA1-Digest: lgUvT4TghBNBxhpuamL6SK/kuJg=
+
+Name: org/bouncycastle/asn1/cms/RecipientKeyIdentifier.class
+SHA1-Digest: SrO/8CRGKd7pbkPygG+ENTdID7I=
+
+Name: com/lowagie/text/DocWriter.class
+SHA1-Digest: uawcKH3iVMh1MyFC9qiJKlp5fMo=
+
+Name: org/bouncycastle/asn1/x9/X962Parameters.class
+SHA1-Digest: O8cqxw4XrotCaBYI7FS5AzXXFdE=
+
+Name: com/lowagie/text/pdf/OcspClient.class
+SHA1-Digest: WzO1e3nQyXlKxBCAK9zJFr8qtJc=
+
+Name: org/bouncycastle/cms/KEKRecipientInfoGenerator.class
+SHA1-Digest: YwmGp37HJ2i59ZJ7mhwhnfKoeGo=
+
+Name: com/lowagie/text/pdf/CFFFont$IndexBaseItem.class
+SHA1-Digest: JL7VrBb2T2V61/IkRpI7mghuwrs=
+
+Name: org/mozilla/universalchardet/prober/distributionanalysis/CharDis
+ tributionAnalysis.class
+SHA1-Digest: IJIIz+clfK/r4V2GVFaXEF+oBo8=
+
+Name: org/bouncycastle/asn1/x9/X962NamedCurves$19.class
+SHA1-Digest: s1TWbwM1wsC1omVUErJqwXyxh4Q=
+
+Name: org/bouncycastle/math/ec/FpNafMultiplier.class
+SHA1-Digest: BqUeHF9Vu6bPdua/kfVgY6Pdoso=
+
+Name: org/bouncycastle/operator/ContentVerifier.class
+SHA1-Digest: ABrC6oGbFPEN9xuCMGpFrMZNCU0=
+
+Name: org/mozilla/universalchardet/prober/statemachine/PkgInt.class
+SHA1-Digest: VItaWZqZVssrMv3Nxj6JOsf6QNA=
+
+Name: com/lowagie/text/pdf/TrueTypeFont$HorizontalHeader.class
+SHA1-Digest: S6m6TAAimEFkeAYDwMRoUA0jEuo=
+
+Name: org/bouncycastle/asn1/sec/SECNamedCurves$33.class
+SHA1-Digest: o5pJNupaXHFAAP5BKcgVPUndI5U=
+
+Name: com/lowagie/text/xml/xmp/PdfSchema.class
+SHA1-Digest: 2rO9rAQbG5mtXIYX65VkPh70AWM=
+
+Name: com/lowagie/text/pdf/PdfSignatureAppearance$RangeStream.class
+SHA1-Digest: roWetY4dT74AokBgnRUumuPR8ZA=
+
+Name: com/lowagie/text/pdf/DefaultFontMapper.class
+SHA1-Digest: 3trfY8JohwO747CpXJJrQUoNBWI=
+
+Name: org/bouncycastle/asn1/cms/OtherRecipientInfo.class
+SHA1-Digest: iy0RwhfIfio2wB4FQk6IicBcD+s=
+
+Name: org/bouncycastle/cms/jcajce/JceKEKEnvelopedRecipient$1.class
+SHA1-Digest: zL2XKuH/FGQ6XT+3kL3o2EpdHjU=
+
+Name: es/gob/afirma/signers/xades/InvalidEFacturaDataException.class
+SHA1-Digest: cZSSzW6u0xo5plrk2K7kiORL6pA=
+
+Name: es/gob/afirma/ui/core/jse/JSEUtils.class
+SHA1-Digest: Eli5Lo9ik7rcGe3L5bMPF9n7680=
+
+Name: org/bouncycastle/cms/jcajce/JceKeyAgreeAuthenticatedRecipient$1.
+ class
+SHA1-Digest: 9QT0hdMi7kW/T/gO33jmpHCrwbU=
+
+Name: org/bouncycastle/asn1/cryptopro/ECGOST3410NamedCurves.class
+SHA1-Digest: j2vDs73i0h5AXQlGVQS3ArjGt8s=
+
+Name: org/bouncycastle/asn1/x509/GeneralSubtree.class
+SHA1-Digest: dreskuQLchM6Cv08QWMHhz2ryio=
+
+Name: org/bouncycastle/jce/provider/ReasonsMask.class
+SHA1-Digest: r5XKz6YAmQOmmnR42iz9FzE6Keo=
+
+Name: es/gob/afirma/core/ciphers/AOCipherConfig.class
+SHA1-Digest: df9nJU3hPSYkQo61rJgdeVxg4lI=
+
+Name: org/bouncycastle/cms/CMSEnvelopedHelper$CMSDigestAuthenticatedSe
+ cureReadable$1.class
+SHA1-Digest: FEzX33olAGI/AZL+LFJ5WBsP7ag=
+
+Name: org/bouncycastle/asn1/ess/SigningCertificateV2.class
+SHA1-Digest: l4iXPtWbNHJuhOSjTBOHL3xg7tM=
+
+Name: org/bouncycastle/util/encoders/Base64Encoder.class
+SHA1-Digest: xSNulPTk4SI5ZG2r/PlN9ZWzyRA=
+
+Name: org/bouncycastle/asn1/ASN1TaggedObjectParser.class
+SHA1-Digest: b8RoWSJXhf/Ted/ekh7vCFihlIU=
+
+Name: org/mozilla/universalchardet/prober/SingleByteCharsetProber.clas
+ s
+SHA1-Digest: ulU8nKgf60ytNDniM++tu30Go2w=
+
+Name: org/bouncycastle/asn1/sec/SECObjectIdentifiers.class
+SHA1-Digest: ZdPuaICaaiv8xfpClxjIWrFAii4=
+
+Name: org/bouncycastle/asn1/eac/EACObjectIdentifiers.class
+SHA1-Digest: jzRYxGpAtqenx4Zbws5oHDRH61E=
+
+Name: org/bouncycastle/asn1/ASN1Sequence.class
+SHA1-Digest: 8THqLvgPLBPKPhHx7pZxFlJzdu8=
+
+Name: com/lowagie/text/pdf/PdfMediaClipData.class
+SHA1-Digest: iOOSPlnQo0CDUGjZ7B/vH8EyODE=
+
+Name: com/lowagie/text/pdf/parser/PdfContentStreamProcessor$TextMoveSt
+ artNextLine.class
+SHA1-Digest: DExXyY7nQvw72XL2lgk0vLFr2cM=
+
+Name: org/mozilla/universalchardet/prober/statemachine/GB18030SMModel.
+ class
+SHA1-Digest: 9qlWrHUqEalAscFKG/2BRwaz3SA=
+
+Name: org/bouncycastle/cms/KeyTransRecipient.class
+SHA1-Digest: C04+buT6QMcG2RdRyxe4mziRWcU=
+
+Name: org/bouncycastle/cms/jcajce/EnvelopedDataHelper$2.class
+SHA1-Digest: NtClMMVAXafDCmGdOE6gzDUZuoc=
+
+Name: org/bouncycastle/ocsp/UnknownStatus.class
+SHA1-Digest: MdxWGQn+MKo1nqz5ZW4EAQBu/sI=
+
+Name: com/lowagie/text/pdf/XfaForm$Xml2Som.class
+SHA1-Digest: /hln2QEP7Ca8R+dNNNjWx9/5Dwc=
+
+Name: es/gob/afirma/core/signers/AOSignConstants.class
+SHA1-Digest: NrluGjhfJVVMnkFC6fK1gnqdmQI=
+
+Name: es/gob/afirma/core/misc/AOUtil.class
+SHA1-Digest: PtouJgF5txwGZRvfT631GL0pFj4=
+
+Name: com/lowagie/text/Font.class
+SHA1-Digest: lO56wSmudQ6+14suBOtRIQqJebM=
+
+Name: org/bouncycastle/asn1/BERTags.class
+SHA1-Digest: reqLA7v1A2RsxOpH1QiVxBw6suA=
+
+Name: com/lowagie/text/pdf/PdfCopy$RefKey.class
+SHA1-Digest: wMO8i912bGf0D6wEmdNI1xmBLxA=
+
+Name: org/bouncycastle/asn1/cmp/PKIFreeText.class
+SHA1-Digest: El5AUmcTAHCXOrI047V0RkzO+F4=
+
+Name: es/gob/afirma/ui/core/jse/JSEUIManager.class
+SHA1-Digest: GyQpTdm2ZzKchLSJOZGRFlO3pag=
+
+Name: org/bouncycastle/tsp/TimeStampResponse.class
+SHA1-Digest: 8PT9I0fynC3usY8fAJ3PQRm7Kl0=
+
+Name: org/bouncycastle/asn1/ASN1ObjectIdentifier.class
+SHA1-Digest: csCm9IBK5pj8ldoKAtWZ2MnD1Rk=
+
+Name: org/bouncycastle/asn1/cms/CompressedData.class
+SHA1-Digest: vw58kVTDcV26vk5kKxm21W3Yij0=
+
+Name: org/bouncycastle/asn1/sec/SECNamedCurves$16.class
+SHA1-Digest: l4drNcA8fYKJNN+2B42YZqNsJBU=
+
+Name: org/bouncycastle/asn1/pkcs/PKCSObjectIdentifiers.class
+SHA1-Digest: gIqVzFQ8NehHdfOTrOGGcr6NNsU=
+
+Name: org/bouncycastle/jce/exception/ExtException.class
+SHA1-Digest: t1MxncKm6lHEl83D621RWOSCMPs=
+
+Name: es/gob/afirma/signers/pkcs7/SignedAndEnvelopedData.class
+SHA1-Digest: nS1FvWsxRUdP2FWFWqcQUNzwSTM=
+
+Name: es/gob/afirma/signers/multi/cades/CAdESTriPhaseCoSigner.class
+SHA1-Digest: 4VVz86EQ6h9uH/wyhwOHBPGhYTM=
+
+Name: es/gob/afirma/signers/cades/AOSigPolicyQualifierInfo.class
+SHA1-Digest: qYZLRrucNpw6ylgOsDQatH6lC7Q=
+
+Name: org/bouncycastle/tsp/TimeStampTokenInfo.class
+SHA1-Digest: VYRVfcl4eZ6sJlLskegozUKgqWc=
+
+Name: org/bouncycastle/asn1/sec/SECNamedCurves$32.class
+SHA1-Digest: 6be5fO6HSHOtwi5Py0fNmQeLZ+U=
+
+Name: es/gob/afirma/signers/multi/cades/AOCAdESCoSigner.class
+SHA1-Digest: YgUArH1ixxyi/vWM+c1QhSEnk9I=
+
+Name: es/gob/afirma/keystores/filters/rfc/RFC2254CertificateFilter.cla
+ ss
+SHA1-Digest: hXYczxWN3awRqhKQXEMbjUJhFoI=
+
+Name: com/lowagie/text/pdf/Type3Glyph.class
+SHA1-Digest: CLsGyFjeOvdAr+0BWYvgxPkh4Ok=
+
+Name: com/lowagie/text/pdf/PdfString.class
+SHA1-Digest: 4lH4uHTXHgEdEYoxFt3njN016D4=
+
+Name: es/gob/afirma/signers/cades/CAdESUtils.class
+SHA1-Digest: uKgxS3sfl5qgpHxCHuVlI6PGFSw=
+
+Name: net/sf/jmimemagic/Magic.class
+SHA1-Digest: DbVQGf6A/Y5uef+rdGYa0Fjw290=
+
+Name: java/com/lowagie/text/pdf/fonts/Times-BoldItalic.afm
+SHA1-Digest: ek7nxfuPiilc46qOkGf7l5TIGjs=
+
+Name: com/lowagie/text/pdf/PdfSpotColor.class
+SHA1-Digest: /0WZUcPSta69VMKPND7K3xw2v+4=
+
+Name: org/bouncycastle/cms/jcajce/EnvelopedDataHelper$1.class
+SHA1-Digest: J0mtJqgWWIwwO832NXjCujHhgxU=
+
+Name: com/lowagie/text/pdf/PdfLine.class
+SHA1-Digest: /RFekhhSVkumtDjLWDSsUdur3/w=
+
+Name: org/bouncycastle/operator/jcajce/JceSymmetricKeyWrapper.class
+SHA1-Digest: j0u07uMUwOrhKddbWvqTWUNxxGQ=
+
+Name: org/bouncycastle/asn1/ocsp/OCSPObjectIdentifiers.class
+SHA1-Digest: dHMMb7VO37Rq+52Wkcht6bvgW0U=
+
+Name: org/mozilla/universalchardet/prober/distributionanalysis/GB2312D
+ istributionAnalysis.class
+SHA1-Digest: umdSEPSHpSoY+reHnJbzATqK2Uc=
+
+Name: es/gob/afirma/signers/xml/XMLConstants.class
+SHA1-Digest: i8HEz8E6FG5VxBUG5GOnwl6Fj8o=
+
+Name: org/bouncycastle/asn1/x9/X962NamedCurves$13.class
+SHA1-Digest: +KsXRy5u+BGQbEDVZROhfdur5m8=
+
+Name: org/bouncycastle/cms/CMSSignedHelper.class
+SHA1-Digest: ZxyPNqSsR3aGkAEvWNyJyYsc+XM=
+
+Name: com/lowagie/text/pdf/PdfCopy.class
+SHA1-Digest: zc/r5Epk71DxZqMDuvQz04HqL2I=
+
+Name: org/bouncycastle/operator/jcajce/JcaContentVerifierProviderBuild
+ er$RawSigVerifier.class
+SHA1-Digest: UrQOWIHGDyK1kzQsUDRLNni83gA=
+
+Name: com/lowagie/text/Row.class
+SHA1-Digest: 95bWWSexDelpjxRwiv2m49R+yZg=
+
+Name: com/lowagie/text/pdf/PushbuttonField.class
+SHA1-Digest: gtQAgV4n0FC6XrUDSGvfuBTNJUI=
+
+Name: org/bouncycastle/cms/jcajce/NamedJcaJceExtHelper.class
+SHA1-Digest: MEcnagSCsuWUfSMy9SRv+fwuflk=
+
+Name: org/bouncycastle/asn1/x509/TargetInformation.class
+SHA1-Digest: Nuwge4X+D+mAV8FS2ro66F3Lstk=
+
+Name: es/gob/afirma/core/misc/SHA2AltNamesProvider.class
+SHA1-Digest: BSE/Ws/8M++r2upp7UkIEgCW56o=
+
+Name: org/bouncycastle/jce/provider/BouncyCastleProviderConfiguration.
+ class
+SHA1-Digest: QPXONy75t3POLfa5uA+W6OloRmg=
+
+Name: org/bouncycastle/operator/bc/BcDigestCalculatorProvider$1.class
+SHA1-Digest: sk8gylp2CaA12AKxFYIrR4bfYqQ=
+
+Name: org/mozilla/universalchardet/prober/sequence/BulgarianModel.clas
+ s
+SHA1-Digest: I8yT6l6FmUxmiNvNgK8HQK3pUaU=
+
+Name: org/bouncycastle/asn1/x9/X9Curve.class
+SHA1-Digest: t5Zx2yzQ4EwpMDpNcfSHnCa0SYk=
+
+Name: net/sf/jmimemagic/MagicMatcher.class
+SHA1-Digest: hqRYZlJlh/RRQgSyvvqfAv93Fc8=
+
+Name: es/gob/afirma/signers/pkcs7/InvalidBouncyCastleException.class
+SHA1-Digest: BQx4dnZCu1Rkr8jxAgoRLa2UMn4=
+
+Name: com/lowagie/text/pdf/TrueTypeFont$FontHeader.class
+SHA1-Digest: SvCt4xUnlyNV0KzqvFciTIIPPbc=
+
+Name: com/lowagie/text/pdf/PdfPTableEvent.class
+SHA1-Digest: NPHaajfMSkjrbvHaqkCP+1vQbFk=
+
+Name: xmlmessages.properties
+SHA1-Digest: tEpzOo9CQooJ7wgAW+mmMeEpvdw=
+
+Name: org/bouncycastle/asn1/DERSet.class
+SHA1-Digest: JF14ALQ9pgWClzGUed7STTFg5Ks=
+
+Name: org/bouncycastle/cms/AuthAttributesProvider.class
+SHA1-Digest: 5CelxRc8IawwNlVwj2fI3+nMmUo=
+
+Name: net/java/xades/util/UniversalIndexKey.class
+SHA1-Digest: KdAOosT4vIYByIbMJhWf/JnSTA0=
+
+Name: org/bouncycastle/asn1/ASN1TaggedObject.class
+SHA1-Digest: 9H+ajRvEUKPG5vbJiSMuD/I2RDg=
+
+Name: org/bouncycastle/crypto/ExtendedDigest.class
+SHA1-Digest: I2s6kEUybjmdUM6PJGF3Yi/IzzQ=
+
+Name: org/bouncycastle/asn1/x509/Extension.class
+SHA1-Digest: Qw6bwIkeqMLZkWURKcClsHvkzk8=
+
+Name: com/lowagie/text/SimpleTable.class
+SHA1-Digest: lPehlZ/o9i1E2jJJsj9NDSRSte8=
+
+Name: org/bouncycastle/cms/jcajce/JceKEKAuthenticatedRecipient$1.class
+SHA1-Digest: 6gE1hUmepjpjEcvU3CoOEhy7x6c=
+
+Name: keystoremessages.properties
+SHA1-Digest: z5P3+rW7U35LoicZHVAAt6z/LmU=
+
+Name: org/bouncycastle/asn1/misc/NetscapeRevocationURL.class
+SHA1-Digest: /lxgi4yfhH1ERe9anXRczLUQvP8=
+
+Name: org/bouncycastle/jce/X509LDAPCertStoreParameters$Builder.class
+SHA1-Digest: ZgFCzZDUCnBECMPuAnSYxtrJ/Xo=
+
+Name: es/gob/afirma/signers/pades/InvalidITextException.class
+SHA1-Digest: mJOpwN5ot4tZyea6KoyBL2o83Wc=
+
+Name: org/bouncycastle/crypto/digests/SHA224Digest.class
+SHA1-Digest: ek5bm+VBTUAgw8MLaAeKPNaPmI4=
+
+Name: com/lowagie/text/pdf/PdfSignature.class
+SHA1-Digest: OCzz72lxrGTT7t64b94FPodQXdA=
+
+Name: com/lowagie/text/pdf/CFFFont$DictNumberItem.class
+SHA1-Digest: ezg02ZJhAQ98R+AkpJhXkIng+sQ=
+
+Name: org/bouncycastle/tsp/TSPIOException.class
+SHA1-Digest: B190L4q9RtOL/0NrJbZXminsfHE=
+
+Name: java/com/lowagie/text/pdf/fonts/Courier-BoldOblique.afm
+SHA1-Digest: ehXkVej3UF8ps5afV7hQhUlfLcI=
+
+Name: org/bouncycastle/x509/X509AttributeCertificate.class
+SHA1-Digest: 8jIjZ8qkhaPmMXKQtNQDVoB9Vdc=
+
+Name: org/bouncycastle/asn1/tsp/TimeStampReq.class
+SHA1-Digest: PdnsDypwRxE4jXmqzgEa/zNAM3k=
+
+Name: org/bouncycastle/operator/KeyWrapper.class
+SHA1-Digest: 3a7dHvizgsfVRx6M0Ncnt5ZOMho=
+
+Name: com/lowagie/text/PageSize.class
+SHA1-Digest: xH2Mj0kHLFGn0+27YN0EbuEYNvM=
+
+Name: org/bouncycastle/cms/jcajce/JceKeyTransAuthenticatedRecipient.cl
+ ass
+SHA1-Digest: TdVSoFVWp1PU+Apk9/SVxKumhGI=
+
+Name: org/bouncycastle/asn1/x509/X509ObjectIdentifiers.class
+SHA1-Digest: YPM72esDBNTrDhPPBaMM3+w8bWk=
+
+Name: org/bouncycastle/asn1/DEROctetString.class
+SHA1-Digest: ndKr9v0SZV+Q4SE3jGtkfCyFh0c=
+
+Name: org/bouncycastle/asn1/ocsp/OCSPRequest.class
+SHA1-Digest: xhauo7n3mu9y4BeGY5peEgqWOBI=
+
+Name: net/java/xades/security/xml/XAdES/DataObjectFormat.class
+SHA1-Digest: 0QAlwFOjLEl2zOhfGz4WA9Ym/yg=
+
+Name: org/bouncycastle/asn1/oiw/OIWObjectIdentifiers.class
+SHA1-Digest: heAWXZ6sCO3KTddGJ5NWDvbYWkw=
+
+Name: java/com/lowagie/text/lgpl.txt
+SHA1-Digest: mfGZATLvikR2v6gUSZ8ZM2r52Tk=
+
+Name: net/java/xades/security/xml/ValidateResult.class
+SHA1-Digest: eYznanPQGA9A17lGAE94WxRZRcQ=
+
+Name: org/bouncycastle/crypto/digests/RIPEMD160Digest.class
+SHA1-Digest: hcpGYRcRwFdZjYOl2HOGflvXhIM=
+
+Name: org/bouncycastle/x509/X509StreamParser.class
+SHA1-Digest: AefdD5gDdKn7kbXp1IECfjGullE=
+
+Name: org/apache/oro/text/perl/MalformedPerl5PatternException.class
+SHA1-Digest: YJa/0ECCLsujQkljy7rSlfsTEKs=
+
+Name: org/bouncycastle/crypto/params/ParametersWithIV.class
+SHA1-Digest: LOMsE/CFdwXyJpPs0e1JDlrfMZ8=
+
+Name: org/bouncycastle/asn1/StreamUtil.class
+SHA1-Digest: l7n8HI7OjjUfSTPC5oIfs/pN+uc=
+
+Name: org/bouncycastle/x509/ExtendedPKIXBuilderParameters.class
+SHA1-Digest: se76zux2QtT9KHqhb6abian7VsM=
+
+Name: org/bouncycastle/cert/CertException.class
+SHA1-Digest: JlJSQRw0Ea/r0H4ALAg+3i4qNCM=
+
+Name: org/bouncycastle/asn1/pkcs/SignedData.class
+SHA1-Digest: TIPgUgk0GCMIRgHZ0EcRl7oY87A=
+
+Name: java/es/gob/afirma/signers/cades/doc-files/CAdESTriPhaseSigner-3
+ .png
+SHA1-Digest: ZyxlEyeIHHIcZK3WSau9DgfRGnk=
+
+Name: org/bouncycastle/asn1/x509/AttributeCertificate.class
+SHA1-Digest: ej1q/5yrrRlLWZgrhTK9Ygac8g0=
+
+Name: org/bouncycastle/tsp/TimeStampToken.class
+SHA1-Digest: 7DT84PYFx+1xvcEE5qRt32CScd8=
+
+Name: org/mozilla/universalchardet/prober/statemachine/EUCKRSMModel.cl
+ ass
+SHA1-Digest: r3lERVWhK/AbKTP5cv6Q1Zd3NiA=
+
+Name: org/bouncycastle/asn1/x509/GeneralNames.class
+SHA1-Digest: +n6Sf7VcAzRz6JXiB2ieUffxQzI=
+
+Name: org/bouncycastle/asn1/x9/X962NamedCurves$9.class
+SHA1-Digest: ZdiFN7huhj4CSIDYESFQ+MQJmVc=
+
+Name: org/bouncycastle/cms/SignerInformation.class
+SHA1-Digest: B0wgQuNKAFwG4v70/m/luyJIu84=
+
+Name: net/java/xades/security/xml/XAdES/SigningCertificateDetails.clas
+ s
+SHA1-Digest: 2d9CX+HP5JPFABI/U7l6odRFi+o=
+
+Name: org/bouncycastle/asn1/DERExternalParser.class
+SHA1-Digest: ZNy4k39ZbGTf7hreJMDCLvXgXJ0=
+
+Name: net/java/xades/security/xml/XAdES/SignerRole.class
+SHA1-Digest: NeHS2T5K7D4zAG4irEqiosravh8=
+
+Name: com/lowagie/text/pdf/TrueTypeFont$WindowsMetrics.class
+SHA1-Digest: eSDvxHzuro+N7ObY7RT6+Y9Pn9w=
+
+Name: org/mozilla/universalchardet/prober/SJISProber.class
+SHA1-Digest: O6SnZ+sy83J17nueZkxYCAxE+c8=
+
+Name: org/apache/oro/text/regex/Perl5Pattern.class
+SHA1-Digest: 1kWctSEzQegTwYOhqpcmKXxTbhE=
+
+Name: es/gob/afirma/miniapplet/keystores/filters/AuthenticationDNIeFil
+ ter.class
+SHA1-Digest: myNsqMYmWUgDmb9W93iX7r9pufc=
+
+Name: com/lowagie/text/pdf/TrueTypeFontUnicode.class
+SHA1-Digest: Cqohu53zclBwj9/d31iyHEXXhSo=
+
+Name: org/bouncycastle/asn1/x9/X962NamedCurves$14.class
+SHA1-Digest: j0XJbRWRc/zzTdMrvUabb+UOh/o=
+
+Name: com/lowagie/text/xml/TagMap.class
+SHA1-Digest: QoVJ/EXis0JjvNgZo/3JOVKTqnc=
+
+Name: com/lowagie/text/pdf/codec/JBIG2Image.class
+SHA1-Digest: RX4lWuWyoFwHG+Gs6OQ+1t4Sv+k=
+
+Name: com/lowagie/text/pdf/parser/PdfContentStreamProcessor$TextSetTex
+ tMatrix.class
+SHA1-Digest: 63hXu7WY4dQ16jvBRm7O3du3OzQ=
+
+Name: com/lowagie/text/pdf/PdfDocument$RenderingContext.class
+SHA1-Digest: ZWr2ZutlT/39ufetlB7wr47L+hE=
+
+Name: com/lowagie/text/pdf/AcroFields$InstHit.class
+SHA1-Digest: Kt3+Ht3E40qBpB/+q7aEQ7pnVR4=
+
+Name: es/gob/afirma/core/AOCancelledOperationException.class
+SHA1-Digest: z+0et7X12wZuAGoxzprIaHyrclI=
+
+Name: es/gob/afirma/miniapplet/keystores/filters/KeyUsagesPattern.clas
+ s
+SHA1-Digest: yknjVnZkQETlqwknogBMrWbvC5k=
+
+Name: com/lowagie/text/pdf/BidiOrder.class
+SHA1-Digest: DMWXLo+fZGCGwN4qvn+1C6z/Ge4=
+
+Name: com/lowagie/text/pdf/PdfContents.class
+SHA1-Digest: ZMTEf7iLv3ro5cYEZBeprh92RVE=
+
+Name: org/mozilla/universalchardet/prober/statemachine/SJISSMModel.cla
+ ss
+SHA1-Digest: K4FcdVc3wYqHiC9aTMWCk+G60b8=
+
+Name: firefoxmessages.properties
+SHA1-Digest: Cw/Yc2IyKj+inDlwW++8LkNQn3I=
+
+Name: org/bouncycastle/cms/CMSEnvelopedHelper$CMSAuthenticatedSecureRe
+ adable.class
+SHA1-Digest: 4JS91o66fUCRWkO4wGNCQONX1w0=
+
+Name: es/gob/afirma/signers/pades/BadPdfPasswordException.class
+SHA1-Digest: S/NDEAZm8Yl/+Q3dtcIFPUMOLeY=
+
+Name: org/bouncycastle/cms/jcajce/CMSUtils.class
+SHA1-Digest: ybVsb5bLkd9VRTQm6h88tL0vIJA=
+
+Name: es/gob/afirma/ui/core/jse/JSEUIManager$ExtFilter.class
+SHA1-Digest: nqtRmaRMvzsxxqEE5O8zJzpQUo8=
+
+Name: com/lowagie/text/pdf/PdfSigGenericPKCS$VeriSign.class
+SHA1-Digest: dRs2R34W+IhH/xlDmH63V6owTDk=
+
+Name: es/gob/afirma/core/signers/AOSignInfo.class
+SHA1-Digest: yszlYvmzQfrN9t4H1aVbsPz4gfc=
+
+Name: com/lowagie/text/pdf/PdfPageEventHelper.class
+SHA1-Digest: 1XO4WlZV5lObmTA7jltokeMqJ98=
+
+Name: org/mozilla/universalchardet/Constants.class
+SHA1-Digest: w+FeV9UIY0E9AKCYpmj2mxi/j5w=
+
+Name: com/lowagie/text/pdf/PdfGState.class
+SHA1-Digest: s3XXhhSx8rV5J4dXH5yU3QFmVq4=
+
+Name: org/bouncycastle/asn1/cms/Attribute.class
+SHA1-Digest: 9lEGYvV87ku/QlKw9AfgQOgJ2N8=
+
+Name: com/lowagie/text/pdf/XfaForm$Xml2SomTemplate.class
+SHA1-Digest: /U3VZUXNCY2ttwhQZ+pv9zXEIwQ=
+
+Name: org/mozilla/universalchardet/prober/HebrewProber.class
+SHA1-Digest: 4fYcCWQDu+nqrWz8i7utnZcaePw=
+
+Name: org/bouncycastle/asn1/DLOutputStream.class
+SHA1-Digest: 0vHd7fYvs+2mnM0PUijv57dzR8w=
+
+Name: org/bouncycastle/math/ec/ECFieldElement$F2m.class
+SHA1-Digest: quEtq9XU1PJLdhGdgSvOWkZmNK0=
+
+Name: org/bouncycastle/x509/NoSuchStoreException.class
+SHA1-Digest: MDyH7lmzcZyYax++XQz3ynoQhJE=
+
+Name: com/lowagie/text/pdf/codec/TIFFDirectory.class
+SHA1-Digest: 7Y7gXBOy4zV56S8g9DsPtENWDBE=
+
+Name: org/bouncycastle/asn1/ASN1Boolean.class
+SHA1-Digest: TUOWTYL3wbt78LlMPhQGH02uKa8=
+
+Name: net/java/xades/security/xml/XAdES/Signer.class
+SHA1-Digest: FiP30Cat9HJ0maBD0MCmnzaVbSg=
+
+Name: es/gob/afirma/ui/core/jse/CertificateSelectionDialog$CertOptionP
+ ane.class
+SHA1-Digest: +dV/uFuptPKEWBU2BYpbYpnZg44=
+
+Name: org/bouncycastle/cms/jcajce/JceKeyTransEnvelopedRecipient$1.clas
+ s
+SHA1-Digest: kNVlEEMEs0FhlvGMK8RkgUBDS7M=
+
+Name: org/bouncycastle/cms/KeyTransRecipientId.class
+SHA1-Digest: T5NhYhYwg37rvnkxzfpfzIHBmy8=
+
+Name: com/lowagie/text/pdf/PdfAppearance.class
+SHA1-Digest: EQfxNbms+DRa4kSUitidmZXFQ9Y=
+
+Name: org/bouncycastle/crypto/macs/HMac.class
+SHA1-Digest: iZkE8E7DbNuVTFCl/rEzjk8Q47c=
+
+Name: com/lowagie/text/pdf/PdfPattern.class
+SHA1-Digest: rvk6CkZ0kjjeSs/1Nzhderz8Ow0=
+
+Name: org/apache/oro/text/regex/CharStringPointer.class
+SHA1-Digest: k6IZZWeZcZGpmY/A7wbhVm2MQMY=
+
+Name: org/mozilla/universalchardet/prober/sequence/SequenceModel.class
+SHA1-Digest: 5YEIzXzmOzq2cpLOIZ133CFMS+w=
+
+Name: com/lowagie/text/pdf/PdfArray.class
+SHA1-Digest: e2Y4xk1K6McE21O8hk4Hk/d7bd0=
+
+Name: com/lowagie/text/pdf/codec/Base64$OutputStream.class
+SHA1-Digest: WN1Rb/2f0vfKT+jqz/zI4VgOzCI=
+
+Name: es/gob/afirma/core/ui/AOUIManager.class
+SHA1-Digest: WruD/mKo5Pf65jaRSXb7YchDTvE=
+
+Name: org/bouncycastle/asn1/sec/SECNamedCurves$23.class
+SHA1-Digest: ywu5yh+fRIezWlLGWvhtoKqEd00=
+
+Name: es/gob/afirma/keystores/filters/rfc/KeyUsageFilter.class
+SHA1-Digest: KmjyaKZfTpxQlfIkrezUvh2jP/4=
+
+Name: com/lowagie/text/pdf/CFFFont$RangeItem.class
+SHA1-Digest: vgQrOWVngq5Vw05alapHersvvDQ=
+
+Name: org/bouncycastle/x509/util/StreamParser.class
+SHA1-Digest: usFucJoYUpwV4N8chO3VnxTF5Ps=
+
+Name: org/mozilla/universalchardet/prober/sequence/HebrewModel.class
+SHA1-Digest: ayIdj498o/IKRYK/ZKQ6Ndr9mx4=
+
+Name: org/bouncycastle/jce/provider/PEMUtil.class
+SHA1-Digest: 0u7HT/0kOa7updawRTKrRQW2cSQ=
+
+Name: com/lowagie/text/pdf/ColorDetails.class
+SHA1-Digest: M/m16yazbGI+8SHHK7ig0x9kN6k=
+
+Name: net/java/xades/security/xml/XAdES/SignaturePolicyIdentifier.clas
+ s
+SHA1-Digest: joeTCLK8p0pM/Ef9yZ1H8k8LE0Y=
+
+Name: com/lowagie/text/pdf/AcroFields$SorterComparator.class
+SHA1-Digest: x0RWfojfcyy6nenZF++NHMD6nqc=
+
+Name: org/bouncycastle/asn1/sec/SECNamedCurves$28.class
+SHA1-Digest: orsCzQW3p+qzzNQLpAH2mg1NDHM=
+
+Name: es/gob/afirma/core/envelopers/AOEnveloper.class
+SHA1-Digest: FWqKCs2XkcPhy4WeIjiac7VU3v0=
+
+Name: org/bouncycastle/asn1/x500/X500NameBuilder.class
+SHA1-Digest: YaHrtacFPexEzuIPIozrpJWxUwc=
+
+Name: com/lowagie/text/xml/TagMap$AttributeHandler.class
+SHA1-Digest: xo8/gw7LGupw+FivTv18IDVaUuI=
+
+Name: com/lowagie/text/pdf/PdfPKCS7$X509Name.class
+SHA1-Digest: /8gQjVHF7WossviTtDo/GQirrrg=
+
+Name: es/gob/afirma/core/ciphers/CipherConstants$AOCipherAlgorithm.cla
+ ss
+SHA1-Digest: PafaZih+arfs03i7GlmjLquD9Ao=
+
+Name: com/lowagie/text/exceptions/InvalidPdfException.class
+SHA1-Digest: PAs+Wij2FXfuokcarLBknn9xkZg=
+
+Name: es/gob/afirma/signers/multi/cades/CAdESCoSignerEnveloped.class
+SHA1-Digest: 0bOgu8EYSKl4v/JRlu7ayPKJ0qs=
+
+Name: org/bouncycastle/asn1/x509/BasicConstraints.class
+SHA1-Digest: 1B+a8u8Yl3+7INhAhh5dzrPDRs0=
+
+Name: org/bouncycastle/tsp/TSPUtil.class
+SHA1-Digest: GNGqROV9fpiUf9nyC9Y9mCpHfMQ=
+
+Name: com/lowagie/text/pdf/hyphenation/TernaryTree$Iterator$Item.class
+SHA1-Digest: xM3z24pA7wOgHEfnOvLzWmK6msU=
+
+Name: org/bouncycastle/asn1/ocsp/OCSPResponseStatus.class
+SHA1-Digest: HbDco8KU76SO4PnT1BNtmMrcOsE=
+
+Name: net/java/xades/security/xml/XAdES/CRLRefs.class
+SHA1-Digest: v+A1VEfL5jn2Gkku8nvjcfjm+uY=
+
+Name: org/bouncycastle/jce/provider/PKIXNameConstraintValidatorExcepti
+ on.class
+SHA1-Digest: tD1lXCabIlx7Il6tp7MKJhSPJjk=
+
+Name: org/bouncycastle/operator/jcajce/JcaDigestCalculatorProviderBuil
+ der$1$1.class
+SHA1-Digest: iTquu2MBjDCKFnVehZDwzmPT7Jc=
+
+Name: org/bouncycastle/math/ec/WNafMultiplier.class
+SHA1-Digest: C+j7qhQRXWgwL86jAFZWYDJQ4jg=
+
+Name: org/bouncycastle/operator/jcajce/JcaContentVerifierProviderBuild
+ er$SigVerifier.class
+SHA1-Digest: 8uXz77EbVX26C2AHkROJqCt8Oxg=
+
+Name: com/lowagie/text/pdf/PdfPublicKeyRecipient.class
+SHA1-Digest: qxq9C9xUZeqxGEBlgKKvVskDxXU=
+
+Name: java/com/lowagie/text/pdf/fonts/Helvetica.afm
+SHA1-Digest: C3FgwLXWkKcJz9ABVcZ1LgE6YFs=
+
+Name: org/bouncycastle/cms/jcajce/DefaultJcaJceExtHelper.class
+SHA1-Digest: OtiuUPZwBEmL2v4Z1XzmhBlLh7Y=
+
+Name: com/lowagie/text/pdf/hyphenation/ByteVector.class
+SHA1-Digest: +J75t2Ttu8iLyALH3ozNiB5L1yE=
+
+Name: org/bouncycastle/asn1/ASN1Primitive.class
+SHA1-Digest: njDUZM2JU1XeBWJipliogmRwRKI=
+
+Name: org/bouncycastle/operator/OperatorStreamException.class
+SHA1-Digest: qQQlfTniZ60zHNUahB/hWVsOj8c=
+
+Name: com/lowagie/text/pdf/collection/PdfCollectionSort.class
+SHA1-Digest: CqZZjrIweHXqY6K1xPviHJme0mg=
+
+Name: org/mozilla/universalchardet/prober/Big5Prober.class
+SHA1-Digest: 5mmO3ZsvEyAQ70PCiKQ31kKPpYM=
+
+Name: es/gob/afirma/core/signers/AOSimpleSigner.class
+SHA1-Digest: wIEg5kYOzVF4YRPJutVvH2YcuMA=
+
+Name: es/gob/afirma/ui/core/jse/FileExtensionFilter.class
+SHA1-Digest: SpegvmT1pAZyVsLpOJ5hxKC5OX0=
+
+Name: org/bouncycastle/cms/jcajce/JcePasswordRecipient.class
+SHA1-Digest: gc56ZTpsPD4zkMF+3GGOIQQNGZU=
+
+Name: org/bouncycastle/asn1/sec/SECNamedCurves$4.class
+SHA1-Digest: CgPh6UPOuleVmCozpvag45tt6hI=
+
+Name: org/bouncycastle/operator/OperatorCreationException.class
+SHA1-Digest: 53NzLVJRCwQ19si0ditBEOxYZ74=
+
+Name: es/gob/afirma/signers/xml/XMLMessages.class
+SHA1-Digest: 1uvf8o7ylIEUzpZT0SA/IZAmHvY=
+
+Name: com/lowagie/text/pdf/CFFFont$Item.class
+SHA1-Digest: B9OA2xsO6sbCoMKguJu0YgV//Lg=
+
+Name: org/bouncycastle/x509/X509CRLStoreSelector.class
+SHA1-Digest: 8+ZdE9sBh3Xp7u4i1409F9Rlmvg=
+
+Name: es/gob/afirma/keystores/main/common/AOKeyStoreManagerFactory.cla
+ ss
+SHA1-Digest: JrTHzxRqPaauJrcp6KH7pB5obhA=
+
+Name: org/mozilla/universalchardet/prober/sequence/Win1251BulgarianMod
+ el.class
+SHA1-Digest: ON4i7DCTv0G4TIDK3Q5NHYZB/ac=
+
+Name: org/bouncycastle/asn1/sec/SECNamedCurves$24.class
+SHA1-Digest: z1KQWtFgODAR3Izhcs4cBYyEHCw=
+
+Name: org/bouncycastle/cms/NullOutputStream.class
+SHA1-Digest: wGXUuNm6mOxcs6VAffucyRsgT0E=
+
+Name: net/java/xades/security/xml/XAdES/SignaturePolicyIdentifierDetai
+ ls.class
+SHA1-Digest: UHxtcwM+RsmAWnESNs032WNXZ00=
+
+Name: com/lowagie/text/pdf/crypto/AESCipher.class
+SHA1-Digest: vqk1j8ydfRpuyG7EvaXwQMIN23Y=
+
+Name: org/bouncycastle/cms/RecipientId.class
+SHA1-Digest: lW+vD0bHsmmn4yppH0DGek9/n6E=
+
+Name: com/lowagie/text/pdf/ExtraEncoding.class
+SHA1-Digest: 4Kdf8HnzkK2HPxYw5LiyYtIzcm0=
+
+Name: es/gob/afirma/signers/xml/XMLConstants$1.class
+SHA1-Digest: z6xMK/E7hPRP1tzE0wW6xcxxxyQ=
+
+Name: com/lowagie/text/pdf/XfaForm$Stack2.class
+SHA1-Digest: GRNB9IFqnW+Roal9EYMn+aNnSuc=
+
+Name: org/bouncycastle/asn1/x9/X962NamedCurves$8.class
+SHA1-Digest: GnA6il7/zWByblTO17ChW5ApBbk=
+
+Name: es/gob/afirma/keystores/main/common/KeyStoreUtilities$2.class
+SHA1-Digest: vH50q5A0TfDJdVntMn19z3F1PVU=
+
+Name: org/bouncycastle/asn1/ConstructedOctetStream.class
+SHA1-Digest: DGHFfPvsNdO6dGLddpa7MuHwYuI=
+
+Name: org/bouncycastle/x509/X509CollectionStoreParameters.class
+SHA1-Digest: TqHYglu/t2cFQaO8CihsXfDcCOI=
+
+Name: es/gob/afirma/core/util/tree/AOTreeModel.class
+SHA1-Digest: GsRj/gmfijuQKt/Chej607sHS80=
+
+Name: org/bouncycastle/asn1/cms/RecipientInfo.class
+SHA1-Digest: aTl2Q16WdhDLfWzvEB3R6VvPckQ=
+
+Name: com/lowagie/text/pdf/PdfDate.class
+SHA1-Digest: X6fjLPSqO+KI3K+O0HwPU5soBkk=
+
+Name: com/lowagie/text/pdf/HyphenationEvent.class
+SHA1-Digest: poPCFhPCjbJJ99ppeJiACcagK4c=
+
+Name: org/bouncycastle/math/ec/ECPoint$F2m.class
+SHA1-Digest: oS0N6UAZuTZtxDTppxM8vP5dXqM=
+
+Name: com/lowagie/text/pdf/DocumentFont.class
+SHA1-Digest: XOtbOoqy2YP2nDKxxFX8MZN/yKw=
+
+Name: org/bouncycastle/operator/jcajce/JceAsymmetricKeyWrapper.class
+SHA1-Digest: mxeyXhGNBVZo+gsfsION+Mef9SU=
+
+Name: org/bouncycastle/asn1/x9/X9FieldElement.class
+SHA1-Digest: zrSi3FcG4QtYsGcZ7rZ+5ke4FyQ=
+
+Name: org/apache/oro/text/PatternCache.class
+SHA1-Digest: U0qg3dSzs9VZes/mtCfG54Ri3HA=
+
+Name: org/bouncycastle/jce/provider/X509CRLObject.class
+SHA1-Digest: TlD7G9vYiKuyT44OgsFUOV840uM=
+
+Name: org/bouncycastle/operator/bc/BcUtil.class
+SHA1-Digest: AkjgsiTSwMbcuf3F+Oz9dFF61bg=
+
+Name: org/bouncycastle/math/ec/ECCurve$Fp.class
+SHA1-Digest: EyCTpeH+GlqCiMuJXOM8EuokXxc=
+
+Name: net/java/xades/security/xml/XAdES/XAdES_BES.class
+SHA1-Digest: OltyAz2uKcdtEj91gztMzMJI8No=
+
+Name: org/bouncycastle/jce/PrincipalUtil.class
+SHA1-Digest: jocabwGnO2hVzs/bomnq1j6a+JU=
+
+Name: org/bouncycastle/jce/interfaces/GOST3410Key.class
+SHA1-Digest: rMXAyLICGO3Q6IJBRWoIWjgG1gU=
+
+Name: org/bouncycastle/asn1/sec/SECNamedCurves$15.class
+SHA1-Digest: VKLherJ9tsZMGF7qHdTPOuFrwiw=
+
+Name: org/bouncycastle/cms/CMSReadable.class
+SHA1-Digest: 7kSynmt9Nzr30kJihWQeuR20RAE=
+
+Name: org/bouncycastle/asn1/teletrust/TeleTrusTNamedCurves$1.class
+SHA1-Digest: 0K6YQTRBv64WKM7oOvsSfwBv6Ic=
+
+Name: org/bouncycastle/jce/spec/ECPublicKeySpec.class
+SHA1-Digest: iwc7DsVU+lhmjTmAcLJZ19CMzwI=
+
+Name: com/lowagie/text/pdf/PdfReader.class
+SHA1-Digest: hKXKCIgt2RPK820yy8+rVvc2Bq4=
+
+Name: com/lowagie/text/pdf/StandardDecryption.class
+SHA1-Digest: Jl1v127Vi/M3VrqKhyoGctULyaQ=
+
+Name: miniappletmessages.properties
+SHA1-Digest: TIgSWmz/MqUVuBmi8IpPE6boOik=
+
+Name: com/lowagie/text/xml/simpleparser/SimpleXMLDocHandler.class
+SHA1-Digest: xFkoulDUeVd+byZhaUxy1oykn20=
+
+Name: com/lowagie/text/pdf/GlyphList.class
+SHA1-Digest: dHxrjCLInzdLvGDjefgRTpU0BFY=
+
+Name: com/lowagie/text/BadElementException.class
+SHA1-Digest: tAdKlWigrJUqpJ6dyK33wH0gKhs=
+
+Name: com/lowagie/text/pdf/PdfAction.class
+SHA1-Digest: 2I8uJz/6rqZnml4EeeFMdEWCOPQ=
+
+Name: es/gob/afirma/core/misc/UrlHttpManagerImpl$2.class
+SHA1-Digest: tsyNhpEidSCxXQLRqiY9WaoPVy8=
+
+Name: org/bouncycastle/cms/jcajce/JcePasswordAuthenticatedRecipient.cl
+ ass
+SHA1-Digest: 3cOZk7j550f2lMJp6dY1tB6Kxa8=
+
+Name: org/bouncycastle/operator/DefaultDigestAlgorithmIdentifierFinder
+ .class
+SHA1-Digest: 1JKm0JvZJqwGuZOTUFWpO89CUSw=
+
+Name: org/bouncycastle/crypto/paddings/PKCS7Padding.class
+SHA1-Digest: xh9Uka3oAGvrlGQIOhLwcY9vWBY=
+
+Name: org/bouncycastle/asn1/teletrust/TeleTrusTNamedCurves$2.class
+SHA1-Digest: Xw4f7frSgBTchqcHl58tiLLtT0Y=
+
+Name: es/gob/afirma/signers/xml/Utils$CannotDereferenceException.class
+SHA1-Digest: hrc2tMTWQ9pjWo//mcXVBuvqZXM=
+
+Name: java/com/lowagie/text/misc_licenses.txt
+SHA1-Digest: WSuQKC63HWR4OyP48LAoA/m0eA4=
+
+Name: org/bouncycastle/asn1/sec/SECNamedCurves$26.class
+SHA1-Digest: Xyy6aRUoILcw9ocNJqu3TQr03F4=
+
+Name: org/bouncycastle/math/ec/ECConstants.class
+SHA1-Digest: h5bSUQIFyBy+PAqjkqTh9JGn0Hk=
+
+Name: com/lowagie/text/pdf/PdfNameTree.class
+SHA1-Digest: 6AfIyX7qUuFPO36kPHQ9a3Fdazg=
+
+Name: org/bouncycastle/asn1/ASN1Sequence$1.class
+SHA1-Digest: 7AakKQ12EPz9EIU6hBrB2G9HIO4=
+
+Name: org/bouncycastle/asn1/isismtt/ISISMTTObjectIdentifiers.class
+SHA1-Digest: qNQ5+9rsDylpsH4GVDylD87155U=
+
+Name: org/bouncycastle/cms/KEKRecipientId.class
+SHA1-Digest: DcXaapzVQa/fTWN/e66TizZlVMA=
+
+Name: com/lowagie/text/pdf/PRTokeniser.class
+SHA1-Digest: t8IBZx6aGsS4rIL70nR7syx/IxY=
+
+Name: org/bouncycastle/crypto/digests/MD5Digest.class
+SHA1-Digest: DIXMX4LZtptuTWnZCOIXL6wEaTk=
+
+Name: com/lowagie/text/pdf/parser/PdfContentStreamProcessor$SetTextRis
+ e.class
+SHA1-Digest: +65DrOl3PwtUw6rA+woVoH1fcL4=
+
+Name: org/bouncycastle/asn1/cmp/PKIStatusInfo.class
+SHA1-Digest: XVxNWwBumILt3wA2gwiU3Kp20m0=
+
+Name: org/bouncycastle/cms/Recipient.class
+SHA1-Digest: bL+oe+4KBAXi7PwQS6Q/wi4GQh4=
+
+Name: net/java/xades/security/xml/XAdES/ObjectIdentifier.class
+SHA1-Digest: X7yV+On+Fixqb/9VHtB9Jy/PM3M=
+
+Name: net/java/xades/security/xml/XAdES/CompleteValidationXAdESImpl.cl
+ ass
+SHA1-Digest: /8rWs1Sz/uYmmXPGsdTkpssoNbY=
+
+Name: com/lowagie/text/pdf/MappedRandomAccessFile.class
+SHA1-Digest: Wb8g9ocrGmAakveuY0yP5FiPYUE=
+
+Name: org/bouncycastle/crypto/BufferedBlockCipher.class
+SHA1-Digest: 50jvKCSoO9phk0tNedAQrYB+rdQ=
+
+Name: com/lowagie/text/pdf/PdfFormXObject.class
+SHA1-Digest: R+OkaUfVpVBxbLo1XQ+ODPk/5dI=
+
+Name: com/lowagie/text/html/Markup.class
+SHA1-Digest: nQQx82TWwk08fOKrlznL76uLPyo=
+
+Name: org/bouncycastle/tsp/GenTimeAccuracy.class
+SHA1-Digest: oaIxbY/DYsVKW/kL1BaTOReZspg=
+
+Name: com/lowagie/text/pdf/PdfEncodings.class
+SHA1-Digest: /1r31/21I8KWaGH2xA8GLEem1t0=
+
+Name: org/bouncycastle/jce/X509LDAPCertStoreParameters.class
+SHA1-Digest: MBy5cdxMsLSoTEgK8zzk+slNXMw=
+
+Name: com/lowagie/text/pdf/XfaForm$Xml2SomDatasets.class
+SHA1-Digest: XLSPgzDaTcOnoxlU5j7HiGym+To=
+
+Name: org/bouncycastle/jce/provider/X509SignatureUtil.class
+SHA1-Digest: 1EPPNfLUQodWhmz+09fK1syGh4k=
+
+Name: org/bouncycastle/asn1/x509/ObjectDigestInfo.class
+SHA1-Digest: LXQCJX3DuA40Yz+HhaFfJMExJqY=
+
+Name: es/gob/afirma/keystores/main/common/KeyStoreConfiguration.class
+SHA1-Digest: XJ8NfIs8AUVwxG3anzXgUlbD+zk=
+
+Name: org/bouncycastle/asn1/ocsp/BasicOCSPResponse.class
+SHA1-Digest: 2qGRPivI0SPYwrBisCvukwSxiTg=
+
+Name: org/bouncycastle/crypto/digests/SHA512Digest.class
+SHA1-Digest: VsyxmiPnc9vR4iia7MmyUjmZB1o=
+
+Name: es/gob/afirma/miniapplet/GetPropertyAction.class
+SHA1-Digest: P3gaxnBJ9IyVmVGZWdkwH4jlt98=
+
+Name: org/bouncycastle/asn1/ASN1ParsingException.class
+SHA1-Digest: FnnP9uJEsIsNsTqI/6rU2RLrH5s=
+
+Name: org/bouncycastle/asn1/x9/X962NamedCurves$21.class
+SHA1-Digest: /EJke3arteJET34sbCPX3g5ocLA=
+
+Name: net/java/xades/security/xml/XAdES/IndividualDataObjectsTimeStamp
+ .class
+SHA1-Digest: /H49PppXiq+PAfuuY9RoNsI6/fg=
+
+Name: com/lowagie/text/pdf/interfaces/PdfVersion.class
+SHA1-Digest: 8KdMQ+wuvr7/hlTYaxuac6mbNHo=
+
+Name: net/java/xades/security/xml/XAdES/XadesElement.class
+SHA1-Digest: qoUP3lqrKwXuNmg8bOz/xtQ/wuU=
+
+Name: org/apache/oro/text/regex/Perl5MatchResult.class
+SHA1-Digest: iA9vmH3myrSu/jnE2wXXlItUtWc=
+
+Name: com/lowagie/text/Annotation.class
+SHA1-Digest: 2MWK8XI96OvnejLgyQYw06vJE08=
+
+Name: org/bouncycastle/asn1/cms/ContentInfo.class
+SHA1-Digest: kB8NrK3r6nKzW1ZT2iE6GKfosRw=
+
+Name: net/java/xades/util/Base64$1.class
+SHA1-Digest: D6DEnBRbuhaRPzd4bkgvxyl216U=
+
+Name: net/sf/jmimemagic/MagicParseException.class
+SHA1-Digest: ydh8zMYlGuKWekNuC8DHpzGGjSQ=
+
+Name: org/bouncycastle/x509/util/StreamParsingException.class
+SHA1-Digest: KLJFZq+3fUyyacpT19Lc97SGqwA=
+
+Name: net/java/xades/security/xml/XAdES/CRLIdentifier.class
+SHA1-Digest: 6ABVWyvC6PGVnM6hPAJsKg8CdS4=
+
+Name: java/com/lowagie/text/pdf/fonts/Times-Bold.afm
+SHA1-Digest: i2qHVf+9R8dx257B1NAK+JI42lk=
+
+Name: pdfmessages.properties
+SHA1-Digest: 3aEVjAm8eFbH7mWasXdGUp7BrtQ=
+
+Name: com/lowagie/text/ListItem.class
+SHA1-Digest: fg5ulgEqOKL1acjZKLaKMZ5i4Fo=
+
+Name: org/bouncycastle/asn1/x509/TBSCertList$CRLEntry.class
+SHA1-Digest: 20GgQJweL7HwWzk9wCmG8F94HEQ=
+
+Name: es/gob/afirma/signers/pades/PdfDocumentSecurityStore$ValidationI
+ nformation.class
+SHA1-Digest: 0tgEpk7AMdNtr+0rROGzbzV97ts=
+
+Name: org/bouncycastle/cms/jcajce/JceKEKEnvelopedRecipient.class
+SHA1-Digest: yp1ClbslUJDYf5chYD4a31hJJd0=
+
+Name: org/bouncycastle/asn1/ocsp/CertStatus.class
+SHA1-Digest: Rbay15BgPJMvyi3Y4Wd0A+aPF7I=
+
+Name: org/bouncycastle/crypto/util/Pack.class
+SHA1-Digest: dd2w7GSfujaUj000AHDm55Df6M0=
+
+Name: org/bouncycastle/jce/provider/CertStatus.class
+SHA1-Digest: XYuyC+29XlH7otqqwvjH3mDVZhE=
+
+Name: com/lowagie/text/pdf/events/PdfPTableEventForwarder.class
+SHA1-Digest: u4iEU4/QULY45fFtktsiCkd512g=
+
+Name: org/bouncycastle/crypto/digests/SHA384Digest.class
+SHA1-Digest: seGHDH49fMOefjNWw4F3CESGVYk=
+
+Name: com/lowagie/text/SplitCharacter.class
+SHA1-Digest: O50z6868m8pxxDeOmS06libhsdM=
+
+Name: com/lowagie/text/pdf/codec/Base64$InputStream.class
+SHA1-Digest: rD1GTG5VZhstoZA7J1jePEJf4ug=
+
+Name: java/com/lowagie/text/pdf/fonts/Helvetica-Oblique.afm
+SHA1-Digest: B4Slk1htal/JWWZv07whpEUIxHc=
+
+Name: com/lowagie/text/pdf/fonts/FontsResourceAnchor.class
+SHA1-Digest: ve9N2feyQlQc57WP6wbyKcEKVyg=
+
+Name: org/bouncycastle/cms/CMSAlgorithm.class
+SHA1-Digest: SxTcwTd91lnnZxghT0Cp/SESZH0=
+
+Name: org/bouncycastle/asn1/tsp/TimeStampResp.class
+SHA1-Digest: vzyJwNumUDWkSvfPi0BEcDIdWSE=
+
+Name: resources/certicon.png
+SHA1-Digest: 0nM7nPI38tgCO7vGcw2cMbBMBPI=
+
+Name: com/lowagie/text/pdf/PdfPCellEvent.class
+SHA1-Digest: K/VXXfgWX1fLPM1zOviM/lI7CiQ=
+
+Name: org/bouncycastle/asn1/x9/X9ObjectIdentifiers.class
+SHA1-Digest: Ef7GNw/g3BKoXYkttUK04ouhI5o=
+
+Name: com/lowagie/text/pdf/events/PdfPageEventForwarder.class
+SHA1-Digest: Uc3/MYrDsvZITUFDvOTEFufwnwM=
+
+Name: org/bouncycastle/asn1/DERGeneralString.class
+SHA1-Digest: jH+qECe2CTtWRcOq4waSoQQgJnw=
+
+Name: org/bouncycastle/operator/jcajce/JceAsymmetricKeyUnwrapper.class
+SHA1-Digest: 2AlzWsT7Od+CIRZ9z80XwuqCysw=
+
+Name: org/bouncycastle/x509/X509AttributeCertStoreSelector.class
+SHA1-Digest: dw491l4IEfZv1NUCLKBuiIF+HEI=
+
+Name: com/lowagie/text/pdf/PdfStructureElement.class
+SHA1-Digest: Zku8DGrgbvF/cF8vIMfOGNyz/M4=
+
+Name: org/bouncycastle/asn1/DERVisibleString.class
+SHA1-Digest: ocNwzXYMHq017SK94ajer/qbMsM=
+
+Name: com/lowagie/text/pdf/PdfTemplate.class
+SHA1-Digest: PzLTL33PBxcYlMIbMbJCN5ljv4g=
+
+Name: com/lowagie/text/pdf/PdfSigGenericPKCS$PPKMS.class
+SHA1-Digest: Ea1Gl53TvhopJT1XaqTRuM5RGCo=
+
+Name: org/bouncycastle/asn1/DERExternal.class
+SHA1-Digest: ACFr8uFcWzNIrRhtuNLSaC+jFuI=
+
+Name: org/bouncycastle/operator/AsymmetricKeyUnwrapper.class
+SHA1-Digest: 7ayjqCXTK43CzJV3kJbSTeJA7eg=
+
+Name: com/lowagie/text/pdf/PdfWriter$PdfBody.class
+SHA1-Digest: J9XZogKZbFrpMBRyPk55WBXPWlA=
+
+Name: org/bouncycastle/asn1/cms/Time.class
+SHA1-Digest: Cgu0tVHr+KKWlaDVInFgHhKsQKA=
+
+Name: org/bouncycastle/asn1/x509/KeyPurposeId.class
+SHA1-Digest: lwiXpPw/NwWppPbMIN7zOwQAZB4=
+
+Name: com/lowagie/text/List.class
+SHA1-Digest: 9AGriBSOwEcE/5Rtqn45l06o3N8=
+
+Name: org/bouncycastle/jce/spec/ECNamedCurveParameterSpec.class
+SHA1-Digest: zijJp7JHkn1b+4xY6QwBil/A8Gs=
+
+Name: es/gob/afirma/miniapplet/CoSignAction.class
+SHA1-Digest: Ixou8ww7ZqSrSOWBTdLXI606MJo=
+
+Name: org/mozilla/universalchardet/prober/distributionanalysis/EUCJPDi
+ stributionAnalysis.class
+SHA1-Digest: 73DnH1N6DspTkzi2M6ZXGTjcYMI=
+
+Name: org/bouncycastle/asn1/teletrust/TeleTrusTObjectIdentifiers.class
+SHA1-Digest: 8krVIT2B93q0nCFwSXIRr5t2B6E=
+
+Name: com/lowagie/text/pdf/PdfTransition.class
+SHA1-Digest: LX9FjFr+SkV+X9Wo95MhX4aymd4=
+
+Name: com/lowagie/text/pdf/OutputStreamEncryption.class
+SHA1-Digest: 6QphC2ZEOjJoQM1p2bL/tFeuFDM=
+
+Name: org/bouncycastle/cms/CMSTypedStream$FullReaderStream.class
+SHA1-Digest: mahzNS4Dx/v4TiOQ3or5eHewKlI=
+
+Name: org/bouncycastle/asn1/IndefiniteLengthInputStream.class
+SHA1-Digest: asV2G7A1D/j9hQqJhTe5dRE1fTQ=
+
+Name: net/java/xades/util/ResourceHelper$EmptyResourceEntries.class
+SHA1-Digest: kFzrSolfwdlBamwvPGpWlrbnHXk=
+
+Name: org/bouncycastle/asn1/nist/NISTObjectIdentifiers.class
+SHA1-Digest: WmuiqOIofCjtF2dVCnCgUyeh5XY=
+
+Name: org/bouncycastle/cms/CMSSignedDataGenerator$SignerInf.class
+SHA1-Digest: 8guNNXX/of+a7BKatLsGFWcwLcA=
+
+Name: net/java/xades/security/xml/XAdES/SignaturePolicyIdentifierImpl.
+ class
+SHA1-Digest: eopITThKbI32QwjdOfII6U7LoqI=
+
+Name: org/bouncycastle/asn1/BEROctetStringGenerator.class
+SHA1-Digest: sqneUbq9AcqX71fp2itlu4oaitU=
+
+Name: org/bouncycastle/asn1/DERSequenceParser.class
+SHA1-Digest: gI0KJYW+GvNUvTEBbvnvAiGq71o=
+
+Name: com/lowagie/text/pdf/XfaForm.class
+SHA1-Digest: iYkijBOANCNRhKMbTYFtGdymr8U=
+
+Name: org/bouncycastle/asn1/InMemoryRepresentable.class
+SHA1-Digest: 5E0t2nxaYDKL9eUMOAm6xxVqSe0=
+
+Name: com/lowagie/text/pdf/SimpleBookmark.class
+SHA1-Digest: j1J+BernzEAtrZKGwRyQthGGAVE=
+
+Name: org/bouncycastle/asn1/DLSet.class
+SHA1-Digest: TAB0SaDXR96cBrxkf4amlCMsmrs=
+
+Name: com/lowagie/text/pdf/interfaces/PdfXConformance.class
+SHA1-Digest: a0m0vKosZu8SxDMbU7iED0H7Uk0=
+
+Name: net/java/xades/security/xml/XAdES/TimestampXAdESImpl.class
+SHA1-Digest: uS5HcwZGDkU1AK9oY0C9WYWUsKA=
+
+Name: com/lowagie/text/pdf/PdfSigGenericPKCS.class
+SHA1-Digest: eD850zyqAbDhEtsJWBngr+bjnxE=
+
+Name: com/lowagie/text/Rectangle.class
+SHA1-Digest: hdOalho3BbELEs0LMY3tdQcJ7Yo=
+
+Name: org/mozilla/universalchardet/prober/distributionanalysis/EUCKRDi
+ stributionAnalysis.class
+SHA1-Digest: Gc3hfCI+vRD1yzP3KjVe1Ao6VfE=
+
+Name: es/gob/afirma/core/signers/AOCoSigner.class
+SHA1-Digest: VZnpKj7NsveuJaso1Ik4ToXlWcI=
+
+Name: es/gob/afirma/signers/pkcs7/AOAlgorithmID.class
+SHA1-Digest: b6cRKc6eH+gmO5OvMawRDrakQBQ=
+
+Name: org/bouncycastle/jce/provider/AnnotatedException.class
+SHA1-Digest: UXFZKe+5R7I5CX8vUMOc86xXkeI=
+
+Name: org/bouncycastle/asn1/cms/OtherKeyAttribute.class
+SHA1-Digest: 25PB4H3J7zq8RTfFMtgdWQD19zo=
+
+Name: com/lowagie/text/pdf/PdfCopyFieldsImp.class
+SHA1-Digest: rYJ+EKKq1LZRg1Fy56r7b9IUzAQ=
+
+Name: com/lowagie/text/xml/SAXiTextHandler.class
+SHA1-Digest: CW/Qr2sP+MzxYyo6jMi2bxxvCV4=
+
+Name: com/lowagie/text/pdf/PdfLayer.class
+SHA1-Digest: ZqFBqIA7BAdIX40IxX3LvsT/UvY=
+
+Name: es/gob/afirma/miniapplet/GetFileNameContentAction.class
+SHA1-Digest: nUez/YYNZWd7RuFXeDzxQuWMtQ8=
+
+Name: org/bouncycastle/asn1/x509/TBSCertificate.class
+SHA1-Digest: 8qwaqiQaMpXoDbpzYhYcMYzR84A=
+
+Name: org/bouncycastle/jce/spec/ECNamedCurveSpec.class
+SHA1-Digest: YyplwHhrGGEF3ZpLjwQORu7ZoiE=
+
+Name: org/bouncycastle/asn1/cms/CMSAttributes.class
+SHA1-Digest: Lc+V8WE2su37DDAUU8TKZBBjmGo=
+
+Name: org/bouncycastle/asn1/x509/ReasonFlags.class
+SHA1-Digest: EpOlA63gIO2bnbmW5aFS9fuSc4s=
+
+Name: org/bouncycastle/asn1/x509/DistributionPointName.class
+SHA1-Digest: dLfNKDjKl60wVEswlXGRy/KoQ0Y=
+
+Name: net/java/xades/security/xml/XAdES/ObjectIdentifierDetails.class
+SHA1-Digest: aZEKY5gZIKT4hbMW7OJISrvgK9E=
+
+Name: com/lowagie/text/pdf/BidiLine.class
+SHA1-Digest: 0KpU+YU9mhmxoPbp8N9ZLJQc48Q=
+
+Name: net/java/xades/util/XMLUtils.class
+SHA1-Digest: Uxu1jdOSuTVWvM82iepT+ciRTQA=
+
+Name: org/bouncycastle/asn1/sec/SECNamedCurves$3.class
+SHA1-Digest: dAdIraMNnZ/ZojNgY8eeuzpbER4=
+
+Name: org/bouncycastle/asn1/x509/AttributeCertificateInfo.class
+SHA1-Digest: 9dOcUDX9TgN1WpefUjVQ2H3O9N4=
+
+Name: com/lowagie/text/pdf/codec/PngImage.class
+SHA1-Digest: VxyayKyqPeiBF5/AEbAYxaIu2mc=
+
+Name: org/apache/oro/util/GenericCache.class
+SHA1-Digest: TePO69fxb+jc2VXuuVL/7A7ROxQ=
+
+Name: org/apache/oro/text/PatternCacheLRU.class
+SHA1-Digest: SxiJEJXj/MuO00m2TS1YnrIU3Do=
+
+Name: org/bouncycastle/asn1/x509/SubjectKeyIdentifier.class
+SHA1-Digest: L1/l/HW1Vhtydf7I2XqRGj2eeIQ=
+
+Name: org/bouncycastle/crypto/digests/RIPEMD128Digest.class
+SHA1-Digest: tgQYc29gg7jFY4idvfZaI31CToc=
+
+Name: org/mozilla/universalchardet/prober/sequence/CyrillicModel.class
+SHA1-Digest: qiQgQLD/qIPQGvwjaY3P5SnApWA=
+
+Name: org/bouncycastle/cms/RecipientInfoGenerator.class
+SHA1-Digest: ZZG50FQMRaRDcNA5M0xV/PJUWXE=
+
+Name: com/lowagie/text/pdf/PdfWriter$PdfBody$PdfCrossReference.class
+SHA1-Digest: TGrxYvluNf+OOfqShWJ7FWAGKA4=
+
+Name: com/lowagie/text/html/WebColors.class
+SHA1-Digest: 1P2qg4CaTxcdYUztevF04g/FE2w=
+
+Name: es/gob/afirma/signers/multi/cades/CAdESCounterSignerEnveloped.cl
+ ass
+SHA1-Digest: vB9BZCyGWNYZItS12FkCP2Jn/3o=
+
+Name: resources/dnieicon.png
+SHA1-Digest: 6f3WBVTxuoZrZIrX/quHnCqQywA=
+
+Name: com/lowagie/text/pdf/PRIndirectReference.class
+SHA1-Digest: Zti0/sLGuXBGUzUgJGpQiugsqag=
+
+Name: org/bouncycastle/jce/spec/GOST3410PublicKeyParameterSetSpec.clas
+ s
+SHA1-Digest: j4Zkc0ukTp+3eRlSarBE3QE2T98=
+
+Name: org/bouncycastle/crypto/params/ParametersWithSBox.class
+SHA1-Digest: 11VtnKUWh6VdPsenicmIVUMtv1U=
+
+Name: org/bouncycastle/asn1/DefiniteLengthInputStream.class
+SHA1-Digest: more3+peQ1MtWYiVcY78ElHXMEc=
+
+Name: org/bouncycastle/asn1/cms/AuthEnvelopedData.class
+SHA1-Digest: /CW7APk5deShZn70C6wd1pt5Tyg=
+
+Name: org/bouncycastle/ocsp/Req.class
+SHA1-Digest: YiZzakw6UCmDojxgZnpiv+tGC+U=
+
+Name: org/bouncycastle/asn1/sec/SECNamedCurves$5.class
+SHA1-Digest: Vw/oVGRYeI+VCqc0d+Xb1mbr11M=
+
+Name: org/bouncycastle/operator/ContentSigner.class
+SHA1-Digest: c2rviGkvpz+Kg45oefNAS+H056M=
+
+Name: net/java/xades/security/xml/XAdES/CounterSignature.class
+SHA1-Digest: HQHPG+q3ciVhXcDa4Bzri3TlJ1s=
+
+Name: org/bouncycastle/asn1/x9/X962NamedCurves$20.class
+SHA1-Digest: a0zuBxTu3A22oJKtuKVICJ1dKmg=
+
+Name: org/bouncycastle/operator/jcajce/OperatorHelper.class
+SHA1-Digest: 6IGsoFk0wh0VvSkKzMKY46iynJc=
+
+Name: net/java/xades/security/xml/XAdES/CommitmentTypeIndicationDetail
+ s.class
+SHA1-Digest: Zalm+dqT2IP5yJi4TQdf1pshpfA=
+
+Name: com/lowagie/text/pdf/CFFFont$UInt8Item.class
+SHA1-Digest: 1vc3jOAMKVpenZN777N/xfUyWcM=
+
+Name: org/bouncycastle/cms/jcajce/JcaSignerInfoVerifierBuilder$Provide
+ rHelper.class
+SHA1-Digest: Cy28edzw/YnVq0MQDQ6QwZSfZsI=
+
+Name: com/lowagie/text/pdf/PdfLayerMembership.class
+SHA1-Digest: glpeImlktBbMbJFAaWuZhFweKe0=
+
+Name: org/bouncycastle/math/ec/ECCurve.class
+SHA1-Digest: UMZlHgLrqXePPAd8TGZT92sJ3qM=
+
+Name: es/gob/afirma/core/signers/AdESPolicy.class
+SHA1-Digest: nyyLU6gFDrCRhcUAD+CdHBr88sY=
+
+Name: org/bouncycastle/cert/selector/X509CertificateHolderSelector.cla
+ ss
+SHA1-Digest: zG8y+GN+MIJFrmpjvVXJH0dIZuw=
+
+Name: com/lowagie/text/xml/XmlDomWriter.class
+SHA1-Digest: skpRGSEACwstrRKY2r7nuNxNMPo=
+
+Name: com/lowagie/text/pdf/events/PdfPCellEventForwarder.class
+SHA1-Digest: NFu7ZjCBw1EZDBl4boa7R85m5O8=
+
+Name: org/bouncycastle/asn1/teletrust/TeleTrusTNamedCurves$13.class
+SHA1-Digest: xdcJbG7mY/b801U9qvaC5QEttJM=
+
+Name: org/bouncycastle/jce/interfaces/MQVPrivateKey.class
+SHA1-Digest: HWLHqjV0yR66qEjSlYQB6JJOw98=
+
+Name: com/lowagie/text/pdf/PdfColor.class
+SHA1-Digest: Wmd7vibtrEAWeygW9/RwxMXrolk=
+
+Name: com/lowagie/text/ImgJBIG2.class
+SHA1-Digest: yhsTTRSCSGZY0DBQFq4mSGR6n5E=
+
+Name: org/bouncycastle/jce/exception/ExtCertPathValidatorException.cla
+ ss
+SHA1-Digest: LgT9EF7kEEJ2UWDGmBbbgPVy2Hw=
+
+Name: net/java/xades/util/SystemUtils.class
+SHA1-Digest: rnNh8Cb3viTsqDB924Pm34N13q8=
+
+Name: org/bouncycastle/x509/X509StoreSpi.class
+SHA1-Digest: V2dIky4L7msRgCIwNjTTnQJdBBg=
+
+Name: org/bouncycastle/x509/NoSuchParserException.class
+SHA1-Digest: 3/vn0vJzYZ/zhs0jCgtotmOpIXo=
+
+Name: org/bouncycastle/asn1/BERGenerator.class
+SHA1-Digest: z+T5ZDk1vP79xLrt3jYIlIcGs+8=
+
+Name: net/java/xades/security/xml/XAdES/SignatureProductionPlaceDetail
+ s.class
+SHA1-Digest: aYEdTTuGTz1xZWKGRs4J6jwRsik=
+
+Name: com/lowagie/text/pdf/hyphenation/TernaryTree.class
+SHA1-Digest: fiGe9HN25A1DQEUIj/Ib2TcEMkg=
+
+Name: com/lowagie/text/pdf/PdfTextArray.class
+SHA1-Digest: NIjq67ELuJPwYpnF9Ns9Ntgnihs=
+
+Name: org/bouncycastle/asn1/ASN1OctetString.class
+SHA1-Digest: hckcN0hePR87fCLDghtvZzmYZ1E=
+
+Name: org/bouncycastle/cms/jcajce/JcePasswordRecipientInfoGenerator.cl
+ ass
+SHA1-Digest: tMEoU0XcnRecvcQTQYg3+jBgIuw=
+
+Name: es/gob/afirma/signers/multi/cades/AOCAdESCounterSigner.class
+SHA1-Digest: ONO2HyTazXX0cnzaY7H2QSaoyko=
+
+Name: com/lowagie/text/pdf/CFFFont$UInt24Item.class
+SHA1-Digest: UVVhlZyd8cKFcZJGXM6DbLbhoMM=
+
+Name: org/bouncycastle/asn1/ASN1Set.class
+SHA1-Digest: /wpYLFfQqjuzgH4tBpUs6LWOMWo=
+
+Name: com/lowagie/text/factories/ElementFactory.class
+SHA1-Digest: 5Ycg6HTWCOjcyvY5SR2nXd268BM=
+
+Name: org/bouncycastle/asn1/teletrust/TeleTrusTNamedCurves$5.class
+SHA1-Digest: 7C2VaCDVIXQ/aRDe/QAI5qgwRNc=
+
+Name: org/bouncycastle/asn1/x509/CertificateList.class
+SHA1-Digest: FTLmVgbjInXlWGvp120J/dAbDrI=
+
+Name: org/bouncycastle/jce/provider/BouncyCastleProvider.class
+SHA1-Digest: jTFdP51nn8xLhEuIZ8fEBOtSerw=
+
+Name: org/bouncycastle/asn1/sec/SECNamedCurves$13.class
+SHA1-Digest: pzPvqGE4p3VYfQ1zI3Sm9VtD0bw=
+
+Name: org/bouncycastle/asn1/BEROctetStringParser.class
+SHA1-Digest: G1KdbU4aTo9YDdL1QentULokY9Y=
+
+Name: com/lowagie/text/pdf/ColumnText.class
+SHA1-Digest: /JAeGOGAHbJghn+47yn8f2ArlIU=
+
+Name: es/gob/afirma/ui/core/jse/AWTUIManager$2.class
+SHA1-Digest: qQaIi428VxTHYLSAdU4daKh3PBU=
+
+Name: com/lowagie/text/pdf/TSAClient.class
+SHA1-Digest: gKolxkffLekraxyxN/V8y1Bm/oM=
+
+Name: com/lowagie/text/Paragraph.class
+SHA1-Digest: goWfrK/JKm1fJ1MMQzsRztGjPQs=
+
+Name: org/bouncycastle/cert/selector/X509AttributeCertificateHolderSel
+ ector.class
+SHA1-Digest: b57DiuZY2Xsw+Z//9E4LebZqHA8=
+
+Name: es/gob/afirma/signers/pkcs7/SigUtils.class
+SHA1-Digest: VsYxQyEGIw+KRRNvoWc8XhqXSuA=
+
+Name: org/mozilla/universalchardet/prober/distributionanalysis/EUCTWDi
+ stributionAnalysis.class
+SHA1-Digest: fpglAeN9orlEkNxyhP+hY7EuVlw=
+
+Name: es/gob/afirma/signers/xades/EFacturaAlreadySignedException.class
+SHA1-Digest: v/dI07AhszpWe0ljt668zvCfN4I=
+
+Name: org/bouncycastle/asn1/BERSequence.class
+SHA1-Digest: yMeCk0fuEGJltuG10MV7OeHUBpc=
+
+Name: org/bouncycastle/asn1/x9/X962NamedCurves$17.class
+SHA1-Digest: WoJc3W2FnpE1IbH1dAuOfY4RsWo=
+
+Name: org/bouncycastle/cms/PasswordRecipientInfoGenerator.class
+SHA1-Digest: 3ma3zW1kDVj+z1HiHQ4DuVu4bkU=
+
+Name: org/apache/oro/text/regex/OpCode.class
+SHA1-Digest: YdhZg4uz6YE81xDidwU/oU6UziM=
+
+Name: com/lowagie/text/pdf/parser/PdfContentStreamProcessor$ShowTextAr
+ ray.class
+SHA1-Digest: deAWAgDVa/NlbchM8qTGF53G8gw=
+
+Name: org/bouncycastle/cert/AttributeCertificateHolder.class
+SHA1-Digest: vewrhpgyBEXdzeHl7JbVm0SSYLA=
+
+Name: net/java/xades/security/xml/XAdES/DataObjectFormatDetails.class
+SHA1-Digest: F+4sRpc1YYxxx7k+Z1JG1iw8wT0=
+
+Name: org/bouncycastle/operator/jcajce/JceSymmetricKeyUnwrapper.class
+SHA1-Digest: ai5RbCKihpK17p0dOwlH0UH5DNo=
+
+Name: es/gob/afirma/signers/xadestri/client/AOXAdESTriPhaseSigner.clas
+ s
+SHA1-Digest: bisnM6/0FGPDMNbPkOndgoQVi8w=
+
+Name: com/lowagie/text/pdf/parser/PdfContentStreamProcessor$SetTextFon
+ t.class
+SHA1-Digest: EyRzwo5g93GFWYLdSaq1NNJJiiM=
+
+Name: org/bouncycastle/asn1/x509/X509DefaultEntryConverter.class
+SHA1-Digest: l6UqUMdfi3/f4XtXXrrK4vyEGrc=
+
+Name: net/java/xades/security/xml/XAdES/XAdESTimeStamp.class
+SHA1-Digest: 14amlrxMjO5vUHF78oIzLkxhtz8=
+
+Name: com/lowagie/text/Chunk.class
+SHA1-Digest: kNlcBzA71MW/mbtlnQEk/Sg6Ys0=
+
+Name: net/java/xades/security/xml/XMLSignatureDocument.class
+SHA1-Digest: ZvC/l7f+fH/ju3JfrLePR0c3Ynw=
+
+Name: policy.properties
+SHA1-Digest: k+dyowl8DrOna1Fi5l/eSQwAg4I=
+
+Name: com/lowagie/text/pdf/PdfCell.class
+SHA1-Digest: b8vJSmK6fkWAE6r5VajABdxS63c=
+
+Name: org/bouncycastle/asn1/x9/X9ECParameters.class
+SHA1-Digest: 0pe+6id8/EmL2aR7/6SrM/M810o=
+
+Name: org/mozilla/universalchardet/prober/sequence/Win1251Model.class
+SHA1-Digest: pzfqr8FXNgxLo3CV8L5KFqmlkuo=
+
+Name: org/bouncycastle/asn1/ASN1Encodable.class
+SHA1-Digest: tSHxB8ZA0pwd0JPzyfa2CJ3cJAs=
+
+Name: com/lowagie/text/pdf/PdfPatternPainter.class
+SHA1-Digest: sJATFx9jR8UOIbtTEwZILXs0a+w=
+
+Name: org/bouncycastle/operator/MacCalculator.class
+SHA1-Digest: nQwquGEHY6xSDicSLAaNz2PxkkI=
+
+Name: com/lowagie/text/pdf/PdfNull.class
+SHA1-Digest: LdgQPtB/zVOussAZ5d4CGs3wWYw=
+
+Name: org/bouncycastle/operator/SymmetricKeyWrapper.class
+SHA1-Digest: G6HhXfMCqSOsgWpKnwZP/ZUIg08=
+
+Name: es/gob/afirma/keystores/main/callbacks/NullPasswordCallback.clas
+ s
+SHA1-Digest: yV5lBnoa3w/s64/kM/vaxogclms=
+
+Name: org/bouncycastle/jcajce/provider/config/ConfigurableProvider.cla
+ ss
+SHA1-Digest: 5h7dpjlHVY6asDHZaTJnMrPLP9Y=
+
+Name: net/java/xades/security/xml/XMLSignatureElement$KeyValueKeySelec
+ tor.class
+SHA1-Digest: bTLpL2PMfwxYnbso/FhluEaouOo=
+
+Name: org/bouncycastle/math/ec/PreCompInfo.class
+SHA1-Digest: fm4n5wNK3kUwooDegbioITMczwU=
+
+Name: org/mozilla/universalchardet/UniversalDetector.class
+SHA1-Digest: y/nrjYAuFUW4cv74+YO131LftIs=
+
+Name: org/bouncycastle/asn1/sec/SECNamedCurves$8.class
+SHA1-Digest: r9rrla+aC+0udQlEh84COc6f22Y=
+
+Name: org/bouncycastle/math/ec/ECFieldElement$Fp.class
+SHA1-Digest: cFLuFIVh4OnvzerjQlb5m2lKOwE=
+
+Name: org/mozilla/universalchardet/prober/statemachine/HZSMModel.class
+SHA1-Digest: v2slMGVxixT06ZIzrGKINiwiT8w=
+
+Name: com/lowagie/text/pdf/codec/wmf/MetaState.class
+SHA1-Digest: cQUQ8s0pj0DOeJHSeXdudABrNmo=
+
+Name: org/bouncycastle/jce/X509Principal.class
+SHA1-Digest: W3dajRrOxbwav/eVZD4L+oSVfsg=
+
+Name: org/mozilla/universalchardet/prober/CharsetProber.class
+SHA1-Digest: cc1P/0wzwQGgaeq4Uq+vkIwNGKw=
+
+Name: org/bouncycastle/asn1/ASN1String.class
+SHA1-Digest: KZibYh9yDfAb6b6cTdNvEOGJlFI=
+
+Name: org/mozilla/universalchardet/prober/sequence/Latin5Model.class
+SHA1-Digest: T6vYyXhm8l8lLQJpaUbkPrG8j7E=
+
+Name: org/bouncycastle/operator/ContentVerifierProvider.class
+SHA1-Digest: Kb/hH3xDm+3a8bXtWYq/v6B5eCk=
+
+Name: com/lowagie/text/pdf/OutputStreamCounter.class
+SHA1-Digest: al5UPzyJjHsJTDL7zkhKN6KVkCs=
+
+Name: org/bouncycastle/cms/jcajce/JceKeyTransAuthenticatedRecipient$1.
+ class
+SHA1-Digest: ZYJXO2h15qTOhrAgVpzX7Nz/AYU=
+
+Name: com/lowagie/text/pdf/parser/GraphicsState.class
+SHA1-Digest: UMBg48Nhb0G+sIVZpIJHdYOJ1Ag=
+
+Name: org/bouncycastle/ocsp/OCSPReqGenerator$RequestObject.class
+SHA1-Digest: PmVBKCijxNyv31DBuQkGdOP8LPg=
+
+Name: org/mozilla/universalchardet/prober/statemachine/EUCJPSMModel.cl
+ ass
+SHA1-Digest: a3CW575c7+q05E7vFQL41URr6wk=
+
+Name: es/gob/afirma/keystores/main/common/MissingSunPKCS11Exception.cl
+ ass
+SHA1-Digest: OnJaqK26fBMoNphLv1EJ6JVBiCs=
+
+Name: org/bouncycastle/operator/jcajce/JcaContentVerifierProviderBuild
+ er.class
+SHA1-Digest: qgy0u0P503lFALtls9jXvYjbjYw=
+
+Name: net/java/xades/security/xml/XAdES/ObjectIdentifierImpl.class
+SHA1-Digest: 3BLodwZbSJs1Zy6yhh4bHR6wj84=
+
+Name: com/lowagie/text/pdf/PdfEncodings$Cp437Conversion.class
+SHA1-Digest: Ctt+WBk2Ak4EoJpxWbzqg3gMTKs=
+
+Name: org/bouncycastle/operator/DigestCalculator.class
+SHA1-Digest: KrKVJ/rbCoc7W7pNbjARMwrOXKI=
+
+Name: org/bouncycastle/cms/KEKRecipient.class
+SHA1-Digest: ZtwpeINbyKjXmf1N97oavBoF3Js=
+
+Name: es/gob/afirma/keystores/mozilla/AOSecMod.class
+SHA1-Digest: ZkTrV9+iVzJQhJbm56sROPPnKHc=
+
+Name: org/bouncycastle/cms/CMSEnvelopedHelper$CMSDigestAuthenticatedSe
+ cureReadable.class
+SHA1-Digest: 5RiVmMdivPMwTyoRJ+NE4jPJ7Y4=
+
+Name: org/bouncycastle/asn1/x509/IssuerSerial.class
+SHA1-Digest: Z9ZhfxERC/o6cNxGgv19tkYHUwU=
+
+Name: org/bouncycastle/cms/KeyAgreeRecipient.class
+SHA1-Digest: DXMcBzEIJfah9zmT3iuplDlRb94=
+
+Name: org/bouncycastle/cms/CMSEnvelopedHelper.class
+SHA1-Digest: uzOSpSUwCdkfE92NJuhFzF8BCLQ=
+
+Name: org/bouncycastle/asn1/cms/OriginatorIdentifierOrKey.class
+SHA1-Digest: xQ8ZPlZ8Lhp7aT9/ReEBIHwKz9I=
+
+Name: java/com/lowagie/text/pdf/fonts/cmap_info.txt
+SHA1-Digest: 7DOmG9LO1flNbS51nEin225oZFA=
+
+Name: org/bouncycastle/operator/DigestCalculatorProvider.class
+SHA1-Digest: r5EDk1V3qckkghmIS/zp0owUMHg=
+
+Name: com/lowagie/text/xml/xmp/XmpBasicSchema.class
+SHA1-Digest: 8rLPlxu6w02L0Zu4kALISdzTvQ8=
+
+Name: es/gob/afirma/core/signers/AOSignerFactory.class
+SHA1-Digest: 2pQUIVMRzNDAnS5jMfQU6yhHbyM=
+
+Name: org/bouncycastle/cert/CertUtils.class
+SHA1-Digest: wkWRLIDBv5mpdXPNQ5tj5hHJP1o=
+
+Name: com/lowagie/text/pdf/PdfPageEvent.class
+SHA1-Digest: g9f/mqHQcp8+wa3wXLuEjZ6G/To=
+
+Name: org/bouncycastle/cms/PasswordRecipientInformation.class
+SHA1-Digest: oK2sUOsK4mL5Ds5EkPlHWeij1Vo=
+
+Name: es/gob/afirma/signers/cades/AOCAdESSigner.class
+SHA1-Digest: 3QXYzqlkK/zDBczZ2dAiT+1UYhc=
+
+Name: org/bouncycastle/asn1/ASN1OctetStringParser.class
+SHA1-Digest: 3vuRLSirvNI6vHzvekFKfxES7Pk=
+
+Name: org/bouncycastle/cms/KeyTransRecipientInformation.class
+SHA1-Digest: ZmPkQrKSeQ3KXHLf4TKGB+2fG/Y=
+
+Name: com/lowagie/text/Image.class
+SHA1-Digest: ifQk0ncJFlPUlcfUw/46xJpzzzo=
+
+Name: org/bouncycastle/asn1/ess/ESSCertID.class
+SHA1-Digest: mpntrnlZwc+2qziLxqgOyoP2VEc=
+

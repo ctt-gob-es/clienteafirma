@@ -164,7 +164,6 @@ public final class JarSignatureCertExtractor {
 			return;
 		}
 		catch (final CertPathValidatorException e) {
-			e.printStackTrace();
 			// Si ignora, porque si falla la validacion es que debemos continuar
 			// normalmente con el proceso, ya que significa que no se valida la
 			// cadena y hay que hacer insertar la raiz
@@ -209,11 +208,6 @@ public final class JarSignatureCertExtractor {
 
 		LOGGER.info("Se han insertado correctamente certificados en el cacerts del usuario"); //$NON-NLS-1$
 
-	}
-
-
-	public static void main(final String args[]) throws Exception {
-		insertJarSignerOnCACerts(null);
 	}
 
 }
