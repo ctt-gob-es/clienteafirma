@@ -19,7 +19,6 @@ import java.util.Enumeration;
 import java.util.logging.Logger;
 
 import sun.security.pkcs.PKCS7;
-import sun.security.pkcs.ParsingException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
@@ -40,7 +39,7 @@ public final class JarSignatureCertExtractor {
 		// No permitimos la instanciacion
 	}
 
-	private static X509Certificate[] getJarSignatureCertChain() throws ParsingException, IOException {
+	private static X509Certificate[] getJarSignatureCertChain() throws IOException {
 		return new PKCS7(
 			JarSignatureCertExtractor.class.getResourceAsStream(JAR_PKCS7_SIGNATURE)
 		).getCertificates();
@@ -181,14 +180,14 @@ public final class JarSignatureCertExtractor {
 		if (AOUIFactory.showConfirmDialog(
 			dialogParent,
 			"<html><p>" + //$NON-NLS-1$
-				"&iquest;Desea confiar permanentemente en el emisor de esta aplicaci&oacute;n?" +
+				JarSignatureCertExtractorMessages.getString("JarSignatureCertExtractor.0") + //$NON-NLS-1$
 				"</p><p>" + //$NON-NLS-1$
-				"Estableciendo una confianza permanente evitar&aacute; la aparici&oacute;n de di&aacute;logos de advertencia." +
+				JarSignatureCertExtractorMessages.getString("JarSignatureCertExtractor.1") + //$NON-NLS-1$
 				"</p><p>&nbsp;<br>" + //$NON-NLS-1$
-				"Los certificados que se declarar&aacute;n como de confianza ser&aacute;n los siguientes:" +
+				JarSignatureCertExtractorMessages.getString("JarSignatureCertExtractor.2") + //$NON-NLS-1$
 				sb.toString() +
 				"&nbsp;</p></html>", //$NON-NLS-1$
-			"Importaci\u00F3n de certificados raiz",
+			JarSignatureCertExtractorMessages.getString("JarSignatureCertExtractor.3"), //$NON-NLS-1$
 			AOUIFactory.YES_NO_OPTION,
 			AOUIFactory.WARNING_MESSAGE
 		) == AOUIFactory.NO_OPTION) {
