@@ -130,7 +130,10 @@ public final class ProtocolInvocationUriParser {
 		}
 
 		// Agregamos como codigo de operacion el nombre de host de la URL
-		final String path = uri.substring(uri.indexOf("://") + "://".length(), uri.indexOf('?')); //$NON-NLS-1$ //$NON-NLS-2$
+		String path = uri.substring(uri.indexOf("://") + "://".length(), uri.indexOf('?')); //$NON-NLS-1$ //$NON-NLS-2$
+		if (path.endsWith("/")) { //$NON-NLS-1$
+			path = path.substring(0, path.length() - 1);
+		}
 		params.put(OPERATION_PARAM, path.substring(path.lastIndexOf('/') + 1));
 
 		return params;
