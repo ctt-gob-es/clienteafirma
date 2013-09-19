@@ -39,10 +39,10 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 	/** Nombre de la propiedad de URL del servidor de firma trif&aacute;sica. */
 	private static final String PROPERTY_NAME_SIGN_SERVER_URL = "serverUrl"; //$NON-NLS-1$
 
-	/** Identificador de la operacion de prefirma en servidor. */
+	/** Identificador de la operaci&oacute;n de prefirma en servidor. */
 	private static final String OPERATION_PRESIGN = "pre"; //$NON-NLS-1$
 
-	/** Identificador de la operacion de postfirma en servidor. */
+	/** Identificador de la operaci&oacute;n de postfirma en servidor. */
 	private static final String OPERATION_POSTSIGN = "post"; //$NON-NLS-1$
 
 	/** Identificador de la operaci&oacute;n criptogr&aacute;fica de firma. */
@@ -81,16 +81,16 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 
 	/** Nombre de la propiedad que contiene el n&uacute;mero de firmas proporcionadas. */
 	private static final String PROPERTY_NAME_SIGN_COUNT = "SIGN_COUNT"; //$NON-NLS-1$
-	
+
 	/** Firma PKCS#1. */
 	private static final String PROPERTY_NAME_PKCS1_SIGN_PREFIX = "PK1."; //$NON-NLS-1$
 	
 	/** Indica si la postfirma requiere la prefirma. */
 	private static final String PROPERTY_NAME_NEED_PRE = "NEED_PRE"; //$NON-NLS-1$
-	
+
 	/** Indica si la postfirma requiere el identificador o contenido del documento. */
 	private static final String PROPERTY_NAME_NEED_DATA = "NEED_DATA"; //$NON-NLS-1$
-	
+
 	/** Nombre de la propiedad con los nodos objetivo para la contrafirma. */
 	private static final String PROPERTY_NAME_CS_TARGET = "target"; //$NON-NLS-1$
 
@@ -151,19 +151,21 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 		return triPhaseOperation(CRYPTO_OPERATION_COUNTERSIGN, sign, algorithm, key, certChain, extraParams);
 	}
 
+	/** {@inheritDoc} */
 	@Override
-	public AOTreeModel getSignersStructure(final byte[] sign,
-			final boolean asSimpleSignInfo) throws AOInvalidFormatException, IOException {
+	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) throws AOInvalidFormatException {
 		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
 	}
 
+	/** {@inheritDoc} */
 	@Override
-	public boolean isSign(final byte[] is) throws IOException {
+	public boolean isSign(final byte[] sign) {
 		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
 	}
 
+	/** {@inheritDoc} */
 	@Override
-	public boolean isValidDataFile(final byte[] data) throws IOException {
+	public boolean isValidDataFile(final byte[] data) {
 		if (data == null) {
 			LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
 			return false;
@@ -171,31 +173,22 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 		return true;
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public String getSignedName(final String originalName, final String inText) {
 		return originalName + (inText != null ? inText : "") + ".csig"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public byte[] getData(final byte[] signData) throws AOException, IOException {
 		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
 	}
 
+	/** {@inheritDoc} */
 	@Override
-	public AOSignInfo getSignInfo(final byte[] signData) throws AOException, IOException {
+	public AOSignInfo getSignInfo(final byte[] sign) throws AOException {
 		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
-	}
-
-	private static String properties2Base64(final Properties p) throws IOException {
-		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		p.store(baos, ""); //$NON-NLS-1$
-		return Base64.encodeBytes(baos.toByteArray(), Base64.URL_SAFE);
-	}
-
-	private static Properties base642Properties(final String base64) throws IOException {
-		final Properties p = new Properties();
-		p.load(new ByteArrayInputStream(Base64.decode(base64, Base64.URL_SAFE)));
-		return p;
 	}
 
 	/**
@@ -400,5 +393,17 @@ public final class AOCAdESTriPhaseSigner implements AOSigner {
 			LOGGER.warning("El resultado de NEWID del servidor no estaba en Base64: " + e); //$NON-NLS-1$
 			throw new AOException("El resultado devuelto por el servidor no es correcto", e); //$NON-NLS-1$
 		}
+	}
+
+	private static String properties2Base64(final Properties p) throws IOException {
+		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		p.store(baos, ""); //$NON-NLS-1$
+		return Base64.encodeBytes(baos.toByteArray(), Base64.URL_SAFE);
+	}
+
+	private static Properties base642Properties(final String base64) throws IOException {
+		final Properties p = new Properties();
+		p.load(new ByteArrayInputStream(Base64.decode(base64, Base64.URL_SAFE)));
+		return p;
 	}
 }
