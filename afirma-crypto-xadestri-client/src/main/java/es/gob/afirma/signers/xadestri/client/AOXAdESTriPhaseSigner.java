@@ -11,6 +11,7 @@
 package es.gob.afirma.signers.xadestri.client;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.security.PrivateKey;
@@ -46,7 +47,7 @@ import es.gob.afirma.core.util.tree.AOTreeModel;
  */
 public final class AOXAdESTriPhaseSigner implements AOSigner {
 
-	static final Logger LOGGER = Logger.getLogger("es.agob.afirma"); //$NON-NLS-1$
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	/** Nombre de la propiedad de URL del servidor de firma trif&aacute;sica. */
 	private static final String PROPERTY_NAME_SIGN_SERVER_URL = "serverUrl"; //$NON-NLS-1$
@@ -97,7 +98,7 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 	/** Indica si la postfirma requiere la prefirma. */
 	private static final String PROPERTY_NAME_NEED_PRE = "NEED_PRE"; //$NON-NLS-1$
 
-	/** Indica si la postfirma requiere el identificador de documento. */
+	/** Indica si la postfirma requiere el identificador o contenido del documento. */
 	private static final String PROPERTY_NAME_NEED_DATA = "NEED_DATA"; //$NON-NLS-1$
 
 	/** Indicador de finalizaci&oacute;n correcta de proceso. */
@@ -389,11 +390,9 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 	}
 
 	private static String properties2Base64(final Properties p) throws IOException {
-		final StringBuilder builder = new StringBuilder();
-		for (final String key : p.keySet().toArray(new String[p.size()])) {
-			builder.append(key).append("=").append(p.getProperty(key)).append("\n"); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		return Base64.encodeBytes(builder.toString().getBytes(), Base64.URL_SAFE);
+		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		p.store(baos, ""); //$NON-NLS-1$
+		return Base64.encodeBytes(baos.toByteArray(), Base64.URL_SAFE);
 	}
 
 	private static Properties base642Properties(final String base64) throws IOException {
