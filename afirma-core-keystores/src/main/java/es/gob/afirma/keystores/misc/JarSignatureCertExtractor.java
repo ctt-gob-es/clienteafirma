@@ -25,11 +25,12 @@ import es.gob.afirma.core.ui.AOUIFactory;
 
 /** Clase de utilidad para obtener los certificados de la firma del JAR
  * que contiene a esta propia clase.
+ * Basado en la implementaci&oacute;n de la Universidad de Murcia
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 @SuppressWarnings("restriction")
 public final class JarSignatureCertExtractor {
 
-	private static final String JAR_PKCS7_SIGNATURE = "/META-INF/1.RSA"; //$NON-NLS-1$
+	private static final String JAR_PKCS7_SIGNATURE = "/META-INF/_CODESIG.RSA"; //$NON-NLS-1$
 	private static final String USER_HOME = "$USER_HOME"; //$NON-NLS-1$
 	private static final String CACERTS_DEFAULT_PASSWORD = "changeit"; //$NON-NLS-1$
 
@@ -207,6 +208,13 @@ public final class JarSignatureCertExtractor {
 
 		LOGGER.info("Se han insertado correctamente certificados en el cacerts del usuario"); //$NON-NLS-1$
 
+	}
+
+	/** Main
+	 * @param args
+	 * @throws Exception */
+	public static void main(final String args[]) throws Exception {
+		insertJarSignerOnCACerts(null);
 	}
 
 }
