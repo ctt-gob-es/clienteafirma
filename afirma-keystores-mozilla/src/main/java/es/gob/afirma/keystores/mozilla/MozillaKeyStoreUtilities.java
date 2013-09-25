@@ -719,4 +719,13 @@ final class MozillaKeyStoreUtilities {
 
 		return p;
 	}
+
+	static boolean isDnieDriver(final String driverName) {
+		if (driverName == null) {
+			return false;
+		}
+		return driverName.toLowerCase().endsWith("usrpkcs11.dll") || //$NON-NLS-1$
+			   driverName.toLowerCase().endsWith("dnie_p11_priv.dll") || //$NON-NLS-1$
+			   driverName.toLowerCase().endsWith("opensc-pkcs11.dll"); //$NON-NLS-1$
+	}
 }
