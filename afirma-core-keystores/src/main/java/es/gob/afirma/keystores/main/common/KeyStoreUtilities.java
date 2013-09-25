@@ -72,7 +72,14 @@ public final class KeyStoreUtilities {
 
         final StringBuilder buffer = new StringBuilder("library="); //$NON-NLS-1$
 
-        buffer.append(getShort(lib)).append("\r\n") //$NON-NLS-1$
+        if (lib.contains(")") || lib.contains("(")) { //$NON-NLS-1$ //$NON-NLS-2$
+        	buffer.append(getShort(lib));
+        }
+        else {
+        	buffer.append(lib);
+        }
+		buffer.append("\r\n") //$NON-NLS-1$
+
         // Ignoramos la descripcion que se nos proporciona, ya que el
         // proveedor PKCS#11 de Sun
         // falla si llegan espacios o caracteres raros
@@ -511,7 +518,7 @@ public final class KeyStoreUtilities {
             return new CachePasswordCallback("dummy".toCharArray()); //$NON-NLS-1$
         }
         if (AOKeyStore.WINDOWS.equals(kStore)) {
-                return new NullPasswordCallback();
+            return new NullPasswordCallback();
         }
         if (AOKeyStore.DNIEJAVA.equals(kStore)) {
             return null;
@@ -530,6 +537,7 @@ public final class KeyStoreUtilities {
             AOKeyStore.WINCA.equals(store)          ||
             AOKeyStore.SINGLE.equals(store)         ||
             AOKeyStore.MOZ_UNI.equals(store)        ||
+            AOKeyStore.DNIE.equals(store)           ||
             AOKeyStore.PKCS11.equals(store)) {
                 return new NullPasswordCallback();
         }
