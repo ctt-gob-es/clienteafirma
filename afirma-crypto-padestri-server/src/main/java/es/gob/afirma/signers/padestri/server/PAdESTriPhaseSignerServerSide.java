@@ -12,6 +12,7 @@ package es.gob.afirma.signers.padestri.server;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URI;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -40,7 +41,6 @@ import com.lowagie.text.pdf.PdfString;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
-import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.signers.cades.CAdESTriPhaseSigner;
@@ -162,16 +162,6 @@ public final class PAdESTriPhaseSignerServerSide {
     public static final String ITEXT_VERSION = "2.1.7"; //$NON-NLS-1$
 
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");  //$NON-NLS-1$
-
-    /** Construye un firmador PAdES trif&aacute;sico, comprobando que la versiones existentes de iText y Bouncycastle sean las adecuadas.
-     * @throws UnsupportedOperationException si se encuentra bibliotecas iText o BouncyCastle en versiones incompatibles
-     */
-    public PAdESTriPhaseSignerServerSide() {
-        final String itextVersion = Platform.getITextVersion();
-        if (!ITEXT_VERSION.equals(itextVersion)) {
-            throw new UnsupportedOperationException("Se necesita iText version " + ITEXT_VERSION + ", pero se ha encontrado la version: " + itextVersion); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-    }
 
     private static final int CSIZE = 27000;
 
@@ -716,7 +706,10 @@ public final class PAdESTriPhaseSignerServerSide {
         	throw new InvalidPdfException(e);
 		}
         catch (final IOException e) {
-        	e.printStackTrace();
+        	ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        	PrintWriter writer = new PrintWriter(baos);
+        	e.printStackTrace(writer);
+        	LOGGER.severe(baos.toString());
 			throw new AOException("Los datos introducidos no se reconocen como PDF", e); //$NON-NLS-1$
 		}
 

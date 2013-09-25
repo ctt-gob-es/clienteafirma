@@ -17,5 +17,5 @@ public interface SignEnhancer {
 	 * @return Firma mejorada.
 	 * @throws IOException Cuando ocurre algun error al generar la firma.
 	 */
-	public byte[] enhance(byte[] signature, Properties options) throws IOException;
+	byte[] enhance(byte[] signature, Properties options) throws IOException;
 }
