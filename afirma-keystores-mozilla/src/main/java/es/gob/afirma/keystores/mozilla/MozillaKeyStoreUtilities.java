@@ -367,7 +367,12 @@ final class MozillaKeyStoreUtilities {
 		try {
 			final Map<String, String> modsByDesc = new Hashtable<String, String>();
 			for (final AOSecMod.ModuleName module : AOSecMod.getModules(getMozillaUserProfileDirectory())) {
-				modsByDesc.put(module.getDescription(), module.getLib());
+				if (!module.getLib().toLowerCase().endsWith("dnie_p11_pub.dll")) { //$NON-NLS-1$
+					modsByDesc.put(module.getDescription(), module.getLib());
+				}
+				else {
+					LOGGER.info("Se ha omitido el modulo DNIe_P11_pub.dll por conveniencia"); //$NON-NLS-1$
+				}
 			}
 			return purgeStoresTable(modsByDesc); // Eliminamos las entradas que usen la misma biblioteca
 		}
