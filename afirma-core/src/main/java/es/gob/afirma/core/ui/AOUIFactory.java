@@ -127,6 +127,8 @@ public final class AOUIFactory {
      * @param text
      *        Texto que se muestra en el di&aacute;logo para pedir la
      *        contrase&ntilde;a
+     * @param icon Objeto de tipo {@code javax.swing.Icon} con el icono del di&aacute;logo
+     * 		  o {@code null} para no mostrar icono.
      * @param charset
      *        Cadena con los caracteres permitidos para la contrase&ntilde;a.
      * @param beep
@@ -138,8 +140,8 @@ public final class AOUIFactory {
      * @throws es.gob.afirma.core.AOCancelledOperationException
      *         Cuando el usuario cancela el proceso de solicitud de
      *         contrase&ntilde;a */
-    public static char[] getPassword(final String text, final String charset, final boolean beep, final Object c) {
-        return uiManager.getPassword(text, charset, beep, c);
+    public static char[] getPassword(final String text, final Object icon, final String charset, final boolean beep, final Object c) {
+        return uiManager.getPassword(text, icon, charset, beep, c);
     }
 
     /** JOptionPane.showConfirmDialog().

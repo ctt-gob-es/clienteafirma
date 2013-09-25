@@ -52,12 +52,14 @@ public class JSEUIManager implements AOUIManager {
      *         contrase&ntilde;a */
     @Override
 	public final char[] getPassword(final String text, final Object c) {
-        return getPassword(text, null, false, c);
+        return getPassword(text, null, null, false, c);
     }
 
     /** Muestra un di&aacute;logo para pedir una contrase&ntilde;a al usuario.
      * @param text Texto con el que se solicitar&aacute; la entrada de texto al
      *             usuario (<i>prompt</i>)
+     * @param icon Objeto de tipo {@code javax.swing.Icon} con el icono del di&aacute;logo o
+     * 			   {@code null} para no mostrar icono.  
      * @param charSet Juego de caracteres aceptados para la contrase&ntilde;a
      * @param beep <code>true</code> si se desea un sonido de advertencia al
      *             introducir un caracter no v&aacute;lido, <code>false</code> en
@@ -67,7 +69,7 @@ public class JSEUIManager implements AOUIManager {
      * @throws AOCancelledOperationException
      *         Cuando el usuario cancela o cierra el di&aacute;logo */
     @Override
-	public final char[] getPassword(final String text, final String charSet, final boolean beep, final Object c) {
+	public final char[] getPassword(final String text, final Object imageIcon, final String charSet, final boolean beep, final Object c) {
         final JPasswordField pwd = new JPasswordField(10);
         if (charSet != null) {
             pwd.setDocument(new JTextFieldFilter(charSet, beep));
@@ -80,7 +82,12 @@ public class JSEUIManager implements AOUIManager {
         panel.add(lbText);
         panel.add(pwd);
 
-        final JOptionPane pane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.OK_CANCEL_OPTION) {
+        Icon icon = null;
+        if (imageIcon instanceof javax.swing.Icon) {
+        	icon = (javax.swing.Icon) imageIcon;
+        }
+        
+        final JOptionPane pane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.OK_CANCEL_OPTION, icon) {
             private static final long serialVersionUID = -3012522768561175760L;
 
             /** {@inheritDoc} */
