@@ -556,14 +556,14 @@ public final class KeyStoreUtilities {
     static String getPKCS11DNIeLib() throws AOKeyStoreManagerException {
         if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
             final String lib = Platform.getSystemLibDir();
+            if (new File(lib + "\\DNIe_P11_priv.dll").exists()) { //$NON-NLS-1$
+            	return lib + "\\DNIe_P11_priv.dll"; //$NON-NLS-1$
+            }
             if (new File(lib + "\\UsrPkcs11.dll").exists()) { //$NON-NLS-1$
                 return lib + "\\UsrPkcs11.dll";  //$NON-NLS-1$
             }
             if (new File(lib + "\\opensc-pkcs11.dll").exists()) { //$NON-NLS-1$
                 return lib + "\\opensc-pkcs11.dll";  //$NON-NLS-1$
-            }
-            if (new File(lib + "\\DNIe_P11_priv.dll").exists()) { //$NON-NLS-1$
-            	return lib + "\\DNIe_P11_priv.dll"; //$NON-NLS-1$
             }
             // No soportamos AutBioPkcs11.dll
             throw new AOKeyStoreManagerException("No hay controlador PKCS#11 de DNIe instalado en este sistema Windows"); //$NON-NLS-1$
