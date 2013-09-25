@@ -656,7 +656,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         }
 
         final List<Reference> referenceList = new ArrayList<Reference>();
-        final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
+        final XMLSignatureFactory fac = Utils.getDOMFactory();
         final DigestMethod digestMethod;
         try {
             digestMethod = fac.newDigestMethod(digestMethodAlgorithm, null);
@@ -1287,7 +1287,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         }
 
         final List<Reference> referenceList = new ArrayList<Reference>();
-        final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
+        final XMLSignatureFactory fac = Utils.getDOMFactory();
         final DigestMethod digestMethod;
         try {
             digestMethod = fac.newDigestMethod(digestMethodAlgorithm, null);
@@ -1911,7 +1911,7 @@ public final class AOXMLDSigSigner implements AOSigner {
 
         // crea la referencia a la firma que se contrafirma
         final List<Reference> referenceList = new ArrayList<Reference>();
-        final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
+        final XMLSignatureFactory fac = Utils.getDOMFactory();
         final DigestMethod digestMethod;
         try {
             digestMethod = fac.newDigestMethod(refsDigestMethod, null);

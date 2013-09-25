@@ -169,7 +169,7 @@ public final class XAdESSigner {
 	 *            <code>xParams</code>:
 	 *            </p>
 	 *            <dl>
-	 *            <dt><b><i>avoidXpathExtraTransformsOnEveloped</i></b></dt>
+	 *            <dt><b><i>avoidXpathExtraTransformsOnEnveloped</i></b></dt>
 	 *            <dd>
 	 *             Indica si se debe evitar la inclusi&oacute;n de la transformaci&oacute;n
 	 *             XPATH2 que normalmente se a&ntilde;ade para posibilitar las cofirmas y
@@ -410,8 +410,8 @@ public final class XAdESSigner {
 
 		final Properties extraParams = xParams != null ? xParams : new Properties();
 
-		final boolean avoidXpathExtraTransformsOnEveloped = Boolean.parseBoolean(extraParams.getProperty(
-				"avoidXpathExtraTransformsOnEveloped", Boolean.FALSE.toString())); //$NON-NLS-1$
+		final boolean avoidXpathExtraTransformsOnEnveloped = Boolean.parseBoolean(extraParams.getProperty(
+				"avoidXpathExtraTransformsOnEnveloped", Boolean.FALSE.toString())); //$NON-NLS-1$
 		final String nodeToSign = extraParams.getProperty(
 				"nodeToSign"); //$NON-NLS-1$
 		final String format = extraParams.getProperty(
@@ -844,7 +844,8 @@ public final class XAdESSigner {
 		}
 
 		final List<Reference> referenceList = new ArrayList<Reference>();
-		final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
+		final XMLSignatureFactory fac = Utils.getDOMFactory();
+
 		final DigestMethod digestMethod;
 		try {
 			digestMethod = fac.newDigestMethod(digestMethodAlgorithm, null);
@@ -1227,7 +1228,7 @@ public final class XAdESSigner {
 				// Salvo que sea una factura electronica o se haya indicado lo contrario,
 				// se agrega una transformacion XPATH para eliminar el resto de firmas del
 				// documento en las firmas Enveloped
-				if (!facturaeSign && !avoidXpathExtraTransformsOnEveloped) {
+				if (!facturaeSign && !avoidXpathExtraTransformsOnEnveloped) {
 					transformList.add(
 						fac.newTransform(
 							Transform.XPATH,

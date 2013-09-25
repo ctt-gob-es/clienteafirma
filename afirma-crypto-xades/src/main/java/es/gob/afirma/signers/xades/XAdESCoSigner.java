@@ -215,7 +215,8 @@ public final class XAdESCoSigner {
 			throw new AOException("No se ha podido leer el documento XML de firmas", e); //$NON-NLS-1$
 		}
 
-		final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
+		final XMLSignatureFactory fac = Utils.getDOMFactory();
+		
 		final DigestMethod digestMethod;
 		try {
 			digestMethod = fac.newDigestMethod(digestMethodAlgorithm, null);

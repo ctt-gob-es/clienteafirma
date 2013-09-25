@@ -27,7 +27,6 @@ import javax.xml.crypto.MarshalException;
 import javax.xml.crypto.XMLCryptoContext;
 import javax.xml.crypto.dsig.XMLSignature;
 import javax.xml.crypto.dsig.XMLSignatureException;
-import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.XMLValidateContext;
 import javax.xml.crypto.dsig.dom.DOMValidateContext;
 import javax.xml.crypto.dsig.keyinfo.KeyInfo;
@@ -47,6 +46,7 @@ import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
 import es.gob.afirma.signers.xades.XAdESCoSigner;
 import es.gob.afirma.signers.xades.XAdESSigner;
+import es.gob.afirma.signers.xml.Utils;
 
 
 /** Parte servidora del firmador trif&aacute;sico XAdES.
@@ -274,14 +274,13 @@ public final class XAdESTriPhaseSignerServerSide {
 		final XMLValidateContext valContext = new DOMValidateContext(new SimpleKeySelector(pk), newSignature);
 		valContext.setProperty("javax.xml.crypto.dsig.cacheReference", Boolean.TRUE); //$NON-NLS-1$
 
-		final XMLSignature signature = XMLSignatureFactory.getInstance("DOM").unmarshalXMLSignature(valContext); //$NON-NLS-1$
+		final XMLSignature signature = Utils.getDOMFactory().unmarshalXMLSignature(valContext);
 
 		signature.validate(valContext);
 
 		return 	AOUtil.getDataFromInputStream(
 				signature.getSignedInfo().getCanonicalizedData()
 				);
-
 	}
 
 	private static class SimpleKeySelector extends KeySelector {

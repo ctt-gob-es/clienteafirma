@@ -388,7 +388,7 @@ public final class AOXAdESSigner implements AOSigner {
      * @param xParams Par&aacute;metros adicionales para la firma.
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
      * <dl>
-	 *  <dt><b><i>avoidXpathExtraTransformsOnEveloped</i></b></dt>
+	 *  <dt><b><i>avoidXpathExtraTransformsOnEnveloped</i></b></dt>
 	 *   <dd>
 	 *    Indica si se debe evitar la inclusi&oacute;n de la transformaci&oacute;n
 	 *    XPATH2 que normalmente se a&ntilde;ade para posibilitar las cofirmas y

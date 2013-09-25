@@ -21,6 +21,7 @@ import java.io.Writer;
 import java.net.URI;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
+import java.security.Provider;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
@@ -286,8 +287,6 @@ public final class Utils {
      *        Prefijo XMLDSig */
     public static void addCustomTransforms(final List<Transform> transforms, final Properties xParams, final String xmlSignaturePrefix) {
 
-        final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
-
         final List<Transform> transformList = transforms != null ? transforms : new ArrayList<Transform>();
         final Properties extraParams = xParams != null ? xParams : new Properties();
 
@@ -372,7 +371,7 @@ public final class Utils {
             // Llegados a este punto tenemos ya la transformacion, asi que la
             // anadimos
             try {
-                transformList.add(fac.newTransform(transformType, transformParam));
+                transformList.add(Utils.getDOMFactory().newTransform(transformType, transformParam));
             }
             catch (final Exception e) {
                 LOGGER.warning("No se ha podido aplicar la transformacion '" + transformType + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
@@ -399,7 +398,6 @@ public final class Utils {
                                                                                                                         InvalidAlgorithmParameterException {
 
         final ArrayList<Transform> transformList = new ArrayList<Transform>();
-        final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
 
         // El nodo de referencia puede contener un nodo "Transforms" que a su
         // vez contiene
@@ -415,7 +413,7 @@ public final class Utils {
 
                 for (int j = 0; j < transformsNodeList.getLength(); j++) {
 
-                    transformList.add(fac.newTransform(getTransformAlgorithm(transformsNodeList.item(j)),
+                    transformList.add(Utils.getDOMFactory().newTransform(getTransformAlgorithm(transformsNodeList.item(j)),
                                                        getTransformParameterSpec(transformsNodeList.item(j), namespacePrefix)));
                 }
                 break; // Si ya hemos encontrado el nodo "Transforms" dejamos de
@@ -727,7 +725,7 @@ public final class Utils {
             return newList;
         }
         List<Transform> trans;
-        final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
+
         boolean needsReconReference;
 
         for (final Reference r : referenceList) {
@@ -756,7 +754,7 @@ public final class Utils {
                 // Ya tenemos las referencias, si se necesita reconstruir
                 // la reconstruimos y la anadimos
                 if (needsReconReference) {
-                    newList.add(fac.newReference(r.getURI(), r.getDigestMethod(), trans, r.getType(), r.getId()));
+                    newList.add(Utils.getDOMFactory().newReference(r.getURI(), r.getDigestMethod(), trans, r.getType(), r.getId()));
                 }
                 // Si no, la referencia es buena y la podemos anadir
                 // directamente
@@ -939,5 +937,23 @@ public final class Utils {
             return null;
         }
         return cert;
+    }
+    
+    /**
+     * Recupera la factoria 
+     * @return
+     */
+    public static XMLSignatureFactory getDOMFactory() {
+		XMLSignatureFactory fac;
+		try {
+			// Primero comprobamos si hay una version nueva de XMLSec accesible, en cuyo caso, podria
+			// provocar un error el no usarla. Normalmente, ClassCastException al recuperar la factoria. 
+			final Provider provider = (Provider) Class.forName("org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI").newInstance(); //$NON-NLS-1$
+			fac =  XMLSignatureFactory.getInstance("DOM", provider); // where XMLDSigRI is the xmlsec 1.5.1 provider //$NON-NLS-1$
+			LOGGER.info("Se usara la factoria XML del XMLSec instalado"); //$NON-NLS-1$
+		} catch (Exception e) {
+			fac = XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
+		}
+		return fac;
     }
 }
