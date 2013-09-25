@@ -32,6 +32,8 @@ import es.gob.afirma.keystores.main.callbacks.UIPasswordCallback;
 import es.gob.afirma.keystores.main.common.AOKeyStore;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManagerException;
+import es.gob.afirma.keystores.main.common.AOKeyStoreManagerFactory;
+import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
 
 /** Representa a un <i>AOKeyStoreManager</i> para acceso a almacenes de claves de
  * Firefox accedidos v&iacute;a NSS en el que se tratan de forma
@@ -137,25 +139,50 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
 
 		KeyStore tmpStore = null;
 		for (final String descr : externalStores.keySet()) {
-			try {
-				tmpStore = new AOKeyStoreManager().init(
+			if (!MozillaKeyStoreUtilities.isDnieDriver(externalStores.get(descr))) {
+				try {
+					tmpStore = new AOKeyStoreManager().init(
 						AOKeyStore.PKCS11,
 						null,
 						new UIPasswordCallback(
-								FirefoxKeyStoreMessages.getString("MozillaUnifiedKeyStoreManager.1") + " " + MozillaKeyStoreUtilities.getMozModuleName(descr.toString()), //$NON-NLS-1$ //$NON-NLS-2$
-								this.parentComponent
+							FirefoxKeyStoreMessages.getString("MozillaUnifiedKeyStoreManager.1") + " " + MozillaKeyStoreUtilities.getMozModuleName(descr.toString()), //$NON-NLS-1$ //$NON-NLS-2$
+							this.parentComponent
 						),
 						new String[] {
 							externalStores.get(descr), descr.toString()
-						}).get(0);
+						}
+					).get(0);
+				}
+				catch (final AOCancelledOperationException ex) {
+					LOGGER.warning("Se cancelo el acceso al almacen externo  '" + descr + "', se continuara con el siguiente: " + ex); //$NON-NLS-1$ //$NON-NLS-2$
+					continue;
+				}
+				catch (final Exception ex) {
+					LOGGER.severe("No se ha podido inicializar el PKCS#11 '" + descr + "': " + ex); //$NON-NLS-1$ //$NON-NLS-2$
+					continue;
+				}
 			}
-			catch (final AOCancelledOperationException ex) {
-				LOGGER.warning("Se cancelo el acceso al almacen externo  '" + descr + "', se continuara con el siguiente: " + ex); //$NON-NLS-1$ //$NON-NLS-2$
-				continue;
-			}
-			catch (final Exception ex) {
-				LOGGER.severe("No se ha podido inicializar el PKCS#11 '" + descr + "': " + ex); //$NON-NLS-1$ //$NON-NLS-2$
-				continue;
+			else {
+				try {
+					tmpStore = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+						AOKeyStore.DNIEJAVA,
+						null,
+						null,
+						KeyStoreUtilities.getPreferredPCB(
+							AOKeyStore.DNIEJAVA,
+							this.parentComponent
+						),
+						this.parentComponent
+					).getKeyStores().get(0);
+				}
+				catch (final AOCancelledOperationException ex) {
+					LOGGER.warning("Se cancelo el acceso al almacen DNIe 100% Java, se continuara con el siguiente: " + ex); //$NON-NLS-1$
+					continue;
+				}
+				catch (final Exception ex) {
+					LOGGER.severe("No se ha podido inicializar el controlador DNIe 100% Java: " + ex); //$NON-NLS-1$
+					continue;
+				}
 			}
 
 			LOGGER.info("El almacen externo '" + descr + "' ha podido inicializarse, se anadiran sus entradas"); //$NON-NLS-1$ //$NON-NLS-2$
