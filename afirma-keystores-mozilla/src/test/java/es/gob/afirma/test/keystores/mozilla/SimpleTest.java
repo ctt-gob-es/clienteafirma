@@ -26,8 +26,10 @@ public final class SimpleTest {
      * @throws Exception */
     @SuppressWarnings("static-method")
     @Test
-    @Ignore
     public void testKeyStoreManagerCreation() throws Exception {
+    	
+    	System.out.println(System.getProperty("java.version"));
+    	
     	final AOKeyStoreManager ksm = AOKeyStoreManagerFactory
 		 .getAOKeyStoreManager(AOKeyStore.MOZ_UNI, null,
 			"TEST-KEYSTORE",  //$NON-NLS-1$

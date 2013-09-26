@@ -10,6 +10,7 @@
 
 package es.gob.afirma.test.keystores;
 
+import java.security.cert.X509Certificate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -17,10 +18,10 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import es.gob.afirma.keystores.main.callbacks.UIPasswordCallback;
 import es.gob.afirma.keystores.main.common.AOKeyStore;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManagerFactory;
+import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
 
 /** Pruebas espec&iacute;ficas para el almac&eacute;n DNIe 100% Java.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -28,9 +29,9 @@ public class TestDnieJava {
 
     /** Prueba de carga y uso del almac&eacute;n DNIe 100% Java.
      * @throws Exception */
-	@Ignore
     @SuppressWarnings("static-method")
 	@Test
+	@Ignore
     public void testDnieJava() throws Exception {
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
 
@@ -38,7 +39,8 @@ public class TestDnieJava {
     		AOKeyStore.DNIEJAVA,
     		null,
     		"Afirma-DNIe", //$NON-NLS-1$
-    		new UIPasswordCallback("PIN del DNIe", null), //$NON-NLS-1$
+    		KeyStoreUtilities.getPreferredPCB(AOKeyStore.DNIEJAVA, null),
+//    		new UIPasswordCallback("PIN del DNIe", null), //$NON-NLS-1$
     		null
 		);
         Assert.assertNotNull(ksm);
@@ -50,7 +52,9 @@ public class TestDnieJava {
         }
 
         for (final String alias : aliases) {
-        	System.out.println(ksm.getCertificate(alias));
+        	X509Certificate cert = ksm.getCertificate(alias);
+        	Assert.assertNotNull("No se pudo recuperar el certificado", cert);
+        	System.out.println(cert);
         }
 
     }

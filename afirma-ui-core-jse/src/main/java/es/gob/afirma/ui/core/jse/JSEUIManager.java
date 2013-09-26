@@ -12,13 +12,14 @@ package es.gob.afirma.ui.core.jse;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Toolkit;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.logging.Logger;
 
-import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -78,9 +79,16 @@ public class JSEUIManager implements AOUIManager {
         lbText.setMinimumSize(new Dimension(lbText.getFontMetrics(lbText.getFont()).stringWidth(text), lbText.getSize().height));
         lbText.setLabelFor(pwd);
         final JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.add(lbText);
-        panel.add(pwd);
+        
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.weightx = 1.0;
+        constraints.anchor = GridBagConstraints.CENTER;
+        
+        panel.setLayout(new GridBagLayout());
+        panel.add(lbText, constraints);
+        constraints.gridy = 1;
+        panel.add(pwd, constraints);
 
         Icon icon = null;
         if (imageIcon instanceof javax.swing.Icon) {
