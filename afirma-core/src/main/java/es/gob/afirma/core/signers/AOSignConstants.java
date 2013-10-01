@@ -149,7 +149,14 @@ public final class AOSignConstants {
 
 	/** OID por defecto para los datos firmados. */
 	public static final String DEFAULT_OID_TO_SIGN = "1.3.6.1.4.1.1466.115.121.1.40"; // Octect //$NON-NLS-1$
-	// String
+	
+	// ************************************************************
+	// ******************** SUBFILTROS PDF ************************
+	// ************************************************************
+	public static final String PADES_SUBFILTER_BASIC = "adbe.pkcs7.detached"; //$NON-NLS-1$
+	public static final String PADES_SUBFILTER_BES = "ETSI.CAdES.detached"; //$NON-NLS-1$
+	
+	
 	// ************************************************************
 	// ************* ALGORITMOS DE FIRMA **************************
 	// ************************************************************
