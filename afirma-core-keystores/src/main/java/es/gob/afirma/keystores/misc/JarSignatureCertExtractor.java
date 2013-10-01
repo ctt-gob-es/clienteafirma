@@ -1,9 +1,11 @@
 package es.gob.afirma.keystores.misc;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.security.CodeSource;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -15,8 +17,9 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.PKIXParameters;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.logging.Logger;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import sun.security.pkcs.PKCS7;
 import es.gob.afirma.core.misc.AOUtil;
@@ -30,7 +33,10 @@ import es.gob.afirma.core.ui.AOUIFactory;
 @SuppressWarnings("restriction")
 public final class JarSignatureCertExtractor {
 
-	private static final String JAR_PKCS7_SIGNATURE = "/META-INF/_CODESIG.RSA"; //$NON-NLS-1$
+	
+	private static final String SIGNATURE_DIR_PATH = "META-INF/"; //$NON-NLS-1$
+	private static final String SIGNATURE_EXT = ".RSA"; //$NON-NLS-1$
+	
 	private static final String USER_HOME = "$USER_HOME"; //$NON-NLS-1$
 	private static final String CACERTS_DEFAULT_PASSWORD = "changeit"; //$NON-NLS-1$
 
@@ -41,12 +47,39 @@ public final class JarSignatureCertExtractor {
 	}
 
 	private static X509Certificate[] getJarSignatureCertChain() throws IOException {
-		return new PKCS7(
-			JarSignatureCertExtractor.class.getResourceAsStream(JAR_PKCS7_SIGNATURE)
-		).getCertificates();
+		final byte[] signature = getJarSignature();
+		if (signature == null) {
+			return null;
+		}
+		return new PKCS7(signature).getCertificates();
 	}
 
-	private static File getJavaCaKeyStoreFileName() {
+	private static byte[] getJarSignature() throws IOException {
+		final CodeSource src = JarSignatureCertExtractor.class.getProtectionDomain().getCodeSource();
+		if (src == null) {
+			throw new IOException("No se ha podido acceder a los recursos del JAR"); //$NON-NLS-1$
+		}
+		
+		int n = 0;
+		ZipEntry e;
+		ByteArrayOutputStream baos = null;
+		final byte[] buffer = new byte[1024];
+		final ZipInputStream zip = new ZipInputStream(src.getLocation().openStream());
+		while((e = zip.getNextEntry()) != null) {
+			String name = e.getName();
+			if (name.startsWith(SIGNATURE_DIR_PATH) && name.endsWith(SIGNATURE_EXT)) {
+				LOGGER.info("Entrada de la firma: " + name);
+				baos = new ByteArrayOutputStream();
+				while ((n = zip.read(buffer)) > 0) {
+					baos.write(buffer, 0, n);
+				}
+				break;
+			}
+		}
+		return baos == null ? null : baos.toByteArray();
+	}
+	
+	private static File getJavaCaKeyStoreFile() {
 
 		String keystoreFilename = System.getProperty(
 			"deployment.user.security.trusted.cacerts" //$NON-NLS-1$
@@ -103,31 +136,30 @@ public final class JarSignatureCertExtractor {
 			                                                             InvalidAlgorithmParameterException,
 			                                                             CertificateException,
 			                                                             NoSuchAlgorithmException {
-		// Miramos primero si es un certificado autofirmado anadido directamente como raiz,
-		// porque en ese caso no forma cadena de confianza
-		final X509Certificate chainEdge = chain[chain.length - 1];
-		final Enumeration<String> aliases = trustStore.aliases();
-		while (aliases.hasMoreElements()) {
-			if (chainEdge.getPublicKey().equals(
-				trustStore.getCertificate(
-					aliases.nextElement()
-				).getPublicKey()
-
-			)) {
-				LOGGER.info("El extremo de la cadena de certificados esta directamente como raiz"); //$NON-NLS-1$
-				return;
-			}
-		}
-
+		
+//		// Miramos primero si es un certificado autofirmado anadido directamente como raiz,
+//		// porque en ese caso no forma cadena de confianza
+//		final X509Certificate chainEdge = chain[chain.length - 1];
+//		final Enumeration<String> aliases = trustStore.aliases();
+//		while (aliases.hasMoreElements()) {
+//			if (chainEdge.getPublicKey().equals(
+//				trustStore.getCertificate(
+//					aliases.nextElement()
+//				).getPublicKey()
+//
+//			)) {
+//				LOGGER.info("El extremo de la cadena de certificados esta directamente como raiz"); //$NON-NLS-1$
+//				return;
+//			}
+//		}
+		
 		// Comprobamos ahora la cadena normalmente
 		final PKIXParameters params = new PKIXParameters(trustStore);
 		params.setRevocationEnabled(false);
-		CertPathValidator.getInstance(
-			CertPathValidator.getDefaultType()
-		).validate(
+		CertPathValidator.getInstance(CertPathValidator.getDefaultType()).validate(
 				CertificateFactory.getInstance("X.509").generateCertPath(Arrays.asList(chain)), //$NON-NLS-1$
-			params
-		);
+				params
+				);
 	}
 
 	/** Inserta los certificados con los que se ha firmado el JAR que contiene esta clase en
@@ -145,7 +177,7 @@ public final class JarSignatureCertExtractor {
 	                                                                              InvalidAlgorithmParameterException {
 		// Primero obtenemos el almacen CA de Java, asi si no se encuentra o la
 		// contrasena no es la por defecto o se continua
-		final File cacertFile = getJavaCaKeyStoreFileName();
+		final File cacertFile = getJavaCaKeyStoreFile();
 		final KeyStore cacerts = getJavaCaKeyStore(cacertFile);
 
 		// Obtenemos los certificados con los que se ha firmado este JAR
@@ -164,7 +196,8 @@ public final class JarSignatureCertExtractor {
 			return;
 		}
 		catch (final CertPathValidatorException e) {
-			// Si ignora, porque si falla la validacion es que debemos continuar
+			LOGGER.warning("Debemos agregar el certificado al truststore para que sea de confianza: " + e); //$NON-NLS-1$
+			// Se ignora, porque si falla la validacion es que debemos continuar
 			// normalmente con el proceso, ya que significa que no se valida la
 			// cadena y hay que hacer insertar la raiz
 		}
