@@ -10,6 +10,7 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.CertPathValidator;
 import java.security.cert.CertPathValidatorException;
 import java.security.cert.CertificateException;
@@ -17,6 +18,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.PKIXParameters;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -30,7 +32,6 @@ import es.gob.afirma.core.ui.AOUIFactory;
  * que contiene a esta propia clase.
  * Basado en la implementaci&oacute;n de la Universidad de Murcia
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-@SuppressWarnings("restriction")
 public final class JarSignatureCertExtractor {
 
 	
@@ -38,10 +39,16 @@ public final class JarSignatureCertExtractor {
 	private static final String SIGNATURE_EXT = ".RSA"; //$NON-NLS-1$
 	
 	private static final String USER_HOME = "$USER_HOME"; //$NON-NLS-1$
-	private static final String CACERTS_DEFAULT_PASSWORD = "changeit"; //$NON-NLS-1$
+	private static final String[] CACERTS_DEFAULT_PASSWORDS = {
+		"", //$NON-NLS-1$
+		"changeit", //$NON-NLS-1$
+		"changeme", //$NON-NLS-1$
+	};
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
+	private static String keystorePassword = null;
+	
 	private JarSignatureCertExtractor() {
 		// No permitimos la instanciacion
 	}
@@ -68,7 +75,6 @@ public final class JarSignatureCertExtractor {
 		while((e = zip.getNextEntry()) != null) {
 			String name = e.getName();
 			if (name.startsWith(SIGNATURE_DIR_PATH) && name.endsWith(SIGNATURE_EXT)) {
-				LOGGER.info("Entrada de la firma: " + name);
 				baos = new ByteArrayOutputStream();
 				while ((n = zip.read(buffer)) > 0) {
 					baos.write(buffer, 0, n);
@@ -94,7 +100,7 @@ public final class JarSignatureCertExtractor {
 		}
 
 		File ret = keystoreFilename != null ? new File(keystoreFilename) : null;
-
+		
 		// Si no existe el alamcen indicado por la variable de entorno o esta variable
 		// no estaba establecida buscamos en la ruta por defecto
 		if (ret == null || !ret.exists()) {
@@ -107,26 +113,42 @@ public final class JarSignatureCertExtractor {
 				"cacerts"; //$NON-NLS-1$
 
 			ret = new File(defaultPath);
-			if (ret.exists()) {
-				return ret;
-			}
 		}
 
-		throw new IllegalStateException(
-			"No se ha encontrado el almacen de certificados raiz de Java" //$NON-NLS-1$
-		);
+		if (!ret.exists()) {
+			throw new IllegalStateException(
+					"No se ha encontrado el almacen de certificados raiz de Java" //$NON-NLS-1$
+				);
+		}
 
+		return ret;
 	}
 
+	
+	
 	private static KeyStore getJavaCaKeyStore(final File storeFile) throws KeyStoreException,
 	                                                                        NoSuchAlgorithmException,
 	                                                                        CertificateException,
 	                                                                        IOException {
 		final FileInputStream fis = new FileInputStream(storeFile);
 		final KeyStore ks = KeyStore.getInstance("JKS"); //$NON-NLS-1$
-		ks.load(fis, CACERTS_DEFAULT_PASSWORD.toCharArray());
+		for (String password : CACERTS_DEFAULT_PASSWORDS) {
+			try {
+				ks.load(fis, password.toCharArray());
+				keystorePassword = password;
+				break;
+			} catch (IOException e) {
+				// Si el error no se debe a una clave erronea, la subimos
+				if (!(e.getCause() instanceof UnrecoverableKeyException)) {
+					fis.close();
+					throw e;
+				}
+			}
+		}
 		fis.close();
 
+		
+		
 		return ks;
 	}
 
@@ -137,21 +159,17 @@ public final class JarSignatureCertExtractor {
 			                                                             CertificateException,
 			                                                             NoSuchAlgorithmException {
 		
-//		// Miramos primero si es un certificado autofirmado anadido directamente como raiz,
-//		// porque en ese caso no forma cadena de confianza
-//		final X509Certificate chainEdge = chain[chain.length - 1];
-//		final Enumeration<String> aliases = trustStore.aliases();
-//		while (aliases.hasMoreElements()) {
-//			if (chainEdge.getPublicKey().equals(
-//				trustStore.getCertificate(
-//					aliases.nextElement()
-//				).getPublicKey()
-//
-//			)) {
-//				LOGGER.info("El extremo de la cadena de certificados esta directamente como raiz"); //$NON-NLS-1$
-//				return;
-//			}
-//		}
+		// Miramos si el certificado mas elevado de la cadena esta en el trustrore,
+		// en cuyo caso no hacemos nada
+		final X509Certificate chainEdge = chain[chain.length - 1];
+		final Enumeration<String> aliases = trustStore.aliases();
+		while (aliases.hasMoreElements()) {
+			if (chainEdge.getSerialNumber().equals(
+					((X509Certificate) trustStore.getCertificate(aliases.nextElement())).getSerialNumber())) {
+				LOGGER.info("El extremo de la cadena de certificados esta en el truststore de Java"); //$NON-NLS-1$
+				return;
+			}
+		}
 		
 		// Comprobamos ahora la cadena normalmente
 		final PKIXParameters params = new PKIXParameters(trustStore);
@@ -177,12 +195,22 @@ public final class JarSignatureCertExtractor {
 	                                                                              InvalidAlgorithmParameterException {
 		// Primero obtenemos el almacen CA de Java, asi si no se encuentra o la
 		// contrasena no es la por defecto o se continua
-		final File cacertFile = getJavaCaKeyStoreFile();
+		final File cacertFile;
+		try {
+			cacertFile = getJavaCaKeyStoreFile();
+		} catch (Exception e) {
+			LOGGER.warning("No se ha podido encontrar el truststore por defecto de Java: " + e); //$NON-NLS-1$
+			return;
+		}
+		if (!cacertFile.canWrite() || !cacertFile.canRead()) {
+			LOGGER.warning("No se tienen permisos para leer/editar el truststore por defecto de Java"); //$NON-NLS-1$
+			return;
+		}
+		
 		final KeyStore cacerts = getJavaCaKeyStore(cacertFile);
 
 		// Obtenemos los certificados con los que se ha firmado este JAR
 		final X509Certificate[] certs = getJarSignatureCertChain();
-
 		if (certs == null || certs.length < 1) {
 			return;
 		}
@@ -236,18 +264,10 @@ public final class JarSignatureCertExtractor {
 		}
 
 		final FileOutputStream fos = new FileOutputStream(cacertFile);
-		cacerts.store(fos, CACERTS_DEFAULT_PASSWORD.toCharArray());
+		cacerts.store(fos, keystorePassword.toCharArray());
 		fos.close();
 
 		LOGGER.info("Se han insertado correctamente certificados en el cacerts del usuario"); //$NON-NLS-1$
 
 	}
-
-	/** Main
-	 * @param args
-	 * @throws Exception */
-	public static void main(final String args[]) throws Exception {
-		insertJarSignerOnCACerts(null);
-	}
-
 }
