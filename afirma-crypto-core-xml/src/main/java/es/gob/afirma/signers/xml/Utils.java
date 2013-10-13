@@ -938,21 +938,22 @@ public final class Utils {
         }
         return cert;
     }
-    
-    /**
-     * Recupera la factoria 
-     * @return
-     */
+
+    /** Recupera la factor&iacute;a de firmas XML preferente.
+     * @return Factor&iacute;a de firmas XML */
     public static XMLSignatureFactory getDOMFactory() {
-		XMLSignatureFactory fac;
+		final XMLSignatureFactory fac;
 		try {
 			// Primero comprobamos si hay una version nueva de XMLSec accesible, en cuyo caso, podria
-			// provocar un error el no usarla. Normalmente, ClassCastException al recuperar la factoria. 
-			final Provider provider = (Provider) Class.forName("org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI").newInstance(); //$NON-NLS-1$
-			fac =  XMLSignatureFactory.getInstance("DOM", provider); // where XMLDSigRI is the xmlsec 1.5.1 provider //$NON-NLS-1$
+			// provocar un error el no usarla. Normalmente, ClassCastException al recuperar la factoria.
+			fac =  XMLSignatureFactory.getInstance(
+				"DOM", //$NON-NLS-1$
+				(Provider) Class.forName("org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI").newInstance() //$NON-NLS-1$
+			);
 			LOGGER.info("Se usara la factoria XML del XMLSec instalado"); //$NON-NLS-1$
-		} catch (Exception e) {
-			fac = XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
+		}
+		catch (final Exception e) {
+			return XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
 		}
 		return fac;
     }
