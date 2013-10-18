@@ -34,7 +34,6 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.core.ui.NameCertificateBean;
 import es.gob.afirma.keystores.main.callbacks.CachePasswordCallback;
-import es.gob.afirma.keystores.main.callbacks.DniePasswordCallback;
 import es.gob.afirma.keystores.main.callbacks.NullPasswordCallback;
 import es.gob.afirma.keystores.main.callbacks.UIPasswordCallback;
 import es.gob.afirma.keystores.main.filters.CertificateFilter;
@@ -520,9 +519,6 @@ public final class KeyStoreUtilities {
         }
         if (AOKeyStore.WINDOWS.equals(kStore)) {
             return new NullPasswordCallback();
-        }
-        if (AOKeyStore.DNIEJAVA.equals(kStore) || AOKeyStore.DNIE.equals(kStore)) {
-            return new DniePasswordCallback(KeyStoreMessages.getString("AOKeyStoreManager.0"), parent); //$NON-NLS-1$
         }
         return new UIPasswordCallback(KeyStoreMessages.getString("KeyStoreUtilities.6", kStore.getName()), parent); //$NON-NLS-1$
     }
