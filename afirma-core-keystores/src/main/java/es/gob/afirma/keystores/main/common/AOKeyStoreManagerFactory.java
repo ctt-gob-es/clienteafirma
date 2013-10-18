@@ -61,7 +61,7 @@ public final class AOKeyStoreManagerFactory {
      *         Cuando ocurre cualquier otro problema durante el proceso
      * @throws IOException
      *         Cuando la contrase&ntilde;a del almac&eacute;n es incorrecta.
-     * @throws es.gob.afirma.core.InvalidOSException Cuando se pide un almac&eacute; &uacute;nicamente disponible para
+     * @throws es.gob.afirma.core.InvalidOSException Cuando se pide un almac&eacute;n &uacute;nicamente disponible para
      *                            un sistema operativo distinto del actual
      * @throws es.gob.afirma.core.MissingLibraryException Cuando no se localice una biblioteca necesaria para el
      * uso del almac&eacute;n.
