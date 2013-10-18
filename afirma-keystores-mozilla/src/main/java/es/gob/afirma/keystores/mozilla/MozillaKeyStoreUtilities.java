@@ -720,7 +720,7 @@ final class MozillaKeyStoreUtilities {
 		return p;
 	}
 
-	static boolean isDnieDriver(final String driverName) {
+	static boolean isDniePkcs11LibraryForWindows(final String driverName) {
 		if (driverName == null) {
 			return false;
 		}

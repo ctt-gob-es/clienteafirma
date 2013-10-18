@@ -33,7 +33,6 @@ import es.gob.afirma.keystores.main.common.AOKeyStore;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManagerException;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManagerFactory;
-import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
 
 /** Representa a un <i>AOKeyStoreManager</i> para acceso a almacenes de claves de
  * Firefox accedidos v&iacute;a NSS en el que se tratan de forma
@@ -139,7 +138,7 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
 
 		KeyStore tmpStore = null;
 		for (final String descr : externalStores.keySet()) {
-			if (!MozillaKeyStoreUtilities.isDnieDriver(externalStores.get(descr))) {
+			if (!MozillaKeyStoreUtilities.isDniePkcs11LibraryForWindows(externalStores.get(descr))) {
 				try {
 					tmpStore = new AOKeyStoreManager().init(
 						AOKeyStore.PKCS11,
@@ -168,10 +167,7 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
 						AOKeyStore.DNIEJAVA,
 						null,
 						null,
-						KeyStoreUtilities.getPreferredPCB(
-							AOKeyStore.DNIEJAVA,
-							this.parentComponent
-						),
+						null,
 						this.parentComponent
 					).getKeyStores().get(0);
 				}
