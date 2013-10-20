@@ -164,10 +164,13 @@ final class PAdESSigner {
 	    // *****************************
 	    // **** Texto firma visible ****
 
-	    // Texto
+	    // Texto en capa 4
+	    final String layer4Text = extraParams.getProperty("layer4Text"); //$NON-NLS-1$
+
+	    // Texto en capa 2
 	    final String layer2Text = extraParams.getProperty("layer2Text"); //$NON-NLS-1$
 
-	    // Tipo de letra
+	    // Tipo de letra en capa 2
 	    int layer2FontFamily;
 	    try {
 	    	layer2FontFamily = extraParams.getProperty("layer2FontFamily") != null ? //$NON-NLS-1$
@@ -178,7 +181,7 @@ final class PAdESSigner {
 	    	layer2FontFamily = -1;
 	    }
 
-	    // Tamano del tipo de letra
+	    // Tamano del tipo de letra en capa 2
 	    int layer2FontSize;
 	    try {
 	    	layer2FontSize = extraParams.getProperty("layer2FontSize") != null ? //$NON-NLS-1$
@@ -189,7 +192,7 @@ final class PAdESSigner {
 	    	layer2FontSize = -1;
 	    }
 
-	    // Estilo del tipo de letra
+	    // Estilo del tipo de letra en capa 2
 	    int layer2FontStyle;
 	    try {
 	    	layer2FontStyle = extraParams.getProperty("layer2FontStyle") != null ? //$NON-NLS-1$
@@ -200,7 +203,7 @@ final class PAdESSigner {
 	    	layer2FontStyle = -1;
 	    }
 
-	    // Color del tipo de letra
+	    // Color del tipo de letra en capa 2
 	    final String layer2FontColor = extraParams.getProperty("layer2FontColor"); //$NON-NLS-1$
 
 	    // ** Fin texto firma visible **
@@ -392,7 +395,7 @@ final class PAdESSigner {
 	        sap.setLayer4Text(""); //$NON-NLS-1$
 	    }
 
-	    // Texto en las capas
+	    // Texto en las capas (solo si no hay rubrica)
 	    else {
 
 	    	// Capa 2
@@ -471,6 +474,11 @@ final class PAdESSigner {
 						)
 					)
 				);
+	    	}
+
+	    	// Capa 4
+	    	if (layer4Text != null) {
+	    		sap.setLayer4Text(layer4Text);
 	    	}
 	    }
 

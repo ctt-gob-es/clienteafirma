@@ -160,6 +160,11 @@ public final class AOPDFSigner implements AOSigner {
      *     <li><i>pink</i> = Rosa</li>
      *    </ul>
      *   </dd>
+     *  <dt><b><i>layer4Text</i></b></dt>
+     *   <dd>
+     *    Texto a escribir dentro de la "capa 4" de la firma visible. Este texto se escribe &uacute;nicamente si no se ha especificado una
+     *    imagen de r&uacute;brica.
+     *   </dd>
      *  <dt><b><i>signatureSubFilter</i></b></dt>
      *   <dd>
      *    Nombre del sub-filtro en el diccionario PDF para indicar el tipo de la firma. Si no se indica este par&aacute;metro por defecto se
@@ -426,6 +431,11 @@ public final class AOPDFSigner implements AOSigner {
      *     <li><i>pink</i> = Rosa</li>
      *    </ul>
      *   </dd>
+     *  <dt><b><i>layer4Text</i></b></dt>
+     *   <dd>
+     *    Texto a escribir dentro de la "capa 4" de la firma visible. Este texto se escribe &uacute;nicamente si no se ha especificado una
+     *    imagen de r&uacute;brica.
+     *   </dd>
      *  <dt><b><i>signatureSubFilter</i></b></dt>
      *   <dd>
      *    Nombre del sub-filtro en el diccionario PDF para indicar el tipo de la firma. Si no se indica este par&aacute;metro por defecto se
@@ -659,6 +669,11 @@ public final class AOPDFSigner implements AOSigner {
      *     <li><i>red</i> = Rojo</li>
      *     <li><i>pink</i> = Rosa</li>
      *    </ul>
+     *   </dd>
+     *  <dt><b><i>layer4Text</i></b></dt>
+     *   <dd>
+     *    Texto a escribir dentro de la "capa 4" de la firma visible. Este texto se escribe &uacute;nicamente si no se ha especificado una
+     *    imagen de r&uacute;brica.
      *   </dd>
      *  <dt><b><i>signatureSubFilter</i></b></dt>
      *   <dd>
