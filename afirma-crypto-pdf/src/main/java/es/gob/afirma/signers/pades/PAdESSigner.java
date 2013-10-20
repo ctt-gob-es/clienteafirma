@@ -171,6 +171,17 @@ final class PAdESSigner {
 	    // ** Fin Adjuntos **
 		// ******************
 
+	    // Nivel de certificacion del PDF
+	    int certificationLevel;
+	    try {
+	    	certificationLevel = extraParams.getProperty("certificationLevel") != null ? //$NON-NLS-1$
+    			Integer.parseInt(extraParams.getProperty("certificationLevel")) : //$NON-NLS-1$
+    				-1;
+	    }
+	    catch(final Exception e) {
+	    	certificationLevel = -1;
+	    }
+
 	    // *****************************
 	    // **** Texto firma visible ****
 
@@ -342,12 +353,17 @@ final class PAdESSigner {
 	    sap.setRender(PdfSignatureAppearance.SignatureRenderDescription);
 	    // En iText nuevo seria "sap.setRenderingMode(PdfSignatureAppearance.RenderingMode.NAME_AND_DESCRIPTION);"
 
+	    // Razon de firma
 	    if (reason != null) {
 	        sap.setReason(reason);
 	    }
+
+	    // Establecer fecha local del equipo
 	    if (useSystemDateTime) {
 	        sap.setSignDate(new GregorianCalendar());
 	    }
+
+	    // Gestion de los cifrados
 	    if (pdfReader.isEncrypted() && (ownerPassword != null || userPassword != null)) {
 	        if (Boolean.TRUE.toString().equalsIgnoreCase(extraParams.getProperty("avoidEncryptingSignedPdfs"))) { //$NON-NLS-1$
 	            LOGGER.info(
@@ -498,21 +514,34 @@ final class PAdESSigner {
 			PdfName.ADOBE_PPKLITE,
 			signatureSubFilter != null && !"".equals(signatureSubFilter) ? new PdfName(signatureSubFilter) : PdfName.ADBE_PKCS7_DETACHED //$NON-NLS-1$
 		);
+
+	    // Fecha de firma
 	    if (sap.getSignDate() != null) {
 	        dic.setDate(new PdfDate(sap.getSignDate()));
 	    }
+
 	    dic.setName(PdfPKCS7.getSubjectFields((X509Certificate) certChain[0]).getField("CN")); //$NON-NLS-1$
 	    if (sap.getReason() != null) {
 	        dic.setReason(sap.getReason());
 	    }
+
+	    // Lugar de la firma
 	    if (sap.getLocation() != null) {
 	        dic.setLocation(sap.getLocation());
 	    }
+
+	    // Contacto del firmante
 	    if (sap.getContact() != null) {
 	        dic.setContact(sap.getContact());
 	    }
 
 	    sap.setCryptoDictionary(dic);
+
+	    // Certificacion del PDF (NOT_CERTIFIED = 0, CERTIFIED_NO_CHANGES_ALLOWED = 1,
+	    // CERTIFIED_FORM_FILLING = 2, CERTIFIED_FORM_FILLING_AND_ANNOTATIONS = 3)
+	    if (certificationLevel != -1) {
+	    	sap.setCertificationLevel(certificationLevel);
+	    }
 
 	    // Reservamos el espacio necesario en el PDF para insertar la firma
 	    final HashMap<PdfName, Integer> exc = new HashMap<PdfName, Integer>();

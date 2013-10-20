@@ -109,6 +109,16 @@ public final class AOPDFSigner implements AOSigner {
      * @param xParams Par&aacute;metros adicionales para la firma.
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
      * <dl>
+     *  <dt><b><i>certificationLevel</i></b></dt>
+     *   <dd>
+     *    Nivel de certificaci&oacute;n de la firma PDF.<br>Los valores admitidos son num&eacute;ricos, correspondiendo:
+     *    <ul>
+     *     <li><i>0</i> = Firma ordinaria no certificada (por defecto)</li>
+     *     <li><i>1</i> = Firma de autor. No se permite ning&uacute;n cambio posterior en el documento</li>
+     *     <li><i>2</i> = Firma de autor certificada para formularios. Se permite &uacute;nicamente el relleno posterior de los campos del formulario</li>
+     *     <li><i>3</i> = Firma certificada. Se permite &uacute;nicamente el relleno posterior de los campos del formulario o el a&ntilde;adido de firmas de aprobaci&oacute;n</li>
+     *    </ul>
+     *   </dd>
      *  <dt><b><i>layer2Text</i></b></dt>
      *   <dd>
      *    Texto a escribir dentro de la "capa 2" de la firma visible. Este texto se escribe &uacute;nicamente si no se ha especificado una
@@ -380,6 +390,16 @@ public final class AOPDFSigner implements AOSigner {
      * @param extraParams Par&aacute;metros adicionales para la firma.
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>extraParams</code>:</p>
      * <dl>
+     *  <dt><b><i>certificationLevel</i></b></dt>
+     *   <dd>
+     *    Nivel de certificaci&oacute;n de la firma PDF.<br>Los valores admitidos son num&eacute;ricos, correspondiendo:
+     *    <ul>
+     *     <li><i>0</i> = Firma ordinaria no certificada (por defecto)</li>
+     *     <li><i>1</i> = Firma de autor. No se permite ning&uacute;n cambio posterior en el documento</li>
+     *     <li><i>2</i> = Firma de autor certificada para formularios. Se permite &uacute;nicamente el relleno posterior de los campos del formulario</li>
+     *     <li><i>3</i> = Firma certificada. Se permite &uacute;nicamente el relleno posterior de los campos del formulario o el a&ntilde;adido de firmas de aprobaci&oacute;n</li>
+     *    </ul>
+     *   </dd>
      *  <dt><b><i>layer2Text</i></b></dt>
      *   <dd>
      *    Texto a escribir dentro de la "capa 2" de la firma visible. Este texto se escribe &uacute;nicamente si no se ha especificado una
@@ -619,6 +639,16 @@ public final class AOPDFSigner implements AOSigner {
      * @param extraParams Par&aacute;metros adicionales para la firma.
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>extraParams</code>:</p>
      * <dl>
+     *  <dt><b><i>certificationLevel</i></b></dt>
+     *   <dd>
+     *    Nivel de certificaci&oacute;n de la firma PDF.<br>Los valores admitidos son num&eacute;ricos, correspondiendo:
+     *    <ul>
+     *     <li><i>0</i> = Firma ordinaria no certificada (por defecto)</li>
+     *     <li><i>1</i> = Firma de autor. No se permite ning&uacute;n cambio posterior en el documento</li>
+     *     <li><i>2</i> = Firma de autor certificada para formularios. Se permite &uacute;nicamente el relleno posterior de los campos del formulario</li>
+     *     <li><i>3</i> = Firma certificada. Se permite &uacute;nicamente el relleno posterior de los campos del formulario o el a&ntilde;adido de firmas de aprobaci&oacute;n</li>
+     *    </ul>
+     *   </dd>
      *  <dt><b><i>layer2Text</i></b></dt>
      *   <dd>
      *    Texto a escribir dentro de la "capa 2" de la firma visible. Este texto se escribe &uacute;nicamente si no se ha especificado una
