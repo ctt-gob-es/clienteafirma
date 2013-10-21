@@ -421,4 +421,64 @@ public class TestPAdES {
         Assert.assertTrue("Deberia haber fallado", failed); //$NON-NLS-1$
 
     }
+    
+    /**
+     * Prueba la firma de un PDF certificado.
+     * @throws Exception en cualquier error
+     */
+    @SuppressWarnings("static-method")
+	@Test
+    public void testCertificatedSignature() throws Exception {
+        Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
+        final PrivateKeyEntry pke;
+
+        final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+        pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+
+        final AOSigner signer = new AOPDFSigner();
+
+        final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILES[0]));
+                
+        Assert.assertTrue("No se ha reconocido como un PDF", signer.isValidDataFile(testPdf)); //$NON-NLS-1$
+
+        String prueba = "Firma certificada PAdES de documento PDF indicando la propiedad certificationLevel"; //$NON-NLS-1$
+
+        String[] certificationLevels = new String[] {
+        	"Firma de autor. No se permite ningun cambio posterior en el documento", //$NON-NLS-1$
+        	"Firma de autor certificada para formularios. Se permite unicamente el relleno posterior de los campos del formulario", //$NON-NLS-1$
+        	"Firma certificada. Se permite unicamente el relleno posterior de los campos del formulario o el anadido de firmas de aprobacion" //$NON-NLS-1$
+        };
+        
+        System.out.println(prueba);
+
+        Properties extraParams = new Properties();
+        
+        for (int i = 1; i <= certificationLevels.length; i++) {
+
+        	extraParams.put("certificationLevel", Integer.toString(i)); //$NON-NLS-1$
+
+        	System.out.println(certificationLevels[i-1]);
+        	
+        	byte[] result = signer.sign(
+        			testPdf,
+        			"SHA512withRSA",  //$NON-NLS-1$
+        			pke.getPrivateKey(),
+        			pke.getCertificateChain(),
+        			extraParams
+        			);
+
+        	final File tempFile = File.createTempFile("afirmaPDF", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
+
+        	final FileOutputStream fos = new FileOutputStream(tempFile);
+        	fos.write(result);
+        	fos.close();
+
+//        	Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
+//        			"Fichero temporal para la comprobacion manual del resultado: " + //$NON-NLS-1$
+//        			tempFile.getAbsolutePath());
+        	System.out.println("Fichero temporal para la comprobacion manual del resultado: " + //$NON-NLS-1$
+        			tempFile.getAbsolutePath());
+        }
+    }
 }
