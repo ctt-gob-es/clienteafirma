@@ -278,7 +278,7 @@ final class PAdESSigner {
 	    	throw new InvalidPdfException(e);
 		}
 
-	    if (pdfReader.getCertificationLevel() != PdfSignatureAppearance.NOT_CERTIFIED && !Boolean.parseBoolean(extraParams.getProperty("allowSigningCertifiedPdfs"))) { //$NON-NLS-1$
+	    if (pdfReader.getCertificationLevel() == PdfSignatureAppearance.CERTIFIED_NO_CHANGES_ALLOWED && !Boolean.parseBoolean(extraParams.getProperty("allowSigningCertifiedPdfs"))) { //$NON-NLS-1$
 	    	// Si no permitimos dialogos graficos o directamente hemos indicado que no permitimos firmar PDF certificados lanzamos
 	    	// una excepcion
 	        if (Boolean.parseBoolean(extraParams.getProperty("headLess")) || "false".equalsIgnoreCase(extraParams.getProperty("allowSigningCertifiedPdfs"))) {  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -421,87 +421,92 @@ final class PAdESSigner {
 	        sap.setLayer4Text(""); //$NON-NLS-1$
 	    }
 
-	    // Texto en las capas (solo si no hay rubrica)
-	    else {
+	    // **************************
+	    // ** Texto en las capas ****
+	    // **************************
 
-	    	// Capa 2
-	    	if (layer2Text != null) {
+		// Capa 2
+    	if (layer2Text != null) {
 
-		    	sap.setLayer2Text(layer2Text);
+	    	sap.setLayer2Text(layer2Text);
 
-			    final int layer2FontColorR;
-			    final int layer2FontColorG;
-			    final int layer2FontColorB;
-			    if ("black".equalsIgnoreCase(layer2FontColor)) { //$NON-NLS-1$
-			    	layer2FontColorR = 0;
-				    layer2FontColorG = 0;
-				    layer2FontColorB = 0;
-			    }
-			    else if ("white".equalsIgnoreCase(layer2FontColor)) { //$NON-NLS-1$
-			    	layer2FontColorR = 255;
-				    layer2FontColorG = 255;
-				    layer2FontColorB = 255;
-			    }
-			    else if ("lightGray".equalsIgnoreCase(layer2FontColor)) { //$NON-NLS-1$
-			    	layer2FontColorR = 192;
-				    layer2FontColorG = 192;
-				    layer2FontColorB = 192;
-			    }
-			    else if ("gray".equalsIgnoreCase(layer2FontColor)) { //$NON-NLS-1$
-			    	layer2FontColorR = 128;
-				    layer2FontColorG = 128;
-				    layer2FontColorB = 128;
-			    }
-			    else if ("darkGray".equalsIgnoreCase(layer2FontColor)) { //$NON-NLS-1$
-			    	layer2FontColorR = 64;
-				    layer2FontColorG = 64;
-				    layer2FontColorB = 64;
-			    }
-			    else if ("red".equalsIgnoreCase(layer2FontColor)) { //$NON-NLS-1$
-			    	layer2FontColorR = 255;
-				    layer2FontColorG = 0;
-				    layer2FontColorB = 0;
-			    }
-			    else if ("pink".equalsIgnoreCase(layer2FontColor)) { //$NON-NLS-1$
-			    	layer2FontColorR = 255;
-				    layer2FontColorG = 175;
-				    layer2FontColorB = 175;
-			    }
-			    else if (layer2FontColor == null) {
-			    	layer2FontColorR = 0;
-				    layer2FontColorG = 0;
-				    layer2FontColorB = 0;
-			    }
-			    else {
-			    	LOGGER.warning("No se soporta el color '" + layer2FontColor + "' para el texto de la capa 4, se usara negro"); //$NON-NLS-1$ //$NON-NLS-2$
-			    	layer2FontColorR = 0;
-				    layer2FontColorG = 0;
-				    layer2FontColorB = 0;
-			    }
+		    final int layer2FontColorR;
+		    final int layer2FontColorG;
+		    final int layer2FontColorB;
+		    if ("black".equalsIgnoreCase(layer2FontColor)) { //$NON-NLS-1$
+		    	layer2FontColorR = 0;
+			    layer2FontColorG = 0;
+			    layer2FontColorB = 0;
+		    }
+		    else if ("white".equalsIgnoreCase(layer2FontColor)) { //$NON-NLS-1$
+		    	layer2FontColorR = 255;
+			    layer2FontColorG = 255;
+			    layer2FontColorB = 255;
+		    }
+		    else if ("lightGray".equalsIgnoreCase(layer2FontColor)) { //$NON-NLS-1$
+		    	layer2FontColorR = 192;
+			    layer2FontColorG = 192;
+			    layer2FontColorB = 192;
+		    }
+		    else if ("gray".equalsIgnoreCase(layer2FontColor)) { //$NON-NLS-1$
+		    	layer2FontColorR = 128;
+			    layer2FontColorG = 128;
+			    layer2FontColorB = 128;
+		    }
+		    else if ("darkGray".equalsIgnoreCase(layer2FontColor)) { //$NON-NLS-1$
+		    	layer2FontColorR = 64;
+			    layer2FontColorG = 64;
+			    layer2FontColorB = 64;
+		    }
+		    else if ("red".equalsIgnoreCase(layer2FontColor)) { //$NON-NLS-1$
+		    	layer2FontColorR = 255;
+			    layer2FontColorG = 0;
+			    layer2FontColorB = 0;
+		    }
+		    else if ("pink".equalsIgnoreCase(layer2FontColor)) { //$NON-NLS-1$
+		    	layer2FontColorR = 255;
+			    layer2FontColorG = 175;
+			    layer2FontColorB = 175;
+		    }
+		    else if (layer2FontColor == null) {
+		    	layer2FontColorR = 0;
+			    layer2FontColorG = 0;
+			    layer2FontColorB = 0;
+		    }
+		    else {
+		    	LOGGER.warning("No se soporta el color '" + layer2FontColor + "' para el texto de la capa 4, se usara negro"); //$NON-NLS-1$ //$NON-NLS-2$
+		    	layer2FontColorR = 0;
+			    layer2FontColorG = 0;
+			    layer2FontColorB = 0;
+		    }
 
-		    	sap.setLayer2Font(
-	    			new com.lowagie.text.Font(
-		    			// Family (COURIER = 0, HELVETICA = 1, TIMES_ROMAN = 2, SYMBOL = 3, ZAPFDINGBATS = 4)
-		    			layer2FontFamily == -1 ? 0 : layer2FontFamily,
-						// Size (DEFAULTSIZE = 12)
-		    			layer2FontSize == -1 ? 12 : layer2FontSize,
-						// Style (NORMAL = 0, BOLD = 1, ITALIC = 2, BOLDITALIC = 3, UNDERLINE = 4, STRIKETHRU = 8)
-						layer2FontStyle == -1 ? com.lowagie.text.Font.NORMAL : layer2FontStyle,
-		    			// Color
-		    			new Color(
-	    					layer2FontColorR,
-	    				    layer2FontColorG,
-	    				    layer2FontColorB
-						)
+	    	sap.setLayer2Font(
+    			new com.lowagie.text.Font(
+	    			// Family (COURIER = 0, HELVETICA = 1, TIMES_ROMAN = 2, SYMBOL = 3, ZAPFDINGBATS = 4)
+	    			layer2FontFamily == -1 ? 0 : layer2FontFamily,
+					// Size (DEFAULTSIZE = 12)
+	    			layer2FontSize == -1 ? 12 : layer2FontSize,
+					// Style (NORMAL = 0, BOLD = 1, ITALIC = 2, BOLDITALIC = 3, UNDERLINE = 4, STRIKETHRU = 8)
+					layer2FontStyle == -1 ? com.lowagie.text.Font.NORMAL : layer2FontStyle,
+	    			// Color
+	    			new Color(
+    					layer2FontColorR,
+    				    layer2FontColorG,
+    				    layer2FontColorB
 					)
-				);
-	    	}
+				)
+			);
+    	}
 
-	    	// Capa 4
-	    	if (layer4Text != null) {
-	    		sap.setLayer4Text(layer4Text);
-	    	}
-	    }
+    	// Capa 4
+    	if (layer4Text != null) {
+    		sap.setLayer4Text(layer4Text);
+    	}
+
+	    // ***************************
+	    // ** Fin texto en las capas *
+	    // ***************************
+
 
 	    sap.setCrypto(null, certChain, null, null);
 
