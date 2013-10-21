@@ -151,7 +151,7 @@ public final class AOPDFSigner implements AOSigner {
      *     <li><i>2</i> = Cursiva</li>
      *     <li><i>3</i> = Negrita y cursiva</li>
      *     <li><i>4</i> = Subrayado</li>
-     *     <li><i>4</i> = Tachado</li>
+     *     <li><i>8</i> = Tachado</li>
      *    </ul>
      *    Es posible combinar estilos aplicando la operaci&oacute;n l&oacute;gica <cite>o</cite> sobre los valores num&eacute;ricos a combinar.
      *   </dd>
