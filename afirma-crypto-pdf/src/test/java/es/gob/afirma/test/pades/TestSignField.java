@@ -79,6 +79,7 @@ public class TestSignField {
 	 * @throws Exception */
 	@SuppressWarnings("static-method")
 	@Test
+	@Ignore
 	public void testCampoDeFirmaConPosicionesYRubrica() throws Exception {
 
 		Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
@@ -122,5 +123,115 @@ public class TestSignField {
 		Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
 				"Fichero temporal para la comprobacion manual del resultado: " + //$NON-NLS-1$
 				tempFile.getAbsolutePath());
+	}
+	
+	/** Prueba de firma PDF visible con un texto.
+	 * @throws Exception */
+	@SuppressWarnings("static-method")
+	@Test
+	@Ignore
+	public void testCampoDeFirmaConPosicionesYTexto() throws Exception {
+
+		Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
+				"Prueba de firma de PDF con posiciones de firma y texto"); //$NON-NLS-1$
+
+		final PrivateKeyEntry pke;
+
+        final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+        pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+
+		final Properties extraParams = new Properties();
+		extraParams.put("signaturePositionOnPageLowerLeftX", "100"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.put("signaturePositionOnPageLowerLeftY", "100"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.put("signaturePositionOnPageUpperRightX", "200"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.put("signaturePositionOnPageUpperRightY", "200"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		extraParams.put("layer2Text", "Este es el texto de prueba 'Hola Mundo'"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.put("layer2FontFamily", "1"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.put("layer2FontSize", "14"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.put("layer2FontStyle", "3"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.put("layer2FontColor", "red"); //$NON-NLS-1$ //$NON-NLS-2$
+//		extraParams.put("layer4Text ", "Texto secundario"); //$NON-NLS-1$
+
+		final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILE));
+
+		final AOPDFSigner signer = new AOPDFSigner();
+		final byte[] signedPdf = signer.sign(
+			testPdf,
+			DEFAULT_SIGNATURE_ALGORITHM,
+			pke.getPrivateKey(),
+			pke.getCertificateChain(),
+			extraParams
+		);
+
+		final File tempFile = File.createTempFile("afirmaPDF", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		final FileOutputStream fos = new FileOutputStream(tempFile);
+		fos.write(signedPdf);
+		fos.close();
+
+		Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
+				"Fichero temporal para la comprobacion manual del resultado: " + //$NON-NLS-1$
+				tempFile.getAbsolutePath());
+	}
+	
+	/** Prueba de firma PDF visible con r&uacute;brica y texto.
+	 * @throws Exception */
+	@SuppressWarnings("static-method")
+	@Test
+	public void testCampoDeFirmaConPosicionesRubricaYTexto() throws Exception {
+
+		Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
+				"Prueba de firma de PDF con posiciones de firma, rubrica y texto"); //$NON-NLS-1$
+
+		final PrivateKeyEntry pke;
+
+        final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+        pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+
+		final Properties extraParams = new Properties();
+		extraParams.put("signaturePositionOnPageLowerLeftX", "100"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.put("signaturePositionOnPageLowerLeftY", "100"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.put("signaturePositionOnPageUpperRightX", "200"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.put("signaturePositionOnPageUpperRightY", "200"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		final byte[] rubricImage = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(RUBRIC_IMAGE));
+
+		final String rubricImageB64 = Base64.encode(rubricImage);
+
+		extraParams.put("signatureRubricImage", rubricImageB64); //$NON-NLS-1$
+		extraParams.put("layer2Text", "Este es el texto de prueba 'Hola Mundo'"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.put("layer2FontFamily", "1"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.put("layer2FontSize", "14"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.put("layer2FontStyle", "3"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.put("layer2FontColor", "red"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILE));
+
+		final AOPDFSigner signer = new AOPDFSigner();
+		final byte[] signedPdf = signer.sign(
+			testPdf,
+			DEFAULT_SIGNATURE_ALGORITHM,
+			pke.getPrivateKey(),
+			pke.getCertificateChain(),
+			extraParams
+		);
+
+		final File tempFile = File.createTempFile("afirmaPDF", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		final FileOutputStream fos = new FileOutputStream(tempFile);
+		fos.write(signedPdf);
+		fos.close();
+
+		Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
+				"Fichero temporal para la comprobacion manual del resultado: " + //$NON-NLS-1$
+				tempFile.getAbsolutePath());
+	}
+	
+	public static void main(String[] args) throws Exception {
+		TestSignField test = new TestSignField();
+		test.testCampoDeFirmaConPosicionesRubricaYTexto();
 	}
 }
