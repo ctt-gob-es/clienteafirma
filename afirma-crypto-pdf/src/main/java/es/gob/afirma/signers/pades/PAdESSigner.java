@@ -636,17 +636,4 @@ final class PAdESSigner {
 	    return baos.toByteArray();
 	}
 
-	public static void main(final String[] args) {
-		System.out.println(Integer.toString(1 | 2));
-		System.out.println(new com.lowagie.text.Font(
-    			// Family (COURIER = 0, HELVETICA = 1, TIMES_ROMAN = 2, SYMBOL = 3, ZAPFDINGBATS = 4)
-    			0,
-				// Size (DEFAULTSIZE = 12)
-    			12,
-				// Style (NORMAL = 0, BOLD = 1, ITALIC = 2, BOLDITALIC = 3, UNDERLINE = 4)
-				com.lowagie.text.Font.NORMAL,
-    			// Color
-    			Color.BLACK
-			).getColor());
-	}
 }
