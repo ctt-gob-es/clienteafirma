@@ -443,11 +443,6 @@ final class PAdESSigner {
 				    layer2FontColorB = 255;
 			    }
 			    else if ("lightGray".equalsIgnoreCase(layer2FontColor)) { //$NON-NLS-1$
-			    	layer2FontColorR = 255;
-				    layer2FontColorG = 255;
-				    layer2FontColorB = 255;
-			    }
-			    else if ("lightGray".equalsIgnoreCase(layer2FontColor)) { //$NON-NLS-1$
 			    	layer2FontColorR = 192;
 				    layer2FontColorG = 192;
 				    layer2FontColorB = 192;
