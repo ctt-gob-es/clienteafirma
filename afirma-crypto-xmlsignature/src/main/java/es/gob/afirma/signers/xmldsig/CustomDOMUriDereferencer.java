@@ -25,7 +25,7 @@
 /*
  * $Id: DOMURIDereferencer.java,v 1.19 2005/09/23 20:09:34 mullan Exp $
  */
-package es.gob.afirma.signers.xml;
+package es.gob.afirma.signers.xmldsig;
 
 import javax.xml.crypto.Data;
 import javax.xml.crypto.URIDereferencer;
