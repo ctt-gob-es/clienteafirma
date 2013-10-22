@@ -406,6 +406,7 @@ public final class XAdESCoSigner {
 				XADES_SIGNATURE_PREFIX,
 				XML_SIGNATURE_PREFIX,
 				digestMethodAlgorithm,
+				rootSig.getOwnerDocument(),
 				rootSig
 				);
 

@@ -1290,6 +1290,7 @@ public final class XAdESSigner {
 			AOXAdESSigner.XADES_SIGNATURE_PREFIX, // XAdES Prefix
 			AOXAdESSigner.XML_SIGNATURE_PREFIX, // XMLDSig Prefix
 			digestMethodAlgorithm, // DigestMethod
+			docSignature, // Document
 			docSignature.getDocumentElement() // Element
 		);
 

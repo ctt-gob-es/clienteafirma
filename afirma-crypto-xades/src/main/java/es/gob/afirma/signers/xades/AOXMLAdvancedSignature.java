@@ -18,7 +18,6 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.xml.crypto.MarshalException;
 import javax.xml.crypto.XMLStructure;
@@ -45,8 +44,6 @@ import net.java.xades.security.xml.XAdES.XMLAdvancedSignature;
 
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
-
-import es.gob.afirma.signers.xml.CustomDOMUriDereferencer;
 
 /** Derivado de <code>net.java.xades.security.xml.XAdES.XMLAdvancedSignature</code> con los
  * siguientes cambios:
@@ -173,13 +170,8 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
         this.signContext = new DOMSignContext(privateKey, this.baseElement);
         this.signContext.putNamespacePrefix(XMLSignature.XMLNS, this.xades.getXmlSignaturePrefix());
         this.signContext.putNamespacePrefix(this.xadesNamespace, this.xades.getXadesPrefix());
-        if (needCustomUriDereferencer()) {
-        	Logger.getLogger("es.gob.afirma").info("Se instala el derreferenciador a medida XML"); //$NON-NLS-1$ //$NON-NLS-2$
-        	this.signContext.setURIDereferencer(new CustomDOMUriDereferencer());
-        }
 
         this.signature.sign(this.signContext);
-
     }
 
     // Sobreescribimos este metodo de XMLAdvancedSignature unicamente para poder instalar el
@@ -234,9 +226,6 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
         this.signContext = new DOMSignContext(privateKey, this.baseElement);
         this.signContext.putNamespacePrefix(XMLSignature.XMLNS, this.xades.getXmlSignaturePrefix());
         this.signContext.putNamespacePrefix(this.xadesNamespace, this.xades.getXadesPrefix());
-        if (needCustomUriDereferencer()) {
-        	this.signContext.setURIDereferencer(new CustomDOMUriDereferencer());
-        }
 
         this.signature.sign(this.signContext);
     }
@@ -250,24 +239,5 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
         result.setDigestMethod(xades.getDigestMethod());
         result.setXadesNamespace(xades.getXadesNamespace());
         return result;
-    }
-
-    /** Indica si es necesario instalar el derreferenciador XML a medida.
-     * @return {@code true} si se tiene que instalar el derreferenciador, {@code false}
-     *         en caso contrario. */
-    public static boolean needCustomUriDereferencer() {
-    	try {
-	    	final Class<?> apacheNodeSetDataClass = Class.forName("org.jcp.xml.dsig.internal.dom.ApacheNodeSetData"); //$NON-NLS-1$
-	    	final Class<?> xmlSignatureInputClass = Class.forName("com.sun.org.apache.xml.internal.security.signature.XMLSignatureInput"); //$NON-NLS-1$
-
-	    	// El constructor ApacheNodeSetData(XMLSignatureInput) esta en XMLSec y no en la JRE. Si
-	    	// se encuentra este metodo entonces XMLSec esta instalado y no es necesario utilizar
-	    	// un derreferenciador a medida
-	    	apacheNodeSetDataClass.getConstructor(xmlSignatureInputClass);
-    	}
-    	catch (final Exception e) {
-    		return false;
-    	}
-    	return true;
     }
 }

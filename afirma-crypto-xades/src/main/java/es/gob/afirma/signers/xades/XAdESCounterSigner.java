@@ -614,6 +614,7 @@ final class XAdESCounterSigner {
 				sigPrefix,
 				AOXAdESSigner.XML_SIGNATURE_PREFIX,
 				digestMethodAlgorithm,
+				counterSignature.getOwnerDocument(),
 				counterSignature
 		);
 
