@@ -57,6 +57,10 @@ final class PAdESSigner {
 
     private static final int CSIZE = 8000;
 
+    private static final int UNDEFINED = -1;
+    private static final int DEFAULT_LAYER_2_FONT_SIZE = 12;
+    private static final int COURIER = 0;
+
 	private static final String PDF_OID = "1.2.826.0.1089.1.5"; //$NON-NLS-1$
 
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");  //$NON-NLS-1$
@@ -182,7 +186,7 @@ final class PAdESSigner {
     				-1;
 	    }
 	    catch(final Exception e) {
-	    	certificationLevel = -1;
+	    	certificationLevel = UNDEFINED;
 	    }
 
 	    // *****************************
@@ -202,7 +206,7 @@ final class PAdESSigner {
     				-1;
 	    }
 	    catch(final Exception e) {
-	    	layer2FontFamily = -1;
+	    	layer2FontFamily = UNDEFINED;
 	    }
 
 	    // Tamano del tipo de letra en capa 2
@@ -213,7 +217,7 @@ final class PAdESSigner {
     				-1;
 	    }
 	    catch(final Exception e) {
-	    	layer2FontSize = -1;
+	    	layer2FontSize = UNDEFINED;
 	    }
 
 	    // Estilo del tipo de letra en capa 2
@@ -224,7 +228,7 @@ final class PAdESSigner {
     				-1;
 	    }
 	    catch(final Exception e) {
-	    	layer2FontStyle = -1;
+	    	layer2FontStyle = UNDEFINED;
 	    }
 
 	    // Color del tipo de letra en capa 2
@@ -486,11 +490,11 @@ final class PAdESSigner {
 	    	sap.setLayer2Font(
     			new com.lowagie.text.Font(
 	    			// Family (COURIER = 0, HELVETICA = 1, TIMES_ROMAN = 2, SYMBOL = 3, ZAPFDINGBATS = 4)
-	    			layer2FontFamily == -1 ? 0 : layer2FontFamily,
+	    			layer2FontFamily == UNDEFINED ? COURIER : layer2FontFamily,
 					// Size (DEFAULTSIZE = 12)
-	    			layer2FontSize == -1 ? 12 : layer2FontSize,
+	    			layer2FontSize == UNDEFINED ? DEFAULT_LAYER_2_FONT_SIZE : layer2FontSize,
 					// Style (NORMAL = 0, BOLD = 1, ITALIC = 2, BOLDITALIC = 3, UNDERLINE = 4, STRIKETHRU = 8)
-					layer2FontStyle == -1 ? com.lowagie.text.Font.NORMAL : layer2FontStyle,
+					layer2FontStyle == UNDEFINED ? com.lowagie.text.Font.NORMAL : layer2FontStyle,
 	    			// Color
 	    			new java.awt.Color(
     					layer2FontColorR,
