@@ -35,6 +35,7 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSimpleSignInfo;
+import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
@@ -111,7 +112,6 @@ public final class TestXAdES {
 
     // IMPORTANTE: Poner extension ".xml" a los ficheros de prueba con contenido XML
     private static final String[] TEST_FILES_DATA = new String[] {
-            "TEST_PDF_Certified.pdf", //$NON-NLS-1$
             "ANF_PF_Activo.pfx", //$NON-NLS-1$
             "base64.b64", //$NON-NLS-1$
             "sample-class-attributes.xml", //$NON-NLS-1$
@@ -123,10 +123,11 @@ public final class TestXAdES {
     };
 
     private static final String[] TEST_FILES_MULTISIGN = new String[] {
-            "sample-factura-firmada-30.xml", //$NON-NLS-1$
-            "sample-factura-firmada-31.xml", //$NON-NLS-1$
-            "sample-factura-firmada-32v1.xsig.xml", //$NON-NLS-1$
-            "sample-facturae-firmada.xsig.xml" //$NON-NLS-1$
+            "XAdES-Detached-SHA1withRSA-B64.xml", //$NON-NLS-1$
+            "XAdES-Detached-SHA1withRSA-XML.xml", //$NON-NLS-1$
+            "XAdES-Enveloped-SHA1withRSA-XML.xml", //$NON-NLS-1$
+            "XAdES-Enveloping-SHA1withRSA-B64.xml", //$NON-NLS-1$
+            "XAdES-Enveloping-SHA1withRSA-XML.xml" //$NON-NLS-1$
     };
 
     /** Prueba de firma de nodo indicado expl&iacute;citamente.
@@ -239,6 +240,62 @@ public final class TestXAdES {
 
     }
 
+    /** Pruebas de contrafirma.
+     * @throws Exception Cuando ocurre un error */
+    @SuppressWarnings("static-method")
+	@Test
+    public void testCounterSign() throws Exception {
+        Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
+        final PrivateKeyEntry pke;
+
+        final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+        pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+
+        final AOSigner signer = new AOXAdESSigner();
+
+        final Properties p = new Properties();
+        p.put("mode", "implicit"); //$NON-NLS-1$ //$NON-NLS-2$
+        p.put("ignoreStyleSheets", "false"); //$NON-NLS-1$ //$NON-NLS-2$
+
+        String prueba;
+
+        for (final String algo : ALGOS) {
+          for(final String filename : TEST_FILES_MULTISIGN) {
+
+            prueba = "Contrafirma XAdES con el algoritmo '" + //$NON-NLS-1$
+            algo + "' y el fichero '" + filename + "'"; //$NON-NLS-1$ //$NON-NLS-2$
+
+            System.out.println();
+            System.out.println(prueba);
+
+            final byte[] data = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(filename));
+
+            final byte[] result = signer.countersign(
+        		data,
+        		algo,
+        		CounterSignTarget.LEAFS,
+        		null,
+        		pke.getPrivateKey(),
+        		pke.getCertificateChain(),
+        		p
+    		);
+
+            final File f = File.createTempFile(algo + "-" + filename.replace(".xml", "") + "-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+            final java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
+            fos.write(result);
+            fos.flush(); fos.close();
+            System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
+
+            Assert.assertTrue("UnsignedProperties invalidas", isValidUnsignedProperties(new ByteArrayInputStream(result),null)); //$NON-NLS-1$
+
+            Assert.assertNotNull(prueba, result);
+            Assert.assertTrue("El resultado no se reconoce como firma", signer.isSign(result)); //$NON-NLS-1$
+          }
+        }
+
+    }
+    
     /**
      * Prueba con hoja de estilo externa.
      * <b>Necesita GUI</b>
