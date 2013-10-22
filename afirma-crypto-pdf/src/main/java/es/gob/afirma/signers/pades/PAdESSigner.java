@@ -571,6 +571,7 @@ final class PAdESSigner {
 	        key,
 	        certChain,
 	        MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(algorithm)).digest(AOUtil.getDataFromInputStream(sap.getRangeStream())),
+	        null,
 	        true, // Modo PAdES
 	        PDF_OID,
 	        extraParams.getProperty("contentDescription") != null ? extraParams.getProperty("contentDescription") : PDF_DESC //$NON-NLS-1$ //$NON-NLS-2$

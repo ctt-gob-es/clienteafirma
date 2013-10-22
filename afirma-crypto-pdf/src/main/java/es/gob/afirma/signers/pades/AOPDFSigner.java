@@ -32,7 +32,6 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.core.misc.SHA2AltNamesProvider;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
@@ -901,8 +900,6 @@ public final class AOPDFSigner implements AOSigner {
 	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
 
     	isPdfFile(sign);
-
-        SHA2AltNamesProvider.install();
 
         final AOTreeNode root = new AOTreeNode("Datos"); //$NON-NLS-1$
         final AcroFields af;
