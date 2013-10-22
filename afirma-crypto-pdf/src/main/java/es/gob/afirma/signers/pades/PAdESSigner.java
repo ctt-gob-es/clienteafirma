@@ -10,7 +10,6 @@
 
 package es.gob.afirma.signers.pades;
 
-import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URI;
@@ -66,6 +65,10 @@ final class PAdESSigner {
 
     /** Referencia a la &uacute;ltima p&aacute;gina del documento PDF. */
     public static final int LAST_PAGE = -666;
+
+    private PAdESSigner() {
+    	// No permitimos la instanciacion
+    }
 
     /** Devuelve la posici&oacute;n de la p&aacute;gina en donde debe agregarse
      * la firma. La medida de posicionamiento es el p&iacute;xel y se cuenta en
@@ -489,7 +492,7 @@ final class PAdESSigner {
 					// Style (NORMAL = 0, BOLD = 1, ITALIC = 2, BOLDITALIC = 3, UNDERLINE = 4, STRIKETHRU = 8)
 					layer2FontStyle == -1 ? com.lowagie.text.Font.NORMAL : layer2FontStyle,
 	    			// Color
-	    			new Color(
+	    			new java.awt.Color(
     					layer2FontColorR,
     				    layer2FontColorG,
     				    layer2FontColorB
