@@ -67,7 +67,7 @@ public final class CAdESUtils {
      * @param policy Pol&iacute;tica de firma
      * @param signingCertificateV2 {@code true} para utilizar la versi&oacute;n 2 del campo
      * signingCertificate, {@code false} para utilizar la versi&oacute;n 1.
-     * @param messageDigest Huella digital de los datos firmados
+     * @param dataDigest Huella digital de los datos firmados
      * @param signDate Fecha de la firma (debe establecerse externamente para evitar desincronismos en la firma trif&aacute;sica)
      * @param padesMode <code>true</code> para generar una firma CAdES compatible PAdES, <code>false</code> para generar una firma CAdES normal
      * @param contentType Tipo de contenido definido por su OID.
@@ -82,7 +82,7 @@ public final class CAdESUtils {
                                                   final byte[] data,
                                                   final AdESPolicy policy,
                                                   final boolean signingCertificateV2,
-                                                  final byte[] messageDigest,
+                                                  final byte[] dataDigest,
                                                   final Date signDate,
                                                   final boolean padesMode,
                                                   final String contentType,
@@ -100,7 +100,7 @@ public final class CAdESUtils {
                 digestAlgorithmName,
                 data,
                 PKCSObjectIdentifiers.data.getId(),
-                messageDigest,
+                dataDigest,
                 signDate,
                 padesMode
         );
@@ -160,7 +160,8 @@ public final class CAdESUtils {
 
             // INICIO SINGNING CERTIFICATE
 
-            /** IssuerSerial ::= SEQUENCE { issuer GeneralNames, serialNumber CertificateSerialNumber } */
+            /** IssuerSerial ::= SEQUENCE { issuer GeneralNames, serialNumber
+             * CertificateSerialNumber } */
 
             final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Primitive.fromByteArray(cert.getTBSCertificate()));
             final GeneralName gn = new GeneralName(tbs.getIssuer());
@@ -175,7 +176,8 @@ public final class CAdESUtils {
             final ESSCertID essCertID = new ESSCertID(certHash, isuerSerial);
 
             /** PolicyInformation ::= SEQUENCE { policyIdentifier CertPolicyId,
-             * policyQualifiers SEQUENCE SIZE (1..MAX) OF PolicyQualifierInfo OPTIONAL }
+             * policyQualifiers SEQUENCE SIZE (1..MAX) OF PolicyQualifierInfo
+             * OPTIONAL }
              * CertPolicyId ::= OBJECT IDENTIFIER
              * PolicyQualifierInfo ::= SEQUENCE { policyQualifierId
              * PolicyQualifierId, qualifier ANY DEFINED BY policyQualifierId } */
@@ -184,7 +186,8 @@ public final class CAdESUtils {
             if (policy.getPolicyIdentifier() != null) {
 
                 /** SigningCertificateV2 ::= SEQUENCE { certs SEQUENCE OF
-                 * ESSCertIDv2, policies SEQUENCE OF PolicyInformation OPTIONAL } */
+                 * ESSCertIDv2, policies SEQUENCE OF PolicyInformation OPTIONAL
+                 * } */
                 /*
                  * HAY QUE HACER UN SEQUENCE, YA QUE EL CONSTRUCTOR DE BOUNCY
                  * CASTLE NO TIENE DICHO CONSTRUCTOR.
@@ -199,7 +202,8 @@ public final class CAdESUtils {
             }
 
             /** id-aa-signingCertificate OBJECT IDENTIFIER ::= { iso(1)
-             * member-body(2) us(840) rsadsi(113549) pkcs(1) pkcs9(9) smime(16) id-aa(2) 12 } */
+             * member-body(2) us(840) rsadsi(113549) pkcs(1) pkcs9(9) smime(16)
+             * id-aa(2) 12 } */
             // Secuencia con singningCertificate
             contexExpecific.add(new Attribute(PKCSObjectIdentifiers.id_aa_signingCertificate, new DERSet(scv)));
         }
@@ -245,8 +249,9 @@ public final class CAdESUtils {
             final DigestInfo otherHashAlgAndValue = new DigestInfo(hashid, hashed);
 
             /**
-             *   AOSigPolicyQualifierInfo ::= SEQUENCE { SigPolicyQualifierId  SigPolicyQualifierId,
-             *       SigQualifier  ANY DEFINED BY policyQualifierId }
+             *   AOSigPolicyQualifierInfo ::= SEQUENCE {
+             *       SigPolicyQualifierId  SigPolicyQualifierId,
+             *       SigQualifier          ANY DEFINED BY policyQualifierId }
              */
             AOSigPolicyQualifierInfo spqInfo = null;
             if(policy.getPolicyQualifier()!=null){
@@ -254,9 +259,12 @@ public final class CAdESUtils {
             }
 
             /**
-             * SignaturePolicyId ::= SEQUENCE { sigPolicyId           SigPolicyId,
+             * SignaturePolicyId ::= SEQUENCE {
+             *  sigPolicyId           SigPolicyId,
              *  sigPolicyHash         SigPolicyHash,
-             *  sigPolicyQualifiers   SEQUENCE SIZE (1..MAX) OF AOSigPolicyQualifierInfo OPTIONAL}
+             *  sigPolicyQualifiers   SEQUENCE SIZE (1..MAX) OF
+             *                          AOSigPolicyQualifierInfo OPTIONAL}
+             *
              */
             final ASN1EncodableVector v = new ASN1EncodableVector();
             // sigPolicyId
@@ -278,7 +286,8 @@ public final class CAdESUtils {
         /**
          * Secuencia con el tipo de contenido firmado. No se agrega en firmas PAdES.
          *
-         * ContentHints ::= SEQUENCE { contentDescription UTF8String (SIZE (1..MAX)) OPTIONAL,
+         * ContentHints ::= SEQUENCE {
+         *	  contentDescription UTF8String (SIZE (1..MAX)) OPTIONAL,
          *	  contentType ContentType }
          */
         if (contentType != null && !padesMode) {
@@ -303,12 +312,16 @@ public final class CAdESUtils {
      * Sirve para los datos de SigningCertificate y SigningCertificateV2. Tiene que llevar algunos
      * datos de la pol&iacute;tica.
      * <pre>
-     * PolicyInformation ::= SEQUENCE { policyIdentifier   CertPolicyId,
-     * policyQualifiers   SEQUENCE SIZE (1..MAX) OF PolicyQualifierInfo OPTIONAL }
+     * PolicyInformation ::= SEQUENCE {
+     * policyIdentifier   CertPolicyId,
+     * policyQualifiers   SEQUENCE SIZE (1..MAX) OF
+     *                          PolicyQualifierInfo OPTIONAL }
+     *
      *
      * CertPolicyId ::= OBJECT IDENTIFIER
      *
-     * PolicyQualifierInfo ::= SEQUENCE { policyQualifierId  PolicyQualifierId,
+     * PolicyQualifierInfo ::= SEQUENCE {
+     *      policyQualifierId  PolicyQualifierId,
      *      qualifier          ANY DEFINED BY policyQualifierId }
      *
      * -- policyQualifierIds for Internet policy qualifiers
@@ -351,8 +364,9 @@ public final class CAdESUtils {
         }
 
         /**
-         * PolicyQualifierInfo ::= SEQUENCE { policyQualifierId  PolicyQualifierId,
-         *          qualifier  ANY DEFINED BY policyQualifierId }
+         * PolicyQualifierInfo ::= SEQUENCE {
+         *          policyQualifierId  PolicyQualifierId,
+         *          qualifier          ANY DEFINED BY policyQualifierId }
          */
 
         final PolicyQualifierId pqid = PolicyQualifierId.id_qt_cps;
@@ -371,8 +385,10 @@ public final class CAdESUtils {
         }
 
         /**
-         * PolicyInformation ::= SEQUENCE { policyIdentifier   CertPolicyId,
-         *     policyQualifiers   SEQUENCE SIZE (1..MAX) OF PolicyQualifierInfo OPTIONAL }
+         * PolicyInformation ::= SEQUENCE {
+         *     policyIdentifier   CertPolicyId,
+         *     policyQualifiers   SEQUENCE SIZE (1..MAX) OF
+         *                          PolicyQualifierInfo OPTIONAL }
          */
 
         if (policy.getPolicyQualifier()==null || pqi == null) {
@@ -388,10 +404,10 @@ public final class CAdESUtils {
     }
 
     /** Inicializa el contexto. */
-    static ASN1EncodableVector initContexExpecific(final String digestAlgorithm,
+    static ASN1EncodableVector initContexExpecific(final String dataDigestAlgorithmName,
                                                    final byte[] data,
                                                    final String dataType,
-                                                   final byte[] messageDigest,
+                                                   final byte[] dataDigest,
                                                    final Date signDate,
                                                    final boolean padesMode) throws NoSuchAlgorithmException {
         // authenticatedAttributes
@@ -408,7 +424,16 @@ public final class CAdESUtils {
         }
 
         // MessageDigest
-        contexExpecific.add(new Attribute(CMSAttributes.messageDigest, new DERSet(new DEROctetString(messageDigest != null ? messageDigest : MessageDigest.getInstance(digestAlgorithm).digest(data)))));
+        contexExpecific.add(
+    		new Attribute(
+				CMSAttributes.messageDigest,
+				new DERSet(
+					new DEROctetString(
+						dataDigest != null ? dataDigest : MessageDigest.getInstance(dataDigestAlgorithmName).digest(data)
+					)
+				)
+			)
+		);
 
         return contexExpecific;
     }

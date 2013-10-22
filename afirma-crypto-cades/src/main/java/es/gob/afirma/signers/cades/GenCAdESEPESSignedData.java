@@ -75,21 +75,19 @@ public final class GenCAdESEPESSignedData {
      *        usar la versi&oacute;n 1
      * @param key Clave privada para firma.
      * @param certChain Cadena de certificados del firmante
-     * @param messageDigest
-     *        Huella digital a aplicar en la firma.
-     * @param padesMode <code>true</code> para generar una firma CAdES compatible PAdES, <code>false</code> para generar una firma CAdES normal
+     * @param dataDigest Huella digital de los datos a firmar cuando esta se proporciona precalculada. Si los datos a firmar (que se proporcionan
+     *                   en el par&aacute;metro <code>parameters</code> (de tipo <code>P7ContentSignerParameters</code>) <u>no</u> son nulos este valor
+     *                   se ignora, us&aacute;ndose &uacute;nicamente cuando el par&aacute;metro <code>parameters</code> es nulo.
+     * @param dataDigestAlgorithmName Algoritmo de huella digital usado para calcular el valor indicado en el par&aacute;metro <code>dataDigest</code>.
+     *                                Si <code>dataDigest</code> es nulo el valor de este par&aacute;metro se ignora.
+     * @param padesMode <code>true</code> para generar una firma CAdES compatible PAdES, <code>false</code> para generar una firma CAdES normal.
      * @param contentType Tipo de contenido definido por su OID.
      * @param contentDescription Descripci&oacute;n textual del tipo de contendio.
      * @return La firma generada codificada en ASN.1 binario.
      * @throws java.security.NoSuchAlgorithmException
-     *         Si no se soporta alguno de los algoritmos de firma o huella
-     *         digital indicados
-     * @throws CertificateException
-     *         En caso de cualquier problema con los certificados de
-     *         firma.
-     * @throws IOException
-     *         En caso de cualquier problema leyendo o escribiendo los
-     *         datos
+     *         Si no se soporta alguno de los algoritmos de firma o huella digital indicados
+     * @throws CertificateException En caso de cualquier problema con los certificados de firma.
+     * @throws IOException En caso de cualquier problema leyendo o escribiendo los datos
      * @throws AOException
      *         Cuando ocurre alg&uacute;n error durante el proceso de codificaci&oacute;n ASN.1 */
     public static byte[] generateSignedData(final P7ContentSignerParameters parameters,
@@ -98,7 +96,8 @@ public final class GenCAdESEPESSignedData {
                                      final boolean signingCertificateV2,
                                      final PrivateKey key,
                                      final Certificate[] certChain,
-                                     final byte[] messageDigest,
+                                     final byte[] dataDigest,
+                                     final String dataDigestAlgorithmName,
                                      final boolean padesMode,
                                      final String contentType,
                                      final String contentDescription) throws NoSuchAlgorithmException, CertificateException, IOException, AOException {
@@ -114,14 +113,16 @@ public final class GenCAdESEPESSignedData {
         final byte[] content = parameters.getContent();
 
         final byte[] preSignature = CAdESTriPhaseSigner.preSign(
-            AOSignConstants.getDigestAlgorithmName(signatureAlgorithm),
+    		dataDigestAlgorithmName != null && dataDigest != null ?
+				AOSignConstants.getDigestAlgorithmName(dataDigestAlgorithmName) :
+					AOSignConstants.getDigestAlgorithmName(signatureAlgorithm),
             omitContent ? null : content,
             (X509Certificate[]) certChain,
             policy,
             signingCertificateV2,
-            messageDigest == null && content != null ?
+            content != null ?
                 MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(signatureAlgorithm)).digest(content) :
-                    messageDigest,
+                    dataDigest,
             signDate,
             padesMode,
             contentType,
@@ -143,9 +144,9 @@ public final class GenCAdESEPESSignedData {
                 (X509Certificate[]) certChain,
                 policy,
                 signingCertificateV2,
-                messageDigest == null && content != null ?
+                dataDigest == null && content != null ?
                     MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(signatureAlgorithm)).digest(content) :
-                        messageDigest,
+                        dataDigest,
                 signDate,
                 padesMode,
                 contentType,

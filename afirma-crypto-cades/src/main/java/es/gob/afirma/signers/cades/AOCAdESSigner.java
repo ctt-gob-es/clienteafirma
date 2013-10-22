@@ -142,11 +142,11 @@ public final class AOCAdESSigner implements AOSigner {
 
         final Properties extraParams = xParams != null ? xParams : new Properties();
 
-        final String precalculatedDigest = extraParams.getProperty("precalculatedHashAlgorithm"); //$NON-NLS-1$
-        byte[] messageDigest = null;
+        final String precalculatedDigestAlgorithmName = extraParams.getProperty("precalculatedHashAlgorithm"); //$NON-NLS-1$
+        byte[] dataDigest = null;
 
-        if (precalculatedDigest != null) {
-            messageDigest = data;
+        if (precalculatedDigestAlgorithmName != null) {
+            dataDigest = data;
         }
 
         boolean signingCertificateV2;
@@ -169,7 +169,7 @@ public final class AOCAdESSigner implements AOSigner {
 
         try {
             boolean omitContent = false;
-            if (mode.equals(AOSignConstants.SIGN_MODE_EXPLICIT) || precalculatedDigest != null) {
+            if (mode.equals(AOSignConstants.SIGN_MODE_EXPLICIT) || precalculatedDigestAlgorithmName != null) {
                 omitContent = true;
             }
 
@@ -180,7 +180,8 @@ public final class AOCAdESSigner implements AOSigner {
 					final MimeHelper mimeHelper = new MimeHelper(data);
 					contentDescription = mimeHelper.getDescription();
 					contentTypeOid = MimeHelper.transformMimeTypeToOid(mimeHelper.getMimeType());
-				} catch (final Exception e) {
+				}
+				catch (final Exception e) {
 					Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
 							"No se han podido cargar las librerias para identificar el tipo de dato firmado: " + e); //$NON-NLS-1$
 				}
@@ -193,7 +194,8 @@ public final class AOCAdESSigner implements AOSigner {
                    signingCertificateV2,
                    key,
                    certChain,
-                   messageDigest,
+                   dataDigest,
+                   precalculatedDigestAlgorithmName,
                    Boolean.parseBoolean(extraParams.getProperty("padesMode", "false")), //$NON-NLS-1$ //$NON-NLS-2$
                    contentTypeOid,
                    contentDescription

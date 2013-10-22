@@ -71,6 +71,7 @@ public class MiniTestDNI {
         		pke.getPrivateKey(),
         		pke.getCertificateChain(),
         		messageDigest,
+        		"SHA-512", //$NON-NLS-1$
         		false,
         		null,
         		null);

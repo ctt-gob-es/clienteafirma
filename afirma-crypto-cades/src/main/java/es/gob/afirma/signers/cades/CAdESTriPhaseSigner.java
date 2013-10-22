@@ -149,7 +149,7 @@ public final class CAdESTriPhaseSigner {
      * @param signerCertificateChain Cadena de certificados del firmante
      * @param policy Pol&iacute;tica de firma
      * @param signingCertificateV2 <code>true</code> para usar SigningCertificateV2, <code>false</code> para usar V1
-     * @param messageDigest Valor de la huella digital del contenido (usar <code>null</code> si se estableci&oacute; <code>content</code>)
+     * @param dataDigest Valor de la huella digital del contenido (usar <code>null</code> si se estableci&oacute; <code>content</code>)
      * @param signDate Fecha de la firma (debe establecerse externamente para evitar desincronismos en la firma trif&aacute;sica)
      * @param padesMode <code>true</code> para generar una firma CAdES compatible PAdES, <code>false</code> para generar una firma CAdES normal
      * @param contentType Tipo de contenido definido por su OID.
@@ -162,7 +162,7 @@ public final class CAdESTriPhaseSigner {
                           final X509Certificate[] signerCertificateChain,
                           final AdESPolicy policy,
                           final boolean signingCertificateV2,
-                          final byte[] messageDigest,
+                          final byte[] dataDigest,
                           final Date signDate,
                           final boolean padesMode,
                           final String contentType,
@@ -183,7 +183,7 @@ public final class CAdESTriPhaseSigner {
                      content,
                      policy,
                      signingCertificateV2,
-                     messageDigest,
+                     dataDigest,
                      signDate,
                      padesMode,
                      contentType,
