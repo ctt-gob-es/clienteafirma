@@ -28,7 +28,7 @@
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-lib-bouncycastle</artifactId>
-			<version>1.48</version>
+			<version>1.49</version>
 		</dependency>
 	</dependencies>
 </project>
