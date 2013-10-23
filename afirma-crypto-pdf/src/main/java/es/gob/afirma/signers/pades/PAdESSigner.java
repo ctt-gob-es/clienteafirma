@@ -44,6 +44,8 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.misc.Platform.OS;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.ui.AOUIFactory;
@@ -119,6 +121,7 @@ final class PAdESSigner {
 		}
     }
 
+	@SuppressWarnings("boxing")
 	static byte[] signPDF(final PrivateKey key,
 						  final java.security.cert.Certificate[] certChain,
 	                      final byte[] inPDF,
@@ -487,22 +490,44 @@ final class PAdESSigner {
 			    layer2FontColorB = 0;
 		    }
 
-	    	sap.setLayer2Font(
-    			new com.lowagie.text.Font(
-	    			// Family (COURIER = 0, HELVETICA = 1, TIMES_ROMAN = 2, SYMBOL = 3, ZAPFDINGBATS = 4)
-	    			layer2FontFamily == UNDEFINED ? COURIER : layer2FontFamily,
-					// Size (DEFAULTSIZE = 12)
-	    			layer2FontSize == UNDEFINED ? DEFAULT_LAYER_2_FONT_SIZE : layer2FontSize,
-					// Style (NORMAL = 0, BOLD = 1, ITALIC = 2, BOLDITALIC = 3, UNDERLINE = 4, STRIKETHRU = 8)
-					layer2FontStyle == UNDEFINED ? com.lowagie.text.Font.NORMAL : layer2FontStyle,
-	    			// Color
-	    			new java.awt.Color(
-    					layer2FontColorR,
-    				    layer2FontColorG,
-    				    layer2FontColorB
-					)
-				)
-			);
+		    com.lowagie.text.Font font;
+		    try {
+		    	Class<?> colorClass;
+		    	if (Platform.getOS() == OS.ANDROID) {
+		    		colorClass = Class.forName("harmony.java.awt.Color"); //$NON-NLS-1$
+		    	}
+		    	else {
+		    		colorClass = Class.forName("java.awt.Color"); //$NON-NLS-1$
+		    	}
+		    	final Object color = colorClass.getConstructor(Integer.TYPE, Integer.TYPE, Integer.TYPE).newInstance(
+		    			layer2FontColorR,
+		    			layer2FontColorG,
+		    			layer2FontColorB);
+		    	
+			    font = com.lowagie.text.Font.class
+			    		.getConstructor(Integer.TYPE, Integer.TYPE, Integer.TYPE, colorClass)
+			    		.newInstance(
+			    				// Family (COURIER = 0, HELVETICA = 1, TIMES_ROMAN = 2, SYMBOL = 3, ZAPFDINGBATS = 4)
+			    				layer2FontFamily == UNDEFINED ? COURIER : layer2FontFamily,
+			    				// Size (DEFAULTSIZE = 12)
+			    				layer2FontSize == UNDEFINED ? DEFAULT_LAYER_2_FONT_SIZE : layer2FontSize,
+			    				// Style (NORMAL = 0, BOLD = 1, ITALIC = 2, BOLDITALIC = 3, UNDERLINE = 4, STRIKETHRU = 8)
+			    				layer2FontStyle == UNDEFINED ? com.lowagie.text.Font.NORMAL : layer2FontStyle,
+			    				// Color
+			    				color);
+			    
+		    } catch (Exception e) {
+		    	font = new com.lowagie.text.Font(
+		    			// Family (COURIER = 0, HELVETICA = 1, TIMES_ROMAN = 2, SYMBOL = 3, ZAPFDINGBATS = 4)
+	    				layer2FontFamily == UNDEFINED ? COURIER : layer2FontFamily,
+	    				// Size (DEFAULTSIZE = 12)
+	    				layer2FontSize == UNDEFINED ? DEFAULT_LAYER_2_FONT_SIZE : layer2FontSize,
+	    				// Style (NORMAL = 0, BOLD = 1, ITALIC = 2, BOLDITALIC = 3, UNDERLINE = 4, STRIKETHRU = 8)
+	    				layer2FontStyle == UNDEFINED ? com.lowagie.text.Font.NORMAL : layer2FontStyle,
+	    				// Color
+	    				null);
+		    }
+	    	sap.setLayer2Font(font);
     	}
 
     	// Capa 4
