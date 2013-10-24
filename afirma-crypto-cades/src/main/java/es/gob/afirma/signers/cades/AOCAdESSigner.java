@@ -11,6 +11,8 @@
 package es.gob.afirma.signers.cades;
 
 import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.util.Properties;
@@ -143,10 +145,20 @@ public final class AOCAdESSigner implements AOSigner {
         final Properties extraParams = xParams != null ? xParams : new Properties();
 
         final String precalculatedDigestAlgorithmName = extraParams.getProperty("precalculatedHashAlgorithm"); //$NON-NLS-1$
-        byte[] dataDigest = null;
-
+        
+        final byte[] dataDigest;
+        final String digestAlgoritmName; 
         if (precalculatedDigestAlgorithmName != null) {
+        	digestAlgoritmName = AOSignConstants.getDigestAlgorithmName(precalculatedDigestAlgorithmName);
             dataDigest = data;
+        }
+        else {
+        	digestAlgoritmName = AOSignConstants.getDigestAlgorithmName(algorithm);
+            try {
+				dataDigest = MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(algorithm)).digest(data);
+			} catch (NoSuchAlgorithmException e) {
+				throw new AOException("Algoritmo no soportado: " + e, e); //$NON-NLS-1$
+			}
         }
 
         boolean signingCertificateV2;
@@ -195,7 +207,7 @@ public final class AOCAdESSigner implements AOSigner {
                    key,
                    certChain,
                    dataDigest,
-                   precalculatedDigestAlgorithmName,
+                   digestAlgoritmName,
                    Boolean.parseBoolean(extraParams.getProperty("padesMode", "false")), //$NON-NLS-1$ //$NON-NLS-2$
                    contentTypeOid,
                    contentDescription
