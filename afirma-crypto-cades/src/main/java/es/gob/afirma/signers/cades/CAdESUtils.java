@@ -116,7 +116,11 @@ public final class CAdESUtils {
             /** IssuerSerial ::= SEQUENCE { issuer GeneralNames, serialNumber
              * CertificateSerialNumber */
 
-            final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Primitive.fromByteArray(cert.getTBSCertificate()));
+            final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(
+        		ASN1Primitive.fromByteArray(
+    				cert.getTBSCertificate()
+				)
+			);
             final GeneralNames gns = new GeneralNames(new GeneralName(tbs.getIssuer()));
 
             final IssuerSerial isuerSerial = new IssuerSerial(gns, tbs.getSerialNumber());
@@ -151,7 +155,12 @@ public final class CAdESUtils {
             }
 
             // Secuencia con singningCertificate
-            contexExpecific.add(new Attribute(PKCSObjectIdentifiers.id_aa_signingCertificateV2, new DERSet(scv2)));
+            contexExpecific.add(
+        		new Attribute(
+    				PKCSObjectIdentifiers.id_aa_signingCertificateV2,
+    				new DERSet(scv2)
+				)
+    		);
 
             // FIN SINGING CERTIFICATE-V2
 
@@ -163,7 +172,11 @@ public final class CAdESUtils {
             /** IssuerSerial ::= SEQUENCE { issuer GeneralNames, serialNumber
              * CertificateSerialNumber } */
 
-            final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Primitive.fromByteArray(cert.getTBSCertificate()));
+            final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(
+        		ASN1Primitive.fromByteArray(
+    				cert.getTBSCertificate()
+				)
+			);
             final GeneralName gn = new GeneralName(tbs.getIssuer());
             final GeneralNames gns = new GeneralNames(gn);
 
@@ -205,7 +218,12 @@ public final class CAdESUtils {
              * member-body(2) us(840) rsadsi(113549) pkcs(1) pkcs9(9) smime(16)
              * id-aa(2) 12 } */
             // Secuencia con singningCertificate
-            contexExpecific.add(new Attribute(PKCSObjectIdentifiers.id_aa_signingCertificate, new DERSet(scv)));
+            contexExpecific.add(
+        		new Attribute(
+    				PKCSObjectIdentifiers.id_aa_signingCertificate,
+    				new DERSet(scv)
+				)
+    		);
         }
 
         // INICIO SIGPOLICYID ATTRIBUTE
@@ -214,7 +232,9 @@ public final class CAdESUtils {
             /**
              * SigPolicyId ::= OBJECT IDENTIFIER Politica de firma.
              */
-            final DERObjectIdentifier doiSigPolicyId = new DERObjectIdentifier(policy.getPolicyIdentifier().toLowerCase().replace("urn:oid:", "")); //$NON-NLS-1$ //$NON-NLS-2$
+            final DERObjectIdentifier doiSigPolicyId = new DERObjectIdentifier(
+        		policy.getPolicyIdentifier().toLowerCase().replace("urn:oid:", "") //$NON-NLS-1$ //$NON-NLS-2$
+    		);
 
             /**
              *   OtherHashAlgAndValue ::= SEQUENCE {
@@ -223,15 +243,17 @@ public final class CAdESUtils {
              *
              */
 
-
             // Algoritmo para el hash
             final AlgorithmIdentifier hashid;
             // si tenemos algoritmo de calculo de hash, lo ponemos
             if(policy.getPolicyIdentifierHashAlgorithm()!=null){
                 hashid = SigUtils.makeAlgId(
-                                    AOAlgorithmID.getOID(
-                                    AOSignConstants.getDigestAlgorithmName(
-                                       policy.getPolicyIdentifierHashAlgorithm())));
+                    AOAlgorithmID.getOID(
+                        AOSignConstants.getDigestAlgorithmName(
+                           policy.getPolicyIdentifierHashAlgorithm()
+                       )
+                   )
+               );
             }
             // si no tenemos, ponemos el algoritmo de firma.
             else{
@@ -254,7 +276,7 @@ public final class CAdESUtils {
              *       SigQualifier          ANY DEFINED BY policyQualifierId }
              */
             AOSigPolicyQualifierInfo spqInfo = null;
-            if(policy.getPolicyQualifier()!=null){
+            if(policy.getPolicyQualifier() != null) {
                 spqInfo = new AOSigPolicyQualifierInfo(policy.getPolicyQualifier().toString());
             }
 
@@ -279,7 +301,14 @@ public final class CAdESUtils {
             final DERSequence ds = new DERSequence(v);
 
             // Secuencia con singningCertificate
-            contexExpecific.add(new Attribute(PKCSObjectIdentifiers.id_aa_ets_sigPolicyId, new DERSet(ds.toASN1Primitive())));
+            contexExpecific.add(
+        		new Attribute(
+    				PKCSObjectIdentifiers.id_aa_ets_sigPolicyId,
+    				new DERSet(
+						ds.toASN1Primitive()
+					)
+				)
+    		);
             // FIN SIGPOLICYID ATTRIBUTE
         }
 
@@ -293,15 +322,20 @@ public final class CAdESUtils {
         if (contentType != null && !padesMode) {
         	final ContentHints contentHints;
         	if (contentDescription != null) {
-        		contentHints = new ContentHints(new ASN1ObjectIdentifier(contentType),
-        										new DERUTF8String(contentDescription));
+        		contentHints = new ContentHints(
+    				new ASN1ObjectIdentifier(contentType),
+    				new DERUTF8String(contentDescription)
+				);
         	}
         	else {
         		contentHints = new ContentHints(new ASN1ObjectIdentifier(contentType));
         	}
-        	contexExpecific.add(new Attribute(
+        	contexExpecific.add(
+    			new Attribute(
         			PKCSObjectIdentifiers.id_aa_contentHint,
-        			new DERSet(contentHints.toASN1Primitive())));
+        			new DERSet(contentHints.toASN1Primitive())
+    			)
+			);
         }
 
         return contexExpecific;
