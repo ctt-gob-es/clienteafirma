@@ -145,9 +145,9 @@ public final class AOCAdESSigner implements AOSigner {
         final Properties extraParams = xParams != null ? xParams : new Properties();
 
         final String precalculatedDigestAlgorithmName = extraParams.getProperty("precalculatedHashAlgorithm"); //$NON-NLS-1$
-        
+
         final byte[] dataDigest;
-        final String digestAlgoritmName; 
+        final String digestAlgoritmName;
         if (precalculatedDigestAlgorithmName != null) {
         	digestAlgoritmName = AOSignConstants.getDigestAlgorithmName(precalculatedDigestAlgorithmName);
             dataDigest = data;
@@ -156,7 +156,8 @@ public final class AOCAdESSigner implements AOSigner {
         	digestAlgoritmName = AOSignConstants.getDigestAlgorithmName(algorithm);
             try {
 				dataDigest = MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(algorithm)).digest(data);
-			} catch (NoSuchAlgorithmException e) {
+			}
+            catch (final NoSuchAlgorithmException e) {
 				throw new AOException("Algoritmo no soportado: " + e, e); //$NON-NLS-1$
 			}
         }

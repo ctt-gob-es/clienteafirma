@@ -112,7 +112,7 @@ public final class GenCAdESEPESSignedData {
         final byte[] content = parameters.getContent();
 
         final byte[] preSignature = CAdESTriPhaseSigner.preSign(
-    		dataDigestAlgorithmName,
+    		AOSignConstants.getDigestAlgorithmName(dataDigestAlgorithmName),
             omitContent ? null : content,
             (X509Certificate[]) certChain,
             policy,
@@ -134,7 +134,7 @@ public final class GenCAdESEPESSignedData {
             // Volvemos a crear la prefirma simulando una firma trifasica en la que la postfirma no cuenta con el
             // resultado de la prefirma
             CAdESTriPhaseSigner.preSign(
-                dataDigestAlgorithmName,
+        		AOSignConstants.getDigestAlgorithmName(dataDigestAlgorithmName),
                 omitContent ? null : content,
                 (X509Certificate[]) certChain,
                 policy,

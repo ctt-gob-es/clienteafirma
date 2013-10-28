@@ -227,14 +227,21 @@ public final class CAdESTriPhaseSigner {
 
         final TBSCertificateStructure tbsCertificateStructure;
         try {
-            tbsCertificateStructure = TBSCertificateStructure.getInstance(ASN1Primitive.fromByteArray(signerCertificateChain[0].getTBSCertificate()));
+            tbsCertificateStructure = TBSCertificateStructure.getInstance(
+        		ASN1Primitive.fromByteArray(
+    				signerCertificateChain[0].getTBSCertificate()
+				)
+    		);
         }
         catch(final Exception e) {
             throw new AOException("No se ha podido crear la estructura de certificados", e); //$NON-NLS-1$
         }
 
         final SignerIdentifier signerIdentifier = new SignerIdentifier(
-           new IssuerAndSerialNumber(X500Name.getInstance(tbsCertificateStructure.getIssuer()), tbsCertificateStructure.getSerialNumber().getValue())
+           new IssuerAndSerialNumber(
+    		   X500Name.getInstance(tbsCertificateStructure.getIssuer()),
+    		   tbsCertificateStructure.getSerialNumber().getValue()
+		   )
         );
 
         // Algoritmo de huella digital
@@ -262,14 +269,23 @@ public final class CAdESTriPhaseSigner {
         final ASN1Set asn1SignedAttributes;
         try {
             asn1SignedAttributes = (ASN1Set) ASN1Primitive.fromByteArray(signedAttributes);
-        } catch (final IOException e) {
+        }
+        catch (final IOException e) {
             throw new AOException("Error en la inclusion de la recuperacion de los SignedAttibutes", e); //$NON-NLS-1$
         }
 
         // SignerInfo
         final ASN1EncodableVector signerInfo = new ASN1EncodableVector();
-        signerInfo.add(new SignerInfo(signerIdentifier, digestAlgorithmOID, asn1SignedAttributes, keyAlgorithmIdentifier, encodedPKCS1Signature, null));
-
+        signerInfo.add(
+    		new SignerInfo(
+				signerIdentifier,
+				digestAlgorithmOID,
+				asn1SignedAttributes,
+				keyAlgorithmIdentifier,
+				encodedPKCS1Signature,
+				null
+			)
+		);
 
         // ContentInfo
         final ContentInfo contentInfo;

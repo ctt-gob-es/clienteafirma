@@ -38,13 +38,13 @@ public final class AdESPolicy {
 
         this.policyIdentifier = identifier;
 
-        if (identifierHash != null && (!"0".equals(identifierHash)) && (identifierHashAlgorithm == null || "".equals(identifierHashAlgorithm))) { //$NON-NLS-1$ //$NON-NLS-2$
+        if (identifierHash != null && !"0".equals(identifierHash) && (identifierHashAlgorithm == null || "".equals(identifierHashAlgorithm))) { //$NON-NLS-1$ //$NON-NLS-2$
             throw new IllegalArgumentException("Si se indica la huella digital del identificador de politica es obligatorio indicar tambien el algoritmo"); //$NON-NLS-1$
         }
 
         if (identifierHash == null) {
             try {
-                this.policyIdentifierHash =  Base64.encode((MessageDigest.getInstance("SHA-512").digest(AOUtil.getDataFromInputStream(new URL(identifier).openStream())))); //$NON-NLS-1$
+                this.policyIdentifierHash =  Base64.encode(MessageDigest.getInstance("SHA-512").digest(AOUtil.getDataFromInputStream(new URL(identifier).openStream()))); //$NON-NLS-1$
                 this.policyIdentifierHashAlgorithm ="SHA-512"; //$NON-NLS-1$
             }
             catch(final Exception e) {
@@ -69,7 +69,7 @@ public final class AdESPolicy {
             }
         }
 
-        if (qualifier != null && (!"".equals(qualifier))) { //$NON-NLS-1$
+        if (qualifier != null && !"".equals(qualifier)) { //$NON-NLS-1$
             try {
                 this.policyQualifier = new URL(qualifier);
             }
@@ -159,8 +159,7 @@ public final class AdESPolicy {
     	final AdESPolicy other = (AdESPolicy) o;
     	return other.getPolicyIdentifier().equals(getPolicyIdentifier()) &&
     		   other.getPolicyIdentifierHash().equals(getPolicyIdentifierHash()) &&
-    		   other.getPolicyIdentifierHashAlgorithm().equals(getPolicyIdentifierHashAlgorithm()) /*&&
-    		   other.getPolicyQualifier().equals(getPolicyQualifier())*/;
+    		   other.getPolicyIdentifierHashAlgorithm().equals(getPolicyIdentifierHashAlgorithm());
     }
 
     /** {@inheritDoc} */
