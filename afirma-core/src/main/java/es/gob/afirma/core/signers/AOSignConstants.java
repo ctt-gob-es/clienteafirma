@@ -99,6 +99,10 @@ public final class AOSignConstants {
 	/** Formato de firma por defecto. */
 	public static final String DEFAULT_SIGN_FORMAT = SIGN_FORMAT_CADES;
 
+	// ************************************************************
+	// ************* OPERACIONES **********************************
+	// ************************************************************
+
 	/** Identificador de la operaci&oacute;n de firma masiva. */
 	public static final String MASSIVE_OPERATION_SIGN = "FIRMAR"; //$NON-NLS-1$
 
