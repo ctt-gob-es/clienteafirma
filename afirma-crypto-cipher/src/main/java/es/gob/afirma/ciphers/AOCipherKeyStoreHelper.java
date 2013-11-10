@@ -170,13 +170,8 @@ public final class AOCipherKeyStoreHelper {
 
         final InputStream ksIs = new FileInputStream(getCipherKeystore());
         this.ks.load(new BufferedInputStream(ksIs), this.pss);
+        ksIs.close();
 
-        try {
-            ksIs.close();
-        }
-        catch (final Exception e) {
-            // Ignoramos los errores en el cierre
-        }
     }
 
     /** Obtiene una clave del almac&eacute;n.
