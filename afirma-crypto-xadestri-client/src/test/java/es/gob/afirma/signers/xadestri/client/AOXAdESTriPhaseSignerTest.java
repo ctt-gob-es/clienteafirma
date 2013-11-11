@@ -23,6 +23,7 @@ import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.core.signers.CounterSignTarget;
 
 public class AOXAdESTriPhaseSignerTest {
 
@@ -32,10 +33,15 @@ public class AOXAdESTriPhaseSignerTest {
 
 	private static final String DATA_FILENAME = "ANF_PF_Activo.pfx"; //$NON-NLS-1$
 	private static final String SIGNATURE_FILENAME = "firma.xml"; //$NON-NLS-1$
+	private static final String COSIGNATURE_FILENAME = "cofirma.xml"; //$NON-NLS-1$
 
-	private static final String SERVER_URL = "http://10.1.46.4:8080/afirma-server-triphase-signer/SignatureService"; //$NON-NLS-1$
+	//private static final String SERVER_URL = "https://valide.redsara.es/firmaMovil/TriPhaseSignerServer/SignatureService"; //$NON-NLS-1$
+	//private static final String SERVER_URL = "https://prevalide.redsara.es/firmaMovil/TriPhaseSignerServer/SignatureService"; //$NON-NLS-1$
+	//private static final String SERVER_URL = "http://localhost:8080/TriPhaseSignerServer/SignatureService"; //$NON-NLS-1$
+	private static final String SERVER_URL = "http://localhost:8080/afirma-server-triphase-signer/SignatureService"; //$NON-NLS-1$
 
 	private static final Properties[] CONFIGS;
+	
 	
 	static {
 		CONFIGS = new Properties[3];
@@ -63,7 +69,6 @@ public class AOXAdESTriPhaseSignerTest {
 	}
 	
 	@Test
-	@Ignore
 	public void pruebaFirmaXAdES() throws Exception {
 
 		final byte[] data = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(DATA_FILENAME));
@@ -105,6 +110,26 @@ public class AOXAdESTriPhaseSignerTest {
 		final AOXAdESTriPhaseSigner signer = new AOXAdESTriPhaseSigner();
 
 		final byte[] result = signer.cosign(sign, AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, pke.getPrivateKey(), pke.getCertificateChain(), config);
+
+		System.out.println("Resultado:\n" + new String(result)); //$NON-NLS-1$
+	}
+	
+	@Test
+	public void pruebaContrafirmaXAdES() throws Exception {
+
+		final byte[] sign = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(COSIGNATURE_FILENAME));
+
+		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+		ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+
+		final Properties config = new Properties();
+		config.setProperty("serverUrl", SERVER_URL); //$NON-NLS-1$
+		config.setProperty("target", "tree"); //$NON-NLS-1$ //$NON-NLS-2$
+		
+		final AOXAdESTriPhaseSigner signer = new AOXAdESTriPhaseSigner();
+		
+		final byte[] result = signer.countersign(sign, AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, CounterSignTarget.LEAFS, null, pke.getPrivateKey(), pke.getCertificateChain(), config);
 
 		System.out.println("Resultado:\n" + new String(result)); //$NON-NLS-1$
 	}

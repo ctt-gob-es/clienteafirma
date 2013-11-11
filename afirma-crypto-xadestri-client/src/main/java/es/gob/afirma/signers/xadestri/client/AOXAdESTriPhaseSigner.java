@@ -64,6 +64,9 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 	/** Identificador de la operaci&oacute;n criptogr&aacute;fica de cofirma. */
 	private static final String CRYPTO_OPERATION_COSIGN = "cosign"; //$NON-NLS-1$
 
+	/** Identificador de la operaci&oacute;n criptogr&aacute;fica de contrafirma. */
+	private static final String CRYPTO_OPERATION_COUNTERSIGN = "countersign"; //$NON-NLS-1$
+	
 	/** Nombre del par&aacute;metro que identifica la operaci&oacute;n trif&aacute;sica en la URL del servidor de firma. */
 	private static final String PARAMETER_NAME_OPERATION = "op"; //$NON-NLS-1$
 
@@ -104,6 +107,15 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 	/** Indicador de finalizaci&oacute;n correcta de proceso. */
 	private static final String SUCCESS = "OK"; //$NON-NLS-1$
 
+	/** Clave de la propiedad de configuraci&oacute;n del tipo de contrafirma. */
+	private static final String COUNTERSIGN_TARGET_KEY = "target"; //$NON-NLS-1$
+	
+	/** Valor para la configuraci&oacute;n de la contrafirma de nodos hoja. */
+	public static final String COUNTERSIGN_TARGET_LEAFS = "leafs"; //$NON-NLS-1$
+	
+	/** Valor para la configuraci&oacute;n de la contrafirma de todos los nodos del &aacute;bol. */
+	public static final String COUNTERSIGN_TARGET_TREE = "tree"; //$NON-NLS-1$
+	
 
 	@Override
 	public byte[] sign(final byte[] data,
@@ -147,8 +159,15 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 			final Object[] targets,
 			final PrivateKey key,
 			final Certificate[] certChain,
-			final Properties xParams) throws AOException {
-		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
+			Properties xParams) throws AOException {
+		
+		if (xParams == null) {
+			xParams = new Properties();
+		}
+		if (!xParams.containsKey(COUNTERSIGN_TARGET_KEY)) {
+			xParams.setProperty(COUNTERSIGN_TARGET_KEY, COUNTERSIGN_TARGET_LEAFS);
+		}
+		return triPhaseOperation(CRYPTO_OPERATION_COUNTERSIGN, sign, algorithm, key, certChain, xParams);
 	}
 
 	/** {@inheritDoc} */

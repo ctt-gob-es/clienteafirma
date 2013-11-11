@@ -1,33 +1,35 @@
 package es.gob.afirma.signers.xadestri.server;
 
+import java.util.List;
+
 
 
 /** Resultado de una prefirma XML.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class XmlPreSignResult {
 
-	private final String xmlSignBase64;
-	private final String signedInfoBase64;
+	private final byte[] xmlSign;
+	private final List<byte[]> signedInfos;
 
-	XmlPreSignResult(final String xmlSign, final String signedInfo) {
-		this.xmlSignBase64 = xmlSign;
-		this.signedInfoBase64 = signedInfo;
+	XmlPreSignResult(final byte[] xmlSign, final List<byte[]> signedInfos) {
+		this.xmlSign = xmlSign;
+		this.signedInfos = signedInfos;
 	}
 
 	/**
 	 * Recupera el PKCS#1 de la firma.
-	 * @return PKCS#1 de la firma en base 64.
+	 * @return PKCS#1 de la firma.
 	 */
-	public String getXmlSignBase64() {
-		return this.xmlSignBase64;
+	public byte[] getXmlSign() {
+		return this.xmlSign;
 	}
 
 	/**
-	 * Recupera el SignedInfo de la firma.
-	 * @return SignedInfo de la firma en base 64.
+	 * Recupera los SignedInfos que hay que firmar.
+	 * @return SignedInfos para firmar.
 	 */
-	public String getSignedInfoBase64() {
-		return this.signedInfoBase64;
+	public List<byte[]> getSignedInfos() {
+		return this.signedInfos;
 	}
 
 

@@ -58,7 +58,7 @@ import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.XMLConstants;
 
-final class XAdESCounterSigner {
+public final class XAdESCounterSigner {
 
 	private static final String CSURI = "http://uri.etsi.org/01903#CountersignedSignature";	//$NON-NLS-1$
 
@@ -180,7 +180,7 @@ final class XAdESCounterSigner {
 	 * @throws AOException
 	 *             Cuando ocurre cualquier problema durante el proceso
 	 */
-	static byte[] countersign(final byte[] sign,
+	public static byte[] countersign(final byte[] sign,
 			                  final String algorithm,
 			                  final CounterSignTarget targetType,
 			                  final Object[] targets,
@@ -363,12 +363,12 @@ final class XAdESCounterSigner {
 		try {
 			for (int i = 0; i < numSignatures; i++) {
 				final Element signature = (Element) signatures.item(i);
-				final int children = signature.getElementsByTagNameNS(
+				final int numCounterSigns = signature.getElementsByTagNameNS(
 						XMLConstants.DSIGNNS, AOXAdESSigner.SIGNATURE_TAG)
 						.getLength();
 
 				// y crea sus contrafirmas
-				if (children == 0) {
+				if (numCounterSigns == 0) {
 					XAdESCounterSigner.cs(signature, key, certChain, extraParams, algorithm, doc);
 					numSignatures++;
 					i++;

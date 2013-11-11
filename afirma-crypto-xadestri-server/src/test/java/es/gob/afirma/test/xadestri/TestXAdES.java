@@ -18,7 +18,6 @@ import java.util.logging.Logger;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.signers.xadestri.server.XAdESTriPhaseSignerServerSide;
 import es.gob.afirma.signers.xadestri.server.XmlPreSignResult;
 
@@ -34,6 +33,7 @@ public final class TestXAdES {
 	private static final String CERT_ALIAS = "anf usuario activo"; //$NON-NLS-1$
 
 	private static final String SIGNATURE_FILENAME = "firma.xml"; //$NON-NLS-1$
+	private static final String COSIGNATURE_FILENAME = "cofirma.xml"; //$NON-NLS-1$
 
 	/** Prueba de prefirma simple.
 	 * @throws Exception en cualquier error */
@@ -49,9 +49,7 @@ public final class TestXAdES {
 
 		final XmlPreSignResult pre = XAdESTriPhaseSignerServerSide.preSign("DATA".getBytes(), "SHA512withRSA", pke.getCertificateChain(), null, XAdESTriPhaseSignerServerSide.Op.SIGN); //$NON-NLS-1$ //$NON-NLS-2$
 
-		System.out.println("Firma:\n" + new String(Base64.decode(pre.getXmlSignBase64())));
-
-
+		System.out.println("Firma:\n" + new String(pre.getXmlSign()));
 	}
 
 	/** Prueba de cofirma en 3 fases.
@@ -70,8 +68,25 @@ public final class TestXAdES {
 
 		final XmlPreSignResult pre = XAdESTriPhaseSignerServerSide.preSign(sign, "SHA512withRSA", pke.getCertificateChain(), null, XAdESTriPhaseSignerServerSide.Op.COSIGN); //$NON-NLS-1$
 
-		System.out.println("Cofirma:\n" + new String(Base64.decode(pre.getXmlSignBase64())));
+		System.out.println("Cofirma:\n" + new String(pre.getXmlSign()));
+	}
+	
+	/** Prueba de contrafirma en 3 fases.
+	 * @throws Exception en cualquier error */
+	@SuppressWarnings("static-method")
+	@Test
+	public void testCounterSignature() throws Exception {
 
+		Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
 
+		final byte[] sign = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(COSIGNATURE_FILENAME));
+
+		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+		ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+
+		final XmlPreSignResult pre = XAdESTriPhaseSignerServerSide.preSign(sign, "SHA512withRSA", pke.getCertificateChain(), null, XAdESTriPhaseSignerServerSide.Op.COUNTERSIGN); //$NON-NLS-1$
+
+		System.out.println("Contrafirma:\n" + new String(pre.getXmlSign()));
 	}
 }

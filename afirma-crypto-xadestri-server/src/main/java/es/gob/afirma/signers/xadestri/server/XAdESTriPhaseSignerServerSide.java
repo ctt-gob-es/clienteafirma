@@ -43,8 +43,10 @@ import org.xml.sax.SAXException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
 import es.gob.afirma.signers.xades.XAdESCoSigner;
+import es.gob.afirma.signers.xades.XAdESCounterSigner;
 import es.gob.afirma.signers.xades.XAdESSigner;
 import es.gob.afirma.signers.xml.Utils;
 
@@ -53,15 +55,21 @@ import es.gob.afirma.signers.xml.Utils;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class XAdESTriPhaseSignerServerSide {
 
+	private static final String COUNTERSIGN_TARGET_KEY = "target"; //$NON-NLS-1$
+	
 	public static enum Op {
 		SIGN,
-		COSIGN
+		COSIGN,
+		COUNTERSIGN
 	}
 
 	private static final String XML_DEFAULT_ENCODING = "UTF-8"; //$NON-NLS-1$
 
+	/** Codigo de indice en la cadena de reemplazo. */
+	public static final String REPLACEMENT_CODE = "%i"; //$NON-NLS-1$
+	
 	/** Cadena por la que reemplazaremos el PKCS#1 impostado de la firma. */
-	public static final String REPLACEMENT_STRING = "%%REPLACEME%%"; //$NON-NLS-1$
+	public static final String REPLACEMENT_STRING = "%%REPLACEME_" + REPLACEMENT_CODE + "%%"; //$NON-NLS-1$ //$NON-NLS-2$
 
 	private static final String XML_NODE_ID = "Id"; //$NON-NLS-1$
 
@@ -74,7 +82,7 @@ public final class XAdESTriPhaseSignerServerSide {
 	 * @param algorithm Algoritmo de firma
 	 * @param certChain Cadena de certificados del firmante
 	 * @param xParams Par&aacute;metros adicionales de la firma
-	 * @return Prefirma XML
+	 * @return Listado de prefirma XML
 	 * @throws NoSuchAlgorithmException
 	 * @throws AOException
 	 * @throws SAXException
@@ -125,6 +133,13 @@ public final class XAdESTriPhaseSignerServerSide {
 		catch(final Exception e) {
 			Logger.getLogger("es.gob.afirma").info("El documento a firmar no es XML, por lo que no contiene firmas previas");  //$NON-NLS-1$//$NON-NLS-2$
 		}
+		
+		if (xml == null && (op == Op.COSIGN || op == Op.COUNTERSIGN)) {
+			Logger.getLogger("es.gob.afirma").severe("Solo se pueden cofirmar y contrafirmar firmas XML");  //$NON-NLS-1$//$NON-NLS-2$
+			throw new AOException("Los datos introducidos no se corresponden con una firma XML"); //$NON-NLS-1$
+		}
+		
+		// Si los datos eran XML, comprobamos y almacenamos las firmas previas
 		if (xml != null) {
 			final Element rootElement = xml.getDocumentElement();
 			if (rootElement.getNodeName().endsWith(":" + AOXAdESSigner.SIGNATURE_TAG)) { //$NON-NLS-1$
@@ -159,7 +174,7 @@ public final class XAdESTriPhaseSignerServerSide {
 			}
 		}
 
-
+		// Generamos un par de claves para hacer la firma temporal, que despues sustituiremos por la real
 		final RSAPrivateKey prk = (RSAPrivateKey) generateKeyPair(
 				((RSAPublicKey)((X509Certificate)certChain[0]).getPublicKey()).getModulus().bitLength()
 				).getPrivate();
@@ -184,52 +199,84 @@ public final class XAdESTriPhaseSignerServerSide {
 					xParams
 					);
 			break;
+		case COUNTERSIGN:
+			final CounterSignTarget targets = 
+				xParams != null && CounterSignTarget.LEAFS.name().equalsIgnoreCase(xParams.getProperty(COUNTERSIGN_TARGET_KEY)) ?
+					CounterSignTarget.LEAFS : CounterSignTarget.TREE;
+			
+			result = XAdESCounterSigner.countersign(
+					data,
+					algorithm,
+					targets,
+					null,
+					prk,
+					certChain,
+					xParams
+					);
+			break;
 		default:
 			throw new IllegalStateException(
 					"No se puede dar una operacion no contemplada en el enumerado de operaciones" //$NON-NLS-1$
 					);
 		}
 
-		final byte[] signedInfo = XAdESTriPhaseSignerServerSide.getSignedInfo(
+		// Cargamos el XML firmado en un String
+		String xmlResult = new String(result, xmlEncoding);
+		
+		// Recuperamos los signed info que se han firmado
+		final List<byte[]> signedInfos = XAdESTriPhaseSignerServerSide.getSignedInfos(
 				result,
 				certChain[0].getPublicKey(),
 				previousSignaturesIds // Identificadores de firmas previas, para poder omitirlos
 				);
 
-		// Calculamos el valor PKCS#1 con la clave privada impostada
-		final Signature signature = Signature.getInstance(algorithm);
-		signature.initSign(prk);
-		signature.update(signedInfo);
+		// Podemos un reemplazo en el XML en lugar de los PKCS#1 de las firmas generadas 
+		for (int i = 0; i < signedInfos.size(); i++) {
+			
+			byte[] signedInfo = signedInfos.get(i);
+			
+			// Calculamos el valor PKCS#1 con la clave privada impostada, para conocer los valores que debemos sustituir
+			final Signature signature = Signature.getInstance(algorithm);
+			signature.initSign(prk);
+			signature.update(signedInfo);
 
-		final String cleanSignatureValue = cleanBase64(Base64.encode(signature.sign()));
+			final String cleanSignatureValue = cleanBase64(Base64.encode(signature.sign()));
 
-		// Cargamos el XML original en un String
-		final String xmlResult = new String(result, xmlEncoding);
+			// Buscamos el PKCS#1 en Base64 en el XML original y lo sustituimos por la cadena de reemplazo
+			final String signValuePrefix = ">" + cleanSignatureValue.substring(0, NUM_CHARACTERS_TO_COMPARE); //$NON-NLS-1$
+			final int signValuePos = xmlResult.indexOf(signValuePrefix) + 1;
+			final int signValueFinalPos = xmlResult.indexOf('<', signValuePos);
+			final String pkcs1String = xmlResult.substring(signValuePos, signValueFinalPos);
 
-		// Buscamos el PKCS#1 en Base64 en el XML original y lo sustituimos por la cadena de reemplazo
-		final String signValuePrefix = ">" + cleanSignatureValue.substring(0, NUM_CHARACTERS_TO_COMPARE); //$NON-NLS-1$
-		final int signValuePos = xmlResult.indexOf(signValuePrefix) + 1;
-		final int signValueFinalPos = xmlResult.indexOf('<', signValuePos);
-		final String pkcs1String = xmlResult.substring(signValuePos, signValueFinalPos);
-
-		final String cleanPkcs1String = cleanBase64(pkcs1String);
-		if (cleanSignatureValue.equals(cleanPkcs1String)) {
-			return new XmlPreSignResult(
-					Base64.encode(
-							xmlResult.replace(pkcs1String, REPLACEMENT_STRING).getBytes()
-							),
-							Base64.encode(signedInfo)
-					);
+			final String cleanPkcs1String = cleanBase64(pkcs1String);
+			if (cleanSignatureValue.equals(cleanPkcs1String)) {
+				xmlResult = xmlResult.replace(
+						pkcs1String,
+						REPLACEMENT_STRING.replace(REPLACEMENT_CODE, Integer.toString(i)));
+			}
 		}
-		throw new XmlPreSignException();
-
+		return new XmlPreSignResult(xmlResult.getBytes(xmlEncoding), signedInfos);
 	}
 
 	private static String cleanBase64(final String base64) {
 		return base64 == null ? null : base64.replace("\n", "").replace("\r", "").replace("\t", "").replace(" ", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
 	}
 
-	private static byte[] getSignedInfo(final byte[] xmlSign,
+	/**
+	 * Recupera los signedInfo de una firma XML, excluyendo los de las firmas indicadas a trav&eacute;s
+	 * de su Id.
+	 * @param xmlSign XML del que se 
+	 * @param pk Clave publicada usada en las firmas de las que se desea obtener los signedInfo.
+	 * @param excludedIds Identificadores de las firmas excluidas.
+	 * @return Listado de signedInfos.
+	 * @throws SAXException
+	 * @throws IOException
+	 * @throws ParserConfigurationException
+	 * @throws MarshalException
+	 * @throws XMLSignatureException
+	 * @throws XmlPreSignException Cuando no se ha encontrado ning&uacute;n signedInfo que devolver.
+	 */
+	private static List<byte[]> getSignedInfos(final byte[] xmlSign,
 			final PublicKey pk,
 			final List<String> excludedIds) throws SAXException,
 			IOException,
@@ -239,50 +286,52 @@ public final class XAdESTriPhaseSignerServerSide {
 		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		dbf.setNamespaceAware(true);
 
-		final NodeList nl = dbf.newDocumentBuilder().parse(
+		final NodeList signatureNodeList = dbf.newDocumentBuilder().parse(
 				new ByteArrayInputStream(xmlSign)
 				).getElementsByTagNameNS(
 						XMLSignature.XMLNS,
 						AOXAdESSigner.SIGNATURE_TAG
 						);
-		if (nl.getLength() == 0) {
+		if (signatureNodeList.getLength() == 0) {
 			throw new IllegalArgumentException("Se ha proporcionado un XML sin firmas"); //$NON-NLS-1$
 		}
 
-		// De los nodos Signature obtenidos, descartar aquellos cuyos identificadores esten en la lista
-		// de excluidos (excludedIds).
-		Node newSignature = null;
-		for (int i=0;i<nl.getLength();i++) {
-			final Node currentNode = nl.item(i);
-			final NamedNodeMap nnm = currentNode.getAttributes();
-			if (nnm != null) {
-				final Node node = nnm.getNamedItem(XML_NODE_ID);
-				if (node != null) {
-					final String id = node.getNodeValue();
-					if (excludedIds == null || !excludedIds.contains(id)) {
-						newSignature = currentNode;
-						break;
-					}
-				}
+		// Recogemos el signedInfo de cada firma cuyo identificador no este en la lista de excluidos (excludedIds)
+		final List<byte[]> signedInfos = new ArrayList<byte[]>();
+		for (int i = 0; i < signatureNodeList.getLength(); i++) {
+			
+			final Node currentNode = signatureNodeList.item(i);
+			
+			// Saltamos las firmas sin identificador
+			if (currentNode.getAttributes() == null || currentNode.getAttributes().getNamedItem(XML_NODE_ID) == null) {
+				Logger.getLogger("es.gob.afirma").warning("El documento contiene firmas sin identificador reconocido");  //$NON-NLS-1$//$NON-NLS-2$
+				continue;
 			}
+
+			// Saltamos las firmas excluidas (las que estaban antes)
+			final String id = currentNode.getAttributes().getNamedItem(XML_NODE_ID).getNodeValue();
+			if (excludedIds != null && excludedIds.contains(id)) {
+				continue;
+			}
+
+			// Agregamos el signed indo de la firma al listado 
+			final XMLValidateContext valContext = new DOMValidateContext(new SimpleKeySelector(pk), currentNode);
+			valContext.setProperty("javax.xml.crypto.dsig.cacheReference", Boolean.TRUE); //$NON-NLS-1$
+			final XMLSignature signature = Utils.getDOMFactory().unmarshalXMLSignature(valContext);
+			signature.validate(valContext);
+			signedInfos.add(
+					AOUtil.getDataFromInputStream(
+							signature.getSignedInfo().getCanonicalizedData()
+							));
 		}
 
-		if (newSignature == null) {
+		if (signedInfos.isEmpty()) {
 			throw new XmlPreSignException("Se ha creado un nodo firma, pero no se ha encontrado en el postproceso"); //$NON-NLS-1$
 		}
-
-		final XMLValidateContext valContext = new DOMValidateContext(new SimpleKeySelector(pk), newSignature);
-		valContext.setProperty("javax.xml.crypto.dsig.cacheReference", Boolean.TRUE); //$NON-NLS-1$
-
-		final XMLSignature signature = Utils.getDOMFactory().unmarshalXMLSignature(valContext);
-
-		signature.validate(valContext);
-
-		return 	AOUtil.getDataFromInputStream(
-				signature.getSignedInfo().getCanonicalizedData()
-				);
+		
+		return signedInfos;
 	}
-
+	
 	private static class SimpleKeySelector extends KeySelector {
 
 		private final PublicKey pk;
