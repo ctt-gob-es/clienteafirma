@@ -115,6 +115,7 @@ public class AOXAdESTriPhaseSignerTest {
 	}
 	
 	@Test
+	@Ignore
 	public void pruebaContrafirmaXAdES() throws Exception {
 
 		final byte[] sign = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(COSIGNATURE_FILENAME));
