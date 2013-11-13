@@ -37,9 +37,13 @@ public final class AOPkcs1Signer implements AOSimpleSigner {
 		final Signature sig;
 
 		try {
-			// El proveedor de AET no declara adecuadamente las claves privadas que acepta, por lo que hay que
+			// En Android las capacidades de los proveedores, aunque se declaren bien, no se manejan adecuadamente
 			if ("com.aet.android.providerPKCS15.SEPrivateKey".equals(key.getClass().getName())) { //$NON-NLS-1$
 				sig = Signature.getInstance(algorithm, "AETProvider"); //$NON-NLS-1$
+			}
+			else if ("es.gob.jmulticard.jse.provider.DniePrivateKey".equals(key.getClass().getName())) { //$NON-NLS-1$
+				java.util.logging.Logger.getLogger("es.gob.afirma").info("Detectada clave privada DNIe 100% Java"); //$NON-NLS-1$ //$NON-NLS-2$
+				sig = Signature.getInstance(algorithm, "DNIeJCAProvider"); //$NON-NLS-1$
 			}
 			else {
 				sig = Signature.getInstance(algorithm);
