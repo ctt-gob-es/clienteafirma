@@ -124,7 +124,7 @@ public class TestSignField {
 				"Fichero temporal para la comprobacion manual del resultado: " + //$NON-NLS-1$
 				tempFile.getAbsolutePath());
 	}
-	
+
 	/** Prueba de firma PDF visible con un texto.
 	 * @throws Exception */
 	@SuppressWarnings("static-method")
@@ -175,7 +175,7 @@ public class TestSignField {
 				"Fichero temporal para la comprobacion manual del resultado: " + //$NON-NLS-1$
 				tempFile.getAbsolutePath());
 	}
-	
+
 	/** Prueba de firma PDF visible con r&uacute;brica y texto.
 	 * @throws Exception */
 	@SuppressWarnings("static-method")
@@ -229,9 +229,12 @@ public class TestSignField {
 				"Fichero temporal para la comprobacion manual del resultado: " + //$NON-NLS-1$
 				tempFile.getAbsolutePath());
 	}
-	
-	public static void main(String[] args) throws Exception {
-		TestSignField test = new TestSignField();
+
+	/** Entrada para pruebas manuales.
+	 * @param args
+	 * @throws Exception */
+	public static void main(final String[] args) throws Exception {
+		final TestSignField test = new TestSignField();
 		test.testCampoDeFirmaConPosicionesRubricaYTexto();
 	}
 }
