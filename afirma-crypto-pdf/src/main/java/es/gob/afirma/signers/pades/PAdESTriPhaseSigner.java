@@ -75,7 +75,7 @@ import es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper.TsaRequestExtension;
  * <p><b>Pre-firma:</b></p>
  * <p align="center"><img src="doc-files/PAdESTriPhaseSigner-1.png"></p>
  * <ul>
- *  <li>El dispositivo m�vil solicita una pre-firma al servidor Web indicando un identificador de documento.</li>
+ *  <li>El dispositivo m&oacute;vil solicita una pre-firma al servidor Web indicando un identificador de documento.</li>
  *  <li>El servidor Web solicita el documento a servidor documental.</li>
  *  <li>
  *   El servidor documental entrega el documento al servidor Web.<br>Es importante recalcar que el servidor
@@ -112,7 +112,7 @@ import es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper.TsaRequestExtension;
  *  </li>
  *  <li>El servidor documental almacena el nuevo documento y devuelve un identificador al servidor Web.</li>
  *  <li>
- *   El servidor Web comunica al dispositivo el �xito de la operaci�n y el identificador del fichero
+ *   El servidor Web comunica al dispositivo el &eacute;xito de la operaci&oacute;n y el identificador del fichero
  *   ya firmado y almacenado.
  *  </li>
  * </ul>
@@ -136,8 +136,7 @@ import es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper.TsaRequestExtension;
  *  Consulte la documentaci&oacute;n de la opci&oacute;n <code>allowSigningCertifiedPdfs</code> para establecer un comportamiento por
  *  defecto respecto a los PDF certificados.
  * </p>
- * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
- * */
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class PAdESTriPhaseSigner {
 
 	private static final String PDF_OID = "1.2.826.0.1089.1.5"; //$NON-NLS-1$
@@ -171,9 +170,8 @@ public final class PAdESTriPhaseSigner {
      * @return pre-firma CAdES/PAdES (atributos CAdES a firmar)
      * @throws IOException
      * @throws AOException
-     * @throws DocumentException
-     */
-    public static PdfPreSignResult preSign(final String digestAlgorithmName,
+     * @throws DocumentException */
+    public static PdfSignResult preSign(final String digestAlgorithmName,
                                            final byte[] inPDF,
                                            final X509Certificate[] signerCertificateChain,
                                            final Calendar signTime,
@@ -208,7 +206,7 @@ public final class PAdESTriPhaseSigner {
         md.update(original);
 
         // pre-firma CAdES
-        return new PdfPreSignResult(
+        return new PdfSignResult(
             ptps.getFileID(),
             CAdESTriPhaseSigner.preSign(
                 AOSignConstants.getDigestAlgorithmName(digestAlgorithmName), // Algoritmo de huella digital
@@ -221,7 +219,9 @@ public final class PAdESTriPhaseSigner {
                 true, // Modo PAdES
                 PDF_OID,
                 PDF_DESC
-            )
+            ),
+            signTime,
+            extraParams
         );
     }
 
@@ -238,11 +238,8 @@ public final class PAdESTriPhaseSigner {
      * </ul>
      * @param inPDF PDF a firmar (debe ser el mismo que el usado en la pre-firma).
      * @param signerCertificateChain Cadena de certificados del firmante (debe ser la misma que la usado en la pre-firma).
-     * @param xParams Opciones adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>). Deben ser las mismas que las usadas en la pre-firma.
-     * @param signature Resultado de la firma PKCS#1 v1.5 de los datos de la pre-firma.
-     * @param signedAttributes Resultado de la pre-firma CAdES/PAdES (atributos CAdES a firmar)
-     * @param fileID FileID del PDF generado en la pre-firma
-     * @param signTime  Momento de la firma (debe ser el mismo que el usado en la pre-firma).
+     * @param pkcs1Signature Resultado de la firma PKCS#1 v1.5 de los datos de la pre-firma.
+     * @param preSign Resultado de la pre-firma
      * @param enhancer Manejador para la generaci&oacute;n de nuevos modos de firma (con
      * sello de tiempo, archivo longevo, etc.)
      * @param enhancerConfig Configuraci&oacute;n para generar el nuevo modo de firma.
@@ -254,19 +251,50 @@ public final class PAdESTriPhaseSigner {
     public static byte[] postSign(final String digestAlgorithmName,
                     final byte[] inPDF,
                     final X509Certificate[] signerCertificateChain,
-                    final Properties xParams,
-                    final byte[] signature,
-                    final byte[] signedAttributes,
-                    final String fileID,
-                    final Calendar signTime,
+                    final byte[] pkcs1Signature,
+                    final PdfSignResult preSign,
                     final SignEnhancer enhancer,
                     final Properties enhancerConfig) throws AOException, IOException, NoSuchAlgorithmException {
+
+    	// Obtenemos la firma
+    	final PdfSignResult completePdfSSignature = generatePdfSignature(
+    		digestAlgorithmName,
+    		signerCertificateChain,
+    		preSign.getExtraParams(),
+    		pkcs1Signature,
+    		preSign.getSign(),
+    		preSign.getFileID(),
+    		preSign.getSignTime(),
+    		enhancer,
+    		enhancerConfig
+		);
+
+        // Insertamos la firma en el PDF
+        return insertSignatureOnPdf(
+    		inPDF,
+    		signerCertificateChain,
+    		completePdfSSignature
+		);
+
+    }
+
+    private static PdfSignResult generatePdfSignature(final String digestAlgorithmName,
+                                               final X509Certificate[] signerCertificateChain,
+                                               final Properties xParams,
+                                               final byte[] pkcs1Signature,
+                                               final byte[] signedAttributes,
+                                               final String pdfFileId,
+                                               final Calendar signingTime,
+                                               final SignEnhancer enhancer,
+                                               final Properties enhancerConfig) throws AOException,
+                                                                                       IOException,
+                                                                                       NoSuchAlgorithmException {
 
         byte[] completeCAdESSignature = CAdESTriPhaseSigner.postSign(
     		AOSignConstants.getDigestAlgorithmName(digestAlgorithmName),
     		null,
     		signerCertificateChain,
-    		signature,
+    		pkcs1Signature,
     		signedAttributes
 		);
 
@@ -316,21 +344,29 @@ public final class PAdESTriPhaseSigner {
         }
         //************** FIN SELLO DE TIEMPO ****************
 
+        return new PdfSignResult(pdfFileId, completeCAdESSignature, signingTime, xParams);
+
+    }
+
+    private static byte[] insertSignatureOnPdf(final byte[] inPdf,
+    		                                   final X509Certificate[] signerCertificateChain,
+    		                                   final PdfSignResult signature) throws AOException, IOException {
+
         final byte[] outc = new byte[CSIZE];
 
-        if (completeCAdESSignature.length > CSIZE) {
+        if (signature.getSign().length > CSIZE) {
         	throw new AOException(
-    			"El tamano de la firma (" + completeCAdESSignature.length + ") supera el maximo permitido para un PDF (" + CSIZE + ")" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    			"El tamano de la firma (" + signature.getSign().length + ") supera el maximo permitido para un PDF (" + CSIZE + ")" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			);
         }
 
         final PdfDictionary dic2 = new PdfDictionary();
-        System.arraycopy(completeCAdESSignature, 0, outc, 0, completeCAdESSignature.length);
+        System.arraycopy(signature.getSign(), 0, outc, 0, signature.getSign().length);
         dic2.put(PdfName.CONTENTS, new PdfString(outc).setHexWriting(true));
 
         final PdfTriPhaseSession pts;
 		try {
-			pts = PdfSessionManager.getSessionData(inPDF, signerCertificateChain, signTime, extraParams);
+			pts = PdfSessionManager.getSessionData(inPdf, signerCertificateChain, signature.getSignTime(), signature.getExtraParams());
 		}
 		catch (final DocumentException e1) {
 			throw new IOException(e1);
@@ -348,41 +384,11 @@ public final class PAdESTriPhaseSigner {
 	        throw new AOException("Error al cerrar el PDF para finalizar el proceso de firma", e); //$NON-NLS-1$
 	    }
 
-	    final byte[] ret = new String(baos.toByteArray(), "ISO-8859-1").replace(badFileID, fileID).getBytes("ISO-8859-1"); //$NON-NLS-1$ //$NON-NLS-2$
+	    final byte[] ret = new String(baos.toByteArray(), "ISO-8859-1").replace(badFileID, signature.getFileID()).getBytes("ISO-8859-1"); //$NON-NLS-1$ //$NON-NLS-2$
 
 	    baos.close();
 
 	    return ret;
-    }
-
-    /** Resultado de una pre-firma (como primera parte de un firma trif&aacute;sica) PAdES. */
-    /** <i>JavaBean</i> que encapsula los resultados de la pre-firma PDF. */
-    public static class PdfPreSignResult {
-
-        private final String fileID;
-        private final byte[] preSign;
-
-        PdfPreSignResult(final String pdfFileId, final byte[] preSignature) {
-            if (pdfFileId == null || preSignature == null || "".equals(pdfFileId) || preSignature.length < 1) { //$NON-NLS-1$
-                throw new IllegalArgumentException("Es obligatorio proporcionar un MAC y una pre-firma"); //$NON-NLS-1$
-            }
-            this.fileID = pdfFileId;
-            this.preSign = preSignature.clone();
-        }
-
-        /** Obtiene el FileID (<i>/ID</i>) del diccionario PDF generado.
-         * @return FileID del diccionario PDF generado
-         */
-        public String getFileID() {
-            return this.fileID;
-        }
-
-        /** Obtiene los atributos CAdES a firmar.
-         * @return Atributos CAdES a firmar (pre-firma) */
-        public byte[] getPreSign() {
-            return this.preSign;
-        }
-
     }
 
 }

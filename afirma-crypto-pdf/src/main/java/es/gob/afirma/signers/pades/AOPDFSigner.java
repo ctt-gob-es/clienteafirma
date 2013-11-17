@@ -17,7 +17,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.Properties;
@@ -42,7 +41,6 @@ import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
-import es.gob.afirma.signers.pades.PAdESTriPhaseSigner.PdfPreSignResult;
 
 /** Manejador de firmas binarias de ficheros Adobe PDF en formato PAdES.
  * <p>Para compatibilidad estricta con PAdES-BES/EPES se utiliza <i>ETSI.CAdES.detached</i> como nombre del subfiltro.</p>
@@ -108,7 +106,6 @@ public final class AOPDFSigner implements AOSigner {
      * </ul>
      * @param key Clave privada a usar para firmar
      * @param certChain Cadena de certificados del firmante
-     * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
      * @return Documento PDF firmado en formato PAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     @Override
@@ -122,15 +119,13 @@ public final class AOPDFSigner implements AOSigner {
 
         checkIText();
 
-        final Calendar signingTime = new GregorianCalendar();
-
-        final PdfPreSignResult pre;
+        final PdfSignResult pre;
         try {
 			pre = PAdESTriPhaseSigner.preSign(
 				algorithm,
 				data,
 				(X509Certificate[]) certChain,
-				signingTime,
+				new GregorianCalendar(),
 				extraParams
 			);
 		}
@@ -143,11 +138,8 @@ public final class AOPDFSigner implements AOSigner {
 				algorithm,
 				data,
 				(X509Certificate[]) certChain,
-				extraParams,
-				new AOPkcs1Signer().sign(pre.getPreSign(), algorithm, key, certChain, extraParams),
-				pre.getPreSign(),
-				pre.getFileID(),
-				signingTime,
+				new AOPkcs1Signer().sign(pre.getSign(), algorithm, key, certChain, extraParams),
+				pre,
 				null,
 				null
 			);
