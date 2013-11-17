@@ -15,21 +15,20 @@ import java.util.ResourceBundle;
 
 /** Clase para la obtencion de los recursos textuales del n&uacute;cleo del
  * cliente de firma. */
-final class PDFMessages {
+public final class CommonPdfMessages {
 
-    private static final String BUNDLE_NAME = "pdfmessages"; //$NON-NLS-1$
+    private static final String BUNDLE_NAME = "commonpdfmessages"; //$NON-NLS-1$
 
     private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME, Locale.getDefault());
 
-    private PDFMessages() {
+    private CommonPdfMessages() {
         // No se permite la instanciacion
     }
 
     /** Recupera el texto identificado con la clave proporcionada.
-     * @param key
-     *        Clave del texto.
-     * @return Recuerso textual. */
-    static String getString(final String key) {
+     * @param key Clave del texto.
+     * @return Recueso textual. */
+    public static String getString(final String key) {
         try {
             return RESOURCE_BUNDLE.getString(key);
         }

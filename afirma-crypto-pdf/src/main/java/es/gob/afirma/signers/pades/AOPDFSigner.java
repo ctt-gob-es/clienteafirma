@@ -15,9 +15,10 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -32,6 +33,7 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.signers.AOPkcs1Signer;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
@@ -40,6 +42,7 @@ import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
+import es.gob.afirma.signers.pades.PAdESTriPhaseSigner.PdfPreSignResult;
 
 /** Manejador de firmas binarias de ficheros Adobe PDF en formato PAdES.
  * <p>Para compatibilidad estricta con PAdES-BES/EPES se utiliza <i>ETSI.CAdES.detached</i> como nombre del subfiltro.</p>
@@ -105,207 +108,7 @@ public final class AOPDFSigner implements AOSigner {
      * </ul>
      * @param key Clave privada a usar para firmar
      * @param certChain Cadena de certificados del firmante
-     * @param xParams Par&aacute;metros adicionales para la firma.
-     * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
-     * <dl>
-     *  <dt><b><i>certificationLevel</i></b></dt>
-     *   <dd>
-     *    Nivel de certificaci&oacute;n de la firma PDF.<br>Los valores admitidos son num&eacute;ricos, correspondiendo:
-     *    <ul>
-     *     <li><i>0</i> = Firma ordinaria no certificada (por defecto)</li>
-     *     <li><i>1</i> = Firma de autor. No se permite ning&uacute;n cambio posterior en el documento</li>
-     *     <li><i>2</i> = Firma de autor certificada para formularios. Se permite &uacute;nicamente el relleno posterior de los campos del formulario</li>
-     *     <li><i>3</i> = Firma certificada. Se permite &uacute;nicamente el relleno posterior de los campos del formulario o el a&ntilde;adido de firmas de aprobaci&oacute;n</li>
-     *    </ul>
-     *   </dd>
-     *  <dt><b><i>layer2Text</i></b></dt>
-     *   <dd>
-     *    Texto a escribir dentro de la "capa 2" de la firma visible. Este texto se escribe &uacute;nicamente si no se ha especificado una
-     *    imagen de r&uacute;brica.
-     *   </dd>
-     *  <dt><b><i>layer2FontFamily</i></b></dt>
-     *   <dd>
-     *    Tipo de letra a usar en el texto de la "capa 2" de la firma visible. Este par&aacute;metro requiere que se haya establecido tambi&eacute;n
-     *    el par&aacute;metro <code>layer2Text</code>.<br>Los valores admitidos son num&eacute;ricos, correspondiendo:
-     *    <ul>
-     *     <li><i>0</i> = Courier (tipo por defecto)</li>
-     *     <li><i>1</i> = Helvetica</li>
-     *     <li><i>2</i> = Times Roman</li>
-     *     <li><i>3</i> = Symbol</li>
-     *     <li><i>4</i> = ZapfDingBats</li>
-     *    </ul>
-     *   </dd>
-     *  <dt><b><i>layer2FontSize</i></b></dt>
-     *   <dd>
-     *    Tama&ntilde;o de de letra a usar en el texto de la "capa 2" de la firma visible. Este par&aacute;metro requiere que se haya establecido
-     *    tambi&eacute;n el par&aacute;metro <code>layer2Text</code>.<br>Los valores admitidos son num&eacute;ricos (y el valor por defecto es 12).
-     *   </dd>
-     *  <dt><b><i>layer2FontStyle</i></b></dt>
-     *   <dd>
-     *    Estilo del tipo de letra a usar en el texto de la "capa 2" de la firma visible. Este par&aacute;metro requiere que se haya establecido
-     *    tambi&eacute;n el par&aacute;metro <code>layer2Text</code>.<br>Los valores admitidos son num&eacute;ricos, correspondiendo:
-     *    <ul>
-     *     <li><i>0</i> = Normal (estilo por defecto)</li>
-     *     <li><i>1</i> = Negrita</li>
-     *     <li><i>2</i> = Cursiva</li>
-     *     <li><i>3</i> = Negrita y cursiva</li>
-     *     <li><i>4</i> = Subrayado</li>
-     *     <li><i>8</i> = Tachado</li>
-     *    </ul>
-     *    Es posible combinar estilos aplicando la operaci&oacute;n l&oacute;gica <cite>o</cite> sobre los valores num&eacute;ricos a combinar.
-     *   </dd>
-     *  <dt><b><i>layer2FontColor</i></b></dt>
-     *   <dd>
-     *    Color del texto de la "capa 2" de la firma visible. Este par&aacute;metro requiere que se haya establecido
-     *    tambi&eacute;n el par&aacute;metro <code>layer2Text</code>.<br>Los valores admitidos son textuales (se ignora entre may&uacute;sculas
-     *    y min&uacute;sculas), soport&aacute;ndose:
-     *    <ul>
-     *     <li><i>black</i> = Negro (color por defecto)</li>
-     *     <li><i>white</i> = Blanco</li>
-     *     <li><i>gray</i> = Gris</li>
-     *     <li><i>lightGray</i> = Gris claro</li>
-     *     <li><i>darkGray</i> = Gris oscuro</li>
-     *     <li><i>red</i> = Rojo</li>
-     *     <li><i>pink</i> = Rosa</li>
-     *    </ul>
-     *   </dd>
-     *  <dt><b><i>layer4Text</i></b></dt>
-     *   <dd>
-     *    Texto a escribir dentro de la "capa 4" de la firma visible. Este texto se escribe &uacute;nicamente si no se ha especificado una
-     *    imagen de r&uacute;brica.
-     *   </dd>
-     *  <dt><b><i>signatureSubFilter</i></b></dt>
-     *   <dd>
-     *    Nombre del sub-filtro en el diccionario PDF para indicar el tipo de la firma. Si no se indica este par&aacute;metro por defecto se
-     *    usa <code>adbe.pkcs7.detached</code> (firma PAdES b&aacute;sica).
-     *    Es posible indicar <code>ETSI.CAdES.detached</code> para generar una firma PAdES-BES, si bien el hacerlo puede causar que al a&ntilde;adir firmas adicionales
-     *    al PDF se invaliden las ya existentes.
-     *   </dd>
-     *  <dt><b><i>signatureField</i></b></dt>
-     *   <dd>
-     *    Nombre del campo en donde insertar la firma.
-     *    Si el documento PDF tiene ya un campo de firma precreado es posible utilizarlo para insertar la firma generada, referenci&aacute;ndolo
-     *    por su nombre.<br>
-     *    Si se indica un nombre de campo de firma que no exista en el documento PDF proporcionado, se generar&aacute; una excepci&oacute;n.
-     *   </dd>
-     *  <dt><b><i>signatureRubricImage</i></b></dt>
-     *   <dd>Imagen JPEG codificada en Base64 de la r&uacute;brica de la firma manuscrita que se desea aparezca como firma visible en el PDF.</dd>
-     *  <dt><b><i>signaturePage</i></b></dt>
-     *   <dd>
-     *    P&aacute;gina del documento PDF donde insertar la firma. Puede usarse la constante <code>LAST_PAGE</code>
-     *    para referirse a la &uacute;ltima p&aacute;gina del documento PDF si se desconoce el n&uacute;mero total de
-     *    p&aacute;ginas de este.<br>
-     *    Este par&aacute;metro se ignora si se ha establecido valor al par&aacute;metro <i>signatureField</i> y necesita que se
-     *    establezcan valores v&aacute;lidos a los par&aacute;metros <i>signaturePositionOnPageLowerLeftX</i>, <i>signaturePositionOnPageLowerLeftY</i>,
-     *    <i>signaturePositionOnPageUpperRightX</i> y <i>signaturePositionOnPageUpperRightY</i>.
-     *   </dd>
-     *  <dt><b><i>signaturePositionOnPageLowerLeftX</i></b></dt>
-     *   <dd>
-     *    Coordenada horizontal inferior izquiera de la posici&oacute;n del recuadro visible de la fimra dentro de la p&aacute;gina.<br>
-     *    Es necesario indicar el resto de coordenadas del recuadro mediante los par&aacute;metros <i>signaturePositionOnPageLowerLeftY</i>,
-     *    <i>signaturePositionOnPageUpperRightX</i> y <i>signaturePositionOnPageUpperRightY</i>.<br>
-     *    Si no se indica una p&aacute;gina en el par&aacute;metro <i>signaturePage</i> la firma se inserta en la &uacute;ltima p&aacute;gina
-     *    del documento.
-     *   </dd>
-     *  <dt><b><i>signaturePositionOnPageLowerLeftY</i></b></dt>
-     *   <dd>
-     *    Coordenada vertical inferior izquiera de la posici&oacute;n del recuadro visible de la fimra dentro de la p&aacute;gina.<br>
-     *    Es necesario indicar el resto de coordenadas del recuadro mediante los par&aacute;metros <i>signaturePositionOnPageLowerLeftX</i>,
-     *    <i>signaturePositionOnPageUpperRightX</i> y <i>signaturePositionOnPageUpperRightY</i>.<br>
-     *    Si no se indica una p&aacute;gina en el par&aacute;metro <i>signaturePage</i> la firma se inserta en la &uacute;ltima p&aacute;gina
-     *    del documento.
-     *   </dd>
-     *  <dt><b><i>signaturePositionOnPageUpperRightX</i></b></dt>
-     *   <dd>
-     *    Coordenada horizontal superior derecha de la posici&oacute;n del recuadro visible de la fimra dentro de la p&aacute;gina.<br>
-     *    Es necesario indicar el resto de coordenadas del recuadro mediante los par&aacute;metros <i>signaturePositionOnPageLowerLeftX</i>,
-     *    <i>signaturePositionOnPageLowerLeftY</i> y <i>signaturePositionOnPageUpperRightY</i>.<br>
-     *    Si no se indica una p&aacute;gina en el par&aacute;metro <i>signaturePage</i> la firma se inserta en la &uacute;ltima p&aacute;gina
-     *    del documento.
-     *   </dd>
-     *  <dt><b><i>signaturePositionOnPageUpperRightY</i></b></dt>
-     *   <dd>
-     *    Coordenada vertical superior derecha de la posici&oacute;n del recuadro visible de la fimra dentro de la p&aacute;gina.<br>
-     *    Es necesario indicar el resto de coordenadas del recuadro mediante los par&aacute;metros <i>signaturePositionOnPageLowerLeftX</i>,
-     *    <i>signaturePositionOnPageLowerLeftY</i> y <i>signaturePositionOnPageUpperRightX</i>.<br>
-     *    Si no se indica una p&aacute;gina en el par&aacute;metro <i>signaturePage</i> la firma se inserta en la &uacute;ltima p&aacute;gina
-     *    del documento.
-     *   </dd>
-     *  <dt><b><i>applySystemDate</i></b></dt>
-     *   <dd><code>true</code> si se desea usar la hora y fecha del sistema como hora y fecha de firma, <code>false</code> en caso contrario.
-     *  <dt><b><i>signReason</i></b></dt>
-     *   <dd>Raz&oacute;n por la que se realiza la firma (este dato se a&ntilde;ade al diccionario PDF, y no a la propia firma).</dd>
-     *  <dt><b><i>signatureProductionCity</i></b></dt>
-     *   <dd>Ciudad en la que se realiza la firma (este dato se a&ntilde;ade al diccionario PDF, y no a la propia firma).</dd>
-     *  <dt><b><i>signerContact</i></b></dt>
-     *   <dd>
-     *    Contacto del firmante, usualmente una direcci&oacute;n de coreo electr&oacute;nico
-     *    (este dato se a&ntilde;ade al diccionario PDF, y no a la propia firma).
-     *   </dd>
-     *  <dt><b><i>policyIdentifier</i></b></dt>
-     *   <dd>
-     *    Identificador de la pol&iacute;tica de firma. Debe ser un OID (o una URN de tipo OID) que identifique
-     *    &uacute;nivocamente la pol&iacute;tica en formato ASN.1 procesable.
-     *   </dd>
-     *  <dt><b><i>policyIdentifierHash</i></b></dt>
-     *   <dd>
-     *    Huella digital del documento de pol&iacute;tica de firma (normalmente del mismo fichero en formato ASN.1 procesable).
-     *    Si no se indica una huella digital y el par&aacute;metro <code>policyIdentifier</code> no es una URL accesible
-     *    universalmente se usar&aacute; <code>0</code>, mientras que si no se indica una huella digital pero el par&aacute;metro
-     *    <code>policyIdentifier</code> es una URL accesible universalmente, se descargara el fichero apuntado por la URL para calcular la huella
-     *    digital <i>al vuelo</i>.
-     *   </dd>
-     *  <dt><b><i>policyIdentifierHashAlgorithm</i></b></dt>
-     *   <dd>
-     *    Algoritmo usado para el c&aacute;lculo de la huella digital indicada en el par&aacute;metro <code>policyIdentifierHash</code>.
-     *    Es obligario indicarlo cuando se proporciona una huella digital distinta de <code>0</code>.
-     *   </dd>
-     *  <dt><b><i>policyQualifier</i></b></dt>
-     *   <dd>
-     *    URL que apunta al documento descriptivo de la pol&iacute;tica de firma (normalmente un documento PDF con una descripci&oacute;n textual).
-     *   </dd>
-     *  <dt><b><i>ownerPassword</i></b></dt>
-     *   <dd>
-     *    Contrase&ntilde;a de apertura del PDF (contrase&ntilde;a del propietario) si este estaba cifrado.<br>
-     *    No se soporta la firma de documentos PDF cifrados con certificados o con algoritmo AES256.
-     *   </dd>
-     *  <dt><b><i>headLess</i></b></dt>
-     *   <dd>
-     *    Evita cualquier interacci&oacute;n con el usuario si se establece a <code>true</code>, si no se establece o se establece a <code>false</code>
-     *    act&uacute;a normalmente (puede mostrar di&aacute;logos, por ejemplo, para solicitar las contrase&ntilde;as de los PDF cifrados). &Uacute;til para
-     *    los procesos desatendidos y por lotes
-     *   </dd>
-     *  <dt><b><i>avoidEncryptingSignedPdfs</i></b></dt>
-     *   <dd>
-     *    Si se establece a <code>true</code> no cifra los PDF firmados aunque el original estuviese firmado, si no se establece o se establece a
-     *    <code>false</code> los PDF se cifran tras firmarse si el original lo estaba, usando la misma contrase&ntilde;a y opciones que este
-     *   </dd>
-     *  <dt><b><i>allowSigningCertifiedPdfs</i></b></dt>
-     *   <dd>
-     *    Si se establece a <code>true</code> permite la firma o cofirma de PDF certificados sin consultarlo al usuario, si se establece a
-     *    <code>false</code> o cualquier otro valor se lanza una excepci&oacute;n en caso de intentar firmar o cofirmar un PDF certificado y
-     *    si no se establece se mostrar&aacute; un di&aacute;logo al usuario para que confirme que desea realizar la firma a pesar de que
-     *    el resultado ser&aacute;n una firma no v&aacute;lida.<br>
-     *    <b>Si el par&aacute;metro <code>headLess</code> est&aacute; establecido a <code>true</code>, no podr&aacute; mostrar el di&aacute;logo
-     *    de confirmaci&oacute;n as&iacute; que llegados a este punto se lanzar&aacute; una excepci&oacute;n.</b><br>
-     *    No se soporta el cifrado de documentos PDF con certificados o con algoritmo AES256.
-     *   </dd>
-     *  <dt><b><i>tsaURL</i></b></dt>
-     *   <dd>URL de la autoridad de sello de tiempo (si no se indica no se a&ntilde;ade sello de tiempo).</dd>
-     *  <dt><b><i>tsaPolicy</i></b></dt>
-     *   <dd>Pol&iacute;tica de sellado de tiempo (obligatoria si se indica <code>tsaURL</code>).</dd>
-     *  <dt><b><i>tsaHashAlgorithm</i></b></dt>
-     *   <dd>Algoritmo de huella digital a usar para el sello de tiempo (si no se establece se usa SHA-1).</dd>
-     *  <dt><b><i>tsaRequireCert</i></b></dt>
-     *   <dd><code>true</code> si se requiere el certificado de la TSA, false en caso contrario (si no se establece se asume <code>true</code>).</dd>
-     *  <dt><b><i>tsaUsr</i></b></dt>
-     *   <dd>Nombre de usuario de la TSA.</dd>
-     *  <dt><b><i>tsaPwd</i></b></dt>
-     *   <dd>Contrase&ntilde;a del usuario de la TSA. Se ignora si no de ha establecido adem&aacute;s <code>tsaUsr</code>.</dd>
-     *  <dt><b><i>signingCertificateV2</i></b></dt>
-     *   <dd>Si se indica a {@code true} se utilizar SigningCertificateV2, si se indica cualquier otra cosa SigningCertificateV1.
-     *   Si no se indica nada, se utilizar&aacute; V1 para las firmas SHA1 y V2 para el resto.</dd>
-     * </dl>
+     * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
      * @return Documento PDF firmado en formato PAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     @Override
@@ -319,35 +122,40 @@ public final class AOPDFSigner implements AOSigner {
 
         checkIText();
 
+        final Calendar signingTime = new GregorianCalendar();
+
+        final PdfPreSignResult pre;
         try {
-            return PAdESSigner.signPDF(key, certChain, data, extraParams, algorithm);
-        }
-        catch (final  com.lowagie.text.exceptions.InvalidPdfException e) {
-        	throw new InvalidPdfException(e);
-        }
-        catch (final CertificateException e) {
-            throw new AOException("Error en el certificado de firma: " + e, e); //$NON-NLS-1$
-        }
-        catch (final NoSuchAlgorithmException e) {
-        	throw new AOException("Error el en algoritmo de firma: " + e, e); //$NON-NLS-1$
+			pre = PAdESTriPhaseSigner.preSign(
+				algorithm,
+				data,
+				(X509Certificate[]) certChain,
+				signingTime,
+				extraParams
+			);
 		}
-        catch (final DocumentException e) {
-        	throw new AOException("Error en el tratamiento del PDF: " + e, e); //$NON-NLS-1$
+        catch (final DocumentException e1) {
+			throw new InvalidPdfException(e1);
 		}
-        catch(final PdfIsPasswordProtectedException e) {
-        	// El PDF se puede abrir sin contrasena pero la necesita para poder firmarse,
-        	// asi que solicitamos una contrasena al usuario
-        	// Esto no se hace dentro del propio metodo de firma porque la proteccion se comprueba
-        	// al crear la firma, y el documento ya esta abierto sin contrasena
-            // Comprobamos que el signer esta en modo interactivo, y si no lo
-            // esta no pedimos contrasena por dialogo, principalmente para no interrumpir un firmado por lotes
-            // desatendido
-            if (Boolean.TRUE.toString().equalsIgnoreCase(extraParams.getProperty("headLess"))) { //$NON-NLS-1$
-                throw new BadPdfPasswordException(e);
-            }
-        	extraParams.put("userPassword", new String(AOUIFactory.getPassword(PDFMessages.getString("AOPDFSigner.0"), null))); //$NON-NLS-1$ //$NON-NLS-2$)
-        	return sign(data, algorithm, key, certChain, extraParams);
-        }
+
+        try {
+			return PAdESTriPhaseSigner.postSign(
+				algorithm,
+				data,
+				(X509Certificate[]) certChain,
+				extraParams,
+				new AOPkcs1Signer().sign(pre.getPreSign(), algorithm, key, certChain, extraParams),
+				pre.getPreSign(),
+				pre.getFileID(),
+				signingTime,
+				null,
+				null
+			);
+		}
+        catch (final NoSuchAlgorithmException e1) {
+			throw new AOException("Error el en algoritmo de firma: " + e1, e1); //$NON-NLS-1$
+		}
+
     }
 
     /** A&ntilde;ade una firma PAdES a un documento PDF. El comportamiento es exactamente el mismo que una llamada al m&eacute;todo <code>sign(...)</code>
@@ -386,207 +194,7 @@ public final class AOPDFSigner implements AOSigner {
      * </ul>
      * @param key Clave privada a usar para firmar
      * @param certChain Cadena de certificados del firmante
-     * @param extraParams Par&aacute;metros adicionales para la firma.
-     * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>extraParams</code>:</p>
-     * <dl>
-     *  <dt><b><i>certificationLevel</i></b></dt>
-     *   <dd>
-     *    Nivel de certificaci&oacute;n de la firma PDF.<br>Los valores admitidos son num&eacute;ricos, correspondiendo:
-     *    <ul>
-     *     <li><i>0</i> = Firma ordinaria no certificada (por defecto)</li>
-     *     <li><i>1</i> = Firma de autor. No se permite ning&uacute;n cambio posterior en el documento</li>
-     *     <li><i>2</i> = Firma de autor certificada para formularios. Se permite &uacute;nicamente el relleno posterior de los campos del formulario</li>
-     *     <li><i>3</i> = Firma certificada. Se permite &uacute;nicamente el relleno posterior de los campos del formulario o el a&ntilde;adido de firmas de aprobaci&oacute;n</li>
-     *    </ul>
-     *   </dd>
-     *  <dt><b><i>layer2Text</i></b></dt>
-     *   <dd>
-     *    Texto a escribir dentro de la "capa 2" de la firma visible. Este texto se escribe &uacute;nicamente si no se ha especificado una
-     *    imagen de r&uacute;brica.
-     *   </dd>
-     *  <dt><b><i>layer2FontFamily</i></b></dt>
-     *   <dd>
-     *    Tipo de letra a usar en el texto de la "capa 2" de la firma visible. Este par&aacute;metro requiere que se haya establecido tambi&eacute;n
-     *    el par&aacute;metro <code>layer2Text</code>.<br>Los valores admitidos son num&eacute;ricos, correspondiendo:
-     *    <ul>
-     *     <li><i>0</i> = Courier (tipo por defecto)</li>
-     *     <li><i>1</i> = Helvetica</li>
-     *     <li><i>2</i> = Times Roman</li>
-     *     <li><i>3</i> = Symbol</li>
-     *     <li><i>4</i> = ZapfDingBats</li>
-     *    </ul>
-     *   </dd>
-     *  <dt><b><i>layer2FontSize</i></b></dt>
-     *   <dd>
-     *    Tama&ntilde;o de de letra a usar en el texto de la "capa 2" de la firma visible. Este par&aacute;metro requiere que se haya establecido
-     *    tambi&eacute;n el par&aacute;metro <code>layer2Text</code>.<br>Los valores admitidos son num&eacute;ricos (y el valor por defecto es 12).
-     *   </dd>
-     *  <dt><b><i>layer2FontStyle</i></b></dt>
-     *   <dd>
-     *    Estilo del tipo de letra a usar en el texto de la "capa 2" de la firma visible. Este par&aacute;metro requiere que se haya establecido
-     *    tambi&eacute;n el par&aacute;metro <code>layer2Text</code>.<br>Los valores admitidos son num&eacute;ricos, correspondiendo:
-     *    <ul>
-     *     <li><i>0</i> = Normal (estilo por defecto)</li>
-     *     <li><i>1</i> = Negrita</li>
-     *     <li><i>2</i> = Cursiva</li>
-     *     <li><i>3</i> = Negrita y cursiva</li>
-     *     <li><i>4</i> = Subrayado</li>
-     *     <li><i>4</i> = Tachado</li>
-     *    </ul>
-     *    Es posible combinar estilos aplicando la operaci&oacute;n l&oacute;gica <cite>o</cite> sobre los valores num&eacute;ricos a combinar.
-     *   </dd>
-     *  <dt><b><i>layer2FontColor</i></b></dt>
-     *   <dd>
-     *    Color del texto de la "capa 2" de la firma visible. Este par&aacute;metro requiere que se haya establecido
-     *    tambi&eacute;n el par&aacute;metro <code>layer2Text</code>.<br>Los valores admitidos son textuales (se ignora entre may&uacute;sculas
-     *    y min&uacute;sculas), soport&aacute;ndose:
-     *    <ul>
-     *     <li><i>black</i> = Negro (color por defecto)</li>
-     *     <li><i>white</i> = Blanco</li>
-     *     <li><i>gray</i> = Gris</li>
-     *     <li><i>lightGray</i> = Gris claro</li>
-     *     <li><i>darkGray</i> = Gris oscuro</li>
-     *     <li><i>red</i> = Rojo</li>
-     *     <li><i>pink</i> = Rosa</li>
-     *    </ul>
-     *   </dd>
-     *  <dt><b><i>layer4Text</i></b></dt>
-     *   <dd>
-     *    Texto a escribir dentro de la "capa 4" de la firma visible. Este texto se escribe &uacute;nicamente si no se ha especificado una
-     *    imagen de r&uacute;brica.
-     *   </dd>
-     *  <dt><b><i>signatureSubFilter</i></b></dt>
-     *   <dd>
-     *    Nombre del sub-filtro en el diccionario PDF para indicar el tipo de la firma. Si no se indica este par&aacute;metro por defecto se
-     *    usa <code>adbe.pkcs7.detached</code> (firma PAdES b&aacute;sica).
-     *    Es posible indicar <code>ETSI.CAdES.detached</code> para generar una firma PAdES-BES, si bien el hacerlo puede causar que al a&ntilde;adir firmas adicionales
-     *    al PDF se invaliden las ya existentes.
-     *   </dd>
-     *  <dt><b><i>signatureField</i></b></dt>
-     *   <dd>
-     *    Nombre del campo en donde insertar la firma.
-     *    Si el documento PDF tiene ya un campo de firma precreado es posible utilizarlo para insertar la firma generada, referenci&aacute;ndolo
-     *    por su nombre.<br>
-     *    Si se indica un nombre de campo de firma que no exista en el documento PDF proporcionado, se generar&aacute; una excepci&oacute;n.
-     *   </dd>
-     *  <dt><b><i>signatureRubricImage</i></b></dt>
-     *   <dd>Imagen JPEG codificada en Base64 de la r&uacute;brica de la firma manuscrita que se desea aparezca como firma visible en el PDF.</dd>
-     *  <dt><b><i>signaturePage</i></b></dt>
-     *   <dd>
-     *    P&aacute;gina del documento PDF donde insertar la firma. Puede usarse la constante <code>LAST_PAGE</code>
-     *    para referirse a la &uacute;ltima p&aacute;gina del documento PDF si se desconoce el n&uacute;mero total de
-     *    p&aacute;ginas de este.<br>
-     *    Este par&aacute;metro se ignora si se ha establecido valor al par&aacute;metro <i>signatureField</i> y necesita que se
-     *    establezcan valores v&aacute;lidos a los par&aacute;metros <i>signaturePositionOnPageLowerLeftX</i>, <i>signaturePositionOnPageLowerLeftY</i>,
-     *    <i>signaturePositionOnPageUpperRightX</i> y <i>signaturePositionOnPageUpperRightY</i>.
-     *   </dd>
-     *  <dt><b><i>signaturePositionOnPageLowerLeftX</i></b></dt>
-     *   <dd>
-     *    Coordenada horizontal inferior izquiera de la posici&oacute;n del recuadro visible de la fimra dentro de la p&aacute;gina.<br>
-     *    Es necesario indicar el resto de coordenadas del recuadro mediante los par&aacute;metros <i>signaturePositionOnPageLowerLeftY</i>,
-     *    <i>signaturePositionOnPageUpperRightX</i> y <i>signaturePositionOnPageUpperRightY</i>.<br>
-     *    Si no se indica una p&aacute;gina en el par&aacute;metro <i>signaturePage</i> la firma se inserta en la &uacute;ltima p&aacute;gina
-     *    del documento.
-     *   </dd>
-     *  <dt><b><i>signaturePositionOnPageLowerLeftY</i></b></dt>
-     *   <dd>
-     *    Coordenada vertical inferior izquiera de la posici&oacute;n del recuadro visible de la fimra dentro de la p&aacute;gina.<br>
-     *    Es necesario indicar el resto de coordenadas del recuadro mediante los par&aacute;metros <i>signaturePositionOnPageLowerLeftX</i>,
-     *    <i>signaturePositionOnPageUpperRightX</i> y <i>signaturePositionOnPageUpperRightY</i>.<br>
-     *    Si no se indica una p&aacute;gina en el par&aacute;metro <i>signaturePage</i> la firma se inserta en la &uacute;ltima p&aacute;gina
-     *    del documento.
-     *   </dd>
-     *  <dt><b><i>signaturePositionOnPageUpperRightX</i></b></dt>
-     *   <dd>
-     *    Coordenada horizontal superior derecha de la posici&oacute;n del recuadro visible de la fimra dentro de la p&aacute;gina.<br>
-     *    Es necesario indicar el resto de coordenadas del recuadro mediante los par&aacute;metros <i>signaturePositionOnPageLowerLeftX</i>,
-     *    <i>signaturePositionOnPageLowerLeftY</i> y <i>signaturePositionOnPageUpperRightY</i>.<br>
-     *    Si no se indica una p&aacute;gina en el par&aacute;metro <i>signaturePage</i> la firma se inserta en la &uacute;ltima p&aacute;gina
-     *    del documento.
-     *   </dd>
-     *  <dt><b><i>signaturePositionOnPageUpperRightY</i></b></dt>
-     *   <dd>
-     *    Coordenada vertical superior derecha de la posici&oacute;n del recuadro visible de la fimra dentro de la p&aacute;gina.<br>
-     *    Es necesario indicar el resto de coordenadas del recuadro mediante los par&aacute;metros <i>signaturePositionOnPageLowerLeftX</i>,
-     *    <i>signaturePositionOnPageLowerLeftY</i> y <i>signaturePositionOnPageUpperRightX</i>.<br>
-     *    Si no se indica una p&aacute;gina en el par&aacute;metro <i>signaturePage</i> la firma se inserta en la &uacute;ltima p&aacute;gina
-     *    del documento.
-     *   </dd>
-     *  <dt><b><i>applySystemDate</i></b></dt>
-     *   <dd><code>true</code> si se desea usar la hora y fecha del sistema como hora y fecha de firma, <code>false</code> en caso contrario.
-     *  <dt><b><i>signReason</i></b></dt>
-     *   <dd>Raz&oacute;n por la que se realiza la firma (este dato se a&ntilde;ade al diccionario PDF, y no a la propia firma).</dd>
-     *  <dt><b><i>signatureProductionCity</i></b></dt>
-     *   <dd>Ciudad en la que se realiza la firma (este dato se a&ntilde;ade al diccionario PDF, y no a la propia firma).</dd>
-     *  <dt><b><i>signerContact</i></b></dt>
-     *   <dd>
-     *    Contacto del firmante, usualmente una direcci&oacute;n de coreo electr&oacute;nico
-     *    (este dato se a&ntilde;ade al diccionario PDF, y no a la propia firma).
-     *   </dd>
-     *  <dt><b><i>policyIdentifier</i></b></dt>
-     *   <dd>
-     *    Identificador de la pol&iacute;tica de firma. Debe ser un OID (o una URN de tipo OID) que identifique
-     *    &uacute;nivocamente la pol&iacute;tica en formato ASN.1 procesable.
-     *   </dd>
-     *  <dt><b><i>policyIdentifierHash</i></b></dt>
-     *   <dd>
-     *    Huella digital del documento de pol&iacute;tica de firma (normalmente del mismo fichero en formato ASN.1 procesable).
-     *    Si no se indica una huella digital y el par&aacute;metro <code>policyIdentifier</code> no es una URL accesible
-     *    universalmente se usar&aacute; <code>0</code>, mientras que si no se indica una huella digital pero el par&aacute;metro
-     *    <code>policyIdentifier</code> es una URL accesible universalmente, se descargara el fichero apuntado por la URL para calcular la huella
-     *    digital <i>al vuelo</i>.
-     *   </dd>
-     *  <dt><b><i>policyIdentifierHashAlgorithm</i></b></dt>
-     *   <dd>
-     *    Algoritmo usado para el c&aacute;lculo de la huella digital indicada en el par&aacute;metro <code>policyIdentifierHash</code>.
-     *    Es obligario indicarlo cuando se proporciona una huella digital distinta de <code>0</code>.
-     *   </dd>
-     *  <dt><b><i>policyQualifier</i></b></dt>
-     *   <dd>
-     *    URL que apunta al documento descriptivo de la pol&iacute;tica de firma (normalmente un documento PDF con una descripci&oacute;n textual).
-     *   </dd>
-     *  <dt><b><i>ownerPassword</i></b></dt>
-     *   <dd>
-     *    Contrase&ntilde;a de apertura del PDF (contrase&ntilde;a del propietario) si este estaba cifrado.<br>
-     *    No se soporta la firma de documentos PDF cifrados con certificados o con algoritmo AES256.
-     *   </dd>
-     *  <dt><b><i>headLess</i></b></dt>
-     *   <dd>
-     *    Evita cualquier interacci&oacute;n con el usuario si se establece a <code>true</code>, si no se establece o se establece a <code>false</code>
-     *    act&uacute;a normalmente (puede mostrar di&aacute;logos, por ejemplo, para solicitar las contrase&ntilde;as de los PDF cifrados). &Uacute;til para
-     *    los procesos desatendidos y por lotes
-     *   </dd>
-     *  <dt><b><i>avoidEncryptingSignedPdfs</i></b></dt>
-     *   <dd>
-     *    Si se establece a <code>true</code> no cifra los PDF firmados aunque el original estuviese firmado, si no se establece o se establece a
-     *    <code>false</code> los PDF se cifran tras firmarse si el original lo estaba, usando la misma contrase&ntilde;a y opciones que este
-     *   </dd>
-     *  <dt><b><i>allowSigningCertifiedPdfs</i></b></dt>
-     *   <dd>
-     *    Si se establece a <code>true</code> permite la firma o cofirma de PDF certificados sin consultarlo al usuario, si se establece a
-     *    <code>false</code> o cualquier otro valor se lanza una excepci&oacute;n en caso de intentar firmar o cofirmar un PDF certificado y
-     *    si no se establece se mostrar&aacute; un di&aacute;logo al usuario para que confirme que desea realizar la firma a pesar de que
-     *    el resultado ser&aacute;n una firma no v&aacute;lida.<br>
-     *    <b>Si el par&aacute;metro <code>headLess</code> est&aacute; establecido a <code>true</code>, no podr&aacute; mostrar el di&aacute;logo
-     *    de confirmaci&oacute;n as&iacute; que llegados a este punto se lanzar&aacute; una excepci&oacute;n.</b><br>
-     *    No se soporta el cifrado de documentos PDF con certificados o con algoritmo AES256.
-     *   </dd>
-     *  <dt><b><i>tsaURL</i></b></dt>
-     *   <dd>URL de la autoridad de sello de tiempo (si no se indica no se a&ntilde;ade sello de tiempo).</dd>
-     *  <dt><b><i>tsaPolicy</i></b></dt>
-     *   <dd>Pol&iacute;tica de sellado de tiempo (obligatoria si se indica <code>tsaURL</code>).</dd>
-     *  <dt><b><i>tsaHashAlgorithm</i></b></dt>
-     *   <dd>Algoritmo de huella digital a usar para el sello de tiempo (si no se establece se usa SHA-1).</dd>
-     *  <dt><b><i>tsaRequireCert</i></b></dt>
-     *   <dd><code>true</code> si se requiere el certificado de la TSA, false en caso contrario (si no se establece se asume <code>true</code>).</dd>
-     *  <dt><b><i>tsaUsr</i></b></dt>
-     *   <dd>Nombre de usuario de la TSA.</dd>
-     *  <dt><b><i>tsaPwd</i></b></dt>
-     *   <dd>Contrase&ntilde;a del usuario de la TSA. Se ignora si no de ha establecido adem&aacute;s <code>tsaUsr</code>.</dd>
-     *  <dt><b><i>signingCertificateV2</i></b></dt>
-     *   <dd>Si se indica a {@code true} se utilizar SigningCertificateV2, si se indica cualquier otra cosa SigningCertificateV1.
-     *   Si no se indica nada, se utilizar&aacute; V1 para las firmas SHA1 y V2 para el resto.</dd>
-     * </dl>
+     * @param extraParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
      * @return Documento PDF firmado en formato PAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso
      * @throws IOException */
@@ -635,207 +243,7 @@ public final class AOPDFSigner implements AOSigner {
      * </ul>
      * @param key Clave privada a usar para firmar
      * @param certChain Cadena de certificados del firmante
-     * @param extraParams Par&aacute;metros adicionales para la firma.
-     * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>extraParams</code>:</p>
-     * <dl>
-     *  <dt><b><i>certificationLevel</i></b></dt>
-     *   <dd>
-     *    Nivel de certificaci&oacute;n de la firma PDF.<br>Los valores admitidos son num&eacute;ricos, correspondiendo:
-     *    <ul>
-     *     <li><i>0</i> = Firma ordinaria no certificada (por defecto)</li>
-     *     <li><i>1</i> = Firma de autor. No se permite ning&uacute;n cambio posterior en el documento</li>
-     *     <li><i>2</i> = Firma de autor certificada para formularios. Se permite &uacute;nicamente el relleno posterior de los campos del formulario</li>
-     *     <li><i>3</i> = Firma certificada. Se permite &uacute;nicamente el relleno posterior de los campos del formulario o el a&ntilde;adido de firmas de aprobaci&oacute;n</li>
-     *    </ul>
-     *   </dd>
-     *  <dt><b><i>layer2Text</i></b></dt>
-     *   <dd>
-     *    Texto a escribir dentro de la "capa 2" de la firma visible. Este texto se escribe &uacute;nicamente si no se ha especificado una
-     *    imagen de r&uacute;brica.
-     *   </dd>
-     *  <dt><b><i>layer2FontFamily</i></b></dt>
-     *   <dd>
-     *    Tipo de letra a usar en el texto de la "capa 2" de la firma visible. Este par&aacute;metro requiere que se haya establecido tambi&eacute;n
-     *    el par&aacute;metro <code>layer2Text</code>.<br>Los valores admitidos son num&eacute;ricos, correspondiendo:
-     *    <ul>
-     *     <li><i>0</i> = Courier (tipo por defecto)</li>
-     *     <li><i>1</i> = Helvetica</li>
-     *     <li><i>2</i> = Times Roman</li>
-     *     <li><i>3</i> = Symbol</li>
-     *     <li><i>4</i> = ZapfDingBats</li>
-     *    </ul>
-     *   </dd>
-     *  <dt><b><i>layer2FontSize</i></b></dt>
-     *   <dd>
-     *    Tama&ntilde;o de de letra a usar en el texto de la "capa 2" de la firma visible. Este par&aacute;metro requiere que se haya establecido
-     *    tambi&eacute;n el par&aacute;metro <code>layer2Text</code>.<br>Los valores admitidos son num&eacute;ricos (y el valor por defecto es 12).
-     *   </dd>
-     *  <dt><b><i>layer2FontStyle</i></b></dt>
-     *   <dd>
-     *    Estilo del tipo de letra a usar en el texto de la "capa 2" de la firma visible. Este par&aacute;metro requiere que se haya establecido
-     *    tambi&eacute;n el par&aacute;metro <code>layer2Text</code>.<br>Los valores admitidos son num&eacute;ricos, correspondiendo:
-     *    <ul>
-     *     <li><i>0</i> = Normal (estilo por defecto)</li>
-     *     <li><i>1</i> = Negrita</li>
-     *     <li><i>2</i> = Cursiva</li>
-     *     <li><i>3</i> = Negrita y cursiva</li>
-     *     <li><i>4</i> = Subrayado</li>
-     *     <li><i>4</i> = Tachado</li>
-     *    </ul>
-     *    Es posible combinar estilos aplicando la operaci&oacute;n l&oacute;gica <cite>o</cite> sobre los valores num&eacute;ricos a combinar.
-     *   </dd>
-     *  <dt><b><i>layer2FontColor</i></b></dt>
-     *   <dd>
-     *    Color del texto de la "capa 2" de la firma visible. Este par&aacute;metro requiere que se haya establecido
-     *    tambi&eacute;n el par&aacute;metro <code>layer2Text</code>.<br>Los valores admitidos son textuales (se ignora entre may&uacute;sculas
-     *    y min&uacute;sculas), soport&aacute;ndose:
-     *    <ul>
-     *     <li><i>black</i> = Negro (color por defecto)</li>
-     *     <li><i>white</i> = Blanco</li>
-     *     <li><i>gray</i> = Gris</li>
-     *     <li><i>lightGray</i> = Gris claro</li>
-     *     <li><i>darkGray</i> = Gris oscuro</li>
-     *     <li><i>red</i> = Rojo</li>
-     *     <li><i>pink</i> = Rosa</li>
-     *    </ul>
-     *   </dd>
-     *  <dt><b><i>layer4Text</i></b></dt>
-     *   <dd>
-     *    Texto a escribir dentro de la "capa 4" de la firma visible. Este texto se escribe &uacute;nicamente si no se ha especificado una
-     *    imagen de r&uacute;brica.
-     *   </dd>
-     *  <dt><b><i>signatureSubFilter</i></b></dt>
-     *   <dd>
-     *    Nombre del sub-filtro en el diccionario PDF para indicar el tipo de la firma. Si no se indica este par&aacute;metro por defecto se
-     *    usa <code>adbe.pkcs7.detached</code> (firma PAdES b&aacute;sica).
-     *    Es posible indicar <code>ETSI.CAdES.detached</code> para generar una firma PAdES-BES, si bien el hacerlo puede causar que al a&ntilde;adir firmas adicionales
-     *    al PDF se invaliden las ya existentes.
-     *   </dd>
-     *  <dt><b><i>signatureField</i></b></dt>
-     *   <dd>
-     *    Nombre del campo en donde insertar la firma.
-     *    Si el documento PDF tiene ya un campo de firma precreado es posible utilizarlo para insertar la firma generada, referenci&aacute;ndolo
-     *    por su nombre.<br>
-     *    Si se indica un nombre de campo de firma que no exista en el documento PDF proporcionado, se generar&aacute; una excepci&oacute;n.
-     *   </dd>
-     *  <dt><b><i>signatureRubricImage</i></b></dt>
-     *   <dd>Imagen JPEG codificada en Base64 de la r&uacute;brica de la firma manuscrita que se desea aparezca como firma visible en el PDF.</dd>
-     *  <dt><b><i>signaturePage</i></b></dt>
-     *   <dd>
-     *    P&aacute;gina del documento PDF donde insertar la firma. Puede usarse la constante <code>LAST_PAGE</code>
-     *    para referirse a la &uacute;ltima p&aacute;gina del documento PDF si se desconoce el n&uacute;mero total de
-     *    p&aacute;ginas de este.<br>
-     *    Este par&aacute;metro se ignora si se ha establecido valor al par&aacute;metro <i>signatureField</i> y necesita que se
-     *    establezcan valores v&aacute;lidos a los par&aacute;metros <i>signaturePositionOnPageLowerLeftX</i>, <i>signaturePositionOnPageLowerLeftY</i>,
-     *    <i>signaturePositionOnPageUpperRightX</i> y <i>signaturePositionOnPageUpperRightY</i>.
-     *   </dd>
-     *  <dt><b><i>signaturePositionOnPageLowerLeftX</i></b></dt>
-     *   <dd>
-     *    Coordenada horizontal inferior izquiera de la posici&oacute;n del recuadro visible de la fimra dentro de la p&aacute;gina.<br>
-     *    Es necesario indicar el resto de coordenadas del recuadro mediante los par&aacute;metros <i>signaturePositionOnPageLowerLeftY</i>,
-     *    <i>signaturePositionOnPageUpperRightX</i> y <i>signaturePositionOnPageUpperRightY</i>.<br>
-     *    Si no se indica una p&aacute;gina en el par&aacute;metro <i>signaturePage</i> la firma se inserta en la &uacute;ltima p&aacute;gina
-     *    del documento.
-     *   </dd>
-     *  <dt><b><i>signaturePositionOnPageLowerLeftY</i></b></dt>
-     *   <dd>
-     *    Coordenada vertical inferior izquiera de la posici&oacute;n del recuadro visible de la fimra dentro de la p&aacute;gina.<br>
-     *    Es necesario indicar el resto de coordenadas del recuadro mediante los par&aacute;metros <i>signaturePositionOnPageLowerLeftX</i>,
-     *    <i>signaturePositionOnPageUpperRightX</i> y <i>signaturePositionOnPageUpperRightY</i>.<br>
-     *    Si no se indica una p&aacute;gina en el par&aacute;metro <i>signaturePage</i> la firma se inserta en la &uacute;ltima p&aacute;gina
-     *    del documento.
-     *   </dd>
-     *  <dt><b><i>signaturePositionOnPageUpperRightX</i></b></dt>
-     *   <dd>
-     *    Coordenada horizontal superior derecha de la posici&oacute;n del recuadro visible de la fimra dentro de la p&aacute;gina.<br>
-     *    Es necesario indicar el resto de coordenadas del recuadro mediante los par&aacute;metros <i>signaturePositionOnPageLowerLeftX</i>,
-     *    <i>signaturePositionOnPageLowerLeftY</i> y <i>signaturePositionOnPageUpperRightY</i>.<br>
-     *    Si no se indica una p&aacute;gina en el par&aacute;metro <i>signaturePage</i> la firma se inserta en la &uacute;ltima p&aacute;gina
-     *    del documento.
-     *   </dd>
-     *  <dt><b><i>signaturePositionOnPageUpperRightY</i></b></dt>
-     *   <dd>
-     *    Coordenada vertical superior derecha de la posici&oacute;n del recuadro visible de la fimra dentro de la p&aacute;gina.<br>
-     *    Es necesario indicar el resto de coordenadas del recuadro mediante los par&aacute;metros <i>signaturePositionOnPageLowerLeftX</i>,
-     *    <i>signaturePositionOnPageLowerLeftY</i> y <i>signaturePositionOnPageUpperRightX</i>.<br>
-     *    Si no se indica una p&aacute;gina en el par&aacute;metro <i>signaturePage</i> la firma se inserta en la &uacute;ltima p&aacute;gina
-     *    del documento.
-     *   </dd>
-     *  <dt><b><i>applySystemDate</i></b></dt>
-     *   <dd><code>true</code> si se desea usar la hora y fecha del sistema como hora y fecha de firma, <code>false</code> en caso contrario.
-     *  <dt><b><i>signReason</i></b></dt>
-     *   <dd>Raz&oacute;n por la que se realiza la firma (este dato se a&ntilde;ade al diccionario PDF, y no a la propia firma).</dd>
-     *  <dt><b><i>signatureProductionCity</i></b></dt>
-     *   <dd>Ciudad en la que se realiza la firma (este dato se a&ntilde;ade al diccionario PDF, y no a la propia firma).</dd>
-     *  <dt><b><i>signerContact</i></b></dt>
-     *   <dd>
-     *    Contacto del firmante, usualmente una direcci&oacute;n de coreo electr&oacute;nico
-     *    (este dato se a&ntilde;ade al diccionario PDF, y no a la propia firma).
-     *   </dd>
-     *  <dt><b><i>policyIdentifier</i></b></dt>
-     *   <dd>
-     *    Identificador de la pol&iacute;tica de firma. Debe ser un OID (o una URN de tipo OID) que identifique
-     *    &uacute;nivocamente la pol&iacute;tica en formato ASN.1 procesable.
-     *   </dd>
-     *  <dt><b><i>policyIdentifierHash</i></b></dt>
-     *   <dd>
-     *    Huella digital del documento de pol&iacute;tica de firma (normalmente del mismo fichero en formato ASN.1 procesable).
-     *    Si no se indica una huella digital y el par&aacute;metro <code>policyIdentifier</code> no es una URL accesible
-     *    universalmente se usar&aacute; <code>0</code>, mientras que si no se indica una huella digital pero el par&aacute;metro
-     *    <code>policyIdentifier</code> es una URL accesible universalmente, se descargara el fichero apuntado por la URL para calcular la huella
-     *    digital <i>al vuelo</i>.
-     *   </dd>
-     *  <dt><b><i>policyIdentifierHashAlgorithm</i></b></dt>
-     *   <dd>
-     *    Algoritmo usado para el c&aacute;lculo de la huella digital indicada en el par&aacute;metro <code>policyIdentifierHash</code>.
-     *    Es obligario indicarlo cuando se proporciona una huella digital distinta de <code>0</code>.
-     *   </dd>
-     *  <dt><b><i>policyQualifier</i></b></dt>
-     *   <dd>
-     *    URL que apunta al documento descriptivo de la pol&iacute;tica de firma (normalmente un documento PDF con una descripci&oacute;n textual).
-     *   </dd>
-     *  <dt><b><i>ownerPassword</i></b></dt>
-     *   <dd>
-     *    Contrase&ntilde;a de apertura del PDF (contrase&ntilde;a del propietario) si este estaba cifrado.<br>
-     *    No se soporta la firma de documentos PDF cifrados con certificados o con algoritmo AES256.
-     *   </dd>
-     *  <dt><b><i>headLess</i></b></dt>
-     *   <dd>
-     *    Evita cualquier interacci&oacute;n con el usuario si se establece a <code>true</code>, si no se establece o se establece a <code>false</code>
-     *    act&uacute;a normalmente (puede mostrar di&aacute;logos, por ejemplo, para solicitar las contrase&ntilde;as de los PDF cifrados). &Uacute;til para
-     *    los procesos desatendidos y por lotes
-     *   </dd>
-     *  <dt><b><i>avoidEncryptingSignedPdfs</i></b></dt>
-     *   <dd>
-     *    Si se establece a <code>true</code> no cifra los PDF firmados aunque el original estuviese firmado, si no se establece o se establece a
-     *    <code>false</code> los PDF se cifran tras firmarse si el original lo estaba, usando la misma contrase&ntilde;a y opciones que este
-     *   </dd>
-     *  <dt><b><i>allowSigningCertifiedPdfs</i></b></dt>
-     *   <dd>
-     *    Si se establece a <code>true</code> permite la firma o cofirma de PDF certificados sin consultarlo al usuario, si se establece a
-     *    <code>false</code> o cualquier otro valor se lanza una excepci&oacute;n en caso de intentar firmar o cofirmar un PDF certificado y
-     *    si no se establece se mostrar&aacute; un di&aacute;logo al usuario para que confirme que desea realizar la firma a pesar de que
-     *    el resultado ser&aacute;n una firma no v&aacute;lida.<br>
-     *    <b>Si el par&aacute;metro <code>headLess</code> est&aacute; establecido a <code>true</code>, no podr&aacute; mostrar el di&aacute;logo
-     *    de confirmaci&oacute;n as&iacute; que llegados a este punto se lanzar&aacute; una excepci&oacute;n.</b><br>
-     *    No se soporta el cifrado de documentos PDF con certificados o con algoritmo AES256.
-     *   </dd>
-     *  <dt><b><i>tsaURL</i></b></dt>
-     *   <dd>URL de la autoridad de sello de tiempo (si no se indica no se a&ntilde;ade sello de tiempo).</dd>
-     *  <dt><b><i>tsaPolicy</i></b></dt>
-     *   <dd>Pol&iacute;tica de sellado de tiempo (obligatoria si se indica <code>tsaURL</code>).</dd>
-     *  <dt><b><i>tsaHashAlgorithm</i></b></dt>
-     *   <dd>Algoritmo de huella digital a usar para el sello de tiempo (si no se establece se usa SHA-1).</dd>
-     *  <dt><b><i>tsaRequireCert</i></b></dt>
-     *   <dd><code>true</code> si se requiere el certificado de la TSA, false en caso contrario (si no se establece se asume <code>true</code>).</dd>
-     *  <dt><b><i>tsaUsr</i></b></dt>
-     *   <dd>Nombre de usuario de la TSA.</dd>
-     *  <dt><b><i>tsaPwd</i></b></dt>
-     *   <dd>Contrase&ntilde;a del usuario de la TSA. Se ignora si no de ha establecido adem&aacute;s <code>tsaUsr</code>.</dd>
-     *  <dt><b><i>signingCertificateV2</i></b></dt>
-     *   <dd>Si se indica a {@code true} se utilizar SigningCertificateV2, si se indica cualquier otra cosa SigningCertificateV1.
-     *   Si no se indica nada, se utilizar&aacute; V1 para las firmas SHA1 y V2 para el resto.</dd>
-     * </dl>
+     * @param extraParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
      * @return Documento PDF firmado en formato PAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso
      * @throws IOException */
@@ -914,7 +322,7 @@ public final class AOPDFSigner implements AOSigner {
             		sign,
             		new String(
         				AOUIFactory.getPassword(
-    						PDFMessages.getString("AOPDFSigner.0"), //$NON-NLS-1$
+    						CommonPdfMessages.getString("AOPDFSigner.0"), //$NON-NLS-1$
     						null
 						)
 					).getBytes()

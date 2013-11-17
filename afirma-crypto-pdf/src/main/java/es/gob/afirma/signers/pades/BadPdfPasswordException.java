@@ -19,7 +19,9 @@ public class BadPdfPasswordException extends AOException {
 
 	private static final long serialVersionUID = 8754705547567762401L;
 
-	BadPdfPasswordException(final Throwable e) {
+	/** Crea una excepci&oacute;n que indica que el PDF no ha podido abrirse o firmarse por estar protegido por una contrase&ntilde;a.
+	 * @param e Excepci&oacute;n de origen */
+	public BadPdfPasswordException(final Throwable e) {
 		super("La contrasena proporcionada no es valida para el PDF actual o no se proporciono ninguna contrasena", e); //$NON-NLS-1$
 	}
 
