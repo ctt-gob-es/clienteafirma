@@ -16,7 +16,7 @@ import java.net.URI;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
-import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -178,7 +178,7 @@ public final class PAdESTriPhaseSigner {
     public static PdfSignResult preSign(final String digestAlgorithmName,
                                            final byte[] inPDF,
                                            final X509Certificate[] signerCertificateChain,
-                                           final Calendar signTime,
+                                           final GregorianCalendar signTime,
                                            final Properties xParams) throws IOException,
                                                                             AOException,
                                                                             DocumentException {
@@ -288,7 +288,7 @@ public final class PAdESTriPhaseSigner {
                                                final byte[] pkcs1Signature,
                                                final byte[] signedAttributes,
                                                final String pdfFileId,
-                                               final Calendar signingTime,
+                                               final GregorianCalendar signingTime,
                                                final SignEnhancer enhancer,
                                                final Properties enhancerConfig) throws AOException,
                                                                                        IOException,

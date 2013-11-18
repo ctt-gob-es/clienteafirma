@@ -6,13 +6,16 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.Properties;
 
+import javax.xml.datatype.DatatypeFactory;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import es.gob.afirma.core.misc.Base64;
@@ -23,15 +26,22 @@ import es.gob.afirma.core.misc.Base64;
 public final class PdfSignResult implements Serializable {
 
 	private static final long serialVersionUID = 2L;
+	
+	private String fileID;
+    private byte[] sign;
+    private GregorianCalendar signTime;
+    private Properties extraParams;
 
-	private final String fileID;
-    private final byte[] sign;
-    private final Calendar signTime;
-    private final Properties extraParams;
-
-    PdfSignResult(final String pdfFileId,
+	protected PdfSignResult() {
+        this.fileID = null;
+        this.sign = new byte[0];
+        this.signTime = new GregorianCalendar();
+        this.extraParams = new Properties();
+	}
+    
+    public PdfSignResult(final String pdfFileId,
     		         final byte[] preSignature,
-    		         final Calendar signingTime,
+    		         final GregorianCalendar signingTime,
     		         final Properties xParams) {
         if (signingTime == null || pdfFileId == null || preSignature == null || "".equals(pdfFileId) || preSignature.length < 1) { //$NON-NLS-1$
             throw new IllegalArgumentException("Es obligatorio proporcionar un MAC, una pre-firma y un momento de firmado"); //$NON-NLS-1$
@@ -62,7 +72,7 @@ public final class PdfSignResult implements Serializable {
 
     /** Obtiene el momento en el que se realiz&oacute; la firma.
      * @return Momento en el que se realiz&oacute; la firma */
-    public Calendar getSignTime() {
+    public GregorianCalendar getSignTime() {
     	return this.signTime;
     }
 
@@ -88,7 +98,21 @@ public final class PdfSignResult implements Serializable {
     	return p;
     }
 
+	/**
+	 * M&eacute;todo necesario para la serializaci&oacute;n de un objeto.
+	 * @param out Datos de salida.
+	 * @throws IOException Cuando no se puede serializar.
+	 */
     private void writeObject(final ObjectOutputStream out) throws IOException {
+    	
+    	final DatatypeFactory dataTypeFactory;
+    	try {
+    		dataTypeFactory = DatatypeFactory.newInstance();
+    	}
+    	catch (Exception e) {
+    		throw new IOException(e);
+    	}
+    	
     	final StringBuilder sb = new StringBuilder()
     		.append("<signResult>\n") //$NON-NLS-1$
     		.append(" <extraParams>\n") //$NON-NLS-1$
@@ -96,19 +120,24 @@ public final class PdfSignResult implements Serializable {
     		.append(" </extraParams>\n") //$NON-NLS-1$
     		.append(" <pdfId>\n") //$NON-NLS-1$
     		.append(getFileID()).append('\n')
-    		.append(" </pdfIf>") //$NON-NLS-1$
+    		.append(" </pdfIf>\n") //$NON-NLS-1$
     		.append(" <sign>\n") //$NON-NLS-1$
     		.append(Base64.encode(getSign())).append('\n')
     		.append(" </sign>\n") //$NON-NLS-1$
-    		.append(" <signTime>") //$NON-NLS-1$
-    		.append(Long.toString(getSignTime().getTimeInMillis())).append('\n')
-    		.append(" </signTime>") //$NON-NLS-1$
+    		.append(" <signTime>\n") //$NON-NLS-1$
+    		.append(dataTypeFactory.newXMLGregorianCalendar(getSignTime()).toXMLFormat()).append('\n')
+    		.append(" </signTime>\n") //$NON-NLS-1$
     		.append("</signResult>") //$NON-NLS-1$
 		;
     	out.write(sb.toString().getBytes());
     }
 
-    @SuppressWarnings({ "static-method", "unused" })
+	/**
+	 * M&eacute;todo necesario para la deserializaci&oacute;n de un objeto.
+	 * @param in Datos de entrada.
+	 * @throws IOException Cuando no se puede deserializar.
+	 * @throws ClassNotFoundException Cuando no existe la clase.
+	 */
 	private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
     	final Document xmlSign;
     	try {
@@ -120,8 +149,64 @@ public final class PdfSignResult implements Serializable {
     	catch (final ParserConfigurationException e) {
     		throw new IOException(e);
 		}
-    	//TODO: Implementar la deserializacion XML
-    	throw new UnsupportedOperationException();
-    }
+    	
+    	NodeList nodeList = xmlSign.getChildNodes();
+    	int i = getNextElementNode(nodeList, 0);
 
+    	// extraParams
+    	Node node = nodeList.item(i);
+    	if (!"extraParams".equalsIgnoreCase(node.getNodeName())) { //$NON-NLS-1$
+    		throw new IOException("No se encontro el nodo 'extraParams' del PdfSignResultSerializado"); //$NON-NLS-1$
+    	}
+    	this.extraParams = base642Properties(node.getTextContent().trim());
+    	
+    	// pdfId
+    	i = getNextElementNode(nodeList, ++i);
+    	node = nodeList.item(i);
+    	if (!"pdfId".equalsIgnoreCase(node.getNodeName())) { //$NON-NLS-1$
+    		throw new IOException("No se encontro el nodo 'pdfId' del PdfSignResultSerializado"); //$NON-NLS-1$
+    	}
+    	this.fileID = node.getTextContent().trim();
+    	
+    	// sign
+    	i = getNextElementNode(nodeList, ++i);
+    	node = nodeList.item(i);
+    	if (!"sign".equalsIgnoreCase(node.getNodeName())) { //$NON-NLS-1$
+    		throw new IOException("No se encontro el nodo 'sign' del PdfSignResultSerializado"); //$NON-NLS-1$
+    	}
+    	this.sign = Base64.decode(node.getTextContent().trim());
+    	
+    	// signTime
+    	i = getNextElementNode(nodeList, ++i);
+    	node = nodeList.item(i);
+    	if (!"signTime".equalsIgnoreCase(node.getNodeName())) { //$NON-NLS-1$
+    		throw new IOException("No se encontro el nodo 'signTime' del PdfSignResultSerializado"); //$NON-NLS-1$
+    	}
+    	
+    	final DatatypeFactory dataTypeFactory;
+    	try {
+    		dataTypeFactory = DatatypeFactory.newInstance();
+    	}
+    	catch (Exception e) {
+    		throw new IOException(e);
+    	}
+    	this.signTime = dataTypeFactory.newXMLGregorianCalendar(node.getTextContent().trim()).toGregorianCalendar();
+    }
+    
+	/**
+	 * Busca el siguiente nodo de tipo elemento del listado.
+	 * @param nodeList Listado de nodos.
+	 * @param initialIndex &Iacute;ndice desde el que empezar la b&uacute;squeda.
+	 * @return &Iacute;ndice del nodo de tipo elemento. 
+	 * @throws IOException Cuando no se encuentran nodos del tipo elemento a partir del &iacute;ndice indicado.
+	 */
+    private static int getNextElementNode(NodeList nodeList, int initialIndex) throws IOException {
+    	for (int i = initialIndex; i < nodeList.getLength(); i++) {
+    		Node node = nodeList.item(i);
+    		if (node.getNodeType() == Node.ELEMENT_NODE) {
+    			return i;
+    		}
+    	}
+    	throw new IOException("No se encontraron todos los campos del PdfSignResult serializado"); //$NON-NLS-1$
+    }
 }
