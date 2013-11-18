@@ -49,7 +49,7 @@ public final class TestXAdES {
 
 		final XmlPreSignResult pre = XAdESTriPhaseSignerServerSide.preSign("DATA".getBytes(), "SHA512withRSA", pke.getCertificateChain(), null, XAdESTriPhaseSignerServerSide.Op.SIGN); //$NON-NLS-1$ //$NON-NLS-2$
 
-		System.out.println("Firma:\n" + new String(pre.getXmlSign()));
+		System.out.println("Firma:\n" + new String(pre.getXmlSign())); //$NON-NLS-1$
 	}
 
 	/** Prueba de cofirma en 3 fases.
@@ -68,9 +68,9 @@ public final class TestXAdES {
 
 		final XmlPreSignResult pre = XAdESTriPhaseSignerServerSide.preSign(sign, "SHA512withRSA", pke.getCertificateChain(), null, XAdESTriPhaseSignerServerSide.Op.COSIGN); //$NON-NLS-1$
 
-		System.out.println("Cofirma:\n" + new String(pre.getXmlSign()));
+		System.out.println("Cofirma:\n" + new String(pre.getXmlSign())); //$NON-NLS-1$
 	}
-	
+
 	/** Prueba de contrafirma en 3 fases.
 	 * @throws Exception en cualquier error */
 	@SuppressWarnings("static-method")
@@ -87,6 +87,6 @@ public final class TestXAdES {
 
 		final XmlPreSignResult pre = XAdESTriPhaseSignerServerSide.preSign(sign, "SHA512withRSA", pke.getCertificateChain(), null, XAdESTriPhaseSignerServerSide.Op.COUNTERSIGN); //$NON-NLS-1$
 
-		System.out.println("Contrafirma:\n" + new String(pre.getXmlSign()));
+		System.out.println("Contrafirma:\n" + new String(pre.getXmlSign())); //$NON-NLS-1$
 	}
 }
