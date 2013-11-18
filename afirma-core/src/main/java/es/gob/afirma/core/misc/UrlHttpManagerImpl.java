@@ -29,7 +29,7 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-/** Implementacion de ua clase para la lectura del contenido de una URL.
+/** Clase para la lectura y env&iacute;o de datos a URL remotas.
  * @author Carlos Gamuci */
 public final class UrlHttpManagerImpl {
 
