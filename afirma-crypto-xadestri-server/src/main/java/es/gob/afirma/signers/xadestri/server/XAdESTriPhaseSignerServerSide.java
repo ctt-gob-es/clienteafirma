@@ -1,3 +1,13 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation;
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
 package es.gob.afirma.signers.xadestri.server;
 
 import java.io.ByteArrayInputStream;
@@ -55,11 +65,19 @@ import es.gob.afirma.signers.xml.Utils;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class XAdESTriPhaseSignerServerSide {
 
+	private XAdESTriPhaseSignerServerSide() {
+		// No permitimos la instanciacion
+	}
+
 	private static final String COUNTERSIGN_TARGET_KEY = "target"; //$NON-NLS-1$
-	
+
+	/** Operaciones de firma soportadas. */
 	public static enum Op {
+		/** Firma. */
 		SIGN,
+		/** Co-firma. */
 		COSIGN,
+		/** Contrafirma. */
 		COUNTERSIGN
 	}
 
@@ -67,7 +85,7 @@ public final class XAdESTriPhaseSignerServerSide {
 
 	/** Codigo de indice en la cadena de reemplazo. */
 	public static final String REPLACEMENT_CODE = "%i"; //$NON-NLS-1$
-	
+
 	/** Cadena por la que reemplazaremos el PKCS#1 impostado de la firma. */
 	public static final String REPLACEMENT_STRING = "%%REPLACEME_" + REPLACEMENT_CODE + "%%"; //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -82,6 +100,7 @@ public final class XAdESTriPhaseSignerServerSide {
 	 * @param algorithm Algoritmo de firma
 	 * @param certChain Cadena de certificados del firmante
 	 * @param xParams Par&aacute;metros adicionales de la firma
+	 * @param op Operaci&oacute;n espec&iacute;fica de firma a realizar
 	 * @return Listado de prefirma XML
 	 * @throws NoSuchAlgorithmException
 	 * @throws AOException
@@ -133,12 +152,12 @@ public final class XAdESTriPhaseSignerServerSide {
 		catch(final Exception e) {
 			Logger.getLogger("es.gob.afirma").info("El documento a firmar no es XML, por lo que no contiene firmas previas");  //$NON-NLS-1$//$NON-NLS-2$
 		}
-		
+
 		if (xml == null && (op == Op.COSIGN || op == Op.COUNTERSIGN)) {
 			Logger.getLogger("es.gob.afirma").severe("Solo se pueden cofirmar y contrafirmar firmas XML");  //$NON-NLS-1$//$NON-NLS-2$
 			throw new AOException("Los datos introducidos no se corresponden con una firma XML"); //$NON-NLS-1$
 		}
-		
+
 		// Si los datos eran XML, comprobamos y almacenamos las firmas previas
 		if (xml != null) {
 			final Element rootElement = xml.getDocumentElement();
@@ -200,10 +219,10 @@ public final class XAdESTriPhaseSignerServerSide {
 					);
 			break;
 		case COUNTERSIGN:
-			final CounterSignTarget targets = 
+			final CounterSignTarget targets =
 				xParams != null && CounterSignTarget.LEAFS.name().equalsIgnoreCase(xParams.getProperty(COUNTERSIGN_TARGET_KEY)) ?
 					CounterSignTarget.LEAFS : CounterSignTarget.TREE;
-			
+
 			result = XAdESCounterSigner.countersign(
 					data,
 					algorithm,
@@ -222,7 +241,7 @@ public final class XAdESTriPhaseSignerServerSide {
 
 		// Cargamos el XML firmado en un String
 		String xmlResult = new String(result, xmlEncoding);
-		
+
 		// Recuperamos los signed info que se han firmado
 		final List<byte[]> signedInfos = XAdESTriPhaseSignerServerSide.getSignedInfos(
 				result,
@@ -230,11 +249,11 @@ public final class XAdESTriPhaseSignerServerSide {
 				previousSignaturesIds // Identificadores de firmas previas, para poder omitirlos
 				);
 
-		// Podemos un reemplazo en el XML en lugar de los PKCS#1 de las firmas generadas 
+		// Podemos un reemplazo en el XML en lugar de los PKCS#1 de las firmas generadas
 		for (int i = 0; i < signedInfos.size(); i++) {
-			
-			byte[] signedInfo = signedInfos.get(i);
-			
+
+			final byte[] signedInfo = signedInfos.get(i);
+
 			// Calculamos el valor PKCS#1 con la clave privada impostada, para conocer los valores que debemos sustituir
 			final Signature signature = Signature.getInstance(algorithm);
 			signature.initSign(prk);
@@ -265,7 +284,7 @@ public final class XAdESTriPhaseSignerServerSide {
 	/**
 	 * Recupera los signedInfo de una firma XML, excluyendo los de las firmas indicadas a trav&eacute;s
 	 * de su Id.
-	 * @param xmlSign XML del que se 
+	 * @param xmlSign XML del que se
 	 * @param pk Clave publicada usada en las firmas de las que se desea obtener los signedInfo.
 	 * @param excludedIds Identificadores de las firmas excluidas.
 	 * @return Listado de signedInfos.
@@ -299,9 +318,9 @@ public final class XAdESTriPhaseSignerServerSide {
 		// Recogemos el signedInfo de cada firma cuyo identificador no este en la lista de excluidos (excludedIds)
 		final List<byte[]> signedInfos = new ArrayList<byte[]>();
 		for (int i = 0; i < signatureNodeList.getLength(); i++) {
-			
+
 			final Node currentNode = signatureNodeList.item(i);
-			
+
 			// Saltamos las firmas sin identificador
 			if (currentNode.getAttributes() == null || currentNode.getAttributes().getNamedItem(XML_NODE_ID) == null) {
 				Logger.getLogger("es.gob.afirma").warning("El documento contiene firmas sin identificador reconocido");  //$NON-NLS-1$//$NON-NLS-2$
@@ -314,7 +333,7 @@ public final class XAdESTriPhaseSignerServerSide {
 				continue;
 			}
 
-			// Agregamos el signed indo de la firma al listado 
+			// Agregamos el signed indo de la firma al listado
 			final XMLValidateContext valContext = new DOMValidateContext(new SimpleKeySelector(pk), currentNode);
 			valContext.setProperty("javax.xml.crypto.dsig.cacheReference", Boolean.TRUE); //$NON-NLS-1$
 			final XMLSignature signature = Utils.getDOMFactory().unmarshalXMLSignature(valContext);
@@ -328,10 +347,10 @@ public final class XAdESTriPhaseSignerServerSide {
 		if (signedInfos.isEmpty()) {
 			throw new XmlPreSignException("Se ha creado un nodo firma, pero no se ha encontrado en el postproceso"); //$NON-NLS-1$
 		}
-		
+
 		return signedInfos;
 	}
-	
+
 	private static class SimpleKeySelector extends KeySelector {
 
 		private final PublicKey pk;
