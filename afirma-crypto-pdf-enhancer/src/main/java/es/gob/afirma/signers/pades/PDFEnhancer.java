@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Properties;
 
 import es.gob.afirma.platform.wsclientoriginal.TestClient;
-import es.gob.afirma.signers.padestri.server.SignEnhancer;
 
 /**
  * Clase para la mejora de las firmas PDF a trav&eacute;s del servicio de actualizaci&oacute;n de
@@ -29,6 +28,7 @@ public class PDFEnhancer implements SignEnhancer {
 	 */
 	public static final String SIGN_TYPE_OPTION = "signType"; //$NON-NLS-1$
 
+	@Override
 	public byte[] enhance(final byte[] signature, final Properties options) throws IOException {
 
 		return TestClient.upgradeSign(
