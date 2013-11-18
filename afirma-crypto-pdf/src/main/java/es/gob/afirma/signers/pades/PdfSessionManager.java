@@ -58,6 +58,10 @@ public final class PdfSessionManager {
 
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");  //$NON-NLS-1$
 
+    private PdfSessionManager() {
+    	// No permitimos la instanciacion
+    }
+
     /** Obtiene los datos PDF relevantes en cuanto a las firmas electr&oacute;nicas, consistentes en los datos
      * a ser firmados con CAdES o PKCS#7 y los metadatos necesarios para su correcta inserci&oacute;n en el PDF.
      * @param inPDF Documento PDF que se desea firmar

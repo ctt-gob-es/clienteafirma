@@ -152,6 +152,10 @@ public final class PAdESTriPhaseSigner {
 
     private static final int CSIZE = 27000;
 
+    private PAdESTriPhaseSigner() {
+    	// No permitimos la instanciacion
+    }
+
     /** Obtiene la pre-firma PAdES/CAdES de un PDF (atributos CAdES a firmar)
      * @param digestAlgorithmName Nombre del algoritmo de huella digital usado para la firma. Debe usarse exactamente el mismo valor en la post-firma.
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>digestAlgorithmName</code>:</p>
