@@ -30,7 +30,6 @@
 		<module>afirma-crypto-core-xml</module>
 		<module>afirma-crypto-odf</module>
 		<module>afirma-crypto-padestri-client</module>
-		<module>afirma-crypto-padestri-server</module>
 		<module>afirma-crypto-pdf-enhancer</module>
 		<module>afirma-crypto-xades</module>
 		<module>afirma-crypto-xadestri-client</module>
