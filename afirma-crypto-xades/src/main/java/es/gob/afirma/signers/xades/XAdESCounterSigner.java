@@ -58,6 +58,7 @@ import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.XMLConstants;
 
+/** Contrafirmador XAdES. */
 public final class XAdESCounterSigner {
 
 	private static final String CSURI = "http://uri.etsi.org/01903#CountersignedSignature";	//$NON-NLS-1$
@@ -106,6 +107,8 @@ public final class XAdESCounterSigner {
 	 *            Listado de nodos o firmantes que se deben contrafirmar
 	 *            seg&uacute;n el {@code targetType} seleccionado.
 	 * @param key Clave privada a usar para firmar.
+	 * @param certChain
+	 * 			  Cadena de certificados del firmante
 	 * @param xParams
 	 *            Par&aacute;metros adicionales para la firma.
 	 *            <p>
@@ -580,7 +583,7 @@ public final class XAdESCounterSigner {
 		// crea la referencia a la firma que se contrafirma
 		final List<Reference> referenceList = new ArrayList<Reference>();
 		final XMLSignatureFactory fac = Utils.getDOMFactory();
-		
+
 		final DigestMethod digestMethod;
 		try {
 			digestMethod = fac.newDigestMethod(digestMethodAlgorithm, null);

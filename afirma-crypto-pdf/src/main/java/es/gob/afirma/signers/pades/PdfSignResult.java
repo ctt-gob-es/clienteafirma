@@ -26,7 +26,7 @@ import es.gob.afirma.core.misc.Base64;
 public final class PdfSignResult implements Serializable {
 
 	private static final long serialVersionUID = 2L;
-	
+
 	private String fileID;
     private byte[] sign;
     private GregorianCalendar signTime;
@@ -38,16 +38,21 @@ public final class PdfSignResult implements Serializable {
         this.signTime = new GregorianCalendar();
         this.extraParams = new Properties();
 	}
-    
+
+    /** Construye el resultado de una pre-firma (como primera parte de un firma trif&aacute;sica) o una firma completa PAdES.
+     * @param pdfFileId Identificador &uacute;nico del PDF
+     * @param signature Firma o pre-firma
+     * @param signingTime Momento de firmado
+     * @param xParams Opciones adiconales de la firma */
     public PdfSignResult(final String pdfFileId,
-    		         final byte[] preSignature,
+    		         final byte[] signature,
     		         final GregorianCalendar signingTime,
     		         final Properties xParams) {
-        if (signingTime == null || pdfFileId == null || preSignature == null || "".equals(pdfFileId) || preSignature.length < 1) { //$NON-NLS-1$
+        if (signingTime == null || pdfFileId == null || signature == null || "".equals(pdfFileId) || signature.length < 1) { //$NON-NLS-1$
             throw new IllegalArgumentException("Es obligatorio proporcionar un MAC, una pre-firma y un momento de firmado"); //$NON-NLS-1$
         }
         this.fileID = pdfFileId;
-        this.sign = preSignature.clone();
+        this.sign = signature.clone();
         this.signTime = signingTime;
         this.extraParams = xParams != null ? xParams : new Properties();
     }
@@ -104,15 +109,15 @@ public final class PdfSignResult implements Serializable {
 	 * @throws IOException Cuando no se puede serializar.
 	 */
     private void writeObject(final ObjectOutputStream out) throws IOException {
-    	
+
     	final DatatypeFactory dataTypeFactory;
     	try {
     		dataTypeFactory = DatatypeFactory.newInstance();
     	}
-    	catch (Exception e) {
+    	catch (final Exception e) {
     		throw new IOException(e);
     	}
-    	
+
     	final StringBuilder sb = new StringBuilder()
     		.append("<signResult>\n") //$NON-NLS-1$
     		.append(" <extraParams>\n") //$NON-NLS-1$
@@ -149,8 +154,8 @@ public final class PdfSignResult implements Serializable {
     	catch (final ParserConfigurationException e) {
     		throw new IOException(e);
 		}
-    	
-    	NodeList nodeList = xmlSign.getChildNodes();
+
+    	final NodeList nodeList = xmlSign.getChildNodes();
     	int i = getNextElementNode(nodeList, 0);
 
     	// extraParams
@@ -159,7 +164,7 @@ public final class PdfSignResult implements Serializable {
     		throw new IOException("No se encontro el nodo 'extraParams' del PdfSignResultSerializado"); //$NON-NLS-1$
     	}
     	this.extraParams = base642Properties(node.getTextContent().trim());
-    	
+
     	// pdfId
     	i = getNextElementNode(nodeList, ++i);
     	node = nodeList.item(i);
@@ -167,7 +172,7 @@ public final class PdfSignResult implements Serializable {
     		throw new IOException("No se encontro el nodo 'pdfId' del PdfSignResultSerializado"); //$NON-NLS-1$
     	}
     	this.fileID = node.getTextContent().trim();
-    	
+
     	// sign
     	i = getNextElementNode(nodeList, ++i);
     	node = nodeList.item(i);
@@ -175,34 +180,34 @@ public final class PdfSignResult implements Serializable {
     		throw new IOException("No se encontro el nodo 'sign' del PdfSignResultSerializado"); //$NON-NLS-1$
     	}
     	this.sign = Base64.decode(node.getTextContent().trim());
-    	
+
     	// signTime
     	i = getNextElementNode(nodeList, ++i);
     	node = nodeList.item(i);
     	if (!"signTime".equalsIgnoreCase(node.getNodeName())) { //$NON-NLS-1$
     		throw new IOException("No se encontro el nodo 'signTime' del PdfSignResultSerializado"); //$NON-NLS-1$
     	}
-    	
+
     	final DatatypeFactory dataTypeFactory;
     	try {
     		dataTypeFactory = DatatypeFactory.newInstance();
     	}
-    	catch (Exception e) {
+    	catch (final Exception e) {
     		throw new IOException(e);
     	}
     	this.signTime = dataTypeFactory.newXMLGregorianCalendar(node.getTextContent().trim()).toGregorianCalendar();
     }
-    
+
 	/**
 	 * Busca el siguiente nodo de tipo elemento del listado.
 	 * @param nodeList Listado de nodos.
 	 * @param initialIndex &Iacute;ndice desde el que empezar la b&uacute;squeda.
-	 * @return &Iacute;ndice del nodo de tipo elemento. 
+	 * @return &Iacute;ndice del nodo de tipo elemento.
 	 * @throws IOException Cuando no se encuentran nodos del tipo elemento a partir del &iacute;ndice indicado.
 	 */
-    private static int getNextElementNode(NodeList nodeList, int initialIndex) throws IOException {
+    private static int getNextElementNode(final NodeList nodeList, final int initialIndex) throws IOException {
     	for (int i = initialIndex; i < nodeList.getLength(); i++) {
-    		Node node = nodeList.item(i);
+    		final Node node = nodeList.item(i);
     		if (node.getNodeType() == Node.ELEMENT_NODE) {
     			return i;
     		}
