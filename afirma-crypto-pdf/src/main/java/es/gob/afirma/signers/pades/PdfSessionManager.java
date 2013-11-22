@@ -20,7 +20,6 @@ import java.util.logging.Logger;
 
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.Image;
-import com.lowagie.text.Jpeg;
 import com.lowagie.text.Rectangle;
 import com.lowagie.text.exceptions.BadPasswordException;
 import com.lowagie.text.pdf.PdfDate;
@@ -36,7 +35,6 @@ import com.lowagie.text.pdf.PdfWriter;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.Platform.OS;
 import es.gob.afirma.core.ui.AOUIFactory;
@@ -84,7 +82,7 @@ public final class PdfSessionManager {
 		// *********************************************************************************************************************
 
 		// Imagen de la rubrica
-		final Image rubric = getRubricImage(extraParams.getProperty("signatureRubricImage")); //$NON-NLS-1$
+		final Image rubric = PdfPreProcessor.getImage(extraParams.getProperty("signatureRubricImage")); //$NON-NLS-1$
 
 		// Motivo de la firma
 		final String reason = extraParams.getProperty("signReason"); //$NON-NLS-1$
@@ -504,50 +502,14 @@ public final class PdfSessionManager {
 		final PdfObject pdfObject = ((com.lowagie.text.pdf.PdfStamperImp) stp.getWriter()).getFileID();
 
 		return new PdfTriPhaseSession(sap, baos, new String(pdfObject.getBytes()));
-}
-
-    private static com.lowagie.text.Image getRubricImage(final String imagebase64Encoded) {
-    	if (imagebase64Encoded == null || "".equals(imagebase64Encoded)) { //$NON-NLS-1$
-    		return null;
-    	}
-    	final byte[] image;
-    	try {
-			image = Base64.decode(imagebase64Encoded);
-		}
-    	catch (final Exception e) {
-    		LOGGER.severe("Se ha proporcionado una imagen de rubrica que no esta codificada en Base64: " + e); //$NON-NLS-1$
-			return null;
-		}
-    	try {
-			return new Jpeg(image);
-		}
-    	catch (final Exception e) {
-    		LOGGER.severe("Se ha proporcionado una imagen de rubrica que no esta codificada en JPEG: " + e); //$NON-NLS-1$
-			return null;
-		}
     }
+
 
     /** Devuelve la posici&oacute;n de la p&aacute;gina en donde debe agregarse
      * la firma. La medida de posicionamiento es el p&iacute;xel y se cuenta en
      * el eje horizontal de izquierda a derecha y en el vertical de abajo a
      * arriba. */
     private static Rectangle getSignaturePositionOnPage(final Properties extraParams) {
-    	if (extraParams.getProperty("signaturePositionOnPageLowerLeftX") != null && //$NON-NLS-1$
-    		extraParams.getProperty("signaturePositionOnPageLowerLeftY") != null && //$NON-NLS-1$
-			extraParams.getProperty("signaturePositionOnPageUpperRightX") != null && //$NON-NLS-1$
-			extraParams.getProperty("signaturePositionOnPageUpperRightY") != null //$NON-NLS-1$
-		) {
-	        try {
-	            return new Rectangle(Integer.parseInt(extraParams.getProperty("signaturePositionOnPageLowerLeftX")), //$NON-NLS-1$
-	                                 Integer.parseInt(extraParams.getProperty("signaturePositionOnPageLowerLeftY")), //$NON-NLS-1$
-	                                 Integer.parseInt(extraParams.getProperty("signaturePositionOnPageUpperRightX")), //$NON-NLS-1$
-	                                 Integer.parseInt(extraParams.getProperty("signaturePositionOnPageUpperRightY")) //$NON-NLS-1$
-	            );
-	        }
-	        catch (final Exception e) {
-	        	LOGGER.severe("Se ha indicado una posicion de firma invalida: " + e); //$NON-NLS-1$
-	        }
-    	}
-    	return null;
+    	return PdfPreProcessor.getPositionOnPage(extraParams, "signature"); //$NON-NLS-1$
     }
 }
