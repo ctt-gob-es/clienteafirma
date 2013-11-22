@@ -1,9 +1,28 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"> 
 <html>
  <head>
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+  <title>
+   Valores aceptados como par&aacute;metros adicionales para las firmas PAdES
+  </title>
  </head>
  <body>
  <p>Valores aceptados en el par&aacute;metro <code>xParams</code> para las firmas PAdES:</p>
  <dl>
+  <dt><b><i>attach</i></b></dt>
+   <dd>
+    Contenido a a&ntilde;adir como adjunto al PDF, en formato Base64 (el adjunto ser&aacute; el binario decodificado).
+    Este par&aacute;metro requiere que se haya establecido tambi&eacute;n el par&aacute;metro <code>attachFileName</code>.
+   </dd>
+  <dt><b><i>attachFileName</i></b></dt>
+   <dd>
+    Nombre de fichero para adjuntar el contenido binario indicado mediante <code>attach</code>.
+    Este par&aacute;metro requiere que se haya establecido tambi&eacute;n el par&aacute;metro <code>attach</code>.
+   </dd>
+  <dt><b><i>attachDescription</i></b></dt>
+   <dd>
+    Descripci&oacute;n del contenido binario indicado mediante <code>attach</code>.
+   </dd>
   <dt><b><i>certificationLevel</i></b></dt>
    <dd>
     Nivel de certificaci&oacute;n de la firma PDF.<br>Los valores admitidos son num&eacute;ricos, correspondiendo:
