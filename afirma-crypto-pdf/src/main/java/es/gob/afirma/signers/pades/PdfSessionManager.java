@@ -110,21 +110,6 @@ public final class PdfSessionManager {
 		// Nombre del subfiltro de firma en el diccionario PDF
 		final String signatureSubFilter = extraParams.getProperty("signatureSubFilter"); //$NON-NLS-1$
 
-		// ******************
-		// ** Adjuntos ******
-
-		// Contenido a adjuntar (en Base64)
-		final String b64Attachment = extraParams.getProperty("attach"); //$NON-NLS-1$
-
-		// Nombre que se pondra al fichero adjunto en el PDF
-		final String attachmentFileName = extraParams.getProperty("attachFileName"); //$NON-NLS-1$
-
-		// Descripcion del adjunto
-		final String attachmentDescription = extraParams.getProperty("attachDescription"); //$NON-NLS-1$
-
-		// ** Fin Adjuntos **
-		// ******************
-
 		// Nivel de certificacion del PDF
 		int certificationLevel;
 		try {
@@ -291,18 +276,7 @@ public final class PdfSessionManager {
 		));
 
 		// Adjuntos
-		if (b64Attachment != null && attachmentFileName != null) {
-			byte[] attachment = null;
-			try {
-				attachment = Base64.decode(b64Attachment);
-			}
-			catch(final IOException e) {
-				LOGGER.warning("Se ha indicado un adjunto, pero no estaba en formato Base64, se ignorara : " + e); //$NON-NLS-1$
-			}
-			if (attachment != null) {
-				stp.getWriter().addFileAttachment(attachmentDescription, attachment, null, attachmentFileName);
-			}
-		}
+		PdfPreProcessor.attachFile(extraParams, stp);
 
 		// iText antiguo
 		sap.setRender(PdfSignatureAppearance.SignatureRenderDescription);
