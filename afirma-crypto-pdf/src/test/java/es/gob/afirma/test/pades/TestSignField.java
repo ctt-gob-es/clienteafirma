@@ -28,6 +28,51 @@ public class TestSignField {
 	private final static String CERT_PASS = "12341234"; //$NON-NLS-1$
 	private final static String CERT_ALIAS = "anf usuario activo"; //$NON-NLS-1$
 
+	/** Prueba de firma de PDF insertando imagen.
+	 * @throws Exception */
+	@SuppressWarnings("static-method")
+	@Test
+	public void testImageOnPdf() throws Exception {
+		Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
+			"Prueba de firma de PDF insertando imagen" //$NON-NLS-1$
+		);
+
+        final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+        final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+
+		final Properties extraParams = new Properties();
+		extraParams.put("imagePositionOnPageLowerLeftX", "100"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.put("imagePositionOnPageLowerLeftY", "100"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.put("imagePositionOnPageUpperRightX", "200"); //$NON-NLS-1$ //$NON-NLS-2$
+		extraParams.put("imagePositionOnPageUpperRightY", "200"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		final byte[] image = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream("4df6ec6b6b5c7.jpg")); //$NON-NLS-1$
+		final String imageB64 = Base64.encode(image);
+		extraParams.put("image", imageB64); //$NON-NLS-1$
+
+		final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILE));
+
+		final AOPDFSigner signer = new AOPDFSigner();
+		final byte[] signedPdf = signer.sign(
+			testPdf,
+			DEFAULT_SIGNATURE_ALGORITHM,
+			pke.getPrivateKey(),
+			pke.getCertificateChain(),
+			extraParams
+		);
+
+		final File tempFile = File.createTempFile("afirmaPDF", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		final FileOutputStream fos = new FileOutputStream(tempFile);
+		fos.write(signedPdf);
+		fos.close();
+
+		Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
+				"Fichero temporal para la comprobacion manual del resultado: " + //$NON-NLS-1$
+				tempFile.getAbsolutePath());
+	}
+
 
 	//TODO: Averiguar porque en MAVEN no encuentra la fuente Helvetica
 
@@ -39,7 +84,8 @@ public class TestSignField {
 	public void testCampoDeFirmaSoloConPosiciones() throws Exception {
 
 		Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
-				"Prueba de firma de PDF solo con posiciones de firma"); //$NON-NLS-1$
+			"Prueba de firma de PDF solo con posiciones de firma" //$NON-NLS-1$
+		);
 
 		final PrivateKeyEntry pke;
 

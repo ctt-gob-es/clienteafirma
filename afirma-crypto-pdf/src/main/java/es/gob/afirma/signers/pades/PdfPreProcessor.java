@@ -61,7 +61,7 @@ final class PdfPreProcessor {
 
 	}
 
-	static void addImage(final PdfStamper stp, final Properties extraParams) throws IOException {
+	static void addImage(final Properties extraParams, final PdfStamper stp) throws IOException {
 		if (extraParams == null || stp == null) {
 			return;
 		}
@@ -95,6 +95,7 @@ final class PdfPreProcessor {
 		catch (final DocumentException e) {
 			throw new IOException("Error durante la insercion de la imagen en el PDF: " + e, e); //$NON-NLS-1$
 		}
+		LOGGER.info("Anadida imagen al PDF antes de la firma"); //$NON-NLS-1$
 	}
 
     /** Devuelve la posici&oacute;n de la p&aacute;gina en donde debe agregarse el elemento
