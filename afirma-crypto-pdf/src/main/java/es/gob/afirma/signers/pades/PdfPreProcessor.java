@@ -78,7 +78,19 @@ final class PdfPreProcessor {
 			return;
 		}
 
-		final int pageNum = 1;
+		final String imagePage = extraParams.getProperty("imagePage"); //$NON-NLS-1$
+		if (imagePage == null) {
+			return;
+		}
+
+		final int pageNum;
+		try {
+			pageNum = Integer.parseInt(imagePage);
+		}
+		catch(final Exception e) {
+			throw new IOException("Se ha indicado un numero de pagina con formato invalido para insertar la imagen (" + imagePage + "): " + e, e); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+
 		final PdfContentByte content = stp.getOverContent(pageNum);
 		try {
 			content.addImage(

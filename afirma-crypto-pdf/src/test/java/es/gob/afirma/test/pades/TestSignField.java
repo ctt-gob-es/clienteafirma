@@ -51,6 +51,8 @@ public class TestSignField {
 		final String imageB64 = Base64.encode(image);
 		extraParams.put("image", imageB64); //$NON-NLS-1$
 
+		extraParams.put("imagePage", "1"); //$NON-NLS-1$ //$NON-NLS-2$
+
 		final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILE));
 
 		final AOPDFSigner signer = new AOPDFSigner();

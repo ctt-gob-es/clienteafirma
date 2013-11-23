@@ -9,7 +9,46 @@
  <body>
  <p>Valores aceptados en el par&aacute;metro <code>xParams</code> para las firmas PAdES:</p>
  <dl>
-  <dt><b><i>attach</i></b></dt>
+  <dt><b><i>image</i></b></dt>
+   <dd>
+    Imagen que se desea insertar en el PDF antes de que este sea firmado. La imagen debe proporcionarse en formato JPEG codificado en Base64.
+   </dd>
+  <dt><b><i>imagePage</i></b></dt>
+   <dd>
+    P&aacute;gina donde desea insertarse la imagen indicada mediante el par&aacute;metro <code>image</code>. La numeraci&oacute;n de las p&aacute;ginas
+    comienza en uno.<br> 
+    Este par&aacute;metro es obligatorio, si
+    no se indica una p&aacute;gina v&aacute;lida no se insertar&aacute;la la imagen.
+   </dd> 
+  <dt><b><i>imagePositionOnPageLowerLeftX</i></b></dt>
+   <dd>
+    Coordenada horizontal inferior izquiera de la posici&oacute;n de la imagen (indicada mediante el par&aacute;metro <code>image</code>) dentro de la p&aacute;gina.<br>
+    Es necesario indicar el resto de coordenadas de la imagen mediante los par&aacute;metros <code>imagePositionOnPageLowerLeftY</code>,
+    <code>imagePositionOnPageUpperRightX</code> y <code>imagePositionOnPageUpperRightY</code>.<br>
+    Es necesario indicar tambi&eacute;n una p&aacute;gina de inseri&oacute;n en el par&aacute;metro <code>imagePage</code>.
+   </dd>
+  <dt><b><i>imagePositionOnPageLowerLeftY</i></b></dt>
+   <dd>
+    Coordenada vertical inferior izquiera de la posici&oacute;n de la imagen (indicada mediante el par&aacute;metro <code>image</code>) dentro de la p&aacute;gina.<br>
+    Es necesario indicar el resto de coordenadas de la imagen mediante los par&aacute;metros <code>imagePositionOnPageLowerLeftX</code>,
+    <code>imagePositionOnPageUpperRightX</code> y <code>imagePositionOnPageUpperRightY</code>.<br>
+    Es necesario indicar tambi&eacute;n una p&aacute;gina de inseri&oacute;n en el par&aacute;metro <code>imagePage</code>.
+   </dd>
+  <dt><b><i>imagePositionOnPageUpperRightX</i></b></dt>
+   <dd>
+    Coordenada horizontal superior derecha de la posici&oacute;n de la imagen (indicada mediante el par&aacute;metro <code>image</code>) dentro de la p&aacute;gina.<br>
+    Es necesario indicar el resto de coordenadas de la imagen mediante los par&aacute;metros <code>imagePositionOnPageLowerLeftX</code>,
+    <code>imagePositionOnPageLowerLeftY</code> y <code>imagePositionOnPageUpperRightY</code>.<br>
+    Es necesario indicar tambi&eacute;n una p&aacute;gina de inseri&oacute;n en el par&aacute;metro <code>imagePage</code>.
+   </dd>
+  <dt><b><i>imagePositionOnPageUpperRightY</i></b></dt>
+   <dd>
+    Coordenada vertical superior derecha de la posici&oacute;n de la imagen (indicada mediante el par&aacute;metro <code>image</code>) dentro de la p&aacute;gina.<br>
+    Es necesario indicar el resto de coordenadas de la imagen mediante los par&aacute;metros <code>imagePositionOnPageLowerLeftX</code>,
+    <code>imagePositionOnPageLowerLeftY</code> y <code>imagePositionOnPageUpperRightX</code>.<br>
+    Es necesario indicar tambi&eacute;n una p&aacute;gina de inseri&oacute;n en el par&aacute;metro <code>imagePage</code>.
+   </dd>
+   <dt><b><i>attach</i></b></dt>
    <dd>
     Contenido a a&ntilde;adir como adjunto al PDF, en formato Base64 (el adjunto ser&aacute; el binario decodificado).
     Este par&aacute;metro requiere que se haya establecido tambi&eacute;n el par&aacute;metro <code>attachFileName</code>.
@@ -112,40 +151,40 @@
     P&aacute;gina del documento PDF donde insertar la firma. Puede usarse la constante <code>LAST_PAGE</code>
     para referirse a la &uacute;ltima p&aacute;gina del documento PDF si se desconoce el n&uacute;mero total de
     p&aacute;ginas de este.<br>
-    Este par&aacute;metro se ignora si se ha establecido valor al par&aacute;metro <i>signatureField</i> y necesita que se
-    establezcan valores v&aacute;lidos a los par&aacute;metros <i>signaturePositionOnPageLowerLeftX</i>, <i>signaturePositionOnPageLowerLeftY</i>,
-    <i>signaturePositionOnPageUpperRightX</i> y <i>signaturePositionOnPageUpperRightY</i>.
+    Este par&aacute;metro se ignora si se ha establecido valor al par&aacute;metro <code>signatureField</code> y necesita que se
+    establezcan valores v&aacute;lidos a los par&aacute;metros <code>signaturePositionOnPageLowerLeftX</code>, <code>signaturePositionOnPageLowerLeftY</code>,
+    <code>signaturePositionOnPageUpperRightX</code> y <code>signaturePositionOnPageUpperRightY</code>.
    </dd>
   <dt><b><i>signaturePositionOnPageLowerLeftX</i></b></dt>
    <dd>
-    Coordenada horizontal inferior izquiera de la posici&oacute;n del recuadro visible de la fimra dentro de la p&aacute;gina.<br>
-    Es necesario indicar el resto de coordenadas del recuadro mediante los par&aacute;metros <i>signaturePositionOnPageLowerLeftY</i>,
-    <i>signaturePositionOnPageUpperRightX</i> y <i>signaturePositionOnPageUpperRightY</i>.<br>
-    Si no se indica una p&aacute;gina en el par&aacute;metro <i>signaturePage</i> la firma se inserta en la &uacute;ltima p&aacute;gina
+    Coordenada horizontal inferior izquiera de la posici&oacute;n del recuadro visible de la firma dentro de la p&aacute;gina.<br>
+    Es necesario indicar el resto de coordenadas del recuadro mediante los par&aacute;metros <code>signaturePositionOnPageLowerLeftY</code>,
+    <code>signaturePositionOnPageUpperRightX</code> y <code>signaturePositionOnPageUpperRightY</code>.<br>
+    Si no se indica una p&aacute;gina en el par&aacute;metro <code>signaturePage</code> la firma se inserta en la &uacute;ltima p&aacute;gina
     del documento.
    </dd>
   <dt><b><i>signaturePositionOnPageLowerLeftY</i></b></dt>
    <dd>
-    Coordenada vertical inferior izquiera de la posici&oacute;n del recuadro visible de la fimra dentro de la p&aacute;gina.<br>
-    Es necesario indicar el resto de coordenadas del recuadro mediante los par&aacute;metros <i>signaturePositionOnPageLowerLeftX</i>,
-    <i>signaturePositionOnPageUpperRightX</i> y <i>signaturePositionOnPageUpperRightY</i>.<br>
-    Si no se indica una p&aacute;gina en el par&aacute;metro <i>signaturePage</i> la firma se inserta en la &uacute;ltima p&aacute;gina
+    Coordenada vertical inferior izquiera de la posici&oacute;n del recuadro visible de la firma dentro de la p&aacute;gina.<br>
+    Es necesario indicar el resto de coordenadas del recuadro mediante los par&aacute;metros <code>signaturePositionOnPageLowerLeftX</code>,
+    <code>signaturePositionOnPageUpperRightX</code> y <code>signaturePositionOnPageUpperRightY</code>.<br>
+    Si no se indica una p&aacute;gina en el par&aacute;metro <code>signaturePage</code> la firma se inserta en la &uacute;ltima p&aacute;gina
     del documento.
    </dd>
   <dt><b><i>signaturePositionOnPageUpperRightX</i></b></dt>
    <dd>
-    Coordenada horizontal superior derecha de la posici&oacute;n del recuadro visible de la fimra dentro de la p&aacute;gina.<br>
-    Es necesario indicar el resto de coordenadas del recuadro mediante los par&aacute;metros <i>signaturePositionOnPageLowerLeftX</i>,
-    <i>signaturePositionOnPageLowerLeftY</i> y <i>signaturePositionOnPageUpperRightY</i>.<br>
-    Si no se indica una p&aacute;gina en el par&aacute;metro <i>signaturePage</i> la firma se inserta en la &uacute;ltima p&aacute;gina
+    Coordenada horizontal superior derecha de la posici&oacute;n del recuadro visible de la firma dentro de la p&aacute;gina.<br>
+    Es necesario indicar el resto de coordenadas del recuadro mediante los par&aacute;metros <code>signaturePositionOnPageLowerLeftX</code>,
+    <code>signaturePositionOnPageLowerLeftY</code> y <code>signaturePositionOnPageUpperRightY</code>.<br>
+    Si no se indica una p&aacute;gina en el par&aacute;metro <code>signaturePage</code> la firma se inserta en la &uacute;ltima p&aacute;gina
     del documento.
    </dd>
   <dt><b><i>signaturePositionOnPageUpperRightY</i></b></dt>
    <dd>
-    Coordenada vertical superior derecha de la posici&oacute;n del recuadro visible de la fimra dentro de la p&aacute;gina.<br>
-    Es necesario indicar el resto de coordenadas del recuadro mediante los par&aacute;metros <i>signaturePositionOnPageLowerLeftX</i>,
-    <i>signaturePositionOnPageLowerLeftY</i> y <i>signaturePositionOnPageUpperRightX</i>.<br>
-    Si no se indica una p&aacute;gina en el par&aacute;metro <i>signaturePage</i> la firma se inserta en la &uacute;ltima p&aacute;gina
+    Coordenada vertical superior derecha de la posici&oacute;n del recuadro visible de la firma dentro de la p&aacute;gina.<br>
+    Es necesario indicar el resto de coordenadas del recuadro mediante los par&aacute;metros <code>signaturePositionOnPageLowerLeftX</code>,
+    <code>signaturePositionOnPageLowerLeftY</code> y <code>signaturePositionOnPageUpperRightX</code>.<br>
+    Si no se indica una p&aacute;gina en el par&aacute;metro <code>signaturePage</code> la firma se inserta en la &uacute;ltima p&aacute;gina
     del documento.
    </dd>
   <dt><b><i>signReason</i></b></dt>
