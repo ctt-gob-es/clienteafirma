@@ -239,7 +239,7 @@ public final class PdfSessionManager {
 
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-		// Activar el atributo de "agregar firma" (cuarto parametro del metodo
+		// Activar el atributo de "agregar firma" (quinto parametro del metodo
 		// "PdfStamper.createSignature") hace que se cree una nueva revision del
 		// documento y evita que las firmas previas queden invalidadas. Sin embargo, este
 		// exige que el PDF no incorpore ningun error, asi que lo mantendremos desactivado
