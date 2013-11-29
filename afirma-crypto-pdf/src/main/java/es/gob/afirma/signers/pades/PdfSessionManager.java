@@ -81,7 +81,10 @@ public final class PdfSessionManager {
 		// **************** LECTURA PARAMETROS ADICIONALES *********************************************************************
 		// *********************************************************************************************************************
 
-		// Imagen de la rubrica
+    	// Forzar la creacion de revisiones incluso en PDF no firmados
+    	final boolean allwaysCreateRevision = Boolean.parseBoolean(extraParams.getProperty("allwaysCreateRevision", "false")); //$NON-NLS-1$ //$NON-NLS-2$
+
+    	// Imagen de la rubrica
 		final Image rubric = PdfPreProcessor.getImage(extraParams.getProperty("signatureRubricImage")); //$NON-NLS-1$
 
 		// Motivo de la firma
@@ -241,19 +244,44 @@ public final class PdfSessionManager {
 
 		// Activar el atributo de "agregar firma" (quinto parametro del metodo
 		// "PdfStamper.createSignature") hace que se cree una nueva revision del
-		// documento y evita que las firmas previas queden invalidadas. Sin embargo, este
-		// exige que el PDF no incorpore ningun error, asi que lo mantendremos desactivado
-		// para la primera firma y activado para las subsiguientes. Un error incorporado
-		// en un PDF erroneo puede quedar subsanado en su version firmada, haciendo
-		// posible incorporar nuevas firmas agregando revisiones del documento.
+		// documento y evita que las firmas previas queden invalidadas.
+		// Sin embargo, este procedimiento no funciona cuando los PDF contienen informacion
+		// despues de la ultima marca %%EOF, aspecto no permitido en PDF 1.7 (ISO 32000-1:2008)
+		// pero si en PDF 1.3 (Adobe) y que se da con frecuencia en PDF generados con bibliotetcas
+		// de software libre como QPDF.
+		//
+		//  Especificacion PDF 1.3
+		//   3.4.4, “File Trailer”
+		//     Acrobat viewers require only that the %%EOF marker appear somewhere within
+		//     the last 1024 bytes of the file.
+		//
+		//  Especificacion PDF 1.7
+		//   7.5.5. File Trailer
+		//     The trailer of a PDF file enables a conforming reader to quickly find the
+		//     cross-reference table and certain special objects. Conforming readers should read a
+		//     PDF file from its end. The last line of the file shall contain only the end-of-file
+		//     marker, %%EOF.
+        //
+		// Para aceptar al menos en algunos casos PDF 1.3 (son aun muy frecuentes, especialmente
+		// en archivos, lo mantendremos desactivado para la primera firma y activado para las
+		// subsiguientes.
+		//
+		// No obstante, el integrador puede siempre forzar la creacion de revisiones mediante
+		// el parametro "allwaysCreateRevision".
 		final PdfStamper stp;
 		try {
 			stp = PdfStamper.createSignature(
-				pdfReader, // PDF de entrada
-				baos, // Salida
-				'\0', // Mantener version
-				null, // No crear temporal
-				pdfReader.getAcroFields().getSignatureNames().size() > 0, // Si hay mas firmas, creo una revision
+				// PDF de entrada
+				pdfReader,
+				// Salida
+				baos,
+				// Mantener version
+				'\0',
+				// No crear temporal
+				null,
+				// Si hay mas firmas o asi me lo indican, creo una revision
+				allwaysCreateRevision || pdfReader.getAcroFields().getSignatureNames().size() > 0,
+				// Momento de la firma
 				signTime
 			);
 		}
