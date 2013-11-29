@@ -251,7 +251,7 @@ public final class PdfSessionManager {
 		// de software libre como QPDF.
 		//
 		//  Especificacion PDF 1.3
-		//   3.4.4, “File Trailer”
+		//   3.4.4, "File Trailer"
 		//     Acrobat viewers require only that the %%EOF marker appear somewhere within
 		//     the last 1024 bytes of the file.
 		//
