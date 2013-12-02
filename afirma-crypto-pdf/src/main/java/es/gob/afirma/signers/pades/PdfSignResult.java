@@ -23,7 +23,7 @@ import es.gob.afirma.core.misc.Base64;
 
 /** Resultado de una pre-firma (como primera parte de un firma trif&aacute;sica) o una firma completa PAdES. */
 /** <i>JavaBean</i> que encapsula los resultados de la pre-firma o firma completa PDF. */
-public final class PdfSignResult implements Serializable {
+final class PdfSignResult implements Serializable {
 
 	private static final long serialVersionUID = 2L;
 
@@ -44,7 +44,7 @@ public final class PdfSignResult implements Serializable {
      * @param signature Firma o pre-firma
      * @param signingTime Momento de firmado
      * @param xParams Opciones adiconales de la firma */
-    public PdfSignResult(final String pdfFileId,
+    PdfSignResult(final String pdfFileId,
     		         final byte[] signature,
     		         final GregorianCalendar signingTime,
     		         final Properties xParams) {
@@ -59,25 +59,25 @@ public final class PdfSignResult implements Serializable {
 
     /** Obtiene las opciones adicionales de la firma.
      * @return Opciones adicionales de la firma */
-    public Properties getExtraParams() {
+    Properties getExtraParams() {
     	return this.extraParams;
     }
 
     /** Obtiene el FileID (<i>/ID</i>) del diccionario PDF generado.
      * @return FileID del diccionario PDF generado */
-    public String getFileID() {
+    String getFileID() {
         return this.fileID;
     }
 
     /** Obtiene los atributos CAdES a firmar.
      * @return Atributos CAdES a firmar (pre-firma) */
-    public byte[] getSign() {
+    byte[] getSign() {
         return this.sign;
     }
 
     /** Obtiene el momento en el que se realiz&oacute; la firma.
      * @return Momento en el que se realiz&oacute; la firma */
-    public GregorianCalendar getSignTime() {
+    GregorianCalendar getSignTime() {
     	return this.signTime;
     }
 
@@ -103,11 +103,9 @@ public final class PdfSignResult implements Serializable {
     	return p;
     }
 
-	/**
-	 * M&eacute;todo necesario para la serializaci&oacute;n de un objeto.
+	/** M&eacute;todo necesario para la serializaci&oacute;n de un objeto.
 	 * @param out Datos de salida.
-	 * @throws IOException Cuando no se puede serializar.
-	 */
+	 * @throws IOException Cuando no se puede serializar. */
     private void writeObject(final ObjectOutputStream out) throws IOException {
 
     	final DatatypeFactory dataTypeFactory;
@@ -137,12 +135,10 @@ public final class PdfSignResult implements Serializable {
     	out.write(sb.toString().getBytes());
     }
 
-	/**
-	 * M&eacute;todo necesario para la deserializaci&oacute;n de un objeto.
+	/** M&eacute;todo necesario para la deserializaci&oacute;n de un objeto.
 	 * @param in Datos de entrada.
 	 * @throws IOException Cuando no se puede deserializar.
-	 * @throws ClassNotFoundException Cuando no existe la clase.
-	 */
+	 * @throws ClassNotFoundException Cuando no existe la clase. */
 	private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
     	final Document xmlSign;
     	try {
@@ -198,13 +194,11 @@ public final class PdfSignResult implements Serializable {
     	this.signTime = dataTypeFactory.newXMLGregorianCalendar(node.getTextContent().trim()).toGregorianCalendar();
     }
 
-	/**
-	 * Busca el siguiente nodo de tipo elemento del listado.
+	/** Busca el siguiente nodo de tipo elemento del listado.
 	 * @param nodeList Listado de nodos.
 	 * @param initialIndex &Iacute;ndice desde el que empezar la b&uacute;squeda.
 	 * @return &Iacute;ndice del nodo de tipo elemento.
-	 * @throws IOException Cuando no se encuentran nodos del tipo elemento a partir del &iacute;ndice indicado.
-	 */
+	 * @throws IOException Cuando no se encuentran nodos del tipo elemento a partir del &iacute;ndice indicado. */
     private static int getNextElementNode(final NodeList nodeList, final int initialIndex) throws IOException {
     	for (int i = initialIndex; i < nodeList.getLength(); i++) {
     		final Node node = nodeList.item(i);
