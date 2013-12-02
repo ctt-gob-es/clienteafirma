@@ -19,7 +19,6 @@ import java.util.Date;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.DERIA5String;
 import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
@@ -35,6 +34,7 @@ import org.bouncycastle.asn1.ess.ESSCertIDv2;
 import org.bouncycastle.asn1.ess.SigningCertificate;
 import org.bouncycastle.asn1.ess.SigningCertificateV2;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.DigestInfo;
 import org.bouncycastle.asn1.x509.GeneralName;
@@ -43,7 +43,6 @@ import org.bouncycastle.asn1.x509.IssuerSerial;
 import org.bouncycastle.asn1.x509.PolicyInformation;
 import org.bouncycastle.asn1.x509.PolicyQualifierId;
 import org.bouncycastle.asn1.x509.PolicyQualifierInfo;
-import org.bouncycastle.asn1.x509.TBSCertificateStructure;
 
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -116,14 +115,11 @@ public final class CAdESUtils {
             /** IssuerSerial ::= SEQUENCE { issuer GeneralNames, serialNumber
              * CertificateSerialNumber */
 
-            final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(
-        		ASN1Primitive.fromByteArray(
-    				cert.getTBSCertificate()
-				)
-			);
-            final GeneralNames gns = new GeneralNames(new GeneralName(tbs.getIssuer()));
+            final GeneralNames gns = new GeneralNames(
+        		new GeneralName(X500Name.getInstance(cert.getIssuerX500Principal().getEncoded()))
+    		);
 
-            final IssuerSerial isuerSerial = new IssuerSerial(gns, tbs.getSerialNumber());
+            final IssuerSerial isuerSerial = new IssuerSerial(gns, cert.getSerialNumber());
 
             /** ESSCertIDv2 ::= SEQUENCE { hashAlgorithm AlgorithmIdentifier
              * DEFAULT {algorithm id-sha256}, certHash Hash, issuerSerial
@@ -172,15 +168,10 @@ public final class CAdESUtils {
             /** IssuerSerial ::= SEQUENCE { issuer GeneralNames, serialNumber
              * CertificateSerialNumber } */
 
-            final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(
-        		ASN1Primitive.fromByteArray(
-    				cert.getTBSCertificate()
-				)
-			);
-            final GeneralName gn = new GeneralName(tbs.getIssuer());
+            final GeneralName gn = new GeneralName(X500Name.getInstance(cert.getIssuerX500Principal().getEncoded()));
             final GeneralNames gns = new GeneralNames(gn);
 
-            final IssuerSerial isuerSerial = new IssuerSerial(gns, tbs.getSerialNumber());
+            final IssuerSerial isuerSerial = new IssuerSerial(gns, cert.getSerialNumber());
 
             /** ESSCertID ::= SEQUENCE { certHash Hash, issuerSerial IssuerSerial
              * OPTIONAL }
