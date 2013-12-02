@@ -115,9 +115,9 @@ public final class ReadNodesTree {
         if (asSimpleSignInfo && signerInfosSd != null) {
             for (int i = 0; i < signerInfosSd.size(); i++) {
                 final ASN1Sequence atribute = (ASN1Sequence) signerInfosSd.getObjectAt(i);
-                final IssuerAndSerialNumber issuerSerial = new IssuerAndSerialNumber((ASN1Sequence) atribute.getObjectAt(1));
+                final IssuerAndSerialNumber issuerSerial = IssuerAndSerialNumber.getInstance(atribute.getObjectAt(1));
                 final X509Certificate[] nameSigner = searchCert(certificates, issuerSerial.getSerialNumber());
-                final SignerInfo si = new SignerInfo(atribute);
+                final SignerInfo si = SignerInfo.getInstance(atribute);
                 final Date signingTime = getSigningTime(si);
                 final AOSimpleSignInfo aossi = new AOSimpleSignInfo(nameSigner, signingTime);
                 aossi.setPkcs1(si.getEncryptedDigest().getOctets());
@@ -131,9 +131,9 @@ public final class ReadNodesTree {
         else if (signerInfosSd != null) {
             for (int i = 0; i < signerInfosSd.size(); i++) {
                 final ASN1Sequence atribute = (ASN1Sequence) signerInfosSd.getObjectAt(i);
-                final IssuerAndSerialNumber issuerSerial = new IssuerAndSerialNumber((ASN1Sequence) atribute.getObjectAt(1));
+                final IssuerAndSerialNumber issuerSerial = IssuerAndSerialNumber.getInstance(atribute.getObjectAt(1));
                 final String nameSigner = searchName(certificates, issuerSerial.getSerialNumber());
-                final SignerInfo si = new SignerInfo(atribute);
+                final SignerInfo si = SignerInfo.getInstance(atribute);
                 this.rama = new AOTreeNode(nameSigner);
                 this.lista.add(nameSigner);
                 getUnsignedAtributes(si.getUnauthenticatedAttributes(), this.rama, certificates);
@@ -165,8 +165,8 @@ public final class ReadNodesTree {
                         final Object obj = eAtributesData.nextElement();
                         if (obj instanceof ASN1Sequence) {
                             final ASN1Sequence atrib = (ASN1Sequence) obj;
-                            final IssuerAndSerialNumber issuerSerial = new IssuerAndSerialNumber((ASN1Sequence) atrib.getObjectAt(1));
-                            final SignerInfo si = new SignerInfo(atrib);
+                            final IssuerAndSerialNumber issuerSerial = IssuerAndSerialNumber.getInstance(atrib.getObjectAt(1));
+                            final SignerInfo si = SignerInfo.getInstance(atrib);
                             final X509Certificate[] nameSigner = searchCert(certificates, issuerSerial.getSerialNumber());
                             final Date signingTime = getSigningTime(si);
                             final AOSimpleSignInfo aossi = new AOSimpleSignInfo(nameSigner, signingTime);
@@ -203,8 +203,8 @@ public final class ReadNodesTree {
                         final Object obj = eAtributesData.nextElement();
                         if (obj instanceof ASN1Sequence) {
                             final ASN1Sequence atrib = (ASN1Sequence) obj;
-                            final IssuerAndSerialNumber issuerSerial = new IssuerAndSerialNumber((ASN1Sequence) atrib.getObjectAt(1));
-                            final SignerInfo si = new SignerInfo(atrib);
+                            final IssuerAndSerialNumber issuerSerial = IssuerAndSerialNumber.getInstance(atrib.getObjectAt(1));
+                            final SignerInfo si = SignerInfo.getInstance(atrib);
                             final String nameSigner = searchName(certificates, issuerSerial.getSerialNumber());
                             this.rama2 = new AOTreeNode(nameSigner);
                             this.lista.add(nameSigner);

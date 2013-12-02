@@ -114,7 +114,7 @@ public final class ObtainContentSignedData {
 		byte[] messageDigest = null;
 
 		for (int i = 0; i < signerInfosSd.size(); i++) {
-			final SignerInfo si = new SignerInfo((ASN1Sequence) signerInfosSd.getObjectAt(i));
+			final SignerInfo si = SignerInfo.getInstance(signerInfosSd.getObjectAt(i));
 			final AlgorithmIdentifier algHash = si.getDigestAlgorithm();
 			if (algHash.getAlgorithm().toString().equals(AOAlgorithmID.getOID(digestAlgorithm))) {
 				final ASN1Set signedAttrib = si.getAuthenticatedAttributes();

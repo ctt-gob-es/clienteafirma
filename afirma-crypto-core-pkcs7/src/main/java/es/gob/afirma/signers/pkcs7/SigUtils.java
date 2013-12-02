@@ -41,7 +41,7 @@ public final class SigUtils {
      *         en el cms.
      * @throws java.io.IOException */
     public static AlgorithmIdentifier makeAlgId(final String oid) throws IOException {
-        return new AlgorithmIdentifier(new ASN1ObjectIdentifier(oid), new DERNull());
+        return new AlgorithmIdentifier(new ASN1ObjectIdentifier(oid), DERNull.INSTANCE);
     }
 
     /** Genera un estructura de tipo SET de formato ASN1.

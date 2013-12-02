@@ -76,8 +76,8 @@ public final class DigestedData implements ASN1Encodable {
         final Enumeration<?> e = seq.getObjects();
 
         this.version = (DERInteger) e.nextElement();
-        this.digestAlgorithm = new AlgorithmIdentifier((ASN1Sequence) e.nextElement());
-        this.contentInfo = new ContentInfo((ASN1Sequence) e.nextElement());
+        this.digestAlgorithm = AlgorithmIdentifier.getInstance(e.nextElement());
+        this.contentInfo = ContentInfo.getInstance(e.nextElement());
         this.digest = (ASN1OctetString) e.nextElement();
 
     }
