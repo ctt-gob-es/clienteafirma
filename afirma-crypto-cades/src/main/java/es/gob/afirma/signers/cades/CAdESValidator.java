@@ -115,7 +115,7 @@ public final class CAdESValidator {
             final ASN1Set signerInfosSd = sd.getSignerInfos();
 
             for (int i = 0; i < signerInfosSd.size(); i++) {
-                final SignerInfo si = new SignerInfo((ASN1Sequence) signerInfosSd.getObjectAt(i));
+                final SignerInfo si = SignerInfo.getInstance(signerInfosSd.getObjectAt(i));
                 isValid = verifySignerInfo(si);
             }
 
@@ -263,7 +263,6 @@ public final class CAdESValidator {
      * @return <code>true</code> si los datos proporcionados se corresponden con una estructura de tipo <i>EnvelopedData</i>,
      * <code>false</code> en caso contrario.
      * @throws IOException Si ocurren problemas relacionados con la lectura de los datos */
-    @SuppressWarnings("unused")
 	static boolean isCAdESEnvelopedData(final byte[] data) throws IOException {
         boolean isValid = false;
 
@@ -293,7 +292,7 @@ public final class CAdESValidator {
             /* los retornos no se usan, solo es para verificar que la conversion
              * ha sido correcta. De no ser asi, se pasaria al manejo de la
              * excepcion. */
-            new EnvelopedData((ASN1Sequence) doj.getObject());
+            EnvelopedData.getInstance(doj.getObject());
         }
         catch (final Exception ex) {
         	LOGGER.info("Lo datos proporcionados no son de tipo CAdESEnvelopedData: " + ex); //$NON-NLS-1$
@@ -340,7 +339,7 @@ public final class CAdESValidator {
         final ASN1Set signerInfosSd = sd.getSignerInfos();
 
         for (int i = 0; i < signerInfosSd.size(); i++) {
-            final SignerInfo si = new SignerInfo((ASN1Sequence) signerInfosSd.getObjectAt(i));
+            final SignerInfo si = SignerInfo.getInstance(signerInfosSd.getObjectAt(i));
             isValid = verifySignerInfo(si);
         }
 
