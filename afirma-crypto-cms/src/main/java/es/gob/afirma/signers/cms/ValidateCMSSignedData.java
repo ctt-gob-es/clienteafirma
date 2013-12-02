@@ -59,7 +59,7 @@ final class ValidateCMSSignedData {
                 final ASN1Set signerInfosSd = sd.getSignerInfos();
 
                 for (int i = 0; isValid && i < signerInfosSd.size(); i++) {
-                    final SignerInfo si = new SignerInfo((ASN1Sequence) signerInfosSd.getObjectAt(i));
+                    final SignerInfo si = SignerInfo.getInstance(signerInfosSd.getObjectAt(i));
                     isValid = verifySignerInfo(si);
                 }
             }
