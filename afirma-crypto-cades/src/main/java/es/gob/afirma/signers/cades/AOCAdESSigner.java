@@ -69,8 +69,6 @@ public final class AOCAdESSigner implements AOSigner {
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
      * <ul>
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>MD5withRSA</i> (no recomendado por vulnerable)</li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>MD2withRSA</i> (no recomendado por vulnerable)</li>
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
@@ -139,6 +137,13 @@ public final class AOCAdESSigner implements AOSigner {
                        final PrivateKey key,
                        final Certificate[] certChain,
                        final Properties xParams) throws AOException {
+
+    	if (algorithm == null) {
+    		throw new IllegalArgumentException("El algoritmo de firma no puede ser nulo"); //$NON-NLS-1$
+    	}
+    	if (algorithm.toUpperCase().startsWith("MD")) { //$NON-NLS-1$
+    		throw new AOException("CAdES no permite huellas digitales MD2 o MD5 (Decision 130/2011 CE)"); //$NON-NLS-1$
+    	}
 
     	new BCChecker().checkBouncyCastle();
 
@@ -245,8 +250,6 @@ public final class AOCAdESSigner implements AOSigner {
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
      * <ul>
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>MD5withRSA</i> (no recomendado por vulnerable)</li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>MD2withRSA</i> (no recomendado por vulnerable)</li>
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
@@ -309,7 +312,16 @@ public final class AOCAdESSigner implements AOSigner {
                          final PrivateKey key,
                          final java.security.cert.Certificate[] certChain,
                          final Properties extraParams) throws AOException {
+
+    	if (algorithm == null) {
+    		throw new IllegalArgumentException("El algoritmo de firma no puede ser nulo"); //$NON-NLS-1$
+    	}
+    	if (algorithm.toUpperCase().startsWith("MD")) { //$NON-NLS-1$
+    		throw new AOException("CAdES no permite huellas digitales MD2 o MD5 (Decision 130/2011 CE)"); //$NON-NLS-1$
+    	}
+
     	new BCChecker().checkBouncyCastle();
+
         try {
             return ((AOCoSigner)Class.forName("es.gob.afirma.signers.multi.cades.AOCAdESCoSigner").newInstance()).cosign( //$NON-NLS-1$
         		data, sign, algorithm, key, certChain, extraParams
@@ -345,8 +357,6 @@ public final class AOCAdESSigner implements AOSigner {
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
      * <ul>
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>MD5withRSA</i> (no recomendado por vulnerable)</li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>MD2withRSA</i> (no recomendado por vulnerable)</li>
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
@@ -398,7 +408,16 @@ public final class AOCAdESSigner implements AOSigner {
                          final PrivateKey key,
                          final java.security.cert.Certificate[] certChain,
                          final Properties extraParams) throws AOException {
+
+    	if (algorithm == null) {
+    		throw new IllegalArgumentException("El algoritmo de firma no puede ser nulo"); //$NON-NLS-1$
+    	}
+    	if (algorithm.toUpperCase().startsWith("MD")) { //$NON-NLS-1$
+    		throw new AOException("CAdES no permite huellas digitales MD2 o MD5 (Decision 130/2011 CE)"); //$NON-NLS-1$
+    	}
+
     	new BCChecker().checkBouncyCastle();
+
         try {
             return ((AOCoSigner)Class.forName("es.gob.afirma.signers.multi.cades.AOCAdESCoSigner").newInstance()).cosign( //$NON-NLS-1$
         		sign, algorithm, key, certChain, extraParams
@@ -424,8 +443,6 @@ public final class AOCAdESSigner implements AOSigner {
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
      * <ul>
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>MD5withRSA</i> (no recomendado por vulnerable)</li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>MD2withRSA</i> (no recomendado por vulnerable)</li>
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
@@ -481,7 +498,16 @@ public final class AOCAdESSigner implements AOSigner {
                               final PrivateKey key,
                               final java.security.cert.Certificate[] certChain,
                               final Properties extraParams) throws AOException {
+
+    	if (algorithm == null) {
+    		throw new IllegalArgumentException("El algoritmo de firma no puede ser nulo"); //$NON-NLS-1$
+    	}
+    	if (algorithm.toUpperCase().startsWith("MD")) { //$NON-NLS-1$
+    		throw new AOException("CAdES no permite huellas digitales MD2 o MD5 (Decision 130/2011 CE)"); //$NON-NLS-1$
+    	}
+
     	new BCChecker().checkBouncyCastle();
+
         try {
             return ((AOCounterSigner)Class.forName("es.gob.afirma.signers.multi.cades.AOCAdESCounterSigner").newInstance()).countersign( //$NON-NLS-1$
         		sign, algorithm, targetType, targets, key, certChain, extraParams
