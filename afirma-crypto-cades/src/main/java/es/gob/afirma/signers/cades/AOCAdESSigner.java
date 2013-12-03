@@ -138,12 +138,7 @@ public final class AOCAdESSigner implements AOSigner {
                        final Certificate[] certChain,
                        final Properties xParams) throws AOException {
 
-    	if (algorithm == null) {
-    		throw new IllegalArgumentException("El algoritmo de firma no puede ser nulo"); //$NON-NLS-1$
-    	}
-    	if (algorithm.toUpperCase().startsWith("MD")) { //$NON-NLS-1$
-    		throw new AOException("CAdES no permite huellas digitales MD2 o MD5 (Decision 130/2011 CE)"); //$NON-NLS-1$
-    	}
+    	checkAlgorithm(algorithm);
 
     	new BCChecker().checkBouncyCastle();
 
@@ -313,12 +308,7 @@ public final class AOCAdESSigner implements AOSigner {
                          final java.security.cert.Certificate[] certChain,
                          final Properties extraParams) throws AOException {
 
-    	if (algorithm == null) {
-    		throw new IllegalArgumentException("El algoritmo de firma no puede ser nulo"); //$NON-NLS-1$
-    	}
-    	if (algorithm.toUpperCase().startsWith("MD")) { //$NON-NLS-1$
-    		throw new AOException("CAdES no permite huellas digitales MD2 o MD5 (Decision 130/2011 CE)"); //$NON-NLS-1$
-    	}
+    	checkAlgorithm(algorithm);
 
     	new BCChecker().checkBouncyCastle();
 
@@ -409,12 +399,7 @@ public final class AOCAdESSigner implements AOSigner {
                          final java.security.cert.Certificate[] certChain,
                          final Properties extraParams) throws AOException {
 
-    	if (algorithm == null) {
-    		throw new IllegalArgumentException("El algoritmo de firma no puede ser nulo"); //$NON-NLS-1$
-    	}
-    	if (algorithm.toUpperCase().startsWith("MD")) { //$NON-NLS-1$
-    		throw new AOException("CAdES no permite huellas digitales MD2 o MD5 (Decision 130/2011 CE)"); //$NON-NLS-1$
-    	}
+    	checkAlgorithm(algorithm);
 
     	new BCChecker().checkBouncyCastle();
 
@@ -499,12 +484,7 @@ public final class AOCAdESSigner implements AOSigner {
                               final java.security.cert.Certificate[] certChain,
                               final Properties extraParams) throws AOException {
 
-    	if (algorithm == null) {
-    		throw new IllegalArgumentException("El algoritmo de firma no puede ser nulo"); //$NON-NLS-1$
-    	}
-    	if (algorithm.toUpperCase().startsWith("MD")) { //$NON-NLS-1$
-    		throw new AOException("CAdES no permite huellas digitales MD2 o MD5 (Decision 130/2011 CE)"); //$NON-NLS-1$
-    	}
+    	checkAlgorithm(algorithm);
 
     	new BCChecker().checkBouncyCastle();
 
@@ -636,4 +616,14 @@ public final class AOCAdESSigner implements AOSigner {
         }
         return new AOSignInfo(AOSignConstants.SIGN_FORMAT_CADES);
     }
+
+    private static void checkAlgorithm(final String algorithm) throws AOException {
+    	if (algorithm == null) {
+    		throw new IllegalArgumentException("El algoritmo de firma no puede ser nulo"); //$NON-NLS-1$
+    	}
+    	if (algorithm.toUpperCase().startsWith("MD")) { //$NON-NLS-1$
+    		throw new AOException("CAdES no permite huellas digitales MD2 o MD5 (Decision 130/2011 CE)"); //$NON-NLS-1$
+    	}
+    }
+
 }
