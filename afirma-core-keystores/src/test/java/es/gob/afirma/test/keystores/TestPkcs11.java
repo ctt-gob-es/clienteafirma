@@ -21,7 +21,7 @@ import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class TestPkcs11 {
 
-	private static final String LIB_NAME = "C:\\temp\\FNMT_P11_x64.dll"; //$NON-NLS-1$
+	private static final String LIB_NAME = "C:\\WINDOWS\\System32\\DNIe_P11_priv.dll"; //$NON-NLS-1$
 	private static final char[] PIN = "xxxx".toCharArray(); //$NON-NLS-1$
 
 	/** Prueba de firma con PKCS#11.
@@ -48,7 +48,6 @@ public final class TestPkcs11 {
 	@Test
 	@Ignore
 	public void testRawPkcs11() throws Exception {
-		@SuppressWarnings("restriction")
 		final Provider p = new sun.security.pkcs11.SunPKCS11(
 			new ByteArrayInputStream(
 				(
@@ -99,7 +98,7 @@ public final class TestPkcs11 {
 	 * @param args
 	 * @throws Exception */
 	public static void main(final String args[]) throws Exception {
-		new TestPkcs11().testDnie();
+		new TestPkcs11().testRawPkcs11();
 	}
 
 }

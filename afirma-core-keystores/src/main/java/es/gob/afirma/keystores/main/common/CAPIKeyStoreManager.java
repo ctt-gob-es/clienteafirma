@@ -205,7 +205,6 @@ public final class CAPIKeyStoreManager extends AOKeyStoreManager {
         while (aliases.hasMoreElements()) {
             currAlias = aliases.nextElement().toString();
             v.add(currAlias);
-            LOGGER.info("Alias: " + currAlias);	//TODO: Traza para ayudar a localizar los problemas relacionados con CLAUER //$NON-NLS-1$
         }
 
         return v.toArray(new String[0]);

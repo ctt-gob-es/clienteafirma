@@ -233,9 +233,6 @@ public final class KeyStoreUtilities {
                     }
                     catch (final UnsupportedOperationException e) {
                         aliassesByFriendlyName.remove(al);
-                        LOGGER.info(
-                          "El certificado '" + al + "' no se mostrara por no soportar operaciones de clave privada" //$NON-NLS-1$ //$NON-NLS-2$
-                        );
                     }
                     catch (final Exception e) {
                         LOGGER.info(

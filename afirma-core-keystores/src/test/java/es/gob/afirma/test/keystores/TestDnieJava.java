@@ -52,11 +52,18 @@ public class TestDnieJava {
         }
 
         for (final String alias : aliases) {
-        	X509Certificate cert = ksm.getCertificate(alias);
-        	Assert.assertNotNull("No se pudo recuperar el certificado", cert);
+        	final X509Certificate cert = ksm.getCertificate(alias);
+        	Assert.assertNotNull("No se pudo recuperar el certificado", cert); //$NON-NLS-1$
         	System.out.println(cert);
         }
 
     }
+
+	/** Main.
+	 * @param args
+	 * @throws Exception */
+	public static void main(final String[] args) throws Exception {
+		new TestDnieJava().testDnieJava();
+	}
 
 }
