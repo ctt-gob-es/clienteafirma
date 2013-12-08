@@ -233,6 +233,9 @@ public final class KeyStoreUtilities {
                     }
                     catch (final UnsupportedOperationException e) {
                         aliassesByFriendlyName.remove(al);
+                        LOGGER.info(
+                          "Se ha ocultado un certificado por no soportar operaciones de clave privada: " + e //$NON-NLS-1$
+                        );
                     }
                     catch (final Exception e) {
                         LOGGER.info(
