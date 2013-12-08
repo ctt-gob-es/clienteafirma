@@ -10,12 +10,14 @@
 
 package es.gob.afirma.test.keystores;
 
+import java.security.Signature;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.junit.Test;
 
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.main.common.AOKeyStore;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
@@ -54,8 +56,16 @@ public class TestWindowsFriendlyNames {
                true, // Show expired
                null  // filters
        );
+
        for (final String key : aliases.keySet()) {
            System.out.println(key + "\n\t" + aliases.get(key)); //$NON-NLS-1$
+           final Signature s = Signature.getInstance("SHA512withRSA"); //$NON-NLS-1$
+           s.initSign(ksm.getKeyEntry(
+			   key,
+			   KeyStoreUtilities.getCertificatePC(AOKeyStore.WINDOWS, null)
+		   ).getPrivateKey());
+           s.update("Hola".getBytes()); //$NON-NLS-1$
+           System.out.println(AOUtil.hexify(s.sign(), true));
        }
     }
 
