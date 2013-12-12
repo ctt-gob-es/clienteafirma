@@ -293,7 +293,7 @@ final class CAdESCounterSigner {
 
         final ASN1EncodableVector counterSigners = new ASN1EncodableVector();
         for (int i = 0; i < signerInfosRaiz.size(); i++) {
-            final SignerInfo si = new SignerInfo((ASN1Sequence) signerInfosRaiz.getObjectAt(i));
+            final SignerInfo si = SignerInfo.getInstance(signerInfosRaiz.getObjectAt(i));
             counterSigners.add(
         		getCounterSignerInfo(
         			si,
@@ -337,7 +337,7 @@ final class CAdESCounterSigner {
 
         final ASN1EncodableVector counterSigners = new ASN1EncodableVector();
         for (int i = 0; i < signerInfosRaiz.size(); i++) {
-            final SignerInfo si = new SignerInfo((ASN1Sequence) signerInfosRaiz.getObjectAt(i));
+            final SignerInfo si = SignerInfo.getInstance(signerInfosRaiz.getObjectAt(i));
             counterSigners.add(
         		getLeafSignerInfo(
     				si,
@@ -390,7 +390,7 @@ final class CAdESCounterSigner {
         this.actualIndex = 0;
 
         for (int i = 0; i < auxSignerRaiz.size(); i++) {
-            final SignerInfo si = new SignerInfo((ASN1Sequence) auxSignerRaiz.getObjectAt(i));
+            final SignerInfo si = SignerInfo.getInstance(auxSignerRaiz.getObjectAt(i));
             SignerInfo counterSigner = null;
             if (this.actualIndex == nodo) {
                 counterSigner = getNodeSignerInfo(
@@ -468,7 +468,7 @@ final class CAdESCounterSigner {
                     final ASN1Set setInto = data.getAttrValues();
                     final Enumeration<?> eAtributesData = setInto.getObjects();
                     while (eAtributesData.hasMoreElements()) {
-                        final SignerInfo si = new SignerInfo((ASN1Sequence) eAtributesData.nextElement());
+                        final SignerInfo si = SignerInfo.getInstance(eAtributesData.nextElement());
                         signerInfosU.add(
                     		getCounterSignerInfo(
                 				si,
@@ -643,7 +643,7 @@ final class CAdESCounterSigner {
                     final ASN1Set setInto = data.getAttrValues();
                     final Enumeration<?> eAtributesData = setInto.getObjects();
                     while (eAtributesData.hasMoreElements()) {
-                        final SignerInfo si = new SignerInfo((ASN1Sequence) eAtributesData.nextElement());
+                        final SignerInfo si = SignerInfo.getInstance(eAtributesData.nextElement());
                         signerInfosU.add(
                     		getLeafSignerInfo(
                         		si,
@@ -801,7 +801,7 @@ final class CAdESCounterSigner {
                     final ASN1Set setInto = data.getAttrValues();
                     final Enumeration<?> eAtributesData = setInto.getObjects();
                     while (eAtributesData.hasMoreElements()) {
-                        signerInfosU.add(new SignerInfo((ASN1Sequence) eAtributesData.nextElement()));
+                        signerInfosU.add(SignerInfo.getInstance(eAtributesData.nextElement()));
                     }
                 }
                 else {
@@ -962,7 +962,7 @@ final class CAdESCounterSigner {
                     final ASN1Set setInto = data.getAttrValues();
                     final Enumeration<?> eAtributesData = setInto.getObjects();
                     while (eAtributesData.hasMoreElements()) {
-                        final SignerInfo si = new SignerInfo((ASN1Sequence) eAtributesData.nextElement());
+                        final SignerInfo si = SignerInfo.getInstance(eAtributesData.nextElement());
                         this.actualIndex++;
                         if (this.actualIndex != node) {
                             if (this.actualIndex < node) {

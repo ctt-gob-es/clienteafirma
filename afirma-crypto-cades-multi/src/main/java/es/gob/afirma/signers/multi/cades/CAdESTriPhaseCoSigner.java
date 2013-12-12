@@ -193,7 +193,7 @@ public final class CAdESTriPhaseCoSigner {
 
 		// introducimos el nuevo SignerInfo del firmante actual.
 		for (int i = 0; i < signerInfosSd.size(); i++) {
-			signerInfos.add(new SignerInfo((ASN1Sequence) signerInfosSd.getObjectAt(i)));
+			signerInfos.add(SignerInfo.getInstance(signerInfosSd.getObjectAt(i)));
 		}
 
 		// Creamos los signerInfos del SignedData

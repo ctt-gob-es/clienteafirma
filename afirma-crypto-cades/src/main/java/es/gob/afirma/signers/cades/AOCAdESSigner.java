@@ -15,6 +15,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -138,13 +139,38 @@ public final class AOCAdESSigner implements AOSigner {
                        final Certificate[] certChain,
                        final Properties xParams) throws AOException {
 
+    	if (certChain == null || certChain.length < 1) {
+    		throw new IllegalArgumentException("La cadena de certificados debe contener al menos un elemento"); //$NON-NLS-1$
+    	}
+
     	checkAlgorithm(algorithm);
 
     	new BCChecker().checkBouncyCastle();
 
+    	//****************************************************************************************************
+    	//*************** LECTURA PARAMETROS ADICIONALES *****************************************************
+
         final Properties extraParams = xParams != null ? xParams : new Properties();
 
+        // Algoritmo usado cuando se proporciona la huella digital precalculada
         final String precalculatedDigestAlgorithmName = extraParams.getProperty("precalculatedHashAlgorithm"); //$NON-NLS-1$
+
+        // Forzado del SigningCertificateV2
+        boolean signingCertificateV2;
+        if (AOSignConstants.isSHA2SignatureAlgorithm(algorithm)) {
+        	signingCertificateV2 = true;
+        }
+        else if (extraParams.containsKey("signingCertificateV2")) { //$NON-NLS-1$
+       		signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2")); //$NON-NLS-1$
+        }
+        else {
+        	signingCertificateV2 = !"SHA1".equals(AOSignConstants.getDigestAlgorithmName(algorithm));	 //$NON-NLS-1$
+        }
+
+        final String mode = extraParams.getProperty("mode", AOSignConstants.DEFAULT_SIGN_MODE); //$NON-NLS-1$
+
+    	//*************** FIN LECTURA PARAMETROS ADICIONALES *************************************************
+    	//****************************************************************************************************
 
         final byte[] dataDigest;
         final String digestAlgoritmName;
@@ -161,19 +187,6 @@ public final class AOCAdESSigner implements AOSigner {
 				throw new AOException("Algoritmo no soportado: " + e, e); //$NON-NLS-1$
 			}
         }
-
-        boolean signingCertificateV2;
-        if (AOSignConstants.isSHA2SignatureAlgorithm(algorithm)) {
-        	signingCertificateV2 = true;
-        }
-        else if (extraParams.containsKey("signingCertificateV2")) { //$NON-NLS-1$
-       		signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2")); //$NON-NLS-1$
-        }
-        else {
-        	signingCertificateV2 = !"SHA1".equals(AOSignConstants.getDigestAlgorithmName(algorithm));	 //$NON-NLS-1$
-        }
-
-        final String mode = extraParams.getProperty("mode", AOSignConstants.DEFAULT_SIGN_MODE); //$NON-NLS-1$
 
         final P7ContentSignerParameters csp = new P7ContentSignerParameters(
     		data,
@@ -206,7 +219,7 @@ public final class AOCAdESSigner implements AOSigner {
                    new AdESPolicy(extraParams),
                    signingCertificateV2,
                    key,
-                   certChain,
+                   Boolean.parseBoolean(extraParams.getProperty("includeOnlySignningCertificate", Boolean.FALSE.toString())) ? new X509Certificate[] { (X509Certificate) certChain[0] } : certChain, //$NON-NLS-1$
                    dataDigest,
                    digestAlgoritmName,
                    Boolean.parseBoolean(extraParams.getProperty("padesMode", "false")), //$NON-NLS-1$ //$NON-NLS-2$
@@ -314,7 +327,12 @@ public final class AOCAdESSigner implements AOSigner {
 
         try {
             return ((AOCoSigner)Class.forName("es.gob.afirma.signers.multi.cades.AOCAdESCoSigner").newInstance()).cosign( //$NON-NLS-1$
-        		data, sign, algorithm, key, certChain, extraParams
+        		data,
+        		sign,
+        		algorithm,
+        		key,
+        		certChain,
+        		extraParams
     		);
         }
         catch(final Exception e) {

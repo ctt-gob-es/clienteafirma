@@ -12,6 +12,7 @@ package es.gob.afirma.signers.multi.cades;
 
 import java.io.IOException;
 import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
 import java.util.Properties;
 
 import es.gob.afirma.core.AOException;
@@ -35,10 +36,15 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                               final CounterSignTarget targetType,
                               final Object[] targets,
                               final PrivateKey key,
-                              final java.security.cert.Certificate[] certChain,
+                              final java.security.cert.Certificate[] cChain,
                               final Properties xParams) throws AOException, IOException {
 
         final Properties extraParams = xParams != null ? xParams : new Properties();
+
+        // Control general para todo el metodo de la inclusion de la cadena completa o solo el certificado del firmante
+		final java.security.cert.Certificate[] certChain = Boolean.parseBoolean(extraParams.getProperty("includeOnlySignningCertificate", Boolean.FALSE.toString())) ? //$NON-NLS-1$
+       		 new X509Certificate[] { (X509Certificate) cChain[0] } :
+       			 cChain;
 
         boolean signingCertificateV2;
         if (AOSignConstants.isSHA2SignatureAlgorithm(algorithm)) {

@@ -50,9 +50,11 @@ public class AOCAdESCoSigner implements AOCoSigner {
         boolean signingCertificateV2;
         if (AOSignConstants.isSHA2SignatureAlgorithm(algorithm)) {
         	signingCertificateV2 = true;
-        } else if (extraParams.containsKey("signingCertificateV2")) { //$NON-NLS-1$
+        }
+        else if (extraParams.containsKey("signingCertificateV2")) { //$NON-NLS-1$
         	signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2")); //$NON-NLS-1$
-        } else {
+        }
+        else {
         	signingCertificateV2 = !"SHA1".equals(AOSignConstants.getDigestAlgorithmName(algorithm));	 //$NON-NLS-1$
         }
 
@@ -68,7 +70,8 @@ public class AOCAdESCoSigner implements AOCoSigner {
 				final MimeHelper mimeHelper = new MimeHelper(data);
 				contentDescription = mimeHelper.getDescription();
 				contentTypeOid = MimeHelper.transformMimeTypeToOid(mimeHelper.getMimeType());
-			} catch (final Exception e) {
+			}
+			catch (final Exception e) {
 				Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
 						"No se han podido cargar las librerias para identificar el tipo de dato firmado: " + e); //$NON-NLS-1$
 			}
@@ -90,7 +93,9 @@ public class AOCAdESCoSigner implements AOCoSigner {
                     new AdESPolicy(extraParams),
                     signingCertificateV2,
                     key,
-                    certChain,
+                    Boolean.parseBoolean(extraParams.getProperty("includeOnlySignningCertificate", Boolean.FALSE.toString())) ? //$NON-NLS-1$
+                		new X509Certificate[] { (X509Certificate) certChain[0] } :
+                			certChain,
                     messageDigest,
                     contentTypeOid,
                     contentDescription
@@ -103,7 +108,9 @@ public class AOCAdESCoSigner implements AOCoSigner {
                  new AdESPolicy(extraParams),
                  signingCertificateV2,
                  key,
-                 certChain,
+                 Boolean.parseBoolean(extraParams.getProperty("includeOnlySignningCertificate", Boolean.FALSE.toString())) ? //$NON-NLS-1$
+            		 new X509Certificate[] { (X509Certificate) certChain[0] } :
+            			 certChain,
                  messageDigest,
                  contentTypeOid,
                  contentDescription
@@ -156,7 +163,7 @@ public class AOCAdESCoSigner implements AOCoSigner {
 				    typeAlgorithm,
 				    Boolean.parseBoolean(extraParams.getProperty("includeOnlySignningCertificate")) ? //$NON-NLS-1$
 						new X509Certificate[] { (X509Certificate) certChain[0] } :
-						(X509Certificate[]) certChain,
+							(X509Certificate[]) certChain,
 				    new ByteArrayInputStream(sign),
 				    new AdESPolicy(extraParams),
 				    signingCertificateV2,
@@ -183,7 +190,9 @@ public class AOCAdESCoSigner implements AOCoSigner {
                  new AdESPolicy(extraParams),
                  signingCertificateV2,
                  key,
-                 certChain,
+                 Boolean.parseBoolean(extraParams.getProperty("includeOnlySignningCertificate", Boolean.FALSE.toString())) ? //$NON-NLS-1$
+            		 new X509Certificate[] { (X509Certificate) certChain[0] } :
+            			 certChain,
                  null, // null porque no nos pueden dar un hash en este metodo, tendria que ser en el que incluye datos
                  contentTypeOid,
                  contentDescription

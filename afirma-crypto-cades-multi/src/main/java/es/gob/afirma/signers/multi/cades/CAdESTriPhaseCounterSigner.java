@@ -81,11 +81,11 @@ public final class CAdESTriPhaseCounterSigner {
 		public byte[] getSign() {
 			return this.sign;
 		}
-		
+
 		/**
 		 * Recupera las prefirmas (SignedData) de cada contrafirma realizada listas para
 		 * firmarse con el certificado correcto.
-		 * @return Listado de prefirmas. 
+		 * @return Listado de prefirmas.
 		 */
 		public ArrayList<byte[]> getPreSigns() {
 			return this.preSigns;
@@ -270,7 +270,7 @@ public final class CAdESTriPhaseCounterSigner {
 
         final ASN1EncodableVector counterSigners = new ASN1EncodableVector();
         for (int i = 0; i < signerInfosRaiz.size(); i++) {
-            final SignerInfo si = new SignerInfo((ASN1Sequence) signerInfosRaiz.getObjectAt(i));
+            final SignerInfo si = SignerInfo.getInstance(signerInfosRaiz.getObjectAt(i));
             counterSigners.add(
         		getCounterSignerInfo(
         			si,
@@ -314,7 +314,7 @@ public final class CAdESTriPhaseCounterSigner {
 
         final ASN1EncodableVector counterSigners = new ASN1EncodableVector();
         for (int i = 0; i < signerInfosRaiz.size(); i++) {
-            final SignerInfo si = new SignerInfo((ASN1Sequence) signerInfosRaiz.getObjectAt(i));
+            final SignerInfo si = SignerInfo.getInstance(signerInfosRaiz.getObjectAt(i));
             counterSigners.add(
         		getLeafSignerInfo(
     				si,
@@ -372,7 +372,7 @@ public final class CAdESTriPhaseCounterSigner {
                     final ASN1Set setInto = data.getAttrValues();
                     final Enumeration<?> eAtributesData = setInto.getObjects();
                     while (eAtributesData.hasMoreElements()) {
-                        final SignerInfo si = new SignerInfo((ASN1Sequence) eAtributesData.nextElement());
+                        final SignerInfo si = SignerInfo.getInstance(eAtributesData.nextElement());
                         signerInfosU.add(
                     		getCounterSignerInfo(
                 				si,
@@ -538,7 +538,7 @@ public final class CAdESTriPhaseCounterSigner {
                     final ASN1Set setInto = data.getAttrValues();
                     final Enumeration<?> eAtributesData = setInto.getObjects();
                     while (eAtributesData.hasMoreElements()) {
-                        final SignerInfo si = new SignerInfo((ASN1Sequence) eAtributesData.nextElement());
+                        final SignerInfo si = SignerInfo.getInstance(eAtributesData.nextElement());
                         signerInfosU.add(
                     		getLeafSignerInfo(
                         		si,
