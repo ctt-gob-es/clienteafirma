@@ -11,6 +11,7 @@
 package es.gob.afirma.signers.pades;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -28,6 +29,13 @@ final class PdfPreProcessor {
 
 	private PdfPreProcessor() {
 		// No permitimos la instancacion
+	}
+
+	static void addMoreInfo(final HashMap<String, String> moreInfo, final PdfStamper stp) {
+		if (moreInfo == null || moreInfo.isEmpty()) {
+			return;
+		}
+		stp.setMoreInfo(moreInfo);
 	}
 
 	static void attachFile(final Properties extraParams, final PdfStamper stp) throws IOException {
