@@ -15,7 +15,7 @@ import es.gob.afirma.core.InvalidLibraryException;
 /** Indica que hay un iText inv&aacute;lido en el CLASSPATH o en el BOOTCLASSPATH, a menudo
  * porque se ha instalado el JAR inapropiadamente como extensi&oacute;n del JRE.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-public class InvalidITextException extends InvalidLibraryException {
+public final class InvalidITextException extends InvalidLibraryException {
 
 	private static final long serialVersionUID = -322997692480101275L;
 
@@ -25,7 +25,7 @@ public class InvalidITextException extends InvalidLibraryException {
 	/** Crea una instancia de la excepci&oacute;n.
 	 * @param expected Versi&oacute;n esperada de iText
 	 * @param found Versi&oacute;n encontrada (actual) de iText */
-	public InvalidITextException(final String expected, final String found) {
+	InvalidITextException(final String expected, final String found) {
 		super("Se necesitaba iText version " + expected + ", pero se encontro la version " + found); //$NON-NLS-1$ //$NON-NLS-2$
 		this.exp = expected;
 		this.fnd = found;

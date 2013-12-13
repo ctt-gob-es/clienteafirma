@@ -14,7 +14,7 @@ import es.gob.afirma.core.AOException;
 
 /** Indica que el PDF no ha podido firmarse por estar certificado.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-public class PdfIsCertifiedException extends AOException {
+public final class PdfIsCertifiedException extends AOException {
 
 	private static final long serialVersionUID = -7345078395676697490L;
 

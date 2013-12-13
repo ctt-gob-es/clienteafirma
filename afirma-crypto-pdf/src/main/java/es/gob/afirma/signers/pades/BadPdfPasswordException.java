@@ -15,13 +15,13 @@ import es.gob.afirma.core.AOException;
 /** Indica que el PDF no ha podido abrirse o firmarse por estar protegido por una contrase&ntilde;a distinta
  * a la proporcionada (si se proporcion&oacute; alguna).
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-public class BadPdfPasswordException extends AOException {
+public final class BadPdfPasswordException extends AOException {
 
 	private static final long serialVersionUID = 8754705547567762401L;
 
 	/** Crea una excepci&oacute;n que indica que el PDF no ha podido abrirse o firmarse por estar protegido por una contrase&ntilde;a.
 	 * @param e Excepci&oacute;n de origen */
-	public BadPdfPasswordException(final Throwable e) {
+	BadPdfPasswordException(final Throwable e) {
 		super("La contrasena proporcionada no es valida para el PDF actual o no se proporciono ninguna contrasena", e); //$NON-NLS-1$
 	}
 

@@ -106,6 +106,7 @@ public final class AOPDFSigner implements AOSigner {
      * </ul>
      * @param key Clave privada a usar para firmar
      * @param certChain Cadena de certificados del firmante
+     * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
      * @return Documento PDF firmado en formato PAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     @Override

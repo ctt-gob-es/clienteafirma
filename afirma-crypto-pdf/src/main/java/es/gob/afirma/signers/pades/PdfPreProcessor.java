@@ -23,7 +23,9 @@ import com.lowagie.text.pdf.PdfStamper;
 
 import es.gob.afirma.core.misc.Base64;
 
-final class PdfPreProcessor {
+/** Utilidades para el manejo y modificaci&oacute;n de PDF antes de firmarlo.
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
+public final class PdfPreProcessor {
 
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");  //$NON-NLS-1$
 
@@ -31,7 +33,10 @@ final class PdfPreProcessor {
 		// No permitimos la instancacion
 	}
 
-	static void addMoreInfo(final HashMap<String, String> moreInfo, final PdfStamper stp) {
+	/** A&ntilde;ade campos adicionales al diccionario PDF.
+	 * @param moreInfo Campos a a&ntilde;adir al diccionario PDF
+	 * @param stp Estampador de PDF, debe abrirse y cerrarse fuera de este m&eacute;todo */
+	public static void addMoreInfo(final HashMap<String, String> moreInfo, final PdfStamper stp) {
 		if (moreInfo == null || moreInfo.isEmpty()) {
 			return;
 		}
@@ -69,7 +74,11 @@ final class PdfPreProcessor {
 
 	}
 
-	static void addImage(final Properties extraParams, final PdfStamper stp) throws IOException {
+	/** Sobreimpone una imagen en un documento PDF.
+	 * @param extraParams Datos de la imagen a a&ntilde;adir como <a href="doc-files/extraparams.html">par&aacute;metros adicionales</a>
+	 * @param stp Estampador de PDF, debe abrirse y cerrarse fuera de este m&eacute;todo
+	 * @throws IOException */
+	public static void addImage(final Properties extraParams, final PdfStamper stp) throws IOException {
 		if (extraParams == null || stp == null) {
 			return;
 		}

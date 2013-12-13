@@ -15,7 +15,7 @@ import java.util.ResourceBundle;
 
 /** Clase para la obtencion de los recursos textuales del n&uacute;cleo del
  * cliente de firma. */
-public final class CommonPdfMessages {
+final class CommonPdfMessages {
 
     private static final String BUNDLE_NAME = "commonpdfmessages"; //$NON-NLS-1$
 
@@ -28,7 +28,7 @@ public final class CommonPdfMessages {
     /** Recupera el texto identificado con la clave proporcionada.
      * @param key Clave del texto.
      * @return Recueso textual. */
-    public static String getString(final String key) {
+    static String getString(final String key) {
         try {
             return RESOURCE_BUNDLE.getString(key);
         }
@@ -61,7 +61,7 @@ public final class CommonPdfMessages {
      * @param params
      *        Par&aacute;metros que se desean insertar.
      * @return Recuerso textual con las subcadenas sustituidas. */
-    public static String getString(final String key, final String[] params) {
+    static String getString(final String key, final String[] params) {
 
         String text;
         try {

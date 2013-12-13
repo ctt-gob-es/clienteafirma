@@ -21,8 +21,8 @@ import org.xml.sax.SAXException;
 import es.gob.afirma.core.misc.Base64;
 
 
-/** Resultado de una pre-firma (como primera parte de un firma trif&aacute;sica) o una firma completa PAdES. */
-/** <i>JavaBean</i> que encapsula los resultados de la pre-firma o firma completa PDF. */
+/** Resultado de una pre-firma (como primera parte de un firma trif&aacute;sica) o una firma completa PAdES.
+ * Es un <i>JavaBean</i> que encapsula los resultados de la pre-firma o firma completa PDF. */
 final class PdfSignResult implements Serializable {
 
 	private static final long serialVersionUID = 2L;
