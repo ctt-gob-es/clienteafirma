@@ -60,16 +60,15 @@ public final class PdfPreProcessor {
 		final String attachmentDescription = extraParams.getProperty("attachDescription"); //$NON-NLS-1$
 
 		if (b64Attachment != null && attachmentFileName != null) {
-			byte[] attachment = null;
+			final byte[] attachment;
 			try {
 				attachment = Base64.decode(b64Attachment);
 			}
 			catch(final IOException e) {
 				LOGGER.warning("Se ha indicado un adjunto, pero no estaba en formato Base64, se ignorara : " + e); //$NON-NLS-1$
+				return;
 			}
-			if (attachment != null) {
-				stp.getWriter().addFileAttachment(attachmentDescription, attachment, null, attachmentFileName);
-			}
+			stp.getWriter().addFileAttachment(attachmentDescription, attachment, null, attachmentFileName);
 		}
 
 	}

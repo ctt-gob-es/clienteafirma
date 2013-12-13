@@ -41,6 +41,8 @@ public class AOCAdESCoSigner implements AOCoSigner {
 
         final Properties extraParams = xParams != null ? xParams : new Properties();
 
+        final boolean onlySigningCertificate = Boolean.parseBoolean(extraParams.getProperty("includeOnlySignningCertificate")); //$NON-NLS-1$
+
         byte[] messageDigest = null;
         final String precalculatedDigest = extraParams.getProperty("precalculatedHashAlgorithm"); //$NON-NLS-1$
         if (precalculatedDigest != null) {
@@ -93,7 +95,7 @@ public class AOCAdESCoSigner implements AOCoSigner {
                     new AdESPolicy(extraParams),
                     signingCertificateV2,
                     key,
-                    Boolean.parseBoolean(extraParams.getProperty("includeOnlySignningCertificate", Boolean.FALSE.toString())) ? //$NON-NLS-1$
+                    onlySigningCertificate ?
                 		new X509Certificate[] { (X509Certificate) certChain[0] } :
                 			certChain,
                     messageDigest,
@@ -108,7 +110,7 @@ public class AOCAdESCoSigner implements AOCoSigner {
                  new AdESPolicy(extraParams),
                  signingCertificateV2,
                  key,
-                 Boolean.parseBoolean(extraParams.getProperty("includeOnlySignningCertificate", Boolean.FALSE.toString())) ? //$NON-NLS-1$
+                 onlySigningCertificate ?
             		 new X509Certificate[] { (X509Certificate) certChain[0] } :
             			 certChain,
                  messageDigest,
@@ -131,6 +133,8 @@ public class AOCAdESCoSigner implements AOCoSigner {
                          final Properties xParams) throws AOException, IOException {
 
         final Properties extraParams = xParams != null ? xParams : new Properties();
+
+        final boolean onlySigningCertificate = Boolean.parseBoolean(extraParams.getProperty("includeOnlySignningCertificate")); //$NON-NLS-1$
 
         boolean signingCertificateV2;
         if (AOSignConstants.isSHA2SignatureAlgorithm(algorithm)) {
@@ -161,7 +165,7 @@ public class AOCAdESCoSigner implements AOCoSigner {
             try {
 				return new CAdESCoSigner().coSigner(
 				    typeAlgorithm,
-				    Boolean.parseBoolean(extraParams.getProperty("includeOnlySignningCertificate")) ? //$NON-NLS-1$
+				    onlySigningCertificate ?
 						new X509Certificate[] { (X509Certificate) certChain[0] } :
 							(X509Certificate[]) certChain,
 				    new ByteArrayInputStream(sign),
@@ -183,7 +187,7 @@ public class AOCAdESCoSigner implements AOCoSigner {
         try {
             return new CAdESCoSignerEnveloped().coSigner(
                  typeAlgorithm,
-                 Boolean.parseBoolean(extraParams.getProperty("includeOnlySignningCertificate")) ? //$NON-NLS-1$
+                 onlySigningCertificate ?
          			new X509Certificate[] { (X509Certificate) certChain[0] } :
      				(X509Certificate[]) certChain,
                  new ByteArrayInputStream(sign),
