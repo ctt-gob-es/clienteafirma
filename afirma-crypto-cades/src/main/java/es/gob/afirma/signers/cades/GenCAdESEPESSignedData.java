@@ -87,8 +87,7 @@ public final class GenCAdESEPESSignedData {
      *         Si no se soporta alguno de los algoritmos de firma o huella digital indicados
      * @throws CertificateException En caso de cualquier problema con los certificados de firma.
      * @throws IOException En caso de cualquier problema leyendo o escribiendo los datos
-     * @throws AOException
-     *         Cuando ocurre alg&uacute;n error durante el proceso de codificaci&oacute;n ASN.1 */
+     * @throws AOException Cuando ocurre alg&uacute;n error durante el proceso de codificaci&oacute;n ASN.1 */
     public static byte[] generateSignedData(final P7ContentSignerParameters parameters,
                                      final boolean omitContent,
                                      final AdESPolicy policy,

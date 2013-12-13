@@ -142,8 +142,7 @@ public final class CAdESTriPhaseSigner {
      // No permitimos la instanciacion
     }
 
-    /**
-     * Genera los atributos firmados CAdES (prefirma).
+    /** Genera los atributos firmados CAdES (prefirma).
      * @param digestAlgorithmName Algoritmo de huella digital
      * @param content Datos a firmar (usar <code>null</code> si no se desean a&ntilde;adir a la firma)
      * @param signerCertificateChain Cadena de certificados del firmante
@@ -155,8 +154,7 @@ public final class CAdESTriPhaseSigner {
      * @param contentType Tipo de contenido definido por su OID.
      * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
      * @return Atributos CAdES a firmar (prefirma) en formato ASN.1
-     * @throws AOException Cuando se produce cualquier error durante el proceso.
-     */
+     * @throws AOException Cuando se produce cualquier error durante el proceso. */
     public static byte[] preSign(final String digestAlgorithmName,
                           final byte[] content,
                           final X509Certificate[] signerCertificateChain,

@@ -76,60 +76,7 @@ public final class AOCAdESSigner implements AOSigner {
      * </ul>
      * @param key Clave privada a usar para firmar.
      * @param certChain Cadena de certificaci&oacute;n.
-     * @param xParams Par&aacute;metros adicionales para la firma.
-     * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
-     * <dl>
-     *  <dt><b><i>includeOnlySignningCertificate</i></b></dt>
-	 *   <dd>
-	 *    Si se establece a {@code true} se incluye en la firma &uacute;nicamente el certificado del firmante (y no la cadena de certificaci&oacute;n completa).
-	 *    Si no se establece o se establece a o {@code false} se incluir&aacute; toda la cadena de certificaci&oacute;n.
-	 *   </dd>
-     *  <dt><b><i>mode</i></b></dt>
-     *   <dd>
-     *    Modo de firma a usar. El valor <code>explicit</code> indica que no se incluyen los datos firmados, sino una
-     *    referencia a estos, mientras que el valor <code>implicit</code> indica que s&iacute; se incluir&aacute;n dentro de
-     *    la propia firma los datos firmados
-     *   </dd>
-     *  <dt><b><i>policyIdentifier</i></b></dt>
-     *   <dd>
-     *    Identificador de la pol&iacute;tica de firma. Debe ser un OID (o una URN de tipo OID) que identifique
-     *    &uacute;nivocamente la pol&iacute;tica en formato ASN.1 procesable.
-     *   </dd>
-     *  <dt><b><i>policyIdentifierHash</i></b></dt>
-     *   <dd>
-     *    Huella digital del documento de pol&iacute;tica de firma (normalmente del mismo fichero en formato ASN.1 procesable).
-     *    Si no se indica una huella digital y el par&aacute;metro <code>policyIdentifier</code> no es una URL accesible
-     *    universalmente se usar&aacute; <code>0</code>, mientras que si no se indica una huella digital pero el par&aacute;metro
-     *    <code>policyIdentifier</code> es una URL accesible universalmente, se descargara el fichero apuntado por la URL para calcular la huella
-     *    digital <i>al vuelo</i>.
-     *   </dd>
-     *  <dt><b><i>policyIdentifierHashAlgorithm</i></b></dt>
-     *   <dd>
-     *    Algoritmo usado para el c&aacute;lculo de la huella digital indicada en el par&aacute;metro <code>policyIdentifierHash</code>.
-     *    Es obligario indicarlo cuando se proporciona una huella digital distinta de <code>0</code>.
-     *   </dd>
-     *  <dt><b><i>policyQualifier</i></b></dt>
-     *   <dd>
-     *    URL que apunta al documento descriptivo de la pol&iacute;tica de firma (normalmente un documento PDF con una descripci&oacute;n textual).
-     *   </dd>
-     *  <dt><b><i>precalculatedHashAlgorithm</i></b></dt>
-     *   <dd>
-     *    Algoritmo de huella digital (a usar para la firma) cuando esta se proporciona precalculada. Cuando se usan modos de firma
-     *    <i>expl&iacute;citos</i>, en los que los datos no se incluyen en la firma, es posible trabajar sin proporcionarlos, indicando
-     *    &uacute;nicamente su huella digital en el par&aacute;metro <code>data</code> y el algoritmo usado para su c&aacute;lculo.<br>
-     *    <b>
-     *     Siempre que se de valor a este par&aacute;metro se supondr&aacute; que los datos proporcionados en el par&aacute;metro
-     *     <code>data</code> son la huella digital de los datos a firmar, y no los datos a firmar en si.
-     *    </b>
-     *   </dd>
-     *  <dt><b><i>signingCertificateV2</i></b></dt>
-     *   <dd>
-     *    Debe establecerse a <code>true</code> si se desea usar la versi&oacute;n 2 del atributo
-     *    <i>Signing Certificate</i> de CAdES. Si no se establece un valor para este par&aacute;metro
-     *    se utilizar&aacute;a la versi&oacute;n 1 con las firmas realizadas con algoritmos SHA1 y
-     *    la versi&oacute;n 2 con las firmas realizadas con cualquier otro algoritmo.
-     *   </dd>
-     * </dl>
+     * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
      * @return Firma en formato CAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     @Override
@@ -263,54 +210,7 @@ public final class AOCAdESSigner implements AOSigner {
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
      * </ul>
      * @param key Clave privada a usar para firmar
-     * @param extraParams
-     * Par&aacute;metros adicionales para la cofirma.
-     * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>extraParams</code>:</p>
-     * <dl>
-     *  <dt><b><i>includeOnlySignningCertificate</i></b></dt>
-	 *   <dd>
-	 *    Si se establece a {@code true} se incluye en la firma &uacute;nicamente el certificado del firmante (y no la cadena de certificaci&oacute;n completa).
-	 *    Si no se establece o se establece a o {@code false} se incluir&aacute; toda la cadena de certificaci&oacute;n.
-	 *   </dd>
-     *  <dt><b><i>mode</i></b></dt>
-     *   <dd>
-     *    Modo de firma a usar. El valor <code>explicit</code> indica que no se incluyen los datos firmados, sino una
-     *    referencia a estos, mientras que el valor <code>implicit</code> indica que s&iacute; se incluiran dentro de
-     *    la propia firma los datos firmados
-     *   </dd>
-     *  <dt><b><i>policyIdentifier</i></b></dt>
-     *   <dd>
-     *    Identificadora de la pol&iacute;tica de firma. Debe ser un OID (o una URN de tipo OID) que identifique
-     *    &uacute;nivocamente la pol&iacute;tica en formato ASN.1 procesable.
-     *   </dd>
-     *  <dt><b><i>policyIdentifierHash</i></b></dt>
-     *   <dd>
-     *    Huella digital del documento de pol&iacute;tica de firma (normalmente del mismo fichero en formato ASN.1 procesable).
-     *    Si no se indica una huella digital y el par&aacute;metro <code>policyIdentifier</code> no es una URL accesible
-     *    universalmente se usar&aacute; <code>0</code>, mientras que si no se indica una huella digital pero el par&aacute;metro
-     *    <code>policyIdentifier</code> es una URL accesible universalmente, se descargara el fichero apuntado por la URL para calcular la huella
-     *    digital <i>al vuelo</i>.
-     *   </dd>
-     *  <dt><b><i>policyIdentifierHashAlgorithm</i></b></dt>
-     *   <dd>
-     *    Algoritmo usado para el c&aacute;lculo de la huella digital indicada en el par&aacute;metro <code>policyIdentifierHash</code>.
-     *    Es obligario indicarlo cuando se proporciona una huella digital distinta de <code>0</code>.
-     *   </dd>
-     *  <dt><b><i>policyQualifier</i></b></dt>
-     *   <dd>
-     *    URL que apunta al documento descriptivo de la pol&iacute;tica de firma (normalmente un documento PDF con una descripci&oacute;n textual).
-     *   </dd>
-     *  <dt><b><i>precalculatedHashAlgorithm</i></b></dt>
-     *   <dd>
-     *    Algoritmo de huella digital (a usar para la firma) cuando esta se proporciona precalculada. Cuando se usan modos de firma
-     *    <i>expl&iacute;citos</i>, en los que los datos no se incluyen en la firma, es posible trabajar sin proporcionarlos, indicando
-     *    &uacute;nicamente su huella digital en el par&aacute;metro <code>data</code> y el algoritmo usado para su c&aacute;lculo.<br>
-     *    <b>
-     *     Siempre que se de valor a este par&aacute;metro se supondr&aacute; que los datos proporcionados en el par&aacute;metro
-     *     <code>data</code> son la huella digital de los datos a firmar, y no los datos a firmar en si.
-     *    </b>
-     *   </dd>
-     * </dl>
+     * @param extraParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
      * @return Firma CAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     @Override
@@ -370,44 +270,7 @@ public final class AOCAdESSigner implements AOSigner {
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
      * </ul>
      * @param key Clave privada a usar para firmar
-     * @param extraParams
-     * Par&aacute;metros adicionales para la cofirma.
-     * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>extraParams</code>:</p>
-     * <dl>
-     *  <dt><b><i>includeOnlySignningCertificate</i></b></dt>
-	 *   <dd>
-	 *    Si se establece a {@code true} se incluye en la firma &uacute;nicamente el certificado del firmante (y no la cadena de certificaci&oacute;n completa).
-	 *    Si no se establece o se establece a o {@code false} se incluir&aacute; toda la cadena de certificaci&oacute;n.
-	 *   </dd>
-     *  <dt><b><i>mode</i></b></dt>
-     *   <dd>
-     *    Modo de firma a usar. El valor <code>explicit</code> indica que no se incluyen los datos firmados, sino una
-     *    referencia a estos, mientras que el valor <code>implicit</code> indica que s&iacute; se incluiran dentro de
-     *    la propia firma los datos firmados
-     *   </dd>
-     *  <dt><b><i>policyIdentifier</i></b></dt>
-     *   <dd>
-     *    Identificadora de la pol&iacute;tica de firma. Debe ser un OID (o una URN de tipo OID) que identifique
-     *    &uacute;nivocamente la pol&iacute;tica en formato ASN.1 procesable.
-     *   </dd>
-     *  <dt><b><i>policyIdentifierHash</i></b></dt>
-     *   <dd>
-     *    Huella digital del documento de pol&iacute;tica de firma (normalmente del mismo fichero en formato ASN.1 procesable).
-     *    Si no se indica una huella digital y el par&aacute;metro <code>policyIdentifier</code> no es una URL accesible
-     *    universalmente se usar&aacute; <code>0</code>, mientras que si no se indica una huella digital pero el par&aacute;metro
-     *    <code>policyIdentifier</code> es una URL accesible universalmente, se descargara el fichero apuntado por la URL para calcular la huella
-     *    digital <i>al vuelo</i>.
-     *   </dd>
-     *  <dt><b><i>policyIdentifierHashAlgorithm</i></b></dt>
-     *   <dd>
-     *    Algoritmo usado para el c&aacute;lculo de la huella digital indicada en el par&aacute;metro <code>policyIdentifierHash</code>.
-     *    Es obligario indicarlo cuando se proporciona una huella digital distinta de <code>0</code>.
-     *   </dd>
-     *  <dt><b><i>policyQualifier</i></b></dt>
-     *   <dd>
-     *    URL que apunta al documento descriptivo de la pol&iacute;tica de firma (normalmente un documento PDF con una descripci&oacute;n textual).
-     *   </dd>
-     * </dl>
+     * @param extraParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
      * @return Firma CAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     @Override
@@ -453,44 +316,7 @@ public final class AOCAdESSigner implements AOSigner {
      * @param targetType Tipo de objetivo de la contrafirma
      * @param targets Informaci&oacute;n complementario seg&uacute;n el tipo de objetivo de la contrafirma
      * @param key Clave privada a usar para firmar
-     * @param extraParams
-     * Par&aacute;metros adicionales para la contrafirma.
-     * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>extraParams</code>:</p>
-     * <dl>
-     *  <dt><b><i>includeOnlySignningCertificate</i></b></dt>
-	 *   <dd>
-	 *    Si se establece a {@code true} se incluye en la firma &uacute;nicamente el certificado del firmante (y no la cadena de certificaci&oacute;n completa).
-	 *    Si no se establece o se establece a o {@code false} se incluir&aacute; toda la cadena de certificaci&oacute;n.
-	 *   </dd>
-     *  <dt><b><i>mode</i></b></dt>
-     *   <dd>
-     *    Modo de firma a usar. El valor <code>explicit</code> indica que no se incluyen los datos firmados, sino una
-     *    referencia a estos, mientras que el valor <code>implicit</code> indica que s&iacute; se incluiran dentro de
-     *    la propia firma los datos firmados
-     *   </dd>
-     *  <dt><b><i>policyIdentifier</i></b></dt>
-     *   <dd>
-     *    Identificadora de la pol&iacute;tica de firma. Debe ser un OID (o una URN de tipo OID) que identifique
-     *    &uacute;nivocamente la pol&iacute;tica en formato ASN.1 procesable.
-     *   </dd>
-     *  <dt><b><i>policyIdentifierHash</i></b></dt>
-     *   <dd>
-     *    Huella digital del documento de pol&iacute;tica de firma (normalmente del mismo fichero en formato ASN.1 procesable).
-     *    Si no se indica una huella digital y el par&aacute;metro <code>policyIdentifier</code> no es una URL accesible
-     *    universalmente se usar&aacute; <code>0</code>, mientras que si no se indica una huella digital pero el par&aacute;metro
-     *    <code>policyIdentifier</code> es una URL accesible universalmente, se descargara el fichero apuntado por la URL para calcular la huella
-     *    digital <i>al vuelo</i>.
-     *   </dd>
-     *  <dt><b><i>policyIdentifierHashAlgorithm</i></b></dt>
-     *   <dd>
-     *    Algoritmo usado para el c&aacute;lculo de la huella digital indicada en el par&aacute;metro <code>policyIdentifierHash</code>.
-     *    Es obligario indicarlo cuando se proporciona una huella digital distinta de <code>0</code>.
-     *   </dd>
-     *  <dt><b><i>policyQualifier</i></b></dt>
-     *   <dd>
-     *    URL que apunta al documento descriptivo de la pol&iacute;tica de firma (normalmente un documento PDF con una descripci&oacute;n textual).
-     *   </dd>
-     * </dl>
+     * @param extraParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
      * @return Contrafirma CAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     @Override
