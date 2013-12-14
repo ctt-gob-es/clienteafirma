@@ -35,14 +35,13 @@
 
 package es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.signer;
 
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.commons.io.input.ProxyInputStream;
-
 /** Input Stream proxy that doesn't close the underlying input stream.
  * @author fcorneli */
-public final class NoCloseInputStream extends ProxyInputStream {
+public final class NoCloseInputStream extends FilterInputStream {
 
     /** Main constructor.
      * @param proxy */

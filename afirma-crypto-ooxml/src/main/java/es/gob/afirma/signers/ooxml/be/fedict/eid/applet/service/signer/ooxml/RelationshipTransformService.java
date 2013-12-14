@@ -78,7 +78,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import com.sun.org.apache.xml.internal.security.utils.Constants;
 import com.sun.org.apache.xpath.internal.XPathAPI;
 
 /** Implementaci&oacute;n JSR105 de la transformaci&oacute;n RelationshipTransform.
@@ -87,6 +86,9 @@ import com.sun.org.apache.xpath.internal.XPathAPI;
 public final class RelationshipTransformService extends TransformService {
 
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
+	private static final String NAMESPACE_SPEC_NS = "http://www.w3.org/2000/xmlns/"; //$NON-NLS-1$
+	private static final String SIGNATURE_SPEC_NS = "http://www.w3.org/2000/09/xmldsig#"; //$NON-NLS-1$
 
     static final String TRANSFORM_URI = "http://schemas.openxmlformats.org/package/2006/RelationshipTransform"; //$NON-NLS-1$
 
@@ -123,8 +125,8 @@ public final class RelationshipTransformService extends TransformService {
             throw new InvalidAlgorithmParameterException(e);
         }
         final Element nsElement = parentNode.getOwnerDocument().createElement("ns"); //$NON-NLS-1$
-        nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:ds", Constants.SignatureSpecNS); //$NON-NLS-1$
-        nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:mdssi", "http://schemas.openxmlformats.org/package/2006/digital-signature"); //$NON-NLS-1$ //$NON-NLS-2$
+        nsElement.setAttributeNS(NAMESPACE_SPEC_NS, "xmlns:ds", SIGNATURE_SPEC_NS); //$NON-NLS-1$
+        nsElement.setAttributeNS(NAMESPACE_SPEC_NS, "xmlns:mdssi", "http://schemas.openxmlformats.org/package/2006/digital-signature"); //$NON-NLS-1$ //$NON-NLS-2$
         NodeList nodeList;
         try {
             nodeList = XPathAPI.selectNodeList(parentNode, "mdssi:RelationshipReference/@SourceId", nsElement); //$NON-NLS-1$
@@ -149,7 +151,11 @@ public final class RelationshipTransformService extends TransformService {
         final DOMStructure domParent = (DOMStructure) parent;
         final Node parentNode = domParent.getNode();
         final Element parentElement = (Element) parentNode;
-        parentElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:mdssi", "http://schemas.openxmlformats.org/package/2006/digital-signature"); //$NON-NLS-1$ //$NON-NLS-2$
+        parentElement.setAttributeNS(
+    		NAMESPACE_SPEC_NS,
+    		"xmlns:mdssi", //$NON-NLS-1$
+    		"http://schemas.openxmlformats.org/package/2006/digital-signature" //$NON-NLS-1$
+		);
         final Document document = parentNode.getOwnerDocument();
         for (final String sourceId : this.sourceIds) {
             final Element relationshipReferenceElement =
@@ -187,7 +193,7 @@ public final class RelationshipTransformService extends TransformService {
             throw new TransformException(e.getMessage(), e);
         }
         final Element nsElement = relationshipsDocument.createElement("ns"); //$NON-NLS-1$
-        nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:tns", "http://schemas.openxmlformats.org/package/2006/relationships");  //$NON-NLS-1$//$NON-NLS-2$
+        nsElement.setAttributeNS(NAMESPACE_SPEC_NS, "xmlns:tns", "http://schemas.openxmlformats.org/package/2006/relationships");  //$NON-NLS-1$//$NON-NLS-2$
         final Element relationshipsElement = relationshipsDocument.getDocumentElement();
         final NodeList childNodes = relationshipsElement.getChildNodes();
         for (int nodeIdx = 0; nodeIdx < childNodes.getLength(); nodeIdx++) {

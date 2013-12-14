@@ -82,7 +82,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.commons.io.FilenameUtils;
 import org.jcp.xml.dsig.internal.dom.DOMReference;
 import org.jcp.xml.dsig.internal.dom.DOMSignedInfo;
 import org.jcp.xml.dsig.internal.dom.DOMXMLSignature;
@@ -341,12 +340,24 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
             return;
         }
         for (final DigestInfo digestInfo : digestInfos) {
-            references.add(signatureFactory.newReference(FilenameUtils.getName(new File(digestInfo.getDescription()).toURI().toURL().getFile()),
-                                                         signatureFactory.newDigestMethod(getXmlDigestAlgo(digestInfo.getDigestAlgo()), null),
-                                                         null,
-                                                         null,
-                                                         null,
-                                                         digestInfo.getDigestValue()));
+            references.add(
+        		signatureFactory.newReference(
+    				new File(
+						new File(
+							digestInfo.getDescription()
+						).toURI().toURL().getFile()
+					).getName(),
+                    signatureFactory.newDigestMethod(
+                		getXmlDigestAlgo(
+            				digestInfo.getDigestAlgo()
+        				), null
+    				),
+                    null,
+                    null,
+                    null,
+                    digestInfo.getDigestValue()
+                )
+            );
         }
     }
 

@@ -72,7 +72,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import com.sun.org.apache.xml.internal.security.utils.Constants;
 import com.sun.org.apache.xpath.internal.XPathAPI;
 
 import es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.signer.NoCloseInputStream;
@@ -84,6 +83,8 @@ import es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.signer.Signature
 final class OOXMLSignatureFacet implements SignatureFacet {
 
     private final AbstractOOXMLSignatureService signatureService;
+
+	private static final String NAMESPACE_SPEC_NS = "http://www.w3.org/2000/xmlns/"; //$NON-NLS-1$
 
     private static final String DIGITAL_SIGNATURE_SCHEMA = "http://schemas.openxmlformats.org/package/2006/digital-signature"; //$NON-NLS-1$
 
@@ -169,9 +170,11 @@ final class OOXMLSignatureFacet implements SignatureFacet {
          */
         final Element signatureTimeElement =
                 document.createElementNS(DIGITAL_SIGNATURE_SCHEMA, "mdssi:SignatureTime"); //$NON-NLS-1$
-        signatureTimeElement.setAttributeNS(Constants.NamespaceSpecNS,
-                                            "xmlns:mdssi", //$NON-NLS-1$
-                                            DIGITAL_SIGNATURE_SCHEMA);
+        signatureTimeElement.setAttributeNS(
+    		NAMESPACE_SPEC_NS,
+            "xmlns:mdssi", //$NON-NLS-1$
+            DIGITAL_SIGNATURE_SCHEMA
+        );
         final Element formatElement = document.createElementNS(DIGITAL_SIGNATURE_SCHEMA, "mdssi:Format"); //$NON-NLS-1$
         formatElement.setTextContent("YYYY-MM-DDThh:mm:ssTZD"); //$NON-NLS-1$
         signatureTimeElement.appendChild(formatElement);
@@ -198,7 +201,7 @@ final class OOXMLSignatureFacet implements SignatureFacet {
         final List<XMLStructure> objectContent = new LinkedList<XMLStructure>();
 
         final Element signatureInfoElement = document.createElementNS("http://schemas.microsoft.com/office/2006/digsig", "SignatureInfoV1"); //$NON-NLS-1$ //$NON-NLS-2$
-        signatureInfoElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns", "http://schemas.microsoft.com/office/2006/digsig"); //$NON-NLS-1$ //$NON-NLS-2$
+        signatureInfoElement.setAttributeNS(NAMESPACE_SPEC_NS, "xmlns", "http://schemas.microsoft.com/office/2006/digsig"); //$NON-NLS-1$ //$NON-NLS-2$
 
         final Element manifestHashAlgorithmElement = document.createElementNS("http://schemas.microsoft.com/office/2006/digsig", "ManifestHashAlgorithm"); //$NON-NLS-1$ //$NON-NLS-2$
         manifestHashAlgorithmElement.setTextContent("http://www.w3.org/2000/09/xmldsig#sha1"); //$NON-NLS-1$
@@ -319,7 +322,7 @@ final class OOXMLSignatureFacet implements SignatureFacet {
             }
             final Document contentTypesDocument = loadDocument(zipInputStream);
             final Element nsElement = contentTypesDocument.createElement("ns"); //$NON-NLS-1$
-            nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:tns", "http://schemas.openxmlformats.org/package/2006/content-types"); //$NON-NLS-1$ //$NON-NLS-2$
+            nsElement.setAttributeNS(NAMESPACE_SPEC_NS, "xmlns:tns", "http://schemas.openxmlformats.org/package/2006/content-types"); //$NON-NLS-1$ //$NON-NLS-2$
             final NodeList nodeList =
                     XPathAPI.selectNodeList(contentTypesDocument, "/tns:Types/tns:Override[@ContentType='" + contentType + "']/@PartName", nsElement); //$NON-NLS-1$ //$NON-NLS-2$
             for (int nodeIdx = 0; nodeIdx < nodeList.getLength(); nodeIdx++) {
