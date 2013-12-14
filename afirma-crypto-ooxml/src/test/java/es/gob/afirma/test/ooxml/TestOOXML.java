@@ -47,19 +47,21 @@ public final class TestOOXML {
     private static final String CERT_PASS3 = "1111"; //$NON-NLS-1$
     private static final String CERT_ALIAS3 = "1"; //$NON-NLS-1$
 
-    private static final String DATA_PATH = "Entrada.docx";  //$NON-NLS-1$
-    private static byte[] DATA;
+    private static final String[] DATA_PATHS = new String[] { "Entrada.docx", "entrada_w2013.docx" };  //$NON-NLS-1$ //$NON-NLS-2$
+    private static byte[][] DATAS = new byte[2][];
 
     private static final Properties[] OOXML_MODES;
 
     static {
 
     	try {
-			DATA = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(DATA_PATH));
+			DATAS[0] = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(DATA_PATHS[0]));
+			DATAS[1] = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(DATA_PATHS[1]));
 		}
     	catch (final Exception e) {
 			System.err.println("No se pudo cargar el documento de pruebas"); //$NON-NLS-1$
-			DATA = "Error".getBytes(); //$NON-NLS-1$
+			DATAS[0] = "Error0".getBytes(); //$NON-NLS-1$
+			DATAS[1] = "Error1".getBytes(); //$NON-NLS-1$
 		}
 
         final Properties p1 = new Properties();
@@ -82,7 +84,9 @@ public final class TestOOXML {
     @SuppressWarnings("static-method")
 	@Test
     public void TestFormatDetection() {
-    	Assert.assertTrue(new AOOOXMLSigner().isValidDataFile(DATA));
+    	for (final byte[] data : DATAS) {
+    		Assert.assertTrue(new AOOOXMLSigner().isValidDataFile(data));
+    	}
     }
 
     /** Prueba de firma convencional.
@@ -112,62 +116,63 @@ public final class TestOOXML {
         final AOSigner signer = new AOOOXMLSigner();
 
         String prueba;
+        for (final byte[] data : DATAS) {
+	        for (final Properties extraParams : OOXML_MODES) {
+	            for (final String algo : ALGOS) {
 
-        for (final Properties extraParams : OOXML_MODES) {
-            for (final String algo : ALGOS) {
+	                prueba = "Firma OOXML con el algoritmo ': " + //$NON-NLS-1$
+	                algo +
+	                "' y politica '" + //$NON-NLS-1$
+	                extraParams.getProperty("policyIdentifier") + //$NON-NLS-1$
+	                "'"; //$NON-NLS-1$
 
-                prueba = "Firma OOXML con el algoritmo ': " + //$NON-NLS-1$
-                algo +
-                "' y politica '" + //$NON-NLS-1$
-                extraParams.getProperty("policyIdentifier") + //$NON-NLS-1$
-                "'"; //$NON-NLS-1$
+	                System.out.println(prueba);
 
-                System.out.println(prueba);
+	                final byte[] result = signer.sign(
+	            		data,
+	            		algo,
+	            		pke.getPrivateKey(),
+	            		pke.getCertificateChain(),
+	            		extraParams
+	        		);
 
-                final byte[] result = signer.sign(
-            		DATA,
-            		algo,
-            		pke.getPrivateKey(),
-            		pke.getCertificateChain(),
-            		extraParams
-        		);
+	                final File saveFile = File.createTempFile(algo + "-", ".docx"); //$NON-NLS-1$ //$NON-NLS-2$
+	                final OutputStream os = new FileOutputStream(saveFile);
+	                os.write(result);
+	                os.flush();
+	                os.close();
+	                System.out.println("Temporal para comprobacion manual: " + saveFile.getAbsolutePath()); //$NON-NLS-1$
 
-                final File saveFile = File.createTempFile(algo + "-", ".docx"); //$NON-NLS-1$ //$NON-NLS-2$
-                final OutputStream os = new FileOutputStream(saveFile);
-                os.write(result);
-                os.flush();
-                os.close();
-                System.out.println("Temporal para comprobacion manual: " + saveFile.getAbsolutePath()); //$NON-NLS-1$
+	              // Enviamos a validar a AFirma
+	//              if (verifier != null) {
+	//                  Assert.assertTrue("Fallo al validar " + saveFile.getAbsolutePath(), verifier.verifyBin(result)); //$NON-NLS-1$
+	//              }
 
-              // Enviamos a validar a AFirma
-//              if (verifier != null) {
-//                  Assert.assertTrue("Fallo al validar " + saveFile.getAbsolutePath(), verifier.verifyBin(result)); //$NON-NLS-1$
-//              }
+	                Assert.assertNotNull(prueba, result);
+	                Assert.assertTrue(signer.isSign(result));
 
-                Assert.assertNotNull(prueba, result);
-                Assert.assertTrue(signer.isSign(result));
+	                AOTreeModel tree = signer.getSignersStructure(result, false);
+	                Assert.assertEquals("Datos", ((AOTreeNode) tree.getRoot()).getUserObject()); //$NON-NLS-1$
+	                Assert.assertEquals("ANF Usuario Activo", ((AOTreeNode) tree.getRoot()).getChildAt(0).getUserObject()); //$NON-NLS-1$
 
-                AOTreeModel tree = signer.getSignersStructure(result, false);
-                Assert.assertEquals("Datos", ((AOTreeNode) tree.getRoot()).getUserObject()); //$NON-NLS-1$
-                Assert.assertEquals("ANF Usuario Activo", ((AOTreeNode) tree.getRoot()).getChildAt(0).getUserObject()); //$NON-NLS-1$
+	                tree = signer.getSignersStructure(result, true);
+	                Assert.assertEquals("Datos", ((AOTreeNode) tree.getRoot()).getUserObject()); //$NON-NLS-1$
+	                final AOSimpleSignInfo simpleSignInfo = (AOSimpleSignInfo) ((AOTreeNode) tree.getRoot()).getChildAt(0).getUserObject();
 
-                tree = signer.getSignersStructure(result, true);
-                Assert.assertEquals("Datos", ((AOTreeNode) tree.getRoot()).getUserObject()); //$NON-NLS-1$
-                final AOSimpleSignInfo simpleSignInfo = (AOSimpleSignInfo) ((AOTreeNode) tree.getRoot()).getChildAt(0).getUserObject();
+	                Assert.assertEquals(cert, simpleSignInfo.getCerts()[0]);
 
-                Assert.assertEquals(cert, simpleSignInfo.getCerts()[0]);
+	                //System.out.println(prueba + ": OK"); //$NON-NLS-1$
+	            }
+	        }
 
-                //System.out.println(prueba + ": OK"); //$NON-NLS-1$
-            }
+	        signer.sign(
+	    		data,
+	    		"SHA1withRSA", //$NON-NLS-1$
+	    		pke.getPrivateKey(),
+	    		pke.getCertificateChain(),
+	    		null
+			);
         }
-
-        signer.sign(
-    		DATA,
-    		"SHA1withRSA", //$NON-NLS-1$
-    		pke.getPrivateKey(),
-    		pke.getCertificateChain(),
-    		null
-		);
 
     }
 
@@ -186,39 +191,41 @@ public final class TestOOXML {
 
         String prueba;
 
-        for (final Properties extraParams : OOXML_MODES) {
-            for (final String algo : ALGOS) {
+        for (final byte[] data : DATAS) {
+	        for (final Properties extraParams : OOXML_MODES) {
+	            for (final String algo : ALGOS) {
 
-                prueba = "Cofirma OOXML con el algoritmo ': " + //$NON-NLS-1$
-                algo +
-                "'"; //$NON-NLS-1$
+	                prueba = "Cofirma OOXML con el algoritmo ': " + //$NON-NLS-1$
+	                algo +
+	                "'"; //$NON-NLS-1$
 
-                System.out.println(prueba);
+	                System.out.println(prueba);
 
-                // Firma simple
-                final byte[] sign1 = sign(signer, DATA, algo, pke1, extraParams);
+	                // Firma simple
+	                final byte[] sign1 = sign(signer, data, algo, pke1, extraParams);
 
-                // Cofirma sin indicar los datos
-                final byte[] sign2 = cosign(signer, sign1, algo, pke2, extraParams);
+	                // Cofirma sin indicar los datos
+	                final byte[] sign2 = cosign(signer, sign1, algo, pke2, extraParams);
 
-                checkSign(signer, sign2, prueba);
+	                checkSign(signer, sign2, prueba);
 
-                // Cofirma indicando los datos
-                final byte[] sign3 = cosign(signer, DATA, sign2, algo, pke3, extraParams);
-                Assert.assertNotNull(sign3);
+	                // Cofirma indicando los datos
+	                final byte[] sign3 = cosign(signer, data, sign2, algo, pke3, extraParams);
+	                Assert.assertNotNull(sign3);
 
-                //checkSign(signer, sign3, new PrivateKeyEntry[] {pke1, pke2, pke3}, new String[] {"ANF Usuario Activo", "CPISR-1 Pf\u00EDsica De la Se\u00F1a Pruebasdit", "Certificado Pruebas Software V\u00E1lido"}, prueba); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	                //checkSign(signer, sign3, new PrivateKeyEntry[] {pke1, pke2, pke3}, new String[] {"ANF Usuario Activo", "CPISR-1 Pf\u00EDsica De la Se\u00F1a Pruebasdit", "Certificado Pruebas Software V\u00E1lido"}, prueba); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-            }
+	            }
+	        }
+
+	        signer.sign(
+	    		data,
+	    		"SHA1withRSA", //$NON-NLS-1$
+	    		pke1.getPrivateKey(),
+	    		pke1.getCertificateChain(),
+	    		null
+			);
         }
-
-        signer.sign(
-    		DATA,
-    		"SHA1withRSA", //$NON-NLS-1$
-    		pke1.getPrivateKey(),
-    		pke1.getCertificateChain(),
-    		null
-		);
 
     }
 
