@@ -18,8 +18,7 @@ import java.util.logging.Logger;
 
 import javax.xml.crypto.dsig.DigestMethod;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;

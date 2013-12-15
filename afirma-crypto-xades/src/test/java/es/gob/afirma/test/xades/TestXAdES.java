@@ -24,8 +24,7 @@ import java.util.logging.Logger;
 import javax.xml.crypto.dsig.DigestMethod;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.Document;
@@ -295,7 +294,7 @@ public final class TestXAdES {
         }
 
     }
-    
+
     /**
      * Prueba con hoja de estilo externa.
      * <b>Necesita GUI</b>
