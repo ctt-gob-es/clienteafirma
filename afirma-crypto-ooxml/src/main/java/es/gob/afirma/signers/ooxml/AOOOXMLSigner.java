@@ -10,13 +10,11 @@
 
 package es.gob.afirma.signers.ooxml;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.Security;
 import java.security.cert.X509Certificate;
-import java.util.Arrays;
 import java.util.Properties;
 import java.util.logging.Logger;
 import java.util.zip.ZipException;
@@ -33,7 +31,7 @@ import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
-import es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.signer.AbstractOOXMLSignatureServiceContainer;
+import es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.signer.OOXMLSignatureServiceContainer;
 import es.gob.afirma.signers.xmldsig.AOXMLDSigSigner;
 
 /** Manejador de firmas electr&oacute;nicas XML de documentos OOXML de Microsoft Office. */
@@ -64,7 +62,7 @@ public final class AOOOXMLSigner implements AOSigner {
             throw new AOInvalidFormatException("El documento introducido no contiene una firma valida"); //$NON-NLS-1$
         }
 
-        // TODO: Por ahora, devolveremos el propio OOXML firmado.
+        // Devolvemos el propio OOXML firmado.
         return sign;
     }
 
@@ -238,7 +236,22 @@ public final class AOOOXMLSigner implements AOSigner {
             throw new AOFormatFileException("Los datos introducidos no se corresponden con un documento OOXML"); //$NON-NLS-1$
         }
 
-        return signOOXML(data, OOXMLUtil.countOOXMLSignatures(data) + 1, algorithm, key, certChain);
+        if (certChain == null || certChain.length < 1) {
+        	throw new IllegalArgumentException("Debe proporcionarse a menos el certificado del firmante"); //$NON-NLS-1$
+        }
+
+        final Properties xParams = extraParams != null ? extraParams : new Properties();
+
+        return signOOXML(
+    		data,
+    		OOXMLUtil.countOOXMLSignatures(data) + 1,
+    		algorithm,
+    		key,
+    		(X509Certificate[]) certChain,
+    		xParams.getProperty("signatureReason"), //$NON-NLS-1$
+    		xParams.getProperty("signatureAddress1"), //$NON-NLS-1$
+    		xParams.getProperty("signatureAddress2") //$NON-NLS-1$
+		);
     }
 
     /** Agrega una firma electr&oacute;nica a un documento OOXML.
@@ -321,26 +334,33 @@ public final class AOOOXMLSigner implements AOSigner {
      * </ul>
      * @param key Clave privada del firmante
      * @param certChain Cadena de certificados del firmante
+     * @param signatureComments Raz&oacute;n de la firma
+     * @param address1 Direcci&oacute;n donde se ha realizado la firma (campo 1)
+     * @param address2 Direcci&oacute;n donde se ha realizado la firma (campo 2)
      * @return Documento OOXML firmado
      * @throws AOException Cuando ocurre alg&uacute;n error durante el proceso de firma */
     private static byte[] signOOXML(final byte[] ooxmlDocument,
-                             final int signNum,
-                             final String algorithm,
-                             final PrivateKey key,
-                             final java.security.cert.Certificate[] certChain) throws AOException {
+                                    final int signNum,
+                                    final String algorithm,
+                                    final PrivateKey key,
+                                    final X509Certificate[] certChain,
+                                    final String signatureComments,
+                                    final String address1,
+                                    final String address2) throws AOException {
 
-        // Pasamos la cadena de certificacion a una lista
         if (key == null) {
-            throw new AOException("No se ha proporcionado una clave valida"); //$NON-NLS-1$
+            throw new IllegalArgumentException("No se ha proporcionado una clave valida"); //$NON-NLS-1$
         }
 
         try {
-			return AbstractOOXMLSignatureServiceContainer.sign(
-                 new ByteArrayInputStream(ooxmlDocument),
-                 Arrays.asList((X509Certificate[])certChain),
-                 AOSignConstants.getDigestAlgorithmName(algorithm),
+			return OOXMLSignatureServiceContainer.sign(
+                 ooxmlDocument,
+                 certChain, // Pasamos la cadena de certificacion a una lista
                  key,
-                 signNum
+                 signNum,
+                 signatureComments,
+                 address1,
+                 address2
             );
         }
         catch (final Exception e) {

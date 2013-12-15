@@ -36,12 +36,10 @@
 package es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.signer;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
-import java.util.List;
 
 import javax.xml.crypto.MarshalException;
 import javax.xml.crypto.dsig.XMLSignatureException;
@@ -50,49 +48,15 @@ import javax.xml.transform.TransformerException;
 
 import org.xml.sax.SAXException;
 
-import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.signer.ooxml.AbstractOOXMLSignatureService;
+import es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.signer.ooxml.OOXMLSignatureService;
 import es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.signer.ooxml.OOXMLProvider;
 
-/** Contenedor para la implementaci&oacute;n abstracta del servicio de firma OOXML. */
-public final class AbstractOOXMLSignatureServiceContainer {
+/** Contenedor para la implementaci&oacute;n del servicio de firma OOXML. */
+public final class OOXMLSignatureServiceContainer {
 
-	private AbstractOOXMLSignatureServiceContainer() {
+	private OOXMLSignatureServiceContainer() {
 		// No permitimos la instanciacion
 	}
-
-    private static final class OOXMLSignatureService extends AbstractOOXMLSignatureService {
-
-        @Override
-        protected String getSignatureDigestAlgorithm() {
-            return this.digestAlgorithm;
-        }
-
-        private final byte[] ooxml;
-
-        private final String digestAlgorithm;
-
-        OOXMLSignatureService(final InputStream ooxmlis, final String digestAlgo) {
-            try {
-                this.ooxml = AOUtil.getDataFromInputStream(ooxmlis);
-            }
-            catch (final Exception e) {
-                throw new IllegalArgumentException("No se ha podido leer el OOXML desde el flujo de entrada", e); //$NON-NLS-1$
-            }
-            if (digestAlgo == null) {
-                this.digestAlgorithm = "SHA1"; //$NON-NLS-1$
-            }
-            else {
-                this.digestAlgorithm = digestAlgo;
-            }
-        }
-
-        @Override
-        protected byte[] getOfficeOpenXMLDocument() {
-            return this.ooxml;
-        }
-
-    }
 
     /** Firma digitalmente un documento OOXML.
      * @param ooxml Documento OOXML
@@ -100,6 +64,9 @@ public final class AbstractOOXMLSignatureServiceContainer {
      * @param digestAlgorithm Algoritmo de huella digital
      * @param pk Clave privada
      * @param signerCount N&uacute;mero de firma
+     * @param signatureComments Raz&oacute;n de la firma
+     * @param address1 Direcci&oacute;n donde se ha realizado la firma (campo 1)
+     * @param address2 Direcci&oacute;n donde se ha realizado la firma (campo 2)
      * @return Documento OOXML firmado
      * @throws XMLSignatureException
      * @throws MarshalException
@@ -109,24 +76,35 @@ public final class AbstractOOXMLSignatureServiceContainer {
      * @throws IOException
      * @throws InvalidAlgorithmParameterException
      * @throws NoSuchAlgorithmException */
-    public static byte[] sign(final InputStream ooxml,
-                             final List<X509Certificate> certChain,
-                             final String digestAlgorithm,
-                             final PrivateKey pk,
-                             final int signerCount) throws NoSuchAlgorithmException,
-                                                           InvalidAlgorithmParameterException,
-                                                           IOException,
-                                                           ParserConfigurationException,
-                                                           SAXException,
-                                                           TransformerException,
-                                                           MarshalException,
-                                                           XMLSignatureException {
-
+    public static byte[] sign(final byte[] ooxml,
+                              final X509Certificate[] certChain,
+                              final PrivateKey pk,
+                              final int signerCount,
+                              final String signatureComments,
+                              final String address1,
+                              final String address2) throws NoSuchAlgorithmException,
+                                                            InvalidAlgorithmParameterException,
+                                                            IOException,
+                                                            ParserConfigurationException,
+                                                            SAXException,
+                                                            TransformerException,
+                                                            MarshalException,
+                                                            XMLSignatureException {
         OOXMLProvider.install();
 
-        final OOXMLSignatureService signatureService = new OOXMLSignatureService(ooxml, digestAlgorithm);
+        final OOXMLSignatureService signatureService = new OOXMLSignatureService();
 
-        return signatureService.outputSignedOfficeOpenXMLDocument(signatureService.preSign(null, certChain, pk));
+        return signatureService.outputSignedOfficeOpenXMLDocument(
+    		ooxml,
+    		signatureService.preSign(
+				ooxml,
+				certChain,
+				pk,
+				signatureComments,
+				address1,
+				address2
+			)
+		);
 
     }
 

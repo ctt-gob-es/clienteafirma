@@ -35,12 +35,14 @@
 
 package es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.signer.ooxml;
 
+import java.awt.Dimension;
+import java.awt.GraphicsEnvironment;
+import java.awt.Toolkit;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
@@ -74,6 +76,7 @@ import org.xml.sax.SAXException;
 
 import com.sun.org.apache.xpath.internal.XPathAPI;
 
+import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.signer.NoCloseInputStream;
 import es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.signer.SignatureFacet;
 
@@ -82,36 +85,44 @@ import es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.signer.Signature
  * @see "http://msdn.microsoft.com/en-us/library/cc313071.aspx" */
 final class OOXMLSignatureFacet implements SignatureFacet {
 
-    private final AbstractOOXMLSignatureService signatureService;
+    private final OOXMLSignatureService signatureService;
 
 	private static final String NAMESPACE_SPEC_NS = "http://www.w3.org/2000/xmlns/"; //$NON-NLS-1$
+
+	private static final String MS_DIGITAL_SIGNATURE_SCHEMA = "http://schemas.microsoft.com/office/2006/digsig"; //$NON-NLS-1$
 
     private static final String DIGITAL_SIGNATURE_SCHEMA = "http://schemas.openxmlformats.org/package/2006/digital-signature"; //$NON-NLS-1$
 
     /** Main constructor.
      * @param signatureService */
-    OOXMLSignatureFacet(final AbstractOOXMLSignatureService signatureService) {
+    OOXMLSignatureFacet(final OOXMLSignatureService signatureService) {
         this.signatureService = signatureService;
     }
 
     @Override
-	public void preSign(final XMLSignatureFactory signatureFactory,
+	public void preSign(final byte[] ooXmlDocument,
+			            final XMLSignatureFactory signatureFactory,
                         final Document document,
                         final String signatureId,
-                        final List<X509Certificate> signingCertificateChain,
                         final List<Reference> references,
-                        final List<XMLObject> objects) throws NoSuchAlgorithmException,
-                                                              InvalidAlgorithmParameterException,
-                                                              IOException,
-                                                              ParserConfigurationException,
-                                                              SAXException, TransformerException {
+                        final List<XMLObject> objects,
+                        final String signatureComments,
+                        final String address1,
+                        final String address2) throws NoSuchAlgorithmException,
+                                                               InvalidAlgorithmParameterException,
+                                                               IOException,
+                                                               ParserConfigurationException,
+                                                               SAXException, TransformerException {
 
-        addManifestObject(signatureFactory, document, signatureId, references, objects);
+    	// Nodo "idPackageObject"
+        addManifestObject(ooXmlDocument, signatureFactory, document, signatureId, references, objects);
 
-        addSignatureInfo(signatureFactory, document, signatureId, references, objects);
+        // Nodo "idOfficeObject"
+        addSignatureInfo(signatureFactory, document, signatureId, references, objects, signatureComments, address1, address2);
     }
 
-    private void addManifestObject(final XMLSignatureFactory signatureFactory,
+    private void addManifestObject(final byte[] ooXmlDocument,
+    		                       final XMLSignatureFactory signatureFactory,
                                    final Document document,
                                    final String signatureId,
                                    final List<Reference> references,
@@ -120,10 +131,10 @@ final class OOXMLSignatureFacet implements SignatureFacet {
                                                                          IOException,
                                                                          ParserConfigurationException,
                                                                          SAXException, TransformerException {
-        final Manifest manifest = constructManifest(signatureFactory);
-        final String objectId = "idPackageObject"; // really has to be this value. //$NON-NLS-1$
+
+        final String objectId = "idPackageObject"; // El nombre tiene que ser este //$NON-NLS-1$
         final List<XMLStructure> objectContent = new LinkedList<XMLStructure>();
-        objectContent.add(manifest);
+        objectContent.add(constructManifest(ooXmlDocument, signatureFactory));
 
         addSignatureTime(signatureFactory, document, signatureId, objectContent);
 
@@ -134,42 +145,48 @@ final class OOXMLSignatureFacet implements SignatureFacet {
         references.add(reference);
     }
 
-    private Manifest constructManifest(final XMLSignatureFactory signatureFactory) throws NoSuchAlgorithmException,
+    private Manifest constructManifest(final byte[] ooXmlDocument,
+    		                           final XMLSignatureFactory signatureFactory) throws NoSuchAlgorithmException,
                                                                                           InvalidAlgorithmParameterException,
                                                                                           IOException,
                                                                                           ParserConfigurationException,
                                                                                           SAXException, TransformerException {
         final List<Reference> manifestReferences = new LinkedList<Reference>();
-        addRelationshipsReferences(signatureFactory, manifestReferences);
+        addRelationshipsReferences(ooXmlDocument, signatureFactory, manifestReferences);
 
         /*
          * Word
          */
-        addParts(signatureFactory, "application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml", manifestReferences); //$NON-NLS-1$
-        addParts(signatureFactory, "application/vnd.openxmlformats-officedocument.wordprocessingml.fontTable+xml", manifestReferences); //$NON-NLS-1$
-        addParts(signatureFactory, "application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml", manifestReferences); //$NON-NLS-1$
-        addParts(signatureFactory, "application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml", manifestReferences); //$NON-NLS-1$
-        addParts(signatureFactory, "application/vnd.openxmlformats-officedocument.theme+xml", manifestReferences); //$NON-NLS-1$
-        addParts(signatureFactory, "application/vnd.openxmlformats-officedocument.wordprocessingml.webSettings+xml", manifestReferences); //$NON-NLS-1$
+        addParts(ooXmlDocument, signatureFactory, "application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml", manifestReferences); //$NON-NLS-1$
+        addParts(ooXmlDocument, signatureFactory, "application/vnd.openxmlformats-officedocument.wordprocessingml.fontTable+xml", manifestReferences); //$NON-NLS-1$
+        addParts(ooXmlDocument, signatureFactory, "application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml", manifestReferences); //$NON-NLS-1$
+        addParts(ooXmlDocument, signatureFactory, "application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml", manifestReferences); //$NON-NLS-1$
+        addParts(ooXmlDocument, signatureFactory, "application/vnd.openxmlformats-officedocument.theme+xml", manifestReferences); //$NON-NLS-1$
+        addParts(ooXmlDocument, signatureFactory, "application/vnd.openxmlformats-officedocument.wordprocessingml.webSettings+xml", manifestReferences); //$NON-NLS-1$
 
         /*
          * Powerpoint
          */
-        addParts(signatureFactory, "application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml", manifestReferences); //$NON-NLS-1$
-        addParts(signatureFactory, "application/vnd.openxmlformats-officedocument.presentationml.slideLayout+xml", manifestReferences); //$NON-NLS-1$
-        addParts(signatureFactory, "application/vnd.openxmlformats-officedocument.presentationml.slideMaster+xml", manifestReferences); //$NON-NLS-1$
-        addParts(signatureFactory, "application/vnd.openxmlformats-officedocument.presentationml.slide+xml", manifestReferences); //$NON-NLS-1$
-        addParts(signatureFactory, "application/vnd.openxmlformats-officedocument.presentationml.tableStyles+xml", manifestReferences); //$NON-NLS-1$
+        addParts(ooXmlDocument, signatureFactory, "application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml", manifestReferences); //$NON-NLS-1$
+        addParts(ooXmlDocument, signatureFactory, "application/vnd.openxmlformats-officedocument.presentationml.slideLayout+xml", manifestReferences); //$NON-NLS-1$
+        addParts(ooXmlDocument, signatureFactory, "application/vnd.openxmlformats-officedocument.presentationml.slideMaster+xml", manifestReferences); //$NON-NLS-1$
+        addParts(ooXmlDocument, signatureFactory, "application/vnd.openxmlformats-officedocument.presentationml.slide+xml", manifestReferences); //$NON-NLS-1$
+        addParts(ooXmlDocument, signatureFactory, "application/vnd.openxmlformats-officedocument.presentationml.tableStyles+xml", manifestReferences); //$NON-NLS-1$
 
         return signatureFactory.newManifest(manifestReferences);
     }
 
-    private static void addSignatureTime(final XMLSignatureFactory signatureFactory, final Document document, final String signatureId, final List<XMLStructure> objectContent) {
+    private static void addSignatureTime(final XMLSignatureFactory signatureFactory,
+    		                             final Document document,
+    		                             final String signatureId,
+    		                             final List<XMLStructure> objectContent) {
         /*
          * SignatureTime
          */
-        final Element signatureTimeElement =
-                document.createElementNS(DIGITAL_SIGNATURE_SCHEMA, "mdssi:SignatureTime"); //$NON-NLS-1$
+        final Element signatureTimeElement = document.createElementNS(
+    		DIGITAL_SIGNATURE_SCHEMA,
+    		"mdssi:SignatureTime" //$NON-NLS-1$
+		);
         signatureTimeElement.setAttributeNS(
     		NAMESPACE_SPEC_NS,
             "xmlns:mdssi", //$NON-NLS-1$
@@ -194,23 +211,136 @@ final class OOXMLSignatureFacet implements SignatureFacet {
     }
 
     private static void addSignatureInfo(final XMLSignatureFactory signatureFactory,
-                                  final Document document,
-                                  final String signatureId,
-                                  final List<Reference> references,
-                                  final List<XMLObject> objects) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+                                         final Document document,
+                                         final String signatureId,
+                                         final List<Reference> references,
+                                         final List<XMLObject> objects,
+                                         final String signatureComments,
+                                         final String address1,
+                                         final String address2) throws NoSuchAlgorithmException,
+                                                                       InvalidAlgorithmParameterException {
+
         final List<XMLStructure> objectContent = new LinkedList<XMLStructure>();
 
-        final Element signatureInfoElement = document.createElementNS("http://schemas.microsoft.com/office/2006/digsig", "SignatureInfoV1"); //$NON-NLS-1$ //$NON-NLS-2$
-        signatureInfoElement.setAttributeNS(NAMESPACE_SPEC_NS, "xmlns", "http://schemas.microsoft.com/office/2006/digsig"); //$NON-NLS-1$ //$NON-NLS-2$
+        // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        // ++++++++++++++ SIGNATURE INFO V1 +++++++++++++++++++++++++++++++++++++++++++++++++++
 
-        final Element manifestHashAlgorithmElement = document.createElementNS("http://schemas.microsoft.com/office/2006/digsig", "ManifestHashAlgorithm"); //$NON-NLS-1$ //$NON-NLS-2$
+        final Element signatureInfoV1Element = document.createElementNS(MS_DIGITAL_SIGNATURE_SCHEMA, "SignatureInfoV1"); //$NON-NLS-1$
+        signatureInfoV1Element.setAttributeNS(NAMESPACE_SPEC_NS, "xmlns", MS_DIGITAL_SIGNATURE_SCHEMA); //$NON-NLS-1$
+
+        final Element manifestHashAlgorithmElement = document.createElementNS(MS_DIGITAL_SIGNATURE_SCHEMA, "ManifestHashAlgorithm"); //$NON-NLS-1$
         manifestHashAlgorithmElement.setTextContent("http://www.w3.org/2000/09/xmldsig#sha1"); //$NON-NLS-1$
-        signatureInfoElement.appendChild(manifestHashAlgorithmElement);
+        signatureInfoV1Element.appendChild(manifestHashAlgorithmElement);
+
+        // ******************************************************************************
+        // **************** Metadatos adicionales V1 ************************************
+
+        if (signatureComments != null) {
+	        final Element signatureCommentsElement = document.createElementNS(
+        		MS_DIGITAL_SIGNATURE_SCHEMA,
+	    		"SignatureComments" //$NON-NLS-1$
+			);
+	        signatureCommentsElement.setTextContent(signatureComments);
+	        signatureInfoV1Element.appendChild(signatureCommentsElement);
+        }
+
+        if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
+        	final Element windowsVersionElement = document.createElementNS(
+    			MS_DIGITAL_SIGNATURE_SCHEMA,
+    			"WindowsVersion" //$NON-NLS-1$
+			);
+        	windowsVersionElement.setTextContent(System.getProperty("os.version")); //$NON-NLS-1$
+        	signatureInfoV1Element.appendChild(windowsVersionElement);
+        }
+
+        final GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+
+        final Element monitorsElement = document.createElementNS(
+    		MS_DIGITAL_SIGNATURE_SCHEMA,
+    		"Monitors" //$NON-NLS-1$
+		);
+        monitorsElement.setTextContent(
+    		Integer.toString(
+				ge.getScreenDevices().length
+			)
+		);
+        signatureInfoV1Element.appendChild(monitorsElement);
+
+        final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+
+        final Element horizontalResolutionElement = document.createElementNS(
+    		MS_DIGITAL_SIGNATURE_SCHEMA,
+    		"HorizontalResolutionElement" //$NON-NLS-1$
+		);
+        horizontalResolutionElement.setTextContent(Integer.toString(screenSize.width));
+        signatureInfoV1Element.appendChild(horizontalResolutionElement);
+
+        final Element verticalResolutionElement = document.createElementNS(
+    		MS_DIGITAL_SIGNATURE_SCHEMA,
+    		"VerticalResolutionElement" //$NON-NLS-1$
+		);
+        verticalResolutionElement.setTextContent(Integer.toString(screenSize.height));
+        signatureInfoV1Element.appendChild(verticalResolutionElement);
+
+        final Element colorDepthElement = document.createElementNS(
+    		MS_DIGITAL_SIGNATURE_SCHEMA,
+        	"ColorDepth" //$NON-NLS-1$
+		);
+        colorDepthElement.setTextContent(
+    		Integer.toString(
+				ge.getScreenDevices()[0].getDisplayMode().getBitDepth()
+			)
+		);
+        signatureInfoV1Element.appendChild(colorDepthElement);
+
+
+        // **************** Fin Metadatos adicionales V1 ********************************
+        // ******************************************************************************
+
+        // ++++++++++++++ FIN SIGNATURE INFO V1 +++++++++++++++++++++++++++++++++++++++++++++++
+        // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+        // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        // ++++++++++++++ SIGNATURE INFO V2 +++++++++++++++++++++++++++++++++++++++++++++++++++
+
+        final Element signatureInfoV2Element = document.createElementNS(MS_DIGITAL_SIGNATURE_SCHEMA, "SignatureInfoV2"); //$NON-NLS-1$
+        signatureInfoV2Element.setAttributeNS(NAMESPACE_SPEC_NS, "xmlns", MS_DIGITAL_SIGNATURE_SCHEMA); //$NON-NLS-1$
+
+        if (address1 != null) {
+	        final Element address1Element = document.createElementNS(
+        		MS_DIGITAL_SIGNATURE_SCHEMA,
+	    		"Address1" //$NON-NLS-1$
+			);
+	        address1Element.setTextContent(signatureComments);
+	        signatureInfoV2Element.appendChild(address1Element);
+        }
+
+        if (address2 != null) {
+	        final Element address2Element = document.createElementNS(
+        		MS_DIGITAL_SIGNATURE_SCHEMA,
+	    		"Address2" //$NON-NLS-1$
+			);
+	        address2Element.setTextContent(signatureComments);
+	        signatureInfoV2Element.appendChild(address2Element);
+        }
+
+        // ++++++++++++++ FIN SIGNATURE INFO V2 +++++++++++++++++++++++++++++++++++++++++++++++
+        // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+        // El nodo idOfficeV1Details agrupa tanto a SignatureInfoV1 como a SignatureInfoV2
 
         final List<XMLStructure> signatureInfoContent = new LinkedList<XMLStructure>();
-        signatureInfoContent.add(new DOMStructure(signatureInfoElement));
-        final SignatureProperty signatureInfoSignatureProperty =
-                signatureFactory.newSignatureProperty(signatureInfoContent, "#" + signatureId, "idOfficeV1Details"); //$NON-NLS-1$ //$NON-NLS-2$
+        signatureInfoContent.add(new DOMStructure(signatureInfoV1Element));
+        signatureInfoContent.add(new DOMStructure(signatureInfoV2Element));
+
+
+        final SignatureProperty signatureInfoSignatureProperty = signatureFactory.newSignatureProperty(
+    		signatureInfoContent, "#" + signatureId, "idOfficeV1Details" //$NON-NLS-1$ //$NON-NLS-2$
+		);
 
         final List<SignatureProperty> signaturePropertyContent = new LinkedList<SignatureProperty>();
         signaturePropertyContent.add(signatureInfoSignatureProperty);
@@ -225,12 +355,18 @@ final class OOXMLSignatureFacet implements SignatureFacet {
         references.add(reference);
     }
 
-    private void addRelationshipsReferences(final XMLSignatureFactory signatureFactory, final List<Reference> manifestReferences) throws IOException,
-                                                                                                                                        ParserConfigurationException,
-                                                                                                                                        SAXException,
-                                                                                                                                        NoSuchAlgorithmException,
-                                                                                                                                        InvalidAlgorithmParameterException {
-        final ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(this.signatureService.getOfficeOpenXMLDocument()));
+    private void addRelationshipsReferences(final byte[] ooXmlDocument,
+    		                                final XMLSignatureFactory signatureFactory,
+    		                                final List<Reference> manifestReferences) throws IOException,
+                                                                                             ParserConfigurationException,
+                                                                                             SAXException,
+                                                                                             NoSuchAlgorithmException,
+                                                                                             InvalidAlgorithmParameterException {
+        final ZipInputStream zipInputStream = new ZipInputStream(
+    		new ByteArrayInputStream(
+				ooXmlDocument
+			)
+		);
         ZipEntry zipEntry;
         while (null != (zipEntry = zipInputStream.getNextEntry())) {
             if (!zipEntry.getName().endsWith(".rels")) { //$NON-NLS-1$
@@ -242,9 +378,10 @@ final class OOXMLSignatureFacet implements SignatureFacet {
     }
 
     private static void addRelationshipsReference(final XMLSignatureFactory signatureFactory,
-                                           final String zipEntryName,
-                                           final Document relsDocument,
-                                           final List<Reference> manifestReferences) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+                                                  final String zipEntryName,
+                                                  final Document relsDocument,
+                                                  final List<Reference> manifestReferences) throws NoSuchAlgorithmException,
+                                                                                                   InvalidAlgorithmParameterException {
 
         final RelationshipTransformParameterSpec parameterSpec = new RelationshipTransformParameterSpec();
         final NodeList nodeList = relsDocument.getDocumentElement().getChildNodes();
@@ -294,9 +431,21 @@ final class OOXMLSignatureFacet implements SignatureFacet {
         manifestReferences.add(reference);
     }
 
-    private void addParts(final XMLSignatureFactory signatureFactory, final String contentType, final List<Reference> references) throws NoSuchAlgorithmException,
-                                                                                                               InvalidAlgorithmParameterException, IOException, ParserConfigurationException, SAXException, TransformerException {
-        final List<String> documentResourceNames = getResourceNames(new ByteArrayInputStream(this.signatureService.getOfficeOpenXMLDocument()), contentType);
+    private void addParts(final byte[] ooXMlDocument,
+    		              final XMLSignatureFactory signatureFactory,
+    		              final String contentType,
+    		              final List<Reference> references) throws NoSuchAlgorithmException,
+                                                                   InvalidAlgorithmParameterException,
+                                                                   IOException,
+                                                                   ParserConfigurationException,
+                                                                   SAXException,
+                                                                   TransformerException {
+        final List<String> documentResourceNames = getResourceNames(
+    		new ByteArrayInputStream(
+				ooXMlDocument
+			),
+			contentType
+		);
         final DigestMethod digestMethod = signatureFactory.newDigestMethod(DigestMethod.SHA1, null);
         for (final String documentResourceName : documentResourceNames) {
 
@@ -335,16 +484,16 @@ final class OOXMLSignatureFacet implements SignatureFacet {
         return signatureResourceNames;
     }
 
-    protected Document loadDocument(final String zipEntryName) throws IOException, ParserConfigurationException, SAXException {
-        final Document document = findDocument(zipEntryName);
+    protected Document loadDocument(final byte[] ooXmlDocument, final String zipEntryName) throws IOException, ParserConfigurationException, SAXException {
+        final Document document = findDocument(ooXmlDocument, zipEntryName);
         if (null != document) {
             return document;
         }
         throw new IOException("ZIP entry not found: " + zipEntryName); //$NON-NLS-1$
     }
 
-    private Document findDocument(final String zipEntryName) throws IOException, ParserConfigurationException, SAXException {
-        final ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(this.signatureService.getOfficeOpenXMLDocument()));
+    private Document findDocument(final byte[] ooXmlDocument, final String zipEntryName) throws IOException, ParserConfigurationException, SAXException {
+        final ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(ooXmlDocument));
         ZipEntry zipEntry;
         while (null != (zipEntry = zipInputStream.getNextEntry())) {
             if (!zipEntryName.equals(zipEntry.getName())) {
@@ -374,8 +523,4 @@ final class OOXMLSignatureFacet implements SignatureFacet {
         return documentBuilder.parse(inputSource);
     }
 
-    @Override
-	public void postSign(final Element signatureElement, final List<X509Certificate> signingCertificateChain) {
-        // empty
-    }
 }

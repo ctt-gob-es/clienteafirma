@@ -78,8 +78,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import com.sun.org.apache.xpath.internal.XPathAPI;
-
 /** Implementaci&oacute;n JSR105 de la transformaci&oacute;n RelationshipTransform.
  * <a href="http://openiso.org/Ecma/376/Part2/12.2.4#26">http://openiso.org/Ecma/376/Part2/12.2.4#26</a>
  * @author Frank Cornelis */
@@ -90,7 +88,8 @@ public final class RelationshipTransformService extends TransformService {
 	private static final String NAMESPACE_SPEC_NS = "http://www.w3.org/2000/xmlns/"; //$NON-NLS-1$
 	private static final String SIGNATURE_SPEC_NS = "http://www.w3.org/2000/09/xmldsig#"; //$NON-NLS-1$
 
-    static final String TRANSFORM_URI = "http://schemas.openxmlformats.org/package/2006/RelationshipTransform"; //$NON-NLS-1$
+	/** URI de declaraci&oacute;n de la transformaci&oacute;n. */
+    public static final String TRANSFORM_URI = "http://schemas.openxmlformats.org/package/2006/RelationshipTransform"; //$NON-NLS-1$
 
     private final List<String> sourceIds;
 
@@ -113,7 +112,8 @@ public final class RelationshipTransformService extends TransformService {
     }
 
     /** {@inheritDoc} */
-    @Override
+    @SuppressWarnings("restriction")
+	@Override
     public void init(final XMLStructure parent, final XMLCryptoContext context) throws InvalidAlgorithmParameterException {
 
         final DOMStructure domParent = (DOMStructure) parent;
@@ -129,7 +129,10 @@ public final class RelationshipTransformService extends TransformService {
         nsElement.setAttributeNS(NAMESPACE_SPEC_NS, "xmlns:mdssi", "http://schemas.openxmlformats.org/package/2006/digital-signature"); //$NON-NLS-1$ //$NON-NLS-2$
         NodeList nodeList;
         try {
-            nodeList = XPathAPI.selectNodeList(parentNode, "mdssi:RelationshipReference/@SourceId", nsElement); //$NON-NLS-1$
+            nodeList = com.sun.org.apache.xpath.internal.XPathAPI.selectNodeList(
+        		parentNode, "mdssi:RelationshipReference/@SourceId", //$NON-NLS-1$
+        		nsElement
+    		);
         }
         catch (final TransformerException e) {
             LOGGER.severe("transformer exception: " + e.getMessage()); //$NON-NLS-1$

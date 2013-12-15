@@ -38,7 +38,6 @@ package es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.signer;
 import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.X509Certificate;
 import java.util.List;
 
 import javax.xml.crypto.dsig.Reference;
@@ -48,7 +47,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 /** JSR105 Signature Facet interface.
@@ -61,27 +59,29 @@ public interface SignatureFacet {
      * @param signatureFactory
      * @param document
      * @param signatureId
-     * @param signingCertificateChain
-     *        the optional signing certificate chain
      * @param references
      * @param objects
+     * @param signatureComments Taz&oacute;n para la firma
+     * @param address1 Direcci&oacute;n donde se ha realizado la firma (campo 1)
+     * @param address2 Direcci&oacute;n donde se ha realizado la firma (campo 2)
      * @throws InvalidAlgorithmParameterException
-     * @throws NoSuchAlgorithmException 
-     * @throws SAXException 
-     * @throws ParserConfigurationException 
-     * @throws IOException 
+     * @throws NoSuchAlgorithmException
+     * @throws SAXException
+     * @throws ParserConfigurationException
+     * @throws IOException
      * @throws TransformerException */
-    void preSign(XMLSignatureFactory signatureFactory,
+    void preSign(byte[] ooXmlDocument,
+    		     XMLSignatureFactory signatureFactory,
                  Document document,
                  String signatureId,
-                 List<X509Certificate> signingCertificateChain,
                  List<Reference> references,
-                 List<XMLObject> objects) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException, IOException, ParserConfigurationException, SAXException, TransformerException;
-
-    /** This method is being invoked by the XML signature service engine during
-     * the post-sign phase. Via this method a signature facet can extend the XML
-     * signatures with for example key information.
-     * @param signatureElement
-     * @param signingCertificateChain */
-    void postSign(Element signatureElement, List<X509Certificate> signingCertificateChain);
+                 List<XMLObject> objects,
+                 String signatureComments,
+                 String address1,
+                 String address2) throws NoSuchAlgorithmException,
+                                         InvalidAlgorithmParameterException,
+                                         IOException,
+                                         ParserConfigurationException,
+                                         SAXException,
+                                         TransformerException;
 }

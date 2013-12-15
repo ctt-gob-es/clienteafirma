@@ -46,7 +46,6 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import javax.xml.crypto.URIDereferencer;
-import javax.xml.crypto.dsig.CanonicalizationMethod;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -64,78 +63,71 @@ import es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.signer.AbstractX
 /** Signature Service implementation for Office OpenXML document format XML
  * signatures.
  * @author Frank Cornelis */
-public abstract class AbstractOOXMLSignatureService extends AbstractXmlSignatureService {
+@SuppressWarnings("restriction")
+public class OOXMLSignatureService extends AbstractXmlSignatureService {
 
 	private static final String NAMESPACE_SPEC_NS = "http://www.w3.org/2000/xmlns/"; //$NON-NLS-1$
 
     private static final String RELATIONSHIPS_SCHEMA = "http://schemas.openxmlformats.org/package/2006/relationships"; //$NON-NLS-1$
 
-    protected AbstractOOXMLSignatureService() {
+    public OOXMLSignatureService() {
         addSignatureFacet(new OOXMLSignatureFacet(this));
     }
 
     @Override
-    protected final String getSignatureDescription() {
-        return "Office OpenXML Document"; //$NON-NLS-1$
+    protected final URIDereferencer getURIDereferencer(final byte[] ooXmlDocument) {
+        return new OOXMLURIDereferencer(
+    		ooXmlDocument
+		);
     }
 
-    @Override
-	public final String getFilesDigestAlgorithm() {
-        return null;
-    }
-
-    @Override
-    protected final URIDereferencer getURIDereferencer() {
-        return new OOXMLURIDereferencer(getOfficeOpenXMLDocument());
-    }
-
-    @Override
-    protected final String getCanonicalizationMethod() {
-        return CanonicalizationMethod.INCLUSIVE;
-    }
-
-    /** Gives back the OOXML to be signed. */
-    protected abstract byte[] getOfficeOpenXMLDocument();
-
-    /** Obtiene el fichero OOXMLK firmado.
-     * @param signatureData
+    /** Obtiene el fichero OOXML firmado.
+     * @param xmlSignatureFile
      * @return Fichero OOXML firmado
      * @throws IOException
      * @throws ParserConfigurationException
      * @throws SAXException
      * @throws TransformerException
      */
-    public final byte[] outputSignedOfficeOpenXMLDocument(final byte[] signatureData) throws IOException,
-                                                                                     ParserConfigurationException,
-                                                                                     SAXException,
-                                                                                     TransformerException {
-
+    public final byte[] outputSignedOfficeOpenXMLDocument(final byte[] ooXmlDocument,
+    		                                              final byte[] xmlSignatureFile) throws IOException,
+                                                                                                ParserConfigurationException,
+                                                                                                SAXException,
+                                                                                                TransformerException {
         final ByteArrayOutputStream signedOOXMLOutputStream = new ByteArrayOutputStream();
 
         final String signatureZipEntryName = "_xmlsignatures/sig-" + UUID.randomUUID().toString() + ".xml"; //$NON-NLS-1$ //$NON-NLS-2$
 
-        /*
-         * Copy the original OOXML content to the signed OOXML package. During
-         * copying some files need to changed.
-         */
-        final ZipOutputStream zipOutputStream = copyOOXMLContent(signatureZipEntryName, signedOOXMLOutputStream);
+        // Copiamos el contenido del OOXML original al OOXML firmado
+        // Durante el proceso es necesario modificar ciertos ficheros
+        final ZipOutputStream zipOutputStream = copyOOXMLContent(
+    		ooXmlDocument,
+    		signatureZipEntryName,
+    		signedOOXMLOutputStream
+		);
 
-        // Add the OOXML XML signature file to the OOXML package.
+        // Anadimos el fichero de firma XML al paquete OOXML
         zipOutputStream.putNextEntry(new ZipEntry(signatureZipEntryName));
-        if (signatureData != null) {
-        	zipOutputStream.write(signatureData);
+        if (xmlSignatureFile != null) {
+        	zipOutputStream.write(xmlSignatureFile);
         }
         zipOutputStream.close();
 
         return signedOOXMLOutputStream.toByteArray();
     }
 
-    private ZipOutputStream copyOOXMLContent(final String signatureZipEntryName, final OutputStream signedOOXMLOutputStream) throws IOException,
+    private ZipOutputStream copyOOXMLContent(final byte[] ooXmlDocument,
+    		                                 final String signatureZipEntryName,
+    		                                 final OutputStream signedOOXMLOutputStream) throws IOException,
                                                                                                                             ParserConfigurationException,
                                                                                                                             SAXException,
                                                                                                                             TransformerException {
         final ZipOutputStream zipOutputStream = new ZipOutputStream(signedOOXMLOutputStream);
-        final ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(this.getOfficeOpenXMLDocument()));
+        final ZipInputStream zipInputStream = new ZipInputStream(
+    		new ByteArrayInputStream(
+				ooXmlDocument
+			)
+		);
         ZipEntry zipEntry;
         boolean hasOriginSigsRels = false;
         while (null != (zipEntry = zipInputStream.getNextEntry())) {
@@ -153,7 +145,11 @@ public abstract class AbstractOOXMLSignatureService extends AbstractXmlSignature
 
                 final Element nsElement = contentTypesDocument.createElement("ns"); //$NON-NLS-1$
                 nsElement.setAttributeNS(NAMESPACE_SPEC_NS, "xmlns:tns", "http://schemas.openxmlformats.org/package/2006/content-types"); //$NON-NLS-1$ //$NON-NLS-2$
-                final NodeList nodeList = XPathAPI.selectNodeList(contentTypesDocument, "/tns:Types/tns:Default[@Extension='sigs']", nsElement); //$NON-NLS-1$
+                final NodeList nodeList = XPathAPI.selectNodeList(
+            		contentTypesDocument,
+            		"/tns:Types/tns:Default[@Extension='sigs']", //$NON-NLS-1$
+            		nsElement
+        		);
                 if (0 == nodeList.getLength()) {
                     // Add Default element for 'sigs' extension.
                     final Element defaultElement =
@@ -170,7 +166,7 @@ public abstract class AbstractOOXMLSignatureService extends AbstractXmlSignature
 
                 final Element nsElement = relsDocument.createElement("ns"); //$NON-NLS-1$
                 nsElement.setAttributeNS(NAMESPACE_SPEC_NS, "xmlns:tns", RELATIONSHIPS_SCHEMA); //$NON-NLS-1$
-                final NodeList nodeList = XPathAPI.selectNodeList(
+				final NodeList nodeList = XPathAPI.selectNodeList(
             		relsDocument,
                     "/tns:Relationships/tns:Relationship[@Type='http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/origin']", //$NON-NLS-1$
                     nsElement
