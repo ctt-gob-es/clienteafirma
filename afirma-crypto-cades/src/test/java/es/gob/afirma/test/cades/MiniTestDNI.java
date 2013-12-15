@@ -11,14 +11,15 @@
 package es.gob.afirma.test.cades;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.lang.reflect.Constructor;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.Provider;
 import java.security.Security;
 import java.util.Properties;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -50,8 +51,9 @@ public class MiniTestDNI {
 	@Test
     public void testCAdESDNIe() throws Exception {
 
-        @SuppressWarnings("restriction")
-		final Provider p = new sun.security.pkcs11.SunPKCS11(new ByteArrayInputStream(DNIE_DRIVER_PATH.getBytes()));
+		final Constructor<?> sunPKCS11Contructor = Class.forName("sun.security.pkcs11.SunPKCS11").getConstructor(InputStream.class); //$NON-NLS-1$
+		final Provider p = (Provider) sunPKCS11Contructor.newInstance(new ByteArrayInputStream(DNIE_DRIVER_PATH.getBytes()));
+
         Security.addProvider(p);
         final KeyStore ks = KeyStore.getInstance("PKCS11", p); //$NON-NLS-1$
         ks.load(null, DNI_PIN);

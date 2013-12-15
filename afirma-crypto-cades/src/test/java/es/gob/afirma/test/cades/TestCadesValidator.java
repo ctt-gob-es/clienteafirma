@@ -2,8 +2,7 @@ package es.gob.afirma.test.cades;
 
 import java.io.InputStream;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
