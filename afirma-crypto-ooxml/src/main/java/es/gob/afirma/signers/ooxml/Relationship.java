@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -11,10 +11,7 @@
 package es.gob.afirma.signers.ooxml;
 
 /** Relaci&oacute;n XML seg&uacute;n la normativa OOXML. */
-final class RelationShip {
-
-//    /** Tipo de la relaci&oacute;n principal del documento. */
-//    public final static String DOCUMENT_RELATIONSHIP_TYPE = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument";
+final class Relationship {
 
     private String id = null;
     private String type = null;
@@ -27,7 +24,7 @@ final class RelationShip {
      *        Typo de la relaci&oacute;n
      * @param target
      *        Destino de la relaci&oacute;n (objeto relacionado) */
-    RelationShip(final String id, final String type, final String target) {
+    Relationship(final String id, final String type, final String target) {
         this.id = id;
         this.type = type;
         this.target = target;

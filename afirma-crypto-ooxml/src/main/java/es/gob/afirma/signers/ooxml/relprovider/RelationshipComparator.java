@@ -1,6 +1,6 @@
 /*
  * eID Applet Project.
- * Copyright (C) 2009 FedICT.
+ * Copyright (C) 2009 Frank Cornelis.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -17,7 +17,7 @@
  */
 
 /*
- * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2009 Frank Cornelis.
  * This file is part of the eID Applet Project.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,24 +33,20 @@
  * limitations under the License.
  */
 
-package es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.signer;
+package es.gob.afirma.signers.ooxml.relprovider;
 
-import java.io.FilterOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.util.Comparator;
 
-/** Output Stream proxy that doesn't close the underlying stream.
- * @author fcorneli */
-final class NoCloseOutputStream extends FilterOutputStream {
+import org.w3c.dom.Element;
 
-    /** Main constructor.
-     * @param proxy */
-    NoCloseOutputStream(final OutputStream proxy) {
-        super(proxy);
-    }
+/** Comparator for Relationship DOM elements.
+ * @author Frank Cornelis */
+final class RelationshipComparator implements Comparator<Element> {
 
     @Override
-    public void close() throws IOException {
-        // empty
+	public int compare(final Element element1, final Element element2) {
+        final String id1 = element1.getAttribute("Id"); //$NON-NLS-1$
+        final String id2 = element2.getAttribute("Id"); //$NON-NLS-1$
+        return id1.compareTo(id2);
     }
 }

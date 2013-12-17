@@ -31,7 +31,7 @@ import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
-import es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.signer.OOXMLSignatureServiceContainer;
+import es.gob.afirma.signers.ooxml.relprovider.OOXMLProvider;
 import es.gob.afirma.signers.xmldsig.AOXMLDSigSigner;
 
 /** Manejador de firmas electr&oacute;nicas XML de documentos OOXML de Microsoft Office. */
@@ -40,6 +40,7 @@ public final class AOOOXMLSigner implements AOSigner {
     static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     static {
+        OOXMLProvider.install();
         if (Security.getProvider("XMLDSig") == null) { //$NON-NLS-1$
             try {
                 Security.addProvider((Provider) Class.forName("org.jcp.xml.dsig.internal.dom.XMLDSigRI").newInstance()); //$NON-NLS-1$
@@ -339,7 +340,7 @@ public final class AOOOXMLSigner implements AOSigner {
      * @param address2 Direcci&oacute;n donde se ha realizado la firma (campo 2)
      * @return Documento OOXML firmado
      * @throws AOException Cuando ocurre alg&uacute;n error durante el proceso de firma */
-    private static byte[] signOOXML(final byte[] ooxmlDocument,
+    private static byte[] signOOXML(final byte[] ooXmlDocument,
                                     final int signNum,
                                     final String algorithm,
                                     final PrivateKey key,
@@ -353,15 +354,10 @@ public final class AOOOXMLSigner implements AOSigner {
         }
 
         try {
-			return OOXMLSignatureServiceContainer.sign(
-                 ooxmlDocument,
-                 certChain, // Pasamos la cadena de certificacion a una lista
-                 key,
-                 signNum,
-                 signatureComments,
-                 address1,
-                 address2
-            );
+            return OOXMLZipHelper.outputSignedOfficeOpenXMLDocument(
+        		ooXmlDocument,
+        		OOXMLXAdESSigner.getSignedXML(ooXmlDocument, algorithm, key, certChain, null)
+    		);
         }
         catch (final Exception e) {
             throw new AOException("Error durante la firma OOXML: " + e, e); //$NON-NLS-1$

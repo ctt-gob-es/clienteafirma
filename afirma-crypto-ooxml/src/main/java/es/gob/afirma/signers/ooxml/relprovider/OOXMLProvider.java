@@ -35,31 +35,31 @@
  * limitations under the License.
  */
 
-package es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.signer.ooxml;
+package es.gob.afirma.signers.ooxml.relprovider;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.security.Provider;
+import java.security.Security;
 
-import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 
-/** Relationship Transform parameter specification class.
- * @author fcorneli */
-public final class RelationshipTransformParameterSpec implements TransformParameterSpec {
+/** Proveedor de seguridad para las transformadas de relaci&oacute;n de OOXML.
+ * @author Frank Cornelis */
+public final class OOXMLProvider extends Provider {
 
-    private final List<String> sourceIds;
+    private static final long serialVersionUID = 1L;
 
-    /** Constructor. */
-    public RelationshipTransformParameterSpec() {
-        this.sourceIds = new LinkedList<String>();
+    private static final String NAME = "OOXMLProvider"; //$NON-NLS-1$
+
+    private OOXMLProvider() {
+        super(NAME, 1.0, "OOXML Security Provider"); //$NON-NLS-1$
+        put("TransformService." + RelationshipTransformService.TRANSFORM_URI, RelationshipTransformService.class.getName()); //$NON-NLS-1$
+        put("TransformService." + RelationshipTransformService.TRANSFORM_URI + " MechanismType", "DOM"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
 
-    /** A&ntilde;ade una referencia de relaci&oacute;n para el identificados proporcionado.
-     * @param sourceId Identificador de origen de la relaci&oacute;n */
-    public void addRelationshipReference(final String sourceId) {
-        this.sourceIds.add(sourceId);
-    }
-
-    List<String> getSourceIds() {
-        return this.sourceIds;
+    /** Instala el proveedor. */
+    public static void install() {
+        final Provider provider = Security.getProvider(NAME);
+        if (null == provider) {
+            Security.addProvider(new OOXMLProvider());
+        }
     }
 }

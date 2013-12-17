@@ -1,4 +1,4 @@
-package es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.signer.xades;
+package es.gob.afirma.signers.ooxml;
 
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
@@ -22,6 +22,10 @@ final class OOXMLOfficeObjectHelper {
 
 	private static final String MS_DIGITAL_SIGNATURE_SCHEMA = "http://schemas.microsoft.com/office/2006/digsig"; //$NON-NLS-1$
 	private static final String NAMESPACE_SPEC_NS = "http://www.w3.org/2000/xmlns/"; //$NON-NLS-1$
+
+	private OOXMLOfficeObjectHelper() {
+		// No permitimos la instanciacion
+	}
 
 	static XMLObject getOfficeObject(final String nodeId,
 			                         final XMLSignatureFactory fac,

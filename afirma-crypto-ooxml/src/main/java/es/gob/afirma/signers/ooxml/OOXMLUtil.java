@@ -46,7 +46,7 @@ final class OOXMLUtil {
      * @return N&uacute;mero de firma del documento OOXML.
      * @throws IOException */
     static int countOOXMLSignatures(final byte[] ooxmlFile) throws IOException {
-        final RelationShip[] rels = getOOXMLSignaturesRelationships(ooxmlFile);
+        final Relationship[] rels = getOOXMLSignaturesRelationships(ooxmlFile);
         return rels == null ? 0 : rels.length;
     }
 
@@ -56,7 +56,7 @@ final class OOXMLUtil {
      * @param ooxmlFile
      *        Documento OOXML.
      * @return N&uacute;mero de firma del documento OOXML. */
-    private static RelationShip[] getOOXMLSignaturesRelationships(final byte[] ooxmlFile) throws IOException {
+    private static Relationship[] getOOXMLSignaturesRelationships(final byte[] ooxmlFile) throws IOException {
 
         final ZipFile zipFile;
         try {
@@ -64,7 +64,7 @@ final class OOXMLUtil {
         }
         catch (final ZipException e) {
             LOGGER.severe("El documento indicado no es un documento OOXML: " + e); //$NON-NLS-1$
-            return new RelationShip[0];
+            return new Relationship[0];
         }
 
         // Comprobamos si existe la relacion de firmas del documento
@@ -73,7 +73,7 @@ final class OOXMLUtil {
         // Si no existe el fichero, el documento no contiene firmas
         if (relsEntry == null) {
         	zipFile.close();
-            return new RelationShip[0];
+            return new Relationship[0];
         }
 
         // Analizamos el fichero de relaciones
@@ -84,21 +84,21 @@ final class OOXMLUtil {
         catch (final Exception e) {
             LOGGER.severe("Error en la lectura del OOXML: " + e); //$NON-NLS-1$
             zipFile.close();
-            return new RelationShip[0];
+            return new Relationship[0];
         }
 
         // ya podemos cerrar el documento
         zipFile.close();
 
         // Contamos las relaciones de firma
-        final List<RelationShip> relations = new ArrayList<RelationShip>();
-        for (final RelationShip rel : parser.getRelationships()) {
+        final List<Relationship> relations = new ArrayList<Relationship>();
+        for (final Relationship rel : parser.getRelationships()) {
             if (OOXML_SIGNATURE_RELATIONSHIP_TYPE.equals(rel.getType())) {
                 relations.add(rel);
             }
         }
 
-        return relations.toArray(new RelationShip[0]);
+        return relations.toArray(new Relationship[0]);
     }
 
     /** Recupera las firmas XMLdSig empotradas en el documento OOXML.
@@ -138,7 +138,7 @@ final class OOXMLUtil {
 
         // Contamos las relaciones de firma
         final List<byte[]> relations = new ArrayList<byte[]>();
-        for (final RelationShip rel : parser.getRelationships()) {
+        for (final Relationship rel : parser.getRelationships()) {
             if (OOXML_SIGNATURE_RELATIONSHIP_TYPE.equals(rel.getType())) {
 
                 // Comprobamos que exista el firma referenciada
@@ -191,7 +191,7 @@ final class OOXMLUtil {
         }
 
         ZipEntry signsEntry = null;
-        for (final RelationShip rel : parser.getRelationships()) {
+        for (final Relationship rel : parser.getRelationships()) {
             if (OOXML_SIGNATURE_ORIGIN_RELATIONSHIP_TYPE.equals(rel.getType())) {
                 final String middleTarget = rel.getTarget().substring(0, "_xmlsignatures".length() + 1); //$NON-NLS-1$
                 final String target = rel.getTarget().substring("_xmlsignatures".length() + 1); //$NON-NLS-1$

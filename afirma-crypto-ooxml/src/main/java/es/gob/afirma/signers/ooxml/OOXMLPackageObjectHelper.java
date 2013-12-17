@@ -1,4 +1,4 @@
-package es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.signer.xades;
+package es.gob.afirma.signers.ooxml;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -36,14 +36,17 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.signer.NoCloseInputStream;
-import es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.signer.ooxml.RelationshipTransformParameterSpec;
-import es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.signer.ooxml.RelationshipTransformService;
+import es.gob.afirma.signers.ooxml.relprovider.RelationshipTransformParameterSpec;
+import es.gob.afirma.signers.ooxml.relprovider.RelationshipTransformService;
 
 final class OOXMLPackageObjectHelper {
 
 	private static final String NAMESPACE_SPEC_NS = "http://www.w3.org/2000/xmlns/"; //$NON-NLS-1$
     private static final String DIGITAL_SIGNATURE_SCHEMA = "http://schemas.openxmlformats.org/package/2006/digital-signature"; //$NON-NLS-1$
+
+    private OOXMLPackageObjectHelper() {
+    	// No permitimos la instanciacion
+    }
 
 	static XMLObject getPackageObject(final String nodeId,
 									  final XMLSignatureFactory fac,

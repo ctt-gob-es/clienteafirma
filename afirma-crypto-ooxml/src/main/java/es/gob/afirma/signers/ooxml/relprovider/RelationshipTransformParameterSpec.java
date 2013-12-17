@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2009 FedICT.
+ * Copyright (C) 2009 Frank Cornelis.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -18,6 +19,7 @@
 
 /*
  * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2009 Frank Cornelis.
  * This file is part of the eID Applet Project.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,24 +35,31 @@
  * limitations under the License.
  */
 
-package es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.signer;
+package es.gob.afirma.signers.ooxml.relprovider;
 
-import java.io.FilterInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.util.LinkedList;
+import java.util.List;
 
-/** Input Stream proxy that doesn't close the underlying input stream.
+import javax.xml.crypto.dsig.spec.TransformParameterSpec;
+
+/** Relationship Transform parameter specification class.
  * @author fcorneli */
-public final class NoCloseInputStream extends FilterInputStream {
+public final class RelationshipTransformParameterSpec implements TransformParameterSpec {
 
-    /** Main constructor.
-     * @param proxy */
-    public NoCloseInputStream(final InputStream proxy) {
-        super(proxy);
+    private final List<String> sourceIds;
+
+    /** Constructor. */
+    public RelationshipTransformParameterSpec() {
+        this.sourceIds = new LinkedList<String>();
     }
 
-    @Override
-    public void close() throws IOException {
-        // Se ignoran los errores al cerrar
+    /** A&ntilde;ade una referencia de relaci&oacute;n para el identificados proporcionado.
+     * @param sourceId Identificador de origen de la relaci&oacute;n */
+    public void addRelationshipReference(final String sourceId) {
+        this.sourceIds.add(sourceId);
+    }
+
+    List<String> getSourceIds() {
+        return this.sourceIds;
     }
 }

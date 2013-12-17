@@ -1,4 +1,4 @@
-package es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.signer.xades;
+package es.gob.afirma.signers.ooxml;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -33,7 +33,6 @@ import net.java.xades.security.xml.XAdES.SignerRole;
 import net.java.xades.security.xml.XAdES.SignerRoleImpl;
 import net.java.xades.security.xml.XAdES.XAdES;
 import net.java.xades.security.xml.XAdES.XAdES_BES;
-import net.java.xades.security.xml.XAdES.XMLAdvancedSignature;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -45,7 +44,7 @@ import es.gob.afirma.signers.xml.XMLConstants;
 
 /** Firmador XAdES OOXML.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-public final class OOXMLXAdESSigner {
+final class OOXMLXAdESSigner {
 
 	private static final String ID_PACKAGE_OBJECT = "idPackageObject"; //$NON-NLS-1$
 	private static final String ID_OFFICE_OBJECT = "idOfficeObject"; //$NON-NLS-1$
@@ -73,18 +72,18 @@ public final class OOXMLXAdESSigner {
      * @throws TransformException
      * @throws XMLSignatureException
      * @throws MarshalException */
-    public static byte[] getSignedXML(final byte[] ooXmlDocument,
-    		                          final String algorithm,
-    								  final PrivateKey pk,
-    								  final X509Certificate[] certChain,
-    								  final Properties xParams) throws ParserConfigurationException,
-    								                                   GeneralSecurityException,
-    								                                   IOException,
-    								                                   SAXException,
-    								                                   TransformerException,
-    								                                   MarshalException,
-    								                                   XMLSignatureException,
-    								                                   TransformException  {
+    static byte[] getSignedXML(final byte[] ooXmlDocument,
+    		                   final String algorithm,
+    						   final PrivateKey pk,
+    						   final X509Certificate[] certChain,
+    						   final Properties xParams) throws ParserConfigurationException,
+    								                            GeneralSecurityException,
+    								                            IOException,
+    								                            SAXException,
+    								                            TransformerException,
+    								                            MarshalException,
+    								                            XMLSignatureException,
+    								                            TransformException  {
 
 		final String algoUri = XMLConstants.SIGN_ALGOS_URI.get(algorithm);
 		if (algoUri == null) {
@@ -154,7 +153,7 @@ public final class OOXMLXAdESSigner {
 		//*******************************************************************
 
 		// Creamos el objeto final de firma
-		final XMLAdvancedSignature xmlSignature = new OOXMLAdvancedSignature(xades);
+		final OOXMLAdvancedSignature xmlSignature = OOXMLAdvancedSignature.newInstance(xades, ooXmlDocument);
 
 		// Lista de referencias a firmar
 		final List<Reference> referenceList = new ArrayList<Reference>();
@@ -226,7 +225,7 @@ public final class OOXMLXAdESSigner {
 		);
 
 		xmlSignature.sign(
-			certChain[0],
+			certChain,
 			pk,
 			XMLConstants.SIGN_ALGOS_URI.get(algorithm),
 			referenceList,
@@ -242,7 +241,7 @@ public final class OOXMLXAdESSigner {
      * @param node Nodo XML que queremos pasar a texto
      * @param props Propiedades del XML (<i>version</i>, <i>encoding</i>, <i>standalone</i>)
      * @return Cadena de texto con el XML en forma de array de octetos */
-    public static byte[] writeXML(final Node node) {
+    private static byte[] writeXML(final Node node) {
 
         // La codificacion por defecto sera UTF-8
         final String xmlEncoding = "UTF-8"; //$NON-NLS-1$

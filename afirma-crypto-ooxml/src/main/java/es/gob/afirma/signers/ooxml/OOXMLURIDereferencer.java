@@ -33,7 +33,7 @@
  * limitations under the License.
  */
 
-package es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.signer.ooxml;
+package es.gob.afirma.signers.ooxml;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -52,9 +52,10 @@ import javax.xml.crypto.URIReferenceException;
 import javax.xml.crypto.XMLCryptoContext;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
 
-/** JSR105 URI dereferencer for Office Open XML documents.
- * @author Frank Cornelis */
-final class OOXMLURIDereferencer implements URIDereferencer {
+import es.gob.afirma.core.misc.AOUtil;
+
+/** Resuelve referencias dentro del Zip de un documento OOXML. */
+public final class OOXMLURIDereferencer implements URIDereferencer {
 
     private final byte[] ooxml;
 
@@ -72,10 +73,10 @@ final class OOXMLURIDereferencer implements URIDereferencer {
 	public Data dereference(final URIReference uriReference, final XMLCryptoContext context) throws URIReferenceException {
 
         if (null == uriReference) {
-            throw new IllegalArgumentException("La URIReference no puede ser nula"); //$NON-NLS-1$
+            throw new IllegalArgumentException("La referencia no puede ser nula"); //$NON-NLS-1$
         }
         if (null == context) {
-            throw new IllegalArgumentException("El XMLCrytoContext no puede ser nulo"); //$NON-NLS-1$
+            throw new IllegalArgumentException("El contexto de firma no puede ser nulo"); //$NON-NLS-1$
         }
 
         String uri = uriReference.getURI();
@@ -91,10 +92,12 @@ final class OOXMLURIDereferencer implements URIDereferencer {
             if (null == dataInputStream) {
                 return this.baseUriDereferencer.dereference(uriReference, context);
             }
-            return new OctetStreamData(dataInputStream, uri, null);
+            final byte[] data = AOUtil.getDataFromInputStream(dataInputStream);
+            dataInputStream.close();
+            return new OctetStreamData(new ByteArrayInputStream(data), uri, null);
         }
         catch (final IOException e) {
-            throw new URIReferenceException("Error de I/O: " + e.getMessage(), e); //$NON-NLS-1$
+            throw new URIReferenceException("Error de I/O: " + e, e); //$NON-NLS-1$
         }
     }
 

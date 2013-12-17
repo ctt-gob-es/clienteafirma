@@ -32,7 +32,7 @@ final class RelationshipsParser {
     private static final String RELATIONSHIPS_SCHEMA = "http://schemas.openxmlformats.org/package/2006/relationships"; //$NON-NLS-1$
 
     /** Listado de relaciones obtenido. */
-    private RelationShip[] relations = null;
+    private Relationship[] relations = null;
 
     /** Construye un parser de objetos XML RelationsShips.
      * @param xmlRelationships
@@ -46,7 +46,7 @@ final class RelationshipsParser {
 
     /** Recupera el listado de relaciones extraido del XML.
      * @return Listado de relaciones. */
-    RelationShip[] getRelationships() {
+    Relationship[] getRelationships() {
         return this.relations;
     }
 
@@ -57,7 +57,7 @@ final class RelationshipsParser {
      * @throws AOException
      *         Cuando la entrada no se corresponde con un objeto
      *         RelationShips v&aacute;lido. */
-    private static RelationShip[] getRelationships(final InputStream xmlRelationships) throws AOException {
+    private static Relationship[] getRelationships(final InputStream xmlRelationships) throws AOException {
 
         final Document doc;
         try {
@@ -77,26 +77,26 @@ final class RelationshipsParser {
         }
 
         final NodeList relationsList = root.getChildNodes();
-        final Vector<RelationShip> relationsVector = new Vector<RelationShip>();
+        final Vector<Relationship> relationsVector = new Vector<Relationship>();
         for (int i = 0; i < relationsList.getLength(); i++) {
             relationsVector.add(RelationshipsParser.getRelationship(relationsList.item(i)));
         }
 
-        return relationsVector.toArray(new RelationShip[0]);
+        return relationsVector.toArray(new Relationship[0]);
     }
 
-    /** Recupera una relaci&oacute;n individual de un nodo RelationShip.<br/>
-     * Un nodo RelationShip tiene estas propiedades:
+    /** Recupera una relaci&oacute;n individual de un nodo Relationship.<br/>
+     * Un nodo Relationship tiene estas propiedades:
      * <ul>
-     * <li><b>Nombre:</b> RelationShip</li>
+     * <li><b>Nombre:</b> Relationship</li>
      * <li><b>Atributos:</b> id, type y target</li>
      * </ul>
      * @param node
-     *        Nodo xml RelationShip.
+     *        Nodo xml Relationship.
      * @return Objeto de relaci&oacute;n.
      * @throws AOException
-     *         Cuando el nodo no encaja con el patr&oacute;n RelationShip. */
-    private static RelationShip getRelationship(final Node node) throws AOException {
+     *         Cuando el nodo no encaja con el patr&oacute;n Relationship. */
+    private static Relationship getRelationship(final Node node) throws AOException {
 
         // Comprobamos que sea un nodo de relacion
         if (!node.getNodeName().equals("Relationship")) { //$NON-NLS-1$
@@ -111,7 +111,7 @@ final class RelationshipsParser {
         }
 
         // Creamos la relacion
-        return new RelationShip(attributes.getNamedItem("Id").getNodeValue(), //$NON-NLS-1$
+        return new Relationship(attributes.getNamedItem("Id").getNodeValue(), //$NON-NLS-1$
                                 attributes.getNamedItem("Type").getNodeValue(), //$NON-NLS-1$
                                 attributes.getNamedItem("Target").getNodeValue()); //$NON-NLS-1$
     }

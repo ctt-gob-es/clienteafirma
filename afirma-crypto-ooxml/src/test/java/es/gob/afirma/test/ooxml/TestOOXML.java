@@ -47,8 +47,8 @@ public final class TestOOXML {
     private static final String CERT_PASS3 = "1111"; //$NON-NLS-1$
     private static final String CERT_ALIAS3 = "1"; //$NON-NLS-1$
 
-    private static final String[] DATA_PATHS = new String[] { /*"Entrada.docx",*/ "entrada_w2013.docx" };  //$NON-NLS-1$
-    private static byte[][] DATAS = new byte[1][];
+    private static final String[] DATA_PATHS = new String[] { "Entrada.docx", "entrada_w2013.docx" };  //$NON-NLS-1$ //$NON-NLS-2$
+    private static byte[][] DATAS = new byte[2][];
 
     private static final Properties[] OOXML_MODES;
 
@@ -56,12 +56,12 @@ public final class TestOOXML {
 
     	try {
 			DATAS[0] = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(DATA_PATHS[0]));
-//			DATAS[1] = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(DATA_PATHS[1]));
+			DATAS[1] = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(DATA_PATHS[1]));
 		}
     	catch (final Exception e) {
 			System.err.println("No se pudo cargar el documento de pruebas"); //$NON-NLS-1$
 			DATAS[0] = "Error0".getBytes(); //$NON-NLS-1$
-//			DATAS[1] = "Error1".getBytes(); //$NON-NLS-1$
+			DATAS[1] = "Error1".getBytes(); //$NON-NLS-1$
 		}
 
         final Properties p1 = new Properties();
