@@ -385,192 +385,7 @@ public final class AOXAdESSigner implements AOSigner {
      * </ul>
      * @param key Clave privada a usar para firmar.
      * @param certChain Cadena de certificados del cliente
-     * @param xParams Par&aacute;metros adicionales para la firma.
-     * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
-     * <dl>
-	 *  <dt><b><i>avoidXpathExtraTransformsOnEnveloped</i></b></dt>
-	 *   <dd>
-	 *    Indica si se debe evitar la inclusi&oacute;n de la transformaci&oacute;n
-	 *    XPATH2 que normalmente se a&ntilde;ade para posibilitar las cofirmas y
-	 *    que elimina todas las firmas del documento para dejar &uacute;nicamente
-	 *    el contenido. Por defecto, se encuentra a {@code false}.
-	 *   </dd>
-	 *  <dt><b><i>nodeToSign</i></b></dt>
-	 *   <dd>
-	 *    Indica un nombre de nodo a firmar, para el caso en el que quiera firmarse
-	 *    un nodo concreto en vez de todo el documento. Solo aplica a la firma de
-	 *    documentos XML.
-	 *    <br>
-	 *    El nombre nodo debe estar indicado con el valor de un atributo llamado <i>Id</i>,
-	 *    y se ignorar&aacute;n los atributos con nombre distinto, aunque se hayan declarado
-	 *    en el esquema como identificadores (con una l&iacute;nea del tipo
-	 *    <code>&lt;xs:attribute name="otronombre" type="xs:ID"/&gt;</code>), para evitar
-	 *    conflictos con el esquema de XAdES y XMLDSig.
-	 *   </dd>
-     *  <dt><b><i>uri</i></b></dt>
-     *   <dd>URL en la que se encuentra el documento a firmar, necesario en el caso del formato <i>XAdES Externally Detached</i></dd>
-     *  <dt><b><i>format</i></b></dt>
-     *   <dd>
-     *    Formato de firma. Se aceptan los siguientes valores:<br>
-     *    <ul>
-     *     <li>
-     *      <i>XAdES Detached</i> (<code>AOSignConstants.SIGN_FORMAT_XADES_DETACHED</code>)
-     *     </li>
-     *     <li>
-     *      <i>XAdES Externally Detached</i> (<code>AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED</code>)
-     *      <p>
-     *       Para el uso del formato <i>XAdES Externally Detached</i> es necesario establecer
-     *       tambi&eacute;n el par&aacute;metro <code>uri</code> con una direcci&oacute;n
-     *       accesible universalmente.
-     *      </p>
-     *     </li>
-     *     <li>
-     *      <i>XAdES Enveloped</i> (<code>AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED</code>)
-     *     </li>
-     *     <li>
-     *      <i>XAdES Enveloping</i> (<code>AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING</code>)
-     *     </li>
-     *    </ul>
-     *   </dd>
-     *  <dt><b><i>policyIdentifier</i></b></dt>
-     *   <dd>Identificador de la pol&iacute;tica de firma (normalmente una URL hacia la pol&iacute;tica en formato XML procesable o una URN de tipo OID)</dd>
-     *  <dt><b><i>policyIdentifierHash</i></b></dt>
-     *   <dd>
-     *    Huella digital del documento de pol&iacute;tica de firma (normalmente del mismo fichero en formato XML procesable).
-     *    Si no se indica, es obligatorio que el par&aacute;metro <code>policyIdentifier</code> sea una URL accesible universalmente
-     *   </dd>
-     *  <dt><b><i>policyIdentifierHashAlgorithm</i></b></dt>
-     *   <dd>Algoritmo usado para el c&aacute;lculo de la huella digital indicada en el par&aacute;metro <code>policyIdentifierHash</code>
-     *  <dt><b><i>policyDescription</i></b></dt>
-     *   <dd>Descripci&oacute;n textual de la pol&iacute;tica</dd>
-     *  <dt><b><i>policyQualifier</i></b></dt>
-     *   <dd>URL hacia el documento (legible por personas, normalmente en formato PDF) descriptivo de la pol&iacute;tica de firma</dd>
-     *  <dt><b><i>includeOnlySignningCertificate</i></b></dt>
-	 *   <dd>Indica, mediante un {@code true} o {@code false}, que debe
-	 *   incluirse en la firma &uacute;nicamente el certificado utilizado
-	 *   para firmar y no su cadena de certificaci&oacute;n completa.
-	 *   Por defecto, se incluir&aacute; toda la cadena de certificaci&oacute;n.</dd>
-	 *  <dt><b><i>facturaeSign</i></b></dt>
-	 *   <dd>Indica, mediante un {@code true} o {@code false}, si se
-	 *   deben realizar las restricciones de comportamiento necesarias
-	 *   para la firma de facturas electr&oacute;nicas (FACTURAe).
-	 *   Estas restricciones son, no introducir la
-	 *   transformaci&oacute;n de canonicalizaci&oacute;n de la firma,
-	 *   ni la transformaci&oacute;n XPATH en las firmas Enveloped.</dd>
-     *  <dt><b><i>signerClaimedRole</i></b></dt>
-     *   <dd>Cargo atribuido para el firmante</dd>
-     *  <dt><b><i>signerCertifiedRole</i></b></dt>
-     *   <dd>Cargo confirmado para el firmante</dd>
-     *  <dt><b><i>precalculatedHashAlgorithm</i></b></dt>
-     *   <dd>Algoritmo de huella digital cuando esta se proporciona precalculada</dd>
-     *  <dt><b><i>signatureProductionCity</i></b></dt>
-     *   <dd>Ciudad en la que se realiza la firma</dd>
-     *  <dt><b><i>signatureProductionProvince</i></b></dt>
-     *   <dd>Provincia en la que se realiza la firma</dd>
-     *  <dt><b><i>signatureProductionPostalCode</i></b></dt>
-     *   <dd>C&oacute;digo postal en el que se realiza la firma</dd>
-     *  <dt><b><i>signatureProductionCountry</i></b></dt>
-     *   <dd>Pa&iacute;s en el que se realiza la firma</dd>
-     *  <dt><b><i>xmlTransforms</i></b></dt>
-     *   <dd>N&uacute;mero de transformaciones a aplicar al XML antes de firmarlo</dd>
-     *  <dt><b><i>xmlTransform</i>n<i>Type</i></b></dt>
-     *   <dd>Tipo de la transformaci&oacute;n <i>n</i> (debe ser la URL del algoritmo segun define W3C)</dd>
-     *  <dt><b><i>xmlTransform</i>n<i>Subtype</i></b></dt>
-     *   <dd>Subtipo de la transformaci&oacute;n <i>n</i> (por ejemplo, "intersect", "subtract" o "union" para XPATH2)</dd>
-     *  <dt><b><i>xmlTransform</i>n<i>Body</i></b></dt>
-     *   <dd>Cuerpo de la transformaci&oacute;n <i>n</i></dd>
-     *  <dt><b><i>referencesDigestMethod</i></b></dt>
-     *   <dd>
-     *    Algoritmo de huella digital a usar en las referencias XML (referencesDigestMethod). Debe indicarse como una URL,
-     *    acept&aacute;ndose los siguientes valores:
-     *    <ul>
-     *     <li><i>http://www.w3.org/2000/09/xmldsig#sha1</i> (SHA-1)</li>
-     *     <li><i>http://www.w3.org/2001/04/xmlenc#sha256</i> (SHA-256, valor recomendado)</li>
-     *     <li><i>http://www.w3.org/2001/04/xmlenc#sha512</i> (SHA-512)</li>
-     *     <li><i>http://www.w3.org/2001/04/xmlenc#ripemd160 (RIPEMD-160)</i></li>
-     *    </ul>
-     *   </dd>
-     *  <dt><b><i>mimeType</i></b></dt>
-     *   <dd>
-     *    MIME-Type de los datos a firmar. Si no se indica se realiza una auto-detecci&oacute;n cuyo resultado puede
-     *    ser inexacto
-     *   </dd>
-     *  <dt><b><i>encoding</i></b></dt>
-     *   <dd>
-     *    Codificaci&oacute;n de los datos a firmar
-     *   </dd>
-     *  <dt><b><i>contentTypeOid</i></b><dt>
-     *   <dd>OID que identifica el tipo de datos a firmar</dd>
-     *  <dt><b><i>canonicalizationAlgorithm</i></b></dt>
-     *   <dd>Algoritmo de canonicalizaci&oacute;n</dd>
-     *  <dt><b><i>xadesNamespace</i></b></dt>
-     *   <dd>
-     *    URL de definici&oacute;n del espacio de nombres de XAdES (y por extensi&oacute;n, versi&oacute;n de XAdES).
-     *    Si se establece este par&aacute;metro es posible que se necesite establecer tambi&eacute;n el par&aacute;metro
-     *    <code>signedPropertiesTypeUrl</code> para evitar incoherencias en la versi&oacute;n de XAdES.
-     *   </dd>
-     *  <dt><b><i>signedPropertiesTypeUrl</i></b></dt>
-     *   <dd>
-     *    URL de definici&oacute;n del tipo de las propiedades firmadas (<i>Signed Properties</i>) de XAdES.
-     *    Si se establece este par&aacute;metro es posible que se necesite establecer tambi&eacute;n el par&aacute;metro
-     *    <code>xadesNamespace</code> para evitar incoherencias en la versi&oacute;n de XAdES.<br>
-     *    Si no se establece se usa el valor por defecto: <a href="http://uri.etsi.org/01903#SignedProperties">http://uri.etsi.org/01903#SignedProperties</a>.
-     *   </dd>
-     *  <dt><b><i>ignoreStyleSheets</i></b></dt>
-     *   <dd>
-     *    Ignora las hojas de estilo externas de los XML (no las firma) si se establece a <code>true</code>,
-     *    si se establece a <code>false</code> act&uacute;a normalmente (s&iacute; las firma)
-     *   </dd>
-     *  <dt><b><i>avoidBase64Transforms</i></b></dt>
-     *   <dd>
-     *    No declara transformaciones Base64 incluso si son necesarias si se establece a <code>true</code>,
-     *    si se establece a <code>false</code> act&uacute;a normalmente (s&iacute; las declara)
-     *   </dd>
-     *  <dt><b><i>headLess</i></b></dt>
-     *   <dd>
-     *    Evita cualquier interacci&oacute;n con el usuario si se establece a <code>true</code>,
-     *    si se establece a <code>false</code> act&uacute;a normalmente (puede mostrar di&aacute;logos,
-     *    por ejemplo, para la dereferenciaci&oacute;n de hojas de estilo enlazadas con rutas relativas).
-     *    &Uacute;til para los procesos desatendidos y por lotes
-     *   </dd>
-     *  <dt><b><i>applySystemDate</i></b></dt>
-     *   <dd>
-     *    Indica si se debe introducir en la firma el atributo <i>signingTime</i> con la fecha actual
-     *    del sistema. Por defecto, se encuentra a {@code true}.
-     *   </dd>
-     * </dl>
-     * <p>
-     *  Respecto al uso de los par&aacute;metros <code>xmlTransform</code>n<code>Type</code>,
-     *  <code>xmlTransform</code>n<code>Subtype</code> y <code>xmlTransform</code>n<code>Body</code>,
-     *  sus valores van ligados, acept&aacute;ndose las siguientes combinaciones:
-     * </p>
-     * <p>
-     *  Transformaci&oacute;n <b>XPATH</b><br>
-     *  &nbsp;&nbsp;-<b>Tipo</b>: <code>http://www.w3.org/TR/1999/REC-xpath-19991116</code><br>
-     *  &nbsp;&nbsp;-<b>Subtipos</b>: No tiene subtipos.<br>
-     *  &nbsp;&nbsp;-<b>Cuerpo</b>: Especificado mediante sentencias de tipo XPATH.<br>
-     *  <br>Transformaci&oacute;n <b>XPATH2</b><br>
-     *  &nbsp;&nbsp;-<b>Tipo</b>: <code>http://www.w3.org/2002/06/xmldsig-filter2</code><br>
-     *  &nbsp;&nbsp;-<b>Subtipos</b>:<br>
-     *  &nbsp;&nbsp;&nbsp;&nbsp;<b><i>subtract</i></b>: Resta.<br>
-     *  &nbsp;&nbsp;&nbsp;&nbsp;<b><i>intersect</i></b>: Intersecci&oacute;n<br>
-     *  &nbsp;&nbsp;&nbsp;&nbsp;<b><i>union</i></b>: Uni&oacute;n<br>
-     *  &nbsp;&nbsp;-<b>Cuerpo</b>: Especificado mediante sentencias de tipo XPATH2.<br>
-     *  <br>Transformaci&oacute;n <b>XSLT</b><br>
-     *  &nbsp;&nbsp;-<b>Tipo</b>: <code>http://www.w3.org/TR/1999/REC-xslt-19991116</code><br>
-     *  &nbsp;&nbsp;-<b>Subtipos</b>: No tiene subtipos.<br>
-     *  &nbsp;&nbsp;-<b>Cuerpo</b>: Especificado mediante sentencias de tipo XSLT.<br>
-     *  <br>Transformaci&oacute;n <b>BASE64</b><br>
-     *  &nbsp;&nbsp;-<b>Tipo</b>: <code>http://www.w3.org/2000/09/xmldsig#base64</code><br>
-     *  &nbsp;&nbsp;-<b>Subtipos</b>: No tiene subtipos.<br>
-     *  &nbsp;&nbsp;-<b>Cuerpo</b>: No tiene cuerpo.
-     * </p>
-     * <p>
-     *  No es posible especificar transformaciones complejas que incluyan varias sentencias.
-     *  En su lugar, puede declararse una sucesi&oacute;n de transformaciones simples que produzcan el
-     *  mismo resultado. Cada una de las transformaciones se aplicar&aacute; de forma ordenada sobre el
-     *  resultado de la anterior.
-     * </p>
+     * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
      * @return Firma en formato XAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     @Override
@@ -582,7 +397,7 @@ public final class AOXAdESSigner implements AOSigner {
     	return XAdESSigner.sign(data, algorithm, key, certChain, xParams);
     }
 
-    /** Comprueba si la firma es detached. Previamente debe haberse comprabado que el XML se
+    /** Comprueba si la firma es detached. Previamente debe haberse comprobado que el XML se
      * corresponde con una firma XAdES.
      * @param element
      *        Elemento que contiene el nodo ra&iacute;z del documento que se
@@ -868,71 +683,7 @@ public final class AOXAdESSigner implements AOSigner {
      * </ul>
      * @param key Clave privada a usar para firmar.
      * @param certChain Cadena de certificados del cliente.
-     * @param xParams Par&aacute;metros adicionales para la firma.
-     * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
-     * <dl>
-     *  <dt><b><i>policyIdentifier</i></b></dt>
-     *   <dd>Identificador de la pol&iacute;tica de firma (normalmente una URL hacia la pol&iacute;tica en formato XML procesable)</dd>
-     *  <dt><b><i>policyIdentifierHash</i></b></dt>
-     *   <dd>
-     *    Huella digital del documento de pol&iacute;tica de firma (normlamente del mismo fichero en formato XML procesable).
-     *    Si no se indica, es obligatorio que el par&aacute;metro <code>policyIdentifier</code> sea una URL accesible universalmente
-     *   </dd>
-     *  <dt><b><i>policyIdentifierHashAlgorithm</i></b></dt>
-     *   <dd>Algoritmo usado para el c&aacute;lculo de la huella digital indicada en el par&aacute;metro <code>policyIdentifierHash</code>
-     *  <dt><b><i>policyDescription</i></b></dt>
-     *   <dd>Descripci&oacute;n textual de la pol&iacute;tica</dd>
-     *  <dt><b><i>policyQualifier</i></b></dt>
-     *   <dd>URL hacia el documento (legible por personas, normalmente en formato PDF) descriptivo de la pol&iacute;tica de firma</dd>
-     *  <dt><b><i>includeOnlySignningCertificate</i></b></dt>
-	 *   <dd>Indica, mediante un {@code true} o {@code false}, que debe
-	 *   incluirse en la firma &uacute;nicamente el certificado utilizado
-	 *   para firmar y no su cadena de certificaci&oacute;n completa.
-	 *   Por defecto, se incluir&aacute; toda la cadena de certificaci&oacute;n.</dd>
-     *  <dt><b><i>signerClaimedRole</i></b></dt>
-     *   <dd>Cargo atribuido para el firmante</dd>
-     *  <dt><b><i>signerCertifiedRole</i></b></dt>
-     *   <dd>Cargo confirmado para el firmante</dd>
-     *  <dt><b><i>signatureProductionCity</i></b></dt>
-     *   <dd>Ciudad en la que se realiza la firma</dd>
-     *  <dt><b><i>signatureProductionProvince</i></b></dt>
-     *   <dd>Provincia en la que se realiza la firma</dd>
-     *  <dt><b><i>signatureProductionPostalCode</i></b></dt>
-     *   <dd>C&oacute;digo postal en el que se realiza la firma</dd>
-     *  <dt><b><i>signatureProductionCountry</i></b></dt>
-     *   <dd>Pa&iacute;s en el que se realiza la firma</dd>
-     *  <dt><b><i>referencesDigestMethod</i></b></dt>
-     *   <dd>
-     *    Algoritmo de huella digital a usar en las referencias XML (referencesDigestMethod). Debe indicarse como una URL,
-     *    acept&aacute;ndose los siguientes valores:
-     *    <ul>
-     *     <li><i>http://www.w3.org/2000/09/xmldsig#sha1</i> (SHA-1)</li>
-     *     <li><i>http://www.w3.org/2001/04/xmlenc#sha256</i> (SHA-256, valor recomendado)</li>
-     *     <li><i>http://www.w3.org/2001/04/xmlenc#sha512</i> (SHA-512)</li>
-     *     <li><i>http://www.w3.org/2001/04/xmlenc#ripemd160 (RIPEMD-160)</i></li>
-     *    </ul>
-     *   </dd>
-     *  <dt><b><i>canonicalizationAlgorithm</i></b></dt>
-     *   <dd>Algoritmo de canonicalizaci&oacute;n</dd>
-     *  <dt><b><i>xadesNamespace</i></b></dt>
-     *   <dd>
-     *    URL de definici&oacute;n del espacio de nombres de XAdES (y por extensi&oacute;n, versi&oacute;n de XAdES).
-     *    Si se establece este par&aacute;metro es posible que se necesite establecer tambi&eacute;n el par&aacute;metro
-     *    <code>signedPropertiesTypeUrl</code> para evitar incoherencias en la versi&oacute;n de XAdES.
-     *   </dd>
-     *  <dt><b><i>signedPropertiesTypeUrl</i></b></dt>
-     *   <dd>
-     *    URL de definici&oacute;n del tipo de las propiedades firmadas (<i>Signed Properties</i>) de XAdES.
-     *    Si se establece este par&aacute;metro es posible que se necesite establecer tambi&eacute;n el par&aacute;metro
-     *    <code>xadesNamespace</code> para evitar incoherencias en la versi&oacute;n de XAdES.<br>
-     *    Si no se establece se usa el valor por defecto: <a href="http://uri.etsi.org/01903#SignedProperties">http://uri.etsi.org/01903#SignedProperties</a>.
-     *   </dd>
-     *  <dt><b><i>applySystemDate</i></b></dt>
-     *   <dd>
-     *    Indica si se debe introducir en la firma el atributo <i>signingTime</i> con la fecha actual
-     *    del sistema. Por defecto, se encuentra a {@code true}.
-     *   </dd>
-     * </dl>
+     * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
      * @return Cofirma en formato XAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     @Override
@@ -970,71 +721,7 @@ public final class AOXAdESSigner implements AOSigner {
      * </ul>
      * @param key Clave privada a usar para firmar.
      * @param certChain Cadena de certificados del firmante.
-     * @param extraParams Par&aacute;metros adicionales para la firma.
-     * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
-     * <dl>
-     *  <dt><b><i>policyIdentifier</i></b></dt>
-     *   <dd>Identificador de la pol&iacute;tica de firma (normalmente una URL hacia la pol&iacute;tica en formato XML procesable)</dd>
-     *  <dt><b><i>policyIdentifierHash</i></b></dt>
-     *   <dd>
-     *    Huella digital del documento de pol&iacute;tica de firma (normlamente del mismo fichero en formato XML procesable).
-     *    Si no se indica, es obligatorio que el par&aacute;metro <code>policyIdentifier</code> sea una URL accesible universalmente
-     *   </dd>
-     *  <dt><b><i>policyIdentifierHashAlgorithm</i></b></dt>
-     *   <dd>Algoritmo usado para el c&aacute;lculo de la huella digital indicada en el par&aacute;metro <code>policyIdentifierHash</code>
-     *  <dt><b><i>policyDescription</i></b></dt>
-     *   <dd>Descripci&oacute;n textual de la pol&iacute;tica</dd>
-     *  <dt><b><i>policyQualifier</i></b></dt>
-     *   <dd>URL hacia el documento (legible por personas, normalmente en formato PDF) descriptivo de la pol&iacute;tica de firma</dd>
-     *  <dt><b><i>includeOnlySignningCertificate</i></b></dt>
-	 *   <dd>Indica, mediante un {@code true} o {@code false}, que debe
-	 *   incluirse en la firma &uacute;nicamente el certificado utilizado
-	 *   para firmar y no su cadena de certificaci&oacute;n completa.
-	 *   Por defecto, se incluir&aacute; toda la cadena de certificaci&oacute;n.</dd>
-     *  <dt><b><i>signerClaimedRole</i></b></dt>
-     *   <dd>Cargo atribuido para el firmante</dd>
-     *  <dt><b><i>signerCertifiedRole</i></b></dt>
-     *   <dd>Cargo confirmado para el firmante</dd>
-     *  <dt><b><i>signatureProductionCity</i></b></dt>
-     *   <dd>Ciudad en la que se realiza la firma</dd>
-     *  <dt><b><i>signatureProductionProvince</i></b></dt>
-     *   <dd>Provincia en la que se realiza la firma</dd>
-     *  <dt><b><i>signatureProductionPostalCode</i></b></dt>
-     *   <dd>C&oacute;digo postal en el que se realiza la firma</dd>
-     *  <dt><b><i>signatureProductionCountry</i></b></dt>
-     *   <dd>Pa&iacute;s en el que se realiza la firma</dd>
-     *  <dt><b><i>referencesDigestMethod</i></b></dt>
-     *   <dd>
-     *    Algoritmo de huella digital a usar en las referencias XML (referencesDigestMethod). Debe indicarse como una URL,
-     *    acept&aacute;ndose los siguientes valores:
-     *    <ul>
-     *     <li><i>http://www.w3.org/2000/09/xmldsig#sha1</i> (SHA-1)</li>
-     *     <li><i>http://www.w3.org/2001/04/xmlenc#sha256</i> (SHA-256, valor recomendado)</li>
-     *     <li><i>http://www.w3.org/2001/04/xmlenc#sha512</i> (SHA-512)</li>
-     *     <li><i>http://www.w3.org/2001/04/xmlenc#ripemd160 (RIPEMD-160)</i></li>
-     *    </ul>
-     *   </dd>
-     *  <dt><b><i>canonicalizationAlgorithm</i></b></dt>
-     *   <dd>Algoritmo de canonicalizaci&oacute;n</dd>
-     *  <dt><b><i>xadesNamespace</i></b></dt>
-     *   <dd>
-     *    URL de definici&oacute;n del espacio de nombres de XAdES (y por extensi&oacute;n, versi&oacute;n de XAdES).
-     *    Si se establece este par&aacute;metro es posible que se necesite establecer tambi&eacute;n el par&aacute;metro
-     *    <code>signedPropertiesTypeUrl</code> para evitar incoherencias en la versi&oacute;n de XAdES.
-     *   </dd>
-     *  <dt><b><i>signedPropertiesTypeUrl</i></b></dt>
-     *   <dd>
-     *    URL de definici&oacute;n del tipo de las propiedades firmadas (<i>Signed Properties</i>) de XAdES.
-     *    Si se establece este par&aacute;metro es posible que se necesite establecer tambi&eacute;n el par&aacute;metro
-     *    <code>xadesNamespace</code> para evitar incoherencias en la versi&oacute;n de XAdES.<br>
-     *    Si no se establece se usa el valor por defecto: <a href="http://uri.etsi.org/01903#SignedProperties">http://uri.etsi.org/01903#SignedProperties</a>.
-     *   </dd>
-     *   <dt><b><i>applySystemDate</i></b></dt>
-     *   <dd>
-     *    Indica si se debe introducir en la firma el atributo <i>signingTime</i> con la fecha actual
-     *    del sistema. Por defecto, se encuentra a {@code true}.
-     *   </dd>
-     * </dl>
+     * @param extraParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
      * @return Cofirma en formato XAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     @Override
@@ -1078,60 +765,7 @@ public final class AOXAdESSigner implements AOSigner {
      * {@code targetType} seleccionado.
      * @param key Clave privada a usar para firmar.
      * @param certChain Cadena de certificados del firmante.
-     * @param xParams Par&aacute;metros adicionales para la firma.
-     * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
-     * <dl>
-     *  <dt><b><i>encoding</i></b></dt>
-     *   <dd>Fuerza la codificaci&oacute;n del XML de salida (utf-8, iso-8859-1,...)</dd>
-     *  <dt><b><i>policyIdentifier</i></b></dt>
-     *   <dd>Identificador de la pol&iacute;tica de firma (normalmente una URL hacia la pol&iacute;tica en formato XML procesable)</dd>
-     *  <dt><b><i>policyIdentifierHash</i></b></dt>
-     *   <dd>
-     *    Huella digital del documento de pol&iacute;tica de firma (normlamente del mismo fichero en formato XML procesable).
-     *    Si no se indica, es obligatorio que el par&aacute;metro <code>policyIdentifier</code> sea una URL accesible universalmente
-     *   </dd>
-     *  <dt><b><i>policyIdentifierHashAlgorithm</i></b></dt>
-     *   <dd>Algoritmo usado para el c&aacute;lculo de la huella digital indicada en el par&aacute;metro <code>policyIdentifierHash</code>
-     *  <dt><b><i>policyDescription</i></b></dt>
-     *   <dd>Descripci&oacute;n textual de la pol&iacute;tica</dd>
-     *  <dt><b><i>policyQualifier</i></b></dt>
-     *   <dd>URL hacia el documento (legible por personas, normalmente en formato PDF) descriptivo de la pol&iacute;tica de firma</dd>
-     *  <dt><b><i>includeOnlySignningCertificate</i></b></dt>
-	 *   <dd>Indica, mediante un {@code true} o {@code false}, que debe
-	 *   incluirse en la firma &uacute;nicamente el certificado utilizado
-	 *   para firmar y no su cadena de certificaci&oacute;n completa.
-	 *   Por defecto, se incluir&aacute; toda la cadena de certificaci&oacute;n.</dd>
-	 *  <dt><b><i>signerClaimedRole</i></b></dt>
-     *   <dd>Cargo atribuido para el firmante</dd>
-     *  <dt><b><i>signerCertifiedRole</i></b></dt>
-     *   <dd>Cargo confirmado para el firmante</dd>
-     *  <dt><b><i>signatureProductionCity</i></b></dt>
-     *   <dd>Ciudad en la que se realiza la firma</dd>
-     *  <dt><b><i>signatureProductionProvince</i></b></dt>
-     *   <dd>Provincia en la que se realiza la firma</dd>
-     *  <dt><b><i>signatureProductionPostalCode</i></b></dt>
-     *   <dd>C&oacute;digo postal en el que se realiza la firma</dd>
-     *  <dt><b><i>signatureProductionCountry</i></b></dt>
-     *   <dd>Pa&iacute;s en el que se realiza la firma</dd>
-     *  <dt><b><i>applySystemDate</i></b></dt>
-     *   <dd>
-     *    Indica si se debe introducir en la firma el atributo <i>signingTime</i> con la fecha actual
-     *    del sistema. Por defecto, se encuentra a {@code true}.
-     *   </dd>
-     *  <dt><b><i>xadesNamespace</i></b></dt>
-     *   <dd>
-     *    URL de definici&oacute;n del espacio de nombres de XAdES (y por extensi&oacute;n, versi&oacute;n de XAdES).
-     *    Si se establece este par&aacute;metro es posible que se necesite establecer tambi&eacute;n el par&aacute;metro
-     *    <code>signedPropertiesTypeUrl</code> para evitar incoherencias en la versi&oacute;n de XAdES.
-     *   </dd>
-     *  <dt><b><i>signedPropertiesTypeUrl</i></b></dt>
-     *   <dd>
-     *    URL de definici&oacute;n del tipo de las propiedades firmadas (<i>Signed Properties</i>) de XAdES.
-     *    Si se establece este par&aacute;metro es posible que se necesite establecer tambi&eacute;n el par&aacute;metro
-     *    <code>xadesNamespace</code> para evitar incoherencias en la versi&oacute;n de XAdES.<br>
-     *    Si no se establece se usa el valor por defecto: <a href="http://uri.etsi.org/01903#SignedProperties">http://uri.etsi.org/01903#SignedProperties</a>.
-     *   </dd>
-     * </dl>
+     * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
      * @return Contrafirma en formato XAdES.
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     @Override
@@ -1337,8 +971,7 @@ public final class AOXAdESSigner implements AOSigner {
 
     /** Devuelve un nuevo documento con ra&iacute;z "AFIRMA" del que cuelga el
      * documento especificado.
-     * @param docu
-     *        Documento que estar&aacute; contenido en el nuevo documento.
+     * @param docu Documento que estar&aacute; contenido en el nuevo documento.
      * @return Documento con ra&iacute;z "AFIRMA".
      * @throws ParserConfigurationException Cuando se produce un error al analizar el XML.
      */
