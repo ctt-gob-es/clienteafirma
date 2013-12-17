@@ -221,7 +221,7 @@ public final class AOOOXMLSigner implements AOSigner {
      * </ul>
      * @param key Clave privada del firmante
      * @param certChain Cadena de certificados del firmante
-     * @param extraParams No usado, se ignora el valor de este par&aacute;metro
+     * @param extraParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
      * @return Documento OOXML firmado
      * @throws AOException Cuando ocurre alg&uacute;n error durante el proceso de firma
      * @throws IOException Cuando hay errores en la lectura de los datos */
@@ -249,9 +249,7 @@ public final class AOOOXMLSigner implements AOSigner {
     		algorithm,
     		key,
     		(X509Certificate[]) certChain,
-    		xParams.getProperty("signatureReason"), //$NON-NLS-1$
-    		xParams.getProperty("signatureAddress1"), //$NON-NLS-1$
-    		xParams.getProperty("signatureAddress2") //$NON-NLS-1$
+    		xParams
 		);
     }
 
@@ -268,7 +266,7 @@ public final class AOOOXMLSigner implements AOSigner {
      * </ul>
      * @param key Clave privada del firmante
      * @param certChain Cadena de certificados del firmante
-     * @param extraParams No usado, se ignora el valor de este par&aacute;metro
+     * @param extraParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
      * @return Documento OOXML firmado
      * @throws AOException Cuando ocurre alg&uacute;n error durante el proceso de firma
      * @throws IOException Cuando hay errores en la lectura de los datos */
@@ -295,7 +293,7 @@ public final class AOOOXMLSigner implements AOSigner {
      * </ul>
      * @param key Clave privada del firmante
      * @param certChain Cadena de certificados del firmante
-     * @param extraParams No usado, se ignora el valor de este par&aacute;metro
+     * @param extraParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
      * @return Documento OOXML firmado
      * @throws AOException Cuando ocurre alg&uacute;n error durante el proceso de firma
      * @throws IOException Cuando hay errores en la lectura de los datos */
@@ -338,6 +336,7 @@ public final class AOOOXMLSigner implements AOSigner {
      * @param signatureComments Raz&oacute;n de la firma
      * @param address1 Direcci&oacute;n donde se ha realizado la firma (campo 1)
      * @param address2 Direcci&oacute;n donde se ha realizado la firma (campo 2)
+     * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
      * @return Documento OOXML firmado
      * @throws AOException Cuando ocurre alg&uacute;n error durante el proceso de firma */
     private static byte[] signOOXML(final byte[] ooXmlDocument,
@@ -345,9 +344,7 @@ public final class AOOOXMLSigner implements AOSigner {
                                     final String algorithm,
                                     final PrivateKey key,
                                     final X509Certificate[] certChain,
-                                    final String signatureComments,
-                                    final String address1,
-                                    final String address2) throws AOException {
+                                    final Properties xParams) throws AOException {
 
         if (key == null) {
             throw new IllegalArgumentException("No se ha proporcionado una clave valida"); //$NON-NLS-1$
@@ -356,7 +353,7 @@ public final class AOOOXMLSigner implements AOSigner {
         try {
             return OOXMLZipHelper.outputSignedOfficeOpenXMLDocument(
         		ooXmlDocument,
-        		OOXMLXAdESSigner.getSignedXML(ooXmlDocument, algorithm, key, certChain, null)
+        		OOXMLXAdESSigner.getSignedXML(ooXmlDocument, algorithm, key, certChain, xParams)
     		);
         }
         catch (final Exception e) {

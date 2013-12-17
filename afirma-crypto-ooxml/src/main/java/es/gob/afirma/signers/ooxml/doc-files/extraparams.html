@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"> 
+<html>
+ <head>
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+  <title>
+   Valores aceptados como par&aacute;metros adicionales para las firmas XAdES
+  </title>
+ </head>
+ <body>
+ <p>Valores aceptados como par&aacute;metros adicionales para las firmas XAdES:</p>
+ <dl>
+  <dt><b><i>policyIdentifier</i></b></dt>
+   <dd>Identificador de la pol&iacute;tica de firma (normalmente una URL hacia la pol&iacute;tica en formato XML procesable o una URN de tipo OID)</dd>
+  <dt><b><i>policyIdentifierHash</i></b></dt>
+   <dd>
+    Huella digital del documento de pol&iacute;tica de firma (normalmente del mismo fichero en formato XML procesable).
+    Si no se indica, es obligatorio que el par&aacute;metro <code>policyIdentifier</code> sea una URL accesible universalmente
+   </dd>
+  <dt><b><i>policyIdentifierHashAlgorithm</i></b></dt>
+   <dd>Algoritmo usado para el c&aacute;lculo de la huella digital indicada en el par&aacute;metro <code>policyIdentifierHash</code>
+  <dt><b><i>policyDescription</i></b></dt>
+   <dd>Descripci&oacute;n textual de la pol&iacute;tica</dd>
+  <dt><b><i>policyQualifier</i></b></dt>
+   <dd>URL hacia el documento (legible por personas, normalmente en formato PDF) descriptivo de la pol&iacute;tica de firma</dd>
+  <dt><b><i>includeOnlySignningCertificate</i></b></dt>
+   <dd>
+    Indica, mediante un {@code true} o {@code false}, que debe
+    incluirse en la firma &uacute;nicamente el certificado utilizado
+	para firmar y no su cadena de certificaci&oacute;n completa.
+	Por defecto, se incluir&aacute; toda la cadena de certificaci&oacute;n.
+   </dd>
+  <dt><b><i>signerClaimedRole</i></b></dt>
+   <dd>Cargo atribuido para el firmante</dd>
+  <dt><b><i>signerCertifiedRole</i></b></dt>
+   <dd>Cargo confirmado para el firmante</dd>
+  <dt><b><i>signatureProductionCity</i></b></dt>
+   <dd>Ciudad en la que se realiza la firma</dd>
+  <dt><b><i>signatureProductionProvince</i></b></dt>
+   <dd>Provincia en la que se realiza la firma</dd>
+  <dt><b><i>signatureProductionPostalCode</i></b></dt>
+   <dd>C&oacute;digo postal en el que se realiza la firma</dd>
+  <dt><b><i>signatureProductionCountry</i></b></dt>
+   <dd>Pa&iacute;s en el que se realiza la firma</dd>
+  <dt><b><i>signatureComments</i></b></dt>
+   <dd>Comentarios sobre la firma (normalmente la raz&oacute;n de la firma).</dd>
+  <dt><b><i>signatureAddress1</i></b></dt>
+   <dd>Primera l&iacute;nea de la direcci&oacute;n en la que se ha realizado la firma.</dd>
+  <dt><b><i>signatureAddress2</i></b></dt>
+   <dd>Segunda l&iacute;nea de la direcci&oacute;n en la que se ha realizado la firma.</dd>
+ </dl>
+ </body>
+</html>

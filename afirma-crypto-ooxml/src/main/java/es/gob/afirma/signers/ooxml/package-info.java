@@ -9,7 +9,7 @@
  */
 
 /** M&oacute;dulo de generaci&oacute;n de firmas digitales Office Open XML (OOXML),
- *  variante de XMLDSig (XML Digital Signature).
+ *  variante de XAdES.
  *  <p>
  *   El m&oacute;dulo genera firmas electr&oacute,nicas en el formato definido en:
  *  </p>
@@ -23,22 +23,22 @@
  *   compatibilidad hacia atr&aacute;s:
  *  </p>
  *  <ul>
- *   <li>Microsoft office 2010</li>
+ *   <li>Microsoft Office 2010</li>
  *   <li>Microsoft Office 2011 for Mac</li>
+ *   <li>Microsoft Office 2013</li>
  *  </ul>
  *  <p align="center"><br><img src="doc-files/package-info-1.png"></p>
  *  <p>Este m&oacute;dulo presenta las siguientes dependencias directas de primer nivel:</p>
  *  <ul>
  *   <li>Dependencia con el m&oacute;dulo N&uacute;cleo (<i>afirma-core</i>) del Cliente.</li>
- *   <li>Dependencia con el m&oacute;dulo de firmas XMLDSig (<i>afirma-crypto-xmlsignature</i>) del Cliente.</li>
- *   <li>Dependencia con la biblioteca Apache Commons IO (<i>commons_io_afirma.jar</i>).</li>
+ *   <li>Dependencia con el m&oacute;dulo de firmas XAdES (<i>afirma-crypto-xades</i>) del Cliente.</li>
  *  </ul>
  *  <p>Adicionalmente, se presentan las siguientes dependencias de segundo nivel:</p>
  *  <ul>
  *   <li>Dependencia con el m&oacute;dulo XML (<i>afirma-crypto-core-xml</i>) del Cliente.</li>
  *  </ul>
  *  <p>
- *   Este m&oacute;dulo es compatible con cualquier entorno JSE 1.6.0_10 o superior.
+ *   Este m&oacute;dulo es compatible con cualquier entorno JSE 1.7.0_45 o superior.
  *  </p>
  *  <p>
  *   Desde este m&oacute;dulo no se realizan llamadas a interfaces gr&aacute;ficas.<br>
