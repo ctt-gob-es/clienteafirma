@@ -180,7 +180,7 @@ public class TestPdfTriphase {
 		}
 
 		final byte[] signature = signer.sign(
-				null,
+				this.data,
 				"SHA512withRSA",  //$NON-NLS-1$
 				this.pke.getPrivateKey(),
 				this.pke.getCertificateChain(),
@@ -193,7 +193,7 @@ public class TestPdfTriphase {
 		config.setProperty(PROPERTY_NAME_DOC_ID, Base64.encodeBytes(signature, Base64.URL_SAFE));
 
 		final byte[] coSignature = signer.cosign(
-				null,
+				signature,
 				"SHA512withRSA",  //$NON-NLS-1$
 				this.pke2.getPrivateKey(),
 				this.pke2.getCertificateChain(),
@@ -207,7 +207,7 @@ public class TestPdfTriphase {
 		System.out.println("La cofirma se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 	}
 
-	private File savePdfTempFile(final byte[] content) throws IOException {
+	private static File savePdfTempFile(final byte[] content) throws IOException {
 		final File tempFile = File.createTempFile("test", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
 		final FileOutputStream fos = new FileOutputStream(tempFile);
 		fos.write(content);
