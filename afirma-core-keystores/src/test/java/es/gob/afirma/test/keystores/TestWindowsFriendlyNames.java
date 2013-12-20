@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -34,6 +35,7 @@ public class TestWindowsFriendlyNames {
      * @throws Exception */
     @SuppressWarnings("static-method")
 	@Test
+	@Ignore
     public void testWindowsFriendlyNames() throws Exception {
         if (!Platform.OS.WINDOWS.equals(Platform.getOS())) {
             return;
