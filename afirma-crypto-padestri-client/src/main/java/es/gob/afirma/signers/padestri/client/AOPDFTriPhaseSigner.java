@@ -337,14 +337,7 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 
 	@Override
 	public boolean isSign(final byte[] data) {
-		if (data == null) {
-			LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
-			return false;
-		}
-		if (!isPdfFile(data)) {
-			return false;
-		}
-		return getSignersStructure(data, false).getCount().intValue() > 0;
+		return false;
 	}
 
 	@Override
