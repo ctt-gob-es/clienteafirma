@@ -159,15 +159,13 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 			final Object[] targets,
 			final PrivateKey key,
 			final Certificate[] certChain,
-			Properties xParams) throws AOException {
+			final Properties xParams) throws AOException {
 		
-		if (xParams == null) {
-			xParams = new Properties();
+		final Properties params = xParams != null ? xParams : new Properties();
+		if (!params.containsKey(COUNTERSIGN_TARGET_KEY)) {
+			params.setProperty(COUNTERSIGN_TARGET_KEY, COUNTERSIGN_TARGET_LEAFS);
 		}
-		if (!xParams.containsKey(COUNTERSIGN_TARGET_KEY)) {
-			xParams.setProperty(COUNTERSIGN_TARGET_KEY, COUNTERSIGN_TARGET_LEAFS);
-		}
-		return triPhaseOperation(CRYPTO_OPERATION_COUNTERSIGN, sign, algorithm, key, certChain, xParams);
+		return triPhaseOperation(CRYPTO_OPERATION_COUNTERSIGN, sign, algorithm, key, certChain, params);
 	}
 
 	/** {@inheritDoc} */
