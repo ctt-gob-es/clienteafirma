@@ -392,7 +392,11 @@ public final class AOPDFSigner implements AOSigner {
         if (!isPdfFile(data)) {
         	return false;
         }
-        return getSignersStructure(data, false) != null;
+        Object root = getSignersStructure(data, false).getRoot();
+        if (root instanceof AOTreeNode) {
+        	return AOTreeModel.getChildCount(root) > 0;
+        }
+        return false;
     }
 
     @SuppressWarnings("unused")

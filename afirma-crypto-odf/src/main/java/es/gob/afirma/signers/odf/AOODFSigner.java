@@ -579,7 +579,7 @@ public final class AOODFSigner implements AOSigner {
                 // Se ignoran los errores del borrado, es responsabilidad del usuario lipiar los temporales periodicamente
             }
 
-            return new AOTreeModel(tree, tree.getChildCount());
+            return new AOTreeModel(tree);
         }
         catch (final Exception e) {
             LOGGER.warning("Se ha producido un error al obtener la estructura de firmas: " + e); //$NON-NLS-1$

@@ -179,7 +179,7 @@ public final class AOOOXMLSigner implements AOSigner {
             return null;
         }
 
-        return new AOTreeModel(tree, tree.getChildCount());
+        return new AOTreeModel(tree);
     }
 
     /** Indica si los datos indicados son un documento OOXML susceptible de contener una firma
