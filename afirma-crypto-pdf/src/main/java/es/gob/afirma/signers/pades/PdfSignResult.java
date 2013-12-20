@@ -23,7 +23,7 @@ import es.gob.afirma.core.misc.Base64;
 
 /** Resultado de una pre-firma (como primera parte de un firma trif&aacute;sica) o una firma completa PAdES.
  * Es un <i>JavaBean</i> que encapsula los resultados de la pre-firma o firma completa PDF. */
-final class PdfSignResult implements Serializable {
+public final class PdfSignResult implements Serializable {
 
 	private static final long serialVersionUID = 2L;
 
@@ -44,7 +44,7 @@ final class PdfSignResult implements Serializable {
      * @param signature Firma o pre-firma
      * @param signingTime Momento de firmado
      * @param xParams Opciones adiconales de la firma */
-    PdfSignResult(final String pdfFileId,
+    public PdfSignResult(final String pdfFileId,
     		         final byte[] signature,
     		         final GregorianCalendar signingTime,
     		         final Properties xParams) {
@@ -65,13 +65,13 @@ final class PdfSignResult implements Serializable {
 
     /** Obtiene el FileID (<i>/ID</i>) del diccionario PDF generado.
      * @return FileID del diccionario PDF generado */
-    String getFileID() {
+    public String getFileID() {
         return this.fileID;
     }
 
     /** Obtiene los atributos CAdES a firmar.
      * @return Atributos CAdES a firmar (pre-firma) */
-    byte[] getSign() {
+    public byte[] getSign() {
         return this.sign;
     }
 
