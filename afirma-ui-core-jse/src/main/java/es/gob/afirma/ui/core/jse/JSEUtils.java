@@ -40,7 +40,7 @@ public final class JSEUtils {
 
         // Iniciamos el DefaultTreeModel
         final DefaultMutableTreeNode rootSwing = new DefaultMutableTreeNode(rootObject);
-        final DefaultTreeModel swingDefaultTreeModel = new DefaultTreeModel(rootSwing, treeModel.asksAllowsChildren());
+        final DefaultTreeModel swingDefaultTreeModel = new DefaultTreeModel(rootSwing);
 
         // Listado con los padres del modelo original
         final List<AOTreeNode> parents = new ArrayList<AOTreeNode>();

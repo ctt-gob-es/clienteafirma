@@ -16,58 +16,10 @@ public final class AOTreeModel {
     /** Root of the tree. */
     private final AOTreeNode root;
 
-    /** Children count. Always 1 starting with the root */
-    private int count = 1;
-
-    /** Obtiene el n&uacute;mero de elementos del &aacute;rbol.
-     * @return N&uacute;mero de elementos del &aacute;rbol */
-    public Integer getCount() {
-        return Integer.valueOf(this.count);
-    }
-
-    /** Determines how the <code>isLeaf</code> method figures out if a node is a
-     * leaf node. If true, a node is a leaf node if it does not allow children.
-     * (If it allows children, it is not a leaf node, even if no children are
-     * present.) That lets you distinguish between <i>folder</i> nodes and
-     * <i>file</i> nodes in a file system, for example.
-     * <p>
-     * If this value is false, then any node which has no children is a leaf node, and any node may acquire children */
-    private final boolean asksAllowsChildren;
-
     /** Crea un &aacute;rbol en el que cualquier nodo puede tener hijos.
      * @param root La ra&iacute;z del &aacute;rbol */
     public AOTreeModel(final AOTreeNode root) {
-        this(root, false);
-    }
-
-    /** Creates a tree specifying whether any node can have children, or whether
-     * only certain nodes can have children.
-     * @param root
-     *        a TreeNode object that is the root of the tree
-     * @param asksAllowsChildren
-     *        a boolean, false if any node can have children, true if each
-     *        node is asked to see if it can have children
-     * @see #asksAllowsChildren */
-    private AOTreeModel(final AOTreeNode root, final boolean asksAllowsChildren) {
-        super();
         this.root = root;
-        this.asksAllowsChildren = asksAllowsChildren;
-    }
-
-    /** Construye un nuevo &aacute;rbol.
-     * @param treeRoot Ra&iacute;z del &aacute;rbol
-     * @param count N&uacute;mero de elementos iniciales del nuevo &aacute;rbol */
-    public AOTreeModel(final AOTreeNode treeRoot, final int count) {
-        this(treeRoot, false);
-        this.count = count;
-    }
-
-    /** Tells how leaf nodes are determined.
-     * @return true if only nodes which do not allow children are leaf nodes,
-     *         false if nodes which have no children (even if allowed) are leaf
-     *         nodes */
-    public boolean asksAllowsChildren() {
-        return this.asksAllowsChildren;
     }
 
     /** Returns the root of the tree. Returns null only if the tree has no nodes.

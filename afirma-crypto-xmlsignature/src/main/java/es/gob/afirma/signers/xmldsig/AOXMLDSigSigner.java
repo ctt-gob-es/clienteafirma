@@ -2057,7 +2057,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             }
         }
 
-        return new AOTreeModel(tree, numSignatures);
+        return new AOTreeModel(tree);
     }
 
     /** M&eacute;todo recursivo para la obtenci&oacute;n de la estructura de

@@ -855,7 +855,7 @@ public final class AOXAdESSigner implements AOSigner {
                 treeRoot.add(generateSignsTree(i, signatures.getLength() - 1, arrayNodes, arrayIds, arrayRef)[i]);
             }
         }
-        return new AOTreeModel(treeRoot, signatures.getLength());
+        return new AOTreeModel(treeRoot);
     }
 
     /** M&eacute;todo recursivo para la obtenci&oacute;n de la estructura de

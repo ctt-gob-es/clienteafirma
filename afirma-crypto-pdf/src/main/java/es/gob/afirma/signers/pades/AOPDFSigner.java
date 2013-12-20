@@ -298,84 +298,86 @@ public final class AOPDFSigner implements AOSigner {
      *        titulares certificados.
      * @return &Aacute;rbol de nodos de firma o <code>null</code> en caso de error. */
     @Override
-	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
+    public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
 
-    	isPdfFile(sign);
+    	final AOTreeNode root = new AOTreeNode("Datos"); //$NON-NLS-1$
 
-        final AOTreeNode root = new AOTreeNode("Datos"); //$NON-NLS-1$
-        final AcroFields af;
+    	if (!isPdfFile(sign)) {
+    		return new AOTreeModel(root);
+    	}
 
-        PdfReader pdfReader;
-        try {
-            pdfReader = new PdfReader(sign);
-        }
-        catch (final BadPasswordException e) {
-            try {
-                pdfReader = new PdfReader(
-            		sign,
-            		new String(
-        				AOUIFactory.getPassword(
-    						CommonPdfMessages.getString("AOPDFSigner.0"), //$NON-NLS-1$
-    						null
-						)
-					).getBytes()
-        		);
-            }
-            catch (final BadPasswordException e2) {
-                LOGGER.severe("La contrasena del PDF no es valida, se devolvera un arbol vacio: " + e2); //$NON-NLS-1$
-                return new AOTreeModel(root, root.getChildCount());
-            }
-            catch (final Exception e3) {
-                LOGGER.severe("No se ha podido leer el PDF, se devolvera un arbol vacio: " + e3); //$NON-NLS-1$
-                return new AOTreeModel(root, root.getChildCount());
-            }
-        }
-        catch (final Exception e) {
-            LOGGER.severe("No se ha podido leer el PDF, se devolvera un arbol vacio: " + e); //$NON-NLS-1$
-            return new AOTreeModel(root, root.getChildCount());
-        }
+    	PdfReader pdfReader;
+    	try {
+    		pdfReader = new PdfReader(sign);
+    	}
+    	catch (final BadPasswordException e) {
+    		try {
+    			pdfReader = new PdfReader(
+    					sign,
+    					new String(
+    							AOUIFactory.getPassword(
+    									CommonPdfMessages.getString("AOPDFSigner.0"), //$NON-NLS-1$
+    									null
+    									)
+    							).getBytes()
+    					);
+    		}
+    		catch (final BadPasswordException e2) {
+    			LOGGER.severe("La contrasena del PDF no es valida, se devolvera un arbol vacio: " + e2); //$NON-NLS-1$
+    			return new AOTreeModel(root);
+    		}
+    		catch (final Exception e3) {
+    			LOGGER.severe("No se ha podido leer el PDF, se devolvera un arbol vacio: " + e3); //$NON-NLS-1$
+    			return new AOTreeModel(root);
+    		}
+    	}
+    	catch (final Exception e) {
+    		LOGGER.severe("No se ha podido leer el PDF, se devolvera un arbol vacio: " + e); //$NON-NLS-1$
+    		return new AOTreeModel(root);
+    	}
 
-        try {
-            af = pdfReader.getAcroFields();
-        }
-        catch (final Exception e) {
-            LOGGER.severe("No se ha podido obtener la informacion de los firmantes del PDF, se devolvera un arbol vacio: " + e); //$NON-NLS-1$
-            return new AOTreeModel(root, root.getChildCount());
-        }
-        final ArrayList<?> names = af.getSignatureNames();
-        Object pkcs1Object = null;
-        for (int i = 0; i < names.size(); ++i) {
-            final PdfPKCS7 pcks7 = af.verifySignature(names.get(i).toString());
-            if (asSimpleSignInfo) {
-                final AOSimpleSignInfo ssi = new AOSimpleSignInfo(new X509Certificate[] {
-                    pcks7.getSigningCertificate()
-                }, pcks7.getSignDate().getTime());
+    	final AcroFields af;
+    	try {
+    		af = pdfReader.getAcroFields();
+    	}
+    	catch (final Exception e) {
+    		LOGGER.severe("No se ha podido obtener la informacion de los firmantes del PDF, se devolvera un arbol vacio: " + e); //$NON-NLS-1$
+    		return new AOTreeModel(root);
+    	}
+    	final ArrayList<?> names = af.getSignatureNames();
+    	Object pkcs1Object = null;
+    	for (int i = 0; i < names.size(); ++i) {
+    		final PdfPKCS7 pcks7 = af.verifySignature(names.get(i).toString());
+    		if (asSimpleSignInfo) {
+    			final AOSimpleSignInfo ssi = new AOSimpleSignInfo(new X509Certificate[] {
+    					pcks7.getSigningCertificate()
+    			}, pcks7.getSignDate().getTime());
 
-                // Extraemos el PKCS1 de la firma
-                try {
-                    // iText antiguo
-                    final Field digestField = Class.forName("com.lowagie.text.pdf.PdfPKCS7").getDeclaredField("digest"); //$NON-NLS-1$ //$NON-NLS-2$
-                    // En iText nuevo seria "final Field digestField = Class.forName("com.itextpdf.text.pdf.PdfPKCS7").getDeclaredField("digest");"
-                    digestField.setAccessible(true);
-                    pkcs1Object = digestField.get(pcks7);
-                }
-                catch (final Exception e) {
-                    LOGGER.severe(
-                      "No se ha podido obtener informacion de una de las firmas del PDF, se continuara con la siguiente: " + e //$NON-NLS-1$
-                    );
-                    continue;
-                }
-                if (pkcs1Object instanceof byte[]) {
-                    ssi.setPkcs1((byte[]) pkcs1Object);
-                }
-                root.add(new AOTreeNode(ssi));
-            }
-            else {
-                root.add(new AOTreeNode(AOUtil.getCN(pcks7.getSigningCertificate())));
-            }
-        }
+    			// Extraemos el PKCS1 de la firma
+    			try {
+    				// iText antiguo
+    				final Field digestField = Class.forName("com.lowagie.text.pdf.PdfPKCS7").getDeclaredField("digest"); //$NON-NLS-1$ //$NON-NLS-2$
+    				// En iText nuevo seria "final Field digestField = Class.forName("com.itextpdf.text.pdf.PdfPKCS7").getDeclaredField("digest");"
+    				digestField.setAccessible(true);
+    				pkcs1Object = digestField.get(pcks7);
+    			}
+    			catch (final Exception e) {
+    				LOGGER.severe(
+    						"No se ha podido obtener informacion de una de las firmas del PDF, se continuara con la siguiente: " + e //$NON-NLS-1$
+    						);
+    				continue;
+    			}
+    			if (pkcs1Object instanceof byte[]) {
+    				ssi.setPkcs1((byte[]) pkcs1Object);
+    			}
+    			root.add(new AOTreeNode(ssi));
+    		}
+    		else {
+    			root.add(new AOTreeNode(AOUtil.getCN(pcks7.getSigningCertificate())));
+    		}
+    	}
 
-        return new AOTreeModel(root, root.getChildCount());
+    	return new AOTreeModel(root);
     }
 
     /** Comprueba que los datos proporcionados sean un documento PDF.
@@ -390,7 +392,7 @@ public final class AOPDFSigner implements AOSigner {
         if (!isPdfFile(data)) {
         	return false;
         }
-        return getSignersStructure(data, false).getCount().intValue() > 0;
+        return getSignersStructure(data, false) != null;
     }
 
     @SuppressWarnings("unused")
