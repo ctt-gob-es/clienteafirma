@@ -42,11 +42,11 @@ final class OOXMLZipHelper {
 
     private static final String RELATIONSHIPS_SCHEMA = "http://schemas.openxmlformats.org/package/2006/relationships"; //$NON-NLS-1$
 
-    static final byte[] outputSignedOfficeOpenXMLDocument(final byte[] ooXmlDocument,
-    		                                              final byte[] xmlSignatureFile) throws IOException,
-                                                                                                ParserConfigurationException,
-                                                                                                SAXException,
-                                                                                                TransformerException {
+    static byte[] outputSignedOfficeOpenXMLDocument(final byte[] ooXmlDocument,
+    		                                        final byte[] xmlSignatureFile) throws IOException,
+                                                                                          ParserConfigurationException,
+                                                                                          SAXException,
+                                                                                          TransformerException {
         final ByteArrayOutputStream signedOOXMLOutputStream = new ByteArrayOutputStream();
 
         final String signatureZipEntryName = "_xmlsignatures/sig-" + UUID.randomUUID().toString() + ".xml"; //$NON-NLS-1$ //$NON-NLS-2$

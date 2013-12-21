@@ -57,6 +57,10 @@ final class OOXMLXAdESSigner {
     private static final String XADES_SIGNATURE_PREFIX = "xd"; //$NON-NLS-1$
     private static final String XML_SIGNATURE_PREFIX = "ds"; //$NON-NLS-1$
 
+    private OOXMLXAdESSigner() {
+    	// No permitimos la instanciacion
+    }
+
     /** Obtiene el XML de firma XAdES <i>enveloping</i> OOXML.
      * @param ooXmlDocument Documento OOXML original
      * @param algorithm Algoritmo de firma

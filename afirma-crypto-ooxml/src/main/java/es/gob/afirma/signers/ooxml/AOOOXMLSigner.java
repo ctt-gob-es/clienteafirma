@@ -39,6 +39,12 @@ public final class AOOOXMLSigner implements AOSigner {
 
     static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
+    private static final String EXTENSION_DOCX = ".docx"; //$NON-NLS-1$
+    private static final String EXTENSION_XLSX = ".xlsx"; //$NON-NLS-1$
+    private static final String EXTENSION_PPTX = ".pptx"; //$NON-NLS-1$
+    private static final String EXTENSION_PPSX = ".ppsx"; //$NON-NLS-1$
+    private static final String EXTENSION_OOXML = ".ooxml"; //$NON-NLS-1$
+
     static {
         OOXMLProvider.install();
         if (Security.getProvider("XMLDSig") == null) { //$NON-NLS-1$
@@ -121,25 +127,25 @@ public final class AOOOXMLSigner implements AOSigner {
 	public String getSignedName(final String originalName, final String inText) {
         final String inTextInt = inText != null ? inText : ""; //$NON-NLS-1$
         if (originalName == null) {
-            return inTextInt + ".ooxml"; //$NON-NLS-1$
+            return inTextInt + EXTENSION_OOXML;
         }
         final String originalNameLC = originalName.toLowerCase();
         if (originalNameLC.length() <= 4) {
-            return originalName + inTextInt + ".ooxml"; //$NON-NLS-1$
+            return originalName + inTextInt + EXTENSION_OOXML;
         }
-        if (originalNameLC.endsWith(".docx")) { //$NON-NLS-1$
-            return originalName.substring(0, originalName.length() - 5) + inTextInt + ".docx"; //$NON-NLS-1$
+        if (originalNameLC.endsWith(EXTENSION_DOCX)) {
+            return originalName.substring(0, originalName.length() - EXTENSION_DOCX.length()) + inTextInt + EXTENSION_DOCX;
         }
-        if (originalNameLC.endsWith(".xlsx")) { //$NON-NLS-1$
-            return originalName.substring(0, originalName.length() - 5) + inTextInt + ".xlsx"; //$NON-NLS-1$
+        if (originalNameLC.endsWith(EXTENSION_XLSX)) {
+            return originalName.substring(0, originalName.length() - EXTENSION_XLSX.length()) + inTextInt + EXTENSION_XLSX;
         }
-        if (originalNameLC.endsWith(".pptx")) { //$NON-NLS-1$
-            return originalName.substring(0, originalName.length() - 5) + inTextInt + ".pptx"; //$NON-NLS-1$
+        if (originalNameLC.endsWith(EXTENSION_PPTX)) {
+            return originalName.substring(0, originalName.length() - EXTENSION_PPTX.length()) + inTextInt + EXTENSION_PPTX;
         }
-        if (originalNameLC.endsWith(".ppsx")) { //$NON-NLS-1$
-            return originalName.substring(0, originalName.length() - 5) + inTextInt + ".ppsx"; //$NON-NLS-1$
+        if (originalNameLC.endsWith(EXTENSION_PPSX)) {
+            return originalName.substring(0, originalName.length() - EXTENSION_PPSX.length()) + inTextInt + EXTENSION_PPSX;
         }
-        return originalName + inTextInt + ".ooxml"; //$NON-NLS-1$
+        return originalName + inTextInt + EXTENSION_OOXML;
     }
 
     /** { {@inheritDoc} */
