@@ -8,7 +8,7 @@
  * may contact the copyright holder at: soporte.afirma5@mpt.es
  */
 
-package es.gob.afirma.test.keystores.mozilla;
+package es.gob.afirma.keystores.mozilla;
 
 import java.io.IOException;
 import java.util.Map;

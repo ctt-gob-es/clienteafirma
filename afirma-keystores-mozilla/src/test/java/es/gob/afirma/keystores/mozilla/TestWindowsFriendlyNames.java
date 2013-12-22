@@ -1,4 +1,4 @@
-package es.gob.afirma.test.keystores.mozilla;
+package es.gob.afirma.keystores.mozilla;
 
 import java.io.File;
 import java.io.FileOutputStream;
