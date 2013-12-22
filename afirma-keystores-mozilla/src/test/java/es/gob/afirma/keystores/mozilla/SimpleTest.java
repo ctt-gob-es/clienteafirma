@@ -27,8 +27,7 @@ public final class SimpleTest {
      * @param args */
     public static void main(final String[] args) {
 		try {
-			//new SimpleTest().testKeyStoreManagerCreation();
-			new SimpleTest().testDirectNssUsage();
+			SimpleTest.testDirectNssUsage();
 		}
 		catch (final Exception e) {
 		    System.err.println(e.toString());
@@ -77,12 +76,12 @@ public final class SimpleTest {
     	System.out.println(ksm.getCertificateChain("ANF Usuario Activo")[0]); //$NON-NLS-1$
     }
 
-    public static void testDirectNssUsage() throws Exception {
+    private static void testDirectNssUsage() throws Exception {
     	final KeyStore keyStore = KeyStore.getInstance(
 			"PKCS11", //$NON-NLS-1$
 			loadNSS(
 				"C:\\Users\\tomas\\AppData\\Local\\Temp\\nss", //$NON-NLS-1$
-				KeyStoreUtilities.getShort("C:\\Users\\tomas\\AppData\\Local\\Temp\\mozñProf").replace("\\", "/") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				KeyStoreUtilities.getShort("C:\\Users\\tomas\\AppData\\Local\\Temp\\moznProf").replace("\\", "/") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			)
 		);
     	keyStore.load(null, new char[0]);
