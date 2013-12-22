@@ -17,7 +17,6 @@ import es.gob.afirma.keystores.main.callbacks.CachePasswordCallback;
 import es.gob.afirma.keystores.main.common.AOKeyStore;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManagerFactory;
-import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
 
 /** Prueba simple de firma con PKCS#11.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -89,13 +88,13 @@ public final class TestPkcs11 {
 			AOKeyStore.DNIE,
 			null,
 			"DNIe_10", //$NON-NLS-1$
-			KeyStoreUtilities.getPreferredPCB(AOKeyStore.DNIE, null),
+			AOKeyStore.DNIE.getStorePasswordCallback(null),
 			null
 		);
 		System.out.println(
 			aoks.getKeyEntry(
 				aoks.getAliases()[0],
-				KeyStoreUtilities.getCertificatePC(AOKeyStore.DNIE, null)
+				AOKeyStore.DNIE.getCertificatePasswordCallback(null)
 			).getPrivateKey()
 		);
 	}

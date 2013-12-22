@@ -17,11 +17,11 @@ import java.util.logging.Logger;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.x500.X500Principal;
 
+import es.gob.afirma.keystores.main.callbacks.NullPasswordCallback;
 import es.gob.afirma.keystores.main.common.AOKeyStore;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManagerException;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManagerFactory;
-import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
 
 /** Representa a un <i>AOKeyStoreManager</i> para acceso a almacenes de claves de DNIe mediante controlador
  * 100% Java m&aacute;s un segundo almac&eacute;n en el que los certificados de ambos se tratan de forma unificada
@@ -85,7 +85,7 @@ public class DnieUnifiedKeyStoreManager extends AOKeyStoreManager {
 					AOKeyStore.DNIEJAVA,
 					null, // Lib
 					originalKsm.getType() + "_PLUS_DNIE", // Description //$NON-NLS-1$
-					KeyStoreUtilities.getPreferredPCB(AOKeyStore.DNIEJAVA, parent),
+					NullPasswordCallback.getInstance(),
 					parent
 				);
 			}
@@ -96,7 +96,7 @@ public class DnieUnifiedKeyStoreManager extends AOKeyStoreManager {
 
 		// Unificamos los alias
 		final String[] originalAliases = originalKsm.getAliases();
-		this.aliases = new String[originalAliases.length + ((this.dnieKsm != null) ? 2 : 0)];
+		this.aliases = new String[originalAliases.length + (this.dnieKsm != null ? 2 : 0)];
 		System.arraycopy(originalAliases, 0, this.aliases, 0, originalAliases.length);
 		if (this.dnieKsm != null) {
 			this.aliases[this.aliases.length-1] = DNIE_ALIASES.get(0);

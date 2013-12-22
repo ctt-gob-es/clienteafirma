@@ -21,7 +21,6 @@ import org.junit.Test;
 import es.gob.afirma.keystores.main.common.AOKeyStore;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManagerFactory;
-import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
 
 /** Pruebas espec&iacute;ficas para el almac&eacute;n DNIe 100% Java.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -39,8 +38,7 @@ public class TestDnieJava {
     		AOKeyStore.DNIEJAVA,
     		null,
     		"Afirma-DNIe", //$NON-NLS-1$
-    		KeyStoreUtilities.getPreferredPCB(AOKeyStore.DNIEJAVA, null),
-//    		new UIPasswordCallback("PIN del DNIe", null), //$NON-NLS-1$
+    		AOKeyStore.DNIEJAVA.getStorePasswordCallback(null),
     		null
 		);
         Assert.assertNotNull(ksm);

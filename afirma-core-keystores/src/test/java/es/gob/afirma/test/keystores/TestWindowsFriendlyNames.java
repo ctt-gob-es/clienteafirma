@@ -64,7 +64,7 @@ public class TestWindowsFriendlyNames {
            final Signature s = Signature.getInstance("SHA512withRSA"); //$NON-NLS-1$
            s.initSign(ksm.getKeyEntry(
 			   key,
-			   KeyStoreUtilities.getCertificatePC(AOKeyStore.WINDOWS, null)
+			   AOKeyStore.WINDOWS.getCertificatePasswordCallback(null)
 		   ).getPrivateKey());
            s.update("Hola".getBytes()); //$NON-NLS-1$
            System.out.println(AOUtil.hexify(s.sign(), true));

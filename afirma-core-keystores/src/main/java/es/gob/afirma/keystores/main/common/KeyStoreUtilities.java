@@ -26,16 +26,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.security.auth.callback.PasswordCallback;
-
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.core.ui.NameCertificateBean;
-import es.gob.afirma.keystores.main.callbacks.CachePasswordCallback;
-import es.gob.afirma.keystores.main.callbacks.NullPasswordCallback;
-import es.gob.afirma.keystores.main.callbacks.UIPasswordCallback;
 import es.gob.afirma.keystores.main.filters.CertificateFilter;
 
 /** Utilidades para le manejo de almacenes de claves y certificados. */
@@ -497,57 +492,6 @@ public final class KeyStoreUtilities {
     		}
     	}
     	return selectedAlias;
-    }
-
-    /** Recupera el PasswordCallback que com&uacute;nmente se requiere para el
-     * acceso a un almac&eacute;n de claves.
-     * @param kStore Almac&eacuten de claves
-     * @param parent Componente sobre el que se deben visualizar los
-     *               di&aacute;logos modales (normalmente un <code>java.awt.Comonent</code>)
-     * @return Manejador para la solicitud de la clave. */
-    public static PasswordCallback getPreferredPCB(final AOKeyStore kStore, final Object parent) {
-
-        if (kStore == null) {
-            throw new IllegalArgumentException(
-               "No se ha indicado el KeyStore del que desea obtener la PasswordCallBack" //$NON-NLS-1$
-            );
-        }
-
-        if (AOKeyStore.APPLE.equals(kStore)) {
-        	// El almacen KeyChain de Apple exige que se le pase una cadena como contrasena (vale cualquiera)
-            return new CachePasswordCallback("dummy".toCharArray()); //$NON-NLS-1$
-        }
-        if (AOKeyStore.WINDOWS.equals(kStore)) {
-            return new NullPasswordCallback();
-        }
-        return new UIPasswordCallback(KeyStoreMessages.getString("KeyStoreUtilities.6", kStore.getName()), parent); //$NON-NLS-1$
-    }
-
-    /** Recupera el manejador de claves asociado a un certificado seg&uacute;n el
-     * repositorio en el que se aloja.
-     * @param store Almace&eacute;n de claves del certificado.
-     * @param parent Componente sobre el que se deben visualizar los
-     *               di&aacute;logos modales (normalmente un <code>java.awt.Comonent</code>)
-     * @return Manejador para la solicitud de la clave. */
-    public static PasswordCallback getCertificatePC(final AOKeyStore store, final Object parent) {
-        if (AOKeyStore.WINADDRESSBOOK.equals(store) ||
-            AOKeyStore.WINCA.equals(store)          ||
-            AOKeyStore.SINGLE.equals(store)         ||
-            AOKeyStore.MOZ_UNI.equals(store)        ||
-            AOKeyStore.DNIE.equals(store)           ||
-            AOKeyStore.PKCS11.equals(store)) {
-                return new NullPasswordCallback();
-        }
-        else if (store == AOKeyStore.DNIEJAVA) {
-        	return null;
-        }
-        else if (AOKeyStore.APPLE.equals(store) || AOKeyStore.WINDOWS.equals(store)) {
-        	// El almacen KeyChain de Apple exige que se le pase una cadena como contrasena (vale cualquiera)
-        	// Windows cono MiniDriver igualmente exige una contrasena, aunque luego no se comprueba y se pide
-        	// con un UI del propio Windows
-        	return new CachePasswordCallback("dummy".toCharArray()); //$NON-NLS-1$
-        }
-        return new UIPasswordCallback(KeyStoreMessages.getString("KeyStoreUtilities.7"), parent); //$NON-NLS-1$
     }
 
     static String getPKCS11DNIeLib() throws AOKeyStoreManagerException {

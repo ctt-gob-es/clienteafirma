@@ -21,7 +21,6 @@ import java.util.logging.Logger;
 import javax.security.auth.callback.PasswordCallback;
 
 import org.junit.Assert;
-
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -30,7 +29,6 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.main.common.AOKeyStore;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManagerFactory;
-import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
 
 /**
  * Pruebas de AOKeyStoreFactory
@@ -57,13 +55,16 @@ public class TestAOKeystoreFactory {
 			AOKeyStore.WINDOWS, // Store
 			null, 				// Lib
 			null, 				// Description
-			KeyStoreUtilities.getPreferredPCB(AOKeyStore.WINDOWS, null),
+			AOKeyStore.WINDOWS.getStorePasswordCallback(null),
 			null				// Parent
 		);
     	for (final String alias : ksm.getAliases()) {
     		System.out.println(alias);
     	}
-    	final PrivateKeyEntry pke = ksm.getKeyEntry(ksm.getAliases()[0], KeyStoreUtilities.getCertificatePC(AOKeyStore.WINDOWS, null));
+    	final PrivateKeyEntry pke = ksm.getKeyEntry(
+			ksm.getAliases()[0],
+			AOKeyStore.WINDOWS.getCertificatePasswordCallback(null)
+		);
     	System.out.println(pke.toString());
 
     }

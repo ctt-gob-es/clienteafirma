@@ -70,7 +70,7 @@ public final class Pkcs12KeyStoreManager extends AOKeyStoreManager {
             throw new AOKeyStoreManagerException("No se ha podido obtener el almacen PKCS#12 / PFX", e); //$NON-NLS-1$
         }
 
-        this.cachePasswordCallback = pssCallBack != null ? new CachePasswordCallback(pssCallBack.getPassword()) : new NullPasswordCallback();
+        this.cachePasswordCallback = pssCallBack != null ? new CachePasswordCallback(pssCallBack.getPassword()) : NullPasswordCallback.getInstance();
         try {
             this.getKeyStore().load(store, this.cachePasswordCallback.getPassword());
         }

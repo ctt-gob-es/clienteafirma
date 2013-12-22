@@ -289,7 +289,7 @@ public final class AOKeyStoreManagerFactory {
         if (p11Lib != null && !new File(p11Lib).exists()) {
         	throw new IOException("La biblioteca '" + p11Lib + "' no existe"); //$NON-NLS-1$ //$NON-NLS-2$
         }
-        
+
         if (p11Lib == null) {
             final String[] exts;
             String extsDesc = KeyStoreMessages.getString("AOKeyStoreManagerFactory.6"); //$NON-NLS-1$
@@ -338,7 +338,7 @@ public final class AOKeyStoreManagerFactory {
                                                                                                   AOKeystoreAlternativeException {
     	final AOKeyStoreManager ksm = new AOKeyStoreManager();
         try {
-            ksm.init(store, null, new NullPasswordCallback(), null);
+            ksm.init(store, null, NullPasswordCallback.getInstance(), null);
         }
         catch (final AOException e) {
             throw new AOKeystoreAlternativeException(
@@ -422,7 +422,7 @@ public final class AOKeyStoreManagerFactory {
             ksm.init(
                  store,
                  lib == null || "".equals(lib) ? null : new FileInputStream(lib),  //$NON-NLS-1$
-                 new NullPasswordCallback(),
+        		 NullPasswordCallback.getInstance(),
                  null
             );
         }

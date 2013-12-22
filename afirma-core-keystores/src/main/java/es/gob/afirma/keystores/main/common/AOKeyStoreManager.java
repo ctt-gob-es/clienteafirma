@@ -457,7 +457,18 @@ public class AOKeyStoreManager {
         }
 
         else if (this.ksType.equals(AOKeyStore.DNIE)) {
-            return initPKCS11(pssCallBack != null ? pssCallBack : new UIPasswordCallback(KeyStoreMessages.getString("AOKeyStoreManager.0"), null), new String[] { KeyStoreUtilities.getPKCS11DNIeLib(), "DNIe-Afirma" });  //$NON-NLS-1$//$NON-NLS-2$
+            return initPKCS11(
+        		pssCallBack != null ?
+    				pssCallBack :
+    					new UIPasswordCallback(
+							KeyStoreMessages.getString("AOKeyStoreManager.0"), //$NON-NLS-1$
+							null
+						),
+				new String[] {
+        			KeyStoreUtilities.getPKCS11DNIeLib(),
+        			"DNIe-Afirma" //$NON-NLS-1$
+    			}
+    		);
         }
 
         throw new UnsupportedOperationException("Tipo de almacen no soportado"); //$NON-NLS-1$
