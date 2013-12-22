@@ -10,8 +10,6 @@ import java.util.HashMap;
 
 import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.PdfStamper;
-import com.lowagie.text.xml.xmp.XmpArray;
-import com.lowagie.text.xml.xmp.XmpSchema;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
@@ -69,30 +67,30 @@ public class TestAddingXmp {
 
 	}
 
-	private static final class BioMetadataSchema extends XmpSchema {
+//	private static final class BioMetadataSchema extends XmpSchema {
+//
+//		private static final long serialVersionUID = 4086239408037761846L;
+//
+//		/** Datos biom&eacute;tricos de firma manuscrita seg&uacute;n ISO 19795-7. */
+//		public static final String ISO197947DATA = "ls:Iso197947Data"; //$NON-NLS-1$
+//
+//		public static final String DEFAULT_XPATH_ID = "ls"; //$NON-NLS-1$
+//	    public static final String DEFAULT_XPATH_URI = "http://www.w3.org/1999/02/22-rdf-syntax-ns#"; //$NON-NLS-1$
+//
+//		BioMetadataSchema() {
+//			super("xmlns:" + DEFAULT_XPATH_ID + "=\"" + DEFAULT_XPATH_URI + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+//		}
 
-		private static final long serialVersionUID = 4086239408037761846L;
+//		private void addIso197947Data(final byte[] iso197947Asn1Data) {
+//			if (iso197947Asn1Data == null) {
+//				throw new IllegalArgumentException("Los datos ISO 19795-7 no pueden ser nulos"); //$NON-NLS-1$
+//			}
+//			final String base64Data = Base64.encode(iso197947Asn1Data);
+//			final XmpArray<String> array = new XmpArray<String>(XmpArray.UNORDERED);
+//			array.add(base64Data);
+//			setProperty(ISO197947DATA, array);
+//		}
 
-		/** Datos biom&eacute;tricos de firma manuscrita seg&uacute;n ISO 19795-7. */
-		public static final String ISO197947DATA = "ls:Iso197947Data"; //$NON-NLS-1$
-
-		public static final String DEFAULT_XPATH_ID = "ls"; //$NON-NLS-1$
-	    public static final String DEFAULT_XPATH_URI = "http://www.w3.org/1999/02/22-rdf-syntax-ns#"; //$NON-NLS-1$
-
-		BioMetadataSchema() {
-			super("xmlns:" + DEFAULT_XPATH_ID + "=\"" + DEFAULT_XPATH_URI + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		}
-
-		public void addIso197947Data(final byte[] iso197947Asn1Data) {
-			if (iso197947Asn1Data == null) {
-				throw new IllegalArgumentException("Los datos ISO 19795-7 no pueden ser nulos"); //$NON-NLS-1$
-			}
-			final String base64Data = Base64.encode(iso197947Asn1Data);
-			final XmpArray<String> array = new XmpArray<String>(XmpArray.UNORDERED);
-			array.add(base64Data);
-			setProperty(ISO197947DATA, array);
-		}
-
-	}
+//	}
 
 }
