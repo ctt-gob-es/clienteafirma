@@ -13,10 +13,10 @@ import java.util.Enumeration;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import es.gob.afirma.keystores.main.AOKeyStore;
+import es.gob.afirma.keystores.main.AOKeyStoreManager;
+import es.gob.afirma.keystores.main.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.main.callbacks.CachePasswordCallback;
-import es.gob.afirma.keystores.main.common.AOKeyStore;
-import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
-import es.gob.afirma.keystores.main.common.AOKeyStoreManagerFactory;
 
 /** Prueba simple de firma con PKCS#11.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */

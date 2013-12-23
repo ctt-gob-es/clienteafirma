@@ -17,11 +17,11 @@ import java.util.logging.Logger;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.x500.X500Principal;
 
+import es.gob.afirma.keystores.main.AOKeyStore;
+import es.gob.afirma.keystores.main.AOKeyStoreManager;
+import es.gob.afirma.keystores.main.AOKeyStoreManagerException;
+import es.gob.afirma.keystores.main.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.main.callbacks.NullPasswordCallback;
-import es.gob.afirma.keystores.main.common.AOKeyStore;
-import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
-import es.gob.afirma.keystores.main.common.AOKeyStoreManagerException;
-import es.gob.afirma.keystores.main.common.AOKeyStoreManagerFactory;
 
 /** Representa a un <i>AOKeyStoreManager</i> para acceso a almacenes de claves de DNIe mediante controlador
  * 100% Java m&aacute;s un segundo almac&eacute;n en el que los certificados de ambos se tratan de forma unificada

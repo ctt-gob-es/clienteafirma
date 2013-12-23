@@ -15,10 +15,10 @@ import org.junit.Test;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.dnie.DnieUnifiedKeyStoreManager;
-import es.gob.afirma.keystores.main.common.AOKeyStore;
-import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
-import es.gob.afirma.keystores.main.common.AOKeyStoreManagerFactory;
-import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
+import es.gob.afirma.keystores.main.AOKeyStore;
+import es.gob.afirma.keystores.main.AOKeyStoreManager;
+import es.gob.afirma.keystores.main.AOKeyStoreManagerFactory;
+import es.gob.afirma.keystores.main.KeyStoreUtilities;
 
 /** Pruebas simples de almacenes Mozilla NSS. */
 public final class SimpleTest {

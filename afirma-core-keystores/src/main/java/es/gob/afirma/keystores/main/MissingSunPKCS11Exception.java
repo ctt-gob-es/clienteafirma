@@ -1,4 +1,4 @@
-package es.gob.afirma.keystores.main.common;
+package es.gob.afirma.keystores.main;
 
 import es.gob.afirma.core.MissingLibraryException;
 

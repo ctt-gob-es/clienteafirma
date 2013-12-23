@@ -8,7 +8,7 @@
  * You may contact the copyright holder at: soporte.afirma5@mpt.es
  */
 
-package es.gob.afirma.keystores.main.common;
+package es.gob.afirma.keystores.main;
 
 import java.util.Locale;
 import java.util.ResourceBundle;

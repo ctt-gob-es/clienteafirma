@@ -1,4 +1,4 @@
-package es.gob.afirma.keystores.main.common;
+package es.gob.afirma.keystores.main;
 
 import java.io.IOException;
 import java.io.InputStream;

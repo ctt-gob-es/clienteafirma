@@ -8,7 +8,7 @@
  * You may contact the copyright holder at: soporte.afirma5@mpt.es
  */
 
-package es.gob.afirma.keystores.main.common;
+package es.gob.afirma.keystores.main;
 
 import java.awt.Component;
 import java.io.ByteArrayInputStream;
@@ -76,7 +76,7 @@ public class AOKeyStoreManager {
      * @throws AOKeyStoreManagerException Cuando ocurre un error durante la inicializaci&oacute;n.
      * @throws IOException Cuando se indique una contrase&ntilde;a incorrecta para la
      *         apertura del almac&eacute;n.
-     * @throws es.gob.afirma.keystores.main.common.MissingSunPKCS11Exception Si no se encuentra la biblioteca SunPKCS11 */
+     * @throws es.gob.afirma.keystores.main.MissingSunPKCS11Exception Si no se encuentra la biblioteca SunPKCS11 */
     private List<KeyStore> initPKCS11(final PasswordCallback pssCallBack,
     		                          final Object[] params) throws AOKeyStoreManagerException,
     		                                                        IOException {

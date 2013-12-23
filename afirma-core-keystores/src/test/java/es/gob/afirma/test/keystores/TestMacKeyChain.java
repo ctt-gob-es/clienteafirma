@@ -23,10 +23,10 @@ import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.keystores.main.AOKeyStore;
+import es.gob.afirma.keystores.main.AOKeyStoreManager;
+import es.gob.afirma.keystores.main.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.main.callbacks.CachePasswordCallback;
-import es.gob.afirma.keystores.main.common.AOKeyStore;
-import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
-import es.gob.afirma.keystores.main.common.AOKeyStoreManagerFactory;
 
 /** Pruebas espec&iacute;ficas para los almacenes de Mac OS X.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */

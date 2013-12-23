@@ -18,11 +18,11 @@ import java.util.logging.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import es.gob.afirma.keystores.main.common.AOKeyStore;
-import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
-import es.gob.afirma.keystores.main.common.AOKeyStoreManagerException;
-import es.gob.afirma.keystores.main.common.AOKeyStoreManagerFactory;
-import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
+import es.gob.afirma.keystores.main.AOKeyStore;
+import es.gob.afirma.keystores.main.AOKeyStoreManager;
+import es.gob.afirma.keystores.main.AOKeyStoreManagerException;
+import es.gob.afirma.keystores.main.AOKeyStoreManagerFactory;
+import es.gob.afirma.keystores.main.KeyStoreUtilities;
 
 /**
  * Prueba la conversi&oacute;n de alias en nombres significativos en CAPI.

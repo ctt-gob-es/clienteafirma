@@ -14,7 +14,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
-import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
+import es.gob.afirma.keystores.main.AOKeyStoreManager;
 
 /** Filtro para certificados. Debe autocontener toda la l&oacute;gica que indique si un
  * certificado cumple o no las condiciones del filtro.

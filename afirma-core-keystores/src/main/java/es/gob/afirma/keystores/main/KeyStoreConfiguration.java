@@ -8,7 +8,7 @@
  * You may contact the copyright holder at: soporte.afirma5@mpt.es
  */
 
-package es.gob.afirma.keystores.main.common;
+package es.gob.afirma.keystores.main;
 
 
 /** Agrupaci&oacute;n de los tres atributos principales de un almac&eacute;n de
