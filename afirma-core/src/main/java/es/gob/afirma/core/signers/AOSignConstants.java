@@ -172,12 +172,6 @@ public final class AOSignConstants {
 	/** Algoritmo de firma SHA1withRSA. */
 	public static final String SIGN_ALGORITHM_SHA1WITHRSA = "SHA1withRSA"; //$NON-NLS-1$
 
-	/** Algoritmo de firma MD5withRSA. */
-	public static final String SIGN_ALGORITHM_MD5WITHRSA = "MD5withRSA"; //$NON-NLS-1$
-
-	/** Algoritmo de firma MD2withRSA. */
-	public static final String SIGN_ALGORITHM_MD2WITHRSA = "MD2withRSA"; //$NON-NLS-1$
-
 	/** Algoritmo de firma SHA256withRSA. */
 	public static final String SIGN_ALGORITHM_SHA256WITHRSA = "SHA256withRSA"; //$NON-NLS-1$
 
@@ -204,8 +198,6 @@ public final class AOSignConstants {
 	/** Algoritmos de firma soportados. */
 	public static final String[] SUPPORTED_SIGN_ALGOS = new String[] {
 		SIGN_ALGORITHM_SHA1WITHRSA,
-		SIGN_ALGORITHM_MD5WITHRSA,
-		SIGN_ALGORITHM_MD2WITHRSA,
 		SIGN_ALGORITHM_NONEWITHRSA,
 		SIGN_ALGORITHM_SHA256WITHRSA,
 		SIGN_ALGORITHM_SHA384WITHRSA,
@@ -276,18 +268,6 @@ public final class AOSignConstants {
 				|| upperPseudoName.startsWith("RIPEMD160") //$NON-NLS-1$
 				|| upperPseudoName.startsWith("RIPEMD-160")) { //$NON-NLS-1$
 			return "RIPEMD160"; //$NON-NLS-1$
-		}
-
-		if (upperPseudoName.equals("MD5") //$NON-NLS-1$
-				|| upperPseudoName.equals("1.2.840.113549.2.5") //$NON-NLS-1$
-				|| upperPseudoName.startsWith("MD5")) { //$NON-NLS-1$
-			return "MD5"; //$NON-NLS-1$
-		}
-
-		if (upperPseudoName.equals("MD2")  //$NON-NLS-1$
-				|| upperPseudoName.equals("1.2.840.113549.2.2") //$NON-NLS-1$
-				|| upperPseudoName.startsWith("MD2")) { //$NON-NLS-1$
-			return "MD2"; //$NON-NLS-1$
 		}
 
 		throw new IllegalArgumentException("Algoritmo de huella digital no soportado: " + pseudoName); //$NON-NLS-1$

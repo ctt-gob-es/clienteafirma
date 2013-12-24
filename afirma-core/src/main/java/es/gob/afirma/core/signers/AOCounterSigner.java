@@ -35,7 +35,7 @@ public interface AOCounterSigner {
      * @param sign
      *        Flujo de lectura de los datos a firmar
      * @param algorithm
-     *        Algoritmo a usar para la firma (SHA1withRSA, MD5withRSA,...)
+     *        Algoritmo a usar para la firma (SHA1withRSA, SHA512withRSA,...)
      * @param targetType
      *        Tipo de objetivo de la contrafirma
      * @param targets

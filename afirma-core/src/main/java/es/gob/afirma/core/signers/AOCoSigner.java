@@ -30,7 +30,7 @@ public interface AOCoSigner {
      *        Flujo de lectura de la firma de los datos que se quiere
      *        cofirmar.
      * @param algorithm
-     *        Algoritmo a usar para la firma (SHA1withRSA, MD5withRSA,...)
+     *        Algoritmo a usar para la firma (SHA1withRSA, SHA512withRSA,...)
      * @param key Clave privada a usar para firmar
      * @param certChain Cadena de certificados del firmante
      * @param extraParams
@@ -55,7 +55,7 @@ public interface AOCoSigner {
      * @param sign
      *        Firma de los datos que se quiere cofirmar.
      * @param algorithm
-     *        Algoritmo a usar para la firma (SHA1withRSA, MD5withRSA,...)
+     *        Algoritmo a usar para la firma (SHA1withRSA, SHA512withRSA,...)
      * @param key Clave privada a usar para firmar
      * @param certChain cadena de certificados del firmante
      * @param extraParams

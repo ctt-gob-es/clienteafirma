@@ -19,8 +19,6 @@ public final class AOPkcs1Signer implements AOSimpleSigner {
 	 * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>signatureAlgorithm</code>:</p>
 	 * <ul>
 	 *  <li><i>SHA1withRSA</i></li>
-	 *  <li><i>MD5withRSA</i> (no recomendado por vulnerable)</li>
-	 *  <li><i>MD2withRSA</i> (no recomendado por vulnerable)</li>
 	 *  <li><i>SHA256withRSA</i></li>
 	 *  <li><i>SHA384withRSA</i></li>
 	 *  <li><i>SHA512withRSA</i></li>

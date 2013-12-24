@@ -72,8 +72,6 @@ public final class TestCMS {
     private final static String[] ALGOS = new String[] {
             AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
             AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
-            AOSignConstants.SIGN_ALGORITHM_MD2WITHRSA,
-            AOSignConstants.SIGN_ALGORITHM_MD5WITHRSA,
             AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA,
             AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA
     };

@@ -160,8 +160,6 @@ public final class PAdESTriPhaseSignerServerSide {
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>digestAlgorithmName</code>:</p>
      * <ul>
      *  <li><i>SHA1</i></li>
-     *  <li><i>MD5</i> (no recomendado por vulnerable)</li>
-     *  <li><i>MD2</i> (no recomendado por vulnerable)</li>
      *  <li><i>SHA-256</i></li>
      *  <li><i>SHA-384</i></li>
      *  <li><i>SHA-512</i></li>
@@ -365,8 +363,6 @@ public final class PAdESTriPhaseSignerServerSide {
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>digestAlgorithmName</code>:</p>
      * <ul>
      *  <li><i>SHA1</i></li>
-     *  <li><i>MD5</i> (no recomendado por vulnerable)</li>
-     *  <li><i>MD2</i> (no recomendado por vulnerable)</li>
      *  <li><i>SHA-256</i></li>
      *  <li><i>SHA-384</i></li>
      *  <li><i>SHA-512</i></li>
