@@ -19,7 +19,7 @@ import javax.naming.directory.BasicAttributes;
 import javax.naming.ldap.LdapName;
 import javax.naming.ldap.Rdn;
 
-import es.gob.afirma.keystores.main.filters.CertificateFilter;
+import es.gob.afirma.keystores.filters.CertificateFilter;
 
 /** Clase que representa un filtro de certificados para
  * el di&aacute;logo de selecci&oacute;n. */

@@ -1,6 +1,6 @@
 package es.gob.afirma.test.keystores;
 
-import es.gob.afirma.keystores.main.KeyStoreUtilities;
+import es.gob.afirma.keystores.KeyStoreUtilities;
 
 
 /** Prueba de obtenci&oaucute;n de nombre corto en Windows. */

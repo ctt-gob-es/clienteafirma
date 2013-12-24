@@ -20,10 +20,10 @@ import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.keystores.main.AOKeyStore;
-import es.gob.afirma.keystores.main.AOKeyStoreManager;
-import es.gob.afirma.keystores.main.AOKeyStoreManagerFactory;
-import es.gob.afirma.keystores.main.KeyStoreUtilities;
+import es.gob.afirma.keystores.AOKeyStore;
+import es.gob.afirma.keystores.AOKeyStoreManager;
+import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
+import es.gob.afirma.keystores.KeyStoreUtilities;
 
 /** Prueba la conversi&oacute;n de alias en nombres significativos en CAPI.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */

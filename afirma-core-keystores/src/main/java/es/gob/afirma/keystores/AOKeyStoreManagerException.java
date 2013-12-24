@@ -8,7 +8,7 @@
  * You may contact the copyright holder at: soporte.afirma5@mpt.es
  */
 
-package es.gob.afirma.keystores.main;
+package es.gob.afirma.keystores;
 
 import es.gob.afirma.core.AOException;
 

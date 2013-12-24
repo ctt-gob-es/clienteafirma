@@ -24,11 +24,11 @@ import java.util.List;
 import javax.crypto.BadPaddingException;
 import javax.security.auth.callback.PasswordCallback;
 
-import es.gob.afirma.keystores.main.AOKeyStore;
-import es.gob.afirma.keystores.main.AOKeyStoreManager;
-import es.gob.afirma.keystores.main.AOKeyStoreManagerException;
-import es.gob.afirma.keystores.main.callbacks.CachePasswordCallback;
-import es.gob.afirma.keystores.main.callbacks.NullPasswordCallback;
+import es.gob.afirma.keystores.AOKeyStore;
+import es.gob.afirma.keystores.AOKeyStoreManager;
+import es.gob.afirma.keystores.AOKeyStoreManagerException;
+import es.gob.afirma.keystores.callbacks.CachePasswordCallback;
+import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
 
 /** Representa a un <i>AOKeyStoreManager</i> para acceso a almacenes de claves tipo PKCS#12 / PFX.
  * Contempla la posibilidad de que el almac&eacute;n y las claves tengan distintas contrase&ntilde;as

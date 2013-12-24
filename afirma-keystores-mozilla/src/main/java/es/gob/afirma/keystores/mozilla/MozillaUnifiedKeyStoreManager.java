@@ -28,11 +28,11 @@ import java.util.Vector;
 import javax.security.auth.callback.PasswordCallback;
 
 import es.gob.afirma.core.AOCancelledOperationException;
-import es.gob.afirma.keystores.main.AOKeyStore;
-import es.gob.afirma.keystores.main.AOKeyStoreManager;
-import es.gob.afirma.keystores.main.AOKeyStoreManagerException;
-import es.gob.afirma.keystores.main.AOKeyStoreManagerFactory;
-import es.gob.afirma.keystores.main.callbacks.UIPasswordCallback;
+import es.gob.afirma.keystores.AOKeyStore;
+import es.gob.afirma.keystores.AOKeyStoreManager;
+import es.gob.afirma.keystores.AOKeyStoreManagerException;
+import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
+import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
 
 /** Representa a un <i>AOKeyStoreManager</i> para acceso a almacenes de claves de
  * Firefox accedidos v&iacute;a NSS en el que se tratan de forma

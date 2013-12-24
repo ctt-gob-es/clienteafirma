@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.keystores.main.KeyStoreUtilities;
+import es.gob.afirma.keystores.KeyStoreUtilities;
 
 final class MozillaKeyStoreUtilitiesWindows {
 

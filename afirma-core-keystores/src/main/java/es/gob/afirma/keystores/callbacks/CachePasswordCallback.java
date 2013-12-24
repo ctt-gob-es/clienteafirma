@@ -8,7 +8,7 @@
  * You may contact the copyright holder at: soporte.afirma5@mpt.es
  */
 
-package es.gob.afirma.keystores.main.callbacks;
+package es.gob.afirma.keystores.callbacks;
 
 import javax.security.auth.callback.PasswordCallback;
 

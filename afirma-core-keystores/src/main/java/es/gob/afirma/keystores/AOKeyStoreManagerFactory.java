@@ -8,7 +8,7 @@
  * You may contact the copyright holder at: soporte.afirma5@mpt.es
  */
 
-package es.gob.afirma.keystores.main;
+package es.gob.afirma.keystores;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -21,8 +21,8 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
 import es.gob.afirma.keystores.dnie.DnieUnifiedKeyStoreManager;
-import es.gob.afirma.keystores.main.callbacks.NullPasswordCallback;
 import es.gob.afirma.keystores.pkcs12.Pkcs12KeyStoreManager;
 
 /** Obtiene clases de tipo AOKeyStoreManager seg&uacute;n se necesiten,

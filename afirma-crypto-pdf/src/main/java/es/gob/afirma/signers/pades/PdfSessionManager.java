@@ -43,7 +43,7 @@ import es.gob.afirma.core.ui.AOUIFactory;
  * la firma monof&aacute;sica PAdES como para las trif&aacute;sicas de una forma unificada, pero
  * &uacute;nicamente en lo referente al formato PDF, sin entrar en la parte CAdES o PKCS#7
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-final class PdfSessionManager {
+public final class PdfSessionManager {
 
     /** Referencia a la &uacute;ltima p&aacute;gina del documento PDF. */
     static final int LAST_PAGE = -666;
@@ -70,7 +70,7 @@ final class PdfSessionManager {
      * @throws AOException
      * @throws IOException
      * @throws DocumentException */
-    static PdfTriPhaseSession getSessionData(final byte[] inPDF,
+    public static PdfTriPhaseSession getSessionData(final byte[] inPDF,
                                                      final X509Certificate[] certChain,
                                                      final Calendar signTime,
                                                      final Properties extraParams) throws AOException,

@@ -15,8 +15,8 @@ import java.util.logging.Logger;
 
 import org.junit.Test;
 
-import es.gob.afirma.keystores.main.AOKeyStoreManager;
-import es.gob.afirma.keystores.main.callbacks.CachePasswordCallback;
+import es.gob.afirma.keystores.AOKeyStoreManager;
+import es.gob.afirma.keystores.callbacks.CachePasswordCallback;
 import es.gob.afirma.keystores.pkcs12.Pkcs12KeyStoreManager;
 
 /** Pruebas de almac&eacute;n PKCS#12 con distintas conttrase&ntilde;as

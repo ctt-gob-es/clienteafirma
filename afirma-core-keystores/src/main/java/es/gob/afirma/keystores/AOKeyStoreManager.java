@@ -8,7 +8,7 @@
  * You may contact the copyright holder at: soporte.afirma5@mpt.es
  */
 
-package es.gob.afirma.keystores.main;
+package es.gob.afirma.keystores;
 
 import java.awt.Component;
 import java.io.ByteArrayInputStream;
@@ -38,7 +38,7 @@ import javax.security.auth.callback.PasswordCallback;
 import es.gob.afirma.core.InvalidOSException;
 import es.gob.afirma.core.MissingLibraryException;
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.keystores.main.callbacks.UIPasswordCallback;
+import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
 
 /** Clase gestora de claves y certificados. B&aacute;sicamente se encarga de
  * crear KeyStores de distintos tipos, utilizando el proveedor JCA apropiado
@@ -76,7 +76,7 @@ public class AOKeyStoreManager {
      * @throws AOKeyStoreManagerException Cuando ocurre un error durante la inicializaci&oacute;n.
      * @throws IOException Cuando se indique una contrase&ntilde;a incorrecta para la
      *         apertura del almac&eacute;n.
-     * @throws es.gob.afirma.keystores.main.MissingSunPKCS11Exception Si no se encuentra la biblioteca SunPKCS11 */
+     * @throws es.gob.afirma.keystores.MissingSunPKCS11Exception Si no se encuentra la biblioteca SunPKCS11 */
     private List<KeyStore> initPKCS11(final PasswordCallback pssCallBack,
     		                          final Object[] params) throws AOKeyStoreManagerException,
     		                                                        IOException {

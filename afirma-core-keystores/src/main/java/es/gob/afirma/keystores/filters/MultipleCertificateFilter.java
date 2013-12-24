@@ -1,8 +1,8 @@
-package es.gob.afirma.keystores.main.filters;
+package es.gob.afirma.keystores.filters;
 
 import java.security.cert.X509Certificate;
 
-import es.gob.afirma.keystores.main.AOKeyStoreManager;
+import es.gob.afirma.keystores.AOKeyStoreManager;
 
 /**
  * Clase que engloba m&uacute;ltiples filtros de certificados, de tal forma que

@@ -33,4 +33,4 @@
  *   Desde este m&oacute;dulo es posible que se realicen llamadas a interfaces gr&aacute;ficas.<br>
  *  </p>
  */
-package es.gob.afirma.keystores.main;
+package es.gob.afirma.keystores;

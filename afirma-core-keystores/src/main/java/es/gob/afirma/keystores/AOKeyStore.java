@@ -8,13 +8,13 @@
  * You may contact the copyright holder at: soporte.afirma5@mpt.es
  */
 
-package es.gob.afirma.keystores.main;
+package es.gob.afirma.keystores;
 
 import javax.security.auth.callback.PasswordCallback;
 
-import es.gob.afirma.keystores.main.callbacks.CachePasswordCallback;
-import es.gob.afirma.keystores.main.callbacks.NullPasswordCallback;
-import es.gob.afirma.keystores.main.callbacks.UIPasswordCallback;
+import es.gob.afirma.keystores.callbacks.CachePasswordCallback;
+import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
+import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
 
 /** Almacenes de claves y certificados soportados. */
 public enum AOKeyStore {

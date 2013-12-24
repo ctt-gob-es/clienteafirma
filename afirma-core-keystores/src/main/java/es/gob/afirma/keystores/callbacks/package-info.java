@@ -8,7 +8,5 @@
  * You may contact the copyright holder at: soporte.afirma5@mpt.es
  */
 
-/** Clases relacionadas con el filtrado de certificados por distintos criterios.
- * Las clases incluidas en este paquete no implementan de forma concreta ninguna
- * t&eacute;cnica de filtrado. */
-package es.gob.afirma.keystores.main.filters;
+/** Clases de utilidad com&uacute;n para la gesti&oacute;n de claves y certificados. */
+package es.gob.afirma.keystores.callbacks;
