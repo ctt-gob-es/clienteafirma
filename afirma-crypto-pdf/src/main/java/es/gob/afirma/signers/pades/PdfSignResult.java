@@ -39,6 +39,14 @@ public final class PdfSignResult implements Serializable {
         this.extraParams = new Properties();
 	}
 
+	/** Establece los par&aacute;metros adicionales de la firma.
+	 * Este m&eacute;todo es &uacute;til cuando se desean a&ntilde;adir par&aacute;metros en la post-firma que
+	 * no alteran la huella digital del rango procesable del PDF (por ejemplo, la imagen de la r&uacute;brica)
+	 * @param xParams Par&aacute;metros adicionales de la firma, se sobrescriben los existentes si los hubiera */
+	public void setExtraParams(final Properties xParams) {
+		this.extraParams = xParams;
+	}
+
     /** Construye el resultado de una pre-firma (como primera parte de un firma trif&aacute;sica) o una firma completa PAdES.
      * @param pdfFileId Identificador &uacute;nico del PDF
      * @param signature Firma o pre-firma
