@@ -23,9 +23,9 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.logging.Logger;
 
-import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 
@@ -109,16 +109,11 @@ public final class AOUtil {
 
     }
 
-    /** Obtiene el flujo de entrada de un fichero (para su lectura) a partir de
-     * su URI.
-     * @param uri
-     *        URI del fichero a leer
+    /** Obtiene el flujo de entrada de un fichero (para su lectura) a partir de su URI.
+     * @param uri URI del fichero a leer
      * @return Flujo de entrada hacia el contenido del fichero
-     * @throws AOException
-     *         Cuando ocurre cualquier problema obteniendo el flujo
-     * @throws IOException Cuando no se ha podido abrir el fichero de datos.
-     */
-    public static InputStream loadFile(final URI uri) throws AOException, IOException {
+     * @throws IOException Cuando no se ha podido abrir el fichero de datos. */
+    public static InputStream loadFile(final URI uri) throws IOException {
 
         if (uri == null) {
             throw new IllegalArgumentException("Se ha pedido el contenido de una URI nula"); //$NON-NLS-1$
@@ -227,7 +222,7 @@ public final class AOUtil {
     private static String getRDNvalue(final String rdn, final String principal) {
 
         int offset1 = 0;
-        while ((offset1 = principal.toLowerCase().indexOf(rdn.toLowerCase(), offset1)) != -1) {
+        while ((offset1 = principal.toLowerCase(Locale.US).indexOf(rdn.toLowerCase(), offset1)) != -1) {
 
             if (offset1 > 0 && principal.charAt(offset1-1) != ',' && principal.charAt(offset1-1) != ' ') {
                 offset1++;
