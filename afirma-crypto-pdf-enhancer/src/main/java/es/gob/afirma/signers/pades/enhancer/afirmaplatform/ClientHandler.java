@@ -7,8 +7,6 @@ import java.security.InvalidParameterException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -250,8 +248,8 @@ class ClientHandler extends BasicHandler {
 	 * Establece el conjunto de propiedades con el que sero inicializado el gestor criptogrofico de WSS4J.
 	 * @return Devuelve el conjunto de propiedades con el que sero inicializado el gestor criptogrofico de WSS4J.
 	 */
-	private Map<String, String> initializateCryptoProperties() {
-		final Map<String, String> res = new HashMap<String, String>();
+	private Properties initializateCryptoProperties() {
+		final Properties res = new Properties();
 		res.put("org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin"); //$NON-NLS-1$ //$NON-NLS-2$
 		res.put("org.apache.ws.security.crypto.merlin.keystore.type", this.keystoreType); //$NON-NLS-1$
 		res.put("org.apache.ws.security.crypto.merlin.keystore.password", this.keystorePassword); //$NON-NLS-1$
