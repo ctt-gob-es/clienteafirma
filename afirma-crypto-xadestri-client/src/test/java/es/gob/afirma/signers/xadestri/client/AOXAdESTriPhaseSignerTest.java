@@ -25,6 +25,7 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.CounterSignTarget;
 
+/** Pruebas XAdES trif&aacute;sico. */
 public class AOXAdESTriPhaseSignerTest {
 
 	private static final String CERT_PATH = "ANF_PF_Activo.pfx"; //$NON-NLS-1$
@@ -41,15 +42,15 @@ public class AOXAdESTriPhaseSignerTest {
 	private static final String SERVER_URL = "http://localhost:8080/afirma-server-triphase-signer/SignatureService"; //$NON-NLS-1$
 
 	private static final Properties[] CONFIGS;
-	
-	
+
+
 	static {
 		CONFIGS = new Properties[3];
-		
+
 		final Properties config0 = new Properties();
 		config0.setProperty("serverUrl", SERVER_URL); //$NON-NLS-1$
 		CONFIGS[0] = config0;
-		
+
 		final Properties config1 = new Properties();
 		config1.setProperty("serverUrl", SERVER_URL); //$NON-NLS-1$
 		config1.setProperty("format", AOSignConstants.SIGN_FORMAT_XADES_DETACHED); //$NON-NLS-1$
@@ -60,14 +61,17 @@ public class AOXAdESTriPhaseSignerTest {
 		config1.setProperty("policyDescription", "Politica de firma electronica para las Administraciones Publicas en Espana"); //$NON-NLS-1$ //$NON-NLS-2$
 		config1.setProperty("policyQualifier", "http://administracionelectronica.gob.es/es/ctt/politicafirma/politica_firma_AGE_v1_8.pdf"); //$NON-NLS-1$ //$NON-NLS-2$
 		CONFIGS[1] = config1;
-		
+
 		final Properties config2 = new Properties();
 		config2.setProperty("serverUrl", SERVER_URL); //$NON-NLS-1$
 		config2.setProperty("format", AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING); //$NON-NLS-1$
 		config2.setProperty("mode", AOSignConstants.SIGN_MODE_EXPLICIT); //$NON-NLS-1$
 		CONFIGS[2] = config2;
 	}
-	
+
+	/** Prueba de firma.
+	 * @throws Exception */
+	@SuppressWarnings("static-method")
 	@Test
 	public void pruebaFirmaXAdES() throws Exception {
 
@@ -79,14 +83,14 @@ public class AOXAdESTriPhaseSignerTest {
 
 		final AOXAdESTriPhaseSigner signer = new AOXAdESTriPhaseSigner();
 
-		for (Properties config : CONFIGS) {
+		for (final Properties config : CONFIGS) {
 
 			final byte[] result = signer.sign(data, AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, pke.getPrivateKey(), pke.getCertificateChain(), config);
 
 			//		System.out.println("Resultado:\n" + new String(result)); //$NON-NLS-1$
 
-			File tempFile = File.createTempFile("xades-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
-			FileOutputStream fos = new FileOutputStream(tempFile);
+			final File tempFile = File.createTempFile("xades-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
+			final FileOutputStream fos = new FileOutputStream(tempFile);
 			fos.write(result);
 			fos.close();
 
@@ -94,6 +98,9 @@ public class AOXAdESTriPhaseSignerTest {
 		}
 	}
 
+	/** Prueba de cofirma.
+	 * @throws Exception */
+	@SuppressWarnings("static-method")
 	@Test
 	@Ignore
 	public void pruebaCofirmaXAdES() throws Exception {
@@ -113,7 +120,10 @@ public class AOXAdESTriPhaseSignerTest {
 
 		System.out.println("Resultado:\n" + new String(result)); //$NON-NLS-1$
 	}
-	
+
+	/** Prueba de contrafirma.
+	 * @throws Exception */
+	@SuppressWarnings("static-method")
 	@Test
 	@Ignore
 	public void pruebaContrafirmaXAdES() throws Exception {
@@ -127,9 +137,9 @@ public class AOXAdESTriPhaseSignerTest {
 		final Properties config = new Properties();
 		config.setProperty("serverUrl", SERVER_URL); //$NON-NLS-1$
 		config.setProperty("target", "tree"); //$NON-NLS-1$ //$NON-NLS-2$
-		
+
 		final AOXAdESTriPhaseSigner signer = new AOXAdESTriPhaseSigner();
-		
+
 		final byte[] result = signer.countersign(sign, AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, CounterSignTarget.LEAFS, null, pke.getPrivateKey(), pke.getCertificateChain(), config);
 
 		System.out.println("Resultado:\n" + new String(result)); //$NON-NLS-1$
