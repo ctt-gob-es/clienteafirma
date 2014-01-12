@@ -5,8 +5,7 @@ import java.security.KeyStore;
 import java.security.Security;
 import java.util.Enumeration;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import es.gob.afirma.keystores.capiaddressbook.MSCAPIAddressBook;
@@ -22,6 +21,7 @@ public class KeyStoreAddressBookTest {
 	 * @throws Exception Cuando no se localiza el proveedor, ocurren un problema
 	 * en su carga o al listar los certificados.
 	 */
+	@SuppressWarnings("static-method")
 	@Test
 	public void pruebaProveedorDeAccesoLibretaDirecciones() throws Exception {
 
