@@ -17,7 +17,6 @@ import java.security.Security;
 import java.security.cert.X509Certificate;
 import java.util.Properties;
 import java.util.logging.Logger;
-import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 import es.gob.afirma.core.AOException;
@@ -78,30 +77,13 @@ public final class AOOOXMLSigner implements AOSigner {
      * @param data Datos que deseamos analizar
      * @return {@code true} si el documento es un OOXML, {@code false} en caso
      *         contrario */
-    private static boolean isOOXMLFile(final byte[] data) {
-
-        final ZipFile zipFile;
-        try {
-            zipFile = AOFileUtils.createTempZipFile(data);
-            final boolean ret = zipFile.getEntry("[Content_Types].xml") != null && (zipFile.getEntry("_rels/.rels") != null || zipFile.getEntry("_rels\\.rels") != null) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                    && (zipFile.getEntry("docProps/app.xml") != null || zipFile.getEntry("docProps\\app.xml") != null) //$NON-NLS-1$ //$NON-NLS-2$
-                    && (zipFile.getEntry("docProps/core.xml") != null || zipFile.getEntry("docProps\\core.xml") != null); //$NON-NLS-1$ //$NON-NLS-2$
-            zipFile.close();
-            return ret;
-        }
-        catch (final ZipException e) {
-            // El fichero no era un ZIP, y por lo tanto, tampoco un OOXML
-            return false;
-        }
-        catch (final Exception e) {
-            LOGGER.severe("Error al cargar el fichero OOXML: " + e); //$NON-NLS-1$
-            return false;
-        }
-
-        // Comprobamos si estan todos los ficheros principales del documento
-
-
-
+    private static boolean isOOXMLFile(final byte[] data) throws IOException {
+        final ZipFile zipFile = AOFileUtils.createTempZipFile(data);
+        final boolean ret = zipFile.getEntry("[Content_Types].xml") != null && (zipFile.getEntry("_rels/.rels") != null || zipFile.getEntry("_rels\\.rels") != null) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                && (zipFile.getEntry("docProps/app.xml") != null || zipFile.getEntry("docProps\\app.xml") != null) //$NON-NLS-1$ //$NON-NLS-2$
+                && (zipFile.getEntry("docProps/core.xml") != null || zipFile.getEntry("docProps\\core.xml") != null); //$NON-NLS-1$ //$NON-NLS-2$
+        zipFile.close();
+        return ret;
     }
 
     /** { {@inheritDoc} */
@@ -212,7 +194,12 @@ public final class AOOOXMLSigner implements AOSigner {
             LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
             return false;
         }
-        return isOOXMLFile(data);
+        try {
+        	return isOOXMLFile(data);
+        }
+        catch(final Exception e) {
+        	return false;
+        }
     }
 
     /** Agrega una firma electr&oacute;nica a un documento OOXML.
