@@ -22,8 +22,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
