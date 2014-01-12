@@ -188,7 +188,7 @@ final class CoSignerEnveloped {
         // introducimos el nuevo SignerInfo del firmante actual.
 
         for (int i = 0; i < signerInfosSd.size(); i++) {
-            final SignerInfo si = new SignerInfo((ASN1Sequence) signerInfosSd.getObjectAt(i));
+            final SignerInfo si = SignerInfo.getInstance(signerInfosSd.getObjectAt(i));
             signerInfos.add(si);
         }
 
@@ -352,7 +352,7 @@ final class CoSignerEnveloped {
         // != null, seguira siendo != null)
         // 3.- Si no es ninguno de los dos casos, no podemos firmar
         for (int i = 0; i < signerInfosSd.size(); i++) {
-            final SignerInfo si = new SignerInfo((ASN1Sequence) signerInfosSd.getObjectAt(i));
+            final SignerInfo si = SignerInfo.getInstance(signerInfosSd.getObjectAt(i));
             final AlgorithmIdentifier algHash = si.getDigestAlgorithm();
             // Solo si coninciden los algos puedo sacar el hash de dentro
             if (algHash.getAlgorithm().toString().equals(AOAlgorithmID.getOID(digestAlgorithm))) {

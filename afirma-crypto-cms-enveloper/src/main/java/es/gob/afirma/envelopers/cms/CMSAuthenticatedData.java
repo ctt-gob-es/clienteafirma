@@ -377,7 +377,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
         // Elemento 4 : DigestAlgorithm
         final DERTaggedObject alg = (DERTaggedObject) e.nextElement();
         final ASN1Sequence content = (ASN1Sequence) alg.getObject();
-        final AlgorithmIdentifier aoi = new AlgorithmIdentifier(content);
+        final AlgorithmIdentifier aoi = AlgorithmIdentifier.getInstance(content);
 
         return aoi;
     }

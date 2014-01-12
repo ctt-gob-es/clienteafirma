@@ -114,7 +114,7 @@ final class ValidateCMS {
                 final ASN1Set signerInfosSd = sd.getSignerInfos();
 
                 for (int i = 0; isValid && i < signerInfosSd.size(); i++) {
-                    final SignerInfo si = new SignerInfo((ASN1Sequence) signerInfosSd.getObjectAt(i));
+                    final SignerInfo si = SignerInfo.getInstance(signerInfosSd.getObjectAt(i));
                     isValid = verifySignerInfo(si);
                 }
             }
@@ -224,7 +224,6 @@ final class ValidateCMS {
      * @param data
      *        Datos CMS.
      * @return si es de este tipo. */
-    @SuppressWarnings("unused")
 	static
     boolean isCMSEnvelopedData(final byte[] data) {
         boolean isValid = true;
@@ -245,7 +244,7 @@ final class ValidateCMS {
                  * Si no se construye el objeto correctamente, se pasa al manejo
                  * de la excepcion
                  */
-                new EnvelopedData((ASN1Sequence) doj.getObject());
+                EnvelopedData.getInstance(doj.getObject());
             }
 
         }
@@ -281,7 +280,7 @@ final class ValidateCMS {
                 final ASN1Set signerInfosSd = sd.getSignerInfos();
 
                 for (int i = 0; i < signerInfosSd.size() && isValid; i++) {
-                    final SignerInfo si = new SignerInfo((ASN1Sequence) signerInfosSd.getObjectAt(i));
+                    final SignerInfo si = SignerInfo.getInstance(signerInfosSd.getObjectAt(i));
                     isValid = verifySignerInfo(si);
                 }
             }

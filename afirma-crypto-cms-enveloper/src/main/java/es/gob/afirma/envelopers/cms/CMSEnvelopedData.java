@@ -229,7 +229,7 @@ public final class CMSEnvelopedData {
             // Contenido de Data
             final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
 
-            final EnvelopedData ed = new EnvelopedData((ASN1Sequence) doj.getObject());
+            final EnvelopedData ed = EnvelopedData.getInstance(doj.getObject());
 
             // Obtenemos los originatorInfo
             OriginatorInfo origInfo = ed.getOriginatorInfo();

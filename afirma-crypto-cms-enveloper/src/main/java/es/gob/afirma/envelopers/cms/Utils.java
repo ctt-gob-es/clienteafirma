@@ -370,7 +370,7 @@ final class Utils {
             aIn.close();
         }
         else {
-            asn1Params = new DERNull();
+            asn1Params = DERNull.INSTANCE;
         }
 
         // obtenemos el OID del algoritmo de cifrado

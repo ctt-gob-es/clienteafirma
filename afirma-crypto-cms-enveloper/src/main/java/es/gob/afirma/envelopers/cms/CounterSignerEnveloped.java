@@ -278,7 +278,7 @@ final class CounterSignerEnveloped {
                                                                                    SignatureException {
         final ASN1EncodableVector counterSigners = new ASN1EncodableVector();
         for (int i = 0; i < signerInfosRaiz.size(); i++) {
-            counterSigners.add(getCounterUnsignedAtributes(new SignerInfo((ASN1Sequence) signerInfosRaiz.getObjectAt(i)), parameters, cert, keyEntry));
+            counterSigners.add(getCounterUnsignedAtributes(SignerInfo.getInstance(signerInfosRaiz.getObjectAt(i)), parameters, cert, keyEntry));
         }
         return counterSigners;
     }
@@ -314,8 +314,8 @@ final class CounterSignerEnveloped {
         for (int i = 0; i < signerInfosRaiz.size(); i++) {
             counterSigners.add(
         		getCounterLeafUnsignedAtributes(
-    				new SignerInfo(
-						(ASN1Sequence) signerInfosRaiz.getObjectAt(i)
+    				SignerInfo.getInstance(
+						signerInfosRaiz.getObjectAt(i)
 					),
     				parameters,
     				cert,
@@ -363,7 +363,7 @@ final class CounterSignerEnveloped {
         this.actualIndex = 0;
 
         for (int i = 0; i < auxSignerRaiz.size(); i++) {
-            final SignerInfo si = new SignerInfo((ASN1Sequence) auxSignerRaiz.getObjectAt(i));
+            final SignerInfo si = SignerInfo.getInstance(auxSignerRaiz.getObjectAt(i));
             SignerInfo counterSigner = null;
             if (this.actualIndex == nodo) {
                 counterSigner = getCounterNodeUnsignedAtributes(si, parameters, cert, keyEntry);
@@ -425,7 +425,7 @@ final class CounterSignerEnveloped {
                         final Object obj = eAtributesData.nextElement();
                         if (obj instanceof ASN1Sequence) {
                             final ASN1Sequence atrib = (ASN1Sequence) obj;
-                            final SignerInfo si = new SignerInfo(atrib);
+                            final SignerInfo si = SignerInfo.getInstance(atrib);
                             final SignerInfo obtained = getCounterUnsignedAtributes(si, parameters, cert, keyEntry);
                             signerInfosU.add(obtained);
                         }
@@ -568,7 +568,7 @@ final class CounterSignerEnveloped {
                     while (eAtributesData.hasMoreElements()) {
                         final Object obj = eAtributesData.nextElement();
                         if (obj instanceof ASN1Sequence) {
-                            signerInfosU.add(getCounterLeafUnsignedAtributes(new SignerInfo((ASN1Sequence) obj), parameters, cert, keyEntry));
+                            signerInfosU.add(getCounterLeafUnsignedAtributes(SignerInfo.getInstance(obj), parameters, cert, keyEntry));
                         }
                         else {
                             attributes.add(obj);
@@ -704,7 +704,7 @@ final class CounterSignerEnveloped {
                     while (eAtributesData.hasMoreElements()) {
                         final Object obj = eAtributesData.nextElement();
                         if (obj instanceof ASN1Sequence) {
-                            signerInfosU.add(new SignerInfo((ASN1Sequence) obj));
+                            signerInfosU.add(SignerInfo.getInstance(obj));
                         }
                         else {
                             attributes.add(obj);
@@ -844,7 +844,7 @@ final class CounterSignerEnveloped {
                         final Object obj = eAtributesData.nextElement();
                         if (obj instanceof ASN1Sequence) {
                             final ASN1Sequence atrib = (ASN1Sequence) obj;
-                            final SignerInfo si = new SignerInfo(atrib);
+                            final SignerInfo si = SignerInfo.getInstance(atrib);
                             this.actualIndex++;
                             if (this.actualIndex != node) {
                                 if (this.actualIndex < node) {
