@@ -20,8 +20,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -421,7 +420,7 @@ public class TestPAdES {
         Assert.assertTrue("Deberia haber fallado", failed); //$NON-NLS-1$
 
     }
-    
+
     /**
      * Prueba la firma de un PDF certificado.
      * @throws Exception en cualquier error
@@ -439,28 +438,28 @@ public class TestPAdES {
         final AOSigner signer = new AOPDFSigner();
 
         final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILES[0]));
-                
+
         Assert.assertTrue("No se ha reconocido como un PDF", signer.isValidDataFile(testPdf)); //$NON-NLS-1$
 
-        String prueba = "Firma certificada PAdES de documento PDF indicando la propiedad certificationLevel"; //$NON-NLS-1$
+        final String prueba = "Firma certificada PAdES de documento PDF indicando la propiedad certificationLevel"; //$NON-NLS-1$
 
-        String[] certificationLevels = new String[] {
+        final String[] certificationLevels = new String[] {
         	"Firma de autor. No se permite ningun cambio posterior en el documento", //$NON-NLS-1$
         	"Firma de autor certificada para formularios. Se permite unicamente el relleno posterior de los campos del formulario", //$NON-NLS-1$
         	"Firma certificada. Se permite unicamente el relleno posterior de los campos del formulario o el anadido de firmas de aprobacion" //$NON-NLS-1$
         };
-        
+
         System.out.println(prueba);
 
-        Properties extraParams = new Properties();
-        
+        final Properties extraParams = new Properties();
+
         for (int i = 1; i <= certificationLevels.length; i++) {
 
         	extraParams.put("certificationLevel", Integer.toString(i)); //$NON-NLS-1$
 
         	System.out.println(certificationLevels[i-1]);
-        	
-        	byte[] result = signer.sign(
+
+        	final byte[] result = signer.sign(
         			testPdf,
         			"SHA512withRSA",  //$NON-NLS-1$
         			pke.getPrivateKey(),
