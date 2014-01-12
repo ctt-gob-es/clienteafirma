@@ -32,7 +32,7 @@ import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.ooxml.relprovider.OOXMLProvider;
-import es.gob.afirma.signers.xmldsig.AOXMLDSigSigner;
+import es.gob.afirma.signers.xades.AOXAdESSigner;
 
 /** Manejador de firmas electr&oacute;nicas XML de documentos OOXML de Microsoft Office. */
 public final class AOOOXMLSigner implements AOSigner {
@@ -163,7 +163,7 @@ public final class AOOOXMLSigner implements AOSigner {
         // Las firmas contenidas en el documento OOXML son de tipo XMLdSig asi
         // que utilizaremos el
         // signer de este tipo para gestionar el arbol de firmas
-        final AOSigner xmldsigSigner = new AOXMLDSigSigner();
+        final AOSigner xmldsigSigner = new AOXAdESSigner();
 
         // Recuperamos las firmas individuales del documento y creamos el arbol
         final AOTreeNode tree = new AOTreeNode("Datos"); //$NON-NLS-1$
