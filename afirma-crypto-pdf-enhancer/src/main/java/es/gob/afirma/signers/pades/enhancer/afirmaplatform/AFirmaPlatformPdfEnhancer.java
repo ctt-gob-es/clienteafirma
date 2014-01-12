@@ -1,29 +1,21 @@
-/**
- * <p>Fichero: TestClient.java</p>
- * <p>Descripcion: </p>
- * <p>Empresa: Telvent Interactiva </p>
- * <p>Fecha creacion: 02-dic-2005</p>
- * @author SERYS
- * @version 1.0
- */
-
-package es.gob.afirma.platform.wsclientoriginal;
+package es.gob.afirma.signers.pades.enhancer.afirmaplatform;
 
 import java.io.IOException;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 
 import org.apache.axis.Handler;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
-import org.apache.log4j.Logger;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 
-public final class TestClient {
-   private static final Logger LOGGER = Logger.getLogger(TestClient.class);
+/** A&ntilde;ade sello de tiempo a un PDF firmado mediante la Plataforma Afirma. */
+final class AFirmaPlatformPdfEnhancer {
+   private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
    private static final String CABECERA = "[TestClient]:"; //$NON-NLS-1$
    //Ruta donde se encuentran los ficheros de entrada a los servicios web
    private static String servicio;
@@ -42,10 +34,10 @@ public final class TestClient {
    private static String authorizationPasswordType;
 
 
-   private TestClient() {
-	   // Impedimos la construccion de objetos 
+   private AFirmaPlatformPdfEnhancer() {
+	   // Impedimos la construccion de objetos
    }
-   
+
    private static void init(final Properties p) {
 
 	  servicio = p.getProperty("webservices.servicio"); //$NON-NLS-1$
@@ -88,10 +80,10 @@ public final class TestClient {
    private static final String SIGN_FIELD = "%%SIGN%%"; //$NON-NLS-1$
    private static final String RETURN_TYPE_FIELD = "%%RETURNTYPE%%"; //$NON-NLS-1$
 
-   public static byte[] upgradeSign(final byte[] sign, final String applicationName, final String returnSignType) throws IOException {
+   static byte[] upgradeSign(final byte[] sign, final String applicationName, final String returnSignType) throws IOException {
 	   final String responseXml = upgradeSign(new String(
 		   AOUtil.getDataFromInputStream(
-			   TestClient.class.getResourceAsStream("signUpgradeTemplate.xml") //$NON-NLS-1$
+			   AFirmaPlatformPdfEnhancer.class.getResourceAsStream("signUpgradeTemplate.xml") //$NON-NLS-1$
 		   )
 	   ).replace(APP_NAME_FIELD, applicationName).replace(SIGN_FIELD, Base64.encode(sign)).replace(RETURN_TYPE_FIELD, returnSignType));
 
@@ -110,14 +102,14 @@ public final class TestClient {
 
    }
 
-   public static String upgradeSign(final String dssXml) {
+   static String upgradeSign(final String dssXml) {
 
 	  String ret;
       try {
 
          final Properties prop = new Properties();
          try {
-            prop.load(TestClient.class.getResourceAsStream("webservices.properties")); //$NON-NLS-1$
+            prop.load(AFirmaPlatformPdfEnhancer.class.getResourceAsStream("webservices.properties")); //$NON-NLS-1$
          }
          catch (final IOException e) {
             final String msgError = "No se han podido cargar las propiedades de WebServices: " + e.getMessage(); //$NON-NLS-1$
@@ -163,10 +155,10 @@ public final class TestClient {
         ret = (String) call.invoke(new Object[] {dssXml});
       }
       catch (final Exception e) {
-    	 LOGGER.error(TestClient.CABECERA + e.toString());
+    	 LOGGER.severe(AFirmaPlatformPdfEnhancer.CABECERA + e.toString());
          return null;
       }
-      
+
       return ret;
    }
 

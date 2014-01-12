@@ -1,9 +1,9 @@
-package es.gob.afirma.signers.pades;
+package es.gob.afirma.signers.pades.enhancer.afirmaplatform;
 
 import java.io.IOException;
 import java.util.Properties;
 
-import es.gob.afirma.platform.wsclientoriginal.TestClient;
+import es.gob.afirma.signers.pades.SignEnhancer;
 
 /**
  * Clase para la mejora de las firmas PDF a trav&eacute;s del servicio de actualizaci&oacute;n de
@@ -31,7 +31,7 @@ public class PDFEnhancer implements SignEnhancer {
 	@Override
 	public byte[] enhance(final byte[] signature, final Properties options) throws IOException {
 
-		return TestClient.upgradeSign(
+		return AFirmaPlatformPdfEnhancer.upgradeSign(
 				signature,
 				options.getProperty(APPLICATION_NAME_OPTION),
 				options.getProperty(SIGN_TYPE_OPTION));
