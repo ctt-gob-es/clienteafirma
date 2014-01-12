@@ -181,7 +181,7 @@ final class CAdESEPESSignedAndEnvelopedData {
         final SignerIdentifier identifier = new SignerIdentifier(encSid);
 
         // AlgorithmIdentifier
-        final AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(new ASN1ObjectIdentifier(AOAlgorithmID.getOID(digestAlgorithm)), new DERNull());
+        final AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(new ASN1ObjectIdentifier(AOAlgorithmID.getOID(digestAlgorithm)), DERNull.INSTANCE);
 
         // // ATRIBUTOS
         final ASN1EncodableVector contextExpecific =
@@ -346,7 +346,7 @@ final class CAdESEPESSignedAndEnvelopedData {
                 final SignerIdentifier identifier = new SignerIdentifier(encSid);
 
                 // AlgorithmIdentifier
-                digAlgId = new AlgorithmIdentifier(new ASN1ObjectIdentifier(AOAlgorithmID.getOID(digestAlgorithm)), new DERNull());
+                digAlgId = new AlgorithmIdentifier(new ASN1ObjectIdentifier(AOAlgorithmID.getOID(digestAlgorithm)), DERNull.INSTANCE);
 
                 // // ATRIBUTOS
                 final ASN1EncodableVector contextExpecific;
