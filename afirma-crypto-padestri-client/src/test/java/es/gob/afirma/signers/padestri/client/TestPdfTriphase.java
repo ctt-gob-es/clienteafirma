@@ -18,8 +18,7 @@ import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.Properties;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -36,7 +35,7 @@ public class TestPdfTriphase {
 	private static final String PROPERTY_VALUE_SIGN_SERVER_URL = "http://localhost:8080/afirma-server-triphase-signer/SignatureService"; //$NON-NLS-1$
 
 	private static final String PROPERTY_NAME_DOC_ID = "documentId"; //$NON-NLS-1$
-	private static final String PROPERTY_VALUE_DOC_ID = "docIdPrueba"; //$NON-NLS-1$
+//	private static final String PROPERTY_VALUE_DOC_ID = "docIdPrueba"; //$NON-NLS-1$
 
 	private static final String PDF_FILENAME = "TEST_PDF.pdf"; //$NON-NLS-1$
 
@@ -61,7 +60,7 @@ public class TestPdfTriphase {
 	private Properties serverConfig;
 
 	private byte[] data;
-	
+
 	/** Carga el almac&acute;n de pruebas.
 	 * @throws Exception */
 	@Before
@@ -167,7 +166,7 @@ public class TestPdfTriphase {
 
 		return encoded;
 	}
-	
+
 	/** Prueba de firma trif&aacute;sica normal.
 	 * @throws Exception */
 	@Test
