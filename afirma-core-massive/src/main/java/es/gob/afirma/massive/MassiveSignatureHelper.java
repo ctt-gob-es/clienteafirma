@@ -274,10 +274,12 @@ public final class MassiveSignatureHelper {
             return null;
         }
 
-        // Creamos el flujo de datos del fichero
-        InputStream is = null;
+        // Creamos el flujo de datos del fichero y leemos su contenido
+        byte[] data = null;
         try {
-            is = AOUtil.loadFile(uri);
+        	final InputStream is = AOUtil.loadFile(uri);
+        	data = AOUtil.getDataFromInputStream(is);
+            is.close();
         }
         catch (final FileNotFoundException e) {
             LOGGER.severe("No ha sido posible encontrar el fichero '" + fileUri + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
@@ -290,29 +292,10 @@ public final class MassiveSignatureHelper {
             return null;
         }
 
-        // Leemos el contenido del fichero
-        byte[] data = null;
-        try {
-            data = AOUtil.getDataFromInputStream(is);
-        }
-        catch (final Exception e) {
-            LOGGER.severe("No es posible leer el contenido del fichero '" + fileUri + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
-            this.addLog(MassiveSignMessages.getString("MassiveSignatureHelper.11") + REG_FIELD_SEPARATOR + fileUri); //$NON-NLS-1$
-            return null;
-        }
         if (data == null) {
             LOGGER.severe("El fichero '" + fileUri + "' esta vacio"); //$NON-NLS-1$ //$NON-NLS-2$
             this.addLog(MassiveSignMessages.getString("MassiveSignatureHelper.12") + REG_FIELD_SEPARATOR + fileUri); //$NON-NLS-1$
             return null;
-        }
-
-        // Liberamos el fichero de recursos
-        try {
-            is.close();
-            is = null;
-        }
-        catch (final Exception e) {
-            LOGGER.warning("No se ha podido liberar el fichero '" + fileUri + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         // Ejecutamos la operacion que corresponda

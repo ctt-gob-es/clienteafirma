@@ -10,7 +10,6 @@
 
 package es.gob.afirma.massive;
 
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
@@ -547,7 +546,6 @@ public class DirectorySignatureHelper {
                                          final Properties signConfig) throws IOException {
 
         boolean allOK = true;
-        InputStream fis = null;
         byte[] dataToSign = null;
         final AOSigner signer = this.defaultSigner;
         for (final File file : files) {
@@ -555,11 +553,10 @@ public class DirectorySignatureHelper {
             // Comprobamos que el fichero actual se pueda firmar con la
             // configuracion de firma actual
             try {
-                if (!this.isValidDataFile(signer, file)) {
+                if (!DirectorySignatureHelper.isValidDataFile(signer, file)) {
                 	LOGGER.warning("El fichero '" + file.getPath() + //$NON-NLS-1$
                 		"' no puede ser firmado con la configuracion de firma actual"); //$NON-NLS-1$
                     this.addLogRegistry(Level.WARNING, MassiveSignMessages.getString("DirectorySignatureHelper.4") + REG_FIELD_SEPARATOR + file.getPath()); //$NON-NLS-1$
-                    DirectorySignatureHelper.closeStream(fis);
                     allOK = false;
                     continue;
                 }
@@ -575,8 +572,9 @@ public class DirectorySignatureHelper {
             signConfig.setProperty(URI_STR, file.toURI().toASCIIString());
 
             try {
-                fis = getFileInputStream(file);
+            	final InputStream fis = new FileInputStream(file);
                 dataToSign = AOUtil.getDataFromInputStream(fis);
+                fis.close();
             }
             catch (final Exception e) {
                 LOGGER.warning("No se pudo leer fichero '" + file.getPath() + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
@@ -584,9 +582,6 @@ public class DirectorySignatureHelper {
                 dataToSign = null;
                 allOK = false;
                 continue;
-            }
-            finally {
-                DirectorySignatureHelper.closeStream(fis);
             }
 
             // Deteccion del MIMEType y Oid de los datos, solo para CAdES, XAdES y XMLDSig
@@ -618,7 +613,6 @@ public class DirectorySignatureHelper {
             catch(final UnsupportedOperationException e) {
                 LOGGER.severe("No ha sido posible firmar el fichero '" + file + "': " + e.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
                 this.addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.7") + REG_FIELD_SEPARATOR + file + REG_FIELD_SEPARATOR + e.getMessage()); //$NON-NLS-1$
-                DirectorySignatureHelper.closeStream(fis);
                 allOK = false;
                 continue;
             }
@@ -627,20 +621,17 @@ public class DirectorySignatureHelper {
             	if ("es.gob.afirma.signers.xades.EFacturaAlreadySignedException".equals(e.getClass().getName())) { //$NON-NLS-1$
                 	LOGGER.warning("La factura ya estaba firmada y no admite firmas adicionales '" + file + "': " + e);   //$NON-NLS-1$//$NON-NLS-2$
                 	this.addLogRegistry(Level.WARNING, MassiveSignMessages.getString("DirectorySignatureHelper.27") + REG_FIELD_SEPARATOR + file); //$NON-NLS-1$
-                	DirectorySignatureHelper.closeStream(fis);
                     allOK = false;
                     continue;
             	}
                 LOGGER.severe("No ha sido posible firmar el fichero '" + file + "': " + e);   //$NON-NLS-1$//$NON-NLS-2$
                 this.addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.7") + REG_FIELD_SEPARATOR + file); //$NON-NLS-1$
-                DirectorySignatureHelper.closeStream(fis);
                 allOK = false;
                 continue;
             }
 			catch (final OutOfMemoryError e) {
 				LOGGER.severe("Error de falta de memoria durante la firma: " + e); //$NON-NLS-1$
 				this.addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.8")); //$NON-NLS-1$
-                DirectorySignatureHelper.closeStream(fis);
                 allOK = false;
                 continue;
 			}
@@ -713,7 +704,9 @@ public class DirectorySignatureHelper {
         AOSigner signer;
         for (final File file : files) {
             try {
-                originalData = AOUtil.getDataFromInputStream(getFileInputStream(file));
+            	final InputStream is = new FileInputStream(file);
+                originalData = AOUtil.getDataFromInputStream(is);
+                is.close();
             }
             catch (final Exception e) {
                 allOK = false;
@@ -892,7 +885,6 @@ public class DirectorySignatureHelper {
                                                 final PrivateKeyEntry keyEntry,
                                                 final Properties signConfig) throws IOException {
         boolean allOK = true;
-        InputStream fis = null;
         final CounterSignTarget target = type == MassiveType.COUNTERSIGN_ALL ? CounterSignTarget.TREE : CounterSignTarget.LEAFS;
         AOSigner signer = this.defaultSigner;
         for (final File file : files) {
@@ -910,19 +902,18 @@ public class DirectorySignatureHelper {
             // Solo podemos contrafirmar un fichero de firma en el mismo formato
             // en el que este
             byte[] signData;
-            if (this.isSign(signer, file)) {
+            if (DirectorySignatureHelper.isSign(signer, file)) {
                 try {
 
                     // Si se nos pide que respetemos el formato original el
                     // signer puede cambiar de una iteracion
                     // a otra. Si no es necesario respetar el formato, el signer
                     // siempre sera el por defecto establecido.
-                    if ((fis = this.getFileInputStream(file)) == null) {
-                        allOK = false;
-                        continue;
-                    }
+                	final InputStream is = new FileInputStream(file);
+                	final byte[] data = AOUtil.getDataFromInputStream(is);
+                	is.close();
                     signData = signer.countersign(
-                		AOUtil.getDataFromInputStream(fis),
+                		data,
                 		this.algorithm,
                 		target,
                 		null,
@@ -930,6 +921,12 @@ public class DirectorySignatureHelper {
                 		keyEntry.getCertificateChain(),
                 		signConfig
             		);
+                }
+                catch (final FileNotFoundException e) {
+                    LOGGER.severe("No se ha encontrado el fichero '" + file.getPath() + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+                    this.addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.24") + REG_FIELD_SEPARATOR + file.getPath()); //$NON-NLS-1$
+                    allOK = false;
+                    continue;
                 }
                 catch (final Exception e) {
                     LOGGER.severe("No ha sido posible contrafirmar el fichero '" + file.getPath() + "': " + e);  //$NON-NLS-1$//$NON-NLS-2$
@@ -943,9 +940,6 @@ public class DirectorySignatureHelper {
                     allOK = false;
                     continue;
     			}
-                finally {
-                    DirectorySignatureHelper.closeStream(fis);
-                }
             }
             else {
                 LOGGER.severe("El fichero '" + file //$NON-NLS-1$
@@ -1082,8 +1076,8 @@ public class DirectorySignatureHelper {
      *         con el signer indicado, <code>false</code> en caso contrario.
      * @throws IOException
      *         Cuando no se pudo leer el fichero. */
-    private boolean isSign(final AOSigner signer, final File file) throws IOException {
-        final InputStream is = this.getFileInputStream(file);
+    private static boolean isSign(final AOSigner signer, final File file) throws IOException {
+        final InputStream is = new FileInputStream(file);
         final boolean isSignFile = signer.isSign(AOUtil.getDataFromInputStream(is));
         is.close();
         return isSignFile;
@@ -1093,27 +1087,21 @@ public class DirectorySignatureHelper {
      * para su firma mediante el manejador <code>signer</code>. En caso de no
      * encontrar el fichero, agrega una entrada al logger indic&aacute;ndolo y
      * se lanza una excepci&oacute;n.
-     * @param signer
-     *        Manejador de firma.
-     * @param file
-     *        Fichero a analizar.
+     * @param signer Manejador de firma.
+     * @param file Fichero a analizar.
      * @return Devuelve <code>true</code> si el fichero puede firmarse con el
      *         signer indicado, <code>false</code> en caso contrario.
-     * @throws IOException
-     *         Cuando no se pudo leer el fichero. */
-    private boolean isValidDataFile(final AOSigner signer, final File file) throws IOException {
-        final InputStream is = this.getFileInputStream(file);
-        final boolean isValidDataFile;
+     * @throws IOException Cuando no se pudo leer el fichero. */
+    private static boolean isValidDataFile(final AOSigner signer, final File file) throws IOException {
+        final InputStream is = new FileInputStream(file);
+        final byte[] data = AOUtil.getDataFromInputStream(is);
+        is.close();
         try {
-        	isValidDataFile = signer.isValidDataFile(AOUtil.getDataFromInputStream(is));
+        	return signer.isValidDataFile(data);
         }
         catch(final OutOfMemoryError e) {
         	throw new IOException("El fichero es demasiado grande: " + e, e); //$NON-NLS-1$
         }
-        finally {
-        	is.close();
-        }
-        return isValidDataFile;
     }
 
     /** Permite activar y desactivar la generaci&oacute;n del fichero de log.
@@ -1148,40 +1136,6 @@ public class DirectorySignatureHelper {
      *         un fichero de registro, <code>false</code> en caso contrario */
     public boolean isActiveLog() {
         return this.activeLog;
-    }
-
-    /** Obtiene el flujo de entrada de datos de un fichero o, en caso de error,
-     * agrega una entrada al logger indicando que no se encuentra el fichero y
-     * se lanza una excepci&oacute;n.
-     * @param file
-     *        Fichero del que deseamos obtener el flujo de entrada de datos.
-     * @return Flujo de entrada de datos.
-     * @throws FileNotFoundException
-     *         No se encuentra el fichero. */
-    private FileInputStream getFileInputStream(final File file) throws FileNotFoundException {
-        try {
-            return new FileInputStream(file);
-        }
-        catch (final FileNotFoundException e) {
-            LOGGER.severe("No se ha encontrado el fichero '" + file.getPath() + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
-            this.addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.24") + REG_FIELD_SEPARATOR + file.getPath()); //$NON-NLS-1$
-            throw e;
-        }
-    }
-
-    /** Cierra un InputStream, mostrando un mensaje de advertencia por consola en
-     * caso de error. Si la entrada es nula, no hace nada.
-     * @param stream
-     *        InputStream a cerrar. */
-    private static void closeStream(final Closeable stream) {
-        if (stream != null) {
-            try {
-                stream.close();
-            }
-            catch (final Exception e) {
-                LOGGER.warning("Error al cerrar un fichero de recursos"); //$NON-NLS-1$
-            }
-        }
     }
 
     /** Recupera el path relativo del path de fichero absoluto introducido. Si se
@@ -1316,15 +1270,15 @@ public class DirectorySignatureHelper {
             throw new IOException("No tiene permisos de lectura sobre el fichero indicado"); //$NON-NLS-1$
         }
 
-        final FileInputStream fis = new FileInputStream(file);
+        final FileInputStream is = new FileInputStream(file);
         try {
-            return AOSignerFactory.getSigner(AOUtil.getDataFromInputStream(fis));
+            return AOSignerFactory.getSigner(AOUtil.getDataFromInputStream(is));
         }
         catch (final Exception e) {
             throw new IOException("Error al leer el fichero: " + e, e); //$NON-NLS-1$
         }
         finally {
-            fis.close();
+            is.close();
         }
     }
 
