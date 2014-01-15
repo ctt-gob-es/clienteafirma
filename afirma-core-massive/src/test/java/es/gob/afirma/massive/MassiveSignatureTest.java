@@ -13,7 +13,6 @@ import org.junit.Test;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignerFactory;
-import es.gob.afirma.massive.MassiveSignatureHelper.MassiveSignConfiguration;
 
 /**
  * Clase para probar todas funciones de firma y multifirma disponibles para
@@ -103,7 +102,7 @@ public class MassiveSignatureTest {
 	}
 
 	private static String getResourcePath(final String filename) {
-		return ((System.getProperty("os.name").contains("indows")) ? "" : File.separator) + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		return (System.getProperty("os.name").contains("indows") ? "" : File.separator) + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				MassiveSignatureTest.class
 						.getResource("/" + filename).toString().replace("%20", " ").replace("file:/", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 	}
