@@ -82,7 +82,7 @@ public final class PdfSessionManager {
 		// *********************************************************************************************************************
 
     	// Forzar la creacion de revisiones incluso en PDF no firmados
-    	final boolean allwaysCreateRevision = Boolean.parseBoolean(extraParams.getProperty("allwaysCreateRevision", "false")); //$NON-NLS-1$ //$NON-NLS-2$
+    	final boolean alwaysCreateRevision = Boolean.parseBoolean(extraParams.getProperty("alwaysCreateRevision", "false")); //$NON-NLS-1$ //$NON-NLS-2$
 
     	// Imagen de la rubrica
 		final Image rubric = PdfPreProcessor.getImage(extraParams.getProperty("signatureRubricImage")); //$NON-NLS-1$
@@ -267,7 +267,7 @@ public final class PdfSessionManager {
 		// subsiguientes.
 		//
 		// No obstante, el integrador puede siempre forzar la creacion de revisiones mediante
-		// el parametro "allwaysCreateRevision".
+		// el parametro "alwaysCreateRevision".
 		final PdfStamper stp;
 		try {
 			stp = PdfStamper.createSignature(
@@ -280,7 +280,7 @@ public final class PdfSessionManager {
 				// No crear temporal
 				null,
 				// Si hay mas firmas o asi me lo indican, creo una revision
-				allwaysCreateRevision || pdfReader.getAcroFields().getSignatureNames().size() > 0,
+				alwaysCreateRevision || pdfReader.getAcroFields().getSignatureNames().size() > 0,
 				// Momento de la firma
 				signTime
 			);
