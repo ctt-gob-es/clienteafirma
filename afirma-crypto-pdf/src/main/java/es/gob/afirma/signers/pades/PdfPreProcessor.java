@@ -15,7 +15,9 @@ import java.util.HashMap;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import com.lowagie.text.Annotation;
 import com.lowagie.text.DocumentException;
+import com.lowagie.text.Image;
 import com.lowagie.text.Jpeg;
 import com.lowagie.text.Rectangle;
 import com.lowagie.text.pdf.PdfContentByte;
@@ -73,20 +75,63 @@ public final class PdfPreProcessor {
 
 	}
 
+	/** Sobreimpone una imagen JPEG en un documento PDF.
+	 * @param jpegImage Imagen JPEG
+	 * @param width Ancho de la imagen
+	 * @param height Alto de la imagen
+	 * @param left
+	 * @param bottom
+	 * @param pageNum N&uacute;mero de p&aacute;gina del PDF donde insertar la imagen
+	 *                (la numeraci&oacute;n comienza en 1)
+	 * @param url URL a la que enlazar&aacute; la imagen si queremos que esta sea un hiperv&iacute;nculo
+	 *            (puede ser <code>null</code>)
+	 * @param stp Estampador PDF de iText
+	 * @throws IOException */
+	public static void addImage(final byte[] jpegImage,
+			                     final int width,
+			                     final int height,
+			                     final int left,
+			                     final int bottom,
+			                     final int pageNum,
+			                     final String url,
+			                     final PdfStamper stp) throws IOException {
+		final PdfContentByte content = stp.getOverContent(pageNum);
+		try {
+			final Image image = new Jpeg(jpegImage);
+			if (url != null) {
+				image.setAnnotation(new Annotation(0, 0, 0, 0, url));
+			}
+			content.addImage(
+				image,  // Image
+				width,  // Image width
+				0,
+				0,
+				height, // Image height
+				left,   // Lower left X position of the image
+				bottom, // Lower left Y position of the image
+				false   // Inline
+			);
+		}
+		catch (final DocumentException e) {
+			throw new IOException("Error durante la insercion de la imagen en el PDF: " + e, e); //$NON-NLS-1$
+		}
+	}
+
 	/** Sobreimpone una imagen en un documento PDF.
 	 * @param extraParams Datos de la imagen a a&ntilde;adir como <a href="doc-files/extraparams.html">par&aacute;metros adicionales</a>
 	 * @param stp Estampador de PDF, debe abrirse y cerrarse fuera de este m&eacute;todo
 	 * @throws IOException */
-	public static void addImage(final Properties extraParams, final PdfStamper stp) throws IOException {
+	static void addImage(final Properties extraParams, final PdfStamper stp) throws IOException {
+
 		if (extraParams == null || stp == null) {
 			return;
 		}
 
-		final com.lowagie.text.Image image = getImage(extraParams.getProperty("image")); //$NON-NLS-1$
-
-		if (image == null) {
+		final String imageDataBase64 = extraParams.getProperty("image"); //$NON-NLS-1$
+		if (imageDataBase64 == null || imageDataBase64.length() < 1) {
 			return;
 		}
+		final byte[] image = Base64.decode(imageDataBase64);
 
 		final Rectangle rect = getPositionOnPage(extraParams, "image"); //$NON-NLS-1$
 
@@ -103,26 +148,21 @@ public final class PdfPreProcessor {
 		try {
 			pageNum = Integer.parseInt(imagePage);
 		}
-		catch(final Exception e) {
+		catch(final NumberFormatException e) {
 			throw new IOException("Se ha indicado un numero de pagina con formato invalido para insertar la imagen (" + imagePage + "): " + e, e); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
-		final PdfContentByte content = stp.getOverContent(pageNum);
-		try {
-			content.addImage(
-				image,            // Image
-				rect.getWidth(),  // Image width
-				0,
-				0,
-				rect.getHeight(), // Image height
-				rect.getLeft(),   // Lower left X position of the image
-				rect.getBottom(), // Lower left Y position of the image
-				false             // Inline
-			);
-		}
-		catch (final DocumentException e) {
-			throw new IOException("Error durante la insercion de la imagen en el PDF: " + e, e); //$NON-NLS-1$
-		}
+		addImage(
+			image,
+			(int) rect.getWidth(),
+			(int) rect.getHeight(),
+			(int) rect.getLeft(),
+			(int) rect.getBottom(),
+			pageNum,
+			null,
+			stp
+		);
+
 		LOGGER.info("Anadida imagen al PDF antes de la firma"); //$NON-NLS-1$
 	}
 
