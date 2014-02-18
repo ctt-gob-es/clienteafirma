@@ -61,6 +61,7 @@ public final class CAPIKeyStoreManager extends AOKeyStoreManager {
 			                   final PasswordCallback pssCallBack,
 			                   final Object[] params) throws AOKeyStoreManagerException, IOException {
 		if (AOKeyStore.WINDOWS.equals(type)) {
+    		this.ksType = AOKeyStore.WINDOWS;
         	return initCAPI();
         }
 		throw new AOKeyStoreManagerException("Tipo de almacen no soportado: " + type.getName()); //$NON-NLS-1$

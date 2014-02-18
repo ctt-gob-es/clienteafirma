@@ -16,14 +16,14 @@ import org.junit.Test;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
-import es.gob.afirma.keystores.callbacks.CachePasswordCallback;
 
 /** Prueba simple de firma con PKCS#11.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class TestPkcs11 {
 
-	private static final String LIB_NAME = "C:\\WINDOWS\\System32\\DNIe_P11_priv.dll"; //$NON-NLS-1$
-	private static final char[] PIN = "xxxx".toCharArray(); //$NON-NLS-1$
+	//private static final String LIB_NAME = "C:\\WINDOWS\\System32\\DNIe_P11_priv.dll"; //$NON-NLS-1$
+	private static final String LIB_NAME = "C:\\WINDOWS\\SysWOW64\\siecap11.dll"; //$NON-NLS-1$
+	private static final char[] PIN = "1111".toCharArray(); //$NON-NLS-1$
 
 	/** Prueba de firma con PKCS#11.
 	 * @throws Exception */
@@ -35,12 +35,20 @@ public final class TestPkcs11 {
     		AOKeyStore.PKCS11,
     		LIB_NAME,
     		"Afirma-P11", //$NON-NLS-1$
-    		new CachePasswordCallback(PIN),
+    		AOKeyStore.PKCS11.getStorePasswordCallback(null),
     		null
 		);
+		String al = null;
 		for (final String alias : ksm.getAliases()) {
 			System.out.println(alias);
+			al = alias;
 		}
+
+		final Signature s = Signature.getInstance("SHA1withRSA"); //$NON-NLS-1$
+		s.initSign(ksm.getKeyEntry(al, AOKeyStore.PKCS11.getCertificatePasswordCallback(null)).getPrivateKey());
+		s.update("Hola".getBytes()); //$NON-NLS-1$
+		System.out.println("Firma: " + new String(s.sign())); //$NON-NLS-1$
+
 	}
 
 	/** Prueba de firma con PKCS#11 usando directamente JRE.
@@ -69,9 +77,9 @@ public final class TestPkcs11 {
 		final String alias = aliases.nextElement();
 		System.out.println("Alias para la firma: " + alias); //$NON-NLS-1$
 
-		final Signature s = Signature.getInstance("SHA1withRSA"); //$NON-NLS-1$
+		final Signature s = Signature.getInstance("SHA1withRSA", p); //$NON-NLS-1$
 		s.initSign(
-			((PrivateKeyEntry)ks.getEntry(alias, new KeyStore.PasswordProtection(PIN))).getPrivateKey()
+			((PrivateKeyEntry)ks.getEntry(alias, null)).getPrivateKey()
 		);
 		s.update("Hola".getBytes()); //$NON-NLS-1$
 		System.out.println("Firma: " + new String(s.sign())); //$NON-NLS-1$
@@ -103,7 +111,7 @@ public final class TestPkcs11 {
 	 * @param args
 	 * @throws Exception */
 	public static void main(final String args[]) throws Exception {
-		new TestPkcs11().testRawPkcs11();
+		new TestPkcs11().testPkcs11();
 	}
 
 }

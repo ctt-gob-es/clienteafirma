@@ -71,4 +71,33 @@ public class TestWindowsFriendlyNames {
        }
     }
 
+    public static void main(final String[] args) throws Exception {
+        Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
+        final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+        		KEYSTORE_TYPE,
+                null,
+               "Almacen Windows",  //$NON-NLS-1$
+               AOKeyStore.WINDOWS.getStorePasswordCallback(null),
+               null
+        );
+
+        System.out.println();
+
+        final String[] aliases = ksm.getAliases();
+		for (final String s : aliases) {
+			System.out.println(s);
+		}
+
+		for (int i=0;i<10;i++) {
+	           final Signature s = Signature.getInstance("SHA1withRSA"); //$NON-NLS-1$
+	           s.initSign(ksm.getKeyEntry(
+        		   "LUIS GONZALEZ ROMA - NIF:29999903Z - 35246954", //$NON-NLS-1$
+				   AOKeyStore.WINDOWS.getCertificatePasswordCallback(null)
+			   ).getPrivateKey());
+	           s.update("Hola".getBytes()); //$NON-NLS-1$
+	           System.out.println(AOUtil.hexify(s.sign(), true));
+		}
+
+	}
+
 }
