@@ -23,7 +23,8 @@ import java.util.logging.Logger;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.Base64;
-import es.gob.afirma.core.misc.UrlHttpManagerImpl;
+import es.gob.afirma.core.misc.UrlHttpManager;
+import es.gob.afirma.core.misc.UrlHttpManagerFactory;
 import es.gob.afirma.core.signers.AOPkcs1Signer;
 import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
@@ -252,6 +253,7 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 			throw new IllegalArgumentException("Error al interpretar los datos como identificador del documento que desea firmar", e); //$NON-NLS-1$
 		}
 
+		final UrlHttpManager urlManager = UrlHttpManagerFactory.getInstalledManager();
 
 		// ---------
 		// PREFIRMA
@@ -283,13 +285,14 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 				append(properties2Base64(extraParams));
 			}
 
-			preSignResult = UrlHttpManagerImpl.readUrlByPost(urlBuffer.toString());
+			preSignResult = urlManager.readUrlByPost(urlBuffer.toString());
 			urlBuffer.setLength(0);
 		}
 		catch (final CertificateEncodingException e) {
 			throw new AOException("Error decodificando el certificado del firmante: " + e, e); //$NON-NLS-1$
 		}
 		catch (final IOException e) {
+			e.printStackTrace();
 			throw new AOException("Error en la llamada de prefirma al servidor: " + e, e); //$NON-NLS-1$
 		}
 
@@ -380,7 +383,7 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 				urlBuffer.append(HTTP_AND).append(PARAMETER_NAME_DOCID).append(HTTP_EQUALS).append(documentId);
 			}
 
-			triSignFinalResult = UrlHttpManagerImpl.readUrlByPost(urlBuffer.toString());
+			triSignFinalResult = urlManager.readUrlByPost(urlBuffer.toString());
 			urlBuffer.setLength(0);
 		}
 		catch (final CertificateEncodingException e) {
