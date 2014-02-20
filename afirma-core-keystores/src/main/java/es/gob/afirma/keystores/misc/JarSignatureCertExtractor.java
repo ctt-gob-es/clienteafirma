@@ -218,11 +218,11 @@ public final class JarSignatureCertExtractor {
 			try {
 				checkCertChain(certs, getJavaCaKeyStore(systemsCaCertFile));
 				// Si no salta excepcion, salimos, porque ha validado y no hay que hacer nada
-				LOGGER.info("Los certificados de firma del JAR son de confianza en Java"); //$NON-NLS-1$
+				LOGGER.warning("Los certificados de firma del JAR son de confianza en Java"); //$NON-NLS-1$
 				return;
 			}
 			catch (final Exception e) {
-				LOGGER.info("Error en la validacion de los certificados contra el almacen de Java"); //$NON-NLS-1$
+				LOGGER.warning("Error en la validacion de los certificados contra el almacen de Java"); //$NON-NLS-1$
 				// Si falla continuamos con el almacen de confianza del usuario
 			}
 		}
@@ -244,7 +244,13 @@ public final class JarSignatureCertExtractor {
 			LOGGER.info("Creamos el truststore ya que no existia previamente"); //$NON-NLS-1$
 		}
 		else {
-			usersTruststore = getJavaCaKeyStore(usersCaCertFile);
+			try {
+				usersTruststore = getJavaCaKeyStore(usersCaCertFile);
+			}
+			catch (Exception e) {
+				LOGGER.warning("No se ha podido cargar el almacen de certificados de CA de confianza del usuario, no se agregara el certificado: " + e); //$NON-NLS-1$
+				return;
+			}
 		}
 		
 		// Comprobamos si el extremo de la cadena es de confianza o no
