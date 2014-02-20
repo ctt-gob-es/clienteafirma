@@ -14,10 +14,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
+import java.net.Proxy;
 import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
+import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
@@ -31,13 +34,9 @@ import javax.net.ssl.X509TrustManager;
 
 /** Clase para la lectura y env&iacute;o de datos a URL remotas.
  * @author Carlos Gamuci */
-public final class UrlHttpManagerImpl {
+final class UrlHttpManagerImpl implements UrlHttpManager {
 
 	private static final int DEFAULT_TIMEOUT = -1;
-	
-	private UrlHttpManagerImpl() {
-		// No permitimos la instanciacion
-	}
 
 	private static final String HTTPS = "https"; //$NON-NLS-1$
 
@@ -63,7 +62,8 @@ public final class UrlHttpManagerImpl {
 	 * @param url URL a leer
 	 * @return Contenido de la URL
 	 * @throws IOException Si no se puede leer la URL */
-	public static byte[] readUrlByPost(final String url) throws IOException {
+	@Override
+	public byte[] readUrlByPost(final String url) throws IOException {
 		return readUrlByPost(url, DEFAULT_TIMEOUT);
 	}
 
@@ -74,7 +74,8 @@ public final class UrlHttpManagerImpl {
 	 * se interpreta como un timeout infinito. Si se indica -1, se usar&aacute; el por defecto de Java.
 	 * @return Contenido de la URL
 	 * @throws IOException Si no se puede leer la URL */
-	public static byte[] readUrlByPost(final String url, final int timeout) throws IOException {
+	@Override
+	public byte[] readUrlByPost(final String url, final int timeout) throws IOException {
 		if (url == null) {
 			throw new IllegalArgumentException("La URL a leer no puede ser nula"); //$NON-NLS-1$
 		}
@@ -101,20 +102,26 @@ public final class UrlHttpManagerImpl {
 			}
 		}
 
-		final HttpURLConnection conn = (HttpURLConnection) uri.openConnection();
+		final HttpURLConnection conn = (HttpURLConnection) uri.openConnection(Proxy.NO_PROXY);
 		conn.setRequestMethod("POST"); //$NON-NLS-1$
+		
+		conn.addRequestProperty("Accept", "*/*");
+		conn.addRequestProperty("Connection", "keep-alive");
+		conn.addRequestProperty("Content-type", "application/x-www-form-urlencoded");
+		conn.addRequestProperty("Host", uri.getHost());
+		conn.addRequestProperty("Origin", uri.getProtocol() +  "://" + uri.getHost());
+		
 		if (timeout != DEFAULT_TIMEOUT) {
 			conn.setConnectTimeout(timeout);
 			conn.setReadTimeout(timeout);
 		}
 
-		conn.setDoOutput(true);
-
 		final OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
 
 		writer.write(urlParameters);
 		writer.flush();
-
+		writer.close();
+		
 		final InputStream is = conn.getInputStream();
 		final byte[] data = AOUtil.getDataFromInputStream(is);
 		is.close();
@@ -130,7 +137,8 @@ public final class UrlHttpManagerImpl {
 	 * @param url URL a leer
 	 * @return Contenido de la URL
 	 * @throws IOException Si no se puede leer la URL */
-	public static byte[] readUrlByGet(final String url) throws IOException {
+	@Override
+	public byte[] readUrlByGet(final String url) throws IOException {
 		final URL uri = new URL(url);
 		if (uri.getProtocol().equals("https")) { //$NON-NLS-1$
 			try {
