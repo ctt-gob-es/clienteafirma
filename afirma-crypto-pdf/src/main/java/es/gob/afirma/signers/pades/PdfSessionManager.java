@@ -452,12 +452,12 @@ public final class PdfSessionManager {
 				);
 
 				font = com.lowagie.text.Font.class
-					.getConstructor(Integer.TYPE, Integer.TYPE, Integer.TYPE, colorClass)
+					.getConstructor(Integer.TYPE, Float.TYPE, Integer.TYPE, colorClass)
 						.newInstance(
 							// Family (COURIER = 0, HELVETICA = 1, TIMES_ROMAN = 2, SYMBOL = 3, ZAPFDINGBATS = 4)
 							Integer.valueOf(layer2FontFamily == UNDEFINED ? COURIER : layer2FontFamily),
 							// Size (DEFAULTSIZE = 12)
-							Integer.valueOf(layer2FontSize == UNDEFINED ? DEFAULT_LAYER_2_FONT_SIZE : layer2FontSize),
+							Float.valueOf(layer2FontSize == UNDEFINED ? DEFAULT_LAYER_2_FONT_SIZE : layer2FontSize),
 							// Style (NORMAL = 0, BOLD = 1, ITALIC = 2, BOLDITALIC = 3, UNDERLINE = 4, STRIKETHRU = 8)
 							Integer.valueOf(layer2FontStyle == UNDEFINED ? com.lowagie.text.Font.NORMAL : layer2FontStyle),
 							// Color
