@@ -156,7 +156,7 @@ final class Utils {
     }
 
     /** Asigna la clave para firmar el contenido del fichero que queremos
-     * envolver y qeu m&aacute;s tarde ser&aacute; cifrada con la clave
+     * envolver y que m&aacute;s tarde ser&aacute; cifrada con la clave
      * p&uacute;blica del usuario que hace la firma.
      * @param config configuraci&oacute;n necesaria para crear la clave */
     private static SecretKey assignKey(final AOCipherConfig config, final Integer keySize) throws NoSuchAlgorithmException {
