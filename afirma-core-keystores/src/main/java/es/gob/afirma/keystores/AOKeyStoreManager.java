@@ -58,7 +58,10 @@ public class AOKeyStoreManager {
     }
 
     /** Tipo de almac&eacute;n. */
-    protected AOKeyStore ksType;
+    private AOKeyStore ksType;
+    protected void setKeyStoreType(final AOKeyStore type) {
+    	this.ksType = type;
+    }
 
     /** Devuelve el tipo de almac&eacute;n de claves.
      * @return Tipo de almac&eacute;n de claves */

@@ -40,7 +40,7 @@ import es.gob.afirma.core.signers.CounterSignTarget;
  * hashes), seg&uacute;n el objetivo establecido el m&oacute;dulo se
  * comporta&aacute; de una forma u otra, devolviendo el resultado de forma
  * acorde con el objetivo establecido. */
-public class DirectorySignatureHelper {
+public final class DirectorySignatureHelper {
 
     private static final String MODE_KEY = "mode"; //$NON-NLS-1$
     private static final String FORMAT_KEY = "format"; //$NON-NLS-1$
@@ -1121,11 +1121,9 @@ public class DirectorySignatureHelper {
     public void setLogPath(final String path) {
         this.logPath = path == null || path.trim().length() == 0 ? null : path;
 	}
-	
-    /**
-     * 
-     * @param os
-     */
+
+    /** Esteblece el manejador de registro.
+     * @param handler Manejador de registro */
 	public void setLogHandler(final LogHandler handler) {
 		this.logHandler = handler;
 	}
@@ -1213,7 +1211,7 @@ public class DirectorySignatureHelper {
             if (this.logHandler != null) {
             	try {
 					this.logHandler.addLog(typeLog.intValue(), msg, inputData, outputSign);
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					LOGGER.warning("No se ha podido insertar un registro en el log de la operacion: " + msg + ": " + e.toString()); //$NON-NLS-1$ //$NON-NLS-2$
 				}
             }
@@ -1237,11 +1235,11 @@ public class DirectorySignatureHelper {
     private void closeLogRegistry() {
 
         if (this.logHandler != null) {
-        	
+
         	final Properties params = new Properties();
     		params.setProperty("warningsCount", Integer.toString(this.warnCount)); //$NON-NLS-1$
     		params.setProperty("errorsCount", Integer.toString(this.errorCount)); //$NON-NLS-1$
-    		
+
         	try {
                 this.logHandler.close(params);
             }
