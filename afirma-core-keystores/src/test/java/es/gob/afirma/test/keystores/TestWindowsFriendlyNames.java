@@ -71,6 +71,9 @@ public class TestWindowsFriendlyNames {
        }
     }
 
+    /** Main.
+     * @param args
+     * @throws Exception */
     public static void main(final String[] args) throws Exception {
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
         final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
