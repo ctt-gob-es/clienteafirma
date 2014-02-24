@@ -19,8 +19,6 @@ import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
-import java.util.List;
-import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
@@ -34,7 +32,7 @@ import javax.net.ssl.X509TrustManager;
 
 /** Clase para la lectura y env&iacute;o de datos a URL remotas.
  * @author Carlos Gamuci */
-final class UrlHttpManagerImpl implements UrlHttpManager {
+public final class UrlHttpManagerImpl implements UrlHttpManager {
 
 	private static final int DEFAULT_TIMEOUT = -1;
 
@@ -42,6 +40,10 @@ final class UrlHttpManagerImpl implements UrlHttpManager {
 
 	private static final HostnameVerifier DEFAULT_HOSTNAME_VERIFIER = HttpsURLConnection.getDefaultHostnameVerifier();
 	private static final SSLSocketFactory DEFAULT_SSL_SOCKET_FACTORY = HttpsURLConnection.getDefaultSSLSocketFactory();
+
+	UrlHttpManagerImpl() {
+		// Instanciacion "default"
+	}
 
 	private static final TrustManager[] DUMMY_TRUST_MANAGER = new TrustManager[] {
 		new X509TrustManager() {
@@ -104,13 +106,13 @@ final class UrlHttpManagerImpl implements UrlHttpManager {
 
 		final HttpURLConnection conn = (HttpURLConnection) uri.openConnection(Proxy.NO_PROXY);
 		conn.setRequestMethod("POST"); //$NON-NLS-1$
-		
-		conn.addRequestProperty("Accept", "*/*");
-		conn.addRequestProperty("Connection", "keep-alive");
-		conn.addRequestProperty("Content-type", "application/x-www-form-urlencoded");
-		conn.addRequestProperty("Host", uri.getHost());
-		conn.addRequestProperty("Origin", uri.getProtocol() +  "://" + uri.getHost());
-		
+
+		conn.addRequestProperty("Accept", "*/*"); //$NON-NLS-1$ //$NON-NLS-2$
+		conn.addRequestProperty("Connection", "keep-alive"); //$NON-NLS-1$ //$NON-NLS-2$
+		conn.addRequestProperty("Content-type", "application/x-www-form-urlencoded"); //$NON-NLS-1$ //$NON-NLS-2$
+		conn.addRequestProperty("Host", uri.getHost()); //$NON-NLS-1$
+		conn.addRequestProperty("Origin", uri.getProtocol() +  "://" + uri.getHost()); //$NON-NLS-1$ //$NON-NLS-2$
+
 		if (timeout != DEFAULT_TIMEOUT) {
 			conn.setConnectTimeout(timeout);
 			conn.setReadTimeout(timeout);
@@ -121,7 +123,7 @@ final class UrlHttpManagerImpl implements UrlHttpManager {
 		writer.write(urlParameters);
 		writer.flush();
 		writer.close();
-		
+
 		final InputStream is = conn.getInputStream();
 		final byte[] data = AOUtil.getDataFromInputStream(is);
 		is.close();
@@ -132,7 +134,7 @@ final class UrlHttpManagerImpl implements UrlHttpManager {
 
 		return data;
 	}
-	
+
 	/** Lee una URL HTTP o HTTPS por GET. En HTTPS no se hacen comprobaciones del certificado servidor.
 	 * @param url URL a leer
 	 * @return Contenido de la URL
