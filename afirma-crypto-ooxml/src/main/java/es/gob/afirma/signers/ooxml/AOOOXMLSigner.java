@@ -238,7 +238,6 @@ public final class AOOOXMLSigner implements AOSigner {
 
         return signOOXML(
     		data,
-    		OOXMLUtil.countOOXMLSignatures(data) + 1,
     		algorithm,
     		key,
     		(X509Certificate[]) certChain,
@@ -315,7 +314,6 @@ public final class AOOOXMLSigner implements AOSigner {
 
     /** Agrega una firma electr&oacute;nica a un documento OOXML.
      * @param ooxmlDocument Documento OOXML.
-     * @param signNum N&uacute;mero de la firma que se va a realizar
      * @param algorithm Algoritmo de firma
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
      * <ul>
@@ -333,7 +331,6 @@ public final class AOOOXMLSigner implements AOSigner {
      * @return Documento OOXML firmado
      * @throws AOException Cuando ocurre alg&uacute;n error durante el proceso de firma */
     private static byte[] signOOXML(final byte[] ooXmlDocument,
-                                    final int signNum,
                                     final String algorithm,
                                     final PrivateKey key,
                                     final X509Certificate[] certChain,
