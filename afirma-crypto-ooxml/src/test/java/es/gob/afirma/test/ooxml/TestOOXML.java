@@ -210,6 +210,11 @@ public final class TestOOXML {
 
 	                checkSign(signer, sign2, prueba);
 
+	                final OutputStream fos = new FileOutputStream(File.createTempFile("OOXML_", ".docx")); //$NON-NLS-1$ //$NON-NLS-2$
+	                fos.write(sign2);
+	                fos.flush();
+	                fos.close();
+
 	                // Cofirma indicando los datos
 	                final byte[] sign3 = cosign(signer, data, sign2, algo, pke3, extraParams);
 	                Assert.assertNotNull(sign3);
