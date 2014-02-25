@@ -10,10 +10,10 @@ public interface LogHandler {
 	static final int LEVEL_INFO = 800;
 
 	/** Nivel de registro de advertencias. */
-	static final int LEVEL_WARNING = 900;
+	final int LEVEL_WARNING = 900;
 
 	/** Nivel de registro de errores. */
-	static final int LEVEL_SEVERE = 1000;
+	final int LEVEL_SEVERE = 1000;
 
 	/** Da por finalizado el registro, a&ntilde;adiendo como pie de este las propiedades indicadas.
 	 * @param params Propiedades a a&ntilde;adir en el pie del regitro al cierre de este
