@@ -66,10 +66,10 @@ public final class CAdESTriPhaseCounterSigner {
 	/** Resultado de un conjunto de PreContraFirmas CAdES. */
 	public static final class CAdESPreCounterSignResult {
 
-		private final ArrayList<byte[]> preSigns;
+		private final List<byte[]> preSigns;
 		private final byte[] sign;
 
-		CAdESPreCounterSignResult(final byte[] s, final ArrayList<byte[]> sDatas) {
+		CAdESPreCounterSignResult(final byte[] s, final List<byte[]> sDatas) {
 			this.preSigns = sDatas;
 			this.sign = s.clone();
 		}
@@ -87,7 +87,7 @@ public final class CAdESTriPhaseCounterSigner {
 		 * firmarse con el certificado correcto.
 		 * @return Listado de prefirmas.
 		 */
-		public ArrayList<byte[]> getPreSigns() {
+		public List<byte[]> getPreSigns() {
 			return this.preSigns;
 		}
 	}
@@ -99,7 +99,7 @@ public final class CAdESTriPhaseCounterSigner {
 	private int counterIndex = 0;
 
 	/** Lista de <i>SignedAttributes</i> de las contrafirmas de la firma ordenados por n&uacute;mero de contrafirma dentro de la firma. */
-	private ArrayList<byte[]> signedDatas = new ArrayList<byte[]>();
+	private List<byte[]> signedDatas = new ArrayList<byte[]>();
 
     /** Crea una contrafirma a partir de los datos
      * del firmante, el archivo que se firma y del archivo que contiene las
