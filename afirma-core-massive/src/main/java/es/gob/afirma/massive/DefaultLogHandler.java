@@ -7,7 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /** Gestor de registro por defecto para la firma masiva, en un fichero de texto. */
-final class DefaultLogHandler implements LogHandler {
+final class DefaultLogHandler extends LogHandler {
 
 	private final OutputStream os;
 
