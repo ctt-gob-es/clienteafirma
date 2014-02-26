@@ -220,6 +220,13 @@ final class OOXMLPackageObjectHelper {
 		addParts(fac, "application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml", manifestReferences, ooXmlDocument); //$NON-NLS-1$
 		addParts(fac, "application/vnd.openxmlformats-officedocument.theme+xml", manifestReferences, ooXmlDocument); //$NON-NLS-1$
 		addParts(fac, "application/vnd.openxmlformats-officedocument.wordprocessingml.webSettings+xml", manifestReferences, ooXmlDocument); //$NON-NLS-1$
+		addParts(fac, "application/vnd.openxmlformats-officedocument.wordprocessingml.footnotes+xml", manifestReferences, ooXmlDocument); //$NON-NLS-1$
+		addParts(fac, "application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml", manifestReferences, ooXmlDocument); //$NON-NLS-1$
+		addParts(fac, "application/vnd.openxmlformats-officedocument.wordprocessingml.endnotes+xml", manifestReferences, ooXmlDocument); //$NON-NLS-1$
+		addParts(fac, "application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml", manifestReferences, ooXmlDocument); //$NON-NLS-1$
+		addParts(fac, "application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml", manifestReferences, ooXmlDocument); //$NON-NLS-1$
+		addParts(fac, "application/vnd.ms-word.stylesWithEffects+xml", manifestReferences, ooXmlDocument); //$NON-NLS-1$
+		addParts(fac, "application/vnd.openxmlformats-officedocument.oleObject", manifestReferences, ooXmlDocument); //$NON-NLS-1$
 
 		// Powerpoint
 		addParts(fac, "application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml", manifestReferences, ooXmlDocument); //$NON-NLS-1$
