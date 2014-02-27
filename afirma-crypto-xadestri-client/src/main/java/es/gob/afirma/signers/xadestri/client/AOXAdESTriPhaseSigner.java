@@ -292,7 +292,6 @@ public final class AOXAdESTriPhaseSigner implements AOSigner {
 			throw new AOException("Error decodificando el certificado del firmante: " + e, e); //$NON-NLS-1$
 		}
 		catch (final IOException e) {
-			e.printStackTrace();
 			throw new AOException("Error en la llamada de prefirma al servidor: " + e, e); //$NON-NLS-1$
 		}
 
