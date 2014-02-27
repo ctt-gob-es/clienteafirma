@@ -11,14 +11,14 @@
  <dl>
    <dt><b><i>includeOnlySignningCertificate</i></b></dt>
 	<dd>
-	 Si se establece a {@code true} se incluye en la firma &uacute;nicamente el certificado del firmante (y no la cadena de certificaci&oacute;n completa).
-	 Si no se establece o se establece a o {@code false} se incluir&aacute; toda la cadena de certificaci&oacute;n.
+	 Si se establece a <code>true</code> se incluye en la firma &uacute;nicamente el certificado del firmante (y no la cadena de certificaci&oacute;n completa).
+	 Si no se establece o se establece a <code>false</code> se incluir&aacute; toda la cadena de certificaci&oacute;n.
 	</dd>
    <dt><b><i>mode</i></b></dt>
     <dd>
      Modo de firma a usar. El valor <code>explicit</code> indica que no se incluyen los datos firmados, sino una
      referencia a estos, mientras que el valor <code>implicit</code> indica que s&iacute; se incluir&aacute;n dentro de
-     la propia firma los datos firmados
+     la propia firma los datos firmados.
     </dd>
    <dt><b><i>policyIdentifier</i></b></dt>
     <dd>
@@ -30,7 +30,7 @@
      Huella digital del documento de pol&iacute;tica de firma (normalmente del mismo fichero en formato ASN.1 procesable).
      Si no se indica una huella digital y el par&aacute;metro <code>policyIdentifier</code> no es una URL accesible
      universalmente se usar&aacute; <code>0</code>, mientras que si no se indica una huella digital pero el par&aacute;metro
-     <code>policyIdentifier</code> es una URL accesible universalmente, se descargara el fichero apuntado por la URL para calcular la huella
+     <code>policyIdentifier</code> es una URL accesible universalmente, se descargar&aacute; el fichero apuntado por la URL para calcular la huella
      digital <i>al vuelo</i>.
     </dd>
    <dt><b><i>policyIdentifierHashAlgorithm</i></b></dt>
