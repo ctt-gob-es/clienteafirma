@@ -64,6 +64,7 @@ final class CAdESCounterSignerEnveloped {
 
     /* Propiedades de la clase */
     private int actualIndex = 0;
+
     private ASN1Set signedAttr2;
 
     private AdESPolicy globalPolicy;
@@ -140,8 +141,8 @@ final class CAdESCounterSignerEnveloped {
                                 final String contentType,
                                 final String contentDescription) throws IOException, NoSuchAlgorithmException, CertificateException, AOException {
 
-        // Introducimos la pol&iacute;tica en variable global por comodidad.
-        // &Eacute;sta no var&iacute;a.
+        // Introducimos la politica en variable global por comodidad.
+        // Esta no varia.
         this.setGlobalPolicy(policy);
         this.setGlobalsigningCertificateV2(signingCertificateV2);
 
@@ -578,10 +579,6 @@ final class CAdESCounterSignerEnveloped {
                             );
                 }
                 else {
-                    // Esta sentencia se comenta para que no se firme el nodo
-                    // actual cuando no sea hoja
-                    // signerInfosU.add(generateSignerInfo(parameters, cert,
-                    // signerInfo, keyEntry));
                     final Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU));
                     counterSigner =
                             new SignerInfo(signerInfo.getSID(),
@@ -850,10 +847,6 @@ final class CAdESCounterSignerEnveloped {
                             );
                 }
                 else {
-                    // Esta sentencia se comenta para que no se firme el nodo
-                    // actual cuando no sea hoja
-                    // signerInfosU.add(generateSignerInfo(parameters, cert,
-                    // signerInfo, keyEntry));
                     counterSigner =
                             new SignerInfo(signerInfo.getSID(),
                                            signerInfo.getDigestAlgorithm(),
@@ -1006,10 +999,6 @@ final class CAdESCounterSignerEnveloped {
                             );
                 }
                 else {
-                    // Esta sentencia se comenta para que no se firme el nodo
-                    // actual cuando no sea hoja
-                    // signerInfosU.add(generateSignerInfo(parameters, cert,
-                    // signerInfo, keyEntry));
                     counterSigner =
                             new SignerInfo(signerInfo.getSID(),
                                            signerInfo.getDigestAlgorithm(),
