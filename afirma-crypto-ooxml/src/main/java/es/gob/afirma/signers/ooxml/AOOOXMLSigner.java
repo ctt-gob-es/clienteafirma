@@ -29,9 +29,7 @@ import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.util.tree.AOTreeModel;
-import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.ooxml.relprovider.OOXMLProvider;
-import es.gob.afirma.signers.xades.AOXAdESSigner;
 
 /** Manejador de firmas electr&oacute;nicas XML de documentos OOXML de Microsoft Office. */
 public final class AOOOXMLSigner implements AOSigner {
@@ -112,9 +110,6 @@ public final class AOOOXMLSigner implements AOSigner {
             return inTextInt + EXTENSION_OOXML;
         }
         final String originalNameLC = originalName.toLowerCase();
-        if (originalNameLC.length() <= 4) {
-            return originalName + inTextInt + EXTENSION_OOXML;
-        }
         if (originalNameLC.endsWith(EXTENSION_DOCX)) {
             return originalName.substring(0, originalName.length() - EXTENSION_DOCX.length()) + inTextInt + EXTENSION_DOCX;
         }
@@ -133,41 +128,7 @@ public final class AOOOXMLSigner implements AOSigner {
     /** { {@inheritDoc} */
     @Override
 	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) throws IOException {
-        if (sign == null) {
-            throw new IllegalArgumentException("Los datos de firma introducidos son nulos"); //$NON-NLS-1$
-        }
-
-        if (!isSign(sign)) {
-            LOGGER.severe("La firma indicada no es de tipo OOXML"); //$NON-NLS-1$
-            return null;
-        }
-
-        // Las firmas contenidas en el documento OOXML son de tipo XMLdSig asi
-        // que utilizaremos el
-        // signer de este tipo para gestionar el arbol de firmas
-        final AOSigner xmldsigSigner = new AOXAdESSigner();
-
-        // Recuperamos las firmas individuales del documento y creamos el arbol
-        final AOTreeNode tree = new AOTreeNode("Datos"); //$NON-NLS-1$
-        try {
-            for (final byte[] elementSign : OOXMLUtil.getOOXMLSignatures(sign)) {
-
-                // Recuperamos el arbol de firmas de la firma individual. Ya que
-                // esta sera una firma simple
-                // solo debe contener un nodo de firma. Ignoramos la raiz del
-                // arbol, que contiene
-                // el ejemplo representativo de los datos firmados y no de la
-                // propia firma.
-                final AOTreeModel signTree = xmldsigSigner.getSignersStructure(elementSign, asSimpleSignInfo);
-                tree.add(((AOTreeNode) signTree.getRoot()).getChildAt(0));
-            }
-        }
-        catch (final Exception e) {
-            LOGGER.severe("La estructura de una de las firmas elementales no es valida: " + e); //$NON-NLS-1$
-            return null;
-        }
-
-        return new AOTreeModel(tree);
+    	throw new UnsupportedOperationException();
     }
 
     /** Indica si los datos indicados son un documento OOXML susceptible de contener una firma
