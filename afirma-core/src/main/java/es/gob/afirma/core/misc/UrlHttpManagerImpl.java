@@ -118,6 +118,8 @@ public final class UrlHttpManagerImpl implements UrlHttpManager {
 			conn.setReadTimeout(timeout);
 		}
 
+		conn.setDoOutput(true);
+		
 		final OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
 
 		writer.write(urlParameters);
