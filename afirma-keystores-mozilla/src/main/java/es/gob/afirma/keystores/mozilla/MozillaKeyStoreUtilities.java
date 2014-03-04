@@ -44,6 +44,10 @@ final class MozillaKeyStoreUtilities {
 
 	private static final String SOFTOKN3_SO = "libsoftokn3.so"; //$NON-NLS-1$
 
+	private static final String AFIRMA_NSS_HOME = "AFIRMA_NSS_HOME"; //$NON-NLS-1$
+
+	private static final String AFIRMA_PROFILE_HOME = "AFIRMA_PROFILE_HOME"; //$NON-NLS-1$
+
 	private MozillaKeyStoreUtilities() {
 		// No permitimos la instanciacion
 	}
@@ -265,19 +269,19 @@ final class MozillaKeyStoreUtilities {
 
 		// Primero probamos con la variable de entorno, que es comun a todos los sistemas operativos
 		try {
-			nssLibDir = System.getenv("NSS_HOME"); //$NON-NLS-1$
+			nssLibDir = System.getenv(AFIRMA_NSS_HOME);
 		}
 		catch(final Exception e) {
-			LOGGER.warning("No se tiene acceso a la variable de entorno 'NSS_HOME': " + e); //$NON-NLS-1$
+			LOGGER.warning("No se tiene acceso a la variable de entorno '" + AFIRMA_NSS_HOME + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		if (nssLibDir != null) {
 			final File nssDir = new File(nssLibDir);
 			if (nssDir.isDirectory() && nssDir.canRead()) {
-				LOGGER.info("Directorio de NSS determinado a partir de la variable de entorno 'NSS_HOME'"); //$NON-NLS-1$
+				LOGGER.info("Directorio de NSS determinado a partir de la variable de entorno '" + AFIRMA_NSS_HOME + "'"); //$NON-NLS-1$ //$NON-NLS-2$
 				return nssLibDir;
 			}
 			LOGGER.warning(
-				"La variable de entorno 'NSS_HOME' apunta a un directorio que no existe o sobre el que no se tienen permisos de lectura, se ignorara" //$NON-NLS-1$
+				"La variable de entorno '" + AFIRMA_NSS_HOME + "' apunta a un directorio que no existe o sobre el que no se tienen permisos de lectura, se ignorara" //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
 
@@ -570,21 +574,23 @@ final class MozillaKeyStoreUtilities {
 	static String getMozillaUserProfileDirectory() {
 
 		String profileDir = null;
-		// Miramos primero la variable de entorno 'PROFILE_HOME', que es comun a todos los sistemas operativos
+		// Miramos primero la variable de entorno 'AFIRMA_PROFILE_HOME'
 		try {
-			profileDir = System.getenv("PROFILE_HOME"); //$NON-NLS-1$
+			profileDir = System.getenv(AFIRMA_PROFILE_HOME);
 		}
 		catch(final Exception e) {
-			LOGGER.warning("No se tiene acceso a la variable de entorno 'PROFILE_HOME': " + e); //$NON-NLS-1$
+			LOGGER.warning("No se tiene acceso a la variable de entorno '" + AFIRMA_PROFILE_HOME + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		if (profileDir != null) {
 			final File nssDir = new File(profileDir);
 			if (nssDir.isDirectory() && nssDir.canRead()) {
-				LOGGER.info("Directorio de perfil de usuario Firefox determinado a partir de la variable de entorno 'PROFILE_HOME'"); //$NON-NLS-1$
+				LOGGER.info(
+					"Directorio de perfil de usuario Firefox determinado a partir de la variable de entorno '" + AFIRMA_PROFILE_HOME + "'" //$NON-NLS-1$ //$NON-NLS-2$
+				);
 				return profileDir;
 			}
 			LOGGER.warning(
-				"La variable de entorno 'PROFILE_HOME' apunta a un directorio que no existe o sobre el que no se tienen permisos de lectura, se ignorara" //$NON-NLS-1$
+				"La variable de entorno '" + AFIRMA_PROFILE_HOME + "' apunta a un directorio que no existe o sobre el que no se tienen permisos de lectura, se ignorara" //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
 
