@@ -69,12 +69,21 @@ final class OOXMLPackageObjectHelper {
 
 		return fac.newXMLObject(objectContent, nodeId, null, null);
 	}
+	
+	private static boolean startsWithAnyOfThose(final String in, final String[] prefixes) {
+		for (final String prefix : prefixes) {
+			if (in.startsWith(prefix)) {
+				return true;
+			}
+		}
+		return false;
+	}
 
     private static void addParts(final XMLSignatureFactory fac,
     		                     final ContentTypeManager contentTypeManager,
     		                     final List<Reference> references,
     		                     final byte[] ooXmlDocument,
-    		                     final String application,
+    		                     final String[] applications,
     		                     final DigestMethod digestMethod) throws IOException {
     	final ZipInputStream zipInputStream = new ZipInputStream(
     			new ByteArrayInputStream(
@@ -83,7 +92,7 @@ final class OOXMLPackageObjectHelper {
 
     	ZipEntry zipEntry;
     	while (null != (zipEntry = zipInputStream.getNextEntry())) {
-    		if (!zipEntry.getName().startsWith(application.toString())) {
+    		if (!startsWithAnyOfThose(zipEntry.getName(), applications)) {
     			continue;
     		}
 
@@ -207,9 +216,7 @@ final class OOXMLPackageObjectHelper {
     	final InputStream contentXml = getContentTypesXMLInputStream(ooXmlDocument);
     	final ContentTypeManager contentTypeManager = new ContentTypeManager(contentXml);
 
-    	for (final String app : CONTENT_DIRS) {
-    		addParts(fac, contentTypeManager, manifestReferences, ooXmlDocument, app, digestMethod);
-    	}
+		addParts(fac, contentTypeManager, manifestReferences, ooXmlDocument, CONTENT_DIRS, digestMethod);
 
 		contentXml.close();
 		return fac.newManifest(manifestReferences);
