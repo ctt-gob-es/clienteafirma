@@ -66,9 +66,6 @@ public final class OOXMLURIDereferencer implements URIDereferencer {
             throw new IllegalArgumentException("El OOXML es nulo"); //$NON-NLS-1$
         }
         this.baseUriDereferencer = XMLSignatureFactory.getInstance().getURIDereferencer();
-        Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
-    		"Para URI normales se usara el dereferenciador: " + this.baseUriDereferencer.getClass().getName() //$NON-NLS-1$
-		);
         this.ooxml = ooxml.clone();
     }
 
