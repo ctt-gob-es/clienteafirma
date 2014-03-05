@@ -122,14 +122,17 @@ public class ContentTypeManager {
 	 * @return ContentType definido para ese fichero.
 	 */
 	protected String getContentType(String partName) {
+		String partNameFix;
 		if (!partName.startsWith("/"))
-			partName = "/" + partName;
+			partNameFix = "/".concat(partName);
+		else
+			partNameFix = partName;
 		
-		if (this.overrideContentTypes.containsKey(partName)) {
-			return this.overrideContentTypes.get(partName);
+		if (this.overrideContentTypes.containsKey(partNameFix)) {
+			return this.overrideContentTypes.get(partNameFix);
 		}
 		
-		final String ext = getExtension(partName);
+		final String ext = getExtension(partNameFix);
 		if (ext != null && this.defaultContentTypes.containsKey(ext)) {
 			return this.defaultContentTypes.get(ext);
 		}
