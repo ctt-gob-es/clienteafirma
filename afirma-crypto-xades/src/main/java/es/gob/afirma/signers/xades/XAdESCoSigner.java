@@ -175,10 +175,18 @@ public final class XAdESCoSigner {
 
 		final Properties extraParams = xParams != null ? xParams: new Properties();
 
-		final String digestMethodAlgorithm = extraParams.getProperty("referencesDigestMethod", DIGEST_METHOD); //$NON-NLS-1$
-		final String canonicalizationAlgorithm = extraParams.getProperty("canonicalizationAlgorithm", CanonicalizationMethod.INCLUSIVE); //$NON-NLS-1$
-		final String xadesNamespace = extraParams.getProperty("xadesNamespace", XADESNS); //$NON-NLS-1$
-		final String signedPropertiesTypeUrl = extraParams.getProperty("signedPropertiesTypeUrl", XADES_SIGNED_PROPERTIES_TYPE); //$NON-NLS-1$
+		final String digestMethodAlgorithm = extraParams.getProperty(
+				"referencesDigestMethod", DIGEST_METHOD); //$NON-NLS-1$
+		final String canonicalizationAlgorithm = extraParams.getProperty(
+				"canonicalizationAlgorithm", CanonicalizationMethod.INCLUSIVE); //$NON-NLS-1$
+		final String xadesNamespace = extraParams.getProperty(
+				"xadesNamespace", XADESNS); //$NON-NLS-1$
+		final String signedPropertiesTypeUrl = extraParams.getProperty(
+				"signedPropertiesTypeUrl", XADES_SIGNED_PROPERTIES_TYPE); //$NON-NLS-1$
+		final boolean addKeyInfoKeyValue = Boolean.parseBoolean(extraParams.getProperty(
+				"addKeyInfoKeyValue", Boolean.FALSE.toString())); //$NON-NLS-1$
+		final boolean addKeyInfoKeyName = Boolean.parseBoolean(extraParams.getProperty(
+				"addKeyInfoKeyName", Boolean.FALSE.toString())); //$NON-NLS-1$
 
 		String mimeType = extraParams.getProperty("mimeType"); //$NON-NLS-1$
 		String encoding = extraParams.getProperty("encoding"); //$NON-NLS-1$
@@ -216,7 +224,7 @@ public final class XAdESCoSigner {
 		}
 
 		final XMLSignatureFactory fac = Utils.getDOMFactory();
-		
+
 		final DigestMethod digestMethod;
 		try {
 			digestMethod = fac.newDigestMethod(digestMethodAlgorithm, null);
@@ -514,12 +522,14 @@ public final class XAdESCoSigner {
 			}
 			else {
 				xmlSignature.sign(
-						Arrays.asList((X509Certificate[]) certChain),
-						pk,
-						algoUri,
-						referenceList,
-						"Signature-" + UUID.randomUUID().toString() //$NON-NLS-1$
-						);
+					Arrays.asList((X509Certificate[]) certChain),
+					pk,
+					algoUri,
+					referenceList,
+					"Signature-" + UUID.randomUUID().toString(), //$NON-NLS-1$
+					addKeyInfoKeyValue,
+					addKeyInfoKeyName
+				);
 			}
 		}
 		catch (final NoSuchAlgorithmException e) {

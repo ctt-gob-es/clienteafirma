@@ -38,6 +38,8 @@ import net.java.xades.security.xml.XAdES.XMLAdvancedSignature;
 
 import org.w3c.dom.Element;
 
+import es.gob.afirma.core.misc.AOUtil;
+
 /** Derivado de <code>net.java.xades.security.xml.XAdES.XMLAdvancedSignature</code> con los
  * siguientes cambios:
  * <ul>
@@ -91,7 +93,9 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
     }
 
     private KeyInfo newKeyInfo(final List<X509Certificate> certificates,
-    		                   final String keyInfoId) throws KeyException {
+    		                   final String keyInfoId,
+    		                   final boolean addKeyValue,
+    		                   final boolean addKeyName) throws KeyException {
         final KeyInfoFactory keyInfoFactory = getXMLSignatureFactory().getKeyInfoFactory();
         final List<X509Certificate> x509DataList = new ArrayList<X509Certificate>();
         if (!XmlWrappedKeyInfo.PUBLIC_KEY.equals(getXmlWrappedKeyInfo())) {
@@ -102,6 +106,18 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
         final List<XMLStructure> newList = new ArrayList<XMLStructure>();
         newList.add(keyInfoFactory.newKeyValue(certificates.get(0).getPublicKey()));
         newList.add(keyInfoFactory.newX509Data(x509DataList));
+        if (addKeyValue) {
+	        newList.add(keyInfoFactory.newKeyValue(
+	    		certificates.get(0).getPublicKey())
+			);
+        }
+        if (addKeyName) {
+	        newList.add(
+	    		keyInfoFactory.newKeyName(
+					AOUtil.getCN(certificates.get(0))
+				)
+			);
+        }
         return keyInfoFactory.newKeyInfo(newList, keyInfoId);
     }
 
@@ -109,7 +125,9 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
               final PrivateKey privateKey,
               final String signatureMethod,
               final List<?> refsIdList,
-              final String signatureIdPrefix) throws MarshalException,
+              final String signatureIdPrefix,
+              final boolean addKeyInfoKeyValue,
+              final boolean addKeyInfoKeyName) throws MarshalException,
                                                      GeneralSecurityException,
                                                      XMLSignatureException {
 
@@ -154,7 +172,7 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
                     fac.newSignatureMethod(signatureMethod, null),
                     documentReferences
                 ),
-                newKeyInfo(certificates, keyInfoId),
+                newKeyInfo(certificates, keyInfoId, addKeyInfoKeyValue, addKeyInfoKeyName),
                 getXMLObjects(),
                 getSignatureId(signatureIdPrefix),
                 getSignatureValueId(signatureIdPrefix)

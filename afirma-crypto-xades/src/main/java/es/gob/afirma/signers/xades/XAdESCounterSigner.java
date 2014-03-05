@@ -65,13 +65,11 @@ public final class XAdESCounterSigner {
 
 	private static final Logger	LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	/**
-	 * Contrafirma firmas en formato XAdES.
+	/** Contrafirma firmas en formato XAdES.
 	 * <p>
 	 * Este m&eacute;todo contrafirma los nodos de firma indicados de un
 	 * documento de firma.
 	 * </p>
-	 *
 	 * @param sign
 	 *            Documento con las firmas iniciales.
 	 * @param algorithm
@@ -721,7 +719,9 @@ public final class XAdESCounterSigner {
 					key,
 					XMLConstants.SIGN_ALGOS_URI.get(algorithm),
 					referenceList,
-					"Signature-" + UUID.randomUUID().toString() //$NON-NLS-1$
+					"Signature-" + UUID.randomUUID().toString(), //$NON-NLS-1$
+					Boolean.parseBoolean(extraParams.getProperty("addKeyInfoKeyValue", Boolean.FALSE.toString())), //$NON-NLS-1$
+					Boolean.parseBoolean(extraParams.getProperty("addKeyInfoKeyName", Boolean.FALSE.toString())) //$NON-NLS-1$
 				);
 			}
 		} catch (final NoSuchAlgorithmException e) {

@@ -423,6 +423,10 @@ public final class XAdESSigner {
 				"avoidBase64Transforms", Boolean.FALSE.toString())); //$NON-NLS-1$
 		final boolean headLess = Boolean.parseBoolean(extraParams.getProperty(
 				"headLess", Boolean.TRUE.toString())); //$NON-NLS-1$
+		final boolean addKeyInfoKeyValue = Boolean.parseBoolean(extraParams.getProperty(
+				"addKeyInfoKeyValue", Boolean.FALSE.toString())); //$NON-NLS-1$
+		final boolean addKeyInfoKeyName = Boolean.parseBoolean(extraParams.getProperty(
+				"addKeyInfoKeyName", Boolean.FALSE.toString())); //$NON-NLS-1$
 		final String precalculatedHashAlgorithm = extraParams.getProperty(
 				"precalculatedHashAlgorithm"); //$NON-NLS-1$
 		final boolean facturaeSign = Boolean.parseBoolean(extraParams.getProperty(
@@ -1472,7 +1476,9 @@ public final class XAdESSigner {
 							pk,
 							algoUri,
 							referenceList,
-							"Signature-" + UUID.randomUUID().toString() //$NON-NLS-1$
+							"Signature-" + UUID.randomUUID().toString(), //$NON-NLS-1$
+							addKeyInfoKeyValue,
+							addKeyInfoKeyName
 						);
 					}
 				}
