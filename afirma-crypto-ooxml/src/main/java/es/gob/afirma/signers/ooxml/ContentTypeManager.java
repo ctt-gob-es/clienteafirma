@@ -43,11 +43,12 @@ public class ContentTypeManager {
 		final Document contentTypeDocument = loadDocument(contentTypeIs);
 		final NodeList nodeList = contentTypeDocument.getChildNodes();
 		
-		// Nodo Types
 		if (nodeList.getLength() > 0) {
+			// Nodo Types
 			Node typeNode = nodeList.item(0);
 			NodeList typeList = typeNode.getChildNodes();
 			
+			// Nodos contenidos en Types
 			for (int i = 0; i < typeList.getLength(); i++) {
 				try {
 					typeNode = typeList.item(i);
@@ -81,7 +82,7 @@ public class ContentTypeManager {
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	public static Document loadDocument(InputStream documentInputStream) throws ParserConfigurationException, SAXException, IOException {
+	private static Document loadDocument(InputStream documentInputStream) throws ParserConfigurationException, SAXException, IOException {
 		DocumentBuilder documentBuilder = getNewDocumentBuilder();
 		Document document = documentBuilder.parse(documentInputStream);
 		return document;
@@ -93,7 +94,7 @@ public class ContentTypeManager {
 	 * @return DOM Document Builder
 	 * @throws ParserConfigurationException
 	 */
-	public static DocumentBuilder getNewDocumentBuilder() throws ParserConfigurationException {
+	private static DocumentBuilder getNewDocumentBuilder() throws ParserConfigurationException {
 		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		documentBuilderFactory.setNamespaceAware(true);
 		return documentBuilderFactory.newDocumentBuilder();
@@ -114,7 +115,6 @@ public class ContentTypeManager {
 		}
 		return attNode.getNodeValue();
 	}
-	
 	
 	/**
 	 * Recupera el ContentType correspondiente a un fichero interno del OOXML.
