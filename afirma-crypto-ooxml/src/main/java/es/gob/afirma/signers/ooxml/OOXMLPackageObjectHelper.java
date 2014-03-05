@@ -43,21 +43,12 @@ final class OOXMLPackageObjectHelper {
 	private static final String NAMESPACE_SPEC_NS = "http://www.w3.org/2000/xmlns/"; //$NON-NLS-1$
     private static final String DIGITAL_SIGNATURE_SCHEMA = "http://schemas.openxmlformats.org/package/2006/digital-signature"; //$NON-NLS-1$
 
-    private static enum MS_APPS {
-    	WORD("word"), EXCEL("excel"), POWERPOINT("powerpoint");
-    	
-    	private String name;
-    	
-    	private MS_APPS(String name) {
-			this.name = name;
-		}
-    	
-    	@Override
-    	public String toString() {
-    		return this.name;
-    	}
-    }
-    
+    private static final String[] CONTENT_DIRS = new String[] {
+    	"word", //$NON-NLS-1$
+    	"excel", //$NON-NLS-1$
+    	"powerpoint" //$NON-NLS-1$
+    };
+
     private OOXMLPackageObjectHelper() {
     	// No permitimos la instanciacion
     }
@@ -80,25 +71,25 @@ final class OOXMLPackageObjectHelper {
 	}
 
     private static void addParts(final XMLSignatureFactory fac,
-    		                     ContentTypeManager contentTypeManager, 
+    		                     final ContentTypeManager contentTypeManager,
     		                     final List<Reference> references,
-    		                     final byte[] ooXmlDocument, 
-    		                     MS_APPS application, 
-    		                     DigestMethod digestMethod) throws IOException {   	
+    		                     final byte[] ooXmlDocument,
+    		                     final String application,
+    		                     final DigestMethod digestMethod) throws IOException {
     	final ZipInputStream zipInputStream = new ZipInputStream(
     			new ByteArrayInputStream(
     					ooXmlDocument)
     			);
-    	
+
     	ZipEntry zipEntry;
     	while (null != (zipEntry = zipInputStream.getNextEntry())) {
     		if (!zipEntry.getName().startsWith(application.toString())) {
     			continue;
     		}
-    		
-    		String contentType = contentTypeManager.getContentType(zipEntry.getName());
-    		
-    		// Solo se añade la referencia si existe contentType
+
+    		final String contentType = contentTypeManager.getContentType(zipEntry.getName());
+
+    		// Solo se anade la referencia si existe contentType
     		if (contentType != null) {
     			final Reference reference = fac.newReference("/" + zipEntry.getName() + "?ContentType=" + contentType, digestMethod); //$NON-NLS-1$ //$NON-NLS-2$
     			references.add(reference);
@@ -106,17 +97,15 @@ final class OOXMLPackageObjectHelper {
     	}
 	}
 
-	private static InputStream getContentTypesXMLInputStream(byte[] ooXmlDocument) throws IOException {
+	private static InputStream getContentTypesXMLInputStream(final byte[] ooXmlDocument) throws IOException {
 	   	final ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(ooXmlDocument));
     	ZipEntry zipEntry;
-    	
     	while (null != (zipEntry = zipInputStream.getNextEntry())) {
     		if ("[Content_Types].xml".equals(zipEntry.getName())) { //$NON-NLS-1$
     			return zipInputStream;
     		}
     	}
-    	
-    	throw new IllegalArgumentException("El documento OOXML es inválido ya que no contiene el fichero [Content_Types].xml"); //$NON-NLS-1$
+    	throw new IllegalStateException("El documento OOXML es invalido ya que no contiene el fichero [Content_Types].xml"); //$NON-NLS-1$
 	}
 
 	@SuppressWarnings("resource")
@@ -132,9 +121,9 @@ final class OOXMLPackageObjectHelper {
     private static void addRelationshipsReference(final XMLSignatureFactory fac,
     		                                      final String zipEntryName,
                                                   final Document relsDocument,
-                                                  final List<Reference> manifestReferences, 
-                                                  String contentType, 
-                                                  DigestMethod digestMethod) throws NoSuchAlgorithmException,
+                                                  final List<Reference> manifestReferences,
+                                                  final String contentType,
+                                                  final DigestMethod digestMethod) throws NoSuchAlgorithmException,
                                                                                                    InvalidAlgorithmParameterException {
     	final RelationshipTransformParameterSpec parameterSpec = new RelationshipTransformParameterSpec();
     	final NodeList nodeList = relsDocument.getDocumentElement().getChildNodes();
@@ -174,10 +163,11 @@ final class OOXMLPackageObjectHelper {
 
     private static void addRelationshipsReferences(final XMLSignatureFactory fac,
     		                                       final List<Reference> manifestReferences,
-    		                                       final byte[] ooXmlDocument, 
-    		                                       DigestMethod digestMethod) throws IOException,
+    		                                       final byte[] ooXmlDocument,
+    		                                       final DigestMethod digestMethod) throws IOException,
                                                                                       ParserConfigurationException,
-                                                                                      SAXException,                                                             NoSuchAlgorithmException,
+                                                                                      SAXException,
+                                                                                      NoSuchAlgorithmException,
                                                                                       InvalidAlgorithmParameterException {
     	final ZipInputStream zipInputStream = new ZipInputStream(
 			new ByteArrayInputStream(
@@ -190,8 +180,15 @@ final class OOXMLPackageObjectHelper {
     			continue;
     		}
     		final Document relsDocument = loadDocumentNoClose(zipInputStream);
-    		String contentType = "application/vnd.openxmlformats-package.relationships+xml";
-    		addRelationshipsReference(fac, zipEntry.getName(), relsDocument, manifestReferences, contentType, digestMethod);
+    		final String contentType = "application/vnd.openxmlformats-package.relationships+xml"; //$NON-NLS-1$
+    		addRelationshipsReference(
+				fac,
+				zipEntry.getName(),
+				relsDocument,
+				manifestReferences,
+				contentType,
+				digestMethod
+			);
     	}
     }
 
@@ -202,22 +199,17 @@ final class OOXMLPackageObjectHelper {
                                                                                  ParserConfigurationException,
                                                                                  SAXException {
     	final DigestMethod digestMethod = fac.newDigestMethod(DigestMethod.SHA512, null);
-    	
+
     	final List<Reference> manifestReferences = new LinkedList<Reference>();
     	addRelationshipsReferences(fac, manifestReferences, ooXmlDocument, digestMethod);
 
     	// Se obtiene el inputstream del fichero [Content_Types].xml para inicializar el ContentTypeManager
-    	InputStream contentXml = getContentTypesXMLInputStream(ooXmlDocument);
-    	ContentTypeManager contentTypeManager = new ContentTypeManager(contentXml);
-    	
-		// Word
-		addParts(fac, contentTypeManager, manifestReferences, ooXmlDocument, MS_APPS.WORD, digestMethod); //$NON-NLS-1$
+    	final InputStream contentXml = getContentTypesXMLInputStream(ooXmlDocument);
+    	final ContentTypeManager contentTypeManager = new ContentTypeManager(contentXml);
 
-		// Powerpoint
-		addParts(fac, contentTypeManager, manifestReferences, ooXmlDocument, MS_APPS.POWERPOINT, digestMethod); //$NON-NLS-1$
-		
-		// Excel
-		addParts(fac, contentTypeManager, manifestReferences, ooXmlDocument, MS_APPS.EXCEL, digestMethod); //$NON-NLS-1$
+    	for (final String app : CONTENT_DIRS) {
+    		addParts(fac, contentTypeManager, manifestReferences, ooXmlDocument, app, digestMethod);
+    	}
 
 		contentXml.close();
 		return fac.newManifest(manifestReferences);

@@ -15,7 +15,6 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
-import java.security.cert.X509Certificate;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,8 +25,6 @@ import org.junit.Test;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
-import es.gob.afirma.core.util.tree.AOTreeModel;
-import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.ooxml.AOOOXMLSigner;
 
 /** Pruebas del m&oacute;dulo OOXML de Afirma.
@@ -94,24 +91,13 @@ public final class TestOOXML {
     @SuppressWarnings("static-method")
 	@Test
     public void testSignature() throws Exception {
-      /*
-      es.gob.afirma.platform.ws.TestSignVerifier verifier = null;
-      try {
-          verifier = new TestSignVerifier();
-      }
-      catch (Exception e) {
-          System.out.println("No se ha podido inicializar el validador de firmas, no se validaran como parte de las pruebas: " + e); //$NON-NLS-1$
-      }
-      */
 
         //Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
         final PrivateKeyEntry pke;
-        final X509Certificate cert;
 
         final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
         ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
         pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
-        cert = (X509Certificate) ks.getCertificate(CERT_ALIAS);
 
         final AOSigner signer = new AOOOXMLSigner();
 
@@ -143,25 +129,9 @@ public final class TestOOXML {
 	                os.close();
 	                System.out.println("Temporal para comprobacion manual: " + saveFile.getAbsolutePath()); //$NON-NLS-1$
 
-	              // Enviamos a validar a AFirma
-	//              if (verifier != null) {
-	//                  Assert.assertTrue("Fallo al validar " + saveFile.getAbsolutePath(), verifier.verifyBin(result)); //$NON-NLS-1$
-	//              }
-
 	                Assert.assertNotNull(prueba, result);
 	                Assert.assertTrue(signer.isSign(result));
 
-	                //AOTreeModel tree = signer.getSignersStructure(result, false);
-	                //Assert.assertEquals("Datos", ((AOTreeNode) tree.getRoot()).getUserObject()); //$NON-NLS-1$
-	                //Assert.assertEquals("ANF Usuario Activo", ((AOTreeNode) tree.getRoot()).getChildAt(0).getUserObject()); //$NON-NLS-1$
-
-	                //tree = signer.getSignersStructure(result, true);
-	                //Assert.assertEquals("Datos", ((AOTreeNode) tree.getRoot()).getUserObject()); //$NON-NLS-1$
-	                //final AOSimpleSignInfo simpleSignInfo = (AOSimpleSignInfo) ((AOTreeNode) tree.getRoot()).getChildAt(0).getUserObject();
-
-	                //Assert.assertEquals(cert, simpleSignInfo.getCerts()[0]);
-
-	                //System.out.println(prueba + ": OK"); //$NON-NLS-1$
 	            }
 	        }
 
@@ -218,8 +188,6 @@ public final class TestOOXML {
 	                final byte[] sign3 = cosign(signer, data, sign2, algo, pke3, extraParams);
 	                Assert.assertNotNull(sign3);
 
-	                //checkSign(signer, sign3, new PrivateKeyEntry[] {pke1, pke2, pke3}, new String[] {"ANF Usuario Activo", "CPISR-1 Pf\u00EDsica De la Se\u00F1a Pruebasdit", "Certificado Pruebas Software V\u00E1lido"}, prueba); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-
 	            }
 	        }
 
@@ -270,7 +238,6 @@ public final class TestOOXML {
 		);
     }
 
-
     private static byte[] cosign(final AOSigner signer, final byte[] data, final byte[] sign, final String algorithm, final PrivateKeyEntry pke, final Properties params) throws Exception {
         return signer.cosign(
     		data,
@@ -280,23 +247,5 @@ public final class TestOOXML {
     		pke.getCertificateChain(),
     		params
 		);
-    }
-
-    /** Hace las comprobaciones b&aacute;sicas de una firma. */
-    private static void checkSign(final AOSigner signer, final byte[] sign, final String prueba) throws
-    Exception {
-        Assert.assertNotNull(prueba, sign);
-        Assert.assertTrue(signer.isSign(sign));
-
-        // Arbol de alias
-        AOTreeModel tree = signer.getSignersStructure(sign, false);
-        AOTreeNode root = (AOTreeNode) tree.getRoot();
-        Assert.assertEquals("Datos", root.getUserObject()); //$NON-NLS-1$
-
-        // Arbol de AOSimpleSignersInfo
-        tree = signer.getSignersStructure(sign, true);
-        root = (AOTreeNode) tree.getRoot();
-        Assert.assertEquals("Datos", root.getUserObject()); //$NON-NLS-1$
-
     }
 }
