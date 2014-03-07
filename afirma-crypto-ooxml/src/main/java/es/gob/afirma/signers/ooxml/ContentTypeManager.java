@@ -22,8 +22,13 @@ import es.gob.afirma.core.AOException;
  * identificaci&oacute;n del content type de un fichero en base a ellos. */
 final class ContentTypeManager {
 
-	final Map<String, String> defaultContentTypes;
-	final Map<String, String> overrideContentTypes;
+	private final Map<String, String> defaultContentTypes = new HashMap<String, String>();
+	private final Map<String, String> overrideContentTypes = new HashMap<String, String>();
+
+	private static final DocumentBuilderFactory DOC_FACTORY = DocumentBuilderFactory.newInstance();
+	static {
+		DOC_FACTORY.setNamespaceAware(true);
+	}
 
 	private static final String SLASH = "/"; //$NON-NLS-1$
 
@@ -34,9 +39,6 @@ final class ContentTypeManager {
 	 * @throws IOException Cuando ocurre un error al leer el XML.
 	 * @throws ParserConfigurationException Cuando no se puede crear el constructor de XML. */
 	ContentTypeManager(final InputStream contentTypeIs) throws SAXException, IOException, ParserConfigurationException {
-
-		this.defaultContentTypes = new HashMap<String, String>();
-		this.overrideContentTypes = new HashMap<String, String>();
 
 		final Document contentTypeDocument = loadDocument(contentTypeIs);
 		final NodeList nodeList = contentTypeDocument.getChildNodes();
@@ -72,16 +74,12 @@ final class ContentTypeManager {
 
 	/** Convierte el inputstream de un XML en un DOM Document. */
 	private static Document loadDocument(final InputStream documentInputStream) throws ParserConfigurationException, SAXException, IOException {
-		final DocumentBuilder documentBuilder = getNewDocumentBuilder();
-		final Document document = documentBuilder.parse(documentInputStream);
-		return document;
+		return getNewDocumentBuilder().parse(documentInputStream);
 	}
 
 	/** Devuelve una nueva instancia del DocumentBuilder. */
 	private static DocumentBuilder getNewDocumentBuilder() throws ParserConfigurationException {
-		final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-		documentBuilderFactory.setNamespaceAware(true);
-		return documentBuilderFactory.newDocumentBuilder();
+		return DOC_FACTORY.newDocumentBuilder();
 	}
 
 	/** Recupera el valor de un atributo.
