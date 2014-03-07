@@ -27,6 +27,8 @@ final class ExternalStoresHelper {
 		"opensc-pkcs11.dll", //$NON-NLS-1$
 	};
 
+
+
 	static Map<String, String> cleanExternalStores(final Map<String, String> externalStores) {
 		if (externalStores == null) {
 			return new HashMap<String, String>(0);
