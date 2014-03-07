@@ -15,7 +15,7 @@ final class ExternalStoresHelper {
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private ExternalStoresHelper() {
-		// NO permitimos la instanciacion
+		// No permitimos la instanciacion
 	}
 
 	private static final String[] DNI_P11_NAMES = new String[] {
@@ -27,7 +27,9 @@ final class ExternalStoresHelper {
 		"opensc-pkcs11.dll", //$NON-NLS-1$
 	};
 
-
+	private static final String[][] KNOWN_MODULES = new String[][] {
+		new String[] { "FNMT-RCM CERES (preinstalado)", "FNMT_P11.dll" } //$NON-NLS-1$ //$NON-NLS-2$
+	};
 
 	static Map<String, String> cleanExternalStores(final Map<String, String> externalStores) {
 		if (externalStores == null) {
@@ -39,8 +41,25 @@ final class ExternalStoresHelper {
 				externalStores.remove(key);
 			}
 		}
-		// Eliminamos los posibles duplicados de la tabla
-		return purgeStoresTable(externalStores);
+		// Anadimos los modulos conocidos que existan y no esten ya incluidos y
+		// eliminamos los posibles duplicados de la tabla
+		return purgeStoresTable(
+			addMissingCommonModules(
+				externalStores
+			)
+		);
+	}
+
+	private static Map<String, String> addMissingCommonModules(final Map<String, String> externalStores) {
+		for (final String[] modules : KNOWN_MODULES) {
+			if (!isModuleIncluded(externalStores, modules[1])) {
+				final String modulePath = getWindowsSystemDirWithFinalSlash() + modules[1];
+				if (new File(modulePath).exists()) {
+					externalStores.put(modules[0], modules[1]);
+				}
+			}
+		}
+		return externalStores;
 	}
 
 	private static boolean isDniePkcs11LibraryForWindows(final String driverName) {
@@ -49,6 +68,18 @@ final class ExternalStoresHelper {
 		}
 		for (final String libName : DNI_P11_NAMES) {
 			if (driverName.toLowerCase().endsWith(libName)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static boolean isModuleIncluded(final Map<String, String> externalStores, final String moduleName) {
+		if (externalStores == null || moduleName == null) {
+			throw new IllegalArgumentException("Ni la lista de almacenes ni el modulo a comprobar pueden ser nulos"); //$NON-NLS-1$
+		}
+		for (final String key : externalStores.keySet()) {
+			if (externalStores.get(key).toLowerCase().endsWith(moduleName.toLowerCase())) {
 				return true;
 			}
 		}
@@ -83,8 +114,8 @@ final class ExternalStoresHelper {
 			}
 			else {
 				LOGGER.warning("Se eliminara el modulo '" + key //$NON-NLS-1$
-						+ "' porque ya existe uno con la misma biblioteca o es un modulo de certificados raiz: " //$NON-NLS-1$
-						+ table.get(key));
+					+ "' porque ya existe uno con la misma biblioteca o es un modulo de certificados raiz: " //$NON-NLS-1$
+					+ table.get(key));
 			}
 		}
 
@@ -92,6 +123,10 @@ final class ExternalStoresHelper {
 	}
 
 	private static String getWindowsSystemDirWithFinalSlash() {
+		// En sistema operativo extrano devulevo cadena vacia
+		if (!Platform.OS.WINDOWS.equals(Platform.getOS())) {
+			return ""; //$NON-NLS-1$
+		}
 		final String winDir = System.getenv("SystemRoot"); //$NON-NLS-1$
 		if (winDir == null) {
 			return ""; //$NON-NLS-1$
