@@ -46,30 +46,8 @@ final class MozillaKeyStoreUtilitiesWindows {
 		// No permitimos la instanciacion
 	}
 
-	static String getMozillaUserProfileDirectoryWindows() {
-		File regFile;
-
-		String finalDir;
-		// En Firefox usamos el profiles.ini (el registro clasico esta ya obsoleto)
-		regFile = new File(getWindowsAppDataDir(), "Mozilla\\Firefox\\profiles.ini"); //$NON-NLS-1$
-		try {
-			if (regFile.exists()) {
-				finalDir = NSPreferences.getFireFoxUserProfileDirectory(regFile);
-			}
-			else {
-				LOGGER.severe(
-					"No se ha encontrado el perfil de usuario de Mozilla en su directorio por defecto, se devolvera null" //$NON-NLS-1$
-				);
-				return null;
-			}
-		}
-		catch (final Exception e) {
-			LOGGER.severe(
-				"Error analizando el 'profiles.ini' de usuario de Firefox, se devolvera null: " + e //$NON-NLS-1$
-			);
-			return null;
-		}
-
+	static String cleanMozillaUserProfileDirectoryWindows(final String dir) {
+		String finalDir = dir;
 		for (final char c : finalDir.toCharArray()) {
 			if (P11_CONFIG_VALID_CHARS.indexOf(c) == -1) {
 				finalDir = finalDir.replace(Platform.getUserHome(), KeyStoreUtilities.getShort(Platform.getUserHome()));
@@ -77,7 +55,6 @@ final class MozillaKeyStoreUtilitiesWindows {
 			}
 		}
 		return finalDir.replace('\\', '/');
-
 	}
 
 	static String getSystemNSSLibDirWindows() throws IOException {
@@ -120,7 +97,7 @@ final class MozillaKeyStoreUtilitiesWindows {
 				if (!tmp.mkdir()) {
 					throw new AOException("No se ha creado el directorio temporal"); //$NON-NLS-1$
 				}
-				
+
 				copyFile(new String[] {
 					SOFTOKN3_DLL,   // "softokn3" es comun para todos los Firefox a partir del 2
 					MOZSQLITE3_DLL, // En Firefox 4 sqlite3.dll pasa a llamarse mozsqlite3.dll
@@ -183,7 +160,7 @@ final class MozillaKeyStoreUtilitiesWindows {
 
 	private static String appData = null;
 
-	private static String getWindowsAppDataDir() {
+	static String getWindowsAppDataDir() {
 
 		// Miramos primero con la variable de entorno
 		if (appData == null) {

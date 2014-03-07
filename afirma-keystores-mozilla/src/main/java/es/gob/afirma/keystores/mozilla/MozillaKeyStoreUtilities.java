@@ -24,11 +24,9 @@ import java.security.Security;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.script.ScriptEngineManager;
@@ -46,7 +44,7 @@ final class MozillaKeyStoreUtilities {
 
 	private static final String AFIRMA_NSS_HOME = "AFIRMA_NSS_HOME"; //$NON-NLS-1$
 
-	private static final String AFIRMA_PROFILE_HOME = "AFIRMA_PROFILE_HOME"; //$NON-NLS-1$
+	private static final String AFIRMA_PROFILES_INI = "AFIRMA_PROFILES_INI"; //$NON-NLS-1$
 
 	private MozillaKeyStoreUtilities() {
 		// No permitimos la instanciacion
@@ -253,7 +251,6 @@ final class MozillaKeyStoreUtilities {
 		throw new FileNotFoundException("No se ha podido deternimar el directorio de NSS en Windows a partir de 'compatibility.ini' de Firefox"); //$NON-NLS-1$
 	}
 
-
 	/** Obtiene el directorio de las bibliotecas NSS (<i>Netscape Security
 	 * Services</i>) del sistema.
 	 * @return Directorio de las bibliotecas NSS del sistema
@@ -371,14 +368,9 @@ final class MozillaKeyStoreUtilities {
 		try {
 			final Map<String, String> modsByDesc = new Hashtable<String, String>();
 			for (final AOSecMod.ModuleName module : AOSecMod.getModules(getMozillaUserProfileDirectory())) {
-				if (!module.getLib().toLowerCase().endsWith("dnie_p11_pub.dll")) { //$NON-NLS-1$
-					modsByDesc.put(module.getDescription(), module.getLib());
-				}
-				else {
-					LOGGER.info("Se ha omitido el modulo DNIe_P11_pub.dll por conveniencia"); //$NON-NLS-1$
-				}
+				modsByDesc.put(module.getDescription(), module.getLib());
 			}
-			return purgeStoresTable(modsByDesc); // Eliminamos las entradas que usen la misma biblioteca
+			return modsByDesc; // Eliminamos las entradas que usen la misma biblioteca
 		}
 		catch (final Exception t) {
 			LOGGER.severe("No se han podido obtener los modulos externos de Mozilla, se devolvera una lista vacia o unicamente con el DNIe: " + t); //$NON-NLS-1$
@@ -406,43 +398,6 @@ final class MozillaKeyStoreUtilities {
 			return description.substring(0, ini).trim();
 		}
 		return description;
-	}
-
-	/** Dada una tabla que indexa por descripci&oacute;n los m&oacute;dulos
-	 * pkcs11, eliminamos las entradas necesarias para que aparezca una
-	 * &uacute;nica vez cada m&oacute;dulo PKCS#11.
-	 * @param table
-	 *        Tabla con las descripciones de los m&oacute;dulos pkcs11 y las
-	 *        librer&iacute;as asociadas.
-	 * @return Tabla con los m&oacute;dulos eliminados. */
-	private static Map<String, String> purgeStoresTable(final Map<String, String> table) {
-
-		if (table == null) {
-			return new Hashtable<String, String>(0);
-		}
-
-		final Map<String, String> purgedTable = new Hashtable<String, String>();
-		final Set<String> revisedLibs = new HashSet<String>();
-
-		String tmpLib;
-		for (final String key : table.keySet()) {
-			tmpLib = table.get(key);
-			if (tmpLib.toLowerCase().endsWith(".dll")) { //$NON-NLS-1$
-				tmpLib = tmpLib.toLowerCase();
-			}
-
-			if (!revisedLibs.contains(tmpLib) && !tmpLib.toLowerCase().contains("nssckbi")) { //$NON-NLS-1$
-				purgedTable.put(key, table.get(key));
-				revisedLibs.add(tmpLib);
-			}
-			else {
-				LOGGER.warning("Se eliminara el modulo '" + key //$NON-NLS-1$
-						+ "' porque ya existe uno con la misma biblioteca o es un modulo de certificados raiz: " //$NON-NLS-1$
-						+ table.get(key));
-			}
-		}
-
-		return purgedTable;
 	}
 
 	/** Carga las dependencias de la biblioteca "softokn3" necesaria para acceder
@@ -534,75 +489,47 @@ final class MozillaKeyStoreUtilities {
 		return new String[0];
 	}
 
-	private static String getMozillaUserProfileDirectoryUnix() {
-		// Probamos con "profiles.ini" de Firefox
-		final File regFile = new File(Platform.getUserHome() + "/.mozilla/firefox/profiles.ini"); //$NON-NLS-1$
+	private static String getProfilesIniPath() {
+		String profilesIniPath = null;
+		// Miramos primero la variable de entorno 'AFIRMA_PROFILES_INI'
 		try {
-			if (regFile.exists()) {
-				return NSPreferences.getFireFoxUserProfileDirectory(regFile);
-			}
-		}
-		catch (final Exception e) {
-			LOGGER.severe(
-					"Error obteniendo el directorio de perfil de usuario de Firefox (UNIX), se devolvera null: " + e //$NON-NLS-1$
-			);
-		}
-		return null;
-	}
-
-	private static String getMozillaUserProfileDirectoryMacOsX() {
-		// Si es un Mac OS X, profiles.ini esta en una ruta distinta...
-		final File regFile = new File(Platform.getUserHome() + "/Library/Application Support/Firefox/profiles.ini"); //$NON-NLS-1$
-		try {
-			if (regFile.exists()) {
-				return NSPreferences.getFireFoxUserProfileDirectory(regFile);
-			}
-		}
-		catch (final Exception e) {
-			LOGGER.severe(
-					"Error obteniendo el directorio de perfil de usuario de Firefox (" + regFile.getAbsolutePath() //$NON-NLS-1$
-					+ "), se devolvera null: " //$NON-NLS-1$
-					+ e
-			);
-		}
-		return null;
-	}
-
-	/** Obtiene el directorio del perfil de usuario de Mozilla / Firefox.
-	 * @return Ruta completa del directorio del perfil de usuario de Mozilla /
-	 *         Firefox */
-	static String getMozillaUserProfileDirectory() {
-
-		String profileDir = null;
-		// Miramos primero la variable de entorno 'AFIRMA_PROFILE_HOME'
-		try {
-			profileDir = System.getenv(AFIRMA_PROFILE_HOME);
+			profilesIniPath = System.getenv(AFIRMA_PROFILES_INI);
 		}
 		catch(final Exception e) {
-			LOGGER.warning("No se tiene acceso a la variable de entorno '" + AFIRMA_PROFILE_HOME + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			LOGGER.warning("No se tiene acceso a la variable de entorno '" + AFIRMA_PROFILES_INI + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		if (profileDir != null) {
-			final File nssDir = new File(profileDir);
-			if (nssDir.isDirectory() && nssDir.canRead()) {
+		if (profilesIniPath != null) {
+			final File profilesIniFile = new File(profilesIniPath);
+			if (profilesIniFile.isFile() && profilesIniFile.canRead()) {
 				LOGGER.info(
-					"Directorio de perfil de usuario Firefox determinado a partir de la variable de entorno '" + AFIRMA_PROFILE_HOME + "'" //$NON-NLS-1$ //$NON-NLS-2$
+					"'profiles.ini' de Firefox determinado a partir de la variable de entorno '" + AFIRMA_PROFILES_INI + "'" //$NON-NLS-1$ //$NON-NLS-2$
 				);
-				return profileDir;
+				return profilesIniPath;
 			}
 			LOGGER.warning(
-				"La variable de entorno '" + AFIRMA_PROFILE_HOME + "' apunta a un directorio que no existe o sobre el que no se tienen permisos de lectura, se ignorara" //$NON-NLS-1$ //$NON-NLS-2$
+				"La variable de entorno '" + AFIRMA_PROFILES_INI + "' apunta a un fichero que no existe o sobre el que no se tienen permisos de lectura, se ignorara" //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
-
 		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-			return MozillaKeyStoreUtilitiesWindows.getMozillaUserProfileDirectoryWindows();
+			return MozillaKeyStoreUtilitiesWindows.getWindowsAppDataDir() + "\\Mozilla\\Firefox\\profiles.ini"; //$NON-NLS-1$
 		}
+		if (Platform.getOS().equals(Platform.OS.MACOSX)) {
+			return Platform.getUserHome() + "/Library/Application Support/Firefox/profiles.ini"; //$NON-NLS-1$
+		}
+		// Linux / UNIX
+		return Platform.getUserHome() + "/.mozilla/firefox/profiles.ini"; //$NON-NLS-1$
+	}
 
-		else if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-			return getMozillaUserProfileDirectoryMacOsX();
+
+	/** Obtiene el directorio del perfil de usuario de Mozilla / Firefox.
+	 * @return Ruta completa del directorio del perfil de usuario de Mozilla / Firefox
+	 * @throws IOException */
+	static String getMozillaUserProfileDirectory() throws IOException {
+		final String dir = NSPreferences.getFireFoxUserProfileDirectory(new File(getProfilesIniPath()));
+		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
+			return MozillaKeyStoreUtilitiesWindows.cleanMozillaUserProfileDirectoryWindows(dir);
 		}
-		// No es Windows ni Mac OS X, entonces es UNIX (Linux / Solaris)
-		return getMozillaUserProfileDirectoryUnix();
+		return dir;
 	}
 
 	static void configureMacNSS(final String binDir) throws AOException {
@@ -707,15 +634,15 @@ final class MozillaKeyStoreUtilities {
 
 			try {
 				p = (Provider) Class.forName("sun.security.pkcs11.SunPKCS11") //$NON-NLS-1$
-				.getConstructor(InputStream.class)
-				.newInstance(new ByteArrayInputStream(p11NSSConfigFile.getBytes()));
+					.getConstructor(InputStream.class)
+					.newInstance(new ByteArrayInputStream(p11NSSConfigFile.getBytes()));
 			}
 			catch (final Exception e2) {
 				// Un ultimo intento de cargar el proveedor valiendonos de que es posible que
 				// las bibliotecas necesarias se hayan cargado tras el ultimo intento
 				p = (Provider) Class.forName("sun.security.pkcs11.SunPKCS11") //$NON-NLS-1$
-				.getConstructor(InputStream.class)
-				.newInstance(new ByteArrayInputStream(p11NSSConfigFile.getBytes()));
+					.getConstructor(InputStream.class)
+					.newInstance(new ByteArrayInputStream(p11NSSConfigFile.getBytes()));
 			}
 		}
 
@@ -724,14 +651,5 @@ final class MozillaKeyStoreUtilities {
 		LOGGER.info("Proveedor PKCS#11 para Firefox anadido"); //$NON-NLS-1$
 
 		return p;
-	}
-
-	static boolean isDniePkcs11LibraryForWindows(final String driverName) {
-		if (driverName == null) {
-			return false;
-		}
-		return driverName.toLowerCase().endsWith("usrpkcs11.dll") || //$NON-NLS-1$
-			   driverName.toLowerCase().endsWith("dnie_p11_priv.dll") || //$NON-NLS-1$
-			   driverName.toLowerCase().endsWith("opensc-pkcs11.dll"); //$NON-NLS-1$
 	}
 }

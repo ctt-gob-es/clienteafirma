@@ -120,8 +120,11 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
 			this.kss.add(keyStore);
 		}
 
-		// Vamos ahora con los almacenes externos
-		final Map<String, String> externalStores = MozillaKeyStoreUtilities.getMozillaPKCS11Modules();
+		// Vamos ahora con los almacenes externos, que se limpian antes de usarse quitando DNIe (porque se usa
+		// el controlador Java) y anadiendo modulos conocidos si se encuentran en el sistema.
+		final Map<String, String> externalStores = ExternalStoresHelper.cleanExternalStores(
+			MozillaKeyStoreUtilities.getMozillaPKCS11Modules()
+		);
 
 		if (externalStores.size() > 0) {
 			final StringBuilder logStr = new StringBuilder("Encontrados los siguientes modulos PKCS#11 externos instalados en Mozilla / Firefox: "); //$NON-NLS-1$
@@ -136,49 +139,28 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
 			LOGGER.info("No se han encontrado modulos PKCS#11 externos instalados en Firefox"); //$NON-NLS-1$
 		}
 
-		KeyStore tmpStore = null;
+		KeyStore tmpStore;
 		for (final String descr : externalStores.keySet()) {
-			if (!MozillaKeyStoreUtilities.isDniePkcs11LibraryForWindows(externalStores.get(descr))) {
-				try {
-					tmpStore = new AOKeyStoreManager().init(
-						AOKeyStore.PKCS11,
-						null,
-						new UIPasswordCallback(
-							FirefoxKeyStoreMessages.getString("MozillaUnifiedKeyStoreManager.1") + " " + MozillaKeyStoreUtilities.getMozModuleName(descr.toString()), //$NON-NLS-1$ //$NON-NLS-2$
-							this.parentComponent
-						),
-						new String[] {
-							externalStores.get(descr), descr.toString()
-						}
-					).get(0);
-				}
-				catch (final AOCancelledOperationException ex) {
-					LOGGER.warning("Se cancelo el acceso al almacen externo  '" + descr + "', se continuara con el siguiente: " + ex); //$NON-NLS-1$ //$NON-NLS-2$
-					continue;
-				}
-				catch (final Exception ex) {
-					LOGGER.severe("No se ha podido inicializar el PKCS#11 '" + descr + "': " + ex); //$NON-NLS-1$ //$NON-NLS-2$
-					continue;
-				}
-			}
-			else {
-				try {
-					tmpStore = AOKeyStoreManagerFactory.getAOKeyStoreManager(
-						AOKeyStore.DNIEJAVA,
-						null,
-						null,
-						null,
+			try {
+				tmpStore = new AOKeyStoreManager().init(
+					AOKeyStore.PKCS11,
+					null,
+					new UIPasswordCallback(
+						FirefoxKeyStoreMessages.getString("MozillaUnifiedKeyStoreManager.1") + " " + MozillaKeyStoreUtilities.getMozModuleName(descr.toString()), //$NON-NLS-1$ //$NON-NLS-2$
 						this.parentComponent
-					).getKeyStores().get(0);
-				}
-				catch (final AOCancelledOperationException ex) {
-					LOGGER.warning("Se cancelo el acceso al almacen DNIe 100% Java, se continuara con el siguiente: " + ex); //$NON-NLS-1$
-					continue;
-				}
-				catch (final Exception ex) {
-					LOGGER.severe("No se ha podido inicializar el controlador DNIe 100% Java: " + ex); //$NON-NLS-1$
-					continue;
-				}
+					),
+					new String[] {
+						externalStores.get(descr), descr.toString()
+					}
+				).get(0);
+			}
+			catch (final AOCancelledOperationException ex) {
+				LOGGER.warning("Se cancelo el acceso al almacen externo  '" + descr + "', se continuara con el siguiente: " + ex); //$NON-NLS-1$ //$NON-NLS-2$
+				continue;
+			}
+			catch (final Exception ex) {
+				LOGGER.severe("No se ha podido inicializar el PKCS#11 '" + descr + "': " + ex); //$NON-NLS-1$ //$NON-NLS-2$
+				continue;
 			}
 
 			LOGGER.info("El almacen externo '" + descr + "' ha podido inicializarse, se anadiran sus entradas"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -202,6 +184,32 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
 				LOGGER.info("Anadida la entrada '" + alias + "' del almacen externo '" + descr + "'"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 			this.kss.add(tmpStore);
+		}
+
+		// Anadimos el controlador Java del DNIe **SIEMPRE**
+		try {
+			tmpStore = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+				AOKeyStore.DNIEJAVA,
+				null,
+				null,
+				null,
+				this.parentComponent
+			).getKeyStores().get(0);
+			tmpAlias = tmpStore.aliases();
+			LOGGER.info("El DNIe 100% Java ha podido inicializarse, se anadiran sus entradas"); //$NON-NLS-1$
+			String alias;
+			while (tmpAlias.hasMoreElements()) {
+				alias = tmpAlias.nextElement().toString();
+				this.storesByAlias.put(alias, tmpStore);
+				LOGGER.info("Anadida la entrada '" + alias + "' del DNIe 100% Java"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			this.kss.add(tmpStore);
+		}
+		catch (final AOCancelledOperationException ex) {
+			LOGGER.warning("Se cancelo el acceso al almacen DNIe 100% Java: " + ex); //$NON-NLS-1$
+		}
+		catch (final Exception ex) {
+			LOGGER.warning("No se ha podido inicializar el controlador DNIe 100% Java: " + ex); //$NON-NLS-1$
 		}
 
 		if (this.kss.isEmpty()) {
