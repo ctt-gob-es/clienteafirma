@@ -36,7 +36,7 @@ import es.gob.afirma.signers.pades.PdfSessionManager;
 import es.gob.afirma.signers.pades.PdfTriPhaseSession;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper;
-import es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper.TsaRequestExtension;
+import es.gob.afirma.signers.tsp.pkcs7.TsaRequestExtension;
 
 /** Clase para la firma electr&oacute;nica en tres fases de ficheros Adobe PDF en formato PAdES.
  * <p>No firma PDF cifrados.</p>
