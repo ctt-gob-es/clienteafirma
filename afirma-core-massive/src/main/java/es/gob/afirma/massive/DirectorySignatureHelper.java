@@ -40,7 +40,7 @@ import es.gob.afirma.core.signers.CounterSignTarget;
  * hashes), seg&uacute;n el objetivo establecido el m&oacute;dulo se
  * comporta&aacute; de una forma u otra, devolviendo el resultado de forma
  * acorde con el objetivo establecido. */
-public final class DirectorySignatureHelper {
+public class DirectorySignatureHelper {
 
     private static final String MODE_KEY = "mode"; //$NON-NLS-1$
     private static final String FORMAT_KEY = "format"; //$NON-NLS-1$
