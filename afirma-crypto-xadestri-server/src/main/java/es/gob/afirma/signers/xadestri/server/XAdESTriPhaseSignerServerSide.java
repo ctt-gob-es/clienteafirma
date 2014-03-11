@@ -202,21 +202,21 @@ public final class XAdESTriPhaseSignerServerSide {
 		switch (op) {
 		case SIGN:
 			result = XAdESSigner.sign(
-					data,
-					algorithm,
-					prk,
-					certChain,
-					xParams
-					);
+				data,
+				algorithm,
+				prk,
+				certChain,
+				xParams
+			);
 			break;
 		case COSIGN:
 			result = XAdESCoSigner.cosign(
-					data,
-					algorithm,
-					prk,
-					certChain,
-					xParams
-					);
+				data,
+				algorithm,
+				prk,
+				certChain,
+				xParams
+			);
 			break;
 		case COUNTERSIGN:
 			final CounterSignTarget targets =
@@ -224,19 +224,19 @@ public final class XAdESTriPhaseSignerServerSide {
 					CounterSignTarget.LEAFS : CounterSignTarget.TREE;
 
 			result = XAdESCounterSigner.countersign(
-					data,
-					algorithm,
-					targets,
-					null,
-					prk,
-					certChain,
-					xParams
-					);
+				data,
+				algorithm,
+				targets,
+				null,
+				prk,
+				certChain,
+				xParams
+			);
 			break;
 		default:
 			throw new IllegalStateException(
-					"No se puede dar una operacion no contemplada en el enumerado de operaciones" //$NON-NLS-1$
-					);
+				"No se puede dar una operacion no contemplada en el enumerado de operaciones" //$NON-NLS-1$
+			);
 		}
 
 		// Cargamos el XML firmado en un String
@@ -244,12 +244,12 @@ public final class XAdESTriPhaseSignerServerSide {
 
 		// Recuperamos los signed info que se han firmado
 		final List<byte[]> signedInfos = XAdESTriPhaseSignerServerSide.getSignedInfos(
-				result,
-				certChain[0].getPublicKey(),
-				previousSignaturesIds // Identificadores de firmas previas, para poder omitirlos
-				);
+			result,
+			certChain[0].getPublicKey(),
+			previousSignaturesIds // Identificadores de firmas previas, para poder omitirlos
+		);
 
-		// Podemos un reemplazo en el XML en lugar de los PKCS#1 de las firmas generadas
+		// Ponemos un reemplazo en el XML en lugar de los PKCS#1 de las firmas generadas
 		for (int i = 0; i < signedInfos.size(); i++) {
 
 			final byte[] signedInfo = signedInfos.get(i);
@@ -281,8 +281,7 @@ public final class XAdESTriPhaseSignerServerSide {
 		return base64 == null ? null : base64.replace("\n", "").replace("\r", "").replace("\t", "").replace(" ", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
 	}
 
-	/**
-	 * Recupera los signedInfo de una firma XML, excluyendo los de las firmas indicadas a trav&eacute;s
+	/** Recupera los signedInfo de una firma XML, excluyendo los de las firmas indicadas a trav&eacute;s
 	 * de su Id.
 	 * @param xmlSign XML del que se
 	 * @param pk Clave publicada usada en las firmas de las que se desea obtener los signedInfo.
@@ -296,21 +295,22 @@ public final class XAdESTriPhaseSignerServerSide {
 	 * @throws XmlPreSignException Cuando no se ha encontrado ning&uacute;n signedInfo que devolver.
 	 */
 	private static List<byte[]> getSignedInfos(final byte[] xmlSign,
-			final PublicKey pk,
-			final List<String> excludedIds) throws SAXException,
-			IOException,
-			ParserConfigurationException,
-			MarshalException,
-			XMLSignatureException, XmlPreSignException {
+			                                   final PublicKey pk,
+			                                   final List<String> excludedIds) throws SAXException,
+			                                                                          IOException,
+			                                                                          ParserConfigurationException,
+			                                                                          MarshalException,
+			                                                                          XMLSignatureException,
+			                                                                          XmlPreSignException {
 		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		dbf.setNamespaceAware(true);
 
 		final NodeList signatureNodeList = dbf.newDocumentBuilder().parse(
-				new ByteArrayInputStream(xmlSign)
-				).getElementsByTagNameNS(
-						XMLSignature.XMLNS,
-						AOXAdESSigner.SIGNATURE_TAG
-						);
+			new ByteArrayInputStream(xmlSign)
+		).getElementsByTagNameNS(
+			XMLSignature.XMLNS,
+			AOXAdESSigner.SIGNATURE_TAG
+		);
 		if (signatureNodeList.getLength() == 0) {
 			throw new IllegalArgumentException("Se ha proporcionado un XML sin firmas"); //$NON-NLS-1$
 		}
@@ -339,9 +339,10 @@ public final class XAdESTriPhaseSignerServerSide {
 			final XMLSignature signature = Utils.getDOMFactory().unmarshalXMLSignature(valContext);
 			signature.validate(valContext);
 			signedInfos.add(
-					AOUtil.getDataFromInputStream(
-							signature.getSignedInfo().getCanonicalizedData()
-							));
+				AOUtil.getDataFromInputStream(
+					signature.getSignedInfo().getCanonicalizedData()
+				)
+			);
 		}
 
 		if (signedInfos.isEmpty()) {
