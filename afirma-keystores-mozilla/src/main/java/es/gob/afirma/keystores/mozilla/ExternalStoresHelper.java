@@ -28,7 +28,8 @@ final class ExternalStoresHelper {
 	};
 
 	private static final String[][] KNOWN_MODULES = new String[][] {
-		new String[] { "FNMT-RCM CERES (preinstalado)", "FNMT_P11.dll" } //$NON-NLS-1$ //$NON-NLS-2$
+		new String[] { "FNMT-RCM CERES (preinstalado)", "FNMT_P11.dll" }, //$NON-NLS-1$ //$NON-NLS-2$
+		new String[] { "Atos CardOS (preinstalado)", "siecap11.dll"    }  //$NON-NLS-1$ //$NON-NLS-2$
 	};
 
 	static Map<String, String> cleanExternalStores(final Map<String, String> externalStores) {
