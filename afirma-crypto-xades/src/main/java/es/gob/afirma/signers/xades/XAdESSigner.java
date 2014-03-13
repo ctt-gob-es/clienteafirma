@@ -150,14 +150,13 @@ public final class XAdESSigner {
 	 * @param algorithm
 	 *            Algoritmo a usar para la firma.
 	 *            <p>
-	 *            Se aceptan los siguientes algoritmos en el par&aacute;metro
-	 *            <code>algorithm</code>:
+	 *              Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:
 	 *            </p>
 	 *            <ul>
-	 *            <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
-	 *            <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
-	 *            <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
-	 *            <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
+	 *              <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
+	 *              <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
+	 *              <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
+	 *              <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
 	 *            </ul>
 	 * @param certChain Cadena de certificados del firmante
 	 * @param pk Clave privada del firmante
@@ -179,6 +178,8 @@ public final class XAdESSigner {
 
 		final Properties extraParams = xParams != null ? xParams : new Properties();
 
+		final String envelopedNodeXPath = extraParams.getProperty(
+				"insertEnvelopedSignatureOnNodeByXPath"); //$NON-NLS-1$
 		final String nodeToSign = extraParams.getProperty(
 				"nodeToSign"); //$NON-NLS-1$
 		final String format = extraParams.getProperty(
@@ -592,7 +593,7 @@ public final class XAdESSigner {
 		// ***************************************************
 		// ***************************************************
 
-		// La URI de contenido a firmat puede ser el nodo especifico si asi se indico o el
+		// La URI de contenido a firmar puede ser el nodo especifico si asi se indico o el
 		// nodo de contenido completo
 		final String tmpUri = "#" + (nodeToSign != null ? nodeToSign : contentId); //$NON-NLS-1$
 		final String tmpStyleUri = "#" + styleId; //$NON-NLS-1$
@@ -602,6 +603,8 @@ public final class XAdESSigner {
 		try {
 			docSignature = dbf.newDocumentBuilder().newDocument();
 			if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED)) {
+				// En este caso, dataElement es siempre el XML original a firmar
+				// (o un nodo de este si asi se especifico)
 				docSignature.appendChild(docSignature.adoptNode(dataElement));
 			}
 			else {
@@ -996,9 +999,8 @@ public final class XAdESSigner {
 					)
 				);
 
-				// Salvo que sea una factura electronica,
-				// se agrega una transformacion XPATH para eliminar el resto de firmas del
-				// documento en las firmas Enveloped
+				// Salvo que sea una factura electronica, se agrega una transformacion XPATH
+				// para eliminar el resto de firmas del documento en las firmas Enveloped
 				if (!facturaeSign) {
 					transformList.add(
 						fac.newTransform(
@@ -1060,18 +1062,25 @@ public final class XAdESSigner {
 			// *******************************************************
 			// ****** Fin hojas de estilo remotas en Enveloped *******
 			// *******************************************************
+		}
 
+		// Nodo donde insertar la firma enveloped
+		Element envNode = null;
+		if (envelopedNodeXPath != null && AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED.equals(format)) {
+			envNode = XAdESUtil.getFirstElmentFromXPath(envelopedNodeXPath, docSignature.getDocumentElement());
 		}
 
 		// Instancia XADES_EPES
 		final XAdES_EPES xades = (XAdES_EPES) XAdES.newInstance(
-			XAdES.EPES, // XAdES
-			xadesNamespace, // XAdES NameSpace
+			XAdES.EPES,                           // XAdES
+			xadesNamespace,                       // XAdES NameSpace
 			AOXAdESSigner.XADES_SIGNATURE_PREFIX, // XAdES Prefix
-			AOXAdESSigner.XML_SIGNATURE_PREFIX, // XMLDSig Prefix
-			digestMethodAlgorithm, // DigestMethod
-			docSignature, // Document
-			docSignature.getDocumentElement() // Element
+			AOXAdESSigner.XML_SIGNATURE_PREFIX,   // XMLDSig Prefix
+			digestMethodAlgorithm,                // DigestMethod
+			docSignature,                         // Document
+			envNode != null ?                     // Nodo donde se inserta la firma (como hijo), si no se indica se usa la raiz
+				envNode:
+					docSignature.getDocumentElement()
 		);
 
 		// SigningCertificate

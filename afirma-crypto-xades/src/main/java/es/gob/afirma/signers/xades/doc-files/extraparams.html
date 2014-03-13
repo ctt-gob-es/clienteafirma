@@ -9,6 +9,15 @@
  <body>
  <p>Valores aceptados como par&aacute;metros adicionales para las firmas XAdES:</p>
  <dl>
+  <dt><b><i>insertEnvelopedSignatureOnNodeByXPath</i></b></dt>
+   <dd>
+    Indica, mediante una expresi&oacute;n XPath (v1), el nodo bajo el cual 
+    debe insertarse el nodo de firma en el caso de una firma <i>Enveloped</i>.<br>
+    Si la expresi&oacute;n devuleve m&aacute;s de un nodo, se usa solo el primero.
+    Si la expresi&oacute;n no devuelve nodos o est&aacute; mal construida se 
+    lanzar&aacute; una excepci&oacute;n.<br>
+    Este par&aacute;metro solo tiene efecto en firmas <i>Enveloped</i>. 
+   </dd>
   <dt><b><i>addKeyInfoKeyValue</i></b></dt>
    <dd>
     Indica, mediante <code>true</code> o <code>false</code>, si debe
