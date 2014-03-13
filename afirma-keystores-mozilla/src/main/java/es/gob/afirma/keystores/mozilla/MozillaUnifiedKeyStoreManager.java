@@ -52,6 +52,11 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
 	 * almac&eacute;n. */
 	private PasswordCallback externallPasswordCallback = null;
 
+	/** Construye un gestor unificado de almac&eacute;n de claves y certificados Mozilla (NSS). */
+	public MozillaUnifiedKeyStoreManager() {
+		setKeyStoreType(AOKeyStore.MOZ_UNI);
+	}
+
 	/** Inicializa la clase gestora de almacenes de claves.
 	 * @return Almac&eacute;n de claves de Firefox correspondiente
 	 *         &uacute;nicamente el m&oacute;dulo interno principal

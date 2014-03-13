@@ -52,7 +52,7 @@ public final class SimpleTest {
     	sig.initSign(
 			ksm.getKeyEntry(
 				aliases[0],
-				null//ksm.getType().getCertificatePasswordCallback(null)
+				ksm.getType().getCertificatePasswordCallback(null)
 			).getPrivateKey()
 		);
     	sig.update("Hola".getBytes()); //$NON-NLS-1$
