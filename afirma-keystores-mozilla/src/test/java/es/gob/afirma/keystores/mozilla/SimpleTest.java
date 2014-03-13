@@ -36,7 +36,6 @@ public final class SimpleTest {
      * @throws Exception */
     @SuppressWarnings("static-method")
     @Test
-    @Ignore
     public void testKeyStoreManagerCreation() throws Exception {
     	final AOKeyStoreManager ksm = AOKeyStoreManagerFactory
 		 .getAOKeyStoreManager(AOKeyStore.MOZ_UNI, null,

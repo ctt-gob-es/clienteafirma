@@ -499,6 +499,17 @@ final class MozillaKeyStoreUtilities {
 			LOGGER.warning("No se tiene acceso a la variable de entorno '" + AFIRMA_PROFILES_INI + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		if (profilesIniPath != null) {
+
+			// Se expande %AppData% en Windows
+			final String addDataUpperCase = "%APPDATA%"; //$NON-NLS-1$
+			final int appDataIndex = profilesIniPath.toUpperCase().indexOf(addDataUpperCase);
+			if (appDataIndex != -1) {
+				profilesIniPath = profilesIniPath.replace(
+					profilesIniPath.substring(appDataIndex, appDataIndex + addDataUpperCase.length()),
+					MozillaKeyStoreUtilitiesWindows.getWindowsAppDataDir()
+				);
+			}
+
 			final File profilesIniFile = new File(profilesIniPath);
 			if (profilesIniFile.isFile() && profilesIniFile.canRead()) {
 				LOGGER.info(
@@ -507,7 +518,7 @@ final class MozillaKeyStoreUtilities {
 				return profilesIniPath;
 			}
 			LOGGER.warning(
-				"La variable de entorno '" + AFIRMA_PROFILES_INI + "' apunta a un fichero que no existe o sobre el que no se tienen permisos de lectura, se ignorara" //$NON-NLS-1$ //$NON-NLS-2$
+				"La variable de entorno '" + AFIRMA_PROFILES_INI + "' apunta a un fichero que no existe o sobre el que no se tienen permisos de lectura, se ignorara: " + profilesIniPath //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
 		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
