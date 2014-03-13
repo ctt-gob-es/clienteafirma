@@ -6,6 +6,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.security.KeyStore;
 import java.security.Provider;
 import java.security.Security;
+import java.security.Signature;
 import java.util.Enumeration;
 import java.util.logging.Logger;
 
@@ -24,14 +25,11 @@ import es.gob.afirma.keystores.dnie.DnieUnifiedKeyStoreManager;
 public final class SimpleTest {
 
     /** Inicio de las pruebas desde consola sin JUnit.
-     * @param args */
-    public static void main(final String[] args) {
-		try {
-			SimpleTest.testDirectNssUsage();
-		}
-		catch (final Exception e) {
-		    System.err.println(e.toString());
-		}
+     * @param args
+     * @throws Exception */
+    public static void main(final String[] args) throws Exception {
+    	System.out.println(MozillaKeyStoreUtilities.getMozillaUserProfileDirectory());
+		SimpleTest.testDirectNssUsage();
     }
 
     /** Prueba de la obtenci&oacute;n de almac&eacute;n y alias con Mozilla NSS.
@@ -50,6 +48,15 @@ public final class SimpleTest {
     	for (final String alias : aliases) {
     		System.out.println(alias);
     	}
+    	final Signature sig = Signature.getInstance("SHA512withRSA"); //$NON-NLS-1$
+    	sig.initSign(
+			ksm.getKeyEntry(
+				aliases[0],
+				null//ksm.getType().getCertificatePasswordCallback(null)
+			).getPrivateKey()
+		);
+    	sig.update("Hola".getBytes()); //$NON-NLS-1$
+    	System.out.println(new String(sig.sign()));
     }
 
     /** Prueba de la obtenci&oacute;n de almac&eacute;n y alias con Mozilla NSS agreg&aacute;ndolo con el controlador DNIe 100& Java.
