@@ -9,6 +9,13 @@
  <body>
  <p>Valores aceptados como par&aacute;metros adicionales para las firmas XAdES:</p>
  <dl>
+  <dt><b><i>useManifest</i></b></dt>
+   <dd>
+    Usa un <a href="http://www.w3.org/TR/xmldsig-core1/#sec-o-Manifest">Manifest</a> de XMLDSig
+    con las referencias de firma en vez de firmar directamente estas referencias.<br>
+    Esto permite que sea opcional la comprobaci&oacute;n del destino y huellas digitales de
+    las referencias. 
+   </dd>
   <dt><b><i>insertEnvelopedSignatureOnNodeByXPath</i></b></dt>
    <dd>
     Indica, mediante una expresi&oacute;n XPath (v1), el nodo bajo el cual 

@@ -28,6 +28,7 @@ public final class TestEnvelopedOnCusomNode {
 	    p3.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
 	    p3.setProperty("includeOnlySignningCertificate", "true"); //$NON-NLS-1$ //$NON-NLS-2$
 	    p3.setProperty("insertEnvelopedSignatureOnNodeByXPath", "/bookstore/book[1]/title"); //$NON-NLS-1$ //$NON-NLS-2$
+	    p3.setProperty("useManifest", "true"); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
 	/** Prueba de XAdES Enveloped con inserci&oacute;n de firma en nodo espec&iacute;fico.
