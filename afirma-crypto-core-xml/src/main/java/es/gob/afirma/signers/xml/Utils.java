@@ -560,14 +560,6 @@ public final class Utils {
         }
 
         if (xades) { // XAdES
-            if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED) && mode.equals(AOSignConstants.SIGN_MODE_EXPLICIT)) {
-                throw new UnsupportedOperationException("No se puede realizar una firma XML Enveloped con contenido Explicito" //$NON-NLS-1$
-                );
-            }
-            if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED) && mode.equals(AOSignConstants.SIGN_MODE_IMPLICIT)) {
-                throw new UnsupportedOperationException("No se puede realizar una firma XML Externally Detached con contenido Implicito" //$NON-NLS-1$
-                );
-            }
             if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED) && uri == null && externallyDetachedHashAlgorithm == null) {
                 throw new UnsupportedOperationException("La firma XML Externally Detached necesita un Message Digest precalculado o una URI accesible" //$NON-NLS-1$
                 );
