@@ -37,7 +37,7 @@
  *   con una autoridad de sellado de tiempo (TSA).
  *  </p>
  *  <p>
- *   No se soporta la generaci&oacite;n del modo PAdES-BASIC (firmas CMS), siempre se incrusta una firma CAdES en el PDF utilizando
+ *   Por defecto se generan firmas PAdES-BASIC, para lo que se incrusta una firma CAdES en el PDF utilizando
  *   <i>ETSI.CAdES.detached</i> como valor del sub-filtro de la firma.
  *  </p>
  *  <p>Los datos de firma electr&oacute;nica empotrados dentro de la estructura PDF equivalen a una firma CAdES.</p>
@@ -51,7 +51,7 @@
  *   <li>Dependencia con el m&oacute;dulo N&uacute;cleo (<i>afirma-core</i>) del Cliente.</li>
  *   <li>Dependencia con el m&oacute;dulo PKCS#7 (<i>afirma-crypto-core-pkcs7</i>) del Cliente.</li>
  *   <li>Dependencia con el m&oacute;dulo CAdES (<i>afirma-crypto-cades</i>) del Cliente.</li>
- *   <li>Dependencia con BouncyCastle 1.46 o superior (Proveedor + TSP + <i>Mail</i>).</li>
+ *   <li>Dependencia con BouncyCastle 1.49 o superior.</li>
  *   <li>Dependencia con iText 2.1.7<sup>*</sup></li>
  *  </ul>
  *  <p>
@@ -67,7 +67,7 @@
  *   </li>
  *  </ul>
  *  <p>
- *   Este m&oacute;dulo es compatible con cualquier entorno JSE 1.5 o superior.
+ *   Este m&oacute;dulo es compatible con cualquier entorno JSE 6 o superior.
  *  </p>
  *  <p>Desde este m&oacute;dulo es posible que se realicen llamadas a interfaces gr&aacute;ficas.</p>
  */
