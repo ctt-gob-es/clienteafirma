@@ -39,6 +39,7 @@ import net.java.xades.security.xml.XAdES.XMLAdvancedSignature;
 import org.w3c.dom.Element;
 
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.signers.xml.style.XmlStyle;
 
 /** Derivado de <code>net.java.xades.security.xml.XAdES.XMLAdvancedSignature</code> con los
  * siguientes cambios:
@@ -70,16 +71,14 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
      * @param sEncoding Codificaci&oacute;n de la hoja de estilo (puede ser nula)
      * @param sId Identificador de la hoja de estilo (si se proporciona un nulo
      *            no se a&ntilde;ade la hoja de estilo) */
-    void addStyleSheetEnvelopingOntoSignature(final Element s,
-    		                                  final String sType,
-    		                                  final String sEncoding,
+    void addStyleSheetEnvelopingOntoSignature(final XmlStyle xmlStyle,
     		                                  final String sId) {
-        this.styleElement = s;
-        if (sType != null) {
-            this.styleType = sType;
+        this.styleElement = xmlStyle.getStyleElement();
+        if (xmlStyle.getStyleType() != null) {
+            this.styleType = xmlStyle.getStyleType();
         }
         this.styleId = sId;
-        this.styleEncoding = sEncoding;
+        this.styleEncoding = xmlStyle.getStyleEncoding();
     }
 
     /** Establece el algoritmo de canonicalizaci&oacute;n.

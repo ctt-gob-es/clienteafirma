@@ -12,8 +12,6 @@ package es.gob.afirma.signers.xml;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
@@ -48,19 +46,16 @@ import javax.xml.crypto.dsig.spec.XSLTTransformParameterSpec;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSSerializer;
 
-import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSimpleSignInfo;
-import es.gob.afirma.core.ui.AOUIFactory;
 
 /** Utilidades para las firmas XML. */
 public final class Utils {
@@ -69,148 +64,6 @@ public final class Utils {
 
     private Utils() {
         // No permitimos la instanciacion
-    }
-
-    /** Hoja de estilo local (rutal local no dereferenciable) a un XML */
-    public static final class IsInnerlException extends Exception {
-        private static final long serialVersionUID = -8769490831203570286L;
-
-        /** Construye la excepci&oacute;n que indica que una referencia apunta al interior del mismo XML.
-         * @param e Excepci&oacute;n anterior en la cadena */
-        public IsInnerlException(final Throwable e) {
-            super(e);
-        }
-
-    }
-
-    /** No se puede dereferenciar la hoja de estilo. */
-    public static final class CannotDereferenceException extends Exception {
-
-        private static final long serialVersionUID = 5883820163272098664L;
-
-        /** Construye una excepci&oacute;n que indica la imposibilidad de
-         * dereferenciar una hoja de estilo.
-         * @param s
-         *        Mesaje de excepci&oacute;n */
-        CannotDereferenceException(final String s) {
-            super(s);
-        }
-
-        /** Construye una excepci&oacute;n que indica la imposibilidad de
-         * dereferenciar una hoja de estilo.
-         * @param s
-         *        Mesaje de excepci&oacute;n
-         * @param e
-         *        Excepci&oacute;n anterior en la cadena */
-        CannotDereferenceException(final String s, final Exception e) {
-            super(s, e);
-        }
-    }
-
-    /** La referencia de hoja de estilo apunta a un no-XML. */
-    public static final class ReferenceIsNotXMLException extends Exception {
-        private static final long serialVersionUID = 8076672806350530425L;
-        ReferenceIsNotXMLException(final Throwable e) {
-            super(e);
-        }
-    }
-
-    /** Dereferencia una hoja de estilo en forma de Documento DOM.
-     * @param id
-     *        Identificador de la hoja de estilo
-     * @param headLess
-     *        <code>true</code> si <b>no</b> se desea que se pregunte al
-     *        usuario para dereferenciar las hojas de estilo enlazadas con
-     *        rutas locales
-     * @return Documento DOM con la hoja de estilo
-     * @throws CannotDereferenceException
-     *         Si no se puede dereferenciar
-     * @throws IsInnerlException
-     *         Si no se puede dereferenciar por ser una referencia local
-     * @throws ReferenceIsNotXMLException
-     *         Si el objeto dereferenciado no puede transformarse en un
-     *         Documento DOM */
-    public static Document dereferenceStyleSheet(final String id, final boolean headLess) throws CannotDereferenceException,
-                                                                                                 IsInnerlException,
-                                                                                                 ReferenceIsNotXMLException {
-        if (id == null || "".equals(id)) { //$NON-NLS-1$
-            throw new CannotDereferenceException("La hoja de estilo era nula o vacia"); //$NON-NLS-1$
-        }
-
-        byte[] xml = null;
-
-        // Intentamos dereferenciar directamente, cosa que funciona con
-        // http://, https:// y file://
-        try {
-            final URI styleURI = AOUtil.createURI(id);
-            if (styleURI.getScheme().equals("file")) { //$NON-NLS-1$
-                throw new UnsupportedOperationException("No se aceptan dereferenciaciones directas con file://"); //$NON-NLS-1$
-            }
-            xml = AOUtil.getDataFromInputStream(AOUtil.loadFile(styleURI));
-        }
-        catch (final Exception e) {
-
-            // Si no dereferencia puede ser por tres cosas, porque es una
-            // referencia interna,
-            // porque es una referencia local
-            // o porque directamente no se puede dereferenciar
-
-            // Miramos si la referencia es local
-            final String[] idParts = id.replace(File.separator, "/").split("/"); //$NON-NLS-1$ //$NON-NLS-2$
-            final String fileName = idParts[idParts.length - 1];
-
-            if (fileName.startsWith("#")) { //$NON-NLS-1$
-                throw new IsInnerlException(e);
-            }
-            else if (!headLess && id.startsWith("file://")) { //$NON-NLS-1$
-            	// Preguntamos al usuario para la dereferenciacion
-            	if (AOUIFactory.showConfirmDialog(null,
-            			XMLMessages.getString("Utils.5"), //$NON-NLS-1$
-            			XMLMessages.getString("Utils.6"), //$NON-NLS-1$
-            			AOUIFactory.OK_CANCEL_OPTION,
-            			AOUIFactory.INFORMATION_MESSAGE) == AOUIFactory.OK_OPTION) {
-
-            		final File xmlStyleFile;
-            		try {
-	            		xmlStyleFile = AOUIFactory.getLoadFiles(
-	            				XMLMessages.getString("Utils.7"), //$NON-NLS-1$
-	            				null,
-	            				fileName,
-	            				null,
-	            				XMLMessages.getString("Utils.8", fileName), //$NON-NLS-1$
-	            				false,
-	            				false,
-	            				null
-	            		)[0];
-            		}
-            		catch(final AOCancelledOperationException ex) {
-            			LOGGER.warning("El usuario ha cancelado la seleccion de hoja de estilo: " + ex); //$NON-NLS-1$
-            			throw new CannotDereferenceException("No se ha podido dereferenciar la hoja de estilo", e); //$NON-NLS-1$
-            		}
-            		try {
-            			final InputStream is = new FileInputStream(xmlStyleFile);
-            			xml = AOUtil.getDataFromInputStream(is);
-        				is.close();
-            		}
-            		catch (final Exception ex) {
-            			throw new CannotDereferenceException("No se ha podido dereferenciar la hoja de estilo", ex); //$NON-NLS-1$
-            		}
-            	}
-            }
-            else {
-                throw new CannotDereferenceException("No se ha podido dereferenciar la hoja de estilo: " + id, e); //$NON-NLS-1$
-            }
-        }
-
-        try {
-            if (xml != null) {
-                return DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(xml));
-            }
-            throw new CannotDereferenceException("No se ha dereferenciado la hoja de estilo"); //$NON-NLS-1$
-        }
-        catch (final Exception e) {
-            throw new ReferenceIsNotXMLException(e);
-        }
     }
 
     /** A&ntilde;ade la cabecera de hoja de estilo a un XML dado.
@@ -243,37 +96,6 @@ public final class Utils {
                                         href
                                         + "\"?>" //$NON-NLS-1$
         );
-    }
-
-    /** Obtiene los par&aacute;metros de la cabecera de definici&oacute;n de la
-     * hoja de estilo de un XML.
-     * @param inputXML
-     *        XML de entrada
-     * @return Properties con los par&aacute;metros encontrados en la cabecera,
-     *         o un Properties vac&iacute;o si el XML no declaraba una hoja de
-     *         estilo */
-    public static Properties getStyleSheetHeader(final String inputXML) {
-        final Properties ret = new Properties();
-        if (inputXML == null) {
-            return ret;
-        }
-        final int startPos = inputXML.indexOf("<?xml-stylesheet "); //$NON-NLS-1$
-        if (startPos == -1) {
-            return ret;
-        }
-
-        String xml = inputXML.substring(startPos);
-        xml = xml.substring(0, xml.indexOf('>') + 1)
-                   .replace("<?xml-stylesheet ", "").replace("?>", "").replace(" ", "\n").replace("\"", "").replace("'", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$
-        try {
-            ret.load(new ByteArrayInputStream(xml.getBytes()));
-        }
-        catch (final Exception e) {
-            LOGGER.severe(
-              "No se ha podido analizar correctamente la cabecera de definicion de la hora de estilo del XML: " + e //$NON-NLS-1$
-            );
-        }
-        return ret;
     }
 
     /** A&ntilde;ade transformaciones seg&uacute; la sintaxis de

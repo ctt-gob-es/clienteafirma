@@ -286,9 +286,6 @@ public final class AOXAdESSigner implements AOSigner {
     /** Algoritmo de huella digital por defecto para las referencias XML. */
     static final String DIGEST_METHOD = DigestMethod.SHA1;
 
-    static final String HTTP_PROTOCOL_PREFIX = "http://"; //$NON-NLS-1$
-    static final String HTTPS_PROTOCOL_PREFIX = "https://"; //$NON-NLS-1$
-
     static final String STYLE_REFERENCE_PREFIX = "StyleReference-"; //$NON-NLS-1$
 
     static final String MIMETYPE_STR = "MimeType"; //$NON-NLS-1$
