@@ -12,7 +12,6 @@ import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Document;
@@ -52,13 +51,12 @@ public final class XmlStyle {
 	 * @throws CannotDereferenceException
 	 * @throws IsInnerlException
 	 * @throws ReferenceIsNotXmlException
-	 * @throws TransformerFactoryConfigurationError */
+	 * @throws javax.xml.transform.TransformerFactoryConfigurationError */
 	public XmlStyle(final byte[] data, final boolean headLess) throws IOException,
 	                                                                  TransformerConfigurationException,
 	                                                                  CannotDereferenceException,
 	                                                                  IsInnerlException,
-	                                                                  ReferenceIsNotXmlException,
-	                                                                  TransformerFactoryConfigurationError {
+	                                                                  ReferenceIsNotXmlException {
 
 		final Properties p = getStyleSheetHeader(new String(data));
 		this.type = p.getProperty("type"); //$NON-NLS-1$

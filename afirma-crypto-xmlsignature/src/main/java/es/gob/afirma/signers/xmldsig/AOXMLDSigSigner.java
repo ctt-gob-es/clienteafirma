@@ -1002,7 +1002,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             final XMLSignature signature =
                     fac.newXMLSignature(fac.newSignedInfo(fac.newCanonicalizationMethod(canonicalizationAlgorithm, (C14NMethodParameterSpec) null),
                                                           fac.newSignatureMethod(algoUri, null),
-                                                          Utils.cleanReferencesList(referenceList)),
+                                                          XmlDSigUtil.cleanReferencesList(referenceList)),
                                         kif.newKeyInfo(content, keyInfoId),
                                         objectList,
                                         "Signature-" + id, //$NON-NLS-1$
@@ -2001,7 +2001,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             root = this.doc.getDocumentElement();
 
             // Identificamos el prefijo que se utiliza en los nodos de firma
-            String xmlDSigNSPrefix = Utils.guessXMLDSigNamespacePrefix(root);
+            String xmlDSigNSPrefix = XmlDSigUtil.guessXmlDSigNamespacePrefix(root);
             if (xmlDSigNSPrefix == null) {
                 xmlDSigNSPrefix = XML_SIGNATURE_PREFIX;
             }
