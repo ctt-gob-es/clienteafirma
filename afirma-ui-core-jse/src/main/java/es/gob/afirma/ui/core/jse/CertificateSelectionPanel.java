@@ -21,7 +21,6 @@ import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.net.URL;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -180,13 +179,68 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		private static final long serialVersionUID = 5012625058876812352L;
 
 		private static final Font SUBJECT_FONT = new Font(VERDANA_FONT_NAME, Font.BOLD, 14);
-
 		private static final Font DETAILS_FONT = new Font(VERDANA_FONT_NAME, Font.PLAIN, 11);
+
+		private static final ImageIcon ICON_DNIE_NORMAL = new ImageIcon(
+			CertificateSelectionPanel.class.getClassLoader().getResource("resources/dnieicon.png") //$NON-NLS-1$
+		);
+		private static final ImageIcon ICON_DNIE_WARNING = new ImageIcon(
+			CertificateSelectionPanel.class.getClassLoader().getResource("resources/dnieicon_w.png") //$NON-NLS-1$
+		);
+		private static final ImageIcon ICON_DNIE_ERROR = new ImageIcon(
+			CertificateSelectionPanel.class.getClassLoader().getResource("resources/dnieicon_e.png") //$NON-NLS-1$
+		);
+		private static final ImageIcon ICON_OTHER_NORMAL = new ImageIcon(
+			CertificateSelectionPanel.class.getClassLoader().getResource("resources/certicon.png") //$NON-NLS-1$
+		);
+		private static final ImageIcon ICON_OTHER_WARNING = new ImageIcon(
+			CertificateSelectionPanel.class.getClassLoader().getResource("resources/certicon_w.png") //$NON-NLS-1$
+		);
+		private static final ImageIcon ICON_OTHER_ERROR = new ImageIcon(
+			CertificateSelectionPanel.class.getClassLoader().getResource("resources/certicon_e.png") //$NON-NLS-1$
+		);
+		static {
+			ICON_DNIE_NORMAL.setDescription(JSEUIMessages.getString("CertificateSelectionPanel.4")); //$NON-NLS-1$
+			ICON_DNIE_NORMAL.getAccessibleContext().setAccessibleDescription(JSEUIMessages.getString("CertificateSelectionPanel.4")); //$NON-NLS-1$
+			ICON_DNIE_WARNING.setDescription(JSEUIMessages.getString("CertificateSelectionPanel.7")); //$NON-NLS-1$
+			ICON_DNIE_WARNING.getAccessibleContext().setAccessibleDescription(JSEUIMessages.getString("CertificateSelectionPanel.7")); //$NON-NLS-1$
+			ICON_DNIE_ERROR.setDescription(JSEUIMessages.getString("CertificateSelectionPanel.9")); //$NON-NLS-1$
+			ICON_DNIE_ERROR.getAccessibleContext().setAccessibleDescription(JSEUIMessages.getString("CertificateSelectionPanel.9")); //$NON-NLS-1$
+			ICON_OTHER_NORMAL.setDescription(JSEUIMessages.getString("CertificateSelectionPanel.11")); //$NON-NLS-1$
+			ICON_OTHER_NORMAL.getAccessibleContext().setAccessibleDescription(JSEUIMessages.getString("CertificateSelectionPanel.11")); //$NON-NLS-1$
+			ICON_OTHER_WARNING.setDescription(JSEUIMessages.getString("CertificateSelectionPanel.13")); //$NON-NLS-1$
+			ICON_OTHER_WARNING.getAccessibleContext().setAccessibleDescription(JSEUIMessages.getString("CertificateSelectionPanel.13")); //$NON-NLS-1$
+			ICON_OTHER_ERROR.setDescription(JSEUIMessages.getString("CertificateSelectionPanel.15")); //$NON-NLS-1$
+			ICON_OTHER_ERROR.getAccessibleContext().setAccessibleDescription(JSEUIMessages.getString("CertificateSelectionPanel.15")); //$NON-NLS-1$
+		}
+
+		private static final long EXPIRITY_WARNING_LEVEL = 1000*60*60*25*7;
 
 		private JLabel propertiesLink = null;
 
 		private final String friendlyName;
 		private final X509Certificate cert;
+
+		private static ImageIcon getIcon(final X509Certificate cert) {
+			final long notAfter = cert.getNotAfter().getTime();
+			final long actualDate = new Date().getTime();
+			if (actualDate >= notAfter || actualDate <= cert.getNotBefore().getTime()) {
+				if (isDNIeCert(cert)) {
+					return ICON_DNIE_ERROR;
+				}
+				return ICON_OTHER_ERROR;
+			}
+			if (notAfter - actualDate < EXPIRITY_WARNING_LEVEL) {
+				if (isDNIeCert(cert)) {
+					return ICON_DNIE_WARNING;
+				}
+				return ICON_OTHER_WARNING;
+			}
+			if (isDNIeCert(cert)) {
+				return ICON_DNIE_NORMAL;
+			}
+			return ICON_OTHER_NORMAL;
+		}
 
 		CertificateLine(final String friendlyName, final X509Certificate cert) {
 			this.friendlyName = friendlyName;
@@ -226,12 +280,9 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 			c.gridy = 1;
 			c.gridheight = 4;
 
-			final URL urlIcon = isDNIeCert(this.cert) ?
-				CertificateSelectionPanel.class.getClassLoader().getResource("resources/dnieicon.png") : //$NON-NLS-1$
-					CertificateSelectionPanel.class.getClassLoader().getResource("resources/certicon.png"); //$NON-NLS-1$
-			final JLabel icon = urlIcon != null ?
-				new JLabel(new ImageIcon(urlIcon)) :
-					new JLabel();
+			final ImageIcon imageIcon = getIcon(this.cert);
+			final JLabel icon = new JLabel(imageIcon);
+			this.setToolTipText(imageIcon.getDescription());
 
 			c.insets = new Insets(2, 2, 2, 5);
 			add(icon, c);
@@ -256,18 +307,24 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 			c.gridy++;
 
 			final JLabel dates = new JLabel(
-					JSEUIMessages.getString("CertificateSelectionPanel.3", //$NON-NLS-1$
-					new String[] { formatDate(this.cert.getNotBefore()),
-						formatDate(this.cert.getNotAfter()) }));
+				JSEUIMessages.getString(
+					"CertificateSelectionPanel.3", //$NON-NLS-1$
+					new String[] {
+						formatDate(this.cert.getNotBefore()),
+						formatDate(this.cert.getNotAfter())
+					}
+				)
+			);
 			dates.setFont(DETAILS_FONT);
 			add(dates, c);
 
 			c.gridy++;
 
 			this.propertiesLink = new JLabel(
-			        "<html><u>" + //$NON-NLS-1$
+		        "<html><u>" + //$NON-NLS-1$
 			        JSEUIMessages.getString("CertificateSelectionPanel.5") + //$NON-NLS-1$
-			        "</u></html>"); //$NON-NLS-1$
+		        "</u></html>" //$NON-NLS-1$
+	        );
 			this.propertiesLink.setFont(DETAILS_FONT);
 			add(this.propertiesLink, c);
 		}
