@@ -27,10 +27,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Vector;
 
-import javax.naming.directory.Attributes;
-import javax.naming.directory.BasicAttributes;
-import javax.naming.ldap.LdapName;
-import javax.naming.ldap.Rdn;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -43,8 +39,6 @@ import javax.swing.ListCellRenderer;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-
-import com.sun.jndi.toolkit.dir.SearchFilter;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
@@ -200,26 +194,16 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 			createUI();
 		}
 
-		/**
-		 * Indica si un certificado pertenece a un DNIe.
+		/** Indica si un certificado pertenece a un DNIe.
 		 * @param certificate Certificado.
 		 * @return Devuelve {@code true} si el certificado pertenece a un DNIe, {@code false}
-		 * en caso contrario.
-		 */
+		 * en caso contrario. */
 		private static boolean isDNIeCert(final X509Certificate certificate) {
-
-			try {
-				final Attributes attrs = new BasicAttributes(true);
-				for (final Rdn rdn : new LdapName(certificate.getIssuerDN().toString()).getRdns()) {
-					attrs.put(rdn.getType(), rdn.getValue());
-				}
-				return new SearchFilter(
-						"(&(cn=AC DNIE *)(ou=DNIE)(o=DIRECCION GENERAL DE LA POLICIA)(c=ES))") //$NON-NLS-1$
-				.check(attrs);
-			}
-			catch (final Exception e) {
+			if (certificate == null) {
 				return false;
 			}
+			final String issuer = certificate.getIssuerX500Principal().toString().toUpperCase();
+			return issuer.contains("O=DIRECCION GENERAL DE LA POLICIA") && issuer.contains("OU=DNIE"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		X509Certificate getCertificate() {
@@ -243,11 +227,11 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 			c.gridheight = 4;
 
 			final URL urlIcon = isDNIeCert(this.cert) ?
-					CertificateSelectionPanel.class.getClassLoader().getResource("resources/dnieicon.png") : //$NON-NLS-1$
-						CertificateSelectionPanel.class.getClassLoader().getResource("resources/certicon.png"); //$NON-NLS-1$
+				CertificateSelectionPanel.class.getClassLoader().getResource("resources/dnieicon.png") : //$NON-NLS-1$
+					CertificateSelectionPanel.class.getClassLoader().getResource("resources/certicon.png"); //$NON-NLS-1$
 			final JLabel icon = urlIcon != null ?
-					new JLabel(new ImageIcon(urlIcon)) :
-						new JLabel();
+				new JLabel(new ImageIcon(urlIcon)) :
+					new JLabel();
 
 			c.insets = new Insets(2, 2, 2, 5);
 			add(icon, c);
@@ -288,27 +272,21 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 			add(this.propertiesLink, c);
 		}
 
-		/**
-		 * Devuelve la fecha con formato.
+		/** Devuelve la fecha con formato.
 		 * @param date Fecha.
-		 * @return Texto que representativo de la fecha.
-		 */
+		 * @return Texto que representativo de la fecha. */
 		private static String formatDate(final Date date) {
 			return new SimpleDateFormat("dd/MM/yyyy").format(date); //$NON-NLS-1$
 		}
 
-		/**
-		 * Recupera el rect&aacute;ngulo ocupado por el enlace para la carga del certificado.
-		 * @return Recuadro con el enlace.
-		 */
+		/** Recupera el rect&aacute;ngulo ocupado por el enlace para la carga del certificado.
+		 * @return Recuadro con el enlace. */
 		Rectangle getCertificateLinkBounds() {
 			return this.propertiesLink.getBounds();
 		}
 	}
 
-	/**
-	 * Renderer para mostrar la informaci&oacute;n de un certificado.
-	 */
+	/** Renderer para mostrar la informaci&oacute;n de un certificado. */
 	private static final class CertListCellRendered implements ListCellRenderer/*<CertificateLine>*/ {
 
 		CertListCellRendered() {
@@ -344,9 +322,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		this.selectedIndex = this.certList.getSelectedIndex();
 	}
 
-	/**
-	 * Manejador de eventos de raton para la lista de certificados.
-	 */
+	/** Manejador de eventos de raton para la lista de certificados. */
 	private final class CertLinkMouseListener extends MouseAdapter {
 
 		private boolean entered = false;
