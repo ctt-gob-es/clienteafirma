@@ -82,6 +82,7 @@ public final class CAPIKeyStoreManager extends AOKeyStoreManager {
 	                Security.addProvider((Provider) Class.forName("sun.security.mscapi.SunMSCAPI").newInstance()); //$NON-NLS-1$
 	            }
 	            catch(final Exception e) {
+	            	LOGGER.severe("No se ha podido instanciar 'sun.security.mscapi.SunMSCAPI': " + e); //$NON-NLS-1$
 	            	throw new MissingSunMSCAPIException(e);
 	            }
 	        }
