@@ -1012,9 +1012,6 @@ public final class AOXMLDSigSigner implements AOSigner {
         		key, docSignature.getDocumentElement()
     		);
             signContext.putNamespacePrefix(XMLConstants.DSIGNNS, xmlSignaturePrefix);
-            if (needCustomUriDereferencer()) {
-            	signContext.setURIDereferencer(new CustomDOMUriDereferencer());
-            }
 
             signature.sign(signContext);
         }
@@ -1411,9 +1408,6 @@ public final class AOXMLDSigSigner implements AOSigner {
 
             final DOMSignContext signContext = new DOMSignContext(key, rootSig);
             signContext.putNamespacePrefix(XMLConstants.DSIGNNS, xmlSignaturePrefix);
-            if (needCustomUriDereferencer()) {
-            	signContext.setURIDereferencer(new CustomDOMUriDereferencer());
-            }
 
             fac.newXMLSignature(fac.newSignedInfo(cm, sm, referenceList), // SignedInfo
                                 kif.newKeyInfo(content, keyInfoId), // KeyInfo
@@ -1973,9 +1967,6 @@ public final class AOXMLDSigSigner implements AOSigner {
         		signature.getOwnerDocument().getDocumentElement()
     		);
             signContext.putNamespacePrefix(XMLConstants.DSIGNNS, xmlSignaturePrefix);
-            if (needCustomUriDereferencer()) {
-            	signContext.setURIDereferencer(new CustomDOMUriDereferencer());
-            }
 
             sign.sign(signContext);
         }
@@ -2239,25 +2230,4 @@ public final class AOXMLDSigSigner implements AOSigner {
         serializer.write(node, output);
     }
 
-    /**
-     * Indica si es necesario instalar el derreferenciador XML a medida.
-     * @return Devuelve {@code true} si se tiene que instalar el derreferenciador, {@code false}
-     * en caso contrario.
-     */
-    public static boolean needCustomUriDereferencer() {
-    	try {
-	    	final Class<?> apacheNodeSetDataClass = Class.forName("org.jcp.xml.dsig.internal.dom.ApacheNodeSetData"); //$NON-NLS-1$
-	    	final Class<?> xmlSignatureInputClass = Class.forName("com.sun.org.apache.xml.internal.security.signature.XMLSignatureInput"); //$NON-NLS-1$
-
-	    	// El constructor ApacheNodeSetData(XMLSignatureInput) esta en XMLSec y no en la JRE. Si
-	    	// se encuentra este metodo entonces XMLSec esta instalado y no es necesario utilizar
-	    	// un derreferenciador a medida
-	    	apacheNodeSetDataClass.getConstructor(xmlSignatureInputClass);
-    	}
-    	catch (final Exception e) {
-    		return false;
-    	}
-    	Logger.getLogger("es.gob.afirma").info("Es necesario instalar el derreferenciador a medida XML"); //$NON-NLS-1$ //$NON-NLS-2$
-    	return true;
-    }
 }
