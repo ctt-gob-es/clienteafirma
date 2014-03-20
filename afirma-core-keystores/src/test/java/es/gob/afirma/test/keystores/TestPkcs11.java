@@ -86,27 +86,6 @@ public final class TestPkcs11 {
 
 	}
 
-	/** Pruebas de DNIe.
-	 * @throws Exception */
-	@Test
-	@Ignore
-	@SuppressWarnings("static-method")
-	public void testDnie() throws Exception {
-		final AOKeyStoreManager aoks = AOKeyStoreManagerFactory.getAOKeyStoreManager(
-			AOKeyStore.DNIE,
-			null,
-			"DNIe_10", //$NON-NLS-1$
-			AOKeyStore.DNIE.getStorePasswordCallback(null),
-			null
-		);
-		System.out.println(
-			aoks.getKeyEntry(
-				aoks.getAliases()[0],
-				AOKeyStore.DNIE.getCertificatePasswordCallback(null)
-			).getPrivateKey()
-		);
-	}
-
 	/** M&eacute;todo de entrada.
 	 * @param args
 	 * @throws Exception */

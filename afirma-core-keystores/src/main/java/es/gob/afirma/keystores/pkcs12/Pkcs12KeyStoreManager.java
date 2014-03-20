@@ -39,12 +39,12 @@ public final class Pkcs12KeyStoreManager extends AOKeyStoreManager {
 
 	/** {@inheritDoc} */
 	@Override
-	public List<KeyStore> init(final AOKeyStore type,
-            final InputStream store,
-            final PasswordCallback pssCallBack,
-            final Object[] params) throws AOKeyStoreManagerException,
-                                          IOException {
-		return init(store, pssCallBack);
+	public void init(final AOKeyStore type,
+                     final InputStream store,
+                     final PasswordCallback pssCallBack,
+                     final Object[] params) throws AOKeyStoreManagerException,
+                                                   IOException {
+		this.kss = init(store, pssCallBack);
 	}
 
 	/** Inicializa un almac&eacute;n de claves y certificados de tipo PKCS#12 / PFX.
@@ -55,7 +55,7 @@ public final class Pkcs12KeyStoreManager extends AOKeyStoreManager {
 	 * @throws AOKeyStoreManagerException Si hay errores en el tratamiento del almac&eacute;n
 	 * @throws IOException Si hay errores en la lectura del almac&eacute;n */
 	private List<KeyStore> init(final InputStream store,
-                               final PasswordCallback pssCallBack) throws AOKeyStoreManagerException,
+                                final PasswordCallback pssCallBack) throws AOKeyStoreManagerException,
                                                                           IOException {
         // Suponemos que el proveedor SunJSSE esta instalado. Hay que tener
         // cuidado con esto si alguna vez se usa JSS, que a veces lo retira
@@ -63,8 +63,10 @@ public final class Pkcs12KeyStoreManager extends AOKeyStoreManager {
         if (store == null) {
             throw new IllegalArgumentException("Es necesario proporcionar el fichero PKCS12 / PFX"); //$NON-NLS-1$
         }
+
+        final KeyStore ks;
         try {
-        	this.setKeyStore(KeyStore.getInstance(getType().getProviderName()));
+        	ks = KeyStore.getInstance(getType().getProviderName());
         }
         catch (final Exception e) {
             throw new AOKeyStoreManagerException("No se ha podido obtener el almacen PKCS#12 / PFX", e); //$NON-NLS-1$
@@ -72,7 +74,7 @@ public final class Pkcs12KeyStoreManager extends AOKeyStoreManager {
 
         this.cachePasswordCallback = pssCallBack != null ? new CachePasswordCallback(pssCallBack.getPassword()) : NullPasswordCallback.getInstance();
         try {
-            this.getKeyStore().load(store, this.cachePasswordCallback.getPassword());
+            ks.load(store, this.cachePasswordCallback.getPassword());
         }
         catch (final IOException e) {
             if (e.getCause() instanceof UnrecoverableKeyException ||
@@ -88,7 +90,7 @@ public final class Pkcs12KeyStoreManager extends AOKeyStoreManager {
             throw new AOKeyStoreManagerException("No se ha podido verificar la integridad del almacen PKCS#12 / PFX solicitado.", e); //$NON-NLS-1$
 		}
         final List<KeyStore> ret = new ArrayList<KeyStore>(1);
-        ret.add(this.getKeyStore());
+        ret.add(ks);
         try {
             store.close();
         }
@@ -119,26 +121,32 @@ public final class Pkcs12KeyStoreManager extends AOKeyStoreManager {
     		                                    final PasswordCallback pssCallback) throws KeyStoreException,
     		                                                                               NoSuchAlgorithmException,
     		                                                                               UnrecoverableEntryException {
-        if (this.getKeyStore() == null) {
+        if (this.kss == null || this.kss.isEmpty()) {
             throw new IllegalStateException("Se han pedido claves a un almacen no inicializado"); //$NON-NLS-1$
         }
 
         // Primero probamos si la contrasena de la clave es la misma que la del certificado
         try {
-        	return (KeyStore.PrivateKeyEntry) this.getKeyStore().getEntry(alias, new KeyStore.PasswordProtection(this.cachePasswordCallback.getPassword()));
+        	return (KeyStore.PrivateKeyEntry) this.kss.get(0).getEntry(
+    			alias, new KeyStore.PasswordProtection(this.cachePasswordCallback.getPassword())
+			);
         }
         catch(final Exception e) {
         	// Se ignora
         }
         // Luego probamos con null
         try {
-        	return (KeyStore.PrivateKeyEntry) this.getKeyStore().getEntry(alias, null);
+        	return (KeyStore.PrivateKeyEntry) this.kss.get(0).getEntry(alias, null);
         }
         catch(final Exception e) {
         	// Se ignora
         }
         // Fnalmente pedimos la contrasena
-        return (KeyStore.PrivateKeyEntry) this.getKeyStore().getEntry(alias, pssCallback != null ? new KeyStore.PasswordProtection(pssCallback.getPassword()) : null);
+        return (KeyStore.PrivateKeyEntry) this.kss.get(0).getEntry(
+    		alias, pssCallback != null ?
+				new KeyStore.PasswordProtection(pssCallback.getPassword()) :
+					null
+		);
     }
 
 }

@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.security.auth.x500.X500Principal;
+
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.keystores.NameCertificateBean;
 import es.gob.afirma.core.misc.AOUtil;
@@ -43,6 +45,8 @@ public final class KeyStoreUtilities {
     static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     private static final String OPENSC_USR_LIB_LINUX = "/usr/lib/opensc-pkcs11.so"; //$NON-NLS-1$
+
+    private static final X500Principal DNIE_ISSUER = new X500Principal("CN=AC DNIE 001, OU=DNIE, O=DIRECCION GENERAL DE LA POLICIA, C=ES"); //$NON-NLS-1$
 
     /** Nombre de los ficheros de biblioteca de los controladores de la FNMT para DNIe y CERES
      * que no tienen implementados el algoritmo SHA1withRSA.
@@ -567,5 +571,14 @@ public final class KeyStoreUtilities {
 			LOGGER.warning("No se ha podido obtener el nombre corto de " + originalPath + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		return originalPath;
+	}
+
+	static boolean containsDnie(final AOKeyStoreManager originalKsm) {
+		for (final String alias : originalKsm.getAliases()) {
+			if (originalKsm.getCertificate(alias).getIssuerX500Principal().equals(DNIE_ISSUER)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

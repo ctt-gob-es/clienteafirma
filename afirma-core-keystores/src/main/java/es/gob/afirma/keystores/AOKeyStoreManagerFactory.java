@@ -22,7 +22,6 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
-import es.gob.afirma.keystores.dnie.DnieUnifiedKeyStoreManager;
 import es.gob.afirma.keystores.pkcs12.Pkcs12KeyStoreManager;
 
 /** Obtiene clases de tipo AOKeyStoreManager seg&uacute;n se necesiten,
@@ -88,7 +87,7 @@ public final class AOKeyStoreManagerFactory {
 
         // Token PKCS#11, en cualquier sistema operativo
         else if (AOKeyStore.PKCS11.equals(store)) {
-        	return getPkcs11KeyStoreManager(store, lib, description, pssCallback, parentComponent);
+        	return getPkcs11KeyStoreManager(lib, description, pssCallback, parentComponent);
         }
 
         // Almacen de certificados de Windows
@@ -101,27 +100,32 @@ public final class AOKeyStoreManagerFactory {
         	return getWindowsAddressBookKeyStoreManager(store);
         }
 
-        else if (AOKeyStore.DNIE.equals(store)) {
-        	return getDniePkcs11KeyStoreManager(store, pssCallback);
-        }
-
         // Almacen de Mozilla que muestra tanto los certificados del almacen interno como los de
         // los dispositivos externos configuramos. A esto, le agregamos en Mac OS X el gestor de
         // DNIe para que agregue los certificados de este mediante el controlador Java del DNIe si
         // se encuentra la biblioteca y hay un DNIe insertado
         else if (AOKeyStore.MOZ_UNI.equals(store)) {
-        	return getMozillaUnifiedKeyStoreManager(store, pssCallback);
+        	return getMozillaUnifiedKeyStoreManager(pssCallback);
         }
 
         // Apple Safari sobre Mac OS X. Le agregamos el gestor de DNIe para que agregue los
         // certificados mediante el controlador Java del DNIe si se encuentra la biblioteca y
         // hay un DNIe insertado
         else if (Platform.getOS().equals(Platform.OS.MACOSX) && AOKeyStore.APPLE.equals(store)) {
-        	return new DnieUnifiedKeyStoreManager(getMacOSXKeyStoreManager(store, lib), parentComponent);
+        	final AOKeyStoreManager ksm = getMacOSXKeyStoreManager(store, lib);
+        	if (!KeyStoreUtilities.containsDnie(ksm)) {
+        		try {
+        			ksm.addKeyStores(getDnieJavaKeyStoreManager(pssCallback, parentComponent).getKeyStores());
+        		}
+        		catch(final Exception e) {
+        			// Se ignora
+        		}
+        	}
+        	return ksm;
         }
 
         else if (AOKeyStore.DNIEJAVA.equals(store)) {
-        	return getDnieJavaKeyStoreManager(store, pssCallback, parentComponent);
+        	return getDnieJavaKeyStoreManager(pssCallback, parentComponent);
         }
 
         throw new AOKeystoreAlternativeException(
@@ -184,18 +188,17 @@ public final class AOKeyStoreManagerFactory {
         return ksm;
 	}
 
-	private static AOKeyStoreManager getDnieJavaKeyStoreManager(final AOKeyStore store,
-    		                                                    final PasswordCallback pssCallback,
+	private static AOKeyStoreManager getDnieJavaKeyStoreManager(final PasswordCallback pssCallback,
     	                                                        final Object parentComponent) throws AOKeystoreAlternativeException,
     																								 IOException {
     	final AOKeyStoreManager ksm = new AOKeyStoreManager();
     	try {
     		// Proporcionamos el componente padre como parametro
-    		ksm.init(store, null, pssCallback, new Object[] { parentComponent });
+    		ksm.init(AOKeyStore.DNIEJAVA, null, pssCallback, new Object[] { parentComponent });
     	}
     	catch (final AOKeyStoreManagerException e) {
     	   throw new AOKeystoreAlternativeException(
-                getAlternateKeyStoreType(store),
+                getAlternateKeyStoreType(AOKeyStore.DNIEJAVA),
                 "Error al inicializar el modulo DNIe 100% Java: " + e, //$NON-NLS-1$
                 e
            );
@@ -275,8 +278,7 @@ public final class AOKeyStoreManagerFactory {
         return ksm;
     }
 
-    private static AOKeyStoreManager getPkcs11KeyStoreManager(final AOKeyStore store,
-                                                              final String lib,
+    private static AOKeyStoreManager getPkcs11KeyStoreManager(final String lib,
                                                               final String description,
                                                               final PasswordCallback pssCallback,
                                                               final Object parentComponent) throws IOException,
@@ -320,13 +322,18 @@ public final class AOKeyStoreManagerFactory {
             throw new AOCancelledOperationException("No se ha seleccionado el controlador PKCS#11"); //$NON-NLS-1$
         }
         try {
-            ksm.init(store, null, pssCallback, new String[] {
+            ksm.init(
+        		AOKeyStore.PKCS11,
+        		null,
+        		pssCallback,
+        		new String[] {
                     p11Lib, description
-            });
+        		}
+    		);
         }
         catch (final AOException e) {
             throw new AOKeystoreAlternativeException(
-                 getAlternateKeyStoreType(store),
+                 getAlternateKeyStoreType(AOKeyStore.PKCS11),
                  "Error al inicializar el modulo PKCS#11", //$NON-NLS-1$
                  e
             );
@@ -350,28 +357,6 @@ public final class AOKeyStoreManagerFactory {
         return ksm;
     }
 
-    private static AOKeyStoreManager getDniePkcs11KeyStoreManager(final AOKeyStore store,
-                                                                  final PasswordCallback pssCallback) throws IOException,
-                                                                                                             AOKeystoreAlternativeException {
-    	final AOKeyStoreManager ksm = new AOKeyStoreManager();
-    	try {
-            ksm.init(
-        		store,
-        		null,
-        		!(pssCallback instanceof NullPasswordCallback) ? pssCallback : null,
-        		null
-    		);
-        }
-        catch (final AOException e) {
-            throw new AOKeystoreAlternativeException(
-                 getAlternateKeyStoreType(store),
-                 "Error al inicializar el PKCS#11 del DNIe", //$NON-NLS-1$
-                 e
-            );
-        }
-        return ksm;
-    }
-
     private static AOKeyStoreManager getWindowsMyCapiKeyStoreManager() throws AOKeystoreAlternativeException, IOException {
     	final AOKeyStoreManager ksmCapi = new CAPIKeyStoreManager();
 		try {
@@ -387,8 +372,7 @@ public final class AOKeyStoreManagerFactory {
 		return ksmCapi;
     }
 
-    private static AOKeyStoreManager getMozillaUnifiedKeyStoreManager(final AOKeyStore store,
-    		                                                          final PasswordCallback pssCallback) throws AOKeystoreAlternativeException,
+    private static AOKeyStoreManager getMozillaUnifiedKeyStoreManager(final PasswordCallback pssCallback) throws AOKeystoreAlternativeException,
     		                                                                                                     IOException {
         final AOKeyStoreManager ksmUni;
         try {
@@ -396,7 +380,7 @@ public final class AOKeyStoreManagerFactory {
         }
         catch(final Exception e) {
             throw new AOKeystoreAlternativeException(
-                 getAlternateKeyStoreType(store),
+                 getAlternateKeyStoreType(AOKeyStore.MOZ_UNI),
                  "Error al obtener dinamicamente el almacen NSS unificado de Mozilla Firefox: " + e, //$NON-NLS-1$
                  e
              );
@@ -406,7 +390,7 @@ public final class AOKeyStoreManagerFactory {
         }
         catch (final AOException e) {
             throw new AOKeystoreAlternativeException(
-                getAlternateKeyStoreType(store),
+                getAlternateKeyStoreType(AOKeyStore.MOZ_UNI),
                 "Error al inicializar el almacen NSS unificado de Mozilla Firefox: " + e, //$NON-NLS-1$
                 e
             );

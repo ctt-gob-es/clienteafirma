@@ -110,14 +110,6 @@ public enum AOKeyStore {
 		new CachePasswordCallback("wincadummy".toCharArray()), //$NON-NLS-1$
 		NullPasswordCallback.getInstance()
 	),
-    /** DNIe, en cualquier plataforma soportada mediante PKCS#11. */
-    DNIE(
-		"DNI Electronico", //$NON-NLS-1$
-		13,
-		"PKCS11", //$NON-NLS-1$
-		NullPasswordCallback.getInstance(),
-		new UIPasswordCallback(KeyStoreMessages.getString("AOKeyStore.10")) //$NON-NLS-1$
-	),
     /** DNIe con controlador nativo Java. */
     DNIEJAVA(
 		"DNIe 100% Java", //$NON-NLS-1$

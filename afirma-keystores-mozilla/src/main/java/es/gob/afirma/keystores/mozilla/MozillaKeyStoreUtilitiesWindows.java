@@ -17,7 +17,10 @@ final class MozillaKeyStoreUtilitiesWindows {
 	private static final String P11_CONFIG_VALID_CHARS = ":\\0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_.\u007E"; //$NON-NLS-1$
 
 	// Bibliotecas Windows de Firefox
+
+	/** Nombre del PKCS#11 NSS en Windows. */
 	private static final String SOFTOKN3_DLL = "softokn3.dll"; //$NON-NLS-1$
+
 	private static final String PLC4_DLL = "plc4.dll"; //$NON-NLS-1$
 	private static final String PLDS4_DLL = "plds4.dll"; //$NON-NLS-1$
 	private static final String NSPR4_DLL = "nspr4.dll"; //$NON-NLS-1$
@@ -152,10 +155,6 @@ final class MozillaKeyStoreUtilitiesWindows {
 			nssPath + NSSDBM3_DLL,    // Firefox 3 y superior
 			nssPath + FREEBL3_DLL     // Firefox 3 y superior
 		};
-	}
-
-	static String getSoftoknLibNameWindows() {
-		return SOFTOKN3_DLL;
 	}
 
 	private static String appData = null;

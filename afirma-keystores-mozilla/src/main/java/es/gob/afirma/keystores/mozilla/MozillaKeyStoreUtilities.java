@@ -42,6 +42,9 @@ final class MozillaKeyStoreUtilities {
 
 	private static final String SOFTOKN3_SO = "libsoftokn3.so"; //$NON-NLS-1$
 
+	/** Nombre del PKCS#11 NSS en Windows. */
+	private static final String SOFTOKN3_DLL = "softokn3.dll"; //$NON-NLS-1$
+
 	private static final String AFIRMA_NSS_HOME = "AFIRMA_NSS_HOME"; //$NON-NLS-1$
 
 	private static final String AFIRMA_PROFILES_INI = "AFIRMA_PROFILES_INI"; //$NON-NLS-1$
@@ -68,12 +71,15 @@ final class MozillaKeyStoreUtilities {
 	 *         NSS. */
 	static String createPKCS11NSSConfigFile(final String userProfileDirectory, final String libDir) {
 
-		String softoknLib = SOFTOKN3_SO;
+		final String softoknLib;
 		if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
-			softoknLib = MozillaKeyStoreUtilitiesWindows.getSoftoknLibNameWindows();
+			softoknLib = SOFTOKN3_DLL;
 		}
 		else if (Platform.getOS().equals(Platform.OS.MACOSX)) {
 			softoknLib = "libsoftokn3.dylib"; //$NON-NLS-1$
+		}
+		else {
+			softoknLib = SOFTOKN3_SO;
 		}
 
 		final StringBuilder buffer = new StringBuilder("name=NSSCrypto-AFirma\r\n"); //$NON-NLS-1$

@@ -56,15 +56,19 @@ public final class CAPIKeyStoreManager extends AOKeyStoreManager {
     }
 
 	@Override
-	public List<KeyStore> init(final AOKeyStore type,
+	public void init(final AOKeyStore type,
 			                   final InputStream store,
 			                   final PasswordCallback pssCallBack,
 			                   final Object[] params) throws AOKeyStoreManagerException, IOException {
 		if (AOKeyStore.WINDOWS.equals(type)) {
 			setKeyStoreType(AOKeyStore.WINDOWS);
-        	return initCAPI();
+        	this.kss = initCAPI();
         }
-		throw new AOKeyStoreManagerException("Tipo de almacen no soportado: " + type.getName()); //$NON-NLS-1$
+		else {
+			throw new AOKeyStoreManagerException(
+				"Tipo de almacen no soportado, este gestor es exclusivo CAPI: " + type.getName() //$NON-NLS-1$
+			);
+		}
 	}
 
     private static List<KeyStore> initCAPI() throws AOKeyStoreManagerException, IOException {
