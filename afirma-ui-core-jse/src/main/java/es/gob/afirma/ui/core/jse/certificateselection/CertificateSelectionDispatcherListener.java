@@ -89,7 +89,6 @@ final class CertificateSelectionDispatcherListener implements KeyEventDispatcher
 								false,
 								this.parent
 							)[0]);
-							System.out.println(ke.getExtendedKeyCode());
 						}
 						catch(final AOCancelledOperationException e) {
 							return false;

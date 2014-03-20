@@ -63,8 +63,6 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 
 	}
 
-
-
 	/** Muestra el di&aacute;logo de selecci&oacute;n de certificados.
 	 * @return Nombre del certificado seleccionado o {@code null} si el usuario
 	 * lo cancela o cierra sin seleccionar. */
