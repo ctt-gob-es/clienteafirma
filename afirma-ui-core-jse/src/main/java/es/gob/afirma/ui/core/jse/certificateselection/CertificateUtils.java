@@ -8,7 +8,7 @@
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
-package es.gob.afirma.ui.core.jse;
+package es.gob.afirma.ui.core.jse.certificateselection;
 
 import java.awt.Component;
 import java.io.File;
@@ -25,6 +25,8 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.Platform.OS;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.ui.core.jse.JSEUIManager;
+import es.gob.afirma.ui.core.jse.JSEUIMessages;
 
 /**
  * Funciones de utilidad del di&aacute;logo de selecci&oacute;n de certificados.

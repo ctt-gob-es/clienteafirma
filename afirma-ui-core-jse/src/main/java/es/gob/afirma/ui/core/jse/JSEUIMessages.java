@@ -13,9 +13,9 @@ package es.gob.afirma.ui.core.jse;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-/** Clase para la obtencion de los recursos textuales del UI del n&uacute;cleo del
+/** Clase para la obtenci&oacute;n de los recursos textuales del UI del n&uacute;cleo del
  * cliente Afirma. */
-final class JSEUIMessages {
+public final class JSEUIMessages {
 
     private static final String BUNDLE_NAME = "uimessages"; //$NON-NLS-1$
     private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME, Locale.getDefault());
@@ -25,10 +25,9 @@ final class JSEUIMessages {
     }
 
     /** Recupera el texto identificado con la clave proporcionada.
-     * @param key
-     *        Clave del texto.
-     * @return Recuerso textual. */
-    static String getString(final String key) {
+     * @param key Clave del texto.
+     * @return Recurso textual. */
+    public static String getString(final String key) {
         try {
             return RESOURCE_BUNDLE.getString(key);
         }
@@ -61,7 +60,7 @@ final class JSEUIMessages {
      * @param params
      *        Par&aacute;metros que se desean insertar.
      * @return Recuerso textual con las subcadenas sustituidas. */
-    static String getString(final String key, final String[] params) {
+    public static String getString(final String key, final String[] params) {
 
         String text;
         try {

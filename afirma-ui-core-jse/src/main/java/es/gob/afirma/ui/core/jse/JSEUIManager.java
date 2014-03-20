@@ -32,8 +32,9 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.keystores.NameCertificateBean;
 import es.gob.afirma.core.ui.AOUIManager;
-import es.gob.afirma.core.ui.NameCertificateBean;
+import es.gob.afirma.ui.core.jse.certificateselection.CertificateSelectionDialog;
 
 /** Gestor de componentes de interfaz gr&aacute;fico (tanto para Applet como para
  * aplicaci&oacute;n de escritorio) de la aplicaci&oacute;n.

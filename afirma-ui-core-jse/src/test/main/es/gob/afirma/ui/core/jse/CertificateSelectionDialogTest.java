@@ -4,7 +4,8 @@ import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 
-import es.gob.afirma.core.ui.NameCertificateBean;
+import es.gob.afirma.core.keystores.NameCertificateBean;
+import es.gob.afirma.ui.core.jse.certificateselection.CertificateSelectionDialog;
 
 /**
  * Di&aacute;logo de selecci&oacute;n de certificados con est&eacute;tica similar al de

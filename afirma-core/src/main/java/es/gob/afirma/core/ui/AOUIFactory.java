@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+import es.gob.afirma.core.keystores.NameCertificateBean;
 import es.gob.afirma.core.misc.Platform;
 
 /**

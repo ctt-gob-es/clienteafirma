@@ -7,7 +7,7 @@
  * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
-package es.gob.afirma.ui.core.jse;
+package es.gob.afirma.ui.core.jse.certificateselection;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -40,8 +40,9 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.keystores.NameCertificateBean;
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.core.ui.NameCertificateBean;
+import es.gob.afirma.ui.core.jse.JSEUIMessages;
 
 /** Di&aacute;logo de selecci&oacute;n de certificados con est&eacute;tica Windows 7. */
 final class CertificateSelectionPanel extends JPanel implements ListSelectionListener {

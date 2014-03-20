@@ -1,4 +1,4 @@
-package es.gob.afirma.core.ui;
+package es.gob.afirma.core.keystores;
 
 import java.security.cert.X509Certificate;
 

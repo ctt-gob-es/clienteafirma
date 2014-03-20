@@ -8,22 +8,24 @@
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
-package es.gob.afirma.ui.core.jse;
+package es.gob.afirma.ui.core.jse.certificateselection;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
-import es.gob.afirma.core.ui.NameCertificateBean;
+import es.gob.afirma.core.keystores.NameCertificateBean;
+import es.gob.afirma.ui.core.jse.JSEUIMessages;
 
 /** Di&aacute;logo de selecci&oacute;n de certificados con est&eacute;tica similar al de
  * Windows 7.
  * @author Carlos Gamuci */
-final class CertificateSelectionDialog extends MouseAdapter {
+public final class CertificateSelectionDialog extends MouseAdapter {
 
 	private final CertificateSelectionPanel csd;
 
@@ -35,7 +37,7 @@ final class CertificateSelectionDialog extends MouseAdapter {
 	 * sus nombres y los propios certificados.
 	 * @param el Listado de certificados.
 	 * @param parent Componente sobre el que se mostrar&aacute; el di&aacute;logo. */
-	CertificateSelectionDialog(final NameCertificateBean[] el, final Component parent) {
+	public CertificateSelectionDialog(final NameCertificateBean[] el, final Component parent) {
 
 	    if (el == null || el.length == 0) {
 	        throw new IllegalArgumentException("El listado de certificados no puede ser nulo ni vacio"); //$NON-NLS-1$
@@ -52,6 +54,13 @@ final class CertificateSelectionDialog extends MouseAdapter {
 		this.optionPane.setMessageType(JOptionPane.PLAIN_MESSAGE);
 		this.optionPane.setOptionType(JOptionPane.OK_CANCEL_OPTION);
 
+		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(
+			new CertificateSelectionDispatcherListener(
+				this.optionPane,
+				null
+			)
+		);
+
 	}
 
 
@@ -59,7 +68,7 @@ final class CertificateSelectionDialog extends MouseAdapter {
 	/** Muestra el di&aacute;logo de selecci&oacute;n de certificados.
 	 * @return Nombre del certificado seleccionado o {@code null} si el usuario
 	 * lo cancela o cierra sin seleccionar. */
-	String showDialog() {
+	public String showDialog() {
 		final JDialog certDialog = this.optionPane.createDialog(this.parent, JSEUIMessages.getString("CertificateSelectionDialog.0")); //$NON-NLS-1$
 		certDialog.setBackground(Color.WHITE);
 		certDialog.setModal(true);

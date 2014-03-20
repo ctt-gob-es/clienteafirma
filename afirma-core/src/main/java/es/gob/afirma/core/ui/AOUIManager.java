@@ -13,6 +13,8 @@ package es.gob.afirma.core.ui;
 import java.io.File;
 import java.io.IOException;
 
+import es.gob.afirma.core.keystores.NameCertificateBean;
+
 /** Gestor de componentes de interfaz gr&aacute;fico
  * @version 0.4 */
 public interface AOUIManager {
