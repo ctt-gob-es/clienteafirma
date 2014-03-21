@@ -42,8 +42,9 @@ public final class Pkcs12KeyStoreManager extends AOKeyStoreManager {
 	public void init(final AOKeyStore type,
                      final InputStream store,
                      final PasswordCallback pssCallBack,
-                     final Object[] params) throws AOKeyStoreManagerException,
-                                                   IOException {
+                     final Object[] params,
+                     final boolean forceReset) throws AOKeyStoreManagerException,
+                                                      IOException {
 		setKeyStores(init(store, pssCallBack));
 	}
 

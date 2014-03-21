@@ -38,24 +38,20 @@ public final class AOKeyStoreManagerFactory {
      * @param store
      *        Almac&eacute;n de claves
      * @param lib
-     *        Biblioteca del KeyStore (solo para KeyStoreManager de tipo
-     *        PKCS#11) o fichero de almac&eacute;n de claves (para
+     *        Biblioteca del KeyStore (solo para KeyStoreManager de tipo PKCS#11) o fichero de almac&eacute;n de claves (para
      *        PKCS#12, Java KeyStore, JCE KeyStore, X.509, llavero de Mac OS X [opcional] y PKCS#7)
      * @param description
      *        Descripci&oacute;n del KeyStoreManager que se desea obtener,
-     *        necesario para obtener el n&uacute;mero de z&oacute;calo de
-     *        los modulos PKCS#11 obtenidos del Secmod de Mozilla / Firefox.
+     *        necesario para obtener el n&uacute;mero de z&oacute;calo de los modulos PKCS#11 obtenidos del Secmod de Mozilla / Firefox.
      *        Debe seguir el formato definido en el m&eacute;todo <code>toString()</code> de la clase <code>sun.security.pkcs11.Secmod.Module</code>
      * @param pssCallback
-     *        <i>Callback</i> que solicita la password del repositorio que deseamos
-     *        recuperar.
+     *        <i>Callback</i> que solicita la password del repositorio que deseamos recuperar.
      * @param parentComponent
      *        Componente padre sobre el que mostrar los di&aacute;logos (normalmente un <code>java.awt.Comonent</code>)
      *        modales de ser necesario.
      * @return KeyStoreManager del tipo indicado
      * @throws AOCancelledOperationException
-     *         Cuando el usuario cancela el proceso (por ejemplo, al
-     *         introducir la contrase&ntilde;a)
+     *         Cuando el usuario cancela el proceso (por ejemplo, al introducir la contrase&ntilde;a)
      * @throws AOKeystoreAlternativeException
      *         Cuando ocurre cualquier otro problema durante el proceso
      * @throws IOException
@@ -63,8 +59,7 @@ public final class AOKeyStoreManagerFactory {
      * @throws es.gob.afirma.core.InvalidOSException Cuando se pide un almac&eacute;n &uacute;nicamente disponible para
      *                            un sistema operativo distinto del actual
      * @throws es.gob.afirma.core.MissingLibraryException Cuando no se localice una biblioteca necesaria para el
-     * uso del almac&eacute;n.
-     */
+     * uso del almac&eacute;n. */
     public static AOKeyStoreManager getAOKeyStoreManager(final AOKeyStore store,
                                                          final String lib,
                                                          final String description,
@@ -150,7 +145,7 @@ public final class AOKeyStoreManagerFactory {
         if (storeFilename == null) {
             String desc = null;
             final String[] exts = new String[] {
-                        "pfx", "p12" //$NON-NLS-1$ //$NON-NLS-2$
+                "pfx", "p12" //$NON-NLS-1$ //$NON-NLS-2$
             };
             desc = KeyStoreMessages.getString("AOKeyStoreManagerFactory.0"); //$NON-NLS-1$
             storeFilename = AOUIFactory.getLoadFiles(
@@ -171,7 +166,7 @@ public final class AOKeyStoreManagerFactory {
         InputStream is = null;
         try {
             is = new FileInputStream(storeFilename);
-            ksm.init(null, is, pssCallback, null);
+            ksm.init(null, is, pssCallback, null, false);
         }
         catch (final AOException e) {
             throw new AOKeystoreAlternativeException(
@@ -190,11 +185,11 @@ public final class AOKeyStoreManagerFactory {
 
 	private static AOKeyStoreManager getDnieJavaKeyStoreManager(final PasswordCallback pssCallback,
     	                                                        final Object parentComponent) throws AOKeystoreAlternativeException,
-    																								 IOException {
+    																							 IOException {
     	final AOKeyStoreManager ksm = new AOKeyStoreManager();
     	try {
     		// Proporcionamos el componente padre como parametro
-    		ksm.init(AOKeyStore.DNIEJAVA, null, pssCallback, new Object[] { parentComponent });
+    		ksm.init(AOKeyStore.DNIEJAVA, null, pssCallback, new Object[] { parentComponent }, false);
     	}
     	catch (final AOKeyStoreManagerException e) {
     	   throw new AOKeystoreAlternativeException(
@@ -261,7 +256,7 @@ public final class AOKeyStoreManagerFactory {
         InputStream is = null;
         try {
             is = new FileInputStream(storeFilename);
-            ksm.init(store, is, pssCallback, null);
+            ksm.init(store, is, pssCallback, null, false);
         }
         catch (final AOException e) {
             throw new AOKeystoreAlternativeException(
@@ -328,7 +323,8 @@ public final class AOKeyStoreManagerFactory {
         		pssCallback,
         		new String[] {
                     p11Lib, description
-        		}
+        		},
+        		false
     		);
         }
         catch (final AOException e) {
@@ -345,7 +341,7 @@ public final class AOKeyStoreManagerFactory {
                                                                                                   AOKeystoreAlternativeException {
     	final AOKeyStoreManager ksm = new AOKeyStoreManager();
         try {
-            ksm.init(store, null, NullPasswordCallback.getInstance(), null);
+            ksm.init(store, null, NullPasswordCallback.getInstance(), null, false);
         }
         catch (final AOException e) {
             throw new AOKeystoreAlternativeException(
@@ -360,7 +356,7 @@ public final class AOKeyStoreManagerFactory {
     private static AOKeyStoreManager getWindowsMyCapiKeyStoreManager() throws AOKeystoreAlternativeException, IOException {
     	final AOKeyStoreManager ksmCapi = new CAPIKeyStoreManager();
 		try {
-			ksmCapi.init(AOKeyStore.WINDOWS, null, null, null);
+			ksmCapi.init(AOKeyStore.WINDOWS, null, null, null, false);
 		}
 		catch (final AOKeyStoreManagerException e) {
 			throw new AOKeystoreAlternativeException(
@@ -386,7 +382,7 @@ public final class AOKeyStoreManagerFactory {
              );
         }
         try {
-            ksmUni.init(AOKeyStore.MOZ_UNI, null, pssCallback, null);
+            ksmUni.init(AOKeyStore.MOZ_UNI, null, pssCallback, null, false);
         }
         catch (final AOException e) {
             throw new AOKeystoreAlternativeException(
@@ -407,7 +403,8 @@ public final class AOKeyStoreManagerFactory {
                  store,
                  lib == null || "".equals(lib) ? null : new FileInputStream(lib),  //$NON-NLS-1$
         		 NullPasswordCallback.getInstance(),
-                 null
+                 null,
+                 false
             );
         }
         catch (final AOException e) {

@@ -48,7 +48,11 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
 	 *         claves, ni el NSS interno, ni ning&uacute;n PKCS#11 externo
 	 *         definido en SecMod */
 	@Override
-	public void init(final AOKeyStore type, final InputStream store, final PasswordCallback pssCallBack, final Object[] params) throws AOKeyStoreManagerException {
+	public void init(final AOKeyStore type,
+			         final InputStream store,
+			         final PasswordCallback pssCallBack,
+			         final Object[] params,
+			         final boolean forceReset) throws AOKeyStoreManagerException {
 
 		// Se ha detectado que en algunas versiones de Java/OpenJDK, al solicitar un proveedor
 		// de seguridad comprobar su existencia, puede afectar negativamente a que este proveedor
@@ -126,7 +130,8 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
 					),
 					new String[] {
 						externalStores.get(descr), descr.toString()
-					}
+					},
+					forceReset
 				);
 				addKeyStores(tmpKsm.getKeyStores());
 			}

@@ -31,7 +31,13 @@ public class TestP12MultiPassword {
 		Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
 
 		final AOKeyStoreManager ksm = new Pkcs12KeyStoreManager();
-		ksm.init(null, ClassLoader.getSystemResourceAsStream("multi_almacen.p12"), new CachePasswordCallback("1111".toCharArray()), null);  //$NON-NLS-1$//$NON-NLS-2$
+		ksm.init(
+			null,
+			ClassLoader.getSystemResourceAsStream("multi_almacen.p12"), //$NON-NLS-1$
+			new CachePasswordCallback("1111".toCharArray()), //$NON-NLS-1$
+			null,
+			false
+		);
 
 		for (int i=0;i<ksm.getAliases().length;i++) {
 			if (i==2 || i==4) {

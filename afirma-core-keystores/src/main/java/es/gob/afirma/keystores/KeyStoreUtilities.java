@@ -378,13 +378,13 @@ public final class KeyStoreUtilities {
      * @throws AOCertificatesNotFoundException
      *         Si no hay certificados que mostrar al usuario */
     public static String showCertSelectionDialog(final String[] alias,
-    		final AOKeyStoreManager ksm,
-    		final Object parentComponent,
-    		final boolean checkPrivateKeys,
-    		final boolean checkValidity,
-    		final boolean showExpiredCertificates,
-    		final List<CertificateFilter> certFilters,
-    		final boolean mandatoryCertificate) throws AOCertificatesNotFoundException {
+    		                                     final AOKeyStoreManager ksm,
+    		                                     final Object parentComponent,
+    		                                     final boolean checkPrivateKeys,
+    		                                     final boolean checkValidity,
+    		                                     final boolean showExpiredCertificates,
+    		                                     final List<CertificateFilter> certFilters,
+    		                                     final boolean mandatoryCertificate) throws AOCertificatesNotFoundException {
 
     	if (alias == null && ksm == null || alias != null && alias.length == 0) {
     		throw new AOCertificatesNotFoundException("El almacen no contenia entradas"); //$NON-NLS-1$

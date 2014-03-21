@@ -31,16 +31,30 @@ public class AOKeyStoreManager {
 
     protected static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
+    /** Tipo de almac&eacute;n. */
+    private AOKeyStore ksType;
+
     /** Almacenes de claves. */
     private List<KeyStore> kss = new ArrayList<KeyStore>();
+
+    /** Reinicia el almac&eacute;n de claves, leyendo de nuevo los dispositivos de almac&eacute;n (tarjetas, etc.)
+     * si es preciso.
+     * @throws IOException
+     * @throws AOKeyStoreManagerException */
+    public void reset() throws AOKeyStoreManagerException, IOException {
+    	this.init(this.ksType, this.storeIs, this.callBack, this.storeParams, true);
+    }
+
     protected void setKeyStores(final List<KeyStore> k) {
     	this.kss = k == null ?
 			this.kss = new ArrayList<KeyStore>() :
 				k;
     }
+
     protected boolean lacksKeyStores() {
     	return this.kss == null || this.kss.isEmpty();
     }
+
     protected void addKeyStore(final KeyStore ks) {
     	if (ks != null) {
     		this.kss.add(ks);
@@ -56,8 +70,6 @@ public class AOKeyStoreManager {
     	}
     }
 
-    /** Tipo de almac&eacute;n. */
-    private AOKeyStore ksType;
     protected void setKeyStoreType(final AOKeyStore type) {
     	this.ksType = type;
     }
@@ -68,6 +80,11 @@ public class AOKeyStoreManager {
         return this.ksType;
     }
 
+    private InputStream storeIs;
+    private PasswordCallback callBack;
+    private Object[] storeParams;
+
+
     /** Inicializa el almac&eacute;n. Se encarga tambi&eacute;n de a&ntilde;adir o
      * retirar los <i>Provider</i> necesarios para operar con dicho almac&eacute;n
      * @param type Tipo del almac&eacute;n de claves
@@ -75,6 +92,7 @@ public class AOKeyStoreManager {
      *        (solo para los almacenes en disco)
      * @param pssCallBack CallBack encargado de recuperar la contrase&ntilde;a del Keystore
      * @param params Par&aacute;metros adicionales (dependen del tipo de almac&eacute;n)
+     * @param forceReset Fuerza un reinicio del almac&eacute;n, no se reutiliza una instancia previa
      * @throws AOKeyStoreManagerException Cuando ocurre cualquier problema durante la inicializaci&oacute;n
      * @throws IOException Se ha insertado una contrase&ntilde;a incorrecta para la apertura del
      *         almac&eacute;n de certificados.
@@ -84,14 +102,19 @@ public class AOKeyStoreManager {
     public void init(final AOKeyStore type,
     		         final InputStream store,
     		         final PasswordCallback pssCallBack,
-    		         final Object[] params) throws AOKeyStoreManagerException,
-    		                                       IOException {
+    		         final Object[] params,
+    		         final boolean forceReset) throws AOKeyStoreManagerException,
+    		                                          IOException {
         if (type == null) {
             throw new IllegalArgumentException("Se ha solicitado inicializar un AOKeyStore nulo"); //$NON-NLS-1$
         }
         LOGGER.info("Inicializamos el almacen de tipo: " + type); //$NON-NLS-1$
 
+        // Guardamos los parametros de inicializacion por si hay que reiniciar
         this.ksType = type;
+        this.storeIs = store;
+        this.callBack = pssCallBack;
+        this.storeParams = params;
 
         switch(this.ksType) {
         	case SINGLE:

@@ -59,10 +59,14 @@ public final class CAPIKeyStoreManager extends AOKeyStoreManager {
 	public void init(final AOKeyStore type,
 			                   final InputStream store,
 			                   final PasswordCallback pssCallBack,
-			                   final Object[] params) throws AOKeyStoreManagerException, IOException {
+			                   final Object[] params,
+			                   final boolean forceReset) throws AOKeyStoreManagerException, IOException {
 		if (AOKeyStore.WINDOWS.equals(type)) {
+			if (forceReset) {
+				capiKsMy = null;
+			}
 			setKeyStoreType(AOKeyStore.WINDOWS);
-			setKeyStores(initCAPI());
+			setKeyStores(initCapi());
         }
 		else {
 			throw new AOKeyStoreManagerException(
@@ -71,7 +75,7 @@ public final class CAPIKeyStoreManager extends AOKeyStoreManager {
 		}
 	}
 
-    private static List<KeyStore> initCAPI() throws AOKeyStoreManagerException, IOException {
+    private static List<KeyStore> initCapi() throws AOKeyStoreManagerException, IOException {
 
     	if (capiKsMy == null) {
 
