@@ -62,7 +62,7 @@ public final class CAPIKeyStoreManager extends AOKeyStoreManager {
 			                   final Object[] params) throws AOKeyStoreManagerException, IOException {
 		if (AOKeyStore.WINDOWS.equals(type)) {
 			setKeyStoreType(AOKeyStore.WINDOWS);
-        	this.kss = initCAPI();
+			setKeyStores(initCAPI());
         }
 		else {
 			throw new AOKeyStoreManagerException(

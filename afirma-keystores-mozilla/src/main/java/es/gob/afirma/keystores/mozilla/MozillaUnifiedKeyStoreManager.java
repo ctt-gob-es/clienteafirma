@@ -13,10 +13,7 @@ package es.gob.afirma.keystores.mozilla;
 import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.Provider;
-import java.util.Enumeration;
-import java.util.Hashtable;
 import java.util.Map;
-import java.util.Vector;
 
 import javax.security.auth.callback.PasswordCallback;
 
@@ -58,8 +55,6 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
 		// se cargue en un futuro, asi que guardamos una copia local del proveedor para hacer
 		// estas comprobaciones
 		final Provider p = getNssProvider();
-		Enumeration<String> tmpAlias = new Vector<String>(0).elements();
-		this.storesByAlias = new Hashtable<String, KeyStore>();
 
 		KeyStore keyStore = null;
 
@@ -93,22 +88,10 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
 				}
 			}
 
-			if (keyStore != null) {
-				try {
-					tmpAlias = keyStore.aliases();
-				}
-				catch (final Exception e) {
-					LOGGER.warning("El almacen interno de Firefox no devolvio certificados, se continuara con los externos: " + e); //$NON-NLS-1$
-					keyStore = null;
-				}
-				while (tmpAlias.hasMoreElements()) {
-					this.storesByAlias.put(tmpAlias.nextElement().toString(), keyStore);
-				}
-			}
 		}
 
 		if (keyStore != null) {
-			this.kss.add(keyStore);
+			addKeyStore(keyStore);
 		}
 
 		// Vamos ahora con los almacenes externos, que se limpian antes de usarse quitando DNIe (porque se usa
@@ -168,15 +151,8 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
 				null,
 				this.parentComponent
 			).getKeyStores().get(0);
-			tmpAlias = tmpStore.aliases();
 			LOGGER.info("El DNIe 100% Java ha podido inicializarse, se anadiran sus entradas"); //$NON-NLS-1$
-			String alias;
-			while (tmpAlias.hasMoreElements()) {
-				alias = tmpAlias.nextElement().toString();
-				this.storesByAlias.put(alias, tmpStore);
-				LOGGER.info("Anadida la entrada '" + alias + "' del DNIe 100% Java"); //$NON-NLS-1$ //$NON-NLS-2$
-			}
-			this.kss.add(tmpStore);
+			addKeyStore(tmpStore);
 		}
 		catch (final AOCancelledOperationException ex) {
 			LOGGER.warning("Se cancelo el acceso al almacen DNIe 100% Java: " + ex); //$NON-NLS-1$
@@ -185,7 +161,7 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
 			LOGGER.warning("No se ha podido inicializar el controlador DNIe 100% Java: " + ex); //$NON-NLS-1$
 		}
 
-		if (this.kss.isEmpty()) {
+		if (lacksKeyStores()) {
 			throw new AOKeyStoreManagerException("No se ha podido inicializar ningun almacen, interno o externo, de Firefox"); //$NON-NLS-1$
 		}
 

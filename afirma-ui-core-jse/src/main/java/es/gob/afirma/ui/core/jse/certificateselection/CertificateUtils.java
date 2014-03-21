@@ -26,11 +26,8 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.Platform.OS;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.ui.core.jse.JSEUIManager;
-import es.gob.afirma.ui.core.jse.JSEUIMessages;
 
-/**
- * Funciones de utilidad del di&aacute;logo de selecci&oacute;n de certificados.
- */
+/** Funciones de utilidad del di&aacute;logo de selecci&oacute;n de certificados. */
 final class CertificateUtils {
 
     private CertificateUtils() {
@@ -75,7 +72,7 @@ final class CertificateUtils {
 				new ProcessBuilder(
 						new String[] {
 								"cmd", "/C", "start", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-								"\"" + JSEUIMessages.getString("CertificateUtils.0") + "\"", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+								"\"" + CertificateSelectionDialogMessages.getString("CertificateUtils.0") + "\"", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 								"\"" + certFile.getAbsolutePath() + "\""} //$NON-NLS-1$ //$NON-NLS-2$
 				).start();
 				return;
@@ -89,19 +86,19 @@ final class CertificateUtils {
 		try {
 	    	AOUIFactory.getSaveDataToFile(
     			certificate.getEncoded(),
-    			JSEUIMessages.getString("CertificateUtils.1"),  //$NON-NLS-1$
+    			CertificateSelectionDialogMessages.getString("CertificateUtils.1"),  //$NON-NLS-1$
     			null,
-    			JSEUIMessages.getString("CertificateUtils.5") + CERTIFICATE_DEFAULT_EXTENSION, //$NON-NLS-1$
+    			CertificateSelectionDialogMessages.getString("CertificateUtils.5") + CERTIFICATE_DEFAULT_EXTENSION, //$NON-NLS-1$
     			new String[] { CERTIFICATE_DEFAULT_EXTENSION },
-    			JSEUIMessages.getString("CertificateUtils.3"), //$NON-NLS-1$
+    			CertificateSelectionDialogMessages.getString("CertificateUtils.3"), //$NON-NLS-1$
     			parent
 			);
 		}
 		catch (final IOException e) {
 			new JSEUIManager().showConfirmDialog(
 				parent,
-				JSEUIMessages.getString("CertificateUtils.2"), //$NON-NLS-1$
-				JSEUIMessages.getString("CertificateUtils.3"), //$NON-NLS-1$
+				CertificateSelectionDialogMessages.getString("CertificateUtils.2"), //$NON-NLS-1$
+				CertificateSelectionDialogMessages.getString("CertificateUtils.3"), //$NON-NLS-1$
 				JOptionPane.CLOSED_OPTION,
 				JOptionPane.ERROR_MESSAGE
 			);
@@ -109,8 +106,8 @@ final class CertificateUtils {
 		catch (final CertificateEncodingException e) {
 			new JSEUIManager().showConfirmDialog(
 					parent,
-					JSEUIMessages.getString(JSEUIMessages.getString("CertificateUtils.4")), //$NON-NLS-1$
-					JSEUIMessages.getString("CertificateUtils.3"), //$NON-NLS-1$
+					CertificateSelectionDialogMessages.getString("CertificateUtils.4"), //$NON-NLS-1$
+					CertificateSelectionDialogMessages.getString("CertificateUtils.3"), //$NON-NLS-1$
 					JOptionPane.CLOSED_OPTION,
 					JOptionPane.ERROR_MESSAGE
 				);

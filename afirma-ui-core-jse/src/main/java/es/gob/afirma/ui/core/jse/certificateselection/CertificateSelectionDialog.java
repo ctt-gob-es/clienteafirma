@@ -20,7 +20,6 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.keystores.NameCertificateBean;
-import es.gob.afirma.ui.core.jse.JSEUIMessages;
 
 /** Di&aacute;logo de selecci&oacute;n de certificados con est&eacute;tica similar al de
  * Windows 7.
@@ -67,7 +66,10 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 	 * @return Nombre del certificado seleccionado o {@code null} si el usuario
 	 * lo cancela o cierra sin seleccionar. */
 	public String showDialog() {
-		final JDialog certDialog = this.optionPane.createDialog(this.parent, JSEUIMessages.getString("CertificateSelectionDialog.0")); //$NON-NLS-1$
+		final JDialog certDialog = this.optionPane.createDialog(
+			this.parent,
+			CertificateSelectionDialogMessages.getString("CertificateSelectionDialog.0") //$NON-NLS-1$
+		);
 		certDialog.setBackground(Color.WHITE);
 		certDialog.setModal(true);
 		certDialog.setVisible(true);

@@ -20,7 +20,6 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
@@ -33,7 +32,20 @@ public class AOKeyStoreManager {
     protected static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** Almacenes de claves. */
-    protected List<KeyStore> kss = new ArrayList<KeyStore>();
+    private List<KeyStore> kss = new ArrayList<KeyStore>();
+    protected void setKeyStores(final List<KeyStore> k) {
+    	this.kss = k == null ?
+			this.kss = new ArrayList<KeyStore>() :
+				k;
+    }
+    protected boolean lacksKeyStores() {
+    	return this.kss == null || this.kss.isEmpty();
+    }
+    protected void addKeyStore(final KeyStore ks) {
+    	if (ks != null) {
+    		this.kss.add(ks);
+    	}
+    }
 
     /** A&ntilde;ade almacenes al conjunto actual. */
     protected void addKeyStores(final List<KeyStore> newStores) {
@@ -43,9 +55,6 @@ public class AOKeyStoreManager {
     		}
     	}
     }
-
-    /** Indica qu&aacute; alias esta en qu&aacute; almac&eacute;n. */
-	protected Map<String, KeyStore> storesByAlias;
 
     /** Tipo de almac&eacute;n. */
     private AOKeyStore ksType;
@@ -200,7 +209,7 @@ public class AOKeyStoreManager {
          if (this.kss == null || this.kss.isEmpty()) {
              LOGGER.warning(
          		"No se ha podido recuperar el certificado con alias '" + alias + "' porque el KeyStore no estaba inicializado, se devolvera una cadena vacia" //$NON-NLS-1$ //$NON-NLS-2$
-     		);
+     		 );
              return new X509Certificate[0];
          }
          for (final KeyStore ks : this.kss) {

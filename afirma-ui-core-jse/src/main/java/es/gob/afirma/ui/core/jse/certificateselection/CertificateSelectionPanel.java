@@ -23,8 +23,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.Vector;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -42,7 +43,6 @@ import javax.swing.event.ListSelectionListener;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.keystores.NameCertificateBean;
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.ui.core.jse.JSEUIMessages;
 
 /** Di&aacute;logo de selecci&oacute;n de certificados con est&eacute;tica Windows 7. */
 final class CertificateSelectionPanel extends JPanel implements ListSelectionListener {
@@ -83,7 +83,9 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		c.weighty = 0.0;
 		c.gridy = 0;
 
-		final JLabel mainMessage = new JLabel(JSEUIMessages.getString("CertificateSelectionPanel.0")); //$NON-NLS-1$
+		final JLabel mainMessage = new JLabel(
+			CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.0") //$NON-NLS-1$
+		);
 		mainMessage.setFont(TITLE_FONT);
 		mainMessage.setForeground(Color.decode("0x0033BC")); //$NON-NLS-1$
 		this.add(mainMessage, c);
@@ -93,7 +95,9 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 			c.gridy++;
 
 			final JTextPane textMessage = new JTextPane();
-			textMessage.setText(JSEUIMessages.getString("CertificateSelectionPanel.1")); //$NON-NLS-1$
+			textMessage.setText(
+				CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.1") //$NON-NLS-1$
+			);
 			textMessage.setFont(TEXT_FONT);
 			textMessage.setBorder(null);
 			textMessage.setPreferredSize(new Dimension(370, 40));
@@ -110,7 +114,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		c.gridy++;
 
 		CertificateLine certLine;
-		final Vector<CertificateLine> certLines = new java.util.Vector<CertificateSelectionPanel.CertificateLine>();
+		final List<CertificateLine> certLines = new ArrayList<CertificateSelectionPanel.CertificateLine>();
 		for (final NameCertificateBean nameCert : this.certificateBeans) {
 		    try {
 		    	certLine = createCertLine(nameCert.getName(), nameCert.getCertificate() );
@@ -124,7 +128,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 
 		this.certList = new JList/*<CertificateLine>*/();
 		this.certList.setCellRenderer(new CertListCellRendered());
-		this.certList.setListData(certLines);
+		this.certList.setListData(certLines.toArray());
 		this.certList.setVisibleRowCount(Math.max(Math.min(4, certLines.size()), 1));
 		if (certLines.size() > 0) {
 			this.certList.setSelectedIndex(0);
@@ -201,18 +205,18 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 			CertificateSelectionPanel.class.getClassLoader().getResource("resources/certicon_e.png") //$NON-NLS-1$
 		);
 		static {
-			ICON_DNIE_NORMAL.setDescription(JSEUIMessages.getString("CertificateSelectionPanel.4")); //$NON-NLS-1$
-			ICON_DNIE_NORMAL.getAccessibleContext().setAccessibleDescription(JSEUIMessages.getString("CertificateSelectionPanel.4")); //$NON-NLS-1$
-			ICON_DNIE_WARNING.setDescription(JSEUIMessages.getString("CertificateSelectionPanel.7")); //$NON-NLS-1$
-			ICON_DNIE_WARNING.getAccessibleContext().setAccessibleDescription(JSEUIMessages.getString("CertificateSelectionPanel.7")); //$NON-NLS-1$
-			ICON_DNIE_ERROR.setDescription(JSEUIMessages.getString("CertificateSelectionPanel.9")); //$NON-NLS-1$
-			ICON_DNIE_ERROR.getAccessibleContext().setAccessibleDescription(JSEUIMessages.getString("CertificateSelectionPanel.9")); //$NON-NLS-1$
-			ICON_OTHER_NORMAL.setDescription(JSEUIMessages.getString("CertificateSelectionPanel.11")); //$NON-NLS-1$
-			ICON_OTHER_NORMAL.getAccessibleContext().setAccessibleDescription(JSEUIMessages.getString("CertificateSelectionPanel.11")); //$NON-NLS-1$
-			ICON_OTHER_WARNING.setDescription(JSEUIMessages.getString("CertificateSelectionPanel.13")); //$NON-NLS-1$
-			ICON_OTHER_WARNING.getAccessibleContext().setAccessibleDescription(JSEUIMessages.getString("CertificateSelectionPanel.13")); //$NON-NLS-1$
-			ICON_OTHER_ERROR.setDescription(JSEUIMessages.getString("CertificateSelectionPanel.15")); //$NON-NLS-1$
-			ICON_OTHER_ERROR.getAccessibleContext().setAccessibleDescription(JSEUIMessages.getString("CertificateSelectionPanel.15")); //$NON-NLS-1$
+			ICON_DNIE_NORMAL.setDescription(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.4")); //$NON-NLS-1$
+			ICON_DNIE_NORMAL.getAccessibleContext().setAccessibleDescription(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.4")); //$NON-NLS-1$
+			ICON_DNIE_WARNING.setDescription(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.7")); //$NON-NLS-1$
+			ICON_DNIE_WARNING.getAccessibleContext().setAccessibleDescription(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.7")); //$NON-NLS-1$
+			ICON_DNIE_ERROR.setDescription(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.9")); //$NON-NLS-1$
+			ICON_DNIE_ERROR.getAccessibleContext().setAccessibleDescription(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.9")); //$NON-NLS-1$
+			ICON_OTHER_NORMAL.setDescription(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.11")); //$NON-NLS-1$
+			ICON_OTHER_NORMAL.getAccessibleContext().setAccessibleDescription(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.11")); //$NON-NLS-1$
+			ICON_OTHER_WARNING.setDescription(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.13")); //$NON-NLS-1$
+			ICON_OTHER_WARNING.getAccessibleContext().setAccessibleDescription(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.13")); //$NON-NLS-1$
+			ICON_OTHER_ERROR.setDescription(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.15")); //$NON-NLS-1$
+			ICON_OTHER_ERROR.getAccessibleContext().setAccessibleDescription(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.15")); //$NON-NLS-1$
 		}
 
 		private static final long EXPIRITY_WARNING_LEVEL = 1000*60*60*25*7;
@@ -301,14 +305,16 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 			c.gridy++;
 			c.insets = new Insets(0, 0, 0, 5);
 
-			final JLabel issuer = new JLabel(JSEUIMessages.getString("CertificateSelectionPanel.2") + AOUtil.getCN(this.cert.getIssuerDN().toString())); //$NON-NLS-1$
+			final JLabel issuer = new JLabel(
+				CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.2") + AOUtil.getCN(this.cert.getIssuerDN().toString()) //$NON-NLS-1$
+			);
 			issuer.setFont(DETAILS_FONT);
 			add(issuer, c);
 
 			c.gridy++;
 
 			final JLabel dates = new JLabel(
-				JSEUIMessages.getString(
+				CertificateSelectionDialogMessages.getString(
 					"CertificateSelectionPanel.3", //$NON-NLS-1$
 					new String[] {
 						formatDate(this.cert.getNotBefore()),
@@ -323,7 +329,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 
 			this.propertiesLink = new JLabel(
 		        "<html><u>" + //$NON-NLS-1$
-			        JSEUIMessages.getString("CertificateSelectionPanel.5") + //$NON-NLS-1$
+        		CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.5") + //$NON-NLS-1$
 		        "</u></html>" //$NON-NLS-1$
 	        );
 			this.propertiesLink.setFont(DETAILS_FONT);

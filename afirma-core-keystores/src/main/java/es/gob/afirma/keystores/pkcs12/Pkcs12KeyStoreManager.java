@@ -44,7 +44,7 @@ public final class Pkcs12KeyStoreManager extends AOKeyStoreManager {
                      final PasswordCallback pssCallBack,
                      final Object[] params) throws AOKeyStoreManagerException,
                                                    IOException {
-		this.kss = init(store, pssCallBack);
+		setKeyStores(init(store, pssCallBack));
 	}
 
 	/** Inicializa un almac&eacute;n de claves y certificados de tipo PKCS#12 / PFX.
@@ -121,31 +121,33 @@ public final class Pkcs12KeyStoreManager extends AOKeyStoreManager {
     		                                    final PasswordCallback pssCallback) throws KeyStoreException,
     		                                                                               NoSuchAlgorithmException,
     		                                                                               UnrecoverableEntryException {
-        if (this.kss == null || this.kss.isEmpty()) {
+        if (lacksKeyStores()) {
             throw new IllegalStateException("Se han pedido claves a un almacen no inicializado"); //$NON-NLS-1$
         }
 
         // Primero probamos si la contrasena de la clave es la misma que la del certificado
         try {
-        	return (KeyStore.PrivateKeyEntry) this.kss.get(0).getEntry(
-    			alias, new KeyStore.PasswordProtection(this.cachePasswordCallback.getPassword())
+        	return super.getKeyEntry(
+    			alias, this.cachePasswordCallback
 			);
         }
         catch(final Exception e) {
         	// Se ignora
         }
+
         // Luego probamos con null
         try {
-        	return (KeyStore.PrivateKeyEntry) this.kss.get(0).getEntry(alias, null);
+        	return super.getKeyEntry(
+    			alias, NullPasswordCallback.getInstance()
+			);
         }
         catch(final Exception e) {
         	// Se ignora
         }
-        // Fnalmente pedimos la contrasena
-        return (KeyStore.PrivateKeyEntry) this.kss.get(0).getEntry(
-    		alias, pssCallback != null ?
-				new KeyStore.PasswordProtection(pssCallback.getPassword()) :
-					null
+
+        // Finalmente pedimos la contrasena
+        return super.getKeyEntry(
+    		alias, pssCallback
 		);
     }
 

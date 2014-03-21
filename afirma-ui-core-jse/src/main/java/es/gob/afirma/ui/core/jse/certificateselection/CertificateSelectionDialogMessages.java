@@ -8,26 +8,25 @@
  * You may contact the copyright holder at: soporte.afirma5@mpt.es
  */
 
-package es.gob.afirma.ui.core.jse;
+package es.gob.afirma.ui.core.jse.certificateselection;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-/** Clase para la obtenci&oacute;n de los recursos textuales del UI del n&uacute;cleo del
- * cliente Afirma. */
-final class JSEUIMessages {
+/** Clase para la obtenci&oacute;n de los recursos textuales del di&uacute;logo de selecci&oacute;n de certificados. */
+final class CertificateSelectionDialogMessages {
 
-    private static final String BUNDLE_NAME = "uimessages"; //$NON-NLS-1$
+    private static final String BUNDLE_NAME = "certdialogmessages"; //$NON-NLS-1$
     private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME, Locale.getDefault());
 
-    private JSEUIMessages() {
+    private CertificateSelectionDialogMessages() {
         // No permitimos la instanciacion
     }
 
     /** Recupera el texto identificado con la clave proporcionada.
      * @param key Clave del texto.
      * @return Recurso textual. */
-    static String getString(final String key) {
+    public static String getString(final String key) {
         try {
             return RESOURCE_BUNDLE.getString(key);
         }
@@ -60,7 +59,7 @@ final class JSEUIMessages {
      * @param params
      *        Par&aacute;metros que se desean insertar.
      * @return Recuerso textual con las subcadenas sustituidas. */
-    static String getString(final String key, final String[] params) {
+    public static String getString(final String key, final String[] params) {
 
         String text;
         try {

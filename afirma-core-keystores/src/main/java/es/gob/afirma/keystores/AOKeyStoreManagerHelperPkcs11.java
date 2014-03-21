@@ -85,8 +85,7 @@ final class AOKeyStoreManagerHelperPkcs11 {
             }
             catch (final Exception e) {
                 // El PKCS#11 del DNIe a veces falla a la primera pero va
-                // correctamente a la segunda
-                // asi que reintentamos una vez mas
+                // correctamente a la segunda asi que reintentamos una vez mas
                 try {
                     p11Provider = (Provider) sunPKCS11Contructor.newInstance(new ByteArrayInputStream(config));
                 }

@@ -11,7 +11,6 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.keystores.KeyStoreRefresher;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.ui.core.jse.JSEUIManager;
-import es.gob.afirma.ui.core.jse.JSEUIMessages;
 
 final class CertificateSelectionDispatcherListener implements KeyEventDispatcher {
 
@@ -80,11 +79,11 @@ final class CertificateSelectionDispatcherListener implements KeyEventDispatcher
 					if (KeyEvent.VK_O == ke.getKeyCode()) {
 						try {
 							this.localKeyStoreEnabler.changeToFileStore(new JSEUIManager().getLoadFiles(
-								JSEUIMessages.getString("CertificateSelectionDispatcherListener.0"), //$NON-NLS-1$
+								CertificateSelectionDialogMessages.getString("CertificateSelectionDispatcherListener.0"), //$NON-NLS-1$
 								null,
 								null,
 								EXTS,
-								JSEUIMessages.getString("CertificateSelectionDispatcherListener.1") + EXTS_DESC, //$NON-NLS-1$
+								CertificateSelectionDialogMessages.getString("CertificateSelectionDispatcherListener.1") + EXTS_DESC, //$NON-NLS-1$
 								false,
 								false,
 								this.parent
