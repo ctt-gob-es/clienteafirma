@@ -12,10 +12,8 @@ import java.security.Security;
 import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Enumeration;
-import java.util.List;
+import java.util.Collections;
 
 import javax.security.auth.callback.PasswordCallback;
 
@@ -195,26 +193,13 @@ public final class CAPIKeyStoreManager extends AOKeyStoreManager {
 
         LOGGER.info("Solicitando los alias al KeyStore (" + capiKsMy.getProvider() + ")"); //$NON-NLS-1$ //$NON-NLS-2$
 
-        final Enumeration<String> aliases;
         try {
-            aliases = capiKsMy.aliases();
+        	return Collections.list(CAPIKeyStoreManager.capiKsMy.aliases()).toArray(new String[0]);
         }
         catch (final Exception e) {
             LOGGER.severe("Error intentando obtener los alias del almacen de claves, se devolvera una enumeracion vacia: " + e); //$NON-NLS-1$
             return new String[0];
         }
-
-        String currAlias;
-        final List<String> v = new ArrayList<String>();
-
-        LOGGER.info("Componiendo el vector de alias"); //$NON-NLS-1$
-
-        while (aliases.hasMoreElements()) {
-            currAlias = aliases.nextElement().toString();
-            v.add(currAlias);
-        }
-
-        return v.toArray(new String[0]);
     }
 
     @Override

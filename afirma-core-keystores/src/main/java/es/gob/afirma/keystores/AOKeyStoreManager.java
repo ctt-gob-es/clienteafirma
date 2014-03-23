@@ -172,16 +172,14 @@ public class AOKeyStoreManager implements KeyStoreRefresher {
         if (alias == null) {
         	throw new IllegalArgumentException("El alias no puede ser nulo"); //$NON-NLS-1$
         }
-    	if (this.ks.containsAlias(alias)) {
-    		try {
-    			return (KeyStore.PrivateKeyEntry) this.ks.getEntry(alias, pssCallback != null ? new KeyStore.PasswordProtection(pssCallback.getPassword()) : null);
-    		}
-    		catch (final Exception e) {
-            	throw new UnsupportedOperationException("La entrada no tiene clave privada: " + e, e); //$NON-NLS-1$
-            }
-    	}
-        LOGGER.warning("El almacen no contiene ninguna clave con el alias '" + alias + "', se devolvera null"); //$NON-NLS-1$ //$NON-NLS-2$
-        return null;
+
+		try {
+			return (KeyStore.PrivateKeyEntry) this.ks.getEntry(alias, pssCallback != null ? new KeyStore.PasswordProtection(pssCallback.getPassword()) : null);
+		}
+		catch (final Exception e) {
+        	throw new UnsupportedOperationException("La entrada no tiene clave privada: " + e, e); //$NON-NLS-1$
+        }
+
     }
 
     /** Obtiene un certificado del keystore activo a partir de su alias.
@@ -202,9 +200,7 @@ public class AOKeyStoreManager implements KeyStoreRefresher {
         }
 
     	try {
-        	if (this.ks.containsAlias(alias)) {
-        		return (X509Certificate) this.ks.getCertificate(alias);
-        	}
+    		return (X509Certificate) this.ks.getCertificate(alias);
     	}
     	catch(final Exception e) {
     		LOGGER.severe(
@@ -212,8 +208,6 @@ public class AOKeyStoreManager implements KeyStoreRefresher {
 			);
     		return null;
     	}
-        LOGGER.warning("El almacen no contiene ningun certificado con alias '" + alias + "', se devolvera null"); //$NON-NLS-1$ //$NON-NLS-2$
-        return null;
     }
 
     /** Obtiene la cadena de certificaci&oacute;n de un certificado del keystore activo a partir de su alias.
@@ -233,9 +227,7 @@ public class AOKeyStoreManager implements KeyStoreRefresher {
          }
 
      	 try {
-        	if (this.ks.containsAlias(alias)) {
-        		return (X509Certificate[]) this.ks.getCertificateChain(alias);
-        	}
+    		return (X509Certificate[]) this.ks.getCertificateChain(alias);
      	 }
      	 catch(final Exception e) {
      		LOGGER.severe(
