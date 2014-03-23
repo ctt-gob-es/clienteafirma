@@ -11,8 +11,6 @@ import java.security.Provider;
 import java.security.Security;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Logger;
 
 import javax.crypto.BadPaddingException;
@@ -31,12 +29,12 @@ final class AOKeyStoreManagerHelperPkcs11 {
      *        contrase&ntilde;a del almac&eacute;n.
      * @param params Parametros adicionales para la configuraci&oacute;n del
      *        almac&eacute;n.
-     * @return Array con los almacenes configurados.
+     * @return Almac&eacute;n configurado.
      * @throws AOKeyStoreManagerException Cuando ocurre un error durante la inicializaci&oacute;n.
      * @throws IOException Cuando se indique una contrase&ntilde;a incorrecta para la
      *         apertura del almac&eacute;n.
      * @throws es.gob.afirma.keystores.MissingSunPKCS11Exception Si no se encuentra la biblioteca SunPKCS11 */
-    static List<KeyStore> initPKCS11(final PasswordCallback pssCallBack,
+    static KeyStore initPKCS11(final PasswordCallback pssCallBack,
     		                          final Object[] params) throws AOKeyStoreManagerException,
     		                                                        IOException {
 
@@ -129,9 +127,7 @@ final class AOKeyStoreManagerHelperPkcs11 {
             p11Provider = null;
             throw new AOKeyStoreManagerException("No se ha podido verificar la integridad del almacen PKCS#11 solicitado", e); //$NON-NLS-1$
 		}
-        final List<KeyStore> ret = new ArrayList<KeyStore>(1);
-        ret.add(ks);
-        return ret;
+        return ks;
     }
 
 

@@ -5,8 +5,6 @@ import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
-import java.util.ArrayList;
-import java.util.List;
 
 import es.gob.afirma.core.InvalidOSException;
 import es.gob.afirma.core.misc.Platform;
@@ -17,7 +15,7 @@ final class AOKeyStoreManagerHelperApple {
 		// No permitimos la instanciacion
 	}
 
-	static List<KeyStore> initApple(final InputStream store) throws AOKeyStoreManagerException, IOException {
+	static KeyStore initApple(final InputStream store) throws AOKeyStoreManagerException, IOException {
 		if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
 			throw new InvalidOSException("Apple Mac OS X"); //$NON-NLS-1$
 		}
@@ -44,9 +42,7 @@ final class AOKeyStoreManagerHelperApple {
 			throw new AOKeyStoreManagerException(
 				"No se ha podido verificar la integridad del almacen Apple.KeychainStore", e); //$NON-NLS-1$
 		}
-		final List<KeyStore> ret = new ArrayList<KeyStore>(1);
-		ret.add(ks);
-		return ret;
+		return ks;
 	}
 
 }

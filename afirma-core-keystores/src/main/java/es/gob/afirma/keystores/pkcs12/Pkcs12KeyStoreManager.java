@@ -18,8 +18,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableEntryException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.crypto.BadPaddingException;
 import javax.security.auth.callback.PasswordCallback;
@@ -45,7 +43,7 @@ public final class Pkcs12KeyStoreManager extends AOKeyStoreManager {
                      final Object[] params,
                      final boolean forceReset) throws AOKeyStoreManagerException,
                                                       IOException {
-		setKeyStores(init(store, pssCallBack));
+		setKeyStore(init(store, pssCallBack));
 	}
 
 	/** Inicializa un almac&eacute;n de claves y certificados de tipo PKCS#12 / PFX.
@@ -55,9 +53,9 @@ public final class Pkcs12KeyStoreManager extends AOKeyStoreManager {
 	 * @return Lista con un &uacute;nico <code>KeyStore</code> correspondiente al PKCS#12
 	 * @throws AOKeyStoreManagerException Si hay errores en el tratamiento del almac&eacute;n
 	 * @throws IOException Si hay errores en la lectura del almac&eacute;n */
-	private List<KeyStore> init(final InputStream store,
-                                final PasswordCallback pssCallBack) throws AOKeyStoreManagerException,
-                                                                          IOException {
+	private KeyStore init(final InputStream store,
+                          final PasswordCallback pssCallBack) throws AOKeyStoreManagerException,
+                                                                     IOException {
         // Suponemos que el proveedor SunJSSE esta instalado. Hay que tener
         // cuidado con esto si alguna vez se usa JSS, que a veces lo retira
 
@@ -90,15 +88,13 @@ public final class Pkcs12KeyStoreManager extends AOKeyStoreManager {
         catch (final NoSuchAlgorithmException e) {
             throw new AOKeyStoreManagerException("No se ha podido verificar la integridad del almacen PKCS#12 / PFX solicitado.", e); //$NON-NLS-1$
 		}
-        final List<KeyStore> ret = new ArrayList<KeyStore>(1);
-        ret.add(ks);
         try {
             store.close();
         }
         catch (final Exception e) {
          // Ignoramos errores en el cierre
         }
-        return ret;
+        return ks;
 
 	}
 

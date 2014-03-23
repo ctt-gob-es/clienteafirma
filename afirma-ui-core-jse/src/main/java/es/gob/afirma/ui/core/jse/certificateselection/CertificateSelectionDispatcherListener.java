@@ -4,8 +4,11 @@ import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.KeyEventDispatcher;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
 import java.net.URI;
 import java.util.logging.Logger;
+
+import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.keystores.KeyStoreRefresher;
@@ -78,7 +81,7 @@ final class CertificateSelectionDispatcherListener implements KeyEventDispatcher
 				if (!Platform.OS.MACOSX.equals(Platform.getOS()) && ke.isControlDown() || ke.isMetaDown()) {
 					if (KeyEvent.VK_O == ke.getKeyCode()) {
 						try {
-							this.localKeyStoreEnabler.changeToFileStore(new JSEUIManager().getLoadFiles(
+							new JSEUIManager().getLoadFiles(
 								CertificateSelectionDialogMessages.getString("CertificateSelectionDispatcherListener.0"), //$NON-NLS-1$
 								null,
 								null,
@@ -87,7 +90,7 @@ final class CertificateSelectionDispatcherListener implements KeyEventDispatcher
 								false,
 								false,
 								this.parent
-							)[0]);
+							);
 						}
 						catch(final AOCancelledOperationException e) {
 							return false;
@@ -95,7 +98,18 @@ final class CertificateSelectionDispatcherListener implements KeyEventDispatcher
 					}
 				}
 				else if (KeyEvent.VK_F5 == ke.getKeyCode()) {
-					this.localKeyStoreEnabler.refresh();
+					try {
+						this.localKeyStoreEnabler.refresh();
+					}
+					catch (final IOException e) {
+						LOGGER.severe("Error al refrescar el almacen actual: " + e); //$NON-NLS-1$
+						new JSEUIManager().showMessageDialog(
+							this.parent,
+							CertificateSelectionDialogMessages.getString("CertificateSelectionDispatcherListener.2"), //$NON-NLS-1$
+							CertificateSelectionDialogMessages.getString("CertificateSelectionDispatcherListener.3"), //$NON-NLS-1$
+							JOptionPane.ERROR_MESSAGE
+						);
+					}
 				}
 			}
 

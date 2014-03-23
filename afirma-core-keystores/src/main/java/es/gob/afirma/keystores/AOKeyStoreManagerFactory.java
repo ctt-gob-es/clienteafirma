@@ -60,14 +60,14 @@ public final class AOKeyStoreManagerFactory {
      *                            un sistema operativo distinto del actual
      * @throws es.gob.afirma.core.MissingLibraryException Cuando no se localice una biblioteca necesaria para el
      * uso del almac&eacute;n. */
-    public static AOKeyStoreManager getAOKeyStoreManager(final AOKeyStore store,
+    public static AggregatedKeyStoreManager getAOKeyStoreManager(final AOKeyStore store,
                                                          final String lib,
                                                          final String description,
                                                          final PasswordCallback pssCallback,
                                                          final Object parentComponent) throws AOKeystoreAlternativeException,
                                                                                               IOException {
     	if (AOKeyStore.PKCS12.equals(store)) {
-    		return getPkcs12KeyStoreManager(lib, pssCallback, parentComponent);
+    		return new AggregatedKeyStoreManager(getPkcs12KeyStoreManager(lib, pssCallback, parentComponent));
     	}
 
 
@@ -77,22 +77,22 @@ public final class AOKeyStoreManagerFactory {
     		AOKeyStore.SINGLE.equals(store) ||
     		AOKeyStore.JAVACE.equals(store) ||
     		AOKeyStore.JCEKS.equals(store)) {
-        		return getFileKeyStoreManager(store, lib, pssCallback, parentComponent);
+        		return new AggregatedKeyStoreManager(getFileKeyStoreManager(store, lib, pssCallback, parentComponent));
         }
 
         // Token PKCS#11, en cualquier sistema operativo
         else if (AOKeyStore.PKCS11.equals(store)) {
-        	return getPkcs11KeyStoreManager(lib, description, pssCallback, parentComponent);
+        	return new AggregatedKeyStoreManager(getPkcs11KeyStoreManager(lib, description, pssCallback, parentComponent));
         }
 
         // Almacen de certificados de Windows
         else if (Platform.getOS().equals(Platform.OS.WINDOWS) && AOKeyStore.WINDOWS.equals(store)) {
-        	return getWindowsMyCapiKeyStoreManager();
+        	return new AggregatedKeyStoreManager(getWindowsMyCapiKeyStoreManager());
         }
 
         // Libreta de direcciones de Windows
         else if (Platform.getOS().equals(Platform.OS.WINDOWS) && (AOKeyStore.WINADDRESSBOOK.equals(store) || AOKeyStore.WINCA.equals(store))) {
-        	return getWindowsAddressBookKeyStoreManager(store);
+        	return new AggregatedKeyStoreManager(getWindowsAddressBookKeyStoreManager(store));
         }
 
         // Almacen de Mozilla que muestra tanto los certificados del almacen interno como los de
@@ -100,27 +100,16 @@ public final class AOKeyStoreManagerFactory {
         // DNIe para que agregue los certificados de este mediante el controlador Java del DNIe si
         // se encuentra la biblioteca y hay un DNIe insertado
         else if (AOKeyStore.MOZ_UNI.equals(store)) {
-        	return getMozillaUnifiedKeyStoreManager(pssCallback);
+        	return getMozillaUnifiedKeyStoreManager(pssCallback, parentComponent);
         }
 
-        // Apple Safari sobre Mac OS X. Le agregamos el gestor de DNIe para que agregue los
-        // certificados mediante el controlador Java del DNIe si se encuentra la biblioteca y
-        // hay un DNIe insertado
+        // Apple Safari sobre Mac OS X.
         else if (Platform.getOS().equals(Platform.OS.MACOSX) && AOKeyStore.APPLE.equals(store)) {
-        	final AOKeyStoreManager ksm = getMacOSXKeyStoreManager(store, lib);
-        	if (!KeyStoreUtilities.containsDnie(ksm)) {
-        		try {
-        			ksm.addKeyStores(getDnieJavaKeyStoreManager(pssCallback, parentComponent).getKeyStores());
-        		}
-        		catch(final Exception e) {
-        			// Se ignora
-        		}
-        	}
-        	return ksm;
+        	return getMacOSXKeyStoreManager(store, lib, pssCallback, parentComponent);
         }
 
         else if (AOKeyStore.DNIEJAVA.equals(store)) {
-        	return getDnieJavaKeyStoreManager(pssCallback, parentComponent);
+        	return new AggregatedKeyStoreManager(getDnieJavaKeyStoreManager(pssCallback, parentComponent));
         }
 
         throw new AOKeystoreAlternativeException(
@@ -185,7 +174,7 @@ public final class AOKeyStoreManagerFactory {
 
 	private static AOKeyStoreManager getDnieJavaKeyStoreManager(final PasswordCallback pssCallback,
     	                                                        final Object parentComponent) throws AOKeystoreAlternativeException,
-    																							 IOException {
+    																							     IOException {
     	final AOKeyStoreManager ksm = new AOKeyStoreManager();
     	try {
     		// Proporcionamos el componente padre como parametro
@@ -368,11 +357,12 @@ public final class AOKeyStoreManagerFactory {
 		return ksmCapi;
     }
 
-    private static AOKeyStoreManager getMozillaUnifiedKeyStoreManager(final PasswordCallback pssCallback) throws AOKeystoreAlternativeException,
-    		                                                                                                     IOException {
-        final AOKeyStoreManager ksmUni;
+    private static AggregatedKeyStoreManager getMozillaUnifiedKeyStoreManager(final PasswordCallback pssCallback,
+                                                                      final Object parentComponent) throws AOKeystoreAlternativeException,
+    		                                                                                               IOException {
+        final AggregatedKeyStoreManager ksmUni;
         try {
-            ksmUni = (AOKeyStoreManager) Class.forName("es.gob.afirma.keystores.mozilla.MozillaUnifiedKeyStoreManager").newInstance(); //$NON-NLS-1$
+            ksmUni = (AggregatedKeyStoreManager) Class.forName("es.gob.afirma.keystores.mozilla.MozillaUnifiedKeyStoreManager").newInstance(); //$NON-NLS-1$
         }
         catch(final Exception e) {
             throw new AOKeystoreAlternativeException(
@@ -382,7 +372,8 @@ public final class AOKeyStoreManagerFactory {
              );
         }
         try {
-            ksmUni.init(AOKeyStore.MOZ_UNI, null, pssCallback, null, false);
+        	// Proporcionamos el componente padre como parametro
+            ksmUni.init(AOKeyStore.MOZ_UNI, null, pssCallback, new Object[] { parentComponent }, false);
         }
         catch (final AOException e) {
             throw new AOKeystoreAlternativeException(
@@ -394,9 +385,12 @@ public final class AOKeyStoreManagerFactory {
         return ksmUni;
     }
 
-    private static AOKeyStoreManager getMacOSXKeyStoreManager(final AOKeyStore store, final String lib) throws IOException,
-                                                                                                        AOKeystoreAlternativeException {
-    	final AOKeyStoreManager ksm = new AOKeyStoreManager();
+    private static AggregatedKeyStoreManager getMacOSXKeyStoreManager(final AOKeyStore store,
+    		                                                          final String lib,
+    		                                                          final PasswordCallback pssCallback,
+    		                                                          final Object parentComponent) throws IOException,
+                                                                                                           AOKeystoreAlternativeException {
+    	final AOKeyStoreManager ksm = new AppleKeyStoreManager();
         // En Mac OS X podemos inicializar un KeyChain en un fichero particular o el "defecto del sistema"
         try {
             ksm.init(
@@ -410,7 +404,18 @@ public final class AOKeyStoreManagerFactory {
         catch (final AOException e) {
             throw new AOKeystoreAlternativeException(getAlternateKeyStoreType(store), "Error al inicializar el Llavero de Mac OS X", e); //$NON-NLS-1$
         }
-        return ksm;
+        final AggregatedKeyStoreManager aksm = new AggregatedKeyStoreManager(ksm);
+        // Le agregamos el gestor de DNIe para que agregue los certificados mediante el
+        // controlador Java del DNIe si se encuentra la biblioteca y hay un DNIe insertado
+    	if (!KeyStoreUtilities.containsDnie(ksm)) {
+    		try {
+    			aksm.addKeyStoreManager(getDnieJavaKeyStoreManager(pssCallback, parentComponent));
+    		}
+    		catch(final Exception e) {
+    			// Se ignora
+    		}
+    	}
+    	return aksm;
     }
 
     /** @return <code>AOKeyStore</code> alternativo o <code>null</code> si no hay alternativo */

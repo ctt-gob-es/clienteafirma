@@ -11,11 +11,6 @@
 package es.gob.afirma.keystores;
 
 import java.io.File;
-import java.security.AccessController;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.PrivateKey;
-import java.security.PrivilegedAction;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
@@ -33,6 +28,7 @@ import es.gob.afirma.core.keystores.NameCertificateBean;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.keystores.callbacks.CachePasswordCallback;
 import es.gob.afirma.keystores.filters.CertificateFilter;
 
 /** Utilidades para le manejo de almacenes de claves y certificados. */
@@ -141,43 +137,25 @@ public final class KeyStoreUtilities {
         }
 
         String tmpCN;
-        if (ksm != null && ksm.getKeyStores().size() > 0) {
+        if (ksm != null) {
 
-        	KeyStore ks = null;
         	X509Certificate tmpCert;
             for (final String al : aliassesByFriendlyName.keySet().toArray(new String[aliassesByFriendlyName.size()])) {
                 tmpCert = null;
 
-                // Seleccionamos el KeyStore en donde se encuentra el alias
-                for (final KeyStore tmpKs : ksm.getKeyStores()) {
-                    try {
-                        tmpCert = (X509Certificate) tmpKs.getCertificate(al);
-                    }
-                    catch (final RuntimeException e) {
-
-                    	// Comprobaciones especifica para la compatibilidad con el proveedor de DNIe
-                    	if ("es.gob.jmulticard.ui.passwordcallback.CancelledOperationException".equals(e.getClass().getName()) || //$NON-NLS-1$
-                    		"es.gob.jmulticard.card.AuthenticationModeLockedException".equals(e.getClass().getName()) || //$NON-NLS-1$
-                    		"es.gob.jmulticard.jse.provider.BadPasswordProviderException".equals(e.getClass().getName()) || //$NON-NLS-1$
-                    		"es.gob.jmulticard.jse.provider.SignatureAuthException".equals(e.getClass().getName())) { //$NON-NLS-1$
-                    			throw e;
-                    	}
-                        LOGGER.warning("No se ha inicializado el KeyStore indicado: " + e); //$NON-NLS-1$
-                        continue;
-                    }
-                    catch (final Exception e) {
-                        LOGGER.warning("No se ha inicializado el KeyStore indicado: " + e); //$NON-NLS-1$
-                        continue;
-                    }
-                    if (tmpCert != null) {
-                        ks = tmpKs;
-                        break;
-                    }
+                try {
+                    tmpCert = ksm.getCertificate(al);
                 }
+                catch (final RuntimeException e) {
 
-                // Si no tenemos Store para el alias en curso, pasamos al
-                // siguiente alias
-                if (ks == null) {
+                	// Comprobaciones especifica para la compatibilidad con el proveedor de DNIe
+                	if ("es.gob.jmulticard.ui.passwordcallback.CancelledOperationException".equals(e.getClass().getName()) || //$NON-NLS-1$
+                		"es.gob.jmulticard.card.AuthenticationModeLockedException".equals(e.getClass().getName()) || //$NON-NLS-1$
+                		"es.gob.jmulticard.jse.provider.BadPasswordProviderException".equals(e.getClass().getName()) || //$NON-NLS-1$
+                		"es.gob.jmulticard.jse.provider.SignatureAuthException".equals(e.getClass().getName())) { //$NON-NLS-1$
+                			throw e;
+                	}
+                    LOGGER.warning("No se ha inicializado el KeyStore indicado: " + e); //$NON-NLS-1$
                     continue;
                 }
 
@@ -201,28 +179,7 @@ public final class KeyStoreUtilities {
 
                 if (checkPrivateKeys) {
                     try {
-                        if ("KeychainStore".equals(ks.getType())) { //$NON-NLS-1$
-                            final KeyStore tmpKs = ks;
-                            AccessController.doPrivileged(new PrivilegedAction<Void>() {
-                            	/** {@inheritDoc} */
-                                @Override
-								public Void run() {
-                                    final PrivateKey key;
-                                    try {
-                                        LOGGER.info("Detectado almacen Llavero de Mac OS X, se trataran directamente las claves privadas"); //$NON-NLS-1$
-                                        key = (PrivateKey) tmpKs.getKey(al, "dummy".toCharArray()); //$NON-NLS-1$
-                                    }
-                                    catch (final Exception e) {
-                                        throw new UnsupportedOperationException("No se ha podido recuperar directamente la clave privada en Mac OS X", e); //$NON-NLS-1$
-                                    }
-                                    if (key == null) {
-                                        throw new UnsupportedOperationException("No se ha podido recuperar directamente la clave privada en Mac OS X"); //$NON-NLS-1$
-                                    }
-                                    return null;
-                                }
-                            });
-                        }
-                        else if (!(ks.getEntry(al, new KeyStore.PasswordProtection(new char[0])) instanceof KeyStore.PrivateKeyEntry)) { //TODO: Solo DNIe
+                    	if (ksm.getKeyEntry(al, new CachePasswordCallback(new char[0])) == null) { //TODO: Solo DNIe
                             aliassesByFriendlyName.remove(al);
                             LOGGER.info(
                               "El certificado '" + al + "' no era tipo trusted pero su clave tampoco era de tipo privada, no se mostrara" //$NON-NLS-1$ //$NON-NLS-2$
@@ -237,8 +194,9 @@ public final class KeyStoreUtilities {
                         );
                     }
                     catch (final Exception e) {
-                        LOGGER.info(
-                          "Se ha incluido un certificado (" + al + ") con clave privada inaccesible: " + e //$NON-NLS-1$ //$NON-NLS-2$
+                    	aliassesByFriendlyName.remove(al);
+                        LOGGER.warning(
+                          "Se ha excluido un certificado (" + al + ") por tener la clave privada inaccesible: " + e //$NON-NLS-1$ //$NON-NLS-2$
                         );
                     }
                 }
@@ -451,50 +409,44 @@ public final class KeyStoreUtilities {
     	}
 
     	if (checkValidity && ksm != null) {
+
+    		String errorMessage = null;
+
+			try {
+				ksm.getCertificate(selectedAlias).checkValidity();
+			}
+			catch (final CertificateExpiredException e) {
+				errorMessage = KeyStoreMessages.getString("KeyStoreUtilities.2"); //$NON-NLS-1$
+			}
+			catch (final CertificateNotYetValidException e) {
+				errorMessage = KeyStoreMessages.getString("KeyStoreUtilities.3"); //$NON-NLS-1$
+			}
+			catch (final Exception e) {
+				errorMessage = KeyStoreMessages.getString("KeyStoreUtilities.4"); //$NON-NLS-1$
+			}
+
     		boolean rejected = false;
-    		for (final KeyStore ks : ksm.getKeyStores()) {
-    			try {
-    				if (!ks.containsAlias(selectedAlias)) {
-    					continue;
-    				}
-    			}
-    			catch (final Exception e) {
-    				continue;
-    			}
 
-    			String errorMessage = null;
-    			try {
-    				((X509Certificate) ks.getCertificate(selectedAlias)).checkValidity();
-    			}
-    			catch (final CertificateExpiredException e) {
-    				errorMessage = KeyStoreMessages.getString("KeyStoreUtilities.2"); //$NON-NLS-1$
-    			}
-    			catch (final CertificateNotYetValidException e) {
-    				errorMessage = KeyStoreMessages.getString("KeyStoreUtilities.3"); //$NON-NLS-1$
-    			}
-    			catch (final KeyStoreException e) {
-    				errorMessage = KeyStoreMessages.getString("KeyStoreUtilities.4"); //$NON-NLS-1$
-    			}
+			if (errorMessage != null) {
+				LOGGER.warning("Error durante la validacion: " + errorMessage); //$NON-NLS-1$
+				if (AOUIFactory.showConfirmDialog(
+						parentComponent,
+						errorMessage,
+						KeyStoreMessages.getString("KeyStoreUtilities.5"), //$NON-NLS-1$
+						AOUIFactory.YES_NO_OPTION,
+						AOUIFactory.WARNING_MESSAGE
+				) == AOUIFactory.YES_OPTION) {
+					return selectedAlias;
+				}
+				rejected = true;
+			}
 
-    			if (errorMessage != null) {
-    				LOGGER.warning("Error durante la validacion: " + errorMessage); //$NON-NLS-1$
-    				if (AOUIFactory.showConfirmDialog(
-    						parentComponent,
-    						errorMessage,
-    						KeyStoreMessages.getString("KeyStoreUtilities.5"), //$NON-NLS-1$
-    						AOUIFactory.YES_NO_OPTION,
-    						AOUIFactory.WARNING_MESSAGE
-    				) == AOUIFactory.YES_OPTION) {
-    					return selectedAlias;
-    				}
-    				rejected = true;
-    			}
+			if (rejected) {
+				throw new AOCancelledOperationException("Se ha reusado un certificado probablemente no valido"); //$NON-NLS-1$
+			}
 
-    			if (rejected) {
-    				throw new AOCancelledOperationException("Se ha reusado un certificado probablemente no valido"); //$NON-NLS-1$
-    			}
-    		}
     	}
+
     	return selectedAlias;
     }
 

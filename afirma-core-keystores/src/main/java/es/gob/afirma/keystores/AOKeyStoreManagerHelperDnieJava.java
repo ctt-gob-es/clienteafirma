@@ -8,8 +8,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
 import java.security.Security;
 import java.security.cert.CertificateException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
@@ -22,7 +20,7 @@ final class AOKeyStoreManagerHelperDnieJava {
 		// No permitimos la instanciacion
 	}
 
-    static List<KeyStore> initDnieJava(final PasswordCallback pssCallBack,
+    static KeyStore initDnieJava(final PasswordCallback pssCallBack,
     		                            final Object parentComponent) throws AOKeyStoreManagerException,
     		                                                                 IOException {
     	final Provider p;
@@ -68,9 +66,7 @@ final class AOKeyStoreManagerHelperDnieJava {
 			throw new AOKeyStoreManagerException("Error de certificado al obtener el almacen DNIe 100% Java: " + e, e);  //$NON-NLS-1$
 		}
 
-        final List<KeyStore> ret = new ArrayList<KeyStore>(1);
-        ret.add(ks);
-        return ret;
+        return ks;
     }
 
 }

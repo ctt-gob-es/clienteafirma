@@ -8,8 +8,6 @@ import java.security.Provider;
 import java.security.Security;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.crypto.BadPaddingException;
 import javax.security.auth.callback.PasswordCallback;
@@ -22,7 +20,7 @@ final class AOKeyStoreManagerHelperSingle {
 		// No permitimos la instanciacion
 	}
 
-	static List<KeyStore> initSingle(final InputStream store,
+	static KeyStore initSingle(final InputStream store,
 			                         final PasswordCallback pssCallBack) throws AOKeyStoreManagerException,
 			                                                                     IOException {
 		if (store == null) {
@@ -71,15 +69,7 @@ final class AOKeyStoreManagerHelperSingle {
 				"No se ha podido verificar la integridad del almacen PKCS#7 / X.509 solicitado", e); //$NON-NLS-1$
 		}
 
-		final List<KeyStore> ret = new ArrayList<KeyStore>(1);
-		ret.add(ks);
-		try {
-			store.close();
-		}
-		catch (final Exception e) {
-			// Ignoramos errores en el cierre
-		}
-		return ret;
+		return ks;
 
 	}
 

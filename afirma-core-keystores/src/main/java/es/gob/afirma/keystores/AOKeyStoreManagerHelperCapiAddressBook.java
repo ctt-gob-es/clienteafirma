@@ -3,8 +3,6 @@ package es.gob.afirma.keystores;
 import java.security.KeyStore;
 import java.security.Provider;
 import java.security.Security;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.InvalidOSException;
@@ -19,7 +17,7 @@ final class AOKeyStoreManagerHelperCapiAddressBook {
     	// No permitimos la instanciacion
     }
 
-    static List<KeyStore> initCAPIAddressBook(final AOKeyStore ksType) throws AOKeyStoreManagerException {
+    static KeyStore initCAPIAddressBook(final AOKeyStore ksType) throws AOKeyStoreManagerException {
 
         if (!Platform.getOS().equals(Platform.OS.WINDOWS)) {
             throw new InvalidOSException("Microsoft Windows"); //$NON-NLS-1$
@@ -63,9 +61,7 @@ final class AOKeyStoreManagerHelperCapiAddressBook {
             throw new AOKeyStoreManagerException("No se ha podido abrir el almacen " + ksType.getProviderName() + ": " + e, e); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
-        final List<KeyStore> ret = new ArrayList<KeyStore>(1);
-        ret.add(ks);
-        return ret;
+        return ks;
     }
 
 }

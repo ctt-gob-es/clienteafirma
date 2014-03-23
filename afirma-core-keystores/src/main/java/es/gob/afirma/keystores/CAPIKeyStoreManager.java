@@ -66,7 +66,7 @@ public final class CAPIKeyStoreManager extends AOKeyStoreManager {
 				capiKsMy = null;
 			}
 			setKeyStoreType(AOKeyStore.WINDOWS);
-			setKeyStores(initCapi());
+			setKeyStore(initCapi());
         }
 		else {
 			throw new AOKeyStoreManagerException(
@@ -75,7 +75,7 @@ public final class CAPIKeyStoreManager extends AOKeyStoreManager {
 		}
 	}
 
-    private static List<KeyStore> initCapi() throws AOKeyStoreManagerException, IOException {
+    private static KeyStore initCapi() throws AOKeyStoreManagerException, IOException {
 
     	if (capiKsMy == null) {
 
@@ -125,10 +125,7 @@ public final class CAPIKeyStoreManager extends AOKeyStoreManager {
 	        }
 
     	}
-
-        final List<KeyStore> ret = new ArrayList<KeyStore>(1);
-        ret.add(capiKsMy);
-        return ret;
+        return capiKsMy;
     }
 
     /** Obtiene un certificado del almac&eacute;n activo a partir de su alias.
@@ -218,15 +215,6 @@ public final class CAPIKeyStoreManager extends AOKeyStoreManager {
         }
 
         return v.toArray(new String[0]);
-    }
-
-    /** Devuelve el <code>keyStore</code> en uso.
-     * @return Almac&eacute;n de claves (<code>KeyStore</code>) actual */
-    @Override
-	public List<KeyStore> getKeyStores() {
-        final List<KeyStore> ret = new ArrayList<KeyStore>(1);
-        ret.add(capiKsMy);
-        return ret;
     }
 
     @Override

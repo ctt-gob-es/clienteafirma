@@ -17,17 +17,17 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableEntryException;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
+import java.util.Collections;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
 
+import es.gob.afirma.core.keystores.KeyStoreRefresher;
+
 /** Clase gestora de claves y certificados. B&aacute;sicamente se encarga de
  * crear KeyStores de distintos tipos, utilizando el proveedor JCA apropiado para cada caso
  * @version 0.4 */
-public class AOKeyStoreManager {
+public class AOKeyStoreManager implements KeyStoreRefresher {
 
     protected static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -35,39 +35,33 @@ public class AOKeyStoreManager {
     private AOKeyStore ksType;
 
     /** Almacenes de claves. */
-    private List<KeyStore> kss = new ArrayList<KeyStore>();
+    private KeyStore ks;
+    protected void setKeyStore(final KeyStore k) {
+    	if (this.ks == null) {
+    		throw new IllegalArgumentException("El almacen no puede ser nulo"); //$NON-NLS-1$
+    	}
+    	this.ks = k;
+    }
+    protected KeyStore getKeyStore() {
+    	return this.ks;
+    }
 
     /** Reinicia el almac&eacute;n de claves, leyendo de nuevo los dispositivos de almac&eacute;n (tarjetas, etc.)
      * si es preciso.
      * @throws IOException
      * @throws AOKeyStoreManagerException */
-    public void reset() throws AOKeyStoreManagerException, IOException {
-    	this.init(this.ksType, this.storeIs, this.callBack, this.storeParams, true);
-    }
-
-    protected void setKeyStores(final List<KeyStore> k) {
-    	this.kss = k == null ?
-			this.kss = new ArrayList<KeyStore>() :
-				k;
+    @Override
+	public void refresh() throws IOException {
+    	try {
+			this.init(this.ksType, this.storeIs, this.callBack, this.storeParams, true);
+		}
+    	catch (final AOKeyStoreManagerException e) {
+			throw new IOException("Error al refrescar el almacen: " + e, e); //$NON-NLS-1$
+		}
     }
 
     protected boolean lacksKeyStores() {
-    	return this.kss == null || this.kss.isEmpty();
-    }
-
-    protected void addKeyStore(final KeyStore ks) {
-    	if (ks != null) {
-    		this.kss.add(ks);
-    	}
-    }
-
-    /** A&ntilde;ade almacenes al conjunto actual. */
-    protected void addKeyStores(final List<KeyStore> newStores) {
-    	if (newStores != null) {
-    		for (final KeyStore ks : newStores) {
-    			this.kss.add(ks);
-    		}
-    	}
+    	return this.ks == null;
     }
 
     protected void setKeyStoreType(final AOKeyStore type) {
@@ -118,33 +112,33 @@ public class AOKeyStoreManager {
 
         switch(this.ksType) {
         	case SINGLE:
-        		this.kss =  AOKeyStoreManagerHelperSingle.initSingle(store, pssCallBack);
+        		this.ks =  AOKeyStoreManagerHelperSingle.initSingle(store, pssCallBack);
         		break;
         	case DNIEJAVA:
                 // En el "params" debemos traer los parametros:
                 // [0] -parent: Componente padre para la modalidad
-            	this.kss = AOKeyStoreManagerHelperDnieJava.initDnieJava(
+            	this.ks = AOKeyStoreManagerHelperDnieJava.initDnieJava(
         			pssCallBack, params != null && params.length > 0 ? params[0] : null
     			);
             	break;
         	case JAVA:
         	case JAVACE:
         	case JCEKS:
-        		this.kss = AOKeyStoreManagerHelperJava.initJava(store, pssCallBack, this.ksType);
+        		this.ks = AOKeyStoreManagerHelperJava.initJava(store, pssCallBack, this.ksType);
         		break;
         	case WINCA:
         	case WINADDRESSBOOK:
-        		this.kss = AOKeyStoreManagerHelperCapiAddressBook.initCAPIAddressBook(this.ksType);
+        		this.ks = AOKeyStoreManagerHelperCapiAddressBook.initCAPIAddressBook(this.ksType);
         		break;
         	case PKCS11:
                 // En el "params" debemos traer los parametros:
                 // [0] -p11lib: Biblioteca PKCS#11, debe estar en el Path (Windows) o en el LD_LIBRARY_PATH (UNIX, Linux, Mac OS X)
                 // [1] -desc: Descripcion del token PKCS#11 (opcional)
                 // [2] -slot: Numero de lector de tarjeta (Sistema Operativo) [OPCIONAL]
-                this.kss = AOKeyStoreManagerHelperPkcs11.initPKCS11(pssCallBack, params);
+                this.ks = AOKeyStoreManagerHelperPkcs11.initPKCS11(pssCallBack, params);
                 break;
         	case APPLE:
-        		this.kss = AOKeyStoreManagerHelperApple.initApple(store);
+        		this.ks = AOKeyStoreManagerHelperApple.initApple(store);
         		break;
             default:
             	throw new UnsupportedOperationException("Tipo de almacen no soportado: " + store); //$NON-NLS-1$
@@ -172,17 +166,20 @@ public class AOKeyStoreManager {
     		                                    final PasswordCallback pssCallback) throws KeyStoreException,
     		                                                                               NoSuchAlgorithmException,
     		                                                                               UnrecoverableEntryException {
-        if (this.kss == null || this.kss.isEmpty()) {
+        if (this.ks == null) {
             throw new IllegalStateException("Se han pedido claves a un almacen no inicializado"); //$NON-NLS-1$
         }
         if (alias == null) {
         	throw new IllegalArgumentException("El alias no puede ser nulo"); //$NON-NLS-1$
         }
-        for (final KeyStore ks : this.kss) {
-        	if (ks.containsAlias(alias)) {
-        		return (KeyStore.PrivateKeyEntry) ks.getEntry(alias, pssCallback != null ? new KeyStore.PasswordProtection(pssCallback.getPassword()) : null);
-        	}
-        }
+    	if (this.ks.containsAlias(alias)) {
+    		try {
+    			return (KeyStore.PrivateKeyEntry) this.ks.getEntry(alias, pssCallback != null ? new KeyStore.PasswordProtection(pssCallback.getPassword()) : null);
+    		}
+    		catch (final Exception e) {
+            	throw new UnsupportedOperationException("La entrada no tiene clave privada: " + e, e); //$NON-NLS-1$
+            }
+    	}
         LOGGER.warning("El almacen no contiene ninguna clave con el alias '" + alias + "', se devolvera null"); //$NON-NLS-1$ //$NON-NLS-2$
         return null;
     }
@@ -197,25 +194,24 @@ public class AOKeyStoreManager {
             return null;
         }
 
-        if (this.kss == null || this.kss.isEmpty()) {
+        if (this.ks == null) {
             LOGGER.warning(
         		"No se ha podido recuperar el certificado con alias '" + alias + "' porque el KeyStore no estaba inicializado, se devolvera null" //$NON-NLS-1$ //$NON-NLS-2$
     		);
             return null;
         }
 
-        for (final KeyStore ks : this.kss) {
-        	try {
-	        	if (ks.containsAlias(alias)) {
-	        		return (X509Certificate) ks.getCertificate(alias);
-	        	}
+    	try {
+        	if (this.ks.containsAlias(alias)) {
+        		return (X509Certificate) this.ks.getCertificate(alias);
         	}
-        	catch(final Exception e) {
-        		LOGGER.severe(
-    				"Error intentando recuperar el certificado con el alias '" + alias + "', se continuara con el siguiente almacen: " + e //$NON-NLS-1$ //$NON-NLS-2$
-				);
-        	}
-        }
+    	}
+    	catch(final Exception e) {
+    		LOGGER.severe(
+				"Error intentando recuperar el certificado con el alias '" + alias + "', se devolvera null: " + e //$NON-NLS-1$ //$NON-NLS-2$
+			);
+    		return null;
+    	}
         LOGGER.warning("El almacen no contiene ningun certificado con alias '" + alias + "', se devolvera null"); //$NON-NLS-1$ //$NON-NLS-2$
         return null;
     }
@@ -229,24 +225,23 @@ public class AOKeyStoreManager {
              return new X509Certificate[0];
          }
 
-         if (this.kss == null || this.kss.isEmpty()) {
+         if (this.ks == null) {
              LOGGER.warning(
          		"No se ha podido recuperar el certificado con alias '" + alias + "' porque el KeyStore no estaba inicializado, se devolvera una cadena vacia" //$NON-NLS-1$ //$NON-NLS-2$
      		 );
              return new X509Certificate[0];
          }
-         for (final KeyStore ks : this.kss) {
-         	try {
- 	        	if (ks.containsAlias(alias)) {
- 	        		return (X509Certificate[]) ks.getCertificateChain(alias);
- 	        	}
-         	}
-         	catch(final Exception e) {
-         		LOGGER.severe(
-     				"Error intentando recuperar la cadena del certificado con alias '" + alias + "', se continuara con el siguiente almacen: " + e //$NON-NLS-1$ //$NON-NLS-2$
- 				);
-         	}
-         }
+
+     	 try {
+        	if (this.ks.containsAlias(alias)) {
+        		return (X509Certificate[]) this.ks.getCertificateChain(alias);
+        	}
+     	 }
+     	 catch(final Exception e) {
+     		LOGGER.severe(
+ 				"Error intentando recuperar la cadena del certificado con alias '" + alias + "', se continuara con el siguiente almacen: " + e //$NON-NLS-1$ //$NON-NLS-2$
+			);
+     	 }
          LOGGER.warning("El almacen no contiene ningun certificado con el alias '" + alias + "', se devolvera una cadena vacia"); //$NON-NLS-1$ //$NON-NLS-2$
          return new X509Certificate[0];
     }
@@ -254,32 +249,18 @@ public class AOKeyStoreManager {
     /** Obtiene todos los alias de los certificados del almac&eacute;n actual.
      * @return Todos los alias encontrados en el almac&eacute;n actual */
     public String[] getAliases() {
-        if (this.kss == null || this.kss.isEmpty()) {
+        if (this.ks == null) {
             throw new IllegalStateException("Se han pedido alias a un almacen no inicializado"); //$NON-NLS-1$
         }
-    	final List<String> aliases = new ArrayList<String>();
-    	Enumeration<String> partAliases;
-    	for (final KeyStore ks : this.kss) {
-    		try {
-				partAliases = ks.aliases();
-			}
-    		catch (final KeyStoreException e) {
-    			LOGGER.severe(
-     				"Error intentando recuperar los alias del almacen '" + ks.getType() + "', se continuara con el siguiente: " + e //$NON-NLS-1$ //$NON-NLS-2$
- 				);
-				continue;
-			}
-    		while (partAliases.hasMoreElements()) {
-    			aliases.add(partAliases.nextElement().toString());
-    		}
-    	}
-    	return aliases.toArray(new String[0]);
-    }
-
-    /** Devuelve el <code>keyStore</code> en uso.
-     * @return Almac&eacute;n de claves (<code>KeyStore</code>) actual */
-    public List<KeyStore> getKeyStores() {
-        return this.kss;
+		try {
+			Collections.list(this.ks.aliases()).toArray(new String[0]);
+		}
+		catch (final KeyStoreException e) {
+			LOGGER.severe(
+ 				"Error intentando recuperar los alias, se devolvera una lista vacia: " + e //$NON-NLS-1$
+			);
+		}
+		return new String[0];
     }
 
     @Override

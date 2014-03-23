@@ -6,8 +6,6 @@ import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.crypto.BadPaddingException;
 import javax.security.auth.callback.PasswordCallback;
@@ -18,7 +16,7 @@ final class AOKeyStoreManagerHelperJava {
 		// No permitimos la instanciacion
 	}
 
-	static List<KeyStore> initJava(final InputStream store,
+	static KeyStore initJava(final InputStream store,
 								   final PasswordCallback pssCallBack,
 			                       final AOKeyStore ksType) throws AOKeyStoreManagerException,
 			                                                       IOException {
@@ -58,15 +56,7 @@ final class AOKeyStoreManagerHelperJava {
 				"No se ha podido verificar la integridad del almacen JavaKeyStore solicitado", e); //$NON-NLS-1$
 		}
 
-		final List<KeyStore> ret = new ArrayList<KeyStore>(1);
-		ret.add(ks);
-		try {
-			store.close();
-		}
-		catch (final Exception e) {
-			// Ignoramos errores en el cierre
-		}
-		return ret;
+		return ks;
 
 	}
 
