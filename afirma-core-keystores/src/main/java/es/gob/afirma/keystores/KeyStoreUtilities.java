@@ -126,7 +126,7 @@ public final class KeyStoreUtilities {
      * @param certFilters
      *        Filtros a aplicar sobre los certificados.
      * @return Alias seleccionado por el usuario */
-    private static Map<String, String> getAliasesByFriendlyName(final String[] aliases,
+    public static Map<String, String> getAliasesByFriendlyName(final String[] aliases,
                                                                final AOKeyStoreManager ksm,
                                                                final boolean checkPrivateKeys,
                                                                final boolean showExpiredCertificates,
