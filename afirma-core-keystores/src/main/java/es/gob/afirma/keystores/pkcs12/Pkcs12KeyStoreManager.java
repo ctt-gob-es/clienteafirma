@@ -43,6 +43,7 @@ public final class Pkcs12KeyStoreManager extends AOKeyStoreManager {
                      final Object[] params,
                      final boolean forceReset) throws AOKeyStoreManagerException,
                                                       IOException {
+		setKeyStoreType(AOKeyStore.PKCS12);
 		setKeyStore(init(store, pssCallBack));
 	}
 

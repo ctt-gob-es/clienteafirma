@@ -13,6 +13,10 @@ import javax.security.auth.callback.PasswordCallback;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 final class AppleKeyStoreManager extends AOKeyStoreManager {
 
+	AppleKeyStoreManager() {
+		setKeyStoreType(AOKeyStore.APPLE);
+	}
+
 	@Override
 	public KeyStore.PrivateKeyEntry getKeyEntry(final String alias,
 			                                    final PasswordCallback pssCallback) throws KeyStoreException,
