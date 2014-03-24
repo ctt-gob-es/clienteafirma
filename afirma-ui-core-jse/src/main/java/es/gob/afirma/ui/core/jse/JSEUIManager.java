@@ -32,6 +32,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.keystores.KeyStoreRefresher;
 import es.gob.afirma.core.keystores.NameCertificateBean;
 import es.gob.afirma.core.ui.AOUIManager;
 import es.gob.afirma.ui.core.jse.certificateselection.CertificateSelectionDialog;
@@ -61,7 +62,7 @@ public class JSEUIManager implements AOUIManager {
      * @param text Texto con el que se solicitar&aacute; la entrada de texto al
      *             usuario (<i>prompt</i>)
      * @param icon Objeto de tipo {@code javax.swing.Icon} con el icono del di&aacute;logo o
-     * 			   {@code null} para no mostrar icono.  
+     * 			   {@code null} para no mostrar icono.
      * @param charSet Juego de caracteres aceptados para la contrase&ntilde;a
      * @param beep <code>true</code> si se desea un sonido de advertencia al
      *             introducir un caracter no v&aacute;lido, <code>false</code> en
@@ -80,12 +81,12 @@ public class JSEUIManager implements AOUIManager {
         lbText.setMinimumSize(new Dimension(lbText.getFontMetrics(lbText.getFont()).stringWidth(text), lbText.getSize().height));
         lbText.setLabelFor(pwd);
         final JPanel panel = new JPanel();
-        
-        GridBagConstraints constraints = new GridBagConstraints();
+
+        final GridBagConstraints constraints = new GridBagConstraints();
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.weightx = 1.0;
         constraints.anchor = GridBagConstraints.CENTER;
-        
+
         panel.setLayout(new GridBagLayout());
         panel.add(lbText, constraints);
         constraints.gridy = 1;
@@ -95,7 +96,7 @@ public class JSEUIManager implements AOUIManager {
         if (imageIcon instanceof javax.swing.Icon) {
         	icon = (javax.swing.Icon) imageIcon;
         }
-        
+
         final JOptionPane pane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.OK_CANCEL_OPTION, icon) {
             private static final long serialVersionUID = -3012522768561175760L;
 
@@ -152,12 +153,13 @@ public class JSEUIManager implements AOUIManager {
     /** {@inheritDoc} */
     @Override
 	public final Object showCertificateSelectionDialog(final Object parentComponent,
-    												   final NameCertificateBean[] selectionValues) {
+    												   final NameCertificateBean[] selectionValues,
+    												   final KeyStoreRefresher ksr) {
     	Component parent = null;
     	if (parentComponent instanceof Component) {
     		parent = (Component) parentComponent;
     	}
-		return new CertificateSelectionDialog(selectionValues, parent).showDialog();
+		return new CertificateSelectionDialog(selectionValues, ksr, parent).showDialog();
     }
 
     /** Original code: <a href="http://tactika.com/realhome/realhome.html">http://tactika.com/realhome/realhome.html</a>

@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+import es.gob.afirma.core.keystores.KeyStoreRefresher;
 import es.gob.afirma.core.keystores.NameCertificateBean;
 import es.gob.afirma.core.misc.Platform;
 
@@ -187,15 +188,15 @@ public final class AOUIFactory {
         return uiManager.showInputDialog(parentComponent, message, title, messageType, icon, selectionValues, initialSelectionValue);
     }
 
-    /**
-     * Di&aacute;logo de selecci&oacute;n de certificados.
+    /** Di&aacute;logo de selecci&oacute;n de certificados.
      * @param parentComponent Componente padre (se descarta si no es del tipo <code>java.awt.Component</code> en la implementaci&oacute;n Swing
      * @param selectionValues Listado de valores seleccionables Nombre-Certificado.
-     * @return Alias del certificado seleccionado o {@code null} si no se seleccion&oacute; ninguno.
-     */
+     * @param ksr Componente para actualizar el almac&eacute;n actual
+     * @return Alias del certificado seleccionado o {@code null} si no se seleccion&oacute; ninguno. */
     public static Object showCertificateSelectionDialog(final Object parentComponent,
-    		                                            final NameCertificateBean[] selectionValues) {
-        return uiManager.showCertificateSelectionDialog(parentComponent, selectionValues);
+    		                                            final NameCertificateBean[] selectionValues,
+    		                                            final KeyStoreRefresher ksr) {
+        return uiManager.showCertificateSelectionDialog(parentComponent, selectionValues, ksr);
     }
 
     /** Pide al usuario que seleccione un fichero.

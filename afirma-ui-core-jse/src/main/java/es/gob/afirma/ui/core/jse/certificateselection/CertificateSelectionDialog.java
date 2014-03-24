@@ -19,6 +19,7 @@ import java.awt.event.MouseEvent;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
+import es.gob.afirma.core.keystores.KeyStoreRefresher;
 import es.gob.afirma.core.keystores.NameCertificateBean;
 
 /** Di&aacute;logo de selecci&oacute;n de certificados con est&eacute;tica similar al de
@@ -35,8 +36,9 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 	/** Construye el di&aacute;logo de selecci&oacute;n de certificados a partir del listado con
 	 * sus nombres y los propios certificados.
 	 * @param el Listado de certificados.
+	 * @param ksr Componente para actualizar el almac&eacute;n actual
 	 * @param parent Componente sobre el que se mostrar&aacute; el di&aacute;logo. */
-	public CertificateSelectionDialog(final NameCertificateBean[] el, final Component parent) {
+	public CertificateSelectionDialog(final NameCertificateBean[] el, final KeyStoreRefresher ksr, final Component parent) {
 
 	    if (el == null || el.length == 0) {
 	        throw new IllegalArgumentException("El listado de certificados no puede ser nulo ni vacio"); //$NON-NLS-1$
@@ -56,7 +58,7 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(
 			new CertificateSelectionDispatcherListener(
 				this.optionPane,
-				null
+				ksr
 			)
 		);
 

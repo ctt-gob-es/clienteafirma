@@ -35,7 +35,7 @@ public class CertificateSelectionDialogTest {
 		}
 
 		final CertificateSelectionDialog dialog = new CertificateSelectionDialog(
-				elements.toArray(new NameCertificateBean[0]), null);
+				elements.toArray(new NameCertificateBean[0]), null, null);
 
 		final String selectedAlias = dialog.showDialog();
 

@@ -400,7 +400,10 @@ public final class KeyStoreUtilities {
     	});
 
     	final String selectedAlias = (String) AOUIFactory.showCertificateSelectionDialog(
-    			parentComponent, orderedFriendlyNames);
+			parentComponent,
+			orderedFriendlyNames,
+			ksm
+		);
 
     	if (selectedAlias == null) {
     		throw new AOCancelledOperationException("Operacion de seleccion de certificado cancelada"); //$NON-NLS-1$
