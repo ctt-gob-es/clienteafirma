@@ -194,10 +194,8 @@ public final class KeyStoreUtilities {
                         );
                     }
                     catch (final Exception e) {
-                    	aliassesByFriendlyName.remove(al);
-                        LOGGER.warning(
-                          "Se ha excluido un certificado (" + al + ") por tener la clave privada inaccesible: " + e //$NON-NLS-1$ //$NON-NLS-2$
-                        );
+                    	// Se ignora, cuando no tienen clave privada dan un UnsupportedOPerationException, si salta otro tipo de excepcion
+                    	// es porque la contrasena es incorrecta o por otra razon, pero si tiene clave privada
                     }
                 }
             }

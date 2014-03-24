@@ -24,6 +24,7 @@ import es.gob.afirma.core.misc.Platform;
  * @version 0.1 */
 public final class CAPIKeyStoreManager extends AOKeyStoreManager {
 
+	// Se persiste de forma estatica
 	private static KeyStore capiKsMy = null;
 
     /** Obtiene la clave privada de un certificado.
@@ -59,6 +60,7 @@ public final class CAPIKeyStoreManager extends AOKeyStoreManager {
 			                   final PasswordCallback pssCallBack,
 			                   final Object[] params,
 			                   final boolean forceReset) throws AOKeyStoreManagerException, IOException {
+		resetCachedAliases();
 		if (AOKeyStore.WINDOWS.equals(type)) {
 			if (forceReset) {
 				capiKsMy = null;
@@ -191,15 +193,20 @@ public final class CAPIKeyStoreManager extends AOKeyStoreManager {
             throw new IllegalStateException("Se han pedido los alias de un almacen no inicializado"); //$NON-NLS-1$
         }
 
+        if (getCachedAliases() != null) {
+        	return getCachedAliases();
+        }
+
         LOGGER.info("Solicitando los alias al KeyStore (" + capiKsMy.getProvider() + ")"); //$NON-NLS-1$ //$NON-NLS-2$
 
         try {
-        	return Collections.list(CAPIKeyStoreManager.capiKsMy.aliases()).toArray(new String[0]);
+        	setCachedAliases(Collections.list(CAPIKeyStoreManager.capiKsMy.aliases()).toArray(new String[0]));
         }
         catch (final Exception e) {
             LOGGER.severe("Error intentando obtener los alias del almacen de claves, se devolvera una enumeracion vacia: " + e); //$NON-NLS-1$
             return new String[0];
         }
+        return getCachedAliases();
     }
 
     @Override

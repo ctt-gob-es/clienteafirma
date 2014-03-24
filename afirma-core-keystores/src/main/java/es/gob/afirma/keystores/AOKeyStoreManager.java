@@ -31,6 +31,17 @@ public class AOKeyStoreManager implements KeyStoreRefresher {
 
     protected static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
+    private String[] cachedAliases = null;
+    protected void resetCachedAliases() {
+    	this.cachedAliases = null;
+    }
+    protected String[] getCachedAliases() {
+    	return this.cachedAliases;
+    }
+    protected void setCachedAliases(final String[] ca) {
+    	this.cachedAliases = ca.clone();
+    }
+
     /** Tipo de almac&eacute;n. */
     private AOKeyStore ksType;
 
@@ -52,6 +63,7 @@ public class AOKeyStoreManager implements KeyStoreRefresher {
      * @throws AOKeyStoreManagerException */
     @Override
 	public void refresh() throws IOException {
+    	resetCachedAliases();
     	try {
 			this.init(this.ksType, this.storeIs, this.callBack, this.storeParams, true);
 		}
@@ -104,6 +116,8 @@ public class AOKeyStoreManager implements KeyStoreRefresher {
         }
         LOGGER.info("Inicializamos el almacen de tipo: " + type); //$NON-NLS-1$
 
+        resetCachedAliases();
+
         // Guardamos los parametros de inicializacion por si hay que reiniciar
         this.ksType = type;
         this.storeIs = store;
@@ -131,11 +145,23 @@ public class AOKeyStoreManager implements KeyStoreRefresher {
         		this.ks = AOKeyStoreManagerHelperCapiAddressBook.initCAPIAddressBook(this.ksType);
         		break;
         	case PKCS11:
+
                 // En el "params" debemos traer los parametros:
                 // [0] -p11lib: Biblioteca PKCS#11, debe estar en el Path (Windows) o en el LD_LIBRARY_PATH (UNIX, Linux, Mac OS X)
                 // [1] -desc: Descripcion del token PKCS#11 (opcional)
                 // [2] -slot: Numero de lector de tarjeta (Sistema Operativo) [OPCIONAL]
-                this.ks = AOKeyStoreManagerHelperPkcs11.initPKCS11(pssCallBack, params);
+
+        		// Hacemos una copia por la mutabilidad
+        		final Object[] newParams;
+        		if (params != null) {
+        			newParams = new Object[params.length];
+        			System.arraycopy(params, 0, newParams, 0, params.length);
+        		}
+        		else {
+        			newParams = null;
+        		}
+
+                this.ks = AOKeyStoreManagerHelperPkcs11.initPKCS11(pssCallBack, newParams);
                 break;
         	case APPLE:
         		this.ks = AOKeyStoreManagerHelperApple.initApple(store);
@@ -172,14 +198,7 @@ public class AOKeyStoreManager implements KeyStoreRefresher {
         if (alias == null) {
         	throw new IllegalArgumentException("El alias no puede ser nulo"); //$NON-NLS-1$
         }
-
-		try {
-			return (KeyStore.PrivateKeyEntry) this.ks.getEntry(alias, pssCallback != null ? new KeyStore.PasswordProtection(pssCallback.getPassword()) : null);
-		}
-		catch (final Exception e) {
-        	throw new UnsupportedOperationException("La entrada no tiene clave privada: " + e, e); //$NON-NLS-1$
-        }
-
+		return (KeyStore.PrivateKeyEntry) this.ks.getEntry(alias, pssCallback != null ? new KeyStore.PasswordProtection(pssCallback.getPassword()) : null);
     }
 
     /** Obtiene un certificado del keystore activo a partir de su alias.
@@ -244,15 +263,20 @@ public class AOKeyStoreManager implements KeyStoreRefresher {
         if (this.ks == null) {
             throw new IllegalStateException("Se han pedido alias a un almacen no inicializado"); //$NON-NLS-1$
         }
+        if (this.cachedAliases != null) {
+        	return this.cachedAliases;
+        }
 		try {
-			Collections.list(this.ks.aliases()).toArray(new String[0]);
+			this.cachedAliases = Collections.list(this.ks.aliases()).toArray(new String[0]);
 		}
 		catch (final KeyStoreException e) {
 			LOGGER.severe(
  				"Error intentando recuperar los alias, se devolvera una lista vacia: " + e //$NON-NLS-1$
 			);
+			return new String[0];
 		}
-		return new String[0];
+		return this.cachedAliases;
+
     }
 
     @Override

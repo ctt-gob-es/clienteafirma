@@ -19,10 +19,6 @@ final class NssKeyStoreManager extends AOKeyStoreManager {
 	/** Componente padre sobre el que montar los di&aacute;logos modales. */
 	private final Object parentComponent;
 
-	/** PasswordCallback establecido de forma externa para el acceso al
-	 * almac&eacute;n. */
-	private final PasswordCallback externallPasswordCallback = null;
-
 	/** Construye un gestor de almac&eacute;n de claves y certificados Mozilla (NSS). */
 	NssKeyStoreManager(final Object parent) {
 		setKeyStoreType(AOKeyStore.MOZ_UNI);
@@ -63,8 +59,8 @@ final class NssKeyStoreManager extends AOKeyStoreManager {
 			}
 			catch (final Exception e) {
 				try {
-					keyStore.load(null, this.externallPasswordCallback != null
-						? this.externallPasswordCallback.getPassword()
+					keyStore.load(null, pssCallBack != null
+						? pssCallBack.getPassword()
 							: new UIPasswordCallback(FirefoxKeyStoreMessages.getString("MozillaUnifiedKeyStoreManager.0"), //$NON-NLS-1$
 								this.parentComponent).getPassword());
 				}
