@@ -21,6 +21,8 @@ final class MozillaKeyStoreUtilitiesWindows {
 	/** Nombre del PKCS#11 NSS en Windows. */
 	private static final String SOFTOKN3_DLL = "softokn3.dll"; //$NON-NLS-1$
 
+	private static final String MSVCR100_DLL = "msvcr100.dll"; //$NON-NLS-1$
+	private static final String MSVCP100_DLL = "msvcp100.dll"; //$NON-NLS-1$
 	private static final String PLC4_DLL = "plc4.dll"; //$NON-NLS-1$
 	private static final String PLDS4_DLL = "plds4.dll"; //$NON-NLS-1$
 	private static final String NSPR4_DLL = "nspr4.dll"; //$NON-NLS-1$
@@ -142,6 +144,8 @@ final class MozillaKeyStoreUtilitiesWindows {
 	 * @return Listado con los nombres de las bibliotecas. */
 	static String[] getSoftkn3DependenciesWindows(final String nssPath) {
 		return new String[] {
+			nssPath + MSVCR100_DLL,	  // Ciertas versiones, Visual C++ 10.0
+			nssPath + MSVCP100_DLL,	  // Ciertas versiones, Visual C++ 10.0
 			nssPath + MOZGLUE_DLL,    // Firefox 11
 			nssPath + NSS3_DLL,       // Firefox 24
 			nssPath + MOZUTILS_DLL,   // Firefox 9 y 10
