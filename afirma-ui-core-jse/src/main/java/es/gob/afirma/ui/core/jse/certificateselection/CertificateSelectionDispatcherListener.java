@@ -103,12 +103,6 @@ final class CertificateSelectionDispatcherListener implements KeyEventDispatcher
 						this.parent.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 					}
 					try {
-						Thread.sleep(5000);
-					} catch (final InterruptedException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-					try {
 						this.localKeyStoreEnabler.refresh();
 					}
 					catch (final IOException e) {
