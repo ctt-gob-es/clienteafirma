@@ -17,6 +17,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.xml.crypto.MarshalException;
 import javax.xml.crypto.XMLStructure;
@@ -39,6 +40,7 @@ import net.java.xades.security.xml.XAdES.XMLAdvancedSignature;
 import org.w3c.dom.Element;
 
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.signers.xml.CustomUriDereferencer;
 import es.gob.afirma.signers.xml.style.XmlStyle;
 
 /** Derivado de <code>net.java.xades.security.xml.XAdES.XMLAdvancedSignature</code> con los
@@ -51,6 +53,8 @@ import es.gob.afirma.signers.xml.style.XmlStyle;
  * <li>Se puede a&ntilde;adir una hoja de estilo en modo <i>enveloping</i> dentro de la firma
  * </ul> */
 final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
+
+	static final Logger LOGGER = Logger.getLogger("es.agob.afirma"); //$NON-NLS-1$
 
     private AOXMLAdvancedSignature(final XAdES_BES xades) {
         super(xades);
@@ -65,10 +69,7 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
     /** A&ntilde;ade una hoja de estilo en modo <i>enveloping</i> dentro de la
      * firma. La referencia para firmarla debe construirse de forma externa,
      * esta clase no la construye ni a&ntilde;ade
-     * @param s XML de la hoja de estilo (si se proporciona un nulo no se
-     *          a&ntilde;ade la hoja de estilo)
-     * @param sType Tipo (MimeType) de la hoja de estilo (puede ser nulo)
-     * @param sEncoding Codificaci&oacute;n de la hoja de estilo (puede ser nula)
+     * @param xmlStyle Elemento de estilo XML
      * @param sId Identificador de la hoja de estilo (si se proporciona un nulo
      *            no se a&ntilde;ade la hoja de estilo) */
     void addStyleSheetEnvelopingOntoSignature(final XmlStyle xmlStyle,
@@ -114,6 +115,22 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
 	        newList.add(
 	    		keyInfoFactory.newKeyName(
 					AOUtil.getCN(certificates.get(0))
+						// Se sustituyen los caracteres UTF-8 comunes para evitar problemas
+						// de codificacion del XML
+						.replace("\u00e1", "a") //$NON-NLS-1$ //$NON-NLS-2$
+						.replace("\u00e9", "e") //$NON-NLS-1$ //$NON-NLS-2$
+						.replace("\u00ed", "i") //$NON-NLS-1$ //$NON-NLS-2$
+						.replace("\u00f3", "o") //$NON-NLS-1$ //$NON-NLS-2$
+						.replace("\u00fa", "u") //$NON-NLS-1$ //$NON-NLS-2$
+						.replace("\u00c1", "A") //$NON-NLS-1$ //$NON-NLS-2$
+						.replace("\u00c9", "E") //$NON-NLS-1$ //$NON-NLS-2$
+						.replace("\u00cd", "I") //$NON-NLS-1$ //$NON-NLS-2$
+						.replace("\u00d3", "O") //$NON-NLS-1$ //$NON-NLS-2$
+						.replace("\u00da", "U") //$NON-NLS-1$ //$NON-NLS-2$
+						.replace("\u00f1", "n") //$NON-NLS-1$ //$NON-NLS-2$
+						.replace("\u00d1", "N") //$NON-NLS-1$ //$NON-NLS-2$
+						.replace("\u00e7", "c") //$NON-NLS-1$ //$NON-NLS-2$
+						.replace("\u00c7", "C") //$NON-NLS-1$ //$NON-NLS-2$
 				)
 			);
         }
@@ -180,6 +197,17 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
         this.signContext = new DOMSignContext(privateKey, this.baseElement);
         this.signContext.putNamespacePrefix(XMLSignature.XMLNS, this.xades.getXmlSignaturePrefix());
         this.signContext.putNamespacePrefix(this.xadesNamespace, this.xades.getXadesPrefix());
+
+        try {
+        	// Obtenemos el dereferenciador por defecto por reflexion
+        	// e instalamos uno nuevo que solo actua cuando falla el por defecto
+        	this.signContext.setURIDereferencer(
+    			new CustomUriDereferencer(CustomUriDereferencer.getDefaultDereferencer())
+			);
+        }
+        catch (final Exception e) {
+        	LOGGER.warning("No se ha podido instalar un dereferenciador a medida, es posible que fallen las firmas de nodos concretos: " + e); //$NON-NLS-1$
+        }
 
         this.signature.sign(this.signContext);
     }

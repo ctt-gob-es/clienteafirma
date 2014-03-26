@@ -268,12 +268,6 @@ public final class XAdESSigner {
 				new ByteArrayInputStream(data)
 			);
 
-			if (nodeToSign != null && XAdESUtil.getElementById(docum, nodeToSign) == null) {
-				throw new InvalidXMLException(
-					"El nodo XML indicado para su firma (" + nodeToSign + ") no existe" //$NON-NLS-1$ //$NON-NLS-2$
-				);
-			}
-
 			// ************************************************
 			// **** Obtencion de la hoja de estilo del XML ****
 			// ************************************************

@@ -79,6 +79,7 @@ import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
+import es.gob.afirma.signers.xml.CustomUriDereferencer;
 import es.gob.afirma.signers.xml.InvalidXMLException;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.XMLConstants;
@@ -1012,6 +1013,17 @@ public final class AOXMLDSigSigner implements AOSigner {
         		key, docSignature.getDocumentElement()
     		);
             signContext.putNamespacePrefix(XMLConstants.DSIGNNS, xmlSignaturePrefix);
+
+            try {
+            	// Obtenemos el dereferenciador por defecto por reflexion
+            	// e instalamos uno nuevo que solo actua cuando falla el por defecto
+            	signContext.setURIDereferencer(
+        			new CustomUriDereferencer(CustomUriDereferencer.getDefaultDereferencer())
+    			);
+            }
+            catch (final Exception e) {
+            	LOGGER.warning("No se ha podido instalar un dereferenciador a medida, es posible que fallen las firmas de nodos concretos: " + e); //$NON-NLS-1$
+            }
 
             signature.sign(signContext);
         }
@@ -1992,10 +2004,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             root = this.doc.getDocumentElement();
 
             // Identificamos el prefijo que se utiliza en los nodos de firma
-            String xmlDSigNSPrefix = XmlDSigUtil.guessXmlDSigNamespacePrefix(root);
-            if (xmlDSigNSPrefix == null) {
-                xmlDSigNSPrefix = XML_SIGNATURE_PREFIX;
-            }
+            final String xmlDSigNSPrefix = Utils.guessXmlDSigNamespacePrefix(root);
             completePrefix = "".equals(xmlDSigNSPrefix) ? "" : xmlDSigNSPrefix + ":"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
             // Si el documento tiene como nodo raiz el nodo de firma, se agrega
