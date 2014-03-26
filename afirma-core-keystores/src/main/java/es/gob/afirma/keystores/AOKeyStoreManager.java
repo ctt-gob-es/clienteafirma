@@ -122,7 +122,14 @@ public class AOKeyStoreManager implements KeyStoreRefresher {
         this.ksType = type;
         this.storeIs = store;
         this.callBack = pssCallBack;
-        this.storeParams = params;
+        if (params == null) {
+        	this.storeParams = null;
+        }
+        else {
+        	// Copia defensiva ante mutaciones
+        	this.storeParams = new Object[params.length];
+        	System.arraycopy(params, 0, this.storeParams, 0, params.length);
+        }
 
         switch(this.ksType) {
         	case SINGLE:

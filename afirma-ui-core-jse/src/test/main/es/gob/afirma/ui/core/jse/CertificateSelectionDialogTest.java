@@ -35,9 +35,9 @@ public class CertificateSelectionDialogTest {
 		}
 
 		final CertificateSelectionDialog dialog = new CertificateSelectionDialog(
-				elements.toArray(new NameCertificateBean[0]), null, null);
+				elements.toArray(new NameCertificateBean[0]), null);
 
-		final String selectedAlias = dialog.showDialog();
+		final String selectedAlias = dialog.showDialog(null);
 
 		System.out.println("Certificado selecionado: " + selectedAlias); //$NON-NLS-1$
 	}

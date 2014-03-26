@@ -1,6 +1,7 @@
 package es.gob.afirma.ui.core.jse.certificateselection;
 
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Desktop;
 import java.awt.KeyEventDispatcher;
 import java.awt.event.KeyEvent;
@@ -98,6 +99,15 @@ final class CertificateSelectionDispatcherListener implements KeyEventDispatcher
 					}
 				}
 				else if (KeyEvent.VK_F5 == ke.getKeyCode()) {
+					if (this.parent != null) {
+						this.parent.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+					}
+					try {
+						Thread.sleep(5000);
+					} catch (final InterruptedException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 					try {
 						this.localKeyStoreEnabler.refresh();
 					}
@@ -109,6 +119,11 @@ final class CertificateSelectionDispatcherListener implements KeyEventDispatcher
 							CertificateSelectionDialogMessages.getString("CertificateSelectionDispatcherListener.3"), //$NON-NLS-1$
 							JOptionPane.ERROR_MESSAGE
 						);
+					}
+					finally {
+						if (this.parent != null) {
+							this.parent.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+						}
 					}
 				}
 			}

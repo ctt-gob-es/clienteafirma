@@ -36,9 +36,8 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 	/** Construye el di&aacute;logo de selecci&oacute;n de certificados a partir del listado con
 	 * sus nombres y los propios certificados.
 	 * @param el Listado de certificados.
-	 * @param ksr Componente para actualizar el almac&eacute;n actual
 	 * @param parent Componente sobre el que se mostrar&aacute; el di&aacute;logo. */
-	public CertificateSelectionDialog(final NameCertificateBean[] el, final KeyStoreRefresher ksr, final Component parent) {
+	public CertificateSelectionDialog(final NameCertificateBean[] el, final Component parent) {
 
 	    if (el == null || el.length == 0) {
 	        throw new IllegalArgumentException("El listado de certificados no puede ser nulo ni vacio"); //$NON-NLS-1$
@@ -55,6 +54,21 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 		this.optionPane.setMessageType(JOptionPane.PLAIN_MESSAGE);
 		this.optionPane.setOptionType(JOptionPane.OK_CANCEL_OPTION);
 
+	}
+
+	/** Muestra el di&aacute;logo de selecci&oacute;n de certificados.
+	 * @param ksr Componente para actualizar el almac&eacute;n actual
+	 * @return Nombre del certificado seleccionado o {@code null} si el usuario
+	 * lo cancela o cierra sin seleccionar. */
+	public String showDialog(final KeyStoreRefresher ksr) {
+		final JDialog certDialog = this.optionPane.createDialog(
+			this.parent,
+			CertificateSelectionDialogMessages.getString("CertificateSelectionDialog.0") //$NON-NLS-1$
+		);
+
+		certDialog.setBackground(Color.WHITE);
+		certDialog.setModal(true);
+
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(
 			new CertificateSelectionDispatcherListener(
 				this.optionPane,
@@ -62,18 +76,6 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 			)
 		);
 
-	}
-
-	/** Muestra el di&aacute;logo de selecci&oacute;n de certificados.
-	 * @return Nombre del certificado seleccionado o {@code null} si el usuario
-	 * lo cancela o cierra sin seleccionar. */
-	public String showDialog() {
-		final JDialog certDialog = this.optionPane.createDialog(
-			this.parent,
-			CertificateSelectionDialogMessages.getString("CertificateSelectionDialog.0") //$NON-NLS-1$
-		);
-		certDialog.setBackground(Color.WHITE);
-		certDialog.setModal(true);
 		certDialog.setVisible(true);
 
 		if (this.optionPane.getValue() == null ||

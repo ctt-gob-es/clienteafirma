@@ -159,7 +159,7 @@ public class JSEUIManager implements AOUIManager {
     	if (parentComponent instanceof Component) {
     		parent = (Component) parentComponent;
     	}
-		return new CertificateSelectionDialog(selectionValues, ksr, parent).showDialog();
+		return new CertificateSelectionDialog(selectionValues, parent).showDialog(ksr);
     }
 
     /** Original code: <a href="http://tactika.com/realhome/realhome.html">http://tactika.com/realhome/realhome.html</a>
