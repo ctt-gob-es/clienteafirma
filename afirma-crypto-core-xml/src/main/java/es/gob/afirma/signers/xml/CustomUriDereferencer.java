@@ -39,10 +39,8 @@ public final class CustomUriDereferencer implements URIDereferencer {
 	 * @throws IllegalArgumentException
 	 * @throws IllegalAccessException */
 	public static URIDereferencer getDefaultDereferencer() throws NoSuchFieldException,
-	                                                               SecurityException,
-	                                                               ClassNotFoundException,
-	                                                               IllegalArgumentException,
-	                                                               IllegalAccessException {
+	                                                              ClassNotFoundException,
+	                                                              IllegalAccessException {
     	// Obtenemos el dereferenciador por defecto por reflexion
     	final Field instanceField = Class.forName(DEFAULT_URI_DEREFERENCER_CLASSNAME).getDeclaredField("INSTANCE"); //$NON-NLS-1$
     	instanceField.setAccessible(true);
@@ -86,7 +84,8 @@ public final class CustomUriDereferencer implements URIDereferencer {
             if (in.isOctetStream()) {
             	try {
             		return new org.jcp.xml.dsig.internal.dom.ApacheOctetStreamData(in);
-            	} catch (final Exception ioe) {
+            	}
+            	catch (final Exception ioe) {
             		throw new URIReferenceException(e);
             	}
             }
