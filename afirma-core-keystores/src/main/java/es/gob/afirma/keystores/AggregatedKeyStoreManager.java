@@ -98,4 +98,9 @@ public class AggregatedKeyStoreManager extends AOKeyStoreManager {
 		}
 	}
 
+	@Override
+	protected boolean lacksKeyStores() {
+		return this.ksms.isEmpty();
+	}
+
 }
