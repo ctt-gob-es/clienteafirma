@@ -16,8 +16,11 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableEntryException;
+import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
@@ -253,7 +256,19 @@ public class AOKeyStoreManager implements KeyStoreRefresher {
          }
 
      	 try {
-    		return (X509Certificate[]) this.ks.getCertificateChain(alias);
+     	     // No hacemos directamente el Cast de Certificate[] a X509Certificate[] porque
+     	     // en ciertas ocasiones encontramos errores en el proceso, especialmente en OS X
+     	     final Certificate[] certs = this.ks.getCertificateChain(alias);
+     	     if (certs == null) {
+     	         return new X509Certificate[0];
+     	     }
+     	     final List<X509Certificate> ret = new ArrayList<X509Certificate>();
+     	     for (final Certificate c : certs) {
+     	         if (c instanceof X509Certificate) {
+     	             ret.add((X509Certificate) c);
+     	         }
+     	     }
+    		 return ret.toArray(new X509Certificate[0]);
      	 }
      	 catch(final Exception e) {
      		LOGGER.severe(
