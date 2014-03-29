@@ -14,6 +14,10 @@ import es.gob.afirma.core.misc.Platform;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public class LogManager {
 
+	private LogManager() {
+		// No permito la instanciacion
+	}
+
 	/** Aplicaci&oacute;n que va a registrar. */
 	public enum App {
 		/** MiniApplet. */
@@ -38,9 +42,9 @@ public class LogManager {
 
 	/** Instala los manejadores de registro adicionales.
 	 * @param app Aplicaci&oacute;n que va a registrar
-	 * @throws SecurityException
+	 * @throws java.lang.SecurityException
 	 * @throws IOException */
-	public static void install(final App app) throws SecurityException, IOException {
+	public static void install(final App app) throws IOException {
 		if (app == null) {
 			application = App.OTHER;
 		}
