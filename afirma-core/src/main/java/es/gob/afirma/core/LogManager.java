@@ -12,7 +12,7 @@ import es.gob.afirma.core.misc.Platform;
 
 /** Gestor de registro del Cliente @firma.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-public class LogManager {
+public final class LogManager {
 
 	private LogManager() {
 		// No permito la instanciacion
