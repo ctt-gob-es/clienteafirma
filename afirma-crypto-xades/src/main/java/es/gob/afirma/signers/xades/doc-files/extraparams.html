@@ -20,7 +20,7 @@
    <dd>
     Indica, mediante una expresi&oacute;n XPath (v1), el nodo bajo el cual 
     debe insertarse el nodo de firma en el caso de una firma <i>Enveloped</i>.<br>
-    Si la expresi&oacute;n devuleve m&aacute;s de un nodo, se usa solo el primero.
+    Si la expresi&oacute;n devuelve m&aacute;s de un nodo, se usa solo el primero.
     Si la expresi&oacute;n no devuelve nodos o est&aacute; mal construida se 
     lanzar&aacute; una excepci&oacute;n.<br>
     Este par&aacute;metro solo tiene efecto en firmas <i>Enveloped</i>. 
@@ -102,7 +102,7 @@
   <dt><b><i>facturaeSign</i></b></dt>
    <dd>
     Indica, mediante un <code>true</code> o <code>false</code>, si se
-	deben realizar las restricciones de comportamiento necesarias
+	deben realizar las necesarias restricciones de comportamiento
 	para la firma de facturas electr&oacute;nicas (FACTURAe).
 	Estas restricciones son, no introducir la
 	transformaci&oacute;n de canonicalizaci&oacute;n de la firma,
@@ -112,7 +112,7 @@
    <dd>Cargo atribuido para el firmante.</dd>
   <dt><b><i>signerCertifiedRole</i></b></dt>
    <dd>Cargo confirmado para el firmante.</dd>
-  <dt><b><i>precalculatedHashAlgorithm</i></b></dt>
+  <dt><b><i>pre-calculatedHashAlgorithm</i></b></dt>
    <dd>Algoritmo de huella digital cuando esta se proporciona precalculada.</dd>
   <dt><b><i>signatureProductionCity</i></b></dt>
    <dd>Ciudad en la que se realiza la firma.</dd>
@@ -125,7 +125,7 @@
   <dt><b><i>xmlTransforms</i></b></dt>
    <dd>N&uacute;mero de transformaciones a aplicar al XML antes de firmarlo.</dd>
   <dt><b><i>xmlTransform</i>n<i>Type</i></b></dt>
-   <dd>Tipo de la transformaci&oacute;n <i>n</i> (debe ser la URL del algoritmo segun define W3C).</dd>
+   <dd>Tipo de la transformaci&oacute;n <i>n</i> (debe ser la URL del algoritmo seg&uacute;n define W3C).</dd>
   <dt><b><i>xmlTransform</i>n<i>Subtype</i></b></dt>
    <dd>Subtipo de la transformaci&oacute;n <i>n</i> (por ejemplo, "intersect", "subtract" o "union" para XPATH2).</dd>
   <dt><b><i>xmlTransform</i>n<i>Body</i></b></dt>

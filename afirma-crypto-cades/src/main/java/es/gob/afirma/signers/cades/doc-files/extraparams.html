@@ -36,7 +36,7 @@
    <dt><b><i>policyIdentifierHashAlgorithm</i></b></dt>
     <dd>
      Algoritmo usado para el c&aacute;lculo de la huella digital indicada en el par&aacute;metro <code>policyIdentifierHash</code>.
-     Es obligario indicarlo cuando se proporciona una huella digital distinta de <code>0</code>.
+     Es obligatorio indicarlo cuando se proporciona una huella digital distinta de <code>0</code>.
      </dd>
     <dt><b><i>policyQualifier</i></b></dt>
      <dd>
@@ -44,19 +44,19 @@
      </dd>
     <dt><b><i>precalculatedHashAlgorithm</i></b></dt>
      <dd>
-      Algoritmo de huella digital (a usar para la firma) cuando esta se proporciona precalculada. Cuando se usan modos de firma
+      Algoritmo de huella digital (a usar para la firma) cuando esta se proporciona pre-calculada. Cuando se usan modos de firma
       <i>expl&iacute;citos</i>, en los que los datos no se incluyen en la firma, es posible trabajar sin proporcionarlos, indicando
       &uacute;nicamente su huella digital en el par&aacute;metro <code>data</code> y el algoritmo usado para su c&aacute;lculo.<br>
       <b>
        Siempre que se de valor a este par&aacute;metro se supondr&aacute; que los datos proporcionados en el par&aacute;metro
-       <code>data</code> son la huella digital de los datos a firmar, y no los datos a firmar en si.
+       <code>data</code> son la huella digital de los datos a firmar, y no los datos a firmar en s&iacute;.
       </b>
      </dd>
     <dt><b><i>signingCertificateV2</i></b></dt>
      <dd>
       Debe establecerse a <code>true</code> si se desea usar la versi&oacute;n 2 del atributo
       <i>Signing Certificate</i> de CAdES. Si no se establece un valor para este par&aacute;metro
-      se utilizar&aacute;a la versi&oacute;n 1 con las firmas realizadas con algoritmos SHA1 y
+      se utilizar&aacute; la versi&oacute;n 1 con las firmas realizadas con algoritmos SHA1 y
       la versi&oacute;n 2 con las firmas realizadas con cualquier otro algoritmo.
      </dd>
  </dl>
