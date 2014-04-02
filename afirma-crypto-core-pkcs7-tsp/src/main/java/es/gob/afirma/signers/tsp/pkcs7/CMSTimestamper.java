@@ -13,6 +13,7 @@ package es.gob.afirma.signers.tsp.pkcs7;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigInteger;
@@ -20,11 +21,20 @@ import java.net.Socket;
 import java.net.URI;
 import java.net.URLConnection;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.logging.Logger;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -58,6 +68,9 @@ import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 public final class CMSTimestamper {
 
     private static final String SIGNATURE_TIMESTAMP_TOKEN_OID = "1.2.840.113549.1.9.16.2.14"; //$NON-NLS-1$
+
+	private static final HostnameVerifier DEFAULT_HOSTNAME_VERIFIER = HttpsURLConnection.getDefaultHostnameVerifier();
+	private static final SSLSocketFactory DEFAULT_SSL_SOCKET_FACTORY = HttpsURLConnection.getDefaultSSLSocketFactory();
 
     private final TimeStampRequestGenerator tsqGenerator;
     private final URI tsaURL;
@@ -94,6 +107,28 @@ public final class CMSTimestamper {
         this.tsaURL = tsa;
         this.tsaPassword = tsaPwd;
         this.tsaUsername = tsaUsr;
+    }
+
+    /** Establece el almac&eacute;n (formato PKCS#12) del certificado cliente a usar en conexiones SSL.
+     * @param p12KeyStoreFile Fichero PKCS#12 / PFX de almac&eacute;n (formato PKCS#12) del certificado cliente a usar en conexiones SSL
+     * @param p12KeyStoreFilePassword Contrase&ntilde;a del ichero PKCS#12 / PFX de almac&eacute;n (formato PKCS#12) del certificado
+     *                                cliente a usar en conexiones SSL */
+    public static void setSslClientKeyStore(final String p12KeyStoreFile, final String p12KeyStoreFilePassword) {
+    	if (p12KeyStoreFile == null || p12KeyStoreFilePassword == null) {
+    		throw new IllegalArgumentException("El almacen PKCS#12 y su contrasena no pueden ser nulos"); //$NON-NLS-1$
+    	}
+    	final File p12File = new File(p12KeyStoreFile);
+    	if (!p12File.exists()) {
+    		throw new IllegalArgumentException("El almacen PKCS#12 indicado para el SSL cliente no existe"); //$NON-NLS-1$
+    	}
+    	if (!p12File.canRead()) {
+    		throw new IllegalArgumentException(
+				"No se tienen permisos de lectura para el almacen PKCS#12 indicado para el SSL cliente" //$NON-NLS-1$
+			);
+    	}
+    	System.setProperty("javax.net.ssl.keyStore", p12KeyStoreFile); //$NON-NLS-1$
+    	System.setProperty("javax.net.ssl.keyStoreType", "pkcs12"); //$NON-NLS-1$ //$NON-NLS-2$
+    	System.setProperty("javax.net.ssl.keyStorePassword", p12KeyStoreFilePassword); //$NON-NLS-1$
     }
 
     /** A&ntilde;ade un sello de tiempo a las firmas encontradas dentro de una estructura PKCS#7.
@@ -153,6 +188,9 @@ public final class CMSTimestamper {
     	else if (this.tsaURL.getScheme().equals("http")) { //$NON-NLS-1$
     		return getTSAResponseHttp(request);
     	}
+    	else if (this.tsaURL.getScheme().equals("https")) { //$NON-NLS-1$
+    		return getTSAResponseHttps(request);
+    	}
     	else {
 			throw new UnsupportedOperationException("Protocolo de conexion con TSA no soportado: " + this.tsaURL.getScheme()); //$NON-NLS-1$
 		}
@@ -190,9 +228,37 @@ public final class CMSTimestamper {
     	return resp;
     }
 
+    /** Obtiene el <i>token</i> de sello de tiempo por HTTPS (SSL).
+     * @return Respuesta de la TSA (array de bytes seg&uacute;n RFC 3161)
+     * @throws IOException Si hay problemas de dentrada / salida */
+    private byte[] getTSAResponseHttps(final byte[] requestBytes) throws IOException {
+    	final SSLContext sc;
+    	try {
+    		sc = SSLContext.getInstance("SSL"); //$NON-NLS-1$
+    		sc.init(null, DUMMY_TRUST_MANAGER, new java.security.SecureRandom());
+    	}
+    	catch(final Exception e) {
+    		throw new IOException("Error estableciendo el gestor laxo de seguridad SSL: " + e, e); //$NON-NLS-1$
+    	}
+		HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+		HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
+			@Override
+			public boolean verify(final String hostname, final SSLSession session) {
+				return true;
+			}
+		});
+		try {
+			return getTSAResponseHttp(requestBytes);
+		}
+		finally {
+			HttpsURLConnection.setDefaultSSLSocketFactory(DEFAULT_SSL_SOCKET_FACTORY);
+			HttpsURLConnection.setDefaultHostnameVerifier(DEFAULT_HOSTNAME_VERIFIER);
+		}
+    }
+
     /** Obtiene el <i>token</i> de sello de tiempo por HTTP.
      * @return Respuesta de la TSA (array de bytes seg&uacute;n RFC 3161)
-     * @throws IOException */
+     * @throws IOException Si hay problemas de dentrada / salida */
     private byte[] getTSAResponseHttp(final byte[] requestBytes) throws IOException {
 
          final URLConnection tsaConnection = this.tsaURL.toURL().openConnection();
@@ -272,5 +338,17 @@ public final class CMSTimestamper {
          // El tamano aproximado del token es tsToken.getEncoded().length + 32;
      }
 
+	 private static final TrustManager[] DUMMY_TRUST_MANAGER = new TrustManager[] {
+		new X509TrustManager() {
+			@Override
+			public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+				return null;
+			}
+			@Override
+			public void checkClientTrusted(final X509Certificate[] certs, final String authType) { /* No hacemos nada */ }
+			@Override
+			public void checkServerTrusted(final X509Certificate[] certs, final String authType) {  /* No hacemos nada */  }
 
+		}
+	 };
 }
