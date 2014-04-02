@@ -13,13 +13,13 @@ package es.gob.afirma.signers.tsp.pkcs7;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URLConnection;
+import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
@@ -77,6 +78,9 @@ public final class CMSTimestamper {
     private final String tsaUsername;
     private final String tsaPassword;
 
+    private byte[] sslP12KeyStoreFile = null;
+    private String sslP12KeyStorePassword = null;
+
     /** Construye un estampador de sellos de tiempo para estructuras CMS y CAdES.
      * @param requireCert <code>true</code> si la TSA requiere certificado, <code>false</code> en caso contrario
      * @param policy OID de la pol&iacute;tica de sellado de tiempo
@@ -84,7 +88,32 @@ public final class CMSTimestamper {
      * @param tsaUsr Nombre de usuario si la TSA requiere autenticaci&oacute;n (puede ser <code>null</code> si no se necesita autenticaci&oacute;n)
      * @param tsaPwd Contrase&ntilde;a del usuario de la TSA (puede ser <code>null</code> si no se necesita autenticaci&oacute;n)
      * @param extensions Extensiones a a&ntilde;adir a la petici&oacute;n de sello de tiempo
-     */
+     * @param p12KeyStoreFile Fichero PKCS#12 / PFX de almac&eacute;n (formato PKCS#12) del certificado cliente a usar en conexiones SSL
+     * @param p12KeyStoreFilePassword Contrase&ntilde;a del ichero PKCS#12 / PFX de almac&eacute;n (formato PKCS#12) del certificado
+     *                                cliente a usar en conexiones SSL */
+    public CMSTimestamper(final boolean requireCert,
+                     final String policy,
+                     final URI tsa,
+                     final String tsaUsr,
+                     final String tsaPwd,
+                     final TsaRequestExtension[] extensions,
+                     final byte[] p12KeyStoreFile,
+                     final String p12KeyStoreFilePassword) {
+    	this(requireCert, policy, tsa, tsaUsr, tsaPwd, extensions);
+    	if (p12KeyStoreFile == null || p12KeyStoreFilePassword == null) {
+    		throw new IllegalArgumentException("El almacen PKCS#12 y su contrasena no pueden ser nulos"); //$NON-NLS-1$
+    	}
+    	this.sslP12KeyStoreFile = p12KeyStoreFile.clone();
+    	this.sslP12KeyStorePassword = p12KeyStoreFilePassword;
+    }
+
+    /** Construye un estampador de sellos de tiempo para estructuras CMS y CAdES.
+     * @param requireCert <code>true</code> si la TSA requiere certificado, <code>false</code> en caso contrario
+     * @param policy OID de la pol&iacute;tica de sellado de tiempo
+     * @param tsa URL de la autoridad de sellado de tiempo
+     * @param tsaUsr Nombre de usuario si la TSA requiere autenticaci&oacute;n (puede ser <code>null</code> si no se necesita autenticaci&oacute;n)
+     * @param tsaPwd Contrase&ntilde;a del usuario de la TSA (puede ser <code>null</code> si no se necesita autenticaci&oacute;n)
+     * @param extensions Extensiones a a&ntilde;adir a la petici&oacute;n de sello de tiempo */
     public CMSTimestamper(final boolean requireCert,
                      final String policy,
                      final URI tsa,
@@ -109,36 +138,13 @@ public final class CMSTimestamper {
         this.tsaUsername = tsaUsr;
     }
 
-    /** Establece el almac&eacute;n (formato PKCS#12) del certificado cliente a usar en conexiones SSL.
-     * @param p12KeyStoreFile Fichero PKCS#12 / PFX de almac&eacute;n (formato PKCS#12) del certificado cliente a usar en conexiones SSL
-     * @param p12KeyStoreFilePassword Contrase&ntilde;a del ichero PKCS#12 / PFX de almac&eacute;n (formato PKCS#12) del certificado
-     *                                cliente a usar en conexiones SSL */
-    public static void setSslClientKeyStore(final String p12KeyStoreFile, final String p12KeyStoreFilePassword) {
-    	if (p12KeyStoreFile == null || p12KeyStoreFilePassword == null) {
-    		throw new IllegalArgumentException("El almacen PKCS#12 y su contrasena no pueden ser nulos"); //$NON-NLS-1$
-    	}
-    	final File p12File = new File(p12KeyStoreFile);
-    	if (!p12File.exists()) {
-    		throw new IllegalArgumentException("El almacen PKCS#12 indicado para el SSL cliente no existe"); //$NON-NLS-1$
-    	}
-    	if (!p12File.canRead()) {
-    		throw new IllegalArgumentException(
-				"No se tienen permisos de lectura para el almacen PKCS#12 indicado para el SSL cliente" //$NON-NLS-1$
-			);
-    	}
-    	System.setProperty("javax.net.ssl.keyStore", p12KeyStoreFile); //$NON-NLS-1$
-    	System.setProperty("javax.net.ssl.keyStoreType", "pkcs12"); //$NON-NLS-1$ //$NON-NLS-2$
-    	System.setProperty("javax.net.ssl.keyStorePassword", p12KeyStoreFilePassword); //$NON-NLS-1$
-    }
-
     /** A&ntilde;ade un sello de tiempo a las firmas encontradas dentro de una estructura PKCS#7.
      * @param pkcs7 Estructura que contiene las firmas a estampar un sello de tiempo
      * @param hashAlgorithm Algoritmo de huella digital a usar en los sellos de tiempo (si se indica <code>null</code> se usa SHA-1)
      * @return Nueva estructura PKCS#7 con los sellos de tiempo a&ntilde;adidos
-     * @throws NoSuchAlgorithmException
-     * @throws AOException
-     * @throws IOException
-     */
+     * @throws NoSuchAlgorithmException Si no se soporta el algoritmo de huella digital del sello de tiempo
+     * @throws AOException Cuando ocurren errores gen&eacute;ricos
+     * @throws IOException Si hay errores de entrada / salida */
     public byte[] addTimestamp(final byte[] pkcs7, final String hashAlgorithm) throws NoSuchAlgorithmException, AOException, IOException {
 
         final CMSSignedData signedData;
@@ -235,10 +241,36 @@ public final class CMSTimestamper {
     	final SSLContext sc;
     	try {
     		sc = SSLContext.getInstance("SSL"); //$NON-NLS-1$
-    		sc.init(null, DUMMY_TRUST_MANAGER, new java.security.SecureRandom());
     	}
     	catch(final Exception e) {
-    		throw new IOException("Error estableciendo el gestor laxo de seguridad SSL: " + e, e); //$NON-NLS-1$
+    		throw new IOException("No se ha podido obtener el contexto de seguridad SSL: " + e, e); //$NON-NLS-1$
+    	}
+    	final KeyManagerFactory keyManagerFactory;
+    	if (this.sslP12KeyStoreFile != null && this.sslP12KeyStorePassword != null) {
+    		try {
+    			final KeyStore keystore = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+				keystore.load(new ByteArrayInputStream(this.sslP12KeyStoreFile), this.sslP12KeyStorePassword.toCharArray());
+	    		keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+	    		keyManagerFactory.init(keystore, this.sslP12KeyStorePassword.toCharArray());
+			}
+    		catch (final Exception e) {
+    			throw new IOException("Error obteniendo el almacen de certificados cliente para el SSL: " + e, e); //$NON-NLS-1$
+			}
+    	}
+    	else {
+    		keyManagerFactory = null;
+    	}
+    	try {
+    		sc.init(
+				keyManagerFactory != null ?
+					keyManagerFactory.getKeyManagers() :
+						null,
+				DUMMY_TRUST_MANAGER,
+				new java.security.SecureRandom()
+			);
+    	}
+    	catch(final Exception e) {
+    		throw new IOException("Error creando el gestor laxo de seguridad SSL: " + e, e); //$NON-NLS-1$
     	}
 		HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 		HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
@@ -348,7 +380,6 @@ public final class CMSTimestamper {
 			public void checkClientTrusted(final X509Certificate[] certs, final String authType) { /* No hacemos nada */ }
 			@Override
 			public void checkServerTrusted(final X509Certificate[] certs, final String authType) {  /* No hacemos nada */  }
-
 		}
 	 };
 }
