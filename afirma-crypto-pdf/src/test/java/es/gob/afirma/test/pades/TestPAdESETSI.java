@@ -28,10 +28,13 @@ import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.signers.pades.AOPDFSigner;
-import es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper;
 
 /** Pruebas PAdES espac&iacute;ficas para el PlugTest de la ETSI. */
 public final class TestPAdESETSI {
+
+	private static final String CATCERT_POLICY = "0.4.0.2023.1.1"; //$NON-NLS-1$
+	private static final String CATCERT_TSP = "http://psis.catcert.net/psis/catcert/tsp"; //$NON-NLS-1$
+	private static final Boolean CATCERT_REQUIRECERT = Boolean.TRUE;
 
     private static final String CERT_PATH = "RequestedKeyCert.p12"; //$NON-NLS-1$
     private static final String CERT_PASS = "1111"; //$NON-NLS-1$
@@ -67,14 +70,14 @@ public final class TestPAdESETSI {
         final Properties p2 = new Properties();
 
         final Properties p3 = new Properties();
-        p3.put("tsaURL", CMSTimestamper.CATCERT_TSP); //$NON-NLS-1$
-        p3.put("tsaRequireCert", CMSTimestamper.CATCERT_REQUIRECERT); //$NON-NLS-1$
-        p3.put("tsaPolicy", CMSTimestamper.CATCERT_POLICY); //$NON-NLS-1$
+        p3.put("tsaURL", CATCERT_TSP); //$NON-NLS-1$
+        p3.put("tsaRequireCert", CATCERT_REQUIRECERT); //$NON-NLS-1$
+        p3.put("tsaPolicy", CATCERT_POLICY); //$NON-NLS-1$
 
         final Properties p4 = new Properties();
-        p4.put("tsaURL", CMSTimestamper.CATCERT_TSP); //$NON-NLS-1$
-        p4.put("tsaRequireCert", CMSTimestamper.CATCERT_REQUIRECERT); //$NON-NLS-1$
-        p4.put("tsaPolicy", CMSTimestamper.CATCERT_POLICY); //$NON-NLS-1$
+        p4.put("tsaURL", CATCERT_TSP); //$NON-NLS-1$
+        p4.put("tsaRequireCert", CATCERT_REQUIRECERT); //$NON-NLS-1$
+        p4.put("tsaPolicy", CATCERT_POLICY); //$NON-NLS-1$
         p4.setProperty("policyIdentifier", "1.2.3.4.5.2"); //$NON-NLS-1$ //$NON-NLS-2$
         try {
             p4.setProperty(

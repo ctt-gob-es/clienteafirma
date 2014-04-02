@@ -14,13 +14,16 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.signers.pades.AOPDFSigner;
-import es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper;
 
 /** Pruebas de firmas de PDF con adjuntos y empotrados.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public class TestAttachments {
 
 	private static final String[] TEST_FILES = { "TEST_PDF.pdf" }; //$NON-NLS-1$
+
+	private static final String CATCERT_POLICY = "0.4.0.2023.1.1"; //$NON-NLS-1$
+	private static final String CATCERT_TSP = "http://psis.catcert.net/psis/catcert/tsp"; //$NON-NLS-1$
+	private static final Boolean CATCERT_REQUIRECERT = Boolean.TRUE;
 
     private static final String CERT_PATH = "ANF_PF_Activo.pfx"; //$NON-NLS-1$
     private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
@@ -39,9 +42,9 @@ public class TestAttachments {
         P1.setProperty("policyIdentifier", "2.16.724.1.3.1.1.2"); //$NON-NLS-1$ //$NON-NLS-2$
         P1.setProperty("policyIdentifierHash", "0"); //$NON-NLS-1$ //$NON-NLS-2$
 
-        P1.put("tsaURL", CMSTimestamper.CATCERT_TSP); //$NON-NLS-1$
-        P1.put("tsaPolicy", CMSTimestamper.CATCERT_POLICY); //$NON-NLS-1$
-        P1.put("tsaRequireCert", CMSTimestamper.CATCERT_REQUIRECERT); //$NON-NLS-1$
+        P1.put("tsaURL", CATCERT_TSP); //$NON-NLS-1$
+        P1.put("tsaPolicy", CATCERT_POLICY); //$NON-NLS-1$
+        P1.put("tsaRequireCert", CATCERT_REQUIRECERT); //$NON-NLS-1$
         P1.put("tsaHashAlgorithm", "SHA1"); //$NON-NLS-1$ //$NON-NLS-2$
 
         P1.setProperty("attach", "RXN0YXMgc29uIGxhcyBtYfFhbml0YXMgcXVlIGNhbnRhYmEgZWwgUmV5IERhdmlkLi4u"); //$NON-NLS-1$ //$NON-NLS-2$

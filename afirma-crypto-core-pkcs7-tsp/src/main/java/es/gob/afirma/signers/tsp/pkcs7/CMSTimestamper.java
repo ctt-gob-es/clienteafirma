@@ -48,17 +48,14 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 
-/** Generador local de sellos de tiempo para PKCS#7. */
+/** Generador local de sellos de tiempo para PKCS#7.
+ * Puede probarse de forma sencilla con la TSA de CatCert:
+ * <ul>
+ *  <li>URL TSP: "http://psis.catcert.net/psis/catcert/tsp"</li>
+ *  <li>OID Pol&iacute;tica de sello de tiempo: "0.4.0.2023.1.1"</li>
+ *  <li>Requiere certificado: S&iacute;</li>
+ * </ul> */
 public final class CMSTimestamper {
-
-    /** URL de la TSA de CatCert. */
-    public static final String CATCERT_TSP = "http://psis.catcert.net/psis/catcert/tsp"; //$NON-NLS-1$
-
-    /** Pol&iacute;tica de sello de tiempo de la TSA de CatCert. */
-    public static final String CATCERT_POLICY = "0.4.0.2023.1.1"; //$NON-NLS-1$
-
-    /** CatCert si requiere el Certificado. */
-    public static final Boolean CATCERT_REQUIRECERT = Boolean.TRUE;
 
     private static final String SIGNATURE_TIMESTAMP_TOKEN_OID = "1.2.840.113549.1.9.16.2.14"; //$NON-NLS-1$
 
@@ -226,7 +223,13 @@ public final class CMSTimestamper {
 
      }
 
-     private byte[] getTimeStampToken(final byte[] imprint, final String hashAlgorithm) throws AOException, IOException {
+    /** Obtiene directamente el <i>token</i> de sello de tiempo seg&uacute;n RFC3161.
+     * @param imprint Huella digital de los datos sobre los que se quiere obtener el sello de tiempo
+     * @param hashAlgorithm Algoritmo de huella digital usado
+     * @return <i>Token</i> de sello de tiempo seg&uacute;n RFC3161
+     * @throws AOException Si se produce un error en el protocolo TSA o en ASN.1
+     * @throws IOException Si hay errores en la comunicaci&oacute;n o en la lectura de datos con la TSA */
+    public byte[] getTimeStampToken(final byte[] imprint, final String hashAlgorithm) throws AOException, IOException {
 
          final TimeStampRequest request = this.tsqGenerator.generate(
                new ASN1ObjectIdentifier(hashAlgorithm != null ? AOAlgorithmID.getOID(hashAlgorithm) : X509ObjectIdentifiers.id_SHA1.getId()),

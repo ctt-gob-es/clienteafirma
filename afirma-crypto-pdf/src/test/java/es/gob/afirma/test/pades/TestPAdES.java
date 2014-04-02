@@ -31,7 +31,6 @@ import es.gob.afirma.core.signers.AOSimpleSignInfo;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.pades.AOPDFSigner;
-import es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper;
 
 /**
  * Pruebas del m&oacute;dulo PAdES de Afirma.
@@ -39,6 +38,10 @@ import es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper;
  *
  */
 public class TestPAdES {
+
+	private static final String CATCERT_POLICY = "0.4.0.2023.1.1"; //$NON-NLS-1$
+	private static final String CATCERT_TSP = "http://psis.catcert.net/psis/catcert/tsp"; //$NON-NLS-1$
+	private static final Boolean CATCERT_REQUIRECERT = Boolean.TRUE;
 
     private static final String CERT_PATH = "ANF_PF_Activo.pfx"; //$NON-NLS-1$
     private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
@@ -127,9 +130,9 @@ public class TestPAdES {
         final Properties extraParams = new Properties();
         //********* TSA CATCERT ********************************************************************
         //******************************************************************************************
-        extraParams.put("tsaURL", CMSTimestamper.CATCERT_TSP); //$NON-NLS-1$
-        extraParams.put("tsaPolicy", CMSTimestamper.CATCERT_POLICY); //$NON-NLS-1$
-        extraParams.put("tsaRequireCert", CMSTimestamper.CATCERT_REQUIRECERT); //$NON-NLS-1$
+        extraParams.put("tsaURL", CATCERT_TSP); //$NON-NLS-1$
+        extraParams.put("tsaPolicy", CATCERT_POLICY); //$NON-NLS-1$
+        extraParams.put("tsaRequireCert", CATCERT_REQUIRECERT); //$NON-NLS-1$
         extraParams.put("tsaHashAlgorithm", "SHA1"); //$NON-NLS-1$ //$NON-NLS-2$
         //******************************************************************************************
         //********* FIN TSA CATCERT ****************************************************************
