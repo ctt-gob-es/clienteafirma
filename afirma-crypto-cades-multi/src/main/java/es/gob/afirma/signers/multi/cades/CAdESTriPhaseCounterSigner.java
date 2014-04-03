@@ -63,6 +63,8 @@ import es.gob.afirma.signers.pkcs7.SigUtils;
  * peculiaridad de que es una Contrafirma. */
 public final class CAdESTriPhaseCounterSigner {
 
+	private static final int MAX_SUPPORTED_COUNTERSIGNS = 10;
+
 	/** Resultado de un conjunto de PreContraFirmas CAdES. */
 	public static final class CAdESPreCounterSignResult {
 
@@ -704,7 +706,7 @@ public final class CAdESTriPhaseCounterSigner {
         // Incrementamos el indice de contrafirmas
     	this.counterIndex = this.counterIndex + 1;
 
-    	if (this.counterIndex > 9) {
+    	if (this.counterIndex >= MAX_SUPPORTED_COUNTERSIGNS) {
     		throw new UnsupportedOperationException("No se soportan mas de 10 contrafirmas en una misma firma"); //$NON-NLS-1$
     	}
 

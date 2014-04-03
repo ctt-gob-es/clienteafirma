@@ -68,9 +68,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import com.sun.org.apache.xml.internal.security.Init;
-import com.sun.org.apache.xml.internal.security.c14n.Canonicalizer;
-
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.AOInvalidFormatException;
@@ -88,6 +85,11 @@ import es.gob.afirma.signers.xml.Utils;
  * con OpenOffice.org 3.2 y superiores.
  * @version 0.2 */
 public final class AOODFSigner implements AOSigner {
+
+	private static final String EXTENSION_ODT = ".odt"; //$NON-NLS-1$
+	private static final String EXTENSION_ODP = ".odp"; //$NON-NLS-1$
+	private static final String EXTENSION_ODS = ".ods"; //$NON-NLS-1$
+	private static final String EXTENSION_ODF = ".odf"; //$NON-NLS-1$
 
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -200,14 +202,21 @@ public final class AOODFSigner implements AOSigner {
 
             // Transforms
             final List<Transform> transformList = new ArrayList<Transform>(1);
-            transformList.add(fac.newTransform(Canonicalizer.ALGO_ID_C14N_OMIT_COMMENTS, (TransformParameterSpec) null));
+            transformList.add(
+        		fac.newTransform(
+    				com.sun.org.apache.xml.internal.security.c14n.Canonicalizer.ALGO_ID_C14N_OMIT_COMMENTS,
+    				(TransformParameterSpec) null
+				)
+    		);
 
             // References
             final List<Reference> referenceList = new ArrayList<Reference>();
 
-            Init.init();
+            com.sun.org.apache.xml.internal.security.Init.init();
 
-            final Canonicalizer canonicalizer = Canonicalizer.getInstance(Canonicalizer.ALGO_ID_C14N_OMIT_COMMENTS);
+            final com.sun.org.apache.xml.internal.security.c14n.Canonicalizer canonicalizer = com.sun.org.apache.xml.internal.security.c14n.Canonicalizer.getInstance(
+        		com.sun.org.apache.xml.internal.security.c14n.Canonicalizer.ALGO_ID_C14N_OMIT_COMMENTS
+    		);
 
             //
             // Anadimos tambien referencias manualmente al propio manifest.xml y
@@ -222,14 +231,23 @@ public final class AOODFSigner implements AOSigner {
                 // Recupera el fichero
                 zf.getInputStream(zf.getEntry("mimetype")))))); //$NON-NLS-1$
 
-                referenceList.add(fac.newReference(MANIFEST_PATH,
-                                                   dm,
-                                                   transformList,
-                                                   null,
-                                                   null,
-                                                   md.digest(canonicalizer.canonicalizeSubtree(
-                                                   // Recupera el fichero y su raiz
-                                                   dbf.newDocumentBuilder().parse(new ByteArrayInputStream(manifestData)).getDocumentElement()))));
+                referenceList.add(
+            		fac.newReference(
+        				MANIFEST_PATH,
+                        dm,
+                        transformList,
+                        null,
+                        null,
+                        md.digest(
+                    		canonicalizer.canonicalizeSubtree(
+                            	// Recupera el fichero y su raiz
+                                dbf.newDocumentBuilder().parse(
+                            		new ByteArrayInputStream(manifestData)
+                        		).getDocumentElement()
+                    		)
+                		)
+            		)
+        		);
             }
 
             // para cada nodo de manifest.xml
@@ -667,22 +685,22 @@ public final class AOODFSigner implements AOSigner {
         final String inTextInt = inText != null ? inText : ""; //$NON-NLS-1$
 
         if (originalName == null) {
-            return inTextInt + ".odf"; //$NON-NLS-1$
+            return inTextInt + EXTENSION_ODF;
         }
         final String originalNameLC = originalName.toLowerCase();
-        if (originalNameLC.length() <= 4) {
-            return originalName + inTextInt + ".odf"; //$NON-NLS-1$
+        if (originalNameLC.length() <= EXTENSION_ODF.length()) {
+            return originalName + inTextInt + EXTENSION_ODF;
         }
-        if (originalNameLC.endsWith(".odt")) { //$NON-NLS-1$
-            return originalName.substring(0, originalName.length() - 4) + inTextInt + ".odt"; //$NON-NLS-1$
+        if (originalNameLC.endsWith(EXTENSION_ODT)) {
+            return originalName.substring(0, originalName.length() - EXTENSION_ODT.length()) + inTextInt + EXTENSION_ODT;
         }
-        if (originalNameLC.endsWith(".odp")) { //$NON-NLS-1$
-            return originalName.substring(0, originalName.length() - 4) + inTextInt + ".odp"; //$NON-NLS-1$
+        if (originalNameLC.endsWith(EXTENSION_ODP)) {
+            return originalName.substring(0, originalName.length() - EXTENSION_ODP.length()) + inTextInt + EXTENSION_ODP;
         }
-        if (originalNameLC.endsWith(".ods")) { //$NON-NLS-1$
-            return originalName.substring(0, originalName.length() - 4) + inTextInt + ".ods"; //$NON-NLS-1$
+        if (originalNameLC.endsWith(EXTENSION_ODS)) {
+            return originalName.substring(0, originalName.length() - EXTENSION_ODS.length()) + inTextInt + EXTENSION_ODS;
         }
-        return originalName + inTextInt + ".odf"; //$NON-NLS-1$
+        return originalName + inTextInt + EXTENSION_ODF;
     }
 
     private static void writeXML(final OutputStream outStream, final Node node, final boolean indent) {
@@ -755,15 +773,12 @@ public final class AOODFSigner implements AOSigner {
         return mimetype;
     }
 
-    /**
-     * Crea un fichero temporal con los datos.
+    /** Crea un fichero temporal con los datos.
      * @param data Datos del fichero.
      * @return Fichero generado.
-     * @throws IOException Cuando se produce un error durante la generaci&oacute;n.
-     */
+     * @throws IOException Cuando se produce un error durante la generaci&oacute;n. */
     private static File createTempFile(final byte[] data) throws IOException {
-    	// Genera el archivo zip temporal a partir del InputStream de
-        // entrada
+    	// Genera el archivo zip temporal a partir del InputStream de entrada
         final File zipFile = File.createTempFile("sign", ".zip"); //$NON-NLS-1$ //$NON-NLS-2$
         final FileOutputStream fos = new FileOutputStream(zipFile);
 

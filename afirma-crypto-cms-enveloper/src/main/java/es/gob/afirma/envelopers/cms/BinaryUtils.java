@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -19,7 +19,9 @@ import java.util.zip.Inflater;
 /** Clase de ayuda de compresi&oacute;n. Permite tanto comprimir como
  * descomprimir. */
 final class BinaryUtils {
-    
+
+	private static final int COMPRESS_BUFFER_SIZE = 1024;
+
     private BinaryUtils() {
         // No permitimos la instanciacion
     }
@@ -30,22 +32,18 @@ final class BinaryUtils {
      * @return Entrada comprimida. */
     static byte[] compress(final byte[] input) {
 
-        // Create the compressor with highest level of compression
+        // Creamos el compresor con el maximo nivel de compresion
         final Deflater compressor = new Deflater();
         compressor.setLevel(Deflater.BEST_COMPRESSION);
 
-        // Give the compressor the data to compress
+        // Le pasamos los datos a comprimir
         compressor.setInput(input);
         compressor.finish();
 
-        // Create an expandable byte array to hold the compressed data.
-        // You cannot use an array that's the same size as the orginal because
-        // there is no guarantee that the compressed data will be smaller than
-        // the uncompressed data.
         final ByteArrayOutputStream bos = new ByteArrayOutputStream(input.length);
 
-        // Compress the data
-        final byte[] buf = new byte[1024];
+        // Comprimimos los datos
+        final byte[] buf = new byte[COMPRESS_BUFFER_SIZE];
         while (!compressor.finished()) {
             final int count = compressor.deflate(buf);
             bos.write(buf, 0, count);
@@ -57,27 +55,22 @@ final class BinaryUtils {
          // Ignoramos los errores en el cierre
         }
 
-        // Get the compressed data
-        final byte[] compressedData = bos.toByteArray();
-
-        return compressedData;
+        return bos.toByteArray();
     }
 
     /** M&eacute;todo que descomprime una entrada.
-     * @param compressedData
-     *        Entrada a descomprimir.
+     * @param compressedData Entrada a descomprimir.
      * @return Entrada descomprimida. */
     static byte[] uncompress(final byte[] compressedData) {
 
-        // Create the decompressor and give it the data to compress
+        // Creamos el descompresor y le pasamos los datos
         final Inflater decompressor = new Inflater();
         decompressor.setInput(compressedData);
 
-        // Create an expandable byte array to hold the decompressed data
         final ByteArrayOutputStream bos = new ByteArrayOutputStream(compressedData.length);
 
-        // Decompress the data
-        final byte[] buf = new byte[1024];
+        // Descomprimimos
+        final byte[] buf = new byte[COMPRESS_BUFFER_SIZE];
         while (!decompressor.finished()) {
             try {
                 final int count = decompressor.inflate(buf);
@@ -92,13 +85,10 @@ final class BinaryUtils {
             bos.close();
         }
         catch (final IOException e) {
-            Logger.getLogger("es.gob.afirma").warning("Error cerrando el flujo binario: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+        	// Ignoramos los errores en el cierre
         }
 
-        // Get the decompressed data
-        final byte[] decompressedData = bos.toByteArray();
-
-        return decompressedData;
+        return bos.toByteArray();
 
     }
 

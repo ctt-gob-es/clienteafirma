@@ -90,6 +90,14 @@ public final class TestOOXML {
      * @throws Exception en cualquier error */
     @SuppressWarnings("static-method")
 	@Test
+    public void testGetSignersStructure() throws Exception {
+    	new AOOOXMLSigner().getSignersStructure(DATAS[0], false);
+    }
+
+    /** Prueba de firma convencional.
+     * @throws Exception en cualquier error */
+    @SuppressWarnings("static-method")
+	@Test
     public void testSignature() throws Exception {
 
         //Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$

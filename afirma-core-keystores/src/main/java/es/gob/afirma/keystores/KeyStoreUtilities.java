@@ -243,7 +243,7 @@ public final class KeyStoreUtilities {
                         aliassesByFriendlyName.put(al, tmpCN);
                     }
                     else {
-                        aliassesByFriendlyName.put(al, value.substring(0, ALIAS_MAX_LENGTH - 3) + "..."); //$NON-NLS-1$
+                        aliassesByFriendlyName.put(al, value.substring(0, ALIAS_MAX_LENGTH - "...".length()) + "..."); //$NON-NLS-1$ //$NON-NLS-2$
                     }
                 }
                 else {
