@@ -73,6 +73,8 @@ public final class CMSTimestamper {
 	private static final HostnameVerifier DEFAULT_HOSTNAME_VERIFIER = HttpsURLConnection.getDefaultHostnameVerifier();
 	private static final SSLSocketFactory DEFAULT_SSL_SOCKET_FACTORY = HttpsURLConnection.getDefaultSSLSocketFactory();
 
+	private static final int SOCKET_TIMEOUT = 500000;
+
     private final TimeStampRequestGenerator tsqGenerator;
     private final URI tsaURL;
     private final String tsaUsername;
@@ -204,7 +206,7 @@ public final class CMSTimestamper {
 
     private byte[] getTSAResponseSocket(final byte[] request) throws IOException {
     	final Socket socket = new Socket(this.tsaURL.getHost(), this.tsaURL.getPort());
-    	socket.setSoTimeout(500000);
+    	socket.setSoTimeout(SOCKET_TIMEOUT);
     	final byte[] ret = getTSAResponseExternalSocket(request, socket);
     	socket.close();
     	return ret;
