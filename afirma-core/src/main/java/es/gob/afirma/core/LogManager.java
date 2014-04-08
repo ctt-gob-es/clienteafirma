@@ -42,8 +42,8 @@ public final class LogManager {
 
 	/** Instala los manejadores de registro adicionales.
 	 * @param app Aplicaci&oacute;n que va a registrar
-	 * @throws java.lang.SecurityException
-	 * @throws IOException */
+	 * @throws java.lang.SecurityException Si no hay permisos para instalar el gestor de registro
+	 * @throws IOException En caso de errores de entrada / salida */
 	public static void install(final App app) throws IOException {
 		if (app == null) {
 			application = App.OTHER;

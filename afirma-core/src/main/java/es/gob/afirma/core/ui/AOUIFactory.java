@@ -19,7 +19,7 @@ import es.gob.afirma.core.keystores.NameCertificateBean;
 import es.gob.afirma.core.misc.Platform;
 
 /**
- * Factor&iscute;a de elementos de interfaz gr&aacute;fica.
+ * Factor&iacute;a de elementos de interfaz gr&aacute;fica.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
  */
 public final class AOUIFactory {

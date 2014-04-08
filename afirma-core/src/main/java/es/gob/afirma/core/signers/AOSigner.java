@@ -49,7 +49,7 @@ public interface AOSigner extends AOCoSigner, AOCounterSigner, AOSimpleSigner {
     boolean isSign(byte[] is) throws IOException;
 
     /** Comprueba si el dato introducido es v&aacute;lido para ser firmado por
-     * este manejador de firma.<br/>
+     * este manejador de firma.<br>
      * @param is Dato que deseamos comprobar.
      * @return Devuelve <code>true</code> si el dato es susceptible de ser firmado por la implementaci&oacute;n concreta,
      *         <code>false</code> en caso contrario.

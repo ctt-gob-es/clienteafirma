@@ -149,9 +149,7 @@ public final class AOTreeNode {
     }
 
     /** Returns this node's user object.
-     * @return the Object stored at this node by the user
-     * @see #setUserObject
-     * @see #toString */
+     * @return the Object stored at this node by the user */
     public Object getUserObject() {
         return this.userObject;
     }
@@ -257,7 +255,6 @@ public final class AOTreeNode {
      * that have no children and nodes that <i>cannot</i> have children (e.g. to
      * distinguish files from empty directories), use this method in conjunction
      * with <code>getAllowsChildren</code>
-     * @see #getAllowsChildren
      * @return true if this node has no children */
     public boolean isLeaf() {
         return getChildCount() == 0;

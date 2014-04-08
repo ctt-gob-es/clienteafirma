@@ -31,7 +31,7 @@ public interface AOCipher {
     /** Cifra un mensaje. El algoritmo que deseamos utilizar para el descifrado
      * puede ir acompa&ntilde;ado de una configuraci&oacute;n, seg&uacute;n lo
      * requiera el proveedor de cifrado. Por ejemplo, podr&iacute;a utilizarse
-     * una de las siguientes cadenas:<br/>
+     * una de las siguientes cadenas:<br>
      * <ul>
      * <li><i>Algoritmo</i></li>
      * <li><i>Algoritmo</i>/<i>Modo</i>/<i>Padding</i></li>
@@ -53,7 +53,7 @@ public interface AOCipher {
     /** Descifra un mensaje. El algoritmo que deseamos utilizar para el
      * descifrado puede ir acompa&ntilde;ado de una configuraci&oacute;n,
      * seg&uacute;n lo requiera el proveedor de cifrado. Por ejemplo,
-     * podr&iacute;a utilizarse una de las siguientes cadenas:<br/>
+     * podr&iacute;a utilizarse una de las siguientes cadenas:<br>
      * <ul>
      * <li><i>Algoritmo</i></li>
      * <li><i>Algoritmo</i>/<i>Modo</i>/<i>Padding</i></li>

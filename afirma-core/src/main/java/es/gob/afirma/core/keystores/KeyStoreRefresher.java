@@ -7,7 +7,7 @@ import java.io.IOException;
 public interface KeyStoreRefresher {
 
 	/** Refresca los almacenes del alma&eacute;n actual.
-	 * @throws IOException */
+	 * @throws IOException En caso de errores de entrada / salida */
 	void refresh() throws IOException ;
 
 }

@@ -193,7 +193,6 @@ public final class ProtocolInvocationUriParser {
 	/** Comprueba que est&eacute;n disponibles en un XML todos los parametros disponibles en la
 	 * entrada de datos para la operaci&oacute;n de firma.
 	 * @param xml XML de entrada
-	 * @param uri Url de llamada
 	 * @return Par&aacute;metros
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto
 	 * @throws UnsupportedEncodingException Si no se soporta UTF-8 en URL (no debe ocurrir nunca) */

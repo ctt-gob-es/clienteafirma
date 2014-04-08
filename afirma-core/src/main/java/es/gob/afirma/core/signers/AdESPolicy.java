@@ -136,8 +136,8 @@ public final class AdESPolicy {
         return this.policyIdentifierHash;
     }
 
-    /** Obtiene el algoritmo usado para el c&aaute;lculo de la huella digital del identificador de la pol&iacute;tica de firma.
-     * @return Algoritmo usado para el c&aaute;lculo de la huella digital del identificador de la pol&iacute;tica de firma
+    /** Obtiene el algoritmo usado para el c&aacute;lculo de la huella digital del identificador de la pol&iacute;tica de firma.
+     * @return Algoritmo usado para el c&aacute;lculo de la huella digital del identificador de la pol&iacute;tica de firma
      */
     public String getPolicyIdentifierHashAlgorithm() {
         return this.policyIdentifierHashAlgorithm;

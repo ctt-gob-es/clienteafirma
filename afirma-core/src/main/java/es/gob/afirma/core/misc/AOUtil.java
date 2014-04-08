@@ -494,7 +494,7 @@ public final class AOUtil {
 
     /** Genera una lista de cadenas compuesta por los fragmentos de texto
      * separados por la cadena de separaci&oacute;n indicada. No soporta
-     * expresiones regulares. Por ejemplo:<br/>
+     * expresiones regulares. Por ejemplo:<br>
      * <ul>
      * <li><b>Texto:</b> foo$bar$foo$$bar$</li>
      * <li><b>Separado:</b> $</li>

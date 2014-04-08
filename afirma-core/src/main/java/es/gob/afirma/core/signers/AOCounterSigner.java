@@ -20,7 +20,7 @@ import es.gob.afirma.core.AOException;
  * @version 1.0 */
 public interface AOCounterSigner {
 
-    /** Contrafirma nodos de firma concretos de una firma electr&oacute;nica.<br/>
+    /** Contrafirma nodos de firma concretos de una firma electr&oacute;nica.<br>
      * Los nodos que se deben firmar se indican en <code>targetType</code> y
      * pueden ser:
      * <ul>

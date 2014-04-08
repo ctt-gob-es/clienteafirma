@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -31,7 +31,7 @@ public final class AOTreeModel {
     /** Returns the child of <I>parent</I> at index <I>index</I> in the parent's
      * child array. <I>parent</I> must be a node previously obtained from this
      * data source. This should not return null if <i>index</i> is a valid index
-     * for <i>parent</i> (that is <i>index</i> >= 0 && <i>index</i> <
+     * for <i>parent</i> (that is <i>index</i> &gt;= 0 &amp;&amp; <i>index</i> &lt;
      * getChildCount(<i>parent</i>)).
      * @param index
      *        the position index of the child

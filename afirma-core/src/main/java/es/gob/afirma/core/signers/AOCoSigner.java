@@ -23,7 +23,7 @@ public interface AOCoSigner {
     /** Cofirma un contenido (t&iacute;picamente un fichero). Para realizar la
      * cofirma se necesitan los datos originales (que este m&eacute;todo
      * firmar&aacute; normalmente) y la firma sobre la que se realiza la cofirma
-     * (a los que se agregar&aacute; el resultado de la nueva firma).<br/>
+     * (a los que se agregar&aacute; el resultado de la nueva firma).<br>
      * @param data
      *        Datos que deseamos a cofirmar.
      * @param sign
@@ -51,7 +51,7 @@ public interface AOCoSigner {
     /** Cofirma un contenido (t&iacute;picamente un fichero). Para realizar la
      * cofirma se necesita el documento en el que se encuentra la firma sobre la
      * que se realiza la cofirma (a los que se agregar&aacute; el resultado de
-     * la nueva firma).<br/>
+     * la nueva firma).<br>
      * @param sign
      *        Firma de los datos que se quiere cofirmar.
      * @param algorithm

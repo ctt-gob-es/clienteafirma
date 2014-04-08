@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -23,8 +23,7 @@ package es.gob.afirma.core.signers;
  * <li>C&oacute;digo de verificaci&oacute;n: C&oacute;digo en base64 para la
  * verificaci&oacute;n de la firma.</li>
  * </ul>
- * Todos los campos, salvo el "Formato de firma" son opcionales.<br/>
- * <br/> */
+ * Todos los campos, salvo el "Formato de firma" son opcionales. */
 public final class AOSignInfo {
 
     /** Formato de firma. */
@@ -47,7 +46,7 @@ public final class AOSignInfo {
      * @param signFormat
      *        Formato general de firma. */
     public AOSignInfo(final String signFormat) {
-        this.format = (signFormat != null ? signFormat : "Desconocido"); //$NON-NLS-1$
+        this.format = signFormat != null ? signFormat : "Desconocido"; //$NON-NLS-1$
     }
 
     /** Recupera la variante de formato a la que pertene el objeto de firma.
