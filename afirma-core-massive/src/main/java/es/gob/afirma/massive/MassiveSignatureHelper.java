@@ -31,7 +31,7 @@ import es.gob.afirma.core.signers.CounterSignTarget;
 
 /** M&oacute;dulo para el soporte de multifirmas m&aacute;sivas. Permite
  * configurar una operaci&oacute;n de firma y ejecutarla sobre datos, hashes y
- * ficheros.</br> Se crea un log de la operaci&oacute;n masiva en donde cada
+ * ficheros.<br> Se crea un log de la operaci&oacute;n masiva en donde cada
  * entrada se corresponde con el resultado de la ejecuci&oacute;n de una
  * operaci&oacute;n. */
 public final class MassiveSignatureHelper {
@@ -123,7 +123,7 @@ public final class MassiveSignatureHelper {
     /** Establece el formato de firma para una operaci&oacute;n de firma masiva. Este
      * m&eacute;todo s&oacute;lo debe utilizarse cuando el formato de firma cambie durante
      * el proceso de firma masiva. Si no es llama a este m&eacute;todo se usar&aacute;
-     * siempre el formato indicado como "defaultFormat".<br/>
+     * siempre el formato indicado como "defaultFormat".<br>
      * Por uniformidad en el resultado, cuando se encuentran configuradas las operaciones
      * masivas cofirma, contrafirma del &aacute;rbol de firma o contrafirma de nodos hojas,
      * se usar&aacute; siempre el formato de firma por defecto. Si se indica <code>null</code>

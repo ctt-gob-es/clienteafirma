@@ -163,7 +163,7 @@ public class DirectorySignatureHelper {
      * Se considera un fichero original todo fichero que no sea fichero de firma
      * del formato de firma con el que estemos realizando la operaci&oacute;n.
      * Cualquier formato de firma, cofirma o contrafirma del formato que estemos
-     * usando se considerar&aacute; fichero de firma. <br/>
+     * usando se considerar&aacute; fichero de firma. <br>
      * <h2>Nomenclatura de ficheros</h2> Cuando ya exista un fichero con el
      * nombre de la firma que deseamos crear, al nuevo fichero de firma se le
      * agregar&aacute;, previamente a su extensi&oacute;n de firma, una cadena
@@ -172,7 +172,7 @@ public class DirectorySignatureHelper {
      * coincida en nombre con otro existente. La estructura del nombre un
      * fichero de firma ser&aacute;: "nombreFichero.ext.extFir". En caso de
      * coincidir con otro nombre de fichero se agregar&aacute;a el
-     * &iacute;ndice, quedando como "nombreFichero.ext(ind).extFir"<br/>
+     * &iacute;ndice, quedando como "nombreFichero.ext(ind).extFir"<br>
      * En el caso de la cofirma y contrafirma, se agregar&aacute; al nombre de
      * fichero despues de su extensi&oacute;n propia y antes de la
      * extensi&oacute;n de firma (o el &iacute;ndice en caso de haberlo) las
@@ -299,7 +299,7 @@ public class DirectorySignatureHelper {
      * Se considera un fichero original todo fichero que no sea fichero de firma
      * del formato de firma con el que estemos realizando la operaci&oacute;n.
      * Cualquier formato de firma, cofirma o contrafirma del formato que estemos
-     * usando se considerar&aacute; fichero de firma. <br/>
+     * usando se considerar&aacute; fichero de firma. <br>
      * <h2>Nomenclatura de ficheros</h2> Cuando ya exista un fichero con el
      * nombre de la firma que deseamos crear, al nuevo fichero de firma se le
      * agregar&aacute;, previamente a su extensi&oacute;n de firma, una cadena
@@ -308,7 +308,7 @@ public class DirectorySignatureHelper {
      * coincida en nombre con otro existente. La estructura del nombre un
      * fichero de firma ser&aacute;: "nombreFichero.ext.extFir". En caso de
      * coincidir con otro nombre de fichero se agregar&aacute;a el
-     * &iacute;ndice, quedando como "nombreFichero.ext(ind).extFir"<br/>
+     * &iacute;ndice, quedando como "nombreFichero.ext(ind).extFir"<br>
      * En el caso de la cofirma y contrafirma, se agregar&aacute; al nombre de
      * fichero despues de su extensi&oacute;n propia y antes de la
      * extensi&oacute;n de firma (o el &iacute;ndice en caso de haberlo) las
@@ -323,8 +323,8 @@ public class DirectorySignatureHelper {
      * ("result.log") en donde se almacenar&aacute; el resultado de la
      * operaci&oacute;n. Este fichero de <code>log</code> sustituir&aacute;a a
      * cualquiera creado anteriormente y nunca se firmar&aacute; en caso de ya
-     * existir en el directorio de salida.<br/>
-     * <br/>
+     * existir en el directorio de salida.<br>
+     * <br>
      * @param type
      *        Tipo de firma (firma, cofirma o contrafirma). Por defecto,
      *        sera firma.

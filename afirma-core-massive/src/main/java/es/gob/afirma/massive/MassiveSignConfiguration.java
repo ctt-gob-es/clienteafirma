@@ -81,7 +81,7 @@ public final class MassiveSignConfiguration {
 
     /** Estable el formato de firma por defecto (para cuando no se desee
      * respetar el original o se realiza una firma masiva). Este valor sustituye
-     * al formato inicial para firmas masivas.<br/>
+     * al formato inicial para firmas masivas.<br>
      * Si se introduce {@code null} se reestablecer&aacute; el formato por defecto.
      * @param defaultFormat
      *        Formato de firma. */
@@ -98,7 +98,7 @@ public final class MassiveSignConfiguration {
 	}
 
     /** Establece el formato de firma para la operaci&oacute;n de firma masiva que, a diferencia
-     * del resto de operaciones, permite ser cambiado durante el proceso de firma masiva.<br/>
+     * del resto de operaciones, permite ser cambiado durante el proceso de firma masiva.<br>
      * Si se establece {@code null} se configura el formato de firma establecido por defecto.
      * Al inicio del proceso de firma masiva este formato siempre tendr&aacute; el mismo valor
      * que el formato por defecto configurado.

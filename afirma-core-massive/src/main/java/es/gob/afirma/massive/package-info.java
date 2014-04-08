@@ -22,7 +22,7 @@
  *    Dependencia din&aacute;mica con el m&oacute;dulo CAdES Multifirmas (<i>afirma-crypto-cades-multi</i>) del Cliente.
  *   </li>
  *   <li>
- *    Dependencia din&aacute;mica con BouncyCastle 1.46 o superior (Proveedor + TSP + <i>Mail</i>).</li>
+ *    Dependencia din&aacute;mica con BouncyCastle 1.46 o superior (Proveedor + TSP + <i>Mail</i>).
  *   </li>
  *   <li>
  *    Dependencia din&aacute;mica con la biblioteca JMIMEMagic.

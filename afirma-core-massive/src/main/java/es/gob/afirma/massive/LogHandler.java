@@ -17,15 +17,15 @@ public abstract class LogHandler {
 
 	/** Da por finalizado el registro, a&ntilde;adiendo como pie de este las propiedades indicadas.
 	 * @param params Propiedades a a&ntilde;adir en el pie del regitro al cierre de este
-	 * @throws IOException */
+	 * @throws IOException En caso de errores de entrada / salida */
 	public abstract void close(Properties params) throws IOException;
 
 	/** A&ntilde;ade una l&iacute;nea de registro-
 	 * @param level Nivel de registro
-	 * @param msg mensaje
+	 * @param msg mensaje Mensaje a registrar
 	 * @param inputData
 	 * @param outputSign
-	 * @throws IOException */
+	 * @throws IOException En caso de errores de entrada / salida */
 	public abstract void addLog(int level, String msg, String inputData, String outputSign) throws IOException;
 
 }
