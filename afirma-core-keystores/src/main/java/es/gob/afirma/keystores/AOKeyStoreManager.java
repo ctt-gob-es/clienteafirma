@@ -62,8 +62,7 @@ public class AOKeyStoreManager implements KeyStoreRefresher {
 
     /** Reinicia el almac&eacute;n de claves, leyendo de nuevo los dispositivos de almac&eacute;n (tarjetas, etc.)
      * si es preciso.
-     * @throws IOException
-     * @throws AOKeyStoreManagerException */
+     * @throws IOException SI ocurren errores de entrada / salida que no permiten refrescar el almac&eacute;n */
     @Override
 	public void refresh() throws IOException {
     	resetCachedAliases();

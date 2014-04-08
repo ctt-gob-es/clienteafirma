@@ -34,14 +34,14 @@ import es.gob.afirma.core.ui.AOUIFactory;
 public final class JarSignatureCertExtractor {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
-	
+
 	private static final int BUFFER_SIZE = 1024;
-	
+
 	private static final String SIGNATURE_DIR_PATH = "META-INF/"; //$NON-NLS-1$
 	private static final String SIGNATURE_EXT = ".RSA"; //$NON-NLS-1$
-	
+
 	private static final String USER_HOME = "$USER_HOME"; //$NON-NLS-1$
-	
+
 	private static final String DEFAULT_PASSWORD = ""; //$NON-NLS-1$
 	private static final String[] CACERTS_DEFAULT_PASSWORDS = {
 		DEFAULT_PASSWORD,
@@ -50,7 +50,7 @@ public final class JarSignatureCertExtractor {
 	};
 
 	private static String keystorePassword = null;
-	
+
 	private JarSignatureCertExtractor() {
 		// No permitimos la instanciacion
 	}
@@ -68,7 +68,7 @@ public final class JarSignatureCertExtractor {
 		if (src == null) {
 			throw new IOException("No se ha podido acceder a los recursos del JAR"); //$NON-NLS-1$
 		}
-		
+
 		int n = 0;
 		ZipEntry e;
 		ByteArrayOutputStream baos = null;
@@ -86,7 +86,7 @@ public final class JarSignatureCertExtractor {
 		}
 		return baos == null ? null : baos.toByteArray();
 	}
-	
+
 	/**
 	 * Recupera el fichero con el almac&eacute;n de CAs de confianza del usuario.
 	 * Si no lo localiza ni lo puede crear, devuelve {@code null}.
@@ -107,10 +107,10 @@ public final class JarSignatureCertExtractor {
 		}
 
 		final File ret = keystoreFilename != null ? new File(keystoreFilename) : null;
-		
+
 		// Devolvemos el fichero con el truststore si existe su directorio padre, ya que entonces
 		// o existe o lo podemos crear en ese directorio
-		return (ret != null && ret.getParentFile().exists()) ? ret : null; 
+		return ret != null && ret.getParentFile().exists() ? ret : null;
 	}
 
 	/**
@@ -127,11 +127,11 @@ public final class JarSignatureCertExtractor {
 		if (keystoreFilename == null) {
 			return null;
 		}
-		
+
 		final File ret = new File(keystoreFilename);
 		return ret.exists() ? ret : null;
 	}
-	
+
 	private static KeyStore getJavaCaKeyStore(final File storeFile) throws KeyStoreException,
 	                                                                        NoSuchAlgorithmException,
 	                                                                        CertificateException,
@@ -153,8 +153,8 @@ public final class JarSignatureCertExtractor {
 		}
 		fis.close();
 
-		
-		
+
+
 		return ks;
 	}
 
@@ -164,12 +164,12 @@ public final class JarSignatureCertExtractor {
 			                                                             InvalidAlgorithmParameterException,
 			                                                             CertificateException,
 			                                                             NoSuchAlgorithmException {
-		
+
 		// Si no hay certificados en el almacen, no estara entre los certificados de confianza
 		if (trustStore.size() == 0) {
 			throw new CertPathValidatorException("No hay certificados en el almacen de confianza"); //$NON-NLS-1$
 		}
-		
+
 		// Miramos si el certificado mas elevado de la cadena esta en el trustrore,
 		// en cuyo caso no hacemos nada
 		final X509Certificate chainEdge = chain[chain.length - 1];
@@ -194,11 +194,12 @@ public final class JarSignatureCertExtractor {
 	/** Inserta los certificados con los que se ha firmado el JAR que contiene esta clase en
 	 * el almac&eacute;n de certificados ra&iacute;z del JRE, con el permiso del usuario.
 	 * @param dialogParent Padre para el di&aacute;logo de solicitud de permiso
-	 * @throws KeyStoreException
-	 * @throws NoSuchAlgorithmException
-	 * @throws CertificateException
-	 * @throws IOException
-	 * @throws InvalidAlgorithmParameterException */
+	 * @throws KeyStoreException Si no se puede tratar el almac&eacute;n de certificados ra&iacute;z del JRE
+	 * @throws NoSuchAlgorithmException Si no se soporta alg&uacute;n algoritmo necesario
+	 * @throws CertificateException Cuando ocurren errores relacionados con los certificados X.509
+	 * @throws IOException Cuando ocurren errores de entrada / salida
+	 * @throws InvalidAlgorithmParameterException Si no se soporta alg&uacute;n par&aacute;metro necesario
+	 *                                            para alg&uacute;n algoritmo  */
 	public static void insertJarSignerOnCACerts(final Object dialogParent) throws KeyStoreException,
 	                                                                              NoSuchAlgorithmException,
 	                                                                              CertificateException,
@@ -211,7 +212,7 @@ public final class JarSignatureCertExtractor {
 			LOGGER.warning("La aplicacion no esta firmada"); //$NON-NLS-1$
 			return;
 		}
-		
+
 		// A continuacion, comprobamos si esos certificados son de confianza para el sistema
 		final File systemsCaCertFile = getSystemsJavaCaKeyStoreFile();
 		if (systemsCaCertFile != null) {
@@ -226,7 +227,7 @@ public final class JarSignatureCertExtractor {
 				// Si falla continuamos con el almacen de confianza del usuario
 			}
 		}
-		
+
 		// Si no son de confianza para el sistema, comprobamos si lo son para el usuario
 		// Cargamos el fichero del almacen
 		final File usersCaCertFile = getUsersJavaCaKeyStoreFile();
@@ -234,8 +235,8 @@ public final class JarSignatureCertExtractor {
 			LOGGER.warning("No se puede localizar el almacen de confianza del usuario, se suspende la validacion"); //$NON-NLS-1$
 			return;
 		}
-		
-		// Si existe el fichero, lo cargamos, si no existe pero se puede crear, lo creamos  
+
+		// Si existe el fichero, lo cargamos, si no existe pero se puede crear, lo creamos
 		final KeyStore usersTruststore;
 		if (!usersCaCertFile.exists()) {
 			keystorePassword = DEFAULT_PASSWORD;
@@ -247,12 +248,12 @@ public final class JarSignatureCertExtractor {
 			try {
 				usersTruststore = getJavaCaKeyStore(usersCaCertFile);
 			}
-			catch (Exception e) {
+			catch (final Exception e) {
 				LOGGER.warning("No se ha podido cargar el almacen de certificados de CA de confianza del usuario, no se agregara el certificado: " + e); //$NON-NLS-1$
 				return;
 			}
 		}
-		
+
 		// Comprobamos si el extremo de la cadena es de confianza o no
 		try {
 			checkCertChain(certs, usersTruststore);

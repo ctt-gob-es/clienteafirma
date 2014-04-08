@@ -300,7 +300,7 @@ public final class KeyStoreUtilities {
     }
 
     /** Muestra un di&aacute;logo para que el usuario seleccione entre los
-     * certificados mostrados. Es posible indicar que s&ocuate;lo puede haber un
+     * certificados mostrados. Es posible indicar que s&oacute;lo puede haber un
      * certificado tras recuperarlos del repositorio y aplicar los filtros, en
      * cuyo caso se seleccionar&iacute; autom&aacute;ticamente. Si se pidiese
      * que se seleccione autom&aacute;ticamemte un certificado y hubiese
