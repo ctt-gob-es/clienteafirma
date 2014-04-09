@@ -83,71 +83,100 @@ public final class XAdESSigner {
 	 * <p>
 	 * Este m&eacute;todo, al firmar un XML, firmas tambi&eacute;n sus hojas de
 	 * estilo XSL asociadas, siguiendo el siguiente criterio:
-	 * <ul>
-	 * <li>Firmas XML <i>Enveloped</i></li>
-	 * <ul>
-	 * <li>Hoja de estilo con ruta relativa</li>
-	 * <ul>
-	 * <li>No se firma.</li>
-	 * </ul>
-	 * <li>Hola de estilo remota con ruta absoluta</li>
-	 * <ul>
-	 * <li>Se restaura la declaraci&oacute;n de hoja de estilo tal y como estaba
-	 * en el XML original</li>
-	 * <li>Se firma una referencia (<i>canonicalizada</i>) a esta hoja remota</li>
-	 * </ul>
-	 * <li>Hoja de estilo empotrada</li>
-	 * <ul>
-	 * <li>Se restaura la declaraci&oacute;n de hoja de estilo tal y como estaba
-	 * en el XML original</li>
-	 * </ul>
-	 * </ul>
-	 * <li>Firmas XML <i>Externally Detached</i></li>
-	 * <ul>
-	 * <li>Hoja de estilo con ruta relativa</li>
-	 * <ul>
-	 * <li>No se firma.</li>
-	 * </ul>
-	 * <li>Hola de estilo remota con ruta absoluta</li>
-	 * <ul>
-	 * <li>Se firma una referencia (<i>canonicalizada</i>) a esta hoja remota</li>
-	 * </ul>
-	 * <li>Hoja de estilo empotrada</li>
-	 * <ul>
-	 * <li>No es necesaria ninguna acci&oacute;n</li>
-	 * </ul>
-	 * </ul>
-	 * <li>Firmas XML <i>Enveloping</i></li>
-	 * <ul>
-	 * <li>Hoja de estilo con ruta relativa</li>
-	 * <ul>
-	 * <li>No se firma.</li>
-	 * </ul>
-	 * <li>Hola de estilo remota con ruta absoluta</li>
-	 * <ul>
-	 * <li>Se firma una referencia (<i>canonicalizada</i>) a esta hoja remota</li>
-	 * </ul>
-	 * <li>Hoja de estilo empotrada</li>
-	 * <ul>
-	 * <li>No es necesaria ninguna acci&oacute;n</li>
-	 * </ul>
-	 * </ul>
-	 * <li>Firmas XML <i>Internally Detached</i></li>
-	 * <ul>
-	 * <li>Hoja de estilo con ruta relativa</li>
-	 * <ul>
-	 * <li>No se firma.</li>
-	 * </ul>
-	 * <li>Hola de estilo remota con ruta absoluta</li>
-	 * <ul>
-	 * <li>Se firma una referencia (<i>canonicalizada</i>) a esta hoja remota</li>
-	 * </ul>
-	 * <li>Hoja de estilo empotrada</li>
-	 * <ul>
-	 * <li>No es necesaria ninguna acci&oacute;n</li>
-	 * </ul>
-	 * </ul> </ul>
-	 *
+     * <ul>
+     *  <li>Firmas XML <i>Enveloped</i>
+     *   <ul>
+     *    <li>
+     *     Hoja de estilo con ruta relativa
+     *     <ul>
+     *      <li>No se firma.</li>
+     *     </ul>
+     *    </li>
+     *    <li>
+     *     Hola de estilo remota con ruta absoluta
+     *     <ul>
+     *      <li>Se restaura la declaraci&oacute;n de hoja de estilo tal y como estaba en el XML original</li>
+     *      <li>Se firma una referencia (<i>canonicalizada</i>) a esta hoja remota</li>
+     *     </ul>
+     *    </li>
+     *    <li>
+     *     Hoja de estilo empotrada
+     *     <ul>
+     *      <li>Se restaura la declaraci&oacute;n de hoja de estilo tal y como estaba en el XML original</li>
+     *     </ul>
+     *    </li>
+     *   </ul>
+     *  </li>
+     *  <li>
+     *   Firmas XML <i>Externally Detached</i>
+     *   <ul>
+     *    <li>
+     *     Hoja de estilo con ruta relativa
+     *     <ul>
+     *      <li>No se firma.</li>
+     *     </ul>
+     *    </li>
+     *    <li>
+     *     Hola de estilo remota con ruta absoluta
+     *     <ul>
+     *      <li>Se firma una referencia (<i>canonicalizada</i>) a esta hoja remota</li>
+     *     </ul>
+     *    </li>
+     *    <li>
+     *     Hoja de estilo empotrada
+     *     <ul>
+     *      <li>No es necesaria ninguna acci&oacute;n</li>
+     *     </ul>
+     *    </li>
+     *   </ul>
+     *  </li>
+     *  <li>
+     *   Firmas XML <i>Enveloping</i>
+     *   <ul>
+     *    <li>
+     *     Hoja de estilo con ruta relativa
+     *     <ul>
+     *      <li>No se firma.</li>
+     *     </ul>
+     *    </li>
+     *    <li>
+     *     Hola de estilo remota con ruta absoluta
+     *     <ul>
+     *      <li>Se firma una referencia (<i>canonicalizada</i>) a esta hoja remota</li>
+     *     </ul>
+     *    </li>
+     *    <li>
+     *     Hoja de estilo empotrada
+     *     <ul>
+     *      <li>No es necesaria ninguna acci&oacute;n</li>
+     *     </ul>
+     *    </li>
+     *   </ul>
+     *  </li>
+     *  <li>
+     *   Firmas XML <i>Internally Detached</i>
+     *   <ul>
+     *    <li>
+     *     Hoja de estilo con ruta relativa
+     *     <ul>
+     *      <li>No se firma.</li>
+     *     </ul>
+     *    </li>
+     *    <li>
+     *     Hola de estilo remota con ruta absoluta
+     *     <ul>
+     *      <li>Se firma una referencia (<i>canonicalizada</i>) a esta hoja remota</li>
+     *     </ul>
+     *    </li>
+     *    <li>
+     *     Hoja de estilo empotrada
+     *     <ul>
+     *      <li>No es necesaria ninguna acci&oacute;n</li>
+     *     </ul>
+     *    </li>
+     *   </ul>
+     *  </li>
+     * </ul>
 	 * @param data Datos que deseamos firmar.
 	 * @param algorithm
 	 *            Algoritmo a usar para la firma.

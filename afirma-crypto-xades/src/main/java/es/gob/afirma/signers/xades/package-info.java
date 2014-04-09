@@ -11,7 +11,7 @@
 /**
  *	M&oacute;dulo de generaci&oacute;n de firmas digitales XAdES.
  *  <p>Tabla de compatibilidad respecto a generaci&oacute;n en cliente de variantes de XAdES:</p>
- *  <p align="center"><table border="1" cellpadding="5">
+ *  <table border="1" cellpadding="5" summary="Tabla de compatibilidad respecto a generaci&oacute;n en cliente de variantes de XAdES">
  *   <tr>
  *    <td>XAdES-BES</td>
  *    <td>XAdES-EPES</td>
@@ -40,13 +40,6 @@
  *  </ul>
  *  <p>
  *   Este m&oacute;dulo es compatible con cualquier entorno JSE 1.6 o superior.<br>
- *   Para compatibilidad
- *   con JSE 1.5 es necesario incluir las clases Java contenidas en el "Paquete de compatibilidad
- *   con Java 5" del Ciente e instalar los productos Apache Xalan 2.7.1 o superior y Apache Xerces
- *   2.11.0 o superior como API ENDORSED de Java.<br>
- *   Consulte la p&aacute;gina
- *   <a href="http://docs.oracle.com/javase/1.5.0/docs/guide/standards/index.html">http://docs.oracle.com/javase/1.5.0/docs/guide/standards/index.html</a>
- *   para informaci&oacute;n ampliada sobre los API ENDORSED de Java.
  *  </p>
  *  <p>
  *   Desde este m&oacute;dulo es posible que se realicen llamadas a interfaces gr&aacute;ficas.<br>

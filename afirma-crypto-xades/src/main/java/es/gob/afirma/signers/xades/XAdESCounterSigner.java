@@ -338,16 +338,14 @@ public final class XAdESCounterSigner {
 				null, null);
 	}
 
-	/**
-	 * Realiza la contrafirma de todos los nodos hoja del arbol
-	 *
-	 * @param root
-	 *            Elemento ra&iacute;z del documento xml que contiene las firmas
-	 * @param algorithm
-	 *            Algoritmo de firma XML
-	 * @throws AOException
-	 *             Cuando ocurre cualquier problema durante el proceso
-	 */
+	/** Realiza la contrafirma de todos los nodos hoja del &aacute;rbol.
+	 * @param root Elemento ra&iacute;z del documento xml que contiene las firmas
+	 * @param key Clave privada para la firma
+	 * @param certChain Cadena de certificados del firmante
+	 * @param extraParams Par&aacute;metros adicionales de configuraci&oacute;n de la firma
+	 * @param algorithm Algoritmo de firma XML
+	 * @param doc Documento DOM XML a contrafirmar
+	 * @throws AOException Cuando ocurre cualquier problema durante el proceso */
 	private static void countersignLeafs(final Element root,
 			                             final PrivateKey key,
 			                             final Certificate[] certChain,
@@ -385,6 +383,11 @@ public final class XAdESCounterSigner {
 	 * <code>targets</code>.
 	 * @param root Elemento ra&iacute;z del documento xml que contiene las firmas
 	 * @param tgts Array con las posiciones de los nodos a contrafirmar
+	 * @param key Clave privada para la firma
+	 * @param certChain Cadena de certificados del firmante
+	 * @param extraParams Par&aacute;metros adicionales de configuraci&oacute;n de la firma
+	 * @param algorithm Algoritmo de firma XML
+	 * @param doc Documento DOM XML a contrafirmar
 	 * @throws AOException Cuando ocurre cualquier problema durante el proceso */
 	private static void countersignNodes(final Element root,
 			                             final Object[] tgts,
@@ -436,6 +439,11 @@ public final class XAdESCounterSigner {
 	 * targets.
 	 * @param root Elemento ra&iacute;z del documento xml que contiene las firmas
 	 * @param targets Array con el nombre de los firmantes de los nodos a contrafirmar
+	 * @param key Clave privada para la firma
+	 * @param certChain Cadena de certificados del firmante
+	 * @param extraParams Par&aacute;metros adicionales de configuraci&oacute;n de la firma
+	 * @param algorithm Algoritmo de firma XML
+	 * @param doc Documento DOM XML a contrafirmar
 	 * @throws AOException Cuando ocurre cualquier problema durante el proceso */
 	private static void countersignSigners(final Element root,
 			                               final Object[] targets,
@@ -471,7 +479,11 @@ public final class XAdESCounterSigner {
 
 	/** Realiza la contrafirma de todos los nodos del &aacute;rbol.
 	 * @param root Elemento ra&iacute;z del documento xml que contiene las firmas
+	 * @param key Clave privada para la firma
+	 * @param certChain Cadena de certificados del firmante
+	 * @param extraParams Par&aacute;metros adicionales de configuraci&oacute;n de la firma
 	 * @param algorithm Algoritmo de firma XML
+	 * @param doc Documento DOM XML a contrafirmar
 	 * @throws AOException Cuando ocurre cualquier problema durante el proceso */
 	private static void countersignTree(final Element root,
 			                            final PrivateKey key,
@@ -510,7 +522,11 @@ public final class XAdESCounterSigner {
 
 	/** Realiza la contrafirma de la firma pasada por par&aacute;metro
 	 * @param signature Elemento con el nodo de la firma a contrafirmar
+	 * @param key Clave privada para la firma
+	 * @param certChain Cadena de certificados del firmante
+	 * @param xParams Par&aacute;metros adicionales de configuraci&oacute;n de la firma
 	 * @param algorithm Algoritmo de firma XML
+	 * @param doc Documento DOM XML a contrafirmar
 	 * @throws AOException Cuando ocurre cualquier problema durante el proceso */
 	private static void cs(final Element signature,
 			               final PrivateKey key,
