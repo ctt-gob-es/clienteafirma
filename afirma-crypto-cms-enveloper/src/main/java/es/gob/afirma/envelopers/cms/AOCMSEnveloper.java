@@ -79,7 +79,7 @@ public class AOCMSEnveloper implements AOEnveloper {
 
   //TODO
     /** M&eacute;todo para la generaci&oacute;n de envolturas de datos. Los tipos de
-     * envoltura definidos para CMS son: <br/>
+     * envoltura definidos para CMS son: <br>
      * <ul>
      * <li>Data</li>
      * <li>Signed Data</li>
@@ -96,24 +96,15 @@ public class AOCMSEnveloper implements AOEnveloper {
      * al usuario destinatario.
      * Nota: El par&aacute;metro algorithm no es el agoritmo de cifrado, es para
      * el digestAlgorithm usado en los "Unsigned Attributes".
-     * @param data
-     *        Datos que se desean envolver.
-     * @param digestAlgorithm
-     *        Algoritmo a usar para la envoltura (SHA1withRSA, MD5withRSA,...)
-     * @param type
-     *        Tipo de envoltura que se quiere hacer.
-     * @param keyEntry
-     *        Clave privada a usar para firmar.
-     * @param certDest
-     *        Certificados de los usuarios a los que va destinado el sobre
-     *        digital.
-     * @param cipherAlgorithm
-     *        Algoritmo utilizado para cifrar
-     * @param extraParams
-     *        Par&aacute;metros adicionales
-     * @return Envoltorio CADES.
-     * @throws AOException
-     *         Cuando ocurre cualquier problema en el proceso. */
+     * @param data Datos que se desean envolver.
+     * @param digestAlgorithm Algoritmo a usar para la envoltura (SHA1withRSA, MD5withRSA,...)
+     * @param type Tipo de envoltura que se quiere hacer.
+     * @param keyEntry Clave privada a usar para firmar.
+     * @param certDest Certificados de los usuarios a los que va destinado el sobre digital
+     * @param cipherAlgorithm Algoritmo utilizado para cifrar
+     * @param extraParams Par&aacute;metros adicionales
+     * @return Envoltorio CADES
+     * @throws AOException Cuando ocurre cualquier problema en el proceso */
     @Override
 	public byte[] envelop(final byte[] data,
                           final String digestAlgorithm,
@@ -129,9 +120,7 @@ public class AOCMSEnveloper implements AOEnveloper {
         return null;
     }
 
-
-    //TODO
-    /** Cifra datos usando para ello una clave de cifrado.<br/>
+    /** Cifra datos usando para ello una clave de cifrado.<br>
      * Se usar&aacute; por defecto el algoritmo de cifrado "AES".
      * La clave usada para cifrar el contenido puede ser tanto un password como
      * una clave privada codificada.
@@ -273,13 +262,13 @@ public class AOCMSEnveloper implements AOEnveloper {
      *         Error en la escritura de datos.
      * @throws CertificateEncodingException
      *         Cuando el certificado del remitente no es v&aacute;lido.
-     * @throws AOException
-     *         Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
-     * @throws BadPaddingException
-     * @throws IllegalBlockSizeException
-     * @throws InvalidAlgorithmParameterException
-     * @throws NoSuchPaddingException
-     * @throws InvalidKeyException
+     * @throws AOException Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
+     * @throws BadPaddingException Si hay problemas estableciendo el relleno de los datos
+     * @throws IllegalBlockSizeException Si no cuadran los tama&ntilde;os de bloque de los algoritmos usados
+     * @throws InvalidAlgorithmParameterException Si no se soporta alg&uacute;n par&aacute;metro necesario
+     *                                            para alg&uacute;n algoritmo
+     * @throws NoSuchPaddingException Si no se soporta alg&uacute;n m&eacute;todo de relleno
+     * @throws InvalidKeyException Si la clave proporcionada no es v&aacute;lida
      */
     public byte[] createCMSEnvelopedData(final byte[] content,
                                          final PrivateKeyEntry ke,
@@ -321,32 +310,23 @@ public class AOCMSEnveloper implements AOEnveloper {
     }
 
     /** Crea un envoltorio CMS de tipo SignedAndEnvelopedData.
-     * @param content
-     *        Contenido que se desea ensobrar.
-     * @param ke
-     *        Clave privada del remitente.
-     * @param cipherConfig
-     *        Configuraci&oacute;n para el cifrado de datos.
-     * @param recipientsCerts
-     *        Destinatarios del sobre electr&oacute;nico.
+     * @param content Contenido que se desea ensobrar.
+     * @param ke Clave privada del remitente.
+     * @param cipherConfig Configuraci&oacute;n para el cifrado de datos.
+     * @param recipientsCerts Destinatarios del sobre electr&oacute;nico.
      * @param keySize Tama&ntilde;o de la clave AES de cifrado
      * @return Envoltorio SignedAndEnvelopedData.
-     * @throws NoSuchAlgorithmException
-     *         Cuando el algoritmo de cifrado indicado no est&aacute;
-     *         soportado.
-     * @throws IOException
-     *         Error en la escritura de datos.
-     * @throws CertificateEncodingException
-     *         Cuando el certificado del remitente no es v&aacute;lido.
-     * @throws AOException
-     *         Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
-     * @throws SignatureException
-     * @throws BadPaddingException
-     * @throws IllegalBlockSizeException
-     * @throws InvalidAlgorithmParameterException
-     * @throws NoSuchPaddingException
-     * @throws InvalidKeyException
-     */
+     * @throws NoSuchAlgorithmException Cuando el algoritmo de cifrado indicado no est&aacute; soportado.
+     * @throws IOException Cuando se produce un error en la escritura de datos.
+     * @throws CertificateEncodingException Cuando el certificado del remitente no es v&aacute;lido.
+     * @throws AOException Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
+     * @throws SignatureException CUando ocuren problemas firmando el sobre digital
+     * @throws BadPaddingException Si hay problemas estableciendo el relleno de los datos
+     * @throws IllegalBlockSizeException Si no cuadran los tama&ntilde;os de bloque de los algoritmos usados
+     * @throws InvalidAlgorithmParameterException Si no se soporta alg&uacute;n par&aacute;metro necesario
+     *                                            para alg&uacute;n algoritmo
+     * @throws NoSuchPaddingException Si no se soporta alg&uacute;n m&eacute;todo de relleno
+     * @throws InvalidKeyException Si la clave proporcionada no es v&aacute;lida */
     public byte[] createCMSSignedAndEnvelopedData(final byte[] content,
                                                   final PrivateKeyEntry ke,
                                                   final AOCipherConfig cipherConfig,
@@ -393,12 +373,12 @@ public class AOCMSEnveloper implements AOEnveloper {
      *         Cuando el certificado del remitente no es v&aacute;lido.
      * @throws AOException
      *         Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
-     * @throws InvalidKeyException
-     * @throws BadPaddingException
-     * @throws IllegalBlockSizeException
-     * @throws InvalidAlgorithmParameterException
-     * @throws NoSuchPaddingException
-     */
+     * @throws InvalidKeyException Si la clave proporcionada no es v&aacute;lida
+     * @throws BadPaddingException Si hay problemas estableciendo el relleno de los datos
+     * @throws IllegalBlockSizeException Si no cuadran los tama&ntilde;os de bloque de los algoritmos usados
+     * @throws InvalidAlgorithmParameterException Si no se soporta alg&uacute;n par&aacute;metro necesario
+     *                                            para alg&uacute;n algoritmo
+     * @throws NoSuchPaddingException Si no se soporta alg&uacute;n m&eacute;todo de relleno */
     byte[] createCMSAuthenticatedData(final byte[] content,
     		                          final PrivateKeyEntry ke,
     		                          final AOCipherConfig cipherConfig,
@@ -446,12 +426,12 @@ public class AOCMSEnveloper implements AOEnveloper {
      *         Cuando el certificado del remitente no es v&aacute;lido.
      * @throws AOException
      *         Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
-     * @throws InvalidKeyException
-     * @throws BadPaddingException
-     * @throws IllegalBlockSizeException
-     * @throws InvalidAlgorithmParameterException
-     * @throws NoSuchPaddingException
-     */
+     * @throws InvalidKeyException Si la clave proporcionada no es v&aacute;lida
+     * @throws BadPaddingException Si hay problemas estableciendo el relleno de los datos
+     * @throws IllegalBlockSizeException Si no cuadran los tama&ntilde;os de bloque de los algoritmos usados
+     * @throws InvalidAlgorithmParameterException Si no se soporta alg&uacute;n par&aacute;metro necesario
+     *                                            para alg&uacute;n algoritmo
+     * @throws NoSuchPaddingException Si no se soporta alg&uacute;n m&eacute;todo de relleno */
     public byte[] createCMSAuthenticatedEnvelopedData(final byte[] content,
                                                       final PrivateKeyEntry ke,
                                                       final AOCipherConfig cipherConfig,
@@ -583,7 +563,7 @@ public class AOCMSEnveloper implements AOEnveloper {
     /** Establece la contrase&ntilde;a o clave para la encriptaci&oacute;n de los
      * datos.
      * @param keyPass
-     *        Clave en base 64 o contrase&ntilda;a de cifrado. */
+     *        Clave en base 64 o contrase&ntilde;a de cifrado. */
     public void setCipherKey(final String keyPass) {
         this.cipherKey = keyPass;
     }
@@ -603,15 +583,11 @@ public class AOCMSEnveloper implements AOEnveloper {
     }
 
     /** Recupera el contenido de un envoltorio CMS.
-     * @param cmsEnvelop
-     *        Envoltorio CMS.
-     * @param addresseePke
-     *        Clave privada del destinatario que desea desensobrar.
+     * @param cmsEnvelop Envoltorio CMS.
+     * @param addresseePke Clave privada del destinatario que desea desensobrar.
      * @return Contenido del envoltorio.
-     * @throws InvalidKeyException
-     *         Cuando la clave de descifrado configurada no sea v&aacute;lida o pertenezca a un destinatario.
-     * @throws AOException
-     *         Cuando se produce un error durante al desenvolver los datos.
+     * @throws InvalidKeyException Cuando la clave de descifrado configurada no sea v&aacute;lida o pertenezca a un destinatario.
+     * @throws AOException Cuando se produce un error durante al desenvolver los datos.
      * @throws InvalidKeySpecException */
     @Override
 	public byte[] recoverData(final byte[] cmsEnvelop,
@@ -709,10 +685,11 @@ public class AOCMSEnveloper implements AOEnveloper {
      *         Cuando la clave proporcionada no es v&aacute;lida.
      * @throws AOException
      *         Cuando se produce un error al desenvolver los datos.
-     * @throws BadPaddingException
-     * @throws IllegalBlockSizeException
-     * @throws InvalidAlgorithmParameterException
-     * @throws NoSuchPaddingException
+     * @throws BadPaddingException Si hay problemas estableciendo el relleno de los datos
+     * @throws IllegalBlockSizeException Si no cuadran los tama&ntilde;os de bloque de los algoritmos usados
+     * @throws InvalidAlgorithmParameterException Si no se soporta alg&uacute;n par&aacute;metro necesario
+     *                                            para alg&uacute;n algoritmo
+     * @throws NoSuchPaddingException Si no se soporta alg&uacute;n m&eacute;todo de relleno
      * @throws NoSuchAlgorithmException
      * @throws IOException
      * @throws InvalidKeySpecException */
@@ -749,11 +726,12 @@ public class AOCMSEnveloper implements AOEnveloper {
      *         destinatarios del sobre.
      * @throws InvalidKeyException
      *         Cuando la clave almacenada en el sobre no es v&aacute;lida.
-     * @throws NoSuchPaddingException
+     * @throws NoSuchPaddingException Si no se soporta alg&uacute;n m&eacute;todo de relleno
      * @throws NoSuchAlgorithmException
-     * @throws BadPaddingException
-     * @throws IllegalBlockSizeException
-     * @throws InvalidAlgorithmParameterException */
+     * @throws BadPaddingException Si hay problemas estableciendo el relleno de los datos
+     * @throws IllegalBlockSizeException Si no cuadran los tama&ntilde;os de bloque de los algoritmos usados
+     * @throws InvalidAlgorithmParameterException Si no se soporta alg&uacute;n par&aacute;metro necesario
+     *                                            para alg&uacute;n algoritmo */
     static byte[] recoverCMSEnvelopedData(final byte[] envelopedData,
     		                              final PrivateKeyEntry ke) throws IOException,
                                                                            CertificateEncodingException,
@@ -784,11 +762,12 @@ public class AOCMSEnveloper implements AOEnveloper {
      *         destinatarios del sobre.
      * @throws InvalidKeyException
      *         Cuando la clave almacenada en el sobre no es v&aacute;lida.
-     * @throws NoSuchPaddingException
+     * @throws NoSuchPaddingException Si no se soporta alg&uacute;n m&eacute;todo de relleno
      * @throws NoSuchAlgorithmException
-     * @throws BadPaddingException
-     * @throws IllegalBlockSizeException
-     * @throws InvalidAlgorithmParameterException */
+     * @throws BadPaddingException Si hay problemas estableciendo el relleno de los datos
+     * @throws IllegalBlockSizeException Si no cuadran los tama&ntilde;os de bloque de los algoritmos usados
+     * @throws InvalidAlgorithmParameterException Si no se soporta alg&uacute;n par&aacute;metro necesario
+     *                                            para alg&uacute;n algoritmo */
     static byte[] recoverCMSSignedEnvelopedData(final byte[] signedEnvelopedData,
     		                                    final PrivateKeyEntry ke) throws IOException,
                                                                                  CertificateEncodingException,
@@ -819,8 +798,7 @@ public class AOCMSEnveloper implements AOEnveloper {
      *         Cuando la clave almacenada en el sobre no es v&aacute;lida.
      * @throws NoSuchAlgorithmException Cuando no se reconoce el algoritmo
      *                                  utilizado para generar el c&oacute;digo de autenticaci&oacute;n.
-     * @throws NoSuchPaddingException
-     */
+     * @throws NoSuchPaddingException Si no se soporta alg&uacute;n m&eacute;todo de relleno */
     static byte[] recoverCMSAuthenticatedData(final byte[] authenticatedData,
     		                                  final PrivateKeyEntry ke) throws IOException,
                                                                                CertificateEncodingException,
@@ -853,11 +831,12 @@ public class AOCMSEnveloper implements AOEnveloper {
      *         destinatarios del sobre.
      * @throws InvalidKeyException
      *         Cuando la clave almacenada en el sobre no es v&aacute;lida.
-     * @throws NoSuchPaddingException
+     * @throws NoSuchPaddingException Si no se soporta alg&uacute;n m&eacute;todo de relleno
      * @throws NoSuchAlgorithmException
-     * @throws BadPaddingException
-     * @throws IllegalBlockSizeException
-     * @throws InvalidAlgorithmParameterException */
+     * @throws BadPaddingException Si hay problemas estableciendo el relleno de los datos
+     * @throws IllegalBlockSizeException Si no cuadran los tama&ntilde;os de bloque de los algoritmos usados
+     * @throws InvalidAlgorithmParameterException Si no se soporta alg&uacute;n par&aacute;metro necesario
+     *                                            para alg&uacute;n algoritmo */
     static byte[] recoverCMSAuthenticatedEnvelopedData(final byte[] authenticatedEnvelopedData,
     												   final PrivateKeyEntry ke) throws IOException,
                                                                                         CertificateEncodingException,
@@ -872,7 +851,7 @@ public class AOCMSEnveloper implements AOEnveloper {
     }
 
     /** M&eacute;todo que comprueba que unos datos se corresponden con una
-     * estructura CMS/PKCS#7. Se realiza la verificaci&ocute;n sobre los los
+     * estructura CMS/PKCS#7. Se realiza la verificaci&oacute;n sobre los los
      * siguientes tipos reconocidos:
      * <ul>
      * <li>Data</li>
