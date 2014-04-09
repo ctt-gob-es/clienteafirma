@@ -23,8 +23,8 @@ public abstract class LogHandler {
 	/** A&ntilde;ade una l&iacute;nea de registro-
 	 * @param level Nivel de registro
 	 * @param msg mensaje Mensaje a registrar
-	 * @param inputData
-	 * @param outputSign
+	 * @param inputData Datos enviados para firmar
+	 * @param outputSign Firma resultante
 	 * @throws IOException En caso de errores de entrada / salida */
 	public abstract void addLog(int level, String msg, String inputData, String outputSign) throws IOException;
 
