@@ -11,10 +11,10 @@
 /**
  *	M&oacute;dulo de generaci&oacute;n de firmas digitales CAdES.
  *  <p>Tabla de compatibilidad respecto a generaci&oacute;n en cliente de variantes de CAdES:</p>
- *  <p align="center"><table border="1" cellpadding="5">
+ *  <table border="1" cellpadding="5" summary="Tabla de compatibilidad respecto a generaci&oacute;n en cliente de variantes de CAdES">
  *   <tr>
  *    <td>CAdES-BES</td>
- *    <td>CAdES-EPES</dt>
+ *    <td>CAdES-EPES</td>
  *    <td>CAdES-T</td>
  *    <td>CAdES-C</td>
  *    <td>CAdES-X</td>
@@ -22,22 +22,22 @@
  *    <td>CAdES-A</td>
  *   </tr>
  *   <tr>
- *    <td bgcolor="green">Si</td>
- *    <td bgcolor="green">Si</td>
- *    <td bgcolor="green">Si<sup>*</sup></td>
- *    <td bgcolor="red">No</td>
- *    <td bgcolor="red">No</td>
- *    <td bgcolor="red">No</td>
- *    <td bgcolor="red">No</td>
+ *    <td style="background-color: green;">Si</td>
+ *    <td style="background-color: green;">Si</td>
+ *    <td style="background-color: green;">Si<sup>*</sup></td>
+ *    <td style="background-color: red;">No</td>
+ *    <td style="background-color: red;">No</td>
+ *    <td style="background-color: red;">No</td>
+ *    <td style="background-color: red;">No</td>
  *   </tr>
- *  </table></p>
+ *  </table>
  *  <p>
  *   <sup>*</sup> La generaci&oacute;n de CAdES-T puede realizarse a&ntilde;adiendo un sello de tiempo una vez generada la
  *   firma mediante la clase <code>es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper</code>, perteneciente al m&oacute;dulo PKCS#7 TSP
  *   del Cliente (<i>afirma-crypto-core-pkcs7-tsp</i>), para lo cual se necesita conexi&oacute;n
  *   con una autoridad de sellado de tiempo (TSA).
  *  </p>
- *  <p align="center"><img src="doc-files/package-info-1.png"></p>
+ *  <p style="text-align: center;"><img src="doc-files/package-info-1.png" alt="Dependencias de subsistemas"></p>
  *  <p>Este m&oacute;dulo presenta las siguientes dependencias directas de primer nivel:</p>
  *  <ul>
  *   <li>Dependencia con el m&oacute;dulo N&uacute;cleo (<i>afirma-core</i>) del Cliente.</li>

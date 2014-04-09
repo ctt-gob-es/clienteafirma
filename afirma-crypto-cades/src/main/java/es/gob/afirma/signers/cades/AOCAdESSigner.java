@@ -16,6 +16,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -64,7 +65,7 @@ public final class AOCAdESSigner implements AOSigner {
 
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-    /** Firma datos en formato CAdES.<br/>
+    /** Firma datos en formato CAdES.
      * @param data Datos que deseamos firmar.
      * @param algorithm Algoritmo a usar para la firma.
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
@@ -294,7 +295,7 @@ public final class AOCAdESSigner implements AOSigner {
         }
     }
 
-    /** Contrafirma nodos de firma concretos de una firma electr&oacute;nica.<br/>
+    /** Contrafirma nodos de firma concretos de una firma electr&oacute;nica.
      * Los nodos que se deben firmar se indican en <code>targetType</code> y
      * pueden ser:
      * <ul>
@@ -349,7 +350,7 @@ public final class AOCAdESSigner implements AOSigner {
      * informaci&oacute;n b&aacute;sica de las firmas individuales, dependiendo del
      * valor del par&aacute;metro <code>asSimpleSignInfo</code>. Los nodos se
      * mostrar&aacute;n en el mismo orden y con la misma estructura con el que
-     * aparecen en la firma electr&oacute;nica.<br/>
+     * aparecen en la firma electr&oacute;nica.<br>
      * Los propios datos se consideran el nodo ra&iacute;z, las firmas y cofirmas
      * pender&aacute;n directamentede de este.
      * @param sign Firma electr&oacute;nica de la que se desea obtener la estructura.
@@ -465,7 +466,7 @@ public final class AOCAdESSigner implements AOSigner {
     	if (algorithm == null) {
     		throw new IllegalArgumentException("El algoritmo de firma no puede ser nulo"); //$NON-NLS-1$
     	}
-    	if (algorithm.toUpperCase().startsWith("MD")) { //$NON-NLS-1$
+    	if (algorithm.toUpperCase(Locale.US).startsWith("MD")) { //$NON-NLS-1$
     		throw new AOException("CAdES no permite huellas digitales MD2 o MD5 (Decision 130/2011 CE)"); //$NON-NLS-1$
     	}
     }

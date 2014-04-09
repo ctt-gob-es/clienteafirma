@@ -82,7 +82,7 @@ import es.gob.afirma.signers.pkcs7.SigUtils;
  *  un servidor Web (que hace la pre-firma y la post-firma) y un servidor documental podr&iacute;a ser el siguiente:
  * </p>
  * <p><b>Pre-firma:</b></p>
- * <p align="center"><img src="doc-files/CAdESTriPhaseSigner-1.png"></p>
+ * <p style="text-align: center;"><img src="doc-files/CAdESTriPhaseSigner-1.png" alt="Esquema de la fase 1: Pre-Firma"></p>
  * <ul>
  *  <li>El dispositivo movil solicita una pre-firma al servidor Web indicando un identificador de documento.</li>
  *  <li>El servidor Web solicita el documento a servidor documental.</li>
@@ -98,7 +98,7 @@ import es.gob.afirma.signers.pkcs7.SigUtils;
  *  </li>
  * </ul>
  * <p><b>Firma:</b></p>
- * <p align="center"><img src="doc-files/CAdESTriPhaseSigner-2.png"></p>
+ * <p style="text-align: center;"><img src="doc-files/CAdESTriPhaseSigner-2.png" alt="Esquema de la fase 2: Firma"></p>
  * <ul>
  *  <li>
  *   El dispositivo m&oacute;vil realiza, de forma completamente aislada una firma electr&oacute;nica
@@ -107,7 +107,7 @@ import es.gob.afirma.signers.pkcs7.SigUtils;
  *  </li>
  * </ul>
  * <p><b>Post-firma:</b></p>
- * <p align="center"><img src="doc-files/CAdESTriPhaseSigner-3.png"></p>
+ * <p style="text-align: center;"><img src="doc-files/CAdESTriPhaseSigner-3.png" alt="Esquema de la fase 3: Post-Firma"></p>
  * <ul>
  *  <li>
  *   El dispositivo m&oacute;vil solicita una post-firma al servidor Web indicando un identificador de
