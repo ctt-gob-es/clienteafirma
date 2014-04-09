@@ -418,7 +418,10 @@ public final class AOKeyStoreManagerFactory {
     	return aksm;
     }
 
-    /** @return <code>AOKeyStore</code> alternativo o <code>null</code> si no hay alternativo */
+    /** Devuelve el almac&eacute;n de claves alternativo al actual m&aacute;s apropiado para usar
+     * cuando falla la carga de este &uacute;ltimo.
+     * @param currentStore Almac&eacute;n de claves actual
+     * @return <code>AOKeyStore</code> alternativo o <code>null</code> si no hay alternativo */
     private static AOKeyStore getAlternateKeyStoreType(final AOKeyStore currentStore) {
         if (AOKeyStore.PKCS12.equals(currentStore)) {
             return null;
