@@ -147,7 +147,6 @@ public final class XAdESSigner {
 	 * <li>No es necesaria ninguna acci&oacute;n</li>
 	 * </ul>
 	 * </ul> </ul>
-	 * </p>
 	 *
 	 * @param data Datos que deseamos firmar.
 	 * @param algorithm

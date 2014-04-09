@@ -14,7 +14,7 @@
  *  <p align="center"><table border="1" cellpadding="5">
  *   <tr>
  *    <td>XAdES-BES</td>
- *    <td>XAdES-EPES</dt>
+ *    <td>XAdES-EPES</td>
  *    <td>XAdES-T</td>
  *    <td>XAdES-C</td>
  *    <td>XAdES-X</td>
@@ -22,16 +22,16 @@
  *    <td>XAdES-A</td>
  *   </tr>
  *   <tr>
- *    <td bgcolor="green">Si</td>
- *    <td bgcolor="green">Si</td>
- *    <td bgcolor="red">No</td>
- *    <td bgcolor="red">No</td>
- *    <td bgcolor="red">No</td>
- *    <td bgcolor="red">No</td>
- *    <td bgcolor="red">No</td>
+ *    <td style="background-color: green;">Si</td>
+ *    <td style="background-color: green;">Si</td>
+ *    <td style="background-color: red;">No</td>
+ *    <td style="background-color: red;">No</td>
+ *    <td style="background-color: red;">No</td>
+ *    <td style="background-color: red;">No</td>
+ *    <td style="background-color: red;">No</td>
  *   </tr>
- *  </table></p>
- *  <p align="center"><br><img src="doc-files/package-info-1.png"></p>
+ *  </table>
+ *  <p style="text-align: center;"><br><img src="doc-files/package-info-1.png" alt="Dependencias de subsistemas"></p>
  *  <p>Este m&oacute;dulo presenta las siguientes dependencias directas de primer nivel:</p>
  *  <ul>
  *   <li>Dependencia con el m&oacute;dulo N&uacute;cleo (<i>afirma-core</i>) del Cliente.</li>

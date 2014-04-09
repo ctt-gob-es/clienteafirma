@@ -118,6 +118,7 @@ public final class AOFacturaESigner implements AOSigner {
      *   <dd>C&oacute;digo postal en el que se realiza la firma</dd>
      *  <dt><b><i>signatureProductionCountry</i></b></dt>
      *   <dd>Pa&iacute;s en el que se realiza la firma</dd>
+     * </dl>
      * @return Cofirma en formato XAdES
      * @throws InvalidEFacturaDataException Cuando se proporcionan datos que no son una factura electr&oacute;nica
      * @throws EFacturaAlreadySignedException Cuando se proporciona un factura ya firmada

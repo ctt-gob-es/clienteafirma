@@ -232,15 +232,15 @@ import es.gob.afirma.signers.xml.XMLConstants;
  *     &lt;To&gt;You&lt;/To&gt;
  *     &lt;Message&gt;msg body&lt;/Message&gt;
  *     &lt;From&gt;
- *      &lt;ds:Signature xmlns:ds="&ds;"&gt;
+ *      &lt;ds:Signature xmlns:ds="ds"&gt;
  *       &lt;ds:SignedInfo&gt;
  *        &lt;ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/&gt;
  *        &lt;ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/&gt;
  *        &lt;ds:Reference URI=""&gt;
  *         &lt;ds:Transforms&gt;
- *          &lt;ds:Transform Algorithm="&enveloped;"&gt;&lt;/ds:Transform&gt;
+ *          &lt;ds:Transform Algorithm="enveloped"&gt;&lt;/ds:Transform&gt;
  *         &lt;/ds:Transforms&gt;
- *         &lt;ds:DigestMethod Algorithm="&digest;"/&gt;
+ *         &lt;ds:DigestMethod Algorithm="digest"/&gt;
  *         &lt;ds:DigestValue&gt;&lt;/ds:DigestValue&gt;
  *        &lt;/ds:Reference&gt;
  *       &lt;/ds:SignedInfo&gt;
@@ -259,6 +259,7 @@ import es.gob.afirma.signers.xml.XMLConstants;
  *    (<code>URI=""</code>), lo cual indica que la firma aplica a la totalidad del documento original.
  *   </p>
  *  </dd>
+ * </dl>
  * @version 0.3.1 */
 public final class AOXAdESSigner implements AOSigner {
 
@@ -370,7 +371,6 @@ public final class AOXAdESSigner implements AOSigner {
      *   </ul>
      *  </ul>
      * </ul>
-     * </p>
      * @param data Datos que deseamos firmar.
      * @param algorithm Algoritmo a usar para la firma.
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
