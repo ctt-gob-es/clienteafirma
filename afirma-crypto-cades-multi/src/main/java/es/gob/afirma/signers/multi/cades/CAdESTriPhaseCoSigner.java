@@ -73,9 +73,9 @@ public final class CAdESTriPhaseCoSigner {
 	 * @param contentDescription Contenido de los datos a firmar
 	 * @param signDate Fecha de la firma
 	 * @return Pre-cofirma CAdES (SignedAttributes de CAdES)
-	 * @throws CertificateEncodingException
-	 * @throws NoSuchAlgorithmException
-	 * @throws IOException */
+	 * @throws CertificateEncodingException Si alguno de los certificados proporcionados tienen problemas de formatos
+	 * @throws NoSuchAlgorithmException Si no se soporta alg&uacute;n algoritmo necesario
+	 * @throws IOException Cuando ocurren problemas de entrada / salida */
 	public static byte[] preCoSign(
 			final byte[] content,
 			final String signatureAlgorithm,
@@ -138,8 +138,8 @@ public final class CAdESTriPhaseCoSigner {
 	 * @param signerCertificateChain Cadena de certificados del firmante
 	 * @param sign Firma donde insertar la cofirma
 	 * @return Cofirma CAdES
-	 * @throws IOException
-	 * @throws CertificateEncodingException */
+	 * @throws IOException Cuando ocurren problemas de entrada / salida
+	 * @throws CertificateEncodingException Si alguno de los certificados proporcionados tienen problemas de formatos */
 	public static byte[] postCoSign(final byte[] pkcs1sign,
 			final byte[] preCoSign,
 			final byte[] content,

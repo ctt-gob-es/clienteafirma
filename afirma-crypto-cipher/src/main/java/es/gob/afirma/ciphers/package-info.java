@@ -12,7 +12,7 @@
  *	M&oacute;dulo de generaci&oacute;n de cifrados sim&eacute;tricos. Se soportan los mismos formatos
  *  y algoritmos que la implementaci&oacute;n de JCE subyacente, tanto basados en claves como basados
  *  en contrase&ntilde;as.
- *  <p align="center"><img src="doc-files/package-info-1.png"></p>
+ *  <p style="text-align: center;"><img src="doc-files/package-info-1.png" alt="Dependencias de subsistemas"></p>
  *  <p>Este m&oacute;dulo presenta las siguientes dependencias directas de primer nivel:</p>
  *  <ul>
  *   <li>Dependencia con el m&oacute;dulo N&uacute;cleo (<i>afirma-core</i>) del Cliente.</li>
