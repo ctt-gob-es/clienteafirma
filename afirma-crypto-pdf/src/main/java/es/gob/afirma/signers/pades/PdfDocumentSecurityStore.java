@@ -138,7 +138,7 @@ final class PdfDocumentSecurityStore {
 
     /** Constructor para inicializar la clase con una estructura DSS ya creada.
      * @param dss Diccionario DSS
-     * @throws IOException */
+     * @throws IOException En caso de errores de entrada / salida */
     PdfDocumentSecurityStore(final PdfDictionary dss) throws IOException {
         int i = 0;
         PdfArray arrayCerts = dss.getAsArray(new PdfName(PDF_NAME_CERTS));

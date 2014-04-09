@@ -14,7 +14,7 @@
  *  <p align="center"><table border="1" cellpadding="5">
  *   <tr>
  *    <td>PAdES-BES</td>
- *    <td>PAdES-EPES</dt>
+ *    <td>PAdES-EPES</td>
  *    <td>PAdES-T</td>
  *    <td>PAdES-C</td>
  *    <td>PAdES-X</td>

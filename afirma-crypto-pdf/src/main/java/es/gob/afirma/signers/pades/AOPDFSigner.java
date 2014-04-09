@@ -190,7 +190,7 @@ public final class AOPDFSigner implements AOSigner {
      * @param extraParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
      * @return Documento PDF firmado en formato PAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso
-     * @throws IOException */
+     * @throws IOException En caso de errores de entrada / salida */
     @Override
 	public byte[] cosign(final byte[] data,
                          final byte[] sign,
@@ -239,7 +239,7 @@ public final class AOPDFSigner implements AOSigner {
      * @param extraParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
      * @return Documento PDF firmado en formato PAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso
-     * @throws IOException */
+     * @throws IOException En caso de errores de entrada / salida */
     @Override
 	public byte[] cosign(final byte[] sign,
 			             final String algorithm,
@@ -392,7 +392,7 @@ public final class AOPDFSigner implements AOSigner {
         if (!isPdfFile(data)) {
         	return false;
         }
-        Object root = getSignersStructure(data, false).getRoot();
+        final Object root = getSignersStructure(data, false).getRoot();
         if (root instanceof AOTreeNode) {
         	return AOTreeModel.getChildCount(root) > 0;
         }

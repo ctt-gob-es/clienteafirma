@@ -86,7 +86,7 @@ public final class PdfPreProcessor {
 	 * @param url URL a la que enlazar&aacute; la imagen si queremos que esta sea un hiperv&iacute;nculo
 	 *            (puede ser <code>null</code>)
 	 * @param stp Estampador PDF de iText
-	 * @throws IOException */
+	 * @throws IOException En caso de errores de entrada / salida */
 	public static void addImage(final byte[] jpegImage,
 			                     final int width,
 			                     final int height,

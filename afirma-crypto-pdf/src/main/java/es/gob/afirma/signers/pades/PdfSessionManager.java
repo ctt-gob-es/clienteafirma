@@ -68,7 +68,7 @@ public final class PdfSessionManager {
      * @param extraParams Par&aacute;metros adicionales de la firma
      * @return Datos PDF relevantes en cuanto a las firmas electr&oacute;nicas
      * @throws AOException
-     * @throws IOException
+     * @throws IOException En caso de errores de entrada / salida
      * @throws DocumentException */
     public static PdfTriPhaseSession getSessionData(final byte[] inPDF,
                                                      final X509Certificate[] certChain,

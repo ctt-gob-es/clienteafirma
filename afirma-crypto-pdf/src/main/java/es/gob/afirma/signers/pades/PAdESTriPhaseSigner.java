@@ -172,7 +172,7 @@ public final class PAdESTriPhaseSigner {
      * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>). Deben usarse exactamente los mismos valores en la post-firma.
      * @param signTime Momento de la firma. Debe usarse exactamente el mismo valor en la post-firma.
      * @return pre-firma CAdES/PAdES (atributos CAdES a firmar)
-     * @throws IOException
+     * @throws IOException En caso de errores de entrada / salida
      * @throws AOException
      * @throws DocumentException */
     public static PdfSignResult preSign(final String digestAlgorithmName,
