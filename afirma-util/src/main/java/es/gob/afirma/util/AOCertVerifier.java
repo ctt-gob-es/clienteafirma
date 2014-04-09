@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -43,8 +43,8 @@ import javax.naming.ldap.LdapName;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 
-/** Clase para la verificaci&oacute;n de certificados X.509. Ejemplo de uso:<br>
- * <code><pre>
+/** Clase para la verificaci&oacute;n de certificados X.509. Ejemplo de uso:<br><br>
+ * <pre>
  *      // Instanciamos la clase verificadora
  *      AOCertVerifier v = new AOCertVerifier();
  *
@@ -72,18 +72,18 @@ import es.gob.afirma.core.misc.AOUtil;
  *      v.checkCertificate(
  *              myKeyStore.getCertificateChain("myAlias")
  *      );
- * </pre></code>
+ * </pre>
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
  * @version 0.1 */
 
 public final class AOCertVerifier {
 
     private final Set<TrustAnchor> tas = new HashSet<TrustAnchor>();
-    
+
     private static final Logger LOGGER = Logger.getLogger("es.atosorigin"); //$NON-NLS-1$
 
     private boolean checkValidity = true;
-    
+
     private static final int LDAP_DEFAULT_PORT = 389;
 
     /** Mensaje de error devuelto por la &uacute;ltima operaci&oacute;n de
@@ -155,25 +155,23 @@ public final class AOCertVerifier {
 
     /** A&ntilde;ade certificados ra&iacute;z como parte de la cadena de
      * confianza.
-     * @param svr
-     *        Servidor LDAP donde se encuentran los certificados
-     * @param location
-     *        Ruta hacia los certificados dentro del servidor LDAP 
-     * @throws NoSuchAlgorithmException 
-     * @throws InvalidAlgorithmParameterException 
-     * @throws IOException 
-     * @throws CertStoreException */
-    public void addRootCertificatesFromLdap(final String svr, 
-    			                            final LdapName location) throws InvalidAlgorithmParameterException, 
-    																		NoSuchAlgorithmException, 
-    																		IOException, 
+     * @param svr Servidor LDAP donde se encuentran los certificados
+     * @param location Ruta hacia los certificados dentro del servidor LDAP
+     * @throws NoSuchAlgorithmException Si el JRE no soporta un algoritmo necesario
+     * @throws InvalidAlgorithmParameterException Si el JRE no soporta un par&aacute;metro necesario para un algoritmo
+     * @throws IOException  Cuando hay errores de entrada / salida
+     * @throws CertStoreException Si ocurren problemas creando el almac&eacute;n de certificados LDAP */
+    public void addRootCertificatesFromLdap(final String svr,
+    			                            final LdapName location) throws InvalidAlgorithmParameterException,
+    																		NoSuchAlgorithmException,
+    																		IOException,
     																		CertStoreException {
         if (svr == null || "".equals(svr) || location == null) { //$NON-NLS-1$
             throw new IllegalArgumentException(
                "No se pueden anadir certificados desde un servidor o una localizacion nula o vacia" //$NON-NLS-1$
             );
         }
-        
+
         String server = svr;
 
         // Comprobamos que el nombre sea correcto
@@ -182,15 +180,15 @@ public final class AOCertVerifier {
         }
         int port = LDAP_DEFAULT_PORT;
         if (server.contains(":")) { //$NON-NLS-1$
-            String tmpPort = server.substring(server.indexOf(':') + 1, server.length() 
+            String tmpPort = server.substring(server.indexOf(':') + 1, server.length()
             );
-            server = server.substring(0, server.indexOf(':')); 
+            server = server.substring(0, server.indexOf(':'));
             String tmpRoot = null;
             if (tmpPort.contains("/")) { //$NON-NLS-1$
-                if (tmpPort.indexOf('/') != tmpPort.length() - 1) { 
-                    tmpRoot = tmpPort.substring(tmpPort.indexOf('/') + 1); 
+                if (tmpPort.indexOf('/') != tmpPort.length() - 1) {
+                    tmpRoot = tmpPort.substring(tmpPort.indexOf('/') + 1);
                 }
-                tmpPort = tmpPort.substring(0, tmpPort.indexOf('/')); 
+                tmpPort = tmpPort.substring(0, tmpPort.indexOf('/'));
             }
             try {
                 port = Integer.parseInt(tmpPort);
@@ -203,7 +201,7 @@ public final class AOCertVerifier {
             server = tmpRoot;
         }
         if (server != null && server.contains("/")) { //$NON-NLS-1$
-            server = server.substring(0, server.indexOf('/')); 
+            server = server.substring(0, server.indexOf('/'));
         }
 
         final CertStore cs = CertStore.getInstance(
