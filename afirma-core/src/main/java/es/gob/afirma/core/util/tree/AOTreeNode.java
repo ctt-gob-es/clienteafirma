@@ -227,8 +227,6 @@ public final class AOTreeNode {
     // Child Queries
     //
 
-    /** Returns true if <code>aNode</code> is a child of this node. If <code>aNode</code> is null, this method returns false.
-     * @return true if <code>aNode</code> is a child of this node; false if <code>aNode</code> is null */
     private boolean isNodeChild(final AOTreeNode aNode) {
         boolean retval;
 

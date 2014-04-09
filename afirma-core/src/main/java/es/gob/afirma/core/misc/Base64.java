@@ -204,13 +204,6 @@ public final class Base64 {
 
 /* ********  D E T E R M I N E   W H I C H   A L H A B E T  ******** */
 
-    /**
-     * Returns one of the _SOMETHING_ALPHABET byte arrays depending on
-     * the options specified.
-     * It's possible, though silly, to specify ORDERED <b>and</b> URLSAFE
-     * in which case one of them will be picked, though there is
-     * no guarantee as to which one will be picked.
-     */
     private static byte[] getAlphabet(final int options ) {
         if ((options & URL_SAFE) == URL_SAFE) {
             return URL_SAFE_ALPHABET;
@@ -218,14 +211,7 @@ public final class Base64 {
         return STANDARD_ALPHABET;
     }	// end getAlphabet
 
-    /**
-     * Returns one of the _SOMETHING_DECODABET byte arrays depending on
-     * the options specified.
-     * It's possible, though silly, to specify ORDERED and URL_SAFE
-     * in which case one of them will be picked, though there is
-     * no guarantee as to which one will be picked.
-     */
-    static byte[] getDecodabet(final int options) {
+    private static byte[] getDecodabet(final int options) {
         if( (options & URL_SAFE) == URL_SAFE) {
             return URL_SAFE_DECODABET;
         }
@@ -240,49 +226,6 @@ public final class Base64 {
 
 /* ********  E N C O D I N G   M E T H O D S  ******** */
 
-    /**
-     * Encodes up to the first three bytes of array <var>threeBytes</var>
-     * and returns a four-byte array in Base64 notation.
-     * The actual number of significant bytes in your array is
-     * given by <var>numSigBytes</var>.
-     * The array <var>threeBytes</var> needs only be as big as
-     * <var>numSigBytes</var>.
-     * Code can reuse a byte array by passing a four-byte array as <var>b4</var>.
-     *
-     * @param b4 A reusable byte array to reduce array instantiation
-     * @param threeBytes the array to convert
-     * @param numSigBytes the number of significant bytes in your array
-     * @return four byte array in Base64 notation.
-     * @since 1.5.1
-     */
-    static byte[] encode3to4(final byte[] b4, final byte[] threeBytes, final int numSigBytes, final int options) {
-        encode3to4( threeBytes, 0, numSigBytes, b4, 0, options );
-        return b4;
-    }   // end encode3to4
-
-    /**
-     * <p>Encodes up to three bytes of the array <var>source</var>
-     * and writes the resulting four Base64 bytes to <var>destination</var>.
-     * The source and destination arrays can be manipulated
-     * anywhere along their length by specifying
-     * <var>srcOffset</var> and <var>destOffset</var>.
-     * This method does not check to make sure your arrays
-     * are large enough to accomodate <var>srcOffset</var> + 3 for
-     * the <var>source</var> array or <var>destOffset</var> + 4 for
-     * the <var>destination</var> array.
-     * The actual number of significant bytes in your array is
-     * given by <var>numSigBytes</var>.</p>
-	 * <p>This is the lowest level of the encoding methods with
-	 * all possible parameters.</p>
-     *
-     * @param source the array to convert
-     * @param srcOffset the index where conversion begins
-     * @param numSigBytes the number of significant bytes in your array
-     * @param destination the array to hold the conversion
-     * @param destOffset the index where output will be put
-     * @return the <var>destination</var> array
-     * @since 1.3
-     */
     private static byte[] encode3to4(final byte[] source,
     		                         final int srcOffset,
     		                         final int numSigBytes,
@@ -525,7 +468,7 @@ public final class Base64 {
      *         or there is not enough room in the array.
      * @since 1.3
      */
-    static int decode4to3(final byte[] source,
+    private static int decode4to3(final byte[] source,
     							  final int srcOffset,
     		                      final byte[] destination,
     		                      final int destOffset,

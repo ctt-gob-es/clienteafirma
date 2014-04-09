@@ -128,8 +128,9 @@ public final class MimeHelper {
         			oidMimetypeProp.getProperty(oid, DEFAULT_MIMETYPE);
     }
 
-    /** Carga el properties que relaciona OIDs de formato con su mime type
-     * correspondiente. */
+    /** Carga el fichero de propiedades que relaciona OID de formato con su mime type
+     * correspondiente.
+     * @throws IOException Cuando hay errores en la carga del fichero de propiedades */
     private static void loadOidMimetypeProperties() throws IOException {
         oidMimetypeProp = new Properties();
         final InputStream isProp = MimeHelper.class.getClassLoader().getResourceAsStream("resources/mimetypes_oids.properties"); //$NON-NLS-1$
@@ -140,7 +141,8 @@ public final class MimeHelper {
         isProp.close();
     }
 
-    /** Carga la tabla de relacion de MimeTypes y Oids. */
+    /** Carga la tabla de relacion de MimeTypes y OID.
+     * @throws IOException Cuando hay errores en la carga del fichero de propiedades */
     private static void loadMimetypeOidProperties() throws IOException {
         if (oidMimetypeProp == null) {
             loadOidMimetypeProperties();

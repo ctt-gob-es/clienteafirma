@@ -32,7 +32,7 @@ public final class AOSimpleSignInfo {
     /** Momento de la firma segundo el dispositivo que la realiz&oacute;. */
     private Date signingTime = null;
 
-    /** Momento de la firma seg&uacte;n un sello uan TSA. */
+    /** Momento de la firma seg&uacute;n un sello uan TSA. */
     private Date[] timestampingTime = null;
 
     /** Cadena binaria con el PKCS#1 de la firma individual. */
@@ -98,7 +98,7 @@ public final class AOSimpleSignInfo {
      * @param timestampingTime Fechas de los sellos de tiempo
      */
     public void setTimestampingTime(final Date[] timestampingTime) {
-        this.timestampingTime = (timestampingTime == null ? null : timestampingTime.clone());
+        this.timestampingTime = timestampingTime == null ? null : timestampingTime.clone();
     }
 
     /** Obtiene el certificado (con su cadena de confianza) de la firma.
@@ -131,7 +131,7 @@ public final class AOSimpleSignInfo {
      * @param pkcs1
      *        PKCS#1 que gener&oacute; la firma. */
     public void setPkcs1(final byte[] pkcs1) {
-        this.pkcs1 = (pkcs1 == null ? null : pkcs1.clone());
+        this.pkcs1 = pkcs1 == null ? null : pkcs1.clone();
     }
 
     @Override
