@@ -1,7 +1,7 @@
 /* Copyright (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
- *   - the GNU General Public License as published by the Free Software Foundation; 
+ *   - the GNU General Public License as published by the Free Software Foundation;
  *     either version 2 of the License, or (at your option) any later version.
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
@@ -17,9 +17,9 @@ import es.gob.afirma.keystores.filters.CertificateFilter;
 /** Clase que representa un filtro de certificados por los atributos KeyUsage para
  * el di&aacute;logo de selecci&oacute;n. */
 public class KeyUsageFilter extends CertificateFilter {
-    
+
     private static final int KEYUSAGE_NBITS = 9;
-    
+
     /** El KeyUsage m&iacute;nimos que debe cumplir el certificado. */
     private final Boolean[] keyUsageFilter;
 
@@ -41,11 +41,11 @@ public class KeyUsageFilter extends CertificateFilter {
         }
         return false;
     }
-    
+
     /** Construye un filtro para certificados.
-     * @param keyUsage M&aacute;scara de bits para filtro por <i>KeyUsage</i><br/>
+     * @param keyUsage M&aacute;scara de bits para filtro por <i>KeyUsage</i><br>
      *        Cada certificado puede permitir simult&aacute;neamente cualquiera de
-     *        estos 8 usos:<br/>
+     *        estos 8 usos:<br>
      *        <ol>
      *        <li><b>digitalSignature</b></li>
      *        <li><b>nonRepudiation</b></li>
@@ -70,7 +70,7 @@ public class KeyUsageFilter extends CertificateFilter {
         }
         this.keyUsageFilter = keyUsage.clone();
     }
-    
+
     /** <i>KeyUsage</i> t&iacute;pico de un certificado v&aacute;lido para firmas
      * digitales. */
     public static final Boolean[] SIGN_CERT_USAGE = {
