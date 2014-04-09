@@ -531,16 +531,14 @@ public class DirectorySignatureHelper {
     }
 
     /** Realiza la operaci&oacute;n de firma masiva.
-     * @param files
-     *        Ficheros que se desean firmar ya comprobados (existencia, no
-     *        directorio, permisos,...).
-     * @param outDir
-     *        Directorio de salida (creado y con permisos).
-     * @param keyEntry
-     *        Clave de firma.
+     * @param files Ficheros que se desean firmar ya comprobados (existencia, no
+     *              directorio, permisos,...).
+     * @param outDir Directorio de salida (creado y con permisos).
+     * @param keyEntry Clave de firma.
+     * @param signConfig Configuraci&oacute; para la operaci&oacute;n de firma
      * @return Devuelve <code>true</code> si toda la operaci&oacute;n
-     *         finaliz&oacute; correctamente, <code>false</code> en caso
-     *         contrario. */
+     *         finaliz&oacute; correctamente, <code>false</code> en caso contrario.
+     * @throws IOException Cuando hay errores de entrada / salida */
     private boolean massiveSignOperation(final File[] files,
                                          final File outDir,
                                          final PrivateKeyEntry keyEntry,
@@ -967,15 +965,15 @@ public class DirectorySignatureHelper {
 
     /** Salva un fichero de firma en un directorio. El fichero ser&aacute;
      * salvado con el mismo nombre que el fichero original m&aacute;s la
-     * extensi&oacute;n que le corresponda segun el tipo de firma. <br/>
+     * extensi&oacute;n que le corresponda segun el tipo de firma. <br>
      * Adicionalmente, se le agregar&iacute;a una part&iacute;cula intermedia
      * entre el nombre de fichero y la extensi&oacute;n de firma, normalmente
      * ".signed", ".cosign" y ".countersign" en los casos de firma, cofirma y
-     * contrafirma, respectivamente. <br/>
+     * contrafirma, respectivamente. <br>
      * Si, una vez determinado el nombre de fichero, se encuentra que ya existe
      * un fichero con este nombre, se agregar&aacute; una cifra entre
      * par&eacute;ntesis (partiendo desde cero y en orden creciente) que permita
-     * almacenar el fichero sin sobreescribir ning&uacute;n otro. <br/>
+     * almacenar el fichero sin sobreescribir ning&uacute;n otro. <br>
      * La estructura del nombre de fichero es:
      * <p>
      * <code>nombre_fichero+particula+cifra+extension_firma</code>
@@ -1198,10 +1196,7 @@ public class DirectorySignatureHelper {
 
     /** Agrega un registro a un fichero de log. Si es nulo el registro de log se
      * muestra un mensaje por consola.
-     * @param typeLog
-     *        Tipo de mensaje.
-     * @param logRegistry
-     *        Entrada del log. */
+     * @param typeLog Tipo de mensaje. */
     private void addLogRegistry(final Level typeLog, final String msg, final String inputData, final String outputSign) {
         if (this.activeLog) {
             if (msg == null) {
@@ -1225,13 +1220,12 @@ public class DirectorySignatureHelper {
     }
 
     /** Inicializa el fichero de log para la firma masiva.
-     * @param outFile
-     *        Ruta del fichero de log. */
+     * @param outputStream Flujo para la escritura del registro */
     protected static LogHandler initDefaultLogHandler(final OutputStream outputStream) {
     	return new DefaultLogHandler(outputStream);
     }
 
-    /** Cierra el fichero de log. */
+    /** Cierra el fichero de <i>log</i>. */
     private void closeLogRegistry() {
 
         if (this.logHandler != null) {

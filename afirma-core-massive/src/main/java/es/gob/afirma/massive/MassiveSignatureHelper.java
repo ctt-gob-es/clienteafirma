@@ -343,22 +343,14 @@ public final class MassiveSignatureHelper {
         return signData;
     }
 
-    /** Firma datos con el signer indicado.
-     * @param signer
-     *        Manejador con el que firmar los datos.
-     * @param data
-     *        Datos a firmar.
-     * @param uri
-     *        Uri de los datos a firmar (opcional seg&uacute;n formato de
-     *        firma).
-     * @param config
-     *        Configuraci&oacute;n general para la operaci&oacute;n.
-     * @return Firma electr&oacute;nica con el formato dado por el manejador de
-     *         firma.
-     * @throws AOException
-     *         Cuando ocurre un error durante la operaci&oacute;n de firma.
-     * throws IOException Cuando ocurre un error durante la lectura o escritura de los datos.
-     */
+    /** Firma datos con el firmador indicado.
+     * @param signer Manejador con el que firmar los datos.
+     * @param data Datos a firmar.
+     * @param uri URI de los datos a firmar (opcional seg&uacute;n formato de firma).
+     * @param config Configuraci&oacute;n general para la operaci&oacute;n.
+     * @return Firma electr&oacute;nica con el formato dado por el manejador de firma.
+     * @throws AOException Cuando ocurre un error durante la operaci&oacute;n de firma.
+     * @throws IOException Cuando ocurre un error durante la lectura o escritura de los datos. */
     private byte[] signDataFromData(final AOSigner signer, final byte[] data, final URI uri, final Properties config) throws AOException, IOException {
 
         // Configuramos y ejecutamos la operacion
@@ -465,8 +457,7 @@ public final class MassiveSignatureHelper {
      *         firma.
      * @throws AOException
      *         Cuando ocurre un error durante la operaci&oacute;n de firma.
-     * throws IOException Cuando ocurre un error durante la lectura o escritura de los datos.
-     */
+     * @throws IOException Cuando ocurre un error durante la lectura o escritura de los datos. */
     private byte[] cosign(final AOSigner signer, final byte[] sign, final Properties config) throws AOException, IOException {
 
         // Configuramos y ejecutamos la operacion
