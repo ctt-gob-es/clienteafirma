@@ -33,9 +33,11 @@ public final class CustomUriDereferencer implements URIDereferencer {
 
 	/** Obtiene el dereferenciador a medida por defecto de Java.
 	 * @return Dereferenciador a medida por defecto de Java
-	 * @throws NoSuchFieldException
-	 * @throws SecurityException
-	 * @throws ClassNotFoundException
+	 * @throws NoSuchFieldException Si falla la reflexi&oacute;n por cambios de las clases internas
+	 *                              de Java
+	 * @throws SecurityException Si no se tienen permisos para la reflexi&oacute;n
+	 * @throws ClassNotFoundException Si falla la reflexi&oacute;n por desaparici&oacute;n de las clases internas
+	 *                                de Java
 	 * @throws IllegalArgumentException
 	 * @throws IllegalAccessException */
 	public static URIDereferencer getDefaultDereferencer() throws NoSuchFieldException,
