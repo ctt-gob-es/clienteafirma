@@ -33,17 +33,23 @@ final class AOSecMod {
         // No permitimos la instanciacion
     }
 
-    /** <pre>
+    /** Obtiene un m&oacute;dulo de seguridad (PKCS#11) de la base de datos de Mozilla.
+     * Cada registro de la base de datos tiene esta estructura:
+     * <pre>
      * struct {
      *   BYTE  commonNameLen[ 2 ];
      *   BYTE  commonName   [ commonNameLen ];
      *   BTTE  libNameLen   [ 2 ];
      *   BYTE  libName      [ libNameLen ];
-     * If it is "extended" it also has these members:
+     * Si es un registro "extendido" tambien tendra estas entradas:
      *   BYTE  initStringLen[ 2 ];
      *   BYTE  initString   [ initStringLen ];
      * }
-     * </pre> */
+     * </pre>
+     * @param secmoddb Base de datos de m&oacute;dulos de seguridad de Mozilla
+     * @param namesOffset Punto de partida en la base de datos de m&oacute;dulos de seguridad
+     * @return Primer m&oacute;dulo de seguridad encontrado en la base de datos a partir del punto
+     *         de partida indicado */
     private static ModuleName processNames(final byte[] secmoddb, final int namesOffset) {
 
         int namesRunningOffset = namesOffset;
@@ -167,7 +173,7 @@ final class AOSecMod {
      * @param offset
      *        Desplazamiento desde el origen para el comienzo del par de
      *        octetos
-     * @return N&ueacute;mero entero de 16 bits (sin signo) */
+     * @return N&uacute;mero entero de 16 bits (sin signo) */
     private static int getShort(final byte[] src, final int offset) {
         return src[offset + 0] << 8 | src[offset + 1];
     }

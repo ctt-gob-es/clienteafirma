@@ -19,7 +19,8 @@ final class NssKeyStoreManager extends AOKeyStoreManager {
 	/** Componente padre sobre el que montar los di&aacute;logos modales. */
 	private final Object parentComponent;
 
-	/** Construye un gestor de almac&eacute;n de claves y certificados Mozilla (NSS). */
+	/** Construye un gestor de almac&eacute;n de claves y certificados Mozilla (NSS).
+	 * @param parent Elemento padre para la modalidad */
 	NssKeyStoreManager(final Object parent) {
 		setKeyStoreType(AOKeyStore.MOZ_UNI);
 		this.parentComponent = parent;

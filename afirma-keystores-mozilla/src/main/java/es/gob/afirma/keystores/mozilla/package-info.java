@@ -9,7 +9,7 @@
  */
 
 /** M&oacute;dulo del Cliente Afirma de gesti&oacute;n de almacenes de claves y certificados de Mozilla.
- *  <p align="center"><br><img src="doc-files/package-info-1.png"></p>
+ *  <p style="text-align: center;"><br><img src="doc-files/package-info-1.png" alt="Dependencias de subsistemas"></p>
  *  <p>Este m&oacute;dulo presenta las siguientes dependencias directas de primer nivel:</p>
  *  <ul>
  *   <li>Dependencia con el m&oacute;dulo N&uacute;cleo (<i>afirma-core</i>) del Cliente.</li>

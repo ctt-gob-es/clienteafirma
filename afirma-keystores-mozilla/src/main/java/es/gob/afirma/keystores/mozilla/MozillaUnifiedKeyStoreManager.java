@@ -33,7 +33,7 @@ public final class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManag
 	 *         Si no puede inicializarse ning&uacute;n almac&eacute;n de
 	 *         claves, ni el NSS interno, ni ning&uacute;n PKCS#11 externo
 	 *         definido en SecMod
-	 * @throws IOException */
+	 * @throws IOException Cuando hay errores de entrada / salida */
 	@Override
 	public void init(final AOKeyStore type,
 			         final InputStream store,

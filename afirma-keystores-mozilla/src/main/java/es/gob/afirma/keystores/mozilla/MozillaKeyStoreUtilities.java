@@ -323,8 +323,9 @@ final class MozillaKeyStoreUtilities {
 		);
 	}
 
-	/** Busca la &uacute;ltima versi&oacute;n de firefox instalada en un sistema
+	/** Busca la &uacute;ltima versi&oacute;n de Firefox instalada en un sistema
 	 * Linux o Solaris
+	 * @param startDir Directorio de inicio para la b&uacute;squeda
 	 * @return &Uacute;ltima versi&oacute;n instalada en el sistema */
 	private static String searchLastFirefoxVersion(final String startDir) {
 		final File directoryLib = new File(startDir);
@@ -386,12 +387,12 @@ final class MozillaKeyStoreUtilities {
 	 * es dependiente de la implementaci&oacute;n de <code>toString()</code> de
 	 * la clase <code>sun.security.pkcs11.Secmod.Module</code>, ya que no
 	 * podemos acceder directamente al atributo <code>slot</code> por ser de
-	 * tipo <i>friend</i>: <code><pre>
+	 * tipo <i>friend</i>: <pre>
 	 * public String toString() {
 	 *   return
 	 *   commonName + " (" + type + ", " + libraryName + ", slot " + slot + ")";
 	 *  }
-	 *  </pre></code>
+	 *  </pre>
 	 * @param description
 	 *        Resultado de una llamada a <code>sun.security.pkcs11.Secmod.Module.toString()</code>
 	 * @return Nombre correspondiente al m&oacute;dulo de seguridad */
@@ -537,7 +538,7 @@ final class MozillaKeyStoreUtilities {
 
 	/** Obtiene el directorio del perfil de usuario de Mozilla / Firefox.
 	 * @return Ruta completa del directorio del perfil de usuario de Mozilla / Firefox
-	 * @throws IOException */
+	 * @throws IOException Cuando hay errores de entrada / salida */
 	static String getMozillaUserProfileDirectory() throws IOException {
 		final String dir = NSPreferences.getFireFoxUserProfileDirectory(new File(getProfilesIniPath()));
 		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
