@@ -618,7 +618,7 @@ final class CAdESCounterSignerEnveloped {
 
     /** M&eacute;todo utilizado por la firma de una hoja del &eacute;rbol para
      * obtener la contrafirma de los signerInfo de una determinada hoja de forma
-     * recursiva.</br>
+     * recursiva.<br>
      * @param signerInfo
      *        Nodo ra&iacute; que contiene todos los signerInfos que se
      *        deben firmar.
@@ -738,7 +738,7 @@ final class CAdESCounterSignerEnveloped {
     /** M&eacute;todo utilizado por la firma de un nodo del &eacute;rbol para
      * obtener la contrafirma de los signerInfo Sin ser recursivo. Esto es por
      * el caso especial de que puede ser el nodo raiz el nodo a firmar, por lo
-     * que no ser&iacute;a necesario usar la recursividad.</br>
+     * que no ser&iacute;a necesario usar la recursividad.<br>
      * @param signerInfo
      *        Nodo ra&iacute; que contiene todos los signerInfos que se
      *        deben firmar.
@@ -881,7 +881,7 @@ final class CAdESCounterSignerEnveloped {
 
     /** M&eacute;todo utilizado por la firma de un nodo del &eacute;rbol para
      * obtener la contrafirma de los signerInfo buscando el nodo de forma
-     * recursiva.</br>
+     * recursiva.<br>
      * @param signerInfo
      *        Nodo ra&iacute; que contiene todos los signerInfos que se
      *        deben firmar.

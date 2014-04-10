@@ -764,7 +764,7 @@ final class CAdESCounterSigner {
 
     /** Obtiene la contrafirma de los signerInfo sin ser recursivo. Esto es por
      * el caso especial de que puede ser el nodo raiz el nodo a firmar, por lo
-     * que no ser&iacute;a necesario usar la recursividad.</br>
+     * que no ser&iacute;a necesario usar la recursividad.<br>
      * @param signerInfo
      *        Nodo ra&iacute; que contiene todos los signerInfos que se
      *        deben firmar.
@@ -919,7 +919,7 @@ final class CAdESCounterSigner {
     }
 
     /** Obtiene la contrafirma de los signerInfo buscando el nodo de forma
-     * recursiva.</br>
+     * recursiva.<br>
      * @param signerInfo
      *        Nodo ra&iacute; que contiene todos los signerInfos que se
      *        deben firmar.

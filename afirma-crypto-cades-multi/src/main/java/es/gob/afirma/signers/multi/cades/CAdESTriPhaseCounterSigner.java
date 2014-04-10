@@ -504,7 +504,7 @@ public final class CAdESTriPhaseCounterSigner {
     }
 
     /** Obtiene la contrafirma de los signerInfo de una determinada hoja de forma
-     * recursiva.</br>
+     * recursiva.<br>
      * @param signerInfo Nodo ra&iacute; que contiene todos los signerInfos que se deben firmar.
      * @param parameters Par&aacute;metros necesarios para firmar un determinado <i>SignerInfo</i> hoja.
      * @param cert Certificado de firma.
@@ -660,26 +660,27 @@ public final class CAdESTriPhaseCounterSigner {
 
     /** Genera un signerInfo espec&iacute;fico utilizando los
      * datos necesarios para crearlo. Se utiliza siempre que no se sabe cual es
-     * el signerInfo que se debe firmar.</br>
-     * @param parameters Par&aacute;metros necesarios para firmar un determinado SignerInfo hoja.
+     * el signerInfo que se debe firmar.<br>
+     * @param signatureAlgorithm Algoritmo de firma.
      * @param si SignerInfo del que se debe recoger la informaci&oacute;n para
      *           realizar la contrafirma espec&iacute;fica.
-     * @param key Clave privada a usar para firmar
+     * @param certChain Cadena de certificados del firmante
      * @param contentType Tipo de contenido definido por su OID.
      * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
-     * @return SignerInfo contrafirmado.
+     * @para policy Pol&iacute;tica de firma
+     * @return <code>SignerInfo</code> contrafirmado.
      * @throws java.security.NoSuchAlgorithmException
-     * @throws java.io.IOException
+     * @throws java.io.IOException En caso de errores de entrada / salida
      * @throws java.security.cert.CertificateException */
     private SignerInfo generateSignerInfo(final String signatureAlgorithm,
-                                                 final SignerInfo si,
-                                                 final java.security.cert.Certificate[] certChain,
-                                                 final String contentType,
-                                                 final String contentDescription,
-                                                 final AdESPolicy policy,
-                                                 final boolean signingCertificateV2) throws NoSuchAlgorithmException,
-                                                                                             IOException,
-                                                                                             CertificateException {
+                                          final SignerInfo si,
+                                          final java.security.cert.Certificate[] certChain,
+                                          final String contentType,
+                                          final String contentDescription,
+                                          final AdESPolicy policy,
+                                          final boolean signingCertificateV2) throws NoSuchAlgorithmException,
+                                                                                     IOException,
+                                                                                     CertificateException {
         // buscamos que timo de algoritmo es y lo codificamos con su OID
         final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
 
