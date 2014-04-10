@@ -46,12 +46,13 @@ public final class XmlStyle {
 	/** Crea un estilo XML (XSL) a firmar.
 	 * @param data XML en formato binario
 	 * @param headLess Indica si deben omitirse las interacciones con el usuario mediante interfaz gr&aacute;fico
-	 * @throws IOException
-	 * @throws TransformerConfigurationException
-	 * @throws CannotDereferenceException
-	 * @throws IsInnerlException
-	 * @throws ReferenceIsNotXmlException
-	 * @throws javax.xml.transform.TransformerFactoryConfigurationError */
+	 * @throws IOException Cuando hay errores de entrada / salida
+	 * @throws TransformerConfigurationException Si hay problemas en la configuraci&oacute;n de alguna transformaci&oacute;n
+	 * @throws CannotDereferenceException Si no se puede obtener el estilo referenciado
+	 * @throws IsInnerlException Si la referencia apunta a un elemento dentro del propio XML
+	 * @throws ReferenceIsNotXmlException Cuando el estilo referenciado no est&aacute; en formato XML
+	 * @throws javax.xml.transform.TransformerFactoryConfigurationError Cuando hay errores de configuraci&oacute; en la
+	 *                                                                  factor&iacute;a de transformaciones */
 	public XmlStyle(final byte[] data, final boolean headLess) throws IOException,
 	                                                                  TransformerConfigurationException,
 	                                                                  CannotDereferenceException,
@@ -170,7 +171,7 @@ public final class XmlStyle {
      *         Si no se puede dereferenciar
      * @throws IsInnerlException
      *         Si no se puede dereferenciar por ser una referencia local
-     * @throws ReferenceIsNotXMLException
+     * @throws ReferenceIsNotXmlException
      *         Si el objeto dereferenciado no puede transformarse en un
      *         Documento DOM */
     private static Document dereferenceStyleSheet(final String id, final boolean headLess) throws CannotDereferenceException,

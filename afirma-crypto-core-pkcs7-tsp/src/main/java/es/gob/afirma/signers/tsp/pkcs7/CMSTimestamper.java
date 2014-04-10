@@ -237,6 +237,7 @@ public final class CMSTimestamper {
     }
 
     /** Obtiene el <i>token</i> de sello de tiempo por HTTPS (SSL).
+     * @param requestBytes Petici&oacute;n a TSA en ASN.1 binario
      * @return Respuesta de la TSA (array de bytes seg&uacute;n RFC 3161)
      * @throws IOException Si hay problemas de dentrada / salida */
     private byte[] getTSAResponseHttps(final byte[] requestBytes) throws IOException {
@@ -291,6 +292,7 @@ public final class CMSTimestamper {
     }
 
     /** Obtiene el <i>token</i> de sello de tiempo por HTTP.
+     * @param requestBytes Petici&oacute;n a TSA en ASN.1 binario
      * @return Respuesta de la TSA (array de bytes seg&uacute;n RFC 3161)
      * @throws IOException Si hay problemas de dentrada / salida */
     private byte[] getTSAResponseHttp(final byte[] requestBytes) throws IOException {

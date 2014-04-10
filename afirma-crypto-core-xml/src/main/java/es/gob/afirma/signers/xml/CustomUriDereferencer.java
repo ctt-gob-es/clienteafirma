@@ -38,8 +38,7 @@ public final class CustomUriDereferencer implements URIDereferencer {
 	 * @throws SecurityException Si no se tienen permisos para la reflexi&oacute;n
 	 * @throws ClassNotFoundException Si falla la reflexi&oacute;n por desaparici&oacute;n de las clases internas
 	 *                                de Java
-	 * @throws IllegalArgumentException
-	 * @throws IllegalAccessException */
+	 * @throws IllegalAccessException Si falla la reflexi&oacute;n por fallos de visibilidad */
 	public static URIDereferencer getDefaultDereferencer() throws NoSuchFieldException,
 	                                                              ClassNotFoundException,
 	                                                              IllegalAccessException {
@@ -96,12 +95,12 @@ public final class CustomUriDereferencer implements URIDereferencer {
 	}
 
 	/** Busca el primer nodo de un documento XML que tenga un atributo con nombre
-	 * <i>Id</i> cuyo valor sea el indicado o <code>null</vode> si no se encuentra
+	 * <i>Id</i> cuyo valor sea el indicado o <code>null</code> si no se encuentra
 	 * ninguno.
 	 * @param doc Documento XML
 	 * @param nodeId Valor del atributo <i>Id</i> del nodo a buscar
 	 * @return Primer nodo de un documento XML que tenga un atributo <i>Id</i> con el
-	 *         valor indicado o <code>null</vode> si no se encuentra ninguno */
+	 *         valor indicado o <code>null</code> si no se encuentra ninguno */
 	private static Element getElementById(final Document doc, final String nodeId) {
 		if (doc == null || nodeId == null) {
 			return null;

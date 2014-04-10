@@ -213,7 +213,7 @@ public final class Utils {
      *         Cuando se encuentre un par&aacute;metro inv&aacute;lido para
      *         el algoritmo de transformaci&oacute;n.
      * @throws NoSuchAlgorithmException
-     *         Cuando se encuentre un algoritmo de transformaci&oacurte;n no
+     *         Cuando se encuentre un algoritmo de transformaci&oacute;n no
      *         soportado. */
     public static List<Transform> getObjectReferenceTransforms(final Node referenceNode, final String namespacePrefix) throws NoSuchAlgorithmException,
                                                                                                                         InvalidAlgorithmParameterException {
@@ -261,19 +261,20 @@ public final class Utils {
         return null;
     }
 
-    /** Recupera los par&aacute;metros de una transformaci&opacute;n. En el caso
+    /** Recupera los par&aacute;metros de una transformaci&oacute;n. En el caso
      * de las transformaciones XPATH y XPATH2, se devolveran los
      * par&aacute;metros especificados y, en las transformacion Base64,
      * Enveloped y de Canonicalizaci&oacute;n (que no reciben par&aacute;metros)
      * se devolver&aacute; {@code null}, al igual que cuando no se reconozca el
      * tipo de transformaci&oacute;n.
-     * @param transformNode
-     *        Nodo de transformaci&oacute;n.
+     * @param transformNode Nodo de transformaci&oacute;n.
+     * @param namespacePrefix Prefijo del espacio de nombres XML
      * @return Par&aacute;metros de la transformaci&oacute;n.
      * @throws InvalidAlgorithmParameterException
      *         Cuando no se especifiquen correctamente los
      *         par&aacute;mnetros de las transformaciones XPATH y XPATH2. */
-    private static TransformParameterSpec getTransformParameterSpec(final Node transformNode, final String namespacePrefix) throws InvalidAlgorithmParameterException {
+    private static TransformParameterSpec getTransformParameterSpec(final Node transformNode,
+    		                                                        final String namespacePrefix) throws InvalidAlgorithmParameterException {
 
         TransformParameterSpec params = null;
         final String algorithm = getTransformAlgorithm(transformNode);
