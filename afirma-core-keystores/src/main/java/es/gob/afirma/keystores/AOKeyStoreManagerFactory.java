@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
 
@@ -32,6 +33,17 @@ public final class AOKeyStoreManagerFactory {
 
     private AOKeyStoreManagerFactory() {
         // No permitimos la instanciacion
+    }
+
+    private static final boolean FORCE_STORE_RESET = Boolean.getBoolean(
+		"es.gob.afirma.keystores.ForceReset" //$NON-NLS-1$
+	);
+    static {
+    	if (FORCE_STORE_RESET) {
+    		Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
+				"No se mantendran los almacenes de claves precargados (es.gob.afirma.keystores.ForceReset=true)" //$NON-NLS-1$
+			);
+    	}
     }
 
     /** Obtiene el <code>KeyStoreManager</code> del tipo indicado.
@@ -155,7 +167,7 @@ public final class AOKeyStoreManagerFactory {
         InputStream is = null;
         try {
             is = new FileInputStream(storeFilename);
-            ksm.init(null, is, pssCallback, null, false);
+            ksm.init(null, is, pssCallback, null, FORCE_STORE_RESET);
         }
         catch (final AOException e) {
             throw new AOKeystoreAlternativeException(
@@ -178,7 +190,7 @@ public final class AOKeyStoreManagerFactory {
     	final AOKeyStoreManager ksm = new AOKeyStoreManager();
     	try {
     		// Proporcionamos el componente padre como parametro
-    		ksm.init(AOKeyStore.DNIEJAVA, null, pssCallback, new Object[] { parentComponent }, false);
+    		ksm.init(AOKeyStore.DNIEJAVA, null, pssCallback, new Object[] { parentComponent }, FORCE_STORE_RESET);
     	}
     	catch (final AOKeyStoreManagerException e) {
     	   throw new AOKeystoreAlternativeException(
@@ -245,7 +257,7 @@ public final class AOKeyStoreManagerFactory {
         InputStream is = null;
         try {
             is = new FileInputStream(storeFilename);
-            ksm.init(store, is, pssCallback, null, false);
+            ksm.init(store, is, pssCallback, null, FORCE_STORE_RESET);
         }
         catch (final AOException e) {
             throw new AOKeystoreAlternativeException(
@@ -313,7 +325,7 @@ public final class AOKeyStoreManagerFactory {
         		new String[] {
                     p11Lib, description
         		},
-        		false
+        		FORCE_STORE_RESET
     		);
         }
         catch (final AOException e) {
@@ -330,7 +342,7 @@ public final class AOKeyStoreManagerFactory {
                                                                                                   AOKeystoreAlternativeException {
     	final AOKeyStoreManager ksm = new AOKeyStoreManager();
         try {
-            ksm.init(store, null, NullPasswordCallback.getInstance(), null, false);
+            ksm.init(store, null, NullPasswordCallback.getInstance(), null, FORCE_STORE_RESET);
         }
         catch (final AOException e) {
             throw new AOKeystoreAlternativeException(
@@ -345,7 +357,7 @@ public final class AOKeyStoreManagerFactory {
     private static AOKeyStoreManager getWindowsMyCapiKeyStoreManager() throws AOKeystoreAlternativeException, IOException {
     	final AOKeyStoreManager ksmCapi = new CAPIKeyStoreManager();
 		try {
-			ksmCapi.init(AOKeyStore.WINDOWS, null, null, null, false);
+			ksmCapi.init(AOKeyStore.WINDOWS, null, null, null, FORCE_STORE_RESET);
 		}
 		catch (final AOKeyStoreManagerException e) {
 			throw new AOKeystoreAlternativeException(
@@ -373,7 +385,7 @@ public final class AOKeyStoreManagerFactory {
         }
         try {
         	// Proporcionamos el componente padre como parametro
-            ksmUni.init(AOKeyStore.MOZ_UNI, null, pssCallback, new Object[] { parentComponent }, false);
+            ksmUni.init(AOKeyStore.MOZ_UNI, null, pssCallback, new Object[] { parentComponent }, FORCE_STORE_RESET);
         }
         catch (final AOException e) {
             throw new AOKeystoreAlternativeException(
@@ -398,7 +410,7 @@ public final class AOKeyStoreManagerFactory {
                  lib == null || "".equals(lib) ? null : new FileInputStream(lib),  //$NON-NLS-1$
         		 NullPasswordCallback.getInstance(),
                  null,
-                 false
+                 FORCE_STORE_RESET
             );
         }
         catch (final AOException e) {
