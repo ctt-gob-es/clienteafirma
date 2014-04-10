@@ -16,6 +16,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
+import java.util.Locale;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -418,17 +419,25 @@ public final class CAdESUtils {
 
         if (policy.getPolicyQualifier()==null || pqi == null) {
             return new PolicyInformation[] {
-                new PolicyInformation(new ASN1ObjectIdentifier(policy.getPolicyIdentifier().toLowerCase().replace("urn:oid:", ""))) //$NON-NLS-1$ //$NON-NLS-2$
+                new PolicyInformation(
+            		new ASN1ObjectIdentifier(
+        				policy.getPolicyIdentifier().toLowerCase(Locale.US).replace("urn:oid:", "") //$NON-NLS-1$ //$NON-NLS-2$
+    				)
+        		)
             };
         }
 
         return new PolicyInformation[] {
-            new PolicyInformation(new ASN1ObjectIdentifier(policy.getPolicyIdentifier().toLowerCase().replace("urn:oid:", "")), new DERSequence(pqi)) //$NON-NLS-1$ //$NON-NLS-2$
+            new PolicyInformation(
+        		new ASN1ObjectIdentifier(
+    				policy.getPolicyIdentifier().toLowerCase(Locale.US).replace("urn:oid:", "") //$NON-NLS-1$ //$NON-NLS-2$
+				),
+    			new DERSequence(pqi)
+    		)
         };
 
     }
 
-    /** Inicializa el contexto. */
     static ASN1EncodableVector initContexExpecific(final String dataDigestAlgorithmName,
                                                    final byte[] data,
                                                    final String dataType,

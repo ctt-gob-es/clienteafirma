@@ -47,8 +47,8 @@ public final class CAdESValidator {
     /** Verifica si los datos proporcionados se corresponden con una estructura de tipo <i>Data</i>.
      * @param data Datos PKCS#7/CMS/CAdES.
      * @return <code>true</code> si los datos proporcionados se corresponden con una estructura de tipo <i>Data</i>,
-     * <code>false</code> en caso contrario. */
-    @SuppressWarnings("unused")
+     * <code>false</code> en caso contrario.
+     * @throws IOException En caso de problemas leyendo el fichero */
 	static boolean isCAdESData(final byte[] data) throws IOException {
 
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
@@ -76,8 +76,7 @@ public final class CAdESValidator {
         try {
             /* Los valores de retorno no se usan, solo es para verificar que la
              * conversion ha sido correcta. De no ser asi, se pasaria al manejo
-             * de la excepcion.
-             */
+             * de la excepcion. */
             new DEROctetString(doj.getObject());
 
         }
