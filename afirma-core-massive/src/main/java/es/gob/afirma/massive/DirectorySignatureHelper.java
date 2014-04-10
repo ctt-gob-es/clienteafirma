@@ -661,15 +661,12 @@ public class DirectorySignatureHelper {
      * firmar ficheros de datos y cofirmar los ficheros de firma que encuentre,
      * teniendo la limitaci&oacute;n de que los ficheros de firma deben contener
      * los datos incrustados.
-     * @param files
-     *        Ficheros de firma y binarios ya comprobados (existencia, no
-     *        directorio, permisos,...).
-     * @param outDir
-     *        Directorio de salida (creado y con permisos).
-     * @param originalFormat
-     *        Respectar formato de firma original
-     * @param keyEntry
-     *        Clave de firma.
+     * @param files Ficheros de firma y binarios ya comprobados (existencia, no
+     *              directorio, permisos,...).
+     * @param outDir Directorio de salida (creado y con permisos).
+     * @param originalFormat Respectar formato de firma original
+     * @param keyEntry Clave de firma.
+     * @param signConfig Par&aacute;metros de configuraci&oacute;n de la firma
      * @return Devuelve <code>true</code> si toda la operaci&oacute;n
      *         finaliz&oacute; correctamente, <code>false</code> en caso
      *         contrario.
@@ -982,17 +979,12 @@ public class DirectorySignatureHelper {
      * <p>
      * <code>nombre_fichero.txt.cosign(1).csig</code>
      * </p>
-     * @param filename
-     *        Nombre del fichero original.
-     * @param signData
-     *        Contenido del fichero de firma.
-     * @param outDirectory
-     *        Directorio de salida.
-     * @param signer
-     *        Objeto con el que se realiza la firma.
-     * @param inText
-     *        Part&iacute;cula de texto intermedia (".signed", ".cosign" y
-     *        ".countersign" habitualmente).
+     * @param filename Nombre del fichero original.
+     * @param signData Contenido del fichero de firma.
+     * @param outDirectory Directorio de salida.
+     * @param signer Objeto con el que se realiza la firma.
+     * @param inText Part&iacute;cula de texto intermedia (".signed", ".cosign" y
+     *               ".countersign" habitualmente).
      * @return Devuelve <code>true</code> si la operaci&oacute;n finaliz&oacute;
      *         correctamente, <code>false</code> en caso contrario. */
     private boolean saveSignToDirectory(final String filename, final byte[] signData, final File outDirectory, final AOSigner signer, final String inText) {
@@ -1050,10 +1042,9 @@ public class DirectorySignatureHelper {
     /** Recupera un manejador de firma compatible para el fichero de firma
      * introducido. Si no se encuentra uno o no se encuentra el fichero se lanza
      * una excepci&oacute;n.
-     * @param file
-     *        Fichero de firma.
+     * @param file Fichero de firma.
      * @return Manejador de firma.
-     * @throws IOException  */
+     * @throws IOException Cuando hay errores de entrada / salida */
     private static AOSigner getAppropiatedSigner(final File file) throws IOException {
         final AOSigner signer;
         signer = determineType(file);
@@ -1067,14 +1058,11 @@ public class DirectorySignatureHelper {
      * por el manejador <code>signer</code>. En caso de no encontrar el fichero,
      * agrega una entrada al logger indic&aacute;ndolo y se lanza una
      * excepci&oacute;n.
-     * @param signer
-     *        Manejador de firma.
-     * @param file
-     *        Fichero a analizar.
+     * @param signer Manejador de firma.
+     * @param file Fichero a analizar.
      * @return Devuelve <code>true</code> si el fichero es una firma compatible
      *         con el signer indicado, <code>false</code> en caso contrario.
-     * @throws IOException
-     *         Cuando no se pudo leer el fichero. */
+     * @throws IOException Cuando no se pudo leer el fichero. */
     private static boolean isSign(final AOSigner signer, final File file) throws IOException {
         final InputStream is = new FileInputStream(file);
         final boolean isSignFile = signer.isSign(AOUtil.getDataFromInputStream(is));
@@ -1188,16 +1176,21 @@ public class DirectorySignatureHelper {
 
     /** Indica si durante el guardado de firmas se deben sobrescribir los
      * ficheros previos que se encuentren con el mismo nombre.
-     * @param overwirte
-     *        Sobrescribir ficheros. */
+     * @param overwirte Sobrescribir ficheros. */
     public void setOverwritePreviuosFileSigns(final boolean overwirte) {
         this.overwriteFiles = overwirte;
     }
 
     /** Agrega un registro a un fichero de log. Si es nulo el registro de log se
      * muestra un mensaje por consola.
-     * @param typeLog Tipo de mensaje. */
-    private void addLogRegistry(final Level typeLog, final String msg, final String inputData, final String outputSign) {
+     * @param typeLog Tipo de mensaje.
+     * @param msg Mensaje
+     * @param inputData Datos que se enviaron para firmar
+     * @param outputSign Firma resultante */
+    private void addLogRegistry(final Level typeLog,
+    		                    final String msg,
+    		                    final String inputData,
+    		                    final String outputSign) {
         if (this.activeLog) {
             if (msg == null) {
                 LOGGER.warning("Se ha intentado insertar un registro nulo en el log"); //$NON-NLS-1$
@@ -1220,7 +1213,8 @@ public class DirectorySignatureHelper {
     }
 
     /** Inicializa el fichero de log para la firma masiva.
-     * @param outputStream Flujo para la escritura del registro */
+     * @param outputStream Flujo para la escritura del registro
+     * @return Manejador del registro */
     protected static LogHandler initDefaultLogHandler(final OutputStream outputStream) {
     	return new DefaultLogHandler(outputStream);
     }
@@ -1250,7 +1244,7 @@ public class DirectorySignatureHelper {
      * @param file
      *        Fichero que deseamos analizar.
      * @return Resultado del an&aacute;lisis.
-     * @throws IOException */
+     * @throws IOException Cuando ocurre alg&uacute;n error en la lectura del fichero */
     private static AOSigner determineType(final File file) throws IOException {
         if (file == null) {
             throw new IllegalArgumentException("Se ha introducido un fichero de firma nulo"); //$NON-NLS-1$
