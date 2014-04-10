@@ -61,14 +61,11 @@ final class MozillaKeyStoreUtilities {
 
 	/** Crea las l&iacute;neas de configuraci&oacute;n para el uso de las
 	 * bibliotecas NSS como m&oacute;dulo PKCS#11 por el proveedor de Sun.
-	 * @param userProfileDirectory
-	 *        Directorio donde se encuentra el perfil de usuario de Mozilla
-	 *        Firefox
-	 * @param libDir
-	 *        Directorio que contiene las bibliotecas NSS
+	 * @param userProfileDirectory Directorio donde se encuentra el perfil de
+	 *                             usuario de Mozilla Firefox
+	 * @param libDir Directorio que contiene las bibliotecas NSS
 	 * @return Fichero con las propiedades de configuracion del proveedor
-	 *         PKCS#11 de Sun para acceder al KeyStore de Mozilla v&iacute;a
-	 *         NSS. */
+	 *         PKCS#11 de Sun para acceder al KeyStore de Mozilla v&iacute;a NSS. */
 	static String createPKCS11NSSConfigFile(final String userProfileDirectory, final String libDir) {
 
 		final String softoknLib;
@@ -624,13 +621,13 @@ final class MozillaKeyStoreUtilities {
 	                                 ClassNotFoundException {
 
 		final String nssDirectory = MozillaKeyStoreUtilities.getSystemNSSLibDir();
-		final String p11NSSConfigFile =
-			MozillaKeyStoreUtilities.createPKCS11NSSConfigFile(
-					MozillaKeyStoreUtilities.getMozillaUserProfileDirectory(),
-					nssDirectory
-			);
+		final String p11NSSConfigFile = MozillaKeyStoreUtilities.createPKCS11NSSConfigFile(
+			MozillaKeyStoreUtilities.getMozillaUserProfileDirectory(),
+			nssDirectory
+		);
 
-		LOGGER.info("Configuracion de NSS para SunPKCS11:\n" + p11NSSConfigFile); //$NON-NLS-1$
+		// Quitamos el directorio del usuario del registro, para evitar que contenga datos personales
+		LOGGER.info("Configuracion de NSS para SunPKCS11:\n" + p11NSSConfigFile.replace(Platform.getUserHome(), "USERHOME")); //$NON-NLS-1$ //$NON-NLS-2$
 
 		Provider p = null;
 		try {
