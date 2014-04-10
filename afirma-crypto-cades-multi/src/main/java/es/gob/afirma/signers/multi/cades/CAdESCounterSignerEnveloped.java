@@ -312,7 +312,7 @@ final class CAdESCounterSignerEnveloped {
      * 		  Descripci&oacute;n textual del tipo de contenido firmado.
      * @return El SignerInfo ra&iacute;z con todos sus nodos Contrafirmados.
      * @throws java.security.NoSuchAlgorithmException
-     * @throws java.io.IOException
+     * @throws java.io.IOException Cuando hay errores de entrada / salida
      * @throws java.security.cert.CertificateException
      * @throws es.map.es.map.afirma.exceptions.AOException */
     private ASN1EncodableVector counterTree(final ASN1Set signerInfosRaiz,
@@ -356,7 +356,7 @@ final class CAdESCounterSignerEnveloped {
      * 		  Descripci&oacute;n textual del tipo de contenido firmado.
      * @return El SignerInfo ra&iacute;z con todos sus nodos Contrafirmados.
      * @throws java.security.NoSuchAlgorithmException
-     * @throws java.io.IOException
+     * @throws java.io.IOException Cuando hay errores de entrada / salida
      * @throws java.security.cert.CertificateException
      * @throws es.map.es.map.afirma.exceptions.AOException */
     private ASN1EncodableVector counterLeaf(final ASN1Set signerInfosRaiz,
@@ -387,21 +387,16 @@ final class CAdESCounterSignerEnveloped {
 
     /** M&eacute;todo que contrafirma un nodo determinado del arbol buscandolo de
      * forma recursiva.<br>
-     * @param sd
-     *        SignedAndEnvelopedData que contiene el Nodo ra&iacute;z.
-     * @param parameters
-     *        Par&aacute;metros necesarios para firmar un determinado
-     *        SignerInfo hoja.
+     * @param sd <code>SignedAndEnvelopedData</code> que contiene el Nodo ra&iacute;z.
+     * @param parameters Par&aacute;metros necesarios para firmar un determinado
+     *        <code>SignerInfo</code> hoja.
      * @param key Clave privada a usar para firmar
-     * @param contentType
-     * 		  Tipo de contenido definido por su OID.
-     * @param contentDescription
-     * 		  Descripci&oacute;n textual del tipo de contenido firmado.
-     * @param nodo
-     *        Nodo signerInfo a firmar.
+     * @param contentType Tipo de contenido definido por su OID.
+     * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
+     * @param nodo Nodo signerInfo a firmar.
      * @return El SignerInfo ra&iacute;z con todos sus nodos Contrafirmados.
      * @throws java.security.NoSuchAlgorithmException
-     * @throws java.io.IOException
+     * @throws java.io.IOException Cuando hay errores de entrada / salida
      * @throws java.security.cert.CertificateException
      * @throws es.map.es.map.afirma.exceptions.AOException */
     private ASN1EncodableVector counterNode(final SignedAndEnvelopedData sd,
@@ -471,7 +466,7 @@ final class CAdESCounterSignerEnveloped {
      * @return El SignerInfo ra&iacute;z parcial con todos sus nodos
      *         Contrafirmados.
      * @throws java.security.NoSuchAlgorithmException
-     * @throws java.io.IOException
+     * @throws java.io.IOException Cuando hay errores de entrada / salida
      * @throws java.security.cert.CertificateException
      * @throws es.map.es.map.afirma.exceptions.AOException */
     private SignerInfo getCounterSignerInfo(final SignerInfo signerInfo,
@@ -633,7 +628,7 @@ final class CAdESCounterSignerEnveloped {
      * @return El SignerInfo ra&iacute;z parcial con todos sus nodos
      *         Contrafirmados.
      * @throws java.security.NoSuchAlgorithmException
-     * @throws java.io.IOException
+     * @throws java.io.IOException Cuando hay errores de entrada / salida
      * @throws java.security.cert.CertificateException
      * @throws es.map.es.map.afirma.exceptions.AOException */
     private SignerInfo getCounterLeafSignerInfo(final SignerInfo signerInfo,

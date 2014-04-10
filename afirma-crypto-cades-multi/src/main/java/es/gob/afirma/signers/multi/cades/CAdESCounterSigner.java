@@ -279,7 +279,7 @@ final class CAdESCounterSigner {
      * 		  Descripci&oacute;n textual del tipo de contenido firmado.
      * @return El SignerInfo ra&iacute;z con todos sus nodos Contrafirmados.
      * @throws java.security.NoSuchAlgorithmException
-     * @throws java.io.IOException
+     * @throws java.io.IOException Cuando hay errores de entrada / salida
      * @throws java.security.cert.CertificateException
      * @throws es.map.es.map.afirma.exceptions.AOException */
     private ASN1EncodableVector counterTree(final ASN1Set signerInfosRaiz,
@@ -323,7 +323,7 @@ final class CAdESCounterSigner {
      * @param contentDescription Descripci&oacute;n textual del tipo de contenido firmado.
      * @return El SignerInfo ra&iacute;z con todos sus nodos Contrafirmados.
      * @throws java.security.NoSuchAlgorithmException
-     * @throws java.io.IOException
+     * @throws java.io.IOException Cuando hay errores de entrada / salida
      * @throws java.security.cert.CertificateException
      * @throws es.map.es.map.afirma.exceptions.AOException */
     private ASN1EncodableVector counterLeaf(final ASN1Set signerInfosRaiz,
@@ -368,7 +368,7 @@ final class CAdESCounterSigner {
      *        Nodo signerInfo a firmar.
      * @return El SignerInfo ra&iacute;z con todos sus nodos Contrafirmados.
      * @throws java.security.NoSuchAlgorithmException
-     * @throws java.io.IOException
+     * @throws java.io.IOException Cuando hay errores de entrada / salida
      * @throws java.security.cert.CertificateException
      * @throws es.map.es.map.afirma.exceptions.AOException */
     private ASN1EncodableVector counterNode(final SignedData sd,
@@ -442,7 +442,7 @@ final class CAdESCounterSigner {
      * @return El SignerInfo ra&iacute;z parcial con todos sus nodos
      *         Contrafirmados.
      * @throws java.security.NoSuchAlgorithmException
-     * @throws java.io.IOException
+     * @throws java.io.IOException Cuando hay errores de entrada / salida
      * @throws java.security.cert.CertificateException
      * @throws es.map.es.map.afirma.exceptions.AOException */
     private SignerInfo getCounterSignerInfo(final SignerInfo signerInfo,
@@ -601,7 +601,7 @@ final class CAdESCounterSigner {
     }
 
     /** Obtiene la contrafirma de los signerInfo de una determinada hoja de forma
-     * recursiva.</br>
+     * recursiva.<br>
      * @param signerInfo
      *        Nodo ra&iacute; que contiene todos los signerInfos que se
      *        deben firmar.
@@ -616,7 +616,7 @@ final class CAdESCounterSigner {
      * @return El SignerInfo ra&iacute;z parcial con todos sus nodos
      *         Contrafirmados.
      * @throws java.security.NoSuchAlgorithmException
-     * @throws java.io.IOException
+     * @throws java.io.IOException Cuando hay errores de entrada / salida
      * @throws java.security.cert.CertificateException
      * @throws es.map.es.map.afirma.exceptions.AOException */
     private SignerInfo getLeafSignerInfo(final SignerInfo signerInfo,
@@ -779,7 +779,7 @@ final class CAdESCounterSigner {
      * @return El SignerInfo ra&iacute;z parcial con todos sus nodos
      *         Contrafirmados.
      * @throws java.security.NoSuchAlgorithmException
-     * @throws java.io.IOException
+     * @throws java.io.IOException Cuando hay errores de entrada / salida
      * @throws java.security.cert.CertificateException */
     private static SignerInfo getNodeSignerInfo(final SignerInfo signerInfo,
                                                        final P7ContentSignerParameters parameters,
@@ -936,7 +936,7 @@ final class CAdESCounterSigner {
      * @return El SignerInfo ra&iacute;z parcial con todos sus nodos
      *         Contrafirmados.
      * @throws java.security.NoSuchAlgorithmException
-     * @throws java.io.IOException
+     * @throws java.io.IOException Cuando hay errores de entrada / salida
      * @throws java.security.cert.CertificateException
      * @throws es.map.es.map.afirma.exceptions.AOException */
     private SignerInfo getNodeSignerInfo(final SignerInfo signerInfo,
@@ -1076,7 +1076,7 @@ final class CAdESCounterSigner {
 
     /** Genera un signerInfo espec&iacute;fico utilizando los
      * datos necesarios para crearlo. Se utiliza siempre que no se sabe cual es
-     * el signerInfo que se debe firmar.</br>
+     * el signerInfo que se debe firmar.<br>
      * @param parameters
      *        Par&aacute;metros necesarios para firmar un determinado SignerInfo hoja.
      * @param si
@@ -1089,7 +1089,7 @@ final class CAdESCounterSigner {
      * 		  Descripci&oacute;n textual del tipo de contenido firmado.
      * @return El signerInfo contrafirmado.
      * @throws java.security.NoSuchAlgorithmException
-     * @throws java.io.IOException
+     * @throws java.io.IOException Cuando hay errores de entrada / salida
      * @throws java.security.cert.CertificateException */
     private static SignerInfo generateSignerInfo(final String signatureAlgorithm,
                                           final SignerInfo si,
