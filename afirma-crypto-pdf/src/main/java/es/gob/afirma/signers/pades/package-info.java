@@ -8,10 +8,9 @@
  * You may contact the copyright holder at: soporte.afirma5@mpt.es
  */
 
-/**
- *	M&oacute;dulo de generaci&oacute;n de firmas digitales PAdES.
+/** M&oacute;dulo de generaci&oacute;n de firmas digitales PAdES.
  *  <p>Tabla de compatibilidad respecto a generaci&oacute;n en cliente de variantes de PAdES:</p>
- *  <p align="center"><table border="1" cellpadding="5">
+ *  <table border="1" cellpadding="5" summary="Tabla de compatibilidad respecto a variantes de PAdES">
  *   <tr>
  *    <td>PAdES-BES</td>
  *    <td>PAdES-EPES</td>
@@ -22,15 +21,15 @@
  *    <td>PAdES-A</td>
  *   </tr>
  *   <tr>
- *    <td bgcolor="green">Si<sup>1</sup></td>
- *    <td bgcolor="green">Si<sup>1</sup></td>
- *    <td bgcolor="green">Si<sup>1</sup> <sup>2</sup></td>
- *    <td bgcolor="red">No</td>
- *    <td bgcolor="red">No</td>
- *    <td bgcolor="red">No</td>
- *    <td bgcolor="red">No</td>
+ *    <td style="background-color: green;">Si<sup>1</sup></td>
+ *    <td style="background-color: green;">Si<sup>1</sup></td>
+ *    <td style="background-color: green;">Si<sup>1</sup> <sup>2</sup></td>
+ *    <td style="background-color: red;">No</td>
+ *    <td style="background-color: red;">No</td>
+ *    <td style="background-color: red;">No</td>
+ *    <td style="background-color: red;">No</td>
  *   </tr>
- *  </table></p>
+ *  </table>
  *  <p>
  *   <sup>1</sup> No se soporta la firma ni de ficheros adjuntos a los documentos PDF ni de ficheros empotrados en los documentos PDF.<br>
  *   <sup>2</sup> La generaci&oacute;n de los sellos de tiempo para PAdES-T necesita conexi&oacute;n
@@ -45,7 +44,7 @@
  *   En general, no se soportan documentos PDF cifrados con certificados, con algoritmo AES256 o con cualquier otro medio introducido en
  *   versiones de Adobe Acrobat posteriores a la 9.
  *  </p>
- *  <p align="center"><img src="doc-files/package-info-1.png"></p>
+ *  <p style="text-align: center;"><img src="doc-files/package-info-1.png" alt="Dependencias de subsistemas"></p>
  *  <p>Este m&oacute;dulo presenta las siguientes dependencias ditectas de primer nivel:</p>
  *  <ul>
  *   <li>Dependencia con el m&oacute;dulo N&uacute;cleo (<i>afirma-core</i>) del Cliente.</li>

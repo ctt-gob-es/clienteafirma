@@ -67,9 +67,9 @@ public final class PdfSessionManager {
      * @param signTime Hora de la firma
      * @param extraParams Par&aacute;metros adicionales de la firma
      * @return Datos PDF relevantes en cuanto a las firmas electr&oacute;nicas
-     * @throws AOException
+     * @throws AOException En caso de que ocurra cualquier otro tipo de error
      * @throws IOException En caso de errores de entrada / salida
-     * @throws DocumentException */
+     * @throws DocumentException Si ocurren errores en la estampaci&iacute;n de la firma PDF */
     public static PdfTriPhaseSession getSessionData(final byte[] inPDF,
                                                      final X509Certificate[] certChain,
                                                      final Calendar signTime,
@@ -539,7 +539,10 @@ public final class PdfSessionManager {
     /** Devuelve la posici&oacute;n de la p&aacute;gina en donde debe agregarse
      * la firma. La medida de posicionamiento es el p&iacute;xel y se cuenta en
      * el eje horizontal de izquierda a derecha y en el vertical de abajo a
-     * arriba. */
+     * arriba.
+     * @param extraParams Conjunto de propiedades con las coordenadas del rect&aacute;ngulo
+     * @return  Rect&aacute;ngulo que define la posici&oacute;n de la p&aacute;gina en donde
+     *          debe agregarse la firma*/
     private static Rectangle getSignaturePositionOnPage(final Properties extraParams) {
     	return PdfPreProcessor.getPositionOnPage(extraParams, "signature"); //$NON-NLS-1$
     }

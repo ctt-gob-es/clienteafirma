@@ -342,7 +342,7 @@ final class PdfDocumentSecurityStore {
     /** Devuelve el VRI pas&aacute;ndole como par&aacute;metro la firma que representa.
      * @param pkcs7 Firma PKCS#7
      * @return VRI que representa la firma
-     * @throws NoSuchAlgorithmException */
+     * @throws NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario */
     ValidationInformation getValidationInformation(final byte pkcs7[]) throws NoSuchAlgorithmException {
         final MessageDigest dg = MessageDigest.getInstance(DEFAULT_DIGEST_ALGORITHM);
         return this.signatures.get(ValidationInformation.getKey(dg.digest(pkcs7)));

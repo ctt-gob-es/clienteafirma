@@ -73,7 +73,7 @@ import es.gob.afirma.signers.tsp.pkcs7.TsaRequestExtension;
  *  un servidor Web (que hace la pre-firma y la post-firma) y un servidor documental podr&iacute;a ser el siguiente:
  * </p>
  * <p><b>Pre-firma:</b></p>
- * <p align="center"><img src="doc-files/PAdESTriPhaseSigner-1.png"></p>
+ * <p style="text-align: center;"><img src="doc-files/PAdESTriPhaseSigner-1.png" alt="Pre-firma"></p>
  * <ul>
  *  <li>El dispositivo m&oacute;vil solicita una pre-firma al servidor Web indicando un identificador de documento.</li>
  *  <li>El servidor Web solicita el documento a servidor documental.</li>
@@ -89,7 +89,7 @@ import es.gob.afirma.signers.tsp.pkcs7.TsaRequestExtension;
  *  </li>
  * </ul>
  * <p><b>Firma:</b></p>
- * <p align="center"><img src="doc-files/PAdESTriPhaseSigner-2.png"></p>
+ * <p style="text-align: center;"><img src="doc-files/PAdESTriPhaseSigner-2.png" alt="Firma"></p>
  * <ul>
  *  <li>
  *   El dispositivo m&oacute;vil realiza, de forma completamente aislada una firma electr&oacute;nica
@@ -98,7 +98,7 @@ import es.gob.afirma.signers.tsp.pkcs7.TsaRequestExtension;
  *  </li>
  * </ul>
  * <p><b>Post-firma:</b></p>
- * <p align="center"><img src="doc-files/PAdESTriPhaseSigner-3.png"></p>
+ * <p style="text-align: center;"><img src="doc-files/PAdESTriPhaseSigner-3.png" alt="Post-firma"></p>
  * <ul>
  *  <li>
  *   El dispositivo m&oacute;vil solicita una post-firma al servidor Web indicando un identificador de
@@ -135,7 +135,6 @@ import es.gob.afirma.signers.tsp.pkcs7.TsaRequestExtension;
  *  las firmas previamente existentes.<br>
  *  Consulte la documentaci&oacute;n de la opci&oacute;n <code>allowSigningCertifiedPdfs</code> para establecer un comportamiento por
  *  defecto respecto a los PDF certificados.
- * </p>
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class PAdESTriPhaseSigner {
 
@@ -173,8 +172,8 @@ public final class PAdESTriPhaseSigner {
      * @param signTime Momento de la firma. Debe usarse exactamente el mismo valor en la post-firma.
      * @return pre-firma CAdES/PAdES (atributos CAdES a firmar)
      * @throws IOException En caso de errores de entrada / salida
-     * @throws AOException
-     * @throws DocumentException */
+     * @throws AOException En caso de cualquier otro tipo de error
+     * @throws DocumentException En caso de errores en el XML de sesi&oacute;n */
     public static PdfSignResult preSign(final String digestAlgorithmName,
                                            final byte[] inPDF,
                                            final X509Certificate[] signerCertificateChain,

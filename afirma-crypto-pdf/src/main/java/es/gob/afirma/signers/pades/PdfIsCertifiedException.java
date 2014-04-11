@@ -18,8 +18,7 @@ public final class PdfIsCertifiedException extends AOException {
 
 	private static final long serialVersionUID = -7345078395676697490L;
 
-	/** Crea una excepci&oacute;n que indica que el PDF no ha podido firmarse por estar certificado.
-	 * @param e Causa inicial de la excepci&oacute;n */
+	/** Crea una excepci&oacute;n que indica que el PDF no ha podido firmarse por estar certificado. */
 	PdfIsCertifiedException() {
 		super("El PDF no se ha firmado por estar certificado"); //$NON-NLS-1$
 	}

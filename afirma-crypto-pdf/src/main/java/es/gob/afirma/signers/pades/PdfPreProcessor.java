@@ -79,8 +79,8 @@ public final class PdfPreProcessor {
 	 * @param jpegImage Imagen JPEG
 	 * @param width Ancho de la imagen
 	 * @param height Alto de la imagen
-	 * @param left
-	 * @param bottom
+	 * @param left Distancia de la imagen al borde izquiero de la p&aacute;gina del PDF
+	 * @param bottom Distancia de la imagen al borde inferior de la p&aacute;gina del PDF
 	 * @param pageNum N&uacute;mero de p&aacute;gina del PDF donde insertar la imagen
 	 *                (la numeraci&oacute;n comienza en 1)
 	 * @param url URL a la que enlazar&aacute; la imagen si queremos que esta sea un hiperv&iacute;nculo
@@ -120,7 +120,7 @@ public final class PdfPreProcessor {
 	/** Sobreimpone una imagen en un documento PDF.
 	 * @param extraParams Datos de la imagen a a&ntilde;adir como <a href="doc-files/extraparams.html">par&aacute;metros adicionales</a>
 	 * @param stp Estampador de PDF, debe abrirse y cerrarse fuera de este m&eacute;todo
-	 * @throws IOException */
+	 * @throws IOException Cuando ocurren errores de entrada / salida */
 	static void addImage(final Properties extraParams, final PdfStamper stp) throws IOException {
 
 		if (extraParams == null || stp == null) {
@@ -168,7 +168,10 @@ public final class PdfPreProcessor {
 
     /** Devuelve la posici&oacute;n de la p&aacute;gina en donde debe agregarse el elemento
      * gr&aacute;fico indicado como prefijo. La medida de posicionamiento es el p&iacute;xel y se cuenta en
-     * el eje horizontal de izquierda a derecha y en el vertical de abajo a arriba. */
+     * el eje horizontal de izquierda a derecha y en el vertical de abajo a arriba.
+     * @param extraParams Definici&oacute;n de las coordenadas como conjunto de propiedades
+     * @param prefix Prefijo de las propiedades de coordenada en el conjunto
+     * @return Rect&aacute;ngulo que define una posici&oacute;n de un elemento en una p&aacute;gina del PDF */
     static Rectangle getPositionOnPage(final Properties extraParams, final String prefix) {
     	if (extraParams == null || prefix == null) {
     		LOGGER.severe("Se ha pedido una posicion para un elemento grafico nulo"); //$NON-NLS-1$
