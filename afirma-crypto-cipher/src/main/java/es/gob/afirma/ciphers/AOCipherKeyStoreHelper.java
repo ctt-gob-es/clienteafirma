@@ -148,12 +148,12 @@ public final class AOCipherKeyStoreHelper {
         }
     }
 
-    /** Carga el almac&eacute;n privado de claves de cifrado de AFirma.
-     * @throws AOException
-     *         Cuando ocurre cualquier problema durante la carga.
-     * @throws IOException
-     *         Cuando se inserta una clave incorrecta.
-     */
+    /** Carga el almac&eacute;n privado de claves de cifrado del Cliente.
+     * @throws AOException Cuando ocurre cualquier problema durante la carga.
+     * @throws IOException Cuando se inserta una clave incorrecta.
+     * @throws NoSuchAlgorithmException Si el JRE en uso no soporta alg&uacute;n algoritmo necesario.
+     * @throws CertificateException Si hay problemas en la codificaci&oacute;n de los certificados.
+     * @throws KeyStoreException Si hay problemas directamente relacionados con el almac&eacute;n de claves. */
     private void loadCipherKeyStore() throws AOException,
                                             IOException,
                                             NoSuchAlgorithmException,
