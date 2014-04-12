@@ -94,39 +94,29 @@ final class GenSignedData {
 
     private ASN1Set signedAttr2;
 
-    /** M&eacute;odo que genera una firma digital usando el sitema conocido como
-     * SignedData y que podr&aacute; ser con el contenido del fichero codificado
+    /** Genera una firma digital usando el sistema conocido como
+     * <code>SignedData</code> y que podr&aacute; ser con el contenido del fichero codificado
      * o s&oacute;lo como referencia del fichero.
-     * @param parameters
-     *        Par&aacute;metros necesarios para obtener los datos de
-     *        SignedData.
-     * @param omitContent
-     *        Par&aacute;metro que indica si en la firma va el contenido del
-     *        fichero o s&oacute;lo va de forma referenciada.
-     * @param applyTimestamp
-     *        Si se aplica el Timestamp o no.
-     * @param dataType
-     *        Identifica el tipo del contenido a firmar.
+     * @param parameters Par&aacute;metros necesarios para obtener los datos de
+     *                   <code>SignedData</code>.
+     * @param omitContent Par&aacute;metro que indica si en la firma va el contenido del
+     *                    fichero o s&oacute;lo va de forma referenciada.
+     * @param applyTimestamp Si se aplica la marca de tiempo o no.
+     * @param dataType Identifica el tipo del contenido a firmar.
      * @param key Clave privada del firmante.
-     * @param atrib
-     *        Atributos firmados opcionales.
-     * @param uatrib
-     *        Atributos no autenticados firmados opcionales.
-     * @param messageDigest
-     *        Hash a aplicar en la firma.
+     * @param certChain Cadena de certificados del firmante.
+     * @param atrib Atributos firmados opcionales.
+     * @param uatrib Atributos no autenticados firmados opcionales.
+     * @param messageDigest Huella digital a aplicar en la firma.
      * @return La firma generada codificada.
-     * @throws java.security.NoSuchAlgorithmException
-     *         Si no se soporta alguno de los algoritmos de firma o huella
-     *         digital
-     * @throws java.security.cert.CertificateException
-     *         Si se produce alguna excepci&oacute;n con los certificados de
-     *         firma.
-     * @throws java.io.IOException
-     *         Cuando ocurre un error durante el proceso de descifrado
-     *         (formato o clave incorrecto,...)
-     * @throws AOException
-     *         Cuando ocurre un error durante el proceso de descifrado
-     *         (formato o clave incorrecto,...) */
+     * @throws java.security.NoSuchAlgorithmException Si no se soporta alguno de los algoritmos de firma o huella
+     *                                                digital
+     * @throws java.security.cert.CertificateException Si se produce alguna excepci&oacute;n con los certificados de
+     *                                                 firma.
+     * @throws java.io.IOException Cuando ocurre un error durante el proceso de descifrado
+     *                             (formato o clave incorrecto,...)
+     * @throws AOException Cuando ocurre un error durante el proceso de descifrado
+     *                     (formato o clave incorrecto,...) */
     byte[] generateSignedData(final P7ContentSignerParameters parameters,
                                      final boolean omitContent,
                                      final boolean applyTimestamp,
@@ -135,7 +125,10 @@ final class GenSignedData {
                                      final java.security.cert.Certificate[] certChain,
                                      final Map<String, byte[]> atrib,
                                      final Map<String, byte[]> uatrib,
-                                     final byte[] messageDigest) throws NoSuchAlgorithmException, CertificateException, IOException, AOException {
+                                     final byte[] messageDigest) throws NoSuchAlgorithmException,
+                                                                        CertificateException,
+                                                                        IOException,
+                                                                        AOException {
 
         if (parameters == null) {
             throw new IllegalArgumentException("Los parametros no pueden ser nulos"); //$NON-NLS-1$
@@ -242,27 +235,22 @@ final class GenSignedData {
 
     }
 
-    /** M&eacute;todo que genera los atributos firmados.
-     * @param digestAlgorithm
-     *        Algoritmo Firmado.
-     * @param datos
-     *        Datos firmados.
-     * @param dataType
-     *        Identifica el tipo del contenido a firmar.
-     * @param timestamp
-     *        Introducir el momento de la firma como atributo firmado (no confundir con un sello de tiempo reconocido)
-     * @param atrib
-     *        Lista de atributos firmados que se insertar&aacute;n dentro
-     *        del archivo de firma.
+    /** Genera los atributos firmados.
+     * @param digestAlgorithm Algoritmo Firmado.
+     * @param datos Datos firmados.
+     * @param dataType Identifica el tipo del contenido a firmar.
+     * @param timestamp Introducir el momento de la firma como atributo firmado (no confundir con un sello de tiempo reconocido)
+     * @param atrib Lista de atributos firmados que se insertar&aacute;n dentro
+     *              del archivo de firma.
+     * @param messageDigest Huella digital.
      * @return Los atributos firmados de la firma.
-     * @throws java.security.NoSuchAlgorithmException */
+     * @throws java.security.NoSuchAlgorithmException Cuando el JRE no soporta alg&uacute;n algoritmo necesario. */
     private ASN1Set generateSignedInfo(final String digestAlgorithm,
                                        final byte[] datos,
                                        final String dataType,
                                        final boolean timestamp,
                                        final Map<String, byte[]> atrib,
                                        final byte[] messageDigest) throws NoSuchAlgorithmException {
-
         // // ATRIBUTOS
 
         // authenticatedAttributes
@@ -343,12 +331,10 @@ final class GenSignedData {
     }
 
     /** Realiza la firma usando los atributos del firmante.
-     * @param signatureAlgorithm
-     *        Algoritmo para la firma
-     * @param keyEntry
-     *        Clave para firmar.
+     * @param signatureAlgorithm Algoritmo para la firma.
+     * @param key Clave para firmar.
      * @return Firma de los atributos.
-     * @throws es.map.es.map.afirma.exceptions.AOException */
+     * @throws AOException Si ocurre cualquier problema durante el proceso */
     private ASN1OctetString firma(final String signatureAlgorithm, final PrivateKey key) throws AOException {
 
         final Signature sig;

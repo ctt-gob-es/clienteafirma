@@ -78,37 +78,26 @@ final class CounterSigner {
     /** Constructor de la clase. Se crea una contrafirma a partir de los datos
      * del firmante, el archivo que se firma y del archivo que contiene las
      * firmas.<br>
-     * @param parameters
-     *        par&aacute;metros necesarios que contienen tanto la firma del
-     *        archivo a firmar como los datos del firmante.
-     * @param data
-     *        Archivo que contiene las firmas.
-     * @param targetType
-     *        Lo que se quiere firmar. Puede ser el &aacute;rbol completo,
-     *        las hojas, un nodo determinado o unos determinados firmantes.
-     * @param targets
-     *        Nodos objetivos a firmar.
+     * @param parameters Par&aacute;metros necesarios que contienen tanto la firma del
+     *                   archivo a firmar como los datos del firmante.
+     * @param data Archivo que contiene las firmas.
+     * @param targetType Lo que se quiere firmar. Puede ser el &aacute;rbol completo,
+     *                   las hojas, un nodo determinado o unos determinados firmantes.
+     * @param targets Nodos objetivos a firmar.
      * @param key Clave privada a usar para firmar.
-     * @param dataType
-     *        Identifica el tipo del contenido a firmar.
-     * @param atri
-     *        Atributo firmado que agregar a la firma.
-     * @param uatri
-     *        Atributo no firmado que agregar a la firma.
+     * @param certChain Cadena de certificados del firmante.
+     * @param dataType Identifica el tipo del contenido a firmar.
+     * @param atri Atributo firmado que agregar a la firma.
+     * @param uatri Atributo no firmado que agregar a la firma.
      * @return El archivo de firmas con la nueva firma.
-     * @throws java.io.IOException
-     *         Si ocurre alg&uacute;n problema leyendo o escribiendo los
-     *         datos
-     * @throws java.security.NoSuchAlgorithmException
-     *         Si no se soporta alguno de los algoritmos de firma o huella
-     *         digital
-     * @throws java.security.cert.CertificateException
-     *         Si se produce alguna excepci&oacute;n con los certificados de
-     *         firma.
-     * @throws AOException
-     *         Cuando ocurre cualquier error no contemplado por el resto de
-     *         las excepciones declaradas
-     */
+     * @throws java.io.IOException Si ocurre alg&uacute;n problema leyendo o escribiendo los
+     *                             datos
+     * @throws java.security.NoSuchAlgorithmException Si no se soporta alguno de los algoritmos de firma o huella
+     *                                                digital.
+     * @throws java.security.cert.CertificateException Si se produce alguna excepci&oacute;n con los certificados de
+     *                                                 firma.
+     * @throws AOException Cuando ocurre cualquier error no contemplado por el resto de
+     *                     las excepciones declaradas */
     byte[] counterSigner(final P7ContentSignerParameters parameters,
                                 final byte[] data,
                                 final CounterSignTarget targetType,
@@ -235,30 +224,28 @@ final class CounterSigner {
 
     /** M&eacute;todo que contrafirma el arbol completo de forma recursiva, todos
      * los dodos creando un nuevo contraSigner.<br>
-     * @param signerInfosRaiz
-     *        Nodo ra&iacute; que contiene todos los signerInfos que se
-     *        deben firmar.
-     * @param parameters
-     *        Par&aacute;metros necesarios para firmar un determinado
-     *        SignerInfo
-     * @param key Clave privada a usar para firmar
+     * @param signerInfosRaiz Nodo ra&iacute; que contiene todos los signerInfos que se
+     *                        deben firmar.
+     * @param parameters Par&aacute;metros necesarios para firmar un determinado
+     *                   <code>SignerInfo</code>.
+     * @param key Clave privada a usar para firmar.
+     * @param certChain Cadena de certificados del firmante.
      * @return El SignerInfo ra&iacute;z con todos sus nodos Contrafirmados.
-     * @throws java.security.NoSuchAlgorithmException
-     *         Si no se soporta alguno de los algoritmos de firma o huella
-     *         digital
-     * @throws java.io.IOException
-     *         Si ocurre alg&uacute;n problema leyendo o escribiendo los
-     *         datos
-     * @throws java.security.cert.CertificateException
-     *         Si se produce alguna excepci&oacute;n con los certificados de
-     *         firma.
-     * @throws es.gob.afirma.exceptions.AOException
-     *         Cuando ocurre un error durante el proceso de contrafirma
-     *         (formato o clave incorrecto,...) */
+     * @throws java.security.NoSuchAlgorithmException Si no se soporta alguno de los algoritmos de firma o huella
+     *                                                digital
+     * @throws java.io.IOException Si ocurre alg&uacute;n problema leyendo o escribiendo los
+     *                             datos
+     * @throws java.security.cert.CertificateException Si se produce alguna excepci&oacute;n con los certificados de
+     *                                                 firma.
+     * @throws AOException Cuando ocurre un error durante el proceso de contrafirma
+     *                     (formato o clave incorrecto,...) */
     private ASN1EncodableVector counterTree(final ASN1Set signerInfosRaiz,
                                             final P7ContentSignerParameters parameters,
                                             final PrivateKey key,
-                                            final java.security.cert.Certificate[] certChain) throws NoSuchAlgorithmException, IOException, CertificateException, AOException {
+                                            final java.security.cert.Certificate[] certChain) throws NoSuchAlgorithmException,
+                                                                                                     IOException,
+                                                                                                     CertificateException,
+                                                                                                     AOException {
 
         final ASN1EncodableVector counterSigners = new ASN1EncodableVector();
 
@@ -273,22 +260,24 @@ final class CounterSigner {
 
     /** M&eacute;todo que contrafirma las hojas del arbol completo de forma
      * recursiva, todos los dodos creando un nuevo contraSigner.<br>
-     * @param signerInfosRaiz
-     *        Nodo ra&iacute; que contiene todos los signerInfos que se
-     *        deben firmar.
-     * @param parameters
-     *        Par&aacute;metros necesarios para firmar un determinado
-     *        SignerInfo hoja.
-     * @param key Clave privada a usar para firmar
+     * @param signerInfosRaiz Nodo ra&iacute; que contiene todos los signerInfos que se
+     *                        deben firmar.
+     * @param parameters Par&aacute;metros necesarios para firmar un determinado
+     *                   <code>SignerInfo</code> hoja.
+     * @param key Clave privada a usar para firmar.
+     * @param certChain Cadena de certificados del firmante.
      * @return El SignerInfo ra&iacute;z con todos sus nodos Contrafirmados.
-     * @throws java.security.NoSuchAlgorithmException
-     * @throws java.io.IOException
-     * @throws java.security.cert.CertificateException
-     * @throws es.map.es.map.afirma.exceptions.AOException */
+     * @throws java.security.NoSuchAlgorithmException Cuando el JRE no soporta alg&uacute;n algoritmo necesario.
+     * @throws java.io.IOException Si hay errores en la lectura de datos.
+     * @throws java.security.cert.CertificateException Si hay problemas en el tratamiento de los certificados.
+     * @throws AOException Si ocurre cualquier otro problema durante el proceso. */
     private ASN1EncodableVector counterLeaf(final ASN1Set signerInfosRaiz,
                                             final P7ContentSignerParameters parameters,
                                             final PrivateKey key,
-                                            final java.security.cert.Certificate[] certChain) throws NoSuchAlgorithmException, IOException, CertificateException, AOException {
+                                            final java.security.cert.Certificate[] certChain) throws NoSuchAlgorithmException,
+                                                                                                     IOException,
+                                                                                                     CertificateException,
+                                                                                                     AOException {
 
         final ASN1EncodableVector counterSigners = new ASN1EncodableVector();
 
@@ -301,26 +290,27 @@ final class CounterSigner {
         return counterSigners;
     }
 
-    /** M&eacute;todo que contrafirma un nodo determinado del arbol buscandolo de
+    /** Contrafirma un nodo determinado del arbol buscandolo de
      * forma recursiva.<br>
-     * @param sd
-     *        SignedData que contiene el Nodo ra&iacute;z.
-     * @param parameters
-     *        Par&aacute;metros necesarios para firmar un determinado
-     *        SignerInfo hoja.
-     * @param key Clave privada a usar para firmar
-     * @param nodo
-     *        Nodo signerInfo a firmar.
+     * @param sd <code>SignedData</code> que contiene el Nodo ra&iacute;z.
+     * @param parameters Par&aacute;metros necesarios para firmar un determinado
+     *                   <code>SignerInfo</code> hoja.
+     * @param key Clave privada a usar para firmar.
+     * @param certChain Cadena de certificados del firmante.
+     * @param nodo Nodo signerInfo a firmar.
      * @return El SignerInfo ra&iacute;z con todos sus nodos Contrafirmados.
-     * @throws java.security.NoSuchAlgorithmException
-     * @throws java.io.IOException
-     * @throws java.security.cert.CertificateException
-     * @throws es.map.es.map.afirma.exceptions.AOException */
+     * @throws java.security.NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario
+     * @throws java.io.IOException Si ocurren problemas durante la lectura de datos
+     * @throws java.security.cert.CertificateException SI ocurren problemas en el tratamiento de los certificados
+     * @throws AOException EN caso de cualquier otro error */
     private ASN1EncodableVector counterNode(final SignedData sd,
                                             final P7ContentSignerParameters parameters,
                                             final PrivateKey key,
                                             final java.security.cert.Certificate[] certChain,
-                                            final int nodo) throws NoSuchAlgorithmException, IOException, CertificateException, AOException {
+                                            final int nodo) throws NoSuchAlgorithmException,
+                                                                   IOException,
+                                                                   CertificateException,
+                                                                   AOException {
 
         final ASN1Set signerInfosRaiz = sd.getSignerInfos();
 
@@ -352,19 +342,17 @@ final class CounterSigner {
 
     /** M&eacute;todo utilizado por la firma del &eacute;rbol para obtener la
      * contrafirma de los signerInfo de forma recursiva.<br>
-     * @param signerInfo
-     *        Nodo ra&iacute; que contiene todos los signerInfos que se
-     *        deben firmar.
-     * @param parameters
-     *        Par&aacute;metros necesarios para firmar un determinado
-     *        SignerInfo hoja.
+     * @param signerInfo Nodo ra&iacute; que contiene todos los signerInfos que se
+     *                   deben firmar.
+     * @param parameters Par&aacute;metros necesarios para firmar un determinado
+     *                   <code>SignerInfo</code> hoja.
      * @param key Clave privada a usar para firmar.
-     * @return El SignerInfo ra&iacute;z parcial con todos sus nodos
-     *         Contrafirmados.
-     * @throws java.security.NoSuchAlgorithmException
-     * @throws java.io.IOException
-     * @throws java.security.cert.CertificateException
-     * @throws es.map.es.map.afirma.exceptions.AOException */
+     * @param certChain Cadena de certificados del firmante.
+     * @return El SignerInfo ra&iacute;z parcial con todos sus nodos contrafirmados.
+     * @throws java.security.NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario
+     * @throws java.io.IOException SI hay problemas en la lectura de datos
+     * @throws java.security.cert.CertificateException Si hay problemas en el tratamiento de los certificados
+     * @throws AOException EN caso de cualquier otro error */
     private SignerInfo getCounterUnsignedAtributes(final SignerInfo signerInfo,
                                                    final P7ContentSignerParameters parameters,
                                                    final PrivateKey key,
@@ -487,20 +475,19 @@ final class CounterSigner {
 
     /** M&eacute;todo utilizado por la firma de una hoja del &eacute;rbol para
      * obtener la contrafirma de los signerInfo de una determinada hoja de forma
-     * recursiva.</br>
-     * @param signerInfo
-     *        Nodo ra&iacute; que contiene todos los signerInfos que se
-     *        deben firmar.
-     * @param parameters
-     *        Par&aacute;metros necesarios para firmar un determinado
-     *        SignerInfo hoja.
-     * @param key Clave privada a usar para firmar
+     * recursiva.
+     * @param signerInfo Nodo ra&iacute; que contiene todos los signerInfos que se
+     *                   deben firmar.
+     * @param parameters Par&aacute;metros necesarios para firmar un determinado
+     *                   <code>SignerInfo</code> hoja.
+     * @param key Clave privada a usar para firmar.
+     * @param certChain Cadena de certificados del firmante.
      * @return El SignerInfo ra&iacute;z parcial con todos sus nodos
      *         Contrafirmados.
-     * @throws java.security.NoSuchAlgorithmException
-     * @throws java.io.IOException
-     * @throws java.security.cert.CertificateException
-     * @throws es.map.es.map.afirma.exceptions.AOException */
+     * @throws java.security.NoSuchAlgorithmException Cuando el JRE no soporta alg&uacute;n algoritmo necesario.
+     * @throws java.io.IOException Si hay errores en la lectura de datos.
+     * @throws java.security.cert.CertificateException Si hay problemas en el tratamiento de los certificados.
+     * @throws AOException Si ocurre cualquier otro problema durante el proceso. */
     private SignerInfo getCounterLeafUnsignedAtributes(final SignerInfo signerInfo,
                                                        final P7ContentSignerParameters parameters,
                                                        final PrivateKey key,
@@ -618,19 +605,18 @@ final class CounterSigner {
     /** M&eacute;todo utilizado por la firma de un nodo del &eacute;rbol para
      * obtener la contrafirma de los signerInfo Sin ser recursivo. Esto es por
      * el caso especial de que puede ser el nodo raiz el nodo a firmar, por lo
-     * que no ser&iacute;a necesario usar la recursividad.</br>
-     * @param signerInfo
-     *        Nodo ra&iacute; que contiene todos los signerInfos que se
-     *        deben firmar.
-     * @param parameters
-     *        Par&aacute;metros necesarios para firmar un determinado
-     *        SignerInfo hoja.
-     * @param key Clave privada a usar para firmar
+     * que no ser&iacute;a necesario usar la recursividad.
+     * @param signerInfo Nodo ra&iacute; que contiene todos los signerInfos que se
+     *                   deben firmar.
+     * @param parameters Par&aacute;metros necesarios para firmar un determinado
+     *                   <code>SignerInfo</code> hoja.
+     * @param key Clave privada a usar para firmar.
+     * @param certChain Cadena de certificados del firmante.
      * @return El SignerInfo ra&iacute;z parcial con todos sus nodos
      *         Contrafirmados.
-     * @throws java.security.NoSuchAlgorithmException
-     * @throws java.io.IOException
-     * @throws java.security.cert.CertificateException */
+     * @throws java.security.NoSuchAlgorithmException Cuando el JRE no soporta alg&uacute;n algoritmo necesario.
+     * @throws java.io.IOException Si hay errores en la lectura de datos.
+     * @throws java.security.cert.CertificateException Si hay problemas en el tratamiento de los certificados. */
     private SignerInfo getCounterNodeUnsignedAtributes(final SignerInfo signerInfo,
                                                        final P7ContentSignerParameters parameters,
                                                        final PrivateKey key,
@@ -744,27 +730,28 @@ final class CounterSigner {
 
     /** M&eacute;todo utilizado por la firma de un nodo del &eacute;rbol para
      * obtener la contrafirma de los signerInfo buscando el nodo de forma
-     * recursiva.</br>
-     * @param signerInfo
-     *        Nodo ra&iacute; que contiene todos los signerInfos que se
-     *        deben firmar.
-     * @param parameters
-     *        Par&aacute;metros necesarios para firmar un determinado
-     *        SignerInfo hoja.
-     * @param key Clave privada a usar para firmar
-     * @param node
-     *        Nodo espec&iacute;fico a firmar.
-     * @return El SignerInfo ra&iacute;z parcial con todos sus nodos
+     * recursiva.
+     * @param signerInfo Nodo ra&iacute; que contiene todos los signerInfos que se
+     *                   deben firmar.
+     * @param parameters Par&aacute;metros necesarios para firmar un determinado
+     *                   <code>SignerInfo</code> hoja.
+     * @param key Clave privada a usar para firmar.
+     * @param certChain Cadena de certificados del firmante.
+     * @param node Nodo espec&iacute;fico a firmar.
+     * @return El <code>SignerInfo</code> ra&iacute;z parcial con todos sus nodos
      *         Contrafirmados.
-     * @throws java.security.NoSuchAlgorithmException
-     * @throws java.io.IOException
-     * @throws java.security.cert.CertificateException
-     * @throws es.map.es.map.afirma.exceptions.AOException */
+     * @throws java.security.NoSuchAlgorithmException Cuando el JRE no soporta alg&uacute;n algoritmo necesario.
+     * @throws java.io.IOException Si hay errores en la lectura de datos.
+     * @throws java.security.cert.CertificateException Si hay problemas en el tratamiento de los certificados.
+     * @throws AOException Si ocurre cualquier otro problema durante el proceso. */
     private SignerInfo getCounterNodeUnsignedAtributes(final SignerInfo signerInfo,
                                                        final P7ContentSignerParameters parameters,
                                                        final PrivateKey key,
                                                        final java.security.cert.Certificate[] certChain,
-                                                       final int node) throws NoSuchAlgorithmException, IOException, CertificateException, AOException {
+                                                       final int node) throws NoSuchAlgorithmException,
+                                                                              IOException,
+                                                                              CertificateException,
+                                                                              AOException {
 
         final List<Object> attributes = new ArrayList<Object>();
         final ASN1EncodableVector signerInfosU = new ASN1EncodableVector();
@@ -866,20 +853,18 @@ final class CounterSigner {
         return counterSigner;
     }
 
-    /** M&eacute;todo que genera la parte que contiene la informaci&oacute;n del
+    /** Genera la parte que contiene la informaci&oacute;n del
      * Usuario. Se generan los atributos que se necesitan para generar la
-     * firma.</br>
-     * @param cert
-     *        Certificado necesario para la firma.
-     * @param digestAlgorithm
-     *        Algoritmo Firmado.
-     * @param datos
-     *        Datos firmados.
+     * firma.
+     * @param cert Certificado necesario para la firma.
+     * @param digestAlgorithm Algoritmo Firmado.
+     * @param datos Datos firmados.
      * @return Los datos necesarios para generar la firma referente a los datos
      *         del usuario.
-     * @throws java.security.NoSuchAlgorithmException */
-    private ASN1Set generateSignerInfo(final X509Certificate cert, final String digestAlgorithm, final byte[] datos) throws NoSuchAlgorithmException {
-
+     * @throws java.security.NoSuchAlgorithmException Cuando el JRE no soporta alg&uacute;n algoritmo necesario. */
+    private ASN1Set generateSignerInfo(final X509Certificate cert,
+    		                           final String digestAlgorithm,
+    		                           final byte[] datos) throws NoSuchAlgorithmException {
         // // ATRIBUTOS
 
         // authenticatedAttributes
@@ -981,18 +966,17 @@ final class CounterSigner {
 
     /** M&eacute;todo que genera un signerInfo espec&iacute;fico utilizando los
      * datos necesarios para crearlo. Se utiliza siempre que no se sabe cual es
-     * el signerInfo que se debe firmar.</br>
-     * @param parameters
-     *        Par&aacute;metros necesarios para firmar un determinado
-     *        SignerInfo hoja.
-     * @param si
-     *        SignerInfo del que se debe recoger la informaci&oacute;n para
-     *        realizar la contrafirma espec&iacute;fica.
-     * @param key Clave privada a usar para firmar
-     * @return El signerInfo contrafirmado.
-     * @throws java.security.NoSuchAlgorithmException
-     * @throws java.io.IOException
-     * @throws java.security.cert.CertificateException */
+     * el signerInfo que se debe firmar.
+     * @param parameters Par&aacute;metros necesarios para firmar un determinado
+     *                   <code>SignerInfo</code> hoja.
+     * @param si <code>SignerInfo</code> del que se debe recoger la informaci&oacute;n para
+     *           realizar la contrafirma espec&iacute;fica.
+     * @param key Clave privada a usar para firmar.
+     * @param certChain Cadena de certificados del firmante.
+     * @return <code>SignerInfo</code> contrafirmado.
+     * @throws java.security.NoSuchAlgorithmException Cuando el JRE no soporta alg&uacute;n algoritmo necesario.
+     * @throws java.io.IOException Si hay errores en la lectura de datos.
+     * @throws java.security.cert.CertificateException Si hay problemas en el tratamiento de los certificados. */
     private SignerInfo unsignedAtributte(final P7ContentSignerParameters parameters,
                                          final SignerInfo si,
                                          final PrivateKey key,
@@ -1037,11 +1021,10 @@ final class CounterSigner {
     }
 
     /** Realiza la firma usando los atributos del firmante.
-     * @param signatureAlgorithm
-     *        Algoritmo para la firma
+     * @param signatureAlgorithm Algoritmo para la firma.
      * @param key Clave para firmar.
      * @return Firma de los atributos.
-     * @throws es.map.es.map.afirma.exceptions.AOException */
+     * @throws AOException EN caso de cualquier error durante el proceso */
     private ASN1OctetString firma(final String signatureAlgorithm, final PrivateKey key) throws AOException {
 
         final Signature sig;

@@ -78,33 +78,23 @@ final class CoSigner {
 
     /** Constructor de la clase. Se crea una cofirma a partir de los datos del
      * firmante, el archivo que se firma y del archivo que contiene las firmas.
-     * @param parameters
-     *        par&aacute;metros necesarios que contienen tanto la firma del
-     *        archivo a firmar como los datos del firmante.
-     * @param sign
-     *        Archivo que contiene las firmas.
-     * @param omitContent
-     *        Si se omite el contenido o no, es decir,si se hace de forma
-     *        Expl&iacute;cita o Impl&iacute;cita.
-     * @param dataType
-     *        Identifica el tipo del contenido a firmar.
+     * @param parameters par&aacute;metros necesarios que contienen tanto la firma del
+     *                   archivo a firmar como los datos del firmante.
+     * @param sign Archivo que contiene las firmas.
+     * @param omitContent Si se omite el contenido o no, es decir,si se hace de forma
+     *                    Expl&iacute;cita o Impl&iacute;cita.
+     * @param dataType Identifica el tipo del contenido a firmar.
      * @param key Clave privada del firmante.
-     * @param atrib
-     *        Atributos firmados opcionales.
-     * @param uatrib
-     *        Atributos no autenticados firmados opcionales.
-     * @param messageDigest
-     *        Hash a aplicar en la firma.
+     * @param certChain Cadena de certificados del firmante
+     * @param atrib Atributos firmados opcionales.
+     * @param uatrib Atributos no autenticados firmados opcionales.
+     * @param messageDigest Hash a aplicar en la firma.
      * @return El archivo de firmas con la nueva firma.
-     * @throws java.io.IOException
-     *         Si ocurre alg&uacute;n problema leyendo o escribiendo los
-     *         datos
+     * @throws java.io.IOException Si ocurre alg&uacute;n problema leyendo o escribiendo los datos
      * @throws java.security.NoSuchAlgorithmException
-     *         Si no se soporta alguno de los algoritmos de firma o huella
-     *         digital
-     * @throws java.security.cert.CertificateException
-     *         Si se produce alguna excepci&oacute;n con los certificados de
-     *         firma. */
+     *         Si no se soporta alguno de los algoritmos de firma o huella digital
+     * @throws java.security.cert.CertificateException Si se produce alguna excepci&oacute;n con
+     *                                                 los certificados de firma. */
     byte[] coSigner(final P7ContentSignerParameters parameters,
                            final byte[] sign,
                            final boolean omitContent,
@@ -257,42 +247,34 @@ final class CoSigner {
 
     /** Constructor de la clase. Se crea una cofirma a partir de los datos del
      * firmante y el archivo que se firma.
-     * @param signatureAlgorithm
-     *        Algoritmo para la firma
-     * @param signerCertificateChain
-     *        Cadena de certificados para la construccion de los parametros
-     *        de firma.
-     * @param sign
-     *        Archivo que contiene las firmas.
-     * @param dataType
-     *        Identifica el tipo del contenido a firmar.
+     * @param signatureAlgorithm Algoritmo para la firma
+     * @param signerCertificateChain Cadena de certificados para la construccion de los parametros
+     *                               de firma.
+     * @param sign Archivo que contiene las firmas.
+     * @param dataType Identifica el tipo del contenido a firmar.
      * @param key Clave privada del firmante.
-     * @param atrib
-     *        Atributos firmados adicionales.
-     * @param uatrib
-     *        Atributos no firmados adicionales.
-     * @param digest
-     *        Hash a aplicar en la firma.
+     * @param atrib Atributos firmados adicionales.
+     * @param uatrib Atributos no firmados adicionales.
+     * @param digest Hash a aplicar en la firma.
      * @return El archivo de firmas con la nueva firma.
-     * @throws java.io.IOException
-     *         Si ocurre alg&uacute;n problema leyendo o escribiendo los
-     *         datos
-     * @throws java.security.NoSuchAlgorithmException
-     *         Si no se soporta alguno de los algoritmos de firma o huella
-     *         digital
-     * @throws java.security.cert.CertificateException
-     *         Si se produce alguna excepci&oacute;n con los certificados de
-     *         firma.
-     * @throws NoContainsDataException Cuando la firma no contiene los datos
-     * 		   ni fue generada con el mismo algoritmo de firma. */
+     * @throws java.io.IOException Si ocurre alg&uacute;n problema leyendo o escribiendo los datos
+     * @throws java.security.NoSuchAlgorithmException Si no se soporta alguno de los algoritmos de
+     *                                                firma o huella digital
+     * @throws java.security.cert.CertificateException Si se produce alguna excepci&oacute;n con
+     *                                                 los certificados de firma.
+     * @throws ContainsNoDataException Cuando la firma no contiene los datos
+     *                                 ni fue generada con el mismo algoritmo de firma. */
     byte[] coSigner(final String signatureAlgorithm,
-                           final X509Certificate[] signerCertificateChain,
-                           final byte[] sign,
-                           final String dataType,
-                           final PrivateKey key,
-                           final Map<String, byte[]> atrib,
-                           final Map<String, byte[]> uatrib,
-                           final byte[] digest) throws IOException, NoSuchAlgorithmException, CertificateException, ContainsNoDataException {
+                    final X509Certificate[] signerCertificateChain,
+                    final byte[] sign,
+                    final String dataType,
+                    final PrivateKey key,
+                    final Map<String, byte[]> atrib,
+                    final Map<String, byte[]> uatrib,
+                    final byte[] digest) throws IOException,
+                                                NoSuchAlgorithmException,
+                                                CertificateException,
+                                                ContainsNoDataException {
 
         byte[] messageDigest = digest != null ? digest.clone() : null;
 
@@ -449,20 +431,18 @@ final class CoSigner {
 
     /** M&eacute;todo que genera la parte que contiene la informaci&oacute;n del
      * Usuario. Se generan los atributos que se necesitan para generar la firma.
-     * @param cert
-     *        Certificado necesario para la firma.
-     * @param digestAlgorithm
-     *        Algoritmo Firmado.
-     * @param datos
-     *        Datos firmados.
-     * @param dataType
-     *        Identifica el tipo del contenido a firmar.
-     * @param atrib
-     *        Lista de atributos firmados que se insertar&aacute;n dentro
-     *        del archivo de firma.
+     * @param digestAlgorithm Algoritmo de huella digital.
+     * @param datos Datos firmados.
+     * @param dataType Identifica el tipo del contenido a firmar.
+     * @param atrib Lista de atributos firmados que se insertar&aacute;n dentro
+     *              del archivo de firma.
      * @return Los atributos firmados de la firma.
-     * @throws java.security.NoSuchAlgorithmException */
-    private ASN1Set generateSignerInfo(final String digestAlgorithm, final byte[] datos, final String dataType, final Map<String, byte[]> atrib) throws NoSuchAlgorithmException {
+     * @throws java.security.NoSuchAlgorithmException Cuando el JRE no soporta alg&uacute;n
+     *                                                algoritmo necesario */
+    private ASN1Set generateSignerInfo(final String digestAlgorithm,
+    		                           final byte[] datos,
+    		                           final String dataType,
+    		                           final Map<String, byte[]> atrib) throws NoSuchAlgorithmException {
 
         // // ATRIBUTOS
 
@@ -504,19 +484,16 @@ final class CoSigner {
     /** M&eacute;todo que genera la parte que contiene la informaci&oacute;n del
      * Usuario. Se generan los atributos que se necesitan para generar la firma.
      * En este caso se introduce el hash directamente.
-     * @param cert
-     *        Certificado necesario para la firma.
-     * @param digestAlgorithm
-     *        Algoritmo Firmado.
-     * @param datos
-     *        Datos firmados.
-     * @param dataType
-     *        Identifica el tipo del contenido a firmar.
-     * @param atrib
-     *        Lista de atributos firmados que se insertar&aacute;n dentro
-     *        del archivo de firma.
-     * @return Los atributos firmados de la firma. */
-    private ASN1Set generateSignerInfoFromHash(final X509Certificate cert, final byte[] datos, final String dataType, final Map<String, byte[]> atrib) {
+     * @param cert Certificado necesario para la firma.
+     * @param datos Datos firmados.
+     * @param dataType Identifica el tipo del contenido a firmar.
+     * @param atrib Lista de atributos firmados que se insertar&aacute;n dentro
+     *              del archivo de firma.
+     * @return Atributos firmados de la firma. */
+    private ASN1Set generateSignerInfoFromHash(final X509Certificate cert,
+    		                                   final byte[] datos,
+    		                                   final String dataType,
+    		                                   final Map<String, byte[]> atrib) {
 
         // // ATRIBUTOS
 
@@ -590,11 +567,10 @@ final class CoSigner {
     }
 
     /** Realiza la firma usando los atributos del firmante.
-     * @param signatureAlgorithm
-     *        Algoritmo para la firma
+     * @param signatureAlgorithm Algoritmo para la firma.
      * @param key Clave para firmar.
      * @return Firma de los atributos.
-     * @throws es.map.es.map.afirma.exceptions.AOException */
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     private ASN1OctetString firma(final String signatureAlgorithm, final PrivateKey key) throws AOException {
 
         final Signature sig;
