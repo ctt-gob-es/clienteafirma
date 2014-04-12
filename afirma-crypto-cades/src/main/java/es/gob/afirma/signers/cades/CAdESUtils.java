@@ -225,7 +225,7 @@ public final class CAdESUtils {
              * SigPolicyId ::= OBJECT IDENTIFIER Politica de firma.
              */
             final DERObjectIdentifier doiSigPolicyId = new DERObjectIdentifier(
-        		policy.getPolicyIdentifier().toLowerCase().replace("urn:oid:", "") //$NON-NLS-1$ //$NON-NLS-2$
+        		policy.getPolicyIdentifier().toLowerCase(Locale.US).replace("urn:oid:", "") //$NON-NLS-1$ //$NON-NLS-2$
     		);
 
             /**
