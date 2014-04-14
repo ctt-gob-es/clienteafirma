@@ -51,7 +51,7 @@ final class ExternalStoresHelper {
 		);
 	}
 
-	private static Map<String, String> addMissingCommonModules(final Map<String, String> externalStores) {
+	private synchronized static Map<String, String> addMissingCommonModules(final Map<String, String> externalStores) {
 		for (final String[] modules : KNOWN_MODULES) {
 			if (!isModuleIncluded(externalStores, modules[1])) {
 				final String modulePath = getWindowsSystemDirWithFinalSlash() + modules[1];
