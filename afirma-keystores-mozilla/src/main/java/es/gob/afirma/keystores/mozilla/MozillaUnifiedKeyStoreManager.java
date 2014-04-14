@@ -51,9 +51,7 @@ public final class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManag
 
 		// Vamos ahora con los almacenes externos, que se limpian antes de usarse quitando DNIe (porque se usa
 		// el controlador Java) y anadiendo modulos conocidos si se encuentran en el sistema.
-		final Map<String, String> externalStores = ExternalStoresHelper.cleanExternalStores(
-			MozillaKeyStoreUtilities.getMozillaPKCS11Modules()
-		);
+		final Map<String, String> externalStores = MozillaKeyStoreUtilities.getMozillaPKCS11Modules(true, true);
 
 		if (externalStores.size() > 0) {
 			final StringBuilder logStr = new StringBuilder("Encontrados los siguientes modulos PKCS#11 externos instalados en Mozilla / Firefox: "); //$NON-NLS-1$

@@ -24,15 +24,18 @@ import java.security.Security;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.script.ScriptEngineManager;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.keystores.mozilla.AOSecMod.ModuleName;
 
 /** Clase con m&eacute;toos de utilidad para la gesti&oacute;n del almac&eacute;n
  * de certificados de Mozilla. */
@@ -48,6 +51,20 @@ final class MozillaKeyStoreUtilities {
 	private static final String AFIRMA_NSS_HOME = "AFIRMA_NSS_HOME"; //$NON-NLS-1$
 
 	private static final String AFIRMA_PROFILES_INI = "AFIRMA_PROFILES_INI"; //$NON-NLS-1$
+
+	private static final String[] DNI_P11_NAMES = new String[] {
+		"libopensc-dnie.dylib", //$NON-NLS-1$
+		"libopensc-dnie.so", //$NON-NLS-1$
+		"usrpkcs11.dll", //$NON-NLS-1$
+		"dnie_p11_priv.dll", //$NON-NLS-1$
+		"dnie_p11_pub.dll", //$NON-NLS-1$
+		"opensc-pkcs11.dll", //$NON-NLS-1$
+	};
+
+	private static final String[][] KNOWN_MODULES = new String[][] {
+		new String[] { "FNMT-RCM CERES (preinstalado)", "FNMT_P11.dll" }, //$NON-NLS-1$ //$NON-NLS-2$
+		new String[] { "Atos CardOS (preinstalado)", "siecap11.dll"    }  //$NON-NLS-1$ //$NON-NLS-2$
+	};
 
 	private MozillaKeyStoreUtilities() {
 		// No permitimos la instanciacion
@@ -368,18 +385,39 @@ final class MozillaKeyStoreUtilities {
 	 * Firefox, indexados por su descripci&oacute;n dentro de una <code>Hashtable</code>.
 	 * @return Nombres de las bibliotecas de los m&oacute;dulos de seguridad de
 	 *         Mozilla / Firefox */
-	synchronized static Map<String, String> getMozillaPKCS11Modules() {
+	synchronized static Map<String, String> getMozillaPKCS11Modules(final boolean excludeDnie,
+			                                                        final boolean includeKnownModules) {
+
+		final Map<String, String> modsByDesc = new Hashtable<String, String>();
+		final List<ModuleName> modules;
 		try {
-			final Map<String, String> modsByDesc = new Hashtable<String, String>();
-			for (final AOSecMod.ModuleName module : AOSecMod.getModules(getMozillaUserProfileDirectory())) {
-				modsByDesc.put(module.getDescription(), module.getLib());
-			}
-			return modsByDesc; // Eliminamos las entradas que usen la misma biblioteca
+			modules =  AOSecMod.getModules(getMozillaUserProfileDirectory());
 		}
 		catch (final Exception t) {
 			LOGGER.severe("No se han podido obtener los modulos externos de Mozilla, se devolvera una lista vacia o unicamente con el DNIe: " + t); //$NON-NLS-1$
 			return new Hashtable<String, String>(0);
 		}
+
+		for (final AOSecMod.ModuleName module : modules) {
+			final String moduleLib =  module.getLib();
+			if (excludeDnie && isDniePkcs11Library(moduleLib)) {
+				continue;
+			}
+			modsByDesc.put(module.getDescription(), moduleLib);
+		}
+
+		if (includeKnownModules) {
+			for (final String[] knownModules : KNOWN_MODULES) {
+				if (!isModuleIncluded(modsByDesc, knownModules[1])) {
+					final String modulePath = getWindowsSystemDirWithFinalSlash() + knownModules[1];
+					if (new File(modulePath).exists()) {
+						modsByDesc.put(knownModules[0], knownModules[1]);
+					}
+				}
+			}
+		}
+
+		return purgeStoresTable(modsByDesc);
 	}
 
 	/** Obtiene el nombre (<i>commonName</i>) de un m&oacute;dulo externo de
@@ -387,12 +425,13 @@ final class MozillaKeyStoreUtilities {
 	 * es dependiente de la implementaci&oacute;n de <code>toString()</code> de
 	 * la clase <code>sun.security.pkcs11.Secmod.Module</code>, ya que no
 	 * podemos acceder directamente al atributo <code>slot</code> por ser de
-	 * tipo <i>friend</i>: <pre>
-	 * public String toString() {
-	 *   return
-	 *   commonName + " (" + type + ", " + libraryName + ", slot " + slot + ")";
+	 * tipo <i>friend</i>:
+	 * <pre>
+	 *  public String toString() {
+	 *    return
+	 *    commonName + " (" + type + ", " + libraryName + ", slot " + slot + ")";
 	 *  }
-	 *  </pre>
+	 * </pre>
 	 * @param description
 	 *        Resultado de una llamada a <code>sun.security.pkcs11.Secmod.Module.toString()</code>
 	 * @return Nombre correspondiente al m&oacute;dulo de seguridad */
@@ -667,4 +706,85 @@ final class MozillaKeyStoreUtilities {
 
 		return p;
 	}
+
+	private static boolean isDniePkcs11Library(final String driverName) {
+		if (driverName == null) {
+			return false;
+		}
+		for (final String libName : DNI_P11_NAMES) {
+			if (driverName.toLowerCase().endsWith(libName)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static String getWindowsSystemDirWithFinalSlash() {
+		// En sistema operativo extrano devulevo cadena vacia
+		if (!Platform.OS.WINDOWS.equals(Platform.getOS())) {
+			return ""; //$NON-NLS-1$
+		}
+		final String winDir = System.getenv("SystemRoot"); //$NON-NLS-1$
+		if (winDir == null) {
+			return ""; //$NON-NLS-1$
+		}
+		// Si java es 64 bits, no hay duda de que Windows es 64 bits y buscamos bibliotecas
+		// de 64 bits
+		if ("64".equals(Platform.getJavaArch())) { //$NON-NLS-1$
+			return winDir + "\\System32\\";  //$NON-NLS-1$
+		}
+		if (new File(winDir + "\\SysWOW64\\").exists()) { //$NON-NLS-1$
+			return winDir + "\\SysWOW64\\"; //$NON-NLS-1$
+		}
+		return winDir + "\\System32\\"; //$NON-NLS-1$
+	}
+
+	private static boolean isModuleIncluded(final Map<String, String> externalStores, final String moduleName) {
+		if (externalStores == null || moduleName == null) {
+			throw new IllegalArgumentException("Ni la lista de almacenes ni el modulo a comprobar pueden ser nulos"); //$NON-NLS-1$
+		}
+		for (final String key : externalStores.keySet()) {
+			if (externalStores.get(key).toLowerCase().endsWith(moduleName.toLowerCase())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/** Dada una tabla que indexa por descripci&oacute;n los m&oacute;dulos
+	 * PKCS#11, elimina las entradas necesarias para que aparezca una
+	 * &uacute;nica vez cada uno de los m&oacute;dulo PKCS#11.
+	 * @param table Tabla con las descripciones de los m&oacute;dulos pkcs11 y las
+	 *              librer&iacute;as asociadas.
+	 * @return Tabla con los duplicados eliminados. */
+	private static synchronized Map<String, String> purgeStoresTable(final Map<String, String> table) {
+
+		if (table == null) {
+			return new Hashtable<String, String>(0);
+		}
+
+		final Map<String, String> purgedTable = new Hashtable<String, String>();
+		final Set<String> revisedLibs = new HashSet<String>();
+
+		String tmpLib;
+		for (final String key : table.keySet()) {
+			tmpLib = table.get(key);
+			if (tmpLib.toLowerCase().endsWith(".dll")) { //$NON-NLS-1$
+				tmpLib = tmpLib.toLowerCase();
+			}
+
+			if (!revisedLibs.contains(tmpLib) && !tmpLib.toLowerCase().contains("nssckbi")) { //$NON-NLS-1$
+				purgedTable.put(key, table.get(key));
+				revisedLibs.add(tmpLib);
+			}
+			else {
+				LOGGER.warning("Se eliminara el modulo '" + key //$NON-NLS-1$
+					+ "' porque ya existe uno con la misma biblioteca o es un modulo de certificados raiz: " //$NON-NLS-1$
+					+ table.get(key));
+			}
+		}
+
+		return purgedTable;
+	}
+
 }
