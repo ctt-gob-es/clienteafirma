@@ -368,7 +368,7 @@ final class MozillaKeyStoreUtilities {
 	 * Firefox, indexados por su descripci&oacute;n dentro de una <code>Hashtable</code>.
 	 * @return Nombres de las bibliotecas de los m&oacute;dulos de seguridad de
 	 *         Mozilla / Firefox */
-	static Map<String, String> getMozillaPKCS11Modules() {
+	synchronized static Map<String, String> getMozillaPKCS11Modules() {
 		try {
 			final Map<String, String> modsByDesc = new Hashtable<String, String>();
 			for (final AOSecMod.ModuleName module : AOSecMod.getModules(getMozillaUserProfileDirectory())) {

@@ -32,7 +32,7 @@ final class ExternalStoresHelper {
 		new String[] { "Atos CardOS (preinstalado)", "siecap11.dll"    }  //$NON-NLS-1$ //$NON-NLS-2$
 	};
 
-	static Map<String, String> cleanExternalStores(final Map<String, String> externalStores) {
+	static synchronized Map<String, String> cleanExternalStores(final Map<String, String> externalStores) {
 		if (externalStores == null) {
 			return new HashMap<String, String>(0);
 		}
@@ -93,7 +93,7 @@ final class ExternalStoresHelper {
 	 * @param table Tabla con las descripciones de los m&oacute;dulos pkcs11 y las
 	 *              librer&iacute;as asociadas.
 	 * @return Tabla con los duplicados eliminados. */
-	private static Map<String, String> purgeStoresTable(final Map<String, String> table) {
+	private static synchronized Map<String, String> purgeStoresTable(final Map<String, String> table) {
 
 		if (table == null) {
 			return new Hashtable<String, String>(0);
