@@ -81,7 +81,7 @@ public final class ObtainContentSignedData {
 	/** M&eacute;todo que obtiene la huella digital de los datos firmados en una firma CMS/CAdES.
 	 * La huella se obtenida estar&aacute; generada con el algoritmo de huella indicado, si este
 	 * algoritmo es el que se utiliz&oacute; en alguna de las operaci&oacute;nes de firma con la
-	 * que se gener&oacute; esta firma. Si no se utiliz&oacute, este algoritmo, se devuelve
+	 * que se gener&oacute; esta firma. Si no se utiliz&oacute; este algoritmo, se devuelve
 	 * {@code null}.
 	 * @param signature Firma de la que obtener la huella digital.
 	 * @param digestAlgorithm Algoritmo con el que se gener&oacute; la huella digital que buscamos.

@@ -35,28 +35,22 @@ public final class SigUtils {
     }
 
     /** M&eacute;todo que devuelve el Identificador del algoritmo.
-     * @param oid
-     *        OID del algoritmo a idenfiticar
+     * @param oid OID del algoritmo a idenfiticar
      * @return El identificador del algoritmo formateado y listo para introducir
      *         en el cms.
-     * @throws java.io.IOException */
+     * @throws java.io.IOException Cuando hay errores de entrada / salida */
     public static AlgorithmIdentifier makeAlgId(final String oid) throws IOException {
         return new AlgorithmIdentifier(new ASN1ObjectIdentifier(oid), DERNull.INSTANCE);
     }
 
     /** Genera un estructura de tipo SET de formato ASN1.
-     * @param derObjects
-     *        Una lista con los objetos a obtener el tipo SET
+     * @param derObjects Una lista con los objetos a obtener el tipo SET
      * @return Un SET de ASN1 con los elementos de la lista introducida. */
     public static ASN1Set createBerSetFromList(final List<ASN1Encodable> derObjects) {
         final ASN1EncodableVector v = new ASN1EncodableVector();
         for (final ASN1Encodable d : derObjects) {
             v.add(d);
         }
-        // Version del blucle para Java 1.4
-        // for (Iterator it = derObjects.iterator(); it.hasNext();) {
-        // v.add((DEREncodable) it.next());
-        // }
         return new BERSet(v);
     }
 

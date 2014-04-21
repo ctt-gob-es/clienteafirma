@@ -12,7 +12,7 @@
  *	M&oacute;dulo de utilidad para la generaci&oacute;n de firmas digitales en formatos derivados de PKCS#7.
  *  No provee ninguna funcionalidad directa a los usuarios (ni siquiera genera firmas en formato PKCS#7),
  *  es un m&oacute;dulo de uso interno por parte de otros m&oacute;dulos.
- *  <p align="center"><img src="doc-files/package-info-1.png"></p>
+ *  <p style="text-align: center;"><img src="doc-files/package-info-1.png" alt="Dependencias de subsistemas"></p>
  *  <p>Este m&oacute;dulo presenta las siguientes dependencias directas de primer nivel:</p>
  *  <ul>
  *   <li>Dependencia con el m&oacute;dulo N&uacute;cleo (<i>afirma-core</i>) del Cliente.</li>
