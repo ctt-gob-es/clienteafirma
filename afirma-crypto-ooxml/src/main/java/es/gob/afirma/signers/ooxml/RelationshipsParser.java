@@ -85,8 +85,8 @@ final class RelationshipsParser {
         return relationsVector.toArray(new Relationship[0]);
     }
 
-    /** Recupera una relaci&oacute;n individual de un nodo Relationship.<br/>
-     * Un nodo Relationship tiene estas propiedades:
+    /** Recupera una relaci&oacute;n individual de un nodo Relationship.
+     * Un nodo <code>Relationship</code> tiene estas propiedades:
      * <ul>
      * <li><b>Nombre:</b> Relationship</li>
      * <li><b>Atributos:</b> id, type y target</li>

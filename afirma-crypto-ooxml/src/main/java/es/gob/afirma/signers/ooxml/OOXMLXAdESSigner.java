@@ -68,14 +68,14 @@ final class OOXMLXAdESSigner {
      * @param certChain Cadena de certificados del firmante
      * @param xParams Par&aacute;metros adicionales de la firma
      * @return XML de firma
-     * @throws ParserConfigurationException
-     * @throws GeneralSecurityException
-     * @throws TransformerException
-     * @throws SAXException
-     * @throws IOException
-     * @throws TransformException
-     * @throws XMLSignatureException
-     * @throws MarshalException */
+     * @throws ParserConfigurationException Si hay problemas con el analizador XML por defecto.
+     * @throws GeneralSecurityException Si ocurre alg&uacute;n problema de seguridad.
+     * @throws TransformerException Si hay problemas con los motores de transformadas.
+     * @throws SAXException Si hay problemas en XML SAX.
+     * @throws IOException Si hay problemas gen&eacute;ricos en el tratamiento de datos.
+     * @throws TransformException Si no se puede aplicar alguna transformaci&oacute;n necesaria.
+     * @throws XMLSignatureException Si hay problemas con la firma XML.
+     * @throws MarshalException Si hay problemas con la envoltura de la firma XML. */
     static byte[] getSignedXML(final byte[] ooXmlDocument,
     		                   final String algorithm,
     						   final PrivateKey pk,
@@ -243,7 +243,6 @@ final class OOXMLXAdESSigner {
 
     /** Escribe un XML como texto.
      * @param node Nodo XML que queremos pasar a texto
-     * @param props Propiedades del XML (<i>version</i>, <i>encoding</i>, <i>standalone</i>)
      * @return Cadena de texto con el XML en forma de array de octetos */
     private static byte[] writeXML(final Node node) {
 
@@ -283,7 +282,6 @@ final class OOXMLXAdESSigner {
         }
     }
 
-    @SuppressWarnings("restriction")
 	private static void writeXMLwithXALAN(final Writer writer, final Node node, final String xmlEncoding) {
         final LSSerializer serializer = ((DOMImplementationLS) node.getOwnerDocument().getImplementation()).createLSSerializer();
         serializer.getDomConfig().setParameter("namespaces", Boolean.FALSE); //$NON-NLS-1$

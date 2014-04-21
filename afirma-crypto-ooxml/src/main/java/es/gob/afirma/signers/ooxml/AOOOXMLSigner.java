@@ -72,9 +72,10 @@ public final class AOOOXMLSigner implements AOSigner {
 
     /** Comprueba que unos datos se adecuen a la estructura b&aacute;sica de un
      * documento OOXML.
-     * @param data Datos que deseamos analizar
+     * @param data Datos que deseamos analizar.
      * @return {@code true} si el documento es un OOXML, {@code false} en caso
-     *         contrario */
+     *         contrario.
+     * @throws IOException Cuando hay problemas en el tratamiento de los datos. */
     private static boolean isOOXMLFile(final byte[] data) throws IOException {
         final ZipFile zipFile = AOFileUtils.createTempZipFile(data);
         final boolean ret = zipFile.getEntry("[Content_Types].xml") != null && (zipFile.getEntry("_rels/.rels") != null || zipFile.getEntry("_rels\\.rels") != null) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -148,7 +149,7 @@ public final class AOOOXMLSigner implements AOSigner {
 
     /** Indica si los datos son un documento OOXML susceptible de ser firmado.
      * @param data Datos a comprobar
-     * @return <cod>true</code> si los datos son un documento OOXML susceptible de ser firmado, <code>false</code> en caso contrario */
+     * @return <code>true</code> si los datos son un documento OOXML susceptible de ser firmado, <code>false</code> en caso contrario */
     @Override
 	public boolean isValidDataFile(final byte[] data) {
         if (data == null) {
@@ -285,13 +286,10 @@ public final class AOOOXMLSigner implements AOSigner {
      * </ul>
      * @param key Clave privada del firmante
      * @param certChain Cadena de certificados del firmante
-     * @param signatureComments Raz&oacute;n de la firma
-     * @param address1 Direcci&oacute;n donde se ha realizado la firma (campo 1)
-     * @param address2 Direcci&oacute;n donde se ha realizado la firma (campo 2)
      * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
      * @return Documento OOXML firmado
      * @throws AOException Cuando ocurre alg&uacute;n error durante el proceso de firma */
-    private static byte[] signOOXML(final byte[] ooXmlDocument,
+    private static byte[] signOOXML(final byte[] ooxmlDocument,
                                     final String algorithm,
                                     final PrivateKey key,
                                     final X509Certificate[] certChain,
@@ -303,8 +301,8 @@ public final class AOOOXMLSigner implements AOSigner {
 
         try {
             return OOXMLZipHelper.outputSignedOfficeOpenXMLDocument(
-        		ooXmlDocument,
-        		OOXMLXAdESSigner.getSignedXML(ooXmlDocument, algorithm, key, certChain, xParams)
+        		ooxmlDocument,
+        		OOXMLXAdESSigner.getSignedXML(ooxmlDocument, algorithm, key, certChain, xParams)
     		);
         }
         catch (final Exception e) {

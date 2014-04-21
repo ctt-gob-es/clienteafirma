@@ -11,7 +11,7 @@
 /** M&oacute;dulo de generaci&oacute;n de firmas digitales Office Open XML (OOXML),
  *  variante de XAdES.
  *  <p>
- *   El m&oacute;dulo genera firmas electr&oacute,nicas en el formato definido en:
+ *   El m&oacute;dulo genera firmas electr&oacute;nicas en el formato definido en:
  *  </p>
  *  <ul>
  *   <li>Microsoft Office 2007</li>
@@ -27,7 +27,7 @@
  *   <li>Microsoft Office 2011 for Mac</li>
  *   <li>Microsoft Office 2013</li>
  *  </ul>
- *  <p align="center"><br><img src="doc-files/package-info-1.png"></p>
+ *  <p style="text-align: center;"><br><img src="doc-files/package-info-1.png" alt="Dependencias de subsistemas"></p>
  *  <p>Este m&oacute;dulo presenta las siguientes dependencias directas de primer nivel:</p>
  *  <ul>
  *   <li>Dependencia con el m&oacute;dulo N&uacute;cleo (<i>afirma-core</i>) del Cliente.</li>
