@@ -132,12 +132,10 @@ final class Utils {
 
     /** Comprueba que el archivo a tratar no es nulo e inicializa la clave de
      * cifrado
-     * @param config
-     *        Configuracion de cifrado
-     * @param certDest
-     *        Certificado
-     * @return Clave secreta
-     * @throws NullPointerException */
+     * @param config Configuraci&oacute;n de cifrado.
+     * @param certDest Certificado.
+     * @param keySize Tama&ntilde;o (en bits) de la clave de cifrado.
+     * @return Clave secreta */
     static SecretKey initEnvelopedData(final AOCipherConfig config, final X509Certificate[] certDest, final Integer keySize) {
         // Comprobamos que el archivo a tratar no sea nulo.
         if (certDest == null || certDest.length == 0) {
@@ -158,7 +156,10 @@ final class Utils {
     /** Asigna la clave para firmar el contenido del fichero que queremos
      * envolver y que m&aacute;s tarde ser&aacute; cifrada con la clave
      * p&uacute;blica del usuario que hace la firma.
-     * @param config configuraci&oacute;n necesaria para crear la clave */
+     * @param config configuraci&oacute;n necesaria para crear la clave.
+     * @param keySize Tama&ntilde;o (en bits) de la clave.
+     * @return Clave asignada
+     * @throws NoSuchAlgorithmException Cuando el JRE no soporta alg&uacute;n algoritmo necesario. */
     private static SecretKey assignKey(final AOCipherConfig config, final Integer keySize) throws NoSuchAlgorithmException {
         final KeyGenerator kg = KeyGenerator.getInstance(config.getAlgorithm().getName());
         if (keySize != null) {
@@ -174,8 +175,9 @@ final class Utils {
      * @param signerCertificateChain
      *        Cadena de certificados firmantes
      * @return ASN1Set
-     * @throws IOException
-     * @throws CertificateEncodingException */
+     * @throws IOException Cuando hay problemas de entrada / salida.
+     * @throws CertificateEncodingException Cuando hay problemas relacionados con la
+     *                                      codificaci&oacute;n de los certificados X.509.*/
     static ASN1Set fetchCertificatesList(final X509Certificate[] signerCertificateChain) throws IOException, CertificateEncodingException {
         if (signerCertificateChain.length != 0) {
             final List<ASN1Encodable> ce = new ArrayList<ASN1Encodable>();
@@ -198,13 +200,12 @@ final class Utils {
      *         datos.
      * @throws CertificateEncodingException Si se produce alguna excepci&oacute;n
      *         con los certificados de los usuarios.
-     * @throws IllegalBlockSizeException
-     * @throws InvalidAlgorithmParameterException
-     * @throws NoSuchPaddingException
-     * @throws NoSuchAlgorithmException
-     * @throws InvalidKeyException
-     * @throws BadPaddingException
-     */
+     * @throws IllegalBlockSizeException Cuando hay problemas internos con los tama&ntilde;os de bloque de cifrado.
+     * @throws InvalidAlgorithmParameterException Si no se soporta un par&aacute;metro necesario para un algoritmo.
+     * @throws NoSuchPaddingException Cuando no se soporta un tipo de relleno necesario.
+     * @throws NoSuchAlgorithmException Cuando el JRE no soporta alg&uacute;n algoritmo necesario.
+     * @throws InvalidKeyException Cuando hay problemas de adecuaci&oacute;n de la clave.
+     * @throws BadPaddingException Cuando hay problemas con un relleno de datos. */
     static Info initVariables(final byte[] data,
     		                  final AOCipherConfig config,
     		                  final X509Certificate[] certDest,
@@ -286,13 +287,13 @@ final class Utils {
      * @param cipherKey
      *        Clave de cifrado
      * @return Un sistema EncryptedContentInfo.
-     * @throws java.security.NoSuchAlgorithmException
-     * @throws javax.crypto.NoSuchPaddingException
-     * @throws java.security.InvalidAlgorithmParameterException
-     * @throws java.security.InvalidKeyException
-     * @throws java.io.IOException
-     * @throws BadPaddingException
-     * @throws IllegalBlockSizeException */
+     * @throws java.security.NoSuchAlgorithmException Cuando el JRE no soporta alg&uacute;n algoritmo necesario.
+     * @throws javax.crypto.NoSuchPaddingException Cuando el JRE no soporta alg&uacute;n tipo de relleno necesario.
+     * @throws java.security.InvalidAlgorithmParameterException Si no se soporta un par&aacute;metro necesario para un algoritmo.
+     * @throws java.security.InvalidKeyException Cuando hay problemas de adecuaci&oacute;n de la clave.
+     * @throws java.io.IOException Cuando hay problemas de entrada / salida.
+     * @throws BadPaddingException Cuando hay problemas con el relleno de datos.
+     * @throws IllegalBlockSizeException Cuando hay problemas con un relleno de datos. */
     static EncryptedContentInfo getEncryptedContentInfo(final byte[] file,
     		                                            final AOCipherConfig config,
     		                                            final SecretKey cipherKey) throws NoSuchAlgorithmException,
@@ -328,14 +329,13 @@ final class Utils {
      * @param config
      *        Configuraci&oacute;n de cifrado.
      * @return Un sistema EncryptedContentInfo.
-     * @throws java.security.NoSuchProviderException
-     * @throws java.security.NoSuchAlgorithmException
-     * @throws javax.crypto.NoSuchPaddingException
-     * @throws java.security.InvalidAlgorithmParameterException
-     * @throws java.security.InvalidKeyException
-     * @throws java.io.IOException
-     * @throws javax.crypto.IllegalBlockSizeException
-     * @throws javax.crypto.BadPaddingException */
+     * @throws java.security.NoSuchAlgorithmException Cuando el JRE no soporta alg&uacute;n algoritmo necesario.
+     * @throws javax.crypto.NoSuchPaddingException Cuando el JRE no soporta alg&uacute;n tipo de relleno necesario.
+     * @throws java.security.InvalidAlgorithmParameterException Si no se soporta un par&aacute;metro necesario para un algoritmo.
+     * @throws java.security.InvalidKeyException Cuando hay problemas de adecuaci&oacute;n de la clave.
+     * @throws java.io.IOException Cuando hay problemas de entrada / salida.
+     * @throws javax.crypto.IllegalBlockSizeException Cuando hay problemas internos con los tama&ntilde;os de bloque de cifrado.
+     * @throws javax.crypto.BadPaddingException Cuando hay problemas con un relleno de datos. */
     static EncryptedContentInfo getEncryptedContentInfo(final byte[] file,
     		                                            final Key cipherKey,
     		                                            final AOCipherConfig config) throws NoSuchAlgorithmException,
@@ -351,11 +351,15 @@ final class Utils {
         return getEncryptedContentInfo(file, config, params, cipher);
     }
 
-    /** Obtiene el contenido de un archivo encriptado
+    /** Obtiene el contenido de un archivo encriptado.
      * @param file Archivo con los datos
      * @param config Configuracion de cifrado
      * @param params Parametros
-     * @param cipher Encriptador */
+     * @param cipher Encriptador
+     * @return Contenido de un archivo encriptado.
+     * @throws BadPaddingException Cuando hay problemas con un relleno de datos.
+     * @throws IOException Cuando hay problemas con el tratamiento de datos.
+     * @throws IllegalBlockSizeException Cuando hay problemas internos con los tama&ntilde;os de bloque de cifrado. */
     private static EncryptedContentInfo getEncryptedContentInfo(final byte[] file,
     		                                                    final AOCipherConfig config,
     		                                                    final AlgorithmParameterSpec params,
@@ -387,10 +391,10 @@ final class Utils {
 
     /** Crea el cifrador usado para cifrar tanto el fichero como la clave usada
      * para cifrar dicho fichero.
-     * @param algName
-     *        algoritmo utilizado para cifrar.
-     * @throws java.security.NoSuchAlgorithmException
-     * @throws javax.crypto.NoSuchPaddingException */
+     * @param algName algoritmo utilizado para cifrar.
+     * @return Cifrador.
+     * @throws java.security.NoSuchAlgorithmException Cuando el JRE no soporta alg&uacute;n algoritmo necesario.
+     * @throws javax.crypto.NoSuchPaddingException Cuando el JRE no soporta alg&uacute;n tipo de relleno necesario. */
     private static Cipher createCipher(final String algName) throws NoSuchAlgorithmException, NoSuchPaddingException {
         return Cipher.getInstance(algName);
     }
@@ -423,12 +427,11 @@ final class Utils {
      * @param cipherKey
      *        Clave de cifrado
      * @return La clave cifrada en "WRAP_MODE".
-     * @throws java.security.NoSuchAlgorithmException
-     * @throws javax.crypto.NoSuchPaddingException
-     * @throws java.security.InvalidKeyException
-     * @throws java.security.InvalidAlgorithmParameterException
-     * @throws javax.crypto.IllegalBlockSizeException
-     * @throws javax.crypto.BadPaddingException */
+     * @throws java.security.NoSuchAlgorithmException Cuando el JRE no soporta alg&uacute;n algoritmo necesario.
+     * @throws javax.crypto.NoSuchPaddingException Cuando el JRE no soporta alg&uacute;n tipo de relleno necesario.
+     * @throws java.security.InvalidKeyException Cuando hay problemas de adecuaci&oacute;n de la clave.
+     * @throws java.security.InvalidAlgorithmParameterException Si no se soporta un par&aacute;metro necesario para un algoritmo.
+     * @throws javax.crypto.IllegalBlockSizeException Cuando hay problemas internos con los tama&ntilde;os de bloque de cifrado. */
     private static byte[] cipherKey(final PublicKey pKey,
     		                        final SecretKey cipherKey) throws NoSuchAlgorithmException,
                                                                       NoSuchPaddingException,
@@ -440,13 +443,13 @@ final class Utils {
         return cipher.wrap(cipherKey);
     }
 
-    /** Inicializa el context
-     * @param digestAlgorithm
-     * @param datos
-     * @param dataType
-     * @param messageDigest
-     * @return ASN1EncodableVector
-     * @throws NoSuchAlgorithmException */
+    /** Inicializa el contexto.
+     * @param digestAlgorithm Algoritmo de huella digital.
+     * @param datos Datos a firmar o envolver.
+     * @param dataType Tipo de los datos a firmar o envolver.
+     * @param messageDigest Huella digital de los datos a firmar o envolver.
+     * @return ASN1EncodableVector Contexto codificado en ASN.1.
+     * @throws NoSuchAlgorithmException Cuando el JRE no soporta alg&uacute;n algoritmo necesario. */
     static ASN1EncodableVector initContexExpecific(final String digestAlgorithm,
     		                                       final byte[] datos,
     		                                       final String dataType,
@@ -572,15 +575,13 @@ final class Utils {
         return origInfo;
     }
 
-    /** Obtiene los parametros de los certificados
-     * @param userCert
-     *        Certificado del usuario
-     * @param elementRecipient
-     *        Listado de destinatarios
-     * @return EncryptedKeyDatas
-     * @throws AOInvalidRecipientException
-     * @throws IOException
-     * @throws CertificateEncodingException */
+    /** Obtiene los par&aacute;metros de los certificados.
+     * @param userCert Certificado del usuario
+     * @param elementRecipient Listado de destinatarios
+     * @return Par&aacute;metros de los certificados (<code>EncryptedKeyDatas</code>).
+     * @throws AOInvalidRecipientException Si el destinatario es inv&aacute;lido por cualquier motivo.
+     * @throws IOException Cuando hay problemas de entrada / salida.
+     * @throws CertificateEncodingException Si hay problemas con la codificaci&oacute;n de los certificados. */
     static EncryptedKeyDatas fetchEncryptedKeyDatas(final X509Certificate userCert,
     		                                        final Enumeration<?> elementRecipient) throws AOInvalidRecipientException,
                                                                                                   IOException,
@@ -630,7 +631,7 @@ final class Utils {
      * @param cmsData
      *        Bytes con los datos
      * @return ASN1Sequence
-     * @throws IOException */
+     * @throws IOException Cuando hay problemas de entrada / salida. */
     static ASN1Sequence fetchWrappedData(final byte[] cmsData) throws IOException {
         // Leemos el fichero que contiene el envoltorio
         final ASN1InputStream is = new ASN1InputStream(cmsData);
@@ -649,21 +650,16 @@ final class Utils {
     }
 
     /** Descifra el contenido a partir de un fichero usando la clave del usuario.
-     * @param file
-     *        Contenido cifrado del sobre digital.
-     * @param config
-     *        Configuracion
-     * @param cipherKey
-     *        Clave de cifrado
+     * @param file Contenido cifrado del sobre digital.
+     * @param config Configuraci&oacute;n de descrifrado.
+     * @param cipherKey Clave de cifrado.
      * @return Conteido descifrado.
-     * @throws java.security.NoSuchAlgorithmException
-     * @throws javax.crypto.NoSuchPaddingException
-     * @throws java.security.InvalidAlgorithmParameterException
-     * @throws java.security.InvalidKeyException
-     * @throws java.io.IOException
-     * @throws org.bouncycastle.cms.CMSException
-     * @throws javax.crypto.IllegalBlockSizeException
-     * @throws javax.crypto.BadPaddingException */
+     * @throws java.security.NoSuchAlgorithmException Cuando el JRE no soporta alg&uacute;n algoritmo necesario.
+     * @throws javax.crypto.NoSuchPaddingException Cuando el JRE no soporta alg&uacute;n tipo de relleno necesario.
+     * @throws java.security.InvalidAlgorithmParameterException Si no se soporta un par&aacute;metro necesario para un algoritmo.
+     * @throws java.security.InvalidKeyException Cuando la clave proporcionada no es v&aacute;lida.
+     * @throws javax.crypto.IllegalBlockSizeException Cuando hay problemas internos con los tama&ntilde;os de bloque de cifrado.
+     * @throws javax.crypto.BadPaddingException Cuando hay problemas con el relleno de datos. */
     static byte[] deCipherContent(final byte[] file,
     		                      final AOCipherConfig config,
     		                      final SecretKey cipherKey) throws NoSuchAlgorithmException,
@@ -683,14 +679,12 @@ final class Utils {
         return cipher.doFinal(file);
     }
 
-    /** Carga la clave de cifrado
-     * @param config
-     *        Configuracion
-     * @param key
-     *        Clave
-     * @return Clave secreta
-     * @throws InvalidKeySpecException
-     * @throws NoSuchAlgorithmException */
+    /** Carga la clave de cifrado.
+     * @param config Configuraci&oacute;n.
+     * @param key Clave.
+     * @return Clave secreta.
+     * @throws InvalidKeySpecException Cuando hay problemas con la clave proporcionada.
+     * @throws NoSuchAlgorithmException Cuando el JRE no soporta alg&uacute;n algoritmo necesario. */
     static SecretKey loadCipherKey(final AOCipherConfig config, final String key) throws InvalidKeySpecException, NoSuchAlgorithmException {
         return SecretKeyFactory.getInstance(
     		config.getAlgorithm().getName()
@@ -709,9 +703,9 @@ final class Utils {
      * @param algClave
      *        Algoritmo necesario para crear la clave.
      * @return Objeto con la configuracion y la clave de cifrado
-     * @throws NoSuchPaddingException
-     * @throws NoSuchAlgorithmException
-     * @throws InvalidKeyException */
+     * @throws NoSuchPaddingException Cuando el JRE no soporta alg&uacute;n tipo de relleno necesario.
+     * @throws NoSuchAlgorithmException Cuando el JRE no soporta alg&uacute;n algoritmo necesario.
+     * @throws InvalidKeyException Cuando la clave proporcionada no es v&aacute;lida. */
     static KeyAsigned assignKey(final byte[] passCiphered,
     		                    final PrivateKeyEntry keyEntry,
     		                    final AlgorithmIdentifier algClave) throws NoSuchAlgorithmException,
@@ -746,21 +740,15 @@ final class Utils {
         return keyAsigned;
     }
 
-    /** M&eacute;todo que genera la parte que contiene la informaci&oacute;n del
+    /** Genera la parte que contiene la informaci&oacute;n del
      * usuario. Se generan los atributos que se necesitan para generar la firma.
-     * @param digestAlgorithm
-     *        Identifica el algoritmo utilizado firmado.
-     * @param datos
-     *        Datos firmados.
-     * @param dataType
-     *        Identifica el tipo del contenido a firmar.
-     * @param uatrib
-     *        Conjunto de atributos no firmados.
+     * @param digestAlgorithm Identifica el algoritmo utilizado firmado.
+     * @param datos Datos firmados.
+     * @param dataType Identifica el tipo del contenido a firmar.
+     * @param uatrib Conjunto de atributos no firmados.
      * @return Los datos necesarios para generar la firma referente a los datos
      *         del usuario.
-     * @throws java.security.NoSuchAlgorithmException
-     * @throws java.security.cert.CertificateException
-     * @throws java.io.IOException */
+     * @throws java.security.NoSuchAlgorithmException Cuando el JRE no soporta alg&uacute;n algoritmo necesario. */
     static ASN1Set generateSignerInfo(final String digestAlgorithm,
     		                          final byte[] datos,
     		                          final String dataType,
@@ -792,17 +780,14 @@ final class Utils {
     }
 
     /** Obtiene la estructura ASN.1 de firma usando los atributos del firmante.
-     * @param signatureAlgorithm
-     *        Algoritmo para la firma
-     * @param keyEntry
-     *        Clave para firmar.
-     * @param signedAttr2
-     *        Atributos firmados
+     * @param signatureAlgorithm Algoritmo para la firma.
+     * @param keyEntry Clave para firmar.
+     * @param signedAttr2 Atributos firmados.
      * @return Firma de los atributos.
-     * @throws NoSuchAlgorithmException
-     * @throws IOException
-     * @throws InvalidKeyException
-     * @throws SignatureException */
+     * @throws NoSuchAlgorithmException Cuando el JRE no soporta alg&uacute;n algoritmo necesario.
+     * @throws IOException Cuando hay problemas de entrada / salida.
+     * @throws InvalidKeyException Cuando la clave proporcionada no es v&aacute;lida.
+     * @throws SignatureException Cuando hay problemas con la firma PKCS#1. */
     static ASN1OctetString firma(final String signatureAlgorithm,
     		                     final PrivateKeyEntry keyEntry,
     		                     final ASN1Set signedAttr2) throws NoSuchAlgorithmException,

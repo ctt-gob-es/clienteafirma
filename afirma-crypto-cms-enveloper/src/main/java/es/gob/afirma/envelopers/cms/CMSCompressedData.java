@@ -56,7 +56,7 @@ final class CMSCompressedData {
      * @param data
      *        Datos a comprimir
      * @return Tipo CompressedData.
-     * @throws IOException */
+     * @throws IOException En caso de error en la lectura o tratamiento de datos */
     static byte[] genCompressedData(final byte[] data) throws IOException {
 
         // Algoritmo de compresion

@@ -209,7 +209,7 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
      * @param content
      *        Datos que se desean envolver.
      * @return Envoltorio Data.
-     * @throws IOException */
+     * @throws IOException En caso de error en la lectura o tratamiento de datos */
     static byte[] createCMSData(final byte[] content) throws IOException {
 		return CMSData.genData(content);
     }
@@ -231,7 +231,7 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
      * @param content
      *        Datos que se desean envolver.
      * @return Envoltorio Compressed Data.
-     * @throws IOException */
+     * @throws IOException En caso de error en la lectura o tratamiento de datos */
     static byte[] createCMSCompressedData(final byte[] content) throws IOException {
 		return CMSCompressedData.genCompressedData(content);
     }
@@ -247,32 +247,24 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
      * @throws NoSuchAlgorithmException
      *         Cuando el algoritmo de cifrado indicado no est&aacute;
      *         soportado.
-     * @throws IOException
-     */
+     * @throws IOException En caso de error en la lectura o tratamiento de datos */
     byte[] createCMSEncryptedData(final byte[] content, final AOCipherConfig cipherConfig, final Key key) throws NoSuchAlgorithmException, IOException {
 		return CMSEncryptedData.genEncryptedData(content, this.signatureAlgorithm, cipherConfig, key, DATA_TYPE_OID, this.uattrib);
     }
 
-    /** Crea un envoltorio CMS de tipo EnvelopedData.
-     * @param content
-     *        Contenido que se desea ensobrar.
-     * @param ke
-     *        Clave privada del remitente (s&oacute;lo si se quiere indicar
-     *        remitente).
-     * @param cipherConfig
-     *        Configuraci&oacute;n para el cifrado de datos.
-     * @param recipientsCerts
-     *        Destinatarios del sobre electr&oacute;nico.
+    /** Crea un envoltorio CMS de tipo <code>EnvelopedData</code>.
+     * @param content Contenido que se desea ensobrar.
+     * @param ke Clave privada del remitente (s&oacute;lo si se quiere indicar
+     *           remitente).
+     * @param cipherConfig Configuraci&oacute;n para el cifrado de datos.
+     * @param recipientsCerts Destinatarios del sobre electr&oacute;nico.
+     * @param keySize Tama&ntilde;o de la clave AES.
      * @return Envoltorio EnvelopedData.
-     * @throws NoSuchAlgorithmException
-     *         Cuando el algoritmo de cifrado indicado no est&aacute;
-     *         soportado.
-     * @throws IOException
-     *         Error en la escritura de datos.
-     * @throws CertificateEncodingException
-     *         Cuando el certificado del remitente no es v&aacute;lido.
-     * @throws AOException
-     *         Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
+     * @throws NoSuchAlgorithmException Cuando el algoritmo de cifrado indicado no est&aacute;
+     *                                  soportado.
+     * @throws IOException Cuando ocurre un error en la escritura de datos.
+     * @throws CertificateEncodingException Cuando el certificado del remitente no es v&aacute;lido.
+     * @throws AOException Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
      * @throws BadPaddingException Si hay problemas estableciendo el relleno de los datos
      * @throws IllegalBlockSizeException Si no cuadran los tama&ntilde;os de bloque de los algoritmos usados
      * @throws InvalidAlgorithmParameterException Si no se soporta alg&uacute;n par&aacute;metro necesario
@@ -292,7 +284,6 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
                                                                        InvalidAlgorithmParameterException,
                                                                        IllegalBlockSizeException,
                                                                        BadPaddingException {
-
         // Si se establecion un remitente
         if (ke != null) {
             return new CMSEnvelopedData().genEnvelopedData(
@@ -319,25 +310,18 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
     }
 
     /** Crea un envoltorio CMS de tipo SignedAndEnvelopedData.
-     * @param content
-     *        Contenido que se desea ensobrar.
-     * @param ke
-     *        Clave privada del remitente.
-     * @param cipherConfig
-     *        Configuraci&oacute;n para el cifrado de datos.
-     * @param recipientsCerts
-     *        Destinatarios del sobre electr&oacute;nico.
+     * @param content Contenido que se desea ensobrar.
+     * @param ke Clave privada del remitente.
+     * @param cipherConfig Configuraci&oacute;n para el cifrado de datos.
+     * @param recipientsCerts Destinatarios del sobre electr&oacute;nico.
+     * @param keySize Tama&ntilde;o de la clave AES.
      * @return Envoltorio SignedAndEnvelopedData.
-     * @throws NoSuchAlgorithmException
-     *         Cuando el algoritmo de cifrado indicado no est&aacute;
-     *         soportado.
-     * @throws IOException
-     *         Error en la escritura de datos.
-     * @throws CertificateEncodingException
-     *         Cuando el certificado del remitente no es v&aacute;lido.
-     * @throws AOException
-     *         Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
-     * @throws SignatureException
+     * @throws NoSuchAlgorithmException Cuando el algoritmo de cifrado indicado no est&aacute;
+     *                                  soportado.
+     * @throws IOException Error en la escritura de datos.
+     * @throws CertificateEncodingException Cuando el certificado del remitente no es v&aacute;lido.
+     * @throws AOException Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
+     * @throws SignatureException Cuando ocurren problemas en la firma PKCS#1.
      * @throws BadPaddingException Si hay problemas estableciendo el relleno de los datos
      * @throws IllegalBlockSizeException Si no cuadran los tama&ntilde;os de bloque de los algoritmos usados
      * @throws InvalidAlgorithmParameterException Si no se soporta alg&uacute;n par&aacute;metro necesario
@@ -359,7 +343,6 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
                                                                                 IllegalBlockSizeException,
                                                                                 BadPaddingException,
                                                                                 SignatureException {
-
         return new CMSSignedAndEnvelopedData().genSignedAndEnvelopedData(
     		AOCMSMultiEnveloper.createContentSignerParementers(content, this.signatureAlgorithm),
     		(X509Certificate[]) ke.getCertificateChain(),
@@ -374,14 +357,11 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
     }
 
     /** Crea un envoltorio CMS de tipo AuthenticatedData.
-     * @param content
-     *        Contenido que se desea ensobrar.
-     * @param ke
-     *        Clave privada del remitente.
-     * @param cipherConfig
-     *        Configuraci&oacute;n para el cifrado de datos.
-     * @param recipientsCerts
-     *        Destinatarios del sobre electr&oacute;nico.
+     * @param content Contenido que se desea ensobrar.
+     * @param ke Clave privada del remitente.
+     * @param cipherConfig Configuraci&oacute;n para el cifrado de datos.
+     * @param recipientsCerts Destinatarios del sobre electr&oacute;nico.
+     * @param keySize Tama&ntilde;o de la clave AES.
      * @return Envoltorio AuthenticatedData.
      * @throws NoSuchAlgorithmException
      *         Cuando el algoritmo de cifrado indicado no est&aacute;
@@ -426,24 +406,17 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
     }
 
     /** Crea un envoltorio CMS de tipo AuthenticatedEnvelopedData.
-     * @param content
-     *        Contenido que se desea ensobrar.
-     * @param ke
-     *        Clave privada del remitente.
-     * @param cipherConfig
-     *        Configuraci&oacute;n para el cifrado de datos.
-     * @param recipientsCerts
-     *        Destinatarios del sobre electr&oacute;nico.
+     * @param content Contenido que se desea ensobrar.
+     * @param ke Clave privada del remitente.
+     * @param cipherConfig Configuraci&oacute;n para el cifrado de datos.
+     * @param recipientsCerts Destinatarios del sobre electr&oacute;nico.
+     * @param keySize Tama&ntilde;o de la clave AES.
      * @return Envoltorio AuthenticatedEnvelopedData.
-     * @throws NoSuchAlgorithmException
-     *         Cuando el algoritmo de cifrado indicado no est&aacute;
-     *         soportado.
-     * @throws IOException
-     *         Error en la escritura de datos.
-     * @throws CertificateEncodingException
-     *         Cuando el certificado del remitente no es v&aacute;lido.
-     * @throws AOException
-     *         Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
+     * @throws NoSuchAlgorithmException Cuando el algoritmo de cifrado indicado no est&aacute;
+     *                                  soportado.
+     * @throws IOException Error en la escritura de datos.
+     * @throws CertificateEncodingException Cuando el certificado del remitente no es v&aacute;lido.
+     * @throws AOException Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
      * @throws InvalidKeyException Si la clave proporcionada no es v&aacute;lida
      * @throws BadPaddingException Si hay problemas estableciendo el relleno de los datos
      * @throws IllegalBlockSizeException Si no cuadran los tama&ntilde;os de bloque de los algoritmos usados
@@ -520,20 +493,17 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
     /** Agrega los datos de un remitente adicional a un envoltorio compatible.
      * Los envoltorios que admiten m&aacute;s de un remitente son:
      * <ul>
-     * <li>Enveloped Data</li>
-     * <li>Authenticated Data</li>
-     * <li>Authenticated And Enveloped Data</li>
-     * <li>Signed And Enveloped Data</li>
+     *   <li>Enveloped Data</li>
+     *   <li>Authenticated Data</li>
+     *   <li>Authenticated And Enveloped Data</li>
+     *   <li>Signed And Enveloped Data</li>
      * </ul>
-     * @param envelop
-     *        Estructura a la que se le desea agregar un remitente.
-     * @param contentInfo
-     *        Tipo de contenido que se desea envolver.
-     * @param ke
-     *        Referencia a la clave privada del certificado del remitente.
-     * @throws AOException
-     *         Cuando ocurrio un error al agregar el remitente a la
-     *         estructura.
+     * @param envelop Estructura a la que se le desea agregar un remitente.
+     * @param contentInfo Tipo de contenido que se desea envolver.
+     * @param ke Referencia a la clave privada del certificado del remitente.
+     * @return Sobre con el remitente a&ntilde;adido.
+     * @throws AOException Cuando ocurre un error al agregar el remitente a la
+     *                     estructura.
      * @throws IOException Cuando ocurre alg&uacute;n error en la lectura de los datos.
      * @throws CertificateEncodingException Cuando el certificado del remitente es inv&aacute;lido
      * @throws IllegalArgumentException
@@ -630,13 +600,13 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
      *         Cuando no se ha indicado un envoltorio soportado.
      * @throws AOException
      *         Cuando se produce un error durante al desenvolver los datos.
-     * @throws NoSuchAlgorithmException
+     * @throws NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario
      * @throws BadPaddingException Si hay problemas estableciendo el relleno de los datos
      * @throws IllegalBlockSizeException Si no cuadran los tama&ntilde;os de bloque de los algoritmos usados
      * @throws InvalidAlgorithmParameterException Si no se soporta alg&uacute;n par&aacute;metro necesario
      *                                            para alg&uacute;n algoritmo
      * @throws NoSuchPaddingException Si no se soporta alg&uacute;n m&eacute;todo de relleno
-     * @throws InvalidKeySpecException */
+     * @throws InvalidKeySpecException Cuando ocurren problemas relacionados con la estructura interna de las claves */
     byte[] recoverData(final byte[] cmsEnvelop) throws InvalidKeyException,
                                                        CertificateEncodingException,
                                                        IOException,
@@ -719,9 +689,9 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
      * @throws InvalidAlgorithmParameterException Si no se soporta alg&uacute;n par&aacute;metro necesario
      *                                            para alg&uacute;n algoritmo
      * @throws NoSuchPaddingException Si no se soporta alg&uacute;n m&eacute;todo de relleno
-     * @throws NoSuchAlgorithmException
-     * @throws IOException
-     * @throws InvalidKeySpecException */
+     * @throws NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario
+     * @throws IOException En caso de error en la lectura o tratamiento de datos
+     * @throws InvalidKeySpecException Cuando ocurren problemas relacionados con la estructura interna de las claves */
     static byte[] recoverCMSEncryptedData(final byte[] encryptedData,
     		                              final String passkey) throws InvalidKeyException,
                                                                        AOException,
@@ -755,7 +725,7 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
      *         destinatarios del sobre.
      * @throws InvalidKeyException Cuando la clave almacenada en el sobre no es v&aacute;lida.
      * @throws NoSuchPaddingException Si no se soporta alg&uacute;n m&eacute;todo de relleno
-     * @throws NoSuchAlgorithmException
+     * @throws NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario
      * @throws BadPaddingException Si hay problemas estableciendo el relleno de los datos
      * @throws IllegalBlockSizeException Si no cuadran los tama&ntilde;os de bloque de los algoritmos usados
      * @throws InvalidAlgorithmParameterException Si no se soporta alg&uacute;n par&aacute;metro necesario
@@ -793,7 +763,7 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
      *         destinatarios del sobre.
      * @throws InvalidKeyException Cuando la clave almacenada en el sobre no es v&aacute;lida.
      * @throws NoSuchPaddingException Si no se soporta alg&uacute;n m&eacute;todo de relleno
-     * @throws NoSuchAlgorithmException
+     * @throws NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario
      * @throws BadPaddingException Si hay problemas estableciendo el relleno de los datos
      * @throws IllegalBlockSizeException Si no cuadran los tama&ntilde;os de bloque de los algoritmos usados
      * @throws InvalidAlgorithmParameterException Si no se soporta alg&uacute;n par&aacute;metro necesario
@@ -825,7 +795,7 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
      *         Cuando ocurre un error durante el proceso de
      *         extracci&oacute;n.
      * @throws InvalidKeyException Cuando la clave almacenada en el sobre no es v&aacute;lida.
-     * @throws NoSuchAlgorithmException
+     * @throws NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario
      * @throws NoSuchPaddingException Si no se soporta alg&uacute;n m&eacute;todo de relleno */
     static byte[] recoverCMSAuthenticatedData(final byte[] authenticatedData,
     		                                  final PrivateKeyEntry ke) throws IOException,
@@ -858,8 +828,8 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
      *         Cuando se indica un certificado que no est&aacute; entre los
      *         destinatarios del sobre.
      * @throws InvalidKeyException Cuando la clave almacenada en el sobre no es v&aacute;lida.
-     * @throws NoSuchPaddingException
-     * @throws NoSuchAlgorithmException
+     * @throws NoSuchPaddingException Cuando no se soporta un tipo de relleno necesario.
+     * @throws NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario
      * @throws BadPaddingException Si hay problemas estableciendo el relleno de los datos
      * @throws IllegalBlockSizeException Si no cuadran los tama&ntilde;os de bloque de los algoritmos usados
      * @throws InvalidAlgorithmParameterException Si no se soporta alg&uacute;n par&aacute;metro necesario

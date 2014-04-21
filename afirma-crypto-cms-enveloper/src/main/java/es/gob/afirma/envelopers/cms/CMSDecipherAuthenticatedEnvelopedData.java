@@ -58,16 +58,14 @@ public final class CMSDecipherAuthenticatedEnvelopedData {
      * @throws AOException
      *         Cuando ocurre un error durante el proceso de descifrado
      *         (formato o clave incorrecto,...)
-     * @throws AOInvalidRecipientException
-     *         Cuando se indica un certificado que no est&aacute; entre los
-     *         destinatarios del sobre.
-     * @throws InvalidKeyException
-     *         Cuando la clave almacenada en el sobre no es v&aacute;lida.
-     * @throws NoSuchPaddingException
-     * @throws NoSuchAlgorithmException
-     * @throws BadPaddingException
-     * @throws IllegalBlockSizeException
-     * @throws InvalidAlgorithmParameterException */
+     * @throws AOInvalidRecipientException Cuando se indica un certificado que no est&aacute; entre los
+     *                                     destinatarios del sobre.
+     * @throws InvalidKeyException Cuando la clave almacenada en el sobre no es v&aacute;lida.
+     * @throws NoSuchPaddingException Cuando no se soporta un tipo de relleno necesario.
+     * @throws NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario
+     * @throws BadPaddingException Cuando hay problemas con un relleno de datos.
+     * @throws IllegalBlockSizeException Cuando hay problemas internos con los tama&ntilde;os de bloque de cifrado.
+     * @throws InvalidAlgorithmParameterException Si no se soporta un par&aacute;metro necesario para un algoritmo. */
     public static byte[] dechiperAuthenticatedEnvelopedData(final byte[] cmsData,
     		                                                final PrivateKeyEntry keyEntry) throws IOException,
                                                                                                    CertificateEncodingException,

@@ -71,31 +71,22 @@ final class CoSignerEnveloped {
 
     /** Constructor de la clase. Se crea una cofirma a partir de los datos del
      * firmante, el archivo que se firma y del archivo que contiene las firmas.
-     * @param parameters
-     *        par&aacute;metros necesarios que contienen tanto la firma del
-     *        archivo a firmar como los datos del firmante.
-     * @param sign
-     *        Archivo que contiene las firmas.
-     * @param dataType
-     *        Identifica el tipo del contenido a firmar.
-     * @param keyEntry
-     *        Clave privada del firmante.
-     * @param atrib
-     *        Atributos firmados opcionales.
-     * @param uatrib
-     *        Atributos no autenticados firmados opcionales.
-     * @param messageDigest
-     *        Hash a aplicar en la firma.
+     * @param parameters par&aacute;metros necesarios que contienen tanto la firma del
+     *                   archivo a firmar como los datos del firmante.
+     * @param signerCertificateChain Cadena de certificados del firmante.
+     * @param sign Archivo que contiene las firmas.
+     * @param dataType Identifica el tipo del contenido a firmar.
+     * @param keyEntry Clave privada del firmante.
+     * @param atrib Atributos firmados opcionales.
+     * @param uatrib Atributos no autenticados firmados opcionales.
+     * @param messageDigest Huella digital a aplicar en la firma.
      * @return El archivo de firmas con la nueva firma.
-     * @throws java.io.IOException
-     *         Si ocurre alg&uacute;n problema leyendo o escribiendo los
-     *         datos
-     * @throws java.security.NoSuchAlgorithmException
-     *         Si no se soporta alguno de los algoritmos de firma o huella
-     *         digital
-     * @throws java.security.cert.CertificateException
-     *         Si se produce alguna excepci&oacute;n con los certificados de
-     *         firma. */
+     * @throws java.io.IOException Si ocurre alg&uacute;n problema leyendo o escribiendo los
+     *                             datos
+     * @throws java.security.NoSuchAlgorithmException Si no se soporta alguno de los algoritmos de firma o huella
+     *                                                digital
+     * @throws java.security.cert.CertificateException Si se produce alguna excepci&oacute;n con los certificados de
+     *                                                 firma. */
     byte[] coSigner(final P7ContentSignerParameters parameters,
     		        final X509Certificate[] signerCertificateChain,
                     final byte[] sign,
@@ -404,8 +395,6 @@ final class CoSignerEnveloped {
 
     /** M&eacute;todo que genera la parte que contiene la informaci&oacute;n del
      * Usuario. Se generan los atributos que se necesitan para generar la firma.
-     * @param cert
-     *        Certificado necesario para la firma.
      * @param digestAlgorithm
      *        Algoritmo Firmado.
      * @param datos
@@ -416,7 +405,7 @@ final class CoSignerEnveloped {
      *        Lista de atributos firmados que se insertar&aacute;n dentro
      *        del archivo de firma.
      * @return Los atributos firmados de la firma.
-     * @throws java.security.NoSuchAlgorithmException */
+     * @throws java.security.NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario */
     private ASN1Set generateSignerInfo(final String digestAlgorithm, final byte[] datos, final String dataType, final Map<String, byte[]> atrib) throws NoSuchAlgorithmException {
 
         // // ATRIBUTOS
@@ -460,19 +449,16 @@ final class CoSignerEnveloped {
     /** M&eacute;todo que genera la parte que contiene la informaci&oacute;n del
      * Usuario. Se generan los atributos que se necesitan para generar la firma.
      * En este caso se introduce el hash directamente.
-     * @param cert
-     *        Certificado necesario para la firma.
-     * @param digestAlgorithm
-     *        Algoritmo Firmado.
-     * @param datos
-     *        Datos firmados.
-     * @param dataType
-     *        Identifica el tipo del contenido a firmar.
-     * @param atrib
-     *        Lista de atributos firmados que se insertar&aacute;n dentro
-     *        del archivo de firma.
+     * @param cert Certificado necesario para la firma.
+     * @param datos Datos firmados.
+     * @param dataType Identifica el tipo del contenido a firmar.
+     * @param atrib Lista de atributos firmados que se insertar&aacute;n dentro
+     *              del archivo de firma.
      * @return Los atributos firmados de la firma. */
-    private ASN1Set generateSignerInfoFromHash(final X509Certificate cert, final byte[] datos, final String dataType, final Map<String, byte[]> atrib) {
+    private ASN1Set generateSignerInfoFromHash(final X509Certificate cert,
+    		                                   final byte[] datos,
+    		                                   final String dataType,
+    		                                   final Map<String, byte[]> atrib) {
 
         // // ATRIBUTOS
 
@@ -546,15 +532,13 @@ final class CoSignerEnveloped {
     }
 
     /** Realiza la firma usando los atributos del firmante.
-     * @param signatureAlgorithm
-     *        Algoritmo para la firma
-     * @param keyEntry
-     *        Clave para firmar.
+     * @param signatureAlgorithm Algoritmo para la firma.
+     * @param keyEntry Clave para firmar.
      * @return Firma de los atributos.
-     * @throws InvalidKeyException
-     * @throws NoSuchAlgorithmException
-     * @throws IOException
-     * @throws SignatureException */
+     * @throws InvalidKeyException Cuando hay problemas de adecuaci&oacute;n de la clave.
+     * @throws NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario
+     * @throws IOException Cuando hay problemas de entrada / salida.
+     * @throws SignatureException  Cuando ocurren problemas en la firma PKCS#1 */
     private ASN1OctetString firma(final String signatureAlgorithm,
     		                      final PrivateKeyEntry keyEntry) throws InvalidKeyException,
     		                                                             NoSuchAlgorithmException,

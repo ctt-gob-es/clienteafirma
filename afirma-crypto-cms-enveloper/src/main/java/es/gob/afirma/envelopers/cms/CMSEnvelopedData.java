@@ -67,34 +67,27 @@ public final class CMSEnvelopedData {
      * mostrarla directamente al usuario. */
     private SecretKey cipherKey;
 
-    /** M&eacute;todo que genera la firma de tipo EnvelopedData.
-     * @param parameters
-     *        Par&aacute;metros necesarios para la generaci&oacute;n de este
-     *        tipo.
-     * @param config
-     *        Configuraci&oacute;n del algoritmo para firmar
-     * @param certDest
-     *        Certificado del destino al cual va dirigido la firma.
-     * @param dataType
-     *        Identifica el tipo del contenido a firmar.
-     * @param uatrib
-     *        Conjunto de atributos no firmados.
+    /** Genera una estructura PKCS#7 <code>EnvelopedData</code>.
+     * @param parameters Par&aacute;metros necesarios para la generaci&oacute;n de este
+     *                   tipo.
+     * @param signerCertificateChain Cadena de certificados del firmante.
+     * @param config Configuraci&oacute;n del algoritmo para firmar
+     * @param certDest Certificado del destino al cual va dirigido la firma.
+     * @param dataType Identifica el tipo del contenido a firmar.
+     * @param uatrib Conjunto de atributos no firmados.
+     * @param keySize Tama&ntilde;o de la clave AES.
      * @return la firma de tipo EnvelopedData.
-     * @throws java.io.IOException
-     *         Si ocurre alg&uacute;n problema leyendo o escribiendo los
-     *         datos
-     * @throws java.security.cert.CertificateEncodingException
-     *         Si se produce alguna excepci&oacute;n con los certificados de
-     *         firma.
-     * @throws java.security.NoSuchAlgorithmException
-     *         Si no se soporta alguno de los algoritmos de firma o huella
-     *         digital
-     * @throws BadPaddingException
-     * @throws IllegalBlockSizeException
-     * @throws InvalidAlgorithmParameterException
-     * @throws NoSuchPaddingException
-     * @throws InvalidKeyException
-     */
+     * @throws java.io.IOException Si ocurre alg&uacute;n problema leyendo o escribiendo los
+     *                             datos
+     * @throws java.security.cert.CertificateEncodingException Si se produce alguna excepci&oacute;n con los certificados de
+     *                                                         firma.
+     * @throws java.security.NoSuchAlgorithmException Si no se soporta alguno de los algoritmos de firma o huella
+     *                                                digital
+     * @throws BadPaddingException Cuando hay problemas con un relleno de datos.
+     * @throws IllegalBlockSizeException Cuando hay problemas internos con los tama&ntilde;os de bloque de cifrado.
+     * @throws InvalidAlgorithmParameterException Si no se soporta un par&aacute;metro necesario para un algoritmo.
+     * @throws NoSuchPaddingException Cuando no se soporta un tipo de relleno necesario.
+     * @throws InvalidKeyException Cuando hay problemas de adecuaci&oacute;n de la clave. */
     byte[] genEnvelopedData(final P7ContentSignerParameters parameters,
     		                final X509Certificate[] signerCertificateChain,
                             final AOCipherConfig config,
@@ -140,29 +133,24 @@ public final class CMSEnvelopedData {
                                                                                       unprotectedAttrs)).getEncoded(ASN1Encoding.DER);
     }
 
-    /** M&eacute;todo que genera la firma de tipo EnvelopedData.
-     * @param data
-     *        Datos binarios a firmar
-     * @param digestAlg
-     *        Algoritmo de hash
-     * @param config
-     *        Configuraci&oacute;n del algoritmo para firmar
-     * @param certDest
-     *        Certificado del destino al cual va dirigido la firma.
-     * @param dataType
-     *        Identifica el tipo del contenido a firmar.
-     * @param uatrib
-     *        Conjunto de atributos no firmados.
+    /** Genera una estructura PKCS#7 <code>EnvelopedData</code>.
+     * @param data Datos binarios a firmar.
+     * @param digestAlg Algoritmo de huella digital.
+     * @param config Configuraci&oacute;n del algoritmo para firmar.
+     * @param certDest Certificado del destino al cual va dirigido la firma.
+     * @param dataType Identifica el tipo del contenido a firmar.
+     * @param uatrib Conjunto de atributos no firmados.
+     * @param keySize Tama&ntilde;o de la clave AES.
      * @return la firma de tipo EnvelopedData.
-     * @throws java.io.IOException
-     * @throws java.security.cert.CertificateEncodingException
-     * @throws java.security.NoSuchAlgorithmException
-     * @throws BadPaddingException
-     * @throws IllegalBlockSizeException
-     * @throws InvalidAlgorithmParameterException
-     * @throws NoSuchPaddingException
-     * @throws InvalidKeyException
-     */
+     * @throws java.io.IOException En caso de error en la lectura o tratamiento de datos
+     * @throws java.security.cert.CertificateEncodingException Cuando hay problemas relacionados con la
+     *                                                         codificaci&oacute;n de los certificados X.509.
+     * @throws java.security.NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario
+     * @throws BadPaddingException Cuando hay problemas con un relleno de datos.
+     * @throws IllegalBlockSizeException Cuando hay problemas internos con los tama&ntilde;os de bloque de cifrado.
+     * @throws InvalidAlgorithmParameterException Si no se soporta un par&aacute;metro necesario para un algoritmo.
+     * @throws NoSuchPaddingException Cuando no se soporta un tipo de relleno necesario.
+     * @throws InvalidKeyException Cuando hay problemas de adecuaci&oacute;n de la clave. */
     byte[] genEnvelopedData(final byte[] data,
                                    final String digestAlg,
                                    final AOCipherConfig config,

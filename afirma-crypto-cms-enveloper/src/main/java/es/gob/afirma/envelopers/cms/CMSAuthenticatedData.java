@@ -107,38 +107,29 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 		 // No instanciable
 	 }
 
-    /** @param parameters
-     *        Par&aacute;metros necesarios que contienen tanto la firma del
-     *        archivo a firmar como los datos del firmante.
-     * @param autenticationAlgorithm
-     *        Algoritmo para los codigos de autenticaci&oacute;n MAC
-     * @param config
-     *        Configuraci&oacute;n del algoritmo para firmar
-     * @param certDest
-     *        Certificado del destino al cual va dirigido la firma.
-     * @param dataType
-     *        Identifica el tipo del contenido a firmar.
-     * @param applyTimestamp
-     *        Si se aplica el Timestamp o no.
-     * @param atrib
-     *        Atributos firmados opcionales.
-     * @param uatrib
-     *        Atributos no autenticados firmados opcionales.
+    /** Genera una estructura PKCS#7 <code>AuthenticatedData</code>.
+     * @param parameters Par&aacute;metros necesarios que contienen tanto la firma del
+     *                    archivo a firmar como los datos del firmante.
+     * @param signerCertChain Cadena de certificados del firmante.
+     * @param autenticationAlgorithm Algoritmo para los codigos de autenticaci&oacute;n MAC
+     * @param config Configuraci&oacute;n del algoritmo para firmar
+     * @param certDest Certificado del destino al cual va dirigido la firma.
+     * @param dataType Identifica el tipo del contenido a firmar.
+     * @param applyTimestamp Si se aplica el Timestamp o no.
+     * @param atrib Atributos firmados opcionales.
+     * @param uatrib Atributos no autenticados firmados opcionales.
+     * @param keySize Tama&ntilde;o de la clave AES.
      * @return Firma de tipo AuthenticatedData.
-     * @throws IOException
-     *         Si ocurre alg&uacute;n problema leyendo o escribiendo los
-     *         datos
-     * @throws CertificateEncodingException
-     *         Si se produce alguna excepci&oacute;n con los certificados de
-     *         firma.
-     * @throws NoSuchAlgorithmException
-     *         Si no se encuentra un algoritmo v&aacute;lido.
-     * @throws InvalidKeyException
-     * @throws BadPaddingException
-     * @throws IllegalBlockSizeException
-     * @throws InvalidAlgorithmParameterException
-     * @throws NoSuchPaddingException
-     */
+     * @throws IOException Si ocurre alg&uacute;n problema leyendo o escribiendo los
+     *                     datos
+     * @throws CertificateEncodingException Si se produce alguna excepci&oacute;n con los certificados de
+     *                                      firma.
+     * @throws NoSuchAlgorithmException Si no se encuentra un algoritmo v&aacute;lido.
+     * @throws InvalidKeyException Cuando hay problemas de adecuaci&oacute;n de la clave.
+     * @throws BadPaddingException Cuando hay problemas con un relleno de datos.
+     * @throws IllegalBlockSizeException Cuando hay problemas internos con los tama&ntilde;os de bloque de cifrado.
+     * @throws InvalidAlgorithmParameterException Si no se soporta un par&aacute;metro necesario para un algoritmo.
+     * @throws NoSuchPaddingException Cuando no se soporta un tipo de relleno necesario. */
     static byte[] genAuthenticatedData(final P7ContentSignerParameters parameters,
     		                           final X509Certificate[] signerCertChain,
                                        final String autenticationAlgorithm,

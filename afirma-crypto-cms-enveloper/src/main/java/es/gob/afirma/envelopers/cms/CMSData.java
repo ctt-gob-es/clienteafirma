@@ -45,7 +45,7 @@ final class CMSData {
      * @param content
      *        Datos que se desean envolver.
      * @return El envoltorio de tipo data.
-     * @throws IOException */
+     * @throws IOException En caso de error en la lectura o tratamiento de datos */
     static byte[] genData(final byte[] content) throws IOException {
         return new ContentInfo(PKCSObjectIdentifiers.data, new DEROctetString(content)).getEncoded(ASN1Encoding.DER);
     }

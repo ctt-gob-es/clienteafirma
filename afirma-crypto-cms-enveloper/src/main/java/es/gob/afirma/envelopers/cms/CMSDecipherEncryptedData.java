@@ -56,13 +56,13 @@ final class CMSDecipherEncryptedData {
      * @throws InvalidKeyException
      *         Cuando se proporciona una clave incorrecta para el
      *         descifrado.
-     * @throws BadPaddingException
-     * @throws IllegalBlockSizeException
-     * @throws InvalidAlgorithmParameterException
-     * @throws NoSuchPaddingException
-     * @throws NoSuchAlgorithmException
-     * @throws IOException
-     * @throws InvalidKeySpecException */
+     * @throws BadPaddingException Cuando hay problemas con un relleno de datos.
+     * @throws IllegalBlockSizeException Cuando hay problemas internos con los tama&ntilde;os de bloque de cifrado.
+     * @throws InvalidAlgorithmParameterException Si no se soporta un par&aacute;metro necesario para un algoritmo.
+     * @throws NoSuchPaddingException Cuando no se soporta un tipo de relleno necesario.
+     * @throws NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario
+     * @throws IOException En caso de error en la lectura o tratamiento de datos
+     * @throws InvalidKeySpecException Cuando ocurren problemas relacionados con la estructura interna de las claves */
     @SuppressWarnings("unused")
     byte[] dechiperEncryptedData(final byte[] encryptedData, final String pass) throws AOException,
                                                                                        InvalidKeyException,
@@ -121,9 +121,9 @@ final class CMSDecipherEncryptedData {
      *        Algoritmo necesario para crear la clave.
      * @param key
      *        Contrase&ntilde;a que se va a usar para cifrar.
-     * @throws NoSuchAlgorithmException
-     * @throws InvalidKeySpecException
-     * @throws IOException */
+     * @throws NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario
+     * @throws InvalidKeySpecException Cuando ocurren problemas relacionados con la estructura interna de las claves
+     * @throws IOException En caso de error en la lectura o tratamiento de datos */
     private void assignKey(final AlgorithmIdentifier alg, final String key) throws InvalidKeySpecException, NoSuchAlgorithmException, IOException {
 
         // obtenemos el oid del algoritmo.

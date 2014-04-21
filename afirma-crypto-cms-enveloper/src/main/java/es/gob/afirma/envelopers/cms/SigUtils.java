@@ -37,7 +37,7 @@ final class SigUtils {
      *        OID del algoritmo a idenfiticar
      * @return El identificador del algoritmo formateado y listo para introducir
      *         en el cms.
-     * @throws java.io.IOException */
+     * @throws java.io.IOException Cuando hay problemas de entrada / salida. */
     static AlgorithmIdentifier makeAlgId(final String oid) throws IOException {
         return new AlgorithmIdentifier(new ASN1ObjectIdentifier(oid), DERNull.INSTANCE);
     }

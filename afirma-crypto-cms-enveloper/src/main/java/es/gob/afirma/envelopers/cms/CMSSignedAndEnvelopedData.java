@@ -81,38 +81,31 @@ final class CMSSignedAndEnvelopedData {
     private ASN1Set signedAttr2;
 
     /** M&eacute;todo que genera la firma de tipo SignedAndEnvelopedData.
-     * @param parameters
-     *        Par&aacute;metros necesarios para la generaci&oacute;n de este
-     *        tipo.
-     * @param config
-     *        Configuraci&oacute;n del algoritmo para firmar
-     * @param certDest
-     *        Certificado del destino al cual va dirigido la firma.
-     * @param dataType
-     *        Identifica el tipo del contenido a firmar.
-     * @param keyEntry
-     *        Eatrada a la clave privada para firma
-     * @param atrib
-     *        Conjunto de atributos firmados.
-     * @param uatrib
-     *        Conjunto de atributos no firmados.
+     * @param parameters Par&aacute;metros necesarios para la generaci&oacute;n de este
+     *                   tipo.
+     * @param signerCertificateChain Cadena de certificados del firmante.
+     * @param config Configuraci&oacute;n del algoritmo para firmar
+     * @param certDest Certificado del destino al cual va dirigido la firma.
+     * @param dataType Identifica el tipo del contenido a firmar.
+     * @param keyEntry Entrada hacia la clave privada para firma.
+     * @param atrib Conjunto de atributos firmados.
+     * @param uatrib Conjunto de atributos no firmados.
+     * @param keySize Tama&ntilde;o de la clave AES.
      * @return La firma de tipo SignedAndEnvelopedData.
-     * @throws java.io.IOException
-     *         Si ocurre alg&uacute;n problema leyendo o escribiendo los
-     *         datos
+     * @throws java.io.IOException Si ocurre alg&uacute;n problema leyendo o escribiendo los
+     *                             datos
      * @throws java.security.cert.CertificateEncodingException
      *         Si se produce alguna excepci&oacute;n con los certificados de
      *         firma.
      * @throws java.security.NoSuchAlgorithmException
      *         Si no se soporta alguno de los algoritmos de firma o huella
      *         digital
-     * @throws BadPaddingException
-     * @throws IllegalBlockSizeException
-     * @throws InvalidAlgorithmParameterException
-     * @throws NoSuchPaddingException
-     * @throws InvalidKeyException
-     * @throws SignatureException
-     */
+     * @throws BadPaddingException Cuando hay problemas con un relleno de datos.
+     * @throws IllegalBlockSizeException Cuando hay problemas internos con los tama&ntilde;os de bloque de cifrado.
+     * @throws InvalidAlgorithmParameterException Si no se soporta un par&aacute;metro necesario para un algoritmo.
+     * @throws NoSuchPaddingException Cuando no se soporta un tipo de relleno necesario.
+     * @throws InvalidKeyException Cuando hay problemas de adecuaci&oacute;n de la clave.
+     * @throws SignatureException  Cuando ocurren problemas en la firma PKCS#1 */
     byte[] genSignedAndEnvelopedData(final P7ContentSignerParameters parameters,
     		                         final X509Certificate[] signerCertificateChain,
                                      final AOCipherConfig config,
@@ -196,20 +189,15 @@ final class CMSSignedAndEnvelopedData {
     }
 
     /** M&eacute;todo que genera la parte que contiene la informaci&oacute;n del
-     * Usuario. Se generan los atributos que se necesitan para generar la firma.
-     * @param digestAlgorithm
-     *        Algoritmo Firmado.
-     * @param datos
-     *        Datos firmados.
-     * @param dataType
-     *        Identifica el tipo del contenido a firmar.
-     * @param atrib
-     *        Conjunto de atributos firmados.
+     * firmante. Se generan los atributos que se necesitan para generar la firma.
+     * @param cert Certificado del firmante.
+     * @param digestAlgorithm Algoritmo Firmado.
+     * @param datos Datos firmados.
+     * @param dataType Identifica el tipo del contenido a firmar.
+     * @param atrib Conjunto de atributos firmados.
      * @return Los datos necesarios para generar la firma referente a los datos
      *         del usuario.
-     * @throws java.security.NoSuchAlgorithmException
-     * @throws java.security.cert.CertificateException
-     * @throws java.io.IOException */
+     * @throws java.security.NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario */
     private ASN1Set generateSignerInfo(final X509Certificate cert,
     		                           final String digestAlgorithm,
     		                           final byte[] datos,

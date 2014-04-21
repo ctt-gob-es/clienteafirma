@@ -42,31 +42,23 @@ final class CMSDecipherAuthenticatedData {
     private SecretKey cipherKey;
     private AOCipherAlgorithm macAlgorithmConfig;
 
-    /** @param cmsData
-     *        Datos del tipo EnvelopedData.
-     * @param keyEntry
-     *        Clave privada del certificado usado para descifrar el
-     *        contenido.
+    /** Descifra un PKCS#7 <code>AuthenticatedData</code>.
+     * @param cmsData Datos del tipo EnvelopedData.
+     * @param keyEntry Clave privada del certificado usado para descifrar el
+     *                 contenido
      * @return El contenido de una firma de tipo authenticatedData.
-     * @throws IOException
-     *         Si ocurre alg&uacute;n problema leyendo o escribiendo los
-     *         datos
-     * @throws CertificateEncodingException
-     *         Si se produce alguna excepci&oacute;n con los certificados de
-     *         firma.
-     * @throws AOException
-     *         Cuando ocurre un error durante el proceso de descifrado
-     *         (formato o clave incorrecto,...)
-     * @throws AOInvalidRecipientException
-     *         Cuando se indica un certificado que no est&aacute; entre los
-     *         destinatarios del sobre.
-     * @throws InvalidKeyException
-     *         Cuando la clave almacenada en el sobre no es v&aacute;lida.
-     * @throws NoSuchAlgorithmException
-     *         Cuando no se reconozca el algoritmo utilizado para generar el
-     *         c&oacute;digo de autenticaci&oacute;n.
-     * @throws NoSuchPaddingException
-     */
+     * @throws IOException Si ocurre alg&uacute;n problema leyendo o escribiendo los
+     *                     datos
+     * @throws CertificateEncodingException Si se produce alguna excepci&oacute;n con los certificados de
+     *                                      firma.
+     * @throws AOException Cuando ocurre un error durante el proceso de descifrado
+     *                     (formato o clave incorrecto,...)
+     * @throws AOInvalidRecipientException Cuando se indica un certificado que no est&aacute; entre los
+     *                                     destinatarios del sobre.
+     * @throws InvalidKeyException Cuando la clave almacenada en el sobre no es v&aacute;lida.
+     * @throws NoSuchAlgorithmException Cuando no se reconozca el algoritmo utilizado para generar el
+     *                                  c&oacute;digo de autenticaci&oacute;n.
+     * @throws NoSuchPaddingException Cuando no se soporta un tipo de relleno necesario. */
     byte[] decipherAuthenticatedData(final byte[] cmsData, final PrivateKeyEntry keyEntry) throws IOException,
                                                                                      CertificateEncodingException,
                                                                                      AOException,
@@ -116,9 +108,9 @@ final class CMSDecipherAuthenticatedData {
      *        Contrase&ntilde;a que se va a usar para descifrar.
      * @param algClave
      *        Algoritmo necesario para crear la clave.
-     * @throws InvalidKeyException
-     * @throws NoSuchAlgorithmException
-     * @throws NoSuchPaddingException */
+     * @throws InvalidKeyException Cuando hay problemas de adecuaci&oacute;n de la clave.
+     * @throws NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario
+     * @throws NoSuchPaddingException Cuando no se soporta un tipo de relleno necesario. */
     private void assignKey(final byte[] passCiphered,
     		               final PrivateKeyEntry keyEntry,
     		               final AlgorithmIdentifier algClave) throws InvalidKeyException,
@@ -153,8 +145,8 @@ final class CMSDecipherAuthenticatedData {
      * @param algName
      *        algoritmo utilizado para cifrar.
      * @return Cifrador.
-     * @throws java.security.NoSuchAlgorithmException
-     * @throws javax.crypto.NoSuchPaddingException */
+     * @throws java.security.NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario
+     * @throws javax.crypto.NoSuchPaddingException Cuando no se soporta un tipo de relleno necesario. */
     private static Cipher createCipher(final String algName) throws NoSuchAlgorithmException, NoSuchPaddingException {
         return Cipher.getInstance(algName);
     }

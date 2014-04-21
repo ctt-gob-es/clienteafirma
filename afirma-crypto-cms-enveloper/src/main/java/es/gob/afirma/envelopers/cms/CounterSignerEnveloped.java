@@ -77,36 +77,26 @@ final class CounterSignerEnveloped {
     /** Constructor de la clase. Se crea una contrafirma a partir de los datos
      * del firmante, el archivo que se firma y del archivo que contiene las
      * firmas.<br>
-     * @param parameters
-     *        par&aacute;metros necesarios que contienen tanto la firma del
-     *        archivo a firmar como los datos del firmante.
-     * @param data
-     *        Archivo que contiene las firmas.
-     * @param targetType
-     *        Lo que se quiere firmar. Puede ser el &aacute;rbol completo,
-     *        las hojas, un nodo determinado o unos determinados firmantes.
-     * @param targets
-     *        Nodos objetivos a firmar.
-     * @param keyEntry
-     *        Clave privada a usar para firmar.
-     * @param dataType
-     *        Identifica el tipo del contenido a firmar.
-     * @param atri
-     *        Atributo firmado que agregar a la firma.
-     * @param uatri
-     *        Atributo no firmado que agregar a la firma.
+     * @param parameters par&aacute;metros necesarios que contienen tanto la firma del
+     *                   archivo a firmar como los datos del firmante.
+     * @param signerCertificateChain Cadena de certificados del firmante.
+     * @param data Archivo que contiene las firmas.
+     * @param targetType Lo que se quiere firmar. Puede ser el &aacute;rbol completo,
+     *                   las hojas, un nodo determinado o unos determinados firmantes.
+     * @param targets Nodos objetivos a firmar.
+     * @param keyEntry Clave privada a usar para firmar.
+     * @param dataType Identifica el tipo del contenido a firmar.
+     * @param atri Atributo firmado que agregar a la firma.
+     * @param uatri Atributo no firmado que agregar a la firma.
      * @return El archivo de firmas con la nueva firma.
-     * @throws java.io.IOException
-     *         Si ocurre alg&uacute;n problema leyendo o escribiendo los
-     *         datos
-     * @throws java.security.NoSuchAlgorithmException
-     *         Si no se soporta alguno de los algoritmos de firma o huella
-     *         digital
-     * @throws java.security.cert.CertificateException
-     *         Si se produce alguna excepci&oacute;n con los certificados de
-     *         firma.
-     * @throws SignatureException
-     * @throws InvalidKeyException */
+     * @throws java.io.IOException Si ocurre alg&uacute;n problema leyendo o escribiendo los
+     *                             datos
+     * @throws java.security.NoSuchAlgorithmException Si no se soporta alguno de los algoritmos de firma o huella
+     *                                                digital.
+     * @throws java.security.cert.CertificateException Si se produce alguna excepci&oacute;n con los certificados de
+     *                                                 firma.
+     * @throws SignatureException Cuando ocurren problemas en la firma PKCS#1.
+     * @throws InvalidKeyException Cuando hay problemas de adecuaci&oacute;n de la clave. */
     byte[] counterSignerEnveloped(final P7ContentSignerParameters parameters,
     		                      final X509Certificate[] signerCertificateChain,
                                   final byte[] data,
@@ -266,8 +256,8 @@ final class CounterSignerEnveloped {
      * @throws java.security.cert.CertificateException
      *         Si se produce alguna excepci&oacute;n con los certificados de
      *         firma.
-     * @throws SignatureException
-     * @throws InvalidKeyException */
+     * @throws SignatureException Cuando ocurren problemas en la firma PKCS#1.
+     * @throws InvalidKeyException Cuando hay problemas de adecuaci&oacute;n de la clave. */
     private ASN1EncodableVector counterTree(final ASN1Set signerInfosRaiz,
                                             final P7ContentSignerParameters parameters,
                                             final X509Certificate cert,
@@ -296,11 +286,11 @@ final class CounterSignerEnveloped {
      * @param keyEntry
      *        Clave privada a usar para firmar
      * @return El SignerInfo ra&iacute;z con todos sus nodos Contrafirmados.
-     * @throws java.security.NoSuchAlgorithmException
-     * @throws java.io.IOException
-     * @throws java.security.cert.CertificateException
-     * @throws SignatureException
-     * @throws InvalidKeyException */
+     * @throws java.security.NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario
+     * @throws java.io.IOException Cuando hay problemas de entrada / salida.
+     * @throws java.security.cert.CertificateException Cuando hay problemas relacionados con los certificados X.509.
+     * @throws SignatureException Cuando ocurren problemas en la firma PKCS#1.
+     * @throws InvalidKeyException Cuando hay problemas de adecuaci&oacute;n de la clave. */
     private ASN1EncodableVector counterLeaf(final ASN1Set signerInfosRaiz,
                                             final P7ContentSignerParameters parameters,
                                             final X509Certificate cert,
@@ -341,11 +331,11 @@ final class CounterSignerEnveloped {
      * @param nodo
      *        Nodo signerInfo a firmar.
      * @return El SignerInfo ra&iacute;z con todos sus nodos Contrafirmados.
-     * @throws java.security.NoSuchAlgorithmException
-     * @throws java.io.IOException
-     * @throws java.security.cert.CertificateException
-     * @throws SignatureException
-     * @throws InvalidKeyException */
+     * @throws java.security.NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario
+     * @throws java.io.IOException Cuando hay problemas de entrada / salida.
+     * @throws java.security.cert.CertificateException Cuando hay problemas relacionados con los certificados X.509.
+     * @throws SignatureException Cuando ocurren problemas en la firma PKCS#1.
+     * @throws InvalidKeyException Cuando hay problemas de adecuaci&oacute;n de la clave. */
     private ASN1EncodableVector counterNode(final SignedAndEnvelopedData sd,
                                             final P7ContentSignerParameters parameters,
                                             final X509Certificate cert,
@@ -383,23 +373,19 @@ final class CounterSignerEnveloped {
 
     /** M&eacute;todo utilizado por la firma del &eacute;rbol para obtener la
      * contrafirma de los signerInfo de forma recursiva.<br>
-     * @param signerInfo
-     *        Nodo ra&iacute; que contiene todos los signerInfos que se
-     *        deben firmar.
-     * @param parameters
-     *        Par&aacute;metros necesarios para firmar un determinado
-     *        SignerInfo hoja.
-     * @param cert
-     *        Certificado de firma.
-     * @param keyEntry
-     *        Clave privada a usar para firmar.
-     * @return El SignerInfo ra&iacute;z parcial con todos sus nodos
+     * @param signerInfo Nodo ra&iacute; que contiene todos los signerInfos que se
+     *                   deben firmar.
+     * @param parameters Par&aacute;metros necesarios para firmar un determinado
+     *                   <code>SignerInfo</code> hoja.
+     * @param cert Certificado de firma.
+     * @param keyEntry Clave privada a usar para firmar.
+     * @return El <code>SignerInfo</code> ra&iacute;z parcial con todos sus nodos
      *         Contrafirmados.
-     * @throws java.security.NoSuchAlgorithmException
-     * @throws java.io.IOException
-     * @throws java.security.cert.CertificateException
-     * @throws SignatureException
-     * @throws InvalidKeyException */
+     * @throws java.security.NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario
+     * @throws java.io.IOException Cuando hay problemas de entrada / salida.
+     * @throws CertificateException Caundo hay problemas relacionados con los certificados X.509.
+     * @throws InvalidKeyException Cuando la clave proporcionada no es v&aacute;lida.
+     * @throws SignatureException Cuando ocurren problando hay problemas de adecuaci&oacute;n de la clave. */
     private SignerInfo getCounterUnsignedAtributes(final SignerInfo signerInfo,
                                                    final P7ContentSignerParameters parameters,
                                                    final X509Certificate cert,
@@ -408,7 +394,6 @@ final class CounterSignerEnveloped {
                                                                                           CertificateException,
                                                                                           InvalidKeyException,
                                                                                           SignatureException {
-
         final List<Object> attributes = new ArrayList<Object>();
         final ASN1EncodableVector signerInfosU = new ASN1EncodableVector();
         final ASN1EncodableVector signerInfosU2 = new ASN1EncodableVector();
@@ -525,7 +510,7 @@ final class CounterSignerEnveloped {
 
     /** M&eacute;todo utilizado por la firma de una hoja del &eacute;rbol para
      * obtener la contrafirma de los signerInfo de una determinada hoja de forma
-     * recursiva.</br>
+     * recursiva.
      * @param signerInfo
      *        Nodo ra&iacute; que contiene todos los signerInfos que se
      *        deben firmar.
@@ -538,11 +523,11 @@ final class CounterSignerEnveloped {
      *        Clave privada a usar para firmar
      * @return El SignerInfo ra&iacute;z parcial con todos sus nodos
      *         Contrafirmados.
-     * @throws java.security.NoSuchAlgorithmException
-     * @throws java.io.IOException
-     * @throws java.security.cert.CertificateException
-     * @throws SignatureException
-     * @throws InvalidKeyException */
+     * @throws java.security.NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario
+     * @throws java.io.IOException Cuando hay problemas de entrada / salida.
+     * @throws java.security.cert.CertificateException Cuando hay problemas relacionados con los certificados X.509.
+     * @throws SignatureException Cuando ocurren problemas en la firma PKCS#1.
+     * @throws InvalidKeyException Cuando hay problemas de adecuaci&oacute;n de la clave. */
     private SignerInfo getCounterLeafUnsignedAtributes(final SignerInfo signerInfo,
                                                        final P7ContentSignerParameters parameters,
                                                        final X509Certificate cert,
@@ -663,7 +648,7 @@ final class CounterSignerEnveloped {
     /** M&eacute;todo utilizado por la firma de un nodo del &eacute;rbol para
      * obtener la contrafirma de los signerInfo Sin ser recursivo. Esto es por
      * el caso especial de que puede ser el nodo raiz el nodo a firmar, por lo
-     * que no ser&iacute;a necesario usar la recursividad.</br>
+     * que no ser&iacute;a necesario usar la recursividad.
      * @param signerInfo
      *        Nodo ra&iacute; que contiene todos los signerInfos que se
      *        deben firmar.
@@ -676,11 +661,11 @@ final class CounterSignerEnveloped {
      *        Clave privada a usar para firmar
      * @return El SignerInfo ra&iacute;z parcial con todos sus nodos
      *         Contrafirmados.
-     * @throws java.security.NoSuchAlgorithmException
-     * @throws java.io.IOException
-     * @throws java.security.cert.CertificateException
-     * @throws SignatureException
-     * @throws InvalidKeyException */
+     * @throws java.security.NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario
+     * @throws java.io.IOException Cuando hay problemas de entrada / salida.
+     * @throws java.security.cert.CertificateException Cuando hay problemas relacionados con los certificados X.509.
+     * @throws SignatureException Cuando ocurren problemas en la firma PKCS#1.
+     * @throws InvalidKeyException Cuando hay problemas de adecuaci&oacute;n de la clave. */
     private SignerInfo getCounterNodeUnsignedAtributes(final SignerInfo signerInfo,
                                                        final P7ContentSignerParameters parameters,
                                                        final X509Certificate cert,
@@ -799,7 +784,7 @@ final class CounterSignerEnveloped {
 
     /** M&eacute;todo utilizado por la firma de un nodo del &eacute;rbol para
      * obtener la contrafirma de los signerInfo buscando el nodo de forma
-     * recursiva.</br>
+     * recursiva.
      * @param signerInfo
      *        Nodo ra&iacute; que contiene todos los signerInfos que se
      *        deben firmar.
@@ -814,11 +799,11 @@ final class CounterSignerEnveloped {
      *        Nodo espec&iacute;fico a firmar.
      * @return El SignerInfo ra&iacute;z parcial con todos sus nodos
      *         Contrafirmados.
-     * @throws java.security.NoSuchAlgorithmException
-     * @throws java.io.IOException
-     * @throws java.security.cert.CertificateException
-     * @throws SignatureException
-     * @throws InvalidKeyException */
+     * @throws java.security.NoSuchAlgorithmException Cuando el JRE no soporta alg&uacute;n algoritmo necesario.
+     * @throws java.io.IOException Cuando hay problemas de entrada / salida.
+     * @throws java.security.cert.CertificateException Cuando hay problemas relacionados con los certificados X.509.
+     * @throws SignatureException Cuando ocurren problemas en la firma PKCS#1.
+     * @throws InvalidKeyException Cuando hay problemas de adecuaci&oacute;n de la clave. */
     private SignerInfo getCounterNodeUnsignedAtributes(final SignerInfo signerInfo,
                                                        final P7ContentSignerParameters parameters,
                                                        final X509Certificate cert,
@@ -934,7 +919,7 @@ final class CounterSignerEnveloped {
 
     /** M&eacute;todo que genera la parte que contiene la informaci&oacute;n del
      * Usuario. Se generan los atributos que se necesitan para generar la
-     * firma.</br>
+     * firma.
      * @param cert
      *        Certificado necesario para la firma.
      * @param digestAlgorithm
@@ -943,7 +928,7 @@ final class CounterSignerEnveloped {
      *        Datos firmados.
      * @return Los datos necesarios para generar la firma referente a los datos
      *         del usuario.
-     * @throws java.security.NoSuchAlgorithmException */
+     * @throws java.security.NoSuchAlgorithmException Cuando el JRE no soporta alg&uacute;n algoritmo necesario. */
     private ASN1Set generateSignerInfo(final X509Certificate cert, final String digestAlgorithm, final byte[] datos) throws NoSuchAlgorithmException {
 
         // // ATRIBUTOS
@@ -1051,23 +1036,20 @@ final class CounterSignerEnveloped {
 
     /** M&eacute;todo que genera un signerInfo espec&iacute;fico utilizando los
      * datos necesarios para crearlo. Se utiliza siempre que no se sabe cual es
-     * el signerInfo que se debe firmar.</br>
+     * el signerInfo que se debe firmar.
      * @param parameters
      *        Par&aacute;metros necesarios para firmar un determinado
      *        SignerInfo hoja.
-     * @param cert
-     *        Certificado de firma.
-     * @param si
-     *        SignerInfo del que se debe recoger la informaci&oacute;n para
-     *        realizar la contrafirma espec&iacute;fica.
-     * @param keyEntry
-     *        Clave privada a usar para firmar
+     * @param cert Certificado de firma.
+     * @param si SignerInfo del que se debe recoger la informaci&oacute;n para
+     *           realizar la contrafirma espec&iacute;fica.
+     * @param keyEntry Clave privada a usar para firmar
      * @return El signerInfo contrafirmado.
-     * @throws java.security.NoSuchAlgorithmException
-     * @throws java.io.IOException
-     * @throws java.security.cert.CertificateException
-     * @throws SignatureException
-     * @throws InvalidKeyException */
+     * @throws java.security.NoSuchAlgorithmException Cuando el JRE no soporta alg&uacute;n algoritmo necesario.
+     * @throws java.io.IOException Cuando hay errores de entrada / salida.
+     * @throws java.security.cert.CertificateException Cuando hay problemas relacionados con los certificados X.509.
+     * @throws SignatureException Cuando ocurren problemas en la firma PKCS#1.
+     * @throws InvalidKeyException Cuando hay problemas de adecuaci&oacute;n de la clave. */
     private SignerInfo unsignedAtributte(final P7ContentSignerParameters parameters,
     		                             final X509Certificate cert,
     		                             final SignerInfo si,
@@ -1113,10 +1095,10 @@ final class CounterSignerEnveloped {
      * @param keyEntry
      *        Clave para firmar.
      * @return Firma de los atributos.
-     * @throws NoSuchAlgorithmException
-     * @throws IOException
-     * @throws InvalidKeyException
-     * @throws SignatureException */
+     * @throws NoSuchAlgorithmException Cuando el JRE no soporta alg&uacute;n algoritmo necesario.
+     * @throws IOException Cuando hay problemas de entrada / salida.
+     * @throws InvalidKeyException Cuando hay problemas de adecuaci&oacute;n de la clave.
+     * @throws SignatureException Cuando ocurren problemas en la firma PKCS#1. */
     private ASN1OctetString firma(final String signatureAlgorithm,
     		                      final PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException,
     		                                                             IOException,
