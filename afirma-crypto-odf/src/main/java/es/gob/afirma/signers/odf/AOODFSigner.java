@@ -455,7 +455,7 @@ public final class AOODFSigner implements AOSigner {
      * </dl>
      * @return Documento ODF con la nueva firma a&ntilde;adida
      * @throws AOException Cuando ocurre cualquier problema durante el proceso
-     * @throws IOException */
+     * @throws IOException Cuando hay errores de entrada / salida */
     @Override
 	public byte[] cosign(final byte[] data,
                          final byte[] sign,
@@ -483,7 +483,7 @@ public final class AOODFSigner implements AOSigner {
      * </dl>
      * @return Documento ODF con la nueva firma a&ntilde;adida
      * @throws AOException Cuando ocurre cualquier problema durante el proceso
-     * @throws IOException */
+     * @throws IOException Cuando hay errores de entrada / salida */
     @Override
 	public byte[] cosign(final byte[] sign,
                          final String algorithm,
@@ -647,7 +647,7 @@ public final class AOODFSigner implements AOSigner {
 
     /** Indica si los datos son un documento ODF susceptible de ser firmado.
      * @param data Datos a comprobar
-     * @return <cod>true</code> si los datos son un documento ODF susceptible de ser firmado, <code>false</code> en caso contrario */
+     * @return <code>true</code> si los datos son un documento ODF susceptible de ser firmado, <code>false</code> en caso contrario */
     @Override
 	public boolean isValidDataFile(final byte[] data) {
 

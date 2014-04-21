@@ -14,7 +14,7 @@
  *   El m&oacute;dulo es compatible con LibreOffice y OpenOffice.org 3.2 y superiores,
  *   pudiendo opcionalmente generar documentos firmados en formato OpenOffice.org 3.1.
  *  </p>
- *  <p align="center"><br><img src="doc-files/package-info-1.png"></p>
+ *  <p style="text-align: center;"><br><img src="doc-files/package-info-1.png" alt="Dependencias de subsistemas"></p>
  *  <p>Este m&oacute;dulo presenta las siguientes dependencias directas de primer nivel:</p>
  *  <ul>
  *   <li>Dependencia con el m&oacute;dulo N&uacute;cleo (<i>afirma-core</i>) del Cliente.</li>
