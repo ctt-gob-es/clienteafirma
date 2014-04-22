@@ -11,7 +11,7 @@
 /** M&oacute;dulo del Cliente Afirma de gesti&oacute;n de almacenes de certificados en formato X.509 (binario puro o Base64) y PKCS#7.<br>
  * Se trata realmente de un proveedor criptogr&aacute;fico JCE que a&ntilde;ade un nuevo tipo de <code>KeyStore</code> con el nombre <code>PKCS7</code>.
  * Este puede ser usado como si fuese cualquier otro <code>KeyStore</code> del sistema.
- *  <p align="center"><br><img src="doc-files/package-info-1.png"></p>
+ *  <p style="text-align: center;"><br><img src="doc-files/package-info-1.png" alt="Dependencias de subsistemas"></p>
  *  <p>Este m&oacute;dulo presenta las siguientes dependencias directas de primer nivel:</p>
  *  <ul>
  *   <li>Dependencia con el m&oacute;dulo N&uacute;cleo (<i>afirma-core</i>) del Cliente.</li>
@@ -21,6 +21,5 @@
  *  </p>
  *  <p>
  *   Desde este m&oacute;dulo no se realizan llamadas a interfaces gr&aacute;ficas.<br>
- *  </p>
- */
+ *  </p> */
 package es.gob.afirma.keystores.single;
