@@ -66,8 +66,6 @@ import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSSerializer;
 import org.xml.sax.SAXException;
 
-import com.sun.org.apache.xerces.internal.dom.DOMOutputImpl;
-
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.AOUtil;
@@ -142,67 +140,98 @@ public final class AOXMLDSigSigner implements AOSigner {
      *  <i>true</i>, se sigue la siguiente convenci&oacute;n para la firma es estas:
      * </p>
      * <ul>
-     *  <li>Firmas XML Enveloped</li>
-     *  <ul>
-     *   <li>Hoja de estilo con ruta relativa</li>
+     *  <li>Firmas XML <i>Enveloped</i>
      *   <ul>
-     *    <li>No se firma.</li>
+     *    <li>
+     *     Hoja de estilo con ruta relativa
+     *     <ul>
+     *      <li>No se firma.</li>
+     *     </ul>
+     *    </li>
+     *    <li>
+     *     Hola de estilo remota con ruta absoluta
+     *     <ul>
+     *      <li>Se restaura la declaraci&oacute;n de hoja de estilo tal y como estaba en el XML original</li>
+     *      <li>Se firma una referencia (<i>canonicalizada</i>) a esta hoja remota</li>
+     *     </ul>
+     *    </li>
+     *    <li>
+     *     Hoja de estilo empotrada
+     *     <ul>
+     *      <li>Se restaura la declaraci&oacute;n de hoja de estilo tal y como estaba en el XML original</li>
+     *     </ul>
+     *    </li>
      *   </ul>
-     *   <li>Hola de estilo remota con ruta absoluta</li>
+     *  </li>
+     *  <li>
+     *   Firmas XML <i>Externally Detached</i>
      *   <ul>
-     *    <li>Se restaura la declaraci&oacute;n de hoja de estilo tal y como estaba en el XML original.</li>
-     *    <li>Se firma una referencia (canonicalizada) a esta hoja remota.</li>
+     *    <li>
+     *     Hoja de estilo con ruta relativa
+     *     <ul>
+     *      <li>No se firma.</li>
+     *     </ul>
+     *    </li>
+     *    <li>
+     *     Hola de estilo remota con ruta absoluta
+     *     <ul>
+     *      <li>Se firma una referencia (<i>canonicalizada</i>) a esta hoja remota</li>
+     *     </ul>
+     *    </li>
+     *    <li>
+     *     Hoja de estilo empotrada
+     *     <ul>
+     *      <li>No es necesaria ninguna acci&oacute;n</li>
+     *     </ul>
+     *    </li>
      *   </ul>
-     *   <li>Hoja de estilo empotrada</li>
+     *  </li>
+     *  <li>
+     *   Firmas XML <i>Enveloping</i>
      *   <ul>
-     *    <li>Se restaura la declaraci&oacute;n de hoja de estilo tal y como estaba en el XML original.</li>
+     *    <li>
+     *     Hoja de estilo con ruta relativa
+     *     <ul>
+     *      <li>No se firma.</li>
+     *     </ul>
+     *    </li>
+     *    <li>
+     *     Hola de estilo remota con ruta absoluta
+     *     <ul>
+     *      <li>Se firma una referencia (<i>canonicalizada</i>) a esta hoja remota</li>
+     *     </ul>
+     *    </li>
+     *    <li>
+     *     Hoja de estilo empotrada
+     *     <ul>
+     *      <li>No es necesaria ninguna acci&oacute;n</li>
+     *     </ul>
+     *    </li>
      *   </ul>
-     *  </ul>
-     *  <li>Firmas XML Externally Detached</li>
-     *  <ul>
-     *   <li>Hoja de estilo con ruta relativa</li>
+     *  </li>
+     *  <li>
+     *   Firmas XML <i>Internally Detached</i>
      *   <ul>
-     *    <li>No se firma.</li>
+     *    <li>
+     *     Hoja de estilo con ruta relativa
+     *     <ul>
+     *      <li>No se firma.</li>
+     *     </ul>
+     *    </li>
+     *    <li>
+     *     Hola de estilo remota con ruta absoluta
+     *     <ul>
+     *      <li>Se firma una referencia (<i>canonicalizada</i>) a esta hoja remota</li>
+     *     </ul>
+     *    </li>
+     *    <li>
+     *     Hoja de estilo empotrada
+     *     <ul>
+     *      <li>No es necesaria ninguna acci&oacute;n</li>
+     *     </ul>
+     *    </li>
      *   </ul>
-     *   <li>Hola de estilo remota con ruta absoluta</li>
-     *   <ul>
-     *    <li>Se firma una referencia (canonicalizada) a esta hoja remota.</li>
-     *   </ul>
-     *   <li>Hoja de estilo empotrada</li>
-     *   <ul>
-     *    <li>No es necesaria ninguna acci&oacute;n adicional.</li>
-     *   </ul>
-     *  </ul>
-     *  <li>Firmas XML Enveloping</li>
-     *  <ul>
-     *   <li>Hoja de estilo con ruta relativa</li>
-     *   <ul>
-     *    <li>No se firma.</li>
-     *   </ul>
-     *   <li>Hola de estilo remota con ruta absoluta</li>
-     *   <ul>
-     *    <li>Se firma una referencia (canonicalizada) a esta hoja remota.</li>
-     *   </ul>
-     *   <li>Hoja de estilo empotrada</li>
-     *   <ul>
-     *    <li>No es necesaria ninguna acci&oacute;n adicional.</li>
-     *   </ul>
-     *  </ul>
-     *  <li>Firmas XML Internally Detached</li>
-     *  <ul>
-     *   <li>Hoja de estilo con ruta relativa</li>
-     *   <ul>
-     *    <li>No se firma.</li>
-     *   </ul>
-     *   <li>Hola de estilo remota con ruta absoluta</li>
-     *   <ul>
-     *    <li>Se firma una referencia (canonicalizada) a esta hoja remota.</li>
-     *   </ul>
-     *   <li>Hoja de estilo empotrada</li>
-     *   <ul>
-     *    <li>No es necesaria ninguna acci&oacute;n adicional</li>
-     *   </ul>
-     *  </ul>
+     *  </li>
      * </ul>
      * @param data Datos que deseamos firmar.
      * @param algorithm Algoritmo a usar para la firma.
@@ -255,9 +284,9 @@ public final class AOXMLDSigSigner implements AOSigner {
      *   <dd>N&uacute;mero de transformaciones a aplicar al XML antes de firmarlo</dd>
      *  <dt><b><i>xmlTransform</i>n<i>Type</i></b></dt>
      *   <dd>Tipo de la transformaci&oacute;n <i>n</i> (debe ser la URL del algoritmo segun define W3C)</dd>
-     *  <dt><b><i>xmlTransform<i>n</i>Subtype</i></b></dt>
+     *  <dt><b><i>xmlTransform</i>n<i>Subtype</i></b></dt>
      *   <dd>Subtipo de la transformaci&oacute;n <i>n</i> (por ejemplo, "intersect", "subtract" o "union" para XPATH2)</dd>
-     *  <dt><b><i>xmlTransform<i>n</i>Body</i></b></dt>
+     *  <dt><b><i>xmlTransform</i>n<i>Body</i></b></dt>
      *   <dd>Cuerpo de la transformaci&oacute;n <i>n</i></dd>
      *  <dt><b><i>referencesDigestMethod</i></b></dt>
      *   <dd>Algoritmo de huella digital a usar en las referencias XML</dd>
@@ -1685,7 +1714,14 @@ public final class AOXMLDSigSigner implements AOSigner {
     }
 
     /** Realiza la contrafirma de todos los nodos del &aacute;rbol.
-     * @param root Elemento ra&iacute;z del documento xml que contiene las firmas
+     * @param root Elemento ra&iacute;z del documento xml que contiene las firmas.
+     * @param key Clave para la firma.
+     * @param certChain Cadena de certificados del firmante.
+     * @param onlySignningCert Si se establece a <code>true</code> incluye solo el certificado del firmante,
+     *                         si se establece a <code>false</code> incluye la cadena completa.
+     * @param refsDigestMethod Algoritmo a usar en la huella digital de las referencias internas.
+     * @param canonicalizationAlgorithm Algoritmo de <i>canonicalizaci&oacute;n</i> a usar.
+     * @param xmlSignaturePrefix Prefijo del espacio de nombres de XMLDSig.
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     private void countersignTree(final Element root,
                                  final PrivateKey key,
@@ -1716,6 +1752,13 @@ public final class AOXMLDSigSigner implements AOSigner {
 
     /** Realiza la contrafirma de todos los nodos hoja del &aacute;rbol.
      * @param root Elemento ra&iacute;z del documento xml que contiene las firmas
+     * @param key Clave para la firma.
+     * @param certChain Cadena de certificados del firmante.
+     * @param onlySignningCert Si se establece a <code>true</code> incluye solo el certificado del firmante,
+     *                         si se establece a <code>false</code> incluye la cadena completa.
+     * @param refsDigestMethod Algoritmo a usar en la huella digital de las referencias internas.
+     * @param canonicalizationAlgorithm Algoritmo de <i>canonicalizaci&oacute;n</i> a usar.
+     * @param xmlSignaturePrefix Prefijo del espacio de nombres de XMLDSig.
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     private void countersignLeafs(final Element root,
                                   final PrivateKey key,
@@ -1770,8 +1813,15 @@ public final class AOXMLDSigSigner implements AOSigner {
 
     /** Realiza la contrafirma de los nodos indicados en el par&aacute;metro
      * targets.
-     * @param root Elemento raiz del documento xml que contiene las firmas
-     * @param tgts Array con las posiciones de los nodos a contrafirmar
+     * @param root Elemento raiz del documento xml que contiene las firmas.
+     * @param key Clave para la firma.
+     * @param certChain Cadena de certificados del firmante.
+     * @param onlySignningCert Si se establece a <code>true</code> incluye solo el certificado del firmante,
+     *                         si se establece a <code>false</code> incluye la cadena completa.
+     * @param refsDigestMethod Algoritmo a usar en la huella digital de las referencias internas.
+     * @param canonicalizationAlgorithm Algoritmo de <i>canonicalizaci&oacute;n</i> a usar.
+     * @param xmlSignaturePrefix Prefijo del espacio de nombres de XMLDSig.
+     * @param tgts Array con las posiciones de los nodos a contrafirmar.
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     private void countersignNodes(final Element root,
     		final Object[] tgts,
@@ -1862,8 +1912,15 @@ public final class AOXMLDSigSigner implements AOSigner {
 
 	/** Realiza la contrafirma de los firmantes indicados en el par&aacute;metro
      * targets.
-     * @param root Elemento ra&iacute;z del documento xml que contiene las firmas
-     * @param targets Array con el nombre de los firmantes de los nodos a contrafirmar
+     * @param root Elemento ra&iacute;z del documento xml que contiene las firmas.
+     * @param targets Array con el nombre de los firmantes de los nodos a contrafirmar.
+     * @param key Clave para la firma.
+     * @param certChain Cadena de certificados del firmante.
+     * @param onlySignningCert Si se establece a <code>true</code> incluye solo el certificado del firmante,
+     *                         si se establece a <code>false</code> incluye la cadena completa.
+     * @param refsDigestMethod Algoritmo a usar en la huella digital de las referencias internas.
+     * @param canonicalizationAlgorithm Algoritmo de <i>canonicalizaci&oacute;n</i> a usar.
+     * @param xmlSignaturePrefix Prefijo del espacio de nombres de XMLDSig.
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     private void countersignSigners(final Element root,
                                     final Object[] targets,
@@ -1898,7 +1955,8 @@ public final class AOXMLDSigSigner implements AOSigner {
 
     /** Realiza la contrafirma de la firma pasada por par&aacute;metro.
      * @param signature Elemento con el nodo de la firma a contrafirmar
-     * @param key Clave privada de firma
+     * @param key Clave privada de firma.
+     * @param certChain Cadena de certificados del firmante.
      * @param onlySignningCert Indica si debe incluirse solo el certificado de firma o toda la cadena
      * @param refsDigestMethod Algoritmo de huella digital
      * @param canonicalizationAlgorithm Algoritmo de canonicalizaci&oacute;n
@@ -2149,7 +2207,7 @@ public final class AOXMLDSigSigner implements AOSigner {
      * documento pasado por par&aacute;metro.
      * @param docu Documento que estar&aacute; contenido en el nuevo documento
      * @return Documento con ra&iacute;z "AFIRMA"
-     * @throws ParserConfigurationException */
+     * @throws ParserConfigurationException Si hay problemas con el analizador XML por defecto. */
     private static Document insertarNodoAfirma(final Document docu) throws ParserConfigurationException {
 
         // Nueva instancia de DocumentBuilderFactory que permita espacio de
@@ -2215,27 +2273,17 @@ public final class AOXMLDSigSigner implements AOSigner {
         return signInfo;
     }
 
-    /**
-     * Escribe el documento especificado al documento dado. La codificaci&oacute;n por
+    /** Escribe el documento especificado al documento dado. La codificaci&oacute;n por
      * defecto es UTF-8.
-     * @param writer
-     *
-     *
-     * @param out
-     *            the output File
-     * @param document
-     *            the document to be writen
-     *
-     */
+     * @param writer Clase para la escritura.
+     * @param node Nodo ra&iacute;z del XML. */
     private static void writeXML(final Writer writer, final Node node) {
         final Document document = node.getOwnerDocument();
         final DOMImplementationLS domImplLS = (DOMImplementationLS) document.getImplementation();
         final LSSerializer serializer = domImplLS.createLSSerializer();
         serializer.getDomConfig().setParameter("namespaces", Boolean.FALSE); //$NON-NLS-1$
-
-        final DOMOutputImpl output = new DOMOutputImpl();
+        final com.sun.org.apache.xerces.internal.dom.DOMOutputImpl output = new com.sun.org.apache.xerces.internal.dom.DOMOutputImpl();
         output.setCharacterStream(writer);
-
         serializer.write(node, output);
     }
 
