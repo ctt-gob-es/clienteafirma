@@ -75,9 +75,9 @@ import es.gob.afirma.signers.tsp.pkcs7.TsaRequestExtension;
  *  un servidor Web (que hace la pre-firma y la post-firma) y un servidor documental podr&iacute;a ser el siguiente:
  * </p>
  * <p><b>Pre-firma:</b></p>
- * <p align="center"><img src="doc-files/PAdESTriPhaseSigner-1.png"></p>
+ * <p style="text-align: center;"><img src="doc-files/PAdESTriPhaseSigner-1.png" alt="Pre-firma"></p>
  * <ul>
- *  <li>El dispositivo m�vil solicita una pre-firma al servidor Web indicando un identificador de documento.</li>
+ *  <li>El dispositivo m&oacute;vil solicita una pre-firma al servidor Web indicando un identificador de documento.</li>
  *  <li>El servidor Web solicita el documento a servidor documental.</li>
  *  <li>
  *   El servidor documental entrega el documento al servidor Web.<br>Es importante recalcar que el servidor
@@ -91,7 +91,7 @@ import es.gob.afirma.signers.tsp.pkcs7.TsaRequestExtension;
  *  </li>
  * </ul>
  * <p><b>Firma:</b></p>
- * <p align="center"><img src="doc-files/PAdESTriPhaseSigner-2.png"></p>
+ * <p style="text-align: center;"><img src="doc-files/PAdESTriPhaseSigner-2.png" alt="Firma"></p>
  * <ul>
  *  <li>
  *   El dispositivo m&oacute;vil realiza, de forma completamente aislada una firma electr&oacute;nica
@@ -100,7 +100,7 @@ import es.gob.afirma.signers.tsp.pkcs7.TsaRequestExtension;
  *  </li>
  * </ul>
  * <p><b>Post-firma:</b></p>
- * <p align="center"><img src="doc-files/PAdESTriPhaseSigner-3.png"></p>
+ * <p style="text-align: center;"><img src="doc-files/PAdESTriPhaseSigner-3.png" alt="Post-firma"></p>
  * <ul>
  *  <li>
  *   El dispositivo m&oacute;vil solicita una post-firma al servidor Web indicando un identificador de
@@ -137,9 +137,7 @@ import es.gob.afirma.signers.tsp.pkcs7.TsaRequestExtension;
  *  las firmas previamente existentes.<br>
  *  Consulte la documentaci&oacute;n de la opci&oacute;n <code>allowSigningCertifiedPdfs</code> para establecer un comportamiento por
  *  defecto respecto a los PDF certificados.
- * </p>
- * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
- * */
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class PAdESTriPhaseSignerServerSide {
 
 	private static final String PDF_OID = "1.2.826.0.1089.1.5"; //$NON-NLS-1$
@@ -172,11 +170,11 @@ public final class PAdESTriPhaseSignerServerSide {
      * <dl>
      *  <dt><b><i>signatureSubFilter</i></b></dt>
      *   <dd>
-     *   </dd>
      *    Nombre del sub-filtro en el diccionario PDF para indicar el tipo de la firma. Si no se indica este par&aacute;metro por defecto se
      *    usa <code>adbe.pkcs7.detached</code> (firma PAdES b&aacute;sica).
      *    Es posible indicar <code>ETSI.CAdES.detached</code> para generar una firma PAdES-BES, si bien el hacerlo puede causar que al a&ntilde;adir firmas adicionales
      *    al PDF se invaliden las ya existentes.
+     *   </dd>
      *  <dt><b><i>signatureField</i></b></dt>
      *   <dd>
      *    Nombre del campo en donde insertar la firma.
@@ -302,10 +300,9 @@ public final class PAdESTriPhaseSignerServerSide {
      * </dl>
      * @param signTime Momento de la firma. Debe usarse exactamente el mismo valor en la post-firma.
      * @return pre-firma CAdES/PAdES (atributos CAdES a firmar)
-     * @throws IOException
-     * @throws AOException
-     * @throws DocumentException
-     */
+     * @throws IOException Si hay problemas en el tratamiento de datos.
+     * @throws AOException Si ocurre cualquier otro tipo de problema.
+     * @throws DocumentException Si hay problemas en la construcci&oacute;n o lectura de XML. */
     public static PdfPreSignResult preSign(final String digestAlgorithmName,
                                            final byte[] inPDF,
                                            final X509Certificate[] signerCertificateChain,
@@ -375,11 +372,11 @@ public final class PAdESTriPhaseSignerServerSide {
      * <dl>
      *  <dt><b><i>signatureSubFilter</i></b></dt>
      *   <dd>
-     *   </dd>
      *    Nombre del sub-filtro en el diccionario PDF para indicar el tipo de la firma. Si no se indica este par&aacute;metro por defecto se
      *    usa <code>adbe.pkcs7.detached</code> (firma PAdES b&aacute;sica).
      *    Es posible indicar <code>ETSI.CAdES.detached</code> para generar una firma PAdES-BES, si bien el hacerlo puede causar que al a&ntilde;adir firmas adicionales
      *    al PDF se invaliden las ya existentes.
+     *   </dd>
      *  <dt><b><i>signatureField</i></b></dt>
      *   <dd>
      *    Nombre del campo en donde insertar la firma.

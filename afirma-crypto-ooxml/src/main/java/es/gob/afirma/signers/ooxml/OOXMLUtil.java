@@ -41,10 +41,9 @@ final class OOXMLUtil {
     /** Cuenta el n&uacute;mero de firmas del documento OOXML. Si se produce
      * alg&uacute;n error durante el an&aacute;lisis del fichero, se
      * devolver&aacute; 0.
-     * @param ooxmlFile
-     *        Documento OOXML.
+     * @param ooxmlFile Documento OOXML.
      * @return N&uacute;mero de firma del documento OOXML.
-     * @throws IOException */
+     * @throws IOException SI hay problemas en el tratamiento de datos. */
     static int countOOXMLSignatures(final byte[] ooxmlFile) throws IOException {
         final Relationship[] rels = getOOXMLSignaturesRelationships(ooxmlFile);
         return rels == null ? 0 : rels.length;
@@ -53,9 +52,9 @@ final class OOXMLUtil {
     /** Cuenta el n&uacute;mero de firmas del documento OOXML. Si se produce
      * alg&uacute;n error durante el an&aacute;lisis del fichero, se
      * devolver&aacute; 0.
-     * @param ooxmlFile
-     *        Documento OOXML.
-     * @return N&uacute;mero de firma del documento OOXML. */
+     * @param ooxmlFile Documento OOXML.
+     * @return N&uacute;mero de firma del documento OOXML.
+     * @throws IOException Si hay problemas en el tratamiento de los datos. */
     private static Relationship[] getOOXMLSignaturesRelationships(final byte[] ooxmlFile) throws IOException {
 
         final ZipFile zipFile;
@@ -102,9 +101,9 @@ final class OOXMLUtil {
     }
 
     /** Recupera las firmas XMLdSig empotradas en el documento OOXML.
-     * @param ooxmlFile
-     *        Documento OOXML.
-     * @return Firmas empotradas en el documento. */
+     * @param ooxmlFile Documento OOXML.
+     * @return Firmas empotradas en el documento.
+     * @throws IOException Si hay problemas en el tratamiento de los datos. */
     static byte[][] getOOXMLSignatures(final byte[] ooxmlFile) throws IOException {
 
         final ZipFile zipFile;

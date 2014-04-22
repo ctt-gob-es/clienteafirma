@@ -72,17 +72,26 @@ final class ContentTypeManager {
 		}
 	}
 
-	/** Convierte el inputstream de un XML en un DOM Document. */
+	/** Convierte el <code>InputStream</code> de un XML en un DOM Document.
+	 * @param documentInputStream Fujo del lectura del XML.
+	 * @return Documento DOM.
+	 * @throws IOException Si hay problemas en el tratamiento de los datos del flujo.
+	 * @throws SAXException Si hay problemas en el tratamiento del XML.
+	 * @throws ParserConfigurationException Si hay problemas con el anlizador XML por defecto. */
 	private static Document loadDocument(final InputStream documentInputStream) throws ParserConfigurationException, SAXException, IOException {
 		return getNewDocumentBuilder().parse(documentInputStream);
 	}
 
-	/** Devuelve una nueva instancia del DocumentBuilder. */
+	/** Devuelve una nueva instancia del <code>DocumentBuilder</code>.
+	 * @return Nueva instancia del <code>DocumentBuilder</code>.
+	 * @throws ParserConfigurationException Si hay problemas en el proceso de obtenci&oacute;n. */
 	private static DocumentBuilder getNewDocumentBuilder() throws ParserConfigurationException {
 		return DOC_FACTORY.newDocumentBuilder();
 	}
 
 	/** Recupera el valor de un atributo.
+	 * @param nodeMap Conjunto de nodos sobre los que realizar la b&uacute;squeda.
+	 * @param attrName Nombre el atributo a recuperar.
 	 * @return Valor del atributo.
 	 * @throws AOException Cuando el nodo o el atributo no existen. */
 	private static String getAttributeValue(final NamedNodeMap nodeMap, final String attrName) throws AOException {

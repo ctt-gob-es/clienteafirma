@@ -102,16 +102,16 @@ public final class XAdESTriPhaseSignerServerSide {
 	 * @param xParams Par&aacute;metros adicionales de la firma
 	 * @param op Operaci&oacute;n espec&iacute;fica de firma a realizar
 	 * @return Listado de prefirma XML
-	 * @throws NoSuchAlgorithmException
-	 * @throws AOException
-	 * @throws SAXException
-	 * @throws IOException
-	 * @throws ParserConfigurationException
-	 * @throws MarshalException
-	 * @throws XMLSignatureException
-	 * @throws InvalidKeyException
-	 * @throws SignatureException
-	 * @throws XmlPreSignException */
+	 * @throws NoSuchAlgorithmException Si el JRE no soporta alg&uacute;n algoritmo necesario.
+	 * @throws AOException Si ocurre cualquier otro error.
+	 * @throws SAXException Si hay problemas en el an&aacute;lisis XML.
+	 * @throws IOException Si hay problemas en el tratamiento de datos.
+	 * @throws ParserConfigurationException Si hay problemas con el analizador por defecto de XML.
+	 * @throws MarshalException Si hay problemas con el empaquetado XML.
+	 * @throws XMLSignatureException Si hay problemas en la propia firma XMLDSig.
+	 * @throws InvalidKeyException Si la clave proporcinoada no es v&aacute;lida.
+	 * @throws SignatureException Si hay problemas con la firma PKCS#1.
+	 * @throws XmlPreSignException Si hay un error en la pre-firma XAdES. */
 	public static XmlPreSignResult preSign(final byte[] data,
 			final String algorithm,
 			final Certificate[] certChain,
@@ -287,13 +287,12 @@ public final class XAdESTriPhaseSignerServerSide {
 	 * @param pk Clave publicada usada en las firmas de las que se desea obtener los signedInfo.
 	 * @param excludedIds Identificadores de las firmas excluidas.
 	 * @return Listado de signedInfos.
-	 * @throws SAXException
-	 * @throws IOException
-	 * @throws ParserConfigurationException
-	 * @throws MarshalException
-	 * @throws XMLSignatureException
-	 * @throws XmlPreSignException Cuando no se ha encontrado ning&uacute;n signedInfo que devolver.
-	 */
+	 * @throws SAXException Si hay problemas durante el an&aacute;lisis XML.
+	 * @throws IOException Si hay problemas en el tratamiento de datos.
+	 * @throws ParserConfigurationException Si hay problemas con el analizador por defecto para XML.
+	 * @throws MarshalException Si hay problemas con el empaquetado XML.
+	 * @throws XMLSignatureException Si hay problemas en la propia firma XMLDSig.
+	 * @throws XmlPreSignException Cuando no se ha encontrado ning&uacute;n signedInfo que devolver. */
 	private static List<byte[]> getSignedInfos(final byte[] xmlSign,
 			                                   final PublicKey pk,
 			                                   final List<String> excludedIds) throws SAXException,
