@@ -383,6 +383,14 @@ final class MozillaKeyStoreUtilities {
 	/** Obtiene las rutas completas hacia las bibliotecas (.dll o .so) de los
 	 * m&oacute;dulos de seguridad externos (PKCS#11) instalados en Mozilla /
 	 * Firefox, indexados por su descripci&oacute;n dentro de una <code>Hashtable</code>.
+	 * @param excludeDnie Si se establece a <code>true</code> excluye los m&oacute;dulos PKCS#11
+	 *                    del DNIe, si se establece a <code>false</code> deja estos m&oacute;dulos en
+	 *                    caso de que se encontrasen.
+	 * @param includeKnownModules Si se establece a <code>true</code> se incluyen m&oacute;dulos PKCS#11 que
+	 *                            est&eacute;n en el directorio de bibliotecas del sistema pero no en la
+	 *                            base de datos de m&oacute;dulos de Mozilla (<i>secmod.db</i>), si se
+	 *                            establece a <code>false</code> se devuelven &uacute;nicamente los
+	 *                            m&oacute;dulos PKCS#11 de la base de datos.
 	 * @return Nombres de las bibliotecas de los m&oacute;dulos de seguridad de
 	 *         Mozilla / Firefox */
 	static synchronized Map<String, String> getMozillaPKCS11Modules(final boolean excludeDnie,
