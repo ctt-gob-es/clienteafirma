@@ -61,7 +61,7 @@ public class JSEUIManager implements AOUIManager {
     /** Muestra un di&aacute;logo para pedir una contrase&ntilde;a al usuario.
      * @param text Texto con el que se solicitar&aacute; la entrada de texto al
      *             usuario (<i>prompt</i>)
-     * @param icon Objeto de tipo {@code javax.swing.Icon} con el icono del di&aacute;logo o
+     * @param imageIcon Objeto de tipo {@code javax.swing.Icon} con el icono del di&aacute;logo o
      * 			   {@code null} para no mostrar icono.
      * @param charSet Juego de caracteres aceptados para la contrase&ntilde;a
      * @param beep <code>true</code> si se desea un sonido de advertencia al

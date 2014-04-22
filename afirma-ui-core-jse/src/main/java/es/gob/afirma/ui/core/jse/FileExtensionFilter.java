@@ -14,7 +14,7 @@ import java.io.File;
 
 import javax.swing.filechooser.FileFilter;
 
-/** Filtro de ficheros basado en extensiones de fichero para di&aacute;logos de selecci&opacute;n.
+/** Filtro de ficheros basado en extensiones de fichero para di&aacute;logos de selecci&oacute;n.
  * @author Carlos Gamuci */
 class FileExtensionFilter extends FileFilter {
 
