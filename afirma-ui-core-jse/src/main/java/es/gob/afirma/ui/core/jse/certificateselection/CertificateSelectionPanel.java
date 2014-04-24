@@ -398,15 +398,19 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		/** {@inheritDoc} */
 		@Override
 		public void mouseClicked(final MouseEvent me) {
-			if (me.getClickCount() == 1 &&
-					((CertificateLine)((JList/*<?>*/) me.getSource()).getSelectedValue()).getCertificateLinkBounds().contains(me.getX(), me.getY() % CERT_LIST_ELEMENT_HEIGHT)) {
-				try {
-					CertificateUtils.openCert(
-							CertificateSelectionPanel.this,
-							((CertificateLine)((JList/*<?>*/) me.getSource()).getSelectedValue()).getCertificate());
-				}
-				catch (final AOCancelledOperationException e) {
-					/* No hacemos nada */
+			final JList/*<?>*/ tmpList = (JList/*<?>*/) me.getSource();
+			final CertificateLine tmpLine = (CertificateLine) tmpList.getSelectedValue();
+			if (tmpLine != null) {
+				if (me.getClickCount() == 1 &&
+						tmpLine.getCertificateLinkBounds().contains(me.getX(), me.getY() % CERT_LIST_ELEMENT_HEIGHT)) {
+					try {
+						CertificateUtils.openCert(
+								CertificateSelectionPanel.this,
+								tmpLine.getCertificate());
+					}
+					catch (final AOCancelledOperationException e) {
+						/* No hacemos nada */
+					}
 				}
 			}
 		}
@@ -414,15 +418,19 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		/** {@inheritDoc} */
 		@Override
 		public void mouseMoved(final MouseEvent me) {
-			if (((CertificateLine)((JList/*<?>*/) me.getSource()).getSelectedValue()).getCertificateLinkBounds().contains(me.getX(), me.getY() % CERT_LIST_ELEMENT_HEIGHT)) {
-				if (!this.entered) {
-					((JList/*<?>*/) me.getSource()).setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-					this.entered = true;
+			final JList/*<?>*/ tmpList = (JList/*<?>*/) me.getSource();
+			final CertificateLine tmpLine = (CertificateLine) tmpList.getSelectedValue();
+			if (tmpLine != null) {
+				if (tmpLine.getCertificateLinkBounds().contains(me.getX(), me.getY() % CERT_LIST_ELEMENT_HEIGHT)) {
+					if (!this.entered) {
+						tmpList.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+						this.entered = true;
+					}
 				}
-			}
-			else if (this.entered) {
-				((JList/*<?>*/) me.getSource()).setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-				this.entered = false;
+				else if (this.entered) {
+					tmpList.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+					this.entered = false;
+				}
 			}
 		}
 
