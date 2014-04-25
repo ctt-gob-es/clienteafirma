@@ -400,18 +400,17 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		public void mouseClicked(final MouseEvent me) {
 			final JList/*<?>*/ tmpList = (JList/*<?>*/) me.getSource();
 			final CertificateLine tmpLine = (CertificateLine) tmpList.getSelectedValue();
-			if (tmpLine != null) {
-				if (me.getClickCount() == 1 &&
-						tmpLine.getCertificateLinkBounds().contains(me.getX(), me.getY() % CERT_LIST_ELEMENT_HEIGHT)) {
-					try {
-						CertificateUtils.openCert(
-								CertificateSelectionPanel.this,
-								tmpLine.getCertificate());
-					}
-					catch (final AOCancelledOperationException e) {
-						/* No hacemos nada */
-					}
-				}
+			if (tmpLine != null &&
+				me.getClickCount() == 1 &&
+					tmpLine.getCertificateLinkBounds().contains(me.getX(), me.getY() % CERT_LIST_ELEMENT_HEIGHT)) {
+						try {
+							CertificateUtils.openCert(
+									CertificateSelectionPanel.this,
+									tmpLine.getCertificate());
+						}
+						catch (final AOCancelledOperationException e) {
+							/* No hacemos nada */
+						}
 			}
 		}
 
