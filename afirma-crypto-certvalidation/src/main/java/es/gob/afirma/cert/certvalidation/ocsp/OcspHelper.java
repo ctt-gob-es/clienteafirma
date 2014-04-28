@@ -81,7 +81,7 @@ final class OcspHelper {
 
 	/** Obtiene una entrada a una clave privada de un almac&eacute;n en formato PKCS#12 / PFX.
 	 * @param pfxFile Archivo PKCS#12 / PFX
-	 * @param pfxPassword Contraseña del archivo PKCS#12 / PFX
+	 * @param pfxPassword Contrase&ntilde;a del archivo PKCS#12 / PFX
 	 * @param alias Alias del certificado a usar
 	 * @return Entrada a una clave privada
 	 * @throws KeyStoreException
