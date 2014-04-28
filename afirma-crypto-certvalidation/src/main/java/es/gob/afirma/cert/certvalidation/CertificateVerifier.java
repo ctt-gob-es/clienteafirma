@@ -18,7 +18,13 @@ public abstract class CertificateVerifier {
 
 	protected static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	protected X509Certificate issuerCert;
+	private X509Certificate issuerCert;
+	protected void setIssuerCert(final X509Certificate cert) {
+		this.issuerCert = cert;
+	}
+	protected X509Certificate getIssuerCert() {
+		return this.issuerCert;
+	}
 
 	protected abstract ValidationResult verifyRevocation(final X509Certificate cert);
 

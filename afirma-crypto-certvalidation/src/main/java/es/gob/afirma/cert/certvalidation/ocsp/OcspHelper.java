@@ -81,7 +81,7 @@ final class OcspHelper {
 
 	/** Obtiene una entrada a una clave privada de un almac&eacute;n en formato PKCS#12 / PFX.
 	 * @param pfxFile Archivo PKCS#12 / PFX
-	 * @param pfxPassword Contrase&ntilde;a del archivo PKCS#12 / PFX
+	 * @param pfxPassword Contraseña del archivo PKCS#12 / PFX
 	 * @param alias Alias del certificado a usar
 	 * @return Entrada a una clave privada
 	 * @throws KeyStoreException
@@ -181,7 +181,6 @@ final class OcspHelper {
 	 * @throws CertificateEncodingException
 	 * @throws NoSuchAlgorithmException
 	 * @throws OCSPException
-	 * @throws IllegalArgumentException
 	 * @throws OperatorCreationException
 	 * @throws IOException */
 	static byte[] createSignedOcspRequest(final X509Certificate certToValidate,
@@ -189,7 +188,6 @@ final class OcspHelper {
 			                              final PrivateKeyEntry requestSignKey) throws CertificateEncodingException,
 			                                                                  	       NoSuchAlgorithmException,
 			                                                                  	       OCSPException,
-			                                                                  	       IllegalArgumentException,
 			                                                                  	       OperatorCreationException,
 			                                                                  	       IOException {
 		final CertificateID certId = new CertificateID(

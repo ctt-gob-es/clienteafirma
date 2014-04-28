@@ -19,6 +19,10 @@ public final class CertificateVerifierFactory {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
+	private CertificateVerifierFactory() {
+		// No permitimos la instanciacion
+	}
+
 	private static String getIssuerIdentifier(final X509Certificate cert) {
 		// Es el CRC del emisor lo que le identifica
 		final CRC32 issuerCrc = new CRC32();

@@ -188,16 +188,14 @@ final class CrlHelper {
 		for (final DistributionPoint dp : distPoint.getDistributionPoints()) {
 			final DistributionPointName dpn = dp.getDistributionPoint();
 		 	// Buscamos URIs en el fullName
-		 	if (dpn != null) {
-		 		if (dpn.getType() == DistributionPointName.FULL_NAME) {
-		 			final GeneralName[] genNames = GeneralNames.getInstance(dpn.getName()).getNames();
-		 			// Buscamos la URI
-		 			for (final GeneralName genName : genNames) {
-		 				if (genName.getTagNo() == GeneralName.uniformResourceIdentifier) {
-		 					crlUrls.add(DERIA5String.getInstance(genName.getName()).getString());
-		 				}
-		 			}
-			 	}
+		 	if (dpn != null && dpn.getType() == DistributionPointName.FULL_NAME) {
+	 			final GeneralName[] genNames = GeneralNames.getInstance(dpn.getName()).getNames();
+	 			// Buscamos la URI
+	 			for (final GeneralName genName : genNames) {
+	 				if (genName.getTagNo() == GeneralName.uniformResourceIdentifier) {
+	 					crlUrls.add(DERIA5String.getInstance(genName.getName()).getString());
+	 				}
+	 			}
 			}
 		}
 		oAsnInStream.close();

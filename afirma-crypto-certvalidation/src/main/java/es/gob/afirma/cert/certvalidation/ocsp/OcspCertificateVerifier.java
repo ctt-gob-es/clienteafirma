@@ -32,11 +32,11 @@ public final class OcspCertificateVerifier extends CertificateVerifier {
 		}
 		final String issuerCertFile = this.conf.getProperty("issuerCertFile"); //$NON-NLS-1$
 		try {
-			this.issuerCert = (X509Certificate) CertificateFactory.getInstance(
+			this.setIssuerCert((X509Certificate) CertificateFactory.getInstance(
 				"X.509" //$NON-NLS-1$
 			).generateCertificate(
 				OcspCertificateVerifier.class.getResourceAsStream(issuerCertFile)
-			);
+			));
 		}
 		catch (final CertificateException e) {
 			throw new IllegalArgumentException(
@@ -70,7 +70,7 @@ public final class OcspCertificateVerifier extends CertificateVerifier {
 
 			// Creamos la peticion OCSP ASN.1 firmada
 			try {
-				ocspRequest = OcspHelper.createSignedOcspRequest(cert, this.issuerCert, pke);
+				ocspRequest = OcspHelper.createSignedOcspRequest(cert, this.getIssuerCert(), pke);
 			}
 			catch (final Exception e) {
 				LOGGER.severe("Error creando la peticion OCSP firmada: " + e); //$NON-NLS-1$
@@ -79,7 +79,7 @@ public final class OcspCertificateVerifier extends CertificateVerifier {
 		}
 		else {
 			try {
-				ocspRequest = OcspHelper.createOcspRequest(cert, this.issuerCert);
+				ocspRequest = OcspHelper.createOcspRequest(cert, this.getIssuerCert());
 			}
 			catch (final Exception e) {
 				LOGGER.severe("Error creando la peticion OCSP: " + e); //$NON-NLS-1$

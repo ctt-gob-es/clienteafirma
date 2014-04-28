@@ -30,11 +30,11 @@ public final class CrlCertificateVerifier extends CertificateVerifier {
 		}
 		final String issuerCertFile = this.conf.getProperty("issuerCertFile"); //$NON-NLS-1$
 		try {
-			this.issuerCert = (X509Certificate) CertificateFactory.getInstance(
+			setIssuerCert((X509Certificate) CertificateFactory.getInstance(
 				"X.509" //$NON-NLS-1$
 			).generateCertificate(
 				OcspCertificateVerifier.class.getResourceAsStream(issuerCertFile)
-			);
+			));
 		}
 		catch (final CertificateException e) {
 			throw new IllegalArgumentException(
@@ -45,7 +45,7 @@ public final class CrlCertificateVerifier extends CertificateVerifier {
 
 	@Override
 	protected ValidationResult verifyRevocation(final X509Certificate cert) {
-		return CrlHelper.verifyCertificateCRLs(cert, this.issuerCert.getPublicKey(), null);
+		return CrlHelper.verifyCertificateCRLs(cert, this.getIssuerCert().getPublicKey(), null);
 	}
 
 }
