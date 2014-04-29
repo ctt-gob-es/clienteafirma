@@ -52,6 +52,8 @@ final class MozillaKeyStoreUtilities {
 
 	private static final String AFIRMA_PROFILES_INI = "AFIRMA_PROFILES_INI"; //$NON-NLS-1$
 
+	private static final String IGNORE_ENV_VARS = "es.gob.afirma.keystores.mozilla.IgnoreEnvironmentVariables"; //$NON-NLS-1$
+
 	private static final String[] DNI_P11_NAMES = new String[] {
 		"libopensc-dnie.dylib", //$NON-NLS-1$
 		"libopensc-dnie.so", //$NON-NLS-1$
@@ -285,21 +287,23 @@ final class MozillaKeyStoreUtilities {
 		}
 
 		// Primero probamos con la variable de entorno, que es comun a todos los sistemas operativos
-		try {
-			nssLibDir = System.getenv(AFIRMA_NSS_HOME);
-		}
-		catch(final Exception e) {
-			LOGGER.warning("No se tiene acceso a la variable de entorno '" + AFIRMA_NSS_HOME + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		if (nssLibDir != null) {
-			final File nssDir = new File(nssLibDir);
-			if (nssDir.isDirectory() && nssDir.canRead()) {
-				LOGGER.info("Directorio de NSS determinado a partir de la variable de entorno '" + AFIRMA_NSS_HOME + "'"); //$NON-NLS-1$ //$NON-NLS-2$
-				return nssLibDir;
+		if (!Boolean.getBoolean(IGNORE_ENV_VARS)) {
+			try {
+				nssLibDir = System.getenv(AFIRMA_NSS_HOME);
 			}
-			LOGGER.warning(
-				"La variable de entorno '" + AFIRMA_NSS_HOME + "' apunta a un directorio que no existe o sobre el que no se tienen permisos de lectura, se ignorara" //$NON-NLS-1$ //$NON-NLS-2$
-			);
+			catch(final Exception e) {
+				LOGGER.warning("No se tiene acceso a la variable de entorno '" + AFIRMA_NSS_HOME + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			if (nssLibDir != null) {
+				final File nssDir = new File(nssLibDir);
+				if (nssDir.isDirectory() && nssDir.canRead()) {
+					LOGGER.info("Directorio de NSS determinado a partir de la variable de entorno '" + AFIRMA_NSS_HOME + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+					return nssLibDir;
+				}
+				LOGGER.warning(
+					"La variable de entorno '" + AFIRMA_NSS_HOME + "' apunta a un directorio que no existe o sobre el que no se tienen permisos de lectura, se ignorara" //$NON-NLS-1$ //$NON-NLS-2$
+				);
+			}
 		}
 
 		if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
@@ -543,34 +547,36 @@ final class MozillaKeyStoreUtilities {
 	private static String getProfilesIniPath() {
 		String profilesIniPath = null;
 		// Miramos primero la variable de entorno 'AFIRMA_PROFILES_INI'
-		try {
-			profilesIniPath = System.getenv(AFIRMA_PROFILES_INI);
-		}
-		catch(final Exception e) {
-			LOGGER.warning("No se tiene acceso a la variable de entorno '" + AFIRMA_PROFILES_INI + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		if (profilesIniPath != null) {
+		if (!Boolean.getBoolean(IGNORE_ENV_VARS)) {
+			try {
+				profilesIniPath = System.getenv(AFIRMA_PROFILES_INI);
+			}
+			catch(final Exception e) {
+				LOGGER.warning("No se tiene acceso a la variable de entorno '" + AFIRMA_PROFILES_INI + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			if (profilesIniPath != null) {
 
-			// Se expande %AppData% en Windows
-			final String addDataUpperCase = "%APPDATA%"; //$NON-NLS-1$
-			final int appDataIndex = profilesIniPath.toUpperCase().indexOf(addDataUpperCase);
-			if (appDataIndex != -1) {
-				profilesIniPath = profilesIniPath.replace(
-					profilesIniPath.substring(appDataIndex, appDataIndex + addDataUpperCase.length()),
-					MozillaKeyStoreUtilitiesWindows.getWindowsAppDataDir()
+				// Se expande %AppData% en Windows
+				final String addDataUpperCase = "%APPDATA%"; //$NON-NLS-1$
+				final int appDataIndex = profilesIniPath.toUpperCase().indexOf(addDataUpperCase);
+				if (appDataIndex != -1) {
+					profilesIniPath = profilesIniPath.replace(
+						profilesIniPath.substring(appDataIndex, appDataIndex + addDataUpperCase.length()),
+						MozillaKeyStoreUtilitiesWindows.getWindowsAppDataDir()
+					);
+				}
+
+				final File profilesIniFile = new File(profilesIniPath);
+				if (profilesIniFile.isFile() && profilesIniFile.canRead()) {
+					LOGGER.info(
+						"'profiles.ini' de Firefox determinado a partir de la variable de entorno '" + AFIRMA_PROFILES_INI + "'" //$NON-NLS-1$ //$NON-NLS-2$
+					);
+					return profilesIniPath;
+				}
+				LOGGER.warning(
+					"La variable de entorno '" + AFIRMA_PROFILES_INI + "' apunta a un fichero que no existe o sobre el que no se tienen permisos de lectura, se ignorara: " + profilesIniPath //$NON-NLS-1$ //$NON-NLS-2$
 				);
 			}
-
-			final File profilesIniFile = new File(profilesIniPath);
-			if (profilesIniFile.isFile() && profilesIniFile.canRead()) {
-				LOGGER.info(
-					"'profiles.ini' de Firefox determinado a partir de la variable de entorno '" + AFIRMA_PROFILES_INI + "'" //$NON-NLS-1$ //$NON-NLS-2$
-				);
-				return profilesIniPath;
-			}
-			LOGGER.warning(
-				"La variable de entorno '" + AFIRMA_PROFILES_INI + "' apunta a un fichero que no existe o sobre el que no se tienen permisos de lectura, se ignorara: " + profilesIniPath //$NON-NLS-1$ //$NON-NLS-2$
-			);
 		}
 		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
 			return MozillaKeyStoreUtilitiesWindows.getWindowsAppDataDir() + "\\Mozilla\\Firefox\\profiles.ini"; //$NON-NLS-1$
