@@ -35,7 +35,7 @@ public final class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManag
 	 *         definido en SecMod
 	 * @throws IOException Cuando hay errores de entrada / salida */
 	@Override
-	public synchronized void init(final AOKeyStore type,
+	public void init(final AOKeyStore type,
 			                      final InputStream store,
 			                      final PasswordCallback pssCallBack,
 			                      final Object[] params,

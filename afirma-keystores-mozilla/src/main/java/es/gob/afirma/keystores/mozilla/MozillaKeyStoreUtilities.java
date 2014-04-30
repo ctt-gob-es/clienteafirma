@@ -25,10 +25,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import javax.script.ScriptEngineManager;
@@ -386,7 +386,7 @@ final class MozillaKeyStoreUtilities {
 
 	/** Obtiene las rutas completas hacia las bibliotecas (.dll o .so) de los
 	 * m&oacute;dulos de seguridad externos (PKCS#11) instalados en Mozilla /
-	 * Firefox, indexados por su descripci&oacute;n dentro de una <code>Hashtable</code>.
+	 * Firefox, indexados por su descripci&oacute;n dentro de un <code>ConcurrentHashMap</code>.
 	 * @param excludeDnie Si se establece a <code>true</code> excluye los m&oacute;dulos PKCS#11
 	 *                    del DNIe, si se establece a <code>false</code> deja estos m&oacute;dulos en
 	 *                    caso de que se encontrasen.
@@ -397,17 +397,17 @@ final class MozillaKeyStoreUtilities {
 	 *                            m&oacute;dulos PKCS#11 de la base de datos.
 	 * @return Nombres de las bibliotecas de los m&oacute;dulos de seguridad de
 	 *         Mozilla / Firefox */
-	static synchronized Map<String, String> getMozillaPKCS11Modules(final boolean excludeDnie,
-			                                                        final boolean includeKnownModules) {
+	static Map<String, String> getMozillaPKCS11Modules(final boolean excludeDnie,
+			                                           final boolean includeKnownModules) {
 
-		final Map<String, String> modsByDesc = new Hashtable<String, String>();
+		final Map<String, String> modsByDesc = new ConcurrentHashMap<String, String>();
 		final List<ModuleName> modules;
 		try {
 			modules =  AOSecMod.getModules(getMozillaUserProfileDirectory());
 		}
 		catch (final Exception t) {
 			LOGGER.severe("No se han podido obtener los modulos externos de Mozilla, se devolvera una lista vacia o unicamente con el DNIe: " + t); //$NON-NLS-1$
-			return new Hashtable<String, String>(0);
+			return new ConcurrentHashMap<String, String>(0);
 		}
 
 		for (final AOSecMod.ModuleName module : modules) {
@@ -418,9 +418,15 @@ final class MozillaKeyStoreUtilities {
 			modsByDesc.put(module.getDescription(), moduleLib);
 		}
 
+		// Creamos una copia de modsByDesc para evitar problemas de concurrencia
+		// (nunca soltara exceciones por usar ConcurrentHashMap, pero no significa
+		// que los problemas no ocurran si no se toman medidas).
+		final ConcurrentHashMap<String, String> modsByDescCopy = new ConcurrentHashMap<String, String>(modsByDesc.size());
+		modsByDescCopy.putAll(modsByDesc);
+
 		if (includeKnownModules) {
 			for (final String[] knownModules : KNOWN_MODULES) {
-				if (!isModuleIncluded(modsByDesc, knownModules[1])) {
+				if (!isModuleIncluded(modsByDescCopy, knownModules[1])) {
 					final String modulePath = getWindowsSystemDirWithFinalSlash() + knownModules[1];
 					if (new File(modulePath).exists()) {
 						modsByDesc.put(knownModules[0], knownModules[1]);
@@ -771,17 +777,22 @@ final class MozillaKeyStoreUtilities {
 	 * @param table Tabla con las descripciones de los m&oacute;dulos pkcs11 y las
 	 *              librer&iacute;as asociadas.
 	 * @return Tabla con los duplicados eliminados. */
-	private static synchronized Map<String, String> purgeStoresTable(final Map<String, String> table) {
+	private static Map<String, String> purgeStoresTable(final Map<String, String> table) {
 
 		if (table == null) {
-			return new Hashtable<String, String>(0);
+			return new ConcurrentHashMap<String, String>(0);
 		}
 
-		final Map<String, String> purgedTable = new Hashtable<String, String>();
+		final Map<String, String> purgedTable = new ConcurrentHashMap<String, String>();
 		final Set<String> revisedLibs = new HashSet<String>();
 
+		// Creamos una copia de las claves para evitar problemas de concurrencia
+		// (nunca soltara exceciones por usar ConcurrentHashMap, pero no significa
+		// que los problemas no ocurran si no se toman medidas).
+		final String[] keys = table.keySet().toArray(new String[0]);
+
 		String tmpLib;
-		for (final String key : table.keySet()) {
+		for (final String key : keys) {
 			tmpLib = table.get(key);
 			if (tmpLib.toLowerCase().endsWith(".dll")) { //$NON-NLS-1$
 				tmpLib = tmpLib.toLowerCase();
