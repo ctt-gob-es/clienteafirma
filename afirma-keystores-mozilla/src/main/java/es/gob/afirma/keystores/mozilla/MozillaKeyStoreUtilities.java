@@ -52,7 +52,7 @@ final class MozillaKeyStoreUtilities {
 
 	private static final String AFIRMA_PROFILES_INI = "AFIRMA_PROFILES_INI"; //$NON-NLS-1$
 
-	private static final String IGNORE_ENV_VARS = "es.gob.afirma.keystores.mozilla.IgnoreEnvironmentVariables"; //$NON-NLS-1$
+	private static final String USE_ENV_VARS = "es.gob.afirma.keystores.mozilla.UseEnvironmentVariables"; //$NON-NLS-1$
 
 	private static final String[] DNI_P11_NAMES = new String[] {
 		"libopensc-dnie.dylib", //$NON-NLS-1$
@@ -287,7 +287,7 @@ final class MozillaKeyStoreUtilities {
 		}
 
 		// Primero probamos con la variable de entorno, que es comun a todos los sistemas operativos
-		if (!Boolean.getBoolean(IGNORE_ENV_VARS)) {
+		if (Boolean.getBoolean(USE_ENV_VARS)) {
 			try {
 				nssLibDir = System.getenv(AFIRMA_NSS_HOME);
 			}
@@ -547,7 +547,7 @@ final class MozillaKeyStoreUtilities {
 	private static String getProfilesIniPath() {
 		String profilesIniPath = null;
 		// Miramos primero la variable de entorno 'AFIRMA_PROFILES_INI'
-		if (!Boolean.getBoolean(IGNORE_ENV_VARS)) {
+		if (Boolean.getBoolean(USE_ENV_VARS)) {
 			try {
 				profilesIniPath = System.getenv(AFIRMA_PROFILES_INI);
 			}
