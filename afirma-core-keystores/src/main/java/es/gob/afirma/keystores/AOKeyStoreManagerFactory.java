@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
 
@@ -69,8 +70,15 @@ public final class AOKeyStoreManagerFactory {
                                                          final PasswordCallback pssCallback,
                                                          final Object parentComponent) throws AOKeystoreAlternativeException,
                                                                                               IOException {
+    	final boolean forceReset = Boolean.getBoolean(FORCE_STORE_RESET);
+    	if (forceReset) {
+    		Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
+				"No se mantendran los almacenes de claves precargados (es.gob.afirma.keystores.ForceReset=true)" //$NON-NLS-1$
+			);
+    	}
+
     	if (AOKeyStore.PKCS12.equals(store)) {
-    		return new AggregatedKeyStoreManager(getPkcs12KeyStoreManager(lib, pssCallback, parentComponent));
+    		return new AggregatedKeyStoreManager(getPkcs12KeyStoreManager(lib, pssCallback, forceReset, parentComponent));
     	}
 
 
@@ -80,39 +88,39 @@ public final class AOKeyStoreManagerFactory {
     		AOKeyStore.SINGLE.equals(store) ||
     		AOKeyStore.JAVACE.equals(store) ||
     		AOKeyStore.JCEKS.equals(store)) {
-        		return new AggregatedKeyStoreManager(getFileKeyStoreManager(store, lib, pssCallback, parentComponent));
+        		return new AggregatedKeyStoreManager(getFileKeyStoreManager(store, lib, pssCallback, forceReset, parentComponent));
         }
 
         // Token PKCS#11, en cualquier sistema operativo
         else if (AOKeyStore.PKCS11.equals(store)) {
-        	return new AggregatedKeyStoreManager(getPkcs11KeyStoreManager(lib, description, pssCallback, parentComponent));
+        	return new AggregatedKeyStoreManager(getPkcs11KeyStoreManager(lib, description, pssCallback, forceReset, parentComponent));
         }
 
         // Almacen de certificados de Windows
         else if (Platform.getOS().equals(Platform.OS.WINDOWS) && AOKeyStore.WINDOWS.equals(store)) {
-        	return new AggregatedKeyStoreManager(getWindowsMyCapiKeyStoreManager());
+        	return new AggregatedKeyStoreManager(getWindowsMyCapiKeyStoreManager(forceReset));
         }
 
         // Libreta de direcciones de Windows
         else if (Platform.getOS().equals(Platform.OS.WINDOWS) && (AOKeyStore.WINADDRESSBOOK.equals(store) || AOKeyStore.WINCA.equals(store))) {
-        	return new AggregatedKeyStoreManager(getWindowsAddressBookKeyStoreManager(store));
+        	return new AggregatedKeyStoreManager(getWindowsAddressBookKeyStoreManager(store, forceReset));
         }
 
-        // Almacen de Mozilla que muestra tanto los certificados del almacen interno como los de
+        // Almacen de Mozilla que muestra tanto los certificados del almacemo los de
         // los dispositivos externos configuramos. A esto, le agregamos en Mac OS X el gestor de
         // DNIe para que agregue los certificados de este mediante el controlador Java del DNIe si
         // se encuentra la biblioteca y hay un DNIe insertado
         else if (AOKeyStore.MOZ_UNI.equals(store)) {
-        	return getMozillaUnifiedKeyStoreManager(pssCallback, parentComponent);
+        	return getMozillaUnifiedKeyStoreManager(pssCallback, forceReset, parentComponent);
         }
 
         // Apple Safari sobre Mac OS X.
         else if (Platform.getOS().equals(Platform.OS.MACOSX) && AOKeyStore.APPLE.equals(store)) {
-        	return getMacOSXKeyStoreManager(store, lib, pssCallback, parentComponent);
+        	return getMacOSXKeyStoreManager(store, lib, pssCallback, forceReset, parentComponent);
         }
 
         else if (AOKeyStore.DNIEJAVA.equals(store)) {
-        	return new AggregatedKeyStoreManager(getDnieJavaKeyStoreManager(pssCallback, parentComponent));
+        	return new AggregatedKeyStoreManager(getDnieJavaKeyStoreManager(pssCallback, forceReset, parentComponent));
         }
 
         throw new AOKeystoreAlternativeException(
@@ -127,6 +135,7 @@ public final class AOKeyStoreManagerFactory {
 
     private static AOKeyStoreManager getPkcs12KeyStoreManager(final String lib,
     		                                                  final PasswordCallback pssCallback,
+    		                                                  final boolean forceReset,
     		                                                  final Object parentComponent) throws IOException,
     		                                                  						               AOKeystoreAlternativeException {
     	final AOKeyStoreManager ksm = new Pkcs12KeyStoreManager();
@@ -158,7 +167,7 @@ public final class AOKeyStoreManagerFactory {
         InputStream is = null;
         try {
             is = new FileInputStream(storeFilename);
-            ksm.init(null, is, pssCallback, null, Boolean.getBoolean(FORCE_STORE_RESET));
+            ksm.init(null, is, pssCallback, null, forceReset);
         }
         catch (final AOException e) {
             throw new AOKeystoreAlternativeException(
@@ -176,12 +185,13 @@ public final class AOKeyStoreManagerFactory {
 	}
 
 	private static AOKeyStoreManager getDnieJavaKeyStoreManager(final PasswordCallback pssCallback,
+																final boolean forceReset,
     	                                                        final Object parentComponent) throws AOKeystoreAlternativeException,
     																							     IOException {
     	final AOKeyStoreManager ksm = new AOKeyStoreManager();
     	try {
     		// Proporcionamos el componente padre como parametro
-    		ksm.init(AOKeyStore.DNIEJAVA, null, pssCallback, new Object[] { parentComponent }, Boolean.getBoolean(FORCE_STORE_RESET));
+    		ksm.init(AOKeyStore.DNIEJAVA, null, pssCallback, new Object[] { parentComponent }, forceReset);
     	}
     	catch (final AOKeyStoreManagerException e) {
     	   throw new AOKeystoreAlternativeException(
@@ -196,6 +206,7 @@ public final class AOKeyStoreManagerFactory {
     private static AOKeyStoreManager getFileKeyStoreManager(final AOKeyStore store,
                                                             final String lib,
                                                             final PasswordCallback pssCallback,
+                                                            final boolean forceReset,
                                                             final Object parentComponent) throws IOException,
                                                                                                  AOKeystoreAlternativeException {
     	final AOKeyStoreManager ksm = new AOKeyStoreManager();
@@ -248,7 +259,7 @@ public final class AOKeyStoreManagerFactory {
         InputStream is = null;
         try {
             is = new FileInputStream(storeFilename);
-            ksm.init(store, is, pssCallback, null, Boolean.getBoolean(FORCE_STORE_RESET));
+            ksm.init(store, is, pssCallback, null, forceReset);
         }
         catch (final AOException e) {
             throw new AOKeystoreAlternativeException(
@@ -268,6 +279,7 @@ public final class AOKeyStoreManagerFactory {
     private static AOKeyStoreManager getPkcs11KeyStoreManager(final String lib,
                                                               final String description,
                                                               final PasswordCallback pssCallback,
+                                                              final boolean forceReset,
                                                               final Object parentComponent) throws IOException,
                                                                                                    AOKeystoreAlternativeException {
     	final AOKeyStoreManager ksm = new AOKeyStoreManager();
@@ -316,7 +328,7 @@ public final class AOKeyStoreManagerFactory {
         		new String[] {
                     p11Lib, description
         		},
-        		Boolean.getBoolean(FORCE_STORE_RESET)
+        		forceReset
     		);
         }
         catch (final AOException e) {
@@ -329,11 +341,12 @@ public final class AOKeyStoreManagerFactory {
         return ksm;
     }
 
-    private static AOKeyStoreManager getWindowsAddressBookKeyStoreManager(final AOKeyStore store) throws IOException,
+    private static AOKeyStoreManager getWindowsAddressBookKeyStoreManager(final AOKeyStore store,
+    		                                                              final boolean forceReset) throws IOException,
                                                                                                   AOKeystoreAlternativeException {
     	final AOKeyStoreManager ksm = new AOKeyStoreManager();
         try {
-            ksm.init(store, null, NullPasswordCallback.getInstance(), null, Boolean.getBoolean(FORCE_STORE_RESET));
+            ksm.init(store, null, NullPasswordCallback.getInstance(), null, forceReset);
         }
         catch (final AOException e) {
             throw new AOKeystoreAlternativeException(
@@ -345,10 +358,10 @@ public final class AOKeyStoreManagerFactory {
         return ksm;
     }
 
-    private static AOKeyStoreManager getWindowsMyCapiKeyStoreManager() throws AOKeystoreAlternativeException, IOException {
+    private static AOKeyStoreManager getWindowsMyCapiKeyStoreManager(final boolean forceReset) throws AOKeystoreAlternativeException, IOException {
     	final AOKeyStoreManager ksmCapi = new CAPIKeyStoreManager();
 		try {
-			ksmCapi.init(AOKeyStore.WINDOWS, null, null, null, Boolean.getBoolean(FORCE_STORE_RESET));
+			ksmCapi.init(AOKeyStore.WINDOWS, null, null, null, forceReset);
 		}
 		catch (final AOKeyStoreManagerException e) {
 			throw new AOKeystoreAlternativeException(
@@ -361,8 +374,9 @@ public final class AOKeyStoreManagerFactory {
     }
 
     private static AggregatedKeyStoreManager getMozillaUnifiedKeyStoreManager(final PasswordCallback pssCallback,
-                                                                      final Object parentComponent) throws AOKeystoreAlternativeException,
-    		                                                                                               IOException {
+    		                                                                  final boolean forceReset,
+                                                                              final Object parentComponent) throws AOKeystoreAlternativeException,
+    		                                                                                                       IOException {
         final AggregatedKeyStoreManager ksmUni;
         try {
             ksmUni = (AggregatedKeyStoreManager) Class.forName("es.gob.afirma.keystores.mozilla.MozillaUnifiedKeyStoreManager").newInstance(); //$NON-NLS-1$
@@ -376,7 +390,7 @@ public final class AOKeyStoreManagerFactory {
         }
         try {
         	// Proporcionamos el componente padre como parametro
-            ksmUni.init(AOKeyStore.MOZ_UNI, null, pssCallback, new Object[] { parentComponent }, Boolean.getBoolean(FORCE_STORE_RESET));
+            ksmUni.init(AOKeyStore.MOZ_UNI, null, pssCallback, new Object[] { parentComponent }, forceReset);
         }
         catch (final AOException e) {
             throw new AOKeystoreAlternativeException(
@@ -391,6 +405,7 @@ public final class AOKeyStoreManagerFactory {
     private static AggregatedKeyStoreManager getMacOSXKeyStoreManager(final AOKeyStore store,
     		                                                          final String lib,
     		                                                          final PasswordCallback pssCallback,
+    		                                                          final boolean forceReset,
     		                                                          final Object parentComponent) throws IOException,
                                                                                                            AOKeystoreAlternativeException {
     	final AOKeyStoreManager ksm = new AppleKeyStoreManager();
@@ -401,7 +416,7 @@ public final class AOKeyStoreManagerFactory {
                  lib == null || "".equals(lib) ? null : new FileInputStream(lib),  //$NON-NLS-1$
         		 NullPasswordCallback.getInstance(),
                  null,
-                 Boolean.getBoolean(FORCE_STORE_RESET)
+                 forceReset
             );
         }
         catch (final AOException e) {
@@ -412,7 +427,7 @@ public final class AOKeyStoreManagerFactory {
         // controlador Java del DNIe si se encuentra la biblioteca y hay un DNIe insertado
     	if (!KeyStoreUtilities.containsDnie(ksm)) {
     		try {
-    			aksm.addKeyStoreManager(getDnieJavaKeyStoreManager(pssCallback, parentComponent));
+    			aksm.addKeyStoreManager(getDnieJavaKeyStoreManager(pssCallback, forceReset, parentComponent));
     		}
     		catch(final Exception e) {
     			// Se ignora
