@@ -21,12 +21,6 @@
 
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
-			<artifactId>afirma-util</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-crypto-core-pkcs7</artifactId>
 			<version>${project.version}</version>
 		</dependency>
