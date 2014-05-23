@@ -69,7 +69,6 @@ final class OOXMLZipHelper {
         return signedOOXMLOutputStream.toByteArray();
     }
 
-    @SuppressWarnings("restriction")
 	private static ZipOutputStream copyOOXMLContent(final byte[] ooXmlDocument,
     		                                        final String signatureZipEntryName,
     		                                        final OutputStream signedOOXMLOutputStream) throws IOException,

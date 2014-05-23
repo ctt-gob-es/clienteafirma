@@ -112,7 +112,6 @@ public final class RelationshipTransformService extends TransformService {
     }
 
     /** {@inheritDoc} */
-    @SuppressWarnings("restriction")
 	@Override
     public void init(final XMLStructure parent, final XMLCryptoContext context) throws InvalidAlgorithmParameterException {
 
