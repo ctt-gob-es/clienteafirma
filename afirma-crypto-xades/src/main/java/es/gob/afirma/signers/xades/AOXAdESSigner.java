@@ -285,7 +285,7 @@ public final class AOXAdESSigner implements AOSigner {
     static final String DETACHED_STYLE_ELEMENT_NAME = "STYLE"; //$NON-NLS-1$
 
     /** Algoritmo de huella digital por defecto para las referencias XML. */
-    static final String DIGEST_METHOD = DigestMethod.SHA1;
+    static final String DIGEST_METHOD = DigestMethod.SHA512;
 
     static final String STYLE_REFERENCE_PREFIX = "StyleReference-"; //$NON-NLS-1$
 
